@@ -51,6 +51,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Confirmar configuracion correcta de despliegue.
 - Crear base documental multi-agente.
 - Corregir encoding de la especificacion externa y alinearla con la documentacion operativa.
+- Reemplazar el README default por uno alineado a Greenhouse.
 
 ### Rama
 - Rama usada: `main`
@@ -64,6 +65,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `Handoff.md`
 - `changelog.md`
 - `project_context.md`
+- `README.md`
 - `../Greenhouse_Portal_Spec_v1.md`
 
 ### Verificacion
@@ -72,6 +74,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm build`: correcto
 - Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
+- Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
 
 ### Riesgos o pendientes
 - La ruta raiz depende de redirect desde `next.config.ts` hacia `/home`. Aun no existe `src/app/page.tsx`.

@@ -25,3 +25,4 @@
 - Se definio la logica operativa de ramas, promotion flow y uso de ambientes `Development`, `Preview` y `Production` con Vercel.
 - Se normalizo el encoding de `../Greenhouse_Portal_Spec_v1.md` para dejar la especificacion legible en UTF-8.
 - Se alineo la documentacion interna del repo con la especificacion funcional del portal Greenhouse.
+- Se reemplazo el `README.md` generico por documentacion real del proyecto Greenhouse.
