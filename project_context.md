@@ -35,6 +35,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `npx pnpm dev`
 - `npx pnpm build`
 - `npx pnpm lint`
+- `npx pnpm clean`
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz
@@ -88,7 +89,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `develop`:
   - rama de integracion compartida
   - debe usarse como entorno de prueba funcional del equipo
-  - debe asociarse al `Custom Environment` `Staging` en Vercel
+  - esta asociada al `Custom Environment` `staging` en Vercel
 - `feature/*` y `fix/*`:
   - ramas personales o por tarea
   - cada push debe validarse en `Preview`
@@ -135,7 +136,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
-- Estas variables aun no estan integradas al starter kit actual.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
+- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` aun no estan integradas al starter kit actual.
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
@@ -146,6 +148,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Usar `develop` como rama de `Staging` y `main` como rama de produccion.
 - Documentar toda decision que afecte layout, rutas, deploy o variables de entorno.
 - Mantener la politica de finales de linea en `LF` y evitar depender de conversiones automaticas de Git en Windows.
+- En Windows local, `build` usa un `distDir` dinamico bajo `.next-local/` para evitar fallos `EPERM` al reutilizar la misma salida dentro de OneDrive.
+- Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.

@@ -80,6 +80,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Evitar trabajar directo sobre `main`.
 - Evitar trabajar directo sobre `develop` salvo integracion, resolucion de conflictos o consolidacion final.
 - No hacer `commit` ni `push` hasta tener evidencia razonable de que el cambio esta sano.
+- No ejecutar en paralelo comandos Git que muten estado del repo, por ejemplo `git add`, `git commit`, `git merge` o `git push`.
 - Validacion minima esperada antes de `commit` o `push`:
   - `npx pnpm build`, o
   - `npx pnpm lint`, o

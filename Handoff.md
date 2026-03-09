@@ -55,6 +55,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Crear `develop` y documentar el flujo `Preview -> Staging -> Production`.
 - Montar el primer shell Greenhouse sobre el starter-kit.
 - Integrar la primera capa real de auth con `next-auth`.
+- Integrar el branding base real del portal en navegacion y favicon.
+- Corregir el flujo de limpieza local para evitar bloqueos de `.next` en Windows.
+- Corregir la operacion Git para evitar `index.lock` por comandos mutantes en paralelo.
 
 ### Rama
 - Rama usada: `feature/greenhouse-shell`
@@ -74,6 +77,11 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `package.json`
 - `pnpm-lock.yaml`
 - `project_context.md`
+- `package.json`
+- `tsconfig.json`
+- `scripts/clean-paths.mjs`
+- `scripts/run-next-build.mjs`
+- `scripts/run-next-start.mjs`
 - `README.md`
 - `.env.example`
 - `src/app/api/auth/[...nextauth]/route.ts`
@@ -94,6 +102,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `src/components/layout/vertical/FooterContent.tsx`
 - `src/components/layout/horizontal/FooterContent.tsx`
 - `src/@core/svg/Logo.tsx`
+- `public/branding/avatar.png`
+- `public/branding/logo-full.svg`
+- `public/branding/logo-negative.svg`
 - `../Greenhouse_Portal_Spec_v1.md`
 
 ### Verificacion
@@ -104,20 +115,27 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm build` sobre `feature/greenhouse-shell`: correcto con rutas `/dashboard`, `/proyectos`, `/sprints`, `/settings`
 - `npx pnpm add next-auth@4.24.13`: correcto
 - `npx pnpm build` con `next-auth` integrado: correcto
+- `npx pnpm build` con branding Greenhouse en navegacion y favicon: correcto
+- `npx pnpm build` ejecutado varias veces seguidas en Windows local con `distDir` dinamico: correcto
 - Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
 - Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
-- Documentacion de staging y custom environment: correcta a nivel de repo; falta configuracion manual en Vercel Dashboard
+- Documentacion de staging y custom environment: correcta y alineada con Vercel
 - `git config --local core.autocrlf false`: correcto
 - `git config --local core.eol lf`: correcto
 - `git add .gitattributes` y `git add .`: correctos, sin warnings `LF/CRLF`
+- Vercel CLI enlazado a `greenhouse-eo`: correcto
+- `staging` confirmado en Vercel y asociado a `develop`: correcto
+- Variables `GCP_PROJECT` y `GOOGLE_APPLICATION_CREDENTIALS_JSON` cargadas en `Development`, `staging` y `Production`: correcto
 
 ### Riesgos o pendientes
 - El shell Greenhouse actual usa datos mock y todavia no consume BigQuery.
 - Login ya autentica con `next-auth`, pero contra credenciales demo configurables por env.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
-- `Staging` aun no existe en Vercel hasta que se cree manualmente el `Custom Environment`.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
+- El branding actual usa assets temporales entregados por el usuario; falta reemplazo por versiones finales de diseno.
+- El repo sigue dentro de OneDrive; si otro proceso externo bloquea archivos, la limpieza ahora reintenta antes de fallar, pero no elimina el riesgo sistémico del sync.
+- En Windows local, `build` ya no reutiliza la misma carpeta de salida; `start` usa la ultima ruta registrada en `.next-build-dir`.
 - La configuracion Git local que evita warnings vive en `.git/config`; si otro agente trabaja en otra maquina y reaparecen avisos, debe revisar `core.autocrlf` contra `.gitattributes`.
 
 ### Proximo paso recomendado

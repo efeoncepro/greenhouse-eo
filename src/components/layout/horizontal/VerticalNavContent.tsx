@@ -71,7 +71,7 @@ const VerticalNavContent = ({ children }: ChildrenType) => {
     <>
       <NavHeader>
         <Link href='/'>
-          <Logo />
+          <Logo variant='sidebar' />
         </Link>
         <NavCollapseIcons
           lockedIcon={<i className='tabler-circle-dot text-xl' />}
