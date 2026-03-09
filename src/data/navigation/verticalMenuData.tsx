@@ -3,14 +3,24 @@ import type { VerticalMenuDataType } from '@/types/menuTypes'
 
 const verticalMenuData = (): VerticalMenuDataType[] => [
   {
-    label: 'Home',
-    href: '/home',
+    label: 'Dashboard',
+    href: '/dashboard',
     icon: 'tabler-smart-home'
   },
   {
-    label: 'About',
-    href: '/about',
-    icon: 'tabler-info-circle'
+    label: 'Proyectos',
+    href: '/proyectos',
+    icon: 'tabler-folders'
+  },
+  {
+    label: 'Sprints',
+    href: '/sprints',
+    icon: 'tabler-bolt'
+  },
+  {
+    label: 'Settings',
+    href: '/settings',
+    icon: 'tabler-settings'
   }
 ]
 

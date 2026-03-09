@@ -9,7 +9,7 @@ import { getServerMode } from '@core/utils/serverHelpers'
 
 export const metadata: Metadata = {
   title: 'Login',
-  description: 'Login to your account'
+  description: 'Sign in to the Greenhouse client portal.'
 }
 
 const LoginPage = async () => {

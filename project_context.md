@@ -38,19 +38,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz
 - `src/app/(dashboard)/layout.tsx`: layout principal autenticado o de dashboard
-- `src/app/(dashboard)/home/page.tsx`: home actual
-- `src/app/(dashboard)/about/page.tsx`: about actual
+- `src/app/(dashboard)/dashboard/page.tsx`: dashboard principal actual
+- `src/app/(dashboard)/proyectos/page.tsx`: vista base de proyectos
+- `src/app/(dashboard)/sprints/page.tsx`: vista base de sprints
+- `src/app/(dashboard)/settings/page.tsx`: vista base de settings
 - `src/app/(blank-layout-pages)/login/page.tsx`: login actual
 - `src/components/layout/**`: piezas del layout
 - `src/configs/**`: configuracion de tema y color
 - `src/data/navigation/**`: definicion de menu
 
 ## Estado de Rutas
-- Existe `/home`
-- Existe `/about`
+- Existe `/dashboard`
+- Existe `/proyectos`
+- Existe `/sprints`
+- Existe `/settings`
 - Existe `/login`
-- No existe `src/app/page.tsx`
-- La raiz `/` redirige a `/home` desde `next.config.ts`
+- Existe `src/app/page.tsx`
+- La raiz `/` redirige a `/dashboard`
+- `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
 
 ## Rutas Objetivo del Producto
 - `/dashboard`: dashboard principal con KPIs ICO
@@ -60,8 +65,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `/settings`: perfil y preferencias del cliente
 
 ## Brecha Actual vs Objetivo
-- El starter kit actual aun usa rutas demo (`/home`, `/about`, `/login`) y branding Vuexy.
-- Aun no existen rutas ni data flows del producto Greenhouse.
+- El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
+- Aun no existen data flows reales del producto Greenhouse.
 - No estan instaladas todavia las dependencias funcionales esperadas por la especificacion:
   - `next-auth`
   - `@google-cloud/bigquery`
@@ -138,12 +143,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Documentar toda decision que afecte layout, rutas, deploy o variables de entorno.
 
 ## Deuda Tecnica Visible
-- Falta una ruta raiz explicita `src/app/page.tsx`.
-- Branding y contenido siguen siendo mayormente de Vuexy.
-- El proyecto aun no refleja la identidad funcional final de Greenhouse.
+- El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - Falta implementar autenticacion multi-tenant.
 - Falta integrar BigQuery server-side.
-- Faltan las rutas de producto definidas en la especificacion.
+- Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

@@ -30,13 +30,15 @@ La documentación operativa interna del repo está en:
 
 Estado hoy:
 - base técnica funcionando en Vercel
-- starter kit de Vuexy todavía visible en varias rutas y componentes
+- shell Greenhouse ya visible en las rutas principales del portal
 - deploy operativo en `greenhouse-eo.vercel.app`
 - documentación multi-agente ya instalada
 
 Rutas actuales:
-- `/home`
-- `/about`
+- `/dashboard`
+- `/proyectos`
+- `/sprints`
+- `/settings`
 - `/login`
 
 Rutas objetivo del producto:
@@ -50,7 +52,7 @@ Brecha visible:
 - falta autenticación real con `NextAuth.js`
 - falta integración server-side con BigQuery
 - faltan API Routes de negocio
-- falta reemplazar branding y navegación demo por Greenhouse
+- el shell Greenhouse ya existe, pero aún usa data mock y no data real
 
 ## Stack
 

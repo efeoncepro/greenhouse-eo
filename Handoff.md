@@ -53,13 +53,14 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Corregir encoding de la especificacion externa y alinearla con la documentacion operativa.
 - Reemplazar el README default por uno alineado a Greenhouse.
 - Crear `develop` y documentar el flujo `Preview -> Staging -> Production`.
+- Montar el primer shell Greenhouse sobre el starter-kit.
 
 ### Rama
-- Rama usada: `main`
-- Rama objetivo del merge: no aplica para este turno inicial
+- Rama usada: `feature/greenhouse-shell`
+- Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
-- Production para el deploy operativo actual
+- Preview de feature branch y luego `Staging`
 
 ### Archivos tocados
 - `.gitignore`
@@ -67,8 +68,23 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `CONTRIBUTING.md`
 - `Handoff.md`
 - `changelog.md`
+- `next.config.ts`
 - `project_context.md`
 - `README.md`
+- `src/app/page.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/proyectos/page.tsx`
+- `src/app/(dashboard)/sprints/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `src/configs/themeConfig.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/*`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/@core/svg/Logo.tsx`
 - `../Greenhouse_Portal_Spec_v1.md`
 
 ### Verificacion
@@ -76,19 +92,21 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `git checkout -b develop` y `git push -u origin develop`: correcto
 - `npx pnpm install --frozen-lockfile`: correcto
 - `npx pnpm build`: correcto
+- `npx pnpm build` sobre `feature/greenhouse-shell`: correcto con rutas `/dashboard`, `/proyectos`, `/sprints`, `/settings`
 - Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
 - Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
 - Documentacion de staging y custom environment: correcta a nivel de repo; falta configuracion manual en Vercel Dashboard
 
 ### Riesgos o pendientes
-- La ruta raiz depende de redirect desde `next.config.ts` hacia `/home`. Aun no existe `src/app/page.tsx`.
-- El repo sigue mostrando branding base de Vuexy; la adaptacion a Greenhouse aun no empieza.
+- El shell Greenhouse actual usa datos mock y todavia no consume BigQuery.
+- Login sigue siendo una entrada demo sin auth real.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - `Staging` aun no existe en Vercel hasta que se cree manualmente el `Custom Environment`.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 
 ### Proximo paso recomendado
-- Crear una ruta raiz explicita `src/app/page.tsx` para no depender solo del redirect.
-- Iniciar reemplazo progresivo de branding, menu, layouts y pantallas hacia Greenhouse segun `../Greenhouse_Portal_Spec_v1.md`.
+- Implementar `next-auth` y proteger las rutas del dashboard.
+- Crear las primeras API routes server-side para KPIs y proyectos.
+- Conectar el shell actual a datos reales de BigQuery.
 - Crear en Vercel el `Custom Environment` `Staging`, asociarlo a `develop` y, si aplica, enlazar `dev.greenhouse.efeonce.com`.

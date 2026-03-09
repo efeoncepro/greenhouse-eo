@@ -17,8 +17,10 @@
 
 ### Proyecto
 - Se valido que el build local funciona con `npx pnpm build`.
-- Se confirmaron rutas activas de app: `/home`, `/about`, `/login`.
-- La ruta `/` actualmente redirige a `/home` via `next.config.ts`.
+- Se redefinio el shell principal del producto con rutas `/dashboard`, `/proyectos`, `/sprints`, `/settings` y `/login`.
+- La ruta `/` ahora redirige a `/dashboard`.
+- `/home` y `/about` quedaron como redirects de compatibilidad.
+- Se reemplazaron menu, branding base, footer, logo, login y dropdown para reflejar Greenhouse en lugar de la demo de Vuexy.
 
 ### Documentacion Operativa
 - Se agregaron `AGENTS.md`, `Handoff.md`, `changelog.md` y `project_context.md` para coordinacion multi-agente.
