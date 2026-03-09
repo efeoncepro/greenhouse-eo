@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // MUI Imports
+import Alert from '@mui/material/Alert'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -18,8 +19,10 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 // Third-party Imports
 import classnames from 'classnames'
+import { signIn } from 'next-auth/react'
 
 // Type Imports
+import type { ChangeEvent, FormEvent } from 'react'
 import type { SystemMode } from '@core/types'
 
 // Component Imports
@@ -59,6 +62,10 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [email, setEmail] = useState('client.portal@efeonce.com')
+  const [password, setPassword] = useState('greenhouse-demo')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
@@ -82,6 +89,29 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   )
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+    setError('')
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: themeConfig.homePageUrl
+    })
+
+    if (result?.error) {
+      setError('Invalid credentials. Use the demo access shown below or configure env-based credentials.')
+      setIsSubmitting(false)
+
+      return
+    }
+
+    router.replace(themeConfig.homePageUrl)
+    router.refresh()
+  }
 
   return (
     <div className='flex bs-full justify-center'>
@@ -113,22 +143,24 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               Sign in to review delivery health, sprint momentum, and project visibility for your team.
             </Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            onSubmit={e => {
-              e.preventDefault()
-              router.push('/dashboard')
-            }}
-            className='flex flex-col gap-5'
-          >
-            <CustomTextField autoFocus fullWidth label='Work Email' placeholder='name@company.com' />
+          <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
+            {error && <Alert severity='error'>{error}</Alert>}
+            <CustomTextField
+              autoFocus
+              fullWidth
+              label='Work Email'
+              placeholder='name@company.com'
+              value={email}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+            />
             <CustomTextField
               fullWidth
               label='Password'
               placeholder='Enter your password'
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
+              value={password}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -142,21 +174,27 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               }}
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label='Keep me signed in' />
+              <FormControlLabel control={<Checkbox defaultChecked />} label='Keep me signed in' />
               <Typography className='text-end' color='primary.main' component={Link}>
                 Need access?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Enter portal
+            <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Enter portal'}
             </Button>
             <div className='rounded border border-dashed p-4'>
               <Typography variant='body2' className='font-medium'>
                 Demo access
               </Typography>
               <Typography variant='body2' color='text.secondary'>
-                This shell is prepared for client auth and BigQuery-backed dashboards. Use any values locally until auth
-                is wired.
+                Email: <strong>client.portal@efeonce.com</strong>
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Password: <strong>greenhouse-demo</strong>
+              </Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                You can override these defaults with `DEMO_CLIENT_EMAIL`, `DEMO_CLIENT_PASSWORD`, and
+                `DEMO_CLIENT_NAME`.
               </Typography>
             </div>
           </form>

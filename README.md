@@ -49,9 +49,9 @@ Rutas objetivo del producto:
 - `/settings`
 
 Brecha visible:
-- falta autenticación real con `NextAuth.js`
 - falta integración server-side con BigQuery
 - faltan API Routes de negocio
+- la autenticación actual usa credenciales demo y aún no consume un origen real de clientes
 - el shell Greenhouse ya existe, pero aún usa data mock y no data real
 
 ## Stack
@@ -119,6 +119,10 @@ npx pnpm lint
 Actuales en `.env.example`:
 - `NEXT_PUBLIC_APP_URL`
 - `BASEPATH`
+- `NEXTAUTH_SECRET`
+- `DEMO_CLIENT_EMAIL`
+- `DEMO_CLIENT_PASSWORD`
+- `DEMO_CLIENT_NAME`
 
 Objetivo funcional:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`

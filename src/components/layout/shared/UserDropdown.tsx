@@ -7,6 +7,9 @@ import type { MouseEvent } from 'react'
 // Next Imports
 import { useRouter } from 'next/navigation'
 
+// Third-party Imports
+import { signOut, useSession } from 'next-auth/react'
+
 // MUI Imports
 import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
@@ -38,6 +41,7 @@ const UserDropdown = () => {
   const anchorRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { settings } = useSettings()
+  const { data: session } = useSession()
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
@@ -56,7 +60,7 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    router.push('/login')
+    await signOut({ callbackUrl: '/login' })
   }
 
   return (
@@ -98,9 +102,9 @@ const UserDropdown = () => {
                     <Avatar alt='Greenhouse Workspace' src='/images/avatars/1.png' />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        Greenhouse Demo
+                        {session?.user?.name || 'Greenhouse Demo'}
                       </Typography>
-                      <Typography variant='caption'>client.portal@efeonce.com</Typography>
+                      <Typography variant='caption'>{session?.user?.email || 'client.portal@efeonce.com'}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />

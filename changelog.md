@@ -21,6 +21,7 @@
 - La ruta `/` ahora redirige a `/dashboard`.
 - `/home` y `/about` quedaron como redirects de compatibilidad.
 - Se reemplazaron menu, branding base, footer, logo, login y dropdown para reflejar Greenhouse en lugar de la demo de Vuexy.
+- Se agrego `next-auth` con `CredentialsProvider`, proteccion base del dashboard, redirect de guest/authenticated y logout real.
 
 ### Documentacion Operativa
 - Se agregaron `AGENTS.md`, `Handoff.md`, `changelog.md` y `project_context.md` para coordinacion multi-agente.

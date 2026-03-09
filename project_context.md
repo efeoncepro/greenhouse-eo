@@ -67,10 +67,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
 - Aun no existen data flows reales del producto Greenhouse.
-- No estan instaladas todavia las dependencias funcionales esperadas por la especificacion:
-  - `next-auth`
-  - `@google-cloud/bigquery`
-- Aun no existe capa de autenticacion real ni API routes de negocio.
+- `next-auth` ya esta integrado con credenciales demo, session JWT y proteccion base del dashboard.
+- `@google-cloud/bigquery` aun no esta integrado.
+- Aun no existen API routes de negocio para datos reales del portal.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -123,6 +122,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `.env.example` define:
   - `NEXT_PUBLIC_APP_URL`
   - `BASEPATH`
+  - `NEXTAUTH_SECRET`
+  - `DEMO_CLIENT_EMAIL`
+  - `DEMO_CLIENT_PASSWORD`
+  - `DEMO_CLIENT_NAME`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
@@ -144,7 +147,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
-- Falta implementar autenticacion multi-tenant.
+- La autenticacion actual es demo y debe reemplazarse por modelo multi-tenant real.
 - Falta integrar BigQuery server-side.
 - Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
 

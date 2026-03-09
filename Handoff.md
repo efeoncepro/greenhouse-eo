@@ -54,6 +54,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Reemplazar el README default por uno alineado a Greenhouse.
 - Crear `develop` y documentar el flujo `Preview -> Staging -> Production`.
 - Montar el primer shell Greenhouse sobre el starter-kit.
+- Integrar la primera capa real de auth con `next-auth`.
 
 ### Rama
 - Rama usada: `feature/greenhouse-shell`
@@ -69,8 +70,15 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `Handoff.md`
 - `changelog.md`
 - `next.config.ts`
+- `package.json`
+- `pnpm-lock.yaml`
 - `project_context.md`
 - `README.md`
+- `.env.example`
+- `src/app/api/auth/[...nextauth]/route.ts`
+- `src/lib/auth.ts`
+- `src/components/auth/AuthSessionProvider.tsx`
+- `src/types/next-auth.d.ts`
 - `src/app/page.tsx`
 - `src/app/(dashboard)/dashboard/page.tsx`
 - `src/app/(dashboard)/proyectos/page.tsx`
@@ -93,6 +101,8 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm install --frozen-lockfile`: correcto
 - `npx pnpm build`: correcto
 - `npx pnpm build` sobre `feature/greenhouse-shell`: correcto con rutas `/dashboard`, `/proyectos`, `/sprints`, `/settings`
+- `npx pnpm add next-auth@4.24.13`: correcto
+- `npx pnpm build` con `next-auth` integrado: correcto
 - Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
 - Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
@@ -100,13 +110,13 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Riesgos o pendientes
 - El shell Greenhouse actual usa datos mock y todavia no consume BigQuery.
-- Login sigue siendo una entrada demo sin auth real.
+- Login ya autentica con `next-auth`, pero contra credenciales demo configurables por env.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - `Staging` aun no existe en Vercel hasta que se cree manualmente el `Custom Environment`.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 
 ### Proximo paso recomendado
-- Implementar `next-auth` y proteger las rutas del dashboard.
 - Crear las primeras API routes server-side para KPIs y proyectos.
+- Reemplazar la validacion demo por modelo multi-tenant real de clientes.
 - Conectar el shell actual a datos reales de BigQuery.
 - Crear en Vercel el `Custom Environment` `Staging`, asociarlo a `develop` y, si aplica, enlazar `dev.greenhouse.efeonce.com`.
