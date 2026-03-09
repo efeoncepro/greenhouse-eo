@@ -83,7 +83,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `develop`:
   - rama de integracion compartida
   - debe usarse como entorno de prueba funcional del equipo
-  - su deploy ocurre en `Preview`
+  - debe asociarse al `Custom Environment` `Staging` en Vercel
 - `feature/*` y `fix/*`:
   - ramas personales o por tarea
   - cada push debe validarse en `Preview`
@@ -98,19 +98,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 3. Validar localmente con `npx pnpm build`, `npx pnpm lint` o prueba manual suficiente.
 4. Hacer push de la rama y revisar su Preview Deployment en Vercel cuando el cambio afecte UI, rutas, layout o variables.
 5. Mergear a `develop` cuando el cambio ya este sano en su preview individual.
-6. Hacer validacion compartida sobre `develop`.
+6. Hacer validacion compartida sobre `Staging` asociado a `develop`.
 7. Mergear a `main` solo cuando el cambio este listo para produccion.
 8. Confirmar deploy a `Production` en Vercel.
 
 ## Regla de Entornos
 - `Development`: uso local de cada agente
-- `Preview`: validacion remota de ramas de trabajo y de `develop`
+- `Preview`: validacion remota de ramas de trabajo
+- `Staging`: entorno persistente controlado asociado a `develop`
 - `Production`: estado estable accesible para usuarios finales
 
 ## Regla de Variables en Vercel
 - Toda variable debe definirse conscientemente por ambiente.
-- No asumir que una variable de `Preview` existe en `Production`, ni al reves.
-- Si una feature necesita variable nueva, primero debe existir en `Preview` antes de promocionarse a `main`.
+- No asumir que una variable de `Preview` o `Staging` existe en `Production`, ni al reves.
+- Si una feature necesita variable nueva, primero debe existir en `Preview` y `Staging` antes de promocionarse a `main`.
 - Mantener `.env.example` alineado con las variables requeridas.
 
 ## Variables de Entorno
@@ -133,7 +134,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Usar `../Greenhouse_Portal_Spec_v1.md` como especificacion funcional principal.
 - No versionar `full-version` como parte de este repo.
 - Favorecer despliegues frecuentes y verificables en Vercel.
-- Usar `develop` como rama de prueba compartida y `main` como rama de produccion.
+- Usar `develop` como rama de `Staging` y `main` como rama de produccion.
 - Documentar toda decision que afecte layout, rutas, deploy o variables de entorno.
 
 ## Deuda Tecnica Visible

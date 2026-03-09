@@ -152,7 +152,7 @@ Nota operativa:
 
 Ramas:
 - `main`: producción
-- `develop`: integración y prueba compartida
+- `develop`: integración y staging compartido
 - `feature/*`, `fix/*`, `docs/*`: trabajo aislado por agente
 - `hotfix/*`: correcciones de producción
 
@@ -162,7 +162,7 @@ Camino normal:
 3. Validar con `npx pnpm build`, `npx pnpm lint` o validación manual suficiente.
 4. Hacer push y revisar Preview Deployment en Vercel si el cambio afecta UI, rutas, layout o deploy.
 5. Mergear a `develop`.
-6. Validar en entorno compartido.
+6. Validar en `Staging`.
 7. Mergear a `main`.
 8. Confirmar deploy a `Production`.
 

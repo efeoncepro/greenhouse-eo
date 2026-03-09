@@ -52,6 +52,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Crear base documental multi-agente.
 - Corregir encoding de la especificacion externa y alinearla con la documentacion operativa.
 - Reemplazar el README default por uno alineado a Greenhouse.
+- Crear `develop` y documentar el flujo `Preview -> Staging -> Production`.
 
 ### Rama
 - Rama usada: `main`
@@ -61,7 +62,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Production para el deploy operativo actual
 
 ### Archivos tocados
+- `.gitignore`
 - `AGENTS.md`
+- `CONTRIBUTING.md`
 - `Handoff.md`
 - `changelog.md`
 - `project_context.md`
@@ -70,18 +73,22 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Verificacion
 - `git push -u origin main --force`: correcto
+- `git checkout -b develop` y `git push -u origin develop`: correcto
 - `npx pnpm install --frozen-lockfile`: correcto
 - `npx pnpm build`: correcto
 - Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
 - Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
+- Documentacion de staging y custom environment: correcta a nivel de repo; falta configuracion manual en Vercel Dashboard
 
 ### Riesgos o pendientes
 - La ruta raiz depende de redirect desde `next.config.ts` hacia `/home`. Aun no existe `src/app/page.tsx`.
 - El repo sigue mostrando branding base de Vuexy; la adaptacion a Greenhouse aun no empieza.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
+- `Staging` aun no existe en Vercel hasta que se cree manualmente el `Custom Environment`.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 
 ### Proximo paso recomendado
 - Crear una ruta raiz explicita `src/app/page.tsx` para no depender solo del redirect.
 - Iniciar reemplazo progresivo de branding, menu, layouts y pantallas hacia Greenhouse segun `../Greenhouse_Portal_Spec_v1.md`.
+- Crear en Vercel el `Custom Environment` `Staging`, asociarlo a `develop` y, si aplica, enlazar `dev.greenhouse.efeonce.com`.

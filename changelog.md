@@ -26,3 +26,5 @@
 - Se normalizo el encoding de `../Greenhouse_Portal_Spec_v1.md` para dejar la especificacion legible en UTF-8.
 - Se alineo la documentacion interna del repo con la especificacion funcional del portal Greenhouse.
 - Se reemplazo el `README.md` generico por documentacion real del proyecto Greenhouse.
+- Se creo la rama `develop` y se dejo documentado el flujo `Preview -> Staging -> Production`.
+- Se agrego `CONTRIBUTING.md` con el flujo de colaboracion y se reforzo `.gitignore` para secretos locales.

@@ -64,7 +64,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 ### Branching y commits
 - `main` es solo para codigo listo para produccion.
-- `develop` debe funcionar como rama de integracion y prueba compartida.
+- `develop` debe funcionar como rama de integracion y rama asociada a `Staging` en Vercel.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
 - Formato recomendado de ramas:
   - `feature/<owner>-<tema>`
@@ -94,6 +94,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - `develop`:
   - integra trabajo ya validado en preview individual
   - es la rama de prueba compartida del proyecto
+  - debe mapear al `Custom Environment` `Staging` en Vercel
   - debe mantenerse funcional y demostrable
 - `main`:
   - refleja el estado productivo
@@ -119,20 +120,21 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 ### Ambientes y Vercel
 - `Production` en Vercel debe estar asociado a `main`.
+- `Staging` en Vercel debe ser un `Custom Environment` asociado a `develop`.
 - `Preview` en Vercel debe usarse para:
   - ramas `feature/*`
   - ramas `fix/*`
-  - rama `develop`
   - ramas `hotfix/*` antes de promocion
-- Si se define un dominio o alias de QA, debe apuntar a `develop`, no a ramas personales.
+- Si se define un dominio de staging, debe apuntar al `Custom Environment` de `develop`, no a ramas personales.
 - No usar Production como entorno de prueba manual.
 
 ### Variables por ambiente
 - Separar variables en Vercel por entorno:
   - `Development`: trabajo local
-  - `Preview`: feature branches, fix branches, develop y hotfix
+  - `Preview`: feature branches, fix branches y hotfix
+  - `Staging`: branch `develop`
   - `Production`: solo main
-- No crear una variable solo en Production si el cambio necesita validacion previa en Preview.
+- No crear una variable solo en Production si el cambio necesita validacion previa en Preview o Staging.
 - Toda variable nueva debe indicar:
   - nombre
   - proposito
@@ -144,7 +146,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - rama de trabajo
   - Preview Deployment
   - merge a `develop`
-  - validacion compartida
+  - validacion compartida en `Staging`
   - merge a `main`
   - deploy a Production
 - Si un cambio no paso por ese camino, debe existir razon explicita en `Handoff.md`.
