@@ -64,6 +64,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Preview de feature branch y luego `Staging`
 
 ### Archivos tocados
+- `.gitattributes`
 - `.gitignore`
 - `AGENTS.md`
 - `CONTRIBUTING.md`
@@ -107,6 +108,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
 - Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
 - Documentacion de staging y custom environment: correcta a nivel de repo; falta configuracion manual en Vercel Dashboard
+- `git config --local core.autocrlf false`: correcto
+- `git config --local core.eol lf`: correcto
+- `git add .gitattributes` y `git add .`: correctos, sin warnings `LF/CRLF`
 
 ### Riesgos o pendientes
 - El shell Greenhouse actual usa datos mock y todavia no consume BigQuery.
@@ -114,6 +118,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - `Staging` aun no existe en Vercel hasta que se cree manualmente el `Custom Environment`.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
+- La configuracion Git local que evita warnings vive en `.git/config`; si otro agente trabaja en otra maquina y reaparecen avisos, debe revisar `core.autocrlf` contra `.gitattributes`.
 
 ### Proximo paso recomendado
 - Crear las primeras API routes server-side para KPIs y proyectos.

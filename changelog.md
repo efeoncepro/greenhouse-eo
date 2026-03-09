@@ -31,3 +31,7 @@
 - Se reemplazo el `README.md` generico por documentacion real del proyecto Greenhouse.
 - Se creo la rama `develop` y se dejo documentado el flujo `Preview -> Staging -> Production`.
 - Se agrego `CONTRIBUTING.md` con el flujo de colaboracion y se reforzo `.gitignore` para secretos locales.
+
+### Calidad de Repositorio
+- Se agrego `.gitattributes` para fijar finales de linea `LF` en archivos de texto y reducir warnings recurrentes de `LF/CRLF` en Windows.
+- Se verifico el staging de Git sin warnings de conversion despues de ajustar la politica local de `EOL`.

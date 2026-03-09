@@ -21,6 +21,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+- `.gitattributes` fija archivos de texto en `LF` para estabilizar el trabajo en Windows
 
 ## Target Definido por la Especificacion
 - Portal de clientes multi-tenant para Efeonce Greenhouse
@@ -144,6 +145,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Favorecer despliegues frecuentes y verificables en Vercel.
 - Usar `develop` como rama de `Staging` y `main` como rama de produccion.
 - Documentar toda decision que afecte layout, rutas, deploy o variables de entorno.
+- Mantener la politica de finales de linea en `LF` y evitar depender de conversiones automaticas de Git en Windows.
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.

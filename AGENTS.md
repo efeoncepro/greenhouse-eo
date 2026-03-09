@@ -60,6 +60,12 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
 - No usar estos documentos como dumping ground. Deben quedar legibles.
 
+### 8. Regla de line endings
+- El repositorio debe versionar archivos de texto con finales de linea `LF`.
+- Mantener `.gitattributes` como fuente de verdad para la politica de `EOL`.
+- No forzar conversiones masivas a `CRLF`.
+- Si reaparecen warnings de `LF/CRLF`, revisar primero `.gitattributes` y la configuracion local de `core.autocrlf`.
+
 ## Convenciones de Trabajo
 
 ### Branching y commits
