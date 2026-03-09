@@ -3,6 +3,11 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Especificacion Fuente
+- Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
+- Ese markdown define el target funcional del portal y debe usarse como referencia primaria de producto.
+- Si existe conflicto entre el estado actual del starter kit y la especificacion, prevalece la especificacion como norte de implementacion salvo decision documentada.
+
 ## Alcance del Repositorio
 - Este repositorio contiene solo `starter-kit`.
 - La carpeta `full-version` existe fuera de este repo como referencia de contexto, referencia visual y referencia funcional.
@@ -16,6 +21,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+
+## Target Definido por la Especificacion
+- Portal de clientes multi-tenant para Efeonce Greenhouse
+- BigQuery como fuente principal de datos consumida server-side
+- NextAuth.js para autenticacion
+- API Routes en App Router para exponer datos filtrados por cliente
+- Dominio objetivo final: `greenhouse.efeonce.com`
 
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
@@ -39,6 +51,21 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/login`
 - No existe `src/app/page.tsx`
 - La raiz `/` redirige a `/home` desde `next.config.ts`
+
+## Rutas Objetivo del Producto
+- `/dashboard`: dashboard principal con KPIs ICO
+- `/proyectos`: lista de proyectos del cliente
+- `/proyectos/[id]`: detalle de proyecto con tareas y sprint
+- `/sprints`: vista de sprints y velocidad
+- `/settings`: perfil y preferencias del cliente
+
+## Brecha Actual vs Objetivo
+- El starter kit actual aun usa rutas demo (`/home`, `/about`, `/login`) y branding Vuexy.
+- Aun no existen rutas ni data flows del producto Greenhouse.
+- No estan instaladas todavia las dependencias funcionales esperadas por la especificacion:
+  - `next-auth`
+  - `@google-cloud/bigquery`
+- Aun no existe capa de autenticacion real ni API routes de negocio.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -93,9 +120,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
+## Variables de Entorno Objetivo
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `GCP_PROJECT`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- Estas variables aun no estan integradas al starter kit actual.
+
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
 - Usar `full-version` como fuente de contexto y referencia para construir la version Greenhouse dentro de `starter-kit`.
+- Usar `../Greenhouse_Portal_Spec_v1.md` como especificacion funcional principal.
 - No versionar `full-version` como parte de este repo.
 - Favorecer despliegues frecuentes y verificables en Vercel.
 - Usar `develop` como rama de prueba compartida y `main` como rama de produccion.
@@ -105,6 +140,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Falta una ruta raiz explicita `src/app/page.tsx`.
 - Branding y contenido siguen siendo mayormente de Vuexy.
 - El proyecto aun no refleja la identidad funcional final de Greenhouse.
+- Falta implementar autenticacion multi-tenant.
+- Falta integrar BigQuery server-side.
+- Faltan las rutas de producto definidas en la especificacion.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
