@@ -176,3 +176,6 @@
   - Nueva ruta ` /admin/tenants/[id]/view-as/dashboard`.
   - La vista renderiza el dashboard real del tenant dentro de un preview admin con banner y retorno al detalle del tenant.
   - Validado con `npx pnpm lint` y `npx pnpm build`.
+- Se agrego `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` para fijar el sistema visual ejecutivo reusable del producto.
+- Quedo alineado en README, arquitectura, backlog, matriz, contexto y handoff que el siguiente trabajo prioritario del dashboard es migrarlo a ese sistema reusable.
+- Se fijo como regla que Vuexy analytics es referencia de jerarquia y composicion, no fuente para copiar branding, paleta ni semantica demo.

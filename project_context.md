@@ -15,6 +15,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
 - Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
 - Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -42,6 +43,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
 - En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
 - Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
+- Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -137,6 +139,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side, usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion, y ahora compone hero/cards segun `businessLines` y `serviceModules`.
+- El siguiente trabajo sobre `/dashboard` no es sumar widgets ad hoc sino migrarlo al `Executive UI System` reusable para mejorar jerarquia, densidad y composicion sin cambiar la semantica de datos primero.
 - Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
@@ -163,6 +166,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - ya existen en `/dashboard` secciones reusables de quality, account team, capacity inicial, herramientas tecnologicas y AI tools
 - esas secciones mezclan señal real de BigQuery, nombres detectados desde Notion, defaults por `serviceModules` y overrides controlados por tenant
 - sigue pendiente formalizar APIs y modelos fuente para que dejen de depender de fallback u overrides
+- la siguiente iteracion de UI debe dejar de tratar cada seccion como una card aislada y converger hacia familias reusables de hero, mini stat, chart, list y table cards
 
 ## Deploy
 - Hosting principal: Vercel
@@ -266,6 +270,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.
+- Falta aterrizar completamente el sistema ejecutivo reusable en runtime para que `/dashboard`, `/equipo`, `/campanas` e internal/admin compartan un mismo lenguaje visual.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

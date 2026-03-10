@@ -45,6 +45,32 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Agente
 - Codex
 
+## 2026-03-10 - Executive UI system documentation baseline
+
+### Objetivo del turno
+- Documentar el sistema visual ejecutivo reusable que debe guiar la siguiente iteracion del dashboard y futuras superficies Greenhouse.
+- Alinear la documentacion viva para que el rediseño no derive en cards ad hoc ni en copias directas de Vuexy.
+
+### Cambios aplicados
+- Se agrego `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` como contrato de:
+  - jerarquia visual
+  - familias de cards ejecutivas
+  - reglas de composicion
+  - limites de reutilizacion de Vuexy
+- Se alinearon `README.md`, `GREENHOUSE_ARCHITECTURE_V1.md`, `BACKLOG.md`, `PHASE_TASK_MATRIX.md` y `project_context.md` para que el siguiente paso prioritario sea migrar `/dashboard` a ese sistema reusable.
+
+### Verificacion
+- Revision manual de consistencia documental sobre:
+  - arquitectura
+  - backlog
+  - matriz de fases
+  - contexto operativo
+  - referencias Vuexy
+
+### Riesgos o pendientes
+- Todavia no hay cambio runtime en este bloque; solo base documental.
+- El siguiente paso correcto es commit documental y luego implementacion del refactor visual reusable en `/dashboard`.
+
 ## 2026-03-10 - Sky reusable dashboard capabilities
 
 ### Objetivo del turno

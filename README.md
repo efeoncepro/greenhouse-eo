@@ -20,6 +20,7 @@ La documentacion operativa interna del repo esta en:
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 - `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - `PHASE_TASK_MATRIX.md`
 - `GREENHOUSE_SERVICE_MODULES_V1.md`
@@ -62,6 +63,7 @@ Ese documento define:
 - No se debe subir `full-version` a este repositorio.
 - Si se toman componentes desde `full-version`, deben adaptarse al contexto Greenhouse antes de integrarse.
 - Los componentes UI reutilizables propios de Greenhouse deben vivir en `src/components/greenhouse/*`; las vistas deben consumir esa capa antes de crear JSX ad hoc por modulo.
+- El sistema visual ejecutivo reusable del producto queda definido en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` y toma a Vuexy como referencia compositiva, no como fuente de pantallas para copiar.
 
 ## Estado Actual
 
@@ -141,7 +143,8 @@ Iniciativa activa documentada:
 - En este momento, `on-time` mensual, tenure y entregables/ajustes por mes ya quedaron implementados sobre datos reales.
 - Tambien quedaron implementadas secciones reusables de account team, capacity inicial, tooling tecnologico, tooling AI y calidad mensual.
 - `RpA` mensual y `First-Time Right` pueden mostrarse desde la misma capa reusable, pero hoy mezclan dato medido con fallback seedado cuando la fuente real no es defendible.
-- El siguiente paso no es volver a diseñar la UI sino formalizar APIs y modelos fuente para team/capacity, quality y tooling.
+- El siguiente paso del dashboard es migrar la composicion actual al `Executive UI System` reusable documentado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+- En paralelo, sigue pendiente formalizar APIs y modelos fuente para team/capacity, quality y tooling.
 
 ## Stack
 
@@ -368,9 +371,9 @@ Regla de componentes Greenhouse:
 
 ## Proximos Pasos Recomendados
 
-1. Validar visualmente el nuevo slice de Sky en `/dashboard`.
-2. Construir `/admin/scopes` y `/admin/feature-flags`.
-3. Agregar `/api/sprints` y la vista real de `/sprints`.
-4. Extender `serviceModules` a navegacion y billing.
-5. Modelar `team/capacity` antes de exponer equipo asignado.
-6. Corregir la calidad de RpA antes de habilitar `First-Time Right`.
+1. Migrar `/dashboard` al `Executive UI System` reusable documentado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+2. Validar visualmente el nuevo slice de Sky en `/dashboard`.
+3. Construir `/admin/scopes` y `/admin/feature-flags`.
+4. Agregar `/api/sprints` y la vista real de `/sprints`.
+5. Extender `serviceModules` a navegacion y billing.
+6. Modelar `team/capacity` antes de exponer equipo asignado como API formal.

@@ -87,6 +87,8 @@ Status:
 
 Open activities:
 - review and promote the new executive dashboard through `Preview`, `staging` and `Production`
+- refactor `/dashboard` to the reusable `Executive UI System` documented in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- create reusable executive card families in `src/components/greenhouse/*`
 - add `/api/dashboard/capacity` once team and staffing data are modeled
 - add `/api/dashboard/market-speed` when time fields become numerically reliable
 - add campaign-aware slices once `/campanas` exists
@@ -211,6 +213,7 @@ Current adaptation rule:
 ### N0.1 Promotion and Documentation Alignment
 
 - keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
+- keep `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` aligned with runtime reality
 - align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
 - validate dashboard and admin surfaces in `Preview` or `staging` before the next promotion to `main`
 
@@ -218,6 +221,8 @@ Current adaptation rule:
 
 - avoid recomputing the same overview payload when only one slice needs refresh
 - decide if tenant-level cache is safe for summary, charts, and risks
+- stop adding one-off cards and migrate the current dashboard to the reusable executive card hierarchy
+- make `/dashboard` visually closer to Vuexy analytics in hierarchy, density, and chart framing while keeping Greenhouse semantics and brand
 
 ### N2.2 Sky tenant dashboard slice
 
@@ -234,6 +239,12 @@ Current adaptation rule:
 - next:
 - validate the Sky slice visually in the dashboard
 - formalize source models and APIs for team/capacity, tooling, and quality
+
+### N2.3 Executive UI System rollout
+
+- use `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` as UI contract
+- introduce reusable wrappers for hero, mini stat, chart, list, and table cards
+- keep tenant-specific emphasis in config and payload capabilities, not in custom JSX per client
 
 ### N7.1 Governance Surfaces
 
@@ -302,6 +313,7 @@ Can move in parallel after access schema exists:
 - add audit logging for auth events and admin actions
 - add observability for failed auth, failed queries, and empty-state anomalies
 - move repeated metric logic into semantic query functions or marts
+- move repeated executive card layout patterns into `src/components/greenhouse/*` before extending `/equipo`, `/campanas`, or internal overviews
 
 ## Done Already
 
