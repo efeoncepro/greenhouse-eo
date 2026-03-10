@@ -65,7 +65,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
 - Greenhouse tambien debe componer vistas y charts segun linea de negocio y servicios contratados del cliente.
 - Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
-- El centro del producto debe pasar a ser `/dashboard` y luego `/equipo` y `/campanas`.
+- El centro actual del producto ya es `/dashboard`; las siguientes capas objetivo son `/equipo` y `/campanas`.
 
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
@@ -149,7 +149,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene lista, roles y detalle de usuario; falta mutacion segura de tenants, scopes y feature flags.
-- Falta modelar `serviceModules` en tenant context para condicionar navegacion, dashboard y billing por servicio contratado.
+- Falta consumir `serviceModules` para condicionar navegacion, dashboard y billing por servicio contratado.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -249,7 +249,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
 - El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
-- Faltan sprints reales, dashboard charts y los data flows restantes definidos en la especificacion.
+- Faltan sprints reales, composicion del dashboard por `serviceModules`, `capacity`, `market-speed` y los data flows restantes definidos en la especificacion.
 - Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.

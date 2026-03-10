@@ -122,3 +122,9 @@
 - Smoke BigQuery de Fase 2:
   - scope bootstrap cliente `hubspot-company-30825221458`: correcto
   - helper `get-dashboard-overview` devolviendo KPIs, charts y proyectos bajo atencion: correcto
+
+### Documentacion Operativa
+- Se alinearon `README.md`, `BACKLOG.md` y `project_context.md` con el estado real de `feature/executive-dashboard-phase2`.
+- Se retiro de esos artefactos el lenguaje que aun trataba auth y dashboard como trabajo futuro cuando ya existen en runtime.
+- Se dejo explicitado que la siguiente promocion valida depende de revisar `Preview` antes de mergear a `develop`.
+- Se verifico la alias de Preview de `feature/executive-dashboard-phase2` con `vercel inspect` y `vercel curl` sobre `/login`, `/api/auth/csrf`, `/dashboard` y `/admin/users`.

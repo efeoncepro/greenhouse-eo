@@ -119,7 +119,7 @@ Rutas objetivo del producto:
 
 Brecha visible:
 - la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero esos contactos siguen en estado `invited` hasta que exista onboarding real
-- el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
+- el dashboard ya es la home ejecutiva actual del portal, pero aun falta composicion por `serviceModules`, `capacity`, `market-speed` y slices de campanas
 - faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
@@ -345,8 +345,8 @@ Service modules:
 
 ## Proximos Pasos Recomendados
 
-1. Definir `client_users`, roles y scopes como siguiente base del modelo multi-tenant.
-2. Agregar `/api/dashboard/charts` y rediseñar `/dashboard` como centro ejecutivo del producto.
-3. Agregar `/api/sprints` y velocity real como contexto de velocidad, no como gestor de trabajo.
-4. Diseñar la capa de `team/capacity`.
-5. Diseñar la capa de `campaign intelligence`.
+1. Validar y promover `feature/executive-dashboard-phase2` por `Preview`, `develop`, `staging` y `main`.
+2. Volver `/dashboard` module-aware usando `serviceModules`.
+3. Construir `/admin/tenants` como siguiente slice real de governance.
+4. Agregar `/api/sprints` y la vista real de `/sprints`.
+5. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.

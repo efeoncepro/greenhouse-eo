@@ -205,41 +205,32 @@ Current adaptation rule:
 
 ## Now
 
-### N0.1 Architecture Alignment
+### N0.1 Promotion and Documentation Alignment
 
 - keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
 - align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
+- promote `feature/executive-dashboard-phase2` only after preview validation of dashboard and admin surfaces
 
-### N0.2 Access Model Design
+### N2.1 Module-Aware Dashboard
 
-- design `client_users`
-- design `roles`
-- design role assignments
-- design project and campaign scopes
-- decide if internal Efeonce users live in the same user table with `tenant_type = efeonce_internal`
-- version the DDL and migration notes
+- compose dashboard widgets by `serviceModules`
+- define which KPIs and cards appear by business line and active module
+- avoid recomputing the same overview payload when only one slice needs refresh
+- decide if tenant-level cache is safe for summary, charts, and risks
 
-### N0.3 Executive KPI Dictionary
+### N7.1 Admin Tenants
 
-- define throughput
-- define lead time
-- define cycle time
-- define review time
-- define time to market
-- define capacity usage
-- define on-time rate
-- define blocked work
-- define rework ratio
+- create `/admin/tenants`
+- create `/admin/tenants/[id]`
+- expose `businessLines` and `serviceModules`
+- keep mutations out until tenant-safe write paths and audit strategy are defined
 
-### N0.4 Dashboard Executive Slice
+### N3.1 Sprints Slice
 
-- implement `/api/dashboard/charts`
-- redesign `/dashboard` around:
-  - KPI strip
-  - trends
-  - capacity
-  - risks
-  - campaign focus
+- create `/api/sprints`
+- create `/api/sprints/[id]`
+- build `/sprints`
+- connect sprint velocity and health as drilldown, not as a task-management center
 
 ## Parallel Streams
 
