@@ -25,11 +25,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Orden recomendado para buscar referencia Vuexy:
 - `../full-version/src/views/dashboards/analytics/*`
 - `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/views/apps/user/list/*`
+- `../full-version/src/views/apps/user/view/*`
+- `../full-version/src/views/apps/roles/*`
 - `../full-version/src/libs/ApexCharts.tsx`
 - `../full-version/src/libs/styles/AppReactApexCharts.tsx`
 - y luego la documentacion oficial:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+- Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
+- En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
+- Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -114,12 +121,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
+- El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side y usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion.
 - Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
+- `/admin/users` y `/admin/roles` son el siguiente candidato natural de reutilizacion directa de Vuexy sobre datos reales.
+- `/admin/users/[id]` debe construirse reutilizando la estructura de `user/view/*` con tabs reinterpretados para Greenhouse:
+- `overview` -> contexto del usuario y alcance
+- `security` -> acceso y auditoria
+- `billing` -> invoices y contexto comercial del cliente
 - El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existe `/api/sprints`.

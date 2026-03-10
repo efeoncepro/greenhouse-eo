@@ -184,6 +184,15 @@ Open activities:
 - create `/admin/scopes`
 - create `/admin/feature-flags`
 
+Current adaptation rule:
+- use `full-version/src/views/apps/user/list/*` as base for `/admin/users`
+- use `full-version/src/views/apps/roles/*` as base for `/admin/roles`
+- use `full-version/src/views/apps/user/view/*` as base for `/admin/users/[id]`
+- reinterpret Vuexy tabs:
+- `overview` -> user context and scope
+- `security` -> access and audit
+- `billing-plans` -> invoices and commercial context
+
 ## Now
 
 ### N0.1 Architecture Alignment

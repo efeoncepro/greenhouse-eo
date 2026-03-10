@@ -26,6 +26,8 @@ La documentacion operativa interna del repo esta en:
 
 Documento maestro:
 - `GREENHOUSE_ARCHITECTURE_V1.md`
+- Documentacion oficial Vuexy:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 
 Ese documento define:
 - el norte del producto
@@ -292,11 +294,33 @@ Usar de `../full-version` principalmente:
 Orden recomendado para buscar referencia Vuexy:
 - `../full-version/src/views/dashboards/analytics/*`
 - `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/views/apps/user/list/*`
+- `../full-version/src/views/apps/user/view/*`
+- `../full-version/src/views/apps/roles/*`
 - `../full-version/src/libs/ApexCharts.tsx`
 - `../full-version/src/libs/styles/AppReactApexCharts.tsx`
 - despues confirmar contra la documentacion oficial de Vuexy:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+
+JWT y ACL en Vuexy vs Greenhouse:
+- Vuexy usa `next-auth` con estrategia `jwt` como patron base de sesion; eso no es una ventaja diferencial del template porque Greenhouse ya usa JWT tambien.
+- El ACL/permisos de Vuexy sirve como referencia de organizacion visual y pantallas demo de permisos, no como modelo multi-tenant listo para produccion.
+- Greenhouse no debe depender del ACL generico del template para autorizacion real.
+- La autorizacion real de Greenhouse vive en `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes` y `greenhouse.user_campaign_scopes`.
+- El enforcement real se hace server-side con `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`, no con flags client-side del template.
+
+User Management y Roles & Permissions:
+- La app de `User Management` y `Roles & Permissions` de Vuexy si es buena candidata para integracion visual en Greenhouse.
+- Debe adaptarse solo como capa UI y estructura de navegacion sobre datos reales de BigQuery.
+- `src/views/apps/user/list/*` y `src/views/apps/roles/*` son referencia directa para `/admin/users` y `/admin/roles`.
+- `src/views/apps/user/view/*` es referencia directa para `/admin/users/[id]`.
+- Los tabs `overview`, `security` y `billing-plans` no deben copiarse tal cual: deben reinterpretarse asi:
+- `overview` -> tenant, roles, scopes, actividad y contexto del usuario
+- `security` -> auth mode, ultimo acceso, resets, auditoria y controles de acceso
+- `billing-plans` -> invoices, fee, plan contratado, consumo y contexto comercial del cliente
+- Los modulos demo de invoices, payment method, recent devices o billing fake no son source of truth y no deben entrar como data layer.
 
 ## Proximos Pasos Recomendados
 

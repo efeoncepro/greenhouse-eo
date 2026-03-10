@@ -641,3 +641,14 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Validar visualmente el nuevo `/dashboard` en `Preview`.
 - Promover el slice a `develop` si la UI y los datos se ven sanos.
 - Luego abrir el siguiente bloque de Fase 2: `capacity` y `market-speed` solo si primero se normalizan los tiempos operativos en origen o en marts.
+
+### Nota de reutilizacion Vuexy para Admin
+- `full-version/src/views/apps/user/list/*` y `full-version/src/views/apps/roles/*` son buenos candidatos de integracion directa para `/admin/users` y `/admin/roles`.
+- `full-version/src/views/apps/user/view/*` es la referencia correcta para `/admin/users/[id]`.
+- `overview`, `security` y `billing-plans` deben reinterpretarse para Greenhouse:
+- `overview` -> tenant, roles, scopes y actividad
+- `security` -> auth mode, last login, resets, audit
+- `billing-plans` -> invoices, fee y contexto comercial del cliente
+- No copiar fake-db ni semantica demo de billing/security del template.
+- Documentacion oficial Vuexy raiz:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`

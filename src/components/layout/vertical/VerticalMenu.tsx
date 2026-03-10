@@ -90,9 +90,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </>
         ) : null}
         {isAdminUser ? (
-          <MenuItem href='/admin/users' icon={<i className='tabler-shield' />}>
-            Admin Users
-          </MenuItem>
+          <>
+            <MenuItem href='/admin/users' icon={<i className='tabler-users' />}>
+              Admin Users
+            </MenuItem>
+            <MenuItem href='/admin/roles' icon={<i className='tabler-shield-lock' />}>
+              Roles & Permissions
+            </MenuItem>
+          </>
         ) : null}
       </Menu>
     </ScrollWrapper>

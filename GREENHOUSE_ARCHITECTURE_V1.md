@@ -572,6 +572,16 @@ Table patterns:
 Admin patterns:
 - role and permission list layouts from `src/views/apps/roles/*`
 - permission management structure from `src/views/apps/permissions/*`
+- user list and user detail layouts from `src/views/apps/user/list/*` and `src/views/apps/user/view/*`
+
+Admin detail reuse rule:
+- Vuexy `overview`, `security`, and `billing-plans` tabs are acceptable structural references for `/admin/users/[id]`
+- but they must be semantically remapped to Greenhouse instead of copied as template business meaning
+- recommended reinterpretation:
+- `overview` -> tenant, roles, scopes, feature flags, project access, activity summary
+- `security` -> auth mode, last login, reset flows, MFA readiness, audit events
+- `billing-plans` -> invoices, contracted fee, commercial plan, usage and account billing context
+- do not import template fake invoices, payment methods, or device history as product truth
 
 ### What must be adapted before reuse
 
@@ -1121,6 +1131,12 @@ Outputs:
 - `/admin/users`
 - `/admin/users/[id]`
 - `/admin/roles`
+
+Recommended reuse:
+- adapt Vuexy `src/views/apps/user/list/*` for `/admin/users`
+- adapt Vuexy `src/views/apps/roles/*` for `/admin/roles`
+- adapt Vuexy `src/views/apps/user/view/*` for `/admin/users/[id]`
+- treat `billing-plans` as future invoice and commercial context surface, not payment-method demo UI
 
 Dependencies:
 - Phase 1 tables
