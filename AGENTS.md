@@ -21,6 +21,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
+- Si el cambio es UI, UX o seleccion de componentes, usar el skill local `greenhouse-vuexy-portal` como criterio operativo y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
 

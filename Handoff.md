@@ -98,6 +98,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - El dashboard ya tiene una capa de composicion reusable, pero aun no existe una extension equivalente para `/equipo`, `/campanas` o vistas internas.
 - Falta validacion visual manual en `dev-greenhouse.efeoncepro.com` y luego en produccion.
 - `AttentionProjectCard.tsx` quedo desplazado por la nueva tabla compacta y podria eliminarse en una limpieza posterior si ya no vuelve a usarse.
+- El skill local `greenhouse-vuexy-portal` fue reforzado con una guia de seleccion de componentes Vuexy/MUI para futuras decisiones UI/UX; usarlo como criterio antes de crear widgets nuevos.
 
 ## 2026-03-10 - Sky reusable dashboard capabilities
 
