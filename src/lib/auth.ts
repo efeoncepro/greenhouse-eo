@@ -22,15 +22,34 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const tenant = await getTenantAccessRecordByEmail(credentials.email)
+        const normalizedEmail = credentials.email.trim().toLowerCase()
+
+        let tenant = null
+
+        try {
+          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        } catch (error) {
+          console.error('Credentials auth lookup failed.', { email: normalizedEmail }, error)
+
+          return null
+        }
 
         if (!tenant) {
+          console.warn('Credentials auth rejected: tenant user not found.', { email: normalizedEmail })
+
           return null
         }
 
         const isValidPassword = await verifyTenantPassword(tenant, credentials.password)
 
         if (!isValidPassword) {
+          console.warn('Credentials auth rejected: password mismatch or inactive user.', {
+            email: normalizedEmail,
+            userId: tenant.userId,
+            active: tenant.active,
+            status: tenant.status
+          })
+
           return null
         }
 

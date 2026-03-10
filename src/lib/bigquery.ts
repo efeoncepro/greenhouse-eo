@@ -4,6 +4,19 @@ import { BigQuery } from '@google-cloud/bigquery'
 
 let bigQueryClient: BigQuery | undefined
 
+const stripWrappingQuotes = (value: string) => {
+  return value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+}
+
+const normalizeLegacyEscapedJson = (value: string) => {
+  return stripWrappingQuotes(value)
+    .replace(/\r?\n/g, '')
+    .replace(/^\{\\n\s*/, '{')
+    .replace(/,\\n\s*"/g, ',"')
+    .replace(/\\n\}$/g, '}')
+    .replace(/\\n\\r\\n$/g, '')
+}
+
 const getProjectId = () => {
   const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
 
@@ -23,8 +36,9 @@ const getCredentials = () => {
 
   const candidates = [
     rawCredentials,
-    rawCredentials.startsWith('"') && rawCredentials.endsWith('"') ? rawCredentials.slice(1, -1) : rawCredentials,
-    rawCredentials.replace(/\\r/g, '\r').replace(/\\n/g, '\n').replace(/\\"/g, '"')
+    stripWrappingQuotes(rawCredentials),
+    stripWrappingQuotes(rawCredentials).replace(/\\r/g, '\r').replace(/\\n/g, '\n').replace(/\\"/g, '"'),
+    normalizeLegacyEscapedJson(rawCredentials)
   ]
 
   for (const candidate of candidates) {
@@ -46,6 +60,8 @@ const getCredentials = () => {
       // Try the next serialization shape. Vercel preview envs may provide escaped JSON strings.
     }
   }
+
+  console.error('Unable to parse GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable.')
 
   throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable')
 }
