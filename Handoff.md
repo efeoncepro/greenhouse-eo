@@ -628,6 +628,14 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - El dashboard ejecutivo ya esta real, pero `capacity` y `market-speed` siguen pendientes porque `tiempo_de_ejecucion`, `tiempo_en_revision` y `tiempo_en_cambios` no vienen en formato numerico confiable desde Notion.
 - Los nuevos endpoints `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks` recomputan el overview completo; si el trafico sube, conviene separar queries o cachear por tenant.
 - El smoke real se hizo con un tenant bootstrap de scope corto; antes de promover conviene revisar tambien un tenant con mas volumen.
+- Para trabajo visual futuro, el orden correcto de referencia Vuexy es:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- y despues validar contra:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
 
 ### Proximo paso recomendado
 - Validar visualmente el nuevo `/dashboard` en `Preview`.

@@ -22,6 +22,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `full-version` debe servir para entender hacia donde debe evolucionar `starter-kit`.
 - No se debe mezclar automaticamente codigo de `full-version` dentro de este repo sin adaptacion y revision.
 - Las referencias mas utiles de `full-version` para Greenhouse son dashboards, tablas y patrones de user/roles/permissions, no los modulos de negocio template.
+- Orden recomendado para buscar referencia Vuexy:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- y luego la documentacion oficial:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
 
 ## Stack Actual
 - Next.js 16.1.1

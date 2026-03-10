@@ -289,6 +289,15 @@ Usar de `../full-version` principalmente:
 - tablas filtrables
 - patrones de usuarios, roles y permissions
 
+Orden recomendado para buscar referencia Vuexy:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- despues confirmar contra la documentacion oficial de Vuexy:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+
 ## Proximos Pasos Recomendados
 
 1. Definir `client_users`, roles y scopes como siguiente base del modelo multi-tenant.
