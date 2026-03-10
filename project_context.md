@@ -14,6 +14,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
 - DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
 - Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
+- Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -155,6 +156,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
+- Para Sky Airline ya existe un diagnostico formal de factibilidad:
+- `on-time` mensual y tenure se pueden construir con la data actual
+- RpA mensual y `First-Time Right` no deben exponerse aun como KPI productivo
+- equipo asignado, capacity, herramientas y AI tools requieren modelo explicito nuevo
 
 ## Deploy
 - Hosting principal: Vercel

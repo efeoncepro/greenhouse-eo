@@ -1344,6 +1344,25 @@ Component boundary rule:
 - capacity may need source enrichment beyond current Notion tables
 - BigQuery query logic may drift unless semantic marts are introduced early
 - internal and client views may fork semantically if KPI definitions are not centralized
+- tenant-specific KPI requests can push the product into misleading metrics if source quality is not validated first
+- current RpA source quality is not yet strong enough to justify tenant-facing `First-Time Right` claims by default
+
+## Tenant-Specific Implementation Notes
+
+The architecture must allow tenant-specific emphasis without hardcoding product semantics by tenant name.
+
+Current active tenant-specific initiative:
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+
+Rule:
+- a tenant-specific request may change copy, emphasis, or sequencing
+- it must not bypass KPI governance, semantic consistency, or source-of-truth rules
+
+For Sky specifically, the current architecture stance is:
+- monthly `on-time` is allowed if derived from defendable task-level delivery status
+- tenure is allowed once the canonical start-date rule is approved
+- monthly RpA and `First-Time Right` remain blocked until source quality improves
+- assigned account team, capacity, technology tools, and AI tools require explicit models and must not be inferred from incidental task assignees or raw JSON keyword matches
 
 ## Decisions Locked By This Document
 
@@ -1356,11 +1375,12 @@ Component boundary rule:
 
 ## Immediate Next Actions
 
-1. Validate visually the module-aware dashboard on `Preview` or `staging`.
-2. Build `/admin/scopes` and `/admin/feature-flags`.
-3. Build `/api/sprints` and the real `/sprints`.
-4. Extend `serviceModules` from dashboard composition into navigation and billing context.
-5. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
+1. Approve the KPI and source rules in `SKY_TENANT_EXECUTIVE_SLICE_V1.md`.
+2. Implement the safe first Sky slice on `/dashboard`.
+3. Build `/admin/scopes` and `/admin/feature-flags`.
+4. Build `/api/sprints` and the real `/sprints`.
+5. Extend `serviceModules` from dashboard composition into navigation and billing context.
+6. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
 
 ## Agent Working Notes
 
@@ -1378,3 +1398,4 @@ This document is not optional context for architecture-changing work.
 
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
 - `bigquery/greenhouse_identity_access_v1.sql`: proposed BigQuery schema and bootstrap seed for users, roles, and scopes
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`: validated scope and feasibility notes for the Sky Airline dashboard slice

@@ -46,6 +46,67 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Reautenticar GCP en local para recuperar acceso confiable a BigQuery.
+- Evaluar sobre datos reales la factibilidad del slice pedido para Sky Airline antes de escribir codigo de producto.
+- Dejar la iniciativa documentada y alineada con backlog, arquitectura y contexto operativo.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: sin merge por ahora; pendiente aprobacion del enfoque
+
+### Ambiente objetivo
+- Development
+- BigQuery dataset `efeonce-group.greenhouse`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `Handoff.md`
+- `PHASE_TASK_MATRIX.md`
+- `README.md`
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- `gcloud auth login --update-adc`: correcto
+- `gcloud auth print-access-token`: correcto
+- `gcloud auth application-default print-access-token`: correcto
+- Smoke BigQuery real sobre Sky:
+  - tenant encontrado: `hubspot-company-30825221458` `Sky Airline`
+  - modulos activos: `agencia_creativa`, `globe`
+  - proyecto scoped actual: `23239c2f-efe7-80ad-b410-f96ea38f49c2` `Kick-Off - Sky Airlines`
+  - `pct_on_time` del proyecto: placeholder dash, no valor usable
+  - `rpa_promedio` del proyecto: `0`
+  - tareas visibles en scope actual: `2`
+  - primera evidencia operativa visible: `2025-07-16`
+  - Daniela visible en proyecto y tareas; Melkin visible en una tarea; Andres no visible en el scope actual
+  - `rpa` no es confiable hoy para KPI cliente: `1118` de `1125` tareas globales tienen `rpa = 0`
+
+### Riesgos o pendientes
+- Sky pide `First-Time Right` basado en RpA, pero el dato de RpA no es defendible hoy para un KPI cliente.
+- La seccion de equipo asignado no debe salir de inferir responsables de tareas; requiere un modelo explicito de account assignment.
+- Herramientas tecnologicas, herramientas AI y capacity por persona no existen todavia como modelo reutilizable en Greenhouse.
+- El contador de tenure necesita una decision de fuente:
+  - `2025-07-16` si significa primera colaboracion operativa visible
+  - `2025-08-01` si significa inicio formal del proyecto
+- No se hizo `commit` ni `push`; queda pendiente aprobacion explicita del enfoque antes de versionar.
+
+### Proximo paso recomendado
+- Revisar y aprobar `SKY_TENANT_EXECUTIVE_SLICE_V1.md`.
+- Si se aprueba, implementar primero solo el slice seguro:
+  - `on-time` mensual
+  - tenure
+  - output mensual y ajustes por mes
+- Dejar RpA, `First-Time Right`, equipo asignado, capacity y tooling para una segunda capa con modelo nuevo.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Promover `develop` a `main` y verificar el deployment productivo real.
 - Corregir la documentacion viva para usar el alias productivo actual validado en Vercel.
 

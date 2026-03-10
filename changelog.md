@@ -133,3 +133,9 @@
 - Se verifico la alias de Preview de `feature/executive-dashboard-phase2` con `vercel inspect` y `vercel curl` sobre `/login`, `/api/auth/csrf`, `/dashboard` y `/admin/users`.
 - Se agrego `/admin/tenants` y `/admin/tenants/[id]` como nuevo slice de governance y se actualizaron los artefactos vivos para reflejarlo.
 - `GREENHOUSE_ARCHITECTURE_V1.md` y `MULTITENANT_ARCHITECTURE.md` ahora explicitan que `tenant = client = company`, y que los usuarios son una relacion separada `1 tenant -> N users`.
+- Se recupero la autenticacion local de GCP con `gcloud auth login --update-adc` para volver a validar BigQuery sin depender de secretos parseados a mano.
+- Se documento `SKY_TENANT_EXECUTIVE_SLICE_V1.md` como iniciativa formal para Sky Airline.
+- Quedo alineado en README, backlog, matriz, contexto, arquitectura y handoff que:
+  - `on-time` mensual y tenure son factibles ahora para Sky
+  - RpA mensual y `First-Time Right` siguen bloqueados por calidad de dato
+  - equipo asignado, capacity, herramientas y AI tools requieren modelo nuevo antes de exponerse

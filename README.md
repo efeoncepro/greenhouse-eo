@@ -20,6 +20,7 @@ La documentacion operativa interna del repo esta en:
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - `PHASE_TASK_MATRIX.md`
 - `GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
@@ -129,6 +130,12 @@ Brecha visible:
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
 - las superficies `/internal/dashboard` y `/admin` ya tienen slices reales, pero aun faltan mutaciones seguras, scopes y feature flags
+
+Iniciativa activa documentada:
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md` fija el diagnostico y la factibilidad del slice pedido por Sky Airline antes de implementarlo.
+- En este momento, `on-time` mensual y tenure son factibles con datos reales.
+- RpA mensual y `First-Time Right` siguen bloqueados por calidad de dato.
+- equipo asignado, capacidad y tooling requieren modelo nuevo y no deben salir de inferencias ad hoc.
 
 ## Stack
 
@@ -355,8 +362,9 @@ Regla de componentes Greenhouse:
 
 ## Proximos Pasos Recomendados
 
-1. Validar visualmente el dashboard module-aware en `Preview` o `staging` con tenants `crm_solutions`, `globe` y `wave`.
-2. Construir `/admin/scopes` y `/admin/feature-flags`.
-3. Agregar `/api/sprints` y la vista real de `/sprints`.
-4. Extender `serviceModules` a navegacion y billing.
-5. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.
+1. Aprobar `SKY_TENANT_EXECUTIVE_SLICE_V1.md` y fijar definicion de `on-time` mensual, start date de tenure y sustituto temporal de `First-Time Right`.
+2. Implementar el primer slice seguro de Sky: `on-time` mensual, tenure y entregables/ajustes por mes.
+3. Construir `/admin/scopes` y `/admin/feature-flags`.
+4. Agregar `/api/sprints` y la vista real de `/sprints`.
+5. Extender `serviceModules` a navegacion y billing.
+6. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.

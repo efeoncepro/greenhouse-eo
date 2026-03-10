@@ -47,6 +47,10 @@ Pending tasks:
 - create `/api/dashboard/capacity`
 - create `/api/dashboard/market-speed`
 - add campaign-aware dashboard slices once `/campanas` exists
+- tenant-specific slice currently defined:
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- for Sky, monthly `on-time` and tenure are feasible now
+- for Sky, monthly RpA and `First-Time Right` stay blocked until data quality improves
 
 ## Phase 3. Delivery Context and Operational Drilldowns
 
@@ -66,6 +70,8 @@ Pending tasks:
 - create `/api/capacity`
 - create `/api/capacity/roles`
 - build `/equipo`
+- Sky-specific guardrail:
+- do not infer assigned account team or capacity from incidental task assignees
 
 ## Phase 5. Campaign Intelligence
 
@@ -79,6 +85,9 @@ Pending tasks:
 - create `/api/campaigns/[id]/kpis`
 - build `/campanas`
 - build `/campanas/[id]`
+- Sky-specific guardrail:
+- monthly deliverable output can ship as a dashboard proxy before the formal campaign model exists
+- tooling and AI tooling remain blocked until explicit assignment models exist
 
 ## Phase 6. Internal Efeonce Visibility
 
@@ -99,7 +108,9 @@ Pending tasks:
 
 ## Recommended Near-Term Order
 
-1. Build `/admin/scopes` and `/admin/feature-flags`
-2. Build `/api/sprints` and the real `/sprints`
-3. Start team/capacity once assignment source of truth is clear
-4. Harden dashboard payload reuse and tenant-safe cache strategy
+1. Approve `SKY_TENANT_EXECUTIVE_SLICE_V1.md` and lock the KPI definitions it depends on
+2. Implement the safe first Sky slice on `/dashboard`
+3. Build `/admin/scopes` and `/admin/feature-flags`
+4. Build `/api/sprints` and the real `/sprints`
+5. Start team/capacity once assignment source of truth is clear
+6. Harden dashboard payload reuse and tenant-safe cache strategy

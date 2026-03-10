@@ -218,6 +218,19 @@ Current adaptation rule:
 - avoid recomputing the same overview payload when only one slice needs refresh
 - decide if tenant-level cache is safe for summary, charts, and risks
 
+### N2.2 Sky tenant dashboard slice
+
+- use `SKY_TENANT_EXECUTIVE_SLICE_V1.md` as the source of truth before implementation
+- lock the monthly on-time grain for Sky before writing API contracts
+- lock the canonical relationship start date for the tenure copy before implementation
+- implement only the safe first slice:
+- monthly on-time
+- tenure
+- deliverables or campaign-like output by month
+- adjustment proxy by month
+- do not expose monthly RpA or `First-Time Right` as production KPIs until source quality improves
+- do not expose assigned account team, capacity, or tooling for Sky until explicit models exist
+
 ### N7.1 Governance Surfaces
 
 - expose `businessLines` and `serviceModules`
