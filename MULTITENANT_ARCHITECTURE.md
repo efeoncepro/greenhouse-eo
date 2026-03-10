@@ -1,5 +1,15 @@
 # Greenhouse Multi-Tenant Architecture
 
+## Status
+
+This document remains useful as the tenant-focused reference.
+
+For the full product architecture, phased roadmap, role hierarchy, internal/admin route model, KPI semantics, and multi-agent execution plan, use:
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+
+If both documents overlap, `GREENHOUSE_ARCHITECTURE_V1.md` is the broader source of truth and this document should stay focused on tenant isolation and auth boundaries.
+
 ## Objective
 
 Greenhouse must serve multiple clients from one Next.js application without exposing cross-tenant data. The tenant boundary is `client_id`.
@@ -13,9 +23,10 @@ Greenhouse must serve multiple clients from one Next.js application without expo
 
 ## Source of Truth
 
-Current system of record for tenant scope:
+Current system of record:
 - BigQuery dataset: `efeonce-group.greenhouse`
-- Table: `greenhouse.clients`
+- Tenant metadata: `greenhouse.clients`
+- User identity and access: `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes`, `greenhouse.user_campaign_scopes`
 
 Current source systems for operational data:
 - `efeonce-group.notion_ops.tareas`
@@ -52,28 +63,42 @@ This is enough to replace the current env-based demo scope and move the portal i
 
 ### 1. Authentication
 
-Target flow:
+Current flow:
 1. User submits email and password.
-2. NextAuth queries `greenhouse.clients` by `primary_contact_email`.
+2. NextAuth queries `greenhouse.client_users` and joins `greenhouse.clients` only for tenant metadata.
 3. Reject login if `active = false` or `status != 'active'`.
 4. Verify password against `password_hash` when `auth_mode = 'credentials'`.
 5. Build session token with:
+   - `userId`
    - `clientId`
-   - `role`
-   - `projectIds`
+   - `tenantType`
+   - `roleCodes`
+   - `primaryRoleCode`
+   - `routeGroups`
+   - `projectScopes`
+   - `campaignScopes`
    - `featureFlags`
    - `timezone`
-   - `authMode`
+   - `portalHomePath`
+   - legacy compatibility aliases for existing routes
 
-Current interim flow:
-- Login still uses env-based demo credentials.
-- Scope is still carried by `DEMO_CLIENT_PROJECT_IDS`.
-- The `greenhouse.clients` table is already created and seeded so the next step is wiring auth to it.
+Current production-ready baseline:
+- Runtime auth no longer falls back to `greenhouse.clients`.
+- Demo and internal admin users authenticate with bcrypt credentials.
+- Imported HubSpot contacts remain in `invited` state until onboarding activates them.
+- `src/lib/bigquery.ts` already handles both the minified JSON form and the legacy escaped JSON form of `GOOGLE_APPLICATION_CREDENTIALS_JSON` used by Vercel Preview envs.
+- A failed login in `Preview` is not enough to conclude wrong credentials; first isolate whether BigQuery credentials were parsed correctly in the running deployment.
 
 ### 2. Session and Tenant Context
 
 Create a single tenant helper that returns:
+- `userId`
 - `clientId`
+- `tenantType`
+- `roleCodes`
+- `primaryRoleCode`
+- `projectScopes`
+- `campaignScopes`
 - `role`
 - `projectIds`
 - `featureFlags`
@@ -107,8 +132,12 @@ const [rows] = await bigQuery.query({
 ## Role Model
 
 Initial roles:
-- `client`: scoped to its own projects only
-- `admin`: internal Efeonce role with broader visibility and operational tools
+- `client_executive`
+- `client_manager`
+- `client_specialist`
+- `efeonce_account`
+- `efeonce_operations`
+- `efeonce_admin`
 
 Rules:
 - `client` never bypasses `projectIds`
@@ -120,13 +149,15 @@ Rules:
 ### Phase 1
 
 - Keep `CredentialsProvider`
-- Replace env lookup with BigQuery lookup to `greenhouse.clients`
+- Use BigQuery lookup to `greenhouse.client_users` plus scopes
 - Continue JWT sessions
+- Seed demo/internal credentials with bcrypt hashes
+- Add route-group guards for `client`, `internal`, and `admin`
+- Add `portalHomePath` redirects after login
 
 ### Phase 2
 
-- Add `client_users` table if one tenant needs multiple named users
-- Move auth records out of `greenhouse.clients`
+- Expand onboarding flows for invited users
 - Keep `greenhouse.clients` as tenant metadata only
 
 Recommended future split:
@@ -142,24 +173,29 @@ Recommended future split:
 
 ## Configuration Rules
 
-- `greenhouse.clients` is the source of truth for client scope in non-local environments.
-- `.env.example` should only hold local bootstrap values and fallbacks.
+- `greenhouse.client_users` plus role/scope tables are the source of truth for runtime auth.
+- `greenhouse.clients` remains tenant metadata and legacy scope compatibility.
+- `.env.example` should only hold app-level runtime configuration.
 - `staging` and `production` should read the same table shape, not different auth logic.
 
 ## Migration Path
 
-1. Replace `DEMO_CLIENT_PROJECT_IDS` reads with a BigQuery lookup to `greenhouse.clients`.
+1. Replace env-based login with `greenhouse.client_users`.
 2. Add password hashing and verification.
 3. Introduce `getTenantContext()` helper.
-4. Move `/api/projects` and `/api/sprints` to the same tenant helper.
-5. Add `client_users` only when multiple users per tenant becomes real.
+4. Guard `/dashboard`, `/proyectos`, `/sprints`, `/settings`, `/internal/**`, and `/admin/**` by route group.
+5. Move business APIs to the same tenant helper and project scope checks.
 
 ## Current Remote Assets
 
 Already created in BigQuery:
 - dataset: `efeonce-group.greenhouse`
 - table: `efeonce-group.greenhouse.clients`
+- tables: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
 - seed tenant: `greenhouse-demo-client`
+- seed users: `user-greenhouse-demo-client-executive`, `user-efeonce-admin-bootstrap`
+- active internal admin: `julio.reyes@efeonce.org`
+- closedwon HubSpot tenants imported as `hubspot-company-*`
 
 Versioned schema file:
 - `bigquery/greenhouse_clients.sql`

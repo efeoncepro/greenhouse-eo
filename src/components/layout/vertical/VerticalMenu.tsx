@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material/styles'
 
 // Third-party Imports
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import { useSession } from 'next-auth/react'
 
 // Type Imports
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
@@ -42,6 +43,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
+  const { data: session } = useSession()
+  const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
+  const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+  const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -68,22 +73,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href='/home' icon={<i className='tabler-smart-home' />}>
-          Home
+        <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
+          Dashboard
         </MenuItem>
-        <MenuItem href='/about' icon={<i className='tabler-info-circle' />}>
-          About
-        </MenuItem>
+        {!isInternalUser ? (
+          <>
+            <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
+              Proyectos
+            </MenuItem>
+            <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
+              Sprints
+            </MenuItem>
+            <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
+              Settings
+            </MenuItem>
+          </>
+        ) : null}
+        {isAdminUser ? (
+          <MenuItem href='/admin/users' icon={<i className='tabler-shield' />}>
+            Admin Users
+          </MenuItem>
+        ) : null}
       </Menu>
-      {/* <Menu
-        popoutMenuOffset={{ mainAxis: 23 }}
-        menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
-        renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-        renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
-        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
-      >
-        <GenerateVerticalMenu menuData={menuData(dictionary)} />
-      </Menu> */}
     </ScrollWrapper>
   )
 }

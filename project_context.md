@@ -3,6 +3,14 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Documento Maestro de Arquitectura
+- Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
+- Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
+- `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
+- Documento tecnico de identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- DDL de identidad y acceso: `bigquery/greenhouse_identity_access_v1.sql`
+
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
 - Ese markdown define el target funcional del portal y debe usarse como referencia primaria de producto.
@@ -13,6 +21,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La carpeta `full-version` existe fuera de este repo como referencia de contexto, referencia visual y referencia funcional.
 - `full-version` debe servir para entender hacia donde debe evolucionar `starter-kit`.
 - No se debe mezclar automaticamente codigo de `full-version` dentro de este repo sin adaptacion y revision.
+- Las referencias mas utiles de `full-version` para Greenhouse son dashboards, tablas y patrones de user/roles/permissions, no los modulos de negocio template.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -31,6 +40,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Dominio objetivo final: `greenhouse.efeonce.com`
 - Dataset propio del portal: `efeonce-group.greenhouse`
 
+## Posicion de Producto Actual
+- Greenhouse debe ser un portal ejecutivo y operativo, no un segundo Notion.
+- Notion sigue siendo el system of work.
+- Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
+- Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
+- El centro del producto debe pasar a ser `/dashboard` y luego `/equipo` y `/campanas`.
+
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
 - `npx pnpm dev`
@@ -43,40 +59,64 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/app/(dashboard)/layout.tsx`: layout principal autenticado o de dashboard
 - `src/app/(dashboard)/dashboard/page.tsx`: dashboard principal actual
 - `src/app/(dashboard)/proyectos/page.tsx`: vista base de proyectos
+- `src/app/(dashboard)/proyectos/[id]/page.tsx`: detalle de proyecto
 - `src/app/(dashboard)/sprints/page.tsx`: vista base de sprints
 - `src/app/(dashboard)/settings/page.tsx`: vista base de settings
 - `src/app/(blank-layout-pages)/login/page.tsx`: login actual
 - `src/app/api/dashboard/kpis/route.ts`: primer endpoint real con datos de BigQuery
+- `src/app/api/projects/route.ts`: listado real de proyectos por tenant
+- `src/app/api/projects/[id]/route.ts`: detalle real de proyecto por tenant
+- `src/app/api/projects/[id]/tasks/route.ts`: tareas del proyecto por tenant
 - `src/components/layout/**`: piezas del layout
 - `src/configs/**`: configuracion de tema y color
 - `src/data/navigation/**`: definicion de menu
 - `src/lib/bigquery.ts`: cliente reusable de BigQuery
 - `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos server-side del dashboard
+- `src/lib/projects/get-projects-overview.ts`: capa de datos server-side de proyectos
+- `src/lib/projects/get-project-detail.ts`: capa de datos server-side del detalle de proyecto y sus tareas
 
 ## Estado de Rutas
 - Existe `/dashboard`
 - Existe `/proyectos`
+- Existe `/proyectos/[id]`
 - Existe `/sprints`
 - Existe `/settings`
 - Existe `/login`
+- Existe `/auth/landing`
+- Existe `/internal/dashboard`
+- Existe `/admin`
+- Existe `/admin/users`
 - Existe `src/app/page.tsx`
-- La raiz `/` redirige a `/dashboard`
+- La raiz `/` redirige segun `portalHomePath`
 - `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
 
 ## Rutas Objetivo del Producto
 - `/dashboard`: dashboard principal con KPIs ICO
+- `/entrega`: contexto operativo agregado
 - `/proyectos`: lista de proyectos del cliente
 - `/proyectos/[id]`: detalle de proyecto con tareas y sprint
+- `/campanas`: lista de campanas y relacion con output
+- `/campanas/[id]`: detalle de campana con entregables y KPIs
+- `/equipo`: equipo asignado, capacidad y carga
 - `/sprints`: vista de sprints y velocidad
 - `/settings`: perfil y preferencias del cliente
+- `/internal/**`: visibilidad interna Efeonce
+- `/admin/**`: gobernanza de tenants, usuarios, roles, scopes y feature flags
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
-- `next-auth` ya esta integrado con credenciales demo, session JWT y proteccion base del dashboard.
+- `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
-- El alcance multi-tenant actual se apoya en `DEMO_CLIENT_PROJECT_IDS`; aun falta una fuente real de clientes.
-- Aun no existen `/api/projects`, `/api/sprints` ni el detalle `/proyectos/[id]`.
+- Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
+- Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
+- Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
+- El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
+- Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
+- Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
+- Ya existe una capa multi-user real separada de tenants.
+- Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
+- Ya existen rutas minimas de Efeonce interno y admin, pero falta desarrollar sus vistas de negocio.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -124,6 +164,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - No asumir que una variable de `Preview` o `Staging` existe en `Production`, ni al reves.
 - Si una feature necesita variable nueva, primero debe existir en `Preview` y `Staging` antes de promocionarse a `main`.
 - Mantener `.env.example` alineado con las variables requeridas.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` en `Preview` puede llegar en mas de una serializacion; el parser de `src/lib/bigquery.ts` ya soporta JSON minified y JSON legacy escapado.
+- Si `Preview` rechaza un login que en BigQuery esta activo y con hash correcto, revisar primero alias del dominio y el parseo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir fallo de credenciales.
 
 ## Variables de Entorno
 - `.env.example` define:
@@ -133,11 +175,6 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `NEXTAUTH_SECRET`
   - `NEXTAUTH_URL`
   - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
-  - `DEMO_CLIENT_ID`
-  - `DEMO_CLIENT_EMAIL`
-  - `DEMO_CLIENT_PASSWORD`
-  - `DEMO_CLIENT_NAME`
-  - `DEMO_CLIENT_PROJECT_IDS`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
@@ -147,14 +184,21 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
-- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` aun no estan integradas al starter kit actual.
+- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
+- Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 
 ## Multi-Tenant Actual
 - Dataset creado: `efeonce-group.greenhouse`
 - Tabla creada: `greenhouse.clients`
 - Tenant bootstrap cargado: `greenhouse-demo-client`
 - Documento de referencia: `MULTITENANT_ARCHITECTURE.md`
+- Documento maestro de evolucion: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Documento de Fase 1 para identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL versionado: `bigquery/greenhouse_clients.sql`
+- DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
+- DDL multi-user ya aplicado en BigQuery: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
+- DDL de bootstrap real desde HubSpot: `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`
+- DDL de bootstrap de scopes por mapeo conocido: `bigquery/greenhouse_project_scope_bootstrap_v1.sql`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
@@ -170,9 +214,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
-- La autenticacion actual es demo y debe reemplazarse por modelo multi-tenant real.
-- Falta mover el scope de cliente a una fuente real como `greenhouse.clients`.
-- Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
+- La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
+- El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
+- Faltan sprints reales, dashboard charts y los data flows restantes definidos en la especificacion.
+- Tenant metadata y user identity ya quedaron separados.
+- Falta definir la capa semantica de KPIs y capacidad.
+- Falta relacion campanas con proyectos, entregables e indicadores.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
