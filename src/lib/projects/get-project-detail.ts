@@ -1,0 +1,393 @@
+import 'server-only'
+
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import type {
+  GreenhouseProjectDetailData,
+  GreenhouseProjectSprintContext,
+  GreenhouseProjectTasksData
+} from '@/types/greenhouse-project-detail'
+import type { GreenhouseProjectReviewLoad, GreenhouseProjectStatusTone } from '@/types/greenhouse-projects'
+
+interface ProjectDetailScope {
+  clientId: string
+  projectId: string
+  projectIds: string[]
+}
+
+interface ProjectSummaryRow {
+  notion_page_id: string | null
+  project_name: string | null
+  status: string | null
+  summary: string | null
+  start_date: { value?: string } | string | null
+  end_date: { value?: string } | string | null
+  total_tasks: number | string | null
+  active_tasks: number | string | null
+  completed_tasks: number | string | null
+  avg_rpa: number | string | null
+  open_review_items: number | string | null
+  ready_for_review_tasks: number | string | null
+  client_change_tasks: number | string | null
+  blocked_tasks: number | string | null
+  progress_value: number | string | null
+  page_url: string | null
+}
+
+interface SprintRow {
+  notion_page_id: string | null
+  sprint_name: string | null
+  status: string | null
+  start_date: { value?: string } | string | null
+  end_date: { value?: string } | string | null
+  total_tasks: number | string | null
+  completed_tasks: number | string | null
+  page_url: string | null
+}
+
+interface TaskRow {
+  notion_page_id: string | null
+  task_name: string | null
+  status: string | null
+  rpa_value: number | string | null
+  frame_versions: number | string | null
+  frame_comments: number | string | null
+  open_frame_comments: number | string | null
+  client_review_open: boolean | null
+  workflow_review_open: boolean | null
+  blocker_count: number | string | null
+  sprint_name: string | null
+  last_frame_comment: string | null
+  last_edited_time: { value?: string } | string | null
+  page_url: string | null
+}
+
+const activeStatuses = ['En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados']
+const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
+const readyForReviewStatuses = ['Listo para revisión', 'Listo para revision']
+const blockedStatuses = ['Bloqueado', 'Detenido']
+
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  if (value && typeof value === 'object' && 'value' in value) {
+    return toNumber((value as { value?: unknown }).value)
+  }
+
+  return 0
+}
+
+const toDateString = (value: { value?: string } | string | null) => {
+  if (!value) {
+    return null
+  }
+
+  if (typeof value === 'string') {
+    return value
+  }
+
+  return typeof value.value === 'string' ? value.value : null
+}
+
+const clampPercentage = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
+
+const getStatusTone = (status: string): GreenhouseProjectStatusTone => {
+  const normalized = status.toLowerCase()
+
+  if (normalized.includes('riesgo') || normalized.includes('cambio') || normalized.includes('bloque') || normalized.includes('detenido')) {
+    return 'error'
+  }
+
+  if (normalized.includes('curso') || normalized.includes('trabajo')) {
+    return 'warning'
+  }
+
+  if (normalized.includes('revisi')) {
+    return 'info'
+  }
+
+  if (normalized.includes('listo') || normalized.includes('complet')) {
+    return 'success'
+  }
+
+  return 'default'
+}
+
+const getReviewLoad = (openReviewItems: number): GreenhouseProjectReviewLoad => {
+  if (openReviewItems >= 5) {
+    return 'High'
+  }
+
+  if (openReviewItems >= 1) {
+    return 'Medium'
+  }
+
+  return 'Low'
+}
+
+export const isProjectInTenantScope = (projectIds: string[], projectId: string) => projectIds.includes(projectId)
+
+const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhouseProjectSprintContext | null> => {
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const query = `
+    WITH project_sprints AS (
+      SELECT
+        sprint_id,
+        COUNT(*) AS total_tasks,
+        COUNTIF(estado IN UNNEST(@completedStatuses)) AS completed_tasks
+      FROM \`${projectId}.notion_ops.tareas\`,
+      UNNEST(IFNULL(sprint_ids, ARRAY<STRING>[])) AS sprint_id
+      WHERE proyecto = @projectDetailId
+      GROUP BY sprint_id
+    )
+    SELECT
+      s.notion_page_id,
+      s.nombre_del_sprint AS sprint_name,
+      s.estado_del_sprint AS status,
+      s.fechas AS start_date,
+      s.fechas_end AS end_date,
+      COALESCE(project_sprints.total_tasks, SAFE_CAST(s.total_de_tareas AS INT64), 0) AS total_tasks,
+      COALESCE(
+        project_sprints.completed_tasks,
+        CAST(ROUND(SAFE_CAST(s.tareas_completadas AS FLOAT64) * SAFE_CAST(s.total_de_tareas AS FLOAT64), 0) AS INT64),
+        0
+      ) AS completed_tasks,
+      s.page_url
+    FROM project_sprints
+    INNER JOIN \`${projectId}.notion_ops.sprints\` s
+      ON s.notion_page_id = project_sprints.sprint_id
+    ORDER BY
+      CASE s.estado_del_sprint
+        WHEN 'Actual' THEN 0
+        WHEN 'Siguiente' THEN 1
+        WHEN 'Último' THEN 2
+        ELSE 3
+      END,
+      s.last_edited_time DESC
+    LIMIT 1
+  `
+
+  const [rows] = await bigQuery.query({
+    query,
+    params: {
+      projectDetailId: scope.projectId,
+      completedStatuses
+    }
+  })
+
+  const sprint = (rows[0] as SprintRow | undefined) || null
+
+  if (!sprint?.notion_page_id) {
+    return null
+  }
+
+  const totalTasks = toNumber(sprint.total_tasks)
+  const completedTasks = Math.min(totalTasks, toNumber(sprint.completed_tasks))
+
+  return {
+    id: sprint.notion_page_id,
+    name: sprint.sprint_name || sprint.notion_page_id,
+    status: sprint.status || 'Unknown',
+    startDate: toDateString(sprint.start_date),
+    endDate: toDateString(sprint.end_date),
+    totalTasks,
+    completedTasks,
+    progress: totalTasks > 0 ? clampPercentage((completedTasks / totalTasks) * 100) : 0,
+    pageUrl: sprint.page_url
+  }
+}
+
+export const getProjectDetail = async (scope: ProjectDetailScope): Promise<GreenhouseProjectDetailData | null> => {
+  if (!isProjectInTenantScope(scope.projectIds, scope.projectId)) {
+    return null
+  }
+
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const query = `
+    WITH requested_project AS (
+      SELECT @projectDetailId AS notion_page_id
+    ),
+    scoped_tasks AS (
+      SELECT
+        estado,
+        COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
+        COALESCE(client_review_open, FALSE) AS client_review_open,
+        COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
+        COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
+        COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count
+      FROM \`${projectId}.notion_ops.tareas\`
+      WHERE proyecto = @projectDetailId
+    ),
+    task_summary AS (
+      SELECT
+        @projectDetailId AS notion_page_id,
+        COUNT(*) AS total_tasks,
+        COUNTIF(estado IN UNNEST(@activeStatuses)) AS active_tasks,
+        COUNTIF(estado IN UNNEST(@completedStatuses)) AS completed_tasks,
+        ROUND(AVG(rpa_value), 2) AS avg_rpa,
+        COUNTIF(client_review_open OR workflow_review_open OR open_frame_comments > 0) AS open_review_items,
+        COUNTIF(estado IN UNNEST(@readyForReviewStatuses)) AS ready_for_review_tasks,
+        COUNTIF(estado = 'Cambios Solicitados') AS client_change_tasks,
+        COUNTIF(blocker_count > 0 OR estado IN UNNEST(@blockedStatuses)) AS blocked_tasks
+      FROM scoped_tasks
+    )
+    SELECT
+      requested_project.notion_page_id,
+      COALESCE(p.nombre_del_proyecto, requested_project.notion_page_id) AS project_name,
+      COALESCE(p.estado, 'Unknown') AS status,
+      p.resumen AS summary,
+      p.fechas AS start_date,
+      p.fechas_end AS end_date,
+      COALESCE(task_summary.total_tasks, 0) AS total_tasks,
+      COALESCE(task_summary.active_tasks, 0) AS active_tasks,
+      COALESCE(task_summary.completed_tasks, 0) AS completed_tasks,
+      COALESCE(task_summary.avg_rpa, 0) AS avg_rpa,
+      COALESCE(task_summary.open_review_items, 0) AS open_review_items,
+      COALESCE(task_summary.ready_for_review_tasks, 0) AS ready_for_review_tasks,
+      COALESCE(task_summary.client_change_tasks, 0) AS client_change_tasks,
+      COALESCE(task_summary.blocked_tasks, 0) AS blocked_tasks,
+      COALESCE(
+        SAFE_CAST(REPLACE(p.pct_on_time, ' %', '') AS FLOAT64),
+        ROUND(SAFE_DIVIDE(COALESCE(task_summary.completed_tasks, 0), COALESCE(task_summary.total_tasks, 0)) * 100, 0),
+        0
+      ) AS progress_value,
+      p.page_url
+    FROM requested_project
+    LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
+      ON p.notion_page_id = requested_project.notion_page_id
+    LEFT JOIN task_summary
+      ON task_summary.notion_page_id = requested_project.notion_page_id
+  `
+
+  const [rows] = await bigQuery.query({
+    query,
+    params: {
+      projectDetailId: scope.projectId,
+      activeStatuses,
+      completedStatuses,
+      readyForReviewStatuses,
+      blockedStatuses
+    }
+  })
+
+  const row = (rows[0] as ProjectSummaryRow | undefined) || null
+
+  if (!row?.notion_page_id) {
+    return null
+  }
+
+  const openReviewItems = toNumber(row.open_review_items)
+  const blockedTasks = toNumber(row.blocked_tasks)
+  const sprint = await getSprintContext(scope)
+
+  return {
+    project: {
+      id: row.notion_page_id,
+      name: row.project_name || row.notion_page_id,
+      status: row.status || 'Unknown',
+      statusTone: getStatusTone(row.status || 'Unknown'),
+      summary: row.summary,
+      startDate: toDateString(row.start_date),
+      endDate: toDateString(row.end_date),
+      pageUrl: row.page_url,
+      totalTasks: toNumber(row.total_tasks),
+      activeTasks: toNumber(row.active_tasks),
+      completedTasks: toNumber(row.completed_tasks),
+      progress: clampPercentage(toNumber(row.progress_value)),
+      avgRpa: toNumber(row.avg_rpa),
+      openReviewItems,
+      blockedTasks,
+      reviewLoad: getReviewLoad(openReviewItems)
+    },
+    sprint,
+    reviewPressure: {
+      tasksWithOpenReviews: openReviewItems,
+      tasksReadyForReview: toNumber(row.ready_for_review_tasks),
+      tasksInClientChanges: toNumber(row.client_change_tasks),
+      tasksBlocked: blockedTasks
+    },
+    scope: {
+      clientId: scope.clientId,
+      projectId: scope.projectId
+    }
+  }
+}
+
+export const getProjectTasks = async (scope: ProjectDetailScope): Promise<GreenhouseProjectTasksData | null> => {
+  if (!isProjectInTenantScope(scope.projectIds, scope.projectId)) {
+    return null
+  }
+
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const query = `
+    SELECT
+      notion_page_id,
+      nombre_de_tarea AS task_name,
+      estado AS status,
+      COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
+      COALESCE(SAFE_CAST(frame_versions AS INT64), 0) AS frame_versions,
+      COALESCE(SAFE_CAST(frame_comments AS INT64), 0) AS frame_comments,
+      COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
+      COALESCE(client_review_open, FALSE) AS client_review_open,
+      COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
+      COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count,
+      sprint AS sprint_name,
+      last_frame_comment,
+      last_edited_time,
+      page_url
+    FROM \`${projectId}.notion_ops.tareas\`
+    WHERE proyecto = @projectDetailId
+    ORDER BY last_edited_time DESC, created_time DESC
+  `
+
+  const [rows] = await bigQuery.query({
+    query,
+    params: {
+      projectDetailId: scope.projectId
+    }
+  })
+
+  const items = (rows as TaskRow[]).map(row => {
+    const openFrameComments = toNumber(row.open_frame_comments)
+    const reviewOpen = Boolean(row.client_review_open || row.workflow_review_open || openFrameComments > 0)
+    const blocked = toNumber(row.blocker_count) > 0 || blockedStatuses.includes(row.status || '')
+
+    return {
+      id: row.notion_page_id || 'unknown-task',
+      name: row.task_name || row.notion_page_id || 'Unnamed task',
+      status: row.status || 'Unknown',
+      statusTone: getStatusTone(row.status || 'Unknown'),
+      rpa: toNumber(row.rpa_value),
+      frameVersions: toNumber(row.frame_versions),
+      frameComments: toNumber(row.frame_comments),
+      openFrameComments,
+      reviewOpen,
+      blocked,
+      sprintName: row.sprint_name,
+      lastFrameComment: row.last_frame_comment,
+      lastEditedAt: toDateString(row.last_edited_time),
+      pageUrl: row.page_url
+    }
+  })
+
+  return {
+    items,
+    meta: {
+      projectId: scope.projectId,
+      totalTasks: items.length
+    }
+  }
+}

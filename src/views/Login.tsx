@@ -62,8 +62,8 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [email, setEmail] = useState('client.portal@efeonce.com')
-  const [password, setPassword] = useState('greenhouse-demo')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -99,17 +99,17 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
       email,
       password,
       redirect: false,
-      callbackUrl: themeConfig.homePageUrl
+      callbackUrl: '/auth/landing'
     })
 
     if (result?.error) {
-      setError('Invalid credentials. Use the demo access shown below or configure env-based credentials.')
+      setError('No pudimos iniciar sesion con ese correo y contraseña. Revisa tus datos o solicita acceso.')
       setIsSubmitting(false)
 
       return
     }
 
-    router.replace(themeConfig.homePageUrl)
+    router.replace('/auth/landing')
     router.refresh()
   }
 
@@ -182,21 +182,6 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
             <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Enter portal'}
             </Button>
-            <div className='rounded border border-dashed p-4'>
-              <Typography variant='body2' className='font-medium'>
-                Demo access
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Email: <strong>client.portal@efeonce.com</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Password: <strong>greenhouse-demo</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                You can override these defaults with `DEMO_CLIENT_EMAIL`, `DEMO_CLIENT_PASSWORD`, and
-                `DEMO_CLIENT_NAME`.
-              </Typography>
-            </div>
           </form>
         </div>
       </div>
