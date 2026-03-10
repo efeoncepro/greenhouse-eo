@@ -46,6 +46,47 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Promover `feature/executive-dashboard-phase2` hacia `develop`.
+- Confirmar que la integracion local en `develop` sigue construyendo correctamente.
+
+### Rama
+- Rama usada: `develop`
+- Rama promovida: `feature/executive-dashboard-phase2` -> `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `Handoff.md`
+
+### Verificacion
+- `git merge --no-ff feature/executive-dashboard-phase2 -m "merge: promote executive dashboard phase 2"`: correcto
+- `npx pnpm build` sobre `develop`: correcto
+- Build confirma rutas:
+  - `/dashboard`
+  - `/admin/roles`
+  - `/admin/users`
+  - `/admin/users/[id]`
+  - `/api/dashboard/summary`
+  - `/api/dashboard/charts`
+  - `/api/dashboard/risks`
+- `git rev-list --left-right --count origin/develop...HEAD`: `0 8`
+
+### Riesgos o pendientes
+- Falta hacer `push` de `develop` y esperar el deployment de `staging`.
+- La validacion en Preview fue tecnica y suficiente para promocion a `develop`, pero aun conviene revision visual manual en `staging` antes de subir a `main`.
+
+### Proximo paso recomendado
+- Hacer `push` de `develop`.
+- Validar `staging` y luego decidir promocion a `main`.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Alinear la documentacion operativa con el estado real de `feature/executive-dashboard-phase2`.
 - Dejar explicitado el estado de promocion de la rama para el siguiente agente.
 
