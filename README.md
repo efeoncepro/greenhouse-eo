@@ -233,7 +233,7 @@ Repositorio:
 Entorno actual:
 - Vercel
 - dominio actual: `greenhouse-eo.vercel.app`
-- dominio objetivo: `greenhouse.efeonce.com`
+- alias productivo actual: `greenhouse.efeoncepro.com`
 
 Configuracion importante en Vercel:
 - `Framework Preset`: `Next.js`

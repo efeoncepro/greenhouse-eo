@@ -56,7 +56,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - BigQuery como fuente principal de datos consumida server-side
 - NextAuth.js para autenticacion
 - API Routes en App Router para exponer datos filtrados por cliente
-- Dominio objetivo final: `greenhouse.efeonce.com`
+- Alias productivo actual: `greenhouse.efeoncepro.com`
 - Dataset propio del portal: `efeonce-group.greenhouse`
 
 ## Posicion de Producto Actual

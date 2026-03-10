@@ -8,8 +8,8 @@ Configuracion esperada en Vercel:
 - `feature/*` y `fix/*` -> Preview deployments efimeros por rama o PR
 
 Dominios objetivo:
-- Produccion: `greenhouse.efeonce.com`
-- Staging: `dev.greenhouse.efeonce.com`
+- Produccion: `greenhouse.efeoncepro.com`
+- Staging: `dev-greenhouse.efeoncepro.com`
 
 Notas:
 - `Staging` debe configurarse como `Custom Environment` en Vercel y asociarse a la branch `develop`.
@@ -65,14 +65,14 @@ git push -u origin feature/nombre-descriptivo
 
 8. Merge a `develop`:
 - actualiza `Staging`
-- revisar `dev.greenhouse.efeonce.com`
+- revisar `dev-greenhouse.efeoncepro.com`
 
 9. Cuando `Staging` esta estable:
 - crear PR `develop` -> `main`
 
 10. Merge a `main`:
 - actualiza Produccion
-- validar `greenhouse.efeonce.com`
+- validar `greenhouse.efeoncepro.com`
 
 ## Naming de ramas
 

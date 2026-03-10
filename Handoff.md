@@ -46,6 +46,51 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Promover `develop` a `main` y verificar el deployment productivo real.
+- Corregir la documentacion viva para usar el alias productivo actual validado en Vercel.
+
+### Rama
+- Rama usada: `main`
+- Rama promovida: `develop` -> `main`
+
+### Ambiente objetivo
+- Production
+
+### Archivos tocados
+- `CONTRIBUTING.md`
+- `Handoff.md`
+- `README.md`
+- `project_context.md`
+
+### Verificacion
+- `git merge --ff-only develop`: correcto
+- `git push origin main`: correcto
+- `vercel list greenhouse-eo --yes`: correcto, nuevo deployment `Production` listo
+- `vercel inspect https://greenhouse-ttyaam78y-efeonce-7670142f.vercel.app`: correcto
+- Alias productivos verificados:
+  - `https://greenhouse-eo.vercel.app`
+  - `https://greenhouse.efeoncepro.com`
+- `nslookup greenhouse.efeoncepro.com`: correcto
+- `vercel curl /login --deployment https://greenhouse-ttyaam78y-efeonce-7670142f.vercel.app`: responde
+- `vercel curl /api/auth/csrf --deployment https://greenhouse-ttyaam78y-efeonce-7670142f.vercel.app`: responde
+- `vercel curl /dashboard --deployment https://greenhouse-ttyaam78y-efeonce-7670142f.vercel.app`: responde
+
+### Riesgos o pendientes
+- El dominio `greenhouse.efeonce.com` no corresponde al alias productivo verificado en este turno; la documentacion viva ya quedo corregida a `greenhouse.efeoncepro.com`.
+- La app productiva esta protegida por Vercel Authentication para smoke HTTP directo; la verificacion remota en este turno se hizo con `vercel inspect`, DNS y `vercel curl`.
+- Sigue pendiente validacion visual manual del dashboard module-aware con tenants `crm_solutions`, `globe` y `wave`.
+
+### Proximo paso recomendado
+- Validar visualmente `https://greenhouse.efeoncepro.com` en Production.
+- Luego volver a `develop` para abrir `/admin/scopes` y `/admin/feature-flags`.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Volver `/dashboard` module-aware usando `businessLines` y `serviceModules` ya presentes en el tenant context.
 - Mantener alineados los artefactos vivos para que el backlog no siga marcando este punto como pendiente.
 
