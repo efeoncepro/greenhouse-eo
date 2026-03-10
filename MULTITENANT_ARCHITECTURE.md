@@ -14,6 +14,12 @@ If both documents overlap, `GREENHOUSE_ARCHITECTURE_V1.md` is the broader source
 
 Greenhouse must serve multiple clients from one Next.js application without exposing cross-tenant data. The tenant boundary is `client_id`.
 
+Terminology used in this repo:
+- `tenant` = `client` = `company`
+- a tenant is the company-level container used for isolation, governance, and product composition
+- users are not the tenant; they are identities associated to a tenant through `client_id`
+- the intended runtime model is one tenant to many users, even if bootstrap data started with one contact per company
+
 ## Tenant Boundary
 
 - Every authenticated session carries a single `client_id`.
@@ -27,6 +33,7 @@ Current system of record:
 - BigQuery dataset: `efeonce-group.greenhouse`
 - Tenant metadata: `greenhouse.clients`
 - User identity and access: `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes`, `greenhouse.user_campaign_scopes`
+- Current admin governance surfaces: `/admin/tenants`, `/admin/tenants/[id]`, `/admin/users`, `/admin/users/[id]`, `/admin/roles`
 
 Current source systems for operational data:
 - `efeonce-group.notion_ops.tareas`
@@ -183,6 +190,11 @@ Rules:
 Recommended future split:
 - `greenhouse.clients`: tenant metadata and project scope
 - `greenhouse.client_users`: login principals and per-user roles
+
+Current runtime interpretation:
+- `greenhouse.clients` is the company/tenant table
+- `greenhouse.client_users` is the user table
+- the current admin tenant views are intentionally centered on company-level governance, then drill down into users linked to that tenant
 
 ## Data Isolation Rules
 

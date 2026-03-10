@@ -26,6 +26,11 @@ Greenhouse is the executive and operational visibility layer that lets:
 - client stakeholders understand what is being produced and how fast it is moving
 - Efeonce understand account health, delivery health, capacity, and risk across tenants
 
+Terminology contract:
+- `tenant`, `client`, and `company` refer to the same business entity in the portal
+- one tenant can have one or many users
+- tenant metadata and user identity must remain separate tables and separate runtime concepts
+
 The portal must answer:
 - what is being delivered
 - how fast it is moving
@@ -1181,6 +1186,11 @@ Dependencies:
 
 Parallelization:
 - list and detail can be split
+
+Current runtime status:
+- `/admin/tenants` and `/admin/tenants/[id]` already exist as read-only governance surfaces
+- the current implementation treats tenant as the company-level unit of governance
+- detail pages already consolidate users, service modules, feature flags, and visible projects for a tenant
 
 Validation:
 - admins can onboard and maintain tenants without direct table edits

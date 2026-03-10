@@ -129,3 +129,4 @@
 - Se dejo explicitado que la siguiente promocion valida depende de revisar `Preview` antes de mergear a `develop`.
 - Se verifico la alias de Preview de `feature/executive-dashboard-phase2` con `vercel inspect` y `vercel curl` sobre `/login`, `/api/auth/csrf`, `/dashboard` y `/admin/users`.
 - Se agrego `/admin/tenants` y `/admin/tenants/[id]` como nuevo slice de governance y se actualizaron los artefactos vivos para reflejarlo.
+- `GREENHOUSE_ARCHITECTURE_V1.md` y `MULTITENANT_ARCHITECTURE.md` ahora explicitan que `tenant = client = company`, y que los usuarios son una relacion separada `1 tenant -> N users`.

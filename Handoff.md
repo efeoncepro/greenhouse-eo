@@ -58,7 +58,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Archivos tocados
 - `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
 - `PHASE_TASK_MATRIX.md`
 - `README.md`
 - `changelog.md`
@@ -90,6 +92,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Riesgos o pendientes
 - El slice de tenants es read-only; aun no existen mutaciones seguras.
 - `client_feature_flags` y `client_service_modules` ya se muestran, pero todavia no existe gobierno editable para scopes ni flags.
+- La capa documental ya refleja que `tenant = client = empresa` y que la relacion correcta es `1 tenant -> N usuarios`.
 - Conviene validar visualmente en `staging` antes de promover a `main`.
 
 ### Proximo paso recomendado
