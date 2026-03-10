@@ -62,8 +62,8 @@ const MaskImg = styled('img')({
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [email, setEmail] = useState('client.portal@efeonce.com')
-  const [password, setPassword] = useState('greenhouse-demo')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -103,7 +103,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     })
 
     if (result?.error) {
-      setError('Invalid credentials. This portal now validates access against the Greenhouse tenant registry.')
+      setError('No pudimos iniciar sesion con ese correo y contraseña. Revisa tus datos o solicita acceso.')
       setIsSubmitting(false)
 
       return
@@ -182,21 +182,6 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
             <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Enter portal'}
             </Button>
-            <div className='rounded border border-dashed p-4'>
-              <Typography variant='body2' className='font-medium'>
-                Demo access
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Email: <strong>client.portal@efeonce.com</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Password: <strong>greenhouse-demo</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                Access is now resolved from `greenhouse.client_users`. Demo and admin users authenticate with hashed
-                credentials, and real client tenants bootstrap from HubSpot closedwon companies.
-              </Typography>
-            </div>
           </form>
         </div>
       </div>
