@@ -1,15 +1,16 @@
 // Next Imports
-import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+
+import type { Metadata } from 'next'
+
+// Third-party Imports
+import { getServerSession } from 'next-auth'
 
 // Component Imports
 import Login from '@views/Login'
 
 // Server Action Imports
 import { getServerMode } from '@core/utils/serverHelpers'
-
-// Third-party Imports
-import { getServerSession } from 'next-auth'
 
 // Lib Imports
 import { authOptions } from '@/lib/auth'

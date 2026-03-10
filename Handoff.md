@@ -20,7 +20,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Rama objetivo del merge
 
 ### Ambiente objetivo
-- Development, Preview o Production
+- Development, Preview, staging o Production
 
 ### Archivos tocados
 - Lista corta de archivos relevantes
@@ -56,55 +56,69 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Montar el primer shell Greenhouse sobre el starter-kit.
 - Integrar la primera capa real de auth con `next-auth`.
 - Integrar el branding base real del portal en navegacion y favicon.
-- Corregir el flujo de limpieza local para evitar bloqueos de `.next` en Windows.
-- Corregir la operacion Git para evitar `index.lock` por comandos mutantes en paralelo.
+- Corregir los warnings recurrentes de `LF/CRLF`.
+- Conectar Vercel CLI, configurar `staging` y cargar credenciales de BigQuery en Vercel.
+- Estabilizar el flujo local de `build` en Windows y evitar `index.lock` por comandos Git mutantes en paralelo.
+- Integrar `@google-cloud/bigquery`, crear `/api/dashboard/kpis` y conectar el dashboard a datos reales por alcance de cliente demo.
+- Definir la arquitectura multi-tenant objetivo, crear la base `greenhouse.clients` en BigQuery y dejar backlog priorizado para continuar el proyecto.
 
 ### Rama
 - Rama usada: `feature/greenhouse-shell`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
-- Preview de feature branch y luego `Staging`
+- Preview de feature branch y luego `staging`
 
 ### Archivos tocados
+- `.env.example`
 - `.gitattributes`
 - `.gitignore`
 - `AGENTS.md`
+- `BACKLOG.md`
 - `CONTRIBUTING.md`
 - `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `bigquery/greenhouse_clients.sql`
 - `changelog.md`
 - `next.config.ts`
 - `package.json`
 - `pnpm-lock.yaml`
 - `project_context.md`
-- `package.json`
 - `tsconfig.json`
 - `scripts/clean-paths.mjs`
 - `scripts/run-next-build.mjs`
 - `scripts/run-next-start.mjs`
-- `README.md`
-- `.env.example`
-- `src/app/api/auth/[...nextauth]/route.ts`
-- `src/lib/auth.ts`
-- `src/components/auth/AuthSessionProvider.tsx`
-- `src/types/next-auth.d.ts`
-- `src/app/page.tsx`
-- `src/app/(dashboard)/dashboard/page.tsx`
-- `src/app/(dashboard)/proyectos/page.tsx`
-- `src/app/(dashboard)/sprints/page.tsx`
-- `src/app/(dashboard)/settings/page.tsx`
-- `src/data/navigation/verticalMenuData.tsx`
-- `src/data/navigation/horizontalMenuData.tsx`
-- `src/configs/themeConfig.ts`
-- `src/views/Login.tsx`
-- `src/views/greenhouse/*`
-- `src/components/layout/shared/UserDropdown.tsx`
-- `src/components/layout/vertical/FooterContent.tsx`
-- `src/components/layout/horizontal/FooterContent.tsx`
-- `src/@core/svg/Logo.tsx`
 - `public/branding/avatar.png`
 - `public/branding/logo-full.svg`
 - `public/branding/logo-negative.svg`
+- `src/app/layout.tsx`
+- `src/app/page.tsx`
+- `src/app/(blank-layout-pages)/login/page.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/proyectos/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/sprints/page.tsx`
+- `src/app/api/auth/[...nextauth]/route.ts`
+- `src/app/api/dashboard/kpis/route.ts`
+- `src/components/auth/AuthSessionProvider.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/components/layout/horizontal/VerticalNavContent.tsx`
+- `src/components/layout/shared/Logo.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/vertical/Navigation.tsx`
+- `src/configs/themeConfig.ts`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/lib/bigquery.ts`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/lib/demo-client.ts`
+- `src/lib/auth.ts`
+- `src/types/greenhouse-dashboard.ts`
+- `src/types/next-auth.d.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/*`
 - `../Greenhouse_Portal_Spec_v1.md`
 
 ### Verificacion
@@ -116,30 +130,36 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm add next-auth@4.24.13`: correcto
 - `npx pnpm build` con `next-auth` integrado: correcto
 - `npx pnpm build` con branding Greenhouse en navegacion y favicon: correcto
-- `npx pnpm build` ejecutado varias veces seguidas en Windows local con `distDir` dinamico: correcto
-- Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
-- Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
-- Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
-- Documentacion de staging y custom environment: correcta y alineada con Vercel
 - `git config --local core.autocrlf false`: correcto
 - `git config --local core.eol lf`: correcto
 - `git add .gitattributes` y `git add .`: correctos, sin warnings `LF/CRLF`
 - Vercel CLI enlazado a `greenhouse-eo`: correcto
 - `staging` confirmado en Vercel y asociado a `develop`: correcto
 - Variables `GCP_PROJECT` y `GOOGLE_APPLICATION_CREDENTIALS_JSON` cargadas en `Development`, `staging` y `Production`: correcto
+- `npx pnpm build` ejecutado varias veces seguidas en Windows local con `distDir` dinamico: correcto
+- `npx pnpm add @google-cloud/bigquery`: correcto
+- `npx pnpm build` con BigQuery integrado y `/api/dashboard/kpis`: correcto
+- `npx pnpm lint`: correcto
+- Dataset `efeonce-group.greenhouse`: creado
+- Tabla `efeonce-group.greenhouse.clients`: creada
+- Tenant bootstrap `greenhouse-demo-client`: insertado y verificado
+- Verificacion manual en Vercel: correcta despues de cambiar `Framework Preset` a `Next.js`
+- Lectura y normalizacion de `../Greenhouse_Portal_Spec_v1.md`: correcta
+- Reemplazo de `README.md`: correcto, alineado con la especificacion y el contexto operativo actual
 
 ### Riesgos o pendientes
-- El shell Greenhouse actual usa datos mock y todavia no consume BigQuery.
 - Login ya autentica con `next-auth`, pero contra credenciales demo configurables por env.
+- El dashboard ya consume BigQuery, pero el tenant scope aun depende de `DEMO_CLIENT_PROJECT_IDS`.
+- `greenhouse.clients` ya existe, pero la app todavia no la usa en runtime.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 - El branding actual usa assets temporales entregados por el usuario; falta reemplazo por versiones finales de diseno.
-- El repo sigue dentro de OneDrive; si otro proceso externo bloquea archivos, la limpieza ahora reintenta antes de fallar, pero no elimina el riesgo sistémico del sync.
+- El repo sigue dentro de OneDrive; la salida dinamica de `build` reduce el problema, pero no elimina el riesgo sistemico del sync.
 - En Windows local, `build` ya no reutiliza la misma carpeta de salida; `start` usa la ultima ruta registrada en `.next-build-dir`.
 - La configuracion Git local que evita warnings vive en `.git/config`; si otro agente trabaja en otra maquina y reaparecen avisos, debe revisar `core.autocrlf` contra `.gitattributes`.
 
 ### Proximo paso recomendado
-- Crear las primeras API routes server-side para KPIs y proyectos.
-- Reemplazar la validacion demo por modelo multi-tenant real de clientes.
-- Conectar el shell actual a datos reales de BigQuery.
-- Crear en Vercel el `Custom Environment` `Staging`, asociarlo a `develop` y, si aplica, enlazar `dev.greenhouse.efeonce.com`.
+- Crear `/api/projects` filtrado por cliente y reemplazar la grilla mock de proyectos.
+- Reemplazar el auth demo por lookup real a `greenhouse.clients`.
+- Implementar `/proyectos/[id]` con detalle de tareas, estado y comentarios abiertos.
+- Despues agregar `/api/sprints` y endurecer auth para un flujo multi-tenant real.

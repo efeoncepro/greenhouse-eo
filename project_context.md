@@ -29,6 +29,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - NextAuth.js para autenticacion
 - API Routes en App Router para exponer datos filtrados por cliente
 - Dominio objetivo final: `greenhouse.efeonce.com`
+- Dataset propio del portal: `efeonce-group.greenhouse`
 
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
@@ -45,9 +46,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/app/(dashboard)/sprints/page.tsx`: vista base de sprints
 - `src/app/(dashboard)/settings/page.tsx`: vista base de settings
 - `src/app/(blank-layout-pages)/login/page.tsx`: login actual
+- `src/app/api/dashboard/kpis/route.ts`: primer endpoint real con datos de BigQuery
 - `src/components/layout/**`: piezas del layout
 - `src/configs/**`: configuracion de tema y color
 - `src/data/navigation/**`: definicion de menu
+- `src/lib/bigquery.ts`: cliente reusable de BigQuery
+- `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos server-side del dashboard
 
 ## Estado de Rutas
 - Existe `/dashboard`
@@ -68,10 +72,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
-- Aun no existen data flows reales del producto Greenhouse.
 - `next-auth` ya esta integrado con credenciales demo, session JWT y proteccion base del dashboard.
-- `@google-cloud/bigquery` aun no esta integrado.
-- Aun no existen API routes de negocio para datos reales del portal.
+- `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
+- Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
+- El alcance multi-tenant actual se apoya en `DEMO_CLIENT_PROJECT_IDS`; aun falta una fuente real de clientes.
+- Aun no existen `/api/projects`, `/api/sprints` ni el detalle `/proyectos/[id]`.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -124,10 +129,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `.env.example` define:
   - `NEXT_PUBLIC_APP_URL`
   - `BASEPATH`
+  - `GCP_PROJECT`
   - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - `DEMO_CLIENT_ID`
   - `DEMO_CLIENT_EMAIL`
   - `DEMO_CLIENT_PASSWORD`
   - `DEMO_CLIENT_NAME`
+  - `DEMO_CLIENT_PROJECT_IDS`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
@@ -138,6 +148,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` aun no estan integradas al starter kit actual.
+
+## Multi-Tenant Actual
+- Dataset creado: `efeonce-group.greenhouse`
+- Tabla creada: `greenhouse.clients`
+- Tenant bootstrap cargado: `greenhouse-demo-client`
+- Documento de referencia: `MULTITENANT_ARCHITECTURE.md`
+- DDL versionado: `bigquery/greenhouse_clients.sql`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
@@ -154,7 +171,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion actual es demo y debe reemplazarse por modelo multi-tenant real.
-- Falta integrar BigQuery server-side.
+- Falta mover el scope de cliente a una fuente real como `greenhouse.clients`.
 - Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
 
 ## Supuestos Operativos

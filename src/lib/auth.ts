@@ -1,9 +1,7 @@
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-const demoEmail = process.env.DEMO_CLIENT_EMAIL || 'client.portal@efeonce.com'
-const demoPassword = process.env.DEMO_CLIENT_PASSWORD || 'greenhouse-demo'
-const demoName = process.env.DEMO_CLIENT_NAME || 'Greenhouse Demo'
+import { demoClientConfig } from '@/lib/demo-client'
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -24,14 +22,16 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (credentials.email !== demoEmail || credentials.password !== demoPassword) {
+        if (credentials.email !== demoClientConfig.email || credentials.password !== demoClientConfig.password) {
           return null
         }
 
         return {
-          id: 'greenhouse-demo-client',
-          email: demoEmail,
-          name: demoName
+          id: demoClientConfig.id,
+          email: demoClientConfig.email,
+          name: demoClientConfig.name,
+          clientId: demoClientConfig.id,
+          projectIds: demoClientConfig.projectIds
         }
       }
     })
@@ -42,6 +42,8 @@ export const authOptions: NextAuthOptions = {
         token.sub = user.id
         token.email = user.email
         token.name = user.name
+        token.clientId = user.clientId
+        token.projectIds = user.projectIds
       }
 
       return token
@@ -51,6 +53,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub || ''
         session.user.email = token.email || ''
         session.user.name = token.name || ''
+        session.user.clientId = typeof token.clientId === 'string' ? token.clientId : ''
+        session.user.projectIds = Array.isArray(token.projectIds) ? token.projectIds.filter(Boolean) : []
       }
 
       return session

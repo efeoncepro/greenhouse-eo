@@ -2,6 +2,7 @@
 
 // React Imports
 import { useState } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
@@ -22,7 +23,6 @@ import classnames from 'classnames'
 import { signIn } from 'next-auth/react'
 
 // Type Imports
-import type { ChangeEvent, FormEvent } from 'react'
 import type { SystemMode } from '@core/types'
 
 // Component Imports

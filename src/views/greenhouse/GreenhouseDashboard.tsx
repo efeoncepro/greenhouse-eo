@@ -1,3 +1,8 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -7,27 +12,78 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-const kpis = [
-  { label: 'Average RpA', value: '1.7', detail: 'Healthy review rhythm', tone: 'success' as const },
-  { label: 'Active tasks', value: '28', detail: '6 blocked, 22 moving', tone: 'warning' as const },
-  { label: 'Completed this sprint', value: '14', detail: '74% of committed scope', tone: 'info' as const },
-  { label: 'Open client comments', value: '9', detail: '3 require same-day action', tone: 'error' as const }
-]
+import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
-const statusRows = [
-  { label: 'In production', value: 11, color: 'success.main' },
-  { label: 'In review', value: 7, color: 'warning.main' },
-  { label: 'Client changes', value: 6, color: 'error.main' },
-  { label: 'Queued next', value: 4, color: 'info.main' }
-]
-
-const projects = [
-  { name: 'Q2 Launch System', client: 'ACME Motion', rpa: '1.4', progress: 82 },
-  { name: 'Content Engine Sprint', client: 'Orbit Foods', rpa: '1.9', progress: 64 },
-  { name: 'Campaign Recovery', client: 'North Peak', rpa: '2.6', progress: 43 }
-]
+const fallbackDashboardData: GreenhouseDashboardData = {
+  kpis: [
+    { label: 'Average RpA', value: '--', detail: 'Loading scoped metrics from BigQuery', tone: 'success' },
+    { label: 'Active tasks', value: '--', detail: 'Loading current workload', tone: 'warning' },
+    { label: 'Completed tasks', value: '--', detail: 'Loading completion signal', tone: 'info' },
+    { label: 'Open review items', value: '--', detail: 'Loading review pressure', tone: 'error' }
+  ],
+  statusRows: [
+    { label: 'In progress', value: 0, color: 'success.main' },
+    { label: 'Ready for review', value: 0, color: 'warning.main' },
+    { label: 'Client changes', value: 0, color: 'error.main' },
+    { label: 'Queued next', value: 0, color: 'info.main' }
+  ],
+  projects: [],
+  summary: {
+    completionRate: 0
+  },
+  scope: {
+    clientId: '',
+    projectCount: 0,
+    projectIds: [],
+    lastSyncedAt: null
+  }
+}
 
 const GreenhouseDashboard = () => {
+  const [data, setData] = useState<GreenhouseDashboardData>(fallbackDashboardData)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    const loadDashboard = async () => {
+      try {
+        setIsLoading(true)
+
+        const response = await fetch('/api/dashboard/kpis', {
+          cache: 'no-store',
+          signal: controller.signal
+        })
+
+        if (!response.ok) {
+          throw new Error(`Dashboard request failed with ${response.status}`)
+        }
+
+        const payload = (await response.json()) as GreenhouseDashboardData
+
+        setData(payload)
+        setError(null)
+      } catch (fetchError) {
+        if ((fetchError as Error).name === 'AbortError') {
+          return
+        }
+
+        setError('The dashboard could not load live metrics from BigQuery.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void loadDashboard()
+
+    return () => controller.abort()
+  }, [])
+
+  const syncedAtLabel = data.scope.lastSyncedAt
+    ? new Date(data.scope.lastSyncedAt).toLocaleString()
+    : 'Waiting for the first successful sync'
+
   return (
     <Stack spacing={6}>
       <Card sx={{ overflow: 'hidden' }}>
@@ -42,12 +98,14 @@ const GreenhouseDashboard = () => {
             <Chip label='Greenhouse overview' color='success' variant='outlined' sx={{ width: 'fit-content' }} />
             <Typography variant='h3'>Client visibility that shows where delivery is smooth and where it is not.</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 780 }}>
-              This first shell turns the starter kit into a client operations portal: sprint health, review pressure,
-              delivery movement, and project-level accountability in one place.
+              This dashboard now reads scoped project metrics from BigQuery. Current tenant scope: {data.scope.projectCount}{' '}
+              projects, last sync {syncedAtLabel}.
             </Typography>
           </Stack>
         </CardContent>
       </Card>
+
+      {error ? <Alert severity='warning'>{error}</Alert> : null}
 
       <Box
         sx={{
@@ -56,13 +114,14 @@ const GreenhouseDashboard = () => {
           gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }
         }}
       >
-        {kpis.map(kpi => (
+        {data.kpis.map(kpi => (
           <Card key={kpi.label}>
             <CardContent>
               <Stack spacing={2}>
                 <Chip label={kpi.label} color={kpi.tone} variant='outlined' sx={{ width: 'fit-content' }} />
                 <Typography variant='h3'>{kpi.value}</Typography>
                 <Typography color='text.secondary'>{kpi.detail}</Typography>
+                {isLoading ? <LinearProgress color={kpi.tone} sx={{ borderRadius: 999 }} /> : null}
               </Stack>
             </CardContent>
           </Card>
@@ -75,11 +134,10 @@ const GreenhouseDashboard = () => {
             <Stack spacing={3}>
               <Typography variant='h5'>Portfolio activity</Typography>
               <Typography color='text.secondary'>
-                Current workload distribution across delivery states. This is the fastest way to show tension before a
-                client asks where things stand.
+                Current workload distribution across live Notion task states for the projects in this client scope.
               </Typography>
               <Stack spacing={2.5}>
-                {statusRows.map(row => (
+                {data.statusRows.map(row => (
                   <Box key={row.label}>
                     <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
                       <Typography>{row.label}</Typography>
@@ -106,25 +164,32 @@ const GreenhouseDashboard = () => {
             <Stack spacing={3}>
               <Typography variant='h5'>Sprint signal</Typography>
               <Typography color='text.secondary'>
-                Current sprint velocity is stable, but review pressure is rising in two accounts.
+                This slice is already live. The next layer is sprint-specific velocity, blockers, and unresolved comments
+                per project.
               </Typography>
               <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'action.hover' }}>
                 <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
                   <Typography variant='body2'>Sprint completion</Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    74%
+                    {data.summary.completionRate}%
                   </Typography>
                 </Stack>
-                <LinearProgress variant='determinate' value={74} sx={{ height: 12, borderRadius: 999 }} />
+                <LinearProgress
+                  variant='determinate'
+                  value={data.summary.completionRate}
+                  sx={{ height: 12, borderRadius: 999 }}
+                />
               </Box>
               <Divider />
               <Stack spacing={1.5}>
                 <Typography variant='body2' color='text.secondary'>
                   Immediate attention
                 </Typography>
-                <Typography>North Peak has the highest comment backlog and the weakest RpA trend this week.</Typography>
+                <Typography>
+                  Open review pressure is now computed from live task data instead of static demo numbers.
+                </Typography>
                 <Typography color='text.secondary'>
-                  Next action: surface late-review tasks and unresolved comments in project detail.
+                  Next action: surface late-review tasks, blocked tasks, and unresolved comments in project detail.
                 </Typography>
               </Stack>
             </Stack>
@@ -137,9 +202,9 @@ const GreenhouseDashboard = () => {
           <Stack spacing={3}>
             <Typography variant='h5'>Projects under watch</Typography>
             <Box sx={{ display: 'grid', gap: 2 }}>
-              {projects.map(project => (
+              {data.projects.map(project => (
                 <Box
-                  key={project.name}
+                  key={project.id}
                   sx={{
                     p: 3,
                     borderRadius: 3,
@@ -152,17 +217,17 @@ const GreenhouseDashboard = () => {
                 >
                   <Box>
                     <Typography variant='h6'>{project.name}</Typography>
-                    <Typography color='text.secondary'>{project.client}</Typography>
+                    <Typography color='text.secondary'>{project.activeTasks} active tasks in scope</Typography>
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
                       Average RpA
                     </Typography>
-                    <Typography variant='h6'>{project.rpa}</Typography>
+                    <Typography variant='h6'>{project.avgRpa.toFixed(2)}</Typography>
                   </Box>
                   <Box sx={{ minWidth: { xs: '100%', md: 180 } }}>
                     <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
-                      <Typography variant='body2'>Execution</Typography>
+                      <Typography variant='body2'>On-time execution</Typography>
                       <Typography variant='body2' color='text.secondary'>
                         {project.progress}%
                       </Typography>
@@ -171,6 +236,11 @@ const GreenhouseDashboard = () => {
                   </Box>
                 </Box>
               ))}
+              {!isLoading && data.projects.length === 0 ? (
+                <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px dashed ${theme.palette.divider}` }}>
+                  <Typography>No scoped projects returned data yet.</Typography>
+                </Box>
+              ) : null}
             </Box>
           </Stack>
         </CardContent>

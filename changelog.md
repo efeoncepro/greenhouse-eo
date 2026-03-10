@@ -26,6 +26,16 @@
 - Se reemplazaron menu, branding base, footer, logo, login y dropdown para reflejar Greenhouse en lugar de la demo de Vuexy.
 - Se agrego `next-auth` con `CredentialsProvider`, proteccion base del dashboard, redirect de guest/authenticated y logout real.
 - Se integraron assets reales de marca en la navegacion y se configuro el avatar temporal como favicon.
+- Se agrego `@google-cloud/bigquery` al repo.
+- Se implemento `src/lib/bigquery.ts` para acceso server-side a BigQuery.
+- Se implemento `src/app/api/dashboard/kpis/route.ts` como primer endpoint real del portal.
+- El dashboard principal ya consume datos reales de BigQuery para KPIs, estado de cartera y proyectos bajo observacion.
+- El scope actual del tenant demo se controla con `DEMO_CLIENT_PROJECT_IDS` mientras se define la fuente multi-tenant real.
+- Se creo el dataset `efeonce-group.greenhouse`.
+- Se creo la tabla `greenhouse.clients` como base del modelo multi-tenant.
+- Se cargo un tenant bootstrap `greenhouse-demo-client`.
+- Se versiono el DDL en `bigquery/greenhouse_clients.sql`.
+- Se agregaron `MULTITENANT_ARCHITECTURE.md` y `BACKLOG.md` para dejar la arquitectura objetivo y el plan de avance.
 
 ### Documentacion Operativa
 - Se agregaron `AGENTS.md`, `Handoff.md`, `changelog.md` y `project_context.md` para coordinacion multi-agente.
