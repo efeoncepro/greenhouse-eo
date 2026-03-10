@@ -87,7 +87,6 @@ Status:
 
 Open activities:
 - review and promote the new executive dashboard through `Preview`, `staging` and `Production`
-- add dashboard composition by `serviceModules`
 - add `/api/dashboard/capacity` once team and staffing data are modeled
 - add `/api/dashboard/market-speed` when time fields become numerically reliable
 - add campaign-aware slices once `/campanas` exists
@@ -97,6 +96,7 @@ Completed in current iteration:
 - created `/api/dashboard/charts`
 - created `/api/dashboard/risks`
 - redesigned `/dashboard` around executive visibility
+- composed dashboard widgets and narrative by `businessLines` and `serviceModules`
 - adopted Vuexy chart stack with `apexcharts` + `react-apexcharts` and the `AppReactApexCharts` wrapper pattern from `full-version`
 - validated the new dashboard queries against real tenant scope in BigQuery
 
@@ -213,10 +213,8 @@ Current adaptation rule:
 - align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
 - promote `feature/executive-dashboard-phase2` only after preview validation of dashboard and admin surfaces
 
-### N2.1 Module-Aware Dashboard
+### N2.1 Dashboard Hardening
 
-- compose dashboard widgets by `serviceModules`
-- define which KPIs and cards appear by business line and active module
 - avoid recomputing the same overview payload when only one slice needs refresh
 - decide if tenant-level cache is safe for summary, charts, and risks
 

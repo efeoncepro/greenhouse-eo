@@ -60,6 +60,7 @@ Ese documento define:
 - `full-version` vive fuera del repo y se usa como referencia de contexto, referencia visual y referencia funcional.
 - No se debe subir `full-version` a este repositorio.
 - Si se toman componentes desde `full-version`, deben adaptarse al contexto Greenhouse antes de integrarse.
+- Los componentes UI reutilizables propios de Greenhouse deben vivir en `src/components/greenhouse/*`; las vistas deben consumir esa capa antes de crear JSX ad hoc por modulo.
 
 ## Estado Actual
 
@@ -76,6 +77,7 @@ Estado hoy:
 - existe `/api/projects` con queries server-side a BigQuery
 - existen `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant
 - el dashboard principal ya es una vista ejecutiva real con charts estilo Vuexy sobre throughput, salud on-time, mix operativo, esfuerzo y proyectos bajo atencion
+- el dashboard ya compone hero y cards segun `businessLines` y `serviceModules` del tenant
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
@@ -122,7 +124,7 @@ Rutas objetivo del producto:
 
 Brecha visible:
 - la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero esos contactos siguen en estado `invited` hasta que exista onboarding real
-- el dashboard ya es la home ejecutiva actual del portal, pero aun falta composicion por `serviceModules`, `capacity`, `market-speed` y slices de campanas
+- el dashboard ya es la home ejecutiva actual del portal y ya compone narrativa por `serviceModules`, pero aun faltan `capacity`, `market-speed` y slices de campanas
 - faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence

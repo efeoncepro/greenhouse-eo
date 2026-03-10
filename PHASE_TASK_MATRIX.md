@@ -44,7 +44,6 @@ Residual follow-up:
 
 Pending tasks:
 - review and promote the executive dashboard through `Preview`, `staging`, and `Production`
-- compose dashboard widgets by `serviceModules`
 - create `/api/dashboard/capacity`
 - create `/api/dashboard/market-speed`
 - add campaign-aware dashboard slices once `/campanas` exists
@@ -100,7 +99,7 @@ Pending tasks:
 
 ## Recommended Near-Term Order
 
-1. Make `/dashboard` module-aware using `serviceModules`
-2. Build `/admin/scopes` and `/admin/feature-flags`
-3. Build `/api/sprints` and the real `/sprints`
-4. Start team/capacity once assignment source of truth is clear
+1. Build `/admin/scopes` and `/admin/feature-flags`
+2. Build `/api/sprints` and the real `/sprints`
+3. Start team/capacity once assignment source of truth is clear
+4. Harden dashboard payload reuse and tenant-safe cache strategy

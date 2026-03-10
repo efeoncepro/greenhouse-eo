@@ -13,6 +13,8 @@ import type {
 interface DashboardViewerScope {
   clientId: string
   projectIds: string[]
+  businessLines: string[]
+  serviceModules: string[]
 }
 
 interface AggregateRow {
@@ -211,6 +213,8 @@ const buildEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboa
     clientId: scope.clientId,
     projectCount: 0,
     projectIds: scope.projectIds,
+    businessLines: scope.businessLines,
+    serviceModules: scope.serviceModules,
     lastSyncedAt: null
   },
   summary: {
@@ -520,6 +524,8 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       clientId: scope.clientId,
       projectCount,
       projectIds: scope.projectIds,
+      businessLines: scope.businessLines,
+      serviceModules: scope.serviceModules,
       lastSyncedAt: toIsoString(aggregateRow.last_synced_at)
     },
     summary,

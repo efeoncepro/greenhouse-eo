@@ -46,6 +46,62 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Volver `/dashboard` module-aware usando `businessLines` y `serviceModules` ya presentes en el tenant context.
+- Mantener alineados los artefactos vivos para que el backlog no siga marcando este punto como pendiente.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `main` despues de validacion visual en `Preview` o `staging`
+
+### Ambiente objetivo
+- Development y luego `Preview` o `staging`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `PHASE_TASK_MATRIX.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/api/dashboard/charts/route.ts`
+- `src/app/api/dashboard/risks/route.ts`
+- `src/app/api/dashboard/summary/route.ts`
+- `src/app/api/dashboard/kpis/route.ts`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/types/greenhouse-dashboard.ts`
+- `src/components/greenhouse/ChipGroup.tsx`
+- `src/components/greenhouse/MetricList.tsx`
+- `src/components/greenhouse/MetricStatCard.tsx`
+- `src/components/greenhouse/SectionHeading.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/dashboard/AttentionProjectCard.tsx`
+- `src/views/greenhouse/dashboard/chart-options.ts`
+- `src/views/greenhouse/dashboard/config.ts`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+
+### Riesgos o pendientes
+- La composicion actual es UI-aware y usa los mismos aggregates ejecutivos existentes; todavia no crea payloads dedicados por modulo ni evita recomputar `getDashboardOverview()` por slice.
+- Falta validacion visual manual en `Preview` o `staging` para confirmar balance, copy y comportamiento responsive del nuevo dashboard.
+- `serviceModules` ya condicionan el dashboard, pero aun no la navegacion ni billing.
+- Next 16 vuelve a intentar inyectar includes efimeros de `.next-local` en `tsconfig.json` durante `build`; se limpiaron para no dejar rutas locales hardcodeadas en el repo.
+- La nueva capa reusable transversal vive en `src/components/greenhouse/*`; futuras vistas Greenhouse deberian consumir primero esa capa y dejar en `src/views/greenhouse/<modulo>/*` solo lo especifico de cada superficie.
+
+### Proximo paso recomendado
+- Validar visualmente `/dashboard` con al menos un tenant `crm_solutions`, uno `globe` y uno `wave`.
+- Si la UI queda sana, abrir `/admin/scopes` y `/admin/feature-flags` como siguiente slice.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Materializar el siguiente slice de Fase 7 centrado en tenants.
 - Mantener consistente el modelo `tenant = client = empresa`, con relacion uno-a-muchos hacia usuarios.
 

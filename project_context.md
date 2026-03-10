@@ -88,12 +88,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/app/api/projects/[id]/route.ts`: detalle real de proyecto por tenant
 - `src/app/api/projects/[id]/tasks/route.ts`: tareas del proyecto por tenant
 - `src/components/layout/**`: piezas del layout
+- `src/components/greenhouse/**`: componentes UI reutilizables del producto Greenhouse
 - `src/configs/**`: configuracion de tema y color
 - `src/data/navigation/**`: definicion de menu
 - `src/lib/bigquery.ts`: cliente reusable de BigQuery
 - `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos server-side del dashboard
 - `src/lib/projects/get-projects-overview.ts`: capa de datos server-side de proyectos
 - `src/lib/projects/get-project-detail.ts`: capa de datos server-side del detalle de proyecto y sus tareas
+- `src/views/greenhouse/dashboard/**`: configuracion y componentes especificos del dashboard Greenhouse
 
 ## Estado de Rutas
 - Existe `/dashboard`
@@ -132,7 +134,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
-- Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side y usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion.
+- Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side, usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion, y ahora compone hero/cards segun `businessLines` y `serviceModules`.
 - Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
@@ -152,7 +154,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
-- Falta consumir `serviceModules` para condicionar navegacion, dashboard y billing por servicio contratado.
+- Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -252,7 +254,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
 - El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
-- Faltan sprints reales, composicion del dashboard por `serviceModules`, `capacity`, `market-speed` y los data flows restantes definidos en la especificacion.
+- Faltan sprints reales, `capacity`, `market-speed` y los data flows restantes definidos en la especificacion.
 - Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.

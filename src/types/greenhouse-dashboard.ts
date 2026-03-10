@@ -11,6 +11,8 @@ export interface GreenhouseDashboardScope {
   clientId: string
   projectCount: number
   projectIds: string[]
+  businessLines: string[]
+  serviceModules: string[]
   lastSyncedAt: string | null
 }
 

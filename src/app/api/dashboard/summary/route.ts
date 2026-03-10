@@ -14,7 +14,9 @@ export async function GET() {
 
   const data = await getDashboardOverview({
     clientId: tenant.clientId,
-    projectIds: tenant.projectIds
+    projectIds: tenant.projectIds,
+    businessLines: tenant.businessLines,
+    serviceModules: tenant.serviceModules
   })
 
   return NextResponse.json({
