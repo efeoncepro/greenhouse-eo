@@ -9,6 +9,7 @@ Greenhouse busca darle a cada cliente acceso a:
 - estado de su operacion creativa
 - dashboards de entrega, velocidad, capacidad y riesgo
 - contexto de proyectos, tareas y sprints sin reemplazar Notion
+- composicion modular por linea de negocio y servicio contratado
 - una capa de transparencia conectada al sistema Greenhouse
 
 La especificacion funcional principal esta en:
@@ -19,6 +20,8 @@ La documentacion operativa interna del repo esta en:
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `PHASE_TASK_MATRIX.md`
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
@@ -26,6 +29,10 @@ La documentacion operativa interna del repo esta en:
 
 Documento maestro:
 - `GREENHOUSE_ARCHITECTURE_V1.md`
+- Resumen rapido de tareas por fase:
+- `PHASE_TASK_MATRIX.md`
+- Documentacion oficial Vuexy:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 
 Ese documento define:
 - el norte del producto
@@ -36,6 +43,9 @@ Ese documento define:
 
 Documento tecnico de Fase 1:
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+
+Documento tecnico de modulos de servicio:
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
 
 Ese documento define:
 - `client_users`
@@ -62,16 +72,19 @@ Estado hoy:
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
+- existen `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`
 - existe `/api/projects` con queries server-side a BigQuery
 - existen `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant
-- el dashboard principal ya consume datos reales para KPIs, estado de cartera y proyectos bajo observacion
+- el dashboard principal ya es una vista ejecutiva real con charts estilo Vuexy sobre throughput, salud on-time, mix operativo, esfuerzo y proyectos bajo atencion
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 - existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
 - ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
 - ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
-- ya existen `/auth/landing`, `/internal/dashboard`, `/admin` y `/admin/users` como superficies minimas de Fase 1
+- ya existen `/auth/landing`, `/internal/dashboard`, `/admin`, `/admin/users`, `/admin/users/[id]` y `/admin/roles` como superficies iniciales de access y governance
+- `/admin/roles` ya reutiliza patrones visuales de Vuexy sobre datos reales de BigQuery
+- `/admin/users/[id]` ya reutiliza la estructura `overview` / `security` / `billing` de Vuexy reinterpretada para Greenhouse
 - el demo client y el admin interno ya autentican con `password_hash` bcrypt
 
 Rutas actuales:
@@ -85,6 +98,17 @@ Rutas actuales:
 - `/internal/dashboard`
 - `/admin`
 - `/admin/users`
+- `/admin/users/[id]`
+- `/admin/roles`
+
+Endpoints principales actuales:
+- `/api/dashboard/kpis`
+- `/api/dashboard/summary`
+- `/api/dashboard/charts`
+- `/api/dashboard/risks`
+- `/api/projects`
+- `/api/projects/[id]`
+- `/api/projects/[id]/tasks`
 
 Rutas objetivo del producto:
 - `/dashboard`
@@ -95,11 +119,11 @@ Rutas objetivo del producto:
 
 Brecha visible:
 - la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero esos contactos siguen en estado `invited` hasta que exista onboarding real
-- el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
-- faltan `/api/sprints` y `/api/dashboard/charts`
+- el dashboard ya es la home ejecutiva actual del portal, pero aun falta composicion por `serviceModules`, `capacity`, `market-speed` y slices de campanas
+- faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
-- las superficies `/internal/dashboard` y `/admin/users` son minimas; falta desarrollar sus vistas de negocio
+- las superficies `/internal/dashboard` y `/admin` ya tienen slices iniciales, pero aun faltan mutaciones, tenencia y gobierno completo
 
 ## Stack
 
@@ -279,10 +303,50 @@ Usar de `../full-version` principalmente:
 - tablas filtrables
 - patrones de usuarios, roles y permissions
 
+Orden recomendado para buscar referencia Vuexy:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/views/apps/user/list/*`
+- `../full-version/src/views/apps/user/view/*`
+- `../full-version/src/views/apps/roles/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- despues confirmar contra la documentacion oficial de Vuexy:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+
+JWT y ACL en Vuexy vs Greenhouse:
+- Vuexy usa `next-auth` con estrategia `jwt` como patron base de sesion; eso no es una ventaja diferencial del template porque Greenhouse ya usa JWT tambien.
+- El ACL/permisos de Vuexy sirve como referencia de organizacion visual y pantallas demo de permisos, no como modelo multi-tenant listo para produccion.
+- Greenhouse no debe depender del ACL generico del template para autorizacion real.
+- La autorizacion real de Greenhouse vive en `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes` y `greenhouse.user_campaign_scopes`.
+- El enforcement real se hace server-side con `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`, no con flags client-side del template.
+
+User Management y Roles & Permissions:
+- La app de `User Management` y `Roles & Permissions` de Vuexy si es buena candidata para integracion visual en Greenhouse.
+- Debe adaptarse solo como capa UI y estructura de navegacion sobre datos reales de BigQuery.
+- `src/views/apps/user/list/*` y `src/views/apps/roles/*` son referencia directa para `/admin/users` y `/admin/roles`.
+- `src/views/apps/user/view/*` es referencia directa para `/admin/users/[id]`.
+- Los tabs `overview`, `security` y `billing-plans` no deben copiarse tal cual: deben reinterpretarse asi:
+- `overview` -> tenant, roles, scopes, actividad y contexto del usuario
+- `security` -> auth mode, ultimo acceso, resets, auditoria y controles de acceso
+- `billing-plans` -> invoices, fee, plan contratado, consumo y contexto comercial del cliente
+- Los modulos demo de invoices, payment method, recent devices o billing fake no son source of truth y no deben entrar como data layer.
+
+Service modules:
+- Greenhouse debe adaptar navegacion, charts y vistas segun servicios contratados del cliente.
+- Ese eje no reemplaza roles ni scopes; los complementa.
+- La fuente comercial actual para derivarlos es `hubspot_crm.deals.linea_de_servicio` y `hubspot_crm.deals.servicios_especificos`.
+- El schema base esta versionado en `bigquery/greenhouse_service_modules_v1.sql`.
+- El bootstrap inicial desde deals `closedwon` esta versionado en `bigquery/greenhouse_service_module_bootstrap_v1.sql`.
+- `getTenantContext()` ya expone `businessLines` y `serviceModules` para runtime server-side.
+- Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
+
 ## Proximos Pasos Recomendados
 
-1. Definir `client_users`, roles y scopes como siguiente base del modelo multi-tenant.
-2. Agregar `/api/dashboard/charts` y rediseñar `/dashboard` como centro ejecutivo del producto.
-3. Agregar `/api/sprints` y velocity real como contexto de velocidad, no como gestor de trabajo.
-4. Diseñar la capa de `team/capacity`.
-5. Diseñar la capa de `campaign intelligence`.
+1. Validar y promover `feature/executive-dashboard-phase2` por `Preview`, `develop`, `staging` y `main`.
+2. Volver `/dashboard` module-aware usando `serviceModules`.
+3. Construir `/admin/tenants` como siguiente slice real de governance.
+4. Agregar `/api/sprints` y la vista real de `/sprints`.
+5. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.

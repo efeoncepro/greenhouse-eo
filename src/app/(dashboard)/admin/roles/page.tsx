@@ -1,9 +1,9 @@
-import GreenhouseAdminUsers from '@views/greenhouse/GreenhouseAdminUsers'
+import GreenhouseAdminRoles from '@views/greenhouse/GreenhouseAdminRoles'
 
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 
 export default async function Page() {
   const data = await getAdminAccessOverview()
 
-  return <GreenhouseAdminUsers data={data} />
+  return <GreenhouseAdminRoles data={data} />
 }

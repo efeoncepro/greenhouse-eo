@@ -71,6 +71,8 @@ export const authOptions: NextAuthOptions = {
           routeGroups: tenant.routeGroups,
           projectScopes: tenant.projectScopes,
           campaignScopes: tenant.campaignScopes,
+          businessLines: tenant.businessLines,
+          serviceModules: tenant.serviceModules,
           projectIds: tenant.projectIds,
           role: tenant.role,
           featureFlags: tenant.featureFlags,
@@ -95,6 +97,8 @@ export const authOptions: NextAuthOptions = {
         token.routeGroups = user.routeGroups
         token.projectScopes = user.projectScopes
         token.campaignScopes = user.campaignScopes
+        token.businessLines = user.businessLines
+        token.serviceModules = user.serviceModules
         token.projectIds = user.projectIds
         token.role = user.role
         token.featureFlags = user.featureFlags
@@ -123,6 +127,8 @@ export const authOptions: NextAuthOptions = {
         session.user.routeGroups = Array.isArray(token.routeGroups) ? token.routeGroups.filter(Boolean) : []
         session.user.projectScopes = Array.isArray(token.projectScopes) ? token.projectScopes.filter(Boolean) : []
         session.user.campaignScopes = Array.isArray(token.campaignScopes) ? token.campaignScopes.filter(Boolean) : []
+        session.user.businessLines = Array.isArray(token.businessLines) ? token.businessLines.filter(Boolean) : []
+        session.user.serviceModules = Array.isArray(token.serviceModules) ? token.serviceModules.filter(Boolean) : []
         session.user.projectIds = Array.isArray(token.projectIds) ? token.projectIds.filter(Boolean) : []
         session.user.role =
           typeof token.role === 'string' ? token.role : session.user.primaryRoleCode || 'client_executive'

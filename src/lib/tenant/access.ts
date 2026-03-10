@@ -18,6 +18,8 @@ interface TenantAccessRow {
   route_groups: string[] | null
   project_scopes: string[] | null
   campaign_scopes: string[] | null
+  business_lines: string[] | null
+  service_modules: string[] | null
   feature_flags: string[] | null
   timezone: string | null
   portal_home_path: string | null
@@ -40,6 +42,8 @@ export interface TenantAccessRecord {
   routeGroups: string[]
   projectScopes: string[]
   campaignScopes: string[]
+  businessLines: string[]
+  serviceModules: string[]
   projectIds: string[]
   role: string
   featureFlags: string[]
@@ -125,6 +129,8 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   const routeGroups = normalizeStringArray(row.route_groups, deriveRouteGroups(roleCodes, tenantType))
   const projectScopes = normalizeStringArray(row.project_scopes)
   const campaignScopes = normalizeStringArray(row.campaign_scopes)
+  const businessLines = normalizeStringArray(row.business_lines)
+  const serviceModules = normalizeStringArray(row.service_modules)
 
   return {
     userId: row.user_id,
@@ -138,6 +144,8 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     routeGroups,
     projectScopes,
     campaignScopes,
+    businessLines,
+    serviceModules,
     projectIds: projectScopes,
     role: primaryRoleCode,
     featureFlags: normalizeStringArray(row.feature_flags),
@@ -169,6 +177,8 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
         ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
         ARRAY_AGG(DISTINCT ups.project_id IGNORE NULLS ORDER BY ups.project_id) AS project_scopes,
         ARRAY_AGG(DISTINCT ucs.campaign_id IGNORE NULLS ORDER BY ucs.campaign_id) AS campaign_scopes,
+        ARRAY_AGG(DISTINCT IF(sm.module_kind = 'business_line', csm.module_code, NULL) IGNORE NULLS ORDER BY IF(sm.module_kind = 'business_line', csm.module_code, NULL)) AS business_lines,
+        ARRAY_AGG(DISTINCT IF(sm.module_kind = 'service_module', csm.module_code, NULL) IGNORE NULLS ORDER BY IF(sm.module_kind = 'service_module', csm.module_code, NULL)) AS service_modules,
         ARRAY_AGG(DISTINCT cff.feature_code IGNORE NULLS ORDER BY cff.feature_code) AS feature_flags,
         COALESCE(cu.timezone, c.timezone, 'UTC') AS timezone,
         COALESCE(cu.default_portal_home_path, c.portal_home_path, IF(cu.tenant_type = 'efeonce_internal', '/internal/dashboard', '/dashboard')) AS portal_home_path,
@@ -195,6 +205,12 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
       LEFT JOIN \`${projectId}.greenhouse.user_campaign_scopes\` AS ucs
         ON ucs.user_id = cu.user_id
        AND ucs.active = TRUE
+      LEFT JOIN \`${projectId}.greenhouse.client_service_modules\` AS csm
+        ON csm.client_id = cu.client_id
+       AND csm.active = TRUE
+      LEFT JOIN \`${projectId}.greenhouse.service_modules\` AS sm
+        ON sm.module_code = csm.module_code
+       AND sm.active = TRUE
       LEFT JOIN \`${projectId}.greenhouse.client_feature_flags\` AS cff
         ON cff.client_id = cu.client_id
        AND cff.active = TRUE

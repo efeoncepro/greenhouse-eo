@@ -1,7 +1,14 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
+import type {
+  GreenhouseDashboardData,
+  GreenhouseDashboardKpi,
+  GreenhouseDashboardMixItem,
+  GreenhouseDashboardProjectRisk,
+  GreenhouseDashboardSummary,
+  GreenhouseDashboardThroughputPoint
+} from '@/types/greenhouse-dashboard'
 
 interface DashboardViewerScope {
   clientId: string
@@ -11,29 +18,50 @@ interface DashboardViewerScope {
 interface AggregateRow {
   project_count: number | string | null
   total_tasks: number | string | null
-  active_tasks: number | string | null
-  completed_tasks: number | string | null
-  open_review_items: number | string | null
-  avg_rpa: number | string | null
-  in_progress_tasks: number | string | null
-  ready_for_review_tasks: number | string | null
+  active_work_items: number | string | null
+  queued_work_items: number | string | null
+  blocked_tasks: number | string | null
   client_change_tasks: number | string | null
-  queued_tasks: number | string | null
+  review_pressure_tasks: number | string | null
+  completed_tasks: number | string | null
+  completed_last_30_days: number | string | null
+  created_last_30_days: number | string | null
+  open_frame_comments: number | string | null
+  avg_on_time_pct: number | string | null
+  healthy_projects: number | string | null
+  projects_at_risk: number | string | null
   last_synced_at: { value?: string } | string | null
 }
 
-interface ProjectRow {
-  notion_page_id: string | null
+interface ThroughputRow {
+  month_start: { value?: string } | string | null
+  created_count: number | string | null
+  completed_count: number | string | null
+}
+
+interface MixRow {
+  group_key: string | null
+  item_count: number | string | null
+}
+
+interface ProjectRiskRow {
+  project_id: string | null
   project_name: string | null
-  active_tasks: number | string | null
-  avg_rpa: number | string | null
-  progress_value: number | string | null
+  project_status: string | null
+  on_time_pct: number | string | null
+  active_work_items: number | string | null
+  blocked_tasks: number | string | null
+  review_pressure_tasks: number | string | null
+  queued_work_items: number | string | null
+  open_frame_comments: number | string | null
+  attention_score: number | string | null
   page_url: string | null
 }
 
-const activeStatusLabels = ['En curso', 'Listo para revisión', 'Listo para revision', 'Cambios Solicitados']
-const completedStatusLabels = ['Listo', 'Done', 'Finalizado', 'Completado']
-const queuedStatusLabels = ['Sin empezar', 'Backlog', 'Pendiente']
+const doneStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
+const closedStatuses = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled']
+const blockedStatuses = ['Bloqueado', 'Detenido']
+const queuedStatuses = ['Sin empezar', 'Backlog', 'Pendiente']
 
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') {
@@ -53,7 +81,17 @@ const toNumber = (value: unknown) => {
   return 0
 }
 
-const toIsoString = (value: AggregateRow['last_synced_at']) => {
+const toNullableNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const numericValue = toNumber(value)
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+const toIsoString = (value: { value?: string } | string | null) => {
   if (!value) {
     return null
   }
@@ -65,192 +103,431 @@ const toIsoString = (value: AggregateRow['last_synced_at']) => {
   return typeof value.value === 'string' ? value.value : null
 }
 
-const createEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboardData => ({
-  kpis: [
-    { label: 'Average RpA', value: '0.00', detail: 'No scoped projects configured yet', tone: 'success' },
-    { label: 'Active tasks', value: '0', detail: 'No tasks in scope', tone: 'warning' },
-    { label: 'Completed tasks', value: '0', detail: 'No finished work in scope', tone: 'info' },
-    { label: 'Open review items', value: '0', detail: 'No review pressure detected', tone: 'error' }
-  ],
-  statusRows: [
-    { label: 'In progress', value: 0, color: 'success.main' },
-    { label: 'Ready for review', value: 0, color: 'warning.main' },
-    { label: 'Client changes', value: 0, color: 'error.main' },
-    { label: 'Queued next', value: 0, color: 'info.main' }
-  ],
-  projects: [],
-  summary: {
-    completionRate: 0
+const monthLabelFormatter = new Intl.DateTimeFormat('es-CL', {
+  month: 'short',
+  year: '2-digit',
+  timeZone: 'UTC'
+})
+
+const formatMonthLabel = (monthValue: string | null) => {
+  if (!monthValue) {
+    return '--'
+  }
+
+  const date = new Date(`${monthValue}T00:00:00.000Z`)
+
+  return monthLabelFormatter.format(date)
+}
+
+const mapStatusLabel = (groupKey: string) => {
+  switch (groupKey) {
+    case 'active':
+      return 'En curso'
+    case 'review':
+      return 'En revision'
+    case 'changes':
+      return 'Cambios cliente'
+    case 'blocked':
+      return 'Bloqueadas'
+    case 'queued':
+      return 'En cola'
+    case 'completed':
+      return 'Entregadas'
+    case 'closed':
+      return 'Cerradas'
+    default:
+      return 'Otro'
+  }
+}
+
+const mapEffortLabel = (groupKey: string) => {
+  switch (groupKey) {
+    case 'high':
+      return 'Esfuerzo alto'
+    case 'medium':
+      return 'Esfuerzo medio'
+    case 'low':
+      return 'Esfuerzo bajo'
+    default:
+      return 'Sin estimacion'
+  }
+}
+
+const buildKpis = (summary: GreenhouseDashboardSummary, projectCount: number): GreenhouseDashboardKpi[] => [
+  {
+    label: 'Piezas entregadas',
+    value: String(summary.completedLast30Days),
+    detail: `${summary.createdLast30Days} creadas en 30 dias dentro de ${projectCount} proyectos`,
+    tone: summary.netFlowLast30Days >= 0 ? 'success' : 'warning'
   },
+  {
+    label: 'Salud on-time',
+    value: `${summary.avgOnTimePct}%`,
+    detail: `${summary.healthyProjects} proyectos saludables y ${summary.projectsAtRisk} bajo observacion`,
+    tone: summary.avgOnTimePct >= 75 ? 'success' : summary.avgOnTimePct >= 60 ? 'warning' : 'error'
+  },
+  {
+    label: 'Trabajo activo',
+    value: String(summary.activeWorkItems),
+    detail: `${summary.queuedWorkItems} en cola y ${summary.blockedTasks} bloqueadas`,
+    tone: summary.blockedTasks > 3 ? 'error' : summary.queuedWorkItems > summary.activeWorkItems ? 'warning' : 'info'
+  },
+  {
+    label: 'Presion de revision',
+    value: String(summary.reviewPressureTasks),
+    detail: `${summary.clientChangeTasks} con cambios cliente y ${summary.openFrameComments} comentarios abiertos`,
+    tone: summary.reviewPressureTasks > 8 ? 'error' : summary.reviewPressureTasks > 3 ? 'warning' : 'success'
+  }
+]
+
+const buildEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboardData => ({
+  kpis: [
+    {
+      label: 'Piezas entregadas',
+      value: '0',
+      detail: 'No hay proyectos conectados al tenant todavia',
+      tone: 'info'
+    },
+    {
+      label: 'Salud on-time',
+      value: '0%',
+      detail: 'Todavia no hay proyectos con historico visible',
+      tone: 'warning'
+    },
+    {
+      label: 'Trabajo activo',
+      value: '0',
+      detail: 'No hay trabajo en alcance para este portal',
+      tone: 'info'
+    },
+    {
+      label: 'Presion de revision',
+      value: '0',
+      detail: 'No hay tareas en revision ni comentarios abiertos',
+      tone: 'success'
+    }
+  ],
   scope: {
     clientId: scope.clientId,
     projectCount: 0,
     projectIds: scope.projectIds,
     lastSyncedAt: null
-  }
+  },
+  summary: {
+    avgOnTimePct: 0,
+    activeWorkItems: 0,
+    blockedTasks: 0,
+    clientChangeTasks: 0,
+    completedLast30Days: 0,
+    completedTasks: 0,
+    completionRate: 0,
+    createdLast30Days: 0,
+    healthyProjects: 0,
+    netFlowLast30Days: 0,
+    openFrameComments: 0,
+    projectsAtRisk: 0,
+    queuedWorkItems: 0,
+    reviewPressureTasks: 0,
+    totalTasks: 0
+  },
+  charts: {
+    throughput: [],
+    statusMix: [],
+    effortMix: []
+  },
+  projects: []
 })
 
 export const getDashboardOverview = async (scope: DashboardViewerScope): Promise<GreenhouseDashboardData> => {
   if (scope.projectIds.length === 0) {
-    return createEmptyDashboardData(scope)
+    return buildEmptyDashboardData(scope)
   }
 
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
-  const aggregateQuery = `
+  const sharedCtes = `
     WITH scoped_tasks AS (
-      SELECT
-        proyecto,
-        estado,
-        COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
-        COALESCE(client_review_open, FALSE) AS client_review_open,
-        COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
-        COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
-        _synced_at
-      FROM \`${projectId}.notion_ops.tareas\`
-      WHERE proyecto IN UNNEST(@projectIds)
-    )
-    SELECT
-      COUNT(DISTINCT proyecto) AS project_count,
-      COUNT(*) AS total_tasks,
-      COUNTIF(estado IN UNNEST(@activeStatuses)) AS active_tasks,
-      COUNTIF(estado IN UNNEST(@completedStatuses)) AS completed_tasks,
-      COUNTIF(client_review_open OR workflow_review_open OR open_frame_comments > 0) AS open_review_items,
-      ROUND(AVG(rpa_value), 2) AS avg_rpa,
-      COUNTIF(estado = 'En curso') AS in_progress_tasks,
-      COUNTIF(estado IN ('Listo para revisión', 'Listo para revision')) AS ready_for_review_tasks,
-      COUNTIF(estado = 'Cambios Solicitados') AS client_change_tasks,
-      COUNTIF(estado IN UNNEST(@queuedStatuses)) AS queued_tasks,
-      MAX(_synced_at) AS last_synced_at
-    FROM scoped_tasks
-  `
-
-  const projectWatchQuery = `
-    WITH scoped_tasks AS (
-      SELECT
-        proyecto,
-        estado,
-        COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value
-      FROM \`${projectId}.notion_ops.tareas\`
-      WHERE proyecto IN UNNEST(@projectIds)
+      SELECT * EXCEPT(scope_rank)
+      FROM (
+        SELECT
+          t.notion_page_id AS task_id,
+          scoped_project_id,
+          t.estado,
+          t.esfuerzo,
+          COALESCE(t.client_review_open, FALSE) AS client_review_open,
+          COALESCE(t.workflow_review_open, FALSE) AS workflow_review_open,
+          COALESCE(SAFE_CAST(t.open_frame_comments AS INT64), 0) AS open_frame_comments,
+          COALESCE(ARRAY_LENGTH(t.bloqueado_por_ids), 0) AS blocked_references,
+          DATE(t.created_time) AS created_date,
+          DATE(t.fecha_de_completado) AS completed_date,
+          t._synced_at AS synced_at,
+          ROW_NUMBER() OVER (PARTITION BY t.notion_page_id ORDER BY scoped_project_id) AS scope_rank
+        FROM \`${projectId}.notion_ops.tareas\` t
+        LEFT JOIN UNNEST(t.proyecto_ids) AS scoped_project_id
+        WHERE scoped_project_id IN UNNEST(@projectIds)
+      )
+      WHERE scope_rank = 1
     ),
-    task_summary AS (
+    annotated_tasks AS (
       SELECT
-        proyecto AS notion_page_id,
-        COUNT(*) AS total_tasks,
-        COUNTIF(estado IN UNNEST(@activeStatuses)) AS active_tasks,
-        COUNTIF(estado IN UNNEST(@completedStatuses)) AS completed_tasks,
-        ROUND(AVG(rpa_value), 2) AS avg_rpa
+        task_id,
+        scoped_project_id,
+        estado,
+        esfuerzo,
+        client_review_open,
+        workflow_review_open,
+        open_frame_comments,
+        blocked_references,
+        created_date,
+        completed_date,
+        synced_at,
+        CASE
+          WHEN estado IN UNNEST(@doneStatuses) THEN 'completed'
+          WHEN estado IN UNNEST(@closedStatuses) THEN 'closed'
+          WHEN estado IN UNNEST(@blockedStatuses) OR blocked_references > 0 THEN 'blocked'
+          WHEN estado = 'Cambios Solicitados' THEN 'changes'
+          WHEN estado = 'En curso' THEN 'active'
+          WHEN estado LIKE 'Listo para revis%' THEN 'review'
+          WHEN estado IN UNNEST(@queuedStatuses) OR estado LIKE 'Listo para dise%' THEN 'queued'
+          ELSE 'other'
+        END AS state_group,
+        CASE
+          WHEN esfuerzo = 'Alto' THEN 'high'
+          WHEN esfuerzo = 'Medio' THEN 'medium'
+          WHEN esfuerzo = 'Bajo' THEN 'low'
+          ELSE 'unknown'
+        END AS effort_group
       FROM scoped_tasks
-      GROUP BY proyecto
+    ),
+    scoped_projects AS (
+      SELECT
+        notion_page_id AS project_id,
+        COALESCE(nombre_del_proyecto, notion_page_id) AS project_name,
+        COALESCE(estado, 'Sin estado') AS project_status,
+        SAFE_CAST(REGEXP_REPLACE(COALESCE(pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64) AS on_time_pct,
+        page_url
+      FROM \`${projectId}.notion_ops.proyectos\`
+      WHERE notion_page_id IN UNNEST(@projectIds)
     )
-    SELECT
-      t.notion_page_id,
-      COALESCE(p.nombre_del_proyecto, t.notion_page_id) AS project_name,
-      t.active_tasks,
-      t.avg_rpa,
-      COALESCE(
-        SAFE_CAST(REPLACE(p.pct_on_time, ' %', '') AS FLOAT64),
-        ROUND(SAFE_DIVIDE(t.completed_tasks, t.total_tasks) * 100, 0)
-      ) AS progress_value,
-      p.page_url
-    FROM task_summary t
-    LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
-      ON p.notion_page_id = t.notion_page_id
-    ORDER BY t.active_tasks DESC, t.total_tasks DESC
-    LIMIT 3
   `
 
-  const aggregateResponse = await bigQuery.query({
-    query: aggregateQuery,
-    params: {
-      projectIds: scope.projectIds,
-      activeStatuses: activeStatusLabels,
-      completedStatuses: completedStatusLabels,
-      queuedStatuses: queuedStatusLabels
-    }
-  })
+  const aggregateQuery = `
+    ${sharedCtes}
+    SELECT
+      COUNT(DISTINCT scoped_project_id) AS project_count,
+      COUNT(*) AS total_tasks,
+      COUNTIF(state_group IN ('active', 'review', 'changes', 'blocked')) AS active_work_items,
+      COUNTIF(state_group = 'queued') AS queued_work_items,
+      COUNTIF(state_group = 'blocked') AS blocked_tasks,
+      COUNTIF(state_group = 'changes') AS client_change_tasks,
+      COUNTIF(client_review_open OR workflow_review_open OR open_frame_comments > 0 OR state_group IN ('review', 'changes')) AS review_pressure_tasks,
+      COUNTIF(state_group = 'completed') AS completed_tasks,
+      COUNTIF(completed_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) AS completed_last_30_days,
+      COUNTIF(created_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) AS created_last_30_days,
+      SUM(open_frame_comments) AS open_frame_comments,
+      (SELECT ROUND(AVG(on_time_pct), 0) FROM scoped_projects) AS avg_on_time_pct,
+      (SELECT COUNTIF(on_time_pct >= 75) FROM scoped_projects) AS healthy_projects,
+      (SELECT COUNTIF(on_time_pct < 60 OR on_time_pct IS NULL) FROM scoped_projects) AS projects_at_risk,
+      MAX(synced_at) AS last_synced_at
+    FROM annotated_tasks
+  `
 
-  const projectResponse = await bigQuery.query({
-    query: projectWatchQuery,
-    params: {
-      projectIds: scope.projectIds,
-      activeStatuses: activeStatusLabels,
-      completedStatuses: completedStatusLabels
-    }
-  })
+  const throughputQuery = `
+    ${sharedCtes}
+    , months AS (
+      SELECT month_start
+      FROM UNNEST(
+        GENERATE_DATE_ARRAY(
+          DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 5 MONTH), MONTH),
+          DATE_TRUNC(CURRENT_DATE(), MONTH),
+          INTERVAL 1 MONTH
+        )
+      ) AS month_start
+    ),
+    created_counts AS (
+      SELECT DATE_TRUNC(created_date, MONTH) AS month_start, COUNT(*) AS created_count
+      FROM annotated_tasks
+      GROUP BY 1
+    ),
+    completed_counts AS (
+      SELECT DATE_TRUNC(completed_date, MONTH) AS month_start, COUNT(*) AS completed_count
+      FROM annotated_tasks
+      WHERE completed_date IS NOT NULL
+      GROUP BY 1
+    )
+    SELECT
+      CAST(months.month_start AS STRING) AS month_start,
+      COALESCE(created_counts.created_count, 0) AS created_count,
+      COALESCE(completed_counts.completed_count, 0) AS completed_count
+    FROM months
+    LEFT JOIN created_counts
+      ON created_counts.month_start = months.month_start
+    LEFT JOIN completed_counts
+      ON completed_counts.month_start = months.month_start
+    ORDER BY months.month_start
+  `
 
-  const aggregateRows = aggregateResponse[0] as AggregateRow[]
-  const projectRows = projectResponse[0] as ProjectRow[]
+  const statusMixQuery = `
+    ${sharedCtes}
+    SELECT state_group AS group_key, COUNT(*) AS item_count
+    FROM annotated_tasks
+    WHERE state_group != 'other'
+    GROUP BY 1
+    ORDER BY item_count DESC
+  `
 
-  const aggregate = aggregateRows[0]
+  const effortMixQuery = `
+    ${sharedCtes}
+    SELECT effort_group AS group_key, COUNT(*) AS item_count
+    FROM annotated_tasks
+    WHERE state_group NOT IN ('closed')
+    GROUP BY 1
+    ORDER BY item_count DESC
+  `
 
-  if (!aggregate) {
-    return createEmptyDashboardData(scope)
+  const projectsQuery = `
+    ${sharedCtes}
+    , task_summary AS (
+      SELECT
+        scoped_project_id AS project_id,
+        COUNTIF(state_group IN ('active', 'review', 'changes', 'blocked')) AS active_work_items,
+        COUNTIF(state_group = 'blocked') AS blocked_tasks,
+        COUNTIF(client_review_open OR workflow_review_open OR open_frame_comments > 0 OR state_group IN ('review', 'changes')) AS review_pressure_tasks,
+        COUNTIF(state_group = 'queued') AS queued_work_items,
+        SUM(open_frame_comments) AS open_frame_comments
+      FROM annotated_tasks
+      GROUP BY 1
+    )
+    SELECT
+      COALESCE(scoped_projects.project_id, task_summary.project_id) AS project_id,
+      COALESCE(scoped_projects.project_name, task_summary.project_id) AS project_name,
+      COALESCE(scoped_projects.project_status, 'Sin estado') AS project_status,
+      scoped_projects.on_time_pct,
+      task_summary.active_work_items,
+      task_summary.blocked_tasks,
+      task_summary.review_pressure_tasks,
+      task_summary.queued_work_items,
+      task_summary.open_frame_comments,
+      scoped_projects.page_url,
+      ROUND(
+        COALESCE(100 - scoped_projects.on_time_pct, 35)
+        + (task_summary.active_work_items * 1.5)
+        + (task_summary.review_pressure_tasks * 4)
+        + (task_summary.blocked_tasks * 8),
+        1
+      ) AS attention_score
+    FROM task_summary
+    LEFT JOIN scoped_projects
+      ON scoped_projects.project_id = task_summary.project_id
+    ORDER BY attention_score DESC, task_summary.blocked_tasks DESC, task_summary.review_pressure_tasks DESC
+    LIMIT 5
+  `
+
+  const queryParams = {
+    projectIds: scope.projectIds,
+    doneStatuses,
+    closedStatuses,
+    blockedStatuses,
+    queuedStatuses
   }
 
-  const projectCount = toNumber(aggregate.project_count)
-  const totalTasks = toNumber(aggregate.total_tasks)
-  const activeTasks = toNumber(aggregate.active_tasks)
-  const completedTasks = toNumber(aggregate.completed_tasks)
-  const openReviewItems = toNumber(aggregate.open_review_items)
-  const avgRpa = toNumber(aggregate.avg_rpa)
-  const inProgressTasks = toNumber(aggregate.in_progress_tasks)
-  const readyForReviewTasks = toNumber(aggregate.ready_for_review_tasks)
-  const clientChangeTasks = toNumber(aggregate.client_change_tasks)
-  const queuedTasks = toNumber(aggregate.queued_tasks)
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
+  const [aggregateResponse, throughputResponse, statusMixResponse, effortMixResponse, projectsResponse] = await Promise.all([
+    bigQuery.query({ query: aggregateQuery, params: queryParams }),
+    bigQuery.query({ query: throughputQuery, params: queryParams }),
+    bigQuery.query({ query: statusMixQuery, params: queryParams }),
+    bigQuery.query({ query: effortMixQuery, params: queryParams }),
+    bigQuery.query({ query: projectsQuery, params: queryParams })
+  ])
+
+  const aggregateRow = (aggregateResponse[0] as AggregateRow[])[0]
+
+  if (!aggregateRow) {
+    return buildEmptyDashboardData(scope)
+  }
+
+  const summary: GreenhouseDashboardSummary = {
+    avgOnTimePct: Math.max(0, Math.min(100, Math.round(toNumber(aggregateRow.avg_on_time_pct)))),
+    activeWorkItems: toNumber(aggregateRow.active_work_items),
+    blockedTasks: toNumber(aggregateRow.blocked_tasks),
+    clientChangeTasks: toNumber(aggregateRow.client_change_tasks),
+    completedLast30Days: toNumber(aggregateRow.completed_last_30_days),
+    completedTasks: toNumber(aggregateRow.completed_tasks),
+    completionRate:
+      toNumber(aggregateRow.total_tasks) > 0
+        ? Math.round((toNumber(aggregateRow.completed_tasks) / toNumber(aggregateRow.total_tasks)) * 100)
+        : 0,
+    createdLast30Days: toNumber(aggregateRow.created_last_30_days),
+    healthyProjects: toNumber(aggregateRow.healthy_projects),
+    netFlowLast30Days: toNumber(aggregateRow.completed_last_30_days) - toNumber(aggregateRow.created_last_30_days),
+    openFrameComments: toNumber(aggregateRow.open_frame_comments),
+    projectsAtRisk: toNumber(aggregateRow.projects_at_risk),
+    queuedWorkItems: toNumber(aggregateRow.queued_work_items),
+    reviewPressureTasks: toNumber(aggregateRow.review_pressure_tasks),
+    totalTasks: toNumber(aggregateRow.total_tasks)
+  }
+
+  const throughput = (throughputResponse[0] as ThroughputRow[]).map(
+    (row): GreenhouseDashboardThroughputPoint => ({
+      month: toIsoString(row.month_start) || '',
+      label: formatMonthLabel(toIsoString(row.month_start)),
+      created: toNumber(row.created_count),
+      completed: toNumber(row.completed_count)
+    })
+  )
+
+  const statusMix = (statusMixResponse[0] as MixRow[])
+    .map(
+      (row): GreenhouseDashboardMixItem => ({
+        key: row.group_key || 'other',
+        label: mapStatusLabel(row.group_key || 'other'),
+        value: toNumber(row.item_count)
+      })
+    )
+    .filter(item => item.value > 0)
+
+  const effortMix = (effortMixResponse[0] as MixRow[])
+    .map(
+      (row): GreenhouseDashboardMixItem => ({
+        key: row.group_key || 'unknown',
+        label: mapEffortLabel(row.group_key || 'unknown'),
+        value: toNumber(row.item_count)
+      })
+    )
+    .filter(item => item.value > 0)
+
+  const projects = (projectsResponse[0] as ProjectRiskRow[]).map(
+    (row): GreenhouseDashboardProjectRisk => ({
+      id: row.project_id || 'unknown-project',
+      name: row.project_name || row.project_id || 'Proyecto sin nombre',
+      status: row.project_status || 'Sin estado',
+      onTimePct: toNullableNumber(row.on_time_pct),
+      activeWorkItems: toNumber(row.active_work_items),
+      blockedTasks: toNumber(row.blocked_tasks),
+      reviewPressureTasks: toNumber(row.review_pressure_tasks),
+      queuedWorkItems: toNumber(row.queued_work_items),
+      openFrameComments: toNumber(row.open_frame_comments),
+      attentionScore: toNumber(row.attention_score),
+      pageUrl: row.page_url
+    })
+  )
+
+  const projectCount = Math.max(toNumber(aggregateRow.project_count), projects.length, scope.projectIds.length)
 
   return {
-    kpis: [
-      {
-        label: 'Average RpA',
-        value: avgRpa.toFixed(2),
-        detail: `${projectCount} projects in scope from BigQuery`,
-        tone: 'success'
-      },
-      {
-        label: 'Active tasks',
-        value: String(activeTasks),
-        detail: `${inProgressTasks} in progress, ${readyForReviewTasks} ready for review`,
-        tone: 'warning'
-      },
-      {
-        label: 'Completed tasks',
-        value: String(completedTasks),
-        detail: `${completionRate}% of scoped work is already marked done`,
-        tone: 'info'
-      },
-      {
-        label: 'Open review items',
-        value: String(openReviewItems),
-        detail: `${clientChangeTasks} tasks are currently in client changes`,
-        tone: 'error'
-      }
-    ],
-    statusRows: [
-      { label: 'In progress', value: inProgressTasks, color: 'success.main' },
-      { label: 'Ready for review', value: readyForReviewTasks, color: 'warning.main' },
-      { label: 'Client changes', value: clientChangeTasks, color: 'error.main' },
-      { label: 'Queued next', value: queuedTasks, color: 'info.main' }
-    ],
-    projects: projectRows.map(project => ({
-      id: project.notion_page_id || 'unknown-project',
-      name: project.project_name || project.notion_page_id || 'Unnamed project',
-      activeTasks: toNumber(project.active_tasks),
-      avgRpa: toNumber(project.avg_rpa),
-      progress: Math.max(0, Math.min(100, Math.round(toNumber(project.progress_value)))),
-      pageUrl: project.page_url
-    })),
-    summary: {
-      completionRate
-    },
+    kpis: buildKpis(summary, projectCount),
     scope: {
       clientId: scope.clientId,
       projectCount,
       projectIds: scope.projectIds,
-      lastSyncedAt: toIsoString(aggregate.last_synced_at)
-    }
+      lastSyncedAt: toIsoString(aggregateRow.last_synced_at)
+    },
+    summary,
+    charts: {
+      throughput,
+      statusMix,
+      effortMix
+    },
+    projects
   }
 }

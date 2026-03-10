@@ -5,11 +5,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Documento Maestro de Arquitectura
 - Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Resumen rapido de fases y tareas: `PHASE_TASK_MATRIX.md`
 - Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
 - Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
 - `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
 - Documento tecnico de identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL de identidad y acceso: `bigquery/greenhouse_identity_access_v1.sql`
+- Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
+- DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
+- Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -22,6 +26,21 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `full-version` debe servir para entender hacia donde debe evolucionar `starter-kit`.
 - No se debe mezclar automaticamente codigo de `full-version` dentro de este repo sin adaptacion y revision.
 - Las referencias mas utiles de `full-version` para Greenhouse son dashboards, tablas y patrones de user/roles/permissions, no los modulos de negocio template.
+- Orden recomendado para buscar referencia Vuexy:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/views/apps/user/list/*`
+- `../full-version/src/views/apps/user/view/*`
+- `../full-version/src/views/apps/roles/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- y luego la documentacion oficial:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+- Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
+- En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
+- Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -44,8 +63,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Greenhouse debe ser un portal ejecutivo y operativo, no un segundo Notion.
 - Notion sigue siendo el system of work.
 - Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
+- Greenhouse tambien debe componer vistas y charts segun linea de negocio y servicios contratados del cliente.
 - Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
-- El centro del producto debe pasar a ser `/dashboard` y luego `/equipo` y `/campanas`.
+- El centro actual del producto ya es `/dashboard`; las siguientes capas objetivo son `/equipo` y `/campanas`.
 
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
@@ -86,6 +106,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/internal/dashboard`
 - Existe `/admin`
 - Existe `/admin/users`
+- Existe `/admin/users/[id]`
+- Existe `/admin/roles`
 - Existe `src/app/page.tsx`
 - La raiz `/` redirige segun `portalHomePath`
 - `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
@@ -106,17 +128,28 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
+- El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
-- Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
+- Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side y usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion.
+- Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
+- `/admin/users`, `/admin/roles` y `/admin/users/[id]` ya son el primer slice real de admin reutilizando patrones de Vuexy sobre datos reales.
+- `/admin/users/[id]` reutiliza la estructura de `user/view/*` con tabs reinterpretados para Greenhouse:
+- `overview` -> contexto del usuario y alcance
+- `security` -> acceso y auditoria
+- `billing` -> invoices y contexto comercial del cliente
 - El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
-- Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
+- Aun no existe `/api/sprints`.
+- Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
+- Ya existe evidencia comercial en BigQuery para derivar modulos de servicio desde `hubspot_crm.deals.linea_de_servicio` y `servicios_especificos`.
+- El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
-- Ya existen rutas minimas de Efeonce interno y admin, pero falta desarrollar sus vistas de negocio.
+- Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene lista, roles y detalle de usuario; falta mutacion segura de tenants, scopes y feature flags.
+- Falta consumir `serviceModules` para condicionar navegacion, dashboard y billing por servicio contratado.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -216,7 +249,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
 - El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
-- Faltan sprints reales, dashboard charts y los data flows restantes definidos en la especificacion.
+- Faltan sprints reales, composicion del dashboard por `serviceModules`, `capacity`, `market-speed` y los data flows restantes definidos en la especificacion.
 - Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.

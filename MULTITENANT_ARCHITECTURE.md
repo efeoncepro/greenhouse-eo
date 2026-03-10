@@ -88,6 +88,8 @@ Current production-ready baseline:
 - Imported HubSpot contacts remain in `invited` state until onboarding activates them.
 - `src/lib/bigquery.ts` already handles both the minified JSON form and the legacy escaped JSON form of `GOOGLE_APPLICATION_CREDENTIALS_JSON` used by Vercel Preview envs.
 - A failed login in `Preview` is not enough to conclude wrong credentials; first isolate whether BigQuery credentials were parsed correctly in the running deployment.
+- Vuexy's generic JWT session pattern is compatible with this, but its ACL/permissions demo is not the source of truth for Greenhouse authorization.
+- Greenhouse authorization is server-side and tenant-aware; it must not rely on template-only client ACL checks.
 
 ### 2. Session and Tenant Context
 
@@ -105,6 +107,24 @@ Create a single tenant helper that returns:
 - `timezone`
 
 Every server route should use that helper instead of reading raw session fields in multiple places.
+
+## JWT and ACL Clarification
+
+- Greenhouse already uses JWT sessions through NextAuth.
+- The JWT is only the session transport for identity and claims.
+- Authorization is a separate concern and is resolved from BigQuery-backed role and scope tables.
+- Vuexy's permissions/ACL examples are useful for admin UI patterns and navigation concepts.
+- They are not sufficient for:
+  - tenant isolation
+  - project-level scoping
+  - campaign-level scoping
+  - internal vs client route separation
+- The correct Greenhouse model is:
+  - JWT session
+  - server-side tenant context
+  - role-based route access
+  - project and campaign scopes
+  - API-level enforcement on every business query
 
 ### 3. Query Layer
 

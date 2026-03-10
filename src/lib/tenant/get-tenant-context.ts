@@ -13,6 +13,8 @@ export interface TenantContext {
   routeGroups: string[]
   projectScopes: string[]
   campaignScopes: string[]
+  businessLines: string[]
+  serviceModules: string[]
   role: string
   projectIds: string[]
   featureFlags: string[]
@@ -37,6 +39,8 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     routeGroups: session.user.routeGroups,
     projectScopes: session.user.projectScopes,
     campaignScopes: session.user.campaignScopes,
+    businessLines: session.user.businessLines,
+    serviceModules: session.user.serviceModules,
     role: session.user.role,
     projectIds: session.user.projectIds,
     featureFlags: session.user.featureFlags,

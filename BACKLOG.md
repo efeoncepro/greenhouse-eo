@@ -52,6 +52,8 @@ Open activities:
 - finalize role matrix
 - finalize KPI dictionary
 - finalize semantic mart design
+- finalize service module taxonomy from HubSpot commercial data
+- define module mapping rules from `linea_de_servicio` and `servicios_especificos`
 - align all repo docs to `GREENHOUSE_ARCHITECTURE_V1.md`
 
 ### Phase 1. Identity, Access, and Multi-User Model
@@ -84,12 +86,19 @@ Status:
 - partially started
 
 Open activities:
-- create `/api/dashboard/summary`
-- create `/api/dashboard/charts`
-- create `/api/dashboard/capacity`
-- create `/api/dashboard/market-speed`
-- create `/api/dashboard/risks`
-- redesign `/dashboard` around executive visibility
+- review and promote the new executive dashboard through `Preview`, `staging` and `Production`
+- add dashboard composition by `serviceModules`
+- add `/api/dashboard/capacity` once team and staffing data are modeled
+- add `/api/dashboard/market-speed` when time fields become numerically reliable
+- add campaign-aware slices once `/campanas` exists
+
+Completed in current iteration:
+- created `/api/dashboard/summary`
+- created `/api/dashboard/charts`
+- created `/api/dashboard/risks`
+- redesigned `/dashboard` around executive visibility
+- adopted Vuexy chart stack with `apexcharts` + `react-apexcharts` and the `AppReactApexCharts` wrapper pattern from `full-version`
+- validated the new dashboard queries against real tenant scope in BigQuery
 
 ### Phase 3. Delivery Context and Operational Drilldowns
 
@@ -139,6 +148,7 @@ Status:
 
 Open activities:
 - design campaign mapping model
+- connect campaign KPI context to `serviceModules`
 - create campaign semantic layer
 - create `/api/campaigns`
 - create `/api/campaigns/[id]`
@@ -173,48 +183,54 @@ Status:
 Open activities:
 - create `/admin/tenants`
 - create `/admin/tenants/[id]`
-- create `/admin/users/[id]`
-- create `/admin/roles`
 - create `/admin/scopes`
 - create `/admin/feature-flags`
+- expose business line and active service modules in admin governance
+
+Completed in current iteration:
+- created `/admin/users`
+- created `/admin/users/[id]`
+- created `/admin/roles`
+- adapted Vuexy `user/list/*`, `user/view/*`, and `roles/*` into read-only admin surfaces backed by BigQuery
+- reinterpreted `overview`, `security`, and `billing-plans` as user context, access/audit, and future invoice/commercial context
+
+Current adaptation rule:
+- use `full-version/src/views/apps/user/list/*` as base for `/admin/users`
+- use `full-version/src/views/apps/roles/*` as base for `/admin/roles`
+- use `full-version/src/views/apps/user/view/*` as base for `/admin/users/[id]`
+- reinterpret Vuexy tabs:
+- `overview` -> user context and scope
+- `security` -> access and audit
+- `billing-plans` -> invoices and commercial context
 
 ## Now
 
-### N0.1 Architecture Alignment
+### N0.1 Promotion and Documentation Alignment
 
 - keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
 - align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
+- promote `feature/executive-dashboard-phase2` only after preview validation of dashboard and admin surfaces
 
-### N0.2 Access Model Design
+### N2.1 Module-Aware Dashboard
 
-- design `client_users`
-- design `roles`
-- design role assignments
-- design project and campaign scopes
-- decide if internal Efeonce users live in the same user table with `tenant_type = efeonce_internal`
-- version the DDL and migration notes
+- compose dashboard widgets by `serviceModules`
+- define which KPIs and cards appear by business line and active module
+- avoid recomputing the same overview payload when only one slice needs refresh
+- decide if tenant-level cache is safe for summary, charts, and risks
 
-### N0.3 Executive KPI Dictionary
+### N7.1 Admin Tenants
 
-- define throughput
-- define lead time
-- define cycle time
-- define review time
-- define time to market
-- define capacity usage
-- define on-time rate
-- define blocked work
-- define rework ratio
+- create `/admin/tenants`
+- create `/admin/tenants/[id]`
+- expose `businessLines` and `serviceModules`
+- keep mutations out until tenant-safe write paths and audit strategy are defined
 
-### N0.4 Dashboard Executive Slice
+### N3.1 Sprints Slice
 
-- implement `/api/dashboard/charts`
-- redesign `/dashboard` around:
-  - KPI strip
-  - trends
-  - capacity
-  - risks
-  - campaign focus
+- create `/api/sprints`
+- create `/api/sprints/[id]`
+- build `/sprints`
+- connect sprint velocity and health as drilldown, not as a task-management center
 
 ## Parallel Streams
 

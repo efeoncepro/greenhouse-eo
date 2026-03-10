@@ -40,6 +40,50 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Alinear la documentacion operativa con el estado real de `feature/executive-dashboard-phase2`.
+- Dejar explicitado el estado de promocion de la rama para el siguiente agente.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development ahora
+- Preview antes de merge a `develop`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `README.md`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `git rev-list --left-right --count develop...feature/executive-dashboard-phase2`: `0 6`
+- `git rev-list --left-right --count main...feature/executive-dashboard-phase2`: `0 7`
+- `vercel inspect` sobre la alias `greenhouse-eo-git-feature-executive-das-e08569-efeonce-7670142f.vercel.app`: correcto, corresponde a `feature/executive-dashboard-phase2`
+- `vercel curl /login`: correcto, devuelve la pantalla de login del portal
+- `vercel curl /api/auth/csrf`: correcto, devuelve `csrfToken`
+- `vercel curl /dashboard`: correcto, responde el dashboard ejecutivo en Preview
+- `vercel curl /admin/users`: correcto, responde la superficie admin en Preview
+
+### Riesgos o pendientes
+- La validacion remota de este turno fue tecnica, no visual; conviene revisar UI manualmente en `staging` despues del merge a `develop`.
+- El siguiente bloque con mejor relacion impacto/esfuerzo sigue siendo: `serviceModules` en dashboard, `/admin/tenants`, y luego `/api/sprints`.
+
+### Proximo paso recomendado
+- Mergear `feature/executive-dashboard-phase2` a `develop`.
+- Validar visualmente `staging` antes de promover a `main`.
+
+### Fecha
 - 2026-03-09 America/Santiago
 
 ### Agente
@@ -571,3 +615,204 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Proximo paso recomendado
 - Iniciar Fase 2 con `/api/dashboard/charts` y la home ejecutiva real del portal.
 - Antes de abrir accesos cliente reales, definir onboarding para usuarios `invited` y flujo de activacion/reset.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar el primer slice completo de Fase 2 para convertir `/dashboard` en la home ejecutiva real del cliente.
+- Reutilizar el stack de charts y el wrapper visual de Vuexy desde `full-version` sin romper el estilo del starter.
+- Validar las nuevas queries de BigQuery sobre un tenant real con scope bootstrap.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y luego promotion a `Preview`, `staging` y `Production`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `README.md`
+- `changelog.md`
+- `package.json`
+- `pnpm-lock.yaml`
+- `project_context.md`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/api/dashboard/charts/route.ts`
+- `src/app/api/dashboard/kpis/route.ts`
+- `src/app/api/dashboard/risks/route.ts`
+- `src/app/api/dashboard/summary/route.ts`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/libs/ApexCharts.tsx`
+- `src/libs/styles/AppReactApexCharts.tsx`
+- `src/types/greenhouse-dashboard.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+
+### Verificacion
+- `npx pnpm add apexcharts@3.49.0 react-apexcharts@1.4.1`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Validacion local de stack Vuexy:
+  - `full-version/package.json`: confirma `apexcharts@3.49.0` y `react-apexcharts@1.4.1`
+  - `full-version/src/libs/ApexCharts.tsx`: confirmado
+  - `full-version/src/libs/styles/AppReactApexCharts.tsx`: confirmado
+- Validacion BigQuery real:
+  - smoke query de usuarios cliente con scopes bootstrap: correcta
+  - smoke del helper `get-dashboard-overview` contra `hubspot-company-30825221458` y proyecto `23239c2f-efe7-80ad-b410-f96ea38f49c2`: correcto
+  - se detecto y corrigio un bug de agregacion en `healthy_projects` y `projects_at_risk` antes de cerrar el turno
+
+### Riesgos o pendientes
+- El dashboard ejecutivo ya esta real, pero `capacity` y `market-speed` siguen pendientes porque `tiempo_de_ejecucion`, `tiempo_en_revision` y `tiempo_en_cambios` no vienen en formato numerico confiable desde Notion.
+- Los nuevos endpoints `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks` recomputan el overview completo; si el trafico sube, conviene separar queries o cachear por tenant.
+- El smoke real se hizo con un tenant bootstrap de scope corto; antes de promover conviene revisar tambien un tenant con mas volumen.
+- Para trabajo visual futuro, el orden correcto de referencia Vuexy es:
+- `../full-version/src/views/dashboards/analytics/*`
+- `../full-version/src/views/dashboards/crm/*`
+- `../full-version/src/libs/ApexCharts.tsx`
+- `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- y despues validar contra:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+
+### Proximo paso recomendado
+- Validar visualmente el nuevo `/dashboard` en `Preview`.
+- Promover el slice a `develop` si la UI y los datos se ven sanos.
+- Luego abrir el siguiente bloque de Fase 2: `capacity` y `market-speed` solo si primero se normalizan los tiempos operativos en origen o en marts.
+
+### Nota de reutilizacion Vuexy para Admin
+- `full-version/src/views/apps/user/list/*` y `full-version/src/views/apps/roles/*` son buenos candidatos de integracion directa para `/admin/users` y `/admin/roles`.
+- `full-version/src/views/apps/user/view/*` es la referencia correcta para `/admin/users/[id]`.
+- `overview`, `security` y `billing-plans` deben reinterpretarse para Greenhouse:
+- `overview` -> tenant, roles, scopes y actividad
+- `security` -> auth mode, last login, resets, audit
+- `billing-plans` -> invoices, fee y contexto comercial del cliente
+- No copiar fake-db ni semantica demo de billing/security del template.
+- Documentacion oficial Vuexy raiz:
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Materializar el siguiente slice de Fase 7 reutilizando `user/view/*` de Vuexy para detalle de usuario admin.
+- Dejar documentado que `User Management`, `Roles & Permissions` y `billing/security` se usan como referencia estructural y no como data layer demo.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y luego `Preview`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/admin/users/[id]/page.tsx`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminUsers.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Build confirma rutas:
+  - `/admin/users`
+  - `/admin/users/[id]`
+  - `/admin/roles`
+- La lista de `/admin/users` ahora navega al detalle por `userId`.
+- `getAdminUserDetail` consulta `client_users`, `clients`, `roles`, `user_role_assignments`, `user_project_scopes` y `user_campaign_scopes` desde BigQuery.
+
+### Riesgos o pendientes
+- `/admin/users`, `/admin/users/[id]` y `/admin/roles` son superficies read-only; aun no existe mutacion segura.
+- El tab `billing` es deliberadamente un placeholder estructural para invoices y fee; no debe conectarse a datos fake.
+- Aun faltan `/admin/tenants`, `/admin/scopes` y `/admin/feature-flags`.
+
+### Proximo paso recomendado
+- Promover este slice si el preview visual esta sano.
+- Luego abrir `/admin/tenants` o volver a Fase 2 para madurar `capacity` y `market-speed`, segun prioridad de producto.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Validar si Greenhouse debe condicionar vistas y charts por servicios contratados del cliente.
+- Aterrizar esa idea sobre datos reales de BigQuery y dejarla documentada como arquitectura formal.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+
+### Hallazgos de datos
+- La fuente comercial real disponible hoy es `efeonce-group.hubspot_crm.deals`.
+- Existen dos campos utiles:
+  - `linea_de_servicio`
+  - `servicios_especificos`
+- Valores observados en deals `closedwon`:
+  - business line: `crm_solutions`, `globe`, `wave`
+  - service modules: `licenciamiento_hubspot`, `implementacion_onboarding`, `consultoria_crm`, `agencia_creativa`, `desarrollo_web`
+- Esto permite derivar modulos de producto para clientes reales sin hardcodear vistas por tenant.
+
+### Decisiones
+- `service modules` se adoptan como cuarto eje del producto junto a tenant, role y scope.
+- No reemplazan seguridad.
+- Sirven para componer:
+  - navegacion
+  - widgets del dashboard
+  - tabs y vistas relevantes
+  - contexto comercial y billing
+
+### Archivos tocados
+- `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `Handoff.md`
+- `README.md`
+- `bigquery/greenhouse_service_modules_v1.sql`
+- `bigquery/greenhouse_service_module_bootstrap_v1.sql`
+- `changelog.md`
+- `project_context.md`
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/get-tenant-context.ts`
+- `src/types/next-auth.d.ts`
+
+### Riesgos o pendientes
+- El mapping inicial depende de consistencia comercial en HubSpot; hay deals cerrados con valores vacios.
+- `serviceModules` deben entrar al tenant context antes de intentar condicionar UI en runtime.
+- No usar `serviceModules` como reemplazo de roles/scopes.
+
+### Proximo paso recomendado
+- Versionar y luego aplicar el schema `greenhouse_service_modules_v1.sql`.
+- Derivar assignments iniciales desde deals `closedwon`.
+- Exponer `serviceModules` en `getTenantContext()` y usarlos primero en dashboard y navegacion.
+
+### Estado real al cierre
+- `greenhouse.service_modules`: 9 filas
+- `greenhouse.client_service_modules`: 22 filas
+- El runtime ya expone `businessLines` y `serviceModules`.
+- Smoke sobre tenants importados:
+  - DDSoft -> `wave` + `desarrollo_web`
+  - Sky Airline -> `globe` + `agencia_creativa`
+  - SSilva -> `crm_solutions` + `consultoria_crm`, `implementacion_onboarding`, `licenciamiento_hubspot`
+
+### Referencia operativa
+- `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
