@@ -188,6 +188,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - esas secciones mezclan señal real de BigQuery, nombres detectados desde Notion, defaults por `serviceModules` y overrides controlados por tenant
 - sigue pendiente formalizar APIs y modelos fuente para que dejen de depender de fallback u overrides
 - la siguiente iteracion de UI debe dejar de tratar cada seccion como una card aislada y converger hacia familias reusables de hero, mini stat, chart, list y table cards
+- el switch de tema del shell Greenhouse ya esta operativo en navbar con soporte real para `light`, `dark` y `system`, incluyendo reaccion al cambio del tema del sistema mientras la sesion sigue abierta
 
 ## Deploy
 - Hosting principal: Vercel

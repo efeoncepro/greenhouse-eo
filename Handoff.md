@@ -1311,6 +1311,15 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Referencia operativa
 - `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
 
+### Delta 2026-03-10 Navbar Theme
+- `ModeDropdown` quedo alineado con Greenhouse:
+  - labels en espanol
+  - popper anclado al grupo derecho del navbar
+  - trigger accesible
+- En layout vertical, el switch de tema ya no vive junto al toggle de navegacion; ahora comparte el grupo derecho con `UserDropdown`.
+- `ModeChanger` ahora reacciona tambien a cambios en `prefers-color-scheme` mientras la app sigue abierta, por lo que `Sistema` ya no queda congelado hasta recargar.
+- Validado con `npx pnpm lint` y `npx pnpm build`.
+
 ### Delta 2026-03-10
 - Se agrego `src/components/greenhouse/BrandLogo.tsx` como primitive reusable para logos de herramientas y marcas.
 - `src/assets/iconify-icons/bundle-icons-css.ts` ahora bundlea marcas curadas para Figma, GitHub, Copilot, Gemini, HubSpot, Looker, Miro, Notion, OpenAI y Vercel.
