@@ -11,6 +11,7 @@ type KnownPersonProfile = {
   id: string
   name: string
   role: string
+  avatarPath?: string | null
   aliases: string[]
 }
 
@@ -45,21 +46,54 @@ const knownPeople: KnownPersonProfile[] = [
     id: 'efeonce-daniela-ferreira',
     name: 'Daniela Ferreira',
     role: 'Creative Operations Lead',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Daniela.png',
     aliases: ['daniela', 'daniela ferreira', 'dferreira@efeoncepro.com']
   },
   {
     id: 'efeonce-melkin-hernandez',
     name: 'Melkin Hernandez',
     role: 'Senior Visual Designer',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Melkin.png',
     aliases: ['melkin hernandez', 'mekin hernandez', 'melkin hernandez | efeonce', 'mekin hernandez | efeonce']
   },
   {
     id: 'efeonce-andres-carlosama',
     name: 'Andres Carlosama',
     role: 'Senior Visual Designer',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Fondo_Team_Andr%C3%A9s.png',
     aliases: ['andres carlosama', 'andres carlosama | efeonce', 'andres carlosama | efoence', 'andres carlosama | efeonce']
+  },
+  {
+    id: 'efeonce-julio-reyes',
+    name: 'Julio Reyes',
+    role: 'Efeonce Team',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Jullio.png',
+    aliases: ['julio reyes', 'jullio', 'julio', 'julio.reyes@efeonce.org']
+  },
+  {
+    id: 'efeonce-valentina',
+    name: 'Valentina',
+    role: 'Efeonce Team',
+    avatarPath: '/images/greenhouse/team/EO_Avatar-Valentina.png',
+    aliases: ['valentina']
+  },
+  {
+    id: 'efeonce-humberly',
+    name: 'Humberly',
+    role: 'Efeonce Team',
+    avatarPath: '/images/greenhouse/team/Humberly.jpg',
+    aliases: ['humberly']
+  },
+  {
+    id: 'efeonce-luis',
+    name: 'Luis',
+    role: 'Efeonce Team',
+    avatarPath: '/images/greenhouse/team/Luis.jpg',
+    aliases: ['luis']
   }
 ]
+
+const knownPeopleById = new Map(knownPeople.map(profile => [profile.id, profile]))
 
 const serviceModuleTechnologyDefaults: Record<string, ToolOverride[]> = {
   agencia_creativa: [
@@ -170,6 +204,7 @@ const resolveKnownPeopleFromSignals = (signals: string[]) => {
       id: matchedProfile.id,
       name: matchedProfile.name,
       role: matchedProfile.role,
+      avatarPath: matchedProfile.avatarPath || null,
       allocationPct: null,
       monthlyHours: null,
       source: 'derived'
@@ -189,8 +224,11 @@ export const buildAccountTeam = (clientId: string, detectedSignals: string[]): G
   }
 
   for (const member of overrideMembers) {
+    const knownProfile = knownPeopleById.get(member.id)
+
     byId.set(member.id, {
       ...member,
+      avatarPath: member.avatarPath ?? knownProfile?.avatarPath ?? null,
       source: 'override'
     })
   }

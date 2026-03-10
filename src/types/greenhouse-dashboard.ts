@@ -68,6 +68,7 @@ export interface GreenhouseDashboardTeamMember {
   id: string
   name: string
   role: string
+  avatarPath?: string | null
   allocationPct: number | null
   monthlyHours: number | null
   source: 'derived' | 'override'

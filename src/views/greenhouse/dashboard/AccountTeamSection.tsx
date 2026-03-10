@@ -51,7 +51,7 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
                   }}
                 >
                   <Stack direction='row' spacing={2} alignItems='center'>
-                    <Avatar>{getInitials(member.name)}</Avatar>
+                    <Avatar src={member.avatarPath || undefined}>{getInitials(member.name)}</Avatar>
                     <Stack spacing={0.5}>
                       <Typography variant='h6'>{member.name}</Typography>
                       <Typography variant='body2' color='text.secondary'>
