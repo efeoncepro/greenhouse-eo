@@ -101,12 +101,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
-- `next-auth` ya esta integrado, consulta `greenhouse.clients`, usa session JWT y proteccion base del dashboard.
+- `next-auth` ya esta integrado, usa session JWT, protege el dashboard y ahora consulta `greenhouse.client_users` con fallback a `greenhouse.clients`.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
-- Ya existe una fuente real de tenants en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
+- Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
 - Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
 - Aun no existe una capa multi-user real separada de tenants.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
@@ -192,6 +192,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Documento de Fase 1 para identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL versionado: `bigquery/greenhouse_clients.sql`
 - DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
+- DDL multi-user ya aplicado en BigQuery: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.

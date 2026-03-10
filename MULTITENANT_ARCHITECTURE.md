@@ -23,9 +23,10 @@ Greenhouse must serve multiple clients from one Next.js application without expo
 
 ## Source of Truth
 
-Current system of record for tenant scope:
+Current system of record:
 - BigQuery dataset: `efeonce-group.greenhouse`
-- Table: `greenhouse.clients`
+- Tenant metadata: `greenhouse.clients`
+- User identity and access: `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes`, `greenhouse.user_campaign_scopes`
 
 Current source systems for operational data:
 - `efeonce-group.notion_ops.tareas`
@@ -76,14 +77,20 @@ Target flow:
    - `authMode`
 
 Current interim flow:
-- Login already looks up the tenant in `greenhouse.clients` by email through NextAuth credentials flow.
-- Session scope is already built from the tenant row in `greenhouse.clients`.
-- The seeded tenant still uses `auth_mode = env_demo`, so production hardening still requires `password_hash` or SSO.
+- Login now prefers `greenhouse.client_users` plus role/scopes tables and falls back to `greenhouse.clients` if the identity tables are unavailable.
+- Session scope now carries `userId`, `tenantType`, `roleCodes`, `primaryRoleCode`, `projectScopes`, `campaignScopes` and legacy compatibility aliases.
+- The seeded demo user still uses `auth_mode = env_demo`, so production hardening still requires `password_hash` or SSO.
 
 ### 2. Session and Tenant Context
 
 Create a single tenant helper that returns:
+- `userId`
 - `clientId`
+- `tenantType`
+- `roleCodes`
+- `primaryRoleCode`
+- `projectScopes`
+- `campaignScopes`
 - `role`
 - `projectIds`
 - `featureFlags`
@@ -130,7 +137,7 @@ Rules:
 ### Phase 1
 
 - Keep `CredentialsProvider`
-- Keep BigQuery lookup to `greenhouse.clients`
+- Use BigQuery lookup to `greenhouse.client_users` plus scopes, with fallback to `greenhouse.clients`
 - Continue JWT sessions
 - Remove `env_demo` from seeded tenants once `password_hash` or SSO is available
 
@@ -170,7 +177,9 @@ Recommended future split:
 Already created in BigQuery:
 - dataset: `efeonce-group.greenhouse`
 - table: `efeonce-group.greenhouse.clients`
+- tables: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
 - seed tenant: `greenhouse-demo-client`
+- seed users: `user-greenhouse-demo-client-executive`, `user-efeonce-admin-bootstrap`
 
 Versioned schema file:
 - `bigquery/greenhouse_clients.sql`

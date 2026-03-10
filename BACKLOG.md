@@ -60,14 +60,13 @@ Goal:
 - separate tenant metadata from user identity and scope
 
 Status:
-- not started
+- partially started
 
 Open activities:
-- add `greenhouse.client_users`
-- define `roles` and role assignments
-- define user-to-project and user-to-campaign scopes
-- redesign session payload
-- centralize authz helpers
+- load real users beyond bootstrap seeds
+- remove legacy fallback to `greenhouse.clients`
+- add route guards by route group and role family
+- add campaign scopes to real runtime consumers
 - remove `auth_mode = env_demo` from normal runtime
 
 ### Phase 2. Executive Client Dashboard

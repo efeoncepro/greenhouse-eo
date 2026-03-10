@@ -57,7 +57,7 @@ Estado hoy:
 - base tecnica funcionando en Vercel
 - shell Greenhouse visible en las rutas principales del portal
 - branding base integrado en navegacion y favicon temporal
-- `next-auth` ya protege el dashboard y resuelve el tenant desde `greenhouse.clients`
+- `next-auth` ya protege el dashboard y ahora prioriza `greenhouse.client_users` con fallback a `greenhouse.clients`
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
@@ -68,6 +68,7 @@ Estado hoy:
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 - existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
+- ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
 
 Rutas actuales:
 - `/dashboard`
@@ -85,11 +86,10 @@ Rutas objetivo del producto:
 - `/settings`
 
 Brecha visible:
-- la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
+- la autenticacion ya consume un origen multi-user real, pero el bootstrap demo sigue seeded con `auth_mode = env_demo`
 - el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
 - faltan `/api/sprints` y `/api/dashboard/charts`
-- el tenant ya se busca en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`
-- aun no existe una capa multi-user separada de tenants
+- el tenant metadata legacy sigue viviendo en `greenhouse.clients` mientras termina la migracion
 - aun no existe la capa de team/capacity y campaign intelligence
 - aun no existen rutas internas de Efeonce ni rutas admin
 

@@ -193,7 +193,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
                 Password: <strong>greenhouse-demo</strong>
               </Typography>
               <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                This bootstrap account is now resolved from `greenhouse.clients` and uses `auth_mode = env_demo`.
+                This bootstrap account now prefers `greenhouse.client_users` with legacy fallback to `greenhouse.clients`, and
+                remains seeded with `auth_mode = env_demo`.
               </Typography>
             </div>
           </form>

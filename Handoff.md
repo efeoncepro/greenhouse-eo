@@ -258,6 +258,68 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - No se ejecuto `build` ni `lint` porque el turno fue documental y no cambio runtime ni dependencias.
 - Se reviso `full-version` como referencia para dashboards, tablas y patrones de user/roles/permissions antes de fijar el plan maestro.
 
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la Fase 1 de auth runtime sobre `client_users`, roles y scopes.
+- Aplicar el schema de identidad y acceso en BigQuery.
+- Mantener compatibilidad con `greenhouse.clients` mientras termina la migracion.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development, Preview y BigQuery dataset `efeonce-group.greenhouse`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/get-tenant-context.ts`
+- `src/types/next-auth.d.ts`
+- `src/views/Login.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `bigquery/greenhouse_identity_access_v1.sql`: aplicado en `efeonce-group.greenhouse` omitiendo solo `CREATE SCHEMA IF NOT EXISTS` porque el dataset ya existia
+- Verificacion de tablas:
+  - `client_users`: 2 filas
+  - `roles`: 6 filas
+  - `user_role_assignments`: 2 filas
+  - `user_project_scopes`: 4 filas
+  - `user_campaign_scopes`: 0 filas
+  - `client_feature_flags`: 0 filas
+  - `audit_events`: 0 filas
+- Verificacion de seeds:
+  - `user-greenhouse-demo-client-executive` con `client_executive` y 4 proyectos
+  - `user-efeonce-admin-bootstrap` con `efeonce_admin`
+- Se actualizo el ACL del dataset `greenhouse` para dar `WRITER` al service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+
+### Riesgos o pendientes
+- El service account todavia no puede crear datasets a nivel proyecto; solo tablas dentro del dataset `greenhouse`
+- El runtime conserva fallback a `greenhouse.clients`; aun no debe retirarse
+- El bootstrap demo sigue usando `auth_mode = env_demo`
+- Todavia no existen guards por route group para `/internal/**` y `/admin/**`
+
+### Proximo paso recomendado
+- Cargar usuarios reales en `client_users`
+- Quitar dependencia operativa de `env_demo`
+- Implementar guards por `tenantType`, `roleCodes` y `routeGroups`
+- Construir `/api/dashboard/charts` y rediseñar `/dashboard` como centro ejecutivo del producto
+
 ### Riesgos o pendientes
 - El repo ya tiene una direccion clara, pero aun falta traducir el plan a schemas concretos de `client_users`, roles y scopes.
 - El siguiente trabajo de codigo deberia tomar `GREENHOUSE_ARCHITECTURE_V1.md` como contrato activo para evitar que el producto derive otra vez hacia vistas demasiado operativas.
