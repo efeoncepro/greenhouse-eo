@@ -1,66 +1,270 @@
 # Greenhouse Backlog
 
-## Operating Rule
+## Purpose
 
-- Keep tasks small, mergeable and verifiable.
-- Prefer vertical slices over broad framework work.
-- A task is not done until build or lint or a meaningful manual check has passed.
+This backlog is the execution summary of `GREENHOUSE_ARCHITECTURE_V1.md`.
+
+Use it to decide what to build next.
+Use the architecture document to understand why, how, and in what order.
+
+## Working Rule
+
+- keep tasks small, mergeable, and verifiable
+- prefer vertical slices over wide refactors
+- do not introduce product behavior that turns Greenhouse into a second Notion
+- a task is not done until build, lint, or meaningful runtime validation has passed
+
+## Master Reference
+
+- `GREENHOUSE_ARCHITECTURE_V1.md` is the source of truth for:
+  - product direction
+  - role model
+  - route structure
+  - multi-tenant architecture
+  - semantic marts direction
+  - phased roadmap
+  - parallelization rules for agents
+
+## Current Product Position
+
+Greenhouse is:
+- a multi-tenant client portal
+- an executive visibility layer
+- an operational context layer
+- a place to explain delivery, speed, capacity, and risk
+
+Greenhouse is not:
+- a second Notion
+- a task editing system
+- a project management workspace
+
+## Phase Summary
+
+### Phase 0. Alignment and Foundations
+
+Goal:
+- lock product boundaries, role model, KPI semantics, and architecture direction
+
+Status:
+- in progress
+
+Open activities:
+- finalize role matrix
+- finalize KPI dictionary
+- finalize semantic mart design
+- align all repo docs to `GREENHOUSE_ARCHITECTURE_V1.md`
+
+### Phase 1. Identity, Access, and Multi-User Model
+
+Goal:
+- separate tenant metadata from user identity and scope
+
+Status:
+- not started
+
+Open activities:
+- add `greenhouse.client_users`
+- define `roles` and role assignments
+- define user-to-project and user-to-campaign scopes
+- redesign session payload
+- centralize authz helpers
+- remove `auth_mode = env_demo` from normal runtime
+
+### Phase 2. Executive Client Dashboard
+
+Goal:
+- make `/dashboard` the true product center for client stakeholders
+
+Status:
+- partially started
+
+Open activities:
+- create `/api/dashboard/summary`
+- create `/api/dashboard/charts`
+- create `/api/dashboard/capacity`
+- create `/api/dashboard/market-speed`
+- create `/api/dashboard/risks`
+- redesign `/dashboard` around executive visibility
+
+### Phase 3. Delivery Context and Operational Drilldowns
+
+Goal:
+- provide enough context to explain indicators without duplicating Notion
+
+Status:
+- partially started
+
+Done:
+- `/api/projects`
+- `/api/projects/[id]`
+- `/api/projects/[id]/tasks`
+- `/proyectos`
+- `/proyectos/[id]`
+
+Open activities:
+- create `/api/sprints`
+- create `/api/sprints/[id]`
+- build real `/sprints`
+- add project timeline and aging to project detail
+- add delivery overview route `/entrega`
+
+### Phase 4. Team and Capacity
+
+Goal:
+- expose assigned team, role mix, capacity, and load
+
+Status:
+- not started
+
+Open activities:
+- define source of truth for assignments
+- create team and capacity semantic layer
+- create `/api/team`
+- create `/api/capacity`
+- create `/api/capacity/roles`
+- build `/equipo`
+
+### Phase 5. Campaign Intelligence
+
+Goal:
+- relate campaigns, projects, deliverables, and KPIs
+
+Status:
+- not started
+
+Open activities:
+- design campaign mapping model
+- create campaign semantic layer
+- create `/api/campaigns`
+- create `/api/campaigns/[id]`
+- create `/api/campaigns/[id]/deliverables`
+- create `/api/campaigns/[id]/kpis`
+- build `/campanas`
+- build `/campanas/[id]`
+
+### Phase 6. Internal Efeonce Visibility
+
+Goal:
+- give Efeonce internal users cross-tenant operational and account visibility
+
+Status:
+- not started
+
+Open activities:
+- create `/internal/dashboard`
+- create `/internal/clientes`
+- create `/internal/clientes/[id]`
+- create `/internal/capacidad`
+- create `/internal/riesgos`
+- create `/internal/kpis`
+
+### Phase 7. Admin and Governance
+
+Goal:
+- provide safe tenant, user, role, scope, and feature administration
+
+Status:
+- not started
+
+Open activities:
+- create `/admin/tenants`
+- create `/admin/tenants/[id]`
+- create `/admin/users`
+- create `/admin/users/[id]`
+- create `/admin/roles`
+- create `/admin/scopes`
+- create `/admin/feature-flags`
 
 ## Now
 
-### P0.1 Tenant Scope and Authentication
+### N0.1 Architecture Alignment
 
-- Load real `password_hash` values into `greenhouse.clients`.
-- Replace `auth_mode = env_demo` bootstrap with hashed credentials or SSO.
-- Use `getTenantContext()` across the remaining authenticated API routes and pages.
-- Remove direct runtime dependence on `DEMO_CLIENT_PROJECT_IDS` outside local/bootstrap fallback.
+- keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
+- align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
 
-## Next
+### N0.2 Access Model Design
 
-### P1.1 Sprint Views
+- design `client_users`
+- design `roles`
+- design role assignments
+- design project and campaign scopes
+- decide if internal Efeonce users live in the same user table with `tenant_type = efeonce_internal`
 
-- Create `/api/sprints`.
-- Build `/sprints` from live data.
-- Show active sprint progress, history and velocity trend.
+### N0.3 Executive KPI Dictionary
 
-### P1.2 Dashboard Depth
+- define throughput
+- define lead time
+- define cycle time
+- define review time
+- define time to market
+- define capacity usage
+- define on-time rate
+- define blocked work
+- define rework ratio
 
-- Add `/api/dashboard/charts`.
-- Replace remaining static dashboard sections with live chart data.
-- Add late tasks, blocked tasks and comment backlog signals.
+### N0.4 Dashboard Executive Slice
 
-### P1.3 Settings and Tenant Metadata
+- implement `/api/dashboard/charts`
+- redesign `/dashboard` around:
+  - KPI strip
+  - trends
+  - capacity
+  - risks
+  - campaign focus
 
-- Build `/settings` against `greenhouse.clients`.
-- Show client name, email, timezone, scope summary and enabled features.
-- Keep edits admin-only until mutation policy exists.
+## Parallel Streams
 
-## Later
+### Stream A. Access and Identity
 
-### P2.1 Multi-User Model
+Can move in parallel:
+- `client_users`
+- auth refactor
+- scope helpers
+- role matrix implementation
 
-- Add `greenhouse.client_users`.
-- Separate tenant metadata from login principals.
-- Support multiple users per client with per-user roles.
+### Stream B. Semantic Data
 
-### P2.2 Admin Operations
+Can move in parallel:
+- KPI dictionary
+- marts design
+- campaign mapping design
+- capacity model design
 
-- Create internal admin views for tenant onboarding and scope assignment.
-- Add CRUD flow for `greenhouse.clients`.
-- Add project-scope assignment tooling.
+### Stream C. Client Product UI
 
-### P2.3 Notifications and Portal Messaging
+Can move in parallel after endpoint contracts are stable:
+- dashboard
+- project detail refinement
+- sprint views
+- team views
+- campaign views
 
-- Add updates/news feed for innovation and account notices.
-- Add tenant-visible status messages and release notes.
+### Stream D. Internal UI
+
+Can move in parallel after role model is stable:
+- internal dashboard
+- client health
+- internal capacity
+- internal risks
+
+### Stream E. Admin
+
+Can move in parallel after access schema exists:
+- tenants
+- users
+- roles
+- scopes
+- feature flags
 
 ## Cross-Cutting Technical Tasks
 
-- Add tests for tenant scope helpers and API route authorization.
-- Add error logging around BigQuery failures.
-- Add cache strategy per tenant for dashboard and projects.
-- Add feature flag handling from `greenhouse.clients.feature_flags`.
-- Add observability for failed auth and failed BigQuery queries.
+- add tests for authz helpers
+- add tests for tenant isolation on API routes
+- add cache strategy per tenant and role where safe
+- add error logging for BigQuery failures
+- add audit logging for auth events and admin actions
+- add observability for failed auth, failed queries, and empty-state anomalies
+- move repeated metric logic into semantic query functions or marts
 
 ## Done Already
 
@@ -76,3 +280,4 @@
 - internal navigation from `/proyectos` to project detail
 - BigQuery dataset `greenhouse`
 - table `greenhouse.clients`
+- architecture master plan documented in `GREENHOUSE_ARCHITECTURE_V1.md`

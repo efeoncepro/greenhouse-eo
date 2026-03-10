@@ -224,3 +224,45 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Reemplazar `env_demo` por `password_hash` reales o SSO.
 - Crear `/api/sprints` y conectar `/sprints` a datos reales.
 - Crear `/api/dashboard/charts` para profundizar el dashboard.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Documentar la arquitectura Greenhouse V1 con suficiente detalle para trabajo multi-agente en paralelo.
+- Reordenar el roadmap del proyecto por fases, streams y actividades ejecutables.
+- Alinear los artefactos de contexto del repo para que el nuevo plan sea la referencia activa.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y documentacion operativa para trabajo futuro
+
+### Archivos tocados
+- `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- No se ejecuto `build` ni `lint` porque el turno fue documental y no cambio runtime ni dependencias.
+- Se reviso `full-version` como referencia para dashboards, tablas y patrones de user/roles/permissions antes de fijar el plan maestro.
+
+### Riesgos o pendientes
+- El repo ya tiene una direccion clara, pero aun falta traducir el plan a schemas concretos de `client_users`, roles y scopes.
+- El siguiente trabajo de codigo deberia tomar `GREENHOUSE_ARCHITECTURE_V1.md` como contrato activo para evitar que el producto derive otra vez hacia vistas demasiado operativas.
+- Sigue pendiente convertir el dashboard actual en la home ejecutiva real del producto.
+
+### Proximo paso recomendado
+- Diseñar y documentar el schema inicial de `client_users`, `roles` y tablas de scope.
+- Despues implementar `/api/dashboard/charts` y rediseñar `/dashboard` como vista ejecutiva principal.

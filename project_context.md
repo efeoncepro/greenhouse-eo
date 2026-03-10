@@ -3,6 +3,12 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Documento Maestro de Arquitectura
+- Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
+- Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
+- `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
+
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
 - Ese markdown define el target funcional del portal y debe usarse como referencia primaria de producto.
@@ -13,6 +19,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La carpeta `full-version` existe fuera de este repo como referencia de contexto, referencia visual y referencia funcional.
 - `full-version` debe servir para entender hacia donde debe evolucionar `starter-kit`.
 - No se debe mezclar automaticamente codigo de `full-version` dentro de este repo sin adaptacion y revision.
+- Las referencias mas utiles de `full-version` para Greenhouse son dashboards, tablas y patrones de user/roles/permissions, no los modulos de negocio template.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -30,6 +37,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - API Routes en App Router para exponer datos filtrados por cliente
 - Dominio objetivo final: `greenhouse.efeonce.com`
 - Dataset propio del portal: `efeonce-group.greenhouse`
+
+## Posicion de Producto Actual
+- Greenhouse debe ser un portal ejecutivo y operativo, no un segundo Notion.
+- Notion sigue siendo el system of work.
+- Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
+- Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
+- El centro del producto debe pasar a ser `/dashboard` y luego `/equipo` y `/campanas`.
 
 ## Comandos Utiles
 - `npx pnpm install --frozen-lockfile`
@@ -72,10 +86,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Rutas Objetivo del Producto
 - `/dashboard`: dashboard principal con KPIs ICO
+- `/entrega`: contexto operativo agregado
 - `/proyectos`: lista de proyectos del cliente
 - `/proyectos/[id]`: detalle de proyecto con tareas y sprint
+- `/campanas`: lista de campanas y relacion con output
+- `/campanas/[id]`: detalle de campana con entregables y KPIs
+- `/equipo`: equipo asignado, capacidad y carga
 - `/sprints`: vista de sprints y velocidad
 - `/settings`: perfil y preferencias del cliente
+- `/internal/**`: visibilidad interna Efeonce
+- `/admin/**`: gobernanza de tenants, usuarios, roles, scopes y feature flags
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
@@ -86,6 +106,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real de tenants en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
 - Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
+- Aun no existe una capa multi-user real separada de tenants.
+- Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
+- Aun no existen rutas internas de Efeonce ni rutas admin.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -163,6 +186,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Tabla creada: `greenhouse.clients`
 - Tenant bootstrap cargado: `greenhouse-demo-client`
 - Documento de referencia: `MULTITENANT_ARCHITECTURE.md`
+- Documento maestro de evolucion: `GREENHOUSE_ARCHITECTURE_V1.md`
 - DDL versionado: `bigquery/greenhouse_clients.sql`
 
 ## Decisiones Actuales
@@ -182,6 +206,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La autenticacion ya resuelve tenants desde `greenhouse.clients`, pero el acceso bootstrap aun depende de `DEMO_CLIENT_PASSWORD`.
 - Falta cargar `password_hash` reales o integrar SSO para cerrar el bootstrap demo.
 - Faltan sprints reales, dashboard charts y los data flows restantes definidos en la especificacion.
+- Falta separar tenant metadata de user identity.
+- Falta definir la capa semantica de KPIs y capacidad.
+- Falta relacion campanas con proyectos, entregables e indicadores.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

@@ -7,7 +7,8 @@ Portal de clientes de Efeonce construido sobre Vuexy + Next.js. Este repositorio
 Greenhouse busca darle a cada cliente acceso a:
 - metricas ICO
 - estado de su operacion creativa
-- dashboards de proyectos y sprints
+- dashboards de entrega, velocidad, capacidad y riesgo
+- contexto de proyectos, tareas y sprints sin reemplazar Notion
 - una capa de transparencia conectada al sistema Greenhouse
 
 La especificacion funcional principal esta en:
@@ -16,10 +17,21 @@ La especificacion funcional principal esta en:
 La documentacion operativa interna del repo esta en:
 - `AGENTS.md`
 - `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
 - `changelog.md`
+
+Documento maestro:
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+
+Ese documento define:
+- el norte del producto
+- el modelo multi-tenant y multi-user
+- las fases de implementacion
+- que se puede trabajar en paralelo
+- la separacion entre cliente, Efeonce interno y admin
 
 ## Alcance del Repo
 
@@ -44,6 +56,7 @@ Estado hoy:
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
+- existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
 
 Rutas actuales:
 - `/dashboard`
@@ -62,9 +75,12 @@ Rutas objetivo del producto:
 
 Brecha visible:
 - la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
-- el dashboard ya tiene un primer vertical slice real, pero faltan mas API Routes de negocio
+- el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
 - faltan `/api/sprints` y `/api/dashboard/charts`
 - el tenant ya se busca en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`
+- aun no existe una capa multi-user separada de tenants
+- aun no existe la capa de team/capacity y campaign intelligence
+- aun no existen rutas internas de Efeonce ni rutas admin
 
 ## Stack
 
@@ -99,6 +115,7 @@ Reglas clave:
 - Las queries deben ejecutarse server-side.
 - El modelo es multi-tenant por `client_id`.
 - La especificacion funcional prevalece como norte del producto salvo decision documentada.
+- Greenhouse no debe convertirse en un segundo Notion.
 
 ## Comandos
 
@@ -228,6 +245,7 @@ Camino normal:
 
 Leer antes de cambios importantes:
 - `AGENTS.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
 - `project_context.md`
 - `../Greenhouse_Portal_Spec_v1.md`
@@ -235,10 +253,15 @@ Leer antes de cambios importantes:
 Usar como referencia de implementacion:
 - `../full-version`
 
+Usar de `../full-version` principalmente:
+- dashboards
+- tablas filtrables
+- patrones de usuarios, roles y permissions
+
 ## Proximos Pasos Recomendados
 
-1. Reemplazar el bootstrap `env_demo` por password hashes reales o SSO.
-2. Agregar `/api/sprints` y velocity real.
-3. Agregar `/api/dashboard/charts` para reemplazar los bloques aun estaticos del dashboard.
-4. Conectar `/settings` a `greenhouse.clients`.
-5. Endurecer la autenticacion con helper de tenant reusable en todas las rutas.
+1. Definir `client_users`, roles y scopes como siguiente base del modelo multi-tenant.
+2. Agregar `/api/dashboard/charts` y rediseñar `/dashboard` como centro ejecutivo del producto.
+3. Agregar `/api/sprints` y velocity real como contexto de velocidad, no como gestor de trabajo.
+4. Diseñar la capa de `team/capacity`.
+5. Diseñar la capa de `campaign intelligence`.

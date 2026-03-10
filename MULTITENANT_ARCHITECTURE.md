@@ -1,5 +1,14 @@
 # Greenhouse Multi-Tenant Architecture
 
+## Status
+
+This document remains useful as the tenant-focused reference.
+
+For the full product architecture, phased roadmap, role hierarchy, internal/admin route model, KPI semantics, and multi-agent execution plan, use:
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+
+If both documents overlap, `GREENHOUSE_ARCHITECTURE_V1.md` is the broader source of truth and this document should stay focused on tenant isolation and auth boundaries.
+
 ## Objective
 
 Greenhouse must serve multiple clients from one Next.js application without exposing cross-tenant data. The tenant boundary is `client_id`.
