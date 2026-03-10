@@ -189,6 +189,7 @@ Open activities:
 - design role assignments
 - design project and campaign scopes
 - decide if internal Efeonce users live in the same user table with `tenant_type = efeonce_internal`
+- version the DDL and migration notes
 
 ### N0.3 Executive KPI Dictionary
 
@@ -281,3 +282,5 @@ Can move in parallel after access schema exists:
 - BigQuery dataset `greenhouse`
 - table `greenhouse.clients`
 - architecture master plan documented in `GREENHOUSE_ARCHITECTURE_V1.md`
+- identity and access design documented in `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- BigQuery identity/access DDL versioned in `bigquery/greenhouse_identity_access_v1.sql`

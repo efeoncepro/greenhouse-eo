@@ -266,3 +266,49 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Proximo paso recomendado
 - Diseñar y documentar el schema inicial de `client_users`, `roles` y tablas de scope.
 - Despues implementar `/api/dashboard/charts` y rediseñar `/dashboard` como vista ejecutiva principal.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Aterrizar la Fase 1 de Greenhouse en artefactos tecnicos ejecutables.
+- Versionar el schema BigQuery propuesto para usuarios, roles y scopes.
+- Documentar el modelo de identidad, session payload y migracion auth con suficiente detalle para trabajo multi-agente.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y documentacion/DDL para siguientes fases
+
+### Archivos tocados
+- `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `bigquery/greenhouse_identity_access_v1.sql`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- No se ejecuto `build` ni `lint` porque el turno fue de documentacion y DDL, sin cambios runtime.
+- Se revisaron `bigquery/greenhouse_clients.sql`, `src/lib/auth.ts`, `src/lib/tenant/clients.ts` y `src/types/next-auth.d.ts` para alinear el diseno con el MVP actual antes de fijar el plan.
+
+### Riesgos o pendientes
+- El DDL nuevo aun no esta aplicado en BigQuery; por ahora es schema versionado, no runtime activo.
+- `src/lib/auth.ts` y la session actual todavia usan el modelo MVP basado en `greenhouse.clients`.
+- El siguiente cambio de codigo debe respetar `GREENHOUSE_IDENTITY_ACCESS_V1.md` para evitar un refactor parcial incoherente.
+- Sigue pendiente convertir el dashboard en home ejecutiva real luego de cerrar el modelo de acceso.
+
+### Proximo paso recomendado
+- Aplicar y validar `bigquery/greenhouse_identity_access_v1.sql`.
+- Refactorizar auth para leer desde `client_users` y cargar roles/scopes.
+- Actualizar el payload de session y los helpers de authz.

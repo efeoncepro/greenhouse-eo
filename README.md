@@ -18,6 +18,7 @@ La documentacion operativa interna del repo esta en:
 - `AGENTS.md`
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
@@ -32,6 +33,16 @@ Ese documento define:
 - las fases de implementacion
 - que se puede trabajar en paralelo
 - la separacion entre cliente, Efeonce interno y admin
+
+Documento tecnico de Fase 1:
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+
+Ese documento define:
+- `client_users`
+- roles
+- scopes
+- session payload objetivo
+- plan de migracion desde el MVP actual
 
 ## Alcance del Repo
 
@@ -246,6 +257,7 @@ Camino normal:
 Leer antes de cambios importantes:
 - `AGENTS.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `Handoff.md`
 - `project_context.md`
 - `../Greenhouse_Portal_Spec_v1.md`

@@ -1277,3 +1277,8 @@ If you are a new agent entering this repo:
 5. If your task touches roles, KPIs, routes, marts, or tenant model, update this document or explicitly state why not.
 
 This document is not optional context for architecture-changing work.
+
+## Related Design Documents
+
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
+- `bigquery/greenhouse_identity_access_v1.sql`: proposed BigQuery schema and bootstrap seed for users, roles, and scopes

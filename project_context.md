@@ -8,6 +8,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
 - Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
 - `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
+- Documento tecnico de identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- DDL de identidad y acceso: `bigquery/greenhouse_identity_access_v1.sql`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -187,7 +189,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Tenant bootstrap cargado: `greenhouse-demo-client`
 - Documento de referencia: `MULTITENANT_ARCHITECTURE.md`
 - Documento maestro de evolucion: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Documento de Fase 1 para identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL versionado: `bigquery/greenhouse_clients.sql`
+- DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
