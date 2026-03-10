@@ -107,13 +107,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
-- Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
+- Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side y usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion.
+- Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
 - El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
-- Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
+- Aun no existe `/api/sprints`.
+- Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, pero falta desarrollar sus vistas de negocio.

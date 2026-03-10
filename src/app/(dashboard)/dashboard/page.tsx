@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 
 import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 
+import { getDashboardOverview } from '@/lib/dashboard/get-dashboard-overview'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
@@ -15,5 +16,10 @@ export default async function Page() {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 
-  return <GreenhouseDashboard />
+  const data = await getDashboardOverview({
+    clientId: tenant.clientId,
+    projectIds: tenant.projectIds
+  })
+
+  return <GreenhouseDashboard data={data} />
 }

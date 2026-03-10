@@ -571,3 +571,65 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Proximo paso recomendado
 - Iniciar Fase 2 con `/api/dashboard/charts` y la home ejecutiva real del portal.
 - Antes de abrir accesos cliente reales, definir onboarding para usuarios `invited` y flujo de activacion/reset.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar el primer slice completo de Fase 2 para convertir `/dashboard` en la home ejecutiva real del cliente.
+- Reutilizar el stack de charts y el wrapper visual de Vuexy desde `full-version` sin romper el estilo del starter.
+- Validar las nuevas queries de BigQuery sobre un tenant real con scope bootstrap.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y luego promotion a `Preview`, `staging` y `Production`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `README.md`
+- `changelog.md`
+- `package.json`
+- `pnpm-lock.yaml`
+- `project_context.md`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/api/dashboard/charts/route.ts`
+- `src/app/api/dashboard/kpis/route.ts`
+- `src/app/api/dashboard/risks/route.ts`
+- `src/app/api/dashboard/summary/route.ts`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/libs/ApexCharts.tsx`
+- `src/libs/styles/AppReactApexCharts.tsx`
+- `src/types/greenhouse-dashboard.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+
+### Verificacion
+- `npx pnpm add apexcharts@3.49.0 react-apexcharts@1.4.1`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Validacion local de stack Vuexy:
+  - `full-version/package.json`: confirma `apexcharts@3.49.0` y `react-apexcharts@1.4.1`
+  - `full-version/src/libs/ApexCharts.tsx`: confirmado
+  - `full-version/src/libs/styles/AppReactApexCharts.tsx`: confirmado
+- Validacion BigQuery real:
+  - smoke query de usuarios cliente con scopes bootstrap: correcta
+  - smoke del helper `get-dashboard-overview` contra `hubspot-company-30825221458` y proyecto `23239c2f-efe7-80ad-b410-f96ea38f49c2`: correcto
+  - se detecto y corrigio un bug de agregacion en `healthy_projects` y `projects_at_risk` antes de cerrar el turno
+
+### Riesgos o pendientes
+- El dashboard ejecutivo ya esta real, pero `capacity` y `market-speed` siguen pendientes porque `tiempo_de_ejecucion`, `tiempo_en_revision` y `tiempo_en_cambios` no vienen en formato numerico confiable desde Notion.
+- Los nuevos endpoints `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks` recomputan el overview completo; si el trafico sube, conviene separar queries o cachear por tenant.
+- El smoke real se hizo con un tenant bootstrap de scope corto; antes de promover conviene revisar tambien un tenant con mas volumen.
+
+### Proximo paso recomendado
+- Validar visualmente el nuevo `/dashboard` en `Preview`.
+- Promover el slice a `develop` si la UI y los datos se ven sanos.
+- Luego abrir el siguiente bloque de Fase 2: `capacity` y `market-speed` solo si primero se normalizan los tiempos operativos en origen o en marts.

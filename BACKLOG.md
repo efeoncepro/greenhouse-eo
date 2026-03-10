@@ -84,12 +84,18 @@ Status:
 - partially started
 
 Open activities:
-- create `/api/dashboard/summary`
-- create `/api/dashboard/charts`
-- create `/api/dashboard/capacity`
-- create `/api/dashboard/market-speed`
-- create `/api/dashboard/risks`
-- redesign `/dashboard` around executive visibility
+- review and promote the new executive dashboard through `Preview`, `staging` and `Production`
+- add `/api/dashboard/capacity` once team and staffing data are modeled
+- add `/api/dashboard/market-speed` when time fields become numerically reliable
+- add campaign-aware slices once `/campanas` exists
+
+Completed in current iteration:
+- created `/api/dashboard/summary`
+- created `/api/dashboard/charts`
+- created `/api/dashboard/risks`
+- redesigned `/dashboard` around executive visibility
+- adopted Vuexy chart stack with `apexcharts` + `react-apexcharts` and the `AppReactApexCharts` wrapper pattern from `full-version`
+- validated the new dashboard queries against real tenant scope in BigQuery
 
 ### Phase 3. Delivery Context and Operational Drilldowns
 

@@ -62,9 +62,10 @@ Estado hoy:
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
+- existen `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`
 - existe `/api/projects` con queries server-side a BigQuery
 - existen `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant
-- el dashboard principal ya consume datos reales para KPIs, estado de cartera y proyectos bajo observacion
+- el dashboard principal ya es una vista ejecutiva real con charts estilo Vuexy sobre throughput, salud on-time, mix operativo, esfuerzo y proyectos bajo atencion
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
@@ -85,6 +86,15 @@ Rutas actuales:
 - `/internal/dashboard`
 - `/admin`
 - `/admin/users`
+
+Endpoints principales actuales:
+- `/api/dashboard/kpis`
+- `/api/dashboard/summary`
+- `/api/dashboard/charts`
+- `/api/dashboard/risks`
+- `/api/projects`
+- `/api/projects/[id]`
+- `/api/projects/[id]/tasks`
 
 Rutas objetivo del producto:
 - `/dashboard`
