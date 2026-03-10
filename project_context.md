@@ -105,6 +105,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/auth/landing`
 - Existe `/internal/dashboard`
 - Existe `/admin`
+- Existe `/admin/tenants`
+- Existe `/admin/tenants/[id]`
 - Existe `/admin/users`
 - Existe `/admin/users/[id]`
 - Existe `/admin/roles`
@@ -135,11 +137,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
-- `/admin/users`, `/admin/roles` y `/admin/users/[id]` ya son el primer slice real de admin reutilizando patrones de Vuexy sobre datos reales.
+- `/admin/tenants`, `/admin/users`, `/admin/roles` y `/admin/users/[id]` ya son el primer slice real de admin sobre datos reales.
 - `/admin/users/[id]` reutiliza la estructura de `user/view/*` con tabs reinterpretados para Greenhouse:
 - `overview` -> contexto del usuario y alcance
 - `security` -> acceso y auditoria
 - `billing` -> invoices y contexto comercial del cliente
+- `/admin/tenants/[id]` consolida la empresa/tenant como unidad de gobierno y la relaciona con usuarios, modulos, flags y proyectos visibles.
 - El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existe `/api/sprints`.
@@ -148,7 +151,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe evidencia comercial en BigQuery para derivar modulos de servicio desde `hubspot_crm.deals.linea_de_servicio` y `servicios_especificos`.
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
-- Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene lista, roles y detalle de usuario; falta mutacion segura de tenants, scopes y feature flags.
+- Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta consumir `serviceModules` para condicionar navegacion, dashboard y billing por servicio contratado.
 
 ## Deploy

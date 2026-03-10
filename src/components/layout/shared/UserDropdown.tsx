@@ -128,6 +128,12 @@ const UserDropdown = () => {
                     </>
                   ) : null}
                   {isAdminUser ? (
+                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/tenants')}>
+                      <i className='tabler-building-community' />
+                      <Typography color='text.primary'>Admin Tenants</Typography>
+                    </MenuItem>
+                  ) : null}
+                  {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/users')}>
                       <i className='tabler-shield' />
                       <Typography color='text.primary'>Admin Users</Typography>

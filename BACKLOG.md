@@ -181,23 +181,25 @@ Status:
 - partially started
 
 Open activities:
-- create `/admin/tenants`
-- create `/admin/tenants/[id]`
 - create `/admin/scopes`
 - create `/admin/feature-flags`
 - expose business line and active service modules in admin governance
 
 Completed in current iteration:
+- created `/admin/tenants`
+- created `/admin/tenants/[id]`
 - created `/admin/users`
 - created `/admin/users/[id]`
 - created `/admin/roles`
 - adapted Vuexy `user/list/*`, `user/view/*`, and `roles/*` into read-only admin surfaces backed by BigQuery
+- added tenant-centric admin views backed by `clients`, `client_users`, `client_service_modules`, and `client_feature_flags`
 - reinterpreted `overview`, `security`, and `billing-plans` as user context, access/audit, and future invoice/commercial context
 
 Current adaptation rule:
 - use `full-version/src/views/apps/user/list/*` as base for `/admin/users`
 - use `full-version/src/views/apps/roles/*` as base for `/admin/roles`
 - use `full-version/src/views/apps/user/view/*` as base for `/admin/users/[id]`
+- keep `/admin/tenants` as a Greenhouse-specific governance surface centered on company/tenant health, not a direct copy of Vuexy demo business modules
 - reinterpret Vuexy tabs:
 - `overview` -> user context and scope
 - `security` -> access and audit
@@ -218,11 +220,11 @@ Current adaptation rule:
 - avoid recomputing the same overview payload when only one slice needs refresh
 - decide if tenant-level cache is safe for summary, charts, and risks
 
-### N7.1 Admin Tenants
+### N7.1 Governance Surfaces
 
-- create `/admin/tenants`
-- create `/admin/tenants/[id]`
 - expose `businessLines` and `serviceModules`
+- create `/admin/scopes`
+- create `/admin/feature-flags`
 - keep mutations out until tenant-safe write paths and audit strategy are defined
 
 ### N3.1 Sprints Slice

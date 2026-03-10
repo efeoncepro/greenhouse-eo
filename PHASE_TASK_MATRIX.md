@@ -93,8 +93,6 @@ Pending tasks:
 ## Phase 7. Admin and Governance
 
 Pending tasks:
-- create `/admin/tenants`
-- create `/admin/tenants/[id]`
 - create `/admin/scopes`
 - create `/admin/feature-flags`
 - expose business line and `serviceModules` in admin governance
@@ -103,6 +101,6 @@ Pending tasks:
 ## Recommended Near-Term Order
 
 1. Make `/dashboard` module-aware using `serviceModules`
-2. Build `/admin/tenants`
+2. Build `/admin/scopes` and `/admin/feature-flags`
 3. Build `/api/sprints` and the real `/sprints`
 4. Start team/capacity once assignment source of truth is clear

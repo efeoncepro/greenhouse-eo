@@ -46,6 +46,63 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Materializar el siguiente slice de Fase 7 centrado en tenants.
+- Mantener consistente el modelo `tenant = client = empresa`, con relacion uno-a-muchos hacia usuarios.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `main` despues de validacion visual en `staging`
+
+### Ambiente objetivo
+- Development y luego `staging`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `PHASE_TASK_MATRIX.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/admin/page.tsx`
+- `src/app/(dashboard)/admin/tenants/page.tsx`
+- `src/app/(dashboard)/admin/tenants/[id]/page.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/get-admin-tenants-overview.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Build confirma rutas:
+  - `/admin/tenants`
+  - `/admin/tenants/[id]`
+  - `/admin/users`
+  - `/admin/users/[id]`
+  - `/admin/roles`
+- Smoke BigQuery previo para diseño del slice:
+  - tenants con `auth_mode = password_reset_pending` y 1 usuario bootstrap: correctos
+  - tenant demo con multiples usuarios: correcto
+  - `serviceModules`, `feature flags` y `scoped projects` por tenant: correctos
+
+### Riesgos o pendientes
+- El slice de tenants es read-only; aun no existen mutaciones seguras.
+- `client_feature_flags` y `client_service_modules` ya se muestran, pero todavia no existe gobierno editable para scopes ni flags.
+- Conviene validar visualmente en `staging` antes de promover a `main`.
+
+### Proximo paso recomendado
+- Validar visualmente `/admin/tenants` y `/admin/tenants/[id]` en `staging`.
+- Luego abrir `/admin/scopes` y `/admin/feature-flags`, o volver a `/api/sprints` segun prioridad operativa.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Recuperar acceso del usuario a cuentas existentes del portal.
 - Resetear la cuenta demo cliente para volver a probar la vista de cliente.
 

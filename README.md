@@ -83,6 +83,7 @@ Estado hoy:
 - ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
 - ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
 - ya existen `/auth/landing`, `/internal/dashboard`, `/admin`, `/admin/users`, `/admin/users/[id]` y `/admin/roles` como superficies iniciales de access y governance
+- ya existen `/admin/tenants` y `/admin/tenants/[id]` como slice real de governance orientado a empresa/tenant
 - `/admin/roles` ya reutiliza patrones visuales de Vuexy sobre datos reales de BigQuery
 - `/admin/users/[id]` ya reutiliza la estructura `overview` / `security` / `billing` de Vuexy reinterpretada para Greenhouse
 - el demo client y el admin interno ya autentican con `password_hash` bcrypt
@@ -100,6 +101,8 @@ Rutas actuales:
 - `/admin/users`
 - `/admin/users/[id]`
 - `/admin/roles`
+- `/admin/tenants`
+- `/admin/tenants/[id]`
 
 Endpoints principales actuales:
 - `/api/dashboard/kpis`
@@ -123,7 +126,7 @@ Brecha visible:
 - faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
-- las superficies `/internal/dashboard` y `/admin` ya tienen slices iniciales, pero aun faltan mutaciones, tenencia y gobierno completo
+- las superficies `/internal/dashboard` y `/admin` ya tienen slices reales, pero aun faltan mutaciones seguras, scopes y feature flags
 
 ## Stack
 
@@ -347,6 +350,6 @@ Service modules:
 
 1. Validar y promover `feature/executive-dashboard-phase2` por `Preview`, `develop`, `staging` y `main`.
 2. Volver `/dashboard` module-aware usando `serviceModules`.
-3. Construir `/admin/tenants` como siguiente slice real de governance.
+3. Construir `/admin/scopes` y `/admin/feature-flags`.
 4. Agregar `/api/sprints` y la vista real de `/sprints`.
 5. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.
