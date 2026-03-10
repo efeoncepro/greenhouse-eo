@@ -1,6 +1,7 @@
 export { default as ExecutiveCardShell } from './ExecutiveCardShell'
 export { default as ExecutiveHeroCard } from './ExecutiveHeroCard'
 export { default as ExecutiveMiniStatCard } from './ExecutiveMiniStatCard'
+export { default as BrandLogo } from './BrandLogo'
 export { default as ChipGroup } from './ChipGroup'
 export type { ChipGroupItem } from './ChipGroup'
 export { default as MetricList } from './MetricList'

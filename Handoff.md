@@ -100,6 +100,26 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `AttentionProjectCard.tsx` quedo desplazado por la nueva tabla compacta y podria eliminarse en una limpieza posterior si ya no vuelve a usarse.
 - El skill local `greenhouse-vuexy-portal` fue reforzado con una guia de seleccion de componentes Vuexy/MUI para futuras decisiones UI/UX; usarlo como criterio antes de crear widgets nuevos.
 
+## 2026-03-10 - Logo libraries and compact documentation model
+
+### Objetivo del turno
+- Dejar documentado el stack real de logos y marcas para UI Greenhouse.
+- Reducir friccion documental con una regla canonica de documentacion liviana.
+
+### Cambios aplicados
+- Se instalaron `simple-icons` y `@iconify-json/logos` en `starter-kit` para reutilizar logos de tecnologia y AI sin descargar assets manuales.
+- Se documento que el stack activo de charts sigue siendo `apexcharts` + `react-apexcharts`, mientras `recharts` y `keen-slider` siguen como referencia en `full-version`.
+- Se agrego `DOCUMENTATION_OPERATING_MODEL_V1.md` para fijar una politica de documentacion compacta basada en una fuente canonica y deltas cortos.
+
+### Verificacion
+- `pnpm add simple-icons`
+- `pnpm add -D @iconify-json/logos`
+- `postinstall` regenero `src/assets/iconify-icons/generated-icons.css`
+
+### Riesgos o pendientes
+- Aun no existe un componente reusable `BrandLogo` para explotar `simple-icons` y `@iconify-json/logos` desde runtime.
+- `recharts` y `keen-slider` aun no fueron activados en `starter-kit`; siguen en evaluacion como siguiente paso visual.
+
 ## 2026-03-10 - Sky reusable dashboard capabilities
 
 ### Objetivo del turno
@@ -1290,3 +1310,13 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Referencia operativa
 - `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
+
+### Delta 2026-03-10
+- Se agrego `src/components/greenhouse/BrandLogo.tsx` como primitive reusable para logos de herramientas y marcas.
+- `src/assets/iconify-icons/bundle-icons-css.ts` ahora bundlea marcas curadas para Figma, GitHub, Copilot, Gemini, HubSpot, Looker, Miro, Notion, OpenAI y Vercel.
+- `ToolingSection` ya consume `BrandLogo` y aplica fallback deterministico:
+  - logo del bundle local
+  - icono brand de Tabler
+  - monograma
+- `npx pnpm build:icons` y `npx pnpm lint` pasaron.
+- `npx pnpm build` completo runtime correctamente; el wrapper local solo expiro por timeout despues del resumen final de rutas.

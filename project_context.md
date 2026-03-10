@@ -36,10 +36,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `../full-version/src/views/apps/roles/*`
 - `../full-version/src/libs/ApexCharts.tsx`
 - `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- `../full-version/src/libs/Recharts.tsx`
+- `../full-version/src/libs/styles/AppRecharts.ts`
 - y luego la documentacion oficial:
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/user-interface/components/avatars/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/development/theming/overview/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/custom/option-menu/`
 - Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
 - En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
 - Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
@@ -52,6 +57,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+- `apexcharts` + `react-apexcharts` activos para charts ejecutivos
+- `simple-icons` activo para logos SVG de marcas como fallback directo en runtime
+- `@iconify-json/logos` activo para incorporar logos de marca al pipeline Iconify/CSS del repo
+- `src/components/greenhouse/BrandLogo.tsx` ya consume ese stack para tooling cards, priorizando logos bundleados y usando fallback a Tabler o monograma
 - `.gitattributes` fija archivos de texto en `LF` para estabilizar el trabajo en Windows
 
 ## Target Definido por la Especificacion
@@ -76,6 +85,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `npx pnpm build`
 - `npx pnpm lint`
 - `npx pnpm clean`
+
+## Librerias visuales activas
+- `apexcharts` y `react-apexcharts`: base actual para charts ejecutivos; wrappers locales en `src/libs/ApexCharts.tsx` y `src/libs/styles/AppReactApexCharts.tsx`.
+- `simple-icons`: logos SVG de marcas y herramientas sin descargar assets manuales.
+- `@iconify-json/logos`: logos de marca integrables al pipeline de iconos del repo en `src/assets/iconify-icons/bundle-icons-css.ts`.
+- `recharts` y `keen-slider`: referencia en `full-version`, aun no activados en `starter-kit`.
+
+## Regla documental compacta
+- La estrategia de documentacion liviana del repo queda en `DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz

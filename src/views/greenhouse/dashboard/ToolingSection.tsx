@@ -5,7 +5,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { ExecutiveCardShell } from '@/components/greenhouse'
+import { BrandLogo, ExecutiveCardShell } from '@/components/greenhouse'
 import type { GreenhouseDashboardData, GreenhouseDashboardTool } from '@/types/greenhouse-dashboard'
 
 type ToolingSectionProps = {
@@ -35,11 +35,14 @@ const ToolGroup = ({ title, description, tools }: ToolGroupProps) => (
             flexDirection: { xs: 'column', md: 'row' }
           }}
         >
-          <Stack spacing={0.5}>
-            <Typography variant='h6'>{tool.label}</Typography>
-            <Typography variant='body2' color='text.secondary'>
-              {tool.category}
-            </Typography>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <BrandLogo brand={tool.label} />
+            <Stack spacing={0.5}>
+              <Typography variant='h6'>{tool.label}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {tool.category}
+              </Typography>
+            </Stack>
           </Stack>
           <Chip
             variant={tool.source === 'override' ? 'tonal' : 'outlined'}

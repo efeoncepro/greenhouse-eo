@@ -35,9 +35,11 @@
     "react-dom": "19.2.3",
     "react-perfect-scrollbar": "1.5.8",
     "react-use": "17.6.0",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "simple-icons": "^16.11.0"
   },
   "devDependencies": {
+    "@iconify-json/logos": "^1.2.10",
     "@iconify/json": "2.2.408",
     "@iconify/tools": "4.1.4",
     "@iconify/types": "2.0.0",

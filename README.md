@@ -18,6 +18,7 @@ La especificacion funcional principal esta en:
 La documentacion operativa interna del repo esta en:
 - `AGENTS.md`
 - `BACKLOG.md`
+- `DOCUMENTATION_OPERATING_MODEL_V1.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
@@ -75,6 +76,8 @@ Estado hoy:
 - el login ya no muestra bloque demo ni mensajes internos de infraestructura
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
+- el stack visual del repo ya usa `apexcharts` + `react-apexcharts`, y ahora tambien cuenta con `simple-icons` y `@iconify-json/logos` para logos de herramientas y marcas sin bajar assets manuales
+- `src/components/greenhouse/BrandLogo.tsx` es la primitive reusable para branding de herramientas y resuelve logos desde el bundle local de Vuexy/Iconify antes de caer a fallbacks
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
 - existen `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`
 - existe `/api/projects` con queries server-side a BigQuery
@@ -332,6 +335,8 @@ Orden recomendado para buscar referencia Vuexy:
 - `../full-version/src/views/apps/roles/*`
 - `../full-version/src/libs/ApexCharts.tsx`
 - `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- `../full-version/src/libs/Recharts.tsx`
+- `../full-version/src/libs/styles/AppRecharts.ts`
 - despues confirmar contra la documentacion oficial de Vuexy:
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
