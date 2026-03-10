@@ -47,11 +47,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/app/(dashboard)/settings/page.tsx`: vista base de settings
 - `src/app/(blank-layout-pages)/login/page.tsx`: login actual
 - `src/app/api/dashboard/kpis/route.ts`: primer endpoint real con datos de BigQuery
+- `src/app/api/projects/route.ts`: listado real de proyectos por tenant
 - `src/components/layout/**`: piezas del layout
 - `src/configs/**`: configuracion de tema y color
 - `src/data/navigation/**`: definicion de menu
 - `src/lib/bigquery.ts`: cliente reusable de BigQuery
 - `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos server-side del dashboard
+- `src/lib/projects/get-projects-overview.ts`: capa de datos server-side de proyectos
 
 ## Estado de Rutas
 - Existe `/dashboard`
@@ -75,8 +77,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `next-auth` ya esta integrado, consulta `greenhouse.clients`, usa session JWT y proteccion base del dashboard.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
+- Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existe una fuente real de tenants en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
-- Aun no existen `/api/projects`, `/api/sprints` ni el detalle `/proyectos/[id]`.
+- Aun no existen `/api/sprints` ni el detalle `/proyectos/[id]`.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -172,7 +175,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion ya resuelve tenants desde `greenhouse.clients`, pero el acceso bootstrap aun depende de `DEMO_CLIENT_PASSWORD`.
 - Falta cargar `password_hash` reales o integrar SSO para cerrar el bootstrap demo.
-- Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
+- Faltan el detalle de proyecto, sprints reales y los data flows restantes definidos en la especificacion.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

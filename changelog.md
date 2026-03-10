@@ -39,6 +39,8 @@
 - `next-auth` ya consulta `greenhouse.clients` para resolver el tenant por email.
 - Se agrego `bcryptjs` para soportar `password_hash` reales cuando se carguen en la tabla.
 - Se agrego actualizacion de `last_login_at` y helper reusable de tenant en runtime.
+- Se implemento `src/app/api/projects/route.ts` como listado real de proyectos por tenant.
+- La vista `/proyectos` ya consume datos reales de BigQuery con estados de carga y error.
 
 ### Documentacion Operativa
 - Se agregaron `AGENTS.md`, `Handoff.md`, `changelog.md` y `project_context.md` para coordinacion multi-agente.

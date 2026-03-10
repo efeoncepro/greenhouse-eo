@@ -62,9 +62,10 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Integrar `@google-cloud/bigquery`, crear `/api/dashboard/kpis` y conectar el dashboard a datos reales por alcance de cliente demo.
 - Definir la arquitectura multi-tenant objetivo, crear la base `greenhouse.clients` en BigQuery y dejar backlog priorizado para continuar el proyecto.
 - Conectar `next-auth` a `greenhouse.clients`, actualizar `last_login_at` y agregar helper de tenant reusable.
+- Implementar `/api/projects` y reemplazar la vista mock de `/proyectos` por datos reales de BigQuery filtrados por tenant.
 
 ### Rama
-- Rama usada: `feature/greenhouse-shell`
+- Rama usada: `feature/tenant-auth-bq`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
@@ -102,6 +103,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `src/app/(dashboard)/sprints/page.tsx`
 - `src/app/api/auth/[...nextauth]/route.ts`
 - `src/app/api/dashboard/kpis/route.ts`
+- `src/app/api/projects/route.ts`
 - `src/components/auth/AuthSessionProvider.tsx`
 - `src/components/layout/horizontal/FooterContent.tsx`
 - `src/components/layout/horizontal/VerticalNavContent.tsx`
@@ -115,6 +117,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `src/lib/bigquery.ts`
 - `src/lib/dashboard/get-dashboard-overview.ts`
 - `src/lib/demo-client.ts`
+- `src/lib/projects/get-projects-overview.ts`
 - `src/lib/auth.ts`
 - `src/lib/tenant/clients.ts`
 - `src/lib/tenant/get-tenant-context.ts`
@@ -143,6 +146,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm add @google-cloud/bigquery`: correcto
 - `npx pnpm add bcryptjs`: correcto
 - `npx pnpm build` con BigQuery integrado y `/api/dashboard/kpis`: correcto
+- `npx pnpm build` con `/api/projects` y `/proyectos` conectado a BigQuery: correcto
 - `npx pnpm lint`: correcto
 - `npx pnpm build` con auth lookup en `greenhouse.clients`: correcto
 - Dataset `efeonce-group.greenhouse`: creado
@@ -156,6 +160,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Login ya autentica con `next-auth`, pero contra credenciales demo configurables por env.
 - La app ya usa `greenhouse.clients` en runtime para resolver tenant y alcance.
 - El bootstrap actual sigue dependiendo de `auth_mode = env_demo` y `DEMO_CLIENT_PASSWORD`.
+- La vista `/proyectos` ya usa datos reales, pero el CTA todavia abre el workspace fuente porque `/proyectos/[id]` aun no existe.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 - El branding actual usa assets temporales entregados por el usuario; falta reemplazo por versiones finales de diseno.
@@ -164,7 +169,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - La configuracion Git local que evita warnings vive en `.git/config`; si otro agente trabaja en otra maquina y reaparecen avisos, debe revisar `core.autocrlf` contra `.gitattributes`.
 
 ### Proximo paso recomendado
-- Crear `/api/projects` filtrado por cliente y reemplazar la grilla mock de proyectos.
 - Reemplazar el bootstrap `env_demo` por `password_hash` reales o SSO.
-- Implementar `/proyectos/[id]` con detalle de tareas, estado y comentarios abiertos.
+- Crear `/proyectos/[id]` con detalle de tareas, estado y comentarios abiertos.
+- Reemplazar el CTA temporal de `/proyectos` por navegacion interna al detalle.
 - Despues agregar `/api/sprints` y endurecer auth para un flujo multi-tenant real.

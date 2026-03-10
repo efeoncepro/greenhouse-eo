@@ -17,10 +17,9 @@
 
 ### P0.2 Projects API and UI
 
-- Create `/api/projects` filtered by tenant scope.
-- Replace mock content in `/proyectos` with live project cards or table.
-- Include project name, status, total tasks, active tasks, on-time percentage and average RpA.
-- Add loading and empty states.
+- Create `/proyectos/[id]` internal detail route.
+- Replace the temporary source-workspace button with internal project navigation.
+- Add tenant-safe empty and error states per project card.
 
 ### P0.3 Project Detail
 
@@ -88,5 +87,6 @@
 - BigQuery credentials in Vercel
 - first real endpoint: `/api/dashboard/kpis`
 - dashboard KPIs fed from BigQuery
+- `/api/projects` and `/proyectos` fed from BigQuery
 - BigQuery dataset `greenhouse`
 - table `greenhouse.clients`

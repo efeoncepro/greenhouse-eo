@@ -38,7 +38,9 @@ Estado hoy:
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
+- existe `/api/projects` con queries server-side a BigQuery
 - el dashboard principal ya consume datos reales para KPIs, estado de cartera y proyectos bajo observacion
+- la vista `/proyectos` ya consume datos reales filtrados por tenant
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 
 Rutas actuales:
@@ -58,7 +60,7 @@ Rutas objetivo del producto:
 Brecha visible:
 - la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
 - el dashboard ya tiene un primer vertical slice real, pero faltan mas API Routes de negocio
-- faltan `/api/projects`, `/api/sprints` y el detalle `/proyectos/[id]`
+- faltan `/api/sprints` y el detalle `/proyectos/[id]`
 - el tenant ya se busca en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`
 
 ## Stack
@@ -205,11 +207,13 @@ Camino normal:
 - `src/app/layout.tsx`: layout raiz
 - `src/app/(dashboard)/layout.tsx`: layout principal del dashboard
 - `src/app/api/dashboard/kpis/route.ts`: primer endpoint real del portal
+- `src/app/api/projects/route.ts`: listado real de proyectos por tenant
 - `src/components/layout/**`: piezas de navegacion y shell
 - `src/configs/**`: tema y configuracion visual
 - `src/data/navigation/**`: definicion del menu
 - `src/lib/bigquery.ts`: cliente server-side de BigQuery
 - `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos del dashboard
+- `src/lib/projects/get-projects-overview.ts`: capa de datos de proyectos
 - `src/app/api/**`: aqui debe vivir la capa de endpoints server-side del producto
 - `scripts/run-next-build.mjs`: wrapper de build local para Windows
 - `scripts/run-next-start.mjs`: wrapper de start local para reutilizar el ultimo build
@@ -228,7 +232,7 @@ Usar como referencia de implementacion:
 ## Proximos Pasos Recomendados
 
 1. Reemplazar el bootstrap `env_demo` por password hashes reales o SSO.
-2. Implementar `/api/projects` con listado real filtrado por cliente.
-3. Crear `/proyectos/[id]` con detalle de proyecto, tareas y presion de revision.
-4. Agregar `/api/sprints` y velocity real.
+2. Crear `/proyectos/[id]` con detalle de proyecto, tareas y presion de revision.
+3. Agregar `/api/sprints` y velocity real.
+4. Reemplazar el CTA temporal de `/proyectos` por navegacion al detalle interno.
 5. Endurecer la autenticacion con helper de tenant reusable en todas las rutas.
