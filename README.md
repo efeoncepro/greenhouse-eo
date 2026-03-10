@@ -1,21 +1,23 @@
 # Greenhouse Portal
 
-Portal de clientes de Efeonce construido sobre Vuexy + Next.js. Este repositorio contiene la base operativa del producto Greenhouse y ya no debe tratarse como un starter genérico.
+Portal de clientes de Efeonce construido sobre Vuexy + Next.js. Este repositorio contiene la base operativa del producto Greenhouse y ya no debe tratarse como un starter generico.
 
 ## Objetivo
 
 Greenhouse busca darle a cada cliente acceso a:
-- métricas ICO
-- estado de su operación creativa
+- metricas ICO
+- estado de su operacion creativa
 - dashboards de proyectos y sprints
 - una capa de transparencia conectada al sistema Greenhouse
 
-La especificación funcional principal está en:
+La especificacion funcional principal esta en:
 - `../Greenhouse_Portal_Spec_v1.md`
 
-La documentación operativa interna del repo está en:
+La documentacion operativa interna del repo esta en:
 - `AGENTS.md`
+- `BACKLOG.md`
 - `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
 - `changelog.md`
 
@@ -29,14 +31,21 @@ La documentación operativa interna del repo está en:
 ## Estado Actual
 
 Estado hoy:
-- base técnica funcionando en Vercel
-- starter kit de Vuexy todavía visible en varias rutas y componentes
-- deploy operativo en `greenhouse-eo.vercel.app`
-- documentación multi-agente ya instalada
+- base tecnica funcionando en Vercel
+- shell Greenhouse visible en las rutas principales del portal
+- branding base integrado en navegacion y favicon temporal
+- `next-auth` ya protege el dashboard con credenciales demo
+- credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
+- `@google-cloud/bigquery` ya esta integrado en el repo
+- existe `/api/dashboard/kpis` con queries server-side a BigQuery
+- el dashboard principal ya consume datos reales para KPIs, estado de cartera y proyectos bajo observacion
+- `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 
 Rutas actuales:
-- `/home`
-- `/about`
+- `/dashboard`
+- `/proyectos`
+- `/sprints`
+- `/settings`
 - `/login`
 
 Rutas objetivo del producto:
@@ -47,10 +56,10 @@ Rutas objetivo del producto:
 - `/settings`
 
 Brecha visible:
-- falta autenticación real con `NextAuth.js`
-- falta integración server-side con BigQuery
-- faltan API Routes de negocio
-- falta reemplazar branding y navegación demo por Greenhouse
+- la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
+- el dashboard ya tiene un primer vertical slice real, pero faltan mas API Routes de negocio
+- faltan `/api/projects`, `/api/sprints` y el detalle `/proyectos/[id]`
+- el scope multi-tenant actual se resuelve por variables demo y aun no por una tabla `greenhouse.clients`
 
 ## Stack
 
@@ -68,7 +77,7 @@ Stack objetivo adicional:
 
 ## Arquitectura Objetivo
 
-La app debe operar así:
+La app debe operar asi:
 
 ```text
 Cliente autenticado
@@ -84,11 +93,11 @@ Reglas clave:
 - BigQuery no se consulta desde el browser.
 - Las queries deben ejecutarse server-side.
 - El modelo es multi-tenant por `client_id`.
-- La especificación funcional prevalece como norte del producto salvo decisión documentada.
+- La especificacion funcional prevalece como norte del producto salvo decision documentada.
 
 ## Comandos
 
-Instalación:
+Instalacion:
 
 ```bash
 npx pnpm install --frozen-lockfile
@@ -106,6 +115,12 @@ Build:
 npx pnpm build
 ```
 
+Limpieza local:
+
+```bash
+npx pnpm clean
+```
+
 Lint:
 
 ```bash
@@ -117,6 +132,15 @@ npx pnpm lint
 Actuales en `.env.example`:
 - `NEXT_PUBLIC_APP_URL`
 - `BASEPATH`
+- `GCP_PROJECT`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `DEMO_CLIENT_ID`
+- `DEMO_CLIENT_EMAIL`
+- `DEMO_CLIENT_PASSWORD`
+- `DEMO_CLIENT_NAME`
+- `DEMO_CLIENT_PROJECT_IDS`
 
 Objetivo funcional:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
@@ -124,10 +148,14 @@ Objetivo funcional:
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 
+Estado actual en Vercel:
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` existe en `Development`, `staging` y `Production`
+- `GCP_PROJECT` existe en `Development`, `staging` y `Production`
+
 Notas:
 - `next.config.ts` usa `BASEPATH` como `basePath`.
 - Si `BASEPATH` se define innecesariamente en Vercel, la app deja de vivir en `/`.
-- Toda variable nueva debe documentarse también en `project_context.md`.
+- Toda variable nueva debe documentarse tambien en `project_context.md`.
 
 ## Deploy
 
@@ -139,10 +167,16 @@ Entorno actual:
 - dominio actual: `greenhouse-eo.vercel.app`
 - dominio objetivo: `greenhouse.efeonce.com`
 
-Configuración importante en Vercel:
+Configuracion importante en Vercel:
 - `Framework Preset`: `Next.js`
-- `Root Directory`: vacío o equivalente al repo raíz
-- `Output Directory`: vacío
+- `Root Directory`: vacio o equivalente al repo raiz
+- `Output Directory`: vacio
+
+Ambientes:
+- `Development`
+- `staging` asociado a `develop`
+- `Production` asociado a `main`
+- `Preview` efimero para ramas feature y fix
 
 Nota operativa:
 - hubo un `404 NOT_FOUND` inicial por tener `Framework Preset` en `Other`
@@ -151,29 +185,34 @@ Nota operativa:
 ## Flujo de Trabajo
 
 Ramas:
-- `main`: producción
-- `develop`: integración y staging compartido
+- `main`: produccion
+- `develop`: integracion y staging compartido
 - `feature/*`, `fix/*`, `docs/*`: trabajo aislado por agente
-- `hotfix/*`: correcciones de producción
+- `hotfix/*`: correcciones de produccion
 
 Camino normal:
 1. Crear rama desde `develop`.
-2. Implementar cambio pequeño y verificable.
-3. Validar con `npx pnpm build`, `npx pnpm lint` o validación manual suficiente.
+2. Implementar cambio pequeno y verificable.
+3. Validar con `npx pnpm build`, `npx pnpm lint` o validacion manual suficiente.
 4. Hacer push y revisar Preview Deployment en Vercel si el cambio afecta UI, rutas, layout o deploy.
 5. Mergear a `develop`.
-6. Validar en `Staging`.
+6. Validar en `staging`.
 7. Mergear a `main`.
 8. Confirmar deploy a `Production`.
 
 ## Estructura Relevante
 
-- `src/app/layout.tsx`: layout raíz
+- `src/app/layout.tsx`: layout raiz
 - `src/app/(dashboard)/layout.tsx`: layout principal del dashboard
-- `src/components/layout/**`: piezas de navegación y shell
-- `src/configs/**`: tema y configuración visual
-- `src/data/navigation/**`: definición del menú
-- `src/app/api/**`: aquí debe vivir la capa de endpoints server-side del producto
+- `src/app/api/dashboard/kpis/route.ts`: primer endpoint real del portal
+- `src/components/layout/**`: piezas de navegacion y shell
+- `src/configs/**`: tema y configuracion visual
+- `src/data/navigation/**`: definicion del menu
+- `src/lib/bigquery.ts`: cliente server-side de BigQuery
+- `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos del dashboard
+- `src/app/api/**`: aqui debe vivir la capa de endpoints server-side del producto
+- `scripts/run-next-build.mjs`: wrapper de build local para Windows
+- `scripts/run-next-start.mjs`: wrapper de start local para reutilizar el ultimo build
 
 ## Referencias de Trabajo
 
@@ -183,13 +222,13 @@ Leer antes de cambios importantes:
 - `project_context.md`
 - `../Greenhouse_Portal_Spec_v1.md`
 
-Usar como referencia de implementación:
+Usar como referencia de implementacion:
 - `../full-version`
 
-## Próximos Pasos Recomendados
+## Proximos Pasos Recomendados
 
-1. Crear `src/app/page.tsx` para que la raíz no dependa solo del redirect.
-2. Reemplazar rutas demo por las rutas objetivo del portal.
-3. Integrar autenticación multi-tenant.
-4. Instalar e integrar BigQuery server-side.
-5. Implementar el dashboard principal y las primeras API Routes del MVP.
+1. Reemplazar el scope demo por una fuente real de clientes y proyectos permitidos.
+2. Implementar `/api/projects` con listado real filtrado por cliente.
+3. Crear `/proyectos/[id]` con detalle de proyecto, tareas y presion de revision.
+4. Agregar `/api/sprints` y velocity real.
+5. Endurecer la autenticacion para dejar atras las credenciales demo.

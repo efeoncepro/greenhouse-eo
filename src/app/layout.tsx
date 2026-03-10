@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 
@@ -16,10 +18,14 @@ import '@/app/globals.css'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
-export const metadata = {
-  title: 'Vuexy - MUI Next.js Admin Dashboard Template',
-  description:
-    'Vuexy - MUI Next.js Admin Dashboard Template - is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.'
+export const metadata: Metadata = {
+  title: 'Greenhouse Portal',
+  description: 'Client portal for project visibility, delivery performance, and sprint health.',
+  icons: {
+    icon: [{ url: '/branding/avatar.png', type: 'image/png' }],
+    shortcut: ['/branding/avatar.png'],
+    apple: ['/branding/avatar.png']
+  }
 }
 
 const RootLayout = async (props: ChildrenType) => {
