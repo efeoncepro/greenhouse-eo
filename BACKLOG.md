@@ -15,23 +15,6 @@
 - Use `getTenantContext()` across the remaining authenticated API routes and pages.
 - Remove direct runtime dependence on `DEMO_CLIENT_PROJECT_IDS` outside local/bootstrap fallback.
 
-### P0.2 Projects API and UI
-
-- Create `/proyectos/[id]` internal detail route.
-- Replace the temporary source-workspace button with internal project navigation.
-- Add tenant-safe empty and error states per project card.
-
-### P0.3 Project Detail
-
-- Create `/api/projects/[id]`.
-- Create `/api/projects/[id]/tasks`.
-- Build `/proyectos/[id]` page with:
-  - header KPIs
-  - tasks table
-  - review pressure section
-  - sprint context if available
-- Enforce tenant authorization on project id.
-
 ## Next
 
 ### P1.1 Sprint Views
@@ -88,5 +71,8 @@
 - first real endpoint: `/api/dashboard/kpis`
 - dashboard KPIs fed from BigQuery
 - `/api/projects` and `/proyectos` fed from BigQuery
+- `/api/projects/[id]` and `/api/projects/[id]/tasks` with tenant authorization
+- `/proyectos/[id]` with KPI header, tasks table, review pressure and sprint context
+- internal navigation from `/proyectos` to project detail
 - BigQuery dataset `greenhouse`
 - table `greenhouse.clients`

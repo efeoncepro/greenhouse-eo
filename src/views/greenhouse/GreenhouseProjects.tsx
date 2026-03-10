@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -207,14 +209,11 @@ const GreenhouseProjects = () => {
                     </Box>
 
                     <Button
-                      variant='outlined'
-                      component='a'
-                      href={project.pageUrl || undefined}
-                      target='_blank'
-                      rel='noreferrer'
-                      disabled={!project.pageUrl}
+                      variant='contained'
+                      component={Link}
+                      href={`/proyectos/${project.id}`}
                     >
-                      Open source workspace
+                      View project detail
                     </Button>
                   </Stack>
                 </CardContent>

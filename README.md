@@ -39,13 +39,16 @@ Estado hoy:
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
 - existe `/api/projects` con queries server-side a BigQuery
+- existen `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant
 - el dashboard principal ya consume datos reales para KPIs, estado de cartera y proyectos bajo observacion
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
+- la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 
 Rutas actuales:
 - `/dashboard`
 - `/proyectos`
+- `/proyectos/[id]`
 - `/sprints`
 - `/settings`
 - `/login`
@@ -60,7 +63,7 @@ Rutas objetivo del producto:
 Brecha visible:
 - la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
 - el dashboard ya tiene un primer vertical slice real, pero faltan mas API Routes de negocio
-- faltan `/api/sprints` y el detalle `/proyectos/[id]`
+- faltan `/api/sprints` y `/api/dashboard/charts`
 - el tenant ya se busca en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`
 
 ## Stack
@@ -208,12 +211,15 @@ Camino normal:
 - `src/app/(dashboard)/layout.tsx`: layout principal del dashboard
 - `src/app/api/dashboard/kpis/route.ts`: primer endpoint real del portal
 - `src/app/api/projects/route.ts`: listado real de proyectos por tenant
+- `src/app/api/projects/[id]/route.ts`: detalle de proyecto por tenant
+- `src/app/api/projects/[id]/tasks/route.ts`: tareas del proyecto por tenant
 - `src/components/layout/**`: piezas de navegacion y shell
 - `src/configs/**`: tema y configuracion visual
 - `src/data/navigation/**`: definicion del menu
 - `src/lib/bigquery.ts`: cliente server-side de BigQuery
 - `src/lib/dashboard/get-dashboard-overview.ts`: capa de datos del dashboard
 - `src/lib/projects/get-projects-overview.ts`: capa de datos de proyectos
+- `src/lib/projects/get-project-detail.ts`: capa de datos del detalle de proyecto
 - `src/app/api/**`: aqui debe vivir la capa de endpoints server-side del producto
 - `scripts/run-next-build.mjs`: wrapper de build local para Windows
 - `scripts/run-next-start.mjs`: wrapper de start local para reutilizar el ultimo build
@@ -232,7 +238,7 @@ Usar como referencia de implementacion:
 ## Proximos Pasos Recomendados
 
 1. Reemplazar el bootstrap `env_demo` por password hashes reales o SSO.
-2. Crear `/proyectos/[id]` con detalle de proyecto, tareas y presion de revision.
-3. Agregar `/api/sprints` y velocity real.
-4. Reemplazar el CTA temporal de `/proyectos` por navegacion al detalle interno.
+2. Agregar `/api/sprints` y velocity real.
+3. Agregar `/api/dashboard/charts` para reemplazar los bloques aun estaticos del dashboard.
+4. Conectar `/settings` a `greenhouse.clients`.
 5. Endurecer la autenticacion con helper de tenant reusable en todas las rutas.

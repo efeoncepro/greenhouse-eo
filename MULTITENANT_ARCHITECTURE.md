@@ -66,9 +66,9 @@ Target flow:
    - `authMode`
 
 Current interim flow:
-- Login still uses env-based demo credentials.
-- Scope is still carried by `DEMO_CLIENT_PROJECT_IDS`.
-- The `greenhouse.clients` table is already created and seeded so the next step is wiring auth to it.
+- Login already looks up the tenant in `greenhouse.clients` by email through NextAuth credentials flow.
+- Session scope is already built from the tenant row in `greenhouse.clients`.
+- The seeded tenant still uses `auth_mode = env_demo`, so production hardening still requires `password_hash` or SSO.
 
 ### 2. Session and Tenant Context
 
@@ -120,8 +120,9 @@ Rules:
 ### Phase 1
 
 - Keep `CredentialsProvider`
-- Replace env lookup with BigQuery lookup to `greenhouse.clients`
+- Keep BigQuery lookup to `greenhouse.clients`
 - Continue JWT sessions
+- Remove `env_demo` from seeded tenants once `password_hash` or SSO is available
 
 ### Phase 2
 
@@ -151,7 +152,7 @@ Recommended future split:
 1. Replace `DEMO_CLIENT_PROJECT_IDS` reads with a BigQuery lookup to `greenhouse.clients`.
 2. Add password hashing and verification.
 3. Introduce `getTenantContext()` helper.
-4. Move `/api/projects` and `/api/sprints` to the same tenant helper.
+4. Move `/api/projects`, `/api/projects/[id]`, `/api/projects/[id]/tasks` and `/api/sprints` to the same tenant helper.
 5. Add `client_users` only when multiple users per tenant becomes real.
 
 ## Current Remote Assets

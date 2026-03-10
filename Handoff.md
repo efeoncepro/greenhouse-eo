@@ -173,3 +173,54 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Crear `/proyectos/[id]` con detalle de tareas, estado y comentarios abiertos.
 - Reemplazar el CTA temporal de `/proyectos` por navegacion interna al detalle.
 - Despues agregar `/api/sprints` y endurecer auth para un flujo multi-tenant real.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar el detalle interno de proyecto como siguiente slice real del portal.
+- Crear APIs tenant-safe para detalle y tareas de proyecto.
+- Reemplazar la navegacion temporal de `/proyectos` por navegacion interna al detalle.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview de feature branch y luego `staging`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/proyectos/[id]/page.tsx`
+- `src/app/api/projects/[id]/route.ts`
+- `src/app/api/projects/[id]/tasks/route.ts`
+- `src/lib/projects/get-project-detail.ts`
+- `src/types/greenhouse-project-detail.ts`
+- `src/views/greenhouse/GreenhouseProjectDetail.tsx`
+- `src/views/greenhouse/GreenhouseProjects.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Build confirmo las rutas ` /api/projects/[id]`, `/api/projects/[id]/tasks` y `/proyectos/[id]`
+- Smoke queries directas a BigQuery para project detail, tasks y sprint context: correctas sobre `2dc39c2f-efe7-803e-abcd-d74ff4a40940`
+
+### Riesgos o pendientes
+- El bootstrap de auth sigue dependiendo de `auth_mode = env_demo` para el tenant seeded.
+- `MULTITENANT_ARCHITECTURE.md` sigue atrasado respecto del runtime real y debe actualizarse.
+- El sprint context depende de `sprint_ids` en tareas; si el proyecto no trae esa relacion, la vista muestra estado vacio controlado.
+- `/sprints`, `/settings` y `/api/dashboard/charts` siguen pendientes como slices reales.
+
+### Proximo paso recomendado
+- Reemplazar `env_demo` por `password_hash` reales o SSO.
+- Crear `/api/sprints` y conectar `/sprints` a datos reales.
+- Crear `/api/dashboard/charts` para profundizar el dashboard.

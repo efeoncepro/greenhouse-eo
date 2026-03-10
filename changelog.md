@@ -57,3 +57,14 @@
 - Se reemplazaron scripts Unix `rm -rf` por utilidades cross-platform con Node.
 - En Windows local, `build` paso a usar un `distDir` dinamico bajo `.next-local/` para evitar bloqueos recurrentes sobre `.next` dentro de OneDrive.
 - Se dejo explicitada la regla de no correr `git add/commit/push` en paralelo para evitar `index.lock`.
+
+## 2026-03-10
+
+### Proyecto
+- Se implementaron `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant usando `getTenantContext()`.
+- Se agrego `/proyectos/[id]` con header de KPIs, tabla de tareas, review pressure y sprint context si existe.
+- La vista `/proyectos` ahora navega al detalle interno del portal en lugar de usar el CTA temporal al workspace fuente.
+
+### Calidad
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
