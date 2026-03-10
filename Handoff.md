@@ -283,10 +283,16 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `README.md`
+- `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`
 - `changelog.md`
 - `project_context.md`
+- `src/app/api/dashboard/kpis/route.ts`
+- `src/app/api/projects/route.ts`
+- `src/app/api/projects/[id]/route.ts`
+- `src/app/api/projects/[id]/tasks/route.ts`
 - `src/lib/auth.ts`
 - `src/lib/tenant/access.ts`
+- `src/lib/tenant/authorization.ts`
 - `src/lib/tenant/get-tenant-context.ts`
 - `src/types/next-auth.d.ts`
 - `src/views/Login.tsx`
@@ -306,18 +312,31 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Verificacion de seeds:
   - `user-greenhouse-demo-client-executive` con `client_executive` y 4 proyectos
   - `user-efeonce-admin-bootstrap` con `efeonce_admin`
+- `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`: aplicado correctamente
+- Verificacion de bootstrap HubSpot:
+  - 9 companias con `closedwon` importadas como tenants `hubspot-company-*`
+  - ejemplos verificados: `ANAM`, `Sky Airline`
+  - 1 contacto cliente inicial por empresa en `client_users` con estado `invited`
+- Usuario admin interno creado:
+  - email: `julio.reyes@efeonce.org`
+  - rol: `efeonce_admin`
+  - estado: `active`
+  - auth_mode: `credentials`
+- `src/lib/tenant/authorization.ts`: agregado y consumido por `/api/dashboard/kpis`, `/api/projects`, `/api/projects/[id]` y `/api/projects/[id]/tasks`
 - Se actualizo el ACL del dataset `greenhouse` para dar `WRITER` al service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
 
 ### Riesgos o pendientes
 - El service account todavia no puede crear datasets a nivel proyecto; solo tablas dentro del dataset `greenhouse`
 - El runtime conserva fallback a `greenhouse.clients`; aun no debe retirarse
 - El bootstrap demo sigue usando `auth_mode = env_demo`
-- Todavia no existen guards por route group para `/internal/**` y `/admin/**`
+- Los guards actuales cubren solo rutas cliente; faltan `/internal/**` y `/admin/**`
+- Los tenants HubSpot bootstrap no tienen aun `notion_project_ids` ni `user_project_scopes`, por lo que entrarian con contexto vacio hasta mapear proyectos
 
 ### Proximo paso recomendado
 - Cargar usuarios reales en `client_users`
 - Quitar dependencia operativa de `env_demo`
-- Implementar guards por `tenantType`, `roleCodes` y `routeGroups`
+- Implementar guards por `tenantType`, `roleCodes` y `routeGroups` para `/internal/**` y `/admin/**`
+- Mapear `notion_project_ids` y `user_project_scopes` para los tenants importados desde HubSpot
 - Construir `/api/dashboard/charts` y rediseñar `/dashboard` como centro ejecutivo del producto
 
 ### Riesgos o pendientes

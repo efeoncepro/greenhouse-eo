@@ -69,6 +69,7 @@ Estado hoy:
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
 - existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
 - ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
+- ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
 
 Rutas actuales:
 - `/dashboard`
@@ -86,7 +87,7 @@ Rutas objetivo del producto:
 - `/settings`
 
 Brecha visible:
-- la autenticacion ya consume un origen multi-user real, pero el bootstrap demo sigue seeded con `auth_mode = env_demo`
+- la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero el demo sigue seeded con `auth_mode = env_demo`
 - el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
 - faltan `/api/sprints` y `/api/dashboard/charts`
 - el tenant metadata legacy sigue viviendo en `greenhouse.clients` mientras termina la migracion

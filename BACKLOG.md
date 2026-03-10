@@ -63,11 +63,11 @@ Status:
 - partially started
 
 Open activities:
-- load real users beyond bootstrap seeds
 - remove legacy fallback to `greenhouse.clients`
 - add route guards by route group and role family
 - add campaign scopes to real runtime consumers
 - remove `auth_mode = env_demo` from normal runtime
+- replace invited bootstrap users with activated credentials or SSO flow
 
 ### Phase 2. Executive Client Dashboard
 

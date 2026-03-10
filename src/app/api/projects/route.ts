@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
 
 import { getProjectsOverview } from '@/lib/projects/get-projects-overview'
-import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { requireClientTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const tenant = await getTenantContext()
+  const { tenant, errorResponse } = await requireClientTenantContext()
 
   if (!tenant) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const data = await getProjectsOverview({

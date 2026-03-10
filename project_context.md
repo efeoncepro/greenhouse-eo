@@ -107,6 +107,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
+- Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
 - Aun no existe una capa multi-user real separada de tenants.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
@@ -193,6 +194,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - DDL versionado: `bigquery/greenhouse_clients.sql`
 - DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
 - DDL multi-user ya aplicado en BigQuery: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
+- DDL de bootstrap real desde HubSpot: `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.

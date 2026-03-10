@@ -1,18 +1,22 @@
 import { NextResponse } from 'next/server'
 
 import { getProjectTasks } from '@/lib/projects/get-project-detail'
-import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { canAccessProject, requireClientTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  const tenant = await getTenantContext()
+  const { tenant, errorResponse } = await requireClientTenantContext()
 
   if (!tenant) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const { id } = await params
+
+  if (!canAccessProject(tenant, id)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const data = await getProjectTasks({
     clientId: tenant.clientId,
