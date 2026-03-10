@@ -38,10 +38,15 @@ npx pnpm build
 npx pnpm lint
 ```
 
+Regla de estructura:
+- si el cambio crea una pieza reutilizable de UI Greenhouse, debe vivir en `src/components/greenhouse/*`
+- si el cambio es especifico de una pantalla o modulo, debe vivir en `src/views/greenhouse/<modulo>/*`
+- evitar dejar componentes genericos atrapados dentro de una vista concreta
+
 4. Commit:
 
 ```bash
-git commit -m "feat: dashboard KPI cards"
+git commit -m "feat: add greenhouse shared metrics cards"
 ```
 
 5. Push:

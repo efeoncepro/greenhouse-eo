@@ -1288,6 +1288,7 @@ The following streams can often proceed in parallel after Phase 0:
 Current structure is acceptable for the MVP but should evolve.
 
 Recommended additions:
+- `src/components/greenhouse/**`
 - `src/lib/authz/**`
 - `src/lib/campaigns/**`
 - `src/lib/capacity/**`
@@ -1300,6 +1301,11 @@ Recommended additions:
 - `src/views/greenhouse/team/**`
 - `src/views/greenhouse/internal/**`
 - `src/views/greenhouse/admin/**`
+
+Component boundary rule:
+- shared Greenhouse UI primitives belong in `src/components/greenhouse/**`
+- route or module composition belongs in `src/views/greenhouse/**`
+- no view should recreate cards, headings, or chip groups ad hoc if they can be promoted to the shared Greenhouse layer
 
 ## Validation Strategy
 
@@ -1350,11 +1356,11 @@ Recommended additions:
 
 ## Immediate Next Actions
 
-1. Update repo context docs to reference this architecture document.
-2. Reframe `BACKLOG.md` by phases and streams.
-3. Design `client_users`, roles, and scope tables.
-4. Design the KPI dictionary for executive dashboard V1.
-5. Build `/api/dashboard/charts` and redesign `/dashboard` around executive visibility.
+1. Validate visually the module-aware dashboard on `Preview` or `staging`.
+2. Build `/admin/scopes` and `/admin/feature-flags`.
+3. Build `/api/sprints` and the real `/sprints`.
+4. Extend `serviceModules` from dashboard composition into navigation and billing context.
+5. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
 
 ## Agent Working Notes
 

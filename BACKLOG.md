@@ -211,7 +211,7 @@ Current adaptation rule:
 
 - keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
 - align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
-- promote `feature/executive-dashboard-phase2` only after preview validation of dashboard and admin surfaces
+- validate dashboard and admin surfaces in `Preview` or `staging` before the next promotion to `main`
 
 ### N2.1 Dashboard Hardening
 

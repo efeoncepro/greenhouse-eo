@@ -345,13 +345,18 @@ Service modules:
 - La fuente comercial actual para derivarlos es `hubspot_crm.deals.linea_de_servicio` y `hubspot_crm.deals.servicios_especificos`.
 - El schema base esta versionado en `bigquery/greenhouse_service_modules_v1.sql`.
 - El bootstrap inicial desde deals `closedwon` esta versionado en `bigquery/greenhouse_service_module_bootstrap_v1.sql`.
-- `getTenantContext()` ya expone `businessLines` y `serviceModules` para runtime server-side.
+- `getTenantContext()` ya expone `businessLines` y `serviceModules` para runtime server-side y composicion actual del dashboard.
 - Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
+
+Regla de componentes Greenhouse:
+- `src/components/greenhouse/*` es la capa compartida de UI del producto.
+- `src/views/greenhouse/<modulo>/*` debe contener solo composicion y piezas especificas del modulo.
+- Antes de crear una card, heading, badge group o lista metrica nueva, revisar primero si debe vivir en `src/components/greenhouse/*`.
 
 ## Proximos Pasos Recomendados
 
-1. Validar y promover `feature/executive-dashboard-phase2` por `Preview`, `develop`, `staging` y `main`.
-2. Volver `/dashboard` module-aware usando `serviceModules`.
-3. Construir `/admin/scopes` y `/admin/feature-flags`.
-4. Agregar `/api/sprints` y la vista real de `/sprints`.
+1. Validar visualmente el dashboard module-aware en `Preview` o `staging` con tenants `crm_solutions`, `globe` y `wave`.
+2. Construir `/admin/scopes` y `/admin/feature-flags`.
+3. Agregar `/api/sprints` y la vista real de `/sprints`.
+4. Extender `serviceModules` a navegacion y billing.
 5. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.

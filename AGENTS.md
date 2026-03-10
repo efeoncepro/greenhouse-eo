@@ -41,6 +41,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Preferir cambios pequenos, verificables y reversibles.
 - Si un archivo base de Vuexy requiere cambios amplios, separar primero la adaptacion funcional y despues el cleanup.
 - Evitar renombrar masivamente archivos o mover carpetas sin una razon fuerte.
+- Los componentes UI compartidos de Greenhouse deben vivir en `src/components/greenhouse/*`.
+- Las rutas y modulos deben reutilizar esa capa y dejar en `src/views/greenhouse/*` solo la composicion o piezas especificas del modulo.
 
 ### 5. Regla de verificacion
 - Todo cambio debe intentar validar al menos una de estas rutas:
@@ -165,6 +167,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `pnpm-lock.yaml`
   - `src/app/layout.tsx`
   - `src/app/(dashboard)/layout.tsx`
+  - `src/components/greenhouse/**`
   - `src/components/layout/**`
   - `src/configs/**`
 - Si alguno cambia, dejar nota en `Handoff.md`.
