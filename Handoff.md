@@ -701,3 +701,71 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Proximo paso recomendado
 - Promover este slice si el preview visual esta sano.
 - Luego abrir `/admin/tenants` o volver a Fase 2 para madurar `capacity` y `market-speed`, segun prioridad de producto.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Validar si Greenhouse debe condicionar vistas y charts por servicios contratados del cliente.
+- Aterrizar esa idea sobre datos reales de BigQuery y dejarla documentada como arquitectura formal.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+
+### Hallazgos de datos
+- La fuente comercial real disponible hoy es `efeonce-group.hubspot_crm.deals`.
+- Existen dos campos utiles:
+  - `linea_de_servicio`
+  - `servicios_especificos`
+- Valores observados en deals `closedwon`:
+  - business line: `crm_solutions`, `globe`, `wave`
+  - service modules: `licenciamiento_hubspot`, `implementacion_onboarding`, `consultoria_crm`, `agencia_creativa`, `desarrollo_web`
+- Esto permite derivar modulos de producto para clientes reales sin hardcodear vistas por tenant.
+
+### Decisiones
+- `service modules` se adoptan como cuarto eje del producto junto a tenant, role y scope.
+- No reemplazan seguridad.
+- Sirven para componer:
+  - navegacion
+  - widgets del dashboard
+  - tabs y vistas relevantes
+  - contexto comercial y billing
+
+### Archivos tocados
+- `BACKLOG.md`
+- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `Handoff.md`
+- `README.md`
+- `bigquery/greenhouse_service_modules_v1.sql`
+- `bigquery/greenhouse_service_module_bootstrap_v1.sql`
+- `changelog.md`
+- `project_context.md`
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/get-tenant-context.ts`
+- `src/types/next-auth.d.ts`
+
+### Riesgos o pendientes
+- El mapping inicial depende de consistencia comercial en HubSpot; hay deals cerrados con valores vacios.
+- `serviceModules` deben entrar al tenant context antes de intentar condicionar UI en runtime.
+- No usar `serviceModules` como reemplazo de roles/scopes.
+
+### Proximo paso recomendado
+- Versionar y luego aplicar el schema `greenhouse_service_modules_v1.sql`.
+- Derivar assignments iniciales desde deals `closedwon`.
+- Exponer `serviceModules` en `getTenantContext()` y usarlos primero en dashboard y navegacion.
+
+### Estado real al cierre
+- `greenhouse.service_modules`: 9 filas
+- `greenhouse.client_service_modules`: 22 filas
+- El runtime ya expone `businessLines` y `serviceModules`.
+- Smoke sobre tenants importados:
+  - DDSoft -> `wave` + `desarrollo_web`
+  - Sky Airline -> `globe` + `agencia_creativa`
+  - SSilva -> `crm_solutions` + `consultoria_crm`, `implementacion_onboarding`, `licenciamiento_hubspot`

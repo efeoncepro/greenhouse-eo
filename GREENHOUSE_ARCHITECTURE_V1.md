@@ -186,6 +186,46 @@ Initial recommended roles:
 - tasks do not get a first-level top-nav route by default
 - project detail and campaign detail are drilldown contexts
 
+## Service Module Capability Layer
+
+Greenhouse needs one more axis beyond tenant, role, and scope:
+- business line
+- service modules
+
+Purpose:
+- adapt product surfaces to the services the client actually contracted
+- avoid hardcoding dashboard variants by tenant name
+- keep CRM, creative, and web experiences composable
+
+Source of truth today:
+- `efeonce-group.hubspot_crm.deals.linea_de_servicio`
+- `efeonce-group.hubspot_crm.deals.servicios_especificos`
+
+Observed current business families from closedwon deals:
+- `crm_solutions`
+- `globe`
+- `wave`
+
+Observed current service-module values from closedwon deals:
+- `licenciamiento_hubspot`
+- `implementacion_onboarding`
+- `consultoria_crm`
+- `agencia_creativa`
+- `desarrollo_web`
+
+Rules:
+- service modules are not the primary security model
+- security still comes from roles and scopes
+- service modules decide which parts of the product are relevant for a tenant
+
+Recommended runtime outcomes:
+- navigation filtered by `routeGroups` plus `serviceModules`
+- dashboard widgets selected by module applicability
+- admin and billing views show business line and active modules
+
+Reference:
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
+
 ## Product Modules
 
 ### 1. Executive Visibility
@@ -638,7 +678,26 @@ Parallelization:
 Validation:
 - docs reviewed and referenced by repo context files
 
-### Activity 0.2: Role model definition
+### Activity 0.2: Service module taxonomy
+
+Goal:
+- define how Greenhouse composes product slices by contracted services
+
+Outputs:
+- service module taxonomy
+- mapping rules from HubSpot commercial data
+- runtime contract for `businessLines` and `serviceModules`
+
+Dependencies:
+- Activity 0.1
+
+Parallelization:
+- can run in parallel with KPI and semantic model work
+
+Validation:
+- module composition rules are documented and tied to real source fields in BigQuery
+
+### Activity 0.3: Role model definition
 
 Goal:
 - define official roles, access depth, and route access
@@ -657,7 +716,7 @@ Parallelization:
 Validation:
 - every route family mapped to at least one role
 
-### Activity 0.3: Semantic KPI model
+### Activity 0.4: Semantic KPI model
 
 Goal:
 - define metric formulas and ownership
@@ -676,7 +735,7 @@ Parallelization:
 Validation:
 - each KPI has definition, grain, source, and intended audience
 
-### Activity 0.4: Data mart design
+### Activity 0.5: Data mart design
 
 Goal:
 - design dimensions and fact tables that support dashboards and drilldowns
@@ -795,8 +854,10 @@ Outputs:
 - `/api/dashboard/capacity`
 - `/api/dashboard/market-speed`
 - `/api/dashboard/risks`
+- module-aware widget contract
 
 Dependencies:
+- Phase 0 service module taxonomy
 - Phase 0 KPI model
 - Phase 1 auth helpers
 
@@ -805,6 +866,7 @@ Parallelization:
 
 Validation:
 - each endpoint documented with payload and role access
+- dashboard payloads can be composed by `serviceModules`
 
 ### Activity 2.2: Redesign dashboard UI
 
@@ -986,6 +1048,7 @@ Outputs:
 - campaign dimension design
 - mapping rules
 - gap list where manual mapping may be needed
+- service-module interpretation per campaign
 
 Dependencies:
 - semantic mart design
@@ -1155,6 +1218,7 @@ Goal:
 Outputs:
 - `/admin/scopes`
 - `/admin/feature-flags`
+- service module governance visibility
 
 Dependencies:
 - scope tables

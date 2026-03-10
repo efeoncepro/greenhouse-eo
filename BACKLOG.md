@@ -52,6 +52,8 @@ Open activities:
 - finalize role matrix
 - finalize KPI dictionary
 - finalize semantic mart design
+- finalize service module taxonomy from HubSpot commercial data
+- define module mapping rules from `linea_de_servicio` and `servicios_especificos`
 - align all repo docs to `GREENHOUSE_ARCHITECTURE_V1.md`
 
 ### Phase 1. Identity, Access, and Multi-User Model
@@ -85,6 +87,7 @@ Status:
 
 Open activities:
 - review and promote the new executive dashboard through `Preview`, `staging` and `Production`
+- add dashboard composition by `serviceModules`
 - add `/api/dashboard/capacity` once team and staffing data are modeled
 - add `/api/dashboard/market-speed` when time fields become numerically reliable
 - add campaign-aware slices once `/campanas` exists
@@ -145,6 +148,7 @@ Status:
 
 Open activities:
 - design campaign mapping model
+- connect campaign KPI context to `serviceModules`
 - create campaign semantic layer
 - create `/api/campaigns`
 - create `/api/campaigns/[id]`
@@ -181,6 +185,7 @@ Open activities:
 - create `/admin/tenants/[id]`
 - create `/admin/scopes`
 - create `/admin/feature-flags`
+- expose business line and active service modules in admin governance
 
 Completed in current iteration:
 - created `/admin/users`

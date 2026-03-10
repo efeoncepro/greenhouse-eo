@@ -10,6 +10,8 @@ declare module 'next-auth' {
     routeGroups: string[]
     projectScopes: string[]
     campaignScopes: string[]
+    businessLines: string[]
+    serviceModules: string[]
     projectIds: string[]
     role: string
     featureFlags: string[]
@@ -29,6 +31,8 @@ declare module 'next-auth' {
       routeGroups: string[]
       projectScopes: string[]
       campaignScopes: string[]
+      businessLines: string[]
+      serviceModules: string[]
       projectIds: string[]
       role: string
       featureFlags: string[]
@@ -51,6 +55,8 @@ declare module 'next-auth/jwt' {
     routeGroups?: string[]
     projectScopes?: string[]
     campaignScopes?: string[]
+    businessLines?: string[]
+    serviceModules?: string[]
     projectIds?: string[]
     role?: string
     featureFlags?: string[]

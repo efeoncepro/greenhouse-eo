@@ -9,6 +9,7 @@ Greenhouse busca darle a cada cliente acceso a:
 - estado de su operacion creativa
 - dashboards de entrega, velocidad, capacidad y riesgo
 - contexto de proyectos, tareas y sprints sin reemplazar Notion
+- composicion modular por linea de negocio y servicio contratado
 - una capa de transparencia conectada al sistema Greenhouse
 
 La especificacion funcional principal esta en:
@@ -19,6 +20,7 @@ La documentacion operativa interna del repo esta en:
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
@@ -38,6 +40,9 @@ Ese documento define:
 
 Documento tecnico de Fase 1:
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+
+Documento tecnico de modulos de servicio:
+- `GREENHOUSE_SERVICE_MODULES_V1.md`
 
 Ese documento define:
 - `client_users`
@@ -325,6 +330,15 @@ User Management y Roles & Permissions:
 - `security` -> auth mode, ultimo acceso, resets, auditoria y controles de acceso
 - `billing-plans` -> invoices, fee, plan contratado, consumo y contexto comercial del cliente
 - Los modulos demo de invoices, payment method, recent devices o billing fake no son source of truth y no deben entrar como data layer.
+
+Service modules:
+- Greenhouse debe adaptar navegacion, charts y vistas segun servicios contratados del cliente.
+- Ese eje no reemplaza roles ni scopes; los complementa.
+- La fuente comercial actual para derivarlos es `hubspot_crm.deals.linea_de_servicio` y `hubspot_crm.deals.servicios_especificos`.
+- El schema base esta versionado en `bigquery/greenhouse_service_modules_v1.sql`.
+- El bootstrap inicial desde deals `closedwon` esta versionado en `bigquery/greenhouse_service_module_bootstrap_v1.sql`.
+- `getTenantContext()` ya expone `businessLines` y `serviceModules` para runtime server-side.
+- Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
 
 ## Proximos Pasos Recomendados
 

@@ -10,6 +10,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
 - Documento tecnico de identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL de identidad y acceso: `bigquery/greenhouse_identity_access_v1.sql`
+- Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
+- DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
+- Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -59,6 +62,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Greenhouse debe ser un portal ejecutivo y operativo, no un segundo Notion.
 - Notion sigue siendo el system of work.
 - Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
+- Greenhouse tambien debe componer vistas y charts segun linea de negocio y servicios contratados del cliente.
 - Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
 - El centro del producto debe pasar a ser `/dashboard` y luego `/equipo` y `/campanas`.
 
@@ -140,8 +144,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Aun no existe `/api/sprints`.
 - Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
+- Ya existe evidencia comercial en BigQuery para derivar modulos de servicio desde `hubspot_crm.deals.linea_de_servicio` y `servicios_especificos`.
+- El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene lista, roles y detalle de usuario; falta mutacion segura de tenants, scopes y feature flags.
+- Falta modelar `serviceModules` en tenant context para condicionar navegacion, dashboard y billing por servicio contratado.
 
 ## Deploy
 - Hosting principal: Vercel
