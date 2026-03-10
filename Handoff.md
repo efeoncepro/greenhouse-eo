@@ -46,6 +46,45 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Codex
 
 ### Objetivo del turno
+- Recuperar acceso del usuario a cuentas existentes del portal.
+- Resetear la cuenta demo cliente para volver a probar la vista de cliente.
+
+### Rama
+- Rama usada: `develop`
+
+### Ambiente objetivo
+- BigQuery dataset `efeonce-group.greenhouse`
+
+### Archivos tocados
+- `Handoff.md`
+
+### Verificacion
+- `gcloud config get-value project`: `efeonce-group`
+- `gcloud auth list`: correcto
+- `gcloud auth application-default print-access-token`: correcto
+- Update directo sobre `greenhouse.client_users` para `client.portal@efeonce.com`: correcto
+- Verificacion posterior de la fila demo:
+  - `status = active`
+  - `active = true`
+  - `auth_mode = credentials`
+  - `password_hash_algorithm = bcrypt`
+  - `default_portal_home_path = /dashboard`
+- Verificacion de hash con la contraseña temporal compartida al usuario en este turno: correcta
+
+### Riesgos o pendientes
+- No dejar la contraseña temporal de la demo en documentos del repo ni en SQL versionado.
+- Los clientes bootstrap desde HubSpot siguen en `invited` o `password_reset_pending`; no sirven aun como cuentas de prueba cliente.
+
+### Proximo paso recomendado
+- Si la cuenta demo vuelve a circular entre varias personas, crear una cuenta cliente de QA separada en lugar de reutilizar `client.portal@efeonce.com`.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
 - Promover `feature/executive-dashboard-phase2` hacia `develop`.
 - Confirmar que la integracion en `develop` construye localmente y queda desplegada en `staging`.
 
