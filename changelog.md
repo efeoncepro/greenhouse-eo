@@ -90,3 +90,13 @@
 ### Calidad
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
+- Se promovio `feature/tenant-auth-bq` a `develop` y luego `develop` a `main`.
+- `dev-greenhouse.efeoncepro.com` y `greenhouse.efeoncepro.com` quedaron actualizados al runtime de Fase 1.
+- Se detecto que `staging` y `Production` tenian `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `NEXTAUTH_SECRET` mal cargados en Vercel.
+- Se reescribieron esas variables en ambos ambientes y se redeployaron los deployments activos.
+- Validacion final en `Production`:
+  - `/login`: 200
+  - `/api/auth/csrf`: 200
+  - `POST /api/auth/callback/credentials` con `julio.reyes@efeonce.org`: 200
+  - `/internal/dashboard`: correcto
+  - `/admin/users`: correcto

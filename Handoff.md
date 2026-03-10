@@ -516,3 +516,58 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Proximo paso recomendado
 - Iniciar Fase 2 con `/api/dashboard/charts` y el dashboard ejecutivo cliente.
 - Mantener el parser de BigQuery tolerante a ambos formatos de secreto mientras Vercel siga entregando ambas variantes en `Preview`.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Promover Fase 1 estable desde `feature/tenant-auth-bq` hacia `develop` y `main`.
+- Validar que `staging` y `Production` quedaran autentificando correctamente.
+- Corregir configuracion rota de Vercel en ambientes persistentes.
+
+### Rama
+- Rama usada: `main`
+- Ramas promovidas: `feature/tenant-auth-bq` -> `develop` -> `main`
+
+### Ambiente objetivo
+- `staging` (`dev-greenhouse.efeoncepro.com`)
+- `Production` (`greenhouse.efeoncepro.com`)
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Merge `feature/tenant-auth-bq` -> `develop`: correcto
+- Push `develop`: correcto
+- Nuevo deployment `staging`: `greenhouse-njozg0ttt-efeonce-7670142f.vercel.app`
+- Merge `develop` -> `main`: correcto
+- Push `main`: correcto
+- Nuevo deployment `Production`: `greenhouse-m1upubtnb-efeonce-7670142f.vercel.app`
+- Diagnostico de env real con `vercel env pull`:
+  - `staging` y `Production` tenian `GOOGLE_APPLICATION_CREDENTIALS_JSON` y/o `NEXTAUTH_SECRET` mal cargados
+- Reescritura de variables en Vercel:
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+- Redeploy de `staging` y `Production`: correctos
+- Validacion final en `Production`:
+  - `/login`: 200
+  - `/api/auth/csrf`: 200
+  - login de `julio.reyes@efeonce.org`: correcto
+  - `/internal/dashboard`: correcto
+  - `/admin/users`: correcto
+
+### Riesgos o pendientes
+- `staging` sigue protegido por Vercel Authentication, por lo que la validacion CLI completa del login requiere `vercel curl` o bypass; el deployment y variables quedaron corregidos, pero la verificacion completa mas limpia se hizo en `Production`.
+- Los contactos cliente bootstrap desde HubSpot siguen `invited`; el acceso confirmado y operativo hoy es el admin interno de Efeonce.
+- El parser tolerante de `GOOGLE_APPLICATION_CREDENTIALS_JSON` debe mantenerse porque Vercel no esta entregando una sola serializacion consistente entre ambientes.
+
+### Proximo paso recomendado
+- Iniciar Fase 2 con `/api/dashboard/charts` y la home ejecutiva real del portal.
+- Antes de abrir accesos cliente reales, definir onboarding para usuarios `invited` y flujo de activacion/reset.
