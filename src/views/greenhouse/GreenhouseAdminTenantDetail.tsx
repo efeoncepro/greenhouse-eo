@@ -9,6 +9,7 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -58,6 +59,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     <Chip size='small' variant='tonal' color={data.active ? 'success' : 'default'} label={data.status} />
                     <Chip size='small' variant='outlined' label={data.authMode} />
                   </Stack>
+                  <Button component={Link} href={`/admin/tenants/${data.clientId}/view-as/dashboard`} variant='contained'>
+                    Ver como cliente
+                  </Button>
                 </Stack>
               </CardContent>
             </Card>

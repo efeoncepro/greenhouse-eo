@@ -188,6 +188,7 @@ Open activities:
 Completed in current iteration:
 - created `/admin/tenants`
 - created `/admin/tenants/[id]`
+- created `/admin/tenants/[id]/view-as/dashboard`
 - created `/admin/users`
 - created `/admin/users/[id]`
 - created `/admin/roles`

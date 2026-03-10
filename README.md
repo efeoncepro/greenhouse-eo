@@ -90,6 +90,7 @@ Estado hoy:
 - ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
 - ya existen `/auth/landing`, `/internal/dashboard`, `/admin`, `/admin/users`, `/admin/users/[id]` y `/admin/roles` como superficies iniciales de access y governance
 - ya existen `/admin/tenants` y `/admin/tenants/[id]` como slice real de governance orientado a empresa/tenant
+- ya existe `/admin/tenants/[id]/view-as/dashboard` para revisar el dashboard cliente desde una sesion admin
 - `/admin/roles` ya reutiliza patrones visuales de Vuexy sobre datos reales de BigQuery
 - `/admin/users/[id]` ya reutiliza la estructura `overview` / `security` / `billing` de Vuexy reinterpretada para Greenhouse
 - el demo client y el admin interno ya autentican con `password_hash` bcrypt
@@ -109,6 +110,7 @@ Rutas actuales:
 - `/admin/roles`
 - `/admin/tenants`
 - `/admin/tenants/[id]`
+- `/admin/tenants/[id]/view-as/dashboard`
 
 Endpoints principales actuales:
 - `/api/dashboard/kpis`

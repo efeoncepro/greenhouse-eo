@@ -86,6 +86,26 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - capacity, tooling y AI tooling ya existen como lectura ejecutiva reusable, pero no como APIs formales ni modelos semanticos duros.
 - Falta validacion visual manual del dashboard en `staging` o `Preview`.
 
+## 2026-03-10 - Admin view-as para dashboard cliente
+
+### Objetivo del turno
+- Permitir a `julio.reyes@efeonce.org` revisar lo que ve un cliente sin cerrar su sesion admin.
+
+### Cambios aplicados
+- Se agrego el boton `Ver como cliente` en `GreenhouseAdminTenantDetail`.
+- Se creo la ruta `src/app/(dashboard)/admin/tenants/[id]/view-as/dashboard/page.tsx`.
+- Se creo `GreenhouseAdminTenantDashboardPreview` para renderizar el dashboard real del tenant bajo shell admin y con banner de preview.
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Next ya registra la ruta `ƒ /admin/tenants/[id]/view-as/dashboard`
+
+### Uso
+- Entrar con cuenta admin
+- Abrir `/admin/tenants/{clientId}`
+- Pulsar `Ver como cliente`
+
 ### Objetivo del turno
 - Implementar el primer slice seguro de Sky Airline dentro del dashboard existente.
 - Mantener fuera de runtime los bloques que siguen bloqueados por modelado o calidad de dato.

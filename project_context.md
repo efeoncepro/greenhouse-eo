@@ -110,6 +110,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/admin`
 - Existe `/admin/tenants`
 - Existe `/admin/tenants/[id]`
+- Existe `/admin/tenants/[id]/view-as/dashboard`
 - Existe `/admin/users`
 - Existe `/admin/users/[id]`
 - Existe `/admin/roles`
@@ -146,6 +147,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `security` -> acceso y auditoria
 - `billing` -> invoices y contexto comercial del cliente
 - `/admin/tenants/[id]` consolida la empresa/tenant como unidad de gobierno y la relaciona con usuarios, modulos, flags y proyectos visibles.
+- `/admin/tenants/[id]/view-as/dashboard` permite revisar el dashboard real del cliente desde una sesion admin sin cambiar de usuario.
 - El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existe `/api/sprints`.

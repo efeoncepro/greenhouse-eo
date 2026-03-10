@@ -171,3 +171,8 @@
     - herramientas AI
     - `RpA` mensual y `First-Time Right` con origen explicito (`measured`, `seeded`, `unavailable`)
   - Validado con `npx pnpm lint` y `npx pnpm build`
+- Se agrego la primera version de `Ver como cliente` para cuentas admin.
+  - Nuevo CTA `Ver como cliente` en `GreenhouseAdminTenantDetail`.
+  - Nueva ruta ` /admin/tenants/[id]/view-as/dashboard`.
+  - La vista renderiza el dashboard real del tenant dentro de un preview admin con banner y retorno al detalle del tenant.
+  - Validado con `npx pnpm lint` y `npx pnpm build`.
