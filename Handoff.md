@@ -466,3 +466,53 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Proximo paso recomendado
 - Iniciar Fase 2 con `/api/dashboard/charts` y el rediseño ejecutivo de `/dashboard`.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Diagnosticar por que `pre-greenhouse.efeoncepro.com/login` seguia rechazando el admin interno aunque el usuario existia y el hash estaba correcto.
+- Corregir el runtime real de `Preview` y confirmar acceso valido.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview de feature branch sobre `pre-greenhouse.efeoncepro.com`
+
+### Archivos tocados
+- `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/lib/auth.ts`
+- `src/lib/bigquery.ts`
+
+### Verificacion
+- Query directa a `greenhouse.client_users` para `julio.reyes@efeonce.org`: correcta
+- `bcrypt.compare('Julio2026!Greenhouse', password_hash)`: correcto
+- `vercel env pull` de `Preview` para `feature/tenant-auth-bq`: correcto
+- Validacion local del secreto `GOOGLE_APPLICATION_CREDENTIALS_JSON`:
+  - formato legacy escapado: correcto con el parser nuevo
+  - formato JSON minified: correcto con el parser nuevo
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Commit `f918641` y push de la rama: correctos
+- Alias de `pre-greenhouse.efeoncepro.com` al deployment mas reciente: correcto
+- Login real en Preview: correcto
+
+### Riesgos o pendientes
+- El mensaje de UI de login sigue siendo generico a proposito; no distingue lookup fallido de error interno para no exponer detalles al usuario final.
+- En `Preview`, Vercel puede entregar `GOOGLE_APPLICATION_CREDENTIALS_JSON` en mas de una serializacion. Si reaparece un falso `Invalid credentials`, revisar primero ese parseo y el alias activo del dominio.
+- Los contactos cliente bootstrap desde HubSpot siguen `invited`, por lo que el acceso confirmado hoy es el admin interno de Efeonce.
+
+### Proximo paso recomendado
+- Iniciar Fase 2 con `/api/dashboard/charts` y el dashboard ejecutivo cliente.
+- Mantener el parser de BigQuery tolerante a ambos formatos de secreto mientras Vercel siga entregando ambas variantes en `Preview`.

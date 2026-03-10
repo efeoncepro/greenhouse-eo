@@ -58,6 +58,7 @@ Estado hoy:
 - shell Greenhouse visible en las rutas principales del portal
 - branding base integrado en navegacion y favicon temporal
 - `next-auth` ya protege el dashboard y autentica solo contra `greenhouse.client_users`
+- el login ya no muestra bloque demo ni mensajes internos de infraestructura
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
@@ -186,10 +187,13 @@ Objetivo funcional:
 Estado actual en Vercel:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` existe en `Development`, `staging` y `Production`
 - `GCP_PROJECT` existe en `Development`, `staging` y `Production`
+- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` existen y deben configurarse tambien en `Preview` cuando una branch necesite login real
 
 Notas:
 - `next.config.ts` usa `BASEPATH` como `basePath`.
 - Si `BASEPATH` se define innecesariamente en Vercel, la app deja de vivir en `/`.
+- En `Preview`, `GOOGLE_APPLICATION_CREDENTIALS_JSON` puede llegar con serializaciones distintas segun como Vercel entregue la variable. `src/lib/bigquery.ts` ya tolera formato JSON minified y formato legacy escapado.
+- Si un login valido falla en `Preview`, primero verificar que el dominio apunte al deployment correcto y luego revisar `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir problema de password o de `client_users`.
 - Toda variable nueva debe documentarse tambien en `project_context.md`.
 
 ## Deploy

@@ -86,6 +86,8 @@ Current production-ready baseline:
 - Runtime auth no longer falls back to `greenhouse.clients`.
 - Demo and internal admin users authenticate with bcrypt credentials.
 - Imported HubSpot contacts remain in `invited` state until onboarding activates them.
+- `src/lib/bigquery.ts` already handles both the minified JSON form and the legacy escaped JSON form of `GOOGLE_APPLICATION_CREDENTIALS_JSON` used by Vercel Preview envs.
+- A failed login in `Preview` is not enough to conclude wrong credentials; first isolate whether BigQuery credentials were parsed correctly in the running deployment.
 
 ### 2. Session and Tenant Context
 

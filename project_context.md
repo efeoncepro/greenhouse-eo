@@ -111,6 +111,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
+- El login ya no muestra bloque demo y el mensaje de error de UI ya no expone detalles internos como `tenant registry`.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
 - Ya existe una capa multi-user real separada de tenants.
@@ -163,6 +164,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - No asumir que una variable de `Preview` o `Staging` existe en `Production`, ni al reves.
 - Si una feature necesita variable nueva, primero debe existir en `Preview` y `Staging` antes de promocionarse a `main`.
 - Mantener `.env.example` alineado con las variables requeridas.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` en `Preview` puede llegar en mas de una serializacion; el parser de `src/lib/bigquery.ts` ya soporta JSON minified y JSON legacy escapado.
+- Si `Preview` rechaza un login que en BigQuery esta activo y con hash correcto, revisar primero alias del dominio y el parseo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir fallo de credenciales.
 
 ## Variables de Entorno
 - `.env.example` define:
@@ -181,7 +184,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
-- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` aun no estan integradas al starter kit actual.
+- `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
+- Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 
 ## Multi-Tenant Actual
 - Dataset creado: `efeonce-group.greenhouse`
