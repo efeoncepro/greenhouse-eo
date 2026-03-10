@@ -104,6 +104,7 @@
 - Se agrego `bigquery/greenhouse_service_module_bootstrap_v1.sql` y se aplico bootstrap inicial de modulos sobre clientes HubSpot cerrados.
 - `greenhouse.service_modules` quedo con 9 registros y `greenhouse.client_service_modules` con 22 asignaciones activas.
 - `next-auth`, `TenantAccessRecord` y `getTenantContext()` ahora exponen `businessLines` y `serviceModules` para composicion futura de dashboard y navegacion.
+- Se agrego `PHASE_TASK_MATRIX.md` como resumen operativo de tareas pendientes por fase.
 
 ### Calidad
 - `npx pnpm lint`: correcto

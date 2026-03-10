@@ -5,6 +5,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Documento Maestro de Arquitectura
 - Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
+- Resumen rapido de fases y tareas: `PHASE_TASK_MATRIX.md`
 - Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
 - Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
 - `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.

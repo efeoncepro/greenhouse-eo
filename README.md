@@ -20,6 +20,7 @@ La documentacion operativa interna del repo esta en:
 - `BACKLOG.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `PHASE_TASK_MATRIX.md`
 - `GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
 - `MULTITENANT_ARCHITECTURE.md`
@@ -28,6 +29,8 @@ La documentacion operativa interna del repo esta en:
 
 Documento maestro:
 - `GREENHOUSE_ARCHITECTURE_V1.md`
+- Resumen rapido de tareas por fase:
+- `PHASE_TASK_MATRIX.md`
 - Documentacion oficial Vuexy:
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 

@@ -769,3 +769,6 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - DDSoft -> `wave` + `desarrollo_web`
   - Sky Airline -> `globe` + `agencia_creativa`
   - SSilva -> `crm_solutions` + `consultoria_crm`, `implementacion_onboarding`, `licenciamiento_hubspot`
+
+### Referencia operativa
+- `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
