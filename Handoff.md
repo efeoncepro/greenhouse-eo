@@ -47,7 +47,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Objetivo del turno
 - Promover `feature/executive-dashboard-phase2` hacia `develop`.
-- Confirmar que la integracion local en `develop` sigue construyendo correctamente.
+- Confirmar que la integracion en `develop` construye localmente y queda desplegada en `staging`.
 
 ### Rama
 - Rama usada: `develop`
@@ -71,14 +71,18 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - `/api/dashboard/charts`
   - `/api/dashboard/risks`
 - `git rev-list --left-right --count origin/develop...HEAD`: `0 8`
+- `git push origin develop`: correcto
+- `vercel inspect https://greenhouse-8gqkxk88v-efeonce-7670142f.vercel.app`: correcto
+- Alias de `staging`: `https://dev-greenhouse.efeoncepro.com`
+- `vercel curl /login --deployment https://greenhouse-8gqkxk88v-efeonce-7670142f.vercel.app`: correcto, responde la pantalla de login
+- `vercel curl /dashboard --deployment https://greenhouse-8gqkxk88v-efeonce-7670142f.vercel.app`: correcto, responde la app protegida y redirige a `/login` sin sesion
 
 ### Riesgos o pendientes
-- Falta hacer `push` de `develop` y esperar el deployment de `staging`.
-- La validacion en Preview fue tecnica y suficiente para promocion a `develop`, pero aun conviene revision visual manual en `staging` antes de subir a `main`.
+- La validacion en Preview y `staging` fue tecnica; aun conviene revision visual manual en `staging` antes de subir a `main`.
 
 ### Proximo paso recomendado
-- Hacer `push` de `develop`.
-- Validar `staging` y luego decidir promocion a `main`.
+- Revisar visualmente `staging`.
+- Si la UI y los datos se ven sanos, promover `develop` a `main`.
 
 ### Fecha
 - 2026-03-10 America/Santiago
