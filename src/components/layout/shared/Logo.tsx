@@ -63,19 +63,23 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   const useNegativeWordmark = variant === 'sidebar' && (settings.semiDark || currentMode === 'dark')
   const wordmarkSrc = useNegativeWordmark ? '/branding/logo-negative.svg' : '/branding/logo-full.svg'
   const markSrc = '/branding/avatar.png'
+  const showCollapsedMarkOnly = variant === 'sidebar' && layout === 'collapsed' && !isHovered && !isBreakpointReached
 
   return (
     <div className='flex items-center min-bs-8'>
-      {variant === 'sidebar' && <BrandMark src={markSrc} alt={`${themeConfig.templateName} mark`} variant={variant} />}
-      <WordmarkSlot
-        isHovered={isHovered}
-        isCollapsed={layout === 'collapsed'}
-        transitionDuration={transitionDuration}
-        isBreakpointReached={isBreakpointReached}
-        variant={variant}
-      >
-        <Wordmark src={wordmarkSrc} alt={themeConfig.templateName} variant={variant} />
-      </WordmarkSlot>
+      {showCollapsedMarkOnly ? (
+        <BrandMark src={markSrc} alt={`${themeConfig.templateName} mark`} variant={variant} />
+      ) : (
+        <WordmarkSlot
+          isHovered={isHovered}
+          isCollapsed={false}
+          transitionDuration={transitionDuration}
+          isBreakpointReached={isBreakpointReached}
+          variant={variant}
+        >
+          <Wordmark src={wordmarkSrc} alt={themeConfig.templateName} variant={variant} />
+        </WordmarkSlot>
+      )}
     </div>
   )
 }

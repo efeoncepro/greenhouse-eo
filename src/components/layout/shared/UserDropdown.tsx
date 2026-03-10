@@ -26,6 +26,7 @@ import Button from '@mui/material/Button'
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 const BadgeContentSpan = styled('span')({
   width: 8,
@@ -45,6 +46,11 @@ const UserDropdown = () => {
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+
+  const sessionAvatarPath = resolveAvatarPath({
+    name: session?.user?.name,
+    email: session?.user?.email
+  })
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
@@ -78,7 +84,7 @@ const UserDropdown = () => {
         <Avatar
           ref={anchorRef}
           alt='Greenhouse Workspace'
-          src='/images/avatars/1.png'
+          src={sessionAvatarPath || '/images/avatars/1.png'}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -102,7 +108,7 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt='Greenhouse Workspace' src='/images/avatars/1.png' />
+                    <Avatar alt='Greenhouse Workspace' src={sessionAvatarPath || '/images/avatars/1.png'} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
                         {session?.user?.name || 'Greenhouse Demo'}
