@@ -179,10 +179,15 @@ Status:
 Open activities:
 - create `/admin/tenants`
 - create `/admin/tenants/[id]`
-- create `/admin/users/[id]`
-- create `/admin/roles`
 - create `/admin/scopes`
 - create `/admin/feature-flags`
+
+Completed in current iteration:
+- created `/admin/users`
+- created `/admin/users/[id]`
+- created `/admin/roles`
+- adapted Vuexy `user/list/*`, `user/view/*`, and `roles/*` into read-only admin surfaces backed by BigQuery
+- reinterpreted `overview`, `security`, and `billing-plans` as user context, access/audit, and future invoice/commercial context
 
 Current adaptation rule:
 - use `full-version/src/views/apps/user/list/*` as base for `/admin/users`

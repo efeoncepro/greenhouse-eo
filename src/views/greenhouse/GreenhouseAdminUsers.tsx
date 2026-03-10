@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -100,7 +102,7 @@ const GreenhouseAdminUsers = ({ data }: Props) => {
                             {getInitials(user.fullName)}
                           </CustomAvatar>
                           <Box>
-                            <Typography color='text.primary' className='font-medium'>
+                            <Typography component={Link} href={`/admin/users/${user.userId}`} color='text.primary' className='font-medium'>
                               {user.fullName}
                             </Typography>
                             <Typography variant='body2' color='text.secondary'>

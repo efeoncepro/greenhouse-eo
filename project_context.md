@@ -101,6 +101,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/internal/dashboard`
 - Existe `/admin`
 - Existe `/admin/users`
+- Existe `/admin/users/[id]`
+- Existe `/admin/roles`
 - Existe `src/app/page.tsx`
 - La raiz `/` redirige segun `portalHomePath`
 - `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
@@ -128,8 +130,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
 - Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
-- `/admin/users` y `/admin/roles` son el siguiente candidato natural de reutilizacion directa de Vuexy sobre datos reales.
-- `/admin/users/[id]` debe construirse reutilizando la estructura de `user/view/*` con tabs reinterpretados para Greenhouse:
+- `/admin/users`, `/admin/roles` y `/admin/users/[id]` ya son el primer slice real de admin reutilizando patrones de Vuexy sobre datos reales.
+- `/admin/users/[id]` reutiliza la estructura de `user/view/*` con tabs reinterpretados para Greenhouse:
 - `overview` -> contexto del usuario y alcance
 - `security` -> acceso y auditoria
 - `billing` -> invoices y contexto comercial del cliente
@@ -139,7 +141,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
-- Ya existen rutas minimas de Efeonce interno y admin, pero falta desarrollar sus vistas de negocio.
+- Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene lista, roles y detalle de usuario; falta mutacion segura de tenants, scopes y feature flags.
 
 ## Deploy
 - Hosting principal: Vercel

@@ -652,3 +652,52 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - No copiar fake-db ni semantica demo de billing/security del template.
 - Documentacion oficial Vuexy raiz:
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Materializar el siguiente slice de Fase 7 reutilizando `user/view/*` de Vuexy para detalle de usuario admin.
+- Dejar documentado que `User Management`, `Roles & Permissions` y `billing/security` se usan como referencia estructural y no como data layer demo.
+
+### Rama
+- Rama usada: `feature/executive-dashboard-phase2`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development y luego `Preview`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/admin/users/[id]/page.tsx`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminUsers.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Build confirma rutas:
+  - `/admin/users`
+  - `/admin/users/[id]`
+  - `/admin/roles`
+- La lista de `/admin/users` ahora navega al detalle por `userId`.
+- `getAdminUserDetail` consulta `client_users`, `clients`, `roles`, `user_role_assignments`, `user_project_scopes` y `user_campaign_scopes` desde BigQuery.
+
+### Riesgos o pendientes
+- `/admin/users`, `/admin/users/[id]` y `/admin/roles` son superficies read-only; aun no existe mutacion segura.
+- El tab `billing` es deliberadamente un placeholder estructural para invoices y fee; no debe conectarse a datos fake.
+- Aun faltan `/admin/tenants`, `/admin/scopes` y `/admin/feature-flags`.
+
+### Proximo paso recomendado
+- Promover este slice si el preview visual esta sano.
+- Luego abrir `/admin/tenants` o volver a Fase 2 para madurar `capacity` y `market-speed`, segun prioridad de producto.

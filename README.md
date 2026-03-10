@@ -74,7 +74,9 @@ Estado hoy:
 - existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
 - ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
 - ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
-- ya existen `/auth/landing`, `/internal/dashboard`, `/admin` y `/admin/users` como superficies minimas de Fase 1
+- ya existen `/auth/landing`, `/internal/dashboard`, `/admin`, `/admin/users`, `/admin/users/[id]` y `/admin/roles` como superficies iniciales de access y governance
+- `/admin/roles` ya reutiliza patrones visuales de Vuexy sobre datos reales de BigQuery
+- `/admin/users/[id]` ya reutiliza la estructura `overview` / `security` / `billing` de Vuexy reinterpretada para Greenhouse
 - el demo client y el admin interno ya autentican con `password_hash` bcrypt
 
 Rutas actuales:
@@ -88,6 +90,8 @@ Rutas actuales:
 - `/internal/dashboard`
 - `/admin`
 - `/admin/users`
+- `/admin/users/[id]`
+- `/admin/roles`
 
 Endpoints principales actuales:
 - `/api/dashboard/kpis`
@@ -108,10 +112,10 @@ Rutas objetivo del producto:
 Brecha visible:
 - la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero esos contactos siguen en estado `invited` hasta que exista onboarding real
 - el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
-- faltan `/api/sprints` y `/api/dashboard/charts`
+- faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
-- las superficies `/internal/dashboard` y `/admin/users` son minimas; falta desarrollar sus vistas de negocio
+- las superficies `/internal/dashboard` y `/admin` ya tienen slices iniciales, pero aun faltan mutaciones, tenencia y gobierno completo
 
 ## Stack
 
