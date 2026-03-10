@@ -1,13 +1,11 @@
 'use client'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { SectionHeading } from '@/components/greenhouse'
+import { ExecutiveCardShell } from '@/components/greenhouse'
 import type { GreenhouseDashboardData, GreenhouseDashboardTool } from '@/types/greenhouse-dashboard'
 
 type ToolingSectionProps = {
@@ -21,42 +19,37 @@ type ToolGroupProps = {
 }
 
 const ToolGroup = ({ title, description, tools }: ToolGroupProps) => (
-  <Card>
-    <CardContent sx={{ height: '100%' }}>
-      <Stack spacing={3}>
-        <SectionHeading title={title} description={description} />
-        <Stack spacing={2}>
-          {tools.map(tool => (
-            <Box
-              key={tool.key}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                border: theme => `1px solid ${theme.palette.divider}`,
-                display: 'flex',
-                alignItems: { xs: 'flex-start', md: 'center' },
-                justifyContent: 'space-between',
-                gap: 2,
-                flexDirection: { xs: 'column', md: 'row' }
-              }}
-            >
-              <Stack spacing={0.5}>
-                <Typography variant='h6'>{tool.label}</Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  {tool.category}
-                </Typography>
-              </Stack>
-              <Chip
-                variant={tool.source === 'override' ? 'tonal' : 'outlined'}
-                color={tool.source === 'override' ? 'warning' : 'info'}
-                label={tool.source === 'override' ? 'Definido para la cuenta' : 'Default por modulo'}
-              />
-            </Box>
-          ))}
-        </Stack>
-      </Stack>
-    </CardContent>
-  </Card>
+  <ExecutiveCardShell title={title} subtitle={description}>
+    <Stack spacing={2}>
+      {tools.map(tool => (
+        <Box
+          key={tool.key}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            border: theme => `1px solid ${theme.palette.divider}`,
+            display: 'flex',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            justifyContent: 'space-between',
+            gap: 2,
+            flexDirection: { xs: 'column', md: 'row' }
+          }}
+        >
+          <Stack spacing={0.5}>
+            <Typography variant='h6'>{tool.label}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {tool.category}
+            </Typography>
+          </Stack>
+          <Chip
+            variant={tool.source === 'override' ? 'tonal' : 'outlined'}
+            color={tool.source === 'override' ? 'warning' : 'info'}
+            label={tool.source === 'override' ? 'Definido para la cuenta' : 'Default por modulo'}
+          />
+        </Box>
+      ))}
+    </Stack>
+  </ExecutiveCardShell>
 )
 
 const ToolingSection = ({ data }: ToolingSectionProps) => {

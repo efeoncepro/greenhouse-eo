@@ -191,6 +191,22 @@ Cards should render based on:
 Cards should not render based on:
 - client name string checks
 
+### Composition orchestrator
+
+The executive UI system should not rely on manual JSX ordering per tenant.
+
+It needs a deterministic composition layer that:
+- knows which executive blocks exist
+- knows which data each block requires
+- knows which services or capabilities make a block relevant
+- chooses the final mix and order of blocks for the current tenant context
+
+Runtime reference:
+- `src/views/greenhouse/dashboard/orchestrator.ts`
+
+This is not an AI chooser.
+It is a product-controlled registry and resolver for executive blocks.
+
 ### Metric source honesty
 
 If a metric is:
@@ -270,6 +286,7 @@ Greenhouse should not inherit:
 ### Stage 2. Reusable UI layer
 - create executive wrappers in `src/components/greenhouse/*`
 - keep dashboard-specific assembly in `src/views/greenhouse/dashboard/*`
+- introduce the executive block orchestrator before tenant-specific branching spreads
 
 ### Stage 3. Dashboard refactor
 - reorganize `/dashboard` into row hierarchy

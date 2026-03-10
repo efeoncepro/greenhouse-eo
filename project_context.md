@@ -99,6 +99,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/lib/projects/get-projects-overview.ts`: capa de datos server-side de proyectos
 - `src/lib/projects/get-project-detail.ts`: capa de datos server-side del detalle de proyecto y sus tareas
 - `src/views/greenhouse/dashboard/**`: configuracion y componentes especificos del dashboard Greenhouse
+- `src/views/greenhouse/dashboard/orchestrator.ts`: orquestador de bloques ejecutivos reutilizables para el dashboard
 
 ## Estado de Rutas
 - Existe `/dashboard`
@@ -140,6 +141,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side, usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion, y ahora compone hero/cards segun `businessLines` y `serviceModules`.
 - El siguiente trabajo sobre `/dashboard` no es sumar widgets ad hoc sino migrarlo al `Executive UI System` reusable para mejorar jerarquia, densidad y composicion sin cambiar la semantica de datos primero.
+- El runtime del dashboard ya incorpora un orquestador deterministico de bloques ejecutivos para seleccionar hero, top stats y secciones por `serviceModules`, calidad de dato y capacidades disponibles.
 - Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.

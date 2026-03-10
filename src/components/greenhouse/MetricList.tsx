@@ -25,13 +25,17 @@ const MetricList = ({ items }: MetricListProps) => {
             borderRadius: 3,
             bgcolor: 'action.hover',
             display: 'grid',
-            gap: 0.5
+            gap: 1.25
           }}
         >
-          <Typography variant='body2' color='text.secondary'>
-            {item.label}
-          </Typography>
-          <Typography variant='h5'>{item.value}</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, alignItems: 'flex-start' }}>
+            <Typography variant='body2' color='text.secondary'>
+              {item.label}
+            </Typography>
+            <Typography variant='h5' sx={{ lineHeight: 1 }}>
+              {item.value}
+            </Typography>
+          </Box>
           <Typography variant='body2' color='text.secondary'>
             {item.detail}
           </Typography>

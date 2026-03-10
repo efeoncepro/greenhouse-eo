@@ -71,6 +71,34 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Todavia no hay cambio runtime en este bloque; solo base documental.
 - El siguiente paso correcto es commit documental y luego implementacion del refactor visual reusable en `/dashboard`.
 
+## 2026-03-10 - Executive dashboard orchestration and Vuexy-aligned refactor
+
+### Objetivo del turno
+- Rehacer `/dashboard` con jerarquia mas cercana a Vuexy analytics sin copiar su branding ni su data demo.
+- Introducir una capa escalable de orquestacion para decidir que bloques ejecutivos mostrar y en que orden.
+
+### Cambios aplicados
+- Se agregaron componentes reusables en `src/components/greenhouse/*`:
+  - `ExecutiveCardShell`
+  - `ExecutiveHeroCard`
+  - `ExecutiveMiniStatCard`
+- Se adaptaron al dashboard patrones fuertes de Vuexy:
+  - hero tipo `WebsiteAnalyticsSlider`
+  - card analitica tipo `EarningReports`
+  - card de salud tipo `SupportTracker`
+  - tabla compacta tipo `ProjectsTable`
+- Se agrego `src/views/greenhouse/dashboard/orchestrator.ts` como registro deterministico de bloques ejecutivos.
+- `GreenhouseDashboard.tsx` ya no arma el layout a mano; ahora consume ese orquestador y compone hero, top stats, analisis y contexto sobre los mismos datos reales.
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+
+### Riesgos o pendientes
+- El dashboard ya tiene una capa de composicion reusable, pero aun no existe una extension equivalente para `/equipo`, `/campanas` o vistas internas.
+- Falta validacion visual manual en `dev-greenhouse.efeoncepro.com` y luego en produccion.
+- `AttentionProjectCard.tsx` quedo desplazado por la nueva tabla compacta y podria eliminarse en una limpieza posterior si ya no vuelve a usarse.
+
 ## 2026-03-10 - Sky reusable dashboard capabilities
 
 ### Objetivo del turno

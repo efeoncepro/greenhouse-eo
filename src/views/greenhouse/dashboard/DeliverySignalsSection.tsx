@@ -1,13 +1,11 @@
 'use client'
 
 import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
 
-import { MetricList, SectionHeading } from '@/components/greenhouse'
+import { ExecutiveCardShell, MetricList } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { createMonthlyAdjustmentOptions, createMonthlyOnTimeOptions } from '@views/greenhouse/dashboard/chart-options'
@@ -54,70 +52,50 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
 
   return (
     <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.25fr 1fr' } }}>
-      <Card>
-        <CardContent sx={{ height: '100%' }}>
-          <Stack spacing={3} sx={{ height: '100%' }}>
-            <SectionHeading
-              title='Entrega mensual visible'
-              description='Agrupa la senal mensual por fecha de creacion para leer ritmo, cumplimiento y estabilidad del alcance visible.'
+      <ExecutiveCardShell
+        title='Entrega mensual visible'
+        subtitle='Serie mensual de ritmo y cumplimiento sobre el alcance visible del tenant.'
+      >
+        <Stack spacing={3} sx={{ height: '100%' }}>
+          <AppReactApexCharts type='line' height={320} width='100%' series={monthlyOnTimeSeries} options={monthlyOnTimeOptions} />
+          <Stack direction='row' flexWrap='wrap' gap={2}>
+            <Chip variant='tonal' color='info' label='Grano mensual: fecha de creacion' />
+            <Chip
+              variant='tonal'
+              color={(latestMonthlyDelivery?.onTimePct ?? 0) >= 75 ? 'success' : 'warning'}
+              label={latestMonthlyDelivery ? `Ultimo mes activo: ${latestMonthlyDelivery.label}` : 'Sin meses con actividad visible'}
             />
-            <AppReactApexCharts
-              type='line'
-              height={320}
-              width='100%'
-              series={monthlyOnTimeSeries}
-              options={monthlyOnTimeOptions}
-            />
-            <Stack direction='row' flexWrap='wrap' gap={2}>
-              <Chip variant='tonal' color='info' label='Grano mensual: fecha de creacion' />
-              <Chip
-                variant='tonal'
-                color={(latestMonthlyDelivery?.onTimePct ?? 0) >= 75 ? 'success' : 'warning'}
-                label={
-                  latestMonthlyDelivery ? `Ultimo mes activo: ${latestMonthlyDelivery.label}` : 'Sin meses con actividad visible'
-                }
-              />
-            </Stack>
           </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
+      </ExecutiveCardShell>
 
-      <Card>
-        <CardContent sx={{ height: '100%' }}>
-          <Stack spacing={3} sx={{ height: '100%' }}>
-            <SectionHeading
-              title='Entregables y ajustes'
-              description='Sirve para medir salida visible, estabilidad de primera pasada y friccion registrada en revisiones cliente.'
-            />
-            <AppReactApexCharts
-              type='bar'
-              height={320}
-              width='100%'
-              series={monthlyAdjustmentSeries}
-              options={monthlyAdjustmentOptions}
-            />
-            <MetricList
-              items={[
-                {
-                  label: 'Entregables visibles',
-                  value: String(totalDeliverablesVisible),
-                  detail: 'Total visible en el alcance actual del tenant para la serie mensual.'
-                },
-                {
-                  label: 'Sin ajustes cliente',
-                  value: String(totalDeliverablesWithoutAdjustments),
-                  detail: 'Lectura base para First-Time Right mientras el modelo formal de calidad madura.'
-                },
-                {
-                  label: 'Rondas de ajuste cliente',
-                  value: String(totalClientAdjustmentRounds),
-                  detail: 'Suma de Client Change Round Final en los entregables visibles.'
-                }
-              ]}
-            />
-          </Stack>
-        </CardContent>
-      </Card>
+      <ExecutiveCardShell
+        title='Entregables y ajustes'
+        subtitle='Lectura compacta de salida visible, estabilidad de primera pasada y friccion cliente.'
+      >
+        <Stack spacing={3} sx={{ height: '100%' }}>
+          <AppReactApexCharts type='bar' height={320} width='100%' series={monthlyAdjustmentSeries} options={monthlyAdjustmentOptions} />
+          <MetricList
+            items={[
+              {
+                label: 'Entregables visibles',
+                value: String(totalDeliverablesVisible),
+                detail: 'Total visible en la serie mensual actual.'
+              },
+              {
+                label: 'Sin ajustes cliente',
+                value: String(totalDeliverablesWithoutAdjustments),
+                detail: 'Base inicial de First-Time Right mientras madura el modelo formal.'
+              },
+              {
+                label: 'Rondas de ajuste',
+                value: String(totalClientAdjustmentRounds),
+                detail: 'Suma de Client Change Round Final en el alcance visible.'
+              }
+            ]}
+          />
+        </Stack>
+      </ExecutiveCardShell>
     </Box>
   )
 }
