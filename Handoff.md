@@ -61,6 +61,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Estabilizar el flujo local de `build` en Windows y evitar `index.lock` por comandos Git mutantes en paralelo.
 - Integrar `@google-cloud/bigquery`, crear `/api/dashboard/kpis` y conectar el dashboard a datos reales por alcance de cliente demo.
 - Definir la arquitectura multi-tenant objetivo, crear la base `greenhouse.clients` en BigQuery y dejar backlog priorizado para continuar el proyecto.
+- Conectar `next-auth` a `greenhouse.clients`, actualizar `last_login_at` y agregar helper de tenant reusable.
 
 ### Rama
 - Rama usada: `feature/greenhouse-shell`
@@ -115,6 +116,8 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `src/lib/dashboard/get-dashboard-overview.ts`
 - `src/lib/demo-client.ts`
 - `src/lib/auth.ts`
+- `src/lib/tenant/clients.ts`
+- `src/lib/tenant/get-tenant-context.ts`
 - `src/types/greenhouse-dashboard.ts`
 - `src/types/next-auth.d.ts`
 - `src/views/Login.tsx`
@@ -138,8 +141,10 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Variables `GCP_PROJECT` y `GOOGLE_APPLICATION_CREDENTIALS_JSON` cargadas en `Development`, `staging` y `Production`: correcto
 - `npx pnpm build` ejecutado varias veces seguidas en Windows local con `distDir` dinamico: correcto
 - `npx pnpm add @google-cloud/bigquery`: correcto
+- `npx pnpm add bcryptjs`: correcto
 - `npx pnpm build` con BigQuery integrado y `/api/dashboard/kpis`: correcto
 - `npx pnpm lint`: correcto
+- `npx pnpm build` con auth lookup en `greenhouse.clients`: correcto
 - Dataset `efeonce-group.greenhouse`: creado
 - Tabla `efeonce-group.greenhouse.clients`: creada
 - Tenant bootstrap `greenhouse-demo-client`: insertado y verificado
@@ -149,8 +154,8 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Riesgos o pendientes
 - Login ya autentica con `next-auth`, pero contra credenciales demo configurables por env.
-- El dashboard ya consume BigQuery, pero el tenant scope aun depende de `DEMO_CLIENT_PROJECT_IDS`.
-- `greenhouse.clients` ya existe, pero la app todavia no la usa en runtime.
+- La app ya usa `greenhouse.clients` en runtime para resolver tenant y alcance.
+- El bootstrap actual sigue dependiendo de `auth_mode = env_demo` y `DEMO_CLIENT_PASSWORD`.
 - La especificacion define un target productivo mas avanzado que el estado actual del starter kit.
 - Si se modifican rutas o `basePath`, validar en Vercel de nuevo.
 - El branding actual usa assets temporales entregados por el usuario; falta reemplazo por versiones finales de diseno.
@@ -160,6 +165,6 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Proximo paso recomendado
 - Crear `/api/projects` filtrado por cliente y reemplazar la grilla mock de proyectos.
-- Reemplazar el auth demo por lookup real a `greenhouse.clients`.
+- Reemplazar el bootstrap `env_demo` por `password_hash` reales o SSO.
 - Implementar `/proyectos/[id]` con detalle de tareas, estado y comentarios abiertos.
 - Despues agregar `/api/sprints` y endurecer auth para un flujo multi-tenant real.

@@ -1,7 +1,7 @@
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-import { demoClientConfig } from '@/lib/demo-client'
+import { getTenantAuthRecordByEmail, updateTenantLastLogin, verifyTenantPassword } from '@/lib/tenant/clients'
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -22,16 +22,31 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (credentials.email !== demoClientConfig.email || credentials.password !== demoClientConfig.password) {
+        const tenant = await getTenantAuthRecordByEmail(credentials.email)
+
+        if (!tenant) {
           return null
         }
 
+        const isValidPassword = await verifyTenantPassword(tenant, credentials.password)
+
+        if (!isValidPassword) {
+          return null
+        }
+
+        await updateTenantLastLogin(tenant.clientId)
+
         return {
-          id: demoClientConfig.id,
-          email: demoClientConfig.email,
-          name: demoClientConfig.name,
-          clientId: demoClientConfig.id,
-          projectIds: demoClientConfig.projectIds
+          id: tenant.clientId,
+          email: tenant.email,
+          name: tenant.clientName,
+          clientId: tenant.clientId,
+          projectIds: tenant.projectIds,
+          role: tenant.role,
+          featureFlags: tenant.featureFlags,
+          timezone: tenant.timezone,
+          portalHomePath: tenant.portalHomePath,
+          authMode: tenant.authMode
         }
       }
     })
@@ -44,6 +59,11 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name
         token.clientId = user.clientId
         token.projectIds = user.projectIds
+        token.role = user.role
+        token.featureFlags = user.featureFlags
+        token.timezone = user.timezone
+        token.portalHomePath = user.portalHomePath
+        token.authMode = user.authMode
       }
 
       return token
@@ -55,6 +75,11 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name || ''
         session.user.clientId = typeof token.clientId === 'string' ? token.clientId : ''
         session.user.projectIds = Array.isArray(token.projectIds) ? token.projectIds.filter(Boolean) : []
+        session.user.role = typeof token.role === 'string' ? token.role : 'client'
+        session.user.featureFlags = Array.isArray(token.featureFlags) ? token.featureFlags.filter(Boolean) : []
+        session.user.timezone = typeof token.timezone === 'string' ? token.timezone : 'UTC'
+        session.user.portalHomePath = typeof token.portalHomePath === 'string' ? token.portalHomePath : '/dashboard'
+        session.user.authMode = typeof token.authMode === 'string' ? token.authMode : 'credentials'
       }
 
       return session

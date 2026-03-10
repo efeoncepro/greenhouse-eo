@@ -103,7 +103,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     })
 
     if (result?.error) {
-      setError('Invalid credentials. Use the demo access shown below or configure env-based credentials.')
+      setError('Invalid credentials. This portal now validates access against the Greenhouse tenant registry.')
       setIsSubmitting(false)
 
       return
@@ -193,8 +193,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
                 Password: <strong>greenhouse-demo</strong>
               </Typography>
               <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                You can override these defaults with `DEMO_CLIENT_EMAIL`, `DEMO_CLIENT_PASSWORD`, and
-                `DEMO_CLIENT_NAME`.
+                This bootstrap account is now resolved from `greenhouse.clients` and uses `auth_mode = env_demo`.
               </Typography>
             </div>
           </form>

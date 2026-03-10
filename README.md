@@ -34,7 +34,7 @@ Estado hoy:
 - base tecnica funcionando en Vercel
 - shell Greenhouse visible en las rutas principales del portal
 - branding base integrado en navegacion y favicon temporal
-- `next-auth` ya protege el dashboard con credenciales demo
+- `next-auth` ya protege el dashboard y resuelve el tenant desde `greenhouse.clients`
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
@@ -59,7 +59,7 @@ Brecha visible:
 - la autenticacion actual usa credenciales demo y aun no consume un origen real de clientes
 - el dashboard ya tiene un primer vertical slice real, pero faltan mas API Routes de negocio
 - faltan `/api/projects`, `/api/sprints` y el detalle `/proyectos/[id]`
-- el scope multi-tenant actual se resuelve por variables demo y aun no por una tabla `greenhouse.clients`
+- el tenant ya se busca en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`
 
 ## Stack
 
@@ -227,8 +227,8 @@ Usar como referencia de implementacion:
 
 ## Proximos Pasos Recomendados
 
-1. Reemplazar el scope demo por una fuente real de clientes y proyectos permitidos.
+1. Reemplazar el bootstrap `env_demo` por password hashes reales o SSO.
 2. Implementar `/api/projects` con listado real filtrado por cliente.
 3. Crear `/proyectos/[id]` con detalle de proyecto, tareas y presion de revision.
 4. Agregar `/api/sprints` y velocity real.
-5. Endurecer la autenticacion para dejar atras las credenciales demo.
+5. Endurecer la autenticacion con helper de tenant reusable en todas las rutas.

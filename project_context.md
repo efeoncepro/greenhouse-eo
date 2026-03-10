@@ -72,10 +72,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
-- `next-auth` ya esta integrado con credenciales demo, session JWT y proteccion base del dashboard.
+- `next-auth` ya esta integrado, consulta `greenhouse.clients`, usa session JWT y proteccion base del dashboard.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
-- El alcance multi-tenant actual se apoya en `DEMO_CLIENT_PROJECT_IDS`; aun falta una fuente real de clientes.
+- Ya existe una fuente real de tenants en `greenhouse.clients`, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
 - Aun no existen `/api/projects`, `/api/sprints` ni el detalle `/proyectos/[id]`.
 
 ## Deploy
@@ -170,8 +170,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
-- La autenticacion actual es demo y debe reemplazarse por modelo multi-tenant real.
-- Falta mover el scope de cliente a una fuente real como `greenhouse.clients`.
+- La autenticacion ya resuelve tenants desde `greenhouse.clients`, pero el acceso bootstrap aun depende de `DEMO_CLIENT_PASSWORD`.
+- Falta cargar `password_hash` reales o integrar SSO para cerrar el bootstrap demo.
 - Faltan el detalle de proyecto y los data flows reales definidos en la especificacion.
 
 ## Supuestos Operativos

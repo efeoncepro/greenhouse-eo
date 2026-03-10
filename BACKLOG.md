@@ -10,11 +10,10 @@
 
 ### P0.1 Tenant Scope and Authentication
 
-- Replace env demo lookup in `next-auth` with a BigQuery lookup to `greenhouse.clients`.
-- Add password hashing support for `credentials` auth.
-- Create `src/lib/tenant/get-tenant-context.ts` and make dashboard use it.
-- Stop reading `DEMO_CLIENT_PROJECT_IDS` in runtime code outside local fallback/bootstrap.
-- Record `last_login_at` on successful sign-in.
+- Load real `password_hash` values into `greenhouse.clients`.
+- Replace `auth_mode = env_demo` bootstrap with hashed credentials or SSO.
+- Use `getTenantContext()` across the remaining authenticated API routes and pages.
+- Remove direct runtime dependence on `DEMO_CLIENT_PROJECT_IDS` outside local/bootstrap fallback.
 
 ### P0.2 Projects API and UI
 

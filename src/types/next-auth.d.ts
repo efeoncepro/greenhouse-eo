@@ -4,6 +4,11 @@ declare module 'next-auth' {
   interface User {
     clientId: string
     projectIds: string[]
+    role: string
+    featureFlags: string[]
+    timezone: string
+    portalHomePath: string
+    authMode: string
   }
 
   interface Session {
@@ -11,6 +16,11 @@ declare module 'next-auth' {
       id: string
       clientId: string
       projectIds: string[]
+      role: string
+      featureFlags: string[]
+      timezone: string
+      portalHomePath: string
+      authMode: string
     } & DefaultSession['user']
   }
 }
@@ -21,5 +31,10 @@ declare module 'next-auth/jwt' {
     name?: string | null
     clientId?: string
     projectIds?: string[]
+    role?: string
+    featureFlags?: string[]
+    timezone?: string
+    portalHomePath?: string
+    authMode?: string
   }
 }
