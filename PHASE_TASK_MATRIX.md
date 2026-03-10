@@ -49,8 +49,9 @@ Pending tasks:
 - add campaign-aware dashboard slices once `/campanas` exists
 - tenant-specific slice currently defined:
 - `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
-- for Sky, monthly `on-time` and tenure are feasible now
-- for Sky, monthly RpA and `First-Time Right` stay blocked until data quality improves
+- for Sky, monthly `on-time`, tenure, and deliverables or adjustments by month are now implemented in the dashboard
+- for Sky, reusable sections for quality, account team, tooling, and AI tooling are now implemented in the dashboard
+- current guardrail: `RpA` can render from measured or seeded fallback, but the source must be explicit in the UI
 
 ## Phase 3. Delivery Context and Operational Drilldowns
 
@@ -71,7 +72,7 @@ Pending tasks:
 - create `/api/capacity/roles`
 - build `/equipo`
 - Sky-specific guardrail:
-- do not infer assigned account team or capacity from incidental task assignees
+- the dashboard may show a controlled assignment layer, but formal APIs must not depend only on incidental task assignees
 
 ## Phase 5. Campaign Intelligence
 
@@ -87,7 +88,7 @@ Pending tasks:
 - build `/campanas/[id]`
 - Sky-specific guardrail:
 - monthly deliverable output can ship as a dashboard proxy before the formal campaign model exists
-- tooling and AI tooling remain blocked until explicit assignment models exist
+- tooling and AI tooling can render in dashboard from module defaults or controlled overrides, but not as a formal campaign-source model yet
 
 ## Phase 6. Internal Efeonce Visibility
 

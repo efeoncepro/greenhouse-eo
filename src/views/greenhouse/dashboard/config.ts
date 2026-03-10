@@ -97,6 +97,15 @@ export const formatDelta = (value: number) => {
   return String(value)
 }
 
+export const hasMonthlyDeliverySignals = (data: GreenhouseDashboardData) => data.charts.monthlyDelivery.length > 0
+
+export const hasAccountTeam = (data: GreenhouseDashboardData) => data.accountTeam.members.length > 0
+
+export const hasTooling = (data: GreenhouseDashboardData) =>
+  data.tooling.technologyTools.length > 0 || data.tooling.aiTools.length > 0
+
+export const hasQualitySignals = (data: GreenhouseDashboardData) => data.qualitySignals.length > 0
+
 export const getProjectTone = (project: GreenhouseDashboardProjectRisk) => {
   if (project.blockedTasks > 0 || project.reviewPressureTasks >= 6) {
     return 'error'

@@ -17,6 +17,23 @@ This document must stay aligned with:
 - `project_context.md`
 - `Handoff.md`
 
+## Implementation Status
+
+As of `2026-03-10`:
+- the first safe slice is now implemented on `/dashboard`
+- monthly on-time is grouped by task creation month
+- relationship tenure is based on first visible operational activity
+- monthly output and client-adjustment proxy are visible
+- a reusable quality section now renders monthly `RpA` and `First-Time Right`
+- a reusable account team and initial capacity section now render for Sky
+- reusable technology tooling and AI tooling sections now render for Sky
+- the current implementation is intentionally hybrid:
+  - measured data where available
+  - Notion-derived team signals where detectable
+  - service-module defaults for tooling
+  - tenant overrides for assignment and seeded quality fallback
+- the pending work is now model hardening, not UI invention
+
 ## Requested Scope
 
 Sky asked for the dashboard to show:

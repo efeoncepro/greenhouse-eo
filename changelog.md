@@ -136,6 +136,38 @@
 - Se recupero la autenticacion local de GCP con `gcloud auth login --update-adc` para volver a validar BigQuery sin depender de secretos parseados a mano.
 - Se documento `SKY_TENANT_EXECUTIVE_SLICE_V1.md` como iniciativa formal para Sky Airline.
 - Quedo alineado en README, backlog, matriz, contexto, arquitectura y handoff que:
-  - `on-time` mensual y tenure son factibles ahora para Sky
+  - `on-time` mensual, tenure y entregables o ajustes por mes son factibles ahora para Sky
   - RpA mensual y `First-Time Right` siguen bloqueados por calidad de dato
   - equipo asignado, capacity, herramientas y AI tools requieren modelo nuevo antes de exponerse
+- Se implemento el primer slice seguro de Sky en `/dashboard`.
+- El dashboard ahora expone:
+  - tenure de relacion desde primera actividad visible
+  - `on-time` mensual agrupado por fecha de creacion
+  - entregables visibles y ajustes cliente por mes
+- Se mantuvo fuera de runtime:
+  - RpA mensual
+  - `First-Time Right`
+  - equipo asignado
+  - capacity
+  - herramientas tecnologicas y AI tools
+- Se hizo reusable y escalable el slice de Sky dentro del dashboard existente.
+  - `getDashboardOverview()` ahora expone `accountTeam`, `tooling`, `qualitySignals`, `relationship` y `monthlyDelivery`.
+  - Se agrego `src/lib/dashboard/tenant-dashboard-overrides.ts` para mezclar:
+    - señal real de BigQuery
+    - señales derivadas desde Notion
+    - defaults por `serviceModules`
+    - overrides controlados por tenant
+  - Se crearon secciones reusables:
+    - `DeliverySignalsSection`
+    - `QualitySignalsSection`
+    - `AccountTeamSection`
+    - `ToolingSection`
+  - Sky ya puede ver:
+    - `on-time` mensual
+    - tenure
+    - entregables y ajustes por mes
+    - account team y capacity inicial
+    - herramientas tecnologicas
+    - herramientas AI
+    - `RpA` mensual y `First-Time Right` con origen explicito (`measured`, `seeded`, `unavailable`)
+  - Validado con `npx pnpm lint` y `npx pnpm build`

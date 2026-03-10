@@ -1,11 +1,14 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildAccountTeam, buildQualitySignals, buildTooling } from '@/lib/dashboard/tenant-dashboard-overrides'
 import type {
   GreenhouseDashboardData,
   GreenhouseDashboardKpi,
+  GreenhouseDashboardMonthlyDeliveryPoint,
   GreenhouseDashboardMixItem,
   GreenhouseDashboardProjectRisk,
+  GreenhouseDashboardRelationship,
   GreenhouseDashboardSummary,
   GreenhouseDashboardThroughputPoint
 } from '@/types/greenhouse-dashboard'
@@ -32,6 +35,7 @@ interface AggregateRow {
   avg_on_time_pct: number | string | null
   healthy_projects: number | string | null
   projects_at_risk: number | string | null
+  first_activity_date: { value?: string } | string | null
   last_synced_at: { value?: string } | string | null
 }
 
@@ -44,6 +48,25 @@ interface ThroughputRow {
 interface MixRow {
   group_key: string | null
   item_count: number | string | null
+}
+
+interface MonthlyDeliveryRow {
+  month_start: { value?: string } | string | null
+  total_deliverables: number | string | null
+  on_time_pct: number | string | null
+  without_client_adjustments: number | string | null
+  with_client_adjustments: number | string | null
+  total_client_adjustment_rounds: number | string | null
+}
+
+interface MeasuredQualityRow {
+  month_start: { value?: string } | string | null
+  avg_rpa: number | string | null
+  positive_rpa_count: number | string | null
+}
+
+interface TeamSignalRow {
+  member_name: string | null
 }
 
 interface ProjectRiskRow {
@@ -119,6 +142,52 @@ const formatMonthLabel = (monthValue: string | null) => {
   const date = new Date(`${monthValue}T00:00:00.000Z`)
 
   return monthLabelFormatter.format(date)
+}
+
+const toDateOnly = (value: string | null) => {
+  if (!value) {
+    return null
+  }
+
+  return value.slice(0, 10)
+}
+
+const getRelationshipFromDate = (startedAt: string | null): GreenhouseDashboardRelationship => {
+  const startDateOnly = toDateOnly(startedAt)
+
+  if (!startDateOnly) {
+    return {
+      startedAt: null,
+      months: 0,
+      days: 0,
+      label: 'Sin historico visible'
+    }
+  }
+
+  const startDate = new Date(`${startDateOnly}T00:00:00.000Z`)
+  const now = new Date()
+  const todayUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+
+  let months = (todayUtc.getUTCFullYear() - startDate.getUTCFullYear()) * 12 + (todayUtc.getUTCMonth() - startDate.getUTCMonth())
+
+  if (todayUtc.getUTCDate() < startDate.getUTCDate()) {
+    months -= 1
+  }
+
+  const boundedMonths = Math.max(months, 0)
+  const anchorDate = new Date(startDate)
+
+  anchorDate.setUTCMonth(anchorDate.getUTCMonth() + boundedMonths)
+
+  const days = Math.max(0, Math.floor((todayUtc.getTime() - anchorDate.getTime()) / (1000 * 60 * 60 * 24)))
+
+
+  return {
+    startedAt: startDateOnly,
+    months: boundedMonths,
+    days,
+    label: `Desde hace ${boundedMonths} meses y ${days} dias formas parte de nuestra Greenhouse.`
+  }
 }
 
 const mapStatusLabel = (groupKey: string) => {
@@ -234,8 +303,25 @@ const buildEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboa
     reviewPressureTasks: 0,
     totalTasks: 0
   },
+  relationship: {
+    startedAt: null,
+    months: 0,
+    days: 0,
+    label: 'Sin historico visible'
+  },
+  accountTeam: {
+    members: [],
+    totalMonthlyHours: 0,
+    averageAllocationPct: null
+  },
+  tooling: {
+    technologyTools: [],
+    aiTools: []
+  },
+  qualitySignals: [],
   charts: {
     throughput: [],
+    monthlyDelivery: [],
     statusMix: [],
     effortMix: []
   },
@@ -259,6 +345,11 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
           scoped_project_id,
           t.estado,
           t.esfuerzo,
+          COALESCE(t.cumplimiento, '') AS cumplimiento,
+          COALESCE(t.completitud, '') AS completitud,
+          COALESCE(SAFE_CAST(t.client_change_round_final AS INT64), 0) AS client_change_round_final,
+          COALESCE(SAFE_CAST(t.rpa AS FLOAT64), 0) AS rpa_value,
+          COALESCE(t.responsables_names, []) AS responsables_names,
           COALESCE(t.client_review_open, FALSE) AS client_review_open,
           COALESCE(t.workflow_review_open, FALSE) AS workflow_review_open,
           COALESCE(SAFE_CAST(t.open_frame_comments AS INT64), 0) AS open_frame_comments,
@@ -279,6 +370,11 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
         scoped_project_id,
         estado,
         esfuerzo,
+        cumplimiento,
+        completitud,
+        client_change_round_final,
+        rpa_value,
+        responsables_names,
         client_review_open,
         workflow_review_open,
         open_frame_comments,
@@ -301,17 +397,25 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
           WHEN esfuerzo = 'Medio' THEN 'medium'
           WHEN esfuerzo = 'Bajo' THEN 'low'
           ELSE 'unknown'
-        END AS effort_group
+        END AS effort_group,
+        CASE
+          WHEN LOWER(completitud) LIKE '%completada a tiempo%' THEN 'on_time'
+          WHEN SAFE_CAST(REGEXP_REPLACE(cumplimiento, r'[^0-9.]', '') AS FLOAT64) >= 100 THEN 'on_time'
+          WHEN LOWER(cumplimiento) LIKE '%incumpl%' THEN 'late'
+          WHEN SAFE_CAST(REGEXP_REPLACE(cumplimiento, r'[^0-9.]', '') AS FLOAT64) > 0 THEN 'late'
+          ELSE 'unknown'
+        END AS delivery_signal
       FROM scoped_tasks
     ),
     scoped_projects AS (
       SELECT
         notion_page_id AS project_id,
-        COALESCE(nombre_del_proyecto, notion_page_id) AS project_name,
-        COALESCE(estado, 'Sin estado') AS project_status,
-        SAFE_CAST(REGEXP_REPLACE(COALESCE(pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64) AS on_time_pct,
-        page_url
-      FROM \`${projectId}.notion_ops.proyectos\`
+      COALESCE(nombre_del_proyecto, notion_page_id) AS project_name,
+      COALESCE(estado, 'Sin estado') AS project_status,
+      COALESCE(propietario_names, []) AS propietario_names,
+      SAFE_CAST(REGEXP_REPLACE(COALESCE(pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64) AS on_time_pct,
+      page_url
+    FROM \`${projectId}.notion_ops.proyectos\`
       WHERE notion_page_id IN UNNEST(@projectIds)
     )
   `
@@ -333,6 +437,7 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       (SELECT ROUND(AVG(on_time_pct), 0) FROM scoped_projects) AS avg_on_time_pct,
       (SELECT COUNTIF(on_time_pct >= 75) FROM scoped_projects) AS healthy_projects,
       (SELECT COUNTIF(on_time_pct < 60 OR on_time_pct IS NULL) FROM scoped_projects) AS projects_at_risk,
+      MIN(created_date) AS first_activity_date,
       MAX(synced_at) AS last_synced_at
     FROM annotated_tasks
   `
@@ -390,6 +495,29 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     ORDER BY item_count DESC
   `
 
+  const monthlyDeliveryQuery = `
+    ${sharedCtes}
+    SELECT
+      CAST(DATE_TRUNC(created_date, MONTH) AS STRING) AS month_start,
+      COUNT(*) AS total_deliverables,
+      ROUND(
+        SAFE_MULTIPLY(
+          SAFE_DIVIDE(
+            COUNTIF(delivery_signal = 'on_time'),
+            NULLIF(COUNTIF(delivery_signal IN ('on_time', 'late')), 0)
+          ),
+          100
+        ),
+        0
+      ) AS on_time_pct,
+      COUNTIF(client_change_round_final = 0) AS without_client_adjustments,
+      COUNTIF(client_change_round_final > 0) AS with_client_adjustments,
+      SUM(client_change_round_final) AS total_client_adjustment_rounds
+    FROM annotated_tasks
+    GROUP BY 1
+    ORDER BY 1
+  `
+
   const projectsQuery = `
     ${sharedCtes}
     , task_summary AS (
@@ -428,6 +556,35 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     LIMIT 5
   `
 
+  const monthlyQualityQuery = `
+    ${sharedCtes}
+    SELECT
+      CAST(DATE_TRUNC(created_date, MONTH) AS STRING) AS month_start,
+      ROUND(AVG(NULLIF(rpa_value, 0)), 2) AS avg_rpa,
+      COUNTIF(rpa_value > 0) AS positive_rpa_count
+    FROM annotated_tasks
+    GROUP BY 1
+    ORDER BY 1
+  `
+
+  const teamSignalsQuery = `
+    ${sharedCtes}
+    SELECT member_name
+    FROM (
+      SELECT DISTINCT member_name
+      FROM scoped_projects,
+      UNNEST(propietario_names) AS member_name
+
+      UNION DISTINCT
+
+      SELECT DISTINCT member_name
+      FROM annotated_tasks,
+      UNNEST(responsables_names) AS member_name
+    )
+    WHERE member_name IS NOT NULL AND TRIM(member_name) != ''
+    ORDER BY member_name
+  `
+
   const queryParams = {
     projectIds: scope.projectIds,
     doneStatuses,
@@ -436,11 +593,23 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     queuedStatuses
   }
 
-  const [aggregateResponse, throughputResponse, statusMixResponse, effortMixResponse, projectsResponse] = await Promise.all([
+  const [
+    aggregateResponse,
+    throughputResponse,
+    statusMixResponse,
+    effortMixResponse,
+    monthlyDeliveryResponse,
+    monthlyQualityResponse,
+    teamSignalsResponse,
+    projectsResponse
+  ] = await Promise.all([
     bigQuery.query({ query: aggregateQuery, params: queryParams }),
     bigQuery.query({ query: throughputQuery, params: queryParams }),
     bigQuery.query({ query: statusMixQuery, params: queryParams }),
     bigQuery.query({ query: effortMixQuery, params: queryParams }),
+    bigQuery.query({ query: monthlyDeliveryQuery, params: queryParams }),
+    bigQuery.query({ query: monthlyQualityQuery, params: queryParams }),
+    bigQuery.query({ query: teamSignalsQuery, params: queryParams }),
     bigQuery.query({ query: projectsQuery, params: queryParams })
   ])
 
@@ -500,6 +669,29 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     )
     .filter(item => item.value > 0)
 
+  const monthlyDelivery = (monthlyDeliveryResponse[0] as MonthlyDeliveryRow[]).map(
+    (row): GreenhouseDashboardMonthlyDeliveryPoint => ({
+      month: toIsoString(row.month_start) || '',
+      label: formatMonthLabel(toIsoString(row.month_start)),
+      totalDeliverables: toNumber(row.total_deliverables),
+      onTimePct: toNullableNumber(row.on_time_pct),
+      withoutClientAdjustments: toNumber(row.without_client_adjustments),
+      withClientAdjustments: toNumber(row.with_client_adjustments),
+      totalClientAdjustmentRounds: toNumber(row.total_client_adjustment_rounds)
+    })
+  )
+
+  const measuredQualitySignals = (monthlyQualityResponse[0] as MeasuredQualityRow[]).map(row => ({
+    month: toIsoString(row.month_start) || '',
+    label: formatMonthLabel(toIsoString(row.month_start)),
+    avgRpa: toNullableNumber(row.avg_rpa),
+    hasReliableRpa: toNumber(row.positive_rpa_count) > 0
+  }))
+
+  const detectedSignals = (teamSignalsResponse[0] as TeamSignalRow[])
+    .map(row => (row.member_name || '').trim())
+    .filter(Boolean)
+
   const projects = (projectsResponse[0] as ProjectRiskRow[]).map(
     (row): GreenhouseDashboardProjectRisk => ({
       id: row.project_id || 'unknown-project',
@@ -517,6 +709,10 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
   )
 
   const projectCount = Math.max(toNumber(aggregateRow.project_count), projects.length, scope.projectIds.length)
+  const relationship = getRelationshipFromDate(toIsoString(aggregateRow.first_activity_date))
+  const accountTeam = buildAccountTeam(scope.clientId, detectedSignals)
+  const tooling = buildTooling(scope.clientId, scope.serviceModules)
+  const qualitySignals = buildQualitySignals(scope.clientId, monthlyDelivery, measuredQualitySignals)
 
   return {
     kpis: buildKpis(summary, projectCount),
@@ -529,8 +725,13 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       lastSyncedAt: toIsoString(aggregateRow.last_synced_at)
     },
     summary,
+    relationship,
+    accountTeam,
+    tooling,
+    qualitySignals,
     charts: {
       throughput,
+      monthlyDelivery,
       statusMix,
       effortMix
     },

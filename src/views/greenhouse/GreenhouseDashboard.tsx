@@ -12,6 +12,7 @@ import { alpha, useTheme } from '@mui/material/styles'
 import { ChipGroup, MetricList, MetricStatCard, SectionHeading } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
+import AccountTeamSection from '@views/greenhouse/dashboard/AccountTeamSection'
 import AttentionProjectCard from '@views/greenhouse/dashboard/AttentionProjectCard'
 import {
   createEffortMixOptions,
@@ -19,12 +20,19 @@ import {
   createStatusMixOptions,
   createThroughputOptions
 } from '@views/greenhouse/dashboard/chart-options'
+import DeliverySignalsSection from '@views/greenhouse/dashboard/DeliverySignalsSection'
+import QualitySignalsSection from '@views/greenhouse/dashboard/QualitySignalsSection'
+import ToolingSection from '@views/greenhouse/dashboard/ToolingSection'
 import {
   buildModuleBadges,
   buildModuleFocusCards,
   buildThemeCopy,
   formatDelta,
   formatSyncedAt,
+  hasAccountTeam,
+  hasMonthlyDeliverySignals,
+  hasQualitySignals,
+  hasTooling,
   resolveDashboardTheme
 } from '@views/greenhouse/dashboard/config'
 
@@ -59,6 +67,24 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
 
   const statusMixSeries = [{ data: data.charts.statusMix.map(item => item.value) }]
   const effortMixSeries = data.charts.effortMix.map(item => item.value)
+
+  const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
+  const totalDeliverablesVisible = data.charts.monthlyDelivery.reduce((sum, item) => sum + item.totalDeliverables, 0)
+
+  const totalDeliverablesWithoutAdjustments = data.charts.monthlyDelivery.reduce(
+    (sum, item) => sum + item.withoutClientAdjustments,
+    0
+  )
+
+  const noAdjustmentRate =
+    totalDeliverablesVisible > 0 ? Math.round((totalDeliverablesWithoutAdjustments / totalDeliverablesVisible) * 100) : 0
+
+  const relationshipValue =
+    data.relationship.startedAt !== null ? `${data.relationship.months}m ${data.relationship.days}d` : 'Sin dato'
+
+  const relationshipStartedAtLabel = data.relationship.startedAt
+    ? new Date(`${data.relationship.startedAt}T00:00:00.000Z`).toLocaleDateString('es-CL')
+    : 'Pendiente de historico'
 
   return (
     <Stack spacing={6}>
@@ -129,6 +155,52 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
         ))}
       </Box>
 
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' }
+        }}
+      >
+        <MetricStatCard
+          chipLabel='Relacion activa'
+          chipTone='info'
+          title='Tiempo compartido'
+          value={relationshipValue}
+          detail={
+            data.relationship.startedAt
+              ? `${data.relationship.label} Inicio visible: ${relationshipStartedAtLabel}.`
+              : 'Aun no hay una primera actividad visible para calcular tenure.'
+          }
+        />
+        <MetricStatCard
+          chipLabel='On-time mensual'
+          chipTone={
+            latestMonthlyDelivery?.onTimePct === null
+              ? 'info'
+              : (latestMonthlyDelivery?.onTimePct ?? 0) >= 75
+                ? 'success'
+                : 'warning'
+          }
+          title='Ultimo mes con actividad'
+          value={latestMonthlyDelivery?.onTimePct !== null ? `${latestMonthlyDelivery?.onTimePct}%` : 'Sin dato'}
+          detail={
+            latestMonthlyDelivery
+              ? `Base mensual agrupada por fecha de creacion en ${latestMonthlyDelivery.label}.`
+              : 'Todavia no hay meses con entregables visibles en el alcance actual.'
+          }
+        />
+        <MetricStatCard
+          chipLabel='Sin ajustes cliente'
+          chipTone={
+            totalDeliverablesVisible === 0 ? 'info' : noAdjustmentRate >= 75 ? 'success' : noAdjustmentRate >= 50 ? 'warning' : 'error'
+          }
+          title='Primera pasada visible'
+          value={`${noAdjustmentRate}%`}
+          detail={`${totalDeliverablesWithoutAdjustments} de ${totalDeliverablesVisible} entregables visibles no registran ajustes cliente.`}
+        />
+      </Box>
+
       <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.6fr 1fr' } }}>
         <Card>
           <CardContent sx={{ height: '100%' }}>
@@ -184,6 +256,14 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
           </CardContent>
         </Card>
       </Box>
+
+      {hasMonthlyDeliverySignals(data) ? <DeliverySignalsSection data={data} /> : null}
+
+      {hasQualitySignals(data) ? <QualitySignalsSection data={data} /> : null}
+
+      {hasAccountTeam(data) ? <AccountTeamSection data={data} /> : null}
+
+      {hasTooling(data) ? <ToolingSection data={data} /> : null}
 
       <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.2fr 1fr' } }}>
         <Card>

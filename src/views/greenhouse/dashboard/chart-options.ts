@@ -215,3 +215,201 @@ export const createOnTimeOptions = (theme: Theme): ApexOptions => ({
     }
   }
 })
+
+export const createMonthlyOnTimeOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false }
+  },
+  stroke: {
+    curve: 'smooth',
+    width: 3
+  },
+  markers: {
+    size: 4,
+    strokeWidth: 0,
+    colors: ['var(--mui-palette-background-paper)']
+  },
+  dataLabels: { enabled: false },
+  colors: ['var(--mui-palette-success-main)'],
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      left: 0,
+      right: 8,
+      top: -8,
+      bottom: -8
+    }
+  },
+  xaxis: {
+    categories: data.charts.monthlyDelivery.map(item => item.label),
+    axisTicks: { show: false },
+    axisBorder: { show: false },
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: {
+    min: 0,
+    max: 100,
+    tickAmount: 4,
+    labels: {
+      formatter: value => `${Math.round(value)}%`,
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${Math.round(value)}% on-time`
+    }
+  }
+})
+
+export const createMonthlyAdjustmentOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    stacked: true,
+    toolbar: { show: false }
+  },
+  dataLabels: { enabled: false },
+  stroke: {
+    width: 0
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 8,
+      columnWidth: '48%'
+    }
+  },
+  colors: ['var(--mui-palette-success-main)', 'var(--mui-palette-warning-main)'],
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      left: 0,
+      right: 8,
+      top: -10,
+      bottom: -8
+    }
+  },
+  legend: {
+    position: 'top',
+    horizontalAlign: 'left',
+    labels: {
+      colors: 'var(--mui-palette-text-secondary)'
+    }
+  },
+  xaxis: {
+    categories: data.charts.monthlyDelivery.map(item => item.label),
+    axisTicks: { show: false },
+    axisBorder: { show: false },
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: {
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${value} entregables`
+    }
+  }
+})
+
+export const createQualitySignalsOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    stacked: false,
+    toolbar: { show: false }
+  },
+  stroke: {
+    curve: 'smooth',
+    width: [3, 3]
+  },
+  markers: {
+    size: 4,
+    strokeWidth: 0
+  },
+  dataLabels: { enabled: false },
+  colors: ['var(--mui-palette-primary-main)', 'var(--mui-palette-success-main)'],
+  legend: {
+    position: 'top',
+    horizontalAlign: 'left',
+    labels: {
+      colors: 'var(--mui-palette-text-secondary)'
+    }
+  },
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      left: 0,
+      right: 8,
+      top: -8,
+      bottom: -8
+    }
+  },
+  xaxis: {
+    categories: data.qualitySignals.map(item => item.label),
+    axisTicks: { show: false },
+    axisBorder: { show: false },
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: [
+    {
+      min: 0,
+      labels: {
+        formatter: value => value.toFixed(1),
+        style: {
+          colors: 'var(--mui-palette-text-disabled)',
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.body2.fontSize as string
+        }
+      }
+    },
+    {
+      opposite: true,
+      min: 0,
+      max: 100,
+      tickAmount: 4,
+      labels: {
+        formatter: value => `${Math.round(value)}%`,
+        style: {
+          colors: 'var(--mui-palette-text-disabled)',
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.body2.fontSize as string
+        }
+      }
+    }
+  ],
+  tooltip: {
+    shared: true,
+    intersect: false
+  }
+})

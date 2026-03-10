@@ -79,6 +79,9 @@ Estado hoy:
 - existen `/api/projects/[id]` y `/api/projects/[id]/tasks` con autorizacion por tenant
 - el dashboard principal ya es una vista ejecutiva real con charts estilo Vuexy sobre throughput, salud on-time, mix operativo, esfuerzo y proyectos bajo atencion
 - el dashboard ya compone hero y cards segun `businessLines` y `serviceModules` del tenant
+- el dashboard ahora tambien expone tenure de relacion, `on-time` mensual y entregables/ajustes por mes cuando el tenant tiene historico visible
+- el dashboard ahora expone tambien secciones reusables de quality, account team y tooling para tenants con senal suficiente
+- la capa reusable combina BigQuery real, señales de Notion y overrides controlados por tenant cuando el modelo formal aun no existe
 - la vista `/proyectos` ya consume datos reales filtrados por tenant
 - la vista `/proyectos/[id]` ya muestra detalle de proyecto con tareas, review pressure y sprint context si existe
 - `build` local estabilizado en Windows con salida dinamica bajo `.next-local/`
@@ -128,14 +131,15 @@ Brecha visible:
 - el dashboard ya es la home ejecutiva actual del portal y ya compone narrativa por `serviceModules`, pero aun faltan `capacity`, `market-speed` y slices de campanas
 - faltan `/api/sprints`, `/api/dashboard/capacity` y `/api/dashboard/market-speed`
 - `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
-- aun no existe la capa de team/capacity y campaign intelligence
+- aun no existe la capa semantica formal de team/capacity, quality ni campaign intelligence, aunque el dashboard ya tiene una primera capa reusable de lectura ejecutiva
 - las superficies `/internal/dashboard` y `/admin` ya tienen slices reales, pero aun faltan mutaciones seguras, scopes y feature flags
 
 Iniciativa activa documentada:
 - `SKY_TENANT_EXECUTIVE_SLICE_V1.md` fija el diagnostico y la factibilidad del slice pedido por Sky Airline antes de implementarlo.
-- En este momento, `on-time` mensual y tenure son factibles con datos reales.
-- RpA mensual y `First-Time Right` siguen bloqueados por calidad de dato.
-- equipo asignado, capacidad y tooling requieren modelo nuevo y no deben salir de inferencias ad hoc.
+- En este momento, `on-time` mensual, tenure y entregables/ajustes por mes ya quedaron implementados sobre datos reales.
+- Tambien quedaron implementadas secciones reusables de account team, capacity inicial, tooling tecnologico, tooling AI y calidad mensual.
+- `RpA` mensual y `First-Time Right` pueden mostrarse desde la misma capa reusable, pero hoy mezclan dato medido con fallback seedado cuando la fuente real no es defendible.
+- El siguiente paso no es volver a diseñar la UI sino formalizar APIs y modelos fuente para team/capacity, quality y tooling.
 
 ## Stack
 
@@ -362,9 +366,9 @@ Regla de componentes Greenhouse:
 
 ## Proximos Pasos Recomendados
 
-1. Aprobar `SKY_TENANT_EXECUTIVE_SLICE_V1.md` y fijar definicion de `on-time` mensual, start date de tenure y sustituto temporal de `First-Time Right`.
-2. Implementar el primer slice seguro de Sky: `on-time` mensual, tenure y entregables/ajustes por mes.
-3. Construir `/admin/scopes` y `/admin/feature-flags`.
-4. Agregar `/api/sprints` y la vista real de `/sprints`.
-5. Extender `serviceModules` a navegacion y billing.
-6. Iniciar `team/capacity` cuando exista una fuente de verdad defendible para assignments.
+1. Validar visualmente el nuevo slice de Sky en `/dashboard`.
+2. Construir `/admin/scopes` y `/admin/feature-flags`.
+3. Agregar `/api/sprints` y la vista real de `/sprints`.
+4. Extender `serviceModules` a navegacion y billing.
+5. Modelar `team/capacity` antes de exponer equipo asignado.
+6. Corregir la calidad de RpA antes de habilitar `First-Time Right`.

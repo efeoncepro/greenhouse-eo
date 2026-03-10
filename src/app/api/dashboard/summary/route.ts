@@ -22,6 +22,10 @@ export async function GET() {
   return NextResponse.json({
     scope: data.scope,
     summary: data.summary,
+    relationship: data.relationship,
+    accountTeam: data.accountTeam,
+    tooling: data.tooling,
+    qualitySignals: data.qualitySignals,
     kpis: data.kpis
   })
 }

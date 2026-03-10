@@ -45,6 +45,99 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Agente
 - Codex
 
+## 2026-03-10 - Sky reusable dashboard capabilities
+
+### Objetivo del turno
+- Convertir el slice de Sky en capacidades reusables y escalables del dashboard, no en una excepcion por tenant.
+- Incorporar account team, capacity inicial, tooling tecnologico, tooling AI, `RpA` mensual y `First-Time Right` con una capa reusable.
+
+### Cambios aplicados
+- Se extendio `getDashboardOverview()` para exponer:
+  - `accountTeam`
+  - `tooling`
+  - `qualitySignals`
+  - `relationship`
+  - `charts.monthlyDelivery`
+- Se creo `src/lib/dashboard/tenant-dashboard-overrides.ts` como capa controlada para:
+  - overrides de equipo asignado
+  - defaults de herramientas por `serviceModules`
+  - fallback seedado de `RpA`
+- Se agregaron secciones reusables del dashboard:
+  - `DeliverySignalsSection`
+  - `QualitySignalsSection`
+  - `AccountTeamSection`
+  - `ToolingSection`
+- `GreenhouseDashboard.tsx` quedo como ensamblador de capacidades, no como archivo monolitico con JSX tenant-specific.
+
+### Validacion
+- Smoke BigQuery real sobre Sky:
+  - miembros detectados desde Notion: `Daniela`, `Melkin Hernandez | Efeonce`
+  - primer proyecto scoped: `Kick-Off - Sky Airlines`
+  - serie mensual visible: `2025-07`
+  - `2` entregables visibles
+  - `50%` on-time mensual
+  - `0` ajustes cliente
+  - `avg_rpa = null` medido y fallback seedado disponible para UI
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+
+### Riesgos o pendientes
+- `RpA` sigue siendo un dato muy pobre en origen; la UI lo muestra con `source = measured | seeded | unavailable`.
+- capacity, tooling y AI tooling ya existen como lectura ejecutiva reusable, pero no como APIs formales ni modelos semanticos duros.
+- Falta validacion visual manual del dashboard en `staging` o `Preview`.
+
+### Objetivo del turno
+- Implementar el primer slice seguro de Sky Airline dentro del dashboard existente.
+- Mantener fuera de runtime los bloques que siguen bloqueados por modelado o calidad de dato.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `main` despues de validacion visual
+
+### Ambiente objetivo
+- Development y luego `staging`
+
+### Archivos tocados
+- `BACKLOG.md`
+- `Handoff.md`
+- `PHASE_TASK_MATRIX.md`
+- `README.md`
+- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `changelog.md`
+- `project_context.md`
+- `src/app/api/dashboard/summary/route.ts`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/types/greenhouse-dashboard.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/dashboard/chart-options.ts`
+
+### Verificacion
+- Smoke BigQuery directo:
+  - primera actividad visible Sky: `2025-07-16`
+  - serie mensual visible: `2025-07`
+  - `2` entregables visibles
+  - `50%` on-time
+  - `0` ajustes cliente
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Intento de smoke directo del helper `getDashboardOverview()` con `tsx`: no aplica fuera del runtime Next por el guard `server-only`
+
+### Riesgos o pendientes
+- El grano mensual actual usa `created_time`, no `due month`; eso fue una decision deliberada para este primer slice seguro.
+- RpA y `First-Time Right` siguen bloqueados y se muestran como pendientes, no como KPI.
+- equipo asignado, capacity, herramientas y AI tools siguen pendientes de modelo explicito.
+- Falta validacion visual manual del nuevo slice en `/dashboard`.
+
+### Proximo paso recomendado
+- Validar visualmente el dashboard de Sky en `staging`.
+- Si la UI queda sana, seguir con `/admin/scopes` y `/admin/feature-flags`.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
 ### Objetivo del turno
 - Reautenticar GCP en local para recuperar acceso confiable a BigQuery.
 - Evaluar sobre datos reales la factibilidad del slice pedido para Sky Airline antes de escribir codigo de producto.

@@ -157,9 +157,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
 - Para Sky Airline ya existe un diagnostico formal de factibilidad:
-- `on-time` mensual y tenure se pueden construir con la data actual
-- RpA mensual y `First-Time Right` no deben exponerse aun como KPI productivo
-- equipo asignado, capacity, herramientas y AI tools requieren modelo explicito nuevo
+- `on-time` mensual, tenure y entregables/ajustes por mes ya quedaron implementados con la data actual
+- ya existen en `/dashboard` secciones reusables de quality, account team, capacity inicial, herramientas tecnologicas y AI tools
+- esas secciones mezclan señal real de BigQuery, nombres detectados desde Notion, defaults por `serviceModules` y overrides controlados por tenant
+- sigue pendiente formalizar APIs y modelos fuente para que dejen de depender de fallback u overrides
 
 ## Deploy
 - Hosting principal: Vercel

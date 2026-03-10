@@ -221,15 +221,18 @@ Current adaptation rule:
 ### N2.2 Sky tenant dashboard slice
 
 - use `SKY_TENANT_EXECUTIVE_SLICE_V1.md` as the source of truth before implementation
-- lock the monthly on-time grain for Sky before writing API contracts
-- lock the canonical relationship start date for the tenure copy before implementation
-- implement only the safe first slice:
-- monthly on-time
-- tenure
-- deliverables or campaign-like output by month
+- completed in current iteration:
+- monthly on-time grouped by task creation month
+- tenure from first visible operational activity
+- deliverables visible by month
 - adjustment proxy by month
-- do not expose monthly RpA or `First-Time Right` as production KPIs until source quality improves
-- do not expose assigned account team, capacity, or tooling for Sky until explicit models exist
+- reusable monthly quality section with `RpA` and `First-Time Right`
+- reusable account team and initial capacity section
+- reusable technology tooling and AI tooling sections
+- the reusable layer mixes measured signals, Notion-derived signals, service-module defaults, and tenant overrides
+- next:
+- validate the Sky slice visually in the dashboard
+- formalize source models and APIs for team/capacity, tooling, and quality
 
 ### N7.1 Governance Surfaces
 
