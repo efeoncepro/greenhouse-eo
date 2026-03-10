@@ -1,5 +1,11 @@
+// Next Imports
+import { redirect } from 'next/navigation'
+
 // MUI Imports
 import Button from '@mui/material/Button'
+
+// Third-party Imports
+import { getServerSession } from 'next-auth'
 
 // Type Imports
 import type { ChildrenType } from '@core/types'
@@ -21,8 +27,17 @@ import ScrollToTop from '@core/components/scroll-to-top'
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
+// Lib Imports
+import { authOptions } from '@/lib/auth'
+
 const Layout = async (props: ChildrenType) => {
   const { children } = props
+
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    redirect('/login')
+  }
 
   // Type guard to ensure lang is a valid Locale
 

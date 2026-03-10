@@ -2,11 +2,13 @@
 
 // React Imports
 import { useState } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 
 // Next Imports
 import { useRouter } from 'next/navigation'
 
 // MUI Imports
+import Alert from '@mui/material/Alert'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -15,10 +17,10 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
 
 // Third-party Imports
 import classnames from 'classnames'
+import { signIn } from 'next-auth/react'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
@@ -35,7 +37,6 @@ import themeConfig from '@configs/themeConfig'
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
 
-// Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
   blockSize: 'auto',
@@ -60,10 +61,12 @@ const MaskImg = styled('img')({
 })
 
 const LoginV2 = ({ mode }: { mode: SystemMode }) => {
-  // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [email, setEmail] = useState('client.portal@efeonce.com')
+  const [password, setPassword] = useState('greenhouse-demo')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
   const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
@@ -71,7 +74,6 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
-  // Hooks
   const router = useRouter()
   const { settings } = useSettings()
   const theme = useTheme()
@@ -88,6 +90,29 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsSubmitting(true)
+    setError('')
+
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: themeConfig.homePageUrl
+    })
+
+    if (result?.error) {
+      setError('Invalid credentials. Use the demo access shown below or configure env-based credentials.')
+      setIsSubmitting(false)
+
+      return
+    }
+
+    router.replace(themeConfig.homePageUrl)
+    router.refresh()
+  }
+
   return (
     <div className='flex bs-full justify-center'>
       <div
@@ -98,7 +123,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
           }
         )}
       >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        <LoginIllustration src={characterIllustration} alt='portal-illustration' />
         {!hidden && (
           <MaskImg
             alt='mask'
@@ -113,25 +138,29 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}`}</Typography>
+            <Typography>
+              Sign in to review delivery health, sprint momentum, and project visibility for your team.
+            </Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            onSubmit={e => {
-              e.preventDefault()
-              router.push('/')
-            }}
-            className='flex flex-col gap-5'
-          >
-            <CustomTextField autoFocus fullWidth label='Email or Username' placeholder='Enter your email or username' />
+          <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
+            {error && <Alert severity='error'>{error}</Alert>}
+            <CustomTextField
+              autoFocus
+              fullWidth
+              label='Work Email'
+              placeholder='name@company.com'
+              value={email}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+            />
             <CustomTextField
               fullWidth
               label='Password'
-              placeholder='············'
+              placeholder='Enter your password'
               id='outlined-adornment-password'
               type={isPasswordShown ? 'text' : 'password'}
+              value={password}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -145,34 +174,28 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               }}
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox />} label='Remember me' />
+              <FormControlLabel control={<Checkbox defaultChecked />} label='Keep me signed in' />
               <Typography className='text-end' color='primary.main' component={Link}>
-                Forgot password?
+                Need access?
               </Typography>
             </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
+            <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Enter portal'}
             </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
-              <Typography>New on our platform?</Typography>
-              <Typography component={Link} color='primary.main'>
-                Create an account
+            <div className='rounded border border-dashed p-4'>
+              <Typography variant='body2' className='font-medium'>
+                Demo access
               </Typography>
-            </div>
-            <Divider className='gap-2 text-textPrimary'>or</Divider>
-            <div className='flex justify-center items-center gap-1.5'>
-              <IconButton className='text-facebook' size='small'>
-                <i className='tabler-brand-facebook-filled' />
-              </IconButton>
-              <IconButton className='text-twitter' size='small'>
-                <i className='tabler-brand-twitter-filled' />
-              </IconButton>
-              <IconButton className='text-textPrimary' size='small'>
-                <i className='tabler-brand-github-filled' />
-              </IconButton>
-              <IconButton className='text-error' size='small'>
-                <i className='tabler-brand-google-filled' />
-              </IconButton>
+              <Typography variant='body2' color='text.secondary'>
+                Email: <strong>client.portal@efeonce.com</strong>
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Password: <strong>greenhouse-demo</strong>
+              </Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                You can override these defaults with `DEMO_CLIENT_EMAIL`, `DEMO_CLIENT_PASSWORD`, and
+                `DEMO_CLIENT_NAME`.
+              </Typography>
             </div>
           </form>
         </div>

@@ -1,17 +1,11 @@
 'use client'
 
-// React Imports
-import { useEffect, useRef } from 'react'
-import type { CSSProperties } from 'react'
-
 // Third-party Imports
 import styled from '@emotion/styled'
+import { useColorScheme } from '@mui/material/styles'
 
 // Type Imports
 import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
-
-// Component Imports
-import VuexyLogo from '@core/svg/Logo'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
@@ -20,68 +14,68 @@ import themeConfig from '@configs/themeConfig'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useSettings } from '@core/hooks/useSettings'
 
-type LogoTextProps = {
+type WordmarkSlotProps = {
   isHovered?: VerticalNavContextProps['isHovered']
   isCollapsed?: VerticalNavContextProps['isCollapsed']
   transitionDuration?: VerticalNavContextProps['transitionDuration']
   isBreakpointReached?: VerticalNavContextProps['isBreakpointReached']
-  color?: CSSProperties['color']
+  variant?: 'default' | 'sidebar'
 }
 
-const LogoText = styled.span<LogoTextProps>`
-  color: ${({ color }) => color ?? 'var(--mui-palette-text-primary)'};
-  font-size: 1.375rem;
-  line-height: 1.09091;
-  font-weight: 700;
-  letter-spacing: 0.25px;
-  transition: ${({ transitionDuration }) =>
-    `margin-inline-start ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out`};
-
-  ${({ isHovered, isCollapsed, isBreakpointReached }) =>
-    !isBreakpointReached && isCollapsed && !isHovered
-      ? 'opacity: 0; margin-inline-start: 0;'
-      : 'opacity: 1; margin-inline-start: 12px;'}
+const BrandMark = styled('img')<{ variant: 'default' | 'sidebar' }>`
+  display: block;
+  flex-shrink: 0;
+  inline-size: ${({ variant }) => (variant === 'sidebar' ? '2rem' : '2.25rem')};
+  block-size: ${({ variant }) => (variant === 'sidebar' ? '2rem' : '2.25rem')};
+  object-fit: contain;
 `
 
-const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
-  // Refs
-  const logoTextRef = useRef<HTMLSpanElement>(null)
+const WordmarkSlot = styled.span<WordmarkSlotProps>`
+  display: flex;
+  overflow: hidden;
+  flex-shrink: 1;
+  transition: ${({ transitionDuration }) =>
+    `margin-inline-start ${transitionDuration}ms ease-in-out, max-inline-size ${transitionDuration}ms ease-in-out, opacity ${transitionDuration}ms ease-in-out`};
 
+  ${({ isHovered, isCollapsed, isBreakpointReached, variant }) =>
+    variant === 'sidebar' && !isBreakpointReached && isCollapsed && !isHovered
+      ? 'opacity: 0; margin-inline-start: 0; max-inline-size: 0;'
+      : `opacity: 1; margin-inline-start: ${variant === 'sidebar' ? '12px' : '0'}; max-inline-size: ${variant === 'sidebar' ? '9rem' : '11rem'};`}
+`
+
+const Wordmark = styled('img')<{ variant: 'default' | 'sidebar' }>`
+  display: block;
+  inline-size: auto;
+  block-size: ${({ variant }) => (variant === 'sidebar' ? '1.75rem' : '2rem')};
+  max-inline-size: ${({ variant }) => (variant === 'sidebar' ? '9rem' : '11rem')};
+  object-fit: contain;
+`
+
+const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   // Hooks
   const { isHovered, transitionDuration, isBreakpointReached } = useVerticalNav()
   const { settings } = useSettings()
+  const { mode, systemMode } = useColorScheme()
 
   // Vars
   const { layout } = settings
-
-  useEffect(() => {
-    if (layout !== 'collapsed') {
-      return
-    }
-
-    if (logoTextRef && logoTextRef.current) {
-      if (!isBreakpointReached && layout === 'collapsed' && !isHovered) {
-        logoTextRef.current?.classList.add('hidden')
-      } else {
-        logoTextRef.current.classList.remove('hidden')
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHovered, layout, isBreakpointReached])
+  const currentMode = mode === 'system' ? systemMode : mode
+  const useNegativeWordmark = variant === 'sidebar' && (settings.semiDark || currentMode === 'dark')
+  const wordmarkSrc = useNegativeWordmark ? '/branding/logo-negative.svg' : '/branding/logo-full.svg'
+  const markSrc = '/branding/avatar.png'
 
   return (
-    <div className='flex items-center'>
-      <VuexyLogo className='text-2xl text-primary' />
-      <LogoText
-        color={color}
-        ref={logoTextRef}
+    <div className='flex items-center min-bs-8'>
+      {variant === 'sidebar' && <BrandMark src={markSrc} alt={`${themeConfig.templateName} mark`} variant={variant} />}
+      <WordmarkSlot
         isHovered={isHovered}
         isCollapsed={layout === 'collapsed'}
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
+        variant={variant}
       >
-        {themeConfig.templateName}
-      </LogoText>
+        <Wordmark src={wordmarkSrc} alt={themeConfig.templateName} variant={variant} />
+      </WordmarkSlot>
     </div>
   )
 }

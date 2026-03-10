@@ -50,9 +50,9 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'Vuexy',
-  homePageUrl: '/home',
-  settingsCookieName: 'vuexy-mui-next-demo-1',
+  templateName: 'Greenhouse',
+  homePageUrl: '/dashboard',
+  settingsCookieName: 'greenhouse-eo-portal',
   mode: 'system', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'
   semiDark: false, // true, false
