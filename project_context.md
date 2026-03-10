@@ -82,8 +82,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe `/sprints`
 - Existe `/settings`
 - Existe `/login`
+- Existe `/auth/landing`
+- Existe `/internal/dashboard`
+- Existe `/admin`
+- Existe `/admin/users`
 - Existe `src/app/page.tsx`
-- La raiz `/` redirige a `/dashboard`
+- La raiz `/` redirige segun `portalHomePath`
 - `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
 
 ## Rutas Objetivo del Producto
@@ -101,17 +105,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Brecha Actual vs Objetivo
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
-- `next-auth` ya esta integrado, usa session JWT, protege el dashboard y ahora consulta `greenhouse.client_users` con fallback a `greenhouse.clients`.
+- `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un primer data flow real: `/api/dashboard/kpis` consulta BigQuery y alimenta el dashboard.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
-- Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles, pero el bootstrap actual sigue usando `auth_mode = env_demo`.
+- Ya existe una fuente real multi-user en `greenhouse.client_users` y tablas de scopes/roles; el demo y el admin interno ya usan credenciales bcrypt.
 - Ya existen 9 tenants cliente bootstrap desde HubSpot para companias con al menos un `closedwon`, cada uno con un contacto cliente inicial en estado `invited`.
 - Aun no existen `/api/sprints` ni `/api/dashboard/charts`.
-- Aun no existe una capa multi-user real separada de tenants.
+- Ya existe una capa multi-user real separada de tenants.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
-- Aun no existen rutas internas de Efeonce ni rutas admin.
+- Ya existen rutas minimas de Efeonce interno y admin, pero falta desarrollar sus vistas de negocio.
 
 ## Deploy
 - Hosting principal: Vercel
@@ -168,11 +172,6 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `NEXTAUTH_SECRET`
   - `NEXTAUTH_URL`
   - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
-  - `DEMO_CLIENT_ID`
-  - `DEMO_CLIENT_EMAIL`
-  - `DEMO_CLIENT_PASSWORD`
-  - `DEMO_CLIENT_NAME`
-  - `DEMO_CLIENT_PROJECT_IDS`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
@@ -195,6 +194,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
 - DDL multi-user ya aplicado en BigQuery: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
 - DDL de bootstrap real desde HubSpot: `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`
+- DDL de bootstrap de scopes por mapeo conocido: `bigquery/greenhouse_project_scope_bootstrap_v1.sql`
 
 ## Decisiones Actuales
 - Mantener cambios iniciales pequenos y reversibles.
@@ -210,10 +210,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
-- La autenticacion ya resuelve tenants desde `greenhouse.clients`, pero el acceso bootstrap aun depende de `DEMO_CLIENT_PASSWORD`.
-- Falta cargar `password_hash` reales o integrar SSO para cerrar el bootstrap demo.
+- La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
+- El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
 - Faltan sprints reales, dashboard charts y los data flows restantes definidos en la especificacion.
-- Falta separar tenant metadata de user identity.
+- Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.
 

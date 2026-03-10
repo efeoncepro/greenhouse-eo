@@ -52,3 +52,49 @@ export const requireClientTenantContext = async () => {
     errorResponse: null
   }
 }
+
+export const requireInternalTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!hasRouteGroup(tenant, 'internal')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireAdminTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!hasRouteGroup(tenant, 'admin') || !hasRoleCode(tenant, 'efeonce_admin')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}

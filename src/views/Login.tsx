@@ -99,7 +99,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
       email,
       password,
       redirect: false,
-      callbackUrl: themeConfig.homePageUrl
+      callbackUrl: '/auth/landing'
     })
 
     if (result?.error) {
@@ -109,7 +109,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
       return
     }
 
-    router.replace(themeConfig.homePageUrl)
+    router.replace('/auth/landing')
     router.refresh()
   }
 
@@ -193,8 +193,8 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
                 Password: <strong>greenhouse-demo</strong>
               </Typography>
               <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-                This bootstrap account now prefers `greenhouse.client_users` with legacy fallback to `greenhouse.clients`, and
-                remains seeded with `auth_mode = env_demo`.
+                Access is now resolved from `greenhouse.client_users`. Demo and admin users authenticate with hashed
+                credentials, and real client tenants bootstrap from HubSpot closedwon companies.
               </Typography>
             </div>
           </form>

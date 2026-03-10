@@ -60,14 +60,20 @@ Goal:
 - separate tenant metadata from user identity and scope
 
 Status:
-- partially started
+- completed
 
-Open activities:
-- remove legacy fallback to `greenhouse.clients`
-- add route guards by route group and role family
-- add campaign scopes to real runtime consumers
-- remove `auth_mode = env_demo` from normal runtime
-- replace invited bootstrap users with activated credentials or SSO flow
+Completed:
+- removed legacy fallback to `greenhouse.clients` from runtime auth
+- added route guards by route group and role family for client, internal, and admin surfaces
+- removed `auth_mode = env_demo` from normal runtime and seeded bcrypt credentials for demo access
+- created `/auth/landing` and portal-home redirects by tenant type
+- created minimum `/internal/dashboard` and `/admin/users` surfaces
+- bootstrapped HubSpot closedwon companies into `greenhouse.clients` and `greenhouse.client_users`
+- mapped confident project scopes for imported tenants where a defendable Notion match existed
+
+Residual operational follow-up:
+- replace invited bootstrap users with real activation or SSO onboarding flow when customer onboarding starts
+- expand campaign scope consumers once campaign routes exist
 
 ### Phase 2. Executive Client Dashboard
 
@@ -147,10 +153,9 @@ Goal:
 - give Efeonce internal users cross-tenant operational and account visibility
 
 Status:
-- not started
+- partially started
 
 Open activities:
-- create `/internal/dashboard`
 - create `/internal/clientes`
 - create `/internal/clientes/[id]`
 - create `/internal/capacidad`
@@ -163,12 +168,11 @@ Goal:
 - provide safe tenant, user, role, scope, and feature administration
 
 Status:
-- not started
+- partially started
 
 Open activities:
 - create `/admin/tenants`
 - create `/admin/tenants/[id]`
-- create `/admin/users`
 - create `/admin/users/[id]`
 - create `/admin/roles`
 - create `/admin/scopes`
@@ -283,3 +287,8 @@ Can move in parallel after access schema exists:
 - architecture master plan documented in `GREENHOUSE_ARCHITECTURE_V1.md`
 - identity and access design documented in `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - BigQuery identity/access DDL versioned in `bigquery/greenhouse_identity_access_v1.sql`
+- runtime auth isolated to `greenhouse.client_users` plus role/scope tables
+- `/auth/landing` redirect by `portalHomePath`
+- `/internal/dashboard` and `/admin/users` as minimum guarded surfaces
+- HubSpot closedwon companies bootstrapped as Greenhouse tenants
+- confident project scopes bootstrapped for DDSoft, SSilva, and Sky Airline

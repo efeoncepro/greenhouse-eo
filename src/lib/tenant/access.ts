@@ -3,15 +3,9 @@ import 'server-only'
 import { compare } from 'bcryptjs'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { demoClientConfig } from '@/lib/demo-client'
-import {
-  getTenantAuthRecordByEmail as getLegacyTenantAuthRecordByEmail,
-  updateTenantLastLogin as updateLegacyTenantLastLogin,
-  type TenantAuthRecord as LegacyTenantAuthRecord
-} from '@/lib/tenant/clients'
+import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
 
 type TenantType = 'client' | 'efeonce_internal'
-type AccessSource = 'identity_v1' | 'legacy_clients'
 
 interface TenantAccessRow {
   user_id: string
@@ -35,7 +29,6 @@ interface TenantAccessRow {
 }
 
 export interface TenantAccessRecord {
-  source: AccessSource
   userId: string
   clientId: string
   clientName: string
@@ -67,11 +60,6 @@ const rolePriority = [
   'client_manager',
   'client_specialist'
 ]
-
-const identityAccessErrorPattern =
-  /(greenhouse\.(client_users|roles|user_role_assignments|user_project_scopes|user_campaign_scopes|client_feature_flags)|Dataset .*greenhouse|Table .*greenhouse)/i
-
-const identityAccessPermissionPattern = /(Access Denied|Permission .* denied|Not found|does not exist)/i
 
 const normalizeStringArray = (value: string[] | null | undefined, fallback: string[] = []) => {
   if (!Array.isArray(value)) {
@@ -130,12 +118,6 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
   return Array.from(routeGroups)
 }
 
-const shouldFallbackToLegacy = (error: unknown) => {
-  const message = error instanceof Error ? error.message : String(error)
-
-  return identityAccessErrorPattern.test(message) && identityAccessPermissionPattern.test(message)
-}
-
 const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   const tenantType = resolveTenantType(row.tenant_type)
   const roleCodes = normalizeStringArray(row.role_codes)
@@ -145,7 +127,6 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   const campaignScopes = normalizeStringArray(row.campaign_scopes)
 
   return {
-    source: 'identity_v1',
     userId: row.user_id,
     clientId: row.client_id || '',
     clientName: row.client_name || (tenantType === 'efeonce_internal' ? 'Efeonce Internal' : 'Greenhouse Client'),
@@ -171,37 +152,6 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   }
 }
 
-const mapLegacyRecordToAccessRecord = (tenant: LegacyTenantAuthRecord): TenantAccessRecord => {
-  const tenantType = tenant.role.startsWith('efeonce_') ? 'efeonce_internal' : 'client'
-  const roleCodes = [tenant.role]
-  const primaryRoleCode = getPrimaryRoleCode(roleCodes, tenantType)
-
-  return {
-    source: 'legacy_clients',
-    userId: tenant.clientId,
-    clientId: tenant.clientId,
-    clientName: tenant.clientName,
-    tenantType,
-    email: tenant.email,
-    fullName: tenant.clientName,
-    roleCodes,
-    primaryRoleCode,
-    routeGroups: deriveRouteGroups(roleCodes, tenantType),
-    projectScopes: tenant.projectIds,
-    campaignScopes: [],
-    projectIds: tenant.projectIds,
-    role: tenant.role,
-    featureFlags: tenant.featureFlags,
-    timezone: tenant.timezone,
-    portalHomePath: tenant.portalHomePath,
-    authMode: tenant.authMode,
-    active: tenant.active,
-    status: tenant.status,
-    passwordHash: tenant.passwordHash,
-    passwordHashAlgorithm: tenant.passwordHashAlgorithm
-  }
-}
-
 const getIdentityAccessRecordByEmail = async (email: string) => {
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
@@ -215,51 +165,11 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
         cu.tenant_type,
         cu.email,
         cu.full_name,
-        ARRAY(
-          SELECT DISTINCT ura.role_code
-          FROM \`${projectId}.greenhouse.user_role_assignments\` AS ura
-          WHERE ura.user_id = cu.user_id
-            AND ura.active = TRUE
-            AND ura.status = 'active'
-            AND (ura.effective_from IS NULL OR ura.effective_from <= CURRENT_TIMESTAMP())
-            AND (ura.effective_to IS NULL OR ura.effective_to >= CURRENT_TIMESTAMP())
-          ORDER BY ura.role_code
-        ) AS role_codes,
-        ARRAY(
-          SELECT DISTINCT route_group
-          FROM \`${projectId}.greenhouse.user_role_assignments\` AS ura
-          JOIN \`${projectId}.greenhouse.roles\` AS roles
-            ON roles.role_code = ura.role_code
-          CROSS JOIN UNNEST(roles.route_group_scope) AS route_group
-          WHERE ura.user_id = cu.user_id
-            AND ura.active = TRUE
-            AND ura.status = 'active'
-            AND (ura.effective_from IS NULL OR ura.effective_from <= CURRENT_TIMESTAMP())
-            AND (ura.effective_to IS NULL OR ura.effective_to >= CURRENT_TIMESTAMP())
-          ORDER BY route_group
-        ) AS route_groups,
-        ARRAY(
-          SELECT DISTINCT ups.project_id
-          FROM \`${projectId}.greenhouse.user_project_scopes\` AS ups
-          WHERE ups.user_id = cu.user_id
-            AND ups.active = TRUE
-          ORDER BY ups.project_id
-        ) AS project_scopes,
-        ARRAY(
-          SELECT DISTINCT ucs.campaign_id
-          FROM \`${projectId}.greenhouse.user_campaign_scopes\` AS ucs
-          WHERE ucs.user_id = cu.user_id
-            AND ucs.active = TRUE
-          ORDER BY ucs.campaign_id
-        ) AS campaign_scopes,
-        ARRAY(
-          SELECT DISTINCT cff.feature_code
-          FROM \`${projectId}.greenhouse.client_feature_flags\` AS cff
-          WHERE cff.client_id = cu.client_id
-            AND cff.active = TRUE
-            AND cff.status IN ('enabled', 'staged')
-          ORDER BY cff.feature_code
-        ) AS feature_flags,
+        ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
+        ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
+        ARRAY_AGG(DISTINCT ups.project_id IGNORE NULLS ORDER BY ups.project_id) AS project_scopes,
+        ARRAY_AGG(DISTINCT ucs.campaign_id IGNORE NULLS ORDER BY ucs.campaign_id) AS campaign_scopes,
+        ARRAY_AGG(DISTINCT cff.feature_code IGNORE NULLS ORDER BY cff.feature_code) AS feature_flags,
         COALESCE(cu.timezone, c.timezone, 'UTC') AS timezone,
         COALESCE(cu.default_portal_home_path, c.portal_home_path, IF(cu.tenant_type = 'efeonce_internal', '/internal/dashboard', '/dashboard')) AS portal_home_path,
         cu.auth_mode,
@@ -270,7 +180,40 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
       FROM \`${projectId}.greenhouse.client_users\` AS cu
       LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
         ON c.client_id = cu.client_id
+      LEFT JOIN \`${projectId}.greenhouse.user_role_assignments\` AS ura
+        ON ura.user_id = cu.user_id
+       AND ura.active = TRUE
+       AND ura.status = 'active'
+       AND (ura.effective_from IS NULL OR ura.effective_from <= CURRENT_TIMESTAMP())
+       AND (ura.effective_to IS NULL OR ura.effective_to >= CURRENT_TIMESTAMP())
+      LEFT JOIN \`${projectId}.greenhouse.roles\` AS roles
+        ON roles.role_code = ura.role_code
+      LEFT JOIN UNNEST(COALESCE(roles.route_group_scope, [])) AS route_group
+      LEFT JOIN \`${projectId}.greenhouse.user_project_scopes\` AS ups
+        ON ups.user_id = cu.user_id
+       AND ups.active = TRUE
+      LEFT JOIN \`${projectId}.greenhouse.user_campaign_scopes\` AS ucs
+        ON ucs.user_id = cu.user_id
+       AND ucs.active = TRUE
+      LEFT JOIN \`${projectId}.greenhouse.client_feature_flags\` AS cff
+        ON cff.client_id = cu.client_id
+       AND cff.active = TRUE
+       AND cff.status IN ('enabled', 'staged')
       WHERE LOWER(cu.email) = LOWER(@email)
+      GROUP BY
+        cu.user_id,
+        cu.client_id,
+        client_name,
+        cu.tenant_type,
+        cu.email,
+        cu.full_name,
+        timezone,
+        portal_home_path,
+        cu.auth_mode,
+        cu.active,
+        cu.status,
+        cu.password_hash,
+        cu.password_hash_algorithm
       LIMIT 1
     `,
     params: { email }
@@ -282,32 +225,12 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
 }
 
 export const getTenantAccessRecordByEmail = async (email: string) => {
-  try {
-    const identityRecord = await getIdentityAccessRecordByEmail(email)
-
-    if (identityRecord) {
-      return identityRecord
-    }
-  } catch (error) {
-    if (!shouldFallbackToLegacy(error)) {
-      throw error
-    }
-
-    console.warn('Falling back to legacy greenhouse.clients auth lookup because identity access tables are unavailable.')
-  }
-
-  const legacyRecord = await getLegacyTenantAuthRecordByEmail(email)
-
-  return legacyRecord ? mapLegacyRecordToAccessRecord(legacyRecord) : null
+  return getIdentityAccessRecordByEmail(email)
 }
 
 export const verifyTenantPassword = async (tenant: TenantAccessRecord, password: string) => {
   if (!tenant.active || tenant.status !== 'active') {
     return false
-  }
-
-  if (tenant.authMode === 'env_demo') {
-    return tenant.email === demoClientConfig.email && password === demoClientConfig.password
   }
 
   if (tenant.passwordHash && tenant.passwordHashAlgorithm === 'bcrypt') {
@@ -318,33 +241,21 @@ export const verifyTenantPassword = async (tenant: TenantAccessRecord, password:
 }
 
 export const updateTenantLastLogin = async (tenant: TenantAccessRecord) => {
-  if (tenant.source === 'legacy_clients') {
-    await updateLegacyTenantLastLogin(tenant.clientId)
-
-    return
-  }
-
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
-  try {
-    await bigQuery.query({
-      query: `
-        UPDATE \`${projectId}.greenhouse.client_users\`
-        SET
-          last_login_at = CURRENT_TIMESTAMP(),
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE user_id = @userId
-      `,
-      params: { userId: tenant.userId }
-    })
-  } catch (error) {
-    if (!shouldFallbackToLegacy(error) || !tenant.clientId) {
-      throw error
-    }
-  }
+  await bigQuery.query({
+    query: `
+      UPDATE \`${projectId}.greenhouse.client_users\`
+      SET
+        last_login_at = CURRENT_TIMESTAMP(),
+        updated_at = CURRENT_TIMESTAMP()
+      WHERE user_id = @userId
+    `,
+    params: { userId: tenant.userId }
+  })
 
   if (tenant.clientId) {
-    await updateLegacyTenantLastLogin(tenant.clientId)
+    await updateClientTenantLastLogin(tenant.clientId)
   }
 }

@@ -393,3 +393,76 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Aplicar y validar `bigquery/greenhouse_identity_access_v1.sql`.
 - Refactorizar auth para leer desde `client_users` y cargar roles/scopes.
 - Actualizar el payload de session y los helpers de authz.
+
+---
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar completamente la Fase 1 de identidad, acceso y multi-user model.
+- Eliminar la dependencia runtime de `env_demo` y del fallback legacy.
+- Agregar superficies minimas internas/admin para soportar `portalHomePath` y evitar errores de redirect para usuarios internos.
+- Dejar el repo, la documentacion y BigQuery alineados con el estado real de Fase 1.
+
+### Rama
+- Rama usada: `feature/tenant-auth-bq`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development, Preview y BigQuery dataset `efeonce-group.greenhouse`
+
+### Archivos tocados
+- `.env.example`
+- `BACKLOG.md`
+- `Handoff.md`
+- `MULTITENANT_ARCHITECTURE.md`
+- `README.md`
+- `bigquery/greenhouse_clients.sql`
+- `bigquery/greenhouse_identity_access_v1.sql`
+- `bigquery/greenhouse_project_scope_bootstrap_v1.sql`
+- `changelog.md`
+- `project_context.md`
+- `src/app/(dashboard)/admin/layout.tsx`
+- `src/app/(dashboard)/admin/page.tsx`
+- `src/app/(dashboard)/admin/users/page.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/internal/layout.tsx`
+- `src/app/(dashboard)/internal/dashboard/page.tsx`
+- `src/app/(dashboard)/proyectos/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/sprints/page.tsx`
+- `src/app/auth/landing/page.tsx`
+- `src/app/page.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/lib/internal/get-internal-dashboard-overview.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/authorization.ts`
+- `src/lib/tenant/clients.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseInternalDashboard.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Smoke BigQuery:
+  - `greenhouse.client_users` usado como unica fuente runtime de auth: correcto
+  - demo user y admin interno con bcrypt: correctos
+  - scopes bootstrap para DDSoft, SSilva y Sky Airline: correctos
+- Smoke HTTP local:
+  - login de demo client: correcto
+  - login de admin interno: correcto
+  - redirects por `portalHomePath`: correctos
+  - `/dashboard`, `/internal/dashboard` y `/admin/users` responden sin error server-side con sesion valida
+
+### Riesgos o pendientes
+- Los contactos cliente importados desde HubSpot siguen en estado `invited`; no se deben considerar usuarios finales activados hasta que exista onboarding.
+- `greenhouse.clients` conserva columnas legacy de auth como metadata de compatibilidad; el runtime ya no las usa.
+- `/internal/dashboard` y `/admin/users` son superficies minimas de Fase 1, no producto final.
+
+### Proximo paso recomendado
+- Iniciar Fase 2 con `/api/dashboard/charts` y el rediseño ejecutivo de `/dashboard`.

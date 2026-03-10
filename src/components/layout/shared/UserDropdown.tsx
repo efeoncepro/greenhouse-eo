@@ -42,6 +42,9 @@ const UserDropdown = () => {
   const router = useRouter()
   const { settings } = useSettings()
   const { data: session } = useSession()
+  const dashboardHref = session?.user?.portalHomePath || '/dashboard'
+  const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
+  const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
@@ -108,18 +111,28 @@ const UserDropdown = () => {
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/dashboard')}>
+                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
                     <i className='tabler-layout-dashboard' />
                     <Typography color='text.primary'>Dashboard</Typography>
                   </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>
-                    <i className='tabler-folders' />
-                    <Typography color='text.primary'>Proyectos</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/settings')}>
-                    <i className='tabler-settings' />
-                    <Typography color='text.primary'>Portal Settings</Typography>
-                  </MenuItem>
+                  {!isInternalUser ? (
+                    <>
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>
+                        <i className='tabler-folders' />
+                        <Typography color='text.primary'>Proyectos</Typography>
+                      </MenuItem>
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/settings')}>
+                        <i className='tabler-settings' />
+                        <Typography color='text.primary'>Portal Settings</Typography>
+                      </MenuItem>
+                    </>
+                  ) : null}
+                  {isAdminUser ? (
+                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/users')}>
+                      <i className='tabler-shield' />
+                      <Typography color='text.primary'>Admin Users</Typography>
+                    </MenuItem>
+                  ) : null}
                   <div className='flex items-center plb-2 pli-3'>
                     <Button
                       fullWidth

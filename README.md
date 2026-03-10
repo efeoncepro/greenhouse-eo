@@ -57,7 +57,7 @@ Estado hoy:
 - base tecnica funcionando en Vercel
 - shell Greenhouse visible en las rutas principales del portal
 - branding base integrado en navegacion y favicon temporal
-- `next-auth` ya protege el dashboard y ahora prioriza `greenhouse.client_users` con fallback a `greenhouse.clients`
+- `next-auth` ya protege el dashboard y autentica solo contra `greenhouse.client_users`
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
@@ -70,6 +70,8 @@ Estado hoy:
 - existe un plan maestro de arquitectura y roadmap multi-agente en `GREENHOUSE_ARCHITECTURE_V1.md`
 - ya existen en BigQuery `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags` y `audit_events`
 - ya existe bootstrap real de clientes desde HubSpot para companias con al menos un `closedwon`
+- ya existen `/auth/landing`, `/internal/dashboard`, `/admin` y `/admin/users` como superficies minimas de Fase 1
+- el demo client y el admin interno ya autentican con `password_hash` bcrypt
 
 Rutas actuales:
 - `/dashboard`
@@ -78,6 +80,10 @@ Rutas actuales:
 - `/sprints`
 - `/settings`
 - `/login`
+- `/auth/landing`
+- `/internal/dashboard`
+- `/admin`
+- `/admin/users`
 
 Rutas objetivo del producto:
 - `/dashboard`
@@ -87,12 +93,12 @@ Rutas objetivo del producto:
 - `/settings`
 
 Brecha visible:
-- la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero el demo sigue seeded con `auth_mode = env_demo`
+- la autenticacion ya consume un origen multi-user real y ahora existen 9 tenants cliente bootstrap desde HubSpot, pero esos contactos siguen en estado `invited` hasta que exista onboarding real
 - el dashboard ya tiene un primer vertical slice real, pero aun no es el centro ejecutivo del producto
 - faltan `/api/sprints` y `/api/dashboard/charts`
-- el tenant metadata legacy sigue viviendo en `greenhouse.clients` mientras termina la migracion
+- `greenhouse.clients` todavia conserva columnas legacy de auth como metadata de compatibilidad, aunque el runtime ya no las usa para login
 - aun no existe la capa de team/capacity y campaign intelligence
-- aun no existen rutas internas de Efeonce ni rutas admin
+- las superficies `/internal/dashboard` y `/admin/users` son minimas; falta desarrollar sus vistas de negocio
 
 ## Stack
 
@@ -170,11 +176,6 @@ Actuales en `.env.example`:
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
-- `DEMO_CLIENT_ID`
-- `DEMO_CLIENT_EMAIL`
-- `DEMO_CLIENT_PASSWORD`
-- `DEMO_CLIENT_NAME`
-- `DEMO_CLIENT_PROJECT_IDS`
 
 Objetivo funcional:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
@@ -237,7 +238,10 @@ Camino normal:
 ## Estructura Relevante
 
 - `src/app/layout.tsx`: layout raiz
+- `src/app/auth/landing/page.tsx`: redirect post-login por `portalHomePath`
 - `src/app/(dashboard)/layout.tsx`: layout principal del dashboard
+- `src/app/(dashboard)/internal/layout.tsx`: guard server-side para rutas internas
+- `src/app/(dashboard)/admin/layout.tsx`: guard server-side para rutas admin
 - `src/app/api/dashboard/kpis/route.ts`: primer endpoint real del portal
 - `src/app/api/projects/route.ts`: listado real de proyectos por tenant
 - `src/app/api/projects/[id]/route.ts`: detalle de proyecto por tenant
