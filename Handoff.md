@@ -40,6 +40,70 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 22:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Auditar todas las ramas activas y de respaldo para separar trabajo ya absorbido de trabajo aun no integrado.
+- Preservar en ramas limpias el provisioning endurecido de contactos HubSpot y el bloque documental cross-repo para que no dependan de memoria conversacional.
+- Verificar explicitamente que `greenhouse-eo` ya consume la integracion creada en `hubspot-bigquery` via el servicio `hubspot-greenhouse-integration`.
+
+### Rama
+- Rama usada: `reconcile/docs-cross-repo-contract`
+- Ramas de consolidacion creadas:
+  - `reconcile/merge-hubspot-provisioning` en commit `802dad6`
+  - `reconcile/docs-cross-repo-contract` en commit `ba14c7b`
+- Rama objetivo del merge:
+  - `reconcile/merge-hubspot-provisioning` -> `develop`
+  - `reconcile/docs-cross-repo-contract` -> `develop` o merge selectivo despues del provisioning
+
+### Ambiente objetivo
+- Development / pre-merge
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+- `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md`
+- `public/docs/greenhouse-cross-repo-contract-v1.md`
+- `src/app/(blank-layout-pages)/developers/api/page.tsx`
+
+### Verificacion
+- Auditoria de ramas:
+  - `reconcile/hubspot-live-plus-local-wip-20260311-1733` sigue siendo la unica rama con trabajo funcional no absorbido por `main` o `develop`
+  - `rescue/wip-local-hubspot-contacts-20260311-1729` quedo supersedida y no debe mergearse
+  - `origin/feature/reconcile-develop-with-main-live` y `origin/feature/hubspot-live-cross-repo-contract` contenian material documental util pero historia mezclada
+- Rama funcional `reconcile/merge-hubspot-provisioning`:
+  - merge limpio desde `reconcile/hubspot-live-plus-local-wip-20260311-1733`
+  - `npx pnpm lint`: correcto
+  - `npx pnpm build`: correcto
+- Rama documental `reconcile/docs-cross-repo-contract`:
+  - rescate selectivo desde `origin/feature/reconcile-develop-with-main-live`
+  - `npx pnpm lint`: correcto
+  - `npx pnpm build`: correcto
+  - nota local: para validar el build fue necesario limpiar varios builds historicos en `.next-local` porque el wildcard del `tsconfig` hacia que TypeScript intentara validar rutas de otras ramas
+- Verificacion cross-repo:
+  - `greenhouse-eo` consume `https://hubspot-greenhouse-integration-183008134038.us-central1.run.app`
+  - `hubspot-bigquery` local apunta a `origin https://github.com/cesargrowth11/hubspot-bigquery.git`
+  - `GET /contract`: `200`
+  - `GET /companies/30825221458/contacts`: `200`
+  - el servicio publicado por `hubspot-bigquery` declara `GET /companies/{hubspotCompanyId}/contacts`, `GET /companies/{hubspotCompanyId}/owner` y `GET /contract`
+
+### Riesgos o pendientes
+- Falta smoke autenticado/visual de `/admin/tenants/[id]` para el boton `Provisionar` antes de promover el provisioning endurecido.
+- El workspace Windows acumula muchos builds historicos en `.next-local`; mientras el `tsconfig` siga incluyendo `.next-local/**`, ramas con superficies distintas pueden fallar build por validadores viejos si no se limpia ese cache local.
+- Las ramas de rescue y safety siguen existiendo; no contienen el mejor estado y pueden confundir si alguien no lee este handoff primero.
+- Aun no se hizo `push` de `reconcile/merge-hubspot-provisioning` ni de `reconcile/docs-cross-repo-contract` en este turno.
+
+### Proximo paso recomendado
+- Pushear ambas ramas de consolidacion para que el rescate ya no sea solo local.
+- Correr smoke admin real sobre `/admin/tenants/hubspot-company-30825221458` desde `reconcile/merge-hubspot-provisioning`.
+- Si el smoke sale bien, promover primero `reconcile/merge-hubspot-provisioning` a `develop`.
+- Tratar `reconcile/docs-cross-repo-contract` como rama documental separada o merge selectivo, sin arrastrar las ramas remotas hibridas originales.
+
+### Fecha
 - 2026-03-11 18:05 America/Santiago
 
 ### Agente
