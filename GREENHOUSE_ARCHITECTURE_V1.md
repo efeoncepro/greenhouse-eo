@@ -84,6 +84,11 @@ The portal must answer:
 - each phase should end with usable product value
 - do not block all progress on a grand rewrite
 
+7. Reusable executive UI system
+- dashboard and executive surfaces must share a stable visual language
+- Vuexy analytics is a composition reference, not a screen to copy
+- reusable executive cards belong in `src/components/greenhouse/**`
+
 ## Personas
 
 ### Client personas
@@ -609,6 +614,7 @@ The `full-version` folder is reference material, not merge material.
 Dashboard patterns:
 - cards and chart framing from `src/views/dashboards/analytics/*`
 - status and chart layout from `src/views/dashboards/crm/*`
+- executive hierarchy from `WebsiteAnalyticsSlider`, `EarningReports`, `SupportTracker`, and `ProjectsTable`
 
 Table patterns:
 - searchable and sortable table patterns from `src/views/react-table/*`
@@ -635,6 +641,24 @@ Admin detail reuse rule:
 - navigation labels
 - fake data assumptions
 - action menus implying CRUD workflows not wanted in Greenhouse
+
+### Executive UI system rule
+
+Reference:
+- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+
+The dashboard and future executive surfaces should converge on:
+- one dominant hero card
+- compact summary cards
+- medium analysis cards with `CardHeader`
+- bottom contextual lists or tables
+
+This rule applies to:
+- `/dashboard`
+- future `/equipo`
+- future `/campanas`
+- internal executive views
+- admin overview surfaces when they need executive readability
 
 ### What must not be imported as-is
 
@@ -884,6 +908,7 @@ Outputs:
 - capacity section
 - risk section
 - campaigns-in-focus block
+- reusable executive UI layer aligned to `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 Dependencies:
 - Activity 2.1
@@ -893,6 +918,7 @@ Parallelization:
 
 Validation:
 - client_executive can understand operation health from one page
+- the first screen has clear hierarchy and no visually flat wall of cards
 
 ### Activity 2.3: Drilldown contracts
 
@@ -1375,11 +1401,11 @@ For Sky specifically, the current architecture stance is:
 
 ## Immediate Next Actions
 
-1. Approve the KPI and source rules in `SKY_TENANT_EXECUTIVE_SLICE_V1.md`.
-2. Implement the safe first Sky slice on `/dashboard`.
-3. Build `/admin/scopes` and `/admin/feature-flags`.
-4. Build `/api/sprints` and the real `/sprints`.
-5. Extend `serviceModules` from dashboard composition into navigation and billing context.
+1. Refactor `/dashboard` into the reusable executive UI system defined in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+2. Build `/admin/scopes` and `/admin/feature-flags`.
+3. Build `/api/sprints` and the real `/sprints`.
+4. Extend `serviceModules` from dashboard composition into navigation and billing context.
+5. Formalize team/capacity, tooling, and quality APIs so the new dashboard cards stop depending on controlled overrides.
 6. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
 
 ## Agent Working Notes
@@ -1399,3 +1425,4 @@ This document is not optional context for architecture-changing work.
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
 - `bigquery/greenhouse_identity_access_v1.sql`: proposed BigQuery schema and bootstrap seed for users, roles, and scopes
 - `SKY_TENANT_EXECUTIVE_SLICE_V1.md`: validated scope and feasibility notes for the Sky Airline dashboard slice
+- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: reusable executive UI contract derived from Vuexy analytics hierarchy

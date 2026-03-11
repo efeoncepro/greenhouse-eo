@@ -4,6 +4,34 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-11
+
+### Dashboard
+- El hero ejecutivo del dashboard se simplifico para bajar densidad arriba del fold: menos copy, dos highlights clave, summary rectangular y badges condensados.
+- Las mini cards derechas del top fold dejaron de heredar altura artificial del hero y ahora se apilan en una columna proporcionada en desktop.
+- `CapacityOverviewCard` ahora soporta variantes `default` y `compact`, manteniendo la version completa como principal y dejando listo el patron multi-formato.
+- Se mejoro el UX writing del top fold y de `Capacity` para hacer la lectura mas corta, directa y consistente.
+- Se agregaron mejoras de accesibilidad en hero y capacity: landmarks, ids accesibles, listas semanticas y labels explicitos para barras de allocation.
+
+### Validacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Validacion visual local con login admin + `view-as` sobre `space-efeonce`: correcta
+- Documento operativo `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md` quedo reescrito con matriz de brechas, soluciones, seleccion y ejecucion final
+## 2026-03-10
+
+### Dashboard
+- Se agrego `snapshot mode` para dashboards con historico corto, reemplazando charts grandes y vacios por una lectura ejecutiva compacta.
+- Se extrajo `CapacityOverviewCard` como componente reusable y escalable para capacity/equipo asignado.
+- Se agrego `layoutMode = snapshot | standard | rich` en el orquestador del dashboard para que la composicion se adapte a la densidad de datos del space.
+- `CapacityOverviewCard` paso a una sola superficie con summary strip, roster responsive e insights compactos al pie.
+- Los grids de KPI, focus, delivery, quality y tooling migraron a patrones mas fluidos con `minmax` para responder mejor al espacio disponible.
+
+### Spaces
+- Se definio el label visible `space` para superficies admin relacionadas con clientes, manteniendo `tenant` solo como termino interno.
+- Se versiono `bigquery/greenhouse_efeonce_space_v1.sql` para sembrar `space-efeonce` como benchmark interno sobre el portfolio propio de Efeonce.
+- El seed real aplicado en BigQuery deja a `space-efeonce` con 57 proyectos base y todos los business lines / service modules activos para validacion del MVP ejecutivo.
+
 ## 2026-03-09
 
 ### Infraestructura
@@ -176,3 +204,69 @@
   - Nueva ruta ` /admin/tenants/[id]/view-as/dashboard`.
   - La vista renderiza el dashboard real del tenant dentro de un preview admin con banner y retorno al detalle del tenant.
   - Validado con `npx pnpm lint` y `npx pnpm build`.
+- Se agrego `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` para fijar el sistema visual ejecutivo reusable del producto.
+- Quedo alineado en README, arquitectura, backlog, matriz, contexto y handoff que el siguiente trabajo prioritario del dashboard es migrarlo a ese sistema reusable.
+- Se fijo como regla que Vuexy analytics es referencia de jerarquia y composicion, no fuente para copiar branding, paleta ni semantica demo.
+- `/dashboard` fue refactorizado hacia un layout ejecutivo Vuexy-aligned con hero reutilizable, mini stat cards, throughput overview, portfolio health y tabla compacta de proyectos bajo atencion.
+- Se agrego `src/views/greenhouse/dashboard/orchestrator.ts` como capa deterministica para decidir el mix de bloques ejecutivos segun `serviceModules`, calidad de dato y capacidades disponibles.
+- Se agregaron `ExecutiveCardShell`, `ExecutiveHeroCard` y `ExecutiveMiniStatCard` a `src/components/greenhouse/*` como primitives reusables para futuras superficies Greenhouse.
+- Se fortalecio el skill local `greenhouse-vuexy-portal` para futuras decisiones UI/UX: ahora incluye una guia de seleccion de componentes Vuexy/MUI para avatars, card-statistics, theming, OptionMenu y orquestacion de dashboards.
+- Se activaron `simple-icons` y `@iconify-json/logos` en `starter-kit` para reutilizar logos de marcas y herramientas sin depender de descargas manuales.
+- Se agrego `DOCUMENTATION_OPERATING_MODEL_V1.md` para reducir duplicacion documental usando una fuente canonica por tema y deltas cortos en los documentos vivos.
+- Se agrego `BrandLogo` como primitive reusable para tooling cards y se ampliaron los icon bundles de Vuexy con logos de marca curados.
+- Se hizo operativo el switch de tema estilo Vuexy en Greenhouse: mejor integracion en navbar, labels localizados y reaccion en vivo al modo `system`.
+- Se instalo en `starter-kit` la paridad de librerias UI de `full-version` para charts, calendars, tables, forms, editor, media, maps, toasts y drag/drop.
+
+### 2026-03-11 - Capability governance and visual validation method
+- Added `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` to formalize the local visual QA workflow used for authenticated dashboard checks and `view-as` tenant reviews.
+- Extended the tenant admin detail flow so `getAdminTenantDetail()` returns the capability catalog/state for each tenant.
+- Added `src/lib/admin/tenant-capability-types.ts` and `src/lib/admin/tenant-capabilities.ts` as the canonical contract and server layer for:
+  - reading tenant capability state
+  - manual admin assignments
+  - HubSpot-derived capability sync
+  - generic source-based capability sync
+- Added admin routes:
+  - `GET /api/admin/tenants/[id]/capabilities`
+  - `PUT /api/admin/tenants/[id]/capabilities`
+  - `POST /api/admin/tenants/[id]/capabilities/sync`
+- Added `TenantCapabilityManager` into `/admin/tenants/[id]` so admin users can assign or sync business lines and service modules directly from the tenant screen.
+- Confirmed the current service-modules initiative is structurally viable because the existing BigQuery model already separates:
+  - canonical capability metadata in `greenhouse.service_modules`
+  - tenant assignments in `greenhouse.client_service_modules`
+  - external commercial source signals in HubSpot deals
+- Quality checks:
+  - `npx pnpm lint`
+  - `npx pnpm build`
+
+### 2026-03-11 - Public identifier strategy
+- Added `GREENHOUSE_ID_STRATEGY_V1.md` to define the separation between internal keys and product-facing public IDs.
+- Added `src/lib/ids/greenhouse-ids.ts` with deterministic public ID builders for:
+  - tenants/spaces
+  - collaborators/users
+  - business lines
+  - service modules
+  - capability assignments
+  - role assignments
+  - feature flag assignments
+- Extended admin tenant and user data contracts so the UI can expose readable IDs without leaking raw `hubspot-company-*` or `user-hubspot-contact-*` prefixes.
+- Updated admin tenant detail, user detail, tenant preview, and capability governance UI to surface the new public IDs and service IDs.
+- Added `bigquery/greenhouse_public_ids_v1.sql` as the versioned migration to add and backfill nullable `public_id` columns in the core governance tables.
+
+### 2026-03-11 - Capability governance UX and source correction
+- Reworked `TenantCapabilityManager` so the governance surface is now a full-width admin section with compact summary tiles, shorter Spanish copy, stronger text hierarchy, and a manual-first interaction model.
+- Rebalanced `/admin/tenants/[id]` so tenant identity, validation CTA, and governance appear in a clearer order instead of pushing the editor into a narrow left rail.
+- Removed automatic capability derivation from HubSpot `closedwon` deals in `POST /api/admin/tenants/[id]/capabilities/sync`.
+- The sync route now requires explicit `businessLines` or `serviceModules` in the payload and treats the source as company-level or external metadata only.
+
+### 2026-03-11 - Generic integrations API
+- Added `GREENHOUSE_INTEGRATIONS_API_V1.md` as the contract for external connectors.
+- Added token-based integration auth via `GREENHOUSE_INTEGRATION_API_TOKEN`.
+- Added generic routes under `/api/integrations/v1/*` so HubSpot, Notion, or any other connector can use the same surface:
+  - `GET /api/integrations/v1/catalog/capabilities`
+  - `GET /api/integrations/v1/tenants`
+  - `POST /api/integrations/v1/tenants/capabilities/sync`
+- The API is intentionally provider-neutral and resolves tenants by:
+  - `clientId`
+  - `publicId`
+  - `sourceSystem` + `sourceObjectType` + `sourceObjectId`
+- Current first-class source mapping is HubSpot company resolution through `hubspot_company_id`, but the contract is ready for additional systems.

@@ -1,9 +1,11 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 
 export interface AdminTenantRow {
   clientId: string
+  publicId: string
   clientName: string
   status: string
   active: boolean
@@ -162,6 +164,10 @@ export const getAdminTenantsOverview = async (): Promise<AdminTenantsOverview> =
     },
     tenants: (tenantRows[0] as Array<Record<string, unknown>>).map(row => ({
       clientId: String(row.client_id || ''),
+      publicId: buildTenantPublicId({
+        clientId: String(row.client_id || ''),
+        hubspotCompanyId: row.hubspot_company_id ? String(row.hubspot_company_id) : null
+      }),
       clientName: String(row.client_name || ''),
       status: String(row.status || ''),
       active: Boolean(row.active),

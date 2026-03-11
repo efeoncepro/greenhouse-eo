@@ -32,6 +32,7 @@ const formatDateTime = (value: string | null) => {
 const authModeTone = (authMode: string) => {
   if (authMode === 'credentials') return 'success'
   if (authMode === 'password_reset_pending') return 'warning'
+  if (authMode === 'internal_preview') return 'info'
 
   return 'default'
 }
@@ -48,11 +49,11 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
           }}
         >
           <Stack spacing={2}>
-            <Chip label='Tenant governance' color='info' variant='outlined' sx={{ width: 'fit-content' }} />
-            <Typography variant='h3'>Administra tenants como empresas, con su postura de acceso, modulos y usuarios asociados.</Typography>
+            <Chip label='Spaces governance' color='info' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Typography variant='h3'>Administra spaces como empresas, con su postura de acceso, modulos y usuarios asociados.</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 920 }}>
-              Cada tenant representa una empresa cliente del portal. Esta vista consolida el estado comercial y operativo del
-              tenant sin colapsar tenant metadata con identidad de usuario.
+              Cada space representa una empresa cliente del portal. Esta vista consolida el estado comercial y operativo del
+              space sin colapsar metadata del cliente con identidad de usuario.
             </Typography>
           </Stack>
         </CardContent>
@@ -66,7 +67,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         }}
       >
         {[
-          ['Tenants', data.totals.totalTenants],
+          ['Spaces', data.totals.totalTenants],
           ['Activos', data.totals.activeTenants],
           ['Con credenciales', data.totals.tenantsWithCredentials],
           ['Pendientes reset', data.totals.tenantsPendingReset],
@@ -89,9 +90,9 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         <CardContent>
           <Stack spacing={3}>
             <Box>
-              <Typography variant='h4'>Admin Tenants</Typography>
+              <Typography variant='h4'>Admin Spaces</Typography>
               <Typography color='text.secondary'>
-                Cada fila representa una empresa cliente. El detalle agrupa usuarios, proyectos visibles, modulos contratados y
+                Cada fila representa un cliente visible como space. El detalle agrupa usuarios, proyectos visibles, modulos contratados y
                 feature flags activos.
               </Typography>
             </Box>
@@ -100,7 +101,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tenant</TableCell>
+                    <TableCell>Space</TableCell>
                     <TableCell>Acceso</TableCell>
                     <TableCell>Usuarios</TableCell>
                     <TableCell>Scope</TableCell>

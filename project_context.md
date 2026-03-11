@@ -14,7 +14,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
 - DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
 - Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
+- Metodo canonico de validacion visual: `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
 - Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- Seed operativo para benchmark interno del dashboard: `bigquery/greenhouse_efeonce_space_v1.sql`
+- Plan UX actual para la siguiente iteracion del dashboard: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -35,13 +39,19 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `../full-version/src/views/apps/roles/*`
 - `../full-version/src/libs/ApexCharts.tsx`
 - `../full-version/src/libs/styles/AppReactApexCharts.tsx`
+- `../full-version/src/libs/Recharts.tsx`
+- `../full-version/src/libs/styles/AppRecharts.ts`
 - y luego la documentacion oficial:
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/libs/apex-charts/`
 - `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/styled-libs/app-react-apex-charts/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/user-interface/components/avatars/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/development/theming/overview/`
+- `https://demos.pixinvent.com/vuexy-nextjs-admin-template/documentation/docs/guide/components/custom/option-menu/`
 - Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
 - En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
 - Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
+- Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -50,6 +60,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+- `apexcharts` + `react-apexcharts` activos para charts ejecutivos
+- El portal ya tiene un `space-efeonce` sembrado en BigQuery para validar el MVP del dashboard cliente sobre el portfolio interno con mayor densidad de datos.
+- En producto, la label visible debe migrar a `space`; `tenant` se mantiene solo como termino interno de runtime y datos.
+- El dashboard ya no se compone solo por `snapshot` vs `non-snapshot`; ahora existe `layoutMode = snapshot | standard | rich` para ajustar jerarquia y distribucion de cards segun la densidad real del space.
+- `recharts` activo como segunda via de charting reusable alineada con `full-version`
+- `keen-slider`, `@fullcalendar/*`, `react-datepicker`, `react-dropzone`, `react-toastify`, `cmdk`, `@tiptap/*`, `@tanstack/react-table`, `react-player`, `mapbox-gl`, `react-map-gl`, `react-hook-form`, `@hookform/resolvers`, `valibot`, `@formkit/drag-and-drop`, `emoji-mart` y `@emoji-mart/*` ya estan instalados en `starter-kit`
+- `simple-icons` activo para logos SVG de marcas como fallback directo en runtime
+- `@iconify-json/logos` activo para incorporar logos de marca al pipeline Iconify/CSS del repo
+- `src/components/greenhouse/BrandLogo.tsx` ya consume ese stack para tooling cards, priorizando logos bundleados y usando fallback a Tabler o monograma
 - `.gitattributes` fija archivos de texto en `LF` para estabilizar el trabajo en Windows
 
 ## Target Definido por la Especificacion
@@ -75,6 +94,26 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `npx pnpm lint`
 - `npx pnpm clean`
 
+## Librerias visuales activas
+- `apexcharts` y `react-apexcharts`: base actual para charts ejecutivos; wrappers locales en `src/libs/ApexCharts.tsx` y `src/libs/styles/AppReactApexCharts.tsx`.
+- `recharts`: segunda via de charting disponible para cards compactas y visualizaciones de comparacion.
+- `keen-slider`: sliders, carousels y hero cards con narrativa visual.
+- `@fullcalendar/*`, `react-datepicker`, `date-fns`: calendario, planner y date UX.
+- `@tanstack/react-table`, `@tanstack/match-sorter-utils`: tablas avanzadas, filtros y sorting.
+- `react-hook-form`, `@hookform/resolvers`, `valibot`, `input-otp`: forms complejas, validacion y OTP UX.
+- `@tiptap/*`, `cmdk`: rich text, editorial UX y command palette.
+- `react-dropzone`, `react-toastify`, `emoji-mart`, `@emoji-mart/*`: upload, feedback y picker UX.
+- `react-player`, `mapbox-gl`, `react-map-gl`: media, embeds y mapas.
+- `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`: posicionamiento, reorder y soporte de iconografia.
+- Ya no es necesario reinstalar este stack desde `full-version`; el inventario base de Vuexy ya vive en `starter-kit`.
+- `simple-icons`: logos SVG de marcas y herramientas sin descargar assets manuales.
+- `@iconify-json/logos`: logos de marca integrables al pipeline de iconos del repo en `src/assets/iconify-icons/bundle-icons-css.ts`.
+- `recharts` y `keen-slider`: referencia en `full-version`, aun no activados en `starter-kit`.
+
+## Regla documental compacta
+- La estrategia de documentacion liviana del repo queda en `DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
+
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz
 - `src/app/(dashboard)/layout.tsx`: layout principal autenticado o de dashboard
@@ -97,6 +136,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/lib/projects/get-projects-overview.ts`: capa de datos server-side de proyectos
 - `src/lib/projects/get-project-detail.ts`: capa de datos server-side del detalle de proyecto y sus tareas
 - `src/views/greenhouse/dashboard/**`: configuracion y componentes especificos del dashboard Greenhouse
+- `src/views/greenhouse/dashboard/orchestrator.ts`: orquestador de bloques ejecutivos reutilizables para el dashboard
 
 ## Estado de Rutas
 - Existe `/dashboard`
@@ -137,6 +177,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
 - Ya existe un dashboard ejecutivo real: `/dashboard` se renderiza server-side, usa BigQuery para throughput, salud on-time, mix operativo, mix de esfuerzo y proyectos bajo atencion, y ahora compone hero/cards segun `businessLines` y `serviceModules`.
+- El siguiente trabajo sobre `/dashboard` no es sumar widgets ad hoc sino migrarlo al `Executive UI System` reusable para mejorar jerarquia, densidad y composicion sin cambiar la semantica de datos primero.
+- El runtime del dashboard ya incorpora un orquestador deterministico de bloques ejecutivos para seleccionar hero, top stats y secciones por `serviceModules`, calidad de dato y capacidades disponibles.
 - Ya existen `/api/dashboard/kpis`, `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`.
 - Ya existe `/api/projects` y la vista `/proyectos` consume datos reales filtrados por tenant.
 - Ya existen `/api/projects/[id]`, `/api/projects/[id]/tasks` y la vista `/proyectos/[id]` con detalle real por tenant.
@@ -153,8 +195,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Aun no existe `/api/sprints`.
 - Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
-- Ya existe evidencia comercial en BigQuery para derivar modulos de servicio desde `hubspot_crm.deals.linea_de_servicio` y `servicios_especificos`.
+- La sincronizacion externa de capabilities debe venir por payload explicito desde una fuente canonica de empresa; no debe inferirse automaticamente desde `deals`.
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
+- `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
@@ -163,6 +206,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - ya existen en `/dashboard` secciones reusables de quality, account team, capacity inicial, herramientas tecnologicas y AI tools
 - esas secciones mezclan señal real de BigQuery, nombres detectados desde Notion, defaults por `serviceModules` y overrides controlados por tenant
 - sigue pendiente formalizar APIs y modelos fuente para que dejen de depender de fallback u overrides
+- la siguiente iteracion de UI debe dejar de tratar cada seccion como una card aislada y converger hacia familias reusables de hero, mini stat, chart, list y table cards
+- el switch de tema del shell Greenhouse ya esta operativo en navbar con soporte real para `light`, `dark` y `system`, incluyendo reaccion al cambio del tema del sistema mientras la sesion sigue abierta
 
 ## Deploy
 - Hosting principal: Vercel
@@ -257,6 +302,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Mantener la politica de finales de linea en `LF` y evitar depender de conversiones automaticas de Git en Windows.
 - En Windows local, `build` usa un `distDir` dinamico bajo `.next-local/` para evitar fallos `EPERM` al reutilizar la misma salida dentro de OneDrive.
 - Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
+- La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
+- Capability governance no debe derivarse desde `deals` ni `closedwon`; el sync externo solo es valido cuando llega con payload explicito desde el registro de empresa u otra fuente canonica equivalente.
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
@@ -266,6 +313,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Tenant metadata y user identity ya quedaron separados.
 - Falta definir la capa semantica de KPIs y capacidad.
 - Falta relacion campanas con proyectos, entregables e indicadores.
+- Falta aterrizar completamente el sistema ejecutivo reusable en runtime para que `/dashboard`, `/equipo`, `/campanas` e internal/admin compartan un mismo lenguaje visual.
+- Sigue pendiente decidir cuando persistir `public_id` en BigQuery; por ahora el runtime puede derivarlos sin romper `client_id` y `user_id`.
+- La nueva referencia para conectores externos es `GREENHOUSE_INTEGRATIONS_API_V1.md`; la API de integraciones debe mantenerse generica para HubSpot, Notion u otros sistemas.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

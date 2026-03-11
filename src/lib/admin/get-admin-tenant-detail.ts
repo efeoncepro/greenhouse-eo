@@ -1,9 +1,13 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getTenantCapabilityState } from '@/lib/admin/tenant-capabilities'
+import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
 
 export interface AdminTenantUserRow {
   userId: string
+  publicUserId: string
   fullName: string
   email: string
   status: string
@@ -31,6 +35,7 @@ export interface AdminTenantFeatureFlagRow {
 
 export interface AdminTenantDetail {
   clientId: string
+  publicId: string
   clientName: string
   status: string
   active: boolean
@@ -49,6 +54,7 @@ export interface AdminTenantDetail {
   invitedUsers: number
   businessLines: string[]
   serviceModules: string[]
+  capabilities: TenantCapabilityRecord[]
   featureFlags: AdminTenantFeatureFlagRow[]
   users: AdminTenantUserRow[]
   projects: AdminTenantProjectRow[]
@@ -91,7 +97,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
-  const [tenantRows, userRows, projectRows, featureFlagRows] = await Promise.all([
+  const [tenantRows, userRows, projectRows, featureFlagRows, capabilityState] = await Promise.all([
     bigQuery.query({
       query: `
         SELECT
@@ -230,7 +236,8 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
         ORDER BY feature_code
       `,
       params: { clientId }
-    })
+    }),
+    getTenantCapabilityState(clientId)
   ])
 
   const tenantRow = (tenantRows[0] as Array<Record<string, unknown>>)[0]
@@ -241,6 +248,10 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
 
   return {
     clientId: String(tenantRow.client_id || ''),
+    publicId: buildTenantPublicId({
+      clientId: String(tenantRow.client_id || ''),
+      hubspotCompanyId: tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null
+    }),
     clientName: String(tenantRow.client_name || ''),
     status: String(tenantRow.status || ''),
     active: Boolean(tenantRow.active),
@@ -259,6 +270,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     invitedUsers: toNumber(tenantRow.invited_users),
     businessLines: normalizeStringArray(tenantRow.business_lines),
     serviceModules: normalizeStringArray(tenantRow.service_modules),
+    capabilities: capabilityState.capabilities,
     featureFlags: (featureFlagRows[0] as Array<Record<string, unknown>>).map(row => ({
       featureCode: String(row.feature_code || ''),
       status: String(row.status || ''),
@@ -267,6 +279,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     })),
     users: (userRows[0] as Array<Record<string, unknown>>).map(row => ({
       userId: String(row.user_id || ''),
+      publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
       fullName: String(row.full_name || ''),
       email: String(row.email || ''),
       status: String(row.status || ''),

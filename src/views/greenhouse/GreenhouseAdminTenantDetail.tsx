@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
@@ -19,6 +21,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
+import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import TenantCapabilityManager from '@views/greenhouse/admin/tenants/TenantCapabilityManager'
 
 type Props = {
   data: AdminTenantDetail
@@ -39,81 +43,190 @@ const flagTone = (status: string) => {
   return 'default'
 }
 
+const getDisplayNote = (notes: string | null, hubspotCompanyId: string | null) => {
+  if (!notes) {
+    return hubspotCompanyId ? 'Space importado desde CRM. Revisar contacto principal y capabilities activas.' : null
+  }
+
+  if (/closedwon/i.test(notes) || /Bootstrap client imported/i.test(notes)) {
+    return hubspotCompanyId ? 'Space importado desde CRM. Revisar contacto principal y capabilities activas.' : notes
+  }
+
+  return notes
+}
+
 const GreenhouseAdminTenantDetail = ({ data }: Props) => {
+  const [capabilities, setCapabilities] = useState<TenantCapabilityRecord[]>(data.capabilities)
+  const businessLines = capabilities.filter(item => item.moduleKind === 'business_line' && item.selected)
+  const serviceModules = capabilities.filter(item => item.moduleKind === 'service_module' && item.selected)
+  const displayNote = getDisplayNote(data.notes, data.hubspotCompanyId)
+
   return (
     <Grid container spacing={6}>
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardContent>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 4,
+                alignItems: 'start',
+                gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.35fr) minmax(0, 0.95fr)' }
+              }}
+            >
+              <Stack spacing={2.5}>
+                <Box>
+                  <Typography variant='overline' sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.08em' }}>
+                    Tenant admin
+                  </Typography>
+                  <Typography variant='h4' sx={{ mt: 0.5 }}>
+                    {data.clientName}
+                  </Typography>
+                  <Typography variant='body1' color='text.secondary' sx={{ mt: 1.25, maxWidth: 760 }}>
+                    Administra acceso, alcance y capabilities visibles del space desde una sola vista.
+                  </Typography>
+                </Box>
+
+                <Stack direction='row' gap={1} flexWrap='wrap'>
+                  <Chip size='small' variant='tonal' color='secondary' label={data.publicId} />
+                  <Chip size='small' variant='tonal' color={data.active ? 'success' : 'default'} label={data.status} />
+                  <Chip size='small' variant='outlined' label={data.authMode} />
+                  {data.hubspotCompanyId ? <Chip size='small' variant='outlined' label={`CRM ${data.hubspotCompanyId}`} /> : null}
+                </Stack>
+
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' }
+                  }}
+                >
+                  {[
+                    ['Contacto principal', data.primaryContactEmail || 'Sin contacto principal'],
+                    ['Portal home', data.portalHomePath || '--'],
+                    ['Timezone', data.timezone || '--'],
+                    ['Ultimo acceso', formatDateTime(data.lastLoginAt)]
+                  ].map(([label, value]) => (
+                    <Box key={label}>
+                      <Typography variant='body2' color='text.secondary'>
+                        {label}
+                      </Typography>
+                      <Typography color='text.primary'>{value}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Stack>
+
+              <Stack spacing={2.5}>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, minmax(0, 1fr))', xl: 'repeat(2, minmax(0, 1fr))' }
+                  }}
+                >
+                  {[
+                    ['Usuarios activos', data.activeUsers],
+                    ['Proyectos scoped', data.scopedProjects],
+                    ['Business lines', businessLines.length],
+                    ['Service modules', serviceModules.length]
+                  ].map(([label, value]) => (
+                    <Box
+                      key={label}
+                      sx={{
+                        p: 2.5,
+                        borderRadius: 3,
+                        border: theme => `1px solid ${theme.palette.divider}`,
+                        backgroundColor: theme => theme.palette.background.default
+                      }}
+                    >
+                      <Typography variant='body2' color='text.secondary'>
+                        {label}
+                      </Typography>
+                      <Typography variant='h4' sx={{ mt: 1 }}>
+                        {value}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: theme => `1px solid ${theme.palette.divider}`
+                  }}
+                >
+                  <Stack direction={{ xs: 'column', sm: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', sm: 'center' }}>
+                    <Box>
+                      <Typography variant='subtitle1'>Revision del tenant</Typography>
+                      <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
+                        Usa la vista real del cliente para validar contenido, permisos y jerarquia visual.
+                      </Typography>
+                    </Box>
+                    <Button component={Link} href={`/admin/tenants/${data.clientId}/view-as/dashboard`} variant='contained'>
+                      Ver como cliente
+                    </Button>
+                  </Stack>
+                </Box>
+              </Stack>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <TenantCapabilityManager
+          clientId={data.clientId}
+          hubspotCompanyId={data.hubspotCompanyId}
+          initialCapabilities={data.capabilities}
+          onCapabilitiesChange={setCapabilities}
+        />
+      </Grid>
+
       <Grid size={{ xs: 12, lg: 4 }}>
         <Grid container spacing={6}>
           <Grid size={{ xs: 12 }}>
             <Card>
               <CardContent>
-                <Stack spacing={3}>
-                  <Box>
-                    <Typography variant='h5'>{data.clientName}</Typography>
-                    <Typography color='text.secondary'>{data.primaryContactEmail || 'Sin contacto principal'}</Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      {data.hubspotCompanyId ? `HubSpot ${data.hubspotCompanyId}` : 'Tenant sin compania HubSpot asociada'}
-                    </Typography>
-                  </Box>
-                  <Stack direction='row' gap={1} flexWrap='wrap'>
-                    <Chip size='small' variant='tonal' color={data.active ? 'success' : 'default'} label={data.status} />
-                    <Chip size='small' variant='outlined' label={data.authMode} />
-                  </Stack>
-                  <Button component={Link} href={`/admin/tenants/${data.clientId}/view-as/dashboard`} variant='contained'>
-                    Ver como cliente
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid size={{ xs: 12 }}>
-            <Card>
-              <CardContent>
                 <Stack spacing={2.5}>
-                  <Typography variant='h6'>Tenant profile</Typography>
+                  <Typography variant='h6'>Identidad del space</Typography>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
-                      Client ID
+                      Space ID
                     </Typography>
-                    <Typography>{data.clientId}</Typography>
+                    <Typography color='text.primary'>{data.publicId}</Typography>
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
-                      Portal home
+                      Internal key
                     </Typography>
-                    <Typography>{data.portalHomePath || '--'}</Typography>
+                    <Typography color='text.primary'>{data.clientId}</Typography>
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
-                      Timezone
+                      Registro CRM
                     </Typography>
-                    <Typography>{data.timezone || '--'}</Typography>
+                    <Typography color='text.primary'>{data.hubspotCompanyId || 'Sin company mapping'}</Typography>
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
                       Creado
                     </Typography>
-                    <Typography>{formatDateTime(data.createdAt)}</Typography>
+                    <Typography color='text.primary'>{formatDateTime(data.createdAt)}</Typography>
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
                       Ultima actualizacion
                     </Typography>
-                    <Typography>{formatDateTime(data.updatedAt)}</Typography>
+                    <Typography color='text.primary'>{formatDateTime(data.updatedAt)}</Typography>
                   </Box>
-                  <Box>
-                    <Typography variant='body2' color='text.secondary'>
-                      Ultimo login del tenant
-                    </Typography>
-                    <Typography>{formatDateTime(data.lastLoginAt)}</Typography>
-                  </Box>
-                  {data.notes ? (
+                  {displayNote ? (
                     <Box>
                       <Typography variant='body2' color='text.secondary'>
-                        Notes
+                        Nota operativa
                       </Typography>
-                      <Typography>{data.notes}</Typography>
+                      <Typography color='text.primary'>{displayNote}</Typography>
                     </Box>
                   ) : null}
                 </Stack>
@@ -129,7 +242,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Access posture</Typography>
+                  <Typography variant='h6'>Estado de acceso</Typography>
                   <Box
                     sx={{
                       display: 'grid',
@@ -160,16 +273,16 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Commercial and rollout context</Typography>
+                  <Typography variant='h6'>Configuracion comercial</Typography>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
                       Business lines
                     </Typography>
                     <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
-                      {data.businessLines.map(moduleCode => (
-                        <Chip key={moduleCode} size='small' color='info' variant='outlined' label={moduleCode} />
+                      {businessLines.map(capability => (
+                        <Chip key={capability.moduleCode} size='small' color='info' variant='outlined' label={capability.moduleLabel} />
                       ))}
-                      {data.businessLines.length === 0 ? <Typography color='text.secondary'>Sin business lines.</Typography> : null}
+                      {businessLines.length === 0 ? <Typography color='text.secondary'>Sin business lines.</Typography> : null}
                     </Stack>
                   </Box>
                   <Divider />
@@ -178,10 +291,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       Service modules
                     </Typography>
                     <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
-                      {data.serviceModules.map(moduleCode => (
-                        <Chip key={moduleCode} size='small' variant='outlined' label={moduleCode} />
+                      {serviceModules.map(capability => (
+                        <Chip key={capability.moduleCode} size='small' variant='outlined' label={capability.moduleLabel} />
                       ))}
-                      {data.serviceModules.length === 0 ? <Typography color='text.secondary'>Sin service modules.</Typography> : null}
+                      {serviceModules.length === 0 ? <Typography color='text.secondary'>Sin service modules.</Typography> : null}
                     </Stack>
                   </Box>
                   <Divider />
@@ -205,7 +318,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Users in tenant</Typography>
+                  <Typography variant='h6'>Usuarios del space</Typography>
                   <TableContainer>
                     <Table>
                       <TableHead>
@@ -226,7 +339,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                   {user.fullName}
                                 </Typography>
                                 <Typography variant='body2' color='text.secondary'>
-                                  {user.email}
+                                  {user.publicUserId} | {user.email}
                                 </Typography>
                               </Stack>
                             </TableCell>
@@ -245,7 +358,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                             </TableCell>
                             <TableCell>
                               <Typography variant='body2'>
-                                {user.projectScopeCount} proyectos · {user.routeGroups.join(', ') || 'sin route groups'}
+                                {user.projectScopeCount} proyectos | {user.routeGroups.join(', ') || 'sin route groups'}
                               </Typography>
                             </TableCell>
                             <TableCell>
@@ -265,7 +378,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Project visibility</Typography>
+                  <Typography variant='h6'>Visibilidad de proyectos</Typography>
                   <Box sx={{ display: 'grid', gap: 2 }}>
                     {data.projects.map(project => (
                       <Box
@@ -295,7 +408,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       </Box>
                     ))}
                     {data.projects.length === 0 ? (
-                      <Typography color='text.secondary'>Este tenant aun no tiene proyectos visibles en scope.</Typography>
+                      <Typography color='text.secondary'>Este space aun no tiene proyectos visibles en scope.</Typography>
                     ) : null}
                   </Box>
                 </Stack>

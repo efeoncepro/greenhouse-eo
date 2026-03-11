@@ -44,6 +44,8 @@ Residual follow-up:
 
 Pending tasks:
 - review and promote the executive dashboard through `Preview`, `staging`, and `Production`
+- refactor `/dashboard` to the reusable `Executive UI System`
+- create reusable executive card families in `src/components/greenhouse/*`
 - create `/api/dashboard/capacity`
 - create `/api/dashboard/market-speed`
 - add campaign-aware dashboard slices once `/campanas` exists
@@ -109,9 +111,9 @@ Pending tasks:
 
 ## Recommended Near-Term Order
 
-1. Approve `SKY_TENANT_EXECUTIVE_SLICE_V1.md` and lock the KPI definitions it depends on
-2. Implement the safe first Sky slice on `/dashboard`
-3. Build `/admin/scopes` and `/admin/feature-flags`
-4. Build `/api/sprints` and the real `/sprints`
-5. Start team/capacity once assignment source of truth is clear
-6. Harden dashboard payload reuse and tenant-safe cache strategy
+1. Refactor `/dashboard` into the reusable `Executive UI System` documented in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+2. Build `/admin/scopes` and `/admin/feature-flags`
+3. Build `/api/sprints` and the real `/sprints`
+4. Start team/capacity once assignment source of truth is clear
+5. Harden dashboard payload reuse and tenant-safe cache strategy
+6. Extend the same executive card language to future `/equipo`, `/campanas`, and internal views

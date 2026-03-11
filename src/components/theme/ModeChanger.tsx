@@ -27,8 +27,7 @@ const ModeChanger = ({ systemMode }: { systemMode: SystemMode }) => {
         setMode(settings.mode)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.mode])
+  }, [isDark, setMode, settings.mode])
 
   return null
 }

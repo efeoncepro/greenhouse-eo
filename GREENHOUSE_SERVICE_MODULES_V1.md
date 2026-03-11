@@ -243,6 +243,114 @@ Admin detail and future billing views should surface:
 - latest source deal
 - invoice relevance by module
 
+## Admin Governance Model
+
+### Tenant capability governance
+
+The current structure is already enough to support editable tenant capabilities without adding a new table.
+
+Use:
+- `greenhouse.service_modules` as the canonical catalog
+- `greenhouse.client_service_modules` as the assignment registry
+
+Interpretation:
+- `business_line` and `service_module` records together form the capability catalog
+- the tenant admin screen can present that catalog as editable capabilities
+- a manual admin save writes controlled assignments into `client_service_modules`
+
+### Source precedence
+
+Recommended precedence:
+1. `greenhouse_admin`
+2. external sync source such as `hubspot_crm`
+3. bootstrap state
+
+Operational rule:
+- when admin manually fixes a capability, that row becomes controlled
+- later external syncs must not overwrite controlled rows automatically
+
+This allows:
+- safe manual correction for bad commercial source data
+- repeatable auto-sync from HubSpot or another provider
+- explicit provenance on each assignment row
+
+### Manual assignment convention
+
+When admin saves capabilities from `/admin/tenants/[id]`, write rows with:
+- `source_system = greenhouse_admin`
+- `source_object_type = admin_user`
+- `source_object_id = <actor user id>`
+- `confidence = controlled`
+- `derived_from_latest_closedwon = false`
+
+If admin removes a capability that was previously active:
+- keep the row
+- set `active = false`
+- keep `greenhouse_admin` as the controlling source
+
+That negative override is what prevents the next external sync from reactivating the module blindly.
+
+## API Structure
+
+### Read current capability state
+
+`GET /api/admin/tenants/[id]/capabilities`
+
+Returns:
+- active `businessLines`
+- active `serviceModules`
+- full capability catalog with selection state and provenance
+
+### Save manual admin selection
+
+`PUT /api/admin/tenants/[id]/capabilities`
+
+Request body:
+
+```json
+{
+  "businessLines": ["crm_solutions"],
+  "serviceModules": ["licenciamiento_hubspot", "implementacion_onboarding"]
+}
+```
+
+Behavior:
+- validates requested codes against `greenhouse.service_modules`
+- writes controlled rows into `greenhouse.client_service_modules`
+- can activate or deactivate capabilities from admin
+
+### Sync from an external source
+
+`POST /api/admin/tenants/[id]/capabilities/sync`
+
+Generic payload shape:
+
+```json
+{
+  "sourceSystem": "hubspot_crm",
+  "sourceObjectType": "company",
+  "sourceObjectId": "30825221458",
+  "sourceClosedwonDealId": "123456789",
+  "confidence": "high",
+  "businessLines": ["globe"],
+  "serviceModules": ["agencia_creativa"]
+}
+```
+
+If `sourceSystem = hubspot_crm` and no arrays are sent:
+- derive capabilities from current `closedwon` deals using the tenant `hubspot_company_id`
+
+Behavior:
+- upserts externally-sourced assignments
+- preserves rows already controlled by `greenhouse_admin`
+- deactivates stale external rows no longer present in the incoming source payload
+
+This route is intentionally provider-agnostic so the same contract can be used by:
+- HubSpot readers
+- future billing systems
+- CRM sync jobs
+- manual operational scripts
+
 ## Phase Placement
 
 ### Phase 0
@@ -266,3 +374,4 @@ Admin detail and future billing views should surface:
 4. expose `serviceModules` in tenant context
 5. use them in navigation and dashboard composition
 6. surface them in admin and billing
+7. add editable admin governance and source-sync APIs

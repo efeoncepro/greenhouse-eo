@@ -12,6 +12,7 @@ import Paper from '@mui/material/Paper'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MenuList from '@mui/material/MenuList'
 import MenuItem from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
 
 // Type Imports
 import type { Mode } from '@core/types'
@@ -57,16 +58,28 @@ const ModeDropdown = () => {
     }
   }
 
+  const modeOptions: Array<{ value: Mode; label: string; icon: string }> = [
+    { value: 'light', label: 'Claro', icon: 'tabler-sun' },
+    { value: 'dark', label: 'Oscuro', icon: 'tabler-moon-stars' },
+    { value: 'system', label: 'Sistema', icon: 'tabler-device-laptop' }
+  ]
+
   return (
     <>
       <Tooltip
-        title={settings.mode + ' Mode'}
+        title={`Tema: ${modeOptions.find(option => option.value === settings.mode)?.label || 'Sistema'}`}
         onOpen={() => setTooltipOpen(true)}
         onClose={() => setTooltipOpen(false)}
         open={open ? false : tooltipOpen ? true : false}
-        slotProps={{ popper: { className: 'capitalize' } }}
       >
-        <IconButton ref={anchorRef} onClick={handleToggle} className='text-textPrimary'>
+        <IconButton
+          ref={anchorRef}
+          onClick={handleToggle}
+          className='text-textPrimary'
+          aria-label='Cambiar tema'
+          aria-haspopup='menu'
+          aria-expanded={open}
+        >
           <i className={getModeIcon()} />
         </IconButton>
       </Tooltip>
@@ -74,42 +87,29 @@ const ModeDropdown = () => {
         open={open}
         transition
         disablePortal
-        placement='bottom-start'
+        placement='bottom-end'
         anchorEl={anchorRef.current}
         className='min-is-[160px] !mbs-3 z-[1]'
       >
         {({ TransitionProps, placement }) => (
           <Fade
             {...TransitionProps}
-            style={{ transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top' }}
+            style={{ transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top' }}
           >
             <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList onKeyDown={handleClose}>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('light')}
-                    selected={settings.mode === 'light'}
-                  >
-                    <i className='tabler-sun' />
-                    Light
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('dark')}
-                    selected={settings.mode === 'dark'}
-                  >
-                    <i className='tabler-moon-stars' />
-                    Dark
-                  </MenuItem>
-                  <MenuItem
-                    className='gap-3'
-                    onClick={() => handleModeSwitch('system')}
-                    selected={settings.mode === 'system'}
-                  >
-                    <i className='tabler-device-laptop' />
-                    System
-                  </MenuItem>
+                  {modeOptions.map(option => (
+                    <MenuItem
+                      key={option.value}
+                      className='gap-3 rounded-lg m-1'
+                      onClick={() => handleModeSwitch(option.value)}
+                      selected={settings.mode === option.value}
+                    >
+                      <i className={option.icon} />
+                      <Typography color='text.primary'>{option.label}</Typography>
+                    </MenuItem>
+                  ))}
                 </MenuList>
               </ClickAwayListener>
             </Paper>

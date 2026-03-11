@@ -84,6 +84,17 @@ async function generateIconsCSS() {
       'bi-airplane-engines',
       'ri-anchor-line',
       'uit-adobe-alt',
+      'logos:figma',
+      'logos:framer',
+      'logos:github-icon',
+      'logos:github-copilot',
+      'logos:google-gemini',
+      'logos:hubspot',
+      'logos:looker-icon',
+      'logos:miro-icon',
+      'logos:notion-icon',
+      'logos:openai-icon',
+      'logos:vercel-icon',
 
       // 'fa6-regular-comment',
       'twemoji-auto-rickshaw'

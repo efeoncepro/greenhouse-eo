@@ -1,6 +1,7 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 type SectionHeadingProps = {
@@ -11,8 +12,12 @@ type SectionHeadingProps = {
 const SectionHeading = ({ title, description }: SectionHeadingProps) => {
   return (
     <Box>
+      <Stack spacing={0.75}>
       <Typography variant='h5'>{title}</Typography>
-      <Typography color='text.secondary'>{description}</Typography>
+      <Typography variant='body2' color='text.secondary'>
+        {description}
+      </Typography>
+      </Stack>
     </Box>
   )
 }

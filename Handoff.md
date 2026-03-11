@@ -40,10 +40,174 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 06:31 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Simplificar el hero del dashboard para corregir la desalineacion del top fold.
+- Mantener la card de `Capacity` como version principal y dejar lista una variante compacta reusable.
+- Subir el nivel de UX writing y accesibilidad en hero y capacity.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
+- `src/components/greenhouse/ExecutiveHeroCard.tsx`
+- `src/components/greenhouse/ExecutiveMiniStatCard.tsx`
+- `src/components/greenhouse/CapacityOverviewCard.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/dashboard/AccountTeamSection.tsx`
+- `src/views/greenhouse/dashboard/config.ts`
+- `src/views/greenhouse/dashboard/orchestrator.ts`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Validacion visual local:
+  - login admin correcto en `http://localhost:3100/login`
+  - `view-as` correcto en `http://localhost:3100/admin/tenants/space-efeonce/view-as/dashboard`
+  - captura Playwright confirmo hero mas compacto y top stats derechas sin elongacion artificial
+- Skill usado para criterio de seleccion UI/UX:
+  - `greenhouse-vuexy-portal`
+  - referencia aplicada: `references/ui-ux-vuexy.md`
+
+### Riesgos o pendientes
+- La variante `compact` de `CapacityOverviewCard` quedo lista en el componente pero no se consume todavia en otra superficie real.
+- La validacion visual se hizo sobre `view-as` del tenant benchmark `space-efeonce`; faltaria repetirla en `Preview` Vercel si este cambio se promueve fuera de local.
+- Se creo `.env.local` ignorado por Git para autenticar la sesion local de validacion; no forma parte del cambio versionado.
+
+### Proximo paso recomendado
+- Hacer push y revisar el deployment de `develop` o del preview correspondiente con `vercel-ops` si se quiere repetir la comprobacion visual fuera de local.
+
+### Fecha
 - 2026-03-10 America/Santiago
 
 ### Agente
 - Codex
+
+### Objetivo del turno
+- Crear el benchmark interno `space-efeonce`, llevar el dashboard a `snapshot mode` para historicos cortos y empezar a migrar el labeling visible de `tenant` a `space`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `bigquery/greenhouse_efeonce_space_v1.sql`
+- `src/lib/dashboard/tenant-dashboard-overrides.ts`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/dashboard/*`
+- `src/components/greenhouse/*`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Smoke BigQuery:
+- `space-efeonce` creado en `greenhouse.clients`
+- `space-efeonce` con `57` proyectos base
+- `space-efeonce` con `958` tareas intersectando el scope
+- `space-efeonce` con business lines `crm_solutions`, `globe`, `wave`
+- `space-efeonce` con service modules `agencia_creativa`, `consultoria_crm`, `desarrollo_web`, `implementacion_onboarding`, `licenciamiento_hubspot`
+
+### Riesgos o pendientes
+- `space-efeonce` es metadata-only por ahora: no tiene `client_users` propios y debe consumirse via `Ver como cliente` desde admin.
+- El lookup de auth no debe duplicarse con el mismo email interno en `tenant_type = client`; eso introduciria ambiguedad en login.
+- El siguiente paso de producto es validar el dashboard de `space-efeonce` y, en base a esa lectura, decidir si se divide en una vista general y vistas anidadas de performance / delivery / quality.
+- La deuda UX mas importante que ya se ataco es `capacity`; la siguiente si hiciera falta seria dividir el dashboard rico en tabs o vistas anidadas para bajar longitud total.
+- Documento de referencia para esta iteracion: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
+## 2026-03-10 - Executive UI system documentation baseline
+
+### Objetivo del turno
+- Documentar el sistema visual ejecutivo reusable que debe guiar la siguiente iteracion del dashboard y futuras superficies Greenhouse.
+- Alinear la documentacion viva para que el rediseño no derive en cards ad hoc ni en copias directas de Vuexy.
+
+### Cambios aplicados
+- Se agrego `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` como contrato de:
+  - jerarquia visual
+  - familias de cards ejecutivas
+  - reglas de composicion
+  - limites de reutilizacion de Vuexy
+- Se alinearon `README.md`, `GREENHOUSE_ARCHITECTURE_V1.md`, `BACKLOG.md`, `PHASE_TASK_MATRIX.md` y `project_context.md` para que el siguiente paso prioritario sea migrar `/dashboard` a ese sistema reusable.
+
+### Verificacion
+- Revision manual de consistencia documental sobre:
+  - arquitectura
+  - backlog
+  - matriz de fases
+  - contexto operativo
+  - referencias Vuexy
+
+### Riesgos o pendientes
+- Todavia no hay cambio runtime en este bloque; solo base documental.
+- El siguiente paso correcto es commit documental y luego implementacion del refactor visual reusable en `/dashboard`.
+
+## 2026-03-10 - Executive dashboard orchestration and Vuexy-aligned refactor
+
+### Objetivo del turno
+- Rehacer `/dashboard` con jerarquia mas cercana a Vuexy analytics sin copiar su branding ni su data demo.
+- Introducir una capa escalable de orquestacion para decidir que bloques ejecutivos mostrar y en que orden.
+
+### Cambios aplicados
+- Se agregaron componentes reusables en `src/components/greenhouse/*`:
+  - `ExecutiveCardShell`
+  - `ExecutiveHeroCard`
+  - `ExecutiveMiniStatCard`
+- Se adaptaron al dashboard patrones fuertes de Vuexy:
+  - hero tipo `WebsiteAnalyticsSlider`
+  - card analitica tipo `EarningReports`
+  - card de salud tipo `SupportTracker`
+  - tabla compacta tipo `ProjectsTable`
+- Se agrego `src/views/greenhouse/dashboard/orchestrator.ts` como registro deterministico de bloques ejecutivos.
+- `GreenhouseDashboard.tsx` ya no arma el layout a mano; ahora consume ese orquestador y compone hero, top stats, analisis y contexto sobre los mismos datos reales.
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+
+### Riesgos o pendientes
+- El dashboard ya tiene una capa de composicion reusable, pero aun no existe una extension equivalente para `/equipo`, `/campanas` o vistas internas.
+- Falta validacion visual manual en `dev-greenhouse.efeoncepro.com` y luego en produccion.
+- `AttentionProjectCard.tsx` quedo desplazado por la nueva tabla compacta y podria eliminarse en una limpieza posterior si ya no vuelve a usarse.
+- El skill local `greenhouse-vuexy-portal` fue reforzado con una guia de seleccion de componentes Vuexy/MUI para futuras decisiones UI/UX; usarlo como criterio antes de crear widgets nuevos.
+
+## 2026-03-10 - Logo libraries and compact documentation model
+
+### Objetivo del turno
+- Dejar documentado el stack real de logos y marcas para UI Greenhouse.
+- Reducir friccion documental con una regla canonica de documentacion liviana.
+
+### Cambios aplicados
+- Se instalaron `simple-icons` y `@iconify-json/logos` en `starter-kit` para reutilizar logos de tecnologia y AI sin descargar assets manuales.
+- Se documento que el stack activo de charts sigue siendo `apexcharts` + `react-apexcharts`, mientras `recharts` y `keen-slider` siguen como referencia en `full-version`.
+- Se agrego `DOCUMENTATION_OPERATING_MODEL_V1.md` para fijar una politica de documentacion compacta basada en una fuente canonica y deltas cortos.
+
+### Verificacion
+- `pnpm add simple-icons`
+- `pnpm add -D @iconify-json/logos`
+- `postinstall` regenero `src/assets/iconify-icons/generated-icons.css`
+
+### Riesgos o pendientes
+- Aun no existe un componente reusable `BrandLogo` para explotar `simple-icons` y `@iconify-json/logos` desde runtime.
+- `recharts` y `keen-slider` aun no fueron activados en `starter-kit`; siguen en evaluacion como siguiente paso visual.
 
 ## 2026-03-10 - Sky reusable dashboard capabilities
 
@@ -1235,3 +1399,108 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Referencia operativa
 - `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
+
+### Delta 2026-03-10 Navbar Theme
+- `ModeDropdown` quedo alineado con Greenhouse:
+  - labels en espanol
+  - popper anclado al grupo derecho del navbar
+  - trigger accesible
+- En layout vertical, el switch de tema ya no vive junto al toggle de navegacion; ahora comparte el grupo derecho con `UserDropdown`.
+- `ModeChanger` ahora reacciona tambien a cambios en `prefers-color-scheme` mientras la app sigue abierta, por lo que `Sistema` ya no queda congelado hasta recargar.
+- Validado con `npx pnpm lint` y `npx pnpm build`.
+
+### Delta 2026-03-10
+- Se agrego `src/components/greenhouse/BrandLogo.tsx` como primitive reusable para logos de herramientas y marcas.
+- `src/assets/iconify-icons/bundle-icons-css.ts` ahora bundlea marcas curadas para Figma, GitHub, Copilot, Gemini, HubSpot, Looker, Miro, Notion, OpenAI y Vercel.
+- `ToolingSection` ya consume `BrandLogo` y aplica fallback deterministico:
+  - logo del bundle local
+  - icono brand de Tabler
+  - monograma
+- `npx pnpm build:icons` y `npx pnpm lint` pasaron.
+- `npx pnpm build` completo runtime correctamente; el wrapper local solo expiro por timeout despues del resumen final de rutas.
+
+### Delta 2026-03-10 UI Library Parity
+- Se instalo en `starter-kit` la paridad de librerias UI de `full-version` para evitar nuevas instalaciones reactivas por modulo.
+- Quedaron disponibles para uso inmediato:
+  - `recharts`, `keen-slider`
+  - `@fullcalendar/*`, `react-datepicker`, `date-fns`
+  - `@tanstack/react-table`, `@tanstack/match-sorter-utils`
+  - `react-hook-form`, `@hookform/resolvers`, `valibot`, `input-otp`
+  - `@tiptap/*`, `cmdk`
+  - `react-dropzone`, `react-toastify`, `emoji-mart`, `@emoji-mart/*`
+- `react-player`, `mapbox-gl`, `react-map-gl`
+- `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`
+- `npx pnpm lint` y `npx pnpm build` pasaron despues de instalar el stack.
+- Warning conocido: `pnpm` reporta peer warnings de `@tiptap/*`, pero el build actual del portal sigue sano.
+
+### Delta 2026-03-11 Capability Governance
+- Se documento `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` como metodologia reutilizable para validacion visual real de dashboards y vistas admin.
+- La iniciativa de `service modules` ya no queda solo en documentacion: ahora `greenhouse.service_modules` funciona como catalogo canonico de capabilities y `greenhouse.client_service_modules` como registro de asignacion por tenant.
+- `/admin/tenants/[id]` ahora expone `Capability governance` para asignar manualmente business lines y service modules desde admin.
+- Se agregaron rutas API para gobernanza y sincronizacion externa:
+  - `GET /api/admin/tenants/[id]/capabilities`
+  - `PUT /api/admin/tenants/[id]/capabilities`
+  - `POST /api/admin/tenants/[id]/capabilities/sync`
+- La estructura de sincronizacion ya soporta HubSpot u otra fuente porque separa:
+  - `sourceSystem`
+  - `sourceObjectType`
+  - `sourceObjectId`
+  - `sourceClosedwonDealId`
+  - `confidence`
+  - payload de `businessLines` y `serviceModules`
+- Cuando `sourceSystem = hubspot_crm` y no llega payload explicito, la API deriva capabilities desde deals `closedwon` usando `hubspot_company_id`.
+- Se fijo precedencia operativa:
+  - `greenhouse_admin` controla manualmente y no se sobreescribe por sync externo
+  - la fuente externa sincroniza el resto de assignments
+- Validado con `npx pnpm lint` y `npx pnpm build`.
+
+### Delta 2026-03-11 Public ID Strategy
+- Se agrego `GREENHOUSE_ID_STRATEGY_V1.md` como contrato para separar `internal keys` de `public IDs`.
+- Regla actual:
+  - tenant con HubSpot: `EO-<hubspot_company_id>`
+  - tenant manual: `EO-SPACE-<slug>`
+  - user importado: `EO-USR-<hubspot_contact_id>`
+  - user manual/interno: `EO-USR-<suffix estable>`
+  - business line: `EO-BL-<module_code>`
+  - service module: `EO-SVC-<module_code>`
+- Se agrego `src/lib/ids/greenhouse-ids.ts` como helper compartido para derivar IDs visibles sin romper joins ni rutas actuales.
+- Admin tenant detail, admin user detail, tenant preview y capability governance ya consumen IDs publicos derivados.
+- Se versiono `bigquery/greenhouse_public_ids_v1.sql` como migracion opcional para persistir `public_id` en tablas clave sin reemplazar los ids internos.
+
+### Delta 2026-03-11 Capability Governance UX + source model correction
+- `/admin/tenants/[id]` ya no deja `Capability governance` comprimido en la columna izquierda.
+  - El resumen del tenant pasa primero.
+  - El editor de capabilities ahora ocupa ancho completo.
+  - La copy se acorto y se alineo al lenguaje operativo del producto.
+- Se removio la derivacion automatica de capabilities desde `deals closedwon`.
+- `POST /api/admin/tenants/[id]/capabilities/sync` ahora exige `businessLines` o `serviceModules` explicitos.
+- La regla vigente queda asi:
+  - admin puede fijar manualmente el estado operativo del tenant
+  - una integracion externa puede sincronizar capabilities si lee el objeto empresa o una fuente canonica equivalente y envia payload explicito
+  - Greenhouse no interpreta `deals` como historial de servicio del cliente
+- Queda deuda de datos:
+  - el dataset replicado actual no expone aun propiedades company-level como `linea_de_servicio` o `servicios_especificos` en `hubspot_crm.companies` ni en `hubspot_crm.companies_history`
+  - por eso el sync externo queda soportado a nivel API, pero no debe autoderivarse desde BigQuery hasta tener esas propiedades disponibles correctamente
+
+### Delta 2026-03-11 Generic Integrations API
+- Se agrego `GREENHOUSE_INTEGRATIONS_API_V1.md` como contrato de integracion bidireccional desde Greenhouse.
+- La nueva superficie no depende de sesiones admin ni de NextAuth.
+  - Usa `GREENHOUSE_INTEGRATION_API_TOKEN`.
+  - Acepta `Authorization: Bearer <token>` o `x-greenhouse-integration-key`.
+- Rutas nuevas:
+  - `GET /api/integrations/v1/catalog/capabilities`
+  - `GET /api/integrations/v1/tenants`
+  - `POST /api/integrations/v1/tenants/capabilities/sync`
+- La API es generica para HubSpot, Notion u otros conectores.
+- El contrato de seleccion/resolucion de tenant usa:
+  - `clientId`
+  - `publicId`
+  - `sourceSystem`
+  - `sourceObjectType`
+  - `sourceObjectId`
+- Resolucion implementada hoy:
+  - `hubspot_crm` + `company` + `hubspot_company_id`
+- La idea operativa es:
+  - los conectores leen el catalogo canonico de capabilities desde Greenhouse
+  - empujan contextos normalizados al tenant correcto
+  - y tambien pueden leer snapshots de tenants para sincronizacion saliente o reconciliacion

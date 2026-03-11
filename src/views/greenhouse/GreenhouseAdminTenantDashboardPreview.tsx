@@ -10,6 +10,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 
@@ -20,6 +21,8 @@ type Props = {
 }
 
 const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: Props) => {
+  const publicTenantId = buildTenantPublicId({ clientId })
+
   return (
     <Stack spacing={6}>
       <Card>
@@ -34,20 +37,20 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
               <Box>
                 <Typography variant='h5'>Ver como cliente</Typography>
                 <Typography color='text.secondary'>
-                  Estás viendo el dashboard cliente de {clientName} desde tu sesión de administrador.
+                  Estas viendo el dashboard del space cliente {clientName} desde tu sesion de administrador.
                 </Typography>
               </Box>
               <Stack direction='row' gap={1.5} flexWrap='wrap'>
                 <Chip variant='outlined' label={clientName} />
-                <Chip color='info' variant='tonal' label={clientId} />
+                <Chip color='info' variant='tonal' label={publicTenantId} />
               </Stack>
             </Stack>
             <Stack direction='row' gap={2} flexWrap='wrap'>
               <Button component={Link} variant='outlined' href={`/admin/tenants/${clientId}`}>
-                Volver al tenant
+                Volver al space
               </Button>
               <Button component={Link} variant='contained' href='/admin/tenants'>
-                Ir a tenants
+                Ir a spaces
               </Button>
             </Stack>
           </Stack>
