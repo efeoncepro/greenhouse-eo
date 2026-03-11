@@ -3,11 +3,13 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
@@ -27,6 +29,15 @@ import TenantCapabilityManager from '@views/greenhouse/admin/tenants/TenantCapab
 
 type Props = {
   data: AdminTenantDetail
+}
+
+type TenantContactProvisioningSummary = {
+  requested: number
+  created: number
+  reconciled: number
+  conflicts: number
+  invalid: number
+  errors: number
 }
 
 const formatDateTime = (value: string | null) => {
@@ -56,8 +67,42 @@ const getDisplayNote = (notes: string | null, hubspotCompanyId: string | null) =
   return notes
 }
 
+const buildProvisionFeedback = (summary: TenantContactProvisioningSummary) => {
+  const fragments = [
+    `${summary.created} creados`,
+    `${summary.reconciled} reconciliados`,
+    `${summary.conflicts} conflictos`,
+    `${summary.invalid} invalidos`,
+    `${summary.errors} errores`
+  ]
+
+  const message = `Provision CRM ejecutado sobre ${summary.requested} contactos: ${fragments.join(' · ')}.`
+
+  if (summary.errors > 0) {
+    return { tone: 'error' as const, message }
+  }
+
+  if (summary.conflicts > 0 || summary.invalid > 0) {
+    return { tone: 'warning' as const, message }
+  }
+
+  if (summary.created > 0 || summary.reconciled > 0) {
+    return { tone: 'success' as const, message }
+  }
+
+  return { tone: 'info' as const, message }
+}
+
 const GreenhouseAdminTenantDetail = ({ data }: Props) => {
+  const router = useRouter()
   const [capabilities, setCapabilities] = useState<TenantCapabilityRecord[]>(data.capabilities)
+  const [isProvisioningContacts, setIsProvisioningContacts] = useState(false)
+
+  const [provisionFeedback, setProvisionFeedback] = useState<{
+    tone: 'success' | 'info' | 'warning' | 'error'
+    message: string
+  } | null>(null)
+
   const businessLines = capabilities.filter(item => item.moduleKind === 'business_line' && item.selected)
   const serviceModules = capabilities.filter(item => item.moduleKind === 'service_module' && item.selected)
   const displayNote = getDisplayNote(data.notes, data.hubspotCompanyId)
@@ -79,6 +124,52 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
     return Boolean(email && !tenantUserEmails.has(email))
   })
+
+  const contactsWithoutEmail = liveContacts.filter(contact => !contact.email?.trim())
+
+  const handleProvisionMissingContacts = async () => {
+    if (missingLiveContacts.length === 0) {
+      return
+    }
+
+    setProvisionFeedback(null)
+    setIsProvisioningContacts(true)
+
+    try {
+      const response = await fetch(`/api/admin/tenants/${data.clientId}/contacts/provision`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contactIds: missingLiveContacts.map(contact => contact.hubspotContactId)
+        })
+      })
+
+      const payload = (await response.json().catch(() => null)) as
+        | (TenantContactProvisioningSummary & { error?: string })
+        | null
+
+      if (!response.ok || !payload) {
+        setProvisionFeedback({
+          tone: 'error',
+          message: payload?.error || 'No pudimos provisionar los contactos CRM del space.'
+        })
+
+        return
+      }
+
+      setProvisionFeedback(buildProvisionFeedback(payload))
+      router.refresh()
+    } catch (error) {
+      setProvisionFeedback({
+        tone: 'error',
+        message: error instanceof Error ? error.message : 'Unknown provisioning error.'
+      })
+    } finally {
+      setIsProvisioningContacts(false)
+    }
+  }
 
   return (
     <Grid container spacing={6}>
@@ -447,12 +538,41 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         contactos ya existen como usuarios del space y cuales faltan por provisionar.
                       </Typography>
                     </Box>
-                    <Stack direction='row' gap={1} flexWrap='wrap'>
-                      <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} en HubSpot`} />
-                      <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} en Greenhouse`} />
-                      <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} pendientes`} />
+                    <Stack direction={{ xs: 'column', sm: 'row' }} gap={1} flexWrap='wrap' alignItems={{ xs: 'stretch', sm: 'center' }}>
+                      <Stack direction='row' gap={1} flexWrap='wrap'>
+                        <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} en HubSpot`} />
+                        <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} en Greenhouse`} />
+                        <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} pendientes`} />
+                        {contactsWithoutEmail.length > 0 ? (
+                          <Chip size='small' variant='outlined' color='default' label={`${contactsWithoutEmail.length} sin email`} />
+                        ) : null}
+                      </Stack>
+                      <Button
+                        variant='contained'
+                        color='warning'
+                        disabled={
+                          isProvisioningContacts ||
+                          missingLiveContacts.length === 0 ||
+                          !data.liveHubspot.serviceConfigured ||
+                          Boolean(data.liveHubspot.error)
+                        }
+                        onClick={handleProvisionMissingContacts}
+                        startIcon={isProvisioningContacts ? <CircularProgress color='inherit' size={16} /> : null}
+                      >
+                        {isProvisioningContacts
+                          ? 'Provisionando...'
+                          : `Provisionar ${missingLiveContacts.length || ''}`.trim()}
+                      </Button>
                     </Stack>
                   </Stack>
+
+                  <Alert severity='info'>
+                    Provisionar crea o reconcilia usuarios `invited` con rol `client_executive` y garantiza los scopes
+                    base del space. Si un contacto ya existia por email dentro del mismo tenant, Greenhouse repara su
+                    acceso en vez de dejarlo como falso positivo.
+                  </Alert>
+
+                  {provisionFeedback ? <Alert severity={provisionFeedback.tone}>{provisionFeedback.message}</Alert> : null}
 
                   <TableContainer>
                     <Table>
@@ -468,6 +588,8 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         {liveContacts.map(contact => {
                           const normalizedEmail = contact.email?.trim().toLowerCase() || null
                           const isProvisioned = Boolean(normalizedEmail && tenantUserEmails.has(normalizedEmail))
+                          const provisionTone = isProvisioned ? 'success' : normalizedEmail ? 'warning' : 'default'
+                          const provisionLabel = isProvisioned ? 'Ya existe' : normalizedEmail ? 'Falta provisionar' : 'Sin email'
 
                           return (
                             <TableRow key={contact.hubspotContactId} hover>
@@ -494,8 +616,8 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                 <Chip
                                   size='small'
                                   variant='tonal'
-                                  color={isProvisioned ? 'success' : 'warning'}
-                                  label={isProvisioned ? 'Ya existe' : 'Falta provisionar'}
+                                  color={provisionTone}
+                                  label={provisionLabel}
                                 />
                               </TableCell>
                             </TableRow>

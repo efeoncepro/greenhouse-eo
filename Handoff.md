@@ -40,6 +40,44 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 19:10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar el slice de provisioning de contactos HubSpot en admin para que no quede como spike backend inseguro.
+- Hacer que el provisioning sea rerunnable y repare estados incompletos en vez de devolver falsos `already_exists`.
+
+### Rama
+- Rama usada: `reconcile/hubspot-live-plus-local-wip-20260311-1733`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / pre-merge
+
+### Archivos tocados
+- `src/lib/admin/tenant-member-provisioning.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- El endpoint nuevo `POST /api/admin/tenants/[id]/contacts/provision` queda compilando y versionado dentro del build local.
+
+### Riesgos o pendientes
+- El provisioning ya reintenta mejor porque vuelve a asegurar rol y scopes sobre usuarios existentes del mismo tenant, pero sigue dependiendo de varias `MERGE` separadas en BigQuery; no hay transaccion multi-tabla.
+- Falta smoke autenticado/visual de `/admin/tenants/[id]` para confirmar la UX del boton `Provisionar` con una sesion admin real y un tenant con contactos pendientes.
+- Falta decidir si este flujo se quedara manual desde admin o si despues se automatizara desde webhook/relay.
+
+### Proximo paso recomendado
+- Entrar con sesion admin real a `/admin/tenants/hubspot-company-30825221458` u otro tenant con gap CRM/Greenhouse y correr una provision real o dry validation operativa.
+- Si el flujo se comporta bien, promover `reconcile/hubspot-live-plus-local-wip-20260311-1733` a `develop` en lugar de dejar el provisioning solo como rama de rescate.
+
+### Fecha
 - 2026-03-11 18:05 America/Santiago
 
 ### Agente
