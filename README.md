@@ -381,8 +381,8 @@ Service modules:
 - Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
 - Para CRM live, Greenhouse ya puede consultar el servicio dedicado `hubspot-greenhouse-integration` y leer `company profile` y `owner` bajo demanda.
 - Regla de latencia actual:
-- `company profile` y `owner` pueden reflejar cambios de HubSpot con baja latencia en cuanto Greenhouse vuelve a consultar.
-- `capabilities` siguen dependiendo de sync explicito hasta que exista una capa event-driven.
+- `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia en cuanto Greenhouse vuelve a consultar el servicio dedicado.
+- `capabilities` ya no dependen solo de sync explicito: `linea_de_servicio` y `servicios_especificos` hoy se propagan desde HubSpot a Greenhouse por webhook relay a traves de `hubspot-greenhouse-integration`.
 
 Regla de componentes Greenhouse:
 - `src/components/greenhouse/*` es la capa compartida de UI del producto.

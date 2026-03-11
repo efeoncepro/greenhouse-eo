@@ -10,9 +10,10 @@
 - Se agrego `src/lib/integrations/hubspot-greenhouse-service.ts` como cliente server-side para el servicio dedicado `hubspot-greenhouse-integration`.
 - `/admin/tenants/[id]` ahora muestra contexto CRM live desde HubSpot para `company profile` y `owner`, con `fetch` `no-store` y timeout defensivo.
 - `/admin/tenants/[id]` ahora tambien consume `GET /companies/{hubspotCompanyId}/contacts` para mostrar los contactos CRM asociados al space y compararlos con los usuarios ya provisionados en Greenhouse.
-- El modelo de latencia quedo documentado: `company` y `owner` pueden reflejar cambios de HubSpot con baja latencia al consultar bajo demanda; `capabilities` siguen siendo sync-based hasta incorporar eventos o webhooks.
+- El modelo de latencia quedo corregido en la documentacion viva: `company`, `owner` y `contacts` se leen live bajo demanda, y las `capabilities` de empresa (`linea_de_servicio`, `servicios_especificos`) ya llegan por webhook relay desde HubSpot.
 - Se agrego `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` a `.env.example` y a la documentacion viva como override del endpoint de Cloud Run.
 - Se agrego `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md` como contrato canonico entre `greenhouse-eo` y los repos conectores, y `/developers/api` ahora lo publica en `/docs/greenhouse-cross-repo-contract-v1.md`.
+- Se dejo explicitado en `Handoff.md` que el deploy documental de esta rama feature a `Production` fue una excepcion controlada y no reemplaza el promotion flow normal.
 
 ### Dashboard
 - El hero ejecutivo del dashboard se simplifico para bajar densidad arriba del fold: menos copy, dos highlights clave, summary rectangular y badges condensados.

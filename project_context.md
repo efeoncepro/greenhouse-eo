@@ -207,7 +207,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - ownership por repo y promotion flow esperado
 - Regla de latencia actual:
   - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
-  - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
+  - `capabilities` de empresa (`linea_de_servicio`, `servicios_especificos`) ya pueden llegar con baja latencia porque el conector activo hace relay por webhook desde HubSpot hacia Greenhouse
+  - fuera de esas capabilities, el resto del CRM live sigue siendo on-demand a traves de la facade dedicada
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.

@@ -52,6 +52,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Rama
 - Rama usada: `feature/hubspot-live-cross-repo-contract`
 - Rama objetivo del merge: `develop`
+- Excepcion operativa: este estado se desplego a `Production` por necesidad documental y contractual, sin pasar primero por `develop`
 
 ### Ambiente objetivo
 - Production
@@ -94,6 +95,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
 - Falta validar visualmente la tabla de contactos CRM y su comparacion con usuarios provisionados en `/admin/tenants/[id]`.
 - Falta decidir si el siguiente paso solo sera lectura live o provisionamiento automatico hacia `greenhouse.client_users`.
+- El promotion flow esperado sigue siendo `feature -> develop -> main`; este deploy directo desde rama feature a `Production` fue una excepcion controlada y no debe repetirse como costumbre.
 
 ### Proximo paso recomendado
 - Revisar con sesion admin real `/admin/tenants/hubspot-company-30825221458` y confirmar que los contactos CRM se muestran correctamente con el estado `Ya existe` o `Falta provisionar`.
@@ -146,7 +148,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - no se hizo verificacion visual/autenticada de `/admin/tenants/[id]` en Production porque faltaba una sesion admin automatizada para ese turno
 
 ### Riesgos o pendientes
-- La lectura live de `company` y `owner` reduce latencia porque consulta HubSpot bajo demanda, pero `capabilities` siguen siendo sync-based.
+- La lectura live de `company` y `owner` reduce latencia porque consulta HubSpot bajo demanda, y las `capabilities` de empresa ya pueden entrar por webhook relay; aun falta validar visualmente la superficie final con sesion admin.
 - El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
 - Falta una validacion visual/autenticada de la card live dentro de `/admin/tenants/[id]`.
 
