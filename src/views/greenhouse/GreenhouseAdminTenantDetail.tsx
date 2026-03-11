@@ -63,8 +63,22 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const displayNote = getDisplayNote(data.notes, data.hubspotCompanyId)
   const liveCompany = data.liveHubspot.company
   const liveOwner = data.liveHubspot.owner
+  const liveContacts = data.liveHubspot.contacts
   const liveMode = data.liveHubspot.contract?.realtime.mode || 'polling_or_on_demand'
   const liveIsRealtime = data.liveHubspot.contract?.realtime.supported === true
+  const tenantUserEmails = new Set(data.users.map(user => user.email.trim().toLowerCase()))
+
+  const provisionedLiveContacts = liveContacts.filter(contact => {
+    const email = contact.email?.trim().toLowerCase()
+
+    return Boolean(email && tenantUserEmails.has(email))
+  })
+
+  const missingLiveContacts = liveContacts.filter(contact => {
+    const email = contact.email?.trim().toLowerCase()
+
+    return Boolean(email && !tenantUserEmails.has(email))
+  })
 
   return (
     <Grid container spacing={6}>
@@ -321,6 +335,17 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
+                      Contactos asociados en HubSpot
+                    </Typography>
+                    <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
+                      <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} contactos`} />
+                      <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} ya existen`} />
+                      <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} por provisionar`} />
+                    </Stack>
+                  </Box>
+
+                  <Box>
+                    <Typography variant='body2' color='text.secondary'>
                       Ultima lectura
                     </Typography>
                     <Typography color='text.primary'>{formatDateTime(data.liveHubspot.fetchedAt)}</Typography>
@@ -405,6 +430,84 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       {data.featureFlags.length === 0 ? <Typography color='text.secondary'>Sin feature flags activos.</Typography> : null}
                     </Stack>
                   </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <Card>
+              <CardContent>
+                <Stack spacing={3}>
+                  <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'center' }}>
+                    <Box>
+                      <Typography variant='h6'>Contactos CRM del space</Typography>
+                      <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
+                        Greenhouse ya puede leer los contactos asociados a la empresa en HubSpot. Esta tabla muestra que
+                        contactos ya existen como usuarios del space y cuales faltan por provisionar.
+                      </Typography>
+                    </Box>
+                    <Stack direction='row' gap={1} flexWrap='wrap'>
+                      <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} en HubSpot`} />
+                      <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} en Greenhouse`} />
+                      <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} pendientes`} />
+                    </Stack>
+                  </Stack>
+
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Contacto</TableCell>
+                          <TableCell>Cargo</TableCell>
+                          <TableCell>Ciclo</TableCell>
+                          <TableCell>Provision</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {liveContacts.map(contact => {
+                          const normalizedEmail = contact.email?.trim().toLowerCase() || null
+                          const isProvisioned = Boolean(normalizedEmail && tenantUserEmails.has(normalizedEmail))
+
+                          return (
+                            <TableRow key={contact.hubspotContactId} hover>
+                              <TableCell>
+                                <Stack spacing={0.75}>
+                                  <Typography color='text.primary' className='font-medium'>
+                                    {contact.displayName || contact.email || `Contacto ${contact.hubspotContactId}`}
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    {contact.hubspotContactId} | {contact.email || 'Sin email'}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant='body2'>{contact.jobTitle || 'Sin cargo'}</Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant='body2'>
+                                  {contact.lifecyclestage || '--'}
+                                  {contact.hsLeadStatus ? ` | ${contact.hsLeadStatus}` : ''}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  size='small'
+                                  variant='tonal'
+                                  color={isProvisioned ? 'success' : 'warning'}
+                                  label={isProvisioned ? 'Ya existe' : 'Falta provisionar'}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  {liveContacts.length === 0 ? (
+                    <Typography color='text.secondary'>No hay contactos asociados en HubSpot para este space.</Typography>
+                  ) : null}
                 </Stack>
               </CardContent>
             </Card>

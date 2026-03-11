@@ -239,6 +239,12 @@ Estado actual en Vercel:
 - `GCP_PROJECT` existe en `Development`, `staging` y `Production`
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` existen y deben configurarse tambien en `Preview` cuando una branch necesite login real
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio live de HubSpot; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback
+- el servicio live de HubSpot ahora expone:
+  - `GET /contract`
+  - `GET /companies/{hubspotCompanyId}`
+  - `GET /companies/{hubspotCompanyId}/owner`
+  - `GET /companies/{hubspotCompanyId}/contacts`
+- `/admin/tenants/[id]` ya consume esos endpoints para mostrar `company`, `owner` y los contactos CRM asociados al space, incluyendo una comparacion rapida contra los usuarios ya provisionados en Greenhouse
 
 Notas:
 - `next.config.ts` usa `BASEPATH` como `basePath`.

@@ -60,6 +60,26 @@ export interface HubSpotGreenhouseCompanyOwnerResponse {
   detail?: string
 }
 
+export interface HubSpotGreenhouseContactProfile {
+  hubspotContactId: string
+  email: string | null
+  firstName: string | null
+  lastName: string | null
+  displayName: string | null
+  phone: string | null
+  mobilePhone: string | null
+  jobTitle: string | null
+  lifecyclestage: string | null
+  hsLeadStatus: string | null
+  company: string | null
+}
+
+export interface HubSpotGreenhouseCompanyContactsResponse {
+  hubspotCompanyId: string
+  count: number
+  contacts: HubSpotGreenhouseContactProfile[]
+}
+
 export interface HubSpotGreenhouseLiveContext {
   serviceConfigured: boolean
   serviceBaseUrl: string | null
@@ -67,6 +87,7 @@ export interface HubSpotGreenhouseLiveContext {
   contract: HubSpotGreenhouseServiceContract | null
   company: HubSpotGreenhouseCompanyProfile | null
   owner: HubSpotGreenhouseOwnerProfile | null
+  contacts: HubSpotGreenhouseContactProfile[]
   error: string | null
 }
 
@@ -130,20 +151,23 @@ export const getHubSpotGreenhouseLiveContext = async (
       contract: null,
       company: null,
       owner: null,
+      contacts: [],
       error: null
     }
   }
 
-  const [contractResult, companyResult, ownerResult] = await Promise.allSettled([
+  const [contractResult, companyResult, ownerResult, contactsResult] = await Promise.allSettled([
     fetchJson<HubSpotGreenhouseServiceContract>('/contract'),
     fetchJson<HubSpotGreenhouseCompanyProfile>(`/companies/${hubspotCompanyId}`),
-    fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
+    fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`),
+    fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
   ])
 
   const company = companyResult.status === 'fulfilled' ? companyResult.value : null
   const owner = ownerResult.status === 'fulfilled' ? ownerResult.value.owner : null
+  const contacts = contactsResult.status === 'fulfilled' ? contactsResult.value.contacts : []
 
-  const errors = [contractResult, companyResult, ownerResult]
+  const errors = [contractResult, companyResult, ownerResult, contactsResult]
     .filter(result => result.status === 'rejected')
     .map(result => toErrorMessage((result as PromiseRejectedResult).reason))
 
@@ -154,6 +178,7 @@ export const getHubSpotGreenhouseLiveContext = async (
     contract: contractResult.status === 'fulfilled' ? contractResult.value : null,
     company,
     owner,
+    contacts,
     error: errors.length > 0 ? errors.join(' | ') : null
   }
 }

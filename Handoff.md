@@ -40,6 +40,55 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 18:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Extender Greenhouse para consumir los contactos asociados a la company desde `hubspot-greenhouse-integration` y mostrar el gap entre contactos CRM y usuarios ya provisionados del space.
+
+### Rama
+- Rama usada: `main`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Production
+
+### Archivos tocados
+- `GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `Handoff.md`
+- `src/lib/integrations/hubspot-greenhouse-service.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `vercel --prod --yes`: correcto
+  - deployment productivo final: `https://greenhouse-9ivzit0uv-efeonce-7670142f.vercel.app`
+  - aliases verificados por `vercel inspect`:
+    - `https://greenhouse-eo.vercel.app`
+    - `https://greenhouse.efeoncepro.com`
+- Validacion operativa del servicio live de HubSpot:
+  - `GET /contract`: `200`
+  - `GET /companies/30825221458/contacts`: `200`
+  - respuesta valida con `16` contactos asociados para `Sky Airline`
+- Limite de smoke:
+  - aun no se ha hecho verificacion visual/autenticada de `/admin/tenants/[id]` en Production para este bloque nuevo de contactos
+
+### Riesgos o pendientes
+- El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
+- Falta validar visualmente la tabla de contactos CRM y su comparacion con usuarios provisionados en `/admin/tenants/[id]`.
+- Falta decidir si el siguiente paso solo sera lectura live o provisionamiento automatico hacia `greenhouse.client_users`.
+
+### Proximo paso recomendado
+- Revisar con sesion admin real `/admin/tenants/hubspot-company-30825221458` y confirmar que los contactos CRM se muestran correctamente con el estado `Ya existe` o `Falta provisionar`.
+- Si el resultado convence, el siguiente paso ya no es solo lectura: decidir si Greenhouse va a provisionar automaticamente esos contactos hacia `greenhouse.client_users`.
+
+### Fecha
 - 2026-03-11 16:45 America/Santiago
 
 ### Agente
