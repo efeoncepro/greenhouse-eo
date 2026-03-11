@@ -199,8 +199,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - `/admin/tenants/[id]` ahora tambien consulta un servicio HubSpot dedicado para leer `company profile` y `owner` bajo demanda, sin esperar a BigQuery.
+- `/admin/tenants/[id]` ahora tambien consulta los `contacts` asociados a la `company` en HubSpot para comparar miembros CRM contra los usuarios ya provisionados en Greenhouse.
 - Regla de latencia actual:
-  - `company profile` y `owner` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
+  - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
   - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.

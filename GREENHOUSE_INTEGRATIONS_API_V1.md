@@ -176,6 +176,7 @@ Implemented now:
   - `GET /contract`
   - `GET /companies/{hubspotCompanyId}`
   - `GET /companies/{hubspotCompanyId}/owner`
+  - `GET /companies/{hubspotCompanyId}/contacts`
 
 Not implemented yet:
 - tenant creation via integration API
@@ -187,6 +188,6 @@ Those can be layered later without replacing the contract above.
 
 ## Latency Model
 
-- `company profile` and `owner` can be read from the dedicated HubSpot facade with low latency because Greenhouse queries the current HubSpot state on demand.
+- `company profile`, `owner`, and associated `contacts` can be read from the dedicated HubSpot facade with low latency because Greenhouse queries the current HubSpot state on demand.
 - `capabilities` are still sync-based. They become visible in Greenhouse when an external connector pushes them or when Greenhouse polls a connector result.
 - Full near-real-time bidirectionality still requires an event-driven layer such as HubSpot webhooks or a high-frequency reconciler.
