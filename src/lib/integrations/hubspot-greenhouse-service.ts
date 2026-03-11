@@ -148,6 +148,7 @@ export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string)
 
 export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
+
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null
 ): Promise<HubSpotGreenhouseLiveContext> => {
@@ -172,6 +173,7 @@ export const getHubSpotGreenhouseLiveContext = async (
     getHubSpotGreenhouseCompanyOwner(hubspotCompanyId),
     getHubSpotGreenhouseCompanyContacts(hubspotCompanyId)
   ])
+
   const errors = [contractResult, companyResult, ownerResult, contactsResult]
     .filter(result => result.status === 'rejected')
     .map(result => toErrorMessage((result as PromiseRejectedResult).reason))

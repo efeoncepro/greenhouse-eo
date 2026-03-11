@@ -448,16 +448,19 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
   }
 
   const liveContactsResponse = await getHubSpotGreenhouseCompanyContacts(tenant.hubspotCompanyId)
+
   const selectedContacts = normalizedContactIds.map(contactId =>
     liveContactsResponse.contacts.find(contact => contact.hubspotContactId === contactId)
   )
 
   const validSelectedContacts = selectedContacts.filter(Boolean) as HubSpotGreenhouseContactProfile[]
+
   const missingSelections = normalizedContactIds.filter(
     contactId => !validSelectedContacts.some(contact => contact.hubspotContactId === contactId)
   )
 
   const candidateUserIds = validSelectedContacts.map(contact => `user-hubspot-contact-${contact.hubspotContactId}`)
+
   const candidateEmails = validSelectedContacts
     .map(contact => normalizeEmail(contact.email))
     .filter((value): value is string => Boolean(value))
