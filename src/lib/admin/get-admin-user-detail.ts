@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
 
 export interface AdminUserProjectScope {
   projectId: string
@@ -16,6 +17,7 @@ export interface AdminUserCampaignScope {
 
 export interface AdminUserDetail {
   userId: string
+  publicUserId: string
   fullName: string
   email: string
   jobTitle: string | null
@@ -33,6 +35,7 @@ export interface AdminUserDetail {
   updatedAt: string | null
   client: {
     clientId: string
+    publicId: string | null
     clientName: string
     primaryContactEmail: string | null
     hubspotCompanyId: string | null
@@ -170,6 +173,7 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
 
   return {
     userId: String(row.user_id || ''),
+    publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
     fullName: String(row.full_name || 'Sin nombre'),
     email: String(row.email || ''),
     jobTitle: row.job_title ? String(row.job_title) : null,
@@ -187,6 +191,12 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
     updatedAt: toIsoString(row.updated_at),
     client: {
       clientId: String(row.client_id || ''),
+      publicId: row.client_id
+        ? buildTenantPublicId({
+            clientId: String(row.client_id || ''),
+            hubspotCompanyId: row.hubspot_company_id ? String(row.hubspot_company_id) : null
+          })
+        : null,
       clientName: String(row.client_name || row.client_id || ''),
       primaryContactEmail: row.primary_contact_email ? String(row.primary_contact_email) : null,
       hubspotCompanyId: row.hubspot_company_id ? String(row.hubspot_company_id) : null,

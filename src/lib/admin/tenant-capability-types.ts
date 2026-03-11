@@ -2,6 +2,7 @@ export type CapabilityKind = 'business_line' | 'service_module'
 
 export interface TenantCapabilityRecord {
   moduleCode: string
+  publicModuleId: string
   moduleLabel: string
   moduleKind: CapabilityKind
   parentModuleCode: string | null

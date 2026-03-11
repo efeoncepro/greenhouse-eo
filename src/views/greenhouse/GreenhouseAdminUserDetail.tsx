@@ -66,6 +66,7 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                       </Box>
                     </div>
                     <div className='flex items-center gap-2 flex-wrap justify-center'>
+                      <Chip size='small' variant='outlined' label={data.publicUserId} />
                       <Chip size='small' variant='tonal' color={tenantTone(data.tenantType)} label={toTitleCase(data.tenantType)} />
                       <Chip size='small' variant='tonal' color={statusTone(data.status)} label={toTitleCase(data.status)} />
                       <Chip size='small' variant='outlined' label={toTitleCase(data.authMode)} />
@@ -103,6 +104,12 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                   <Typography variant='h5'>Details</Typography>
                   <Divider className='mlb-4' />
                   <div className='flex flex-col gap-2'>
+                    <div className='flex items-center flex-wrap gap-x-1.5'>
+                      <Typography className='font-medium' color='text.primary'>
+                        Collaborator ID:
+                      </Typography>
+                      <Typography>{data.publicUserId}</Typography>
+                    </div>
                     <div className='flex items-center flex-wrap gap-x-1.5'>
                       <Typography className='font-medium' color='text.primary'>
                         Username:
@@ -371,7 +378,13 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                             </Box>
                             <Box>
                               <Typography variant='body2' color='text.secondary'>
-                                Client ID
+                                Space ID
+                              </Typography>
+                              <Typography>{data.client.publicId || data.client.clientId}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant='body2' color='text.secondary'>
+                                Internal key
                               </Typography>
                               <Typography>{data.client.clientId}</Typography>
                             </Box>

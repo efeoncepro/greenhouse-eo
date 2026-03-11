@@ -3,9 +3,11 @@ import 'server-only'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { getTenantCapabilityState } from '@/lib/admin/tenant-capabilities'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
 
 export interface AdminTenantUserRow {
   userId: string
+  publicUserId: string
   fullName: string
   email: string
   status: string
@@ -33,6 +35,7 @@ export interface AdminTenantFeatureFlagRow {
 
 export interface AdminTenantDetail {
   clientId: string
+  publicId: string
   clientName: string
   status: string
   active: boolean
@@ -245,6 +248,10 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
 
   return {
     clientId: String(tenantRow.client_id || ''),
+    publicId: buildTenantPublicId({
+      clientId: String(tenantRow.client_id || ''),
+      hubspotCompanyId: tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null
+    }),
     clientName: String(tenantRow.client_name || ''),
     status: String(tenantRow.status || ''),
     active: Boolean(tenantRow.active),
@@ -272,6 +279,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     })),
     users: (userRows[0] as Array<Record<string, unknown>>).map(row => ({
       userId: String(row.user_id || ''),
+      publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
       fullName: String(row.full_name || ''),
       email: String(row.email || ''),
       status: String(row.status || ''),

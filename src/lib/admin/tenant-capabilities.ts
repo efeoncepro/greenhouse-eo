@@ -2,6 +2,7 @@ import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import type { CapabilityKind, TenantCapabilityRecord, TenantCapabilityState } from '@/lib/admin/tenant-capability-types'
+import { buildModulePublicId } from '@/lib/ids/greenhouse-ids'
 
 type UpsertAssignmentInput = {
   clientId: string
@@ -28,13 +29,6 @@ type CapabilitySyncInput = {
   derivedFromLatestClosedwon?: boolean
 }
 
-type HubSpotCapabilityDerivation = {
-  hubspotCompanyId: string
-  latestDealId: string | null
-  businessLines: string[]
-  serviceModules: string[]
-}
-
 const toIsoString = (value: unknown) => {
   if (!value) return null
   if (typeof value === 'string') return value
@@ -48,36 +42,9 @@ const toIsoString = (value: unknown) => {
   return null
 }
 
-const normalizeStringArray = (value: unknown) => {
-  if (!Array.isArray(value)) return []
-
-  return value
-    .map(item => (typeof item === 'string' ? item.trim() : ''))
-    .filter(Boolean)
-}
-
 const unique = (values: string[]) => Array.from(new Set(values.map(value => value.trim()).filter(Boolean)))
 
 const buildAssignmentId = (clientId: string, moduleCode: string) => `client-service-module-${clientId}-${moduleCode}`
-
-const getTenantHubSpotCompanyId = async (clientId: string) => {
-  const projectId = getBigQueryProjectId()
-  const bigQuery = getBigQueryClient()
-
-  const [rows] = await bigQuery.query({
-    query: `
-      SELECT hubspot_company_id
-      FROM \`${projectId}.greenhouse.clients\`
-      WHERE client_id = @clientId
-      LIMIT 1
-    `,
-    params: { clientId }
-  })
-
-  const row = (rows as Array<Record<string, unknown>>)[0]
-
-  return row?.hubspot_company_id ? String(row.hubspot_company_id) : null
-}
 
 export const getTenantCapabilityState = async (clientId: string): Promise<TenantCapabilityState> => {
   const projectId = getBigQueryProjectId()
@@ -133,6 +100,10 @@ export const getTenantCapabilityState = async (clientId: string): Promise<Tenant
 
     return {
       moduleCode: String(row.module_code || ''),
+      publicModuleId: buildModulePublicId({
+        moduleCode: String(row.module_code || ''),
+        moduleKind
+      }),
       moduleLabel: String(row.module_label || row.module_code || ''),
       moduleKind,
       parentModuleCode: row.parent_module_code ? String(row.parent_module_code) : null,
@@ -300,49 +271,6 @@ export const setTenantCapabilitiesFromAdmin = async ({
   }
 
   return getTenantCapabilityState(clientId)
-}
-
-export const deriveHubSpotCapabilitiesForTenant = async (clientId: string): Promise<HubSpotCapabilityDerivation | null> => {
-  const projectId = getBigQueryProjectId()
-  const bigQuery = getBigQueryClient()
-  const hubspotCompanyId = await getTenantHubSpotCompanyId(clientId)
-
-  if (!hubspotCompanyId) {
-    return null
-  }
-
-  const [rows] = await bigQuery.query({
-    query: `
-      WITH closedwon_deals AS (
-        SELECT
-          CAST(deals.hs_object_id AS STRING) AS deal_id,
-          deals.closedate,
-          NULLIF(TRIM(deals.linea_de_servicio), '') AS business_line,
-          NULLIF(TRIM(service_module), '') AS service_module
-        FROM \`${projectId}.hubspot_crm.deals\` AS deals
-        LEFT JOIN UNNEST(SPLIT(COALESCE(deals.servicios_especificos, ''), ';')) AS service_module
-        WHERE LOWER(COALESCE(deals.dealstage, '')) = 'closedwon'
-          AND @hubspotCompanyId IN UNNEST(SPLIT(REPLACE(COALESCE(deals.assoc_companies, ''), ' ', ''), ','))
-      )
-      SELECT
-        ARRAY_AGG(DISTINCT business_line IGNORE NULLS ORDER BY business_line) AS business_lines,
-        ARRAY_AGG(DISTINCT service_module IGNORE NULLS ORDER BY service_module) AS service_modules,
-        ARRAY_AGG(deal_id IGNORE NULLS ORDER BY closedate DESC, deal_id DESC LIMIT 1)[OFFSET(0)] AS latest_deal_id
-      FROM closedwon_deals
-    `,
-    params: {
-      hubspotCompanyId
-    }
-  })
-
-  const row = (rows as Array<Record<string, unknown>>)[0]
-
-  return {
-    hubspotCompanyId,
-    latestDealId: row?.latest_deal_id ? String(row.latest_deal_id) : null,
-    businessLines: normalizeStringArray(row?.business_lines),
-    serviceModules: normalizeStringArray(row?.service_modules)
-  }
 }
 
 export const syncTenantCapabilitiesFromSource = async ({

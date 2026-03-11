@@ -10,6 +10,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 
@@ -20,6 +21,8 @@ type Props = {
 }
 
 const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: Props) => {
+  const publicTenantId = buildTenantPublicId({ clientId })
+
   return (
     <Stack spacing={6}>
       <Card>
@@ -39,7 +42,7 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
               </Box>
               <Stack direction='row' gap={1.5} flexWrap='wrap'>
                 <Chip variant='outlined' label={clientName} />
-                <Chip color='info' variant='tonal' label={clientId} />
+                <Chip color='info' variant='tonal' label={publicTenantId} />
               </Stack>
             </Stack>
             <Stack direction='row' gap={2} flexWrap='wrap'>

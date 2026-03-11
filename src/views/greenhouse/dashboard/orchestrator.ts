@@ -38,6 +38,25 @@ type ExecutiveBlockKey =
   | 'effortMix'
   | 'projects'
 
+const compactHeroCopyByTheme = {
+  creative: {
+    title: 'Throughput, revision y salud creativa en una lectura.',
+    description: 'La historia principal queda arriba del fold; el detalle operativo vive en cards de apoyo.'
+  },
+  crm: {
+    title: 'Activacion y estabilidad CRM en una lectura.',
+    description: 'La lectura principal queda arriba; el detalle CRM se reparte en cards accionables.'
+  },
+  web: {
+    title: 'Cadencia, bloqueos y carga activa en una lectura.',
+    description: 'El hero deja la historia corta arriba del fold y mueve el detalle a cards dedicadas.'
+  },
+  general: {
+    title: 'La operacion del cliente se entiende rapido.',
+    description: 'La lectura ejecutiva queda arriba y la evidencia operativa se distribuye en bloques faciles de escanear.'
+  }
+} as const
+
 export type ExecutiveDashboardLayout = {
   isSnapshotMode: boolean
   layoutMode: 'snapshot' | 'standard' | 'rich'
@@ -88,6 +107,7 @@ const formatSignedDelta = (current: number | null | undefined, previous: number 
 export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): ExecutiveDashboardLayout => {
   const dashboardTheme = resolveDashboardTheme(data)
   const themeCopy = buildThemeCopy(dashboardTheme)
+  const compactHeroCopy = compactHeroCopyByTheme[dashboardTheme]
   const moduleBadges = buildModuleBadges(data)
   const moduleFocusCards = buildModuleFocusCards(data, dashboardTheme)
   const syncedAtLabel = formatSyncedAt(data.scope.lastSyncedAt)
@@ -148,10 +168,10 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
     themeCopy,
     hero: {
       eyebrow: themeCopy.heroLabel,
-      title: themeCopy.heroTitle,
+      title: compactHeroCopy.title,
       description: isSnapshotMode
-        ? `${themeCopy.heroDescription} Snapshot mode activo con ${data.scope.projectCount} proyectos visibles. Sync: ${syncedAtLabel}.`
-        : `${themeCopy.heroDescription} Alcance visible: ${data.scope.projectCount} proyectos. Sync: ${syncedAtLabel}.`,
+        ? `${compactHeroCopy.description} Snapshot con ${data.scope.projectCount} proyectos visibles. Sync: ${syncedAtLabel}.`
+        : `${compactHeroCopy.description} ${data.scope.projectCount} proyectos visibles. Sync: ${syncedAtLabel}.`,
       highlights: [
         { label: 'Entregadas 30d', value: String(data.summary.completedLast30Days) },
         { label: 'Review abierta', value: String(data.summary.reviewPressureTasks) }
@@ -170,7 +190,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         tone: 'info',
         title: 'Tiempo compartido',
         value: formatRelationshipValue(data),
-        detail: formatRelationshipDetail(data),
+        detail: data.relationship.startedAt ? formatRelationshipDetail(data) : 'Sin primera actividad visible todavia.',
         icon: 'tabler-timeline'
       },
       {
@@ -179,7 +199,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         tone: data.summary.projectsAtRisk > 0 ? 'warning' : 'info',
         title: 'Carga activa del space',
         value: String(data.summary.activeWorkItems),
-        detail: `${data.summary.queuedWorkItems} items en cola y ${data.summary.projectsAtRisk} proyectos bajo observacion.`,
+        detail: `${data.summary.queuedWorkItems} en cola y ${data.summary.projectsAtRisk} proyectos bajo observacion.`,
         icon: 'tabler-briefcase'
       },
       {
@@ -194,7 +214,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         title: latestMonthlyDelivery ? latestMonthlyDelivery.label : 'Ultimo mes activo',
         value: latestMonthlyDelivery?.onTimePct !== null ? `${latestMonthlyDelivery?.onTimePct}%` : 'Sin dato',
         detail: latestMonthlyDelivery
-          ? `Serie agrupada por fecha de creacion sobre ${latestMonthlyDelivery.totalDeliverables} entregables visibles.`
+          ? `${latestMonthlyDelivery.totalDeliverables} entregables visibles en la serie actual.`
           : 'Todavia no hay meses con entregables visibles en el alcance actual.',
         delta: formatSignedDelta(latestMonthlyDelivery?.onTimePct, previousMonthlyDelivery?.onTimePct),
         miniChart: {

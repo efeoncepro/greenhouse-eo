@@ -69,8 +69,8 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
             xs: '1fr',
             xl:
               layout.layoutMode === 'rich'
-                ? 'minmax(0, 1.9fr) minmax(320px, 0.95fr)'
-                : 'minmax(0, 1.75fr) minmax(320px, 1fr)'
+                ? 'minmax(0, 2.05fr) minmax(300px, 0.9fr)'
+                : 'minmax(0, 1.9fr) minmax(300px, 0.95fr)'
           },
           alignItems: 'start'
         }}

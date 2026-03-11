@@ -211,35 +211,45 @@ const ExecutiveMiniStatCard = ({
   if (miniChart?.variant === 'split-bars' && chartOptions) {
     return (
       <Card sx={{ height: stretch ? '100%' : 'auto' }}>
-        <CardContent sx={{ p: 4, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+        <CardContent sx={{ p: 3.5, display: 'flex', justifyContent: 'space-between', gap: 2.5 }}>
           <Stack justifyContent='space-between' spacing={3} sx={{ minWidth: 0, flex: 1 }}>
-            <Stack spacing={1.25}>
-              <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Stack spacing={1}>
+              {eyebrow ? (
+                <Typography variant='overline' sx={{ color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}>
+                  {eyebrow}
+                </Typography>
+              ) : null}
+              <Stack direction='row' spacing={1.5} alignItems='flex-start'>
                 {icon ? (
                   <Box
                     sx={{
-                      width: 42,
-                      height: 42,
+                      width: 40,
+                      height: 40,
                       borderRadius: 2.5,
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       bgcolor: toneBackgroundColor,
-                      color: toneColor
+                      color: toneColor,
+                      flexShrink: 0
                     }}
                   >
                     <i className={icon} />
                   </Box>
                 ) : null}
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography variant='h6'>{title}</Typography>
+                  <Typography variant='h6' sx={{ color: 'text.primary', fontWeight: 700, lineHeight: 1.22 }}>
+                    {title}
+                  </Typography>
                   <Typography
-                    color='text.secondary'
+                    variant='body2'
                     sx={{
+                      color: 'text.secondary',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      lineHeight: 1.5
                     }}
                   >
                     {detail}
@@ -248,7 +258,9 @@ const ExecutiveMiniStatCard = ({
               </Stack>
             </Stack>
             <Stack spacing={1.5} alignItems='flex-start'>
-              <Typography variant='h3'>{value}</Typography>
+              <Typography variant='h3' sx={{ color: 'text.primary', fontWeight: 800, lineHeight: 1.05 }}>
+                {value}
+              </Typography>
               {delta ? <Chip variant='tonal' size='small' color={tone} label={delta} /> : null}
             </Stack>
           </Stack>
@@ -260,32 +272,41 @@ const ExecutiveMiniStatCard = ({
 
   return (
     <Card sx={{ height: stretch ? '100%' : 'auto' }}>
-      <CardContent sx={{ p: 3.5 }}>
-        <Stack spacing={3}>
-          <Stack spacing={0.75}>
+      <CardContent sx={{ p: 3.25 }}>
+        <Stack spacing={2.5}>
+          <Stack spacing={1}>
+            {eyebrow ? (
+              <Typography variant='overline' sx={{ color: 'text.secondary', fontWeight: 700, lineHeight: 1.2 }}>
+                {eyebrow}
+              </Typography>
+            ) : null}
             <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
               <Stack spacing={0.5}>
-                <Typography variant='h6'>{title}</Typography>
+                <Typography variant='h6' sx={{ color: 'text.primary', fontWeight: 700, lineHeight: 1.22 }}>
+                  {title}
+                </Typography>
                 <Typography
-                  color='text.secondary'
+                  variant='body2'
                   sx={{
+                    color: 'text.secondary',
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    minHeight: 42
+                    minHeight: 36,
+                    lineHeight: 1.5
                   }}
                 >
                   {detail}
                 </Typography>
               </Stack>
-              {eyebrow ? <Chip size='small' color={tone} variant='tonal' label={eyebrow} /> : null}
+              {delta ? <Chip size='small' color={tone} variant='tonal' label={delta} /> : null}
             </Stack>
             {icon && !miniChart ? (
               <Box
                 sx={{
-                  width: 44,
-                  height: 44,
+                  width: 42,
+                  height: 42,
                   borderRadius: 2.5,
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -301,17 +322,19 @@ const ExecutiveMiniStatCard = ({
           {miniChart && chartOptions ? (
             <AppReactApexCharts
               type={miniChart.variant === 'area' ? 'area' : 'bar'}
-              height={84}
+              height={78}
               width='100%'
               series={chartSeries}
               options={chartOptions}
             />
           ) : null}
-          <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
-            <Typography variant='h3'>{value}</Typography>
-            {delta ? (
-              <Typography variant='body2' color={`${tone}.main`}>
-                {delta}
+          <Stack direction='row' justifyContent='space-between' alignItems='flex-end' gap={2}>
+            <Typography variant='h3' sx={{ color: 'text.primary', fontWeight: 800, lineHeight: 1.04 }}>
+              {value}
+            </Typography>
+            {!delta && eyebrow ? (
+              <Typography variant='caption' sx={{ color: `${tone}.main`, fontWeight: 700 }}>
+                {eyebrow}
               </Typography>
             ) : null}
           </Stack>
@@ -326,10 +349,12 @@ const ExecutiveMiniStatCard = ({
                     backgroundColor: toneBackgroundColor
                   }}
                 >
-                  <Typography variant='caption' color='text.secondary'>
+                  <Typography variant='caption' sx={{ color: 'text.secondary', fontWeight: 600 }}>
                     {item.label}
                   </Typography>
-                  <Typography variant='h6'>{item.value}</Typography>
+                  <Typography variant='h6' sx={{ color: 'text.primary', fontWeight: 700 }}>
+                    {item.value}
+                  </Typography>
                 </Box>
               ))}
             </Box>

@@ -237,3 +237,23 @@
 - Quality checks:
   - `npx pnpm lint`
   - `npx pnpm build`
+
+### 2026-03-11 - Public identifier strategy
+- Added `GREENHOUSE_ID_STRATEGY_V1.md` to define the separation between internal keys and product-facing public IDs.
+- Added `src/lib/ids/greenhouse-ids.ts` with deterministic public ID builders for:
+  - tenants/spaces
+  - collaborators/users
+  - business lines
+  - service modules
+  - capability assignments
+  - role assignments
+  - feature flag assignments
+- Extended admin tenant and user data contracts so the UI can expose readable IDs without leaking raw `hubspot-company-*` or `user-hubspot-contact-*` prefixes.
+- Updated admin tenant detail, user detail, tenant preview, and capability governance UI to surface the new public IDs and service IDs.
+- Added `bigquery/greenhouse_public_ids_v1.sql` as the versioned migration to add and backfill nullable `public_id` columns in the core governance tables.
+
+### 2026-03-11 - Capability governance UX and source correction
+- Reworked `TenantCapabilityManager` so the governance surface is now a full-width admin section with compact summary tiles, shorter Spanish copy, stronger text hierarchy, and a manual-first interaction model.
+- Rebalanced `/admin/tenants/[id]` so tenant identity, validation CTA, and governance appear in a clearer order instead of pushing the editor into a narrow left rail.
+- Removed automatic capability derivation from HubSpot `closedwon` deals in `POST /api/admin/tenants/[id]/capabilities/sync`.
+- The sync route now requires explicit `businessLines` or `serviceModules` in the payload and treats the source as company-level or external metadata only.

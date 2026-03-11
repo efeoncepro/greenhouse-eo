@@ -1453,3 +1453,31 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - `greenhouse_admin` controla manualmente y no se sobreescribe por sync externo
   - la fuente externa sincroniza el resto de assignments
 - Validado con `npx pnpm lint` y `npx pnpm build`.
+
+### Delta 2026-03-11 Public ID Strategy
+- Se agrego `GREENHOUSE_ID_STRATEGY_V1.md` como contrato para separar `internal keys` de `public IDs`.
+- Regla actual:
+  - tenant con HubSpot: `EO-<hubspot_company_id>`
+  - tenant manual: `EO-SPACE-<slug>`
+  - user importado: `EO-USR-<hubspot_contact_id>`
+  - user manual/interno: `EO-USR-<suffix estable>`
+  - business line: `EO-BL-<module_code>`
+  - service module: `EO-SVC-<module_code>`
+- Se agrego `src/lib/ids/greenhouse-ids.ts` como helper compartido para derivar IDs visibles sin romper joins ni rutas actuales.
+- Admin tenant detail, admin user detail, tenant preview y capability governance ya consumen IDs publicos derivados.
+- Se versiono `bigquery/greenhouse_public_ids_v1.sql` como migracion opcional para persistir `public_id` en tablas clave sin reemplazar los ids internos.
+
+### Delta 2026-03-11 Capability Governance UX + source model correction
+- `/admin/tenants/[id]` ya no deja `Capability governance` comprimido en la columna izquierda.
+  - El resumen del tenant pasa primero.
+  - El editor de capabilities ahora ocupa ancho completo.
+  - La copy se acorto y se alineo al lenguaje operativo del producto.
+- Se removio la derivacion automatica de capabilities desde `deals closedwon`.
+- `POST /api/admin/tenants/[id]/capabilities/sync` ahora exige `businessLines` o `serviceModules` explicitos.
+- La regla vigente queda asi:
+  - admin puede fijar manualmente el estado operativo del tenant
+  - una integracion externa puede sincronizar capabilities si lee el objeto empresa o una fuente canonica equivalente y envia payload explicito
+  - Greenhouse no interpreta `deals` como historial de servicio del cliente
+- Queda deuda de datos:
+  - el dataset replicado actual no expone aun propiedades company-level como `linea_de_servicio` o `servicios_especificos` en `hubspot_crm.companies` ni en `hubspot_crm.companies_history`
+  - por eso el sync externo queda soportado a nivel API, pero no debe autoderivarse desde BigQuery hasta tener esas propiedades disponibles correctamente
