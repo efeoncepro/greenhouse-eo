@@ -4,6 +4,7 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import { BrandLogo, ExecutiveCardShell } from '@/components/greenhouse'
 import type { GreenhouseDashboardData, GreenhouseDashboardTool } from '@/types/greenhouse-dashboard'
@@ -20,12 +21,12 @@ type ToolGroupProps = {
 
 const ToolGroup = ({ title, description, tools }: ToolGroupProps) => (
   <ExecutiveCardShell title={title} subtitle={description}>
-    <Stack spacing={2}>
+    <Stack spacing={2.5}>
       {tools.map(tool => (
         <Box
           key={tool.key}
           sx={{
-            p: 3,
+            p: 2.5,
             borderRadius: 3,
             border: theme => `1px solid ${theme.palette.divider}`,
             display: 'flex',
@@ -56,6 +57,8 @@ const ToolGroup = ({ title, description, tools }: ToolGroupProps) => (
 )
 
 const ToolingSection = ({ data }: ToolingSectionProps) => {
+  const theme = useTheme()
+
   return (
     <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
       <ToolGroup
@@ -68,6 +71,20 @@ const ToolingSection = ({ data }: ToolingSectionProps) => {
         description='Capa inicial de IA aplicada al servicio para hacer visible el stack operativo del cliente.'
         tools={data.tooling.aiTools}
       />
+      <Box
+        sx={{
+          gridColumn: { xs: 'auto', xl: '1 / -1' },
+          p: 3,
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.info.main, 0.14)}`,
+          backgroundColor: alpha(theme.palette.info.main, 0.04)
+        }}
+      >
+        <Typography variant='body2' color='text.secondary'>
+          El stack visible mezcla defaults por modulo con overrides por cuenta. La meta es que esta capa evolucione a
+          tooling operativo real por proyecto y por equipo, no solo a inventario declarativo.
+        </Typography>
+      </Box>
     </Box>
   )
 }

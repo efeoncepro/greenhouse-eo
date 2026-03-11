@@ -49,9 +49,18 @@ const throughputBreakdown = (data: GreenhouseDashboardData) => [
 ]
 
 const ThroughputOverviewCard = ({ data, title, subtitle, series, options, netFlowLabel }: ThroughputOverviewCardProps) => {
+  const hasSparseSeries = data.charts.throughput.length < 2
+
   return (
     <ExecutiveCardShell title={title} subtitle={subtitle}>
-      <Box sx={{ display: 'grid', gap: 4, gridTemplateColumns: { xs: '1fr', lg: '220px minmax(0, 1fr)' }, alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 4,
+          gridTemplateColumns: { xs: '1fr', lg: hasSparseSeries ? '1fr' : '220px minmax(0, 1fr)' },
+          alignItems: 'center'
+        }}
+      >
         <Stack spacing={3}>
           <Stack spacing={1.5}>
             <Stack direction='row' alignItems='center' gap={1.5} flexWrap='wrap'>
@@ -88,7 +97,7 @@ const ThroughputOverviewCard = ({ data, title, subtitle, series, options, netFlo
             ))}
           </Stack>
         </Stack>
-        <AppReactApexCharts type='bar' height={280} width='100%' series={series} options={options} />
+        <AppReactApexCharts type='bar' height={hasSparseSeries ? 180 : 280} width='100%' series={series} options={options} />
       </Box>
     </ExecutiveCardShell>
   )

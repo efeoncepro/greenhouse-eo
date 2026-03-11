@@ -39,6 +39,7 @@ type ExecutiveBlockKey =
   | 'projects'
 
 export type ExecutiveDashboardLayout = {
+  isSnapshotMode: boolean
   themeCopy: ReturnType<typeof buildThemeCopy>
   hero: {
     eyebrow: string
@@ -89,6 +90,8 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
   const moduleBadges = buildModuleBadges(data)
   const moduleFocusCards = buildModuleFocusCards(data, dashboardTheme)
   const syncedAtLabel = formatSyncedAt(data.scope.lastSyncedAt)
+  const maxHistoryDepth = Math.max(data.charts.monthlyDelivery.length, data.charts.throughput.length, data.qualitySignals.length)
+  const isSnapshotMode = maxHistoryDepth < 2
 
   const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
   const previousMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 2] || null
@@ -132,14 +135,21 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
     blocks.push('tooling')
   }
 
-  blocks.push('statusMix', 'effortMix', 'projects')
+  if (!isSnapshotMode) {
+    blocks.push('statusMix', 'effortMix')
+  }
+
+  blocks.push('projects')
 
   return {
+    isSnapshotMode,
     themeCopy,
     hero: {
       eyebrow: themeCopy.heroLabel,
       title: themeCopy.heroTitle,
-      description: `${themeCopy.heroDescription} Alcance visible: ${data.scope.projectCount} proyectos. Ultima sincronizacion: ${syncedAtLabel}.`,
+      description: isSnapshotMode
+        ? `${themeCopy.heroDescription} Vista snapshot activada: ${data.scope.projectCount} proyectos visibles y sincronizacion ${syncedAtLabel}.`
+        : `${themeCopy.heroDescription} Alcance visible: ${data.scope.projectCount} proyectos. Ultima sincronizacion: ${syncedAtLabel}.`,
       highlights: [
         { label: 'Entregadas 30d', value: String(data.summary.completedLast30Days) },
         { label: 'Review abierta', value: String(data.summary.reviewPressureTasks) },
@@ -148,7 +158,9 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
       ],
       summaryLabel: 'On-time portfolio',
       summaryValue: `${data.summary.avgOnTimePct}%`,
-      summaryDetail: `${data.summary.healthyProjects} proyectos saludables dentro del alcance visible.`,
+      summaryDetail: isSnapshotMode
+        ? `${data.summary.healthyProjects} proyectos saludables dentro del alcance visible hoy.`
+        : `${data.summary.healthyProjects} proyectos saludables dentro del alcance visible.`,
       badges: moduleBadges.map(badge => badge.label)
     },
     topStats: [
@@ -194,7 +206,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         }
       }
     ],
-    focusCards: moduleFocusCards.map(card => ({
+    focusCards: moduleFocusCards.slice(0, isSnapshotMode ? 2 : 3).map(card => ({
       key: card.key,
       eyebrow: card.eyebrow,
       tone: card.tone,
@@ -210,7 +222,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
               ? 'tabler-building-store'
               : 'tabler-sparkles'
     })),
-    kpiCards: data.kpis.map(kpi => ({
+    kpiCards: data.kpis.slice(0, isSnapshotMode ? 3 : data.kpis.length).map(kpi => ({
       key: kpi.label,
       eyebrow: kpi.label,
       tone: kpi.tone,

@@ -1,4 +1,6 @@
 export { default as ExecutiveCardShell } from './ExecutiveCardShell'
+export { default as CapacityOverviewCard } from './CapacityOverviewCard'
+export type { CapacityOverviewMember } from './CapacityOverviewCard'
 export { default as ExecutiveHeroCard } from './ExecutiveHeroCard'
 export { default as ExecutiveMiniStatCard } from './ExecutiveMiniStatCard'
 export { default as BrandLogo } from './BrandLogo'

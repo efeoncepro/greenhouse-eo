@@ -230,8 +230,18 @@ const ExecutiveMiniStatCard = ({
                   </Box>
                 ) : null}
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography variant='h5'>{title}</Typography>
-                  <Typography color='text.secondary'>{detail}</Typography>
+                  <Typography variant='h6'>{title}</Typography>
+                  <Typography
+                    color='text.secondary'
+                    sx={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {detail}
+                  </Typography>
                 </Box>
               </Stack>
             </Stack>
@@ -248,13 +258,24 @@ const ExecutiveMiniStatCard = ({
 
   return (
     <Card sx={{ height: '100%' }}>
-      <CardContent sx={{ p: 4 }}>
+      <CardContent sx={{ p: 3.5 }}>
         <Stack spacing={3}>
           <Stack spacing={0.75}>
             <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
               <Stack spacing={0.5}>
-                <Typography variant='h5'>{title}</Typography>
-                <Typography color='text.secondary'>{detail}</Typography>
+                <Typography variant='h6'>{title}</Typography>
+                <Typography
+                  color='text.secondary'
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    minHeight: 42
+                  }}
+                >
+                  {detail}
+                </Typography>
               </Stack>
               {eyebrow ? <Chip size='small' color={tone} variant='tonal' label={eyebrow} /> : null}
             </Stack>

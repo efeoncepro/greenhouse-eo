@@ -7,8 +7,6 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
-import CustomAvatar from '@core/components/mui/Avatar'
-
 type ExecutiveHeroHighlight = {
   label: string
   value: string
@@ -109,18 +107,18 @@ const ExecutiveHeroCard = ({
                       backgroundColor: alpha(theme.palette.common.white, 0.12),
                       border: `1px solid ${alpha(theme.palette.common.white, 0.18)}`,
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: 2
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      minHeight: 104
                     }}
                   >
-                    <CustomAvatar skin='light-static' color='primary' variant='rounded' size={40}>
+                    <Typography variant='h4' sx={{ color: 'common.white' }}>
                       {item.value}
-                    </CustomAvatar>
-                    <Box>
-                      <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.78) }}>
-                        {item.label}
-                      </Typography>
-                    </Box>
+                    </Typography>
+                    <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.78) }}>
+                      {item.label}
+                    </Typography>
                   </Box>
                 </Grid>
               ))}

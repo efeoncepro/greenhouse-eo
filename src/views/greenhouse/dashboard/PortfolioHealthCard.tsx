@@ -40,12 +40,21 @@ const supportItems = (data: GreenhouseDashboardData) => [
 ]
 
 const PortfolioHealthCard = ({ data, options }: PortfolioHealthCardProps) => {
+  const hasWeakHealthSignal = data.summary.completedLast30Days === 0 && data.summary.avgOnTimePct === 0
+
   return (
     <ExecutiveCardShell
       title='Salud del portfolio'
       subtitle='Lectura ejecutiva de cumplimiento, riesgo y friccion visible sobre la cartera actual.'
     >
-      <Box sx={{ display: 'grid', gap: 4, gridTemplateColumns: { xs: '1fr', lg: '220px minmax(0, 1fr)' }, alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 4,
+          gridTemplateColumns: { xs: '1fr', lg: hasWeakHealthSignal ? '1fr' : '220px minmax(0, 1fr)' },
+          alignItems: 'center'
+        }}
+      >
         <Stack spacing={3}>
           <Box>
             <Typography variant='h2'>{data.summary.avgOnTimePct}%</Typography>
@@ -69,7 +78,16 @@ const PortfolioHealthCard = ({ data, options }: PortfolioHealthCardProps) => {
             ))}
           </Stack>
         </Stack>
-        <AppReactApexCharts type='radialBar' height={310} width='100%' series={[data.summary.avgOnTimePct]} options={options} />
+        {hasWeakHealthSignal ? (
+          <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'action.hover' }}>
+            <Typography variant='body2' color='text.secondary'>
+              Todavia no hay suficiente trazabilidad para que un radial grande aporte lectura. La tarjeta queda en modo
+              compacto hasta que la cartera tenga mas historia operativa visible.
+            </Typography>
+          </Box>
+        ) : (
+          <AppReactApexCharts type='radialBar' height={280} width='100%' series={[data.summary.avgOnTimePct]} options={options} />
+        )}
       </Box>
     </ExecutiveCardShell>
   )
