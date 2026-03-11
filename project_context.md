@@ -113,6 +113,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Regla documental compacta
 - La estrategia de documentacion liviana del repo queda en `DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
+- Estado operativo de consolidacion al 2026-03-11:
+- la rama funcional a promover primero es `reconcile/merge-hubspot-provisioning`
+- la rama documental rescatada aparte es `reconcile/docs-cross-repo-contract`
+- no usar `rescue/wip-local-hubspot-contacts-20260311-1729` como base de merge
+- si un build local falla por rutas de otra rama, revisar el cache historico en `.next-local/**` antes de asumir un bug del cambio actual
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz

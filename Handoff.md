@@ -40,18 +40,25 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
-- 2026-03-11 19:10 America/Santiago
+- 2026-03-11 22:55 America/Santiago
 
 ### Agente
 - Codex
 
 ### Objetivo del turno
-- Cerrar el slice de provisioning de contactos HubSpot en admin para que no quede como spike backend inseguro.
-- Hacer que el provisioning sea rerunnable y repare estados incompletos en vez de devolver falsos `already_exists`.
+- Auditar todas las ramas activas y de respaldo para separar trabajo ya absorbido de trabajo aun no integrado.
+- Preservar en ramas limpias el provisioning endurecido de contactos HubSpot y el bloque documental cross-repo para que no dependan de memoria conversacional.
+- Verificar explicitamente que `greenhouse-eo` ya consume la integracion creada en `hubspot-bigquery` via el servicio `hubspot-greenhouse-integration`.
+- Dejar ambas ramas de consolidacion pusheadas a remoto para que el rescate no dependa de estado local.
 
 ### Rama
-- Rama usada: `reconcile/hubspot-live-plus-local-wip-20260311-1733`
-- Rama objetivo del merge: `develop`
+- Rama usada: `reconcile/merge-hubspot-provisioning`
+- Ramas de consolidacion creadas:
+  - `reconcile/merge-hubspot-provisioning` en commit `802dad6`
+  - `reconcile/docs-cross-repo-contract` en commit `78e2d0c`
+- Rama objetivo del merge:
+  - `reconcile/merge-hubspot-provisioning` -> `develop`
+  - `reconcile/docs-cross-repo-contract` -> `develop` o merge selectivo despues del provisioning
 
 ### Ambiente objetivo
 - Development / pre-merge
@@ -59,23 +66,43 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Archivos tocados
 - `src/lib/admin/tenant-member-provisioning.ts`
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/app/api/admin/tenants/[id]/contacts/provision/route.ts`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
 
 ### Verificacion
-- `npx pnpm lint`: correcto
-- `npx pnpm build`: correcto
-- El endpoint nuevo `POST /api/admin/tenants/[id]/contacts/provision` queda compilando y versionado dentro del build local.
+- Auditoria de ramas:
+  - `reconcile/hubspot-live-plus-local-wip-20260311-1733` era la unica rama con trabajo funcional no absorbido por `main` o `develop`
+  - `rescue/wip-local-hubspot-contacts-20260311-1729` quedo supersedida y no debe mergearse
+  - `origin/feature/reconcile-develop-with-main-live` y `origin/feature/hubspot-live-cross-repo-contract` contenian material documental util pero historia mezclada
+- Rama funcional `reconcile/merge-hubspot-provisioning`:
+  - merge limpio desde `reconcile/hubspot-live-plus-local-wip-20260311-1733`
+  - `npx pnpm lint`: correcto
+  - `npx pnpm build`: correcto
+  - push remoto: correcto
+- Rama documental `reconcile/docs-cross-repo-contract`:
+  - rescate selectivo desde `origin/feature/reconcile-develop-with-main-live`
+  - `npx pnpm lint`: correcto
+  - `npx pnpm build`: correcto
+  - push remoto: correcto
+  - nota local: para validar el build fue necesario limpiar varios builds historicos recientes en `.next-local` porque el wildcard del `tsconfig` hacia que TypeScript intentara validar rutas de otras ramas
+- Verificacion cross-repo:
+  - `greenhouse-eo` consume `https://hubspot-greenhouse-integration-183008134038.us-central1.run.app`
+  - `hubspot-bigquery` local apunta a `origin https://github.com/cesargrowth11/hubspot-bigquery.git`
+  - `GET /contract`: `200`
+  - `GET /companies/30825221458/contacts`: `200`
+  - el servicio publicado por `hubspot-bigquery` declara `GET /companies/{hubspotCompanyId}/contacts`, `GET /companies/{hubspotCompanyId}/owner` y `GET /contract`
 
 ### Riesgos o pendientes
-- El provisioning ya reintenta mejor porque vuelve a asegurar rol y scopes sobre usuarios existentes del mismo tenant, pero sigue dependiendo de varias `MERGE` separadas en BigQuery; no hay transaccion multi-tabla.
-- Falta smoke autenticado/visual de `/admin/tenants/[id]` para confirmar la UX del boton `Provisionar` con una sesion admin real y un tenant con contactos pendientes.
-- Falta decidir si este flujo se quedara manual desde admin o si despues se automatizara desde webhook/relay.
+- Falta smoke autenticado/visual de `/admin/tenants/[id]` para el boton `Provisionar` antes de promover el provisioning endurecido.
+- El workspace Windows acumula muchos builds historicos en `.next-local`; mientras el `tsconfig` siga incluyendo `.next-local/**`, ramas con superficies distintas pueden fallar build por validadores viejos si no se limpia ese cache local.
+- Las ramas de rescue y safety siguen existiendo; no contienen el mejor estado y pueden confundir si alguien no lee este handoff primero.
 
 ### Proximo paso recomendado
-- Entrar con sesion admin real a `/admin/tenants/hubspot-company-30825221458` u otro tenant con gap CRM/Greenhouse y correr una provision real o dry validation operativa.
-- Si el flujo se comporta bien, promover `reconcile/hubspot-live-plus-local-wip-20260311-1733` a `develop` en lugar de dejar el provisioning solo como rama de rescate.
+- Correr smoke admin real sobre `/admin/tenants/hubspot-company-30825221458` desde `reconcile/merge-hubspot-provisioning`.
+- Si el smoke sale bien, promover primero `reconcile/merge-hubspot-provisioning` a `develop`.
+- Tratar `reconcile/docs-cross-repo-contract` como rama documental separada o merge selectivo, sin arrastrar las ramas remotas hibridas originales.
 
 ### Fecha
 - 2026-03-11 18:05 America/Santiago
