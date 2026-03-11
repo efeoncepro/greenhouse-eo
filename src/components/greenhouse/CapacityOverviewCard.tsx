@@ -1,5 +1,7 @@
 'use client'
 
+import { useId } from 'react'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
@@ -38,6 +40,7 @@ type CapacityOverviewCardProps = {
   subtitle: string
   summaryItems: CapacitySummaryItem[]
   members: CapacityOverviewMember[]
+  variant?: 'default' | 'compact'
   insightTitle: string
   insightSubtitle: string
   insightItems: MetricListItem[]
@@ -80,6 +83,7 @@ const CapacityOverviewCard = ({
   subtitle,
   summaryItems,
   members,
+  variant = 'default',
   insightTitle,
   insightSubtitle,
   insightItems,
@@ -87,31 +91,63 @@ const CapacityOverviewCard = ({
   coverageTone = 'success'
 }: CapacityOverviewCardProps) => {
   const theme = useTheme()
+  const headingId = useId()
+  const descriptionId = useId()
+  const isCompact = variant === 'compact'
 
   return (
     <ExecutiveCardShell
       title={title}
       subtitle={subtitle}
       action={<Chip size='small' variant='tonal' color={coverageTone} label={coverageLabel} />}
-      contentSx={{ pt: 3.5 }}
+      contentSx={{ pt: isCompact ? 3 : 3.5 }}
     >
-      <Stack spacing={3.5}>
+      <Stack
+        spacing={isCompact ? 3 : 3.5}
+        component='section'
+        role='region'
+        aria-labelledby={headingId}
+        aria-describedby={descriptionId}
+        sx={{ position: 'relative' }}
+      >
         <Box
+          sx={{
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            p: 0,
+            m: -1,
+            overflow: 'hidden',
+            clip: 'rect(0 0 0 0)',
+            whiteSpace: 'nowrap',
+            border: 0
+          }}
+        >
+          <Typography id={headingId}>{title}</Typography>
+          <Typography id={descriptionId}>{subtitle}</Typography>
+        </Box>
+        <Box
+          component='ul'
+          role='list'
           sx={{
             display: 'grid',
             gap: 2,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'
+            gridTemplateColumns: `repeat(auto-fit, minmax(${isCompact ? 150 : 160}px, 1fr))`,
+            listStyle: 'none',
+            m: 0,
+            p: 0
           }}
         >
           {summaryItems.map(item => (
             <Box
               key={item.label}
+              component='li'
               sx={{
-                p: 2.5,
+                p: isCompact ? 2.25 : 2.5,
                 borderRadius: 3,
                 backgroundColor: alpha(theme.palette.primary.main, 0.05),
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.12)}`,
-                minHeight: 116,
+                minHeight: isCompact ? 104 : 116,
                 display: 'grid',
                 gap: 0.75,
                 alignContent: 'start'
@@ -129,10 +165,15 @@ const CapacityOverviewCard = ({
         </Box>
 
         <Box
+          component='ul'
+          role='list'
           sx={{
             display: 'grid',
             gap: 2,
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
+            gridTemplateColumns: `repeat(auto-fit, minmax(${isCompact ? 220 : 250}px, 1fr))`,
+            listStyle: 'none',
+            m: 0,
+            p: 0
           }}
         >
           {members.map(member => {
@@ -142,14 +183,16 @@ const CapacityOverviewCard = ({
             return (
               <Box
                 key={member.id}
+                component='li'
+                aria-label={`${member.name}, ${member.role}. ${resolveAllocationLabel(member)}. ${resolveHoursLabel(member)}.`}
                 sx={{
-                  p: 2.75,
+                  p: isCompact ? 2.25 : 2.75,
                   borderRadius: 3,
                   border: `1px solid ${theme.palette.divider}`,
                   display: 'grid',
-                  gap: 2,
+                  gap: isCompact ? 1.5 : 2,
                   alignContent: 'start',
-                  minHeight: 220
+                  minHeight: isCompact ? 174 : 220
                 }}
               >
                 <Stack direction='row' spacing={1.75} alignItems='center'>
@@ -175,6 +218,7 @@ const CapacityOverviewCard = ({
                     variant='determinate'
                     color={allocationTone}
                     value={allocationValue}
+                    aria-label={`${member.name} allocation ${member.allocationPct !== null ? `${member.allocationPct}%` : 'pending'}`}
                     sx={{ height: 8, borderRadius: 999 }}
                   />
                 </Box>
@@ -184,22 +228,41 @@ const CapacityOverviewCard = ({
                   <Chip size='small' variant='tonal' color='primary' label={resolveHoursLabel(member)} />
                 </Stack>
 
-                <Box
-                  sx={{
-                    p: 1.75,
-                    borderRadius: 2.5,
-                    backgroundColor: alpha(theme.palette.info.main, 0.05),
-                    border: `1px solid ${alpha(theme.palette.info.main, 0.12)}`
-                  }}
-                >
-                  <Typography variant='caption' color='text.secondary'>
-                    Fuente
-                  </Typography>
+                {isCompact ? (
                   <Stack direction='row' justifyContent='space-between' gap={2} alignItems='center'>
-                    <Typography variant='body2'>{member.sourceLabel}</Typography>
-                    <Chip size='small' variant='outlined' color={member.sourceTone || 'info'} label={member.sourceTone === 'warning' ? 'Controlado' : 'Detectado'} />
+                    <Typography variant='caption' color='text.secondary'>
+                      {member.sourceLabel}
+                    </Typography>
+                    <Chip
+                      size='small'
+                      variant='outlined'
+                      color={member.sourceTone || 'info'}
+                      label={member.sourceTone === 'warning' ? 'Controlled' : 'Detected'}
+                    />
                   </Stack>
-                </Box>
+                ) : (
+                  <Box
+                    sx={{
+                      p: 1.75,
+                      borderRadius: 2.5,
+                      backgroundColor: alpha(theme.palette.info.main, 0.05),
+                      border: `1px solid ${alpha(theme.palette.info.main, 0.12)}`
+                    }}
+                  >
+                    <Typography variant='caption' color='text.secondary'>
+                      Fuente
+                    </Typography>
+                    <Stack direction='row' justifyContent='space-between' gap={2} alignItems='center'>
+                      <Typography variant='body2'>{member.sourceLabel}</Typography>
+                      <Chip
+                        size='small'
+                        variant='outlined'
+                        color={member.sourceTone || 'info'}
+                        label={member.sourceTone === 'warning' ? 'Controlado' : 'Detectado'}
+                      />
+                    </Stack>
+                  </Box>
+                )}
               </Box>
             )
           })}
@@ -222,21 +285,27 @@ const CapacityOverviewCard = ({
             </Box>
 
             <Box
+              component='ul'
+              role='list'
               sx={{
                 display: 'grid',
                 gap: 2,
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+                gridTemplateColumns: `repeat(auto-fit, minmax(${isCompact ? 150 : 180}px, 1fr))`,
+                listStyle: 'none',
+                m: 0,
+                p: 0
               }}
             >
               {insightItems.map(item => (
                 <Box
                   key={item.label}
+                  component='li'
                   sx={{
-                    p: 2.25,
+                    p: isCompact ? 2 : 2.25,
                     borderRadius: 3,
                     bgcolor: 'background.paper',
                     border: `1px solid ${theme.palette.divider}`,
-                    minHeight: 112,
+                    minHeight: isCompact ? 96 : 112,
                     display: 'grid',
                     gap: 0.75,
                     alignContent: 'start'

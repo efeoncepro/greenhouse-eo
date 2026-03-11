@@ -72,7 +72,7 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
                 ? 'minmax(0, 1.9fr) minmax(320px, 0.95fr)'
                 : 'minmax(0, 1.75fr) minmax(320px, 1fr)'
           },
-          alignItems: 'stretch'
+          alignItems: 'start'
         }}
       >
         <ExecutiveHeroCard {...layout.hero} />
@@ -84,8 +84,9 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
             gridTemplateColumns: {
               xs: '1fr',
               sm: 'repeat(2, minmax(0, 1fr))',
-              xl: layout.layoutMode === 'rich' ? 'repeat(3, minmax(0, 1fr))' : '1fr'
-            }
+              xl: '1fr'
+            },
+            alignContent: 'start'
           }}
         >
           {layout.topStats.map(card => (
@@ -100,6 +101,7 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
               delta={card.delta}
               miniChart={card.miniChart}
               supportItems={card.supportItems}
+              stretch={false}
             />
           ))}
         </Box>

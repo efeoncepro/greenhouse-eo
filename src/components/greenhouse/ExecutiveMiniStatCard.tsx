@@ -34,6 +34,7 @@ type ExecutiveMiniStatCardProps = {
   delta?: string
   supportItems?: SupportItem[]
   miniChart?: MiniChart
+  stretch?: boolean
 }
 
 const ExecutiveMiniStatCard = ({
@@ -45,7 +46,8 @@ const ExecutiveMiniStatCard = ({
   icon,
   delta,
   supportItems = [],
-  miniChart
+  miniChart,
+  stretch = true
 }: ExecutiveMiniStatCardProps) => {
   const theme = useTheme()
   const toneColor = theme.palette[tone].main
@@ -208,7 +210,7 @@ const ExecutiveMiniStatCard = ({
 
   if (miniChart?.variant === 'split-bars' && chartOptions) {
     return (
-      <Card sx={{ height: '100%' }}>
+      <Card sx={{ height: stretch ? '100%' : 'auto' }}>
         <CardContent sx={{ p: 4, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
           <Stack justifyContent='space-between' spacing={3} sx={{ minWidth: 0, flex: 1 }}>
             <Stack spacing={1.25}>
@@ -257,7 +259,7 @@ const ExecutiveMiniStatCard = ({
   }
 
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card sx={{ height: stretch ? '100%' : 'auto' }}>
       <CardContent sx={{ p: 3.5 }}>
         <Stack spacing={3}>
           <Stack spacing={0.75}>

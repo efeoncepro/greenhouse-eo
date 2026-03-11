@@ -40,6 +40,53 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 06:31 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Simplificar el hero del dashboard para corregir la desalineacion del top fold.
+- Mantener la card de `Capacity` como version principal y dejar lista una variante compacta reusable.
+- Subir el nivel de UX writing y accesibilidad en hero y capacity.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
+- `src/components/greenhouse/ExecutiveHeroCard.tsx`
+- `src/components/greenhouse/ExecutiveMiniStatCard.tsx`
+- `src/components/greenhouse/CapacityOverviewCard.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/dashboard/AccountTeamSection.tsx`
+- `src/views/greenhouse/dashboard/config.ts`
+- `src/views/greenhouse/dashboard/orchestrator.ts`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Validacion visual local:
+  - login admin correcto en `http://localhost:3100/login`
+  - `view-as` correcto en `http://localhost:3100/admin/tenants/space-efeonce/view-as/dashboard`
+  - captura Playwright confirmo hero mas compacto y top stats derechas sin elongacion artificial
+- Skill usado para criterio de seleccion UI/UX:
+  - `greenhouse-vuexy-portal`
+  - referencia aplicada: `references/ui-ux-vuexy.md`
+
+### Riesgos o pendientes
+- La variante `compact` de `CapacityOverviewCard` quedo lista en el componente pero no se consume todavia en otra superficie real.
+- La validacion visual se hizo sobre `view-as` del tenant benchmark `space-efeonce`; faltaria repetirla en `Preview` Vercel si este cambio se promueve fuera de local.
+- Se creo `.env.local` ignorado por Git para autenticar la sesion local de validacion; no forma parte del cambio versionado.
+
+### Proximo paso recomendado
+- Hacer push y revisar el deployment de `develop` o del preview correspondiente con `vercel-ops` si se quiere repetir la comprobacion visual fuera de local.
+
+### Fecha
 - 2026-03-10 America/Santiago
 
 ### Agente

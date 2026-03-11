@@ -1,93 +1,32 @@
 # GREENHOUSE_DASHBOARD_UX_GAPS_V1
 
 ## Brechas detectadas
-- `Capacity` tiene buena data pero mala distribución: la versión actual fragmenta summary, roster e insights en una composición que ocupa demasiado alto y deja aire poco útil.
-- El dashboard usa grids demasiado rígidos en varias capas. Cuando sobra espacio o falta espacio, las cards no siempre se ensanchan o compactan con naturalidad.
-- El template actual funciona mejor con spaces ricos como `Efeonce`, pero todavía no define un contrato claro de densidad para spaces `snapshot`, `standard` y `rich`.
-- Algunas secciones siguen compitiendo por el mismo peso visual aunque no todas merecen la misma jerarquía en todos los spaces.
-- `Delivery`, `Quality`, `Tooling` y `Capacity` ya son reutilizables en data, pero no lo son del todo en layout. Cada una resuelve su grid por separado.
-- El dashboard general sigue siendo demasiado largo para algunos spaces; falta una regla explícita para cuándo condensar, agrupar o redistribuir superficies.
+- El hero estaba cargando demasiada narrativa, badges y highlights; eso elevaba su altura y empujaba a que las cards de la derecha se vieran largas y desalineadas.
+- La columna derecha del top fold usaba tres mini cards comprimidas en un espacio angosto y, ademas, heredaba altura innecesaria del hero.
+- `Capacity` tenia una buena direccion visual, pero todavia no existia una variante compacta reusable para layouts con menos alto.
+- El UX writing del top fold mezclaba mensajes largos, etiquetas redundantes y poca consistencia entre espanol ejecutivo e indicadores mas tecnicos.
+- Habia oportunidades claras de accesibilidad en hero y capacity: landmarks, labels mas explicitos y mejor semantica para listas y barras de progreso.
 
 ## Matriz de soluciones
+| Brecha | Solucion viable | Pros | Contras | Esfuerzo | Impacto | Puntaje |
+| --- | --- | --- | --- | --- | --- | --- |
+| Hero sobredimensionado | Reducir copy, bajar highlights a dos y convertir el summary en panel compacto rectangular | Baja la altura, mejora el scan y ordena la jerarquia | Requiere recalibrar copy y layout del top fold | 3/5 | 5/5 | 5/5 |
+| Hero sobredimensionado | Mantener el hero actual y solo reducir padding | Cambio rapido | No corrige la causa estructural | 1/5 | 2/5 | 2/5 |
+| Mini cards derechas alargadas | Apilar las top stats en una sola columna en desktop y desactivar el fill-height | Corrige proporcion y alineacion de inmediato | Cambia la lectura respecto a la version anterior | 2/5 | 5/5 | 5/5 |
+| Mini cards derechas alargadas | Mantener tres columnas y solo bajar min-heights | Conserva la estructura previa | Sigue dejando cards demasiado angostas | 1/5 | 2/5 | 2/5 |
+| Falta variante compacta en capacity | Extender `CapacityOverviewCard` con variantes `default` y `compact` | Abre el camino a formatos multiples sin duplicar componentes | La variante compacta queda lista pero no reemplaza la principal todavia | 3/5 | 4/5 | 4/5 |
+| Falta variante compacta en capacity | Crear otro componente independiente para capacity compacto | Aisla el experimento | Duplica logica y styling | 3/5 | 2/5 | 2/5 |
+| UX writing irregular | Reescribir hero y copy del top fold con mensajes mas cortos y lenguaje mas escaneable | Mejora comprension y densidad visual | Requiere revisar coherencia entre secciones | 2/5 | 4/5 | 4/5 |
+| UX writing irregular | Mantener copy y traducir solo labels aislados | Barato | No resuelve la friccion general | 1/5 | 2/5 | 2/5 |
+| Accesibilidad incompleta | Agregar landmarks, ids accesibles, listas semanticas y labels para progress/summaries | Mejora lectura asistida y deja mejor base para iteraciones futuras | No reemplaza una auditoria completa con lector de pantalla real | 2/5 | 4/5 | 4/5 |
+| Accesibilidad incompleta | Limitarse a agregar `aria-label` sueltos | Rapido | Solucion parcial y poco coherente | 1/5 | 2/5 | 2/5 |
 
-### Brecha 1: Capacity sobredisuida
-- Opcion A: Mantener dos cards separadas y solo pulir estilos.
-  - Pros: cambio barato.
-  - Contras: no resuelve la distribución raíz.
-  - Esfuerzo: 2/5
-  - Impacto: 2/5
-- Opcion B: Unificar `Capacity` en una sola card reusable con summary strip, roster responsive en grid y insights compactos al pie.
-  - Pros: reduce altura, mejora lectura, escala a cualquier cantidad de miembros.
-  - Contras: exige refactor del componente.
-  - Esfuerzo: 3/5
-  - Impacto: 5/5
+## Solucion recomendada
+La mejor combinacion es simplificar el hero, desacoplar la altura de las mini cards derechas y extender `CapacityOverviewCard` con variantes. Esa mezcla supera al resto porque corrige la desalineacion de raiz, reduce densidad arriba del fold y deja un patron reusable para futuros formatos compactos sin duplicar componentes.
 
-### Brecha 2: Grids rígidos
-- Opcion A: Seguir con `repeat(n, 1fr)` según breakpoints.
-  - Pros: simple.
-  - Contras: sigue generando cards apretadas o aire muerto.
-  - Esfuerzo: 1/5
-  - Impacto: 2/5
-- Opcion B: Migrar a grids con `auto-fit / minmax` en cards KPI, focus y bloques operativos.
-  - Pros: responde mejor al espacio real disponible y hace el dashboard más reusable.
-  - Contras: requiere recalibrar varios `minmax`.
-  - Esfuerzo: 3/5
-  - Impacto: 5/5
-
-### Brecha 3: Falta contrato de densidad por space
-- Opcion A: Mantener solo `snapshot` vs `non-snapshot`.
-  - Pros: ya existe parcialmente.
-  - Contras: es insuficiente para spaces ricos como `Efeonce`.
-  - Esfuerzo: 1/5
-  - Impacto: 3/5
-- Opcion B: Introducir `layoutMode = snapshot | standard | rich` en el orquestador.
-  - Pros: hace explícita la estrategia de layout y permite crecer sin hardcodes por cliente.
-  - Contras: requiere revisar algunos grids y pesos.
-  - Esfuerzo: 3/5
-  - Impacto: 5/5
-
-### Brecha 4: Peso visual homogéneo
-- Opcion A: Ajustar spacing y typography sin cambiar orden.
-  - Pros: rápido.
-  - Contras: mejora poco la lectura.
-  - Esfuerzo: 2/5
-  - Impacto: 2/5
-- Opcion B: Reordenar por jerarquía: hero, indicadores rápidos, operación, señales de delivery/calidad, capacity/tooling, cartera bajo atención.
-  - Pros: la lectura ejecutiva mejora inmediatamente.
-  - Contras: obliga a tocar layout general.
-  - Esfuerzo: 3/5
-  - Impacto: 4/5
-
-### Brecha 5: Reutilización parcial del layout
-- Opcion A: dejar que cada sección siga definiendo su propio grid.
-  - Pros: menos cambios inmediatos.
-  - Contras: mantiene divergencia visual.
-  - Esfuerzo: 1/5
-  - Impacto: 2/5
-- Opcion B: mover la lógica de composición al orquestador y usar patrones de grid compartidos en el dashboard.
-  - Pros: escala mejor para cualquier space y cualquier densidad de data.
-  - Contras: requiere disciplina de implementación.
-  - Esfuerzo: 4/5
-  - Impacto: 5/5
-
-## Solución recomendada
-- Combinar `B` en todas las brechas críticas: `CapacityOverviewCard` unificada, grids `auto-fit/minmax`, `layoutMode` explícito y jerarquía más clara desde el orquestador.
-- Esta combinación supera al resto porque ataca la causa estructural, no solo el síntoma visual. Además deja un contrato reusable para cualquier space sin depender de la cantidad de datos que tenga hoy.
-
-## Plan final listo y documentado y empieza a ejecutar
-1. Rediseñar `CapacityOverviewCard` como una sola card reusable con:
-   - summary strip arriba
-   - roster en grid responsive
-   - insights compactos abajo
-   - estado de cobertura visible en header
-2. Introducir `layoutMode = snapshot | standard | rich` en el orquestador.
-3. Migrar grids del dashboard a `auto-fit / minmax` para que las cards se ensanchen o compacten según el espacio libre.
-4. Ajustar el orden visual del dashboard para spaces ricos:
-   - hero
-   - top stats
-   - KPIs/focus
-   - operación
-   - delivery + quality
-   - capacity + tooling
-   - projects
-5. Validar en `space-efeonce` como benchmark y mantener compatibilidad con spaces de baja densidad.
+## Plan listo, documentado y ejecutado y documentado
+1. Se simplifico el hero: menos copy, dos highlights clave, summary rectangular y badges condensados en un bloque secundario.
+2. Se corrigio la fila superior: las top stats derechas ya no se estiran por la altura del hero y en desktop viven en una sola columna mas proporcionada.
+3. `CapacityOverviewCard` ahora soporta `default` y `compact`, manteniendo la version actual como principal y dejando la variante compacta lista para futuros layouts.
+4. Se ajusto el UX writing del top fold y de `Capacity` para hacer la lectura mas corta, directa y consistente.
+5. Se integraron mejoras de accesibilidad en hero y capacity con landmarks, ids accesibles, listas semanticas y labels para allocation/progress.

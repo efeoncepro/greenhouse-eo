@@ -1,5 +1,7 @@
 'use client'
 
+import { useId } from 'react'
+
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
@@ -34,11 +36,20 @@ const ExecutiveHeroCard = ({
   badges
 }: ExecutiveHeroCardProps) => {
   const theme = useTheme()
+  const headingId = useId()
+  const descriptionId = useId()
+  const scopeId = useId()
+  const visibleBadges = badges.slice(0, 3)
+  const hiddenBadgesCount = Math.max(0, badges.length - visibleBadges.length)
 
   return (
     <Box
+      component='section'
+      role='region'
+      aria-labelledby={headingId}
+      aria-describedby={descriptionId}
       sx={{
-        p: { xs: 4, md: 6 },
+        p: { xs: 4, md: 5 },
         borderRadius: 4,
         background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.92)} 0%, ${alpha(
           theme.palette.info.main,
@@ -51,6 +62,7 @@ const ExecutiveHeroCard = ({
       }}
     >
       <Box
+        aria-hidden='true'
         sx={{
           position: 'absolute',
           insetInlineEnd: { xs: -70, md: -30 },
@@ -66,7 +78,7 @@ const ExecutiveHeroCard = ({
       />
       <Grid container spacing={6} sx={{ position: 'relative', zIndex: 1, alignItems: 'center' }}>
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Stack spacing={3}>
+          <Stack spacing={2.5}>
             <Chip
               label={eyebrow}
               sx={{
@@ -77,31 +89,20 @@ const ExecutiveHeroCard = ({
               }}
               variant='outlined'
             />
-            <Stack spacing={1.5}>
-              <Typography variant='h3' sx={{ color: 'common.white', maxWidth: 680 }}>
+            <Stack spacing={1.25}>
+              <Typography id={headingId} variant='h3' sx={{ color: 'common.white', maxWidth: 620 }}>
                 {title}
               </Typography>
-              <Typography sx={{ color: alpha(theme.palette.common.white, 0.76), maxWidth: 760 }}>{description}</Typography>
+              <Typography id={descriptionId} sx={{ color: alpha(theme.palette.common.white, 0.76), maxWidth: 620 }}>
+                {description}
+              </Typography>
             </Stack>
-            <Stack direction='row' flexWrap='wrap' gap={1.5}>
-              {badges.map(badge => (
-                <Chip
-                  key={badge}
-                  size='small'
-                  label={badge}
-                  sx={{
-                    color: 'common.white',
-                    backgroundColor: alpha(theme.palette.common.white, 0.12)
-                  }}
-                />
-              ))}
-            </Stack>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} component='ul' role='list' sx={{ listStyle: 'none', m: 0, p: 0 }}>
               {highlights.map(item => (
-                <Grid key={item.label} size={{ xs: 12, sm: 6 }}>
+                <Grid key={item.label} component='li' size={{ xs: 12, sm: 6 }}>
                   <Box
                     sx={{
-                      p: 3,
+                      p: 2.5,
                       borderRadius: 3,
                       backdropFilter: 'blur(12px)',
                       backgroundColor: alpha(theme.palette.common.white, 0.12),
@@ -110,14 +111,14 @@ const ExecutiveHeroCard = ({
                       flexDirection: 'column',
                       alignItems: 'flex-start',
                       justifyContent: 'space-between',
-                      minHeight: 104
+                      minHeight: 92
                     }}
                   >
-                    <Typography variant='h4' sx={{ color: 'common.white' }}>
-                      {item.value}
-                    </Typography>
                     <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.78) }}>
                       {item.label}
+                    </Typography>
+                    <Typography variant='h4' sx={{ color: 'common.white' }}>
+                      {item.value}
                     </Typography>
                   </Box>
                 </Grid>
@@ -126,37 +127,81 @@ const ExecutiveHeroCard = ({
           </Stack>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Box sx={{ minHeight: 240, display: 'grid', placeItems: 'center' }}>
+          <Stack spacing={2.5} sx={{ height: '100%' }}>
             <Box
+              role='group'
+              aria-label={`${summaryLabel}: ${summaryValue}. ${summaryDetail}`}
               sx={{
-                width: { xs: 220, md: 260 },
-                height: { xs: 220, md: 260 },
-                borderRadius: '50%',
+                flex: 1,
+                minHeight: 216,
+                borderRadius: 4,
                 display: 'grid',
-                placeItems: 'center',
-                p: 4,
-                textAlign: 'center',
-                background: `radial-gradient(circle at 30% 30%, ${alpha(theme.palette.common.white, 0.3)} 0%, ${alpha(
+                alignContent: 'center',
+                p: { xs: 3, md: 4 },
+                background: `linear-gradient(180deg, ${alpha(theme.palette.common.white, 0.16)} 0%, ${alpha(
                   theme.palette.common.white,
-                  0.08
-                )} 42%, ${alpha(theme.palette.common.white, 0.02)} 100%)`,
+                  0.06
+                )} 100%)`,
                 border: `1px solid ${alpha(theme.palette.common.white, 0.22)}`,
                 boxShadow: `0 22px 60px ${alpha(theme.palette.common.black, 0.22)}`
               }}
             >
-              <Stack spacing={1} alignItems='center'>
+              <Stack spacing={1.25}>
                 <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.72) }}>
                   {summaryLabel}
                 </Typography>
                 <Typography variant='h1' sx={{ color: 'common.white' }}>
                   {summaryValue}
                 </Typography>
-                <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.76), maxWidth: 180 }}>
+                <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.76), maxWidth: 240 }}>
                   {summaryDetail}
                 </Typography>
               </Stack>
             </Box>
-          </Box>
+
+            {badges.length > 0 ? (
+              <Box
+                aria-labelledby={scopeId}
+                sx={{
+                  p: 2.5,
+                  borderRadius: 3,
+                  backgroundColor: alpha(theme.palette.common.white, 0.08),
+                  border: `1px solid ${alpha(theme.palette.common.white, 0.12)}`
+                }}
+              >
+                <Stack spacing={1.5}>
+                  <Typography id={scopeId} variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.72) }}>
+                    Scope visible
+                  </Typography>
+                  <Stack direction='row' flexWrap='wrap' gap={1}>
+                    {visibleBadges.map(badge => (
+                      <Chip
+                        key={badge}
+                        size='small'
+                        label={badge}
+                        sx={{
+                          color: 'common.white',
+                          backgroundColor: alpha(theme.palette.common.white, 0.12)
+                        }}
+                      />
+                    ))}
+                    {hiddenBadgesCount > 0 ? (
+                      <Chip
+                        size='small'
+                        label={`+${hiddenBadgesCount} more`}
+                        sx={{
+                          color: 'common.white',
+                          backgroundColor: alpha(theme.palette.common.white, 0.08),
+                          border: `1px solid ${alpha(theme.palette.common.white, 0.18)}`
+                        }}
+                        variant='outlined'
+                      />
+                    ) : null}
+                  </Stack>
+                </Stack>
+              </Box>
+            ) : null}
+          </Stack>
         </Grid>
       </Grid>
     </Box>

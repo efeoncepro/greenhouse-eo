@@ -64,7 +64,7 @@ const formatRelationshipValue = (data: GreenhouseDashboardData) =>
 const formatRelationshipDetail = (data: GreenhouseDashboardData) =>
   data.relationship.startedAt
     ? `${data.relationship.label}. Inicio visible: ${new Date(`${data.relationship.startedAt}T00:00:00.000Z`).toLocaleDateString('es-CL')}.`
-    : 'Aun no hay una primera actividad visible para calcular tenure.'
+    : 'Todavia no hay una primera actividad visible para calcular tenure.'
 
 const lastValues = (values: Array<number | null | undefined>, length = 7) =>
   values
@@ -105,15 +105,6 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
 
   const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
   const previousMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 2] || null
-  const totalDeliverablesVisible = data.charts.monthlyDelivery.reduce((sum, item) => sum + item.totalDeliverables, 0)
-
-  const totalDeliverablesWithoutAdjustments = data.charts.monthlyDelivery.reduce(
-    (sum, item) => sum + item.withoutClientAdjustments,
-    0
-  )
-
-  const noAdjustmentRate =
-    totalDeliverablesVisible > 0 ? Math.round((totalDeliverablesWithoutAdjustments / totalDeliverablesVisible) * 100) : 0
 
   const firstPassSeries = lastValues(
     data.charts.monthlyDelivery.map(item =>
@@ -159,18 +150,16 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
       eyebrow: themeCopy.heroLabel,
       title: themeCopy.heroTitle,
       description: isSnapshotMode
-        ? `${themeCopy.heroDescription} Vista snapshot activada: ${data.scope.projectCount} proyectos visibles y sincronizacion ${syncedAtLabel}.`
-        : `${themeCopy.heroDescription} Alcance visible: ${data.scope.projectCount} proyectos. Ultima sincronizacion: ${syncedAtLabel}.`,
+        ? `${themeCopy.heroDescription} Snapshot mode activo con ${data.scope.projectCount} proyectos visibles. Sync: ${syncedAtLabel}.`
+        : `${themeCopy.heroDescription} Alcance visible: ${data.scope.projectCount} proyectos. Sync: ${syncedAtLabel}.`,
       highlights: [
         { label: 'Entregadas 30d', value: String(data.summary.completedLast30Days) },
-        { label: 'Review abierta', value: String(data.summary.reviewPressureTasks) },
-        { label: 'Proyectos en riesgo', value: String(data.summary.projectsAtRisk) },
-        { label: 'Trabajo activo', value: String(data.summary.activeWorkItems) }
+        { label: 'Review abierta', value: String(data.summary.reviewPressureTasks) }
       ],
       summaryLabel: 'On-time portfolio',
       summaryValue: `${data.summary.avgOnTimePct}%`,
       summaryDetail: isSnapshotMode
-        ? `${data.summary.healthyProjects} proyectos saludables dentro del alcance visible hoy.`
+        ? `${data.summary.healthyProjects} proyectos saludables hoy.`
         : `${data.summary.healthyProjects} proyectos saludables dentro del alcance visible.`,
       badges: moduleBadges.map(badge => badge.label)
     },
@@ -183,6 +172,15 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         value: formatRelationshipValue(data),
         detail: formatRelationshipDetail(data),
         icon: 'tabler-timeline'
+      },
+      {
+        key: 'active-work',
+        eyebrow: 'Active work',
+        tone: data.summary.projectsAtRisk > 0 ? 'warning' : 'info',
+        title: 'Carga activa del space',
+        value: String(data.summary.activeWorkItems),
+        detail: `${data.summary.queuedWorkItems} items en cola y ${data.summary.projectsAtRisk} proyectos bajo observacion.`,
+        icon: 'tabler-briefcase'
       },
       {
         key: 'monthly-on-time',
@@ -202,18 +200,6 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         miniChart: {
           variant: 'bars',
           data: onTimeSeries
-        }
-      },
-      {
-        key: 'first-pass',
-        eyebrow: 'Primera pasada',
-        tone: totalDeliverablesVisible === 0 ? 'info' : noAdjustmentRate >= 75 ? 'success' : noAdjustmentRate >= 50 ? 'warning' : 'error',
-        title: 'Sin ajustes cliente',
-        value: `${noAdjustmentRate}%`,
-        detail: `${totalDeliverablesWithoutAdjustments} de ${totalDeliverablesVisible} entregables visibles no registran ajustes cliente.`,
-        miniChart: {
-          variant: 'bars',
-          data: firstPassSeries
         }
       }
     ],
@@ -275,7 +261,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
                 }
               : {
                   variant: 'bars',
-                  data: reviewRoundsSeries
+                  data: firstPassSeries.length > 0 ? firstPassSeries : reviewRoundsSeries
                 }
     })),
     blocks

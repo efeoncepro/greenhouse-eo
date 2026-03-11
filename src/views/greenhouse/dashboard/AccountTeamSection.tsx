@@ -20,7 +20,8 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
   return (
     <CapacityOverviewCard
       title='Capacity y equipo asignado'
-      subtitle='Capacity visible de la cuenta con un roster reusable, cobertura ejecutiva y espacio para crecer a assignments formales.'
+      subtitle='La version principal mantiene el roster completo y deja lista una variante compacta para futuros layouts con menos alto.'
+      variant='default'
       coverageLabel={coverageLabel}
       coverageTone={assignedPeopleCount === 0 ? 'warning' : 'success'}
       summaryItems={[
@@ -51,7 +52,7 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
         sourceTone: member.source === 'override' ? 'warning' : 'success'
       }))}
       insightTitle='Lectura de capacity'
-      insightSubtitle='Resumen ejecutivo del staffing visible mientras madura el modelo formal de assignments.'
+      insightSubtitle='Resumen ejecutivo del staffing visible mientras madura el modelo formal de assignments y formatos compactos.'
       insightItems={[
         {
           label: 'Personas asignadas',

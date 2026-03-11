@@ -142,9 +142,8 @@ export const buildThemeCopy = (theme: DashboardTheme): DashboardThemeCopy => {
     case 'creative':
       return {
         heroLabel: 'Creative operations',
-        heroTitle: 'La operacion creativa se lee por throughput, revision abierta y cartera bajo presion.',
-        heroDescription:
-          'Greenhouse prioriza hoy la lectura de friccion de feedback, cadencia de piezas y salud de entrega para clientes creativos.',
+        heroTitle: 'Throughput, review pressure y salud del portfolio en una sola lectura.',
+        heroDescription: 'El hero resume la señal principal del space; el detalle operativo queda distribuido en cards de apoyo.',
         throughputTitle: 'Cadencia de piezas y salidas',
         throughputDescription: 'Mide cuanto trabajo creativo entra al flujo y cuanto ya logra salir con cierre real.',
         statusMixTitle: 'Mix del flujo creativo',
@@ -157,9 +156,8 @@ export const buildThemeCopy = (theme: DashboardTheme): DashboardThemeCopy => {
     case 'crm':
       return {
         heroLabel: 'CRM operations',
-        heroTitle: 'La operacion CRM se lee por activacion, estabilidad operativa y capacidad de cerrar backlog visible.',
-        heroDescription:
-          'Greenhouse pone adelante onboarding, consultoria y licenciamiento como una cartera operativa, no como un listado plano.',
+        heroTitle: 'Activacion, backlog visible y estabilidad operativa en una sola vista.',
+        heroDescription: 'El hero muestra la señal principal del servicio y deja el detalle CRM en cards accionables y comparables.',
         throughputTitle: 'Momentum de activacion y cierre',
         throughputDescription: 'Compara el backlog que entra a la operacion CRM contra lo que ya se logra cerrar y estabilizar.',
         statusMixTitle: 'Mix de operacion CRM',
@@ -172,9 +170,8 @@ export const buildThemeCopy = (theme: DashboardTheme): DashboardThemeCopy => {
     case 'web':
       return {
         heroLabel: 'Web delivery',
-        heroTitle: 'La operacion web se lee por cadencia de build, bloqueos y carga activa del delivery.',
-        heroDescription:
-          'Greenhouse prioriza visibilidad de ejecucion, cola y riesgo de release para clientes con desarrollo web activo.',
+        heroTitle: 'Cadencia, bloqueos y carga activa del delivery en una sola vista.',
+        heroDescription: 'El hero deja la historia corta arriba del fold y mueve la lectura de release, quality y capacity a cards dedicadas.',
         throughputTitle: 'Cadencia de ejecucion y salida',
         throughputDescription: 'Mide si la operacion logra sostener un ritmo sano entre entrada de trabajo y cierre del backlog.',
         statusMixTitle: 'Mix de delivery web',
@@ -187,9 +184,8 @@ export const buildThemeCopy = (theme: DashboardTheme): DashboardThemeCopy => {
     default:
       return {
         heroLabel: 'Executive dashboard',
-        heroTitle: 'La operacion del cliente ya se lee como una cartera, no como una lista de tareas.',
-        heroDescription:
-          'Greenhouse muestra velocidad de entrega, salud on-time, presion de revision y proyectos bajo atencion para el alcance visible.',
+        heroTitle: 'La operacion del cliente se entiende rapido, sin recorrer cada card.',
+        heroDescription: 'El hero concentra la lectura ejecutiva y deja la evidencia operativa distribuida en bloques mas faciles de escanear.',
         throughputTitle: 'Momentum de entrega',
         throughputDescription: 'Compara el flujo de trabajo que entra contra el trabajo que ya esta saliendo al mercado.',
         statusMixTitle: 'Mix operativo actual',
