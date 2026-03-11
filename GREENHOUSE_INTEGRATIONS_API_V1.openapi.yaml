@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Greenhouse Integrations API
+  version: 1.0.0
+  description: |
+    Generic integration surface for external connectors such as HubSpot, Notion,
+    or other systems that need to exchange tenant commercial context with Greenhouse.
+servers:
+  - url: https://dev-greenhouse.efeoncepro.com
+components:
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: API Token
+  schemas:
+    CapabilityCatalogItem:
+      type: object
+      required:
+        - moduleCode
+        - publicModuleId
+        - moduleLabel
+        - moduleKind
+        - sortOrder
+      properties:
+        moduleCode:
+          type: string
+        publicModuleId:
+          type: string
+        moduleLabel:
+          type: string
+        moduleKind:
+          type: string
+          enum: [business_line, service_module]
+        parentModuleCode:
+          type: [string, 'null']
+        description:
+          type: [string, 'null']
+        sortOrder:
+          type: integer
+    TenantSnapshot:
+      type: object
+      required:
+        - clientId
+        - publicId
+        - clientName
+        - status
+        - active
+        - portalHomePath
+        - businessLines
+        - serviceModules
+      properties:
+        clientId:
+          type: string
+        publicId:
+          type: string
+        clientName:
+          type: string
+        status:
+          type: string
+        active:
+          type: boolean
+        primaryContactEmail:
+          type: [string, 'null']
+        portalHomePath:
+          type: string
+        hubspotCompanyId:
+          type: [string, 'null']
+        businessLines:
+          type: array
+          items:
+            type: string
+        serviceModules:
+          type: array
+          items:
+            type: string
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+        capabilitiesUpdatedAt:
+          type: [string, 'null']
+          format: date-time
+    IntegrationTenantSelector:
+      type: object
+      properties:
+        clientId:
+          type: string
+        publicId:
+          type: string
+        sourceSystem:
+          type: string
+        sourceObjectType:
+          type: string
+        sourceObjectId:
+          type: string
+    CapabilitySyncPayload:
+      type: object
+      required:
+        - sourceSystem
+        - businessLines
+        - serviceModules
+      properties:
+        sourceSystem:
+          type: string
+        sourceObjectType:
+          type: [string, 'null']
+        sourceObjectId:
+          type: [string, 'null']
+        confidence:
+          type: string
+          default: high
+        businessLines:
+          type: array
+          items:
+            type: string
+        serviceModules:
+          type: array
+          items:
+            type: string
+security:
+  - bearerToken: []
+paths:
+  /api/integrations/v1/catalog/capabilities:
+    get:
+      summary: Export the active Greenhouse capability catalog
+      responses:
+        '200':
+          description: Catalog exported successfully
+  /api/integrations/v1/tenants:
+    get:
+      summary: Export tenant snapshots for integration readers
+      parameters:
+        - in: query
+          name: clientId
+          schema:
+            type: string
+        - in: query
+          name: publicId
+          schema:
+            type: string
+        - in: query
+          name: sourceSystem
+          schema:
+            type: string
+        - in: query
+          name: sourceObjectType
+          schema:
+            type: string
+        - in: query
+          name: sourceObjectId
+          schema:
+            type: string
+        - in: query
+          name: updatedSince
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        '200':
+          description: Tenant snapshots exported successfully
+  /api/integrations/v1/tenants/capabilities/sync:
+    post:
+      summary: Push normalized capabilities from an external connector into Greenhouse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target, sync]
+              properties:
+                target:
+                  $ref: '#/components/schemas/IntegrationTenantSelector'
+                sync:
+                  $ref: '#/components/schemas/CapabilitySyncPayload'
+            examples:
+              hubspotCompany:
+                value:
+                  target:
+                    sourceSystem: hubspot_crm
+                    sourceObjectType: company
+                    sourceObjectId: '30825221458'
+                  sync:
+                    sourceSystem: hubspot_crm
+                    sourceObjectType: company
+                    sourceObjectId: '30825221458'
+                    confidence: high
+                    businessLines:
+                      - globe
+                    serviceModules:
+                      - agencia_creativa
+      responses:
+        '200':
+          description: Tenant capabilities synced successfully
+        '404':
+          description: Tenant not found for selector

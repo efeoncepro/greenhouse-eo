@@ -195,7 +195,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Aun no existe `/api/sprints`.
 - Aun no existen `/api/dashboard/capacity` ni `/api/dashboard/market-speed`; se pospusieron porque los tiempos operativos actuales no vienen en formato numerico confiable.
 - Ya existe una capa multi-user real separada de tenants.
-- Ya existe evidencia comercial en BigQuery para derivar modulos de servicio desde `hubspot_crm.deals.linea_de_servicio` y `servicios_especificos`.
+- La sincronizacion externa de capabilities debe venir por payload explicito desde una fuente canonica de empresa; no debe inferirse automaticamente desde `deals`.
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
@@ -315,6 +315,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Falta relacion campanas con proyectos, entregables e indicadores.
 - Falta aterrizar completamente el sistema ejecutivo reusable en runtime para que `/dashboard`, `/equipo`, `/campanas` e internal/admin compartan un mismo lenguaje visual.
 - Sigue pendiente decidir cuando persistir `public_id` en BigQuery; por ahora el runtime puede derivarlos sin romper `client_id` y `user_id`.
+- La nueva referencia para conectores externos es `GREENHOUSE_INTEGRATIONS_API_V1.md`; la API de integraciones debe mantenerse generica para HubSpot, Notion u otros sistemas.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

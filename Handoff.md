@@ -1481,3 +1481,26 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Queda deuda de datos:
   - el dataset replicado actual no expone aun propiedades company-level como `linea_de_servicio` o `servicios_especificos` en `hubspot_crm.companies` ni en `hubspot_crm.companies_history`
   - por eso el sync externo queda soportado a nivel API, pero no debe autoderivarse desde BigQuery hasta tener esas propiedades disponibles correctamente
+
+### Delta 2026-03-11 Generic Integrations API
+- Se agrego `GREENHOUSE_INTEGRATIONS_API_V1.md` como contrato de integracion bidireccional desde Greenhouse.
+- La nueva superficie no depende de sesiones admin ni de NextAuth.
+  - Usa `GREENHOUSE_INTEGRATION_API_TOKEN`.
+  - Acepta `Authorization: Bearer <token>` o `x-greenhouse-integration-key`.
+- Rutas nuevas:
+  - `GET /api/integrations/v1/catalog/capabilities`
+  - `GET /api/integrations/v1/tenants`
+  - `POST /api/integrations/v1/tenants/capabilities/sync`
+- La API es generica para HubSpot, Notion u otros conectores.
+- El contrato de seleccion/resolucion de tenant usa:
+  - `clientId`
+  - `publicId`
+  - `sourceSystem`
+  - `sourceObjectType`
+  - `sourceObjectId`
+- Resolucion implementada hoy:
+  - `hubspot_crm` + `company` + `hubspot_company_id`
+- La idea operativa es:
+  - los conectores leen el catalogo canonico de capabilities desde Greenhouse
+  - empujan contextos normalizados al tenant correcto
+  - y tambien pueden leer snapshots de tenants para sincronizacion saliente o reconciliacion

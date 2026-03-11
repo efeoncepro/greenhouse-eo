@@ -257,3 +257,16 @@
 - Rebalanced `/admin/tenants/[id]` so tenant identity, validation CTA, and governance appear in a clearer order instead of pushing the editor into a narrow left rail.
 - Removed automatic capability derivation from HubSpot `closedwon` deals in `POST /api/admin/tenants/[id]/capabilities/sync`.
 - The sync route now requires explicit `businessLines` or `serviceModules` in the payload and treats the source as company-level or external metadata only.
+
+### 2026-03-11 - Generic integrations API
+- Added `GREENHOUSE_INTEGRATIONS_API_V1.md` as the contract for external connectors.
+- Added token-based integration auth via `GREENHOUSE_INTEGRATION_API_TOKEN`.
+- Added generic routes under `/api/integrations/v1/*` so HubSpot, Notion, or any other connector can use the same surface:
+  - `GET /api/integrations/v1/catalog/capabilities`
+  - `GET /api/integrations/v1/tenants`
+  - `POST /api/integrations/v1/tenants/capabilities/sync`
+- The API is intentionally provider-neutral and resolves tenants by:
+  - `clientId`
+  - `publicId`
+  - `sourceSystem` + `sourceObjectType` + `sourceObjectId`
+- Current first-class source mapping is HubSpot company resolution through `hubspot_company_id`, but the contract is ready for additional systems.
