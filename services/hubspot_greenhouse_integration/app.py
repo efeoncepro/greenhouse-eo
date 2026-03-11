@@ -1,9 +1,16 @@
 from flask import Flask, jsonify
 
-from .config import build_runtime_config
-from .contract import build_contract
-from .hubspot_client import HubSpotClient, HubSpotIntegrationError
-from .models import build_company_profile, build_owner_profile
+try:
+    from .config import build_runtime_config
+    from .contract import build_contract
+    from .hubspot_client import HubSpotClient, HubSpotIntegrationError
+    from .models import build_company_profile, build_owner_profile
+except ImportError:
+    # Allow standalone execution when Cloud Run deploys from this subdirectory.
+    from config import build_runtime_config
+    from contract import build_contract
+    from hubspot_client import HubSpotClient, HubSpotIntegrationError
+    from models import build_company_profile, build_owner_profile
 
 
 def create_app() -> Flask:

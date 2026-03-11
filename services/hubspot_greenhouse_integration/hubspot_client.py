@@ -2,7 +2,11 @@ from typing import Any
 
 import requests
 
-from .config import HUBSPOT_API
+try:
+    from .config import HUBSPOT_API
+except ImportError:
+    # Allow standalone execution when Cloud Run deploys from this subdirectory.
+    from config import HUBSPOT_API
 
 
 class HubSpotIntegrationError(RuntimeError):
@@ -35,9 +39,10 @@ def _parse_error(response: requests.Response) -> str:
 
 class HubSpotClient:
     def __init__(self, *, access_token: str, timeout_seconds: int):
-        if not access_token:
+        normalized_access_token = access_token.strip()
+        if not normalized_access_token:
             raise HubSpotIntegrationError("HUBSPOT_ACCESS_TOKEN is not set")
-        self.access_token = access_token
+        self.access_token = normalized_access_token
         self.timeout_seconds = timeout_seconds
         self.session = requests.Session()
 

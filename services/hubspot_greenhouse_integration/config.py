@@ -15,12 +15,13 @@ DEFAULT_SERVICE_MODULE_PROP = os.environ.get(
 
 
 def build_runtime_config() -> dict:
+    access_token = os.environ.get("HUBSPOT_ACCESS_TOKEN", "").strip()
     return {
         "service_name": "hubspot-greenhouse-integration",
         "service_version": SERVICE_VERSION,
         "hubspot_api": HUBSPOT_API,
         "timeout_seconds": DEFAULT_TIMEOUT_SECONDS,
-        "hubspot_access_token": os.environ.get("HUBSPOT_ACCESS_TOKEN", ""),
+        "hubspot_access_token": access_token,
         "business_line_prop": DEFAULT_BUSINESS_LINE_PROP,
         "service_module_prop": DEFAULT_SERVICE_MODULE_PROP,
     }
