@@ -17,6 +17,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 - Seed operativo para benchmark interno del dashboard: `bigquery/greenhouse_efeonce_space_v1.sql`
+- Plan UX actual para la siguiente iteracion del dashboard: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -61,6 +62,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `apexcharts` + `react-apexcharts` activos para charts ejecutivos
 - El portal ya tiene un `space-efeonce` sembrado en BigQuery para validar el MVP del dashboard cliente sobre el portfolio interno con mayor densidad de datos.
 - En producto, la label visible debe migrar a `space`; `tenant` se mantiene solo como termino interno de runtime y datos.
+- El dashboard ya no se compone solo por `snapshot` vs `non-snapshot`; ahora existe `layoutMode = snapshot | standard | rich` para ajustar jerarquia y distribucion de cards segun la densidad real del space.
 - `recharts` activo como segunda via de charting reusable alineada con `full-version`
 - `keen-slider`, `@fullcalendar/*`, `react-datepicker`, `react-dropzone`, `react-toastify`, `cmdk`, `@tiptap/*`, `@tanstack/react-table`, `react-player`, `mapbox-gl`, `react-map-gl`, `react-hook-form`, `@hookform/resolvers`, `valibot`, `@formkit/drag-and-drop`, `emoji-mart` y `@emoji-mart/*` ya estan instalados en `starter-kit`
 - `simple-icons` activo para logos SVG de marcas como fallback directo en runtime

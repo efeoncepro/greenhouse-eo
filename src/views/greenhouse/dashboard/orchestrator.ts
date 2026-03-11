@@ -40,6 +40,7 @@ type ExecutiveBlockKey =
 
 export type ExecutiveDashboardLayout = {
   isSnapshotMode: boolean
+  layoutMode: 'snapshot' | 'standard' | 'rich'
   themeCopy: ReturnType<typeof buildThemeCopy>
   hero: {
     eyebrow: string
@@ -93,6 +94,15 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
   const maxHistoryDepth = Math.max(data.charts.monthlyDelivery.length, data.charts.throughput.length, data.qualitySignals.length)
   const isSnapshotMode = maxHistoryDepth < 2
 
+  const layoutMode: ExecutiveDashboardLayout['layoutMode'] = isSnapshotMode
+    ? 'snapshot'
+    : data.scope.projectCount >= 8 ||
+        data.summary.totalTasks >= 180 ||
+        data.charts.monthlyDelivery.length >= 4 ||
+        data.accountTeam.members.length >= 5
+      ? 'rich'
+      : 'standard'
+
   const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
   const previousMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 2] || null
   const totalDeliverablesVisible = data.charts.monthlyDelivery.reduce((sum, item) => sum + item.totalDeliverables, 0)
@@ -143,6 +153,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
 
   return {
     isSnapshotMode,
+    layoutMode,
     themeCopy,
     hero: {
       eyebrow: themeCopy.heroLabel,

@@ -54,7 +54,7 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
 
   if (isSparseWindow) {
     return (
-      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(auto-fit, minmax(360px, 1fr))' } }}>
         <ExecutiveCardShell
           title='Entrega mensual visible'
           subtitle='Con una sola observacion mensual visible, el dashboard cambia a una lectura snapshot en vez de insistir en una serie larga.'
@@ -141,7 +141,7 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
   }
 
   return (
-    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.25fr 1fr' } }}>
+    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(auto-fit, minmax(360px, 1fr))' } }}>
       <ExecutiveCardShell
         title='Entrega mensual visible'
         subtitle='Serie mensual de ritmo y cumplimiento sobre el alcance visible del space.'

@@ -65,8 +65,8 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `src/components/greenhouse/*`
 
 ### Verificacion
-- `npx pnpm lint`: pendiente ejecutar al cierre de esta iteracion
-- `npx pnpm build`: pendiente ejecutar al cierre de esta iteracion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
 - Smoke BigQuery:
 - `space-efeonce` creado en `greenhouse.clients`
 - `space-efeonce` con `57` proyectos base
@@ -78,6 +78,8 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `space-efeonce` es metadata-only por ahora: no tiene `client_users` propios y debe consumirse via `Ver como cliente` desde admin.
 - El lookup de auth no debe duplicarse con el mismo email interno en `tenant_type = client`; eso introduciria ambiguedad en login.
 - El siguiente paso de producto es validar el dashboard de `space-efeonce` y, en base a esa lectura, decidir si se divide en una vista general y vistas anidadas de performance / delivery / quality.
+- La deuda UX mas importante que ya se ataco es `capacity`; la siguiente si hiciera falta seria dividir el dashboard rico en tabs o vistas anidadas para bajar longitud total.
+- Documento de referencia para esta iteracion: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`.
 
 ### Fecha
 - 2026-03-10 America/Santiago

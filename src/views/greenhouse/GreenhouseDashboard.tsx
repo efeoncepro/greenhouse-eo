@@ -65,13 +65,29 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
         sx={{
           display: 'grid',
           gap: 3,
-          gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.75fr) minmax(320px, 1fr)' },
+          gridTemplateColumns: {
+            xs: '1fr',
+            xl:
+              layout.layoutMode === 'rich'
+                ? 'minmax(0, 1.9fr) minmax(320px, 0.95fr)'
+                : 'minmax(0, 1.75fr) minmax(320px, 1fr)'
+          },
           alignItems: 'stretch'
         }}
       >
         <ExecutiveHeroCard {...layout.hero} />
 
-        <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: '1fr' } }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, minmax(0, 1fr))',
+              xl: layout.layoutMode === 'rich' ? 'repeat(3, minmax(0, 1fr))' : '1fr'
+            }
+          }}
+        >
           {layout.topStats.map(card => (
             <ExecutiveMiniStatCard
               key={card.key}
@@ -94,7 +110,10 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
           sx={{
             display: 'grid',
             gap: 3,
-            gridTemplateColumns: { xs: '1fr', md: `repeat(${Math.min(layout.focusCards.length, 3)}, minmax(0, 1fr))` }
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(auto-fit, minmax(240px, 1fr))'
+            }
           }}
         >
           {layout.focusCards.map(card => (
@@ -119,8 +138,7 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
           gap: 3,
           gridTemplateColumns: {
             xs: '1fr',
-            sm: 'repeat(2, minmax(0, 1fr))',
-            xl: layout.isSnapshotMode ? 'repeat(3, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))'
+            md: 'repeat(auto-fit, minmax(220px, 1fr))'
           }
         }}
       >
@@ -148,7 +166,19 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
           healthDescription='La vista compacta agrupa salud, mix operativo y carga de esfuerzo mientras el historico mensual sigue madurando.'
         />
       ) : (
-        <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.25fr 1fr' } }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: {
+              xs: '1fr',
+              xl:
+                layout.layoutMode === 'rich'
+                  ? 'minmax(0, 1.35fr) minmax(360px, 0.95fr)'
+                  : 'minmax(0, 1.25fr) minmax(340px, 1fr)'
+            }
+          }}
+        >
           <ThroughputOverviewCard
             data={data}
             title={layout.themeCopy.throughputTitle}
@@ -170,7 +200,16 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
       {hasBlock('tooling') ? <ToolingSection data={data} /> : null}
 
       {!layout.isSnapshotMode ? (
-        <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.1fr 0.9fr' } }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: {
+              xs: '1fr',
+              xl: 'minmax(0, 1.1fr) minmax(320px, 0.9fr)'
+            }
+          }}
+        >
           <ExecutiveCardShell title={layout.themeCopy.statusMixTitle} subtitle={layout.themeCopy.statusMixDescription}>
             <AppReactApexCharts type='bar' height={320} width='100%' series={statusMixSeries} options={statusMixOptions} />
           </ExecutiveCardShell>

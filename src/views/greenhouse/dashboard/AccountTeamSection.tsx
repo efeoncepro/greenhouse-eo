@@ -10,25 +10,34 @@ type AccountTeamSectionProps = {
 const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
   const assignedPeopleCount = data.accountTeam.members.length
 
+  const coverageLabel =
+    assignedPeopleCount === 0
+      ? 'Pendiente'
+      : data.accountTeam.averageAllocationPct !== null && data.accountTeam.averageAllocationPct >= 85
+        ? 'Cobertura saludable'
+        : 'Cobertura parcial'
+
   return (
     <CapacityOverviewCard
       title='Capacity y equipo asignado'
-      subtitle='Staffing visible de la cuenta con una lectura ejecutiva de cobertura, horas y estado de asignacion.'
+      subtitle='Capacity visible de la cuenta con un roster reusable, cobertura ejecutiva y espacio para crecer a assignments formales.'
+      coverageLabel={coverageLabel}
+      coverageTone={assignedPeopleCount === 0 ? 'warning' : 'success'}
       summaryItems={[
         {
           label: 'Personas asignadas',
           value: String(assignedPeopleCount),
-          detail: 'Roster visible'
+          detail: 'Roster visible del space'
         },
         {
           label: 'Horas mensuales',
           value: String(data.accountTeam.totalMonthlyHours),
-          detail: 'Capacidad mensual'
+          detail: 'Capacidad mensual comprometida'
         },
         {
           label: 'Asignacion promedio',
           value: data.accountTeam.averageAllocationPct !== null ? `${data.accountTeam.averageAllocationPct}%` : 'Pendiente',
-          detail: 'Carga media visible'
+          detail: 'Carga media visible del equipo'
         }
       ]}
       members={data.accountTeam.members.map(member => ({
@@ -38,26 +47,26 @@ const AccountTeamSection = ({ data }: AccountTeamSectionProps) => {
         avatarPath: member.avatarPath,
         allocationPct: member.allocationPct,
         monthlyHours: member.monthlyHours,
-        sourceLabel: member.source === 'override' ? 'Dedicated override' : 'Detectado desde Notion',
+        sourceLabel: member.source === 'override' ? 'Asignacion controlada para la cuenta' : 'Detectado desde Notion',
         sourceTone: member.source === 'override' ? 'warning' : 'success'
       }))}
       insightTitle='Lectura de capacity'
-      insightSubtitle='Resumen ejecutivo de cobertura y capacidad visible sobre la cuenta.'
+      insightSubtitle='Resumen ejecutivo del staffing visible mientras madura el modelo formal de assignments.'
       insightItems={[
         {
           label: 'Personas asignadas',
           value: String(assignedPeopleCount),
-          detail: 'Cuenta de miembros visibles para la cuenta en el dashboard.'
+          detail: 'Miembros visibles para la cuenta en el dashboard.'
         },
         {
           label: 'Horas mensuales',
           value: String(data.accountTeam.totalMonthlyHours),
-          detail: 'Suma de capacidad mensual visible sobre la cuenta.'
+          detail: 'Suma de capacidad mensual hoy visible sobre la cuenta.'
         },
         {
           label: 'Asignacion promedio',
           value: data.accountTeam.averageAllocationPct !== null ? `${data.accountTeam.averageAllocationPct}%` : 'Pendiente',
-          detail: 'Promedio simple de allocation para la cuenta visible.'
+          detail: 'Promedio simple de allocation del roster visible.'
         },
         {
           label: 'Cobertura actual',

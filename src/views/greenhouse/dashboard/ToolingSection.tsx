@@ -60,7 +60,7 @@ const ToolingSection = ({ data }: ToolingSectionProps) => {
   const theme = useTheme()
 
   return (
-    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
+    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(auto-fit, minmax(320px, 1fr))' } }}>
       <ToolGroup
         title='Herramientas tecnologicas'
         description='Inventario reusable por cuenta derivado desde modulos activos y complementado con overrides controlados.'

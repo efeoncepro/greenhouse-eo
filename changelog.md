@@ -9,6 +9,9 @@
 ### Dashboard
 - Se agrego `snapshot mode` para dashboards con historico corto, reemplazando charts grandes y vacios por una lectura ejecutiva compacta.
 - Se extrajo `CapacityOverviewCard` como componente reusable y escalable para capacity/equipo asignado.
+- Se agrego `layoutMode = snapshot | standard | rich` en el orquestador del dashboard para que la composicion se adapte a la densidad de datos del space.
+- `CapacityOverviewCard` paso a una sola superficie con summary strip, roster responsive e insights compactos al pie.
+- Los grids de KPI, focus, delivery, quality y tooling migraron a patrones mas fluidos con `minmax` para responder mejor al espacio disponible.
 
 ### Spaces
 - Se definio el label visible `space` para superficies admin relacionadas con clientes, manteniendo `tenant` solo como termino interno.

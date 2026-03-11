@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import ExecutiveCardShell from './ExecutiveCardShell'
-import MetricList from './MetricList'
 import type { MetricListItem } from './MetricList'
 
 type CapacitySummaryItem = {
@@ -42,6 +41,8 @@ type CapacityOverviewCardProps = {
   insightTitle: string
   insightSubtitle: string
   insightItems: MetricListItem[]
+  coverageLabel?: string
+  coverageTone?: CapacityMemberTone
 }
 
 const getInitials = (value: string) =>
@@ -81,42 +82,59 @@ const CapacityOverviewCard = ({
   members,
   insightTitle,
   insightSubtitle,
-  insightItems
+  insightItems,
+  coverageLabel = 'Healthy',
+  coverageTone = 'success'
 }: CapacityOverviewCardProps) => {
   const theme = useTheme()
 
   return (
-    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.2fr 1fr' } }}>
-      <ExecutiveCardShell title={title} subtitle={subtitle}>
-        <Stack spacing={3}>
-          <Box
-            sx={{
-              display: 'grid',
-              gap: 2,
-              gridTemplateColumns: { xs: '1fr', md: `repeat(${Math.min(Math.max(summaryItems.length, 1), 3)}, minmax(0, 1fr))` }
-            }}
-          >
-            {summaryItems.map(item => (
-              <Box
-                key={item.label}
-                sx={{
-                  p: 2.5,
-                  borderRadius: 3,
-                  backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.12)}`
-                }}
-              >
-                <Typography variant='caption' color='text.secondary'>
-                  {item.label}
-                </Typography>
-                <Typography variant='h4'>{item.value}</Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  {item.detail}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+    <ExecutiveCardShell
+      title={title}
+      subtitle={subtitle}
+      action={<Chip size='small' variant='tonal' color={coverageTone} label={coverageLabel} />}
+      contentSx={{ pt: 3.5 }}
+    >
+      <Stack spacing={3.5}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))'
+          }}
+        >
+          {summaryItems.map(item => (
+            <Box
+              key={item.label}
+              sx={{
+                p: 2.5,
+                borderRadius: 3,
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                minHeight: 116,
+                display: 'grid',
+                gap: 0.75,
+                alignContent: 'start'
+              }}
+            >
+              <Typography variant='caption' color='text.secondary'>
+                {item.label}
+              </Typography>
+              <Typography variant='h4'>{item.value}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {item.detail}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
 
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
+          }}
+        >
           {members.map(member => {
             const allocationTone = resolveAllocationTone(member)
             const allocationValue = member.allocationPct ?? 0
@@ -125,60 +143,119 @@ const CapacityOverviewCard = ({
               <Box
                 key={member.id}
                 sx={{
-                  p: 3,
+                  p: 2.75,
                   borderRadius: 3,
-                  border: theme => `1px solid ${theme.palette.divider}`,
+                  border: `1px solid ${theme.palette.divider}`,
                   display: 'grid',
-                  gap: 2.5,
-                  gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) auto' }
+                  gap: 2,
+                  alignContent: 'start',
+                  minHeight: 220
                 }}
               >
-                <Stack spacing={2.5}>
-                  <Stack direction='row' spacing={2} alignItems='center'>
-                    <Avatar src={member.avatarPath || undefined} sx={{ width: 48, height: 48 }}>
-                      {getInitials(member.name)}
-                    </Avatar>
-                    <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                      <Typography variant='h6'>{member.name}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {member.role}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-
-                  <Box>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center' className='mbe-1'>
-                      <Typography variant='body2' color='text.secondary'>
-                        Allocation
-                      </Typography>
-                      <Typography variant='body2' color='text.primary'>
-                        {member.allocationPct !== null ? `${member.allocationPct}%` : 'Pendiente'}
-                      </Typography>
-                    </Stack>
-                    <LinearProgress
-                      variant='determinate'
-                      color={allocationTone}
-                      value={allocationValue}
-                      sx={{ height: 8, borderRadius: 999 }}
-                    />
+                <Stack direction='row' spacing={1.75} alignItems='center'>
+                  <Avatar src={member.avatarPath || undefined} sx={{ width: 52, height: 52 }}>
+                    {getInitials(member.name)}
+                  </Avatar>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant='h6'>{member.name}</Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {member.role}
+                    </Typography>
                   </Box>
                 </Stack>
 
-                <Stack direction='row' flexWrap='wrap' gap={1.5} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
-                  <Chip variant='tonal' color={allocationTone} label={resolveAllocationLabel(member)} />
-                  <Chip variant='tonal' color='primary' label={resolveHoursLabel(member)} />
-                  <Chip variant='outlined' color={member.sourceTone || 'info'} label={member.sourceLabel} />
+                <Box>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center' className='mbe-1'>
+                    <Typography variant='body2' color='text.secondary'>
+                      Allocation
+                    </Typography>
+                    <Typography variant='body2'>{member.allocationPct !== null ? `${member.allocationPct}%` : 'Pendiente'}</Typography>
+                  </Stack>
+                  <LinearProgress
+                    variant='determinate'
+                    color={allocationTone}
+                    value={allocationValue}
+                    sx={{ height: 8, borderRadius: 999 }}
+                  />
+                </Box>
+
+                <Stack direction='row' gap={1} flexWrap='wrap'>
+                  <Chip size='small' variant='tonal' color={allocationTone} label={resolveAllocationLabel(member)} />
+                  <Chip size='small' variant='tonal' color='primary' label={resolveHoursLabel(member)} />
                 </Stack>
+
+                <Box
+                  sx={{
+                    p: 1.75,
+                    borderRadius: 2.5,
+                    backgroundColor: alpha(theme.palette.info.main, 0.05),
+                    border: `1px solid ${alpha(theme.palette.info.main, 0.12)}`
+                  }}
+                >
+                  <Typography variant='caption' color='text.secondary'>
+                    Fuente
+                  </Typography>
+                  <Stack direction='row' justifyContent='space-between' gap={2} alignItems='center'>
+                    <Typography variant='body2'>{member.sourceLabel}</Typography>
+                    <Chip size='small' variant='outlined' color={member.sourceTone || 'info'} label={member.sourceTone === 'warning' ? 'Controlado' : 'Detectado'} />
+                  </Stack>
+                </Box>
               </Box>
             )
           })}
-        </Stack>
-      </ExecutiveCardShell>
+        </Box>
 
-      <ExecutiveCardShell title={insightTitle} subtitle={insightSubtitle}>
-        <MetricList items={insightItems} />
-      </ExecutiveCardShell>
-    </Box>
+        <Box
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            backgroundColor: alpha(theme.palette.background.default, 0.48),
+            border: `1px solid ${theme.palette.divider}`
+          }}
+        >
+          <Stack spacing={2.5}>
+            <Box>
+              <Typography variant='h6'>{insightTitle}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {insightSubtitle}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))'
+              }}
+            >
+              {insightItems.map(item => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    p: 2.25,
+                    borderRadius: 3,
+                    bgcolor: 'background.paper',
+                    border: `1px solid ${theme.palette.divider}`,
+                    minHeight: 112,
+                    display: 'grid',
+                    gap: 0.75,
+                    alignContent: 'start'
+                  }}
+                >
+                  <Typography variant='caption' color='text.secondary'>
+                    {item.label}
+                  </Typography>
+                  <Typography variant='h5'>{item.value}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {item.detail}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Stack>
+        </Box>
+      </Stack>
+    </ExecutiveCardShell>
   )
 }
 

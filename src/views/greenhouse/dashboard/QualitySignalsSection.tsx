@@ -38,7 +38,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
 
   if (isSparseWindow) {
     return (
-      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' } }}>
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(auto-fit, minmax(360px, 1fr))' } }}>
         <ExecutiveCardShell
           title='Calidad mensual'
           subtitle='Con una sola observacion visible, la calidad se resume como snapshot con procedencia explicita.'
@@ -119,7 +119,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
   }
 
   return (
-    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.25fr 1fr' } }}>
+    <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(auto-fit, minmax(360px, 1fr))' } }}>
       <ExecutiveCardShell
         title='Calidad mensual'
         subtitle='RpA y First-Time Right con origen explicito mientras madura la calidad de la fuente medida.'
