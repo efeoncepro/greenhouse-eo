@@ -138,6 +138,16 @@ const toErrorMessage = (error: unknown) => {
   return 'Unknown HubSpot integration service error'
 }
 
+export const getHubSpotGreenhouseServiceContract = async () => fetchJson<HubSpotGreenhouseServiceContract>('/contract')
+
+export const getHubSpotGreenhouseCompanyProfile = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyProfile>(`/companies/${hubspotCompanyId}`)
+
+export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
+
+export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null
 ): Promise<HubSpotGreenhouseLiveContext> => {
@@ -157,16 +167,11 @@ export const getHubSpotGreenhouseLiveContext = async (
   }
 
   const [contractResult, companyResult, ownerResult, contactsResult] = await Promise.allSettled([
-    fetchJson<HubSpotGreenhouseServiceContract>('/contract'),
-    fetchJson<HubSpotGreenhouseCompanyProfile>(`/companies/${hubspotCompanyId}`),
-    fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`),
-    fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
+    getHubSpotGreenhouseServiceContract(),
+    getHubSpotGreenhouseCompanyProfile(hubspotCompanyId),
+    getHubSpotGreenhouseCompanyOwner(hubspotCompanyId),
+    getHubSpotGreenhouseCompanyContacts(hubspotCompanyId)
   ])
-
-  const company = companyResult.status === 'fulfilled' ? companyResult.value : null
-  const owner = ownerResult.status === 'fulfilled' ? ownerResult.value.owner : null
-  const contacts = contactsResult.status === 'fulfilled' ? contactsResult.value.contacts : []
-
   const errors = [contractResult, companyResult, ownerResult, contactsResult]
     .filter(result => result.status === 'rejected')
     .map(result => toErrorMessage((result as PromiseRejectedResult).reason))
@@ -176,9 +181,9 @@ export const getHubSpotGreenhouseLiveContext = async (
     serviceBaseUrl: baseUrl,
     fetchedAt: new Date().toISOString(),
     contract: contractResult.status === 'fulfilled' ? contractResult.value : null,
-    company,
-    owner,
-    contacts,
+    company: companyResult.status === 'fulfilled' ? companyResult.value : null,
+    owner: ownerResult.status === 'fulfilled' ? ownerResult.value.owner : null,
+    contacts: contactsResult.status === 'fulfilled' ? contactsResult.value.contacts : [],
     error: errors.length > 0 ? errors.join(' | ') : null
   }
 }
