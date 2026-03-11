@@ -308,6 +308,16 @@ const upsertClientUser = async ({
       portalHomePath,
       timezone,
       actorUserId
+    },
+    types: {
+      userId: 'STRING',
+      clientId: 'STRING',
+      email: 'STRING',
+      fullName: 'STRING',
+      jobTitle: 'STRING',
+      portalHomePath: 'STRING',
+      timezone: 'STRING',
+      actorUserId: 'STRING'
     }
   })
 }

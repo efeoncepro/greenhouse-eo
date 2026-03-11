@@ -40,6 +40,62 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 23:28 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar el smoke autenticado real del provisioning admin sobre `hubspot-company-30825221458`.
+- Confirmar login local con ADC en lugar de depender del `GOOGLE_APPLICATION_CREDENTIALS_JSON` roto de otros entornos.
+- Corregir un bug real del provisioning detectado durante el smoke.
+
+### Rama
+- Rama usada: `reconcile/merge-hubspot-provisioning`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development local en `http://localhost:3100`
+
+### Archivos tocados
+- `src/lib/admin/tenant-member-provisioning.ts`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- Se levanto `npx next dev --turbopack --port 3100` con `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GOOGLE_APPLICATION_CREDENTIALS` limpiados del proceso.
+- Login admin real correcto:
+  - cuenta interna `julio.reyes@efeonce.org`
+  - `GET /api/auth/session`: correcto
+- Smoke del tenant:
+  - `GET /admin/tenants/hubspot-company-30825221458`: `200`
+  - `POST /api/admin/tenants/hubspot-company-30825221458/contacts/provision` con `["136893943450"]`
+- Hallazgo y correccion:
+  - el primer POST devolvio `error` por BigQuery: `Parameter types must be provided for null values via the 'types' field in query options.`
+  - se corrigio `upsertClientUser` agregando `types` explicitos para parametros `STRING`
+- Re-verificacion despues del fix:
+  - mismo POST devolvio `created: 1`
+  - segundo POST sobre el mismo contacto devolvio `reconciled: 1`
+  - chequeo directo en BigQuery correcto para `user-hubspot-contact-136893943450`:
+    - `client_id = hubspot-company-30825221458`
+    - `status = invited`
+    - `active = false`
+    - `auth_mode = password_reset_pending`
+    - rol `client_executive`
+    - `1` scope base de proyecto
+
+### Riesgos o pendientes
+- El smoke funcional ya paso; falta dejar validacion de rama con `lint` y `build` despues del fix si se quiere promover sin mas cambios.
+- Siguen pendientes los smoke mas amplios de UX visual manual y la decision de promocion a `develop`.
+- El contacto `136893943450` ya fue provisionado de verdad en BigQuery durante este smoke.
+
+### Proximo paso recomendado
+- Ejecutar `npx pnpm lint` y `npx pnpm build` en esta rama con el fix ya aplicado.
+- Si ambos pasan, promover `reconcile/merge-hubspot-provisioning` a `develop`.
+- Dejar el contacto ya provisionado como evidencia del smoke real y seguir luego con corrida bulk controlada para los contactos faltantes.
+
+### Fecha
 - 2026-03-11 22:55 America/Santiago
 
 ### Agente

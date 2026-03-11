@@ -118,6 +118,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - la rama documental rescatada aparte es `reconcile/docs-cross-repo-contract`
 - no usar `rescue/wip-local-hubspot-contacts-20260311-1729` como base de merge
 - si un build local falla por rutas de otra rama, revisar el cache historico en `.next-local/**` antes de asumir un bug del cambio actual
+- smoke real del provisioning ya ejecutado en local sobre `hubspot-company-30825221458`:
+  - login admin correcto con ADC y `.env.local` minima
+  - el endpoint `/api/admin/tenants/[id]/contacts/provision` ya fue probado contra BigQuery real
+  - el bug detectado en el smoke fue tipado explicito de `null` para `upsertClientUser` en BigQuery
+  - evidencia real: `user-hubspot-contact-136893943450` quedo creado y una segunda corrida devolvio `reconciled`
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz

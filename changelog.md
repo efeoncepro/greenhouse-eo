@@ -13,6 +13,10 @@
   - repara rol `client_executive` y scopes base cuando el usuario del mismo tenant ya existia por `user_id` o por `email`
   - detecta duplicados ambiguos dentro del mismo tenant y los devuelve como conflicto en lugar de dejarlos pasar como `already_exists`
 - La tabla de contactos CRM ahora distingue `Ya existe`, `Falta provisionar` y `Sin email`, y expone feedback del resultado de la corrida admin.
+- El smoke real sobre `hubspot-company-30825221458` detecto y corrigio un bug de BigQuery en el alta de usuarios nuevos:
+  - `upsertClientUser` ahora envia `types` explicitos para parametros `STRING` cuando `jobTitle` u otros campos llegan como `null`
+  - despues del fix, el contacto `136893943450` (`valeria.gutierrez@skyairline.com`) quedo provisionado con `status=invited`, `auth_mode=password_reset_pending`, rol `client_executive` y `1` scope base
+  - una segunda corrida sobre el mismo contacto devolvio `reconciled`, confirmando idempotencia funcional
 
 ### Integrations
 - Se auditaron todas las ramas activas y de respaldo; el unico trabajo funcional no absorbido quedo fijado en `reconcile/merge-hubspot-provisioning` y el rescate documental cross-repo en `reconcile/docs-cross-repo-contract`.
@@ -33,6 +37,12 @@
 ### Validacion
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
+- Smoke local autenticado en `http://localhost:3100` con cuenta admin real: correcto
+- `GET /admin/tenants/hubspot-company-30825221458`: `200`
+- `POST /api/admin/tenants/hubspot-company-30825221458/contacts/provision`:
+  - primer intento: detecto bug real de tipado `null` en BigQuery
+  - segundo intento despues del fix: `created: 1`
+  - tercer intento sobre el mismo contacto: `reconciled: 1`
 - Validacion visual local con login admin + `view-as` sobre `space-efeonce`: correcta
 - Documento operativo `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md` quedo reescrito con matriz de brechas, soluciones, seleccion y ejecucion final
 ## 2026-03-10
