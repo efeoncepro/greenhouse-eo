@@ -1,6 +1,7 @@
 import type { GreenhouseDashboardData, GreenhouseKpiTone } from '@/types/greenhouse-dashboard'
 import {
   buildModuleFocusCards,
+  formatDelta,
   formatSyncedAt,
   hasAccountTeam,
   hasMonthlyDeliverySignals,
@@ -18,6 +19,13 @@ type ExecutiveMiniStatDescriptor = {
   title: string
   value: string
   detail: string
+  icon?: string
+  delta?: string
+  miniChart?: {
+    variant: 'bars' | 'area' | 'split-bars'
+    data: number[]
+    categories?: string[]
+  }
   supportItems?: { label: string; value: string }[]
 }
 
@@ -56,6 +64,25 @@ const formatRelationshipDetail = (data: GreenhouseDashboardData) =>
     ? `${data.relationship.label}. Inicio visible: ${new Date(`${data.relationship.startedAt}T00:00:00.000Z`).toLocaleDateString('es-CL')}.`
     : 'Aun no hay una primera actividad visible para calcular tenure.'
 
+const lastValues = (values: Array<number | null | undefined>, length = 7) =>
+  values
+    .slice(-length)
+    .map(value => Math.max(0, Math.round(value ?? 0)))
+
+const formatSignedDelta = (current: number | null | undefined, previous: number | null | undefined) => {
+  if (current === null || current === undefined || previous === null || previous === undefined) {
+    return undefined
+  }
+
+  const delta = Math.round(current - previous)
+
+  if (delta === 0) {
+    return '0%'
+  }
+
+  return `${delta > 0 ? '+' : ''}${delta}%`
+}
+
 export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): ExecutiveDashboardLayout => {
   const dashboardTheme = resolveDashboardTheme(data)
   const themeCopy = buildThemeCopy(dashboardTheme)
@@ -64,6 +91,7 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
   const syncedAtLabel = formatSyncedAt(data.scope.lastSyncedAt)
 
   const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
+  const previousMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 2] || null
   const totalDeliverablesVisible = data.charts.monthlyDelivery.reduce((sum, item) => sum + item.totalDeliverables, 0)
 
   const totalDeliverablesWithoutAdjustments = data.charts.monthlyDelivery.reduce(
@@ -73,6 +101,18 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
 
   const noAdjustmentRate =
     totalDeliverablesVisible > 0 ? Math.round((totalDeliverablesWithoutAdjustments / totalDeliverablesVisible) * 100) : 0
+
+  const firstPassSeries = lastValues(
+    data.charts.monthlyDelivery.map(item =>
+      item.totalDeliverables > 0 ? (item.withoutClientAdjustments / item.totalDeliverables) * 100 : 0
+    )
+  )
+
+  const onTimeSeries = lastValues(data.charts.monthlyDelivery.map(item => item.onTimePct))
+  const createdSeries = lastValues(data.charts.throughput.map(item => item.created))
+  const completedSeries = lastValues(data.charts.throughput.map(item => item.completed))
+  const reviewRoundsSeries = lastValues(data.charts.monthlyDelivery.map(item => item.totalClientAdjustmentRounds))
+  const monthCategories = data.charts.monthlyDelivery.slice(-7).map(item => item.label.replace(/\s\d{2}$/, ''))
 
   const blocks: ExecutiveBlockKey[] = []
 
@@ -118,7 +158,8 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         tone: 'info',
         title: 'Tiempo compartido',
         value: formatRelationshipValue(data),
-        detail: formatRelationshipDetail(data)
+        detail: formatRelationshipDetail(data),
+        icon: 'tabler-timeline'
       },
       {
         key: 'monthly-on-time',
@@ -133,7 +174,12 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         value: latestMonthlyDelivery?.onTimePct !== null ? `${latestMonthlyDelivery?.onTimePct}%` : 'Sin dato',
         detail: latestMonthlyDelivery
           ? `Serie agrupada por fecha de creacion sobre ${latestMonthlyDelivery.totalDeliverables} entregables visibles.`
-          : 'Todavia no hay meses con entregables visibles en el alcance actual.'
+          : 'Todavia no hay meses con entregables visibles en el alcance actual.',
+        delta: formatSignedDelta(latestMonthlyDelivery?.onTimePct, previousMonthlyDelivery?.onTimePct),
+        miniChart: {
+          variant: 'bars',
+          data: onTimeSeries
+        }
       },
       {
         key: 'first-pass',
@@ -141,7 +187,11 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
         tone: totalDeliverablesVisible === 0 ? 'info' : noAdjustmentRate >= 75 ? 'success' : noAdjustmentRate >= 50 ? 'warning' : 'error',
         title: 'Sin ajustes cliente',
         value: `${noAdjustmentRate}%`,
-        detail: `${totalDeliverablesWithoutAdjustments} de ${totalDeliverablesVisible} entregables visibles no registran ajustes cliente.`
+        detail: `${totalDeliverablesWithoutAdjustments} de ${totalDeliverablesVisible} entregables visibles no registran ajustes cliente.`,
+        miniChart: {
+          variant: 'bars',
+          data: firstPassSeries
+        }
       }
     ],
     focusCards: moduleFocusCards.map(card => ({
@@ -150,7 +200,15 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
       tone: card.tone,
       title: card.title,
       value: card.value,
-      detail: card.detail
+      detail: card.detail,
+      icon:
+        card.key === 'agencia_creativa'
+          ? 'tabler-palette'
+          : card.key === 'desarrollo_web'
+            ? 'tabler-code'
+            : card.key === 'consultoria_crm'
+              ? 'tabler-building-store'
+              : 'tabler-sparkles'
     })),
     kpiCards: data.kpis.map(kpi => ({
       key: kpi.label,
@@ -158,7 +216,44 @@ export const buildExecutiveDashboardLayout = (data: GreenhouseDashboardData): Ex
       tone: kpi.tone,
       title: kpi.label,
       value: kpi.value,
-      detail: kpi.detail
+      detail: kpi.detail,
+      delta:
+        kpi.label === 'Piezas entregadas'
+          ? formatDelta(data.summary.netFlowLast30Days)
+          : kpi.label === 'Salud on-time'
+            ? `${data.summary.healthyProjects} healthy`
+            : kpi.label === 'Trabajo activo'
+              ? `${data.summary.queuedWorkItems} cola`
+              : `${data.summary.openFrameComments} comentarios`,
+      icon:
+        kpi.label === 'Piezas entregadas'
+          ? 'tabler-checkup-list'
+          : kpi.label === 'Salud on-time'
+            ? 'tabler-heart-rate-monitor'
+            : kpi.label === 'Trabajo activo'
+              ? 'tabler-briefcase'
+              : 'tabler-message-2',
+      miniChart:
+        kpi.label === 'Piezas entregadas'
+          ? {
+              variant: 'area',
+              data: completedSeries
+            }
+          : kpi.label === 'Salud on-time'
+            ? {
+                variant: 'split-bars',
+                data: onTimeSeries,
+                categories: monthCategories
+              }
+            : kpi.label === 'Trabajo activo'
+              ? {
+                  variant: 'bars',
+                  data: createdSeries
+                }
+              : {
+                  variant: 'bars',
+                  data: reviewRoundsSeries
+                }
     })),
     blocks
   }

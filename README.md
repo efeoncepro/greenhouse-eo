@@ -76,7 +76,7 @@ Estado hoy:
 - el login ya no muestra bloque demo ni mensajes internos de infraestructura
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
-- el stack visual del repo ya usa `apexcharts` + `react-apexcharts`, y ahora tambien cuenta con `simple-icons` y `@iconify-json/logos` para logos de herramientas y marcas sin bajar assets manuales
+- el stack visual del repo ya usa `apexcharts` + `react-apexcharts`, `recharts`, `keen-slider`, `fullcalendar`, `react-datepicker`, `react-dropzone`, `react-toastify`, `cmdk`, `tiptap`, `tanstack/react-table`, `react-player`, `mapbox-gl`, `react-map-gl`, `react-hook-form`, `valibot`, `simple-icons` y `@iconify-json/logos`
 - `src/components/greenhouse/BrandLogo.tsx` es la primitive reusable para branding de herramientas y resuelve logos desde el bundle local de Vuexy/Iconify antes de caer a fallbacks
 - existe `/api/dashboard/kpis` con queries server-side a BigQuery
 - existen `/api/dashboard/summary`, `/api/dashboard/charts` y `/api/dashboard/risks`

@@ -80,6 +80,9 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
               title={card.title}
               value={card.value}
               detail={card.detail}
+              icon={card.icon}
+              delta={card.delta}
+              miniChart={card.miniChart}
               supportItems={card.supportItems}
             />
           ))}
@@ -102,6 +105,9 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
               title={card.title}
               value={card.value}
               detail={card.detail}
+              icon={card.icon}
+              delta={card.delta}
+              miniChart={card.miniChart}
             />
           ))}
         </Box>
@@ -122,6 +128,9 @@ const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
             title={card.title}
             value={card.value}
             detail={card.detail}
+            icon={card.icon}
+            delta={card.delta}
+            miniChart={card.miniChart}
           />
         ))}
       </Box>

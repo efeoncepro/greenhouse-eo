@@ -58,6 +58,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - App Router en `src/app`
 - PNPM lockfile presente
 - `apexcharts` + `react-apexcharts` activos para charts ejecutivos
+- `recharts` activo como segunda via de charting reusable alineada con `full-version`
+- `keen-slider`, `@fullcalendar/*`, `react-datepicker`, `react-dropzone`, `react-toastify`, `cmdk`, `@tiptap/*`, `@tanstack/react-table`, `react-player`, `mapbox-gl`, `react-map-gl`, `react-hook-form`, `@hookform/resolvers`, `valibot`, `@formkit/drag-and-drop`, `emoji-mart` y `@emoji-mart/*` ya estan instalados en `starter-kit`
 - `simple-icons` activo para logos SVG de marcas como fallback directo en runtime
 - `@iconify-json/logos` activo para incorporar logos de marca al pipeline Iconify/CSS del repo
 - `src/components/greenhouse/BrandLogo.tsx` ya consume ese stack para tooling cards, priorizando logos bundleados y usando fallback a Tabler o monograma
@@ -88,6 +90,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Librerias visuales activas
 - `apexcharts` y `react-apexcharts`: base actual para charts ejecutivos; wrappers locales en `src/libs/ApexCharts.tsx` y `src/libs/styles/AppReactApexCharts.tsx`.
+- `recharts`: segunda via de charting disponible para cards compactas y visualizaciones de comparacion.
+- `keen-slider`: sliders, carousels y hero cards con narrativa visual.
+- `@fullcalendar/*`, `react-datepicker`, `date-fns`: calendario, planner y date UX.
+- `@tanstack/react-table`, `@tanstack/match-sorter-utils`: tablas avanzadas, filtros y sorting.
+- `react-hook-form`, `@hookform/resolvers`, `valibot`, `input-otp`: forms complejas, validacion y OTP UX.
+- `@tiptap/*`, `cmdk`: rich text, editorial UX y command palette.
+- `react-dropzone`, `react-toastify`, `emoji-mart`, `@emoji-mart/*`: upload, feedback y picker UX.
+- `react-player`, `mapbox-gl`, `react-map-gl`: media, embeds y mapas.
+- `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`: posicionamiento, reorder y soporte de iconografia.
+- Ya no es necesario reinstalar este stack desde `full-version`; el inventario base de Vuexy ya vive en `starter-kit`.
 - `simple-icons`: logos SVG de marcas y herramientas sin descargar assets manuales.
 - `@iconify-json/logos`: logos de marca integrables al pipeline de iconos del repo en `src/assets/iconify-icons/bundle-icons-css.ts`.
 - `recharts` y `keen-slider`: referencia en `full-version`, aun no activados en `starter-kit`.

@@ -1329,3 +1329,17 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - monograma
 - `npx pnpm build:icons` y `npx pnpm lint` pasaron.
 - `npx pnpm build` completo runtime correctamente; el wrapper local solo expiro por timeout despues del resumen final de rutas.
+
+### Delta 2026-03-10 UI Library Parity
+- Se instalo en `starter-kit` la paridad de librerias UI de `full-version` para evitar nuevas instalaciones reactivas por modulo.
+- Quedaron disponibles para uso inmediato:
+  - `recharts`, `keen-slider`
+  - `@fullcalendar/*`, `react-datepicker`, `date-fns`
+  - `@tanstack/react-table`, `@tanstack/match-sorter-utils`
+  - `react-hook-form`, `@hookform/resolvers`, `valibot`, `input-otp`
+  - `@tiptap/*`, `cmdk`
+  - `react-dropzone`, `react-toastify`, `emoji-mart`, `@emoji-mart/*`
+  - `react-player`, `mapbox-gl`, `react-map-gl`
+  - `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`
+- `npx pnpm lint` y `npx pnpm build` pasaron despues de instalar el stack.
+- Warning conocido: `pnpm` reporta peer warnings de `@tiptap/*`, pero el build actual del portal sigue sano.
