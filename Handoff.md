@@ -40,6 +40,60 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 16:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Conectar Greenhouse al servicio dedicado `hubspot-greenhouse-integration` para lecturas live de `company profile` y `owner`, y dejar documentado el modelo real de latencia frente a HubSpot.
+
+### Rama
+- Rama usada: `main`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Production
+
+### Archivos tocados
+- `.env.example`
+- `GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `README.md`
+- `changelog.md`
+- `project_context.md`
+- `Handoff.md`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/integrations/hubspot-greenhouse-service.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `vercel --prod --yes`: correcto
+  - deployment productivo final: `https://greenhouse-qzt2jdrt3-efeonce-7670142f.vercel.app`
+  - aliases verificados por `vercel inspect`:
+    - `https://greenhouse-eo.vercel.app`
+    - `https://greenhouse.efeoncepro.com`
+- `vercel env ls production`: correcto
+  - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` ya existe en `Production`
+- Validacion operativa del servicio live de HubSpot:
+  - `GET /contract`: `200`
+  - `GET /companies/30825221458`: `200`
+  - `GET /companies/30825221458/owner`: `200`
+  - retorna `Sky Airline` y owner `Julio Reyes Rangel`
+- Limite de smoke:
+  - no se hizo verificacion visual/autenticada de `/admin/tenants/[id]` en Production porque faltaba una sesion admin automatizada para ese turno
+
+### Riesgos o pendientes
+- La lectura live de `company` y `owner` reduce latencia porque consulta HubSpot bajo demanda, pero `capabilities` siguen siendo sync-based.
+- El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
+- Falta una validacion visual/autenticada de la card live dentro de `/admin/tenants/[id]`.
+
+### Proximo paso recomendado
+- Entrar con una sesion admin real y revisar `/admin/tenants/hubspot-company-30825221458` para confirmar visualmente la card live.
+- Si Greenhouse va a leer mas campos live, extender el servicio dedicado antes de tocar la API generica de integraciones.
+
+### Fecha
 - 2026-03-11 10:55 America/Santiago
 
 ### Agente

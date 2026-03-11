@@ -172,6 +172,10 @@ Implemented now:
 - capability catalog export
 - tenant snapshot export
 - inbound capability sync by tenant selector
+- live CRM reads can now be consumed separately through the dedicated HubSpot facade service `hubspot-greenhouse-integration` for:
+  - `GET /contract`
+  - `GET /companies/{hubspotCompanyId}`
+  - `GET /companies/{hubspotCompanyId}/owner`
 
 Not implemented yet:
 - tenant creation via integration API
@@ -180,3 +184,9 @@ Not implemented yet:
 - signed request rotation or per-integration credentials
 
 Those can be layered later without replacing the contract above.
+
+## Latency Model
+
+- `company profile` and `owner` can be read from the dedicated HubSpot facade with low latency because Greenhouse queries the current HubSpot state on demand.
+- `capabilities` are still sync-based. They become visible in Greenhouse when an external connector pushes them or when Greenhouse polls a connector result.
+- Full near-real-time bidirectionality still requires an event-driven layer such as HubSpot webhooks or a high-frequency reconciler.
