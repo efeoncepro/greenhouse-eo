@@ -19,6 +19,7 @@ La documentacion operativa interna del repo esta en:
 - `AGENTS.md`
 - `BACKLOG.md`
 - `DOCUMENTATION_OPERATING_MODEL_V1.md`
+- `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md`
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
@@ -245,6 +246,7 @@ Estado actual en Vercel:
   - `GET /companies/{hubspotCompanyId}/owner`
   - `GET /companies/{hubspotCompanyId}/contacts`
 - `/admin/tenants/[id]` ya consume esos endpoints para mostrar `company`, `owner` y los contactos CRM asociados al space, incluyendo una comparacion rapida contra los usuarios ya provisionados en Greenhouse
+- `/developers/api` ahora enlaza el contrato canonico cross-repo en `/docs/greenhouse-cross-repo-contract-v1.md` para dejar claro que Greenhouse consume conectores externos y no reimplementa sus syncs
 
 Notas:
 - `next.config.ts` usa `BASEPATH` como `basePath`.
@@ -379,8 +381,8 @@ Service modules:
 - Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
 - Para CRM live, Greenhouse ya puede consultar el servicio dedicado `hubspot-greenhouse-integration` y leer `company profile` y `owner` bajo demanda.
 - Regla de latencia actual:
-- `company profile` y `owner` pueden reflejar cambios de HubSpot con baja latencia en cuanto Greenhouse vuelve a consultar.
-- `capabilities` siguen dependiendo de sync explicito hasta que exista una capa event-driven.
+- `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia en cuanto Greenhouse vuelve a consultar el servicio dedicado.
+- `capabilities` ya no dependen solo de sync explicito: `linea_de_servicio` y `servicios_especificos` hoy se propagan desde HubSpot a Greenhouse por webhook relay a traves de `hubspot-greenhouse-integration`.
 
 Regla de componentes Greenhouse:
 - `src/components/greenhouse/*` es la capa compartida de UI del producto.

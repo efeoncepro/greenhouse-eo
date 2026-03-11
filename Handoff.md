@@ -47,20 +47,25 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Objetivo del turno
 - Extender Greenhouse para consumir los contactos asociados a la company desde `hubspot-greenhouse-integration` y mostrar el gap entre contactos CRM y usuarios ya provisionados del space.
+- Publicar un contrato cross-repo en `/developers/api` para fijar ownership por repo, contract surfaces, branch policy y promotion flow.
 
 ### Rama
-- Rama usada: `main`
-- Rama objetivo del merge: `main`
+- Rama usada: `feature/hubspot-live-cross-repo-contract`
+- Rama objetivo del merge: `develop`
+- Excepcion operativa: este estado se desplego a `Production` por necesidad documental y contractual, sin pasar primero por `develop`
 
 ### Ambiente objetivo
 - Production
 
 ### Archivos tocados
+- `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md`
 - `GREENHOUSE_INTEGRATIONS_API_V1.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
 - `Handoff.md`
+- `public/docs/greenhouse-cross-repo-contract-v1.md`
+- `src/app/(blank-layout-pages)/developers/api/page.tsx`
 - `src/lib/integrations/hubspot-greenhouse-service.ts`
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 
@@ -68,7 +73,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
 - `vercel --prod --yes`: correcto
-  - deployment productivo final: `https://greenhouse-9ivzit0uv-efeonce-7670142f.vercel.app`
+  - deployment productivo final: `https://greenhouse-9s95g7396-efeonce-7670142f.vercel.app`
   - aliases verificados por `vercel inspect`:
     - `https://greenhouse-eo.vercel.app`
     - `https://greenhouse.efeoncepro.com`
@@ -76,6 +81,13 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - `GET /contract`: `200`
   - `GET /companies/30825221458/contacts`: `200`
   - respuesta valida con `16` contactos asociados para `Sky Airline`
+- `/developers/api` ahora debe considerarse la referencia publica para:
+  - Integrations API hospedada por Greenhouse
+  - facade CRM externa consumida por Greenhouse
+  - contrato cross-repo descargable
+- smoke publico:
+  - `vercel curl /developers/api --deployment greenhouse-9s95g7396-efeonce-7670142f.vercel.app`: correcto
+  - `vercel curl /docs/greenhouse-cross-repo-contract-v1.md --deployment greenhouse-9s95g7396-efeonce-7670142f.vercel.app`: correcto
 - Limite de smoke:
   - aun no se ha hecho verificacion visual/autenticada de `/admin/tenants/[id]` en Production para este bloque nuevo de contactos
 
@@ -83,10 +95,12 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
 - Falta validar visualmente la tabla de contactos CRM y su comparacion con usuarios provisionados en `/admin/tenants/[id]`.
 - Falta decidir si el siguiente paso solo sera lectura live o provisionamiento automatico hacia `greenhouse.client_users`.
+- El promotion flow esperado sigue siendo `feature -> develop -> main`; este deploy directo desde rama feature a `Production` fue una excepcion controlada y no debe repetirse como costumbre.
 
 ### Proximo paso recomendado
 - Revisar con sesion admin real `/admin/tenants/hubspot-company-30825221458` y confirmar que los contactos CRM se muestran correctamente con el estado `Ya existe` o `Falta provisionar`.
 - Si el resultado convence, el siguiente paso ya no es solo lectura: decidir si Greenhouse va a provisionar automaticamente esos contactos hacia `greenhouse.client_users`.
+- Si otro agente o repo necesita continuar este trabajo, el primer read ya no debe ser una memoria conversacional sino `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md`.
 
 ### Fecha
 - 2026-03-11 16:45 America/Santiago
@@ -134,7 +148,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - no se hizo verificacion visual/autenticada de `/admin/tenants/[id]` en Production porque faltaba una sesion admin automatizada para ese turno
 
 ### Riesgos o pendientes
-- La lectura live de `company` y `owner` reduce latencia porque consulta HubSpot bajo demanda, pero `capabilities` siguen siendo sync-based.
+- La lectura live de `company` y `owner` reduce latencia porque consulta HubSpot bajo demanda, y las `capabilities` de empresa ya pueden entrar por webhook relay; aun falta validar visualmente la superficie final con sesion admin.
 - El servicio dedicado de HubSpot sigue publico por ahora; si Greenhouse va a depender mas de el, conviene endurecer autenticacion o red privada.
 - Falta una validacion visual/autenticada de la card live dentro de `/admin/tenants/[id]`.
 

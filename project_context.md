@@ -14,6 +14,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
 - DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
 - Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
+- Contrato operativo cross-repo para conectores y futuros agentes: `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md`
 - Metodo canonico de validacion visual: `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
 - Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
@@ -200,9 +201,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - `/admin/tenants/[id]` ahora tambien consulta un servicio HubSpot dedicado para leer `company profile` y `owner` bajo demanda, sin esperar a BigQuery.
 - `/admin/tenants/[id]` ahora tambien consulta los `contacts` asociados a la `company` en HubSpot para comparar miembros CRM contra los usuarios ya provisionados en Greenhouse.
+- `/developers/api` ahora publica y enlaza el contrato cross-repo para distinguir con claridad entre:
+  - APIs hospedadas por Greenhouse
+  - la facade CRM externa que Greenhouse consume
+  - ownership por repo y promotion flow esperado
 - Regla de latencia actual:
   - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
-  - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
+  - `capabilities` de empresa (`linea_de_servicio`, `servicios_especificos`) ya pueden llegar con baja latencia porque el conector activo hace relay por webhook desde HubSpot hacia Greenhouse
+  - fuera de esas capabilities, el resto del CRM live sigue siendo on-demand a traves de la facade dedicada
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
