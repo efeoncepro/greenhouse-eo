@@ -85,7 +85,8 @@ export default function GreenhouseIntegrationsApiPage() {
                   sx={{
                     p: 3,
                     borderRadius: 3,
-                    border: theme => `1px solid ${theme.palette.divider}`
+                    border: '1px solid',
+                    borderColor: 'divider'
                   }}
                 >
                   <Stack spacing={1.25}>
