@@ -34,7 +34,7 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
               <Box>
                 <Typography variant='h5'>Ver como cliente</Typography>
                 <Typography color='text.secondary'>
-                  Estás viendo el dashboard cliente de {clientName} desde tu sesión de administrador.
+                  Estas viendo el dashboard del space cliente {clientName} desde tu sesion de administrador.
                 </Typography>
               </Box>
               <Stack direction='row' gap={1.5} flexWrap='wrap'>
@@ -44,10 +44,10 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
             </Stack>
             <Stack direction='row' gap={2} flexWrap='wrap'>
               <Button component={Link} variant='outlined' href={`/admin/tenants/${clientId}`}>
-                Volver al tenant
+                Volver al space
               </Button>
               <Button component={Link} variant='contained' href='/admin/tenants'>
-                Ir a tenants
+                Ir a spaces
               </Button>
             </Stack>
           </Stack>

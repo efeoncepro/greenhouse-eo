@@ -73,7 +73,7 @@ const ThroughputOverviewCard = ({ data, title, subtitle, series, options, netFlo
               />
             </Stack>
             <Typography variant='body2' color='text.secondary'>
-              Entregas cerradas en los ultimos 30 dias dentro del alcance visible del tenant.
+              Entregas cerradas en los ultimos 30 dias dentro del alcance visible del space.
             </Typography>
           </Stack>
           <Stack spacing={2}>

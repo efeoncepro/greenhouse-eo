@@ -45,6 +45,46 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Agente
 - Codex
 
+### Objetivo del turno
+- Crear el benchmark interno `space-efeonce`, llevar el dashboard a `snapshot mode` para historicos cortos y empezar a migrar el labeling visible de `tenant` a `space`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `bigquery/greenhouse_efeonce_space_v1.sql`
+- `src/lib/dashboard/tenant-dashboard-overrides.ts`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/dashboard/*`
+- `src/components/greenhouse/*`
+
+### Verificacion
+- `npx pnpm lint`: pendiente ejecutar al cierre de esta iteracion
+- `npx pnpm build`: pendiente ejecutar al cierre de esta iteracion
+- Smoke BigQuery:
+- `space-efeonce` creado en `greenhouse.clients`
+- `space-efeonce` con `57` proyectos base
+- `space-efeonce` con `958` tareas intersectando el scope
+- `space-efeonce` con business lines `crm_solutions`, `globe`, `wave`
+- `space-efeonce` con service modules `agencia_creativa`, `consultoria_crm`, `desarrollo_web`, `implementacion_onboarding`, `licenciamiento_hubspot`
+
+### Riesgos o pendientes
+- `space-efeonce` es metadata-only por ahora: no tiene `client_users` propios y debe consumirse via `Ver como cliente` desde admin.
+- El lookup de auth no debe duplicarse con el mismo email interno en `tenant_type = client`; eso introduciria ambiguedad en login.
+- El siguiente paso de producto es validar el dashboard de `space-efeonce` y, en base a esa lectura, decidir si se divide en una vista general y vistas anidadas de performance / delivery / quality.
+
+### Fecha
+- 2026-03-10 America/Santiago
+
+### Agente
+- Codex
+
 ## 2026-03-10 - Executive UI system documentation baseline
 
 ### Objetivo del turno

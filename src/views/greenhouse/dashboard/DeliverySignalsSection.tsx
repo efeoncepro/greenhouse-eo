@@ -144,7 +144,7 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
     <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.25fr 1fr' } }}>
       <ExecutiveCardShell
         title='Entrega mensual visible'
-        subtitle='Serie mensual de ritmo y cumplimiento sobre el alcance visible del tenant.'
+        subtitle='Serie mensual de ritmo y cumplimiento sobre el alcance visible del space.'
       >
         <Stack spacing={3} sx={{ height: '100%' }}>
           <AppReactApexCharts type='line' height={280} width='100%' series={monthlyOnTimeSeries} options={monthlyOnTimeOptions} />

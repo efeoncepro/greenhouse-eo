@@ -129,6 +129,59 @@ const serviceModuleAiDefaults: Record<string, ToolOverride[]> = {
 }
 
 const tenantOverrides: Record<string, TenantDashboardOverride> = {
+  'space-efeonce': {
+    accountTeam: [
+      {
+        id: 'efeonce-julio-reyes',
+        name: 'Julio Reyes',
+        role: 'Efeonce Leadership',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-daniela-ferreira',
+        name: 'Daniela Ferreira',
+        role: 'Creative Operations Lead',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-melkin-hernandez',
+        name: 'Melkin Hernandez',
+        role: 'Senior Visual Designer',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-andres-carlosama',
+        name: 'Andres Carlosama',
+        role: 'Senior Visual Designer',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-valentina',
+        name: 'Valentina',
+        role: 'Efeonce Team',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-humberly',
+        name: 'Humberly',
+        role: 'Efeonce Team',
+        allocationPct: 100,
+        monthlyHours: 160
+      },
+      {
+        id: 'efeonce-luis',
+        name: 'Luis',
+        role: 'Efeonce Team',
+        allocationPct: 100,
+        monthlyHours: 160
+      }
+    ]
+  },
   'hubspot-company-30825221458': {
     accountTeam: [
       {

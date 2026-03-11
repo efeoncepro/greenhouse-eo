@@ -45,7 +45,7 @@ const AttentionProjectsTable = ({ projects, title, subtitle }: AttentionProjects
       />
       <CardContent sx={{ pt: 0 }}>
         {projects.length === 0 ? (
-          <Typography color='text.secondary'>No hay proyectos con datos suficientes para este tenant todavia.</Typography>
+          <Typography color='text.secondary'>No hay proyectos con datos suficientes para este space todavia.</Typography>
         ) : (
           <Stack spacing={4}>
             {projects.map(project => (

@@ -52,7 +52,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     <Typography variant='h5'>{data.clientName}</Typography>
                     <Typography color='text.secondary'>{data.primaryContactEmail || 'Sin contacto principal'}</Typography>
                     <Typography variant='body2' color='text.secondary'>
-                      {data.hubspotCompanyId ? `HubSpot ${data.hubspotCompanyId}` : 'Tenant sin compania HubSpot asociada'}
+                      {data.hubspotCompanyId ? `HubSpot ${data.hubspotCompanyId}` : 'Space sin compania HubSpot asociada'}
                     </Typography>
                   </Box>
                   <Stack direction='row' gap={1} flexWrap='wrap'>
@@ -71,7 +71,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={2.5}>
-                  <Typography variant='h6'>Tenant profile</Typography>
+                  <Typography variant='h6'>Space profile</Typography>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
                       Client ID
@@ -104,7 +104,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   </Box>
                   <Box>
                     <Typography variant='body2' color='text.secondary'>
-                      Ultimo login del tenant
+                      Ultimo login del space
                     </Typography>
                     <Typography>{formatDateTime(data.lastLoginAt)}</Typography>
                   </Box>
@@ -205,7 +205,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Users in tenant</Typography>
+                  <Typography variant='h6'>Users in space</Typography>
                   <TableContainer>
                     <Table>
                       <TableHead>
@@ -295,7 +295,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       </Box>
                     ))}
                     {data.projects.length === 0 ? (
-                      <Typography color='text.secondary'>Este tenant aun no tiene proyectos visibles en scope.</Typography>
+                      <Typography color='text.secondary'>Este space aun no tiene proyectos visibles en scope.</Typography>
                     ) : null}
                   </Box>
                 </Stack>
