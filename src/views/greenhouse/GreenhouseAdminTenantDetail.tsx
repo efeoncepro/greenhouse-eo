@@ -13,6 +13,7 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
+import Alert from '@mui/material/Alert'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -60,6 +61,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const businessLines = capabilities.filter(item => item.moduleKind === 'business_line' && item.selected)
   const serviceModules = capabilities.filter(item => item.moduleKind === 'service_module' && item.selected)
   const displayNote = getDisplayNote(data.notes, data.hubspotCompanyId)
+  const liveCompany = data.liveHubspot.company
+  const liveOwner = data.liveHubspot.owner
+  const liveMode = data.liveHubspot.contract?.realtime.mode || 'polling_or_on_demand'
+  const liveIsRealtime = data.liveHubspot.contract?.realtime.supported === true
 
   return (
     <Grid container spacing={6}>
@@ -229,6 +234,97 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       <Typography color='text.primary'>{displayNote}</Typography>
                     </Box>
                   ) : null}
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <Card>
+              <CardContent>
+                <Stack spacing={2.5}>
+                  <Box>
+                    <Typography variant='h6'>Lectura live desde HubSpot</Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
+                      Este bloque consulta el servicio CRM bajo demanda. Company y owner pueden reflejar cambios de HubSpot
+                      apenas Greenhouse vuelve a leer; capabilities siguen siendo sincronizacion explicita.
+                    </Typography>
+                  </Box>
+
+                  <Stack direction='row' gap={1} flexWrap='wrap'>
+                    <Chip
+                      size='small'
+                      variant='tonal'
+                      color={data.liveHubspot.serviceConfigured ? 'success' : 'default'}
+                      label={data.liveHubspot.serviceConfigured ? 'Servicio conectado' : 'Servicio no configurado'}
+                    />
+                    <Chip
+                      size='small'
+                      variant='outlined'
+                      color={liveIsRealtime ? 'success' : 'warning'}
+                      label={liveIsRealtime ? 'Realtime' : liveMode}
+                    />
+                  </Stack>
+
+                  {data.liveHubspot.error ? <Alert severity='warning'>{data.liveHubspot.error}</Alert> : null}
+
+                  <Box>
+                    <Typography variant='body2' color='text.secondary'>
+                      Company profile
+                    </Typography>
+                    <Stack spacing={0.75} sx={{ mt: 1 }}>
+                      <Typography color='text.primary'>{liveCompany?.identity.name || 'Sin lectura live'}</Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {liveCompany?.identity.domain || '--'} | {liveCompany?.identity.industry || '--'}
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {liveCompany?.identity.city || '--'}, {liveCompany?.identity.country || '--'}
+                      </Typography>
+                    </Stack>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant='body2' color='text.secondary'>
+                      Owner actual en HubSpot
+                    </Typography>
+                    <Stack spacing={0.75} sx={{ mt: 1 }}>
+                      <Typography color='text.primary'>{liveOwner?.ownerDisplayName || 'Sin owner asignado'}</Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {liveOwner?.ownerEmail || '--'}
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        HubSpot owner ID: {liveOwner?.hubspotOwnerId || liveCompany?.owner.hubspotOwnerId || '--'}
+                      </Typography>
+                    </Stack>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant='body2' color='text.secondary'>
+                      Capabilities visibles en HubSpot
+                    </Typography>
+                    <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
+                      {liveCompany?.capabilities.businessLines.map(code => (
+                        <Chip key={`live-bl-${code}`} size='small' color='info' variant='outlined' label={code} />
+                      ))}
+                      {liveCompany?.capabilities.serviceModules.map(code => (
+                        <Chip key={`live-sm-${code}`} size='small' variant='outlined' label={code} />
+                      ))}
+                      {!liveCompany?.capabilities.businessLines.length && !liveCompany?.capabilities.serviceModules.length ? (
+                        <Typography color='text.secondary'>Sin capabilities live registradas.</Typography>
+                      ) : null}
+                    </Stack>
+                  </Box>
+
+                  <Box>
+                    <Typography variant='body2' color='text.secondary'>
+                      Ultima lectura
+                    </Typography>
+                    <Typography color='text.primary'>{formatDateTime(data.liveHubspot.fetchedAt)}</Typography>
+                  </Box>
                 </Stack>
               </CardContent>
             </Card>

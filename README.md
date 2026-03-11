@@ -225,17 +225,20 @@ Actuales en `.env.example`:
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 
 Objetivo funcional:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 
 Estado actual en Vercel:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` existe en `Development`, `staging` y `Production`
 - `GCP_PROJECT` existe en `Development`, `staging` y `Production`
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` existen y deben configurarse tambien en `Preview` cuando una branch necesite login real
+- `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio live de HubSpot; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback
 
 Notas:
 - `next.config.ts` usa `BASEPATH` como `basePath`.
@@ -368,6 +371,10 @@ Service modules:
 - El bootstrap inicial desde deals `closedwon` esta versionado en `bigquery/greenhouse_service_module_bootstrap_v1.sql`.
 - `getTenantContext()` ya expone `businessLines` y `serviceModules` para runtime server-side y composicion actual del dashboard.
 - Ver `GREENHOUSE_SERVICE_MODULES_V1.md`.
+- Para CRM live, Greenhouse ya puede consultar el servicio dedicado `hubspot-greenhouse-integration` y leer `company profile` y `owner` bajo demanda.
+- Regla de latencia actual:
+- `company profile` y `owner` pueden reflejar cambios de HubSpot con baja latencia en cuanto Greenhouse vuelve a consultar.
+- `capabilities` siguen dependiendo de sync explicito hasta que exista una capa event-driven.
 
 Regla de componentes Greenhouse:
 - `src/components/greenhouse/*` es la capa compartida de UI del producto.

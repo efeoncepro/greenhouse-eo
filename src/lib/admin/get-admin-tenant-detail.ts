@@ -4,6 +4,8 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { getTenantCapabilityState } from '@/lib/admin/tenant-capabilities'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
+import type { HubSpotGreenhouseLiveContext } from '@/lib/integrations/hubspot-greenhouse-service'
+import { getHubSpotGreenhouseLiveContext } from '@/lib/integrations/hubspot-greenhouse-service'
 
 export interface AdminTenantUserRow {
   userId: string
@@ -58,6 +60,7 @@ export interface AdminTenantDetail {
   featureFlags: AdminTenantFeatureFlagRow[]
   users: AdminTenantUserRow[]
   projects: AdminTenantProjectRow[]
+  liveHubspot: HubSpotGreenhouseLiveContext
 }
 
 const toNumber = (value: unknown) => {
@@ -246,17 +249,20 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     return null
   }
 
+  const hubspotCompanyId = tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null
+  const liveHubspot = await getHubSpotGreenhouseLiveContext(hubspotCompanyId)
+
   return {
     clientId: String(tenantRow.client_id || ''),
     publicId: buildTenantPublicId({
       clientId: String(tenantRow.client_id || ''),
-      hubspotCompanyId: tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null
+      hubspotCompanyId
     }),
     clientName: String(tenantRow.client_name || ''),
     status: String(tenantRow.status || ''),
     active: Boolean(tenantRow.active),
     primaryContactEmail: tenantRow.primary_contact_email ? String(tenantRow.primary_contact_email) : null,
-    hubspotCompanyId: tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null,
+    hubspotCompanyId,
     authMode: String(tenantRow.auth_mode || ''),
     portalHomePath: String(tenantRow.portal_home_path || ''),
     timezone: tenantRow.timezone ? String(tenantRow.timezone) : null,
@@ -295,6 +301,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
       projectName: String(row.project_name || row.project_id || ''),
       pageUrl: row.page_url ? String(row.page_url) : null,
       assignedUsers: toNumber(row.assigned_users)
-    }))
+    })),
+    liveHubspot
   }
 }

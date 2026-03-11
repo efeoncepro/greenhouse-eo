@@ -198,6 +198,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La sincronizacion externa de capabilities debe venir por payload explicito desde una fuente canonica de empresa; no debe inferirse automaticamente desde `deals`.
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
+- `/admin/tenants/[id]` ahora tambien consulta un servicio HubSpot dedicado para leer `company profile` y `owner` bajo demanda, sin esperar a BigQuery.
+- Regla de latencia actual:
+  - `company profile` y `owner` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
+  - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
 - Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
@@ -263,9 +267,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `NEXT_PUBLIC_APP_URL`
   - `BASEPATH`
   - `GCP_PROJECT`
-  - `NEXTAUTH_SECRET`
-  - `NEXTAUTH_URL`
-  - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
@@ -276,6 +281,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
+- `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 
 ## Multi-Tenant Actual
@@ -317,6 +323,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Sigue pendiente decidir cuando persistir `public_id` en BigQuery; por ahora el runtime puede derivarlos sin romper `client_id` y `user_id`.
 - La nueva referencia para conectores externos es `GREENHOUSE_INTEGRATIONS_API_V1.md`; la API de integraciones debe mantenerse generica para HubSpot, Notion u otros sistemas.
 - `GET /api/integrations/v1/tenants` no debe enviar parametros `NULL` sin `types` a BigQuery; el runtime vigente usa strings vacios como sentinel y tipos explicitos para mantener estable la resolucion de tenants en integraciones externas.
+- La nueva lectura operacional de HubSpot no reemplaza la API generica de integraciones:
+  - `/api/integrations/v1/*` sigue siendo el contrato para sync bidireccional de capabilities
+  - el servicio `hubspot-greenhouse-integration` es la fachada de lectura live para CRM company/owner
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
