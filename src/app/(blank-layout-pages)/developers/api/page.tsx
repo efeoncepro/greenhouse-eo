@@ -35,6 +35,29 @@ const routes = [
   }
 ]
 
+const facadeRoutes = [
+  {
+    method: 'GET',
+    path: 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app/contract',
+    summary: 'Contrato live que Greenhouse consume para CRM company, owner y contacts.'
+  },
+  {
+    method: 'GET',
+    path: 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app/companies/{hubspotCompanyId}',
+    summary: 'Lectura live de la empresa CRM desde HubSpot.'
+  },
+  {
+    method: 'GET',
+    path: 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app/companies/{hubspotCompanyId}/owner',
+    summary: 'Lectura live del owner actual de la empresa en HubSpot.'
+  },
+  {
+    method: 'GET',
+    path: 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app/companies/{hubspotCompanyId}/contacts',
+    summary: 'Lectura live de los contactos asociados a la empresa en HubSpot.'
+  }
+]
+
 export default function GreenhouseIntegrationsApiPage() {
   return (
     <Container maxWidth='lg' sx={{ py: 12 }}>
@@ -70,6 +93,9 @@ export default function GreenhouseIntegrationsApiPage() {
                 <Button href='/docs/greenhouse-integrations-api-v1.md' variant='outlined'>
                   Descargar Reference MD
                 </Button>
+                <Button href='/docs/greenhouse-cross-repo-contract-v1.md' variant='outlined'>
+                  Descargar Cross-Repo Contract
+                </Button>
               </Stack>
             </Stack>
           </CardContent>
@@ -103,6 +129,59 @@ export default function GreenhouseIntegrationsApiPage() {
                   </Stack>
                 </Box>
               ))}
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <Stack spacing={2.5}>
+              <Typography variant='h5'>Runtime Dependency Surface</Typography>
+              <Typography color='text.secondary'>
+                Greenhouse hostea la Integrations API, pero consume una facade CRM externa para leer datos live desde
+                HubSpot. Esa fachada vive en otro repo y no debe reimplementarse dentro de Greenhouse.
+              </Typography>
+              {facadeRoutes.map(route => (
+                <Box
+                  key={route.path}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: '1px solid',
+                    borderColor: 'divider'
+                  }}
+                >
+                  <Stack spacing={1.25}>
+                    <Stack direction='row' gap={1} alignItems='center' flexWrap='wrap'>
+                      <Chip size='small' color='info' variant='tonal' label={route.method} />
+                      <Typography variant='subtitle1'>{route.path}</Typography>
+                    </Stack>
+                    <Typography color='text.secondary'>{route.summary}</Typography>
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <Stack spacing={2.5}>
+              <Typography variant='h5'>Cross-Repo Operating Contract</Typography>
+              <Typography color='text.secondary'>
+                Usa este contrato para evitar confusiones entre repos, chats y workspaces. Define ownership por repo,
+                branch policy, promotion flow, golden smoke target y el contrato runtime que Greenhouse consume.
+              </Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} gap={2}>
+                <Chip color='secondary' variant='tonal' label='Golden smoke: Sky Airline / 30825221458' />
+                <Chip color='warning' variant='tonal' label='Greenhouse consume conectores, no reimplementa los syncs' />
+              </Stack>
+              <Box>
+                <Typography variant='body2' color='text.secondary'>
+                  Documento canonico
+                </Typography>
+                <Typography color='text.primary'>/docs/greenhouse-cross-repo-contract-v1.md</Typography>
+              </Box>
             </Stack>
           </CardContent>
         </Card>

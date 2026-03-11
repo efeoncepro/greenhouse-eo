@@ -12,6 +12,7 @@
 - `/admin/tenants/[id]` ahora tambien consume `GET /companies/{hubspotCompanyId}/contacts` para mostrar los contactos CRM asociados al space y compararlos con los usuarios ya provisionados en Greenhouse.
 - El modelo de latencia quedo documentado: `company` y `owner` pueden reflejar cambios de HubSpot con baja latencia al consultar bajo demanda; `capabilities` siguen siendo sync-based hasta incorporar eventos o webhooks.
 - Se agrego `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` a `.env.example` y a la documentacion viva como override del endpoint de Cloud Run.
+- Se agrego `GREENHOUSE_CROSS_REPO_CONTRACT_V1.md` como contrato canonico entre `greenhouse-eo` y los repos conectores, y `/developers/api` ahora lo publica en `/docs/greenhouse-cross-repo-contract-v1.md`.
 
 ### Dashboard
 - El hero ejecutivo del dashboard se simplifico para bajar densidad arriba del fold: menos copy, dos highlights clave, summary rectangular y badges condensados.
