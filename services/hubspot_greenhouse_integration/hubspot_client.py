@@ -78,3 +78,75 @@ class HubSpotClient:
                 status_code=response.status_code,
             )
         return response.json()
+
+    def list_company_contact_ids(self, company_id: str, *, limit: int = 100) -> list[str]:
+        contact_ids: list[str] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": limit}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/contacts",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            for result in payload.get("results") or []:
+                contact_id = result.get("toObjectId")
+                if contact_id is not None:
+                    contact_ids.append(str(contact_id))
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        deduped_contact_ids: list[str] = []
+        seen = set()
+        for contact_id in contact_ids:
+            if contact_id in seen:
+                continue
+            seen.add(contact_id)
+            deduped_contact_ids.append(contact_id)
+        return deduped_contact_ids
+
+    def get_contacts_by_ids(
+        self,
+        contact_ids: list[str],
+        *,
+        properties: list[str],
+    ) -> list[dict[str, Any]]:
+        if not contact_ids:
+            return []
+
+        results: list[dict[str, Any]] = []
+        for start in range(0, len(contact_ids), 100):
+            batch_ids = contact_ids[start : start + 100]
+            response = self.session.post(
+                f"{HUBSPOT_API}/crm/v3/objects/contacts/batch/read",
+                headers=self._headers(),
+                json={
+                    "properties": properties,
+                    "inputs": [{"id": contact_id} for contact_id in batch_ids],
+                },
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+        return results

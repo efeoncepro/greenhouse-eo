@@ -97,3 +97,28 @@ def build_owner_profile(owner_id: str, owner: dict[str, Any]) -> dict[str, Any]:
         "userId": owner.get("userId"),
         "archived": owner.get("archived"),
     }
+
+
+def build_contact_profile(contact: dict[str, Any]) -> dict[str, Any]:
+    props = contact.get("properties") or {}
+    return {
+        "hubspotContactId": str(contact.get("id")),
+        "email": props.get("email"),
+        "firstName": props.get("firstname"),
+        "lastName": props.get("lastname"),
+        "displayName": " ".join(
+            part
+            for part in (
+                str(props.get("firstname") or "").strip(),
+                str(props.get("lastname") or "").strip(),
+            )
+            if part
+        ).strip()
+        or None,
+        "phone": props.get("phone"),
+        "mobilePhone": props.get("mobilephone"),
+        "jobTitle": props.get("jobtitle"),
+        "lifecyclestage": props.get("lifecyclestage"),
+        "hsLeadStatus": props.get("hs_lead_status"),
+        "company": props.get("company"),
+    }

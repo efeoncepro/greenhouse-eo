@@ -23,6 +23,10 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}/owner",
             },
+            "company_contacts": {
+                "method": "GET",
+                "path": "/companies/{hubspotCompanyId}/contacts",
+            },
             "hubspot_webhook": {
                 "method": "POST",
                 "path": "/webhooks/hubspot",
@@ -55,6 +59,18 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "ownerLastName",
                 "ownerDisplayName",
             ],
+            "contacts": [
+                "hubspotContactId",
+                "email",
+                "firstName",
+                "lastName",
+                "displayName",
+                "phone",
+                "mobilePhone",
+                "jobTitle",
+                "lifecyclestage",
+                "hsLeadStatus",
+            ],
         },
         "sourceFields": {
             "companies": [
@@ -79,6 +95,17 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "lastName",
                 "userId",
                 "archived",
+            ],
+            "contacts": [
+                "email",
+                "firstname",
+                "lastname",
+                "phone",
+                "mobilephone",
+                "jobtitle",
+                "lifecyclestage",
+                "hs_lead_status",
+                "company",
             ],
         },
         "decisionRules": {

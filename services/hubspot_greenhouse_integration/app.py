@@ -5,7 +5,11 @@ try:
     from .contract import build_contract
     from .greenhouse_client import GreenhouseClient
     from .hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from .models import build_company_profile, build_owner_profile
+    from .models import (
+        build_company_profile,
+        build_contact_profile,
+        build_owner_profile,
+    )
     from .webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -19,7 +23,7 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_owner_profile
+    from models import build_company_profile, build_contact_profile, build_owner_profile
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -107,6 +111,37 @@ def create_app() -> Flask:
                 {
                     "hubspotCompanyId": company_id,
                     "owner": build_owner_profile(str(owner_id), owner),
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/companies/<company_id>/contacts")
+    def company_contacts(company_id: str):
+        try:
+            contract = build_contract(app.config)
+            client = _client()
+            contact_ids = client.list_company_contact_ids(company_id)
+            contacts = client.get_contacts_by_ids(
+                contact_ids,
+                properties=contract["sourceFields"]["contacts"],
+            )
+            contacts_by_id = {
+                str(contact.get("id")): build_contact_profile(contact)
+                for contact in contacts
+            }
+            ordered_contacts = [
+                contacts_by_id[contact_id]
+                for contact_id in contact_ids
+                if contact_id in contacts_by_id
+            ]
+            return jsonify(
+                {
+                    "hubspotCompanyId": company_id,
+                    "count": len(ordered_contacts),
+                    "contacts": ordered_contacts,
                 }
             )
         except HubSpotIntegrationError as exc:
