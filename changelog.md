@@ -270,3 +270,22 @@
   - `publicId`
   - `sourceSystem` + `sourceObjectType` + `sourceObjectId`
 - Current first-class source mapping is HubSpot company resolution through `hubspot_company_id`, but the contract is ready for additional systems.
+
+### 2026-03-11 - Integrations API tenant listing fix
+- Fixed `GET /api/integrations/v1/tenants` so BigQuery no longer receives untyped `NULL` params for `targetClientId` and `updatedSince`.
+- The route now sends empty-string sentinels plus explicit BigQuery param types, avoiding the production `500` raised by `Parameter types must be provided for null values`.
+- Validation:
+  - `npx pnpm lint src/lib/integrations/greenhouse-integration.ts src/app/api/integrations/v1/tenants/route.ts`
+  - `npx pnpm build`
+- Deployed the fix to Production as `https://greenhouse-rd6xgomq7-efeonce-7670142f.vercel.app`.
+- Post-deploy smoke outcome:
+  - the `500` path is no longer the active failure mode
+  - the production integration token currently configured for connectors still returns `401 Unauthorized` on `/api/integrations/v1/catalog/capabilities` and `/api/integrations/v1/tenants`
+  - the remaining blocker is token/auth configuration, not the BigQuery null-parameter bug
+- Rotated `GREENHOUSE_INTEGRATION_API_TOKEN` in Vercel Production and redeployed to `https://greenhouse-ojlumllrz-efeonce-7670142f.vercel.app`.
+- Fixed the integration sync mutation path by adding explicit BigQuery param types in `src/lib/admin/tenant-capabilities.ts` for nullable merge params.
+- Production verification after token rotation and redeploy:
+  - `GET /api/integrations/v1/catalog/capabilities`: `200`
+  - `GET /api/integrations/v1/tenants?limit=3`: `200`
+  - `GET /api/integrations/v1/tenants?sourceSystem=hubspot_crm&sourceObjectType=company&sourceObjectId=30825221458`: `200`
+  - `POST /api/integrations/v1/tenants/capabilities/sync`: no longer the active `500` blocker for the HubSpot bridge rollout

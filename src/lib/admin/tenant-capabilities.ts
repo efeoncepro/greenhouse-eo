@@ -223,6 +223,19 @@ const upsertClientCapabilityAssignment = async ({
       confidence,
       active,
       derivedFromLatestClosedwon
+    },
+    types: {
+      assignmentId: 'STRING',
+      clientId: 'STRING',
+      hubspotCompanyId: 'STRING',
+      moduleCode: 'STRING',
+      sourceSystem: 'STRING',
+      sourceObjectType: 'STRING',
+      sourceObjectId: 'STRING',
+      sourceClosedwonDealId: 'STRING',
+      confidence: 'STRING',
+      active: 'BOOL',
+      derivedFromLatestClosedwon: 'BOOL'
     }
   })
 }
