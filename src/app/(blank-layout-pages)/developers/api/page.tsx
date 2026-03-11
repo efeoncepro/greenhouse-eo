@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import type { Metadata } from 'next'
 
 import Box from '@mui/material/Box'
@@ -66,10 +64,10 @@ export default function GreenhouseIntegrationsApiPage() {
                 o `x-greenhouse-integration-key`.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} gap={2}>
-                <Button component={Link} href='/docs/greenhouse-integrations-api-v1.openapi.yaml' variant='contained'>
+                <Button href='/docs/greenhouse-integrations-api-v1.openapi.yaml' variant='contained'>
                   Descargar OpenAPI YAML
                 </Button>
-                <Button component={Link} href='/docs/greenhouse-integrations-api-v1.md' variant='outlined'>
+                <Button href='/docs/greenhouse-integrations-api-v1.md' variant='outlined'>
                   Descargar Reference MD
                 </Button>
               </Stack>
