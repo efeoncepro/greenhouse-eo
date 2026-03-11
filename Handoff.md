@@ -1428,7 +1428,28 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - `react-hook-form`, `@hookform/resolvers`, `valibot`, `input-otp`
   - `@tiptap/*`, `cmdk`
   - `react-dropzone`, `react-toastify`, `emoji-mart`, `@emoji-mart/*`
-  - `react-player`, `mapbox-gl`, `react-map-gl`
-  - `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`
+- `react-player`, `mapbox-gl`, `react-map-gl`
+- `@floating-ui/dom`, `@formkit/drag-and-drop`, `bootstrap-icons`
 - `npx pnpm lint` y `npx pnpm build` pasaron despues de instalar el stack.
 - Warning conocido: `pnpm` reporta peer warnings de `@tiptap/*`, pero el build actual del portal sigue sano.
+
+### Delta 2026-03-11 Capability Governance
+- Se documento `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` como metodologia reutilizable para validacion visual real de dashboards y vistas admin.
+- La iniciativa de `service modules` ya no queda solo en documentacion: ahora `greenhouse.service_modules` funciona como catalogo canonico de capabilities y `greenhouse.client_service_modules` como registro de asignacion por tenant.
+- `/admin/tenants/[id]` ahora expone `Capability governance` para asignar manualmente business lines y service modules desde admin.
+- Se agregaron rutas API para gobernanza y sincronizacion externa:
+  - `GET /api/admin/tenants/[id]/capabilities`
+  - `PUT /api/admin/tenants/[id]/capabilities`
+  - `POST /api/admin/tenants/[id]/capabilities/sync`
+- La estructura de sincronizacion ya soporta HubSpot u otra fuente porque separa:
+  - `sourceSystem`
+  - `sourceObjectType`
+  - `sourceObjectId`
+  - `sourceClosedwonDealId`
+  - `confidence`
+  - payload de `businessLines` y `serviceModules`
+- Cuando `sourceSystem = hubspot_crm` y no llega payload explicito, la API deriva capabilities desde deals `closedwon` usando `hubspot_company_id`.
+- Se fijo precedencia operativa:
+  - `greenhouse_admin` controla manualmente y no se sobreescribe por sync externo
+  - la fuente externa sincroniza el resto de assignments
+- Validado con `npx pnpm lint` y `npx pnpm build`.

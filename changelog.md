@@ -216,3 +216,24 @@
 - Se agrego `BrandLogo` como primitive reusable para tooling cards y se ampliaron los icon bundles de Vuexy con logos de marca curados.
 - Se hizo operativo el switch de tema estilo Vuexy en Greenhouse: mejor integracion en navbar, labels localizados y reaccion en vivo al modo `system`.
 - Se instalo en `starter-kit` la paridad de librerias UI de `full-version` para charts, calendars, tables, forms, editor, media, maps, toasts y drag/drop.
+
+### 2026-03-11 - Capability governance and visual validation method
+- Added `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` to formalize the local visual QA workflow used for authenticated dashboard checks and `view-as` tenant reviews.
+- Extended the tenant admin detail flow so `getAdminTenantDetail()` returns the capability catalog/state for each tenant.
+- Added `src/lib/admin/tenant-capability-types.ts` and `src/lib/admin/tenant-capabilities.ts` as the canonical contract and server layer for:
+  - reading tenant capability state
+  - manual admin assignments
+  - HubSpot-derived capability sync
+  - generic source-based capability sync
+- Added admin routes:
+  - `GET /api/admin/tenants/[id]/capabilities`
+  - `PUT /api/admin/tenants/[id]/capabilities`
+  - `POST /api/admin/tenants/[id]/capabilities/sync`
+- Added `TenantCapabilityManager` into `/admin/tenants/[id]` so admin users can assign or sync business lines and service modules directly from the tenant screen.
+- Confirmed the current service-modules initiative is structurally viable because the existing BigQuery model already separates:
+  - canonical capability metadata in `greenhouse.service_modules`
+  - tenant assignments in `greenhouse.client_service_modules`
+  - external commercial source signals in HubSpot deals
+- Quality checks:
+  - `npx pnpm lint`
+  - `npx pnpm build`

@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getTenantCapabilityState } from '@/lib/admin/tenant-capabilities'
+import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 export interface AdminTenantUserRow {
   userId: string
@@ -49,6 +51,7 @@ export interface AdminTenantDetail {
   invitedUsers: number
   businessLines: string[]
   serviceModules: string[]
+  capabilities: TenantCapabilityRecord[]
   featureFlags: AdminTenantFeatureFlagRow[]
   users: AdminTenantUserRow[]
   projects: AdminTenantProjectRow[]
@@ -91,7 +94,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
-  const [tenantRows, userRows, projectRows, featureFlagRows] = await Promise.all([
+  const [tenantRows, userRows, projectRows, featureFlagRows, capabilityState] = await Promise.all([
     bigQuery.query({
       query: `
         SELECT
@@ -230,7 +233,8 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
         ORDER BY feature_code
       `,
       params: { clientId }
-    })
+    }),
+    getTenantCapabilityState(clientId)
   ])
 
   const tenantRow = (tenantRows[0] as Array<Record<string, unknown>>)[0]
@@ -259,6 +263,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     invitedUsers: toNumber(tenantRow.invited_users),
     businessLines: normalizeStringArray(tenantRow.business_lines),
     serviceModules: normalizeStringArray(tenantRow.service_modules),
+    capabilities: capabilityState.capabilities,
     featureFlags: (featureFlagRows[0] as Array<Record<string, unknown>>).map(row => ({
       featureCode: String(row.feature_code || ''),
       status: String(row.status || ''),

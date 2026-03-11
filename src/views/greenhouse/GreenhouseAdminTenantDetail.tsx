@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
@@ -19,6 +21,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
+import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import TenantCapabilityManager from '@views/greenhouse/admin/tenants/TenantCapabilityManager'
 
 type Props = {
   data: AdminTenantDetail
@@ -40,10 +44,23 @@ const flagTone = (status: string) => {
 }
 
 const GreenhouseAdminTenantDetail = ({ data }: Props) => {
+  const [capabilities, setCapabilities] = useState<TenantCapabilityRecord[]>(data.capabilities)
+  const businessLines = capabilities.filter(item => item.moduleKind === 'business_line' && item.selected)
+  const serviceModules = capabilities.filter(item => item.moduleKind === 'service_module' && item.selected)
+
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, lg: 4 }}>
         <Grid container spacing={6}>
+          <Grid size={{ xs: 12 }}>
+            <TenantCapabilityManager
+              clientId={data.clientId}
+              hubspotCompanyId={data.hubspotCompanyId}
+              initialCapabilities={data.capabilities}
+              onCapabilitiesChange={setCapabilities}
+            />
+          </Grid>
+
           <Grid size={{ xs: 12 }}>
             <Card>
               <CardContent>
@@ -166,10 +183,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       Business lines
                     </Typography>
                     <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
-                      {data.businessLines.map(moduleCode => (
-                        <Chip key={moduleCode} size='small' color='info' variant='outlined' label={moduleCode} />
+                      {businessLines.map(capability => (
+                        <Chip key={capability.moduleCode} size='small' color='info' variant='outlined' label={capability.moduleLabel} />
                       ))}
-                      {data.businessLines.length === 0 ? <Typography color='text.secondary'>Sin business lines.</Typography> : null}
+                      {businessLines.length === 0 ? <Typography color='text.secondary'>Sin business lines.</Typography> : null}
                     </Stack>
                   </Box>
                   <Divider />
@@ -178,10 +195,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       Service modules
                     </Typography>
                     <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1 }}>
-                      {data.serviceModules.map(moduleCode => (
-                        <Chip key={moduleCode} size='small' variant='outlined' label={moduleCode} />
+                      {serviceModules.map(capability => (
+                        <Chip key={capability.moduleCode} size='small' variant='outlined' label={capability.moduleLabel} />
                       ))}
-                      {data.serviceModules.length === 0 ? <Typography color='text.secondary'>Sin service modules.</Typography> : null}
+                      {serviceModules.length === 0 ? <Typography color='text.secondary'>Sin service modules.</Typography> : null}
                     </Stack>
                   </Box>
                   <Divider />
