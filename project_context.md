@@ -200,6 +200,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - `/admin/tenants/[id]` ahora tambien consulta un servicio HubSpot dedicado para leer `company profile` y `owner` bajo demanda, sin esperar a BigQuery.
 - `/admin/tenants/[id]` ahora tambien consulta los `contacts` asociados a la `company` en HubSpot para comparar miembros CRM contra los usuarios ya provisionados en Greenhouse.
+- `/admin/tenants/[id]` ya puede provisionar de forma segura los contactos CRM faltantes hacia `greenhouse.client_users`:
+  - crea usuarios `invited` cuando no existen
+  - reconcilia usuarios ya existentes del mismo tenant por email para reparar rol `client_executive` y scopes base si quedaron incompletos
+  - evita falsos `already_exists` cuando el usuario existia pero su acceso no estaba completo
 - Regla de latencia actual:
   - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
   - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven

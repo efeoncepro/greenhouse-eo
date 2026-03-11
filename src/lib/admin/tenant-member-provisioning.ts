@@ -27,7 +27,7 @@ export type TenantContactProvisioningResult = {
   hubspotContactId: string
   email: string | null
   displayName: string
-  outcome: 'created' | 'already_exists' | 'conflict' | 'invalid'
+  outcome: 'created' | 'reconciled' | 'conflict' | 'invalid' | 'error'
   reason: string
   userId: string | null
 }
@@ -38,9 +38,10 @@ export type TenantContactsProvisioningSummary = {
   hubspotCompanyId: string
   requested: number
   created: number
-  alreadyExists: number
+  reconciled: number
   conflicts: number
   invalid: number
+  errors: number
   results: TenantContactProvisioningResult[]
 }
 
@@ -62,6 +63,53 @@ const buildScopeId = (userId: string, projectId: string) => {
   const digest = createHash('sha256').update(`${userId}:${projectId}`).digest('hex').slice(0, 18)
 
   return `scope-${digest}`
+}
+
+const ensureTenantMembership = async ({
+  userId,
+  clientId,
+  email,
+  fullName,
+  jobTitle,
+  portalHomePath,
+  timezone,
+  actorUserId,
+  hubspotContactId,
+  projectIds
+}: {
+  userId: string
+  clientId: string
+  email: string
+  fullName: string
+  jobTitle: string | null
+  portalHomePath: string
+  timezone: string
+  actorUserId: string
+  hubspotContactId: string
+  projectIds: string[]
+}) => {
+  await upsertClientUser({
+    userId,
+    clientId,
+    email,
+    fullName,
+    jobTitle,
+    portalHomePath,
+    timezone,
+    actorUserId
+  })
+
+  await upsertClientExecutiveAssignment({
+    userId,
+    clientId,
+    hubspotContactId
+  })
+
+  await upsertProjectScopes({
+    userId,
+    clientId,
+    projectIds
+  })
 }
 
 const getTenantProvisioningContext = async (clientId: string): Promise<TenantProvisioningContext | null> => {
@@ -440,9 +488,10 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
       hubspotCompanyId: tenant.hubspotCompanyId,
       requested: 0,
       created: 0,
-      alreadyExists: 0,
+      reconciled: 0,
       conflicts: 0,
       invalid: 0,
+      errors: 0,
       results: []
     }
   }
@@ -484,7 +533,7 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
 
   for (const contact of validSelectedContacts) {
     const normalizedEmail = normalizeEmail(contact.email)
-    const userId = `user-hubspot-contact-${contact.hubspotContactId}`
+    const canonicalUserId = `user-hubspot-contact-${contact.hubspotContactId}`
     const displayName = normalizeDisplayName(contact)
 
     if (!normalizedEmail) {
@@ -500,10 +549,29 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
       continue
     }
 
-    const existingById = existingByUserId.get(userId)
+    const existingById = existingByUserId.get(canonicalUserId)
     const existingByEmailRow = existingByEmail.get(normalizedEmail)
+    const hasExistingCanonicalUser = Boolean(existingById && existingById.client_id === clientId)
+    const hasExistingTenantEmailUser = Boolean(existingByEmailRow && existingByEmailRow.client_id === clientId)
 
-    if (existingById && existingById.client_id && existingById.client_id !== clientId) {
+    if (
+      hasExistingCanonicalUser &&
+      hasExistingTenantEmailUser &&
+      existingById?.user_id !== existingByEmailRow?.user_id
+    ) {
+      results.push({
+        hubspotContactId: contact.hubspotContactId,
+        email: normalizedEmail,
+        displayName,
+        outcome: 'conflict',
+        reason: `This tenant already has two different users linked to this HubSpot contact/email (${existingById?.user_id} and ${existingByEmailRow?.user_id}). Resolve that duplication before provisioning again.`,
+        userId: existingById?.user_id || existingByEmailRow?.user_id || null
+      })
+
+      continue
+    }
+
+    if (existingById && existingById.client_id !== clientId) {
       results.push({
         hubspotContactId: contact.hubspotContactId,
         email: normalizedEmail,
@@ -516,7 +584,7 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
       continue
     }
 
-    if (existingByEmailRow && existingByEmailRow.user_id !== userId && existingByEmailRow.client_id !== clientId) {
+    if (existingByEmailRow && existingByEmailRow.user_id !== canonicalUserId && existingByEmailRow.client_id !== clientId) {
       results.push({
         hubspotContactId: contact.hubspotContactId,
         email: normalizedEmail,
@@ -529,55 +597,67 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
       continue
     }
 
-    if (
-      (existingById && existingById.client_id === clientId) ||
-      (existingByEmailRow && existingByEmailRow.client_id === clientId)
-    ) {
+    const targetUserId =
+      existingById?.client_id === clientId
+        ? existingById.user_id
+        : existingByEmailRow?.client_id === clientId
+          ? existingByEmailRow.user_id
+          : canonicalUserId
+
+    try {
+      await ensureTenantMembership({
+        userId: targetUserId,
+        clientId,
+        email: normalizedEmail,
+        fullName: displayName,
+        jobTitle: contact.jobTitle?.trim() || null,
+        portalHomePath: tenant.portalHomePath || DEFAULT_PORTAL_HOME,
+        timezone: tenant.timezone || DEFAULT_TIMEZONE,
+        actorUserId,
+        hubspotContactId: contact.hubspotContactId,
+        projectIds: tenant.notionProjectIds
+      })
+
+      if (targetUserId === canonicalUserId && !hasExistingCanonicalUser && !hasExistingTenantEmailUser) {
+        results.push({
+          hubspotContactId: contact.hubspotContactId,
+          email: normalizedEmail,
+          displayName,
+          outcome: 'created',
+          reason: tenant.notionProjectIds.length
+            ? `Member created with client_executive role and ${tenant.notionProjectIds.length} base project scopes.`
+            : 'Member created with client_executive role and no base project scopes yet.',
+          userId: targetUserId
+        })
+
+        continue
+      }
+
+      const adoptionReason =
+        targetUserId !== canonicalUserId
+          ? `Existing tenant user ${targetUserId} was matched by email and reconciled with HubSpot contact ${contact.hubspotContactId}.`
+          : `Existing tenant user ${targetUserId} was re-synced to ensure client_executive access and base project scopes.`
+
       results.push({
         hubspotContactId: contact.hubspotContactId,
         email: normalizedEmail,
         displayName,
-        outcome: 'already_exists',
-        reason: 'The contact is already provisioned for this tenant.',
-        userId: existingById?.user_id || existingByEmailRow?.user_id || userId
+        outcome: 'reconciled',
+        reason: tenant.notionProjectIds.length
+          ? `${adoptionReason} ${tenant.notionProjectIds.length} base project scopes were ensured.`
+          : `${adoptionReason} No base project scopes were available for this tenant yet.`,
+        userId: targetUserId
       })
-
-      continue
+    } catch (error) {
+      results.push({
+        hubspotContactId: contact.hubspotContactId,
+        email: normalizedEmail,
+        displayName,
+        outcome: 'error',
+        reason: error instanceof Error ? error.message : 'Unknown provisioning error while reconciling this contact.',
+        userId: targetUserId
+      })
     }
-
-    await upsertClientUser({
-      userId,
-      clientId,
-      email: normalizedEmail,
-      fullName: displayName,
-      jobTitle: contact.jobTitle?.trim() || null,
-      portalHomePath: tenant.portalHomePath || DEFAULT_PORTAL_HOME,
-      timezone: tenant.timezone || DEFAULT_TIMEZONE,
-      actorUserId
-    })
-
-    await upsertClientExecutiveAssignment({
-      userId,
-      clientId,
-      hubspotContactId: contact.hubspotContactId
-    })
-
-    await upsertProjectScopes({
-      userId,
-      clientId,
-      projectIds: tenant.notionProjectIds
-    })
-
-    results.push({
-      hubspotContactId: contact.hubspotContactId,
-      email: normalizedEmail,
-      displayName,
-      outcome: 'created',
-      reason: tenant.notionProjectIds.length
-        ? `Member created with client_executive role and ${tenant.notionProjectIds.length} base project scopes.`
-        : 'Member created with client_executive role and no base project scopes yet.',
-      userId
-    })
   }
 
   return {
@@ -586,9 +666,10 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
     hubspotCompanyId: tenant.hubspotCompanyId,
     requested: normalizedContactIds.length,
     created: results.filter(item => item.outcome === 'created').length,
-    alreadyExists: results.filter(item => item.outcome === 'already_exists').length,
+    reconciled: results.filter(item => item.outcome === 'reconciled').length,
     conflicts: results.filter(item => item.outcome === 'conflict').length,
     invalid: results.filter(item => item.outcome === 'invalid').length,
+    errors: results.filter(item => item.outcome === 'error').length,
     results
   }
 }
