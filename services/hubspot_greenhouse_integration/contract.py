@@ -23,6 +23,10 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
                 "method": "GET",
                 "path": "/companies/{hubspotCompanyId}/owner",
             },
+            "hubspot_webhook": {
+                "method": "POST",
+                "path": "/webhooks/hubspot",
+            },
         },
         "companyModel": {
             "identity": [
@@ -82,11 +86,22 @@ def build_contract(config: dict[str, Any]) -> dict[str, Any]:
             "createCustomCompanyPropertyOnlyIfMissingAtCompanyLevel": True,
         },
         "realtime": {
-            "supported": False,
-            "mode": "polling_or_on_demand",
+            "supported": bool(
+                config.get("hubspot_app_client_secret")
+                and config.get("greenhouse_base_url")
+                and config.get("greenhouse_integration_api_token")
+            ),
+            "mode": (
+                "hubspot_webhooks"
+                if config.get("hubspot_app_client_secret")
+                and config.get("greenhouse_base_url")
+                and config.get("greenhouse_integration_api_token")
+                else "polling_or_on_demand"
+            ),
             "details": (
-                "This service can read current HubSpot state on demand, but it does "
-                "not implement webhook-driven propagation yet."
+                "This service can read current HubSpot state on demand and can relay "
+                "company capability changes through HubSpot webhooks when the webhook "
+                "client secret plus Greenhouse integration auth are configured."
             ),
         },
     }

@@ -1,16 +1,32 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 try:
     from .config import build_runtime_config
     from .contract import build_contract
+    from .greenhouse_client import GreenhouseClient
     from .hubspot_client import HubSpotClient, HubSpotIntegrationError
     from .models import build_company_profile, build_owner_profile
+    from .webhooks import (
+        extract_company_ids_from_webhook_events,
+        parse_webhook_events,
+        sync_company_capabilities_from_hubspot,
+        validate_hubspot_request_signature,
+        HubSpotWebhookValidationError,
+    )
 except ImportError:
     # Allow standalone execution when Cloud Run deploys from this subdirectory.
     from config import build_runtime_config
     from contract import build_contract
+    from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
     from models import build_company_profile, build_owner_profile
+    from webhooks import (
+        extract_company_ids_from_webhook_events,
+        parse_webhook_events,
+        sync_company_capabilities_from_hubspot,
+        validate_hubspot_request_signature,
+        HubSpotWebhookValidationError,
+    )
 
 
 def create_app() -> Flask:
@@ -23,6 +39,13 @@ def create_app() -> Flask:
             timeout_seconds=app.config["timeout_seconds"],
         )
 
+    def _greenhouse_client() -> GreenhouseClient:
+        return GreenhouseClient(
+            base_url=app.config["greenhouse_base_url"],
+            api_token=app.config["greenhouse_integration_api_token"],
+            timeout_seconds=app.config["timeout_seconds"],
+        )
+
     @app.get("/health")
     def health():
         return jsonify(
@@ -31,7 +54,11 @@ def create_app() -> Flask:
                 "version": app.config["service_version"],
                 "status": "ok",
                 "hubspotConfigured": bool(app.config["hubspot_access_token"]),
-                "realtime": False,
+                "realtime": bool(
+                    app.config["hubspot_app_client_secret"]
+                    and app.config["greenhouse_base_url"]
+                    and app.config["greenhouse_integration_api_token"]
+                ),
             }
         )
 
@@ -86,6 +113,77 @@ def create_app() -> Flask:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502
             )
+
+    @app.post("/webhooks/hubspot")
+    def hubspot_webhook():
+        try:
+            signature_version = request.headers.get(
+                "X-HubSpot-Signature-Version", "v3"
+            )
+            signature_header = (
+                "X-HubSpot-Signature"
+                if signature_version.lower() == "v1"
+                else "X-HubSpot-Signature-v3"
+            )
+            validate_hubspot_request_signature(
+                app_secret=app.config["hubspot_app_client_secret"],
+                signature_version=signature_version,
+                method=request.method,
+                request_uri=request.url,
+                body=request.get_data(cache=True),
+                timestamp=request.headers.get("X-HubSpot-Request-Timestamp", ""),
+                signature=request.headers.get(signature_header, ""),
+                max_age_ms=app.config["webhook_max_age_ms"],
+            )
+            events = parse_webhook_events(request.get_data(cache=True))
+            company_ids = extract_company_ids_from_webhook_events(
+                events,
+                business_line_prop=app.config["business_line_prop"],
+                service_module_prop=app.config["service_module_prop"],
+            )
+        except HubSpotWebhookValidationError as exc:
+            return jsonify({"error": str(exc)}), 401
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+
+        if not company_ids:
+            return jsonify(
+                {
+                    "receivedEvents": len(events),
+                    "matchedCompanyIds": [],
+                    "processed": 0,
+                    "status": "ignored",
+                }
+            ), 202
+
+        results = [
+            sync_company_capabilities_from_hubspot(
+                hubspot_client=_client(),
+                greenhouse_client=_greenhouse_client(),
+                hubspot_company_id=company_id,
+                business_line_prop=app.config["business_line_prop"],
+                service_module_prop=app.config["service_module_prop"],
+            )
+            for company_id in company_ids
+        ]
+
+        response_payload = {
+            "receivedEvents": len(events),
+            "matchedCompanyIds": company_ids,
+            "processed": len(results),
+            "results": [
+                {
+                    "hubspotCompanyId": result.hubspot_company_id,
+                    "businessLines": result.business_lines,
+                    "serviceModules": result.service_modules,
+                    "greenhouseStatus": result.greenhouse_status,
+                    "error": result.error,
+                }
+                for result in results
+            ],
+        }
+        has_errors = any(result.error for result in results)
+        return jsonify(response_payload), (207 if has_errors else 202)
 
     return app
 
