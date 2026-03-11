@@ -215,7 +215,7 @@ export const listTenantsForIntegration = async ({
         LEFT JOIN \`${projectId}.greenhouse.service_modules\` AS sm
           ON sm.module_code = la.module_code
          AND sm.active = TRUE
-        WHERE (@targetClientId IS NULL OR c.client_id = @targetClientId)
+        WHERE (@targetClientId = '' OR c.client_id = @targetClientId)
         GROUP BY
           c.client_id,
           c.client_name,
@@ -229,16 +229,21 @@ export const listTenantsForIntegration = async ({
       SELECT *
       FROM tenant_snapshots
       WHERE (
-        @updatedSince IS NULL
+        @updatedSince = ''
         OR COALESCE(capabilities_updated_at, tenant_updated_at) >= TIMESTAMP(@updatedSince)
       )
       ORDER BY COALESCE(capabilities_updated_at, tenant_updated_at) DESC, client_name ASC
       LIMIT @limit
     `,
     params: {
-      targetClientId,
-      updatedSince,
+      targetClientId: targetClientId || '',
+      updatedSince: updatedSince || '',
       limit
+    },
+    types: {
+      targetClientId: 'STRING',
+      updatedSince: 'STRING',
+      limit: 'INT64'
     }
   })
 

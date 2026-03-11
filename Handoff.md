@@ -40,6 +40,57 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-11 10:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Reparar la API productiva de integraciones para que el bridge de HubSpot pueda resolver tenants y terminar la conexion bidireccional con Greenhouse.
+
+### Rama
+- Rama usada: `main`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Production
+
+### Archivos tocados
+- `.gitignore`
+- `src/lib/integrations/greenhouse-integration.ts`
+- `changelog.md`
+- `project_context.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm lint src/lib/integrations/greenhouse-integration.ts src/app/api/integrations/v1/tenants/route.ts`: correcto
+- `npx pnpm build`: correcto
+- Causa raiz reproducida antes del fix:
+  - BigQuery rechazaba `NULL` en `targetClientId` y `updatedSince` sin `types`, devolviendo `Parameter types must be provided for null values`
+- `vercel --prod --yes`: correcto
+  - deployments productivos relevantes:
+    - `https://greenhouse-rd6xgomq7-efeonce-7670142f.vercel.app`
+    - `https://greenhouse-ki5azne0e-efeonce-7670142f.vercel.app`
+    - `https://greenhouse-ojlumllrz-efeonce-7670142f.vercel.app`
+- Se roto `GREENHOUSE_INTEGRATION_API_TOKEN` en Vercel Production y luego se redeployo Greenhouse.
+- Se corrigio tambien el path de mutacion de integraciones:
+  - `src/lib/admin/tenant-capabilities.ts` ahora envia `types` explicitos a BigQuery para los params nullable del `MERGE`
+- Smoke real final en Production:
+  - `GET /api/integrations/v1/catalog/capabilities`: `200`
+  - `GET /api/integrations/v1/tenants`: `200`
+  - `GET /api/integrations/v1/tenants?sourceSystem=hubspot_crm&sourceObjectType=company&sourceObjectId=30825221458`: `200`
+  - el bloqueo operativo ya no esta en Greenhouse; el bridge de HubSpot pudo volver a consumir la API correctamente
+
+### Riesgos o pendientes
+- `staging` sigue pendiente de validacion separada; el problema operativo activo estaba en Production.
+- Los archivos temporales `.env.vercel.production` y `.env.vercel.staging` se siguen eliminando tras cada uso local; no forman parte del cambio versionado.
+- Falta decidir si los dry runs del bridge HubSpot deben dejar o no huella de idempotencia, porque hoy el primer push real despues de un dry run necesita `force=true`.
+
+### Proximo paso recomendado
+- Mantener Greenhouse y `hubspot-bigquery` sincronizados sobre el token actual rotando ambos lados en el mismo turno si vuelve a cambiar.
+- Si se quiere pulir la operacion, ajustar la semantica de idempotencia para que `dryRun=true` no obligue a usar `force=true` en la primera corrida real.
+
+### Fecha
 - 2026-03-11 06:31 America/Santiago
 
 ### Agente
