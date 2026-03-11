@@ -1,0 +1,1 @@
+web: python -m flask --app services.hubspot_greenhouse_integration.app run --host=0.0.0.0 --port=${PORT:-8080}
