@@ -1,0 +1,68 @@
+openapi: 3.1.0
+info:
+  title: Greenhouse Integrations API
+  version: 1.0.0
+  description: Generic integration surface for external connectors such as HubSpot, Notion, or other systems.
+servers:
+  - url: https://greenhouse.efeoncepro.com
+components:
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: API Token
+security:
+  - bearerToken: []
+paths:
+  /api/integrations/v1/catalog/capabilities:
+    get:
+      summary: Export the active Greenhouse capability catalog
+      responses:
+        '200':
+          description: Catalog exported successfully
+  /api/integrations/v1/tenants:
+    get:
+      summary: Export tenant snapshots for integration readers
+      parameters:
+        - in: query
+          name: clientId
+          schema:
+            type: string
+        - in: query
+          name: publicId
+          schema:
+            type: string
+        - in: query
+          name: sourceSystem
+          schema:
+            type: string
+        - in: query
+          name: sourceObjectType
+          schema:
+            type: string
+        - in: query
+          name: sourceObjectId
+          schema:
+            type: string
+        - in: query
+          name: updatedSince
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        '200':
+          description: Tenant snapshots exported successfully
+  /api/integrations/v1/tenants/capabilities/sync:
+    post:
+      summary: Push normalized capabilities from an external connector into Greenhouse
+      responses:
+        '200':
+          description: Tenant capabilities synced successfully
+        '404':
+          description: Tenant not found for selector
