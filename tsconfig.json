@@ -62,6 +62,8 @@
     ".next-local/**/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "full-version",
+    "demo-configs"
   ]
 }

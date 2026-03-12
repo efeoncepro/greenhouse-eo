@@ -67,6 +67,7 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                     </div>
                     <div className='flex items-center gap-2 flex-wrap justify-center'>
                       <Chip size='small' variant='outlined' label={data.publicUserId} />
+                      {data.identityPublicId ? <Chip size='small' variant='outlined' color='info' label={data.identityPublicId} /> : null}
                       <Chip size='small' variant='tonal' color={tenantTone(data.tenantType)} label={toTitleCase(data.tenantType)} />
                       <Chip size='small' variant='tonal' color={statusTone(data.status)} label={toTitleCase(data.status)} />
                       <Chip size='small' variant='outlined' label={toTitleCase(data.authMode)} />
@@ -110,6 +111,14 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                       </Typography>
                       <Typography>{data.publicUserId}</Typography>
                     </div>
+                    {data.identityPublicId ? (
+                      <div className='flex items-center flex-wrap gap-x-1.5'>
+                        <Typography className='font-medium' color='text.primary'>
+                          EO-ID:
+                        </Typography>
+                        <Typography>{data.identityPublicId}</Typography>
+                      </div>
+                    ) : null}
                     <div className='flex items-center flex-wrap gap-x-1.5'>
                       <Typography className='font-medium' color='text.primary'>
                         Username:

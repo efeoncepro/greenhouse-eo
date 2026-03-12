@@ -11,6 +11,8 @@
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
+    "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
+    "backfill:internal-identity-profiles": "tsx scripts/backfill-internal-identity-profiles.ts",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",
     "clear": "node scripts/clean-paths.mjs node_modules .next-local .next"

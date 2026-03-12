@@ -18,6 +18,8 @@ export interface AdminUserCampaignScope {
 export interface AdminUserDetail {
   userId: string
   publicUserId: string
+  identityProfileId: string | null
+  identityPublicId: string | null
   fullName: string
   email: string
   jobTitle: string | null
@@ -77,6 +79,8 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
       query: `
         SELECT
           cu.user_id,
+          cu.identity_profile_id,
+          ip.public_id AS identity_public_id,
           cu.full_name,
           cu.email,
           cu.job_title,
@@ -102,6 +106,8 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
         FROM \`${projectId}.greenhouse.client_users\` AS cu
         LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
           ON c.client_id = cu.client_id
+        LEFT JOIN \`${projectId}.greenhouse.identity_profiles\` AS ip
+          ON ip.profile_id = cu.identity_profile_id
         LEFT JOIN \`${projectId}.greenhouse.user_role_assignments\` AS ura
           ON ura.user_id = cu.user_id
          AND ura.active = TRUE
@@ -111,6 +117,8 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
         WHERE cu.user_id = @userId
         GROUP BY
           cu.user_id,
+          cu.identity_profile_id,
+          identity_public_id,
           cu.full_name,
           cu.email,
           cu.job_title,
@@ -174,6 +182,8 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
   return {
     userId: String(row.user_id || ''),
     publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
+    identityProfileId: row.identity_profile_id ? String(row.identity_profile_id) : null,
+    identityPublicId: row.identity_public_id ? String(row.identity_public_id) : null,
     fullName: String(row.full_name || 'Sin nombre'),
     email: String(row.email || ''),
     jobTitle: row.job_title ? String(row.job_title) : null,

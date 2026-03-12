@@ -12,6 +12,12 @@ type ModuleIdInput = {
   moduleKind: 'business_line' | 'service_module'
 }
 
+type IdentityProfileInput = {
+  sourceSystem: string
+  sourceObjectType: string
+  sourceObjectId: string
+}
+
 const HUBSPOT_TENANT_ID_PATTERN = /^hubspot-company-(\d+)$/i
 const HUBSPOT_USER_ID_PATTERN = /^user-hubspot-contact-(\d+)$/i
 
@@ -87,3 +93,38 @@ export const buildRoleAssignmentPublicId = ({
 
 export const buildFeatureFlagPublicId = ({ clientId, hubspotCompanyId, featureCode }: TenantIdInput & { featureCode: string }) =>
   `EO-FLG-${buildTenantPublicId({ clientId, hubspotCompanyId }).replace(/^EO-/, '')}-${toPublicToken(featureCode)}`
+
+export const buildIdentityProfileId = ({ sourceSystem, sourceObjectType, sourceObjectId }: IdentityProfileInput) => {
+  const systemToken = normalizeToken(sourceSystem)
+  const objectTypeToken = normalizeToken(sourceObjectType)
+  const objectIdToken = normalizeToken(sourceObjectId)
+
+  return `identity-${systemToken}-${objectTypeToken}-${objectIdToken}`
+}
+
+export const buildIdentityProfilePublicId = ({ sourceSystem, sourceObjectType, sourceObjectId }: IdentityProfileInput) => {
+  const normalizedSourceSystem = normalizeToken(sourceSystem)
+  const normalizedObjectType = normalizeToken(sourceObjectType)
+  const normalizedObjectId = normalizeToken(sourceObjectId)
+
+  if (normalizedSourceSystem === 'hubspot-crm' && normalizedObjectType === 'owner' && /^\d+$/.test(sourceObjectId.trim())) {
+    return `EO-ID-HSO-${sourceObjectId.trim()}`
+  }
+
+  if (normalizedSourceSystem === 'greenhouse-auth' && normalizedObjectType === 'client-user') {
+    return `EO-ID-GH-${toPublicToken(sourceObjectId)}`
+  }
+
+  if (normalizedSourceSystem === 'notion' && normalizedObjectType === 'person') {
+    return `EO-ID-NOT-${toPublicToken(sourceObjectId)}`
+  }
+
+  if (normalizedSourceSystem === 'azure-ad' && normalizedObjectType === 'user') {
+    return `EO-ID-AAD-${toPublicToken(sourceObjectId)}`
+  }
+
+  return `EO-ID-${toPublicToken(normalizedSourceSystem)}-${toPublicToken(normalizedObjectType)}-${toPublicToken(normalizedObjectId)}`
+}
+
+export const buildIdentitySourceLinkId = ({ profileId, sourceSystem, sourceObjectType, sourceObjectId }: IdentityProfileInput & { profileId: string }) =>
+  `identity-link-${normalizeToken(profileId)}-${normalizeToken(sourceSystem)}-${normalizeToken(sourceObjectType)}-${normalizeToken(sourceObjectId)}`

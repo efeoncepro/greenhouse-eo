@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
+
 const DEFAULT_BASE_URL = 'https://hubspot-greenhouse-integration-183008134038.us-central1.run.app'
 const DEFAULT_TIMEOUT_MS = 4000
 
@@ -147,7 +149,17 @@ export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string)
   fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
 
 export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: string) =>
-  fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
+  {
+    const response = await fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
+
+    return {
+      ...response,
+      contacts: response.contacts.map(contact => ({
+        ...contact,
+        displayName: resolveContactDisplayName(contact)
+      }))
+    }
+  }
 
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null

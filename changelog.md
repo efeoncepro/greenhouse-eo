@@ -4,6 +4,24 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-12
+
+### Internal identity foundation
+- Se agrego `GREENHOUSE_INTERNAL_IDENTITY_V1.md` para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
+- Se versiono `bigquery/greenhouse_internal_identity_v1.sql` con:
+  - `greenhouse.identity_profiles`
+  - `greenhouse.identity_profile_source_links`
+  - `greenhouse.client_users.identity_profile_id`
+- Se agrego `scripts/backfill-internal-identity-profiles.ts` y se ejecuto sobre BigQuery real:
+  - `2` auth principals internos Greenhouse enlazados a perfil canonico
+  - `6` HubSpot owners internos sembrados como perfiles canonicos
+  - `8` perfiles `EO-ID-*` creados
+- `src/lib/ids/greenhouse-ids.ts` ahora deriva `EO-ID-*` para perfiles canonicos internos sin romper `EO-USR-*` para el principal de acceso.
+- `/admin/users/[id]` ahora puede mostrar el `EO-ID` cuando el usuario tenga `identity_profile_id` enlazado.
+
+### Build and deploy hygiene
+- `starter-kit` ahora excluye `full-version/` y `demo-configs/` del scope de TypeScript, ESLint y Vercel deploy para que el runtime productivo no arrastre codigo de referencia ni demos.
+
 ## 2026-03-11
 
 ### Admin
