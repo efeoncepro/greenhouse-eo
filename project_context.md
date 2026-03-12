@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-12 Internal Identity Foundation
+- Se agrego `GREENHOUSE_INTERNAL_IDENTITY_V1.md` como contrato canonico para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
+- La fundacion nueva usa:
+  - `EO-USR-*` para el principal de acceso actual
+  - `EO-ID-*` para el perfil canonico interno
+- Se versiono `bigquery/greenhouse_internal_identity_v1.sql` para crear `identity_profiles`, `identity_profile_source_links` y `client_users.identity_profile_id`.
+- Se agrego bootstrap operativo `scripts/backfill-internal-identity-profiles.ts`:
+  - descubre candidatos internos por `tenant_type` o rol interno en `client_users`
+  - descubre owners internos en `hubspot_crm.owners` por dominio `@efeonce.org` o `@efeoncepro.com`
+  - crea perfiles canonicos y source links listos para enlazar Notion o Azure AD despues
+- Estado real ejecutado:
+  - `2` auth principals internos Greenhouse enlazados
+  - `6` HubSpot owners internos sembrados como perfiles canonicos
+  - `8` perfiles `EO-ID-*` creados en BigQuery
+
 ## Documento Maestro de Arquitectura
 - Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
 - Resumen rapido de fases y tareas: `PHASE_TASK_MATRIX.md`

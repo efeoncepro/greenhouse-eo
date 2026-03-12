@@ -39,6 +39,43 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ## Estado Actual
 
+## 2026-03-12 07:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar el modelado inicial de identidad interna Efeonce para no depender solo de `client_users` y dejar preparada la futura unificacion con Azure AD.
+
+### Rama
+- Rama usada: actual de trabajo local
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- Development con aplicacion real en BigQuery
+
+### Archivos tocados
+- `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `bigquery/greenhouse_internal_identity_v1.sql`
+- `scripts/backfill-internal-identity-profiles.ts`
+- `src/lib/ids/greenhouse-ids.ts`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+
+### Verificacion
+- `npx pnpm backfill:internal-identity-profiles --dry-run`: correcto
+- `npx pnpm backfill:internal-identity-profiles`: correcto
+- Resultado real en BigQuery:
+  - `2` auth principals internos enlazados a `identity_profile_id`
+  - `6` owners HubSpot internos sembrados como perfiles canonicos
+  - `8` perfiles `EO-ID-*` creados
+- ADC verificado sano con `gcloud auth application-default print-access-token`
+
+### Riesgos o pendientes
+- No se hizo auto-merge entre `julio.reyes@efeonce.org` y `jreyes@efeoncepro.com`; esa clase de alias entre dominios queda como reconciliacion manual o futura regla revisada.
+- Falta corrida final de `lint` y `build` despues del bootstrap de identidad interna antes de commit si el turno se retoma desde aqui.
+- Azure AD no esta implementado; solo quedo la base canonica para enlazarlo despues.
+
 ### Fecha
 - 2026-03-12 09:15 America/Santiago
 

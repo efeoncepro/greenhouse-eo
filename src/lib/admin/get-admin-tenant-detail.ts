@@ -11,6 +11,7 @@ import { getHubSpotGreenhouseLiveContext } from '@/lib/integrations/hubspot-gree
 export interface AdminTenantUserRow {
   userId: string
   publicUserId: string
+  hubspotContactIds: string[]
   fullName: string
   email: string
   status: string
@@ -167,6 +168,11 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
           cu.active,
           cu.auth_mode,
           cu.last_login_at,
+          ARRAY_AGG(
+            DISTINCT REGEXP_EXTRACT(ura.assignment_id, r'^assignment-hubspot-contact-(\\d+)-client-executive$')
+            IGNORE NULLS
+            ORDER BY REGEXP_EXTRACT(ura.assignment_id, r'^assignment-hubspot-contact-(\\d+)-client-executive$')
+          ) AS hubspot_contact_ids,
           ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
           ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
           COUNT(DISTINCT IF(ups.active = TRUE, ups.project_id, NULL)) AS project_scope_count
@@ -295,6 +301,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     users: (userRows[0] as Array<Record<string, unknown>>).map(row => ({
       userId: String(row.user_id || ''),
       publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
+      hubspotContactIds: normalizeStringArray(row.hubspot_contact_ids),
       fullName: String(row.full_name || ''),
       email: String(row.email || ''),
       status: String(row.status || ''),

@@ -13,6 +13,7 @@ import {
   getHubSpotGreenhouseCompanyContacts,
   type HubSpotGreenhouseContactProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
+import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
 
 type TenantProvisioningContext = {
   clientId: string
@@ -34,14 +35,6 @@ const DEFAULT_TIMEZONE = 'America/Santiago'
 const DEFAULT_PORTAL_HOME = '/dashboard'
 
 const normalizeEmail = (value: string | null | undefined) => value?.trim().toLowerCase() || null
-
-const normalizeDisplayName = (contact: HubSpotGreenhouseContactProfile) => {
-  if (contact.displayName?.trim()) return contact.displayName.trim()
-
-  const composed = [contact.firstName, contact.lastName].map(item => item?.trim() || '').filter(Boolean).join(' ')
-
-  return composed || contact.email?.trim() || `HubSpot Contact ${contact.hubspotContactId}`
-}
 
 const buildScopeId = (userId: string, projectId: string) => {
   const digest = createHash('sha256').update(`${userId}:${projectId}`).digest('hex').slice(0, 18)
@@ -526,7 +519,20 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
   })
 
   const existingByUserId = new Map(existingUsers.map(row => [row.user_id, row]))
-  const existingByEmail = new Map(existingUsers.map(row => [normalizeEmail(row.email) || row.email.toLowerCase(), row]))
+  const existingByEmail = new Map<string, ExistingUserRow[]>()
+
+  for (const row of existingUsers) {
+    const normalizedExistingEmail = normalizeEmail(row.email)
+
+    if (!normalizedExistingEmail) {
+      continue
+    }
+
+    const current = existingByEmail.get(normalizedExistingEmail) || []
+
+    current.push(row)
+    existingByEmail.set(normalizedExistingEmail, current)
+  }
 
   const results: TenantContactProvisioningResult[] = missingSelections.map(contactId => ({
     hubspotContactId: contactId,
@@ -540,7 +546,7 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
   for (const contact of validSelectedContacts) {
     const normalizedEmail = normalizeEmail(contact.email)
     const canonicalUserId = `user-hubspot-contact-${contact.hubspotContactId}`
-    const displayName = normalizeDisplayName(contact)
+    const displayName = resolveContactDisplayName(contact)
 
     if (!normalizedEmail) {
       results.push({
@@ -556,22 +562,53 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
     }
 
     const existingById = existingByUserId.get(canonicalUserId)
-    const existingByEmailRow = existingByEmail.get(normalizedEmail)
+    const existingEmailRows = existingByEmail.get(normalizedEmail) || []
+
+    const sameTenantEmailUsers = Array.from(
+      new Map(
+        existingEmailRows
+          .filter(row => row.client_id === clientId)
+          .map(row => [row.user_id, row])
+      ).values()
+    )
+
+    const otherTenantEmailUsers = Array.from(
+      new Map(
+        existingEmailRows
+          .filter(row => row.client_id && row.client_id !== clientId)
+          .map(row => [`${row.client_id}:${row.user_id}`, row])
+      ).values()
+    )
+
+    const existingTenantEmailUser = sameTenantEmailUsers[0] || null
     const hasExistingCanonicalUser = Boolean(existingById && existingById.client_id === clientId)
-    const hasExistingTenantEmailUser = Boolean(existingByEmailRow && existingByEmailRow.client_id === clientId)
+    const hasExistingTenantEmailUser = Boolean(existingTenantEmailUser)
 
     if (
       hasExistingCanonicalUser &&
       hasExistingTenantEmailUser &&
-      existingById?.user_id !== existingByEmailRow?.user_id
+      existingById?.user_id !== existingTenantEmailUser?.user_id
     ) {
       results.push({
         hubspotContactId: contact.hubspotContactId,
         email: normalizedEmail,
         displayName,
         outcome: 'conflict',
-        reason: `This tenant already has two different users linked to this HubSpot contact/email (${existingById?.user_id} and ${existingByEmailRow?.user_id}). Resolve that duplication before provisioning again.`,
-        userId: existingById?.user_id || existingByEmailRow?.user_id || null
+        reason: `This tenant already has two different users linked to this HubSpot contact/email (${existingById?.user_id} and ${existingTenantEmailUser?.user_id}). Resolve that duplication before provisioning again.`,
+        userId: existingById?.user_id || existingTenantEmailUser?.user_id || null
+      })
+
+      continue
+    }
+
+    if (sameTenantEmailUsers.length > 1) {
+      results.push({
+        hubspotContactId: contact.hubspotContactId,
+        email: normalizedEmail,
+        displayName,
+        outcome: 'conflict',
+        reason: `This tenant already has multiple users with the same email (${sameTenantEmailUsers.map(row => row.user_id).join(', ')}). Resolve that duplication before provisioning again.`,
+        userId: sameTenantEmailUsers[0]?.user_id || null
       })
 
       continue
@@ -590,14 +627,14 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
       continue
     }
 
-    if (existingByEmailRow && existingByEmailRow.user_id !== canonicalUserId && existingByEmailRow.client_id !== clientId) {
+    if (!hasExistingCanonicalUser && !hasExistingTenantEmailUser && otherTenantEmailUsers.length > 0) {
       results.push({
         hubspotContactId: contact.hubspotContactId,
         email: normalizedEmail,
         displayName,
         outcome: 'conflict',
-        reason: `This email already belongs to another Greenhouse user (${existingByEmailRow.user_id}).`,
-        userId: existingByEmailRow.user_id
+        reason: `This email already belongs to another Greenhouse user (${otherTenantEmailUsers.map(row => row.user_id).join(', ')}).`,
+        userId: otherTenantEmailUsers[0]?.user_id || null
       })
 
       continue
@@ -606,8 +643,8 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
     const targetUserId =
       existingById?.client_id === clientId
         ? existingById.user_id
-        : existingByEmailRow?.client_id === clientId
-          ? existingByEmailRow.user_id
+        : existingTenantEmailUser?.client_id === clientId
+          ? existingTenantEmailUser.user_id
           : canonicalUserId
 
     try {

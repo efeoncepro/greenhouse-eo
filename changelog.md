@@ -6,6 +6,19 @@
 
 ## 2026-03-12
 
+### Internal identity foundation
+- Se agrego `GREENHOUSE_INTERNAL_IDENTITY_V1.md` para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
+- Se versiono `bigquery/greenhouse_internal_identity_v1.sql` con:
+  - `greenhouse.identity_profiles`
+  - `greenhouse.identity_profile_source_links`
+  - `greenhouse.client_users.identity_profile_id`
+- Se agrego `scripts/backfill-internal-identity-profiles.ts` y se ejecuto sobre BigQuery real:
+  - `2` auth principals internos Greenhouse enlazados a perfil canonico
+  - `6` HubSpot owners internos sembrados como perfiles canonicos
+  - `8` perfiles `EO-ID-*` creados
+- `src/lib/ids/greenhouse-ids.ts` ahora deriva `EO-ID-*` para perfiles canonicos internos sin romper `EO-USR-*` para el principal de acceso.
+- `/admin/users/[id]` ahora puede mostrar el `EO-ID` cuando el usuario tenga `identity_profile_id` enlazado.
+
 ### UI orchestration
 - Se agrego `GREENHOUSE_UI_ORCHESTRATION_V1.md` como contrato canonico para seleccionar y promover patrones Vuexy/MUI en Greenhouse.
 - Se agrego `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` como primer catalogo curado de referencias `full-version` y primitives locales reutilizables.

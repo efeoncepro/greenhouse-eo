@@ -25,6 +25,7 @@ import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import { buildUserPublicId } from '@/lib/ids/greenhouse-ids'
 import {
   chunkTenantContactIds,
   MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE,
@@ -44,6 +45,8 @@ const formatDateTime = (value: string | null) => {
 
   return new Date(value).toLocaleString('es-CL')
 }
+
+const normalizeEmailValue = (value: string | null | undefined) => value?.trim().toLowerCase() || null
 
 const flagTone = (status: string) => {
   if (status === 'enabled') return 'success'
@@ -115,21 +118,56 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const liveContacts = data.liveHubspot.contacts
   const liveMode = data.liveHubspot.contract?.realtime.mode || 'polling_or_on_demand'
   const liveIsRealtime = data.liveHubspot.contract?.realtime.supported === true
-  const tenantUserEmails = new Set(data.users.map(user => user.email.trim().toLowerCase()))
 
-  const provisionedLiveContacts = liveContacts.filter(contact => {
-    const email = contact.email?.trim().toLowerCase()
+  const usersByEmail = data.users.reduce<Map<string, AdminTenantDetail['users']>>((map, user) => {
+    const normalizedEmail = normalizeEmailValue(user.email)
 
-    return Boolean(email && tenantUserEmails.has(email))
+    if (!normalizedEmail) {
+      return map
+    }
+
+    const current = map.get(normalizedEmail) || []
+
+    current.push(user)
+    map.set(normalizedEmail, current)
+
+    return map
+  }, new Map())
+
+  const usersByHubspotContactId = data.users.reduce<Map<string, AdminTenantDetail['users']>>((map, user) => {
+    user.hubspotContactIds.forEach(contactId => {
+      const current = map.get(contactId) || []
+
+      current.push(user)
+      map.set(contactId, current)
+    })
+
+    return map
+  }, new Map())
+
+  const duplicateUsersByEmail = Array.from(usersByEmail.entries())
+    .filter(([, users]) => users.length > 1)
+    .map(([email, users]) => ({ email, users }))
+
+  const reconciledLiveContacts = liveContacts.map(contact => {
+    const normalizedEmail = normalizeEmailValue(contact.email)
+    const matchedByContactId = usersByHubspotContactId.get(contact.hubspotContactId) || []
+    const matchedByEmail = normalizedEmail ? usersByEmail.get(normalizedEmail) || [] : []
+    const matchedUsers = Array.from(new Map([...matchedByContactId, ...matchedByEmail].map(user => [user.userId, user])).values())
+
+    return {
+      contact,
+      normalizedEmail,
+      matchedUsers,
+      matchedByContactId: matchedByContactId.length > 0,
+      expectedPublicUserId: buildUserPublicId({ userId: `user-hubspot-contact-${contact.hubspotContactId}` })
+    }
   })
 
-  const missingLiveContacts = liveContacts.filter(contact => {
-    const email = contact.email?.trim().toLowerCase()
-
-    return Boolean(email && !tenantUserEmails.has(email))
-  })
-
-  const contactsWithoutEmail = liveContacts.filter(contact => !contact.email?.trim())
+  const provisionedLiveContacts = reconciledLiveContacts.filter(item => item.matchedUsers.length === 1)
+  const ambiguousLiveContacts = reconciledLiveContacts.filter(item => item.matchedUsers.length > 1)
+  const missingLiveContacts = reconciledLiveContacts.filter(item => Boolean(item.normalizedEmail) && item.matchedUsers.length === 0)
+  const contactsWithoutEmail = reconciledLiveContacts.filter(item => !item.normalizedEmail)
 
   const handleProvisionMissingContacts = async () => {
     if (missingLiveContacts.length === 0) {
@@ -140,7 +178,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
     setIsProvisioningContacts(true)
 
     try {
-      const contactIds = missingLiveContacts.map(contact => contact.hubspotContactId)
+      const contactIds = missingLiveContacts.map(item => item.contact.hubspotContactId)
       const batches = chunkTenantContactIds(contactIds)
       const summaries: TenantContactsProvisioningSummary[] = []
 
@@ -514,7 +552,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   >
                     {[
                       ['Usuarios activos', data.activeUsers],
-                      ['Usuarios invitados', data.invitedUsers],
+                      ['Pendientes de activar', data.invitedUsers],
                       ['Proyectos scoped', data.scopedProjects],
                       ['Proyectos base', data.notionProjectCount]
                     ].map(([label, value]) => (
@@ -582,17 +620,21 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 <Stack spacing={3}>
                   <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'center' }}>
                     <Box>
-                      <Typography variant='h6'>Contactos CRM del space</Typography>
+                      <Typography variant='h6'>Contactos CRM asociados (fuente)</Typography>
                       <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                        Greenhouse ya puede leer los contactos asociados a la empresa en HubSpot. Esta tabla muestra que
-                        contactos ya existen como usuarios del space y cuales faltan por provisionar.
+                        Esta tabla es la lectura live de HubSpot. No representa un segundo padron de usuarios: cada
+                        contacto se reconcilia contra su acceso real en Greenhouse para mostrar si ya existe, si falta
+                        provisionar o si hay una coincidencia ambigua.
                       </Typography>
                     </Box>
                     <Stack direction={{ xs: 'column', sm: 'row' }} gap={1} flexWrap='wrap' alignItems={{ xs: 'stretch', sm: 'center' }}>
                       <Stack direction='row' gap={1} flexWrap='wrap'>
                         <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} en HubSpot`} />
-                        <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} en Greenhouse`} />
+                        <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} reconciliados`} />
                         <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} pendientes`} />
+                        {ambiguousLiveContacts.length > 0 ? (
+                          <Chip size='small' variant='outlined' color='error' label={`${ambiguousLiveContacts.length} ambiguos`} />
+                        ) : null}
                         {contactsWithoutEmail.length > 0 ? (
                           <Chip size='small' variant='outlined' color='default' label={`${contactsWithoutEmail.length} sin email`} />
                         ) : null}
@@ -617,11 +659,23 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   </Stack>
 
                   <Alert severity='info'>
-                    Provisionar crea o reconcilia usuarios `invited` con rol `client_executive` y garantiza los scopes
-                    base del space. Si un contacto ya existia por email dentro del mismo tenant, Greenhouse repara su
-                    acceso en vez de dejarlo como falso positivo. Para evitar timeouts, los lotes se ejecutan de a{' '}
+                    Provisionar crea o reconcilia accesos del space en `greenhouse.client_users` con estado `invited`,
+                    rol `client_executive` y scopes base. `Invited` no es otra categoria de persona: es el estado del
+                    mismo usuario provisionado antes de su activacion. Para evitar timeouts, los lotes se ejecutan de a{' '}
                     {MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE} contactos por request.
                   </Alert>
+
+                  {duplicateUsersByEmail.length > 0 || ambiguousLiveContacts.length > 0 ? (
+                    <Alert severity='warning'>
+                      Se detectaron brechas de reconciliacion.
+                      {duplicateUsersByEmail.length > 0
+                        ? ` Emails repetidos en el space: ${duplicateUsersByEmail.map(item => item.email).join(', ')}.`
+                        : ''}
+                      {ambiguousLiveContacts.length > 0
+                        ? ` Contactos CRM con mas de un usuario candidato: ${ambiguousLiveContacts.map(item => item.contact.hubspotContactId).join(', ')}.`
+                        : ''}
+                    </Alert>
+                  ) : null}
 
                   {provisionProgress ? (
                     <Alert severity='info'>
@@ -642,15 +696,23 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                           <TableCell>Contacto</TableCell>
                           <TableCell>Cargo</TableCell>
                           <TableCell>Ciclo</TableCell>
-                          <TableCell>Provision</TableCell>
+                          <TableCell>Usuario Greenhouse</TableCell>
+                          <TableCell>Estado</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {liveContacts.map(contact => {
-                          const normalizedEmail = contact.email?.trim().toLowerCase() || null
-                          const isProvisioned = Boolean(normalizedEmail && tenantUserEmails.has(normalizedEmail))
-                          const provisionTone = isProvisioned ? 'success' : normalizedEmail ? 'warning' : 'default'
-                          const provisionLabel = isProvisioned ? 'Ya existe' : normalizedEmail ? 'Falta provisionar' : 'Sin email'
+                        {reconciledLiveContacts.map(({ contact, matchedUsers, matchedByContactId, normalizedEmail, expectedPublicUserId }) => {
+                          const provisionTone =
+                            matchedUsers.length > 1 ? 'error' : matchedUsers.length === 1 ? 'success' : normalizedEmail ? 'warning' : 'default'
+
+                          const provisionLabel =
+                            matchedUsers.length > 1
+                              ? 'Coincidencia ambigua'
+                              : matchedUsers.length === 1
+                                ? 'Provisionado'
+                                : normalizedEmail
+                                  ? 'Pendiente'
+                                  : 'Sin email'
 
                           return (
                             <TableRow key={contact.hubspotContactId} hover>
@@ -674,12 +736,48 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                <Chip
-                                  size='small'
-                                  variant='tonal'
-                                  color={provisionTone}
-                                  label={provisionLabel}
-                                />
+                                {matchedUsers.length === 1 ? (
+                                  <Stack spacing={0.75}>
+                                    <Typography
+                                      component={Link}
+                                      href={`/admin/users/${matchedUsers[0].userId}`}
+                                      color='text.primary'
+                                      className='font-medium'
+                                    >
+                                      {matchedUsers[0].fullName}
+                                    </Typography>
+                                    <Typography variant='body2' color='text.secondary'>
+                                      {matchedUsers[0].publicUserId} | {matchedUsers[0].email}
+                                    </Typography>
+                                    <Chip
+                                      size='small'
+                                      variant='outlined'
+                                      color={matchedByContactId ? 'success' : 'warning'}
+                                      label={matchedByContactId ? 'Match exacto HubSpot' : 'Reconciliado por email'}
+                                      sx={{ width: 'fit-content' }}
+                                    />
+                                  </Stack>
+                                ) : matchedUsers.length > 1 ? (
+                                  <Stack spacing={0.75}>
+                                    {matchedUsers.map(user => (
+                                      <Typography key={user.userId} variant='body2' color='text.secondary'>
+                                        {user.publicUserId} | {user.email}
+                                      </Typography>
+                                    ))}
+                                  </Stack>
+                                ) : (
+                                  <Stack spacing={0.75}>
+                                    <Typography variant='body2' color='text.secondary'>
+                                      Todavia no existe acceso Greenhouse para este contacto.
+                                    </Typography>
+                                    <Typography variant='body2' color='text.secondary'>
+                                      ID esperado: {expectedPublicUserId}
+                                    </Typography>
+                                  </Stack>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Chip size='small' variant='tonal' color={provisionTone} label={provisionLabel} />
                               </TableCell>
                             </TableRow>
                           )
@@ -700,12 +798,19 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <Typography variant='h6'>Usuarios del space</Typography>
+                  <Box>
+                    <Typography variant='h6'>Accesos provisionados del space</Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
+                      Esta tabla sale de `greenhouse.client_users`. Si el origen fue HubSpot, se muestra el contacto
+                      asociado; si no, el acceso se considera manual o interno.
+                    </Typography>
+                  </Box>
                   <TableContainer>
                     <Table>
                       <TableHead>
                         <TableRow>
                           <TableCell>Usuario</TableCell>
+                          <TableCell>Origen</TableCell>
                           <TableCell>Roles</TableCell>
                           <TableCell>Acceso</TableCell>
                           <TableCell>Scopes</TableCell>
@@ -724,6 +829,20 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                   {user.publicUserId} | {user.email}
                                 </Typography>
                               </Stack>
+                            </TableCell>
+                            <TableCell>
+                              {user.hubspotContactIds.length === 0 ? (
+                                <Chip size='small' variant='outlined' label='Manual o interno' />
+                              ) : user.hubspotContactIds.length === 1 ? (
+                                <Chip size='small' variant='outlined' color='info' label={`HubSpot ${user.hubspotContactIds[0]}`} />
+                              ) : (
+                                <Stack spacing={0.75}>
+                                  <Chip size='small' variant='outlined' color='warning' label='Multiples contactos HubSpot' />
+                                  <Typography variant='body2' color='text.secondary'>
+                                    {user.hubspotContactIds.join(', ')}
+                                  </Typography>
+                                </Stack>
+                              )}
                             </TableCell>
                             <TableCell>
                               <Stack direction='row' gap={1} flexWrap='wrap'>
