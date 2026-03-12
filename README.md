@@ -22,6 +22,9 @@ La documentacion operativa interna del repo esta en:
 - `GREENHOUSE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `GREENHOUSE_UI_ORCHESTRATION_V1.md`
+- `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
+- `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - `PHASE_TASK_MATRIX.md`
 - `GREENHOUSE_SERVICE_MODULES_V1.md`
@@ -65,6 +68,7 @@ Ese documento define:
 - Si se toman componentes desde `full-version`, deben adaptarse al contexto Greenhouse antes de integrarse.
 - Los componentes UI reutilizables propios de Greenhouse deben vivir en `src/components/greenhouse/*`; las vistas deben consumir esa capa antes de crear JSX ad hoc por modulo.
 - El sistema visual ejecutivo reusable del producto queda definido en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` y toma a Vuexy como referencia compositiva, no como fuente de pantallas para copiar.
+- La seleccion de patrones Vuexy/MUI para nuevas interfaces queda gobernada por `GREENHOUSE_UI_ORCHESTRATION_V1.md`, el catalogo curado `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` y el brief `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
 
 ## Estado Actual
 

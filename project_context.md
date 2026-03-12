@@ -17,6 +17,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Metodo canonico de validacion visual: `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
 - Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- Contrato canonico de orquestacion UI: `GREENHOUSE_UI_ORCHESTRATION_V1.md`
+- Catalogo curado de patrones Vuexy/MUI: `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
+- Brief canonico de intake UI: `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - Seed operativo para benchmark interno del dashboard: `bigquery/greenhouse_efeonce_space_v1.sql`
 - Plan UX actual para la siguiente iteracion del dashboard: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 
@@ -52,6 +55,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
 - Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
 - Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+- La seleccion de patrones Vuexy/MUI para cualquier solicitud nueva ya no debe salir de exploracion libre de `full-version`; debe pasar por el sistema definido en `GREENHOUSE_UI_ORCHESTRATION_V1.md`.
+- El intake de solicitudes UI puede venir de personas o de otros agentes; el brief canonico para normalizar pedidos de Claude, Codex u otros queda en `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
 
 ## Stack Actual
 - Next.js 16.1.1
@@ -227,6 +232,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - crea usuarios `invited` cuando no existen
   - reconcilia usuarios ya existentes del mismo tenant por email para reparar rol `client_executive` y scopes base si quedaron incompletos
   - evita falsos `already_exists` cuando el usuario existia pero su acceso no estaba completo
+- ya existe una base documental para un orquestador UI multi-agente: `GREENHOUSE_UI_ORCHESTRATION_V1.md`, `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` y `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md` fijan como Claude, Codex u otros asistentes deben normalizar solicitudes y seleccionar patrones Vuexy/MUI sin explorar `full-version` de forma ad hoc
 - Regla de latencia actual:
   - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
   - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
