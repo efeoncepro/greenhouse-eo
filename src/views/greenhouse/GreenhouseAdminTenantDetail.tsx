@@ -67,7 +67,7 @@ const getDisplayNote = (notes: string | null, hubspotCompanyId: string | null) =
   return notes
 }
 
-const buildProvisionFeedback = (summary: TenantContactProvisioningSummary) => {
+const buildProvisionFeedback = (summary: TenantContactsProvisioningSummary) => {
   const fragments = [
     `${summary.created} creados`,
     `${summary.reconciled} reconciliados`,
@@ -97,6 +97,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const router = useRouter()
   const [capabilities, setCapabilities] = useState<TenantCapabilityRecord[]>(data.capabilities)
   const [isProvisioningContacts, setIsProvisioningContacts] = useState(false)
+
   const [provisionProgress, setProvisionProgress] = useState<{
     completedBatches: number
     totalBatches: number
