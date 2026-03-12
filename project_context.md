@@ -123,6 +123,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el endpoint `/api/admin/tenants/[id]/contacts/provision` ya fue probado contra BigQuery real
   - el bug detectado en el smoke fue tipado explicito de `null` para `upsertClientUser` en BigQuery
   - evidencia real: `user-hubspot-contact-136893943450` quedo creado y una segunda corrida devolvio `reconciled`
+- estado productivo al 2026-03-12:
+  - `develop` y `main` ya quedaron alineadas en `10b7ca8`
+  - el deployment productivo de `greenhouse.efeoncepro.com` ya fue verificado con login admin real
+  - el tenant Sky `hubspot-company-30825221458` ya quedo sin gap de contactos CRM provisionables: `tenantUserCount = 16`, `liveContactCount = 16`, `missingCount = 0`
+  - el provisioning bulk funciona productivamente, pero para corridas largas la conexion HTTP puede cerrarse antes de devolver respuesta aunque el trabajo termine server-side
+  - la cuenta demo cliente `client.portal@efeonce.com` tambien fue validada en produccion con `/dashboard` respondiendo `200`
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz

@@ -17,6 +17,12 @@
   - `upsertClientUser` ahora envia `types` explicitos para parametros `STRING` cuando `jobTitle` u otros campos llegan como `null`
   - despues del fix, el contacto `136893943450` (`valeria.gutierrez@skyairline.com`) quedo provisionado con `status=invited`, `auth_mode=password_reset_pending`, rol `client_executive` y `1` scope base
   - una segunda corrida sobre el mismo contacto devolvio `reconciled`, confirmando idempotencia funcional
+- El tenant de Sky (`hubspot-company-30825221458`) ya quedo completamente provisionado en produccion:
+  - `tenantUserCount = 16`
+  - `liveContactCount = 16`
+  - `missingCount = 0`
+  - la corrida bulk creo o reconcilio el resto de contactos CRM con email
+- Se valido tambien la experiencia cliente productiva con la cuenta demo `client.portal@efeonce.com`: login correcto, sesion `client_executive` y `/dashboard` respondiendo `200`.
 
 ### Integrations
 - Se auditaron todas las ramas activas y de respaldo; el unico trabajo funcional no absorbido quedo fijado en `reconcile/merge-hubspot-provisioning` y el rescate documental cross-repo en `reconcile/docs-cross-repo-contract`.
@@ -43,6 +49,13 @@
   - primer intento: detecto bug real de tipado `null` en BigQuery
   - segundo intento despues del fix: `created: 1`
   - tercer intento sobre el mismo contacto: `reconciled: 1`
+- Produccion verificada despues de promover `develop` a `main`:
+  - deployment productivo activo y aliases correctos
+  - login admin productivo correcto
+  - `GET /admin/tenants/hubspot-company-30825221458`: `200`
+  - endpoint productivo de provisioning confirmado
+  - corrida bulk productiva completada para Sky, con caveat de cierre prematuro de la conexion HTTP en corridas largas
+- Smoke cliente productivo con `client.portal@efeonce.com`: correcto
 - Validacion visual local con login admin + `view-as` sobre `space-efeonce`: correcta
 - Documento operativo `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md` quedo reescrito con matriz de brechas, soluciones, seleccion y ejecucion final
 ## 2026-03-10

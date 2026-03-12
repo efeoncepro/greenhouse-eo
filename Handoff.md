@@ -40,6 +40,66 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-12 05:16 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Promover controladamente `develop` a `main` y verificar el deployment productivo resultante.
+- Cerrar el provisioning de contactos HubSpot para `hubspot-company-30825221458` en produccion.
+- Validar tambien la experiencia base del lado cliente con la cuenta demo productiva.
+
+### Rama
+- Rama usada: `docs/production-closeout`
+- Estado promovido:
+  - `origin/develop = 10b7ca8`
+  - `origin/main = 10b7ca8`
+- Rama objetivo del merge:
+  - `docs/production-closeout` -> `main`
+  - luego `main` -> `develop` solo si se quiere mantener ambos punteros documentales identicos
+
+### Ambiente objetivo
+- Production en `https://greenhouse.efeoncepro.com`
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- Promocion Git:
+  - `develop` fue promovida a `main` por fast-forward limpio
+  - `origin/main` y `origin/develop` quedaron alineadas en `10b7ca8`
+- Deploy productivo:
+  - deployment activo verificado: `greenhouse-j8nh65tj5-efeonce-7670142f.vercel.app`
+  - alias productivos verificados: `https://greenhouse-eo.vercel.app` y `https://greenhouse.efeoncepro.com`
+  - `GET /api/auth/csrf`: correcto
+- Smoke admin productivo:
+  - login real con `julio.reyes@efeonce.org`: correcto
+  - `GET /admin/tenants/hubspot-company-30825221458`: `200`
+  - POST idempotente del endpoint de provisioning: correcto
+- Provisioning Sky:
+  - corrida bulk productiva ejecutada para los contactos faltantes
+  - observacion operacional: la conexion HTTP del bulk puede cerrarse antes de devolver respuesta aunque el trabajo termine server-side
+  - verificacion final contra BigQuery + HubSpot:
+    - `tenantUserCount = 16`
+    - `liveContactCount = 16`
+    - `missingCount = 0`
+- Smoke cliente productivo:
+  - login real con `client.portal@efeonce.com`: correcto
+  - sesion `client_executive`: correcta
+  - `GET /dashboard`: `200`
+
+### Riesgos o pendientes
+- El endpoint bulk funciona, pero la respuesta HTTP no es lo bastante confiable para corridas largas; conviene batch pequeno o ejecucion asincrona con polling antes de repetir esto en otros tenants.
+- El checkout principal del usuario sigue con `.gitignore` modificado y no debe mezclarse por accidente con este cierre documental.
+
+### Proximo paso recomendado
+- Si no quieres tocar mas codigo, mergear este cierre documental corto a `main` y `develop`.
+- Si quieres endurecer la operacion, abrir un follow-up tecnico para convertir el provisioning bulk en job asincrono o en lotes pequenos.
+
+### Fecha
 - 2026-03-11 23:28 America/Santiago
 
 ### Agente
