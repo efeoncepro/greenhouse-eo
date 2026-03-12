@@ -1,249 +1,317 @@
 'use client'
 
+import { useMemo, useState } from 'react'
+
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
+import MuiLink from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-import {
-  ExecutiveCardShell,
-  ExecutiveHeroCard,
-  ExecutiveMiniStatCard,
-  MetricList
-} from '@/components/greenhouse'
+import { EmptyState, ExecutiveCardShell, SectionErrorBoundary } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
-import AccountTeamSection from '@views/greenhouse/dashboard/AccountTeamSection'
-import AttentionProjectsTable from '@views/greenhouse/dashboard/AttentionProjectsTable'
+import ClientAttentionProjectsAccordion from '@views/greenhouse/dashboard/ClientAttentionProjectsAccordion'
+import ClientDashboardHero from '@views/greenhouse/dashboard/ClientDashboardHero'
+import ClientEcosystemSection from '@views/greenhouse/dashboard/ClientEcosystemSection'
+import ClientPortfolioHealthAccordion from '@views/greenhouse/dashboard/ClientPortfolioHealthAccordion'
+import ClientTeamCapacitySection from '@views/greenhouse/dashboard/ClientTeamCapacitySection'
+import DashboardKpiCard from '@views/greenhouse/dashboard/DashboardKpiCard'
+import DashboardRequestDialog from '@views/greenhouse/dashboard/DashboardRequestDialog'
 import {
-  createEffortMixOptions,
-  createOnTimeOptions,
-  createStatusMixOptions,
-  createThroughputOptions
+  createClientOtdTrendOptions,
+  createClientStatusDonutOptions,
+  createProjectRpaOptions,
+  createWeeklyCadenceOptions
 } from '@views/greenhouse/dashboard/chart-options'
-import DeliverySignalsSection from '@views/greenhouse/dashboard/DeliverySignalsSection'
-import OperationalSnapshotSection from '@views/greenhouse/dashboard/OperationalSnapshotSection'
-import PortfolioHealthCard from '@views/greenhouse/dashboard/PortfolioHealthCard'
-import QualitySignalsSection from '@views/greenhouse/dashboard/QualitySignalsSection'
-import ThroughputOverviewCard from '@views/greenhouse/dashboard/ThroughputOverviewCard'
-import ToolingSection from '@views/greenhouse/dashboard/ToolingSection'
-import { formatDelta } from '@views/greenhouse/dashboard/config'
-import { buildExecutiveDashboardLayout } from '@views/greenhouse/dashboard/orchestrator'
+import { buildModuleBadges } from '@views/greenhouse/dashboard/config'
+import {
+  formatDecimal,
+  formatInteger,
+  formatPercent,
+  formatRelativeDate,
+  formatUpdatedAt,
+  getOtdStatus,
+  getRelationshipSummary,
+  getReviewStatus,
+  getRpaStatus,
+  getTrend,
+  formatTrendValue
+} from '@views/greenhouse/dashboard/helpers'
 
 type GreenhouseDashboardProps = {
+  clientName: string
   data: GreenhouseDashboardData
 }
 
-const GreenhouseDashboard = ({ data }: GreenhouseDashboardProps) => {
+const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => {
   const theme = useTheme()
-  const layout = buildExecutiveDashboardLayout(data)
+  const [requestIntent, setRequestIntent] = useState<string | null>(null)
 
-  const throughputOptions = createThroughputOptions(theme, data)
-  const statusMixOptions = createStatusMixOptions(theme, data)
-  const effortMixOptions = createEffortMixOptions(data)
-  const onTimeOptions = createOnTimeOptions(theme)
+  const latestQualitySignal = data.qualitySignals[data.qualitySignals.length - 1] || null
+  const previousQualitySignal = data.qualitySignals[data.qualitySignals.length - 2] || null
+  const latestMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 1] || null
+  const previousMonthlyDelivery = data.charts.monthlyDelivery[data.charts.monthlyDelivery.length - 2] || null
+  const latestWeeklyCadenceCount = data.charts.deliveryCadenceWeekly.filter(item => item.completed > 0).length
 
-  const throughputSeries = [
+  const statusMix = useMemo(
+    () => data.charts.statusMix.filter(item => ['active', 'review', 'changes', 'completed'].includes(item.key)),
+    [data.charts.statusMix]
+  )
+
+  const statusMixOptions = createClientStatusDonutOptions(theme, {
+    ...data,
+    charts: {
+      ...data.charts,
+      statusMix
+    }
+  })
+
+  const weeklyCadenceOptions = createWeeklyCadenceOptions(theme, data)
+  const projectRpaOptions = createProjectRpaOptions(theme)
+  const otdTrendOptions = createClientOtdTrendOptions(theme, data)
+
+  const heroSubtitle = `Última actividad: ${formatRelativeDate(data.scope.lastActivityAt)}. ${formatInteger(
+    data.scope.projectCount
+  )} ${data.scope.projectCount === 1 ? 'proyecto activo.' : 'proyectos activos.'} ${getRelationshipSummary(data.relationship.months)}`
+
+  const rpaStatus = getRpaStatus(latestQualitySignal?.avgRpa ?? null)
+  const otdStatus = getOtdStatus(data.summary.avgOnTimePct)
+  const reviewStatus = getReviewStatus(data.summary.reviewPressureTasks, data.summary.openFrameComments)
+  const badgeLabels = buildModuleBadges(data).map(item => item.label)
+
+  const donutSeries = statusMix.map(item => item.value)
+  const cadenceSeries = [{ name: 'Piezas entregadas', data: data.charts.deliveryCadenceWeekly.map(item => item.completed) }]
+
+  const projectRpaSeries = [
     {
-      name: 'Creadas',
-      data: data.charts.throughput.map(item => item.created)
-    },
-    {
-      name: 'Entregadas',
-      data: data.charts.throughput.map(item => item.completed)
+      name: 'RpA',
+      data: data.charts.projectRpa.map(item => ({
+        x: item.projectName,
+        y: item.avgRpa ?? 0
+      }))
     }
   ]
 
-  const statusMixSeries = [{ data: data.charts.statusMix.map(item => item.value) }]
-  const effortMixSeries = data.charts.effortMix.map(item => item.value)
-  const riskProjects = data.projects.slice(0, 5)
-
-  const hasBlock = (key: (typeof layout.blocks)[number]) => layout.blocks.includes(key)
+  const otdTrendSeries = [{ name: 'OTD%', data: data.charts.monthlyDelivery.map(item => item.onTimePct ?? 0) }]
 
   return (
-    <Stack spacing={6}>
-      <Box
-        sx={{
-          display: 'grid',
-          gap: 3,
-          gridTemplateColumns: {
-            xs: '1fr',
-            xl:
-              layout.layoutMode === 'rich'
-                ? 'minmax(0, 2.05fr) minmax(300px, 0.9fr)'
-                : 'minmax(0, 1.9fr) minmax(300px, 0.95fr)'
-          },
-          alignItems: 'start'
-        }}
-      >
-        <ExecutiveHeroCard {...layout.hero} />
-
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, minmax(0, 1fr))',
-              xl: '1fr'
-            },
-            alignContent: 'start'
-          }}
-        >
-          {layout.topStats.map(card => (
-            <ExecutiveMiniStatCard
-              key={card.key}
-              eyebrow={card.eyebrow}
-              tone={card.tone}
-              title={card.title}
-              value={card.value}
-              detail={card.detail}
-              icon={card.icon}
-              delta={card.delta}
-              miniChart={card.miniChart}
-              supportItems={card.supportItems}
-              stretch={false}
-            />
-          ))}
-        </Box>
-      </Box>
-
-      {layout.focusCards.length > 0 ? (
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: 'repeat(auto-fit, minmax(240px, 1fr))'
-            }
-          }}
-        >
-          {layout.focusCards.map(card => (
-            <ExecutiveMiniStatCard
-              key={card.key}
-              eyebrow={card.eyebrow}
-              tone={card.tone}
-              title={card.title}
-              value={card.value}
-              detail={card.detail}
-              icon={card.icon}
-              delta={card.delta}
-              miniChart={card.miniChart}
-            />
-          ))}
-        </Box>
-      ) : null}
-
-      <Box
-        sx={{
-          display: 'grid',
-          gap: 3,
-          gridTemplateColumns: {
-            xs: '1fr',
-            md: 'repeat(auto-fit, minmax(220px, 1fr))'
-          }
-        }}
-      >
-        {layout.kpiCards.map(card => (
-          <ExecutiveMiniStatCard
-            key={card.key}
-            eyebrow={card.eyebrow}
-            tone={card.tone}
-            title={card.title}
-            value={card.value}
-            detail={card.detail}
-            icon={card.icon}
-            delta={card.delta}
-            miniChart={card.miniChart}
+    <>
+      <Stack spacing={6}>
+        <SectionErrorBoundary sectionName='dashboard-hero' description='Intenta de nuevo en unos segundos.'>
+          <ClientDashboardHero
+            clientName={clientName}
+            subtitle={heroSubtitle}
+            badges={badgeLabels}
+            updatedAtLabel={formatUpdatedAt(data.scope.lastSyncedAt)}
           />
-        ))}
-      </Box>
+        </SectionErrorBoundary>
 
-      {layout.isSnapshotMode ? (
-        <OperationalSnapshotSection
-          data={data}
-          throughputTitle={layout.themeCopy.throughputTitle}
-          throughputDescription={layout.themeCopy.throughputDescription}
-          healthTitle='Lectura operativa'
-          healthDescription='La vista compacta agrupa salud, mix operativo y carga de esfuerzo mientras el historico mensual sigue madurando.'
-        />
-      ) : (
+        <SectionErrorBoundary sectionName='dashboard-kpis' description='No pudimos cargar los KPI del dashboard.'>
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, minmax(0, 1fr))',
+                xl: 'repeat(4, minmax(0, 1fr))'
+              }
+            }}
+          >
+            <DashboardKpiCard
+              title='RpA'
+              stats={latestQualitySignal?.avgRpa !== null ? formatDecimal(latestQualitySignal.avgRpa) : '0'}
+              avatarIcon='tabler-git-pull-request'
+              avatarColor='primary'
+              trend={getTrend(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
+              trendNumber={formatTrendValue(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
+              subtitle='Promedio de rondas de revisión por pieza'
+              titleTooltip='Rounds per Asset: cuántas veces una pieza pasa por revisión antes de ser aprobada. Meta ICO: ≤2 rondas.'
+              footer={
+                latestQualitySignal?.avgRpa !== null
+                  ? `${latestQualitySignal.label}.`
+                  : 'Aún sin actividad este mes.'
+              }
+              statusLabel={rpaStatus.label}
+              statusColor={rpaStatus.tone}
+              statusIcon={rpaStatus.icon}
+            />
+
+            <DashboardKpiCard
+              title='Piezas entregadas'
+              stats={formatInteger(data.summary.completedLast30Days)}
+              avatarIcon='tabler-checkup-list'
+              avatarColor='success'
+              trend={getTrend(latestMonthlyDelivery?.totalDeliverables ?? null, previousMonthlyDelivery?.totalDeliverables ?? null)}
+              trendNumber={formatTrendValue(latestMonthlyDelivery?.totalDeliverables ?? null, previousMonthlyDelivery?.totalDeliverables ?? null)}
+              subtitle='Últimos 30 días'
+              titleTooltip='Total de piezas que pasaron a estado "Listo" en los últimos 30 días.'
+              footer={data.summary.completedLast30Days > 0 ? 'Actividad reciente visible en la cuenta.' : 'Aún sin actividad este mes.'}
+              statusLabel={data.summary.completedLast30Days > 0 ? 'Actividad mensual' : 'Sin actividad este mes'}
+              statusColor={data.summary.completedLast30Days > 0 ? 'info' : 'default'}
+              statusIcon={data.summary.completedLast30Days > 0 ? 'tabler-activity' : 'tabler-circle-dashed'}
+            />
+
+            <DashboardKpiCard
+              title='OTD%'
+              stats={formatPercent(data.summary.avgOnTimePct)}
+              avatarIcon='tabler-clock-check'
+              avatarColor='warning'
+              trend={getTrend(latestMonthlyDelivery?.onTimePct ?? null, previousMonthlyDelivery?.onTimePct ?? null)}
+              trendNumber={formatTrendValue(latestMonthlyDelivery?.onTimePct ?? null, previousMonthlyDelivery?.onTimePct ?? null, '%')}
+              subtitle='Entregas dentro de plazo'
+              titleTooltip='On-Time Delivery: porcentaje de piezas entregadas dentro del plazo definido en el brief. Meta: ≥90%.'
+              footer={data.summary.avgOnTimePct > 0 ? 'Promedio del portafolio visible.' : 'Aún sin actividad este mes.'}
+              statusLabel={otdStatus.label}
+              statusColor={otdStatus.tone}
+              statusIcon={otdStatus.icon}
+            />
+
+            <DashboardKpiCard
+              title='En revisión'
+              stats={formatInteger(data.summary.reviewPressureTasks)}
+              avatarIcon='tabler-message-circle'
+              avatarColor='info'
+              trend='neutral'
+              trendNumber='0'
+              subtitle='Piezas esperando tu feedback'
+              titleTooltip='Piezas en estado "Listo para revisión" o con comentarios abiertos en Frame.io.'
+              footer={`${formatInteger(data.summary.openFrameComments)} comentarios abiertos.`}
+              statusLabel={reviewStatus.label}
+              statusColor={reviewStatus.tone}
+              statusIcon={reviewStatus.icon}
+            />
+          </Box>
+        </SectionErrorBoundary>
+
         <Box
           sx={{
             display: 'grid',
             gap: 3,
             gridTemplateColumns: {
               xs: '1fr',
-              xl:
-                layout.layoutMode === 'rich'
-                  ? 'minmax(0, 1.35fr) minmax(360px, 0.95fr)'
-                  : 'minmax(0, 1.25fr) minmax(340px, 1fr)'
+              xl: 'repeat(2, minmax(0, 1fr))'
             }
           }}
         >
-          <ThroughputOverviewCard
-            data={data}
-            title={layout.themeCopy.throughputTitle}
-            subtitle={layout.themeCopy.throughputDescription}
-            series={throughputSeries}
-            options={throughputOptions}
-            netFlowLabel={`Flujo neto 30d: ${formatDelta(data.summary.netFlowLast30Days)}`}
-          />
-          <PortfolioHealthCard data={data} options={onTimeOptions} />
+          <SectionErrorBoundary sectionName='chart-status' description='No pudimos cargar la distribución por estado.'>
+            <ExecutiveCardShell title='Distribución por estado' subtitle='Tareas activas de tu cuenta'>
+              {donutSeries.reduce((sum, value) => sum + value, 0) === 0 ? (
+                <EmptyState
+                  icon='tabler-chart-donut-3'
+                  title='Aún no hay suficiente actividad'
+                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                />
+              ) : (
+                <Box aria-label='Gráfico de distribución de tareas por estado'>
+                  <AppReactApexCharts type='donut' height={320} width='100%' series={donutSeries} options={statusMixOptions} />
+                </Box>
+              )}
+            </ExecutiveCardShell>
+          </SectionErrorBoundary>
+
+          <SectionErrorBoundary sectionName='chart-cadence' description='No pudimos cargar la cadencia de entregas.'>
+            <ExecutiveCardShell title='Cadencia de entregas' subtitle='Piezas completadas por semana - últimos 3 meses'>
+              {latestWeeklyCadenceCount < 2 ? (
+                <EmptyState
+                  icon='tabler-chart-histogram'
+                  title='Aún no hay suficiente actividad'
+                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                />
+              ) : (
+                <Box aria-label='Gráfico de piezas completadas por semana en los últimos 3 meses'>
+                  <AppReactApexCharts type='bar' height={320} width='100%' series={cadenceSeries} options={weeklyCadenceOptions} />
+                </Box>
+              )}
+            </ExecutiveCardShell>
+          </SectionErrorBoundary>
+
+          <SectionErrorBoundary sectionName='chart-rpa-project' description='No pudimos cargar el RpA por proyecto.'>
+            <ExecutiveCardShell title='RpA por proyecto' subtitle='Línea de referencia: 2,0 (máximo ICO)'>
+              {data.charts.projectRpa.length === 0 ? (
+                <EmptyState
+                  icon='tabler-chart-bar'
+                  title='Aún no hay suficiente actividad'
+                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                />
+              ) : (
+                <Box aria-label='Gráfico de RpA promedio por proyecto'>
+                  <AppReactApexCharts type='bar' height={320} width='100%' series={projectRpaSeries} options={projectRpaOptions} />
+                </Box>
+              )}
+            </ExecutiveCardShell>
+          </SectionErrorBoundary>
+
+          <SectionErrorBoundary sectionName='chart-otd-trend' description='No pudimos cargar la tendencia mensual de OTD%.'>
+            <ExecutiveCardShell title='OTD% mensual' subtitle='Tendencia de los últimos 6 meses - meta: 90%'>
+              {data.charts.monthlyDelivery.filter(item => item.onTimePct !== null).length < 2 ? (
+                <EmptyState
+                  icon='tabler-chart-line'
+                  title='Aún no hay suficiente actividad'
+                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                />
+              ) : (
+                <Box aria-label='Gráfico de tendencia mensual de OTD%'>
+                  <AppReactApexCharts type='line' height={320} width='100%' series={otdTrendSeries} options={otdTrendOptions} />
+                </Box>
+              )}
+            </ExecutiveCardShell>
+          </SectionErrorBoundary>
         </Box>
-      )}
 
-      {hasBlock('delivery') ? <DeliverySignalsSection data={data} /> : null}
+        <SectionErrorBoundary sectionName='team-capacity' description='No pudimos cargar la sección de equipo.'>
+          <ClientTeamCapacitySection data={data} onRequest={setRequestIntent} />
+        </SectionErrorBoundary>
 
-      {hasBlock('quality') ? <QualitySignalsSection data={data} /> : null}
+        <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la sección de ecosistema.'>
+          <ClientEcosystemSection tooling={data.tooling} onRequest={setRequestIntent} />
+        </SectionErrorBoundary>
 
-      {hasBlock('accountTeam') ? <AccountTeamSection data={data} /> : null}
+        <SectionErrorBoundary sectionName='portfolio-health' description='No pudimos cargar la salud del portafolio.'>
+          <ClientPortfolioHealthAccordion data={data} />
+        </SectionErrorBoundary>
 
-      {hasBlock('tooling') ? <ToolingSection data={data} /> : null}
+        <SectionErrorBoundary sectionName='attention-projects' description='No pudimos cargar los proyectos bajo atención.'>
+          <ClientAttentionProjectsAccordion projects={data.projects} />
+        </SectionErrorBoundary>
 
-      {!layout.isSnapshotMode ? (
         <Box
+          component='footer'
           sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: {
-              xs: '1fr',
-              xl: 'minmax(0, 1.1fr) minmax(320px, 0.9fr)'
-            }
+            pt: 2,
+            pb: 4,
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'flex-start', md: 'center' },
+            justifyContent: 'space-between',
+            gap: 2
           }}
         >
-          <ExecutiveCardShell title={layout.themeCopy.statusMixTitle} subtitle={layout.themeCopy.statusMixDescription}>
-            <AppReactApexCharts type='bar' height={320} width='100%' series={statusMixSeries} options={statusMixOptions} />
-          </ExecutiveCardShell>
-
-          <ExecutiveCardShell title={layout.themeCopy.effortMixTitle} subtitle={layout.themeCopy.effortMixDescription}>
-            <Stack spacing={3}>
-              <AppReactApexCharts type='donut' height={300} width='100%' series={effortMixSeries} options={effortMixOptions} />
-              <MetricList
-                items={[
-                  {
-                    label: 'Trabajo activo',
-                    value: String(data.summary.activeWorkItems),
-                    detail: 'Incluye ejecucion, revision, cambios y tareas bloqueadas.'
-                  },
-                  {
-                    label: 'Trabajo en cola',
-                    value: String(data.summary.queuedWorkItems),
-                    detail: 'Demanda lista para entrar a la operacion.'
-                  }
-                ]}
-              />
-            </Stack>
-          </ExecutiveCardShell>
+          <Typography variant='body2' color='text.disabled'>
+            © 2026 Efeonce Group. Greenhouse keeps project delivery visible, measurable, and accountable.
+          </Typography>
+          <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
+            <MuiLink component={Link} href='/dashboard' color='text.secondary' underline='hover'>
+              Dashboard
+            </MuiLink>
+            <MuiLink component={Link} href='/proyectos' color='text.secondary' underline='hover'>
+              Proyectos
+            </MuiLink>
+            <MuiLink component={Link} href='/sprints' color='text.secondary' underline='hover'>
+              Sprints
+            </MuiLink>
+            <MuiLink component={Link} href='/settings' color='text.secondary' underline='hover'>
+              Settings
+            </MuiLink>
+          </Stack>
         </Box>
-      ) : null}
+      </Stack>
 
-      <AttentionProjectsTable
-        projects={riskProjects}
-        title={layout.themeCopy.projectsTitle}
-        subtitle={layout.themeCopy.projectsDescription}
-      />
-    </Stack>
+      <DashboardRequestDialog open={requestIntent !== null} intent={requestIntent} onClose={() => setRequestIntent(null)} />
+    </>
   )
 }
 

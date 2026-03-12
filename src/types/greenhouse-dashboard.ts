@@ -13,6 +13,7 @@ export interface GreenhouseDashboardScope {
   projectIds: string[]
   businessLines: string[]
   serviceModules: string[]
+  lastActivityAt: string | null
   lastSyncedAt: string | null
 }
 
@@ -84,6 +85,8 @@ export interface GreenhouseDashboardTool {
   key: string
   label: string
   category: string
+  description: string
+  href: string | null
   source: 'service_module_default' | 'override'
 }
 
@@ -98,6 +101,19 @@ export interface GreenhouseDashboardQualityPoint {
   avgRpa: number | null
   firstTimeRightPct: number | null
   rpaSource: 'measured' | 'seeded' | 'unavailable'
+}
+
+export interface GreenhouseDashboardWeeklyDeliveryPoint {
+  weekStart: string
+  label: string
+  completed: number
+}
+
+export interface GreenhouseDashboardProjectRpaPoint {
+  projectId: string
+  projectName: string
+  avgRpa: number | null
+  assetCount: number
 }
 
 export interface GreenhouseDashboardProjectRisk {
@@ -127,6 +143,8 @@ export interface GreenhouseDashboardData {
     monthlyDelivery: GreenhouseDashboardMonthlyDeliveryPoint[]
     statusMix: GreenhouseDashboardMixItem[]
     effortMix: GreenhouseDashboardMixItem[]
+    deliveryCadenceWeekly: GreenhouseDashboardWeeklyDeliveryPoint[]
+    projectRpa: GreenhouseDashboardProjectRpaPoint[]
   }
   projects: GreenhouseDashboardProjectRisk[]
 }

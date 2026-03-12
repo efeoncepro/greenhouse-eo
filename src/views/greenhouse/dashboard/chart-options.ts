@@ -5,6 +5,8 @@ import type { ApexOptions } from 'apexcharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { effortColorMap, statusColorMap } from '@views/greenhouse/dashboard/config'
 
+const clientStatusColors = ['#2196F3', '#FF9800', '#F44336', '#4CAF50']
+
 export const createThroughputOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
   chart: {
     parentHeightOffset: 0,
@@ -411,5 +413,243 @@ export const createQualitySignalsOptions = (theme: Theme, data: GreenhouseDashbo
   tooltip: {
     shared: true,
     intersect: false
+  }
+})
+
+export const createClientStatusDonutOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false }
+  },
+  labels: data.charts.statusMix.map(item => item.label),
+  colors: clientStatusColors,
+  legend: {
+    position: 'bottom',
+    labels: {
+      colors: 'var(--mui-palette-text-secondary)'
+    }
+  },
+  dataLabels: { enabled: false },
+  stroke: {
+    width: 4,
+    colors: ['var(--mui-palette-background-paper)']
+  },
+  plotOptions: {
+    pie: {
+      donut: {
+        size: '72%',
+        labels: {
+          show: true,
+          total: {
+            show: true,
+            label: 'Tareas',
+            formatter: () => String(data.charts.statusMix.reduce((sum, item) => sum + item.value, 0))
+          }
+        }
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${value} tareas`
+    }
+  }
+})
+
+export const createWeeklyCadenceOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false }
+  },
+  plotOptions: {
+    bar: {
+      borderRadius: 6,
+      columnWidth: '48%'
+    }
+  },
+  dataLabels: { enabled: false },
+  colors: ['var(--mui-palette-success-main)'],
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      top: -8,
+      left: 0,
+      right: 0,
+      bottom: -8
+    }
+  },
+  xaxis: {
+    categories: data.charts.deliveryCadenceWeekly.map(item => item.label),
+    axisTicks: { show: false },
+    axisBorder: { show: false },
+    labels: {
+      rotate: 0,
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: {
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${value} piezas`
+    }
+  }
+})
+
+export const createProjectRpaOptions = (theme: Theme): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false }
+  },
+  plotOptions: {
+    bar: {
+      horizontal: true,
+      borderRadius: 6,
+      barHeight: '52%'
+    }
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: value => Number(value).toFixed(1),
+    style: {
+      colors: ['var(--mui-palette-text-primary)']
+    }
+  },
+  colors: ['var(--mui-palette-primary-main)'],
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      top: -8,
+      left: 4,
+      right: 8,
+      bottom: -8
+    }
+  },
+  annotations: {
+    xaxis: [
+      {
+        x: 2,
+        borderColor: 'var(--mui-palette-warning-main)',
+        strokeDashArray: 4,
+        label: {
+          text: 'Meta 2,0',
+          style: {
+            background: 'var(--mui-palette-warning-main)',
+            color: '#fff'
+          }
+        }
+      }
+    ]
+  },
+  xaxis: {
+    labels: {
+      formatter: value => Number(value).toFixed(1),
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: {
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-secondary)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${Number(value).toFixed(1)} RpA`
+    }
+  }
+})
+
+export const createClientOtdTrendOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false }
+  },
+  stroke: {
+    curve: 'smooth',
+    width: 3
+  },
+  markers: {
+    size: 4,
+    strokeWidth: 0,
+    colors: ['var(--mui-palette-background-paper)']
+  },
+  dataLabels: { enabled: false },
+  colors: ['var(--mui-palette-success-main)'],
+  annotations: {
+    yaxis: [
+      {
+        y: 90,
+        borderColor: 'var(--mui-palette-success-main)',
+        strokeDashArray: 4,
+        label: {
+          text: 'Meta 90%',
+          style: {
+            background: 'var(--mui-palette-success-main)',
+            color: '#fff'
+          }
+        }
+      }
+    ]
+  },
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 6,
+    padding: {
+      top: -8,
+      left: 0,
+      right: 8,
+      bottom: -8
+    }
+  },
+  xaxis: {
+    categories: data.charts.monthlyDelivery.map(item => item.label),
+    axisTicks: { show: false },
+    axisBorder: { show: false },
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  yaxis: {
+    min: 0,
+    max: 100,
+    tickAmount: 4,
+    labels: {
+      formatter: value => `${Math.round(value)}%`,
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    y: {
+      formatter: value => `${Math.round(value)}%`
+    }
   }
 })

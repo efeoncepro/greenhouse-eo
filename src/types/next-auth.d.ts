@@ -4,6 +4,7 @@ declare module 'next-auth' {
   interface User {
     userId: string
     clientId: string
+    clientName: string
     tenantType: 'client' | 'efeonce_internal'
     roleCodes: string[]
     primaryRoleCode: string
@@ -25,6 +26,7 @@ declare module 'next-auth' {
       id: string
       userId: string
       clientId: string
+      clientName: string
       tenantType: 'client' | 'efeonce_internal'
       roleCodes: string[]
       primaryRoleCode: string
@@ -49,6 +51,7 @@ declare module 'next-auth/jwt' {
     email?: string | null
     name?: string | null
     clientId?: string
+    clientName?: string
     tenantType?: 'client' | 'efeonce_internal'
     roleCodes?: string[]
     primaryRoleCode?: string

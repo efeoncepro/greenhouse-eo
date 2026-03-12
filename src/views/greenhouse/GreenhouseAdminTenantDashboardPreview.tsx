@@ -57,7 +57,7 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
         </CardContent>
       </Card>
 
-      <GreenhouseDashboard data={data} />
+      <GreenhouseDashboard clientName={clientName} data={data} />
     </Stack>
   )
 }

@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
           name: tenant.fullName,
           userId: tenant.userId,
           clientId: tenant.clientId,
+          clientName: tenant.clientName,
           tenantType: tenant.tenantType,
           roleCodes: tenant.roleCodes,
           primaryRoleCode: tenant.primaryRoleCode,
@@ -91,6 +92,7 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email
         token.name = user.name
         token.clientId = user.clientId
+        token.clientName = user.clientName
         token.tenantType = user.tenantType
         token.roleCodes = user.roleCodes
         token.primaryRoleCode = user.primaryRoleCode
@@ -116,6 +118,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email || ''
         session.user.name = token.name || ''
         session.user.clientId = typeof token.clientId === 'string' ? token.clientId : ''
+        session.user.clientName = typeof token.clientName === 'string' ? token.clientName : 'Greenhouse Client'
         session.user.tenantType = token.tenantType === 'efeonce_internal' ? 'efeonce_internal' : 'client'
         session.user.roleCodes = Array.isArray(token.roleCodes) ? token.roleCodes.filter(Boolean) : []
         session.user.primaryRoleCode =

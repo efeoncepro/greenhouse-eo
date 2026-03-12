@@ -7,10 +7,12 @@ import type {
   GreenhouseDashboardKpi,
   GreenhouseDashboardMonthlyDeliveryPoint,
   GreenhouseDashboardMixItem,
+  GreenhouseDashboardProjectRpaPoint,
   GreenhouseDashboardProjectRisk,
   GreenhouseDashboardRelationship,
   GreenhouseDashboardSummary,
-  GreenhouseDashboardThroughputPoint
+  GreenhouseDashboardThroughputPoint,
+  GreenhouseDashboardWeeklyDeliveryPoint
 } from '@/types/greenhouse-dashboard'
 
 interface DashboardViewerScope {
@@ -36,12 +38,18 @@ interface AggregateRow {
   healthy_projects: number | string | null
   projects_at_risk: number | string | null
   first_activity_date: { value?: string } | string | null
+  last_activity_date: { value?: string } | string | null
   last_synced_at: { value?: string } | string | null
 }
 
 interface ThroughputRow {
   month_start: { value?: string } | string | null
   created_count: number | string | null
+  completed_count: number | string | null
+}
+
+interface WeeklyDeliveryRow {
+  week_start: { value?: string } | string | null
   completed_count: number | string | null
 }
 
@@ -63,6 +71,13 @@ interface MeasuredQualityRow {
   month_start: { value?: string } | string | null
   avg_rpa: number | string | null
   positive_rpa_count: number | string | null
+}
+
+interface ProjectRpaRow {
+  project_id: string | null
+  project_name: string | null
+  avg_rpa: number | string | null
+  asset_count: number | string | null
 }
 
 interface TeamSignalRow {
@@ -134,6 +149,12 @@ const monthLabelFormatter = new Intl.DateTimeFormat('es-CL', {
   timeZone: 'UTC'
 })
 
+const weekLabelFormatter = new Intl.DateTimeFormat('es-CL', {
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'UTC'
+})
+
 const formatMonthLabel = (monthValue: string | null) => {
   if (!monthValue) {
     return '--'
@@ -142,6 +163,16 @@ const formatMonthLabel = (monthValue: string | null) => {
   const date = new Date(`${monthValue}T00:00:00.000Z`)
 
   return monthLabelFormatter.format(date)
+}
+
+const formatWeekLabel = (weekValue: string | null) => {
+  if (!weekValue) {
+    return '--'
+  }
+
+  const date = new Date(`${weekValue}T00:00:00.000Z`)
+
+  return weekLabelFormatter.format(date)
 }
 
 const toDateOnly = (value: string | null) => {
@@ -284,6 +315,7 @@ const buildEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboa
     projectIds: scope.projectIds,
     businessLines: scope.businessLines,
     serviceModules: scope.serviceModules,
+    lastActivityAt: null,
     lastSyncedAt: null
   },
   summary: {
@@ -323,7 +355,9 @@ const buildEmptyDashboardData = (scope: DashboardViewerScope): GreenhouseDashboa
     throughput: [],
     monthlyDelivery: [],
     statusMix: [],
-    effortMix: []
+    effortMix: [],
+    deliveryCadenceWeekly: [],
+    projectRpa: []
   },
   projects: []
 })
@@ -438,6 +472,7 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       (SELECT COUNTIF(on_time_pct >= 75) FROM scoped_projects) AS healthy_projects,
       (SELECT COUNTIF(on_time_pct < 60 OR on_time_pct IS NULL) FROM scoped_projects) AS projects_at_risk,
       MIN(created_date) AS first_activity_date,
+      MAX(COALESCE(completed_date, created_date)) AS last_activity_date,
       MAX(synced_at) AS last_synced_at
     FROM annotated_tasks
   `
@@ -484,6 +519,33 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     WHERE state_group != 'other'
     GROUP BY 1
     ORDER BY item_count DESC
+  `
+
+  const weeklyDeliveryQuery = `
+    ${sharedCtes}
+    , weeks AS (
+      SELECT week_start
+      FROM UNNEST(
+        GENERATE_DATE_ARRAY(
+          DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 11 WEEK), WEEK(MONDAY)),
+          DATE_TRUNC(CURRENT_DATE(), WEEK(MONDAY)),
+          INTERVAL 1 WEEK
+        )
+      ) AS week_start
+    ),
+    completed_counts AS (
+      SELECT DATE_TRUNC(completed_date, WEEK(MONDAY)) AS week_start, COUNT(*) AS completed_count
+      FROM annotated_tasks
+      WHERE completed_date IS NOT NULL
+      GROUP BY 1
+    )
+    SELECT
+      CAST(weeks.week_start AS STRING) AS week_start,
+      COALESCE(completed_counts.completed_count, 0) AS completed_count
+    FROM weeks
+    LEFT JOIN completed_counts
+      ON completed_counts.week_start = weeks.week_start
+    ORDER BY weeks.week_start
   `
 
   const effortMixQuery = `
@@ -567,6 +629,20 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     ORDER BY 1
   `
 
+  const projectRpaQuery = `
+    ${sharedCtes}
+    SELECT
+      scoped_project_id AS project_id,
+      COALESCE(sp.project_name, scoped_project_id) AS project_name,
+      ROUND(AVG(NULLIF(rpa_value, 0)), 2) AS avg_rpa,
+      COUNTIF(rpa_value > 0) AS asset_count
+    FROM annotated_tasks
+    LEFT JOIN scoped_projects AS sp
+      ON sp.project_id = scoped_project_id
+    GROUP BY 1, 2
+    ORDER BY IF(avg_rpa IS NULL, 1, 0), avg_rpa DESC, asset_count DESC, project_name
+  `
+
   const teamSignalsQuery = `
     ${sharedCtes}
     SELECT member_name
@@ -597,20 +673,24 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     aggregateResponse,
     throughputResponse,
     statusMixResponse,
+    weeklyDeliveryResponse,
     effortMixResponse,
     monthlyDeliveryResponse,
     monthlyQualityResponse,
     teamSignalsResponse,
-    projectsResponse
+    projectsResponse,
+    projectRpaResponse
   ] = await Promise.all([
     bigQuery.query({ query: aggregateQuery, params: queryParams }),
     bigQuery.query({ query: throughputQuery, params: queryParams }),
     bigQuery.query({ query: statusMixQuery, params: queryParams }),
+    bigQuery.query({ query: weeklyDeliveryQuery, params: queryParams }),
     bigQuery.query({ query: effortMixQuery, params: queryParams }),
     bigQuery.query({ query: monthlyDeliveryQuery, params: queryParams }),
     bigQuery.query({ query: monthlyQualityQuery, params: queryParams }),
     bigQuery.query({ query: teamSignalsQuery, params: queryParams }),
-    bigQuery.query({ query: projectsQuery, params: queryParams })
+    bigQuery.query({ query: projectsQuery, params: queryParams }),
+    bigQuery.query({ query: projectRpaQuery, params: queryParams })
   ])
 
   const aggregateRow = (aggregateResponse[0] as AggregateRow[])[0]
@@ -669,6 +749,14 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     )
     .filter(item => item.value > 0)
 
+  const deliveryCadenceWeekly = (weeklyDeliveryResponse[0] as WeeklyDeliveryRow[]).map(
+    (row): GreenhouseDashboardWeeklyDeliveryPoint => ({
+      weekStart: toIsoString(row.week_start) || '',
+      label: formatWeekLabel(toIsoString(row.week_start)),
+      completed: toNumber(row.completed_count)
+    })
+  )
+
   const monthlyDelivery = (monthlyDeliveryResponse[0] as MonthlyDeliveryRow[]).map(
     (row): GreenhouseDashboardMonthlyDeliveryPoint => ({
       month: toIsoString(row.month_start) || '',
@@ -687,6 +775,17 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
     avgRpa: toNullableNumber(row.avg_rpa),
     hasReliableRpa: toNumber(row.positive_rpa_count) > 0
   }))
+
+  const projectRpa = (projectRpaResponse[0] as ProjectRpaRow[])
+    .map(
+      (row): GreenhouseDashboardProjectRpaPoint => ({
+        projectId: row.project_id || 'unknown-project',
+        projectName: row.project_name || row.project_id || 'Proyecto sin nombre',
+        avgRpa: toNullableNumber(row.avg_rpa),
+        assetCount: toNumber(row.asset_count)
+      })
+    )
+    .filter(item => item.assetCount > 0)
 
   const detectedSignals = (teamSignalsResponse[0] as TeamSignalRow[])
     .map(row => (row.member_name || '').trim())
@@ -722,6 +821,7 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       projectIds: scope.projectIds,
       businessLines: scope.businessLines,
       serviceModules: scope.serviceModules,
+      lastActivityAt: toIsoString(aggregateRow.last_activity_date),
       lastSyncedAt: toIsoString(aggregateRow.last_synced_at)
     },
     summary,
@@ -733,7 +833,9 @@ export const getDashboardOverview = async (scope: DashboardViewerScope): Promise
       throughput,
       monthlyDelivery,
       statusMix,
-      effortMix
+      effortMix,
+      deliveryCadenceWeekly,
+      projectRpa
     },
     projects
   }

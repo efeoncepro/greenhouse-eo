@@ -7,6 +7,7 @@ import { authOptions } from '@/lib/auth'
 export interface TenantContext {
   userId: string
   clientId: string
+  clientName: string
   tenantType: 'client' | 'efeonce_internal'
   roleCodes: string[]
   primaryRoleCode: string
@@ -33,6 +34,7 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
   return {
     userId: session.user.userId,
     clientId: session.user.clientId,
+    clientName: session.user.clientName,
     tenantType: session.user.tenantType,
     roleCodes: session.user.roleCodes,
     primaryRoleCode: session.user.primaryRoleCode,

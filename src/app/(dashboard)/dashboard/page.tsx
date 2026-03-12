@@ -23,5 +23,5 @@ export default async function Page() {
     serviceModules: tenant.serviceModules
   })
 
-  return <GreenhouseDashboard data={data} />
+  return <GreenhouseDashboard clientName={tenant.clientName} data={data} />
 }

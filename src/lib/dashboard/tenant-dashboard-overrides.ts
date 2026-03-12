@@ -20,6 +20,8 @@ type TeamMemberOverride = Omit<GreenhouseDashboardTeamMember, 'source'>
 type ToolOverride = {
   label: string
   category: string
+  description: string
+  href?: string | null
 }
 
 type QualitySeed = {
@@ -97,34 +99,34 @@ const knownPeopleById = new Map(knownPeople.map(profile => [profile.id, profile]
 
 const serviceModuleTechnologyDefaults: Record<string, ToolOverride[]> = {
   agencia_creativa: [
-    { label: 'Figma', category: 'Diseno colaborativo' },
-    { label: 'Frame.io', category: 'Revision audiovisual' },
-    { label: 'Notion', category: 'Operacion y seguimiento' }
+    { label: 'Figma', category: 'Diseno colaborativo', description: 'Diseno, comentarios y revision visual.' },
+    { label: 'Frame.io', category: 'Revision audiovisual', description: 'Revision de video y feedback centralizado.' },
+    { label: 'Notion', category: 'Operacion y seguimiento', description: 'Seguimiento operativo del servicio.' }
   ],
   desarrollo_web: [
-    { label: 'GitHub', category: 'Codigo y versionado' },
-    { label: 'Vercel', category: 'Deploy y hosting' },
-    { label: 'Notion', category: 'Operacion y seguimiento' }
+    { label: 'GitHub', category: 'Codigo y versionado', description: 'Repositorio y control de versiones.' },
+    { label: 'Vercel', category: 'Deploy y hosting', description: 'Publicacion y hosting del entorno web.' },
+    { label: 'Notion', category: 'Operacion y seguimiento', description: 'Seguimiento operativo del servicio.' }
   ],
   consultoria_crm: [
-    { label: 'HubSpot', category: 'CRM y automatizacion' },
-    { label: 'Notion', category: 'Operacion y seguimiento' },
-    { label: 'Looker Studio', category: 'Reporting' }
+    { label: 'HubSpot', category: 'CRM y automatizacion', description: 'Gestion comercial y automatizacion.' },
+    { label: 'Notion', category: 'Operacion y seguimiento', description: 'Seguimiento operativo del servicio.' },
+    { label: 'Looker Studio', category: 'Reporting', description: 'Visualizacion y reporting ejecutivo.' }
   ]
 }
 
 const serviceModuleAiDefaults: Record<string, ToolOverride[]> = {
   agencia_creativa: [
-    { label: 'ChatGPT', category: 'Ideacion y apoyo creativo' },
-    { label: 'Adobe Firefly', category: 'Generacion visual' }
+    { label: 'ChatGPT', category: 'Ideacion y apoyo creativo', description: 'Asistencia estrategica y de contenido.' },
+    { label: 'Adobe Firefly', category: 'Generacion visual', description: 'Generacion y composicion visual.' }
   ],
   desarrollo_web: [
-    { label: 'GitHub Copilot', category: 'Asistencia de desarrollo' },
-    { label: 'ChatGPT', category: 'Asistencia tecnica' }
+    { label: 'GitHub Copilot', category: 'Asistencia de desarrollo', description: 'Apoyo en implementacion tecnica.' },
+    { label: 'ChatGPT', category: 'Asistencia tecnica', description: 'Apoyo de investigacion y documentacion.' }
   ],
   consultoria_crm: [
-    { label: 'ChatGPT', category: 'Analisis y documentacion' },
-    { label: 'Gemini', category: 'Apoyo analitico' }
+    { label: 'ChatGPT', category: 'Analisis y documentacion', description: 'Apoyo de analisis y documentacion.' },
+    { label: 'Gemini', category: 'Apoyo analitico', description: 'Asistencia analitica para trabajo CRM.' }
   ]
 }
 
@@ -314,6 +316,8 @@ export const buildTooling = (clientId: string, serviceModules: string[]): Greenh
         key: toToolKey(tool.label),
         label: tool.label,
         category: tool.category,
+        description: tool.description,
+        href: tool.href || null,
         source: 'service_module_default'
       })
     }
@@ -323,6 +327,8 @@ export const buildTooling = (clientId: string, serviceModules: string[]): Greenh
         key: toToolKey(tool.label),
         label: tool.label,
         category: tool.category,
+        description: tool.description,
+        href: tool.href || null,
         source: 'service_module_default'
       })
     }
@@ -333,6 +339,8 @@ export const buildTooling = (clientId: string, serviceModules: string[]): Greenh
       key: toToolKey(tool.label),
       label: tool.label,
       category: tool.category,
+      description: tool.description,
+      href: tool.href || null,
       source: 'override'
     })
   }
@@ -342,6 +350,8 @@ export const buildTooling = (clientId: string, serviceModules: string[]): Greenh
       key: toToolKey(tool.label),
       label: tool.label,
       category: tool.category,
+      description: tool.description,
+      href: tool.href || null,
       source: 'override'
     })
   }

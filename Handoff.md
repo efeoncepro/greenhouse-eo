@@ -40,6 +40,48 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-12 13:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar el brief `CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / dashboard cliente y preview admin `view-as`
+
+### Archivos tocados
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/dashboard/*`
+- `src/lib/dashboard/get-dashboard-overview.ts`
+- `src/lib/dashboard/tenant-dashboard-overrides.ts`
+- `src/components/greenhouse/EmptyState.tsx`
+- `src/components/greenhouse/SectionErrorBoundary.tsx`
+- `src/components/card-statistics/HorizontalWithSubtitle.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/dashboard/loading.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/lib/auth.ts`
+- `src/lib/tenant/get-tenant-context.ts`
+- `src/types/greenhouse-dashboard.ts`
+- `src/types/next-auth.d.ts`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- No se ejecuto validacion visual autenticada real en `/dashboard` ni en `/admin/tenants/[id]/view-as/dashboard`.
+
+### Riesgos o pendientes
+- El modal de ampliacion de equipo/ecosistema no dispara una notificacion real porque el repo aun no tiene endpoint ni workflow para enviar esa solicitud a owner, email o webhook; quedo como mensaje copiable.
+- La zona de `Tu stack` solo muestra herramientas con URL configurada; si la cuenta no tiene links reales guardados, cae al empty state aunque existan defaults por modulo.
+- La seccion de capacidad usa la capacidad visible hoy en la cuenta (`monthlyHours` + `averageAllocationPct`) y no una serie formal de utilization historica por 2+ meses.
+- Falta smoke visual/authenticado del nuevo dashboard en desktop, tablet y mobile.
+
 ## 2026-03-12 07:35 America/Santiago
 
 ### Agente
