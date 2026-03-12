@@ -57,6 +57,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
 - La seleccion de patrones Vuexy/MUI para cualquier solicitud nueva ya no debe salir de exploracion libre de `full-version`; debe pasar por el sistema definido en `GREENHOUSE_UI_ORCHESTRATION_V1.md`.
 - El intake de solicitudes UI puede venir de personas o de otros agentes; el brief canonico para normalizar pedidos de Claude, Codex u otros queda en `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
+- El repo tambien versiona una copia del skill operativo en `.codex/skills/greenhouse-ui-orchestrator/` para que el flujo no dependa solo del perfil local del agente.
 
 ## Stack Actual
 - Next.js 16.1.1

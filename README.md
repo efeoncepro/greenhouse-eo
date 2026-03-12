@@ -69,6 +69,7 @@ Ese documento define:
 - Los componentes UI reutilizables propios de Greenhouse deben vivir en `src/components/greenhouse/*`; las vistas deben consumir esa capa antes de crear JSX ad hoc por modulo.
 - El sistema visual ejecutivo reusable del producto queda definido en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` y toma a Vuexy como referencia compositiva, no como fuente de pantallas para copiar.
 - La seleccion de patrones Vuexy/MUI para nuevas interfaces queda gobernada por `GREENHOUSE_UI_ORCHESTRATION_V1.md`, el catalogo curado `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` y el brief `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
+- El skill repo-versionado que operacionaliza ese flujo vive en `.codex/skills/greenhouse-ui-orchestrator/`.
 
 ## Estado Actual
 

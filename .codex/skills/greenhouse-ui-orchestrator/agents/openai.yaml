@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse UI Orchestrator"
+  short_description: "Map UI asks to Greenhouse Vuexy patterns."
+  default_prompt: "Use $greenhouse-ui-orchestrator to map this Greenhouse UI request to the right Vuexy/MUI pattern and local target."
+
+policy:
+  allow_implicit_invocation: true
