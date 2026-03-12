@@ -26,6 +26,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - validacion
   - riesgos o pendientes
 - Formato corto. No duplicar arquitectura.
+- Si hace falta conservar historia detallada, moverla a `Handoff.archive.md` y dejar en `Handoff.md` solo el estado activo.
 
 ### 4. Registro de cambios
 - `changelog.md`

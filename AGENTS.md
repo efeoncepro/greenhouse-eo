@@ -20,6 +20,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ### 1. Antes de cambiar codigo
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
+- Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el cambio es UI, UX o seleccion de componentes, usar el skill local `greenhouse-vuexy-portal` como criterio operativo y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Aplicar `DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.

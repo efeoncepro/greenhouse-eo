@@ -129,34 +129,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya no es necesario reinstalar este stack desde `full-version`; el inventario base de Vuexy ya vive en `starter-kit`.
 - `simple-icons`: logos SVG de marcas y herramientas sin descargar assets manuales.
 - `@iconify-json/logos`: logos de marca integrables al pipeline de iconos del repo en `src/assets/iconify-icons/bundle-icons-css.ts`.
-- `recharts` y `keen-slider`: referencia en `full-version`, aun no activados en `starter-kit`.
+- `recharts` y `keen-slider` ya estan disponibles en `starter-kit`; usarlos solo cuando una superficie lo justifique y manteniendo `apexcharts` como base actual del dashboard.
 
 ## Regla documental compacta
 - La estrategia de documentacion liviana del repo queda en `DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
-- Estado operativo de consolidacion al 2026-03-11:
-- la rama funcional a promover primero es `reconcile/merge-hubspot-provisioning`
-- la rama documental rescatada aparte es `reconcile/docs-cross-repo-contract`
-- no usar `rescue/wip-local-hubspot-contacts-20260311-1729` como base de merge
-- si un build local falla por rutas de otra rama, revisar el cache historico en `.next-local/**` antes de asumir un bug del cambio actual
-- smoke real del provisioning ya ejecutado en local sobre `hubspot-company-30825221458`:
-  - login admin correcto con ADC y `.env.local` minima
-  - el endpoint `/api/admin/tenants/[id]/contacts/provision` ya fue probado contra BigQuery real
-  - el bug detectado en el smoke fue tipado explicito de `null` para `upsertClientUser` en BigQuery
-  - evidencia real: `user-hubspot-contact-136893943450` quedo creado y una segunda corrida devolvio `reconciled`
-- estado productivo al 2026-03-12:
-  - `develop` y `main` ya quedaron alineadas en `10b7ca8`
-  - el deployment productivo de `greenhouse.efeoncepro.com` ya fue verificado con login admin real
-  - el tenant Sky `hubspot-company-30825221458` ya quedo sin gap de contactos CRM provisionables: `tenantUserCount = 16`, `liveContactCount = 16`, `missingCount = 0`
-  - el provisioning bulk funciona productivamente, pero para corridas largas la conexion HTTP puede cerrarse antes de devolver respuesta aunque el trabajo termine server-side
-  - la cuenta demo cliente `client.portal@efeonce.com` tambien fue validada en produccion con `/dashboard` respondiendo `200`
-- evolucion tecnica en curso para escalar ese flujo:
-  - una sola lectura live inicial desde `hubspot-greenhouse-integration`
-  - snapshot firmado por servidor para reusar esa lectura durante la corrida admin
-  - batches chicos por request hacia `/api/admin/tenants/[id]/contacts/provision`
-  - agregacion de progreso/feedback desde la UI
-  - fallback a lectura live directa si el snapshot no existe o expira
-  - smoke real ya ejecutado sobre `ANAM` con `5` pendientes: rechazo correcto del request sobredimensionado y cierre correcto por `2` lotes secuenciales
+- `Handoff.md` debe mantener solo el estado activo del turno o del frente abierto.
+- `Handoff.archive.md` conserva el historial detallado cuando un handoff deja de ser operativo como snapshot rapido.
+- Si un build local falla por rutas de otra rama, revisar el cache historico en `.next-local/**` antes de asumir un bug del cambio actual.
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz
