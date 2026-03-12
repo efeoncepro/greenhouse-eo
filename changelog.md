@@ -23,6 +23,12 @@
   - `missingCount = 0`
   - la corrida bulk creo o reconcilio el resto de contactos CRM con email
 - Se valido tambien la experiencia cliente productiva con la cuenta demo `client.portal@efeonce.com`: login correcto, sesion `client_executive` y `/dashboard` respondiendo `200`.
+- Se implemento una via escalable para el provisioning admin:
+  - la pantalla admin usa un snapshot firmado de los contactos live leidos al cargar el tenant
+  - el backend limita cada request a `4` contactos para evitar corridas largas atadas a una sola conexion HTTP
+  - la UI ejecuta batches secuenciales y agrega progreso y feedback consolidado
+  - si el snapshot firmado no existe o expira, el backend conserva fallback a lectura live directa desde la Cloud Run
+- Este cambio busca mantener el boundary por tenant y la frescura del source CRM, pero bajar el riesgo operacional de timeouts en corridas bulk.
 
 ### Integrations
 - Se auditaron todas las ramas activas y de respaldo; el unico trabajo funcional no absorbido quedo fijado en `reconcile/merge-hubspot-provisioning` y el rescate documental cross-repo en `reconcile/docs-cross-repo-contract`.
@@ -56,6 +62,8 @@
   - endpoint productivo de provisioning confirmado
   - corrida bulk productiva completada para Sky, con caveat de cierre prematuro de la conexion HTTP en corridas largas
 - Smoke cliente productivo con `client.portal@efeonce.com`: correcto
+- `lint` y chequeo de tipos del modelo escalable por batches: correctos
+- `build` del worktree largo de Windows: bloqueado por limite de path/Turbopack fuera del alcance funcional del cambio
 - Validacion visual local con login admin + `view-as` sobre `space-efeonce`: correcta
 - Documento operativo `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md` quedo reescrito con matriz de brechas, soluciones, seleccion y ejecucion final
 ## 2026-03-10

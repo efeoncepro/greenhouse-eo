@@ -129,6 +129,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el tenant Sky `hubspot-company-30825221458` ya quedo sin gap de contactos CRM provisionables: `tenantUserCount = 16`, `liveContactCount = 16`, `missingCount = 0`
   - el provisioning bulk funciona productivamente, pero para corridas largas la conexion HTTP puede cerrarse antes de devolver respuesta aunque el trabajo termine server-side
   - la cuenta demo cliente `client.portal@efeonce.com` tambien fue validada en produccion con `/dashboard` respondiendo `200`
+- evolucion tecnica en curso para escalar ese flujo:
+  - una sola lectura live inicial desde `hubspot-greenhouse-integration`
+  - snapshot firmado por servidor para reusar esa lectura durante la corrida admin
+  - batches chicos por request hacia `/api/admin/tenants/[id]/contacts/provision`
+  - agregacion de progreso/feedback desde la UI
+  - fallback a lectura live directa si el snapshot no existe o expira
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz

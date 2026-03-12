@@ -4,6 +4,12 @@ import { createHash } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import {
+  type TenantContactProvisioningResult,
+  type TenantContactsProvisioningSummary,
+  normalizeTenantContactIds
+} from '@/lib/admin/tenant-member-provisioning-shared'
+import { verifyTenantContactProvisioningSnapshotToken } from '@/lib/admin/tenant-contact-provisioning-snapshot'
+import {
   getHubSpotGreenhouseCompanyContacts,
   type HubSpotGreenhouseContactProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
@@ -21,28 +27,6 @@ type ExistingUserRow = {
   user_id: string
   client_id: string | null
   email: string
-}
-
-export type TenantContactProvisioningResult = {
-  hubspotContactId: string
-  email: string | null
-  displayName: string
-  outcome: 'created' | 'reconciled' | 'conflict' | 'invalid' | 'error'
-  reason: string
-  userId: string | null
-}
-
-export type TenantContactsProvisioningSummary = {
-  clientId: string
-  clientName: string
-  hubspotCompanyId: string
-  requested: number
-  created: number
-  reconciled: number
-  conflicts: number
-  invalid: number
-  errors: number
-  results: TenantContactProvisioningResult[]
 }
 
 const DEFAULT_LOCALE = 'es-CL'
@@ -474,13 +458,15 @@ const upsertProjectScopes = async ({
 export const provisionTenantUsersFromHubSpotContacts = async ({
   clientId,
   actorUserId,
-  contactIds
+  contactIds,
+  contactsSnapshotToken
 }: {
   clientId: string
   actorUserId: string
   contactIds: string[]
+  contactsSnapshotToken?: string | null
 }): Promise<TenantContactsProvisioningSummary> => {
-  const normalizedContactIds = Array.from(new Set(contactIds.map(item => item.trim()).filter(Boolean)))
+  const normalizedContactIds = normalizeTenantContactIds(contactIds)
   const tenant = await getTenantProvisioningContext(clientId)
 
   if (!tenant) {
@@ -506,10 +492,20 @@ export const provisionTenantUsersFromHubSpotContacts = async ({
     }
   }
 
-  const liveContactsResponse = await getHubSpotGreenhouseCompanyContacts(tenant.hubspotCompanyId)
+  const snapshotContacts =
+    contactsSnapshotToken?.trim() && tenant.hubspotCompanyId
+      ? verifyTenantContactProvisioningSnapshotToken({
+          token: contactsSnapshotToken.trim(),
+          clientId: tenant.clientId,
+          hubspotCompanyId: tenant.hubspotCompanyId
+        })
+      : null
+
+  const liveContacts =
+    snapshotContacts || (await getHubSpotGreenhouseCompanyContacts(tenant.hubspotCompanyId)).contacts
 
   const selectedContacts = normalizedContactIds.map(contactId =>
-    liveContactsResponse.contacts.find(contact => contact.hubspotContactId === contactId)
+    liveContacts.find(contact => contact.hubspotContactId === contactId)
   )
 
   const validSelectedContacts = selectedContacts.filter(Boolean) as HubSpotGreenhouseContactProfile[]

@@ -40,6 +40,51 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-12 08:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Hacer escalable el provisioning de contactos HubSpot sin romper el boundary por tenant.
+- Eliminar la dependencia de una sola request larga para corridas bulk.
+
+### Rama
+- Rama usada: `docs/production-closeout`
+- Rama objetivo del merge: por definir antes de promover a `develop` y `main`
+
+### Ambiente objetivo
+- Development / pre-merge
+
+### Archivos tocados
+- `src/lib/admin/tenant-member-provisioning-shared.ts`
+- `src/lib/admin/tenant-contact-provisioning-snapshot.ts`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/tenant-member-provisioning.ts`
+- `src/app/api/admin/tenants/[id]/contacts/provision/route.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+
+### Verificacion
+- Cambio funcional implementado:
+  - la pantalla admin ahora hace una sola lectura live inicial de contactos y reutiliza un snapshot firmado por el servidor
+  - el endpoint ya no acepta corridas largas: limita el request a `4` contactos por llamada
+  - la UI divide automaticamente los pendientes en batches secuenciales y agrega feedback/progreso
+  - el backend solo vuelve a consultar Cloud Run si no recibe un snapshot valido
+- Validacion:
+  - `npx pnpm lint`: correcto
+  - `npx tsc -p tsconfig.json --noEmit`: correcto
+  - `npx pnpm build`: bloqueado por limitacion de Turbopack/Windows/OneDrive con paths largos en el worktree largo, no por un error de tipos del cambio
+
+### Riesgos o pendientes
+- Falta smoke funcional del batching nuevo en un runtime real antes de promover.
+- La rama de trabajo actual nacio como cierre documental y ahora contiene codigo; conviene reetiquetarla o mover estos commits a una rama de feature antes del merge.
+
+### Proximo paso recomendado
+- Crear una rama de feature limpia para este cambio escalable.
+- Hacer smoke local o preview de la UI admin ejecutando varios lotes secuenciales.
+- Si el smoke sale bien, promover primero a `develop`.
+
+### Fecha
 - 2026-03-12 05:16 America/Santiago
 
 ### Agente

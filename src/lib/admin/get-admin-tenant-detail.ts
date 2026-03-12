@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildTenantContactProvisioningSnapshotToken } from '@/lib/admin/tenant-contact-provisioning-snapshot'
 import { getTenantCapabilityState } from '@/lib/admin/tenant-capabilities'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
@@ -61,6 +62,7 @@ export interface AdminTenantDetail {
   users: AdminTenantUserRow[]
   projects: AdminTenantProjectRow[]
   liveHubspot: HubSpotGreenhouseLiveContext
+  contactsSnapshotToken: string | null
 }
 
 const toNumber = (value: unknown) => {
@@ -252,6 +254,13 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
   const hubspotCompanyId = tenantRow.hubspot_company_id ? String(tenantRow.hubspot_company_id) : null
   const liveHubspot = await getHubSpotGreenhouseLiveContext(hubspotCompanyId)
 
+  const contactsSnapshotToken = buildTenantContactProvisioningSnapshotToken({
+    clientId: String(tenantRow.client_id || ''),
+    hubspotCompanyId,
+    fetchedAt: liveHubspot.fetchedAt,
+    contacts: liveHubspot.contacts
+  })
+
   return {
     clientId: String(tenantRow.client_id || ''),
     publicId: buildTenantPublicId({
@@ -302,6 +311,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
       pageUrl: row.page_url ? String(row.page_url) : null,
       assignedUsers: toNumber(row.assigned_users)
     })),
-    liveHubspot
+    liveHubspot,
+    contactsSnapshotToken
   }
 }

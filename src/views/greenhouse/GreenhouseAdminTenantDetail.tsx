@@ -25,19 +25,16 @@ import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import {
+  chunkTenantContactIds,
+  MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE,
+  mergeTenantContactsProvisioningSummaries,
+  type TenantContactsProvisioningSummary
+} from '@/lib/admin/tenant-member-provisioning-shared'
 import TenantCapabilityManager from '@views/greenhouse/admin/tenants/TenantCapabilityManager'
 
 type Props = {
   data: AdminTenantDetail
-}
-
-type TenantContactProvisioningSummary = {
-  requested: number
-  created: number
-  reconciled: number
-  conflicts: number
-  invalid: number
-  errors: number
 }
 
 const formatDateTime = (value: string | null) => {
@@ -67,7 +64,7 @@ const getDisplayNote = (notes: string | null, hubspotCompanyId: string | null) =
   return notes
 }
 
-const buildProvisionFeedback = (summary: TenantContactProvisioningSummary) => {
+const buildProvisionFeedback = (summary: TenantContactsProvisioningSummary) => {
   const fragments = [
     `${summary.created} creados`,
     `${summary.reconciled} reconciliados`,
@@ -97,6 +94,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const router = useRouter()
   const [capabilities, setCapabilities] = useState<TenantCapabilityRecord[]>(data.capabilities)
   const [isProvisioningContacts, setIsProvisioningContacts] = useState(false)
+
+  const [provisionProgress, setProvisionProgress] = useState<{
+    completedBatches: number
+    totalBatches: number
+    processedContacts: number
+    totalContacts: number
+  } | null>(null)
 
   const [provisionFeedback, setProvisionFeedback] = useState<{
     tone: 'success' | 'info' | 'warning' | 'error'
@@ -136,30 +140,75 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
     setIsProvisioningContacts(true)
 
     try {
-      const response = await fetch(`/api/admin/tenants/${data.clientId}/contacts/provision`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contactIds: missingLiveContacts.map(contact => contact.hubspotContactId)
-        })
+      const contactIds = missingLiveContacts.map(contact => contact.hubspotContactId)
+      const batches = chunkTenantContactIds(contactIds)
+      const summaries: TenantContactsProvisioningSummary[] = []
+
+      setProvisionProgress({
+        completedBatches: 0,
+        totalBatches: batches.length,
+        processedContacts: 0,
+        totalContacts: contactIds.length
       })
 
-      const payload = (await response.json().catch(() => null)) as
-        | (TenantContactProvisioningSummary & { error?: string })
-        | null
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex += 1) {
+        const batch = batches[batchIndex]
 
-      if (!response.ok || !payload) {
+        const response = await fetch(`/api/admin/tenants/${data.clientId}/contacts/provision`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contactIds: batch,
+            contactsSnapshotToken: data.contactsSnapshotToken
+          })
+        })
+
+        const payload = (await response.json().catch(() => null)) as
+          | (TenantContactsProvisioningSummary & { error?: string })
+          | null
+
+        if (!response.ok || !payload) {
+          const mergedSummary = mergeTenantContactsProvisioningSummaries(summaries)
+          const processedContacts = mergedSummary?.requested || 0
+
+          setProvisionFeedback({
+            tone: 'error',
+            message:
+              `${payload?.error || 'No pudimos provisionar un lote de contactos CRM.'} ` +
+              `Se completaron ${processedContacts} de ${contactIds.length} contactos antes del error.`
+          })
+
+          if (processedContacts > 0) {
+            router.refresh()
+          }
+
+          return
+        }
+
+        summaries.push(payload)
+
+        setProvisionProgress({
+          completedBatches: batchIndex + 1,
+          totalBatches: batches.length,
+          processedContacts: summaries.reduce((total, summary) => total + summary.requested, 0),
+          totalContacts: contactIds.length
+        })
+      }
+
+      const mergedSummary = mergeTenantContactsProvisioningSummaries(summaries)
+
+      if (!mergedSummary) {
         setProvisionFeedback({
-          tone: 'error',
-          message: payload?.error || 'No pudimos provisionar los contactos CRM del space.'
+          tone: 'info',
+          message: 'No habia contactos CRM por provisionar.'
         })
 
         return
       }
 
-      setProvisionFeedback(buildProvisionFeedback(payload))
+      setProvisionFeedback(buildProvisionFeedback(mergedSummary))
       router.refresh()
     } catch (error) {
       setProvisionFeedback({
@@ -168,6 +217,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
       })
     } finally {
       setIsProvisioningContacts(false)
+      setProvisionProgress(null)
     }
   }
 
@@ -560,7 +610,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         startIcon={isProvisioningContacts ? <CircularProgress color='inherit' size={16} /> : null}
                       >
                         {isProvisioningContacts
-                          ? 'Provisionando...'
+                          ? `Provisionando ${provisionProgress?.processedContacts || 0}/${provisionProgress?.totalContacts || missingLiveContacts.length}...`
                           : `Provisionar ${missingLiveContacts.length || ''}`.trim()}
                       </Button>
                     </Stack>
@@ -569,8 +619,19 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   <Alert severity='info'>
                     Provisionar crea o reconcilia usuarios `invited` con rol `client_executive` y garantiza los scopes
                     base del space. Si un contacto ya existia por email dentro del mismo tenant, Greenhouse repara su
-                    acceso en vez de dejarlo como falso positivo.
+                    acceso en vez de dejarlo como falso positivo. Para evitar timeouts, los lotes se ejecutan de a{' '}
+                    {MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE} contactos por request.
                   </Alert>
+
+                  {provisionProgress ? (
+                    <Alert severity='info'>
+                      Ejecutando lote {provisionProgress.completedBatches + 1 > provisionProgress.totalBatches
+                        ? provisionProgress.totalBatches
+                        : provisionProgress.completedBatches + 1}{' '}
+                      de {provisionProgress.totalBatches}. Procesados {provisionProgress.processedContacts} de{' '}
+                      {provisionProgress.totalContacts} contactos.
+                    </Alert>
+                  ) : null}
 
                   {provisionFeedback ? <Alert severity={provisionFeedback.tone}>{provisionFeedback.message}</Alert> : null}
 
