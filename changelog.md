@@ -29,6 +29,11 @@
   - la UI ejecuta batches secuenciales y agrega progreso y feedback consolidado
   - si el snapshot firmado no existe o expira, el backend conserva fallback a lectura live directa desde la Cloud Run
 - Este cambio busca mantener el boundary por tenant y la frescura del source CRM, pero bajar el riesgo operacional de timeouts en corridas bulk.
+- Smoke del modelo escalable:
+  - `ANAM` (`hubspot-company-27776076692`) tenia `5` contactos pendientes
+  - una request de `5` IDs devolvio `400` por sobrepasar el limite del endpoint
+  - dos requests secuenciales (`4 + 1`) con snapshot firmado devolvieron `created`
+  - verificacion final: `missingCount = 0`
 
 ### Integrations
 - Se auditaron todas las ramas activas y de respaldo; el unico trabajo funcional no absorbido quedo fijado en `reconcile/merge-hubspot-provisioning` y el rescate documental cross-repo en `reconcile/docs-cross-repo-contract`.

@@ -40,6 +40,53 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ## Estado Actual
 
 ### Fecha
+- 2026-03-12 09:02 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Preparar el smoke funcional del nuevo modelo escalable de provisioning por batches.
+- Dejar explicitado que este trabajo sigue abierto y no debe mezclarse aun con `develop`.
+
+### Rama
+- Rama usada: `feature/scalable-tenant-contact-provisioning`
+- Commit actual del feature: `bc8b546`
+- Rama objetivo del merge: ninguna aun; smoke pendiente antes de promover a `develop`
+
+### Ambiente objetivo
+- Development local / feature branch aislada
+
+### Archivos tocados
+- `src/lib/admin/tenant-member-provisioning-shared.ts`
+- `src/lib/admin/tenant-contact-provisioning-snapshot.ts`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/tenant-member-provisioning.ts`
+- `src/app/api/admin/tenants/[id]/contacts/provision/route.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx tsc -p tsconfig.json --noEmit`: correcto
+- `npx pnpm build`: bloqueado en este worktree por limitacion de Turbopack/Windows/OneDrive con paths largos, no por error de tipos del cambio
+- Push remoto: correcto en `origin/feature/scalable-tenant-contact-provisioning`
+- Smoke funcional real del batching:
+  - tenant usado: `hubspot-company-27776076692` (`ANAM`)
+  - caso validado: `5` contactos pendientes
+  - una request con `5` IDs devolvio `400` como se esperaba
+  - luego se ejecutaron `2` lotes secuenciales (`4 + 1`) con snapshot firmado y ambos devolvieron `created`
+  - verificacion final contra BigQuery + Cloud Run: `tenantUserCount = 6`, `liveContactCount = 6`, `missingCount = 0`
+
+### Riesgos o pendientes
+- El batching nuevo ya fue smokeado funcionalmente; falta solo decidir promocion.
+- No mergear aun esta rama a `develop` ni `main`.
+- El checkout principal del usuario sigue con `.gitignore` modificado; este feature se esta trabajando aparte para no colisionar con ese estado local.
+
+### Proximo paso recomendado
+- Promover `feature/scalable-tenant-contact-provisioning` a `develop`.
+- Despues validar en preview o staging una corrida equivalente antes de llevarlo a `main`.
+
+### Fecha
 - 2026-03-12 08:45 America/Santiago
 
 ### Agente

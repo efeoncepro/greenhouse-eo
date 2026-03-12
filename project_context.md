@@ -135,6 +135,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - batches chicos por request hacia `/api/admin/tenants/[id]/contacts/provision`
   - agregacion de progreso/feedback desde la UI
   - fallback a lectura live directa si el snapshot no existe o expira
+  - smoke real ya ejecutado sobre `ANAM` con `5` pendientes: rechazo correcto del request sobredimensionado y cierre correcto por `2` lotes secuenciales
 
 ## Estructura Base
 - `src/app/layout.tsx`: layout raiz
