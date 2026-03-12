@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { forwardRef, useImperativeHandle, useState, useTransition } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -9,6 +9,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
+import Collapse from '@mui/material/Collapse'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -28,6 +29,10 @@ type TenantCapabilityManagerProps = {
   hubspotCompanyId: string | null
   initialCapabilities: TenantCapabilityRecord[]
   onCapabilitiesChange?: (capabilities: TenantCapabilityRecord[]) => void
+}
+
+export type TenantCapabilityManagerHandle = {
+  submitManualSelection: () => void
 }
 
 const getSourceTone = (sourceSystem: string | null) => {
@@ -53,12 +58,12 @@ const getSourceLabel = (capability: TenantCapabilityRecord) => {
   return 'Available'
 }
 
-const TenantCapabilityManager = ({
+const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, TenantCapabilityManagerProps>(({
   clientId,
   hubspotCompanyId,
   initialCapabilities,
   onCapabilitiesChange
-}: TenantCapabilityManagerProps) => {
+}, ref) => {
   const [capabilities, setCapabilities] = useState(initialCapabilities)
 
   const [selectedCodes, setSelectedCodes] = useState<string[]>(
@@ -67,6 +72,7 @@ const TenantCapabilityManager = ({
 
   const [feedback, setFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [showPolicyAlert, setShowPolicyAlert] = useState(false)
 
   const businessLines = capabilities.filter(item => item.moduleKind === 'business_line')
   const serviceModules = capabilities.filter(item => item.moduleKind === 'service_module')
@@ -118,8 +124,12 @@ const TenantCapabilityManager = ({
         tone: 'success',
         message: 'Capabilities guardadas desde admin.'
       })
-      })
+    })
   }
+
+  useImperativeHandle(ref, () => ({
+    submitManualSelection
+  }))
 
   const renderCapabilityOption = (capability: TenantCapabilityRecord) => {
     const parentLabel = capability.parentModuleCode ? parentLabelByCode.get(capability.parentModuleCode) : null
@@ -233,10 +243,23 @@ const TenantCapabilityManager = ({
             ))}
           </Box>
 
-          <Alert severity='info'>
-            La edicion manual tiene precedencia. La sincronizacion externa se admite via API con `businessLines` y
-            `serviceModules` explicitos; no se deriva desde deals.
-          </Alert>
+          <Stack spacing={1.5}>
+            <Button
+              variant='text'
+              color='warning'
+              onClick={() => setShowPolicyAlert(current => !current)}
+              sx={{ width: 'fit-content', px: 0 }}
+              endIcon={<i className={showPolicyAlert ? 'tabler-chevron-up' : 'tabler-chevron-down'} />}
+            >
+              Regla de precedencia manual
+            </Button>
+            <Collapse in={showPolicyAlert}>
+              <Alert severity='info'>
+                La edicion manual tiene precedencia. La sincronizacion externa se admite via API con `businessLines` y
+                `serviceModules` explicitos; no se deriva desde deals.
+              </Alert>
+            </Collapse>
+          </Stack>
 
           {feedback ? <Alert severity={feedback.tone}>{feedback.message}</Alert> : null}
 
@@ -331,6 +354,8 @@ const TenantCapabilityManager = ({
       </CardContent>
     </Card>
   )
-}
+})
+
+TenantCapabilityManager.displayName = 'TenantCapabilityManager'
 
 export default TenantCapabilityManager

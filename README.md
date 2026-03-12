@@ -26,6 +26,7 @@ La documentacion operativa interna del repo esta en:
 - `PHASE_TASK_MATRIX.md`
 - `GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
+- `Handoff.archive.md`
 - `MULTITENANT_ARCHITECTURE.md`
 - `project_context.md`
 - `changelog.md`

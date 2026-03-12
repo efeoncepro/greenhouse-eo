@@ -1,0 +1,242 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+
+import Chip from '@mui/material/Chip'
+import MenuItem from '@mui/material/MenuItem'
+import TablePagination from '@mui/material/TablePagination'
+import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
+
+import CustomTextField from '@core/components/mui/TextField'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+
+import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+
+import tableStyles from '@core/styles/table.module.css'
+
+import {
+  getCapabilityPalette,
+  getCapabilitySourceLabel,
+  getCapabilitySourceTone,
+  toTitleCase
+} from './helpers'
+
+type TenantServiceModulesTableProps = {
+  capabilities: TenantCapabilityRecord[]
+}
+
+type ServiceModuleRow = TenantCapabilityRecord & {
+  familyLabel: string
+}
+
+const columnHelper = createColumnHelper<ServiceModuleRow>()
+
+const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTableProps) => {
+  const [searchValue, setSearchValue] = useState('')
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'moduleLabel', desc: false }])
+
+  const data = useMemo(
+    () =>
+      capabilities
+        .filter(item => item.moduleKind === 'service_module')
+        .map(item => ({
+          ...item,
+          familyLabel: getCapabilityPalette(item).label
+        })),
+    [capabilities]
+  )
+
+  const filteredRows = useMemo(() => {
+    const query = searchValue.trim().toLowerCase()
+
+    if (!query) return data
+
+    return data.filter(row =>
+      [row.moduleLabel, row.moduleCode, row.publicModuleId, row.familyLabel, row.assignmentSourceSystem || '']
+        .join(' ')
+        .toLowerCase()
+        .includes(query)
+    )
+  }, [data, searchValue])
+
+  const columns = useMemo<ColumnDef<ServiceModuleRow, any>[]>(
+    () => [
+      columnHelper.accessor('moduleLabel', {
+        header: 'Modulo',
+        cell: ({ row }) => (
+          <div className='flex flex-col gap-1'>
+            <Typography color='text.primary'>{row.original.moduleLabel}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {row.original.description || 'Sin descripcion operativa'}
+            </Typography>
+          </div>
+        )
+      }),
+      columnHelper.accessor('publicModuleId', {
+        header: 'Codigo',
+        cell: ({ row }) => <Chip size='small' variant='outlined' label={row.original.publicModuleId} />
+      }),
+      columnHelper.accessor('familyLabel', {
+        header: 'Familia',
+        cell: ({ row }) => {
+          const palette = getCapabilityPalette(row.original)
+
+          return (
+            <Chip
+              size='small'
+              label={palette.label}
+              sx={{
+                color: palette.accent,
+                backgroundColor: palette.soft,
+                border: `1px solid ${palette.soft}`
+              }}
+            />
+          )
+        }
+      }),
+      columnHelper.display({
+        id: 'state',
+        header: 'Estado',
+        cell: ({ row }) => (
+          <div className='flex flex-col gap-1'>
+            <Chip
+              size='small'
+              variant='tonal'
+              color={getCapabilitySourceTone(row.original)}
+              label={row.original.selected ? 'Activo' : 'Disponible'}
+              sx={{ width: 'fit-content' }}
+            />
+            <Typography variant='body2' color='text.secondary'>
+              {getCapabilitySourceLabel(row.original)}
+            </Typography>
+          </div>
+        )
+      }),
+      columnHelper.accessor('updatedAt', {
+        header: 'Actualizado',
+        cell: ({ row }) => (
+          <Typography variant='body2' color='text.secondary'>
+            {row.original.updatedAt ? new Date(row.original.updatedAt).toLocaleDateString('es-CL') : 'Sin fecha'}
+          </Typography>
+        )
+      })
+    ],
+    []
+  )
+
+  const table = useReactTable({
+    data: filteredRows,
+    columns,
+    state: {
+      sorting
+    },
+    initialState: {
+      pagination: {
+        pageSize: 8
+      }
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
+
+  return (
+    <>
+      <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+        <CustomTextField
+          value={searchValue}
+          onChange={event => {
+            setSearchValue(event.target.value)
+            table.setPageIndex(0)
+          }}
+          placeholder='Buscar modulo'
+          className='max-sm:is-full'
+        />
+        <div className='flex items-center gap-4 max-sm:is-full'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={event => table.setPageSize(Number(event.target.value))}
+            className='max-sm:is-full sm:is-[88px]'
+          >
+            <MenuItem value='8'>8</MenuItem>
+            <MenuItem value='12'>12</MenuItem>
+            <MenuItem value='24'>24</MenuItem>
+          </CustomTextField>
+          <Typography color='text.secondary'>{`${filteredRows.filter(row => row.selected).length} activos`}</Typography>
+        </div>
+      </div>
+      <div className='overflow-x-auto'>
+        <table className={tableStyles.table}>
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th key={header.id}>
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={classnames({
+                          'flex items-center gap-2': header.column.getIsSorted(),
+                          'cursor-pointer select-none': header.column.getCanSort()
+                        })}
+                        onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{
+                          asc: <i className='tabler-chevron-up text-xl' />,
+                          desc: <i className='tabler-chevron-down text-xl' />
+                        }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          {table.getRowModel().rows.length === 0 ? (
+            <tbody>
+              <tr>
+                <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                  {toTitleCase('sin service modules registrados para este filtro')}
+                </td>
+              </tr>
+            </tbody>
+          ) : (
+            <tbody>
+              {table.getRowModel().rows.map(row => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
+      <TablePagination
+        component={() => <TablePaginationComponent table={table} />}
+        count={table.getFilteredRowModel().rows.length}
+        rowsPerPage={table.getState().pagination.pageSize}
+        page={table.getState().pagination.pageIndex}
+        onPageChange={(_, page) => {
+          table.setPageIndex(page)
+        }}
+      />
+    </>
+  )
+}
+
+export default TenantServiceModulesTable
