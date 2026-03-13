@@ -21,6 +21,7 @@ import classnames from 'classnames'
 import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -73,22 +74,22 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
   const columns = useMemo<ColumnDef<ServiceModuleRow, any>[]>(
     () => [
       columnHelper.accessor('moduleLabel', {
-        header: 'Modulo',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_module,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color='text.primary'>{row.original.moduleLabel}</Typography>
             <Typography variant='body2' color='text.secondary'>
-              {row.original.description || 'Sin descripcion operativa'}
+              {row.original.description || GH_INTERNAL_MESSAGES.admin_tenant_capability_description_empty}
             </Typography>
           </div>
         )
       }),
       columnHelper.accessor('publicModuleId', {
-        header: 'Codigo',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_code,
         cell: ({ row }) => <Chip size='small' variant='outlined' label={row.original.publicModuleId} />
       }),
       columnHelper.accessor('familyLabel', {
-        header: 'Familia',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_family,
         cell: ({ row }) => {
           const palette = getCapabilityPalette(row.original)
 
@@ -107,14 +108,18 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
       }),
       columnHelper.display({
         id: 'state',
-        header: 'Estado',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_state,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Chip
               size='small'
               variant='tonal'
               color={getCapabilitySourceTone(row.original)}
-              label={row.original.selected ? 'Activo' : 'Disponible'}
+              label={
+                row.original.selected
+                  ? GH_INTERNAL_MESSAGES.admin_tenant_capability_state_active
+                  : GH_INTERNAL_MESSAGES.admin_tenant_capability_state_available
+              }
               sx={{ width: 'fit-content' }}
             />
             <Typography variant='body2' color='text.secondary'>
@@ -124,10 +129,12 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
         )
       }),
       columnHelper.accessor('updatedAt', {
-        header: 'Actualizado',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_updated,
         cell: ({ row }) => (
           <Typography variant='body2' color='text.secondary'>
-            {row.original.updatedAt ? new Date(row.original.updatedAt).toLocaleDateString('es-CL') : 'Sin fecha'}
+            {row.original.updatedAt
+              ? new Date(row.original.updatedAt).toLocaleDateString('es-CL')
+              : GH_INTERNAL_MESSAGES.admin_tenant_service_modules_no_date}
           </Typography>
         )
       })
@@ -161,7 +168,7 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
             setSearchValue(event.target.value)
             table.setPageIndex(0)
           }}
-          placeholder='Buscar modulo'
+          placeholder={GH_INTERNAL_MESSAGES.admin_tenant_service_modules_search}
           className='max-sm:is-full'
         />
         <div className='flex items-center gap-4 max-sm:is-full'>
@@ -175,7 +182,9 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
             <MenuItem value='12'>12</MenuItem>
             <MenuItem value='24'>24</MenuItem>
           </CustomTextField>
-          <Typography color='text.secondary'>{`${filteredRows.filter(row => row.selected).length} activos`}</Typography>
+          <Typography color='text.secondary'>
+            {GH_INTERNAL_MESSAGES.admin_tenant_service_modules_active_count(filteredRows.filter(row => row.selected).length)}
+          </Typography>
         </div>
       </div>
       <div className='overflow-x-auto'>
@@ -209,7 +218,7 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
             <tbody>
               <tr>
                 <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                  {toTitleCase('sin service modules registrados para este filtro')}
+                  {toTitleCase(GH_INTERNAL_MESSAGES.admin_tenant_service_modules_empty)}
                 </td>
               </tr>
             </tbody>

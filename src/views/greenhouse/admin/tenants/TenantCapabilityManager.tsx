@@ -16,6 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
 type CapabilityStateResponse = {
@@ -44,18 +45,22 @@ const getSourceTone = (sourceSystem: string | null) => {
 
 const getSourceLabel = (capability: TenantCapabilityRecord) => {
   if (capability.assignmentSourceSystem === 'greenhouse_admin') {
-    return capability.selected ? 'Controlled' : 'Admin off'
+    return capability.selected
+      ? GH_INTERNAL_MESSAGES.admin_tenant_governance_source_controlled
+      : GH_INTERNAL_MESSAGES.admin_tenant_governance_source_admin_off
   }
 
   if (capability.assignmentSourceSystem === 'hubspot_crm') {
-    return capability.selected ? 'HubSpot' : 'HubSpot off'
+    return capability.selected
+      ? GH_INTERNAL_MESSAGES.admin_tenant_governance_source_hubspot
+      : GH_INTERNAL_MESSAGES.admin_tenant_governance_source_hubspot_off
   }
 
   if (capability.selected) {
-    return 'Active'
+    return GH_INTERNAL_MESSAGES.admin_tenant_governance_source_active
   }
 
-  return 'Available'
+  return GH_INTERNAL_MESSAGES.admin_tenant_governance_source_available
 }
 
 const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, TenantCapabilityManagerProps>(({
@@ -113,7 +118,7 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
       if (!response.ok || !payload) {
         setFeedback({
           tone: 'error',
-          message: payload?.error || 'No pudimos guardar las capabilities del tenant.'
+          message: payload?.error || GH_INTERNAL_MESSAGES.admin_tenant_governance_save_error
         })
 
         return
@@ -122,7 +127,7 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
       applyState(payload)
       setFeedback({
         tone: 'success',
-        message: 'Capabilities guardadas desde admin.'
+        message: GH_INTERNAL_MESSAGES.admin_tenant_governance_save_success
       })
     })
   }
@@ -207,22 +212,23 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
           >
             <Box>
               <Typography variant='overline' sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.08em' }}>
-                Capability governance
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_eyebrow}
               </Typography>
               <Typography variant='h5' sx={{ mt: 0.5 }}>
-                Capabilities activas del space
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_title}
               </Typography>
               <Typography variant='body1' color='text.secondary' sx={{ mt: 1.25, maxWidth: 760 }}>
-                Define que lineas de negocio y modulos quedan habilitados para este cliente. Admin fija el estado
-                operativo y las integraciones externas solo pueden actualizarlo si envian payload explicito desde el
-                registro de empresa.
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_subtitle}
               </Typography>
             </Box>
 
             {[
-              ['Business lines activas', selectedBusinessLineCount],
-              ['Service modules activos', selectedServiceModuleCount],
-              ['Registro de empresa', hubspotCompanyId ? 'Listo' : 'Pendiente']
+              [GH_INTERNAL_MESSAGES.admin_tenant_governance_business_lines_active, selectedBusinessLineCount],
+              [GH_INTERNAL_MESSAGES.admin_tenant_governance_service_modules_active, selectedServiceModuleCount],
+              [
+                GH_INTERNAL_MESSAGES.admin_tenant_governance_company_record,
+                hubspotCompanyId ? GH_INTERNAL_MESSAGES.admin_tenant_governance_ready : GH_INTERNAL_MESSAGES.admin_tenant_governance_pending
+              ]
             ].map(([label, value]) => (
               <Box
                 key={label}
@@ -251,13 +257,10 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
               sx={{ width: 'fit-content', px: 0 }}
               endIcon={<i className={showPolicyAlert ? 'tabler-chevron-up' : 'tabler-chevron-down'} />}
             >
-              Regla de precedencia manual
+              {GH_INTERNAL_MESSAGES.admin_tenant_governance_rule_button}
             </Button>
             <Collapse in={showPolicyAlert}>
-              <Alert severity='info'>
-                La edicion manual tiene precedencia. La sincronizacion externa se admite via API con `businessLines` y
-                `serviceModules` explicitos; no se deriva desde deals.
-              </Alert>
+              <Alert severity='info'>{GH_INTERNAL_MESSAGES.admin_tenant_governance_rule_body}</Alert>
             </Collapse>
           </Stack>
 
@@ -282,9 +285,9 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
             >
               <Stack spacing={2.5}>
                 <Box>
-                  <Typography variant='subtitle1'>Business lines</Typography>
+                  <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_governance_business_lines_title}</Typography>
                   <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                    Activa solo las familias comerciales que deben estar disponibles en este tenant.
+                    {GH_INTERNAL_MESSAGES.admin_tenant_governance_business_lines_subtitle}
                   </Typography>
                 </Box>
                 <Stack spacing={1.5}>
@@ -302,9 +305,9 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
             >
               <Stack spacing={2.5}>
                 <Box>
-                  <Typography variant='subtitle1'>Service modules</Typography>
+                  <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_governance_service_modules_title}</Typography>
                   <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                    Habilita los modulos concretos que el space puede usar y reportar.
+                    {GH_INTERNAL_MESSAGES.admin_tenant_governance_service_modules_subtitle}
                   </Typography>
                 </Box>
                 <Stack spacing={1.5}>
@@ -324,21 +327,21 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
           >
             <Stack spacing={0.5}>
               <Typography variant='body2' color='text.secondary'>
-                Registro de empresa
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_company_record}
               </Typography>
               <Typography variant='subtitle1' color='text.primary'>
-                {hubspotCompanyId ? `EO-${hubspotCompanyId}` : 'Sin company mapping'}
+                {hubspotCompanyId ? `EO-${hubspotCompanyId}` : GH_INTERNAL_MESSAGES.admin_tenant_governance_company_mapping_empty}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
                 {hubspotCompanyId
-                  ? 'Las integraciones externas deben sincronizar capabilities desde el objeto empresa.'
-                  : 'Sin una empresa asociada, este tenant solo puede gobernarse manualmente desde admin.'}
+                  ? GH_INTERNAL_MESSAGES.admin_tenant_governance_company_mapping_with_id
+                  : GH_INTERNAL_MESSAGES.admin_tenant_governance_company_mapping_without_id}
               </Typography>
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} gap={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
               <Typography variant='body2' color='text.secondary'>
-                Tenant: {clientId}
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_tenant_label(clientId)}
               </Typography>
               <Button
                 variant='contained'
@@ -346,7 +349,7 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
                 disabled={isPending}
                 startIcon={isPending ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
               >
-                Guardar seleccion manual
+                {GH_INTERNAL_MESSAGES.admin_tenant_governance_save}
               </Button>
             </Stack>
           </Stack>

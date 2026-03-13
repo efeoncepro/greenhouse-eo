@@ -8,6 +8,8 @@ import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+
 type Props = {
   children: ReactNode
   title?: string
@@ -45,13 +47,13 @@ class TenantDetailErrorBoundary extends Component<Props, State> {
         <CardContent>
           <Stack spacing={2.5} alignItems='flex-start' sx={{ py: 3 }}>
             <Stack spacing={1}>
-              <Typography variant='h6'>{this.props.title || 'No pudimos renderizar esta sección'}</Typography>
+              <Typography variant='h6'>{this.props.title || GH_INTERNAL_MESSAGES.admin_tenant_error_title}</Typography>
               <Typography color='text.secondary'>
-                {this.props.description || 'Reintenta la carga. Si el problema persiste, revisa la integración o el payload de este tenant.'}
+                {this.props.description || GH_INTERNAL_MESSAGES.admin_tenant_error_description}
               </Typography>
             </Stack>
             <Button variant='contained' onClick={this.handleRetry}>
-              Reintentar
+              {GH_INTERNAL_MESSAGES.admin_tenant_error_retry}
             </Button>
           </Stack>
         </CardContent>

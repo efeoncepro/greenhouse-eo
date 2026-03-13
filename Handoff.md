@@ -921,3 +921,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Barrer `GreenhouseAdminTenantDetail.tsx` y `GreenhouseAdminTenantDashboardPreview.tsx` para terminar de sacar copy residual interna.
 - Ejecutar smoke visual autenticado de `/dashboard`, `/proyectos/[id]`, `/settings`, `/sprints`, `/updates`, `/admin`, `/admin/users/[id]`.
 - Resolver o eliminar el archivo duplicado `src/config/capability-registry (1).ts` antes del siguiente `build/tsc` integral.
+
+### Fecha
+- 2026-03-13 18:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Extender la alineacion de nomenclatura Greenhouse a `admin/tenants/[id]`, `view-as/dashboard` y los subcomponentes operativos del detalle de space.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- `internal/admin` del repo `starter-kit`
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx`
+- `src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantDetailErrorBoundary.tsx`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- `pnpm exec eslint src/config/greenhouse-nomenclature.ts src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx src/views/greenhouse/admin/tenants/TenantDetailErrorBoundary.tsx`: correcto
+
+### Riesgos o pendientes
+- El detalle de tenant queda mucho mas alineado, pero aun puede sobrevivir copy residual menor ligado a labels tecnicas de HubSpot owner/base URL o textos de dominio que el equipo quiera hispanizar mas adelante.
+- Sigue pendiente smoke visual autenticado de `admin/tenants/[id]` y `view-as/dashboard`.
