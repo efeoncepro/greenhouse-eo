@@ -87,9 +87,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuSection label='Operacion'>
           <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
             <NavigationItemLabel
-              label={isInternalUser ? 'Dashboard' : GH_NAV.dashboard.label}
-              subtitle={GH_NAV.dashboard.subtitle}
-              showSubtitle={!isInternalUser && showNavSubtitles}
+              label={isInternalUser ? GH_NAV.internalDashboard.label : GH_NAV.dashboard.label}
+              subtitle={isInternalUser ? GH_NAV.internalDashboard.subtitle : GH_NAV.dashboard.subtitle}
+              showSubtitle={showNavSubtitles}
             />
           </MenuItem>
           {!isInternalUser ? (
@@ -123,13 +123,25 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         {isAdminUser ? (
           <MenuSection label='Admin'>
             <MenuItem href='/admin/tenants' icon={<i className='tabler-building-community' />}>
-              Admin Tenants
+              <NavigationItemLabel
+                label={GH_NAV.adminSpaces.label}
+                subtitle={GH_NAV.adminSpaces.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
             <MenuItem href='/admin/users' icon={<i className='tabler-users' />}>
-              Admin Users
+              <NavigationItemLabel
+                label={GH_NAV.adminUsers.label}
+                subtitle={GH_NAV.adminUsers.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
             <MenuItem href='/admin/roles' icon={<i className='tabler-shield-lock' />}>
-              Roles & Permissions
+              <NavigationItemLabel
+                label={GH_NAV.adminRoles.label}
+                subtitle={GH_NAV.adminRoles.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
           </MenuSection>
         ) : null}

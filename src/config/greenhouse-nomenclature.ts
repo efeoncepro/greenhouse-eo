@@ -3,6 +3,10 @@ export const GH_NAV = {
   projects: { label: 'Proyectos', subtitle: 'Proyectos activos' },
   sprints: { label: 'Ciclos', subtitle: 'Sprints de produccion' },
   settings: { label: 'Mi Greenhouse', subtitle: 'Perfil y preferencias' },
+  internalDashboard: { label: 'Control Tower', subtitle: 'Operacion interna de spaces' },
+  adminSpaces: { label: 'Admin Spaces', subtitle: 'Spaces, acceso y modulos' },
+  adminUsers: { label: 'Admin Users', subtitle: 'Usuarios, scopes y acceso' },
+  adminRoles: { label: 'Roles & Permissions', subtitle: 'Gobernanza del portal' },
   updates: { label: 'Updates', subtitle: 'Novedades del ecosistema' }
 } as const
 

@@ -115,7 +115,7 @@ const UserDropdown = () => {
                   <Divider className='mlb-1' />
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
                     <i className='tabler-layout-dashboard' />
-                    <Typography color='text.primary'>{isInternalUser ? 'Dashboard' : GH_NAV.dashboard.label}</Typography>
+                    <Typography color='text.primary'>{isInternalUser ? GH_NAV.internalDashboard.label : GH_NAV.dashboard.label}</Typography>
                   </MenuItem>
                   {!isInternalUser ? (
                     <>
@@ -132,13 +132,19 @@ const UserDropdown = () => {
                   {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/tenants')}>
                       <i className='tabler-building-community' />
-                      <Typography color='text.primary'>Admin Tenants</Typography>
+                      <Typography color='text.primary'>{GH_NAV.adminSpaces.label}</Typography>
                     </MenuItem>
                   ) : null}
                   {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/users')}>
                       <i className='tabler-shield' />
-                      <Typography color='text.primary'>Admin Users</Typography>
+                      <Typography color='text.primary'>{GH_NAV.adminUsers.label}</Typography>
+                    </MenuItem>
+                  ) : null}
+                  {isAdminUser ? (
+                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/roles')}>
+                      <i className='tabler-shield-lock' />
+                      <Typography color='text.primary'>{GH_NAV.adminRoles.label}</Typography>
                     </MenuItem>
                   ) : null}
                   <div className='flex items-center plb-2 pli-3'>

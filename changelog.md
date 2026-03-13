@@ -6,6 +6,12 @@
 
 ## 2026-03-13
 
+### Internal/admin branding lock and nav hydration
+- El shell autenticado ahora recibe la sesion inicial en `SessionProvider`, evitando que `/internal/**` y `/admin/**` arranquen con el menu cliente y luego muten a labels legacy al hidratar.
+- `src/config/greenhouse-nomenclature.ts` ahora tambien cubre labels del nav interno/admin (`Control Tower`, `Admin Spaces`, `Admin Users`, `Roles & Permissions`) y el dropdown de usuario ya consume la misma fuente.
+- El runtime de settings ya no respeta `primaryColor`, `skin` ni `semiDark` legacy guardados en cookie cuando contradicen el branding Greenhouse; se preservan solo preferencias seguras como `mode`, `layout` y widths.
+- `getSettingsFromCookie()` ahora sanea cookies invalidas o viejas antes de renderizar, reduciendo escapes de color/skin basicos de Vuexy entre SSR e hidratacion.
+
 ### Greenhouse nomenclature portal v3 rollout
 - Se agrego `src/config/greenhouse-nomenclature.ts` como fuente unica de copy y tokens visibles del portal cliente, consolidando `GH_NAV`, `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES` y `GH_COLORS`.
 - La navegacion cliente ahora expone `Pulse`, `Proyectos`, `Ciclos` y `Mi Greenhouse`, incluyendo subtitulos en el sidebar vertical cuando el nav no esta colapsado.

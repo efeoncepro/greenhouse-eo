@@ -10,13 +10,18 @@ import type { SystemMode } from '@core/types'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
+import { sanitizeBrandSettings } from '@core/utils/brandSettings'
 
 export const getSettingsFromCookie = async (): Promise<Settings> => {
   const cookieStore = await cookies()
 
   const cookieName = themeConfig.settingsCookieName
 
-  return JSON.parse(cookieStore.get(cookieName)?.value || '{}')
+  try {
+    return sanitizeBrandSettings(JSON.parse(cookieStore.get(cookieName)?.value || '{}'))
+  } catch {
+    return sanitizeBrandSettings(null)
+  }
 }
 
 export const getMode = async () => {

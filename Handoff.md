@@ -40,6 +40,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 12:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el desalineamiento post-branding donde `/internal/dashboard` y superficies admin arrancaban con nomenclatura Greenhouse parcial y luego hidrataban a labels legacy/Vuexy, ademas de revisar escapes de tema por cookies viejas.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / production fix candidate / shell autenticado / branding runtime
+
+### Archivos tocados
+- `src/@core/utils/brandSettings.ts`
+- `src/@core/contexts/settingsContext.tsx`
+- `src/@core/utils/serverHelpers.ts`
+- `src/components/auth/AuthSessionProvider.tsx`
+- `src/components/Providers.tsx`
+- `src/app/(dashboard)/layout.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/@core/utils/brandSettings.ts src/@core/contexts/settingsContext.tsx src/@core/utils/serverHelpers.ts src/components/auth/AuthSessionProvider.tsx src/components/Providers.tsx "src/app/(dashboard)/layout.tsx" src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
+- `npx pnpm build`: correcto
+- No se ejecuto smoke visual autenticado en navegador real despues del fix; la validacion fue estatico + build
+
+### Riesgos o pendientes
+- El fix elimina el flicker del shell autenticado y bloquea `primaryColor/skin/semiDark` legacy en cookie, pero no reescribe aun copy legacy fuera del nav/dropdown en vistas admin como headers o tablas.
+- Si algun usuario esperaba seguir personalizando color primario o `skin` desde cookies legacy/customizer, ese comportamiento ya no se preserva; se mantiene solo `mode`, `layout` y widths.
+- Conviene hacer smoke visual real en `/internal/dashboard`, `/admin/tenants`, `/admin/users` y `/admin/roles` en preview o staging para confirmar que no queda ningun escape visual de Vuexy en runtime autenticado.
+
 ## 2026-03-13 12:01 America/Santiago
 
 ### Agente

@@ -2,17 +2,17 @@
 
 // React Imports
 import type { ReactNode } from 'react'
-import { createContext, useMemo, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 
 // Type Imports
 import type { Mode, Skin, Layout, LayoutComponentWidth } from '@core/types'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
-import primaryColorConfig from '@configs/primaryColorConfig'
 
 // Hook Imports
 import { useObjectCookie } from '@core/hooks/useObjectCookie'
+import { getGreenhouseBrandSettings, sanitizeBrandSettings } from '@core/utils/brandSettings'
 
 // Settings type
 export type Settings = {
@@ -52,16 +52,7 @@ export const SettingsContext = createContext<SettingsContextProps | null>(null)
 // Settings Provider
 export const SettingsProvider = (props: Props) => {
   // Initial Settings
-  const initialSettings: Settings = {
-    mode: themeConfig.mode,
-    skin: themeConfig.skin,
-    semiDark: themeConfig.semiDark,
-    layout: themeConfig.layout,
-    navbarContentWidth: themeConfig.navbar.contentWidth,
-    contentWidth: themeConfig.contentWidth,
-    footerContentWidth: themeConfig.footer.contentWidth,
-    primaryColor: primaryColorConfig[0].main
-  }
+  const initialSettings: Settings = getGreenhouseBrandSettings()
 
   const updatedInitialSettings = {
     ...initialSettings,
@@ -69,21 +60,27 @@ export const SettingsProvider = (props: Props) => {
   }
 
   // Cookies
-  const [settingsCookie, updateSettingsCookie] = useObjectCookie<Settings>(
+  const [rawSettingsCookie, updateSettingsCookie] = useObjectCookie<Settings>(
     themeConfig.settingsCookieName,
-    JSON.stringify(props.settingsCookie) !== '{}' ? props.settingsCookie : updatedInitialSettings
+    sanitizeBrandSettings(JSON.stringify(props.settingsCookie) !== '{}' ? props.settingsCookie : updatedInitialSettings)
   )
 
+  const settingsCookie = useMemo(() => sanitizeBrandSettings(rawSettingsCookie), [rawSettingsCookie])
+
   // State
-  const [_settingsState, _updateSettingsState] = useState<Settings>(
-    JSON.stringify(settingsCookie) !== '{}' ? settingsCookie : updatedInitialSettings
-  )
+  const [_settingsState, _updateSettingsState] = useState<Settings>(settingsCookie)
+
+  useEffect(() => {
+    if (JSON.stringify(rawSettingsCookie) !== JSON.stringify(settingsCookie)) {
+      updateSettingsCookie(settingsCookie)
+    }
+  }, [rawSettingsCookie, settingsCookie, updateSettingsCookie])
 
   const updateSettings = (settings: Partial<Settings>, options?: UpdateSettingsOptions) => {
     const { updateCookie = true } = options || {}
 
     _updateSettingsState(prev => {
-      const newSettings = { ...prev, ...settings }
+      const newSettings = sanitizeBrandSettings({ ...prev, ...settings })
 
       // Update cookie if needed
       if (updateCookie) updateSettingsCookie(newSettings)
@@ -112,11 +109,11 @@ export const SettingsProvider = (props: Props) => {
   }
 
   const resetSettings = () => {
-    updateSettings(initialSettings)
+    updateSettings(updatedInitialSettings)
   }
 
   const isSettingsChanged = useMemo(
-    () => JSON.stringify(initialSettings) !== JSON.stringify(_settingsState),
+    () => JSON.stringify(updatedInitialSettings) !== JSON.stringify(_settingsState),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [_settingsState]
   )

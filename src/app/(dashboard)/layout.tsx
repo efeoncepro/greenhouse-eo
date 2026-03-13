@@ -47,7 +47,7 @@ const Layout = async (props: ChildrenType) => {
   const systemMode = await getSystemMode()
 
   return (
-    <Providers direction={direction}>
+    <Providers direction={direction} session={session}>
       <LayoutWrapper
         systemMode={systemMode}
         verticalLayout={
