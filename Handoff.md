@@ -40,6 +40,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 09:11 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cubrir la parte literal restante del documento en frontend: `CapabilityCard` dispatcher y `ModuleLayout` declarativo guiado por `data.module.cards`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / frontend declarativo / smoke autenticado
+
+### Archivos tocados
+- `src/components/capabilities/CapabilityCard.tsx`
+- `src/components/capabilities/ModuleLayout.tsx`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `tsconfig.json`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/capabilities/CapabilityCard.tsx src/components/capabilities/ModuleLayout.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- El dispatcher declarativo cubre los card types reales del registry actual (`metric`, `project-list`, `tooling-list`, `quality-list`), no aun el catalogo amplio completo del documento.
+- `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes del commit.
+- Los modulos futuros y pipelines nuevas del documento siguen siendo backlog, no deuda de esta iteracion.
+
 ## 2026-03-13 08:39 America/Santiago
 
 ### Agente
