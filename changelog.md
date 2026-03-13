@@ -6,6 +6,11 @@
 
 ## 2026-03-13
 
+### Login branding and preview auth hardening
+- `/login` deja de renderizar la ilustracion `v2-login` y la `auth-mask` de Vuexy; la columna visual ahora usa una composicion branded propia con gradiente Midnight Navy, chips de navegacion Greenhouse y cards de contexto Efeonce.
+- `src/lib/bigquery.ts` ahora soporta `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` como fallback para Preview, ademas de tolerar mas shapes serializados del JSON crudo antes de abortar el login server-side.
+- Queda ratificado que una Preview con login roto debe validarse contra alias actual y secretos serializados del branch, no solo contra `GOOGLE_APPLICATION_CREDENTIALS_JSON` plano.
+
 ### Internal/admin branding lock and nav hydration
 - El shell autenticado ahora recibe la sesion inicial en `SessionProvider`, evitando que `/internal/**` y `/admin/**` arranquen con el menu cliente y luego muten a labels legacy al hidratar.
 - `src/config/greenhouse-nomenclature.ts` ahora tambien cubre labels del nav interno/admin (`Control Tower`, `Admin Spaces`, `Admin Users`, `Roles & Permissions`) y el dropdown de usuario ya consume la misma fuente.

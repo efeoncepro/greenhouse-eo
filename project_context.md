@@ -3,6 +3,12 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Login branding and preview auth hardening
+- `src/views/Login.tsx` ya no debe depender de las ilustraciones `v2-login-*` ni de `auth-mask-*` heredadas de Vuexy; el acceso publico pasa a usar una composicion branded propia con paleta Efeonce y labels de `GH_NAV`.
+- La ruta `/login` sigue consumiendo `GH_MESSAGES`, pero ahora la experiencia visual tambien debe considerarse parte del rollout de nomenclatura v3, no solo el copy.
+- `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
+- Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.
+
 ## Delta 2026-03-13 Branding lock and nav hydration
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
 - La capa `GH_NAV` ya no cubre solo cliente: tambien versiona labels del nav interno/admin para que `VerticalMenu` y `UserDropdown` no vuelvan a hardcodear copy legacy.
