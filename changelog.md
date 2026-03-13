@@ -18,6 +18,7 @@
   - `greenhouse.clients.logo_url` para logos de space/tenant
   - `greenhouse.client_users.avatar_url` para fotos de usuario
 - El runtime ya refleja esas imagenes en detalle de tenant, detalle de usuario, listados admin, tabla interna de control tower, tabla de usuarios por tenant y dropdown de sesion.
+- `tsconfig.json` ahora excluye archivos duplicados `* (1).ts(x)` para que previews de Vercel no queden bloqueadas por copias accidentales del workspace.
 
 ### Branding SVG rollout
 - El shell autenticado y el favicon ahora consumen isotipos/wordmarks SVG oficiales de Efeonce en lugar del `avatar.png` heredado.

@@ -94,6 +94,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `package.json` y `pnpm-lock.yaml` siguen modificados en el worktree por trabajo ajeno y no deben mezclarse por accidente con este commit.
 - Si el bucket `${GCP_PROJECT}-greenhouse-media` no existe en un ambiente dado, hay que crearlo o definir `GREENHOUSE_MEDIA_BUCKET` antes de probar uploads reales.
 
+## 2026-03-13 20:28 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Verificar por que `pre-greenhouse.efeoncepro.com` no mostraba el estado nuevo de la rama y corregir el bloqueo de Preview en Vercel.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Preview de Vercel / branch `fix/internal-nav-nomenclature-hydration`
+
+### Archivos tocados
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `vercel inspect pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: el alias `pre-greenhouse.efeoncepro.com` sigue apuntando a `greenhouse-5jepkohhj-efeonce-7670142f.vercel.app`, no al preview activo de la rama.
+- `vercel inspect greenhouse-o05bk3bl7-efeonce-7670142f.vercel.app --logs -S efeonce-7670142f`: el ultimo deploy del branch `fix/internal-nav-nomenclature-hydration` estaba fallando en build por `src/config/capability-registry (1).ts`.
+- `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto despues de excluir duplicados `* (1).ts(x)` del typecheck.
+
+### Riesgos o pendientes
+- Aunque el branch vuelva a desplegar en `Ready`, `pre-greenhouse.efeoncepro.com` seguira mostrando el deployment viejo hasta que se re-asigne o se promueva manualmente el alias.
+- Sigue pendiente confirmar visualmente que el uploader y los logos cargados ya aparecen en la preview nueva una vez que Vercel termine el deploy sano.
+
 ## 2026-03-13 18:46 America/Santiago
 
 ### Agente
