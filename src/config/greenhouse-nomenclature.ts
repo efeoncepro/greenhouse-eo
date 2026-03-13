@@ -1,13 +1,18 @@
-export const GH_NAV = {
+export const GH_CLIENT_NAV = {
   dashboard: { label: 'Pulse', subtitle: 'Vista general de tu operacion' },
   projects: { label: 'Proyectos', subtitle: 'Proyectos activos' },
   sprints: { label: 'Ciclos', subtitle: 'Sprints de produccion' },
   settings: { label: 'Mi Greenhouse', subtitle: 'Perfil y preferencias' },
-  internalDashboard: { label: 'Control Tower', subtitle: 'Operacion interna de spaces' },
-  adminSpaces: { label: 'Spaces', subtitle: 'Acceso, modulos y gobierno del portal' },
-  adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
-  adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza del portal' },
   updates: { label: 'Updates', subtitle: 'Novedades del ecosistema' }
+} as const
+
+// Internal/admin surfaces are operational runtime, not part of the client portal
+// nomenclature contract defined in Greenhouse_Nomenclatura_Portal_v3.md.
+export const GH_INTERNAL_NAV = {
+  internalDashboard: { label: 'Dashboard', subtitle: 'Operacion interna de spaces' },
+  adminTenants: { label: 'Admin Tenants', subtitle: 'Spaces, acceso y gobierno del portal' },
+  adminUsers: { label: 'Admin Users', subtitle: 'Acceso, roles y scopes visibles' },
+  adminRoles: { label: 'Roles & Permissions', subtitle: 'Gobernanza operativa del portal' }
 } as const
 
 export const GH_LABELS = {

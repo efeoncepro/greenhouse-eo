@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { EmptyState, ExecutiveCardShell, SectionErrorBoundary } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
@@ -300,16 +300,16 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           </Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
             <MuiLink component={Link} href='/dashboard' color='text.secondary' underline='hover'>
-              {GH_NAV.dashboard.label}
+              {GH_CLIENT_NAV.dashboard.label}
             </MuiLink>
             <MuiLink component={Link} href='/proyectos' color='text.secondary' underline='hover'>
-              {GH_NAV.projects.label}
+              {GH_CLIENT_NAV.projects.label}
             </MuiLink>
             <MuiLink component={Link} href='/sprints' color='text.secondary' underline='hover'>
-              {GH_NAV.sprints.label}
+              {GH_CLIENT_NAV.sprints.label}
             </MuiLink>
             <MuiLink component={Link} href='/settings' color='text.secondary' underline='hover'>
-              {GH_NAV.settings.label}
+              {GH_CLIENT_NAV.settings.label}
             </MuiLink>
           </Stack>
         </Box>

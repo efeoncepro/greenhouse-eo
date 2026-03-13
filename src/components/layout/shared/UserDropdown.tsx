@@ -21,7 +21,7 @@ import Popper from '@mui/material/Popper'
 import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
-import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_INTERNAL_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 const BadgeContentSpan = styled('span')({
@@ -115,36 +115,42 @@ const UserDropdown = () => {
                   <Divider className='mlb-1' />
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
                     <i className='tabler-layout-dashboard' />
-                    <Typography color='text.primary'>{isInternalUser ? GH_NAV.internalDashboard.label : GH_NAV.dashboard.label}</Typography>
+                    <Typography color='text.primary'>
+                      {isInternalUser ? GH_INTERNAL_NAV.internalDashboard.label : GH_CLIENT_NAV.dashboard.label}
+                    </Typography>
                   </MenuItem>
                   {!isInternalUser ? (
                     <>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>
                         <i className='tabler-folders' />
-                        <Typography color='text.primary'>{GH_NAV.projects.label}</Typography>
+                        <Typography color='text.primary'>{GH_CLIENT_NAV.projects.label}</Typography>
+                      </MenuItem>
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/sprints')}>
+                        <i className='tabler-bolt' />
+                        <Typography color='text.primary'>{GH_CLIENT_NAV.sprints.label}</Typography>
                       </MenuItem>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/settings')}>
                         <i className='tabler-settings' />
-                        <Typography color='text.primary'>{GH_NAV.settings.label}</Typography>
+                        <Typography color='text.primary'>{GH_CLIENT_NAV.settings.label}</Typography>
                       </MenuItem>
                     </>
                   ) : null}
                   {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/tenants')}>
                       <i className='tabler-building-community' />
-                      <Typography color='text.primary'>{GH_NAV.adminSpaces.label}</Typography>
+                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminTenants.label}</Typography>
                     </MenuItem>
                   ) : null}
                   {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/users')}>
                       <i className='tabler-shield' />
-                      <Typography color='text.primary'>{GH_NAV.adminUsers.label}</Typography>
+                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminUsers.label}</Typography>
                     </MenuItem>
                   ) : null}
                   {isAdminUser ? (
                     <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin/roles')}>
                       <i className='tabler-shield-lock' />
-                      <Typography color='text.primary'>{GH_NAV.adminRoles.label}</Typography>
+                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminRoles.label}</Typography>
                     </MenuItem>
                   ) : null}
                   <div className='flex items-center plb-2 pli-3'>

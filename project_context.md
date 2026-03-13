@@ -9,17 +9,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Delta 2026-03-13 Branding lock and nav hydration
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
-- La capa `GH_NAV` ya no cubre solo cliente: tambien versiona labels del nav interno/admin para que `VerticalMenu` y `UserDropdown` no vuelvan a hardcodear copy legacy.
+- La capa de nomenclatura ya no debe mezclar portal cliente con internal/admin:
+  - `GH_CLIENT_NAV` queda reservado para la navegacion cliente normada por `Greenhouse_Nomenclatura_Portal_v3.md`
+  - `GH_INTERNAL_NAV` queda como nomenclatura operativa separada para `/internal/**` y `/admin/**`
 - Regla operativa nueva para theming runtime: Greenhouse no debe honrar cookies legacy de `primaryColor`, `skin` o `semiDark` que reintroduzcan branding Vuexy; esas preferencias quedan bloqueadas al baseline Greenhouse y solo se preservan `mode`, `layout` y widths compatibles.
 - `src/@core/utils/brandSettings.ts` y `getSettingsFromCookie()` son ahora el boundary de saneamiento para cookies de settings antes de SSR o hidratacion cliente.
 
 ## Delta 2026-03-13 Greenhouse nomenclature portal
 - Ya existe `src/config/greenhouse-nomenclature.ts` como fuente unica de nomenclatura visible para la capa cliente:
-  - `GH_NAV`
+  - `GH_CLIENT_NAV`
   - `GH_LABELS`
   - `GH_TEAM`
   - `GH_MESSAGES`
   - `GH_COLORS`
+- `src/config/greenhouse-nomenclature.ts` tambien versiona `GH_INTERNAL_NAV`, pero solo como capa operativa para superficies `internal/admin`; no como parte del contrato del portal cliente definido en `Greenhouse_Nomenclatura_Portal_v3.md`.
 - La navegacion cliente y las superficies principales `/login`, `/dashboard`, `/proyectos`, `/sprints` y `/settings` ya empezaron a consumir esa capa centralizada en vez de labels hardcodeados.
 - El rollout ya no es solo copy-level: la marca Efeonce ahora entra por el wiring oficial del starter kit sin crear un theme paralelo:
   - `src/components/theme/mergedTheme.ts`

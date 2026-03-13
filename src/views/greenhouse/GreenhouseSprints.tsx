@@ -6,7 +6,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 const sprintHistory = [
   { label: 'Ciclo 18', velocity: 84, completion: '14/16 assets', status: GH_LABELS.semaphore_green },
@@ -18,7 +18,7 @@ const GreenhouseSprints = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>{GH_NAV.sprints.label}</Typography>
+        <Typography variant='h4'>{GH_CLIENT_NAV.sprints.label}</Typography>
         <Typography color='text.secondary'>{GH_MESSAGES.subtitle_sprints}</Typography>
       </Box>
 

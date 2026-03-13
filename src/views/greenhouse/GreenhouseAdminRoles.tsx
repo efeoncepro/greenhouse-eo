@@ -14,7 +14,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
-import { GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
 type Props = {
   data: AdminAccessOverview
@@ -25,7 +25,7 @@ const GreenhouseAdminRoles = ({ data }: Props) => {
     <Stack spacing={6}>
       <Box>
         <Typography variant='h4' sx={{ mb: 1 }}>
-          {GH_NAV.adminRoles.label}
+          {GH_INTERNAL_NAV.adminRoles.label}
         </Typography>
         <Typography color='text.secondary'>
           Adaptado del patrón visual de Vuexy Roles, pero usando los roles reales de Greenhouse y sus scopes operativos.

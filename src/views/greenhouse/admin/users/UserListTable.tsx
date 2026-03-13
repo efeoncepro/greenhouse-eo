@@ -33,7 +33,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
-import { GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -250,7 +250,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
   return (
     <Card>
       <CardHeader
-        title={GH_NAV.adminUsers.label}
+        title={GH_INTERNAL_NAV.adminUsers.label}
         subheader='Patron Vuexy User Management reinterpretado sobre client_users, roles y scopes reales de Greenhouse.'
       />
       <div className='p-6 border-bs'>

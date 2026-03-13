@@ -15,7 +15,7 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectsData } from '@/types/greenhouse-projects'
 
 const fallbackData: GreenhouseProjectsData = {
@@ -85,7 +85,7 @@ const GreenhouseProjects = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>{GH_NAV.projects.label}</Typography>
+        <Typography variant='h4'>{GH_CLIENT_NAV.projects.label}</Typography>
         <Typography color='text.secondary'>{GH_MESSAGES.subtitle_projects}</Typography>
       </Box>
 

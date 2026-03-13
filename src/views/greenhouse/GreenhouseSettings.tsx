@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 
 import { signIn, useSession } from 'next-auth/react'
 
-import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 const settingsRows = [
   {
@@ -43,7 +43,7 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>{GH_NAV.settings.label}</Typography>
+        <Typography variant='h4'>{GH_CLIENT_NAV.settings.label}</Typography>
         <Typography color='text.secondary'>{GH_MESSAGES.subtitle_settings}</Typography>
       </Box>
 

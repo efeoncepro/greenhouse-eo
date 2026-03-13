@@ -16,7 +16,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
-import { GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
 type Props = {
   data: AdminTenantsOverview
@@ -91,7 +91,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         <CardContent>
           <Stack spacing={3}>
             <Box>
-              <Typography variant='h4'>{GH_NAV.adminSpaces.label}</Typography>
+              <Typography variant='h4'>{GH_INTERNAL_NAV.adminTenants.label}</Typography>
               <Typography color='text.secondary'>
                 Cada fila representa un cliente visible como space. El detalle agrupa usuarios, proyectos visibles, modulos contratados y
                 feature flags activos.

@@ -40,6 +40,49 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 14:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir la interpretacion de `Greenhouse_Nomenclatura_Portal_v3.md` para no mezclar la navegacion cliente del documento con labels de `internal/admin`, y realinear la distribucion del sidebar cliente.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / preview / sidebar cliente / nomenclatura operativa
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjects.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/dashboard/ClientDashboardHero.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseDashboard.tsx src/views/greenhouse/GreenhouseProjects.tsx src/views/greenhouse/GreenhouseSprints.tsx src/views/greenhouse/GreenhouseSettings.tsx src/views/greenhouse/dashboard/ClientDashboardHero.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/GreenhouseAdminRoles.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/components/layout/vertical/FooterContent.tsx src/components/layout/horizontal/FooterContent.tsx src/data/navigation/verticalMenuData.tsx src/data/navigation/horizontalMenuData.tsx`: correcto
+- No se hizo validacion visual autenticada real del sidebar cliente o admin despues de este ajuste.
+
+### Riesgos o pendientes
+- La separacion cliente vs internal/admin ya corrige el boundary conceptual, pero aun falta un barrido route-by-route del microcopy cliente contra el documento completo.
+- La seccion dinamica `Servicios` sigue viva en el sidebar cliente por necesidad de runtime de capabilities; conviene validarla despues contra la arquitectura de navegacion del producto y no solo contra el doc de nomenclatura.
+
 ## 2026-03-13 14:24 America/Santiago
 
 ### Agente

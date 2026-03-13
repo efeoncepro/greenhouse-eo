@@ -7,7 +7,7 @@ import classnames from 'classnames'
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()
@@ -24,16 +24,16 @@ const FooterContent = () => {
       {!isBreakpointReached ? (
         <div className='flex items-center gap-4'>
           <Link href='/dashboard' className='text-primary'>
-            {GH_NAV.dashboard.label}
+            {GH_CLIENT_NAV.dashboard.label}
           </Link>
           <Link href='/proyectos' className='text-primary'>
-            {GH_NAV.projects.label}
+            {GH_CLIENT_NAV.projects.label}
           </Link>
           <Link href='/sprints' className='text-primary'>
-            {GH_NAV.sprints.label}
+            {GH_CLIENT_NAV.sprints.label}
           </Link>
           <Link href='/settings' className='text-primary'>
-            {GH_NAV.settings.label}
+            {GH_CLIENT_NAV.settings.label}
           </Link>
         </div>
       ) : null}
