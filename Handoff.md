@@ -40,6 +40,249 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 14:39 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Subir la barra visual de `Creative Hub` para que la capability no solo cumpla el runtime del documento, sino que reutilice de forma explicita patrones Vuexy de `full-version`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / Creative Hub / visual refactor / smoke autenticado
+
+### Archivos tocados
+- `src/components/capabilities/CapabilityOverviewHero.tsx`
+- `src/components/capabilities/CapabilityCard.tsx`
+- `src/components/card-statistics/HorizontalWithSubtitle.tsx`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/card-statistics/HorizontalWithSubtitle.tsx src/components/capabilities/CapabilityOverviewHero.tsx src/components/capabilities/CapabilityCard.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- `Creative Hub` ya usa de forma activa patrones visuales adaptados de `full-version`, pero solo este modulo quedo llevado a esa barra; el resto de capabilities aun usan el dispatcher declarativo con visuales mas sobrios.
+- `HorizontalWithSubtitle` ahora admite ocultar trend cuando no existe una delta real; si otro agente lo reutiliza, esa flexibilidad ya es parte del contrato del componente.
+- `next build` sigue mostrando el mensaje de reconfiguracion de `tsconfig.json`; en este turno no dejo basura porque el archivo se limpio antes de cerrar.
+
+## 2026-03-13 11:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Consolidar `Creative Hub` como el primer modulo enriquecido del runtime declarativo de capabilities y ampliar el card catalog real sin romper los otros modules.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / Creative Hub / smoke autenticado
+
+### Archivos tocados
+- `src/types/capabilities.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capability-queries/helpers.ts`
+- `src/lib/capability-queries/creative-hub.ts`
+- `src/lib/capability-queries/crm-command-center.ts`
+- `src/lib/capability-queries/onboarding-center.ts`
+- `src/lib/capability-queries/web-delivery-lab.ts`
+- `src/components/capabilities/CapabilityCard.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `tsconfig.json`
+
+### Verificacion
+- `npx pnpm exec eslint src/types/capabilities.ts src/config/capability-registry.ts src/lib/capability-queries/helpers.ts src/lib/capability-queries/creative-hub.ts src/lib/capability-queries/crm-command-center.ts src/lib/capability-queries/onboarding-center.ts src/lib/capability-queries/web-delivery-lab.ts src/components/capabilities/CapabilityCard.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- `Creative Hub` ya usa `cardData` propio y dos card types nuevos (`metric-list`, `chart-bar`), pero el catalogo del documento completo aun es mayor y sigue siendo backlog.
+- `next build` sigue reinyectando includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes de cerrar este turno.
+- El siguiente bloque natural, si se sigue expandiendo capabilities, es extraer otro modulo real sobre el mismo patron declarativo enriquecido, probablemente `CRM Command` o un modulo nuevo del documento.
+
+## 2026-03-13 09:11 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cubrir la parte literal restante del documento en frontend: `CapabilityCard` dispatcher y `ModuleLayout` declarativo guiado por `data.module.cards`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / frontend declarativo / smoke autenticado
+
+### Archivos tocados
+- `src/components/capabilities/CapabilityCard.tsx`
+- `src/components/capabilities/ModuleLayout.tsx`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `tsconfig.json`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/capabilities/CapabilityCard.tsx src/components/capabilities/ModuleLayout.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- El dispatcher declarativo cubre los card types reales del registry actual (`metric`, `project-list`, `tooling-list`, `quality-list`), no aun el catalogo amplio completo del documento.
+- `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes del commit.
+- Los modulos futuros y pipelines nuevas del documento siguen siendo backlog, no deuda de esta iteracion.
+
+## 2026-03-13 08:39 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar la siguiente capa pendiente de `Greenhouse_Capabilities_Architecture_v1.md`: query builders dedicados, cache por capability y guard server-side reusable, dejando el flujo validado y publicado.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / BigQuery / smoke autenticado / build local
+
+### Archivos tocados
+- `src/config/capability-registry.ts`
+- `src/types/capabilities.ts`
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/lib/capabilities/module-content-builders.ts`
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/lib/capabilities/verify-module-access.ts`
+- `src/lib/capability-queries/*`
+- `src/app/api/capabilities/[moduleId]/data/route.ts`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `scripts/mint-local-admin-jwt.js`
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre la nueva capa de capabilities: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+- `node .\\scripts\\mint-local-admin-jwt.js`: correcto
+
+### Riesgos o pendientes
+- La UI de capabilities sigue siendo una composicion ejecutiva compartida; el avance de este turno separa la data layer y el guard, pero no implementa aun el dispatcher completo de card types propuesto por la spec.
+- `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; el workaround operativo sigue siendo limpiar esos paths autogenerados antes de commitear.
+- El documento original menciona modulos futuros como `Review Engine`, `Performance Center` o `SEO Monitor`; esos siguen fuera del scope activo y requeriran nuevas pipelines de datos.
+
+## 2026-03-13 07:21 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar la validacion pendiente de `Greenhouse_Capabilities_Architecture_v1.md` con preview admin autenticada, smoke local real y estabilizacion de la verificacion TypeScript en este worktree.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / admin preview / capability runtime / smoke local autenticado
+
+### Archivos tocados
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/lib/capabilities/module-content-builders.ts`
+- `src/types/capabilities.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantCapabilityPreview.tsx`
+- `src/app/(dashboard)/admin/tenants/[id]/capability-preview/[moduleId]/page.tsx`
+- `scripts/mint-local-admin-jwt.js`
+- `scripts/run-capability-preview-smoke.ps1`
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `gcloud auth login --update-adc`: correcto
+- `gcloud auth application-default print-access-token`: correcto
+- `npx pnpm exec eslint ...` sobre archivos de capabilities y preview admin: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1 -SkipScreenshots`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+- Smoke validado sobre:
+  - `/admin/tenants/space-efeonce/view-as/dashboard`
+  - `/admin/tenants/space-efeonce/capability-preview/creative-hub`
+
+### Riesgos o pendientes
+- El documento original sigue proponiendo query builders dedicados por module; hoy la data de cada capability sigue montada sobre el contrato de `/dashboard` con builders editoriales separados.
+- La ruta preview admin se movio a `capability-preview` porque el nesting anterior bajo `view-as/capabilities` provocaba corrupcion de route types en Next 16 durante typegen.
+- `tsconfig.json` deja fuera validators historicos de `.next-local/build-*`; la intencion es estabilizar la verificacion del repo actual y no compilar caches de ramas antiguas.
+
+## 2026-03-13 00:54 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `Greenhouse_Capabilities_Architecture_v1.md` sobre la arquitectura real del repo, alineando capabilities con `businessLines` y `serviceModules` ya resueltos en sesion y no con el modelo legacy de `greenhouse.clients`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / client portal / navegacion dinamica / capabilities runtime
+
+### Archivos tocados
+- `src/types/capabilities.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `src/app/api/capabilities/resolve/route.ts`
+- `src/app/api/capabilities/[moduleId]/data/route.ts`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `src/app/(dashboard)/capabilities/[moduleId]/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre los archivos tocados de capabilities y `VerticalMenu`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: timeout en este worktree
+- `npx pnpm build`: timeout en este worktree
+
+### Riesgos o pendientes
+- La capa nueva ejecuta la spec usando el runtime vigente (`client_users` + `client_service_modules` + tenant session) y no el JOIN legacy sugerido por el documento original; esa diferencia queda intencional.
+- La data de `/capabilities/[moduleId]` reutiliza el payload del dashboard actual; aun no existen query builders dedicados por module ni cache dedicada.
+- Conviene hacer smoke visual autenticado del sidebar dinamico y al menos un module route real (`/capabilities/creative-hub` o equivalente) antes de promover cambios mayores sobre esta linea.
+
 ## 2026-03-13 01:40 America/Santiago
 
 ### Agente

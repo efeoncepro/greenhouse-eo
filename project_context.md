@@ -3,6 +3,50 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Capabilities runtime foundation
+- La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
+- El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.
+- Se agregaron:
+  - `GET /api/capabilities/resolve`
+  - `GET /api/capabilities/[moduleId]/data`
+  - `/capabilities/[moduleId]`
+- El sidebar vertical ahora incorpora una seccion dinamica `Servicios` cuando el tenant cliente tiene modules activos en el registry.
+- La primera implementacion incluye registry versionado para:
+  - `creative-hub`
+  - `crm-command-center`
+  - `onboarding-center`
+  - `web-delivery-lab`
+- La data inicial de cada modulo reutiliza el contrato real de `/dashboard` para entregar una lectura ejecutiva coherente mientras los query builders dedicados siguen siendo una fase posterior.
+- El admin ahora tiene una vista de validacion autenticada para modules en `/admin/tenants/[id]/capability-preview/[moduleId]`, separada del `view-as/dashboard`.
+- La preview admin usa fallback controlado al registry para inspeccionar modules del tenant aunque la resolucion cliente estricta siga dependiendo de `businessLines` y `serviceModules`.
+- El smoke operativo de capabilities queda automatizado en `scripts/run-capability-preview-smoke.ps1`, con JWT admin local y capturas Playwright sobre:
+  - `/admin/tenants/space-efeonce/view-as/dashboard`
+  - `/admin/tenants/space-efeonce/capability-preview/creative-hub`
+- `tsconfig.json` ya no incluye validators historicos de `.next-local/build-*`; solo conserva tipos `dev` para evitar que caches viejos rompan `tsc`.
+- La capa ahora ya no reutiliza `getDashboardOverview()` para `/capabilities/[moduleId]`; existe `src/lib/capability-queries/*` con query builders dedicados por modulo y snapshot BigQuery cacheada con `unstable_cache`.
+- Se agrego `verifyCapabilityModuleAccess()` para centralizar el guard server-side y distinguir `404` de `403` en `/api/capabilities/[moduleId]/data`.
+- El registry de capabilities ahora declara `dataSources` por modulo para dejar trazabilidad explicita entre cada surface y sus tablas BigQuery reales.
+- `/capabilities/[moduleId]` ya no depende de una composicion hardcodeada; el route renderiza `data.module.cards` via `src/components/capabilities/CapabilityCard.tsx` y `src/components/capabilities/ModuleLayout.tsx`.
+- El dispatcher declarativo actual ya no consume arrays globales de modulo; cada tarjeta usa `cardData` por `card.id`, dejando el runtime listo para ampliar el catalogo sin romper los modulos existentes.
+- `Creative Hub` ya quedo consolidado como primer modulo mas rico del sistema declarativo, con:
+  - `creative-metrics`
+  - `creative-review-pipeline`
+  - `creative-review-hotspots`
+  - `creative-projects`
+  - `creative-quality`
+- La consolidacion visual de `Creative Hub` ya quedo alineada explicitamente con patrones de `full-version` en vez de una composicion ad hoc:
+  - hero adaptado desde la logica de `WebsiteAnalyticsSlider`
+  - KPI cards sobre `HorizontalWithSubtitle`
+  - quality card compacta tipo `SupportTracker`
+  - listas ejecutivas con jerarquia tipo `SourceVisits`
+- El dispatcher declarativo actual cubre los card types reales del registry vigente:
+  - `metric`
+  - `project-list`
+  - `tooling-list`
+  - `quality-list`
+  - `metric-list`
+  - `chart-bar`
+
 ## Delta 2026-03-12 Internal Control Tower Redesign
 - `/internal/dashboard` dejo de ser un hero estatico con lista plana de tenants y ahora funciona como `Control Tower` operativo para el equipo interno Efeonce.
 - La landing interna ahora usa:
@@ -194,6 +238,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 
 ## Estado de Rutas
 - Existe `/dashboard`
+- Existe `/capabilities/[moduleId]`
 - Existe `/proyectos`
 - Existe `/proyectos/[id]`
 - Existe `/sprints`
@@ -254,6 +299,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ya existe una capa multi-user real separada de tenants.
 - La sincronizacion externa de capabilities debe venir por payload explicito desde una fuente canonica de empresa; no debe inferirse automaticamente desde `deals`.
 - El runtime de auth y `getTenantContext()` ya exponen `businessLines` y `serviceModules`.
+- La spec de capabilities ya no queda solo en documento: existe un registry runtime y una ruta generica `/capabilities/[moduleId]` alimentada por el tenant context actual.
 - `/admin/tenants/[id]` ya no solo muestra business lines y service modules: ahora tambien dispone de un editor de capabilities y rutas API para guardar seleccion manual o sincronizar desde fuentes externas.
 - `/admin/tenants/[id]` ahora tambien consulta un servicio HubSpot dedicado para leer `company profile` y `owner` bajo demanda, sin esperar a BigQuery.
 - `/admin/tenants/[id]` ahora tambien consulta los `contacts` asociados a la `company` en HubSpot para comparar miembros CRM contra los usuarios ya provisionados en Greenhouse.
@@ -267,7 +313,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
 - Aun no existe una capa semantica de KPIs y marts para dashboard, team, capacity y campaigns.
 - Ya existen rutas minimas de Efeonce interno y admin, y el modulo admin ya tiene tenants, lista de usuarios, roles y detalle de usuario; falta mutacion segura de scopes y feature flags.
-- Falta extender `serviceModules` a navegacion y billing por servicio contratado; el dashboard ya los consume para composicion de narrativa y cards.
+- `serviceModules` ya extienden la navegacion cliente a traves de la seccion dinamica `Servicios`; sigue pendiente extenderlos a billing por servicio contratado.
 - Para Sky Airline ya existe un diagnostico formal de factibilidad:
 - `on-time` mensual, tenure y entregables/ajustes por mes ya quedaron implementados con la data actual
 - ya existen en `/dashboard` secciones reusables de quality, account team, capacity inicial, herramientas tecnologicas y AI tools

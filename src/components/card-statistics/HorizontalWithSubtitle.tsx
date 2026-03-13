@@ -18,8 +18,8 @@ export type HorizontalWithSubtitleData = {
   stats: string
   avatarIcon: string
   avatarColor?: ThemeColor
-  trend: 'positive' | 'negative' | 'neutral'
-  trendNumber: string
+  trend?: 'positive' | 'negative' | 'neutral'
+  trendNumber?: string
   subtitle: string
   titleTooltip?: string
   footer?: string
@@ -58,6 +58,8 @@ const HorizontalWithSubtitle = (props: HorizontalWithSubtitleData) => {
     statusIcon
   } = props
 
+  const hasTrend = Boolean(trend && trendNumber)
+
   return (
     <Card>
       <CardContent className='flex flex-col gap-3'>
@@ -75,7 +77,7 @@ const HorizontalWithSubtitle = (props: HorizontalWithSubtitleData) => {
             </Stack>
             <div className='flex items-center gap-2 flex-wrap'>
               <Typography variant='h4'>{stats}</Typography>
-              <Typography color={getTrendColor(trend)}>{`(${getTrendPrefix(trend)}${trendNumber})`}</Typography>
+              {hasTrend ? <Typography color={getTrendColor(trend)}>{`(${getTrendPrefix(trend)}${trendNumber})`}</Typography> : null}
             </div>
             <Typography variant='body2'>{subtitle}</Typography>
           </div>
