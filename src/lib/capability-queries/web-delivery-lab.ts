@@ -3,6 +3,7 @@ import 'server-only'
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
   buildCapabilityScope,
+  buildBaseCapabilityCardData,
   buildProjectItemsForLens,
   buildQualityItems,
   buildToolItems
@@ -18,12 +19,24 @@ export const getWebDeliveryLabQuery: CapabilityQueryBuilder = async viewer => {
     return null
   }
 
+  const projects = buildProjectItemsForLens(snapshot, 'web')
+  const tools = buildToolItems(snapshot)
+  const quality = buildQualityItems(snapshot)
+
   return {
     hero: content.hero,
     metrics: content.metrics,
-    projects: buildProjectItemsForLens(snapshot, 'web'),
-    tools: buildToolItems(snapshot),
-    quality: buildQualityItems(snapshot),
+    projects,
+    tools,
+    quality,
+    cardData: buildBaseCapabilityCardData({
+      metricCardId: 'web-metrics',
+      metrics: content.metrics,
+      projectCardId: 'web-projects',
+      projects,
+      toolingCardId: 'web-tooling',
+      tools
+    }),
     scope: buildCapabilityScope(snapshot)
   }
 }

@@ -3,6 +3,7 @@ import 'server-only'
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
   buildCapabilityScope,
+  buildCreativeHubCardData,
   buildProjectItemsForLens,
   buildQualityItems,
   buildToolItems
@@ -18,12 +19,22 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
     return null
   }
 
+  const projects = buildProjectItemsForLens(snapshot, 'creative')
+  const tools = buildToolItems(snapshot)
+  const quality = buildQualityItems(snapshot)
+
   return {
     hero: content.hero,
     metrics: content.metrics,
-    projects: buildProjectItemsForLens(snapshot, 'creative'),
-    tools: buildToolItems(snapshot),
-    quality: buildQualityItems(snapshot),
+    projects,
+    tools,
+    quality,
+    cardData: buildCreativeHubCardData({
+      snapshot,
+      metrics: content.metrics,
+      projects,
+      quality
+    }),
     scope: buildCapabilityScope(snapshot)
   }
 }

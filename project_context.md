@@ -27,11 +27,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Se agrego `verifyCapabilityModuleAccess()` para centralizar el guard server-side y distinguir `404` de `403` en `/api/capabilities/[moduleId]/data`.
 - El registry de capabilities ahora declara `dataSources` por modulo para dejar trazabilidad explicita entre cada surface y sus tablas BigQuery reales.
 - `/capabilities/[moduleId]` ya no depende de una composicion hardcodeada; el route renderiza `data.module.cards` via `src/components/capabilities/CapabilityCard.tsx` y `src/components/capabilities/ModuleLayout.tsx`.
+- El dispatcher declarativo actual ya no consume arrays globales de modulo; cada tarjeta usa `cardData` por `card.id`, dejando el runtime listo para ampliar el catalogo sin romper los modulos existentes.
+- `Creative Hub` ya quedo consolidado como primer modulo mas rico del sistema declarativo, con:
+  - `creative-metrics`
+  - `creative-review-pipeline`
+  - `creative-review-hotspots`
+  - `creative-projects`
+  - `creative-quality`
 - El dispatcher declarativo actual cubre los card types reales del registry vigente:
   - `metric`
   - `project-list`
   - `tooling-list`
   - `quality-list`
+  - `metric-list`
+  - `chart-bar`
 
 ## Delta 2026-03-12 Internal Control Tower Redesign
 - `/internal/dashboard` dejo de ser un hero estatico con lista plana de tenants y ahora funciona como `Control Tower` operativo para el equipo interno Efeonce.

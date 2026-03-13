@@ -47,6 +47,20 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         description: 'Cadencia, revision abierta y calidad visible del flujo creativo.'
       },
       {
+        id: 'creative-review-pipeline',
+        title: 'Review pipeline',
+        type: 'metric-list',
+        size: 'md',
+        description: 'Donde se concentra hoy la presion de revision dentro del flujo creativo.'
+      },
+      {
+        id: 'creative-review-hotspots',
+        title: 'Review hotspots',
+        type: 'chart-bar',
+        size: 'lg',
+        description: 'Proyectos con mayor presion combinada de revision y comentarios abiertos.'
+      },
+      {
         id: 'creative-projects',
         title: 'Projects in focus',
         type: 'project-list',

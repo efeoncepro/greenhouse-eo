@@ -3,6 +3,7 @@ import 'server-only'
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
   buildCapabilityScope,
+  buildBaseCapabilityCardData,
   buildProjectItemsForLens,
   buildQualityItems,
   buildToolItems
@@ -18,12 +19,24 @@ export const getCrmCommandCenterQuery: CapabilityQueryBuilder = async viewer => 
     return null
   }
 
+  const projects = buildProjectItemsForLens(snapshot, 'crm')
+  const tools = buildToolItems(snapshot)
+  const quality = buildQualityItems(snapshot)
+
   return {
     hero: content.hero,
     metrics: content.metrics,
-    projects: buildProjectItemsForLens(snapshot, 'crm'),
-    tools: buildToolItems(snapshot),
-    quality: buildQualityItems(snapshot),
+    projects,
+    tools,
+    quality,
+    cardData: buildBaseCapabilityCardData({
+      metricCardId: 'crm-metrics',
+      metrics: content.metrics,
+      projectCardId: 'crm-projects',
+      projects,
+      toolingCardId: 'crm-tooling',
+      tools
+    }),
     scope: buildCapabilityScope(snapshot)
   }
 }

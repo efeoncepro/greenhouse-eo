@@ -40,6 +40,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 11:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Consolidar `Creative Hub` como el primer modulo enriquecido del runtime declarativo de capabilities y ampliar el card catalog real sin romper los otros modules.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / Creative Hub / smoke autenticado
+
+### Archivos tocados
+- `src/types/capabilities.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capability-queries/helpers.ts`
+- `src/lib/capability-queries/creative-hub.ts`
+- `src/lib/capability-queries/crm-command-center.ts`
+- `src/lib/capability-queries/onboarding-center.ts`
+- `src/lib/capability-queries/web-delivery-lab.ts`
+- `src/components/capabilities/CapabilityCard.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `tsconfig.json`
+
+### Verificacion
+- `npx pnpm exec eslint src/types/capabilities.ts src/config/capability-registry.ts src/lib/capability-queries/helpers.ts src/lib/capability-queries/creative-hub.ts src/lib/capability-queries/crm-command-center.ts src/lib/capability-queries/onboarding-center.ts src/lib/capability-queries/web-delivery-lab.ts src/components/capabilities/CapabilityCard.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- `Creative Hub` ya usa `cardData` propio y dos card types nuevos (`metric-list`, `chart-bar`), pero el catalogo del documento completo aun es mayor y sigue siendo backlog.
+- `next build` sigue reinyectando includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes de cerrar este turno.
+- El siguiente bloque natural, si se sigue expandiendo capabilities, es extraer otro modulo real sobre el mismo patron declarativo enriquecido, probablemente `CRM Command` o un modulo nuevo del documento.
+
 ## 2026-03-13 09:11 America/Santiago
 
 ### Agente

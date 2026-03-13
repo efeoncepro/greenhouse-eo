@@ -1,7 +1,7 @@
 import type { GreenhouseKpiTone } from '@/types/greenhouse-dashboard'
 
 export type CapabilityModuleTheme = 'creative' | 'crm' | 'onboarding' | 'web'
-export type CapabilityModuleCardType = 'metric' | 'project-list' | 'tooling-list' | 'quality-list'
+export type CapabilityModuleCardType = 'metric' | 'project-list' | 'tooling-list' | 'quality-list' | 'metric-list' | 'chart-bar'
 export type CapabilityModuleCardSize = 'sm' | 'md' | 'lg' | 'full'
 
 export interface CapabilityDataSourceRef {
@@ -82,6 +82,35 @@ export interface CapabilityQualityItem {
   firstTimeRight: string
 }
 
+export interface CapabilityMetricListItem {
+  label: string
+  value: string
+  detail: string
+}
+
+export interface CapabilityBarChartSeries {
+  name: string
+  data: number[]
+}
+
+export interface CapabilityBarChartData {
+  categories: string[]
+  series: CapabilityBarChartSeries[]
+  summaryLabel: string
+  summaryValue: string
+  summaryDetail: string
+  totalLabel: string
+  totalValue: string
+}
+
+export type CapabilityCardData =
+  | { type: 'metric'; metrics: CapabilityMetric[] }
+  | { type: 'project-list'; items: CapabilityProjectItem[] }
+  | { type: 'tooling-list'; items: CapabilityToolItem[] }
+  | { type: 'quality-list'; items: CapabilityQualityItem[] }
+  | { type: 'metric-list'; items: CapabilityMetricListItem[] }
+  | { type: 'chart-bar'; chart: CapabilityBarChartData }
+
 export interface CapabilityModuleData {
   module: ResolvedCapabilityModule
   hero: CapabilityHeroSummary
@@ -89,6 +118,7 @@ export interface CapabilityModuleData {
   projects: CapabilityProjectItem[]
   tools: CapabilityToolItem[]
   quality: CapabilityQualityItem[]
+  cardData: Record<string, CapabilityCardData>
   scope: {
     projectCount: number
     businessLines: string[]

@@ -3,6 +3,7 @@ import 'server-only'
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
   buildCapabilityScope,
+  buildBaseCapabilityCardData,
   buildProjectItemsForLens,
   buildQualityItems,
   buildToolItems
@@ -18,12 +19,24 @@ export const getOnboardingCenterQuery: CapabilityQueryBuilder = async viewer => 
     return null
   }
 
+  const projects = buildProjectItemsForLens(snapshot, 'onboarding')
+  const tools = buildToolItems(snapshot)
+  const quality = buildQualityItems(snapshot)
+
   return {
     hero: content.hero,
     metrics: content.metrics,
-    projects: buildProjectItemsForLens(snapshot, 'onboarding'),
-    tools: buildToolItems(snapshot),
-    quality: buildQualityItems(snapshot),
+    projects,
+    tools,
+    quality,
+    cardData: buildBaseCapabilityCardData({
+      metricCardId: 'onboarding-metrics',
+      metrics: content.metrics,
+      projectCardId: 'onboarding-projects',
+      projects,
+      qualityCardId: 'onboarding-quality',
+      quality
+    }),
     scope: buildCapabilityScope(snapshot)
   }
 }
