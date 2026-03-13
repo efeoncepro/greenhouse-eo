@@ -4,9 +4,9 @@ export const GH_NAV = {
   sprints: { label: 'Ciclos', subtitle: 'Sprints de produccion' },
   settings: { label: 'Mi Greenhouse', subtitle: 'Perfil y preferencias' },
   internalDashboard: { label: 'Control Tower', subtitle: 'Operacion interna de spaces' },
-  adminSpaces: { label: 'Admin Spaces', subtitle: 'Spaces, acceso y modulos' },
-  adminUsers: { label: 'Admin Users', subtitle: 'Usuarios, scopes y acceso' },
-  adminRoles: { label: 'Roles & Permissions', subtitle: 'Gobernanza del portal' },
+  adminSpaces: { label: 'Spaces', subtitle: 'Acceso, modulos y gobierno del portal' },
+  adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
+  adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza del portal' },
   updates: { label: 'Updates', subtitle: 'Novedades del ecosistema' }
 } as const
 
@@ -194,12 +194,15 @@ export const GH_MESSAGES = {
     'Revisa como esta vinculada tu identidad de acceso dentro de Greenhouse.',
   settings_preferences_title: 'Preferences',
   settings_preferences_subtitle: 'Ajusta tus preferencias de visibilidad del servicio.',
-  settings_digest_title: 'Weekly client digest',
-  settings_digest_description: 'Send a concise Friday summary of cycle status, review pressure, and unresolved feedback.',
-  settings_alerts_title: 'Comment escalation alerts',
-  settings_alerts_description: 'Highlight when unresolved feedback crosses the threshold agreed with your account team.',
-  settings_risk_title: 'Delivery health score',
-  settings_risk_description: 'Expose an executive-friendly score that blends throughput, review rounds, and overdue work.',
+  settings_digest_title: 'Resumen semanal del cliente',
+  settings_digest_description:
+    'Recibe cada viernes un resumen breve del status del ciclo, la presion de revision y el feedback pendiente.',
+  settings_alerts_title: 'Alertas de escalamiento de feedback',
+  settings_alerts_description:
+    'Marca cuando el feedback sin resolver supera el umbral acordado con tu equipo de cuenta.',
+  settings_risk_title: 'Indicador de salud de delivery',
+  settings_risk_description:
+    'Muestra un indicador ejecutivo que combina throughput, rondas de revision y trabajo vencido.',
   settings_account_linked: 'Cuenta vinculada',
   settings_account_unlinked: 'Sin vinculo Microsoft',
   settings_verified: 'Verificado',

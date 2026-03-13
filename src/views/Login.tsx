@@ -6,11 +6,9 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
-import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
-import Paper from '@mui/material/Paper'
-import { alpha, styled } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -26,78 +24,60 @@ import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
+import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
-import { GH_COLORS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
-const VisualPanel = styled('div')(({ theme }) => ({
-  position: 'relative',
-  display: 'flex',
-  minHeight: '100dvh',
-  alignItems: 'center',
-  overflow: 'hidden',
-  padding: theme.spacing(8),
-  background:
-    'radial-gradient(circle at 18% 18%, rgba(3, 117, 219, 0.22), transparent 34%), linear-gradient(155deg, #022A4E 0%, #023C70 44%, #024C8F 100%)'
+const LoginIllustration = styled('img')(({ theme }) => ({
+  zIndex: 2,
+  blockSize: 'auto',
+  maxBlockSize: 680,
+  maxInlineSize: '100%',
+  margin: theme.spacing(12),
+  [theme.breakpoints.down(1536)]: {
+    maxBlockSize: 550
+  },
+  [theme.breakpoints.down('lg')]: {
+    maxBlockSize: 450
+  }
 }))
 
-const VisualOrb = styled('div')({
+const MaskImg = styled('img')({
+  blockSize: 'auto',
+  maxBlockSize: 355,
+  inlineSize: '100%',
   position: 'absolute',
-  borderRadius: '999px',
-  filter: 'blur(0px)',
-  opacity: 0.9
+  insetBlockEnd: 0,
+  zIndex: -1
 })
 
-const StoryCard = styled(Paper)(({ theme }) => ({
-  position: 'relative',
-  overflow: 'hidden',
-  borderRadius: 24,
-  padding: theme.spacing(3),
-  backdropFilter: 'blur(18px)',
-  backgroundColor: alpha('#FFFFFF', 0.1),
-  border: `1px solid ${alpha('#FFFFFF', 0.14)}`,
-  boxShadow: '0 24px 60px rgba(1, 42, 78, 0.28)'
-}))
-
-const AccentDot = styled('span')<{ color: string }>(({ color }) => ({
-  display: 'inline-block',
-  inlineSize: 10,
-  blockSize: 10,
-  borderRadius: 999,
-  backgroundColor: color
-}))
-
-const visualCards = [
-  {
-    eyebrow: 'Pulse',
-    title: 'Control Tower',
-    description: 'Actividad, onboarding y focos de riesgo visibles desde el primer acceso.',
-    color: GH_COLORS.role.development.source
-  },
-  {
-    eyebrow: 'Proyectos',
-    title: 'Operacion viva',
-    description: 'Status, avance y dependencias de cada frente creativo en un solo espacio.',
-    color: GH_COLORS.role.media.source
-  },
-  {
-    eyebrow: 'Mi Greenhouse',
-    title: 'Acceso ordenado',
-    description: 'Identidad, preferencias y contexto de cuenta sin bloques demo de Vuexy.',
-    color: GH_COLORS.role.design.source
-  }
-]
-
-const navHighlights = [GH_NAV.dashboard.label, GH_NAV.projects.label, GH_NAV.sprints.label, GH_NAV.settings.label]
-
-const LoginV2 = ({ hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAuth: boolean }) => {
+const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAuth: boolean }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const darkImg = '/images/pages/auth-mask-dark.png'
+  const lightImg = '/images/pages/auth-mask-light.png'
+  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
+  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
+  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
+  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
+
   const router = useRouter()
   const { settings } = useSettings()
+  const theme = useTheme()
+  const hidden = useMediaQuery(theme.breakpoints.down('md'))
+  const authBackground = useImageVariant(mode, lightImg, darkImg)
+
+  const characterIllustration = useImageVariant(
+    mode,
+    lightIllustration,
+    darkIllustration,
+    borderedLightIllustration,
+    borderedDarkIllustration
+  )
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
@@ -134,104 +114,23 @@ const LoginV2 = ({ hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAuth: boo
 
   return (
     <div className='flex bs-full justify-center'>
-      <VisualPanel
-        className={classnames('flex-1 max-md:hidden', {
-          'border-ie': settings.skin === 'bordered'
-        })}
+      <div
+        className={classnames(
+          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
+          {
+            'border-ie': settings.skin === 'bordered'
+          }
+        )}
       >
-        <VisualOrb
-          style={{
-            insetInlineStart: '-8%',
-            insetBlockStart: '12%',
-            inlineSize: 220,
-            blockSize: 220,
-            background: alpha(GH_COLORS.role.development.source, 0.3)
-          }}
-        />
-        <VisualOrb
-          style={{
-            insetInlineEnd: '-4%',
-            insetBlockEnd: '8%',
-            inlineSize: 300,
-            blockSize: 300,
-            background: alpha(GH_COLORS.role.media.source, 0.18)
-          }}
-        />
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 1,
-            display: 'flex',
-            width: '100%',
-            maxWidth: 720,
-            flexDirection: 'column',
-            gap: 5,
-            color: '#fff'
-          }}
-        >
-          <Box
-            component='img'
-            src='/branding/logo-negative.svg'
-            alt='Greenhouse'
-            sx={{ width: 220, height: 'auto' }}
+        <LoginIllustration src={characterIllustration} alt='portal-illustration' />
+        {!hidden && (
+          <MaskImg
+            alt='mask'
+            src={authBackground}
+            className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
           />
-          <Stack spacing={2.5}>
-            <Typography
-              variant='overline'
-              sx={{ color: alpha('#fff', 0.7), letterSpacing: '0.18em', fontWeight: 700 }}
-            >
-              GREENHOUSE PORTAL
-            </Typography>
-            <Typography variant='h2' sx={{ color: '#fff', maxWidth: 560 }}>
-              Visibilidad real de tu operacion creativa desde el primer acceso.
-            </Typography>
-            <Typography sx={{ maxWidth: 560, color: alpha('#fff', 0.82), fontSize: '1.05rem' }}>
-              Greenhouse reemplaza el bloque demo de Vuexy por un punto de entrada alineado al lenguaje Efeonce:
-              control de la cuenta, progreso operativo y acceso ordenado por space.
-            </Typography>
-          </Stack>
-          <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap>
-            {navHighlights.map(label => (
-              <Chip
-                key={label}
-                label={label}
-                sx={{
-                  height: 36,
-                  borderRadius: 999,
-                  bgcolor: alpha('#fff', 0.12),
-                  color: '#fff',
-                  fontWeight: 600,
-                  border: `1px solid ${alpha('#fff', 0.18)}`
-                }}
-              />
-            ))}
-          </Stack>
-          <Box
-            sx={{
-              display: 'grid',
-              gap: 2,
-              gridTemplateColumns: { xl: 'repeat(3, minmax(0, 1fr))', md: 'repeat(2, minmax(0, 1fr))' }
-            }}
-          >
-            {visualCards.map(card => (
-              <StoryCard key={card.title} elevation={0}>
-                <Stack spacing={2}>
-                  <Stack direction='row' alignItems='center' spacing={1.25}>
-                    <AccentDot color={card.color} />
-                    <Typography sx={{ color: alpha('#fff', 0.7), fontWeight: 700, letterSpacing: '0.08em' }}>
-                      {card.eyebrow}
-                    </Typography>
-                  </Stack>
-                  <Typography variant='h5' sx={{ color: '#fff' }}>
-                    {card.title}
-                  </Typography>
-                  <Typography sx={{ color: alpha('#fff', 0.78) }}>{card.description}</Typography>
-                </Stack>
-              </StoryCard>
-            ))}
-          </Box>
-        </Box>
-      </VisualPanel>
+        )}
+      </div>
       <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
         <Link className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
           <Logo />

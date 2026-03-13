@@ -33,6 +33,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
+import { GH_NAV } from '@/config/greenhouse-nomenclature'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -41,7 +42,7 @@ import { formatDateTime, roleColorFor, roleIconFor, statusTone, tenantTone, toTi
 const columnHelper = createColumnHelper<AdminUserRow>()
 
 const exportToCsv = (rows: AdminUserRow[]) => {
-  const headers = ['Nombre', 'Email', 'Cliente', 'Tenant', 'Estado', 'Auth', 'Roles', 'Route groups', 'Home', 'Ultimo login']
+  const headers = ['Nombre', 'Email', 'Cliente', 'Space', 'Estado', 'Acceso', 'Roles', 'Grupos de ruta', 'Home', 'Ultimo login']
 
   const lines = rows.map(row =>
     [
@@ -120,7 +121,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
         enableSorting: false
       },
       columnHelper.accessor('fullName', {
-        header: 'User',
+        header: 'Usuario',
         cell: ({ row }) => {
           const avatarSrc = resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
 
@@ -141,7 +142,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       }),
       columnHelper.display({
         id: 'role',
-        header: 'Role',
+        header: 'Rol',
         cell: ({ row }) => {
           const primaryRole = row.original.roleCodes[0]
 
@@ -163,7 +164,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
         }
       }),
       columnHelper.accessor('clientName', {
-        header: 'Tenant',
+        header: 'Space',
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color='text.primary'>{row.original.clientName}</Typography>
@@ -173,7 +174,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       }),
       columnHelper.display({
         id: 'access',
-        header: 'Access',
+        header: 'Acceso',
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <div className='flex items-center gap-2 flex-wrap'>
@@ -194,7 +195,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       }),
       columnHelper.display({
         id: 'action',
-        header: 'Action',
+        header: 'Acciones',
         enableSorting: false,
         cell: ({ row }) => (
           <div className='flex items-center gap-1'>
@@ -249,29 +250,29 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
   return (
     <Card>
       <CardHeader
-        title='Admin Users'
+        title={GH_NAV.adminUsers.label}
         subheader='Patron Vuexy User Management reinterpretado sobre client_users, roles y scopes reales de Greenhouse.'
       />
       <div className='p-6 border-bs'>
         <Typography variant='h6' className='mbe-4'>
-          Filters
+          Filtros
         </Typography>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <CustomTextField select fullWidth value={roleFilter} onChange={event => setRoleFilter(event.target.value)} label='Select Role'>
-            <MenuItem value='all'>All roles</MenuItem>
+          <CustomTextField select fullWidth value={roleFilter} onChange={event => setRoleFilter(event.target.value)} label='Filtrar rol'>
+            <MenuItem value='all'>Todos los roles</MenuItem>
             {roleOptions.map(roleCode => (
               <MenuItem key={roleCode} value={roleCode}>
                 {toTitleCase(roleCode)}
               </MenuItem>
             ))}
           </CustomTextField>
-          <CustomTextField select fullWidth value={tenantFilter} onChange={event => setTenantFilter(event.target.value)} label='Select Tenant'>
-            <MenuItem value='all'>All tenants</MenuItem>
-            <MenuItem value='client'>Client</MenuItem>
-            <MenuItem value='efeonce_internal'>Efeonce Internal</MenuItem>
+          <CustomTextField select fullWidth value={tenantFilter} onChange={event => setTenantFilter(event.target.value)} label='Filtrar tenant'>
+            <MenuItem value='all'>Todos los tenants</MenuItem>
+            <MenuItem value='client'>Cliente</MenuItem>
+            <MenuItem value='efeonce_internal'>Efeonce interno</MenuItem>
           </CustomTextField>
-          <CustomTextField select fullWidth value={statusFilter} onChange={event => setStatusFilter(event.target.value)} label='Select Status'>
-            <MenuItem value='all'>All status</MenuItem>
+          <CustomTextField select fullWidth value={statusFilter} onChange={event => setStatusFilter(event.target.value)} label='Filtrar status'>
+            <MenuItem value='all'>Todos los status</MenuItem>
             {Array.from(new Set(data.users.map(user => user.status))).map(status => (
               <MenuItem key={status} value={status}>
                 {toTitleCase(status)}
@@ -298,11 +299,11 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
               setSearchValue(event.target.value)
               table.setPageIndex(0)
             }}
-            placeholder='Search User'
+            placeholder='Buscar usuario'
             className='max-sm:is-full'
           />
           <Button color='secondary' variant='tonal' startIcon={<i className='tabler-upload' />} onClick={() => exportToCsv(filteredUsers)} className='max-sm:is-full'>
-            Export
+            Exportar
           </Button>
           <Button component={Link} href='/admin/roles' variant='contained' startIcon={<i className='tabler-shield-lock' />} className='max-sm:is-full'>
             Roles y permisos
@@ -340,7 +341,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
             <tbody>
               <tr>
                 <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                  No data available
+                  Sin datos disponibles
                 </td>
               </tr>
             </tbody>

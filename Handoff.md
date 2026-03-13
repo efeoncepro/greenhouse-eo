@@ -46,7 +46,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Corregir el login que todavia mostraba composicion visual Vuexy y endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel.
+- Endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel y revisar desalineaciones de microcopy contra `Greenhouse_Nomenclatura_Portal_v3.md`.
 
 ### Rama
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
@@ -56,21 +56,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Preview / login / branding publico / runtime auth BigQuery
 
 ### Archivos tocados
-- `src/views/Login.tsx`
 - `src/lib/bigquery.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
 
 ### Verificacion
-- `npx pnpm exec eslint src/views/Login.tsx src/lib/bigquery.ts`: pendiente de rerun despues del ultimo ajuste menor
+- `npx pnpm exec eslint src/views/Login.tsx src/lib/bigquery.ts`: correcto antes de la ronda final de microcopy
 - `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivos duplicados ajenos ya presentes en el worktree (`*(1).ts`, `*(1).tsx`) fuera de este cambio
 - `vercel inspect https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, alias apuntando a la preview vigente de la branch
 - `vercel logs https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f --no-follow --since 10m --expand`: detecto fallo previo de parseo en `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 
 ### Riesgos o pendientes
-- Falta rerun de lint despues del ultimo ajuste al prop `mode` en `Login.tsx`.
-- Falta volver a publicar esta nueva capa de codigo en Vercel; el dominio `pre-greenhouse.efeoncepro.com` sigue mostrando el ultimo deploy listo, no aun el JSX nuevo del login.
+- Falta rerun de lint sobre el slice final con microcopy admin/settings.
+- Falta volver a publicar la ronda final de microcopy en Vercel.
 - Si el branch sigue fallando en credenciales despues del fallback base64, cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` en Preview de la branch y redeployar antes de volver a diagnosticar password o provisionamiento.
 
 ## 2026-03-13 12:46 America/Santiago

@@ -16,6 +16,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
+import { GH_NAV } from '@/config/greenhouse-nomenclature'
 
 type Props = {
   data: AdminTenantsOverview
@@ -49,7 +50,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
           }}
         >
           <Stack spacing={2}>
-            <Chip label='Spaces governance' color='info' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Chip label='Gobernanza de spaces' color='info' variant='outlined' sx={{ width: 'fit-content' }} />
             <Typography variant='h3'>Administra spaces como empresas, con su postura de acceso, modulos y usuarios asociados.</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 920 }}>
               Cada space representa una empresa cliente del portal. Esta vista consolida el estado comercial y operativo del
@@ -71,7 +72,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
           ['Activos', data.totals.activeTenants],
           ['Con credenciales', data.totals.tenantsWithCredentials],
           ['Pendientes reset', data.totals.tenantsPendingReset],
-          ['Con proyectos scoped', data.totals.tenantsWithScopedProjects]
+          ['Con proyectos en scope', data.totals.tenantsWithScopedProjects]
         ].map(([label, value]) => (
           <Card key={label}>
             <CardContent>
@@ -90,7 +91,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         <CardContent>
           <Stack spacing={3}>
             <Box>
-              <Typography variant='h4'>Admin Spaces</Typography>
+              <Typography variant='h4'>{GH_NAV.adminSpaces.label}</Typography>
               <Typography color='text.secondary'>
                 Cada fila representa un cliente visible como space. El detalle agrupa usuarios, proyectos visibles, modulos contratados y
                 feature flags activos.
@@ -153,16 +154,16 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                           ))}
                           {tenant.businessLines.length === 0 && tenant.serviceModules.length === 0 ? (
                             <Typography variant='body2' color='text.secondary'>
-                              Sin modulos
+                              Sin modulos activos
                             </Typography>
                           ) : null}
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Stack spacing={0.75}>
-                          <Typography variant='body2'>Flags: {tenant.featureFlagCount}</Typography>
+                          <Typography variant='body2'>Feature flags: {tenant.featureFlagCount}</Typography>
                           <Typography variant='body2' color='text.secondary'>
-                            Update: {formatDateTime(tenant.updatedAt)}
+                            Actualizacion: {formatDateTime(tenant.updatedAt)}
                           </Typography>
                           <Typography variant='body2' color='text.secondary'>
                             Ultimo login: {formatDateTime(tenant.lastLoginAt)}
