@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-12 Internal Control Tower Redesign
+- `/internal/dashboard` dejo de ser un hero estatico con lista plana de tenants y ahora funciona como `Control Tower` operativo para el equipo interno Efeonce.
+- La landing interna ahora usa:
+  - header compacto con subtitulo dinamico y acciones
+  - 6 KPI cards con semaforos de activacion, inactividad y OTD global
+  - tabla paginada con busqueda, filtros por estado, row actions y prioridad visual para `Requiere atencion`
+- `src/lib/internal/get-internal-dashboard-overview.ts` ahora entrega senales adicionales por cliente:
+  - `createdAt`
+  - `updatedAt`
+  - `lastLoginAt`
+  - `lastActivityAt`
+  - `totalUsers`, `activeUsers`, `invitedUsers`, `pendingResetUsers`
+  - `scopedProjects`
+  - `avgOnTimePct`
+  - arrays de `businessLines` y `serviceModules`
+- El rediseño sigue sin introducir mutaciones nuevas: `Crear space`, `Editar` y `Desactivar` quedan como affordances parciales hasta que exista workflow real.
+
 ## Delta 2026-03-12 Internal Identity Foundation
 - Se agrego `GREENHOUSE_INTERNAL_IDENTITY_V1.md` como contrato canonico para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
 - La fundacion nueva usa:
@@ -200,6 +217,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
 - `@google-cloud/bigquery` ya esta integrado con un cliente server-side reusable.
+- `/internal/dashboard` ya fue reinterpretado como `Control Tower` en espanol, con foco en salud de activacion, onboarding trabado, inactividad y acceso rapido al detalle del space.
 - `/dashboard` ya fue redisenado hacia una lectura cliente mas compacta en 3 zonas: hero + 4 KPI cards, 4 charts ejecutivos y detalle operativo bajo el fold.
 - El dashboard cliente ya no expone la cocina anterior de `capacity`, tooling declarativo por modulo ni cards redundantes de calidad/entrega; esas piezas se movieron fuera de la vista principal del cliente.
 - El contrato server-side del dashboard ahora tambien entrega cadencia semanal de entregas y `RpA` por proyecto sin cambiar la fuente de datos base en BigQuery.

@@ -40,6 +40,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-12 16:10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar el brief `CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / landing interna Efeonce
+
+### Archivos tocados
+- `src/views/greenhouse/GreenhouseInternalDashboard.tsx`
+- `src/views/greenhouse/internal/dashboard/*`
+- `src/lib/internal/get-internal-dashboard-overview.ts`
+- `src/app/(dashboard)/internal/dashboard/loading.tsx`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- No se ejecuto validacion visual autenticada real en `/internal/dashboard`.
+
+### Riesgos o pendientes
+- El CTA `Crear space` quedo visible pero deshabilitado porque el repo aun no tiene mutacion ni ruta real para onboarding de un nuevo space desde UI.
+- `Editar` y `Desactivar` existen como acciones del menu contextual pero siguen deshabilitadas; no hay workflow admin implementado para esas mutaciones.
+- La priorizacion operativa usa las senales disponibles hoy (`createdAt`, `lastLoginAt`, `scopedProjects`, `pendingResetUsers`, `avgOnTimePct`) y no una auditoria formal de onboarding multi-evento.
+
 ## 2026-03-12 13:05 America/Santiago
 
 ### Agente
