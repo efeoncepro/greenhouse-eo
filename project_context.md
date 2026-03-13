@@ -18,7 +18,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
     - `responsables_names`
     - `responsable_texto`
   - El match operativo prioriza `notion_user_id` ↔ `responsables_ids[SAFE_OFFSET(0)]`, con fallback a email/nombre.
-- El repo no contiene el pipeline externo `notion-bq-sync`; por lo tanto esta ronda no modifico ni redeployo la Cloud Function. Ese tramo sigue siendo un bloqueo externo al workspace actual.
+- `scripts/setup-team-tables.sql` quedo endurecido como bootstrap idempotente via `MERGE` y ya fue aplicado en BigQuery real:
+  - `greenhouse.team_members`: `7` filas seed
+  - `greenhouse.client_team_assignments`: `10` filas seed
+- La validacion local ya corrio con runtime Node real:
+  - `pnpm lint`: correcto
+  - `pnpm build`: correcto
+- El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
+  - Ese repo no existe en este workspace.
+  - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
 - `/settings` ya no depende de `getDashboardOverview()` solo para el roster; consume el endpoint dedicado de equipo.
 - `/dashboard` reemplaza la card legacy de capacity por una surface cliente que consume la API dedicada.
 - `/proyectos/[id]` ahora incorpora una seccion `Equipo en este proyecto`.

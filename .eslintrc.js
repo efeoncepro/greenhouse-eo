@@ -1,6 +1,16 @@
 module.exports = {
   extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended', 'plugin:import/recommended', 'prettier'],
-  ignorePatterns: ['next-env.d.ts', '.next/**', 'node_modules/**', 'full-version/**', 'demo-configs/**'],
+  ignorePatterns: [
+    'next-env.d.ts',
+    '.next/**',
+    'node_modules/**',
+    'full-version/**',
+    'demo-configs/**',
+    '**/* (1).js',
+    '**/* (1).jsx',
+    '**/* (1).ts',
+    '**/* (1).tsx'
+  ],
   rules: {
     'jsx-a11y/alt-text': 'off',
     'react/display-name': 'off',

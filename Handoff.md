@@ -40,6 +40,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar los pendientes reales del runtime de team identity + capacity:
+  - validar con Node local
+  - endurecer y aplicar el bootstrap SQL en BigQuery
+  - confirmar el nombre correcto del repo externo del sync
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `.eslintrc.js`
+- `src/lib/team-queries.ts`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `scripts/setup-team-tables.sql`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` aplicado en BigQuery real: correcto
+  - `greenhouse.team_members`: `7` filas
+  - `greenhouse.client_team_assignments`: `10` filas
+- Verificacion directa en BigQuery:
+  - `space-efeonce` quedo con `7` assignments seed
+  - `hubspot-company-30825221458` quedo con `3` assignments seed
+- `git ls-remote https://github.com/efeoncepro/notion-bigquery.git HEAD`: sin acceso util desde esta sesion
+- `git ls-remote git@github.com:efeoncepro/notion-bigquery.git HEAD`: `Repository not found`
+
+### Riesgos o pendientes
+- El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
+- Esa parte externa sigue pendiente porque el repo no esta en este workspace y no hubo acceso remoto valido desde esta sesion.
+- La validacion ad hoc por import directo de `src/lib/team-queries.ts` con `tsx` choco con `server-only`; no indica fallo del feature, pero si que una smoke script reusable tendria que correr via entorno Next/server real o con un harness dedicado.
+
 ## 2026-03-13 22:15 America/Santiago
 
 ### Agente

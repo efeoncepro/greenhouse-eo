@@ -62,6 +62,7 @@ const TeamDossierSection = () => {
   }, [])
 
   const teamMembers = data?.members || []
+
   const footer = data?.footer || {
     serviceLines: [],
     modality: null,

@@ -130,6 +130,7 @@ const throughputBenchmarks: Record<TeamRoleCategory, number> = {
 
 const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
 const inactiveStatuses = [...completedStatuses, 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled']
+
 const periodFormatter = new Intl.DateTimeFormat('es-CL', {
   month: 'long',
   year: 'numeric',
@@ -220,6 +221,7 @@ const sortAssignments = <T extends { roleCategory: TeamRoleCategory; displayName
 
 const toLegacyMemberResponse = (viewer: TeamQueryViewer): TeamMembersPayload => {
   const legacy = buildAccountTeam(viewer.clientId, [])
+
   const members: TeamMemberResponse[] = legacy.members.map(member => ({
     memberId: member.id,
     displayName: member.name,
@@ -435,9 +437,7 @@ const buildResponsableSignals = (columns: Set<string>) => {
       : 't.responsables_names[SAFE_OFFSET(0)]'
     : 't.responsable_texto'
 
-  const responsableEmailSelect = columns.has('responsables')
-    ? 'LOWER(t.responsables[SAFE_OFFSET(0)]) AS responsable_email,'
-    : 'CAST(NULL AS STRING) AS responsable_email,'
+  const responsableEmailSelect = 'CAST(NULL AS STRING) AS responsable_email,'
 
   const responsableNotionIdSelect = columns.has('responsables_ids')
     ? 't.responsables_ids[SAFE_OFFSET(0)] AS responsable_notion_id,'
@@ -457,6 +457,7 @@ const getOperationalLoadRows = async (projectIds: string[], columns: Set<string>
   }
 
   const projectId = getBigQueryProjectId()
+
   const {
     responsableNombreExpr,
     responsableNombreSelect,
@@ -495,6 +496,7 @@ const getProjectBreakdownRows = async (projectIds: string[], columns: Set<string
   }
 
   const projectId = getBigQueryProjectId()
+
   const {
     responsableNombreExpr,
     responsableNombreSelect,
@@ -593,6 +595,7 @@ const buildCapacityMembers = (
 
 const getUtilizationPercent = (members: TeamCapacityMember[]) => {
   const activeAssets = members.reduce((sum, member) => sum + member.activeAssets, 0)
+
   const expectedMonthlyThroughput = members.reduce(
     (sum, member) => sum + member.fteAllocation * throughputBenchmarks[member.roleCategory],
     0
@@ -607,6 +610,7 @@ const getUtilizationPercent = (members: TeamCapacityMember[]) => {
 
 const getProjectName = async (projectIdValue: string) => {
   const projectId = getBigQueryProjectId()
+
   const rows = await runQuery<{ project_name: string | null }>(
     `
       SELECT COALESCE(nombre_del_proyecto, notion_page_id) AS project_name
@@ -626,6 +630,7 @@ const getProjectTeamRows = async (projectIdValue: string, columns: Set<string>) 
   }
 
   const projectId = getBigQueryProjectId()
+
   const {
     responsableNombreExpr,
     responsableNombreSelect,
@@ -731,6 +736,7 @@ const getSprintTeamRows = async (sprintId: string, projectIds: string[], columns
   }
 
   const projectId = getBigQueryProjectId()
+
   const {
     responsableNombreExpr,
     responsableNombreSelect,
