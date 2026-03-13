@@ -90,6 +90,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `Preview (develop)`: ahora tiene `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
 
 ### Riesgos o pendientes
+- El runtime auth ahora incluye un fallback para internos Efeonce que resuelve aliases `@efeonce.org` y `@efeoncepro.com` usando el perfil Microsoft antes de rechazar el SSO.
 - El task original pedía resolver SSO contra `greenhouse.clients`, pero el runtime real ya vive en `greenhouse.client_users`; el cambio se implemento sobre el modelo actual para no reintroducir el principal legacy.
 - Por seguridad, el flujo no auto-provisiona usuarios solo por `allowed_email_domains`; si el dominio coincide pero no existe un principal explicito en `client_users`, el login Microsoft cae en `/auth/access-denied`.
 - `Preview` sigue usando env vars muy branch-specific; otras ramas feature que quieran validar SSO remoto pueden necesitar `AZURE_AD_*` cargadas tambien para su branch preview concreto.

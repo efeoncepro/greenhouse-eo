@@ -5,6 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import {
   getTenantAccessRecordByAllowedEmailDomain,
   getTenantAccessRecordByEmail,
+  getTenantAccessRecordByInternalMicrosoftAlias,
   getTenantAccessRecordByMicrosoftOid,
   isEligibleForMicrosoftSignIn,
   linkMicrosoftIdentity,
@@ -21,7 +22,7 @@ const getMicrosoftProfileIdentity = ({
   user
 }: {
   profile?: Record<string, unknown> | null
-  user?: { email?: string | null } | null
+  user?: { email?: string | null; name?: string | null } | null
 }) => {
   const normalizedEmail =
     typeof profile?.email === 'string'
@@ -39,10 +40,23 @@ const getMicrosoftProfileIdentity = ({
 
   const tenantId = typeof profile?.tid === 'string' ? profile.tid : ''
 
+  const displayName =
+    typeof profile?.name === 'string'
+      ? profile.name.trim()
+      : typeof user?.name === 'string'
+        ? user.name.trim()
+        : ''
+
+  const givenName = typeof profile?.given_name === 'string' ? profile.given_name.trim() : ''
+  const familyName = typeof profile?.family_name === 'string' ? profile.family_name.trim() : ''
+
   return {
     normalizedEmail,
     oid,
-    tenantId
+    tenantId,
+    displayName,
+    givenName,
+    familyName
   }
 }
 
@@ -154,7 +168,7 @@ export const authOptions: NextAuthOptions = {
         return false
       }
 
-      const { normalizedEmail, oid, tenantId } = getMicrosoftProfileIdentity({
+      const { normalizedEmail, oid, tenantId, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
         profile: (profile as Record<string, unknown> | null | undefined) || null,
         user
       })
@@ -167,6 +181,15 @@ export const authOptions: NextAuthOptions = {
 
       if (!tenant) {
         tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+      }
+
+      if (!tenant) {
+        tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+          email: normalizedEmail,
+          displayName,
+          givenName,
+          familyName
+        })
       }
 
       if (!tenant) {
@@ -227,7 +250,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (account?.provider === 'azure-ad') {
-        const { normalizedEmail, oid } = getMicrosoftProfileIdentity({
+        const { normalizedEmail, oid, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
           profile: (profile as Record<string, unknown> | null | undefined) || null,
           user
         })
@@ -236,6 +259,15 @@ export const authOptions: NextAuthOptions = {
 
         if (!tenant && normalizedEmail) {
           tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        }
+
+        if (!tenant && normalizedEmail) {
+          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+            email: normalizedEmail,
+            displayName,
+            givenName,
+            familyName
+          })
         }
 
         if (tenant) {

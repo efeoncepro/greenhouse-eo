@@ -3,6 +3,11 @@ import 'server-only'
 import { compare } from 'bcryptjs'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  buildEfeonceEmailAliasCandidates,
+  isInternalEfeonceEmail,
+  isLikelyEfeonceProfileMatch
+} from '@/lib/tenant/internal-email-aliases'
 import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
 
 type TenantType = 'client' | 'efeonce_internal'
@@ -31,6 +36,13 @@ interface TenantAccessRow {
   status: string | null
   password_hash: string | null
   password_hash_algorithm: string | null
+}
+
+interface InternalAliasCandidateRow {
+  user_id: string
+  email: string
+  microsoft_email: string | null
+  full_name: string
 }
 
 export interface TenantAccessRecord {
@@ -270,6 +282,12 @@ const getIdentityAccessRecordByEmail = async (email: string) =>
     params: { email }
   })
 
+const getIdentityAccessRecordByUserId = async (userId: string) =>
+  getIdentityAccessRecord({
+    whereClause: 'cu.user_id = @userId',
+    params: { userId }
+  })
+
 export const getTenantAccessRecordByEmail = async (email: string) => {
   return getIdentityAccessRecordByEmail(email)
 }
@@ -279,6 +297,72 @@ export const getTenantAccessRecordByMicrosoftOid = async (oid: string) =>
     whereClause: 'cu.microsoft_oid = @oid',
     params: { oid }
   })
+
+export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
+  email,
+  displayName,
+  givenName,
+  familyName
+}: {
+  email: string
+  displayName?: string | null
+  givenName?: string | null
+  familyName?: string | null
+}) => {
+  if (!isInternalEfeonceEmail(email)) {
+    return null
+  }
+
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const [rows] = await bigQuery.query({
+    query: `
+      SELECT
+        cu.user_id,
+        cu.email,
+        cu.microsoft_email,
+        cu.full_name
+      FROM \`${projectId}.greenhouse.client_users\` AS cu
+      WHERE cu.active = TRUE
+        AND cu.status IN ('active', 'invited')
+        AND cu.tenant_type = 'efeonce_internal'
+    `
+  })
+
+  const normalizedEmail = email.trim().toLowerCase()
+
+  const matches = (rows as InternalAliasCandidateRow[]).filter(row => {
+    const aliases = buildEfeonceEmailAliasCandidates({
+      email: row.email,
+      fullName: row.full_name,
+      microsoftEmail: row.microsoft_email
+    })
+
+    return (
+      aliases.includes(normalizedEmail) &&
+      isLikelyEfeonceProfileMatch({
+        candidateFullName: row.full_name,
+        displayName,
+        givenName,
+        familyName
+      })
+    )
+  })
+
+  if (matches.length !== 1) {
+    if (matches.length > 1) {
+      console.warn('Internal Microsoft alias resolution was ambiguous.', {
+        email: normalizedEmail,
+        candidates: matches.map(match => match.user_id)
+      })
+    }
+
+    return null
+  }
+
+  return getIdentityAccessRecordByUserId(matches[0].user_id)
+}
 
 export const getTenantAccessRecordByAllowedEmailDomain = async (domain: string) => {
   const projectId = getBigQueryProjectId()

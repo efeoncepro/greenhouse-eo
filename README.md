@@ -80,6 +80,7 @@ Estado hoy:
 - branding base integrado en navegacion y favicon temporal
 - `next-auth` ya protege el dashboard y autentica solo contra `greenhouse.client_users`
 - el login ahora soporta `credentials` y Microsoft Entra ID sobre el mismo principal `greenhouse.client_users`
+- el runtime auth ya resuelve aliases internos de Efeonce entre `@efeonce.org` y `@efeoncepro.com` durante Microsoft SSO antes de rechazar acceso
 - el login ya no muestra bloque demo ni mensajes internos de infraestructura
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
