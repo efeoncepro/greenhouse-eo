@@ -6,12 +6,14 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import { BusinessLineBadge } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import type { ModuleBadge } from './config'
 
 type ClientDashboardHeroProps = {
   clientName: string
   subtitle: string
-  badges: string[]
+  badges: ModuleBadge[]
   updatedAtLabel: string
 }
 
@@ -83,17 +85,21 @@ const ClientDashboardHero = ({ clientName, subtitle, badges, updatedAtLabel }: C
         {badges.length > 0 ? (
           <Stack direction='row' gap={1} flexWrap='wrap'>
             {badges.map(badge => (
-              <Chip
-                key={badge}
-                size='small'
-                label={badge}
-                sx={{
-                  color: 'common.white',
-                  fontWeight: 600,
-                  backgroundColor: alpha(theme.palette.common.white, 0.14),
-                  border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`
-                }}
-              />
+              badge.surface === 'business-line' && badge.brand ? (
+                <BusinessLineBadge key={badge.key} brand={badge.brand} negative />
+              ) : (
+                <Chip
+                  key={badge.key}
+                  size='small'
+                  label={badge.label}
+                  sx={{
+                    color: 'common.white',
+                    fontWeight: 600,
+                    backgroundColor: alpha(theme.palette.common.white, 0.14),
+                    border: `1px solid ${alpha(theme.palette.common.white, 0.2)}`
+                  }}
+                />
+              )
             ))}
           </Stack>
         ) : null}

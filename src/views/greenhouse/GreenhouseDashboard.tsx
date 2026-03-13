@@ -81,7 +81,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
   const rpaStatus = getRpaStatus(latestQualitySignal?.avgRpa ?? null)
   const otdStatus = getOtdStatus(data.summary.avgOnTimePct)
   const reviewStatus = getReviewStatus(data.summary.reviewPressureTasks, data.summary.openFrameComments)
-  const badgeLabels = buildModuleBadges(data).map(item => item.label)
+  const moduleBadges = buildModuleBadges(data)
 
   const donutSeries = statusMix.map(item => item.value)
   const cadenceSeries = [{ name: GH_LABELS.kpi_completed, data: data.charts.deliveryCadenceWeekly.map(item => item.completed) }]
@@ -105,7 +105,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           <ClientDashboardHero
             clientName={clientName}
             subtitle={heroSubtitle}
-            badges={badgeLabels}
+            badges={moduleBadges}
             updatedAtLabel={formatUpdatedAt(data.scope.lastSyncedAt)}
           />
         </SectionErrorBoundary>

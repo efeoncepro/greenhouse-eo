@@ -21,7 +21,10 @@ export type DashboardThemeCopy = {
   projectsDescription: string
 }
 
-export type ModuleBadge = ChipGroupItem
+export type ModuleBadge = ChipGroupItem & {
+  brand?: string
+  surface: 'business-line' | 'service-module'
+}
 
 export type ModuleFocusCard = {
   key: string
@@ -203,15 +206,18 @@ export const buildModuleBadges = (data: GreenhouseDashboardData): ModuleBadge[] 
   const businessLineBadges = data.scope.businessLines.map(moduleCode => ({
     key: `business-line-${moduleCode}`,
     label: formatModuleLabel(moduleCode, businessLineLabelMap),
+    brand: moduleCode,
     color: 'info' as const,
-    variant: 'outlined' as const
+    variant: 'outlined' as const,
+    surface: 'business-line' as const
   }))
 
   const serviceModuleBadges = data.scope.serviceModules.map(moduleCode => ({
     key: `service-module-${moduleCode}`,
     label: formatModuleLabel(moduleCode, serviceModuleLabelMap),
     color: 'primary' as const,
-    variant: 'tonal' as const
+    variant: 'tonal' as const,
+    surface: 'service-module' as const
   }))
 
   return [...businessLineBadges, ...serviceModuleBadges]

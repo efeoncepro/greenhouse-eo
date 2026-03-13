@@ -74,7 +74,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Riesgos o pendientes
 - El typo del asset `public/branding/SVG/isotipo-goble-full.svg` se consume tal como existe en disco; si luego se corrige el nombre del archivo, hay que ajustar el registry.
-- Esta ronda aplica logos donde hoy ya hay entidades de marca visibles; no reescribe aun chips del hero cliente ni todos los listados secundarios de modules.
+- Esta ronda ya cubre shell, hero cliente y business lines visibles, pero no reescribe aun todos los listados secundarios de modules en el portal.
 
 ## 2026-03-13 14:58 America/Santiago
 
