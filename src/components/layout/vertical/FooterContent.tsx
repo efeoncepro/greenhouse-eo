@@ -1,47 +1,42 @@
 'use client'
 
-// Next Imports
 import Link from 'next/link'
 
-// Third-party Imports
 import classnames from 'classnames'
 
-// Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
-// Util Imports
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
+import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useVerticalNav()
 
   return (
-    <div
-      className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}
-    >
+    <div className={classnames(verticalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
       <p>
         <span className='text-textSecondary'>{`© ${new Date().getFullYear()} Efeonce Group. `}</span>
-        <span className='text-textSecondary'>{`Greenhouse keeps project delivery visible, measurable, and accountable.`}</span>
-        <Link href='/dashboard' className='text-primary uppercase mie-0 mis-2'>
-          Portal
+        <span className='text-textSecondary'>{GH_MESSAGES.footer}</span>
+        <Link href='/dashboard' className='text-primary mie-0 mis-2'>
+          {GH_MESSAGES.footer_portal_link}
         </Link>
       </p>
-      {!isBreakpointReached && (
+      {!isBreakpointReached ? (
         <div className='flex items-center gap-4'>
           <Link href='/dashboard' className='text-primary'>
-            Dashboard
+            {GH_NAV.dashboard.label}
           </Link>
           <Link href='/proyectos' className='text-primary'>
-            Proyectos
+            {GH_NAV.projects.label}
           </Link>
           <Link href='/sprints' className='text-primary'>
-            Sprints
+            {GH_NAV.sprints.label}
           </Link>
           <Link href='/settings' className='text-primary'>
-            Settings
+            {GH_NAV.settings.label}
           </Link>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

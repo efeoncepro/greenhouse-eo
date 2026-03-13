@@ -11,24 +11,26 @@ import Typography from '@mui/material/Typography'
 
 import { signIn, useSession } from 'next-auth/react'
 
+import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+
 const settingsRows = [
   {
-    title: 'Weekly client digest',
-    description: 'Send a concise Friday summary of sprint status, review pressure, and unresolved comments.'
+    title: GH_MESSAGES.settings_digest_title,
+    description: GH_MESSAGES.settings_digest_description
   },
   {
-    title: 'Comment escalation alerts',
-    description: 'Highlight when unresolved feedback crosses the threshold agreed for the account.'
+    title: GH_MESSAGES.settings_alerts_title,
+    description: GH_MESSAGES.settings_alerts_description
   },
   {
-    title: 'Delivery health score',
-    description: 'Expose an executive-friendly score that blends throughput, review rounds, and overdue work.'
+    title: GH_MESSAGES.settings_risk_title,
+    description: GH_MESSAGES.settings_risk_description
   }
 ]
 
 const providerLabelMap: Record<string, string> = {
   credentials: 'Email y contrasena',
-  'microsoft_sso': 'Microsoft SSO'
+  microsoft_sso: 'Microsoft SSO'
 }
 
 const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean }) => {
@@ -41,10 +43,8 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>Portal settings</Typography>
-        <Typography color='text.secondary'>
-          Ajusta tus preferencias de visibilidad y revisa como esta vinculada tu identidad de acceso en Greenhouse.
-        </Typography>
+        <Typography variant='h4'>{GH_NAV.settings.label}</Typography>
+        <Typography color='text.secondary'>{GH_MESSAGES.subtitle_settings}</Typography>
       </Box>
 
       <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1fr 1.1fr' } }}>
@@ -52,24 +52,20 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
           <CardContent>
             <Stack spacing={3}>
               <Chip
-                label={isMicrosoftLinked ? 'Cuenta vinculada' : 'Sin vinculo Microsoft'}
+                label={isMicrosoftLinked ? GH_MESSAGES.settings_account_linked : GH_MESSAGES.settings_account_unlinked}
                 color={isMicrosoftLinked ? 'success' : 'warning'}
                 variant='outlined'
                 sx={{ width: 'fit-content' }}
               />
-              <Typography variant='h5'>Cuenta vinculada</Typography>
-              <Typography color='text.secondary'>
-                Greenhouse ya soporta credenciales y Microsoft SSO sobre el mismo principal de acceso.
-              </Typography>
+              <Typography variant='h5'>{GH_MESSAGES.settings_identity_title}</Typography>
+              <Typography color='text.secondary'>{GH_MESSAGES.settings_identity_subtitle}</Typography>
 
               <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'action.hover' }}>
                 <Stack spacing={2}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
                     <i className='tabler-brand-windows text-[24px]' />
-                    <Typography className='font-medium'>
-                      {microsoftEmail || 'Todavia no hay una cuenta Microsoft vinculada'}
-                    </Typography>
-                    {isMicrosoftLinked ? <Chip size='small' color='success' label='Verificado' /> : null}
+                    <Typography className='font-medium'>{microsoftEmail || GH_MESSAGES.settings_account_unlinked}</Typography>
+                    {isMicrosoftLinked ? <Chip size='small' color='success' label={GH_MESSAGES.settings_verified} /> : null}
                   </Box>
                   <Typography variant='body2' color='text.secondary'>
                     Metodo de acceso activo: {providerLabelMap[activeProvider] || activeProvider}
@@ -84,20 +80,19 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
                   onClick={() => signIn('azure-ad', { callbackUrl: '/settings' })}
                   sx={{
                     alignSelf: 'flex-start',
-                    bgcolor: '#0078D4',
+                    bgcolor: 'info.main',
                     '&:hover': {
-                      bgcolor: '#106EBE'
+                      bgcolor: 'info.dark'
                     }
                   }}
                 >
-                  Vincular cuenta Microsoft
+                  {GH_MESSAGES.settings_link_microsoft}
                 </Button>
               ) : null}
 
               {!hasMicrosoftAuth ? (
                 <Typography variant='body2' color='text.secondary'>
-                  El provider Microsoft no esta configurado en este ambiente, por lo que el vinculo SSO no se puede
-                  iniciar desde aqui todavia.
+                  {GH_MESSAGES.settings_microsoft_unavailable}
                 </Typography>
               ) : null}
             </Stack>
@@ -107,7 +102,8 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
         <Card>
           <CardContent>
             <Stack spacing={3}>
-              <Typography variant='h5'>Delivery visibility preferences</Typography>
+              <Typography variant='h5'>{GH_MESSAGES.settings_preferences_title}</Typography>
+              <Typography color='text.secondary'>{GH_MESSAGES.settings_preferences_subtitle}</Typography>
               {settingsRows.map(row => (
                 <Box
                   key={row.title}

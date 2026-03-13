@@ -9,6 +9,7 @@ import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardProjectRisk } from '@/types/greenhouse-dashboard'
 import { getProjectAttentionLabel } from '@views/greenhouse/dashboard/helpers'
 
@@ -32,17 +33,22 @@ const ClientAttentionProjectsAccordion = ({ projects }: ClientAttentionProjectsA
           gap={1.5}
         >
           <Box>
-            <Typography variant='h6'>Proyectos bajo atención</Typography>
+            <Typography variant='h6'>{GH_MESSAGES.attention_title}</Typography>
             <Typography variant='body2' color='text.secondary'>
               {getProjectAttentionLabel(alertProjects.length)}
             </Typography>
           </Box>
-          <Chip size='small' variant='outlined' color={alertProjects.length > 0 ? 'warning' : 'success'} label={`${alertProjects.length} alertas`} />
+          <Chip
+            size='small'
+            variant='outlined'
+            color={alertProjects.length > 0 ? 'warning' : 'success'}
+            label={GH_MESSAGES.attention_alerts_chip(alertProjects.length)}
+          />
         </Stack>
       </AccordionSummary>
       <AccordionDetails>
         {alertProjects.length === 0 ? (
-          <Typography color='text.secondary'>Todos los proyectos operan normalmente.</Typography>
+          <Typography color='text.secondary'>{GH_MESSAGES.attention_all_clear}</Typography>
         ) : (
           <Stack spacing={2.5}>
             {alertProjects.map(project => (
@@ -64,17 +70,19 @@ const ClientAttentionProjectsAccordion = ({ projects }: ClientAttentionProjectsA
                     </Typography>
                   </Box>
                   <Stack direction='row' gap={1} flexWrap='wrap'>
-                    {project.blockedTasks > 0 ? <Chip size='small' variant='tonal' color='error' label={`${project.blockedTasks} bloqueadas`} /> : null}
-                    {project.reviewPressureTasks > 0 ? (
-                      <Chip size='small' variant='tonal' color='warning' label={`${project.reviewPressureTasks} en revisión`} />
+                    {project.blockedTasks > 0 ? (
+                      <Chip size='small' variant='tonal' color='error' label={GH_MESSAGES.attention_blocked_chip(project.blockedTasks)} />
                     ) : null}
-                    <Chip size='small' variant='outlined' color='info' label={`OTD ${project.onTimePct === null ? 'Sin dato' : `${Math.round(project.onTimePct)}%`}`} />
+                    {project.reviewPressureTasks > 0 ? (
+                      <Chip size='small' variant='tonal' color='warning' label={GH_MESSAGES.attention_review_chip(project.reviewPressureTasks)} />
+                    ) : null}
+                    <Chip size='small' variant='outlined' color='info' label={GH_MESSAGES.attention_otd_chip(project.onTimePct)} />
                   </Stack>
                 </Stack>
 
                 {project.pageUrl ? (
                   <Link href={project.pageUrl} target='_blank' rel='noreferrer' underline='hover'>
-                    Abrir proyecto
+                    {GH_MESSAGES.attention_open_project}
                   </Link>
                 ) : null}
               </Box>

@@ -1,12 +1,13 @@
 'use client'
 
 import type { ThemeColor } from '@core/types'
+import { GH_COLORS, GH_LABELS } from '@/config/greenhouse-nomenclature'
 
 export const CLIENT_STATUS_COLORS = {
-  active: '#2196F3',
-  review: '#FF9800',
-  changes: '#F44336',
-  completed: '#4CAF50'
+  active: GH_COLORS.semantic.info.source,
+  review: GH_COLORS.semantic.warning.source,
+  changes: GH_COLORS.semantic.danger.source,
+  completed: GH_COLORS.semantic.success.source
 } as const
 
 const absoluteDateFormatter = new Intl.DateTimeFormat('es-CL', {
@@ -68,7 +69,7 @@ export const formatRelativeDate = (value: string | null) => {
 
   if (diffDays <= 0) return 'hoy'
   if (diffDays === 1) return 'ayer'
-  if (diffDays < 7) return `hace ${diffDays} días`
+  if (diffDays < 7) return `hace ${diffDays} dias`
   if (diffDays < 14) return 'hace 1 semana'
   if (diffDays < 21) return 'hace 2 semanas'
 
@@ -77,17 +78,17 @@ export const formatRelativeDate = (value: string | null) => {
 
 export const formatUpdatedAt = (value: string | null) => {
   if (!value) {
-    return 'Datos actualizados: sin sincronización registrada'
+    return 'Datos actualizados: sin sincronizacion registrada'
   }
 
   return `Datos actualizados: ${updatedDateFormatter.format(new Date(value))}`
 }
 
 export const getRelationshipSummary = (months: number) => {
-  if (months <= 0) return 'Relación activa: menos de 1 mes.'
-  if (months === 1) return 'Relación activa: 1 mes.'
+  if (months <= 0) return 'Relacion activa: menos de 1 mes.'
+  if (months === 1) return 'Relacion activa: 1 mes.'
 
-  return `Relación activa: ${formatInteger(months)} meses.`
+  return `Relacion activa: ${formatInteger(months)} meses.`
 }
 
 export const getRpaStatus = (value: number | null): {
@@ -100,14 +101,14 @@ export const getRpaStatus = (value: number | null): {
   }
 
   if (value <= 1.5) {
-    return { tone: 'success', label: 'Saludable', icon: 'tabler-check' }
+    return { tone: 'success', label: GH_LABELS.semaphore_green, icon: 'tabler-check' }
   }
 
   if (value <= 2.5) {
-    return { tone: 'warning', label: 'Bajo observación', icon: 'tabler-alert-triangle' }
+    return { tone: 'warning', label: GH_LABELS.semaphore_yellow, icon: 'tabler-alert-triangle' }
   }
 
-  return { tone: 'error', label: 'Requiere atención', icon: 'tabler-alert-circle' }
+  return { tone: 'error', label: GH_LABELS.semaphore_red, icon: 'tabler-alert-circle' }
 }
 
 export const getOtdStatus = (value: number): {
@@ -116,18 +117,18 @@ export const getOtdStatus = (value: number): {
   icon: string
 } => {
   if (value >= 90) {
-    return { tone: 'success', label: 'Saludable', icon: 'tabler-check' }
+    return { tone: 'success', label: GH_LABELS.semaphore_green, icon: 'tabler-check' }
   }
 
   if (value >= 70) {
-    return { tone: 'warning', label: 'Bajo observación', icon: 'tabler-alert-triangle' }
+    return { tone: 'warning', label: GH_LABELS.semaphore_yellow, icon: 'tabler-alert-triangle' }
   }
 
   if (value === 0) {
     return { tone: 'default', label: 'Sin actividad este mes', icon: 'tabler-circle-dashed' }
   }
 
-  return { tone: 'error', label: 'Requiere atención', icon: 'tabler-alert-circle' }
+  return { tone: 'error', label: GH_LABELS.semaphore_red, icon: 'tabler-alert-circle' }
 }
 
 export const getReviewStatus = (reviewCount: number, openComments: number) => {
@@ -137,7 +138,7 @@ export const getReviewStatus = (reviewCount: number, openComments: number) => {
     return { tone: 'success' as const, label: 'Sin pendientes', icon: 'tabler-check' }
   }
 
-  return { tone: 'info' as const, label: 'Feedback pendiente', icon: 'tabler-message-circle' }
+  return { tone: 'info' as const, label: GH_LABELS.kpi_feedback, icon: 'tabler-message-circle' }
 }
 
 export const getTrend = (current: number | null, previous: number | null): 'positive' | 'negative' | 'neutral' => {

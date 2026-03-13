@@ -38,9 +38,7 @@ const StyledBoxForShadow = styled('div')(({ theme }) => ({
   width: 'calc(100% + 15px)',
   height: theme.mixins.toolbar.minHeight,
   transition: 'opacity .15s ease-in-out',
-  background: `linear-gradient(var(--mui-palette-background-paper) ${
-    theme.direction === 'rtl' ? '95%' : '5%'
-  }, rgb(var(--mui-palette-background-paperChannel) / 0.85) 30%, rgb(var(--mui-palette-background-paperChannel) / 0.5) 65%, rgb(var(--mui-palette-background-paperChannel) / 0.3) 75%, transparent)`,
+  background: `linear-gradient(#022A4E ${theme.direction === 'rtl' ? '95%' : '5%'}, rgba(2, 42, 78, 0.92) 30%, rgba(2, 42, 78, 0.58) 65%, rgba(2, 42, 78, 0.28) 75%, transparent)`,
   '&.scrolled': {
     opacity: 1
   }
@@ -97,7 +95,7 @@ const Navigation = (props: Props) => {
     <VerticalNav
       customStyles={navigationCustomStyles(verticalNavOptions, theme)}
       collapsedWidth={71}
-      backgroundColor='var(--mui-palette-background-paper)'
+      backgroundColor='#022A4E'
       // eslint-disable-next-line lines-around-comment
       // The following condition adds the data-dark attribute to the VerticalNav component
       // when semiDark is enabled and the mode or systemMode is light

@@ -60,7 +60,7 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   // Vars
   const { layout } = settings
   const currentMode = mode === 'system' ? systemMode : mode
-  const useNegativeWordmark = variant === 'sidebar' && (settings.semiDark || currentMode === 'dark')
+  const useNegativeWordmark = variant === 'sidebar' || (variant === 'default' && (settings.semiDark || currentMode === 'dark'))
   const wordmarkSrc = useNegativeWordmark ? '/branding/logo-negative.svg' : '/branding/logo-full.svg'
   const markSrc = '/branding/avatar.png'
   const showCollapsedMarkOnly = variant === 'sidebar' && layout === 'collapsed' && !isHovered && !isBreakpointReached

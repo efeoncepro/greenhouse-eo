@@ -1,24 +1,25 @@
 // Type Imports
 import type { HorizontalMenuDataType } from '@/types/menuTypes'
+import { GH_NAV } from '@/config/greenhouse-nomenclature'
 
 const horizontalMenuData = (): HorizontalMenuDataType[] => [
   {
-    label: 'Dashboard',
+    label: GH_NAV.dashboard.label,
     href: '/dashboard',
     icon: 'tabler-smart-home'
   },
   {
-    label: 'Proyectos',
+    label: GH_NAV.projects.label,
     href: '/proyectos',
     icon: 'tabler-folders'
   },
   {
-    label: 'Sprints',
+    label: GH_NAV.sprints.label,
     href: '/sprints',
     icon: 'tabler-bolt'
   },
   {
-    label: 'Settings',
+    label: GH_NAV.settings.label,
     href: '/settings',
     icon: 'tabler-settings'
   }

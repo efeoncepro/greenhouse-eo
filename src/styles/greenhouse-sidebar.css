@@ -1,0 +1,46 @@
+.ts-vertical-nav-root .ts-vertical-nav-bg-color-container {
+  background-color: #022a4e !important;
+}
+
+.ts-vertical-nav-root .ts-vertical-nav-container {
+  box-shadow: 0 18px 48px rgba(2, 42, 78, 0.18) !important;
+}
+
+.ts-vertical-nav-root,
+.ts-vertical-nav-root .ts-vertical-nav-header,
+.ts-vertical-nav-root .ts-vertical-nav-header a,
+.ts-vertical-nav-root .ts-menu-button,
+.ts-vertical-nav-root .ts-menu-button .ts-menu-label,
+.ts-vertical-nav-root .ts-menu-button .ts-menu-icon,
+.ts-vertical-nav-root .ts-menu-button .ts-menu-prefix,
+.ts-vertical-nav-root .ts-menu-button .ts-menu-suffix {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ts-vertical-nav-root .ts-menu-button:hover,
+.ts-vertical-nav-root .ts-menu-button:focus-visible,
+.ts-vertical-nav-root .ts-menu-button[aria-expanded='true'] {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.ts-vertical-nav-root .ts-menu-button.ts-active,
+.ts-vertical-nav-root .ts-submenu-root.ts-open > .ts-menu-button,
+.ts-vertical-nav-root .ts-submenu-root > .ts-menu-button.ts-active {
+  background: rgba(3, 117, 219, 0.16) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+.ts-vertical-nav-root .ts-menu-button.ts-active .ts-menu-icon,
+.ts-vertical-nav-root .ts-submenu-root.ts-open > .ts-menu-button .ts-menu-icon,
+.ts-vertical-nav-root .ts-submenu-root > .ts-menu-button.ts-active .ts-menu-icon {
+  color: inherit !important;
+}
+
+.ts-vertical-nav-root .ts-menu-section-content {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ts-vertical-nav-root .ts-menu-section-content::before {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}

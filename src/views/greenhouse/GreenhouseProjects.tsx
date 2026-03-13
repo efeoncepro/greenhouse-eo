@@ -11,10 +11,11 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import LinearProgress from '@mui/material/LinearProgress'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Skeleton from '@mui/material/Skeleton'
 
+import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectsData } from '@/types/greenhouse-projects'
 
 const fallbackData: GreenhouseProjectsData = {
@@ -28,11 +29,11 @@ const fallbackData: GreenhouseProjectsData = {
 
 const formatDateRange = (startDate: string | null, endDate: string | null) => {
   if (!startDate && !endDate) {
-    return 'Dates not set yet'
+    return GH_MESSAGES.projects_dates_pending
   }
 
   const format = (value: string | null) =>
-    value ? new Date(`${value}T00:00:00`).toLocaleDateString() : 'Open'
+    value ? new Date(`${value}T00:00:00`).toLocaleDateString() : GH_MESSAGES.projects_dates_open
 
   return `${format(startDate)} - ${format(endDate)}`
 }
@@ -70,7 +71,7 @@ const GreenhouseProjects = () => {
           return
         }
 
-        setError('The projects view could not load live tenant data from BigQuery.')
+        setError(GH_MESSAGES.error_projects_live)
       } finally {
         setIsLoading(false)
       }
@@ -84,10 +85,8 @@ const GreenhouseProjects = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>Projects</Typography>
-        <Typography color='text.secondary'>
-          Active client workspaces with live delivery progress, review pressure, and tenant-scoped execution metrics.
-        </Typography>
+        <Typography variant='h4'>{GH_NAV.projects.label}</Typography>
+        <Typography color='text.secondary'>{GH_MESSAGES.subtitle_projects}</Typography>
       </Box>
 
       {error ? <Alert severity='warning'>{error}</Alert> : null}
@@ -103,7 +102,7 @@ const GreenhouseProjects = () => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant='body2' color='text.secondary'>
-                Projects in scope
+                {GH_MESSAGES.projects_scope_metric}
               </Typography>
               <Typography variant='h4'>{isLoading ? '--' : data.scope.projectCount}</Typography>
             </Stack>
@@ -113,7 +112,7 @@ const GreenhouseProjects = () => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant='body2' color='text.secondary'>
-                Active tasks
+                {GH_MESSAGES.projects_active_metric}
               </Typography>
               <Typography variant='h4'>{isLoading ? '--' : activeTasks}</Typography>
             </Stack>
@@ -123,7 +122,7 @@ const GreenhouseProjects = () => {
           <CardContent>
             <Stack spacing={1}>
               <Typography variant='body2' color='text.secondary'>
-                Open review items
+                {GH_MESSAGES.projects_review_metric}
               </Typography>
               <Typography variant='h4'>{isLoading ? '--' : openReviewItems}</Typography>
             </Stack>
@@ -167,25 +166,25 @@ const GreenhouseProjects = () => {
                     <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                       <Box>
                         <Typography variant='body2' color='text.secondary'>
-                          Total tasks
+                          {GH_MESSAGES.projects_total_metric}
                         </Typography>
                         <Typography>{project.totalTasks}</Typography>
                       </Box>
                       <Box>
                         <Typography variant='body2' color='text.secondary'>
-                          Active tasks
+                          {GH_LABELS.kpi_active}
                         </Typography>
                         <Typography>{project.activeTasks}</Typography>
                       </Box>
                       <Box>
                         <Typography variant='body2' color='text.secondary'>
-                          Review load
+                          {GH_LABELS.kpi_feedback}
                         </Typography>
                         <Typography>{project.reviewLoad}</Typography>
                       </Box>
                       <Box>
                         <Typography variant='body2' color='text.secondary'>
-                          Average RpA
+                          {GH_LABELS.kpi_rpa}
                         </Typography>
                         <Typography>{project.avgRpa.toFixed(2)}</Typography>
                       </Box>
@@ -193,14 +192,14 @@ const GreenhouseProjects = () => {
 
                     <Box>
                       <Typography variant='body2' color='text.secondary'>
-                        Completed tasks
+                        {GH_MESSAGES.projects_delivery_label}
                       </Typography>
                       <Typography>{project.completedTasks}</Typography>
                     </Box>
 
                     <Box>
                       <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
-                        <Typography variant='body2'>On-time execution</Typography>
+                        <Typography variant='body2'>{GH_MESSAGES.projects_progress_label}</Typography>
                         <Typography variant='body2' color='text.secondary'>
                           {project.progress}%
                         </Typography>
@@ -208,12 +207,8 @@ const GreenhouseProjects = () => {
                       <LinearProgress variant='determinate' value={project.progress} sx={{ height: 10, borderRadius: 999 }} />
                     </Box>
 
-                    <Button
-                      variant='contained'
-                      component={Link}
-                      href={`/proyectos/${project.id}`}
-                    >
-                      View project detail
+                    <Button variant='contained' component={Link} href={`/proyectos/${project.id}`}>
+                      {GH_MESSAGES.projects_detail_button}
                     </Button>
                   </Stack>
                 </CardContent>
@@ -222,7 +217,7 @@ const GreenhouseProjects = () => {
         {!isLoading && data.items.length === 0 ? (
           <Card sx={{ gridColumn: '1 / -1' }}>
             <CardContent>
-              <Typography>No tenant-scoped projects returned data yet.</Typography>
+              <Typography>{GH_MESSAGES.empty_projects}</Typography>
             </CardContent>
           </Card>
         ) : null}

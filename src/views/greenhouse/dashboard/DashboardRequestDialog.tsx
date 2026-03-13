@@ -11,6 +11,8 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
+import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+
 type DashboardRequestDialogProps = {
   open: boolean
   intent: string | null
@@ -33,39 +35,39 @@ const DashboardRequestDialog = ({ open, intent, onClose }: DashboardRequestDialo
   }, [intent, open])
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(value || 'Necesito apoyo con mi operación en Greenhouse.')
+    await navigator.clipboard.writeText(value || 'Necesito apoyo con mi operacion en Greenhouse.')
     setCopied(true)
   }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-      <DialogTitle>¿Qué necesitas?</DialogTitle>
+      <DialogTitle>{GH_MESSAGES.request_dialog_title}</DialogTitle>
       <DialogContent>
         <Stack spacing={2.5} sx={{ pt: 1 }}>
           <Typography variant='body2' color='text.secondary'>
-            Describe el perfil, la capacidad o la herramienta que buscas. Podrás copiar este mensaje y compartirlo con tu account manager.
+            {GH_MESSAGES.request_dialog_description}
           </Typography>
           <TextField
             multiline
             minRows={5}
             fullWidth
-            placeholder='Describe el perfil o la capacidad que buscas. Tu account manager te contactará.'
+            placeholder={GH_MESSAGES.request_dialog_placeholder}
             value={value}
             onChange={event => setValue(event.target.value)}
           />
           {copied ? (
             <Typography variant='body2' color='success.main'>
-              Solicitud lista para compartir con tu account manager.
+              {GH_MESSAGES.request_dialog_copied}
             </Typography>
           ) : null}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} variant='text'>
-          Cerrar
+          {GH_MESSAGES.request_dialog_close}
         </Button>
         <Button onClick={handleCopy} variant='contained'>
-          Copiar solicitud
+          {GH_MESSAGES.request_dialog_copy}
         </Button>
       </DialogActions>
     </Dialog>

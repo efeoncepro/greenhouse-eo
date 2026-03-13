@@ -8,6 +8,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
 type ClientPortfolioHealthAccordionProps = {
@@ -28,15 +29,15 @@ const ClientPortfolioHealthAccordion = ({ data }: ClientPortfolioHealthAccordion
           gap={1.5}
         >
           <Box>
-            <Typography variant='h6'>Salud del portafolio</Typography>
+            <Typography variant='h6'>{GH_MESSAGES.portfolio_title}</Typography>
             <Typography variant='body2' color='text.secondary'>
-              {data.summary.healthyProjects} proyectos saludables, {data.summary.projectsAtRisk} bajo observación.
+              {GH_MESSAGES.portfolio_summary(data.summary.healthyProjects, data.summary.projectsAtRisk)}
             </Typography>
           </Box>
           <Stack direction='row' gap={1} flexWrap='wrap'>
-            <Chip size='small' variant='tonal' color='success' label={`${data.summary.healthyProjects} saludables`} />
-            <Chip size='small' variant='tonal' color='warning' label={`${data.summary.projectsAtRisk} bajo observación`} />
-            <Chip size='small' variant='outlined' color='info' label={`${data.summary.openFrameComments} comentarios abiertos`} />
+            <Chip size='small' variant='tonal' color='success' label={GH_MESSAGES.portfolio_healthy_chip(data.summary.healthyProjects)} />
+            <Chip size='small' variant='tonal' color='warning' label={GH_MESSAGES.portfolio_risk_chip(data.summary.projectsAtRisk)} />
+            <Chip size='small' variant='outlined' color='info' label={GH_MESSAGES.portfolio_feedback_chip(data.summary.openFrameComments)} />
           </Stack>
         </Stack>
       </AccordionSummary>
@@ -49,9 +50,9 @@ const ClientPortfolioHealthAccordion = ({ data }: ClientPortfolioHealthAccordion
           }}
         >
           {[
-            ['OTD% promedio', `${data.summary.avgOnTimePct}%`, 'Entregas dentro del plazo definido en el brief.'],
-            ['Piezas entregadas', String(data.summary.completedLast30Days), 'Últimos 30 días del alcance visible.'],
-            ['Comentarios abiertos', String(data.summary.openFrameComments), 'Fricción activa de revisión sobre la cuenta.']
+            [GH_MESSAGES.portfolio_metric_otd, `${data.summary.avgOnTimePct}%`, GH_MESSAGES.portfolio_metric_otd_detail],
+            [GH_MESSAGES.portfolio_metric_delivered, String(data.summary.completedLast30Days), GH_MESSAGES.portfolio_metric_delivered_detail],
+            [GH_MESSAGES.portfolio_metric_feedback, String(data.summary.openFrameComments), GH_MESSAGES.portfolio_metric_feedback_detail]
           ].map(([label, value, detail]) => (
             <Box
               key={label}

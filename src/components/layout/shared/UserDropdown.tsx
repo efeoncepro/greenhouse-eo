@@ -1,31 +1,27 @@
 'use client'
 
-// React Imports
 import { useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-// Next Imports
 import { useRouter } from 'next/navigation'
 
-// Third-party Imports
 import { signOut, useSession } from 'next-auth/react'
 
-// MUI Imports
 import { styled } from '@mui/material/styles'
-import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
-import Popper from '@mui/material/Popper'
-import Fade from '@mui/material/Fade'
-import Paper from '@mui/material/Paper'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MenuList from '@mui/material/MenuList'
-import Typography from '@mui/material/Typography'
-import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
+import Badge from '@mui/material/Badge'
 import Button from '@mui/material/Button'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
+import Divider from '@mui/material/Divider'
+import Fade from '@mui/material/Fade'
+import MenuItem from '@mui/material/MenuItem'
+import MenuList from '@mui/material/MenuList'
+import Paper from '@mui/material/Paper'
+import Popper from '@mui/material/Popper'
+import Typography from '@mui/material/Typography'
 
-// Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
+import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 const BadgeContentSpan = styled('span')({
@@ -119,17 +115,17 @@ const UserDropdown = () => {
                   <Divider className='mlb-1' />
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
                     <i className='tabler-layout-dashboard' />
-                    <Typography color='text.primary'>Dashboard</Typography>
+                    <Typography color='text.primary'>{isInternalUser ? 'Dashboard' : GH_NAV.dashboard.label}</Typography>
                   </MenuItem>
                   {!isInternalUser ? (
                     <>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>
                         <i className='tabler-folders' />
-                        <Typography color='text.primary'>Proyectos</Typography>
+                        <Typography color='text.primary'>{GH_NAV.projects.label}</Typography>
                       </MenuItem>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/settings')}>
                         <i className='tabler-settings' />
-                        <Typography color='text.primary'>Portal Settings</Typography>
+                        <Typography color='text.primary'>{GH_NAV.settings.label}</Typography>
                       </MenuItem>
                     </>
                   ) : null}
@@ -155,7 +151,7 @@ const UserDropdown = () => {
                       onClick={handleUserLogout}
                       sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
                     >
-                      Sign out
+                      {GH_MESSAGES.logout_button}
                     </Button>
                   </div>
                 </MenuList>

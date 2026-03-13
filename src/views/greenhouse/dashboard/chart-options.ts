@@ -2,10 +2,11 @@ import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
+import { GH_COLORS, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { effortColorMap, statusColorMap } from '@views/greenhouse/dashboard/config'
 
-const clientStatusColors = ['#2196F3', '#FF9800', '#F44336', '#4CAF50']
+const clientStatusColors = [GH_COLORS.chart.primary, GH_COLORS.chart.warning, GH_COLORS.chart.error, GH_COLORS.chart.success]
 
 export const createThroughputOptions = (theme: Theme, data: GreenhouseDashboardData): ApexOptions => ({
   chart: {
@@ -442,7 +443,7 @@ export const createClientStatusDonutOptions = (theme: Theme, data: GreenhouseDas
           show: true,
           total: {
             show: true,
-            label: 'Tareas',
+            label: GH_LABELS.chart_total_assets,
             formatter: () => String(data.charts.statusMix.reduce((sum, item) => sum + item.value, 0))
           }
         }
@@ -451,7 +452,7 @@ export const createClientStatusDonutOptions = (theme: Theme, data: GreenhouseDas
   },
   tooltip: {
     y: {
-      formatter: value => `${value} tareas`
+      formatter: value => GH_MESSAGES.chart_tooltip_assets(value)
     }
   }
 })
@@ -503,7 +504,7 @@ export const createWeeklyCadenceOptions = (theme: Theme, data: GreenhouseDashboa
   },
   tooltip: {
     y: {
-      formatter: value => `${value} piezas`
+      formatter: value => GH_MESSAGES.chart_tooltip_weekly_assets(value)
     }
   }
 })
@@ -545,7 +546,7 @@ export const createProjectRpaOptions = (theme: Theme): ApexOptions => ({
         borderColor: 'var(--mui-palette-warning-main)',
         strokeDashArray: 4,
         label: {
-          text: 'Meta 2,0',
+          text: GH_MESSAGES.chart_goal_rpa,
           style: {
             background: 'var(--mui-palette-warning-main)',
             color: '#fff'
@@ -603,7 +604,7 @@ export const createClientOtdTrendOptions = (theme: Theme, data: GreenhouseDashbo
         borderColor: 'var(--mui-palette-success-main)',
         strokeDashArray: 4,
         label: {
-          text: 'Meta 90%',
+          text: GH_MESSAGES.chart_goal_otd,
           style: {
             background: 'var(--mui-palette-success-main)',
             color: '#fff'

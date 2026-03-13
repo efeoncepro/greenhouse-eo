@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
+import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
 import { EmptyState, ExecutiveCardShell, SectionErrorBoundary } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
@@ -32,13 +33,13 @@ import {
   formatInteger,
   formatPercent,
   formatRelativeDate,
+  formatTrendValue,
   formatUpdatedAt,
   getOtdStatus,
   getRelationshipSummary,
   getReviewStatus,
   getRpaStatus,
-  getTrend,
-  formatTrendValue
+  getTrend
 } from '@views/greenhouse/dashboard/helpers'
 
 type GreenhouseDashboardProps = {
@@ -73,9 +74,9 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
   const projectRpaOptions = createProjectRpaOptions(theme)
   const otdTrendOptions = createClientOtdTrendOptions(theme, data)
 
-  const heroSubtitle = `Última actividad: ${formatRelativeDate(data.scope.lastActivityAt)}. ${formatInteger(
+  const heroSubtitle = `${GH_MESSAGES.hero_activity_prefix}: ${formatRelativeDate(data.scope.lastActivityAt)}. ${GH_MESSAGES.hero_active_projects(
     data.scope.projectCount
-  )} ${data.scope.projectCount === 1 ? 'proyecto activo.' : 'proyectos activos.'} ${getRelationshipSummary(data.relationship.months)}`
+  )} ${getRelationshipSummary(data.relationship.months)}`
 
   const rpaStatus = getRpaStatus(latestQualitySignal?.avgRpa ?? null)
   const otdStatus = getOtdStatus(data.summary.avgOnTimePct)
@@ -83,7 +84,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
   const badgeLabels = buildModuleBadges(data).map(item => item.label)
 
   const donutSeries = statusMix.map(item => item.value)
-  const cadenceSeries = [{ name: 'Piezas entregadas', data: data.charts.deliveryCadenceWeekly.map(item => item.completed) }]
+  const cadenceSeries = [{ name: GH_LABELS.kpi_completed, data: data.charts.deliveryCadenceWeekly.map(item => item.completed) }]
 
   const projectRpaSeries = [
     {
@@ -122,64 +123,68 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
             }}
           >
             <DashboardKpiCard
-              title='RpA'
+              title={GH_LABELS.kpi_rpa}
               stats={latestQualitySignal?.avgRpa !== null ? formatDecimal(latestQualitySignal.avgRpa) : '0'}
               avatarIcon='tabler-git-pull-request'
               avatarColor='primary'
               trend={getTrend(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
               trendNumber={formatTrendValue(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
-              subtitle='Promedio de rondas de revisión por pieza'
-              titleTooltip='Rounds per Asset: cuántas veces una pieza pasa por revisión antes de ser aprobada. Meta ICO: ≤2 rondas.'
-              footer={
-                latestQualitySignal?.avgRpa !== null
-                  ? `${latestQualitySignal.label}.`
-                  : 'Aún sin actividad este mes.'
-              }
+              subtitle={GH_MESSAGES.dashboard_kpi_rpa_subtitle}
+              titleTooltip={GH_MESSAGES.tooltip_rpa}
+              footer={latestQualitySignal?.avgRpa !== null ? `${latestQualitySignal.label}.` : GH_MESSAGES.dashboard_kpi_monthly_empty}
               statusLabel={rpaStatus.label}
               statusColor={rpaStatus.tone}
               statusIcon={rpaStatus.icon}
             />
 
             <DashboardKpiCard
-              title='Piezas entregadas'
+              title={GH_LABELS.kpi_completed}
               stats={formatInteger(data.summary.completedLast30Days)}
               avatarIcon='tabler-checkup-list'
               avatarColor='success'
               trend={getTrend(latestMonthlyDelivery?.totalDeliverables ?? null, previousMonthlyDelivery?.totalDeliverables ?? null)}
               trendNumber={formatTrendValue(latestMonthlyDelivery?.totalDeliverables ?? null, previousMonthlyDelivery?.totalDeliverables ?? null)}
-              subtitle='Últimos 30 días'
-              titleTooltip='Total de piezas que pasaron a estado "Listo" en los últimos 30 días.'
-              footer={data.summary.completedLast30Days > 0 ? 'Actividad reciente visible en la cuenta.' : 'Aún sin actividad este mes.'}
-              statusLabel={data.summary.completedLast30Days > 0 ? 'Actividad mensual' : 'Sin actividad este mes'}
+              subtitle={GH_MESSAGES.dashboard_kpi_completed_subtitle}
+              titleTooltip={GH_MESSAGES.dashboard_kpi_completed_tooltip}
+              footer={
+                data.summary.completedLast30Days > 0
+                  ? GH_MESSAGES.dashboard_kpi_completed_footer_active
+                  : GH_MESSAGES.dashboard_kpi_monthly_empty
+              }
+              statusLabel={
+                data.summary.completedLast30Days > 0
+                  ? GH_MESSAGES.dashboard_kpi_completed_status_active
+                  : GH_MESSAGES.dashboard_kpi_completed_status_empty
+              }
               statusColor={data.summary.completedLast30Days > 0 ? 'info' : 'default'}
               statusIcon={data.summary.completedLast30Days > 0 ? 'tabler-activity' : 'tabler-circle-dashed'}
             />
 
             <DashboardKpiCard
-              title='OTD%'
+              title={GH_LABELS.kpi_otd}
               stats={formatPercent(data.summary.avgOnTimePct)}
               avatarIcon='tabler-clock-check'
               avatarColor='warning'
               trend={getTrend(latestMonthlyDelivery?.onTimePct ?? null, previousMonthlyDelivery?.onTimePct ?? null)}
               trendNumber={formatTrendValue(latestMonthlyDelivery?.onTimePct ?? null, previousMonthlyDelivery?.onTimePct ?? null, '%')}
-              subtitle='Entregas dentro de plazo'
-              titleTooltip='On-Time Delivery: porcentaje de piezas entregadas dentro del plazo definido en el brief. Meta: ≥90%.'
-              footer={data.summary.avgOnTimePct > 0 ? 'Promedio del portafolio visible.' : 'Aún sin actividad este mes.'}
+              subtitle={GH_MESSAGES.dashboard_kpi_otd_subtitle}
+              titleTooltip={GH_MESSAGES.tooltip_otd}
+              footer={data.summary.avgOnTimePct > 0 ? GH_MESSAGES.dashboard_kpi_otd_footer : GH_MESSAGES.dashboard_kpi_monthly_empty}
               statusLabel={otdStatus.label}
               statusColor={otdStatus.tone}
               statusIcon={otdStatus.icon}
             />
 
             <DashboardKpiCard
-              title='En revisión'
+              title={GH_LABELS.kpi_feedback}
               stats={formatInteger(data.summary.reviewPressureTasks)}
               avatarIcon='tabler-message-circle'
               avatarColor='info'
               trend='neutral'
               trendNumber='0'
-              subtitle='Piezas esperando tu feedback'
-              titleTooltip='Piezas en estado "Listo para revisión" o con comentarios abiertos en Frame.io.'
-              footer={`${formatInteger(data.summary.openFrameComments)} comentarios abiertos.`}
+              subtitle={GH_MESSAGES.dashboard_kpi_feedback_subtitle}
+              titleTooltip={GH_MESSAGES.dashboard_kpi_feedback_tooltip}
+              footer={GH_MESSAGES.dashboard_kpi_feedback_footer(data.summary.openFrameComments)}
               statusLabel={reviewStatus.label}
               statusColor={reviewStatus.tone}
               statusIcon={reviewStatus.icon}
@@ -197,32 +202,32 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
             }
           }}
         >
-          <SectionErrorBoundary sectionName='chart-status' description='No pudimos cargar la distribución por estado.'>
-            <ExecutiveCardShell title='Distribución por estado' subtitle='Tareas activas de tu cuenta'>
+          <SectionErrorBoundary sectionName='chart-status' description='No pudimos cargar la distribucion por estado.'>
+            <ExecutiveCardShell title={GH_LABELS.chart_status} subtitle={GH_MESSAGES.chart_status_subtitle}>
               {donutSeries.reduce((sum, value) => sum + value, 0) === 0 ? (
                 <EmptyState
                   icon='tabler-chart-donut-3'
-                  title='Aún no hay suficiente actividad'
-                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                  title={GH_MESSAGES.chart_empty_title}
+                  description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Gráfico de distribución de tareas por estado'>
+                <Box aria-label='Grafico de distribucion de assets por estado'>
                   <AppReactApexCharts type='donut' height={320} width='100%' series={donutSeries} options={statusMixOptions} />
                 </Box>
               )}
             </ExecutiveCardShell>
           </SectionErrorBoundary>
 
-          <SectionErrorBoundary sectionName='chart-cadence' description='No pudimos cargar la cadencia de entregas.'>
-            <ExecutiveCardShell title='Cadencia de entregas' subtitle='Piezas completadas por semana - últimos 3 meses'>
+          <SectionErrorBoundary sectionName='chart-cadence' description='No pudimos cargar la cadencia de deliveries.'>
+            <ExecutiveCardShell title={GH_MESSAGES.chart_cadence_title} subtitle={GH_MESSAGES.chart_cadence_subtitle}>
               {latestWeeklyCadenceCount < 2 ? (
                 <EmptyState
                   icon='tabler-chart-histogram'
-                  title='Aún no hay suficiente actividad'
-                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                  title={GH_MESSAGES.chart_empty_title}
+                  description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Gráfico de piezas completadas por semana en los últimos 3 meses'>
+                <Box aria-label='Grafico de assets completados por semana en los ultimos 3 meses'>
                   <AppReactApexCharts type='bar' height={320} width='100%' series={cadenceSeries} options={weeklyCadenceOptions} />
                 </Box>
               )}
@@ -230,15 +235,15 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           </SectionErrorBoundary>
 
           <SectionErrorBoundary sectionName='chart-rpa-project' description='No pudimos cargar el RpA por proyecto.'>
-            <ExecutiveCardShell title='RpA por proyecto' subtitle='Línea de referencia: 2,0 (máximo ICO)'>
+            <ExecutiveCardShell title={GH_LABELS.chart_rpa} subtitle={GH_MESSAGES.chart_rpa_subtitle}>
               {data.charts.projectRpa.length === 0 ? (
                 <EmptyState
                   icon='tabler-chart-bar'
-                  title='Aún no hay suficiente actividad'
-                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                  title={GH_MESSAGES.chart_empty_title}
+                  description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Gráfico de RpA promedio por proyecto'>
+                <Box aria-label='Grafico de RpA promedio por proyecto'>
                   <AppReactApexCharts type='bar' height={320} width='100%' series={projectRpaSeries} options={projectRpaOptions} />
                 </Box>
               )}
@@ -246,15 +251,15 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           </SectionErrorBoundary>
 
           <SectionErrorBoundary sectionName='chart-otd-trend' description='No pudimos cargar la tendencia mensual de OTD%.'>
-            <ExecutiveCardShell title='OTD% mensual' subtitle='Tendencia de los últimos 6 meses - meta: 90%'>
+            <ExecutiveCardShell title={GH_MESSAGES.chart_otd_title} subtitle={GH_MESSAGES.chart_otd_subtitle}>
               {data.charts.monthlyDelivery.filter(item => item.onTimePct !== null).length < 2 ? (
                 <EmptyState
                   icon='tabler-chart-line'
-                  title='Aún no hay suficiente actividad'
-                  description='Este gráfico necesita al menos 2 semanas de datos para ser útil.'
+                  title={GH_MESSAGES.chart_empty_title}
+                  description={GH_MESSAGES.chart_empty_description}
                 />
               ) : (
-                <Box aria-label='Gráfico de tendencia mensual de OTD%'>
+                <Box aria-label='Grafico de tendencia mensual de OTD%'>
                   <AppReactApexCharts type='line' height={320} width='100%' series={otdTrendSeries} options={otdTrendOptions} />
                 </Box>
               )}
@@ -262,11 +267,11 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           </SectionErrorBoundary>
         </Box>
 
-        <SectionErrorBoundary sectionName='team-capacity' description='No pudimos cargar la sección de equipo.'>
+        <SectionErrorBoundary sectionName='team-capacity' description='No pudimos cargar la seccion de equipo.'>
           <ClientTeamCapacitySection data={data} onRequest={setRequestIntent} />
         </SectionErrorBoundary>
 
-        <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la sección de ecosistema.'>
+        <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la seccion de ecosistema.'>
           <ClientEcosystemSection tooling={data.tooling} onRequest={setRequestIntent} />
         </SectionErrorBoundary>
 
@@ -274,7 +279,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           <ClientPortfolioHealthAccordion data={data} />
         </SectionErrorBoundary>
 
-        <SectionErrorBoundary sectionName='attention-projects' description='No pudimos cargar los proyectos bajo atención.'>
+        <SectionErrorBoundary sectionName='attention-projects' description='No pudimos cargar los proyectos bajo atencion.'>
           <ClientAttentionProjectsAccordion projects={data.projects} />
         </SectionErrorBoundary>
 
@@ -291,20 +296,20 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           }}
         >
           <Typography variant='body2' color='text.disabled'>
-            © 2026 Efeonce Group. Greenhouse keeps project delivery visible, measurable, and accountable.
+            {GH_MESSAGES.footer}
           </Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
             <MuiLink component={Link} href='/dashboard' color='text.secondary' underline='hover'>
-              Dashboard
+              {GH_NAV.dashboard.label}
             </MuiLink>
             <MuiLink component={Link} href='/proyectos' color='text.secondary' underline='hover'>
-              Proyectos
+              {GH_NAV.projects.label}
             </MuiLink>
             <MuiLink component={Link} href='/sprints' color='text.secondary' underline='hover'>
-              Sprints
+              {GH_NAV.sprints.label}
             </MuiLink>
             <MuiLink component={Link} href='/settings' color='text.secondary' underline='hover'>
-              Settings
+              {GH_NAV.settings.label}
             </MuiLink>
           </Stack>
         </Box>

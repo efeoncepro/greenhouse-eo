@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import { GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { BrandLogo, EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
 import type { GreenhouseDashboardTooling } from '@/types/greenhouse-dashboard'
 
@@ -71,7 +72,7 @@ const EcosystemColumn = ({
               </Stack>
               {tool.href ? (
                 <Button component={Link} href={tool.href} target='_blank' rel='noreferrer' variant='text' sx={{ px: 0, width: 'fit-content' }}>
-                  Abrir herramienta
+                  {GH_MESSAGES.ecosystem_open_tool}
                 </Button>
               ) : (
                 <Typography variant='caption' color='text.secondary'>
@@ -99,20 +100,20 @@ const ClientEcosystemSection = ({ tooling, onRequest }: ClientEcosystemSectionPr
   return (
     <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' } }}>
       <EcosystemColumn
-        title='Tu stack'
-        subtitle='Herramientas activas en tu cuenta'
-        emptyTitle='Tu stack está en configuración.'
-        emptyDescription='Pronto tendrás acceso directo a tus herramientas desde aquí.'
-        requestLabel='¿Necesitas una herramienta adicional? Solicitar'
+        title={GH_MESSAGES.ecosystem_stack_title}
+        subtitle={GH_MESSAGES.ecosystem_stack_subtitle}
+        emptyTitle={GH_MESSAGES.ecosystem_stack_empty_title}
+        emptyDescription={GH_MESSAGES.ecosystem_stack_empty_description}
+        requestLabel={GH_MESSAGES.ecosystem_stack_request}
         tools={configuredStack}
         onRequest={() => onRequest('una herramienta adicional')}
       />
       <EcosystemColumn
-        title='AI en tu cuenta'
-        subtitle='Inteligencia artificial activa en tu operación'
-        emptyTitle='Las herramientas AI se activarán con tu primer proyecto creativo.'
-        emptyDescription='Esta sección mostrará la capacidad AI activa de tu cuenta cuando esté habilitada.'
-        requestLabel='¿Necesitas otra capacidad AI? Solicitar'
+        title={GH_MESSAGES.ecosystem_ai_title}
+        subtitle={GH_MESSAGES.ecosystem_ai_subtitle}
+        emptyTitle={GH_MESSAGES.ecosystem_ai_empty_title}
+        emptyDescription={GH_MESSAGES.ecosystem_ai_empty_description}
+        requestLabel={GH_MESSAGES.ecosystem_ai_request}
         tools={configuredAi}
         onRequest={() => onRequest('otra capacidad AI')}
       />

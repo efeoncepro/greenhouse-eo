@@ -6,6 +6,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
+import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+
 type ClientDashboardHeroProps = {
   clientName: string
   subtitle: string
@@ -62,13 +64,17 @@ const ClientDashboardHero = ({ clientName, subtitle, badges, updatedAtLabel }: C
                 fontSize: { xs: '1.8rem', md: '2.35rem' }
               }}
             >
-              Throughput, revisión y salud creativa.
+              {GH_NAV.dashboard.label}
             </Typography>
           </Stack>
           <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.78), textAlign: { xs: 'left', md: 'right' } }}>
             {updatedAtLabel}
           </Typography>
         </Stack>
+
+        <Typography variant='body2' sx={{ color: alpha(theme.palette.common.white, 0.78), maxWidth: 720 }}>
+          {GH_MESSAGES.subtitle_pulse}
+        </Typography>
 
         <Typography variant='body1' sx={{ color: alpha(theme.palette.common.white, 0.92), maxWidth: 820, lineHeight: 1.6 }}>
           {subtitle}
