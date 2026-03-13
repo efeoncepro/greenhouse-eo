@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 
 import GreenhouseSettings from '@views/greenhouse/GreenhouseSettings'
 
-import { getDashboardOverview } from '@/lib/dashboard/get-dashboard-overview'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
@@ -17,18 +16,5 @@ export default async function Page() {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 
-  const data = await getDashboardOverview({
-    clientId: tenant.clientId,
-    projectIds: tenant.projectIds,
-    businessLines: tenant.businessLines,
-    serviceModules: tenant.serviceModules
-  })
-
-  return (
-    <GreenhouseSettings
-      hasMicrosoftAuth={hasMicrosoftAuth}
-      accountTeam={data.accountTeam}
-      businessLines={tenant.businessLines}
-    />
-  )
+  return <GreenhouseSettings hasMicrosoftAuth={hasMicrosoftAuth} />
 }

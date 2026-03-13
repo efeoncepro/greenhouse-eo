@@ -3,6 +3,27 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Team identity and capacity runtime
+- Se implemento una primera capa real del task `CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
+  - `GET /api/team/members`
+  - `GET /api/team/capacity`
+  - `GET /api/team/by-project/[projectId]`
+  - `GET /api/team/by-sprint/[sprintId]`
+  - `scripts/setup-team-tables.sql`
+  - componentes cliente para dossier, capacidad, equipo por proyecto y velocity por persona
+- La fuente real inspeccionada en BigQuery para `notion_ops.tareas` no expone `responsable_nombre` ni `responsable_email` como columnas directas.
+  - El runtime nuevo usa el schema real detectado en `INFORMATION_SCHEMA`:
+    - `responsables`
+    - `responsables_ids`
+    - `responsables_names`
+    - `responsable_texto`
+  - El match operativo prioriza `notion_user_id` ↔ `responsables_ids[SAFE_OFFSET(0)]`, con fallback a email/nombre.
+- El repo no contiene el pipeline externo `notion-bq-sync`; por lo tanto esta ronda no modifico ni redeployo la Cloud Function. Ese tramo sigue siendo un bloqueo externo al workspace actual.
+- `/settings` ya no depende de `getDashboardOverview()` solo para el roster; consume el endpoint dedicado de equipo.
+- `/dashboard` reemplaza la card legacy de capacity por una surface cliente que consume la API dedicada.
+- `/proyectos/[id]` ahora incorpora una seccion `Equipo en este proyecto`.
+- El repo no tenia `/sprints/[id]`; se habilito una primera ruta para hospedar `Velocity por persona` y enlazarla desde el detalle de proyecto.
+
 ## Delta 2026-03-13 Preview auth hardening
 - `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
 - Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.

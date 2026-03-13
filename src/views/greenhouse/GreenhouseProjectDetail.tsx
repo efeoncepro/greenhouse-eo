@@ -22,7 +22,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import { EmptyState } from '@/components/greenhouse'
+import { EmptyState, ProjectTeamSection } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseProjectDetailData, GreenhouseProjectTasksData } from '@/types/greenhouse-project-detail'
 
@@ -205,6 +205,8 @@ const GreenhouseProjectDetail = ({ projectId }: Props) => {
             ))}
           </Box>
 
+          <ProjectTeamSection projectId={projectId} />
+
           <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: '1.7fr 1fr' } }}>
             <Card>
               <CardContent>
@@ -361,11 +363,16 @@ const GreenhouseProjectDetail = ({ projectId }: Props) => {
                           </Box>
                         </Box>
 
-                        {detail.sprint.pageUrl ? (
-                          <Button component='a' href={detail.sprint.pageUrl} target='_blank' rel='noreferrer' variant='text' sx={{ px: 0, minWidth: 0 }}>
-                            {GH_MESSAGES.project_cycle_source}
+                        <Stack direction='row' spacing={2} flexWrap='wrap'>
+                          <Button component={Link} href={`/sprints/${detail.sprint.id}`} variant='text' sx={{ px: 0, minWidth: 0 }}>
+                            {GH_MESSAGES.project_cycle_detail}
                           </Button>
-                        ) : null}
+                          {detail.sprint.pageUrl ? (
+                            <Button component='a' href={detail.sprint.pageUrl} target='_blank' rel='noreferrer' variant='text' sx={{ px: 0, minWidth: 0 }}>
+                              {GH_MESSAGES.project_cycle_source}
+                            </Button>
+                          ) : null}
+                        </Stack>
                       </>
                     ) : (
                       <EmptyState icon='tabler-timeline' title={GH_LABELS.sprint_active} description={GH_MESSAGES.empty_project_cycle} minHeight={220} />

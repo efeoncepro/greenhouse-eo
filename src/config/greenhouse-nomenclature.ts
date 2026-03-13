@@ -51,8 +51,15 @@ export const GH_TEAM = {
   label_fte: 'Dedicacion',
   label_service_line: 'Linea de servicio',
   label_modality: 'Modalidad',
+  footer_team_total: 'Equipo',
   expand_title: 'Ampliar equipo',
   expand_subtitle: 'Agrega capacidad creativa, de medios o tecnologia.',
+  modality_pending: 'Por definir',
+  relevance_pending: 'La nota de relevancia de esta persona se esta configurando.',
+  contact_pending: 'Canal en configuracion',
+  contact_channel_teams: 'Microsoft Teams',
+  contact_channel_slack: 'Slack',
+  contact_channel_email: 'Email',
 
   capacity_title: 'Capacidad del equipo',
   capacity_subtitle: 'Carga operativa basada en proyectos y tareas activas',
@@ -60,8 +67,16 @@ export const GH_TEAM = {
   label_hours: 'Horas este mes',
   label_utilization: 'Utilizacion',
   label_load: 'Carga por persona',
+  active_assets_short: 'assets activos',
+  projects_short: 'proyectos',
 
   project_team_title: 'Equipo en este proyecto',
+  project_team_subtitle: 'Quienes estan trabajando hoy en este proyecto y como se mueve su carga.',
+  project_people_summary: '{count} personas trabajando en este proyecto',
+  project_person_column: 'Persona',
+  project_active_column: 'Assets activos',
+  project_completed_column: 'Completados',
+  project_review_column: 'En revision',
 
   sprint_vel_title: 'Velocity por persona',
   sprint_vel_subtitle: 'Rendimiento del equipo en este ciclo',
@@ -113,6 +128,10 @@ export const GH_MESSAGES = {
   error_no_data: 'Sin datos para este periodo',
   error_projects_live: 'No pudimos cargar datos live de proyectos para tu space.',
   error_project_detail: 'No pudimos cargar este proyecto. Intenta de nuevo en unos minutos.',
+  error_team_members: 'No pudimos cargar tu equipo de cuenta. Intenta de nuevo en unos minutos.',
+  error_team_capacity: 'No pudimos cargar la capacidad del equipo en este momento.',
+  error_team_project: 'No pudimos cargar el equipo de este proyecto.',
+  error_team_sprint: 'No pudimos cargar la velocity por persona de este ciclo.',
   error_updates: 'No pudimos cargar los updates del ecosistema en este momento.',
 
   empty_dashboard:
@@ -125,6 +144,7 @@ export const GH_MESSAGES = {
   empty_team:
     'Tu equipo de cuenta esta siendo configurado. Cuando este listo, veras aqui a cada persona asignada a tu operacion.',
   empty_capacity: 'Los datos de capacidad apareceran cuando tu primer proyecto este en marcha.',
+  empty_team_project: 'Todavia no hay trazabilidad suficiente para mostrar el equipo de este proyecto.',
   empty_project_assets:
     'Aun no hay assets visibles para este proyecto. Cuando la produccion se active, apareceran aqui.',
   empty_project_cycle:
@@ -144,6 +164,9 @@ export const GH_MESSAGES = {
   tooltip_semaphore_red:
     'Alerta: indicadores fuera de rango. Tu equipo de cuenta te contactara con un action plan.',
   tooltip_utilization: 'Estimacion de uso basada en la carga operativa actual del equipo.',
+  team_operational_pending:
+    'La trazabilidad operativa de responsables aun no esta completa en BigQuery. El roster contractual sigue visible mientras termina ese sync.',
+  team_project_breakdown_empty: 'Sin distribucion visible por proyecto todavia.',
 
   footer: 'Efeonce Greenhouse | El ambiente disenado para que tu marca crezca',
   footer_portal_link: 'Portal',
@@ -235,6 +258,7 @@ export const GH_MESSAGES = {
   project_cycle_assets: 'Assets en ciclo',
   project_cycle_completed: 'Completados',
   project_cycle_source: 'Abrir ciclo fuente',
+  project_cycle_detail: 'Ver detalle del ciclo',
   project_review_title: 'Presion de feedback',
   project_review_subtitle:
     'Usa esta lectura para decidir si la siguiente conversacion debe enfocarse en aprobaciones, retrabajo o bloqueos.',
@@ -298,6 +322,8 @@ export const GH_MESSAGES = {
     'Describe el perfil, la capacidad o la herramienta que buscas. Podras copiar este mensaje y compartirlo con tu equipo de cuenta.',
   request_dialog_placeholder:
     'Describe el perfil o la capacidad que buscas. Tu equipo de cuenta te contactara.',
+  request_dialog_prefill: (intent: string) => `Necesito apoyo en: ${intent}.`,
+  request_dialog_fallback: 'Necesito apoyo con mi operacion en Greenhouse.',
   request_dialog_copied: 'Solicitud lista para compartir con tu equipo de cuenta.',
   request_dialog_close: 'Cerrar',
   request_dialog_copy: 'Copiar solicitud'

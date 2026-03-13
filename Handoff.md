@@ -40,6 +40,64 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 22:15 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la base runtime del sistema de identidad y capacidad del equipo descrito en `CODEX_TASK_Team_Identity_Capacity_System.md` dentro del repo actual.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / cliente / team identity + capacity
+
+### Archivos tocados
+- `src/types/team.ts`
+- `src/lib/team-queries.ts`
+- `src/app/api/team/members/route.ts`
+- `src/app/api/team/capacity/route.ts`
+- `src/app/api/team/by-project/[projectId]/route.ts`
+- `src/app/api/team/by-sprint/[sprintId]/route.ts`
+- `src/components/greenhouse/RequestDialog.tsx`
+- `src/components/greenhouse/TeamAvatar.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamLoadBar.tsx`
+- `src/components/greenhouse/UpsellBanner.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/views/greenhouse/dashboard/DashboardRequestDialog.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/views/greenhouse/GreenhouseProjectDetail.tsx`
+- `src/views/greenhouse/GreenhouseSprintDetail.tsx`
+- `src/app/(dashboard)/sprints/[id]/page.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `scripts/setup-team-tables.sql`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- Inspeccion real de BigQuery via `INFORMATION_SCHEMA` usando las credenciales de `.env.local`: correcto.
+  - `notion_ops.tareas` expone `responsables`, `responsables_ids`, `responsables_names` y `responsable_texto`.
+  - No existe una tabla `notion_ops.users`/`usuarios` visible en ese dataset.
+- No se pudo ejecutar `pnpm lint`, `pnpm build` ni `tsc` en esta sesion porque el runtime del terminal no expone `node`, `pnpm` ni `npx`.
+- No se hizo smoke visual autenticado real de `/settings`, `/dashboard`, `/proyectos/[id]` ni `/sprints/[id]` despues del wiring.
+
+### Riesgos o pendientes
+- El task original menciona cambios al pipeline externo `notion-bq-sync`, pero ese repo no existe en este workspace; esa parte sigue bloqueada fuera de este turno.
+- La implementacion usa el schema real hoy visible en BigQuery, no el schema hipotetico del documento. Si el pipeline cambia y normaliza columnas `responsable_*`, conviene reevaluar si mantener el alias runtime actual o simplificarlo.
+- `/sprints/[id]` no existia en el repo y quedo habilitado en version minima para hospedar `Velocity por persona`; falta una pasada visual y decidir si la pagina debe crecer con mas contexto de sprint.
+- `package.json` y `pnpm-lock.yaml` siguen sin tocarse; no hubo validacion JavaScript/TypeScript integral desde este terminal.
+
 ## 2026-03-13 20:05 America/Santiago
 
 ### Agente

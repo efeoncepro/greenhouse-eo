@@ -11,9 +11,8 @@ import Typography from '@mui/material/Typography'
 
 import { signIn, useSession } from 'next-auth/react'
 
-import { AccountTeamDossierSection } from '@/components/greenhouse'
+import { TeamDossierSection } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
-import type { GreenhouseDashboardAccountTeam } from '@/types/greenhouse-dashboard'
 
 const settingsRows = [
   {
@@ -36,13 +35,9 @@ const providerLabelMap: Record<string, string> = {
 }
 
 const GreenhouseSettings = ({
-  hasMicrosoftAuth,
-  accountTeam,
-  businessLines
+  hasMicrosoftAuth
 }: {
   hasMicrosoftAuth: boolean
-  accountTeam: GreenhouseDashboardAccountTeam
-  businessLines: string[]
 }) => {
   const { data: session } = useSession()
 
@@ -138,7 +133,7 @@ const GreenhouseSettings = ({
         </Card>
       </Box>
 
-      <AccountTeamDossierSection accountTeam={accountTeam} businessLines={businessLines} />
+      <TeamDossierSection />
     </Stack>
   )
 }
