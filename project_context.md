@@ -34,6 +34,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `creative-review-hotspots`
   - `creative-projects`
   - `creative-quality`
+- La consolidacion visual de `Creative Hub` ya quedo alineada explicitamente con patrones de `full-version` en vez de una composicion ad hoc:
+  - hero adaptado desde la logica de `WebsiteAnalyticsSlider`
+  - KPI cards sobre `HorizontalWithSubtitle`
+  - quality card compacta tipo `SupportTracker`
+  - listas ejecutivas con jerarquia tipo `SourceVisits`
 - El dispatcher declarativo actual cubre los card types reales del registry vigente:
   - `metric`
   - `project-list`

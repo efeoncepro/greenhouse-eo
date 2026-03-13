@@ -1,7 +1,7 @@
 import Stack from '@mui/material/Stack'
 
+import CapabilityOverviewHero from '@/components/capabilities/CapabilityOverviewHero'
 import ModuleLayout from '@/components/capabilities/ModuleLayout'
-import { ExecutiveHeroCard } from '@/components/greenhouse'
 import type { CapabilityModuleData } from '@/types/capabilities'
 
 type GreenhouseCapabilityModuleProps = {
@@ -12,7 +12,7 @@ type GreenhouseCapabilityModuleProps = {
 const GreenhouseCapabilityModule = ({ clientName, data }: GreenhouseCapabilityModuleProps) => {
   return (
     <Stack spacing={6}>
-      <ExecutiveHeroCard
+      <CapabilityOverviewHero
         eyebrow={data.hero.eyebrow}
         title={`${clientName}: ${data.hero.title}`}
         description={data.hero.description}

@@ -40,6 +40,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 14:39 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Subir la barra visual de `Creative Hub` para que la capability no solo cumpla el runtime del documento, sino que reutilice de forma explicita patrones Vuexy de `full-version`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / Creative Hub / visual refactor / smoke autenticado
+
+### Archivos tocados
+- `src/components/capabilities/CapabilityOverviewHero.tsx`
+- `src/components/capabilities/CapabilityCard.tsx`
+- `src/components/card-statistics/HorizontalWithSubtitle.tsx`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/card-statistics/HorizontalWithSubtitle.tsx src/components/capabilities/CapabilityOverviewHero.tsx src/components/capabilities/CapabilityCard.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+
+### Riesgos o pendientes
+- `Creative Hub` ya usa de forma activa patrones visuales adaptados de `full-version`, pero solo este modulo quedo llevado a esa barra; el resto de capabilities aun usan el dispatcher declarativo con visuales mas sobrios.
+- `HorizontalWithSubtitle` ahora admite ocultar trend cuando no existe una delta real; si otro agente lo reutiliza, esa flexibilidad ya es parte del contrato del componente.
+- `next build` sigue mostrando el mensaje de reconfiguracion de `tsconfig.json`; en este turno no dejo basura porque el archivo se limpio antes de cerrar.
+
 ## 2026-03-13 11:42 America/Santiago
 
 ### Agente
