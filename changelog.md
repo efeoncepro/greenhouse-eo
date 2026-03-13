@@ -4,6 +4,22 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-13
+
+### Capabilities runtime foundation
+- Se ejecuto la primera version funcional de `Greenhouse_Capabilities_Architecture_v1.md` sobre el runtime vigente del portal, sin reintroducir el modelo legacy de resolver capabilities desde `greenhouse.clients`.
+- Se agregaron `src/config/capability-registry.ts`, `src/lib/capabilities/resolve-capabilities.ts` y `src/lib/capabilities/get-capability-module-data.ts` para resolver modules a partir de `businessLines` y `serviceModules` ya presentes en la sesion.
+- Se agregaron:
+  - `GET /api/capabilities/resolve`
+  - `GET /api/capabilities/[moduleId]/data`
+  - `/capabilities/[moduleId]`
+- El sidebar vertical ahora muestra una seccion dinamica `Servicios` con modules activos del tenant:
+  - `Creative Hub`
+  - `CRM Command`
+  - `Onboarding Center`
+  - `Web Delivery`
+- La data inicial de cada capability module reutiliza el contrato server-side del dashboard actual para exponer hero, metric cards, projects in focus, tooling y quality signal mientras los query builders dedicados quedan para una iteracion posterior.
+
 ## 2026-03-12
 
 ### Microsoft SSO foundation

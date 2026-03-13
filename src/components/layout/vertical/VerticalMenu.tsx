@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import { Menu, MenuItem } from '@menu/vertical-menu'
+import { Menu, MenuItem, MenuSection } from '@menu/vertical-menu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -20,6 +20,8 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 // Style Imports
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
+
+import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -48,6 +50,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
+  const capabilityModules = resolveCapabilityModules({
+    businessLines: session?.user?.businessLines || [],
+    serviceModules: session?.user?.serviceModules || []
+  })
+
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
   return (
@@ -73,24 +80,32 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
-          Dashboard
-        </MenuItem>
-        {!isInternalUser ? (
-          <>
-            <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
-              Proyectos
-            </MenuItem>
-            <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
-              Sprints
-            </MenuItem>
-            <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
-              Settings
-            </MenuItem>
-          </>
+        <MenuSection label='Operacion'>
+          <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
+            Dashboard
+          </MenuItem>
+          {!isInternalUser ? (
+            <>
+              <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
+                Proyectos
+              </MenuItem>
+              <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
+                Sprints
+              </MenuItem>
+            </>
+          ) : null}
+        </MenuSection>
+        {!isInternalUser && capabilityModules.length > 0 ? (
+          <MenuSection label='Servicios'>
+            {capabilityModules.map(module => (
+              <MenuItem key={module.id} href={module.route} icon={<i className={module.icon} />}>
+                {module.label}
+              </MenuItem>
+            ))}
+          </MenuSection>
         ) : null}
         {isAdminUser ? (
-          <>
+          <MenuSection label='Admin'>
             <MenuItem href='/admin/tenants' icon={<i className='tabler-building-community' />}>
               Admin Tenants
             </MenuItem>
@@ -100,7 +115,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href='/admin/roles' icon={<i className='tabler-shield-lock' />}>
               Roles & Permissions
             </MenuItem>
-          </>
+          </MenuSection>
+        ) : null}
+        {!isInternalUser ? (
+          <MenuSection label='Cuenta'>
+            <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
+              Settings
+            </MenuItem>
+          </MenuSection>
         ) : null}
       </Menu>
     </ScrollWrapper>

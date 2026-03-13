@@ -40,6 +40,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 00:54 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `Greenhouse_Capabilities_Architecture_v1.md` sobre la arquitectura real del repo, alineando capabilities con `businessLines` y `serviceModules` ya resueltos en sesion y no con el modelo legacy de `greenhouse.clients`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / client portal / navegacion dinamica / capabilities runtime
+
+### Archivos tocados
+- `src/types/capabilities.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `src/app/api/capabilities/resolve/route.ts`
+- `src/app/api/capabilities/[moduleId]/data/route.ts`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `src/app/(dashboard)/capabilities/[moduleId]/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre los archivos tocados de capabilities y `VerticalMenu`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: timeout en este worktree
+- `npx pnpm build`: timeout en este worktree
+
+### Riesgos o pendientes
+- La capa nueva ejecuta la spec usando el runtime vigente (`client_users` + `client_service_modules` + tenant session) y no el JOIN legacy sugerido por el documento original; esa diferencia queda intencional.
+- La data de `/capabilities/[moduleId]` reutiliza el payload del dashboard actual; aun no existen query builders dedicados por module ni cache dedicada.
+- Conviene hacer smoke visual autenticado del sidebar dinamico y al menos un module route real (`/capabilities/creative-hub` o equivalente) antes de promover cambios mayores sobre esta linea.
+
 ## 2026-03-13 01:40 America/Santiago
 
 ### Agente
