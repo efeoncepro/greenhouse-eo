@@ -27,8 +27,8 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 
-// Core Theme Imports
-import defaultCoreTheme from '@core/theme'
+// Theme Imports
+import mergedTheme from './mergedTheme'
 
 type Props = ChildrenType & {
   direction: Direction
@@ -85,7 +85,7 @@ const CustomThemeProvider = (props: Props) => {
       }
     }
 
-    const coreTheme = deepmerge(defaultCoreTheme(settings, currentMode, direction), newTheme)
+    const coreTheme = deepmerge(mergedTheme(settings, currentMode, direction), newTheme)
 
     return createTheme(coreTheme)
 

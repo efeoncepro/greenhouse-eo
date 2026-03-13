@@ -40,6 +40,100 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 12:01 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar la ejecucion real de `Greenhouse_Nomenclatura_Portal_v3.md`, no solo a nivel de labels, sino tambien en theming, tipografia, sidebar branded y copy secundaria del dashboard cliente activo.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / client portal / nomenclature + branding runtime / Vuexy theme-safe rollout
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/configs/primaryColorConfig.ts`
+- `src/configs/themeConfig.ts`
+- `src/app/layout.tsx`
+- `src/styles/greenhouse-sidebar.css`
+- `src/components/theme/index.tsx`
+- `src/components/theme/mergedTheme.ts`
+- `src/components/theme/types.ts`
+- `src/components/layout/shared/Logo.tsx`
+- `src/components/layout/vertical/Navigation.tsx`
+- `src/components/layout/horizontal/VerticalNavContent.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjects.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/dashboard/ClientPortfolioHealthAccordion.tsx`
+- `src/views/greenhouse/dashboard/ClientAttentionProjectsAccordion.tsx`
+- `src/views/greenhouse/dashboard/ClientEcosystemSection.tsx`
+- `src/views/greenhouse/dashboard/chart-options.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre el slice tocado de nomenclatura, theme y dashboard cliente: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
+- `npx pnpm build`: correcto
+- No se ejecuto validacion visual autenticada real en `/login`, `/dashboard`, `/proyectos`, `/sprints` o `/settings`
+
+### Riesgos o pendientes
+- Falta smoke visual autenticado real del sidebar branded, login y dashboard cliente siguiendo `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`; este turno valido estructura y build, no jerarquia visual final.
+- `themeConfig.mode` queda en `light` como default del documento, pero el switch runtime de `light/dark/system` sigue existiendo; conviene revisar que el look & feel en `dark` no necesite ajuste fino despues del smoke visual.
+- El documento completo sigue siendo mas amplio que este slice: admin e internal aun conservan copy legacy fuera de la capa centralizada y no fueron objetivo de este turno.
+
+## 2026-03-13 11:09 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `Greenhouse_Nomenclatura_Portal_v3.md` sobre las superficies cliente principales sin romper el sistema de theming oficial de Vuexy.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / client portal / nomenclature rollout / Vuexy theme-safe UI wiring
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjects.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/dashboard/*`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/data/navigation/*`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre los archivos tocados de nomenclatura y superficies cliente: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: timeout en este worktree (`124s`), no verificado
+
+### Riesgos o pendientes
+- La nomenclatura v3 ya cubre login, navegacion y las rutas cliente principales, pero todavia quedan textos legacy fuera de este slice en componentes secundarios de dashboard, admin e internal.
+- Se ratifico que Vuexy debe seguir siendo la capa de theming base; si otro agente quiere tocar paleta global u overrides compartidos, debe hacerlo por `src/components/theme/mergedTheme.ts` o `@core/theme/*`, no con un theme custom paralelo.
+- Conviene correr una validacion visual autenticada real sobre `/dashboard`, `/proyectos`, `/sprints`, `/settings` y `/login` antes de promover este cambio.
+
 ## 2026-03-13 14:39 America/Santiago
 
 ### Agente

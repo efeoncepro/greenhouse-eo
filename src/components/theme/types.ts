@@ -157,6 +157,17 @@ declare module '@mui/material/styles' {
       tableHeaderBg: string
       tooltipText: string
       trackBg: string
+      midnight?: string
+      deepAzure?: string
+      royalBlue?: string
+      coreBlue?: string
+      neonLime?: string
+      sunsetOrange?: string
+      crimson?: string
+      lightAlloy?: string
+      bodyText?: string
+      secondaryText?: string
+      claimGray?: string
     }
   }
   interface PaletteOptions {
@@ -168,6 +179,17 @@ declare module '@mui/material/styles' {
       tableHeaderBg?: string
       tooltipText?: string
       trackBg?: string
+      midnight?: string
+      deepAzure?: string
+      royalBlue?: string
+      coreBlue?: string
+      neonLime?: string
+      sunsetOrange?: string
+      crimson?: string
+      lightAlloy?: string
+      bodyText?: string
+      secondaryText?: string
+      claimGray?: string
     }
   }
 

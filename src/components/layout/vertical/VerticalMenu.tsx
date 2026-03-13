@@ -1,26 +1,22 @@
-// MUI Imports
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-// Third-party Imports
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { useSession } from 'next-auth/react'
 
-// Type Imports
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
-// Component Imports
 import { Menu, MenuItem, MenuSection } from '@menu/vertical-menu'
 
-// Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
-// Styled Component Imports
 import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNavExpandIcon'
 
-// Style Imports
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
+import { GH_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -38,13 +34,24 @@ const RenderExpandIcon = ({ open, transitionDuration }: RenderExpandIconProps) =
   </StyledVerticalNavExpandIcon>
 )
 
+const NavigationItemLabel = ({ label, subtitle, showSubtitle }: { label: string; subtitle: string; showSubtitle: boolean }) => (
+  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+    <Typography component='span' sx={{ color: 'inherit', fontSize: 'inherit', fontWeight: 500, lineHeight: 1.2 }}>
+      {label}
+    </Typography>
+    {showSubtitle ? (
+      <Typography component='span' variant='caption' sx={{ color: 'rgba(255, 255, 255, 0.56)', lineHeight: 1.2, whiteSpace: 'normal' }}>
+        {subtitle}
+      </Typography>
+    ) : null}
+  </Box>
+)
+
 const VerticalMenu = ({ scrollMenu }: Props) => {
-  // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
 
-  // Vars
-  const { isBreakpointReached, transitionDuration } = verticalNavOptions
+  const { isBreakpointReached, transitionDuration, isCollapsed, isHovered } = verticalNavOptions
   const { data: session } = useSession()
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
@@ -55,11 +62,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     serviceModules: session?.user?.serviceModules || []
   })
 
+  const showNavSubtitles = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
   return (
-    // eslint-disable-next-line lines-around-comment
-    /* Custom scrollbar instead of browser scroll, remove if you want browser scroll only */
     <ScrollWrapper
       {...(isBreakpointReached
         ? {
@@ -71,8 +77,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             onScrollY: container => scrollMenu(container, true)
           })}
     >
-      {/* Incase you also want to scroll NavHeader to scroll with Vertical Menu, remove NavHeader from above and paste it below this comment */}
-      {/* Vertical Menu */}
       <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
         menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
@@ -82,15 +86,27 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       >
         <MenuSection label='Operacion'>
           <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
-            Dashboard
+            <NavigationItemLabel
+              label={isInternalUser ? 'Dashboard' : GH_NAV.dashboard.label}
+              subtitle={GH_NAV.dashboard.subtitle}
+              showSubtitle={!isInternalUser && showNavSubtitles}
+            />
           </MenuItem>
           {!isInternalUser ? (
             <>
               <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
-                Proyectos
+                <NavigationItemLabel
+                  label={GH_NAV.projects.label}
+                  subtitle={GH_NAV.projects.subtitle}
+                  showSubtitle={showNavSubtitles}
+                />
               </MenuItem>
               <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
-                Sprints
+                <NavigationItemLabel
+                  label={GH_NAV.sprints.label}
+                  subtitle={GH_NAV.sprints.subtitle}
+                  showSubtitle={showNavSubtitles}
+                />
               </MenuItem>
             </>
           ) : null}
@@ -120,7 +136,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         {!isInternalUser ? (
           <MenuSection label='Cuenta'>
             <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
-              Settings
+              <NavigationItemLabel
+                label={GH_NAV.settings.label}
+                subtitle={GH_NAV.settings.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
           </MenuSection>
         ) : null}

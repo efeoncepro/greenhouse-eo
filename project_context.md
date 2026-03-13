@@ -3,6 +3,27 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Greenhouse nomenclature portal
+- Ya existe `src/config/greenhouse-nomenclature.ts` como fuente unica de nomenclatura visible para la capa cliente:
+  - `GH_NAV`
+  - `GH_LABELS`
+  - `GH_TEAM`
+  - `GH_MESSAGES`
+  - `GH_COLORS`
+- La navegacion cliente y las superficies principales `/login`, `/dashboard`, `/proyectos`, `/sprints` y `/settings` ya empezaron a consumir esa capa centralizada en vez de labels hardcodeados.
+- El rollout ya no es solo copy-level: la marca Efeonce ahora entra por el wiring oficial del starter kit sin crear un theme paralelo:
+  - `src/components/theme/mergedTheme.ts`
+  - `src/components/theme/index.tsx`
+  - `src/configs/primaryColorConfig.ts`
+  - `src/app/layout.tsx`
+- `layout.tsx` ahora carga `DM Sans` + `Poppins`, y el sidebar branded queda encapsulado en `src/styles/greenhouse-sidebar.css` con logo negativo para el nav vertical.
+- El dashboard cliente activo ahora tambien consume la nomenclatura centralizada en sus componentes secundarios de experiencia:
+  - `ClientPortfolioHealthAccordion`
+  - `ClientAttentionProjectsAccordion`
+  - `ClientEcosystemSection`
+  - annotations, tooltips y totals de `chart-options.ts`
+- Regla operativa ratificada para theming: Greenhouse no debe reescribir el theme de Vuexy desde cero; cualquier ajuste global de tema debe pasar por `src/components/theme/mergedTheme.ts`, `@core/theme/*` o la configuracion oficial de Vuexy.
+
 ## Delta 2026-03-13 Capabilities runtime foundation
 - La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
 - El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.

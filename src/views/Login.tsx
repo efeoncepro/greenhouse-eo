@@ -1,13 +1,10 @@
 'use client'
 
-// React Imports
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 
-// Next Imports
 import { useRouter } from 'next/navigation'
 
-// MUI Imports
 import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import useMediaQuery from '@mui/material/useMediaQuery'
@@ -18,21 +15,18 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 
-// Third-party Imports
 import classnames from 'classnames'
 import { signIn } from 'next-auth/react'
 
-// Type Imports
 import type { SystemMode } from '@core/types'
 
-// Component Imports
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
-// Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { GH_COLORS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 const LoginIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
@@ -100,7 +94,7 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
     })
 
     if (result?.error) {
-      setError('No pudimos iniciar sesion con ese correo y contraseña. Revisa tus datos o solicita acceso.')
+      setError(GH_MESSAGES.login_error_credentials)
       setIsSubmitting(false)
 
       return
@@ -143,10 +137,8 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>Acceso a Greenhouse</Typography>
-            <Typography>
-              Entra con Microsoft para usar SSO o usa tus credenciales como fallback si tu cuenta ya fue provisionada.
-            </Typography>
+            <Typography variant='h4'>{GH_MESSAGES.login_title}</Typography>
+            <Typography>{GH_MESSAGES.login_subtitle}</Typography>
           </div>
           <Stack spacing={4}>
             {error ? <Alert severity='error'>{error}</Alert> : null}
@@ -159,11 +151,11 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
               startIcon={<i className='tabler-brand-windows' />}
               sx={{
                 py: 2.2,
-                bgcolor: '#0078D4',
+                bgcolor: GH_COLORS.semantic.info.source,
                 color: '#fff',
-                boxShadow: '0 14px 32px rgba(0, 120, 212, 0.24)',
+                boxShadow: `0 14px 32px ${GH_COLORS.semantic.info.bg}`,
                 '&:hover': {
-                  bgcolor: '#106EBE'
+                  bgcolor: GH_COLORS.role.development.textDark
                 },
                 '&.Mui-disabled': {
                   bgcolor: 'action.disabledBackground',
@@ -171,28 +163,23 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
                 }
               }}
             >
-              Iniciar sesion con Microsoft
+              {GH_MESSAGES.login_with_microsoft}
             </Button>
-            {!hasMicrosoftAuth ? (
-              <Alert severity='info'>
-                El provider Microsoft aun no esta configurado en este ambiente. Puedes usar credenciales mientras se
-                cargan `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`.
-              </Alert>
-            ) : null}
+            {!hasMicrosoftAuth ? <Alert severity='info'>{GH_MESSAGES.login_microsoft_unavailable}</Alert> : null}
             <Divider sx={{ '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
             <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
               <CustomTextField
                 autoFocus
                 fullWidth
                 label='Email'
-                placeholder='nombre@empresa.com'
+                placeholder={GH_MESSAGES.login_email_placeholder}
                 value={email}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
               />
               <CustomTextField
                 fullWidth
-                label='Contrasena'
-                placeholder='Ingresa tu contrasena'
+                label='Password'
+                placeholder={GH_MESSAGES.login_password_placeholder}
                 id='outlined-adornment-password'
                 type={isPasswordShown ? 'text' : 'password'}
                 value={password}
@@ -210,12 +197,11 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
                 }}
               />
               <Button fullWidth variant='outlined' type='submit' disabled={isSubmitting} color='secondary'>
-                {isSubmitting ? 'Validando acceso...' : 'Iniciar sesion con email'}
+                {isSubmitting ? 'Validando acceso...' : GH_MESSAGES.login_with_email}
               </Button>
             </form>
             <Typography variant='body2' color='text.secondary'>
-              El acceso al portal se provisiona internamente. Si tu cuenta aun no aparece, contacta a tu account
-              manager en Efeonce.
+              {GH_MESSAGES.login_access_note}
             </Typography>
           </Stack>
         </div>
