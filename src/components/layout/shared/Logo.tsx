@@ -9,6 +9,7 @@ import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
+import { resolveBrandAssets } from '@/components/greenhouse/brand-assets'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -61,8 +62,9 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   const { layout } = settings
   const currentMode = mode === 'system' ? systemMode : mode
   const useNegativeWordmark = variant === 'sidebar' || (variant === 'default' && (settings.semiDark || currentMode === 'dark'))
-  const wordmarkSrc = useNegativeWordmark ? '/branding/logo-negative.svg' : '/branding/logo-full.svg'
-  const markSrc = '/branding/avatar.png'
+  const efeonceAssets = resolveBrandAssets('efeonce')
+  const wordmarkSrc = useNegativeWordmark ? efeonceAssets?.negativeWordmarkSrc || '/branding/logo-negative.svg' : efeonceAssets?.wordmarkSrc || '/branding/logo-full.svg'
+  const markSrc = useNegativeWordmark ? efeonceAssets?.negativeMarkSrc || '/branding/avatar.png' : efeonceAssets?.markSrc || '/branding/avatar.png'
   const showCollapsedMarkOnly = variant === 'sidebar' && layout === 'collapsed' && !isHovered && !isBreakpointReached
 
   return (

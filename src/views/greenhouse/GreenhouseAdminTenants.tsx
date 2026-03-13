@@ -15,6 +15,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import { BusinessLineBadge } from '@/components/greenhouse'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
@@ -144,7 +145,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                       <TableCell>
                         <Stack direction='row' gap={1} flexWrap='wrap'>
                           {tenant.businessLines.map(moduleCode => (
-                            <Chip key={moduleCode} size='small' color='info' variant='outlined' label={moduleCode} />
+                            <BusinessLineBadge key={moduleCode} brand={moduleCode} />
                           ))}
                           {tenant.serviceModules.map(moduleCode => (
                             <Chip key={moduleCode} size='small' variant='outlined' label={moduleCode} />

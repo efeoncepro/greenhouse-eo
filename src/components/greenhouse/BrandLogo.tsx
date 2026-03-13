@@ -4,6 +4,8 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import { resolveBrandAssets } from './brand-assets'
+
 type BrandLogoProps = {
   brand: string
   size?: number
@@ -66,7 +68,9 @@ const getMonogram = (brand: string) =>
 
 const BrandLogo = ({ brand, size = 40 }: BrandLogoProps) => {
   const entry = resolveBrandEntry(brand)
+  const assetEntry = resolveBrandAssets(brand)
   const iconSize = Math.round(size * 0.52)
+  const markSize = Math.round(size * 0.66)
 
   return (
     <Box
@@ -91,7 +95,18 @@ const BrandLogo = ({ brand, size = 40 }: BrandLogoProps) => {
         }
       }}
     >
-      {entry?.iconClassName ? (
+      {assetEntry?.markSrc ? (
+        <Box
+          component='img'
+          src={assetEntry.markSrc}
+          alt={assetEntry.label}
+          sx={{
+            inlineSize: markSize,
+            blockSize: markSize,
+            objectFit: 'contain'
+          }}
+        />
+      ) : entry?.iconClassName ? (
         <i className={entry.iconClassName} />
       ) : entry?.fallbackIconClassName ? (
         <i className={entry.fallbackIconClassName} />

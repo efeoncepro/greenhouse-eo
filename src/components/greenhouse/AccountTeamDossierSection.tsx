@@ -2,15 +2,16 @@
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardAccountTeam } from '@/types/greenhouse-dashboard'
 
+import { getBrandDisplayLabel } from './brand-assets'
 import EmptyState from './EmptyState'
 import ExecutiveCardShell from './ExecutiveCardShell'
+import BusinessLineBadge from './BusinessLineBadge'
 
 type Props = {
   accountTeam: GreenhouseDashboardAccountTeam
@@ -170,17 +171,25 @@ const AccountTeamDossierSection = ({ accountTeam, businessLines }: Props) => {
                 const tone = GH_COLORS.service[getServiceTone(line)]
 
                 return (
-                  <Chip
+                  <Box
                     key={line}
-                    size='small'
-                    label={line}
                     sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      px: 1,
+                      py: 0.75,
+                      borderRadius: 999,
                       bgcolor: tone.bg,
                       color: tone.text,
                       border: `1px solid ${tone.text}`
                     }}
-                    variant='outlined'
-                  />
+                    >
+                    <BusinessLineBadge brand={line} />
+                    <Typography variant='caption' sx={{ fontWeight: 700, color: tone.text }}>
+                      {getBrandDisplayLabel(line)}
+                    </Typography>
+                  </Box>
                 )
               })
             ) : (

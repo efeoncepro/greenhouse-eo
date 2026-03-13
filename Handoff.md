@@ -40,6 +40,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 18:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Incorporar los nuevos SVG de branding cargados en `public/branding/SVG` y reemplazar placeholders previos en el shell y en superficies donde `Globe`, `Reach`, `Wave` y `Efeonce` ya forman parte visible de la experiencia.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / branding / shell autenticado / business lines
+
+### Archivos tocados
+- `src/components/greenhouse/brand-assets.ts`
+- `src/components/greenhouse/BrandLogo.tsx`
+- `src/components/greenhouse/BusinessLineBadge.tsx`
+- `src/components/greenhouse/AccountTeamDossierSection.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/components/layout/shared/Logo.tsx`
+- `src/app/layout.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/greenhouse/brand-assets.ts src/components/greenhouse/BusinessLineBadge.tsx src/components/greenhouse/BrandLogo.tsx src/components/greenhouse/AccountTeamDossierSection.tsx src/components/greenhouse/index.ts src/components/layout/shared/Logo.tsx src/app/layout.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx`: correcto
+
+### Riesgos o pendientes
+- El typo del asset `public/branding/SVG/isotipo-goble-full.svg` se consume tal como existe en disco; si luego se corrige el nombre del archivo, hay que ajustar el registry.
+- Esta ronda aplica logos donde hoy ya hay entidades de marca visibles; no reescribe aun chips del hero cliente ni todos los listados secundarios de modules.
+
 ## 2026-03-13 14:58 America/Santiago
 
 ### Agente
