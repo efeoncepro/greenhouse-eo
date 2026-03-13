@@ -123,9 +123,9 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
         ),
         project_health AS (
           SELECT
-            scoped_projects.client_id,
-            COUNT(DISTINCT scoped_projects.project_id) AS scoped_projects,
-            COUNT(DISTINCT IF(safe_on_time_pct IS NOT NULL, scoped_projects.project_id, NULL)) AS tracked_otd_projects,
+            scoped_project_rows.client_id,
+            COUNT(DISTINCT scoped_project_rows.project_id) AS scoped_projects,
+            COUNT(DISTINCT IF(safe_on_time_pct IS NOT NULL, scoped_project_rows.project_id, NULL)) AS tracked_otd_projects,
             AVG(safe_on_time_pct) AS avg_on_time_pct
           FROM (
             SELECT
@@ -135,8 +135,8 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
             FROM client_project_scopes AS cps
             LEFT JOIN \`${projectId}.notion_ops.proyectos\` AS p
               ON p.notion_page_id = cps.project_id
-          ) AS scoped_projects
-          GROUP BY scoped_projects.client_id
+          ) AS scoped_project_rows
+          GROUP BY scoped_project_rows.client_id
         ),
         feature_summary AS (
           SELECT
