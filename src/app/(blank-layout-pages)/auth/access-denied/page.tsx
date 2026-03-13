@@ -22,9 +22,9 @@ export default function AccessDeniedPage() {
                 tu account manager en Efeonce.
               </Typography>
             </Stack>
-            <Button component={Link} href='/login' variant='contained'>
-              Volver al inicio
-            </Button>
+            <Link href='/login' style={{ textDecoration: 'none' }}>
+              <Button variant='contained'>Volver al inicio</Button>
+            </Link>
           </Stack>
         </CardContent>
       </Card>
