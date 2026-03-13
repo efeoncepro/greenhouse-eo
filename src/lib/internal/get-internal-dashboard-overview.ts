@@ -148,8 +148,16 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
         module_summary AS (
           SELECT
             csm.client_id,
-            ARRAY_AGG(DISTINCT IF(sm.module_kind = 'business_line', csm.module_code, NULL) IGNORE NULLS ORDER BY csm.module_code) AS business_lines,
-            ARRAY_AGG(DISTINCT IF(sm.module_kind = 'service_module', csm.module_code, NULL) IGNORE NULLS ORDER BY csm.module_code) AS service_modules
+            ARRAY_AGG(
+              DISTINCT IF(sm.module_kind = 'business_line', csm.module_code, NULL)
+              IGNORE NULLS
+              ORDER BY IF(sm.module_kind = 'business_line', csm.module_code, NULL)
+            ) AS business_lines,
+            ARRAY_AGG(
+              DISTINCT IF(sm.module_kind = 'service_module', csm.module_code, NULL)
+              IGNORE NULLS
+              ORDER BY IF(sm.module_kind = 'service_module', csm.module_code, NULL)
+            ) AS service_modules
           FROM \`${projectId}.greenhouse.client_service_modules\` AS csm
           LEFT JOIN \`${projectId}.greenhouse.service_modules\` AS sm
             ON sm.module_code = csm.module_code
@@ -181,8 +189,8 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
           COALESCE(user_summary.invited_users, 0) AS invited_users,
           COALESCE(user_summary.pending_reset_users, 0) AS pending_reset_users,
           COALESCE(feature_summary.feature_flag_count, 0) AS feature_flag_count,
-          COALESCE(module_summary.business_lines, []) AS business_lines,
-          COALESCE(module_summary.service_modules, []) AS service_modules
+          module_summary.business_lines,
+          module_summary.service_modules
         FROM client_base
         LEFT JOIN user_summary
           ON user_summary.client_id = client_base.client_id
