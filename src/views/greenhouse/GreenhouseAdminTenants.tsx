@@ -15,7 +15,11 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import CustomAvatar from '@core/components/mui/Avatar'
+import { BusinessLineBadge } from '@/components/greenhouse'
+import { getInitials } from '@/utils/getInitials'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
+import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
 type Props = {
   data: AdminTenantsOverview
@@ -23,7 +27,7 @@ type Props = {
 
 const formatDateTime = (value: string | null) => {
   if (!value) {
-    return 'Sin registro'
+    return GH_INTERNAL_MESSAGES.admin_tenants_no_record
   }
 
   return new Date(value).toLocaleString('es-CL')
@@ -49,11 +53,10 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
           }}
         >
           <Stack spacing={2}>
-            <Chip label='Spaces governance' color='info' variant='outlined' sx={{ width: 'fit-content' }} />
-            <Typography variant='h3'>Administra spaces como empresas, con su postura de acceso, modulos y usuarios asociados.</Typography>
+            <Chip label={GH_INTERNAL_MESSAGES.admin_tenants_chip} color='info' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Typography variant='h3'>{GH_INTERNAL_MESSAGES.admin_tenants_hero_title}</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 920 }}>
-              Cada space representa una empresa cliente del portal. Esta vista consolida el estado comercial y operativo del
-              space sin colapsar metadata del cliente con identidad de usuario.
+              {GH_INTERNAL_MESSAGES.admin_tenants_hero_subtitle}
             </Typography>
           </Stack>
         </CardContent>
@@ -67,11 +70,11 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         }}
       >
         {[
-          ['Spaces', data.totals.totalTenants],
-          ['Activos', data.totals.activeTenants],
-          ['Con credenciales', data.totals.tenantsWithCredentials],
-          ['Pendientes reset', data.totals.tenantsPendingReset],
-          ['Con proyectos scoped', data.totals.tenantsWithScopedProjects]
+          [GH_INTERNAL_MESSAGES.admin_tenants_total_spaces, data.totals.totalTenants],
+          [GH_INTERNAL_MESSAGES.admin_tenants_active_spaces, data.totals.activeTenants],
+          [GH_INTERNAL_MESSAGES.admin_tenants_with_credentials, data.totals.tenantsWithCredentials],
+          [GH_INTERNAL_MESSAGES.admin_tenants_pending_reset, data.totals.tenantsPendingReset],
+          [GH_INTERNAL_MESSAGES.admin_tenants_with_projects, data.totals.tenantsWithScopedProjects]
         ].map(([label, value]) => (
           <Card key={label}>
             <CardContent>
@@ -90,11 +93,8 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
         <CardContent>
           <Stack spacing={3}>
             <Box>
-              <Typography variant='h4'>Admin Spaces</Typography>
-              <Typography color='text.secondary'>
-                Cada fila representa un cliente visible como space. El detalle agrupa usuarios, proyectos visibles, modulos contratados y
-                feature flags activos.
-              </Typography>
+              <Typography variant='h4'>{GH_INTERNAL_NAV.adminTenants.label}</Typography>
+              <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenants_table_subtitle}</Typography>
             </Box>
 
             <TableContainer>
@@ -113,13 +113,26 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                   {data.tenants.map(tenant => (
                     <TableRow key={tenant.clientId} hover>
                       <TableCell>
-                        <Stack spacing={0.75}>
-                          <Typography component={Link} href={`/admin/tenants/${tenant.clientId}`} color='text.primary' className='font-medium'>
-                            {tenant.clientName}
-                          </Typography>
-                          <Typography variant='body2' color='text.secondary'>
-                            {tenant.primaryContactEmail || 'Sin contacto principal'} {tenant.hubspotCompanyId ? `· HubSpot ${tenant.hubspotCompanyId}` : ''}
-                          </Typography>
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                          <CustomAvatar
+                            alt={tenant.clientName}
+                            src={tenant.logoUrl ? `/api/media/tenants/${tenant.clientId}/logo` : undefined}
+                            variant='rounded'
+                            size={42}
+                            skin={tenant.logoUrl ? undefined : 'light'}
+                            color='primary'
+                          >
+                            {!tenant.logoUrl ? getInitials(tenant.clientName) : null}
+                          </CustomAvatar>
+                          <Stack spacing={0.75}>
+                            <Typography component={Link} href={`/admin/tenants/${tenant.clientId}`} color='text.primary' className='font-medium'>
+                              {tenant.clientName}
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              {tenant.primaryContactEmail || GH_INTERNAL_MESSAGES.admin_tenants_no_contact}{' '}
+                              {tenant.hubspotCompanyId ? `· HubSpot ${tenant.hubspotCompanyId}` : ''}
+                            </Typography>
+                          </Stack>
                         </Stack>
                       </TableCell>
                       <TableCell>
@@ -129,7 +142,7 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                             <Chip size='small' variant='outlined' color={authModeTone(tenant.authMode)} label={tenant.authMode} />
                           </Stack>
                           <Typography variant='body2' color='text.secondary'>
-                            Home: {tenant.portalHomePath || '--'}
+                            {GH_INTERNAL_MESSAGES.admin_tenants_home_label}: {tenant.portalHomePath || '--'}
                           </Typography>
                         </Stack>
                       </TableCell>
@@ -146,26 +159,28 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                       <TableCell>
                         <Stack direction='row' gap={1} flexWrap='wrap'>
                           {tenant.businessLines.map(moduleCode => (
-                            <Chip key={moduleCode} size='small' color='info' variant='outlined' label={moduleCode} />
+                            <BusinessLineBadge key={moduleCode} brand={moduleCode} />
                           ))}
                           {tenant.serviceModules.map(moduleCode => (
                             <Chip key={moduleCode} size='small' variant='outlined' label={moduleCode} />
                           ))}
                           {tenant.businessLines.length === 0 && tenant.serviceModules.length === 0 ? (
                             <Typography variant='body2' color='text.secondary'>
-                              Sin modulos
+                              {GH_INTERNAL_MESSAGES.admin_tenants_no_modules}
                             </Typography>
                           ) : null}
                         </Stack>
                       </TableCell>
                       <TableCell>
                         <Stack spacing={0.75}>
-                          <Typography variant='body2'>Flags: {tenant.featureFlagCount}</Typography>
-                          <Typography variant='body2' color='text.secondary'>
-                            Update: {formatDateTime(tenant.updatedAt)}
+                          <Typography variant='body2'>
+                            {GH_INTERNAL_MESSAGES.admin_tenants_features_label}: {tenant.featureFlagCount}
                           </Typography>
                           <Typography variant='body2' color='text.secondary'>
-                            Ultimo login: {formatDateTime(tenant.lastLoginAt)}
+                            {GH_INTERNAL_MESSAGES.admin_tenants_updated_label}: {formatDateTime(tenant.updatedAt)}
+                          </Typography>
+                          <Typography variant='body2' color='text.secondary'>
+                            {GH_INTERNAL_MESSAGES.admin_tenants_last_login_label}: {formatDateTime(tenant.lastLoginAt)}
                           </Typography>
                         </Stack>
                       </TableCell>

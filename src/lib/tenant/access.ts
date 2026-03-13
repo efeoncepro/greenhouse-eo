@@ -22,6 +22,7 @@ interface TenantAccessRow {
   microsoft_tenant_id: string | null
   microsoft_email: string | null
   full_name: string
+  avatar_url: string | null
   role_codes: string[] | null
   route_groups: string[] | null
   project_scopes: string[] | null
@@ -55,6 +56,7 @@ export interface TenantAccessRecord {
   microsoftTenantId: string | null
   microsoftEmail: string | null
   fullName: string
+  avatarUrl: string | null
   roleCodes: string[]
   primaryRoleCode: string
   routeGroups: string[]
@@ -160,6 +162,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     microsoftTenantId: row.microsoft_tenant_id,
     microsoftEmail: row.microsoft_email,
     fullName: row.full_name,
+    avatarUrl: row.avatar_url,
     roleCodes,
     primaryRoleCode,
     routeGroups,
@@ -205,6 +208,7 @@ const getIdentityAccessRecord = async ({
         cu.microsoft_tenant_id,
         cu.microsoft_email,
         cu.full_name,
+        cu.avatar_url,
         ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
         ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
         ARRAY_AGG(DISTINCT ups.project_id IGNORE NULLS ORDER BY ups.project_id) AS project_scopes,
@@ -258,6 +262,7 @@ const getIdentityAccessRecord = async ({
         cu.microsoft_tenant_id,
         cu.microsoft_email,
         cu.full_name,
+        cu.avatar_url,
         timezone,
         portal_home_path,
         cu.auth_mode,

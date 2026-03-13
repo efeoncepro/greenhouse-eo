@@ -14,6 +14,7 @@ export interface AdminTenantUserRow {
   hubspotContactIds: string[]
   fullName: string
   email: string
+  avatarUrl: string | null
   status: string
   active: boolean
   authMode: string
@@ -41,6 +42,7 @@ export interface AdminTenantDetail {
   clientId: string
   publicId: string
   clientName: string
+  logoUrl: string | null
   status: string
   active: boolean
   primaryContactEmail: string | null
@@ -109,6 +111,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
         SELECT
           c.client_id,
           c.client_name,
+          JSON_VALUE(TO_JSON_STRING(c), '$.logo_url') AS logo_url,
           c.status,
           c.active,
           c.primary_contact_email,
@@ -142,6 +145,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
         GROUP BY
           c.client_id,
           c.client_name,
+          logo_url,
           c.status,
           c.active,
           c.primary_contact_email,
@@ -191,6 +195,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
           cu.user_id,
           cu.full_name,
           cu.email,
+          cu.avatar_url,
           cu.status,
           cu.active,
           cu.auth_mode,
@@ -274,6 +279,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
       hubspotCompanyId
     }),
     clientName: String(tenantRow.client_name || ''),
+    logoUrl: tenantRow.logo_url ? String(tenantRow.logo_url) : null,
     status: String(tenantRow.status || ''),
     active: Boolean(tenantRow.active),
     primaryContactEmail: tenantRow.primary_contact_email ? String(tenantRow.primary_contact_email) : null,
@@ -304,6 +310,7 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
       hubspotContactIds: normalizeStringArray(row.hubspot_contact_ids),
       fullName: String(row.full_name || ''),
       email: String(row.email || ''),
+      avatarUrl: row.avatar_url ? String(row.avatar_url) : null,
       status: String(row.status || ''),
       active: Boolean(row.active),
       authMode: String(row.auth_mode || ''),

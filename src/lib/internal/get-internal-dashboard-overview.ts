@@ -5,6 +5,7 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 export interface InternalDashboardClientRow {
   clientId: string
   clientName: string
+  logoUrl: string | null
   status: string
   active: boolean
   primaryContactEmail: string | null
@@ -86,6 +87,7 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
           SELECT
             c.client_id,
             c.client_name,
+            JSON_VALUE(TO_JSON_STRING(c), '$.logo_url') AS logo_url,
             c.status,
             c.active,
             c.primary_contact_email,
@@ -168,6 +170,7 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
         SELECT
           client_base.client_id,
           client_base.client_name,
+          client_base.logo_url,
           client_base.status,
           client_base.active,
           client_base.primary_contact_email,
@@ -221,6 +224,7 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
   const clients = (clientRows[0] as Array<Record<string, unknown>>).map(row => ({
     clientId: String(row.client_id || ''),
     clientName: String(row.client_name || ''),
+    logoUrl: row.logo_url ? String(row.logo_url) : null,
     status: String(row.status || ''),
     active: Boolean(row.active),
     primaryContactEmail: row.primary_contact_email ? String(row.primary_contact_email) : null,

@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 type Props = {
   data: AdminAccessOverview
@@ -19,40 +20,40 @@ const getShare = (part: number, total: number) => {
 const UserListCards = ({ data }: Props) => {
   const cards = [
     {
-      title: 'Usuarios',
+      title: GH_INTERNAL_MESSAGES.admin_users_total,
       stats: data.totals.totalUsers.toLocaleString('es-CL'),
       avatarIcon: 'tabler-users',
       avatarColor: 'primary' as const,
       trend: 'neutral' as const,
       trendNumber: getShare(data.totals.clientUsers, data.totals.totalUsers),
-      subtitle: 'Usuarios cliente sobre el total visible'
+      subtitle: GH_INTERNAL_MESSAGES.admin_users_total_subtitle
     },
     {
-      title: 'Activos',
+      title: GH_INTERNAL_MESSAGES.admin_users_active,
       stats: data.totals.activeUsers.toLocaleString('es-CL'),
       avatarIcon: 'tabler-user-check',
       avatarColor: 'success' as const,
       trend: 'positive' as const,
       trendNumber: getShare(data.totals.activeUsers, data.totals.totalUsers),
-      subtitle: 'Base operativa con acceso habilitado'
+      subtitle: GH_INTERNAL_MESSAGES.admin_users_active_subtitle
     },
     {
-      title: 'Invitados',
+      title: GH_INTERNAL_MESSAGES.admin_users_invited,
       stats: data.totals.invitedUsers.toLocaleString('es-CL'),
       avatarIcon: 'tabler-user-search',
       avatarColor: 'warning' as const,
       trend: 'neutral' as const,
       trendNumber: getShare(data.totals.invitedUsers, data.totals.totalUsers),
-      subtitle: 'Onboarding pendiente o acceso en curso'
+      subtitle: GH_INTERNAL_MESSAGES.admin_users_invited_subtitle
     },
     {
-      title: 'Internos',
+      title: GH_INTERNAL_MESSAGES.admin_users_internal,
       stats: data.totals.internalUsers.toLocaleString('es-CL'),
       avatarIcon: 'tabler-building-community',
       avatarColor: 'info' as const,
       trend: 'neutral' as const,
       trendNumber: getShare(data.totals.internalUsers, data.totals.totalUsers),
-      subtitle: 'Staff Efeonce habilitado en la plataforma'
+      subtitle: GH_INTERNAL_MESSAGES.admin_users_internal_subtitle
     }
   ]
 

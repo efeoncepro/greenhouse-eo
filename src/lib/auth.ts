@@ -135,6 +135,7 @@ export const authOptions: NextAuthOptions = {
           id: tenant.userId,
           email: tenant.email,
           name: tenant.fullName,
+          avatarUrl: tenant.avatarUrl,
           userId: tenant.userId,
           clientId: tenant.clientId,
           clientName: tenant.clientName,
@@ -229,6 +230,7 @@ export const authOptions: NextAuthOptions = {
         token.userId = user.userId
         token.email = user.email
         token.name = user.name
+        token.avatarUrl = user.avatarUrl
         token.clientId = user.clientId
         token.clientName = user.clientName
         token.tenantType = user.tenantType
@@ -275,6 +277,7 @@ export const authOptions: NextAuthOptions = {
           token.userId = tenant.userId
           token.email = tenant.email
           token.name = tenant.fullName
+          token.avatarUrl = tenant.avatarUrl
           token.clientId = tenant.clientId
           token.clientName = tenant.clientName
           token.tenantType = tenant.tenantType
@@ -304,6 +307,7 @@ export const authOptions: NextAuthOptions = {
         session.user.userId = typeof token.userId === 'string' ? token.userId : token.sub || ''
         session.user.email = token.email || ''
         session.user.name = token.name || ''
+        session.user.avatarUrl = typeof token.avatarUrl === 'string' ? token.avatarUrl : null
         session.user.clientId = typeof token.clientId === 'string' ? token.clientId : ''
         session.user.clientName = typeof token.clientName === 'string' ? token.clientName : 'Greenhouse Client'
         session.user.tenantType = token.tenantType === 'efeonce_internal' ? 'efeonce_internal' : 'client'

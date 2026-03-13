@@ -6,19 +6,18 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { EmptyState } from '@/components/greenhouse'
+import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 
-const sprintHistory = [
-  { label: 'Ciclo 18', velocity: 84, completion: '14/16 assets', status: GH_LABELS.semaphore_green },
-  { label: 'Ciclo 17', velocity: 71, completion: '12/17 assets', status: GH_LABELS.semaphore_yellow },
-  { label: 'Ciclo 16', velocity: 63, completion: '10/16 assets', status: 'Feedback pesado' }
-]
+const GreenhouseSprints = ({ data }: { data: GreenhouseDashboardData }) => {
+  const activeCycleProgress = Math.max(0, Math.min(100, Math.round(data.summary.completionRate)))
+  const cycleHistory = data.charts.monthlyDelivery.slice(-3).reverse()
 
-const GreenhouseSprints = () => {
   return (
     <Stack spacing={6}>
       <Box>
-        <Typography variant='h4'>{GH_NAV.sprints.label}</Typography>
+        <Typography variant='h4'>{GH_CLIENT_NAV.sprints.label}</Typography>
         <Typography color='text.secondary'>{GH_MESSAGES.subtitle_sprints}</Typography>
       </Box>
 
@@ -34,10 +33,10 @@ const GreenhouseSprints = () => {
                 <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
                   <Typography variant='body2'>{GH_MESSAGES.sprints_progress_label}</Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    74%
+                    {activeCycleProgress}%
                   </Typography>
                 </Stack>
-                <LinearProgress variant='determinate' value={74} sx={{ height: 12, borderRadius: 999 }} />
+                <LinearProgress variant='determinate' value={activeCycleProgress} sx={{ height: 12, borderRadius: 999 }} />
               </Box>
 
               <Box
@@ -51,19 +50,19 @@ const GreenhouseSprints = () => {
                   <Typography variant='body2' color='text.secondary'>
                     {GH_MESSAGES.sprints_deliveries_metric}
                   </Typography>
-                  <Typography variant='h4'>14</Typography>
+                  <Typography variant='h4'>{data.summary.completedLast30Days}</Typography>
                 </Box>
                 <Box sx={{ p: 2.5, borderRadius: 3, bgcolor: 'action.hover' }}>
                   <Typography variant='body2' color='text.secondary'>
                     {GH_LABELS.kpi_feedback}
                   </Typography>
-                  <Typography variant='h4'>5</Typography>
+                  <Typography variant='h4'>{data.summary.reviewPressureTasks}</Typography>
                 </Box>
                 <Box sx={{ p: 2.5, borderRadius: 3, bgcolor: 'action.hover' }}>
                   <Typography variant='body2' color='text.secondary'>
                     {GH_MESSAGES.sprints_blocked_metric}
                   </Typography>
-                  <Typography variant='h4'>2</Typography>
+                  <Typography variant='h4'>{data.summary.blockedTasks}</Typography>
                 </Box>
               </Box>
             </Stack>
@@ -74,18 +73,96 @@ const GreenhouseSprints = () => {
           <CardContent>
             <Stack spacing={3}>
               <Typography variant='h5'>{GH_MESSAGES.sprints_history_title}</Typography>
-              {sprintHistory.map(item => (
-                <Box key={item.label} sx={{ p: 2.5, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
-                  <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
-                    <Typography className='font-medium'>{item.label}</Typography>
-                    <Typography color='text.secondary'>{item.status}</Typography>
-                  </Stack>
-                  <Typography variant='body2' color='text.secondary' sx={{ mb: 1.5 }}>
-                    {item.completion}
-                  </Typography>
-                  <LinearProgress variant='determinate' value={item.velocity} sx={{ height: 10, borderRadius: 999 }} />
-                </Box>
-              ))}
+              {cycleHistory.length > 0 ? (
+                cycleHistory.map(item => (
+                  <Box key={item.month} sx={{ p: 2.5, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
+                    <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
+                      <Typography className='font-medium'>{item.label}</Typography>
+                      <Typography color='text.secondary'>{item.onTimePct === null ? 'Sin OTD' : `OTD ${Math.round(item.onTimePct)}%`}</Typography>
+                    </Stack>
+                    <Typography variant='body2' color='text.secondary' sx={{ mb: 1.5 }}>
+                      {GH_MESSAGES.sprints_completion_format(item.totalDeliverables, item.totalDeliverables + item.totalClientAdjustmentRounds)}
+                    </Typography>
+                    <LinearProgress
+                      variant='determinate'
+                      value={Math.max(0, Math.min(100, item.onTimePct ?? 0))}
+                      sx={{ height: 10, borderRadius: 999 }}
+                    />
+                  </Box>
+                ))
+              ) : (
+                <EmptyState icon='tabler-history' title={GH_MESSAGES.sprints_history_title} description={GH_MESSAGES.empty_sprints} minHeight={220} />
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: {
+            xs: '1fr',
+            xl: 'repeat(3, minmax(0, 1fr))'
+          }
+        }}
+      >
+        <Card>
+          <CardContent>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant='h5'>{GH_MESSAGES.sprints_velocity_title}</Typography>
+                <Typography color='text.secondary'>{GH_MESSAGES.sprints_velocity_subtitle}</Typography>
+              </Box>
+
+              {cycleHistory.length > 0 ? (
+                <Stack spacing={2}>
+                  {cycleHistory.map(item => (
+                    <Box key={`${item.month}-velocity`}>
+                      <Stack direction='row' justifyContent='space-between' alignItems='center' className='mbe-1'>
+                        <Typography variant='body2' color='text.secondary'>
+                          {item.label}
+                        </Typography>
+                        <Typography variant='body2' color='text.primary'>
+                          {GH_MESSAGES.chart_tooltip_assets(item.totalDeliverables)}
+                        </Typography>
+                      </Stack>
+                      <LinearProgress
+                        variant='determinate'
+                        value={Math.max(0, Math.min(100, item.onTimePct ?? 0))}
+                        sx={{ height: 8, borderRadius: 999 }}
+                      />
+                    </Box>
+                  ))}
+                </Stack>
+              ) : (
+                <EmptyState icon='tabler-activity' title={GH_MESSAGES.sprints_velocity_title} description={GH_MESSAGES.empty_sprint_velocity} minHeight={220} />
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant='h5'>{GH_LABELS.sprint_burndown}</Typography>
+                <Typography color='text.secondary'>{GH_MESSAGES.sprints_burndown_subtitle}</Typography>
+              </Box>
+              <EmptyState icon='tabler-chart-line' title={GH_LABELS.sprint_burndown} description={GH_MESSAGES.empty_sprint_burndown} minHeight={220} />
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant='h5'>{GH_TEAM.sprint_vel_title}</Typography>
+                <Typography color='text.secondary'>{GH_TEAM.sprint_vel_subtitle}</Typography>
+              </Box>
+              <EmptyState icon='tabler-users-group' title={GH_TEAM.sprint_vel_title} description={GH_MESSAGES.empty_sprint_team} minHeight={220} />
             </Stack>
           </CardContent>
         </Card>

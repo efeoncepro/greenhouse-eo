@@ -22,6 +22,7 @@ export interface AdminUserDetail {
   identityPublicId: string | null
   fullName: string
   email: string
+  avatarUrl: string | null
   jobTitle: string | null
   tenantType: 'client' | 'efeonce_internal'
   status: string
@@ -83,6 +84,7 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
           ip.public_id AS identity_public_id,
           cu.full_name,
           cu.email,
+          cu.avatar_url,
           cu.job_title,
           cu.tenant_type,
           cu.status,
@@ -121,6 +123,7 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
           identity_public_id,
           cu.full_name,
           cu.email,
+          cu.avatar_url,
           cu.job_title,
           cu.tenant_type,
           cu.status,
@@ -186,6 +189,7 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
     identityPublicId: row.identity_public_id ? String(row.identity_public_id) : null,
     fullName: String(row.full_name || 'Sin nombre'),
     email: String(row.email || ''),
+    avatarUrl: row.avatar_url ? String(row.avatar_url) : null,
     jobTitle: row.job_title ? String(row.job_title) : null,
     tenantType: (row.tenant_type as AdminUserDetail['tenantType']) || 'client',
     status: String(row.status || ''),

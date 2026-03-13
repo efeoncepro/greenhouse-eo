@@ -29,12 +29,13 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import OptionMenu from '@core/components/option-menu'
 
+import { BusinessLineBadge, BrandWordmark, IdentityImageUploader } from '@/components/greenhouse'
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 import { buildUserPublicId } from '@/lib/ids/greenhouse-ids'
@@ -180,10 +181,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   )
 
   const crmTabs = [
-    { value: 'contacto', label: 'Contacto', icon: 'tabler-users' },
-    { value: 'cuerpo', label: 'Cuerpo', icon: 'tabler-id-badge-2' },
-    { value: 'ciclo', label: 'Ciclo', icon: 'tabler-refresh-dot' },
-    { value: 'proveedor', label: 'Proveedor', icon: 'tabler-building-store' }
+    { value: 'contacto', label: GH_INTERNAL_MESSAGES.admin_tenant_crm_tab_contact, icon: 'tabler-users' },
+    { value: 'cuerpo', label: GH_INTERNAL_MESSAGES.admin_tenant_crm_tab_body, icon: 'tabler-id-badge-2' },
+    { value: 'ciclo', label: GH_INTERNAL_MESSAGES.admin_tenant_crm_tab_cycle, icon: 'tabler-refresh-dot' },
+    { value: 'proveedor', label: GH_INTERNAL_MESSAGES.admin_tenant_crm_tab_provider, icon: 'tabler-building-store' }
   ] as const
 
   const handleHubSpotRefresh = () => {
@@ -232,13 +233,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           | (TenantContactsProvisioningSummary & { error?: string })
           | null
 
-        if (!response.ok || !payload) {
+                      if (!response.ok || !payload) {
           const mergedSummary = mergeTenantContactsProvisioningSummaries(summaries)
           const processedContacts = mergedSummary?.requested || 0
 
           setProvisionFeedback({
             tone: 'error',
-            message: `No pudimos completar el provisioning de contactos CRM. Se procesaron ${processedContacts} de ${contactIds.length} contactos antes del corte.`
+            message: GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_error_partial(processedContacts, contactIds.length)
           })
 
           if (processedContacts > 0) router.refresh()
@@ -261,7 +262,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
       if (!mergedSummary) {
         setProvisionFeedback({
           tone: 'info',
-          message: 'No habia contactos CRM por provisionar.'
+          message: GH_INTERNAL_MESSAGES.admin_tenant_crm_no_contacts
         })
 
         return
@@ -272,7 +273,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
     } catch {
       setProvisionFeedback({
         tone: 'error',
-        message: 'No pudimos completar el provisioning de contactos CRM. Reintenta en unos segundos.'
+        message: GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_error
       })
     } finally {
       setIsProvisioningContacts(false)
@@ -282,24 +283,24 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
   const usersKpis = [
     {
-      title: 'Usuarios',
+      title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_users,
       value: `${data.activeUsers} / ${data.users.length}`,
-      subtitle: `${data.invitedUsers} invitados pendientes`
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_users_subtitle(data.invitedUsers)
     },
     {
-      title: 'Business lines',
+      title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_business_lines,
       value: String(businessLines.length),
-      subtitle: 'Activas para este space'
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_business_lines_subtitle
     },
     {
-      title: 'Proyectos',
+      title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_projects,
       value: String(data.scopedProjects),
-      subtitle: `${data.notionProjectCount} detectados en Notion`
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_projects_subtitle(data.notionProjectCount)
     },
     {
-      title: 'Service modules',
+      title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_modules,
       value: String(serviceModules.length),
-      subtitle: 'Habilitados en governance'
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_modules_subtitle
     }
   ]
 
@@ -310,15 +311,23 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           <Grid container spacing={4} alignItems='center'>
             <Grid size={{ xs: 12, xl: 7 }}>
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
-                <CustomAvatar
-                  skin='light'
-                  variant='rounded'
+                <IdentityImageUploader
+                  alt={data.clientName}
+                  currentImageSrc={data.logoUrl ? `/api/media/tenants/${data.clientId}/logo` : undefined}
+                  fallback={getInitials(data.clientName)}
+                  uploadUrl={`/api/admin/tenants/${data.clientId}/logo`}
+                  helperText={GH_INTERNAL_MESSAGES.admin_tenant_detail_logo_helper}
+                  successText={GH_INTERNAL_MESSAGES.admin_media_upload_success}
+                  errorText={GH_INTERNAL_MESSAGES.admin_media_upload_error}
+                  invalidTypeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_type}
+                  invalidSizeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_size}
+                  idleCta={GH_INTERNAL_MESSAGES.admin_media_upload_cta}
+                  replaceCta={GH_INTERNAL_MESSAGES.admin_media_upload_replace}
+                  uploadingCta={GH_INTERNAL_MESSAGES.admin_media_upload_progress}
                   size={88}
+                  variant='rounded'
                   color={tenantStatusTone(data.status, data.active)}
-                  sx={{ fontSize: '2rem', fontWeight: 700 }}
-                >
-                  {getInitials(data.clientName)}
-                </CustomAvatar>
+                />
 
                 <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} flexWrap='wrap'>
@@ -332,11 +341,16 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   </Stack>
 
                   <Typography color='text.secondary' sx={{ maxWidth: 780 }}>
-                    Estado completo de la cuenta: capabilities, usuarios, CRM y visibilidad operativa del space en una sola vista.
+                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_header_summary}
                   </Typography>
 
                   <Typography variant='body2' color='text.secondary'>
-                    {`Space ID ${data.publicId}  |  CRM ${data.hubspotCompanyId || '--'}  |  Timezone ${data.timezone || '--'}  |  Ultima lectura HubSpot ${formatRelativeDate(data.liveHubspot.fetchedAt)}`}
+                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_header_meta(
+                      data.publicId,
+                      data.hubspotCompanyId,
+                      data.timezone,
+                      formatRelativeDate(data.liveHubspot.fetchedAt)
+                    )}
                   </Typography>
                 </Stack>
               </Stack>
@@ -372,7 +386,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent='flex-end' alignItems={{ xs: 'stretch', sm: 'center' }}>
                   <Button component={Link} href={`/admin/tenants/${data.clientId}/view-as/dashboard`} variant='contained'>
-                    Ver como cliente
+                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_view_as_client}
                   </Button>
                   <Button
                     variant='tonal'
@@ -381,13 +395,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     disabled={isSavingCapabilities}
                     startIcon={isSavingCapabilities ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
                   >
-                    Guardar seleccion manual
+                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_save_manual}
                   </Button>
                   <OptionMenu
                     iconButtonProps={{ size: 'medium' }}
                     options={[
                       {
-                        text: 'Refrescar lectura HubSpot',
+                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_refresh_hubspot,
                         icon: <i className='tabler-refresh text-base' />,
                         menuItemProps: {
                           className: 'flex items-center gap-2 text-textSecondary',
@@ -395,13 +409,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         }
                       },
                       {
-                        text: 'Abrir preview cliente',
+                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_open_preview,
                         icon: <i className='tabler-external-link text-base' />,
                         href: `/admin/tenants/${data.clientId}/view-as/dashboard`,
                         menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
                       },
                       {
-                        text: 'Desactivar space',
+                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_deactivate_space,
                         icon: <i className='tabler-user-off text-base' />,
                         menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                       }
@@ -423,9 +437,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           <CardContent>
             <Stack spacing={3}>
               <Box>
-                <Typography variant='h5'>Business lines</Typography>
+                <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_title}</Typography>
                 <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                  Familias comerciales activas del space con color operativo y origen de asignacion.
+                  {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_subtitle}
                 </Typography>
               </Box>
               <Grid container spacing={3}>
@@ -443,26 +457,25 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       <Stack spacing={2}>
                         <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                           <Box>
-                            <Typography variant='h6'>{capability.moduleLabel}</Typography>
+                            <Box sx={{ minHeight: 28, display: 'flex', alignItems: 'center' }}>
+                              <BrandWordmark brand={capability.moduleLabel} height={22} maxWidth={110} />
+                            </Box>
                             <Typography variant='body2' color='text.secondary'>
                               {capability.publicModuleId}
                             </Typography>
                           </Box>
-                          <Chip
-                            size='small'
-                            label={palette.label}
-                            sx={{
-                              color: palette.accent,
-                              backgroundColor: palette.contrast
-                            }}
-                          />
+                          <BusinessLineBadge brand={palette.label} height={16} />
                         </Stack>
                         <Stack direction='row' gap={1} flexWrap='wrap'>
                           <Chip
                             size='small'
                             variant='tonal'
                             color={capability.selected ? 'success' : 'secondary'}
-                            label={capability.selected ? 'Active' : 'Available'}
+                            label={
+                              capability.selected
+                                ? GH_INTERNAL_MESSAGES.admin_tenant_capability_state_active
+                                : GH_INTERNAL_MESSAGES.admin_tenant_capability_state_available
+                            }
                           />
                           <Chip
                             size='small'
@@ -472,7 +485,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                           />
                         </Stack>
                         <Typography variant='body2' color='text.secondary'>
-                          {capability.description || 'Sin descripcion operacional declarada.'}
+                          {capability.description || GH_INTERNAL_MESSAGES.admin_tenant_capability_description_empty}
                         </Typography>
                       </Stack>
                     </Box>
@@ -488,9 +501,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent sx={{ pb: 0 }}>
             <Stack spacing={1}>
-              <Typography variant='h5'>Service modules</Typography>
+              <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_title}</Typography>
               <Typography variant='body2' color='text.secondary'>
-                Tabla compacta de modulos activos o disponibles para este tenant, con sorting y filtro local.
+                {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_subtitle}
               </Typography>
             </Stack>
           </CardContent>
@@ -502,7 +515,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent>
             <Stack spacing={3}>
-              <Typography variant='h6'>Feature flags</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_title}</Typography>
               <Stack direction='row' gap={1} flexWrap='wrap'>
                 {data.featureFlags.map(flag => (
                   <Chip
@@ -514,16 +527,16 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   />
                 ))}
                 {data.featureFlags.length === 0 ? (
-                  <Typography color='text.secondary'>Sin feature flags activos.</Typography>
+                  <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_empty}</Typography>
                 ) : null}
               </Stack>
               <Divider />
               <Box>
                 <Typography variant='body2' color='text.secondary'>
-                  Registro de empresa
+                  {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record}
                 </Typography>
                 <Typography color='text.primary' sx={{ mt: 1 }}>
-                  {data.hubspotCompanyId ? `EO-${data.hubspotCompanyId}` : 'Sin company mapping'}
+                  {data.hubspotCompanyId ? `EO-${data.hubspotCompanyId}` : GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record_empty}
                 </Typography>
               </Box>
             </Stack>
@@ -535,9 +548,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Accordion disableGutters defaultExpanded>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
             <Box>
-              <Typography variant='h6'>Editar governance manual</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_title}</Typography>
               <Typography variant='body2' color='text.secondary'>
-                Mantiene la logica actual de precedencia manual vs sync externo, pero ahora dentro del tab correcto.
+                {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_subtitle}
               </Typography>
             </Box>
           </AccordionSummary>
@@ -564,45 +577,47 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
               <Grid size={{ xs: 12, lg: 8 }}>
                 <Stack spacing={3}>
                   <Box>
-                    <Typography variant='h5'>Configuracion comercial</Typography>
+                    <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_config_title}</Typography>
                     <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                      Contexto compacto del registro comercial y la relacion actual con HubSpot.
+                      {GH_INTERNAL_MESSAGES.admin_tenant_crm_config_subtitle}
                     </Typography>
                   </Box>
                   <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 4 }}>
                       <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
                         <Typography variant='body2' color='text.secondary'>
-                          Business lines
+                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_business_lines}
                         </Typography>
                         <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.5 }}>
                           {businessLines.map(capability => (
-                            <Chip key={capability.moduleCode} size='small' label={capability.moduleLabel} />
+                            <BusinessLineBadge key={capability.moduleCode} brand={capability.moduleLabel} />
                           ))}
-                          {businessLines.length === 0 ? <Typography color='text.secondary'>Sin business lines.</Typography> : null}
+                          {businessLines.length === 0 ? <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_business_lines_empty}</Typography> : null}
                         </Stack>
                       </Box>
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                       <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
                         <Typography variant='body2' color='text.secondary'>
-                          Service modules
+                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_service_modules}
                         </Typography>
                         <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.5 }}>
                           {serviceModules.map(capability => (
                             <Chip key={capability.moduleCode} size='small' variant='outlined' label={capability.moduleLabel} />
                           ))}
-                          {serviceModules.length === 0 ? <Typography color='text.secondary'>Sin service modules.</Typography> : null}
+                          {serviceModules.length === 0 ? <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_service_modules_empty}</Typography> : null}
                         </Stack>
                       </Box>
                     </Grid>
                     <Grid size={{ xs: 12, md: 4 }}>
                       <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
                         <Typography variant='body2' color='text.secondary'>
-                          Lifecycle
+                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_lifecycle}
                         </Typography>
                         <Typography variant='h6' sx={{ mt: 1.5 }}>
-                          {liveCompany?.lifecycle.lifecyclestage ? toTitleCase(liveCompany.lifecycle.lifecyclestage) : 'Sin lifecycle'}
+                          {liveCompany?.lifecycle.lifecyclestage
+                            ? toTitleCase(liveCompany.lifecycle.lifecyclestage)
+                            : GH_INTERNAL_MESSAGES.admin_tenant_crm_lifecycle_empty}
                         </Typography>
                         <Typography variant='body2' color='text.secondary'>
                           {liveCompany?.lifecycle.hs_current_customer || liveMode}
@@ -618,7 +633,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   <Alert severity={hasFriendlyHubspotError ? 'warning' : 'success'}>
                     {hasFriendlyHubspotError
                       ? getFriendlyHubspotError()
-                      : 'Lectura live de HubSpot operativa para company, owner y contactos asociados.'}
+                      : GH_INTERNAL_MESSAGES.admin_tenant_crm_live_ok}
                   </Alert>
                   <Button
                     variant='tonal'
@@ -627,7 +642,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     disabled={isRefreshingHubSpot}
                     startIcon={isRefreshingHubSpot ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-refresh' />}
                   >
-                    Reintentar lectura live
+                    {GH_INTERNAL_MESSAGES.admin_tenant_crm_retry_live}
                   </Button>
                 </Stack>
               </Grid>
@@ -642,20 +657,40 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
             <Stack spacing={3}>
               <Stack direction={{ xs: 'column', xl: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', xl: 'center' }}>
                 <Box>
-                  <Typography variant='h5'>Contactos CRM</Typography>
+                  <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_title}</Typography>
                   <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                    Lectura live de HubSpot reconciliada contra los accesos reales del space.
+                    {GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_subtitle}
                   </Typography>
                 </Box>
                 <Stack direction={{ xs: 'column', md: 'row' }} gap={1} flexWrap='wrap'>
-                  <Chip size='small' variant='tonal' color='info' label={`${liveContacts.length} en HubSpot`} />
-                  <Chip size='small' variant='outlined' color='success' label={`${provisionedLiveContacts.length} reconciliados`} />
-                  <Chip size='small' variant='outlined' color='warning' label={`${missingLiveContacts.length} pendientes`} />
+                  <Chip size='small' variant='tonal' color='info' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_hubspot(liveContacts.length)} />
+                  <Chip
+                    size='small'
+                    variant='outlined'
+                    color='success'
+                    label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_reconciled(provisionedLiveContacts.length)}
+                  />
+                  <Chip
+                    size='small'
+                    variant='outlined'
+                    color='warning'
+                    label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_pending(missingLiveContacts.length)}
+                  />
                   {ambiguousLiveContacts.length > 0 ? (
-                    <Chip size='small' variant='outlined' color='error' label={`${ambiguousLiveContacts.length} ambiguos`} />
+                    <Chip
+                      size='small'
+                      variant='outlined'
+                      color='error'
+                      label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_ambiguous(ambiguousLiveContacts.length)}
+                    />
                   ) : null}
                   {contactsWithoutEmail.length > 0 ? (
-                    <Chip size='small' variant='outlined' color='secondary' label={`${contactsWithoutEmail.length} sin email`} />
+                    <Chip
+                      size='small'
+                      variant='outlined'
+                      color='secondary'
+                      label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_no_email(contactsWithoutEmail.length)}
+                    />
                   ) : null}
                   <Button
                     variant='contained'
@@ -670,28 +705,35 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     startIcon={isProvisioningContacts ? <CircularProgress color='inherit' size={16} /> : <i className='tabler-user-plus' />}
                   >
                     {isProvisioningContacts
-                      ? `Provisionando ${provisionProgress?.processedContacts || 0}/${provisionProgress?.totalContacts || missingLiveContacts.length}`
-                      : `Provisionar ${missingLiveContacts.length || ''}`.trim()}
+                      ? GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_progress(
+                          provisionProgress?.processedContacts || 0,
+                          provisionProgress?.totalContacts || missingLiveContacts.length
+                        )
+                      : GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_action(missingLiveContacts.length)}
                   </Button>
                 </Stack>
               </Stack>
 
               <Alert severity='info'>
-                Provisionar crea o reconcilia accesos `invited` en `greenhouse.client_users` con rol base `client_executive`.
-                Los lotes se ejecutan de a {MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE} contactos por request.
+                {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_info} {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_batches(
+                  MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE
+                )}
               </Alert>
 
               {duplicateUsersByEmail.length > 0 || ambiguousLiveContacts.length > 0 ? (
                 <Alert severity='warning'>
-                  Hay brechas de reconciliacion que conviene resolver antes de nuevas invitaciones.
+                  {GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciliation_warning}
                 </Alert>
               ) : null}
 
               {provisionProgress ? (
                 <Alert severity='info'>
-                  Ejecutando lote {Math.min(provisionProgress.completedBatches + 1, provisionProgress.totalBatches)} de{' '}
-                  {provisionProgress.totalBatches}. Procesados {provisionProgress.processedContacts} de{' '}
-                  {provisionProgress.totalContacts} contactos.
+                  {GH_INTERNAL_MESSAGES.admin_tenant_crm_batch_progress(
+                    Math.min(provisionProgress.completedBatches + 1, provisionProgress.totalBatches),
+                    provisionProgress.totalBatches,
+                    provisionProgress.processedContacts,
+                    provisionProgress.totalContacts
+                  )}
                 </Alert>
               ) : null}
 
@@ -700,18 +742,18 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
               {hasFriendlyHubspotError ? (
                 <TenantDetailEmptyState
                   icon='tabler-plug-connected-x'
-                  title='No pudimos cargar los contactos CRM'
-                  description='La lectura live de HubSpot devolvio una incidencia. Reintenta la consulta antes de provisionar contactos.'
-                  actionLabel='Reintentar lectura live'
+                  title={GH_INTERNAL_MESSAGES.admin_tenant_crm_empty_load_title}
+                  description={GH_INTERNAL_MESSAGES.admin_tenant_crm_empty_load_description}
+                  actionLabel={GH_INTERNAL_MESSAGES.admin_tenant_crm_retry_live}
                   onAction={handleHubSpotRefresh}
                   disabled={isRefreshingHubSpot}
                 />
               ) : liveContacts.length === 0 ? (
                 <TenantDetailEmptyState
                   icon='tabler-address-book-off'
-                  title='No hay contactos asociados en HubSpot'
-                  description='Este space no tiene contactos company-level visibles en la lectura actual. Reintenta o revisa la asociacion CRM.'
-                  actionLabel='Sincronizar ahora'
+                  title={GH_INTERNAL_MESSAGES.admin_tenant_crm_empty_no_contacts_title}
+                  description={GH_INTERNAL_MESSAGES.admin_tenant_crm_empty_no_contacts_description}
+                  actionLabel={GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_now}
                   onAction={handleHubSpotRefresh}
                   disabled={isRefreshingHubSpot}
                 />
@@ -729,10 +771,18 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableCell>Contacto</TableCell>
-                              <TableCell>{activeCrmTab === 'contacto' ? 'Canales' : activeCrmTab === 'cuerpo' ? 'Cargo' : activeCrmTab === 'ciclo' ? 'Ciclo' : 'Proveedor'}</TableCell>
-                              <TableCell>Usuario Greenhouse</TableCell>
-                              <TableCell>Estado</TableCell>
+                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_contact}</TableCell>
+                              <TableCell>
+                                {activeCrmTab === 'contacto'
+                                  ? GH_INTERNAL_MESSAGES.admin_tenant_crm_header_channels
+                                  : activeCrmTab === 'cuerpo'
+                                    ? GH_INTERNAL_MESSAGES.admin_tenant_crm_header_role
+                                    : activeCrmTab === 'ciclo'
+                                      ? GH_INTERNAL_MESSAGES.admin_tenant_crm_header_cycle
+                                      : GH_INTERNAL_MESSAGES.admin_tenant_crm_header_provider}
+                              </TableCell>
+                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_user}</TableCell>
+                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_status}</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
@@ -742,12 +792,12 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
                               const provisionLabel =
                                 matchedUsers.length > 1
-                                  ? 'Ambiguo'
+                                  ? GH_INTERNAL_MESSAGES.admin_tenant_crm_status_ambiguous
                                   : matchedUsers.length === 1
-                                    ? 'Provisionado'
+                                    ? GH_INTERNAL_MESSAGES.admin_tenant_crm_status_provisioned
                                     : normalizedEmail
-                                      ? 'Pendiente'
-                                      : 'Sin email'
+                                      ? GH_INTERNAL_MESSAGES.admin_tenant_crm_status_pending
+                                      : GH_INTERNAL_MESSAGES.admin_tenant_crm_status_no_email
 
                               return (
                                 <TableRow key={`${activeCrmTab}-${contact.hubspotContactId}`} hover>
@@ -757,40 +807,48 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                         {contact.displayName || contact.email || `Contacto ${contact.hubspotContactId}`}
                                       </Typography>
                                       <Typography variant='body2' color='text.secondary'>
-                                        {contact.hubspotContactId} | {contact.email || 'Sin email'}
+                                        {contact.hubspotContactId} | {contact.email || GH_INTERNAL_MESSAGES.admin_tenant_crm_status_no_email}
                                       </Typography>
                                     </Stack>
                                   </TableCell>
                                   <TableCell>
                                     {activeCrmTab === 'contacto' ? (
                                       <Stack spacing={0.75}>
-                                        <Typography variant='body2'>{contact.phone || contact.mobilePhone || 'Sin telefono'}</Typography>
+                                        <Typography variant='body2'>
+                                          {contact.phone || contact.mobilePhone || GH_INTERNAL_MESSAGES.admin_tenant_crm_phone_empty}
+                                        </Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                          {contact.company || 'Sin company'}
+                                          {contact.company || GH_INTERNAL_MESSAGES.admin_tenant_crm_company_empty}
                                         </Typography>
                                       </Stack>
                                     ) : null}
                                     {activeCrmTab === 'cuerpo' ? (
                                       <Stack spacing={0.75}>
-                                        <Typography variant='body2'>{contact.jobTitle || 'Sin cargo'}</Typography>
+                                        <Typography variant='body2'>{contact.jobTitle || GH_INTERNAL_MESSAGES.admin_tenant_crm_job_empty}</Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                          {contact.company || 'Sin company'}
+                                          {contact.company || GH_INTERNAL_MESSAGES.admin_tenant_crm_company_empty}
                                         </Typography>
                                       </Stack>
                                     ) : null}
                                     {activeCrmTab === 'ciclo' ? (
                                       <Stack spacing={0.75}>
-                                        <Typography variant='body2'>{contact.lifecyclestage || 'Sin lifecycle'}</Typography>
+                                        <Typography variant='body2'>
+                                          {contact.lifecyclestage || GH_INTERNAL_MESSAGES.admin_tenant_crm_lead_stage_empty}
+                                        </Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                          {contact.hsLeadStatus || 'Sin lead status'}
+                                          {contact.hsLeadStatus || GH_INTERNAL_MESSAGES.admin_tenant_crm_lead_status_empty}
                                         </Typography>
                                       </Stack>
                                     ) : null}
                                     {activeCrmTab === 'proveedor' ? (
                                       <Stack spacing={0.75}>
-                                        <Typography variant='body2'>{matchedByContactId ? 'Match exacto HubSpot' : 'Reconciliacion por email'}</Typography>
+                                        <Typography variant='body2'>
+                                          {matchedByContactId
+                                            ? GH_INTERNAL_MESSAGES.admin_tenant_crm_exact_match
+                                            : GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciled_email}
+                                        </Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                          ID esperado: {expectedPublicUserId}
+                                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_expected_id(expectedPublicUserId)}
                                         </Typography>
                                       </Stack>
                                     ) : null}
@@ -808,7 +866,11 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                           size='small'
                                           variant='outlined'
                                           color={matchedByContactId ? 'success' : 'warning'}
-                                          label={matchedByContactId ? 'Match exacto HubSpot' : 'Reconciliado por email'}
+                                          label={
+                                            matchedByContactId
+                                              ? GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciled_label_exact
+                                              : GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciled_label_email
+                                          }
                                           sx={{ width: 'fit-content' }}
                                         />
                                       </Stack>
@@ -823,10 +885,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                                     ) : (
                                       <Stack spacing={0.75}>
                                         <Typography variant='body2' color='text.secondary'>
-                                          Aun no existe acceso Greenhouse para este contacto.
+                                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_no_access}
                                         </Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                          ID esperado: {expectedPublicUserId}
+                                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_expected_id(expectedPublicUserId)}
                                         </Typography>
                                       </Stack>
                                     )}
@@ -853,9 +915,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Accordion>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
             <Box>
-              <Typography variant='h6'>Lectura HubSpot</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_title}</Typography>
               <Typography variant='body2' color='text.secondary'>
-                Detalle tecnico y operativo del sync bajo demanda. Colapsado por defecto para no contaminar la lectura principal.
+                {GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_subtitle}
               </Typography>
             </Box>
           </AccordionSummary>
@@ -865,8 +927,8 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 <Card variant='outlined'>
                   <CardContent>
                     <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>Company profile</Typography>
-                      <Typography color='text.primary'>{liveCompany?.identity.name || 'Sin lectura live'}</Typography>
+                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile}</Typography>
+                      <Typography color='text.primary'>{liveCompany?.identity.name || GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile_empty}</Typography>
                       <Typography variant='body2' color='text.secondary'>
                         {liveCompany?.identity.domain || '--'} | {liveCompany?.identity.industry || '--'}
                       </Typography>
@@ -881,8 +943,8 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 <Card variant='outlined'>
                   <CardContent>
                     <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>Owner</Typography>
-                      <Typography color='text.primary'>{liveOwner?.ownerDisplayName || 'Sin owner asignado'}</Typography>
+                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_owner}</Typography>
+                      <Typography color='text.primary'>{liveOwner?.ownerDisplayName || GH_INTERNAL_MESSAGES.admin_tenant_crm_owner_empty}</Typography>
                       <Typography variant='body2' color='text.secondary'>
                         {liveOwner?.ownerEmail || '--'}
                       </Typography>
@@ -897,21 +959,25 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 <Card variant='outlined'>
                   <CardContent>
                     <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>Sync</Typography>
+                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_sync}</Typography>
                       <Stack direction='row' gap={1} flexWrap='wrap'>
                         <Chip
                           size='small'
                           variant='tonal'
                           color={data.liveHubspot.serviceConfigured ? 'success' : 'secondary'}
-                          label={data.liveHubspot.serviceConfigured ? 'Servicio conectado' : 'Servicio no configurado'}
+                          label={
+                            data.liveHubspot.serviceConfigured
+                              ? GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_connected
+                              : GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_disconnected
+                          }
                         />
                         <Chip size='small' variant='outlined' color={liveIsRealtime ? 'success' : 'warning'} label={liveIsRealtime ? 'Realtime' : liveMode} />
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
-                        Ultima lectura: {formatDateTime(data.liveHubspot.fetchedAt)}
+                        {GH_INTERNAL_MESSAGES.admin_tenant_crm_last_read(formatDateTime(data.liveHubspot.fetchedAt))}
                       </Typography>
                       <Typography variant='body2' color='text.secondary'>
-                        Base URL: {data.liveHubspot.serviceBaseUrl || '--'}
+                        {GH_INTERNAL_MESSAGES.admin_tenant_crm_base_url(data.liveHubspot.serviceBaseUrl || '--')}
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -929,13 +995,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
       <Grid size={{ xs: 12 }}>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'center' }}>
           <Box>
-            <Typography variant='h5'>Visibilidad de proyectos</Typography>
+            <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_projects_title}</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-              Proyectos visibles en scope para este space y su cobertura actual.
+              {GH_INTERNAL_MESSAGES.admin_tenant_projects_subtitle}
             </Typography>
           </Box>
           <Button variant='contained' startIcon={<i className='tabler-plus' />} disabled>
-            Agregar proyecto al scope
+            {GH_INTERNAL_MESSAGES.admin_tenant_projects_add}
           </Button>
         </Stack>
       </Grid>
@@ -944,8 +1010,8 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Grid size={{ xs: 12 }}>
           <TenantDetailEmptyState
             icon='tabler-folder-off'
-            title='No hay proyectos visibles en scope'
-            description='Este space aun no tiene proyectos conectados a la visibilidad del tenant o no existen scopes activos.'
+            title={GH_INTERNAL_MESSAGES.admin_tenant_projects_empty_title}
+            description={GH_INTERNAL_MESSAGES.admin_tenant_projects_empty_description}
           />
         </Grid>
       ) : null}
@@ -960,14 +1026,14 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     <Stack spacing={2}>
                       <Stack direction='row' justifyContent='space-between' gap={2}>
                         <Typography variant='h6'>{project.projectName}</Typography>
-                        <Chip size='small' variant='outlined' label={`${project.assignedUsers} usuarios`} />
+                        <Chip size='small' variant='outlined' label={GH_INTERNAL_MESSAGES.admin_tenant_projects_users(project.assignedUsers)} />
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
                         {project.projectId}
                       </Typography>
                       {project.pageUrl ? (
                         <Button component={Link} href={project.pageUrl} target='_blank' variant='text' sx={{ px: 0, width: 'fit-content' }}>
-                          Abrir origen en Notion
+                          {GH_INTERNAL_MESSAGES.admin_tenant_projects_open_source}
                         </Button>
                       ) : null}
                     </Stack>
@@ -987,10 +1053,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Proyecto</TableCell>
-                      <TableCell>ID</TableCell>
-                      <TableCell>Usuarios asignados</TableCell>
-                      <TableCell>Estado</TableCell>
+                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_project}</TableCell>
+                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_id}</TableCell>
+                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_users}</TableCell>
+                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_state}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -1001,7 +1067,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                             <Typography color='text.primary'>{project.projectName}</Typography>
                             {project.pageUrl ? (
                               <Typography component={Link} href={project.pageUrl} target='_blank' color='primary'>
-                                Abrir origen en Notion
+                                {GH_INTERNAL_MESSAGES.admin_tenant_projects_open_source}
                               </Typography>
                             ) : null}
                           </Stack>
@@ -1009,7 +1075,12 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         <TableCell>{project.projectId}</TableCell>
                         <TableCell>{project.assignedUsers}</TableCell>
                         <TableCell>
-                          <Chip size='small' variant='tonal' color='info' label='Scoped' />
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color='info'
+                            label={GH_INTERNAL_MESSAGES.admin_tenant_projects_state_scoped}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1029,13 +1100,13 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent>
             <Stack spacing={2.5}>
-              <Typography variant='h6'>Identidad del space</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_identity_title}</Typography>
               {[
-                ['Space ID', data.publicId],
-                ['Internal key', data.clientId],
-                ['HubSpot company', data.hubspotCompanyId || 'Sin company mapping'],
-                ['Portal home', data.portalHomePath || '--'],
-                ['Timezone', data.timezone || '--']
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_space_id, data.publicId],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_internal_key, data.clientId],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_hubspot, data.hubspotCompanyId || GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record_empty],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_home, data.portalHomePath || '--'],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_timezone, data.timezone || '--']
               ].map(([label, value]) => (
                 <Box key={label}>
                   <Typography variant='body2' color='text.secondary'>
@@ -1053,24 +1124,24 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent>
             <Stack spacing={2.5}>
-              <Typography variant='h6'>Estado de acceso</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_access_title}</Typography>
               <HorizontalWithSubtitle
-                title='Usuarios activos'
+                title={GH_INTERNAL_MESSAGES.admin_tenant_settings_active_users}
                 stats={String(data.activeUsers)}
                 avatarIcon='tabler-user-check'
                 avatarColor='success'
                 trend='neutral'
                 trendNumber='0'
-                subtitle={`${data.invitedUsers} invitados`}
+                subtitle={GH_INTERNAL_MESSAGES.admin_tenant_settings_active_users_subtitle(data.invitedUsers)}
               />
               <HorizontalWithSubtitle
-                title='Proyectos scoped'
+                title={GH_INTERNAL_MESSAGES.admin_tenant_settings_scoped_projects}
                 stats={String(data.scopedProjects)}
                 avatarIcon='tabler-folders'
                 avatarColor='primary'
                 trend='neutral'
                 trendNumber='0'
-                subtitle={`${data.notionProjectCount} detectados`}
+                subtitle={GH_INTERNAL_MESSAGES.admin_tenant_settings_scoped_projects_subtitle(data.notionProjectCount)}
               />
             </Stack>
           </CardContent>
@@ -1081,31 +1152,35 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent>
             <Stack spacing={2.5}>
-              <Typography variant='h6'>Registro de empresa</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_company_record_title}</Typography>
               <Stack direction='row' gap={1} flexWrap='wrap'>
                 <Chip
                   size='small'
                   variant='tonal'
                   color={data.liveHubspot.serviceConfigured ? 'success' : 'secondary'}
-                  label={data.liveHubspot.serviceConfigured ? 'Integrado con HubSpot' : 'Sin integracion activa'}
+                  label={
+                    data.liveHubspot.serviceConfigured
+                      ? GH_INTERNAL_MESSAGES.admin_tenant_settings_company_connected
+                      : GH_INTERNAL_MESSAGES.admin_tenant_settings_company_disconnected
+                  }
                 />
                 <Chip size='small' variant='outlined' color={liveIsRealtime ? 'success' : 'warning'} label={liveIsRealtime ? 'Realtime' : liveMode} />
               </Stack>
               <Box>
                 <Typography variant='body2' color='text.secondary'>
-                  Ultima sync live
+                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_live_sync}
                 </Typography>
                 <Typography color='text.primary'>{formatDateTime(data.liveHubspot.fetchedAt)}</Typography>
               </Box>
               <Box>
                 <Typography variant='body2' color='text.secondary'>
-                  Ultima actualizacion del tenant
+                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_tenant_updated}
                 </Typography>
                 <Typography color='text.primary'>{formatDateTime(data.updatedAt)}</Typography>
               </Box>
               <Box>
                 <Typography variant='body2' color='text.secondary'>
-                  Creado
+                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_created}
                 </Typography>
                 <Typography color='text.primary'>{formatDateTime(data.createdAt)}</Typography>
               </Box>
@@ -1118,18 +1193,18 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <Card>
           <CardContent>
             <Stack spacing={2}>
-              <Typography variant='h6'>Notas operativas</Typography>
+              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_title}</Typography>
               <CustomTextField
                 multiline
                 minRows={4}
                 fullWidth
-                value={displayNote || 'Sin nota operativa registrada para este space.'}
+                value={displayNote || GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_empty}
                 slotProps={{
                   input: {
                     readOnly: true
                   }
                 }}
-                helperText='La mutacion de notas internas aun no esta expuesta en esta superficie.'
+                helperText={GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_helper}
               />
             </Stack>
           </CardContent>
@@ -1147,11 +1222,26 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           <Grid container spacing={6}>
             <Grid size={{ xs: 12 }}>
               <CustomTabList onChange={(_, value) => setActiveTab(value)} variant='scrollable' pill='true'>
-                <Tab icon={<i className='tabler-puzzle' />} value='capabilities' label='Capabilities' iconPosition='start' />
-                <Tab icon={<i className='tabler-users' />} value='usuarios' label='Usuarios' iconPosition='start' />
-                <Tab icon={<i className='tabler-building' />} value='crm' label='CRM' iconPosition='start' />
-                <Tab icon={<i className='tabler-folder' />} value='proyectos' label='Proyectos' iconPosition='start' />
-                <Tab icon={<i className='tabler-settings' />} value='configuracion' label='Configuracion' iconPosition='start' />
+                <Tab
+                  icon={<i className='tabler-puzzle' />}
+                  value='capabilities'
+                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_capabilities}
+                  iconPosition='start'
+                />
+                <Tab icon={<i className='tabler-users' />} value='usuarios' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_users} iconPosition='start' />
+                <Tab icon={<i className='tabler-building' />} value='crm' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_crm} iconPosition='start' />
+                <Tab
+                  icon={<i className='tabler-folder' />}
+                  value='proyectos'
+                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_projects}
+                  iconPosition='start'
+                />
+                <Tab
+                  icon={<i className='tabler-settings' />}
+                  value='configuracion'
+                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_settings}
+                  iconPosition='start'
+                />
               </CustomTabList>
             </Grid>
 

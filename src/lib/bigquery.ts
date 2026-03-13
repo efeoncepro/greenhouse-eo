@@ -5,7 +5,11 @@ import { BigQuery } from '@google-cloud/bigquery'
 let bigQueryClient: BigQuery | undefined
 
 const stripWrappingQuotes = (value: string) => {
-  return value.startsWith('"') && value.endsWith('"') ? value.slice(1, -1) : value
+  const trimmed = value.trim()
+  const hasDoubleQuotes = trimmed.startsWith('"') && trimmed.endsWith('"')
+  const hasSingleQuotes = trimmed.startsWith("'") && trimmed.endsWith("'")
+
+  return hasDoubleQuotes || hasSingleQuotes ? trimmed.slice(1, -1).trim() : trimmed
 }
 
 const normalizeLegacyEscapedJson = (value: string) => {
@@ -17,30 +21,39 @@ const normalizeLegacyEscapedJson = (value: string) => {
     .replace(/\\n\\r\\n$/g, '')
 }
 
-const getProjectId = () => {
-  const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+const collapseDoubledQuotes = (value: string) => value.replace(/""/g, '"')
 
-  if (!projectId) {
-    throw new Error('Missing GCP_PROJECT environment variable')
-  }
+const extractJsonEnvelope = (value: string) => {
+  const start = value.indexOf('{')
+  const end = value.lastIndexOf('}')
 
-  return projectId
+  return start >= 0 && end > start ? value.slice(start, end + 1) : value
 }
 
-const getCredentials = () => {
-  const rawCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.trim()
+const buildCredentialCandidates = (value: string) => {
+  const stripped = stripWrappingQuotes(value)
+  const unescaped = stripped.replace(/\\r/g, '\r').replace(/\\n/g, '\n').replace(/\\"/g, '"')
+  const normalized = normalizeLegacyEscapedJson(stripped)
+  const extracted = extractJsonEnvelope(stripped)
+  const extractedNormalized = extractJsonEnvelope(normalized)
 
-  if (!rawCredentials) {
-    return undefined
-  }
+  return Array.from(
+    new Set(
+      [
+        value,
+        stripped,
+        unescaped,
+        normalized,
+        collapseDoubledQuotes(stripped),
+        collapseDoubledQuotes(unescaped),
+        extracted,
+        extractedNormalized
+      ].filter(Boolean)
+    )
+  )
+}
 
-  const candidates = [
-    rawCredentials,
-    stripWrappingQuotes(rawCredentials),
-    stripWrappingQuotes(rawCredentials).replace(/\\r/g, '\r').replace(/\\n/g, '\n').replace(/\\"/g, '"'),
-    normalizeLegacyEscapedJson(rawCredentials)
-  ]
-
+const parseCredentials = (candidates: string[]) => {
   for (const candidate of candidates) {
     try {
       const parsed = JSON.parse(candidate)
@@ -57,13 +70,55 @@ const getCredentials = () => {
         }
       }
     } catch {
-      // Try the next serialization shape. Vercel preview envs may provide escaped JSON strings.
+      // Try the next serialization shape. Preview envs may inject escaped or re-quoted JSON strings.
+    }
+  }
+
+  return undefined
+}
+
+const getProjectId = () => {
+  const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
+
+  if (!projectId) {
+    throw new Error('Missing GCP_PROJECT environment variable')
+  }
+
+  return projectId
+}
+
+export const getGoogleCredentials = () => {
+  const rawCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.trim()
+  const rawCredentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64?.trim()
+
+  if (!rawCredentials && !rawCredentialsBase64) {
+    return undefined
+  }
+
+  if (rawCredentials) {
+    const parsed = parseCredentials(buildCredentialCandidates(rawCredentials))
+
+    if (parsed) {
+      return parsed
+    }
+  }
+
+  if (rawCredentialsBase64) {
+    try {
+      const decoded = Buffer.from(stripWrappingQuotes(rawCredentialsBase64), 'base64').toString('utf8')
+      const parsed = parseCredentials(buildCredentialCandidates(decoded))
+
+      if (parsed) {
+        return parsed
+      }
+    } catch {
+      // Fall through to the explicit runtime error below.
     }
   }
 
   console.error('Unable to parse GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable.')
 
-  throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable')
+  throw new Error('Invalid BigQuery credentials environment variable')
 }
 
 export const getBigQueryClient = () => {
@@ -71,7 +126,7 @@ export const getBigQueryClient = () => {
     return bigQueryClient
   }
 
-  const credentials = getCredentials()
+  const credentials = getGoogleCredentials()
 
   bigQueryClient = new BigQuery({
     projectId: getProjectId(),

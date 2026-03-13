@@ -171,7 +171,7 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
               <CustomTextField
                 autoFocus
                 fullWidth
-                label='Email'
+                label={GH_MESSAGES.login_email_placeholder}
                 placeholder={GH_MESSAGES.login_email_placeholder}
                 value={email}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
@@ -197,7 +197,7 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
                 }}
               />
               <Button fullWidth variant='outlined' type='submit' disabled={isSubmitting} color='secondary'>
-                {isSubmitting ? 'Validando acceso...' : GH_MESSAGES.login_with_email}
+                {isSubmitting ? GH_MESSAGES.login_validating : GH_MESSAGES.login_button}
               </Button>
             </form>
             <Typography variant='body2' color='text.secondary'>

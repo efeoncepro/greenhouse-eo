@@ -40,6 +40,255 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 20:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar upload persistente de logo/foto para spaces y usuarios en los lugares donde hoy existian placeholders de identidad visual.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / admin e internal / identidad visual persistente
+
+### Archivos tocados
+- `src/lib/storage/greenhouse-media.ts`
+- `src/lib/admin/media-assets.ts`
+- `src/lib/bigquery.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/auth.ts`
+- `src/types/next-auth.d.ts`
+- `src/app/api/admin/tenants/[id]/logo/route.ts`
+- `src/app/api/admin/users/[id]/avatar/route.ts`
+- `src/app/api/media/tenants/[id]/logo/route.ts`
+- `src/app/api/media/users/[id]/avatar/route.ts`
+- `src/components/greenhouse/IdentityImageUploader.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantUsersTable.tsx`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/get-admin-tenants-overview.ts`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `src/lib/admin/get-admin-access-overview.ts`
+- `src/lib/internal/get-internal-dashboard-overview.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/lib/bigquery.ts src/lib/storage/greenhouse-media.ts src/lib/admin/media-assets.ts 'src/app/api/admin/tenants/[id]/logo/route.ts' 'src/app/api/admin/users/[id]/avatar/route.ts' 'src/app/api/media/tenants/[id]/logo/route.ts' 'src/app/api/media/users/[id]/avatar/route.ts' src/components/greenhouse/IdentityImageUploader.tsx src/components/greenhouse/index.ts src/lib/admin/get-admin-tenant-detail.ts src/lib/admin/get-admin-tenants-overview.ts src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-access-overview.ts src/lib/internal/get-internal-dashboard-overview.ts src/lib/tenant/access.ts src/lib/auth.ts src/types/next-auth.d.ts src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseAdminUserDetail.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/views/greenhouse/admin/tenants/TenantUsersTable.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/config/greenhouse-nomenclature.ts`: correcto
+- `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: sigue bloqueado solo por el archivo duplicado ajeno `src/config/capability-registry (1).ts`
+
+### Riesgos o pendientes
+- No se hizo smoke visual autenticado real del flujo de upload ni prueba end-to-end contra GCS/BigQuery en este turno; la validacion fue estatica.
+- `package.json` y `pnpm-lock.yaml` siguen modificados en el worktree por trabajo ajeno y no deben mezclarse por accidente con este commit.
+- Si el bucket `${GCP_PROJECT}-greenhouse-media` no existe en un ambiente dado, hay que crearlo o definir `GREENHOUSE_MEDIA_BUCKET` antes de probar uploads reales.
+
+## 2026-03-13 20:28 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Verificar por que `pre-greenhouse.efeoncepro.com` no mostraba el estado nuevo de la rama y corregir el bloqueo de Preview en Vercel.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Preview de Vercel / branch `fix/internal-nav-nomenclature-hydration`
+
+### Archivos tocados
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `vercel inspect pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: el alias `pre-greenhouse.efeoncepro.com` sigue apuntando a `greenhouse-5jepkohhj-efeonce-7670142f.vercel.app`, no al preview activo de la rama.
+- `vercel inspect greenhouse-o05bk3bl7-efeonce-7670142f.vercel.app --logs -S efeonce-7670142f`: el ultimo deploy del branch `fix/internal-nav-nomenclature-hydration` estaba fallando en build por `src/config/capability-registry (1).ts`.
+- `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto despues de excluir duplicados `* (1).ts(x)` del typecheck.
+
+### Riesgos o pendientes
+- Aunque el branch vuelva a desplegar en `Ready`, `pre-greenhouse.efeoncepro.com` seguira mostrando el deployment viejo hasta que se re-asigne o se promueva manualmente el alias.
+- Sigue pendiente confirmar visualmente que el uploader y los logos cargados ya aparecen en la preview nueva una vez que Vercel termine el deploy sano.
+
+## 2026-03-13 18:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Incorporar los nuevos SVG de branding cargados en `public/branding/SVG` y reemplazar placeholders previos en el shell y en superficies donde `Globe`, `Reach`, `Wave` y `Efeonce` ya forman parte visible de la experiencia.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / branding / shell autenticado / business lines
+
+### Archivos tocados
+- `src/components/greenhouse/brand-assets.ts`
+- `src/components/greenhouse/BrandWordmark.tsx`
+- `src/components/greenhouse/BrandLogo.tsx`
+- `src/components/greenhouse/BusinessLineBadge.tsx`
+- `src/components/greenhouse/AccountTeamDossierSection.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/components/layout/shared/Logo.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/app/layout.tsx`
+- `src/app/(blank-layout-pages)/auth/access-denied/page.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx`
+- `src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx`
+- `src/views/greenhouse/dashboard/ClientDashboardHero.tsx`
+- `src/views/greenhouse/dashboard/config.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/components/greenhouse/brand-assets.ts src/components/greenhouse/BusinessLineBadge.tsx src/components/greenhouse/BrandLogo.tsx src/components/greenhouse/AccountTeamDossierSection.tsx src/components/greenhouse/index.ts src/components/layout/shared/Logo.tsx src/app/layout.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx`: correcto
+
+### Riesgos o pendientes
+- El typo del asset `public/branding/SVG/isotipo-goble-full.svg` se consume tal como existe en disco; si luego se corrige el nombre del archivo, hay que ajustar el registry.
+- Esta ronda ya cubre shell, hero cliente, footers, business lines visibles y superficies principales de admin/internal; conviene hacer una pasada visual real para confirmar tamaños y contraste de wordmarks negativos sobre fondos oscuros.
+
+## 2026-03-13 14:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir la interpretacion de `Greenhouse_Nomenclatura_Portal_v3.md` para no mezclar la navegacion cliente del documento con labels de `internal/admin`, y realinear la distribucion del sidebar cliente.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / preview / sidebar cliente / nomenclatura operativa
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjects.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/dashboard/ClientDashboardHero.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseDashboard.tsx src/views/greenhouse/GreenhouseProjects.tsx src/views/greenhouse/GreenhouseSprints.tsx src/views/greenhouse/GreenhouseSettings.tsx src/views/greenhouse/dashboard/ClientDashboardHero.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/GreenhouseAdminRoles.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/components/layout/vertical/FooterContent.tsx src/components/layout/horizontal/FooterContent.tsx src/data/navigation/verticalMenuData.tsx src/data/navigation/horizontalMenuData.tsx`: correcto
+- No se hizo validacion visual autenticada real del sidebar cliente o admin despues de este ajuste.
+
+### Riesgos o pendientes
+- La separacion cliente vs internal/admin ya corrige el boundary conceptual, pero aun falta un barrido route-by-route del microcopy cliente contra el documento completo.
+- La seccion dinamica `Servicios` sigue viva en el sidebar cliente por necesidad de runtime de capabilities; conviene validarla despues contra la arquitectura de navegacion del producto y no solo contra el doc de nomenclatura.
+
+## 2026-03-13 14:24 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel y revisar desalineaciones de microcopy contra `Greenhouse_Nomenclatura_Portal_v3.md`.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Preview / login / branding publico / runtime auth BigQuery
+
+### Archivos tocados
+- `src/lib/bigquery.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/views/Login.tsx src/lib/bigquery.ts`: correcto antes de la ronda final de microcopy
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivos duplicados ajenos ya presentes en el worktree (`*(1).ts`, `*(1).tsx`) fuera de este cambio
+- `vercel inspect https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, alias apuntando a la preview vigente de la branch
+- `vercel logs https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f --no-follow --since 10m --expand`: detecto fallo previo de parseo en `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+
+### Riesgos o pendientes
+- Falta rerun de lint sobre el slice final con microcopy admin/settings.
+- Falta volver a publicar la ronda final de microcopy en Vercel.
+- Si el branch sigue fallando en credenciales despues del fallback base64, cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` en Preview de la branch y redeployar antes de volver a diagnosticar password o provisionamiento.
+
+## 2026-03-13 12:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el desalineamiento post-branding donde `/internal/dashboard` y superficies admin arrancaban con nomenclatura Greenhouse parcial y luego hidrataban a labels legacy/Vuexy, ademas de revisar escapes de tema por cookies viejas.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / production fix candidate / shell autenticado / branding runtime
+
+### Archivos tocados
+- `src/@core/utils/brandSettings.ts`
+- `src/@core/contexts/settingsContext.tsx`
+- `src/@core/utils/serverHelpers.ts`
+- `src/components/auth/AuthSessionProvider.tsx`
+- `src/components/Providers.tsx`
+- `src/app/(dashboard)/layout.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/@core/utils/brandSettings.ts src/@core/contexts/settingsContext.tsx src/@core/utils/serverHelpers.ts src/components/auth/AuthSessionProvider.tsx src/components/Providers.tsx "src/app/(dashboard)/layout.tsx" src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx`: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
+- `npx pnpm build`: correcto
+- No se ejecuto smoke visual autenticado en navegador real despues del fix; la validacion fue estatico + build
+
+### Riesgos o pendientes
+- El fix elimina el flicker del shell autenticado y bloquea `primaryColor/skin/semiDark` legacy en cookie, pero no reescribe aun copy legacy fuera del nav/dropdown en vistas admin como headers o tablas.
+- Si algun usuario esperaba seguir personalizando color primario o `skin` desde cookies legacy/customizer, ese comportamiento ya no se preserva; se mantiene solo `mode`, `layout` y widths.
+- Conviene hacer smoke visual real en `/internal/dashboard`, `/admin/tenants`, `/admin/users` y `/admin/roles` en preview o staging para confirmar que no queda ningun escape visual de Vuexy en runtime autenticado.
+
 ## 2026-03-13 12:01 America/Santiago
 
 ### Agente
@@ -730,3 +979,109 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El brief pedia notas operativas editables, pero no existe una mutacion ya expuesta para `notes`; la vista quedo preparada como lectura clara, no como editor persistente.
 - El repo no trae `@mui/x-data-grid`; la tabla de usuarios y la de service modules quedaron resueltas con el patron Vuexy existente sobre `@tanstack/react-table` y `TablePaginationComponent`.
 - Conviene correr la validacion visual autentica descrita en `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` sobre `/admin/tenants/[id]` y revisar responsive en tablet antes de cerrar commit final.
+
+### Fecha
+- 2026-03-13 11:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la fase principal de alineacion a `Greenhouse_Nomenclatura_Portal_v3.md` sin mezclar trabajo de agente/runtime AI.
+- Canonicalizar microcopy cliente e `internal/admin` en `src/config/greenhouse-nomenclature.ts`.
+- Completar piezas faltantes del portal cliente: `Updates`, `Tu equipo de cuenta` en `Mi Greenhouse`, y `Ciclos` con modulos base adicionales.
+
+### Rama
+- Rama usada: actual de trabajo local
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- Cliente + `internal/admin` en `starter-kit`
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/greenhouse/AccountTeamDossierSection.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/app/(dashboard)/updates/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/sprints/page.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjectDetail.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/GreenhouseUpdates.tsx`
+- `src/views/greenhouse/dashboard/ClientTeamCapacitySection.tsx`
+- `src/views/greenhouse/GreenhouseInternalDashboard.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListCards.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantUsersTable.tsx`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `changelog.md`
+- `project_context.md`
+- `Handoff.md`
+
+### Verificacion
+- Cambio funcional implementado:
+  - se agrego la ruta cliente `/updates` y su navegacion asociada
+  - `Mi Greenhouse` ahora incorpora el dossier `Tu equipo de cuenta`
+  - `Pulse` separa la lectura de `Capacidad del equipo` del dossier relacional
+  - `Ciclos` ahora expone `Ciclo activo`, `Ciclos anteriores`, `Velocity por ciclo`, `Burndown` y `Velocity por persona` con copy Greenhouse
+  - `Proyectos/[id]` fue reescrito con breadcrumbs cliente, labels Greenhouse y sin mensajes tecnicos visibles
+  - `internal/admin` ahora toma una capa adicional de copy desde `GH_INTERNAL_MESSAGES` en dashboard interno, tablas de users, users por tenant y detalle de usuario
+- Validacion:
+  - `pnpm exec eslint` sobre los slices tocados: correcto
+  - `pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivo ajeno `src/config/capability-registry (1).ts`
+
+### Riesgos o pendientes
+- Sigue quedando copy residual legacy en superficies internas grandes no barridas completas en este turno, especialmente `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`.
+- No se ejecuto smoke visual autenticado real; la validacion fue estatica.
+- `tsc` sigue bloqueado por el archivo duplicado ajeno `src/config/capability-registry (1).ts`, fuera del alcance de esta alineacion.
+
+### Proximo paso recomendado
+- Barrer `GreenhouseAdminTenantDetail.tsx` y `GreenhouseAdminTenantDashboardPreview.tsx` para terminar de sacar copy residual interna.
+- Ejecutar smoke visual autenticado de `/dashboard`, `/proyectos/[id]`, `/settings`, `/sprints`, `/updates`, `/admin`, `/admin/users/[id]`.
+- Resolver o eliminar el archivo duplicado `src/config/capability-registry (1).ts` antes del siguiente `build/tsc` integral.
+
+### Fecha
+- 2026-03-13 18:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Extender la alineacion de nomenclatura Greenhouse a `admin/tenants/[id]`, `view-as/dashboard` y los subcomponentes operativos del detalle de space.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- `internal/admin` del repo `starter-kit`
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx`
+- `src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantDetailErrorBoundary.tsx`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- `pnpm exec eslint src/config/greenhouse-nomenclature.ts src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx src/views/greenhouse/admin/tenants/TenantDetailErrorBoundary.tsx`: correcto
+
+### Riesgos o pendientes
+- El detalle de tenant queda mucho mas alineado, pero aun puede sobrevivir copy residual menor ligado a labels tecnicas de HubSpot owner/base URL o textos de dominio que el equipo quiera hispanizar mas adelante.
+- Sigue pendiente smoke visual autenticado de `admin/tenants/[id]` y `view-as/dashboard`.

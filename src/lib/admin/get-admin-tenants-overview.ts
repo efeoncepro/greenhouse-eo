@@ -7,6 +7,7 @@ export interface AdminTenantRow {
   clientId: string
   publicId: string
   clientName: string
+  logoUrl: string | null
   status: string
   active: boolean
   primaryContactEmail: string | null
@@ -79,6 +80,7 @@ export const getAdminTenantsOverview = async (): Promise<AdminTenantsOverview> =
         SELECT
           c.client_id,
           c.client_name,
+          JSON_VALUE(TO_JSON_STRING(c), '$.logo_url') AS logo_url,
           c.status,
           c.active,
           c.primary_contact_email,
@@ -112,6 +114,7 @@ export const getAdminTenantsOverview = async (): Promise<AdminTenantsOverview> =
         GROUP BY
           c.client_id,
           c.client_name,
+          logo_url,
           c.status,
           c.active,
           c.primary_contact_email,
@@ -169,6 +172,7 @@ export const getAdminTenantsOverview = async (): Promise<AdminTenantsOverview> =
         hubspotCompanyId: row.hubspot_company_id ? String(row.hubspot_company_id) : null
       }),
       clientName: String(row.client_name || ''),
+      logoUrl: row.logo_url ? String(row.logo_url) : null,
       status: String(row.status || ''),
       active: Boolean(row.active),
       primaryContactEmail: row.primary_contact_email ? String(row.primary_contact_email) : null,

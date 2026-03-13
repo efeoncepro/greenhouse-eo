@@ -6,6 +6,7 @@ export interface AdminUserRow {
   userId: string
   fullName: string
   email: string
+  avatarUrl: string | null
   clientName: string
   tenantType: 'client' | 'efeonce_internal'
   status: string
@@ -72,6 +73,7 @@ export const getAdminAccessOverview = async (): Promise<AdminAccessOverview> => 
           cu.user_id,
           cu.full_name,
           cu.email,
+          cu.avatar_url,
           COALESCE(c.client_name, cu.client_id) AS client_name,
           cu.tenant_type,
           cu.status,
@@ -97,6 +99,7 @@ export const getAdminAccessOverview = async (): Promise<AdminAccessOverview> => 
           cu.user_id,
           cu.full_name,
           cu.email,
+          cu.avatar_url,
           client_name,
           cu.tenant_type,
           cu.status,
@@ -158,6 +161,7 @@ export const getAdminAccessOverview = async (): Promise<AdminAccessOverview> => 
       userId: String(row.user_id || ''),
       fullName: String(row.full_name || 'Sin nombre'),
       email: String(row.email || ''),
+      avatarUrl: row.avatar_url ? String(row.avatar_url) : null,
       clientName: String(row.client_name || ''),
       tenantType: (row.tenant_type as AdminUserRow['tenantType']) || 'client',
       status: String(row.status || ''),

@@ -6,8 +6,9 @@ import classnames from 'classnames'
 
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
+import { BrandWordmark } from '@/components/greenhouse'
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 const FooterContent = () => {
   const { isBreakpointReached } = useHorizontalNav()
@@ -15,7 +16,8 @@ const FooterContent = () => {
   return (
     <div className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
       <p>
-        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} Efeonce Group. `}</span>
+        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} `}</span>
+        <BrandWordmark brand='efeonce' sx={{ verticalAlign: 'middle', mr: 0.5 }} imgSx={{ opacity: 0.92 }} />
         <span className='text-textSecondary'>{GH_MESSAGES.footer}</span>
         <Link href='/dashboard' className='text-primary mie-0 mis-2'>
           {GH_MESSAGES.footer_portal_link}
@@ -24,16 +26,19 @@ const FooterContent = () => {
       {!isBreakpointReached ? (
         <div className='flex items-center gap-4'>
           <Link href='/dashboard' className='text-primary'>
-            {GH_NAV.dashboard.label}
+            {GH_CLIENT_NAV.dashboard.label}
           </Link>
           <Link href='/proyectos' className='text-primary'>
-            {GH_NAV.projects.label}
+            {GH_CLIENT_NAV.projects.label}
           </Link>
           <Link href='/sprints' className='text-primary'>
-            {GH_NAV.sprints.label}
+            {GH_CLIENT_NAV.sprints.label}
           </Link>
           <Link href='/settings' className='text-primary'>
-            {GH_NAV.settings.label}
+            {GH_CLIENT_NAV.settings.label}
+          </Link>
+          <Link href='/updates' className='text-primary'>
+            {GH_CLIENT_NAV.updates.label}
           </Link>
         </div>
       ) : null}
