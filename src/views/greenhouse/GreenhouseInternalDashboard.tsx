@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 
 import InternalControlTowerTable from './internal/dashboard/InternalControlTowerTable'
@@ -96,77 +97,92 @@ const GreenhouseInternalDashboard = ({ data }: Props) => {
 
   const cards = [
     {
-      title: 'Clientes',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_clients,
       stats: formatInteger(data.totals.totalClients),
       avatarIcon: 'tabler-building-community',
       avatarColor: 'primary' as const,
       trend: summary.newClientsThisMonth > 0 ? ('positive' as const) : ('neutral' as const),
       trendNumber: formatInteger(summary.newClientsThisMonth),
       subtitle: `${formatInteger(summary.activeClients)} activos hoy`,
-      footer: summary.newClientsThisMonth > 0 ? `${formatInteger(summary.newClientsThisMonth)} nuevos este mes.` : 'Sin altas nuevas este mes.'
+      footer:
+        summary.newClientsThisMonth > 0
+          ? `${formatInteger(summary.newClientsThisMonth)} nuevos este mes.`
+          : GH_INTERNAL_MESSAGES.internal_dashboard_no_new_clients
     },
     {
-      title: 'Usuarios activos',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_active_users,
       stats: formatInteger(summary.activeUsers),
       avatarIcon: 'tabler-user-check',
       avatarColor: 'success' as const,
       trend: activeUsersRate < 20 ? ('negative' as const) : ('positive' as const),
       trendNumber: `${Math.round(activeUsersRate)}%`,
-      subtitle: `${formatInteger(summary.activeUsers)} de ${formatInteger(summary.totalUsers)} con al menos 1 login`,
-      statusLabel: activeUsersRate < 20 ? 'Activacion baja' : 'Base activa',
+      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_active_subtitle(summary.activeUsers, summary.totalUsers),
+      statusLabel:
+        activeUsersRate < 20
+          ? GH_INTERNAL_MESSAGES.internal_dashboard_active_status_low
+          : GH_INTERNAL_MESSAGES.internal_dashboard_active_status_healthy,
       statusColor: activeUsersRate < 20 ? ('warning' as const) : ('success' as const),
-      footer: 'Semaforo de activacion efectiva del portal.'
+      footer: GH_INTERNAL_MESSAGES.internal_dashboard_active_footer
     },
     {
-      title: 'Pendientes de activacion',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_pending_users,
       stats: formatInteger(summary.invitedUsers),
       avatarIcon: 'tabler-user-search',
       avatarColor: 'warning' as const,
       trend: pendingUsersRate > 80 ? ('negative' as const) : ('neutral' as const),
       trendNumber: `${Math.round(pendingUsersRate)}%`,
-      subtitle: 'Usuarios invitados sin login visible',
-      statusLabel: pendingUsersRate > 80 ? 'Onboarding en riesgo' : 'Bajo control',
+      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_pending_subtitle,
+      statusLabel:
+        pendingUsersRate > 80
+          ? GH_INTERNAL_MESSAGES.internal_dashboard_pending_status_risk
+          : GH_INTERNAL_MESSAGES.internal_dashboard_pending_status_ok,
       statusColor: pendingUsersRate > 80 ? ('error' as const) : ('warning' as const),
-      footer: 'Si supera 80% hay friccion de activacion.'
+      footer: GH_INTERNAL_MESSAGES.internal_dashboard_pending_footer
     },
     {
-      title: 'Admins internos',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_internal_admins,
       stats: formatInteger(summary.internalAdmins),
       avatarIcon: 'tabler-shield-lock',
       avatarColor: 'info' as const,
       trend: 'neutral' as const,
       trendNumber: formatInteger(summary.internalAdmins),
-      subtitle: 'Equipo Efeonce con acceso visible',
-      footer: 'Sin semaforo: sirve como control de cobertura interna.'
+      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_admins_subtitle,
+      footer: GH_INTERNAL_MESSAGES.internal_dashboard_admins_footer
     },
     {
-      title: 'Spaces sin actividad',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity,
       stats: formatInteger(summary.spacesWithoutActivity),
       avatarIcon: 'tabler-alert-triangle',
       avatarColor: 'error' as const,
       trend: summary.spacesWithoutActivity > 0 ? ('negative' as const) : ('positive' as const),
       trendNumber: formatInteger(summary.attentionCount),
-      subtitle: '0 scopes o sin actividad en los ultimos 30 dias',
-      statusLabel: summary.spacesWithoutActivity > 0 ? 'Revisar hoy' : 'Sin alertas',
+      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_subtitle,
+      statusLabel:
+        summary.spacesWithoutActivity > 0
+          ? GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_status_alert
+          : GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_status_clear,
       statusColor: summary.spacesWithoutActivity > 0 ? ('error' as const) : ('success' as const),
-      footer: 'Indicador directo de clientes que necesitan intervencion.'
+      footer: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_footer
     },
     {
-      title: 'OTD global',
+      title: GH_INTERNAL_MESSAGES.internal_dashboard_global_otd,
       stats: formatPercent(summary.avgOnTimePct),
       avatarIcon: 'tabler-target-arrow',
       avatarColor: globalOtdTone === 'default' ? ('secondary' as const) : globalOtdTone,
       trend:
         summary.avgOnTimePct === null ? ('neutral' as const) : summary.avgOnTimePct >= 90 ? ('positive' as const) : summary.avgOnTimePct >= 70 ? ('neutral' as const) : ('negative' as const),
       trendNumber: formatInteger(summary.trackedOtdProjects),
-      subtitle: 'Promedio ponderado de OTD visible',
+      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_global_subtitle,
       statusLabel:
-        summary.avgOnTimePct === null ? 'Sin data' : summary.avgOnTimePct >= 90 ? 'Saludable' : summary.avgOnTimePct >= 70 ? 'Bajo observacion' : 'Requiere atencion',
+        summary.avgOnTimePct === null
+          ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_empty
+          : summary.avgOnTimePct >= 90
+            ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_healthy
+            : summary.avgOnTimePct >= 70
+              ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_watch
+              : GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_alert,
       statusColor: globalOtdTone,
-      footer:
-        summary.trackedOtdProjects > 0
-          ? `${formatInteger(summary.trackedOtdProjects)} proyectos con OTD visible.`
-          : 'Sin proyectos con OTD visible todavia.'
+      footer: GH_INTERNAL_MESSAGES.internal_dashboard_otd_footer(summary.trackedOtdProjects)
     }
   ]
 
@@ -174,48 +190,51 @@ const GreenhouseInternalDashboard = ({ data }: Props) => {
     <Stack spacing={6}>
       <div className='flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between'>
         <div className='flex flex-col gap-2'>
-          <Typography variant='h3'>Control Tower</Typography>
+          <Typography variant='h3'>{GH_INTERNAL_MESSAGES.internal_dashboard_title}</Typography>
           <Typography color='text.secondary'>
-            {formatInteger(summary.activeClients)} clientes activos. {formatInteger(summary.invitedUsers)} usuarios pendientes de activacion. Ultima actividad:{' '}
-            {formatRelativeDate(summary.lastActivityAt)}.
+            {GH_INTERNAL_MESSAGES.internal_dashboard_summary(
+              summary.activeClients,
+              summary.invitedUsers,
+              formatRelativeDate(summary.lastActivityAt)
+            )}
           </Typography>
           <div className='flex flex-wrap gap-2'>
             {summary.attentionCount > 0 ? (
               <Button variant='tonal' color='error' startIcon={<i className='tabler-alert-triangle' />} onClick={() => setStatusFilter('attention')}>
-                {formatInteger(summary.attentionCount)} requieren atencion
+                {GH_INTERNAL_MESSAGES.internal_dashboard_requires_attention(summary.attentionCount)}
               </Button>
             ) : null}
             {summary.onboardingCount > 0 ? (
               <Button variant='tonal' color='warning' startIcon={<i className='tabler-rocket' />} onClick={() => setStatusFilter('onboarding')}>
-                {formatInteger(summary.onboardingCount)} en onboarding
+                {GH_INTERNAL_MESSAGES.internal_dashboard_onboarding(summary.onboardingCount)}
               </Button>
             ) : null}
             {summary.inactiveCount > 0 ? (
               <Button variant='tonal' color='secondary' startIcon={<i className='tabler-moon-stars' />} onClick={() => setStatusFilter('inactive')}>
-                {formatInteger(summary.inactiveCount)} inactivos
+                {GH_INTERNAL_MESSAGES.internal_dashboard_inactive(summary.inactiveCount)}
               </Button>
             ) : null}
           </div>
         </div>
 
         <div className='flex flex-col gap-3 sm:flex-row'>
-          <Tooltip title='El flujo de creacion de spaces aun no existe como mutacion dedicada en el repo.'>
+          <Tooltip title={GH_INTERNAL_MESSAGES.internal_dashboard_create_space_tooltip}>
             <span>
               <Button variant='contained' startIcon={<i className='tabler-plus' />} disabled>
-                Crear space
+                {GH_INTERNAL_MESSAGES.internal_dashboard_create_space}
               </Button>
             </span>
           </Tooltip>
           <Button variant='tonal' color='secondary' startIcon={<i className='tabler-upload' />} onClick={() => exportToCsv(filteredTenants)}>
-            Exportar
+            {GH_INTERNAL_MESSAGES.internal_dashboard_export}
           </Button>
         </div>
       </div>
 
       <SectionErrorBoundary
         sectionName='control-tower-kpis'
-        title='No pudimos cargar los indicadores del control tower'
-        description='Reintenta la lectura de la capa ejecutiva en unos segundos.'
+        title={GH_INTERNAL_MESSAGES.internal_dashboard_kpis_error_title}
+        description={GH_INTERNAL_MESSAGES.internal_dashboard_kpis_error_description}
       >
         <Grid container spacing={6}>
           {cards.map(card => (
@@ -228,8 +247,8 @@ const GreenhouseInternalDashboard = ({ data }: Props) => {
 
       <SectionErrorBoundary
         sectionName='control-tower-table'
-        title='No pudimos cargar la lista de clientes'
-        description='Intenta de nuevo. Si persiste, revisa la consulta interna del control tower.'
+        title={GH_INTERNAL_MESSAGES.internal_dashboard_table_error_title}
+        description={GH_INTERNAL_MESSAGES.internal_dashboard_table_error_description}
       >
         <InternalControlTowerTable
           rows={filteredTenants}

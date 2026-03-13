@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-import { GH_LABELS, GH_MESSAGES, GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { EmptyState, ExecutiveCardShell, SectionErrorBoundary } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
@@ -81,7 +81,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
   const rpaStatus = getRpaStatus(latestQualitySignal?.avgRpa ?? null)
   const otdStatus = getOtdStatus(data.summary.avgOnTimePct)
   const reviewStatus = getReviewStatus(data.summary.reviewPressureTasks, data.summary.openFrameComments)
-  const badgeLabels = buildModuleBadges(data).map(item => item.label)
+  const moduleBadges = buildModuleBadges(data)
 
   const donutSeries = statusMix.map(item => item.value)
   const cadenceSeries = [{ name: GH_LABELS.kpi_completed, data: data.charts.deliveryCadenceWeekly.map(item => item.completed) }]
@@ -105,7 +105,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           <ClientDashboardHero
             clientName={clientName}
             subtitle={heroSubtitle}
-            badges={badgeLabels}
+            badges={moduleBadges}
             updatedAtLabel={formatUpdatedAt(data.scope.lastSyncedAt)}
           />
         </SectionErrorBoundary>
@@ -300,16 +300,19 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
           </Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
             <MuiLink component={Link} href='/dashboard' color='text.secondary' underline='hover'>
-              {GH_NAV.dashboard.label}
+              {GH_CLIENT_NAV.dashboard.label}
             </MuiLink>
             <MuiLink component={Link} href='/proyectos' color='text.secondary' underline='hover'>
-              {GH_NAV.projects.label}
+              {GH_CLIENT_NAV.projects.label}
             </MuiLink>
             <MuiLink component={Link} href='/sprints' color='text.secondary' underline='hover'>
-              {GH_NAV.sprints.label}
+              {GH_CLIENT_NAV.sprints.label}
             </MuiLink>
             <MuiLink component={Link} href='/settings' color='text.secondary' underline='hover'>
-              {GH_NAV.settings.label}
+              {GH_CLIENT_NAV.settings.label}
+            </MuiLink>
+            <MuiLink component={Link} href='/updates' color='text.secondary' underline='hover'>
+              {GH_CLIENT_NAV.updates.label}
             </MuiLink>
           </Stack>
         </Box>

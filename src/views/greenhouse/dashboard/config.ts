@@ -21,7 +21,10 @@ export type DashboardThemeCopy = {
   projectsDescription: string
 }
 
-export type ModuleBadge = ChipGroupItem
+export type ModuleBadge = ChipGroupItem & {
+  brand?: string
+  surface: 'business-line' | 'service-module'
+}
 
 export type ModuleFocusCard = {
   key: string
@@ -61,7 +64,9 @@ const serviceModuleLabelMap: Record<string, string> = {
 const businessLineLabelMap: Record<string, string> = {
   crm_solutions: 'CRM Solutions',
   globe: 'Globe',
-  wave: 'Wave'
+  reach: 'Reach',
+  wave: 'Wave',
+  efeonce_digital: 'Efeonce'
 }
 
 const crmServiceModules = new Set(['licenciamiento_hubspot', 'implementacion_onboarding', 'consultoria_crm'])
@@ -203,15 +208,18 @@ export const buildModuleBadges = (data: GreenhouseDashboardData): ModuleBadge[] 
   const businessLineBadges = data.scope.businessLines.map(moduleCode => ({
     key: `business-line-${moduleCode}`,
     label: formatModuleLabel(moduleCode, businessLineLabelMap),
+    brand: moduleCode,
     color: 'info' as const,
-    variant: 'outlined' as const
+    variant: 'outlined' as const,
+    surface: 'business-line' as const
   }))
 
   const serviceModuleBadges = data.scope.serviceModules.map(moduleCode => ({
     key: `service-module-${moduleCode}`,
     label: formatModuleLabel(moduleCode, serviceModuleLabelMap),
     color: 'primary' as const,
-    variant: 'tonal' as const
+    variant: 'tonal' as const,
+    surface: 'service-module' as const
   }))
 
   return [...businessLineBadges, ...serviceModuleBadges]

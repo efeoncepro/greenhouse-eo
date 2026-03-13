@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 605.52 336.55">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #0375db;
+      }
+
+      .cls-3 {
+        fill: #082e8e;
+      }
+    </style>
+  </defs>
+  <g id="Capa_1" data-name="Capa 1">
+    <g>
+      <polygon class="cls-1" points="313.46 119.15 514.22 179.01 514.35 178.97 313.46 119.15"/>
+      <polygon class="cls-3" points="514.22 179.01 313.46 239.2 313.46 336.55 605.52 238.37 605.52 206.23 514.22 179.01"/>
+      <polygon class="cls-2" points="605.52 98.18 313.46 0 313.46 97.35 514.35 157.17 514.22 157.21 605.52 184.43 605.52 98.18"/>
+      <polygon class="cls-1" points="292.06 239.2 91.3 179.34 91.17 179.38 292.06 239.2"/>
+      <polygon class="cls-3" points="91.3 157.54 292.06 97.35 292.06 0 0 98.18 0 130.32 91.3 157.54"/>
+      <polygon class="cls-2" points="0 238.37 292.06 336.55 292.06 239.2 91.17 179.38 91.3 179.34 0 152.12 0 238.37"/>
+    </g>
+  </g>
+</svg>

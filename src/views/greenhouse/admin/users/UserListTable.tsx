@@ -31,6 +31,7 @@ import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
+import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
@@ -41,7 +42,7 @@ import { formatDateTime, roleColorFor, roleIconFor, statusTone, tenantTone, toTi
 const columnHelper = createColumnHelper<AdminUserRow>()
 
 const exportToCsv = (rows: AdminUserRow[]) => {
-  const headers = ['Nombre', 'Email', 'Cliente', 'Tenant', 'Estado', 'Auth', 'Roles', 'Route groups', 'Home', 'Ultimo login']
+  const headers = ['Nombre', 'Email', 'Cliente', 'Space', 'Estado', 'Acceso', 'Roles', 'Grupos de ruta', 'Home', 'Ultimo login']
 
   const lines = rows.map(row =>
     [
@@ -120,9 +121,11 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
         enableSorting: false
       },
       columnHelper.accessor('fullName', {
-        header: 'User',
+        header: GH_INTERNAL_MESSAGES.admin_users_user_header,
         cell: ({ row }) => {
-          const avatarSrc = resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+          const avatarSrc = row.original.avatarUrl
+            ? `/api/media/users/${row.original.userId}/avatar`
+            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
 
           return (
             <div className='flex items-center gap-4'>
@@ -141,29 +144,31 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       }),
       columnHelper.display({
         id: 'role',
-        header: 'Role',
+        header: GH_INTERNAL_MESSAGES.admin_users_role_header,
         cell: ({ row }) => {
           const primaryRole = row.original.roleCodes[0]
 
           if (!primaryRole) {
-            return <Typography color='text.secondary'>Sin rol</Typography>
+            return <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_users_no_role}</Typography>
           }
 
           return (
             <div className='flex flex-col gap-1'>
               <div className='flex items-center gap-2'>
                 <i className={roleIconFor(primaryRole)} style={{ color: `var(--mui-palette-${roleColorFor(primaryRole)}-main)` }} />
-                <Typography color='text.primary'>{toTitleCase(primaryRole)}</Typography>
+              <Typography color='text.primary'>{toTitleCase(primaryRole)}</Typography>
               </div>
               <Typography variant='body2'>
-                {row.original.roleCodes.length > 1 ? `+${row.original.roleCodes.length - 1} roles extra` : 'Rol primario'}
+                {row.original.roleCodes.length > 1
+                  ? GH_INTERNAL_MESSAGES.admin_users_extra_roles(row.original.roleCodes.length - 1)
+                  : GH_INTERNAL_MESSAGES.admin_users_primary_role}
               </Typography>
             </div>
           )
         }
       }),
       columnHelper.accessor('clientName', {
-        header: 'Tenant',
+        header: GH_INTERNAL_MESSAGES.admin_users_space_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color='text.primary'>{row.original.clientName}</Typography>
@@ -173,46 +178,46 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       }),
       columnHelper.display({
         id: 'access',
-        header: 'Access',
+        header: GH_INTERNAL_MESSAGES.admin_users_access_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <div className='flex items-center gap-2 flex-wrap'>
               <Chip size='small' variant='tonal' color={statusTone(row.original.status)} label={toTitleCase(row.original.status)} />
               <Chip size='small' variant='outlined' label={toTitleCase(row.original.authMode)} />
             </div>
-            <Typography variant='body2'>{`${row.original.projectScopeCount} proyectos · ${row.original.routeGroups.length} route groups`}</Typography>
+            <Typography variant='body2'>{GH_INTERNAL_MESSAGES.admin_users_access_detail(row.original.projectScopeCount, row.original.routeGroups.length)}</Typography>
           </div>
         )
       }),
       columnHelper.accessor('portalHomePath', {
-        header: 'Home',
+        header: GH_INTERNAL_MESSAGES.admin_users_home_header,
         cell: ({ row }) => <Typography color='text.primary'>{row.original.portalHomePath || '--'}</Typography>
       }),
       columnHelper.accessor('lastLoginAt', {
-        header: 'Ultimo login',
+        header: GH_INTERNAL_MESSAGES.admin_users_last_login_header,
         cell: ({ row }) => <Typography>{formatDateTime(row.original.lastLoginAt)}</Typography>
       }),
       columnHelper.display({
         id: 'action',
-        header: 'Action',
+        header: GH_INTERNAL_MESSAGES.admin_users_actions_header,
         enableSorting: false,
         cell: ({ row }) => (
           <div className='flex items-center gap-1'>
             <Button component={Link} href={`/admin/users/${row.original.userId}`} variant='text' size='small' startIcon={<i className='tabler-eye' />}>
-              Ver
+              {GH_INTERNAL_MESSAGES.admin_users_view}
             </Button>
             <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
               options={[
                 {
-                  text: 'Abrir detalle',
+                  text: GH_INTERNAL_MESSAGES.admin_users_open_detail,
                   icon: <i className='tabler-user-circle text-base' />,
                   href: `/admin/users/${row.original.userId}`,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
                 },
                 {
-                  text: 'Ir a roles',
+                  text: GH_INTERNAL_MESSAGES.admin_users_open_roles,
                   icon: <i className='tabler-shield-lock text-base' />,
                   href: '/admin/roles',
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
@@ -249,29 +254,29 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
   return (
     <Card>
       <CardHeader
-        title='Admin Users'
-        subheader='Patron Vuexy User Management reinterpretado sobre client_users, roles y scopes reales de Greenhouse.'
+        title={GH_INTERNAL_NAV.adminUsers.label}
+        subheader={GH_INTERNAL_MESSAGES.admin_users_table_subtitle}
       />
       <div className='p-6 border-bs'>
         <Typography variant='h6' className='mbe-4'>
-          Filters
+          {GH_INTERNAL_MESSAGES.admin_users_filters_title}
         </Typography>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <CustomTextField select fullWidth value={roleFilter} onChange={event => setRoleFilter(event.target.value)} label='Select Role'>
-            <MenuItem value='all'>All roles</MenuItem>
+          <CustomTextField select fullWidth value={roleFilter} onChange={event => setRoleFilter(event.target.value)} label={GH_INTERNAL_MESSAGES.admin_users_filter_role}>
+            <MenuItem value='all'>{GH_INTERNAL_MESSAGES.admin_users_filter_role_all}</MenuItem>
             {roleOptions.map(roleCode => (
               <MenuItem key={roleCode} value={roleCode}>
                 {toTitleCase(roleCode)}
               </MenuItem>
             ))}
           </CustomTextField>
-          <CustomTextField select fullWidth value={tenantFilter} onChange={event => setTenantFilter(event.target.value)} label='Select Tenant'>
-            <MenuItem value='all'>All tenants</MenuItem>
-            <MenuItem value='client'>Client</MenuItem>
-            <MenuItem value='efeonce_internal'>Efeonce Internal</MenuItem>
+          <CustomTextField select fullWidth value={tenantFilter} onChange={event => setTenantFilter(event.target.value)} label={GH_INTERNAL_MESSAGES.admin_users_filter_tenant}>
+            <MenuItem value='all'>{GH_INTERNAL_MESSAGES.admin_users_filter_tenant_all}</MenuItem>
+            <MenuItem value='client'>{GH_INTERNAL_MESSAGES.admin_users_tenant_client}</MenuItem>
+            <MenuItem value='efeonce_internal'>{GH_INTERNAL_MESSAGES.admin_users_tenant_internal}</MenuItem>
           </CustomTextField>
-          <CustomTextField select fullWidth value={statusFilter} onChange={event => setStatusFilter(event.target.value)} label='Select Status'>
-            <MenuItem value='all'>All status</MenuItem>
+          <CustomTextField select fullWidth value={statusFilter} onChange={event => setStatusFilter(event.target.value)} label={GH_INTERNAL_MESSAGES.admin_users_filter_status}>
+            <MenuItem value='all'>{GH_INTERNAL_MESSAGES.admin_users_filter_status_all}</MenuItem>
             {Array.from(new Set(data.users.map(user => user.status))).map(status => (
               <MenuItem key={status} value={status}>
                 {toTitleCase(status)}
@@ -298,14 +303,14 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
               setSearchValue(event.target.value)
               table.setPageIndex(0)
             }}
-            placeholder='Search User'
+            placeholder={GH_INTERNAL_MESSAGES.admin_users_search_placeholder}
             className='max-sm:is-full'
           />
           <Button color='secondary' variant='tonal' startIcon={<i className='tabler-upload' />} onClick={() => exportToCsv(filteredUsers)} className='max-sm:is-full'>
-            Export
+            {GH_INTERNAL_MESSAGES.admin_users_export}
           </Button>
           <Button component={Link} href='/admin/roles' variant='contained' startIcon={<i className='tabler-shield-lock' />} className='max-sm:is-full'>
-            Roles y permisos
+            {GH_INTERNAL_MESSAGES.admin_users_roles_button}
           </Button>
         </div>
       </div>
@@ -340,7 +345,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
             <tbody>
               <tr>
                 <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                  No data available
+                  {GH_INTERNAL_MESSAGES.admin_users_no_data}
                 </td>
               </tr>
             </tbody>

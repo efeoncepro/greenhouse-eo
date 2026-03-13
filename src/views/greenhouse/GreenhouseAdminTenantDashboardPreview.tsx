@@ -10,6 +10,7 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
@@ -41,9 +42,9 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
               gap={2}
             >
               <Box>
-                <Typography variant='h5'>Ver como cliente</Typography>
+                <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_preview_title}</Typography>
                 <Typography color='text.secondary'>
-                  Estas viendo el dashboard del space cliente {clientName} desde tu sesion de administrador.
+                  {GH_INTERNAL_MESSAGES.admin_tenant_preview_subtitle(clientName)}
                 </Typography>
               </Box>
               <Stack direction='row' gap={1.5} flexWrap='wrap'>
@@ -53,10 +54,10 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
             </Stack>
             <Stack direction='row' gap={2} flexWrap='wrap'>
               <Button component={Link} variant='outlined' href={`/admin/tenants/${clientId}`}>
-                Volver al space
+                {GH_INTERNAL_MESSAGES.admin_tenant_preview_back}
               </Button>
               <Button component={Link} variant='contained' href='/admin/tenants'>
-                Ir a spaces
+                {GH_INTERNAL_MESSAGES.admin_tenant_preview_spaces}
               </Button>
             </Stack>
             {capabilityModules.length > 0 ? (

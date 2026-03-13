@@ -16,7 +16,7 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
-import { GH_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -84,33 +84,55 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuSection label='Operacion'>
-          <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
-            <NavigationItemLabel
-              label={isInternalUser ? 'Dashboard' : GH_NAV.dashboard.label}
-              subtitle={GH_NAV.dashboard.subtitle}
-              showSubtitle={!isInternalUser && showNavSubtitles}
-            />
-          </MenuItem>
-          {!isInternalUser ? (
-            <>
-              <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
-                <NavigationItemLabel
-                  label={GH_NAV.projects.label}
-                  subtitle={GH_NAV.projects.subtitle}
-                  showSubtitle={showNavSubtitles}
-                />
-              </MenuItem>
-              <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
-                <NavigationItemLabel
-                  label={GH_NAV.sprints.label}
-                  subtitle={GH_NAV.sprints.subtitle}
-                  showSubtitle={showNavSubtitles}
-                />
-              </MenuItem>
-            </>
-          ) : null}
-        </MenuSection>
+        {isInternalUser ? (
+          <MenuSection label='Operacion'>
+            <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
+              <NavigationItemLabel
+                label={GH_INTERNAL_NAV.internalDashboard.label}
+                subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </MenuSection>
+        ) : (
+          <>
+            <MenuItem href={dashboardHref} icon={<i className='tabler-smart-home' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.dashboard.label}
+                subtitle={GH_CLIENT_NAV.dashboard.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/proyectos' icon={<i className='tabler-folders' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.projects.label}
+                subtitle={GH_CLIENT_NAV.projects.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/sprints' icon={<i className='tabler-bolt' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.sprints.label}
+                subtitle={GH_CLIENT_NAV.sprints.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.settings.label}
+                subtitle={GH_CLIENT_NAV.settings.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/updates' icon={<i className='tabler-bell' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.updates.label}
+                subtitle={GH_CLIENT_NAV.updates.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </>
+        )}
         {!isInternalUser && capabilityModules.length > 0 ? (
           <MenuSection label='Servicios'>
             {capabilityModules.map(module => (
@@ -123,22 +145,23 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         {isAdminUser ? (
           <MenuSection label='Admin'>
             <MenuItem href='/admin/tenants' icon={<i className='tabler-building-community' />}>
-              Admin Tenants
+              <NavigationItemLabel
+                label={GH_INTERNAL_NAV.adminTenants.label}
+                subtitle={GH_INTERNAL_NAV.adminTenants.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
             <MenuItem href='/admin/users' icon={<i className='tabler-users' />}>
-              Admin Users
+              <NavigationItemLabel
+                label={GH_INTERNAL_NAV.adminUsers.label}
+                subtitle={GH_INTERNAL_NAV.adminUsers.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
             </MenuItem>
             <MenuItem href='/admin/roles' icon={<i className='tabler-shield-lock' />}>
-              Roles & Permissions
-            </MenuItem>
-          </MenuSection>
-        ) : null}
-        {!isInternalUser ? (
-          <MenuSection label='Cuenta'>
-            <MenuItem href='/settings' icon={<i className='tabler-settings' />}>
               <NavigationItemLabel
-                label={GH_NAV.settings.label}
-                subtitle={GH_NAV.settings.subtitle}
+                label={GH_INTERNAL_NAV.adminRoles.label}
+                subtitle={GH_INTERNAL_NAV.adminRoles.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>

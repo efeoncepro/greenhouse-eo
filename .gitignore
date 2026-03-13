@@ -48,4 +48,12 @@ demo-configs/
 src/assets/iconify-icons/generated-icons.js
 src/assets/iconify-icons/generated-icons.css
 
+# local agent and task scratch space
+.codex/skills/greenhouse-agent/
+.codex/skills/greenhouse-portal-ui-implementer/
+.codex/skills/greenhouse-vuexy-ui-expert/
+CODEX_TASK_*.md
+src/app/api/internal/
+src/lib/ai/
+
 .vercel

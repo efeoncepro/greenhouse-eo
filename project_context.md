@@ -3,13 +3,26 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Preview auth hardening
+- `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
+- Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.
+
+## Delta 2026-03-13 Branding lock and nav hydration
+- El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
+- La capa de nomenclatura ya no debe mezclar portal cliente con internal/admin:
+  - `GH_CLIENT_NAV` queda reservado para la navegacion cliente normada por `Greenhouse_Nomenclatura_Portal_v3.md`
+  - `GH_INTERNAL_NAV` queda como nomenclatura operativa separada para `/internal/**` y `/admin/**`
+- Regla operativa nueva para theming runtime: Greenhouse no debe honrar cookies legacy de `primaryColor`, `skin` o `semiDark` que reintroduzcan branding Vuexy; esas preferencias quedan bloqueadas al baseline Greenhouse y solo se preservan `mode`, `layout` y widths compatibles.
+- `src/@core/utils/brandSettings.ts` y `getSettingsFromCookie()` son ahora el boundary de saneamiento para cookies de settings antes de SSR o hidratacion cliente.
+
 ## Delta 2026-03-13 Greenhouse nomenclature portal
 - Ya existe `src/config/greenhouse-nomenclature.ts` como fuente unica de nomenclatura visible para la capa cliente:
-  - `GH_NAV`
+  - `GH_CLIENT_NAV`
   - `GH_LABELS`
   - `GH_TEAM`
   - `GH_MESSAGES`
   - `GH_COLORS`
+- `src/config/greenhouse-nomenclature.ts` tambien versiona `GH_INTERNAL_NAV`, pero solo como capa operativa para superficies `internal/admin`; no como parte del contrato del portal cliente definido en `Greenhouse_Nomenclatura_Portal_v3.md`.
 - La navegacion cliente y las superficies principales `/login`, `/dashboard`, `/proyectos`, `/sprints` y `/settings` ya empezaron a consumir esa capa centralizada en vez de labels hardcodeados.
 - El rollout ya no es solo copy-level: la marca Efeonce ahora entra por el wiring oficial del starter kit sin crear un theme paralelo:
   - `src/components/theme/mergedTheme.ts`
@@ -23,6 +36,30 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `ClientEcosystemSection`
   - annotations, tooltips y totals de `chart-options.ts`
 - Regla operativa ratificada para theming: Greenhouse no debe reescribir el theme de Vuexy desde cero; cualquier ajuste global de tema debe pasar por `src/components/theme/mergedTheme.ts`, `@core/theme/*` o la configuracion oficial de Vuexy.
+
+## Delta 2026-03-13 Branding SVG rollout
+- `public/branding/SVG` pasa a ser la carpeta canonica para isotipos y wordmarks SVG de `Efeonce`, `Globe`, `Reach` y `Wave`.
+- `src/components/greenhouse/brand-assets.ts` centraliza el mapping reusable de esos assets para shell, business lines y futuras cards que necesiten logos propios.
+- `src/components/layout/shared/Logo.tsx` y `src/app/layout.tsx` ya no deben depender del PNG `avatar.png` como marca primaria; el shell y el favicon salen desde esa capa SVG.
+- `src/components/greenhouse/BrandWordmark.tsx` y `src/components/greenhouse/BusinessLineBadge.tsx` son ahora los componentes canonicos para renderizar `Efeonce`, `Globe`, `Reach` y `Wave` en contextos `inline`, footer, hero, tabla o chip sin hardcodes de imagen dispersos.
+
+## Delta 2026-03-13 Tenant and user media persistence
+- El runtime ya soporta subir y persistir logos/fotos reales para identidades visibles del portal en lugar de depender solo de iniciales o fallbacks.
+- Capa server-side nueva:
+  - `src/lib/storage/greenhouse-media.ts` para upload/download autenticado contra GCS
+  - `src/lib/admin/media-assets.ts` para leer/escribir `logo_url` y `avatar_url` en BigQuery
+- Endpoints internos nuevos:
+  - `POST /api/admin/tenants/[id]/logo`
+  - `POST /api/admin/users/[id]/avatar`
+  - `GET /api/media/tenants/[id]/logo`
+  - `GET /api/media/users/[id]/avatar`
+- Regla operativa:
+  - el bucket por defecto es `${GCP_PROJECT}-greenhouse-media`
+  - puede overridearse con `GREENHOUSE_MEDIA_BUCKET`
+  - los assets se guardan como `gs://...` en BigQuery y se sirven via proxy autenticado del portal, no via URL publica del bucket
+- El uploader UI reusable para admin ahora vive en `src/components/greenhouse/IdentityImageUploader.tsx`.
+- `greenhouse.clients` no traia `logo_url` en el DDL base; el runtime agrega la columna on-demand con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS logo_url STRING` antes de persistir logos de tenant.
+- La sesion NextAuth ya propaga `avatarUrl`, permitiendo que el dropdown autenticado refleje la foto guardada del usuario.
 
 ## Delta 2026-03-13 Capabilities runtime foundation
 - La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
@@ -416,6 +453,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
+- `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
 
 ## Multi-Tenant Actual
 - Dataset creado: `efeonce-group.greenhouse`
@@ -443,6 +481,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
 - La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
 - Capability governance no debe derivarse desde `deals` ni `closedwon`; el sync externo solo es valido cuando llega con payload explicito desde el registro de empresa u otra fuente canonica equivalente.
+- La fuente canonica de nomenclatura y microcopy Greenhouse vive en `src/config/greenhouse-nomenclature.ts`; cualquier texto visible nuevo en cliente debe salir de esa capa.
+- La navegacion cliente vigente para el portal Greenhouse contempla `Pulse`, `Proyectos`, `Ciclos`, `Mi Greenhouse` y `Updates`.
+- `Mi Greenhouse` concentra el modulo relacional `Tu equipo de cuenta`; `Pulse` mantiene `Capacidad del equipo` como lectura operativa separada.
+- La capa `GH_INTERNAL_MESSAGES` ya gobierna tambien partes grandes de `admin/tenants/[id]`, `view-as/dashboard`, governance de capabilities y tablas operativas del detalle de space.
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
@@ -459,6 +501,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La nueva lectura operacional de HubSpot no reemplaza la API generica de integraciones:
   - `/api/integrations/v1/*` sigue siendo el contrato para sync bidireccional de capabilities
   - el servicio `hubspot-greenhouse-integration` es la fachada de lectura live para CRM company/owner
+- Sigue pendiente barrer copy residual interna en superficies grandes como `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`.
+- Existe un bloqueo de tipos ajeno al plan actual por el archivo duplicado `src/config/capability-registry (1).ts`, que hoy impide usar `tsc` como verificacion integral limpia.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.

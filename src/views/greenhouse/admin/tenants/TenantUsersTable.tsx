@@ -29,7 +29,9 @@ import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantUserRow } from '@/lib/admin/get-admin-tenant-detail'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -69,36 +71,51 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
   const columns = useMemo<ColumnDef<AdminTenantUserRow, any>[]>(
     () => [
       columnHelper.accessor('fullName', {
-        header: 'Usuario',
-        cell: ({ row }) => (
-          <div className='flex items-center gap-4'>
-            <CustomAvatar skin='light' color={userStatusTone(row.original.status)} size={38}>
-              {getInitials(row.original.fullName)}
-            </CustomAvatar>
-            <div className='flex flex-col'>
-              <Typography component={Link} href={`/admin/users/${row.original.userId}`} color='text.primary' className='font-medium'>
-                {row.original.fullName}
-              </Typography>
-              <Typography variant='body2'>{row.original.email}</Typography>
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_user_header,
+        cell: ({ row }) => {
+          const avatarSrc = row.original.avatarUrl
+            ? `/api/media/users/${row.original.userId}/avatar`
+            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+
+          return (
+            <div className='flex items-center gap-4'>
+              <CustomAvatar
+                src={avatarSrc || undefined}
+                skin={avatarSrc ? undefined : 'light'}
+                color={userStatusTone(row.original.status)}
+                size={38}
+              >
+                {!avatarSrc ? getInitials(row.original.fullName) : null}
+              </CustomAvatar>
+              <div className='flex flex-col'>
+                <Typography component={Link} href={`/admin/users/${row.original.userId}`} color='text.primary' className='font-medium'>
+                  {row.original.fullName}
+                </Typography>
+                <Typography variant='body2'>{row.original.email}</Typography>
+              </div>
             </div>
-          </div>
-        )
+          )
+        }
       }),
       columnHelper.display({
         id: 'role',
-        header: 'Rol',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_role_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
-            <Typography color='text.primary'>{row.original.roleCodes[0] ? toTitleCase(row.original.roleCodes[0]) : 'Sin rol'}</Typography>
+            <Typography color='text.primary'>
+              {row.original.roleCodes[0] ? toTitleCase(row.original.roleCodes[0]) : GH_INTERNAL_MESSAGES.admin_tenant_users_no_role}
+            </Typography>
             <Typography variant='body2' color='text.secondary'>
-              {row.original.roleCodes.length > 1 ? `+${row.original.roleCodes.length - 1} roles extra` : row.original.publicUserId}
+              {row.original.roleCodes.length > 1
+                ? GH_INTERNAL_MESSAGES.admin_tenant_users_extra_roles(row.original.roleCodes.length - 1)
+                : row.original.publicUserId}
             </Typography>
           </div>
         )
       }),
       columnHelper.display({
         id: 'access',
-        header: 'Acceso',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_access_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <div className='flex items-center gap-2 flex-wrap'>
@@ -106,52 +123,54 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
               <Chip size='small' variant='outlined' label={toTitleCase(row.original.authMode)} />
             </div>
             <Typography variant='body2' color='text.secondary'>
-              {row.original.hubspotContactIds.length > 0 ? `HubSpot ${row.original.hubspotContactIds.join(', ')}` : 'Manual o interno'}
+              {row.original.hubspotContactIds.length > 0
+                ? `HubSpot ${row.original.hubspotContactIds.join(', ')}`
+                : GH_INTERNAL_MESSAGES.admin_tenant_users_manual_source}
             </Typography>
           </div>
         )
       }),
       columnHelper.display({
         id: 'scopes',
-        header: 'Scopes',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_scopes_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color='text.primary'>{`${row.original.projectScopeCount} proyectos`}</Typography>
             <Typography variant='body2' color='text.secondary'>
-              {row.original.routeGroups.length > 0 ? row.original.routeGroups.join(', ') : 'Sin route groups'}
+              {row.original.routeGroups.length > 0 ? row.original.routeGroups.join(', ') : GH_INTERNAL_MESSAGES.admin_tenant_users_no_route_groups}
             </Typography>
           </div>
         )
       }),
       columnHelper.accessor('lastLoginAt', {
-        header: 'Ultimo login',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_last_login_header,
         cell: ({ row }) => <Typography>{formatDateTime(row.original.lastLoginAt)}</Typography>
       }),
       columnHelper.display({
         id: 'action',
-        header: 'Acciones',
+        header: GH_INTERNAL_MESSAGES.admin_tenant_users_actions_header,
         enableSorting: false,
         cell: ({ row }) => (
           <div className='flex items-center gap-1'>
             <Button component={Link} href={`/admin/users/${row.original.userId}`} variant='text' size='small' startIcon={<i className='tabler-eye' />}>
-              Ver
+              {GH_INTERNAL_MESSAGES.admin_tenant_users_view}
             </Button>
             <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
               options={[
                 {
-                  text: 'Reenviar invitacion',
+                  text: GH_INTERNAL_MESSAGES.admin_tenant_users_resend_invite,
                   icon: <i className='tabler-mail-forward text-base' />,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                 },
                 {
-                  text: 'Cambiar rol',
+                  text: GH_INTERNAL_MESSAGES.admin_tenant_users_change_role,
                   icon: <i className='tabler-user-up text-base' />,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                 },
                 {
-                  text: 'Desactivar',
+                  text: GH_INTERNAL_MESSAGES.admin_tenant_users_deactivate,
                   icon: <i className='tabler-user-x text-base' />,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                 }
@@ -188,36 +207,36 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
     <>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
         <HorizontalWithSubtitle
-          title='Activos'
+          title={GH_INTERNAL_MESSAGES.admin_tenant_users_active}
           stats={String(activeCount)}
           avatarIcon='tabler-user-check'
           avatarColor='success'
           trend='neutral'
           trendNumber='0'
-          subtitle='Con acceso operativo'
+          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_active_subtitle}
         />
         <HorizontalWithSubtitle
-          title='Invitados'
+          title={GH_INTERNAL_MESSAGES.admin_tenant_users_invited}
           stats={String(invitedCount)}
           avatarIcon='tabler-mail-forward'
           avatarColor='warning'
           trend='neutral'
           trendNumber='0'
-          subtitle='Pendientes de activacion'
+          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_invited_subtitle}
         />
         <HorizontalWithSubtitle
-          title='Total'
+          title={GH_INTERNAL_MESSAGES.admin_tenant_users_total}
           stats={String(users.length)}
           avatarIcon='tabler-users'
           avatarColor='primary'
           trend='neutral'
           trendNumber='0'
-          subtitle='Usuarios del space'
+          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_total_subtitle}
         />
       </div>
 
       <Card>
-        <CardHeader title='Usuarios del space' subheader='Patron Vuexy User Management adaptado a client_users, roles y scopes reales del tenant.' />
+        <CardHeader title={GH_INTERNAL_MESSAGES.admin_tenant_users_title} subheader={GH_INTERNAL_MESSAGES.admin_tenant_users_subtitle} />
         <div className='p-6 border-bs'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <CustomTextField
@@ -226,7 +245,7 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
                 setSearchValue(event.target.value)
                 table.setPageIndex(0)
               }}
-              placeholder='Buscar usuario'
+              placeholder={GH_INTERNAL_MESSAGES.admin_tenant_users_search_placeholder}
             />
             <CustomTextField
               select
@@ -236,9 +255,9 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
                 setStatusFilter(event.target.value)
                 table.setPageIndex(0)
               }}
-              label='Estado'
+              label={GH_INTERNAL_MESSAGES.admin_tenant_users_status_label}
             >
-              <MenuItem value='all'>Todos</MenuItem>
+              <MenuItem value='all'>{GH_INTERNAL_MESSAGES.admin_tenant_users_status_all}</MenuItem>
               {statusOptions.map(status => (
                 <MenuItem key={status} value={status}>
                   {toTitleCase(status)}
@@ -260,10 +279,10 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
           </CustomTextField>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
             <Button variant='tonal' color='secondary' startIcon={<i className='tabler-user-plus' />} disabled className='max-sm:is-full'>
-              Invitar usuario
+              {GH_INTERNAL_MESSAGES.admin_tenant_users_invite}
             </Button>
             <Button variant='contained' color='warning' startIcon={<i className='tabler-mail-forward' />} disabled className='max-sm:is-full'>
-              Reenviar pendientes
+              {GH_INTERNAL_MESSAGES.admin_tenant_users_resend}
             </Button>
           </div>
         </div>
@@ -298,7 +317,7 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
               <tbody>
                 <tr>
                   <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                    No hay usuarios para este filtro.
+                    {GH_INTERNAL_MESSAGES.admin_tenant_users_no_data}
                   </td>
                 </tr>
               </tbody>

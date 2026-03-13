@@ -1,4 +1,6 @@
 // Type Imports
+import type { Session } from 'next-auth'
+
 import type { ChildrenType, Direction } from '@core/types'
 
 // Context Imports
@@ -12,11 +14,12 @@ import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serve
 
 type Props = ChildrenType & {
   direction: Direction
+  session?: Session | null
 }
 
 const Providers = async (props: Props) => {
   // Props
-  const { children, direction } = props
+  const { children, direction, session = null } = props
 
   // Vars
   const mode = await getMode()
@@ -24,7 +27,7 @@ const Providers = async (props: Props) => {
   const systemMode = await getSystemMode()
 
   return (
-    <AuthSessionProvider>
+    <AuthSessionProvider session={session}>
       <VerticalNavProvider>
         <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
           <ThemeProvider direction={direction} systemMode={systemMode}>
