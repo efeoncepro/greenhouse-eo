@@ -17,6 +17,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `onboarding-center`
   - `web-delivery-lab`
 - La data inicial de cada modulo reutiliza el contrato real de `/dashboard` para entregar una lectura ejecutiva coherente mientras los query builders dedicados siguen siendo una fase posterior.
+- El admin ahora tiene una vista de validacion autenticada para modules en `/admin/tenants/[id]/capability-preview/[moduleId]`, separada del `view-as/dashboard`.
+- La preview admin usa fallback controlado al registry para inspeccionar modules del tenant aunque la resolucion cliente estricta siga dependiendo de `businessLines` y `serviceModules`.
+- El smoke operativo de capabilities queda automatizado en `scripts/run-capability-preview-smoke.ps1`, con JWT admin local y capturas Playwright sobre:
+  - `/admin/tenants/space-efeonce/view-as/dashboard`
+  - `/admin/tenants/space-efeonce/capability-preview/creative-hub`
+- `tsconfig.json` ya no incluye validators historicos de `.next-local/build-*`; solo conserva tipos `dev` para evitar que caches viejos rompan `tsc`.
 
 ## Delta 2026-03-12 Internal Control Tower Redesign
 - `/internal/dashboard` dejo de ser un hero estatico con lista plana de tenants y ahora funciona como `Control Tower` operativo para el equipo interno Efeonce.

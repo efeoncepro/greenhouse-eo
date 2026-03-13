@@ -90,3 +90,11 @@ export interface CapabilityModuleData {
     lastSyncedAt: string | null
   }
 }
+
+export interface CapabilityViewerContext {
+  clientId: string
+  clientName: string
+  projectIds: string[]
+  businessLines: string[]
+  serviceModules: string[]
+}

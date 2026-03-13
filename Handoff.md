@@ -40,6 +40,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 07:21 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar la validacion pendiente de `Greenhouse_Capabilities_Architecture_v1.md` con preview admin autenticada, smoke local real y estabilizacion de la verificacion TypeScript en este worktree.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / admin preview / capability runtime / smoke local autenticado
+
+### Archivos tocados
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/lib/capabilities/module-content-builders.ts`
+- `src/types/capabilities.ts`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantCapabilityPreview.tsx`
+- `src/app/(dashboard)/admin/tenants/[id]/capability-preview/[moduleId]/page.tsx`
+- `scripts/mint-local-admin-jwt.js`
+- `scripts/run-capability-preview-smoke.ps1`
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `gcloud auth login --update-adc`: correcto
+- `gcloud auth application-default print-access-token`: correcto
+- `npx pnpm exec eslint ...` sobre archivos de capabilities y preview admin: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1 -SkipScreenshots`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+- Smoke validado sobre:
+  - `/admin/tenants/space-efeonce/view-as/dashboard`
+  - `/admin/tenants/space-efeonce/capability-preview/creative-hub`
+
+### Riesgos o pendientes
+- El documento original sigue proponiendo query builders dedicados por module; hoy la data de cada capability sigue montada sobre el contrato de `/dashboard` con builders editoriales separados.
+- La ruta preview admin se movio a `capability-preview` porque el nesting anterior bajo `view-as/capabilities` provocaba corrupcion de route types en Next 16 durante typegen.
+- `tsconfig.json` deja fuera validators historicos de `.next-local/build-*`; la intencion es estabilizar la verificacion del repo actual y no compilar caches de ramas antiguas.
+
 ## 2026-03-13 00:54 America/Santiago
 
 ### Agente
