@@ -311,6 +311,9 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
             <MuiLink component={Link} href='/settings' color='text.secondary' underline='hover'>
               {GH_CLIENT_NAV.settings.label}
             </MuiLink>
+            <MuiLink component={Link} href='/updates' color='text.secondary' underline='hover'>
+              {GH_CLIENT_NAV.updates.label}
+            </MuiLink>
           </Stack>
         </Box>
       </Stack>

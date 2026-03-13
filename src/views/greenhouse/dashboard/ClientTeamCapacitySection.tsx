@@ -8,8 +8,8 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
+import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import { formatFte, formatHours, formatTeamMemberInitials } from '@views/greenhouse/dashboard/helpers'
 
@@ -32,6 +32,22 @@ const getRoleTone = (role: string): TeamRoleTone => {
   return 'development'
 }
 
+const formatMemberDedication = (allocationPct: number | null, monthlyHours: number | null) => {
+  if (allocationPct !== null && monthlyHours !== null) {
+    return `${allocationPct}% · ${monthlyHours}h/mes`
+  }
+
+  if (allocationPct !== null) {
+    return `${allocationPct}%`
+  }
+
+  if (monthlyHours !== null) {
+    return `${monthlyHours}h/mes`
+  }
+
+  return GH_TEAM.dedication_pending
+}
+
 const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectionProps) => {
   const teamMembers = data.accountTeam.members
   const hasTeam = teamMembers.length > 0
@@ -43,14 +59,14 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
 
   if (!hasTeam) {
     return (
-      <ExecutiveCardShell title={GH_TEAM.section_title} subtitle={GH_TEAM.section_subtitle}>
-        <EmptyState icon='tabler-users-group' title={GH_TEAM.section_title} description={GH_MESSAGES.empty_team} minHeight={260} />
+      <ExecutiveCardShell title={GH_TEAM.capacity_title} subtitle={GH_TEAM.capacity_subtitle}>
+        <EmptyState icon='tabler-users-group' title={GH_TEAM.capacity_title} description={GH_MESSAGES.empty_capacity} minHeight={260} />
       </ExecutiveCardShell>
     )
   }
 
   return (
-    <ExecutiveCardShell title={GH_TEAM.section_title} subtitle={GH_TEAM.section_subtitle}>
+    <ExecutiveCardShell title={GH_TEAM.capacity_title} subtitle={GH_TEAM.capacity_subtitle}>
       <Box
         sx={{
           display: 'grid',
@@ -62,8 +78,11 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
         }}
       >
         <Stack spacing={2}>
+          <Typography variant='subtitle2'>{GH_TEAM.label_load}</Typography>
+
           {teamMembers.map(member => {
             const roleTone = GH_COLORS.role[getRoleTone(member.role)]
+            const memberUtilization = Math.max(0, Math.min(100, member.allocationPct ?? 0))
 
             return (
               <Box
@@ -72,78 +91,58 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
                   p: 2.5,
                   borderRadius: 3,
                   border: `1px solid ${GH_COLORS.neutral.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2
+                  display: 'grid',
+                  gap: 1.5
                 }}
               >
-                <Avatar
-                  src={member.avatarPath || undefined}
-                  sx={{
-                    width: 46,
-                    height: 46,
-                    bgcolor: roleTone.bg,
-                    color: roleTone.textDark,
-                    border: `1px solid ${roleTone.bgHover}`
-                  }}
-                >
-                  {formatTeamMemberInitials(member.name)}
-                </Avatar>
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant='h6'>{member.name}</Typography>
-                  <Typography variant='body2' sx={{ color: roleTone.text }}>
-                    {member.role}
-                  </Typography>
-                </Box>
+                <Stack direction='row' spacing={2} alignItems='center'>
+                  <Avatar
+                    src={member.avatarPath || undefined}
+                    sx={{
+                      width: 46,
+                      height: 46,
+                      bgcolor: roleTone.bg,
+                      color: roleTone.textDark,
+                      border: `1px solid ${roleTone.bgHover}`
+                    }}
+                  >
+                    {formatTeamMemberInitials(member.name)}
+                  </Avatar>
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                    <Typography variant='h6'>{member.name}</Typography>
+                    <Typography variant='body2' sx={{ color: roleTone.text }}>
+                      {member.role}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right' }}>
+                    <Typography variant='caption' color='text.secondary'>
+                      {GH_TEAM.label_fte}
+                    </Typography>
+                    <Typography variant='body2'>{formatMemberDedication(member.allocationPct, member.monthlyHours)}</Typography>
+                  </Box>
+                </Stack>
+
+                {member.allocationPct !== null ? (
+                  <Box>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center' className='mbe-1'>
+                      <Typography variant='body2' color='text.secondary'>
+                        {member.name}
+                      </Typography>
+                      <Typography variant='body2' color='text.primary'>
+                        {memberUtilization}%
+                      </Typography>
+                    </Stack>
+                    <LinearProgress
+                      color={memberUtilization >= 85 ? 'warning' : 'info'}
+                      variant='determinate'
+                      value={memberUtilization}
+                      sx={{ height: 8, borderRadius: 999 }}
+                    />
+                  </Box>
+                ) : null}
               </Box>
             )
           })}
-
-          <ButtonBase
-            onClick={() => onRequest('ampliar equipo')}
-            sx={{
-              p: 2.5,
-              borderRadius: 3,
-              border: `1px dashed ${GH_COLORS.semantic.warning.text}`,
-              justifyContent: 'flex-start',
-              transition: 'border-color 150ms ease, transform 150ms ease, background-color 150ms ease',
-              '&:hover': {
-                borderColor: GH_COLORS.semantic.warning.source,
-                backgroundColor: GH_COLORS.semantic.warning.bg
-              },
-              '&:hover .ghost-slot-icon': {
-                transform: 'scale(1.1)'
-              }
-            }}
-            aria-label={GH_TEAM.expand_title}
-          >
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <Box
-                className='ghost-slot-icon'
-                sx={{
-                  width: 46,
-                  height: 46,
-                  borderRadius: '50%',
-                  border: `1px dashed ${GH_COLORS.semantic.warning.text}`,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: GH_COLORS.semantic.warning.text,
-                  transition: 'transform 150ms ease'
-                }}
-              >
-                <i className='tabler-plus text-xl' />
-              </Box>
-              <Box sx={{ textAlign: 'left' }}>
-                <Typography variant='subtitle1' sx={{ color: GH_COLORS.semantic.warning.text }}>
-                  {GH_TEAM.expand_title}
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  {GH_TEAM.expand_subtitle}
-                </Typography>
-              </Box>
-            </Stack>
-          </ButtonBase>
         </Stack>
 
         {hasCapacity ? (
@@ -159,7 +158,7 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
             }}
           >
             <Box>
-              <Typography variant='h6'>{GH_TEAM.capacity_title}</Typography>
+              <Typography variant='h6'>{GH_TEAM.label_contracted}</Typography>
               <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
                 {formatFte(utilizedHours)} de {formatFte(totalMonthlyHours)} contratados
               </Typography>
@@ -177,13 +176,17 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
               <LinearProgress color={capacityTone} variant='determinate' value={utilizationPct} sx={{ height: 10, borderRadius: 999 }} />
             </Box>
 
-            <Typography variant='body2' color='text.secondary'>
-              {formatHours(utilizedHours)} de {formatHours(totalMonthlyHours)} mensuales utilizadas.
-            </Typography>
-
-            <Typography variant='caption' color='text.secondary'>
-              {GH_MESSAGES.tooltip_utilization}
-            </Typography>
+            <Box sx={{ display: 'grid', gap: 1 }}>
+              <Typography variant='caption' color='text.secondary'>
+                {GH_TEAM.label_hours}
+              </Typography>
+              <Typography variant='body2'>
+                {formatHours(utilizedHours)} de {formatHours(totalMonthlyHours)} mensuales utilizadas.
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {GH_MESSAGES.tooltip_utilization}
+              </Typography>
+            </Box>
 
             {utilizationPct >= 85 ? (
               <Box
@@ -191,15 +194,31 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
                   p: 2,
                   borderRadius: 3,
                   backgroundColor: GH_COLORS.semantic.warning.bg,
-                  border: `1px solid ${alpha(GH_COLORS.semantic.warning.source, 0.24)}`
+                  border: `1px solid ${alpha(GH_COLORS.semantic.warning.source, 0.24)}`,
+                  display: 'grid',
+                  gap: 1.5
                 }}
               >
                 <Typography variant='subtitle2' sx={{ color: GH_COLORS.role.media.textDark }}>
                   {GH_TEAM.cta_title.replace('{percent}', String(utilizationPct))}
                 </Typography>
-                <Typography variant='body2' sx={{ mt: 0.75, color: GH_COLORS.semantic.warning.text }}>
+                <Typography variant='body2' sx={{ color: GH_COLORS.semantic.warning.text }}>
                   {GH_TEAM.cta_subtitle}
                 </Typography>
+                <ButtonBase
+                  onClick={() => onRequest('ampliar capacidad')}
+                  sx={{
+                    justifyContent: 'center',
+                    px: 2,
+                    py: 1.5,
+                    borderRadius: 2,
+                    border: `1px solid ${GH_COLORS.semantic.warning.source}`,
+                    color: GH_COLORS.semantic.warning.text,
+                    fontWeight: 600
+                  }}
+                >
+                  {GH_TEAM.cta_button}
+                </ButtonBase>
               </Box>
             ) : null}
           </Box>

@@ -133,6 +133,10 @@ const UserDropdown = () => {
                         <i className='tabler-settings' />
                         <Typography color='text.primary'>{GH_CLIENT_NAV.settings.label}</Typography>
                       </MenuItem>
+                      <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/updates')}>
+                        <i className='tabler-bell' />
+                        <Typography color='text.primary'>{GH_CLIENT_NAV.updates.label}</Typography>
+                      </MenuItem>
                     </>
                   ) : null}
                   {isAdminUser ? (

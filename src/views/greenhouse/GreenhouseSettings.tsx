@@ -11,7 +11,9 @@ import Typography from '@mui/material/Typography'
 
 import { signIn, useSession } from 'next-auth/react'
 
+import { AccountTeamDossierSection } from '@/components/greenhouse'
 import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import type { GreenhouseDashboardAccountTeam } from '@/types/greenhouse-dashboard'
 
 const settingsRows = [
   {
@@ -29,11 +31,19 @@ const settingsRows = [
 ]
 
 const providerLabelMap: Record<string, string> = {
-  credentials: 'Email y contrasena',
-  microsoft_sso: 'Microsoft SSO'
+  credentials: GH_MESSAGES.settings_provider_credentials,
+  microsoft_sso: GH_MESSAGES.settings_provider_microsoft
 }
 
-const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean }) => {
+const GreenhouseSettings = ({
+  hasMicrosoftAuth,
+  accountTeam,
+  businessLines
+}: {
+  hasMicrosoftAuth: boolean
+  accountTeam: GreenhouseDashboardAccountTeam
+  businessLines: string[]
+}) => {
   const { data: session } = useSession()
 
   const activeProvider = session?.user?.provider || 'credentials'
@@ -68,7 +78,7 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
                     {isMicrosoftLinked ? <Chip size='small' color='success' label={GH_MESSAGES.settings_verified} /> : null}
                   </Box>
                   <Typography variant='body2' color='text.secondary'>
-                    Metodo de acceso activo: {providerLabelMap[activeProvider] || activeProvider}
+                    {GH_MESSAGES.settings_access_method_label}: {providerLabelMap[activeProvider] || activeProvider}
                   </Typography>
                 </Stack>
               </Box>
@@ -127,6 +137,8 @@ const GreenhouseSettings = ({ hasMicrosoftAuth }: { hasMicrosoftAuth: boolean })
           </CardContent>
         </Card>
       </Box>
+
+      <AccountTeamDossierSection accountTeam={accountTeam} businessLines={businessLines} />
     </Stack>
   )
 }

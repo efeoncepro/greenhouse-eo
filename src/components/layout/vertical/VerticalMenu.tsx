@@ -124,6 +124,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
+            <MenuItem href='/updates' icon={<i className='tabler-bell' />}>
+              <NavigationItemLabel
+                label={GH_CLIENT_NAV.updates.label}
+                subtitle={GH_CLIENT_NAV.updates.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
           </>
         )}
         {!isInternalUser && capabilityModules.length > 0 ? (

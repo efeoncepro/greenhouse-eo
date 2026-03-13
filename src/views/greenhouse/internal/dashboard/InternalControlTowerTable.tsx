@@ -36,6 +36,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import EmptyState from '@components/greenhouse/EmptyState'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -57,11 +58,11 @@ type Props = {
 const columnHelper = createColumnHelper<DerivedControlTowerTenant>()
 
 const statusFilterOptions: Array<{ value: StatusFilter; label: string }> = [
-  { value: 'all', label: 'Todos' },
-  { value: 'active', label: 'Activos' },
-  { value: 'onboarding', label: 'Onboarding' },
-  { value: 'attention', label: 'Requiere atencion' },
-  { value: 'inactive', label: 'Inactivos' }
+  { value: 'all', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_all },
+  { value: 'active', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_active },
+  { value: 'onboarding', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_onboarding },
+  { value: 'attention', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_attention },
+  { value: 'inactive', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_inactive }
 ]
 
 const InternalControlTowerTable = ({
@@ -125,7 +126,7 @@ const InternalControlTowerTable = ({
         cell: () => null
       }),
       columnHelper.accessor('clientName', {
-        header: 'Cliente',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_client_header,
         cell: ({ row }) => {
           const avatarColor = row.original.needsAttention
             ? 'error'
@@ -143,7 +144,7 @@ const InternalControlTowerTable = ({
                   {row.original.clientName}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  {row.original.primaryContactEmail || 'Sin contacto principal'}
+                  {row.original.primaryContactEmail || GH_INTERNAL_MESSAGES.internal_dashboard_table_no_contact}
                 </Typography>
                 {row.original.primaryAlerts.length > 0 ? (
                   <Typography variant='caption' color='error.main'>
@@ -157,7 +158,7 @@ const InternalControlTowerTable = ({
       }),
       columnHelper.display({
         id: 'status',
-        header: 'Estado',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_status_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <div className='flex items-center gap-2 flex-wrap'>
@@ -179,20 +180,23 @@ const InternalControlTowerTable = ({
       }),
       columnHelper.display({
         id: 'users',
-        header: 'Usuarios',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_users_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color={row.original.activeUsers === 0 ? 'error.main' : 'text.primary'}>
-              {formatInteger(row.original.activeUsers)} activos / {formatInteger(row.original.totalUsers)} total
+              {GH_INTERNAL_MESSAGES.internal_dashboard_table_active_users_summary(
+                row.original.activeUsers,
+                row.original.totalUsers
+              )}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              {formatInteger(row.original.invitedUsers)} pendientes de activacion
+              {GH_INTERNAL_MESSAGES.internal_dashboard_table_pending_users_summary(row.original.invitedUsers)}
             </Typography>
           </div>
         )
       }),
       columnHelper.accessor('scopedProjects', {
-        header: 'Proyectos',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_projects_header,
         cell: ({ row }) => (
           <div className='flex items-center gap-2'>
             {row.original.scopedProjects === 0 ? <i className='tabler-alert-triangle text-[18px]' style={{ color: theme.palette.error.main }} /> : null}
@@ -201,7 +205,7 @@ const InternalControlTowerTable = ({
                 {formatInteger(row.original.scopedProjects)}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
-                {formatInteger(row.original.notionProjectCount)} base
+                {GH_INTERNAL_MESSAGES.internal_dashboard_table_projects_base(row.original.notionProjectCount)}
               </Typography>
             </div>
           </div>
@@ -209,14 +213,14 @@ const InternalControlTowerTable = ({
       }),
       columnHelper.display({
         id: 'capabilities',
-        header: 'Capabilities',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_capabilities_header,
         enableSorting: false,
         cell: ({ row }) => {
           const visibleCapabilities = row.original.capabilityCodes.slice(0, 3)
           const remaining = row.original.capabilityCodes.length - visibleCapabilities.length
 
           if (visibleCapabilities.length === 0) {
-            return <Typography variant='body2' color='text.secondary'>Sin capabilities activas</Typography>
+            return <Typography variant='body2' color='text.secondary'>{GH_INTERNAL_MESSAGES.internal_dashboard_table_no_capabilities}</Typography>
           }
 
           return (
@@ -237,50 +241,52 @@ const InternalControlTowerTable = ({
       }),
       columnHelper.display({
         id: 'lastActivity',
-        header: 'Ultima actividad',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_last_activity_header,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <Typography color={(row.original.lastActivityDays ?? 0) > 30 ? 'error.main' : 'text.primary'}>
               {row.original.lastActivityLabel}
             </Typography>
             <Typography variant='body2' color='text.secondary'>
-              {row.original.lastLoginAt ? 'Ultimo login registrado' : 'Sin login visible'}
+              {row.original.lastLoginAt
+                ? GH_INTERNAL_MESSAGES.internal_dashboard_table_last_login_recorded
+                : GH_INTERNAL_MESSAGES.internal_dashboard_table_no_login}
             </Typography>
           </div>
         )
       }),
       columnHelper.display({
         id: 'actions',
-        header: 'Acciones',
+        header: GH_INTERNAL_MESSAGES.internal_dashboard_table_actions_header,
         enableSorting: false,
         cell: ({ row }) => (
           <div className='flex items-center gap-1' onClick={event => event.stopPropagation()}>
             <Button component={Link} href={`/admin/tenants/${row.original.clientId}`} variant='text' size='small' startIcon={<i className='tabler-eye' />}>
-              Ver
+              {GH_INTERNAL_MESSAGES.internal_dashboard_table_view}
             </Button>
             <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
               options={[
                 {
-                  text: 'Ver detalle',
+                  text: GH_INTERNAL_MESSAGES.internal_dashboard_table_view_detail,
                   icon: <i className='tabler-building-store text-base' />,
                   href: `/admin/tenants/${row.original.clientId}`,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
                 },
                 {
-                  text: 'Ver como cliente',
+                  text: GH_INTERNAL_MESSAGES.internal_dashboard_table_view_as_client,
                   icon: <i className='tabler-layout-dashboard text-base' />,
                   href: `/admin/tenants/${row.original.clientId}/view-as/dashboard`,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
                 },
                 {
-                  text: 'Editar',
+                  text: GH_INTERNAL_MESSAGES.internal_dashboard_table_edit,
                   icon: <i className='tabler-edit text-base' />,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                 },
                 {
-                  text: 'Desactivar',
+                  text: GH_INTERNAL_MESSAGES.internal_dashboard_table_deactivate,
                   icon: <i className='tabler-lock text-base' />,
                   menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
                 }
@@ -322,16 +328,16 @@ const InternalControlTowerTable = ({
       <CardContent className='flex flex-col gap-4'>
         <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           <div>
-            <Typography variant='h4'>Clientes</Typography>
+            <Typography variant='h4'>{GH_INTERNAL_MESSAGES.internal_dashboard_table_title}</Typography>
             <Typography color='text.secondary'>
-              Control operativo de spaces con prioridad visual para onboarding trabado, baja activacion y falta de scope.
+              {GH_INTERNAL_MESSAGES.internal_dashboard_table_subtitle}
             </Typography>
           </div>
           <div className='flex flex-col gap-3 md:flex-row md:items-center'>
             <CustomTextField
               value={searchValue}
               onChange={event => onSearchChange(event.target.value)}
-              placeholder='Buscar por cliente o email'
+              placeholder={GH_INTERNAL_MESSAGES.internal_dashboard_table_search_placeholder}
               className='min-w-[260px]'
             />
             <CustomTextField select value={statusFilter} onChange={event => onStatusFilterChange(event.target.value as StatusFilter)} className='min-w-[180px]'>
@@ -371,16 +377,20 @@ const InternalControlTowerTable = ({
         {rows.length === 0 ? (
           <EmptyState
             icon={totalRows === 0 ? 'tabler-building-community' : 'tabler-search-off'}
-            title={totalRows === 0 ? 'Sin clientes configurados.' : 'Sin resultados para este filtro.'}
+            title={
+              totalRows === 0
+                ? GH_INTERNAL_MESSAGES.internal_dashboard_table_empty_title
+                : GH_INTERNAL_MESSAGES.internal_dashboard_table_empty_filtered_title
+            }
             description={
               totalRows === 0
-                ? 'Crea tu primer space para comenzar.'
-                : 'Prueba con otro filtro o busca por nombre.'
+                ? GH_INTERNAL_MESSAGES.internal_dashboard_table_empty_description
+                : GH_INTERNAL_MESSAGES.internal_dashboard_table_empty_filtered_description
             }
             action={
               totalRows === 0 ? (
                 <Button variant='contained' disabled>
-                  Crear space
+                  {GH_INTERNAL_MESSAGES.internal_dashboard_create_space}
                 </Button>
               ) : undefined
             }

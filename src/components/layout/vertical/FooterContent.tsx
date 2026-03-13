@@ -35,6 +35,9 @@ const FooterContent = () => {
           <Link href='/settings' className='text-primary'>
             {GH_CLIENT_NAV.settings.label}
           </Link>
+          <Link href='/updates' className='text-primary'>
+            {GH_CLIENT_NAV.updates.label}
+          </Link>
         </div>
       ) : null}
     </div>

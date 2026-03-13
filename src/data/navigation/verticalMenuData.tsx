@@ -22,6 +22,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
     label: GH_CLIENT_NAV.settings.label,
     href: '/settings',
     icon: 'tabler-settings'
+  },
+  {
+    label: GH_CLIENT_NAV.updates.label,
+    href: '/updates',
+    icon: 'tabler-bell'
   }
 ]
 
