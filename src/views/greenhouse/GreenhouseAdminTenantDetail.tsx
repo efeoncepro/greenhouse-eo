@@ -35,7 +35,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import OptionMenu from '@core/components/option-menu'
 
-import { BusinessLineBadge } from '@/components/greenhouse'
+import { BusinessLineBadge, BrandWordmark } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
@@ -450,19 +450,14 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       <Stack spacing={2}>
                         <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                           <Box>
-                            <Typography variant='h6'>{capability.moduleLabel}</Typography>
+                            <Box sx={{ minHeight: 28, display: 'flex', alignItems: 'center' }}>
+                              <BrandWordmark brand={capability.moduleLabel} height={22} maxWidth={110} />
+                            </Box>
                             <Typography variant='body2' color='text.secondary'>
                               {capability.publicModuleId}
                             </Typography>
                           </Box>
-                          <Chip
-                            size='small'
-                            label={palette.label}
-                            sx={{
-                              color: palette.accent,
-                              backgroundColor: palette.contrast
-                            }}
-                          />
+                          <BusinessLineBadge brand={palette.label} height={16} />
                         </Stack>
                         <Stack direction='row' gap={1} flexWrap='wrap'>
                           <Chip

@@ -57,14 +57,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Archivos tocados
 - `src/components/greenhouse/brand-assets.ts`
+- `src/components/greenhouse/BrandWordmark.tsx`
 - `src/components/greenhouse/BrandLogo.tsx`
 - `src/components/greenhouse/BusinessLineBadge.tsx`
 - `src/components/greenhouse/AccountTeamDossierSection.tsx`
 - `src/components/greenhouse/index.ts`
 - `src/components/layout/shared/Logo.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
 - `src/app/layout.tsx`
+- `src/app/(blank-layout-pages)/auth/access-denied/page.tsx`
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 - `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx`
+- `src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx`
+- `src/views/greenhouse/dashboard/ClientDashboardHero.tsx`
+- `src/views/greenhouse/dashboard/config.ts`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
@@ -74,7 +84,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Riesgos o pendientes
 - El typo del asset `public/branding/SVG/isotipo-goble-full.svg` se consume tal como existe en disco; si luego se corrige el nombre del archivo, hay que ajustar el registry.
-- Esta ronda ya cubre shell, hero cliente y business lines visibles, pero no reescribe aun todos los listados secundarios de modules en el portal.
+- Esta ronda ya cubre shell, hero cliente, footers, business lines visibles y superficies principales de admin/internal; conviene hacer una pasada visual real para confirmar tamaños y contraste de wordmarks negativos sobre fondos oscuros.
 
 ## 2026-03-13 14:58 America/Santiago
 

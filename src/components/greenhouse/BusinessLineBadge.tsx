@@ -4,18 +4,19 @@ import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import { alpha } from '@mui/material/styles'
 
+import BrandWordmark from './BrandWordmark'
 import { getBrandDisplayLabel, resolveBrandAssets } from './brand-assets'
 
 type BusinessLineBadgeProps = {
   brand: string
   negative?: boolean
+  height?: number
 }
 
-const BusinessLineBadge = ({ brand, negative = false }: BusinessLineBadgeProps) => {
+const BusinessLineBadge = ({ brand, negative = false, height = 18 }: BusinessLineBadgeProps) => {
   const assetEntry = resolveBrandAssets(brand)
-  const src = negative ? assetEntry?.negativeWordmarkSrc || assetEntry?.wordmarkSrc : assetEntry?.wordmarkSrc || assetEntry?.negativeWordmarkSrc
 
-  if (!src) {
+  if (!assetEntry?.wordmarkSrc && !assetEntry?.negativeWordmarkSrc) {
     return <Chip size='small' variant='outlined' label={getBrandDisplayLabel(brand)} />
   }
 
@@ -34,18 +35,7 @@ const BusinessLineBadge = ({ brand, negative = false }: BusinessLineBadgeProps) 
         backdropFilter: negative ? 'blur(10px)' : 'blur(6px)'
       })}
     >
-      <Box
-        component='img'
-        src={src}
-        alt={assetEntry?.label || brand}
-        sx={{
-          display: 'block',
-          inlineSize: 'auto',
-          blockSize: 18,
-          maxInlineSize: 88,
-          objectFit: 'contain'
-        }}
-      />
+      <BrandWordmark brand={brand} negative={negative} height={height} maxWidth={88} />
     </Box>
   )
 }

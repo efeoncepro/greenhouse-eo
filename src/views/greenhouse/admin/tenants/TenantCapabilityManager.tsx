@@ -16,6 +16,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { BrandWordmark, BusinessLineBadge } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
@@ -162,12 +163,16 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
                 justifyContent='space-between'
                 alignItems={{ xs: 'flex-start', md: 'center' }}
               >
-                <Typography variant='subtitle1' color='text.primary'>
-                  {capability.moduleLabel}
-                </Typography>
+                {capability.moduleKind === 'business_line' ? (
+                  <BrandWordmark brand={capability.moduleLabel} height={20} maxWidth={104} />
+                ) : (
+                  <Typography variant='subtitle1' color='text.primary'>
+                    {capability.moduleLabel}
+                  </Typography>
+                )}
                 <Stack direction='row' gap={1} flexWrap='wrap'>
                   <Chip size='small' variant='tonal' color='secondary' label={capability.publicModuleId} />
-                  {parentLabel ? <Chip size='small' variant='outlined' color='info' label={parentLabel} /> : null}
+                  {parentLabel ? <BusinessLineBadge brand={parentLabel} height={15} /> : null}
                   <Chip
                     size='small'
                     variant='outlined'

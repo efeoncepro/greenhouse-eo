@@ -34,7 +34,9 @@ import OptionMenu from '@core/components/option-menu'
 
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
+import { BusinessLineBadge } from '@/components/greenhouse'
 import EmptyState from '@components/greenhouse/EmptyState'
+import { resolveBrandAssets } from '@/components/greenhouse/brand-assets'
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { getInitials } from '@/utils/getInitials'
@@ -226,13 +228,17 @@ const InternalControlTowerTable = ({
           return (
             <div className='flex items-center gap-1 flex-wrap'>
               {visibleCapabilities.map(capability => (
-                <Chip
-                  key={capability}
-                  size='small'
-                  variant='tonal'
-                  color={getCapabilityTone(capability) === 'default' ? undefined : getCapabilityTone(capability)}
-                  label={getCapabilityLabel(capability)}
-                />
+                resolveBrandAssets(capability) ? (
+                  <BusinessLineBadge key={capability} brand={capability} height={16} />
+                ) : (
+                  <Chip
+                    key={capability}
+                    size='small'
+                    variant='tonal'
+                    color={getCapabilityTone(capability) === 'default' ? undefined : getCapabilityTone(capability)}
+                    label={getCapabilityLabel(capability)}
+                  />
+                )
               ))}
               {remaining > 0 ? <Chip size='small' variant='outlined' label={`+${remaining}`} /> : null}
             </div>

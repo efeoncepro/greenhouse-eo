@@ -21,6 +21,7 @@ import classnames from 'classnames'
 import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
+import { BusinessLineBadge } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
 
@@ -93,17 +94,7 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
         cell: ({ row }) => {
           const palette = getCapabilityPalette(row.original)
 
-          return (
-            <Chip
-              size='small'
-              label={palette.label}
-              sx={{
-                color: palette.accent,
-                backgroundColor: palette.soft,
-                border: `1px solid ${palette.soft}`
-              }}
-            />
-          )
+          return <BusinessLineBadge brand={palette.label} height={16} />
         }
       }),
       columnHelper.display({

@@ -64,7 +64,9 @@ const serviceModuleLabelMap: Record<string, string> = {
 const businessLineLabelMap: Record<string, string> = {
   crm_solutions: 'CRM Solutions',
   globe: 'Globe',
-  wave: 'Wave'
+  reach: 'Reach',
+  wave: 'Wave',
+  efeonce_digital: 'Efeonce'
 }
 
 const crmServiceModules = new Set(['licenciamiento_hubspot', 'implementacion_onboarding', 'consultoria_crm'])

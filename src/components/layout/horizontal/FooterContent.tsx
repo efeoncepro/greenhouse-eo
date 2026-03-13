@@ -6,6 +6,7 @@ import classnames from 'classnames'
 
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
+import { BrandWordmark } from '@/components/greenhouse'
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
@@ -15,7 +16,8 @@ const FooterContent = () => {
   return (
     <div className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
       <p>
-        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} Efeonce Group. `}</span>
+        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} `}</span>
+        <BrandWordmark brand='efeonce' sx={{ verticalAlign: 'middle', mr: 0.5 }} imgSx={{ opacity: 0.92 }} />
         <span className='text-textSecondary'>{GH_MESSAGES.footer}</span>
         <Link href='/dashboard' className='text-primary mie-0 mis-2'>
           {GH_MESSAGES.footer_portal_link}
