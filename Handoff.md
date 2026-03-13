@@ -849,3 +849,75 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El brief pedia notas operativas editables, pero no existe una mutacion ya expuesta para `notes`; la vista quedo preparada como lectura clara, no como editor persistente.
 - El repo no trae `@mui/x-data-grid`; la tabla de usuarios y la de service modules quedaron resueltas con el patron Vuexy existente sobre `@tanstack/react-table` y `TablePaginationComponent`.
 - Conviene correr la validacion visual autentica descrita en `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` sobre `/admin/tenants/[id]` y revisar responsive en tablet antes de cerrar commit final.
+
+### Fecha
+- 2026-03-13 11:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la fase principal de alineacion a `Greenhouse_Nomenclatura_Portal_v3.md` sin mezclar trabajo de agente/runtime AI.
+- Canonicalizar microcopy cliente e `internal/admin` en `src/config/greenhouse-nomenclature.ts`.
+- Completar piezas faltantes del portal cliente: `Updates`, `Tu equipo de cuenta` en `Mi Greenhouse`, y `Ciclos` con modulos base adicionales.
+
+### Rama
+- Rama usada: actual de trabajo local
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- Cliente + `internal/admin` en `starter-kit`
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/greenhouse/AccountTeamDossierSection.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/app/(dashboard)/updates/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/sprints/page.tsx`
+- `src/data/navigation/verticalMenuData.tsx`
+- `src/data/navigation/horizontalMenuData.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/components/layout/vertical/FooterContent.tsx`
+- `src/components/layout/horizontal/FooterContent.tsx`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseProjectDetail.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/views/greenhouse/GreenhouseSprints.tsx`
+- `src/views/greenhouse/GreenhouseUpdates.tsx`
+- `src/views/greenhouse/dashboard/ClientTeamCapacitySection.tsx`
+- `src/views/greenhouse/GreenhouseInternalDashboard.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/GreenhouseAdminRoles.tsx`
+- `src/views/greenhouse/admin/users/UserListCards.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantUsersTable.tsx`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `changelog.md`
+- `project_context.md`
+- `Handoff.md`
+
+### Verificacion
+- Cambio funcional implementado:
+  - se agrego la ruta cliente `/updates` y su navegacion asociada
+  - `Mi Greenhouse` ahora incorpora el dossier `Tu equipo de cuenta`
+  - `Pulse` separa la lectura de `Capacidad del equipo` del dossier relacional
+  - `Ciclos` ahora expone `Ciclo activo`, `Ciclos anteriores`, `Velocity por ciclo`, `Burndown` y `Velocity por persona` con copy Greenhouse
+  - `Proyectos/[id]` fue reescrito con breadcrumbs cliente, labels Greenhouse y sin mensajes tecnicos visibles
+  - `internal/admin` ahora toma una capa adicional de copy desde `GH_INTERNAL_MESSAGES` en dashboard interno, tablas de users, users por tenant y detalle de usuario
+- Validacion:
+  - `pnpm exec eslint` sobre los slices tocados: correcto
+  - `pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivo ajeno `src/config/capability-registry (1).ts`
+
+### Riesgos o pendientes
+- Sigue quedando copy residual legacy en superficies internas grandes no barridas completas en este turno, especialmente `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`.
+- No se ejecuto smoke visual autenticado real; la validacion fue estatica.
+- `tsc` sigue bloqueado por el archivo duplicado ajeno `src/config/capability-registry (1).ts`, fuera del alcance de esta alineacion.
+
+### Proximo paso recomendado
+- Barrer `GreenhouseAdminTenantDetail.tsx` y `GreenhouseAdminTenantDashboardPreview.tsx` para terminar de sacar copy residual interna.
+- Ejecutar smoke visual autenticado de `/dashboard`, `/proyectos/[id]`, `/settings`, `/sprints`, `/updates`, `/admin`, `/admin/users/[id]`.
+- Resolver o eliminar el archivo duplicado `src/config/capability-registry (1).ts` antes del siguiente `build/tsc` integral.

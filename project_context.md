@@ -456,6 +456,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
 - La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
 - Capability governance no debe derivarse desde `deals` ni `closedwon`; el sync externo solo es valido cuando llega con payload explicito desde el registro de empresa u otra fuente canonica equivalente.
+- La fuente canonica de nomenclatura y microcopy Greenhouse vive en `src/config/greenhouse-nomenclature.ts`; cualquier texto visible nuevo en cliente debe salir de esa capa.
+- La navegacion cliente vigente para el portal Greenhouse contempla `Pulse`, `Proyectos`, `Ciclos`, `Mi Greenhouse` y `Updates`.
+- `Mi Greenhouse` concentra el modulo relacional `Tu equipo de cuenta`; `Pulse` mantiene `Capacidad del equipo` como lectura operativa separada.
 
 ## Deuda Tecnica Visible
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
@@ -472,6 +475,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La nueva lectura operacional de HubSpot no reemplaza la API generica de integraciones:
   - `/api/integrations/v1/*` sigue siendo el contrato para sync bidireccional de capabilities
   - el servicio `hubspot-greenhouse-integration` es la fachada de lectura live para CRM company/owner
+- Sigue pendiente barrer copy residual interna en superficies grandes como `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`.
+- Existe un bloqueo de tipos ajeno al plan actual por el archivo duplicado `src/config/capability-registry (1).ts`, que hoy impide usar `tsc` como verificacion integral limpia.
 
 ## Supuestos Operativos
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
