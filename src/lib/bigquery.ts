@@ -87,7 +87,7 @@ const getProjectId = () => {
   return projectId
 }
 
-const getCredentials = () => {
+export const getGoogleCredentials = () => {
   const rawCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.trim()
   const rawCredentialsBase64 = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64?.trim()
 
@@ -126,7 +126,7 @@ export const getBigQueryClient = () => {
     return bigQueryClient
   }
 
-  const credentials = getCredentials()
+  const credentials = getGoogleCredentials()
 
   bigQueryClient = new BigQuery({
     projectId: getProjectId(),

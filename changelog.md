@@ -6,6 +6,19 @@
 
 ## 2026-03-13
 
+### Tenant and user identity media
+- Los placeholders de logo/foto en admin e internal ahora ya pueden persistir imagen real para spaces y usuarios.
+- Se agregaron uploads autenticados server-side para:
+  - `POST /api/admin/tenants/[id]/logo`
+  - `POST /api/admin/users/[id]/avatar`
+- Se agregaron proxies autenticados de lectura para no exponer buckets publicos:
+  - `GET /api/media/tenants/[id]/logo`
+  - `GET /api/media/users/[id]/avatar`
+- La persistencia queda repartida entre:
+  - `greenhouse.clients.logo_url` para logos de space/tenant
+  - `greenhouse.client_users.avatar_url` para fotos de usuario
+- El runtime ya refleja esas imagenes en detalle de tenant, detalle de usuario, listados admin, tabla interna de control tower, tabla de usuarios por tenant y dropdown de sesion.
+
 ### Branding SVG rollout
 - El shell autenticado y el favicon ahora consumen isotipos/wordmarks SVG oficiales de Efeonce en lugar del `avatar.png` heredado.
 - Las business lines visibles del producto (`Globe`, `Reach`, `Wave`) ya pueden renderizar logos oficiales desde una capa reusable en `src/components/greenhouse/brand-assets.ts`.

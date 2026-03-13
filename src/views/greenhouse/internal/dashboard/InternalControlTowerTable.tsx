@@ -138,8 +138,13 @@ const InternalControlTowerTable = ({
 
           return (
             <div className='flex items-center gap-4'>
-              <CustomAvatar skin='light' color={avatarColor} size={38}>
-                {getInitials(row.original.clientName)}
+              <CustomAvatar
+                skin={row.original.logoUrl ? undefined : 'light'}
+                color={avatarColor}
+                size={38}
+                src={row.original.logoUrl ? `/api/media/tenants/${row.original.clientId}/logo` : undefined}
+              >
+                {row.original.logoUrl ? null : getInitials(row.original.clientName)}
               </CustomAvatar>
               <div className='flex flex-col gap-1'>
                 <Typography component={Link} href={`/admin/tenants/${row.original.clientId}`} color='text.primary' className='font-medium'>

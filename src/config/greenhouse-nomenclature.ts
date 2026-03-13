@@ -474,6 +474,7 @@ export const GH_INTERNAL_MESSAGES = {
   admin_tenant_users_deactivate: 'Desactivar',
 
   admin_user_detail_job_title_empty: 'Sin cargo registrado',
+  admin_user_detail_avatar_helper: 'PNG, JPG, WEBP o SVG hasta 5 MB. Visible en admin y en la sesion autenticada del usuario.',
   admin_user_detail_project_scope: 'Project scope',
   admin_user_detail_campaign_scope: 'Campaign scope',
   admin_user_detail_details_title: 'Detalles',
@@ -551,6 +552,7 @@ export const GH_INTERNAL_MESSAGES = {
     'Estado completo de la cuenta: modulos, usuarios, CRM y visibilidad operativa del space en una sola vista.',
   admin_tenant_detail_header_meta: (publicId: string, hubspotCompanyId: string | null, timezone: string | null, fetchedAt: string) =>
     `Space ID ${publicId}  |  CRM ${hubspotCompanyId || '--'}  |  Timezone ${timezone || '--'}  |  Ultima lectura HubSpot ${fetchedAt}`,
+  admin_tenant_detail_logo_helper: 'PNG, JPG, WEBP o SVG hasta 5 MB. Visible en admin, internal y superficies autenticadas del space.',
   admin_tenant_detail_view_as_client: 'Ver como cliente',
   admin_tenant_detail_save_manual: 'Guardar seleccion manual',
   admin_tenant_detail_refresh_hubspot: 'Refrescar lectura HubSpot',
@@ -745,7 +747,14 @@ export const GH_INTERNAL_MESSAGES = {
   admin_tenant_error_title: 'No pudimos renderizar esta seccion',
   admin_tenant_error_description:
     'Reintenta la carga. Si el problema persiste, revisa la integracion o el payload de este space.',
-  admin_tenant_error_retry: 'Reintentar'
+  admin_tenant_error_retry: 'Reintentar',
+  admin_media_upload_cta: 'Subir imagen',
+  admin_media_upload_replace: 'Cambiar imagen',
+  admin_media_upload_progress: 'Guardando imagen...',
+  admin_media_upload_success: 'Imagen guardada.',
+  admin_media_upload_error: 'No pudimos guardar la imagen. Reintenta en unos segundos.',
+  admin_media_upload_invalid_type: 'Selecciona un PNG, JPG, WEBP o SVG.',
+  admin_media_upload_invalid_size: 'La imagen supera 5 MB.'
 } as const
 
 export const GH_COLORS = {

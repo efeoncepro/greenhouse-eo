@@ -48,6 +48,11 @@ const UserDropdown = () => {
     email: session?.user?.email
   })
 
+  const avatarSrc =
+    session?.user?.avatarUrl && session.user.userId
+      ? `/api/media/users/${session.user.userId}/avatar`
+      : sessionAvatarPath || '/images/avatars/1.png'
+
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)
   }
@@ -80,7 +85,7 @@ const UserDropdown = () => {
         <Avatar
           ref={anchorRef}
           alt='Greenhouse Workspace'
-          src={sessionAvatarPath || '/images/avatars/1.png'}
+          src={avatarSrc}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -104,7 +109,7 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt='Greenhouse Workspace' src={sessionAvatarPath || '/images/avatars/1.png'} />
+                    <Avatar alt='Greenhouse Workspace' src={avatarSrc} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
                         {session?.user?.name || 'Greenhouse Demo'}

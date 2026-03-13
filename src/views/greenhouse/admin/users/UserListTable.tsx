@@ -123,7 +123,9 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
       columnHelper.accessor('fullName', {
         header: GH_INTERNAL_MESSAGES.admin_users_user_header,
         cell: ({ row }) => {
-          const avatarSrc = resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+          const avatarSrc = row.original.avatarUrl
+            ? `/api/media/users/${row.original.userId}/avatar`
+            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
 
           return (
             <div className='flex items-center gap-4'>

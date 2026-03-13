@@ -40,6 +40,60 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 20:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar upload persistente de logo/foto para spaces y usuarios en los lugares donde hoy existian placeholders de identidad visual.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / admin e internal / identidad visual persistente
+
+### Archivos tocados
+- `src/lib/storage/greenhouse-media.ts`
+- `src/lib/admin/media-assets.ts`
+- `src/lib/bigquery.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/auth.ts`
+- `src/types/next-auth.d.ts`
+- `src/app/api/admin/tenants/[id]/logo/route.ts`
+- `src/app/api/admin/users/[id]/avatar/route.ts`
+- `src/app/api/media/tenants/[id]/logo/route.ts`
+- `src/app/api/media/users/[id]/avatar/route.ts`
+- `src/components/greenhouse/IdentityImageUploader.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/components/layout/shared/UserDropdown.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenants.tsx`
+- `src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx`
+- `src/views/greenhouse/admin/users/UserListTable.tsx`
+- `src/views/greenhouse/admin/tenants/TenantUsersTable.tsx`
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/get-admin-tenants-overview.ts`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `src/lib/admin/get-admin-access-overview.ts`
+- `src/lib/internal/get-internal-dashboard-overview.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint src/lib/bigquery.ts src/lib/storage/greenhouse-media.ts src/lib/admin/media-assets.ts 'src/app/api/admin/tenants/[id]/logo/route.ts' 'src/app/api/admin/users/[id]/avatar/route.ts' 'src/app/api/media/tenants/[id]/logo/route.ts' 'src/app/api/media/users/[id]/avatar/route.ts' src/components/greenhouse/IdentityImageUploader.tsx src/components/greenhouse/index.ts src/lib/admin/get-admin-tenant-detail.ts src/lib/admin/get-admin-tenants-overview.ts src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-access-overview.ts src/lib/internal/get-internal-dashboard-overview.ts src/lib/tenant/access.ts src/lib/auth.ts src/types/next-auth.d.ts src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseAdminUserDetail.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/views/greenhouse/admin/tenants/TenantUsersTable.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/config/greenhouse-nomenclature.ts`: correcto
+- `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: sigue bloqueado solo por el archivo duplicado ajeno `src/config/capability-registry (1).ts`
+
+### Riesgos o pendientes
+- No se hizo smoke visual autenticado real del flujo de upload ni prueba end-to-end contra GCS/BigQuery en este turno; la validacion fue estatica.
+- `package.json` y `pnpm-lock.yaml` siguen modificados en el worktree por trabajo ajeno y no deben mezclarse por accidente con este commit.
+- Si el bucket `${GCP_PROJECT}-greenhouse-media` no existe en un ambiente dado, hay que crearlo o definir `GREENHOUSE_MEDIA_BUCKET` antes de probar uploads reales.
+
 ## 2026-03-13 18:46 America/Santiago
 
 ### Agente

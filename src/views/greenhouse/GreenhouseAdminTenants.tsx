@@ -15,7 +15,9 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import { BusinessLineBadge } from '@/components/greenhouse'
+import { getInitials } from '@/utils/getInitials'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 
@@ -111,14 +113,26 @@ const GreenhouseAdminTenants = ({ data }: Props) => {
                   {data.tenants.map(tenant => (
                     <TableRow key={tenant.clientId} hover>
                       <TableCell>
-                        <Stack spacing={0.75}>
-                          <Typography component={Link} href={`/admin/tenants/${tenant.clientId}`} color='text.primary' className='font-medium'>
-                            {tenant.clientName}
-                          </Typography>
-                          <Typography variant='body2' color='text.secondary'>
-                            {tenant.primaryContactEmail || GH_INTERNAL_MESSAGES.admin_tenants_no_contact}{' '}
-                            {tenant.hubspotCompanyId ? `· HubSpot ${tenant.hubspotCompanyId}` : ''}
-                          </Typography>
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                          <CustomAvatar
+                            alt={tenant.clientName}
+                            src={tenant.logoUrl ? `/api/media/tenants/${tenant.clientId}/logo` : undefined}
+                            variant='rounded'
+                            size={42}
+                            skin={tenant.logoUrl ? undefined : 'light'}
+                            color='primary'
+                          >
+                            {!tenant.logoUrl ? getInitials(tenant.clientName) : null}
+                          </CustomAvatar>
+                          <Stack spacing={0.75}>
+                            <Typography component={Link} href={`/admin/tenants/${tenant.clientId}`} color='text.primary' className='font-medium'>
+                              {tenant.clientName}
+                            </Typography>
+                            <Typography variant='body2' color='text.secondary'>
+                              {tenant.primaryContactEmail || GH_INTERNAL_MESSAGES.admin_tenants_no_contact}{' '}
+                              {tenant.hubspotCompanyId ? `· HubSpot ${tenant.hubspotCompanyId}` : ''}
+                            </Typography>
+                          </Stack>
                         </Stack>
                       </TableCell>
                       <TableCell>

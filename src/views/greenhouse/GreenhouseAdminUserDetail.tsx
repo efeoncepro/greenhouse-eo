@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 
+import { IdentityImageUploader } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminUserDetail } from '@/lib/admin/get-admin-user-detail'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
@@ -34,7 +35,7 @@ type Props = {
 
 const GreenhouseAdminUserDetail = ({ data }: Props) => {
   const [activeTab, setActiveTab] = useState('overview')
-  const avatarSrc = resolveAvatarPath({ name: data.fullName, email: data.email })
+  const avatarSrc = data.avatarUrl ? `/api/media/users/${data.userId}/avatar` : resolveAvatarPath({ name: data.fullName, email: data.email })
   const projectProgress = data.projectScopes.length === 0 ? 0 : Math.min(100, 28 + data.projectScopes.length * 18)
   const primaryRole = data.roleCodes[0]
 
@@ -48,16 +49,23 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                 <div className='flex flex-col gap-6'>
                   <div className='flex items-center justify-center flex-col gap-4'>
                     <div className='flex flex-col items-center gap-4'>
-                      <CustomAvatar
+                      <IdentityImageUploader
                         alt={data.fullName}
-                        src={avatarSrc || undefined}
-                        variant='rounded'
+                        currentImageSrc={avatarSrc || undefined}
+                        fallback={getInitials(data.fullName)}
+                        uploadUrl={`/api/admin/users/${data.userId}/avatar`}
+                        helperText={GH_INTERNAL_MESSAGES.admin_user_detail_avatar_helper}
+                        successText={GH_INTERNAL_MESSAGES.admin_media_upload_success}
+                        errorText={GH_INTERNAL_MESSAGES.admin_media_upload_error}
+                        invalidTypeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_type}
+                        invalidSizeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_size}
+                        idleCta={GH_INTERNAL_MESSAGES.admin_media_upload_cta}
+                        replaceCta={GH_INTERNAL_MESSAGES.admin_media_upload_replace}
+                        uploadingCta={GH_INTERNAL_MESSAGES.admin_media_upload_progress}
                         size={120}
-                        skin={avatarSrc ? undefined : 'light'}
+                        variant='rounded'
                         color={tenantTone(data.tenantType)}
-                      >
-                        {!avatarSrc ? getInitials(data.fullName) : null}
-                      </CustomAvatar>
+                      />
                       <Box textAlign='center'>
                         <Typography variant='h5'>{data.fullName}</Typography>
                         <Typography color='text.secondary'>{data.email}</Typography>

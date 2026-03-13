@@ -43,6 +43,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/components/layout/shared/Logo.tsx` y `src/app/layout.tsx` ya no deben depender del PNG `avatar.png` como marca primaria; el shell y el favicon salen desde esa capa SVG.
 - `src/components/greenhouse/BrandWordmark.tsx` y `src/components/greenhouse/BusinessLineBadge.tsx` son ahora los componentes canonicos para renderizar `Efeonce`, `Globe`, `Reach` y `Wave` en contextos `inline`, footer, hero, tabla o chip sin hardcodes de imagen dispersos.
 
+## Delta 2026-03-13 Tenant and user media persistence
+- El runtime ya soporta subir y persistir logos/fotos reales para identidades visibles del portal en lugar de depender solo de iniciales o fallbacks.
+- Capa server-side nueva:
+  - `src/lib/storage/greenhouse-media.ts` para upload/download autenticado contra GCS
+  - `src/lib/admin/media-assets.ts` para leer/escribir `logo_url` y `avatar_url` en BigQuery
+- Endpoints internos nuevos:
+  - `POST /api/admin/tenants/[id]/logo`
+  - `POST /api/admin/users/[id]/avatar`
+  - `GET /api/media/tenants/[id]/logo`
+  - `GET /api/media/users/[id]/avatar`
+- Regla operativa:
+  - el bucket por defecto es `${GCP_PROJECT}-greenhouse-media`
+  - puede overridearse con `GREENHOUSE_MEDIA_BUCKET`
+  - los assets se guardan como `gs://...` en BigQuery y se sirven via proxy autenticado del portal, no via URL publica del bucket
+- El uploader UI reusable para admin ahora vive en `src/components/greenhouse/IdentityImageUploader.tsx`.
+- `greenhouse.clients` no traia `logo_url` en el DDL base; el runtime agrega la columna on-demand con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS logo_url STRING` antes de persistir logos de tenant.
+- La sesion NextAuth ya propaga `avatarUrl`, permitiendo que el dropdown autenticado refleje la foto guardada del usuario.
+
 ## Delta 2026-03-13 Capabilities runtime foundation
 - La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
 - El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.

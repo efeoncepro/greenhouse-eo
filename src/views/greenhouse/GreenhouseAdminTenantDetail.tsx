@@ -29,13 +29,12 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import OptionMenu from '@core/components/option-menu'
 
-import { BusinessLineBadge, BrandWordmark } from '@/components/greenhouse'
+import { BusinessLineBadge, BrandWordmark, IdentityImageUploader } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
@@ -312,15 +311,23 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           <Grid container spacing={4} alignItems='center'>
             <Grid size={{ xs: 12, xl: 7 }}>
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
-                <CustomAvatar
-                  skin='light'
-                  variant='rounded'
+                <IdentityImageUploader
+                  alt={data.clientName}
+                  currentImageSrc={data.logoUrl ? `/api/media/tenants/${data.clientId}/logo` : undefined}
+                  fallback={getInitials(data.clientName)}
+                  uploadUrl={`/api/admin/tenants/${data.clientId}/logo`}
+                  helperText={GH_INTERNAL_MESSAGES.admin_tenant_detail_logo_helper}
+                  successText={GH_INTERNAL_MESSAGES.admin_media_upload_success}
+                  errorText={GH_INTERNAL_MESSAGES.admin_media_upload_error}
+                  invalidTypeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_type}
+                  invalidSizeText={GH_INTERNAL_MESSAGES.admin_media_upload_invalid_size}
+                  idleCta={GH_INTERNAL_MESSAGES.admin_media_upload_cta}
+                  replaceCta={GH_INTERNAL_MESSAGES.admin_media_upload_replace}
+                  uploadingCta={GH_INTERNAL_MESSAGES.admin_media_upload_progress}
                   size={88}
+                  variant='rounded'
                   color={tenantStatusTone(data.status, data.active)}
-                  sx={{ fontSize: '2rem', fontWeight: 700 }}
-                >
-                  {getInitials(data.clientName)}
-                </CustomAvatar>
+                />
 
                 <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} flexWrap='wrap'>

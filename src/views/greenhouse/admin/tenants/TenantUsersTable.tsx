@@ -31,6 +31,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantUserRow } from '@/lib/admin/get-admin-tenant-detail'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -71,19 +72,30 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
     () => [
       columnHelper.accessor('fullName', {
         header: GH_INTERNAL_MESSAGES.admin_tenant_users_user_header,
-        cell: ({ row }) => (
-          <div className='flex items-center gap-4'>
-            <CustomAvatar skin='light' color={userStatusTone(row.original.status)} size={38}>
-              {getInitials(row.original.fullName)}
-            </CustomAvatar>
-            <div className='flex flex-col'>
-              <Typography component={Link} href={`/admin/users/${row.original.userId}`} color='text.primary' className='font-medium'>
-                {row.original.fullName}
-              </Typography>
-              <Typography variant='body2'>{row.original.email}</Typography>
+        cell: ({ row }) => {
+          const avatarSrc = row.original.avatarUrl
+            ? `/api/media/users/${row.original.userId}/avatar`
+            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+
+          return (
+            <div className='flex items-center gap-4'>
+              <CustomAvatar
+                src={avatarSrc || undefined}
+                skin={avatarSrc ? undefined : 'light'}
+                color={userStatusTone(row.original.status)}
+                size={38}
+              >
+                {!avatarSrc ? getInitials(row.original.fullName) : null}
+              </CustomAvatar>
+              <div className='flex flex-col'>
+                <Typography component={Link} href={`/admin/users/${row.original.userId}`} color='text.primary' className='font-medium'>
+                  {row.original.fullName}
+                </Typography>
+                <Typography variant='body2'>{row.original.email}</Typography>
+              </div>
             </div>
-          </div>
-        )
+          )
+        }
       }),
       columnHelper.display({
         id: 'role',
