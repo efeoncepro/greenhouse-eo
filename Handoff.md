@@ -40,6 +40,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 19:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar operativamente la iniciativa de alineacion Greenhouse + identidad visual persistente y dejar trazabilidad del promote flow hasta `staging` y `Production`.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Promocion ejecutada:
+  - `fix/internal-nav-nomenclature-hydration` -> `develop`
+  - `develop` -> `main`
+
+### Ambiente objetivo
+- Preview, `staging` y `Production` en Vercel
+
+### Verificacion
+- `pre-greenhouse.efeoncepro.com` ya no apunta al preview viejo; fue re-asignado al deployment `greenhouse-mwp8lexfz-efeonce-7670142f.vercel.app` del branch `fix/internal-nav-nomenclature-hydration`.
+- `dev-greenhouse.efeoncepro.com` quedo en `Ready` sobre `greenhouse-521mddeos-efeonce-7670142f.vercel.app` despues del merge a `develop`.
+- `greenhouse.efeoncepro.com` quedo en `Ready` sobre `greenhouse-2jwy203sv-efeonce-7670142f.vercel.app` despues del merge a `main`.
+- Validacion tecnica usada para la promocion:
+  - `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`
+  - `vercel inspect` sobre preview, staging y production
+
+### Riesgos o pendientes
+- El cierre tecnico y de deploy ya quedo realizado, pero sigue pendiente validacion visual humana final en `pre-greenhouse`, `dev-greenhouse` y `greenhouse` para confirmar jerarquia, contraste y el flujo real de upload de logo/foto.
+- El worktree local puede seguir mostrando cambios ajenos en `.env.example`, `.env.local.example`, `package.json` y `pnpm-lock.yaml`; no forman parte del cierre de esta iniciativa.
+
 ## 2026-03-13 20:05 America/Santiago
 
 ### Agente

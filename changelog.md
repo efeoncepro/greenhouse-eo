@@ -6,6 +6,12 @@
 
 ## 2026-03-13
 
+### Promote and deploy closeout
+- La rama `fix/internal-nav-nomenclature-hydration` ya fue promovida a `develop` y luego a `main`.
+- `pre-greenhouse.efeoncepro.com` fue re-apuntado manualmente al preview nuevo del branch despues de corregir el bloqueo de Preview por archivos duplicados `* (1).ts(x)`.
+- `dev-greenhouse.efeoncepro.com` quedo actualizado sobre el deployment de `staging` generado desde `develop`.
+- `greenhouse.efeoncepro.com` quedo actualizado sobre el deployment productivo generado desde `main`.
+
 ### Tenant and user identity media
 - Los placeholders de logo/foto en admin e internal ahora ya pueden persistir imagen real para spaces y usuarios.
 - Se agregaron uploads autenticados server-side para:
