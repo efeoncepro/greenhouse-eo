@@ -39,3 +39,6 @@ export const getResolvedCapabilityModule = (
   moduleId: string,
   input: ResolveCapabilityModulesInput
 ): ResolvedCapabilityModule | null => resolveCapabilityModules(input).find(module => module.id === moduleId) || null
+
+export const getCapabilityRegistryModule = (moduleId: string) =>
+  CAPABILITY_REGISTRY.find(module => module.id === moduleId) || null

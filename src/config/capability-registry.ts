@@ -11,6 +11,33 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
     theme: 'creative',
     requiredBusinessLines: ['globe'],
     requiredServiceModules: ['agencia_creativa'],
+    dataSources: [
+      {
+        dataset: 'notion_ops',
+        table: 'tareas',
+        requiredColumns: [
+          'notion_page_id',
+          'proyecto_ids',
+          'estado',
+          'cumplimiento',
+          'completitud',
+          'client_change_round_final',
+          'rpa',
+          'client_review_open',
+          'workflow_review_open',
+          'open_frame_comments',
+          'bloqueado_por_ids',
+          'created_time',
+          'fecha_de_completado',
+          '_synced_at'
+        ]
+      },
+      {
+        dataset: 'notion_ops',
+        table: 'proyectos',
+        requiredColumns: ['notion_page_id', 'nombre_del_proyecto', 'estado', 'pct_on_time', 'page_url']
+      }
+    ],
     cards: [
       {
         id: 'creative-metrics',
@@ -45,6 +72,33 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
     theme: 'crm',
     requiredBusinessLines: ['crm_solutions'],
     requiredServiceModules: ['licenciamiento_hubspot', 'consultoria_crm'],
+    dataSources: [
+      {
+        dataset: 'notion_ops',
+        table: 'tareas',
+        requiredColumns: [
+          'notion_page_id',
+          'proyecto_ids',
+          'estado',
+          'cumplimiento',
+          'completitud',
+          'client_change_round_final',
+          'rpa',
+          'client_review_open',
+          'workflow_review_open',
+          'open_frame_comments',
+          'bloqueado_por_ids',
+          'created_time',
+          'fecha_de_completado',
+          '_synced_at'
+        ]
+      },
+      {
+        dataset: 'notion_ops',
+        table: 'proyectos',
+        requiredColumns: ['notion_page_id', 'nombre_del_proyecto', 'estado', 'pct_on_time', 'page_url']
+      }
+    ],
     cards: [
       {
         id: 'crm-metrics',
@@ -78,6 +132,33 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
     priority: 30,
     theme: 'onboarding',
     requiredServiceModules: ['implementacion_onboarding'],
+    dataSources: [
+      {
+        dataset: 'notion_ops',
+        table: 'tareas',
+        requiredColumns: [
+          'notion_page_id',
+          'proyecto_ids',
+          'estado',
+          'cumplimiento',
+          'completitud',
+          'client_change_round_final',
+          'rpa',
+          'client_review_open',
+          'workflow_review_open',
+          'open_frame_comments',
+          'bloqueado_por_ids',
+          'created_time',
+          'fecha_de_completado',
+          '_synced_at'
+        ]
+      },
+      {
+        dataset: 'notion_ops',
+        table: 'proyectos',
+        requiredColumns: ['notion_page_id', 'nombre_del_proyecto', 'estado', 'pct_on_time', 'page_url']
+      }
+    ],
     cards: [
       {
         id: 'onboarding-metrics',
@@ -112,6 +193,33 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
     theme: 'web',
     requiredBusinessLines: ['wave'],
     requiredServiceModules: ['desarrollo_web'],
+    dataSources: [
+      {
+        dataset: 'notion_ops',
+        table: 'tareas',
+        requiredColumns: [
+          'notion_page_id',
+          'proyecto_ids',
+          'estado',
+          'cumplimiento',
+          'completitud',
+          'client_change_round_final',
+          'rpa',
+          'client_review_open',
+          'workflow_review_open',
+          'open_frame_comments',
+          'bloqueado_por_ids',
+          'created_time',
+          'fecha_de_completado',
+          '_synced_at'
+        ]
+      },
+      {
+        dataset: 'notion_ops',
+        table: 'proyectos',
+        requiredColumns: ['notion_page_id', 'nombre_del_proyecto', 'estado', 'pct_on_time', 'page_url']
+      }
+    ],
     cards: [
       {
         id: 'web-metrics',

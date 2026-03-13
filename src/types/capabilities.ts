@@ -4,6 +4,12 @@ export type CapabilityModuleTheme = 'creative' | 'crm' | 'onboarding' | 'web'
 export type CapabilityModuleCardType = 'metric' | 'project-list' | 'tooling-list' | 'quality-list'
 export type CapabilityModuleCardSize = 'sm' | 'md' | 'lg' | 'full'
 
+export interface CapabilityDataSourceRef {
+  dataset: string
+  table: string
+  requiredColumns: string[]
+}
+
 export interface CapabilityModuleCard {
   id: string
   title: string
@@ -22,6 +28,7 @@ export interface CapabilityModuleDefinition {
   theme: CapabilityModuleTheme
   requiredBusinessLines?: string[]
   requiredServiceModules?: string[]
+  dataSources: CapabilityDataSourceRef[]
   cards: CapabilityModuleCard[]
 }
 

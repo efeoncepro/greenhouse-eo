@@ -40,6 +40,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 08:39 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar la siguiente capa pendiente de `Greenhouse_Capabilities_Architecture_v1.md`: query builders dedicados, cache por capability y guard server-side reusable, dejando el flujo validado y publicado.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / capability runtime / BigQuery / smoke autenticado / build local
+
+### Archivos tocados
+- `src/config/capability-registry.ts`
+- `src/types/capabilities.ts`
+- `src/lib/capabilities/get-capability-module-data.ts`
+- `src/lib/capabilities/module-content-builders.ts`
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/lib/capabilities/verify-module-access.ts`
+- `src/lib/capability-queries/*`
+- `src/app/api/capabilities/[moduleId]/data/route.ts`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `scripts/mint-local-admin-jwt.js`
+- `tsconfig.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `npx pnpm exec eslint ...` sobre la nueva capa de capabilities: correcto
+- `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
+- `node .\\scripts\\mint-local-admin-jwt.js`: correcto
+
+### Riesgos o pendientes
+- La UI de capabilities sigue siendo una composicion ejecutiva compartida; el avance de este turno separa la data layer y el guard, pero no implementa aun el dispatcher completo de card types propuesto por la spec.
+- `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; el workaround operativo sigue siendo limpiar esos paths autogenerados antes de commitear.
+- El documento original menciona modulos futuros como `Review Engine`, `Performance Center` o `SEO Monitor`; esos siguen fuera del scope activo y requeriran nuevas pipelines de datos.
+
 ## 2026-03-13 07:21 America/Santiago
 
 ### Agente
