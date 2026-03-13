@@ -13,6 +13,9 @@ interface TenantAccessRow {
   client_name: string | null
   tenant_type: string | null
   email: string
+  microsoft_oid: string | null
+  microsoft_tenant_id: string | null
+  microsoft_email: string | null
   full_name: string
   role_codes: string[] | null
   route_groups: string[] | null
@@ -36,6 +39,9 @@ export interface TenantAccessRecord {
   clientName: string
   tenantType: TenantType
   email: string
+  microsoftOid: string | null
+  microsoftTenantId: string | null
+  microsoftEmail: string | null
   fullName: string
   roleCodes: string[]
   primaryRoleCode: string
@@ -138,6 +144,9 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     clientName: row.client_name || (tenantType === 'efeonce_internal' ? 'Efeonce Internal' : 'Greenhouse Client'),
     tenantType,
     email: row.email,
+    microsoftOid: row.microsoft_oid,
+    microsoftTenantId: row.microsoft_tenant_id,
+    microsoftEmail: row.microsoft_email,
     fullName: row.full_name,
     roleCodes,
     primaryRoleCode,
@@ -160,7 +169,15 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   }
 }
 
-const getIdentityAccessRecordByEmail = async (email: string) => {
+const getIdentityAccessRecord = async ({
+  whereClause,
+  params,
+  types
+}: {
+  whereClause: string
+  params: Record<string, unknown>
+  types?: Record<string, string>
+}) => {
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
@@ -172,6 +189,9 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
         COALESCE(c.client_name, IF(cu.tenant_type = 'efeonce_internal', 'Efeonce Internal', cu.full_name)) AS client_name,
         cu.tenant_type,
         cu.email,
+        cu.microsoft_oid,
+        cu.microsoft_tenant_id,
+        cu.microsoft_email,
         cu.full_name,
         ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
         ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
@@ -215,13 +235,16 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
         ON cff.client_id = cu.client_id
        AND cff.active = TRUE
        AND cff.status IN ('enabled', 'staged')
-      WHERE LOWER(cu.email) = LOWER(@email)
+      WHERE ${whereClause}
       GROUP BY
         cu.user_id,
         cu.client_id,
         client_name,
         cu.tenant_type,
         cu.email,
+        cu.microsoft_oid,
+        cu.microsoft_tenant_id,
+        cu.microsoft_email,
         cu.full_name,
         timezone,
         portal_home_path,
@@ -232,7 +255,8 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
         cu.password_hash_algorithm
       LIMIT 1
     `,
-    params: { email }
+    params,
+    ...(types ? { types } : {})
   })
 
   const accessRow = (rows[0] as TenantAccessRow | undefined) || null
@@ -240,8 +264,52 @@ const getIdentityAccessRecordByEmail = async (email: string) => {
   return accessRow ? normalizeTenantAccessRow(accessRow) : null
 }
 
+const getIdentityAccessRecordByEmail = async (email: string) =>
+  getIdentityAccessRecord({
+    whereClause: "LOWER(cu.email) = LOWER(@email) OR LOWER(COALESCE(cu.microsoft_email, '')) = LOWER(@email)",
+    params: { email }
+  })
+
 export const getTenantAccessRecordByEmail = async (email: string) => {
   return getIdentityAccessRecordByEmail(email)
+}
+
+export const getTenantAccessRecordByMicrosoftOid = async (oid: string) =>
+  getIdentityAccessRecord({
+    whereClause: 'cu.microsoft_oid = @oid',
+    params: { oid }
+  })
+
+export const getTenantAccessRecordByAllowedEmailDomain = async (domain: string) => {
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  const [rows] = await bigQuery.query({
+    query: `
+      SELECT
+        c.client_id,
+        c.client_name
+      FROM \`${projectId}.greenhouse.clients\` AS c
+      WHERE c.active = TRUE
+        AND LOWER(@domain) IN UNNEST(
+          ARRAY(
+            SELECT LOWER(allowed_domain)
+            FROM UNNEST(COALESCE(c.allowed_email_domains, [])) AS allowed_domain
+          )
+        )
+      LIMIT 1
+    `,
+    params: { domain }
+  })
+
+  const row = rows[0] as { client_id?: string; client_name?: string } | undefined
+
+  return row
+    ? {
+        clientId: String(row.client_id || ''),
+        clientName: String(row.client_name || '')
+      }
+    : null
 }
 
 export const verifyTenantPassword = async (tenant: TenantAccessRecord, password: string) => {
@@ -256,7 +324,59 @@ export const verifyTenantPassword = async (tenant: TenantAccessRecord, password:
   return false
 }
 
-export const updateTenantLastLogin = async (tenant: TenantAccessRecord) => {
+export const isEligibleForMicrosoftSignIn = (tenant: TenantAccessRecord) => {
+  if (!tenant.active) {
+    return false
+  }
+
+  return ['active', 'invited'].includes(tenant.status)
+}
+
+export const linkMicrosoftIdentity = async ({
+  tenant,
+  oid,
+  tenantId,
+  microsoftEmail
+}: {
+  tenant: TenantAccessRecord
+  oid: string
+  tenantId?: string | null
+  microsoftEmail: string
+}) => {
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  await bigQuery.query({
+    query: `
+      UPDATE \`${projectId}.greenhouse.client_users\`
+      SET
+        microsoft_oid = @oid,
+        microsoft_tenant_id = NULLIF(@tenantId, ''),
+        microsoft_email = @microsoftEmail,
+        auth_mode = CASE
+          WHEN auth_mode = 'credentials' THEN 'both'
+          WHEN auth_mode = 'both' THEN 'both'
+          WHEN password_hash IS NOT NULL THEN 'both'
+          ELSE 'sso'
+        END,
+        status = CASE
+          WHEN status = 'invited' THEN 'active'
+          ELSE status
+        END,
+        active = TRUE,
+        updated_at = CURRENT_TIMESTAMP()
+      WHERE user_id = @userId
+    `,
+    params: {
+      userId: tenant.userId,
+      oid,
+      tenantId: tenantId || '',
+      microsoftEmail: microsoftEmail.trim().toLowerCase()
+    }
+  })
+}
+
+export const updateTenantLastLogin = async (tenant: TenantAccessRecord, provider = 'credentials') => {
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
@@ -265,10 +385,14 @@ export const updateTenantLastLogin = async (tenant: TenantAccessRecord) => {
       UPDATE \`${projectId}.greenhouse.client_users\`
       SET
         last_login_at = CURRENT_TIMESTAMP(),
+        last_login_provider = @provider,
         updated_at = CURRENT_TIMESTAMP()
       WHERE user_id = @userId
     `,
-    params: { userId: tenant.userId }
+    params: {
+      userId: tenant.userId,
+      provider
+    }
   })
 
   if (tenant.clientId) {

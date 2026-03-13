@@ -79,6 +79,7 @@ Estado hoy:
 - shell Greenhouse visible en las rutas principales del portal
 - branding base integrado en navegacion y favicon temporal
 - `next-auth` ya protege el dashboard y autentica solo contra `greenhouse.client_users`
+- el login ahora soporta `credentials` y Microsoft Entra ID sobre el mismo principal `greenhouse.client_users`
 - el login ya no muestra bloque demo ni mensajes internos de infraestructura
 - credenciales de BigQuery cargadas en Vercel para `Development`, `staging` y `Production`
 - `@google-cloud/bigquery` ya esta integrado en el repo
@@ -230,6 +231,8 @@ Actuales en `.env.example`:
 - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `AZURE_AD_CLIENT_ID`
+- `AZURE_AD_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 
@@ -244,6 +247,7 @@ Estado actual en Vercel:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` existe en `Development`, `staging` y `Production`
 - `GCP_PROJECT` existe en `Development`, `staging` y `Production`
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` existen y deben configurarse tambien en `Preview` cuando una branch necesite login real
+- `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` deben existir en `Development`, `Preview`, `staging` y `Production` para habilitar Microsoft SSO
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio live de HubSpot; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback
 - el servicio live de HubSpot ahora expone:
   - `GET /contract`
@@ -257,6 +261,7 @@ Notas:
 - Si `BASEPATH` se define innecesariamente en Vercel, la app deja de vivir en `/`.
 - En `Preview`, `GOOGLE_APPLICATION_CREDENTIALS_JSON` puede llegar con serializaciones distintas segun como Vercel entregue la variable. `src/lib/bigquery.ts` ya tolera formato JSON minified y formato legacy escapado.
 - Si un login valido falla en `Preview`, primero verificar que el dominio apunte al deployment correcto y luego revisar `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir problema de password o de `client_users`.
+- Para desarrollo local con Microsoft SSO, el redirect URI `http://localhost:3000/api/auth/callback/azure-ad` debe estar registrado en la App Registration de Azure.
 - Toda variable nueva debe documentarse tambien en `project_context.md`.
 
 ## Deploy

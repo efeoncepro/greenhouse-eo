@@ -9,14 +9,14 @@ import { useRouter } from 'next/navigation'
 
 // MUI Imports
 import Alert from '@mui/material/Alert'
+import Divider from '@mui/material/Divider'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
+import Stack from '@mui/material/Stack'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -29,9 +29,6 @@ import type { SystemMode } from '@core/types'
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
-
-// Config Imports
-import themeConfig from '@configs/themeConfig'
 
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
@@ -60,7 +57,7 @@ const MaskImg = styled('img')({
   zIndex: -1
 })
 
-const LoginV2 = ({ mode }: { mode: SystemMode }) => {
+const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAuth: boolean }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -113,6 +110,14 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     router.refresh()
   }
 
+  const handleMicrosoftSignIn = async () => {
+    setError('')
+
+    await signIn('azure-ad', {
+      callbackUrl: '/auth/landing'
+    })
+  }
+
   return (
     <div className='flex bs-full justify-center'>
       <div
@@ -138,51 +143,81 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
         </Link>
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}`}</Typography>
+            <Typography variant='h4'>Acceso a Greenhouse</Typography>
             <Typography>
-              Sign in to review delivery health, sprint momentum, and project visibility for your team.
+              Entra con Microsoft para usar SSO o usa tus credenciales como fallback si tu cuenta ya fue provisionada.
             </Typography>
           </div>
-          <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
-            {error && <Alert severity='error'>{error}</Alert>}
-            <CustomTextField
-              autoFocus
+          <Stack spacing={4}>
+            {error ? <Alert severity='error'>{error}</Alert> : null}
+            <Button
               fullWidth
-              label='Work Email'
-              placeholder='name@company.com'
-              value={email}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-            />
-            <CustomTextField
-              fullWidth
-              label='Password'
-              placeholder='Enter your password'
-              id='outlined-adornment-password'
-              type={isPasswordShown ? 'text' : 'password'}
-              value={password}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                        <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                      </IconButton>
-                    </InputAdornment>
-                  )
+              variant='contained'
+              size='large'
+              onClick={handleMicrosoftSignIn}
+              disabled={!hasMicrosoftAuth}
+              startIcon={<i className='tabler-brand-windows' />}
+              sx={{
+                py: 2.2,
+                bgcolor: '#0078D4',
+                color: '#fff',
+                boxShadow: '0 14px 32px rgba(0, 120, 212, 0.24)',
+                '&:hover': {
+                  bgcolor: '#106EBE'
+                },
+                '&.Mui-disabled': {
+                  bgcolor: 'action.disabledBackground',
+                  color: 'text.disabled'
                 }
               }}
-            />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
-              <FormControlLabel control={<Checkbox defaultChecked />} label='Keep me signed in' />
-              <Typography className='text-end' color='primary.main' component={Link}>
-                Need access?
-              </Typography>
-            </div>
-            <Button fullWidth variant='contained' type='submit' disabled={isSubmitting}>
-              {isSubmitting ? 'Signing in...' : 'Enter portal'}
+            >
+              Iniciar sesion con Microsoft
             </Button>
-          </form>
+            {!hasMicrosoftAuth ? (
+              <Alert severity='info'>
+                El provider Microsoft aun no esta configurado en este ambiente. Puedes usar credenciales mientras se
+                cargan `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`.
+              </Alert>
+            ) : null}
+            <Divider sx={{ '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
+            <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
+              <CustomTextField
+                autoFocus
+                fullWidth
+                label='Email'
+                placeholder='nombre@empresa.com'
+                value={email}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+              />
+              <CustomTextField
+                fullWidth
+                label='Contrasena'
+                placeholder='Ingresa tu contrasena'
+                id='outlined-adornment-password'
+                type={isPasswordShown ? 'text' : 'password'}
+                value={password}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
+                          <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }
+                }}
+              />
+              <Button fullWidth variant='outlined' type='submit' disabled={isSubmitting} color='secondary'>
+                {isSubmitting ? 'Validando acceso...' : 'Iniciar sesion con email'}
+              </Button>
+            </form>
+            <Typography variant='body2' color='text.secondary'>
+              El acceso al portal se provisiona internamente. Si tu cuenta aun no aparece, contacta a tu account
+              manager en Efeonce.
+            </Typography>
+          </Stack>
         </div>
       </div>
     </div>

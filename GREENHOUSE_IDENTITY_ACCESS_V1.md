@@ -141,6 +141,9 @@ Important fields:
 - `client_id`
 - `tenant_type`
 - `email`
+- `microsoft_oid`
+- `microsoft_tenant_id`
+- `microsoft_email`
 - `full_name`
 - `status`
 - `active`
@@ -151,10 +154,12 @@ Important fields:
 - `timezone`
 - `locale`
 - `last_login_at`
+- `last_login_provider`
 
 Notes:
 - `client_id` can be null for internal-only users if needed
 - `tenant_type` is required to avoid ambiguous routing logic
+- `auth_mode` should allow `credentials`, `sso`, and `both` while Greenhouse keeps password fallback during the SSO rollout
 - `auth_mode = env_demo` should exist only as a temporary bootstrap compatibility path
 
 ## `greenhouse.roles`
@@ -407,15 +412,15 @@ As long as new code reads from the richer fields first.
 
 ## Auth Flow V1 Target
 
-1. User submits email and password.
-2. Auth layer looks up `client_users` by email.
+1. User submits email/password or starts Microsoft SSO.
+2. Auth layer looks up `client_users` by email or `microsoft_oid`.
 3. If user is inactive or status is not valid, reject.
-4. Verify password or SSO path according to `auth_mode`.
+4. Verify password or SSO path according to `auth_mode`, linking Microsoft identity on first successful SSO when the principal already exists.
 5. Load active role assignments.
 6. Load project scopes and campaign scopes.
 7. Load tenant-level feature flags if user is tenant-bound.
 8. Build session token with all authorization context.
-9. Update `last_login_at` on the user principal.
+9. Update `last_login_at` and `last_login_provider` on the user principal.
 10. Emit audit event if audit trail is enabled.
 
 ## Guard Layer Design

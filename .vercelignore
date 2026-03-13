@@ -1,2 +1,15 @@
+node_modules
+.next
+.next-cache
+.next-local
+.next-build-dir
+out
+coverage
+build
+.vercel
+.env
+.env*.local
 full-version
 demo-configs
+CODEX_TASK_*.md
+Greenhouse_Capabilities_Architecture_v1.md

@@ -22,15 +22,16 @@ export const metadata: Metadata = {
 
 const LoginPage = async () => {
   const session = await getServerSession(authOptions)
+  const hasMicrosoftAuth = Boolean(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET)
 
   if (session) {
-    redirect('/dashboard')
+    redirect('/auth/landing')
   }
 
   // Vars
   const mode = await getServerMode()
 
-  return <Login mode={mode} />
+  return <Login mode={mode} hasMicrosoftAuth={hasMicrosoftAuth} />
 }
 
 export default LoginPage

@@ -19,6 +19,8 @@ declare module 'next-auth' {
     timezone: string
     portalHomePath: string
     authMode: string
+    provider: string
+    microsoftEmail: string | null
   }
 
   interface Session {
@@ -41,6 +43,8 @@ declare module 'next-auth' {
       timezone: string
       portalHomePath: string
       authMode: string
+      provider: string
+      microsoftEmail: string | null
     } & DefaultSession['user']
   }
 }
@@ -66,5 +70,7 @@ declare module 'next-auth/jwt' {
     timezone?: string
     portalHomePath?: string
     authMode?: string
+    provider?: string
+    microsoftEmail?: string | null
   }
 }

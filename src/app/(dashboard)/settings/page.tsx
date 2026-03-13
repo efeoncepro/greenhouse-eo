@@ -6,6 +6,7 @@ import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
   const tenant = await getTenantContext()
+  const hasMicrosoftAuth = Boolean(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET)
 
   if (!tenant) {
     redirect('/login')
@@ -15,5 +16,5 @@ export default async function Page() {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 
-  return <GreenhouseSettings />
+  return <GreenhouseSettings hasMicrosoftAuth={hasMicrosoftAuth} />
 }

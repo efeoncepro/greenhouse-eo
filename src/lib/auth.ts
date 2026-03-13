@@ -1,16 +1,74 @@
 import type { NextAuthOptions } from 'next-auth'
+import AzureADProvider from 'next-auth/providers/azure-ad'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-import { getTenantAccessRecordByEmail, updateTenantLastLogin, verifyTenantPassword } from '@/lib/tenant/access'
+import {
+  getTenantAccessRecordByAllowedEmailDomain,
+  getTenantAccessRecordByEmail,
+  getTenantAccessRecordByMicrosoftOid,
+  isEligibleForMicrosoftSignIn,
+  linkMicrosoftIdentity,
+  updateTenantLastLogin,
+  verifyTenantPassword
+} from '@/lib/tenant/access'
+
+const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
+const microsoftClientSecret = process.env.AZURE_AD_CLIENT_SECRET
+const hasMicrosoftProvider = Boolean(microsoftClientId && microsoftClientSecret)
+
+const getMicrosoftProfileIdentity = ({
+  profile,
+  user
+}: {
+  profile?: Record<string, unknown> | null
+  user?: { email?: string | null } | null
+}) => {
+  const normalizedEmail =
+    typeof profile?.email === 'string'
+      ? profile.email.trim().toLowerCase()
+      : typeof user?.email === 'string'
+        ? user.email.trim().toLowerCase()
+        : ''
+
+  const oid =
+    typeof profile?.oid === 'string'
+      ? profile.oid
+      : typeof profile?.sub === 'string'
+        ? profile.sub
+        : ''
+
+  const tenantId = typeof profile?.tid === 'string' ? profile.tid : ''
+
+  return {
+    normalizedEmail,
+    oid,
+    tenantId
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt'
   },
   pages: {
-    signIn: '/login'
+    signIn: '/login',
+    error: '/auth/access-denied'
   },
   providers: [
+    ...(hasMicrosoftProvider
+      ? [
+          AzureADProvider({
+            clientId: microsoftClientId!,
+            clientSecret: microsoftClientSecret!,
+            tenantId: 'common',
+            authorization: {
+              params: {
+                scope: 'openid profile email'
+              }
+            }
+          })
+        ]
+      : []),
     CredentialsProvider({
       name: 'Greenhouse Credentials',
       credentials: {
@@ -54,7 +112,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          await updateTenantLastLogin(tenant)
+          await updateTenantLastLogin(tenant, 'credentials')
         } catch (error) {
           console.warn('Unable to update tenant last_login_at after successful auth.', error)
         }
@@ -79,13 +137,70 @@ export const authOptions: NextAuthOptions = {
           featureFlags: tenant.featureFlags,
           timezone: tenant.timezone,
           portalHomePath: tenant.portalHomePath,
-          authMode: tenant.authMode
+          authMode: tenant.authMode,
+          provider: 'credentials',
+          microsoftEmail: tenant.microsoftEmail
         }
       }
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'credentials') {
+        return true
+      }
+
+      if (account?.provider !== 'azure-ad') {
+        return false
+      }
+
+      const { normalizedEmail, oid, tenantId } = getMicrosoftProfileIdentity({
+        profile: (profile as Record<string, unknown> | null | undefined) || null,
+        user
+      })
+
+      if (!normalizedEmail || !oid) {
+        return '/auth/access-denied'
+      }
+
+      let tenant = await getTenantAccessRecordByMicrosoftOid(oid)
+
+      if (!tenant) {
+        tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+      }
+
+      if (!tenant) {
+        const allowedDomain = normalizedEmail.split('@')[1]?.trim().toLowerCase() || ''
+        const tenantMatch = allowedDomain ? await getTenantAccessRecordByAllowedEmailDomain(allowedDomain) : null
+
+        if (tenantMatch) {
+          console.warn('Microsoft SSO rejected because the domain matched a tenant but no explicit principal exists.', {
+            email: normalizedEmail,
+            clientId: tenantMatch.clientId
+          })
+        }
+
+        return '/auth/access-denied'
+      }
+
+      if (!isEligibleForMicrosoftSignIn(tenant)) {
+        return '/auth/access-denied'
+      }
+
+      if (tenant.microsoftOid !== oid || tenant.microsoftEmail !== normalizedEmail || tenant.microsoftTenantId !== tenantId) {
+        await linkMicrosoftIdentity({
+          tenant,
+          oid,
+          tenantId,
+          microsoftEmail: normalizedEmail
+        })
+      }
+
+      await updateTenantLastLogin(tenant, 'microsoft_sso')
+
+      return true
+    },
+    async jwt({ token, user, account, profile }) {
       if (user) {
         token.sub = user.id
         token.userId = user.userId
@@ -107,6 +222,46 @@ export const authOptions: NextAuthOptions = {
         token.timezone = user.timezone
         token.portalHomePath = user.portalHomePath
         token.authMode = user.authMode
+        token.provider = user.provider
+        token.microsoftEmail = user.microsoftEmail
+      }
+
+      if (account?.provider === 'azure-ad') {
+        const { normalizedEmail, oid } = getMicrosoftProfileIdentity({
+          profile: (profile as Record<string, unknown> | null | undefined) || null,
+          user
+        })
+
+        let tenant = oid ? await getTenantAccessRecordByMicrosoftOid(oid) : null
+
+        if (!tenant && normalizedEmail) {
+          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        }
+
+        if (tenant) {
+          token.sub = tenant.userId
+          token.userId = tenant.userId
+          token.email = tenant.email
+          token.name = tenant.fullName
+          token.clientId = tenant.clientId
+          token.clientName = tenant.clientName
+          token.tenantType = tenant.tenantType
+          token.roleCodes = tenant.roleCodes
+          token.primaryRoleCode = tenant.primaryRoleCode
+          token.routeGroups = tenant.routeGroups
+          token.projectScopes = tenant.projectScopes
+          token.campaignScopes = tenant.campaignScopes
+          token.businessLines = tenant.businessLines
+          token.serviceModules = tenant.serviceModules
+          token.projectIds = tenant.projectIds
+          token.role = tenant.role
+          token.featureFlags = tenant.featureFlags
+          token.timezone = tenant.timezone
+          token.portalHomePath = tenant.portalHomePath
+          token.authMode = tenant.authMode
+          token.provider = 'microsoft_sso'
+          token.microsoftEmail = tenant.microsoftEmail || normalizedEmail
+        }
       }
 
       return token
@@ -139,6 +294,8 @@ export const authOptions: NextAuthOptions = {
         session.user.timezone = typeof token.timezone === 'string' ? token.timezone : 'UTC'
         session.user.portalHomePath = typeof token.portalHomePath === 'string' ? token.portalHomePath : '/dashboard'
         session.user.authMode = typeof token.authMode === 'string' ? token.authMode : 'credentials'
+        session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'
+        session.user.microsoftEmail = typeof token.microsoftEmail === 'string' ? token.microsoftEmail : null
       }
 
       return session

@@ -40,6 +40,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 01:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development + auth runtime + BigQuery + configuracion Vercel
+
+### Archivos tocados
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/types/next-auth.d.ts`
+- `src/views/Login.tsx`
+- `src/app/(blank-layout-pages)/login/page.tsx`
+- `src/app/(blank-layout-pages)/auth/access-denied/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `bigquery/greenhouse_identity_access_v1.sql`
+- `bigquery/greenhouse_microsoft_sso_v1.sql`
+- `scripts/setup-bigquery.sql`
+- `.env.example`
+- `.env.local.example`
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `README.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+- `npx pnpm lint`: correcto
+- `npx pnpm build`: correcto
+- Migracion BigQuery aplicada con el cliente Node del repo:
+  - `bigquery/greenhouse_microsoft_sso_v1.sql`
+  - columnas confirmadas en `greenhouse.client_users`: `microsoft_oid`, `microsoft_tenant_id`, `microsoft_email`, `last_login_provider`
+- `gcloud config get-value project`: `efeonce-group`
+- `gcloud auth application-default print-access-token`: correcto
+- `vercel login`: correcto por device flow
+- Vercel env verificado con `vercel env list --debug`
+  - `Production`: ahora tiene `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
+  - `staging`: ahora tiene `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
+  - `Development`: ahora tiene `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`
+  - `Preview (develop)`: ahora tiene `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
+
+### Riesgos o pendientes
+- El task original pedía resolver SSO contra `greenhouse.clients`, pero el runtime real ya vive en `greenhouse.client_users`; el cambio se implemento sobre el modelo actual para no reintroducir el principal legacy.
+- Por seguridad, el flujo no auto-provisiona usuarios solo por `allowed_email_domains`; si el dominio coincide pero no existe un principal explicito en `client_users`, el login Microsoft cae en `/auth/access-denied`.
+- `Preview` sigue usando env vars muy branch-specific; otras ramas feature que quieran validar SSO remoto pueden necesitar `AZURE_AD_*` cargadas tambien para su branch preview concreto.
+- No se hizo smoke OAuth completo en navegador contra Azure; quedo verificado el runtime, el build, la migracion de BigQuery y la presencia de variables clave en Vercel.
+
 ## 2026-03-12 16:10 America/Santiago
 
 ### Agente

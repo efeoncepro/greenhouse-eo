@@ -35,6 +35,19 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `6` HubSpot owners internos sembrados como perfiles canonicos
   - `8` perfiles `EO-ID-*` creados en BigQuery
 
+## Delta 2026-03-12 Microsoft SSO foundation
+- El login ahora soporta dos flujos en paralelo sobre `greenhouse.client_users`:
+  - `credentials`
+  - Microsoft Entra ID (`azure-ad` en NextAuth)
+- `client_users` extiende el contrato de identidad con:
+  - `microsoft_oid`
+  - `microsoft_tenant_id`
+  - `microsoft_email`
+  - `last_login_provider`
+- `/login` prioriza Microsoft SSO como CTA principal y deja email + contrasena como fallback.
+- `/settings` ahora muestra el estado de vinculo Microsoft y permite iniciar el enlace SSO cuando la sesion entro por credenciales.
+- La ruta publica adicional `/auth/access-denied` cubre el rechazo de usuarios Microsoft sin principal explicito autorizado en Greenhouse.
+
 ## Documento Maestro de Arquitectura
 - Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
 - Resumen rapido de fases y tareas: `PHASE_TASK_MATRIX.md`
@@ -319,6 +332,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `AZURE_AD_CLIENT_ID`
+- `AZURE_AD_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
@@ -331,6 +346,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_URL`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
+- `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 
