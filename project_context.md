@@ -61,6 +61,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `greenhouse.clients` no traia `logo_url` en el DDL base; el runtime agrega la columna on-demand con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS logo_url STRING` antes de persistir logos de tenant.
 - La sesion NextAuth ya propaga `avatarUrl`, permitiendo que el dropdown autenticado refleje la foto guardada del usuario.
 
+## Delta 2026-03-13 Promote and deploy closeout
+- La iniciativa de alineacion de nomenclatura + branding + media persistente ya quedo promovida a:
+  - `develop`
+  - `main`
+- Estado actual de aliases Vercel confirmado al cierre:
+  - `pre-greenhouse.efeoncepro.com` apunta al preview vigente del branch `fix/internal-nav-nomenclature-hydration`
+  - `dev-greenhouse.efeoncepro.com` apunta al deployment de `staging` generado desde `develop`
+  - `greenhouse.efeoncepro.com` apunta al deployment productivo generado desde `main`
+- Regla operativa ratificada:
+  - si `pre-greenhouse` no refleja una rama activa, no asumir fallo de codigo; primero revisar `vercel inspect`, alias asignado y estado del ultimo deployment del branch
+  - si Preview falla por duplicados `* (1).ts(x)`, `tsconfig.json` ya los excluye para que el deploy no quede atascado por copias accidentales del workspace
+
 ## Delta 2026-03-13 Capabilities runtime foundation
 - La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
 - El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.
