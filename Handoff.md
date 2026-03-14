@@ -40,6 +40,55 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer de verdad la identidad canonica del roster Efeonce para que Greenhouse sea la identidad base y los providers externos queden enlazados como enrichment.
+- Dar una pasada visual adicional a las 4 surfaces live del task usando patrones Vuexy ya presentes en el repo.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `src/types/team.ts`
+- `src/lib/team-queries.ts`
+- `scripts/setup-team-tables.sql`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/greenhouse/TeamIdentityBadgeGroup.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` reaplicado en BigQuery real: correcto
+- Verificacion directa en BigQuery:
+  - `greenhouse.team_members` ahora expone `identity_profile_id` y `email_aliases`
+  - el roster Efeonce quedo con `7` miembros enlazados a perfil canonico
+  - `identity_profile_source_links` ahora incluye links activos de `greenhouse_team`, `greenhouse_auth`, `notion`, `hubspot_crm` y `azure_ad`
+  - el perfil legado `identity-hubspot-crm-owner-75788512` de Julio quedo `archived` / `active = FALSE`
+  - `greenhouse.team_members` ahora tambien expone columnas de perfil ampliado: `first_name`, `last_name`, `preferred_name`, `legal_name`, `org_role_id`, `profession_id`, `seniority_level`, `employment_type`, `birth_date`, `phone`, `teams_user_id`, `slack_user_id`, `location_city`, `location_country`, `time_zone`, `years_experience`, `efeonce_start_date`, `biography`, `languages`
+  - `greenhouse.team_role_catalog` y `greenhouse.team_profession_catalog` ya quedaron sembradas en BigQuery real
+
+### Riesgos o pendientes
+- Falta validacion visual autenticada en Preview para confirmar la nueva jerarquia visual de las 4 cards con datos reales en navegador.
+- La capa ya soporta futuros providers en `identity_profile_source_links`, pero todavia no existe ingestion real para `google_workspace`, `deel`, `frame_io` o `adobe`; el modelo quedo listo, no el sync.
+- El perfil ampliado ya existe a nivel schema y runtime, pero varios atributos siguen `NULL` en seed porque no habia dato confirmado; para cerrar la ficha completa faltaria una fuente canonica de RRHH o un backoffice admin de talento.
+- El repo externo `notion-bigquery` ya estaba alineado para `Responsables`; no hay cambio pendiente ahi por este ajuste salvo mergear su rama documental si se quiere dejar el contrato cerrado.
+
 ## 2026-03-13 19:35 America/Santiago
 
 ### Agente
@@ -68,6 +117,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El cierre tecnico y de deploy ya quedo realizado, pero sigue pendiente validacion visual humana final en `pre-greenhouse`, `dev-greenhouse` y `greenhouse` para confirmar jerarquia, contraste y el flujo real de upload de logo/foto.
 - El worktree local puede seguir mostrando cambios ajenos en `.env.example`, `.env.local.example`, `package.json` y `pnpm-lock.yaml`; no forman parte del cierre de esta iniciativa.
+
+## 2026-03-13 23:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar los pendientes reales del runtime de team identity + capacity:
+  - validar con Node local
+  - endurecer y aplicar el bootstrap SQL en BigQuery
+  - confirmar el nombre correcto del repo externo del sync
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `.eslintrc.js`
+- `src/lib/team-queries.ts`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `scripts/setup-team-tables.sql`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` aplicado en BigQuery real: correcto
+  - `greenhouse.team_members`: `7` filas
+  - `greenhouse.client_team_assignments`: `10` filas
+- Verificacion directa en BigQuery:
+  - `space-efeonce` quedo con `7` assignments seed
+  - `hubspot-company-30825221458` quedo con `3` assignments seed
+- `git ls-remote https://github.com/efeoncepro/notion-bigquery.git HEAD`: sin acceso util desde esta sesion
+- `git ls-remote git@github.com:efeoncepro/notion-bigquery.git HEAD`: `Repository not found`
+
+### Riesgos o pendientes
+- El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
+- Esa parte externa sigue pendiente porque el repo no esta en este workspace y no hubo acceso remoto valido desde esta sesion.
+- La validacion ad hoc por import directo de `src/lib/team-queries.ts` con `tsx` choco con `server-only`; no indica fallo del feature, pero si que una smoke script reusable tendria que correr via entorno Next/server real o con un harness dedicado.
 
 ## 2026-03-13 20:05 America/Santiago
 

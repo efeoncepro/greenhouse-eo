@@ -3,6 +3,76 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Canonical team identity hardening
+- La capa de equipo/capacidad ya no debe tratar `azure_oid`, `notion_user_id` o `hubspot_owner_id` como la identidad canonica.
+  - `greenhouse.team_members.identity_profile_id` pasa a ser el enlace canonico de persona para el roster Efeonce.
+  - Los providers externos se resuelven y enriquecen desde `greenhouse.identity_profile_source_links`.
+- `scripts/setup-team-tables.sql` ahora tambien actua como bootstrap de reconciliacion canonica para el roster de equipo:
+  - agrega `identity_profile_id` y `email_aliases` si faltan en `greenhouse.team_members`
+  - siembra o actualiza perfiles canonicos usados por el roster
+  - siembra source links para `greenhouse_team`, `greenhouse_auth`, `notion`, `hubspot_crm` y `azure_ad`
+  - archiva el perfil duplicado de Julio anclado en HubSpot y deja un solo perfil canonico activo para su identidad
+- Regla operativa nueva:
+  - `greenhouse_team` representa la identidad Greenhouse del roster
+  - `identity_profile_source_links` es la capa preparada para sumar futuros providers como `google_workspace`, `deel`, `frame_io` o `adobe` sin redisenar `team_members`
+- La lectura runtime de providers en `src/lib/team-queries.ts` ya no debe inferir Microsoft desde `greenhouse_auth`; `greenhouse_auth` es un principal interno, no un provider externo.
+- Las 4 surfaces live del task tuvieron una pasada visual adicional con patrones Vuexy compartidos:
+  - `Mi Greenhouse` y `Pulse` ya muestran badges de identidad mas robustos
+  - `Equipo en este proyecto` y `Velocity por persona` ahora usan `ExecutiveCardShell`, resumenes KPI y cards por persona con mejor jerarquia visual
+
+## Delta 2026-03-13 Team profile taxonomy
+- `greenhouse.team_members` ya no modela solo roster operativo; ahora tambien soporta perfil profesional y atributos de identidad laboral:
+  - nombre estructurado: `first_name`, `last_name`, `preferred_name`, `legal_name`
+  - taxonomia interna: `org_role_id`, `profession_id`, `seniority_level`, `employment_type`
+  - contacto y presencia: `phone`, `teams_user_id`, `slack_user_id`
+  - ubicacion y contexto: `location_city`, `location_country`, `time_zone`
+  - trayectoria: `birth_date`, `years_experience`, `efeonce_start_date`
+  - perfil narrativo: `biography`, `languages`
+- Se agregaron catalogos nuevos en BigQuery:
+  - `greenhouse.team_role_catalog`
+  - `greenhouse.team_profession_catalog`
+- Regla operativa nueva para talento:
+  - `role_title` sigue siendo el cargo visible en la operacion actual
+  - `org_role_id` representa el rol interno dentro de Efeonce
+  - `profession_id` representa la profesion u oficio reusable para staffing y matching de perfiles
+- El runtime cliente de `/api/team/members` ahora deriva ademas:
+  - `tenureEfeonceMonths`
+  - `tenureClientMonths`
+  - `ageYears`
+  - `profileCompletenessPercent`
+- Se decidio no inventar PII faltante en seed:
+  - si ciudad, pais, telefono, edad o experiencia real no estaban confirmados, quedan `NULL`
+  - el modelo ya existe y la UI lo expresa como `en configuracion`
+
+## Delta 2026-03-13 Team identity and capacity runtime
+- Se implemento una primera capa real del task `CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
+  - `GET /api/team/members`
+  - `GET /api/team/capacity`
+  - `GET /api/team/by-project/[projectId]`
+  - `GET /api/team/by-sprint/[sprintId]`
+  - `scripts/setup-team-tables.sql`
+  - componentes cliente para dossier, capacidad, equipo por proyecto y velocity por persona
+- La fuente real inspeccionada en BigQuery para `notion_ops.tareas` no expone `responsable_nombre` ni `responsable_email` como columnas directas.
+  - El runtime nuevo usa el schema real detectado en `INFORMATION_SCHEMA`:
+    - `responsables`
+    - `responsables_ids`
+    - `responsables_names`
+    - `responsable_texto`
+  - El match operativo prioriza `notion_user_id` ↔ `responsables_ids[SAFE_OFFSET(0)]`, con fallback a email/nombre.
+- `scripts/setup-team-tables.sql` quedo endurecido como bootstrap idempotente via `MERGE` y ya fue aplicado en BigQuery real:
+  - `greenhouse.team_members`: `7` filas seed
+  - `greenhouse.client_team_assignments`: `10` filas seed
+- La validacion local ya corrio con runtime Node real:
+  - `pnpm lint`: correcto
+  - `pnpm build`: correcto
+- El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
+  - Ese repo no existe en este workspace.
+  - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
+- `/settings` ya no depende de `getDashboardOverview()` solo para el roster; consume el endpoint dedicado de equipo.
+- `/dashboard` reemplaza la card legacy de capacity por una surface cliente que consume la API dedicada.
+- `/proyectos/[id]` ahora incorpora una seccion `Equipo en este proyecto`.
+- El repo no tenia `/sprints/[id]`; se habilito una primera ruta para hospedar `Velocity por persona` y enlazarla desde el detalle de proyecto.
+
 ## Delta 2026-03-13 Preview auth hardening
 - `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
 - Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.
