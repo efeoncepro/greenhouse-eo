@@ -40,6 +40,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 11:25 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revalidar `develop` despues de habilitar tooling de Node utilizable en shells de login y confirmar si la promocion documental/GitHub hygiene seguia sana.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / local validation
+
+### Archivos tocados
+- `Handoff.md`
+
+### Verificacion
+- Tooling disponible en este entorno despues del ajuste local de shell:
+  - `node`: `v20.20.1`
+  - `pnpm`: `10.32.1`
+  - `npx`: `10.8.2`
+- `pnpm install --frozen-lockfile`: correcto
+- `pnpm build`: correcto
+- `pnpm lint`: falla, pero por errores preexistentes fuera de este lote en:
+  - `src/components/greenhouse/TeamCapacitySection.tsx:23`
+  - `src/components/greenhouse/TeamCapacitySection.tsx:64`
+  - `src/components/greenhouse/TeamCapacitySection.tsx:101`
+
+### Riesgos o pendientes
+- El lote mergeado de documentacion y `.github/` no introdujo el fallo de lint; el bloqueo sigue en `TeamCapacitySection.tsx`.
+- La nota anterior sobre ausencia de `node`/`pnpm` aplica al estado previo del shell, no al estado actual despues de instalar y exponer tooling via login shell.
+
 ## 2026-03-14 09:45 America/Santiago
 
 ### Agente
