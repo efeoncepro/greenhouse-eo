@@ -55,6 +55,20 @@
   - `PersonTabs` usa `detail.access.visibleTabs`
   - `PersonLeftSidebar` usa `detail.summary`
 - La navegacion interna ya expone `Personas` en el sidebar mediante `GH_PEOPLE_NAV`.
+- El modulo ya fue publicado en preview desde `feature/hr-payroll`:
+  - commit `a52c682`
+  - preview `Ready`: `https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
+  - branch alias: `https://greenhouse-eo-git-feature-hr-payroll-efeonce-7670142f.vercel.app`
+- Smoke de preview sin sesion:
+  - `/login` responde correctamente
+  - `/api/people` y `/api/people/[memberId]` devuelven `Unauthorized`
+  - `/people` redirige a `/login`
+- QA autenticado real ya ejecutado por rol:
+  - `efeonce_operations`: login correcto y acceso correcto a `/api/people` y `/api/people/[memberId]`
+  - `efeonce_account`: login correcto pero `/api/people` responde `403 Forbidden`
+  - `hr_payroll`: `Humberly Henriquez` fue provisionada con el rol y el preview ya la reconoce con `routeGroups ['hr','internal']`
+  - `GET /api/hr/payroll/periods` con sesión `hr_payroll`: `200 OK`
+- `pre-greenhouse.efeoncepro.com` fue re-asignado al deployment vigente de `feature/hr-payroll` (`greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`) para QA compartido del modulo `People`.
 
 ### People unified view task alignment
 - Se agrego `docs/tasks/CODEX_TASK_People_Unified_View_v2.md` como brief corregido y ejecutable para `People`, alineado al runtime real del repo.

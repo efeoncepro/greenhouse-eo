@@ -40,6 +40,132 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 10:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar el QA autenticado de `People` en preview con roles reales y confirmar la matriz efectiva de acceso.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Vercel / authenticated QA by role
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Preview usado:
+  - `https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
+- Flujo de QA ejecutado con `vercel curl` sobre preview protegido y login real por `credentials`.
+- Resultado validado:
+  - `efeonce_operations`:
+    - login real correcto con `daniela.ferreira@efeonce.org`
+    - `/api/auth/session`: correcto
+    - `GET /api/people`: correcto
+    - `GET /api/people/daniela-ferreira`: correcto
+    - `/people`: renderiza autenticado correctamente
+  - `efeonce_account`:
+    - login real correcto con `valentina.hoyos@efeonce.org`
+    - `/api/auth/session`: correcto
+    - `GET /api/people`: responde `403 Forbidden`
+    - confirma que `account` queda fuera del alcance inicial
+- Verificacion de permisos backend:
+  - `requirePeopleTenantContext()` y `canAccessPeopleModule()` siguen permitiendo solo:
+    - `efeonce_admin`
+    - `efeonce_operations`
+    - `hr_payroll`
+- Verificacion de provisionamiento real:
+  - en `greenhouse.client_users` / `greenhouse.user_role_assignments` no existe hoy ningun usuario interno activo con rol `hr_payroll`
+  - por eso no se pudo cerrar aun el smoke autenticado de ese tercer rol
+
+### Riesgos o pendientes
+- `People` queda tecnicamente validado para `operations` y bloqueado correctamente para `account`.
+- `Julio Reyes` conserva rol `efeonce_admin`, por lo que backend y sidebar deben permitir acceso; falta solo la comprobacion manual/autenticada en runtime con su propia sesion si se quiere evidencia de UI final.
+- Para cerrar la matriz completa de QA falta provisionar o identificar un usuario real `hr_payroll`.
+
+## 2026-03-14 10:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Activar `hr_payroll` para Humberly y cerrar la validacion real del tercer rol permitido en `People`.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / BigQuery real / role provisioning and QA
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se activo la asignacion `hr_payroll` para `Humberly Henriquez` en `greenhouse.user_role_assignments`:
+  - `assignment-efeonce-internal-humberly-henriquez-hr-payroll`
+- La lectura efectiva de acceso ya devuelve para Humberly:
+  - `roleCodes`: `['efeonce_operations', 'hr_payroll']`
+  - `primaryRoleCode`: `hr_payroll`
+  - `routeGroups`: `['hr', 'internal']`
+
+### Verificacion
+- BigQuery real:
+  - `humberly.henriquez@efeonce.org` ahora resuelve `efeonce_operations` + `hr_payroll`
+- Preview real:
+  - login por `credentials`: correcto
+  - `/api/auth/session`: correcto, sesión ya refleja `hr_payroll`
+  - `GET /api/people`: correcto
+  - `GET /api/hr/payroll/periods`: `200 OK`, responde `[]`
+
+### Riesgos o pendientes
+- La matriz de acceso real queda ya validada para los tres roles esperados:
+  - `efeonce_admin`: permitido por contrato backend
+  - `efeonce_operations`: validado en runtime
+  - `hr_payroll`: validado en runtime
+- `efeonce_account` sigue correctamente fuera (`403 Forbidden`).
+- Si se quiere evidencia visual final del caso admin, falta solo la validacion manual con una sesion real de Julio en preview.
+
+## 2026-03-14 11:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Re-apuntar `pre-greenhouse.efeoncepro.com` al preview actual de `feature/hr-payroll` para QA compartido.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / shared domain alias
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se reasigno el alias compartido:
+  - `pre-greenhouse.efeoncepro.com` -> `https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
+
+### Verificacion
+- `pnpm dlx vercel alias set https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto
+- `pnpm dlx vercel alias ls -S efeonce-7670142f`: correcto, `pre-greenhouse.efeoncepro.com` ya figura bajo el source `greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
+- `pnpm dlx vercel curl /login --deployment https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, responde el login del deployment `dpl_46Xq4TodnJcuLY4z4qJ2hRa6g2BT`
+- `pnpm dlx vercel curl /api/people --deployment https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, responde `Unauthorized` sin sesion
+
+### Riesgos o pendientes
+- `pre-greenhouse` vuelve a ser un alias compartido; otro agente podria moverlo despues.
+- La validacion visual/autenticada final del modulo `People` ahora puede hacerse directamente sobre `https://pre-greenhouse.efeoncepro.com`.
+
 ## 2026-03-14 14:30 America/Santiago
 
 ### Agente
