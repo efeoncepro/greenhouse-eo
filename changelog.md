@@ -6,6 +6,25 @@
 
 ## 2026-03-14
 
+### Finance backend runtime closure and task v2
+- `Financial Module` dejó de tratarse como brief greenfield activo:
+  - `docs/tasks/complete/CODEX_TASK_Financial_Module.md` queda como referencia histórica
+  - `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md` pasa a ser el brief vigente para cierre runtime/backend y handoff con frontend
+- Se agregó backend operativo para cerrar conciliación y egresos especializados:
+  - `GET /api/finance/reconciliation/[id]/candidates`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `GET /api/finance/expenses/meta`
+  - `GET /api/finance/expenses/payroll-candidates`
+- Se endureció la consistencia de conciliación:
+  - `auto-match` ahora también marca `fin_income` / `fin_expenses` como reconciliados cuando aplica
+  - `match`, `unmatch` y `exclude` sincronizan el estado entre `fin_bank_statement_rows` y la transacción financiera target
+  - `GET /api/finance/reconciliation/[id]` ahora devuelve `matchStatus` normalizado y `rawMatchStatus`
+- `POST /api/finance/expenses` ahora también acepta los campos especializados que ya existían en schema:
+  - previsión
+  - impuestos
+  - categoría de varios
+- `project_context.md` y `docs/architecture/FINANCE_CANONICAL_360_V1.md` quedaron actualizados para reflejar esta capa backend nueva.
+
 ### HR payroll brief split: baseline vs runtime gaps
 - `CODEX_TASK_HR_Payroll_Module_v2.md` dejó de tratarse como brief vigente greenfield y quedó marcado como referencia histórica de la implementación base.
 - Se creó `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md` como brief activo para cerrar los gaps reales del módulo actual:

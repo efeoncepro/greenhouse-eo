@@ -19,6 +19,8 @@ import {
   EXPENSE_PAYMENT_STATUSES,
   PAYMENT_METHODS,
   SERVICE_LINES,
+  SOCIAL_SECURITY_TYPES,
+  TAX_TYPES,
   buildMonthlySequenceId,
   resolveExchangeRateToClp,
   type ExpenseType,
@@ -56,6 +58,13 @@ interface ExpenseRow {
   payroll_entry_id: string | null
   member_id: string | null
   member_name: string | null
+  social_security_type: string | null
+  social_security_institution: string | null
+  social_security_period: string | null
+  tax_type: string | null
+  tax_period: string | null
+  tax_form_number: string | null
+  miscellaneous_category: string | null
   service_line: string | null
   is_recurring: boolean
   recurrence_frequency: string | null
@@ -93,6 +102,13 @@ const normalizeExpense = (row: ExpenseRow) => ({
   payrollEntryId: row.payroll_entry_id ? normalizeString(row.payroll_entry_id) : null,
   memberId: row.member_id ? normalizeString(row.member_id) : null,
   memberName: row.member_name ? normalizeString(row.member_name) : null,
+  socialSecurityType: row.social_security_type ? normalizeString(row.social_security_type) : null,
+  socialSecurityInstitution: row.social_security_institution ? normalizeString(row.social_security_institution) : null,
+  socialSecurityPeriod: row.social_security_period ? normalizeString(row.social_security_period) : null,
+  taxType: row.tax_type ? normalizeString(row.tax_type) : null,
+  taxPeriod: row.tax_period ? normalizeString(row.tax_period) : null,
+  taxFormNumber: row.tax_form_number ? normalizeString(row.tax_form_number) : null,
+  miscellaneousCategory: row.miscellaneous_category ? normalizeString(row.miscellaneous_category) : null,
   serviceLine: row.service_line ? normalizeString(row.service_line) : null,
   isRecurring: normalizeBoolean(row.is_recurring),
   recurrenceFrequency: row.recurrence_frequency ? normalizeString(row.recurrence_frequency) : null,
@@ -259,7 +275,9 @@ export async function POST(request: Request) {
         document_number, document_date, due_date,
         supplier_id, supplier_name, supplier_invoice_number,
         payroll_period_id, payroll_entry_id, member_id, member_name,
-        service_line, is_recurring, recurrence_frequency,
+        social_security_type, social_security_institution, social_security_period,
+        tax_type, tax_period, tax_form_number,
+        miscellaneous_category, service_line, is_recurring, recurrence_frequency,
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
@@ -271,7 +289,9 @@ export async function POST(request: Request) {
         @documentNumber, @documentDate, @dueDate,
         @supplierId, @supplierName, @supplierInvoiceNumber,
         @payrollPeriodId, @payrollEntryId, @memberId, @memberName,
-        @serviceLine, @isRecurring, @recurrenceFrequency,
+        @socialSecurityType, @socialSecurityInstitution, @socialSecurityPeriod,
+        @taxType, @taxPeriod, @taxFormNumber,
+        @miscellaneousCategory, @serviceLine, @isRecurring, @recurrenceFrequency,
         FALSE, @notes, @createdBy,
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
@@ -302,6 +322,21 @@ export async function POST(request: Request) {
       payrollEntryId: resolvedMember.payrollEntryId,
       memberId: resolvedMember.memberId,
       memberName: normalizeString(body.memberName) || resolvedMember.memberName,
+      socialSecurityType: body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
+        ? normalizeString(body.socialSecurityType)
+        : body.socialSecurityType
+          ? null
+          : null,
+      socialSecurityInstitution: body.socialSecurityInstitution ? normalizeString(body.socialSecurityInstitution) : null,
+      socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
+      taxType: body.taxType && TAX_TYPES.includes(body.taxType)
+        ? normalizeString(body.taxType)
+        : body.taxType
+          ? null
+          : null,
+      taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
+      taxFormNumber: body.taxFormNumber ? normalizeString(body.taxFormNumber) : null,
+      miscellaneousCategory: body.miscellaneousCategory ? normalizeString(body.miscellaneousCategory) : null,
       serviceLine,
       isRecurring: Boolean(body.isRecurring),
       recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,

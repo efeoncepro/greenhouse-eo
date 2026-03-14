@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Finance backend runtime closure
+- `Finance` ya no debe tratarse solo como dashboard + CRUD parcial; ahora también expone una capa backend de soporte operativo para que frontend cierre conciliación y egresos especializados sin inventar contratos.
+- Superficie backend agregada o endurecida:
+  - `GET /api/finance/reconciliation/[id]/candidates`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `GET /api/finance/expenses/meta`
+  - `GET /api/finance/expenses/payroll-candidates`
+  - `POST /api/finance/expenses` ahora también acepta campos especializados de previsión, impuestos y varios
+- Regla operativa vigente:
+  - conciliación sigue siendo ownership de `Finance`; los writes siguen viviendo en `fin_reconciliation_periods`, `fin_bank_statement_rows`, `fin_income` y `fin_expenses`
+  - la integración con `Payroll` sigue siendo read-only desde `Finance`; la nueva superficie de payroll candidates no convierte a `Finance` en source of truth de nómina
+  - los contratos nuevos siguen anclados a `client_id` y `member_id` cuando corresponde
+- Ajuste de consistencia relevante:
+  - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
+
 ## Delta 2026-03-14 Task board reorganization
 - `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.
 - Regla operativa nueva:

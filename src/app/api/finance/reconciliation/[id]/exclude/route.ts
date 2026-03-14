@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { clearReconciliationLink, getReconciliationPeriodContext } from '@/lib/finance/reconciliation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -9,7 +10,6 @@ import {
   normalizeString,
   runFinanceQuery
 } from '@/lib/finance/shared'
-import { clearReconciliationLink } from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,61 +26,67 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const { id: periodId } = await params
     const body = await request.json()
     const rowId = assertNonEmptyString(body.rowId, 'rowId')
+    const notes = body.notes ? normalizeString(body.notes) : null
+
+    const period = await getReconciliationPeriodContext(periodId)
+
+    if (period.status === 'reconciled' || period.status === 'closed') {
+      throw new FinanceValidationError('Cannot exclude rows from a reconciled or closed period.', 409)
+    }
 
     const projectId = getFinanceProjectId()
 
-    // Get current match info before clearing
     const rows = await runFinanceQuery<{
       row_id: string
       matched_type: string | null
       matched_id: string | null
-      match_status: string
     }>(`
-      SELECT row_id, matched_type, matched_id, match_status
+      SELECT row_id, matched_type, matched_id
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
       WHERE row_id = @rowId AND period_id = @periodId
+      LIMIT 1
     `, { rowId, periodId })
-
-    if (rows.length === 0) {
-      return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
-    }
 
     const row = rows[0]
 
-    if (row.match_status === 'unmatched') {
-      return NextResponse.json({ error: 'Row is already unmatched' }, { status: 400 })
+    if (!row) {
+      return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
     }
 
-    const previousType = normalizeString(row.matched_type)
-    const previousId = normalizeString(row.matched_id)
+    const previousMatchedType = normalizeString(row.matched_type)
+    const previousMatchedId = normalizeString(row.matched_id)
 
-    // Clear the match on the statement row
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
-      SET
-        match_status = 'unmatched',
-        matched_type = NULL,
-        matched_id = NULL,
-        match_confidence = NULL,
-        matched_by = NULL,
-        matched_at = NULL
-      WHERE row_id = @rowId AND period_id = @periodId
-    `, { rowId, periodId })
-
-    // Revert reconciliation on the income/expense if it was matched
-    if (previousType && previousId) {
+    if (previousMatchedType && previousMatchedId) {
       await clearReconciliationLink({
-        matchedType: previousType,
-        matchedId: previousId,
+        matchedType: previousMatchedType,
+        matchedId: previousMatchedId,
         rowId
       })
     }
 
-    return NextResponse.json({
-      unmatched: true,
+    await runFinanceQuery(`
+      UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
+      SET
+        match_status = 'excluded',
+        matched_type = NULL,
+        matched_id = NULL,
+        match_confidence = NULL,
+        matched_by = @matchedBy,
+        matched_at = CURRENT_TIMESTAMP(),
+        notes = @notes
+      WHERE row_id = @rowId AND period_id = @periodId
+    `, {
       rowId,
-      previousMatchedType: previousType || null,
-      previousMatchedId: previousId || null
+      periodId,
+      matchedBy: tenant.userId || null,
+      notes
+    })
+
+    return NextResponse.json({
+      excluded: true,
+      rowId,
+      previousMatchedType: previousMatchedType || null,
+      previousMatchedId: previousMatchedId || null
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

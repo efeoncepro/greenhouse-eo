@@ -1,5 +1,17 @@
 # CODEX TASK — Financial Module: Gestión Financiera para Greenhouse
 
+## Estado del brief
+
+Este documento queda como brief histórico de la implementación base de `Finance`.
+
+Estado al `2026-03-14`:
+- el route group `/finance` ya existe en runtime
+- el guard dedicado, sidebar, tablas `fin_*` y la mayor parte de APIs core ya están implementadas
+- los cierres operativos reales ya no deben trabajarse desde este documento greenfield
+
+Brief vigente para continuar el módulo:
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+
 ## Resumen
 
 Implementar el **módulo financiero** en el portal Greenhouse como espacio exclusivo para el equipo de finanzas y administración de Efeonce. Permite registrar ingresos por cobro a clientes, egresos por pago a proveedores (nacionales e internacionales), compensación de empleados, obligaciones previsionales chilenas, impuestos, gastos varios, y conciliar movimientos contra estados de cuenta bancarios.

@@ -40,6 +40,75 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 21:10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Contrastar `Financial Module` con arquitectura, cerrar la capa backend faltante del módulo y reescribir la task activa como `v2` basada en runtime real para handoff con frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/lib/finance/shared.ts`
+- `src/lib/finance/reconciliation.ts`
+- `src/app/api/finance/reconciliation/[id]/route.ts`
+- `src/app/api/finance/reconciliation/[id]/auto-match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/unmatch/route.ts`
+- `src/app/api/finance/reconciliation/[id]/candidates/route.ts`
+- `src/app/api/finance/reconciliation/[id]/exclude/route.ts`
+- `src/app/api/finance/expenses/route.ts`
+- `src/app/api/finance/expenses/meta/route.ts`
+- `src/app/api/finance/expenses/payroll-candidates/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/complete/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/README.md`
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se revisó explícitamente el trabajo contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md`
+- Se cerró backend operativo de conciliación:
+  - `GET /api/finance/reconciliation/[id]/candidates`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `auto-match` ahora también sincroniza estado reconciliado en `fin_income` / `fin_expenses`
+  - `match`, `unmatch` y `exclude` mantienen coherencia entre fila bancaria y target financiero
+  - `GET /api/finance/reconciliation/[id]` ahora expone `matchStatus` normalizado + `rawMatchStatus`
+- Se cerró backend de soporte para egresos especializados:
+  - `POST /api/finance/expenses` ahora también persiste campos de previsión, impuestos y varios
+  - `GET /api/finance/expenses/meta` expone catálogos backend para formularios
+  - `GET /api/finance/expenses/payroll-candidates` expone payroll aprobada/exportada disponible para Finance
+- Se pasó `Financial Module` al mismo patrón documental de Payroll:
+  - `CODEX_TASK_Financial_Module.md` queda como brief histórico
+  - `CODEX_TASK_Financial_Module_v2.md` queda como task activa orientada a runtime/backend + handoff para Claude frontend
+- Se agregó además mini handoff técnico para Claude dentro de `CODEX_TASK_Financial_Module_v2.md` con:
+  - payloads ejemplo por endpoint
+  - orden recomendado de consumo desde frontend
+  - ejemplos concretos para conciliación, payroll, previsión e impuestos
+
+### Verificacion
+- `pnpm exec eslint` sobre los archivos backend tocados: correcto
+- Falta todavía una validación de runtime manual o `pnpm build` completa en este turno
+
+### Riesgos o pendientes
+- El backend ya quedó listo para que Claude monte frontend de conciliación y egresos especializados, pero la UI actual todavía no consume estas rutas nuevas.
+- Queda pendiente confirmar en runtime real:
+  - flujo completo de importación + auto-match + exclude + unmatch
+  - consumo de `expenses/payroll-candidates`
+  - formularios frontend contra `expenses/meta`
+
 ## 2026-03-14 20:17 America/Santiago
 
 ### Agente

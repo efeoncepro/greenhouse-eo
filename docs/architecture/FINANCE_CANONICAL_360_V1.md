@@ -16,7 +16,7 @@ Use this document together with:
 - `project_context.md`
 - `Handoff.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
-- `docs/tasks/in-progress/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
 
 ## Status
 
@@ -29,6 +29,7 @@ Current state:
 - collaborator identity is anchored to `greenhouse.team_members.member_id`
 - reads are enriched from shared Greenhouse, HubSpot, Payroll, and identity tables
 - legacy references are still accepted to avoid breaking existing UI and historical rows
+- reconciliation, payroll-to-expense discovery, and finance form metadata now expose dedicated backend support endpoints without moving writes out of Finance
 
 This is not yet a complete product-wide 360 UI spec.
 It is the runtime contract for the current backend model.
@@ -390,12 +391,17 @@ Still pending or partial:
 
 Key implementation files:
 - `src/lib/finance/canonical.ts`
+- `src/lib/finance/reconciliation.ts`
 - `src/app/api/finance/clients/route.ts`
 - `src/app/api/finance/clients/[id]/route.ts`
 - `src/app/api/finance/clients/sync/route.ts`
 - `src/app/api/finance/income/route.ts`
 - `src/app/api/finance/expenses/route.ts`
 - `src/app/api/finance/expenses/bulk/route.ts`
+- `src/app/api/finance/expenses/meta/route.ts`
+- `src/app/api/finance/expenses/payroll-candidates/route.ts`
+- `src/app/api/finance/reconciliation/[id]/candidates/route.ts`
+- `src/app/api/finance/reconciliation/[id]/exclude/route.ts`
 - `src/lib/people/get-person-finance-overview.ts`
 - `src/app/api/people/[memberId]/finance/route.ts`
 

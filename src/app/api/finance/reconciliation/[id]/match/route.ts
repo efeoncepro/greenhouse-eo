@@ -9,6 +9,7 @@ import {
   normalizeString,
   runFinanceQuery
 } from '@/lib/finance/shared'
+import { clearReconciliationLink, setReconciliationLink } from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,8 +36,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const projectId = getFinanceProjectId()
 
     // Verify the statement row exists and belongs to this period
-    const rows = await runFinanceQuery<{ row_id: string; match_status: string }>(`
-      SELECT row_id, match_status
+    const rows = await runFinanceQuery<{
+      row_id: string
+      match_status: string
+      matched_type: string | null
+      matched_id: string | null
+    }>(`
+      SELECT row_id, match_status, matched_type, matched_id
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
       WHERE row_id = @rowId AND period_id = @periodId
     `, { rowId, periodId })
@@ -49,14 +55,36 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const targetTable = matchedType === 'income' ? 'fin_income' : 'fin_expenses'
     const targetIdCol = matchedType === 'income' ? 'income_id' : 'expense_id'
 
-    const targets = await runFinanceQuery<{ id: string }>(`
-      SELECT ${targetIdCol} AS id
+    const targets = await runFinanceQuery<{
+      id: string
+      is_reconciled: boolean
+      reconciliation_id: string | null
+    }>(`
+      SELECT ${targetIdCol} AS id, is_reconciled, reconciliation_id
       FROM \`${projectId}.greenhouse.${targetTable}\`
       WHERE ${targetIdCol} = @matchedId
     `, { matchedId })
 
     if (targets.length === 0) {
       throw new FinanceValidationError(`${matchedType} record "${matchedId}" not found.`, 404)
+    }
+
+    const target = targets[0]
+
+    if (target.is_reconciled && normalizeString(target.reconciliation_id) !== rowId) {
+      throw new FinanceValidationError(`${matchedType} record "${matchedId}" is already reconciled to another statement row.`, 409)
+    }
+
+    const currentRow = rows[0]
+    const previousMatchedType = normalizeString(currentRow.matched_type)
+    const previousMatchedId = normalizeString(currentRow.matched_id)
+
+    if (previousMatchedType && previousMatchedId && (previousMatchedType !== matchedType || previousMatchedId !== matchedId)) {
+      await clearReconciliationLink({
+        matchedType: previousMatchedType,
+        matchedId: previousMatchedId,
+        rowId
+      })
     }
 
     // Update the statement row
@@ -80,12 +108,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       periodId
     })
 
-    // Mark the income/expense as reconciled
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.${targetTable}\`
-      SET is_reconciled = TRUE, reconciliation_id = @rowId, updated_at = CURRENT_TIMESTAMP()
-      WHERE ${targetIdCol} = @matchedId
-    `, { matchedId, rowId })
+    await setReconciliationLink({
+      matchedType: matchedType as 'income' | 'expense',
+      matchedId,
+      rowId
+    })
 
     return NextResponse.json({
       matched: true,

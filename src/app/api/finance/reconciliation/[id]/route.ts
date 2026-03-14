@@ -12,6 +12,7 @@ import {
   toTimestampString,
   FinanceValidationError
 } from '@/lib/finance/shared'
+import { normalizeMatchStatus } from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -111,7 +112,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       reference: s.reference ? normalizeString(s.reference) : null,
       amount: toNumber(s.amount),
       balance: toNumber(s.balance),
-      matchStatus: normalizeString(s.match_status),
+      matchStatus: normalizeMatchStatus(s.match_status),
+      rawMatchStatus: normalizeString(s.match_status),
       matchedType: s.matched_type ? normalizeString(s.matched_type) : null,
       matchedId: s.matched_id ? normalizeString(s.matched_id) : null,
       matchConfidence: toNumber(s.match_confidence),

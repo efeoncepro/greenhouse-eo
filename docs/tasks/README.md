@@ -13,7 +13,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | Task | Foco |
 | --- | --- |
 | [CODEX_TASK_Admin_Team_Module_v2.md](in-progress/CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
-| [CODEX_TASK_Financial_Module.md](in-progress/CODEX_TASK_Financial_Module.md) | Módulo Finance y sus gaps operativos restantes |
+| [CODEX_TASK_Financial_Module_v2.md](in-progress/CODEX_TASK_Financial_Module_v2.md) | Cierre backend/runtime de Finance y handoff para frontend |
 | [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
 
 ## To Do
@@ -35,6 +35,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Client_Dashboard_Redesign.md](complete/CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
 | [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](complete/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual del dashboard cliente |
 | [CODEX_TASK_Creative_Hub_Module.md](complete/CODEX_TASK_Creative_Hub_Module.md) | Capability module Creative Hub |
+| [CODEX_TASK_Financial_Module.md](complete/CODEX_TASK_Financial_Module.md) | Brief histórico de Finance reemplazado por v2 |
 | [CODEX_TASK_Fix_Team_Capacity_Views.md](complete/CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
 | [CODEX_TASK_Google_SSO_Greenhouse.md](complete/CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
 | [CODEX_TASK_HR_Payroll_Module.md](complete/CODEX_TASK_HR_Payroll_Module.md) | Brief histórico de HR Payroll reemplazado por v2 |

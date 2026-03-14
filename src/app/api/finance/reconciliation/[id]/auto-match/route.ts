@@ -10,6 +10,7 @@ import {
   toDateString,
   FinanceValidationError
 } from '@/lib/finance/shared'
+import { setReconciliationLink } from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -191,7 +192,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
       if (bestMatch && bestMatchCount === 1) {
         const autoMatch = bestMatch.confidence >= 0.85
-        const newStatus = autoMatch ? 'matched' : 'suggested'
+        const newStatus = autoMatch ? 'auto_matched' : 'suggested'
 
         await runFinanceQuery(`
           UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
@@ -212,9 +213,14 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
           matchedBy: autoMatch ? 'auto' : null
         })
 
-        matchedCandidateIds.add(bestMatch.candidate.id)
-
         if (autoMatch) {
+          await setReconciliationLink({
+            matchedType: bestMatch.candidate.type,
+            matchedId: bestMatch.candidate.id,
+            rowId: normalizeString(row.row_id)
+          })
+
+          matchedCandidateIds.add(bestMatch.candidate.id)
           matched++
         } else {
           suggested++
