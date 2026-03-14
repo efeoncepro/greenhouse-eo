@@ -9,10 +9,12 @@ import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
+import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
@@ -233,7 +235,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           | (TenantContactsProvisioningSummary & { error?: string })
           | null
 
-                      if (!response.ok || !payload) {
+        if (!response.ok || !payload) {
           const mergedSummary = mergeTenantContactsProvisioningSummaries(summaries)
           const processedContacts = mergedSummary?.requested || 0
 
@@ -284,33 +286,44 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   const usersKpis = [
     {
       title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_users,
-      value: `${data.activeUsers} / ${data.users.length}`,
-      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_users_subtitle(data.invitedUsers)
+      stats: `${data.activeUsers} / ${data.users.length}`,
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_users_subtitle(data.invitedUsers),
+      avatarIcon: 'tabler-users',
+      avatarColor: 'info' as const
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_business_lines,
-      value: String(businessLines.length),
-      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_business_lines_subtitle
+      stats: String(businessLines.length),
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_business_lines_subtitle,
+      avatarIcon: 'tabler-building',
+      avatarColor: 'primary' as const
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_projects,
-      value: String(data.scopedProjects),
-      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_projects_subtitle(data.notionProjectCount)
+      stats: String(data.scopedProjects),
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_projects_subtitle(data.notionProjectCount),
+      avatarIcon: 'tabler-folders',
+      avatarColor: 'success' as const
     },
     {
       title: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_modules,
-      value: String(serviceModules.length),
-      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_modules_subtitle
+      stats: String(serviceModules.length),
+      subtitle: GH_INTERNAL_MESSAGES.admin_tenant_detail_kpi_modules_subtitle,
+      avatarIcon: 'tabler-puzzle',
+      avatarColor: 'warning' as const
     }
   ]
 
+  // ─── Header ─────────────────────────────────────────────────────────────────
+
   const headerSection = (
     <Grid size={{ xs: 12 }}>
-      <Card>
-        <CardContent>
-          <Grid container spacing={4} alignItems='center'>
-            <Grid size={{ xs: 12, xl: 7 }}>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+          <Grid container spacing={5} alignItems='flex-start'>
+            {/* Identity */}
+            <Grid size={{ xs: 12, lg: 5 }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
                 <IdentityImageUploader
                   alt={data.clientName}
                   currentImageSrc={data.logoUrl ? `/api/media/tenants/${data.clientId}/logo` : undefined}
@@ -328,10 +341,9 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   variant='rounded'
                   color={tenantStatusTone(data.status, data.active)}
                 />
-
                 <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} flexWrap='wrap'>
-                    <Typography variant='h4'>{data.clientName}</Typography>
+                  <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
+                    <Typography variant='h4' sx={{ fontWeight: 700 }}>{data.clientName}</Typography>
                     <Chip
                       size='small'
                       variant='tonal'
@@ -339,89 +351,97 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                       label={toTitleCase(data.active ? data.status : 'inactive')}
                     />
                   </Stack>
-
-                  <Typography color='text.secondary' sx={{ maxWidth: 780 }}>
+                  <Typography variant='body2' color='text.secondary' sx={{ maxWidth: 400, lineHeight: 1.6 }}>
                     {GH_INTERNAL_MESSAGES.admin_tenant_detail_header_summary}
                   </Typography>
-
-                  <Typography variant='body2' color='text.secondary'>
-                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_header_meta(
-                      data.publicId,
-                      data.hubspotCompanyId,
-                      data.timezone,
-                      formatRelativeDate(data.liveHubspot.fetchedAt)
-                    )}
-                  </Typography>
+                  <Stack direction='row' spacing={2} flexWrap='wrap' sx={{ mt: 0.5 }}>
+                    <Typography variant='caption' color='text.disabled' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <i className='tabler-id text-xs' /> {data.publicId}
+                    </Typography>
+                    {data.hubspotCompanyId ? (
+                      <Typography variant='caption' color='text.disabled' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className='tabler-brand-hubspot text-xs' /> {data.hubspotCompanyId}
+                      </Typography>
+                    ) : null}
+                    {data.timezone ? (
+                      <Typography variant='caption' color='text.disabled' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className='tabler-clock text-xs' /> {data.timezone}
+                      </Typography>
+                    ) : null}
+                    <Typography variant='caption' color='text.disabled' sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <i className='tabler-refresh text-xs' /> HubSpot {formatRelativeDate(data.liveHubspot.fetchedAt)}
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Stack>
             </Grid>
 
-            <Grid size={{ xs: 12, xl: 5 }}>
-              <Stack spacing={2.5}>
-                <Grid container spacing={2}>
-                  {usersKpis.map(item => (
-                    <Grid key={item.title} size={{ xs: 6 }}>
-                      <Box
-                        sx={{
-                          p: 2.5,
-                          borderRadius: 3,
-                          border: theme => `1px solid ${theme.palette.divider}`,
-                          backgroundColor: 'background.default',
-                          minHeight: 104
-                        }}
-                      >
-                        <Typography variant='body2' color='text.secondary'>
-                          {item.title}
-                        </Typography>
-                        <Typography variant='h4' sx={{ mt: 1 }}>
-                          {item.value}
-                        </Typography>
-                        <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-                          {item.subtitle}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
+            {/* KPIs */}
+            <Grid size={{ xs: 12, lg: 5 }}>
+              <Grid container spacing={3}>
+                {usersKpis.map(kpi => (
+                  <Grid key={kpi.title} size={{ xs: 6 }}>
+                    <HorizontalWithSubtitle
+                      title={kpi.title}
+                      stats={kpi.stats}
+                      avatarIcon={kpi.avatarIcon}
+                      avatarColor={kpi.avatarColor}
+                      trend='neutral'
+                      trendNumber='0'
+                      subtitle={kpi.subtitle}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent='flex-end' alignItems={{ xs: 'stretch', sm: 'center' }}>
-                  <Button component={Link} href={`/admin/tenants/${data.clientId}/view-as/dashboard`} variant='contained'>
-                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_view_as_client}
-                  </Button>
-                  <Button
-                    variant='tonal'
-                    color='warning'
-                    onClick={handleCapabilitySave}
-                    disabled={isSavingCapabilities}
-                    startIcon={isSavingCapabilities ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
-                  >
-                    {GH_INTERNAL_MESSAGES.admin_tenant_detail_save_manual}
-                  </Button>
-                  <OptionMenu
-                    iconButtonProps={{ size: 'medium' }}
-                    options={[
-                      {
-                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_refresh_hubspot,
-                        icon: <i className='tabler-refresh text-base' />,
-                        menuItemProps: {
-                          className: 'flex items-center gap-2 text-textSecondary',
-                          onClick: handleHubSpotRefresh
-                        }
-                      },
-                      {
-                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_open_preview,
-                        icon: <i className='tabler-external-link text-base' />,
-                        href: `/admin/tenants/${data.clientId}/view-as/dashboard`,
-                        menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
-                      },
-                      {
-                        text: GH_INTERNAL_MESSAGES.admin_tenant_detail_deactivate_space,
-                        icon: <i className='tabler-user-off text-base' />,
-                        menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
+            {/* Actions */}
+            <Grid size={{ xs: 12, lg: 2 }}>
+              <Stack spacing={1.5} alignItems={{ xs: 'flex-start', lg: 'flex-end' }}>
+                <Button
+                  component={Link}
+                  href={`/admin/tenants/${data.clientId}/view-as/dashboard`}
+                  variant='contained'
+                  fullWidth
+                  sx={{ maxWidth: 200 }}
+                >
+                  {GH_INTERNAL_MESSAGES.admin_tenant_detail_view_as_client}
+                </Button>
+                <Button
+                  variant='tonal'
+                  color='warning'
+                  fullWidth
+                  sx={{ maxWidth: 200 }}
+                  onClick={handleCapabilitySave}
+                  disabled={isSavingCapabilities}
+                  startIcon={isSavingCapabilities ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
+                >
+                  {GH_INTERNAL_MESSAGES.admin_tenant_detail_save_manual}
+                </Button>
+                <OptionMenu
+                  iconButtonProps={{ size: 'medium' }}
+                  options={[
+                    {
+                      text: GH_INTERNAL_MESSAGES.admin_tenant_detail_refresh_hubspot,
+                      icon: <i className='tabler-refresh text-base' />,
+                      menuItemProps: {
+                        className: 'flex items-center gap-2 text-textSecondary',
+                        onClick: handleHubSpotRefresh
                       }
-                    ]}
-                  />
-                </Stack>
+                    },
+                    {
+                      text: GH_INTERNAL_MESSAGES.admin_tenant_detail_open_preview,
+                      icon: <i className='tabler-external-link text-base' />,
+                      href: `/admin/tenants/${data.clientId}/view-as/dashboard`,
+                      menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
+                    },
+                    {
+                      text: GH_INTERNAL_MESSAGES.admin_tenant_detail_deactivate_space,
+                      icon: <i className='tabler-user-off text-base' />,
+                      menuItemProps: { className: 'flex items-center gap-2 text-textSecondary', disabled: true }
+                    }
+                  ]}
+                />
               </Stack>
             </Grid>
           </Grid>
@@ -430,191 +450,259 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
     </Grid>
   )
 
+  // ─── Capabilities tab ────────────────────────────────────────────────────────
+
   const capabilitiesPanel = (
     <Grid container spacing={6}>
+      {/* Business Lines */}
       <Grid size={{ xs: 12 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
+                <i className='tabler-building text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_title}
+            subheader={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_subtitle}
+            titleTypographyProps={{ variant: 'h5' }}
+            subheaderTypographyProps={{ variant: 'body2' }}
+          />
+          <Divider />
           <CardContent>
-            <Stack spacing={3}>
-              <Box>
-                <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_title}</Typography>
-                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_subtitle}
-                </Typography>
-              </Box>
-              <Grid container spacing={3}>
-                {businessLineCards.map(({ capability, palette }) => (
-                  <Grid key={capability.moduleCode} size={{ xs: 12, md: 6, xl: 3 }}>
-                    <Box
-                      sx={{
-                        p: 3,
-                        height: '100%',
-                        borderRadius: 4,
-                        border: `1px solid ${palette.soft}`,
-                        background: `linear-gradient(180deg, ${palette.soft} 0%, rgba(255,255,255,0) 100%)`
-                      }}
-                    >
-                      <Stack spacing={2}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
-                          <Box>
-                            <Box sx={{ minHeight: 28, display: 'flex', alignItems: 'center' }}>
-                              <BrandWordmark brand={capability.moduleLabel} height={22} maxWidth={110} />
-                            </Box>
-                            <Typography variant='body2' color='text.secondary'>
-                              {capability.publicModuleId}
-                            </Typography>
+            <Grid container spacing={3}>
+              {businessLineCards.map(({ capability, palette }) => (
+                <Grid key={capability.moduleCode} size={{ xs: 12, md: 6, xl: 3 }}>
+                  <Box
+                    sx={{
+                      p: 3,
+                      height: '100%',
+                      borderRadius: 3,
+                      borderLeft: `4px solid ${palette.accent}`,
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      borderLeftColor: palette.accent,
+                      bgcolor: 'background.paper',
+                      transition: 'box-shadow 0.2s',
+                      '&:hover': { boxShadow: 2 }
+                    }}
+                  >
+                    <Stack spacing={2.5}>
+                      <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
+                        <Stack spacing={0.5}>
+                          <Box sx={{ minHeight: 26, display: 'flex', alignItems: 'center' }}>
+                            <BrandWordmark brand={capability.moduleLabel} height={20} maxWidth={110} />
                           </Box>
-                          <BusinessLineBadge brand={palette.label} height={16} />
+                          <Typography variant='caption' color='text.disabled'>
+                            {capability.publicModuleId}
+                          </Typography>
                         </Stack>
-                        <Stack direction='row' gap={1} flexWrap='wrap'>
-                          <Chip
-                            size='small'
-                            variant='tonal'
-                            color={capability.selected ? 'success' : 'secondary'}
-                            label={
-                              capability.selected
-                                ? GH_INTERNAL_MESSAGES.admin_tenant_capability_state_active
-                                : GH_INTERNAL_MESSAGES.admin_tenant_capability_state_available
-                            }
-                          />
-                          <Chip
-                            size='small'
-                            variant='outlined'
-                            color={getCapabilitySourceTone(capability)}
-                            label={getCapabilitySourceLabel(capability)}
-                          />
-                        </Stack>
-                        <Typography variant='body2' color='text.secondary'>
-                          {capability.description || GH_INTERNAL_MESSAGES.admin_tenant_capability_description_empty}
-                        </Typography>
+                        <BusinessLineBadge brand={palette.label} height={15} />
                       </Stack>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Stack>
+                      <Stack direction='row' gap={1} flexWrap='wrap'>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={capability.selected ? 'success' : 'secondary'}
+                          label={
+                            capability.selected
+                              ? GH_INTERNAL_MESSAGES.admin_tenant_capability_state_active
+                              : GH_INTERNAL_MESSAGES.admin_tenant_capability_state_available
+                          }
+                        />
+                        <Chip
+                          size='small'
+                          variant='outlined'
+                          color={getCapabilitySourceTone(capability)}
+                          label={getCapabilitySourceLabel(capability)}
+                        />
+                      </Stack>
+                      <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.6 }}>
+                        {capability.description || GH_INTERNAL_MESSAGES.admin_tenant_capability_description_empty}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
           </CardContent>
         </Card>
       </Grid>
 
+      {/* Service Modules + Feature Flags + Registry */}
       <Grid size={{ xs: 12, xl: 8 }}>
-        <Card>
-          <CardContent sx={{ pb: 0 }}>
-            <Stack spacing={1}>
-              <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_title}</Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_subtitle}
-              </Typography>
-            </Stack>
-          </CardContent>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'success.main', width: 36, height: 36 }}>
+                <i className='tabler-puzzle text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_title}
+            subheader={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_service_modules_subtitle}
+            titleTypographyProps={{ variant: 'h5' }}
+            subheaderTypographyProps={{ variant: 'body2' }}
+          />
+          <Divider />
           <TenantServiceModulesTable capabilities={capabilities} />
         </Card>
       </Grid>
 
       <Grid size={{ xs: 12, xl: 4 }}>
-        <Card>
-          <CardContent>
-            <Stack spacing={3}>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_title}</Typography>
-              <Stack direction='row' gap={1} flexWrap='wrap'>
-                {data.featureFlags.map(flag => (
-                  <Chip
-                    key={flag.featureCode}
-                    size='small'
-                    color={flagTone(flag.status)}
-                    variant='tonal'
-                    label={flag.featureCode}
-                  />
-                ))}
-                {data.featureFlags.length === 0 ? (
-                  <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_empty}</Typography>
-                ) : null}
-              </Stack>
-              <Divider />
-              <Box>
+        <Stack spacing={4} sx={{ height: '100%' }}>
+          {/* Feature Flags */}
+          <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, flexGrow: 1 }}>
+            <CardHeader
+              avatar={
+                <Avatar variant='rounded' sx={{ bgcolor: 'warning.main', width: 36, height: 36 }}>
+                  <i className='tabler-flag text-lg' />
+                </Avatar>
+              }
+              title={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_title}
+              titleTypographyProps={{ variant: 'h6' }}
+            />
+            <Divider />
+            <CardContent>
+              {data.featureFlags.length === 0 ? (
                 <Typography variant='body2' color='text.secondary'>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record}
+                  {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_feature_flags_empty}
                 </Typography>
-                <Typography color='text.primary' sx={{ mt: 1 }}>
-                  {data.hubspotCompanyId ? `EO-${data.hubspotCompanyId}` : GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record_empty}
-                </Typography>
-              </Box>
-            </Stack>
-          </CardContent>
-        </Card>
+              ) : (
+                <Stack direction='row' gap={1} flexWrap='wrap'>
+                  {data.featureFlags.map(flag => (
+                    <Chip
+                      key={flag.featureCode}
+                      size='small'
+                      color={flagTone(flag.status)}
+                      variant='tonal'
+                      label={flag.featureCode}
+                    />
+                  ))}
+                </Stack>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Company Record */}
+          <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+            <CardHeader
+              avatar={
+                <Avatar variant='rounded' sx={{ bgcolor: 'info.main', width: 36, height: 36 }}>
+                  <i className='tabler-brand-hubspot text-lg' />
+                </Avatar>
+              }
+              title={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record}
+              titleTypographyProps={{ variant: 'h6' }}
+            />
+            <Divider />
+            <CardContent>
+              <Typography variant='body2' color={data.hubspotCompanyId ? 'text.primary' : 'text.secondary'}>
+                {data.hubspotCompanyId ? `EO-${data.hubspotCompanyId}` : GH_INTERNAL_MESSAGES.admin_tenant_capabilities_company_record_empty}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Stack>
       </Grid>
 
+      {/* Governance Manager */}
       <Grid size={{ xs: 12 }}>
-        <Accordion disableGutters defaultExpanded>
-          <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
-            <Box>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_title}</Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_subtitle}
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails sx={{ pt: 0 }}>
-            <TenantCapabilityManager
-              ref={capabilityManagerRef}
-              clientId={data.clientId}
-              hubspotCompanyId={data.hubspotCompanyId}
-              initialCapabilities={data.capabilities}
-              onCapabilitiesChange={setCapabilities}
-            />
-          </AccordionDetails>
-        </Accordion>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <Accordion disableGutters elevation={0} defaultExpanded sx={{ '&:before': { display: 'none' } }}>
+            <AccordionSummary
+              expandIcon={<i className='tabler-chevron-down' />}
+              sx={{ px: 4, py: 2 }}
+            >
+              <Stack direction='row' spacing={2} alignItems='center'>
+                <Avatar variant='rounded' sx={{ bgcolor: 'secondary.main', width: 36, height: 36 }}>
+                  <i className='tabler-adjustments text-lg' />
+                </Avatar>
+                <Box>
+                  <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_title}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_INTERNAL_MESSAGES.admin_tenant_capabilities_edit_subtitle}
+                  </Typography>
+                </Box>
+              </Stack>
+            </AccordionSummary>
+            <Divider />
+            <AccordionDetails sx={{ p: 4 }}>
+              <TenantCapabilityManager
+                ref={capabilityManagerRef}
+                clientId={data.clientId}
+                hubspotCompanyId={data.hubspotCompanyId}
+                initialCapabilities={data.capabilities}
+                onCapabilitiesChange={setCapabilities}
+              />
+            </AccordionDetails>
+          </Accordion>
+        </Card>
       </Grid>
     </Grid>
   )
 
+  // ─── CRM tab ─────────────────────────────────────────────────────────────────
+
   const crmPanel = (
     <Grid container spacing={6}>
+      {/* CRM Config */}
       <Grid size={{ xs: 12 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'error.main', width: 36, height: 36 }}>
+                <i className='tabler-building-store text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_crm_config_title}
+            subheader={GH_INTERNAL_MESSAGES.admin_tenant_crm_config_subtitle}
+            titleTypographyProps={{ variant: 'h5' }}
+            subheaderTypographyProps={{ variant: 'body2' }}
+          />
+          <Divider />
           <CardContent>
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
               <Grid size={{ xs: 12, lg: 8 }}>
-                <Stack spacing={3}>
-                  <Box>
-                    <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_config_title}</Typography>
-                    <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                      {GH_INTERNAL_MESSAGES.admin_tenant_crm_config_subtitle}
-                    </Typography>
-                  </Box>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
-                        <Typography variant='body2' color='text.secondary'>
+                <Grid container spacing={3}>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>
                           {GH_INTERNAL_MESSAGES.admin_tenant_crm_business_lines}
                         </Typography>
-                        <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.5 }}>
+                        <Stack direction='row' gap={1} flexWrap='wrap'>
                           {businessLines.map(capability => (
                             <BusinessLineBadge key={capability.moduleCode} brand={capability.moduleLabel} />
                           ))}
-                          {businessLines.length === 0 ? <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_business_lines_empty}</Typography> : null}
+                          {businessLines.length === 0 ? (
+                            <Typography variant='body2' color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_business_lines_empty}</Typography>
+                          ) : null}
                         </Stack>
-                      </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
-                        <Typography variant='body2' color='text.secondary'>
+                      </Stack>
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>
                           {GH_INTERNAL_MESSAGES.admin_tenant_crm_service_modules}
                         </Typography>
-                        <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.5 }}>
+                        <Stack direction='row' gap={1} flexWrap='wrap'>
                           {serviceModules.map(capability => (
                             <Chip key={capability.moduleCode} size='small' variant='outlined' label={capability.moduleLabel} />
                           ))}
-                          {serviceModules.length === 0 ? <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_service_modules_empty}</Typography> : null}
+                          {serviceModules.length === 0 ? (
+                            <Typography variant='body2' color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_service_modules_empty}</Typography>
+                          ) : null}
                         </Stack>
-                      </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                      <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}` }}>
-                        <Typography variant='body2' color='text.secondary'>
+                      </Stack>
+                    </Box>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Box sx={{ p: 3, borderRadius: 3, border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>
                           {GH_INTERNAL_MESSAGES.admin_tenant_crm_lifecycle}
                         </Typography>
-                        <Typography variant='h6' sx={{ mt: 1.5 }}>
+                        <Typography variant='h6' sx={{ fontWeight: 600 }}>
                           {liveCompany?.lifecycle.lifecyclestage
                             ? toTitleCase(liveCompany.lifecycle.lifecyclestage)
                             : GH_INTERNAL_MESSAGES.admin_tenant_crm_lifecycle_empty}
@@ -622,10 +710,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         <Typography variant='body2' color='text.secondary'>
                           {liveCompany?.lifecycle.hs_current_customer || liveMode}
                         </Typography>
-                      </Box>
-                    </Grid>
+                      </Stack>
+                    </Box>
                   </Grid>
-                </Stack>
+                </Grid>
               </Grid>
 
               <Grid size={{ xs: 12, lg: 4 }}>
@@ -651,79 +739,63 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         </Card>
       </Grid>
 
+      {/* Contact Reconciliation */}
       <Grid size={{ xs: 12 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'info.main', width: 36, height: 36 }}>
+                <i className='tabler-users text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_title}
+            subheader={GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_subtitle}
+            titleTypographyProps={{ variant: 'h5' }}
+            subheaderTypographyProps={{ variant: 'body2' }}
+            action={
+              <Stack direction='row' gap={1} flexWrap='wrap' alignItems='center' sx={{ pt: 1, pr: 1 }}>
+                <Chip size='small' variant='tonal' color='info' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_hubspot(liveContacts.length)} />
+                <Chip size='small' variant='outlined' color='success' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_reconciled(provisionedLiveContacts.length)} />
+                <Chip size='small' variant='outlined' color='warning' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_pending(missingLiveContacts.length)} />
+                {ambiguousLiveContacts.length > 0 ? (
+                  <Chip size='small' variant='outlined' color='error' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_ambiguous(ambiguousLiveContacts.length)} />
+                ) : null}
+                {contactsWithoutEmail.length > 0 ? (
+                  <Chip size='small' variant='outlined' color='secondary' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_no_email(contactsWithoutEmail.length)} />
+                ) : null}
+                <Button
+                  variant='contained'
+                  color='warning'
+                  size='small'
+                  disabled={
+                    isProvisioningContacts ||
+                    missingLiveContacts.length === 0 ||
+                    !data.liveHubspot.serviceConfigured ||
+                    hasFriendlyHubspotError
+                  }
+                  onClick={handleProvisionMissingContacts}
+                  startIcon={isProvisioningContacts ? <CircularProgress color='inherit' size={14} /> : <i className='tabler-user-plus' />}
+                >
+                  {isProvisioningContacts
+                    ? GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_progress(
+                        provisionProgress?.processedContacts || 0,
+                        provisionProgress?.totalContacts || missingLiveContacts.length
+                      )
+                    : GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_action(missingLiveContacts.length)}
+                </Button>
+              </Stack>
+            }
+          />
+          <Divider />
           <CardContent>
             <Stack spacing={3}>
-              <Stack direction={{ xs: 'column', xl: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', xl: 'center' }}>
-                <Box>
-                  <Typography variant='h5'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_title}</Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ mt: 0.75 }}>
-                    {GH_INTERNAL_MESSAGES.admin_tenant_crm_contacts_subtitle}
-                  </Typography>
-                </Box>
-                <Stack direction={{ xs: 'column', md: 'row' }} gap={1} flexWrap='wrap'>
-                  <Chip size='small' variant='tonal' color='info' label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_hubspot(liveContacts.length)} />
-                  <Chip
-                    size='small'
-                    variant='outlined'
-                    color='success'
-                    label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_reconciled(provisionedLiveContacts.length)}
-                  />
-                  <Chip
-                    size='small'
-                    variant='outlined'
-                    color='warning'
-                    label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_pending(missingLiveContacts.length)}
-                  />
-                  {ambiguousLiveContacts.length > 0 ? (
-                    <Chip
-                      size='small'
-                      variant='outlined'
-                      color='error'
-                      label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_ambiguous(ambiguousLiveContacts.length)}
-                    />
-                  ) : null}
-                  {contactsWithoutEmail.length > 0 ? (
-                    <Chip
-                      size='small'
-                      variant='outlined'
-                      color='secondary'
-                      label={GH_INTERNAL_MESSAGES.admin_tenant_crm_chip_no_email(contactsWithoutEmail.length)}
-                    />
-                  ) : null}
-                  <Button
-                    variant='contained'
-                    color='warning'
-                    disabled={
-                      isProvisioningContacts ||
-                      missingLiveContacts.length === 0 ||
-                      !data.liveHubspot.serviceConfigured ||
-                      hasFriendlyHubspotError
-                    }
-                    onClick={handleProvisionMissingContacts}
-                    startIcon={isProvisioningContacts ? <CircularProgress color='inherit' size={16} /> : <i className='tabler-user-plus' />}
-                  >
-                    {isProvisioningContacts
-                      ? GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_progress(
-                          provisionProgress?.processedContacts || 0,
-                          provisionProgress?.totalContacts || missingLiveContacts.length
-                        )
-                      : GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_action(missingLiveContacts.length)}
-                  </Button>
-                </Stack>
-              </Stack>
-
               <Alert severity='info'>
-                {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_info} {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_batches(
-                  MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE
-                )}
+                {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_info}{' '}
+                {GH_INTERNAL_MESSAGES.admin_tenant_crm_provision_batches(MAX_TENANT_CONTACT_PROVISIONING_BATCH_SIZE)}
               </Alert>
 
               {duplicateUsersByEmail.length > 0 || ambiguousLiveContacts.length > 0 ? (
-                <Alert severity='warning'>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciliation_warning}
-                </Alert>
+                <Alert severity='warning'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_reconciliation_warning}</Alert>
               ) : null}
 
               {provisionProgress ? (
@@ -911,84 +983,93 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         </Card>
       </Grid>
 
+      {/* HubSpot Raw Read */}
       <Grid size={{ xs: 12 }}>
-        <Accordion>
-          <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
-            <Box>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_title}</Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_subtitle}
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile}</Typography>
-                      <Typography color='text.primary'>{liveCompany?.identity.name || GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile_empty}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {liveCompany?.identity.domain || '--'} | {liveCompany?.identity.industry || '--'}
-                      </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {liveCompany?.identity.city || '--'}, {liveCompany?.identity.country || '--'}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_owner}</Typography>
-                      <Typography color='text.primary'>{liveOwner?.ownerDisplayName || GH_INTERNAL_MESSAGES.admin_tenant_crm_owner_empty}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {liveOwner?.ownerEmail || '--'}
-                      </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        HubSpot owner ID: {liveOwner?.hubspotOwnerId || liveCompany?.owner.hubspotOwnerId || '--'}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={1.5}>
-                      <Typography variant='subtitle1'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_sync}</Typography>
-                      <Stack direction='row' gap={1} flexWrap='wrap'>
-                        <Chip
-                          size='small'
-                          variant='tonal'
-                          color={data.liveHubspot.serviceConfigured ? 'success' : 'secondary'}
-                          label={
-                            data.liveHubspot.serviceConfigured
-                              ? GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_connected
-                              : GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_disconnected
-                          }
-                        />
-                        <Chip size='small' variant='outlined' color={liveIsRealtime ? 'success' : 'warning'} label={liveIsRealtime ? 'Realtime' : liveMode} />
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <Accordion disableGutters elevation={0} sx={{ '&:before': { display: 'none' } }}>
+            <AccordionSummary expandIcon={<i className='tabler-chevron-down' />} sx={{ px: 4, py: 2 }}>
+              <Stack direction='row' spacing={2} alignItems='center'>
+                <Avatar variant='rounded' sx={{ bgcolor: 'secondary.main', width: 36, height: 36 }}>
+                  <i className='tabler-database text-lg' />
+                </Avatar>
+                <Box>
+                  <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_title}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_INTERNAL_MESSAGES.admin_tenant_crm_hubspot_read_subtitle}
+                  </Typography>
+                </Box>
+              </Stack>
+            </AccordionSummary>
+            <Divider />
+            <AccordionDetails sx={{ p: 4 }}>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Card variant='outlined'>
+                    <CardContent>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile}</Typography>
+                        <Typography color='text.primary'>{liveCompany?.identity.name || GH_INTERNAL_MESSAGES.admin_tenant_crm_company_profile_empty}</Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          {liveCompany?.identity.domain || '--'} · {liveCompany?.identity.industry || '--'}
+                        </Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          {liveCompany?.identity.city || '--'}, {liveCompany?.identity.country || '--'}
+                        </Typography>
                       </Stack>
-                      <Typography variant='body2' color='text.secondary'>
-                        {GH_INTERNAL_MESSAGES.admin_tenant_crm_last_read(formatDateTime(data.liveHubspot.fetchedAt))}
-                      </Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {GH_INTERNAL_MESSAGES.admin_tenant_crm_base_url(data.liveHubspot.serviceBaseUrl || '--')}
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Card variant='outlined'>
+                    <CardContent>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_owner}</Typography>
+                        <Typography color='text.primary'>{liveOwner?.ownerDisplayName || GH_INTERNAL_MESSAGES.admin_tenant_crm_owner_empty}</Typography>
+                        <Typography variant='body2' color='text.secondary'>{liveOwner?.ownerEmail || '--'}</Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          HubSpot owner ID: {liveOwner?.hubspotOwnerId || liveCompany?.owner.hubspotOwnerId || '--'}
+                        </Typography>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Card variant='outlined'>
+                    <CardContent>
+                      <Stack spacing={1.5}>
+                        <Typography variant='overline' color='text.disabled'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_sync}</Typography>
+                        <Stack direction='row' gap={1} flexWrap='wrap'>
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={data.liveHubspot.serviceConfigured ? 'success' : 'secondary'}
+                            label={
+                              data.liveHubspot.serviceConfigured
+                                ? GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_connected
+                                : GH_INTERNAL_MESSAGES.admin_tenant_crm_sync_disconnected
+                            }
+                          />
+                          <Chip size='small' variant='outlined' color={liveIsRealtime ? 'success' : 'warning'} label={liveIsRealtime ? 'Realtime' : liveMode} />
+                        </Stack>
+                        <Typography variant='body2' color='text.secondary'>
+                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_last_read(formatDateTime(data.liveHubspot.fetchedAt))}
+                        </Typography>
+                        <Typography variant='body2' color='text.secondary'>
+                          {GH_INTERNAL_MESSAGES.admin_tenant_crm_base_url(data.liveHubspot.serviceBaseUrl || '--')}
+                        </Typography>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
               </Grid>
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
+            </AccordionDetails>
+          </Accordion>
+        </Card>
       </Grid>
     </Grid>
   )
+
+  // ─── Projects tab ─────────────────────────────────────────────────────────────
 
   const projectsPanel = (
     <Grid container spacing={6}>
@@ -1021,16 +1102,14 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
           <Grid container spacing={3}>
             {data.projects.map(project => (
               <Grid key={project.projectId} size={{ xs: 12, md: 4 }}>
-                <Card>
+                <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
                   <CardContent>
                     <Stack spacing={2}>
                       <Stack direction='row' justifyContent='space-between' gap={2}>
                         <Typography variant='h6'>{project.projectName}</Typography>
                         <Chip size='small' variant='outlined' label={GH_INTERNAL_MESSAGES.admin_tenant_projects_users(project.assignedUsers)} />
                       </Stack>
-                      <Typography variant='body2' color='text.secondary'>
-                        {project.projectId}
-                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>{project.projectId}</Typography>
                       {project.pageUrl ? (
                         <Button component={Link} href={project.pageUrl} target='_blank' variant='text' sx={{ px: 0, width: 'fit-content' }}>
                           {GH_INTERNAL_MESSAGES.admin_tenant_projects_open_source}
@@ -1047,7 +1126,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
 
       {data.projects.length > 3 ? (
         <Grid size={{ xs: 12 }}>
-          <Card>
+          <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
             <CardContent>
               <TableContainer>
                 <Table>
@@ -1075,12 +1154,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                         <TableCell>{project.projectId}</TableCell>
                         <TableCell>{project.assignedUsers}</TableCell>
                         <TableCell>
-                          <Chip
-                            size='small'
-                            variant='tonal'
-                            color='info'
-                            label={GH_INTERNAL_MESSAGES.admin_tenant_projects_state_scoped}
-                          />
+                          <Chip size='small' variant='tonal' color='info' label={GH_INTERNAL_MESSAGES.admin_tenant_projects_state_scoped} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1094,13 +1168,24 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
     </Grid>
   )
 
+  // ─── Settings tab ─────────────────────────────────────────────────────────────
+
   const settingsPanel = (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12, xl: 4 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
+                <i className='tabler-id text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_settings_identity_title}
+            titleTypographyProps={{ variant: 'h6' }}
+          />
+          <Divider />
           <CardContent>
-            <Stack spacing={2.5}>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_identity_title}</Typography>
+            <Stack spacing={3}>
               {[
                 [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_space_id, data.publicId],
                 [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_internal_key, data.clientId],
@@ -1109,10 +1194,10 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 [GH_INTERNAL_MESSAGES.admin_tenant_settings_label_timezone, data.timezone || '--']
               ].map(([label, value]) => (
                 <Box key={label}>
-                  <Typography variant='body2' color='text.secondary'>
+                  <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
                     {label}
                   </Typography>
-                  <Typography color='text.primary'>{value}</Typography>
+                  <Typography color='text.primary' sx={{ mt: 0.5, fontFamily: 'monospace', fontSize: '0.8rem' }}>{value}</Typography>
                 </Box>
               ))}
             </Stack>
@@ -1121,10 +1206,19 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
       </Grid>
 
       <Grid size={{ xs: 12, xl: 4 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'success.main', width: 36, height: 36 }}>
+                <i className='tabler-users text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_settings_access_title}
+            titleTypographyProps={{ variant: 'h6' }}
+          />
+          <Divider />
           <CardContent>
-            <Stack spacing={2.5}>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_access_title}</Typography>
+            <Stack spacing={3}>
               <HorizontalWithSubtitle
                 title={GH_INTERNAL_MESSAGES.admin_tenant_settings_active_users}
                 stats={String(data.activeUsers)}
@@ -1149,10 +1243,19 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
       </Grid>
 
       <Grid size={{ xs: 12, xl: 4 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}`, height: '100%' }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'info.main', width: 36, height: 36 }}>
+                <i className='tabler-brand-hubspot text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_settings_company_record_title}
+            titleTypographyProps={{ variant: 'h6' }}
+          />
+          <Divider />
           <CardContent>
-            <Stack spacing={2.5}>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_company_record_title}</Typography>
+            <Stack spacing={3}>
               <Stack direction='row' gap={1} flexWrap='wrap'>
                 <Chip
                   size='small'
@@ -1166,52 +1269,51 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 />
                 <Chip size='small' variant='outlined' color={liveIsRealtime ? 'success' : 'warning'} label={liveIsRealtime ? 'Realtime' : liveMode} />
               </Stack>
-              <Box>
-                <Typography variant='body2' color='text.secondary'>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_live_sync}
-                </Typography>
-                <Typography color='text.primary'>{formatDateTime(data.liveHubspot.fetchedAt)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='body2' color='text.secondary'>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_tenant_updated}
-                </Typography>
-                <Typography color='text.primary'>{formatDateTime(data.updatedAt)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='body2' color='text.secondary'>
-                  {GH_INTERNAL_MESSAGES.admin_tenant_settings_created}
-                </Typography>
-                <Typography color='text.primary'>{formatDateTime(data.createdAt)}</Typography>
-              </Box>
+              {[
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_live_sync, formatDateTime(data.liveHubspot.fetchedAt)],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_tenant_updated, formatDateTime(data.updatedAt)],
+                [GH_INTERNAL_MESSAGES.admin_tenant_settings_created, formatDateTime(data.createdAt)]
+              ].map(([label, value]) => (
+                <Box key={label}>
+                  <Typography variant='caption' color='text.disabled' sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600 }}>
+                    {label}
+                  </Typography>
+                  <Typography color='text.primary' sx={{ mt: 0.5 }}>{value}</Typography>
+                </Box>
+              ))}
             </Stack>
           </CardContent>
         </Card>
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Card>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardHeader
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'secondary.main', width: 36, height: 36 }}>
+                <i className='tabler-notes text-lg' />
+              </Avatar>
+            }
+            title={GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_title}
+            titleTypographyProps={{ variant: 'h6' }}
+          />
+          <Divider />
           <CardContent>
-            <Stack spacing={2}>
-              <Typography variant='h6'>{GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_title}</Typography>
-              <CustomTextField
-                multiline
-                minRows={4}
-                fullWidth
-                value={displayNote || GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_empty}
-                slotProps={{
-                  input: {
-                    readOnly: true
-                  }
-                }}
-                helperText={GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_helper}
-              />
-            </Stack>
+            <CustomTextField
+              multiline
+              minRows={4}
+              fullWidth
+              value={displayNote || GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_empty}
+              slotProps={{ input: { readOnly: true } }}
+              helperText={GH_INTERNAL_MESSAGES.admin_tenant_settings_notes_helper}
+            />
           </CardContent>
         </Card>
       </Grid>
     </Grid>
   )
+
+  // ─── Root ─────────────────────────────────────────────────────────────────────
 
   return (
     <Grid container spacing={6}>
@@ -1221,28 +1323,17 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         <TabContext value={activeTab}>
           <Grid container spacing={6}>
             <Grid size={{ xs: 12 }}>
-              <CustomTabList onChange={(_, value) => setActiveTab(value)} variant='scrollable' pill='true'>
-                <Tab
-                  icon={<i className='tabler-puzzle' />}
-                  value='capabilities'
-                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_capabilities}
-                  iconPosition='start'
-                />
-                <Tab icon={<i className='tabler-users' />} value='usuarios' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_users} iconPosition='start' />
-                <Tab icon={<i className='tabler-building' />} value='crm' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_crm} iconPosition='start' />
-                <Tab
-                  icon={<i className='tabler-folder' />}
-                  value='proyectos'
-                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_projects}
-                  iconPosition='start'
-                />
-                <Tab
-                  icon={<i className='tabler-settings' />}
-                  value='configuracion'
-                  label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_settings}
-                  iconPosition='start'
-                />
-              </CustomTabList>
+              <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+                <CardContent sx={{ py: 0, '&:last-child': { pb: 0 } }}>
+                  <CustomTabList onChange={(_, value) => setActiveTab(value)} variant='scrollable' pill='true'>
+                    <Tab icon={<i className='tabler-puzzle' />} value='capabilities' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_capabilities} iconPosition='start' />
+                    <Tab icon={<i className='tabler-users' />} value='usuarios' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_users} iconPosition='start' />
+                    <Tab icon={<i className='tabler-building' />} value='crm' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_crm} iconPosition='start' />
+                    <Tab icon={<i className='tabler-folder' />} value='proyectos' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_projects} iconPosition='start' />
+                    <Tab icon={<i className='tabler-settings' />} value='configuracion' label={GH_INTERNAL_MESSAGES.admin_tenant_tabs_settings} iconPosition='start' />
+                  </CustomTabList>
+                </CardContent>
+              </Card>
             </Grid>
 
             <Grid size={{ xs: 12 }}>
