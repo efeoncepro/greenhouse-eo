@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,6 +51,7 @@ const ClientsListView = () => {
   const [search, setSearch] = useState('')
   const [poFilter, setPoFilter] = useState('')
   const [hesFilter, setHesFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchClients = useCallback(async () => {
     setLoading(true)
@@ -126,14 +128,33 @@ const ClientsListView = () => {
             Perfil financiero de clientes
           </Typography>
         </Box>
-        <Button
-          variant='contained'
-          color='primary'
-          startIcon={<i className='tabler-plus' />}
-          href='/finance/clients'
-        >
-          Nuevo perfil
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button
+            variant='outlined'
+            color='info'
+            startIcon={<i className='tabler-refresh' />}
+            onClick={async () => {
+              const res = await fetch('/api/finance/clients/sync', { method: 'POST' })
+
+              if (res.ok) {
+                const data = await res.json()
+
+                alert(data.message)
+                fetchClients()
+              }
+            }}
+          >
+            Sincronizar clientes
+          </Button>
+          <Button
+            variant='contained'
+            color='primary'
+            startIcon={<i className='tabler-plus' />}
+            onClick={() => setDrawerOpen(true)}
+          >
+            Nuevo perfil
+          </Button>
+        </Box>
       </Box>
 
       {/* KPIs */}
@@ -290,6 +311,8 @@ const ClientsListView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateClientDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchClients() }} />
     </Box>
   )
 }
