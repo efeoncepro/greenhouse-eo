@@ -1,7 +1,7 @@
 'use client'
 
 import type { ThemeColor } from '@core/types'
-import { GH_COLORS, GH_LABELS } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
 export const CLIENT_STATUS_COLORS = {
   active: GH_COLORS.semantic.info.source,
@@ -97,7 +97,7 @@ export const getRpaStatus = (value: number | null): {
   icon: string
 } => {
   if (value === null || value === 0) {
-    return { tone: 'default', label: 'Sin actividad este mes', icon: 'tabler-circle-dashed' }
+    return { tone: 'default', label: GH_MESSAGES.team_no_visible_activity, icon: 'tabler-circle-dashed' }
   }
 
   if (value <= 1.5) {
@@ -125,7 +125,7 @@ export const getOtdStatus = (value: number): {
   }
 
   if (value === 0) {
-    return { tone: 'default', label: 'Sin actividad este mes', icon: 'tabler-circle-dashed' }
+    return { tone: 'default', label: GH_MESSAGES.team_no_visible_activity, icon: 'tabler-circle-dashed' }
   }
 
   return { tone: 'error', label: GH_LABELS.semaphore_red, icon: 'tabler-alert-circle' }

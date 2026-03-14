@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
-import LinearProgress from '@mui/material/LinearProgress'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -20,6 +19,8 @@ import EmptyState from './EmptyState'
 import ExecutiveCardShell from './ExecutiveCardShell'
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
 import TeamIdentityBadgeGroup from './TeamIdentityBadgeGroup'
+import TeamProgressBar from './TeamProgressBar'
+import TeamSignalChip from './TeamSignalChip'
 
 type SprintTeamVelocitySectionProps = {
   sprintId: string
@@ -135,15 +136,28 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
                 stats={String(data.totalTasks)}
                 avatarIcon='tabler-checklist'
                 avatarColor='primary'
-                subtitle={`${data.memberCount} ${GH_TEAM.sprint_tasks_subtitle}`}
+                subtitle={GH_TEAM.sprint_people_active(data.memberCount)}
               />
-              <HorizontalWithSubtitle
-                title={GH_TEAM.sprint_completed_title}
-                stats={`${completionPercent}%`}
-                avatarIcon='tabler-progress-check'
-                avatarColor={completionPercent >= 80 ? 'success' : completionPercent >= 50 ? 'warning' : 'error'}
-                subtitle={`${data.completedTasks} ${GH_TEAM.sprint_completed_subtitle}`}
-              />
+              <Box
+                sx={{
+                  p: 3,
+                  borderRadius: 4,
+                  border: `1px solid ${GH_COLORS.neutral.border}`,
+                  bgcolor: 'background.paper',
+                  display: 'grid',
+                  gap: 1.5
+                }}
+              >
+                <Typography variant='body2' color='text.secondary'>
+                  {GH_TEAM.sprint_completed_title}
+                </Typography>
+                <Typography variant='h4'>{`${completionPercent}%`}</Typography>
+                <TeamSignalChip
+                  tone={getProgressColor(completionPercent, elapsedPercent)}
+                  label={GH_TEAM.sprint_completed_total(data.completedTasks)}
+                  icon='tabler-progress-check'
+                />
+              </Box>
               <HorizontalWithSubtitle
                 title={GH_TEAM.sprint_pace_title}
                 stats={elapsedPercent === null ? '--' : `${elapsedPercent}%`}
@@ -163,17 +177,15 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
             >
               <Stack direction='row' justifyContent='space-between' spacing={2} alignItems='center'>
                 <Typography variant='subtitle2'>{GH_TEAM.sprint_global_progress}</Typography>
-                <Chip
-                  size='small'
-                  color={getProgressColor(completionPercent, elapsedPercent)}
+                <TeamSignalChip
+                  tone={getProgressColor(completionPercent, elapsedPercent)}
                   label={elapsedPercent === null ? GH_TEAM.sprint_baseline_missing : `${GH_TEAM.sprint_plan_prefix} ${elapsedPercent}%`}
+                  icon='tabler-timeline'
                 />
               </Stack>
-              <LinearProgress
-                variant='determinate'
+              <TeamProgressBar
                 value={completionPercent}
-                color={getProgressColor(completionPercent, elapsedPercent)}
-                sx={{ mt: 1.5, height: 10, borderRadius: 999 }}
+                tone={getProgressColor(completionPercent, elapsedPercent)}
               />
             </Box>
 
@@ -203,14 +215,13 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
                           {member.roleTitle}
                         </Typography>
                         <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
-                          {memberCompletionPercent}% personal
+                          {GH_TEAM.sprint_progress_personal(memberCompletionPercent)}
                         </Typography>
                       </Box>
-                      <Chip
-                        size='small'
-                        color={rpaStatus.tone === 'default' ? 'default' : rpaStatus.tone}
-                        label={member.avgRpa === null ? 'RpA --' : `RpA ${member.avgRpa.toFixed(1)}`}
-                        variant='outlined'
+                      <TeamSignalChip
+                        tone={rpaStatus.tone === 'default' ? 'default' : rpaStatus.tone}
+                        label={member.avgRpa === null ? GH_TEAM.rpa_empty : GH_TEAM.rpa_label(member.avgRpa)}
+                        icon={rpaStatus.icon}
                       />
                     </Stack>
 
@@ -222,11 +233,9 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
                       <Chip size='small' variant='tonal' color='info' label={`${member.totalInSprint} ${GH_TEAM.sprint_chip_total}`} />
                     </Stack>
 
-                    <LinearProgress
-                      variant='determinate'
+                    <TeamProgressBar
                       value={memberCompletionPercent}
-                      color={getProgressColor(memberCompletionPercent, elapsedPercent)}
-                      sx={{ height: 10, borderRadius: 999 }}
+                      tone={getProgressColor(memberCompletionPercent, elapsedPercent)}
                     />
                   </Box>
                 )

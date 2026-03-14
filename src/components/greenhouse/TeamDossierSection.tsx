@@ -116,7 +116,7 @@ const TeamDossierSection = () => {
                   stats={String(teamMembers.length)}
                   avatarIcon='tabler-users-group'
                   avatarColor='primary'
-                  subtitle='Roster activo visible en tu operacion.'
+                  subtitle={GH_TEAM.section_people_subtitle}
                 />
                 <HorizontalWithSubtitle
                   title={GH_TEAM.footer_team_total}
@@ -130,7 +130,7 @@ const TeamDossierSection = () => {
                   stats={`${connectedCount}/${teamMembers.length}`}
                   avatarIcon='tabler-link'
                   avatarColor='info'
-                  subtitle='Personas con identidad externa enlazada.'
+                  subtitle={GH_TEAM.section_identity_subtitle}
                 />
               </Box>
 
