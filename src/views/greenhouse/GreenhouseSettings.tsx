@@ -31,19 +31,50 @@ const settingsRows = [
 
 const providerLabelMap: Record<string, string> = {
   credentials: GH_MESSAGES.settings_provider_credentials,
-  microsoft_sso: GH_MESSAGES.settings_provider_microsoft
+  microsoft_sso: GH_MESSAGES.settings_provider_microsoft,
+  google_sso: GH_MESSAGES.settings_provider_google
 }
 
 const GreenhouseSettings = ({
-  hasMicrosoftAuth
+  hasMicrosoftAuth,
+  hasGoogleAuth
 }: {
   hasMicrosoftAuth: boolean
+  hasGoogleAuth: boolean
 }) => {
   const { data: session } = useSession()
 
   const activeProvider = session?.user?.provider || 'credentials'
   const microsoftEmail = session?.user?.microsoftEmail
+  const googleEmail = session?.user?.googleEmail
   const isMicrosoftLinked = Boolean(microsoftEmail)
+  const isGoogleLinked = Boolean(googleEmail)
+  const hasLinkedIdentity = isMicrosoftLinked || isGoogleLinked
+
+  const linkedAccounts = [
+    {
+      key: 'microsoft',
+      iconClassName: 'tabler-brand-windows',
+      email: microsoftEmail,
+      linked: isMicrosoftLinked,
+      available: hasMicrosoftAuth,
+      emptyLabel: GH_MESSAGES.settings_microsoft_unlinked,
+      linkLabel: GH_MESSAGES.settings_link_microsoft,
+      unavailableLabel: GH_MESSAGES.settings_microsoft_unavailable,
+      onLink: () => signIn('azure-ad', { callbackUrl: '/settings' })
+    },
+    {
+      key: 'google',
+      iconClassName: 'tabler-brand-google-filled',
+      email: googleEmail,
+      linked: isGoogleLinked,
+      available: hasGoogleAuth,
+      emptyLabel: GH_MESSAGES.settings_google_unlinked,
+      linkLabel: GH_MESSAGES.settings_link_google,
+      unavailableLabel: GH_MESSAGES.settings_google_unavailable,
+      onLink: () => signIn('google', { callbackUrl: '/settings' })
+    }
+  ] as const
 
   return (
     <Stack spacing={6}>
@@ -57,8 +88,8 @@ const GreenhouseSettings = ({
           <CardContent>
             <Stack spacing={3}>
               <Chip
-                label={isMicrosoftLinked ? GH_MESSAGES.settings_account_linked : GH_MESSAGES.settings_account_unlinked}
-                color={isMicrosoftLinked ? 'success' : 'warning'}
+                label={hasLinkedIdentity ? GH_MESSAGES.settings_account_linked : GH_MESSAGES.settings_account_unlinked}
+                color={hasLinkedIdentity ? 'success' : 'warning'}
                 variant='outlined'
                 sx={{ width: 'fit-content' }}
               />
@@ -66,40 +97,44 @@ const GreenhouseSettings = ({
               <Typography color='text.secondary'>{GH_MESSAGES.settings_identity_subtitle}</Typography>
 
               <Box sx={{ p: 3, borderRadius: 3, bgcolor: 'action.hover' }}>
-                <Stack spacing={2}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-                    <i className='tabler-brand-windows text-[24px]' />
-                    <Typography className='font-medium'>{microsoftEmail || GH_MESSAGES.settings_account_unlinked}</Typography>
-                    {isMicrosoftLinked ? <Chip size='small' color='success' label={GH_MESSAGES.settings_verified} /> : null}
-                  </Box>
+                <Stack spacing={3}>
+                  {linkedAccounts.map(account => (
+                    <Stack key={account.key} spacing={1.5}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                        <i className={`${account.iconClassName} text-[24px]`} />
+                        <Typography className='font-medium'>{account.email || account.emptyLabel}</Typography>
+                        {account.linked ? (
+                          <Chip size='small' color='success' label={GH_MESSAGES.settings_verified} />
+                        ) : null}
+                      </Box>
+                      {!account.linked && account.available ? (
+                        <Button
+                          variant='contained'
+                          startIcon={<i className={account.iconClassName} />}
+                          onClick={account.onLink}
+                          sx={{
+                            alignSelf: 'flex-start',
+                            bgcolor: account.key === 'microsoft' ? 'info.main' : 'primary.main',
+                            '&:hover': {
+                              bgcolor: account.key === 'microsoft' ? 'info.dark' : 'primary.dark'
+                            }
+                          }}
+                        >
+                          {account.linkLabel}
+                        </Button>
+                      ) : null}
+                      {!account.available ? (
+                        <Typography variant='body2' color='text.secondary'>
+                          {account.unavailableLabel}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                  ))}
                   <Typography variant='body2' color='text.secondary'>
                     {GH_MESSAGES.settings_access_method_label}: {providerLabelMap[activeProvider] || activeProvider}
                   </Typography>
                 </Stack>
               </Box>
-
-              {!isMicrosoftLinked && activeProvider === 'credentials' && hasMicrosoftAuth ? (
-                <Button
-                  variant='contained'
-                  startIcon={<i className='tabler-brand-windows' />}
-                  onClick={() => signIn('azure-ad', { callbackUrl: '/settings' })}
-                  sx={{
-                    alignSelf: 'flex-start',
-                    bgcolor: 'info.main',
-                    '&:hover': {
-                      bgcolor: 'info.dark'
-                    }
-                  }}
-                >
-                  {GH_MESSAGES.settings_link_microsoft}
-                </Button>
-              ) : null}
-
-              {!hasMicrosoftAuth ? (
-                <Typography variant='body2' color='text.secondary'>
-                  {GH_MESSAGES.settings_microsoft_unavailable}
-                </Typography>
-              ) : null}
             </Stack>
           </CardContent>
         </Card>

@@ -40,6 +40,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 22:59 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
+
+### Rama
+- Rama usada: `feature/google-sso`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch / `pre-greenhouse`
+
+### Archivos tocados
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/types/next-auth.d.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/app/(blank-layout-pages)/login/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `scripts/setup-bigquery.sql`
+- `.env.example`
+- `.env.local.example`
+- `README.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `git diff --check`: correcto
+- Referencia Vuexy revisada:
+  - `../greenhouse-eo/full-version/src/libs/auth.ts` confirma el patron simple de `GoogleProvider`
+  - `../greenhouse-eo/full-version/src/views/Login.tsx` y `src/views/pages/auth/LoginV2.tsx` solo aportan el detalle visual del icono Google; no se reutilizo el layout demo ni el adapter Prisma
+- Validacion automatica pendiente:
+  - `pnpm lint`: no ejecutado porque este shell no tiene `node`, `npm`, `npx` ni `pnpm`
+  - `pnpm build`: no ejecutado por la misma limitacion
+
+### Riesgos o pendientes
+- Falta aplicar en BigQuery real el delta aditivo de `scripts/setup-bigquery.sql` para `google_sub` y `google_email`.
+- Falta cargar `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en Vercel para `Development`, `Preview`, `staging` y `Production`.
+- Regla operativa importante: esta rama mantiene el principio vigente del portal; Google SSO solo vincula principals existentes en `greenhouse.client_users` y no auto-provisiona acceso solo por `allowed_email_domains`.
+- Conviene validar visualmente en Preview el login y `/settings` una vez que existan las variables de entorno de Google.
+
 ## 2026-03-13 21:00 America/Santiago
 
 ### Agente

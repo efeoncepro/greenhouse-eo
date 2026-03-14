@@ -22,6 +22,7 @@ declare module 'next-auth' {
     authMode: string
     provider: string
     microsoftEmail: string | null
+    googleEmail: string | null
   }
 
   interface Session {
@@ -47,6 +48,7 @@ declare module 'next-auth' {
       authMode: string
       provider: string
       microsoftEmail: string | null
+      googleEmail: string | null
     } & DefaultSession['user']
   }
 }
@@ -75,5 +77,6 @@ declare module 'next-auth/jwt' {
     authMode?: string
     provider?: string
     microsoftEmail?: string | null
+    googleEmail?: string | null
   }
 }

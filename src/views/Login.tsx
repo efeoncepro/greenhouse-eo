@@ -51,7 +51,15 @@ const MaskImg = styled('img')({
   zIndex: -1
 })
 
-const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAuth: boolean }) => {
+const LoginV2 = ({
+  mode,
+  hasMicrosoftAuth,
+  hasGoogleAuth
+}: {
+  mode: SystemMode
+  hasMicrosoftAuth: boolean
+  hasGoogleAuth: boolean
+}) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -112,6 +120,14 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
     })
   }
 
+  const handleGoogleSignIn = async () => {
+    setError('')
+
+    await signIn('google', {
+      callbackUrl: '/auth/landing'
+    })
+  }
+
   return (
     <div className='flex bs-full justify-center'>
       <div
@@ -166,6 +182,30 @@ const LoginV2 = ({ mode, hasMicrosoftAuth }: { mode: SystemMode; hasMicrosoftAut
               {GH_MESSAGES.login_with_microsoft}
             </Button>
             {!hasMicrosoftAuth ? <Alert severity='info'>{GH_MESSAGES.login_microsoft_unavailable}</Alert> : null}
+            <Button
+              fullWidth
+              variant='outlined'
+              size='large'
+              onClick={handleGoogleSignIn}
+              disabled={!hasGoogleAuth}
+              startIcon={<i className='tabler-brand-google-filled' />}
+              sx={{
+                py: 2.2,
+                borderColor: 'divider',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  bgcolor: 'action.hover'
+                },
+                '&.Mui-disabled': {
+                  borderColor: 'divider',
+                  color: 'text.disabled'
+                }
+              }}
+            >
+              {GH_MESSAGES.login_with_google}
+            </Button>
+            {!hasGoogleAuth ? <Alert severity='info'>{GH_MESSAGES.login_google_unavailable}</Alert> : null}
             <Divider sx={{ '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
             <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
               <CustomTextField

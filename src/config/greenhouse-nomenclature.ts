@@ -167,6 +167,7 @@ export const GH_MESSAGES = {
   login_button: 'Entrar',
   logout_button: 'Salir del Greenhouse',
   login_with_microsoft: 'Entrar con Microsoft',
+  login_with_google: 'Entrar con Google',
   login_with_email: 'Entrar con email',
   login_validating: 'Validando acceso...',
   login_email_placeholder: 'Tu email corporativo',
@@ -177,6 +178,8 @@ export const GH_MESSAGES = {
     'El acceso al portal se provisiona internamente. Si tu cuenta aun no aparece, contacta a tu equipo de cuenta.',
   login_microsoft_unavailable:
     'Microsoft SSO aun no esta configurado en este ambiente. Puedes usar credenciales mientras se cargan AZURE_AD_CLIENT_ID y AZURE_AD_CLIENT_SECRET.',
+  login_google_unavailable:
+    'Google SSO aun no esta configurado en este ambiente. Puedes usar credenciales mientras se cargan GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET.',
 
   welcome_first: (name: string) => `Bienvenido al Greenhouse, ${name}`,
   welcome_return: (name: string) => `${name}, tu Greenhouse esta actualizado`,
@@ -352,15 +355,21 @@ export const GH_MESSAGES = {
   settings_risk_title: 'Indicador de salud de delivery',
   settings_risk_description:
     'Muestra un indicador ejecutivo que combina throughput, rondas de revision y trabajo vencido.',
-  settings_account_linked: 'Cuenta vinculada',
-  settings_account_unlinked: 'Sin vinculo Microsoft',
+  settings_account_linked: 'Cuenta SSO vinculada',
+  settings_account_unlinked: 'Sin cuentas SSO vinculadas',
   settings_verified: 'Verificado',
+  settings_microsoft_unlinked: 'Sin vinculo Microsoft',
+  settings_google_unlinked: 'Sin vinculo Google',
   settings_link_microsoft: 'Vincular cuenta Microsoft',
+  settings_link_google: 'Vincular cuenta Google',
   settings_microsoft_unavailable:
     'El provider Microsoft no esta configurado en este ambiente, por lo que el vinculo SSO no se puede iniciar desde aqui todavia.',
+  settings_google_unavailable:
+    'El provider Google no esta configurado en este ambiente, por lo que el vinculo SSO no se puede iniciar desde aqui todavia.',
   settings_access_method_label: 'Metodo de acceso activo',
   settings_provider_credentials: 'Email y password',
   settings_provider_microsoft: 'Microsoft SSO',
+  settings_provider_google: 'Google SSO',
 
   sprints_cycle_active_title: 'Ciclo activo',
   sprints_cycle_active_description:

@@ -234,6 +234,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `6` HubSpot owners internos sembrados como perfiles canonicos
   - `8` perfiles `EO-ID-*` creados en BigQuery
 
+## Delta 2026-03-13 Google SSO foundation
+- El login ahora soporta tres flujos paralelos sobre `greenhouse.client_users`:
+  - `credentials`
+  - Microsoft Entra ID (`azure-ad` en NextAuth)
+  - Google OAuth (`google` en NextAuth)
+- `client_users` extiende el contrato de identidad con:
+  - `google_sub`
+  - `google_email`
+- `/login` ahora agrega Google como CTA secundaria debajo de Microsoft y antes del divisor de credenciales.
+- `/settings` ahora muestra el estado de vinculo de Microsoft y Google, y permite iniciar cualquiera de los dos enlaces SSO cuando la sesion actual entro por credenciales.
+- Regla operativa ratificada para auth:
+  - Google SSO, igual que Microsoft SSO, solo vincula principals ya existentes en `greenhouse.client_users`
+  - `allowed_email_domains` puede explicar un rechazo o servir de pista de provisioning, pero no auto-crea principals durante login
+
 ## Delta 2026-03-12 Microsoft SSO foundation
 - El login ahora soporta dos flujos en paralelo sobre `greenhouse.client_users`:
   - `credentials`
@@ -535,6 +549,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_URL`
 - `AZURE_AD_CLIENT_ID`
 - `AZURE_AD_CLIENT_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
@@ -545,9 +561,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
+- `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
