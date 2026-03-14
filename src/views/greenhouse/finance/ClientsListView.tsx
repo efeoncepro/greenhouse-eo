@@ -52,6 +52,7 @@ const ClientsListView = () => {
   const [poFilter, setPoFilter] = useState('')
   const [hesFilter, setHesFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   const fetchClients = useCallback(async () => {
     setLoading(true)
@@ -132,19 +133,32 @@ const ClientsListView = () => {
           <Button
             variant='outlined'
             color='info'
-            startIcon={<i className='tabler-refresh' />}
+            startIcon={<i className={syncing ? 'tabler-loader-2' : 'tabler-refresh'} />}
+            disabled={syncing}
             onClick={async () => {
-              const res = await fetch('/api/finance/clients/sync', { method: 'POST' })
+              setSyncing(true)
 
-              if (res.ok) {
-                const data = await res.json()
+              try {
+                const res = await fetch('/api/finance/clients/sync', { method: 'POST' })
 
-                alert(data.message)
-                fetchClients()
+                if (res.ok) {
+                  const data = await res.json()
+
+                  alert(data.message)
+                  fetchClients()
+                } else {
+                  const data = await res.json().catch(() => ({}))
+
+                  alert(data.error || `Error al sincronizar (${res.status})`)
+                }
+              } catch {
+                alert('Error de conexión al sincronizar')
+              } finally {
+                setSyncing(false)
               }
             }}
           >
-            Sincronizar clientes
+            {syncing ? 'Sincronizando...' : 'Sincronizar clientes'}
           </Button>
           <Button
             variant='contained'

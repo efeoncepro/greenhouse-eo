@@ -13,14 +13,14 @@ const buildStatements = (projectId: string) => [
       account_number STRING,
       account_number_full STRING,
       currency STRING NOT NULL,
-      account_type STRING NOT NULL DEFAULT 'checking',
-      country STRING NOT NULL DEFAULT 'CL',
-      is_active BOOL DEFAULT TRUE,
-      opening_balance NUMERIC DEFAULT 0,
+      account_type STRING NOT NULL,
+      country STRING NOT NULL,
+      is_active BOOL,
+      opening_balance NUMERIC,
       opening_balance_date DATE,
       notes STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -29,11 +29,11 @@ const buildStatements = (projectId: string) => [
       legal_name STRING NOT NULL,
       trade_name STRING,
       tax_id STRING,
-      tax_id_type STRING DEFAULT 'RUT',
-      country STRING NOT NULL DEFAULT 'CL',
+      tax_id_type STRING,
+      country STRING NOT NULL,
       category STRING NOT NULL,
       service_type STRING,
-      is_international BOOL DEFAULT FALSE,
+      is_international BOOL,
       primary_contact_name STRING,
       primary_contact_email STRING,
       primary_contact_phone STRING,
@@ -42,15 +42,15 @@ const buildStatements = (projectId: string) => [
       bank_account_number STRING,
       bank_account_type STRING,
       bank_routing STRING,
-      payment_currency STRING DEFAULT 'CLP',
-      default_payment_terms INT64 DEFAULT 30,
-      default_payment_method STRING DEFAULT 'transfer',
-      requires_po BOOL DEFAULT FALSE,
-      is_active BOOL DEFAULT TRUE,
+      payment_currency STRING,
+      default_payment_terms INT64,
+      default_payment_method STRING,
+      requires_po BOOL,
+      is_active BOOL,
       notes STRING,
       created_by STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -58,21 +58,21 @@ const buildStatements = (projectId: string) => [
       client_profile_id STRING NOT NULL,
       hubspot_company_id STRING NOT NULL,
       tax_id STRING,
-      tax_id_type STRING DEFAULT 'RUT',
+      tax_id_type STRING,
       legal_name STRING,
       billing_address STRING,
-      billing_country STRING DEFAULT 'CL',
-      payment_terms_days INT64 DEFAULT 30,
-      payment_currency STRING DEFAULT 'CLP',
-      requires_po BOOL DEFAULT FALSE,
-      requires_hes BOOL DEFAULT FALSE,
+      billing_country STRING,
+      payment_terms_days INT64,
+      payment_currency STRING,
+      requires_po BOOL,
+      requires_hes BOOL,
       current_po_number STRING,
       current_hes_number STRING,
       finance_contacts JSON,
       special_conditions STRING,
       created_by STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -87,25 +87,25 @@ const buildStatements = (projectId: string) => [
       due_date DATE,
       currency STRING NOT NULL,
       subtotal NUMERIC NOT NULL,
-      tax_rate NUMERIC DEFAULT 0.19,
+      tax_rate NUMERIC,
       tax_amount NUMERIC NOT NULL,
       total_amount NUMERIC NOT NULL,
-      exchange_rate_to_clp NUMERIC DEFAULT 1.0,
+      exchange_rate_to_clp NUMERIC,
       total_amount_clp NUMERIC NOT NULL,
-      payment_status STRING NOT NULL DEFAULT 'pending',
-      amount_paid NUMERIC DEFAULT 0,
+      payment_status STRING NOT NULL,
+      amount_paid NUMERIC,
       payments_received JSON,
       po_number STRING,
       hes_number STRING,
       service_line STRING,
-      income_type STRING DEFAULT 'service_fee',
+      income_type STRING,
       description STRING,
-      is_reconciled BOOL DEFAULT FALSE,
+      is_reconciled BOOL,
       reconciliation_id STRING,
       notes STRING,
       created_by STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -115,13 +115,13 @@ const buildStatements = (projectId: string) => [
       description STRING NOT NULL,
       currency STRING NOT NULL,
       subtotal NUMERIC NOT NULL,
-      tax_rate NUMERIC DEFAULT 0,
-      tax_amount NUMERIC DEFAULT 0,
+      tax_rate NUMERIC,
+      tax_amount NUMERIC,
       total_amount NUMERIC NOT NULL,
-      exchange_rate_to_clp NUMERIC DEFAULT 1.0,
+      exchange_rate_to_clp NUMERIC,
       total_amount_clp NUMERIC NOT NULL,
       payment_date DATE,
-      payment_status STRING NOT NULL DEFAULT 'pending',
+      payment_status STRING NOT NULL,
       payment_method STRING,
       payment_account_id STRING,
       payment_reference STRING,
@@ -143,14 +143,14 @@ const buildStatements = (projectId: string) => [
       tax_form_number STRING,
       miscellaneous_category STRING,
       service_line STRING,
-      is_recurring BOOL DEFAULT FALSE,
+      is_recurring BOOL,
       recurrence_frequency STRING,
-      is_reconciled BOOL DEFAULT FALSE,
+      is_reconciled BOOL,
       reconciliation_id STRING,
       notes STRING,
       created_by STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -163,15 +163,15 @@ const buildStatements = (projectId: string) => [
       closing_balance_bank NUMERIC,
       closing_balance_system NUMERIC,
       difference NUMERIC,
-      status STRING NOT NULL DEFAULT 'open',
-      statement_imported BOOL DEFAULT FALSE,
+      status STRING NOT NULL,
+      statement_imported BOOL,
       statement_imported_at TIMESTAMP,
-      statement_row_count INT64 DEFAULT 0,
+      statement_row_count INT64,
       reconciled_by STRING,
       reconciled_at TIMESTAMP,
       notes STRING,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
     )
   `,
   `
@@ -184,14 +184,14 @@ const buildStatements = (projectId: string) => [
       reference STRING,
       amount NUMERIC NOT NULL,
       balance NUMERIC,
-      match_status STRING NOT NULL DEFAULT 'unmatched',
+      match_status STRING NOT NULL,
       matched_type STRING,
       matched_id STRING,
       match_confidence NUMERIC,
       notes STRING,
       matched_by STRING,
       matched_at TIMESTAMP,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      created_at TIMESTAMP
     )
   `,
   `
@@ -201,8 +201,8 @@ const buildStatements = (projectId: string) => [
       to_currency STRING NOT NULL,
       rate NUMERIC NOT NULL,
       rate_date DATE NOT NULL,
-      source STRING DEFAULT 'manual',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+      source STRING,
+      created_at TIMESTAMP
     )
   `,
   `
