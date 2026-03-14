@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 const LoginPage = async () => {
   const session = await getServerSession(authOptions)
   const hasMicrosoftAuth = Boolean(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET)
+  const hasGoogleAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
 
   if (session) {
     redirect('/auth/landing')
@@ -31,7 +32,7 @@ const LoginPage = async () => {
   // Vars
   const mode = await getServerMode()
 
-  return <Login mode={mode} hasMicrosoftAuth={hasMicrosoftAuth} />
+  return <Login mode={mode} hasMicrosoftAuth={hasMicrosoftAuth} hasGoogleAuth={hasGoogleAuth} />
 }
 
 export default LoginPage

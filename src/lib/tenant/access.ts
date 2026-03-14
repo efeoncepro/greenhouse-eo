@@ -21,6 +21,8 @@ interface TenantAccessRow {
   microsoft_oid: string | null
   microsoft_tenant_id: string | null
   microsoft_email: string | null
+  google_sub: string | null
+  google_email: string | null
   full_name: string
   avatar_url: string | null
   role_codes: string[] | null
@@ -55,6 +57,8 @@ export interface TenantAccessRecord {
   microsoftOid: string | null
   microsoftTenantId: string | null
   microsoftEmail: string | null
+  googleSub: string | null
+  googleEmail: string | null
   fullName: string
   avatarUrl: string | null
   roleCodes: string[]
@@ -161,6 +165,8 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     microsoftOid: row.microsoft_oid,
     microsoftTenantId: row.microsoft_tenant_id,
     microsoftEmail: row.microsoft_email,
+    googleSub: row.google_sub,
+    googleEmail: row.google_email,
     fullName: row.full_name,
     avatarUrl: row.avatar_url,
     roleCodes,
@@ -207,6 +213,8 @@ const getIdentityAccessRecord = async ({
         cu.microsoft_oid,
         cu.microsoft_tenant_id,
         cu.microsoft_email,
+        cu.google_sub,
+        cu.google_email,
         cu.full_name,
         cu.avatar_url,
         ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
@@ -261,6 +269,8 @@ const getIdentityAccessRecord = async ({
         cu.microsoft_oid,
         cu.microsoft_tenant_id,
         cu.microsoft_email,
+        cu.google_sub,
+        cu.google_email,
         cu.full_name,
         cu.avatar_url,
         timezone,
@@ -283,7 +293,8 @@ const getIdentityAccessRecord = async ({
 
 const getIdentityAccessRecordByEmail = async (email: string) =>
   getIdentityAccessRecord({
-    whereClause: "LOWER(cu.email) = LOWER(@email) OR LOWER(COALESCE(cu.microsoft_email, '')) = LOWER(@email)",
+    whereClause:
+      "LOWER(cu.email) = LOWER(@email) OR LOWER(COALESCE(cu.microsoft_email, '')) = LOWER(@email) OR LOWER(COALESCE(cu.google_email, '')) = LOWER(@email)",
     params: { email }
   })
 
@@ -301,6 +312,12 @@ export const getTenantAccessRecordByMicrosoftOid = async (oid: string) =>
   getIdentityAccessRecord({
     whereClause: 'cu.microsoft_oid = @oid',
     params: { oid }
+  })
+
+export const getTenantAccessRecordByGoogleSub = async (sub: string) =>
+  getIdentityAccessRecord({
+    whereClause: 'cu.google_sub = @sub',
+    params: { sub }
   })
 
 export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
@@ -413,13 +430,15 @@ export const verifyTenantPassword = async (tenant: TenantAccessRecord, password:
   return false
 }
 
-export const isEligibleForMicrosoftSignIn = (tenant: TenantAccessRecord) => {
+export const isEligibleForExternalSSOSignIn = (tenant: TenantAccessRecord) => {
   if (!tenant.active) {
     return false
   }
 
   return ['active', 'invited'].includes(tenant.status)
 }
+
+export const isEligibleForMicrosoftSignIn = (tenant: TenantAccessRecord) => isEligibleForExternalSSOSignIn(tenant)
 
 export const linkMicrosoftIdentity = async ({
   tenant,
@@ -461,6 +480,46 @@ export const linkMicrosoftIdentity = async ({
       oid,
       tenantId: tenantId || '',
       microsoftEmail: microsoftEmail.trim().toLowerCase()
+    }
+  })
+}
+
+export const linkGoogleIdentity = async ({
+  tenant,
+  sub,
+  googleEmail
+}: {
+  tenant: TenantAccessRecord
+  sub: string
+  googleEmail: string
+}) => {
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  await bigQuery.query({
+    query: `
+      UPDATE \`${projectId}.greenhouse.client_users\`
+      SET
+        google_sub = @sub,
+        google_email = @googleEmail,
+        auth_mode = CASE
+          WHEN auth_mode = 'credentials' THEN 'both'
+          WHEN auth_mode = 'both' THEN 'both'
+          WHEN password_hash IS NOT NULL THEN 'both'
+          ELSE 'sso'
+        END,
+        status = CASE
+          WHEN status = 'invited' THEN 'active'
+          ELSE status
+        END,
+        active = TRUE,
+        updated_at = CURRENT_TIMESTAMP()
+      WHERE user_id = @userId
+    `,
+    params: {
+      userId: tenant.userId,
+      sub,
+      googleEmail: googleEmail.trim().toLowerCase()
     }
   })
 }

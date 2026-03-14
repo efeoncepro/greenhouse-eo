@@ -40,79 +40,68 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
-## 2026-03-13 23:59 America/Santiago
+## 2026-03-13 22:59 America/Santiago
 
 ### Agente
 - Codex
 
 ### Objetivo del turno
-- Corregir de forma literal `CODEX_TASK_Fix_Team_Capacity_Views.md` despues de detectar que `Pulse` seguia mostrando una vista de capacidad operativa y, en `view-as`, ademas podia caer por depender de un fetch cliente fuera del contexto correcto.
+- Ejecutar `CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
 
 ### Rama
-- Rama usada: `fix/team-capacity-views-vuexy`
+- Rama usada: `feature/google-sso`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
 - Preview branch / `pre-greenhouse`
 
 ### Archivos tocados
-- `src/components/greenhouse/TeamCapacitySection.tsx`
-- `src/views/greenhouse/GreenhouseDashboard.tsx`
-- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
-- `src/app/(dashboard)/dashboard/page.tsx`
-- `src/app/(dashboard)/admin/tenants/[id]/view-as/dashboard/page.tsx`
+- `src/lib/auth.ts`
+- `src/lib/tenant/access.ts`
+- `src/types/next-auth.d.ts`
+- `src/views/Login.tsx`
+- `src/views/greenhouse/GreenhouseSettings.tsx`
+- `src/app/(blank-layout-pages)/login/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
 - `src/config/greenhouse-nomenclature.ts`
+- `scripts/setup-bigquery.sql`
+- `.env.example`
+- `.env.local.example`
+- `README.md`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
 
 ### Verificacion
+- `git diff --check`: correcto
 - `pnpm lint`: correcto
-- `pnpm build`: correcto
-- Resultado funcional esperado del delta:
-  - `Pulse` ahora usa roster asignado (`getTeamMembers`) como fuente principal para la card de equipo.
-  - La card ya no muestra barras de utilizacion, CTA de saturacion ni copy operativo como contenido principal.
-  - `view-as/dashboard` deja de depender de un fetch cliente a `/api/team/capacity` para esta seccion.
+- Referencia Vuexy revisada:
+  - `../greenhouse-eo/full-version/src/libs/auth.ts` confirma el patron simple de `GoogleProvider`
+  - `../greenhouse-eo/full-version/src/views/Login.tsx` y `src/views/pages/auth/LoginV2.tsx` solo aportan el detalle visual del icono Google; no se reutilizo el layout demo ni el adapter Prisma
+- BigQuery real:
+  - `ALTER TABLE efeonce-group.greenhouse.client_users` aplicado para `google_sub` y `google_email`
+- GCP real:
+  - OAuth client creado: `projects/efeonce-group/locations/global/oauthClients/greenhouse-portal`
+  - `clientId`: `a1fcb039b-cb54-41a3-8988-3acad9901c96`
+  - redirect URIs activas:
+    - `https://greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://dev-greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://pre-greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://greenhouse-eo-git-feature-google-sso-efeonce-7670142f.vercel.app/api/auth/callback/google`
+    - `http://localhost:3000/api/auth/callback/google`
+- Vercel real:
+  - se cargaron `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en `Development`, `staging`, `Production`, `Preview (develop)` y `Preview (feature/google-sso)`
+  - `Preview (feature/google-sso)` tambien quedo con `GCP_PROJECT`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
+  - preview validado: `https://greenhouse-eo-git-feature-google-sso-efeonce-7670142f.vercel.app`
+  - deployment activo validado: `https://greenhouse-c6rz0laml-efeonce-7670142f.vercel.app`
+- Validacion runtime remota:
+  - `/login` responde en el preview protegido via `vercel curl`
+  - `/api/auth/providers` expone `azure-ad`, `google` y `credentials`
 
 ### Riesgos o pendientes
-- Queda pendiente pushar este delta y revisar visualmente el deployment nuevo en `pre-greenhouse.efeoncepro.com`.
-- El branch tiene otros archivos modificados en la zona de capabilities (`src/config/capability-registry.ts`, `src/lib/capability-queries/creative-hub.ts`, `src/types/capabilities.ts`, etc.) que no pertenecen a este fix; al commitear, seleccionar solo los archivos de este ajuste y no arrastrar cambios ajenos.
-
-## 2026-03-13 23:40 America/Santiago
-
-### Agente
-- Codex
-
-### Objetivo del turno
-- Ejecutar `CODEX_TASK_Fix_Team_Capacity_Views.md` en una rama paralela y cerrar el ajuste visual/funcional de las vistas de equipo priorizando patrones vivos de Vuexy en vez de componer cards ad hoc.
-
-### Rama
-- Rama usada: `fix/team-capacity-views-vuexy`
-- Rama objetivo del merge: `develop`
-
-### Ambiente objetivo
-- Preview branch
-
-### Archivos tocados
-- `src/components/greenhouse/TeamCapacitySection.tsx`
-- `src/components/greenhouse/TeamDossierSection.tsx`
-- `src/components/greenhouse/TeamExpansionGhostCard.tsx`
-- `src/components/greenhouse/index.ts`
-- `src/config/greenhouse-nomenclature.ts`
-
-### Verificacion
-- `pnpm lint`: correcto
-- `pnpm build`: correcto
-- Validacion funcional del delta:
-  - `Pulse` deja de inventar metricas operativas por persona cuando el backend solo entrega capacidad contractual.
-  - `Pulse` ahora compone mejor con primitives Vuexy existentes (`HorizontalWithSubtitle`) y suma una ghost slot reusable para solicitudes de expansion.
-  - `Mi Greenhouse` reutiliza el mismo ghost slot para mantener consistencia visual y de CTA.
-
-### Riesgos o pendientes
-- El task `CODEX_TASK_Fix_Team_Capacity_Views.md` esta parcialmente desfasado respecto al estado real del repo: las vistas 1, 3 y 4 ya existian antes de este turno.
-- Conviene validar en Preview que la nueva densidad del grid de `Pulse` se vea bien con tenants pequeños y con equipos de mas de 6 personas.
-- `pre-greenhouse.efeoncepro.com` no estaba mostrando esta rama al momento del chequeo; seguia apuntando a un preview anterior (`fix/internal-nav-nomenclature-hydration`).
-- La iteracion final de este turno rehizo `Pulse` hacia una lista mas compacta y ejecutiva, con ghost slot en formato fila y CTA menos invasivo. Esa version necesita quedar pushada para reflejarse en el preview del branch.
+- Regla operativa importante: esta rama mantiene el principio vigente del portal; Google SSO solo vincula principals existentes en `greenhouse.client_users` y no auto-provisiona acceso solo por `allowed_email_domains`.
+- El `pnpm build` local en este shell siguio fallando por un issue local de Next.js alrededor de `/developers/api`, pero el build remoto de Vercel para `feature/google-sso` quedo `Ready`.
+- Falta validacion humana final del redirect completo en navegador contra una cuenta Google real; desde CLI quedo validado el provider, el callback URL y el principal Efeonce existente.
 
 ## 2026-03-13 21:00 America/Santiago
 

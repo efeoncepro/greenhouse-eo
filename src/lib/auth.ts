@@ -1,13 +1,16 @@
 import type { NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 
 import {
   getTenantAccessRecordByAllowedEmailDomain,
   getTenantAccessRecordByEmail,
+  getTenantAccessRecordByGoogleSub,
   getTenantAccessRecordByInternalMicrosoftAlias,
   getTenantAccessRecordByMicrosoftOid,
-  isEligibleForMicrosoftSignIn,
+  isEligibleForExternalSSOSignIn,
+  linkGoogleIdentity,
   linkMicrosoftIdentity,
   updateTenantLastLogin,
   verifyTenantPassword
@@ -15,7 +18,10 @@ import {
 
 const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
 const microsoftClientSecret = process.env.AZURE_AD_CLIENT_SECRET
+const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
 const hasMicrosoftProvider = Boolean(microsoftClientId && microsoftClientSecret)
+const hasGoogleProvider = Boolean(googleClientId && googleClientSecret)
 
 const getMicrosoftProfileIdentity = ({
   profile,
@@ -60,6 +66,61 @@ const getMicrosoftProfileIdentity = ({
   }
 }
 
+const getGoogleProfileIdentity = ({
+  profile,
+  user
+}: {
+  profile?: Record<string, unknown> | null
+  user?: { email?: string | null; name?: string | null } | null
+}) => {
+  const normalizedEmail =
+    typeof profile?.email === 'string'
+      ? profile.email.trim().toLowerCase()
+      : typeof user?.email === 'string'
+        ? user.email.trim().toLowerCase()
+        : ''
+
+  const sub = typeof profile?.sub === 'string' ? profile.sub.trim() : ''
+
+  const displayName =
+    typeof profile?.name === 'string'
+      ? profile.name.trim()
+      : typeof user?.name === 'string'
+        ? user.name.trim()
+        : ''
+
+  const givenName = typeof profile?.given_name === 'string' ? profile.given_name.trim() : ''
+  const familyName = typeof profile?.family_name === 'string' ? profile.family_name.trim() : ''
+
+  return {
+    normalizedEmail,
+    sub,
+    displayName,
+    givenName,
+    familyName
+  }
+}
+
+const getRejectedTenantMatchRedirect = async ({
+  provider,
+  normalizedEmail
+}: {
+  provider: 'Microsoft' | 'Google'
+  normalizedEmail: string
+}) => {
+  const allowedDomain = normalizedEmail.split('@')[1]?.trim().toLowerCase() || ''
+  const tenantMatch = allowedDomain ? await getTenantAccessRecordByAllowedEmailDomain(allowedDomain) : null
+
+  if (tenantMatch) {
+    console.warn(`${provider} SSO rejected because the domain matched a tenant but no explicit principal exists.`, {
+      email: normalizedEmail,
+      clientId: tenantMatch.clientId
+    })
+  }
+
+  return '/auth/access-denied'
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt'
@@ -78,6 +139,19 @@ export const authOptions: NextAuthOptions = {
             authorization: {
               params: {
                 scope: 'openid profile email'
+              }
+            }
+          })
+        ]
+      : []),
+    ...(hasGoogleProvider
+      ? [
+          GoogleProvider({
+            clientId: googleClientId!,
+            clientSecret: googleClientSecret!,
+            authorization: {
+              params: {
+                scope: 'openid email'
               }
             }
           })
@@ -154,7 +228,8 @@ export const authOptions: NextAuthOptions = {
           portalHomePath: tenant.portalHomePath,
           authMode: tenant.authMode,
           provider: 'credentials',
-          microsoftEmail: tenant.microsoftEmail
+          microsoftEmail: tenant.microsoftEmail,
+          googleEmail: tenant.googleEmail
         }
       }
     })
@@ -165,64 +240,106 @@ export const authOptions: NextAuthOptions = {
         return true
       }
 
-      if (account?.provider !== 'azure-ad') {
-        return false
-      }
-
-      const { normalizedEmail, oid, tenantId, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
-        profile: (profile as Record<string, unknown> | null | undefined) || null,
-        user
-      })
-
-      if (!normalizedEmail || !oid) {
-        return '/auth/access-denied'
-      }
-
-      let tenant = await getTenantAccessRecordByMicrosoftOid(oid)
-
-      if (!tenant) {
-        tenant = await getTenantAccessRecordByEmail(normalizedEmail)
-      }
-
-      if (!tenant) {
-        tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
-          email: normalizedEmail,
-          displayName,
-          givenName,
-          familyName
+      if (account?.provider === 'azure-ad') {
+        const { normalizedEmail, oid, tenantId, displayName, givenName, familyName } = getMicrosoftProfileIdentity({
+          profile: (profile as Record<string, unknown> | null | undefined) || null,
+          user
         })
-      }
 
-      if (!tenant) {
-        const allowedDomain = normalizedEmail.split('@')[1]?.trim().toLowerCase() || ''
-        const tenantMatch = allowedDomain ? await getTenantAccessRecordByAllowedEmailDomain(allowedDomain) : null
+        if (!normalizedEmail || !oid) {
+          return '/auth/access-denied'
+        }
 
-        if (tenantMatch) {
-          console.warn('Microsoft SSO rejected because the domain matched a tenant but no explicit principal exists.', {
+        let tenant = await getTenantAccessRecordByMicrosoftOid(oid)
+
+        if (!tenant) {
+          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        }
+
+        if (!tenant) {
+          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
             email: normalizedEmail,
-            clientId: tenantMatch.clientId
+            displayName,
+            givenName,
+            familyName
           })
         }
 
-        return '/auth/access-denied'
+        if (!tenant) {
+          return getRejectedTenantMatchRedirect({
+            provider: 'Microsoft',
+            normalizedEmail
+          })
+        }
+
+        if (!isEligibleForExternalSSOSignIn(tenant)) {
+          return '/auth/access-denied'
+        }
+
+        if (tenant.microsoftOid !== oid || tenant.microsoftEmail !== normalizedEmail || tenant.microsoftTenantId !== tenantId) {
+          await linkMicrosoftIdentity({
+            tenant,
+            oid,
+            tenantId,
+            microsoftEmail: normalizedEmail
+          })
+        }
+
+        await updateTenantLastLogin(tenant, 'microsoft_sso')
+
+        return true
       }
 
-      if (!isEligibleForMicrosoftSignIn(tenant)) {
-        return '/auth/access-denied'
-      }
-
-      if (tenant.microsoftOid !== oid || tenant.microsoftEmail !== normalizedEmail || tenant.microsoftTenantId !== tenantId) {
-        await linkMicrosoftIdentity({
-          tenant,
-          oid,
-          tenantId,
-          microsoftEmail: normalizedEmail
+      if (account?.provider === 'google') {
+        const { normalizedEmail, sub, displayName, givenName, familyName } = getGoogleProfileIdentity({
+          profile: (profile as Record<string, unknown> | null | undefined) || null,
+          user
         })
+
+        if (!normalizedEmail || !sub) {
+          return '/auth/access-denied'
+        }
+
+        let tenant = await getTenantAccessRecordByGoogleSub(sub)
+
+        if (!tenant) {
+          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        }
+
+        if (!tenant) {
+          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+            email: normalizedEmail,
+            displayName,
+            givenName,
+            familyName
+          })
+        }
+
+        if (!tenant) {
+          return getRejectedTenantMatchRedirect({
+            provider: 'Google',
+            normalizedEmail
+          })
+        }
+
+        if (!isEligibleForExternalSSOSignIn(tenant)) {
+          return '/auth/access-denied'
+        }
+
+        if (tenant.googleSub !== sub || tenant.googleEmail !== normalizedEmail) {
+          await linkGoogleIdentity({
+            tenant,
+            sub,
+            googleEmail: normalizedEmail
+          })
+        }
+
+        await updateTenantLastLogin(tenant, 'google_sso')
+
+        return true
       }
 
-      await updateTenantLastLogin(tenant, 'microsoft_sso')
-
-      return true
+      return false
     },
     async jwt({ token, user, account, profile }) {
       if (user) {
@@ -249,6 +366,7 @@ export const authOptions: NextAuthOptions = {
         token.authMode = user.authMode
         token.provider = user.provider
         token.microsoftEmail = user.microsoftEmail
+        token.googleEmail = user.googleEmail
       }
 
       if (account?.provider === 'azure-ad') {
@@ -299,6 +417,54 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      if (account?.provider === 'google') {
+        const { normalizedEmail, sub, displayName, givenName, familyName } = getGoogleProfileIdentity({
+          profile: (profile as Record<string, unknown> | null | undefined) || null,
+          user
+        })
+
+        let tenant = sub ? await getTenantAccessRecordByGoogleSub(sub) : null
+
+        if (!tenant && normalizedEmail) {
+          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+        }
+
+        if (!tenant && normalizedEmail) {
+          tenant = await getTenantAccessRecordByInternalMicrosoftAlias({
+            email: normalizedEmail,
+            displayName,
+            givenName,
+            familyName
+          })
+        }
+
+        if (tenant) {
+          token.sub = tenant.userId
+          token.userId = tenant.userId
+          token.email = tenant.email
+          token.name = tenant.fullName
+          token.avatarUrl = tenant.avatarUrl
+          token.clientId = tenant.clientId
+          token.clientName = tenant.clientName
+          token.tenantType = tenant.tenantType
+          token.roleCodes = tenant.roleCodes
+          token.primaryRoleCode = tenant.primaryRoleCode
+          token.routeGroups = tenant.routeGroups
+          token.projectScopes = tenant.projectScopes
+          token.campaignScopes = tenant.campaignScopes
+          token.businessLines = tenant.businessLines
+          token.serviceModules = tenant.serviceModules
+          token.projectIds = tenant.projectIds
+          token.role = tenant.role
+          token.featureFlags = tenant.featureFlags
+          token.timezone = tenant.timezone
+          token.portalHomePath = tenant.portalHomePath
+          token.authMode = tenant.authMode
+          token.provider = 'google_sso'
+          token.googleEmail = tenant.googleEmail || normalizedEmail
+        }
+      }
+
       return token
     },
     async session({ session, token }) {
@@ -332,6 +498,7 @@ export const authOptions: NextAuthOptions = {
         session.user.authMode = typeof token.authMode === 'string' ? token.authMode : 'credentials'
         session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'
         session.user.microsoftEmail = typeof token.microsoftEmail === 'string' ? token.microsoftEmail : null
+        session.user.googleEmail = typeof token.googleEmail === 'string' ? token.googleEmail : null
       }
 
       return session
