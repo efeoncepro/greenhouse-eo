@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
@@ -29,6 +29,13 @@ const SERVICE_LINE_LABELS: Record<string, string> = {
 
 const SERVICE_LINES = Object.keys(SERVICE_LINE_LABELS)
 
+interface ClientOption {
+  clientProfileId: string
+  hubspotCompanyId: string | null
+  legalName: string | null
+  paymentCurrency: string
+}
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -37,6 +44,7 @@ type Props = {
 
 const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [description, setDescription] = useState('')
+  const [selectedClientId, setSelectedClientId] = useState('')
   const [clientName, setClientName] = useState('')
   const [currency, setCurrency] = useState('')
   const [totalAmount, setTotalAmount] = useState('')
@@ -49,8 +57,53 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Client dropdown data
+  const [clients, setClients] = useState<ClientOption[]>([])
+  const [loadingClients, setLoadingClients] = useState(false)
+
+  const fetchClients = useCallback(async () => {
+    setLoadingClients(true)
+
+    try {
+      const res = await fetch('/api/finance/clients')
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setClients(data.items ?? [])
+      }
+    } finally {
+      setLoadingClients(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (open && clients.length === 0) {
+      fetchClients()
+    }
+  }, [open, clients.length, fetchClients])
+
+  const handleClientChange = (clientProfileId: string) => {
+    setSelectedClientId(clientProfileId)
+
+    const client = clients.find(c => c.clientProfileId === clientProfileId)
+
+    if (client) {
+      setClientName(client.legalName || client.clientProfileId)
+      setHubspotCompanyId(client.hubspotCompanyId || '')
+
+      if (client.paymentCurrency && !currency) {
+        setCurrency(client.paymentCurrency)
+      }
+    } else {
+      setClientName('')
+      setHubspotCompanyId('')
+    }
+  }
+
   const resetForm = () => {
     setDescription('')
+    setSelectedClientId('')
     setClientName('')
     setCurrency('')
     setTotalAmount('')
@@ -155,13 +208,22 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
           required
         />
         <CustomTextField
+          select
           fullWidth
           size='small'
           label='Nombre del cliente'
-          value={clientName}
-          onChange={e => setClientName(e.target.value)}
+          value={selectedClientId}
+          onChange={e => handleClientChange(e.target.value)}
           required
-        />
+          disabled={loadingClients}
+        >
+          <MenuItem value=''>{loadingClients ? 'Cargando...' : '— Seleccionar cliente —'}</MenuItem>
+          {clients.map(c => (
+            <MenuItem key={c.clientProfileId} value={c.clientProfileId}>
+              {c.legalName || c.clientProfileId}
+            </MenuItem>
+          ))}
+        </CustomTextField>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -248,7 +310,11 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
           size='small'
           label='HubSpot Company ID'
           value={hubspotCompanyId}
-          onChange={e => setHubspotCompanyId(e.target.value)}
+          disabled
+          InputProps={{
+            readOnly: true,
+            sx: { fontFamily: 'monospace', fontSize: '0.85rem', bgcolor: 'action.hover' }
+          }}
         />
         <CustomTextField
           fullWidth

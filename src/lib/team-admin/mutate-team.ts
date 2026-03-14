@@ -131,7 +131,9 @@ export const toTeamAdminErrorResponse = (error: unknown, fallbackMessage: string
 
   console.error(fallbackMessage, error)
 
-  return NextResponse.json({ error: fallbackMessage }, { status: 500 })
+  const detail = error instanceof Error ? error.message : String(error)
+
+  return NextResponse.json({ error: fallbackMessage, detail }, { status: 500 })
 }
 
 const runQuery = async <T>(query: string, params: Record<string, unknown> = {}) => {

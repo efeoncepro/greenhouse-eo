@@ -40,6 +40,87 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 18:00 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Consolidar en una sola fuente canónica la documentación del modelo Finance 360 y de la lógica enriquecida cliente/persona que ya estaba dispersa entre código, `project_context.md` y handoffs previos.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura
+
+### Archivos tocados
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md` (nuevo)
+- `docs/README.md`
+
+### Cambios realizados
+- Se creó `docs/architecture/FINANCE_CANONICAL_360_V1.md` como fuente canónica del modelo actual:
+  - llaves canónicas de cliente y colaborador
+  - reglas de resolución en `src/lib/finance/canonical.ts`
+  - read model de cliente 360
+  - read model de colaborador 360
+  - sinergias con `greenhouse.clients`, `team_members`, `payroll_entries`, `hubspot_crm.*`
+  - compatibilidad legacy con `clientProfileId`, `hubspotCompanyId` y `payrollEntryId`
+  - límites entre ownership financiero y read-models transversales
+- Se enlazó el documento desde `docs/README.md` para que no dependa de conocer el nombre del archivo de memoria.
+
+### Verificacion
+- Revisión manual de consistencia contra el código ya implementado en `clients`, `income`, `expenses` y `people/[memberId]/finance`
+
+### Riesgos o pendientes
+- La documentación 360 ya está centralizada, pero todavía falta que el frontend consuma más de estas lecturas enriquecidas fuera de las vistas actuales de Finance y People.
+
+## 2026-03-14 17:52 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir fallos runtime de `Finance` detectados en `Staging` antes de cualquier promoción a `Production`, con foco en:
+  - bootstrap BigQuery demasiado agresivo en lecturas
+  - `GET /api/finance/clients` devolviendo `500` y dejando la vista sin clientes
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Staging / Preview de `develop`
+
+### Archivos tocados
+- `src/lib/finance/schema.ts`
+- `src/app/api/finance/clients/route.ts`
+
+### Cambios realizados
+- Se reescribió `ensureFinanceInfrastructure()` para dejar de ejecutar DDL/DML ciegos en cada cold start:
+  - ahora primero inspecciona `INFORMATION_SCHEMA.TABLES` y `INFORMATION_SCHEMA.COLUMNS`
+  - solo crea tablas `fin_*` faltantes
+  - solo agrega columnas canónicas faltantes (`client_id`)
+  - ya no ejecuta los `UPDATE` de backfill ni el `MERGE` de roles en cada lectura
+  - el seed de `finance_manager` quedó reducido a `SELECT` + `INSERT` solo si realmente falta
+- Se corrigió `GET /api/finance/clients`:
+  - se eliminaron subqueries correlacionadas para receivables/invoice count
+  - el listado ahora usa CTEs con `UNNEST` + `JOIN` + rollup por `client_id`, compatible con BigQuery
+  - esto ataca el `500` real que dejaba `/finance/clients` sin datos en el preview de `develop`
+
+### Verificacion
+- `pnpm exec eslint src/lib/finance/schema.ts src/app/api/finance/clients/route.ts src/app/api/finance/income/summary/route.ts src/app/api/finance/accounts/route.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/expenses/summary/route.ts`: correcto
+- `git diff --check`: correcto
+- Revisión de logs de Vercel previa al fix:
+  - `/api/finance/clients` devolvía `500` por `Correlated subqueries...`
+  - `/api/finance/accounts`, `/api/finance/exchange-rates/latest` y `/api/finance/expenses/summary` fallaban por `table update operations quota`
+- Aún no se valida un preview nuevo post-fix; sigue pendiente push/deploy y smoke real contra `Staging`
+
+### Riesgos o pendientes
+- El cambio reduce drásticamente el riesgo de cuota BigQuery en lectura, pero falta confirmarlo con un deployment nuevo.
+- Los backfills históricos de `client_id` ya no corren automáticamente en `ensureFinanceInfrastructure()`; si se necesitan como operación explícita, conviene moverlos a un script o endpoint administrativo dedicado.
+
 ## 2026-03-14 17:45 America/Santiago
 
 ### Agente
