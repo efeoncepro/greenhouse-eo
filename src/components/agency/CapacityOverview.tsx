@@ -1,6 +1,5 @@
 'use client'
 
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
@@ -9,6 +8,7 @@ import { alpha } from '@mui/material/styles'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import EmptyState from '@/components/greenhouse/EmptyState'
+import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencyCapacityOverview } from '@/lib/agency/agency-queries'
 
@@ -119,11 +119,7 @@ const CapacityOverview = ({ capacity }: Props) => {
               '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
             }}
           >
-            <Avatar
-              sx={{ width: 36, height: 36, bgcolor: GH_COLORS.role.account.bg, color: GH_COLORS.role.account.text, fontSize: '0.8rem', fontFamily: 'Poppins', fontWeight: 500 }}
-            >
-              {member.displayName.charAt(0).toUpperCase()}
-            </Avatar>
+            <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={36} />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant='subtitle2' noWrap sx={{ color: GH_COLORS.neutral.textPrimary }}>
                 {member.displayName}
