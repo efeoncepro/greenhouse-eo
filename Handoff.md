@@ -40,6 +40,54 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 09:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Rescatar el trabajo no committeado de `HR Payroll`, publicarlo en una rama propia y dejar un preview real de Vercel listo para prueba de backend + UI.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / integration validation
+
+### Archivos tocados
+- No hubo cambios de código adicionales fuera del trabajo ya existente; el objetivo del turno fue reubicar, commitear, publicar y desplegar.
+- `Handoff.md`
+
+### Verificacion
+- Se creó la rama `feature/hr-payroll` desde el worktree actual sin usar `stash`.
+- Se hicieron 2 commits:
+  - `a30b0dc` `feat: add reusable payroll ui infrastructure`
+  - `2c85a9f` `feat: implement hr payroll module`
+- Se publicó la rama:
+  - `origin/feature/hr-payroll`
+- Se creó bloque de variables `Preview (feature/hr-payroll)` en Vercel para:
+  - `GCP_PROJECT`
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `AZURE_AD_CLIENT_ID`
+  - `AZURE_AD_CLIENT_SECRET`
+- Preview final listo:
+  - `https://greenhouse-obspv8j1r-efeonce-7670142f.vercel.app`
+- Smoke real del preview:
+  - `/login`: responde correctamente y renderiza `Entrar con Microsoft` y `Entrar con Google`
+  - `/api/hr/payroll/periods`: responde `{"error":"Unauthorized"}`, que es el comportamiento esperado sin sesión
+- PR sugerido por GitHub:
+  - `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/hr-payroll`
+
+### Riesgos o pendientes
+- Claude puede tomar esta rama como base oficial del frontend `HR Payroll`; ya no depende del worktree mezclado de `feature/admin-tenant-detail-redesign`.
+- El preview listo para prueba es el manual de Vercel arriba indicado; el auto-preview anterior de la rama falló antes de que se crearan las env vars de `feature/hr-payroll`.
+- Si se quiere probar el módulo completo más allá de `/login`, hace falta autenticarse con un principal que tenga acceso `hr` o `efeonce_admin`.
+
 ## 2026-03-14 08:45 America/Santiago
 
 ### Agente
