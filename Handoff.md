@@ -74,18 +74,34 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Verificacion
 - `git diff --check`: correcto
+- `pnpm lint`: correcto
 - Referencia Vuexy revisada:
   - `../greenhouse-eo/full-version/src/libs/auth.ts` confirma el patron simple de `GoogleProvider`
   - `../greenhouse-eo/full-version/src/views/Login.tsx` y `src/views/pages/auth/LoginV2.tsx` solo aportan el detalle visual del icono Google; no se reutilizo el layout demo ni el adapter Prisma
-- Validacion automatica pendiente:
-  - `pnpm lint`: no ejecutado porque este shell no tiene `node`, `npm`, `npx` ni `pnpm`
-  - `pnpm build`: no ejecutado por la misma limitacion
+- BigQuery real:
+  - `ALTER TABLE efeonce-group.greenhouse.client_users` aplicado para `google_sub` y `google_email`
+- GCP real:
+  - OAuth client creado: `projects/efeonce-group/locations/global/oauthClients/greenhouse-portal`
+  - `clientId`: `a1fcb039b-cb54-41a3-8988-3acad9901c96`
+  - redirect URIs activas:
+    - `https://greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://dev-greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://pre-greenhouse.efeoncepro.com/api/auth/callback/google`
+    - `https://greenhouse-eo-git-feature-google-sso-efeonce-7670142f.vercel.app/api/auth/callback/google`
+    - `http://localhost:3000/api/auth/callback/google`
+- Vercel real:
+  - se cargaron `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en `Development`, `staging`, `Production`, `Preview (develop)` y `Preview (feature/google-sso)`
+  - `Preview (feature/google-sso)` tambien quedo con `GCP_PROJECT`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
+  - preview validado: `https://greenhouse-eo-git-feature-google-sso-efeonce-7670142f.vercel.app`
+  - deployment activo validado: `https://greenhouse-c6rz0laml-efeonce-7670142f.vercel.app`
+- Validacion runtime remota:
+  - `/login` responde en el preview protegido via `vercel curl`
+  - `/api/auth/providers` expone `azure-ad`, `google` y `credentials`
 
 ### Riesgos o pendientes
-- Falta aplicar en BigQuery real el delta aditivo de `scripts/setup-bigquery.sql` para `google_sub` y `google_email`.
-- Falta cargar `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en Vercel para `Development`, `Preview`, `staging` y `Production`.
 - Regla operativa importante: esta rama mantiene el principio vigente del portal; Google SSO solo vincula principals existentes en `greenhouse.client_users` y no auto-provisiona acceso solo por `allowed_email_domains`.
-- Conviene validar visualmente en Preview el login y `/settings` una vez que existan las variables de entorno de Google.
+- El `pnpm build` local en este shell siguio fallando por un issue local de Next.js alrededor de `/developers/api`, pero el build remoto de Vercel para `feature/google-sso` quedo `Ready`.
+- Falta validacion humana final del redirect completo en navegador contra una cuenta Google real; desde CLI quedo validado el provider, el callback URL y el principal Efeonce existente.
 
 ## 2026-03-13 21:00 America/Santiago
 

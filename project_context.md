@@ -244,6 +244,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `google_email`
 - `/login` ahora agrega Google como CTA secundaria debajo de Microsoft y antes del divisor de credenciales.
 - `/settings` ahora muestra el estado de vinculo de Microsoft y Google, y permite iniciar cualquiera de los dos enlaces SSO cuando la sesion actual entro por credenciales.
+- Infra ya aplicada fuera del repo:
+  - `greenhouse.client_users` ya expone `google_sub` y `google_email` en BigQuery real
+  - el proyecto `efeonce-group` ya tiene creado el OAuth client `greenhouse-portal`
+  - Vercel `greenhouse-eo` ya tiene `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` cargados en `Development`, `staging`, `Production`, `Preview (develop)` y `Preview (feature/google-sso)`
 - Regla operativa ratificada para auth:
   - Google SSO, igual que Microsoft SSO, solo vincula principals ya existentes en `greenhouse.client_users`
   - `allowed_email_domains` puede explicar un rechazo o servir de pista de provisioning, pero no auto-crea principals durante login
