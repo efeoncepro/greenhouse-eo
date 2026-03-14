@@ -14,6 +14,10 @@ export const hasRouteGroup = (tenant: TenantContext, routeGroup: TenantRouteGrou
 
 export const canAccessProject = (tenant: TenantContext, projectId: string) => tenant.projectIds.includes(projectId)
 
+export const canAccessPeopleModule = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'internal') &&
+  (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll'))
+
 export const requireTenantContext = async () => {
   const tenant = await getTenantContext()
 
@@ -110,6 +114,29 @@ export const requireHrTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, 'efeonce_admin')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requirePeopleTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!canAccessPeopleModule(tenant)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

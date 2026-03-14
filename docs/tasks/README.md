@@ -16,6 +16,7 @@ Indice de briefs y tasks de implementacion del repo.
 | [CODEX_TASK_HR_Payroll_Module_v2.md](CODEX_TASK_HR_Payroll_Module_v2.md) | Modulo HR de nomina y compensacion |
 | [CODEX_TASK_Login_Page_Greenhouse.md](CODEX_TASK_Login_Page_Greenhouse.md) | UI de login |
 | [CODEX_TASK_Microsoft_SSO_Greenhouse.md](CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
+| [CODEX_TASK_People_Unified_View_v2.md](CODEX_TASK_People_Unified_View_v2.md) | Vista unificada de personas alineada al runtime real |
 | [CODEX_TASK_Space_Admin_View_Redesign.md](CODEX_TASK_Space_Admin_View_Redesign.md) | Vista admin de space |
 | [CODEX_TASK_Team_Identity_Capacity_System.md](CODEX_TASK_Team_Identity_Capacity_System.md) | Sistema de identidad y capacidad |
 | [CODEX_TASK_Tenant_Detail_View_Redesign.md](CODEX_TASK_Tenant_Detail_View_Redesign.md) | Detalle admin de tenant |

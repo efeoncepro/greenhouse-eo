@@ -40,6 +40,250 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 14:30 America/Santiago
+
+### Agente
+- Claude
+
+### Objetivo del turno
+- Implementar el frontend completo de `People Unified View v2`: lista, ficha, sidebar, tabs y navegacion.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / frontend implementation
+
+### Archivos tocados
+- `src/app/(dashboard)/people/layout.tsx` (nuevo)
+- `src/app/(dashboard)/people/page.tsx` (nuevo)
+- `src/app/(dashboard)/people/[memberId]/page.tsx` (nuevo)
+- `src/views/greenhouse/people/helpers.ts` (nuevo)
+- `src/views/greenhouse/people/PeopleList.tsx` (nuevo)
+- `src/views/greenhouse/people/PeopleListStats.tsx` (nuevo)
+- `src/views/greenhouse/people/PeopleListFilters.tsx` (nuevo)
+- `src/views/greenhouse/people/PeopleListTable.tsx` (nuevo)
+- `src/views/greenhouse/people/PersonView.tsx` (nuevo)
+- `src/views/greenhouse/people/PersonLeftSidebar.tsx` (nuevo)
+- `src/views/greenhouse/people/PersonTabs.tsx` (nuevo)
+- `src/views/greenhouse/people/tabs/PersonAssignmentsTab.tsx` (nuevo)
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` (nuevo)
+- `src/views/greenhouse/people/tabs/PersonCompensationTab.tsx` (nuevo)
+- `src/views/greenhouse/people/tabs/PersonPayrollTab.tsx` (nuevo)
+- `src/views/greenhouse/people/components/CountryFlag.tsx` (nuevo)
+- `src/views/greenhouse/people/components/IntegrationStatus.tsx` (nuevo)
+- `src/config/greenhouse-nomenclature.ts` (modificado: agregado `GH_PEOPLE_NAV`)
+- `src/components/layout/vertical/VerticalMenu.tsx` (modificado: seccion Equipo)
+
+### Verificacion
+- `pnpm exec tsc --noEmit`: solo errores de `.next-local` cache (no del delta)
+- `pnpm build`: correcto, artefacto incluye `/people` y `/people/[memberId]`
+- 18 archivos nuevos, 2 modificados
+
+### Riesgos o pendientes
+- El frontend consume los contratos `PeopleListPayload` y `PersonDetail` del backend de Codex.
+- Codex modifico los tipos del backend agregando `access.visibleTabs`, `summary.*` y `integrations.identityConfidence`. El frontend ya se adapto a estos cambios (linter/user hizo ajustes a `PersonView`, `PersonLeftSidebar`, `PersonTabs`).
+- Tab Asignaciones es read-only con ghost slot oculto (`display: none`) listo para activar cuando Admin Team CRUD exista.
+- Tab Compensacion reutiliza `formatCurrency` y `regimeLabel` de `payroll/helpers.ts`.
+- Tab Nomina reutiliza el patron de `MemberPayrollHistory` con chart y tabla.
+- Sidebar "Equipo > Personas" visible solo para `efeonce_admin`, `efeonce_operations`, `hr_payroll` (por `roleCodes`, no por route group).
+- Proximo paso: commit del frontend, luego PR a develop o preview Vercel.
+
+## 2026-03-14 13:10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar el backend base de `People Unified View v2` para congelar contrato y habilitar trabajo paralelo de frontend.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / backend contract freeze
+
+### Archivos tocados
+- `src/types/people.ts`
+- `src/lib/people/shared.ts`
+- `src/lib/people/get-people-list.ts`
+- `src/lib/people/get-person-detail.ts`
+- `src/lib/people/get-person-operational-metrics.ts`
+- `src/app/api/people/route.ts`
+- `src/app/api/people/[memberId]/route.ts`
+- `src/lib/tenant/authorization.ts`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- `pnpm exec eslint src/lib/people src/app/api/people src/types/people.ts src/lib/tenant/authorization.ts`: correcto
+- `pnpm exec tsc --noEmit --pretty false`: correcto en el momento del freeze backend
+- `pnpm build`: correcto en el momento del freeze backend
+- `git diff --check`: correcto
+- El artefacto de build ya incluye:
+  - `/api/people`
+  - `/api/people/[memberId]`
+
+### Riesgos o pendientes
+- Claude ya puede avanzar en paralelo con frontend usando estos payloads:
+  - `PeopleListPayload`
+  - `PersonDetail`
+- El contrato backend ahora expone ademas metadata lista para frontend:
+  - `access.visibleTabs`
+  - `access.canView*`
+  - `summary.activeAssignments`
+  - `summary.totalFte`
+  - `summary.totalHoursMonth`
+- Helper reusable disponible para frontend/server:
+  - `src/lib/people/permissions.ts`
+- El match operativo de `People` ya no depende solo de `member.notion_user_id`:
+  - ahora tambien usa señales de `identity_profile_source_links`
+  - toma candidatos adicionales de Notion desde `source_object_id` / `source_user_id`
+  - suma fallback por `source_display_name`, `source_email` y aliases ya reconciliados
+- Boundary acordado para evitar retrabajo:
+  - `People` sigue siendo read-only
+  - no introducir drawers de escritura ni writes bajo `/api/people/*`
+  - el CRUD posterior de equipo debe vivir en `Admin Team Module`
+- Siguiente paso recomendado backend:
+  - agregar page/layout server-side de `/people`
+  - dejar helpers de permisos reutilizables para tabs del frontend
+  - revisar con data real si conviene ampliar el fallback de match operativo mas alla de `notion_user_id`
+- Nota de coordinacion:
+  - mientras Claude arma `src/app/(dashboard)/people/*` y `src/views/greenhouse/people/*`, el `tsc` global puede mostrar ruido transitorio por imports frontend aun no creados
+  - el delta backend actual sigue validado por `eslint` y `git diff --check`
+
+## 2026-03-14 13:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar la integración entre el backend de `People` y el frontend ya implementado por Claude, dejando el módulo compilando end-to-end.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / module integration
+
+### Archivos tocados
+- `src/views/greenhouse/people/PersonView.tsx`
+- `src/views/greenhouse/people/PersonTabs.tsx`
+- `src/views/greenhouse/people/PersonLeftSidebar.tsx`
+- `src/lib/people/get-person-detail.ts`
+- `src/lib/people/get-person-operational-metrics.ts`
+- `src/app/(dashboard)/people/layout.tsx`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- `pnpm exec eslint src/views/greenhouse/people 'src/app/(dashboard)/people' src/app/api/people src/lib/people src/types/people.ts src/lib/tenant/authorization.ts src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts`: correcto
+- `pnpm exec tsc --noEmit --pretty false`: correcto
+- `pnpm build`: correcto
+- `git diff --check`: correcto
+- Build final incluye:
+  - `/people`
+  - `/people/[memberId]`
+  - `/api/people`
+  - `/api/people/[memberId]`
+
+### Riesgos o pendientes
+- El modulo `People` ya esta listo para smoke en preview, pero aun no se ha publicado este delta.
+- Integracion cerrada importante:
+  - `PersonTabs` ahora usa `detail.access.visibleTabs` del backend
+  - `PersonLeftSidebar` ahora usa `detail.summary`
+  - el match operativo de actividad ya reutiliza senales canonicas desde `identity_profile_source_links`
+- Siguiente paso recomendado:
+  - publicar el delta en preview y validar con usuarios reales por rol
+  - despues de esa validacion, recien evaluar abrir `Admin Team Module`
+
+## 2026-03-14 12:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar la factibilidad tecnica de la task `People Unified View` contra el estado real del repo y reescribir el brief como una version ejecutable.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentation / implementation planning
+
+### Archivos tocados
+- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión contrastada contra runtime y docs vivas del repo:
+  - `project_context.md`
+  - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `src/lib/tenant/authorization.ts`
+  - `src/lib/tenant/access.ts`
+  - `src/lib/team-queries.ts`
+  - `src/types/team.ts`
+  - `src/types/payroll.ts`
+  - `src/lib/payroll/get-compensation.ts`
+- Hallazgos incorporados a la nueva task:
+  - no existe `/admin/team` ni `/api/admin/team/*`
+  - no existe route group `people`
+  - los roles reales son `efeonce_admin`, `efeonce_operations`, `efeonce_account`, `hr_payroll`
+  - `team_members` ya tiene `location_country`; no se debe agregar `country`
+- No hubo cambios de runtime ni de base de datos; este turno fue documental.
+
+### Riesgos o pendientes
+- La task vigente para People debe tomarse desde `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`, no desde la version original.
+- La `v2` deja People como surface inicialmente read-first; si se quiere editar assignments desde esa vista, hace falta una task adicional de CRUD de team.
+- Sigue pendiente decidir si `efeonce_account` debe ver `/people` en lectura o si queda fuera del alcance inicial.
+
+## 2026-03-14 12:28 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Leer tambien `CODEX_TASK_Admin_Team_Module.md` y dejar explicitado como coordinar `People Unified View` ahora sin bloquear ni retrabajar el futuro modulo `Admin Team`.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentation / implementation planning
+
+### Archivos tocados
+- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `Handoff.md`
+
+### Verificacion
+- Lectura comparada entre:
+  - `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+  - `docs/tasks/CODEX_TASK_Admin_Team_Module.md`
+- Se dejo documentado en la task de People:
+  - People `v2` es capa de lectura consolidada
+  - no debe introducir writes bajo `/api/people/*`
+  - el futuro CRUD de equipo debe vivir bajo `/api/admin/team/*`
+  - la capa `src/lib/people/*` debe diseñarse reusable para que `Admin Team` la consuma despues
+
+### Riesgos o pendientes
+- Division de trabajo acordada para la siguiente implementacion:
+  - Codex hace todo el backend de `People Unified View v2`
+  - Claude hace todo el frontend de `People Unified View v2`
+- Esa implementacion debe dejar preparado el camino para `Admin Team Module` posterior:
+  - contratos read-only en People
+  - shared queries separadas de los route handlers
+  - sin mezclar People con CRUD admin en esta primera fase
+- `CODEX_TASK_Admin_Team_Module.md` tambien esta desfasada respecto al repo en su parte de infraestructura base, pero sigue siendo util como brief de CRUD y surfaces admin para una fase posterior.
+
 ## 2026-03-14 09:35 America/Santiago
 
 ### Agente
@@ -1844,3 +2088,120 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El detalle de tenant queda mucho mas alineado, pero aun puede sobrevivir copy residual menor ligado a labels tecnicas de HubSpot owner/base URL o textos de dominio que el equipo quiera hispanizar mas adelante.
 - Sigue pendiente smoke visual autenticado de `admin/tenants/[id]` y `view-as/dashboard`.
+
+### Fecha
+- 2026-03-14 10:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Re-asignar `pre-greenhouse.efeoncepro.com` para que apunte al preview activo de `HR Payroll` y dejar claro el nuevo destino compartido de pruebas.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- Vercel Preview compartido / `pre-greenhouse`
+
+### Cambios realizados
+- Se confirmo que `feature/hr-payroll` tenia previews `Ready` propios, pero `pre-greenhouse.efeoncepro.com` no apuntaba a esa rama.
+- Se detecto que el scope correcto para operar el dominio era `efeonce-7670142f`, no el scope personal `efeonce`.
+- Se reasigno `pre-greenhouse.efeoncepro.com` al deployment `greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app` correspondiente al preview actual de `feature/hr-payroll`.
+
+### Verificacion
+- `pnpm dlx vercel@latest alias set greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto
+- `pnpm dlx vercel@latest curl /login --deployment https://pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto, responde login con `Entrar con Microsoft` y `Entrar con Google`
+- `pnpm dlx vercel@latest curl /api/hr/payroll/periods --deployment https://pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto, responde `{\"error\":\"Unauthorized\"}` sin sesion
+
+### Riesgos o pendientes
+- `pre-greenhouse` es un alias compartido; cualquier otro agente que lo necesite para otra rama tendra que re-asignarlo conscientemente.
+- Falta validacion humana autenticada del flujo completo de `HR Payroll` sobre `pre-greenhouse`.
+
+### Fecha
+- 2026-03-14 10:28 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el bloqueo real de login en `pre-greenhouse` para `feature/hr-payroll` y aislar si el rechazo restante era de infraestructura o de password.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- Vercel Preview compartido / `pre-greenhouse`
+
+### Cambios realizados
+- Se detecto por logs que el login por `credentials` estaba fallando antes de validar password por un error de BigQuery:
+  - `Cannot parse REYES@EFEONCE as CloudRegion`
+- Se corrigieron las env vars branch-specific de `Preview (feature/hr-payroll)`:
+  - `GCP_PROJECT = efeonce-group`
+  - `NEXTAUTH_URL = https://pre-greenhouse.efeoncepro.com`
+- Se redeployo el preview corregido:
+  - `https://greenhouse-lc737eg28-efeonce-7670142f.vercel.app`
+- Se re-asigno `pre-greenhouse.efeoncepro.com` a ese deployment corregido.
+
+### Verificacion
+- `vercel logs` antes del fix: confirmo error de infraestructura en callback `credentials`
+- `vercel env add ... --force` para `GCP_PROJECT` y `NEXTAUTH_URL`: correcto
+- `vercel redeploy greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app --scope efeonce-7670142f`: correcto
+- `vercel alias set greenhouse-lc737eg28-efeonce-7670142f.vercel.app pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto
+- Smoke del callback `credentials` con sesion CSRF real:
+  - ahora responde `CredentialsSignin`
+  - ya no aparece el error `CloudRegion`
+- `vercel logs` despues del fix:
+  - el principal `julio.reyes@efeonce.org` existe y esta `active = true`, `status = active`
+  - el rechazo restante es `password mismatch or inactive user`, por lo que el bloqueo de infraestructura quedo resuelto y el fallo actual es solo de password no coincidente
+
+### Riesgos o pendientes
+- El preview ya no rompe por BigQuery durante login, pero el acceso por email/password seguira fallando mientras no se use la password correcta o no se resetee la credencial del usuario.
+- Para usuarios internos de Efeonce, el flujo recomendado sigue siendo `Entrar con Microsoft`; el principal ya existe y el path SSO es mas apropiado que depender de password manual.
+
+### Fecha
+- 2026-03-14 10:52 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Provisionar accesos internos nuevos para el equipo Efeonce en Greenhouse sin tocar la cuenta existente de Julio y dejar sus claves temporales en un archivo local separado.
+
+### Rama
+- Rama usada: `feature/hr-payroll`
+- Rama objetivo: la rama activa del repo
+
+### Ambiente objetivo
+- BigQuery real / `pre-greenhouse`
+
+### Cambios realizados
+- Se confirmo que, de la lista entregada, solo `Julio Reyes` ya existia como `client_user`; su cuenta y password no se tocaron.
+- Se verifico que las otras 6 personas ya existian en `greenhouse.team_members` / `greenhouse.identity_profiles`, por lo que se provisiono solo la capa de acceso en `greenhouse.client_users`.
+- Se crearon 6 usuarios internos nuevos en `greenhouse.client_users`, enlazados por `identity_profile_id` y con `microsoft_email` igual al correo `@efeoncepro.com`:
+  - `Valentina Hoyos` -> `efeonce_account`
+  - `Daniela Ferreira` -> `efeonce_operations`
+  - `Humberly Henriquez` -> `efeonce_operations`
+  - `Melkin Hernandez` -> `efeonce_operations`
+  - `Andres Carlosama` -> `efeonce_operations`
+  - `Luis Reyes` -> `efeonce_account`
+- Se agregaron o consolidaron aliases de email en `greenhouse.team_members.email_aliases` para incluir los correos internos `@efeonce.org` provistos por el usuario.
+- Se crearon `user_role_assignments` activos para esas 6 cuentas.
+- Se agregaron `identity_profile_source_links` de tipo `greenhouse_auth/client_user` para dejar la capa de identidad canonica enlazada al nuevo principal de login.
+- Se genero un archivo local con claves temporales:
+  - `LOCAL_INTERNAL_TEAM_ACCESS_CREDENTIALS_2026-03-14.md`
+  - el archivo fue agregado a `.git/info/exclude` para no commitearlo por accidente
+
+### Verificacion
+- Query real a BigQuery despues del alta:
+  - las 6 cuentas nuevas aparecen activas en `greenhouse.client_users`
+  - cada una con `identity_profile_id` y `role_codes` esperados
+- Smoke real de login en `pre-greenhouse` con `valentina.hoyos@efeonce.org`:
+  - `POST /api/auth/callback/credentials` devolvio `https://pre-greenhouse.efeoncepro.com/auth/landing`
+
+### Riesgos o pendientes
+- El archivo `LOCAL_INTERNAL_TEAM_ACCESS_CREDENTIALS_2026-03-14.md` es sensible y local-only; no debe compartirse ni commitearse.
+- Algunos perfiles canonicos siguen anclados a HubSpot o `greenhouse_team`; hoy eso no bloquea login porque `client_users.identity_profile_id` y `identity_profile_source_links` ya quedaron creados.
+- Si se quiere endurecer la gobernanza, el siguiente paso seria crear un flujo formal de reset/rotacion de passwords temporales para internos.

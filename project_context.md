@@ -3,6 +3,60 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 People unified frontend
+- Frontend completo de `People Unified View v2` implementado sobre los contratos backend:
+  - `/people` → `PeopleList.tsx` (stats + filtros + tabla TanStack)
+  - `/people/[memberId]` → `PersonView.tsx` (2 columnas: sidebar + tabs)
+- Tabs dinamicos segun `detail.access.visibleTabs` del backend:
+  - Asignaciones (read-only, ghost slot para futuro CRUD)
+  - Actividad (3 KPI cards + breakdown por proyecto)
+  - Compensacion (desglose vigente con seccion Chile condicional)
+  - Nomina (chart ApexCharts + tabla detalle por periodo)
+- Sidebar "Equipo > Personas" agregado al `VerticalMenu.tsx`:
+  - visibilidad por `roleCodes`, no por route group
+  - posicion: despues de Agencia, antes de HR
+- Componentes reutilizables nuevos:
+  - `CountryFlag.tsx` (banderas emoji por ISO alpha-2)
+  - `IntegrationStatus.tsx` (check verde/gris por provider)
+- La carpeta `views/greenhouse/people/drawers/` queda reservada para Admin Team Module (CRUD)
+
+## Delta 2026-03-14 People unified backend foundation
+- El repo ya tiene una primera capa backend read-only para `People Unified View`:
+  - `GET /api/people`
+  - `GET /api/people/[memberId]`
+  - `src/lib/people/get-people-list.ts`
+  - `src/lib/people/get-person-detail.ts`
+  - `src/lib/people/get-person-operational-metrics.ts`
+  - `src/types/people.ts`
+- Regla operativa de acceso vigente:
+  - `People` no introduce route group `people`
+  - el backend valida `internal` y restringe por roles reales:
+    - `efeonce_admin`
+    - `efeonce_operations`
+    - `hr_payroll`
+- Regla operativa de arquitectura:
+  - `People` es lectura consolidada, no CRUD
+  - no se deben introducir writes bajo `/api/people/*`
+  - el futuro `Admin Team Module` debe vivir bajo `/api/admin/team/*` y reutilizar la misma capa de datos
+- Fuentes reales del backend `People`:
+  - roster: `greenhouse.team_members`
+  - assignments: `greenhouse.client_team_assignments`
+  - identidad: `greenhouse.identity_profile_source_links`
+  - actividad: `notion_ops.tareas`
+  - HR: `greenhouse.compensation_versions` y `greenhouse.payroll_entries`
+- Regla de modelado vigente:
+  - usar `location_country`, no crear una columna redundante `country`
+  - tratar `team_members.identity_profile_id` como identidad canonica de persona
+  - tratar `client_users` como principal de acceso, no como ficha laboral
+- Estado de integracion actual:
+  - ya existen `/people` y `/people/[memberId]` en App Router
+  - el sidebar ya expone `Personas`
+  - el frontend consume el contrato backend consolidado
+  - `pnpm build` ya incluye las dos rutas UI y las dos APIs del modulo
+- Regla de acople frontend/backend:
+  - el frontend no debe recalcular permisos de tabs desde la session si el backend ya entrega `access.visibleTabs`
+  - el sidebar de persona debe usar `summary` del payload, no recomputar FTE u horas desde la tabla
+
 ## Delta 2026-03-14 HR payroll backend foundation
 - El repo ya tiene una primera capa backend operativa de `HR Payroll` bajo el route group propio `hr`:
   - `src/app/(dashboard)/hr/layout.tsx`

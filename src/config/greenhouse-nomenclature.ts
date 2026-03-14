@@ -15,6 +15,10 @@ export const GH_INTERNAL_NAV = {
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' }
 } as const
 
+export const GH_PEOPLE_NAV = {
+  people: { label: 'Personas', subtitle: 'Vista operativa del equipo Efeonce' }
+} as const
+
 export const GH_AGENCY_NAV = {
   pulseGlobal: { label: 'Pulse Global', subtitle: 'KPIs agregados de todos los Spaces' },
   spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },

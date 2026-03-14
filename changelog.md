@@ -6,6 +6,65 @@
 
 ## 2026-03-14
 
+### People unified frontend
+- Se implemento el frontend completo de `People Unified View v2` con 18 archivos nuevos.
+- Lista `/people`: stats row (4 cards), filtros (rol, pais, estado, busqueda), tabla TanStack con avatar, cargo, pais, FTE, estado.
+- Ficha `/people/[memberId]`: layout 2 columnas, sidebar izquierdo (avatar, contacto, metricas, integraciones), tabs dinamicos por rol.
+- Tabs implementados: Asignaciones (read-only), Actividad (KPIs + breakdown), Compensacion (desglose vigente), Nomina (chart + tabla).
+- Sidebar navigation: seccion "Equipo > Personas" visible por `roleCodes` (`efeonce_admin`, `efeonce_operations`, `hr_payroll`).
+- Ghost slot en tab Asignaciones preparado para futuro Admin Team CRUD.
+
+### People unified backend foundation
+- Se implemento la primera capa backend read-only de `People Unified View v2` con dos rutas nuevas:
+  - `GET /api/people`
+  - `GET /api/people/[memberId]`
+- Se agrego `src/types/people.ts` como contrato base para lista y ficha de persona.
+- El contrato de detalle ya incluye metadata util para frontend sin recalculo cliente:
+  - `access.visibleTabs`
+  - `access.canViewAssignments`
+  - `access.canViewActivity`
+  - `access.canViewCompensation`
+  - `access.canViewPayroll`
+  - `summary.activeAssignments`
+  - `summary.totalFte`
+  - `summary.totalHoursMonth`
+- Se agrego `src/lib/people/permissions.ts` como helper reusable para calcular visibilidad real de tabs segun roles.
+- La nueva capa `src/lib/people/*` consolida:
+  - roster y assignments desde `team_members` + `client_team_assignments`
+  - integraciones desde `identity_profile_source_links`
+  - actividad operativa desde `notion_ops.tareas`
+  - compensacion y nomina desde payroll
+- El match operativo del detalle de persona quedo endurecido:
+  - sigue priorizando `notion_user_id`
+  - ahora tambien reutiliza señales canonicas desde `identity_profile_source_links` para mejorar el fallback de actividad cuando falta o cambia el enlace principal
+- `src/lib/tenant/authorization.ts` ahora expone `requirePeopleTenantContext()` y fija el acceso real del modulo a:
+  - `efeonce_admin`
+  - `efeonce_operations`
+  - `hr_payroll`
+- Queda ratificada la regla de arquitectura para evitar retrabajo:
+  - `People` es lectura consolidada
+  - el futuro CRUD de equipo no debe vivir bajo `/api/people/*`, sino bajo `/api/admin/team/*`
+
+### People unified module integration
+- El frontend y backend de `People` ya quedaron integrados y el modulo completo compila dentro del repo:
+  - `/people`
+  - `/people/[memberId]`
+  - `/api/people`
+  - `/api/people/[memberId]`
+- La UI de detalle ya no recalcula permisos ni resumen localmente cuando el backend ya entrega esos datos:
+  - `PersonTabs` usa `detail.access.visibleTabs`
+  - `PersonLeftSidebar` usa `detail.summary`
+- La navegacion interna ya expone `Personas` en el sidebar mediante `GH_PEOPLE_NAV`.
+
+### People unified view task alignment
+- Se agrego `docs/tasks/CODEX_TASK_People_Unified_View_v2.md` como brief corregido y ejecutable para `People`, alineado al runtime real del repo.
+- La nueva version elimina supuestos incorrectos del brief anterior:
+  - no depende de `/admin/team` ni de `/api/admin/team/*`
+  - no introduce un route group `people` inexistente
+  - mapea permisos al auth real (`efeonce_admin`, `efeonce_operations`, `hr_payroll`)
+  - reutiliza `location_country` en lugar de proponer una columna redundante `country`
+- `docs/tasks/README.md` ya indexa la nueva task como referencia operativa.
+
 ### HR payroll backend hardening
 - El backend de `HR Payroll` ya quedó operativo y validado con `pnpm build`, incluyendo las rutas `/api/hr/payroll/**` dentro del artefacto de producción.
 - Se endureció la capa server-side de payroll para evitar estados inconsistentes:
@@ -622,3 +681,7 @@
 - feat: `Proyectos/[id]` y `Ciclos` fueron reescritos con microcopy Greenhouse, breadcrumbs cliente, estados vacios explicativos y modulos base del documento.
 - feat: se extendio la canonizacion de copy operativa a `Control Tower`, tablas de usuarios, usuarios del space y detalle de usuario en `internal/admin`.
 - feat: `admin/tenants/[id]`, `view-as/dashboard`, governance de capabilities y tabla de service modules ahora consumen copy operativa desde `GH_INTERNAL_MESSAGES` en lugar de labels dispersos.
+# 2026-03-14
+- chore: `pre-greenhouse.efeoncepro.com` fue re-asignado al preview `feature/hr-payroll` (`greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app`) para validar backend + UI del modulo HR Payroll en el dominio compartido de Preview.
+- fix: el preview `feature/hr-payroll` dejo de romper el login por `credentials` antes de validar password; se corrigieron `GCP_PROJECT` y `NEXTAUTH_URL` en `Preview (feature/hr-payroll)`, se redeployo a `greenhouse-lc737eg28-efeonce-7670142f.vercel.app` y `pre-greenhouse` fue reasignado a ese deployment corregido.
+- feat: se provisionaron 6 nuevos usuarios internos Efeonce en `greenhouse.client_users`, enlazados a `team_members` / `identity_profiles`, con roles `efeonce_account` o `efeonce_operations`, aliases internos `@efeonce.org` y smoke de login exitoso en `pre-greenhouse`.
