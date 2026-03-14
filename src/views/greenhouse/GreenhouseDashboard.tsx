@@ -14,6 +14,7 @@ import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomen
 import { EmptyState, ExecutiveCardShell, SectionErrorBoundary, TeamCapacitySection } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
+import type { TeamMembersPayload } from '@/types/team'
 import ClientAttentionProjectsAccordion from '@views/greenhouse/dashboard/ClientAttentionProjectsAccordion'
 import ClientDashboardHero from '@views/greenhouse/dashboard/ClientDashboardHero'
 import ClientEcosystemSection from '@views/greenhouse/dashboard/ClientEcosystemSection'
@@ -44,9 +45,10 @@ import {
 type GreenhouseDashboardProps = {
   clientName: string
   data: GreenhouseDashboardData
+  teamMembersData?: TeamMembersPayload | null
 }
 
-const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => {
+const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: GreenhouseDashboardProps) => {
   const theme = useTheme()
   const [requestIntent, setRequestIntent] = useState<string | null>(null)
 
@@ -267,7 +269,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
         </Box>
 
         <SectionErrorBoundary sectionName='team-capacity' description='No pudimos cargar la seccion de equipo.'>
-          <TeamCapacitySection />
+          <TeamCapacitySection initialData={teamMembersData} dashboardData={data} />
         </SectionErrorBoundary>
 
         <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la seccion de ecosistema.'>

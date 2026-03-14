@@ -1,7 +1,17 @@
 import type { GreenhouseKpiTone } from '@/types/greenhouse-dashboard'
 
 export type CapabilityModuleTheme = 'creative' | 'crm' | 'onboarding' | 'web'
-export type CapabilityModuleCardType = 'metric' | 'project-list' | 'tooling-list' | 'quality-list' | 'metric-list' | 'chart-bar'
+export type CapabilityModuleCardType =
+  | 'metric'
+  | 'project-list'
+  | 'tooling-list'
+  | 'quality-list'
+  | 'metric-list'
+  | 'chart-bar'
+  | 'section-header'
+  | 'pipeline'
+  | 'metrics-row'
+  | 'alert-list'
 export type CapabilityModuleCardSize = 'sm' | 'md' | 'lg' | 'full'
 
 export interface CapabilityDataSourceRef {
@@ -103,6 +113,31 @@ export interface CapabilityBarChartData {
   totalValue: string
 }
 
+export interface CapabilityPipelinePhase {
+  id: string
+  label: string
+  color: string
+  count: number
+}
+
+export interface CapabilityMetricsRowItem {
+  id: string
+  label: string
+  value: string | null
+  description: string
+  tone: 'success' | 'warning' | 'error' | 'info'
+}
+
+export interface CapabilityAlertItem {
+  id: string
+  name: string
+  project: string
+  phase: string
+  daysStuck: number
+  severity: 'warning' | 'danger'
+  frameUrl?: string | null
+}
+
 export type CapabilityCardData =
   | { type: 'metric'; metrics: CapabilityMetric[] }
   | { type: 'project-list'; items: CapabilityProjectItem[] }
@@ -110,6 +145,10 @@ export type CapabilityCardData =
   | { type: 'quality-list'; items: CapabilityQualityItem[] }
   | { type: 'metric-list'; items: CapabilityMetricListItem[] }
   | { type: 'chart-bar'; chart: CapabilityBarChartData }
+  | { type: 'section-header'; subtitle: string; icon: string }
+  | { type: 'pipeline'; phases: CapabilityPipelinePhase[]; total: number }
+  | { type: 'metrics-row'; items: CapabilityMetricsRowItem[] }
+  | { type: 'alert-list'; items: CapabilityAlertItem[]; emptyMessage: string }
 
 export interface CapabilityModuleData {
   module: ResolvedCapabilityModule

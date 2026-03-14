@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
-import CardActionArea from '@mui/material/CardActionArea'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Alert from '@mui/material/Alert'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
@@ -17,6 +16,7 @@ import BusinessLineBadge from './BusinessLineBadge'
 import EmptyState from './EmptyState'
 import ExecutiveCardShell from './ExecutiveCardShell'
 import RequestDialog from './RequestDialog'
+import TeamExpansionGhostCard from './TeamExpansionGhostCard'
 import TeamMemberCard from './TeamMemberCard'
 import { getBrandDisplayLabel } from './brand-assets'
 
@@ -148,45 +148,7 @@ const TeamDossierSection = () => {
                   <TeamMemberCard key={member.memberId} member={member} />
                 ))}
 
-                <Box
-                  sx={{
-                    borderRadius: 3,
-                    border: `1px dashed ${GH_COLORS.neutral.border}`,
-                    bgcolor: GH_COLORS.neutral.bgSurface,
-                    overflow: 'hidden'
-                  }}
-                >
-                  <CardActionArea
-                    onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())}
-                    sx={{
-                      minHeight: 280,
-                      display: 'grid',
-                      placeItems: 'center',
-                      p: 3,
-                      textAlign: 'center'
-                    }}
-                  >
-                    <Stack spacing={1.5} alignItems='center'>
-                      <Box
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          display: 'grid',
-                          placeItems: 'center',
-                          borderRadius: 999,
-                          bgcolor: GH_COLORS.semantic.warning.bg,
-                          color: GH_COLORS.semantic.warning.text
-                        }}
-                      >
-                        <i className='tabler-plus text-[24px]' />
-                      </Box>
-                      <Typography variant='h6'>{GH_TEAM.expand_title}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {GH_TEAM.expand_subtitle}
-                      </Typography>
-                    </Stack>
-                  </CardActionArea>
-                </Box>
+                <TeamExpansionGhostCard minHeight={280} onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())} />
               </Box>
 
               <Box

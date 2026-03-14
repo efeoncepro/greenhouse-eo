@@ -73,6 +73,52 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         type: 'quality-list',
         size: 'md',
         description: 'Senales recientes de RpA y First-Time Right.'
+      },
+
+      // ── Revenue Enabled ───────────────────────────────────────────
+      {
+        id: 'revenue-header',
+        title: 'Revenue Enabled',
+        type: 'section-header',
+        size: 'full',
+        description: 'El impacto de tu produccion creativa en el negocio'
+      },
+      {
+        id: 'creative-revenue-kpis',
+        title: 'Revenue metrics',
+        type: 'metrics-row',
+        size: 'full',
+        description: 'Early Launch Advantage, Iteration Velocity, Creative Throughput y First Time Right.'
+      },
+
+      // ── CSC Pipeline Tracker ──────────────────────────────────────
+      {
+        id: 'pipeline-header',
+        title: 'Creative Supply Chain',
+        type: 'section-header',
+        size: 'full',
+        description: 'El pipeline completo de tu produccion creativa'
+      },
+      {
+        id: 'csc-pipeline',
+        title: 'Pipeline CSC',
+        type: 'pipeline',
+        size: 'full',
+        description: 'Assets activos por fase de la Creative Supply Chain.'
+      },
+      {
+        id: 'csc-metrics',
+        title: 'Pipeline metrics',
+        type: 'metrics-row',
+        size: 'full',
+        description: 'Cycle time promedio, bottleneck, pipeline velocity y stuck assets.'
+      },
+      {
+        id: 'stuck-assets',
+        title: 'Stuck steps',
+        type: 'alert-list',
+        size: 'full',
+        description: 'Proyectos con assets detenidos mas de 48h sin movimiento.'
       }
     ]
   },

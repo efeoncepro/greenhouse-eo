@@ -48,6 +48,8 @@ export const GH_LABELS = {
 export const GH_TEAM = {
   section_title: 'Tu equipo de cuenta',
   section_subtitle: 'Las personas asignadas a tu operacion. Contacto directo, sin intermediarios.',
+  pulse_title: 'Tu equipo asignado',
+  pulse_subtitle: 'Las personas asignadas a tu operacion creativa',
   section_people_subtitle: 'Roster activo visible en tu operacion.',
   section_identity_subtitle: 'Personas con identidad externa enlazada.',
   label_fte: 'Dedicacion',
@@ -95,8 +97,27 @@ export const GH_TEAM = {
   label_hours: 'Horas este mes',
   label_utilization: 'Utilizacion',
   label_load: 'Carga por persona',
+  label_committed_capacity: 'Dedicacion contratada',
+  pulse_summary_title: 'Capacidad contratada',
+  pulse_summary_fte: (fte: number) => `${fte.toFixed(1)} FTE de ${fte.toFixed(1)} FTE contratados`,
+  pulse_summary_hours: (hours: number) => `${hours} horas mensuales`,
+  pulse_service_lines_more: (count: number) => `+${count} linea${count === 1 ? '' : 's'} adicional${count === 1 ? '' : 'es'}`,
   active_assets_short: 'assets activos',
   projects_short: 'proyectos',
+  capacity_contract_only: 'Por ahora mostramos la dedicacion contratada por persona.',
+  capacity_summary_subtitle: 'Resumen de capacidad contratada y uso estimado del mes',
+  capacity_utilization_help: 'La utilizacion se calcula sobre la capacidad total visible del equipo.',
+  capacity_people_assigned: (count: number) => `${count} ${count === 1 ? 'persona asignada' : 'personas asignadas'}`,
+  capacity_people_helper: 'Cobertura visible hoy para tu operacion.',
+  capacity_uniform_allocation: 'Todo el equipo visible tiene la misma dedicacion contratada.',
+  capacity_operational_live: 'La carga real por persona ya esta visible.',
+  capacity_member_hours: (hours: number) => `${hours}h/mes`,
+  capacity_member_fte: (fte: number) => `${fte.toFixed(1)} FTE`,
+  capacity_overloaded: 'Carga alta',
+  capacity_available: 'Carga visible',
+  capacity_projects_label: (count: number) => `${count} ${count === 1 ? 'proyecto' : 'proyectos'}`,
+  capacity_assets_label: (count: number) => `${count} ${count === 1 ? 'asset activo' : 'assets activos'}`,
+  capacity_no_breakdown: 'Sin desglose operativo por persona',
 
   project_team_title: 'Equipo en este proyecto',
   project_team_subtitle: 'Quienes estan trabajando hoy en este proyecto y como se mueve su carga.',
@@ -931,5 +952,15 @@ export const GH_COLORS = {
     error: '#bb1954',
     info: '#023c70',
     neutral: '#dbdbdb'
+  },
+
+  cscPhase: {
+    planning:   { source: '#633f93', bg: '#f2eff6', text: '#633f93' },
+    briefing:   { source: '#024c8f', bg: '#eaf0f6', text: '#024c8f' },
+    production: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
+    approval:   { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
+    assetMgmt:  { source: '#0375db', bg: '#eaf3fc', text: '#0375db' },
+    activation: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },
+    completed:  { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' }
   }
 } as const
