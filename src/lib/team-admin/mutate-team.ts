@@ -652,7 +652,8 @@ const writeAuditEvent = async ({
       targetEntityType,
       targetEntityId,
       eventPayload: JSON.stringify(payload)
-    }
+    },
+    types: clientId ? undefined : { clientId: 'STRING' }
   })
 }
 
@@ -919,6 +920,25 @@ export const createMember = async ({
     params[placeholder.slice(1)] = value
   }
 
+  const CREATE_COL_TYPES: Record<string, string> = {
+    locationCountry: 'STRING',
+    locationCity: 'STRING',
+    avatarUrl: 'STRING',
+    contactHandle: 'STRING',
+    relevanceNote: 'STRING',
+    azureOid: 'STRING',
+    notionUserId: 'STRING',
+    hubspotOwnerId: 'STRING'
+  }
+
+  const createTypes: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null && CREATE_COL_TYPES[key]) {
+      createTypes[key] = CREATE_COL_TYPES[key]
+    }
+  }
+
   await getBigQueryClient().query({
     query: `
       INSERT INTO \`${projectId}.greenhouse.team_members\` (
@@ -928,7 +948,8 @@ export const createMember = async ({
         ${insertValues.join(', ')}
       )
     `,
-    params
+    params,
+    types: Object.keys(createTypes).length > 0 ? createTypes : undefined
   })
 
   const created = await getMemberRecord(payload.memberId)
@@ -986,13 +1007,40 @@ export const updateMember = async ({
 
   setClauses.push('updated_at = CURRENT_TIMESTAMP()')
 
+  const COLUMN_TYPES: Record<string, string> = {
+    displayName: 'STRING',
+    email: 'STRING',
+    emailAliases: 'ARRAY<STRING>',
+    locationCountry: 'STRING',
+    locationCity: 'STRING',
+    roleTitle: 'STRING',
+    roleCategory: 'STRING',
+    avatarUrl: 'STRING',
+    contactChannel: 'STRING',
+    contactHandle: 'STRING',
+    relevanceNote: 'STRING',
+    azureOid: 'STRING',
+    notionUserId: 'STRING',
+    hubspotOwnerId: 'STRING',
+    active: 'BOOL'
+  }
+
+  const types: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null && COLUMN_TYPES[key]) {
+      types[key] = COLUMN_TYPES[key]
+    }
+  }
+
   await getBigQueryClient().query({
     query: `
       UPDATE \`${projectId}.greenhouse.team_members\`
       SET ${setClauses.join(', ')}
       WHERE member_id = @memberId
     `,
-    params
+    params,
+    types: Object.keys(types).length > 0 ? types : undefined
   })
 
   const updated = await getMemberRecord(memberId)
@@ -1096,6 +1144,24 @@ export const createAssignment = async ({
     })
   }
 
+  const ASSIGNMENT_NULL_TYPES: Record<string, string> = {
+    roleTitleOverride: 'STRING',
+    relevanceNoteOverride: 'STRING',
+    contactChannelOverride: 'STRING',
+    contactHandleOverride: 'STRING',
+    clientName: 'STRING'
+  }
+
+  const assignmentTypes: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(payload)) {
+    if (value === null && ASSIGNMENT_NULL_TYPES[key]) {
+      assignmentTypes[key] = ASSIGNMENT_NULL_TYPES[key]
+    }
+  }
+
+  const typesOpt = Object.keys(assignmentTypes).length > 0 ? assignmentTypes : undefined
+
   if (existing) {
     await getBigQueryClient().query({
       query: `
@@ -1113,7 +1179,8 @@ export const createAssignment = async ({
           updated_at = CURRENT_TIMESTAMP()
         WHERE assignment_id = @assignmentId
       `,
-      params: payload
+      params: payload,
+      types: typesOpt
     })
   } else {
     await getBigQueryClient().query({
@@ -1149,7 +1216,8 @@ export const createAssignment = async ({
           CURRENT_TIMESTAMP()
         )
       `,
-      params: payload
+      params: payload,
+      types: typesOpt
     })
   }
 
@@ -1209,13 +1277,31 @@ export const updateAssignment = async ({
 
   setClauses.push('updated_at = CURRENT_TIMESTAMP()')
 
+  const ASSIGN_COL_TYPES: Record<string, string> = {
+    fteAllocation: 'FLOAT64',
+    hoursPerMonth: 'INT64',
+    roleTitleOverride: 'STRING',
+    relevanceNoteOverride: 'STRING',
+    contactChannelOverride: 'STRING',
+    contactHandleOverride: 'STRING'
+  }
+
+  const assignTypes: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null && ASSIGN_COL_TYPES[key]) {
+      assignTypes[key] = ASSIGN_COL_TYPES[key]
+    }
+  }
+
   await getBigQueryClient().query({
     query: `
       UPDATE \`${projectId}.greenhouse.client_team_assignments\`
       SET ${setClauses.join(', ')}
       WHERE assignment_id = @assignmentId
     `,
-    params
+    params,
+    types: Object.keys(assignTypes).length > 0 ? assignTypes : undefined
   })
 
   const updated = await getAssignmentRecord(assignmentId)
