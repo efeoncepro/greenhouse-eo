@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/efeoncepro/greenhouse-eo/security/advisories/new
+    about: Report vulnerabilities privately. Do not open public issues for security reports.
+  - name: Repo support
+    url: https://github.com/efeoncepro/greenhouse-eo/blob/main/.github/SUPPORT.md
+    about: Read support and escalation guidance before opening a request.

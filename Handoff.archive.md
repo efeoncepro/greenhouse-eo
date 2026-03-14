@@ -55,7 +55,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development con aplicacion real en BigQuery
 
 ### Archivos tocados
-- `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `bigquery/greenhouse_internal_identity_v1.sql`
 - `scripts/backfill-internal-identity-profiles.ts`
 - `src/lib/ids/greenhouse-ids.ts`
@@ -274,7 +274,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Production
 
 ### Archivos tocados
-- `GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -324,7 +324,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Archivos tocados
 - `.env.example`
-- `GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -430,7 +430,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development / staging
 
 ### Archivos tocados
-- `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
+- `docs/ui/GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 - `src/components/greenhouse/ExecutiveHeroCard.tsx`
 - `src/components/greenhouse/ExecutiveMiniStatCard.tsx`
 - `src/components/greenhouse/CapacityOverviewCard.tsx`
@@ -498,7 +498,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - El lookup de auth no debe duplicarse con el mismo email interno en `tenant_type = client`; eso introduciria ambiguedad en login.
 - El siguiente paso de producto es validar el dashboard de `space-efeonce` y, en base a esa lectura, decidir si se divide en una vista general y vistas anidadas de performance / delivery / quality.
 - La deuda UX mas importante que ya se ataco es `capacity`; la siguiente si hiciera falta seria dividir el dashboard rico en tabs o vistas anidadas para bajar longitud total.
-- Documento de referencia para esta iteracion: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`.
+- Documento de referencia para esta iteracion: `docs/ui/GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`.
 
 ### Fecha
 - 2026-03-10 America/Santiago
@@ -513,12 +513,12 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Alinear la documentacion viva para que el rediseño no derive en cards ad hoc ni en copias directas de Vuexy.
 
 ### Cambios aplicados
-- Se agrego `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` como contrato de:
+- Se agrego `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` como contrato de:
   - jerarquia visual
   - familias de cards ejecutivas
   - reglas de composicion
   - limites de reutilizacion de Vuexy
-- Se alinearon `README.md`, `GREENHOUSE_ARCHITECTURE_V1.md`, `BACKLOG.md`, `PHASE_TASK_MATRIX.md` y `project_context.md` para que el siguiente paso prioritario sea migrar `/dashboard` a ese sistema reusable.
+- Se alinearon `README.md`, `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`, `docs/roadmap/BACKLOG.md`, `docs/roadmap/PHASE_TASK_MATRIX.md` y `project_context.md` para que el siguiente paso prioritario sea migrar `/dashboard` a ese sistema reusable.
 
 ### Verificacion
 - Revision manual de consistencia documental sobre:
@@ -570,7 +570,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Cambios aplicados
 - Se instalaron `simple-icons` y `@iconify-json/logos` en `starter-kit` para reutilizar logos de tecnologia y AI sin descargar assets manuales.
 - Se documento que el stack activo de charts sigue siendo `apexcharts` + `react-apexcharts`, mientras `recharts` y `keen-slider` siguen como referencia en `full-version`.
-- Se agrego `DOCUMENTATION_OPERATING_MODEL_V1.md` para fijar una politica de documentacion compacta basada en una fuente canonica y deltas cortos.
+- Se agrego `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para fijar una politica de documentacion compacta basada en una fuente canonica y deltas cortos.
 
 ### Verificacion
 - `pnpm add simple-icons`
@@ -654,11 +654,11 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y luego `staging`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
-- `PHASE_TASK_MATRIX.md`
+- `docs/roadmap/PHASE_TASK_MATRIX.md`
 - `README.md`
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - `changelog.md`
 - `project_context.md`
 - `src/app/api/dashboard/summary/route.ts`
@@ -708,12 +708,12 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - BigQuery dataset `efeonce-group.greenhouse`
 
 ### Archivos tocados
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
-- `PHASE_TASK_MATRIX.md`
+- `docs/roadmap/PHASE_TASK_MATRIX.md`
 - `README.md`
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - `changelog.md`
 - `project_context.md`
 
@@ -742,7 +742,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - No se hizo `commit` ni `push`; queda pendiente aprobacion explicita del enfoque antes de versionar.
 
 ### Proximo paso recomendado
-- Revisar y aprobar `SKY_TENANT_EXECUTIVE_SLICE_V1.md`.
+- Revisar y aprobar `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`.
 - Si se aprueba, implementar primero solo el slice seguro:
   - `on-time` mensual
   - tenure
@@ -812,9 +812,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y luego `Preview` o `staging`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
-- `PHASE_TASK_MATRIX.md`
+- `docs/roadmap/PHASE_TASK_MATRIX.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -868,11 +868,11 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y luego `staging`
 
 ### Archivos tocados
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
-- `PHASE_TASK_MATRIX.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/roadmap/PHASE_TASK_MATRIX.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -1013,7 +1013,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Preview antes de merge a `develop`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `README.md`
 - `Handoff.md`
 - `changelog.md`
@@ -1075,10 +1075,10 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - `.gitattributes`
 - `.gitignore`
 - `AGENTS.md`
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `CONTRIBUTING.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `bigquery/greenhouse_clients.sql`
 - `changelog.md`
@@ -1194,7 +1194,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Preview de feature branch y luego `staging`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
 - `README.md`
 - `changelog.md`
@@ -1215,7 +1215,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Riesgos o pendientes
 - El bootstrap de auth sigue dependiendo de `auth_mode = env_demo` para el tenant seeded.
-- `MULTITENANT_ARCHITECTURE.md` sigue atrasado respecto del runtime real y debe actualizarse.
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md` sigue atrasado respecto del runtime real y debe actualizarse.
 - El sprint context depende de `sprint_ids` en tareas; si el proyecto no trae esa relacion, la vista muestra estado vacio controlado.
 - `/sprints`, `/settings` y `/api/dashboard/charts` siguen pendientes como slices reales.
 
@@ -1245,10 +1245,10 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y documentacion operativa para trabajo futuro
 
 ### Archivos tocados
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -1278,9 +1278,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development, Preview y BigQuery dataset `efeonce-group.greenhouse`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `bigquery/greenhouse_hubspot_customer_bootstrap_v1.sql`
 - `changelog.md`
@@ -1340,7 +1340,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Riesgos o pendientes
 - El repo ya tiene una direccion clara, pero aun falta traducir el plan a schemas concretos de `client_users`, roles y scopes.
-- El siguiente trabajo de codigo deberia tomar `GREENHOUSE_ARCHITECTURE_V1.md` como contrato activo para evitar que el producto derive otra vez hacia vistas demasiado operativas.
+- El siguiente trabajo de codigo deberia tomar `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` como contrato activo para evitar que el producto derive otra vez hacia vistas demasiado operativas.
 - Sigue pendiente convertir el dashboard actual en la home ejecutiva real del producto.
 
 ### Proximo paso recomendado
@@ -1368,11 +1368,11 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y documentacion/DDL para siguientes fases
 
 ### Archivos tocados
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
-- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `bigquery/greenhouse_identity_access_v1.sql`
 - `changelog.md`
@@ -1385,7 +1385,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 ### Riesgos o pendientes
 - El DDL nuevo aun no esta aplicado en BigQuery; por ahora es schema versionado, no runtime activo.
 - `src/lib/auth.ts` y la session actual todavia usan el modelo MVP basado en `greenhouse.clients`.
-- El siguiente cambio de codigo debe respetar `GREENHOUSE_IDENTITY_ACCESS_V1.md` para evitar un refactor parcial incoherente.
+- El siguiente cambio de codigo debe respetar `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md` para evitar un refactor parcial incoherente.
 - Sigue pendiente convertir el dashboard en home ejecutiva real luego de cerrar el modelo de acceso.
 
 ### Proximo paso recomendado
@@ -1416,9 +1416,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Archivos tocados
 - `.env.example`
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `bigquery/greenhouse_clients.sql`
 - `bigquery/greenhouse_identity_access_v1.sql`
@@ -1487,7 +1487,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 
 ### Archivos tocados
 - `Handoff.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `README.md`
 - `changelog.md`
 - `project_context.md`
@@ -1592,7 +1592,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y luego promotion a `Preview`, `staging` y `Production`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
 - `README.md`
 - `changelog.md`
@@ -1672,7 +1672,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Development y luego `Preview`
 
 ### Archivos tocados
-- `BACKLOG.md`
+- `docs/roadmap/BACKLOG.md`
 - `Handoff.md`
 - `README.md`
 - `changelog.md`
@@ -1736,9 +1736,9 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - contexto comercial y billing
 
 ### Archivos tocados
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
-- `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - `Handoff.md`
 - `README.md`
 - `bigquery/greenhouse_service_modules_v1.sql`
@@ -1770,7 +1770,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - SSilva -> `crm_solutions` + `consultoria_crm`, `implementacion_onboarding`, `licenciamiento_hubspot`
 
 ### Referencia operativa
-- `PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
+- `docs/roadmap/PHASE_TASK_MATRIX.md` resume el estado de fases y las tareas pendientes por fase para continuacion rapida entre agentes.
 
 ### Delta 2026-03-10 Navbar Theme
 - `ModeDropdown` quedo alineado con Greenhouse:
@@ -1806,7 +1806,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Warning conocido: `pnpm` reporta peer warnings de `@tiptap/*`, pero el build actual del portal sigue sano.
 
 ### Delta 2026-03-11 Capability Governance
-- Se documento `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` como metodologia reutilizable para validacion visual real de dashboards y vistas admin.
+- Se documento `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` como metodologia reutilizable para validacion visual real de dashboards y vistas admin.
 - La iniciativa de `service modules` ya no queda solo en documentacion: ahora `greenhouse.service_modules` funciona como catalogo canonico de capabilities y `greenhouse.client_service_modules` como registro de asignacion por tenant.
 - `/admin/tenants/[id]` ahora expone `Capability governance` para asignar manualmente business lines y service modules desde admin.
 - Se agregaron rutas API para gobernanza y sincronizacion externa:
@@ -1827,7 +1827,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
 - Validado con `npx pnpm lint` y `npx pnpm build`.
 
 ### Delta 2026-03-11 Public ID Strategy
-- Se agrego `GREENHOUSE_ID_STRATEGY_V1.md` como contrato para separar `internal keys` de `public IDs`.
+- Se agrego `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md` como contrato para separar `internal keys` de `public IDs`.
 - Regla actual:
   - tenant con HubSpot: `EO-<hubspot_company_id>`
   - tenant manual: `EO-SPACE-<slug>`
@@ -1855,7 +1855,7 @@ Si un cambio fue dejado sin `commit` o sin `push` por falta de verificacion, eso
   - por eso el sync externo queda soportado a nivel API, pero no debe autoderivarse desde BigQuery hasta tener esas propiedades disponibles correctamente
 
 ### Delta 2026-03-11 Generic Integrations API
-- Se agrego `GREENHOUSE_INTEGRATIONS_API_V1.md` como contrato de integracion bidireccional desde Greenhouse.
+- Se agrego `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` como contrato de integracion bidireccional desde Greenhouse.
 - La nueva superficie no depende de sesiones admin ni de NextAuth.
   - Usa `GREENHOUSE_INTEGRATION_API_TOKEN`.
   - Acepta `Authorization: Bearer <token>` o `x-greenhouse-integration-key`.

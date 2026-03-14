@@ -249,7 +249,7 @@ Enumera lo que hoy conviene consultar primero.
 1. Consultar primero las primitives locales `shared`
 2. Si no alcanza, consultar una sola familia `reference-only`
 3. Si el patron ya tiene adaptacion local, reusar esa adaptacion antes de volver a `full-version`
-4. Si un patron requiere mucha reinterpretacion semantica, documentar el port en `GREENHOUSE_UI_ORCHESTRATION_V1.md` antes de expandirlo
+4. Si un patron requiere mucha reinterpretacion semantica, documentar el port en `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md` antes de expandirlo
 
 ## Proximo trabajo recomendado
 

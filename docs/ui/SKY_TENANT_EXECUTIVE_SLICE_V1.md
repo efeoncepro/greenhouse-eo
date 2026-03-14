@@ -11,9 +11,9 @@ This file is the source of truth for:
 - what requires new modeling before it is safe to expose
 
 This document must stay aligned with:
-- `GREENHOUSE_ARCHITECTURE_V1.md`
-- `BACKLOG.md`
-- `PHASE_TASK_MATRIX.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/roadmap/PHASE_TASK_MATRIX.md`
 - `project_context.md`
 - `Handoff.md`
 

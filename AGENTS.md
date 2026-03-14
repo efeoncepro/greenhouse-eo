@@ -6,8 +6,11 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ## Alcance
 - Este repo corresponde solo a `starter-kit`.
 - `full-version` debe usarse como referencia de contexto para entender componentes, patrones, flujos y alcance funcional esperado.
-- No versionar `full-version` dentro de este repo.
+- Aunque `full-version` exista versionado en este workspace como referencia local, no debe tratarse como source of truth del producto ni ampliarse como si fuera parte activa del portal.
 - Cualquier copia de componentes desde `full-version` debe ser intencional, revisada y adaptada al contexto Greenhouse antes de integrarse.
+- Convencion documental vigente:
+  - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
+  - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
 
 ## Prioridades
 1. Mantener el proyecto desplegable en Vercel.
@@ -22,8 +25,9 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
-- Si el cambio es UI, UX o seleccion de componentes, usar el skill local `greenhouse-vuexy-portal` como criterio operativo y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
-- Aplicar `DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
+- Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
+- Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
+- Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
 
@@ -64,7 +68,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Actualizar `changelog.md` cuando haya un cambio real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
 - No usar estos documentos como dumping ground. Deben quedar legibles.
-- Usar `DOCUMENTATION_OPERATING_MODEL_V1.md` para evitar duplicacion: una fuente canonica por tema y deltas breves en el resto.
+- Usar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para evitar duplicacion: una fuente canonica por tema y deltas breves en el resto.
 
 ### 8. Regla de line endings
 - El repositorio debe versionar archivos de texto con finales de linea `LF`.

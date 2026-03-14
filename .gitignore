@@ -40,8 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local reference-only trees
-full-version/
+# local reference-only trees that should stay out of app/runtime tooling
 demo-configs/
 
 # icon generated file

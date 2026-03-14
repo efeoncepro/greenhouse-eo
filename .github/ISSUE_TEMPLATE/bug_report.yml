@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a defect affecting product behavior, runtime, deploy, or workflow.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the bug and the user or operator impact.
+      placeholder: What is broken and why does it matter?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: List the exact steps, route, or API involved.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened instead?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - client
+        - admin
+        - internal
+        - agency
+        - auth
+        - capabilities
+        - data / BigQuery
+        - deploy / Vercel
+        - documentation
+        - repo workflow
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Evidence
+      description: Include screenshots, logs, preview URLs, or failing checks if available.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add risk notes, environment details, or related issues.

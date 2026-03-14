@@ -57,6 +57,8 @@ git push -u origin feature/nombre-descriptivo
 
 6. Crear Pull Request:
 - `feature/*` o `fix/*` -> `develop`
+- usar `.github/PULL_REQUEST_TEMPLATE.md`
+- completar problema, alcance, validacion, riesgo y cambios de docs/env
 
 7. Revisar Preview Deployment en Vercel:
 - validar UI
@@ -96,6 +98,13 @@ git push -u origin feature/nombre-descriptivo
 - No hacer `push` como cambio cerrado si no hubo validacion razonable.
 - Para cambios de UI, layout o rutas, revisar tambien el preview deployment.
 - Para cambios de deploy, auth, variables o data access, validar en `Staging` antes de promover a `main`.
+- Los PRs que apuntan a ramas activas del proyecto deben pasar la verificacion automatica de GitHub Actions o dejar explicado por que no aplica.
+
+## Soporte GitHub
+
+- Usar los issue templates para bugs y propuestas de mejora.
+- No reportar vulnerabilidades en issues normales; seguir `.github/SECURITY.md`.
+- La revision por defecto del repo se resuelve desde `.github/CODEOWNERS`.
 
 ## Archivos sensibles
 

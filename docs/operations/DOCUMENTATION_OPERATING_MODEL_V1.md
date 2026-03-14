@@ -6,10 +6,33 @@ Reducir duplicacion documental sin perder continuidad, trazabilidad ni contexto 
 ## Regla base
 Cada cambio debe documentarse, pero no cada documento debe repetir la historia completa.
 
+## Layout del repo
+
+### 1. Raiz operativa
+- `README.md`
+- `AGENTS.md`
+- `CONTRIBUTING.md`
+- `project_context.md`
+- `Handoff.md`
+- `Handoff.archive.md`
+- `changelog.md`
+- Esta raiz queda reservada para onboarding GitHub y continuidad operativa entre agentes.
+
+### 2. Carpeta `docs/`
+- Aqui viven specs, roadmap, tasks y guias especializadas.
+- La taxonomia vigente es:
+  - `docs/architecture/`
+  - `docs/api/`
+  - `docs/ui/`
+  - `docs/roadmap/`
+  - `docs/operations/`
+  - `docs/tasks/`
+- `docs/README.md` debe servir como indice maestro.
+
 ## Estructura canonica
 
 ### 1. Documento maestro
-- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - Aqui viven principios, decisiones estables, fases y contratos de producto.
 - No registrar aqui el detalle de cada turno.
 
@@ -35,8 +58,8 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 
 ### 5. Guias especializadas
 - Docs tematicas como:
-  - `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
-  - `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+  - `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+  - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
 
 ## Regla de compresion

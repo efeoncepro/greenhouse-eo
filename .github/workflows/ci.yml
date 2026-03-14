@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXTAUTH_SECRET: ci-placeholder-secret
+      NEXTAUTH_URL: http://localhost:3000
+      GCP_PROJECT: ci-placeholder-project
+      GOOGLE_CLOUD_LOCATION: us-central1
+      GOOGLE_GENAI_USE_VERTEXAI: "false"
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: "{}"
+      GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64: e30=
+      GOOGLE_CLIENT_ID: ci-google-client-id
+      GOOGLE_CLIENT_SECRET: ci-google-client-secret
+      AZURE_AD_CLIENT_ID: ci-azure-client-id
+      AZURE_AD_CLIENT_SECRET: ci-azure-client-secret
+      GREENHOUSE_AGENT_MODEL: gpt-5-mini
+      HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL: https://example.invalid
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build

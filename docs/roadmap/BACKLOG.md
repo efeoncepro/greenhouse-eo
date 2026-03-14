@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This backlog is the execution summary of `GREENHOUSE_ARCHITECTURE_V1.md`.
+This backlog is the execution summary of `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`.
 
 Use it to decide what to build next.
 Use the architecture document to understand why, how, and in what order.
@@ -16,7 +16,7 @@ Use the architecture document to understand why, how, and in what order.
 
 ## Master Reference
 
-- `GREENHOUSE_ARCHITECTURE_V1.md` is the source of truth for:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` is the source of truth for:
   - product direction
   - role model
   - route structure
@@ -54,7 +54,7 @@ Open activities:
 - finalize semantic mart design
 - finalize service module taxonomy from HubSpot commercial data
 - define module mapping rules from `linea_de_servicio` and `servicios_especificos`
-- align all repo docs to `GREENHOUSE_ARCHITECTURE_V1.md`
+- align all repo docs to `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 
 ### Phase 1. Identity, Access, and Multi-User Model
 
@@ -87,7 +87,7 @@ Status:
 
 Open activities:
 - review and promote the new executive dashboard through `Preview`, `staging` and `Production`
-- refactor `/dashboard` to the reusable `Executive UI System` documented in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- refactor `/dashboard` to the reusable `Executive UI System` documented in `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 - create reusable executive card families in `src/components/greenhouse/*`
 - add `/api/dashboard/capacity` once team and staffing data are modeled
 - add `/api/dashboard/market-speed` when time fields become numerically reliable
@@ -212,9 +212,9 @@ Current adaptation rule:
 
 ### N0.1 Promotion and Documentation Alignment
 
-- keep `GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
-- keep `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` aligned with runtime reality
-- align `BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
+- keep `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
+- keep `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` aligned with runtime reality
+- align `docs/roadmap/BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
 - validate dashboard and admin surfaces in `Preview` or `staging` before the next promotion to `main`
 
 ### N2.1 Dashboard Hardening
@@ -226,7 +226,7 @@ Current adaptation rule:
 
 ### N2.2 Sky tenant dashboard slice
 
-- use `SKY_TENANT_EXECUTIVE_SLICE_V1.md` as the source of truth before implementation
+- use `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md` as the source of truth before implementation
 - completed in current iteration:
 - monthly on-time grouped by task creation month
 - tenure from first visible operational activity
@@ -242,7 +242,7 @@ Current adaptation rule:
 
 ### N2.3 Executive UI System rollout
 
-- use `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` as UI contract
+- use `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` as UI contract
 - introduce reusable wrappers for hero, mini stat, chart, list, and table cards
 - keep tenant-specific emphasis in config and payload capabilities, not in custom JSX per client
 
@@ -329,8 +329,8 @@ Can move in parallel after access schema exists:
 - internal navigation from `/proyectos` to project detail
 - BigQuery dataset `greenhouse`
 - table `greenhouse.clients`
-- architecture master plan documented in `GREENHOUSE_ARCHITECTURE_V1.md`
-- identity and access design documented in `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- architecture master plan documented in `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- identity and access design documented in `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - BigQuery identity/access DDL versioned in `bigquery/greenhouse_identity_access_v1.sql`
 - runtime auth isolated to `greenhouse.client_users` plus role/scope tables
 - `/auth/landing` redirect by `portalHomePath`
