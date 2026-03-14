@@ -2,23 +2,32 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
+import AvatarGroup from '@mui/material/AvatarGroup'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
 
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_LABELS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamByProjectPayload } from '@/types/team'
 import { getRpaStatus } from '@views/greenhouse/dashboard/helpers'
 
 import EmptyState from './EmptyState'
 import ExecutiveCardShell from './ExecutiveCardShell'
-import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
+import TeamAvatar from './TeamAvatar'
 import TeamIdentityBadgeGroup from './TeamIdentityBadgeGroup'
+import TeamSignalChip from './TeamSignalChip'
 
 type ProjectTeamSectionProps = {
   projectId: string
@@ -105,87 +114,144 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
           <>
             <Box
               sx={{
+                p: 2.5,
+                borderRadius: 4,
+                border: `1px solid ${GH_COLORS.neutral.border}`,
+                bgcolor: GH_COLORS.neutral.bgSurface,
                 display: 'grid',
-                gap: 2,
-                gridTemplateColumns: {
-                  xs: '1fr',
-                  md: 'repeat(3, minmax(0, 1fr))'
-                }
+                gap: 2
               }}
             >
-              <HorizontalWithSubtitle
-                title={GH_TEAM.label_people}
-                stats={String(data.memberCount)}
-                avatarIcon='tabler-users-group'
-                avatarColor='primary'
-                subtitle={GH_TEAM.project_people_subtitle}
-              />
-              <HorizontalWithSubtitle
-                title={GH_TEAM.project_active_column}
-                stats={String(summary.activeAssets)}
-                avatarIcon='tabler-briefcase'
-                avatarColor='info'
-                subtitle={GH_TEAM.project_load_subtitle}
-              />
-              <HorizontalWithSubtitle
-                title={GH_LABELS.col_review}
-                stats={String(summary.inReview)}
-                avatarIcon='tabler-eye-search'
-                avatarColor='warning'
-                subtitle={`${summary.completedAssets} ${GH_TEAM.project_review_subtitle.toLowerCase()}`}
-              />
+              <Stack
+                direction={{ xs: 'column', md: 'row' }}
+                spacing={2}
+                justifyContent='space-between'
+                alignItems={{ xs: 'flex-start', md: 'center' }}
+              >
+                <Stack spacing={1}>
+                  <Typography variant='subtitle2'>{GH_TEAM.project_team_title}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_TEAM.project_people_summary_label(data.memberCount)}
+                  </Typography>
+                </Stack>
+
+                <AvatarGroup
+                  max={6}
+                  sx={{
+                    '& .MuiAvatar-root': {
+                      width: 32,
+                      height: 32,
+                      fontSize: '0.75rem',
+                      border: `2px solid ${GH_COLORS.neutral.bgSurface}`
+                    }
+                  }}
+                >
+                  {data.members.map(member => (
+                    <TeamAvatar key={member.memberId} name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={32} />
+                  ))}
+                </AvatarGroup>
+              </Stack>
+
+              <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+                <Chip size='small' variant='tonal' color='primary' label={`${summary.activeAssets} ${GH_TEAM.project_chip_active}`} />
+                <Chip size='small' variant='tonal' color='success' label={`${summary.completedAssets} ${GH_TEAM.project_chip_completed}`} />
+                <Chip size='small' variant='tonal' color='warning' label={`${summary.inReview} ${GH_TEAM.project_chip_review}`} />
+              </Stack>
             </Box>
 
-            <Stack spacing={2}>
-              {data.members.map(member => {
-                const rpaStatus = getRpaStatus(member.avgRpa)
-                const tone = getTeamRoleTone(member.roleCategory)
+            <Accordion
+              disableGutters
+              sx={{
+                borderRadius: 4,
+                overflow: 'hidden',
+                border: `1px solid ${GH_COLORS.neutral.border}`,
+                '&::before': { display: 'none' }
+              }}
+            >
+              <AccordionSummary expandIcon={<i className='tabler-chevron-down text-[20px]' />}>
+                <Stack spacing={0.5}>
+                  <Typography variant='subtitle2'>{GH_TEAM.project_detail_title}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_TEAM.project_expand_label}
+                  </Typography>
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 0 }}>
+                <TableContainer>
+                  <Table sx={{ minWidth: 720 }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{GH_TEAM.project_person_column}</TableCell>
+                        <TableCell align='right'>{GH_TEAM.project_active_column}</TableCell>
+                        <TableCell align='right'>{GH_TEAM.project_completed_column}</TableCell>
+                        <TableCell align='right'>{GH_TEAM.label_rpa}</TableCell>
+                        <TableCell align='right'>{GH_TEAM.project_review_column}</TableCell>
+                        <TableCell align='right'>{GH_TEAM.project_changes_column}</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.members.map(member => {
+                        const rpaStatus = getRpaStatus(member.avgRpa)
 
-                return (
-                  <Box
-                    key={member.memberId}
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 4,
-                      border: `1px solid ${alpha(tone.source, 0.16)}`,
-                      background: `linear-gradient(180deg, ${alpha(tone.source, 0.08)} 0%, rgba(255,255,255,0) 100%)`,
-                      display: 'grid',
-                      gap: 1.75
-                    }}
-                  >
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={40} />
-                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                        <Typography variant='h6'>{member.displayName}</Typography>
-                        <Typography variant='body2' color='text.secondary'>
-                          {member.roleTitle}
-                        </Typography>
-                        {member.email ? (
-                          <Typography variant='caption' color='text.secondary'>
-                            {member.email}
-                          </Typography>
-                        ) : null}
-                      </Box>
-                      <Chip
-                        size='small'
-                        color={rpaStatus.tone === 'default' ? 'default' : rpaStatus.tone}
-                        label={member.avgRpa === null ? 'RpA --' : `RpA ${member.avgRpa.toFixed(1)}`}
-                        variant='outlined'
-                      />
-                    </Stack>
-
-                    <TeamIdentityBadgeGroup providers={member.identityProviders} confidence={member.identityConfidence} />
-
-                    <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
-                      <Chip size='small' variant='tonal' color='primary' label={`${member.activeAssets} ${GH_TEAM.project_chip_active}`} />
-                      <Chip size='small' variant='tonal' color='success' label={`${member.completedAssets} ${GH_TEAM.project_chip_completed}`} />
-                      <Chip size='small' variant='tonal' color='warning' label={`${member.inReview} ${GH_TEAM.project_chip_review}`} />
-                      <Chip size='small' variant='tonal' color='secondary' label={`${member.changesRequested} ${GH_TEAM.project_chip_changes}`} />
-                    </Stack>
-                  </Box>
-                )
-              })}
-            </Stack>
+                        return (
+                          <TableRow key={member.memberId} hover>
+                            <TableCell>
+                              <Stack direction='row' spacing={1.5} alignItems='center'>
+                                <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={36} />
+                                <Box sx={{ minWidth: 0 }}>
+                                  <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                                    {member.displayName}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {member.roleTitle}
+                                  </Typography>
+                                  <Box sx={{ mt: 0.75 }}>
+                                    <TeamIdentityBadgeGroup providers={member.identityProviders} confidence={member.identityConfidence} />
+                                  </Box>
+                                </Box>
+                              </Stack>
+                            </TableCell>
+                            <TableCell align='right'>{member.activeAssets}</TableCell>
+                            <TableCell align='right'>{member.completedAssets}</TableCell>
+                            <TableCell align='right'>
+                              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <TeamSignalChip
+                                  tone={rpaStatus.tone === 'default' ? 'default' : rpaStatus.tone}
+                                  label={member.avgRpa === null ? GH_TEAM.rpa_empty : GH_TEAM.rpa_label(member.avgRpa)}
+                                  icon={rpaStatus.icon}
+                                />
+                              </Box>
+                            </TableCell>
+                            <TableCell align='right'>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontWeight: 600,
+                                  color: member.inReview > 0 ? GH_COLORS.semaphore.yellow.text : GH_COLORS.neutral.textPrimary
+                                }}
+                              >
+                                {member.inReview}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align='right'>
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  fontWeight: 600,
+                                  color: member.changesRequested > 0 ? GH_COLORS.semaphore.red.text : GH_COLORS.neutral.textPrimary
+                                }}
+                              >
+                                {member.changesRequested}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </AccordionDetails>
+            </Accordion>
           </>
         ) : null}
 

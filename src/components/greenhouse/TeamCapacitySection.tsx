@@ -20,6 +20,7 @@ import RequestDialog from './RequestDialog'
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
 import TeamIdentityBadgeGroup from './TeamIdentityBadgeGroup'
 import TeamLoadBar from './TeamLoadBar'
+import TeamSignalChip from './TeamSignalChip'
 import UpsellBanner from './UpsellBanner'
 
 const TeamCapacitySection = () => {
@@ -98,7 +99,7 @@ const TeamCapacitySection = () => {
                   stats={`${data.summary.totalFte.toFixed(1)} FTE`}
                   avatarIcon='tabler-users-group'
                   avatarColor='primary'
-                  subtitle={`${data.summary.memberCount} ${GH_TEAM.label_people.toLowerCase()} activas`}
+                  subtitle={GH_TEAM.capacity_people_active(data.summary.memberCount)}
                 />
 
                 <HorizontalWithSubtitle
@@ -109,14 +110,31 @@ const TeamCapacitySection = () => {
                   subtitle={data.period}
                 />
 
-                <HorizontalWithSubtitle
-                  title={GH_TEAM.label_utilization}
-                  stats={`${data.summary.utilizationPercent}%`}
-                  avatarIcon='tabler-activity-heartbeat'
-                  avatarColor={data.summary.utilizationPercent >= 90 ? 'error' : data.summary.utilizationPercent >= 71 ? 'warning' : 'success'}
-                  titleTooltip={GH_MESSAGES.tooltip_utilization}
-                  subtitle={data.summary.utilizationPercent >= 85 ? GH_TEAM.cta_signal_high : GH_TEAM.cta_signal_balanced}
-                />
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 4,
+                    border: `1px solid ${GH_COLORS.neutral.border}`,
+                    bgcolor: 'background.paper',
+                    display: 'grid',
+                    gap: 1.5
+                  }}
+                >
+                  <Typography variant='body2' color='text.secondary'>
+                    {GH_TEAM.label_utilization}
+                  </Typography>
+                  <Typography variant='h4'>{`${data.summary.utilizationPercent}%`}</Typography>
+                  <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+                    <TeamSignalChip
+                      tone={data.summary.utilizationPercent >= 90 ? 'error' : data.summary.utilizationPercent >= 71 ? 'warning' : 'success'}
+                      label={data.summary.utilizationPercent >= 85 ? GH_TEAM.cta_signal_high : GH_TEAM.cta_signal_balanced}
+                      icon='tabler-activity-heartbeat'
+                    />
+                    <Typography variant='caption' color='text.secondary'>
+                      {GH_MESSAGES.tooltip_utilization}
+                    </Typography>
+                  </Stack>
+                </Box>
               </Box>
 
               {!data.hasOperationalMetrics ? (
@@ -159,10 +177,10 @@ const TeamCapacitySection = () => {
                           <Chip size='small' variant='tonal' color='primary' label={`${member.activeAssets} ${GH_TEAM.active_assets_short}`} />
                           <Chip size='small' variant='tonal' color='success' label={`${member.completedAssets} ${GH_TEAM.project_chip_completed}`} />
                           <Chip size='small' variant='tonal' color='info' label={`${member.projectCount} ${GH_TEAM.projects_short}`} />
-                          <Chip
-                            size='small'
-                            variant='outlined'
-                            label={member.avgRpa === null ? 'RpA --' : `RpA ${member.avgRpa.toFixed(1)}`}
+                          <TeamSignalChip
+                            tone={member.avgRpa === null ? 'default' : member.avgRpa <= 1.5 ? 'success' : member.avgRpa <= 2.5 ? 'warning' : 'error'}
+                            label={member.avgRpa === null ? GH_TEAM.rpa_empty : GH_TEAM.rpa_label(member.avgRpa)}
+                            icon='tabler-chart-line'
                           />
                         </Stack>
 

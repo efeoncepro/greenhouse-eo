@@ -68,14 +68,29 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
   - Ese repo no existe en este workspace.
   - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
+- El task `CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
+  - La especificacion se alineo al contrato real verificado en `notion_ops.tareas`:
+    - `responsables_names`
+    - `responsables_ids`
+    - `responsable_texto`
+  - Los derivados operativos `responsable_nombre` y `responsable_notion_id` se resuelven en runtime desde esos campos.
 - `/settings` ya no depende de `getDashboardOverview()` solo para el roster; consume el endpoint dedicado de equipo.
 - `/dashboard` reemplaza la card legacy de capacity por una surface cliente que consume la API dedicada.
 - `/proyectos/[id]` ahora incorpora una seccion `Equipo en este proyecto`.
 - El repo no tenia `/sprints/[id]`; se habilito una primera ruta para hospedar `Velocity por persona` y enlazarla desde el detalle de proyecto.
+- Cierre literal del task en UI:
+  - Vista 1 ya no muestra FTE individual por persona
+  - Vista 3 ya usa `AvatarGroup` + expandible tabular por persona
+  - los semaforos visibles del modulo usan primitives basadas en `GH_COLORS.semaphore`
+  - los textos visibles que faltaban en las 4 vistas se movieron a `GH_TEAM` / `GH_MESSAGES`
 
 ## Delta 2026-03-13 Preview auth hardening
 - `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
 - Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.
+- El repo ahora versiona una skill local para operaciones Vercel:
+  - `.codex/skills/vercel-operations/SKILL.md`
+  - cubre CLI, dominios protegidos, `promote`, `rollback`, env vars y el mapa operativo `Preview` / `Staging` / `Production` del proyecto
+  - debe usarse como criterio operativo cuando el trabajo requiera verificar previews, dominios custom o promociones entre ambientes
 
 ## Delta 2026-03-13 Branding lock and nav hydration
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.

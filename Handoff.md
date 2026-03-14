@@ -40,6 +40,87 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 21:00 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Investigar la documentacion oficial de Vercel y dejar una skill reusable para operar previews, staging, production, dominios protegidos y promociones desde este repo.
+
+### Rama
+- Rama usada: `fix/team-identity-task-closeout`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Operacion Vercel cross-environment
+
+### Archivos tocados
+- `.codex/skills/vercel-operations/SKILL.md`
+- `.codex/skills/vercel-operations/references/official-vercel-reference.md`
+- `.codex/skills/vercel-operations/references/greenhouse-vercel-map.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- Fuentes usadas: documentacion oficial de Vercel sobre CLI, project linking, env, logs, promote, rollback, deployment protection, protection bypass, custom environments y Vercel MCP.
+- `git diff --check`: correcto
+- Limitacion actual del entorno:
+  - este shell sigue sin `vercel`, `node`, `npx` y `pnpm`
+  - por eso la skill ya quedo versionada, pero la CLI real aun no puede ejecutarse desde esta sesion
+
+### Riesgos o pendientes
+- Para usar la skill de forma operativa aqui mismo, hace falta que el entorno tenga `vercel` disponible o que otro shell autenticado la ejecute.
+- `pre-greenhouse.efeoncepro.com` fue verificado por `curl` y responde Vercel Authentication `401`; eso confirma proteccion activa, no el deployment exacto detras del dominio.
+
+## 2026-03-13 23:59 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar los gaps literales que quedaban entre el task `CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
+
+### Rama
+- Rama usada: `fix/team-identity-task-closeout`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / development branch
+
+### Archivos tocados
+- `src/components/greenhouse/TeamSignalChip.tsx`
+- `src/components/greenhouse/TeamProgressBar.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `src/views/greenhouse/dashboard/helpers.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `CODEX_TASK_Team_Identity_Capacity_System.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `git diff --check`: correcto
+- Validacion automatica pendiente:
+  - `pnpm lint`: no ejecutado en este shell porque `node`, `npx` y `pnpm` no estan disponibles
+  - `pnpm build`: no ejecutado en este shell por la misma limitacion
+- Revision manual del delta:
+  - Vista 1 ya no muestra FTE individual
+  - Vista 3 ahora usa `AvatarGroup` + detalle expandible tabular
+  - los semaforos nuevos del modulo pasan por primitives basadas en `GH_COLORS.semaphore`
+  - los textos visibles que faltaban se centralizaron en nomenclatura
+  - el task doc ya quedo alineado al schema real de `notion_ops.tareas`
+
+### Riesgos o pendientes
+- Hace falta correr `pnpm lint` y `pnpm build` en un entorno con Node antes de mergear esta rama.
+- El cierre documental del task asume como contrato valido el schema real (`responsables_names`, `responsables_ids`, `responsable_texto`), no el supuesto original de columnas directas `responsable_*`.
+- Conviene validar visualmente en Preview la nueva Vista 3 porque cambio de cards siempre abiertas a resumen compacto + expandible.
+
 ## 2026-03-13 23:58 America/Santiago
 
 ### Agente

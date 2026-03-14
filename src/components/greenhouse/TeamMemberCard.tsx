@@ -86,12 +86,11 @@ const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mb: 1 }}>
             <Chip size='small' variant='tonal' label={member.roleTitle} sx={{ color: tone.textDark, bgcolor: tone.bg }} />
             <Chip size='small' variant='outlined' label={profile.professionName || GH_TEAM.profession_pending} />
-            <Chip size='small' variant='outlined' label={`${member.fteAllocation.toFixed(1)} FTE`} />
           </Stack>
 
           <Typography variant='h6'>{member.displayName}</Typography>
           <Typography variant='body2' color='text.secondary'>
-            {member.startDate ? `Asignado desde ${member.startDate}` : GH_TEAM.dedication_pending}
+            {member.startDate ? GH_TEAM.assigned_since(member.startDate) : GH_TEAM.dedication_pending}
           </Typography>
           {profile.preferredName && profile.preferredName !== member.displayName ? (
             <Typography variant='caption' color='text.secondary'>
@@ -138,7 +137,7 @@ const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
             value:
               profile.yearsExperience === null
                 ? GH_TEAM.experience_pending
-                : `${profile.yearsExperience.toFixed(1)} anos`
+                : GH_TEAM.experience_years(profile.yearsExperience)
           },
           {
             label: GH_TEAM.label_tenure_efeonce,
