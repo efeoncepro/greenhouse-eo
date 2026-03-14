@@ -6,6 +6,19 @@
 
 ## 2026-03-13
 
+### Agency operator layer
+- Se integro la primera capa agency sobre `develop` con rutas autenticadas para lectura global interna:
+  - `/agency`
+  - `/agency/spaces`
+  - `/agency/capacity`
+- Se agregaron endpoints dedicados:
+  - `GET /api/agency/pulse`
+  - `GET /api/agency/spaces`
+  - `GET /api/agency/capacity`
+- `VerticalMenu` ahora muestra una seccion `Agencia` para usuarios con acceso `internal/admin`, sin afectar login, settings ni Google SSO.
+- `src/lib/agency/agency-queries.ts` ya resuelve KPIs, salud de spaces y capacidad global desde BigQuery reutilizando `greenhouse.clients`, `greenhouse.client_service_modules`, `greenhouse.team_members`, `greenhouse.client_team_assignments` y `notion_ops`.
+- La integracion sobre `develop` se valido con `pnpm exec eslint` y `pnpm build` despues de corregir errores menores de estilo que venian en la rama original.
+
 ### Pulse team view correction
 - `Pulse` dejo de usar la lectura de `team/capacity` como base de la card principal y ahora renderiza la Vista 1 del task desde roster asignado (`getTeamMembers`).
 - `src/components/greenhouse/TeamCapacitySection.tsx` se rehizo como `Tu equipo asignado`: lista compacta de personas con avatar, nombre, cargo, canal de contacto, FTE y ghost slot final.

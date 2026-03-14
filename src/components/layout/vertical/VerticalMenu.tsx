@@ -16,7 +16,7 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
-import { GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -55,6 +55,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const { data: session } = useSession()
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+  const isAgencyUser = isInternalUser || isAdminUser
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
   const capabilityModules = resolveCapabilityModules({
@@ -140,6 +141,31 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 {module.label}
               </MenuItem>
             ))}
+          </MenuSection>
+        ) : null}
+        {isAgencyUser ? (
+          <MenuSection label='Agencia'>
+            <MenuItem href='/agency' icon={<i className='tabler-building' />}>
+              <NavigationItemLabel
+                label={GH_AGENCY_NAV.pulseGlobal.label}
+                subtitle={GH_AGENCY_NAV.pulseGlobal.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/agency/spaces' icon={<i className='tabler-grid-4x4' />}>
+              <NavigationItemLabel
+                label={GH_AGENCY_NAV.spaces.label}
+                subtitle={GH_AGENCY_NAV.spaces.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/agency/capacity' icon={<i className='tabler-chart-bar' />}>
+              <NavigationItemLabel
+                label={GH_AGENCY_NAV.capacity.label}
+                subtitle={GH_AGENCY_NAV.capacity.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
           </MenuSection>
         ) : null}
         {isAdminUser ? (

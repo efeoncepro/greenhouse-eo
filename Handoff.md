@@ -40,6 +40,56 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Integrar `feature/agency-operator-layer` sobre la punta real de `develop` sin romper Google SSO ni el rediseño de team, corrigiendo el delta minimo para que la integracion cumpla lint y build.
+
+### Rama
+- Rama usada: `mergecheck-agency-operator-layer`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `src/app/(dashboard)/agency/capacity/page.tsx`
+- `src/app/(dashboard)/agency/layout.tsx`
+- `src/app/(dashboard)/agency/page.tsx`
+- `src/app/(dashboard)/agency/spaces/[spaceId]/page.tsx`
+- `src/app/(dashboard)/agency/spaces/page.tsx`
+- `src/app/api/agency/capacity/route.ts`
+- `src/app/api/agency/pulse/route.ts`
+- `src/app/api/agency/spaces/route.ts`
+- `src/components/agency/*`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/lib/agency/agency-queries.ts`
+- `src/lib/tenant/authorization.ts`
+- `src/views/agency/*`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- Merge simulado sobre `origin/develop`: sin conflictos de Git
+- Delta final del merge:
+  - solo entran 22 archivos del modulo `agency`, mas `VerticalMenu`, nomenclatura y `tenant/authorization`
+  - no se tocan `src/lib/auth.ts`, `src/lib/tenant/access.ts`, `src/views/Login.tsx`, `src/views/greenhouse/GreenhouseSettings.tsx` ni superficies del rediseño de team
+- `pnpm exec eslint ...` sobre el delta agency: correcto
+- `pnpm build`: correcto
+- Riesgo original detectado y resuelto:
+  - la rama `feature/agency-operator-layer` traia errores de lint de estilo en varios archivos `agency`
+  - se corrigieron en la integracion antes de promover a `develop`
+
+### Riesgos o pendientes
+- El acceso agency hoy reutiliza `internal/admin`; no existe aun un principal dedicado con `routeGroup = 'agency'` en runtime.
+- `/agency/spaces/[spaceId]` por ahora redirige a `/dashboard?space=<id>`; no existe todavia una surface propia de detalle agency para cada space.
+- Despues del merge a `develop`, conviene validar visualmente `dev-greenhouse.efeoncepro.com/agency`, `/agency/spaces` y `/agency/capacity`.
+
 ## 2026-03-13 23:42 America/Santiago
 
 ### Agente

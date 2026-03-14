@@ -3,6 +3,27 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Agency operator layer
+- El repo ahora tiene una primera capa agency para lectura ejecutiva interna a nivel transversal:
+  - `/agency`
+  - `/agency/spaces`
+  - `/agency/capacity`
+- Regla operativa de acceso:
+  - hoy no existe un principal dedicado `agency`
+  - la surface agency se habilita a usuarios `internal` o `admin` via `requireAgencyTenantContext()`
+- La navegacion global ahora puede mostrar una seccion `Agencia` en `VerticalMenu` sin afectar el contrato cliente ni los flows de auth ya activos.
+- La data agency sale de BigQuery real y no de mocks:
+  - `greenhouse.clients`
+  - `greenhouse.client_service_modules`
+  - `greenhouse.service_modules`
+  - `greenhouse.team_members`
+  - `greenhouse.client_team_assignments`
+  - `notion_ops.tareas`
+  - `notion_ops.proyectos`
+- Restriccion actual:
+  - `/agency/spaces/[spaceId]` todavia no es una surface agency dedicada; redirige al dashboard del portal con `?space=<id>`
+  - si se necesita una lectura agency por space mas profunda, debera implementarse como modulo posterior y no asumirse ya resuelto por esta iteracion
+
 ## Delta 2026-03-13 Pulse team view correction
 - `Pulse` ya no debe tratar la seccion de equipo como una lectura primaria de capacidad operativa.
   - La surface del dashboard cliente ahora consume roster asignado (`getTeamMembers`) como fuente principal para `Tu equipo asignado`.
