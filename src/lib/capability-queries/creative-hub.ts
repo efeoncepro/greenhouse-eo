@@ -3,7 +3,11 @@ import 'server-only'
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
   buildCapabilityScope,
+  buildCreativeCscMetricsCardData,
   buildCreativeHubCardData,
+  buildCreativePipelineCardData,
+  buildCreativeRevenueCardData,
+  buildCreativeStuckCardData,
   buildProjectItemsForLens,
   buildQualityItems,
   buildToolItems
@@ -29,12 +33,15 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
     projects,
     tools,
     quality,
-    cardData: buildCreativeHubCardData({
-      snapshot,
-      metrics: content.metrics,
-      projects,
-      quality
-    }),
+    cardData: {
+      ...buildCreativeHubCardData({ snapshot, metrics: content.metrics, projects, quality }),
+      'revenue-header':        { type: 'section-header', subtitle: 'El impacto de tu produccion creativa en el negocio', icon: 'tabler-trending-up' },
+      'creative-revenue-kpis': buildCreativeRevenueCardData(snapshot),
+      'pipeline-header':       { type: 'section-header', subtitle: 'El pipeline completo de tu produccion creativa', icon: 'tabler-git-branch' },
+      'csc-pipeline':          buildCreativePipelineCardData(snapshot),
+      'csc-metrics':           buildCreativeCscMetricsCardData(snapshot),
+      'stuck-assets':          buildCreativeStuckCardData(snapshot)
+    },
     scope: buildCapabilityScope(snapshot)
   }
 }

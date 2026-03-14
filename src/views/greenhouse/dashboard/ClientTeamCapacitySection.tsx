@@ -55,7 +55,7 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
   const hasCapacity = totalMonthlyHours > 0
   const utilizationPct = Math.max(0, Math.min(100, data.accountTeam.averageAllocationPct ?? 0))
   const utilizedHours = Math.round((totalMonthlyHours * utilizationPct) / 100)
-  const capacityTone = utilizationPct > 95 ? 'error' : utilizationPct >= 80 ? 'warning' : 'success'
+  const capacityTone = utilizationPct >= 90 ? 'error' : utilizationPct >= 71 ? 'warning' : 'success'
 
   if (!hasTeam) {
     return (

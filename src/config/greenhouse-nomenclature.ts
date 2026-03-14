@@ -952,5 +952,15 @@ export const GH_COLORS = {
     error: '#bb1954',
     info: '#023c70',
     neutral: '#dbdbdb'
+  },
+
+  cscPhase: {
+    planning:   { source: '#633f93', bg: '#f2eff6', text: '#633f93' },
+    briefing:   { source: '#024c8f', bg: '#eaf0f6', text: '#024c8f' },
+    production: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
+    approval:   { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
+    assetMgmt:  { source: '#0375db', bg: '#eaf3fc', text: '#0375db' },
+    activation: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },
+    completed:  { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' }
   }
 } as const

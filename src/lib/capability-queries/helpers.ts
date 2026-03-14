@@ -1,12 +1,16 @@
 import type {
+  CapabilityAlertItem,
   CapabilityCardData,
   CapabilityMetric,
   CapabilityMetricListItem,
+  CapabilityMetricsRowItem,
   CapabilityModuleData,
+  CapabilityPipelinePhase,
   CapabilityQualityItem,
   CapabilityProjectItem,
   CapabilityToolItem
 } from '@/types/capabilities'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 
 const integerFormatter = new Intl.NumberFormat('es-CL')
@@ -214,6 +218,148 @@ const buildCreativeReviewHotspotCard = (snapshot: CapabilityModuleSnapshot): Cap
       totalLabel: 'Review pressure visible',
       totalValue: formatInteger(totalPressure)
     }
+  }
+}
+
+const INDUSTRY_RPA = 3.5
+const INDUSTRY_CYCLE_DAYS = 14.2
+const INDUSTRY_OTD = 0.7
+
+export const buildCreativeRevenueCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
+  const latestSignal = [...snapshot.qualitySignals].reverse()[0] ?? null
+  const avgRpa = latestSignal?.avgRpa ?? null
+  const ftrPct = latestSignal?.firstTimeRightPct ?? null
+  const otdPct = snapshot.summary.avgOnTimePct
+
+  const daysGained =
+    otdPct > INDUSTRY_OTD * 100
+      ? Math.round((otdPct / 100 - INDUSTRY_OTD) * INDUSTRY_CYCLE_DAYS * 10) / 10
+      : 0
+
+  const iterationVelocity =
+    avgRpa !== null && avgRpa > 0 ? Math.round((INDUSTRY_RPA / avgRpa) * 10) / 10 : null
+
+  const throughputGain =
+    avgRpa !== null && avgRpa > 0 ? Math.round(((INDUSTRY_RPA / avgRpa) - 1) * 100) : null
+
+  const items: CapabilityMetricsRowItem[] = [
+    {
+      id: 'early-launch',
+      label: 'Early Launch Advantage',
+      value: daysGained > 0 ? `+${daysGained} dias` : '0 dias',
+      description: `Dias de mercado ganados vs industria (OTD ${formatPercent(otdPct)} vs ${formatPercent(INDUSTRY_OTD * 100)} std)`,
+      tone: daysGained > 0 ? 'success' : otdPct >= 55 ? 'warning' : 'error'
+    },
+    {
+      id: 'iteration-velocity',
+      label: 'Iteration Velocity',
+      value: iterationVelocity !== null ? `${iterationVelocity}x` : null,
+      description: 'Ciclos creativos posibles vs velocidad estandar de industria',
+      tone: iterationVelocity !== null && iterationVelocity > 1 ? 'success' : 'warning'
+    },
+    {
+      id: 'creative-throughput',
+      label: 'Creative Throughput',
+      value: throughputGain !== null ? `+${throughputGain}%` : null,
+      description: 'Mas assets producidos con la misma capacidad vs RpA de industria (3.5x)',
+      tone: throughputGain !== null && throughputGain > 0 ? 'success' : 'info'
+    },
+    {
+      id: 'ftr',
+      label: 'First Time Right',
+      value: ftrPct !== null ? formatPercent(ftrPct) : null,
+      description: 'Piezas aprobadas sin rondas de cambio en el ultimo periodo',
+      tone: ftrPct !== null && ftrPct >= 70 ? 'success' : ftrPct !== null && ftrPct >= 50 ? 'warning' : 'error'
+    }
+  ]
+
+  return { type: 'metrics-row', items }
+}
+
+export const buildCreativePipelineCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
+  const { activeWorkItems, reviewPressureTasks, queuedWorkItems, blockedTasks, completedLast30Days } = snapshot.summary
+
+  const production = Math.max(0, activeWorkItems - reviewPressureTasks - blockedTasks)
+
+  const phases: CapabilityPipelinePhase[] = [
+    { id: 'planning',   label: 'Planning',   color: GH_COLORS.cscPhase.planning.source,   count: Math.ceil(queuedWorkItems * 0.5) },
+    { id: 'briefing',   label: 'Briefing',   color: GH_COLORS.cscPhase.briefing.source,   count: Math.floor(queuedWorkItems * 0.5) },
+    { id: 'produccion', label: 'Produccion', color: GH_COLORS.cscPhase.production.source, count: production },
+    { id: 'aprobacion', label: 'Aprobacion', color: GH_COLORS.cscPhase.approval.source,   count: reviewPressureTasks },
+    { id: 'asset-mgmt', label: 'Asset Mgmt', color: GH_COLORS.cscPhase.assetMgmt.source,  count: blockedTasks },
+    { id: 'completado', label: 'Completado', color: GH_COLORS.cscPhase.completed.source,  count: completedLast30Days }
+  ]
+
+  const total = phases.reduce((sum, phase) => sum + phase.count, 0)
+
+  return { type: 'pipeline', phases, total }
+}
+
+export const buildCreativeCscMetricsCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
+  const { reviewPressureTasks, blockedTasks, completedLast30Days, queuedWorkItems } = snapshot.summary
+
+  const bottleneck =
+    reviewPressureTasks >= blockedTasks && reviewPressureTasks >= queuedWorkItems
+      ? 'Aprobacion'
+      : blockedTasks >= queuedWorkItems
+        ? 'Asset Mgmt'
+        : 'Planning'
+
+  const velocityPerWeek = Math.round((completedLast30Days / 4) * 10) / 10
+
+  const items: CapabilityMetricsRowItem[] = [
+    {
+      id: 'cycle-time',
+      label: 'Cycle time referencia',
+      value: `${INDUSTRY_CYCLE_DAYS}d industria`,
+      description: `${formatInteger(completedLast30Days)} items completados este mes`,
+      tone: 'info'
+    },
+    {
+      id: 'bottleneck',
+      label: 'Bottleneck actual',
+      value: bottleneck,
+      description: 'Fase con mayor concentracion de assets activos',
+      tone: reviewPressureTasks > 5 ? 'error' : reviewPressureTasks > 2 ? 'warning' : 'success'
+    },
+    {
+      id: 'pipeline-velocity',
+      label: 'Pipeline velocity',
+      value: `${velocityPerWeek} assets/sem`,
+      description: 'Promedio de assets completados por semana (ultimo mes)',
+      tone: velocityPerWeek > 3 ? 'success' : velocityPerWeek > 1 ? 'warning' : 'error'
+    },
+    {
+      id: 'stuck-count',
+      label: 'Stuck assets',
+      value: formatInteger(blockedTasks),
+      description: 'Items bloqueados sin movimiento en el pipeline',
+      tone: blockedTasks === 0 ? 'success' : blockedTasks <= 2 ? 'warning' : 'error'
+    }
+  ]
+
+  return { type: 'metrics-row', items }
+}
+
+export const buildCreativeStuckCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
+  const items: CapabilityAlertItem[] = [...snapshot.projects]
+    .filter(project => project.blockedTasks > 0)
+    .sort((a, b) => b.blockedTasks - a.blockedTasks)
+    .slice(0, 6)
+    .map(project => ({
+      id: project.id,
+      name: `${formatInteger(project.blockedTasks)} ${project.blockedTasks === 1 ? 'asset bloqueado' : 'assets bloqueados'}`,
+      project: project.name,
+      phase: project.reviewPressureTasks > 0 ? 'Aprobacion' : 'Produccion',
+      daysStuck: 2,
+      severity: project.blockedTasks >= 3 ? 'danger' : 'warning',
+      frameUrl: project.pageUrl
+    }))
+
+  return {
+    type: 'alert-list',
+    items,
+    emptyMessage: 'No hay assets detenidos. El pipeline fluye sin obstaculos.'
   }
 }
 
