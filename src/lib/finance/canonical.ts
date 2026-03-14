@@ -142,6 +142,7 @@ export const resolveFinanceClientContext = async ({
   }
 
   const projectId = getFinanceProjectId()
+
   const clientRows = await runFinanceQuery<ClientRow>(`
     SELECT client_id, client_name, CAST(hubspot_company_id AS STRING) AS hubspot_company_id
     FROM \`${projectId}.greenhouse.clients\`
@@ -181,6 +182,32 @@ export const resolveFinanceClientContext = async ({
     normalizedClientId,
     normalizedHubspotCompanyId
   })
+
+  if (
+    normalizedClientId
+    && !clientRows.some(row => normalizeString(row.client_id) === normalizedClientId)
+    && !profileRows.some(row =>
+      normalizeString(row.client_id) === normalizedClientId
+      || normalizeString(row.client_profile_id) === normalizedClientId
+    )
+  ) {
+    throw new FinanceValidationError('clientId does not exist in the finance client context.', 409)
+  }
+
+  if (
+    normalizedClientProfileId
+    && !profileRows.some(row => normalizeString(row.client_profile_id) === normalizedClientProfileId)
+  ) {
+    throw new FinanceValidationError('clientProfileId does not exist in the finance client context.', 409)
+  }
+
+  if (
+    normalizedHubspotCompanyId
+    && !clientRows.some(row => normalizeString(row.hubspot_company_id) === normalizedHubspotCompanyId)
+    && !profileRows.some(row => normalizeString(row.hubspot_company_id) === normalizedHubspotCompanyId)
+  ) {
+    throw new FinanceValidationError('hubspotCompanyId does not exist in the finance client context.', 409)
+  }
 
   const canonicalClientId = normalizedClientId
     || normalizeString(preferredProfile?.client_id)
@@ -252,6 +279,7 @@ export const resolveFinanceMemberContext = async ({
   }
 
   const projectId = getFinanceProjectId()
+
   const payrollRows = normalizedPayrollEntryId
     ? await runFinanceQuery<PayrollEntryRow>(`
       SELECT entry_id, period_id, member_id
@@ -272,6 +300,7 @@ export const resolveFinanceMemberContext = async ({
   }
 
   const resolvedMemberId = normalizedMemberId || normalizeString(payrollRow?.member_id)
+
   const memberRows = resolvedMemberId
     ? await runFinanceQuery<MemberRow>(`
       SELECT member_id, display_name
@@ -282,6 +311,10 @@ export const resolveFinanceMemberContext = async ({
     : []
 
   const memberRow = memberRows[0] ?? null
+
+  if (resolvedMemberId && !memberRow) {
+    throw new FinanceValidationError('memberId does not exist.', 409)
+  }
 
   return {
     memberId: resolvedMemberId || null,

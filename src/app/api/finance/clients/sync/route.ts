@@ -41,6 +41,12 @@ export async function POST() {
       WHERE c.active = TRUE
     ) AS source
     ON target.client_profile_id = source.client_profile_id
+    WHEN MATCHED THEN
+      UPDATE SET
+        client_id = COALESCE(target.client_id, source.client_id),
+        hubspot_company_id = COALESCE(target.hubspot_company_id, source.hubspot_company_id),
+        legal_name = COALESCE(target.legal_name, source.legal_name),
+        updated_at = CURRENT_TIMESTAMP()
     WHEN NOT MATCHED THEN
       INSERT (
         client_profile_id, client_id, hubspot_company_id, legal_name,

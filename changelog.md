@@ -6,6 +6,23 @@
 
 ## 2026-03-14
 
+### Finance canonical backend phase
+- El backend de `Finance` avanzó desde referencias parciales a llaves canónicas sin romper contratos existentes:
+  - `clients` ahora prioriza `greenhouse.clients.client_id` como anclaje principal y conserva fallback por `client_profile_id` / `hubspot_company_id`
+  - `POST /api/finance/clients` y `/api/finance/clients/sync` ya rellenan `client_id` en `fin_client_profiles` cuando el tenant es resoluble
+  - `income` y `expenses` ya pasan por resolución canónica de cliente antes de persistir
+  - los egresos también validan y resuelven relación `memberId` / `payrollEntryId` antes de escribir
+  - inconsistencias explícitas entre referencias financieras ahora responden `409`
+  - referencias canónicas inexistentes (`clientId`, `clientProfileId`, `hubspotCompanyId`, `memberId`) ya no se aceptan silenciosamente
+  - `GET /api/finance/clients` corrigió un bug en los filtros `requiresPo` / `requiresHes`
+- Se agregó una nueva lectura financiera de colaborador:
+  - `GET /api/people/[memberId]/finance`
+  - devuelve summary, assignments, identities, payroll history y expenses asociados al colaborador
+  - el endpoint fuerza bootstrap de infraestructura financiera antes de consultar `fin_expenses`
+- Validación ejecutada:
+  - `pnpm exec eslint` sobre los archivos tocados: correcto
+  - `git diff --check`: correcto
+  - `pnpm exec tsc --noEmit --pretty false`: siguen presentes errores globales preexistentes de `.next-local/.next` y rutas SCIM faltantes
 ### Finance module backend hardening
 - Se corrigieron varios desalineamientos críticos del módulo `Finance` en `feature/finance-module`:
   - `GET /api/finance/income/[id]` y `GET /api/finance/expenses/[id]` ya existen para detalle real

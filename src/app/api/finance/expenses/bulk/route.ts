@@ -54,15 +54,18 @@ export async function POST(request: Request) {
       const description = assertNonEmptyString(item.description, 'description')
       const currency = assertValidCurrency(item.currency)
       const subtotal = assertPositiveAmount(toNumber(item.subtotal), 'subtotal')
+
       const resolvedClient = await resolveFinanceClientContext({
         clientId: item.clientId,
         clientProfileId: item.clientProfileId,
         hubspotCompanyId: item.hubspotCompanyId
       })
+
       const resolvedMember = await resolveFinanceMemberContext({
         memberId: item.memberId,
         payrollEntryId: item.payrollEntryId
       })
+
       const taxRate = toNumber(item.taxRate ?? 0)
       const taxAmount = toNumber(item.taxAmount) || subtotal * taxRate
       const totalAmount = toNumber(item.totalAmount) || subtotal + taxAmount

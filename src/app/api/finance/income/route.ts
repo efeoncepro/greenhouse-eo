@@ -175,6 +175,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
+
     const resolvedClient = await resolveFinanceClientContext({
       clientId: body.clientId,
       clientProfileId: body.clientProfileId,
@@ -185,6 +186,7 @@ export async function POST(request: Request) {
       body.clientName ?? resolvedClient.clientName ?? resolvedClient.legalName,
       'clientName'
     )
+
     const invoiceDate = assertDateString(body.invoiceDate, 'invoiceDate')
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')

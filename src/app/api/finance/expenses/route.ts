@@ -206,11 +206,13 @@ export async function POST(request: Request) {
     const description = assertNonEmptyString(body.description, 'description')
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
+
     const resolvedClient = await resolveFinanceClientContext({
       clientId: body.clientId,
       clientProfileId: body.clientProfileId,
       hubspotCompanyId: body.hubspotCompanyId
     })
+
     const resolvedMember = await resolveFinanceMemberContext({
       memberId: body.memberId,
       payrollEntryId: body.payrollEntryId

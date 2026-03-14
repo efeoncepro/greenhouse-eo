@@ -40,6 +40,152 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 17:16 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Hacer la revisión final previa a commit/push del paquete canónico de Finance y corregir los últimos riesgos funcionales detectados.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance + people
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/lib/finance/canonical.ts`
+- `src/lib/people/get-person-finance-overview.ts`
+- `Handoff.md`
+
+### Cambios realizados
+- Se corrigió un bug de runtime en `GET /api/finance/clients`:
+  - los filtros `requiresPo` y `requiresHes` apuntaban a un alias inexistente (`cp`)
+  - ahora filtran correctamente sobre el read-model derivado
+- Se endureció la validación canónica:
+  - `resolveFinanceClientContext()` ahora rechaza `clientId`, `clientProfileId` o `hubspotCompanyId` inexistentes en vez de aceptar referencias fantasma
+  - `resolveFinanceMemberContext()` ahora rechaza `memberId` inexistente en `team_members`
+- Se blindó el endpoint `GET /api/people/[memberId]/finance`:
+  - ahora ejecuta `ensureFinanceInfrastructure()` antes de leer `fin_expenses`, para no depender de que el schema canónico ya haya sido aplicado previamente en el entorno
+
+### Verificacion
+- `pnpm exec eslint` sobre las rutas/helper tocados de finance + people: correcto
+- `git diff --check`: correcto
+- Revisión manual adicional del diff para detectar aliases rotos y referencias no resueltas: corregida
+
+### Riesgos o pendientes
+- El working tree sigue con cambios locales listos para commit; todavía no se ha hecho `git add` / `git commit` / `git push` de este último paquete.
+- `pnpm exec tsc --noEmit --pretty false` sigue arrastrando errores globales preexistentes de `.next-local/.next` y rutas SCIM faltantes.
+
+## 2026-03-14 17:15 America/Santiago
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Crear bank statement CSV parser por banco y agregar `finance_manager` a `rolePriority`
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance
+
+### Archivos tocados
+- `src/lib/finance/csv-parser.ts` (nuevo) — parsers por banco
+- `src/app/api/finance/reconciliation/[id]/statements/route.ts` (modificado) — acepta CSV
+- `src/lib/tenant/access.ts` (modificado) — rolePriority
+- `src/lib/finance/canonical.ts` (nuevo, de Codex) — labels canónicos
+- `src/lib/finance/schema.ts` (modificado, de Codex) — constraints de schema
+- 6 archivos de API routes (de Codex) — validación mejorada
+
+### Cambios realizados
+- **CSV parser** (`src/lib/finance/csv-parser.ts`):
+  - 4 parsers: BCI (comma, DD/MM/YYYY, Cargo/Abono/Saldo), Santander (semicolon, DD/MM/YYYY, Nro Documento), BancoChile (comma, DD-MM-YYYY, Monto único), Scotiabank (comma, MM/DD/YYYY, English headers)
+  - Manejo de formato numérico chileno (puntos como separador de miles, coma como decimal)
+  - Factory function `parseBankStatement(csvContent, bankFormat)` con validación
+- **Statement import endpoint** actualizado:
+  - Acepta `{ csvContent, bankFormat }` además de `{ rows }` JSON existente
+  - Backward compatible — ambos formatos siguen funcionando
+- **rolePriority**: `finance_manager` agregado en posición 2 (después de `efeonce_admin`)
+- **Codex changes commiteados**: canonical.ts, schema hardening, validation improvements en 9 archivos
+
+### Verificacion
+- `pnpm eslint` sobre csv-parser.ts y statements/route.ts: limpio
+- `pnpm tsc --noEmit`: solo errores preexistentes (SCIM module, no relacionados)
+- `git status`: working tree clean, 2 commits ahead of origin
+
+### Commits
+- `ad2093f` — feat: add bank statement CSV parser and finance_manager role priority
+- `4ce5020` — feat: codex finance hardening — canonical labels, schema constraints, validation improvements
+
+### Riesgos o pendientes
+- **No pusheado** — 2 commits pendientes de push a origin
+- Dashboard frontend (`FinanceDashboardView.tsx`) sigue consumiendo `/income/summary` y `/expenses/summary`, no los endpoints `/dashboard/*` (aging, cashflow, by-service-line)
+- CSV parser no tiene tests unitarios — validar con cartolas reales de cada banco
+- Los parsers asumen formato estándar de cada banco; variaciones de formato (ej. BCI con headers diferentes por tipo de cuenta) podrían requerir ajustes
+
+---
+
+## 2026-03-14 17:08 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la fase canónica del backend de Finance sin romper el módulo actual: anclaje por `client_id`, resolución de referencias cliente/persona y endpoint read-only de finance para People.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance + people
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/app/api/finance/clients/[id]/route.ts`
+- `src/app/api/finance/clients/sync/route.ts`
+- `src/app/api/finance/expenses/route.ts`
+- `src/app/api/finance/expenses/bulk/route.ts`
+- `src/app/api/finance/income/route.ts`
+- `src/lib/finance/canonical.ts`
+- `src/lib/people/get-person-finance-overview.ts` (nuevo)
+- `src/app/api/people/[memberId]/finance/route.ts` (nuevo)
+
+### Cambios realizados
+- Se cerró la resolución canónica de referencias financieras:
+  - `resolveFinanceClientContext()` ya se usa en `income`, `expenses` y `clients`
+  - `resolveFinanceMemberContext()` se usa en egresos para validar `memberId` vs `payrollEntryId`
+  - si las referencias explícitas chocan, el backend responde `409`
+- La capa de clientes ahora prioriza `fin_client_profiles.client_id` como enlace canónico al tenant:
+  - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` prefieren joins por `client_id`
+  - se mantiene fallback legado por `client_profile_id` y `hubspot_company_id`
+  - los receivables/invoices ahora consideran `fin_income.client_id` además de las referencias viejas
+- `POST /api/finance/clients` y `POST /api/finance/clients/sync` ya rellenan `client_id` en `fin_client_profiles` cuando el tenant es resoluble.
+- Se agregó lectura 360 financiera por colaborador:
+  - nuevo helper `src/lib/people/get-person-finance-overview.ts`
+  - nuevo endpoint `GET /api/people/[memberId]/finance`
+  - expone bloque read-only con `member`, `summary`, `assignments`, `identities`, `payrollHistory` y `expenses`
+- Quedó preservado lo ya existente del módulo:
+  - no se tocaron `/api/finance/dashboard/*`
+  - no se tocaron `match/unmatch` de conciliación
+  - no se tocaron las páginas/detail views actuales
+
+### Verificacion
+- `pnpm exec eslint src/lib/finance/canonical.ts src/lib/finance/schema.ts src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/clients/route.ts src/app/api/finance/clients/sync/route.ts src/app/api/finance/clients/[id]/route.ts src/lib/people/get-person-finance-overview.ts src/app/api/people/[memberId]/finance/route.ts`: correcto
+- `git diff --check`: correcto
+- `pnpm exec tsc --noEmit --pretty false`: sigue fallando por errores globales preexistentes en `.next-local/.next` y rutas SCIM faltantes, no por este paquete
+
+### Riesgos o pendientes
+- El endpoint nuevo `/api/people/[memberId]/finance` todavía no está consumido por el frontend.
+- Sigue pendiente una corrida manual o por preview que dispare `ensureFinanceInfrastructure()` en un entorno real para aplicar el add/backfill de `client_id` si todavía no corrió después de estos cambios.
+- La capa 360 de cliente ya está mejor anclada, pero todavía no existe una vista unificada equivalente dentro del frontend de People o de Finance dashboard.
+
 ## 2026-03-14 15:10 America/Santiago
 
 ### Agente

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getHubspotCompaniesExpressions, getHubspotTableColumns } from '@/lib/finance/hubspot'
+import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -69,11 +70,11 @@ export async function GET(request: Request) {
   const params: Record<string, unknown> = {}
 
   if (requiresPo === 'true') {
-    filters += ' AND cp.requires_po = TRUE'
+    filters += ' AND requires_po = TRUE'
   }
 
   if (requiresHes === 'true') {
-    filters += ' AND cp.requires_hes = TRUE'
+    filters += ' AND requires_hes = TRUE'
   }
 
   if (search) {
@@ -90,29 +91,57 @@ export async function GET(request: Request) {
   }
 
   const baseClientsCte = `
-    WITH base_clients AS (
+    WITH profile_by_client AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      WHERE client_id IS NOT NULL
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY client_id
+        ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, client_profile_id
+      ) = 1
+    ),
+    profile_by_legacy_id AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY client_profile_id
+        ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, client_profile_id
+      ) = 1
+    ),
+    profile_by_hubspot AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      WHERE hubspot_company_id IS NOT NULL
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY hubspot_company_id
+        ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, client_profile_id
+      ) = 1
+    ),
+    base_clients AS (
       SELECT
         gc.client_id,
         gc.client_name AS greenhouse_client_name,
         CAST(gc.hubspot_company_id AS STRING) AS hubspot_company_id,
-        COALESCE(fp_client.client_profile_id, fp_hubspot.client_profile_id, CAST(gc.client_id AS STRING), CAST(gc.hubspot_company_id AS STRING)) AS client_profile_id,
-        COALESCE(fp_client.legal_name, fp_hubspot.legal_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
-        COALESCE(fp_client.tax_id, fp_hubspot.tax_id) AS tax_id,
-        COALESCE(fp_client.payment_terms_days, fp_hubspot.payment_terms_days, 30) AS payment_terms_days,
-        COALESCE(fp_client.payment_currency, fp_hubspot.payment_currency, 'CLP') AS payment_currency,
-        COALESCE(fp_client.requires_po, fp_hubspot.requires_po, FALSE) AS requires_po,
-        COALESCE(fp_client.requires_hes, fp_hubspot.requires_hes, FALSE) AS requires_hes,
+        COALESCE(fp_client.client_profile_id, fp_legacy.client_profile_id, fp_hubspot.client_profile_id, CAST(gc.client_id AS STRING), CAST(gc.hubspot_company_id AS STRING)) AS client_profile_id,
+        COALESCE(fp_client.legal_name, fp_legacy.legal_name, fp_hubspot.legal_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
+        COALESCE(fp_client.tax_id, fp_legacy.tax_id, fp_hubspot.tax_id) AS tax_id,
+        COALESCE(fp_client.payment_terms_days, fp_legacy.payment_terms_days, fp_hubspot.payment_terms_days, 30) AS payment_terms_days,
+        COALESCE(fp_client.payment_currency, fp_legacy.payment_currency, fp_hubspot.payment_currency, 'CLP') AS payment_currency,
+        COALESCE(fp_client.requires_po, fp_legacy.requires_po, fp_hubspot.requires_po, FALSE) AS requires_po,
+        COALESCE(fp_client.requires_hes, fp_legacy.requires_hes, fp_hubspot.requires_hes, FALSE) AS requires_hes,
         ${companyExpressions.nameExpr} AS company_name,
         ${companyExpressions.domainExpr} AS company_domain,
         ${companyExpressions.countryExpr} AS company_country,
         ${companyExpressions.businessLineExpr} AS business_line,
         ${companyExpressions.servicesExpr} AS service_modules_raw,
-        COALESCE(fp_client.created_at, fp_hubspot.created_at) AS created_at,
-        COALESCE(fp_client.updated_at, fp_hubspot.updated_at) AS updated_at
+        COALESCE(fp_client.created_at, fp_legacy.created_at, fp_hubspot.created_at) AS created_at,
+        COALESCE(fp_client.updated_at, fp_legacy.updated_at, fp_hubspot.updated_at) AS updated_at
       FROM \`${projectId}.greenhouse.clients\` gc
-      LEFT JOIN \`${projectId}.greenhouse.fin_client_profiles\` fp_client
-        ON fp_client.client_profile_id = gc.client_id
-      LEFT JOIN \`${projectId}.greenhouse.fin_client_profiles\` fp_hubspot
+      LEFT JOIN profile_by_client fp_client
+        ON fp_client.client_id = gc.client_id
+      LEFT JOIN profile_by_legacy_id fp_legacy
+        ON fp_legacy.client_profile_id = gc.client_id
+      LEFT JOIN profile_by_hubspot fp_hubspot
         ON fp_hubspot.hubspot_company_id = CAST(gc.hubspot_company_id AS STRING)
       LEFT JOIN \`${projectId}.hubspot_crm.companies\` hc
         ON CAST(gc.hubspot_company_id AS STRING) = ${companyExpressions.idExpr}
@@ -137,13 +166,21 @@ export async function GET(request: Request) {
       (
         SELECT COALESCE(SUM(i.total_amount - COALESCE(i.amount_paid, 0)), 0)
         FROM \`${projectId}.greenhouse.fin_income\` i
-        WHERE (i.client_profile_id = bc.client_profile_id OR i.hubspot_company_id = bc.hubspot_company_id)
+        WHERE (
+          i.client_id = bc.client_id
+          OR i.client_profile_id = bc.client_profile_id
+          OR i.hubspot_company_id = bc.hubspot_company_id
+        )
           AND i.payment_status IN ('pending', 'overdue', 'partial')
       ) AS total_receivable,
       (
         SELECT COUNT(*)
         FROM \`${projectId}.greenhouse.fin_income\` i
-        WHERE (i.client_profile_id = bc.client_profile_id OR i.hubspot_company_id = bc.hubspot_company_id)
+        WHERE (
+          i.client_id = bc.client_id
+          OR i.client_profile_id = bc.client_profile_id
+          OR i.hubspot_company_id = bc.hubspot_company_id
+        )
           AND i.payment_status IN ('pending', 'overdue', 'partial')
       ) AS active_invoices_count
     FROM base_clients bc
@@ -192,11 +229,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    const hubspotCompanyId = body.hubspotCompanyId
-      ? normalizeString(body.hubspotCompanyId)
-      : null
+    const resolvedClient = await resolveFinanceClientContext({
+      clientId: body.clientId,
+      clientProfileId: body.clientProfileId,
+      hubspotCompanyId: body.hubspotCompanyId
+    })
 
-    const clientProfileId = normalizeString(body.clientProfileId) || hubspotCompanyId
+    const hubspotCompanyId = resolvedClient.hubspotCompanyId || normalizeString(body.hubspotCompanyId)
+    const clientProfileId = resolvedClient.clientProfileId || normalizeString(body.clientProfileId) || resolvedClient.clientId || hubspotCompanyId
 
     if (!clientProfileId) {
       throw new FinanceValidationError('clientProfileId or hubspotCompanyId is required.')
@@ -213,6 +253,7 @@ export async function POST(request: Request) {
       USING (
         SELECT
           @clientProfileId AS client_profile_id,
+          @clientId AS client_id,
           @hubspotCompanyId AS hubspot_company_id,
           @taxId AS tax_id,
           @taxIdType AS tax_id_type,
@@ -233,6 +274,8 @@ export async function POST(request: Request) {
       ON target.client_profile_id = source.client_profile_id
       WHEN MATCHED THEN
         UPDATE SET
+          client_id = COALESCE(source.client_id, target.client_id),
+          hubspot_company_id = COALESCE(source.hubspot_company_id, target.hubspot_company_id),
           legal_name = source.legal_name,
           tax_id = source.tax_id,
           tax_id_type = source.tax_id_type,
@@ -248,13 +291,13 @@ export async function POST(request: Request) {
           updated_at = CURRENT_TIMESTAMP()
       WHEN NOT MATCHED THEN
         INSERT (
-          client_profile_id, hubspot_company_id, tax_id, tax_id_type, legal_name,
+          client_profile_id, client_id, hubspot_company_id, tax_id, tax_id_type, legal_name,
           billing_address, billing_country, payment_terms_days, payment_currency,
           requires_po, requires_hes, current_po_number, current_hes_number,
           special_conditions, created_by, created_at, updated_at
         )
         VALUES (
-          source.client_profile_id, source.hubspot_company_id, source.tax_id,
+          source.client_profile_id, source.client_id, source.hubspot_company_id, source.tax_id,
           source.tax_id_type, source.legal_name, source.billing_address,
           source.billing_country, source.payment_terms_days, source.payment_currency,
           source.requires_po, source.requires_hes, source.current_po_number,
@@ -263,6 +306,7 @@ export async function POST(request: Request) {
         )
     `, {
       clientProfileId,
+      clientId: resolvedClient.clientId,
       hubspotCompanyId: hubspotCompanyId || clientProfileId,
       taxId: body.taxId ? normalizeString(body.taxId) : null,
       taxIdType,
