@@ -4,6 +4,7 @@ import GreenhouseAdminTenantDashboardPreview from '@views/greenhouse/GreenhouseA
 
 import { getAdminTenantDetail } from '@/lib/admin/get-admin-tenant-detail'
 import { getDashboardOverview } from '@/lib/dashboard/get-dashboard-overview'
+import { getTeamMembers } from '@/lib/team-queries'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -20,5 +21,19 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     serviceModules: tenant.serviceModules
   })
 
-  return <GreenhouseAdminTenantDashboardPreview clientId={tenant.clientId} clientName={tenant.clientName} data={data} />
+  const teamMembersData = await getTeamMembers({
+    clientId: tenant.clientId,
+    projectIds: tenant.projects.map(project => project.projectId),
+    businessLines: tenant.businessLines,
+    serviceModules: tenant.serviceModules
+  }).catch(() => null)
+
+  return (
+    <GreenhouseAdminTenantDashboardPreview
+      clientId={tenant.clientId}
+      clientName={tenant.clientName}
+      data={data}
+      teamMembersData={teamMembersData}
+    />
+  )
 }

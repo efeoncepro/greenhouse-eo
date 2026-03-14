@@ -40,6 +40,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:59 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir de forma literal `CODEX_TASK_Fix_Team_Capacity_Views.md` despues de detectar que `Pulse` seguia mostrando una vista de capacidad operativa y, en `view-as`, ademas podia caer por depender de un fetch cliente fuera del contexto correcto.
+
+### Rama
+- Rama usada: `fix/team-capacity-views-vuexy`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch / `pre-greenhouse`
+
+### Archivos tocados
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/admin/tenants/[id]/view-as/dashboard/page.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- Resultado funcional esperado del delta:
+  - `Pulse` ahora usa roster asignado (`getTeamMembers`) como fuente principal para la card de equipo.
+  - La card ya no muestra barras de utilizacion, CTA de saturacion ni copy operativo como contenido principal.
+  - `view-as/dashboard` deja de depender de un fetch cliente a `/api/team/capacity` para esta seccion.
+
+### Riesgos o pendientes
+- Queda pendiente pushar este delta y revisar visualmente el deployment nuevo en `pre-greenhouse.efeoncepro.com`.
+- El branch tiene otros archivos modificados en la zona de capabilities (`src/config/capability-registry.ts`, `src/lib/capability-queries/creative-hub.ts`, `src/types/capabilities.ts`, etc.) que no pertenecen a este fix; al commitear, seleccionar solo los archivos de este ajuste y no arrastrar cambios ajenos.
+
 ## 2026-03-13 23:40 America/Santiago
 
 ### Agente

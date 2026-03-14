@@ -1,349 +1,391 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import Alert from '@mui/material/Alert'
-import AvatarGroup from '@mui/material/AvatarGroup'
 import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
-import Divider from '@mui/material/Divider'
-import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
-import type { TeamCapacityPayload } from '@/types/team'
+import type { GreenhouseDashboardData, GreenhouseDashboardTeamMember } from '@/types/greenhouse-dashboard'
+import type { TeamContactChannel, TeamMemberResponse, TeamMembersPayload, TeamRoleCategory } from '@/types/team'
 
+import BusinessLineBadge from './BusinessLineBadge'
 import EmptyState from './EmptyState'
 import ExecutiveCardShell from './ExecutiveCardShell'
 import RequestDialog from './RequestDialog'
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
 import TeamExpansionGhostCard from './TeamExpansionGhostCard'
-import TeamLoadBar from './TeamLoadBar'
-import TeamProgressBar from './TeamProgressBar'
-import TeamSignalChip from './TeamSignalChip'
-import UpsellBanner from './UpsellBanner'
+import { getBrandDisplayLabel } from './brand-assets'
 
-const getUtilizationTone = (value: number): 'success' | 'warning' | 'error' => {
-  if (value >= 90) return 'error'
-  if (value >= 71) return 'warning'
+const inferRoleCategory = (roleTitle: string): TeamRoleCategory => {
+  const normalizedRole = roleTitle.toLowerCase()
 
-  return 'success'
+  if (normalizedRole.includes('account') || normalizedRole.includes('leadership')) return 'account'
+  if (normalizedRole.includes('operat')) return 'operations'
+  if (normalizedRole.includes('strateg')) return 'strategy'
+  if (normalizedRole.includes('design') || normalizedRole.includes('creative')) return 'design'
+  if (normalizedRole.includes('media')) return 'media'
+
+  return 'development'
 }
 
-const TeamCapacitySection = () => {
-  const [data, setData] = useState<TeamCapacityPayload | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+const getContactLabel = (channel: TeamContactChannel) => {
+  switch (channel) {
+    case 'slack':
+      return GH_TEAM.contact_channel_slack
+    case 'email':
+      return GH_TEAM.contact_channel_email
+    default:
+      return GH_TEAM.contact_channel_teams
+  }
+}
+
+const getContactIcon = (channel: TeamContactChannel) => {
+  switch (channel) {
+    case 'slack':
+      return 'tabler-brand-slack'
+    case 'email':
+      return 'tabler-mail'
+    default:
+      return 'tabler-brand-teams'
+  }
+}
+
+const getFallbackRoleTitle = (member: GreenhouseDashboardTeamMember) => {
+  if (member.role !== 'Efeonce Team') {
+    return member.role
+  }
+
+  const normalizedName = member.name.toLowerCase()
+
+  if (normalizedName.includes('valentina')) return 'Account Manager'
+  if (normalizedName.includes('humberly')) return 'Content Strategist'
+  if (normalizedName.includes('luis')) return 'Operations Specialist'
+
+  return 'Operations Specialist'
+}
+
+const shouldHideFallbackMember = (member: GreenhouseDashboardTeamMember) => member.role.toLowerCase().includes('leadership')
+
+const toFallbackMember = (member: GreenhouseDashboardTeamMember): TeamMemberResponse => {
+  const roleTitle = getFallbackRoleTitle(member)
+  const monthlyHours = member.monthlyHours ?? (member.allocationPct !== null ? Math.round((member.allocationPct / 100) * 160) : 0)
+
+  const fteAllocation =
+    member.allocationPct !== null
+      ? Number((member.allocationPct / 100).toFixed(1))
+      : monthlyHours > 0
+        ? Number((monthlyHours / 160).toFixed(1))
+        : 0
+
+  return {
+    memberId: member.id,
+    displayName: member.name,
+    email: '',
+    avatarUrl: member.avatarPath || null,
+    roleTitle,
+    roleCategory: inferRoleCategory(roleTitle),
+    relevanceNote: null,
+    contactChannel: 'teams',
+    contactHandle: null,
+    fteAllocation,
+    startDate: null,
+    profile: {
+      firstName: null,
+      lastName: null,
+      preferredName: null,
+      legalName: null,
+      orgRoleId: null,
+      orgRoleName: null,
+      professionId: null,
+      professionName: null,
+      seniorityLevel: null,
+      employmentType: null,
+      ageYears: null,
+      phone: null,
+      teamsUserId: null,
+      slackUserId: null,
+      locationCity: null,
+      locationCountry: null,
+      timeZone: null,
+      yearsExperience: null,
+      efeonceStartDate: null,
+      tenureEfeonceMonths: null,
+      tenureClientMonths: null,
+      biography: null,
+      languages: [],
+      profileCompletenessPercent: 0
+    },
+    identityProviders: [],
+    identityConfidence: 'basic'
+  }
+}
+
+const buildFallbackTeam = (dashboardData: GreenhouseDashboardData): TeamMembersPayload => {
+  const members = dashboardData.accountTeam.members.filter(member => !shouldHideFallbackMember(member)).map(toFallbackMember)
+  const totalFte = Number(members.reduce((sum, member) => sum + member.fteAllocation, 0).toFixed(1))
+
+  return {
+    members,
+    footer: {
+      serviceLines: dashboardData.scope.businessLines,
+      modality: dashboardData.scope.serviceModules.length > 0 ? 'On-Going' : 'On-Demand',
+      totalFte
+    },
+    source: 'legacy_override'
+  }
+}
+
+const formatDedication = (member: TeamMemberResponse) => {
+  const monthlyHours = Math.round(member.fteAllocation * 160)
+
+  return {
+    fte: GH_TEAM.capacity_member_fte(member.fteAllocation),
+    hours: GH_TEAM.capacity_member_hours(monthlyHours)
+  }
+}
+
+type TeamCapacitySectionProps = {
+  initialData?: TeamMembersPayload | null
+  dashboardData?: GreenhouseDashboardData
+}
+
+const TeamCapacitySection = ({ initialData = null, dashboardData }: TeamCapacitySectionProps) => {
   const [requestIntent, setRequestIntent] = useState<string | null>(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
+  const data = initialData || (dashboardData ? buildFallbackTeam(dashboardData) : null)
+  const members = data?.members || []
 
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
+  const footer = data?.footer || {
+    serviceLines: [],
+    modality: null,
+    totalFte: 0
+  }
 
-        const response = await fetch('/api/team/capacity', {
-          cache: 'no-store',
-          signal: controller.signal
-        })
+  const totalHours = Math.round(footer.totalFte * 160)
+  const primaryServiceLine = footer.serviceLines[0] || null
+  const extraServiceLines = Math.max(0, footer.serviceLines.length - 1)
 
-        if (!response.ok) {
-          throw new Error(`Team capacity request failed with ${response.status}`)
-        }
-
-        const payload = (await response.json()) as TeamCapacityPayload
-
-        setData(payload)
-        setError(null)
-      } catch (fetchError) {
-        if ((fetchError as Error).name === 'AbortError') {
-          return
-        }
-
-        setError(GH_MESSAGES.error_team_capacity)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    void loadData()
-
-    return () => controller.abort()
-  }, [])
+  if (members.length === 0) {
+    return (
+      <>
+        <ExecutiveCardShell title={GH_TEAM.pulse_title} subtitle={GH_TEAM.pulse_subtitle}>
+          <EmptyState icon='tabler-users-group' title={GH_TEAM.pulse_title} description={GH_MESSAGES.empty_team} minHeight={260} />
+        </ExecutiveCardShell>
+        <RequestDialog open={requestIntent !== null} intent={requestIntent} onClose={() => setRequestIntent(null)} />
+      </>
+    )
+  }
 
   return (
     <>
-      <ExecutiveCardShell title={GH_TEAM.capacity_title} subtitle={GH_TEAM.capacity_subtitle}>
-        <Stack spacing={3}>
-          {isLoading ? (
-            <Stack spacing={2.5}>
-              <Skeleton variant='rounded' height={120} />
-              <Skeleton variant='rounded' height={280} />
-            </Stack>
-          ) : null}
+      <ExecutiveCardShell title={GH_TEAM.pulse_title} subtitle={GH_TEAM.pulse_subtitle}>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: {
+              xs: '1fr',
+              xl: 'minmax(0, 1.35fr) minmax(300px, 0.65fr)'
+            }
+          }}
+        >
+          <Stack spacing={1.5}>
+            {members.map(member => {
+              const tone = getTeamRoleTone(member.roleCategory)
+              const dedication = formatDedication(member)
+              const contactValue = member.contactHandle || member.email || GH_TEAM.contact_pending
 
-          {error ? <Alert severity='warning'>{error}</Alert> : null}
-
-          {!isLoading && !error && (!data || data.members.length === 0) ? (
-            <EmptyState icon='tabler-users-group' title={GH_TEAM.capacity_title} description={GH_MESSAGES.empty_capacity} minHeight={260} />
-          ) : null}
-
-          {!isLoading && !error && data ? (
-            <>
-              {(() => {
-                const utilizationTone = getUtilizationTone(data.summary.utilizationPercent)
-                const memberFteValues = Array.from(new Set(data.members.map(member => member.fteAllocation.toFixed(2))))
-                const showMemberAllocation = memberFteValues.length > 1
-
-                const avgActiveAssets =
-                  data.members.length > 0 ? data.members.reduce((sum, member) => sum + member.activeAssets, 0) / data.members.length : 0
-
-                return (
-                  <>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gap: 2,
-                  gridTemplateColumns: {
-                    xs: '1fr',
-                    md: 'repeat(3, minmax(0, 1fr))'
-                  }
-                }}
-              >
-                <HorizontalWithSubtitle
-                  title={GH_TEAM.label_contracted}
-                  stats={`${data.summary.totalFte.toFixed(1)} FTE`}
-                  avatarIcon='tabler-users-group'
-                  avatarColor='primary'
-                  subtitle={GH_TEAM.capacity_people_assigned(data.summary.memberCount)}
-                />
-
-                <HorizontalWithSubtitle
-                  title={GH_TEAM.label_hours}
-                  stats={`${data.summary.utilizedHoursMonth} / ${data.summary.totalHoursMonth}h`}
-                  avatarIcon='tabler-clock-hour-4'
-                  avatarColor='info'
-                  subtitle={data.period}
-                />
-
+              return (
                 <Box
+                  key={member.memberId}
                   sx={{
-                    p: 3,
-                    borderRadius: 4,
+                    px: { xs: 2, md: 2.5 },
+                    py: 2,
+                    borderRadius: 3,
                     border: `1px solid ${GH_COLORS.neutral.border}`,
-                    bgcolor: 'background.paper',
-                    display: 'grid',
-                    gap: 1.5
+                    bgcolor: 'background.paper'
                   }}
                 >
-                  <Typography variant='body2' color='text.secondary'>
-                    {GH_TEAM.label_utilization}
-                  </Typography>
-                  <Typography variant='h4'>{`${data.summary.utilizationPercent}%`}</Typography>
-                  <Stack spacing={1.25}>
-                    <TeamProgressBar value={data.summary.utilizationPercent} tone={utilizationTone} />
-                    <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
-                      <TeamSignalChip
-                        tone={utilizationTone}
-                        label={data.summary.utilizationPercent >= 85 ? GH_TEAM.cta_signal_high : GH_TEAM.cta_signal_balanced}
-                        icon='tabler-activity-heartbeat'
-                      />
-                      <Typography variant='caption' color='text.secondary'>
-                        {GH_TEAM.capacity_utilization_help}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                </Box>
-              </Box>
+                  <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center'>
+                    <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0, flexGrow: 1 }}>
+                      <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={44} />
 
-              {!data.hasOperationalMetrics ? (
-                <Alert severity='info'>{GH_MESSAGES.team_operational_pending}</Alert>
-              ) : null}
-
-              <Box
-                sx={{
-                  display: 'grid',
-                  gap: 3,
-                  alignItems: 'start',
-                  gridTemplateColumns: {
-                    xs: '1fr',
-                    xl: 'minmax(0, 1.35fr) minmax(320px, 0.65fr)'
-                  }
-                }}
-              >
-                <Stack spacing={2}>
-                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'center' }}>
-                    <Stack spacing={0.5}>
-                      <Typography variant='subtitle2'>{GH_TEAM.label_load}</Typography>
-                      <Typography variant='body2' color='text.secondary'>
-                        {data.hasOperationalMetrics ? GH_TEAM.capacity_operational_live : GH_TEAM.capacity_contract_only}
-                      </Typography>
-                    </Stack>
-
-                    <Stack direction='row' spacing={1.5} alignItems='center' useFlexGap flexWrap='wrap'>
-                      <AvatarGroup
-                        max={4}
-                        sx={{
-                          '& .MuiAvatar-root': {
-                            width: 28,
-                            height: 28,
-                            fontSize: '0.75rem',
-                            borderColor: 'background.paper'
-                          }
-                        }}
-                      >
-                        {data.members.map(member => (
-                          <TeamAvatar
-                            key={`capacity-avatar-${member.memberId}`}
-                            name={member.displayName}
-                            avatarUrl={member.avatarUrl}
-                            roleCategory={member.roleCategory}
-                            size={28}
-                          />
-                        ))}
-                      </AvatarGroup>
-                      <Typography variant='caption' color='text.secondary'>
-                        {GH_TEAM.capacity_people_helper}
-                      </Typography>
-                    </Stack>
-                  </Stack>
-
-                  <Stack
-                    divider={<Divider flexItem sx={{ borderStyle: 'dashed', borderColor: alpha(GH_COLORS.neutral.border, 0.8) }} />}
-                    sx={{
-                      borderRadius: 4,
-                      border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
-                      bgcolor: 'background.paper',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {data.members.map(member => {
-                      const tone = getTeamRoleTone(member.roleCategory)
-                      const isOverloaded = data.hasOperationalMetrics && avgActiveAssets > 0 && member.activeAssets > avgActiveAssets * 1.5
-
-                      return (
-                        <Stack
-                          key={member.memberId}
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                        <Typography
                           sx={{
-                            px: { xs: 2, md: 2.5 },
-                            py: 2,
-                            gap: 1.5
+                            color: GH_COLORS.neutral.textPrimary,
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            lineHeight: 1.35
                           }}
                         >
-                          <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
-                            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
-                              <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={36} />
-                              <Box sx={{ minWidth: 0 }}>
-                                <Typography variant='subtitle2' sx={{ color: 'text.primary' }}>
-                                  {member.displayName}
-                                </Typography>
-                                <Typography variant='caption' sx={{ color: tone.text, display: 'block' }}>
-                                  {member.roleTitle}
-                                </Typography>
-                              </Box>
-                            </Stack>
+                          {member.displayName}
+                        </Typography>
 
-                            <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                              <Stack direction='row' spacing={1} justifyContent='flex-end' flexWrap='wrap' useFlexGap>
-                                {data.hasOperationalMetrics ? (
-                                  <>
-                                    <TeamSignalChip
-                                      tone={isOverloaded ? 'error' : 'primary'}
-                                      label={GH_TEAM.capacity_assets_label(member.activeAssets)}
-                                      icon='tabler-layers-intersect'
-                                    />
-                                    <Chip
-                                      size='small'
-                                      variant='tonal'
-                                      color='info'
-                                      label={GH_TEAM.capacity_projects_label(member.projectCount)}
-                                    />
-                                    {member.avgRpa !== null ? (
-                                      <TeamSignalChip
-                                        tone={member.avgRpa <= 1.5 ? 'success' : member.avgRpa <= 2.5 ? 'warning' : 'error'}
-                                        label={GH_TEAM.rpa_label(member.avgRpa)}
-                                        icon='tabler-chart-line'
-                                      />
-                                    ) : null}
-                                  </>
-                                ) : showMemberAllocation ? (
-                                  <>
-                                    <Chip size='small' variant='outlined' label={GH_TEAM.capacity_member_fte(member.fteAllocation)} />
-                                    <Typography variant='caption' color='text.secondary'>
-                                      {GH_TEAM.capacity_member_hours(Math.round(member.fteAllocation * 160))}
-                                    </Typography>
-                                  </>
-                                ) : null}
-                              </Stack>
-                            </Box>
-                          </Stack>
+                        <Typography
+                          sx={{
+                            color: tone.text,
+                            fontSize: '0.8125rem',
+                            fontWeight: 400,
+                            lineHeight: 1.35,
+                            mt: 0.25
+                          }}
+                        >
+                          {member.roleTitle}
+                        </Typography>
 
-                          {data.hasOperationalMetrics ? (
-                            <Stack spacing={1}>
-                              <TeamLoadBar items={member.projectBreakdown} emptyLabel={GH_MESSAGES.team_project_breakdown_empty} />
-                              <Typography variant='caption' color='text.secondary'>
-                                {member.completedAssets} {GH_TEAM.project_chip_completed}
-                              </Typography>
-                            </Stack>
-                          ) : null}
+                        <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mt: 0.75, minWidth: 0 }}>
+                          <Box component='span' sx={{ color: GH_COLORS.neutral.textSecondary, display: 'inline-flex' }}>
+                            <i className={`${getContactIcon(member.contactChannel)} text-[16px]`} />
+                          </Box>
+                          <Typography
+                            sx={{
+                              color: GH_COLORS.neutral.textSecondary,
+                              fontSize: '0.75rem',
+                              fontWeight: 400,
+                              lineHeight: 1.35,
+                              minWidth: 0
+                            }}
+                          >
+                            {`${getContactLabel(member.contactChannel)} - ${contactValue}`}
+                          </Typography>
                         </Stack>
-                      )
-                    })}
+                      </Box>
+                    </Stack>
 
-                    <Box sx={{ p: 2 }}>
-                      <TeamExpansionGhostCard variant='row' onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())} />
+                    <Box sx={{ minWidth: 92, textAlign: 'right', flexShrink: 0 }}>
+                      <Typography
+                        sx={{
+                          color: GH_COLORS.neutral.textPrimary,
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          lineHeight: 1.35
+                        }}
+                      >
+                        {dedication.fte}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: GH_COLORS.neutral.textSecondary,
+                          fontSize: '0.75rem',
+                          fontWeight: 400,
+                          lineHeight: 1.35,
+                          mt: 0.25
+                        }}
+                      >
+                        {dedication.hours}
+                      </Typography>
                     </Box>
                   </Stack>
-                </Stack>
+                </Box>
+              )
+            })}
 
-                <Stack
-                  spacing={2}
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 4,
-                    border: `1px solid ${GH_COLORS.neutral.border}`,
-                    bgcolor: GH_COLORS.neutral.bgSurface,
-                    alignSelf: 'start'
-                  }}
-                >
-                  <Typography variant='subtitle2'>{GH_TEAM.capacity_summary_subtitle}</Typography>
-                  <HorizontalWithSubtitle
-                    title={GH_TEAM.label_contracted}
-                    stats={`${data.summary.totalFte.toFixed(1)} FTE`}
-                    avatarIcon='tabler-users-group'
-                    avatarColor='primary'
-                    subtitle={`${data.summary.totalHoursMonth}h/mes`}
-                  />
-                  <HorizontalWithSubtitle
-                    title={GH_TEAM.label_hours}
-                    stats={`${data.summary.utilizedHoursMonth}h`}
-                    avatarIcon='tabler-clock-hour-4'
-                    avatarColor='info'
-                    subtitle={data.period}
-                  />
-                  <HorizontalWithSubtitle
-                    title={GH_TEAM.label_utilization}
-                    stats={`${data.summary.utilizationPercent}%`}
-                    avatarIcon='tabler-activity-heartbeat'
-                    avatarColor={utilizationTone}
-                    subtitle={GH_MESSAGES.tooltip_utilization}
-                  />
+            <TeamExpansionGhostCard variant='row' onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())} />
+          </Stack>
 
-                  {data.summary.utilizationPercent >= 85 ? (
-                    <UpsellBanner utilizationPercent={data.summary.utilizationPercent} onRequest={() => setRequestIntent(GH_TEAM.cta_button.toLowerCase())} />
+          <Stack
+            spacing={2}
+            sx={{
+              p: 2.5,
+              borderRadius: 3,
+              border: `1px solid ${GH_COLORS.neutral.border}`,
+              bgcolor: GH_COLORS.neutral.bgSurface,
+              alignSelf: 'start',
+              position: {
+                xs: 'static',
+                xl: 'sticky'
+              },
+              top: {
+                xl: 96
+              }
+            }}
+          >
+            <Typography variant='subtitle2'>{GH_TEAM.pulse_summary_title}</Typography>
+
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+                bgcolor: 'background.paper'
+              }}
+            >
+              <Typography variant='caption' color='text.secondary'>
+                {GH_TEAM.label_contracted}
+              </Typography>
+              <Typography variant='body1' sx={{ mt: 0.75, color: GH_COLORS.neutral.textPrimary }}>
+                {GH_TEAM.pulse_summary_fte(footer.totalFte)}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+                bgcolor: 'background.paper'
+              }}
+            >
+              <Typography variant='caption' color='text.secondary'>
+                {GH_TEAM.label_hours}
+              </Typography>
+              <Typography variant='body1' sx={{ mt: 0.75, color: GH_COLORS.neutral.textPrimary }}>
+                {GH_TEAM.pulse_summary_hours(totalHours)}
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+                bgcolor: 'background.paper'
+              }}
+            >
+              <Typography variant='caption' color='text.secondary'>
+                {GH_TEAM.label_service_line}
+              </Typography>
+
+              {primaryServiceLine ? (
+                <Stack spacing={1} sx={{ mt: 1 }}>
+                  <Box>
+                    <BusinessLineBadge brand={primaryServiceLine} />
+                  </Box>
+                  <Typography variant='body2'>{getBrandDisplayLabel(primaryServiceLine)}</Typography>
+                  {extraServiceLines > 0 ? (
+                    <Typography variant='caption' color='text.secondary'>
+                      {GH_TEAM.pulse_service_lines_more(extraServiceLines)}
+                    </Typography>
                   ) : null}
                 </Stack>
-              </Box>
-                  </>
-                )
-              })()}
-            </>
-          ) : null}
-        </Stack>
+              ) : (
+                <Typography variant='body2' sx={{ mt: 0.75, color: GH_COLORS.neutral.textSecondary }}>
+                  {GH_TEAM.service_lines_empty}
+                </Typography>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+                bgcolor: 'background.paper'
+              }}
+            >
+              <Typography variant='caption' color='text.secondary'>
+                {GH_TEAM.label_modality}
+              </Typography>
+              <Typography variant='body1' sx={{ mt: 0.75, color: GH_COLORS.neutral.textPrimary }}>
+                {footer.modality || GH_TEAM.modality_pending}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
       </ExecutiveCardShell>
 
       <RequestDialog open={requestIntent !== null} intent={requestIntent} onClose={() => setRequestIntent(null)} />

@@ -14,15 +14,17 @@ import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import { buildTenantPublicId } from '@/lib/ids/greenhouse-ids'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
+import type { TeamMembersPayload } from '@/types/team'
 import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 
 type Props = {
   clientId: string
   clientName: string
   data: GreenhouseDashboardData
+  teamMembersData?: TeamMembersPayload | null
 }
 
-const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: Props) => {
+const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data, teamMembersData = null }: Props) => {
   const publicTenantId = buildTenantPublicId({ clientId })
 
   const capabilityModules = resolveCapabilityModules({
@@ -80,7 +82,7 @@ const GreenhouseAdminTenantDashboardPreview = ({ clientId, clientName, data }: P
         </CardContent>
       </Card>
 
-      <GreenhouseDashboard clientName={clientName} data={data} />
+      <GreenhouseDashboard clientName={clientName} data={data} teamMembersData={teamMembersData} />
     </Stack>
   )
 }

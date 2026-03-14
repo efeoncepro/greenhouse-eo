@@ -3,6 +3,15 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-13 Pulse team view correction
+- `Pulse` ya no debe tratar la seccion de equipo como una lectura primaria de capacidad operativa.
+  - La surface del dashboard cliente ahora consume roster asignado (`getTeamMembers`) como fuente principal para `Tu equipo asignado`.
+  - La columna derecha queda limitada a resumen contractual visible: FTE, horas, linea de servicio y modalidad.
+- Regla operativa nueva para `Pulse`:
+  - la Vista 1 (`Tu equipo asignado`) es roster-first y no depende de queries de carga operativa para renderizar
+  - la Vista 2 (`Capacidad operativa`) queda fuera de la card principal y solo debe aparecer despues como detalle/expandible o en otra ubicacion
+- El `view-as` admin del dashboard ahora tambien hidrata esta seccion server-side con roster del tenant para evitar errores por fetch cliente fuera del contexto `client`.
+
 ## Delta 2026-03-13 Canonical team identity hardening
 - La capa de equipo/capacidad ya no debe tratar `azure_oid`, `notion_user_id` o `hubspot_owner_id` como la identidad canonica.
   - `greenhouse.team_members.identity_profile_id` pasa a ser el enlace canonico de persona para el roster Efeonce.
