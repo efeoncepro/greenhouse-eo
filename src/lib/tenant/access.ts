@@ -82,6 +82,7 @@ export interface TenantAccessRecord {
 
 const rolePriority = [
   'efeonce_admin',
+  'finance_manager',
   'hr_payroll',
   'efeonce_operations',
   'efeonce_account',

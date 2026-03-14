@@ -11,6 +11,8 @@ import {
   toNumber,
   FinanceValidationError
 } from '@/lib/finance/shared'
+import { parseBankStatement, SUPPORTED_BANK_FORMATS } from '@/lib/finance/csv-parser'
+import type { BankStatementRow } from '@/lib/finance/csv-parser'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,6 +24,16 @@ interface StatementInput {
   amount: number
   balance?: number
 }
+
+/** Convert CSV-parsed rows into the standard StatementInput shape */
+const csvRowsToStatementInput = (parsed: BankStatementRow[]): StatementInput[] =>
+  parsed.map(r => ({
+    transactionDate: r.transactionDate,
+    description: r.description,
+    amount: r.amount,
+    ...(r.balance !== null && { balance: r.balance }),
+    ...(r.reference !== null && { reference: r.reference })
+  }))
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -52,7 +64,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new FinanceValidationError('Cannot import statements into a reconciled or closed period.', 409)
     }
 
-    const rows: StatementInput[] = Array.isArray(body.rows) ? body.rows : []
+    // Resolve rows: either from CSV content or from pre-parsed JSON
+    let rows: StatementInput[]
+
+    if (body.csvContent && body.bankFormat) {
+      const parsed = parseBankStatement(body.csvContent, body.bankFormat)
+
+      rows = csvRowsToStatementInput(parsed)
+    } else if (Array.isArray(body.rows)) {
+      rows = body.rows
+    } else {
+      throw new FinanceValidationError(
+        `Provide either { csvContent, bankFormat } or { rows }. Supported bank formats: ${SUPPORTED_BANK_FORMATS.join(', ')}`
+      )
+    }
 
     if (rows.length === 0) {
       throw new FinanceValidationError('At least one statement row is required.')
@@ -107,7 +132,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       WHERE period_id = @periodId
     `, { periodId, rowCount: imported })
 
-    return NextResponse.json({ periodId, imported }, { status: 201 })
+    return NextResponse.json({
+      periodId,
+      imported,
+      ...(body.bankFormat && { bankFormat: body.bankFormat })
+    }, { status: 201 })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
