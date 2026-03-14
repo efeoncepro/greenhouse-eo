@@ -48,6 +48,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
+- [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
 
 ### Tasks
 

@@ -6,6 +6,21 @@
 
 ## 2026-03-14
 
+### HR payroll backend hardening
+- El backend de `HR Payroll` ya quedó operativo y validado con `pnpm build`, incluyendo las rutas `/api/hr/payroll/**` dentro del artefacto de producción.
+- Se endureció la capa server-side de payroll para evitar estados inconsistentes:
+  - validación estricta de números y fechas en compensaciones, períodos y edición de entries
+  - bloqueo de actualización de `payroll_periods` cuando el período ya no está en `draft`
+  - validación final de reglas de bono antes de aprobar una nómina
+- `compensation_versions` ahora inserta nuevas versiones sin solapes de vigencia y mantiene `is_current` coherente cuando existe una versión futura programada, reduciendo riesgo de cálculos históricos o programados inconsistentes.
+- La auditoría de creación de compensaciones ya prioriza el email de sesión y no solo el `userId` interno cuando el actor está autenticado.
+- El smoke runtime contra BigQuery real ya quedó ejecutado:
+  - `notion_ops.tareas` confirmó los campos productivos usados por payroll (`responsables_ids`, `rpa`, `estado`, `last_edited_time`, `fecha_de_completado`, `fecha_límite`)
+  - el bootstrap `greenhouse_hr_payroll_v1.sql` ya fue aplicado en `efeonce-group.greenhouse`
+  - existen en BigQuery real las tablas `compensation_versions`, `payroll_periods`, `payroll_entries`, `payroll_bonus_config` y el rol `hr_payroll`
+- `fetch-kpis-for-period.ts` quedó corregido para soportar columnas acentuadas reales del dataset y el DDL de payroll se ajustó para no depender de `DEFAULT` literales incompatibles en este bootstrap de BigQuery.
+- Se agregó el runbook [docs/operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](docs/operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md) para rescatar y reubicar trabajo no committeado de payroll en una rama propia sin usar un flujo riesgoso de `stash -> develop -> apply`.
+
 ### GitHub collaboration hygiene
 - El repo ahora incorpora `.github/` con una capa minima de colaboracion y mantenimiento:
   - `workflows/ci.yml`

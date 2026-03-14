@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 HR payroll backend foundation
+- El repo ya tiene una primera capa backend operativa de `HR Payroll` bajo el route group propio `hr`:
+  - `src/app/(dashboard)/hr/layout.tsx`
+  - `src/app/api/hr/payroll/**`
+  - `src/lib/payroll/**`
+  - `src/types/payroll.ts`
+- La infraestructura de payroll no depende exclusivamente de una migración manual previa:
+  - `ensurePayrollInfrastructure()` crea on-demand `greenhouse.compensation_versions`, `greenhouse.payroll_periods`, `greenhouse.payroll_entries` y `greenhouse.payroll_bonus_config`
+  - el seed del rol `hr_payroll` también quedó incorporado en runtime y en SQL versionado
+- Reglas backend vigentes del módulo:
+  - solo períodos `draft` aceptan cambios de `uf_value`, `tax_table_version` o `notes`
+  - la aprobación de nómina revalida server-side que los bonos respeten elegibilidad y rangos
+  - la creación de `compensation_versions` ya no debe generar solapes de vigencia y distingue entre versiones actuales y futuras usando `effective_from` / `effective_to`
+- Estado de validación actual:
+  - `pnpm build`: correcto con las rutas `HR Payroll` incluidas
+  - la validación runtime contra BigQuery real ya confirmó:
+    - schema vivo de `notion_ops.tareas` con `responsables_ids`, `rpa`, `estado`, `last_edited_time`, `fecha_de_completado` y `fecha_límite`
+    - bootstrap aplicado de `greenhouse.compensation_versions`, `greenhouse.payroll_periods`, `greenhouse.payroll_entries` y `greenhouse.payroll_bonus_config`
+    - seed aplicado del rol `hr_payroll` en `greenhouse.roles`
+- Ajuste operativo derivado del smoke real:
+  - `fetch-kpis-for-period.ts` ya no debe asumir aliases sin acento como `fecha_limite`; en producción existen columnas acentuadas y deben citarse como identifiers escapados en SQL dinámico
+  - el DDL versionado de payroll se endureció para no depender de `DEFAULT` literales en BigQuery, porque el runtime de la app ya setea esos valores explícitamente
+
 ## Delta 2026-03-14 GitHub collaboration hygiene
 - El repo ahora incorpora una capa explicita de buenas practicas GitHub bajo `.github/`:
   - `workflows/ci.yml`

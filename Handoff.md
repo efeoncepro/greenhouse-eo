@@ -40,6 +40,270 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 08:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Dejar documentada la estrategia acordada para rescatar y reubicar el trabajo no committeado de `HR Payroll` que hoy está mezclado en `feature/admin-tenant-detail-redesign`.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / branch coordination
+
+### Archivos tocados
+- `Handoff.md`
+
+### Verificacion
+- Confirmado sin mover rama:
+  - el worktree actual está en `feature/admin-tenant-detail-redesign`
+  - el trabajo actual de payroll (backend + frontend + infraestructura) vive en este árbol como cambios sin commit
+  - `fix/team-capacity-views-vuexy` sí existe, pero sus commits guardados corresponden a iniciativas anteriores y no al delta actual sin commit de payroll
+
+### Riesgos o pendientes
+- Estrategia recomendada para reubicar el trabajo de payroll:
+  - crear `feature/hr-payroll` desde el estado actual del worktree, sin perder el árbol sucio
+  - hacer 2 commits lógicos dentro de `feature/hr-payroll`
+  - commit 1: infraestructura reusable
+  - commit 2: `HR Payroll`
+- Infraestructura reusable sugerida:
+  - `src/components/card-statistics/*`
+  - `src/components/dialogs/*`
+  - `src/hooks/*`
+  - `src/libs/styles/AppReactDatepicker.tsx`
+  - `src/libs/styles/AppReactDropzone.ts`
+  - `src/libs/styles/AppReactToastify.tsx`
+- Scope sugerido del commit `HR Payroll`:
+  - `src/app/(dashboard)/hr/**`
+  - `src/app/api/hr/payroll/**`
+  - `src/views/greenhouse/payroll/**`
+  - `src/lib/payroll/**`
+  - `src/types/payroll.ts`
+  - `bigquery/greenhouse_hr_payroll_v1.sql`
+  - `bigquery/greenhouse_identity_access_v1.sql`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/lib/tenant/access.ts`
+  - `src/lib/tenant/authorization.ts`
+  - `Handoff.md`
+  - `project_context.md`
+  - `changelog.md`
+- Recomendacion operativa:
+  - no abrir una rama extra para `infra` por ahora
+  - no usar `stash -> develop -> apply` como primer movimiento si se puede evitar
+  - primero rescatar el trabajo en `feature/hr-payroll`, luego limpiar historial si hace falta
+- Runbook operativo creado:
+  - `docs/operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md`
+
+## 2026-03-14 08:32 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar validación runtime real del backend `HR Payroll` contra BigQuery y aplicar el bootstrap del módulo en el dataset `greenhouse`.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / BigQuery runtime validation
+
+### Archivos tocados
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/schema.ts`
+- `bigquery/greenhouse_hr_payroll_v1.sql`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- Query read-only a `efeonce-group.notion_ops.INFORMATION_SCHEMA.COLUMNS`: confirmó schema real de `tareas`
+- Bootstrap aplicado en BigQuery real desde `bigquery/greenhouse_hr_payroll_v1.sql`
+- Revalidación posterior:
+  - tablas creadas: `compensation_versions`, `payroll_periods`, `payroll_entries`, `payroll_bonus_config`
+  - rol sembrado: `hr_payroll` con `route_group_scope = ['internal', 'hr']`
+  - seed `payroll_bonus_config`: correcto
+- Smoke read-only de KPIs reales: correcto para RpA y OTD usando `rpa`, `estado`, `last_edited_time`, `fecha_de_completado` y `fecha_límite`
+- `pnpm exec eslint` sobre `src/lib/payroll/fetch-kpis-for-period.ts` y `src/lib/payroll/schema.ts`: correcto
+- `pnpm build`: correcto
+
+### Riesgos o pendientes
+- El bootstrap BigQuery ya quedó aplicado, pero sigue pendiente la provisión real de usuarios `client_users` / `user_role_assignments` con el rol `hr_payroll`; hoy existe el role, no necesariamente los principals de HR.
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue ignorado por Git; la implementación ya avanzó más que el brief trackeado.
+- Existen archivos UI no trackeados fuera del scope backend en el working tree; no fueron tocados en este turno.
+
+## 2026-03-14 08:08 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer el backend de `HR Payroll` para dejarlo listo para integración real con frontend: validaciones numéricas server-side, versionado de compensación sin solapes, bloqueo de edición de períodos fuera de `draft`, aprobación con validación final de bonos y auditoría consistente por email de sesión.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / backend hardening
+
+### Archivos tocados
+- `src/lib/payroll/shared.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/app/api/hr/payroll/compensation/route.ts`
+- `src/app/api/hr/payroll/periods/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/route.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/approve/route.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm exec eslint` sobre el delta endurecido de payroll: correcto
+- `git diff --check`: correcto
+- `pnpm build`: correcto
+
+### Riesgos o pendientes
+- El backend ya quedó buildable y con rutas `HR Payroll` incluidas en el artefacto de producción, pero sigue faltando validación runtime contra BigQuery real para confirmar:
+  - columnas vivas de `notion_ops.tareas` para OTD automático
+  - permisos efectivos de creación sobre `greenhouse.payroll_*`
+  - seed y asignación real del rol `hr_payroll` en datos productivos
+- La lógica de `compensation_versions` ahora soporta inserciones sin solapes y distingue versiones futuras vs vigentes, pero sigue siendo recomendable que Claude trate `effectiveFrom` como campo de negocio sensible y no como input libre sin guía UX.
+- El frontend de `HR Payroll` puede avanzar ya sobre estos contratos; evitar tocar menú visual y pantallas desde backend salvo bloqueo funcional nuevo.
+
+## 2026-03-14 07:53 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la primera entrega backend de `HR Payroll`: route group `hr`, guard/layout server-side, tipos, capa `lib/payroll`, SQL bootstrap y API routes base para compensaciones, periodos, calculo, edicion, aprobacion, export e historial.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / backend implementation
+
+### Archivos tocados
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/authorization.ts`
+- `src/app/(dashboard)/hr/layout.tsx`
+- `src/types/payroll.ts`
+- `src/lib/payroll/api-response.ts`
+- `src/lib/payroll/shared.ts`
+- `src/lib/payroll/schema.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/app/api/hr/payroll/compensation/route.ts`
+- `src/app/api/hr/payroll/periods/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/calculate/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/entries/route.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/approve/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/export/route.ts`
+- `src/app/api/hr/payroll/members/[memberId]/history/route.ts`
+- `bigquery/greenhouse_hr_payroll_v1.sql`
+- `bigquery/greenhouse_identity_access_v1.sql`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm exec eslint` sobre el delta backend de payroll: correcto
+- `git diff --check`: correcto
+- `pnpm exec tsc --noEmit`: el proyecto sigue teniendo ruido previo en `.next-local`; al filtrar errores por paths del delta backend de payroll no aparecieron errores nuevos del trabajo actual
+- No se ejecuto `pnpm build` todavia
+
+### Riesgos o pendientes
+- La implementacion backend ya existe, pero falta validacion runtime real contra BigQuery:
+  - schema vivo de `notion_ops.tareas`
+  - presencia o ausencia real de columnas para OTD automatico
+  - permisos reales para crear tablas `greenhouse.payroll_*` y seedear `hr_payroll`
+- El frontend de `HR Payroll` sigue reservado para Claude; evitar tocar vistas, menu y navegacion visual desde backend salvo que aparezca un bloqueo funcional.
+- El layout/guard `hr` ya existe, pero todavia no se agrego navegacion visual al sidebar porque eso corresponde al frente.
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; el brief corregido existe en disco pero no queda trackeado por Git salvo que se ajuste esa regla.
+
+## 2026-03-14 07:34 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Dejar registrada la division operativa para `HR Payroll`: Codex implementara el backend completo del modulo y Claude implementara todo el frontend, ambos tomando como base `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / implementation handoff
+
+### Archivos tocados
+- `Handoff.md`
+
+### Verificacion
+- Revision final del brief `HR Payroll v2`: correcta como base de implementacion, con pendientes acotados de verificacion runtime antes de escribir codigo
+- `git diff --check`: pendiente de re-ejecucion tras esta actualizacion de handoff
+
+### Riesgos o pendientes
+- Alcance operativo acordado:
+  - Codex: backend completo del modulo `HR Payroll`
+  - Claude: frontend completo del modulo `HR Payroll`
+- Antes de arrancar backend, validar en runtime:
+  - schema real de `notion_ops.tareas`
+  - wiring real de auth para route group `hr`
+  - criterio final de OTD por persona vs fallback manual
+- Mantener la separacion de responsabilidades para evitar solapamiento:
+  - backend: BigQuery schema, auth/guards, API routes, calculadora de payroll, export, tipos y logica server-side
+  - frontend: rutas UI, vistas, tablas, drawers, inputs, estados y navegacion visual
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; si el brief debe compartirse por Git, habra que corregir esa regla.
+
+## 2026-03-14 07:31 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar y corregir `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` para dejar el brief mas implementable y alineado con el repo real: route group `hr`, versionado por vigencia del periodo, persistencia de KPIs manuales y auditabilidad de overrides.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / docs alignment
+
+### Archivos tocados
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+- Revision manual del brief corregido: correcta
+- `git diff --check`: correcto
+- No aplica `pnpm lint` ni `pnpm build` porque no hubo cambios de runtime
+
+### Riesgos o pendientes
+- El brief ya no depende de `/admin/payroll`, pero la implementacion futura todavia debe resolver el wiring real de auth para `hr`: role seed, `TenantRouteGroup`, guard reusable y redirect post-login.
+- Antes de implementar, sigue siendo obligatorio verificar el schema vivo de `notion_ops.tareas` para definir la query final de KPIs y confirmar si OTD por persona es calculable o queda manual.
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` esta afectado por la regla `.gitignore: CODEX_TASK_*.md`; el archivo quedo corregido en disco pero no aparece como cambio trackeado del repo. Si esta version debe compartirse por Git, habra que ajustar esa regla o versionar el archivo por otra via.
+
 ## 2026-03-14 09:45 America/Santiago
 
 ### Agente

@@ -55,6 +55,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const { data: session } = useSession()
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+  const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
   const isAgencyUser = isInternalUser || isAdminUser
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
@@ -163,6 +164,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               <NavigationItemLabel
                 label={GH_AGENCY_NAV.capacity.label}
                 subtitle={GH_AGENCY_NAV.capacity.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </MenuSection>
+        ) : null}
+        {isHrUser || isAdminUser ? (
+          <MenuSection label='HR'>
+            <MenuItem href='/hr/payroll' icon={<i className='tabler-receipt-2' />}>
+              <NavigationItemLabel
+                label='Nómina'
+                subtitle='Compensaciones y nómina mensual'
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>

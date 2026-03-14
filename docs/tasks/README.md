@@ -13,6 +13,7 @@ Indice de briefs y tasks de implementacion del repo.
 | [CODEX_TASK_Creative_Hub_Module.md](CODEX_TASK_Creative_Hub_Module.md) | Capability module Creative Hub |
 | [CODEX_TASK_Fix_Team_Capacity_Views.md](CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
 | [CODEX_TASK_Google_SSO_Greenhouse.md](CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
+| [CODEX_TASK_HR_Payroll_Module_v2.md](CODEX_TASK_HR_Payroll_Module_v2.md) | Modulo HR de nomina y compensacion |
 | [CODEX_TASK_Login_Page_Greenhouse.md](CODEX_TASK_Login_Page_Greenhouse.md) | UI de login |
 | [CODEX_TASK_Microsoft_SSO_Greenhouse.md](CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
 | [CODEX_TASK_Space_Admin_View_Redesign.md](CODEX_TASK_Space_Admin_View_Redesign.md) | Vista admin de space |

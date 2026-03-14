@@ -121,6 +121,8 @@ USING (
   UNION ALL
   SELECT 'efeonce_operations', 'Efeonce Operations', 'internal', 'Cross-tenant operational visibility across delivery, capacity, and risk.', 'efeonce_internal', FALSE, TRUE, ['internal'], CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
   UNION ALL
+  SELECT 'hr_payroll', 'HR Payroll', 'internal', 'Specialized payroll access for human resources operations.', 'efeonce_internal', FALSE, TRUE, ['internal', 'hr'], CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
+  UNION ALL
   SELECT 'efeonce_admin', 'Efeonce Admin', 'admin', 'Administrative access to tenants, users, scopes, feature flags, and governance surfaces.', 'efeonce_internal', TRUE, TRUE, ['internal', 'admin'], CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
 ) AS source
 ON target.role_code = source.role_code
