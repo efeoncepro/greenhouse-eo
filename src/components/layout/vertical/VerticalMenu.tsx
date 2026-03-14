@@ -16,7 +16,7 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
-import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_INTERNAL_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -55,7 +55,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const { data: session } = useSession()
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
+  const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
   const isAgencyUser = isInternalUser || isAdminUser
+  const roleCodes = session?.user?.roleCodes ?? []
+
+  const canSeePeople =
+    roleCodes.includes('efeonce_admin') ||
+    roleCodes.includes('efeonce_operations') ||
+    roleCodes.includes('hr_payroll')
+
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
   const capabilityModules = resolveCapabilityModules({
@@ -163,6 +171,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               <NavigationItemLabel
                 label={GH_AGENCY_NAV.capacity.label}
                 subtitle={GH_AGENCY_NAV.capacity.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </MenuSection>
+        ) : null}
+        {canSeePeople ? (
+          <MenuSection label='Equipo'>
+            <MenuItem href='/people' icon={<i className='tabler-users-group' />}>
+              <NavigationItemLabel
+                label={GH_PEOPLE_NAV.people.label}
+                subtitle={GH_PEOPLE_NAV.people.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </MenuSection>
+        ) : null}
+        {isHrUser || isAdminUser ? (
+          <MenuSection label='HR'>
+            <MenuItem href='/hr/payroll' icon={<i className='tabler-receipt-2' />}>
+              <NavigationItemLabel
+                label='Nómina'
+                subtitle='Compensaciones y nómina mensual'
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>

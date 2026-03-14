@@ -1,0 +1,64 @@
+import type { TeamRoleCategory } from '@/types/team'
+
+// ── Country flags ──────────────────────────────────────────────────
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  CL: '🇨🇱',
+  CO: '🇨🇴',
+  VE: '🇻🇪',
+  MX: '🇲🇽',
+  PE: '🇵🇪',
+  US: '🇺🇸',
+  AR: '🇦🇷',
+  BR: '🇧🇷',
+  EC: '🇪🇨'
+}
+
+export const countryFlag = (code: string | null): string => {
+  if (!code) return '🌐'
+
+  return COUNTRY_FLAGS[code.toUpperCase()] ?? '🌐'
+}
+
+export const countryLabel = (code: string | null): string => {
+  if (!code) return 'Sin país'
+
+  return `${countryFlag(code)} ${code.toUpperCase()}`
+}
+
+// ── Role category labels ───────────────────────────────────────────
+
+export const roleCategoryLabel: Record<TeamRoleCategory, string> = {
+  account: 'Account',
+  operations: 'Operations',
+  strategy: 'Strategy',
+  design: 'Design',
+  development: 'Development',
+  media: 'Media',
+  unknown: 'Sin categoría'
+}
+
+// ── Tab permissions ────────────────────────────────────────────────
+
+export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll'
+
+export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
+  assignments: ['efeonce_admin', 'efeonce_operations'],
+  activity: ['efeonce_admin', 'efeonce_operations'],
+  compensation: ['efeonce_admin', 'hr_payroll'],
+  payroll: ['efeonce_admin', 'hr_payroll']
+}
+
+export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }> = [
+  { value: 'assignments', label: 'Asignaciones', icon: 'tabler-briefcase' },
+  { value: 'activity', label: 'Actividad', icon: 'tabler-chart-bar' },
+  { value: 'compensation', label: 'Compensación', icon: 'tabler-cash' },
+  { value: 'payroll', label: 'Nómina', icon: 'tabler-receipt-2' }
+]
+
+export const getVisibleTabs = (roleCodes: string[]) =>
+  TAB_CONFIG.filter(tab => TAB_PERMISSIONS[tab.value].some(role => roleCodes.includes(role)))
+
+// ── Formatting ─────────────────────────────────────────────────────
+
+export const formatFte = (value: number): string => value.toFixed(1)

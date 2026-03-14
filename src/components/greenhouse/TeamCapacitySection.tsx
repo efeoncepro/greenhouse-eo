@@ -20,7 +20,7 @@ import ExecutiveCardShell from './ExecutiveCardShell'
 import RequestDialog from './RequestDialog'
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
 import TeamExpansionGhostCard from './TeamExpansionGhostCard'
-import { getBrandDisplayLabel, resolveBrandAssets } from './brand-assets'
+import { getBrandDisplayLabel } from './brand-assets'
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -61,6 +61,7 @@ const getFallbackRoleTitle = (member: GreenhouseDashboardTeamMember) => {
 const toFallbackMember = (member: GreenhouseDashboardTeamMember): TeamMemberResponse => {
   const roleTitle = getFallbackRoleTitle(member)
   const monthlyHours = member.monthlyHours ?? (member.allocationPct !== null ? Math.round((member.allocationPct / 100) * 160) : 0)
+
   const fteAllocation =
     member.allocationPct !== null
       ? Number((member.allocationPct / 100).toFixed(1))
@@ -98,6 +99,7 @@ const buildFallbackTeam = (dashboardData: GreenhouseDashboardData): TeamMembersP
   const members = dashboardData.accountTeam.members
     .filter(m => !isHiddenInClientView(getFallbackRoleTitle(m)))
     .map(toFallbackMember)
+
   const totalFte = Number(members.reduce((sum, m) => sum + m.fteAllocation, 0).toFixed(1))
 
   return {

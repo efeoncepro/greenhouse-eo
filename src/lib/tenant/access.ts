@@ -82,6 +82,7 @@ export interface TenantAccessRecord {
 
 const rolePriority = [
   'efeonce_admin',
+  'hr_payroll',
   'efeonce_operations',
   'efeonce_account',
   'client_executive',
@@ -128,6 +129,11 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
   for (const roleCode of roleCodes) {
     if (roleCode.startsWith('efeonce_')) {
       routeGroups.add('internal')
+    }
+
+    if (roleCode === 'hr_payroll') {
+      routeGroups.add('internal')
+      routeGroups.add('hr')
     }
 
     if (roleCode === 'efeonce_admin') {
@@ -181,7 +187,8 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     featureFlags: normalizeStringArray(row.feature_flags),
     timezone: row.timezone || 'UTC',
     portalHomePath:
-      row.portal_home_path || (tenantType === 'efeonce_internal' ? '/internal/dashboard' : '/dashboard'),
+      row.portal_home_path ||
+      (roleCodes.includes('hr_payroll') ? '/hr/payroll' : tenantType === 'efeonce_internal' ? '/internal/dashboard' : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',
