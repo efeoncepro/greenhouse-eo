@@ -77,6 +77,39 @@ const parseCredentials = (candidates: string[]) => {
   return undefined
 }
 
+const normalizeCredentialString = (value: string) =>
+  stripWrappingQuotes(value)
+    .replace(/\r/g, '')
+    .replace(/\\r/g, '')
+    .replace(/\\n/g, '\n')
+    .trim()
+
+const normalizeParsedCredentials = (value: unknown) => {
+  if (!value || typeof value !== 'object') {
+    return undefined
+  }
+
+  const credentials = { ...(value as Record<string, unknown>) }
+
+  if (typeof credentials.private_key === 'string') {
+    const normalizedPrivateKey = normalizeCredentialString(credentials.private_key)
+
+    credentials.private_key = normalizedPrivateKey.endsWith('\n')
+      ? normalizedPrivateKey
+      : `${normalizedPrivateKey}\n`
+  }
+
+  if (typeof credentials.client_email === 'string') {
+    credentials.client_email = normalizeCredentialString(credentials.client_email)
+  }
+
+  if (typeof credentials.project_id === 'string') {
+    credentials.project_id = normalizeCredentialString(credentials.project_id)
+  }
+
+  return credentials
+}
+
 const getProjectId = () => {
   const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
 
@@ -99,7 +132,7 @@ export const getGoogleCredentials = () => {
     const parsed = parseCredentials(buildCredentialCandidates(rawCredentials))
 
     if (parsed) {
-      return parsed
+      return normalizeParsedCredentials(parsed)
     }
   }
 
@@ -109,7 +142,7 @@ export const getGoogleCredentials = () => {
       const parsed = parseCredentials(buildCredentialCandidates(decoded))
 
       if (parsed) {
-        return parsed
+        return normalizeParsedCredentials(parsed)
       }
     } catch {
       // Fall through to the explicit runtime error below.

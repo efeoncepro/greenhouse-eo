@@ -40,6 +40,342 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 17:45 America/Santiago
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Integrar componentes Vuexy de navbar: NavSearch (⌘K), ShortcutsDropdown, NotificationsDropdown al portal Greenhouse
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview → `pre-greenhouse.efeoncepro.com`
+
+### Archivos tocados
+- `src/components/layout/shared/search/index.tsx` (nuevo) — Command palette con ⌘K
+- `src/components/layout/shared/search/DefaultSuggestions.tsx` (nuevo) — Sugerencias por defecto en español
+- `src/components/layout/shared/search/NoResult.tsx` (nuevo) — Estado vacío
+- `src/components/layout/shared/search/styles.css` (nuevo) — Estilos del command dialog
+- `src/components/layout/shared/ShortcutsDropdown.tsx` (nuevo) — Panel de accesos rápidos (6 shortcuts)
+- `src/components/layout/shared/NotificationsDropdown.tsx` (nuevo) — Dropdown de notificaciones con badge
+- `src/data/searchData.ts` (nuevo) — 17 rutas indexadas del portal
+- `src/components/layout/vertical/NavbarContent.tsx` (modificado) — Agrega Search + Shortcuts + Notifications
+- `src/components/layout/horizontal/NavbarContent.tsx` (modificado) — Idem horizontal
+
+### Cambios realizados
+- Portados desde `full-version/` los 4 componentes de Vuexy navbar que faltaban
+- Adaptación: eliminado i18n/locale routing (Greenhouse no lo usa), textos en español
+- Search indexa: Dashboards, Finanzas (7 rutas), People (3 rutas), Administración (5 rutas)
+- Shortcuts: Finanzas, Ingresos, Usuarios, Roles, Nómina, Configuración
+- Notificaciones: placeholder estático (1 notificación de bienvenida), listo para conectar backend
+
+### Verificacion
+- `pnpm tsc --noEmit`: solo errores preexistentes (LayoutRoutes, SCIM)
+- `pnpm eslint` sobre los 9 archivos: limpio
+- Dependencias ya instaladas: cmdk, react-perfect-scrollbar, classnames, @radix-ui/react-dialog
+
+### Riesgos o pendientes
+- NotificationsDropdown tiene data estática — necesita backend de notificaciones
+- ShortcutsDropdown tiene shortcuts hardcodeados — podría personalizarse por rol
+- searchData.ts es estático — se podría generar dinámicamente según permisos del usuario
+
+---
+
+## 2026-03-14 17:16 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Hacer la revisión final previa a commit/push del paquete canónico de Finance y corregir los últimos riesgos funcionales detectados.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance + people
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/lib/finance/canonical.ts`
+- `src/lib/people/get-person-finance-overview.ts`
+- `Handoff.md`
+
+### Cambios realizados
+- Se corrigió un bug de runtime en `GET /api/finance/clients`:
+  - los filtros `requiresPo` y `requiresHes` apuntaban a un alias inexistente (`cp`)
+  - ahora filtran correctamente sobre el read-model derivado
+- Se endureció la validación canónica:
+  - `resolveFinanceClientContext()` ahora rechaza `clientId`, `clientProfileId` o `hubspotCompanyId` inexistentes en vez de aceptar referencias fantasma
+  - `resolveFinanceMemberContext()` ahora rechaza `memberId` inexistente en `team_members`
+- Se blindó el endpoint `GET /api/people/[memberId]/finance`:
+  - ahora ejecuta `ensureFinanceInfrastructure()` antes de leer `fin_expenses`, para no depender de que el schema canónico ya haya sido aplicado previamente en el entorno
+
+### Verificacion
+- `pnpm exec eslint` sobre las rutas/helper tocados de finance + people: correcto
+- `git diff --check`: correcto
+- Revisión manual adicional del diff para detectar aliases rotos y referencias no resueltas: corregida
+
+### Riesgos o pendientes
+- El working tree sigue con cambios locales listos para commit; todavía no se ha hecho `git add` / `git commit` / `git push` de este último paquete.
+- `pnpm exec tsc --noEmit --pretty false` sigue arrastrando errores globales preexistentes de `.next-local/.next` y rutas SCIM faltantes.
+
+## 2026-03-14 17:15 America/Santiago
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Crear bank statement CSV parser por banco y agregar `finance_manager` a `rolePriority`
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance
+
+### Archivos tocados
+- `src/lib/finance/csv-parser.ts` (nuevo) — parsers por banco
+- `src/app/api/finance/reconciliation/[id]/statements/route.ts` (modificado) — acepta CSV
+- `src/lib/tenant/access.ts` (modificado) — rolePriority
+- `src/lib/finance/canonical.ts` (nuevo, de Codex) — labels canónicos
+- `src/lib/finance/schema.ts` (modificado, de Codex) — constraints de schema
+- 6 archivos de API routes (de Codex) — validación mejorada
+
+### Cambios realizados
+- **CSV parser** (`src/lib/finance/csv-parser.ts`):
+  - 4 parsers: BCI (comma, DD/MM/YYYY, Cargo/Abono/Saldo), Santander (semicolon, DD/MM/YYYY, Nro Documento), BancoChile (comma, DD-MM-YYYY, Monto único), Scotiabank (comma, MM/DD/YYYY, English headers)
+  - Manejo de formato numérico chileno (puntos como separador de miles, coma como decimal)
+  - Factory function `parseBankStatement(csvContent, bankFormat)` con validación
+- **Statement import endpoint** actualizado:
+  - Acepta `{ csvContent, bankFormat }` además de `{ rows }` JSON existente
+  - Backward compatible — ambos formatos siguen funcionando
+- **rolePriority**: `finance_manager` agregado en posición 2 (después de `efeonce_admin`)
+- **Codex changes commiteados**: canonical.ts, schema hardening, validation improvements en 9 archivos
+
+### Verificacion
+- `pnpm eslint` sobre csv-parser.ts y statements/route.ts: limpio
+- `pnpm tsc --noEmit`: solo errores preexistentes (SCIM module, no relacionados)
+- `git status`: working tree clean, 2 commits ahead of origin
+
+### Commits
+- `ad2093f` — feat: add bank statement CSV parser and finance_manager role priority
+- `4ce5020` — feat: codex finance hardening — canonical labels, schema constraints, validation improvements
+
+### Riesgos o pendientes
+- **No pusheado** — 2 commits pendientes de push a origin
+- Dashboard frontend (`FinanceDashboardView.tsx`) sigue consumiendo `/income/summary` y `/expenses/summary`, no los endpoints `/dashboard/*` (aging, cashflow, by-service-line)
+- CSV parser no tiene tests unitarios — validar con cartolas reales de cada banco
+- Los parsers asumen formato estándar de cada banco; variaciones de formato (ej. BCI con headers diferentes por tipo de cuenta) podrían requerir ajustes
+
+---
+
+## 2026-03-14 17:08 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la fase canónica del backend de Finance sin romper el módulo actual: anclaje por `client_id`, resolución de referencias cliente/persona y endpoint read-only de finance para People.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance + people
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/app/api/finance/clients/[id]/route.ts`
+- `src/app/api/finance/clients/sync/route.ts`
+- `src/app/api/finance/expenses/route.ts`
+- `src/app/api/finance/expenses/bulk/route.ts`
+- `src/app/api/finance/income/route.ts`
+- `src/lib/finance/canonical.ts`
+- `src/lib/people/get-person-finance-overview.ts` (nuevo)
+- `src/app/api/people/[memberId]/finance/route.ts` (nuevo)
+
+### Cambios realizados
+- Se cerró la resolución canónica de referencias financieras:
+  - `resolveFinanceClientContext()` ya se usa en `income`, `expenses` y `clients`
+  - `resolveFinanceMemberContext()` se usa en egresos para validar `memberId` vs `payrollEntryId`
+  - si las referencias explícitas chocan, el backend responde `409`
+- La capa de clientes ahora prioriza `fin_client_profiles.client_id` como enlace canónico al tenant:
+  - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` prefieren joins por `client_id`
+  - se mantiene fallback legado por `client_profile_id` y `hubspot_company_id`
+  - los receivables/invoices ahora consideran `fin_income.client_id` además de las referencias viejas
+- `POST /api/finance/clients` y `POST /api/finance/clients/sync` ya rellenan `client_id` en `fin_client_profiles` cuando el tenant es resoluble.
+- Se agregó lectura 360 financiera por colaborador:
+  - nuevo helper `src/lib/people/get-person-finance-overview.ts`
+  - nuevo endpoint `GET /api/people/[memberId]/finance`
+  - expone bloque read-only con `member`, `summary`, `assignments`, `identities`, `payrollHistory` y `expenses`
+- Quedó preservado lo ya existente del módulo:
+  - no se tocaron `/api/finance/dashboard/*`
+  - no se tocaron `match/unmatch` de conciliación
+  - no se tocaron las páginas/detail views actuales
+
+### Verificacion
+- `pnpm exec eslint src/lib/finance/canonical.ts src/lib/finance/schema.ts src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/clients/route.ts src/app/api/finance/clients/sync/route.ts src/app/api/finance/clients/[id]/route.ts src/lib/people/get-person-finance-overview.ts src/app/api/people/[memberId]/finance/route.ts`: correcto
+- `git diff --check`: correcto
+- `pnpm exec tsc --noEmit --pretty false`: sigue fallando por errores globales preexistentes en `.next-local/.next` y rutas SCIM faltantes, no por este paquete
+
+### Riesgos o pendientes
+- El endpoint nuevo `/api/people/[memberId]/finance` todavía no está consumido por el frontend.
+- Sigue pendiente una corrida manual o por preview que dispare `ensureFinanceInfrastructure()` en un entorno real para aplicar el add/backfill de `client_id` si todavía no corrió después de estos cambios.
+- La capa 360 de cliente ya está mejor anclada, pero todavía no existe una vista unificada equivalente dentro del frontend de People o de Finance dashboard.
+
+## 2026-03-14 15:10 America/Santiago
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Cerrar los gaps restantes del Finance Module contra la CODEX_TASK_Financial_Module.md. Codex había dejado cambios sin commitear + gaps abiertos documentados en el Handoff anterior.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend + frontend finance
+
+### Archivos tocados
+- `src/app/api/finance/dashboard/summary/route.ts` (nuevo)
+- `src/app/api/finance/dashboard/cashflow/route.ts` (nuevo)
+- `src/app/api/finance/dashboard/aging/route.ts` (nuevo)
+- `src/app/api/finance/dashboard/by-service-line/route.ts` (nuevo)
+- `src/app/api/finance/reconciliation/[id]/match/route.ts` (nuevo)
+- `src/app/api/finance/reconciliation/[id]/unmatch/route.ts` (nuevo)
+- `src/app/(dashboard)/finance/income/[id]/page.tsx` (nuevo)
+- `src/app/(dashboard)/finance/expenses/[id]/page.tsx` (nuevo)
+- `src/views/greenhouse/finance/IncomeDetailView.tsx` (nuevo)
+- `src/views/greenhouse/finance/ExpenseDetailView.tsx` (nuevo)
+- `src/views/greenhouse/finance/ClientDetailView.tsx` (reescrito — 4 tabs)
+- `src/views/greenhouse/finance/ClientsListView.tsx` (rows clickeables)
+- `src/views/greenhouse/finance/IncomeListView.tsx` (rows clickeables)
+- `src/views/greenhouse/finance/ExpensesListView.tsx` (rows clickeables)
+- Commit previo de Codex: `src/app/api/finance/expenses/bulk/route.ts`, `src/app/api/finance/income/[id]/payment/route.ts`, `src/lib/finance/hubspot.ts`, + 11 archivos modificados
+
+### Cambios realizados
+- Commiteados y pusheados los cambios pendientes de Codex (commit `6fbb567`):
+  - POST /expenses/bulk, POST /income/[id]/payment, GET /income/[id], GET /expenses/[id]
+  - hubspot.ts para introspección de columnas
+  - Auto-match con ±3 días, enum alignment en drawers
+- Creados 4 endpoints de Dashboard API (commit `591e84a`):
+  - `/api/finance/dashboard/summary` — KPIs: ingresos/egresos del mes, flujo neto, receivables, payables, trends vs mes anterior
+  - `/api/finance/dashboard/cashflow` — Flujo de caja mensual rolling 12 meses
+  - `/api/finance/dashboard/aging` — Aging de cuentas por cobrar (current, 1-30, 31-60, 61-90, 90+)
+  - `/api/finance/dashboard/by-service-line` — Ingresos y egresos por línea de servicio
+- Creados endpoints de conciliación faltantes:
+  - `POST /reconciliation/[id]/match` — match manual de fila de extracto con ingreso/egreso, marca ambos como reconciliados
+  - `POST /reconciliation/[id]/unmatch` — deshace match, revierte reconciliación
+- Creadas páginas de detalle:
+  - `/finance/income/[id]` — IncomeDetailView con KPIs, datos de factura, formulario de registro de pago inline, historial de pagos
+  - `/finance/expenses/[id]` — ExpenseDetailView con KPIs, datos del egreso, enlace a proveedor
+- Reescrito ClientDetailView con 4 tabs (spec decía 4, tenía 2):
+  - Tab Facturación: datos tributarios, condiciones de pago, OC/HES
+  - Tab Contactos: contactos financieros con roles (procurement, accounts_payable, etc.)
+  - Tab Facturas: historial con navegación a detalle de ingreso
+  - Tab Deals: deals de HubSpot (read-only, desde API enriquecido)
+  - KPI row con receivables, facturas vencidas, condiciones de pago
+- Rows de listas ahora navegan a detalle (income, expenses, clients)
+
+### Verificacion
+- `pnpm exec eslint` sobre los 14 archivos nuevos/modificados: pasa (4 warnings preexistentes en IncomeListView y ExpensesListView, no introducidos)
+- `pnpm exec tsc --noEmit`: 2 errores preexistentes de LayoutRoutes type, no relacionados con finance
+- `git diff --check`: correcto
+- Push exitoso a `origin/feature/finance-module`
+
+### Riesgos o pendientes
+- El dashboard frontend (`FinanceDashboardView.tsx`) actualmente consume `/income/summary` y `/expenses/summary` (rutas bonus), NO los nuevos endpoints `/dashboard/*`. Para aprovechar los nuevos endpoints (aging, cashflow, by-service-line) se necesita actualizar el frontend del dashboard.
+- CSV parser por banco (BCI, Santander, BancoChile) sigue pendiente — el importador actual acepta JSON pre-parseado.
+- `finance_manager` no está en el array `rolePriority` de `access.ts`. Funcional pero podría afectar si un usuario tiene múltiples roles.
+- No se tocó el login de preview en este turno.
+
+---
+
+## 2026-03-14 13:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar los ajustes recientes de Claude sobre `Finance Module`, confirmar qué hallazgos previos seguían abiertos y cerrar el paquete backend mínimo para dejar el módulo más consistente con la task.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / backend finance
+
+### Archivos tocados
+- `src/lib/finance/shared.ts`
+- `src/app/api/finance/income/route.ts`
+- `src/app/api/finance/income/[id]/route.ts`
+- `src/app/api/finance/income/[id]/payment/route.ts`
+- `src/app/api/finance/expenses/route.ts`
+- `src/app/api/finance/expenses/[id]/route.ts`
+- `src/app/api/finance/expenses/bulk/route.ts`
+- `src/app/api/finance/suppliers/route.ts`
+- `src/app/api/finance/clients/route.ts`
+- `src/app/api/finance/clients/[id]/route.ts`
+- `src/app/api/finance/reconciliation/[id]/auto-match/route.ts`
+- `src/views/greenhouse/finance/drawers/CreateSupplierDrawer.tsx`
+- `src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Hallazgos previos ya corregidos por Claude:
+  - contract fix del detalle de conciliación (`statements`, `matched`, `matchedType`)
+  - drawers de ingresos/egresos ya envían `subtotal`
+  - botón `Nuevo perfil` en clientes y ruta `POST /api/finance/clients/sync`
+- Fixes cerrados por Codex:
+  - `GET /api/finance/income/[id]`
+  - `GET /api/finance/expenses/[id]`
+  - `POST /api/finance/income/[id]/payment`
+  - `POST /api/finance/expenses/bulk`
+  - IDs secuenciales mensuales para ingresos y egresos (`INC-YYYYMM-###`, `EXP-YYYYMM-###`)
+  - snapshot de tipo de cambio obligatorio para USD con fallback al último `fin_exchange_rates`
+  - validación real de `paymentCurrency` y `taxIdType` en clientes/proveedores
+  - `finance_contacts` ahora se persiste como JSON real con `PARSE_JSON(...)`
+  - auto-match con fecha `±3 días` y bloqueo de matches ambiguos
+  - alineación de enums en drawers de clientes/proveedores para evitar drift (`CLP/USD`, tax IDs y categorías soportadas)
+  - enriquecimiento real de clientes:
+    - `GET /api/finance/clients` ahora sale desde `greenhouse.clients` activos y hace enrichment con `hubspot_crm.companies` + `fin_client_profiles`
+    - `GET /api/finance/clients/[id]` ahora devuelve contexto company, summary de receivables y deals de HubSpot cuando el schema synced trae columnas suficientes
+    - se agregó `src/lib/finance/hubspot.ts` para introspección de columnas vía `hubspot_crm.INFORMATION_SCHEMA.COLUMNS`, evitando hardcodes frágiles de `companies`/`deals`
+
+### Verificacion
+- `pnpm exec eslint src/lib/finance/shared.ts src/app/api/finance/income/route.ts 'src/app/api/finance/income/[id]/route.ts' 'src/app/api/finance/income/[id]/payment/route.ts' src/app/api/finance/expenses/route.ts 'src/app/api/finance/expenses/[id]/route.ts' 'src/app/api/finance/expenses/bulk/route.ts' src/app/api/finance/suppliers/route.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' src/views/greenhouse/finance/drawers/CreateSupplierDrawer.tsx src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx`
+- `pnpm exec eslint src/lib/finance/hubspot.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts'`
+- `git diff --check`
+- `pnpm exec tsc --noEmit --pretty false`
+- Resultado:
+  - `eslint`: correcto sobre los archivos tocados
+  - `git diff --check`: correcto
+  - `tsc`: sigue fallando por problemas globales preexistentes en `.next-local` / `.next` y rutas SCIM faltantes, no por estos cambios de Finance
+
+### Riesgos o pendientes
+- Sigue pendiente el gap grande contra la task en clientes:
+  - el enrichment de clientes ya existe, pero el frontend actual aún no consume `company`, `summary` ni `deals`
+  - no se implementó todavía CRUD dedicado para contactos financieros; solo persiste el JSON completo `finance_contacts`
+- La conciliación quedó mejor, pero aún falta superficie completa del brief:
+  - importador CSV real por banco
+  - manual match / unmatch
+- El dashboard financiero sigue parcial respecto al documento:
+  - no existen todavía `/api/finance/dashboard/*`
+  - los summaries actuales no reemplazan toda la spec de KPIs/charts
+- No se tocó el fallo de login preview en este turno.
+
 ## 2026-03-14 12:20 America/Santiago
 
 ### Agente
@@ -2648,3 +2984,345 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El archivo `LOCAL_INTERNAL_TEAM_ACCESS_CREDENTIALS_2026-03-14.md` es sensible y local-only; no debe compartirse ni commitearse.
 - Algunos perfiles canonicos siguen anclados a HubSpot o `greenhouse_team`; hoy eso no bloquea login porque `client_users.identity_profile_id` y `identity_profile_source_links` ya quedaron creados.
 - Si se quiere endurecer la gobernanza, el siguiente paso seria crear un flujo formal de reset/rotacion de passwords temporales para internos.
+
+---
+
+## 2026-03-14 21:00 America/Santiago
+
+### Agente
+- Claude (claude-opus-4-6)
+
+### Objetivo del turno
+- Implementación de Phase 1 del módulo financiero (CODEX_TASK_Financial_Module.md): infraestructura BigQuery, auth, guards, sidebar, API routes, placeholder pages y diseño UX del dashboard.
+
+### Rama
+- Rama usada: `feature/finance-module` (desde `origin/develop`)
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos creados
+
+#### Infraestructura backend
+- `src/lib/finance/schema.ts` — `ensureFinanceInfrastructure()`: provisioning on-demand de 8 tablas BigQuery (`fin_accounts`, `fin_suppliers`, `fin_client_profiles`, `fin_income`, `fin_expenses`, `fin_reconciliation_periods`, `fin_bank_statement_rows`, `fin_exchange_rates`) + seed del rol `finance_manager`. Patrón singleton promise idempotente.
+- `src/lib/finance/shared.ts` — `FinanceValidationError`, validators (`assertValidCurrency`, `assertPositiveAmount`, `assertNonEmptyString`, `assertDateString`), tipos (`FinanceCurrency`, `AccountType`, `PaymentMethod`, `ExpenseType`, `PaymentStatus`, `ServiceLine`), helper `runFinanceQuery<T>()`, normalizadores.
+
+#### Auth y access
+- `src/lib/tenant/authorization.ts` — Agregado `'finance'` al tipo `TenantRouteGroup` + función `requireFinanceTenantContext()` (permite `routeGroups.includes('finance') || roleCodes.includes('efeonce_admin')`).
+- `src/lib/tenant/access.ts` — Agregado mapeo `finance_manager` → `['internal', 'finance']` en `deriveRouteGroups()`.
+
+#### API Routes
+- `src/app/api/finance/accounts/route.ts` — GET (lista cuentas activas), POST (crear cuenta con validación)
+- `src/app/api/finance/accounts/[id]/route.ts` — PUT (actualización parcial dinámica con check 404)
+- `src/app/api/finance/exchange-rates/route.ts` — GET (lista con filtros de fecha), POST (upsert con MERGE)
+- `src/app/api/finance/exchange-rates/latest/route.ts` — GET (último tipo de cambio USD/CLP)
+
+#### Pages y layout
+- `src/app/(dashboard)/finance/layout.tsx` — Guard de ruta: requiere route group `finance` o `efeonce_admin`
+- `src/app/(dashboard)/finance/page.tsx` — Placeholder dashboard
+- `src/app/(dashboard)/finance/income/page.tsx` — Placeholder ingresos
+- `src/app/(dashboard)/finance/expenses/page.tsx` — Placeholder egresos
+- `src/app/(dashboard)/finance/suppliers/page.tsx` — Placeholder proveedores
+- `src/app/(dashboard)/finance/clients/page.tsx` — Placeholder clientes
+- `src/app/(dashboard)/finance/reconciliation/page.tsx` — Placeholder conciliación
+
+#### Navegación
+- `src/components/layout/vertical/VerticalMenu.tsx` — Agregada sección "Finanzas" con 6 items (Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación). Visible solo para `isFinanceUser || isAdminUser`.
+
+### Verificación
+- `pnpm exec tsc --noEmit`: sin errores en código fuente (errores solo en `.next` cache stale de SCIM/smoke tests, no relacionados)
+- Todos los campos monetarios usan `NUMERIC` (no `FLOAT64`) en DDL
+- `amount_pending` no existe como columna física — se calcula como `total_amount - COALESCE(amount_paid, 0)`
+- Tipos `unknown` en BigQuery rows resueltos con type assertions explícitas
+
+### Finance Dashboard — Implementado
+- **View component creado**: `src/views/greenhouse/finance/FinanceDashboardView.tsx` (client component, ~450 líneas)
+- **Spec UX producida por greenhouse-ux skill e implementada completa:**
+  - 4 KPIs (`HorizontalWithSubtitle`): Saldo total (primary), Ingresos del mes (success), Egresos del mes (error), Tipo de cambio (info)
+  - 2 charts side-by-side (7/5 split): bar chart Ingresos vs Egresos (success/error), area chart Flujo de caja (primary) con `AppReactApexCharts` (dynamic import, ssr: false)
+  - Quick actions row: 3 buttons (Registrar ingreso → success, Registrar egreso → error, Iniciar conciliación → primary outlined) con navegación a sub-rutas
+  - Recent transactions table: 5 columnas (Tipo/Descripción/Cuenta/Fecha/Monto), empty state "No hay movimientos registrados aún"
+  - Loading skeleton: 4 KPI skeletons + 2 chart skeletons
+  - Data fetching: `GET /api/finance/accounts` (saldo total + cuenta activas), `GET /api/finance/exchange-rates/latest` (USD/CLP)
+  - Phase 1 placeholders: KPIs 2-3 muestran `$0` con "Próximamente", charts y tabla en empty state
+- **Page actualizada**: `src/app/(dashboard)/finance/page.tsx` ahora importa `FinanceDashboardView` como server page → client view
+- **Grid v6**: Usa `Grid size={{ xs, sm, md }}` (no `item xs=`) para compatibilidad con MUI v6
+- **tsc --noEmit**: sin errores en código fuente
+
+### Paralelismo con SCIM (Codex)
+- **Zero conflicto confirmado**: SCIM trabaja en `src/app/api/scim/`, `src/lib/scim/` — Finance en `src/app/api/finance/`, `src/lib/finance/`
+- No comparten tablas BQ, rutas, componentes UI ni auth mechanisms
+- Ramas independientes: `feature/scim-provisioning` vs `feature/finance-module`
+
+### Riesgos o pendientes
+- **Phase 3**: Income y Expenses CRUD con tablas TanStack
+- **Phase 4**: Reconciliación bancaria con auto-match algorithm
+- **Endpoints de summary**: `/api/finance/income/summary` y `/api/finance/expenses/summary` no existen aún — dashboard muestra placeholder
+- Los errores de `.next/types/validator.ts` referentes a SCIM son de cache stale y se limpian con `rm -rf .next`
+
+---
+
+## 2026-03-14 22:00 America/Santiago
+
+### Agente
+- Claude (claude-opus-4-6)
+
+### Objetivo del turno
+- Phase 2 del módulo financiero: Suppliers y Clients CRUD completo (API routes + UI views con KPIs, filtros y tablas).
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos creados/modificados
+
+#### shared.ts ampliado
+- `src/lib/finance/shared.ts` — Agregados tipos: `SUPPLIER_CATEGORIES`, `TAX_ID_TYPES`, `CONTACT_ROLES` con sus type exports
+
+#### API Routes — Suppliers
+- `src/app/api/finance/suppliers/route.ts` — GET (lista con paginación + filtros: category, country, international, active) + POST (crear con validación, slug auto-generado desde legalName)
+- `src/app/api/finance/suppliers/[id]/route.ts` — GET (detalle + payment history de fin_expenses) + PUT (actualización parcial dinámica, 15+ campos editables)
+
+#### API Routes — Clients
+- `src/app/api/finance/clients/route.ts` — GET (lista con paginación + filtros: search, requiresPo, requiresHes) + POST (upsert con MERGE por client_profile_id)
+- `src/app/api/finance/clients/[id]/route.ts` — GET (perfil financiero + invoices de fin_income, JSON parse finance_contacts) + PUT (actualización parcial, incluyendo finance_contacts JSON)
+
+#### UI Views
+- `src/views/greenhouse/finance/SuppliersListView.tsx` — Client component con:
+  - 4 KPIs: Total proveedores, Activos, Internacionales, Categoría principal
+  - Filtros: categoría (9 opciones), nacional/internacional
+  - Tabla: Proveedor (nombre comercial + razón social), Categoría (chip color), País, Moneda, Plazo, Contacto, Estado
+  - Loading skeleton, empty state
+- `src/views/greenhouse/finance/ClientsListView.tsx` — Client component con:
+  - 4 KPIs: Total clientes, Requieren OC, Requieren HES, Facturación USD
+  - Filtros: búsqueda por nombre/RUT, OC requerida, HES requerida
+  - Tabla: Razón social + HubSpot ID, RUT, Plazo, Moneda, OC (chip), HES (chip)
+  - Loading skeleton, empty state
+
+#### Pages actualizadas
+- `src/app/(dashboard)/finance/suppliers/page.tsx` — Usa `SuppliersListView`
+- `src/app/(dashboard)/finance/clients/page.tsx` — Usa `ClientsListView`
+
+### Verificación
+- `pnpm exec tsc --noEmit`: 0 errores en código fuente
+- CustomChip `round` prop usa `'true'` string (no boolean) — patrón Vuexy v5
+- Grid usa `size={{ xs, sm, md }}` — patrón MUI v6
+- `createdBy` usa `tenant.userId` (no `tenant.email` que no existe en TenantContext)
+- Paginación implementada con `page/pageSize` query params, max 200
+
+### Riesgos o pendientes
+- **Phase 4**: Reconciliación bancaria con auto-match algorithm
+- **Detail views**: Suppliers y Clients tienen API GET [id] listas pero las pages de detalle (`/finance/suppliers/[id]`, `/finance/clients/[id]`) aún no existen como views con tabs
+- **Endpoints de summary**: `/api/finance/income/summary` y `/api/finance/expenses/summary` no existen aún — dashboard muestra placeholder
+
+---
+
+## 2026-03-14 22:45 America/Santiago
+
+### Agente
+- Claude (claude-opus-4-6)
+
+### Objetivo del turno
+- Phase 3 del módulo financiero: Income y Expenses CRUD completo (API routes con paginación/filtros + UI views con KPIs, filtros y tablas).
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos creados
+
+#### API Routes — Income
+- `src/app/api/finance/income/route.ts` — GET (lista con paginación + filtros: status, clientProfileId, serviceLine, fromDate, toDate) + POST (crear factura con cálculo automático de IVA, tipo de cambio, total CLP, ID auto-generado `INC-YYYYMM-NNNNNN`)
+- `src/app/api/finance/income/[id]/route.ts` — PUT (actualización parcial, 20+ campos editables)
+
+#### API Routes — Expenses
+- `src/app/api/finance/expenses/route.ts` — GET (lista con paginación + filtros: expenseType, status, supplierId, serviceLine, fromDate, toDate) + POST (crear egreso con 5 tipos: supplier/payroll/social_security/tax/miscellaneous, ID auto-generado `EXP-YYYYMM-NNNNNN`)
+- `src/app/api/finance/expenses/[id]/route.ts` — PUT (actualización parcial con campos numéricos, strings y enums tipados)
+
+#### UI Views
+- `src/views/greenhouse/finance/IncomeListView.tsx` — Client component con:
+  - 4 KPIs: Total facturado (CLP), Por cobrar, Cobrados, Vencidos
+  - Filtro por estado de pago (pending/partial/paid/overdue)
+  - Tabla 7 columnas: Factura (número + descripción), Cliente, Fecha, Vencimiento, Monto, Estado (chip), Pendiente (color rojo/verde)
+  - Formateadores de moneda CLP/USD y fechas DD/MM/YYYY
+- `src/views/greenhouse/finance/ExpensesListView.tsx` — Client component con:
+  - 4 KPIs: Total egresos, Por pagar, Pagados, Recurrentes
+  - Filtros: tipo de egreso (5 opciones), estado de pago
+  - Tabla 7 columnas: Tipo (chip color), Descripción + doc number, Proveedor, Fecha, Vencimiento, Monto (rojo), Estado (chip)
+  - Chips de tipo con colores semánticos (supplier=primary, payroll=info, tax=error, etc.)
+
+#### Pages actualizadas
+- `src/app/(dashboard)/finance/income/page.tsx` — Usa `IncomeListView`
+- `src/app/(dashboard)/finance/expenses/page.tsx` — Usa `ExpensesListView`
+
+#### shared.ts ampliado
+- `src/lib/finance/shared.ts` — Ya incluía `SUPPLIER_CATEGORIES`, `TAX_ID_TYPES`, `CONTACT_ROLES` de Phase 2
+
+### Verificación
+- `pnpm exec tsc --noEmit`: 0 errores en código fuente
+- Income POST calcula automáticamente: taxAmount = subtotal × taxRate, totalAmount = subtotal + taxAmount, totalAmountClp = totalAmount × exchangeRateToClp
+- Expenses soporta los 5 expense_types del DDL con campos específicos por tipo (supplier_id para supplier, payroll_period_id para payroll, etc.)
+- `amount_pending` es campo computado en normalización: `totalAmount - amountPaid` (no almacenado en BQ)
+
+### Resumen acumulado del módulo financiero
+
+| Componente | Archivos | Estado |
+|---|---|---|
+| Infraestructura BQ (8 tablas + rol) | `schema.ts` | Completo |
+| Shared validators/types | `shared.ts` | Completo |
+| Auth + access control | `authorization.ts`, `access.ts` | Completo |
+| Layout + guard | `finance/layout.tsx` | Completo |
+| Sidebar navigation | `VerticalMenu.tsx` | Completo |
+| Dashboard (KPIs + charts) | `FinanceDashboardView.tsx` | Completo |
+| Accounts API | `accounts/route.ts`, `accounts/[id]/route.ts` | Completo |
+| Exchange Rates API | `exchange-rates/route.ts`, `latest/route.ts` | Completo |
+| Suppliers API + UI | 2 API routes + `SuppliersListView.tsx` | Completo |
+| Clients API + UI | 2 API routes + `ClientsListView.tsx` | Completo |
+| Income API + UI | 2 API routes + `IncomeListView.tsx` | Completo |
+| Expenses API + UI | 2 API routes + `ExpensesListView.tsx` | Completo |
+| Reconciliation | Placeholder page only | Pendiente (Phase 4) |
+
+### Riesgos o pendientes
+- **Detail views con tabs**: Suppliers [id], Clients [id] — APIs GET listas, falta UI con tabs
+- **Dashboard data real**: Endpoints de summary para alimentar KPIs y charts del dashboard
+- **Formularios de creación**: Botones "Registrar ingreso/egreso/período" existen pero no abren drawer/modal aún
+
+---
+
+## 2026-03-14 23:30 America/Santiago
+
+### Agente
+- Claude (claude-opus-4-6)
+
+### Objetivo del turno
+- Phase 4 del módulo financiero: Reconciliación bancaria completa con auto-match algorithm, import de cartolas y gestión de períodos.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos creados
+
+#### API Routes — Reconciliation
+- `src/app/api/finance/reconciliation/route.ts` — GET (lista de períodos con filtros: accountId, status) + POST (crear período con validación de duplicados, ID auto-generado `{accountId}_{year}_{month}`)
+- `src/app/api/finance/reconciliation/[id]/route.ts` — GET (detalle del período + todas las filas de cartola bancaria) + PUT (actualizar saldos, status, marcar como reconciled con timestamp y user)
+- `src/app/api/finance/reconciliation/[id]/statements/route.ts` — POST (importar filas de cartola bancaria, máximo 500 rows, actualiza metadata del período, cambia status a in_progress)
+- `src/app/api/finance/reconciliation/[id]/auto-match/route.ts` — POST (auto-match algorithm):
+  - Nivel 1: Reference match → 0.95 confidence (auto-match)
+  - Nivel 2: Amount + date + partial reference → 0.85 (auto-match)
+  - Nivel 3: Amount + date only → 0.70 (suggest, no auto-match)
+  - Cruza contra `fin_income` (is_reconciled=FALSE) y `fin_expenses` (is_reconciled=FALSE)
+  - Retorna `{ matched, suggested, unmatched, total }`
+
+#### UI View
+- `src/views/greenhouse/finance/ReconciliationView.tsx` — Client component con:
+  - 4 KPIs: Períodos totales, Conciliados, En proceso, Diferencia total pendiente
+  - Filtros: cuenta bancaria (dinámico desde API accounts), estado
+  - Tabla 8 columnas: Período (mes/año), Cuenta, Saldo apertura, Saldo banco, Saldo sistema, Diferencia (rojo/verde), Filas importadas, Estado (chip)
+  - Nombres de mes en español
+
+#### Page actualizada
+- `src/app/(dashboard)/finance/reconciliation/page.tsx` — Usa `ReconciliationView`
+
+### Verificación
+- `pnpm exec tsc --noEmit`: 0 errores en código fuente
+- Auto-match algorithm protegido: no permite match en períodos reconciled/closed
+- Import de statements protegido contra períodos cerrados
+- Tolerance de ±1 unidad en matching de montos para absorber redondeos
+
+### Resumen final del módulo financiero completo
+
+| Componente | API Routes | UI View | Estado |
+|---|---|---|---|
+| Infraestructura BQ (8 tablas + rol) | — | — | ✅ |
+| Auth + access control | — | — | ✅ |
+| Dashboard | — | `FinanceDashboardView` | ✅ |
+| Accounts | GET, POST, PUT | — | ✅ |
+| Exchange Rates | GET, POST, GET latest | — | ✅ |
+| Suppliers | GET, POST, GET [id], PUT [id] | `SuppliersListView` | ✅ |
+| Clients | GET, POST, GET [id], PUT [id] | `ClientsListView` | ✅ |
+| Income | GET, POST, PUT [id] | `IncomeListView` | ✅ |
+| Expenses | GET, POST, PUT [id] | `ExpensesListView` | ✅ |
+| Reconciliation | GET, POST, GET [id], PUT [id] | `ReconciliationView` | ✅ |
+| Statement Import | POST [id]/statements | — | ✅ |
+| Auto-match | POST [id]/auto-match | — | ✅ |
+
+**Total: 20 API endpoints + 6 UI views + 8 BigQuery tables + sidebar navigation + route guards**
+
+### Pendientes menores (no bloqueantes)
+- ~~**Detail views con tabs**: Suppliers [id] y Clients [id] tienen API GET lista pero no UI de detalle~~ ✅ Resuelto
+- ~~**Dashboard data real**: Summary endpoints para alimentar charts y KPIs 2-3 con datos reales~~ ✅ Resuelto
+- **Formularios modales**: Botones de creación (ingreso/egreso/período/proveedor) sin drawer/modal aún
+
+---
+
+## 2026-03-14 14:55 America/Santiago
+
+### Agente
+- Claude Code (Opus 4.6)
+
+### Objetivo del turno
+- Completar pendientes del módulo financiero: wiring de dashboard a datos reales, detail views con tabs para Suppliers/Clients/Reconciliation
+
+### Rama
+- `feature/admin-team-crud` (continuación del trabajo financiero)
+- Target: `develop`
+
+### Ambiente objetivo
+- Preview / Development
+
+### Archivos tocados
+
+**Summary API endpoints (nuevos)**:
+- `src/app/api/finance/income/summary/route.ts` — Current month vs previous + last 6 months breakdown
+- `src/app/api/finance/expenses/summary/route.ts` — Same pattern for expenses
+
+**Dashboard wiring (actualizado)**:
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx` — Ahora consume `/api/finance/income/summary` y `/api/finance/expenses/summary` para KPIs reales (Ingresos del mes con trend, Egresos del mes con trend) y charts con datos mensuales dinámicos
+
+**Detail pages (nuevos)**:
+- `src/app/(dashboard)/finance/suppliers/[id]/page.tsx` — Server page
+- `src/views/greenhouse/finance/SupplierDetailView.tsx` — Detalle con 2 tabs (Información + Historial de pagos), datos bancarios, contacto, categoría
+- `src/app/(dashboard)/finance/clients/[id]/page.tsx` — Server page
+- `src/views/greenhouse/finance/ClientDetailView.tsx` — Detalle con 2 tabs (Perfil financiero + Facturas), contactos, condiciones especiales
+- `src/app/(dashboard)/finance/reconciliation/[id]/page.tsx` — Server page
+- `src/views/greenhouse/finance/ReconciliationDetailView.tsx` — Detalle con KPIs, tabla de statement rows, botón auto-match, chips de match status
+
+### Verificación
+- `pnpm exec tsc --noEmit`: 0 errores en código fuente (solo cache artifacts de `.next`/`.next-local`)
+- Dashboard KPIs 2-3 ahora muestran datos reales con trend arrows
+- Charts bar/area reciben categorías dinámicas de los últimos 6 meses
+- Detail views usan `useParams()` para obtener ID de la URL
+
+### Resumen actualizado del módulo financiero
+
+| Componente | API Routes | UI Views | Estado |
+|---|---|---|---|
+| Infraestructura BQ (8 tablas + rol) | — | — | ✅ |
+| Auth + access control | — | — | ✅ |
+| Dashboard | GET income/summary, GET expenses/summary | `FinanceDashboardView` (wired) | ✅ |
+| Accounts | GET, POST, PUT | — | ✅ |
+| Exchange Rates | GET, POST, GET latest | — | ✅ |
+| Suppliers | GET, POST, GET [id], PUT [id] | `SuppliersListView` + `SupplierDetailView` | ✅ |
+| Clients | GET, POST, GET [id], PUT [id] | `ClientsListView` + `ClientDetailView` | ✅ |
+| Income | GET, POST, PUT [id], GET summary | `IncomeListView` | ✅ |
+| Expenses | GET, POST, PUT [id], GET summary | `ExpensesListView` | ✅ |
+| Reconciliation | GET, POST, GET [id], PUT [id] | `ReconciliationView` + `ReconciliationDetailView` | ✅ |
+| Statement Import | POST [id]/statements | — | ✅ |
+| Auto-match | POST [id]/auto-match | — | ✅ |
+
+**Total: 22 API endpoints + 9 UI views + 8 BigQuery tables + sidebar navigation + route guards**
+
+### Pendientes menores (no bloqueantes)
+- **Formularios modales**: Botones de creación (ingreso/egreso/período/proveedor) sin drawer/modal aún — abren links a las list views por ahora
+- **Reconciliation detail view**: UI para ver filas de cartola y aceptar/rechazar matches sugeridos

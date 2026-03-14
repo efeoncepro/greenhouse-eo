@@ -3,6 +3,22 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Finance canonical backend phase
+- El módulo `Finance` mantiene sus tablas `fin_*` como capa transaccional propia, pero ya no debe modelarse como silo aislado:
+  - `greenhouse.clients.client_id` queda como llave canónica de cliente
+  - `greenhouse.team_members.member_id` queda como llave canónica de colaborador
+  - `fin_client_profiles` actúa como extensión financiera del tenant, no como identidad primaria paralela
+- Regla operativa vigente del backend financiero:
+  - nuevas escrituras deben resolver referencias por `clientId` cuando sea posible
+  - durante la transición se aceptan `clientProfileId` y `hubspotCompanyId`, pero el backend valida consistencia y responde `409` ante referencias incompatibles
+  - egresos que vengan con `payrollEntryId` deben resolverse a `memberId` server-side
+- Superficie backend relevante agregada o endurecida:
+  - `src/lib/finance/canonical.ts` centraliza resolución cliente/persona
+  - `GET /api/people/[memberId]/finance` agrega lectura financiera read-only para People sin introducir writes bajo `/api/people/*`
+- Boundary de arquitectura:
+  - `Finance` sigue owning cuentas, proveedores, tipos de cambio y conciliación
+  - las vistas 360 deben salir de read-models enriquecidos, no de convertir `fin_*` en source of truth para roster o tenants
+
 ## Delta 2026-03-14 Admin team backend foundation
 - El repo ya tiene la primera capa backend de escritura para `Admin Team Module v2` sobre rama de trabajo dedicada:
   - `src/lib/team-admin/mutate-team.ts`

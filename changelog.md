@@ -6,6 +6,49 @@
 
 ## 2026-03-14
 
+### Finance canonical backend phase
+- El backend de `Finance` avanzó desde referencias parciales a llaves canónicas sin romper contratos existentes:
+  - `clients` ahora prioriza `greenhouse.clients.client_id` como anclaje principal y conserva fallback por `client_profile_id` / `hubspot_company_id`
+  - `POST /api/finance/clients` y `/api/finance/clients/sync` ya rellenan `client_id` en `fin_client_profiles` cuando el tenant es resoluble
+  - `income` y `expenses` ya pasan por resolución canónica de cliente antes de persistir
+  - los egresos también validan y resuelven relación `memberId` / `payrollEntryId` antes de escribir
+  - inconsistencias explícitas entre referencias financieras ahora responden `409`
+  - referencias canónicas inexistentes (`clientId`, `clientProfileId`, `hubspotCompanyId`, `memberId`) ya no se aceptan silenciosamente
+  - `GET /api/finance/clients` corrigió un bug en los filtros `requiresPo` / `requiresHes`
+- Se agregó una nueva lectura financiera de colaborador:
+  - `GET /api/people/[memberId]/finance`
+  - devuelve summary, assignments, identities, payroll history y expenses asociados al colaborador
+  - el endpoint fuerza bootstrap de infraestructura financiera antes de consultar `fin_expenses`
+- Validación ejecutada:
+  - `pnpm exec eslint` sobre los archivos tocados: correcto
+  - `git diff --check`: correcto
+  - `pnpm exec tsc --noEmit --pretty false`: siguen presentes errores globales preexistentes de `.next-local/.next` y rutas SCIM faltantes
+### Finance module backend hardening
+- Se corrigieron varios desalineamientos críticos del módulo `Finance` en `feature/finance-module`:
+  - `GET /api/finance/income/[id]` y `GET /api/finance/expenses/[id]` ya existen para detalle real
+  - `POST /api/finance/income/[id]/payment` quedó implementado para registrar pagos parciales o totales y persistir `payments_received`
+  - `POST /api/finance/expenses/bulk` quedó implementado para creación masiva de egresos
+  - los `POST` de ingresos y egresos ahora generan IDs secuenciales `INC-YYYYMM-###` / `EXP-YYYYMM-###`
+  - las transacciones en USD ya no aceptan `exchangeRateToClp = 0`; resuelven el snapshot desde `fin_exchange_rates` o fallan con error explícito
+- La conciliación automática también quedó endurecida:
+  - matching por monto + fecha con ventana de `±3 días`
+  - resolución ambigua bloqueada cuando hay más de un candidato con la misma confianza
+  - mejor uso de referencia + descripción para detectar coincidencias
+- Se alinearon contratos de entrada del frontend con el backend:
+  - drawers de clientes y proveedores ahora usan solo monedas `CLP/USD`
+  - tax ID types y categorías de proveedores quedaron sincronizados con los enums server-side
+  - `clients` y `suppliers` validan `paymentCurrency` / `taxIdType` en backend en vez de aceptar valores drifted
+  - `finance_contacts` de clientes ya se escribe como JSON real con `PARSE_JSON(...)`
+- La capa de clientes quedó más cerca del brief financiero:
+  - `GET /api/finance/clients` ahora usa `greenhouse.clients` como base activa y enriquece con `hubspot_crm.companies` + `fin_client_profiles`
+  - la lista expone nombre comercial HubSpot, dominio, país, línea de servicio, módulos, saldo por cobrar y cantidad de facturas activas
+  - `GET /api/finance/clients/[id]` ahora devuelve company context, summary de cuentas por cobrar y deals read-only de HubSpot cuando el schema disponible los soporta
+  - el enriquecimiento HubSpot se construye con introspección de columnas (`INFORMATION_SCHEMA`) para no asumir rígidamente nombres de campos en `companies`/`deals`
+- Validación ejecutada:
+  - `pnpm exec eslint` sobre los archivos tocados: correcto
+  - `git diff --check`: correcto
+  - `pnpm exec tsc --noEmit --pretty false`: sigue fallando por errores globales preexistentes en `.next` / SCIM, no por los cambios de Finance
+
 ### Admin team promoted to develop
 - `feature/admin-team-crud` fue integrado en `develop` mediante el merge commit `ee2355b` para abrir la fase de validación compartida en `Staging`.
 - La integración arrastra:
