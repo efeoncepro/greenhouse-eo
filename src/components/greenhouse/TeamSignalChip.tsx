@@ -7,7 +7,7 @@ import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 type TeamSignalChipProps = {
   label: string
-  tone: 'success' | 'warning' | 'error' | 'default' | 'info'
+  tone: 'success' | 'warning' | 'error' | 'default' | 'info' | 'primary' | 'secondary'
   icon?: string
   size?: 'small' | 'medium'
 }
@@ -21,7 +21,14 @@ const getToneStyles = (tone: TeamSignalChipProps['tone']) => {
     case 'error':
       return GH_COLORS.semaphore.red
     case 'info':
+    case 'primary':
       return GH_COLORS.semantic.info
+    case 'secondary':
+      return {
+        source: GH_COLORS.neutral.textPrimary,
+        bg: alpha(GH_COLORS.neutral.textPrimary, 0.08),
+        text: GH_COLORS.neutral.textPrimary
+      }
     default:
       return {
         source: GH_COLORS.neutral.textSecondary,
