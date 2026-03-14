@@ -40,6 +40,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Integrar Google SSO sobre la punta actual de `develop` sin tocar el rediseño de team y dejar `pre-greenhouse` apuntando a una rama merge-safe.
+
+### Rama
+- Rama usada: `mergecheck-google-sso`
+- Rama objetivo del merge: `develop`
+- Rama remota lista para PR: `fix/google-sso-develop-safe`
+
+### Ambiente objetivo
+- Preview branch / `pre-greenhouse`
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- Delta contra `origin/develop` validado:
+  - solo cambia `.env.example`, `.env.local.example`, `Handoff.md`, `README.md`, `changelog.md`, `project_context.md`, `scripts/setup-bigquery.sql`, `src/app/(blank-layout-pages)/login/page.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/config/greenhouse-nomenclature.ts`, `src/lib/auth.ts`, `src/lib/tenant/access.ts`, `src/types/next-auth.d.ts`, `src/views/Login.tsx` y `src/views/greenhouse/GreenhouseSettings.tsx`
+  - no entran `TeamCapacitySection`, `TeamDossierSection`, `GreenhouseDashboard` ni `GreenhouseAdminTenantDashboardPreview`
+- `pnpm exec eslint 'src/app/(blank-layout-pages)/login/page.tsx' 'src/app/(dashboard)/settings/page.tsx' src/config/greenhouse-nomenclature.ts src/lib/auth.ts src/lib/tenant/access.ts src/types/next-auth.d.ts src/views/Login.tsx src/views/greenhouse/GreenhouseSettings.tsx`: correcto
+- Vercel real:
+  - se copiaron a `Preview (fix/google-sso-develop-safe)` las envs necesarias desde el preview funcional (`GCP_PROJECT`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`)
+  - se hizo redeploy del branch safe y quedo `Ready` en `https://greenhouse-eo-git-fix-google-sso-develop-safe-efeonce-7670142f.vercel.app`
+  - `pre-greenhouse.efeoncepro.com` ahora apunta a ese deployment safe
+- Validacion runtime remota:
+  - `https://greenhouse-eo-git-fix-google-sso-develop-safe-efeonce-7670142f.vercel.app/api/auth/providers` expone `azure-ad`, `google` y `credentials`
+  - `https://pre-greenhouse.efeoncepro.com/api/auth/providers` expone `azure-ad`, `google` y `credentials`
+  - `https://pre-greenhouse.efeoncepro.com/login` contiene `Entrar con Google` y `Entrar con Microsoft`
+
+### Riesgos o pendientes
+- `pre-greenhouse` ya no apunta al preview experimental `feature/google-sso`; ahora refleja la rama merge-safe `fix/google-sso-develop-safe`.
+- El alias estable del branch safe (`greenhouse-eo-git-fix-google-sso-develop-safe-efeonce-7670142f.vercel.app`) no esta agregado como redirect URI en GCP; para pruebas humanas usar `pre-greenhouse.efeoncepro.com`, que si esta autorizado.
+- Queda pendiente solo la validacion humana final del flujo OAuth completo en navegador antes del merge a `develop`.
+
 ## 2026-03-13 22:59 America/Santiago
 
 ### Agente

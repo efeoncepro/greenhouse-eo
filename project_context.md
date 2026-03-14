@@ -100,6 +100,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `.codex/skills/vercel-operations/SKILL.md`
   - cubre CLI, dominios protegidos, `promote`, `rollback`, env vars y el mapa operativo `Preview` / `Staging` / `Production` del proyecto
   - debe usarse como criterio operativo cuando el trabajo requiera verificar previews, dominios custom o promociones entre ambientes
+- Regla operativa adicional para previews OAuth:
+  - si una branch preview necesita login real, no asumir que hereda los secrets de otra preview
+  - cargar un bloque explicito `Preview (<branch>)` con `GCP_PROJECT`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`
+  - para pruebas humanas de Google SSO, preferir el dominio autorizado `pre-greenhouse.efeoncepro.com` sobre aliases estables de branch si esos aliases no fueron agregados en GCP como redirect URI
 
 ## Delta 2026-03-13 Branding lock and nav hydration
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
@@ -160,7 +164,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `develop`
   - `main`
 - Estado actual de aliases Vercel confirmado al cierre:
-  - `pre-greenhouse.efeoncepro.com` apunta al preview vigente del branch `fix/internal-nav-nomenclature-hydration`
+  - `pre-greenhouse.efeoncepro.com` apunta al preview vigente del branch `fix/google-sso-develop-safe`
   - `dev-greenhouse.efeoncepro.com` apunta al deployment de `staging` generado desde `develop`
   - `greenhouse.efeoncepro.com` apunta al deployment productivo generado desde `main`
 - Regla operativa ratificada:
