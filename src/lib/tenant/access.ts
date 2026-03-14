@@ -136,6 +136,11 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
       routeGroups.add('hr')
     }
 
+    if (roleCode === 'finance_manager') {
+      routeGroups.add('internal')
+      routeGroups.add('finance')
+    }
+
     if (roleCode === 'efeonce_admin') {
       routeGroups.add('admin')
     }

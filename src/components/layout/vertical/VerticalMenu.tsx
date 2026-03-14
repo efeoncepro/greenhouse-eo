@@ -56,6 +56,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
+  const isFinanceUser = session?.user?.routeGroups?.includes('finance') ?? false
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
@@ -182,6 +183,52 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               <NavigationItemLabel
                 label={GH_PEOPLE_NAV.people.label}
                 subtitle={GH_PEOPLE_NAV.people.subtitle}
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+          </MenuSection>
+        ) : null}
+        {isFinanceUser || isAdminUser ? (
+          <MenuSection label='Finanzas'>
+            <MenuItem href='/finance' icon={<i className='tabler-chart-bar' />}>
+              <NavigationItemLabel
+                label='Dashboard'
+                subtitle='Vista consolidada'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/finance/income' icon={<i className='tabler-cash' />}>
+              <NavigationItemLabel
+                label='Ingresos'
+                subtitle='Facturación y cobros'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/finance/expenses' icon={<i className='tabler-credit-card' />}>
+              <NavigationItemLabel
+                label='Egresos'
+                subtitle='Pagos y obligaciones'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/finance/suppliers' icon={<i className='tabler-building-store' />}>
+              <NavigationItemLabel
+                label='Proveedores'
+                subtitle='Directorio de proveedores'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/finance/clients' icon={<i className='tabler-users-group' />}>
+              <NavigationItemLabel
+                label='Clientes'
+                subtitle='Perfil financiero'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/finance/reconciliation' icon={<i className='tabler-arrows-exchange' />}>
+              <NavigationItemLabel
+                label='Conciliación'
+                subtitle='Conciliación bancaria'
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
