@@ -267,10 +267,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    const detail = error instanceof Error ? error.message : 'Unknown error'
 
-    console.error('POST /api/finance/income failed:', message, error)
+    console.error('POST /api/finance/income failed:', detail, error)
 
-    return NextResponse.json({ error: `Error al registrar ingreso: ${message}` }, { status: 500 })
+    return NextResponse.json({ error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' }, { status: 500 })
   }
 }

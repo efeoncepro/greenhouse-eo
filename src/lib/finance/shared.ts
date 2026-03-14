@@ -135,6 +135,20 @@ export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
 export const EXPENSE_TYPES = ['supplier', 'payroll', 'social_security', 'tax', 'miscellaneous'] as const
 export type ExpenseType = (typeof EXPENSE_TYPES)[number]
 
+export const SOCIAL_SECURITY_TYPES = ['afp', 'health', 'unemployment', 'mutual', 'caja_compensacion'] as const
+export type SocialSecurityType = (typeof SOCIAL_SECURITY_TYPES)[number]
+
+export const TAX_TYPES = [
+  'iva_mensual',
+  'ppm',
+  'renta_anual',
+  'patente',
+  'contribuciones',
+  'retencion_honorarios',
+  'other'
+] as const
+export type TaxType = (typeof TAX_TYPES)[number]
+
 export const PAYMENT_STATUSES = ['pending', 'partial', 'paid', 'overdue', 'written_off'] as const
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
@@ -169,7 +183,22 @@ export type ContactRole = (typeof CONTACT_ROLES)[number]
 export const runFinanceQuery = async <T>(query: string, params?: Record<string, unknown>): Promise<T[]> => {
   const bigQuery = getBigQueryClient()
 
-  const [rows] = await bigQuery.query({ query, params })
+  // BigQuery requires explicit types for null parameters
+  const types = params
+    ? Object.fromEntries(
+        Object.entries(params)
+          .filter(([, value]) => value === null || value === undefined)
+          .map(([key]) => [key, 'STRING'])
+      )
+    : undefined
+
+  const hasNullTypes = types && Object.keys(types).length > 0
+
+  const [rows] = await bigQuery.query({
+    query,
+    params,
+    ...(hasNullTypes ? { types } : {})
+  })
 
   return rows as T[]
 }
