@@ -11,6 +11,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
+  - los briefs `CODEX_TASK_*` que sigan vivos para el proyecto deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades
 1. Mantener el proyecto desplegable en Vercel.
@@ -26,6 +28,10 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
+- Si el trabajo nace de una `CODEX_TASK_*`, revisar obligatoriamente la arquitectura antes de implementar:
+  - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- Si una `CODEX_TASK_*` contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.

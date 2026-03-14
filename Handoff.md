@@ -40,6 +40,158 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 20:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Reordenar los `CODEX_TASK_*` en paneles operativos `in-progress`, `to-do` y `complete`, y alinear la documentación troncal del repo a esa convención.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / gobernanza operativa
+
+### Archivos tocados
+- `.gitignore`
+- `README.md`
+- `AGENTS.md`
+- `project_context.md`
+- `docs/README.md`
+- `docs/tasks/README.md`
+- `docs/tasks/complete/*`
+- `docs/tasks/in-progress/*`
+- `docs/tasks/to-do/*`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `docs/tasks/` ahora opera como board con tres paneles explícitos:
+  - `in-progress`
+  - `to-do`
+  - `complete`
+- Se reclasificaron las tasks vigentes contrastando estado real del repo con `project_context.md`, `Handoff.md` y `changelog.md`, en vez de moverlas solo por nombre o antigüedad.
+- Se corrigieron referencias cruzadas dentro de los propios briefs para que el nuevo árbol `docs/tasks/**` no deje links rotos entre tasks relacionadas.
+- `README.md`, `AGENTS.md`, `project_context.md` y `docs/README.md` quedaron alineados para que el board de tasks ya no compita con una lectura plana u obsoleta de `docs/tasks/`.
+- `.gitignore` se corrigió para que los `CODEX_TASK_*` dentro de `docs/tasks/**` puedan quedar versionados; el patrón ignorado en raíz se conserva solo para scratch local.
+
+### Verificacion
+- `find docs/tasks -maxdepth 2 -type f | sort`: correcto
+- `git diff --check`: correcto
+- `git status --short --untracked-files=all docs/tasks`: confirma `23` task briefs visibles para versionado bajo el nuevo árbol
+
+### Riesgos o pendientes
+- Históricamente varios `CODEX_TASK_*` estaban fuera del índice Git por la regla vieja de `.gitignore`; tras esta corrección quedarán visibles como archivos versionables y habrá que incorporarlos formalmente en el siguiente ciclo de commit.
+- La clasificación actual del board es un snapshot operativo al 2026-03-14; si cambian el repo o los handoffs, habrá que mover tasks entre paneles con el mismo criterio documental.
+
+## 2026-03-14 20:02 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer la regla de gobernanza para que toda `CODEX_TASK_*` deba revisarse contra la arquitectura antes de ejecutarse.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / gobernanza operativa
+
+### Archivos tocados
+- `AGENTS.md`
+- `docs/tasks/README.md`
+- `docs/README.md`
+- `changelog.md`
+
+### Cambios realizados
+- `AGENTS.md` ahora obliga explícitamente a revisar arquitectura base y especializada cuando el trabajo nace desde una `CODEX_TASK_*`.
+- `docs/tasks/README.md` ahora trata la revisión arquitectónica como gate obligatorio y ya no solo como alineación deseable al 360.
+- `docs/README.md` ahora refleja esa misma regla en el índice maestro para que no quede escondida solo dentro de `tasks/README.md`.
+
+### Verificacion
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- La regla ya quedó documentada, pero las tasks históricas siguen necesitando disciplina de revisión humana; esta edición no audita una por una todas las `CODEX_TASK_*`.
+
+## 2026-03-14 19:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar si `Provider` debía entrar al modelo 360 como objeto canónico y alinear la task de `AI Tooling & Credit System` para evitar que nazca con vendors libres sin relación reusable.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura transversal
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/CODEX_TASK_AI_Tooling_Credit_System.md`
+- `project_context.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se agregó `Provider` al modelo 360 como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin.
+- Se dejó explícito el boundary recomendado:
+  - ancla objetivo `greenhouse.providers.provider_id`
+  - `fin_suppliers` como extensión financiera del Provider
+  - códigos de auth/source providers y `vendor` libre como referencias secundarias, no como identidad primaria
+- La task de `AI Tooling & Credit System` quedó alineada para:
+  - introducir un registro `providers`
+  - relacionar `ai_tool_catalog` mediante `provider_id`
+  - permitir `vendor` solo como snapshot/display label
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md` ahora documenta explícitamente la distinción `Supplier vs Provider` para evitar que el equipo siga leyendo `fin_suppliers` como identidad vendor transversal por defecto.
+
+### Verificacion
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Aún no existe implementación runtime de `greenhouse.providers`; por ahora esto deja la decisión de arquitectura cerrada y la task alineada, pero falta una iteración posterior para materializar la tabla y sus mapeos con `fin_suppliers` e identidades externas.
+
+## 2026-03-14 19:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el modal de ingresos para que reutilice el mismo directorio de clientes visible en `/finance/clients` y no falle en silencio cuando la carga del dropdown se rompe.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Staging
+
+### Archivos tocados
+- `src/views/greenhouse/finance/drawers/CreateIncomeDrawer.tsx`
+
+### Cambios realizados
+- `CreateIncomeDrawer` ahora vuelve a pedir `/api/finance/clients` cada vez que se abre el modal y usa `cache: 'no-store'`, alineándose con la vista de clientes.
+- El dropdown de clientes ya no se queda vacío sin contexto si la API falla:
+  - limpia la lista rota
+  - muestra un `Alert` con el error real de carga
+  - deja un placeholder explícito cuando no hay opciones disponibles
+- Se amplió el fallback de labels del selector para aceptar `legalName`, `companyName`, `greenhouseClientName`, `clientProfileId` o `clientId`.
+- El submit del ingreso ahora también envía `clientId` y `clientProfileId` del cliente seleccionado, para no perder la referencia canónica cuando el cliente no tiene `hubspotCompanyId`.
+
+### Verificacion
+- `pnpm exec eslint src/views/greenhouse/finance/drawers/CreateIncomeDrawer.tsx`: correcto
+
+### Riesgos o pendientes
+- El patrón de carga silenciosa sin `no-store` también existe en otros drawers de Finance, por ejemplo proveedores/egresos; no se tocó en este turno para mantener el cambio acotado.
+
 ## 2026-03-14 19:18 America/Santiago
 
 ### Agente
@@ -96,14 +248,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Documentación / tasks
 
 ### Archivos tocados
-- `docs/tasks/CODEX_TASK_Financial_Module.md`
-- `docs/tasks/CODEX_TASK_AI_Tooling_Credit_System.md`
-- `docs/tasks/CODEX_TASK_Creative_Hub_Module.md`
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`
-- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
-- `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
-- `docs/tasks/CODEX_TASK_Agency_Operator_Layer.md`
-- `docs/tasks/CODEX_TASK_Admin_Team_Module_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/to-do/CODEX_TASK_AI_Tooling_Credit_System.md`
+- `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md`
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/complete/CODEX_TASK_Agency_Operator_Layer.md`
+- `docs/tasks/in-progress/CODEX_TASK_Admin_Team_Module_v2.md`
 - `docs/tasks/README.md`
 
 ### Cambios realizados
@@ -842,7 +994,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Verificacion
 - Se revisó la task vigente:
-  - `docs/tasks/CODEX_TASK_Admin_Team_Module_v2.md`
+  - `docs/tasks/in-progress/CODEX_TASK_Admin_Team_Module_v2.md`
 - Se confirmó contra el runtime real del repo que ya existe la base necesaria:
   - `greenhouse.team_members`
   - `greenhouse.client_team_assignments`
@@ -1265,7 +1417,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Documentation / implementation planning
 
 ### Archivos tocados
-- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 - `changelog.md`
@@ -1288,7 +1440,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No hubo cambios de runtime ni de base de datos; este turno fue documental.
 
 ### Riesgos o pendientes
-- La task vigente para People debe tomarse desde `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`, no desde la version original.
+- La task vigente para People debe tomarse desde `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`, no desde la version original.
 - La `v2` deja People como surface inicialmente read-first; si se quiere editar assignments desde esa vista, hace falta una task adicional de CRUD de team.
 - Sigue pendiente decidir si `efeonce_account` debe ver `/people` en lectura o si queda fuera del alcance inicial.
 
@@ -1308,13 +1460,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Documentation / implementation planning
 
 ### Archivos tocados
-- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
 - `Handoff.md`
 
 ### Verificacion
 - Lectura comparada entre:
-  - `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
-  - `docs/tasks/CODEX_TASK_Admin_Team_Module.md`
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
+  - `docs/tasks/complete/CODEX_TASK_Admin_Team_Module.md`
 - Se dejo documentado en la task de People:
   - People `v2` es capa de lectura consolidada
   - no debe introducir writes bajo `/api/people/*`
@@ -1473,7 +1625,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Riesgos o pendientes
 - El bootstrap BigQuery ya quedó aplicado, pero sigue pendiente la provisión real de usuarios `client_users` / `user_role_assignments` con el rol `hr_payroll`; hoy existe el role, no necesariamente los principals de HR.
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue ignorado por Git; la implementación ya avanzó más que el brief trackeado.
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` sigue ignorado por Git; la implementación ya avanzó más que el brief trackeado.
 - Existen archivos UI no trackeados fuera del scope backend en el working tree; no fueron tocados en este turno.
 
 ## 2026-03-14 08:08 America/Santiago
@@ -1576,7 +1728,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - permisos reales para crear tablas `greenhouse.payroll_*` y seedear `hr_payroll`
 - El frontend de `HR Payroll` sigue reservado para Claude; evitar tocar vistas, menu y navegacion visual desde backend salvo que aparezca un bloqueo funcional.
 - El layout/guard `hr` ya existe, pero todavia no se agrego navegacion visual al sidebar porque eso corresponde al frente.
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; el brief corregido existe en disco pero no queda trackeado por Git salvo que se ajuste esa regla.
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; el brief corregido existe en disco pero no queda trackeado por Git salvo que se ajuste esa regla.
 
 ## 2026-03-14 07:34 America/Santiago
 
@@ -1584,7 +1736,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Dejar registrada la division operativa para `HR Payroll`: Codex implementara el backend completo del modulo y Claude implementara todo el frontend, ambos tomando como base `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`.
+- Dejar registrada la division operativa para `HR Payroll`: Codex implementara el backend completo del modulo y Claude implementara todo el frontend, ambos tomando como base `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`.
 
 ### Rama
 - Rama usada: `feature/admin-tenant-detail-redesign`
@@ -1611,7 +1763,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Mantener la separacion de responsabilidades para evitar solapamiento:
   - backend: BigQuery schema, auth/guards, API routes, calculadora de payroll, export, tipos y logica server-side
   - frontend: rutas UI, vistas, tablas, drawers, inputs, estados y navegacion visual
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; si el brief debe compartirse por Git, habra que corregir esa regla.
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` sigue afectado por `.gitignore`; si el brief debe compartirse por Git, habra que corregir esa regla.
 
 ## 2026-03-14 07:31 America/Santiago
 
@@ -1619,7 +1771,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Revisar y corregir `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` para dejar el brief mas implementable y alineado con el repo real: route group `hr`, versionado por vigencia del periodo, persistencia de KPIs manuales y auditabilidad de overrides.
+- Revisar y corregir `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` para dejar el brief mas implementable y alineado con el repo real: route group `hr`, versionado por vigencia del periodo, persistencia de KPIs manuales y auditabilidad de overrides.
 
 ### Rama
 - Rama usada: `feature/admin-tenant-detail-redesign`
@@ -1629,7 +1781,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Development / docs alignment
 
 ### Archivos tocados
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 
@@ -1641,7 +1793,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El brief ya no depende de `/admin/payroll`, pero la implementacion futura todavia debe resolver el wiring real de auth para `hr`: role seed, `TenantRouteGroup`, guard reusable y redirect post-login.
 - Antes de implementar, sigue siendo obligatorio verificar el schema vivo de `notion_ops.tareas` para definir la query final de KPIs y confirmar si OTD por persona es calculable o queda manual.
-- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md` esta afectado por la regla `.gitignore: CODEX_TASK_*.md`; el archivo quedo corregido en disco pero no aparece como cambio trackeado del repo. Si esta version debe compartirse por Git, habra que ajustar esa regla o versionar el archivo por otra via.
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` esta afectado por la regla `.gitignore: CODEX_TASK_*.md`; el archivo quedo corregido en disco pero no aparece como cambio trackeado del repo. Si esta version debe compartirse por Git, habra que ajustar esa regla o versionar el archivo por otra via.
 
 ## 2026-03-14 09:45 America/Santiago
 
@@ -1830,7 +1982,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `docs/tasks/CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
+- Ejecutar `docs/tasks/complete/CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
 
 ### Rama
 - Rama usada: `feature/google-sso`
@@ -1927,7 +2079,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Cerrar los gaps literales que quedaban entre el task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
+- Cerrar los gaps literales que quedaban entre el task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
 
 ### Rama
 - Rama usada: `fix/team-identity-task-closeout`
@@ -1946,7 +2098,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/components/greenhouse/SprintTeamVelocitySection.tsx`
 - `src/views/greenhouse/dashboard/helpers.ts`
 - `src/config/greenhouse-nomenclature.ts`
-- `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
@@ -2682,7 +2834,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `docs/tasks/CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
+- Ejecutar `docs/tasks/complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
 
 ### Rama
 - Rama usada: `develop`
@@ -2738,7 +2890,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar el brief `docs/tasks/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
+- Ejecutar el brief `docs/tasks/complete/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
 
 ### Rama
 - Rama usada: `develop`
@@ -2769,7 +2921,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar el brief `docs/tasks/CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
+- Ejecutar el brief `docs/tasks/complete/CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
 
 ### Rama
 - Rama usada: `develop`
@@ -2997,7 +3149,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `docs/tasks/CODEX_TASK_Tenant_Detail_View_Redesign.md` y rediseñar `/admin/tenants/[id]` con header, tabs y patrones Vuexy reutilizados desde `full-version`.
+- Ejecutar `docs/tasks/complete/CODEX_TASK_Tenant_Detail_View_Redesign.md` y rediseñar `/admin/tenants/[id]` con header, tabs y patrones Vuexy reutilizados desde `full-version`.
 
 ### Rama
 - Rama usada: actual de trabajo local

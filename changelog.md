@@ -6,6 +6,35 @@
 
 ## 2026-03-14
 
+### Codex task board operational panels
+- `docs/tasks/` dejó de funcionar como carpeta plana y ahora se organiza como tablero operativo con paneles:
+  - `docs/tasks/in-progress/`
+  - `docs/tasks/to-do/`
+  - `docs/tasks/complete/`
+- `docs/tasks/README.md` quedó como vista maestra del board y la referencia obligatoria para saber qué task está activa, pendiente o ya absorbida/histórica.
+- La clasificación inicial se hizo contrastando repo real + `project_context.md` + `Handoff.md` + `changelog.md`, para no mover briefs solo por intuición.
+- Se corrigió `.gitignore` para que los `CODEX_TASK_*` bajo `docs/tasks/**` vuelvan a quedar versionables; el patrón ignorado ahora aplica solo a scratch files en raíz.
+- `README.md`, `AGENTS.md` y `project_context.md` quedaron alineados a esta convención nueva.
+
+### Provider canonical object alignment
+- La arquitectura 360 ahora reconoce `Provider` como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin.
+- Se documentó la relación recomendada:
+  - ancla objetivo `greenhouse.providers.provider_id`
+  - `fin_suppliers` como extensión financiera del Provider, no como identidad global del vendor
+  - `vendor` libre permitido solo como snapshot/display label, no como relación primaria reusable
+- Se alineó la task `AI Tooling & Credit System` para que el catálogo de herramientas guarde `provider_id` y no nazca acoplado a vendors en texto libre.
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md` ahora también deja explícita la distinción operativa entre `Supplier` y `Provider` para que Finance no siga funcionando como identidad vendor global por omisión.
+
+### Codex task architecture gate
+- La gobernanza de `CODEX_TASK_*` quedó endurecida:
+  - toda task nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse
+  - mínimo obligatorio: `GREENHOUSE_ARCHITECTURE_V1.md` y `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - además, cada task debe contrastarse con la arquitectura especializada aplicable
+- La regla quedó documentada en:
+  - `AGENTS.md`
+  - `docs/tasks/README.md`
+  - `docs/README.md`
+
 ### Greenhouse 360 object model
 - Se formalizó una regla transversal de arquitectura para todo el portal en `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`:
   - Greenhouse debe evolucionar sobre objetos canónicos enriquecidos, no sobre módulos con identidades paralelas por silo
@@ -39,6 +68,10 @@
   - si falla `hubspot_crm.companies`, el endpoint cae a modo degradado y sigue devolviendo clientes base
   - si falla el rollup de receivables, la vista sigue cargando clientes con KPIs financieros en `0`
   - `ClientsListView` ya no interpreta errores backend como “no hay clientes”; ahora muestra un `Alert` explícito cuando `/api/finance/clients` responde no-`ok`
+- El modal `Registrar ingreso` quedó alineado con esa misma fuente:
+  - vuelve a cargar `/api/finance/clients` con `cache: 'no-store'` cada vez que se abre
+  - deja visible el error real si el dropdown no puede hidratar clientes
+  - envía también `clientId` y `clientProfileId` del cliente seleccionado al crear el ingreso, evitando perder la referencia canónica cuando falta `hubspotCompanyId`
 
 ### Finance canonical backend phase
 - El backend de `Finance` avanzó desde referencias parciales a llaves canónicas sin romper contratos existentes:
@@ -245,7 +278,7 @@
   - smoke autenticado en `staging`: correcto para `People` y `HR Payroll`
 
 ### People unified view task alignment
-- Se agrego `docs/tasks/CODEX_TASK_People_Unified_View_v2.md` como brief corregido y ejecutable para `People`, alineado al runtime real del repo.
+- Se agrego `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` como brief corregido y ejecutable para `People`, alineado al runtime real del repo.
 - La nueva version elimina supuestos incorrectos del brief anterior:
   - no depende de `/admin/team` ni de `/api/admin/team/*`
   - no introduce un route group `people` inexistente
@@ -326,7 +359,7 @@
 - Validacion ejecutada: `pnpm lint` y `pnpm build`.
 
 ### Team capacity views closeout
-- Se ejecuto `docs/tasks/CODEX_TASK_Fix_Team_Capacity_Views.md` en la rama paralela `fix/team-capacity-views-vuexy`, priorizando composicion con primitives activas de Vuexy/MUI ya presentes en el repo.
+- Se ejecuto `docs/tasks/complete/CODEX_TASK_Fix_Team_Capacity_Views.md` en la rama paralela `fix/team-capacity-views-vuexy`, priorizando composicion con primitives activas de Vuexy/MUI ya presentes en el repo.
 - `src/components/greenhouse/TeamCapacitySection.tsx` ahora distingue entre capacidad contractual y metricas operativas reales: si BigQuery no trae columnas operativas, ya no inventa breakdowns por persona ni chips de actividad.
 - `Pulse` gano un resumen lateral mas ejecutivo con `HorizontalWithSubtitle`, barra de utilizacion contextual y una lectura contractual mas clara para cada miembro.
 - Se agrego `TeamExpansionGhostCard` como primitive reusable para el CTA de ampliacion del equipo y se reutilizo tanto en `Pulse` como en `Mi Greenhouse`.
@@ -387,7 +420,7 @@
 - La Vista 3 se rehizo al patron pedido por el task: `AvatarGroup` compacto arriba y detalle expandible tabular por persona debajo.
 - Se agregaron primitives visuales nuevas `TeamSignalChip` y `TeamProgressBar` para que los semaforos del modulo usen `GH_COLORS.semaphore` en vez de depender solo de los colores genericos de MUI.
 - Los textos visibles que seguian hardcodeados en las 4 vistas del modulo se movieron a `GH_TEAM` / `GH_MESSAGES`.
-- El documento `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` se alineo al contrato real de BigQuery y al repo correcto del pipeline (`notion-bigquery`).
+- El documento `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` se alineo al contrato real de BigQuery y al repo correcto del pipeline (`notion-bigquery`).
 
 ### Tenant and user identity media
 - Los placeholders de logo/foto en admin e internal ahora ya pueden persistir imagen real para spaces y usuarios.

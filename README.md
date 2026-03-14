@@ -9,7 +9,7 @@ Greenhouse ya corre como una aplicación App Router con:
 - autenticación con `next-auth` contra `greenhouse.client_users`
 - login por `credentials`, Microsoft Entra ID y Google OAuth
 - data server-side desde BigQuery
-- superficies cliente, `internal`, `admin`, `agency` y `capabilities`
+- superficies cliente, `internal`, `admin`, `agency`, `capabilities`, `people`, `hr` y `finance`
 - branding y nomenclatura Greenhouse encima de Vuexy, sin crear un theme paralelo
 
 El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecutiva, contexto operativo y gobierno de acceso sobre las fuentes de verdad reales.
@@ -26,6 +26,24 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - `/settings`
 - `/capabilities/[moduleId]`
 - `/updates`
+
+### Operación interna
+
+- `/people`
+- `/people/[memberId]`
+- `/hr/payroll`
+- `/hr/payroll/member/[memberId]`
+- `/finance`
+- `/finance/clients`
+- `/finance/clients/[id]`
+- `/finance/income`
+- `/finance/income/[id]`
+- `/finance/expenses`
+- `/finance/expenses/[id]`
+- `/finance/suppliers`
+- `/finance/suppliers/[id]`
+- `/finance/reconciliation`
+- `/finance/reconciliation/[id]`
 
 ### Acceso
 
@@ -70,6 +88,41 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - `/api/team/capacity`
 - `/api/team/by-project/[projectId]`
 - `/api/team/by-sprint/[sprintId]`
+
+### People y HR
+
+- `/api/people`
+- `/api/people/[memberId]`
+- `/api/people/[memberId]/finance`
+- `/api/hr/payroll/compensation`
+- `/api/hr/payroll/entries`
+- `/api/hr/payroll/members`
+- `/api/hr/payroll/periods`
+
+### Finance
+
+- `/api/finance/accounts`
+- `/api/finance/accounts/[id]`
+- `/api/finance/clients`
+- `/api/finance/clients/[id]`
+- `/api/finance/clients/sync`
+- `/api/finance/exchange-rates`
+- `/api/finance/exchange-rates/latest`
+- `/api/finance/expenses`
+- `/api/finance/expenses/[id]`
+- `/api/finance/expenses/bulk`
+- `/api/finance/expenses/summary`
+- `/api/finance/income`
+- `/api/finance/income/[id]`
+- `/api/finance/income/summary`
+- `/api/finance/reconciliation`
+- `/api/finance/reconciliation/[id]`
+- `/api/finance/suppliers`
+- `/api/finance/suppliers/[id]`
+- `/api/finance/dashboard/aging`
+- `/api/finance/dashboard/by-service-line`
+- `/api/finance/dashboard/cashflow`
+- `/api/finance/dashboard/summary`
 
 ### Capabilities
 
@@ -125,6 +178,7 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - Microsoft SSO y Google SSO ya conviven con `credentials` sobre el mismo principal canónico.
 - El dashboard cliente ya es una vista ejecutiva real, no una demo.
 - Proyectos, detalle de proyecto, sprints, settings, admin tenants y agency ya existen como módulos vivos.
+- People, HR Payroll y Finance ya existen como superficies reales del portal.
 - Capabilities ya tiene routing, resolución por tenant y preview admin.
 - Team/capacity ya tiene APIs dedicadas y componentes propios de Greenhouse.
 - El runtime ya soporta persistencia de logo de tenant y avatar de usuario.
@@ -225,7 +279,11 @@ Notas operativas:
 - `docs/ui/*`: sistema visual, orquestación UI y validación visual
 - `docs/roadmap/*`: backlog y matriz de fases
 - `docs/operations/*`: modelo de documentación
-- `docs/tasks/*`: briefs `CODEX_TASK_*`
+- `docs/tasks/README.md`: tablero maestro de briefs `CODEX_TASK_*`
+  - `docs/tasks/in-progress/*`: briefs activos o parcialmente implementados
+  - `docs/tasks/to-do/*`: backlog listo para retomarse
+  - `docs/tasks/complete/*`: briefs cerrados, absorbidos o históricos
+  - los briefs vigentes deben vivir versionados dentro de estas carpetas, no como archivos sueltos en raíz
 
 ## Qué leer primero
 

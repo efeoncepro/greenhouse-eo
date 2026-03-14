@@ -55,3 +55,9 @@ Indice maestro de la documentacion no operativa del repo.
 ### Tasks
 
 - [Task Index](tasks/README.md)
+- Paneles activos bajo `docs/tasks/`:
+  - `in-progress/`
+  - `to-do/`
+  - `complete/`
+- Regla obligatoria:
+  - toda `CODEX_TASK_*` debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse

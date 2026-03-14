@@ -1429,6 +1429,7 @@ For Sky specifically, the current architecture stance is:
 - tenure is allowed once the canonical start-date rule is approved
 - monthly RpA and `First-Time Right` remain blocked until source quality improves
 - assigned account team, capacity, technology tools, and AI tools require explicit models and must not be inferred from incidental task assignees or raw JSON keyword matches
+- provider relationships for tooling or AI suites must resolve through an explicit provider registry, not loose `vendor` strings scattered per module
 
 ## Decisions Locked By This Document
 
@@ -1445,7 +1446,7 @@ For Sky specifically, the current architecture stance is:
 2. Build `/admin/scopes` and `/admin/feature-flags`.
 3. Build `/api/sprints` and the real `/sprints`.
 4. Extend `serviceModules` from dashboard composition into navigation and billing context.
-5. Formalize team/capacity, tooling, and quality APIs so the new dashboard cards stop depending on controlled overrides.
+5. Formalize team/capacity, tooling, quality, and provider-linked tooling APIs so the new dashboard cards stop depending on controlled overrides.
 6. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
 
 ## Agent Working Notes

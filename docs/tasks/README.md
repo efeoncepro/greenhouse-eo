@@ -1,30 +1,62 @@
 # Codex Tasks
 
-Indice de briefs y tasks de implementacion del repo.
+Panel operativo de briefs `CODEX_TASK_*` del repo.
 
-## Lista
+## Estados
+
+- `in-progress`: trabajo activo o parcialmente implementado que sigue abierto.
+- `to-do`: brief vigente, alineado o por alinear, pero sin ejecución cerrada en el repo actual.
+- `complete`: task cerrada, implementada, absorbida por otra versión o conservada como referencia histórica.
+
+## In Progress
 
 | Task | Foco |
 | --- | --- |
-| [CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md](CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md) | Landing interna y control tower |
-| [CODEX_TASK_Admin_Team_Module_v2.md](CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
-| [CODEX_TASK_Agency_Operator_Layer.md](CODEX_TASK_Agency_Operator_Layer.md) | Capa agency transversal |
-| [CODEX_TASK_Client_Dashboard_Redesign.md](CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
-| [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual dashboard |
-| [CODEX_TASK_Creative_Hub_Module.md](CODEX_TASK_Creative_Hub_Module.md) | Capability module Creative Hub |
-| [CODEX_TASK_Fix_Team_Capacity_Views.md](CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
-| [CODEX_TASK_Google_SSO_Greenhouse.md](CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
-| [CODEX_TASK_HR_Payroll_Module_v2.md](CODEX_TASK_HR_Payroll_Module_v2.md) | Modulo HR de nomina y compensacion |
-| [CODEX_TASK_Login_Page_Greenhouse.md](CODEX_TASK_Login_Page_Greenhouse.md) | UI de login |
-| [CODEX_TASK_Microsoft_SSO_Greenhouse.md](CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
-| [CODEX_TASK_People_Unified_View_v2.md](CODEX_TASK_People_Unified_View_v2.md) | Vista unificada de personas alineada al runtime real |
-| [CODEX_TASK_Space_Admin_View_Redesign.md](CODEX_TASK_Space_Admin_View_Redesign.md) | Vista admin de space |
-| [CODEX_TASK_Team_Identity_Capacity_System.md](CODEX_TASK_Team_Identity_Capacity_System.md) | Sistema de identidad y capacidad |
-| [CODEX_TASK_Tenant_Detail_View_Redesign.md](CODEX_TASK_Tenant_Detail_View_Redesign.md) | Detalle admin de tenant |
-| [CODEX_TASK_Typography_Hierarchy_Fix.md](CODEX_TASK_Typography_Hierarchy_Fix.md) | Jerarquía tipográfica |
+| [CODEX_TASK_Admin_Team_Module_v2.md](in-progress/CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
+| [CODEX_TASK_Financial_Module.md](in-progress/CODEX_TASK_Financial_Module.md) | Módulo Finance y sus gaps operativos restantes |
+
+## To Do
+
+| Task | Foco |
+| --- | --- |
+| [CODEX_TASK_AI_Tooling_Credit_System.md](to-do/CODEX_TASK_AI_Tooling_Credit_System.md) | AI tooling, licencias y créditos |
+| [CODEX_TASK_SCIM_User_Provisioning.md](to-do/CODEX_TASK_SCIM_User_Provisioning.md) | Provisioning SCIM desde Entra ID |
+| [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | Ajuste transversal de jerarquía tipográfica |
+
+## Complete
+
+| Task | Foco |
+| --- | --- |
+| [CODEX_TASKS_ALIGNMENT_UPDATE_v1.md](complete/CODEX_TASKS_ALIGNMENT_UPDATE_v1.md) | Alineación histórica de tasks con el repo real |
+| [CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md](complete/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md) | Landing interna y control tower |
+| [CODEX_TASK_Admin_Team_Module.md](complete/CODEX_TASK_Admin_Team_Module.md) | Brief histórico de Admin Team reemplazado por v2 |
+| [CODEX_TASK_Agency_Operator_Layer.md](complete/CODEX_TASK_Agency_Operator_Layer.md) | Capa agency transversal |
+| [CODEX_TASK_Client_Dashboard_Redesign.md](complete/CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
+| [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](complete/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual del dashboard cliente |
+| [CODEX_TASK_Creative_Hub_Module.md](complete/CODEX_TASK_Creative_Hub_Module.md) | Capability module Creative Hub |
+| [CODEX_TASK_Fix_Team_Capacity_Views.md](complete/CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
+| [CODEX_TASK_Google_SSO_Greenhouse.md](complete/CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
+| [CODEX_TASK_HR_Payroll_Module.md](complete/CODEX_TASK_HR_Payroll_Module.md) | Brief histórico de HR Payroll reemplazado por v2 |
+| [CODEX_TASK_HR_Payroll_Module_v2.md](complete/CODEX_TASK_HR_Payroll_Module_v2.md) | Módulo HR Payroll |
+| [CODEX_TASK_Login_Page_Greenhouse.md](complete/CODEX_TASK_Login_Page_Greenhouse.md) | UI de login Greenhouse |
+| [CODEX_TASK_Microsoft_SSO_Greenhouse.md](complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
+| [CODEX_TASK_People_Unified_View.md](complete/CODEX_TASK_People_Unified_View.md) | Brief histórico de People reemplazado por v2 |
+| [CODEX_TASK_People_Unified_View_v2.md](complete/CODEX_TASK_People_Unified_View_v2.md) | Vista unificada de personas |
+| [CODEX_TASK_Space_Admin_View_Redesign.md](complete/CODEX_TASK_Space_Admin_View_Redesign.md) | Brief histórico de vista admin de space |
+| [CODEX_TASK_Team_Identity_Capacity_System.md](complete/CODEX_TASK_Team_Identity_Capacity_System.md) | Sistema de identidad y capacidad |
+| [CODEX_TASK_Tenant_Detail_View_Redesign.md](complete/CODEX_TASK_Tenant_Detail_View_Redesign.md) | Detalle admin de tenant |
 
 ## Regla operativa
 
-- Mantener todos los `CODEX_TASK_*` juntos en esta carpeta.
-- No asumir que un task esta vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
-- Toda task nueva o reactivada debe alinearse con `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` para evitar identidades paralelas y diseño por silos.
+- Mantener todos los `CODEX_TASK_*` dentro de `docs/tasks/` y sus subcarpetas de estado.
+- Los briefs vivos del proyecto deben quedar versionados dentro de `docs/tasks/**`; no usar archivos sueltos en raíz como source of truth.
+- No asumir que un task está vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
+- Toda `CODEX_TASK_*` nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse.
+- Revisión mínima obligatoria para cualquier `CODEX_TASK_*`:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- Además de esa base, cada task debe contrastarse con la arquitectura especializada que le corresponda.
+  - ejemplos: `FINANCE_CANONICAL_360_V1.md`, `GREENHOUSE_SERVICE_MODULES_V1.md`, `GREENHOUSE_IDENTITY_ACCESS_V1.md`, `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Si una task contradice la arquitectura vigente, no debe ejecutarse tal cual.
+  - primero se corrige la task
+  - o se documenta explícitamente la nueva decisión arquitectónica antes de implementar

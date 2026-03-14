@@ -30,11 +30,20 @@ const SERVICE_LINE_LABELS: Record<string, string> = {
 const SERVICE_LINES = Object.keys(SERVICE_LINE_LABELS)
 
 interface ClientOption {
+  clientId: string
   clientProfileId: string
   hubspotCompanyId: string | null
+  companyName: string | null
+  greenhouseClientName: string | null
   legalName: string | null
   paymentCurrency: string
 }
+
+const getClientOptionLabel = (client: ClientOption) =>
+  client.legalName || client.companyName || client.greenhouseClientName || client.clientProfileId || client.clientId
+
+const getIncomeClientName = (client: ClientOption) =>
+  client.greenhouseClientName || client.companyName || client.legalName || client.clientProfileId || client.clientId
 
 type Props = {
   open: boolean
@@ -60,36 +69,48 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   // Client dropdown data
   const [clients, setClients] = useState<ClientOption[]>([])
   const [loadingClients, setLoadingClients] = useState(false)
+  const [clientsError, setClientsError] = useState<string | null>(null)
 
   const fetchClients = useCallback(async () => {
     setLoadingClients(true)
+    setClientsError(null)
 
     try {
-      const res = await fetch('/api/finance/clients')
+      const res = await fetch('/api/finance/clients', { cache: 'no-store' })
 
       if (res.ok) {
         const data = await res.json()
 
         setClients(data.items ?? [])
+
+        return
       }
+
+      const data = await res.json().catch(() => ({}))
+
+      setClients([])
+      setClientsError(data.error || `No pudimos cargar los clientes (${res.status}).`)
+    } catch {
+      setClients([])
+      setClientsError('No pudimos cargar los clientes. Revisa la conexión o intenta nuevamente.')
     } finally {
       setLoadingClients(false)
     }
   }, [])
 
   useEffect(() => {
-    if (open && clients.length === 0) {
+    if (open) {
       fetchClients()
     }
-  }, [open, clients.length, fetchClients])
+  }, [open, fetchClients])
 
-  const handleClientChange = (clientProfileId: string) => {
-    setSelectedClientId(clientProfileId)
+  const handleClientChange = (selectedValue: string) => {
+    setSelectedClientId(selectedValue)
 
-    const client = clients.find(c => c.clientProfileId === clientProfileId)
+    const client = clients.find(c => (c.clientId || c.clientProfileId) === selectedValue)
 
     if (client) {
-      setClientName(client.legalName || client.clientProfileId)
+      setClientName(getIncomeClientName(client))
       setHubspotCompanyId(client.hubspotCompanyId || '')
 
       if (client.paymentCurrency && !currency) {
@@ -138,10 +159,13 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
     setError(null)
 
     const amount = Number(totalAmount)
+    const selectedClient = clients.find(c => (c.clientId || c.clientProfileId) === selectedClientId)
 
     const body = {
       description: description.trim(),
       clientName: clientName.trim(),
+      ...(selectedClient?.clientId && { clientId: selectedClient.clientId }),
+      ...(selectedClient?.clientProfileId && { clientProfileId: selectedClient.clientProfileId }),
       currency,
       subtotal: amount,
       totalAmount: amount,
@@ -198,6 +222,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
 
       <Stack spacing={3} sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
         {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
+        {clientsError && <Alert severity='warning' onClose={() => setClientsError(null)}>{clientsError}</Alert>}
 
         <CustomTextField
           fullWidth
@@ -217,10 +242,16 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
           required
           disabled={loadingClients}
         >
-          <MenuItem value=''>{loadingClients ? 'Cargando...' : '— Seleccionar cliente —'}</MenuItem>
+          <MenuItem value=''>
+            {loadingClients
+              ? 'Cargando...'
+              : clients.length === 0
+                ? 'No hay clientes disponibles'
+                : '— Seleccionar cliente —'}
+          </MenuItem>
           {clients.map(c => (
-            <MenuItem key={c.clientProfileId} value={c.clientProfileId}>
-              {c.legalName || c.clientProfileId}
+            <MenuItem key={c.clientId || c.clientProfileId} value={c.clientId || c.clientProfileId}>
+              {getClientOptionLabel(c)}
             </MenuItem>
           ))}
         </CustomTextField>

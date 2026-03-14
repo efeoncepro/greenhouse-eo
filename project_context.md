@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Task board reorganization
+- `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.
+- Regla operativa nueva:
+  - las `CODEX_TASK_*` se ordenan en paneles `in-progress`, `to-do` y `complete`
+  - `docs/tasks/README.md` es la vista maestra del board y la única entrada obligatoria para entender estado vigente de tasks
+  - `complete` puede incluir tasks implementadas, absorbidas por una v2 o mantenidas como referencia histórica cerrada
+- Regla de versionado nueva:
+  - los briefs `CODEX_TASK_*` vigentes del proyecto deben vivir dentro de `docs/tasks/**`
+  - el patrón ignorado `CODEX_TASK_*.md` ya no debe ocultar los documentos bajo `docs/tasks/`; queda reservado solo para scratch local en raíz
+- Restricción operativa nueva:
+  - mover una task entre paneles requiere contraste con repo real + `project_context.md` + `Handoff.md` + `changelog.md`, no solo intuición
+
+## Delta 2026-03-14 Provider canonical object alignment
+- La arquitectura 360 ya no debe tratar `provider`, `vendor` o `supplier` como conceptos intercambiables.
+- Regla operativa nueva:
+  - `Provider` pasa a reconocerse como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin
+  - ancla recomendada: `greenhouse.providers.provider_id`
+  - `fin_suppliers` debe tratarse como extensión financiera del Provider, no como identidad global del vendor
+  - `vendor` libre puede existir como snapshot/display label, pero no como relación primaria cuando el vínculo de proveedor sea reusable entre módulos
+- Impacto inmediato en diseño:
+  - la task de `AI Tooling & Credit System` debe relacionar `ai_tool_catalog` con `provider_id`
+  - futuras relaciones de licencias, wallets, costos y mapeos de identidad deben resolver contra `provider_id` cuando aplique
+
 ## Delta 2026-03-14 Greenhouse 360 object model
 - El repo ahora formaliza una regla de arquitectura transversal: Greenhouse debe evolucionar como plataforma de `objetos canónicos enriquecidos`, no como módulos con identidades paralelas por silo.
 - Documento canónico nuevo:
@@ -162,7 +185,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/roadmap/`
   - `docs/operations/`
   - `docs/tasks/`
-- `docs/README.md` es el mapa maestro y `docs/tasks/README.md` concentra el indice de briefs `CODEX_TASK_*`.
+- `docs/README.md` es el mapa maestro y `docs/tasks/README.md` concentra el board de briefs `CODEX_TASK_*`.
+- Estructura viva de tasks:
+  - `docs/tasks/in-progress/`
+  - `docs/tasks/to-do/`
+  - `docs/tasks/complete/`
 
 ## Delta 2026-03-14 Agency data hydration correction
 - La capa `agency` ya no debe asumir que toda la senal operativa vive solo en `notion_project_ids` ni filtrar `greenhouse.clients` por `tenant_type`.
@@ -247,7 +274,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el modelo ya existe y la UI lo expresa como `en configuracion`
 
 ## Delta 2026-03-13 Team identity and capacity runtime
-- Se implemento una primera capa real del task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
+- Se implemento una primera capa real del task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
   - `GET /api/team/members`
   - `GET /api/team/capacity`
   - `GET /api/team/by-project/[projectId]`
@@ -270,7 +297,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
   - Ese repo no existe en este workspace.
   - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
-- El task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
+- El task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
   - La especificacion se alineo al contrato real verificado en `notion_ops.tareas`:
     - `responsables_names`
     - `responsables_ids`
