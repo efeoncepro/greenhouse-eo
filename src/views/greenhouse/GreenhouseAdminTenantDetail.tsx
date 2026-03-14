@@ -104,12 +104,12 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   // ─── Header ─────────────────────────────────────────────────────────────────
 
   const headerSection = (
-    <Grid size={{ xs: 12 }}>
-      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
-        <CardContent sx={{ p: { xs: 3, md: 5 } }}>
-          <Grid container spacing={5} alignItems='flex-start'>
-            {/* Identity */}
-            <Grid size={{ xs: 12, lg: 5 }}>
+    <>
+      {/* Identity + Actions */}
+      <Grid size={{ xs: 12 }}>
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardContent sx={{ p: { xs: 3, md: 5 } }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between'>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', sm: 'center' }}>
                 <IdentityImageUploader
                   alt={data.clientName}
@@ -128,7 +128,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   variant='rounded'
                   color={tenantStatusTone(data.status, data.active)}
                 />
-                <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
+                <Stack spacing={1.5}>
                   <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
                     <Typography variant='h4' sx={{ fontWeight: 700 }}>{data.clientName}</Typography>
                     <CustomChip
@@ -162,43 +162,17 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   </Stack>
                 </Stack>
               </Stack>
-            </Grid>
-
-            {/* KPIs */}
-            <Grid size={{ xs: 12, lg: 5 }}>
-              <Grid container spacing={3}>
-                {usersKpis.map(kpi => (
-                  <Grid key={kpi.title} size={{ xs: 6 }}>
-                    <HorizontalWithSubtitle
-                      title={kpi.title}
-                      stats={kpi.stats}
-                      avatarIcon={kpi.avatarIcon}
-                      avatarColor={kpi.avatarColor}
-                      subtitle={kpi.subtitle}
-                      {...(kpi.statusLabel ? { statusLabel: kpi.statusLabel, statusColor: kpi.statusColor } : {})}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-
-            {/* Actions */}
-            <Grid size={{ xs: 12, lg: 2 }}>
-              <Stack spacing={1.5} alignItems={{ xs: 'flex-start', lg: 'flex-end' }}>
+              <Stack direction='row' spacing={1.5} alignItems='center'>
                 <Button
                   component={Link}
                   href={`/admin/tenants/${data.clientId}/view-as/dashboard`}
                   variant='contained'
-                  fullWidth
-                  sx={{ maxWidth: 200 }}
                 >
                   {GH_INTERNAL_MESSAGES.admin_tenant_detail_view_as_client}
                 </Button>
                 <Button
                   variant='tonal'
                   color='warning'
-                  fullWidth
-                  sx={{ maxWidth: 200 }}
                   onClick={handleCapabilitySave}
                   disabled={isSavingCapabilities}
                   startIcon={isSavingCapabilities ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
@@ -230,11 +204,25 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                   ]}
                 />
               </Stack>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-    </Grid>
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* KPIs */}
+      {usersKpis.map(kpi => (
+        <Grid key={kpi.title} size={{ xs: 12, sm: 6, md: 3 }}>
+          <HorizontalWithSubtitle
+            title={kpi.title}
+            stats={kpi.stats}
+            avatarIcon={kpi.avatarIcon}
+            avatarColor={kpi.avatarColor}
+            subtitle={kpi.subtitle}
+            {...(kpi.statusLabel ? { statusLabel: kpi.statusLabel, statusColor: kpi.statusColor } : {})}
+          />
+        </Grid>
+      ))}
+    </>
   )
 
   // ─── Root ─────────────────────────────────────────────────────────────────────

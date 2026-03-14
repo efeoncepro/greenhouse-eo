@@ -7,7 +7,7 @@ import Link from 'next/link'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
+import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
@@ -24,6 +24,7 @@ import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
@@ -119,8 +120,8 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
             <div className='flex items-center gap-2 flex-wrap'>
-              <Chip size='small' variant='tonal' color={userStatusTone(row.original.status)} label={toTitleCase(row.original.status)} />
-              <Chip size='small' variant='outlined' label={toTitleCase(row.original.authMode)} />
+              <CustomChip round='true' size='small' variant='tonal' color={userStatusTone(row.original.status)} label={toTitleCase(row.original.status)} />
+              <CustomChip round='true' size='small' variant='tonal' color='secondary' label={toTitleCase(row.original.authMode)} />
             </div>
             <Typography variant='body2' color='text.secondary'>
               {row.original.hubspotContactIds.length > 0
@@ -205,35 +206,35 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
 
   return (
     <>
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-        <HorizontalWithSubtitle
-          title={GH_INTERNAL_MESSAGES.admin_tenant_users_active}
-          stats={String(activeCount)}
-          avatarIcon='tabler-user-check'
-          avatarColor='success'
-          trend='neutral'
-          trendNumber='0'
-          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_active_subtitle}
-        />
-        <HorizontalWithSubtitle
-          title={GH_INTERNAL_MESSAGES.admin_tenant_users_invited}
-          stats={String(invitedCount)}
-          avatarIcon='tabler-mail-forward'
-          avatarColor='warning'
-          trend='neutral'
-          trendNumber='0'
-          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_invited_subtitle}
-        />
-        <HorizontalWithSubtitle
-          title={GH_INTERNAL_MESSAGES.admin_tenant_users_total}
-          stats={String(users.length)}
-          avatarIcon='tabler-users'
-          avatarColor='primary'
-          trend='neutral'
-          trendNumber='0'
-          subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_total_subtitle}
-        />
-      </div>
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title={GH_INTERNAL_MESSAGES.admin_tenant_users_active}
+            stats={String(activeCount)}
+            avatarIcon='tabler-user-check'
+            avatarColor='success'
+            subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_active_subtitle}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title={GH_INTERNAL_MESSAGES.admin_tenant_users_invited}
+            stats={String(invitedCount)}
+            avatarIcon='tabler-mail-forward'
+            avatarColor='warning'
+            subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_invited_subtitle}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title={GH_INTERNAL_MESSAGES.admin_tenant_users_total}
+            stats={String(users.length)}
+            avatarIcon='tabler-users'
+            avatarColor='primary'
+            subtitle={GH_INTERNAL_MESSAGES.admin_tenant_users_total_subtitle}
+          />
+        </Grid>
+      </Grid>
 
       <Card>
         <CardHeader title={GH_INTERNAL_MESSAGES.admin_tenant_users_title} subheader={GH_INTERNAL_MESSAGES.admin_tenant_users_subtitle} />
