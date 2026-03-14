@@ -8,7 +8,9 @@ import {
   assertNonEmptyString,
   assertValidCurrency,
   normalizeString,
+  toDateString,
   toNumber,
+  toTimestampString,
   FinanceValidationError,
   PAYMENT_STATUSES,
   SERVICE_LINES,
@@ -17,6 +19,110 @@ import {
 } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
+
+interface IncomeDetailRow {
+  income_id: string
+  client_profile_id: string | null
+  hubspot_company_id: string | null
+  hubspot_deal_id: string | null
+  client_name: string
+  invoice_number: string | null
+  invoice_date: unknown
+  due_date: unknown
+  currency: string
+  subtotal: unknown
+  tax_rate: unknown
+  tax_amount: unknown
+  total_amount: unknown
+  exchange_rate_to_clp: unknown
+  total_amount_clp: unknown
+  payment_status: string
+  amount_paid: unknown
+  payments_received: unknown
+  po_number: string | null
+  hes_number: string | null
+  service_line: string | null
+  income_type: string | null
+  description: string | null
+  is_reconciled: boolean
+  reconciliation_id: string | null
+  notes: string | null
+  created_by: string | null
+  created_at: unknown
+  updated_at: unknown
+}
+
+const parsePaymentsReceived = (value: unknown) => {
+  try {
+    if (!value) {
+      return []
+    }
+
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value
+
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+const normalizeIncomeDetail = (row: IncomeDetailRow) => ({
+  incomeId: normalizeString(row.income_id),
+  clientProfileId: row.client_profile_id ? normalizeString(row.client_profile_id) : null,
+  hubspotCompanyId: row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null,
+  hubspotDealId: row.hubspot_deal_id ? normalizeString(row.hubspot_deal_id) : null,
+  clientName: normalizeString(row.client_name),
+  invoiceNumber: row.invoice_number ? normalizeString(row.invoice_number) : null,
+  invoiceDate: toDateString(row.invoice_date as string | { value?: string } | null),
+  dueDate: toDateString(row.due_date as string | { value?: string } | null),
+  currency: normalizeString(row.currency),
+  subtotal: toNumber(row.subtotal),
+  taxRate: toNumber(row.tax_rate),
+  taxAmount: toNumber(row.tax_amount),
+  totalAmount: toNumber(row.total_amount),
+  exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+  totalAmountClp: toNumber(row.total_amount_clp),
+  paymentStatus: normalizeString(row.payment_status),
+  amountPaid: toNumber(row.amount_paid),
+  amountPending: toNumber(row.total_amount) - toNumber(row.amount_paid),
+  paymentsReceived: parsePaymentsReceived(row.payments_received),
+  poNumber: row.po_number ? normalizeString(row.po_number) : null,
+  hesNumber: row.hes_number ? normalizeString(row.hes_number) : null,
+  serviceLine: row.service_line ? normalizeString(row.service_line) : null,
+  incomeType: row.income_type ? normalizeString(row.income_type) : null,
+  description: row.description ? normalizeString(row.description) : null,
+  isReconciled: Boolean(row.is_reconciled),
+  reconciliationId: row.reconciliation_id ? normalizeString(row.reconciliation_id) : null,
+  notes: row.notes ? normalizeString(row.notes) : null,
+  createdBy: row.created_by ? normalizeString(row.created_by) : null,
+  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+  updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+})
+
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  await ensureFinanceInfrastructure()
+
+  const { id: incomeId } = await params
+  const projectId = getFinanceProjectId()
+
+  const rows = await runFinanceQuery<IncomeDetailRow>(`
+    SELECT *
+    FROM \`${projectId}.greenhouse.fin_income\`
+    WHERE income_id = @incomeId
+  `, { incomeId })
+
+  if (rows.length === 0) {
+    return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+  }
+
+  return NextResponse.json(normalizeIncomeDetail(rows[0]))
+}
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()

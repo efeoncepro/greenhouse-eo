@@ -21,17 +21,16 @@ import CustomTextField from '@core/components/mui/TextField'
 
 const TAX_ID_TYPES = [
   { value: 'RUT', label: 'RUT' },
-  { value: 'RFC', label: 'RFC' },
   { value: 'NIT', label: 'NIT' },
+  { value: 'RFC', label: 'RFC' },
+  { value: 'RUC', label: 'RUC' },
   { value: 'EIN', label: 'EIN' },
-  { value: 'VAT', label: 'VAT' },
-  { value: 'other', label: 'Otro' }
+  { value: 'OTHER', label: 'Otro' }
 ]
 
 const CURRENCIES = [
   { value: 'CLP', label: 'CLP' },
-  { value: 'USD', label: 'USD' },
-  { value: 'EUR', label: 'EUR' }
+  { value: 'USD', label: 'USD' }
 ]
 
 type Props = {

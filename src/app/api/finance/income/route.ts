@@ -17,6 +17,8 @@ import {
   FinanceValidationError,
   PAYMENT_STATUSES,
   SERVICE_LINES,
+  buildMonthlySequenceId,
+  resolveExchangeRateToClp,
   type PaymentStatus,
   type ServiceLine
 } from '@/lib/finance/shared'
@@ -172,12 +174,18 @@ export async function POST(request: Request) {
     const taxRate = toNumber(body.taxRate ?? 0.19)
     const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
     const totalAmount = toNumber(body.totalAmount) || subtotal + taxAmount
-    const exchangeRateToClp = toNumber(body.exchangeRateToClp) || (currency === 'CLP' ? 1 : 0)
+    const exchangeRateToClp = await resolveExchangeRateToClp({ currency, requestedRate: body.exchangeRateToClp })
     const totalAmountClp = toNumber(body.totalAmountClp) || totalAmount * exchangeRateToClp
 
-    const now = new Date()
+    const period = invoiceDate.slice(0, 7).replace('-', '')
+
     const incomeId = normalizeString(body.incomeId) ||
-      `INC-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${String(Date.now()).slice(-6)}`
+      await buildMonthlySequenceId({
+        tableName: 'fin_income',
+        idColumn: 'income_id',
+        prefix: 'INC',
+        period
+      })
 
     const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
       ? (body.serviceLine as ServiceLine)

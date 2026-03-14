@@ -9,6 +9,8 @@ import {
   assertValidCurrency,
   normalizeString,
   toNumber,
+  toDateString,
+  toTimestampString,
   FinanceValidationError,
   EXPENSE_TYPES,
   EXPENSE_PAYMENT_STATUSES,
@@ -21,6 +23,119 @@ import {
 } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
+
+interface ExpenseDetailRow {
+  expense_id: string
+  expense_type: string
+  description: string
+  currency: string
+  subtotal: unknown
+  tax_rate: unknown
+  tax_amount: unknown
+  total_amount: unknown
+  exchange_rate_to_clp: unknown
+  total_amount_clp: unknown
+  payment_date: unknown
+  payment_status: string
+  payment_method: string | null
+  payment_account_id: string | null
+  payment_reference: string | null
+  document_number: string | null
+  document_date: unknown
+  due_date: unknown
+  supplier_id: string | null
+  supplier_name: string | null
+  supplier_invoice_number: string | null
+  payroll_period_id: string | null
+  payroll_entry_id: string | null
+  member_id: string | null
+  member_name: string | null
+  social_security_type: string | null
+  social_security_institution: string | null
+  social_security_period: string | null
+  tax_type: string | null
+  tax_period: string | null
+  tax_form_number: string | null
+  miscellaneous_category: string | null
+  service_line: string | null
+  is_recurring: boolean
+  recurrence_frequency: string | null
+  is_reconciled: boolean
+  reconciliation_id: string | null
+  notes: string | null
+  created_by: string | null
+  created_at: unknown
+  updated_at: unknown
+}
+
+const normalizeExpenseDetail = (row: ExpenseDetailRow) => ({
+  expenseId: normalizeString(row.expense_id),
+  expenseType: normalizeString(row.expense_type),
+  description: normalizeString(row.description),
+  currency: normalizeString(row.currency),
+  subtotal: toNumber(row.subtotal),
+  taxRate: toNumber(row.tax_rate),
+  taxAmount: toNumber(row.tax_amount),
+  totalAmount: toNumber(row.total_amount),
+  exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+  totalAmountClp: toNumber(row.total_amount_clp),
+  paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
+  paymentStatus: normalizeString(row.payment_status),
+  paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+  paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
+  paymentReference: row.payment_reference ? normalizeString(row.payment_reference) : null,
+  documentNumber: row.document_number ? normalizeString(row.document_number) : null,
+  documentDate: toDateString(row.document_date as string | { value?: string } | null),
+  dueDate: toDateString(row.due_date as string | { value?: string } | null),
+  supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
+  supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
+  supplierInvoiceNumber: row.supplier_invoice_number ? normalizeString(row.supplier_invoice_number) : null,
+  payrollPeriodId: row.payroll_period_id ? normalizeString(row.payroll_period_id) : null,
+  payrollEntryId: row.payroll_entry_id ? normalizeString(row.payroll_entry_id) : null,
+  memberId: row.member_id ? normalizeString(row.member_id) : null,
+  memberName: row.member_name ? normalizeString(row.member_name) : null,
+  socialSecurityType: row.social_security_type ? normalizeString(row.social_security_type) : null,
+  socialSecurityInstitution: row.social_security_institution ? normalizeString(row.social_security_institution) : null,
+  socialSecurityPeriod: row.social_security_period ? normalizeString(row.social_security_period) : null,
+  taxType: row.tax_type ? normalizeString(row.tax_type) : null,
+  taxPeriod: row.tax_period ? normalizeString(row.tax_period) : null,
+  taxFormNumber: row.tax_form_number ? normalizeString(row.tax_form_number) : null,
+  miscellaneousCategory: row.miscellaneous_category ? normalizeString(row.miscellaneous_category) : null,
+  serviceLine: row.service_line ? normalizeString(row.service_line) : null,
+  isRecurring: Boolean(row.is_recurring),
+  recurrenceFrequency: row.recurrence_frequency ? normalizeString(row.recurrence_frequency) : null,
+  isReconciled: Boolean(row.is_reconciled),
+  reconciliationId: row.reconciliation_id ? normalizeString(row.reconciliation_id) : null,
+  notes: row.notes ? normalizeString(row.notes) : null,
+  createdBy: row.created_by ? normalizeString(row.created_by) : null,
+  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+  updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+})
+
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  await ensureFinanceInfrastructure()
+
+  const { id: expenseId } = await params
+  const projectId = getFinanceProjectId()
+
+  const rows = await runFinanceQuery<ExpenseDetailRow>(`
+    SELECT *
+    FROM \`${projectId}.greenhouse.fin_expenses\`
+    WHERE expense_id = @expenseId
+  `, { expenseId })
+
+  if (rows.length === 0) {
+    return NextResponse.json({ error: 'Expense record not found' }, { status: 404 })
+  }
+
+  return NextResponse.json(normalizeExpenseDetail(rows[0]))
+}
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()

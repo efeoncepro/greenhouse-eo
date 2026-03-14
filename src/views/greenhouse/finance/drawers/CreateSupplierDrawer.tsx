@@ -20,30 +20,29 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 const CATEGORIES = [
-  { value: 'technology', label: 'Tecnología' },
-  { value: 'professional_services', label: 'Servicios profesionales' },
-  { value: 'marketing', label: 'Marketing' },
-  { value: 'office', label: 'Oficina' },
+  { value: 'software', label: 'Software' },
   { value: 'infrastructure', label: 'Infraestructura' },
+  { value: 'professional_services', label: 'Servicios profesionales' },
+  { value: 'media', label: 'Medios' },
+  { value: 'creative', label: 'Creativo' },
   { value: 'hr_services', label: 'RRHH' },
-  { value: 'legal', label: 'Legal' },
-  { value: 'financial', label: 'Financiero' },
+  { value: 'office', label: 'Oficina' },
+  { value: 'legal_accounting', label: 'Legal y contable' },
   { value: 'other', label: 'Otro' }
 ]
 
 const TAX_ID_TYPES = [
   { value: 'RUT', label: 'RUT' },
-  { value: 'RFC', label: 'RFC' },
   { value: 'NIT', label: 'NIT' },
+  { value: 'RFC', label: 'RFC' },
+  { value: 'RUC', label: 'RUC' },
   { value: 'EIN', label: 'EIN' },
-  { value: 'VAT', label: 'VAT' },
-  { value: 'other', label: 'Otro' }
+  { value: 'OTHER', label: 'Otro' }
 ]
 
 const CURRENCIES = [
   { value: 'CLP', label: 'CLP' },
-  { value: 'USD', label: 'USD' },
-  { value: 'EUR', label: 'EUR' }
+  { value: 'USD', label: 'USD' }
 ]
 
 type Props = {

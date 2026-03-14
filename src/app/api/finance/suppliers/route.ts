@@ -14,6 +14,7 @@ import {
   FinanceValidationError,
   SUPPLIER_CATEGORIES,
   PAYMENT_METHODS,
+  assertValidTaxIdType,
   type SupplierCategory,
   type PaymentMethod
 } from '@/lib/finance/shared'
@@ -161,9 +162,11 @@ export async function POST(request: Request) {
     const supplierId = normalizeString(body.supplierId) ||
       legalName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
-    const category = SUPPLIER_CATEGORIES.includes(body.category)
-      ? (body.category as SupplierCategory)
-      : 'other'
+    if (!SUPPLIER_CATEGORIES.includes(body.category)) {
+      throw new FinanceValidationError(`Invalid category: ${normalizeString(body.category)}.`)
+    }
+
+    const category = body.category as SupplierCategory
 
     const paymentCurrency = body.paymentCurrency
       ? assertValidCurrency(body.paymentCurrency)
@@ -198,7 +201,7 @@ export async function POST(request: Request) {
       legalName,
       tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
       taxId: body.taxId ? normalizeString(body.taxId) : null,
-      taxIdType: body.taxIdType ? normalizeString(body.taxIdType) : 'RUT',
+      taxIdType: body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT',
       country: normalizeString(body.country) || 'CL',
       category,
       serviceType: body.serviceType ? normalizeString(body.serviceType) : null,

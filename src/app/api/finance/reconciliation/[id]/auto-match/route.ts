@@ -30,6 +30,39 @@ interface TransactionCandidate {
   description: string
 }
 
+const amountMatches = (statementAmount: number, candidateAmount: number) => Math.abs(statementAmount - candidateAmount) <= 1
+
+const dateMatchesWithinWindow = (statementDate: string | null, candidateDate: string | null, windowDays = 3) => {
+  if (!statementDate || !candidateDate) {
+    return false
+  }
+
+  const statementTime = new Date(`${statementDate}T00:00:00Z`).getTime()
+  const candidateTime = new Date(`${candidateDate}T00:00:00Z`).getTime()
+
+  if (!Number.isFinite(statementTime) || !Number.isFinite(candidateTime)) {
+    return false
+  }
+
+  return Math.abs(statementTime - candidateTime) <= windowDays * 24 * 60 * 60 * 1000
+}
+
+const hasPartialReferenceMatch = (statementText: string, candidateReference: string | null) => {
+  if (!statementText || !candidateReference) {
+    return false
+  }
+
+  const normalizedReference = candidateReference.toLowerCase()
+
+  if (statementText.includes(normalizedReference) || normalizedReference.includes(statementText)) {
+    return true
+  }
+
+  const shortReference = normalizedReference.slice(0, Math.min(4, normalizedReference.length))
+
+  return shortReference.length >= 4 && statementText.includes(shortReference)
+}
+
 /**
  * Auto-match algorithm (reference-first):
  *  1. Reference match → 0.95 confidence (auto-match)
@@ -122,52 +155,41 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     for (const row of unmatchedRows) {
       const rowAmount = toNumber(row.amount)
       const rowDate = toDateString(row.transaction_date as string | { value?: string } | null)
-      const rowRef = row.reference ? normalizeString(row.reference).toLowerCase() : ''
-
+      const rowText = `${normalizeString(row.description)} ${row.reference ? normalizeString(row.reference) : ''}`.trim().toLowerCase()
       let bestMatch: { candidate: TransactionCandidate; confidence: number } | null = null
+      let bestMatchCount = 0
 
       for (const candidate of candidates) {
         if (matchedCandidateIds.has(candidate.id)) continue
 
-        const amountMatch = Math.abs(rowAmount - candidate.amount) < 1 // within 1 unit tolerance
+        const amountMatch = amountMatches(rowAmount, candidate.amount)
 
         if (!amountMatch) continue
 
-        // Level 1: Reference exact match → 0.95
-        if (rowRef && candidate.reference) {
-          const candidateRef = candidate.reference.toLowerCase()
+        const dateMatch = dateMatchesWithinWindow(rowDate, candidate.date)
+        let confidence = 0
 
-          if (rowRef.includes(candidateRef) || candidateRef.includes(rowRef)) {
-            bestMatch = { candidate, confidence: 0.95 }
-            break // Best possible match
-          }
+        if (rowText.includes(candidate.id.toLowerCase()) || hasPartialReferenceMatch(rowText, candidate.reference)) {
+          confidence = 0.95
+        } else if (dateMatch && hasPartialReferenceMatch(rowText, candidate.reference)) {
+          confidence = 0.85
+        } else if (dateMatch) {
+          confidence = 0.70
         }
 
-        // Level 2: Amount + date + partial reference → 0.85
-        const dateMatch = rowDate && candidate.date && rowDate === candidate.date
-
-        if (dateMatch && rowRef && candidate.reference) {
-          const candidateRef = candidate.reference.toLowerCase()
-          const partialRefMatch = rowRef.includes(candidateRef.slice(0, 4)) || candidateRef.includes(rowRef.slice(0, 4))
-
-          if (partialRefMatch) {
-            if (!bestMatch || bestMatch.confidence < 0.85) {
-              bestMatch = { candidate, confidence: 0.85 }
-            }
-
-            continue
-          }
+        if (confidence === 0) {
+          continue
         }
 
-        // Level 3: Amount + date only → 0.70 (suggest)
-        if (dateMatch) {
-          if (!bestMatch || bestMatch.confidence < 0.70) {
-            bestMatch = { candidate, confidence: 0.70 }
-          }
+        if (!bestMatch || confidence > bestMatch.confidence) {
+          bestMatch = { candidate, confidence }
+          bestMatchCount = 1
+        } else if (bestMatch && confidence === bestMatch.confidence) {
+          bestMatchCount += 1
         }
       }
 
-      if (bestMatch) {
+      if (bestMatch && bestMatchCount === 1) {
         const autoMatch = bestMatch.confidence >= 0.85
         const newStatus = autoMatch ? 'matched' : 'suggested'
 

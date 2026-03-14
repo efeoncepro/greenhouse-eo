@@ -7,7 +7,6 @@ import {
   getFinanceProjectId,
   assertNonEmptyString,
   assertValidCurrency,
-  assertDateString,
   assertPositiveAmount,
   normalizeString,
   normalizeBoolean,
@@ -19,6 +18,8 @@ import {
   EXPENSE_PAYMENT_STATUSES,
   PAYMENT_METHODS,
   SERVICE_LINES,
+  buildMonthlySequenceId,
+  resolveExchangeRateToClp,
   type ExpenseType,
   type ExpensePaymentStatus,
   type PaymentMethod,
@@ -189,12 +190,19 @@ export async function POST(request: Request) {
     const taxRate = toNumber(body.taxRate ?? 0)
     const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
     const totalAmount = toNumber(body.totalAmount) || subtotal + taxAmount
-    const exchangeRateToClp = toNumber(body.exchangeRateToClp) || (currency === 'CLP' ? 1 : 0)
+    const exchangeRateToClp = await resolveExchangeRateToClp({ currency, requestedRate: body.exchangeRateToClp })
     const totalAmountClp = toNumber(body.totalAmountClp) || totalAmount * exchangeRateToClp
 
-    const now = new Date()
+    const periodSource = normalizeString(body.documentDate || body.paymentDate) || new Date().toISOString().slice(0, 10)
+    const period = periodSource.slice(0, 7).replace('-', '')
+
     const expenseId = normalizeString(body.expenseId) ||
-      `EXP-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${String(Date.now()).slice(-6)}`
+      await buildMonthlySequenceId({
+        tableName: 'fin_expenses',
+        idColumn: 'expense_id',
+        prefix: 'EXP',
+        period
+      })
 
     const paymentStatus = body.paymentStatus && EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
       ? (body.paymentStatus as ExpensePaymentStatus) : 'pending'

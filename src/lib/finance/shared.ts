@@ -153,6 +153,16 @@ export type SupplierCategory = (typeof SUPPLIER_CATEGORIES)[number]
 export const TAX_ID_TYPES = ['RUT', 'NIT', 'RFC', 'RUC', 'EIN', 'OTHER'] as const
 export type TaxIdType = (typeof TAX_ID_TYPES)[number]
 
+export const assertValidTaxIdType = (taxIdType: unknown): TaxIdType => {
+  const upper = normalizeString(taxIdType).toUpperCase()
+
+  if (!TAX_ID_TYPES.includes(upper as TaxIdType)) {
+    throw new FinanceValidationError(`Invalid taxIdType: ${normalizeString(taxIdType)}.`)
+  }
+
+  return upper as TaxIdType
+}
+
 export const CONTACT_ROLES = ['procurement', 'accounts_payable', 'finance_director', 'controller', 'other'] as const
 export type ContactRole = (typeof CONTACT_ROLES)[number]
 
@@ -165,3 +175,78 @@ export const runFinanceQuery = async <T>(query: string, params?: Record<string, 
 }
 
 export const getFinanceProjectId = () => getBigQueryProjectId()
+
+export const getLatestExchangeRate = async ({
+  fromCurrency,
+  toCurrency
+}: {
+  fromCurrency: FinanceCurrency
+  toCurrency: FinanceCurrency
+}) => {
+  const projectId = getFinanceProjectId()
+
+  const rows = await runFinanceQuery<{ rate: unknown }>(`
+    SELECT rate
+    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
+    WHERE from_currency = @fromCurrency AND to_currency = @toCurrency
+    ORDER BY rate_date DESC
+    LIMIT 1
+  `, { fromCurrency, toCurrency })
+
+  const rate = toNumber(rows[0]?.rate)
+
+  return rate > 0 ? rate : null
+}
+
+export const resolveExchangeRateToClp = async ({
+  currency,
+  requestedRate
+}: {
+  currency: FinanceCurrency
+  requestedRate?: unknown
+}) => {
+  const normalizedRequestedRate = toNumber(requestedRate)
+
+  if (currency === 'CLP') {
+    return 1
+  }
+
+  if (normalizedRequestedRate > 0) {
+    return roundCurrency(normalizedRequestedRate)
+  }
+
+  const latestRate = await getLatestExchangeRate({ fromCurrency: currency, toCurrency: 'CLP' })
+
+  if (!latestRate) {
+    throw new FinanceValidationError(`Missing ${currency}/CLP exchange rate. Provide exchangeRateToClp or register a rate first.`, 409)
+  }
+
+  return roundCurrency(latestRate)
+}
+
+export const buildMonthlySequenceId = async ({
+  tableName,
+  idColumn,
+  prefix,
+  period
+}: {
+  tableName: string
+  idColumn: string
+  prefix: string
+  period: string
+}) => {
+  const projectId = getFinanceProjectId()
+
+  const rows = await runFinanceQuery<{ next_seq: unknown }>(`
+    SELECT COALESCE(MAX(CAST(REGEXP_EXTRACT(${idColumn}, @sequencePattern) AS INT64)), 0) + 1 AS next_seq
+    FROM \`${projectId}.greenhouse.${tableName}\`
+    WHERE REGEXP_CONTAINS(${idColumn}, @idPattern)
+  `, {
+    sequencePattern: `^${prefix}-${period}-(\\d{3})$`,
+    idPattern: `^${prefix}-${period}-\\d{3}$`
+  })
+
+  const nextSeq = Math.max(1, Math.trunc(toNumber(rows[0]?.next_seq)))
+
+  return `${prefix}-${period}-${String(nextSeq).padStart(3, '0')}`
+}
