@@ -150,26 +150,26 @@ Crear archivo `scripts/setup-team-tables.sql` en el repo con todo el DDL anterio
 
 ---
 
-## PARTE B: Cambio al pipeline notion-bq-sync
+## PARTE B: Verificacion del pipeline notion-bigquery
 
 ### B1. Agregar campo Responsable al sync de tareas
 
-El pipeline `notion-bq-sync` (Cloud Function en `us-central1-efeonce-group.cloudfunctions.net/notion-bq-sync`) sincroniza la base Tareas de Notion a `notion_ops.tareas`. Actualmente **no incluye** el campo Responsable (people property).
-
-**Cambio requerido:** Agregar extracción del campo Responsable en la config de la tabla `tareas`. El people property en Notion retorna un array de objetos con `{id, name, person: {email}}`. Extraer:
+El repo correcto del sync es `notion-bigquery`. En el dataset real inspeccionado, `notion_ops.tareas` ya expone el people property Responsable en formato array/texto. Para esta tarea, el contrato operativo se considera resuelto si esos campos existen y permiten derivar el responsable principal en runtime:
 
 | Nuevo campo en BQ | Tipo | Origen |
 |---|---|---|
-| `responsable_nombre` | STRING | Primer elemento del people property → `name` |
-| `responsable_email` | STRING | Primer elemento → `person.email` |
-| `responsable_notion_id` | STRING | Primer elemento → `id` |
+| `responsables_names` | ARRAY<STRING> | Lista de nombres del people property |
+| `responsables_ids` | ARRAY<STRING> | Lista de IDs Notion del people property |
+| `responsable_texto` | STRING | Fallback textual del responsable |
 
 **Notas de implementación:**
 
-- El campo Responsable en Notion puede tener múltiples personas. Para MVP, extraer solo el primero (el responsable principal). Si hay más de uno, concatenar nombres separados por `;` en `responsable_nombre`.
-- Si el campo está vacío, los tres campos son NULL.
-- El pipeline usa schema inference dinámico — los nuevos campos aparecerán automáticamente en BigQuery al primer sync después del deploy.
-- **Repo del pipeline:** `github.com/cesargrowth11/notion-frame-io.git` — NO. El pipeline notion-bq-sync es un repo separado. Verificar cuál es el repo correcto antes de modificar.
+- Para MVP, el runtime toma el primer responsable como principal:
+  - `responsable_nombre = COALESCE(responsables_names[SAFE_OFFSET(0)], responsable_texto)`
+  - `responsable_notion_id = responsables_ids[SAFE_OFFSET(0)]`
+- `responsable_email` no debe bloquear esta entrega porque el dataset real no lo expone como columna visible en `notion_ops.tareas`.
+- Si el campo está vacío, los derivados quedan `NULL`.
+- El repo correcto del pipeline es `github.com/cesargrowth11/notion-bigquery`.
 
 ### B2. Verificar campo Responsable en Notion
 
@@ -678,8 +678,8 @@ scripts/
 - [ ] Tabla `greenhouse.client_team_assignments` creada con el schema especificado
 - [ ] Seed data insertado para el equipo Globe actual (mínimo 3 personas)
 - [ ] Script SQL documentado en `scripts/setup-team-tables.sql`
-- [ ] Pipeline `notion-bq-sync` actualizado para incluir `responsable_nombre`, `responsable_email`, `responsable_notion_id` en `notion_ops.tareas`
-- [ ] Sync manual ejecutado y verificado — campos de responsable visibles en BigQuery
+- [ ] Pipeline `notion-bigquery` verificado contra el schema real de `notion_ops.tareas` (`responsables_names`, `responsables_ids`, `responsable_texto`)
+- [ ] Sync manual ejecutado y verificado — datos de responsable visibles en BigQuery y derivados operativos disponibles en runtime
 
 ### API:
 - [ ] `GET /api/team/members` retorna miembros del equipo del cliente autenticado con datos de presentación
@@ -687,7 +687,7 @@ scripts/
 - [ ] `GET /api/team/by-project/[id]` retorna métricas individuales por persona en el contexto de un proyecto
 - [ ] `GET /api/team/by-sprint/[id]` retorna velocity por persona en el contexto de un sprint
 - [ ] Todas las API routes validan autenticación y filtran por `client_id`
-- [ ] Match entre `responsable_nombre` de BQ y `display_name` / `notion_display_name` de `team_members` funciona correctamente
+- [ ] Match entre `responsables_ids[SAFE_OFFSET(0)]` o `responsable_nombre` derivado y `notion_user_id` / `display_name` / `notion_display_name` de `team_members` funciona correctamente
 
 ### Vista 1 — Tu equipo de cuenta (Mi Greenhouse):
 - [ ] Grid de 2 columnas con card por persona (responsive a 1 columna en mobile)

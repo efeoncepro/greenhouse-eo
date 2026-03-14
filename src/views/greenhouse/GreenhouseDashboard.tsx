@@ -11,14 +11,14 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import { GH_CLIENT_NAV, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
-import { EmptyState, ExecutiveCardShell, SectionErrorBoundary } from '@/components/greenhouse'
+import { EmptyState, ExecutiveCardShell, SectionErrorBoundary, TeamCapacitySection } from '@/components/greenhouse'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
+import type { TeamMembersPayload } from '@/types/team'
 import ClientAttentionProjectsAccordion from '@views/greenhouse/dashboard/ClientAttentionProjectsAccordion'
 import ClientDashboardHero from '@views/greenhouse/dashboard/ClientDashboardHero'
 import ClientEcosystemSection from '@views/greenhouse/dashboard/ClientEcosystemSection'
 import ClientPortfolioHealthAccordion from '@views/greenhouse/dashboard/ClientPortfolioHealthAccordion'
-import ClientTeamCapacitySection from '@views/greenhouse/dashboard/ClientTeamCapacitySection'
 import DashboardKpiCard from '@views/greenhouse/dashboard/DashboardKpiCard'
 import DashboardRequestDialog from '@views/greenhouse/dashboard/DashboardRequestDialog'
 import {
@@ -45,9 +45,10 @@ import {
 type GreenhouseDashboardProps = {
   clientName: string
   data: GreenhouseDashboardData
+  teamMembersData?: TeamMembersPayload | null
 }
 
-const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => {
+const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: GreenhouseDashboardProps) => {
   const theme = useTheme()
   const [requestIntent, setRequestIntent] = useState<string | null>(null)
 
@@ -268,7 +269,7 @@ const GreenhouseDashboard = ({ clientName, data }: GreenhouseDashboardProps) => 
         </Box>
 
         <SectionErrorBoundary sectionName='team-capacity' description='No pudimos cargar la seccion de equipo.'>
-          <ClientTeamCapacitySection data={data} onRequest={setRequestIntent} />
+          <TeamCapacitySection initialData={teamMembersData} dashboardData={data} />
         </SectionErrorBoundary>
 
         <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la seccion de ecosistema.'>

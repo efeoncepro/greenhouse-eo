@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 
 import { getDashboardOverview } from '@/lib/dashboard/get-dashboard-overview'
+import { getTeamMembers } from '@/lib/team-queries'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
@@ -23,5 +24,12 @@ export default async function Page() {
     serviceModules: tenant.serviceModules
   })
 
-  return <GreenhouseDashboard clientName={tenant.clientName} data={data} />
+  const teamMembersData = await getTeamMembers({
+    clientId: tenant.clientId,
+    projectIds: tenant.projectIds,
+    businessLines: tenant.businessLines,
+    serviceModules: tenant.serviceModules
+  }).catch(() => null)
+
+  return <GreenhouseDashboard clientName={tenant.clientName} data={data} teamMembersData={teamMembersData} />
 }

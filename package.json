@@ -36,6 +36,7 @@
     "@fullcalendar/react": "6.1.20",
     "@fullcalendar/timegrid": "6.1.20",
     "@google-cloud/bigquery": "^8.1.1",
+    "@google/genai": "^1.45.0",
     "@hookform/resolvers": "5.2.2",
     "@mui/lab": "7.0.1-beta.19",
     "@mui/material": "7.3.6",

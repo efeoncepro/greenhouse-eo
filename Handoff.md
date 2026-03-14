@@ -40,6 +40,210 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:59 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir de forma literal `CODEX_TASK_Fix_Team_Capacity_Views.md` despues de detectar que `Pulse` seguia mostrando una vista de capacidad operativa y, en `view-as`, ademas podia caer por depender de un fetch cliente fuera del contexto correcto.
+
+### Rama
+- Rama usada: `fix/team-capacity-views-vuexy`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch / `pre-greenhouse`
+
+### Archivos tocados
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/views/greenhouse/GreenhouseDashboard.tsx`
+- `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/admin/tenants/[id]/view-as/dashboard/page.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- Resultado funcional esperado del delta:
+  - `Pulse` ahora usa roster asignado (`getTeamMembers`) como fuente principal para la card de equipo.
+  - La card ya no muestra barras de utilizacion, CTA de saturacion ni copy operativo como contenido principal.
+  - `view-as/dashboard` deja de depender de un fetch cliente a `/api/team/capacity` para esta seccion.
+
+### Riesgos o pendientes
+- Queda pendiente pushar este delta y revisar visualmente el deployment nuevo en `pre-greenhouse.efeoncepro.com`.
+- El branch tiene otros archivos modificados en la zona de capabilities (`src/config/capability-registry.ts`, `src/lib/capability-queries/creative-hub.ts`, `src/types/capabilities.ts`, etc.) que no pertenecen a este fix; al commitear, seleccionar solo los archivos de este ajuste y no arrastrar cambios ajenos.
+
+## 2026-03-13 23:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `CODEX_TASK_Fix_Team_Capacity_Views.md` en una rama paralela y cerrar el ajuste visual/funcional de las vistas de equipo priorizando patrones vivos de Vuexy en vez de componer cards ad hoc.
+
+### Rama
+- Rama usada: `fix/team-capacity-views-vuexy`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch
+
+### Archivos tocados
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamExpansionGhostCard.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/config/greenhouse-nomenclature.ts`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- Validacion funcional del delta:
+  - `Pulse` deja de inventar metricas operativas por persona cuando el backend solo entrega capacidad contractual.
+  - `Pulse` ahora compone mejor con primitives Vuexy existentes (`HorizontalWithSubtitle`) y suma una ghost slot reusable para solicitudes de expansion.
+  - `Mi Greenhouse` reutiliza el mismo ghost slot para mantener consistencia visual y de CTA.
+
+### Riesgos o pendientes
+- El task `CODEX_TASK_Fix_Team_Capacity_Views.md` esta parcialmente desfasado respecto al estado real del repo: las vistas 1, 3 y 4 ya existian antes de este turno.
+- Conviene validar en Preview que la nueva densidad del grid de `Pulse` se vea bien con tenants pequeños y con equipos de mas de 6 personas.
+- `pre-greenhouse.efeoncepro.com` no estaba mostrando esta rama al momento del chequeo; seguia apuntando a un preview anterior (`fix/internal-nav-nomenclature-hydration`).
+- La iteracion final de este turno rehizo `Pulse` hacia una lista mas compacta y ejecutiva, con ghost slot en formato fila y CTA menos invasivo. Esa version necesita quedar pushada para reflejarse en el preview del branch.
+
+## 2026-03-13 21:00 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Investigar la documentacion oficial de Vercel y dejar una skill reusable para operar previews, staging, production, dominios protegidos y promociones desde este repo.
+
+### Rama
+- Rama usada: `fix/team-identity-task-closeout`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Operacion Vercel cross-environment
+
+### Archivos tocados
+- `.codex/skills/vercel-operations/SKILL.md`
+- `.codex/skills/vercel-operations/references/official-vercel-reference.md`
+- `.codex/skills/vercel-operations/references/greenhouse-vercel-map.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- Fuentes usadas: documentacion oficial de Vercel sobre CLI, project linking, env, logs, promote, rollback, deployment protection, protection bypass, custom environments y Vercel MCP.
+- `git diff --check`: correcto
+- Limitacion actual del entorno:
+  - este shell sigue sin `vercel`, `node`, `npx` y `pnpm`
+  - por eso la skill ya quedo versionada, pero la CLI real aun no puede ejecutarse desde esta sesion
+
+### Riesgos o pendientes
+- Para usar la skill de forma operativa aqui mismo, hace falta que el entorno tenga `vercel` disponible o que otro shell autenticado la ejecute.
+- `pre-greenhouse.efeoncepro.com` fue verificado por `curl` y responde Vercel Authentication `401`; eso confirma proteccion activa, no el deployment exacto detras del dominio.
+
+## 2026-03-13 23:59 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar los gaps literales que quedaban entre el task `CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
+
+### Rama
+- Rama usada: `fix/team-identity-task-closeout`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / development branch
+
+### Archivos tocados
+- `src/components/greenhouse/TeamSignalChip.tsx`
+- `src/components/greenhouse/TeamProgressBar.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `src/views/greenhouse/dashboard/helpers.ts`
+- `src/config/greenhouse-nomenclature.ts`
+- `CODEX_TASK_Team_Identity_Capacity_System.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `git diff --check`: correcto
+- Validacion automatica pendiente:
+  - `pnpm lint`: no ejecutado en este shell porque `node`, `npx` y `pnpm` no estan disponibles
+  - `pnpm build`: no ejecutado en este shell por la misma limitacion
+- Revision manual del delta:
+  - Vista 1 ya no muestra FTE individual
+  - Vista 3 ahora usa `AvatarGroup` + detalle expandible tabular
+  - los semaforos nuevos del modulo pasan por primitives basadas en `GH_COLORS.semaphore`
+  - los textos visibles que faltaban se centralizaron en nomenclatura
+  - el task doc ya quedo alineado al schema real de `notion_ops.tareas`
+
+### Riesgos o pendientes
+- Hace falta correr `pnpm lint` y `pnpm build` en un entorno con Node antes de mergear esta rama.
+- El cierre documental del task asume como contrato valido el schema real (`responsables_names`, `responsables_ids`, `responsable_texto`), no el supuesto original de columnas directas `responsable_*`.
+- Conviene validar visualmente en Preview la nueva Vista 3 porque cambio de cards siempre abiertas a resumen compacto + expandible.
+
+## 2026-03-13 23:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer de verdad la identidad canonica del roster Efeonce para que Greenhouse sea la identidad base y los providers externos queden enlazados como enrichment.
+- Dar una pasada visual adicional a las 4 surfaces live del task usando patrones Vuexy ya presentes en el repo.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `src/types/team.ts`
+- `src/lib/team-queries.ts`
+- `scripts/setup-team-tables.sql`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/greenhouse/TeamIdentityBadgeGroup.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` reaplicado en BigQuery real: correcto
+- Verificacion directa en BigQuery:
+  - `greenhouse.team_members` ahora expone `identity_profile_id` y `email_aliases`
+  - el roster Efeonce quedo con `7` miembros enlazados a perfil canonico
+  - `identity_profile_source_links` ahora incluye links activos de `greenhouse_team`, `greenhouse_auth`, `notion`, `hubspot_crm` y `azure_ad`
+  - el perfil legado `identity-hubspot-crm-owner-75788512` de Julio quedo `archived` / `active = FALSE`
+  - `greenhouse.team_members` ahora tambien expone columnas de perfil ampliado: `first_name`, `last_name`, `preferred_name`, `legal_name`, `org_role_id`, `profession_id`, `seniority_level`, `employment_type`, `birth_date`, `phone`, `teams_user_id`, `slack_user_id`, `location_city`, `location_country`, `time_zone`, `years_experience`, `efeonce_start_date`, `biography`, `languages`
+  - `greenhouse.team_role_catalog` y `greenhouse.team_profession_catalog` ya quedaron sembradas en BigQuery real
+
+### Riesgos o pendientes
+- Falta validacion visual autenticada en Preview para confirmar la nueva jerarquia visual de las 4 cards con datos reales en navegador.
+- La capa ya soporta futuros providers en `identity_profile_source_links`, pero todavia no existe ingestion real para `google_workspace`, `deel`, `frame_io` o `adobe`; el modelo quedo listo, no el sync.
+- El perfil ampliado ya existe a nivel schema y runtime, pero varios atributos siguen `NULL` en seed porque no habia dato confirmado; para cerrar la ficha completa faltaria una fuente canonica de RRHH o un backoffice admin de talento.
+- El repo externo `notion-bigquery` ya estaba alineado para `Responsables`; no hay cambio pendiente ahi por este ajuste salvo mergear su rama documental si se quiere dejar el contrato cerrado.
+
 ## 2026-03-13 19:35 America/Santiago
 
 ### Agente
@@ -68,6 +272,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El cierre tecnico y de deploy ya quedo realizado, pero sigue pendiente validacion visual humana final en `pre-greenhouse`, `dev-greenhouse` y `greenhouse` para confirmar jerarquia, contraste y el flujo real de upload de logo/foto.
 - El worktree local puede seguir mostrando cambios ajenos en `.env.example`, `.env.local.example`, `package.json` y `pnpm-lock.yaml`; no forman parte del cierre de esta iniciativa.
+
+## 2026-03-13 23:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar los pendientes reales del runtime de team identity + capacity:
+  - validar con Node local
+  - endurecer y aplicar el bootstrap SQL en BigQuery
+  - confirmar el nombre correcto del repo externo del sync
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `.eslintrc.js`
+- `src/lib/team-queries.ts`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `scripts/setup-team-tables.sql`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` aplicado en BigQuery real: correcto
+  - `greenhouse.team_members`: `7` filas
+  - `greenhouse.client_team_assignments`: `10` filas
+- Verificacion directa en BigQuery:
+  - `space-efeonce` quedo con `7` assignments seed
+  - `hubspot-company-30825221458` quedo con `3` assignments seed
+- `git ls-remote https://github.com/efeoncepro/notion-bigquery.git HEAD`: sin acceso util desde esta sesion
+- `git ls-remote git@github.com:efeoncepro/notion-bigquery.git HEAD`: `Repository not found`
+
+### Riesgos o pendientes
+- El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
+- Esa parte externa sigue pendiente porque el repo no esta en este workspace y no hubo acceso remoto valido desde esta sesion.
+- La validacion ad hoc por import directo de `src/lib/team-queries.ts` con `tsx` choco con `server-only`; no indica fallo del feature, pero si que una smoke script reusable tendria que correr via entorno Next/server real o con un harness dedicado.
 
 ## 2026-03-13 20:05 America/Santiago
 

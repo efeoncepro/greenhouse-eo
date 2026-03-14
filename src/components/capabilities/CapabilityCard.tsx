@@ -7,6 +7,7 @@ import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
@@ -15,8 +16,9 @@ import type { ThemeColor } from '@core/types'
 import CustomAvatar from '@core/components/mui/Avatar'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
-import type { CapabilityCardData, CapabilityModuleCard, CapabilityModuleData } from '@/types/capabilities'
+import type { CapabilityCardData, CapabilityMetricsRowItem, CapabilityModuleCard, CapabilityModuleData } from '@/types/capabilities'
 
 type CapabilityCardProps = {
   card: CapabilityModuleCard
@@ -483,6 +485,197 @@ const BarChartCard = ({ card, cardData }: TypedCapabilityCardProps<'chart-bar'>)
   )
 }
 
+const toneToMuiColor: Record<CapabilityMetricsRowItem['tone'], ThemeColor> = {
+  success: 'success',
+  warning: 'warning',
+  error: 'error',
+  info: 'info'
+}
+
+const SectionHeaderCard = ({ card, cardData }: TypedCapabilityCardProps<'section-header'>) => (
+  <Box sx={{ pt: 3, pb: 0.5 }}>
+    <Stack direction='row' spacing={1.5} alignItems='center'>
+      <CustomAvatar skin='light' variant='rounded' color='primary' size={36}>
+        <i className={`${cardData.icon} text-[20px]`} />
+      </CustomAvatar>
+      <Box>
+        <Typography variant='h5'>{card.title}</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          {cardData.subtitle}
+        </Typography>
+      </Box>
+    </Stack>
+    <Divider sx={{ mt: 2 }} />
+  </Box>
+)
+
+const MetricsRowCard = ({ card, cardData }: TypedCapabilityCardProps<'metrics-row'>) => (
+  <ExecutiveCardShell title={card.title} subtitle={card.description} contentSx={{ pt: 3.5 }}>
+    <Box
+      sx={{
+        display: 'grid',
+        gap: 3,
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, minmax(0, 1fr))',
+          xl: 'repeat(4, minmax(0, 1fr))'
+        }
+      }}
+    >
+      {cardData.items.map(item => (
+        <Box
+          key={item.id}
+          sx={{
+            p: 2.5,
+            borderRadius: 3,
+            border: `1px solid ${GH_COLORS.neutral.border}`,
+            bgcolor: GH_COLORS.neutral.bgSurface,
+            display: 'grid',
+            gap: 1
+          }}
+        >
+          <Typography variant='caption' color='text.secondary'>
+            {item.label}
+          </Typography>
+          {item.value !== null ? (
+            <Typography variant='h5' sx={{ color: `var(--mui-palette-${toneToMuiColor[item.tone]}-main)` }}>
+              {item.value}
+            </Typography>
+          ) : (
+            <Typography variant='body2' color='text.disabled'>
+              Proximamente
+            </Typography>
+          )}
+          <Typography variant='caption' color='text.secondary'>
+            {item.description}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  </ExecutiveCardShell>
+)
+
+const PipelineCard = ({ card, cardData }: TypedCapabilityCardProps<'pipeline'>) => {
+  const hasData = cardData.total > 0
+
+  return (
+    <ExecutiveCardShell title={card.title} subtitle={card.description} contentSx={{ pt: 3.5 }}>
+      {hasData ? (
+        <Stack spacing={3}>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Typography variant='body2' color='text.secondary'>
+              {cardData.total} assets en pipeline
+            </Typography>
+          </Stack>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {cardData.phases.map(phase => (
+              <Tooltip key={phase.id} title={`${phase.label}: ${phase.count} assets`} arrow>
+                <Box
+                  sx={{
+                    flex: phase.count > 0 ? `${Math.max(phase.count, 1)} 1 0` : '0 0 auto',
+                    minWidth: 60,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    border: `1px solid ${alpha(phase.color, 0.24)}`
+                  }}
+                >
+                  <Box sx={{ height: 6, bgcolor: phase.color }} />
+                  <Stack sx={{ p: 1.5, bgcolor: alpha(phase.color, 0.06) }} spacing={0.5}>
+                    <Typography variant='h6' sx={{ color: phase.color, lineHeight: 1.2 }}>
+                      {phase.count}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ fontSize: '0.65rem' }}>
+                      {phase.label}
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Tooltip>
+            ))}
+          </Box>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            {cardData.phases.map(phase => (
+              <Stack key={phase.id} direction='row' spacing={0.5} alignItems='center'>
+                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: phase.color }} />
+                <Typography variant='caption' color='text.secondary'>
+                  {phase.label}
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Stack>
+      ) : (
+        <EmptyState
+          icon='tabler-git-branch'
+          title='Pipeline sin actividad'
+          description='Tu pipeline creativo aparecera aqui cuando haya tareas activas en tus proyectos.'
+          minHeight={180}
+        />
+      )}
+    </ExecutiveCardShell>
+  )
+}
+
+const AlertListCard = ({ card, cardData }: TypedCapabilityCardProps<'alert-list'>) => (
+  <ExecutiveCardShell title={card.title} subtitle={card.description} contentSx={{ pt: 3.5 }}>
+    {cardData.items.length > 0 ? (
+      <Stack spacing={2}>
+        {cardData.items.map(item => {
+          const isDanger = item.severity === 'danger'
+
+          return (
+            <Box
+              key={item.id}
+              sx={{
+                display: 'flex',
+                gap: 2,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 2,
+                borderRadius: 3,
+                border: `1px solid ${alpha(isDanger ? GH_COLORS.semantic.danger.source : GH_COLORS.semantic.warning.source, 0.24)}`,
+                bgcolor: isDanger ? GH_COLORS.semantic.danger.bg : GH_COLORS.semantic.warning.bg
+              }}
+            >
+              <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0, flex: 1 }}>
+                <CustomAvatar skin='light' variant='rounded' color={isDanger ? 'error' : 'warning'} size={36}>
+                  <i className='tabler-alert-triangle text-[20px]' />
+                </CustomAvatar>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant='subtitle2' noWrap>
+                    {item.name}
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary'>
+                    {item.project} · {item.phase}
+                  </Typography>
+                </Box>
+              </Stack>
+              {item.frameUrl ? (
+                <Button component={Link} href={item.frameUrl} target='_blank' size='small' variant='text' color={isDanger ? 'error' : 'warning'} sx={{ flexShrink: 0 }}>
+                  Ver
+                </Button>
+              ) : (
+                <Chip
+                  size='small'
+                  variant='tonal'
+                  color={isDanger ? 'error' : 'warning'}
+                  label={isDanger ? 'Critico' : 'Detenido'}
+                />
+              )}
+            </Box>
+          )
+        })}
+      </Stack>
+    ) : (
+      <EmptyState
+        icon='tabler-circle-check'
+        title='Pipeline fluye sin obstaculos'
+        description={cardData.emptyMessage}
+        minHeight={160}
+      />
+    )}
+  </ExecutiveCardShell>
+)
+
 const CapabilityCard = (props: CapabilityCardProps) => {
   const cardData = props.data.cardData[props.card.id]
 
@@ -503,6 +696,14 @@ const CapabilityCard = (props: CapabilityCardProps) => {
       return <MetricListCard {...props} cardData={cardData} />
     case 'chart-bar':
       return <BarChartCard {...props} cardData={cardData} />
+    case 'section-header':
+      return <SectionHeaderCard {...props} cardData={cardData} />
+    case 'metrics-row':
+      return <MetricsRowCard {...props} cardData={cardData} />
+    case 'pipeline':
+      return <PipelineCard {...props} cardData={cardData} />
+    case 'alert-list':
+      return <AlertListCard {...props} cardData={cardData} />
     default:
       return <MissingCardData card={props.card} />
   }
