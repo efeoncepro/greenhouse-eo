@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Agency data hydration correction
+- La capa `agency` ya no debe asumir que toda la senal operativa vive solo en `notion_project_ids` ni filtrar `greenhouse.clients` por `tenant_type`.
+  - `src/lib/agency/agency-queries.ts` ahora toma `clients.active = TRUE` como base canonica de spaces.
+  - El inventario de proyectos agency se arma desde la union de:
+    - `greenhouse.clients.notion_project_ids`
+    - `greenhouse.user_project_scopes` via `greenhouse.client_users`
+- Regla operativa nueva para `/agency/spaces`:
+  - si un space tiene poca o nula senal en `notion_ops`, igual debe mostrar contexto util desde Greenhouse (`personas asignadas`, `FTE`, `usuarios`) y no quedar casi vacio.
+- Regla operativa nueva para `/agency/capacity`:
+  - la lista de capacidad debe reutilizar `TeamAvatar` y no un avatar ad-hoc, para heredar `avatarUrl` real y fallback cromatico consistente con el roster.
+
 ## Delta 2026-03-13 Agency operator layer
 - El repo ahora tiene una primera capa agency para lectura ejecutiva interna a nivel transversal:
   - `/agency`

@@ -143,7 +143,12 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                     )}
                   </Stack>
                   <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                    {space.projectCount} proyecto{space.projectCount !== 1 ? 's' : ''}
+                    {[
+                      `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
+                      `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,
+                      `${space.allocatedFte.toFixed(1)} FTE`,
+                      ...(space.totalUsers > 0 ? [`${space.totalUsers} usuario${space.totalUsers !== 1 ? 's' : ''}`] : [])
+                    ].join(' · ')}
                   </Typography>
                 </Box>
               </Stack>

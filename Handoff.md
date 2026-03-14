@@ -40,6 +40,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 00:17 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir en una rama paralela la hidratacion real de `/agency/spaces` y `/agency/capacity` para que los nuevos spaces no queden casi vacios y para que la capacidad muestre fotos reales del roster Efeonce.
+
+### Rama
+- Rama usada: `fix/agency-space-data-and-avatars`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch / development
+
+### Archivos tocados
+- `src/lib/agency/agency-queries.ts`
+- `src/components/agency/CapacityOverview.tsx`
+- `src/components/agency/SpaceCard.tsx`
+- `src/components/agency/SpaceHealthTable.tsx`
+
+### Verificacion
+- `pnpm exec eslint src/lib/agency/agency-queries.ts src/components/agency/CapacityOverview.tsx src/components/agency/SpaceCard.tsx src/components/agency/SpaceHealthTable.tsx`: correcto
+- `pnpm build`: correcto
+- Validacion runtime real contra BigQuery:
+  - se elimino el filtro invalido `c.tenant_type = 'client'` sobre `greenhouse.clients`, que hacia fallar la capa agency
+  - `getAgencySpacesHealth()` ahora responde `11` spaces activos y `space-efeonce` vuelve con data real:
+    - `57` proyectos
+    - `7` personas asignadas
+    - `7` FTE
+    - `243` assets activos
+    - `1` feedback pendiente
+  - `getAgencyCapacity()` ahora devuelve `avatarUrl` reales para el roster Efeonce y deja de renderizar solo iniciales en `/agency/capacity`
+
+### Riesgos o pendientes
+- Los spaces sin data Notion siguen pudiendo mostrar `RpA` / `OTD` en `—`, pero ya no quedan vacios porque ahora exponen inventario Greenhouse complementario (`proyectos`, `equipo`, `FTE`, `usuarios`) en card y tabla.
+- No se hizo push ni deploy desde esta rama aun; queda lista para preview seguro antes de mergear a `develop`.
+
 ## 2026-03-13 23:58 America/Santiago
 
 ### Agente

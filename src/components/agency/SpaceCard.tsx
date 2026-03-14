@@ -54,6 +54,13 @@ const SpaceCard = ({ space }: Props) => {
   const router = useRouter()
   const color = getServiceColor(space.businessLines)
 
+  const supportMetrics = [
+    { label: 'Proyectos', value: String(space.projectCount) },
+    { label: 'Equipo', value: String(space.assignedMembers) },
+    { label: 'FTE', value: space.allocatedFte.toFixed(1) },
+    ...(space.totalUsers > 0 ? [{ label: 'Usuarios', value: String(space.totalUsers) }] : [])
+  ]
+
   return (
     <Card
       onClick={() => router.push(`/agency/spaces/${space.clientId}`)}
@@ -141,6 +148,30 @@ const SpaceCard = ({ space }: Props) => {
           tone={getOtdTone(space.otdPct)}
         />
         <MetricCol label='Assets' value={String(space.assetsActivos)} />
+      </Stack>
+
+      <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap' sx={{ px: 2.5, pb: 1.5 }}>
+        {supportMetrics.map(metric => (
+          <Box
+            key={metric.label}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              px: 1,
+              py: 0.5,
+              borderRadius: 999,
+              bgcolor: GH_COLORS.neutral.bgSurface
+            }}
+          >
+            <Typography sx={{ fontSize: '0.7rem', fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+              {metric.value}
+            </Typography>
+            <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+              {metric.label}
+            </Typography>
+          </Box>
+        ))}
       </Stack>
 
       {/* Feedback alert */}
