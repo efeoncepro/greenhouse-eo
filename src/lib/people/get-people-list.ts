@@ -21,7 +21,7 @@ type PeopleListRow = {
   pay_regime: string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
   const emailAliases = toStringArray(row.email_aliases)
@@ -48,6 +48,7 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
 }
 
 export const getPeopleList = async (): Promise<PeopleListPayload> => {
+  const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const compensationColumns = await getPeopleTableColumns('greenhouse', 'compensation_versions')
 
@@ -133,14 +134,14 @@ export const getPeopleList = async (): Promise<PeopleListPayload> => {
     summary: {
       activeMembers: items.filter(item => item.active).length,
       totalFte: roundToTenths(items.reduce((sum, item) => sum + item.totalFte, 0)),
-      coveredClients: await getCoveredClientsCount(),
+      coveredClients: await getCoveredClientsCount(projectId),
       chileCount: items.filter(item => item.payRegime === 'chile').length,
       internationalCount: items.filter(item => item.payRegime === 'international').length
     }
   }
 }
 
-const getCoveredClientsCount = async () => {
+const getCoveredClientsCount = async (projectId: string) => {
   const [row] = await runPeopleQuery<{ covered_clients: number | string | null }>(
     `
       SELECT COUNT(DISTINCT client_id) AS covered_clients

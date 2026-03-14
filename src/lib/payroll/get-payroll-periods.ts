@@ -30,7 +30,7 @@ type PayrollPeriodRow = {
   created_at: { value?: string } | string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
   periodId: String(row.period_id || ''),
@@ -50,6 +50,7 @@ const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
 
 export const listPayrollPeriods = async () => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const rows = await runPayrollQuery<PayrollPeriodRow>(
     `
@@ -64,6 +65,7 @@ export const listPayrollPeriods = async () => {
 
 export const getPayrollPeriod = async (periodId: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const [row] = await runPayrollQuery<PayrollPeriodRow>(
     `
@@ -80,6 +82,7 @@ export const getPayrollPeriod = async (periodId: string) => {
 
 export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   if (!Number.isInteger(input.year) || input.year < 2024) {
     throw new PayrollValidationError('year must be a valid integer.')
@@ -144,6 +147,7 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
 
 export const updatePayrollPeriod = async (periodId: string, input: UpdatePayrollPeriodInput) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const current = await getPayrollPeriod(periodId)
 

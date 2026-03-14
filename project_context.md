@@ -3,6 +3,27 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Admin team backend foundation
+- El repo ya tiene la primera capa backend de escritura para `Admin Team Module v2` sobre rama de trabajo dedicada:
+  - `src/lib/team-admin/mutate-team.ts`
+  - `/api/admin/team/meta`
+  - `/api/admin/team/members`
+  - `/api/admin/team/members/[memberId]`
+  - `/api/admin/team/members/[memberId]/deactivate`
+  - `/api/admin/team/assignments`
+  - `/api/admin/team/assignments/[assignmentId]`
+- Regla operativa vigente:
+  - `Admin Team` es la única capa de mutación de roster/asignaciones
+  - `People` sigue siendo read-first y no debe incorporar writes bajo `/api/people/*`
+  - todas las mutaciones nuevas se protegen con `requireAdminTenantContext()` y quedan reservadas a `efeonce_admin`
+- Boundary de coordinación vigente:
+  - Codex implementa backend de `Admin Team`
+  - Claude implementa frontend de `Admin Team`
+  - Claude puede avanzar en paralelo una vez exista el `mutation contract freeze` mínimo
+- Ajuste de contrato para frontend:
+  - `GET /api/admin/team/meta` expone metadata para drawers admin (`activeClients`, `roleCategories`, `contactChannels`)
+  - `GET /api/admin/team/members` se mantiene como capability handshake compatible con la task para habilitar CTAs admin sin depender de `404/405`
+
 ## Delta 2026-03-14 People unified frontend
 - Frontend completo de `People Unified View v2` implementado sobre los contratos backend:
   - `/people` → `PeopleList.tsx` (stats + filtros + tabla TanStack)

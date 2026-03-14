@@ -21,7 +21,7 @@ type FetchKpisInput = {
   periodEndExclusive: string
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const pickFirstExistingColumn = (columns: Set<string>, candidates: string[]) => candidates.find(column => columns.has(column)) || null
 const quoteIdentifier = (identifier: string) => `\`${identifier.replace(/`/g, '``')}\``
@@ -33,6 +33,7 @@ export const fetchKpisForPeriod = async ({
   snapshots: Map<string, PayrollKpiSnapshot>
   diagnostics: PayrollKpiDiagnostics
 }> => {
+  const projectId = getProjectId()
   const columns = await getTableColumns('notion_ops', 'tareas')
   const timeFilterColumn = pickFirstExistingColumn(columns, ['last_edited_time', 'updated_at', 'created_time'])
   const statusColumn = pickFirstExistingColumn(columns, ['estado', 'status'])

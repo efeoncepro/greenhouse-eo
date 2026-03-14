@@ -25,8 +25,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 
 import type { PersonListItem } from '@/types/people'
-import type { TeamRoleCategory } from '@/types/team'
-import { countryLabel, formatFte, roleCategoryLabel } from './helpers'
+import { countryLabel, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import PeopleListFilters from './PeopleListFilters'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -54,7 +53,7 @@ const PeopleListTable = ({ data }: Props) => {
             <TeamAvatar
               name={row.original.displayName}
               avatarUrl={row.original.avatarUrl}
-              roleCategory={row.original.roleCategory as TeamRoleCategory}
+              roleCategory={safeRoleCategory(row.original.roleCategory)}
               size={38}
             />
             <div className='flex flex-col'>
@@ -85,7 +84,7 @@ const PeopleListTable = ({ data }: Props) => {
         cell: ({ getValue }) => (
           <Chip
             size='small'
-            label={roleCategoryLabel[getValue() as TeamRoleCategory] ?? getValue()}
+            label={roleCategoryLabel[safeRoleCategory(getValue() as string)] ?? getValue()}
             variant='tonal'
             color='secondary'
           />

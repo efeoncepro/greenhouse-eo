@@ -18,9 +18,12 @@ import { formatFte } from '../helpers'
 
 type Props = {
   assignments?: PersonDetailAssignment[]
+  isAdmin?: boolean
+  onNewAssignment?: () => void
+  onEditAssignment?: (a: PersonDetailAssignment) => void
 }
 
-const PersonAssignmentsTab = ({ assignments }: Props) => {
+const PersonAssignmentsTab = ({ assignments, isAdmin, onNewAssignment, onEditAssignment }: Props) => {
   if (!assignments || assignments.length === 0) {
     return (
       <Card>
@@ -56,7 +59,16 @@ const PersonAssignmentsTab = ({ assignments }: Props) => {
             </TableHead>
             <TableBody>
               {activeAssignments.map(a => (
-                <TableRow key={a.assignmentId} hover>
+                <TableRow
+                  key={a.assignmentId}
+                  hover
+                  sx={isAdmin ? { cursor: 'pointer' } : undefined}
+                  onClick={isAdmin && onEditAssignment ? () => onEditAssignment(a) : undefined}
+                  onKeyDown={isAdmin && onEditAssignment ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onEditAssignment(a) } } : undefined}
+                  tabIndex={isAdmin ? 0 : undefined}
+                  role={isAdmin ? 'button' : undefined}
+                  aria-label={isAdmin ? `Editar asignación a ${a.clientName}` : undefined}
+                >
                   <TableCell>
                     <Typography variant='body2' fontWeight={500}>{a.clientName}</Typography>
                   </TableCell>
@@ -105,21 +117,28 @@ const PersonAssignmentsTab = ({ assignments }: Props) => {
           </Table>
         </TableContainer>
 
-        {/* Ghost slot for future Admin Team CTA */}
-        <Box
-          sx={{
-            mt: 2,
-            p: 2,
-            border: '1px dashed',
-            borderColor: 'divider',
-            borderRadius: 1,
-            textAlign: 'center',
-            color: 'text.disabled',
-            display: 'none' // Hidden until Admin Team CRUD exists
-          }}
-        >
-          <i className='tabler-plus' /> Asignar a nueva cuenta
-        </Box>
+        {isAdmin && (
+          <Box
+            onClick={onNewAssignment}
+            onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && onNewAssignment) { e.preventDefault(); onNewAssignment() } }}
+            tabIndex={0}
+            role='button'
+            aria-label='Asignar a nueva cuenta'
+            sx={{
+              mt: 2,
+              p: 2,
+              border: '1px dashed',
+              borderColor: 'divider',
+              borderRadius: 1,
+              textAlign: 'center',
+              color: 'text.secondary',
+              cursor: 'pointer',
+              '&:hover': { borderColor: 'primary.main', color: 'primary.main' }
+            }}
+          >
+            <i className='tabler-plus' /> Asignar a nueva cuenta
+          </Box>
+        )}
       </CardContent>
     </Card>
   )

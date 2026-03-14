@@ -9,8 +9,7 @@ import MenuItem from '@mui/material/MenuItem'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PersonListItem } from '@/types/people'
-import type { TeamRoleCategory } from '@/types/team'
-import { roleCategoryLabel } from './helpers'
+import { roleCategoryLabel, safeRoleCategory } from './helpers'
 
 type Props = {
   data: PersonListItem[]
@@ -73,7 +72,7 @@ const PeopleListFilters = ({
             <MenuItem value=''>Todos</MenuItem>
             {roles.map(r => (
               <MenuItem key={r} value={r}>
-                {roleCategoryLabel[r as TeamRoleCategory] ?? r}
+                {roleCategoryLabel[safeRoleCategory(r)] ?? r}
               </MenuItem>
             ))}
           </CustomTextField>

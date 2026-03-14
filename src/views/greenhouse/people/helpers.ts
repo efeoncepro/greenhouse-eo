@@ -28,6 +28,11 @@ export const countryLabel = (code: string | null): string => {
 
 // ── Role category labels ───────────────────────────────────────────
 
+export const ROLE_CATEGORIES: TeamRoleCategory[] = ['account', 'operations', 'strategy', 'design', 'development', 'media']
+
+export const safeRoleCategory = (value: string): TeamRoleCategory =>
+  ROLE_CATEGORIES.includes(value as TeamRoleCategory) ? (value as TeamRoleCategory) : 'unknown'
+
 export const roleCategoryLabel: Record<TeamRoleCategory, string> = {
   account: 'Account',
   operations: 'Operations',

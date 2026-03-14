@@ -22,9 +22,11 @@ type BonusConfigRow = {
   rpa_threshold: number | string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const getBonusConfigForDate = async (periodEnd: string) => {
+  const projectId = getProjectId()
+
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
       SELECT otd_threshold, rpa_threshold
@@ -138,6 +140,7 @@ export const calculatePayroll = async ({
   actorIdentifier: string | null
 }): Promise<PayrollCalculationResult> => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const period = await getPayrollPeriod(periodId)
 
