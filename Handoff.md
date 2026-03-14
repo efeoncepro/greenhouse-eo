@@ -40,6 +40,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 20:17 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar si `CODEX_TASK_HR_Payroll_Module_v2.md` seguía siendo un brief realmente listo y convertirlo en documentación operativa más fiel al estado actual del módulo.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / gobernanza operativa
+
+### Archivos tocados
+- `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `HR Payroll v2` quedó marcado explícitamente como brief histórico de la implementación base ya absorbida por el runtime actual.
+- Se creó `HR Payroll v3` como brief activo para los gaps reales detectados en la revisión contra el módulo:
+  - alta inicial de compensación desde UI
+  - edición de metadata del período en `draft`
+  - fallback manual de KPI y override de entries en la vista
+  - ficha de colaborador útil aun sin entries cerradas
+- El board de `docs/tasks/README.md` vuelve a tratar `HR Payroll` como trabajo `in-progress`, no como task completamente cerrada.
+
+### Verificacion
+- Revisión manual contra runtime del módulo:
+  - `/hr/payroll`
+  - `/hr/payroll/member/[memberId]`
+  - `/api/hr/payroll/**`
+- `git diff --check`: pendiente al cierre del turno
+
+### Riesgos o pendientes
+- Esta actualización ordena el brief, pero no implementa todavía los gaps v3; el módulo sigue funcional pero no debe considerarse “cerrado” hasta resolverlos.
+
 ## 2026-03-14 20:20 America/Santiago
 
 ### Agente

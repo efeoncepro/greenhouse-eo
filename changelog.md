@@ -6,6 +6,15 @@
 
 ## 2026-03-14
 
+### HR payroll brief split: baseline vs runtime gaps
+- `CODEX_TASK_HR_Payroll_Module_v2.md` dejó de tratarse como brief vigente greenfield y quedó marcado como referencia histórica de la implementación base.
+- Se creó `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md` como brief activo para cerrar los gaps reales del módulo actual:
+  - alta inicial de compensación desde UI
+  - edición visible de metadata del período en `draft`
+  - fallback manual de KPI y override de entry en la vista de nómina
+  - ficha de colaborador útil aun sin payroll cerrado
+- `docs/tasks/README.md` quedó alineado para que `HR Payroll` vuelva a figurar como trabajo `in-progress` en vez de task cerrada por completo.
+
 ### Codex task board operational panels
 - `docs/tasks/` dejó de funcionar como carpeta plana y ahora se organiza como tablero operativo con paneles:
   - `docs/tasks/in-progress/`

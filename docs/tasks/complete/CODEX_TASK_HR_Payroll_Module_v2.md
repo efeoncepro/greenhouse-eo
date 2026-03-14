@@ -1,5 +1,17 @@
 # CODEX TASK — HR Payroll: Módulo de Nómina y Compensación (v2)
 
+## Estado del brief
+
+Este documento queda como brief histórico de la implementación base de `HR Payroll`.
+
+Estado al `2026-03-14`:
+- el módulo `/hr/payroll` ya existe en runtime
+- el route group `hr`, el rol `hr_payroll`, las tablas `compensation_versions`, `payroll_periods`, `payroll_entries` y `payroll_bonus_config`, y la mayoría de APIs ya están implementadas
+- los gaps operativos restantes ya no deben trabajarse desde este documento greenfield
+
+Brief vigente para continuar el módulo:
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+
 ## Resumen
 
 Implementar el **módulo de nómina (payroll)** en el portal Greenhouse como espacio exclusivo para el HR Business Partner. Permite calcular la compensación mensual de cada colaborador combinando salario base, bonos variables por performance (OTD% y RpA), asignación de teletrabajo, y — para colaboradores en Chile — los descuentos legales obligatorios (AFP, salud, seguro cesantía, impuesto único).

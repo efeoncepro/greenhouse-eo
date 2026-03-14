@@ -14,6 +14,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | --- | --- |
 | [CODEX_TASK_Admin_Team_Module_v2.md](in-progress/CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
 | [CODEX_TASK_Financial_Module.md](in-progress/CODEX_TASK_Financial_Module.md) | Módulo Finance y sus gaps operativos restantes |
+| [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
 
 ## To Do
 
@@ -37,7 +38,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Fix_Team_Capacity_Views.md](complete/CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
 | [CODEX_TASK_Google_SSO_Greenhouse.md](complete/CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
 | [CODEX_TASK_HR_Payroll_Module.md](complete/CODEX_TASK_HR_Payroll_Module.md) | Brief histórico de HR Payroll reemplazado por v2 |
-| [CODEX_TASK_HR_Payroll_Module_v2.md](complete/CODEX_TASK_HR_Payroll_Module_v2.md) | Módulo HR Payroll |
+| [CODEX_TASK_HR_Payroll_Module_v2.md](complete/CODEX_TASK_HR_Payroll_Module_v2.md) | Brief histórico de HR Payroll absorbido por v3 |
 | [CODEX_TASK_Login_Page_Greenhouse.md](complete/CODEX_TASK_Login_Page_Greenhouse.md) | UI de login Greenhouse |
 | [CODEX_TASK_Microsoft_SSO_Greenhouse.md](complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
 | [CODEX_TASK_People_Unified_View.md](complete/CODEX_TASK_People_Unified_View.md) | Brief histórico de People reemplazado por v2 |
