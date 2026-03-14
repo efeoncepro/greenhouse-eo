@@ -6,6 +6,18 @@
 
 ## 2026-03-14
 
+### Admin team promoted to develop
+- `feature/admin-team-crud` fue integrado en `develop` mediante el merge commit `ee2355b` para abrir la fase de validación compartida en `Staging`.
+- La integración arrastra:
+  - backend `Admin Team` bajo `/api/admin/team/*`
+  - drawers admin dentro de `People`
+  - endurecimiento de previews para evitar fallos por `NEXTAUTH_SECRET` y otras env vars faltantes
+- Validación local post-merge: `eslint`, `tsc --noEmit` y `git diff --check` correctos.
+- Se corrigieron tres detalles menores de frontend detectados en esa pasada:
+  - grouping de imports en `src/views/greenhouse/people/PeopleList.tsx`
+  - import no usado en `src/views/greenhouse/people/PersonLeftSidebar.tsx`
+  - grouping de imports en `src/views/greenhouse/people/PersonView.tsx`
+
 ### Vercel ops skill hardening
 - La skill local [vercel-operations](/Users/jreye/Documents/greenhouse-eo/.codex/skills/vercel-operations/SKILL.md) ahora deja explícito el patrón operativo que venía rompiendo previews en este repo:
   - verificar env vars branch-scoped antes de confiar en un Preview

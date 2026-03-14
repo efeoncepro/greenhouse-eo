@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
+
 import { useSession } from 'next-auth/react'
 
 import Box from '@mui/material/Box'
@@ -12,6 +13,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { PeopleListPayload } from '@/types/people'
+
 import CreateMemberDrawer from './drawers/CreateMemberDrawer'
 import PeopleListStats from './PeopleListStats'
 import PeopleListTable from './PeopleListTable'

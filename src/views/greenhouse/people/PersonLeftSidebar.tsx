@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 
 import type { PersonDetail } from '@/types/people'
-import type { TeamRoleCategory } from '@/types/team'
 import { countryFlag, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import IntegrationStatus from './components/IntegrationStatus'
 

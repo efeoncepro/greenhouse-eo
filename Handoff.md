@@ -40,6 +40,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 12:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Promover `feature/admin-team-crud` a `develop` después del QA manual del usuario y dejar la integración local validada.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `main` cuando staging quede aprobado
+
+### Ambiente objetivo
+- Development / integración hacia Staging
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+- `src/views/greenhouse/people/PeopleList.tsx`
+- `src/views/greenhouse/people/PersonLeftSidebar.tsx`
+- `src/views/greenhouse/people/PersonView.tsx`
+
+### Verificacion
+- Merge local ejecutado:
+  - `merge: integrate admin team module`
+- Validación post-merge en worktree `develop`:
+  - `pnpm exec eslint src/components/Providers.tsx src/lib/people src/app/api/people src/lib/team-admin src/app/api/admin/team src/types/team.ts src/views/greenhouse/people/drawers/EditProfileDrawer.tsx src/views/greenhouse/people/PeopleList.tsx src/views/greenhouse/people/PeopleListFilters.tsx src/views/greenhouse/people/PeopleListTable.tsx src/views/greenhouse/people/PersonLeftSidebar.tsx src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonView.tsx src/views/greenhouse/people/helpers.ts src/views/greenhouse/people/tabs/PersonAssignmentsTab.tsx scripts/admin-team-runtime-smoke.ts src/lib/payroll 'src/app/api/hr/payroll/periods/[periodId]/approve/route.ts'`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `git diff --check`
+- Resultado: correcto.
+- Ajuste menor post-merge:
+  - se normalizaron imports en `PeopleList.tsx` y `PersonView.tsx`
+  - se eliminó un import no usado en `PersonLeftSidebar.tsx`
+
+### Riesgos o pendientes
+- `develop` queda listo para push y posterior validación compartida en `Staging`.
+- No se tocó `.claude/`; sigue fuera del flujo de Git.
+
 ## 2026-03-14 11:55 America/Santiago
 
 ### Agente

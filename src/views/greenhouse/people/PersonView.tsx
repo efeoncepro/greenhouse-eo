@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
+
 import { useSession } from 'next-auth/react'
 import { toast } from 'react-toastify'
 
@@ -14,6 +15,7 @@ import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
+
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AssignmentDrawer from './drawers/AssignmentDrawer'
 import EditAssignmentDrawer from './drawers/EditAssignmentDrawer'
