@@ -40,6 +40,56 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 11:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Integrar `feature/hr-payroll` en `develop`, validar el árbol mergeado y confirmar el runtime de `staging` en Vercel.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / staging
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/views/greenhouse/payroll/MemberPayrollHistory.tsx`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+
+### Verificacion
+- Merge realizado:
+  - `ad63aa5` `merge: integrate hr payroll and people unified modules`
+- Validacion local sobre el árbol mergeado:
+  - `pnpm lint`: correcto
+  - `pnpm exec tsc --noEmit --pretty false`: correcto
+  - `git diff --check`: correcto
+- Build local:
+  - `pnpm build`: el árbol compila, pero la corrida local en este worktree falla al colectar page data si no se inyecta `GCP_PROJECT`; no se trató como regresión funcional porque `staging` sí construyó correcto con envs remotas.
+- Vercel `staging` desde `develop`:
+  - deployment `dpl_EJqoBLEUZhqZiyWjpyJrh9PRWpHq`
+  - URL: `https://greenhouse-i1mmln0yp-efeonce-7670142f.vercel.app`
+  - alias estable: `https://dev-greenhouse.efeoncepro.com`
+  - estado: `Ready`
+- Smoke real en `dev-greenhouse`:
+  - `/login`: correcto
+  - `/api/people` sin sesión: `Unauthorized`
+  - login real con `humberly.henriquez@efeonce.org`: correcto
+  - `/api/auth/session`: correcto, sesión con `roleCodes ['efeonce_operations','hr_payroll']`
+  - `/api/people`: correcto
+  - `/api/hr/payroll/periods`: `200 OK`, responde `[]`
+
+### Riesgos o pendientes
+- `develop` queda listo para validación compartida y base de primera release.
+- `pre-greenhouse` sigue siendo alias compartido de preview y `dev-greenhouse` ya refleja `develop`.
+- Si se quiere cerrar el circuito de release completo, el siguiente paso es promover desde `develop` hacia `main` con revisión final de `staging`.
+
 ## 2026-03-14 10:35 America/Santiago
 
 ### Agente

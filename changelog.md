@@ -69,6 +69,10 @@
   - `hr_payroll`: `Humberly Henriquez` fue provisionada con el rol y el preview ya la reconoce con `routeGroups ['hr','internal']`
   - `GET /api/hr/payroll/periods` con sesión `hr_payroll`: `200 OK`
 - `pre-greenhouse.efeoncepro.com` fue re-asignado al deployment vigente de `feature/hr-payroll` (`greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`) para QA compartido del modulo `People`.
+- El módulo ya quedó integrado en `develop` y validado en `staging`:
+  - merge `ad63aa5`
+  - `dev-greenhouse.efeoncepro.com` ya apunta al deployment `dpl_EJqoBLEUZhqZiyWjpyJrh9PRWpHq`
+  - smoke autenticado en `staging`: correcto para `People` y `HR Payroll`
 
 ### People unified view task alignment
 - Se agrego `docs/tasks/CODEX_TASK_People_Unified_View_v2.md` como brief corregido y ejecutable para `People`, alineado al runtime real del repo.
