@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -26,6 +27,7 @@ export const dynamic = 'force-dynamic'
 
 interface ExpenseDetailRow {
   expense_id: string
+  client_id: string | null
   expense_type: string
   description: string
   currency: string
@@ -70,6 +72,7 @@ interface ExpenseDetailRow {
 
 const normalizeExpenseDetail = (row: ExpenseDetailRow) => ({
   expenseId: normalizeString(row.expense_id),
+  clientId: row.client_id ? normalizeString(row.client_id) : null,
   expenseType: normalizeString(row.expense_type),
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
@@ -151,8 +154,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{ expense_id: string }>(`
-      SELECT expense_id
+    const existing = await runFinanceQuery<{
+      expense_id: string
+      client_id: string | null
+      member_id: string | null
+      member_name: string | null
+      payroll_entry_id: string | null
+      payroll_period_id: string | null
+    }>(`
+      SELECT expense_id, client_id, member_id, member_name, payroll_entry_id, payroll_period_id
       FROM \`${projectId}.greenhouse.fin_expenses\`
       WHERE expense_id = @expenseId
     `, { expenseId })
@@ -163,6 +173,41 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const updates: string[] = []
     const updateParams: Record<string, unknown> = { expenseId }
+    const existingExpense = existing[0]
+
+    if (body.clientId !== undefined || body.clientProfileId !== undefined || body.hubspotCompanyId !== undefined) {
+      const resolvedClient = await resolveFinanceClientContext({
+        clientId: body.clientId ?? existingExpense.client_id,
+        clientProfileId: body.clientProfileId,
+        hubspotCompanyId: body.hubspotCompanyId
+      })
+
+      updates.push('client_id = @clientId')
+      updateParams.clientId = resolvedClient.clientId
+    }
+
+    if (body.memberId !== undefined || body.memberName !== undefined || body.payrollEntryId !== undefined || body.payrollPeriodId !== undefined) {
+      const resolvedMember = await resolveFinanceMemberContext({
+        memberId: body.memberId ?? existingExpense.member_id,
+        payrollEntryId: body.payrollEntryId ?? existingExpense.payroll_entry_id
+      })
+
+      updates.push('member_id = @memberId')
+      updateParams.memberId = resolvedMember.memberId
+
+      updates.push('member_name = @memberName')
+      updateParams.memberName = body.memberName
+        ? normalizeString(body.memberName)
+        : (resolvedMember.memberName || existingExpense.member_name)
+
+      updates.push('payroll_entry_id = @payrollEntryId')
+      updateParams.payrollEntryId = resolvedMember.payrollEntryId
+
+      updates.push('payroll_period_id = @payrollPeriodId')
+      updateParams.payrollPeriodId = normalizeString(body.payrollPeriodId)
+        || resolvedMember.payrollPeriodId
+        || existingExpense.payroll_period_id
+    }
 
     if (body.description !== undefined) {
       updates.push('description = @description')
@@ -217,6 +262,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       ['documentDate', 'document_date'], ['dueDate', 'due_date'],
       ['supplierId', 'supplier_id'], ['supplierName', 'supplier_name'],
       ['supplierInvoiceNumber', 'supplier_invoice_number'],
+      ['socialSecurityType', 'social_security_type'],
+      ['socialSecurityInstitution', 'social_security_institution'],
+      ['socialSecurityPeriod', 'social_security_period'],
+      ['taxType', 'tax_type'],
+      ['taxPeriod', 'tax_period'],
+      ['taxFormNumber', 'tax_form_number'],
+      ['miscellaneousCategory', 'miscellaneous_category'],
       ['notes', 'notes']
     ]
 

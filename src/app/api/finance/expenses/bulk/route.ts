@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   EXPENSE_PAYMENT_STATUSES,
@@ -53,6 +54,15 @@ export async function POST(request: Request) {
       const description = assertNonEmptyString(item.description, 'description')
       const currency = assertValidCurrency(item.currency)
       const subtotal = assertPositiveAmount(toNumber(item.subtotal), 'subtotal')
+      const resolvedClient = await resolveFinanceClientContext({
+        clientId: item.clientId,
+        clientProfileId: item.clientProfileId,
+        hubspotCompanyId: item.hubspotCompanyId
+      })
+      const resolvedMember = await resolveFinanceMemberContext({
+        memberId: item.memberId,
+        payrollEntryId: item.payrollEntryId
+      })
       const taxRate = toNumber(item.taxRate ?? 0)
       const taxAmount = toNumber(item.taxAmount) || subtotal * taxRate
       const totalAmount = toNumber(item.totalAmount) || subtotal + taxAmount
@@ -87,7 +97,7 @@ export async function POST(request: Request) {
 
       await runFinanceQuery(`
         INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-          expense_id, expense_type, description, currency,
+          expense_id, client_id, expense_type, description, currency,
           subtotal, tax_rate, tax_amount, total_amount,
           exchange_rate_to_clp, total_amount_clp,
           payment_date, payment_status, payment_method,
@@ -101,7 +111,7 @@ export async function POST(request: Request) {
           is_reconciled, notes, created_by,
           created_at, updated_at
         ) VALUES (
-          @expenseId, @expenseType, @description, @currency,
+          @expenseId, @clientId, @expenseType, @description, @currency,
           @subtotal, @taxRate, @taxAmount, @totalAmount,
           @exchangeRateToClp, @totalAmountClp,
           @paymentDate, @paymentStatus, @paymentMethod,
@@ -117,6 +127,7 @@ export async function POST(request: Request) {
         )
       `, {
         expenseId,
+        clientId: resolvedClient.clientId,
         expenseType,
         description,
         currency,
@@ -137,10 +148,10 @@ export async function POST(request: Request) {
         supplierId: item.supplierId ? normalizeString(item.supplierId) : null,
         supplierName: item.supplierName ? normalizeString(item.supplierName) : null,
         supplierInvoiceNumber: item.supplierInvoiceNumber ? normalizeString(item.supplierInvoiceNumber) : null,
-        payrollPeriodId: item.payrollPeriodId ? normalizeString(item.payrollPeriodId) : null,
-        payrollEntryId: item.payrollEntryId ? normalizeString(item.payrollEntryId) : null,
-        memberId: item.memberId ? normalizeString(item.memberId) : null,
-        memberName: item.memberName ? normalizeString(item.memberName) : null,
+        payrollPeriodId: normalizeString(item.payrollPeriodId) || resolvedMember.payrollPeriodId,
+        payrollEntryId: resolvedMember.payrollEntryId,
+        memberId: resolvedMember.memberId,
+        memberName: normalizeString(item.memberName) || resolvedMember.memberName,
         socialSecurityType: item.socialSecurityType ? normalizeString(item.socialSecurityType) : null,
         socialSecurityInstitution: item.socialSecurityInstitution ? normalizeString(item.socialSecurityInstitution) : null,
         socialSecurityPeriod: item.socialSecurityPeriod ? normalizeString(item.socialSecurityPeriod) : null,

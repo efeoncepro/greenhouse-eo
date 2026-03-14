@@ -56,6 +56,7 @@ const buildStatements = (projectId: string) => [
   `
     CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_client_profiles\` (
       client_profile_id STRING NOT NULL,
+      client_id STRING,
       hubspot_company_id STRING NOT NULL,
       tax_id STRING,
       tax_id_type STRING,
@@ -78,6 +79,7 @@ const buildStatements = (projectId: string) => [
   `
     CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_income\` (
       income_id STRING NOT NULL,
+      client_id STRING,
       client_profile_id STRING,
       hubspot_company_id STRING,
       hubspot_deal_id STRING,
@@ -111,6 +113,7 @@ const buildStatements = (projectId: string) => [
   `
     CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_expenses\` (
       expense_id STRING NOT NULL,
+      client_id STRING,
       expense_type STRING NOT NULL,
       description STRING NOT NULL,
       currency STRING NOT NULL,
@@ -204,6 +207,122 @@ const buildStatements = (projectId: string) => [
       source STRING,
       created_at TIMESTAMP
     )
+  `,
+  `ALTER TABLE \`${projectId}.greenhouse.fin_client_profiles\` ADD COLUMN IF NOT EXISTS client_id STRING`,
+  `ALTER TABLE \`${projectId}.greenhouse.fin_income\` ADD COLUMN IF NOT EXISTS client_id STRING`,
+  `ALTER TABLE \`${projectId}.greenhouse.fin_expenses\` ADD COLUMN IF NOT EXISTS client_id STRING`,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_client_profiles\` AS fp
+    SET client_id = fp.client_profile_id
+    WHERE (fp.client_id IS NULL OR fp.client_id = '')
+      AND fp.client_profile_id IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM \`${projectId}.greenhouse.clients\` AS c
+        WHERE c.active = TRUE
+          AND c.client_id = fp.client_profile_id
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_client_profiles\` AS fp
+    SET client_id = (
+      SELECT c.client_id
+      FROM \`${projectId}.greenhouse.clients\` AS c
+      WHERE c.active = TRUE
+        AND fp.hubspot_company_id IS NOT NULL
+        AND CAST(c.hubspot_company_id AS STRING) = fp.hubspot_company_id
+      ORDER BY c.client_id
+      LIMIT 1
+    )
+    WHERE (fp.client_id IS NULL OR fp.client_id = '')
+      AND fp.hubspot_company_id IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM \`${projectId}.greenhouse.clients\` AS c
+        WHERE c.active = TRUE
+          AND CAST(c.hubspot_company_id AS STRING) = fp.hubspot_company_id
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
+    SET client_id = i.client_profile_id
+    WHERE (i.client_id IS NULL OR i.client_id = '')
+      AND i.client_profile_id IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM \`${projectId}.greenhouse.clients\` AS c
+        WHERE c.active = TRUE
+          AND c.client_id = i.client_profile_id
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
+    SET client_id = (
+      SELECT fp.client_id
+      FROM \`${projectId}.greenhouse.fin_client_profiles\` AS fp
+      WHERE fp.client_id IS NOT NULL
+        AND (
+          (i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id)
+          OR (i.hubspot_company_id IS NOT NULL AND fp.hubspot_company_id = i.hubspot_company_id)
+        )
+      ORDER BY IF(i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id, 0, 1), fp.client_id
+      LIMIT 1
+    )
+    WHERE (i.client_id IS NULL OR i.client_id = '')
+      AND (
+        i.client_profile_id IS NOT NULL
+        OR i.hubspot_company_id IS NOT NULL
+      )
+      AND EXISTS (
+        SELECT 1
+        FROM \`${projectId}.greenhouse.fin_client_profiles\` AS fp
+        WHERE fp.client_id IS NOT NULL
+          AND (
+            (i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id)
+            OR (i.hubspot_company_id IS NOT NULL AND fp.hubspot_company_id = i.hubspot_company_id)
+          )
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
+    SET client_id = (
+      SELECT c.client_id
+      FROM \`${projectId}.greenhouse.clients\` AS c
+      WHERE c.active = TRUE
+        AND i.hubspot_company_id IS NOT NULL
+        AND CAST(c.hubspot_company_id AS STRING) = i.hubspot_company_id
+      ORDER BY c.client_id
+      LIMIT 1
+    )
+    WHERE (i.client_id IS NULL OR i.client_id = '')
+      AND i.hubspot_company_id IS NOT NULL
+      AND EXISTS (
+        SELECT 1
+        FROM \`${projectId}.greenhouse.clients\` AS c
+        WHERE c.active = TRUE
+          AND CAST(c.hubspot_company_id AS STRING) = i.hubspot_company_id
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_expenses\` AS e
+    SET
+      member_id = pe.member_id,
+      payroll_period_id = COALESCE(NULLIF(e.payroll_period_id, ''), pe.period_id)
+    FROM \`${projectId}.greenhouse.payroll_entries\` AS pe
+    WHERE e.payroll_entry_id = pe.entry_id
+      AND (
+        e.member_id IS NULL
+        OR e.member_id = ''
+        OR e.payroll_period_id IS NULL
+        OR e.payroll_period_id = ''
+      )
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.fin_expenses\` AS e
+    SET member_name = tm.display_name
+    FROM \`${projectId}.greenhouse.team_members\` AS tm
+    WHERE e.member_id = tm.member_id
+      AND (e.member_name IS NULL OR e.member_name = '')
   `,
   `
     MERGE \`${projectId}.greenhouse.roles\` AS target

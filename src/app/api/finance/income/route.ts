@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -27,6 +28,7 @@ export const dynamic = 'force-dynamic'
 
 interface IncomeRow {
   income_id: string
+  client_id: string | null
   client_profile_id: string | null
   hubspot_company_id: string | null
   client_name: string
@@ -56,6 +58,7 @@ interface IncomeRow {
 
 const normalizeIncome = (row: IncomeRow) => ({
   incomeId: normalizeString(row.income_id),
+  clientId: row.client_id ? normalizeString(row.client_id) : null,
   clientProfileId: row.client_profile_id ? normalizeString(row.client_profile_id) : null,
   hubspotCompanyId: row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null,
   clientName: normalizeString(row.client_name),
@@ -95,6 +98,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
+  const clientId = searchParams.get('clientId')
   const clientProfileId = searchParams.get('clientProfileId')
   const serviceLine = searchParams.get('serviceLine')
   const fromDate = searchParams.get('fromDate')
@@ -109,6 +113,11 @@ export async function GET(request: Request) {
   if (status) {
     filters += ' AND payment_status = @status'
     params.status = status
+  }
+
+  if (clientId) {
+    filters += ' AND client_id = @clientId'
+    params.clientId = clientId
   }
 
   if (clientProfileId) {
@@ -166,7 +175,16 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const clientName = assertNonEmptyString(body.clientName, 'clientName')
+    const resolvedClient = await resolveFinanceClientContext({
+      clientId: body.clientId,
+      clientProfileId: body.clientProfileId,
+      hubspotCompanyId: body.hubspotCompanyId
+    })
+
+    const clientName = assertNonEmptyString(
+      body.clientName ?? resolvedClient.clientName ?? resolvedClient.legalName,
+      'clientName'
+    )
     const invoiceDate = assertDateString(body.invoiceDate, 'invoiceDate')
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
@@ -195,7 +213,7 @@ export async function POST(request: Request) {
 
     await runFinanceQuery(`
       INSERT INTO \`${projectId}.greenhouse.fin_income\` (
-        income_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
+        income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date,
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
@@ -204,7 +222,7 @@ export async function POST(request: Request) {
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @incomeId, @clientProfileId, @hubspotCompanyId, @hubspotDealId,
+        @incomeId, @clientId, @clientProfileId, @hubspotCompanyId, @hubspotDealId,
         @clientName, @invoiceNumber, @invoiceDate, @dueDate,
         @currency, @subtotal, @taxRate, @taxAmount, @totalAmount,
         @exchangeRateToClp, @totalAmountClp,
@@ -215,8 +233,9 @@ export async function POST(request: Request) {
       )
     `, {
       incomeId,
-      clientProfileId: body.clientProfileId ? normalizeString(body.clientProfileId) : null,
-      hubspotCompanyId: body.hubspotCompanyId ? normalizeString(body.hubspotCompanyId) : null,
+      clientId: resolvedClient.clientId,
+      clientProfileId: resolvedClient.clientProfileId,
+      hubspotCompanyId: resolvedClient.hubspotCompanyId,
       hubspotDealId: body.hubspotDealId ? normalizeString(body.hubspotDealId) : null,
       clientName,
       invoiceNumber: body.invoiceNumber ? normalizeString(body.invoiceNumber) : null,

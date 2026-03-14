@@ -28,6 +28,7 @@ export async function POST() {
     USING (
       SELECT
         c.client_id AS client_profile_id,
+        c.client_id AS client_id,
         COALESCE(c.hubspot_company_id, c.client_id) AS hubspot_company_id,
         c.client_name AS legal_name,
         'CL' AS billing_country,
@@ -42,13 +43,13 @@ export async function POST() {
     ON target.client_profile_id = source.client_profile_id
     WHEN NOT MATCHED THEN
       INSERT (
-        client_profile_id, hubspot_company_id, legal_name,
+        client_profile_id, client_id, hubspot_company_id, legal_name,
         billing_country, payment_terms_days, payment_currency,
         requires_po, requires_hes, created_by,
         created_at, updated_at
       )
       VALUES (
-        source.client_profile_id, source.hubspot_company_id, source.legal_name,
+        source.client_profile_id, source.client_id, source.hubspot_company_id, source.legal_name,
         source.billing_country, source.payment_terms_days, source.payment_currency,
         source.requires_po, source.requires_hes, source.created_by,
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()

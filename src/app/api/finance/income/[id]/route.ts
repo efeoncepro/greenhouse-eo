@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -22,6 +23,7 @@ export const dynamic = 'force-dynamic'
 
 interface IncomeDetailRow {
   income_id: string
+  client_id: string | null
   client_profile_id: string | null
   hubspot_company_id: string | null
   hubspot_deal_id: string | null
@@ -68,6 +70,7 @@ const parsePaymentsReceived = (value: unknown) => {
 
 const normalizeIncomeDetail = (row: IncomeDetailRow) => ({
   incomeId: normalizeString(row.income_id),
+  clientId: row.client_id ? normalizeString(row.client_id) : null,
   clientProfileId: row.client_profile_id ? normalizeString(row.client_profile_id) : null,
   hubspotCompanyId: row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null,
   hubspotDealId: row.hubspot_deal_id ? normalizeString(row.hubspot_deal_id) : null,
@@ -138,8 +141,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{ income_id: string }>(`
-      SELECT income_id
+    const existing = await runFinanceQuery<{
+      income_id: string
+      client_id: string | null
+      client_profile_id: string | null
+      hubspot_company_id: string | null
+      client_name: string
+    }>(`
+      SELECT income_id, client_id, client_profile_id, hubspot_company_id, client_name
       FROM \`${projectId}.greenhouse.fin_income\`
       WHERE income_id = @incomeId
     `, { incomeId })
@@ -150,8 +159,37 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const updates: string[] = []
     const updateParams: Record<string, unknown> = { incomeId }
+    const existingIncome = existing[0]
 
-    if (body.clientName !== undefined) {
+    if (
+      body.clientId !== undefined
+      || body.clientProfileId !== undefined
+      || body.hubspotCompanyId !== undefined
+      || body.clientName !== undefined
+    ) {
+      const resolvedClient = await resolveFinanceClientContext({
+        clientId: body.clientId ?? existingIncome.client_id,
+        clientProfileId: body.clientProfileId ?? existingIncome.client_profile_id,
+        hubspotCompanyId: body.hubspotCompanyId ?? existingIncome.hubspot_company_id
+      })
+
+      updates.push('client_id = @clientId')
+      updateParams.clientId = resolvedClient.clientId
+
+      updates.push('client_profile_id = @clientProfileId')
+      updateParams.clientProfileId = resolvedClient.clientProfileId
+
+      updates.push('hubspot_company_id = @hubspotCompanyId')
+      updateParams.hubspotCompanyId = resolvedClient.hubspotCompanyId
+
+      updates.push('client_name = @clientName')
+      updateParams.clientName = assertNonEmptyString(
+        body.clientName ?? resolvedClient.clientName ?? resolvedClient.legalName ?? existingIncome.client_name,
+        'clientName'
+      )
+    }
+
+    if (body.clientName !== undefined && !updates.includes('client_name = @clientName')) {
       updates.push('client_name = @clientName')
       updateParams.clientName = assertNonEmptyString(body.clientName, 'clientName')
     }
@@ -244,8 +282,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     const stringFields: [string, string][] = [
-      ['clientProfileId', 'client_profile_id'],
-      ['hubspotCompanyId', 'hubspot_company_id'],
       ['hubspotDealId', 'hubspot_deal_id'],
       ['incomeType', 'income_type']
     ]

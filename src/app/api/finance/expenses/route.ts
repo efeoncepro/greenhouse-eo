@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -30,6 +31,7 @@ export const dynamic = 'force-dynamic'
 
 interface ExpenseRow {
   expense_id: string
+  client_id: string | null
   expense_type: string
   description: string
   currency: string
@@ -50,6 +52,10 @@ interface ExpenseRow {
   supplier_id: string | null
   supplier_name: string | null
   supplier_invoice_number: string | null
+  payroll_period_id: string | null
+  payroll_entry_id: string | null
+  member_id: string | null
+  member_name: string | null
   service_line: string | null
   is_recurring: boolean
   recurrence_frequency: string | null
@@ -62,6 +68,7 @@ interface ExpenseRow {
 
 const normalizeExpense = (row: ExpenseRow) => ({
   expenseId: normalizeString(row.expense_id),
+  clientId: row.client_id ? normalizeString(row.client_id) : null,
   expenseType: normalizeString(row.expense_type),
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
@@ -82,6 +89,10 @@ const normalizeExpense = (row: ExpenseRow) => ({
   supplierId: row.supplier_id ? normalizeString(row.supplier_id) : null,
   supplierName: row.supplier_name ? normalizeString(row.supplier_name) : null,
   supplierInvoiceNumber: row.supplier_invoice_number ? normalizeString(row.supplier_invoice_number) : null,
+  payrollPeriodId: row.payroll_period_id ? normalizeString(row.payroll_period_id) : null,
+  payrollEntryId: row.payroll_entry_id ? normalizeString(row.payroll_entry_id) : null,
+  memberId: row.member_id ? normalizeString(row.member_id) : null,
+  memberName: row.member_name ? normalizeString(row.member_name) : null,
   serviceLine: row.service_line ? normalizeString(row.service_line) : null,
   isRecurring: normalizeBoolean(row.is_recurring),
   recurrenceFrequency: row.recurrence_frequency ? normalizeString(row.recurrence_frequency) : null,
@@ -104,6 +115,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const expenseType = searchParams.get('expenseType')
   const status = searchParams.get('status')
+  const clientId = searchParams.get('clientId')
+  const memberId = searchParams.get('memberId')
   const supplierId = searchParams.get('supplierId')
   const serviceLine = searchParams.get('serviceLine')
   const fromDate = searchParams.get('fromDate')
@@ -123,6 +136,16 @@ export async function GET(request: Request) {
   if (status) {
     filters += ' AND payment_status = @status'
     params.status = status
+  }
+
+  if (clientId) {
+    filters += ' AND client_id = @clientId'
+    params.clientId = clientId
+  }
+
+  if (memberId) {
+    filters += ' AND member_id = @memberId'
+    params.memberId = memberId
   }
 
   if (supplierId) {
@@ -183,6 +206,15 @@ export async function POST(request: Request) {
     const description = assertNonEmptyString(body.description, 'description')
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
+    const resolvedClient = await resolveFinanceClientContext({
+      clientId: body.clientId,
+      clientProfileId: body.clientProfileId,
+      hubspotCompanyId: body.hubspotCompanyId
+    })
+    const resolvedMember = await resolveFinanceMemberContext({
+      memberId: body.memberId,
+      payrollEntryId: body.payrollEntryId
+    })
 
     const expenseType = body.expenseType && EXPENSE_TYPES.includes(body.expenseType)
       ? (body.expenseType as ExpenseType) : 'supplier'
@@ -217,30 +249,33 @@ export async function POST(request: Request) {
 
     await runFinanceQuery(`
       INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-        expense_id, expense_type, description, currency,
+        expense_id, client_id, expense_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_date, payment_status, payment_method,
         payment_account_id, payment_reference,
         document_number, document_date, due_date,
         supplier_id, supplier_name, supplier_invoice_number,
+        payroll_period_id, payroll_entry_id, member_id, member_name,
         service_line, is_recurring, recurrence_frequency,
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @expenseId, @expenseType, @description, @currency,
+        @expenseId, @clientId, @expenseType, @description, @currency,
         @subtotal, @taxRate, @taxAmount, @totalAmount,
         @exchangeRateToClp, @totalAmountClp,
         @paymentDate, @paymentStatus, @paymentMethod,
         @paymentAccountId, @paymentReference,
         @documentNumber, @documentDate, @dueDate,
         @supplierId, @supplierName, @supplierInvoiceNumber,
+        @payrollPeriodId, @payrollEntryId, @memberId, @memberName,
         @serviceLine, @isRecurring, @recurrenceFrequency,
         FALSE, @notes, @createdBy,
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
     `, {
       expenseId,
+      clientId: resolvedClient.clientId,
       expenseType,
       description,
       currency,
@@ -261,6 +296,10 @@ export async function POST(request: Request) {
       supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
       supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
       supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
+      payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
+      payrollEntryId: resolvedMember.payrollEntryId,
+      memberId: resolvedMember.memberId,
+      memberName: normalizeString(body.memberName) || resolvedMember.memberName,
       serviceLine,
       isRecurring: Boolean(body.isRecurring),
       recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,
