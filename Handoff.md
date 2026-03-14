@@ -81,6 +81,10 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Validacion local disponible en este shell:
   - `git diff --check`
   - revision manual de paths y archivos creados
+- Rechequeo previo a `push` sobre este entorno:
+  - `command -v node`: no disponible
+  - `command -v pnpm`: no disponible
+  - `command -v npx`: no disponible
 - Limitacion conocida:
   - este shell no tiene `node`/`pnpm`, asi que no se puede ejecutar `pnpm lint` ni `pnpm build` localmente en este turno
 
