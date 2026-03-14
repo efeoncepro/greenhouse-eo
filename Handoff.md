@@ -40,6 +40,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 17:45 America/Santiago
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Integrar componentes Vuexy de navbar: NavSearch (⌘K), ShortcutsDropdown, NotificationsDropdown al portal Greenhouse
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview → `pre-greenhouse.efeoncepro.com`
+
+### Archivos tocados
+- `src/components/layout/shared/search/index.tsx` (nuevo) — Command palette con ⌘K
+- `src/components/layout/shared/search/DefaultSuggestions.tsx` (nuevo) — Sugerencias por defecto en español
+- `src/components/layout/shared/search/NoResult.tsx` (nuevo) — Estado vacío
+- `src/components/layout/shared/search/styles.css` (nuevo) — Estilos del command dialog
+- `src/components/layout/shared/ShortcutsDropdown.tsx` (nuevo) — Panel de accesos rápidos (6 shortcuts)
+- `src/components/layout/shared/NotificationsDropdown.tsx` (nuevo) — Dropdown de notificaciones con badge
+- `src/data/searchData.ts` (nuevo) — 17 rutas indexadas del portal
+- `src/components/layout/vertical/NavbarContent.tsx` (modificado) — Agrega Search + Shortcuts + Notifications
+- `src/components/layout/horizontal/NavbarContent.tsx` (modificado) — Idem horizontal
+
+### Cambios realizados
+- Portados desde `full-version/` los 4 componentes de Vuexy navbar que faltaban
+- Adaptación: eliminado i18n/locale routing (Greenhouse no lo usa), textos en español
+- Search indexa: Dashboards, Finanzas (7 rutas), People (3 rutas), Administración (5 rutas)
+- Shortcuts: Finanzas, Ingresos, Usuarios, Roles, Nómina, Configuración
+- Notificaciones: placeholder estático (1 notificación de bienvenida), listo para conectar backend
+
+### Verificacion
+- `pnpm tsc --noEmit`: solo errores preexistentes (LayoutRoutes, SCIM)
+- `pnpm eslint` sobre los 9 archivos: limpio
+- Dependencias ya instaladas: cmdk, react-perfect-scrollbar, classnames, @radix-ui/react-dialog
+
+### Riesgos o pendientes
+- NotificationsDropdown tiene data estática — necesita backend de notificaciones
+- ShortcutsDropdown tiene shortcuts hardcodeados — podría personalizarse por rol
+- searchData.ts es estático — se podría generar dinámicamente según permisos del usuario
+
+---
+
 ## 2026-03-14 17:16 America/Santiago
 
 ### Agente
