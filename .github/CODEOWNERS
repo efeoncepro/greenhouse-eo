@@ -1,0 +1,10 @@
+# CODEOWNERS template
+# Activate these rules only after replacing the placeholder with a valid GitHub
+# username or team slug that has write access to this repository.
+#
+# Example:
+# * @efeoncepro/platform
+# /.github/ @efeoncepro/platform
+# /docs/ @efeoncepro/platform
+# /src/ @efeoncepro/platform
+# /scripts/ @efeoncepro/platform

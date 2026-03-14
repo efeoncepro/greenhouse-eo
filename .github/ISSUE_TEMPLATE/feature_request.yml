@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose a product, platform, or repo workflow improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What user, operator, or team pain should this change address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the ideal outcome and the expected scope.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - client
+        - admin
+        - internal
+        - agency
+        - auth
+        - capabilities
+        - data / BigQuery
+        - deploy / Vercel
+        - documentation
+        - repo workflow
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints or dependencies
+      description: Note env vars, data dependencies, rollout constraints, or design references.
+  - type: textarea
+    id: success
+    attributes:
+      label: Success signal
+      description: How should we know this is done?

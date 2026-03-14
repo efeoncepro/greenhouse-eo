@@ -14,8 +14,8 @@ It defines:
 - how different agents can work on the identity and access layer in parallel
 
 Use this document together with:
-- `GREENHOUSE_ARCHITECTURE_V1.md`
-- `MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `bigquery/greenhouse_identity_access_v1.sql`
 
 ## Problem Statement

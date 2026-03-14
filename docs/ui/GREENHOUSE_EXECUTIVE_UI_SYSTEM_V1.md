@@ -25,9 +25,9 @@ Primary visual references:
 - `../full-version/src/views/dashboards/analytics/ProjectsTable.tsx`
 
 Primary product references:
-- `GREENHOUSE_ARCHITECTURE_V1.md`
-- `GREENHOUSE_SERVICE_MODULES_V1.md`
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 
 ## Design Goal
 

@@ -3,6 +3,39 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 GitHub collaboration hygiene
+- El repo ahora incorpora una capa explicita de buenas practicas GitHub bajo `.github/`:
+  - `workflows/ci.yml`
+  - `PULL_REQUEST_TEMPLATE.md`
+  - `ISSUE_TEMPLATE/bug_report.yml`
+  - `ISSUE_TEMPLATE/feature_request.yml`
+  - `ISSUE_TEMPLATE/config.yml`
+  - `dependabot.yml`
+  - `CODEOWNERS`
+- La automatizacion minima esperada del repo queda formalizada:
+  - `pnpm lint`
+  - `pnpm build`
+  - revision semanal de dependencias `npm` y GitHub Actions via Dependabot
+- Se agregaron `.github/SECURITY.md` y `.github/SUPPORT.md` como documentos canonicos de reporte y soporte del repositorio.
+- Regla operativa nueva:
+  - Greenhouse es un repo `private` con licencia comercial declarada en `package.json`
+  - no debe agregarse una licencia open source por defecto ni asumir permisos de redistribucion sin decision explicita de Efeonce
+- Se removio la contradiccion de `.gitignore` respecto de `full-version/`; aunque siga siendo referencia local, hoy existe versionado en este workspace y no debe tratarse como artefacto ignorado.
+
+## Delta 2026-03-14 Document structure reorganization
+- La raiz documental del repo ya no debe usarse para mezclar specs, tasks y guias especializadas.
+- Regla operativa vigente:
+  - en raiz solo quedan `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md`
+  - la documentacion canónica no operativa ahora vive en `docs/`
+- Taxonomia activa:
+  - `docs/architecture/`
+  - `docs/api/`
+  - `docs/ui/`
+  - `docs/roadmap/`
+  - `docs/operations/`
+  - `docs/tasks/`
+- `docs/README.md` es el mapa maestro y `docs/tasks/README.md` concentra el indice de briefs `CODEX_TASK_*`.
+
 ## Delta 2026-03-13 Agency operator layer
 - El repo ahora tiene una primera capa agency para lectura ejecutiva interna a nivel transversal:
   - `/agency`
@@ -75,7 +108,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el modelo ya existe y la UI lo expresa como `en configuracion`
 
 ## Delta 2026-03-13 Team identity and capacity runtime
-- Se implemento una primera capa real del task `CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
+- Se implemento una primera capa real del task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
   - `GET /api/team/members`
   - `GET /api/team/capacity`
   - `GET /api/team/by-project/[projectId]`
@@ -98,7 +131,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
   - Ese repo no existe en este workspace.
   - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
-- El task `CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
+- El task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
   - La especificacion se alineo al contrato real verificado en `notion_ops.tareas`:
     - `responsables_names`
     - `responsables_ids`
@@ -129,7 +162,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-03-13 Branding lock and nav hydration
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
 - La capa de nomenclatura ya no debe mezclar portal cliente con internal/admin:
-  - `GH_CLIENT_NAV` queda reservado para la navegacion cliente normada por `Greenhouse_Nomenclatura_Portal_v3.md`
+  - `GH_CLIENT_NAV` queda reservado para la navegacion cliente normada por `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
   - `GH_INTERNAL_NAV` queda como nomenclatura operativa separada para `/internal/**` y `/admin/**`
 - Regla operativa nueva para theming runtime: Greenhouse no debe honrar cookies legacy de `primaryColor`, `skin` o `semiDark` que reintroduzcan branding Vuexy; esas preferencias quedan bloqueadas al baseline Greenhouse y solo se preservan `mode`, `layout` y widths compatibles.
 - `src/@core/utils/brandSettings.ts` y `getSettingsFromCookie()` son ahora el boundary de saneamiento para cookies de settings antes de SSR o hidratacion cliente.
@@ -141,7 +174,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GH_TEAM`
   - `GH_MESSAGES`
   - `GH_COLORS`
-- `src/config/greenhouse-nomenclature.ts` tambien versiona `GH_INTERNAL_NAV`, pero solo como capa operativa para superficies `internal/admin`; no como parte del contrato del portal cliente definido en `Greenhouse_Nomenclatura_Portal_v3.md`.
+- `src/config/greenhouse-nomenclature.ts` tambien versiona `GH_INTERNAL_NAV`, pero solo como capa operativa para superficies `internal/admin`; no como parte del contrato del portal cliente definido en `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`.
 - La navegacion cliente y las superficies principales `/login`, `/dashboard`, `/proyectos`, `/sprints` y `/settings` ya empezaron a consumir esa capa centralizada en vez de labels hardcodeados.
 - El rollout ya no es solo copy-level: la marca Efeonce ahora entra por el wiring oficial del starter kit sin crear un theme paralelo:
   - `src/components/theme/mergedTheme.ts`
@@ -193,7 +226,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si Preview falla por duplicados `* (1).ts(x)`, `tsconfig.json` ya los excluye para que el deploy no quede atascado por copias accidentales del workspace
 
 ## Delta 2026-03-13 Capabilities runtime foundation
-- La spec `Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
+- La spec `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
 - El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.
 - Se agregaron:
   - `GET /api/capabilities/resolve`
@@ -254,7 +287,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El rediseño sigue sin introducir mutaciones nuevas: `Crear space`, `Editar` y `Desactivar` quedan como affordances parciales hasta que exista workflow real.
 
 ## Delta 2026-03-12 Internal Identity Foundation
-- Se agrego `GREENHOUSE_INTERNAL_IDENTITY_V1.md` como contrato canonico para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
+- Se agrego `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md` como contrato canonico para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
 - La fundacion nueva usa:
   - `EO-USR-*` para el principal de acceso actual
   - `EO-ID-*` para el perfil canonico interno
@@ -300,24 +333,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La ruta publica adicional `/auth/access-denied` cubre el rechazo de usuarios Microsoft sin principal explicito autorizado en Greenhouse.
 
 ## Documento Maestro de Arquitectura
-- Documento maestro actual: `GREENHOUSE_ARCHITECTURE_V1.md`
-- Resumen rapido de fases y tareas: `PHASE_TASK_MATRIX.md`
+- Documento maestro actual: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- Resumen rapido de fases y tareas: `docs/roadmap/PHASE_TASK_MATRIX.md`
 - Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
-- Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `GREENHOUSE_ARCHITECTURE_V1.md`.
-- `BACKLOG.md` es el resumen operativo del roadmap; `GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
-- Documento tecnico de identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- Si un agente necesita trabajar en paralelo con otro, debe tomar su scope desde las fases y actividades definidas en `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`.
+- `docs/roadmap/BACKLOG.md` es el resumen operativo del roadmap; `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` es la explicacion completa.
+- Documento tecnico de identidad y acceso: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL de identidad y acceso: `bigquery/greenhouse_identity_access_v1.sql`
-- Documento tecnico de modulos de servicio: `GREENHOUSE_SERVICE_MODULES_V1.md`
+- Documento tecnico de modulos de servicio: `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - DDL de modulos de servicio: `bigquery/greenhouse_service_modules_v1.sql`
 - Bootstrap de modulos de servicio: `bigquery/greenhouse_service_module_bootstrap_v1.sql`
-- Metodo canonico de validacion visual: `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
-- Iniciativa tenant-especifica activa: `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
-- Contrato visual ejecutivo reusable: `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
-- Contrato canonico de orquestacion UI: `GREENHOUSE_UI_ORCHESTRATION_V1.md`
-- Catalogo curado de patrones Vuexy/MUI: `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
-- Brief canonico de intake UI: `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
+- Metodo canonico de validacion visual: `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`
+- Iniciativa tenant-especifica activa: `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- Contrato visual ejecutivo reusable: `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- Contrato canonico de orquestacion UI: `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
+- Catalogo curado de patrones Vuexy/MUI: `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
+- Brief canonico de intake UI: `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - Seed operativo para benchmark interno del dashboard: `bigquery/greenhouse_efeonce_space_v1.sql`
-- Plan UX actual para la siguiente iteracion del dashboard: `GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
+- Plan UX actual para la siguiente iteracion del dashboard: `docs/ui/GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 
 ## Especificacion Fuente
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
@@ -350,9 +383,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Vuexy tambien trae `next-auth` con JWT y pantallas/patrones de permissions, pero eso debe leerse como referencia de template, no como el modelo de seguridad final de Greenhouse.
 - En Greenhouse, JWT ya existe, pero la autorizacion real no depende del ACL demo del template; depende de roles y scopes multi-tenant resueltos server-side desde BigQuery.
 - Las apps de `User Management` y `Roles & Permissions` si deben considerarse candidatas directas para `/admin`, pero solo reutilizando estructura visual y componentes; la data layer debe salir de BigQuery y no de fake-db.
-- Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
-- La seleccion de patrones Vuexy/MUI para cualquier solicitud nueva ya no debe salir de exploracion libre de `full-version`; debe pasar por el sistema definido en `GREENHOUSE_UI_ORCHESTRATION_V1.md`.
-- El intake de solicitudes UI puede venir de personas o de otros agentes; el brief canonico para normalizar pedidos de Claude, Codex u otros queda en `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
+- Para dashboards y superficies ejecutivas, la referencia correcta es la jerarquia de `full-version/src/views/dashboards/analytics/*`; el sistema reusable que la adapta a Greenhouse queda fijado en `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+- La seleccion de patrones Vuexy/MUI para cualquier solicitud nueva ya no debe salir de exploracion libre de `full-version`; debe pasar por el sistema definido en `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`.
+- El intake de solicitudes UI puede venir de personas o de otros agentes; el brief canonico para normalizar pedidos de Claude, Codex u otros queda en `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
 - El repo tambien versiona una copia del skill operativo en `.codex/skills/greenhouse-ui-orchestrator/` para que el flujo no dependa solo del perfil local del agente.
 
 ## Stack Actual
@@ -413,7 +446,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `recharts` y `keen-slider` ya estan disponibles en `starter-kit`; usarlos solo cuando una superficie lo justifique y manteniendo `apexcharts` como base actual del dashboard.
 
 ## Regla documental compacta
-- La estrategia de documentacion liviana del repo queda en `DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- La estrategia de documentacion liviana del repo queda en `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
 - `Handoff.md` debe mantener solo el estado activo del turno o del frente abierto.
 - `Handoff.archive.md` conserva el historial detallado cuando un handoff deja de ser operativo como snapshot rapido.
@@ -514,7 +547,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - crea usuarios `invited` cuando no existen
   - reconcilia usuarios ya existentes del mismo tenant por email para reparar rol `client_executive` y scopes base si quedaron incompletos
   - evita falsos `already_exists` cuando el usuario existia pero su acceso no estaba completo
-- ya existe una base documental para un orquestador UI multi-agente: `GREENHOUSE_UI_ORCHESTRATION_V1.md`, `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` y `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md` fijan como Claude, Codex u otros asistentes deben normalizar solicitudes y seleccionar patrones Vuexy/MUI sin explorar `full-version` de forma ad hoc
+- ya existe una base documental para un orquestador UI multi-agente: `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`, `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md` y `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md` fijan como Claude, Codex u otros asistentes deben normalizar solicitudes y seleccionar patrones Vuexy/MUI sin explorar `full-version` de forma ad hoc
 - Regla de latencia actual:
   - `company profile`, `owner` y `contacts` pueden reflejar cambios de HubSpot con baja latencia cuando Greenhouse vuelve a consultar el servicio dedicado
   - `capabilities` siguen siendo sync-based hasta que exista una capa event-driven o webhook-driven
@@ -613,9 +646,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Dataset creado: `efeonce-group.greenhouse`
 - Tabla creada: `greenhouse.clients`
 - Tenant bootstrap cargado: `greenhouse-demo-client`
-- Documento de referencia: `MULTITENANT_ARCHITECTURE.md`
-- Documento maestro de evolucion: `GREENHOUSE_ARCHITECTURE_V1.md`
-- Documento de Fase 1 para identidad y acceso: `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- Documento de referencia: `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- Documento maestro de evolucion: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- Documento de Fase 1 para identidad y acceso: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - DDL versionado: `bigquery/greenhouse_clients.sql`
 - DDL propuesto para evolucion multi-user: `bigquery/greenhouse_identity_access_v1.sql`
 - DDL multi-user ya aplicado en BigQuery: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
@@ -633,7 +666,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Mantener la politica de finales de linea en `LF` y evitar depender de conversiones automaticas de Git en Windows.
 - En Windows local, `build` usa un `distDir` dinamico bajo `.next-local/` para evitar fallos `EPERM` al reutilizar la misma salida dentro de OneDrive.
 - Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
-- La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
+- La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
 - Capability governance no debe derivarse desde `deals` ni `closedwon`; el sync externo solo es valido cuando llega con payload explicito desde el registro de empresa u otra fuente canonica equivalente.
 - La fuente canonica de nomenclatura y microcopy Greenhouse vive en `src/config/greenhouse-nomenclature.ts`; cualquier texto visible nuevo en cliente debe salir de esa capa.
 - La navegacion cliente vigente para el portal Greenhouse contempla `Pulse`, `Proyectos`, `Ciclos`, `Mi Greenhouse` y `Updates`.
@@ -650,7 +683,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Falta relacion campanas con proyectos, entregables e indicadores.
 - Falta aterrizar completamente el sistema ejecutivo reusable en runtime para que `/dashboard`, `/equipo`, `/campanas` e internal/admin compartan un mismo lenguaje visual.
 - Sigue pendiente decidir cuando persistir `public_id` en BigQuery; por ahora el runtime puede derivarlos sin romper `client_id` y `user_id`.
-- La nueva referencia para conectores externos es `GREENHOUSE_INTEGRATIONS_API_V1.md`; la API de integraciones debe mantenerse generica para HubSpot, Notion u otros sistemas.
+- La nueva referencia para conectores externos es `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`; la API de integraciones debe mantenerse generica para HubSpot, Notion u otros sistemas.
 - `GET /api/integrations/v1/tenants` no debe enviar parametros `NULL` sin `types` a BigQuery; el runtime vigente usa strings vacios como sentinel y tipos explicitos para mantener estable la resolucion de tenants en integraciones externas.
 - La nueva lectura operacional de HubSpot no reemplaza la API generica de integraciones:
   - `/api/integrations/v1/*` sigue siendo el contrato para sync bidireccional de capabilities

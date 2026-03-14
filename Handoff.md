@@ -40,6 +40,97 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 09:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Implementar la capa faltante de buenas practicas GitHub del repo sin tocar producto: CI, templates de PR/issues, Dependabot, `CODEOWNERS`, soporte/seguridad y housekeeping documental.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / repo hygiene
+
+### Archivos tocados
+- `.github/workflows/ci.yml`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/ISSUE_TEMPLATE/bug_report.yml`
+- `.github/ISSUE_TEMPLATE/feature_request.yml`
+- `.github/ISSUE_TEMPLATE/config.yml`
+- `.github/dependabot.yml`
+- `.github/CODEOWNERS`
+- `.github/SECURITY.md`
+- `.github/SUPPORT.md`
+- `.gitignore`
+- `README.md`
+- `CONTRIBUTING.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `scripts/mint-local-admin-jwt (1).js`
+
+### Verificacion
+- Verificacion estructural prevista:
+  - `.github/` ahora debe contener CI, templates y metadata de repo
+  - `README.md` y `CONTRIBUTING.md` deben reflejar el flujo GitHub actual
+  - `.gitignore` ya no debe contradecir el hecho de que `full-version/` esta versionado
+- Validacion local disponible en este shell:
+  - `git diff --check`
+  - revision manual de paths y archivos creados
+- Limitacion conocida:
+  - este shell no tiene `node`/`pnpm`, asi que no se puede ejecutar `pnpm lint` ni `pnpm build` localmente en este turno
+
+### Riesgos o pendientes
+- `.github/CODEOWNERS` queda como template seguro hasta confirmar un username o team slug valido con permisos de escritura en GitHub.
+- No se agrego `LICENSE` porque el repo es `private` y `Commercial`; eso requiere decision legal explicita y no debe inventarse.
+
+## 2026-03-14 01:10 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Reorganizar la documentacion Markdown del repo para limpiar la raiz, mover specs y tasks a `docs/`, y actualizar referencias sin romper el flujo operativo entre agentes.
+
+### Rama
+- Rama usada: `feature/admin-tenant-detail-redesign`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / docs hygiene
+
+### Archivos tocados
+- `README.md`
+- `AGENTS.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+- `.codex/skills/greenhouse-ui-orchestrator/SKILL.md`
+- `docs/README.md`
+- `docs/tasks/README.md`
+- `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+- multiples docs movidos a `docs/architecture/*`, `docs/api/*`, `docs/ui/*`, `docs/roadmap/*` y `docs/tasks/*`
+
+### Verificacion
+- `find . -maxdepth 1 -name '*.md'` ahora devuelve solo:
+  - `README.md`
+  - `AGENTS.md`
+  - `CONTRIBUTING.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `Handoff.archive.md`
+  - `changelog.md`
+- `rg` de referencias documentales sin rutas viejas a archivos movidos: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- No se dejaron stubs en raiz para los documentos movidos; cualquier referencia externa fuera del repo que use paths antiguos debera actualizarse.
+- Conviene revisar futuros PRs para que no vuelvan a caer `.md` especializados en raiz por inercia.
+
 ## 2026-03-13 23:58 America/Santiago
 
 ### Agente
@@ -136,7 +227,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
+- Ejecutar `docs/tasks/CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
 
 ### Rama
 - Rama usada: `feature/google-sso`
@@ -233,7 +324,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Cerrar los gaps literales que quedaban entre el task `CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
+- Cerrar los gaps literales que quedaban entre el task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
 
 ### Rama
 - Rama usada: `fix/team-identity-task-closeout`
@@ -252,7 +343,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/components/greenhouse/SprintTeamVelocitySection.tsx`
 - `src/views/greenhouse/dashboard/helpers.ts`
 - `src/config/greenhouse-nomenclature.ts`
-- `CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
@@ -532,7 +623,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Corregir la interpretacion de `Greenhouse_Nomenclatura_Portal_v3.md` para no mezclar la navegacion cliente del documento con labels de `internal/admin`, y realinear la distribucion del sidebar cliente.
+- Corregir la interpretacion de `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` para no mezclar la navegacion cliente del documento con labels de `internal/admin`, y realinear la distribucion del sidebar cliente.
 
 ### Rama
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
@@ -575,7 +666,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel y revisar desalineaciones de microcopy contra `Greenhouse_Nomenclatura_Portal_v3.md`.
+- Endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel y revisar desalineaciones de microcopy contra `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`.
 
 ### Rama
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
@@ -651,7 +742,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Cerrar la ejecucion real de `Greenhouse_Nomenclatura_Portal_v3.md`, no solo a nivel de labels, sino tambien en theming, tipografia, sidebar branded y copy secundaria del dashboard cliente activo.
+- Cerrar la ejecucion real de `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`, no solo a nivel de labels, sino tambien en theming, tipografia, sidebar branded y copy secundaria del dashboard cliente activo.
 
 ### Rama
 - Rama usada: `develop`
@@ -694,7 +785,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se ejecuto validacion visual autenticada real en `/login`, `/dashboard`, `/proyectos`, `/sprints` o `/settings`
 
 ### Riesgos o pendientes
-- Falta smoke visual autenticado real del sidebar branded, login y dashboard cliente siguiendo `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`; este turno valido estructura y build, no jerarquia visual final.
+- Falta smoke visual autenticado real del sidebar branded, login y dashboard cliente siguiendo `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`; este turno valido estructura y build, no jerarquia visual final.
 - `themeConfig.mode` queda en `light` como default del documento, pero el switch runtime de `light/dark/system` sigue existiendo; conviene revisar que el look & feel en `dark` no necesite ajuste fino despues del smoke visual.
 - El documento completo sigue siendo mas amplio que este slice: admin e internal aun conservan copy legacy fuera de la capa centralizada y no fueron objetivo de este turno.
 
@@ -704,7 +795,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `Greenhouse_Nomenclatura_Portal_v3.md` sobre las superficies cliente principales sin romper el sistema de theming oficial de Vuexy.
+- Ejecutar `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` sobre las superficies cliente principales sin romper el sistema de theming oficial de Vuexy.
 
 ### Rama
 - Rama usada: `develop`
@@ -858,7 +949,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar la siguiente capa pendiente de `Greenhouse_Capabilities_Architecture_v1.md`: query builders dedicados, cache por capability y guard server-side reusable, dejando el flujo validado y publicado.
+- Ejecutar la siguiente capa pendiente de `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`: query builders dedicados, cache por capability y guard server-side reusable, dejando el flujo validado y publicado.
 
 ### Rama
 - Rama usada: `develop`
@@ -902,7 +993,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Cerrar la validacion pendiente de `Greenhouse_Capabilities_Architecture_v1.md` con preview admin autenticada, smoke local real y estabilizacion de la verificacion TypeScript en este worktree.
+- Cerrar la validacion pendiente de `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` con preview admin autenticada, smoke local real y estabilizacion de la verificacion TypeScript en este worktree.
 
 ### Rama
 - Rama usada: `develop`
@@ -947,7 +1038,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `Greenhouse_Capabilities_Architecture_v1.md` sobre la arquitectura real del repo, alineando capabilities con `businessLines` y `serviceModules` ya resueltos en sesion y no con el modelo legacy de `greenhouse.clients`.
+- Ejecutar `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` sobre la arquitectura real del repo, alineando capabilities con `businessLines` y `serviceModules` ya resueltos en sesion y no con el modelo legacy de `greenhouse.clients`.
 
 ### Rama
 - Rama usada: `develop`
@@ -988,7 +1079,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
+- Ejecutar `docs/tasks/CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
 
 ### Rama
 - Rama usada: `develop`
@@ -1011,7 +1102,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `scripts/setup-bigquery.sql`
 - `.env.example`
 - `.env.local.example`
-- `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `README.md`
 - `project_context.md`
 - `changelog.md`
@@ -1044,7 +1135,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar el brief `CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
+- Ejecutar el brief `docs/tasks/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
 
 ### Rama
 - Rama usada: `develop`
@@ -1075,7 +1166,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar el brief `CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
+- Ejecutar el brief `docs/tasks/CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
 
 ### Rama
 - Rama usada: `develop`
@@ -1127,7 +1218,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Development con aplicacion real en BigQuery
 
 ### Archivos tocados
-- `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `bigquery/greenhouse_internal_identity_v1.sql`
 - `scripts/backfill-internal-identity-profiles.ts`
 - `src/lib/ids/greenhouse-ids.ts`
@@ -1166,9 +1257,9 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Development / documentacion operativa
 
 ### Archivos tocados
-- `GREENHOUSE_UI_ORCHESTRATION_V1.md`
-- `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
-- `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
+- `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
+- `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
+- `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - `README.md`
 - `project_context.md`
 - `Handoff.md`
@@ -1178,7 +1269,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Verificacion
 - Revision documental del modelo actual en:
-  - `DOCUMENTATION_OPERATING_MODEL_V1.md`
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
   - `references/ui-ux-vuexy.md` del skill `greenhouse-vuexy-portal`
 - Verificacion de referencias reales en `full-version` y `starter-kit` para:
   - `WebsiteAnalyticsSlider`
@@ -1303,7 +1394,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Ejecutar `CODEX_TASK_Tenant_Detail_View_Redesign.md` y rediseñar `/admin/tenants/[id]` con header, tabs y patrones Vuexy reutilizados desde `full-version`.
+- Ejecutar `docs/tasks/CODEX_TASK_Tenant_Detail_View_Redesign.md` y rediseñar `/admin/tenants/[id]` con header, tabs y patrones Vuexy reutilizados desde `full-version`.
 
 ### Rama
 - Rama usada: actual de trabajo local
@@ -1334,7 +1425,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El brief pedia notas operativas editables, pero no existe una mutacion ya expuesta para `notes`; la vista quedo preparada como lectura clara, no como editor persistente.
 - El repo no trae `@mui/x-data-grid`; la tabla de usuarios y la de service modules quedaron resueltas con el patron Vuexy existente sobre `@tanstack/react-table` y `TablePaginationComponent`.
-- Conviene correr la validacion visual autentica descrita en `GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` sobre `/admin/tenants/[id]` y revisar responsive en tablet antes de cerrar commit final.
+- Conviene correr la validacion visual autentica descrita en `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` sobre `/admin/tenants/[id]` y revisar responsive en tablet antes de cerrar commit final.
 
 ### Fecha
 - 2026-03-13 11:35 America/Santiago
@@ -1343,7 +1434,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Codex
 
 ### Objetivo del turno
-- Implementar la fase principal de alineacion a `Greenhouse_Nomenclatura_Portal_v3.md` sin mezclar trabajo de agente/runtime AI.
+- Implementar la fase principal de alineacion a `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` sin mezclar trabajo de agente/runtime AI.
 - Canonicalizar microcopy cliente e `internal/admin` en `src/config/greenhouse-nomenclature.ts`.
 - Completar piezas faltantes del portal cliente: `Updates`, `Tu equipo de cuenta` en `Mi Greenhouse`, y `Ciclos` con modulos base adicionales.
 

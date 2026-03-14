@@ -13,7 +13,7 @@ The API is not the connector itself.
 It is the Greenhouse-side contract that those connectors can call.
 
 Machine-readable handoff:
-- `GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
 ## Authentication
 

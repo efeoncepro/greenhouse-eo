@@ -234,7 +234,7 @@ Recommended runtime outcomes:
 - admin and billing views show business line and active modules
 
 Reference:
-- `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 
 ## Product Modules
 
@@ -645,7 +645,7 @@ Admin detail reuse rule:
 ### Executive UI system rule
 
 Reference:
-- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 The dashboard and future executive surfaces should converge on:
 - one dominant hero card
@@ -908,7 +908,7 @@ Outputs:
 - capacity section
 - risk section
 - campaigns-in-focus block
-- reusable executive UI layer aligned to `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+- reusable executive UI layer aligned to `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 Dependencies:
 - Activity 2.1
@@ -1338,7 +1338,7 @@ Component boundary rule:
 ### For docs and architecture changes
 
 - update `project_context.md`
-- update `BACKLOG.md`
+- update `docs/roadmap/BACKLOG.md`
 - update `Handoff.md`
 - update `changelog.md` when architecture or roadmap changes materially
 
@@ -1378,7 +1378,7 @@ Component boundary rule:
 The architecture must allow tenant-specific emphasis without hardcoding product semantics by tenant name.
 
 Current active tenant-specific initiative:
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 
 Rule:
 - a tenant-specific request may change copy, emphasis, or sequencing
@@ -1401,7 +1401,7 @@ For Sky specifically, the current architecture stance is:
 
 ## Immediate Next Actions
 
-1. Refactor `/dashboard` into the reusable executive UI system defined in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
+1. Refactor `/dashboard` into the reusable executive UI system defined in `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
 2. Build `/admin/scopes` and `/admin/feature-flags`.
 3. Build `/api/sprints` and the real `/sprints`.
 4. Extend `serviceModules` from dashboard composition into navigation and billing context.
@@ -1422,7 +1422,7 @@ This document is not optional context for architecture-changing work.
 
 ## Related Design Documents
 
-- `GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
 - `bigquery/greenhouse_identity_access_v1.sql`: proposed BigQuery schema and bootstrap seed for users, roles, and scopes
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`: validated scope and feasibility notes for the Sky Airline dashboard slice
-- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: reusable executive UI contract derived from Vuexy analytics hierarchy
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`: validated scope and feasibility notes for the Sky Airline dashboard slice
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: reusable executive UI contract derived from Vuexy analytics hierarchy

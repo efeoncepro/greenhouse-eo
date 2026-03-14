@@ -18,9 +18,9 @@ Read only what the task needs, in this order:
 - `<repo>/AGENTS.md`
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
-- `<repo>/GREENHOUSE_UI_ORCHESTRATION_V1.md`
-- `<repo>/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
-- `<repo>/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
+- `<repo>/docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
+- `<repo>/docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
+- `<repo>/docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 
 If the task is visual or needs extra Vuexy heuristics:
 - use the existing `greenhouse-vuexy-portal` skill
@@ -49,9 +49,9 @@ Normalize it into:
 ## Workflow
 
 1. Confirm the active phase and route surface.
-2. Normalize the request with `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
+2. Normalize the request with `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`.
 3. Inspect local shared components before opening `full-version`.
-4. Choose one primary pattern family from `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`.
+4. Choose one primary pattern family from `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`.
 5. Inspect at most 1 to 3 `full-version` references for that family.
 6. Decide whether the implementation belongs in:
    - `src/components/greenhouse/*`

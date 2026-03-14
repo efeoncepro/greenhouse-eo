@@ -41,10 +41,10 @@ Este sistema no decide:
 
 ## Relacion con otros documentos
 
-- `GREENHOUSE_ARCHITECTURE_V1.md`: define producto, limites y fases
-- `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: contrato visual de superficies ejecutivas
-- `GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`: catalogo curado de patrones permitidos
-- `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`: formato de normalizacion de solicitudes
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`: define producto, limites y fases
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: contrato visual de superficies ejecutivas
+- `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`: catalogo curado de patrones permitidos
+- `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`: formato de normalizacion de solicitudes
 - `project_context.md`: estado operativo del repo y librerias activas
 
 ## Problema que resuelve
@@ -142,7 +142,7 @@ Toda solicitud debe normalizarse a este modelo, aunque el texto original venga r
 - revisar si la fase actual permite construir esa vista o si primero falta modelar datos
 
 2. Normalizar la solicitud
-- usar `GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
+- usar `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - el prompt original del agente upstream se trata como insumo, no como verdad cerrada
 
 3. Inspeccionar la realidad local

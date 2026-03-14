@@ -25,8 +25,8 @@ Routes:
 - `POST /api/integrations/v1/tenants/capabilities/sync`
 
 Read next:
-- `GREENHOUSE_INTEGRATIONS_API_V1.md`
-- `GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 
 Key rules:
 - provider-neutral contract
@@ -51,7 +51,7 @@ Routes:
 - `POST /api/admin/tenants/[id]/capabilities/sync`
 
 Read next:
-- `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 
 Key rules:
 - manual admin assignments keep precedence
@@ -60,9 +60,9 @@ Key rules:
 
 ## Recommended Read Order For Another Codex
 
-1. `GREENHOUSE_API_REFERENCE_V1.md`
-2. `GREENHOUSE_INTEGRATIONS_API_V1.md`
-3. `GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+2. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+3. `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
 4. `project_context.md`
 5. `Handoff.md`
 

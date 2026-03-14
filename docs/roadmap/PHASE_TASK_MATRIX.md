@@ -10,8 +10,8 @@ Use it when:
 - product and technical discussions need a compact execution view
 
 Primary sources:
-- `BACKLOG.md`
-- `GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/roadmap/BACKLOG.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 
 ## Current Status
 
@@ -50,7 +50,7 @@ Pending tasks:
 - create `/api/dashboard/market-speed`
 - add campaign-aware dashboard slices once `/campanas` exists
 - tenant-specific slice currently defined:
-- `SKY_TENANT_EXECUTIVE_SLICE_V1.md`
+- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - for Sky, monthly `on-time`, tenure, and deliverables or adjustments by month are now implemented in the dashboard
 - for Sky, reusable sections for quality, account team, tooling, and AI tooling are now implemented in the dashboard
 - current guardrail: `RpA` can render from measured or seeded fallback, but the source must be explicit in the UI
@@ -111,7 +111,7 @@ Pending tasks:
 
 ## Recommended Near-Term Order
 
-1. Refactor `/dashboard` into the reusable `Executive UI System` documented in `GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+1. Refactor `/dashboard` into the reusable `Executive UI System` documented in `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 2. Build `/admin/scopes` and `/admin/feature-flags`
 3. Build `/api/sprints` and the real `/sprints`
 4. Start team/capacity once assignment source of truth is clear
