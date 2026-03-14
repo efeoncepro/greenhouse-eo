@@ -40,6 +40,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 10:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Promover `develop` a `main`, desplegar `Production` y validar el primer release operativo de Greenhouse.
+
+### Rama
+- Rama usada: `main`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Production / Vercel
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Promocion Git:
+  - `origin/main` fue actualizado por fast-forward desde `origin/develop`
+  - release commit en producción: `361d36e`
+- Vercel `Production`:
+  - deployment `dpl_7LZ3GcuYRp5oKubke42u8mvJuF2E`
+  - URL: `https://greenhouse-ld2p73cqt-efeonce-7670142f.vercel.app`
+  - dominio productivo: `https://greenhouse.efeoncepro.com`
+  - estado: `Ready`
+- Smoke real en producción:
+  - `/login`: correcto
+  - `/api/people` sin sesión: `Unauthorized`
+  - login real con `humberly.henriquez@efeonce.org`: correcto
+  - `/api/auth/session`: correcto, sesión con `roleCodes ['efeonce_operations','hr_payroll']`
+  - `/api/people`: correcto
+  - `/api/hr/payroll/periods`: `200 OK`, responde `[]`
+
+### Riesgos o pendientes
+- El primer release de Greenhouse queda ya activo en `Production`.
+- `develop` y `main` deben conservarse sincronizadas desde este punto como ramas base de staging y producción.
+- El siguiente trabajo recomendado ya no es release, sino el próximo módulo funcional sobre esta base estable.
+
 ## 2026-03-14 11:35 America/Santiago
 
 ### Agente

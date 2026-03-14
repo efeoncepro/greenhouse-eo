@@ -6,6 +6,21 @@
 
 ## 2026-03-14
 
+### First production release
+- `main` fue promovida por fast-forward desde `develop` y Greenhouse queda lanzado formalmente en producción.
+- Deployment productivo validado:
+  - commit release: `361d36e`
+  - deployment: `dpl_7LZ3GcuYRp5oKubke42u8mvJuF2E`
+  - URL: `https://greenhouse-ld2p73cqt-efeonce-7670142f.vercel.app`
+  - dominio final: `https://greenhouse.efeoncepro.com`
+- Smoke real en producción:
+  - `/login`: correcto
+  - `/api/people` sin sesión: `Unauthorized`
+  - login real con `humberly.henriquez@efeonce.org`: correcto
+  - `/api/auth/session`: correcto
+  - `/api/people`: correcto
+  - `/api/hr/payroll/periods`: `200 OK`
+
 ### People unified frontend
 - Se implemento el frontend completo de `People Unified View v2` con 18 archivos nuevos.
 - Lista `/people`: stats row (4 cards), filtros (rol, pais, estado, busqueda), tabla TanStack con avatar, cargo, pais, FTE, estado.
