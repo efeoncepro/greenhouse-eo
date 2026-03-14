@@ -58,10 +58,10 @@ const TenantProjectsPanel = ({ projects }: Props) => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_project}</TableCell>
-                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_id}</TableCell>
-                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_users}</TableCell>
-                      <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_state}</TableCell>
+                      <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_project}</TableCell>
+                      <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_id}</TableCell>
+                      <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_users}</TableCell>
+                      <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_projects_header_state}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

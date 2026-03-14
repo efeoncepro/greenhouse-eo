@@ -292,25 +292,33 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
             <thead>
               {table.getHeaderGroups().map(headerGroup => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map(header => (
-                    <th key={header.id}>
-                      {header.isPlaceholder ? null : (
-                        <div
-                          className={classnames({
-                            'flex items-center gap-2': header.column.getIsSorted(),
-                            'cursor-pointer select-none': header.column.getCanSort()
-                          })}
-                          onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{
-                            asc: <i className='tabler-chevron-up text-xl' />,
-                            desc: <i className='tabler-chevron-down text-xl' />
-                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                        </div>
-                      )}
-                    </th>
-                  ))}
+                  {headerGroup.headers.map(header => {
+                    const sorted = header.column.getIsSorted()
+
+                    return (
+                      <th
+                        key={header.id}
+                        scope='col'
+                        aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : header.column.getCanSort() ? 'none' : undefined}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div
+                            className={classnames({
+                              'flex items-center gap-2': sorted,
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' aria-hidden='true' />,
+                              desc: <i className='tabler-chevron-down text-xl' aria-hidden='true' />
+                            }[sorted as 'asc' | 'desc'] ?? null}
+                          </div>
+                        )}
+                      </th>
+                    )
+                  })}
                 </tr>
               ))}
             </thead>

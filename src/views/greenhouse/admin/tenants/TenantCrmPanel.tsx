@@ -439,8 +439,8 @@ const TenantCrmPanel = ({ data, capabilities, isRefreshingHubSpot, onRefreshHubS
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_contact}</TableCell>
-                              <TableCell>
+                              <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_contact}</TableCell>
+                              <TableCell component='th' scope='col'>
                                 {activeCrmTab === 'contacto'
                                   ? GH_INTERNAL_MESSAGES.admin_tenant_crm_header_channels
                                   : activeCrmTab === 'cuerpo'
@@ -449,8 +449,8 @@ const TenantCrmPanel = ({ data, capabilities, isRefreshingHubSpot, onRefreshHubS
                                       ? GH_INTERNAL_MESSAGES.admin_tenant_crm_header_cycle
                                       : GH_INTERNAL_MESSAGES.admin_tenant_crm_header_provider}
                               </TableCell>
-                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_user}</TableCell>
-                              <TableCell>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_status}</TableCell>
+                              <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_user}</TableCell>
+                              <TableCell component='th' scope='col'>{GH_INTERNAL_MESSAGES.admin_tenant_crm_header_status}</TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>

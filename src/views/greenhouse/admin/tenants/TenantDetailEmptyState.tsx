@@ -38,7 +38,7 @@ const TenantDetailEmptyState = ({
               backgroundColor: 'action.hover'
             }}
           >
-            <i className={`${icon} text-[30px]`} />
+            <i className={`${icon} text-[30px]`} aria-hidden='true' />
           </Stack>
           <Stack spacing={1}>
             <Typography variant='h6'>{title}</Typography>

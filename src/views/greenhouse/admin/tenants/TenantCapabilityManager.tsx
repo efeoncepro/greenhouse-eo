@@ -8,13 +8,14 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
-import Chip from '@mui/material/Chip'
-import Collapse from '@mui/material/Collapse'
 import CircularProgress from '@mui/material/CircularProgress'
+import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+
+import CustomChip from '@core/components/mui/Chip'
 
 import { BrandWordmark, BusinessLineBadge } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
@@ -171,12 +172,13 @@ const TenantCapabilityManager = forwardRef<TenantCapabilityManagerHandle, Tenant
                   </Typography>
                 )}
                 <Stack direction='row' gap={1} flexWrap='wrap'>
-                  <Chip size='small' variant='tonal' color='secondary' label={capability.publicModuleId} />
+                  <CustomChip round='true' size='small' variant='tonal' color='secondary' label={capability.publicModuleId} />
                   {parentLabel ? <BusinessLineBadge brand={parentLabel} height={15} /> : null}
-                  <Chip
+                  <CustomChip
+                    round='true'
                     size='small'
-                    variant='outlined'
-                    color={getSourceTone(capability.assignmentSourceSystem)}
+                    variant='tonal'
+                    color={getSourceTone(capability.assignmentSourceSystem) === 'default' ? 'secondary' : getSourceTone(capability.assignmentSourceSystem)}
                     label={getSourceLabel(capability)}
                   />
                 </Stack>

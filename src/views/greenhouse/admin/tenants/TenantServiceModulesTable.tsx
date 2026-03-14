@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 
-import Chip from '@mui/material/Chip'
 import MenuItem from '@mui/material/MenuItem'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
@@ -18,6 +17,7 @@ import {
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import classnames from 'classnames'
 
+import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
@@ -87,7 +87,9 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
       }),
       columnHelper.accessor('publicModuleId', {
         header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_code,
-        cell: ({ row }) => <Chip size='small' variant='outlined' label={row.original.publicModuleId} />
+        cell: ({ row }) => (
+          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{row.original.publicModuleId}</Typography>
+        )
       }),
       columnHelper.accessor('familyLabel', {
         header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_family,
@@ -102,7 +104,8 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
         header: GH_INTERNAL_MESSAGES.admin_tenant_service_modules_header_state,
         cell: ({ row }) => (
           <div className='flex flex-col gap-1'>
-            <Chip
+            <CustomChip
+              round='true'
               size='small'
               variant='tonal'
               color={getCapabilitySourceTone(row.original)}
@@ -183,25 +186,33 @@ const TenantServiceModulesTable = ({ capabilities }: TenantServiceModulesTablePr
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={classnames({
-                          'flex items-center gap-2': header.column.getIsSorted(),
-                          'cursor-pointer select-none': header.column.getCanSort()
-                        })}
-                        onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {{
-                          asc: <i className='tabler-chevron-up text-xl' />,
-                          desc: <i className='tabler-chevron-down text-xl' />
-                        }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                      </div>
-                    )}
-                  </th>
-                ))}
+                {headerGroup.headers.map(header => {
+                  const sorted = header.column.getIsSorted()
+
+                  return (
+                    <th
+                      key={header.id}
+                      scope='col'
+                      aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : header.column.getCanSort() ? 'none' : undefined}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={classnames({
+                            'flex items-center gap-2': sorted,
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' aria-hidden='true' />,
+                            desc: <i className='tabler-chevron-down text-xl' aria-hidden='true' />
+                          }[sorted as 'asc' | 'desc'] ?? null}
+                        </div>
+                      )}
+                    </th>
+                  )
+                })}
               </tr>
             ))}
           </thead>
