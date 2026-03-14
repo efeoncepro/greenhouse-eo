@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,6 +86,7 @@ const SuppliersListView = () => {
   const [total, setTotal] = useState(0)
   const [categoryFilter, setCategoryFilter] = useState('')
   const [internationalFilter, setInternationalFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true)
@@ -170,7 +172,7 @@ const SuppliersListView = () => {
           variant='contained'
           color='primary'
           startIcon={<i className='tabler-plus' />}
-          href='/finance/suppliers'
+          onClick={() => setDrawerOpen(true)}
         >
           Nuevo proveedor
         </Button>
@@ -341,6 +343,8 @@ const SuppliersListView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateSupplierDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchSuppliers() }} />
     </Box>
   )
 }

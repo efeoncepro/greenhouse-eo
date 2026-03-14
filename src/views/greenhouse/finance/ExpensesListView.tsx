@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -116,6 +117,7 @@ const ExpensesListView = () => {
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true)
@@ -193,7 +195,7 @@ const ExpensesListView = () => {
             Pagos, obligaciones y cuentas por pagar
           </Typography>
         </Box>
-        <Button variant='contained' color='error' startIcon={<i className='tabler-plus' />}>
+        <Button variant='contained' color='error' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
           Registrar egreso
         </Button>
       </Box>
@@ -355,6 +357,8 @@ const ExpensesListView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateExpenseDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchExpenses() }} />
     </Box>
   )
 }

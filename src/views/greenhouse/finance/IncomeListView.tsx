@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -96,6 +97,7 @@ const IncomeListView = () => {
   const [items, setItems] = useState<Income[]>([])
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchIncome = useCallback(async () => {
     setLoading(true)
@@ -172,7 +174,7 @@ const IncomeListView = () => {
             Facturación, cobros y cuentas por cobrar
           </Typography>
         </Box>
-        <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />}>
+        <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
           Registrar ingreso
         </Button>
       </Box>
@@ -321,6 +323,8 @@ const IncomeListView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateIncomeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchIncome() }} />
     </Box>
   )
 }

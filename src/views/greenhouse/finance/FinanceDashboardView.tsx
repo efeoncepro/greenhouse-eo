@@ -28,6 +28,8 @@ import type { ApexOptions } from 'apexcharts'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import OptionMenu from '@core/components/option-menu'
+import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
+import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
 
@@ -196,6 +198,8 @@ const FinanceDashboardView = () => {
   const [exchangeRate, setExchangeRate] = useState<ExchangeRate>({ available: false })
   const [incomeSummary, setIncomeSummary] = useState<SummaryData | null>(null)
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
+  const [incomeDrawerOpen, setIncomeDrawerOpen] = useState(false)
+  const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -449,20 +453,18 @@ const FinanceDashboardView = () => {
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardContent sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
           <Button
-            component={Link}
-            href='/finance/income'
             variant='contained'
             color='success'
             startIcon={<i className='tabler-plus' />}
+            onClick={() => setIncomeDrawerOpen(true)}
           >
             Registrar ingreso
           </Button>
           <Button
-            component={Link}
-            href='/finance/expenses'
             variant='contained'
             color='error'
             startIcon={<i className='tabler-plus' />}
+            onClick={() => setExpenseDrawerOpen(true)}
           >
             Registrar egreso
           </Button>
@@ -512,6 +514,9 @@ const FinanceDashboardView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateIncomeDrawer open={incomeDrawerOpen} onClose={() => setIncomeDrawerOpen(false)} onSuccess={() => setIncomeDrawerOpen(false)} />
+      <CreateExpenseDrawer open={expenseDrawerOpen} onClose={() => setExpenseDrawerOpen(false)} onSuccess={() => setExpenseDrawerOpen(false)} />
     </Box>
   )
 }
