@@ -15,10 +15,10 @@ export default async function AgencyPulsePage() {
   const tenant = await getTenantContext()
 
   const [kpis, spaces, statusMix, weeklyActivity] = await Promise.all([
-    getAgencyPulseKpis().catch(() => null),
-    getAgencySpacesHealth().catch(() => []),
-    getAgencyStatusMix().catch(() => []),
-    getAgencyWeeklyActivity().catch(() => [])
+    getAgencyPulseKpis().catch(err => { console.error('[AgencyPulse] KPI fetch error:', err); return null }),
+    getAgencySpacesHealth().catch(err => { console.error('[AgencyPulse] Spaces fetch error:', err); return [] }),
+    getAgencyStatusMix().catch(err => { console.error('[AgencyPulse] StatusMix fetch error:', err); return [] }),
+    getAgencyWeeklyActivity().catch(err => { console.error('[AgencyPulse] Weekly fetch error:', err); return [] })
   ])
 
   return (
