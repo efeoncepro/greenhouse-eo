@@ -271,7 +271,7 @@ const IncomeListView = () => {
                   const statusConf = STATUS_CONFIG[item.paymentStatus] || STATUS_CONFIG.pending
 
                   return (
-                    <TableRow key={item.incomeId} hover>
+                    <TableRow key={item.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/income/${item.incomeId}`}>
                       <TableCell>
                         <Box>
                           <Typography variant='body2' fontWeight={600}>

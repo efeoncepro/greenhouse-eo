@@ -304,7 +304,7 @@ const ExpensesListView = () => {
                   const typeConf = TYPE_CONFIG[item.expenseType] || TYPE_CONFIG.miscellaneous
 
                   return (
-                    <TableRow key={item.expenseId} hover>
+                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/expenses/${item.expenseId}`}>
                       <TableCell>
                         <CustomChip
                           round='true'

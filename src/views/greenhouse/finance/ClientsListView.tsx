@@ -282,6 +282,7 @@ const ClientsListView = () => {
                     key={client.clientProfileId}
                     hover
                     sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+                    onClick={() => window.location.href = `/finance/clients/${client.clientProfileId}`}
                   >
                     <TableCell>
                       <Box>
