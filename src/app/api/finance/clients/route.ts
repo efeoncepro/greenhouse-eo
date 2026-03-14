@@ -41,11 +41,27 @@ interface ClientListRow {
   updated_at: unknown
 }
 
+interface ClientReceivableMatchRow {
+  income_id: string
+  outstanding_amount: unknown
+  income_key: string
+}
+
 const parseServiceModules = (value: string | null) =>
   (value || '')
     .split(';')
     .map(item => item.trim())
     .filter(Boolean)
+
+const DEFAULT_COMPANY_EXPRESSIONS = {
+  idExpr: 'NULL',
+  nameExpr: 'NULL',
+  domainExpr: 'NULL',
+  countryExpr: 'NULL',
+  archivedFilter: 'TRUE',
+  businessLineExpr: 'NULL',
+  servicesExpr: 'NULL'
+}
 
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -63,8 +79,20 @@ export async function GET(request: Request) {
   const requiresHes = searchParams.get('requiresHes')
   const search = searchParams.get('search')
   const projectId = getFinanceProjectId()
-  const companyColumns = await getHubspotTableColumns('companies')
-  const companyExpressions = getHubspotCompaniesExpressions(companyColumns)
+  let companyExpressions = DEFAULT_COMPANY_EXPRESSIONS
+  let hubspotCompaniesJoin = ''
+
+  try {
+    const companyColumns = await getHubspotTableColumns('companies')
+
+    companyExpressions = getHubspotCompaniesExpressions(companyColumns)
+    hubspotCompaniesJoin = `
+      LEFT JOIN \`${projectId}.hubspot_crm.companies\` hc
+        ON CAST(gc.hubspot_company_id AS STRING) = ${companyExpressions.idExpr}
+    `
+  } catch (error) {
+    console.error('Finance clients list: unable to load HubSpot companies metadata, falling back to greenhouse.clients only.', error)
+  }
 
   let filters = ''
   const params: Record<string, unknown> = {}
@@ -143,8 +171,7 @@ export async function GET(request: Request) {
         ON fp_legacy.client_profile_id = gc.client_id
       LEFT JOIN profile_by_hubspot fp_hubspot
         ON fp_hubspot.hubspot_company_id = CAST(gc.hubspot_company_id AS STRING)
-      LEFT JOIN \`${projectId}.hubspot_crm.companies\` hc
-        ON CAST(gc.hubspot_company_id AS STRING) = ${companyExpressions.idExpr}
+      ${hubspotCompaniesJoin}
       WHERE gc.active = TRUE
         AND ${companyExpressions.archivedFilter}
     )
@@ -161,52 +188,87 @@ export async function GET(request: Request) {
 
   const rows = await runFinanceQuery<ClientListRow>(`
     ${baseClientsCte}
-    , client_keys AS (
-      SELECT bc.client_id, client_key
-      FROM base_clients bc,
-      UNNEST([CAST(bc.client_id AS STRING), bc.client_profile_id, bc.hubspot_company_id]) AS client_key
-      WHERE client_key IS NOT NULL
-        AND client_key != ''
-    ),
-    open_income AS (
-      SELECT income_id, outstanding_amount, income_key
-      FROM (
-        SELECT
-          income_id,
-          GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) AS outstanding_amount,
-          [client_id, client_profile_id, hubspot_company_id] AS income_keys
-        FROM \`${projectId}.greenhouse.fin_income\`
-        WHERE payment_status IN ('pending', 'overdue', 'partial')
-      ),
-      UNNEST(income_keys) AS income_key
-      WHERE income_key IS NOT NULL
-        AND income_key != ''
-    ),
-    client_income_matches AS (
-      SELECT DISTINCT ck.client_id, oi.income_id, oi.outstanding_amount
-      FROM client_keys ck
-      INNER JOIN open_income oi
-        ON oi.income_key = ck.client_key
-    ),
-    client_income_rollup AS (
-      SELECT
-        client_id,
-        COALESCE(SUM(outstanding_amount), 0) AS total_receivable,
-        COUNT(*) AS active_invoices_count
-      FROM client_income_matches
-      GROUP BY client_id
-    )
     SELECT
       bc.*,
-      COALESCE(cir.total_receivable, 0) AS total_receivable,
-      COALESCE(cir.active_invoices_count, 0) AS active_invoices_count
+      0 AS total_receivable,
+      0 AS active_invoices_count
     FROM base_clients bc
-    LEFT JOIN client_income_rollup cir
-      ON cir.client_id = bc.client_id
     WHERE TRUE ${filters}
     ORDER BY COALESCE(bc.company_name, bc.legal_name, bc.greenhouse_client_name) ASC
     LIMIT @limit OFFSET @offset
   `, { ...params, limit: pageSize, offset: (page - 1) * pageSize })
+
+  const clientRollups = new Map<string, { totalReceivable: number; activeInvoicesCount: number }>()
+
+  if (rows.length > 0) {
+    const clientIdsByKey = new Map<string, Set<string>>()
+
+    rows.forEach(row => {
+      const keys = [normalizeString(row.client_id), normalizeString(row.client_profile_id), normalizeString(row.hubspot_company_id)]
+        .filter(Boolean)
+
+      keys.forEach(key => {
+        const existing = clientIdsByKey.get(key) ?? new Set<string>()
+
+        existing.add(row.client_id)
+        clientIdsByKey.set(key, existing)
+      })
+    })
+
+    try {
+      const receivableRows = await runFinanceQuery<ClientReceivableMatchRow>(`
+        WITH open_income AS (
+          SELECT income_id, outstanding_amount, income_key
+          FROM (
+            SELECT
+              income_id,
+              GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) AS outstanding_amount,
+              [client_id, client_profile_id, hubspot_company_id] AS income_keys
+            FROM \`${projectId}.greenhouse.fin_income\`
+            WHERE payment_status IN ('pending', 'overdue', 'partial')
+          ),
+          UNNEST(income_keys) AS income_key
+          WHERE income_key IS NOT NULL
+            AND income_key != ''
+            AND income_key IN UNNEST(@clientKeys)
+        )
+        SELECT DISTINCT income_id, outstanding_amount, income_key
+        FROM open_income
+      `, { clientKeys: Array.from(clientIdsByKey.keys()) })
+
+      const incomeIdsByClientId = new Map<string, Set<string>>()
+      const receivableByClientId = new Map<string, number>()
+
+      receivableRows.forEach(row => {
+        const matchingClientIds = clientIdsByKey.get(row.income_key)
+
+        if (!matchingClientIds || matchingClientIds.size === 0) {
+          return
+        }
+
+        matchingClientIds.forEach(clientId => {
+          const seenIncomeIds = incomeIdsByClientId.get(clientId) ?? new Set<string>()
+
+          if (seenIncomeIds.has(row.income_id)) {
+            return
+          }
+
+          seenIncomeIds.add(row.income_id)
+          incomeIdsByClientId.set(clientId, seenIncomeIds)
+          receivableByClientId.set(clientId, (receivableByClientId.get(clientId) ?? 0) + toNumber(row.outstanding_amount))
+        })
+      })
+
+      rows.forEach(row => {
+        clientRollups.set(row.client_id, {
+          totalReceivable: receivableByClientId.get(row.client_id) ?? 0,
+          activeInvoicesCount: incomeIdsByClientId.get(row.client_id)?.size ?? 0
+        })
+      })
+    } catch (error) {
+      console.error('Finance clients list: receivable rollup failed, returning base client directory without income aggregates.', error)
+    }
+  }
 
   return NextResponse.json({
     items: rows.map(row => ({
@@ -225,8 +287,8 @@ export async function GET(request: Request) {
       paymentCurrency: normalizeString(row.payment_currency),
       requiresPo: normalizeBoolean(row.requires_po),
       requiresHes: normalizeBoolean(row.requires_hes),
-      totalReceivable: toNumber(row.total_receivable),
-      activeInvoicesCount: toNumber(row.active_invoices_count),
+      totalReceivable: clientRollups.get(row.client_id)?.totalReceivable ?? 0,
+      activeInvoicesCount: clientRollups.get(row.client_id)?.activeInvoicesCount ?? 0,
       createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
       updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
     })),

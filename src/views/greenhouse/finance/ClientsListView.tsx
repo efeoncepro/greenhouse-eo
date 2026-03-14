@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -31,7 +32,7 @@ import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDr
 
 interface ClientProfile {
   clientProfileId: string
-  hubspotCompanyId: string
+  hubspotCompanyId: string | null
   legalName: string | null
   taxId: string | null
   paymentTermsDays: number
@@ -51,11 +52,13 @@ const ClientsListView = () => {
   const [search, setSearch] = useState('')
   const [poFilter, setPoFilter] = useState('')
   const [hesFilter, setHesFilter] = useState('')
+  const [error, setError] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
 
   const fetchClients = useCallback(async () => {
     setLoading(true)
+    setError('')
 
     try {
       const params = new URLSearchParams()
@@ -64,14 +67,26 @@ const ClientsListView = () => {
       if (poFilter === 'true') params.set('requiresPo', 'true')
       if (hesFilter === 'true') params.set('requiresHes', 'true')
 
-      const res = await fetch(`/api/finance/clients?${params.toString()}`)
+      const res = await fetch(`/api/finance/clients?${params.toString()}`, { cache: 'no-store' })
 
       if (res.ok) {
         const data = await res.json()
 
         setClients(data.items ?? [])
         setTotal(data.total ?? 0)
+
+        return
       }
+
+      const data = await res.json().catch(() => ({}))
+
+      setClients([])
+      setTotal(0)
+      setError(data.error || `No pudimos cargar los clientes (${res.status}).`)
+    } catch {
+      setClients([])
+      setTotal(0)
+      setError('No pudimos cargar los clientes. Revisa la conexión o intenta nuevamente.')
     } finally {
       setLoading(false)
     }
@@ -172,6 +187,8 @@ const ClientsListView = () => {
       </Box>
 
       {/* KPIs */}
+      {error ? <Alert severity='error'>{error}</Alert> : null}
+
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle

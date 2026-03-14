@@ -40,6 +40,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 19:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Resolver definitivamente por qué `/finance/clients` seguía mostrando una lista vacía aun cuando `greenhouse.clients` sí tenía tenants activos.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Staging
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/views/greenhouse/finance/ClientsListView.tsx`
+
+### Cambios realizados
+- Se confirmó con consulta BigQuery real que `greenhouse.clients` sí tiene 11 clientes activos; el problema no era falta de data.
+- Se endureció `GET /api/finance/clients` para que el directorio salga primero desde `greenhouse.clients` y no dependa de que HubSpot o el rollup de `fin_income` estén sanos.
+  - si falla la introspección o lectura de `hubspot_crm.companies`, el endpoint cae a modo degradado y sigue devolviendo clientes base
+  - si falla el cálculo de receivables desde `fin_income`, el endpoint devuelve el directorio igual y solo deja `totalReceivable` / `activeInvoicesCount` en `0`
+- Se removió la dependencia de un único query monolítico para el listado; el rollup financiero ahora es best-effort y no puede vaciar la vista completa.
+- Se corrigió `ClientsListView` para que deje de ocultar errores backend como si fueran “no hay perfiles”.
+  - ahora usa `cache: 'no-store'`
+  - si `/api/finance/clients` responde no-`ok`, muestra un `Alert` con el error real
+
+### Verificacion
+- Consulta directa contra BigQuery real usando las credenciales locales del repo:
+  - `greenhouse.clients` devuelve `11` clientes activos
+  - el SQL base de `base_clients` devuelve los `11` clientes esperados
+- `pnpm exec eslint src/app/api/finance/clients/route.ts src/views/greenhouse/finance/ClientsListView.tsx`: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Falta validar el preview nuevo con tráfico autenticado real para confirmar si el problema visible del usuario venía de HubSpot, `fin_income` o de otro error de entorno; la diferencia es que ahora esa falla ya no debe esconderse como lista vacía.
+- Si el endpoint sigue devolviendo error en preview, la UI ahora mostrará el mensaje explícito y los logs deberían ser mucho más accionables.
+
 ## 2026-03-14 18:36 America/Santiago
 
 ### Agente

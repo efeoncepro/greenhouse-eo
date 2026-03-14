@@ -34,6 +34,11 @@
 - `GET /api/finance/clients` dejó de depender de subqueries correlacionadas no soportadas por BigQuery:
   - receivables y cantidad de facturas activas ahora salen de un rollup por `JOIN`
   - con esto se corrige el `500` que dejaba `/finance/clients` sin clientes en `develop`/`Staging`
+- Se volvió a endurecer el directorio de clientes para evitar fallas silenciosas:
+  - la lista ahora se apoya primero en `greenhouse.clients` y trata HubSpot + `fin_income` como enriquecimientos opcionales
+  - si falla `hubspot_crm.companies`, el endpoint cae a modo degradado y sigue devolviendo clientes base
+  - si falla el rollup de receivables, la vista sigue cargando clientes con KPIs financieros en `0`
+  - `ClientsListView` ya no interpreta errores backend como “no hay clientes”; ahora muestra un `Alert` explícito cuando `/api/finance/clients` responde no-`ok`
 
 ### Finance canonical backend phase
 - El backend de `Finance` avanzó desde referencias parciales a llaves canónicas sin romper contratos existentes:
