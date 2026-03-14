@@ -51,13 +51,12 @@ interface StatementRow {
   rowId: string
   transactionDate: string
   description: string
-  reference: string
-  debit: number
-  credit: number
+  reference: string | null
+  amount: number
   balance: number
   matchStatus: string
-  matchedEntityType: string | null
-  matchedEntityId: string | null
+  matchedType: string | null
+  matchedId: string | null
   matchConfidence: number | null
 }
 
@@ -122,7 +121,7 @@ const ReconciliationDetailView = () => {
         const data = await res.json()
 
         setPeriod(data.period ?? null)
-        setStatementRows(data.statementRows ?? [])
+        setStatementRows(data.statements ?? [])
       }
     } finally {
       setLoading(false)
@@ -143,11 +142,12 @@ const ReconciliationDetailView = () => {
 
       if (res.ok) {
         const data = await res.json()
-        const matchedCount = data.matchedCount ?? 0
+        const matchedTotal = data.matched ?? 0
+        const suggestedTotal = data.suggested ?? 0
 
         setSnackbar({
           open: true,
-          message: `Auto-match completado: ${matchedCount} transacciones conciliadas`,
+          message: `Auto-match completado: ${matchedTotal} conciliadas, ${suggestedTotal} sugeridas`,
           severity: 'success'
         })
 
@@ -310,10 +310,10 @@ const ReconciliationDetailView = () => {
                 <TableCell>Fecha</TableCell>
                 <TableCell>Descripción</TableCell>
                 <TableCell>Referencia</TableCell>
-                <TableCell align='right'>Débito</TableCell>
-                <TableCell align='right'>Crédito</TableCell>
+                <TableCell align='right'>Monto</TableCell>
                 <TableCell align='right'>Saldo</TableCell>
                 <TableCell>Estado match</TableCell>
+                <TableCell>Tipo</TableCell>
                 <TableCell>Entidad</TableCell>
               </TableRow>
             </TableHead>
@@ -329,6 +329,7 @@ const ReconciliationDetailView = () => {
               ) : (
                 statementRows.map(row => {
                   const matchConf = MATCH_STATUS_CONFIG[row.matchStatus] || MATCH_STATUS_CONFIG.unmatched
+                  const isNegative = row.amount < 0
 
                   return (
                     <TableRow key={row.rowId} hover>
@@ -344,25 +345,16 @@ const ReconciliationDetailView = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                          {row.reference}
+                          {row.reference || '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
                         <Typography
                           variant='body2'
-                          color={row.debit > 0 ? 'error.main' : 'text.primary'}
-                          fontWeight={row.debit > 0 ? 600 : 400}
+                          color={isNegative ? 'error.main' : 'success.main'}
+                          fontWeight={600}
                         >
-                          {row.debit > 0 ? formatCLP(row.debit) : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography
-                          variant='body2'
-                          color={row.credit > 0 ? 'success.main' : 'text.primary'}
-                          fontWeight={row.credit > 0 ? 600 : 400}
-                        >
-                          {row.credit > 0 ? formatCLP(row.credit) : '—'}
+                          {formatCLP(row.amount)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
@@ -379,9 +371,21 @@ const ReconciliationDetailView = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        {row.matchedEntityId ? (
+                        {row.matchedType ? (
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            color={row.matchedType === 'income' ? 'success' : 'error'}
+                            label={row.matchedType === 'income' ? 'Ingreso' : 'Egreso'}
+                          />
+                        ) : (
+                          <Typography variant='body2' color='text.secondary'>—</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {row.matchedId ? (
                           <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                            {row.matchedEntityId}
+                            {row.matchedId}
                           </Typography>
                         ) : (
                           <Typography variant='body2' color='text.secondary'>

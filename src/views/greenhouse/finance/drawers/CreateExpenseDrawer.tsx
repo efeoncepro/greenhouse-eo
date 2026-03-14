@@ -19,32 +19,33 @@ import CustomTextField from '@core/components/mui/TextField'
 
 const EXPENSE_TYPE_LABELS: Record<string, string> = {
   supplier: 'Proveedor',
-  payroll: 'Nomina',
-  social_security: 'Prevision',
+  payroll: 'Nómina',
+  social_security: 'Previsión',
   tax: 'Impuesto',
-  other: 'Otro'
+  miscellaneous: 'Varios'
 }
 
 const EXPENSE_TYPES = Object.keys(EXPENSE_TYPE_LABELS)
 
-const CURRENCIES = ['CLP', 'USD', 'EUR']
+const CURRENCIES = ['CLP', 'USD']
 
 const SERVICE_LINE_LABELS: Record<string, string> = {
-  performance: 'Performance',
-  branding: 'Branding',
-  development: 'Desarrollo',
-  strategy: 'Estrategia',
-  media: 'Medios',
-  consulting: 'Consultoria'
+  globe: 'Globe',
+  efeonce_digital: 'Efeonce Digital',
+  reach: 'Reach',
+  wave: 'Wave',
+  crm_solutions: 'CRM Solutions'
 }
 
 const SERVICE_LINES = Object.keys(SERVICE_LINE_LABELS)
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   transfer: 'Transferencia',
+  credit_card: 'Tarjeta de crédito',
+  paypal: 'PayPal',
+  wise: 'Wise',
   check: 'Cheque',
   cash: 'Efectivo',
-  credit_card: 'Tarjeta de credito',
   other: 'Otro'
 }
 
@@ -108,6 +109,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
       description: description.trim(),
       expenseType,
       currency,
+      subtotal: amount,
       totalAmount: amount,
       paymentDate,
       ...(supplierId.trim() && { supplierId: supplierId.trim() }),

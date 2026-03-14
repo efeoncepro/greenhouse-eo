@@ -17,8 +17,17 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-const CURRENCIES = ['CLP', 'USD', 'EUR']
-const SERVICE_LINES = ['performance', 'branding', 'development', 'strategy', 'media', 'consulting']
+const CURRENCIES = ['CLP', 'USD']
+
+const SERVICE_LINE_LABELS: Record<string, string> = {
+  globe: 'Globe',
+  efeonce_digital: 'Efeonce Digital',
+  reach: 'Reach',
+  wave: 'Wave',
+  crm_solutions: 'CRM Solutions'
+}
+
+const SERVICE_LINES = Object.keys(SERVICE_LINE_LABELS)
 
 type Props = {
   open: boolean
@@ -75,11 +84,14 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
     setSaving(true)
     setError(null)
 
+    const amount = Number(totalAmount)
+
     const body = {
       description: description.trim(),
       clientName: clientName.trim(),
       currency,
-      totalAmount: Number(totalAmount),
+      subtotal: amount,
+      totalAmount: amount,
       invoiceDate,
       dueDate,
       ...(invoiceNumber.trim() && { invoiceNumber: invoiceNumber.trim() }),
@@ -228,7 +240,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
         >
           <MenuItem value=''>—</MenuItem>
           {SERVICE_LINES.map(sl => (
-            <MenuItem key={sl} value={sl}>{sl}</MenuItem>
+            <MenuItem key={sl} value={sl}>{SERVICE_LINE_LABELS[sl]}</MenuItem>
           ))}
         </CustomTextField>
         <CustomTextField
