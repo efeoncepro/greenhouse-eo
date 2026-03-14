@@ -15,6 +15,47 @@ export const GH_INTERNAL_NAV = {
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' }
 } as const
 
+export const GH_AGENCY_NAV = {
+  pulseGlobal: { label: 'Pulse Global', subtitle: 'KPIs agregados de todos los Spaces' },
+  spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },
+  capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' }
+} as const
+
+export const GH_AGENCY = {
+  pulse_title: 'Pulse Global',
+  pulse_subtitle: 'La operación completa de Efeonce, en un vistazo',
+  spaces_title: 'Spaces',
+  spaces_subtitle: 'Lista de clientes y su estado operativo',
+  capacity_title: 'Capacidad',
+  capacity_subtitle: 'Carga operativa global del equipo Efeonce',
+  chip_interno: 'Interno',
+  kpi_rpa: 'RpA Global',
+  kpi_assets: 'Assets activos',
+  kpi_otd: 'OTD% Global',
+  kpi_feedback: 'Feedback pendiente',
+  kpi_fte: 'FTE Total',
+  kpi_utilization: 'Utilización',
+  kpi_hours: 'Horas mes',
+  rpa_semaphore: (rpa: number | null) => rpa === null ? 'Sin data' : rpa <= 1.5 ? 'Óptimo' : rpa <= 2.5 ? 'Atención' : 'Alerta',
+  otd_semaphore: (pct: number | null) => pct === null ? 'Sin data' : pct >= 90 ? 'Óptimo' : pct >= 70 ? 'Atención' : 'Alerta',
+  space_filter_all: 'Todos los Spaces',
+  space_filter_active: 'Activos',
+  space_filter_inactive: 'Inactivos',
+  search_placeholder: 'Buscar por nombre o ID…',
+  empty_spaces: 'No hay Spaces que coincidan con tu búsqueda.',
+  empty_pulse: 'Se necesitan al menos 2 semanas de actividad para generar esta gráfica.',
+  capacity_empty: 'Los datos de capacidad se están configurando. Estarán disponibles cuando el sistema de equipo esté activo.',
+  col_space: 'Space',
+  col_service_line: 'Línea',
+  col_rpa: 'RpA',
+  col_otd: 'OTD%',
+  col_assets: 'Assets',
+  col_feedback: 'Feedback',
+  meta_spaces: (n: number) => `${n} Space${n !== 1 ? 's' : ''} activo${n !== 1 ? 's' : ''}`,
+  meta_projects: (n: number) => `${n} proyecto${n !== 1 ? 's' : ''}`,
+  meta_sync: (label: string) => `Última sync: ${label}`
+} as const
+
 export const GH_LABELS = {
   kpi_rpa: 'RpA promedio',
   kpi_active: 'Assets activos',

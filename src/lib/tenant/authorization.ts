@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
-export type TenantRouteGroup = 'client' | 'internal' | 'admin'
+export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency'
 
 export const isClientTenant = (tenant: TenantContext) => tenant.tenantType === 'client' && Boolean(tenant.clientId)
 
@@ -64,6 +64,29 @@ export const requireInternalTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'internal')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireAgencyTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!hasRouteGroup(tenant, 'internal') && !hasRouteGroup(tenant, 'admin')) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
