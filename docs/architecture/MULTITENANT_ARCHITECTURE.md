@@ -7,6 +7,7 @@ This document remains useful as the tenant-focused reference.
 For the full product architecture, phased roadmap, role hierarchy, internal/admin route model, KPI semantics, and multi-agent execution plan, use:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 
 If both documents overlap, `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` is the broader source of truth and this document should stay focused on tenant isolation and auth boundaries.
 
@@ -20,6 +21,10 @@ Terminology used in this repo:
 - users are not the tenant; they are identities associated to a tenant through `client_id`
 - the intended runtime model is one tenant to many users, even if bootstrap data started with one contact per company
 
+Object-model clarification:
+- in the 360 architecture, `greenhouse.clients.client_id` is the canonical Client object anchor
+- modules may enrich the client, but they must not create a parallel tenant identity if `client_id` already exists
+
 ## Tenant Boundary
 
 - Every authenticated session carries a single `client_id`.
@@ -31,7 +36,7 @@ Terminology used in this repo:
 
 Current system of record:
 - BigQuery dataset: `efeonce-group.greenhouse`
-- Tenant metadata: `greenhouse.clients`
+- Tenant metadata and canonical Client anchor: `greenhouse.clients`
 - User identity and access: `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes`, `greenhouse.user_campaign_scopes`
 - Current admin governance surfaces: `/admin/tenants`, `/admin/tenants/[id]`, `/admin/users`, `/admin/users/[id]`, `/admin/roles`
 
@@ -40,6 +45,10 @@ Current source systems for operational data:
 - `efeonce-group.notion_ops.proyectos`
 - `efeonce-group.notion_ops.sprints`
 - `efeonce-group.hubspot_crm.*`
+
+Rule:
+- external systems may enrich the Client object
+- external systems are not the canonical Client identity inside Greenhouse
 
 ## MVP Tenant Table
 

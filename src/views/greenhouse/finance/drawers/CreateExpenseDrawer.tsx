@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
@@ -11,11 +11,13 @@ import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
+import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
 
 const EXPENSE_TYPE_LABELS: Record<string, string> = {
   supplier: 'Proveedor',
@@ -51,6 +53,15 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
 
 const PAYMENT_METHODS = Object.keys(PAYMENT_METHOD_LABELS)
 
+const ADD_NEW_SUPPLIER = '__ADD_NEW__'
+
+interface SupplierOption {
+  supplierId: string
+  legalName: string
+  tradeName: string | null
+  paymentCurrency?: string
+}
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -71,6 +82,57 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Supplier dropdown
+  const [suppliers, setSuppliers] = useState<SupplierOption[]>([])
+  const [loadingSuppliers, setLoadingSuppliers] = useState(false)
+  const [supplierDrawerOpen, setSupplierDrawerOpen] = useState(false)
+
+  const fetchSuppliers = useCallback(async () => {
+    setLoadingSuppliers(true)
+
+    try {
+      const res = await fetch('/api/finance/suppliers')
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setSuppliers(data.items ?? [])
+      }
+    } finally {
+      setLoadingSuppliers(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (open && suppliers.length === 0) {
+      fetchSuppliers()
+    }
+  }, [open, suppliers.length, fetchSuppliers])
+
+  const handleSupplierChange = (value: string) => {
+    if (value === ADD_NEW_SUPPLIER) {
+      setSupplierDrawerOpen(true)
+
+      return
+    }
+
+    setSupplierId(value)
+
+    const supplier = suppliers.find(s => s.supplierId === value)
+
+    if (supplier?.paymentCurrency && !currency) {
+      setCurrency(supplier.paymentCurrency)
+    }
+  }
+
+  const handleSupplierCreated = () => {
+    setSupplierDrawerOpen(false)
+
+    // Refresh list and it will include the new supplier
+    setSuppliers([])
+    fetchSuppliers()
+  }
 
   const resetForm = () => {
     setDescription('')
@@ -148,6 +210,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   return (
+    <>
     <Drawer
       anchor='right'
       open={open}
@@ -245,14 +308,30 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
             <Typography variant='subtitle2' color='text.secondary'>Campos opcionales</Typography>
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12 }}>
             <CustomTextField
+              select
               fullWidth
               size='small'
-              label='ID Proveedor'
+              label='Proveedor'
               value={supplierId}
-              onChange={e => setSupplierId(e.target.value)}
-            />
+              onChange={e => handleSupplierChange(e.target.value)}
+              disabled={loadingSuppliers}
+            >
+              <MenuItem value=''>{loadingSuppliers ? 'Cargando...' : '— Seleccionar proveedor —'}</MenuItem>
+              {suppliers.map(s => (
+                <MenuItem key={s.supplierId} value={s.supplierId}>
+                  {s.tradeName || s.legalName}
+                </MenuItem>
+              ))}
+              <ListSubheader sx={{ p: 0 }}>
+                <Divider />
+              </ListSubheader>
+              <MenuItem value={ADD_NEW_SUPPLIER} sx={{ color: 'primary.main', fontWeight: 600 }}>
+                <i className='tabler-plus' style={{ marginRight: 8, fontSize: 18 }} />
+                Agregar proveedor
+              </MenuItem>
+            </CustomTextField>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -333,6 +412,13 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
         </Button>
       </Box>
     </Drawer>
+
+    <CreateSupplierDrawer
+      open={supplierDrawerOpen}
+      onClose={() => setSupplierDrawerOpen(false)}
+      onSuccess={handleSupplierCreated}
+    />
+    </>
   )
 }
 

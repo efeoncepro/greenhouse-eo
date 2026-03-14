@@ -40,6 +40,274 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 19:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Resolver definitivamente por qué `/finance/clients` seguía mostrando una lista vacía aun cuando `greenhouse.clients` sí tenía tenants activos.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Staging
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/views/greenhouse/finance/ClientsListView.tsx`
+
+### Cambios realizados
+- Se confirmó con consulta BigQuery real que `greenhouse.clients` sí tiene 11 clientes activos; el problema no era falta de data.
+- Se endureció `GET /api/finance/clients` para que el directorio salga primero desde `greenhouse.clients` y no dependa de que HubSpot o el rollup de `fin_income` estén sanos.
+  - si falla la introspección o lectura de `hubspot_crm.companies`, el endpoint cae a modo degradado y sigue devolviendo clientes base
+  - si falla el cálculo de receivables desde `fin_income`, el endpoint devuelve el directorio igual y solo deja `totalReceivable` / `activeInvoicesCount` en `0`
+- Se removió la dependencia de un único query monolítico para el listado; el rollup financiero ahora es best-effort y no puede vaciar la vista completa.
+- Se corrigió `ClientsListView` para que deje de ocultar errores backend como si fueran “no hay perfiles”.
+  - ahora usa `cache: 'no-store'`
+  - si `/api/finance/clients` responde no-`ok`, muestra un `Alert` con el error real
+
+### Verificacion
+- Consulta directa contra BigQuery real usando las credenciales locales del repo:
+  - `greenhouse.clients` devuelve `11` clientes activos
+  - el SQL base de `base_clients` devuelve los `11` clientes esperados
+- `pnpm exec eslint src/app/api/finance/clients/route.ts src/views/greenhouse/finance/ClientsListView.tsx`: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Falta validar el preview nuevo con tráfico autenticado real para confirmar si el problema visible del usuario venía de HubSpot, `fin_income` o de otro error de entorno; la diferencia es que ahora esa falla ya no debe esconderse como lista vacía.
+- Si el endpoint sigue devolviendo error en preview, la UI ahora mostrará el mensaje explícito y los logs deberían ser mucho más accionables.
+
+## 2026-03-14 18:36 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Auditar los `CODEX_TASK_*` más sensibles para detectar si contradicen o desvían la nueva arquitectura de `objetos canónicos enriquecidos`, y corregirlos para que funcionen como briefs alineados al modelo 360.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / tasks
+
+### Archivos tocados
+- `docs/tasks/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/CODEX_TASK_AI_Tooling_Credit_System.md`
+- `docs/tasks/CODEX_TASK_Creative_Hub_Module.md`
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/CODEX_TASK_Agency_Operator_Layer.md`
+- `docs/tasks/CODEX_TASK_Admin_Team_Module_v2.md`
+- `docs/tasks/README.md`
+
+### Cambios realizados
+- Se agregaron secciones explícitas de alineación con `GREENHOUSE_360_OBJECT_MODEL_V1.md` en las tasks con mayor riesgo de deriva arquitectónica.
+- Criterios que ahora quedan explícitos dentro de los briefs:
+  - no crear identidades paralelas de `Client` o `Collaborator`
+  - tratar tablas de dominio como `extension tables` o `transaction tables`, no como nuevos maestros
+  - distinguir catálogo/capability canónico vs módulos UI de capabilities
+  - tratar Payroll y Finance como extensiones sobre objetos compartidos
+  - tratar Agency como capa transversal de lectura sobre el mismo graph de objetos
+- En `CODEX_TASK_Team_Identity_Capacity_System.md` se dejó explícito qué partes siguen vigentes y qué partes quedaron históricas para no seguir usando email o `notion_display_name` como identidad canónica de diseño.
+- `docs/tasks/README.md` ahora exige alinear cualquier task nueva o reactivada con `GREENHOUSE_360_OBJECT_MODEL_V1.md`.
+
+### Verificacion
+- Revisión manual comparando cada task contra:
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+  - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `git diff --check`: pendiente de corrida final del paquete completo, pero los parches aplicados no introdujeron conflictos de formato en las ediciones visibles
+
+### Riesgos o pendientes
+- No todas las tasks del repo requerían edición; se tocaron las que realmente podían empujar al equipo hacia silos o identidades paralelas.
+- Si se reactiva una task antigua no auditada todavía, usar `GREENHOUSE_360_OBJECT_MODEL_V1.md` como gate antes de implementarla.
+
+## 2026-03-14 18:24 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar la carpeta `docs/architecture` para detectar contradicciones con el nuevo modelo `GREENHOUSE_360_OBJECT_MODEL_V1` y corregirlas sin duplicar arquitectura innecesariamente.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / coherencia arquitectónica
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+
+### Cambios realizados
+- Se alineó `GREENHOUSE_ARCHITECTURE_V1.md` con el modelo 360:
+  - nuevo principio de `canonical object graph`
+  - distinción explícita entre tablas canónicas, tablas de extensión y marts
+  - corrección del lenguaje que seguía tratando deals como fuente canónica de capabilities
+- Se alineó `MULTITENANT_ARCHITECTURE.md`:
+  - `greenhouse.clients` queda explicitado como ancla canónica del objeto `Client`
+  - los sistemas externos quedan como enriquecedores, no como identidad primaria
+- Se alineó `GREENHOUSE_SERVICE_MODULES_V1.md`:
+  - `service_modules` y `client_service_modules` quedan explicitados como catálogo y assignment registry canónicos del objeto `Product/Capability`
+  - se corrigió la idea de que `closedwon deals` deban seguir siendo la capa canónica de assignment
+- Se alineó `Greenhouse_Capabilities_Architecture_v1.md`:
+  - se aclaró que `Capability Registry` describe módulos UI, no la identidad canónica del producto
+  - se corrigió lenguaje heredado de MVP que trataba `greenhouse.clients` como tabla de auth
+
+### Verificacion
+- `git diff --check`: correcto
+- Barrido manual con `rg` sobre `docs/architecture` para detectar lenguaje conflictivo de:
+  - `closedwon deals` como canónico
+  - `clients` como tabla de auth
+  - `Capability Registry` como si fuera catálogo de producto
+
+### Riesgos o pendientes
+- Aún quedan referencias históricas a `closedwon deals` como fuente de observación o bootstrap; ya no están presentadas como identidad canónica, pero conviene seguir puliendo el lenguaje si se hace otra pasada editorial más amplia.
+
+## 2026-03-14 18:12 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Formalizar a nivel de arquitectura de plataforma la regla de `objetos canónicos enriquecidos` para evitar que futuros módulos sigan creando silos o identidades paralelas.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura transversal
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` (nuevo)
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- `docs/README.md`
+- `project_context.md`
+
+### Cambios realizados
+- Se creó `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` como fuente canónica de la regla transversal:
+  - tesis de plataforma basada en objetos canónicos enriquecidos
+  - definición de `canonical object`, `extension table`, `snapshot field`, `360 read model` y `domain owner`
+  - reglas no negociables para evitar identidades paralelas
+  - catálogo detallado de objetos:
+    - `Client`
+    - `Collaborator`
+    - `Product/Capability`
+    - `Quote`
+    - `Project`
+    - `Sprint`
+  - reglas de ownership, enriquecimiento, write/read patterns, snapshots, APIs, migración y anti-patterns
+- Se conectó `FINANCE_CANONICAL_360_V1.md` como especialización del modelo 360 general, no como excepción aislada.
+- Se agregó el documento al índice maestro `docs/README.md`.
+- Se dejó un delta corto en `project_context.md` para que el estado operativo del repo también refleje esta regla.
+
+### Verificacion
+- Revisión manual de consistencia contra la arquitectura ya documentada en:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_ID_STRATEGY_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- La regla de arquitectura ya quedó formalizada, pero todavía hay objetos cuyo contrato canónico debe aterrizarse más en runtime:
+  - `Quote`
+  - `Project`
+  - `Sprint`
+- Conviene usar este documento como gate explícito de revisión antes de arrancar nuevos módulos como `AI Tooling`, `Creative Hub` o capas comerciales futuras.
+
+## 2026-03-14 18:00 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Consolidar en una sola fuente canónica la documentación del modelo Finance 360 y de la lógica enriquecida cliente/persona que ya estaba dispersa entre código, `project_context.md` y handoffs previos.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura
+
+### Archivos tocados
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md` (nuevo)
+- `docs/README.md`
+
+### Cambios realizados
+- Se creó `docs/architecture/FINANCE_CANONICAL_360_V1.md` como fuente canónica del modelo actual:
+  - llaves canónicas de cliente y colaborador
+  - reglas de resolución en `src/lib/finance/canonical.ts`
+  - read model de cliente 360
+  - read model de colaborador 360
+  - sinergias con `greenhouse.clients`, `team_members`, `payroll_entries`, `hubspot_crm.*`
+  - compatibilidad legacy con `clientProfileId`, `hubspotCompanyId` y `payrollEntryId`
+  - límites entre ownership financiero y read-models transversales
+- Se enlazó el documento desde `docs/README.md` para que no dependa de conocer el nombre del archivo de memoria.
+
+### Verificacion
+- Revisión manual de consistencia contra el código ya implementado en `clients`, `income`, `expenses` y `people/[memberId]/finance`
+
+### Riesgos o pendientes
+- La documentación 360 ya está centralizada, pero todavía falta que el frontend consuma más de estas lecturas enriquecidas fuera de las vistas actuales de Finance y People.
+
+## 2026-03-14 17:52 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir fallos runtime de `Finance` detectados en `Staging` antes de cualquier promoción a `Production`, con foco en:
+  - bootstrap BigQuery demasiado agresivo en lecturas
+  - `GET /api/finance/clients` devolviendo `500` y dejando la vista sin clientes
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Staging / Preview de `develop`
+
+### Archivos tocados
+- `src/lib/finance/schema.ts`
+- `src/app/api/finance/clients/route.ts`
+
+### Cambios realizados
+- Se reescribió `ensureFinanceInfrastructure()` para dejar de ejecutar DDL/DML ciegos en cada cold start:
+  - ahora primero inspecciona `INFORMATION_SCHEMA.TABLES` y `INFORMATION_SCHEMA.COLUMNS`
+  - solo crea tablas `fin_*` faltantes
+  - solo agrega columnas canónicas faltantes (`client_id`)
+  - ya no ejecuta los `UPDATE` de backfill ni el `MERGE` de roles en cada lectura
+  - el seed de `finance_manager` quedó reducido a `SELECT` + `INSERT` solo si realmente falta
+- Se corrigió `GET /api/finance/clients`:
+  - se eliminaron subqueries correlacionadas para receivables/invoice count
+  - el listado ahora usa CTEs con `UNNEST` + `JOIN` + rollup por `client_id`, compatible con BigQuery
+  - esto ataca el `500` real que dejaba `/finance/clients` sin datos en el preview de `develop`
+
+### Verificacion
+- `pnpm exec eslint src/lib/finance/schema.ts src/app/api/finance/clients/route.ts src/app/api/finance/income/summary/route.ts src/app/api/finance/accounts/route.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/expenses/summary/route.ts`: correcto
+- `git diff --check`: correcto
+- Revisión de logs de Vercel previa al fix:
+  - `/api/finance/clients` devolvía `500` por `Correlated subqueries...`
+  - `/api/finance/accounts`, `/api/finance/exchange-rates/latest` y `/api/finance/expenses/summary` fallaban por `table update operations quota`
+- Aún no se valida un preview nuevo post-fix; sigue pendiente push/deploy y smoke real contra `Staging`
+
+### Riesgos o pendientes
+- El cambio reduce drásticamente el riesgo de cuota BigQuery en lectura, pero falta confirmarlo con un deployment nuevo.
+- Los backfills históricos de `client_id` ya no corren automáticamente en `ensureFinanceInfrastructure()`; si se necesitan como operación explícita, conviene moverlos a un script o endpoint administrativo dedicado.
+
 ## 2026-03-14 17:45 America/Santiago
 
 ### Agente

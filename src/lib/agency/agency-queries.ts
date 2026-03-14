@@ -222,7 +222,7 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
           AVG(SAFE_CAST(t.rpa AS FLOAT64)) AS rpa_global,
           COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente,
-          MAX(t.updated_at) AS last_synced_at
+          MAX(t.last_edited_time) AS last_synced_at
         FROM \`${projectId}.notion_ops.tareas\` t
         WHERE t.proyecto IN (SELECT project_id FROM client_project_ids)
       ),
@@ -367,13 +367,13 @@ export const getAgencyWeeklyActivity = async (): Promise<AgencyChartWeeklyPoint[
     query: `
       ${getAgencyClientScopeCtes(projectId)}
       SELECT
-        DATE_TRUNC(DATE(t.done_at), WEEK(MONDAY)) AS week_start,
+        DATE_TRUNC(DATE(t.fecha_de_completado), WEEK(MONDAY)) AS week_start,
         COUNT(*) AS completed
       FROM \`${projectId}.notion_ops.tareas\` t
       WHERE t.proyecto IN (SELECT project_id FROM client_project_ids)
         AND t.estado = 'Listo'
-        AND t.done_at IS NOT NULL
-        AND DATE(t.done_at) >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 WEEK)
+        AND t.fecha_de_completado IS NOT NULL
+        AND DATE(t.fecha_de_completado) >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 WEEK)
       GROUP BY week_start
       ORDER BY week_start ASC
     `

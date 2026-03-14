@@ -19,7 +19,19 @@ import type { PersonDetailMember } from '@/types/people'
 import type { TeamContactChannel, TeamRoleCategory } from '@/types/team'
 
 const ROLE_CATEGORIES: TeamRoleCategory[] = ['account', 'operations', 'strategy', 'design', 'development', 'media']
-const COUNTRIES = ['CL', 'CO', 'VE', 'MX', 'PE', 'US', 'AR', 'BR', 'EC']
+
+const COUNTRIES: { code: string; flag: string; name: string }[] = [
+  { code: 'CL', flag: '🇨🇱', name: 'Chile' },
+  { code: 'CO', flag: '🇨🇴', name: 'Colombia' },
+  { code: 'VE', flag: '🇻🇪', name: 'Venezuela' },
+  { code: 'MX', flag: '🇲🇽', name: 'México' },
+  { code: 'PE', flag: '🇵🇪', name: 'Perú' },
+  { code: 'US', flag: '🇺🇸', name: 'Estados Unidos' },
+  { code: 'AR', flag: '🇦🇷', name: 'Argentina' },
+  { code: 'BR', flag: '🇧🇷', name: 'Brasil' },
+  { code: 'EC', flag: '🇪🇨', name: 'Ecuador' }
+]
+
 const CONTACT_CHANNELS: TeamContactChannel[] = ['teams', 'slack', 'email']
 
 const normalizeRoleCategory = (value: string): TeamRoleCategory =>
@@ -76,18 +88,30 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
     setSaving(true)
     setError(null)
 
-    const body = {
+    const body: Record<string, unknown> = {
       displayName: displayName.trim(),
       roleTitle: roleTitle.trim(),
-      roleCategory,
-      ...(locationCountry !== (member.profile.locationCountry ?? '') && { locationCountry: locationCountry || undefined }),
-      ...(locationCity !== (member.profile.locationCity ?? '') && { locationCity: locationCity || undefined }),
-      ...(contactChannel !== ((member.contactChannel as string) ?? '') && { contactChannel: contactChannel || undefined }),
-      ...(contactHandle !== (member.contactHandle ?? '') && { contactHandle: contactHandle || undefined }),
-      ...(relevanceNote && { relevanceNote }),
-      ...(azureOid !== (member.azureOid ?? '') && { azureOid: azureOid || undefined }),
-      ...(notionUserId !== (member.notionUserId ?? '') && { notionUserId: notionUserId || undefined }),
-      ...(hubspotOwnerId !== (member.hubspotOwnerId ?? '') && { hubspotOwnerId: hubspotOwnerId || undefined })
+      roleCategory
+    }
+
+    if (locationCountry !== (member.profile.locationCountry ?? '')) {
+      body.locationCountry = locationCountry || null
+    }
+
+    if (locationCity !== (member.profile.locationCity ?? '')) {
+      body.locationCity = locationCity || null
+    }
+
+    if (contactChannel !== ((member.contactChannel as string) ?? '')) {
+      body.contactChannel = contactChannel || null
+    }
+
+    if (relevanceNote) {
+      body.relevanceNote = relevanceNote
+    }
+
+    if (azureOid !== (member.azureOid ?? '')) {
+      body.azureOid = azureOid || null
     }
 
     try {
@@ -100,7 +124,7 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
 
-        setError(data.error || 'Error al actualizar perfil')
+        setError(data.detail ? `${data.error}: ${data.detail}` : data.error || 'Error al actualizar perfil')
         setSaving(false)
 
         return
@@ -183,7 +207,7 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
             >
               <MenuItem value=''>Sin especificar</MenuItem>
               {COUNTRIES.map(c => (
-                <MenuItem key={c} value={c}>{c}</MenuItem>
+                <MenuItem key={c.code} value={c.code}>{c.flag} {c.name}</MenuItem>
               ))}
             </CustomTextField>
           </Grid>
@@ -220,7 +244,11 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
               size='small'
               label='Handle'
               value={contactHandle}
-              onChange={e => setContactHandle(e.target.value)}
+              disabled
+              InputProps={{
+                readOnly: true,
+                sx: { fontFamily: 'monospace', fontSize: '0.85rem', bgcolor: 'action.hover' }
+              }}
             />
           </Grid>
         </Grid>
@@ -238,8 +266,28 @@ const EditProfileDrawer = ({ open, member, onClose, onSuccess }: Props) => {
         <Divider />
         <Typography variant='subtitle2' color='text.secondary'>Integraciones (opcional)</Typography>
         <CustomTextField fullWidth size='small' label='Azure OID' value={azureOid} onChange={e => setAzureOid(e.target.value)} />
-        <CustomTextField fullWidth size='small' label='Notion User ID' value={notionUserId} onChange={e => setNotionUserId(e.target.value)} />
-        <CustomTextField fullWidth size='small' label='HubSpot Owner ID' value={hubspotOwnerId} onChange={e => setHubspotOwnerId(e.target.value)} />
+        <CustomTextField
+          fullWidth
+          size='small'
+          label='Notion User ID'
+          value={notionUserId}
+          disabled
+          InputProps={{
+            readOnly: true,
+            sx: { fontFamily: 'monospace', fontSize: '0.85rem', bgcolor: 'action.hover' }
+          }}
+        />
+        <CustomTextField
+          fullWidth
+          size='small'
+          label='HubSpot Owner ID'
+          value={hubspotOwnerId}
+          disabled
+          InputProps={{
+            readOnly: true,
+            sx: { fontFamily: 'monospace', fontSize: '0.85rem', bgcolor: 'action.hover' }
+          }}
+        />
       </Stack>
 
       <Divider />

@@ -20,7 +20,9 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_IDENTITY_ACCESS_V1.md](architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md)
 - [GREENHOUSE_INTERNAL_IDENTITY_V1.md](architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md)
 - [GREENHOUSE_ID_STRATEGY_V1.md](architecture/GREENHOUSE_ID_STRATEGY_V1.md)
+- [GREENHOUSE_360_OBJECT_MODEL_V1.md](architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md)
 - [GREENHOUSE_SERVICE_MODULES_V1.md](architecture/GREENHOUSE_SERVICE_MODULES_V1.md)
+- [FINANCE_CANONICAL_360_V1.md](architecture/FINANCE_CANONICAL_360_V1.md)
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)
 
