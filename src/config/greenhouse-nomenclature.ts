@@ -95,8 +95,12 @@ export const GH_TEAM = {
   label_hours: 'Horas este mes',
   label_utilization: 'Utilizacion',
   label_load: 'Carga por persona',
+  label_committed_capacity: 'Dedicacion contratada',
   active_assets_short: 'assets activos',
   projects_short: 'proyectos',
+  capacity_contract_only: 'Por ahora mostramos la dedicacion contratada por persona.',
+  capacity_summary_subtitle: 'Resumen de capacidad contratada y uso estimado del mes',
+  capacity_utilization_help: 'La utilizacion se calcula sobre la capacidad total visible del equipo.',
 
   project_team_title: 'Equipo en este proyecto',
   project_team_subtitle: 'Quienes estan trabajando hoy en este proyecto y como se mueve su carga.',

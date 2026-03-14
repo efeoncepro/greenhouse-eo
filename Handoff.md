@@ -40,6 +40,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar `CODEX_TASK_Fix_Team_Capacity_Views.md` en una rama paralela y cerrar el ajuste visual/funcional de las vistas de equipo priorizando patrones vivos de Vuexy en vez de componer cards ad hoc.
+
+### Rama
+- Rama usada: `fix/team-capacity-views-vuexy`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview branch
+
+### Archivos tocados
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamExpansionGhostCard.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/config/greenhouse-nomenclature.ts`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- Validacion funcional del delta:
+  - `Pulse` deja de inventar metricas operativas por persona cuando el backend solo entrega capacidad contractual.
+  - `Pulse` ahora compone mejor con primitives Vuexy existentes (`HorizontalWithSubtitle`) y suma una ghost slot reusable para solicitudes de expansion.
+  - `Mi Greenhouse` reutiliza el mismo ghost slot para mantener consistencia visual y de CTA.
+
+### Riesgos o pendientes
+- El task `CODEX_TASK_Fix_Team_Capacity_Views.md` esta parcialmente desfasado respecto al estado real del repo: las vistas 1, 3 y 4 ya existian antes de este turno.
+- Conviene validar en Preview que la nueva densidad del grid de `Pulse` se vea bien con tenants pequeños y con equipos de mas de 6 personas.
+
 ## 2026-03-13 21:00 America/Santiago
 
 ### Agente
