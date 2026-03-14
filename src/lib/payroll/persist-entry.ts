@@ -6,10 +6,11 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { runPayrollQuery } from '@/lib/payroll/shared'
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 export const upsertPayrollEntry = async (entry: PayrollEntry) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   await runPayrollQuery(
     `

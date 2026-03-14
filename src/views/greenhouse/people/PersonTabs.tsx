@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { SyntheticEvent } from 'react'
 
 import Tab from '@mui/material/Tab'
@@ -10,7 +10,7 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import type { PersonDetail } from '@/types/people'
+import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 import type { PersonTab } from './helpers'
 import { TAB_CONFIG } from './helpers'
 import PersonAssignmentsTab from './tabs/PersonAssignmentsTab'
@@ -20,16 +20,12 @@ import PersonPayrollTab from './tabs/PersonPayrollTab'
 
 type Props = {
   detail: PersonDetail
+  isAdmin?: boolean
+  onNewAssignment?: () => void
+  onEditAssignment?: (a: PersonDetailAssignment) => void
 }
 
-const TAB_COMPONENTS: Record<PersonTab, (detail: PersonDetail) => React.ReactNode> = {
-  assignments: detail => <PersonAssignmentsTab assignments={detail.assignments} />,
-  activity: detail => <PersonActivityTab metrics={detail.operationalMetrics} />,
-  compensation: detail => <PersonCompensationTab compensation={detail.currentCompensation} />,
-  payroll: detail => <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
-}
-
-const PersonTabs = ({ detail }: Props) => {
+const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment }: Props) => {
   const visibleTabs = TAB_CONFIG.filter(tab => detail.access.visibleTabs.includes(tab.value))
   const [activeTab, setActiveTab] = useState(visibleTabs[0]?.value ?? 'assignments')
 
@@ -57,7 +53,20 @@ const PersonTabs = ({ detail }: Props) => {
         </Grid>
         <Grid size={{ xs: 12 }}>
           <TabPanel value={activeTab} className='p-0'>
-            {TAB_COMPONENTS[activeTab as PersonTab]?.(detail)}
+            {activeTab === 'assignments' ? (
+              <PersonAssignmentsTab
+                assignments={detail.assignments}
+                isAdmin={isAdmin}
+                onNewAssignment={onNewAssignment}
+                onEditAssignment={onEditAssignment}
+              />
+            ) : activeTab === 'activity' ? (
+              <PersonActivityTab metrics={detail.operationalMetrics} />
+            ) : activeTab === 'compensation' ? (
+              <PersonCompensationTab compensation={detail.currentCompensation} />
+            ) : activeTab === 'payroll' ? (
+              <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
+            ) : null}
           </TabPanel>
         </Grid>
       </Grid>

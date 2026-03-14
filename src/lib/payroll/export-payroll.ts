@@ -5,9 +5,10 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError, escapeCsvValue, runPayrollQuery } from '@/lib/payroll/shared'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 export const exportPayrollCsv = async (periodId: string) => {
+  const projectId = getProjectId()
   const period = await getPayrollPeriod(periodId)
 
   if (!period) {

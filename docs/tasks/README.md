@@ -7,6 +7,7 @@ Indice de briefs y tasks de implementacion del repo.
 | Task | Foco |
 | --- | --- |
 | [CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md](CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md) | Landing interna y control tower |
+| [CODEX_TASK_Admin_Team_Module_v2.md](CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
 | [CODEX_TASK_Agency_Operator_Layer.md](CODEX_TASK_Agency_Operator_Layer.md) | Capa agency transversal |
 | [CODEX_TASK_Client_Dashboard_Redesign.md](CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
 | [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual dashboard |

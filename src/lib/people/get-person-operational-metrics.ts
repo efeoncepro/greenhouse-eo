@@ -39,7 +39,7 @@ type BreakdownRow = {
 
 const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
 const inactiveStatuses = [...completedStatuses, 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled']
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const quoteIdentifier = (identifier: string) => `\`${identifier.replace(/`/g, '``')}\``
 const pickFirstExistingColumn = (columns: Set<string>, candidates: string[]) => candidates.find(column => columns.has(column)) || null
@@ -83,6 +83,7 @@ export const getPersonOperationalMetrics = async ({
   identityMatchSignals,
   notionUserCandidates
 }: PersonOperationalInput): Promise<PersonOperationalMetrics | null> => {
+  const projectId = getProjectId()
   const columns = await getPeopleTableColumns('notion_ops', 'tareas')
   const statusColumn = pickFirstExistingColumn(columns, ['estado', 'status'])
   const rpaColumn = pickFirstExistingColumn(columns, ['rpa', 'frame_versions', 'client_change_round'])

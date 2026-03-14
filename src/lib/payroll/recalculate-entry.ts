@@ -16,7 +16,7 @@ type BonusConfigRow = {
   rpa_threshold: number | string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const assertOptionalNumericInput = ({
   value,
@@ -63,6 +63,7 @@ const assertOptionalNumericInput = ({
 }
 
 const getBonusConfigForPeriod = async (periodId: string) => {
+  const projectId = getProjectId()
   const period = await getPayrollPeriod(periodId)
 
   if (!period) {

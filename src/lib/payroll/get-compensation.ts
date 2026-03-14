@@ -59,7 +59,7 @@ type CompensationBoundaryRow = {
   effective_from: { value?: string } | string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const addDaysToDateString = (dateString: string, days: number) => {
   const date = new Date(`${dateString}T00:00:00.000Z`)
@@ -147,6 +147,7 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
 
 export const getCurrentCompensation = async () => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const rows = await runPayrollQuery<CompensationRow>(
     `
@@ -170,6 +171,7 @@ export const getCurrentCompensation = async () => {
 
 export const getCompensationHistoryByMember = async (memberId: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const rows = await runPayrollQuery<CompensationRow>(
     `
@@ -193,6 +195,7 @@ export const getCompensationHistoryByMember = async (memberId: string) => {
 
 export const getCompensationVersionById = async (versionId: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const [row] = await runPayrollQuery<CompensationRow>(
     `
@@ -216,6 +219,7 @@ export const getCompensationVersionById = async (versionId: string) => {
 
 export const getApplicableCompensationVersionsForPeriod = async (periodStart: string, periodEnd: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
 
   const rows = await runPayrollQuery<ApplicableCompensationRow>(
     `
@@ -286,6 +290,8 @@ export const createCompensationVersion = async ({
   actorEmail: string | null
 }) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+
   assertCompensationInput(input)
   const effectiveFrom = assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
 

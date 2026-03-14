@@ -1,6 +1,7 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
@@ -11,16 +12,19 @@ import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 
 import type { PersonDetail } from '@/types/people'
 import type { TeamRoleCategory } from '@/types/team'
-import { countryFlag, formatFte, roleCategoryLabel } from './helpers'
+import { countryFlag, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
 import IntegrationStatus from './components/IntegrationStatus'
 
 type Props = {
   detail: PersonDetail
+  isAdmin?: boolean
+  onEditProfile?: () => void
+  onDeactivate?: () => void
 }
 
-const PersonLeftSidebar = ({ detail }: Props) => {
+const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Props) => {
   const { member, integrations, summary } = detail
-  const roleCategory = member.roleCategory as TeamRoleCategory
+  const roleCategory = safeRoleCategory(member.roleCategory)
 
   return (
     <Card>
@@ -105,6 +109,23 @@ const PersonLeftSidebar = ({ detail }: Props) => {
           Confianza de identidad: {integrations.identityConfidence}
         </Typography>
       </CardContent>
+
+      {isAdmin && (
+        <>
+          <Divider />
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography variant='overline' color='text.secondary'>Admin</Typography>
+            <Button variant='tonal' size='small' startIcon={<i className='tabler-edit' />} onClick={onEditProfile} fullWidth>
+              Editar perfil
+            </Button>
+            {member.active && (
+              <Button variant='tonal' color='error' size='small' startIcon={<i className='tabler-user-off' />} onClick={onDeactivate} fullWidth>
+                Desactivar
+              </Button>
+            )}
+          </CardContent>
+        </>
+      )}
     </Card>
   )
 }

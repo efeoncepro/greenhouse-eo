@@ -6,6 +6,72 @@
 
 ## 2026-03-14
 
+### Vercel ops skill hardening
+- La skill local [vercel-operations](/Users/jreye/Documents/greenhouse-eo/.codex/skills/vercel-operations/SKILL.md) ahora deja explícito el patrón operativo que venía rompiendo previews en este repo:
+  - verificar env vars branch-scoped antes de confiar en un Preview
+  - tratar `next-auth NO_SECRET` como problema de infraestructura/env
+  - no mover `pre-greenhouse` sin smoke previo de `/api/auth/session`
+  - usar un playbook corto para errores de preview antes del login
+- El objetivo es evitar repetir ciclos donde un deployment parece `Ready` pero se cae en runtime por `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` o credenciales Google faltantes.
+
+### Admin team preview promotion
+- La rama `feature/admin-team-crud` ya quedó publicada en GitHub:
+  - commit `f894eba`
+  - PR: `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/admin-team-crud`
+- Preview oficial de la rama confirmado en Vercel:
+  - `https://greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - alias de rama: `https://greenhouse-eo-git-feature-admin-team-crud-efeonce-7670142f.vercel.app`
+- `pre-greenhouse.efeoncepro.com` fue repuntado a ese deployment para QA compartido del módulo `Admin Team`.
+
+### Admin team preview hardening
+- El backend de `Admin Team` quedó endurecido para desplegar en preview sin depender de `GCP_PROJECT` durante `module evaluation`.
+- Se movió a lazy resolution el acceso a `getBigQueryProjectId()` en la capa nueva de admin y también en los helpers que todavía podían romper previews al colectar page data:
+  - `src/lib/team-admin/mutate-team.ts`
+  - `src/lib/payroll/*` relevantes para export, periods, compensation, entries, calculate, KPI fetch y persist
+  - `src/app/api/hr/payroll/periods/[periodId]/approve/route.ts`
+  - `src/lib/people/get-people-list.ts`
+  - `src/lib/people/get-person-detail.ts`
+  - `src/lib/people/get-person-operational-metrics.ts`
+- También se corrigieron dos regressions de frontend que estaban tumbando `next build` en preview:
+  - `src/components/Providers.tsx` ya no pasa `direction` a `AppReactToastify`
+  - `src/views/greenhouse/people/drawers/EditProfileDrawer.tsx` normaliza `roleCategory` localmente
+- Preview funcional confirmado:
+  - `https://greenhouse-enzxjzyg9-efeonce-7670142f.vercel.app`
+- Smoke sin sesión del módulo admin:
+  - `GET /api/admin/team/meta`: `401 Unauthorized`
+  - `GET /api/admin/team/members`: `401 Unauthorized`
+- El primer deploy listo de la rama seguía devolviendo `500` por `next-auth NO_SECRET`; se resolvió para este deployment puntual inyectando runtime envs en el comando de deploy.
+
+### Admin team backend foundation
+- Se inició `Admin Team Module v2` en la rama `feature/admin-team-crud` con la primera capa backend de mutaciones.
+- Nuevas rutas admin bajo `/api/admin/team/*`:
+  - `GET /api/admin/team/meta`
+  - `GET/POST /api/admin/team/members`
+  - `PATCH /api/admin/team/members/[memberId]`
+  - `POST /api/admin/team/members/[memberId]/deactivate`
+  - `POST /api/admin/team/assignments`
+  - `PATCH/DELETE /api/admin/team/assignments/[assignmentId]`
+- Se agregó `src/lib/team-admin/mutate-team.ts` como helper server-side para:
+  - crear y editar personas
+  - desactivar personas y cerrar sus assignments activos
+  - crear, reactivar, editar y desasignar assignments
+  - registrar `audit_events` cuando la tabla existe
+- `src/types/team.ts` ahora también exporta los contratos de mutación y records admin:
+  - `CreateMemberInput`
+  - `UpdateMemberInput`
+  - `CreateAssignmentInput`
+  - `UpdateAssignmentInput`
+  - `TeamAdminMemberRecord`
+  - `TeamAdminAssignmentRecord`
+- El backend ya expone metadata estable para frontend admin:
+  - `GET /api/admin/team/meta`
+  - `GET /api/admin/team/members` como handshake compatible con la task
+  - ambas respuestas incluyen `roleCategories`, `contactChannels` y `activeClients`
+- Las validaciones de mutación se endurecieron desde el inicio:
+  - duplicados de email se revisan contra `team_members` y `client_users`
+  - no se crean assignments sobre tenants inactivos
+  - si existe un assignment histórico para la misma combinación `clientId + memberId`, el backend lo reactiva en vez de duplicar la relación
+
 ### First production release
 - `main` fue promovida por fast-forward desde `develop` y Greenhouse queda lanzado formalmente en producción.
 - Deployment productivo validado:

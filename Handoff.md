@@ -40,6 +40,194 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 11:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Capturar en la skill local de Vercel el patrón repetido de fallos por env vars faltantes en previews (`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT`, credenciales Google) para evitar futuros ciclos de alias roto en `pre-greenhouse`.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Operación Vercel / documentación operativa
+
+### Archivos tocados
+- `.codex/skills/vercel-operations/SKILL.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Se enriqueció la skill `vercel-operations` con:
+  - checklist mínimo de env vars por branch preview
+  - regla explícita de tratar `next-auth NO_SECRET` como problema de infraestructura
+  - regla de no mover `pre-greenhouse` antes de validar `/api/auth/session`
+  - playbook corto para previews que caen antes de login
+
+### Riesgos o pendientes
+- Este conocimiento ya queda en la skill local, pero no reemplaza la disciplina operativa: si una rama nueva va a usar `pre-greenhouse`, sigue siendo obligatorio confirmar env vars branch-scoped antes de mover el alias.
+
+## 2026-03-14 11:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Publicar `feature/admin-team-crud`, confirmar su preview oficial y mover `pre-greenhouse` al deployment actual del módulo para QA compartido.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Vercel
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Git:
+  - commit publicado: `f894eba` `feat: implement admin team module foundation`
+  - push correcto a `origin/feature/admin-team-crud`
+  - PR listo: `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/admin-team-crud`
+- Preview oficial de rama:
+  - deployment `dpl_CSAt6zBgYEMUvMD1FGbVxakWNX8t`
+  - URL: `https://greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - alias de rama: `https://greenhouse-eo-git-feature-admin-team-crud-efeonce-7670142f.vercel.app`
+- Alias compartido:
+  - `pre-greenhouse.efeoncepro.com` fue reasignado a `greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - confirmación vía `vercel alias ls`: correcta
+
+### Riesgos o pendientes
+- `pre-greenhouse` ahora muestra `feature/admin-team-crud`, así que cualquier QA compartido verá este módulo hasta que otro agente vuelva a mover el alias.
+- Queda pendiente el siguiente QA autenticado real de `Admin Team` ya sobre el preview oficial de la rama.
+
+## 2026-03-14 11:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer el backend de `Admin Team` para preview real: eliminar lecturas `GCP_PROJECT` en import-time, corregir dos regressions de frontend que estaban rompiendo `next build`, desplegar un preview funcional y validar el handshake runtime del módulo.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Vercel / Admin Team parallel implementation
+
+### Archivos tocados
+- `src/lib/team-admin/mutate-team.ts`
+- `src/app/api/admin/team/**`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/approve/route.ts`
+- `src/lib/people/get-people-list.ts`
+- `src/lib/people/get-person-detail.ts`
+- `src/lib/people/get-person-operational-metrics.ts`
+- `src/components/Providers.tsx`
+- `src/views/greenhouse/people/drawers/EditProfileDrawer.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Validación local:
+  - `pnpm exec eslint src/components/Providers.tsx src/lib/people src/app/api/people src/lib/team-admin src/app/api/admin/team src/types/team.ts src/views/greenhouse/people/drawers/EditProfileDrawer.tsx scripts/admin-team-runtime-smoke.ts src/lib/payroll 'src/app/api/hr/payroll/periods/[periodId]/approve/route.ts'`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+  - `git diff --check`
+- Resultado: correcto.
+- Preview listo:
+  - `https://greenhouse-enzxjzyg9-efeonce-7670142f.vercel.app`
+- Smoke runtime del módulo admin vía `vercel curl`:
+  - `GET /api/admin/team/meta` sin sesión: `401 Unauthorized`
+  - `GET /api/admin/team/members` sin sesión: `401 Unauthorized`
+- Logs del preview:
+  - se confirmó y corrigió el primer bloqueo de runtime `NO_SECRET` de `next-auth` inyectando envs al deployment puntual
+  - ya no hay `500` en el handshake sin sesión
+
+### Riesgos o pendientes
+- El preview funcional actual depende de envs inyectadas en el deployment puntual (`NEXTAUTH_SECRET`, `GCP_PROJECT`, `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`); la rama `feature/admin-team-crud` todavía no existe en el Git remoto conectado a Vercel, así que no fue posible sembrar env vars branch-scoped permanentes.
+- Claude puede seguir con frontend de `Admin Team` sobre este backend:
+  - el mutation contract freeze sigue vigente
+  - el preview ya no está bloqueado por build/runtime básico
+- Falta el siguiente QA:
+  - login real en el preview de `Admin Team`
+  - smoke autenticado de `GET /api/admin/team/meta`
+  - smoke autenticado de creación/edición/desactivación desde los drawers de Claude
+- `scripts/admin-team-runtime-smoke.ts` sigue pendiente de una validación local limpia contra BigQuery; el bloqueo actual no es del módulo sino de OpenSSL/Google Auth en el Node local cuando se usa `vercel env run`.
+
+## 2026-03-14 10:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Arrancar `Admin Team Module v2` como siguiente módulo post-release, dejando explícita la coordinación Codex/Claude y congelando primero el contrato backend de mutaciones.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / parallel implementation kickoff
+
+### Archivos tocados
+- `Handoff.md`
+
+### Cambios realizados
+- Se fija la división de trabajo para `CODEX_TASK_Admin_Team_Module_v2.md`:
+  - Codex implementa todo el backend de `Admin Team`
+  - Claude implementa todo el frontend de `Admin Team`
+- Regla operativa para avanzar en paralelo:
+  - Claude no necesita esperar al backend completo
+  - Codex debe cerrar primero un `mutation contract freeze` mínimo para que Claude no invente payloads, errores ni CTAs incompatibles
+- Boundary vigente:
+  - `People` sigue siendo la surface read-first
+  - las mutaciones nuevas viven bajo `/api/admin/team/*`
+  - solo `efeonce_admin` puede ejecutar esas mutaciones
+
+### Verificacion
+- Se revisó la task vigente:
+  - `docs/tasks/CODEX_TASK_Admin_Team_Module_v2.md`
+- Se confirmó contra el runtime real del repo que ya existe la base necesaria:
+  - `greenhouse.team_members`
+  - `greenhouse.client_team_assignments`
+  - `greenhouse.identity_profile_source_links`
+  - `People Unified View v2` read-only ya desplegado
+  - `requireAdminTenantContext()` ya disponible en `authorization.ts`
+
+### Riesgos o pendientes
+- Claude debe esperar solo al freeze de contrato backend, no al backend completo.
+- No se debe implementar CRUD dentro de `/api/people/*`; todo write debe vivir en `/api/admin/team/*`.
+- Freeze backend ya disponible para Claude:
+  - `GET /api/admin/team/meta`
+  - `GET /api/admin/team/members` (handshake compatible con la task, ahora devuelve metadata admin)
+  - `POST /api/admin/team/members`
+  - `PATCH /api/admin/team/members/[memberId]`
+  - `POST /api/admin/team/members/[memberId]/deactivate`
+  - `POST /api/admin/team/assignments`
+  - `PATCH /api/admin/team/assignments/[assignmentId]`
+  - `DELETE /api/admin/team/assignments/[assignmentId]`
+- Metadata ya expuesta para drawers admin:
+  - `roleCategories`
+  - `contactChannels`
+  - `activeClients`
+- Validaciones endurecidas:
+  - duplicado de email revisado contra `team_members` y también `client_users`
+  - assignments nuevos solo sobre tenants activos
+
 ## 2026-03-14 10:40 America/Santiago
 
 ### Agente

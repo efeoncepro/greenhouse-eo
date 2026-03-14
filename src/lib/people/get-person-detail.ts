@@ -83,7 +83,7 @@ type IdentitySourceRow = {
   source_system: string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const getCurrentCompensationFromHistory = (history: CompensationVersion[]) => history.find(item => item.isCurrent) || null
 
@@ -257,6 +257,7 @@ const buildPersonMember = (row: MemberRow): {
 }
 
 const getMemberById = async (memberId: string) => {
+  const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const roleCatalogColumns = await getPeopleTableColumns('greenhouse', 'team_role_catalog')
   const professionCatalogColumns = await getPeopleTableColumns('greenhouse', 'team_profession_catalog')
@@ -318,8 +319,10 @@ const getMemberById = async (memberId: string) => {
   return rows[0] || null
 }
 
-const getAssignmentsByMember = async (memberId: string) =>
-  runPeopleQuery<AssignmentRow>(
+const getAssignmentsByMember = async (memberId: string) => {
+  const projectId = getProjectId()
+
+  return runPeopleQuery<AssignmentRow>(
     `
       SELECT
         a.assignment_id,
@@ -339,11 +342,14 @@ const getAssignmentsByMember = async (memberId: string) =>
     `,
     { memberId }
   )
+}
 
 const getIdentityProvidersByProfile = async (identityProfileId: string | null) => {
   if (!identityProfileId) {
     return [] as IdentitySourceRow[]
   }
+
+  const projectId = getProjectId()
 
   return runPeopleQuery<IdentitySourceRow>(
     `

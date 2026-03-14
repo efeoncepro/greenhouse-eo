@@ -150,3 +150,96 @@ export interface TeamBySprintPayload {
   members: TeamBySprintMember[]
   hasOperationalMetrics: boolean
 }
+
+export interface CreateMemberInput {
+  displayName: string
+  email: string
+  emailAliases?: string[]
+  locationCountry?: string
+  locationCity?: string
+  roleTitle: string
+  roleCategory: TeamRoleCategory
+  avatarUrl?: string
+  contactChannel?: TeamContactChannel
+  contactHandle?: string
+  relevanceNote?: string
+  azureOid?: string
+  notionUserId?: string
+  hubspotOwnerId?: string
+}
+
+export interface UpdateMemberInput extends Partial<CreateMemberInput> {
+  active?: boolean
+}
+
+export interface CreateAssignmentInput {
+  clientId: string
+  memberId: string
+  fteAllocation: number
+  hoursPerMonth?: number
+  roleTitleOverride?: string
+  relevanceNoteOverride?: string
+  contactChannelOverride?: TeamContactChannel
+  contactHandleOverride?: string
+  startDate?: string
+}
+
+export interface UpdateAssignmentInput {
+  fteAllocation?: number
+  hoursPerMonth?: number
+  roleTitleOverride?: string
+  relevanceNoteOverride?: string
+  contactChannelOverride?: TeamContactChannel
+  contactHandleOverride?: string
+}
+
+export interface TeamAdminMemberRecord {
+  memberId: string
+  displayName: string
+  email: string
+  emailAliases: string[]
+  roleTitle: string
+  roleCategory: TeamRoleCategory
+  avatarUrl: string | null
+  locationCountry: string | null
+  locationCity: string | null
+  contactChannel: TeamContactChannel
+  contactHandle: string | null
+  relevanceNote: string | null
+  azureOid: string | null
+  notionUserId: string | null
+  hubspotOwnerId: string | null
+  active: boolean
+}
+
+export interface TeamAdminAssignmentRecord {
+  assignmentId: string
+  clientId: string
+  clientName: string | null
+  memberId: string
+  fteAllocation: number
+  hoursPerMonth: number | null
+  roleTitleOverride: string | null
+  relevanceNoteOverride: string | null
+  contactChannelOverride: TeamContactChannel | null
+  contactHandleOverride: string | null
+  startDate: string | null
+  endDate: string | null
+  active: boolean
+}
+
+export interface TeamAdminClientOption {
+  clientId: string
+  clientName: string
+  active: boolean
+}
+
+export interface TeamAdminMetadata {
+  canManageTeam: boolean
+  memberCrud: boolean
+  assignmentCrud: boolean
+  requiredRole: 'efeonce_admin'
+  roleCategories: TeamRoleCategory[]
+  contactChannels: TeamContactChannel[]
+  activeClients: TeamAdminClientOption[]
+}

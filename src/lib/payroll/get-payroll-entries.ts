@@ -63,7 +63,7 @@ type PayrollEntryRow = {
   updated_at: { value?: string } | string | null
 }
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   entryId: String(row.entry_id || ''),
@@ -113,7 +113,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   updatedAt: toTimestampString(row.updated_at)
 })
 
-const baseEntryQuery = `
+const buildBaseEntryQuery = (projectId: string) => `
   SELECT
     e.entry_id,
     e.period_id,
@@ -169,6 +169,8 @@ const baseEntryQuery = `
 
 export const getPayrollEntries = async (periodId: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+  const baseEntryQuery = buildBaseEntryQuery(projectId)
 
   const rows = await runPayrollQuery<PayrollEntryRow>(
     `
@@ -184,6 +186,8 @@ export const getPayrollEntries = async (periodId: string) => {
 
 export const getPayrollEntryById = async (entryId: string) => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+  const baseEntryQuery = buildBaseEntryQuery(projectId)
 
   const [row] = await runPayrollQuery<PayrollEntryRow>(
     `
@@ -199,6 +203,8 @@ export const getPayrollEntryById = async (entryId: string) => {
 
 export const getMemberPayrollHistory = async (memberId: string): Promise<MemberPayrollHistory> => {
   await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+  const baseEntryQuery = buildBaseEntryQuery(projectId)
 
   const rows = await runPayrollQuery<PayrollEntryRow>(
     `

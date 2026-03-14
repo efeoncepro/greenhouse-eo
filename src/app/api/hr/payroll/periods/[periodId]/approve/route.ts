@@ -13,7 +13,7 @@ import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-const projectId = getBigQueryProjectId()
+const getProjectId = () => getBigQueryProjectId()
 
 export async function POST(_: Request, { params }: { params: Promise<{ periodId: string }> }) {
   const { tenant, errorResponse } = await requireHrTenantContext()
@@ -24,6 +24,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
 
   try {
     await ensurePayrollInfrastructure()
+    const projectId = getProjectId()
 
     const { periodId } = await params
     const period = await getPayrollPeriod(periodId)
