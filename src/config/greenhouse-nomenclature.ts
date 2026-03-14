@@ -63,8 +63,8 @@ export const GH_LABELS = {
   kpi_feedback: 'Feedback pendiente',
   kpi_otd: 'OTD%',
 
-  semaphore_green: 'Optimo',
-  semaphore_yellow: 'Atencion',
+  semaphore_green: 'Óptimo',
+  semaphore_yellow: 'Atención',
   semaphore_red: 'Alerta',
 
   chart_status: 'Status de assets',
@@ -288,18 +288,18 @@ export const GH_MESSAGES = {
 
   tooltip_rpa: 'Rounds per Asset: promedio de rondas de revision por pieza. Menos es mejor.',
   tooltip_otd: 'On-Time Delivery: porcentaje de entregas realizadas en la fecha comprometida.',
-  tooltip_semaphore_green: 'Optimo: la operacion esta dentro de los estandares ICO.',
+  tooltip_semaphore_green: 'Óptimo: la operación está dentro de los estándares ICO.',
   tooltip_semaphore_yellow:
-    'Atencion: algunos indicadores se acercan al limite. Tu equipo de cuenta ya esta al tanto.',
+    'Atención: algunos indicadores se acercan al límite. Tu equipo de cuenta ya está al tanto.',
   tooltip_semaphore_red:
-    'Alerta: indicadores fuera de rango. Tu equipo de cuenta te contactara con un action plan.',
+    'Alerta: indicadores fuera de rango. Tu equipo de cuenta te contactará con un action plan.',
   tooltip_utilization: 'Estimacion de uso basada en la carga operativa actual del equipo.',
   team_operational_pending:
     'La trazabilidad operativa de responsables aun no esta completa en BigQuery. El roster contractual sigue visible mientras termina ese sync.',
   team_project_breakdown_empty: 'Sin distribucion visible por proyecto todavia.',
   team_no_visible_activity: 'Sin actividad este mes',
 
-  footer: 'Efeonce Greenhouse | El ambiente disenado para que tu marca crezca',
+  footer: 'Efeonce Greenhouse™ · El ambiente diseñado para que tu marca crezca',
   footer_portal_link: 'Portal',
 
   hero_activity_prefix: 'Ultima actividad',
