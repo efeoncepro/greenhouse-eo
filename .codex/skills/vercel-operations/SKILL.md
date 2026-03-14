@@ -35,6 +35,15 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 - Treat `.vercel/` as project state. Re-link deliberately; do not casually overwrite it.
 - Do not use `vercel alias` as the default production promotion mechanism. Prefer `vercel --prod --skip-domain`, `vercel promote`, and `vercel rollback`.
 - If a protected deployment returns `401` or a Vercel auth page, do not guess. Use `vercel curl`, Vercel MCP, or a valid protection bypass secret.
+- Before trusting a Preview deployment for QA, verify the branch-scoped env vars that the runtime actually needs. In this repo, the minimum recurring set is:
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+  - `GCP_PROJECT`
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON` or `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`
+- Treat `next-auth NO_SECRET` as an infrastructure/env issue first, not as an application bug.
+- Do not repoint shared aliases like `pre-greenhouse` to a branch preview until that preview has passed a minimal auth smoke:
+  - `vercel curl /api/auth/session --deployment <url>`
+  - expected without session: `200 {}` or another non-500 response
 - When reporting results, always include the exact branch, project, environment, deployment URL, domain alias, and whether protection/auth blocked validation.
 
 ## Workflow
@@ -74,6 +83,12 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
   - `vercel env pull --environment=preview --git-branch=<branch>`
   - `vercel env run -e preview -- <command>`
   - use `vercel pull` instead of `vercel env pull` when you need `.vercel/` settings for `vercel build` or `vercel dev`
+  - when a preview branch fails with missing auth or GCP config, compare against a known-good preview branch first:
+    - `vercel env ls preview`
+    - confirm whether the branch is missing `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT`, or Google credentials
+  - if the branch does not yet exist in the connected Git repo, branch-scoped env creation may fail with `branch_not_found`; in that case either:
+    - push the branch first, then add env vars, or
+    - do a one-off preview deploy with `-e KEY=VALUE` to unblock immediate QA
 - Promotion and rollback:
   - promote: `vercel promote <deployment-url>`
   - promotion status: `vercel promote status`
@@ -97,6 +112,12 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
   - check error logs
   - verify domain or deployment URL response
   - only then promote
+- For shared preview aliases like `pre-greenhouse`:
+  - inspect the target deployment
+  - check runtime error logs for the last few minutes
+  - verify `/api/auth/session` is not failing with `NO_SECRET`
+  - verify a representative protected route or module path
+  - only then move the alias
 - For rollback:
   - confirm production issue
   - rollback
@@ -114,6 +135,17 @@ If the task is time-sensitive or blocked by auth/protection, verify against offi
 - try `vercel curl https://preview-domain`
 - if blocked and CLI is unavailable, use MCP or a bypass secret
 - report whether the domain is serving the expected branch or if that cannot be proven
+
+### Fix a preview that crashes before login
+- first inspect logs:
+  - `vercel logs <deployment-url> --since 15m --level error --expand`
+- if logs show `next-auth NO_SECRET`, add branch-scoped preview env vars before doing anything else
+- if logs show `Missing GCP_PROJECT environment variable`, look for import-time calls and harden them to lazy resolution
+- redeploy after env or code fixes
+- verify:
+  - `vercel curl /api/auth/session --deployment <url>`
+  - `vercel curl /api/<module-handshake> --deployment <url>`
+  - only then repoint `pre-greenhouse`
 
 ### Sync branch-specific preview env vars
 - `vercel env pull --environment=preview --git-branch=<branch>`

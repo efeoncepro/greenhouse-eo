@@ -40,6 +40,72 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 11:55 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Capturar en la skill local de Vercel el patrón repetido de fallos por env vars faltantes en previews (`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT`, credenciales Google) para evitar futuros ciclos de alias roto en `pre-greenhouse`.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Operación Vercel / documentación operativa
+
+### Archivos tocados
+- `.codex/skills/vercel-operations/SKILL.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Se enriqueció la skill `vercel-operations` con:
+  - checklist mínimo de env vars por branch preview
+  - regla explícita de tratar `next-auth NO_SECRET` como problema de infraestructura
+  - regla de no mover `pre-greenhouse` antes de validar `/api/auth/session`
+  - playbook corto para previews que caen antes de login
+
+### Riesgos o pendientes
+- Este conocimiento ya queda en la skill local, pero no reemplaza la disciplina operativa: si una rama nueva va a usar `pre-greenhouse`, sigue siendo obligatorio confirmar env vars branch-scoped antes de mover el alias.
+
+## 2026-03-14 11:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Publicar `feature/admin-team-crud`, confirmar su preview oficial y mover `pre-greenhouse` al deployment actual del módulo para QA compartido.
+
+### Rama
+- Rama usada: `feature/admin-team-crud`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Vercel
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+- Git:
+  - commit publicado: `f894eba` `feat: implement admin team module foundation`
+  - push correcto a `origin/feature/admin-team-crud`
+  - PR listo: `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/admin-team-crud`
+- Preview oficial de rama:
+  - deployment `dpl_CSAt6zBgYEMUvMD1FGbVxakWNX8t`
+  - URL: `https://greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - alias de rama: `https://greenhouse-eo-git-feature-admin-team-crud-efeonce-7670142f.vercel.app`
+- Alias compartido:
+  - `pre-greenhouse.efeoncepro.com` fue reasignado a `greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - confirmación vía `vercel alias ls`: correcta
+
+### Riesgos o pendientes
+- `pre-greenhouse` ahora muestra `feature/admin-team-crud`, así que cualquier QA compartido verá este módulo hasta que otro agente vuelva a mover el alias.
+- Queda pendiente el siguiente QA autenticado real de `Admin Team` ya sobre el preview oficial de la rama.
+
 ## 2026-03-14 11:35 America/Santiago
 
 ### Agente

@@ -6,6 +6,23 @@
 
 ## 2026-03-14
 
+### Vercel ops skill hardening
+- La skill local [vercel-operations](/Users/jreye/Documents/greenhouse-eo/.codex/skills/vercel-operations/SKILL.md) ahora deja explícito el patrón operativo que venía rompiendo previews en este repo:
+  - verificar env vars branch-scoped antes de confiar en un Preview
+  - tratar `next-auth NO_SECRET` como problema de infraestructura/env
+  - no mover `pre-greenhouse` sin smoke previo de `/api/auth/session`
+  - usar un playbook corto para errores de preview antes del login
+- El objetivo es evitar repetir ciclos donde un deployment parece `Ready` pero se cae en runtime por `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` o credenciales Google faltantes.
+
+### Admin team preview promotion
+- La rama `feature/admin-team-crud` ya quedó publicada en GitHub:
+  - commit `f894eba`
+  - PR: `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/admin-team-crud`
+- Preview oficial de la rama confirmado en Vercel:
+  - `https://greenhouse-2z503i2bu-efeonce-7670142f.vercel.app`
+  - alias de rama: `https://greenhouse-eo-git-feature-admin-team-crud-efeonce-7670142f.vercel.app`
+- `pre-greenhouse.efeoncepro.com` fue repuntado a ese deployment para QA compartido del módulo `Admin Team`.
+
 ### Admin team preview hardening
 - El backend de `Admin Team` quedó endurecido para desplegar en preview sin depender de `GCP_PROJECT` durante `module evaluation`.
 - Se movió a lazy resolution el acceso a `getBigQueryProjectId()` en la capa nueva de admin y también en los helpers que todavía podían romper previews al colectar page data:
