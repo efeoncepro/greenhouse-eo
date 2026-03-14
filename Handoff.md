@@ -73,6 +73,8 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El task `CODEX_TASK_Fix_Team_Capacity_Views.md` esta parcialmente desfasado respecto al estado real del repo: las vistas 1, 3 y 4 ya existian antes de este turno.
 - Conviene validar en Preview que la nueva densidad del grid de `Pulse` se vea bien con tenants pequeños y con equipos de mas de 6 personas.
+- `pre-greenhouse.efeoncepro.com` no estaba mostrando esta rama al momento del chequeo; seguia apuntando a un preview anterior (`fix/internal-nav-nomenclature-hydration`).
+- La iteracion final de este turno rehizo `Pulse` hacia una lista mas compacta y ejecutiva, con ghost slot en formato fila y CTA menos invasivo. Esa version necesita quedar pushada para reflejarse en el preview del branch.
 
 ## 2026-03-13 21:00 America/Santiago
 

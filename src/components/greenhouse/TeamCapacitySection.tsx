@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
+import AvatarGroup from '@mui/material/AvatarGroup'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -19,11 +21,17 @@ import ExecutiveCardShell from './ExecutiveCardShell'
 import RequestDialog from './RequestDialog'
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
 import TeamExpansionGhostCard from './TeamExpansionGhostCard'
-import TeamIdentityBadgeGroup from './TeamIdentityBadgeGroup'
 import TeamLoadBar from './TeamLoadBar'
 import TeamProgressBar from './TeamProgressBar'
 import TeamSignalChip from './TeamSignalChip'
 import UpsellBanner from './UpsellBanner'
+
+const getUtilizationTone = (value: number): 'success' | 'warning' | 'error' => {
+  if (value >= 90) return 'error'
+  if (value >= 71) return 'warning'
+
+  return 'success'
+}
 
 const TeamCapacitySection = () => {
   const [data, setData] = useState<TeamCapacityPayload | null>(null)
@@ -86,6 +94,16 @@ const TeamCapacitySection = () => {
 
           {!isLoading && !error && data ? (
             <>
+              {(() => {
+                const utilizationTone = getUtilizationTone(data.summary.utilizationPercent)
+                const memberFteValues = Array.from(new Set(data.members.map(member => member.fteAllocation.toFixed(2))))
+                const showMemberAllocation = memberFteValues.length > 1
+
+                const avgActiveAssets =
+                  data.members.length > 0 ? data.members.reduce((sum, member) => sum + member.activeAssets, 0) / data.members.length : 0
+
+                return (
+                  <>
               <Box
                 sx={{
                   display: 'grid',
@@ -101,7 +119,7 @@ const TeamCapacitySection = () => {
                   stats={`${data.summary.totalFte.toFixed(1)} FTE`}
                   avatarIcon='tabler-users-group'
                   avatarColor='primary'
-                  subtitle={GH_TEAM.capacity_people_active(data.summary.memberCount)}
+                  subtitle={GH_TEAM.capacity_people_assigned(data.summary.memberCount)}
                 />
 
                 <HorizontalWithSubtitle
@@ -126,19 +144,18 @@ const TeamCapacitySection = () => {
                     {GH_TEAM.label_utilization}
                   </Typography>
                   <Typography variant='h4'>{`${data.summary.utilizationPercent}%`}</Typography>
-                  <TeamProgressBar
-                    value={data.summary.utilizationPercent}
-                    tone={data.summary.utilizationPercent >= 90 ? 'error' : data.summary.utilizationPercent >= 71 ? 'warning' : 'success'}
-                  />
-                  <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
-                    <TeamSignalChip
-                      tone={data.summary.utilizationPercent >= 90 ? 'error' : data.summary.utilizationPercent >= 71 ? 'warning' : 'success'}
-                      label={data.summary.utilizationPercent >= 85 ? GH_TEAM.cta_signal_high : GH_TEAM.cta_signal_balanced}
-                      icon='tabler-activity-heartbeat'
-                    />
-                    <Typography variant='caption' color='text.secondary'>
-                      {GH_TEAM.capacity_utilization_help}
-                    </Typography>
+                  <Stack spacing={1.25}>
+                    <TeamProgressBar value={data.summary.utilizationPercent} tone={utilizationTone} />
+                    <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+                      <TeamSignalChip
+                        tone={utilizationTone}
+                        label={data.summary.utilizationPercent >= 85 ? GH_TEAM.cta_signal_high : GH_TEAM.cta_signal_balanced}
+                        icon='tabler-activity-heartbeat'
+                      />
+                      <Typography variant='caption' color='text.secondary'>
+                        {GH_TEAM.capacity_utilization_help}
+                      </Typography>
+                    </Stack>
                   </Stack>
                 </Box>
               </Box>
@@ -151,86 +168,136 @@ const TeamCapacitySection = () => {
                 sx={{
                   display: 'grid',
                   gap: 3,
+                  alignItems: 'start',
                   gridTemplateColumns: {
                     xs: '1fr',
-                    xl: 'minmax(0, 1.25fr) minmax(320px, 0.75fr)'
+                    xl: 'minmax(0, 1.35fr) minmax(320px, 0.65fr)'
                   }
                 }}
               >
                 <Stack spacing={2}>
-                  <Stack spacing={0.5}>
-                    <Typography variant='subtitle2'>{GH_TEAM.label_load}</Typography>
-                    {!data.hasOperationalMetrics ? (
+                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} justifyContent='space-between' alignItems={{ xs: 'flex-start', md: 'center' }}>
+                    <Stack spacing={0.5}>
+                      <Typography variant='subtitle2'>{GH_TEAM.label_load}</Typography>
                       <Typography variant='body2' color='text.secondary'>
-                        {GH_TEAM.capacity_contract_only}
+                        {data.hasOperationalMetrics ? GH_TEAM.capacity_operational_live : GH_TEAM.capacity_contract_only}
                       </Typography>
-                    ) : null}
+                    </Stack>
+
+                    <Stack direction='row' spacing={1.5} alignItems='center' useFlexGap flexWrap='wrap'>
+                      <AvatarGroup
+                        max={4}
+                        sx={{
+                          '& .MuiAvatar-root': {
+                            width: 28,
+                            height: 28,
+                            fontSize: '0.75rem',
+                            borderColor: 'background.paper'
+                          }
+                        }}
+                      >
+                        {data.members.map(member => (
+                          <TeamAvatar
+                            key={`capacity-avatar-${member.memberId}`}
+                            name={member.displayName}
+                            avatarUrl={member.avatarUrl}
+                            roleCategory={member.roleCategory}
+                            size={28}
+                          />
+                        ))}
+                      </AvatarGroup>
+                      <Typography variant='caption' color='text.secondary'>
+                        {GH_TEAM.capacity_people_helper}
+                      </Typography>
+                    </Stack>
                   </Stack>
 
-                  <Box
+                  <Stack
+                    divider={<Divider flexItem sx={{ borderStyle: 'dashed', borderColor: alpha(GH_COLORS.neutral.border, 0.8) }} />}
                     sx={{
-                      display: 'grid',
-                      gap: 2,
-                      gridTemplateColumns: {
-                        xs: '1fr',
-                        lg: 'repeat(2, minmax(0, 1fr))'
-                      }
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+                      bgcolor: 'background.paper',
+                      overflow: 'hidden'
                     }}
                   >
                     {data.members.map(member => {
                       const tone = getTeamRoleTone(member.roleCategory)
+                      const isOverloaded = data.hasOperationalMetrics && avgActiveAssets > 0 && member.activeAssets > avgActiveAssets * 1.5
 
                       return (
-                        <Box
+                        <Stack
                           key={member.memberId}
                           sx={{
-                            p: 2.5,
-                            borderRadius: 4,
-                            border: `1px solid ${alpha(tone.source, 0.16)}`,
-                            background: `linear-gradient(180deg, ${alpha(tone.source, 0.08)} 0%, ${GH_COLORS.neutral.bgSurface} 36%)`,
-                            display: 'grid',
-                            gap: 1.75
+                            px: { xs: 2, md: 2.5 },
+                            py: 2,
+                            gap: 1.5
                           }}
                         >
-                          <Stack direction='row' spacing={2} alignItems='center'>
-                            <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={44} />
+                          <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+                            <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
+                              <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={36} />
+                              <Box sx={{ minWidth: 0 }}>
+                                <Typography variant='subtitle2' sx={{ color: 'text.primary' }}>
+                                  {member.displayName}
+                                </Typography>
+                                <Typography variant='caption' sx={{ color: tone.text, display: 'block' }}>
+                                  {member.roleTitle}
+                                </Typography>
+                              </Box>
+                            </Stack>
+
                             <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                              <Typography variant='h6'>{member.displayName}</Typography>
-                              <Typography variant='body2' sx={{ color: tone.text }}>
-                                {member.roleTitle}
-                              </Typography>
+                              <Stack direction='row' spacing={1} justifyContent='flex-end' flexWrap='wrap' useFlexGap>
+                                {data.hasOperationalMetrics ? (
+                                  <>
+                                    <TeamSignalChip
+                                      tone={isOverloaded ? 'error' : 'primary'}
+                                      label={GH_TEAM.capacity_assets_label(member.activeAssets)}
+                                      icon='tabler-layers-intersect'
+                                    />
+                                    <Chip
+                                      size='small'
+                                      variant='tonal'
+                                      color='info'
+                                      label={GH_TEAM.capacity_projects_label(member.projectCount)}
+                                    />
+                                    {member.avgRpa !== null ? (
+                                      <TeamSignalChip
+                                        tone={member.avgRpa <= 1.5 ? 'success' : member.avgRpa <= 2.5 ? 'warning' : 'error'}
+                                        label={GH_TEAM.rpa_label(member.avgRpa)}
+                                        icon='tabler-chart-line'
+                                      />
+                                    ) : null}
+                                  </>
+                                ) : showMemberAllocation ? (
+                                  <>
+                                    <Chip size='small' variant='outlined' label={GH_TEAM.capacity_member_fte(member.fteAllocation)} />
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {GH_TEAM.capacity_member_hours(Math.round(member.fteAllocation * 160))}
+                                    </Typography>
+                                  </>
+                                ) : null}
+                              </Stack>
                             </Box>
-                            <Chip size='small' variant='outlined' label={`${member.fteAllocation.toFixed(1)} FTE`} />
                           </Stack>
 
-                          <TeamIdentityBadgeGroup providers={member.identityProviders} confidence={member.identityConfidence} />
-
                           {data.hasOperationalMetrics ? (
-                            <>
-                              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                                <Chip size='small' variant='tonal' color='primary' label={`${member.activeAssets} ${GH_TEAM.active_assets_short}`} />
-                                <Chip size='small' variant='tonal' color='success' label={`${member.completedAssets} ${GH_TEAM.project_chip_completed}`} />
-                                <Chip size='small' variant='tonal' color='info' label={`${member.projectCount} ${GH_TEAM.projects_short}`} />
-                                <TeamSignalChip
-                                  tone={member.avgRpa === null ? 'default' : member.avgRpa <= 1.5 ? 'success' : member.avgRpa <= 2.5 ? 'warning' : 'error'}
-                                  label={member.avgRpa === null ? GH_TEAM.rpa_empty : GH_TEAM.rpa_label(member.avgRpa)}
-                                  icon='tabler-chart-line'
-                                />
-                              </Stack>
-
+                            <Stack spacing={1}>
                               <TeamLoadBar items={member.projectBreakdown} emptyLabel={GH_MESSAGES.team_project_breakdown_empty} />
-                            </>
-                          ) : (
-                            <Typography variant='caption' color='text.secondary'>
-                              {GH_TEAM.label_committed_capacity}: {`${Math.round(member.fteAllocation * 160)}h/mes`}
-                            </Typography>
-                          )}
-                        </Box>
+                              <Typography variant='caption' color='text.secondary'>
+                                {member.completedAssets} {GH_TEAM.project_chip_completed}
+                              </Typography>
+                            </Stack>
+                          ) : null}
+                        </Stack>
                       )
                     })}
 
-                    <TeamExpansionGhostCard minHeight={220} onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())} />
-                  </Box>
+                    <Box sx={{ p: 2 }}>
+                      <TeamExpansionGhostCard variant='row' onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())} />
+                    </Box>
+                  </Stack>
                 </Stack>
 
                 <Stack
@@ -240,7 +307,7 @@ const TeamCapacitySection = () => {
                     borderRadius: 4,
                     border: `1px solid ${GH_COLORS.neutral.border}`,
                     bgcolor: GH_COLORS.neutral.bgSurface,
-                    alignContent: 'start'
+                    alignSelf: 'start'
                   }}
                 >
                   <Typography variant='subtitle2'>{GH_TEAM.capacity_summary_subtitle}</Typography>
@@ -262,7 +329,7 @@ const TeamCapacitySection = () => {
                     title={GH_TEAM.label_utilization}
                     stats={`${data.summary.utilizationPercent}%`}
                     avatarIcon='tabler-activity-heartbeat'
-                    avatarColor={data.summary.utilizationPercent >= 90 ? 'error' : data.summary.utilizationPercent >= 71 ? 'warning' : 'success'}
+                    avatarColor={utilizationTone}
                     subtitle={GH_MESSAGES.tooltip_utilization}
                   />
 
@@ -271,6 +338,9 @@ const TeamCapacitySection = () => {
                   ) : null}
                 </Stack>
               </Box>
+                  </>
+                )
+              })()}
             </>
           ) : null}
         </Stack>
