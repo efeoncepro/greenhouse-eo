@@ -40,6 +40,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 21:00 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Investigar la documentacion oficial de Vercel y dejar una skill reusable para operar previews, staging, production, dominios protegidos y promociones desde este repo.
+
+### Rama
+- Rama usada: `fix/team-identity-task-closeout`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Operacion Vercel cross-environment
+
+### Archivos tocados
+- `.codex/skills/vercel-operations/SKILL.md`
+- `.codex/skills/vercel-operations/references/official-vercel-reference.md`
+- `.codex/skills/vercel-operations/references/greenhouse-vercel-map.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- Fuentes usadas: documentacion oficial de Vercel sobre CLI, project linking, env, logs, promote, rollback, deployment protection, protection bypass, custom environments y Vercel MCP.
+- `git diff --check`: correcto
+- Limitacion actual del entorno:
+  - este shell sigue sin `vercel`, `node`, `npx` y `pnpm`
+  - por eso la skill ya quedo versionada, pero la CLI real aun no puede ejecutarse desde esta sesion
+
+### Riesgos o pendientes
+- Para usar la skill de forma operativa aqui mismo, hace falta que el entorno tenga `vercel` disponible o que otro shell autenticado la ejecute.
+- `pre-greenhouse.efeoncepro.com` fue verificado por `curl` y responde Vercel Authentication `401`; eso confirma proteccion activa, no el deployment exacto detras del dominio.
+
 ## 2026-03-13 23:59 America/Santiago
 
 ### Agente
