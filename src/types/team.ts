@@ -4,13 +4,49 @@ export type TeamRoleCategory = 'account' | 'operations' | 'strategy' | 'design' 
 
 export type TeamDataSource = 'team_assignments' | 'legacy_override'
 
+export type TeamIdentityProvider = 'notion' | 'microsoft' | 'google' | 'hubspot' | 'deel' | (string & {})
+
+export type TeamIdentityConfidence = 'strong' | 'partial' | 'basic'
+
+export interface TeamIdentitySummary {
+  identityProviders: TeamIdentityProvider[]
+  identityConfidence: TeamIdentityConfidence
+}
+
+export interface TeamMemberProfile {
+  firstName: string | null
+  lastName: string | null
+  preferredName: string | null
+  legalName: string | null
+  orgRoleId: string | null
+  orgRoleName: string | null
+  professionId: string | null
+  professionName: string | null
+  seniorityLevel: string | null
+  employmentType: string | null
+  ageYears: number | null
+  phone: string | null
+  teamsUserId: string | null
+  slackUserId: string | null
+  locationCity: string | null
+  locationCountry: string | null
+  timeZone: string | null
+  yearsExperience: number | null
+  efeonceStartDate: string | null
+  tenureEfeonceMonths: number | null
+  tenureClientMonths: number | null
+  biography: string | null
+  languages: string[]
+  profileCompletenessPercent: number
+}
+
 export interface TeamMembersFooter {
   serviceLines: string[]
   modality: string | null
   totalFte: number
 }
 
-export interface TeamMemberResponse {
+export interface TeamMemberResponse extends TeamIdentitySummary {
   memberId: string
   displayName: string
   email: string
@@ -22,6 +58,7 @@ export interface TeamMemberResponse {
   contactHandle: string | null
   fteAllocation: number
   startDate: string | null
+  profile: TeamMemberProfile
 }
 
 export interface TeamMembersPayload {
@@ -37,7 +74,7 @@ export interface TeamCapacityProjectBreakdown {
   activeCount: number
 }
 
-export interface TeamCapacityMember {
+export interface TeamCapacityMember extends TeamIdentitySummary {
   memberId: string
   displayName: string
   avatarUrl: string | null
@@ -65,7 +102,7 @@ export interface TeamCapacityPayload {
   hasOperationalMetrics: boolean
 }
 
-export interface TeamByProjectMember {
+export interface TeamByProjectMember extends TeamIdentitySummary {
   memberId: string
   displayName: string
   email: string | null
@@ -88,7 +125,7 @@ export interface TeamByProjectPayload {
   hasOperationalMetrics: boolean
 }
 
-export interface TeamBySprintMember {
+export interface TeamBySprintMember extends TeamIdentitySummary {
   memberId: string
   displayName: string
   email: string | null

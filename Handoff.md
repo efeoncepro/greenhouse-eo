@@ -40,6 +40,55 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-13 23:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Endurecer de verdad la identidad canonica del roster Efeonce para que Greenhouse sea la identidad base y los providers externos queden enlazados como enrichment.
+- Dar una pasada visual adicional a las 4 surfaces live del task usando patrones Vuexy ya presentes en el repo.
+
+### Rama
+- Rama usada: `fix/internal-nav-nomenclature-hydration`
+- Rama objetivo del merge: `main`
+
+### Ambiente objetivo
+- Development / BigQuery real / preview readiness
+
+### Archivos tocados
+- `src/types/team.ts`
+- `src/lib/team-queries.ts`
+- `scripts/setup-team-tables.sql`
+- `src/config/greenhouse-nomenclature.ts`
+- `src/components/greenhouse/TeamIdentityBadgeGroup.tsx`
+- `src/components/greenhouse/TeamMemberCard.tsx`
+- `src/components/greenhouse/TeamDossierSection.tsx`
+- `src/components/greenhouse/TeamCapacitySection.tsx`
+- `src/components/greenhouse/ProjectTeamSection.tsx`
+- `src/components/greenhouse/SprintTeamVelocitySection.tsx`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+- `pnpm lint`: correcto
+- `pnpm build`: correcto
+- `scripts/setup-team-tables.sql` reaplicado en BigQuery real: correcto
+- Verificacion directa en BigQuery:
+  - `greenhouse.team_members` ahora expone `identity_profile_id` y `email_aliases`
+  - el roster Efeonce quedo con `7` miembros enlazados a perfil canonico
+  - `identity_profile_source_links` ahora incluye links activos de `greenhouse_team`, `greenhouse_auth`, `notion`, `hubspot_crm` y `azure_ad`
+  - el perfil legado `identity-hubspot-crm-owner-75788512` de Julio quedo `archived` / `active = FALSE`
+  - `greenhouse.team_members` ahora tambien expone columnas de perfil ampliado: `first_name`, `last_name`, `preferred_name`, `legal_name`, `org_role_id`, `profession_id`, `seniority_level`, `employment_type`, `birth_date`, `phone`, `teams_user_id`, `slack_user_id`, `location_city`, `location_country`, `time_zone`, `years_experience`, `efeonce_start_date`, `biography`, `languages`
+  - `greenhouse.team_role_catalog` y `greenhouse.team_profession_catalog` ya quedaron sembradas en BigQuery real
+
+### Riesgos o pendientes
+- Falta validacion visual autenticada en Preview para confirmar la nueva jerarquia visual de las 4 cards con datos reales en navegador.
+- La capa ya soporta futuros providers en `identity_profile_source_links`, pero todavia no existe ingestion real para `google_workspace`, `deel`, `frame_io` o `adobe`; el modelo quedo listo, no el sync.
+- El perfil ampliado ya existe a nivel schema y runtime, pero varios atributos siguen `NULL` en seed porque no habia dato confirmado; para cerrar la ficha completa faltaria una fuente canonica de RRHH o un backoffice admin de talento.
+- El repo externo `notion-bigquery` ya estaba alineado para `Responsables`; no hay cambio pendiente ahi por este ajuste salvo mergear su rama documental si se quiere dejar el contrato cerrado.
+
 ## 2026-03-13 23:20 America/Santiago
 
 ### Agente

@@ -11,6 +11,9 @@ import type {
   TeamCapacityPayload,
   TeamContactChannel,
   TeamDataSource,
+  TeamIdentityConfidence,
+  TeamIdentityProvider,
+  TeamMemberProfile,
   TeamMemberResponse,
   TeamMembersPayload,
   TeamRoleCategory
@@ -37,6 +40,31 @@ type TeamAssignmentRow = {
   start_date: { value?: string } | string | null
   notion_display_name: string | null
   notion_user_id: string | null
+  identity_profile_id: string | null
+  email_aliases: string[] | null
+  azure_oid: string | null
+  hubspot_owner_id: string | null
+  first_name: string | null
+  last_name: string | null
+  preferred_name: string | null
+  legal_name: string | null
+  org_role_id: string | null
+  org_role_name: string | null
+  profession_id: string | null
+  profession_name: string | null
+  seniority_level: string | null
+  employment_type: string | null
+  birth_date: { value?: string } | string | null
+  phone: string | null
+  teams_user_id: string | null
+  slack_user_id: string | null
+  location_city: string | null
+  location_country: string | null
+  time_zone: string | null
+  years_experience: number | string | null
+  efeonce_start_date: { value?: string } | string | null
+  biography: string | null
+  languages: string[] | null
 }
 
 type TeamAssignment = {
@@ -53,6 +81,25 @@ type TeamAssignment = {
   startDate: string | null
   notionDisplayName: string | null
   notionUserId: string | null
+  identityProfileId: string | null
+  emailAliases: string[]
+  azureOid: string | null
+  hubspotOwnerId: string | null
+  profile: TeamMemberProfile
+  identityProviders: TeamIdentityProvider[]
+  identityConfidence: TeamIdentityConfidence
+  identityMatchSignals: string[]
+}
+
+type TeamIdentitySourceRow = {
+  profile_id: string | null
+  source_system: string | null
+  source_object_type: string | null
+  source_object_id: string | null
+  source_user_id: string | null
+  source_email: string | null
+  source_display_name: string | null
+  is_login_identity: boolean | null
 }
 
 type OperationalLoadRow = {
@@ -181,6 +228,68 @@ const roundToTenths = (value: number) => Math.round(value * 10) / 10
 
 const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
 
+const toStringArray = (value: string[] | null | undefined) =>
+  Array.isArray(value)
+    ? value
+        .map(item => String(item || '').trim())
+        .filter(Boolean)
+    : []
+
+const getMonthDiffFromDate = (value: string | null) => {
+  if (!value) {
+    return null
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`)
+
+  if (Number.isNaN(date.getTime())) {
+    return null
+  }
+
+  const now = new Date()
+  let months = (now.getUTCFullYear() - date.getUTCFullYear()) * 12 + (now.getUTCMonth() - date.getUTCMonth())
+
+  if (now.getUTCDate() < date.getUTCDate()) {
+    months -= 1
+  }
+
+  return Math.max(0, months)
+}
+
+const getAgeYearsFromDate = (value: string | null) => {
+  const months = getMonthDiffFromDate(value)
+
+  return months === null ? null : Math.floor(months / 12)
+}
+
+const getProfileCompletenessPercent = (profile: Omit<TeamMemberProfile, 'profileCompletenessPercent'>) => {
+  const checks = [
+    profile.firstName,
+    profile.lastName,
+    profile.orgRoleId,
+    profile.professionId,
+    profile.seniorityLevel,
+    profile.phone,
+    profile.locationCity,
+    profile.locationCountry,
+    profile.timeZone,
+    profile.yearsExperience,
+    profile.efeonceStartDate,
+    profile.teamsUserId || profile.slackUserId,
+    profile.languages.length > 0 ? 'languages' : null
+  ]
+
+  const populatedCount = checks.filter(value => {
+    if (typeof value === 'number') {
+      return Number.isFinite(value)
+    }
+
+    return Boolean(value)
+  }).length
+
+  return clampPercent((populatedCount / checks.length) * 100)
+}
+
 const normalizeMatchValue = (value: string | null | undefined) =>
   (value || '')
     .toLowerCase()
@@ -212,12 +321,91 @@ const toContactChannel = (value: string | null | undefined): TeamContactChannel 
   return 'teams'
 }
 
+const mapIdentityProvider = (sourceSystem: string | null | undefined): TeamIdentityProvider | null => {
+  const normalized = normalizeMatchValue(sourceSystem)
+
+  if (normalized === 'notion') return 'notion'
+  if (normalized === 'hubspot_crm' || normalized === 'hubspot') return 'hubspot'
+
+  if (normalized === 'azure_ad' || normalized === 'microsoft' || normalized === 'microsoft_sso') {
+    return 'microsoft'
+  }
+
+  if (normalized === 'google' || normalized === 'google_oauth' || normalized === 'google_workspace') {
+    return 'google'
+  }
+
+  if (normalized === 'deel' || normalized === 'deel_hr' || normalized === 'deel_com') {
+    return 'deel'
+  }
+
+  return null
+}
+
+const getIdentityConfidence = ({
+  providers,
+  identityProfileId,
+  emailAliases
+}: {
+  providers: TeamIdentityProvider[]
+  identityProfileId: string | null
+  emailAliases: string[]
+}): TeamIdentityConfidence => {
+  if (identityProfileId && (providers.length >= 2 || (providers.length >= 1 && emailAliases.length > 0))) {
+    return 'strong'
+  }
+
+  if (identityProfileId || providers.length >= 1 || emailAliases.length > 0) {
+    return 'partial'
+  }
+
+  return 'basic'
+}
+
 const sortAssignments = <T extends { roleCategory: TeamRoleCategory; displayName: string }>(items: T[]) =>
   [...items].sort((left, right) => {
     const roleDelta = roleOrder[left.roleCategory] - roleOrder[right.roleCategory]
 
     return roleDelta !== 0 ? roleDelta : left.displayName.localeCompare(right.displayName, 'es')
   })
+
+const createEmptyProfile = (overrides: Partial<Omit<TeamMemberProfile, 'profileCompletenessPercent'>> = {}): TeamMemberProfile => {
+  const baseProfile: Omit<TeamMemberProfile, 'profileCompletenessPercent'> = {
+    firstName: null,
+    lastName: null,
+    preferredName: null,
+    legalName: null,
+    orgRoleId: null,
+    orgRoleName: null,
+    professionId: null,
+    professionName: null,
+    seniorityLevel: null,
+    employmentType: null,
+    ageYears: null,
+    phone: null,
+    teamsUserId: null,
+    slackUserId: null,
+    locationCity: null,
+    locationCountry: null,
+    timeZone: null,
+    yearsExperience: null,
+    efeonceStartDate: null,
+    tenureEfeonceMonths: null,
+    tenureClientMonths: null,
+    biography: null,
+    languages: []
+  }
+
+  const profile = {
+    ...baseProfile,
+    ...overrides
+  }
+
+  return {
+    ...profile,
+    profileCompletenessPercent: getProfileCompletenessPercent(profile)
+  }
+}
 
 const toLegacyMemberResponse = (viewer: TeamQueryViewer): TeamMembersPayload => {
   const legacy = buildAccountTeam(viewer.clientId, [])
@@ -233,7 +421,10 @@ const toLegacyMemberResponse = (viewer: TeamQueryViewer): TeamMembersPayload => 
     contactChannel: 'teams',
     contactHandle: null,
     fteAllocation: roundToTenths((member.monthlyHours || 0) / 160),
-    startDate: null
+    startDate: null,
+    profile: createEmptyProfile(),
+    identityProviders: [],
+    identityConfidence: 'basic'
   }))
 
   return {
@@ -259,6 +450,8 @@ const toCapacityFallback = (viewer: TeamQueryViewer): TeamCapacityPayload => {
     avatarUrl: member.avatarUrl,
     roleTitle: member.roleTitle,
     roleCategory: member.roleCategory,
+    identityProviders: member.identityProviders,
+    identityConfidence: member.identityConfidence,
     fteAllocation: member.fteAllocation,
     activeAssets: 0,
     completedAssets: 0,
@@ -327,8 +520,34 @@ const getTableColumns = async (dataset: string, tableName: string) => {
   }
 }
 
+const getOptionalStringSelect = (columns: Set<string>, columnName: string, expression = `m.${columnName}`) =>
+  columns.has(columnName) ? `${expression} AS ${columnName},` : `CAST(NULL AS STRING) AS ${columnName},`
+
+const getOptionalDateSelect = (columns: Set<string>, columnName: string, expression = `m.${columnName}`) =>
+  columns.has(columnName) ? `${expression} AS ${columnName},` : `CAST(NULL AS DATE) AS ${columnName},`
+
+const getOptionalNumberSelect = (columns: Set<string>, columnName: string, expression = `m.${columnName}`) =>
+  columns.has(columnName) ? `${expression} AS ${columnName},` : `CAST(NULL AS FLOAT64) AS ${columnName},`
+
+const getOptionalArrayStringSelect = (columns: Set<string>, columnName: string, expression = `m.${columnName}`) =>
+  columns.has(columnName) ? `COALESCE(${expression}, ARRAY<STRING>[]) AS ${columnName},` : `ARRAY<STRING>[] AS ${columnName},`
+
 const getAssignmentRows = async (clientId: string) => {
   const projectId = getBigQueryProjectId()
+  const memberColumns = await getTableColumns('greenhouse', 'team_members')
+  const roleCatalogColumns = await getTableColumns('greenhouse', 'team_role_catalog')
+  const professionCatalogColumns = await getTableColumns('greenhouse', 'team_profession_catalog')
+
+  const identityProfileSelect = memberColumns.has('identity_profile_id')
+    ? 'm.identity_profile_id,'
+    : 'CAST(NULL AS STRING) AS identity_profile_id,'
+
+  const emailAliasesSelect = memberColumns.has('email_aliases')
+    ? 'COALESCE(m.email_aliases, ARRAY<STRING>[]) AS email_aliases,'
+    : 'ARRAY<STRING>[] AS email_aliases,'
+
+  const canJoinRoleCatalog = memberColumns.has('org_role_id') && roleCatalogColumns.size > 0
+  const canJoinProfessionCatalog = memberColumns.has('profession_id') && professionCatalogColumns.size > 0
 
   return runQuery<TeamAssignmentRow>(
     `
@@ -345,10 +564,37 @@ const getAssignmentRows = async (clientId: string) => {
         a.fte_allocation,
         a.start_date,
         m.notion_display_name,
-        m.notion_user_id
+        m.notion_user_id,
+        ${identityProfileSelect}
+        ${emailAliasesSelect}
+        m.azure_oid,
+        m.hubspot_owner_id,
+        ${getOptionalStringSelect(memberColumns, 'first_name')}
+        ${getOptionalStringSelect(memberColumns, 'last_name')}
+        ${getOptionalStringSelect(memberColumns, 'preferred_name')}
+        ${getOptionalStringSelect(memberColumns, 'legal_name')}
+        ${getOptionalStringSelect(memberColumns, 'org_role_id')}
+        ${canJoinRoleCatalog ? 'rc.role_name AS org_role_name,' : 'CAST(NULL AS STRING) AS org_role_name,'}
+        ${getOptionalStringSelect(memberColumns, 'profession_id')}
+        ${canJoinProfessionCatalog ? 'pc.profession_name AS profession_name,' : 'CAST(NULL AS STRING) AS profession_name,'}
+        ${getOptionalStringSelect(memberColumns, 'seniority_level')}
+        ${getOptionalStringSelect(memberColumns, 'employment_type')}
+        ${getOptionalDateSelect(memberColumns, 'birth_date')}
+        ${getOptionalStringSelect(memberColumns, 'phone')}
+        ${getOptionalStringSelect(memberColumns, 'teams_user_id')}
+        ${getOptionalStringSelect(memberColumns, 'slack_user_id')}
+        ${getOptionalStringSelect(memberColumns, 'location_city')}
+        ${getOptionalStringSelect(memberColumns, 'location_country')}
+        ${getOptionalStringSelect(memberColumns, 'time_zone')}
+        ${getOptionalNumberSelect(memberColumns, 'years_experience')}
+        ${getOptionalDateSelect(memberColumns, 'efeonce_start_date')}
+        ${getOptionalStringSelect(memberColumns, 'biography')}
+        ${getOptionalArrayStringSelect(memberColumns, 'languages')}
       FROM \`${projectId}.greenhouse.client_team_assignments\` AS a
       INNER JOIN \`${projectId}.greenhouse.team_members\` AS m
         ON m.member_id = a.member_id
+      ${canJoinRoleCatalog ? `LEFT JOIN \`${projectId}.greenhouse.team_role_catalog\` AS rc ON rc.role_id = m.org_role_id AND rc.active = TRUE` : ''}
+      ${canJoinProfessionCatalog ? `LEFT JOIN \`${projectId}.greenhouse.team_profession_catalog\` AS pc ON pc.profession_id = m.profession_id AND pc.active = TRUE` : ''}
       WHERE a.client_id = @clientId
         AND a.active = TRUE
         AND m.active = TRUE
@@ -370,21 +616,168 @@ const getAssignmentRows = async (clientId: string) => {
 }
 
 const toAssignments = (rows: TeamAssignmentRow[]): TeamAssignment[] =>
-  rows.map(row => ({
-    memberId: row.member_id || createSyntheticMemberId(row.display_name || '', row.email),
-    displayName: row.display_name || row.email || 'Efeonce Team',
-    email: row.email || '',
-    avatarUrl: row.avatar_url || null,
-    roleTitle: row.role_title || 'Efeonce Team',
-    roleCategory: inferRoleCategory(row.role_category || row.role_title),
-    relevanceNote: row.relevance_note || null,
-    contactChannel: toContactChannel(row.contact_channel),
-    contactHandle: row.contact_handle || null,
-    fteAllocation: roundToTenths(toNumber(row.fte_allocation)),
-    startDate: toDateString(row.start_date),
-    notionDisplayName: row.notion_display_name || null,
-    notionUserId: row.notion_user_id || null
-  }))
+  rows.map(row => {
+    const startDate = toDateString(row.start_date)
+    const birthDate = toDateString(row.birth_date)
+    const efeonceStartDate = toDateString(row.efeonce_start_date)
+
+    const profile = createEmptyProfile({
+      firstName: row.first_name || null,
+      lastName: row.last_name || null,
+      preferredName: row.preferred_name || null,
+      legalName: row.legal_name || null,
+      orgRoleId: row.org_role_id || null,
+      orgRoleName: row.org_role_name || null,
+      professionId: row.profession_id || null,
+      professionName: row.profession_name || null,
+      seniorityLevel: row.seniority_level || null,
+      employmentType: row.employment_type || null,
+      ageYears: getAgeYearsFromDate(birthDate),
+      phone: row.phone || null,
+      teamsUserId: row.teams_user_id || null,
+      slackUserId: row.slack_user_id || null,
+      locationCity: row.location_city || null,
+      locationCountry: row.location_country || null,
+      timeZone: row.time_zone || null,
+      yearsExperience: toNullableNumber(row.years_experience),
+      efeonceStartDate,
+      tenureEfeonceMonths: getMonthDiffFromDate(efeonceStartDate),
+      tenureClientMonths: getMonthDiffFromDate(startDate),
+      biography: row.biography || null,
+      languages: toStringArray(row.languages)
+    })
+
+    return {
+      memberId: row.member_id || createSyntheticMemberId(row.display_name || '', row.email),
+      displayName: row.display_name || row.email || 'Efeonce Team',
+      email: row.email || '',
+      avatarUrl: row.avatar_url || null,
+      roleTitle: row.role_title || profile.orgRoleName || 'Efeonce Team',
+      roleCategory: inferRoleCategory(row.role_category || row.role_title || profile.professionName),
+      relevanceNote: row.relevance_note || null,
+      contactChannel: toContactChannel(row.contact_channel),
+      contactHandle: row.contact_handle || null,
+      fteAllocation: roundToTenths(toNumber(row.fte_allocation)),
+      startDate,
+      notionDisplayName: row.notion_display_name || null,
+      notionUserId: row.notion_user_id || null,
+      identityProfileId: row.identity_profile_id || null,
+      emailAliases: Array.isArray(row.email_aliases) ? row.email_aliases.filter(Boolean) : [],
+      azureOid: row.azure_oid || null,
+      hubspotOwnerId: row.hubspot_owner_id || null,
+      profile,
+      identityProviders: [],
+      identityConfidence: 'basic',
+      identityMatchSignals: []
+    }
+  })
+
+const getIdentitySourceRows = async (profileIds: string[]) => {
+  if (profileIds.length === 0) {
+    return [] as TeamIdentitySourceRow[]
+  }
+
+  const projectId = getBigQueryProjectId()
+
+  try {
+    return await runQuery<TeamIdentitySourceRow>(
+      `
+        SELECT
+          profile_id,
+          source_system,
+          source_object_type,
+          source_object_id,
+          source_user_id,
+          source_email,
+          source_display_name,
+          is_login_identity
+        FROM \`${projectId}.greenhouse.identity_profile_source_links\`
+        WHERE active = TRUE
+          AND profile_id IN UNNEST(@profileIds)
+      `,
+      { profileIds }
+    )
+  } catch (error) {
+    if (isMissingBigQueryEntityError(error)) {
+      return [] as TeamIdentitySourceRow[]
+    }
+
+    throw error
+  }
+}
+
+const enrichAssignmentsWithIdentity = async (assignments: TeamAssignment[]) => {
+  const profileIds = assignments.map(assignment => assignment.identityProfileId).filter(Boolean) as string[]
+  const identityRows = await getIdentitySourceRows(profileIds)
+  const identityRowsByProfile = new Map<string, TeamIdentitySourceRow[]>()
+
+  for (const row of identityRows) {
+    if (!row.profile_id) {
+      continue
+    }
+
+    const current = identityRowsByProfile.get(row.profile_id) || []
+
+    current.push(row)
+    identityRowsByProfile.set(row.profile_id, current)
+  }
+
+  return assignments.map(assignment => {
+    const linkedRows = assignment.identityProfileId ? identityRowsByProfile.get(assignment.identityProfileId) || [] : []
+    const providers = new Set<TeamIdentityProvider>()
+    const identityMatchSignals = new Set<string>()
+
+    if (assignment.notionUserId) providers.add('notion')
+    if (assignment.azureOid) providers.add('microsoft')
+    if (assignment.hubspotOwnerId) providers.add('hubspot')
+
+    ;[
+      assignment.identityProfileId,
+      assignment.notionUserId,
+      assignment.azureOid,
+      assignment.hubspotOwnerId,
+      assignment.email,
+      assignment.notionDisplayName,
+      assignment.displayName,
+      ...assignment.emailAliases
+    ].forEach(value => {
+      const normalized = normalizeMatchValue(value)
+
+      if (normalized) {
+        identityMatchSignals.add(normalized)
+      }
+    })
+
+    for (const row of linkedRows) {
+      const provider = mapIdentityProvider(row.source_system)
+
+      if (provider) {
+        providers.add(provider)
+      }
+
+      ;[row.source_object_id, row.source_user_id, row.source_email, row.source_display_name].forEach(value => {
+        const normalized = normalizeMatchValue(value)
+
+        if (normalized) {
+          identityMatchSignals.add(normalized)
+        }
+      })
+    }
+
+    const identityProviders = Array.from(providers)
+
+    return {
+      ...assignment,
+      identityProviders,
+      identityConfidence: getIdentityConfidence({
+        providers: identityProviders,
+        identityProfileId: assignment.identityProfileId,
+        emailAliases: assignment.emailAliases
+      }),
+      identityMatchSignals: Array.from(identityMatchSignals)
+    }
+  })
+}
 
 const buildLookup = (assignments: TeamAssignment[]) => {
   const lookup = new Map<string, TeamAssignment>()
@@ -394,7 +787,9 @@ const buildLookup = (assignments: TeamAssignment[]) => {
       assignment.notionUserId,
       assignment.email,
       assignment.notionDisplayName,
-      assignment.displayName
+      assignment.displayName,
+      ...assignment.emailAliases,
+      ...assignment.identityMatchSignals
     ]
 
     for (const key of keys) {
@@ -582,6 +977,8 @@ const buildCapacityMembers = (
         avatarUrl: assignment.avatarUrl,
         roleTitle: assignment.roleTitle,
         roleCategory: assignment.roleCategory,
+        identityProviders: assignment.identityProviders,
+        identityConfidence: assignment.identityConfidence,
         fteAllocation: assignment.fteAllocation,
         activeAssets: toNumber(loadRow?.active_assets),
         completedAssets: toNumber(loadRow?.completed_assets),
@@ -682,6 +1079,8 @@ const enrichProjectMember = (
     avatarUrl: assignment?.avatarUrl || null,
     roleTitle: assignment?.roleTitle || 'Efeonce Team',
     roleCategory: assignment?.roleCategory || 'unknown',
+    identityProviders: assignment?.identityProviders || [],
+    identityConfidence: assignment?.identityConfidence || 'basic',
     totalAssets: toNumber(row.total_assets),
     activeAssets: toNumber(row.active_assets),
     completedAssets: toNumber(row.completed_assets),
@@ -788,6 +1187,8 @@ const enrichSprintMember = (row: SprintTeamRow, lookup: Map<string, TeamAssignme
     avatarUrl: assignment?.avatarUrl || null,
     roleTitle: assignment?.roleTitle || 'Efeonce Team',
     roleCategory: assignment?.roleCategory || 'unknown',
+    identityProviders: assignment?.identityProviders || [],
+    identityConfidence: assignment?.identityConfidence || 'basic',
     totalInSprint: toNumber(row.total_in_sprint),
     completed: toNumber(row.completed),
     pending: toNumber(row.pending),
@@ -797,7 +1198,7 @@ const enrichSprintMember = (row: SprintTeamRow, lookup: Map<string, TeamAssignme
 
 const getAssignmentsOrFallback = async (viewer: TeamQueryViewer): Promise<{ assignments: TeamAssignment[]; source: TeamDataSource }> => {
   try {
-    const assignments = toAssignments(await getAssignmentRows(viewer.clientId))
+    const assignments = await enrichAssignmentsWithIdentity(toAssignments(await getAssignmentRows(viewer.clientId)))
 
     return {
       assignments,
@@ -824,7 +1225,15 @@ const getAssignmentsOrFallback = async (viewer: TeamQueryViewer): Promise<{ assi
         fteAllocation: member.fteAllocation,
         startDate: member.startDate,
         notionDisplayName: null,
-        notionUserId: null
+        notionUserId: null,
+        identityProfileId: null,
+        emailAliases: [],
+        azureOid: null,
+        hubspotOwnerId: null,
+        profile: member.profile,
+        identityProviders: member.identityProviders,
+        identityConfidence: member.identityConfidence,
+        identityMatchSignals: []
       })),
       source: 'legacy_override'
     }
@@ -834,7 +1243,7 @@ const getAssignmentsOrFallback = async (viewer: TeamQueryViewer): Promise<{ assi
 export const getTeamMembers = async (viewer: TeamQueryViewer): Promise<TeamMembersPayload> => {
   try {
     const rows = await getAssignmentRows(viewer.clientId)
-    const assignments = toAssignments(rows)
+    const assignments = await enrichAssignmentsWithIdentity(toAssignments(rows))
 
     return {
       members: assignments.map(assignment => ({
@@ -848,7 +1257,10 @@ export const getTeamMembers = async (viewer: TeamQueryViewer): Promise<TeamMembe
         contactChannel: assignment.contactChannel,
         contactHandle: assignment.contactHandle,
         fteAllocation: assignment.fteAllocation,
-        startDate: assignment.startDate
+        startDate: assignment.startDate,
+        profile: assignment.profile,
+        identityProviders: assignment.identityProviders,
+        identityConfidence: assignment.identityConfidence
       })),
       footer: {
         serviceLines: viewer.businessLines,

@@ -9,6 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 
+import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamMembersPayload } from '@/types/team'
 
@@ -69,6 +70,8 @@ const TeamDossierSection = () => {
     totalFte: 0
   }
 
+  const connectedCount = teamMembers.filter(member => member.identityProviders.length > 0).length
+
   return (
     <>
       <ExecutiveCardShell title={GH_TEAM.section_title} subtitle={GH_TEAM.section_subtitle}>
@@ -101,6 +104,39 @@ const TeamDossierSection = () => {
               <Box
                 sx={{
                   display: 'grid',
+                  gap: 2,
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    md: 'repeat(3, minmax(0, 1fr))'
+                  }
+                }}
+              >
+                <HorizontalWithSubtitle
+                  title={GH_TEAM.label_people}
+                  stats={String(teamMembers.length)}
+                  avatarIcon='tabler-users-group'
+                  avatarColor='primary'
+                  subtitle='Roster activo visible en tu operacion.'
+                />
+                <HorizontalWithSubtitle
+                  title={GH_TEAM.footer_team_total}
+                  stats={`${footer.totalFte.toFixed(1)} FTE`}
+                  avatarIcon='tabler-briefcase'
+                  avatarColor='success'
+                  subtitle={footer.modality || GH_TEAM.modality_pending}
+                />
+                <HorizontalWithSubtitle
+                  title={GH_TEAM.label_identity}
+                  stats={`${connectedCount}/${teamMembers.length}`}
+                  avatarIcon='tabler-link'
+                  avatarColor='info'
+                  subtitle='Personas con identidad externa enlazada.'
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'grid',
                   gap: 3,
                   gridTemplateColumns: {
                     xs: '1fr',
@@ -123,7 +159,7 @@ const TeamDossierSection = () => {
                   <CardActionArea
                     onClick={() => setRequestIntent(GH_TEAM.expand_title.toLowerCase())}
                     sx={{
-                      minHeight: 240,
+                      minHeight: 280,
                       display: 'grid',
                       placeItems: 'center',
                       p: 3,
@@ -156,67 +192,42 @@ const TeamDossierSection = () => {
               <Box
                 sx={{
                   p: 2.5,
-                  borderRadius: 3,
+                  borderRadius: 4,
                   border: `1px solid ${GH_COLORS.neutral.border}`,
-                  display: 'grid',
-                  gap: 2,
-                  gridTemplateColumns: {
-                    xs: '1fr',
-                    md: 'repeat(3, minmax(0, 1fr))'
-                  }
+                  bgcolor: GH_COLORS.neutral.bgSurface
                 }}
               >
-                <Box>
-                  <Typography variant='caption' color='text.secondary'>
-                    {GH_TEAM.label_service_line}
-                  </Typography>
-                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
-                    {footer.serviceLines.length ? (
-                      footer.serviceLines.map(line => (
-                        <Box
-                          key={line}
-                          sx={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            px: 1,
-                            py: 0.75,
-                            borderRadius: 999,
-                            bgcolor: GH_COLORS.neutral.bgSurface,
-                            border: `1px solid ${GH_COLORS.neutral.border}`
-                          }}
-                        >
-                          <BusinessLineBadge brand={line} />
-                          <Typography variant='caption' sx={{ fontWeight: 700 }}>
-                            {getBrandDisplayLabel(line)}
-                          </Typography>
-                        </Box>
-                      ))
-                    ) : (
-                      <Typography variant='body2' color='text.secondary'>
-                        {GH_TEAM.service_lines_empty}
-                      </Typography>
-                    )}
-                  </Stack>
-                </Box>
-
-                <Box>
-                  <Typography variant='caption' color='text.secondary'>
-                    {GH_TEAM.label_modality}
-                  </Typography>
-                  <Typography variant='body2' sx={{ mt: 1 }}>
-                    {footer.modality || GH_TEAM.modality_pending}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Typography variant='caption' color='text.secondary'>
-                    {GH_TEAM.footer_team_total}
-                  </Typography>
-                  <Typography variant='body2' sx={{ mt: 1 }}>
-                    {`${footer.totalFte.toFixed(1)} FTE`}
-                  </Typography>
-                </Box>
+                <Typography variant='caption' color='text.secondary'>
+                  {GH_TEAM.label_service_line}
+                </Typography>
+                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+                  {footer.serviceLines.length ? (
+                    footer.serviceLines.map(line => (
+                      <Box
+                        key={line}
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          px: 1.25,
+                          py: 0.9,
+                          borderRadius: 999,
+                          bgcolor: 'background.paper',
+                          border: `1px solid ${GH_COLORS.neutral.border}`
+                        }}
+                      >
+                        <BusinessLineBadge brand={line} />
+                        <Typography variant='caption' sx={{ fontWeight: 700 }}>
+                          {getBrandDisplayLabel(line)}
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant='body2' color='text.secondary'>
+                      {GH_TEAM.service_lines_empty}
+                    </Typography>
+                  )}
+                </Stack>
               </Box>
             </>
           ) : null}
