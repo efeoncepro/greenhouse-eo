@@ -27,3 +27,4 @@ Indice de briefs y tasks de implementacion del repo.
 
 - Mantener todos los `CODEX_TASK_*` juntos en esta carpeta.
 - No asumir que un task esta vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
+- Toda task nueva o reactivada debe alinearse con `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` para evitar identidades paralelas y diseño por silos.

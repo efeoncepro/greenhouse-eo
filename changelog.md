@@ -6,6 +6,35 @@
 
 ## 2026-03-14
 
+### Greenhouse 360 object model
+- Se formalizó una regla transversal de arquitectura para todo el portal en `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`:
+  - Greenhouse debe evolucionar sobre objetos canónicos enriquecidos, no sobre módulos con identidades paralelas por silo
+  - se definieron los anclajes y reglas base para `Client`, `Collaborator`, `Product/Capability`, `Quote`, `Project` y `Sprint`
+  - `Finance` queda explícitamente tratado como una especialización de este modelo, no como una excepción local
+- Se alinearon docs existentes de arquitectura para evitar contradicciones con ese modelo, especialmente en:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `MULTITENANT_ARCHITECTURE.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `Greenhouse_Capabilities_Architecture_v1.md`
+- Se alinearon también las tasks con mayor riesgo de deriva para que futuros desarrollos no reintroduzcan silos:
+  - `Financial Module`
+  - `AI Tooling & Credit System`
+  - `Creative Hub`
+  - `HR Payroll v2`
+  - `People Unified View v2`
+  - `Team Identity & Capacity`
+  - `Agency Operator Layer`
+  - `Admin Team v2`
+
+### Finance staging runtime stabilization
+- Se endureció el bootstrap runtime de `Finance` para no agotar cuota de BigQuery en lecturas:
+  - `ensureFinanceInfrastructure()` ya no ejecuta `ALTER`/`UPDATE`/`MERGE` de forma ciega en cada request
+  - ahora inspecciona `INFORMATION_SCHEMA` y solo crea tablas o columnas faltantes
+  - el seed de `finance_manager` pasa a `INSERT` solo si el rol no existe
+- `GET /api/finance/clients` dejó de depender de subqueries correlacionadas no soportadas por BigQuery:
+  - receivables y cantidad de facturas activas ahora salen de un rollup por `JOIN`
+  - con esto se corrige el `500` que dejaba `/finance/clients` sin clientes en `develop`/`Staging`
+
 ### Finance canonical backend phase
 - El backend de `Finance` avanzó desde referencias parciales a llaves canónicas sin romper contratos existentes:
   - `clients` ahora prioriza `greenhouse.clients.client_id` como anclaje principal y conserva fallback por `client_profile_id` / `hubspot_company_id`

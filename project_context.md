@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Greenhouse 360 object model
+- El repo ahora formaliza una regla de arquitectura transversal: Greenhouse debe evolucionar como plataforma de `objetos canónicos enriquecidos`, no como módulos con identidades paralelas por silo.
+- Documento canónico nuevo:
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- Regla operativa vigente:
+  - si un módulo describe un objeto ya existente en Greenhouse, debe anclarse a su ID canónico
+  - las tablas de dominio pueden existir, pero como `extension tables`, `transaction tables` o `event tables`, no como nuevos maestros del mismo objeto
+  - las vistas 360 deben salir de read models enriquecidos sobre objetos compartidos
+- Catálogo canónico actual explicitado:
+  - `Cliente` → `greenhouse.clients.client_id`
+  - `Colaborador` → `greenhouse.team_members.member_id`
+  - `Producto/Capability` → `greenhouse.service_modules.module_id`
+  - `Cotización`, `Proyecto` y `Sprint` quedan definidos como objetos canónicos objetivo aunque todavía necesiten mayor formalización de identidad en runtime
+
 ## Delta 2026-03-14 Finance canonical backend phase
 - El módulo `Finance` mantiene sus tablas `fin_*` como capa transaccional propia, pero ya no debe modelarse como silo aislado:
   - `greenhouse.clients.client_id` queda como llave canónica de cliente

@@ -4,9 +4,9 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 
 let ensureFinanceInfrastructurePromise: Promise<void> | null = null
 
-const buildStatements = (projectId: string) => [
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_accounts\` (
+const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
+  fin_accounts: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_accounts\` (
       account_id STRING NOT NULL,
       account_name STRING NOT NULL,
       bank_name STRING NOT NULL,
@@ -23,8 +23,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_suppliers\` (
+  fin_suppliers: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_suppliers\` (
       supplier_id STRING NOT NULL,
       legal_name STRING NOT NULL,
       trade_name STRING,
@@ -53,8 +53,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_client_profiles\` (
+  fin_client_profiles: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_client_profiles\` (
       client_profile_id STRING NOT NULL,
       client_id STRING,
       hubspot_company_id STRING NOT NULL,
@@ -76,8 +76,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_income\` (
+  fin_income: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_income\` (
       income_id STRING NOT NULL,
       client_id STRING,
       client_profile_id STRING,
@@ -110,8 +110,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_expenses\` (
+  fin_expenses: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_expenses\` (
       expense_id STRING NOT NULL,
       client_id STRING,
       expense_type STRING NOT NULL,
@@ -156,8 +156,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_reconciliation_periods\` (
+  fin_reconciliation_periods: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_reconciliation_periods\` (
       period_id STRING NOT NULL,
       account_id STRING NOT NULL,
       year INT64 NOT NULL,
@@ -177,8 +177,8 @@ const buildStatements = (projectId: string) => [
       updated_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_bank_statement_rows\` (
+  fin_bank_statement_rows: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_bank_statement_rows\` (
       row_id STRING NOT NULL,
       period_id STRING NOT NULL,
       transaction_date DATE NOT NULL,
@@ -197,8 +197,8 @@ const buildStatements = (projectId: string) => [
       created_at TIMESTAMP
     )
   `,
-  `
-    CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.fin_exchange_rates\` (
+  fin_exchange_rates: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_exchange_rates\` (
       rate_id STRING NOT NULL,
       from_currency STRING NOT NULL,
       to_currency STRING NOT NULL,
@@ -207,161 +207,91 @@ const buildStatements = (projectId: string) => [
       source STRING,
       created_at TIMESTAMP
     )
-  `,
-  `ALTER TABLE \`${projectId}.greenhouse.fin_client_profiles\` ADD COLUMN IF NOT EXISTS client_id STRING`,
-  `ALTER TABLE \`${projectId}.greenhouse.fin_income\` ADD COLUMN IF NOT EXISTS client_id STRING`,
-  `ALTER TABLE \`${projectId}.greenhouse.fin_expenses\` ADD COLUMN IF NOT EXISTS client_id STRING`,
   `
-    UPDATE \`${projectId}.greenhouse.fin_client_profiles\` AS fp
-    SET client_id = fp.client_profile_id
-    WHERE (fp.client_id IS NULL OR fp.client_id = '')
-      AND fp.client_profile_id IS NOT NULL
-      AND EXISTS (
-        SELECT 1
-        FROM \`${projectId}.greenhouse.clients\` AS c
-        WHERE c.active = TRUE
-          AND c.client_id = fp.client_profile_id
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_client_profiles\` AS fp
-    SET client_id = (
-      SELECT c.client_id
-      FROM \`${projectId}.greenhouse.clients\` AS c
-      WHERE c.active = TRUE
-        AND fp.hubspot_company_id IS NOT NULL
-        AND CAST(c.hubspot_company_id AS STRING) = fp.hubspot_company_id
-      ORDER BY c.client_id
+}
+
+const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
+  fin_client_profiles: {
+    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_client_profiles` ADD COLUMN IF NOT EXISTS client_id STRING'
+  },
+  fin_income: {
+    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS client_id STRING'
+  },
+  fin_expenses: {
+    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING'
+  }
+}
+
+const FINANCE_MANAGER_ROLE_INSERT = `
+  INSERT INTO \`{projectId}.greenhouse.roles\` (
+    role_code, role_name, role_family, description, tenant_type,
+    is_admin, is_internal, route_group_scope, created_at, updated_at
+  )
+  VALUES (
+    'finance_manager',
+    'Finance Manager',
+    'internal',
+    'Financial operations access for Efeonce finance team.',
+    'efeonce_internal',
+    FALSE,
+    TRUE,
+    ['internal', 'finance'],
+    CURRENT_TIMESTAMP(),
+    CURRENT_TIMESTAMP()
+  )
+`
+
+const formatProjectStatement = (statement: string, projectId: string) =>
+  statement.replaceAll('{projectId}', projectId)
+
+const getExistingFinanceTables = async (projectId: string) => {
+  const bigQuery = getBigQueryClient()
+  const tableNames = Object.keys(FINANCE_TABLE_DEFINITIONS)
+
+  const [rows] = await bigQuery.query({
+    query: `
+      SELECT table_name
+      FROM \`${projectId}.greenhouse.INFORMATION_SCHEMA.TABLES\`
+      WHERE table_name IN UNNEST(@tableNames)
+    `,
+    params: { tableNames }
+  })
+
+  return new Set((rows as Array<{ table_name: string }>).map(row => row.table_name))
+}
+
+const getExistingFinanceColumns = async (projectId: string) => {
+  const bigQuery = getBigQueryClient()
+  const tableNames = Object.keys(FINANCE_COLUMN_REQUIREMENTS)
+
+  const [rows] = await bigQuery.query({
+    query: `
+      SELECT table_name, column_name
+      FROM \`${projectId}.greenhouse.INFORMATION_SCHEMA.COLUMNS\`
+      WHERE table_name IN UNNEST(@tableNames)
+    `,
+    params: { tableNames }
+  })
+
+  return new Set((rows as Array<{ table_name: string; column_name: string }>).map(row => `${row.table_name}.${row.column_name}`))
+}
+
+const ensureFinanceManagerRole = async (projectId: string) => {
+  const bigQuery = getBigQueryClient()
+
+  const [rows] = await bigQuery.query({
+    query: `
+      SELECT role_code
+      FROM \`${projectId}.greenhouse.roles\`
+      WHERE role_code = 'finance_manager'
       LIMIT 1
-    )
-    WHERE (fp.client_id IS NULL OR fp.client_id = '')
-      AND fp.hubspot_company_id IS NOT NULL
-      AND EXISTS (
-        SELECT 1
-        FROM \`${projectId}.greenhouse.clients\` AS c
-        WHERE c.active = TRUE
-          AND CAST(c.hubspot_company_id AS STRING) = fp.hubspot_company_id
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
-    SET client_id = i.client_profile_id
-    WHERE (i.client_id IS NULL OR i.client_id = '')
-      AND i.client_profile_id IS NOT NULL
-      AND EXISTS (
-        SELECT 1
-        FROM \`${projectId}.greenhouse.clients\` AS c
-        WHERE c.active = TRUE
-          AND c.client_id = i.client_profile_id
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
-    SET client_id = (
-      SELECT fp.client_id
-      FROM \`${projectId}.greenhouse.fin_client_profiles\` AS fp
-      WHERE fp.client_id IS NOT NULL
-        AND (
-          (i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id)
-          OR (i.hubspot_company_id IS NOT NULL AND fp.hubspot_company_id = i.hubspot_company_id)
-        )
-      ORDER BY IF(i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id, 0, 1), fp.client_id
-      LIMIT 1
-    )
-    WHERE (i.client_id IS NULL OR i.client_id = '')
-      AND (
-        i.client_profile_id IS NOT NULL
-        OR i.hubspot_company_id IS NOT NULL
-      )
-      AND EXISTS (
-        SELECT 1
-        FROM \`${projectId}.greenhouse.fin_client_profiles\` AS fp
-        WHERE fp.client_id IS NOT NULL
-          AND (
-            (i.client_profile_id IS NOT NULL AND fp.client_profile_id = i.client_profile_id)
-            OR (i.hubspot_company_id IS NOT NULL AND fp.hubspot_company_id = i.hubspot_company_id)
-          )
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_income\` AS i
-    SET client_id = (
-      SELECT c.client_id
-      FROM \`${projectId}.greenhouse.clients\` AS c
-      WHERE c.active = TRUE
-        AND i.hubspot_company_id IS NOT NULL
-        AND CAST(c.hubspot_company_id AS STRING) = i.hubspot_company_id
-      ORDER BY c.client_id
-      LIMIT 1
-    )
-    WHERE (i.client_id IS NULL OR i.client_id = '')
-      AND i.hubspot_company_id IS NOT NULL
-      AND EXISTS (
-        SELECT 1
-        FROM \`${projectId}.greenhouse.clients\` AS c
-        WHERE c.active = TRUE
-          AND CAST(c.hubspot_company_id AS STRING) = i.hubspot_company_id
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_expenses\` AS e
-    SET
-      member_id = pe.member_id,
-      payroll_period_id = COALESCE(NULLIF(e.payroll_period_id, ''), pe.period_id)
-    FROM \`${projectId}.greenhouse.payroll_entries\` AS pe
-    WHERE e.payroll_entry_id = pe.entry_id
-      AND (
-        e.member_id IS NULL
-        OR e.member_id = ''
-        OR e.payroll_period_id IS NULL
-        OR e.payroll_period_id = ''
-      )
-  `,
-  `
-    UPDATE \`${projectId}.greenhouse.fin_expenses\` AS e
-    SET member_name = tm.display_name
-    FROM \`${projectId}.greenhouse.team_members\` AS tm
-    WHERE e.member_id = tm.member_id
-      AND (e.member_name IS NULL OR e.member_name = '')
-  `,
-  `
-    MERGE \`${projectId}.greenhouse.roles\` AS target
-    USING (
-      SELECT
-        'finance_manager' AS role_code,
-        'Finance Manager' AS role_name,
-        'internal' AS role_family,
-        'Financial operations access for Efeonce finance team.' AS description,
-        'efeonce_internal' AS tenant_type,
-        FALSE AS is_admin,
-        TRUE AS is_internal,
-        ['internal', 'finance'] AS route_group_scope,
-        CURRENT_TIMESTAMP() AS created_at,
-        CURRENT_TIMESTAMP() AS updated_at
-    ) AS source
-    ON target.role_code = source.role_code
-    WHEN MATCHED THEN
-      UPDATE SET
-        role_name = source.role_name,
-        role_family = source.role_family,
-        description = source.description,
-        tenant_type = source.tenant_type,
-        is_admin = source.is_admin,
-        is_internal = source.is_internal,
-        route_group_scope = source.route_group_scope,
-        updated_at = CURRENT_TIMESTAMP()
-    WHEN NOT MATCHED THEN
-      INSERT (
-        role_code, role_name, role_family, description, tenant_type,
-        is_admin, is_internal, route_group_scope, created_at, updated_at
-      )
-      VALUES (
-        source.role_code, source.role_name, source.role_family, source.description,
-        source.tenant_type, source.is_admin, source.is_internal, source.route_group_scope,
-        source.created_at, source.updated_at
-      )
-  `
-]
+    `
+  })
+
+  if ((rows as Array<{ role_code: string }>).length === 0) {
+    await bigQuery.query({ query: formatProjectStatement(FINANCE_MANAGER_ROLE_INSERT, projectId) })
+  }
+}
 
 export const ensureFinanceInfrastructure = async () => {
   if (ensureFinanceInfrastructurePromise) {
@@ -372,9 +302,25 @@ export const ensureFinanceInfrastructure = async () => {
   const bigQuery = getBigQueryClient()
 
   ensureFinanceInfrastructurePromise = (async () => {
-    for (const query of buildStatements(projectId)) {
-      await bigQuery.query({ query })
+    const existingTables = await getExistingFinanceTables(projectId)
+
+    for (const [tableName, statement] of Object.entries(FINANCE_TABLE_DEFINITIONS)) {
+      if (!existingTables.has(tableName)) {
+        await bigQuery.query({ query: formatProjectStatement(statement, projectId) })
+      }
     }
+
+    const existingColumns = await getExistingFinanceColumns(projectId)
+
+    for (const [tableName, columns] of Object.entries(FINANCE_COLUMN_REQUIREMENTS)) {
+      for (const [columnName, statement] of Object.entries(columns)) {
+        if (!existingColumns.has(`${tableName}.${columnName}`)) {
+          await bigQuery.query({ query: formatProjectStatement(statement, projectId) })
+        }
+      }
+    }
+
+    await ensureFinanceManagerRole(projectId)
   })().catch(error => {
     ensureFinanceInfrastructurePromise = null
     throw error

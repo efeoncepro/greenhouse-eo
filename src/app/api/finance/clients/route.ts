@@ -161,29 +161,48 @@ export async function GET(request: Request) {
 
   const rows = await runFinanceQuery<ClientListRow>(`
     ${baseClientsCte}
+    , client_keys AS (
+      SELECT bc.client_id, client_key
+      FROM base_clients bc,
+      UNNEST([CAST(bc.client_id AS STRING), bc.client_profile_id, bc.hubspot_company_id]) AS client_key
+      WHERE client_key IS NOT NULL
+        AND client_key != ''
+    ),
+    open_income AS (
+      SELECT income_id, outstanding_amount, income_key
+      FROM (
+        SELECT
+          income_id,
+          GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) AS outstanding_amount,
+          [client_id, client_profile_id, hubspot_company_id] AS income_keys
+        FROM \`${projectId}.greenhouse.fin_income\`
+        WHERE payment_status IN ('pending', 'overdue', 'partial')
+      ),
+      UNNEST(income_keys) AS income_key
+      WHERE income_key IS NOT NULL
+        AND income_key != ''
+    ),
+    client_income_matches AS (
+      SELECT DISTINCT ck.client_id, oi.income_id, oi.outstanding_amount
+      FROM client_keys ck
+      INNER JOIN open_income oi
+        ON oi.income_key = ck.client_key
+    ),
+    client_income_rollup AS (
+      SELECT
+        client_id,
+        COALESCE(SUM(outstanding_amount), 0) AS total_receivable,
+        COUNT(*) AS active_invoices_count
+      FROM client_income_matches
+      GROUP BY client_id
+    )
     SELECT
       bc.*,
-      (
-        SELECT COALESCE(SUM(i.total_amount - COALESCE(i.amount_paid, 0)), 0)
-        FROM \`${projectId}.greenhouse.fin_income\` i
-        WHERE (
-          i.client_id = bc.client_id
-          OR i.client_profile_id = bc.client_profile_id
-          OR i.hubspot_company_id = bc.hubspot_company_id
-        )
-          AND i.payment_status IN ('pending', 'overdue', 'partial')
-      ) AS total_receivable,
-      (
-        SELECT COUNT(*)
-        FROM \`${projectId}.greenhouse.fin_income\` i
-        WHERE (
-          i.client_id = bc.client_id
-          OR i.client_profile_id = bc.client_profile_id
-          OR i.hubspot_company_id = bc.hubspot_company_id
-        )
-          AND i.payment_status IN ('pending', 'overdue', 'partial')
-      ) AS active_invoices_count
+      COALESCE(cir.total_receivable, 0) AS total_receivable,
+      COALESCE(cir.active_invoices_count, 0) AS active_invoices_count
     FROM base_clients bc
+    LEFT JOIN client_income_rollup cir
+      ON cir.client_id = bc.client_id
     WHERE TRUE ${filters}
     ORDER BY COALESCE(bc.company_name, bc.legal_name, bc.greenhouse_client_name) ASC
     LIMIT @limit OFFSET @offset

@@ -12,6 +12,10 @@ This model exists to solve a product problem:
 `service modules` do not replace roles or scopes.
 They complement them.
 
+Use together with:
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
+
 ## Four Product Axes
 
 1. `tenant`
@@ -47,17 +51,32 @@ Examples:
 - a `crm_solutions` client should see CRM delivery, onboarding progress, licensing context, and CRM operational health
 - a `web_dev` client should see execution velocity, active build context, and release visibility
 
-## Current Real Data Source
+## Canonical Product Model
 
-As of `2026-03-10`, the current reliable source for commercial service context is:
-- `efeonce-group.hubspot_crm.deals.linea_de_servicio`
-- `efeonce-group.hubspot_crm.deals.servicios_especificos`
+Within the Greenhouse 360 object model:
+- `service module` is the closest current implementation of the canonical `Product/Capability` object
+- the canonical product catalog lives in `greenhouse.service_modules`
+- client-level product assignments live in `greenhouse.client_service_modules`
 
-This is usable because Greenhouse tenants already bootstrap from HubSpot `closedwon` companies.
+Important distinction:
+- the canonical product object is not the same thing as a portal UI module
+- a portal module may be activated by one or more service modules, but it is a presentation concern, not the core product identity itself
+
+## Current External Commercial Signal
+
+As of March 2026, the external commercial signal for capability resolution should come from:
+- explicit company-level capability payloads
+- or HubSpot company properties mirrored into BigQuery, especially:
+  - `hubspot_crm.companies.linea_de_servicio`
+  - `hubspot_crm.companies.servicios_especificos`
+
+Historical note:
+- closedwon `hubspot_crm.deals` were useful to discover initial values and bootstrap the taxonomy
+- deals should not remain the long-term canonical assignment layer for capabilities inside Greenhouse
 
 ## Current Observed Values
 
-Observed from `hubspot_crm.deals` over `closedwon` deals:
+Observed historically from commercial discovery over HubSpot data:
 
 ### `linea_de_servicio`
 
@@ -74,7 +93,7 @@ Observed counts on `2026-03-10`:
 
 ### `servicios_especificos`
 
-Observed current values on closedwon deals:
+Historical values observed on closedwon deal data:
 - `licenciamiento_hubspot`
 - `implementacion_onboarding`
 - `consultoria_crm`
@@ -140,6 +159,11 @@ Security remains server-side through:
 - `user_project_scopes`
 - `user_campaign_scopes`
 
+Object-model rule:
+- `greenhouse.service_modules` is the canonical product or capability catalog
+- `greenhouse.client_service_modules` is the canonical client-to-capability assignment registry
+- external CRM values are enrichment or sync signals, not the Greenhouse product identity itself
+
 ## Proposed BigQuery Model
 
 ### `greenhouse.service_modules`
@@ -181,9 +205,20 @@ Recommended columns:
 - `created_at`
 - `updated_at`
 
-## Derivation Rule
+## Derivation and Sync Rule
 
-For client tenants imported from HubSpot:
+Preferred rule for client capability assignment:
+
+1. keep `greenhouse.service_modules` as the canonical capability catalog
+2. keep `greenhouse.client_service_modules` as the canonical assignment registry
+3. derive or sync assignments from an explicit company-level source payload
+4. preserve external provenance on the assignment row
+
+If the source is HubSpot-based, derive from company-level capability signals, not from deal rows as the long-term identity source.
+
+Historical bootstrap discovery may still use deals for taxonomy analysis, but runtime assignment should converge on company payload or controlled sync.
+
+For client tenants imported from HubSpot during transitional flows:
 
 1. find all `closedwon` deals for the client company
 2. collect distinct `linea_de_servicio`
@@ -197,6 +232,9 @@ Fallback rules:
 - if `linea_de_servicio` is blank but `servicios_especificos` exists, derive only service modules
 - if both are blank, assign `unknown`
 - never block tenant creation because service modules are missing
+
+Transitional note:
+- the deal-based derivation above should be treated as bootstrap or reconciliation logic, not as the ideal long-term canonical rule
 
 ## Runtime Contract
 
@@ -257,6 +295,10 @@ Interpretation:
 - `business_line` and `service_module` records together form the capability catalog
 - the tenant admin screen can present that catalog as editable capabilities
 - a manual admin save writes controlled assignments into `client_service_modules`
+
+360 object rule:
+- this is a client-to-product relationship, not a replacement for the Client object
+- capability governance must enrich the Client object graph instead of inventing a second company identity
 
 ### Source precedence
 

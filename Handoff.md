@@ -40,6 +40,153 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 18:36 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Auditar los `CODEX_TASK_*` más sensibles para detectar si contradicen o desvían la nueva arquitectura de `objetos canónicos enriquecidos`, y corregirlos para que funcionen como briefs alineados al modelo 360.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / tasks
+
+### Archivos tocados
+- `docs/tasks/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/CODEX_TASK_AI_Tooling_Credit_System.md`
+- `docs/tasks/CODEX_TASK_Creative_Hub_Module.md`
+- `docs/tasks/CODEX_TASK_HR_Payroll_Module_v2.md`
+- `docs/tasks/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/CODEX_TASK_Agency_Operator_Layer.md`
+- `docs/tasks/CODEX_TASK_Admin_Team_Module_v2.md`
+- `docs/tasks/README.md`
+
+### Cambios realizados
+- Se agregaron secciones explícitas de alineación con `GREENHOUSE_360_OBJECT_MODEL_V1.md` en las tasks con mayor riesgo de deriva arquitectónica.
+- Criterios que ahora quedan explícitos dentro de los briefs:
+  - no crear identidades paralelas de `Client` o `Collaborator`
+  - tratar tablas de dominio como `extension tables` o `transaction tables`, no como nuevos maestros
+  - distinguir catálogo/capability canónico vs módulos UI de capabilities
+  - tratar Payroll y Finance como extensiones sobre objetos compartidos
+  - tratar Agency como capa transversal de lectura sobre el mismo graph de objetos
+- En `CODEX_TASK_Team_Identity_Capacity_System.md` se dejó explícito qué partes siguen vigentes y qué partes quedaron históricas para no seguir usando email o `notion_display_name` como identidad canónica de diseño.
+- `docs/tasks/README.md` ahora exige alinear cualquier task nueva o reactivada con `GREENHOUSE_360_OBJECT_MODEL_V1.md`.
+
+### Verificacion
+- Revisión manual comparando cada task contra:
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+  - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `git diff --check`: pendiente de corrida final del paquete completo, pero los parches aplicados no introdujeron conflictos de formato en las ediciones visibles
+
+### Riesgos o pendientes
+- No todas las tasks del repo requerían edición; se tocaron las que realmente podían empujar al equipo hacia silos o identidades paralelas.
+- Si se reactiva una task antigua no auditada todavía, usar `GREENHOUSE_360_OBJECT_MODEL_V1.md` como gate antes de implementarla.
+
+## 2026-03-14 18:24 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar la carpeta `docs/architecture` para detectar contradicciones con el nuevo modelo `GREENHOUSE_360_OBJECT_MODEL_V1` y corregirlas sin duplicar arquitectura innecesariamente.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / coherencia arquitectónica
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+
+### Cambios realizados
+- Se alineó `GREENHOUSE_ARCHITECTURE_V1.md` con el modelo 360:
+  - nuevo principio de `canonical object graph`
+  - distinción explícita entre tablas canónicas, tablas de extensión y marts
+  - corrección del lenguaje que seguía tratando deals como fuente canónica de capabilities
+- Se alineó `MULTITENANT_ARCHITECTURE.md`:
+  - `greenhouse.clients` queda explicitado como ancla canónica del objeto `Client`
+  - los sistemas externos quedan como enriquecedores, no como identidad primaria
+- Se alineó `GREENHOUSE_SERVICE_MODULES_V1.md`:
+  - `service_modules` y `client_service_modules` quedan explicitados como catálogo y assignment registry canónicos del objeto `Product/Capability`
+  - se corrigió la idea de que `closedwon deals` deban seguir siendo la capa canónica de assignment
+- Se alineó `Greenhouse_Capabilities_Architecture_v1.md`:
+  - se aclaró que `Capability Registry` describe módulos UI, no la identidad canónica del producto
+  - se corrigió lenguaje heredado de MVP que trataba `greenhouse.clients` como tabla de auth
+
+### Verificacion
+- `git diff --check`: correcto
+- Barrido manual con `rg` sobre `docs/architecture` para detectar lenguaje conflictivo de:
+  - `closedwon deals` como canónico
+  - `clients` como tabla de auth
+  - `Capability Registry` como si fuera catálogo de producto
+
+### Riesgos o pendientes
+- Aún quedan referencias históricas a `closedwon deals` como fuente de observación o bootstrap; ya no están presentadas como identidad canónica, pero conviene seguir puliendo el lenguaje si se hace otra pasada editorial más amplia.
+
+## 2026-03-14 18:12 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Formalizar a nivel de arquitectura de plataforma la regla de `objetos canónicos enriquecidos` para evitar que futuros módulos sigan creando silos o identidades paralelas.
+
+### Rama
+- Rama usada: `feature/finance-module`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura transversal
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` (nuevo)
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- `docs/README.md`
+- `project_context.md`
+
+### Cambios realizados
+- Se creó `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` como fuente canónica de la regla transversal:
+  - tesis de plataforma basada en objetos canónicos enriquecidos
+  - definición de `canonical object`, `extension table`, `snapshot field`, `360 read model` y `domain owner`
+  - reglas no negociables para evitar identidades paralelas
+  - catálogo detallado de objetos:
+    - `Client`
+    - `Collaborator`
+    - `Product/Capability`
+    - `Quote`
+    - `Project`
+    - `Sprint`
+  - reglas de ownership, enriquecimiento, write/read patterns, snapshots, APIs, migración y anti-patterns
+- Se conectó `FINANCE_CANONICAL_360_V1.md` como especialización del modelo 360 general, no como excepción aislada.
+- Se agregó el documento al índice maestro `docs/README.md`.
+- Se dejó un delta corto en `project_context.md` para que el estado operativo del repo también refleje esta regla.
+
+### Verificacion
+- Revisión manual de consistencia contra la arquitectura ya documentada en:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_ID_STRATEGY_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- La regla de arquitectura ya quedó formalizada, pero todavía hay objetos cuyo contrato canónico debe aterrizarse más en runtime:
+  - `Quote`
+  - `Project`
+  - `Sprint`
+- Conviene usar este documento como gate explícito de revisión antes de arrancar nuevos módulos como `AI Tooling`, `Creative Hub` o capas comerciales futuras.
+
 ## 2026-03-14 18:00 America/Santiago
 
 ### Agente

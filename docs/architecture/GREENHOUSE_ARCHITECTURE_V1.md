@@ -15,6 +15,10 @@ This document should be treated as the master architecture reference for product
 
 When this document conflicts with the starter-template shape, the Greenhouse product direction in this document wins unless a newer documented decision supersedes it.
 
+Use together with:
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
+
 ## Product Thesis
 
 Greenhouse is not a project management tool.
@@ -88,6 +92,11 @@ The portal must answer:
 - dashboard and executive surfaces must share a stable visual language
 - Vuexy analytics is a composition reference, not a screen to copy
 - reusable executive cards belong in `src/components/greenhouse/**`
+
+8. Canonical object graph
+- Greenhouse should evolve around canonical enriched objects, not module-local identity silos
+- modules may own transactions and extensions, but shared business objects must keep one canonical identity
+- cross-module 360 views should come from read-model composition, not duplicated master tables
 
 ## Personas
 
@@ -207,16 +216,24 @@ Purpose:
 - avoid hardcoding dashboard variants by tenant name
 - keep CRM, creative, and web experiences composable
 
-Source of truth today:
-- `efeonce-group.hubspot_crm.deals.linea_de_servicio`
-- `efeonce-group.hubspot_crm.deals.servicios_especificos`
+Canonical Greenhouse model:
+- capability catalog lives in `greenhouse.service_modules`
+- client capability assignments live in `greenhouse.client_service_modules`
 
-Observed current business families from closedwon deals:
+Current external commercial signal:
+- HubSpot company properties such as `hubspot_crm.companies.linea_de_servicio`
+- HubSpot company properties such as `hubspot_crm.companies.servicios_especificos`
+
+Historical discovery and bootstrap signal:
+- closedwon `hubspot_crm.deals` helped identify initial families and combinations
+- deals must not remain the long-term canonical capability identity layer inside Greenhouse
+
+Historical business families observed from closedwon deal data:
 - `crm_solutions`
 - `globe`
 - `wave`
 
-Observed current service-module values from closedwon deals:
+Historical service-module values observed from closedwon deal data:
 - `licenciamiento_hubspot`
 - `implementacion_onboarding`
 - `consultoria_crm`
@@ -329,7 +346,7 @@ Primary outputs:
 
 ## Data Architecture
 
-Greenhouse should move from direct-table ad hoc reads toward a layered analytics model.
+Greenhouse should move from direct-table ad hoc reads toward a layered object and analytics model.
 
 ### Layer A: source operational tables
 
@@ -343,12 +360,17 @@ Examples:
 - `hubspot_crm.companies`
 - `hubspot_crm.contacts`
 
-### Layer B: Greenhouse control tables
+### Layer B: Greenhouse canonical and control tables
 
-This is where access, tenant metadata, and app governance live.
+This is where canonical object anchors, access, tenant metadata, and app governance live.
 
 Recommended tables:
 - `greenhouse.clients`
+- `greenhouse.team_members`
+- `greenhouse.identity_profiles`
+- `greenhouse.identity_profile_source_links`
+- `greenhouse.service_modules`
+- `greenhouse.client_service_modules`
 - `greenhouse.client_users`
 - `greenhouse.roles`
 - `greenhouse.user_role_assignments`
@@ -356,6 +378,24 @@ Recommended tables:
 - `greenhouse.user_campaign_scopes`
 - `greenhouse.client_feature_flags`
 - `greenhouse.audit_events`
+
+Recommended rule:
+- objects such as `Client`, `Collaborator`, and `Product/Capability` should resolve here first
+- module-owned transaction or extension tables should point back to these canonical anchors
+- use `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` as the object-model contract
+
+### Layer B2: domain extension and transaction tables
+
+This is where modules keep their own transactional or extension data without taking ownership of shared object identity.
+
+Examples:
+- `greenhouse.fin_*`
+- `greenhouse.payroll_*`
+- future quote, campaign, or AI usage extension tables
+
+Rule:
+- these tables may store snapshots and source references
+- they should not redefine the canonical identity of shared Greenhouse objects
 
 ### Layer C: semantic marts
 

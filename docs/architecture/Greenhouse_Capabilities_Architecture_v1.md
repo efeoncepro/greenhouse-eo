@@ -86,7 +86,7 @@ BigQuery: hubspot_crm.companies
   │ linea_de_servicio (STRING)
   │ servicios_especificos (STRING, semicolon-separated)
   ↓
-greenhouse.clients (tabla de auth)
+greenhouse.clients (tabla canonica de Client / tenant)
   │ hubspot_company_id → JOIN con hubspot_crm.companies
   ↓
 API Route: /api/capabilities/resolve
@@ -107,6 +107,16 @@ La Cloud Function `hubspot-bq-sync` (dataset `hubspot_crm`) debe incluir `linea_
 ### 4.1 Concepto
 
 El Capability Registry es un archivo de configuración (TypeScript) que define el mapeo entre líneas de servicio, servicios específicos y módulos del portal. No es una tabla de base de datos — es código versionado en el repo, porque los módulos disponibles cambian con cada release del portal, no con cada cambio en HubSpot.
+
+Clarificación importante con el modelo 360:
+- el `Capability Registry` describe módulos de experiencia o presentación del portal
+- no define por sí mismo la identidad canónica del objeto `Product/Capability`
+- el objeto canónico `Product/Capability` vive en Greenhouse como:
+  - catálogo: `greenhouse.service_modules`
+  - assignments por cliente: `greenhouse.client_service_modules`
+- por lo tanto:
+  - `service module` = objeto producto/capability canónico
+  - `capability module` = surface o módulo UI activado por ese objeto
 
 ### 4.2 Estructura del Registry
 
@@ -222,9 +232,9 @@ export function parseMultiSelect(value: string | null): string[] {
 
 ---
 
-## 5. Extensión del schema de autenticación
+## 5. Extensión del schema del cliente
 
-La tabla `greenhouse.clients` (spec v1, sección 3.1) se extiende con campos derivados de HubSpot:
+En un MVP temprano, la tabla `greenhouse.clients` podría exponer campos derivados de HubSpot para simplificar lecturas:
 
 | Campo | Tipo | Descripción | Fuente |
 |---|---|---|---|
@@ -239,7 +249,7 @@ La tabla `greenhouse.clients` (spec v1, sección 3.1) se extiende con campos der
 | **linea_de_servicio** | **STRING** | **Línea de servicio activa** | **JOIN con hubspot_crm.companies** |
 | **servicios_especificos** | **STRING** | **Servicios contratados (semicolon-separated)** | **JOIN con hubspot_crm.companies** |
 
-**Opción A (recomendada para MVP):** No duplicar los campos en `greenhouse.clients`. Hacer JOIN dinámico en cada request:
+**Opción A (recomendada para MVP temprano):** No duplicar los campos en `greenhouse.clients`. Hacer JOIN dinámico en cada request:
 
 ```sql
 SELECT 
@@ -254,6 +264,14 @@ WHERE c.client_id = @current_client_id
 ```
 
 **Opción B (futuro):** Materializar en `greenhouse.clients` con un scheduled query que sincronice los campos de HubSpot a la tabla de clientes cada hora.
+
+Dirección arquitectónica actual:
+- esto no debe convertirse en la capa canónica del objeto `Product/Capability`
+- `greenhouse.clients` sigue siendo el objeto `Client`
+- el modelo 360 prefiere:
+  - `greenhouse.service_modules` como catálogo de capability
+  - `greenhouse.client_service_modules` como relación cliente-capability
+- los campos derivados en `clients` serían conveniencia de lectura o cache, no identidad canónica del capability
 
 ---
 
