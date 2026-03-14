@@ -104,9 +104,6 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Pro
             { label: 'HubSpot', linked: integrations.hubspotLinked }
           ]}
         />
-        <Typography variant='caption' color='text.secondary'>
-          Confianza de identidad: {integrations.identityConfidence}
-        </Typography>
       </CardContent>
 
       {isAdmin && (

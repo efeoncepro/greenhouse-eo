@@ -15,14 +15,12 @@ const FooterContent = () => {
 
   return (
     <div className={classnames(horizontalLayoutClasses.footerContent, 'flex items-center justify-between flex-wrap gap-4')}>
-      <p>
-        <span className='text-textSecondary'>{`© ${new Date().getFullYear()} `}</span>
-        <BrandWordmark brand='efeonce' sx={{ verticalAlign: 'middle', mr: 0.5 }} imgSx={{ opacity: 0.92 }} />
-        <span className='text-textSecondary'>{GH_MESSAGES.footer}</span>
-        <Link href='/dashboard' className='text-primary mie-0 mis-2'>
-          {GH_MESSAGES.footer_portal_link}
-        </Link>
-      </p>
+      <div className='flex items-center gap-3'>
+        <BrandWordmark brand='efeonce' height={16} sx={{ opacity: 0.85 }} />
+        <span className='text-textSecondary' style={{ fontSize: '0.8125rem' }}>
+          {`© ${new Date().getFullYear()} · ${GH_MESSAGES.footer}`}
+        </span>
+      </div>
       {!isBreakpointReached ? (
         <div className='flex items-center gap-4'>
           <Link href='/dashboard' className='text-primary'>
