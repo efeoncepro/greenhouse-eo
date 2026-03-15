@@ -4,13 +4,36 @@ import type { PayrollEntry } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
-import { runPayrollQuery } from '@/lib/payroll/shared'
+import { buildPayrollQueryTypes, runPayrollQuery } from '@/lib/payroll/shared'
 
 const getProjectId = () => getBigQueryProjectId()
+
+const PAYROLL_ENTRY_MUTATION_TYPES = {
+  kpiOtdPercent: 'FLOAT64',
+  kpiRpaAvg: 'FLOAT64',
+  kpiTasksCompleted: 'INT64',
+  bonusOtherDescription: 'STRING',
+  chileAfpName: 'STRING',
+  chileAfpRate: 'FLOAT64',
+  chileAfpAmount: 'FLOAT64',
+  chileHealthSystem: 'STRING',
+  chileHealthAmount: 'FLOAT64',
+  chileUnemploymentRate: 'FLOAT64',
+  chileUnemploymentAmount: 'FLOAT64',
+  chileTaxableBase: 'FLOAT64',
+  chileTaxAmount: 'FLOAT64',
+  chileApvAmount: 'FLOAT64',
+  chileUfValue: 'FLOAT64',
+  chileTotalDeductions: 'FLOAT64',
+  netTotalCalculated: 'FLOAT64',
+  netTotalOverride: 'FLOAT64',
+  manualOverrideNote: 'STRING'
+} as const
 
 export const upsertPayrollEntry = async (entry: PayrollEntry) => {
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
+  const entryParams = entry as unknown as Record<string, unknown>
 
   await runPayrollQuery(
     `
@@ -175,6 +198,7 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           CURRENT_TIMESTAMP()
         )
     `,
-    entry as unknown as Record<string, unknown>
+    entryParams,
+    buildPayrollQueryTypes(entryParams, PAYROLL_ENTRY_MUTATION_TYPES)
   )
 }

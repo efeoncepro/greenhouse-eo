@@ -35,10 +35,11 @@ import { formatCurrency, regimeLabel, regimeColor } from './helpers'
 type Props = {
   compensations: CompensationVersion[]
   eligibleMembers: PayrollCompensationMember[]
+  members: PayrollCompensationMember[]
   onRefresh: () => void
 }
 
-const PayrollCompensationTab = ({ compensations, eligibleMembers, onRefresh }: Props) => {
+const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRefresh }: Props) => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedComp, setSelectedComp] = useState<CompensationVersion | null>(null)
   const [newMemberId, setNewMemberId] = useState('')
@@ -87,7 +88,11 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, onRefresh }: P
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Compensaciones vigentes'
-          subheader={`${compensations.length} colaborador${compensations.length !== 1 ? 'es' : ''} con compensación activa`}
+          subheader={
+            compensations.length > 0
+              ? `${compensations.length} colaborador${compensations.length !== 1 ? 'es' : ''} con compensación activa`
+              : 'Aquí defines salario base, teletrabajo, bonos y previsión para calcular nómina.'
+          }
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
               <i className='tabler-adjustments-dollar' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -116,6 +121,11 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, onRefresh }: P
                 color='warning'
               />
             </Box>
+          )}
+          {compensations.length > 0 && eligibleMembers.length === 0 && (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 2 }}>
+              Todos los colaboradores activos ya tienen compensación vigente. Haz clic en una fila para crear una nueva versión.
+            </Typography>
           )}
           <TableContainer>
             <Table size='small'>
@@ -196,9 +206,26 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, onRefresh }: P
                       <Stack alignItems='center' spacing={1}>
                         <i className='tabler-adjustments-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
                         <Typography color='text.secondary'>No hay compensaciones configuradas.</Typography>
-                        <Typography variant='caption' color='text.disabled'>
-                          Crea la primera compensación para comenzar a calcular nómina.
-                        </Typography>
+                        {members.length === 0 ? (
+                          <Typography variant='caption' color='text.disabled'>
+                            Primero debes tener colaboradores activos en Admin Team para habilitar nómina.
+                          </Typography>
+                        ) : (
+                          <>
+                            <Typography variant='caption' color='text.disabled'>
+                              Crea la primera compensación para comenzar a calcular nómina.
+                            </Typography>
+                            <Button
+                              variant='contained'
+                              size='small'
+                              startIcon={<i className='tabler-plus' />}
+                              disabled={eligibleMembers.length === 0}
+                              onClick={() => setSelectorOpen(true)}
+                            >
+                              Configurar primera compensación
+                            </Button>
+                          </>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>

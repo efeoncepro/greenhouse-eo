@@ -5,6 +5,7 @@ import type { CreatePayrollPeriodInput, PayrollPeriod, UpdatePayrollPeriodInput 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import {
+  buildPayrollQueryTypes,
   PayrollValidationError,
   buildPeriodId,
   normalizeNullableString,
@@ -13,6 +14,12 @@ import {
   toNumber,
   toTimestampString
 } from '@/lib/payroll/shared'
+
+const PAYROLL_PERIOD_MUTATION_TYPES = {
+  ufValue: 'FLOAT64',
+  taxTableVersion: 'STRING',
+  notes: 'STRING'
+} as const
 
 type PayrollPeriodRow = {
   period_id: string | null
@@ -103,6 +110,15 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
     throw new PayrollValidationError('Payroll period already exists.', 409)
   }
 
+  const createParams = {
+    periodId,
+    year: input.year,
+    month: input.month,
+    ufValue: input.ufValue ?? null,
+    taxTableVersion: normalizeNullableString(input.taxTableVersion),
+    notes: normalizeNullableString(input.notes)
+  }
+
   await runPayrollQuery(
     `
       INSERT INTO \`${projectId}.greenhouse.payroll_periods\` (
@@ -126,14 +142,8 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
         CURRENT_TIMESTAMP()
       )
     `,
-    {
-      periodId,
-      year: input.year,
-      month: input.month,
-      ufValue: input.ufValue ?? null,
-      taxTableVersion: normalizeNullableString(input.taxTableVersion),
-      notes: normalizeNullableString(input.notes)
-    }
+    createParams,
+    buildPayrollQueryTypes(createParams, PAYROLL_PERIOD_MUTATION_TYPES)
   )
 
   const created = await getPayrollPeriod(periodId)
@@ -163,6 +173,14 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
 
+  const updateParams = {
+    periodId,
+    ufValue: input.ufValue ?? current.ufValue,
+    taxTableVersion:
+      input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
+    notes: input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
+  }
+
   await runPayrollQuery(
     `
       UPDATE \`${projectId}.greenhouse.payroll_periods\`
@@ -172,13 +190,8 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
         notes = @notes
       WHERE period_id = @periodId
     `,
-    {
-      periodId,
-      ufValue: input.ufValue ?? current.ufValue,
-      taxTableVersion:
-        input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
-      notes: input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
-    }
+    updateParams,
+    buildPayrollQueryTypes(updateParams, PAYROLL_PERIOD_MUTATION_TYPES)
   )
 
   const updated = await getPayrollPeriod(periodId)

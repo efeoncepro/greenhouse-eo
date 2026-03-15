@@ -38,6 +38,7 @@ const PayrollDashboard = () => {
   const [entries, setEntries] = useState<PayrollEntry[]>([])
   const [compensations, setCompensations] = useState<CompensationVersion[]>([])
   const [eligibleMembers, setEligibleMembers] = useState<PayrollCompensationMember[]>([])
+  const [compensationMembers, setCompensationMembers] = useState<PayrollCompensationMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -53,6 +54,8 @@ const PayrollDashboard = () => {
         fetch('/api/hr/payroll/periods'),
         fetch('/api/hr/payroll/compensation')
       ])
+
+      const nextErrors: string[] = []
 
       if (periodsRes.ok) {
         const data = await periodsRes.json()
@@ -73,7 +76,14 @@ const PayrollDashboard = () => {
 
             setEntries(eData.entries || [])
           }
+        } else {
+          setCurrentPeriod(null)
+          setEntries([])
         }
+      } else {
+        const data = await periodsRes.json().catch(() => null)
+
+        nextErrors.push(data?.error || 'No fue posible cargar los períodos de nómina.')
       }
 
       if (compRes.ok) {
@@ -81,7 +91,17 @@ const PayrollDashboard = () => {
 
         setCompensations(data.compensations || [])
         setEligibleMembers(data.eligibleMembers || [])
+        setCompensationMembers(data.members || [])
+      } else {
+        const data = await compRes.json().catch(() => null)
+
+        setCompensations([])
+        setEligibleMembers([])
+        setCompensationMembers([])
+        nextErrors.push(data?.error || 'No fue posible cargar las compensaciones de nómina.')
       }
+
+      setError(nextErrors.length > 0 ? nextErrors.join(' ') : null)
     } catch (err: any) {
       setError(err.message || 'Error cargando datos')
     } finally {
@@ -164,6 +184,8 @@ const PayrollDashboard = () => {
   const totalNet = entries.reduce((s, e) => s + e.netTotal, 0)
   const statusConfig = currentPeriod ? periodStatusConfig[currentPeriod.status] : null
   const primaryCurrency = entries[0]?.currency ?? 'CLP'
+  const needsCompensationSetup = compensations.length === 0
+  const hasActivePayrollMembers = compensationMembers.length > 0
 
   return (
     <>
@@ -188,6 +210,23 @@ const PayrollDashboard = () => {
         {error && (
           <Alert severity='error' onClose={() => setError(null)}>
             {error}
+          </Alert>
+        )}
+
+        {needsCompensationSetup && (
+          <Alert
+            severity={hasActivePayrollMembers ? 'info' : 'warning'}
+            action={
+              hasActivePayrollMembers ? (
+                <Button color='inherit' size='small' onClick={() => setTab('compensation')}>
+                  Configurar salarios
+                </Button>
+              ) : undefined
+            }
+          >
+            {hasActivePayrollMembers
+              ? 'Antes de calcular nómina, configura salario base, previsión y bonos desde la pestaña Compensaciones.'
+              : 'No hay colaboradores activos disponibles para nómina. Primero debes habilitarlos desde Admin Team.'}
           </Alert>
         )}
 
@@ -269,6 +308,7 @@ const PayrollDashboard = () => {
             <PayrollCompensationTab
               compensations={compensations}
               eligibleMembers={eligibleMembers}
+              members={compensationMembers}
               onRefresh={handleRefresh}
             />
           </TabPanel>
@@ -323,7 +363,7 @@ const PayrollDashboard = () => {
               type='number'
               value={newUf}
               onChange={e => setNewUf(e.target.value === '' ? '' : Number(e.target.value))}
-              helperText='Necesario para calcular Isapre. Puede ingresarse después.'
+              helperText='Necesario para calcular Isapre. El salario base, AFP, salud y bonos se configuran en Compensaciones.'
             />
           </Stack>
         </DialogContent>

@@ -40,6 +40,65 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 08:02 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el fallo de creación de períodos en `HR Payroll` y revisar por qué `Compensaciones` aparecía con CTA apagado pese a existir colaboradores activos en preview.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/payroll/shared.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se endurecieron writes de `Payroll` para BigQuery cuando existen params opcionales `null`:
+  - períodos
+  - compensaciones
+  - entries de nómina
+- Se confirmó sobre `Preview` que:
+  - `greenhouse.team_members` tiene `7` colaboradores activos
+  - hoy `greenhouse.compensation_versions` no tiene compensaciones vigentes para ellos
+- `PayrollDashboard` ahora deja de silenciar respuestas `!ok` de:
+  - `GET /api/hr/payroll/periods`
+  - `GET /api/hr/payroll/compensation`
+- `Compensaciones` ahora:
+  - muestra CTA visible para configurar la primera compensación
+  - explica mejor cuándo faltan colaboradores activos
+  - explica cuándo todos ya tienen compensación y la edición se hace desde la fila
+- El modal `Nuevo período` ahora aclara que salario base, AFP, salud y bonos se configuran en la pestaña `Compensaciones`.
+
+### Verificación
+- Query manual a BigQuery con env de `Preview`:
+  - `team_members`: `7` activos
+  - `current compensation`: `0`
+- `pnpm exec eslint src/lib/payroll/shared.ts src/lib/payroll/get-payroll-periods.ts src/lib/payroll/get-compensation.ts src/lib/payroll/persist-entry.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+  - correcto
+- `git diff --check -- src/lib/payroll/shared.ts src/lib/payroll/get-payroll-periods.ts src/lib/payroll/get-compensation.ts src/lib/payroll/persist-entry.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
+  - correcto
+
+### Riesgos o pendientes
+- No se hizo smoke autenticado completo en `pre-greenhouse` después del fix, así que falta confirmar el roundtrip real de:
+  - crear período
+  - crear primera compensación
+  - calcular nómina
+- El síntoma del botón apagado ya no debería quedar silencioso, pero si `GET /api/hr/payroll/compensation` sigue devolviendo error con sesión real, el siguiente paso es inspeccionar el response vivo en Preview con usuario autenticado.
+
 ## 2026-03-15 07:05 America/Santiago
 
 ### Agente

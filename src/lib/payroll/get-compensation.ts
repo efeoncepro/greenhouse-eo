@@ -5,6 +5,7 @@ import type { CompensationVersion, CreateCompensationVersionInput, PayrollCompen
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
 import {
+  buildPayrollQueryTypes,
   PayrollValidationError,
   assertPayrollDateString,
   normalizeBoolean,
@@ -18,6 +19,16 @@ import {
   toTimestampString
 } from '@/lib/payroll/shared'
 import { getBigQueryProjectId } from '@/lib/bigquery'
+
+const COMPENSATION_MUTATION_TYPES = {
+  afpName: 'STRING',
+  afpRate: 'FLOAT64',
+  healthSystem: 'STRING',
+  healthPlanUf: 'FLOAT64',
+  unemploymentRate: 'FLOAT64',
+  effectiveTo: 'DATE',
+  createdBy: 'STRING'
+} as const
 
 type CompensationRow = {
   version_id: string | null
@@ -437,6 +448,33 @@ export const createCompensationVersion = async ({
     )
   }
 
+  const createParams = {
+    versionId,
+    memberId: input.memberId,
+    version: nextVersion,
+    payRegime: input.payRegime,
+    currency: input.currency,
+    baseSalary: Number(input.baseSalary),
+    remoteAllowance: Number(input.remoteAllowance ?? 0),
+    bonusOtdMin: Number(input.bonusOtdMin ?? 0),
+    bonusOtdMax: Number(input.bonusOtdMax ?? 0),
+    bonusRpaMin: Number(input.bonusRpaMin ?? 0),
+    bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    afpName: normalizeNullableString(input.afpName),
+    afpRate: input.afpRate ?? null,
+    healthSystem: input.healthSystem ?? null,
+    healthPlanUf: input.healthPlanUf ?? null,
+    unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+    contractType: input.contractType ?? 'indefinido',
+    hasApv: Boolean(input.hasApv),
+    apvAmount: Number(input.apvAmount ?? 0),
+    effectiveFrom,
+    effectiveTo: nextEffectiveTo,
+    isCurrent,
+    changeReason: input.changeReason.trim(),
+    createdBy: actorEmail
+  }
+
   await runPayrollQuery(
     `
       INSERT INTO \`${projectId}.greenhouse.compensation_versions\` (
@@ -494,32 +532,8 @@ export const createCompensationVersion = async ({
         CURRENT_TIMESTAMP()
       )
     `,
-    {
-      versionId,
-      memberId: input.memberId,
-      version: nextVersion,
-      payRegime: input.payRegime,
-      currency: input.currency,
-      baseSalary: Number(input.baseSalary),
-      remoteAllowance: Number(input.remoteAllowance ?? 0),
-      bonusOtdMin: Number(input.bonusOtdMin ?? 0),
-      bonusOtdMax: Number(input.bonusOtdMax ?? 0),
-      bonusRpaMin: Number(input.bonusRpaMin ?? 0),
-      bonusRpaMax: Number(input.bonusRpaMax ?? 0),
-      afpName: normalizeNullableString(input.afpName),
-      afpRate: input.afpRate ?? null,
-      healthSystem: input.healthSystem ?? null,
-      healthPlanUf: input.healthPlanUf ?? null,
-      unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-      contractType: input.contractType ?? 'indefinido',
-      hasApv: Boolean(input.hasApv),
-      apvAmount: Number(input.apvAmount ?? 0),
-      effectiveFrom,
-      effectiveTo: nextEffectiveTo,
-      isCurrent,
-      changeReason: input.changeReason.trim(),
-      createdBy: actorEmail
-    }
+    createParams,
+    buildPayrollQueryTypes(createParams, COMPENSATION_MUTATION_TYPES)
   )
 
   const [created] = await getCompensationHistoryByMember(input.memberId)

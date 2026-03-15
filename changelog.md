@@ -6,6 +6,19 @@
 
 ## 2026-03-15
 
+### HR Payroll period creation and compensation onboarding hardening
+- `HR Payroll` ya no depende de inferencia implícita de tipos para params `null` en BigQuery al crear períodos, crear compensaciones o persistir entries.
+- Se agregaron tipos explícitos en los writes de:
+  - `payroll_periods`
+  - `compensation_versions`
+  - `payroll_entries`
+- El dashboard de nómina ahora deja de silenciar fallos de carga en `/api/hr/payroll/periods` y `/api/hr/payroll/compensation`.
+- `Compensaciones` ahora explica mejor el onboarding:
+  - CTA visible para configurar la primera compensación
+  - mensaje explícito si faltan colaboradores activos
+  - mensaje explícito cuando todos ya tienen compensación vigente y la edición se hace desde la fila
+- En `Preview` se confirmó que sí existe relación canónica entre colaboradores y `Payroll`: hoy hay `7` `team_members` activos y `0` compensaciones vigentes.
+
 ### Supplier to Provider canonical bridge for AI Tooling
 - `Finance Suppliers` y `AI Tooling` ahora comparten mejor la identidad canónica de vendor/plataforma a través de `greenhouse.providers`.
 - Se agregó `src/lib/providers/canonical.ts` para sincronizar suppliers financieros activos hacia `greenhouse.providers`.

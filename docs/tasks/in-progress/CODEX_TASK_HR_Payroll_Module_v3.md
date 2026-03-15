@@ -184,6 +184,55 @@ Handoff backend para frontend:
 - la vista `MemberPayrollHistory` ya no tiene issues de lint en esta pasada
 - falta smoke autenticado con datos reales de cálculo/aprobación/export
 
+## Runtime hardening 2026-03-15 — create period + compensation onboarding
+
+### Diagnóstico real en Preview
+
+- se contrastó `Preview` con BigQuery usando las variables del branch `fix/codex-operational-finance`
+- resultado:
+  - `greenhouse.team_members` tiene `7` colaboradores activos
+  - `greenhouse.compensation_versions` no tiene compensaciones vigentes para esos `7`
+- conclusión:
+  - el botón apagado de `Compensaciones` no implicaba ausencia real de relación con colaboradores
+  - el módulo estaba dejando demasiado silencioso el fallo/no-carga del overview de compensaciones
+
+### Fix backend aplicado
+
+- `src/lib/payroll/shared.ts`
+  - se agregó `buildPayrollQueryTypes()` y `runPayrollQuery()` ahora acepta `types`
+- `src/lib/payroll/get-payroll-periods.ts`
+  - `create/update payroll period` ya no dependen de inferencia implícita para params `null`
+- `src/lib/payroll/get-compensation.ts`
+  - `create compensation version` ahora tipa explícitamente params opcionales nulos hacia BigQuery
+- `src/lib/payroll/persist-entry.ts`
+  - el `upsert` de entries ahora también tipa params nulos de KPI/deducciones/override
+
+Impacto esperado:
+- crear período deja de fallar por campos opcionales vacíos como `notes`, `taxTableVersion` o `ufValue`
+- crear compensaciones y persistir entries deja de quedar expuesto al mismo problema de nulabilidad
+
+### Fix frontend aplicado
+
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+  - el dashboard ahora expone errores `GET /periods` y `GET /compensation` en vez de quedar “vacío”
+  - se agregó callout operativo cuando todavía faltan compensaciones para comenzar nómina
+  - el modal `Nuevo período` ahora aclara que salario base, AFP, salud y bonos se configuran en `Compensaciones`
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+  - ahora recibe `members`
+  - muestra CTA explícito `Configurar primera compensación` cuando hay colaboradores activos sin compensación
+  - explica mejor dos estados:
+    - no hay colaboradores activos para nómina
+    - todos ya tienen compensación vigente y se debe abrir la fila para crear nueva versión
+
+### Estado después de esta tanda
+
+- `Payroll` vuelve a reconocer que sí existe base canónica de colaboradores desde `greenhouse.team_members`
+- el usuario ya no debería interpretar un botón apagado como “no hay relación interna” sin feedback visible
+- sigue pendiente validar en preview autenticado el roundtrip completo:
+  - crear período
+  - crear primera compensación
+  - calcular nómina
+
 ## Alcance v3
 
 ### A. Alta inicial de compensación
