@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -17,8 +16,6 @@ import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
-import TablePagination from '@mui/material/TablePagination'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import type { TextFieldProps } from '@mui/material/TextField'
 
@@ -43,7 +40,6 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AiTool, ProviderRecord, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { toolCategoryConfig, costModelConfig, formatCost } from '../helpers'
-import AiCatalogFilters from './AiCatalogFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -94,7 +90,6 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const [saving, setSaving] = useState(false)
   const [filterCategory, setFilterCategory] = useState('')
   const [filterProvider, setFilterProvider] = useState('')
-  const [filtered, setFiltered] = useState<AiTool[]>(tools)
   const [globalFilter, setGlobalFilter] = useState('')
   const [rowSelection, setRowSelection] = useState({})
 
@@ -126,6 +121,21 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
       return acc
     }, [])
   }, [meta, providers])
+
+  const categories = useMemo(
+    () => meta?.toolCategories ?? (Object.keys(toolCategoryConfig) as Array<keyof typeof toolCategoryConfig>),
+    [meta]
+  )
+
+  // Inline filtering (replaces AiCatalogFilters component)
+  const filteredTools = useMemo(() => {
+    return tools.filter(item => {
+      if (filterCategory && item.toolCategory !== filterCategory) return false
+      if (filterProvider && item.providerId !== filterProvider) return false
+
+      return true
+    })
+  }, [tools, filterCategory, filterProvider])
 
   const resetForm = () => {
     setFormToolId('')
@@ -240,21 +250,13 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                 <Typography color='text.primary' className='font-medium'>
                   {row.original.toolName}
                 </Typography>
-                {row.original.description && (
-                  <Typography variant='body2'>{row.original.description}</Typography>
-                )}
+                <Typography variant='body2' color='text.secondary'>
+                  {row.original.providerName ?? row.original.vendor ?? '—'}
+                </Typography>
               </div>
             </div>
           )
         }
-      }),
-      columnHelper.accessor('providerName', {
-        header: 'Proveedor',
-        cell: ({ row }) => (
-          <Typography color='text.primary'>
-            {row.original.providerName ?? row.original.vendor ?? '—'}
-          </Typography>
-        )
       }),
       columnHelper.accessor('toolCategory', {
         header: 'Categoría',
@@ -316,12 +318,9 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
       }),
       columnHelper.display({
         id: 'actions',
-        header: 'Acciones',
+        header: '',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton size='small' onClick={() => openEdit(row.original)}>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton>
             <OptionMenu
               iconButtonProps={{ size: 'medium' }}
               iconClassName='text-textSecondary'
@@ -351,7 +350,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   )
 
   const table = useReactTable({
-    data: filtered,
+    data: filteredTools,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { rowSelection, globalFilter },
@@ -368,34 +367,42 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   return (
     <>
       <Card>
-        <CardHeader title='Filters' className='pbe-4' />
-        <AiCatalogFilters
-          data={tools}
-          providers={providers}
-          meta={meta}
-          category={filterCategory}
-          provider={filterProvider}
-          setCategory={setFilterCategory}
-          setProvider={setFilterProvider}
-          setFiltered={setFiltered}
-        />
-        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-          <CustomTextField
-            select
-            value={table.getState().pagination.pageSize}
-            onChange={e => table.setPageSize(Number(e.target.value))}
-            className='max-sm:is-full sm:is-[70px]'
-          >
-            <MenuItem value='10'>10</MenuItem>
-            <MenuItem value='25'>25</MenuItem>
-            <MenuItem value='50'>50</MenuItem>
-          </CustomTextField>
+        {/* Toolbar: filters + search + action */}
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 gap-4'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
+            <CustomTextField
+              select size='small' label='Categoría'
+              value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+              className='max-sm:is-full sm:is-[180px]'
+            >
+              <MenuItem value=''>Todas</MenuItem>
+              {categories.map(cat => (
+                <MenuItem key={cat} value={cat}>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    <i className={toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.icon ?? 'tabler-puzzle'} style={{ fontSize: 16 }} />
+                    <span>{toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.label ?? cat}</span>
+                  </Stack>
+                </MenuItem>
+              ))}
+            </CustomTextField>
+            <CustomTextField
+              select size='small' label='Proveedor'
+              value={filterProvider} onChange={e => setFilterProvider(e.target.value)}
+              className='max-sm:is-full sm:is-[180px]'
+            >
+              <MenuItem value=''>Todos</MenuItem>
+              {providerOptions.map(p => (
+                <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
+              ))}
+            </CustomTextField>
+          </div>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Buscar herramienta'
+              placeholder='Buscar herramienta...'
               className='max-sm:is-full sm:is-[250px]'
+              size='small'
             />
             <Button
               variant='contained'
@@ -407,6 +414,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
             </Button>
           </div>
         </div>
+        <Divider />
         <div className='overflow-x-auto'>
           <table className={tableStyles.table}>
             <thead>
@@ -415,21 +423,19 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                   {headerGroup.headers.map(header => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
-                        <>
-                          <div
-                            className={classnames({
-                              'flex items-center': header.column.getIsSorted(),
-                              'cursor-pointer select-none': header.column.getCanSort()
-                            })}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                            {{
-                              asc: <i className='tabler-chevron-up text-xl' />,
-                              desc: <i className='tabler-chevron-down text-xl' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                          </div>
-                        </>
+                        <div
+                          className={classnames({
+                            'flex items-center': header.column.getIsSorted(),
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' />,
+                            desc: <i className='tabler-chevron-down text-xl' />
+                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                        </div>
                       )}
                     </th>
                   ))}
@@ -440,9 +446,21 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
               <tbody>
                 <tr>
                   <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                    <Typography color='text.secondary' sx={{ py: 4 }}>
-                      No se encontraron herramientas
-                    </Typography>
+                    <Stack alignItems='center' spacing={2} sx={{ py: 8 }}>
+                      <CustomAvatar variant='rounded' skin='light' color='warning' size={48}>
+                        <i className='tabler-database-off' style={{ fontSize: 24 }} />
+                      </CustomAvatar>
+                      <Typography color='text.secondary'>No se encontraron herramientas</Typography>
+                      {(filterCategory || filterProvider || globalFilter) && (
+                        <Button
+                          variant='tonal' size='small' color='secondary'
+                          startIcon={<i className='tabler-filter-off' />}
+                          onClick={() => { setFilterCategory(''); setFilterProvider(''); setGlobalFilter('') }}
+                        >
+                          Limpiar filtros
+                        </Button>
+                      )}
+                    </Stack>
                   </td>
                 </tr>
               </tbody>
@@ -462,13 +480,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
             )}
           </table>
         </div>
-        <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => table.setPageIndex(page)}
-        />
+        <TablePaginationComponent table={table} />
       </Card>
 
       {/* Create/Edit Dialog */}

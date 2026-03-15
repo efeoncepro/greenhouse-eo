@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -14,7 +13,6 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
 import type { TextFieldProps } from '@mui/material/TextField'
 
@@ -39,7 +37,6 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import type { AiTool, MemberToolLicense, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { licenseStatusConfig, accessLevelConfig, formatDate } from '../helpers'
 import { getInitials } from '@/utils/getInitials'
-import AiLicensesFilters from './AiLicensesFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -88,7 +85,6 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
-  const [filtered, setFiltered] = useState<MemberToolLicense[]>(licenses)
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Form state
@@ -98,6 +94,17 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const [formEmail, setFormEmail] = useState('')
   const [formExpires, setFormExpires] = useState('')
   const [formNotes, setFormNotes] = useState('')
+
+  const statuses = meta?.licenseStatuses ?? (Object.keys(licenseStatusConfig) as Array<keyof typeof licenseStatusConfig>)
+
+  // Inline filtering
+  const filteredLicenses = useMemo(() => {
+    return licenses.filter(item => {
+      if (filterStatus && item.licenseStatus !== filterStatus) return false
+
+      return true
+    })
+  }, [licenses, filterStatus])
 
   const openCreate = () => {
     setFormMember('')
@@ -149,7 +156,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                 {row.original.memberName ?? '—'}
               </Typography>
               {row.original.memberEmail && (
-                <Typography variant='body2'>{row.original.memberEmail}</Typography>
+                <Typography variant='body2' color='text.secondary'>{row.original.memberEmail}</Typography>
               )}
             </div>
           </div>
@@ -205,7 +212,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
         id: 'assignedDate',
         header: 'Asignado',
         cell: ({ row }) => (
-          <Typography>{formatDate(row.original.activatedAt ?? row.original.createdAt)}</Typography>
+          <Typography variant='body2'>{formatDate(row.original.activatedAt ?? row.original.createdAt)}</Typography>
         )
       })
     ],
@@ -213,7 +220,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   )
 
   const table = useReactTable({
-    data: filtered,
+    data: filteredLicenses,
     columns,
     filterFns: { fuzzy: fuzzyFilter },
     state: { globalFilter },
@@ -229,31 +236,32 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   return (
     <>
       <Card>
-        <CardHeader title='Filters' className='pbe-4' />
-        <AiLicensesFilters
-          data={licenses}
-          meta={meta}
-          status={filterStatus}
-          setStatus={setFilterStatus}
-          setFiltered={setFiltered}
-        />
-        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-          <CustomTextField
-            select
-            value={table.getState().pagination.pageSize}
-            onChange={e => table.setPageSize(Number(e.target.value))}
-            className='max-sm:is-full sm:is-[70px]'
-          >
-            <MenuItem value='10'>10</MenuItem>
-            <MenuItem value='25'>25</MenuItem>
-            <MenuItem value='50'>50</MenuItem>
-          </CustomTextField>
+        {/* Toolbar: filter + search + action */}
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 gap-4'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
+            <CustomTextField
+              select size='small' label='Estado'
+              value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              className='max-sm:is-full sm:is-[180px]'
+            >
+              <MenuItem value=''>Todos</MenuItem>
+              {statuses.map(s => (
+                <MenuItem key={s} value={s}>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    <i className={licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.icon ?? 'tabler-circle'} style={{ fontSize: 16 }} />
+                    <span>{licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.label ?? s}</span>
+                  </Stack>
+                </MenuItem>
+              ))}
+            </CustomTextField>
+          </div>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Buscar licencia'
+              placeholder='Buscar licencia...'
               className='max-sm:is-full sm:is-[250px]'
+              size='small'
             />
             <Button
               variant='contained'
@@ -265,6 +273,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
             </Button>
           </div>
         </div>
+        <Divider />
         <div className='overflow-x-auto'>
           <table className={tableStyles.table}>
             <thead>
@@ -273,21 +282,19 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                   {headerGroup.headers.map(header => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
-                        <>
-                          <div
-                            className={classnames({
-                              'flex items-center': header.column.getIsSorted(),
-                              'cursor-pointer select-none': header.column.getCanSort()
-                            })}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                            {{
-                              asc: <i className='tabler-chevron-up text-xl' />,
-                              desc: <i className='tabler-chevron-down text-xl' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                          </div>
-                        </>
+                        <div
+                          className={classnames({
+                            'flex items-center': header.column.getIsSorted(),
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' />,
+                            desc: <i className='tabler-chevron-down text-xl' />
+                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                        </div>
                       )}
                     </th>
                   ))}
@@ -298,9 +305,21 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
               <tbody>
                 <tr>
                   <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                    <Typography color='text.secondary' sx={{ py: 4 }}>
-                      No se encontraron licencias
-                    </Typography>
+                    <Stack alignItems='center' spacing={2} sx={{ py: 8 }}>
+                      <CustomAvatar variant='rounded' skin='light' color='info' size={48}>
+                        <i className='tabler-key-off' style={{ fontSize: 24 }} />
+                      </CustomAvatar>
+                      <Typography color='text.secondary'>No se encontraron licencias</Typography>
+                      {(filterStatus || globalFilter) && (
+                        <Button
+                          variant='tonal' size='small' color='secondary'
+                          startIcon={<i className='tabler-filter-off' />}
+                          onClick={() => { setFilterStatus(''); setGlobalFilter('') }}
+                        >
+                          Limpiar filtros
+                        </Button>
+                      )}
+                    </Stack>
                   </td>
                 </tr>
               </tbody>
@@ -320,13 +339,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
             )}
           </table>
         </div>
-        <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => table.setPageIndex(page)}
-        />
+        <TablePaginationComponent table={table} />
       </Card>
 
       {/* Assign License Dialog */}

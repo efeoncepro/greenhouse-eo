@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -15,7 +14,6 @@ import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
 import type { TextFieldProps } from '@mui/material/TextField'
 
@@ -39,7 +37,6 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AiCreditLedgerEntry, AiCreditLedgerResponse, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { ledgerEntryTypeConfig, formatTimestamp, formatCost } from '../helpers'
-import AiConsumptionFilters from './AiConsumptionFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -162,7 +159,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('createdAt', {
         header: 'Fecha',
         cell: ({ getValue }) => (
-          <Typography sx={{ whiteSpace: 'nowrap' }}>
+          <Typography variant='body2' sx={{ whiteSpace: 'nowrap' }}>
             {formatTimestamp(getValue())}
           </Typography>
         )
@@ -208,14 +205,14 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('consumedByName', {
         header: 'Miembro',
         cell: ({ getValue }) => (
-          <Typography>{getValue() ?? '—'}</Typography>
+          <Typography variant='body2'>{getValue() ?? '—'}</Typography>
         )
       }),
       columnHelper.display({
         id: 'asset',
         header: 'Descripción',
         cell: ({ row }) => (
-          <Typography noWrap sx={{ maxWidth: 200 }}>
+          <Typography variant='body2' noWrap sx={{ maxWidth: 200 }}>
             {row.original.assetDescription ?? row.original.reloadReason ?? '—'}
           </Typography>
         )
@@ -223,7 +220,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('projectName', {
         header: 'Proyecto',
         cell: ({ getValue }) => (
-          <Typography>{getValue() ?? '—'}</Typography>
+          <Typography variant='body2'>{getValue() ?? '—'}</Typography>
         )
       }),
       columnHelper.display({
@@ -256,8 +253,8 @@ const AiConsumptionTab = ({ meta }: Props) => {
   if (loading) {
     return (
       <Card>
-        <CardHeader title='Registro de consumo' />
         <Stack spacing={1} sx={{ p: 6 }}>
+          <Skeleton variant='rounded' height={48} />
           {[0, 1, 2, 3, 4].map(i => (
             <Skeleton key={i} variant='rounded' height={44} />
           ))}
@@ -269,31 +266,33 @@ const AiConsumptionTab = ({ meta }: Props) => {
   return (
     <>
       <Card>
-        <CardHeader title='Filters' className='pbe-4' />
-        <AiConsumptionFilters
-          meta={meta}
-          filterMember={filterMember}
-          filterWallet={filterWallet}
-          setFilterMember={setFilterMember}
-          setFilterWallet={setFilterWallet}
-        />
-        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
-          <CustomTextField
-            select
-            value={table.getState().pagination.pageSize}
-            onChange={e => table.setPageSize(Number(e.target.value))}
-            className='max-sm:is-full sm:is-[70px]'
-          >
-            <MenuItem value='10'>10</MenuItem>
-            <MenuItem value='25'>25</MenuItem>
-            <MenuItem value='50'>50</MenuItem>
-          </CustomTextField>
+        {/* Toolbar: filters + search + action */}
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 gap-4'>
+          <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
+            <CustomTextField
+              select size='small' label='Miembro'
+              value={filterMember} onChange={e => setFilterMember(e.target.value)}
+              className='max-sm:is-full sm:is-[180px]'
+            >
+              <MenuItem value=''>Todos</MenuItem>
+              {(meta?.activeMembers ?? []).map(m => (
+                <MenuItem key={m.memberId} value={m.memberId}>{m.displayName}</MenuItem>
+              ))}
+            </CustomTextField>
+            <CustomTextField
+              size='small' label='Wallet ID'
+              value={filterWallet} onChange={e => setFilterWallet(e.target.value)}
+              placeholder='Filtrar por wallet...'
+              className='max-sm:is-full sm:is-[180px]'
+            />
+          </div>
           <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Buscar movimiento'
+              placeholder='Buscar movimiento...'
               className='max-sm:is-full sm:is-[250px]'
+              size='small'
             />
             <Button
               variant='contained'
@@ -305,6 +304,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
             </Button>
           </div>
         </div>
+        <Divider />
         <div className='overflow-x-auto'>
           <table className={tableStyles.table}>
             <thead>
@@ -313,21 +313,19 @@ const AiConsumptionTab = ({ meta }: Props) => {
                   {headerGroup.headers.map(header => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
-                        <>
-                          <div
-                            className={classnames({
-                              'flex items-center': header.column.getIsSorted(),
-                              'cursor-pointer select-none': header.column.getCanSort()
-                            })}
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                            {{
-                              asc: <i className='tabler-chevron-up text-xl' />,
-                              desc: <i className='tabler-chevron-down text-xl' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
-                          </div>
-                        </>
+                        <div
+                          className={classnames({
+                            'flex items-center': header.column.getIsSorted(),
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' />,
+                            desc: <i className='tabler-chevron-down text-xl' />
+                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                        </div>
                       )}
                     </th>
                   ))}
@@ -338,9 +336,21 @@ const AiConsumptionTab = ({ meta }: Props) => {
               <tbody>
                 <tr>
                   <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
-                    <Typography color='text.secondary' sx={{ py: 4 }}>
-                      No se encontraron movimientos
-                    </Typography>
+                    <Stack alignItems='center' spacing={2} sx={{ py: 8 }}>
+                      <CustomAvatar variant='rounded' skin='light' color='warning' size={48}>
+                        <i className='tabler-receipt-off' style={{ fontSize: 24 }} />
+                      </CustomAvatar>
+                      <Typography color='text.secondary'>No se encontraron movimientos</Typography>
+                      {(filterWallet || filterMember || globalFilter) && (
+                        <Button
+                          variant='tonal' size='small' color='secondary'
+                          startIcon={<i className='tabler-filter-off' />}
+                          onClick={() => { setFilterWallet(''); setFilterMember(''); setGlobalFilter('') }}
+                        >
+                          Limpiar filtros
+                        </Button>
+                      )}
+                    </Stack>
                   </td>
                 </tr>
               </tbody>
@@ -360,13 +370,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
             )}
           </table>
         </div>
-        <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
-          count={table.getFilteredRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => table.setPageIndex(page)}
-        />
+        <TablePaginationComponent table={table} />
       </Card>
 
       {/* Consume Dialog */}
