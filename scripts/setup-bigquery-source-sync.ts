@@ -4,7 +4,7 @@ import process from 'node:process'
 
 import { BigQuery } from '@google-cloud/bigquery'
 
-import { getGoogleCredentials } from '@/lib/google-credentials'
+import { loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 const splitSqlStatements = (sql: string) =>
   sql
@@ -13,28 +13,19 @@ const splitSqlStatements = (sql: string) =>
     .filter(Boolean)
 
 const getProjectId = () => {
-  const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT
-
-  if (!projectId) {
-    throw new Error('Missing GCP_PROJECT environment variable')
-  }
-
-  return projectId
+  return process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
 }
 
 const main = async () => {
+  loadGreenhouseToolEnv()
+
   const projectId = getProjectId()
   const location = process.env.GREENHOUSE_BIGQUERY_LOCATION?.trim() || 'US'
   const sqlPath = path.resolve(process.cwd(), 'scripts/setup-bigquery-source-sync.sql')
   const sql = await readFile(sqlPath, 'utf8')
   const renderedSql = sql.replaceAll('__PROJECT_ID__', projectId).replaceAll('__LOCATION__', location)
   const statements = splitSqlStatements(renderedSql)
-  const credentials = getGoogleCredentials()
-
-  const bigQuery = new BigQuery({
-    projectId,
-    ...(credentials ? { credentials } : {})
-  })
+  const bigQuery = new BigQuery({ projectId })
 
   for (const statement of statements) {
     await bigQuery.query({

@@ -6,7 +6,7 @@ const main = async () => {
   await runPostgresSqlFile({
     sqlPath: 'scripts/setup-postgres-source-sync.sql',
     successMessage: 'Applied PostgreSQL source sync foundation for Greenhouse',
-    profile: 'migrator'
+    profile: 'admin'
   })
 }
 

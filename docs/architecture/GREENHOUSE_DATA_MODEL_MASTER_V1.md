@@ -163,6 +163,8 @@ Core rule:
 - `HubSpot Company` maps to one `Greenhouse Client/Tenant`
 - `HubSpot Contact` must map to one `Greenhouse User` and ideally one `Identity Profile`
 - company-contact membership is commercial context, not a replacement for tenant membership
+- only companies that are already client companies for Greenhouse belong in the operational Greenhouse graph
+- associated contacts inherit that same boundary; non-client companies and their contacts may exist in raw or conformed, but not as tenant runtime truth
 
 ### `greenhouse_delivery`
 
@@ -343,6 +345,10 @@ Canonical business meaning:
 Required relationship:
 - `hubspot_company_id -> greenhouse_core.clients.hubspot_company_id`
 
+Admission rule:
+- a HubSpot company only enters the Greenhouse runtime graph when it is already part of the Greenhouse client universe
+- raw and conformed can keep broader CRM history, but `greenhouse_core` and client-facing runtime projections must stay restricted to client companies
+
 ## CRM Contact
 
 Target operational anchor:
@@ -358,6 +364,7 @@ Required relationships:
 
 Non-negotiable rule:
 - HubSpot contacts must be part of the Greenhouse model because user identity and tenant membership are reconciled against them
+- only contacts associated with client companies should project into the Greenhouse runtime graph
 
 ## Delivery Workspace
 

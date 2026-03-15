@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
   project_record_id TEXT PRIMARY KEY,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
+  project_database_source_id TEXT,
   notion_project_id TEXT NOT NULL UNIQUE,
   project_name TEXT NOT NULL,
   project_status TEXT,
@@ -119,6 +120,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
 CREATE TABLE IF NOT EXISTS greenhouse_delivery.sprints (
   sprint_record_id TEXT PRIMARY KEY,
   project_record_id TEXT REFERENCES greenhouse_delivery.projects(project_record_id) ON DELETE SET NULL,
+  project_database_source_id TEXT,
   notion_sprint_id TEXT NOT NULL UNIQUE,
   sprint_name TEXT NOT NULL,
   sprint_status TEXT,
@@ -140,6 +142,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   assignee_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
+  project_database_source_id TEXT,
   notion_task_id TEXT NOT NULL UNIQUE,
   notion_project_id TEXT,
   notion_sprint_id TEXT,
@@ -158,6 +161,47 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+GRANT USAGE ON SCHEMA greenhouse_crm TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_crm TO greenhouse_migrator;
+GRANT USAGE ON SCHEMA greenhouse_delivery TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_delivery TO greenhouse_migrator;
+GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_runtime;
+GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_migrator;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_crm TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_crm TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_delivery TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_delivery TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_migrator;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_crm
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_delivery
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_crm
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_delivery
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
+
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
 
 CREATE INDEX IF NOT EXISTS source_sync_runs_source_idx
   ON greenhouse_sync.source_sync_runs (source_system, source_object_type, started_at DESC);
@@ -192,14 +236,23 @@ CREATE INDEX IF NOT EXISTS crm_deals_module_idx
 CREATE INDEX IF NOT EXISTS delivery_projects_client_idx
   ON greenhouse_delivery.projects (client_id);
 
+CREATE INDEX IF NOT EXISTS delivery_projects_database_source_idx
+  ON greenhouse_delivery.projects (project_database_source_id);
+
 CREATE INDEX IF NOT EXISTS delivery_projects_module_idx
   ON greenhouse_delivery.projects (module_id);
 
 CREATE INDEX IF NOT EXISTS delivery_sprints_project_idx
   ON greenhouse_delivery.sprints (project_record_id);
 
+CREATE INDEX IF NOT EXISTS delivery_sprints_database_source_idx
+  ON greenhouse_delivery.sprints (project_database_source_id);
+
 CREATE INDEX IF NOT EXISTS delivery_tasks_project_idx
   ON greenhouse_delivery.tasks (project_record_id);
+
+CREATE INDEX IF NOT EXISTS delivery_tasks_database_source_idx
+  ON greenhouse_delivery.tasks (project_database_source_id);
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_sprint_idx
   ON greenhouse_delivery.tasks (sprint_record_id);
@@ -212,20 +265,3 @@ CREATE INDEX IF NOT EXISTS delivery_tasks_module_idx
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_assignee_idx
   ON greenhouse_delivery.tasks (assignee_member_id);
-
-GRANT USAGE ON SCHEMA greenhouse_crm TO greenhouse_app;
-GRANT USAGE ON SCHEMA greenhouse_delivery TO greenhouse_app;
-GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_app;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_crm TO greenhouse_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_delivery TO greenhouse_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_app;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_crm
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_delivery
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;

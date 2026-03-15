@@ -3,6 +3,36 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Data model master and source-sync runtime seed
+- Se agregó la fuente de verdad del modelo de datos actual en:
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- Se agregó la guía operativa para evolucionar ese documento en:
+  - `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
+- `AGENTS.md` y `docs/README.md` ya apuntan a ambos documentos cuando el trabajo toca modelado de datos, source sync, PostgreSQL o BigQuery.
+- `Source Sync Runtime Projections` quedó ejecutado con datos reales:
+  - BigQuery conformed:
+    - `delivery_projects = 59`
+    - `delivery_sprints = 13`
+    - `delivery_tasks = 1173`
+    - `crm_companies = 628`
+    - `crm_deals = 178`
+  - PostgreSQL runtime projections:
+    - `greenhouse_delivery.projects = 59`
+    - `greenhouse_delivery.sprints = 13`
+    - `greenhouse_delivery.tasks = 1173`
+    - `greenhouse_crm.companies = 9`
+    - `greenhouse_crm.deals = 25`
+- Regla 360 explicitada y ya aplicada al runtime:
+  - `HubSpot Company` solo entra a `greenhouse_crm` si ya pertenece al universo de clientes Greenhouse
+  - `raw` y `conformed` pueden conservar universo fuente completo
+  - `greenhouse_crm` runtime mantiene solo companias cliente y sus relaciones comerciales relevantes
+- `HubSpot Contacts` quedó declarado como slice obligatorio siguiente del modelo:
+  - `HubSpot Contact -> client_user / identity_profile`
+  - solo contactos asociados a companias cliente deben entrar al runtime Greenhouse
+- Delivery quedó modelado con soporte explícito para:
+  - `project_database_source_id`
+  - binding tenant-level futuro del workspace de delivery en Notion
+
 ## Delta 2026-03-15 PostgreSQL access model and tooling
 - Se formalizó la capa de acceso escalable a Cloud SQL en:
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`

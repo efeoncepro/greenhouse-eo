@@ -92,6 +92,7 @@ Construir jobs o runners para:
 - `greenhouse_raw.notion_sprints_snapshots`
 - `greenhouse_raw.hubspot_companies_snapshots`
 - `greenhouse_raw.hubspot_deals_snapshots`
+- `greenhouse_raw.hubspot_contacts_snapshots`
 
 Fase pragmatica permitida:
 - seed inicial desde datasets legacy `notion_ops.*` y `hubspot_crm.*` si eso acelera la puesta en marcha
@@ -105,6 +106,7 @@ Construir la carga actualizada de:
 - `greenhouse_conformed.delivery_sprints`
 - `greenhouse_conformed.crm_companies`
 - `greenhouse_conformed.crm_deals`
+- `greenhouse_conformed.crm_contacts`
 
 ### 4. Proyectar a PostgreSQL
 
@@ -114,6 +116,17 @@ Publicar el subset runtime-critico en:
 - `greenhouse_delivery.sprints`
 - `greenhouse_crm.companies`
 - `greenhouse_crm.deals`
+- `greenhouse_crm.contacts`
+
+Relaciones obligatorias:
+- `HubSpot Company -> Greenhouse Client/Tenant`
+- `HubSpot Contact -> Greenhouse User / Identity Profile`
+- `Notion project database -> tenant delivery workspace`
+
+Boundary obligatoria:
+- `raw` y `conformed` pueden conservar el universo CRM completo
+- `greenhouse_crm` runtime solo debe proyectar companias que ya pertenecen al universo de clientes Greenhouse
+- sus contactos asociados heredan esa misma frontera de tenant
 
 ### 5. Dejar listo el consumo por modulos
 
@@ -172,6 +185,7 @@ Puede avanzar en paralelo con ambas porque su output es una capa de datos y no d
 - raw contiene snapshots con metadata de ingesta
 - conformed devuelve filas consistentes y sin depender de queries manuales ad hoc
 - PostgreSQL contiene proyecciones runtime utilizables
+- la relacion `HubSpot Contact -> client_user / identity_profile` queda modelada o explicitamente abierta con contrato documentado
 
 ### Operacion
 

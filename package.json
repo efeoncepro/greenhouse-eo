@@ -17,6 +17,7 @@
     "backfill:postgres:finance": "tsx scripts/backfill-postgres-finance.ts",
     "backfill:postgres:canonical-360": "tsx scripts/backfill-postgres-canonical-360.ts",
     "pg:doctor": "tsx scripts/pg-doctor.ts",
+    "sync:source-runtime-projections": "tsx scripts/sync-source-runtime-projections.ts",
     "setup:bigquery:source-sync": "tsx scripts/setup-bigquery-source-sync.ts",
     "setup:postgres:access": "tsx scripts/setup-postgres-access.ts",
     "setup:postgres:canonical-360": "tsx scripts/setup-postgres-canonical-360.ts",

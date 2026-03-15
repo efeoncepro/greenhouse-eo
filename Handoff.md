@@ -40,6 +40,106 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 18:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar el primer seed real de `Source Sync Runtime Projections`, ajustar el modelado 360 de delivery/CRM y dejar un documento maestro del modelo de datos para agentes.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
+
+### Archivos tocados
+- `scripts/setup-postgres-access.sql`
+- `scripts/setup-postgres-source-sync.sql`
+- `scripts/setup-postgres-source-sync.ts`
+- `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-bigquery-source-sync.ts`
+- `scripts/sync-source-runtime-projections.ts`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `docs/README.md`
+- `AGENTS.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se creó `GREENHOUSE_DATA_MODEL_MASTER_V1.md` como snapshot maestro del modelo de datos Greenhouse.
+- Se creó `GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md` para definir cómo los agentes deben evolucionar el master doc.
+- Se ejecutó `Source Sync Runtime Projections` con datos reales desde datasets legacy hacia:
+  - `greenhouse_raw`
+  - `greenhouse_conformed`
+  - `greenhouse_delivery`
+  - `greenhouse_crm`
+- Se agregó soporte explícito a `project_database_source_id` en:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.tasks`
+  - `greenhouse_delivery.sprints`
+- El seed delivery usa el bridge práctico actual `greenhouse.clients.notion_project_ids`, pero ya deja modelado el binding target por database de Notion.
+- Se corrigieron errores reales del runner:
+  - grants faltantes en `greenhouse_sync`
+  - setup BigQuery demasiado rígido con `GCP_PROJECT`
+  - inserts inválidos de `JSON` hacia BigQuery
+  - normalización de `DATE` y `TIMESTAMP`
+  - columnas faltantes en `greenhouse_conformed.crm_deals`
+  - placeholder mismatch en inserts PostgreSQL
+- Regla CRM corregida en runtime:
+  - `raw` y `conformed` mantienen universo HubSpot completo
+  - `greenhouse_crm` solo proyecta companias que ya pertenecen al universo de clientes Greenhouse
+  - resultado actual en PostgreSQL:
+    - `greenhouse_crm.companies = 9`
+    - `greenhouse_crm.deals = 25`
+- Se dejó explícito en el modelo que `HubSpot Contacts` son obligatorios para el 360:
+  - `HubSpot Contact -> client_user / identity_profile`
+  - solo contactos asociados a companias cliente deben entrar al runtime
+
+### Verificación
+- `pnpm exec eslint scripts/sync-source-runtime-projections.ts scripts/setup-postgres-source-sync.ts scripts/setup-bigquery-source-sync.ts scripts/setup-postgres-access.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-access.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-bigquery-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/sync-source-runtime-projections.ts`
+  - correcto
+- Conteos verificados en PostgreSQL:
+  - `greenhouse_delivery.projects = 59`
+  - `greenhouse_delivery.sprints = 13`
+  - `greenhouse_delivery.tasks = 1173`
+  - `greenhouse_crm.companies = 9`
+  - `greenhouse_crm.deals = 25`
+- Conteos verificados en BigQuery conformed:
+  - `delivery_projects = 59`
+  - `delivery_sprints = 13`
+  - `delivery_tasks = 1173`
+  - `crm_companies = 628`
+  - `crm_deals = 178`
+- Control plane verificado:
+  - `notion` tiene runs `succeeded`
+  - `hubspot` tiene runs `succeeded`
+  - watermarks activos en `greenhouse_sync.source_sync_watermarks`
+
+### Riesgos o pendientes
+- `HubSpot Contacts` aun no estan materializados en `greenhouse_conformed` ni `greenhouse_crm`; quedaron declarados como slice obligatorio siguiente.
+- El binding tenant-level definitivo para delivery aun no existe como objeto canonico separado; hoy el seed usa:
+  - `_source_database_id` como contexto de workspace
+  - `greenhouse.clients.notion_project_ids` como bridge practico actual
+- El runner ya funciona, pero sigue siendo secuencial para PostgreSQL; si crece mucho el volumen, conviene batch upsert.
+
 ## 2026-03-15 16:35 America/Santiago
 
 ### Agente

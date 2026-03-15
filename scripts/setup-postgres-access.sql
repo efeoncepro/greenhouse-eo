@@ -43,7 +43,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO 
 
 GRANT USAGE ON SCHEMA greenhouse_core TO greenhouse_migrator;
 GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_migrator;
-GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_migrator;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_sync TO greenhouse_migrator;
 
 GRANT SELECT, REFERENCES ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_migrator;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_migrator;

@@ -31,6 +31,9 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el trabajo nace de una `CODEX_TASK_*`, revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
+  - revisar `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - revisar `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
 - Si el cambio toca PostgreSQL, Cloud SQL, backfills, source sync o migraciones runtime:
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
