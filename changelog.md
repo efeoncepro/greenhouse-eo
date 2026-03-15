@@ -6,6 +6,11 @@
 
 ## 2026-03-15
 
+### HR leave request creation type fix in PostgreSQL
+- Se corrigió la creación de solicitudes en `HR > Permisos` sobre PostgreSQL.
+- El write de `leave_balances` usaba el parámetro `year` como `text` dentro del `INSERT ... SELECT`, lo que rompía `POST /api/hr/core/leave/requests`.
+- `src/lib/hr-core/postgres-leave-store.ts` ahora fuerza el placeholder como entero en el `balance_id` y en la columna `year`, evitando el error `column "year" is of type integer but expression is of type text`.
+
 ### External source sync architecture for Notion and HubSpot
 - Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para definir el blueprint de ingestión, backup, normalización y serving de datos externos.
 - Greenhouse formaliza que:

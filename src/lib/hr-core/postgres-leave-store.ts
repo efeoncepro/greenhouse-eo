@@ -453,10 +453,10 @@ const ensureYearBalances = async ({
         updated_by_user_id
       )
       SELECT
-        $1 || '-' || $2::text || '-' || lt.leave_type_code,
+        $1 || '-' || ($2::integer)::text || '-' || lt.leave_type_code,
         $1,
         lt.leave_type_code,
-        $2,
+        $2::integer,
         COALESCE(lt.default_annual_allowance_days, 0),
         0,
         0,

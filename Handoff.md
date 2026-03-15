@@ -40,6 +40,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:15 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el error vivo al crear solicitudes en `HR > Permisos` después de que la vista ya había quedado operativa.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / `pre-greenhouse`
+
+### Archivos tocados
+- `src/lib/hr-core/postgres-leave-store.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se inspeccionaron logs reales de `POST /api/hr/core/leave/requests` en `pre-greenhouse`.
+- La causa exacta fue un error PostgreSQL:
+  - `column "year" is of type integer but expression is of type text`
+- El bug estaba en el seed/upsert automático de `leave_balances` dentro de `ensureYearBalances()`:
+  - el mismo placeholder `$2` se usaba primero como texto para construir `balance_id`
+  - luego se reutilizaba para insertar en la columna `year`
+- Se corrigió tipando explícitamente el placeholder como entero en ambos usos:
+  - `($2::integer)::text` para el `balance_id`
+  - `$2::integer` para la columna `year`
+
+### Verificación
+- `pnpm exec eslint src/lib/hr-core/postgres-leave-store.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- Logs de Vercel:
+  - se confirmó el error exacto antes del fix en `POST /api/hr/core/leave/requests`
+
+### Riesgos o pendientes
+- Falta smoke autenticado después del deploy para confirmar que la solicitud ya se crea y aparece en la tabla.
+- Sigue existiendo un archivo no trackeado fuera de este lote:
+  - `docs/architecture/POSTGRESQL_ADVANCED_PATTERNS.md`
+
 ## 2026-03-15 05:08 America/Santiago
 
 ### Agente
