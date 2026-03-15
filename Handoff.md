@@ -40,6 +40,58 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 09:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Empezar el corte de consumers legacy hacia capas canónicas sin romper el provisioning live de HubSpot -> Greenhouse.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `src/app/api/finance/clients/route.ts`
+- `src/app/api/finance/clients/[id]/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `Finance > Clients` ahora usa patrón `canonical first + live fallback`.
+- `GET /api/finance/clients`:
+  - prioriza `greenhouse_conformed.crm_companies`
+  - deriva módulos desde `greenhouse.client_service_modules`
+  - mantiene fallback a `hubspot_crm.companies` para clientes recién promovidos aún no proyectados
+- `GET /api/finance/clients/[id]`:
+  - prioriza `greenhouse_conformed.crm_companies`
+  - deriva módulos desde `greenhouse.client_service_modules`
+  - prioriza `greenhouse_conformed.crm_deals`
+  - mantiene fallback a `hubspot_crm.companies` y `hubspot_crm.deals` cuando la proyección todavía no alcanzó el evento live
+- Regla explícita fijada para próximos cortes:
+  - no migrar consumers a `sync-only` cuando el dominio todavía depende de provisioning en tiempo real
+  - preferir `canonical first, live fallback`
+
+### Verificación
+- `pnpm exec eslint src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts'`
+  - correcto
+- `pnpm build`
+  - correcto
+- `git diff --check -- src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts'`
+  - correcto
+
+### Riesgos o pendientes
+- Este corte todavía usa `hubspot_crm.*` como compatibilidad; no es el estado final.
+- El siguiente consumer debe seguir el mismo criterio híbrido mientras exista provisioning live.
+- Próximo paso recomendado:
+  - seguir con consumers legacy que aún leen `hubspot_crm` / `notion_ops`, empezando por los de menor riesgo y mayor beneficio.
+
 ## 2026-03-16 ~02:00 America/Santiago
 
 ### Agente

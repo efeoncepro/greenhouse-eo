@@ -91,7 +91,10 @@ export async function GET(request: Request) {
         ON CAST(gc.hubspot_company_id AS STRING) = ${companyExpressions.idExpr}
     `
   } catch (error) {
-    console.error('Finance clients list: unable to load HubSpot companies metadata, falling back to greenhouse.clients only.', error)
+    console.error(
+      'Finance clients list: unable to load HubSpot companies metadata, falling back to projected/canonical data only.',
+      error
+    )
   }
 
   let filters = ''
@@ -145,23 +148,64 @@ export async function GET(request: Request) {
         ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, client_profile_id
       ) = 1
     ),
+    crm_company_by_client AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.crm_companies\`
+      WHERE client_id IS NOT NULL
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY client_id
+        ORDER BY updated_at DESC NULLS LAST, synced_at DESC NULLS LAST, company_source_id
+      ) = 1
+    ),
+    module_summary_by_client AS (
+      SELECT
+        csm.client_id,
+        STRING_AGG(
+          DISTINCT IF(sm.module_kind = 'business_line', sm.module_code, NULL),
+          ';' IGNORE NULLS
+          ORDER BY IF(sm.module_kind = 'business_line', sm.module_code, NULL)
+        ) AS business_lines_raw,
+        STRING_AGG(
+          DISTINCT IF(sm.module_kind = 'service_module', sm.module_code, NULL),
+          ';' IGNORE NULLS
+          ORDER BY IF(sm.module_kind = 'service_module', sm.module_code, NULL)
+        ) AS service_modules_raw
+      FROM \`${projectId}.greenhouse.client_service_modules\` csm
+      LEFT JOIN \`${projectId}.greenhouse.service_modules\` sm
+        ON sm.module_code = csm.module_code
+      WHERE csm.active = TRUE
+      GROUP BY csm.client_id
+    ),
     base_clients AS (
       SELECT
         gc.client_id,
         gc.client_name AS greenhouse_client_name,
         CAST(gc.hubspot_company_id AS STRING) AS hubspot_company_id,
-        COALESCE(fp_client.client_profile_id, fp_legacy.client_profile_id, fp_hubspot.client_profile_id, CAST(gc.client_id AS STRING), CAST(gc.hubspot_company_id AS STRING)) AS client_profile_id,
-        COALESCE(fp_client.legal_name, fp_legacy.legal_name, fp_hubspot.legal_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
+        COALESCE(
+          fp_client.client_profile_id,
+          fp_legacy.client_profile_id,
+          fp_hubspot.client_profile_id,
+          CAST(gc.client_id AS STRING),
+          CAST(gc.hubspot_company_id AS STRING)
+        ) AS client_profile_id,
+        COALESCE(fp_client.legal_name, fp_legacy.legal_name, fp_hubspot.legal_name, cc.legal_name, cc.company_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
         COALESCE(fp_client.tax_id, fp_legacy.tax_id, fp_hubspot.tax_id) AS tax_id,
         COALESCE(fp_client.payment_terms_days, fp_legacy.payment_terms_days, fp_hubspot.payment_terms_days, 30) AS payment_terms_days,
         COALESCE(fp_client.payment_currency, fp_legacy.payment_currency, fp_hubspot.payment_currency, 'CLP') AS payment_currency,
         COALESCE(fp_client.requires_po, fp_legacy.requires_po, fp_hubspot.requires_po, FALSE) AS requires_po,
         COALESCE(fp_client.requires_hes, fp_legacy.requires_hes, fp_hubspot.requires_hes, FALSE) AS requires_hes,
-        ${companyExpressions.nameExpr} AS company_name,
-        ${companyExpressions.domainExpr} AS company_domain,
-        ${companyExpressions.countryExpr} AS company_country,
-        ${companyExpressions.businessLineExpr} AS business_line,
-        ${companyExpressions.servicesExpr} AS service_modules_raw,
+        COALESCE(cc.company_name, ${companyExpressions.nameExpr}) AS company_name,
+        COALESCE(
+          NULLIF(REGEXP_EXTRACT(COALESCE(cc.website_url, ''), r'^(?:https?://)?(?:www\\.)?([^/]+)'), ''),
+          ${companyExpressions.domainExpr}
+        ) AS company_domain,
+        COALESCE(cc.country_code, ${companyExpressions.countryExpr}) AS company_country,
+        COALESCE(
+          SPLIT(COALESCE(ms.business_lines_raw, ''), ';')[SAFE_OFFSET(0)],
+          ${companyExpressions.businessLineExpr}
+        ) AS business_line,
+        COALESCE(ms.service_modules_raw, ${companyExpressions.servicesExpr}) AS service_modules_raw,
         COALESCE(fp_client.created_at, fp_legacy.created_at, fp_hubspot.created_at) AS created_at,
         COALESCE(fp_client.updated_at, fp_legacy.updated_at, fp_hubspot.updated_at) AS updated_at
       FROM \`${projectId}.greenhouse.clients\` gc
@@ -171,9 +215,13 @@ export async function GET(request: Request) {
         ON fp_legacy.client_profile_id = gc.client_id
       LEFT JOIN profile_by_hubspot fp_hubspot
         ON fp_hubspot.hubspot_company_id = CAST(gc.hubspot_company_id AS STRING)
+      LEFT JOIN crm_company_by_client cc
+        ON cc.client_id = gc.client_id
+      LEFT JOIN module_summary_by_client ms
+        ON ms.client_id = gc.client_id
       ${hubspotCompaniesJoin}
       WHERE gc.active = TRUE
-        AND ${companyExpressions.archivedFilter}
+        AND (cc.company_source_id IS NOT NULL OR ${companyExpressions.archivedFilter})
     )
   `
 

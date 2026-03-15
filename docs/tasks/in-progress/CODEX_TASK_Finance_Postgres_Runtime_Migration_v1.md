@@ -148,6 +148,35 @@ Script `scripts/backfill-postgres-finance-slice2.ts` escrito pero **NO ejecutado
 ### Commit
 
 - `8375edb` en `fix/codex-operational-finance` — pushed to origin
+
+## Delta 2026-03-15 Consumers hybridizados para no romper provisioning live
+
+Primer corte de consumers legacy ejecutado sobre `Finance > Clients`.
+
+### Rutas ajustadas
+
+- `GET /api/finance/clients`
+- `GET /api/finance/clients/[id]`
+
+### Patrón aplicado
+
+- `canonical first`
+  - `greenhouse_conformed.crm_companies`
+  - `greenhouse_conformed.crm_deals`
+  - `greenhouse.client_service_modules`
+- `live fallback`
+  - `hubspot_crm.companies`
+  - `hubspot_crm.deals`
+
+### Motivo
+
+- El flujo `HubSpot -> Greenhouse` sigue promoviendo clientes en tiempo real cuando una empresa cambia de estado.
+- Cortar estos consumers a `projection only` habría introducido desfase visible hasta que corriera el sync.
+
+### Regla operativa derivada para el resto de Finance
+
+- Mientras exista provisioning live, los consumers deben migrarse en modo híbrido.
+- `sync-only` solo es válido cuando el dominio ya no depende de visibilidad en tiempo real.
 - Archivos: 10 (1 nuevo + 9 modificados)
 
 ## Por que esta lane existe ahora

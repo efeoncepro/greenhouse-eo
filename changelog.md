@@ -26,6 +26,15 @@
 
 ## 2026-03-15
 
+### Finance clients consumers now read canonical CRM first with live fallback
+- `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya no dependen solo de `hubspot_crm.*` live.
+- Ambos consumers ahora priorizan:
+  - `greenhouse_conformed.crm_companies`
+  - `greenhouse_conformed.crm_deals`
+  - `greenhouse.client_service_modules`
+- Se mantuvo fallback a `hubspot_crm.companies` y `hubspot_crm.deals` cuando la proyección todavía no alcanzó el evento live.
+- Esto evita romper el flujo donde HubSpot promociona una empresa a cliente y Greenhouse la crea en tiempo real antes de que corra el sync.
+
 ### HubSpot contacts + owners now project into the canonical runtime graph
 - `Source Sync Runtime Projections` ya materializa:
   - `greenhouse_conformed.crm_contacts`

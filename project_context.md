@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Finance clients consumers migrated to canonical-first, live-compatible reads
+- `Finance > Clients` ya no depende solo de `hubspot_crm.*` live para listar y detallar clientes.
+- Las rutas:
+  - `GET /api/finance/clients`
+  - `GET /api/finance/clients/[id]`
+  ahora usan patrón `canonical first + live fallback`.
+- Fuente primaria nueva:
+  - `greenhouse_conformed.crm_companies`
+  - `greenhouse_conformed.crm_deals`
+  - `greenhouse.client_service_modules`
+- Compatibilidad conservada:
+  - si una compañía o deal todavía no alcanzó a proyectarse por `Source Sync Runtime Projections`, el consumer cae a `hubspot_crm.companies` / `hubspot_crm.deals`
+  - esto protege el flujo live donde HubSpot promociona un lead/empresa a cliente y Greenhouse lo crea en tiempo real
+- Regla operativa derivada:
+  - no cortar consumers a sync-only cuando el dominio todavía depende de provisioning live
+  - el patrón correcto de transición es `canonical first, live fallback`, no `raw only` ni `projection only`
+
 ## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
 - `Source Sync Runtime Projections` ya materializa contactos CRM en:
   - `greenhouse_conformed.crm_contacts`
