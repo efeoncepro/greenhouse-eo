@@ -216,3 +216,31 @@ Si Claude toma esta lane:
 - debe asumir `PostgreSQL` como store objetivo del modulo
 - debe mantener payloads API estables
 - cualquier gap de source sync se resuelve con compat layer temporal, no frenando el corte operativo
+
+## Asignacion activa
+
+### Agente: Claude
+### Fecha: 2026-03-15
+### Rama: `fix/codex-operational-finance`
+
+### Alineacion 360
+
+Esta migracion adapta el schema al modelo canonico 360 (`GREENHOUSE_360_OBJECT_MODEL_V1.md`, `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`):
+
+- Schema: `greenhouse_payroll` (extension domain, no `greenhouse_core`)
+- `member_id` → FK a `greenhouse_core.members(member_id)` (ancla canonica del colaborador)
+- `created_by_user_id`, `calculated_by_user_id`, `approved_by_user_id` → FK a `greenhouse_core.client_users(user_id)`
+- Snapshot fields permitidos: `member_display_name` en entries (para exports/historial)
+- Outbox: writes publican a `greenhouse_sync.outbox_events`
+- Serving view: `greenhouse_serving.member_payroll_360`
+- Patron replicado de: `greenhouse_hr` (Leave) — `setup-postgres-hr-leave.sql` + `postgres-leave-store.ts`
+- No se crea identidad paralela de colaborador
+- No se mueven KPIs analiticos pesados a request-time en PostgreSQL
+
+### Plan de implementacion
+
+1. `scripts/setup-postgres-payroll.sql` — DDL + seed + grants
+2. `src/lib/payroll/postgres-store.ts` — repository layer con assertReady, typed rows, mappers, outbox
+3. Migrar APIs existentes a Postgres-first con fallback BQ temporal
+4. Agregar `greenhouse_serving.member_payroll_360` view
+5. TypeScript check y validacion runtime

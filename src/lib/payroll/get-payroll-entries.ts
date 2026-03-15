@@ -15,6 +15,13 @@ import {
   toNumber,
   toTimestampString
 } from '@/lib/payroll/shared'
+import {
+  isPayrollPostgresEnabled,
+  pgGetPayrollEntries,
+  pgGetPayrollEntryById,
+  pgGetMemberPayrollEntries,
+  pgGetPayrollMemberSummary
+} from '@/lib/payroll/postgres-store'
 
 type PayrollEntryRow = {
   entry_id: string | null
@@ -169,6 +176,10 @@ const buildBaseEntryQuery = (projectId: string) => `
 `
 
 export const getPayrollEntries = async (periodId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetPayrollEntries(periodId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
   const baseEntryQuery = buildBaseEntryQuery(projectId)
@@ -186,6 +197,10 @@ export const getPayrollEntries = async (periodId: string) => {
 }
 
 export const getPayrollEntryById = async (entryId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetPayrollEntryById(entryId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
   const baseEntryQuery = buildBaseEntryQuery(projectId)
@@ -203,6 +218,23 @@ export const getPayrollEntryById = async (entryId: string) => {
 }
 
 export const getMemberPayrollHistory = async (memberId: string): Promise<MemberPayrollHistory> => {
+  if (isPayrollPostgresEnabled()) {
+    const member = await pgGetPayrollMemberSummary(memberId)
+
+    if (!member) {
+      throw new PayrollValidationError('Payroll member not found.', 404)
+    }
+
+    const entries = await pgGetMemberPayrollEntries(memberId)
+
+    return {
+      memberId,
+      member,
+      entries,
+      compensationHistory: await getCompensationHistoryByMember(memberId)
+    }
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
   const baseEntryQuery = buildBaseEntryQuery(projectId)

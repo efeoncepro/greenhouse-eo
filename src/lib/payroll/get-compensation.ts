@@ -24,6 +24,15 @@ import {
   toTimestampString
 } from '@/lib/payroll/shared'
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  isPayrollPostgresEnabled,
+  pgGetCurrentCompensation,
+  pgGetCompensationHistoryByMember,
+  pgGetCompensationVersionById,
+  pgGetApplicableCompensationVersionsForPeriod,
+  pgCreateCompensationVersion,
+  pgGetCompensationOverview
+} from '@/lib/payroll/postgres-store'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
@@ -188,6 +197,10 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
 }
 
 export const getCurrentCompensation = async () => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCurrentCompensation()
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -277,6 +290,10 @@ const mergeCurrentCompensationIntoMembers = ({
 }
 
 export const getCompensationOverview = async (): Promise<PayrollCompensationOverview> => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationOverview()
+  }
+
   const [compensationsResult, membersResult] = await Promise.allSettled([
     getCurrentCompensation(),
     listPayrollCompensationMembers()
@@ -313,6 +330,10 @@ export const getCompensationOverview = async (): Promise<PayrollCompensationOver
 }
 
 export const getCompensationHistoryByMember = async (memberId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationHistoryByMember(memberId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -337,6 +358,10 @@ export const getCompensationHistoryByMember = async (memberId: string) => {
 }
 
 export const getCompensationVersionById = async (versionId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationVersionById(versionId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -361,6 +386,10 @@ export const getCompensationVersionById = async (versionId: string) => {
 }
 
 export const getApplicableCompensationVersionsForPeriod = async (periodStart: string, periodEnd: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetApplicableCompensationVersionsForPeriod(periodStart, periodEnd)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -432,6 +461,17 @@ export const createCompensationVersion = async ({
   input: CreateCompensationVersionInput
   actorEmail: string | null
 }) => {
+  if (isPayrollPostgresEnabled()) {
+    const versionId = await pgCreateCompensationVersion({ input, actorEmail })
+    const [created] = await pgGetCompensationHistoryByMember(input.memberId)
+
+    if (!created) {
+      throw new PayrollValidationError('Unable to read newly created compensation version.', 500)
+    }
+
+    return created
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 

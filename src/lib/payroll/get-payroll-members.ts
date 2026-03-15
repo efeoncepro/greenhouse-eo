@@ -5,6 +5,11 @@ import type { PayrollCompensationMember, PayrollCurrency, PayrollMemberSummary, 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { normalizeBoolean, normalizeNullableString, runPayrollQuery, toDateString, toNumber } from '@/lib/payroll/shared'
+import {
+  isPayrollPostgresEnabled,
+  pgGetPayrollMemberSummary,
+  pgListPayrollCompensationMembers
+} from '@/lib/payroll/postgres-store'
 
 type PayrollMemberRow = {
   member_id: string | null
@@ -67,6 +72,10 @@ const normalizeCompensationMember = (row: PayrollCompensationMemberRow): Payroll
 }
 
 export const getPayrollMemberSummary = async (memberId: string): Promise<PayrollMemberSummary | null> => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetPayrollMemberSummary(memberId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -90,6 +99,10 @@ export const getPayrollMemberSummary = async (memberId: string): Promise<Payroll
 }
 
 export const listPayrollCompensationMembers = async (): Promise<PayrollCompensationMember[]> => {
+  if (isPayrollPostgresEnabled()) {
+    return pgListPayrollCompensationMembers()
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 

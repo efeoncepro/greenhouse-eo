@@ -16,6 +16,11 @@ import {
   runPayrollQuery,
   toNumber
 } from '@/lib/payroll/shared'
+import {
+  isPayrollPostgresEnabled,
+  pgGetActiveBonusConfig,
+  pgSetPeriodCalculated
+} from '@/lib/payroll/postgres-store'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -25,6 +30,15 @@ type BonusConfigRow = {
 const getProjectId = () => getBigQueryProjectId()
 
 const getBonusConfigForDate = async (periodEnd: string) => {
+  if (isPayrollPostgresEnabled()) {
+    const config = await pgGetActiveBonusConfig()
+
+    return {
+      otdThreshold: config?.otdThreshold ?? 89,
+      rpaThreshold: config?.rpaThreshold ?? 2
+    }
+  }
+
   const projectId = getProjectId()
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
@@ -200,20 +214,24 @@ export const calculatePayroll = async ({
     entries.push(entry)
   }
 
-  await runPayrollQuery(
-    `
-      UPDATE \`${projectId}.greenhouse.payroll_periods\`
-      SET
-        status = 'calculated',
-        calculated_at = CURRENT_TIMESTAMP(),
-        calculated_by = @actorIdentifier
-      WHERE period_id = @periodId
-    `,
-    {
-      periodId,
-      actorIdentifier
-    }
-  )
+  if (isPayrollPostgresEnabled()) {
+    await pgSetPeriodCalculated(periodId, actorIdentifier)
+  } else {
+    await runPayrollQuery(
+      `
+        UPDATE \`${projectId}.greenhouse.payroll_periods\`
+        SET
+          status = 'calculated',
+          calculated_at = CURRENT_TIMESTAMP(),
+          calculated_by = @actorIdentifier
+        WHERE period_id = @periodId
+      `,
+      {
+        periodId,
+        actorIdentifier
+      }
+    )
+  }
 
   const updatedPeriod = await getPayrollPeriod(periodId)
 

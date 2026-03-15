@@ -5,6 +5,7 @@ import type { PayrollEntry } from '@/types/payroll'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { buildPayrollQueryTypes, runPayrollQuery } from '@/lib/payroll/shared'
+import { isPayrollPostgresEnabled, pgUpsertPayrollEntry } from '@/lib/payroll/postgres-store'
 
 const getProjectId = () => getBigQueryProjectId()
 
@@ -31,6 +32,10 @@ const PAYROLL_ENTRY_MUTATION_TYPES = {
 } as const
 
 export const upsertPayrollEntry = async (entry: PayrollEntry) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgUpsertPayrollEntry(entry)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
   const entryParams = entry as unknown as Record<string, unknown>

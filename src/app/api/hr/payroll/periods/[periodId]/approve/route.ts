@@ -10,6 +10,7 @@ import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, runPayrollQuery } from '@/lib/payroll/shared'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
+import { isPayrollPostgresEnabled, pgSetPeriodApproved } from '@/lib/payroll/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,21 +59,26 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     }
 
     const session = await getServerSession(authOptions)
+    const actorIdentifier = session?.user?.email || tenant.userId
 
-    await runPayrollQuery(
-      `
-        UPDATE \`${projectId}.greenhouse.payroll_periods\`
-        SET
-          status = 'approved',
-          approved_at = CURRENT_TIMESTAMP(),
-          approved_by = @actorIdentifier
-        WHERE period_id = @periodId
-      `,
-      {
-        periodId,
-        actorIdentifier: session?.user?.email || tenant.userId
-      }
-    )
+    if (isPayrollPostgresEnabled()) {
+      await pgSetPeriodApproved(periodId, actorIdentifier)
+    } else {
+      await runPayrollQuery(
+        `
+          UPDATE \`${projectId}.greenhouse.payroll_periods\`
+          SET
+            status = 'approved',
+            approved_at = CURRENT_TIMESTAMP(),
+            approved_by = @actorIdentifier
+          WHERE period_id = @periodId
+        `,
+        {
+          periodId,
+          actorIdentifier
+        }
+      )
+    }
 
     const updated = await getPayrollPeriod(periodId)
 

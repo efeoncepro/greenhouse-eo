@@ -40,6 +40,126 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 13:45 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Materializar el primer slice `Finance -> PostgreSQL` sin romper la alineacion 360 ni el bridge activo con `AI Tooling`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Cloud SQL `greenhouse-pg-dev`
+
+### Archivos tocados
+- `src/lib/providers/postgres.ts`
+- `src/lib/finance/postgres-store.ts`
+- `src/lib/finance/shared.ts`
+- `src/lib/finance/exchange-rates.ts`
+- `src/app/api/finance/accounts/route.ts`
+- `src/app/api/finance/accounts/[id]/route.ts`
+- `src/app/api/finance/exchange-rates/route.ts`
+- `src/app/api/finance/exchange-rates/latest/route.ts`
+- `src/app/api/finance/exchange-rates/sync/route.ts`
+- `src/app/api/finance/expenses/meta/route.ts`
+- `scripts/setup-postgres-finance.sql`
+- `scripts/setup-postgres-finance.ts`
+- `scripts/backfill-postgres-finance.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se materializo `greenhouse_finance` en Cloud SQL con:
+  - `accounts`
+  - `suppliers`
+  - `exchange_rates`
+- Se agrego la vista 360:
+  - `greenhouse_serving.provider_finance_360`
+- Se agrego el repository `src/lib/finance/postgres-store.ts`.
+- Runtime `Postgres first` ya activo para:
+  - `accounts`
+  - `exchange-rates`
+  - subset de cuentas en `expenses/meta`
+- `suppliers` se modelo y backfilleo en PostgreSQL, pero no se corto aun el runtime principal ahi para no romper `AI Tooling`, que todavia consume `greenhouse.fin_suppliers` en BigQuery.
+- Se corrigio el problema estructural de permisos en Cloud SQL:
+  - `greenhouse_app` no podia crear FKs hacia `greenhouse_core.client_users` / `providers`
+  - se otorgaron grants sobre `greenhouse_core`, `greenhouse_sync` y `greenhouse_serving`
+  - `setup-postgres-finance.sql` ya incorpora grants para no depender de fix manual en nuevos ambientes
+- Backfill ejecutado desde BigQuery:
+  - `accounts`: `1`
+  - `suppliers`: `2`
+  - `exchange_rates`: `0`
+- El backfill de suppliers tambien materializa providers canonicos `financial_vendor` en `greenhouse_core.providers`.
+
+### Verificación
+- `pnpm exec eslint src/lib/providers/postgres.ts src/lib/finance/postgres-store.ts src/lib/finance/shared.ts src/lib/finance/exchange-rates.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts src/app/api/finance/expenses/meta/route.ts scripts/setup-postgres-finance.ts scripts/backfill-postgres-finance.ts`
+  - correcto
+- `git diff --check -- ...` sobre el scope financiero tocado
+  - correcto
+- `pnpm build`
+  - correcto
+- Queries reales en Cloud SQL:
+  - `greenhouse_finance.accounts = 1`
+  - `greenhouse_finance.suppliers = 2`
+  - `greenhouse_finance.exchange_rates = 0`
+  - `greenhouse_serving.provider_finance_360 = 10`
+- Provisioning real ejecutado:
+  - `setup-postgres-finance` correcto
+  - `backfill-postgres-finance` correcto
+
+### Riesgos o pendientes
+- `suppliers` runtime sigue en BigQuery por dependencia viva con `AI Tooling`.
+- `exchange_rates` quedo con `0` filas por no existir snapshots previos en BigQuery; el path runtime igual se mantiene sano porque el sync diario/live ya persiste en el store operativo cuando se invoque.
+- El siguiente corte sano es:
+  - `suppliers` runtime a PostgreSQL una vez que `AI Tooling` quede desacoplado de `greenhouse.fin_suppliers`
+  - luego `income`, `expenses` y `reconciliation`
+
+## 2026-03-15 ~12:00 America/Santiago
+
+### Agente
+- Claude
+
+### Objetivo del turno
+- Tomar la lane `HR Payroll Postgres Runtime Migration v1` y ejecutar el corte operativo de Payroll desde BigQuery hacia PostgreSQL, alineado al modelo canonico 360.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / `pre-greenhouse`
+
+### Archivos tocados
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md` — registro de asignacion y plan 360
+- `scripts/setup-postgres-payroll.sql` — DDL schema `greenhouse_payroll`
+- `src/lib/payroll/postgres-store.ts` — repository layer PostgreSQL
+- `src/lib/payroll/get-compensation.ts` — migrado a Postgres-first
+- `src/lib/payroll/get-payroll-periods.ts` — migrado a Postgres-first
+- `src/lib/payroll/get-payroll-entries.ts` — migrado a Postgres-first
+- `src/lib/payroll/get-payroll-members.ts` — migrado a Postgres-first
+- `src/lib/payroll/persist-entry.ts` — migrado a Postgres-first
+- `Handoff.md`
+
+### Alineacion 360
+- Schema: `greenhouse_payroll` como domain extension
+- FKs canonicas: `member_id` → `greenhouse_core.members`, user IDs → `greenhouse_core.client_users`
+- Outbox events en `greenhouse_sync.outbox_events`
+- Serving view: `greenhouse_serving.member_payroll_360`
+- Patron replicado de `greenhouse_hr` (Leave)
+
+### Riesgos o pendientes
+- Schema `greenhouse_payroll` debe ser provisionado en Cloud SQL antes del deploy
+- Backfill de datos existentes de BigQuery a PostgreSQL pendiente (script separado)
+- KPIs de Notion (`kpi_otd_percent`, `kpi_rpa_avg`) siguen viniendo de source sync, no de PostgreSQL
+
+---
+
 ## 2026-03-15 05:58 America/Santiago
 
 ### Agente
