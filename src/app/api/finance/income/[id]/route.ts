@@ -200,12 +200,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     if (body.invoiceDate !== undefined) {
-      updates.push('invoice_date = @invoiceDate')
+      updates.push('invoice_date = IF(@invoiceDate = \'\', NULL, CAST(@invoiceDate AS DATE))')
       updateParams.invoiceDate = normalizeString(body.invoiceDate)
     }
 
     if (body.dueDate !== undefined) {
-      updates.push('due_date = @dueDate')
+      updates.push('due_date = IF(@dueDate = \'\', NULL, CAST(@dueDate AS DATE))')
       updateParams.dueDate = body.dueDate ? normalizeString(body.dueDate) : null
     }
 
