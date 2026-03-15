@@ -18,7 +18,6 @@ import {
 } from '@/lib/finance/shared'
 import {
   createFinanceAccountInPostgres,
-  listFinanceAccountsFromPostgres,
   shouldFallbackFromFinancePostgres
 } from '@/lib/finance/postgres-store'
 
@@ -156,34 +155,8 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  try {
-    const [accounts, balanceMap] = await Promise.all([
-      listFinanceAccountsFromPostgres(),
-      getCurrentBalanceMap()
-    ])
-
-    const items = accounts.map(account => {
-      const statement = balanceMap.statementMap.get(account.accountId)
-      const periodClose = balanceMap.periodMap.get(account.accountId)
-      const balance = statement || periodClose
-
-      return {
-        ...account,
-        currentBalance: balance?.currentBalance ?? account.openingBalance,
-        balanceAsOf: balance?.balanceAsOf ?? account.openingBalanceDate,
-        balanceSource: balance?.balanceSource ?? 'opening_balance'
-      }
-    })
-
-    return NextResponse.json({
-      items,
-      total: items.length
-    })
-  } catch (error) {
-    if (!shouldFallbackFromFinancePostgres(error)) {
-      throw error
-    }
-
+  // ── BigQuery read path (Postgres tables not yet backfilled) ──
+  {
     await ensureFinanceInfrastructure()
 
     const projectId = getFinanceProjectId()

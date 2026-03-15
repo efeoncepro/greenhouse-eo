@@ -18,8 +18,6 @@ import {
   type PaymentStatus,
   type ServiceLine
 } from '@/lib/finance/shared'
-import { getFinanceIncomeFromPostgres } from '@/lib/finance/postgres-store-slice2'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -113,20 +111,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const { id: incomeId } = await params
 
-  // ── Postgres-first path ──
-  try {
-    const income = await getFinanceIncomeFromPostgres(incomeId)
-
-    if (income) {
-      return NextResponse.json(income)
-    }
-  } catch (error) {
-    if (!shouldFallbackFromFinancePostgres(error)) {
-      throw error
-    }
-  }
-
-  // ── BigQuery fallback ──
+  // ── BigQuery read path (Postgres tables not yet backfilled) ──
   await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 

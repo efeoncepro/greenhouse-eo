@@ -14,7 +14,6 @@ import {
   toTimestampString
 } from '@/lib/finance/shared'
 import {
-  listFinanceExchangeRatesFromPostgres,
   shouldFallbackFromFinancePostgres,
   upsertFinanceExchangeRateInPostgres
 } from '@/lib/finance/postgres-store'
@@ -53,18 +52,8 @@ export async function GET(request: Request) {
   const fromDate = searchParams.get('fromDate')
   const toDate = searchParams.get('toDate')
 
-  try {
-    const items = await listFinanceExchangeRatesFromPostgres({ fromDate, toDate })
-
-    return NextResponse.json({
-      items,
-      total: items.length
-    })
-  } catch (error) {
-    if (!shouldFallbackFromFinancePostgres(error)) {
-      throw error
-    }
-
+  // ── BigQuery read path (Postgres tables not yet backfilled) ──
+  {
     await ensureFinanceInfrastructure()
 
     const projectId = getFinanceProjectId()
