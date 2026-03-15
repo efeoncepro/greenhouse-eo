@@ -40,6 +40,101 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-16 — Sistematización Pre-Nómina (5 fases)
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Sistematización completa del motor de nómina: prorrateo gradual de bonos, integración asistencia/licencias, generación PDF/Excel, actualización de vistas, y dashboard de gasto de personal.
+
+### Rama
+- Rama usada: `develop`
+- Commit: `1d4ed3f`
+
+### Ambiente objetivo
+- Preview / Cloud SQL / HR Payroll
+
+### Archivos tocados
+
+**Nuevos (10 archivos):**
+- `src/lib/payroll/bonus-proration.ts` — funciones puras de prorrateo OTD/RpA
+- `src/lib/payroll/fetch-attendance-for-period.ts` — query combinada BigQuery attendance + Postgres leave_requests
+- `src/lib/payroll/generate-payroll-excel.ts` — workbook 3 hojas (Resumen, Detalle, Asistencia & Bonos) con exceljs
+- `src/lib/payroll/generate-payroll-pdf.tsx` — reporte período (landscape) + recibo individual con @react-pdf/renderer
+- `src/lib/payroll/personnel-expense.ts` — agregación gasto de personal por rango de fechas
+- `src/app/api/hr/payroll/periods/[periodId]/excel/route.ts` — GET descarga Excel
+- `src/app/api/hr/payroll/periods/[periodId]/pdf/route.ts` — GET descarga PDF período
+- `src/app/api/hr/payroll/entries/[entryId]/receipt/route.ts` — GET descarga recibo individual
+- `src/app/api/hr/payroll/personnel-expense/route.ts` — GET gasto de personal con query params
+- `src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx` — dashboard con charts, cards, tabla
+
+**Modificados (14 archivos):**
+- `src/types/payroll.ts` — +BonusProrationConfig, +9 campos en PayrollEntry (proration factors, attendance snapshot, adjusted salary)
+- `src/lib/payroll/calculate-payroll.ts` — prorrateo gradual reemplaza lógica binaria, integración asistencia en buildPayrollEntry
+- `src/lib/payroll/recalculate-entry.ts` — prorrateo en recálculo individual, validación [0, max] en vez de [min, max]
+- `src/lib/payroll/get-payroll-entries.ts` — +9 campos en normalizer, BigQuery SELECT usa CAST(NULL) para nuevos campos
+- `src/lib/payroll/export-payroll.ts` — CSV expandido de 19 a 27 columnas
+- `src/lib/payroll/postgres-store.ts` — pgGetActiveBonusConfig +otdFloor, pgUpsertPayrollEntry +9 campos
+- `src/lib/payroll/persist-entry.ts` — BigQuery MERGE sin cambios (Postgres-first)
+- `scripts/setup-postgres-payroll.sql` — +otd_floor en bonus_config, +9 cols en entries, migration block
+- `src/views/greenhouse/payroll/helpers.ts` — OTD semáforo 3 niveles (>=94/70-94/<70), RpA umbral 3
+- `src/views/greenhouse/payroll/PayrollEntryTable.tsx` — columna asistencia, tooltips adjusted salary, botón recibo, card prorrateo en expanded
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx` — botones PDF/Excel/CSV para períodos aprobados
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx` — tab "Gasto de personal"
+- `src/views/greenhouse/payroll/MemberPayrollHistory.tsx` — columnas asistencia, OTD factor, RpA factor
+- `package.json` — +exceljs, +@react-pdf/renderer
+
+### Cambios realizados
+
+**Fase 1 — Motor de prorrateo de bonos:**
+- OTD: >=94% → 100%, 70-94% → prorrateo lineal `(otd - 70) / (94 - 70)`, <70% → $0
+- RpA: <=3 → prorrateo inverso `(3 - rpa) / 3`, >3 → $0
+- Funciones puras en `bonus-proration.ts` con tipo `BonusProrationConfig`
+- Thresholds configurables desde `payroll_bonus_config` (nuevo campo `otd_floor`)
+
+**Fase 2 — Integración asistencia/licencias:**
+- Combina BigQuery `attendance_daily` (Teams webhook) + Postgres `leave_requests` (flujo aprobación)
+- Días deducibles = `daysAbsent + daysOnUnpaidLeave` → reducen base y teletrabajo proporcionalmente
+- 9 campos nuevos en `payroll_entries`: proration factors (2), attendance snapshot (5), adjusted salary (2)
+- Postgres-first: nuevas columnas solo en Cloud SQL, BigQuery devuelve CAST(NULL)
+
+**Fase 3 — Generación PDF/Excel:**
+- Excel (exceljs): 3 hojas con formato, colores por régimen, auto-filter, porcentajes
+- PDF (@react-pdf/renderer): reporte período landscape + recibo individual (haberes, asistencia, descuentos, neto)
+- 3 endpoints GET que validan período aprobado/exportado y devuelven buffer con Content-Disposition
+
+**Fase 4 — Actualización UI:**
+- Semáforos OTD 3 niveles con color (success/warning/error) y factor %
+- Columna asistencia con ratio present/total y chip de ausencias
+- Tooltips en base y teletrabajo ajustados ("Original: $X | Ajustado por inasistencia")
+- Card expandible de asistencia + prorrateo en detalle de entry
+- Botón recibo por entry, botones PDF/Excel/CSV en período
+
+**Fase 5 — Gasto de personal:**
+- Query agregada sobre entries de períodos aprobados con totales y breakdown por régimen
+- Dashboard: 4 KPI cards, gráfico líneas (bruto vs neto), donut (Chile vs Internacional), tabla detalle
+- Filtro por rango de fechas (año/mes desde-hasta)
+- Integrado como nueva pestaña en PayrollDashboard
+
+### Verificación
+- `npx tsc --noEmit` → 0 errores en todas las fases
+- `git push origin develop` → `1d4ed3f` exitoso
+
+### Decisiones de arquitectura
+- **Postgres-first, BigQuery OLAP**: nuevos campos solo persisten en Cloud SQL. BigQuery SELECT retorna `CAST(NULL AS ...)` para backward compat. BigQuery MERGE no se modificó.
+- **PDF server-side**: se eligió `@react-pdf/renderer` (JSX → PDF) sobre `window.print()` de Vuexy porque necesitamos generación sin browser para API endpoints.
+- **Prorrateo gradual**: reemplaza completamente la lógica binaria previa. El rango de validación pasó de `[min, max]` a `[0, max]` para acomodar montos prorrateados.
+
+### Riesgos o pendientes
+- **DDL migration**: el bloque `ALTER TABLE ADD COLUMN IF NOT EXISTS` en `setup-postgres-payroll.sql` debe ejecutarse en Cloud SQL si la tabla ya existe.
+- **Seed data**: insertar nuevo registro en `payroll_bonus_config` con `otd_threshold=94, rpa_threshold=3, otd_floor=70` y `effective_from='2026-04-01'`.
+- **Recibo sin logo**: el PDF usa texto "Greenhouse EO" como header; si se quiere logo gráfico, hay que registrar fuente/imagen en @react-pdf.
+- **Gasto de personal mixto**: el dashboard muestra totales en CLP; para equipos con mix CLP+USD los totales suman sin conversión (comportamiento intencional para MVP).
+- **Tests unitarios**: `bonus-proration.ts` y `fetch-attendance-for-period.ts` son funciones puras ideales para unit tests — pendiente.
+
+---
+
 ## 2026-03-15 15:12 America/Santiago
 
 ### Agente
