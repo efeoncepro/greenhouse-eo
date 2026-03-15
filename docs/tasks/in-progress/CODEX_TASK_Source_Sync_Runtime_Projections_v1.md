@@ -121,12 +121,14 @@ Publicar el subset runtime-critico en:
 Relaciones obligatorias:
 - `HubSpot Company -> Greenhouse Client/Tenant`
 - `HubSpot Contact -> Greenhouse User / Identity Profile`
+- `HubSpot Owner -> Greenhouse Member / Greenhouse User`
 - `Notion project database -> Greenhouse Space`
 
 Boundary obligatoria:
 - `raw` y `conformed` pueden conservar el universo CRM completo
 - `greenhouse_crm` runtime solo debe proyectar companias que ya pertenecen al universo de clientes Greenhouse
 - sus contactos asociados heredan esa misma frontera de tenant
+- el sync modela y reconcilia contactos CRM, pero no auto-provisiona accesos nuevos; la provisión de `client_users` sigue en la integración/admin live
 - `delivery` debe proyectar `space_id` como boundary operativo y `client_id` solo cuando el space es client-backed
 
 ### 5. Dejar listo el consumo por modulos
@@ -176,6 +178,23 @@ Puede avanzar en paralelo con ambas porque su output es una capa de datos y no d
 - conformed actualizado con datos reales
 - proyecciones `greenhouse_crm` y `greenhouse_delivery` con filas reales
 - documentacion de incremental sync y fallback de seed inicial
+
+## Estado 2026-03-15
+
+- `crm_contacts` ya quedó materializado en:
+  - `greenhouse_conformed.crm_contacts`
+  - `greenhouse_crm.contacts`
+- el slice respeta el boundary del modelo:
+  - solo entran contactos asociados a companias que ya están dentro del universo Greenhouse
+  - no se exige que la integración live de HubSpot escriba directo a BigQuery
+  - la reconciliación de acceso reutiliza `client_users` existentes en vez de provisionar usuarios nuevos silenciosamente
+- owners CRM ya se resuelven a colaboradores usando `greenhouse.team_members.hubspot_owner_id`
+- conteos validados tras rerun:
+  - `crm_contacts = 63`
+  - `linked_user_id = 29`
+  - `linked_identity_profile_id = 29`
+  - `owner_member_id = 63`
+  - `owner_user_id = 61`
 
 ## Criterios de aceptacion
 

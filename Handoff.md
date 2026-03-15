@@ -40,6 +40,87 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 09:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar el slice `HubSpot Contacts -> greenhouse_conformed.crm_contacts -> greenhouse_crm.contacts -> client_users / identity_profiles`, incorporando además `HubSpot Owner -> Member/User`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
+
+### Archivos tocados
+- `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-postgres-source-sync.sql`
+- `scripts/sync-source-runtime-projections.ts`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se agregó `greenhouse_conformed.crm_contacts`.
+- Se agregó `greenhouse_crm.contacts`.
+- El sync ahora replica `hubspot_crm.contacts` a `greenhouse_raw.hubspot_contacts_snapshots`, luego a `crm_contacts`, y finalmente a `greenhouse_crm.contacts`.
+- Boundary aplicada:
+  - solo se proyectan contactos asociados a compañías que ya están admitidas en el universo Greenhouse.
+- Reconciliación aplicada:
+  - `HubSpot Contact -> client_user`
+    - `user-hubspot-contact-<contact_id>`
+    - luego source link explícito
+    - luego email único dentro del tenant
+  - `HubSpot Contact -> identity_profile`
+    - primero el profile del user
+    - luego source link explícito
+    - luego email único
+    - si el user existe y no tiene profile, se crea `profile-hubspot-contact-<contact_id>`
+- Se poblaron también:
+  - `greenhouse_core.identity_profile_source_links` para HubSpot contact
+  - `greenhouse_core.entity_source_links` para `user <- hubspot contact`
+- `HubSpot Owner -> Collaborator / User` quedó modelado:
+  - `crm_companies.owner_member_id`
+  - `crm_deals.owner_member_id`
+  - `crm_contacts.owner_member_id`
+  - `owner_user_id` cuando el colaborador tiene principal en `greenhouse_core.client_users`
+- Regla dejada explícita en docs:
+  - el sync modela y reconcilia CRM contacts
+  - la integración live/admin sigue siendo la capa de provisioning de accesos
+  - no exigir que la integración live escriba directo a BigQuery
+
+### Verificación
+- `pnpm exec eslint scripts/sync-source-runtime-projections.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-bigquery-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/sync-source-runtime-projections.ts`
+  - correcto, rerun exitoso
+- Conteos verificados:
+  - BigQuery conformed `crm_contacts = 63`
+  - PostgreSQL runtime `greenhouse_crm.contacts = 63`
+  - `linked_user_id = 29`
+  - `linked_identity_profile_id = 29`
+  - `owner_member_id = 63`
+  - `owner_user_id = 61`
+  - `identity_profile_source_links` HubSpot contact = `29`
+  - `entity_source_links` HubSpot contact -> user = `29`
+  - PostgreSQL runtime owners:
+    - companies `owner_member_id = 9`, `owner_user_id = 9`
+    - deals `owner_member_id = 21`, `owner_user_id = 21`
+
+### Riesgos o pendientes
+- El seed completo sigue siendo lento porque `sync-source-runtime-projections.ts` hace demasiados writes secuenciales; conviene optimizarlo después de cerrar este slice.
+- `crm_contacts` todavía resuelve un `company_source_id` primario; si más adelante necesitamos una relación explícita many-to-many, corresponde agregar `crm_company_contacts`.
+- El siguiente slice lógico del 360 es endurecer `HubSpot Owner -> identity_profile / user` como source link reutilizable para que toda la plataforma lo consuma igual.
+
 ## 2026-03-16 ~02:00 America/Santiago
 
 ### Agente

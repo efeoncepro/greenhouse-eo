@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_crm.companies (
   hubspot_company_id TEXT NOT NULL UNIQUE,
   company_name TEXT NOT NULL,
   legal_name TEXT,
+  owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
   owner_user_id TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
   lifecycle_stage TEXT,
   industry TEXT,
@@ -83,9 +84,40 @@ CREATE TABLE IF NOT EXISTS greenhouse_crm.deals (
   amount NUMERIC(14, 2),
   currency TEXT,
   close_date DATE,
+  owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
   owner_user_id TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
   is_closed_won BOOLEAN NOT NULL DEFAULT FALSE,
   is_closed_lost BOOLEAN NOT NULL DEFAULT FALSE,
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  source_updated_at TIMESTAMPTZ,
+  synced_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  sync_run_id TEXT REFERENCES greenhouse_sync.source_sync_runs(sync_run_id) ON DELETE SET NULL,
+  payload_hash TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS greenhouse_crm.contacts (
+  contact_record_id TEXT PRIMARY KEY,
+  client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
+  company_record_id TEXT REFERENCES greenhouse_crm.companies(company_record_id) ON DELETE SET NULL,
+  linked_user_id TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+  linked_identity_profile_id TEXT REFERENCES greenhouse_core.identity_profiles(profile_id) ON DELETE SET NULL,
+  hubspot_contact_id TEXT NOT NULL UNIQUE,
+  hubspot_primary_company_id TEXT,
+  hubspot_associated_company_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  email TEXT,
+  first_name TEXT,
+  last_name TEXT,
+  display_name TEXT NOT NULL,
+  job_title TEXT,
+  phone TEXT,
+  mobile_phone TEXT,
+  lifecycle_stage TEXT,
+  lead_status TEXT,
+  owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
+  owner_user_id TEXT REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
   source_updated_at TIMESTAMPTZ,
   synced_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -215,6 +247,15 @@ ALTER TABLE greenhouse_delivery.tasks
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
 
+ALTER TABLE greenhouse_crm.companies
+  ADD COLUMN IF NOT EXISTS owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL;
+
+ALTER TABLE greenhouse_crm.deals
+  ADD COLUMN IF NOT EXISTS owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL;
+
+ALTER TABLE greenhouse_crm.contacts
+  ADD COLUMN IF NOT EXISTS owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL;
+
 CREATE INDEX IF NOT EXISTS source_sync_runs_source_idx
   ON greenhouse_sync.source_sync_runs (source_system, source_object_type, started_at DESC);
 
@@ -236,6 +277,9 @@ CREATE INDEX IF NOT EXISTS crm_companies_client_idx
 CREATE INDEX IF NOT EXISTS crm_companies_owner_idx
   ON greenhouse_crm.companies (owner_user_id);
 
+CREATE INDEX IF NOT EXISTS crm_companies_owner_member_idx
+  ON greenhouse_crm.companies (owner_member_id);
+
 CREATE INDEX IF NOT EXISTS crm_deals_client_idx
   ON greenhouse_crm.deals (client_id);
 
@@ -244,6 +288,27 @@ CREATE INDEX IF NOT EXISTS crm_deals_company_idx
 
 CREATE INDEX IF NOT EXISTS crm_deals_module_idx
   ON greenhouse_crm.deals (module_id);
+
+CREATE INDEX IF NOT EXISTS crm_deals_owner_member_idx
+  ON greenhouse_crm.deals (owner_member_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_client_idx
+  ON greenhouse_crm.contacts (client_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_company_idx
+  ON greenhouse_crm.contacts (company_record_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_user_idx
+  ON greenhouse_crm.contacts (linked_user_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_identity_idx
+  ON greenhouse_crm.contacts (linked_identity_profile_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_owner_member_idx
+  ON greenhouse_crm.contacts (owner_member_id);
+
+CREATE INDEX IF NOT EXISTS crm_contacts_email_idx
+  ON greenhouse_crm.contacts (LOWER(email));
 
 CREATE INDEX IF NOT EXISTS delivery_projects_client_idx
   ON greenhouse_delivery.projects (client_id);

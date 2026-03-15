@@ -299,6 +299,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.crm_companies` (
   company_name STRING NOT NULL,
   legal_name STRING,
   owner_source_id STRING,
+  owner_member_id STRING,
   owner_user_id STRING,
   lifecycle_stage STRING,
   industry STRING,
@@ -328,6 +329,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.crm_deals` (
   currency STRING,
   close_date DATE,
   owner_source_id STRING,
+  owner_member_id STRING,
   owner_user_id STRING,
   is_closed_won BOOL,
   is_closed_lost BOOL,
@@ -340,6 +342,35 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.crm_deals` (
 PARTITION BY DATE(synced_at)
 CLUSTER BY deal_source_id, company_source_id, client_id
 OPTIONS(description = "Current-state conformed CRM deals derived from HubSpot");
+
+CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.crm_contacts` (
+  contact_source_id STRING NOT NULL,
+  company_source_id STRING,
+  associated_company_source_ids ARRAY<STRING>,
+  client_id STRING,
+  linked_user_id STRING,
+  linked_identity_profile_id STRING,
+  email STRING,
+  first_name STRING,
+  last_name STRING,
+  display_name STRING,
+  job_title STRING,
+  phone STRING,
+  mobile_phone STRING,
+  lifecycle_stage STRING,
+  lead_status STRING,
+  owner_source_id STRING,
+  owner_member_id STRING,
+  owner_user_id STRING,
+  updated_at TIMESTAMP,
+  payload_hash STRING,
+  is_deleted BOOL NOT NULL,
+  sync_run_id STRING,
+  synced_at TIMESTAMP NOT NULL
+)
+PARTITION BY DATE(synced_at)
+CLUSTER BY contact_source_id, company_source_id, client_id
+OPTIONS(description = "Current-state conformed CRM contacts derived from HubSpot and reconciled against Greenhouse access identities");
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_projects`
 ADD COLUMN IF NOT EXISTS space_id STRING;
@@ -364,3 +395,12 @@ ADD COLUMN IF NOT EXISTS module_code STRING;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.crm_deals`
 ADD COLUMN IF NOT EXISTS module_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.crm_companies`
+ADD COLUMN IF NOT EXISTS owner_member_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.crm_deals`
+ADD COLUMN IF NOT EXISTS owner_member_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.crm_contacts`
+ADD COLUMN IF NOT EXISTS owner_member_id STRING;

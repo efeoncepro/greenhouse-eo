@@ -3,6 +3,39 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
+- `Source Sync Runtime Projections` ya materializa contactos CRM en:
+  - `greenhouse_conformed.crm_contacts`
+  - `greenhouse_crm.contacts`
+- El slice respeta la boundary canónica acordada:
+  - solo entran contactos asociados a compañías que ya pertenecen al universo Greenhouse
+  - el sync modela y reconcilia CRM contacts, pero no auto-provisiona nuevos `client_users`
+  - la provisión de acceso sigue siendo responsabilidad de la integración/admin live de HubSpot -> Greenhouse
+- Reconciliación activa para `HubSpot Contact -> client_user / identity_profile`:
+  - preferencia por `user-hubspot-contact-<contact_id>`
+  - luego source link explícito
+  - luego email único dentro del tenant
+  - si existe user runtime enlazado y no hay profile todavía, el sync crea `profile-hubspot-contact-<contact_id>` y fija el bridge canónico
+- `HubSpot Owner -> Collaborator / User` ya queda proyectado usando `greenhouse.team_members.hubspot_owner_id`:
+  - `owner_member_id` queda poblado en `crm_companies`, `crm_deals` y `crm_contacts`
+  - `owner_user_id` se resuelve cuando el colaborador también tiene principal en `greenhouse_core.client_users`
+- Estado validado después de rerun completo:
+  - BigQuery conformed `crm_contacts = 63`
+  - PostgreSQL runtime `greenhouse_crm.contacts = 63`
+  - contactos con `linked_user_id = 29`
+  - contactos con `linked_identity_profile_id = 29`
+  - `identity_profile_source_links` HubSpot contact = `29`
+  - `entity_source_links` HubSpot contact -> user = `29`
+  - `crm_contacts.owner_member_id = 63`
+  - `crm_contacts.owner_user_id = 61`
+  - PostgreSQL runtime owner coverage:
+    - companies: `owner_member_id = 9`, `owner_user_id = 9`
+    - deals: `owner_member_id = 21`, `owner_user_id = 21`
+- Regla operativa derivada:
+  - no pedirle a la integración live que escriba directo a BigQuery
+  - el source sync es quien replica a `raw` / `conformed`
+  - la integración live sigue siendo la pieza de provisioning y reconciliación de accesos
+
 ## Delta 2026-03-15 Space model added to canonical 360 and delivery projections
 - `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` ya existen en Cloud SQL como nuevo boundary operativo del 360.
 - Regla arquitectónica ya documentada y aplicada:

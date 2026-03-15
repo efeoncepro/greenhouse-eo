@@ -259,9 +259,9 @@ Current tables:
 - `delivery_sprints`
 - `crm_companies`
 - `crm_deals`
+- `crm_contacts`
 
 Required next slice:
-- `crm_contacts`
 - if needed, `crm_company_contacts`
 
 ### `greenhouse_marts`
@@ -381,10 +381,13 @@ Required relationships:
 - `hubspot_contact_id -> source link`
 - `contact email -> identity_profile / client_user reconciliation`
 - `company membership -> client context`
+- `hubspot_owner_id -> greenhouse_core.members` and then `owner_user_id` when the collaborator has a Greenhouse access principal
 
 Non-negotiable rule:
 - HubSpot contacts must be part of the Greenhouse model because user identity and tenant membership are reconciled against them
 - only contacts associated with client companies should project into the Greenhouse runtime graph
+- user provisioning still belongs to the Greenhouse <-> HubSpot integration/admin workflow; source sync should model and reconcile CRM contacts, not silently provision every contact as an access principal
+- Greenhouse should not require the live HubSpot integration service to write directly into BigQuery; source sync owns the replication into `raw` / `conformed`
 
 ## Delivery Workspace
 
@@ -466,11 +469,31 @@ Target:
 
 Current state:
 - raw snapshot table exists
-- operational projection is still pending
+- `crm_contacts` now projects only contacts associated with companies already admitted into the Greenhouse client universe
+- reconciliation to `client_users` is conservative:
+  - prefer canonical `user-hubspot-contact-<contact_id>`
+  - then explicit source link
+  - then unique email match inside the same tenant
+- reconciliation to `identity_profiles` is conservative:
+  - use the user's existing `identity_profile_id` when present
+  - then explicit HubSpot source link
+  - then unique email match
+  - create a HubSpot-backed profile only when a linked runtime user exists and no profile is attached yet
 
 Target:
 - `greenhouse_crm.contacts` must become first-class
 - contact reconciliation to `client_users` and `identity_profiles` must be explicit
+
+### 5. HubSpot owners as collaborator identity
+
+Current state:
+- HubSpot companies, deals and contacts expose `hubspot_owner_id`
+- `greenhouse.team_members` already stores `hubspot_owner_id`, `notion_user_id` and `azure_oid` as source identity anchors
+
+Target:
+- `hubspot_owner_id` must resolve to `greenhouse_core.members.member_id` as the operational owner anchor
+- when the collaborator also has a Greenhouse user principal, runtime projections should also populate `owner_user_id`
+- this keeps ownership comparable across CRM, delivery, HR and auth without inventing a second internal owner model
 
 ### 4. Service module normalization
 

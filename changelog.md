@@ -26,6 +26,30 @@
 
 ## 2026-03-15
 
+### HubSpot contacts + owners now project into the canonical runtime graph
+- `Source Sync Runtime Projections` ya materializa:
+  - `greenhouse_conformed.crm_contacts`
+  - `greenhouse_crm.contacts`
+- El slice respeta la frontera Greenhouse:
+  - solo entran contactos asociados a compañías que ya pertenecen al universo de clientes Greenhouse
+  - no se auto-provisionan nuevos `client_users` desde el sync
+  - la integración/admin live sigue siendo la capa de provisioning de accesos
+- Reconciliación activa:
+  - `HubSpot Contact -> client_user`
+  - `HubSpot Contact -> identity_profile`
+  - `HubSpot Owner -> member/user`
+- Estado validado tras rerun:
+  - `crm_contacts = 63`
+  - `linked_user_id = 29`
+  - `linked_identity_profile_id = 29`
+  - `owner_member_id = 63`
+  - `owner_user_id = 61`
+  - `identity_profile_source_links` HubSpot contact = `29`
+  - `entity_source_links` HubSpot contact -> user = `29`
+  - runtime owners:
+    - companies `owner_member_id = 9`, `owner_user_id = 9`
+    - deals `owner_member_id = 21`, `owner_user_id = 21`
+
 ### Canonical `Space` model added to the 360 backbone
 - Se agregó `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` como nuevo boundary operativo para Agency, delivery e ICO metrics.
 - `Efeonce` ya quedó modelado como `internal_space` con `client_id = null`, en vez de depender solo del pseudo-cliente legacy `space-efeonce`.
