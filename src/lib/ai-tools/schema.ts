@@ -348,6 +348,15 @@ const getExistingTables = async (projectId: string) => {
 const seedProviders = async (projectId: string) => {
   const bigQuery = getBigQueryClient()
 
+  // Skip seeding if providers already exist
+  const [countRows] = await bigQuery.query({
+    query: `SELECT COUNT(*) AS cnt FROM \`${projectId}.greenhouse.providers\` WHERE provider_id IS NOT NULL LIMIT 1`
+  })
+
+  if ((countRows as Array<{ cnt: number }>)[0]?.cnt >= PROVIDER_SEEDS.length) {
+    return
+  }
+
   for (const provider of PROVIDER_SEEDS) {
     await bigQuery.query({
       query: `
@@ -398,6 +407,15 @@ const seedProviders = async (projectId: string) => {
 
 const seedTools = async (projectId: string) => {
   const bigQuery = getBigQueryClient()
+
+  // Skip seeding if tools already exist
+  const [countRows] = await bigQuery.query({
+    query: `SELECT COUNT(*) AS cnt FROM \`${projectId}.greenhouse.ai_tool_catalog\` WHERE tool_id IS NOT NULL LIMIT 1`
+  })
+
+  if ((countRows as Array<{ cnt: number }>)[0]?.cnt >= TOOL_SEEDS.length) {
+    return
+  }
 
   for (const tool of TOOL_SEEDS) {
     await bigQuery.query({

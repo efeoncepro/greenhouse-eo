@@ -38,7 +38,8 @@ const fetchMindicadorUsdToClp = async (rateDate?: string | null): Promise<Exchan
 
   const response = await fetch(`${MINDICADOR_BASE_URL}${path}`, {
     headers: { Accept: 'application/json' },
-    cache: 'no-store'
+    cache: 'no-store',
+    signal: AbortSignal.timeout(6000)
   })
 
   if (!response.ok) {
@@ -67,7 +68,8 @@ const fetchMindicadorUsdToClp = async (rateDate?: string | null): Promise<Exchan
 const fetchOpenExchangeRateUsdToClp = async (): Promise<ExchangeRateProviderResult | null> => {
   const response = await fetch(`${OPEN_EXCHANGE_RATE_BASE_URL}/latest/USD`, {
     headers: { Accept: 'application/json' },
-    cache: 'no-store'
+    cache: 'no-store',
+    signal: AbortSignal.timeout(6000)
   })
 
   if (!response.ok) {

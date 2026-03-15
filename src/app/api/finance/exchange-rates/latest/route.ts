@@ -20,17 +20,22 @@ export async function GET() {
     toCurrency: 'CLP'
   })
 
+  // If no stored rate, attempt a non-blocking sync (best effort, 8s timeout)
   if (!latestRate) {
     try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 8000)
+
       await syncDailyUsdClpExchangeRate()
+      clearTimeout(timeout)
+
+      latestRate = await getLatestStoredExchangeRatePair({
+        fromCurrency: 'USD',
+        toCurrency: 'CLP'
+      })
     } catch (syncError) {
       console.warn('[exchange-rates/latest] sync failed:', syncError instanceof Error ? syncError.message : syncError)
     }
-
-    latestRate = await getLatestStoredExchangeRatePair({
-      fromCurrency: 'USD',
-      toCurrency: 'CLP'
-    })
   }
 
   if (!latestRate) {
