@@ -3,6 +3,42 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Finance PostgreSQL first slice
+- Se materializó el primer slice operacional de `Finance` sobre PostgreSQL en `greenhouse-pg-dev / greenhouse_app`.
+- Nuevo schema operativo:
+  - `greenhouse_finance`
+- Objetos materializados:
+  - `greenhouse_finance.accounts`
+  - `greenhouse_finance.suppliers`
+  - `greenhouse_finance.exchange_rates`
+  - `greenhouse_serving.provider_finance_360`
+- Se agregó el repository `src/lib/finance/postgres-store.ts` con validación de infraestructura, writes y lecturas `Postgres first`.
+- Rutas ya cortadas o semi-cortadas a PostgreSQL:
+  - `GET /api/finance/accounts`
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `GET /api/finance/exchange-rates`
+  - `POST /api/finance/exchange-rates`
+  - `GET /api/finance/exchange-rates/latest`
+  - `GET/POST /api/finance/exchange-rates/sync`
+  - `GET /api/finance/expenses/meta` para el subset de cuentas
+- Se ejecutó backfill inicial desde BigQuery:
+  - `accounts`: `1`
+  - `suppliers`: `2`
+  - `exchange_rates`: `0`
+- Alineación 360 aplicada:
+  - `suppliers.provider_id` referencia `greenhouse_core.providers`
+  - el backfill de suppliers también materializa providers canónicos tipo `financial_vendor`
+  - `greenhouse_serving.provider_finance_360` expone la relación `provider -> supplier`
+- Permisos estructurales corregidos en Cloud SQL:
+  - `greenhouse_app` recibió `USAGE` sobre `greenhouse_core`, `greenhouse_sync` y `greenhouse_serving`
+  - `greenhouse_app` recibió `SELECT, REFERENCES` sobre tablas de `greenhouse_core`
+  - `greenhouse_app` recibió `SELECT, INSERT, UPDATE, DELETE` sobre tablas de `greenhouse_sync`
+- Boundary vigente:
+  - `accounts` y `exchange_rates` ya tienen store operativo PostgreSQL
+  - `suppliers` quedó materializado y backfilleado en PostgreSQL, pero el runtime principal todavía no se corta ahí para no romper `AI Tooling`, que sigue leyendo `greenhouse.fin_suppliers` en BigQuery
+  - dashboards y reporting financiero pesado siguen en BigQuery por ahora
+
 ## Delta 2026-03-15 Source sync foundation materialized
 - Se ejecutó el primer slice técnico del blueprint de sync externo sobre PostgreSQL y BigQuery.
 - Scripts nuevos agregados:

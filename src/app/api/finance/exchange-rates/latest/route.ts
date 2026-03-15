@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   fetchUsdToClpFromProviders,
   getLatestStoredExchangeRatePair,
@@ -16,8 +15,6 @@ export async function GET() {
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  await ensureFinanceInfrastructure()
 
   let latestRate = await getLatestStoredExchangeRatePair({
     fromCurrency: 'USD',

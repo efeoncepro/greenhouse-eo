@@ -23,6 +23,39 @@ Objetivo de esta task:
 - mantener las lecturas analiticas pesadas en BigQuery mientras sea sano
 - dejar contratos API estables para frontend
 
+## Delta 2026-03-15 Slice 1 materializado
+
+Primer corte ya ejecutado:
+- schema `greenhouse_finance` materializado en Cloud SQL
+- tablas activas:
+  - `accounts`
+  - `suppliers`
+  - `exchange_rates`
+- vista 360 agregada:
+  - `greenhouse_serving.provider_finance_360`
+- repository nuevo:
+  - `src/lib/finance/postgres-store.ts`
+- rutas ya en `Postgres first`:
+  - `GET/POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `GET/POST /api/finance/exchange-rates`
+  - `GET /api/finance/exchange-rates/latest`
+  - `GET/POST /api/finance/exchange-rates/sync`
+  - `GET /api/finance/expenses/meta` para cuentas
+- backfill ejecutado desde BigQuery:
+  - `accounts`: `1`
+  - `suppliers`: `2`
+  - `exchange_rates`: `0`
+
+Decisión 360 aplicada:
+- `suppliers` se modeló como extension operativa de `providers`
+- el backfill materializa `financial_vendor` en `greenhouse_core.providers`
+- la relación `provider -> supplier` queda expuesta en `provider_finance_360`
+
+Boundary deliberado:
+- `suppliers` no se cortó todavía a PostgreSQL en runtime principal
+- razón: `AI Tooling` sigue consumiendo `greenhouse.fin_suppliers` en BigQuery y no conviene romper ese bridge en esta misma tanda
+
 ## Por que esta lane existe ahora
 
 `Finance` ya recibio varias tandas de hardening y QA.

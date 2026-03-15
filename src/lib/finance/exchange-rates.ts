@@ -1,6 +1,19 @@
 import 'server-only'
 
-import { getFinanceProjectId, normalizeString, roundCurrency, runFinanceQuery, toDateString, toNumber, type FinanceCurrency } from '@/lib/finance/shared'
+import {
+  getFinanceProjectId,
+  normalizeString,
+  roundCurrency,
+  runFinanceQuery,
+  toDateString,
+  toNumber,
+  type FinanceCurrency
+} from '@/lib/finance/shared'
+import {
+  getLatestFinanceExchangeRateFromPostgres,
+  shouldFallbackFromFinancePostgres,
+  upsertFinanceExchangeRateInPostgres
+} from '@/lib/finance/postgres-store'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 const OPEN_EXCHANGE_RATE_BASE_URL = 'https://open.er-api.com/v6'
@@ -137,6 +150,18 @@ export const getLatestStoredExchangeRatePair = async ({
   fromCurrency: FinanceCurrency
   toCurrency: FinanceCurrency
 }) => {
+  try {
+    const latest = await getLatestFinanceExchangeRateFromPostgres({ fromCurrency, toCurrency })
+
+    if (latest) {
+      return latest
+    }
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<{
@@ -232,9 +257,18 @@ export const upsertExchangeRates = async (rates: PersistedExchangeRate[]) => {
     return []
   }
 
-  const projectId = getFinanceProjectId()
-
   for (const rate of rates) {
+    try {
+      await upsertFinanceExchangeRateInPostgres(rate)
+      continue
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    const projectId = getFinanceProjectId()
+
     await runFinanceQuery(`
       MERGE \`${projectId}.greenhouse.fin_exchange_rates\` AS target
       USING (

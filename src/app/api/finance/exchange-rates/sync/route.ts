@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { assertDateString, FinanceValidationError, normalizeString } from '@/lib/finance/shared'
 import { syncDailyUsdClpExchangeRate } from '@/lib/finance/exchange-rates'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
@@ -36,8 +35,6 @@ const getRequestedRateDate = async (request: Request) => {
 }
 
 const syncAndRespond = async (rateDate?: string | null) => {
-  await ensureFinanceInfrastructure()
-
   const result = await syncDailyUsdClpExchangeRate(rateDate)
 
   if (!result.synced) {

@@ -5,12 +5,14 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 export class FinanceValidationError extends Error {
   statusCode: number
   details?: unknown
+  code?: string
 
-  constructor(message: string, statusCode = 400, details?: unknown) {
+  constructor(message: string, statusCode = 400, details?: unknown, code?: string) {
     super(message)
     this.name = 'FinanceValidationError'
     this.statusCode = statusCode
     this.details = details
+    this.code = code
   }
 }
 
@@ -224,20 +226,12 @@ export const getLatestExchangeRate = async ({
   fromCurrency: FinanceCurrency
   toCurrency: FinanceCurrency
 }) => {
-  const projectId = getFinanceProjectId()
+  const { getLatestStoredExchangeRatePair, syncDailyUsdClpExchangeRate } = await import('@/lib/finance/exchange-rates')
 
-  const rows = await runFinanceQuery<{ rate: unknown }>(`
-    SELECT rate
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE from_currency = @fromCurrency AND to_currency = @toCurrency
-    ORDER BY rate_date DESC
-    LIMIT 1
-  `, { fromCurrency, toCurrency })
+  const latest = await getLatestStoredExchangeRatePair({ fromCurrency, toCurrency })
 
-  const rate = toNumber(rows[0]?.rate)
-
-  if (rate > 0) {
-    return rate
+  if (latest && latest.rate > 0) {
+    return latest.rate
   }
 
   const supportsAutoSync =
@@ -248,24 +242,15 @@ export const getLatestExchangeRate = async ({
     return null
   }
 
-  const { syncDailyUsdClpExchangeRate } = await import('@/lib/finance/exchange-rates')
   const syncResult = await syncDailyUsdClpExchangeRate()
 
   if (!syncResult.synced) {
     return null
   }
 
-  const syncedRows = await runFinanceQuery<{ rate: unknown }>(`
-    SELECT rate
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE from_currency = @fromCurrency AND to_currency = @toCurrency
-    ORDER BY rate_date DESC
-    LIMIT 1
-  `, { fromCurrency, toCurrency })
+  const synced = await getLatestStoredExchangeRatePair({ fromCurrency, toCurrency })
 
-  const syncedRate = toNumber(syncedRows[0]?.rate)
-
-  return syncedRate > 0 ? syncedRate : null
+  return synced && synced.rate > 0 ? synced.rate : null
 }
 
 export const resolveExchangeRateToClp = async ({

@@ -6,6 +6,25 @@
 
 ## 2026-03-15
 
+### Finance PostgreSQL first slice and canonical provider bridge
+- `Finance` ya tiene materializado su primer slice operacional en PostgreSQL:
+  - `greenhouse_finance.accounts`
+  - `greenhouse_finance.suppliers`
+  - `greenhouse_finance.exchange_rates`
+  - `greenhouse_serving.provider_finance_360`
+- Se agregó `src/lib/finance/postgres-store.ts` para el repository `Postgres first`.
+- `accounts` y `exchange-rates` ya prefieren PostgreSQL en runtime, con fallback controlado a BigQuery durante rollout.
+- `GET /api/finance/expenses/meta` ya toma la lista de cuentas desde PostgreSQL cuando el slice está listo.
+- Se ejecutó backfill inicial desde BigQuery:
+  - `accounts`: `1`
+  - `suppliers`: `2`
+  - `exchange_rates`: `0`
+- El bridge `Supplier -> Provider` ahora también materializa providers canónicos `financial_vendor` en PostgreSQL y expone la relación vía `provider_finance_360`.
+- Se corrigió además el setup estructural de permisos en Cloud SQL:
+  - `greenhouse_app` ya tiene `REFERENCES` sobre `greenhouse_core`
+  - `greenhouse_app` ya puede publicar en `greenhouse_sync`
+  - el script `setup-postgres-finance.sql` ahora incorpora grants para que un ambiente nuevo no dependa de intervención manual
+
 ### Parallel Postgres migration lanes documented for agent work
 - Se agregaron tres tasks nuevas para ejecutar en paralelo la siguiente etapa de plataforma:
   - `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md`

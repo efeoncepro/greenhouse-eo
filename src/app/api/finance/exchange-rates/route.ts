@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
-  runFinanceQuery,
-  getFinanceProjectId,
   assertValidCurrency,
   assertDateString,
   assertPositiveAmount,
   normalizeString,
-  toNumber,
+  FinanceValidationError,
+  runFinanceQuery,
+  getFinanceProjectId,
   toDateString,
-  toTimestampString,
-  FinanceValidationError
+  toNumber,
+  toTimestampString
 } from '@/lib/finance/shared'
+import {
+  listFinanceExchangeRatesFromPostgres,
+  shouldFallbackFromFinancePostgres,
+  upsertFinanceExchangeRateInPostgres
+} from '@/lib/finance/postgres-store'
+import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,38 +49,52 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { searchParams } = new URL(request.url)
   const fromDate = searchParams.get('fromDate')
   const toDate = searchParams.get('toDate')
-  const projectId = getFinanceProjectId()
 
-  let dateFilter = ''
-  const params: Record<string, unknown> = {}
+  try {
+    const items = await listFinanceExchangeRatesFromPostgres({ fromDate, toDate })
 
-  if (fromDate) {
-    dateFilter += ' AND rate_date >= @fromDate'
-    params.fromDate = fromDate
+    return NextResponse.json({
+      items,
+      total: items.length
+    })
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+
+    await ensureFinanceInfrastructure()
+
+    const projectId = getFinanceProjectId()
+
+    let dateFilter = ''
+    const params: Record<string, unknown> = {}
+
+    if (fromDate) {
+      dateFilter += ' AND rate_date >= @fromDate'
+      params.fromDate = fromDate
+    }
+
+    if (toDate) {
+      dateFilter += ' AND rate_date <= @toDate'
+      params.toDate = toDate
+    }
+
+    const rows = await runFinanceQuery<ExchangeRateRow>(`
+      SELECT rate_id, from_currency, to_currency, rate, rate_date, source, created_at
+      FROM \`${projectId}.greenhouse.fin_exchange_rates\`
+      WHERE TRUE ${dateFilter}
+      ORDER BY rate_date DESC
+      LIMIT 200
+    `, params)
+
+    return NextResponse.json({
+      items: rows.map(normalizeRate),
+      total: rows.length
+    })
   }
-
-  if (toDate) {
-    dateFilter += ' AND rate_date <= @toDate'
-    params.toDate = toDate
-  }
-
-  const rows = await runFinanceQuery<ExchangeRateRow>(`
-    SELECT rate_id, from_currency, to_currency, rate, rate_date, source, created_at
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE TRUE ${dateFilter}
-    ORDER BY rate_date DESC
-    LIMIT 200
-  `, params)
-
-  return NextResponse.json({
-    items: rows.map(normalizeRate),
-    total: rows.length
-  })
 }
 
 export async function POST(request: Request) {
@@ -84,8 +103,6 @@ export async function POST(request: Request) {
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  await ensureFinanceInfrastructure()
 
   try {
     const body = await request.json()
@@ -104,34 +121,51 @@ export async function POST(request: Request) {
 
     const source = normalizeString(body.source) || 'manual'
     const rateId = `${fromCurrency}_${toCurrency}_${rateDate}`
-    const projectId = getFinanceProjectId()
 
-    await runFinanceQuery(`
-      MERGE \`${projectId}.greenhouse.fin_exchange_rates\` AS target
-      USING (
-        SELECT
-          @rateId AS rate_id,
-          @fromCurrency AS from_currency,
-          @toCurrency AS to_currency,
-          @rate AS rate,
-          @rateDate AS rate_date,
-          @source AS source,
-          CURRENT_TIMESTAMP() AS created_at
-      ) AS source
-      ON target.rate_id = source.rate_id
-      WHEN MATCHED THEN
-        UPDATE SET rate = source.rate, source = source.source
-      WHEN NOT MATCHED THEN
-        INSERT (rate_id, from_currency, to_currency, rate, rate_date, source, created_at)
-        VALUES (source.rate_id, source.from_currency, source.to_currency, source.rate, source.rate_date, source.source, source.created_at)
-    `, {
-      rateId,
-      fromCurrency,
-      toCurrency,
-      rate,
-      rateDate,
-      source
-    })
+    try {
+      await upsertFinanceExchangeRateInPostgres({
+        rateId,
+        fromCurrency,
+        toCurrency,
+        rate,
+        rateDate,
+        source
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+
+      await ensureFinanceInfrastructure()
+      const projectId = getFinanceProjectId()
+
+      await runFinanceQuery(`
+        MERGE \`${projectId}.greenhouse.fin_exchange_rates\` AS target
+        USING (
+          SELECT
+            @rateId AS rate_id,
+            @fromCurrency AS from_currency,
+            @toCurrency AS to_currency,
+            @rate AS rate,
+            @rateDate AS rate_date,
+            @source AS source,
+            CURRENT_TIMESTAMP() AS created_at
+        ) AS source
+        ON target.rate_id = source.rate_id
+        WHEN MATCHED THEN
+          UPDATE SET rate = source.rate, source = source.source
+        WHEN NOT MATCHED THEN
+          INSERT (rate_id, from_currency, to_currency, rate, rate_date, source, created_at)
+          VALUES (source.rate_id, source.from_currency, source.to_currency, source.rate, source.rate_date, source.source, source.created_at)
+      `, {
+        rateId,
+        fromCurrency,
+        toCurrency,
+        rate,
+        rateDate,
+        source
+      })
+    }
 
     return NextResponse.json({ rateId, created: true }, { status: 201 })
   } catch (error) {

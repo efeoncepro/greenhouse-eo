@@ -12,6 +12,7 @@ import {
   runFinanceQuery,
   getFinanceProjectId
 } from '@/lib/finance/shared'
+import { listFinanceAccountsFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -54,17 +55,34 @@ export async function GET() {
       WHERE is_active = TRUE
       ORDER BY COALESCE(trade_name, legal_name) ASC
     `),
-    runFinanceQuery<{
-      account_id: string
-      account_name: string
-      currency: string
-      account_type: string
-    }>(`
-      SELECT account_id, account_name, currency, account_type
-      FROM \`${projectId}.greenhouse.fin_accounts\`
-      WHERE is_active = TRUE
-      ORDER BY account_name ASC
-    `),
+    (async () => {
+      try {
+        const items = await listFinanceAccountsFromPostgres()
+
+        return items.map(item => ({
+          account_id: item.accountId,
+          account_name: item.accountName,
+          currency: item.currency,
+          account_type: item.accountType
+        }))
+      } catch (error) {
+        if (!shouldFallbackFromFinancePostgres(error)) {
+          throw error
+        }
+
+        return runFinanceQuery<{
+          account_id: string
+          account_name: string
+          currency: string
+          account_type: string
+        }>(`
+          SELECT account_id, account_name, currency, account_type
+          FROM \`${projectId}.greenhouse.fin_accounts\`
+          WHERE is_active = TRUE
+          ORDER BY account_name ASC
+        `)
+      }
+    })(),
     runFinanceQuery<{ institution: string | null }>(`
       SELECT DISTINCT social_security_institution AS institution
       FROM \`${projectId}.greenhouse.fin_expenses\`
