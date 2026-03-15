@@ -136,10 +136,15 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
   notion_project_id TEXT NOT NULL UNIQUE,
   project_name TEXT NOT NULL,
   project_status TEXT,
+  project_summary TEXT,
+  completion_label TEXT,
+  on_time_pct_source NUMERIC(6, 2),
+  avg_rpa_source NUMERIC(10, 2),
   project_phase TEXT,
   owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
   start_date DATE,
   end_date DATE,
+  page_url TEXT,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
   source_updated_at TIMESTAMPTZ,
@@ -160,6 +165,10 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.sprints (
   sprint_status TEXT,
   start_date DATE,
   end_date DATE,
+  completed_tasks_count INTEGER,
+  total_tasks_count INTEGER,
+  completion_pct_source NUMERIC(6, 2),
+  page_url TEXT,
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
   source_updated_at TIMESTAMPTZ,
   synced_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -185,8 +194,32 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   task_status TEXT,
   task_phase TEXT,
   task_priority TEXT,
+  completion_label TEXT,
+  delivery_compliance TEXT,
+  days_late INTEGER,
+  rescheduled_days INTEGER,
+  is_rescheduled BOOLEAN NOT NULL DEFAULT FALSE,
+  performance_indicator_label TEXT,
+  performance_indicator_code TEXT,
+  client_change_round_label TEXT,
+  client_change_round_final INTEGER,
+  rpa_semaphore_source TEXT,
+  rpa_value NUMERIC(10, 2),
+  frame_versions INTEGER,
+  frame_comments INTEGER,
+  open_frame_comments INTEGER,
+  client_review_open BOOLEAN NOT NULL DEFAULT FALSE,
+  workflow_review_open BOOLEAN NOT NULL DEFAULT FALSE,
+  blocker_count INTEGER,
+  last_frame_comment TEXT,
+  original_due_date DATE,
+  execution_time_label TEXT,
+  changes_time_label TEXT,
+  review_time_label TEXT,
+  workflow_change_round INTEGER,
   due_date DATE,
   completed_at TIMESTAMPTZ,
+  page_url TEXT,
   estimated_hours NUMERIC(10, 2),
   is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
   source_updated_at TIMESTAMPTZ,
@@ -235,17 +268,116 @@ ALTER TABLE greenhouse_delivery.projects
 ALTER TABLE greenhouse_delivery.projects
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
 
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS project_summary TEXT;
+
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS completion_label TEXT;
+
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS on_time_pct_source NUMERIC(6, 2);
+
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS avg_rpa_source NUMERIC(10, 2);
+
+ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS page_url TEXT;
+
 ALTER TABLE greenhouse_delivery.sprints
   ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.sprints
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
 
+ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS completed_tasks_count INTEGER;
+
+ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS total_tasks_count INTEGER;
+
+ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS completion_pct_source NUMERIC(6, 2);
+
+ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS page_url TEXT;
+
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS completion_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS delivery_compliance TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS days_late INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS rescheduled_days INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS is_rescheduled BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS performance_indicator_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS performance_indicator_code TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS client_change_round_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS client_change_round_final INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS rpa_semaphore_source TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS rpa_value NUMERIC(10, 2);
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS frame_versions INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS frame_comments INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS open_frame_comments INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS client_review_open BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS workflow_review_open BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS blocker_count INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS last_frame_comment TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS original_due_date DATE;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS execution_time_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS changes_time_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS review_time_label TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS workflow_change_round INTEGER;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS page_url TEXT;
 
 ALTER TABLE greenhouse_crm.companies
   ADD COLUMN IF NOT EXISTS owner_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL;

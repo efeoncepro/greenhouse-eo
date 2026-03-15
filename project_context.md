@@ -3,6 +3,44 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Performance indicators and source RpA semaphore identified and wired for runtime
+- Se confirmó contra `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos, no solo señales derivadas:
+  - `🟢 On-Time`
+  - `🟡 Late Drop`
+  - `🔴 Overdue`
+  - `🔵 Carry-Over`
+- También se confirmó que Notion ya trae `semáforo_rpa` como dato fuente separado de `rpa`.
+- Decisión de modelado:
+  - `rpa` y `semáforo_rpa` se tratan como datos distintos
+  - Greenhouse debe preservar ambos:
+    - `rpa_value`
+    - `rpa_semaphore_source`
+    - y puede seguir calculando un `rpa_semaphore_derived` para compatibilidad/guardrails
+- `Project Detail > tasks` ya expone en runtime el set de indicadores fuente:
+  - `rpaSemaphoreSource`
+  - `rpaSemaphoreDerived`
+  - `performanceIndicatorLabel`
+  - `performanceIndicatorCode`
+  - `deliveryCompliance`
+  - `completionLabel`
+  - `daysLate`
+  - `rescheduledDays`
+  - `isRescheduled`
+  - `clientChangeRoundLabel`
+  - `clientChangeRoundFinal`
+  - `workflowChangeRound`
+  - `originalDueDate`
+  - `executionTimeLabel`
+  - `changesTimeLabel`
+  - `reviewTimeLabel`
+- `Source Sync Runtime Projections` quedó ampliado para proyectar ese mismo set a:
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_delivery.tasks`
+  - además de señales fuente nuevas en `delivery_projects` y `delivery_sprints`
+- Restricción operativa vigente:
+  - el apply de BigQuery para estas nuevas columnas sigue bloqueado por `table update quota exceeded`
+  - el consumer de `Project Detail` no depende de esperar ese apply porque lee estos campos directo desde `notion_ops.tareas`
+
 ## Delta 2026-03-15 Finance clients consumers migrated to canonical-first, live-compatible reads
 - `Finance > Clients` ya no depende solo de `hubspot_crm.*` live para listar y detallar clientes.
 - Las rutas:

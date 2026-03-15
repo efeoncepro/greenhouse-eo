@@ -181,6 +181,26 @@ Puede avanzar en paralelo con ambas porque su output es una capa de datos y no d
 
 ## Estado 2026-03-15
 
+- `delivery` ya identificó y modeló el set de campos fuente más semántico para performance/ICO desde `notion_ops.tareas`:
+  - `indicador_de_performance`
+  - `semáforo_rpa`
+  - `cumplimiento`
+  - `completitud`
+  - `días_de_retraso`
+  - `días_reprogramados`
+  - `reprogramada`
+  - `client_change_round`
+  - `client_change_round_final`
+  - `workflow_change_round`
+  - `tiempo_de_ejecución`
+  - `tiempo_en_revisión`
+  - `tiempo_en_cambios`
+- El sync script ya quedó extendido para proyectarlos a `delivery_tasks`, más señales fuente en `delivery_projects` (`pct_on_time`, `rpa_promedio`, `finalización`) y `delivery_sprints` (`tareas_completadas`, `total_de_tareas`).
+- Bloqueo actual:
+  - el apply de BigQuery sobre `greenhouse_conformed.delivery_*` falló de nuevo por `table update quota exceeded`
+  - sí se aplicó el schema PostgreSQL
+  - mientras tanto, `Project Detail` ya consume esos campos directo desde `notion_ops.tareas`, así que el portal no queda ciego a esos indicadores
+
 - `crm_contacts` ya quedó materializado en:
   - `greenhouse_conformed.crm_contacts`
   - `greenhouse_crm.contacts`

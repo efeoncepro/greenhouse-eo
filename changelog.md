@@ -26,6 +26,22 @@
 
 ## 2026-03-15
 
+### Project detail now exposes source performance indicators and RpA semaphore
+- `Project Detail > tasks` ya expone directamente desde fuente:
+  - `semáforo_rpa`
+  - `indicador_de_performance`
+  - `cumplimiento`
+  - `completitud`
+  - `días_de_retraso`
+  - `días_reprogramados`
+  - `reprogramada`
+  - `client_change_round`
+  - `client_change_round_final`
+  - `workflow_change_round`
+  - tiempos de ejecución, revisión y cambios
+- También se agregó `rpaSemaphoreDerived` para compatibilidad con la lógica actual del portal.
+- `Source Sync Runtime Projections` quedó extendido para llevar ese mismo set al modelo canónico `delivery_*`, aunque el apply de BigQuery sigue temporalmente bloqueado por `table update quota exceeded`.
+
 ### Finance clients consumers now read canonical CRM first with live fallback
 - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya no dependen solo de `hubspot_crm.*` live.
 - Ambos consumers ahora priorizan:

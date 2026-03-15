@@ -25,10 +25,15 @@ type NotionProjectRow = {
   created_time: { value?: string } | string | null
   last_edited_time: { value?: string } | string | null
   nombre_del_proyecto: string | null
+  resumen: string | null
   estado: string | null
+  finalización: string | null
+  pct_on_time: string | null
   prioridad: string | null
+  rpa_promedio: string | null
   fechas: string | null
   fechas_end: string | null
+  page_url: string | null
   propietario_ids: string[] | null
 }
 
@@ -41,12 +46,36 @@ type NotionTaskRow = {
   estado: string | null
   prioridad: string | null
   priorización: string | null
+  completitud: string | null
+  cumplimiento: string | null
+  días_de_retraso: string | null
+  días_reprogramados: string | null
+  reprogramada: string | null
+  indicador_de_performance: string | null
+  client_change_round: string | null
+  client_change_round_final: string | null
+  rpa: string | null
+  semáforo_rpa: string | null
+  frame_versions: string | null
+  frame_comments: string | null
+  open_frame_comments: string | null
+  client_review_open: boolean | null
+  workflow_review_open: boolean | null
+  bloqueado_por_ids: string[] | null
+  last_frame_comment: string | null
   proyecto_ids: string[] | null
   sprint_ids: string[] | null
   responsables_ids: string[] | null
   fecha_límite: string | null
   fecha_límite_end: string | null
+  fecha_límite_original: string | null
+  fecha_límite_original_end: string | null
   fecha_de_completado: string | null
+  tiempo_de_ejecución: string | null
+  tiempo_en_cambios: string | null
+  tiempo_en_revisión: string | null
+  workflow_change_round: string | null
+  page_url: string | null
 }
 
 type NotionSprintRow = {
@@ -58,6 +87,9 @@ type NotionSprintRow = {
   estado_del_sprint: string | null
   fechas: string | null
   fechas_end: string | null
+  tareas_completadas: string | null
+  total_de_tareas: string | null
+  page_url: string | null
 }
 
 type ClientNotionBindingRow = {
@@ -156,6 +188,48 @@ const toBoolean = (value: unknown) => {
   const normalized = toNullableString(value)?.toLowerCase()
 
   return normalized === 'true'
+}
+
+const toYesNoBoolean = (value: unknown) => {
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  const normalized = toNullableString(value)
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  return normalized === 'si' || normalized === 'yes' || normalized === 'true'
+}
+
+const normalizePerformanceIndicatorCode = (value: unknown) => {
+  const normalized = toNullableString(value)
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (!normalized || normalized === '—' || normalized === '-') {
+    return null
+  }
+
+  if (normalized.includes('on-time') || normalized.includes('on time')) {
+    return 'on_time'
+  }
+
+  if (normalized.includes('late drop')) {
+    return 'late_drop'
+  }
+
+  if (normalized.includes('overdue')) {
+    return 'overdue'
+  }
+
+  if (normalized.includes('carry-over') || normalized.includes('carry over')) {
+    return 'carry_over'
+  }
+
+  return null
 }
 
 const toNumber = (value: unknown) => {
@@ -464,10 +538,15 @@ const syncNotion = async (): Promise<SyncSummary> => {
             created_time,
             last_edited_time,
             nombre_del_proyecto,
+            resumen,
             estado,
+            \`finalización\`,
+            pct_on_time,
             prioridad,
+            rpa_promedio,
             fechas,
             fechas_end,
+            page_url,
             propietario_ids
           FROM \`${projectId}.notion_ops.proyectos\`
           WHERE notion_page_id IS NOT NULL
@@ -484,12 +563,36 @@ const syncNotion = async (): Promise<SyncSummary> => {
             estado,
             prioridad,
             \`priorización\`,
+            completitud,
+            cumplimiento,
+            \`días_de_retraso\`,
+            \`días_reprogramados\`,
+            reprogramada,
+            indicador_de_performance,
+            client_change_round,
+            client_change_round_final,
+            rpa,
+            \`semáforo_rpa\`,
+            frame_versions,
+            frame_comments,
+            open_frame_comments,
+            client_review_open,
+            workflow_review_open,
+            bloqueado_por_ids,
+            last_frame_comment,
             proyecto_ids,
             sprint_ids,
             responsables_ids,
             \`fecha_límite\`,
             \`fecha_límite_end\`,
-            fecha_de_completado
+            \`fecha_límite_original\`,
+            \`fecha_límite_original_end\`,
+            fecha_de_completado,
+            \`tiempo_de_ejecución\`,
+            \`tiempo_en_cambios\`,
+            \`tiempo_en_revisión\`,
+            workflow_change_round,
+            page_url
           FROM \`${projectId}.notion_ops.tareas\`
           WHERE notion_page_id IS NOT NULL
         `
@@ -504,7 +607,10 @@ const syncNotion = async (): Promise<SyncSummary> => {
             nombre_del_sprint,
             estado_del_sprint,
             fechas,
-            fechas_end
+            fechas_end,
+            tareas_completadas,
+            total_de_tareas,
+            page_url
           FROM \`${projectId}.notion_ops.sprints\`
           WHERE notion_page_id IS NOT NULL
         `
@@ -597,11 +703,16 @@ const syncNotion = async (): Promise<SyncSummary> => {
         module_id: null,
         project_name: toNullableString(row.nombre_del_proyecto) || 'Sin nombre',
         project_status: toNullableString(row.estado),
+        project_summary: toNullableString(row.resumen),
+        completion_label: toNullableString(row['finalización']),
+        on_time_pct_source: toNumber(row.pct_on_time),
+        avg_rpa_source: toNumber(row.rpa_promedio),
         project_phase: null,
         owner_source_id: ownerSourceId,
         owner_member_id: null as string | null,
         start_date: toDateValue(row.fechas),
         end_date: toDateValue(row.fechas_end),
+        page_url: toNullableString(row.page_url),
         last_edited_time: toTimestampValue(row.last_edited_time),
         payload_hash: buildPayloadHash(row),
         is_deleted: false,
@@ -674,8 +785,32 @@ const syncNotion = async (): Promise<SyncSummary> => {
         task_priority: toNullableString(row.prioridad),
         assignee_source_id: assigneeSourceId,
         assignee_member_id: assigneeSourceId ? notionMemberMap.get(assigneeSourceId) || null : null,
+        completion_label: toNullableString(row.completitud),
+        delivery_compliance: toNullableString(row.cumplimiento),
+        days_late: toNumber(row['días_de_retraso']),
+        rescheduled_days: toNumber(row['días_reprogramados']),
+        is_rescheduled: toYesNoBoolean(row.reprogramada),
+        performance_indicator_label: toNullableString(row.indicador_de_performance),
+        performance_indicator_code: normalizePerformanceIndicatorCode(row.indicador_de_performance),
+        client_change_round_label: toNullableString(row.client_change_round),
+        client_change_round_final: toNumber(row.client_change_round_final),
+        rpa_semaphore_source: toNullableString(row['semáforo_rpa']),
+        rpa_value: toNumber(row.rpa),
+        frame_versions: toNumber(row.frame_versions),
+        frame_comments: toNumber(row.frame_comments),
+        open_frame_comments: toNumber(row.open_frame_comments),
+        client_review_open: Boolean(row.client_review_open),
+        workflow_review_open: Boolean(row.workflow_review_open),
+        blocker_count: row.bloqueado_por_ids?.length || 0,
+        last_frame_comment: toNullableString(row.last_frame_comment),
+        original_due_date: toDateValue(row['fecha_límite_original_end']) || toDateValue(row['fecha_límite_original']),
+        execution_time_label: toNullableString(row['tiempo_de_ejecución']),
+        changes_time_label: toNullableString(row['tiempo_en_cambios']),
+        review_time_label: toNullableString(row['tiempo_en_revisión']),
+        workflow_change_round: toNumber(row.workflow_change_round),
         due_date: toDateValue(row['fecha_límite_end']) || toDateValue(row['fecha_límite']),
         completed_at: toTimestampValue(row.fecha_de_completado),
+        page_url: toNullableString(row.page_url),
         last_edited_time: toTimestampValue(row.last_edited_time),
         payload_hash: buildPayloadHash(row),
         is_deleted: false,
@@ -704,6 +839,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
     const deliverySprints = sprints.map(row => {
       const sprintSourceId = toNullableString(row.notion_page_id)
+      const completedTasksCount = toNumber(row.tareas_completadas)
+      const totalTasksCount = toNumber(row.total_de_tareas)
 
       const projectDatabaseSourceId =
         (sprintSourceId ? sprintProjectDatabaseMap.get(sprintSourceId) || null : null) ||
@@ -718,6 +855,10 @@ const syncNotion = async (): Promise<SyncSummary> => {
         sprint_status: toNullableString(row.estado_del_sprint),
         start_date: toDateValue(row.fechas),
         end_date: toDateValue(row.fechas_end),
+        completed_tasks_count: completedTasksCount,
+        total_tasks_count: totalTasksCount,
+        completion_pct_source: totalTasksCount && totalTasksCount > 0 ? Math.round(((completedTasksCount || 0) / totalTasksCount) * 100) : null,
+        page_url: toNullableString(row.page_url),
         last_edited_time: toTimestampValue(row.last_edited_time),
         payload_hash: buildPayloadHash(row),
         is_deleted: false,
@@ -759,10 +900,15 @@ const syncNotion = async (): Promise<SyncSummary> => {
             notion_project_id,
             project_name,
             project_status,
+            project_summary,
+            completion_label,
+            on_time_pct_source,
+            avg_rpa_source,
             project_phase,
             owner_member_id,
             start_date,
             end_date,
+            page_url,
             active,
             is_deleted,
             source_updated_at,
@@ -770,7 +916,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::date, $12::date, TRUE, $13, $14::timestamptz, $15::timestamptz, $16, $17)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::date, $16::date, $17, TRUE, $18, $19::timestamptz, $20::timestamptz, $21, $22)
           ON CONFLICT (notion_project_id) DO UPDATE
           SET
             space_id = EXCLUDED.space_id,
@@ -779,10 +925,15 @@ const syncNotion = async (): Promise<SyncSummary> => {
             project_database_source_id = EXCLUDED.project_database_source_id,
             project_name = EXCLUDED.project_name,
             project_status = EXCLUDED.project_status,
+            project_summary = EXCLUDED.project_summary,
+            completion_label = EXCLUDED.completion_label,
+            on_time_pct_source = EXCLUDED.on_time_pct_source,
+            avg_rpa_source = EXCLUDED.avg_rpa_source,
             project_phase = EXCLUDED.project_phase,
             owner_member_id = EXCLUDED.owner_member_id,
             start_date = EXCLUDED.start_date,
             end_date = EXCLUDED.end_date,
+            page_url = EXCLUDED.page_url,
             active = EXCLUDED.active,
             is_deleted = EXCLUDED.is_deleted,
             source_updated_at = EXCLUDED.source_updated_at,
@@ -800,10 +951,15 @@ const syncNotion = async (): Promise<SyncSummary> => {
           project.project_source_id,
           project.project_name,
           project.project_status,
+          project.project_summary,
+          project.completion_label,
+          project.on_time_pct_source,
+          project.avg_rpa_source,
           project.project_phase,
           project.owner_member_id,
           project.start_date,
           project.end_date,
+          project.page_url,
           project.is_deleted,
           project.last_edited_time,
           project.synced_at,
@@ -827,13 +983,17 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sprint_status,
             start_date,
             end_date,
+            completed_tasks_count,
+            total_tasks_count,
+            completion_pct_source,
+            page_url,
             is_deleted,
             source_updated_at,
             synced_at,
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11::timestamptz, $12::timestamptz, $13, $14)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11, $12, $13, $14::timestamptz, $15::timestamptz, $16, $17)
           ON CONFLICT (notion_sprint_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -843,6 +1003,10 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sprint_status = EXCLUDED.sprint_status,
             start_date = EXCLUDED.start_date,
             end_date = EXCLUDED.end_date,
+            completed_tasks_count = EXCLUDED.completed_tasks_count,
+            total_tasks_count = EXCLUDED.total_tasks_count,
+            completion_pct_source = EXCLUDED.completion_pct_source,
+            page_url = EXCLUDED.page_url,
             is_deleted = EXCLUDED.is_deleted,
             source_updated_at = EXCLUDED.source_updated_at,
             synced_at = EXCLUDED.synced_at,
@@ -860,6 +1024,10 @@ const syncNotion = async (): Promise<SyncSummary> => {
           sprint.sprint_status,
           sprint.start_date,
           sprint.end_date,
+          sprint.completed_tasks_count,
+          sprint.total_tasks_count,
+          sprint.completion_pct_source,
+          sprint.page_url,
           sprint.is_deleted,
           sprint.last_edited_time,
           sprint.synced_at,
@@ -889,15 +1057,39 @@ const syncNotion = async (): Promise<SyncSummary> => {
             task_status,
             task_phase,
             task_priority,
+            completion_label,
+            delivery_compliance,
+            days_late,
+            rescheduled_days,
+            is_rescheduled,
+            performance_indicator_label,
+            performance_indicator_code,
+            client_change_round_label,
+            client_change_round_final,
+            rpa_semaphore_source,
+            rpa_value,
+            frame_versions,
+            frame_comments,
+            open_frame_comments,
+            client_review_open,
+            workflow_review_open,
+            blocker_count,
+            last_frame_comment,
+            original_due_date,
+            execution_time_label,
+            changes_time_label,
+            review_time_label,
+            workflow_change_round,
             due_date,
             completed_at,
+            page_url,
             is_deleted,
             source_updated_at,
             synced_at,
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16::date, $17::timestamptz, $18, $19::timestamptz, $20::timestamptz, $21, $22)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35::date, $36, $37, $38, $39, $40, $41::date, $42::timestamptz, $43, $44, $45::timestamptz, $46::timestamptz, $47, $48)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -913,8 +1105,32 @@ const syncNotion = async (): Promise<SyncSummary> => {
             task_status = EXCLUDED.task_status,
             task_phase = EXCLUDED.task_phase,
             task_priority = EXCLUDED.task_priority,
+            completion_label = EXCLUDED.completion_label,
+            delivery_compliance = EXCLUDED.delivery_compliance,
+            days_late = EXCLUDED.days_late,
+            rescheduled_days = EXCLUDED.rescheduled_days,
+            is_rescheduled = EXCLUDED.is_rescheduled,
+            performance_indicator_label = EXCLUDED.performance_indicator_label,
+            performance_indicator_code = EXCLUDED.performance_indicator_code,
+            client_change_round_label = EXCLUDED.client_change_round_label,
+            client_change_round_final = EXCLUDED.client_change_round_final,
+            rpa_semaphore_source = EXCLUDED.rpa_semaphore_source,
+            rpa_value = EXCLUDED.rpa_value,
+            frame_versions = EXCLUDED.frame_versions,
+            frame_comments = EXCLUDED.frame_comments,
+            open_frame_comments = EXCLUDED.open_frame_comments,
+            client_review_open = EXCLUDED.client_review_open,
+            workflow_review_open = EXCLUDED.workflow_review_open,
+            blocker_count = EXCLUDED.blocker_count,
+            last_frame_comment = EXCLUDED.last_frame_comment,
+            original_due_date = EXCLUDED.original_due_date,
+            execution_time_label = EXCLUDED.execution_time_label,
+            changes_time_label = EXCLUDED.changes_time_label,
+            review_time_label = EXCLUDED.review_time_label,
+            workflow_change_round = EXCLUDED.workflow_change_round,
             due_date = EXCLUDED.due_date,
             completed_at = EXCLUDED.completed_at,
+            page_url = EXCLUDED.page_url,
             is_deleted = EXCLUDED.is_deleted,
             source_updated_at = EXCLUDED.source_updated_at,
             synced_at = EXCLUDED.synced_at,
@@ -938,8 +1154,32 @@ const syncNotion = async (): Promise<SyncSummary> => {
           task.task_status,
           task.task_phase,
           task.task_priority,
+          task.completion_label,
+          task.delivery_compliance,
+          task.days_late,
+          task.rescheduled_days,
+          task.is_rescheduled,
+          task.performance_indicator_label,
+          task.performance_indicator_code,
+          task.client_change_round_label,
+          task.client_change_round_final,
+          task.rpa_semaphore_source,
+          task.rpa_value,
+          task.frame_versions,
+          task.frame_comments,
+          task.open_frame_comments,
+          task.client_review_open,
+          task.workflow_review_open,
+          task.blocker_count,
+          task.last_frame_comment,
+          task.original_due_date,
+          task.execution_time_label,
+          task.changes_time_label,
+          task.review_time_label,
+          task.workflow_change_round,
           task.due_date,
           task.completed_at,
+          task.page_url,
           task.is_deleted,
           task.last_edited_time,
           task.synced_at,

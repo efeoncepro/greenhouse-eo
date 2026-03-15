@@ -40,6 +40,87 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 09:46 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Levantar todos los campos semánticamente indicadores desde `Notion` hacia el modelo runtime y exponerlos ya en el consumer de `Project Detail`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `scripts/sync-source-runtime-projections.ts`
+- `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-postgres-source-sync.sql`
+- `src/lib/projects/get-project-detail.ts`
+- `src/types/greenhouse-project-detail.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Confirmado directamente en `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos:
+  - `🟢 On-Time`
+  - `🟡 Late Drop`
+  - `🔴 Overdue`
+  - `🔵 Carry-Over`
+- Confirmado además que la fuente ya trae:
+  - `semáforo_rpa`
+  - `cumplimiento`
+  - `completitud`
+  - `días_de_retraso`
+  - `días_reprogramados`
+  - `reprogramada`
+  - `client_change_round`
+  - `client_change_round_final`
+  - `workflow_change_round`
+  - tiempos de ejecución/revisión/cambios
+- `Project Detail > tasks` ahora expone en runtime:
+  - `rpaSemaphoreSource`
+  - `rpaSemaphoreDerived`
+  - `performanceIndicatorLabel`
+  - `performanceIndicatorCode`
+  - `deliveryCompliance`
+  - `completionLabel`
+  - `daysLate`
+  - `rescheduledDays`
+  - `isRescheduled`
+  - `clientChangeRoundLabel`
+  - `clientChangeRoundFinal`
+  - `workflowChangeRound`
+  - `originalDueDate`
+  - `executionTimeLabel`
+  - `changesTimeLabel`
+  - `reviewTimeLabel`
+- `Source Sync Runtime Projections` quedó extendido para proyectar ese mismo set a `delivery_tasks`, más señales fuente de `delivery_projects` y `delivery_sprints`.
+
+### Verificación
+- `pnpm exec eslint scripts/sync-source-runtime-projections.ts src/lib/projects/get-project-detail.ts src/types/greenhouse-project-detail.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-source-sync.ts`
+  - correcto
+- inspección real de `notion_ops.INFORMATION_SCHEMA.COLUMNS`
+  - correcta
+- muestreo real de `indicador_de_performance`
+  - correcto
+
+### Riesgos o pendientes
+- `setup-bigquery-source-sync.ts` sigue bloqueado por `BigQuery table update quota exceeded`; el cambio quedó implementado en SQL y sync script, pero no materializado todavía en `greenhouse_conformed`.
+- El consumer de `Project Detail` ya puede usar estos indicadores directo desde `notion_ops`, así que el portal no queda esperando ese apply.
+- Próximo paso recomendado:
+  - reintentar el apply de `greenhouse_conformed.delivery_*` cuando baje la cuota
+  - luego cortar `dashboard` y `agency` para que consuman estos indicadores desde la proyección canónica
+
 ## 2026-03-15 09:18 America/Santiago
 
 ### Agente

@@ -49,12 +49,26 @@ interface TaskRow {
   task_name: string | null
   status: string | null
   rpa_value: number | string | null
+  rpa_semaphore_source: string | null
+  performance_indicator_label: string | null
+  completion_label: string | null
+  delivery_compliance: string | null
+  days_late: number | string | null
+  rescheduled_days: number | string | null
+  is_rescheduled: boolean | null
+  client_change_round_label: string | null
+  client_change_round_final: number | string | null
+  workflow_change_round: number | string | null
   frame_versions: number | string | null
   frame_comments: number | string | null
   open_frame_comments: number | string | null
   client_review_open: boolean | null
   workflow_review_open: boolean | null
   blocker_count: number | string | null
+  original_due_date: { value?: string } | string | null
+  execution_time_label: string | null
+  changes_time_label: string | null
+  review_time_label: string | null
   sprint_name: string | null
   last_frame_comment: string | null
   last_edited_time: { value?: string } | string | null
@@ -97,6 +111,32 @@ const toDateString = (value: { value?: string } | string | null) => {
 }
 
 const clampPercentage = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
+
+const normalizePerformanceIndicatorCode = (value: string | null) => {
+  const normalized = (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (!normalized || normalized === '—' || normalized === '-') {
+    return null
+  }
+
+  if (normalized.includes('on-time') || normalized.includes('on time')) return 'on_time'
+  if (normalized.includes('late drop')) return 'late_drop'
+  if (normalized.includes('overdue')) return 'overdue'
+  if (normalized.includes('carry-over') || normalized.includes('carry over')) return 'carry_over'
+
+  return null
+}
+
+const getDerivedRpaSemaphore = (value: number | null): 'green' | 'yellow' | 'red' | 'default' => {
+  if (value === null || value === 0) return 'default'
+  if (value <= 1.5) return 'green'
+  if (value <= 2.5) return 'yellow'
+
+  return 'red'
+}
 
 const getStatusTone = (status: string): GreenhouseProjectStatusTone => {
   const normalized = status.toLowerCase()
@@ -362,12 +402,32 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       nombre_de_tarea AS task_name,
       estado AS status,
       COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
+      \`semáforo_rpa\` AS rpa_semaphore_source,
+      indicador_de_performance AS performance_indicator_label,
+      completitud AS completion_label,
+      cumplimiento AS delivery_compliance,
+      SAFE_CAST(\`días_de_retraso\` AS INT64) AS days_late,
+      SAFE_CAST(\`días_reprogramados\` AS INT64) AS rescheduled_days,
+      CASE LOWER(COALESCE(reprogramada, ''))
+        WHEN 'sí' THEN TRUE
+        WHEN 'si' THEN TRUE
+        WHEN 'yes' THEN TRUE
+        WHEN 'true' THEN TRUE
+        ELSE FALSE
+      END AS is_rescheduled,
+      client_change_round AS client_change_round_label,
+      SAFE_CAST(client_change_round_final AS INT64) AS client_change_round_final,
+      SAFE_CAST(workflow_change_round AS INT64) AS workflow_change_round,
       COALESCE(SAFE_CAST(frame_versions AS INT64), 0) AS frame_versions,
       COALESCE(SAFE_CAST(frame_comments AS INT64), 0) AS frame_comments,
       COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
       COALESCE(client_review_open, FALSE) AS client_review_open,
       COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
       COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count,
+      COALESCE(\`fecha_límite_original_end\`, \`fecha_límite_original\`) AS original_due_date,
+      \`tiempo_de_ejecución\` AS execution_time_label,
+      \`tiempo_en_cambios\` AS changes_time_label,
+      \`tiempo_en_revisión\` AS review_time_label,
       sprint AS sprint_name,
       last_frame_comment,
       last_edited_time,
@@ -395,11 +455,33 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       status: row.status || 'Unknown',
       statusTone: getStatusTone(row.status || 'Unknown'),
       rpa: toNumber(row.rpa_value),
+      rpaSemaphoreSource: row.rpa_semaphore_source,
+      rpaSemaphoreDerived: getDerivedRpaSemaphore(toNumber(row.rpa_value)),
+      performanceIndicatorLabel: row.performance_indicator_label,
+      performanceIndicatorCode: normalizePerformanceIndicatorCode(row.performance_indicator_label),
+      deliveryCompliance: row.delivery_compliance,
+      completionLabel: row.completion_label,
+      daysLate: row.days_late === null || row.days_late === undefined ? null : toNumber(row.days_late),
+      rescheduledDays: row.rescheduled_days === null || row.rescheduled_days === undefined ? null : toNumber(row.rescheduled_days),
+      isRescheduled: Boolean(row.is_rescheduled),
+      clientChangeRoundLabel: row.client_change_round_label,
+      clientChangeRoundFinal:
+        row.client_change_round_final === null || row.client_change_round_final === undefined
+          ? null
+          : toNumber(row.client_change_round_final),
+      workflowChangeRound:
+        row.workflow_change_round === null || row.workflow_change_round === undefined
+          ? null
+          : toNumber(row.workflow_change_round),
       frameVersions: toNumber(row.frame_versions),
       frameComments: toNumber(row.frame_comments),
       openFrameComments,
       reviewOpen,
       blocked,
+      originalDueDate: toDateString(row.original_due_date),
+      executionTimeLabel: row.execution_time_label,
+      changesTimeLabel: row.changes_time_label,
+      reviewTimeLabel: row.review_time_label,
       sprintName: row.sprint_name,
       lastFrameComment: row.last_frame_comment,
       lastEditedAt: toDateString(row.last_edited_time),
