@@ -56,6 +56,100 @@ Boundary deliberado:
 - `suppliers` no se cortó todavía a PostgreSQL en runtime principal
 - razón: `AI Tooling` sigue consumiendo `greenhouse.fin_suppliers` en BigQuery y no conviene romper ese bridge en esta misma tanda
 
+## Delta 2026-03-15 Slice 2 materializado — Income, Expenses, Payments
+
+Segundo corte ejecutado por Claude. Cubre el write path completo de income, expenses y pagos.
+
+### Schema y DDL
+
+- `scripts/setup-postgres-finance-slice2.sql` — DDL para 7 tablas + vista `income_360`
+- `scripts/setup-postgres-finance-slice2.ts` — runner TypeScript
+- `scripts/backfill-postgres-finance-slice2.ts` — backfill BigQuery → PostgreSQL (escrito, NO ejecutado aún)
+- `scripts/setup-postgres-finance.sql` — actualizado con DDL Slice 2 inline
+
+Tablas creadas en `greenhouse_finance`:
+- `client_profiles` — perfiles de facturación
+- `income` — facturas emitidas a clientes
+- `income_payments` — pagos individuales (reemplaza JSON `payments_received` de BigQuery)
+- `factoring_operations` — operaciones de factoring
+- `expenses` — egresos operativos
+- `reconciliation_periods` — periodos de conciliación
+- `bank_statement_rows` — líneas de extractos bancarios
+
+Vista serving:
+- `greenhouse_finance.income_360` — income + client context + factoring
+
+### Repository layer
+
+- `src/lib/finance/postgres-store-slice2.ts` (~1100 líneas)
+  - Readiness check independiente: `assertFinanceSlice2PostgresReady()` con TTL cache de 60s
+  - Chequea 6 tablas requeridas sin depender de Slice 1
+  - Exports principales:
+    - `listFinanceIncomeFromPostgres()` — lista income con payments JOIN
+    - `getFinanceIncomeFromPostgres()` — detalle income + payments array
+    - `createFinanceIncomeInPostgres()` — insert income + outbox event
+    - `createFinanceIncomePaymentInPostgres()` — insert payment + update income (transaccional con `FOR UPDATE`)
+    - `listFinanceExpensesFromPostgres()` — lista expenses
+    - `getFinanceExpenseFromPostgres()` — detalle expense
+    - `createFinanceExpenseInPostgres()` — insert expense + outbox event
+    - `listFinanceIncomePaymentsFromPostgres()` — payments standalone
+    - `buildMonthlySequenceIdFromPostgres()` — genera sequence IDs (INC-2026-03-001)
+  - Todos los writes publican a `greenhouse_sync.outbox_events`
+
+### Rutas wired a Postgres-first
+
+| Ruta | Método | Postgres-first | BigQuery fallback |
+|------|--------|----------------|-------------------|
+| `/api/finance/income` | GET | `listFinanceIncomeFromPostgres()` | BigQuery `fin_income` |
+| `/api/finance/income` | POST | `createFinanceIncomeInPostgres()` | BigQuery INSERT |
+| `/api/finance/income/[id]` | GET | `getFinanceIncomeFromPostgres()` | BigQuery SELECT |
+| `/api/finance/income/[id]/payment` | POST | `createFinanceIncomePaymentInPostgres()` | BigQuery JSON update |
+| `/api/finance/expenses` | GET | `listFinanceExpensesFromPostgres()` | BigQuery `fin_expenses` |
+| `/api/finance/expenses` | POST | `createFinanceExpenseInPostgres()` | BigQuery INSERT |
+| `/api/finance/expenses/[id]` | GET | `getFinanceExpenseFromPostgres()` | BigQuery SELECT |
+
+Patrón de fallback: `try { postgres } catch { if (!shouldFallbackFromFinancePostgres(error)) throw; } // BigQuery fallback`
+
+### Archivos de ruta modificados
+
+- `src/app/api/finance/income/route.ts` — GET + POST wired
+- `src/app/api/finance/income/[id]/route.ts` — GET wired
+- `src/app/api/finance/income/[id]/payment/route.ts` — POST wired
+- `src/app/api/finance/expenses/route.ts` — GET + POST wired
+- `src/app/api/finance/expenses/[id]/route.ts` — GET wired
+
+### Decisiones arquitectónicas Slice 2
+
+1. **Income payments como tabla propia**: En BigQuery, payments era un JSON array `payments_received` dentro de `fin_income`. En Postgres, se normalizó a tabla `income_payments` con FK a `income.income_id`. El GET de income desde Postgres devuelve payments como array (JOIN + aggregation). BigQuery fallback sigue usando el JSON array.
+
+2. **Readiness independiente**: `assertFinanceSlice2PostgresReady()` es separado de `assertFinancePostgresReady()` (Slice 1). Así un ambiente que solo tiene Slice 1 no se rompe al intentar usar Slice 2.
+
+3. **PUT no migrado**: Los endpoints PUT de income y expenses siguen operando solo contra BigQuery. Razón: requieren lógica de resolución de contexto compleja (`resolveFinanceClientContext`, `resolveFinanceMemberContext`) que conviene migrar como un tercer slice separado.
+
+4. **Sequence IDs**: `buildMonthlySequenceIdFromPostgres()` genera IDs como `INC-2026-03-001` usando `COUNT(*) + 1` dentro del mes. Si Postgres no está disponible, cae al `buildMonthlySequenceId()` de BigQuery.
+
+### Backfill
+
+Script `scripts/backfill-postgres-finance-slice2.ts` escrito pero **NO ejecutado**. Backfilla:
+- `client_profiles` desde `fin_client_profiles`
+- `income` desde `fin_income`
+- `income_payments` desde JSON `payments_received` de `fin_income`
+- `expenses` desde `fin_expenses`
+- `reconciliation_periods` desde `fin_reconciliation_periods`
+- `bank_statement_rows` desde `fin_bank_statement_rows`
+
+### Pendientes Slice 2
+
+- [ ] Ejecutar backfill (`pnpm exec tsx scripts/backfill-postgres-finance-slice2.ts`)
+- [ ] Migrar PUT income y PUT expenses a Postgres-first
+- [ ] Migrar reconciliation runtime (match/unmatch/exclude/auto-match)
+- [ ] Verificar TypeScript: `pnpm tsc --noEmit` (pasó localmente antes del commit)
+
+### Commit
+
+- `8375edb` en `fix/codex-operational-finance` — pushed to origin
+- Archivos: 10 (1 nuevo + 9 modificados)
+
 ## Por que esta lane existe ahora
 
 `Finance` ya recibio varias tandas de hardening y QA.

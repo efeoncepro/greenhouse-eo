@@ -130,14 +130,17 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `HubSpot Contacts -> greenhouse_conformed.crm_contacts -> greenhouse_crm.contacts`
   - reconciliation `HubSpot Contact -> client_user / identity_profile`
 
-## 2026-03-15 ~21:30 America/Santiago
+## 2026-03-15 ~22:30 America/Santiago
 
 ### Agente
 - Claude
 
 ### Objetivo del turno
-- Wiring completo de Finance Slice 2 a PostgreSQL: income (GET/POST), expenses (GET/POST), income payments (POST), expense detail (GET), income detail (GET).
-- Lectura y análisis de `GREENHOUSE_IDENTITY_ACCESS_V2.md` para modelar Identity & Access V2 en PostgreSQL.
+- Wiring completo de Finance Slice 2 a PostgreSQL: income, expenses, payments.
+- Backfill scripts para HR Payroll y HR Leave (BigQuery → PostgreSQL).
+- Serving view `member_leave_360` para HR Leave.
+- Análisis de Identity & Access V2 para modelado PostgreSQL.
+- Validación completa del proyecto (TypeScript + build).
 
 ### Rama
 - Rama usada: `fix/codex-operational-finance`
@@ -153,35 +156,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/app/api/finance/income/[id]/payment/route.ts` (modificado — Postgres-first POST)
 - `src/app/api/finance/expenses/route.ts` (modificado — Postgres-first GET + POST)
 - `src/app/api/finance/expenses/[id]/route.ts` (modificado — Postgres-first GET)
-- `scripts/setup-postgres-finance-slice2.sql` (existente, no modificado)
-- `scripts/setup-postgres-finance-slice2.ts` (existente, no modificado)
-- `scripts/backfill-postgres-finance-slice2.ts` (existente, no modificado)
+- `scripts/backfill-postgres-payroll.ts` (NUEVO — backfill BigQuery → Postgres para payroll)
+- `scripts/backfill-postgres-hr-leave.ts` (NUEVO — backfill BigQuery → Postgres para leave)
+- `scripts/setup-postgres-hr-leave.sql` (modificado — vista `member_leave_360` agregada)
+- `scripts/sync-source-runtime-projections.ts` (fix TS: tipo de `owner_member_id`)
 - `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md` (actualizado con delta Slice 2)
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md` (actualizado con delta completo)
+- `docs/tasks/README.md` (agregado Identity Access V2 a To Do)
+- `changelog.md` (entradas para Finance Slice 2 + HR backfills)
 
 ### Cambios realizados
-- Creado `postgres-store-slice2.ts` con repository layer completo para Slice 2:
-  - Readiness check independiente (`assertFinanceSlice2PostgresReady()`) con TTL cache 60s
-  - CRUD para income, expenses, income_payments
-  - Sequence ID generator para Postgres (`buildMonthlySequenceIdFromPostgres()`)
-  - Todos los writes publican outbox events
-  - Payment creation transaccional: INSERT payment + UPDATE income con `FOR UPDATE` lock
-- Wired 7 rutas API a Postgres-first con BigQuery fallback:
-  - GET/POST `/api/finance/income`
-  - GET `/api/finance/income/[id]`
-  - POST `/api/finance/income/[id]/payment`
-  - GET/POST `/api/finance/expenses`
-  - GET `/api/finance/expenses/[id]`
-- Income payments normalizados: Postgres usa tabla `income_payments`, BigQuery fallback sigue con JSON `payments_received`
-- Analizados esquemas existentes y spec V2 para proponer modelo PostgreSQL de Identity & Access V2 (no implementado aún)
+
+**Finance Slice 2**:
+- Creado `postgres-store-slice2.ts` con repository layer completo
+- 7 rutas API wired a Postgres-first con BigQuery fallback
+- Income payments normalizados a tabla propia en Postgres
+
+**HR Payroll backfill**:
+- `scripts/backfill-postgres-payroll.ts` — backfilla 4 tablas: compensation_versions, payroll_periods, payroll_entries, payroll_bonus_config
+
+**HR Leave backfill + serving view**:
+- `scripts/backfill-postgres-hr-leave.ts` — backfilla 4 tablas: leave_types, leave_balances, leave_requests, leave_request_actions
+- `greenhouse_serving.member_leave_360` — vista 360 de leave por member con balances y solicitudes
+
+**Fix TS de Codex**:
+- `sync-source-runtime-projections.ts:571` — `owner_member_id: null` tipado como `null as string | null` para que el build pase
 
 ### Verificación
-- `pnpm tsc --noEmit` — pasó antes del commit
-- Commit `8375edb` pushed a `fix/codex-operational-finance`
+- `pnpm tsc --noEmit` — pasó limpio (0 errores)
+- `pnpm build` — build exitoso, todas las rutas finance + hr compiladas correctamente
 
 ### Riesgos o pendientes
-- Backfill Slice 2 **NO ejecutado** — `scripts/backfill-postgres-finance-slice2.ts` está listo pero no se corrió
-- PUT income y PUT expenses siguen solo en BigQuery (migrar como Slice 3)
-- Reconciliation runtime (match/unmatch/exclude/auto-match) aún en BigQuery
+- Backfills **NO ejecutados** aún (finance slice 2, payroll, leave)
+- DDL leave actualizado no ejecutado en Cloud SQL (para crear `member_leave_360`)
+- PUT income y PUT expenses siguen solo en BigQuery
+- Reconciliation runtime aún en BigQuery
 - Identity & Access V2: modelo PostgreSQL propuesto pero DDL no generado aún
 
 ---

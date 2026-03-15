@@ -239,8 +239,54 @@ Esta migracion adapta el schema al modelo canonico 360 (`GREENHOUSE_360_OBJECT_M
 
 ### Plan de implementacion
 
-1. `scripts/setup-postgres-payroll.sql` — DDL + seed + grants
-2. `src/lib/payroll/postgres-store.ts` — repository layer con assertReady, typed rows, mappers, outbox
-3. Migrar APIs existentes a Postgres-first con fallback BQ temporal
-4. Agregar `greenhouse_serving.member_payroll_360` view
-5. TypeScript check y validacion runtime
+1. `scripts/setup-postgres-payroll.sql` — DDL + seed + grants ✅
+2. `src/lib/payroll/postgres-store.ts` — repository layer con assertReady, typed rows, mappers, outbox ✅
+3. Migrar APIs existentes a Postgres-first con fallback BQ temporal ✅
+4. Agregar `greenhouse_serving.member_payroll_360` view ✅
+5. TypeScript check y validacion runtime ✅
+
+## Delta 2026-03-15 — Payroll + Leave completamente wired
+
+### Payroll — Estado completo
+
+**DDL**: `scripts/setup-postgres-payroll.sql` materializado con 4 tablas + vista `member_payroll_360`
+**Repository**: `src/lib/payroll/postgres-store.ts` — 25 funciones exportadas
+**Rutas wired**: 11/11 rutas Postgres-first con BigQuery fallback
+**Serving view**: `greenhouse_serving.member_payroll_360` (member + compensación actual)
+
+### Leave — Estado completo
+
+**DDL**: `scripts/setup-postgres-hr-leave.sql` materializado con 4 tablas + vista `member_leave_360`
+**Repository**: `src/lib/hr-core/postgres-leave-store.ts` — 8 funciones exportadas
+**Rutas wired**: 5/5 rutas Postgres-first con BigQuery fallback
+**Serving view**: `greenhouse_serving.member_leave_360` (member + balances + solicitudes año actual)
+
+### Backfill scripts (Claude, 2026-03-15)
+
+- `scripts/backfill-postgres-payroll.ts` — backfill BigQuery → PostgreSQL para:
+  - `compensation_versions`
+  - `payroll_periods`
+  - `payroll_entries`
+  - `payroll_bonus_config`
+
+- `scripts/backfill-postgres-hr-leave.ts` — backfill BigQuery → PostgreSQL para:
+  - `leave_types`
+  - `leave_balances`
+  - `leave_requests`
+  - `leave_request_actions`
+
+**Status backfill**: Scripts escritos, **NO ejecutados aún**.
+
+### Serving view agregada (Claude, 2026-03-15)
+
+- `greenhouse_serving.member_leave_360` — agrega al DDL de leave:
+  - member + department + supervisor
+  - vacation balance (allowance, used, reserved, available)
+  - pending/approved request counts del año actual
+  - Grants para `greenhouse_runtime` y `greenhouse_migrator`
+
+### Pendientes
+
+- [ ] Ejecutar backfill payroll (`pnpm exec tsx scripts/backfill-postgres-payroll.ts`)
+- [ ] Ejecutar backfill leave (`pnpm exec tsx scripts/backfill-postgres-hr-leave.ts`)
+- [ ] Ejecutar DDL leave actualizado para crear `member_leave_360` (`pnpm exec tsx scripts/setup-postgres-hr-leave.ts`)

@@ -35,9 +35,14 @@
   - GET `/api/finance/expenses/[id]`
 - Income payments normalizados: Postgres usa tabla `income_payments` con FK; BigQuery fallback mantiene JSON `payments_received`.
 - Payment creation transaccional con `FOR UPDATE` lock sobre income row.
-- Commit `8375edb` pushed a `fix/codex-operational-finance`.
-- Backfill script escrito pero NO ejecutado aún.
 - PUT income/expenses y reconciliation runtime quedan pendientes para Slice 3.
+
+### HR Payroll & Leave backfill scripts + serving view (Claude)
+- `scripts/backfill-postgres-payroll.ts` — backfill BigQuery → PostgreSQL para compensation_versions, payroll_periods, payroll_entries, payroll_bonus_config.
+- `scripts/backfill-postgres-hr-leave.ts` — backfill BigQuery → PostgreSQL para leave_types, leave_balances, leave_requests, leave_request_actions.
+- `greenhouse_serving.member_leave_360` — serving view con member + vacation balance + pending/approved requests del año actual.
+- Scripts escritos, NO ejecutados aún.
+- Fix TS en `sync-source-runtime-projections.ts:571` para desbloquear build.
 
 ### Data model master and first real source-sync seed
 - Se agregó `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` y su operating model para agentes como fuente de verdad del modelo de datos Greenhouse.

@@ -103,6 +103,64 @@ SET
   active = EXCLUDED.active,
   updated_at = CURRENT_TIMESTAMP;
 
+-- ============================================================
+-- Serving view: member_leave_360
+-- Combines canonical member identity with current-year leave
+-- balances and recent request counts.
+-- ============================================================
+
+CREATE OR REPLACE VIEW greenhouse_serving.member_leave_360 AS
+SELECT
+  m.member_id,
+  m.display_name,
+  m.primary_email,
+  m.status AS member_status,
+  m.active AS member_active,
+  d.name AS department_name,
+  mgr.member_id AS supervisor_member_id,
+  mgr.display_name AS supervisor_name,
+  COALESCE(bal.vacation_allowance, 0) AS vacation_allowance,
+  COALESCE(bal.vacation_used, 0) AS vacation_used,
+  COALESCE(bal.vacation_reserved, 0) AS vacation_reserved,
+  COALESCE(bal.vacation_allowance, 0)
+    + COALESCE(bal.vacation_carried, 0)
+    - COALESCE(bal.vacation_used, 0)
+    - COALESCE(bal.vacation_reserved, 0) AS vacation_available,
+  COALESCE(req.pending_count, 0) AS pending_requests,
+  COALESCE(req.approved_count, 0) AS approved_requests_this_year,
+  COALESCE(req.total_approved_days, 0) AS total_approved_days_this_year
+FROM greenhouse_core.members m
+LEFT JOIN greenhouse_core.departments d ON d.department_id = m.department_id
+LEFT JOIN greenhouse_core.members mgr ON mgr.member_id = m.reports_to_member_id
+LEFT JOIN LATERAL (
+  SELECT
+    SUM(allowance_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_allowance,
+    SUM(carried_over_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_carried,
+    SUM(used_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_used,
+    SUM(reserved_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_reserved
+  FROM greenhouse_hr.leave_balances lb
+  WHERE lb.member_id = m.member_id
+    AND lb.year = EXTRACT(YEAR FROM CURRENT_DATE)
+) bal ON TRUE
+LEFT JOIN LATERAL (
+  SELECT
+    COUNT(*) FILTER (WHERE status IN ('pending_supervisor', 'pending_hr')) AS pending_count,
+    COUNT(*) FILTER (WHERE status = 'approved') AS approved_count,
+    COALESCE(SUM(requested_days) FILTER (WHERE status = 'approved'), 0) AS total_approved_days
+  FROM greenhouse_hr.leave_requests lr
+  WHERE lr.member_id = m.member_id
+    AND EXTRACT(YEAR FROM lr.start_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+) req ON TRUE
+WHERE m.active = TRUE;
+
+-- Ensure serving view is accessible
+GRANT SELECT ON greenhouse_serving.member_leave_360 TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_serving.member_leave_360 TO greenhouse_migrator;
+
+-- ============================================================
+-- Grants
+-- ============================================================
+
 GRANT USAGE ON SCHEMA greenhouse_hr TO greenhouse_runtime;
 GRANT USAGE, CREATE ON SCHEMA greenhouse_hr TO greenhouse_migrator;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_hr TO greenhouse_runtime;
