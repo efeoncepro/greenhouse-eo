@@ -128,84 +128,92 @@ export async function GET(request: Request) {
 
   await ensureFinanceInfrastructure()
 
-  const { searchParams } = new URL(request.url)
-  const expenseType = searchParams.get('expenseType')
-  const status = searchParams.get('status')
-  const clientId = searchParams.get('clientId')
-  const memberId = searchParams.get('memberId')
-  const supplierId = searchParams.get('supplierId')
-  const serviceLine = searchParams.get('serviceLine')
-  const fromDate = searchParams.get('fromDate')
-  const toDate = searchParams.get('toDate')
-  const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
-  const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
-  const projectId = getFinanceProjectId()
+  try {
+    const { searchParams } = new URL(request.url)
+    const expenseType = searchParams.get('expenseType')
+    const status = searchParams.get('status')
+    const clientId = searchParams.get('clientId')
+    const memberId = searchParams.get('memberId')
+    const supplierId = searchParams.get('supplierId')
+    const serviceLine = searchParams.get('serviceLine')
+    const fromDate = searchParams.get('fromDate')
+    const toDate = searchParams.get('toDate')
+    const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
+    const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
+    const projectId = getFinanceProjectId()
 
-  let filters = ''
-  const params: Record<string, unknown> = {}
+    let filters = ''
+    const params: Record<string, unknown> = {}
 
-  if (expenseType) {
-    filters += ' AND expense_type = @expenseType'
-    params.expenseType = expenseType
+    if (expenseType) {
+      filters += ' AND expense_type = @expenseType'
+      params.expenseType = expenseType
+    }
+
+    if (status) {
+      filters += ' AND payment_status = @status'
+      params.status = status
+    }
+
+    if (clientId) {
+      filters += ' AND client_id = @clientId'
+      params.clientId = clientId
+    }
+
+    if (memberId) {
+      filters += ' AND member_id = @memberId'
+      params.memberId = memberId
+    }
+
+    if (supplierId) {
+      filters += ' AND supplier_id = @supplierId'
+      params.supplierId = supplierId
+    }
+
+    if (serviceLine) {
+      filters += ' AND service_line = @serviceLine'
+      params.serviceLine = serviceLine
+    }
+
+    if (fromDate) {
+      filters += ' AND COALESCE(document_date, payment_date) >= @fromDate'
+      params.fromDate = fromDate
+    }
+
+    if (toDate) {
+      filters += ' AND COALESCE(document_date, payment_date) <= @toDate'
+      params.toDate = toDate
+    }
+
+    const countRows = await runFinanceQuery<{ total: number }>(`
+      SELECT COUNT(*) AS total
+      FROM \`${projectId}.greenhouse.fin_expenses\`
+      WHERE TRUE ${filters}
+    `, params)
+
+    const total = toNumber(countRows[0]?.total)
+
+    const rows = await runFinanceQuery<ExpenseRow>(`
+      SELECT *
+      FROM \`${projectId}.greenhouse.fin_expenses\`
+      WHERE TRUE ${filters}
+      ORDER BY COALESCE(document_date, payment_date, DATE(created_at)) DESC
+      LIMIT @limit OFFSET @offset
+    `, { ...params, limit: pageSize, offset: (page - 1) * pageSize })
+
+    return NextResponse.json({
+      items: rows.map(normalizeExpense),
+      total,
+      page,
+      pageSize
+    })
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('GET /api/finance/expenses failed:', detail, error)
+
+    return NextResponse.json({ error: detail }, { status: 500 })
   }
-
-  if (status) {
-    filters += ' AND payment_status = @status'
-    params.status = status
-  }
-
-  if (clientId) {
-    filters += ' AND client_id = @clientId'
-    params.clientId = clientId
-  }
-
-  if (memberId) {
-    filters += ' AND member_id = @memberId'
-    params.memberId = memberId
-  }
-
-  if (supplierId) {
-    filters += ' AND supplier_id = @supplierId'
-    params.supplierId = supplierId
-  }
-
-  if (serviceLine) {
-    filters += ' AND service_line = @serviceLine'
-    params.serviceLine = serviceLine
-  }
-
-  if (fromDate) {
-    filters += ' AND COALESCE(document_date, payment_date) >= @fromDate'
-    params.fromDate = fromDate
-  }
-
-  if (toDate) {
-    filters += ' AND COALESCE(document_date, payment_date) <= @toDate'
-    params.toDate = toDate
-  }
-
-  const countRows = await runFinanceQuery<{ total: number }>(`
-    SELECT COUNT(*) AS total
-    FROM \`${projectId}.greenhouse.fin_expenses\`
-    WHERE TRUE ${filters}
-  `, params)
-
-  const total = toNumber(countRows[0]?.total)
-
-  const rows = await runFinanceQuery<ExpenseRow>(`
-    SELECT *
-    FROM \`${projectId}.greenhouse.fin_expenses\`
-    WHERE TRUE ${filters}
-    ORDER BY COALESCE(document_date, payment_date, created_at) DESC
-    LIMIT @limit OFFSET @offset
-  `, { ...params, limit: pageSize, offset: (page - 1) * pageSize })
-
-  return NextResponse.json({
-    items: rows.map(normalizeExpense),
-    total,
-    page,
-    pageSize
-  })
 }
 
 export async function POST(request: Request) {

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -118,6 +119,7 @@ const ExpensesListView = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true)
@@ -135,7 +137,14 @@ const ExpensesListView = () => {
 
         setItems(data.items ?? [])
         setTotal(data.total ?? 0)
+        setFetchError(null)
+      } else {
+        const data = await res.json().catch(() => ({}))
+
+        setFetchError(data.error || `Error ${res.status}`)
       }
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Error de conexión')
     } finally {
       setLoading(false)
     }
@@ -199,6 +208,8 @@ const ExpensesListView = () => {
           Registrar egreso
         </Button>
       </Box>
+
+      {fetchError && <Alert severity='error'>{fetchError}</Alert>}
 
       {/* KPIs */}
       <Grid container spacing={6}>
