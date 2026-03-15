@@ -222,7 +222,12 @@ export const getMemberPayrollHistory = async (memberId: string): Promise<MemberP
     const member = await pgGetPayrollMemberSummary(memberId)
 
     if (!member) {
-      throw new PayrollValidationError('Payroll member not found.', 404)
+      return {
+        memberId,
+        member: null,
+        entries: [],
+        compensationHistory: await getCompensationHistoryByMember(memberId)
+      }
     }
 
     const entries = await pgGetMemberPayrollEntries(memberId)
