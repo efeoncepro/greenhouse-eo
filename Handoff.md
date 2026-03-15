@@ -40,6 +40,92 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 00:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Verificar por qué `Finance` mostraba saldo total en cero, sin movimientos en dashboard y sin señal visible en conciliación bancaria; corregir la superficie frontend para reflejar mejor el estado real.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx`
+- `src/views/greenhouse/finance/ReconciliationView.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se verificó el estado real del dataset financiero:
+  - `fin_accounts`: `0` cuentas activas
+  - `fin_income`: `2` movimientos
+  - `fin_expenses`: `1` movimiento
+  - `fin_reconciliation_periods`: `0` períodos
+  - `fin_bank_statement_rows`: `0` filas de extracto
+- Se corrigió el dashboard de `Finance` para que:
+  - no muestre un `Saldo total` engañoso como si fuera balance real cuando no existen cuentas activas
+  - cargue y renderice `Últimos movimientos` reales mezclando ingresos y egresos recientes
+  - refresque la vista después de crear ingreso o egreso desde los drawers
+- Se corrigió la vista de `Conciliación` para que:
+  - siga listando períodos cuando existan
+  - muestre `Movimientos por conciliar` aunque todavía no haya períodos abiertos
+  - explique explícitamente cuando el bloqueo real es ausencia de cuentas activas o de períodos de conciliación
+
+### Verificación
+- Consulta manual a BigQuery para contrastar tablas `fin_accounts`, `fin_income`, `fin_expenses`, `fin_reconciliation_periods` y `fin_bank_statement_rows`: realizada
+- `pnpm exec eslint src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/finance/ReconciliationView.tsx`: correcto
+- `git diff --check -- src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/finance/ReconciliationView.tsx`: correcto
+
+### Riesgos o pendientes
+- El KPI de `Saldo total` sigue dependiendo de cuentas activas; mientras no exista UI o seed para `fin_accounts`, no habrá saldo bancario real.
+- `Nuevo período` en `ReconciliationView` y `Importar extracto` en `ReconciliationDetailView` siguen sin flujo UI implementado.
+- Si se quiere cerrar conciliación end-to-end desde portal, el siguiente paso natural es agregar UI para crear cuentas financieras, crear períodos e importar cartolas.
+
+## 2026-03-14 23:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Documentar una task `to-do` para consolidación de vistas/surfaces del portal sin hacer cambios runtime.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación operativa / UX architecture
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
+- `docs/tasks/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se creó una task nueva en `to-do` para ordenar la arquitectura UX de vistas del portal.
+- La task documenta, con alto nivel de detalle:
+  - surfaces actuales
+  - conflictos de intención entre vistas
+  - recomendaciones de keep / unify / enrich / deprioritize
+  - entregables esperados y preguntas que debe resolver
+- Se dejó explícito que esta task no ejecuta cambios de código todavía.
+
+### Verificacion
+- Revisión manual del contenido creado: realizada
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Esta task no reemplaza una futura implementación; solo deja el criterio rector para una siguiente fase.
+- El siguiente paso natural es priorizar si esta consolidación entra antes o después de que Claude cierre frontend de `People`, `Finance` y `Payroll`.
+
 ## 2026-03-14 23:18 America/Santiago
 
 ### Agente

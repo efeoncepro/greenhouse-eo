@@ -3,6 +3,18 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Portal surface consolidation task
+- Se documentó una task `to-do` específica para consolidación UX y arquitectura de surfaces del portal:
+  - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
+- La task no propone cambios de código inmediatos.
+- Su objetivo es resolver con criterio explícito:
+  - qué vistas son troncales
+  - qué vistas se unifican
+  - qué vistas se enriquecen
+  - qué vistas deben pasar a tabs, drilldowns o redirects
+- Regla operativa derivada:
+  - no seguir abriendo rutas nuevas por módulo sin revisar antes esta consolidación de surfaces
+
 ## Delta 2026-03-14 People + Team capacity backend complements
 - `People v3` y `Team Identity & Capacity v2` ya no dependen solo de contratos mínimos heredados.
 - Complementos backend activos:

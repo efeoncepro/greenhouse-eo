@@ -6,6 +6,15 @@
 
 ## 2026-03-14
 
+### Portal surface consolidation task
+- Se agregó una task `to-do` específica para consolidación UX y arquitectura de vistas del portal:
+  - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
+- La task documenta:
+  - qué surfaces hoy sí se sienten troncales
+  - qué surfaces compiten por la misma intención
+  - qué vistas conviene unificar, enriquecer o depriorizar
+- No hay cambios runtime en esta entrada; solo se deja el brief rector para una futura fase de implementación.
+
 ### People and team capacity backend complements
 - `People v3` y `Team Identity & Capacity v2` recibieron complementos backend para dejar contratos más estables antes del frontend.
 - `GET /api/people/meta` ahora expone:
@@ -1103,3 +1112,6 @@
 - chore: `pre-greenhouse.efeoncepro.com` fue re-asignado al preview `feature/hr-payroll` (`greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app`) para validar backend + UI del modulo HR Payroll en el dominio compartido de Preview.
 - fix: el preview `feature/hr-payroll` dejo de romper el login por `credentials` antes de validar password; se corrigieron `GCP_PROJECT` y `NEXTAUTH_URL` en `Preview (feature/hr-payroll)`, se redeployo a `greenhouse-lc737eg28-efeonce-7670142f.vercel.app` y `pre-greenhouse` fue reasignado a ese deployment corregido.
 - feat: se provisionaron 6 nuevos usuarios internos Efeonce en `greenhouse.client_users`, enlazados a `team_members` / `identity_profiles`, con roles `efeonce_account` o `efeonce_operations`, aliases internos `@efeonce.org` y smoke de login exitoso en `pre-greenhouse`.
+# 2026-03-15
+- fix: `FinanceDashboardView` ya no presenta saldo total engañoso cuando no existen cuentas activas y ahora muestra movimientos recientes reales combinando ingresos y egresos.
+- fix: `ReconciliationView` ahora expone movimientos pendientes por conciliar aunque no existan períodos abiertos y comunica explícitamente cuando el bloqueo operativo es ausencia de cuentas activas o de períodos.

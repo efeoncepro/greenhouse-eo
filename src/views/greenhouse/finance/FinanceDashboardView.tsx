@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -70,6 +70,34 @@ interface SummaryData {
   monthly: MonthlyDataPoint[]
 }
 
+interface IncomeListItem {
+  incomeId: string
+  clientName: string
+  invoiceDate: string | null
+  totalAmountClp: number
+}
+
+interface ExpenseListItem {
+  expenseId: string
+  description: string
+  supplierName: string | null
+  memberName: string | null
+  paymentAccountId: string | null
+  paymentDate: string | null
+  documentDate: string | null
+  totalAmountClp: number
+}
+
+interface RecentMovement {
+  id: string
+  type: 'income' | 'expense'
+  description: string
+  partyName: string | null
+  accountName: string | null
+  date: string | null
+  amount: number
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -80,6 +108,16 @@ const formatCLP = (amount: number): string => {
 
 const formatRate = (rate: number): string => {
   return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(rate)
+}
+
+const formatDate = (date: string | null): string => {
+  if (!date) {
+    return '—'
+  }
+
+  const [year, month, day] = date.split('-')
+
+  return `${day}/${month}/${year}`
 }
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -199,72 +237,126 @@ const FinanceDashboardView = () => {
   const [exchangeRate, setExchangeRate] = useState<ExchangeRate>({ available: false })
   const [incomeSummary, setIncomeSummary] = useState<SummaryData | null>(null)
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
+  const [recentMovements, setRecentMovements] = useState<RecentMovement[]>([])
   const [incomeDrawerOpen, setIncomeDrawerOpen] = useState(false)
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
 
-  useEffect(() => {
+  const fetchData = useCallback(async () => {
     let cancelled = false
 
-    const fetchData = async () => {
-      const errors: string[] = []
+    setLoading(true)
 
-      try {
-        const [accountsRes, rateRes, incomeRes, expenseRes] = await Promise.all([
-          fetch('/api/finance/accounts'),
-          fetch('/api/finance/exchange-rates/latest'),
-          fetch('/api/finance/income/summary'),
-          fetch('/api/finance/expenses/summary')
-        ])
+    const errors: string[] = []
 
-        if (cancelled) return
+    try {
+      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes] = await Promise.all([
+        fetch('/api/finance/accounts', { cache: 'no-store' }),
+        fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
+        fetch('/api/finance/income/summary', { cache: 'no-store' }),
+        fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
+        fetch('/api/finance/income?pageSize=6', { cache: 'no-store' }),
+        fetch('/api/finance/expenses?pageSize=6', { cache: 'no-store' })
+      ])
 
-        if (accountsRes.ok) {
-          const accountsData = await accountsRes.json()
+      if (cancelled) return
 
-          setAccounts(accountsData.items ?? [])
-        } else {
-          errors.push(`Cuentas: ${accountsRes.status}`)
+      let accountItems: AccountSummary[] = []
+
+      if (accountsRes.ok) {
+        const accountsData = await accountsRes.json()
+
+        accountItems = accountsData.items ?? []
+        setAccounts(accountItems)
+      } else {
+        errors.push(`Cuentas: ${accountsRes.status}`)
+      }
+
+      if (rateRes.ok) {
+        const rateData = await rateRes.json()
+
+        setExchangeRate(rateData)
+      }
+
+      if (incomeSummaryRes.ok) {
+        setIncomeSummary(await incomeSummaryRes.json())
+      } else {
+        const d = await incomeSummaryRes.json().catch(() => ({}))
+
+        errors.push(`Ingresos: ${d.error || incomeSummaryRes.status}`)
+      }
+
+      if (expenseSummaryRes.ok) {
+        setExpenseSummary(await expenseSummaryRes.json())
+      } else {
+        const d = await expenseSummaryRes.json().catch(() => ({}))
+
+        errors.push(`Egresos: ${d.error || expenseSummaryRes.status}`)
+      }
+
+      if (incomeListRes.ok && expenseListRes.ok) {
+        const incomeListData = await incomeListRes.json()
+        const expenseListData = await expenseListRes.json()
+        const accountMap = new Map(accountItems.map(account => [account.accountId, account.accountName]))
+
+        const incomes: RecentMovement[] = (incomeListData.items ?? []).map((item: IncomeListItem) => ({
+          id: item.incomeId,
+          type: 'income',
+          description: item.clientName || item.incomeId,
+          partyName: item.clientName || null,
+          accountName: null,
+          date: item.invoiceDate,
+          amount: item.totalAmountClp
+        }))
+
+        const expenses: RecentMovement[] = (expenseListData.items ?? []).map((item: ExpenseListItem) => ({
+          id: item.expenseId,
+          type: 'expense',
+          description: item.description,
+          partyName: item.supplierName || item.memberName || null,
+          accountName: item.paymentAccountId ? accountMap.get(item.paymentAccountId) || item.paymentAccountId : null,
+          date: item.paymentDate || item.documentDate,
+          amount: -item.totalAmountClp
+        }))
+
+        const combined = [...incomes, ...expenses]
+          .sort((left, right) => (right.date || '').localeCompare(left.date || ''))
+          .slice(0, 8)
+
+        setRecentMovements(combined)
+      } else {
+        if (!incomeListRes.ok) {
+          errors.push(`Movimientos ingresos: ${incomeListRes.status}`)
         }
 
-        if (rateRes.ok) {
-          const rateData = await rateRes.json()
-
-          setExchangeRate(rateData)
+        if (!expenseListRes.ok) {
+          errors.push(`Movimientos egresos: ${expenseListRes.status}`)
         }
-
-        if (incomeRes.ok) {
-          setIncomeSummary(await incomeRes.json())
-        } else {
-          const d = await incomeRes.json().catch(() => ({}))
-
-          errors.push(`Ingresos: ${d.error || incomeRes.status}`)
-        }
-
-        if (expenseRes.ok) {
-          setExpenseSummary(await expenseRes.json())
-        } else {
-          const d = await expenseRes.json().catch(() => ({}))
-
-          errors.push(`Egresos: ${d.error || expenseRes.status}`)
-        }
-      } catch (e) {
-        errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
-      } finally {
-        if (!cancelled) {
-          setFetchErrors(errors)
-          setLoading(false)
-        }
+      }
+    } catch (e) {
+      errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
+    } finally {
+      if (!cancelled) {
+        setFetchErrors(errors)
+        setLoading(false)
       }
     }
 
-    fetchData()
-
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
+  useEffect(() => {
+    const dispose = fetchData()
+
+    return () => {
+      Promise.resolve(dispose).then(cleanup => cleanup?.())
+    }
+  }, [fetchData])
+
   // Derived values
-  const totalBalance = accounts.reduce((sum, a) => sum + (a.openingBalance ?? 0), 0)
+  const totalBalance = accounts.length > 0 ? accounts.reduce((sum, a) => sum + (a.openingBalance ?? 0), 0) : null
   const activeAccountCount = accounts.filter(a => a.isActive).length
 
   const incomeMonthly = incomeSummary?.monthly ?? []
@@ -277,6 +369,7 @@ const FinanceDashboardView = () => {
   expenseMonthly.forEach(m => allMonths.add(`${m.year}-${m.month}`))
 
   const sortedMonths = Array.from(allMonths).sort()
+
   const chartLabels = sortedMonths.map(key => {
     const month = parseInt(key.split('-')[1])
 
@@ -363,13 +456,21 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
+      {accounts.length === 0 && recentMovements.length > 0 && (
+        <Alert severity='info'>
+          Hay movimientos financieros registrados, pero aún no existen cuentas activas en `Finance`. Por eso el saldo total no puede calcularse desde bancos y conciliación todavía no tiene base operativa.
+        </Alert>
+      )}
+
       {/* KPI row */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Saldo total'
-            stats={formatCLP(totalBalance)}
-            subtitle={`${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
+            stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
+            subtitle={accounts.length === 0
+              ? 'Sin cuentas activas registradas'
+              : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
             avatarIcon='tabler-wallet'
             avatarColor='primary'
           />
@@ -523,26 +624,88 @@ const FinanceDashboardView = () => {
               <TableRow>
                 <TableCell sx={{ width: 80 }}>Tipo</TableCell>
                 <TableCell>Descripción</TableCell>
-                <TableCell sx={{ width: 140 }}>Cuenta</TableCell>
+                <TableCell sx={{ width: 160 }}>Entidad / Cuenta</TableCell>
                 <TableCell sx={{ width: 100 }}>Fecha</TableCell>
                 <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                  <Typography variant='body2' color='text.secondary'>
-                    No hay movimientos registrados aún
-                  </Typography>
-                </TableCell>
-              </TableRow>
+              {recentMovements.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      No hay movimientos registrados aún
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                recentMovements.map(movement => (
+                  <TableRow key={movement.id} hover>
+                    <TableCell>
+                      <Typography
+                        variant='body2'
+                        fontWeight={600}
+                        color={movement.type === 'income' ? 'success.main' : 'error.main'}
+                      >
+                        {movement.type === 'income' ? 'Ingreso' : 'Egreso'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2' fontWeight={500}>
+                        {movement.description}
+                      </Typography>
+                      {movement.id && (
+                        <Typography variant='caption' color='text.secondary'>
+                          {movement.id}
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2'>
+                        {movement.partyName || movement.accountName || '—'}
+                      </Typography>
+                      {movement.accountName && movement.partyName && (
+                        <Typography variant='caption' color='text.secondary'>
+                          {movement.accountName}
+                        </Typography>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2'>{formatDate(movement.date)}</Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Typography
+                        variant='body2'
+                        fontWeight={600}
+                        color={movement.amount >= 0 ? 'success.main' : 'error.main'}
+                      >
+                        {formatCLP(movement.amount)}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
       </Card>
 
-      <CreateIncomeDrawer open={incomeDrawerOpen} onClose={() => setIncomeDrawerOpen(false)} onSuccess={() => setIncomeDrawerOpen(false)} />
-      <CreateExpenseDrawer open={expenseDrawerOpen} onClose={() => setExpenseDrawerOpen(false)} onSuccess={() => setExpenseDrawerOpen(false)} />
+      <CreateIncomeDrawer
+        open={incomeDrawerOpen}
+        onClose={() => setIncomeDrawerOpen(false)}
+        onSuccess={() => {
+          setIncomeDrawerOpen(false)
+          void fetchData()
+        }}
+      />
+      <CreateExpenseDrawer
+        open={expenseDrawerOpen}
+        onClose={() => setExpenseDrawerOpen(false)}
+        onSuccess={() => {
+          setExpenseDrawerOpen(false)
+          void fetchData()
+        }}
+      />
     </Box>
   )
 }
