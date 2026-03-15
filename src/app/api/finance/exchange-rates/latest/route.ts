@@ -21,7 +21,12 @@ export async function GET() {
   })
 
   if (!latestRate) {
-    await syncDailyUsdClpExchangeRate()
+    try {
+      await syncDailyUsdClpExchangeRate()
+    } catch (syncError) {
+      console.warn('[exchange-rates/latest] sync failed:', syncError instanceof Error ? syncError.message : syncError)
+    }
+
     latestRate = await getLatestStoredExchangeRatePair({
       fromCurrency: 'USD',
       toCurrency: 'CLP'

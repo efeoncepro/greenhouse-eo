@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { getFinanceProjectId, normalizeString, roundCurrency, runFinanceQuery, toNumber, type FinanceCurrency } from '@/lib/finance/shared'
+import { getFinanceProjectId, normalizeString, roundCurrency, runFinanceQuery, toDateString, toNumber, type FinanceCurrency } from '@/lib/finance/shared'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 const OPEN_EXCHANGE_RATE_BASE_URL = 'https://open.er-api.com/v6'
@@ -142,7 +142,7 @@ export const getLatestStoredExchangeRatePair = async ({
     from_currency: string
     to_currency: string
     rate: unknown
-    rate_date: string
+    rate_date: unknown
     source: string | null
   }>(`
     SELECT rate_id, from_currency, to_currency, rate, rate_date, source
@@ -158,12 +158,18 @@ export const getLatestStoredExchangeRatePair = async ({
     return null
   }
 
+  const rateDate = toDateString(row.rate_date as { value?: string } | string | null)
+
+  if (!rateDate) {
+    return null
+  }
+
   return {
     rateId: normalizeString(row.rate_id),
     fromCurrency,
     toCurrency,
     rate: roundCurrency(toNumber(row.rate)),
-    rateDate: row.rate_date,
+    rateDate,
     source: normalizeString(row.source) || 'manual'
   }
 }
