@@ -40,6 +40,64 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 04:53 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Resolver la caída real de `HR > Permisos` en `pre-greenhouse` después del cutover a PostgreSQL y endurecer el rollout para que el módulo no vuelva a caer completo si Cloud SQL falla en `Preview`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / `pre-greenhouse`
+
+### Archivos tocados
+- `src/lib/hr-core/service.ts`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se identificó en logs de Vercel que la caída de `GET /api/hr/core/meta`, `GET /api/hr/core/leave/balances` y `GET /api/hr/core/leave/requests` no venía del frontend sino de Cloud SQL:
+  - `boss::NOT_AUTHORIZED`
+  - falta de permiso `cloudsql.instances.get`
+- Se otorgó `roles/cloudsql.client` al service account usado por `Preview`:
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+- `HR Core` ahora hace fallback controlado a BigQuery para el slice de `leave` cuando PostgreSQL falla por:
+  - falta de permisos Cloud SQL
+  - schema Postgres no listo
+  - conectividad Cloud SQL temporal
+- El fallback cubre:
+  - `getHrCoreMetadata`
+  - `listLeaveBalances`
+  - `listLeaveRequests`
+  - `getLeaveRequestById`
+  - `createLeaveRequest`
+  - `reviewLeaveRequest`
+- El objetivo del ajuste es que `Preview` siga operativo durante rollout o incidentes de infraestructura sin perder el camino a PostgreSQL como store principal del dominio.
+
+### Verificación
+- `pnpm exec eslint src/lib/hr-core/service.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `gcloud projects add-iam-policy-binding efeonce-group --member=serviceAccount:greenhouse-portal@efeonce-group.iam.gserviceaccount.com --role=roles/cloudsql.client`
+  - correcto
+- `gcloud projects get-iam-policy efeonce-group`
+  - correcto; binding presente
+
+### Riesgos o pendientes
+- Todavía falta smoke autenticado manual en `pre-greenhouse` para confirmar la UX final del flujo:
+  - carga de la vista
+  - creación de solicitud
+  - revisión approve/reject/cancel
+- El fallback se diseñó como protección de rollout; cuando `Preview` y `Staging` estén estables sobre Cloud SQL conviene observar logs y, si todo queda sano, reducir el uso de la vía legacy en BigQuery.
+
 ## 2026-03-15 10:35 America/Santiago
 
 ### Agente

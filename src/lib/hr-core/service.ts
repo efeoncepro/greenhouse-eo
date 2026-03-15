@@ -194,6 +194,57 @@ const getProjectId = () => getHrCoreProjectId()
 
 const getCurrentYear = () => new Date().getUTCFullYear()
 
+const isHrLeavePostgresFallbackError = (error: unknown) => {
+  if (error instanceof HrCoreValidationError) {
+    return error.code === 'HR_CORE_POSTGRES_NOT_CONFIGURED' || error.code === 'HR_CORE_POSTGRES_SCHEMA_NOT_READY'
+  }
+
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+
+  const maybeError = error as { code?: unknown; status?: unknown; message?: unknown }
+  const message = typeof maybeError.message === 'string' ? maybeError.message : ''
+  const code = typeof maybeError.code === 'number' ? maybeError.code : Number(maybeError.code)
+  const status = typeof maybeError.status === 'number' ? maybeError.status : Number(maybeError.status)
+
+  return (
+    code === 403 ||
+    status === 403 ||
+    message.includes('boss::NOT_AUTHORIZED') ||
+    message.includes('cloudsql.instances.get') ||
+    message.includes('Cloud SQL') ||
+    message.includes('ECONNREFUSED') ||
+    message.includes('connect ETIMEDOUT')
+  )
+}
+
+const withHrLeavePostgresFallback = async <T>({
+  operation,
+  postgres,
+  fallback
+}: {
+  operation: string
+  postgres: () => Promise<T>
+  fallback: () => Promise<T>
+}) => {
+  if (!isHrCoreLeavePostgresEnabled()) {
+    return fallback()
+  }
+
+  try {
+    return await postgres()
+  } catch (error) {
+    if (!isHrLeavePostgresFallbackError(error)) {
+      throw error
+    }
+
+    console.warn(`[hr-core] Falling back to BigQuery for ${operation}`, error)
+
+    return fallback()
+  }
+}
+
 const mapDepartment = (row: DepartmentRow): HrDepartment => ({
   departmentId: String(row.department_id || ''),
   name: String(row.name || ''),
@@ -684,22 +735,26 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
 }
 
 export const getHrCoreMetadata = async (): Promise<HrCoreMetadata> => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return getHrCoreMetadataFromPostgres()
+  const fallback = async () => {
+    const [departments, leaveTypes] = await Promise.all([getActiveDepartmentsInternal(), getLeaveTypesInternal()])
+
+    return {
+      departments,
+      leaveTypes,
+      jobLevels: [...HR_JOB_LEVELS],
+      employmentTypes: [...HR_EMPLOYMENT_TYPES],
+      healthSystems: [...HR_HEALTH_SYSTEMS],
+      bankAccountTypes: [...HR_BANK_ACCOUNT_TYPES],
+      leaveRequestStatuses: [...HR_LEAVE_REQUEST_STATUSES],
+      attendanceStatuses: [...HR_ATTENDANCE_STATUSES]
+    }
   }
 
-  const [departments, leaveTypes] = await Promise.all([getActiveDepartmentsInternal(), getLeaveTypesInternal()])
-
-  return {
-    departments,
-    leaveTypes,
-    jobLevels: [...HR_JOB_LEVELS],
-    employmentTypes: [...HR_EMPLOYMENT_TYPES],
-    healthSystems: [...HR_HEALTH_SYSTEMS],
-    bankAccountTypes: [...HR_BANK_ACCOUNT_TYPES],
-    leaveRequestStatuses: [...HR_LEAVE_REQUEST_STATUSES],
-    attendanceStatuses: [...HR_ATTENDANCE_STATUSES]
-  }
+  return withHrLeavePostgresFallback({
+    operation: 'getHrCoreMetadata',
+    postgres: () => getHrCoreMetadataFromPostgres(),
+    fallback
+  })
 }
 
 export const listDepartments = async (): Promise<HrDepartmentsResponse> => {
@@ -1117,67 +1172,71 @@ export const listLeaveBalances = async ({
   memberId?: string | null
   year?: number | null
 }): Promise<HrLeaveBalancesResponse> => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return listLeaveBalancesFromPostgres({ tenant, memberId, year })
-  }
+  const fallback = async (): Promise<HrLeaveBalancesResponse> => {
+    await assertHrCoreInfrastructureReady()
+    const effectiveYear = year || getCurrentYear()
+    const effectiveMemberId = memberId || (isHrAdminTenant(tenant) ? null : (await resolveTenantMember(tenant)).member_id)
 
-  await assertHrCoreInfrastructureReady()
-  const effectiveYear = year || getCurrentYear()
-  const effectiveMemberId = memberId || (isHrAdminTenant(tenant) ? null : (await resolveTenantMember(tenant)).member_id)
+    if (effectiveMemberId) {
+      await assertMemberVisibleToTenant(tenant, effectiveMemberId)
+      await ensureYearBalances({
+        memberId: effectiveMemberId,
+        year: effectiveYear,
+        actorUserId: tenant.userId
+      })
+    }
 
-  if (effectiveMemberId) {
-    await assertMemberVisibleToTenant(tenant, effectiveMemberId)
-    await ensureYearBalances({
-      memberId: effectiveMemberId,
-      year: effectiveYear,
-      actorUserId: tenant.userId
-    })
-  }
+    const projectId = getProjectId()
+    const filters = ['b.year = @year']
+    const params: Record<string, unknown> = { year: effectiveYear }
 
-  const projectId = getProjectId()
-  const filters = ['b.year = @year']
-  const params: Record<string, unknown> = { year: effectiveYear }
+    if (effectiveMemberId) {
+      filters.push('b.member_id = @memberId')
+      params.memberId = effectiveMemberId
+    } else if (!isHrAdminTenant(tenant)) {
+      throw new HrCoreValidationError('Forbidden', 403)
+    }
 
-  if (effectiveMemberId) {
-    filters.push('b.member_id = @memberId')
-    params.memberId = effectiveMemberId
-  } else if (!isHrAdminTenant(tenant)) {
-    throw new HrCoreValidationError('Forbidden', 403)
-  }
+    const rows = await runHrCoreQuery<LeaveBalanceRow>(
+      `
+        SELECT
+          b.balance_id,
+          b.member_id,
+          m.display_name AS member_name,
+          b.leave_type_code,
+          lt.leave_type_name,
+          b.year,
+          b.allowance_days,
+          b.carried_over_days,
+          b.used_days,
+          b.reserved_days
+        FROM \`${projectId}.greenhouse.leave_balances\` AS b
+        LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
+          ON m.member_id = b.member_id
+        LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
+          ON lt.leave_type_code = b.leave_type_code
+        WHERE ${filters.join(' AND ')}
+        ORDER BY m.display_name ASC, lt.leave_type_name ASC
+      `,
+      params
+    )
 
-  const rows = await runHrCoreQuery<LeaveBalanceRow>(
-    `
-      SELECT
-        b.balance_id,
-        b.member_id,
-        m.display_name AS member_name,
-        b.leave_type_code,
-        lt.leave_type_name,
-        b.year,
-        b.allowance_days,
-        b.carried_over_days,
-        b.used_days,
-        b.reserved_days
-      FROM \`${projectId}.greenhouse.leave_balances\` AS b
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
-        ON m.member_id = b.member_id
-      LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
-        ON lt.leave_type_code = b.leave_type_code
-      WHERE ${filters.join(' AND ')}
-      ORDER BY m.display_name ASC, lt.leave_type_name ASC
-    `,
-    params
-  )
+    const balances = rows.map(mapLeaveBalance)
 
-  const balances = rows.map(mapLeaveBalance)
-
-  return {
-    balances,
-    summary: {
-      memberCount: new Set(balances.map(balance => balance.memberId)).size,
-      totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+    return {
+      balances,
+      summary: {
+        memberCount: new Set(balances.map(balance => balance.memberId)).size,
+        totalAvailableDays: balances.reduce((sum, balance) => sum + balance.availableDays, 0)
+      }
     }
   }
+
+  return withHrLeavePostgresFallback({
+    operation: 'listLeaveBalances',
+    postgres: () => listLeaveBalancesFromPostgres({ tenant, memberId, year }),
+    fallback
+  })
 }
 
 export const listLeaveRequests = async ({
@@ -1191,82 +1250,86 @@ export const listLeaveRequests = async ({
   status?: string | null
   year?: number | null
 }): Promise<HrLeaveRequestsResponse> => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return listLeaveRequestsFromPostgres({ tenant, memberId, status, year })
-  }
+  const fallback = async (): Promise<HrLeaveRequestsResponse> => {
+    await assertHrCoreInfrastructureReady()
+    const currentMember = isHrAdminTenant(tenant) ? null : await resolveTenantMember(tenant)
+    const effectiveYear = year || null
+    const projectId = getProjectId()
+    const filters = ['1 = 1']
+    const params: Record<string, unknown> = {}
 
-  await assertHrCoreInfrastructureReady()
-  const currentMember = isHrAdminTenant(tenant) ? null : await resolveTenantMember(tenant)
-  const effectiveYear = year || null
-  const projectId = getProjectId()
-  const filters = ['1 = 1']
-  const params: Record<string, unknown> = {}
-
-  if (isHrAdminTenant(tenant)) {
-    if (memberId) {
-      filters.push('r.member_id = @memberId')
-      params.memberId = memberId
+    if (isHrAdminTenant(tenant)) {
+      if (memberId) {
+        filters.push('r.member_id = @memberId')
+        params.memberId = memberId
+      }
+    } else {
+      filters.push('(r.member_id = @currentMemberId OR r.supervisor_member_id = @currentMemberId)')
+      params.currentMemberId = currentMember?.member_id || ''
     }
-  } else {
-    filters.push('(r.member_id = @currentMemberId OR r.supervisor_member_id = @currentMemberId)')
-    params.currentMemberId = currentMember?.member_id || ''
-  }
 
-  if (status) {
-    filters.push('r.status = @status')
-    params.status = status
-  }
+    if (status) {
+      filters.push('r.status = @status')
+      params.status = status
+    }
 
-  if (effectiveYear) {
-    filters.push('EXTRACT(YEAR FROM r.start_date) = @year')
-    params.year = effectiveYear
-  }
+    if (effectiveYear) {
+      filters.push('EXTRACT(YEAR FROM r.start_date) = @year')
+      params.year = effectiveYear
+    }
 
-  const rows = await runHrCoreQuery<LeaveRequestRow>(
-    `
-      SELECT
-        r.request_id,
-        r.member_id,
-        m.display_name AS member_name,
-        r.leave_type_code,
-        lt.leave_type_name,
-        r.start_date,
-        r.end_date,
-        r.requested_days,
-        r.status,
-        r.reason,
-        r.attachment_url,
-        r.supervisor_member_id,
-        supervisor.display_name AS supervisor_name,
-        r.hr_reviewer_user_id,
-        r.decided_at,
-        r.decided_by,
-        r.notes,
-        r.created_at
-      FROM \`${projectId}.greenhouse.leave_requests\` AS r
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
-        ON m.member_id = r.member_id
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS supervisor
-        ON supervisor.member_id = r.supervisor_member_id
-      LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
-        ON lt.leave_type_code = r.leave_type_code
-      WHERE ${filters.join(' AND ')}
-      ORDER BY r.created_at DESC
-    `,
-    params
-  )
+    const rows = await runHrCoreQuery<LeaveRequestRow>(
+      `
+        SELECT
+          r.request_id,
+          r.member_id,
+          m.display_name AS member_name,
+          r.leave_type_code,
+          lt.leave_type_name,
+          r.start_date,
+          r.end_date,
+          r.requested_days,
+          r.status,
+          r.reason,
+          r.attachment_url,
+          r.supervisor_member_id,
+          supervisor.display_name AS supervisor_name,
+          r.hr_reviewer_user_id,
+          r.decided_at,
+          r.decided_by,
+          r.notes,
+          r.created_at
+        FROM \`${projectId}.greenhouse.leave_requests\` AS r
+        LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
+          ON m.member_id = r.member_id
+        LEFT JOIN \`${projectId}.greenhouse.team_members\` AS supervisor
+          ON supervisor.member_id = r.supervisor_member_id
+        LEFT JOIN \`${projectId}.greenhouse.leave_types\` AS lt
+          ON lt.leave_type_code = r.leave_type_code
+        WHERE ${filters.join(' AND ')}
+        ORDER BY r.created_at DESC
+      `,
+      params
+    )
 
-  const requests = rows.map(mapLeaveRequest)
+    const requests = rows.map(mapLeaveRequest)
 
-  return {
-    requests,
-    summary: {
-      total: requests.length,
-      pendingSupervisor: requests.filter(item => item.status === 'pending_supervisor').length,
-      pendingHr: requests.filter(item => item.status === 'pending_hr').length,
-      approved: requests.filter(item => item.status === 'approved').length
+    return {
+      requests,
+      summary: {
+        total: requests.length,
+        pendingSupervisor: requests.filter(item => item.status === 'pending_supervisor').length,
+        pendingHr: requests.filter(item => item.status === 'pending_hr').length,
+        approved: requests.filter(item => item.status === 'approved').length
+      }
     }
   }
+
+  return withHrLeavePostgresFallback({
+    operation: 'listLeaveRequests',
+    postgres: () => listLeaveRequestsFromPostgres({ tenant, memberId, status, year }),
+    fallback
+  })
 }
 
 export const getLeaveRequestById = async ({
@@ -1276,27 +1339,31 @@ export const getLeaveRequestById = async ({
   tenant: TenantContext
   requestId: string
 }) => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return getLeaveRequestByIdFromPostgres({ tenant, requestId })
-  }
+  const fallback = async () => {
+    const request = await getLeaveRequestByIdInternal(requestId)
 
-  const request = await getLeaveRequestByIdInternal(requestId)
+    if (!request) {
+      throw new HrCoreValidationError('Leave request not found.', 404)
+    }
 
-  if (!request) {
-    throw new HrCoreValidationError('Leave request not found.', 404)
-  }
+    if (isHrAdminTenant(tenant)) {
+      return request
+    }
 
-  if (isHrAdminTenant(tenant)) {
+    const currentMember = await resolveTenantMember(tenant)
+
+    if (request.memberId !== currentMember.member_id && request.supervisorMemberId !== currentMember.member_id) {
+      throw new HrCoreValidationError('Forbidden', 403)
+    }
+
     return request
   }
 
-  const currentMember = await resolveTenantMember(tenant)
-
-  if (request.memberId !== currentMember.member_id && request.supervisorMemberId !== currentMember.member_id) {
-    throw new HrCoreValidationError('Forbidden', 403)
-  }
-
-  return request
+  return withHrLeavePostgresFallback({
+    operation: 'getLeaveRequestById',
+    postgres: () => getLeaveRequestByIdFromPostgres({ tenant, requestId }),
+    fallback
+  })
 }
 
 export const createLeaveRequest = async ({
@@ -1308,141 +1375,85 @@ export const createLeaveRequest = async ({
   input: CreateLeaveRequestInput
   actorUserId: string
 }) => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return createLeaveRequestInPostgres({ tenant, input, actorUserId })
-  }
+  const fallback = async () => {
+    await assertHrCoreInfrastructureReady()
+    const projectId = getProjectId()
+    const currentMember = await resolveTenantMember(tenant)
+    const effectiveMemberId = isHrAdminTenant(tenant) ? normalizeString(input.memberId || currentMember.member_id) : String(currentMember.member_id || '')
+    const member = await getMemberResolverById(effectiveMemberId)
+    const leaveTypeCode = normalizeString(input.leaveTypeCode)
+    const leaveTypes = await getLeaveTypesInternal()
+    const leaveType = leaveTypes.find(item => item.leaveTypeCode === leaveTypeCode)
 
-  await assertHrCoreInfrastructureReady()
-  const projectId = getProjectId()
-  const currentMember = await resolveTenantMember(tenant)
-  const effectiveMemberId = isHrAdminTenant(tenant) ? normalizeString(input.memberId || currentMember.member_id) : String(currentMember.member_id || '')
-  const member = await getMemberResolverById(effectiveMemberId)
-  const leaveTypeCode = normalizeString(input.leaveTypeCode)
-  const leaveTypes = await getLeaveTypesInternal()
-  const leaveType = leaveTypes.find(item => item.leaveTypeCode === leaveTypeCode)
-
-  if (!leaveType) {
-    throw new HrCoreValidationError('Leave type not found.', 404)
-  }
-
-  const startDate = assertDateString(input.startDate, 'startDate')
-  const endDate = assertDateString(input.endDate, 'endDate')
-  const requestedDays = assertNonNegativeNumber(input.requestedDays, 'requestedDays')
-
-  if (endDate < startDate) {
-    throw new HrCoreValidationError('endDate must be greater than or equal to startDate.')
-  }
-
-  const year = Number(startDate.slice(0, 4))
-
-  await ensureYearBalances({ memberId: effectiveMemberId, year, actorUserId })
-
-  if (leaveType.defaultAnnualAllowanceDays > 0) {
-    const balance = await getBalanceRow({ memberId: effectiveMemberId, leaveTypeCode, year })
-
-    if (!balance || balance.availableDays < requestedDays) {
-      throw new HrCoreValidationError('Insufficient leave balance.', 409, {
-        availableDays: balance?.availableDays ?? 0
-      })
+    if (!leaveType) {
+      throw new HrCoreValidationError('Leave type not found.', 404)
     }
-  }
 
-  const requestId = `leave-${randomUUID()}`
-  const supervisorMemberId = normalizeNullableString(member.reports_to)
-  const status = supervisorMemberId ? 'pending_supervisor' : 'pending_hr'
+    const startDate = assertDateString(input.startDate, 'startDate')
+    const endDate = assertDateString(input.endDate, 'endDate')
+    const requestedDays = assertNonNegativeNumber(input.requestedDays, 'requestedDays')
 
-  await runHrCoreQuery(
-    `
-      INSERT INTO \`${projectId}.greenhouse.leave_requests\` (
-        request_id,
-        member_id,
-        leave_type_code,
-        start_date,
-        end_date,
-        requested_days,
-        status,
-        reason,
-        attachment_url,
-        supervisor_member_id,
-        notes,
-        created_by,
-        created_at,
-        updated_at
-      )
-      VALUES (
-        @requestId,
-        @memberId,
-        @leaveTypeCode,
-        DATE(@startDate),
-        DATE(@endDate),
-        @requestedDays,
-        @status,
-        @reason,
-        @attachmentUrl,
-        @supervisorMemberId,
-        @notes,
-        @createdBy,
-        CURRENT_TIMESTAMP(),
-        CURRENT_TIMESTAMP()
-      )
-    `,
-    {
-      requestId,
-      memberId: effectiveMemberId,
-      leaveTypeCode,
-      startDate,
-      endDate,
-      requestedDays,
-      status,
-      reason: normalizeNullableString(input.reason),
-      attachmentUrl: normalizeNullableString(input.attachmentUrl),
-      supervisorMemberId,
-      notes: normalizeNullableString(input.notes),
-      createdBy: actorUserId
+    if (endDate < startDate) {
+      throw new HrCoreValidationError('endDate must be greater than or equal to startDate.')
     }
-  )
 
-  await runHrCoreQuery(
-    `
-      INSERT INTO \`${projectId}.greenhouse.leave_request_actions\` (
-        action_id,
-        request_id,
-        action,
-        actor_user_id,
-        actor_member_id,
-        actor_name,
-        notes,
-        created_at
-      )
-      VALUES (
-        @actionId,
-        @requestId,
-        'submit',
-        @actorUserId,
-        @actorMemberId,
-        @actorName,
-        @notes,
-        CURRENT_TIMESTAMP()
-      )
-    `,
-    {
-      actionId: `leave-action-${randomUUID()}`,
-      requestId,
-      actorUserId,
-      actorMemberId: currentMember.member_id,
-      actorName: currentMember.display_name,
-      notes: normalizeNullableString(input.notes)
+    const year = Number(startDate.slice(0, 4))
+
+    await ensureYearBalances({ memberId: effectiveMemberId, year, actorUserId })
+
+    if (leaveType.defaultAnnualAllowanceDays > 0) {
+      const balance = await getBalanceRow({ memberId: effectiveMemberId, leaveTypeCode, year })
+
+      if (!balance || balance.availableDays < requestedDays) {
+        throw new HrCoreValidationError('Insufficient leave balance.', 409, {
+          availableDays: balance?.availableDays ?? 0
+        })
+      }
     }
-  )
 
-  if (leaveType.defaultAnnualAllowanceDays > 0 && requestedDays > 0) {
-    await adjustBalanceForRequest({
-      request: {
+    const requestId = `leave-${randomUUID()}`
+    const supervisorMemberId = normalizeNullableString(member.reports_to)
+    const status = supervisorMemberId ? 'pending_supervisor' : 'pending_hr'
+
+    await runHrCoreQuery(
+      `
+        INSERT INTO \`${projectId}.greenhouse.leave_requests\` (
+          request_id,
+          member_id,
+          leave_type_code,
+          start_date,
+          end_date,
+          requested_days,
+          status,
+          reason,
+          attachment_url,
+          supervisor_member_id,
+          notes,
+          created_by,
+          created_at,
+          updated_at
+        )
+        VALUES (
+          @requestId,
+          @memberId,
+          @leaveTypeCode,
+          DATE(@startDate),
+          DATE(@endDate),
+          @requestedDays,
+          @status,
+          @reason,
+          @attachmentUrl,
+          @supervisorMemberId,
+          @notes,
+          @createdBy,
+          CURRENT_TIMESTAMP(),
+          CURRENT_TIMESTAMP()
+        )
+      `,
+      {
         requestId,
         memberId: effectiveMemberId,
-        memberName: normalizeNullableString(member.display_name),
         leaveTypeCode,
-        leaveTypeName: leaveType.leaveTypeName,
         startDate,
         endDate,
         requestedDays,
@@ -1450,26 +1461,86 @@ export const createLeaveRequest = async ({
         reason: normalizeNullableString(input.reason),
         attachmentUrl: normalizeNullableString(input.attachmentUrl),
         supervisorMemberId,
-        supervisorName: null,
-        hrReviewerUserId: null,
-        decidedAt: null,
-        decidedBy: null,
         notes: normalizeNullableString(input.notes),
-        createdAt: null
-      },
-      reservedDelta: requestedDays,
-      usedDelta: 0,
-      actorUserId
-    })
+        createdBy: actorUserId
+      }
+    )
+
+    await runHrCoreQuery(
+      `
+        INSERT INTO \`${projectId}.greenhouse.leave_request_actions\` (
+          action_id,
+          request_id,
+          action,
+          actor_user_id,
+          actor_member_id,
+          actor_name,
+          notes,
+          created_at
+        )
+        VALUES (
+          @actionId,
+          @requestId,
+          'submit',
+          @actorUserId,
+          @actorMemberId,
+          @actorName,
+          @notes,
+          CURRENT_TIMESTAMP()
+        )
+      `,
+      {
+        actionId: `leave-action-${randomUUID()}`,
+        requestId,
+        actorUserId,
+        actorMemberId: currentMember.member_id,
+        actorName: currentMember.display_name,
+        notes: normalizeNullableString(input.notes)
+      }
+    )
+
+    if (leaveType.defaultAnnualAllowanceDays > 0 && requestedDays > 0) {
+      await adjustBalanceForRequest({
+        request: {
+          requestId,
+          memberId: effectiveMemberId,
+          memberName: normalizeNullableString(member.display_name),
+          leaveTypeCode,
+          leaveTypeName: leaveType.leaveTypeName,
+          startDate,
+          endDate,
+          requestedDays,
+          status,
+          reason: normalizeNullableString(input.reason),
+          attachmentUrl: normalizeNullableString(input.attachmentUrl),
+          supervisorMemberId,
+          supervisorName: null,
+          hrReviewerUserId: null,
+          decidedAt: null,
+          decidedBy: null,
+          notes: normalizeNullableString(input.notes),
+          createdAt: null
+        },
+        reservedDelta: requestedDays,
+        usedDelta: 0,
+        actorUserId
+      })
+    }
+
+    const created = await getLeaveRequestByIdInternal(requestId)
+
+    if (!created) {
+      throw new HrCoreValidationError('Created leave request could not be reloaded.', 500)
+    }
+
+    return created
   }
 
-  const created = await getLeaveRequestByIdInternal(requestId)
-
-  if (!created) {
-    throw new HrCoreValidationError('Created leave request could not be reloaded.', 500)
-  }
-
-  return created
+  return withHrLeavePostgresFallback({
+    operation: 'createLeaveRequest',
+    postgres: () => createLeaveRequestInPostgres({ tenant, input, actorUserId }),
+    fallback
+  })
 }
 
 export const reviewLeaveRequest = async ({
@@ -1483,168 +1554,172 @@ export const reviewLeaveRequest = async ({
   input: ReviewLeaveRequestInput
   actorUserId: string
 }) => {
-  if (isHrCoreLeavePostgresEnabled()) {
-    return reviewLeaveRequestInPostgres({ tenant, requestId, input, actorUserId })
-  }
+  const fallback = async () => {
+    await assertHrCoreInfrastructureReady()
+    const projectId = getProjectId()
+    const request = await getLeaveRequestByIdInternal(requestId)
 
-  await assertHrCoreInfrastructureReady()
-  const projectId = getProjectId()
-  const request = await getLeaveRequestByIdInternal(requestId)
-
-  if (!request) {
-    throw new HrCoreValidationError('Leave request not found.', 404)
-  }
-
-  const action = assertEnum(input.action, ['approve', 'reject', 'cancel'] as const, 'action')
-  const notes = normalizeNullableString(input.notes)
-  const actorMember = await resolveTenantMember(tenant).catch(() => null)
-  const actorMemberId = actorMember?.member_id || null
-  const actorName = actorMember?.display_name || tenant.userId
-
-  if (action === 'cancel') {
-    if (!isHrAdminTenant(tenant) && actorMemberId !== request.memberId) {
-      throw new HrCoreValidationError('Forbidden', 403)
+    if (!request) {
+      throw new HrCoreValidationError('Leave request not found.', 404)
     }
 
-    if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
-      throw new HrCoreValidationError('Only pending requests can be cancelled.', 409)
+    const action = assertEnum(input.action, ['approve', 'reject', 'cancel'] as const, 'action')
+    const notes = normalizeNullableString(input.notes)
+    const actorMember = await resolveTenantMember(tenant).catch(() => null)
+    const actorMemberId = actorMember?.member_id || null
+    const actorName = actorMember?.display_name || tenant.userId
+
+    if (action === 'cancel') {
+      if (!isHrAdminTenant(tenant) && actorMemberId !== request.memberId) {
+        throw new HrCoreValidationError('Forbidden', 403)
+      }
+
+      if (!['pending_supervisor', 'pending_hr'].includes(request.status)) {
+        throw new HrCoreValidationError('Only pending requests can be cancelled.', 409)
+      }
+
+      await runHrCoreQuery(
+        `
+          UPDATE \`${projectId}.greenhouse.leave_requests\`
+          SET
+            status = 'cancelled',
+            decided_at = CURRENT_TIMESTAMP(),
+            decided_by = @decidedBy,
+            notes = @notes,
+            updated_at = CURRENT_TIMESTAMP()
+          WHERE request_id = @requestId
+        `,
+        {
+          requestId,
+          decidedBy: actorName,
+          notes
+        }
+      )
+
+      if (request.requestedDays > 0) {
+        await adjustBalanceForRequest({
+          request,
+          reservedDelta: -request.requestedDays,
+          usedDelta: 0,
+          actorUserId
+        })
+      }
+    } else if (!isHrAdminTenant(tenant)) {
+      if (request.supervisorMemberId !== actorMemberId || request.status !== 'pending_supervisor') {
+        throw new HrCoreValidationError('Forbidden', 403)
+      }
+
+      await runHrCoreQuery(
+        `
+          UPDATE \`${projectId}.greenhouse.leave_requests\`
+          SET
+            status = @status,
+            decided_at = CASE WHEN @status = 'rejected' THEN CURRENT_TIMESTAMP() ELSE decided_at END,
+            decided_by = CASE WHEN @status = 'rejected' THEN @decidedBy ELSE decided_by END,
+            notes = @notes,
+            updated_at = CURRENT_TIMESTAMP()
+          WHERE request_id = @requestId
+        `,
+        {
+          requestId,
+          status: action === 'approve' ? 'pending_hr' : 'rejected',
+          decidedBy: actorName,
+          notes
+        }
+      )
+
+      if (action === 'reject' && request.requestedDays > 0) {
+        await adjustBalanceForRequest({
+          request,
+          reservedDelta: -request.requestedDays,
+          usedDelta: 0,
+          actorUserId
+        })
+      }
+    } else {
+      if (!['pending_hr', 'pending_supervisor'].includes(request.status)) {
+        throw new HrCoreValidationError('This request is no longer pending HR review.', 409)
+      }
+
+      await runHrCoreQuery(
+        `
+          UPDATE \`${projectId}.greenhouse.leave_requests\`
+          SET
+            status = @status,
+            hr_reviewer_user_id = @hrReviewerUserId,
+            decided_at = CURRENT_TIMESTAMP(),
+            decided_by = @decidedBy,
+            notes = @notes,
+            updated_at = CURRENT_TIMESTAMP()
+          WHERE request_id = @requestId
+        `,
+        {
+          requestId,
+          status: action === 'approve' ? 'approved' : 'rejected',
+          hrReviewerUserId: tenant.userId,
+          decidedBy: actorName,
+          notes
+        }
+      )
+
+      if (request.requestedDays > 0) {
+        await adjustBalanceForRequest({
+          request,
+          reservedDelta: -request.requestedDays,
+          usedDelta: action === 'approve' ? request.requestedDays : 0,
+          actorUserId
+        })
+      }
     }
 
     await runHrCoreQuery(
       `
-        UPDATE \`${projectId}.greenhouse.leave_requests\`
-        SET
-          status = 'cancelled',
-          decided_at = CURRENT_TIMESTAMP(),
-          decided_by = @decidedBy,
-          notes = @notes,
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE request_id = @requestId
+        INSERT INTO \`${projectId}.greenhouse.leave_request_actions\` (
+          action_id,
+          request_id,
+          action,
+          actor_user_id,
+          actor_member_id,
+          actor_name,
+          notes,
+          created_at
+        )
+        VALUES (
+          @actionId,
+          @requestId,
+          @action,
+          @actorUserId,
+          @actorMemberId,
+          @actorName,
+          @notes,
+          CURRENT_TIMESTAMP()
+        )
       `,
       {
+        actionId: `leave-action-${randomUUID()}`,
         requestId,
-        decidedBy: actorName,
-        notes
-      }
-    )
-
-    if (request.requestedDays > 0) {
-      await adjustBalanceForRequest({
-        request,
-        reservedDelta: -request.requestedDays,
-        usedDelta: 0,
-        actorUserId
-      })
-    }
-  } else if (!isHrAdminTenant(tenant)) {
-    if (request.supervisorMemberId !== actorMemberId || request.status !== 'pending_supervisor') {
-      throw new HrCoreValidationError('Forbidden', 403)
-    }
-
-    await runHrCoreQuery(
-      `
-        UPDATE \`${projectId}.greenhouse.leave_requests\`
-        SET
-          status = @status,
-          decided_at = CASE WHEN @status = 'rejected' THEN CURRENT_TIMESTAMP() ELSE decided_at END,
-          decided_by = CASE WHEN @status = 'rejected' THEN @decidedBy ELSE decided_by END,
-          notes = @notes,
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE request_id = @requestId
-      `,
-      {
-        requestId,
-        status: action === 'approve' ? 'pending_hr' : 'rejected',
-        decidedBy: actorName,
-        notes
-      }
-    )
-
-    if (action === 'reject' && request.requestedDays > 0) {
-      await adjustBalanceForRequest({
-        request,
-        reservedDelta: -request.requestedDays,
-        usedDelta: 0,
-        actorUserId
-      })
-    }
-  } else {
-    if (!['pending_hr', 'pending_supervisor'].includes(request.status)) {
-      throw new HrCoreValidationError('This request is no longer pending HR review.', 409)
-    }
-
-    await runHrCoreQuery(
-      `
-        UPDATE \`${projectId}.greenhouse.leave_requests\`
-        SET
-          status = @status,
-          hr_reviewer_user_id = @hrReviewerUserId,
-          decided_at = CURRENT_TIMESTAMP(),
-          decided_by = @decidedBy,
-          notes = @notes,
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE request_id = @requestId
-      `,
-      {
-        requestId,
-        status: action === 'approve' ? 'approved' : 'rejected',
-        hrReviewerUserId: tenant.userId,
-        decidedBy: actorName,
-        notes
-      }
-    )
-
-    if (request.requestedDays > 0) {
-      await adjustBalanceForRequest({
-        request,
-        reservedDelta: -request.requestedDays,
-        usedDelta: action === 'approve' ? request.requestedDays : 0,
-        actorUserId
-      })
-    }
-  }
-
-  await runHrCoreQuery(
-    `
-      INSERT INTO \`${projectId}.greenhouse.leave_request_actions\` (
-        action_id,
-        request_id,
         action,
-        actor_user_id,
-        actor_member_id,
-        actor_name,
-        notes,
-        created_at
-      )
-      VALUES (
-        @actionId,
-        @requestId,
-        @action,
-        @actorUserId,
-        @actorMemberId,
-        @actorName,
-        @notes,
-        CURRENT_TIMESTAMP()
-      )
-    `,
-    {
-      actionId: `leave-action-${randomUUID()}`,
-      requestId,
-      action,
-      actorUserId,
-      actorMemberId,
-      actorName,
-      notes
+        actorUserId,
+        actorMemberId,
+        actorName,
+        notes
+      }
+    )
+
+    const updated = await getLeaveRequestByIdInternal(requestId)
+
+    if (!updated) {
+      throw new HrCoreValidationError('Updated leave request could not be reloaded.', 500)
     }
-  )
 
-  const updated = await getLeaveRequestByIdInternal(requestId)
-
-  if (!updated) {
-    throw new HrCoreValidationError('Updated leave request could not be reloaded.', 500)
+    return updated
   }
 
-  return updated
+  return withHrLeavePostgresFallback({
+    operation: 'reviewLeaveRequest',
+    postgres: () => reviewLeaveRequestInPostgres({ tenant, requestId, input, actorUserId }),
+    fallback
+  })
 }
 
 export const listAttendance = async ({

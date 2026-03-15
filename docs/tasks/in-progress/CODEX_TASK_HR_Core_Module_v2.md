@@ -30,6 +30,29 @@ Conclusiones obligatorias:
   - asistencia
   - historial de aprobaciones
 
+## Hotfix 2026-03-15 rollout PostgreSQL en `Preview`
+
+Se detectó un incidente real después del primer cutover de `HR > Permisos` a PostgreSQL:
+- la vista en `pre-greenhouse` caía por errores Cloud SQL del service account de `Preview`
+- el síntoma visible era fallo en:
+  - `meta`
+  - `balances`
+  - `requests`
+- el error real observado en runtime fue:
+  - `boss::NOT_AUTHORIZED`
+  - permiso faltante `cloudsql.instances.get`
+
+Corrección aplicada:
+- se otorgó `roles/cloudsql.client` al service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+- `src/lib/hr-core/service.ts` ahora hace fallback controlado a BigQuery para el dominio `leave` si PostgreSQL falla por:
+  - permisos Cloud SQL
+  - schema Postgres no listo
+  - conectividad transitoria
+
+Decisión operativa:
+- PostgreSQL sigue siendo el store objetivo del dominio `leave`
+- BigQuery se mantiene temporalmente como red de seguridad para `Preview` y rollout por ambiente, no como reversión arquitectónica
+
 ## Decisiones de modelado de esta v2
 
 ### Qué sigue viviendo en `team_members`

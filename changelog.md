@@ -6,6 +6,14 @@
 
 ## 2026-03-15
 
+### HR leave rollout hardening for Preview
+- `HR > Permisos` ya no cae completo en `Preview` si el conector a Cloud SQL falla durante el rollout a PostgreSQL.
+- `src/lib/hr-core/service.ts` ahora hace fallback controlado a BigQuery para metadata, balances, requests, creación y revisión de solicitudes cuando detecta:
+  - falta de permisos Cloud SQL
+  - schema Postgres no listo
+  - errores transitorios de conectividad
+- Se corrigió además la infraestructura de `Preview` otorgando `roles/cloudsql.client` al service account `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`, que era el origen real del error `cloudsql.instances.get`.
+
 ### PostgreSQL canonical 360 backbone and initial BigQuery backfill
 - Se agregó `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` para formalizar el modelo canónico 360 en PostgreSQL.
 - Se materializaron en `greenhouse-pg-dev` los esquemas:

@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 HR leave preview rollout hardening
+- El cutover de `HR > Permisos` a PostgreSQL en `Preview` quedó endurecido con fallback operativo a BigQuery para evitar que la vista completa falle si Cloud SQL no está disponible.
+- El slice de `leave` ahora puede caer controladamente al path legacy para:
+  - metadata
+  - balances
+  - requests
+  - create/review
+- Regla operativa derivada:
+  - una rama `Preview` que use Cloud SQL connector debe tener el service account de `GOOGLE_APPLICATION_CREDENTIALS_JSON` con `roles/cloudsql.client`
+  - sin ese rol, el error esperable es `cloudsql.instances.get` / `boss::NOT_AUTHORIZED`
+- Este fallback no cambia la dirección arquitectónica:
+  - PostgreSQL sigue siendo el store objetivo del dominio
+  - BigQuery queda como red de seguridad temporal mientras se estabiliza el rollout por ambiente
+
 ## Delta 2026-03-15 HR leave runtime cutover to PostgreSQL
 - `HR > Permisos` se convirtió en el primer dominio operativo del portal que ya usa PostgreSQL en runtime sobre la instancia `greenhouse-pg-dev`.
 - Se agregó el dominio `greenhouse_hr` en Cloud SQL con:
