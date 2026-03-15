@@ -36,7 +36,10 @@ export const GH_FINANCE_NAV = {
 } as const
 
 export const GH_HR_NAV = {
-  payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' }
+  payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
+  departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
+  leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
+  attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }
 } as const
 
 export const GH_AGENCY = {

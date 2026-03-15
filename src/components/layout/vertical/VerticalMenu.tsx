@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react'
 
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
-import { Menu, MenuItem, MenuSection } from '@menu/vertical-menu'
+import { Menu, MenuItem, MenuSection, SubMenu } from '@menu/vertical-menu'
 
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
@@ -175,93 +175,58 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuSection>
         ) : null}
         {isFinanceUser || isAdminUser ? (
-          <MenuSection label='Finanzas'>
-            <MenuItem href='/finance' icon={<i className='tabler-chart-bar' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.dashboard.label}
-                subtitle={GH_FINANCE_NAV.dashboard.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+          <SubMenu label='Finanzas' icon={<i className='tabler-report-money' />}>
+            <MenuItem href='/finance'>
+              {GH_FINANCE_NAV.dashboard.label}
             </MenuItem>
-            <MenuItem href='/finance/income' icon={<i className='tabler-cash' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.income.label}
-                subtitle={GH_FINANCE_NAV.income.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/finance/income'>
+              {GH_FINANCE_NAV.income.label}
             </MenuItem>
-            <MenuItem href='/finance/expenses' icon={<i className='tabler-credit-card' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.expenses.label}
-                subtitle={GH_FINANCE_NAV.expenses.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/finance/expenses'>
+              {GH_FINANCE_NAV.expenses.label}
             </MenuItem>
-            <MenuItem href='/finance/suppliers' icon={<i className='tabler-building-store' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.suppliers.label}
-                subtitle={GH_FINANCE_NAV.suppliers.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/finance/suppliers'>
+              {GH_FINANCE_NAV.suppliers.label}
             </MenuItem>
-            <MenuItem href='/finance/clients' icon={<i className='tabler-users-group' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.clients.label}
-                subtitle={GH_FINANCE_NAV.clients.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/finance/clients'>
+              {GH_FINANCE_NAV.clients.label}
             </MenuItem>
-            <MenuItem href='/finance/reconciliation' icon={<i className='tabler-arrows-exchange' />}>
-              <NavigationItemLabel
-                label={GH_FINANCE_NAV.reconciliation.label}
-                subtitle={GH_FINANCE_NAV.reconciliation.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/finance/reconciliation'>
+              {GH_FINANCE_NAV.reconciliation.label}
             </MenuItem>
-          </MenuSection>
+          </SubMenu>
         ) : null}
         {isHrUser || isAdminUser ? (
-          <MenuSection label='HR'>
-            <MenuItem href='/hr/payroll' icon={<i className='tabler-receipt-2' />}>
-              <NavigationItemLabel
-                label={GH_HR_NAV.payroll.label}
-                subtitle={GH_HR_NAV.payroll.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+          <SubMenu label='HR' icon={<i className='tabler-heart-handshake' />}>
+            <MenuItem href='/hr/payroll'>
+              {GH_HR_NAV.payroll.label}
             </MenuItem>
-          </MenuSection>
+            <MenuItem href='/hr/departments'>
+              {GH_HR_NAV.departments.label}
+            </MenuItem>
+            <MenuItem href='/hr/leave'>
+              {GH_HR_NAV.leave.label}
+            </MenuItem>
+            <MenuItem href='/hr/attendance'>
+              {GH_HR_NAV.attendance.label}
+            </MenuItem>
+          </SubMenu>
         ) : null}
         {isAdminUser ? (
-          <MenuSection label='Admin'>
-            <MenuItem href='/admin/tenants' icon={<i className='tabler-building-community' />}>
-              <NavigationItemLabel
-                label={GH_INTERNAL_NAV.adminTenants.label}
-                subtitle={GH_INTERNAL_NAV.adminTenants.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+          <SubMenu label='Admin' icon={<i className='tabler-shield-lock' />}>
+            <MenuItem href='/admin/tenants'>
+              {GH_INTERNAL_NAV.adminTenants.label}
             </MenuItem>
-            <MenuItem href='/admin/users' icon={<i className='tabler-users' />}>
-              <NavigationItemLabel
-                label={GH_INTERNAL_NAV.adminUsers.label}
-                subtitle={GH_INTERNAL_NAV.adminUsers.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/admin/users'>
+              {GH_INTERNAL_NAV.adminUsers.label}
             </MenuItem>
-            <MenuItem href='/admin/roles' icon={<i className='tabler-shield-lock' />}>
-              <NavigationItemLabel
-                label={GH_INTERNAL_NAV.adminRoles.label}
-                subtitle={GH_INTERNAL_NAV.adminRoles.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/admin/roles'>
+              {GH_INTERNAL_NAV.adminRoles.label}
             </MenuItem>
-            <MenuItem href='/admin/ai-tools' icon={<i className='tabler-wand' />}>
-              <NavigationItemLabel
-                label='AI Tooling'
-                subtitle='Herramientas, licencias y créditos IA'
-                showSubtitle={showNavSubtitles}
-              />
+            <MenuItem href='/admin/ai-tools'>
+              AI Tooling
             </MenuItem>
-          </MenuSection>
+          </SubMenu>
         ) : null}
       </Menu>
     </ScrollWrapper>
