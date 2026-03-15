@@ -8,6 +8,7 @@
 
 ### PostgreSQL access model and `pg:doctor` tooling
 - Se agregó `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` para formalizar la separación de acceso `runtime / migrator / admin`.
+- `AGENTS.md` ahora documenta cómo acceder a PostgreSQL, qué perfil usar según el tipo de trabajo y qué comandos correr antes de tocar un dominio nuevo.
 - Se agregaron los comandos:
   - `pnpm setup:postgres:access`
   - `pnpm pg:doctor`

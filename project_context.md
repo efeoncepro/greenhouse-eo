@@ -6,6 +6,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-03-15 PostgreSQL access model and tooling
 - Se formalizó la capa de acceso escalable a Cloud SQL en:
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `AGENTS.md` ya documenta explícitamente cómo acceder y operar PostgreSQL para evitar que otros agentes vuelvan a usar el perfil incorrecto.
 - Greenhouse ahora separa explícitamente tres perfiles operativos de PostgreSQL:
   - `runtime`
   - `migrator`

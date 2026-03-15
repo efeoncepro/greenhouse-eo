@@ -83,6 +83,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Cambios realizados
 - Se formalizó el modelo de acceso `runtime / migrator / admin` en PostgreSQL.
+- `AGENTS.md` quedó actualizado con:
+  - perfiles de acceso
+  - variables por perfil
+  - comandos canónicos
+  - regla de usar `pg:doctor` antes de cualquier nuevo corte
 - Se agregó `scripts/setup-postgres-access.ts` para bootstrap de roles y grants compartidos.
 - Se agregó `scripts/pg-doctor.ts` para validar:
   - perfil aplicado
