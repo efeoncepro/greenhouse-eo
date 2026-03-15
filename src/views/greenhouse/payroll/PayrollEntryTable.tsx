@@ -26,20 +26,23 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { PayrollEntry, PeriodStatus } from '@/types/payroll'
+import type { PayrollEntry, PayrollPeriod, PeriodStatus } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
 import BonusInput from './BonusInput'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
+import PayrollReceiptDialog from './PayrollReceiptDialog'
 import { formatCurrency, formatPercent, formatDecimal, formatFactor, formatAttendanceRatio, otdSemaphore, rpaSemaphore, regimeLabel, regimeColor } from './helpers'
 
 type Props = {
   entries: PayrollEntry[]
+  period: PayrollPeriod
   periodStatus: PeriodStatus
   onEntryUpdate: (entryId: string, field: string, value: number | string | boolean | null) => void
 }
 
-const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
+const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Props) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
 
   const isEditable = periodStatus === 'calculated'
 
@@ -48,6 +51,7 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
   }
 
   return (
+    <>
     <TableContainer>
       <Table size='small'>
         <TableHead>
@@ -257,8 +261,8 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                   {/* Receipt */}
                   <TableCell>
                     {(periodStatus === 'approved' || periodStatus === 'exported') && (
-                      <Tooltip title='Descargar recibo'>
-                        <IconButton size='small' onClick={() => window.open(`/api/hr/payroll/entries/${entry.entryId}/receipt`, '_blank')}>
+                      <Tooltip title='Ver recibo'>
+                        <IconButton size='small' onClick={() => setReceiptEntry(entry)}>
                           <i className='tabler-file-invoice' />
                         </IconButton>
                       </Tooltip>
@@ -502,6 +506,14 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
         </TableBody>
       </Table>
     </TableContainer>
+
+    <PayrollReceiptDialog
+      open={!!receiptEntry}
+      onClose={() => setReceiptEntry(null)}
+      entry={receiptEntry}
+      period={period}
+    />
+    </>
   )
 }
 

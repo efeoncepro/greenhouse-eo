@@ -29,7 +29,7 @@ const getProjectId = () => getBigQueryProjectId()
 /**
  * Count weekdays (Mon-Fri) between two dates inclusive.
  */
-const countWeekdays = (startDate: string, endDate: string): number => {
+export const countWeekdays = (startDate: string, endDate: string): number => {
   const start = new Date(startDate + 'T00:00:00')
   const end = new Date(endDate + 'T00:00:00')
   let count = 0

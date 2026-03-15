@@ -386,6 +386,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
           ) : (
             <PayrollEntryTable
               entries={entries}
+              period={period}
               periodStatus={period.status}
               onEntryUpdate={handleEntryUpdate}
             />

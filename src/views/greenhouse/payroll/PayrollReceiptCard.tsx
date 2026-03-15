@@ -1,0 +1,195 @@
+'use client'
+
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableRow from '@mui/material/TableRow'
+import Typography from '@mui/material/Typography'
+
+import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { formatCurrency, formatFactor, formatPercent, formatPeriodLabel } from './helpers'
+
+type Props = {
+  entry: PayrollEntry
+  period: PayrollPeriod
+}
+
+const MONTH_NAMES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+]
+
+const ReceiptRow = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
+  <TableRow sx={bold ? { bgcolor: 'action.hover' } : undefined}>
+    <TableCell sx={{ py: 0.75, fontWeight: bold ? 700 : 400 }}>{label}</TableCell>
+    <TableCell align='right' sx={{ py: 0.75, fontFamily: 'monospace', fontWeight: bold ? 700 : 400 }}>{value}</TableCell>
+  </TableRow>
+)
+
+const PayrollReceiptCard = ({ entry, period }: Props) => {
+  const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
+  const currency = entry.currency
+  const isChile = entry.payRegime === 'chile'
+  const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
+
+  // Build haberes rows
+  const haberesRows: [string, string][] = [
+    ['Sueldo base', formatCurrency(entry.baseSalary, currency)]
+  ]
+
+  if (hasAttendanceAdjustment) {
+    haberesRows.push(['Sueldo base ajustado (por inasistencia)', formatCurrency(entry.adjustedBaseSalary, currency)])
+  }
+
+  haberesRows.push(['Asignación teletrabajo', formatCurrency(entry.remoteAllowance, currency)])
+
+  if (hasAttendanceAdjustment && entry.adjustedRemoteAllowance != null) {
+    haberesRows.push(['Teletrabajo ajustado (por inasistencia)', formatCurrency(entry.adjustedRemoteAllowance, currency)])
+  }
+
+  haberesRows.push(
+    [`Bono OTD (${formatPercent(entry.kpiOtdPercent)} → factor ${formatFactor(entry.bonusOtdProrationFactor)})`, formatCurrency(entry.bonusOtdAmount, currency)],
+    [`Bono RpA (${entry.kpiRpaAvg != null ? entry.kpiRpaAvg.toFixed(1) : '—'} → factor ${formatFactor(entry.bonusRpaProrationFactor)})`, formatCurrency(entry.bonusRpaAmount, currency)]
+  )
+
+  if (entry.bonusOtherAmount > 0) {
+    haberesRows.push([`Bono adicional${entry.bonusOtherDescription ? ` (${entry.bonusOtherDescription})` : ''}`, formatCurrency(entry.bonusOtherAmount, currency)])
+  }
+
+  // Attendance rows
+  const attendanceRows: [string, string][] = entry.workingDaysInPeriod != null ? [
+    ['Días hábiles en período', String(entry.workingDaysInPeriod)],
+    ['Días presentes', String(entry.daysPresent ?? '—')],
+    ['Días ausentes', String(entry.daysAbsent ?? 0)],
+    ['Días licencia', String(entry.daysOnLeave ?? 0)],
+    ['Días licencia no remunerada', String(entry.daysOnUnpaidLeave ?? 0)]
+  ] : []
+
+  // Deduction rows (Chile only)
+  const deductionRows: [string, string][] = isChile ? [
+    [`AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`, formatCurrency(entry.chileAfpAmount, currency)],
+    [`Salud (${entry.chileHealthSystem ?? '—'})`, formatCurrency(entry.chileHealthAmount, currency)],
+    [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, formatCurrency(entry.chileUnemploymentAmount, currency)],
+    ['Impuesto único', formatCurrency(entry.chileTaxAmount, currency)]
+  ] : []
+
+  if (isChile && entry.chileApvAmount != null && entry.chileApvAmount > 0) {
+    deductionRows.push(['APV', formatCurrency(entry.chileApvAmount, currency)])
+  }
+
+  return (
+    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
+        {/* Header */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
+          <Box>
+            <Typography variant='h5' sx={{ color: '#2E7D32', fontWeight: 700 }}>Greenhouse EO</Typography>
+            <Typography variant='body2' color='text.secondary'>Recibo de remuneraciones</Typography>
+          </Box>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant='h6'>{monthName} {period.year}</Typography>
+            <Typography variant='caption' color='text.secondary'>{period.periodId}</Typography>
+          </Box>
+        </Box>
+
+        <Divider sx={{ borderColor: '#2E7D32', borderWidth: 1, mb: 3 }} />
+
+        {/* Employee info */}
+        <Typography variant='subtitle2' sx={{ mb: 1.5 }}>Datos del colaborador</Typography>
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant='caption' color='text.secondary'>Nombre</Typography>
+            <Typography variant='body2' fontWeight={500}>{entry.memberName}</Typography>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant='caption' color='text.secondary'>Email</Typography>
+            <Typography variant='body2'>{entry.memberEmail}</Typography>
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant='caption' color='text.secondary'>Régimen</Typography>
+            <Typography variant='body2'>{isChile ? 'Chile' : 'Internacional'}</Typography>
+          </Grid>
+          <Grid size={{ xs: 6, sm: 3 }}>
+            <Typography variant='caption' color='text.secondary'>Moneda</Typography>
+            <Typography variant='body2'>{currency}</Typography>
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ mb: 3 }} />
+
+        {/* Haberes */}
+        <Typography variant='subtitle2' sx={{ mb: 1 }}>Haberes</Typography>
+        <Table size='small' sx={{ mb: 3 }}>
+          <TableBody>
+            {haberesRows.map(([label, value], i) => (
+              <ReceiptRow key={`h-${i}`} label={label} value={value} />
+            ))}
+            <ReceiptRow label='Total bruto' value={formatCurrency(entry.grossTotal, currency)} bold />
+          </TableBody>
+        </Table>
+
+        {/* Attendance */}
+        {attendanceRows.length > 0 && (
+          <>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>Asistencia</Typography>
+            <Table size='small' sx={{ mb: 3 }}>
+              <TableBody>
+                {attendanceRows.map(([label, value], i) => (
+                  <ReceiptRow key={`a-${i}`} label={label} value={value} />
+                ))}
+              </TableBody>
+            </Table>
+          </>
+        )}
+
+        {/* Deductions (Chile only) */}
+        {deductionRows.length > 0 && (
+          <>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>Descuentos legales</Typography>
+            <Table size='small' sx={{ mb: 3 }}>
+              <TableBody>
+                {deductionRows.map(([label, value], i) => (
+                  <ReceiptRow key={`d-${i}`} label={label} value={value} />
+                ))}
+                <ReceiptRow label='Total descuentos' value={formatCurrency(entry.chileTotalDeductions, currency)} bold />
+              </TableBody>
+            </Table>
+          </>
+        )}
+
+        {/* Net total */}
+        <Box
+          sx={{
+            bgcolor: '#2E7D32',
+            color: '#fff',
+            borderRadius: 1,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            px: 3,
+            py: 2,
+            mt: 2
+          }}
+        >
+          <Typography variant='subtitle1' fontWeight={700} color='inherit'>Líquido a pagar</Typography>
+          <Typography variant='h6' fontWeight={700} sx={{ fontFamily: 'monospace' }} color='inherit'>
+            {formatCurrency(entry.netTotal, currency)}
+          </Typography>
+        </Box>
+
+        {entry.manualOverride && (
+          <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+            * Monto neto ajustado manualmente{entry.manualOverrideNote ? `: ${entry.manualOverrideNote}` : ''}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+export default PayrollReceiptCard

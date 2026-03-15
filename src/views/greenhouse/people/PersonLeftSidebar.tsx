@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography'
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
+import { formatCurrency } from '@views/greenhouse/payroll/helpers'
 
 import type { PersonDetail } from '@/types/people'
 import { countryFlag, formatFte, roleCategoryLabel, safeRoleCategory } from './helpers'
@@ -130,6 +131,33 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Pro
                 {GH_INTERNAL_MESSAGES.people_detail_link_admin}
               </Button>
             )}
+          </CardContent>
+        </>
+      )}
+
+      {detail.currentCompensation && (
+        <>
+          <Divider />
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Typography variant='overline' color='text.secondary'>Compensación</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <i className='tabler-cash' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
+              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                {formatCurrency(detail.currentCompensation.baseSalary, detail.currentCompensation.currency)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <i className='tabler-building-bank' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
+              <Typography variant='body2'>
+                {detail.currentCompensation.payRegime === 'chile' ? 'Chile' : 'Internacional'} · {detail.currentCompensation.currency}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <i className='tabler-calendar-check' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
+              <Typography variant='body2' color='text.secondary'>
+                Desde {detail.currentCompensation.effectiveFrom}
+              </Typography>
+            </Box>
           </CardContent>
         </>
       )}

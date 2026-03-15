@@ -10,6 +10,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
     "backfill:hubspot-contact-names": "tsx scripts/backfill-hubspot-contact-names.ts",
     "backfill:efeonce-microsoft-aliases": "tsx scripts/backfill-efeonce-microsoft-aliases.ts",
@@ -141,7 +143,8 @@
     "tailwindcss": "4.1.17",
     "tailwindcss-logical": "4.1.0",
     "tsx": "4.20.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.1.0"
   },
   "resolutions": {
     "rimraf": "5.0.7",
