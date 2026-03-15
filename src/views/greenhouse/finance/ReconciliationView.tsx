@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -25,6 +27,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
+import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -115,6 +118,7 @@ const formatDate = (date: string | null): string => {
 // ---------------------------------------------------------------------------
 
 const ReconciliationView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [periods, setPeriods] = useState<ReconciliationPeriod[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -123,6 +127,7 @@ const ReconciliationView = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
+  const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -276,9 +281,16 @@ const ReconciliationView = () => {
         </Alert>
       )}
 
-      {accounts.length === 0 && pendingMovementCount > 0 && (
-        <Alert severity='info'>
-          Hay movimientos financieros pendientes, pero todavía no existen cuentas activas en `Finance`. Mientras no se registren cuentas, no podrás abrir períodos de conciliación ni cargar extractos bancarios.
+      {accounts.length === 0 && !loading && (
+        <Alert
+          severity='info'
+          action={
+            <Button color='inherit' size='small' onClick={() => setAccountDrawerOpen(true)}>
+              Crear cuenta
+            </Button>
+          }
+        >
+          No existen cuentas bancarias registradas. Crea una cuenta para empezar a conciliar.
         </Alert>
       )}
 
@@ -413,7 +425,12 @@ const ReconciliationView = () => {
                   const hasDifference = period.difference !== 0 && period.status !== 'reconciled'
 
                   return (
-                    <TableRow key={period.periodId} hover>
+                    <TableRow
+                      key={period.periodId}
+                      hover
+                      onClick={() => router.push(`/finance/reconciliation/${period.periodId}`)}
+                      sx={{ cursor: 'pointer' }}
+                    >
                       <TableCell>
                         <Typography variant='body2' fontWeight={600}>
                           {MONTH_NAMES[period.month]} {period.year}
@@ -544,6 +561,15 @@ const ReconciliationView = () => {
         onClose={() => setCreateDrawerOpen(false)}
         onSuccess={() => {
           setCreateDrawerOpen(false)
+          fetchData()
+        }}
+      />
+
+      <CreateAccountDrawer
+        open={accountDrawerOpen}
+        onClose={() => setAccountDrawerOpen(false)}
+        onSuccess={() => {
+          setAccountDrawerOpen(false)
           fetchData()
         }}
       />

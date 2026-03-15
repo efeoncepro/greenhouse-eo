@@ -12,11 +12,13 @@ import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
+import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,6 +73,9 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
 
   const [accounts, setAccounts] = useState<AccountOption[]>([])
   const [loadingAccounts, setLoadingAccounts] = useState(false)
+  const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
+
+  const ADD_NEW_ACCOUNT = '__ADD_NEW__'
 
   const fetchAccounts = useCallback(async () => {
     setLoadingAccounts(true)
@@ -99,6 +104,22 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
       fetchAccounts()
     }
   }, [open, accounts.length, fetchAccounts])
+
+  const handleAccountChange = (value: string) => {
+    if (value === ADD_NEW_ACCOUNT) {
+      setAccountDrawerOpen(true)
+
+      return
+    }
+
+    setAccountId(value)
+  }
+
+  const handleAccountCreated = () => {
+    setAccountDrawerOpen(false)
+    setAccounts([])
+    fetchAccounts()
+  }
 
   const resetForm = () => {
     setAccountId('')
@@ -176,6 +197,7 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
   }
 
   return (
+    <>
     <Drawer
       anchor='right'
       open={open}
@@ -202,7 +224,7 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
               size='small'
               label='Cuenta bancaria'
               value={accountId}
-              onChange={e => setAccountId(e.target.value)}
+              onChange={e => handleAccountChange(e.target.value)}
               required
               disabled={loadingAccounts}
             >
@@ -212,6 +234,13 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
                   {acc.accountName} ({acc.currency})
                 </MenuItem>
               ))}
+              <ListSubheader sx={{ p: 0 }}>
+                <Divider />
+              </ListSubheader>
+              <MenuItem value={ADD_NEW_ACCOUNT} sx={{ color: 'primary.main', fontWeight: 600 }}>
+                <i className='tabler-plus' style={{ marginRight: 8, fontSize: 18 }} />
+                Crear cuenta bancaria
+              </MenuItem>
             </CustomTextField>
           </Grid>
 
@@ -287,6 +316,13 @@ const CreateReconciliationPeriodDrawer = ({ open, onClose, onSuccess }: Props) =
         </Button>
       </Box>
     </Drawer>
+
+    <CreateAccountDrawer
+      open={accountDrawerOpen}
+      onClose={() => setAccountDrawerOpen(false)}
+      onSuccess={handleAccountCreated}
+    />
+    </>
   )
 }
 
