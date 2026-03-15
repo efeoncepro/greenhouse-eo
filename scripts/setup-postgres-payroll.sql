@@ -126,6 +126,19 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   manual_override BOOLEAN NOT NULL DEFAULT FALSE,
   manual_override_note TEXT,
 
+  -- Bonus proration factors (0.0 to 1.0)
+  bonus_otd_proration_factor NUMERIC(6, 4),
+  bonus_rpa_proration_factor NUMERIC(6, 4),
+
+  -- Attendance snapshot
+  working_days_in_period INTEGER,
+  days_present INTEGER,
+  days_absent INTEGER,
+  days_on_leave INTEGER,
+  days_on_unpaid_leave INTEGER,
+  adjusted_base_salary NUMERIC(14, 2),
+  adjusted_remote_allowance NUMERIC(14, 2),
+
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT payroll_entries_period_member_unique UNIQUE (period_id, member_id)
@@ -139,6 +152,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_bonus_config (
   config_id TEXT NOT NULL,
   otd_threshold NUMERIC(6, 2) NOT NULL,
   rpa_threshold NUMERIC(6, 2) NOT NULL,
+  otd_floor NUMERIC(6, 2) NOT NULL DEFAULT 70,
   effective_from DATE NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (config_id, effective_from)
@@ -170,12 +184,52 @@ CREATE INDEX IF NOT EXISTS payroll_entries_member_idx
 -- Seed data
 -- ============================================================
 
-INSERT INTO greenhouse_payroll.payroll_bonus_config (config_id, otd_threshold, rpa_threshold, effective_from, created_at)
-VALUES ('default', 89.0, 2.0, '2026-01-01', CURRENT_TIMESTAMP)
+INSERT INTO greenhouse_payroll.payroll_bonus_config (config_id, otd_threshold, rpa_threshold, otd_floor, effective_from, created_at)
+VALUES ('default', 89.0, 2.0, 70.0, '2026-01-01', CURRENT_TIMESTAMP)
 ON CONFLICT (config_id, effective_from) DO UPDATE
 SET
   otd_threshold = EXCLUDED.otd_threshold,
-  rpa_threshold = EXCLUDED.rpa_threshold;
+  rpa_threshold = EXCLUDED.rpa_threshold,
+  otd_floor = EXCLUDED.otd_floor;
+
+-- New prorated bonus config effective 2026-04-01
+INSERT INTO greenhouse_payroll.payroll_bonus_config (config_id, otd_threshold, rpa_threshold, otd_floor, effective_from, created_at)
+VALUES ('default', 94.0, 3.0, 70.0, '2026-04-01', CURRENT_TIMESTAMP)
+ON CONFLICT (config_id, effective_from) DO UPDATE
+SET
+  otd_threshold = EXCLUDED.otd_threshold,
+  rpa_threshold = EXCLUDED.rpa_threshold,
+  otd_floor = EXCLUDED.otd_floor;
+
+-- ============================================================
+-- Additive migration (for databases where tables already exist)
+-- ============================================================
+DO $$
+BEGIN
+  -- bonus_config: otd_floor
+  ALTER TABLE greenhouse_payroll.payroll_bonus_config
+    ADD COLUMN IF NOT EXISTS otd_floor NUMERIC(6, 2) NOT NULL DEFAULT 70;
+
+  -- payroll_entries: proration + attendance columns
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS bonus_otd_proration_factor NUMERIC(6, 4);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS bonus_rpa_proration_factor NUMERIC(6, 4);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS working_days_in_period INTEGER;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS days_present INTEGER;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS days_absent INTEGER;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS days_on_leave INTEGER;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS days_on_unpaid_leave INTEGER;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS adjusted_base_salary NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS adjusted_remote_allowance NUMERIC(14, 2);
+END $$;
 
 -- ============================================================
 -- Serving view: member_payroll_360

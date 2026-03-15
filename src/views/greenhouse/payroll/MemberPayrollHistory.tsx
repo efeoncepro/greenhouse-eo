@@ -32,7 +32,7 @@ import CustomChip from '@core/components/mui/Chip'
 import { HorizontalWithSubtitle, StatsWithAreaChart } from '@/components/card-statistics'
 import type { MemberPayrollHistory as MemberHistory } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
-import { formatCurrency, formatPeriodIdLabel, regimeLabel, regimeColor } from './helpers'
+import { formatCurrency, formatPeriodIdLabel, formatAttendanceRatio, formatFactor, regimeLabel, regimeColor } from './helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
@@ -272,7 +272,10 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Período</TableCell>
+                    <TableCell align='center'>Asistencia</TableCell>
                     <TableCell align='right'>Base</TableCell>
+                    <TableCell align='center'>OTD</TableCell>
+                    <TableCell align='center'>RpA</TableCell>
                     <TableCell align='right'>Bonos</TableCell>
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Descuentos</TableCell>
@@ -287,9 +290,24 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                           {formatPeriodIdLabel(entry.periodId)}
                         </Typography>
                       </TableCell>
+                      <TableCell align='center'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {formatAttendanceRatio(entry.daysPresent, entry.workingDaysInPeriod)}
+                        </Typography>
+                      </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                          {formatCurrency(entry.baseSalary, entry.currency)}
+                          {formatCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {formatFactor(entry.bonusOtdProrationFactor)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {formatFactor(entry.bonusRpaProrationFactor)}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>

@@ -1,9 +1,11 @@
 import 'server-only'
 
-import type { CompensationVersion, PayrollCalculationResult, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
+import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResult, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { fetchAttendanceForAllMembers } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
@@ -25,17 +27,19 @@ import {
 type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
+  otd_floor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
 
-const getBonusConfigForDate = async (periodEnd: string) => {
+const getBonusConfigForDate = async (periodEnd: string): Promise<BonusProrationConfig> => {
   if (isPayrollPostgresEnabled()) {
     const config = await pgGetActiveBonusConfig()
 
     return {
-      otdThreshold: config?.otdThreshold ?? 89,
-      rpaThreshold: config?.rpaThreshold ?? 2
+      otdThreshold: config?.otdThreshold ?? 94,
+      otdFloor: config?.otdFloor ?? 70,
+      rpaThreshold: config?.rpaThreshold ?? 3
     }
   }
 
@@ -43,7 +47,7 @@ const getBonusConfigForDate = async (periodEnd: string) => {
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold
+      SELECT otd_threshold, rpa_threshold, otd_floor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -53,35 +57,62 @@ const getBonusConfigForDate = async (periodEnd: string) => {
   )
 
   return {
-    otdThreshold: row ? toNumber(row.otd_threshold) : 89,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 2
+    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
+    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
+    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
   }
 }
+
+type AttendanceSnapshot = {
+  workingDaysInPeriod: number
+  daysPresent: number
+  daysAbsent: number
+  daysOnLeave: number
+  daysOnUnpaidLeave: number
+}
+
+const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
 const buildPayrollEntry = ({
   periodId,
   compensation,
   ufValue,
   bonusConfig,
-  kpi
+  kpi,
+  attendance
 }: {
   periodId: string
   compensation: CompensationVersion
   ufValue: number | null
-  bonusConfig: { otdThreshold: number; rpaThreshold: number }
+  bonusConfig: BonusProrationConfig
   kpi: PayrollKpiSnapshot | null
+  attendance: AttendanceSnapshot | null
 }): PayrollEntry => {
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
-  const kpiOtdQualifies = typeof kpiOtdPercent === 'number' && kpiOtdPercent >= bonusConfig.otdThreshold
-  const kpiRpaQualifies = typeof kpiRpaAvg === 'number' && kpiRpaAvg < bonusConfig.rpaThreshold
-  const bonusOtdAmount = kpiOtdQualifies ? compensation.bonusOtdMin : 0
-  const bonusRpaAmount = kpiRpaQualifies ? compensation.bonusRpaMin : 0
+
+  const otdResult = calculateOtdBonus(kpiOtdPercent, compensation.bonusOtdMin, bonusConfig)
+  const rpaResult = calculateRpaBonus(kpiRpaAvg, compensation.bonusRpaMin, bonusConfig)
+
+  const bonusOtdAmount = otdResult.amount
+  const bonusRpaAmount = rpaResult.amount
+
+  // Attendance-based adjustments
+  const deductibleDays = attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
+  const workingDays = attendance?.workingDaysInPeriod ?? 22
+  const attendanceRatio = workingDays > 0 ? Math.max(0, (workingDays - deductibleDays) / workingDays) : 1
+
+  const adjustedBaseSalary = deductibleDays > 0
+    ? roundCurrency(compensation.baseSalary * attendanceRatio)
+    : compensation.baseSalary
+  const adjustedRemoteAllowance = deductibleDays > 0
+    ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
+    : compensation.remoteAllowance
 
   const totals = calculatePayrollTotals({
     payRegime: compensation.payRegime,
-    baseSalary: compensation.baseSalary,
-    remoteAllowance: compensation.remoteAllowance,
+    baseSalary: adjustedBaseSalary,
+    remoteAllowance: adjustedRemoteAllowance,
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
@@ -111,8 +142,8 @@ const buildPayrollEntry = ({
     remoteAllowance: compensation.remoteAllowance,
     kpiOtdPercent,
     kpiRpaAvg,
-    kpiOtdQualifies,
-    kpiRpaQualifies,
+    kpiOtdQualifies: otdResult.qualifies,
+    kpiRpaQualifies: rpaResult.qualifies,
     kpiTasksCompleted: kpi ? kpi.tasksCompleted : null,
     kpiDataSource: kpi ? 'notion_ops' : 'manual',
     bonusOtdAmount,
@@ -141,6 +172,15 @@ const buildPayrollEntry = ({
     netTotal: totals.netTotalCalculated,
     manualOverride: false,
     manualOverrideNote: null,
+    bonusOtdProrationFactor: otdResult.prorationFactor,
+    bonusRpaProrationFactor: rpaResult.prorationFactor,
+    workingDaysInPeriod: attendance?.workingDaysInPeriod ?? null,
+    daysPresent: attendance?.daysPresent ?? null,
+    daysAbsent: attendance?.daysAbsent ?? null,
+    daysOnLeave: attendance?.daysOnLeave ?? null,
+    daysOnUnpaidLeave: attendance?.daysOnUnpaidLeave ?? null,
+    adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
+    adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
     createdAt: null,
     updatedAt: null
   }
@@ -185,12 +225,15 @@ export const calculatePayroll = async ({
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
   }
 
-  const [bonusConfig, kpiData] = await Promise.all([
+  const memberIds = compensationRows.map(row => row.memberId)
+
+  const [bonusConfig, kpiData, attendanceData] = await Promise.all([
     getBonusConfigForDate(range.periodEnd),
     fetchKpisForPeriod({
       periodStart: range.periodStart,
       periodEndExclusive: range.periodEndExclusive
-    })
+    }),
+    fetchAttendanceForAllMembers(memberIds, range.periodStart, range.periodEnd)
   ])
 
   const entries: PayrollEntry[] = []
@@ -203,12 +246,15 @@ export const calculatePayroll = async ({
       missingKpiMemberIds.push(compensation.memberId)
     }
 
+    const attendance = attendanceData.get(compensation.memberId) ?? null
+
     const entry = buildPayrollEntry({
       periodId,
       compensation,
       ufValue: period.ufValue,
       bonusConfig,
-      kpi
+      kpi,
+      attendance
     })
 
     await upsertPayrollEntry(entry)

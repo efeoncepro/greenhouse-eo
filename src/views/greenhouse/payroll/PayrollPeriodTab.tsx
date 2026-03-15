@@ -324,15 +324,37 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                 </>
               )}
               {(period.status === 'approved' || period.status === 'exported') && (
-                <Button
-                  variant='tonal'
-                  size='small'
-                  startIcon={<i className='tabler-file-export' />}
-                  onClick={handleExport}
-                  disabled={isPending}
-                >
-                  Exportar CSV
-                </Button>
+                <>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='info'
+                    startIcon={<i className='tabler-file-type-pdf' />}
+                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    disabled={isPending}
+                  >
+                    PDF
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='success'
+                    startIcon={<i className='tabler-file-spreadsheet' />}
+                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
+                    disabled={isPending}
+                  >
+                    Excel
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    startIcon={<i className='tabler-file-export' />}
+                    onClick={handleExport}
+                    disabled={isPending}
+                  >
+                    CSV
+                  </Button>
+                </>
               )}
             </Stack>
           }

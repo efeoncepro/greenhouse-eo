@@ -129,6 +129,15 @@ type PgEntryRow = {
   net_total: number | string
   manual_override: boolean
   manual_override_note: string | null
+  bonus_otd_proration_factor: number | string | null
+  bonus_rpa_proration_factor: number | string | null
+  working_days_in_period: number | string | null
+  days_present: number | string | null
+  days_absent: number | string | null
+  days_on_leave: number | string | null
+  days_on_unpaid_leave: number | string | null
+  adjusted_base_salary: number | string | null
+  adjusted_remote_allowance: number | string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -387,6 +396,15 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   netTotal: toNumber(row.net_total),
   manualOverride: normalizeBoolean(row.manual_override),
   manualOverrideNote: normalizeNullableString(row.manual_override_note),
+  bonusOtdProrationFactor: toNullableNumber(row.bonus_otd_proration_factor),
+  bonusRpaProrationFactor: toNullableNumber(row.bonus_rpa_proration_factor),
+  workingDaysInPeriod: toNullableNumber(row.working_days_in_period),
+  daysPresent: toNullableNumber(row.days_present),
+  daysAbsent: toNullableNumber(row.days_absent),
+  daysOnLeave: toNullableNumber(row.days_on_leave),
+  daysOnUnpaidLeave: toNullableNumber(row.days_on_unpaid_leave),
+  adjustedBaseSalary: toNullableNumber(row.adjusted_base_salary),
+  adjustedRemoteAllowance: toNullableNumber(row.adjusted_remote_allowance),
   createdAt: toPgTimestampString(row.created_at),
   updatedAt: toPgTimestampString(row.updated_at)
 })
@@ -945,6 +963,15 @@ const ENTRY_BASE_SELECT = `
     e.net_total,
     e.manual_override,
     e.manual_override_note,
+    e.bonus_otd_proration_factor,
+    e.bonus_rpa_proration_factor,
+    e.working_days_in_period,
+    e.days_present,
+    e.days_absent,
+    e.days_on_leave,
+    e.days_on_unpaid_leave,
+    e.adjusted_base_salary,
+    e.adjusted_remote_allowance,
     e.created_at,
     e.updated_at
   FROM greenhouse_payroll.payroll_entries AS e
@@ -1026,7 +1053,11 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_taxable_base, chile_tax_amount, chile_apv_amount, chile_uf_value,
           chile_total_deductions,
           net_total_calculated, net_total_override, net_total,
-          manual_override, manual_override_note
+          manual_override, manual_override_note,
+          bonus_otd_proration_factor, bonus_rpa_proration_factor,
+          working_days_in_period, days_present, days_absent,
+          days_on_leave, days_on_unpaid_leave,
+          adjusted_base_salary, adjusted_remote_allowance
         )
         VALUES (
           $1, $2, $3, $4,
@@ -1042,7 +1073,11 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           $28, $29, $30, $31,
           $32,
           $33, $34, $35,
-          $36, $37
+          $36, $37,
+          $38, $39,
+          $40, $41, $42,
+          $43, $44,
+          $45, $46
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1081,6 +1116,15 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           net_total = EXCLUDED.net_total,
           manual_override = EXCLUDED.manual_override,
           manual_override_note = EXCLUDED.manual_override_note,
+          bonus_otd_proration_factor = EXCLUDED.bonus_otd_proration_factor,
+          bonus_rpa_proration_factor = EXCLUDED.bonus_rpa_proration_factor,
+          working_days_in_period = EXCLUDED.working_days_in_period,
+          days_present = EXCLUDED.days_present,
+          days_absent = EXCLUDED.days_absent,
+          days_on_leave = EXCLUDED.days_on_leave,
+          days_on_unpaid_leave = EXCLUDED.days_on_unpaid_leave,
+          adjusted_base_salary = EXCLUDED.adjusted_base_salary,
+          adjusted_remote_allowance = EXCLUDED.adjusted_remote_allowance,
           updated_at = CURRENT_TIMESTAMP
       `,
       [
@@ -1097,7 +1141,11 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.chileTaxableBase, entry.chileTaxAmount, entry.chileApvAmount, entry.chileUfValue,
         entry.chileTotalDeductions,
         entry.netTotalCalculated, entry.netTotalOverride, entry.netTotal,
-        entry.manualOverride, entry.manualOverrideNote
+        entry.manualOverride, entry.manualOverrideNote,
+        entry.bonusOtdProrationFactor, entry.bonusRpaProrationFactor,
+        entry.workingDaysInPeriod, entry.daysPresent, entry.daysAbsent,
+        entry.daysOnLeave, entry.daysOnUnpaidLeave,
+        entry.adjustedBaseSalary, entry.adjustedRemoteAllowance
       ]
     )
 
@@ -1192,6 +1240,7 @@ export const pgGetActiveBonusConfig = async () => {
     config_id: string
     otd_threshold: number | string
     rpa_threshold: number | string
+    otd_floor: number | string | null
     effective_from: string | Date
   }>(
     `
@@ -1207,6 +1256,7 @@ export const pgGetActiveBonusConfig = async () => {
         configId: row.config_id,
         otdThreshold: toNumber(row.otd_threshold),
         rpaThreshold: toNumber(row.rpa_threshold),
+        otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : 70,
         effectiveFrom: toPgDateString(row.effective_from)
       }
     : null

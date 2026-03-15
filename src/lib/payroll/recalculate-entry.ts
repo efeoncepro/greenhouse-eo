@@ -1,8 +1,9 @@
 import 'server-only'
 
-import type { PayrollEntry, UpdatePayrollEntryInput } from '@/types/payroll'
+import type { BonusProrationConfig, PayrollEntry, UpdatePayrollEntryInput } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
@@ -15,6 +16,7 @@ import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/
 type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
+  otd_floor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
@@ -75,8 +77,9 @@ const getBonusConfigForPeriod = async (periodId: string) => {
 
     return {
       period,
-      otdThreshold: config?.otdThreshold ?? 89,
-      rpaThreshold: config?.rpaThreshold ?? 2
+      otdThreshold: config?.otdThreshold ?? 94,
+      otdFloor: config?.otdFloor ?? 70,
+      rpaThreshold: config?.rpaThreshold ?? 3
     }
   }
 
@@ -85,7 +88,7 @@ const getBonusConfigForPeriod = async (periodId: string) => {
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold
+      SELECT otd_threshold, rpa_threshold, otd_floor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -96,21 +99,20 @@ const getBonusConfigForPeriod = async (periodId: string) => {
 
   return {
     period,
-    otdThreshold: row ? toNumber(row.otd_threshold) : 89,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 2
+    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
+    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
+    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
   }
 }
 
 const validateBonusAmount = ({
   qualifies,
   amount,
-  min,
   max,
   label
 }: {
   qualifies: boolean
   amount: number
-  min: number
   max: number
   label: string
 }) => {
@@ -118,9 +120,9 @@ const validateBonusAmount = ({
     throw new PayrollValidationError(`${label} cannot be assigned when KPI threshold is not met.`, 400)
   }
 
-  if (qualifies && (amount < min || amount > max)) {
+  if (qualifies && (amount < 0 || amount > max)) {
     throw new PayrollValidationError(`${label} must stay within the configured compensation range.`, 400, {
-      min,
+      min: 0,
       max
     })
   }
@@ -164,11 +166,13 @@ export const recalculatePayrollEntry = async ({
     throw new PayrollValidationError('Compensation version not found for payroll entry.', 500)
   }
 
-  const { period, otdThreshold, rpaThreshold } = await getBonusConfigForPeriod(entry.periodId)
+  const { period, otdThreshold, otdFloor, rpaThreshold } = await getBonusConfigForPeriod(entry.periodId)
 
   if (period.status === 'approved' || period.status === 'exported') {
     throw new PayrollValidationError('Approved payroll entries cannot be edited.', 409)
   }
+
+  const bonusConfig: BonusProrationConfig = { otdThreshold, otdFloor, rpaThreshold }
 
   const forceManualKpi = input.kpiDataSource === 'manual' || entry.kpiDataSource === 'manual'
 
@@ -183,32 +187,36 @@ export const recalculatePayrollEntry = async ({
   const nextKpiOtdPercent = input.kpiOtdPercent !== undefined ? input.kpiOtdPercent : entry.kpiOtdPercent
   const nextKpiRpaAvg = input.kpiRpaAvg !== undefined ? input.kpiRpaAvg : entry.kpiRpaAvg
   const nextKpiTasksCompleted = input.kpiTasksCompleted !== undefined ? input.kpiTasksCompleted : entry.kpiTasksCompleted
-  const nextKpiOtdQualifies = typeof nextKpiOtdPercent === 'number' && nextKpiOtdPercent >= otdThreshold
-  const nextKpiRpaQualifies = typeof nextKpiRpaAvg === 'number' && nextKpiRpaAvg < rpaThreshold
+
+  const otdResult = calculateOtdBonus(nextKpiOtdPercent, compensation.bonusOtdMin, bonusConfig)
+  const rpaResult = calculateRpaBonus(nextKpiRpaAvg, compensation.bonusRpaMin, bonusConfig)
+
   const nextBonusOtdAmount = input.bonusOtdAmount ?? entry.bonusOtdAmount
   const nextBonusRpaAmount = input.bonusRpaAmount ?? entry.bonusRpaAmount
   const nextBonusOtherAmount = input.bonusOtherAmount ?? entry.bonusOtherAmount
   const nextTaxAmount = input.chileTaxAmount ?? entry.chileTaxAmount ?? 0
 
   validateBonusAmount({
-    qualifies: nextKpiOtdQualifies,
+    qualifies: otdResult.qualifies,
     amount: nextBonusOtdAmount,
-    min: compensation.bonusOtdMin,
     max: compensation.bonusOtdMax,
     label: 'OTD bonus'
   })
   validateBonusAmount({
-    qualifies: nextKpiRpaQualifies,
+    qualifies: rpaResult.qualifies,
     amount: nextBonusRpaAmount,
-    min: compensation.bonusRpaMin,
     max: compensation.bonusRpaMax,
     label: 'RpA bonus'
   })
 
+  // Use adjusted base/remote from the entry if attendance was already computed
+  const effectiveBaseSalary = entry.adjustedBaseSalary ?? compensation.baseSalary
+  const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
+
   const totals = calculatePayrollTotals({
     payRegime: compensation.payRegime,
-    baseSalary: compensation.baseSalary,
-    remoteAllowance: compensation.remoteAllowance,
+    baseSalary: effectiveBaseSalary,
+    remoteAllowance: effectiveRemoteAllowance,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
     bonusOtherAmount: nextBonusOtherAmount,
@@ -234,13 +242,15 @@ export const recalculatePayrollEntry = async ({
     kpiRpaAvg: nextKpiRpaAvg,
     kpiTasksCompleted: nextKpiTasksCompleted,
     kpiDataSource: nextKpiDataSource,
-    kpiOtdQualifies: nextKpiOtdQualifies,
-    kpiRpaQualifies: nextKpiRpaQualifies,
+    kpiOtdQualifies: otdResult.qualifies,
+    kpiRpaQualifies: rpaResult.qualifies,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
     bonusOtherAmount: nextBonusOtherAmount,
     bonusOtherDescription: input.bonusOtherDescription !== undefined ? input.bonusOtherDescription : entry.bonusOtherDescription,
     grossTotal: totals.grossTotal,
+    bonusOtdProrationFactor: otdResult.prorationFactor,
+    bonusRpaProrationFactor: rpaResult.prorationFactor,
     chileAfpName: totals.chileAfpName,
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,

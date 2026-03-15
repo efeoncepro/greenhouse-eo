@@ -67,6 +67,15 @@ type PayrollEntryRow = {
   net_total: number | string | null
   manual_override: boolean | null
   manual_override_note: string | null
+  bonus_otd_proration_factor: number | string | null
+  bonus_rpa_proration_factor: number | string | null
+  working_days_in_period: number | string | null
+  days_present: number | string | null
+  days_absent: number | string | null
+  days_on_leave: number | string | null
+  days_on_unpaid_leave: number | string | null
+  adjusted_base_salary: number | string | null
+  adjusted_remote_allowance: number | string | null
   created_at: { value?: string } | string | null
   updated_at: { value?: string } | string | null
 }
@@ -117,6 +126,15 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   netTotal: toNumber(row.net_total),
   manualOverride: normalizeBoolean(row.manual_override),
   manualOverrideNote: normalizeNullableString(row.manual_override_note),
+  bonusOtdProrationFactor: toNullableNumber(row.bonus_otd_proration_factor),
+  bonusRpaProrationFactor: toNullableNumber(row.bonus_rpa_proration_factor),
+  workingDaysInPeriod: toNullableNumber(row.working_days_in_period),
+  daysPresent: toNullableNumber(row.days_present),
+  daysAbsent: toNullableNumber(row.days_absent),
+  daysOnLeave: toNullableNumber(row.days_on_leave),
+  daysOnUnpaidLeave: toNullableNumber(row.days_on_unpaid_leave),
+  adjustedBaseSalary: toNullableNumber(row.adjusted_base_salary),
+  adjustedRemoteAllowance: toNullableNumber(row.adjusted_remote_allowance),
   createdAt: toTimestampString(row.created_at),
   updatedAt: toTimestampString(row.updated_at)
 })
@@ -166,6 +184,15 @@ const buildBaseEntryQuery = (projectId: string) => `
     e.net_total,
     e.manual_override,
     e.manual_override_note,
+    CAST(NULL AS FLOAT64) AS bonus_otd_proration_factor,
+    CAST(NULL AS FLOAT64) AS bonus_rpa_proration_factor,
+    CAST(NULL AS INT64) AS working_days_in_period,
+    CAST(NULL AS INT64) AS days_present,
+    CAST(NULL AS INT64) AS days_absent,
+    CAST(NULL AS INT64) AS days_on_leave,
+    CAST(NULL AS INT64) AS days_on_unpaid_leave,
+    CAST(NULL AS FLOAT64) AS adjusted_base_salary,
+    CAST(NULL AS FLOAT64) AS adjusted_remote_allowance,
     e.created_at,
     e.updated_at
   FROM \`${projectId}.greenhouse.payroll_entries\` AS e

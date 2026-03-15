@@ -28,6 +28,7 @@ import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, Payr
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
+import PayrollPersonnelExpenseTab from './PayrollPersonnelExpenseTab'
 import { formatCurrency, formatPeriodLabel, periodStatusConfig } from './helpers'
 
 const PayrollDashboard = () => {
@@ -300,6 +301,12 @@ const PayrollDashboard = () => {
               icon={<i className='tabler-history' />}
               iconPosition='start'
             />
+            <Tab
+              value='expense'
+              label='Gasto de personal'
+              icon={<i className='tabler-report-money' />}
+              iconPosition='start'
+            />
           </CustomTabList>
 
           <TabPanel value='period' sx={{ p: 0 }}>
@@ -324,6 +331,10 @@ const PayrollDashboard = () => {
               periods={periods}
               onSelectPeriod={handleSelectHistoryPeriod}
             />
+          </TabPanel>
+
+          <TabPanel value='expense' sx={{ p: 0 }}>
+            <PayrollPersonnelExpenseTab />
           </TabPanel>
         </TabContext>
       </Stack>

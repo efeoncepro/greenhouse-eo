@@ -80,18 +80,43 @@ export const regimeColor: Record<PayRegime, 'success' | 'info'> = {
 
 // ── KPI Semaphore ───────────────────────────────────────────────────
 
-export const otdSemaphore = (pct: number | null) => {
+export const otdSemaphore = (pct: number | null, prorationFactor?: number | null) => {
   if (pct == null) return { label: 'Sin data', color: 'default' as const }
-  if (pct >= 89) return { label: 'Califica', color: 'success' as const }
+  if (pct >= 94) return { label: '100%', color: 'success' as const }
 
-  return { label: 'No califica', color: 'default' as const }
+  if (pct >= 70) {
+    const factorLabel = prorationFactor != null ? `${(prorationFactor * 100).toFixed(0)}%` : 'Prorrateo'
+
+    return { label: factorLabel, color: 'warning' as const }
+  }
+
+  return { label: 'No califica', color: 'error' as const }
 }
 
-export const rpaSemaphore = (rpa: number | null) => {
+export const rpaSemaphore = (rpa: number | null, prorationFactor?: number | null) => {
   if (rpa == null) return { label: 'Sin data', color: 'default' as const }
-  if (rpa < 2.0) return { label: 'Califica', color: 'success' as const }
 
-  return { label: 'No califica', color: 'default' as const }
+  if (rpa <= 3) {
+    const factorLabel = prorationFactor != null ? `${(prorationFactor * 100).toFixed(0)}%` : 'Califica'
+
+    return { label: factorLabel, color: 'success' as const }
+  }
+
+  return { label: 'No califica', color: 'error' as const }
+}
+
+// ── Attendance formatting ───────────────────────────────────────────
+
+export const formatAttendanceRatio = (present: number | null, total: number | null): string => {
+  if (present == null || total == null) return '—'
+
+  return `${present}/${total}`
+}
+
+export const formatFactor = (value: number | null): string => {
+  if (value == null) return '—'
+
+  return `${(value * 100).toFixed(0)}%`
 }
 
 // ── Timestamp formatting ────────────────────────────────────────────

@@ -5,6 +5,12 @@ export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
 export type PayrollKpiDataSource = 'notion_ops' | 'manual'
 
+export interface BonusProrationConfig {
+  otdThreshold: number
+  otdFloor: number
+  rpaThreshold: number
+}
+
 export interface PayrollMemberSummary {
   memberId: string
   memberName: string
@@ -152,6 +158,15 @@ export interface PayrollEntry {
   netTotal: number
   manualOverride: boolean
   manualOverrideNote: string | null
+  bonusOtdProrationFactor: number | null
+  bonusRpaProrationFactor: number | null
+  workingDaysInPeriod: number | null
+  daysPresent: number | null
+  daysAbsent: number | null
+  daysOnLeave: number | null
+  daysOnUnpaidLeave: number | null
+  adjustedBaseSalary: number | null
+  adjustedRemoteAllowance: number | null
   createdAt: string | null
   updatedAt: string | null
 }

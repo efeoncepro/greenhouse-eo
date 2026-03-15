@@ -30,7 +30,7 @@ import type { PayrollEntry, PeriodStatus } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
 import BonusInput from './BonusInput'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
-import { formatCurrency, formatPercent, formatDecimal, otdSemaphore, rpaSemaphore, regimeLabel, regimeColor } from './helpers'
+import { formatCurrency, formatPercent, formatDecimal, formatFactor, formatAttendanceRatio, otdSemaphore, rpaSemaphore, regimeLabel, regimeColor } from './helpers'
 
 type Props = {
   entries: PayrollEntry[]
@@ -54,6 +54,7 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
           <TableRow>
             <TableCell sx={{ width: 40 }} />
             <TableCell>Colaborador</TableCell>
+            <TableCell align='center'>Asistencia</TableCell>
             <TableCell align='right'>Base</TableCell>
             <TableCell align='center'>OTD%</TableCell>
             <TableCell align='right'>Bono OTD</TableCell>
@@ -63,16 +64,17 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
             <TableCell align='right'>Bruto</TableCell>
             <TableCell align='right'>Descuentos</TableCell>
             <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
+            <TableCell sx={{ width: 40 }} />
           </TableRow>
         </TableHead>
         <TableBody>
           {entries.map(entry => {
             const isChile = entry.payRegime === 'chile'
             const isExpanded = expandedId === entry.entryId
-            const otd = otdSemaphore(entry.kpiOtdPercent)
-            const rpa = rpaSemaphore(entry.kpiRpaAvg)
+            const otd = otdSemaphore(entry.kpiOtdPercent, entry.bonusOtdProrationFactor)
+            const rpa = rpaSemaphore(entry.kpiRpaAvg, entry.bonusRpaProrationFactor)
             const isManualKpi = entry.kpiDataSource === 'manual'
-            const canExpand = isChile || isEditable
+            const canExpand = isChile || isEditable || entry.workingDaysInPeriod != null
 
             return (
               <Fragment key={entry.entryId}>
@@ -112,11 +114,34 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                     </Stack>
                   </TableCell>
 
+                  {/* Attendance */}
+                  <TableCell align='center'>
+                    {entry.workingDaysInPeriod != null ? (
+                      <Tooltip title={`Presentes: ${entry.daysPresent ?? 0} | Ausentes: ${entry.daysAbsent ?? 0} | Licencia: ${entry.daysOnLeave ?? 0}`}>
+                        <span>
+                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                            {formatAttendanceRatio(entry.daysPresent, entry.workingDaysInPeriod)}
+                          </Typography>
+                          {(entry.daysAbsent ?? 0) > 0 && (
+                            <CustomChip round='true' size='small' label={`-${entry.daysAbsent}`} color='error' sx={{ height: 16, fontSize: '0.55rem', mt: 0.25 }} />
+                          )}
+                        </span>
+                      </Tooltip>
+                    ) : (
+                      <Typography variant='body2' color='text.disabled'>—</Typography>
+                    )}
+                  </TableCell>
+
                   {/* Base */}
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                      {formatCurrency(entry.baseSalary, entry.currency)}
-                    </Typography>
+                    <Tooltip title={entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
+                      ? `Original: ${formatCurrency(entry.baseSalary, entry.currency)} | Ajustado por inasistencia`
+                      : ''
+                    }>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {formatCurrency(entry.adjustedBaseSalary ?? entry.baseSalary, entry.currency)}
+                      </Typography>
+                    </Tooltip>
                   </TableCell>
 
                   {/* OTD% */}
@@ -182,9 +207,14 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
 
                   {/* Teletrabajo */}
                   <TableCell align='right'>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                      {formatCurrency(entry.remoteAllowance, entry.currency)}
-                    </Typography>
+                    <Tooltip title={entry.adjustedRemoteAllowance != null && entry.adjustedRemoteAllowance !== entry.remoteAllowance
+                      ? `Original: ${formatCurrency(entry.remoteAllowance, entry.currency)} | Ajustado por inasistencia`
+                      : ''
+                    }>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {formatCurrency(entry.adjustedRemoteAllowance ?? entry.remoteAllowance, entry.currency)}
+                      </Typography>
+                    </Tooltip>
                   </TableCell>
 
                   {/* Bruto */}
@@ -223,15 +253,74 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                       </Tooltip>
                     )}
                   </TableCell>
+
+                  {/* Receipt */}
+                  <TableCell>
+                    {(periodStatus === 'approved' || periodStatus === 'exported') && (
+                      <Tooltip title='Descargar recibo'>
+                        <IconButton size='small' onClick={() => window.open(`/api/hr/payroll/entries/${entry.entryId}/receipt`, '_blank')}>
+                          <i className='tabler-file-invoice' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </TableCell>
                 </TableRow>
 
                 {/* Expanded detail row */}
                 {canExpand && (
                   <TableRow>
-                    <TableCell colSpan={11} sx={{ py: 0, px: 0 }}>
+                    <TableCell colSpan={13} sx={{ py: 0, px: 0 }}>
                       <Collapse in={isExpanded} timeout='auto' unmountOnExit>
                         <Box sx={{ p: 2 }}>
                           <Stack spacing={3}>
+                            {/* Attendance & proration breakdown */}
+                            {entry.workingDaysInPeriod != null && (
+                              <Card
+                                elevation={0}
+                                sx={{
+                                  border: t => `1px solid ${t.palette.divider}`,
+                                  borderLeftWidth: '4px',
+                                  borderLeftStyle: 'solid',
+                                  borderLeftColor: 'primary.main'
+                                }}
+                              >
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
+                                    <i className='tabler-calendar-stats' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    Asistencia y prorrateo
+                                  </Typography>
+                                  <Grid container spacing={2}>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Días hábiles</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{entry.workingDaysInPeriod}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Presentes</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{entry.daysPresent ?? '—'}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Ausentes</Typography>
+                                      <Typography variant='body2' fontWeight={500} color={(entry.daysAbsent ?? 0) > 0 ? 'error.main' : undefined}>
+                                        {entry.daysAbsent ?? 0}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Licencia</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{entry.daysOnLeave ?? 0}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Factor OTD</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{formatFactor(entry.bonusOtdProrationFactor)}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 2 }}>
+                                      <Typography variant='caption' color='text.secondary'>Factor RpA</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{formatFactor(entry.bonusRpaProrationFactor)}</Typography>
+                                    </Grid>
+                                  </Grid>
+                                </CardContent>
+                              </Card>
+                            )}
+
                             {/* Chile deduction breakdown */}
                             {isChile && (
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
