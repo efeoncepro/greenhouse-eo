@@ -25,6 +25,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import ReconciliationMatchDialog from '@views/greenhouse/finance/dialogs/ReconciliationMatchDialog'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -58,6 +59,7 @@ interface StatementRow {
   matchedType: string | null
   matchedId: string | null
   matchConfidence: number | null
+  notes: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -71,10 +73,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning
   closed: { label: 'Cerrado', color: 'secondary' }
 }
 
-const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'secondary' }> = {
+const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'secondary' | 'error' }> = {
   matched: { label: 'Conciliado', color: 'success' },
+  manual_matched: { label: 'Conciliado', color: 'success' },
   suggested: { label: 'Sugerido', color: 'warning' },
-  unmatched: { label: 'Sin match', color: 'secondary' }
+  unmatched: { label: 'Sin match', color: 'secondary' },
+  excluded: { label: 'Excluido', color: 'error' }
 }
 
 const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -105,6 +109,8 @@ const ReconciliationDetailView = () => {
   const [period, setPeriod] = useState<ReconciliationPeriod | null>(null)
   const [statementRows, setStatementRows] = useState<StatementRow[]>([])
   const [autoMatchLoading, setAutoMatchLoading] = useState(false)
+  const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
     open: false,
     message: '',
@@ -169,6 +175,21 @@ const ReconciliationDetailView = () => {
     } finally {
       setAutoMatchLoading(false)
     }
+  }
+
+  const handleRowClick = (row: StatementRow) => {
+    setSelectedRow(row)
+    setMatchDialogOpen(true)
+  }
+
+  const handleMatchActionComplete = () => {
+    setSnackbar({
+      open: true,
+      message: 'Conciliacion actualizada correctamente',
+      severity: 'success'
+    })
+
+    fetchData()
   }
 
   // ---------------------------------------------------------------------------
@@ -332,7 +353,16 @@ const ReconciliationDetailView = () => {
                   const isNegative = row.amount < 0
 
                   return (
-                    <TableRow key={row.rowId} hover>
+                    <TableRow
+                      key={row.rowId}
+                      hover
+                      onClick={() => handleRowClick(row)}
+                      sx={{ cursor: 'pointer' }}
+                      role='button'
+                      tabIndex={0}
+                      aria-label={`${row.description}, ${formatCLP(row.amount)}, ${matchConf.label}`}
+                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleRowClick(row) } }}
+                    >
                       <TableCell>
                         <Typography variant='body2'>
                           {formatDate(row.transactionDate)}
@@ -401,6 +431,15 @@ const ReconciliationDetailView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      {/* Match Dialog */}
+      <ReconciliationMatchDialog
+        open={matchDialogOpen}
+        periodId={id}
+        row={selectedRow}
+        onClose={() => setMatchDialogOpen(false)}
+        onActionComplete={handleMatchActionComplete}
+      />
 
       {/* Snackbar */}
       <Snackbar
