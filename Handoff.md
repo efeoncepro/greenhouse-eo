@@ -40,48 +40,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
-## 2026-03-15 13:41 America/Santiago
-
-### Agente
-- Codex
-
-### Objetivo del turno
-- Corregir el overflow horizontal nuevo en `Admin > Users > detail` después de reactivar el detalle en `develop`.
-
-### Rama
-- Rama usada: `fix/codex-admin-user-detail-overflow`
-- Rama objetivo del merge: `develop`
-
-### Ambiente objetivo
-- Development / Staging (`dev-greenhouse.efeoncepro.com`)
-
-### Archivos tocados
-- `src/views/greenhouse/admin/users/UserDetailHeader.tsx`
-- `Handoff.md`
-- `changelog.md`
-
-### Cambios realizados
-- Se detectó que el header del detalle de usuario estaba empujando el ancho del viewport.
-- La causa principal era estructural:
-  - el bloque derecho del header usaba `is-full` dentro de un `md:flex-row`
-  - eso forzaba un ancho efectivo de `100%` además del bloque del avatar
-  - resultado: la página generaba espacio extra hacia la derecha y scroll horizontal
-- Se ajustó el layout para que el contenedor principal use:
-  - `flex-1`
-  - `min-w-0`
-  - wrap explícito en nombre y acciones
-- También se corrigió una clase inválida:
-  - `sm-gap-0` -> patrón responsive correcto vía `sm:gap-0`
-
-### Verificacion
-- Revisión directa del diff del header
-- `git diff --check`
-  - correcto
-- No se ejecutó validación visual automatizada; queda pendiente confirmación manual en `dev`
-
-### Riesgos o pendientes
-- Si todavía aparece overflow horizontal después de este ajuste, el siguiente candidato es el contenedor del avatar con `mis-[-5px]`; no lo toqué todavía porque este cambio ya corrige el desborde más probable sin alterar la composición visual.
-
 ## 2026-03-15 12:48 America/Santiago
 
 ### Agente

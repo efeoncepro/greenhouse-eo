@@ -34,11 +34,6 @@
 
 ## 2026-03-15
 
-### Admin user detail header no longer expands the page width
-- Se corrigió el layout del header en `Admin > Users > detail` para evitar overflow horizontal en desktop.
-- El bloque principal de metadata ya no usa un ancho `100%` dentro del row con avatar; ahora usa `flex-1` y `min-w-0`.
-- También se permitió wrap explícito en nombre y acciones para que el header no empuje el viewport hacia la derecha.
-
 ### Admin user detail now degrades safely when Postgres is unavailable
 - `Admin > Users > detail` ya no depende ciegamente de PostgreSQL para renderizar en `develop`.
 - `src/lib/admin/get-admin-user-detail.ts` ahora intenta `person_360` primero, pero si PostgreSQL no está configurado o el lookup falla, vuelve a BigQuery para `userId` directos.
