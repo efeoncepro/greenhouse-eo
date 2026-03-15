@@ -27,6 +27,7 @@ import { getInitials } from '@/utils/getInitials'
 
 import UserActivityTimeline from './admin/users/UserActivityTimeline'
 import UserProjectListTable from './admin/users/UserProjectListTable'
+import UserRoleManager from './admin/users/UserRoleManager'
 import { formatDateTime, roleColorFor, roleIconFor, statusTone, tenantTone, toTitleCase } from './admin/users/helpers'
 
 type Props = {
@@ -260,6 +261,12 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                   icon={<i className='tabler-file-invoice' />}
                   value='billing'
                   label={GH_INTERNAL_MESSAGES.admin_user_detail_tab_billing}
+                  iconPosition='start'
+                />
+                <Tab
+                  icon={<i className='tabler-shield-check' />}
+                  value='roles'
+                  label={GH_INTERNAL_MESSAGES.admin_user_detail_tab_roles}
                   iconPosition='start'
                 />
               </CustomTabList>
@@ -548,6 +555,14 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
                       </Card>
                     </Grid>
                   </Grid>
+                ) : null}
+
+                {activeTab === 'roles' ? (
+                  <UserRoleManager
+                    userId={data.userId}
+                    tenantType={data.tenantType}
+                    initialRoleCodes={data.roleCodes}
+                  />
                 ) : null}
               </TabPanel>
             </Grid>

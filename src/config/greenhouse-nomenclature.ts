@@ -690,6 +690,7 @@ export const GH_INTERNAL_MESSAGES = {
   admin_user_detail_tab_security: 'Security',
   admin_user_detail_tab_tenant: 'Tenant',
   admin_user_detail_tab_billing: 'Commercial',
+  admin_user_detail_tab_roles: 'Roles',
   admin_user_detail_campaign_context_title: 'Campaign and feature context',
   admin_user_detail_campaign_count: (count: number) => `Campanas visibles: ${count}`,
   admin_user_detail_no_campaign_scopes: 'Sin scopes de campana activos.',
