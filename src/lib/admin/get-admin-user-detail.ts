@@ -181,129 +181,158 @@ const getPersonFromPostgres = async (identifier: string): Promise<PersonRow | nu
 }
 
 const getClientExtras = async (clientId: string) => {
-  const [clientRows, flagRows] = await Promise.all([
-    runGreenhousePostgresQuery<ClientRow>(
-      `SELECT hubspot_company_id, billing_currency
-       FROM greenhouse_core.clients WHERE client_id = $1`,
-      [clientId]
-    ),
-    runGreenhousePostgresQuery<FeatureFlagRow>(
-      `SELECT flag_code FROM greenhouse_core.client_feature_flags
-       WHERE client_id = $1 AND enabled = TRUE ORDER BY flag_code`,
-      [clientId]
-    )
-  ])
+  try {
+    const [clientRows, flagRows] = await Promise.all([
+      runGreenhousePostgresQuery<ClientRow>(
+        `SELECT hubspot_company_id, billing_currency
+         FROM greenhouse_core.clients WHERE client_id = $1`,
+        [clientId]
+      ),
+      runGreenhousePostgresQuery<FeatureFlagRow>(
+        `SELECT flag_code FROM greenhouse_core.client_feature_flags
+         WHERE client_id = $1 AND enabled = TRUE ORDER BY flag_code`,
+        [clientId]
+      )
+    ])
 
-  return {
-    hubspotCompanyId: clientRows[0]?.hubspot_company_id ?? null,
-    featureFlags: flagRows.map(r => r.flag_code)
+    return {
+      hubspotCompanyId: clientRows[0]?.hubspot_company_id ?? null,
+      featureFlags: flagRows.map(r => r.flag_code)
+    }
+  } catch {
+    return { hubspotCompanyId: null, featureFlags: [] as string[] }
   }
 }
 
 const getRouteGroups = async (roleCodes: string[]) => {
   if (roleCodes.length === 0) return []
 
-  const rows = await runGreenhousePostgresQuery<RouteGroupRow>(
-    `SELECT DISTINCT UNNEST(route_group_scope) AS route_group
-     FROM greenhouse_core.roles
-     WHERE role_code = ANY($1)
-     ORDER BY route_group`,
-    [roleCodes]
-  )
+  try {
+    const rows = await runGreenhousePostgresQuery<RouteGroupRow>(
+      `SELECT DISTINCT UNNEST(route_group_scope) AS route_group
+       FROM greenhouse_core.roles
+       WHERE role_code = ANY($1)
+       ORDER BY route_group`,
+      [roleCodes]
+    )
 
-  return rows.map(r => r.route_group)
+    return rows.map(r => r.route_group)
+  } catch {
+    return []
+  }
 }
 
-const getProjectScopes = async (userId: string) => {
-  const rows = await runGreenhousePostgresQuery<ProjectScopeRow>(
-    `SELECT
-      ups.project_id,
-      dp.project_name
-    FROM greenhouse_core.user_project_scopes ups
-    LEFT JOIN greenhouse_delivery.projects dp
-      ON dp.project_record_id = ups.project_id
-    WHERE ups.user_id = $1
-      AND ups.active = TRUE
-    ORDER BY COALESCE(dp.project_name, ups.project_id)`,
-    [userId]
-  )
+const getProjectScopes = async (userId: string): Promise<ProjectScopeRow[]> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<ProjectScopeRow>(
+      `SELECT
+        ups.project_id,
+        dp.project_name
+      FROM greenhouse_core.user_project_scopes ups
+      LEFT JOIN greenhouse_delivery.projects dp
+        ON dp.project_record_id = ups.project_id
+      WHERE ups.user_id = $1
+        AND ups.active = TRUE
+      ORDER BY COALESCE(dp.project_name, ups.project_id)`,
+      [userId]
+    )
 
-  return rows
+    return rows
+  } catch {
+    // Fallback: greenhouse_delivery.projects may not be provisioned yet
+    const rows = await runGreenhousePostgresQuery<{ project_id: string }>(
+      `SELECT project_id
+       FROM greenhouse_core.user_project_scopes
+       WHERE user_id = $1 AND active = TRUE
+       ORDER BY project_id`,
+      [userId]
+    )
+
+    return rows.map(r => ({ project_id: r.project_id, project_name: null }))
+  }
 }
 
-const getCampaignScopes = async (userId: string) => {
-  const rows = await runGreenhousePostgresQuery<CampaignScopeRow>(
-    `SELECT campaign_id
-     FROM greenhouse_core.user_campaign_scopes
-     WHERE user_id = $1 AND active = TRUE
-     ORDER BY campaign_id`,
-    [userId]
-  )
-
-  return rows
+const getCampaignScopes = async (userId: string): Promise<CampaignScopeRow[]> => {
+  try {
+    return await runGreenhousePostgresQuery<CampaignScopeRow>(
+      `SELECT campaign_id
+       FROM greenhouse_core.user_campaign_scopes
+       WHERE user_id = $1 AND active = TRUE
+       ORDER BY campaign_id`,
+      [userId]
+    )
+  } catch {
+    return []
+  }
 }
 
 // ── Main function ──
 
 export const getAdminUserDetail = async (identifier: string): Promise<AdminUserDetail | null> => {
-  const person = await getPersonFromPostgres(identifier)
+  try {
+    const person = await getPersonFromPostgres(identifier)
 
-  if (!person) return null
+    if (!person) return null
 
-  const userId = person.user_id
-  const clientId = person.client_id ?? ''
-  const roleCodes = person.active_role_codes ?? []
+    const userId = person.user_id
+    const clientId = person.client_id ?? ''
+    const roleCodes = person.active_role_codes ?? []
 
-  const [clientExtras, routeGroups, projectScopes, campaignScopes] = await Promise.all([
-    clientId ? getClientExtras(clientId) : Promise.resolve({ hubspotCompanyId: null, featureFlags: [] as string[] }),
-    getRouteGroups(roleCodes),
-    getProjectScopes(userId),
-    getCampaignScopes(userId)
-  ])
+    const [clientExtras, routeGroups, projectScopes, campaignScopes] = await Promise.all([
+      clientId ? getClientExtras(clientId) : Promise.resolve({ hubspotCompanyId: null, featureFlags: [] as string[] }),
+      getRouteGroups(roleCodes),
+      getProjectScopes(userId),
+      getCampaignScopes(userId)
+    ])
 
-  return {
-    eoId: person.eo_id,
-    userId,
-    publicUserId: buildUserPublicId({ userId }),
-    identityProfileId: person.identity_profile_id,
-    linkedMemberId: person.member_id,
-    fullName: person.resolved_display_name || 'Sin nombre',
-    email: person.user_email || '',
-    avatarUrl: person.resolved_avatar_url,
-    jobTitle: person.resolved_job_title,
-    tenantType: (person.tenant_type as AdminUserDetail['tenantType']) || 'client',
-    status: person.user_status || '',
-    active: Boolean(person.user_active),
-    authMode: person.auth_mode || '',
-    passwordAlgorithm: person.password_hash_algorithm,
-    defaultPortalHomePath: person.default_portal_home_path || '',
-    timezone: person.user_timezone,
-    locale: null, // not yet in Postgres
-    lastLoginAt: person.last_login_at,
-    invitedAt: null, // not yet in Postgres
-    createdAt: person.created_at,
-    updatedAt: person.updated_at,
-    client: {
-      clientId,
-      publicId: clientId
-        ? buildTenantPublicId({ clientId, hubspotCompanyId: clientExtras.hubspotCompanyId })
-        : null,
-      clientName: person.client_name || clientId || '',
-      primaryContactEmail: null, // not yet in Postgres clients table
-      hubspotCompanyId: clientExtras.hubspotCompanyId,
-      featureFlags: clientExtras.featureFlags
-    },
-    roleCodes,
-    routeGroups,
-    projectScopes: projectScopes.map(s => ({
-      projectId: s.project_id,
-      projectName: s.project_name || s.project_id,
-      accessLevel: 'full',
-      pageUrl: null
-    })),
-    campaignScopes: campaignScopes.map(s => ({
-      campaignId: s.campaign_id,
-      accessLevel: 'full'
-    }))
+    return {
+      eoId: person.eo_id,
+      userId,
+      publicUserId: buildUserPublicId({ userId }),
+      identityProfileId: person.identity_profile_id,
+      linkedMemberId: person.member_id,
+      fullName: person.resolved_display_name || 'Sin nombre',
+      email: person.user_email || '',
+      avatarUrl: person.resolved_avatar_url,
+      jobTitle: person.resolved_job_title,
+      tenantType: (person.tenant_type as AdminUserDetail['tenantType']) || 'client',
+      status: person.user_status || '',
+      active: Boolean(person.user_active),
+      authMode: person.auth_mode || '',
+      passwordAlgorithm: person.password_hash_algorithm,
+      defaultPortalHomePath: person.default_portal_home_path || '',
+      timezone: person.user_timezone,
+      locale: null, // not yet in Postgres
+      lastLoginAt: person.last_login_at,
+      invitedAt: null, // not yet in Postgres
+      createdAt: person.created_at,
+      updatedAt: person.updated_at,
+      client: {
+        clientId,
+        publicId: clientId
+          ? buildTenantPublicId({ clientId, hubspotCompanyId: clientExtras.hubspotCompanyId })
+          : null,
+        clientName: person.client_name || clientId || '',
+        primaryContactEmail: null, // not yet in Postgres clients table
+        hubspotCompanyId: clientExtras.hubspotCompanyId,
+        featureFlags: clientExtras.featureFlags
+      },
+      roleCodes,
+      routeGroups,
+      projectScopes: projectScopes.map(s => ({
+        projectId: s.project_id,
+        projectName: s.project_name || s.project_id,
+        accessLevel: 'full',
+        pageUrl: null
+      })),
+      campaignScopes: campaignScopes.map(s => ({
+        campaignId: s.campaign_id,
+        accessLevel: 'full'
+      }))
+    }
+  } catch (error) {
+    console.error('[getAdminUserDetail] Postgres error', { identifier }, error)
+
+    return null
   }
 }
