@@ -1,13 +1,11 @@
-import MemberPayrollHistory from '@views/greenhouse/payroll/MemberPayrollHistory'
+import { redirect } from 'next/navigation'
 
 type Props = {
   params: Promise<{ memberId: string }>
 }
 
-const MemberPayrollPage = async ({ params }: Props) => {
+export default async function PayrollMemberRedirect({ params }: Props) {
   const { memberId } = await params
 
-  return <MemberPayrollHistory memberId={memberId} />
+  redirect(`/people/${memberId}?tab=payroll`)
 }
-
-export default MemberPayrollPage

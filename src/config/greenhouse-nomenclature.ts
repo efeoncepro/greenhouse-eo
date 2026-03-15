@@ -20,9 +20,23 @@ export const GH_PEOPLE_NAV = {
 } as const
 
 export const GH_AGENCY_NAV = {
+  workspace: { label: 'Agencia', subtitle: 'Pulse, Spaces y capacidad del equipo' },
   pulseGlobal: { label: 'Pulse Global', subtitle: 'KPIs agregados de todos los Spaces' },
   spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' }
+} as const
+
+export const GH_FINANCE_NAV = {
+  dashboard: { label: 'Resumen', subtitle: 'Vista consolidada' },
+  income: { label: 'Ingresos', subtitle: 'Facturación y cobros' },
+  expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
+  suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
+  clients: { label: 'Clientes', subtitle: 'Perfil financiero' },
+  reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' }
+} as const
+
+export const GH_HR_NAV = {
+  payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' }
 } as const
 
 export const GH_AGENCY = {

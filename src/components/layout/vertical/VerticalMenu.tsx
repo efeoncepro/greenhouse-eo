@@ -16,7 +16,7 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
-import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_INTERNAL_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_FINANCE_NAV, GH_HR_NAV, GH_INTERNAL_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -156,22 +156,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuSection label='Agencia'>
             <MenuItem href='/agency' icon={<i className='tabler-building' />}>
               <NavigationItemLabel
-                label={GH_AGENCY_NAV.pulseGlobal.label}
-                subtitle={GH_AGENCY_NAV.pulseGlobal.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
-            <MenuItem href='/agency/spaces' icon={<i className='tabler-grid-4x4' />}>
-              <NavigationItemLabel
-                label={GH_AGENCY_NAV.spaces.label}
-                subtitle={GH_AGENCY_NAV.spaces.subtitle}
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
-            <MenuItem href='/agency/capacity' icon={<i className='tabler-chart-bar' />}>
-              <NavigationItemLabel
-                label={GH_AGENCY_NAV.capacity.label}
-                subtitle={GH_AGENCY_NAV.capacity.subtitle}
+                label={GH_AGENCY_NAV.workspace.label}
+                subtitle={GH_AGENCY_NAV.workspace.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
@@ -192,43 +178,43 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <MenuSection label='Finanzas'>
             <MenuItem href='/finance' icon={<i className='tabler-chart-bar' />}>
               <NavigationItemLabel
-                label='Dashboard'
-                subtitle='Vista consolidada'
+                label={GH_FINANCE_NAV.dashboard.label}
+                subtitle={GH_FINANCE_NAV.dashboard.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
             <MenuItem href='/finance/income' icon={<i className='tabler-cash' />}>
               <NavigationItemLabel
-                label='Ingresos'
-                subtitle='Facturación y cobros'
+                label={GH_FINANCE_NAV.income.label}
+                subtitle={GH_FINANCE_NAV.income.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
             <MenuItem href='/finance/expenses' icon={<i className='tabler-credit-card' />}>
               <NavigationItemLabel
-                label='Egresos'
-                subtitle='Pagos y obligaciones'
+                label={GH_FINANCE_NAV.expenses.label}
+                subtitle={GH_FINANCE_NAV.expenses.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
             <MenuItem href='/finance/suppliers' icon={<i className='tabler-building-store' />}>
               <NavigationItemLabel
-                label='Proveedores'
-                subtitle='Directorio de proveedores'
+                label={GH_FINANCE_NAV.suppliers.label}
+                subtitle={GH_FINANCE_NAV.suppliers.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
             <MenuItem href='/finance/clients' icon={<i className='tabler-users-group' />}>
               <NavigationItemLabel
-                label='Clientes'
-                subtitle='Perfil financiero'
+                label={GH_FINANCE_NAV.clients.label}
+                subtitle={GH_FINANCE_NAV.clients.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
             <MenuItem href='/finance/reconciliation' icon={<i className='tabler-arrows-exchange' />}>
               <NavigationItemLabel
-                label='Conciliación'
-                subtitle='Conciliación bancaria'
+                label={GH_FINANCE_NAV.reconciliation.label}
+                subtitle={GH_FINANCE_NAV.reconciliation.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
@@ -236,38 +222,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         ) : null}
         {isHrUser || isAdminUser ? (
           <MenuSection label='HR'>
-            <MenuItem href='/hr' icon={<i className='tabler-heart-handshake' />}>
-              <NavigationItemLabel
-                label='Equipo HR'
-                subtitle='Dashboard de gestión de personas'
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
-            <MenuItem href='/hr/departments' icon={<i className='tabler-sitemap' />}>
-              <NavigationItemLabel
-                label='Departamentos'
-                subtitle='Estructura organizacional'
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
-            <MenuItem href='/hr/leave' icon={<i className='tabler-calendar-event' />}>
-              <NavigationItemLabel
-                label='Permisos'
-                subtitle='Solicitudes y saldos de permisos'
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
-            <MenuItem href='/hr/attendance' icon={<i className='tabler-clock-check' />}>
-              <NavigationItemLabel
-                label='Asistencia'
-                subtitle='Registros de asistencia del equipo'
-                showSubtitle={showNavSubtitles}
-              />
-            </MenuItem>
             <MenuItem href='/hr/payroll' icon={<i className='tabler-receipt-2' />}>
               <NavigationItemLabel
-                label='Nómina'
-                subtitle='Compensaciones y nómina mensual'
+                label={GH_HR_NAV.payroll.label}
+                subtitle={GH_HR_NAV.payroll.subtitle}
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>

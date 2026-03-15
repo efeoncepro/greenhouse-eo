@@ -507,3 +507,262 @@ Una vez aprobada esta lectura, crear una task hija de implementación (`v2-imple
 - Agregar secciones reales: cuenta, identidad, SSO, notificaciones
 
 Este documento debe cerrarse primero como criterio rector, no como implementación apresurada.
+
+---
+
+## Análisis multi-disciplinario verificado (2026-03-15)
+
+> Ejecutado invocando `greenhouse-ux`, `greenhouse-ux-writing`, `greenhouse-backend` y accesibilidad WCAG 2.2 AA contra el codebase actual.
+
+### Hallazgo clave: People ya tiene tabs implementadas
+
+El documento original propone 4 tabs (Perfil, Asignaciones, Nómina, Actividad), pero el codebase ya tiene **6 tabs** en `PersonTabs.tsx`:
+- Asignaciones, Actividad, Compensación, Nómina, Perfil HR, AI Tools
+- La visibilidad es condicional por rol vía `TAB_PERMISSIONS` en `helpers.ts`
+- La propuesta de "agregar tabs" ya está resuelta — lo que falta es la consolidación de la ficha de Payroll como redirect
+
+**Corrección a la propuesta:** No se necesita agregar una tab "Perfil" — el sidebar izquierdo (`PersonLeftSidebar`) ya cumple esa función. Agregar un tab Perfil duplicaría información sin contenido nuevo.
+
+---
+
+### Evaluación UX (`greenhouse-ux`)
+
+#### Tab patterns — variantes correctas
+
+| Surface | Variante `CustomTabList` | Razón |
+|---------|-------------------------|-------|
+| People detail | `pill='true'` (actual) → evaluar cambio a `pill='false'` | Con 6 tabs visibles para admin, las pills compiten visualmente con el sidebar de identidad. El underline reduce peso visual. |
+| Agency workspace | `pill='false'` (underline) | Agency es un workspace operativo, no un entity detail. El underline señala "secciones del mismo workspace". |
+
+#### Deep linking — `router.replace()`, NO `router.push()`
+
+Los cambios de tab usan `router.replace()` para actualizar `?tab=` sin agregar entradas al historial del navegador. El usuario espera que "Atrás" lo lleve a la página anterior, no al tab anterior.
+
+**Excepción:** Los redirects desde rutas legacy (`/agency/spaces`, `/hr/payroll/member/[memberId]`) deben ser HTTP 308 server-side via `redirect()` de Next.js.
+
+#### Layout — sin cambios de Grid
+
+- **People:** Mantener layout actual: sidebar izquierdo (xs:12 md:5 lg:4) + tabs derecha (xs:12 md:7 lg:8)
+- **Agency:** Full-width `Stack` con header compartido + `CustomTabList` + `TabPanel` lazy. No necesita multi-column.
+
+#### Riesgos visuales
+
+1. **People con 6 tabs en mobile:** `variant='scrollable'` ya maneja overflow, pero verificar que el tercer tab quede parcialmente visible como cue de scroll.
+2. **Agency Pulse pierde sensación de landing:** Mitigación: el header compartido del workspace lleva título/subtítulo de Pulse como estado default. Los KPIs (`PulseGlobalKpis`) permanecen dentro del tab panel — la densidad de datos es lo que da sensación de landing, no el header.
+
+#### Component reuse
+
+- **No extraer componente compartido de tabs todavía.** People y Agency difieren en variante (pill vs underline), URL sync, y visibilidad condicional. Prematura la abstracción.
+- **Agregar `SectionErrorBoundary`** a los tab panels de People (Agency ya los tiene).
+
+---
+
+### Evaluación UX Writing (`greenhouse-ux-writing`)
+
+#### Correcciones de copy
+
+| # | Issue | Severidad | Corrección |
+|---|-------|-----------|------------|
+| 1 | Empty state de `/updates` propone "actualizaciones" — viola regla de spanglish de Nomenclatura v3 que dice usar "updates" | ALTA | Usar copy canónico de `GH_MESSAGES.empty_updates`: "Todo al día. Cuando haya updates del ecosistema, aparecerán aquí." |
+| 2 | "Próximamente" en empty state hace promesa sin respaldo | MEDIA | Eliminar — usar copy neutral que no comprometa timeline |
+| 3 | Finance sidebar usa "Dashboard" como label | BAJA | Renombrar a **"Resumen"** para evitar colisión con vocabulario "Pulse" |
+| 4 | No existen aria-labels para ningún tab propuesto | ALTA | Definir (ver sección de accesibilidad abajo) |
+| 5 | No existe patrón de `document.title` para tabs | MEDIA | Definir (ver abajo) |
+
+#### Labels de tabs — verificación final
+
+| Surface | Tab | Label visible | URL param | Veredicto |
+|---------|-----|---------------|-----------|-----------|
+| People | — | Asignaciones | `?tab=assignments` | PASS — ya existe |
+| People | — | Actividad | `?tab=activity` | PASS — ya existe |
+| People | — | Compensación | `?tab=compensation` | PASS — ya existe |
+| People | — | Nómina | `?tab=payroll` | PASS — ya existe |
+| People | — | Perfil HR | `?tab=hr-profile` | PASS — ya existe |
+| People | — | AI Tools | `?tab=ai-tools` | PASS — ya existe |
+| Agency | — | Pulse | `?tab=pulse` | PASS — vocabulario de marca |
+| Agency | — | Spaces | `?tab=spaces` | PASS — es término de marca, no inglés sin traducir |
+| Agency | — | Capacidad | `?tab=capacidad` | PASS |
+
+#### Patrones de `document.title`
+
+```
+People: "{nombre} — {tab} | Personas | Greenhouse"
+Agency: "Agencia — {tab} | Greenhouse"
+```
+
+#### Toast para redirect de Payroll → People
+
+> "La ficha de nómina ahora vive dentro del perfil del colaborador."
+
+- Tipo: informacional, auto-dismiss 5s
+- Mostrar solo una vez por sesión (`sessionStorage`)
+
+#### Constantes faltantes en `greenhouse-nomenclature.ts`
+
+- `GH_FINANCE_NAV` — labels de sidebar de Finance (Resumen, Ingresos, Egresos, Proveedores, Clientes, Conciliación)
+- `GH_HR_NAV` — labels de sidebar de HR
+- `GH_DOCUMENT_TITLES` — patrones de título por surface
+- `GH_PEOPLE_DETAIL_TABS` — labels y aria-labels de tabs de People
+
+---
+
+### Evaluación Backend (`greenhouse-backend`)
+
+#### API readiness: LISTO — no se necesitan endpoints nuevos
+
+| Contrato | Estado | Notas |
+|----------|--------|-------|
+| `/api/people/[memberId]` | EXISTE | Ya es un agregador 360 — `getPersonDetail()` hace `Promise.all` de perfil + asignaciones + payroll + finance + metrics, condicional por permisos |
+| `/api/people/[memberId]/finance` | EXISTE | Standalone finance overview per member |
+| `/api/hr/payroll/members/[memberId]/history` | EXISTE | Payroll history con auth guard propio (`requireHrTenantContext`) |
+| `/api/agency/pulse` | EXISTE | KPIs globales (3 queries BigQuery en paralelo) |
+| `/api/agency/spaces` | EXISTE | Health per client |
+| `/api/agency/capacity` | EXISTE | Team utilization |
+
+**Sobre un endpoint `/api/people/[memberId]/360` unificado:** No es necesario. `getPersonDetail()` ya ES el read model 360 del colaborador. Ensambla condicionalmente perfil + asignaciones + payroll + finance + actividad basado en `PersonAccess`.
+
+#### Auth — defense in depth ya existe
+
+| Consolidación | Layout guard | API guard | Riesgo |
+|--------------|-------------|-----------|--------|
+| People absorbe Payroll tab | `canAccessPeopleModule()` | Payroll API: `requireHrTenantContext()` | **BAJO** — API tiene guard propio |
+| Agency tabs | `internal OR admin` | Cada API: `requireAgencyTenantContext()` | **NINGUNO** — guards idénticos |
+
+Ocultar la tab condicionalmente es suficiente. La capa de API provee defense in depth independiente.
+
+#### Contratos faltantes (para fases futuras)
+
+- **Activity timeline:** `getPersonOperationalMetrics()` retorna métricas agregadas de 30 días, no un feed cronológico. Cuando la tab "Actividad" gradúe de "futuro timeline" a implementación real, se necesitará un endpoint `/api/people/[memberId]/activity` que consulte `notion_ops.tareas` ordenado por fecha.
+
+---
+
+### Evaluación de Accesibilidad (WCAG 2.2 AA)
+
+#### Gaps actuales en el codebase
+
+| # | Gap | Archivo | SC violado | Severidad |
+|---|-----|---------|------------|-----------|
+| 1 | Sin `aria-label` en `CustomTabList` de People | `PersonTabs.tsx` | 4.1.2 | ALTA |
+| 2 | Un solo `<TabPanel>` con ternario — rompe linkeo `aria-controls` para tabs inactivos | `PersonTabs.tsx` | 1.3.1, 4.1.2 | ALTA |
+| 3 | Sin actualización de `document.title` al cambiar tab | Todos los tab views | 2.4.2 | ALTA |
+| 4 | Sin estilo `Mui-focusVisible` en variante pill de tabs | `TabList.tsx` (@core) | 2.4.7 | ALTA |
+| 5 | `SemaphoreDot` usa solo color, sin texto/icono alternativo | `SpaceHealthTable.tsx` | 1.4.1 | ALTA |
+| 6 | `SemaphoreDot` es 8x8px sin nombre accesible | `SpaceHealthTable.tsx` | 4.1.2, 2.5.8 | ALTA |
+| 7 | Filas clickeables con `<Box onClick>` sin role de teclado | `SpaceHealthTable.tsx` | 2.1.1 | ALTA |
+| 8 | Iconos de tab sin `aria-hidden="true"` explícito | `PersonTabs.tsx` | 4.1.2 | BAJA |
+| 9 | Sin anuncios de carga para contenido async de tabs | Tab panels | 4.1.3 | MEDIA |
+| 10 | Sin focus management para llegada por redirect (`?tab=nomina`) | No implementado | 2.4.3 | MEDIA |
+
+#### Requisitos concretos para implementación
+
+**aria-labels requeridos:**
+
+| Componente | `aria-label` |
+|-----------|-------------|
+| People tablist | `"Secciones del perfil del colaborador"` |
+| Agency tablist | `"Secciones del workspace de agencia"` |
+| Agency Pulse tab | `"Pulse: KPIs globales de la agencia"` |
+| Agency Spaces tab | `"Spaces: lista de clientes activos"` |
+| Agency Capacidad tab | `"Capacidad: utilización del equipo"` |
+
+**Focus management en redirect:**
+1. Leer `tab` de `searchParams` al montar
+2. Panel del tab debe tener `tabIndex={-1}` para ser focuseable programáticamente
+3. Llamar `panelRef.current?.focus()` en `useEffect` de mount cuando hay `tab` param
+
+**TabPanel — un panel por tab:**
+Cambiar de un `<TabPanel>` con ternario a múltiples `<TabPanel>` individuales. Para lazy loading:
+```tsx
+<TabPanel value="payroll" className="p-0">
+  {activeTab === 'payroll' && <PersonPayrollTab ... />}
+</TabPanel>
+```
+Esto mantiene el nodo DOM del panel (para `aria-controls`) mientras defer el render del contenido.
+
+**Anuncios para screen reader:**
+- Region `aria-live="polite"` visualmente oculta dentro de cada tab panel
+- Contenido de carga: `"Cargando datos de nómina..."`
+- Error: `aria-live="assertive"` para anuncio inmediato
+
+#### Checklist de implementación por fase
+
+**Fase B (Agency tabs):**
+- [ ] `CustomTabList` con `aria-label="Secciones del workspace de agencia"`
+- [ ] Un `<TabPanel>` por tab con lazy loading
+- [ ] `document.title` actualiza al cambiar tab
+- [ ] URL sync con `router.replace()` y `?tab=`
+- [ ] `aria-live="polite"` para anuncios de contenido async
+- [ ] Focus to panel con `tabIndex={-1}` en deep link arrival
+- [ ] `SemaphoreDot` corregido: agregar `role="img"`, `aria-label`, y label de texto visible
+- [ ] Filas clickeables: usar `<button>` o agregar `role="link"` + `tabIndex={0}` + `onKeyDown`
+
+**Fase C (People absorbe Payroll):**
+- [ ] Separar en múltiples `<TabPanel>` individuales
+- [ ] Agregar `aria-label` al `CustomTabList` existente
+- [ ] URL sync con `router.replace()` y `?tab=`
+- [ ] `document.title` actualiza al cambiar tab
+- [ ] Focus management en redirect desde `/hr/payroll/member/[memberId]`
+- [ ] `aria-live="polite"` para carga async de tabs pesados
+- [ ] Iconos de tabs con `aria-hidden="true"`
+- [ ] `SectionErrorBoundary` en cada tab panel
+
+---
+
+### Análisis del menú dinámico (sidebar)
+
+#### Estado actual del `VerticalMenu.tsx`
+
+El menú ya es dinámico — renderiza condicionalmente secciones basadas en `session.user.routeGroups` y `session.user.roleCodes`. Para un usuario `efeonce_admin`, el sidebar muestra **hasta 8 secciones y ~20 items**:
+
+| Sección | Condición | Items |
+|---------|-----------|-------|
+| Operación | `isInternalUser` | 1 (Control Tower) |
+| Agencia | `isAgencyUser` | 3 (Pulse, Spaces, Capacidad) |
+| Equipo | `canSeePeople` | 1 (Personas) |
+| Finanzas | `isFinanceUser \|\| isAdminUser` | 6 (Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación) |
+| HR | `isHrUser \|\| isAdminUser` | 5 (Equipo HR, Departamentos, Permisos, Asistencia, Nómina) |
+| Admin | `isAdminUser` | 4 (Spaces, Usuarios, Roles, AI Tooling) |
+| **Total admin** | — | **~20 items** |
+
+#### Problemas identificados
+
+1. **El sidebar es largo para admin** — 20 items en 6 secciones requiere scroll. En viewport estándar (1080px), las últimas secciones (HR, Admin) quedan debajo del fold.
+2. **Finance y HR tienen items sin respaldo de nomenclatura** — Los labels están hardcodeados, no vienen de `greenhouse-nomenclature.ts`.
+3. **HR tiene 4 rutas placeholder** — `/hr`, `/hr/departments`, `/hr/leave`, `/hr/attendance` no tienen implementación real (son placeholders del schema de payroll). Solo `/hr/payroll` es funcional.
+4. **Finance podría usar SubMenu colapsable** — 6 items de Finance pueden colapsarse bajo un SubMenu, dejando visible solo "Finanzas" como nodo padre. Lo mismo aplica para HR y Admin.
+
+#### Impacto de la consolidación en el sidebar
+
+Con las consolidaciones propuestas:
+- **Agency de 3 items a 1** — las tabs viven dentro de la página, no en el sidebar
+- **HR se simplifica** — eliminar los 4 items placeholder, dejar solo "Nómina"
+- **Resultado:** de ~20 items a ~14 items para admin. El sidebar se reduce un 30%.
+
+#### Propuesta: SubMenu colapsable para secciones grandes
+
+Usar el componente `SubMenu` de Vuexy (ya disponible en `@menu/vertical-menu`) para colapsar Finance y Admin:
+
+```
+Finanzas ▸
+  ├── Resumen
+  ├── Ingresos
+  ├── Egresos
+  ├── Proveedores
+  ├── Clientes
+  └── Conciliación
+
+Admin ▸
+  ├── Spaces
+  ├── Usuarios
+  ├── Roles y permisos
+  └── AI Tooling
+```
+
+Esto mantiene el menú dinámico actual (condicional por rol) pero reduce la longitud visible colapsando secciones con muchos items.
+
+#### Siguiente paso para el menú
+
+1. **Fase A:** Eliminar los 4 items placeholder de HR (Equipo HR, Departamentos, Permisos, Asistencia)
+2. **Fase B:** Agency de 3 items a 1 (alineado con la consolidación de tabs)
+3. **Fase C:** Evaluar SubMenu colapsable para Finance y Admin
+4. **Fase D:** Migrar labels hardcodeados a `greenhouse-nomenclature.ts` (`GH_FINANCE_NAV`, `GH_HR_NAV`)
