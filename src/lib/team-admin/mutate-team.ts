@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getPeopleTableColumns, toContactChannel, toDateString, toNumber, toStringArray } from '@/lib/people/shared'
 import type {
   CreateAssignmentInput,
@@ -1061,6 +1062,14 @@ const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInp
   }
 }
 
+const syncAssignmentToPostgres = (label: string, query: string, values: unknown[]) => {
+  if (!isGreenhousePostgresConfigured()) return
+
+  runGreenhousePostgresQuery(query, values).catch(error => {
+    console.warn(`[team-admin] Postgres sync (${label}) failed:`, error instanceof Error ? error.message : error)
+  })
+}
+
 const buildAssignmentUpsertPayload = async (input: CreateAssignmentInput) => {
   const clientId = normalizeText(input.clientId)
   const memberId = normalizeText(input.memberId)
@@ -1494,6 +1503,15 @@ export const deactivateMember = async ({
     })
   ])
 
+  // ── Postgres dual-write (assignments only) ──
+  syncAssignmentToPostgres(
+    'deactivate-member-assignments',
+    `UPDATE greenhouse_core.client_team_assignments
+     SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
+     WHERE member_id = $1 AND active = TRUE`,
+    [memberId]
+  )
+
   const updated = await getMemberRecord(memberId)
 
   if (!updated) {
@@ -1610,6 +1628,33 @@ export const createAssignment = async ({
     })
   }
 
+  // ── Postgres dual-write ──
+  syncAssignmentToPostgres(
+    existing ? 'reactivate' : 'create',
+    `INSERT INTO greenhouse_core.client_team_assignments (
+       assignment_id, client_id, member_id, fte_allocation, hours_per_month,
+       role_title_override, relevance_note_override,
+       contact_channel_override, contact_handle_override,
+       active, start_date, end_date, created_at, updated_at
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE, $10::date, NULL,
+       CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+     ON CONFLICT (assignment_id) DO UPDATE SET
+       fte_allocation = EXCLUDED.fte_allocation,
+       hours_per_month = EXCLUDED.hours_per_month,
+       role_title_override = EXCLUDED.role_title_override,
+       relevance_note_override = EXCLUDED.relevance_note_override,
+       contact_channel_override = EXCLUDED.contact_channel_override,
+       contact_handle_override = EXCLUDED.contact_handle_override,
+       active = TRUE, start_date = EXCLUDED.start_date, end_date = NULL,
+       updated_at = CURRENT_TIMESTAMP`,
+    [
+      payload.assignmentId, payload.clientId, payload.memberId,
+      payload.fteAllocation, payload.hoursPerMonth, payload.roleTitleOverride,
+      payload.relevanceNoteOverride, payload.contactChannelOverride,
+      payload.contactHandleOverride, payload.startDate
+    ]
+  )
+
   const created = await getAssignmentRecord(payload.assignmentId)
 
   if (!created) {
@@ -1693,6 +1738,30 @@ export const updateAssignment = async ({
     types: Object.keys(assignTypes).length > 0 ? assignTypes : undefined
   })
 
+  // ── Postgres dual-write ──
+  {
+    const pgClauses: string[] = []
+    const pgValues: unknown[] = []
+    let pi = 1
+
+    for (const [col, val] of Object.entries(updates)) {
+      if (!writableAssignmentColumns.has(col)) continue
+      pgClauses.push(`${col} = $${pi}`)
+      pgValues.push(val)
+      pi++
+    }
+
+    if (pgClauses.length > 0) {
+      pgClauses.push('updated_at = CURRENT_TIMESTAMP')
+      pgValues.push(assignmentId)
+      syncAssignmentToPostgres(
+        'update',
+        `UPDATE greenhouse_core.client_team_assignments SET ${pgClauses.join(', ')} WHERE assignment_id = $${pi}`,
+        pgValues
+      )
+    }
+  }
+
   const updated = await getAssignmentRecord(assignmentId)
 
   if (!updated) {
@@ -1742,6 +1811,15 @@ export const deleteAssignment = async ({
     `,
     params: { assignmentId }
   })
+
+  // ── Postgres dual-write ──
+  syncAssignmentToPostgres(
+    'delete',
+    `UPDATE greenhouse_core.client_team_assignments
+     SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
+     WHERE assignment_id = $1`,
+    [assignmentId]
+  )
 
   const updated = await getAssignmentRecord(assignmentId)
 

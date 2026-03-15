@@ -52,6 +52,9 @@ const backfillAssignments = async () => {
         fte_allocation,
         hours_per_month,
         role_title_override,
+        relevance_note_override,
+        contact_channel_override,
+        contact_handle_override,
         active,
         start_date,
         end_date,
@@ -79,17 +82,21 @@ const backfillAssignments = async () => {
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_core.client_team_assignments (
           assignment_id, client_id, member_id, fte_allocation, hours_per_month,
-          role_title_override, active, start_date, end_date, created_at, updated_at
+          role_title_override, relevance_note_override, contact_channel_override,
+          contact_handle_override, active, start_date, end_date, created_at, updated_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date,
-          COALESCE($10::timestamptz, CURRENT_TIMESTAMP),
-          COALESCE($11::timestamptz, CURRENT_TIMESTAMP))
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::date, $12::date,
+          COALESCE($13::timestamptz, CURRENT_TIMESTAMP),
+          COALESCE($14::timestamptz, CURRENT_TIMESTAMP))
         ON CONFLICT (assignment_id) DO UPDATE SET
           client_id = EXCLUDED.client_id,
           member_id = EXCLUDED.member_id,
           fte_allocation = EXCLUDED.fte_allocation,
           hours_per_month = EXCLUDED.hours_per_month,
           role_title_override = EXCLUDED.role_title_override,
+          relevance_note_override = EXCLUDED.relevance_note_override,
+          contact_channel_override = EXCLUDED.contact_channel_override,
+          contact_handle_override = EXCLUDED.contact_handle_override,
           active = EXCLUDED.active,
           start_date = EXCLUDED.start_date,
           end_date = EXCLUDED.end_date,
@@ -101,6 +108,9 @@ const backfillAssignments = async () => {
           toNumber(row.fte_allocation, 0),
           row.hours_per_month !== null && row.hours_per_month !== undefined ? toNumber(row.hours_per_month) : null,
           toNullableString(row.role_title_override),
+          toNullableString(row.relevance_note_override),
+          toNullableString(row.contact_channel_override),
+          toNullableString(row.contact_handle_override),
           toBoolean(row.active, true),
           toNullableString(row.start_date),
           toNullableString(row.end_date),

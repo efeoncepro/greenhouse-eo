@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.client_team_assignments (
   fte_allocation NUMERIC(5,3) NOT NULL DEFAULT 0,
   hours_per_month INTEGER,
   role_title_override TEXT,
+  relevance_note_override TEXT,
+  contact_channel_override TEXT,
+  contact_handle_override TEXT,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   start_date DATE,
   end_date DATE,
@@ -29,3 +32,14 @@ CREATE INDEX IF NOT EXISTS client_assignments_client_idx
 -- Grants
 GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_core.client_team_assignments TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON greenhouse_core.client_team_assignments TO greenhouse_migrator;
+
+-- Additive migration: add override columns if table already exists
+DO $$
+BEGIN
+  ALTER TABLE greenhouse_core.client_team_assignments
+    ADD COLUMN IF NOT EXISTS relevance_note_override TEXT;
+  ALTER TABLE greenhouse_core.client_team_assignments
+    ADD COLUMN IF NOT EXISTS contact_channel_override TEXT;
+  ALTER TABLE greenhouse_core.client_team_assignments
+    ADD COLUMN IF NOT EXISTS contact_handle_override TEXT;
+END $$;
