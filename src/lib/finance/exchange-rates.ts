@@ -243,7 +243,7 @@ export const upsertExchangeRates = async (rates: PersistedExchangeRate[]) => {
           @fromCurrency AS from_currency,
           @toCurrency AS to_currency,
           @rate AS rate,
-          @rateDate AS rate_date,
+          CAST(@rateDate AS DATE) AS rate_date,
           @source AS source,
           CURRENT_TIMESTAMP() AS created_at
       ) AS source
