@@ -57,6 +57,17 @@ const AiToolingDashboard = () => {
       if (licRes.ok) setLicensesData(await licRes.json())
       if (walRes.ok) setWalletsData(await walRes.json())
       if (metaRes.ok) setMeta(await metaRes.json())
+
+      const failed = [
+        !catRes.ok && 'catálogo',
+        !licRes.ok && 'licencias',
+        !walRes.ok && 'wallets',
+        !metaRes.ok && 'metadata'
+      ].filter(Boolean)
+
+      if (failed.length > 0) {
+        setError(`No se pudieron cargar: ${failed.join(', ')}. Los formularios pueden estar incompletos.`)
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error cargando datos')
     } finally {

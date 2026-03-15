@@ -187,13 +187,17 @@ export const syncProviderRegistryFromFinanceSuppliers = async () => {
       continue
     }
 
-    await syncProviderFromFinanceSupplier({
-      supplierId,
-      providerId: normalizeNullableString(row.provider_id),
-      legalName,
-      tradeName: normalizeNullableString(row.trade_name),
-      website: normalizeNullableString(row.website),
-      isActive: row.is_active ?? true
-    })
+    try {
+      await syncProviderFromFinanceSupplier({
+        supplierId,
+        providerId: normalizeNullableString(row.provider_id),
+        legalName,
+        tradeName: normalizeNullableString(row.trade_name),
+        website: normalizeNullableString(row.website),
+        isActive: row.is_active ?? true
+      })
+    } catch (err) {
+      console.warn(`[providers/canonical] Failed to sync supplier ${supplierId} (${legalName}):`, err)
+    }
   }
 }

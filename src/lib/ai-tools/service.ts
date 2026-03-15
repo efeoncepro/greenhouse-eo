@@ -384,7 +384,13 @@ const assertClient = async (clientId: string) => {
 
 const getProviders = async (activeOnly = false) => {
   await ensureAiToolingInfrastructure()
-  await syncProviderRegistryFromFinanceSuppliers()
+
+  try {
+    await syncProviderRegistryFromFinanceSuppliers()
+  } catch (err) {
+    console.warn('[ai-tools/service] Provider sync from finance suppliers failed, continuing with existing providers:', err)
+  }
+
   const projectId = getProjectId()
 
   const rows = await runAiToolingQuery<ProviderRow>(
