@@ -21,9 +21,16 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   }
 
   const { id } = await params
-  const state = await getUserRoleState(id)
 
-  return NextResponse.json(state)
+  try {
+    const state = await getUserRoleState(id)
+
+    return NextResponse.json(state)
+  } catch (error) {
+    console.error('[admin/users/roles] GET failed:', error instanceof Error ? error.message : error)
+
+    return NextResponse.json({ error: 'Failed to load roles' }, { status: 500 })
+  }
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -42,11 +49,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   const roleCodes = normalizeCodeList(body.roleCodes)
 
-  const updatedAssignments = await updateUserRoles({
-    userId: id,
-    roleCodes,
-    assignedByUserId: tenant.userId
-  })
+  try {
+    const updatedAssignments = await updateUserRoles({
+      userId: id,
+      roleCodes,
+      assignedByUserId: tenant.userId
+    })
 
-  return NextResponse.json({ userId: id, currentAssignments: updatedAssignments })
+    return NextResponse.json({ userId: id, currentAssignments: updatedAssignments })
+  } catch (error) {
+    console.error('[admin/users/roles] PUT failed:', error instanceof Error ? error.message : error)
+
+    return NextResponse.json({ error: 'Failed to update roles' }, { status: 500 })
+  }
 }

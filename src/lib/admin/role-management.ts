@@ -110,7 +110,7 @@ export const updateUserRoles = async (params: {
   roleCodes: string[]
   assignedByUserId: string
 }): Promise<UserRoleAssignment[]> => {
-  const { userId, roleCodes, assignedByUserId } = params
+  const { userId, roleCodes } = params
 
   return withGreenhousePostgresTransaction(async client => {
     // 1. Deactivate roles no longer in the list
@@ -130,18 +130,31 @@ export const updateUserRoles = async (params: {
       )
     }
 
-    // 2. Upsert each new role assignment
+    // 2. Upsert each role: reactivate existing or insert new
     for (const roleCode of roleCodes) {
-      const assignmentId = `ura-${userId}-${roleCode}`
-
-      await client.query(
-        `INSERT INTO greenhouse_core.user_role_assignments
-           (assignment_id, user_id, role_code, status, active, assigned_by_user_id, created_at, updated_at)
-         VALUES ($1, $2, $3, 'active', true, $4, NOW(), NOW())
-         ON CONFLICT (assignment_id) DO UPDATE
-           SET active = true, status = 'active', assigned_by_user_id = $4, updated_at = NOW()`,
-        [assignmentId, userId, roleCode, assignedByUserId]
+      const existing = await client.query(
+        `SELECT assignment_id FROM greenhouse_core.user_role_assignments
+         WHERE user_id = $1 AND role_code = $2 LIMIT 1`,
+        [userId, roleCode]
       )
+
+      if (existing.rows.length > 0) {
+        await client.query(
+          `UPDATE greenhouse_core.user_role_assignments
+           SET active = true, status = 'active', updated_at = NOW()
+           WHERE assignment_id = $1`,
+          [existing.rows[0].assignment_id]
+        )
+      } else {
+        const assignmentId = `ura-${userId}-${roleCode}`
+
+        await client.query(
+          `INSERT INTO greenhouse_core.user_role_assignments
+             (assignment_id, user_id, role_code, status, active, created_at, updated_at)
+           VALUES ($1, $2, $3, 'active', true, NOW(), NOW())`,
+          [assignmentId, userId, roleCode]
+        )
+      }
     }
 
     // 3. Return updated assignments
