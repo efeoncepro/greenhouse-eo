@@ -1,83 +1,17 @@
-CREATE SCHEMA IF NOT EXISTS greenhouse_finance;
-
-CREATE TABLE IF NOT EXISTS greenhouse_finance.accounts (
-  account_id TEXT PRIMARY KEY,
-  account_name TEXT NOT NULL,
-  bank_name TEXT NOT NULL,
-  account_number TEXT,
-  account_number_full TEXT,
-  currency TEXT NOT NULL,
-  account_type TEXT NOT NULL,
-  country_code TEXT NOT NULL DEFAULT 'CL',
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  opening_balance NUMERIC NOT NULL DEFAULT 0,
-  opening_balance_date DATE,
-  notes TEXT,
-  created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS finance_accounts_active_idx
-  ON greenhouse_finance.accounts (is_active, account_name);
-
-CREATE TABLE IF NOT EXISTS greenhouse_finance.suppliers (
-  supplier_id TEXT PRIMARY KEY,
-  provider_id TEXT REFERENCES greenhouse_core.providers(provider_id),
-  legal_name TEXT NOT NULL,
-  trade_name TEXT,
-  tax_id TEXT,
-  tax_id_type TEXT,
-  country_code TEXT NOT NULL DEFAULT 'CL',
-  category TEXT NOT NULL,
-  service_type TEXT,
-  is_international BOOLEAN NOT NULL DEFAULT FALSE,
-  primary_contact_name TEXT,
-  primary_contact_email TEXT,
-  primary_contact_phone TEXT,
-  website_url TEXT,
-  bank_name TEXT,
-  bank_account_number TEXT,
-  bank_account_type TEXT,
-  bank_routing TEXT,
-  payment_currency TEXT NOT NULL DEFAULT 'CLP',
-  default_payment_terms INTEGER NOT NULL DEFAULT 30,
-  default_payment_method TEXT,
-  requires_po BOOLEAN NOT NULL DEFAULT FALSE,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  notes TEXT,
-  created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS finance_suppliers_active_idx
-  ON greenhouse_finance.suppliers (is_active, legal_name);
-
-CREATE INDEX IF NOT EXISTS finance_suppliers_provider_idx
-  ON greenhouse_finance.suppliers (provider_id);
-
-CREATE TABLE IF NOT EXISTS greenhouse_finance.exchange_rates (
-  rate_id TEXT PRIMARY KEY,
-  from_currency TEXT NOT NULL,
-  to_currency TEXT NOT NULL,
-  rate NUMERIC NOT NULL,
-  rate_date DATE NOT NULL,
-  source TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT finance_exchange_rates_unique_pair UNIQUE (from_currency, to_currency, rate_date)
-);
-
-CREATE INDEX IF NOT EXISTS finance_exchange_rates_pair_idx
-  ON greenhouse_finance.exchange_rates (from_currency, to_currency, rate_date DESC);
-
 -- ============================================================
--- Slice 2: Income, Payments, Factoring, Expenses, Reconciliation
+-- Greenhouse Finance — Slice 2: Income, Payments, Factoring,
+-- Expenses, Client Profiles, Reconciliation
+-- ============================================================
+-- Extends greenhouse_finance schema (Slice 1: accounts, suppliers, exchange_rates)
+-- Follows 360 canonical model:
+--   - client_id   → greenhouse_core.clients(client_id)
+--   - member_id   → greenhouse_core.members(member_id)
+--   - provider_id → greenhouse_core.providers(provider_id)
+--   - user IDs    → greenhouse_core.client_users(user_id)
 -- ============================================================
 
 -- ------------------------------------------------------------
--- 4. client_profiles — billing/invoicing profile per client
+-- 1. client_profiles — billing/invoicing profile per client
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.client_profiles (
   client_profile_id TEXT PRIMARY KEY,
@@ -108,7 +42,7 @@ CREATE INDEX IF NOT EXISTS finance_client_profiles_hubspot_idx
   ON greenhouse_finance.client_profiles (hubspot_company_id);
 
 -- ------------------------------------------------------------
--- 5. income — invoices emitted to clients
+-- 2. income — invoices emitted to clients
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.income (
   income_id TEXT PRIMARY KEY,
@@ -155,7 +89,7 @@ CREATE INDEX IF NOT EXISTS finance_income_date_idx
   ON greenhouse_finance.income (invoice_date DESC);
 
 -- ------------------------------------------------------------
--- 6. income_payments — individual collection records per invoice
+-- 3. income_payments — individual collection records per invoice
 --    Replaces the JSON payments_received array from BigQuery.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.income_payments (
@@ -187,7 +121,7 @@ CREATE INDEX IF NOT EXISTS finance_income_payments_unreconciled_idx
   WHERE is_reconciled = FALSE;
 
 -- ------------------------------------------------------------
--- 7. factoring_operations — invoice factoring/assignment
+-- 4. factoring_operations — invoice factoring/assignment
 --    Tracks when an invoice is sold to a factoring provider
 --    for early collection at a discount.
 -- ------------------------------------------------------------
@@ -221,7 +155,7 @@ CREATE INDEX IF NOT EXISTS finance_factoring_status_idx
   ON greenhouse_finance.factoring_operations (status, operation_date DESC);
 
 -- ------------------------------------------------------------
--- 8. expenses — operational expenditures
+-- 5. expenses — operational expenditures
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
   expense_id TEXT PRIMARY KEY,
@@ -263,7 +197,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
   recurrence_frequency TEXT,
   is_reconciled BOOLEAN NOT NULL DEFAULT FALSE,
   reconciliation_id TEXT,
-  linked_income_id TEXT REFERENCES greenhouse_finance.income(income_id),
+  linked_income_id TEXT,
   notes TEXT,
   created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -286,7 +220,7 @@ CREATE INDEX IF NOT EXISTS finance_expenses_status_idx
   ON greenhouse_finance.expenses (payment_status, due_date DESC);
 
 -- ------------------------------------------------------------
--- 9. reconciliation_periods — monthly bank reconciliation
+-- 6. reconciliation_periods — monthly bank reconciliation
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.reconciliation_periods (
   period_id TEXT PRIMARY KEY,
@@ -314,7 +248,7 @@ CREATE INDEX IF NOT EXISTS finance_reconciliation_account_idx
   ON greenhouse_finance.reconciliation_periods (account_id, year DESC, month DESC);
 
 -- ------------------------------------------------------------
--- 10. bank_statement_rows — imported bank statement lines
+-- 7. bank_statement_rows — imported bank statement lines
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_finance.bank_statement_rows (
   row_id TEXT PRIMARY KEY,
@@ -345,10 +279,9 @@ CREATE INDEX IF NOT EXISTS finance_bank_rows_unmatched_idx
   WHERE match_status = 'unmatched';
 
 -- ============================================================
--- Serving Views
+-- Serving View: income_360
 -- ============================================================
 
--- income_360: invoice with full context
 CREATE OR REPLACE VIEW greenhouse_serving.income_360 AS
 SELECT
   i.income_id,
@@ -385,50 +318,25 @@ LEFT JOIN LATERAL (
   WHERE fo2.income_id = i.income_id
 ) fop ON TRUE;
 
-CREATE OR REPLACE VIEW greenhouse_serving.provider_finance_360 AS
-SELECT
-  p.provider_id,
-  p.public_id,
-  p.provider_name,
-  p.legal_name AS provider_legal_name,
-  p.provider_type,
-  p.primary_email AS provider_primary_email,
-  p.primary_contact_name AS provider_primary_contact_name,
-  p.country_code AS provider_country_code,
-  p.status AS provider_status,
-  p.active AS provider_active,
-  s.supplier_id,
-  s.legal_name AS supplier_legal_name,
-  s.trade_name AS supplier_trade_name,
-  s.category AS supplier_category,
-  s.service_type AS supplier_service_type,
-  s.payment_currency,
-  s.default_payment_terms,
-  s.default_payment_method,
-  s.requires_po,
-  s.is_active AS supplier_active,
-  s.created_at AS supplier_created_at,
-  s.updated_at AS supplier_updated_at
-FROM greenhouse_core.providers AS p
-LEFT JOIN greenhouse_finance.suppliers AS s
-  ON s.provider_id = p.provider_id;
+-- ============================================================
+-- Grants for Slice 2 tables
+-- ============================================================
 
-GRANT USAGE ON SCHEMA greenhouse_finance TO greenhouse_runtime;
-GRANT USAGE, CREATE ON SCHEMA greenhouse_finance TO greenhouse_migrator;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_runtime;
-GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.client_profiles TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.income TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.income_payments TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.factoring_operations TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expenses TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.reconciliation_periods TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.bank_statement_rows TO greenhouse_runtime;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_finance
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+GRANT ALL ON greenhouse_finance.client_profiles TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.income TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.income_payments TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.factoring_operations TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.expenses TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.reconciliation_periods TO greenhouse_migrator;
+GRANT ALL ON greenhouse_finance.bank_statement_rows TO greenhouse_migrator;
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_finance
-GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
-
-GRANT SELECT ON greenhouse_serving.provider_finance_360 TO greenhouse_runtime;
-GRANT SELECT ON greenhouse_serving.provider_finance_360 TO greenhouse_migrator;
 GRANT SELECT ON greenhouse_serving.income_360 TO greenhouse_runtime;
 GRANT SELECT ON greenhouse_serving.income_360 TO greenhouse_migrator;
-
--- Re-grant on all tables after Slice 2 additions
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_runtime;
-GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_migrator;

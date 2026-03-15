@@ -28,6 +28,12 @@ import {
   type PaymentMethod,
   type ServiceLine
 } from '@/lib/finance/shared'
+import {
+  listFinanceExpensesFromPostgres,
+  createFinanceExpenseInPostgres,
+  buildMonthlySequenceIdFromPostgres
+} from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -126,20 +132,35 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { searchParams } = new URL(request.url)
+  const expenseType = searchParams.get('expenseType')
+  const status = searchParams.get('status')
+  const clientId = searchParams.get('clientId')
+  const memberId = searchParams.get('memberId')
+  const supplierId = searchParams.get('supplierId')
+  const serviceLine = searchParams.get('serviceLine')
+  const fromDate = searchParams.get('fromDate')
+  const toDate = searchParams.get('toDate')
+  const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
+  const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
+
+  // ── Postgres-first path ──
+  try {
+    const result = await listFinanceExpensesFromPostgres({
+      expenseType, status, clientId, memberId, supplierId, serviceLine, fromDate, toDate, page, pageSize
+    })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
   await ensureFinanceInfrastructure()
 
   try {
-    const { searchParams } = new URL(request.url)
-    const expenseType = searchParams.get('expenseType')
-    const status = searchParams.get('status')
-    const clientId = searchParams.get('clientId')
-    const memberId = searchParams.get('memberId')
-    const supplierId = searchParams.get('supplierId')
-    const serviceLine = searchParams.get('serviceLine')
-    const fromDate = searchParams.get('fromDate')
-    const toDate = searchParams.get('toDate')
-    const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
-    const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
     const projectId = getFinanceProjectId()
 
     let filters = ''
@@ -223,8 +244,6 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const body = await request.json()
     const description = assertNonEmptyString(body.description, 'description')
@@ -254,14 +273,6 @@ export async function POST(request: Request) {
     const periodSource = normalizeString(body.documentDate || body.paymentDate) || new Date().toISOString().slice(0, 10)
     const period = periodSource.slice(0, 7).replace('-', '')
 
-    const expenseId = normalizeString(body.expenseId) ||
-      await buildMonthlySequenceId({
-        tableName: 'fin_expenses',
-        idColumn: 'expense_id',
-        prefix: 'EXP',
-        period
-      })
-
     const paymentStatus = body.paymentStatus && EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
       ? (body.paymentStatus as ExpensePaymentStatus) : 'pending'
 
@@ -270,6 +281,83 @@ export async function POST(request: Request) {
 
     const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
       ? (body.serviceLine as ServiceLine) : null
+
+    // Shared field resolution
+    const socialSecurityType = body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
+      ? normalizeString(body.socialSecurityType)
+      : null
+    const taxType = body.taxType && TAX_TYPES.includes(body.taxType)
+      ? normalizeString(body.taxType)
+      : null
+
+    // ── Postgres-first path ──
+    try {
+      const expenseId = normalizeString(body.expenseId) ||
+        await buildMonthlySequenceIdFromPostgres({
+          tableName: 'expenses',
+          idColumn: 'expense_id',
+          prefix: 'EXP',
+          period
+        })
+
+      await createFinanceExpenseInPostgres({
+        expenseId,
+        clientId: resolvedClient.clientId,
+        expenseType,
+        description,
+        currency,
+        subtotal,
+        taxRate,
+        taxAmount,
+        totalAmount,
+        exchangeRateToClp,
+        totalAmountClp,
+        paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
+        paymentStatus,
+        paymentMethod,
+        paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
+        paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
+        documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
+        documentDate: body.documentDate ? normalizeString(body.documentDate) : null,
+        dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
+        supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
+        supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
+        supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
+        payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
+        payrollEntryId: resolvedMember.payrollEntryId,
+        memberId: resolvedMember.memberId,
+        memberName: normalizeString(body.memberName) || resolvedMember.memberName,
+        socialSecurityType,
+        socialSecurityInstitution: body.socialSecurityInstitution ? normalizeString(body.socialSecurityInstitution) : null,
+        socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
+        taxType,
+        taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
+        taxFormNumber: body.taxFormNumber ? normalizeString(body.taxFormNumber) : null,
+        miscellaneousCategory: body.miscellaneousCategory ? normalizeString(body.miscellaneousCategory) : null,
+        serviceLine,
+        isRecurring: Boolean(body.isRecurring),
+        recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        actorUserId: tenant.userId || null
+      })
+
+      return NextResponse.json({ expenseId, created: true }, { status: 201 })
+    } catch (pgError) {
+      if (!shouldFallbackFromFinancePostgres(pgError)) {
+        throw pgError
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
+
+    const expenseId = normalizeString(body.expenseId) ||
+      await buildMonthlySequenceId({
+        tableName: 'fin_expenses',
+        idColumn: 'expense_id',
+        prefix: 'EXP',
+        period
+      })
 
     const projectId = getFinanceProjectId()
 
@@ -330,18 +418,10 @@ export async function POST(request: Request) {
       payrollEntryId: resolvedMember.payrollEntryId,
       memberId: resolvedMember.memberId,
       memberName: normalizeString(body.memberName) || resolvedMember.memberName,
-      socialSecurityType: body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
-        ? normalizeString(body.socialSecurityType)
-        : body.socialSecurityType
-          ? null
-          : null,
+      socialSecurityType,
       socialSecurityInstitution: body.socialSecurityInstitution ? normalizeString(body.socialSecurityInstitution) : null,
       socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
-      taxType: body.taxType && TAX_TYPES.includes(body.taxType)
-        ? normalizeString(body.taxType)
-        : body.taxType
-          ? null
-          : null,
+      taxType,
       taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
       taxFormNumber: body.taxFormNumber ? normalizeString(body.taxFormNumber) : null,
       miscellaneousCategory: body.miscellaneousCategory ? normalizeString(body.miscellaneousCategory) : null,

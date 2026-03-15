@@ -14,6 +14,8 @@ import {
   runFinanceQuery,
   toNumber
 } from '@/lib/finance/shared'
+import { createFinanceIncomePaymentInPostgres } from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -46,6 +48,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     const paymentDate = assertDateString(body.paymentDate, 'paymentDate')
+    const paymentId = normalizeString(body.paymentId) || `pay_${randomUUID()}`
+
+    // ── Postgres-first path ──
+    try {
+      const result = await createFinanceIncomePaymentInPostgres({
+        incomeId,
+        paymentId,
+        paymentDate,
+        amount,
+        reference: body.reference ? normalizeString(body.reference) : null,
+        paymentMethod: body.paymentMethod ? normalizeString(body.paymentMethod) : null,
+        paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        actorUserId: tenant.userId || null
+      })
+
+      return NextResponse.json(result, { status: 201 })
+    } catch (pgError) {
+      if (!shouldFallbackFromFinancePostgres(pgError)) {
+        throw pgError
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
     const rows = await runFinanceQuery<IncomePaymentRow>(`
@@ -70,7 +97,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const existingPayments = parseIncomePaymentsReceived(row.payments_received)
 
     const paymentRecord = {
-      paymentId: normalizeString(body.paymentId) || `pay_${randomUUID()}`,
+      paymentId,
       paymentDate,
       amount,
       currency: normalizeString(row.currency),
