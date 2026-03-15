@@ -26,17 +26,18 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { MemberToolLicense, AiToolingAdminMetadata } from '@/types/ai-tools'
+import type { AiTool, MemberToolLicense, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { licenseStatusConfig, accessLevelConfig, formatDate } from '../helpers'
 import { getInitials } from '@/utils/getInitials'
 
 type Props = {
   licenses: MemberToolLicense[]
+  tools: AiTool[]
   meta: AiToolingAdminMetadata | null
   onRefresh: () => void
 }
 
-const AiLicensesTab = ({ licenses, meta, onRefresh }: Props) => {
+const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
@@ -243,8 +244,14 @@ const AiLicensesTab = ({ licenses, meta, onRefresh }: Props) => {
               value={formTool} onChange={e => setFormTool(e.target.value)}
               required
             >
-              {(meta?.providers ?? []).length === 0 && <MenuItem value='' disabled>Cargando...</MenuItem>}
-              {/* We'd ideally fetch tools list here, but we can use toolCategories as proxy for now */}
+              {tools.length === 0 && <MenuItem value='' disabled>Sin herramientas disponibles</MenuItem>}
+              {tools
+                .filter(tool => tool.isActive)
+                .map(tool => (
+                  <MenuItem key={tool.toolId} value={tool.toolId}>
+                    {tool.toolName}
+                  </MenuItem>
+                ))}
             </CustomTextField>
             <CustomTextField
               select fullWidth size='small' label='Nivel de acceso'

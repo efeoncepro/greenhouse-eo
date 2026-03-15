@@ -27,21 +27,24 @@ import type { ApexOptions } from 'apexcharts'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { AiCreditWallet, AiToolingAdminMetadata, ReloadReason } from '@/types/ai-tools'
+import type { AiCreditWallet, AiTool, AiToolingAdminMetadata, ReloadReason } from '@/types/ai-tools'
 import { walletStatusConfig, balanceHealthConfig, walletScopeLabel, reloadReasonLabel, formatDate } from '../helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 type Props = {
   wallets: AiCreditWallet[]
+  tools: AiTool[]
   meta: AiToolingAdminMetadata | null
   onRefresh: () => void
 }
 
-const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
+const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
   const theme = useTheme()
   const [createOpen, setCreateOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [reloadOpen, setReloadOpen] = useState(false)
+  const [editWallet, setEditWallet] = useState<AiCreditWallet | null>(null)
   const [reloadWallet, setReloadWallet] = useState<AiCreditWallet | null>(null)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
@@ -58,6 +61,15 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
   const [formValidFrom, setFormValidFrom] = useState('')
   const [formValidUntil, setFormValidUntil] = useState('')
   const [formNotes, setFormNotes] = useState('')
+
+  // Edit form
+  const [editMonthlyLimit, setEditMonthlyLimit] = useState<number | ''>('')
+  const [editResetDay, setEditResetDay] = useState<number | ''>(1)
+  const [editThreshold, setEditThreshold] = useState<number | ''>('')
+  const [editValidFrom, setEditValidFrom] = useState('')
+  const [editValidUntil, setEditValidUntil] = useState('')
+  const [editStatus, setEditStatus] = useState('active')
+  const [editNotes, setEditNotes] = useState('')
 
   // Reload form
   const [reloadAmount, setReloadAmount] = useState<number | ''>(0)
@@ -86,6 +98,18 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
     setReloadRef('')
     setReloadNotes('')
     setReloadOpen(true)
+  }
+
+  const openEdit = (wallet: AiCreditWallet) => {
+    setEditWallet(wallet)
+    setEditMonthlyLimit(wallet.monthlyLimit ?? '')
+    setEditResetDay(wallet.monthlyResetDay ?? 1)
+    setEditThreshold(wallet.lowBalanceThreshold ?? '')
+    setEditValidFrom(wallet.validFrom)
+    setEditValidUntil(wallet.validUntil ?? '')
+    setEditStatus(wallet.walletStatus)
+    setEditNotes(wallet.notes ?? '')
+    setEditOpen(true)
   }
 
   const handleCreate = async () => {
@@ -138,6 +162,35 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
 
       if (res.ok) {
         setReloadOpen(false)
+        onRefresh()
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleEdit = async () => {
+    if (!editWallet) return
+
+    setSaving(true)
+
+    try {
+      const res = await fetch(`/api/admin/ai-tools/wallets/${editWallet.walletId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          monthlyLimit: editMonthlyLimit === '' ? null : editMonthlyLimit,
+          monthlyResetDay: editResetDay === '' ? 1 : editResetDay,
+          lowBalanceThreshold: editThreshold === '' ? null : editThreshold,
+          validFrom: editValidFrom,
+          validUntil: editValidUntil || null,
+          walletStatus: editStatus,
+          notes: editNotes || null
+        })
+      })
+
+      if (res.ok) {
+        setEditOpen(false)
         onRefresh()
       }
     } finally {
@@ -337,7 +390,7 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
                           <Button variant='tonal' size='small' color='success' fullWidth onClick={() => openReload(wallet)}>
                             <i className='tabler-plus' style={{ marginRight: 4 }} /> Recargar
                           </Button>
-                          <Button variant='tonal' size='small' color='secondary' fullWidth>
+                          <Button variant='tonal' size='small' color='secondary' fullWidth onClick={() => openEdit(wallet)}>
                             Editar
                           </Button>
                         </Stack>
@@ -378,10 +431,17 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
               </CustomTextField>
             )}
             <CustomTextField
-              fullWidth size='small' label='Herramienta (tool ID)'
+              select fullWidth size='small' label='Herramienta'
               value={formTool} onChange={e => setFormTool(e.target.value)}
-              required helperText='ID del catálogo: ej. kling-v2, flux-pro'
-            />
+              required
+            >
+              {tools.length === 0 && <MenuItem value='' disabled>Sin herramientas disponibles</MenuItem>}
+              {tools
+                .filter(tool => tool.isActive)
+                .map(tool => (
+                  <MenuItem key={tool.toolId} value={tool.toolId}>{tool.toolName}</MenuItem>
+                ))}
+            </CustomTextField>
             <Stack direction='row' spacing={2}>
               <CustomTextField
                 size='small' label='Balance inicial' type='number'
@@ -429,6 +489,72 @@ const AiWalletsTab = ({ wallets, meta, onRefresh }: Props) => {
           <Button variant='tonal' color='secondary' onClick={() => setCreateOpen(false)} disabled={saving}>Cancelar</Button>
           <Button variant='contained' onClick={handleCreate} disabled={saving || !formTool || !formValidFrom || (formScope === 'client' && !formClient)}>
             {saving ? 'Creando...' : 'Crear wallet'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Wallet Dialog */}
+      <Dialog open={editOpen} onClose={() => !saving && setEditOpen(false)} maxWidth='sm' fullWidth closeAfterTransition={false}>
+        <DialogTitle>Editar wallet</DialogTitle>
+        <Divider />
+        <DialogContent>
+          {editWallet && (
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+                <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {editWallet.clientName ?? 'Pool interno'} · {editWallet.walletId}
+                </Typography>
+              </Box>
+              <Stack direction='row' spacing={2}>
+                <CustomTextField
+                  size='small' label='Límite mensual' type='number'
+                  value={editMonthlyLimit} onChange={e => setEditMonthlyLimit(e.target.value === '' ? '' : Number(e.target.value))}
+                  sx={{ flex: 1 }}
+                />
+                <CustomTextField
+                  size='small' label='Día reset mensual' type='number'
+                  value={editResetDay} onChange={e => setEditResetDay(e.target.value === '' ? '' : Number(e.target.value))}
+                  sx={{ flex: 1 }}
+                />
+              </Stack>
+              <CustomTextField
+                size='small' label='Umbral bajo' type='number'
+                value={editThreshold} onChange={e => setEditThreshold(e.target.value === '' ? '' : Number(e.target.value))}
+                helperText='Alerta de balance bajo'
+              />
+              <Stack direction='row' spacing={2}>
+                <CustomTextField
+                  size='small' label='Válido desde' type='date'
+                  value={editValidFrom} onChange={e => setEditValidFrom(e.target.value)}
+                  InputLabelProps={{ shrink: true }} required sx={{ flex: 1 }}
+                />
+                <CustomTextField
+                  size='small' label='Válido hasta' type='date'
+                  value={editValidUntil} onChange={e => setEditValidUntil(e.target.value)}
+                  InputLabelProps={{ shrink: true }} sx={{ flex: 1 }}
+                />
+              </Stack>
+              <CustomTextField
+                select size='small' label='Estado'
+                value={editStatus} onChange={e => setEditStatus(e.target.value)}
+              >
+                {(meta?.walletStatuses ?? []).map(status => (
+                  <MenuItem key={status} value={status}>{walletStatusConfig[status]?.label ?? status}</MenuItem>
+                ))}
+              </CustomTextField>
+              <CustomTextField
+                fullWidth size='small' label='Notas'
+                value={editNotes} onChange={e => setEditNotes(e.target.value)}
+                multiline rows={2}
+              />
+            </Stack>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>Cancelar</Button>
+          <Button variant='contained' onClick={handleEdit} disabled={saving || !editValidFrom}>
+            {saving ? 'Guardando...' : 'Guardar cambios'}
           </Button>
         </DialogActions>
       </Dialog>
