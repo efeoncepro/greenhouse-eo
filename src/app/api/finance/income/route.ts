@@ -224,13 +224,13 @@ export async function POST(request: Request) {
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @incomeId, @clientId, @clientProfileId, @hubspotCompanyId, @hubspotDealId,
-        @clientName, @invoiceNumber, @invoiceDate, @dueDate,
+        @incomeId, NULLIF(@clientId, ''), NULLIF(@clientProfileId, ''), NULLIF(@hubspotCompanyId, ''), NULLIF(@hubspotDealId, ''),
+        @clientName, NULLIF(@invoiceNumber, ''), @invoiceDate, NULLIF(@dueDate, ''),
         @currency, @subtotal, @taxRate, @taxAmount, @totalAmount,
         @exchangeRateToClp, @totalAmountClp,
         @paymentStatus, 0,
-        @poNumber, @hesNumber, @serviceLine, @incomeType, @description,
-        FALSE, @notes, @createdBy,
+        NULLIF(@poNumber, ''), NULLIF(@hesNumber, ''), NULLIF(@serviceLine, ''), @incomeType, NULLIF(@description, ''),
+        FALSE, NULLIF(@notes, ''), NULLIF(@createdBy, ''),
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
     `, {

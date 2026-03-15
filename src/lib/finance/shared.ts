@@ -183,22 +183,16 @@ export type ContactRole = (typeof CONTACT_ROLES)[number]
 export const runFinanceQuery = async <T>(query: string, params?: Record<string, unknown>): Promise<T[]> => {
   const bigQuery = getBigQueryClient()
 
-  // BigQuery requires explicit types for null parameters
-  const types = params
+  // BigQuery throws on null params when it cannot infer the type.
+  // Replace null/undefined with empty string — the normalisation layer
+  // already treats '' and null identically on read.
+  const safeParams = params
     ? Object.fromEntries(
-        Object.entries(params)
-          .filter(([, value]) => value === null || value === undefined)
-          .map(([key]) => [key, 'STRING'])
+        Object.entries(params).map(([key, value]) => [key, value ?? ''])
       )
     : undefined
 
-  const hasNullTypes = types && Object.keys(types).length > 0
-
-  const [rows] = await bigQuery.query({
-    query,
-    params,
-    ...(hasNullTypes ? { types } : {})
-  })
+  const [rows] = await bigQuery.query({ query, params: safeParams })
 
   return rows as T[]
 }
