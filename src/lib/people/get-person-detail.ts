@@ -5,6 +5,7 @@ import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMe
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
+import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
 import { getPersonOperationalMetrics } from '@/lib/people/get-person-operational-metrics'
 import {
   PeopleValidationError,
@@ -22,7 +23,8 @@ import {
   toStringArray,
   enrichProfile
 } from '@/lib/people/shared'
-import type { TeamIdentityProvider } from '@/types/team'
+import { getAssignedHoursMonth, getCapacityHealth, getExpectedMonthlyThroughput, getUtilizationPercent } from '@/lib/team-capacity/shared'
+import type { TeamIdentityProvider, TeamRoleCategory } from '@/types/team'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type MemberRow = {
@@ -134,6 +136,41 @@ const buildAssignmentsSummary = (rows: AssignmentRow[]) => {
     activeAssignments,
     totalFte,
     totalHoursMonth
+  }
+}
+
+const buildCapacitySummary = ({
+  roleCategory,
+  totalFte,
+  metrics
+}: {
+  roleCategory: string
+  totalFte: number
+  metrics: PersonDetail['operationalMetrics'] | null | undefined
+}) => {
+  const assignedHoursMonth = getAssignedHoursMonth(totalFte)
+
+  const expectedMonthlyThroughput = getExpectedMonthlyThroughput({
+    roleCategory: roleCategory as TeamRoleCategory,
+    fteAllocation: totalFte
+  })
+
+  const activeAssets = metrics?.tasksActiveNow || 0
+  const completedAssets = metrics?.tasksCompleted30d || 0
+
+  const utilizationPercent = getUtilizationPercent({
+    activeAssets,
+    expectedMonthlyThroughput
+  })
+
+  return {
+    assignedHoursMonth,
+    activeAssets,
+    completedAssets,
+    projectCount: metrics?.projectBreakdown.length || 0,
+    expectedMonthlyThroughput,
+    utilizationPercent,
+    capacityHealth: getCapacityHealth(utilizationPercent)
   }
 }
 
@@ -423,7 +460,7 @@ export const getPersonDetail = async ({
     getAssignmentsByMember(memberId).then(rows => {
       detail.summary = buildAssignmentsSummary(rows)
 
-      if (access.canViewAssignments) {
+  if (access.canViewAssignments) {
         detail.assignments = normalizeAssignments(rows)
       }
     })
@@ -459,7 +496,23 @@ export const getPersonDetail = async ({
     )
   }
 
+  if (access.canViewFinance) {
+    tasks.push(
+      getPersonFinanceOverview(memberId).then(finance => {
+        detail.financeSummary = finance.summary
+      })
+    )
+  }
+
   await Promise.all(tasks)
+
+  if (access.canViewActivity || access.canViewAssignments) {
+    detail.capacity = buildCapacitySummary({
+      roleCategory: member.roleCategory,
+      totalFte: detail.summary.totalFte,
+      metrics: detail.operationalMetrics
+    })
+  }
 
   return detail
 }

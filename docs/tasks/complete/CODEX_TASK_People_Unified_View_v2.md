@@ -2,21 +2,17 @@
 
 ## Estado
 
-Este brief **reemplaza operativamente** a `CODEX_TASK_People_Unified_View.md`.
+Este brief **reemplazo operativamente** a `CODEX_TASK_People_Unified_View.md`, pero hoy debe leerse como referencia histórica.
 
-La version original quedo desfasada respecto al repo real en 4 puntos:
-- asume un modulo `Admin Team` ya implementado bajo `/admin/team` y `/api/admin/team/*`
-- propone un route group `people` que no existe en el auth runtime
-- modela roles `hr` y `operator` que no existen con esos codigos en `greenhouse.roles`
-- agrega `country` a `team_members`, pero el roster real ya usa `location_country`
+Estado 2026-03-14:
+- `People` sí existe en runtime y sí está alineado con arquitectura
+- la `v2` ya quedó parcialmente desfasada porque desde entonces:
+  - `/api/admin/team/*` sí existe y ya soporta writes reales
+  - `People` ya consume acciones admin reales desde su propia UI
+  - el backend 360 por colaborador siguió creciendo más allá del scope original
 
-Esta `v2` aterriza la People view sobre lo que **si existe hoy**:
-- `greenhouse.team_members`
-- `greenhouse.client_team_assignments`
-- `greenhouse.identity_profile_source_links`
-- `src/lib/team-queries.ts`
-- `src/types/team.ts`
-- backend `HR Payroll` ya operativo
+Brief activo vigente:
+- `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md`
 
 ---
 

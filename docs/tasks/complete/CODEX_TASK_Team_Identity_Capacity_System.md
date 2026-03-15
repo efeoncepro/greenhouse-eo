@@ -1,5 +1,7 @@
 # CODEX TASK — Sistema de Identidad y Capacidad del Equipo
 
+> Estado 2026-03-14: brief histórico/fundacional. La base de identidad del colaborador sí quedó absorbida en el runtime actual, pero la parte de capacidad no debe tratarse como cerrada. La task activa pasa a ser `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md`.
+
 ## Resumen
 
 Implementar el sistema completo de identidad del equipo Efeonce en el portal Greenhouse. Incluye: dos tablas nuevas en BigQuery (`greenhouse.team_members` y `greenhouse.client_team_assignments`), una API route para servir datos de equipo y capacidad, un cambio al pipeline `notion-bq-sync` para incluir el campo Responsable, y 5 vistas/componentes en el portal que consumen esta data.
@@ -18,6 +20,11 @@ Partes que siguen vigentes:
 - `greenhouse.team_members` como ancla del objeto `Collaborator`
 - `greenhouse.client_team_assignments` como relación cliente ↔ colaborador
 - la idea de separar identidad de persona, asignación y señal operativa
+
+Partes que hoy deben leerse como históricas:
+- la implementación greenfield de `team_members` y `client_team_assignments`
+- la idea de que el cierre del sistema dependía solo de `/api/team/*`
+- la noción de que la capacidad ya quedaba resuelta con señales derivadas de Notion
 
 Partes que ya no deben tomarse literalmente si contradicen el runtime actual:
 

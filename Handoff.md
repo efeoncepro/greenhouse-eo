@@ -40,6 +40,106 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-14 23:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar complementos backend de `People v3` y `Team Identity & Capacity v2` para dejar contratos más completos antes del frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/lib/team-capacity/shared.ts`
+- `src/lib/team-queries.ts`
+- `src/types/team.ts`
+- `src/types/people.ts`
+- `src/lib/people/permissions.ts`
+- `src/lib/people/get-people-meta.ts`
+- `src/app/api/people/meta/route.ts`
+- `src/lib/people/get-people-list.ts`
+- `src/lib/people/get-person-detail.ts`
+- `src/lib/people/get-person-finance-overview.ts`
+- `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md`
+- `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `People` quedó con contratos backend más cerrados:
+  - `GET /api/people/meta`
+  - `GET /api/people` ahora devuelve `filters`
+  - `GET /api/people/[memberId]` ahora puede devolver `capacity` y `financeSummary`
+  - `access.visibleTabs` ya contempla `finance` para el contrato futuro del módulo
+- `Team/Capacity` quedó con semántica más explícita:
+  - `GET /api/team/capacity` ahora devuelve `assignedHoursMonth`, `expectedMonthlyThroughput`, `healthBuckets` y `roleBreakdown`
+  - cada member ahora expone `utilizationPercent` y `capacityHealth`
+- Se agregó `src/lib/team-capacity/shared.ts` para centralizar benchmarks, horas/FTE y health states entre `People` y `Team`.
+- Se actualizaron las tasks activas para dejar el handoff backend explícito a frontend.
+
+### Verificacion
+- `pnpm exec eslint` sobre el scope tocado: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- No corrí smoke runtime/manual de `/api/people/*` ni `/api/team/capacity`.
+- `People` ya expone `finance` en permisos backend, pero frontend todavía no tiene ese tab.
+- La semántica de capacity sigue siendo operativa; todavía no reemplaza una futura capa contractual/planning de capacidad más formal.
+
+## 2026-03-14 22:44 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ajustar `Team Identity & Capacity` y `People Unified View v2` contra arquitectura y reclasificarlas a versiones activas coherentes con el runtime real.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación operativa / task governance
+
+### Archivos tocados
+- `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md`
+- `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md`
+- `docs/tasks/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastaron ambas tasks contra arquitectura y runtime actual.
+- Conclusiones:
+  - `People` sí está vivo y alineado como capa read-first del colaborador
+  - `People v2` ya quedó históricamente desfasado porque `Admin Team` hoy sí existe y People ya orquesta acciones admin reales
+  - `Team Identity & Capacity` sí dejó sembrada la base canónica de identidad del colaborador
+  - la parte de capacidad todavía no debe considerarse cerrada como dominio
+- Se reclasificaron las tasks:
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` queda como brief activo para cierre 360 de People
+  - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como brief histórico/fundacional
+  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` queda como brief activo para formalización de team/capacity
+- Se actualizó el board de tasks y la documentación viva asociada.
+
+### Verificacion
+- Revisión manual contra arquitectura + runtime del repo: realizada
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Esta pasada no cambia runtime ni backend; deja gobernanza y alcance correctos para una futura implementación.
+- El siguiente paso natural es contrastar `People v3` y `Team Identity & Capacity v2` contra runtime antes de tocar código para no reabrir silos entre `People`, `Admin Team` y `Capacity`.
+
 ## 2026-03-15 00:12 America/Santiago
 
 ### Agente

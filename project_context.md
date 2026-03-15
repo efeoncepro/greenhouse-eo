@@ -3,6 +3,35 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 People + Team capacity backend complements
+- `People v3` y `Team Identity & Capacity v2` ya no dependen solo de contratos mínimos heredados.
+- Complementos backend activos:
+  - `GET /api/people/meta`
+  - `GET /api/people` ahora también devuelve `filters`
+  - `GET /api/people/[memberId]` ahora puede devolver `capacity` y `financeSummary`
+  - `GET /api/team/capacity` ahora devuelve semántica explícita de capacidad por miembro y por rol
+- Regla operativa derivada:
+  - frontend no debe inferir salud de capacidad desde `FTE` o `activeAssets` si el backend ya devuelve `capacityHealth`
+  - frontend de `People` debe usar `meta`, `capacity` y `financeSummary` como contratos canónicos de lectura 360
+
+## Delta 2026-03-14 Team Identity & People task reclassification
+- `Team Identity & Capacity` y `People Unified View v2` fueron contrastadas explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md` en el caso de `People`
+- Resultado operativo:
+  - `People` sí está alineado con arquitectura y sí existe como módulo real
+  - `People v2` ya debe tratarse como brief histórico porque el runtime avanzó más allá de su contexto original
+  - `Team Identity & Capacity` sí cerró la base canónica de identidad sobre `team_members.member_id`
+  - la parte de capacidad no debe tratarse todavía como cerrada
+- Regla operativa derivada:
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task vigente para cierre 360 del colaborador
+  - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como brief histórico/fundacional
+  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
+
 ## Delta 2026-03-14 Creative Hub task reclassification
 - `Creative Hub` fue contrastado explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`

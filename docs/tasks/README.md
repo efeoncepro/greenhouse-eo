@@ -18,6 +18,8 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Financial_Module_v2.md](in-progress/CODEX_TASK_Financial_Module_v2.md) | Cierre backend/runtime de Finance y handoff para frontend |
 | [CODEX_TASK_HR_Core_Module_v2.md](in-progress/CODEX_TASK_HR_Core_Module_v2.md) | Foundation backend de HR core, permisos, asistencia y estructura org |
 | [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
+| [CODEX_TASK_People_Unified_View_v3.md](in-progress/CODEX_TASK_People_Unified_View_v3.md) | Cierre 360 de People sobre el runtime actual |
+| [CODEX_TASK_Team_Identity_Capacity_System_v2.md](in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | Identidad canónica ya sembrada y formalización pendiente de capacity |
 
 ## To Do
 
@@ -47,9 +49,9 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Login_Page_Greenhouse.md](complete/CODEX_TASK_Login_Page_Greenhouse.md) | UI de login Greenhouse |
 | [CODEX_TASK_Microsoft_SSO_Greenhouse.md](complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
 | [CODEX_TASK_People_Unified_View.md](complete/CODEX_TASK_People_Unified_View.md) | Brief histórico de People reemplazado por v2 |
-| [CODEX_TASK_People_Unified_View_v2.md](complete/CODEX_TASK_People_Unified_View_v2.md) | Vista unificada de personas |
+| [CODEX_TASK_People_Unified_View_v2.md](complete/CODEX_TASK_People_Unified_View_v2.md) | Brief histórico de People reemplazado por v3 |
 | [CODEX_TASK_Space_Admin_View_Redesign.md](complete/CODEX_TASK_Space_Admin_View_Redesign.md) | Brief histórico de vista admin de space |
-| [CODEX_TASK_Team_Identity_Capacity_System.md](complete/CODEX_TASK_Team_Identity_Capacity_System.md) | Sistema de identidad y capacidad |
+| [CODEX_TASK_Team_Identity_Capacity_System.md](complete/CODEX_TASK_Team_Identity_Capacity_System.md) | Brief histórico de Team Identity & Capacity reemplazado por v2 |
 | [CODEX_TASK_Tenant_Detail_View_Redesign.md](complete/CODEX_TASK_Tenant_Detail_View_Redesign.md) | Detalle admin de tenant |
 
 ## Regla operativa

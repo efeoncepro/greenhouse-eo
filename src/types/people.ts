@@ -1,7 +1,7 @@
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
-import type { TeamMemberProfile } from '@/types/team'
+import type { TeamCapacityHealth, TeamMemberProfile, TeamRoleCategory } from '@/types/team'
 
-export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll'
+export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll' | 'finance'
 
 export interface PersonListItem {
   memberId: string
@@ -26,6 +26,20 @@ export interface PeopleListPayload {
     coveredClients: number
     chileCount: number
     internationalCount: number
+  }
+  filters: {
+    roleCategories: Array<{
+      roleCategory: TeamRoleCategory
+      count: number
+    }>
+    countries: Array<{
+      countryCode: string
+      count: number
+    }>
+    payRegimes: Array<{
+      payRegime: 'chile' | 'international' | 'unknown'
+      count: number
+    }>
   }
 }
 
@@ -86,6 +100,7 @@ export interface PersonAccess {
   canViewActivity: boolean
   canViewCompensation: boolean
   canViewPayroll: boolean
+  canViewFinance: boolean
   visibleTabs: PersonTab[]
 }
 
@@ -95,11 +110,101 @@ export interface PersonSummary {
   totalHoursMonth: number
 }
 
+export interface PersonCapacitySummary {
+  assignedHoursMonth: number
+  activeAssets: number
+  completedAssets: number
+  projectCount: number
+  expectedMonthlyThroughput: number
+  utilizationPercent: number
+  capacityHealth: TeamCapacityHealth
+}
+
+export interface PersonFinanceSummary {
+  activeAssignmentsCount: number
+  payrollEntriesCount: number
+  expenseCount: number
+  paidExpensesCount: number
+  totalExpensesClp: number
+  lastExpenseDate: string | null
+}
+
+export interface PersonFinanceOverview {
+  member: {
+    memberId: string
+    displayName: string | null
+    identityProfileId: string | null
+  }
+  summary: PersonFinanceSummary
+  assignments: Array<{
+    assignmentId: string
+    clientId: string
+    clientName: string
+    fteAllocation: number
+    hoursPerMonth: number
+    roleTitleOverride: string | null
+    startDate: string | null
+    endDate: string | null
+    active: boolean
+  }>
+  identities: Array<{
+    sourceSystem: string | null
+    sourceObjectId: string | null
+    sourceUserId: string | null
+    sourceEmail: string | null
+    sourceDisplayName: string | null
+  }>
+  payrollHistory: Array<{
+    entryId: string
+    periodId: string
+    year: number
+    month: number
+    status: string | null
+    currency: string | null
+    grossTotal: number
+    netTotal: number
+    createdAt: string | null
+  }>
+  expenses: Array<{
+    expenseId: string
+    clientId: string | null
+    clientName: string | null
+    expenseType: string
+    description: string
+    currency: string
+    totalAmount: number
+    totalAmountClp: number
+    paymentStatus: string
+    paymentDate: string | null
+    documentDate: string | null
+    supplierName: string | null
+    serviceLine: string | null
+    payrollEntryId: string | null
+    createdAt: string | null
+  }>
+}
+
+export interface PeopleMetaPayload {
+  canManageTeam: boolean
+  visibleTabs: PersonTab[]
+  supportedTabs: PersonTab[]
+  availableEnrichments: {
+    activity: boolean
+    compensation: boolean
+    payroll: boolean
+    finance: boolean
+    capacity: boolean
+  }
+  allowedRoleCodes: string[]
+}
+
 export interface PersonDetail {
   member: PersonDetailMember
   access: PersonAccess
   summary: PersonSummary
   integrations: PersonIntegrations
+  capacity?: PersonCapacitySummary | null
+  financeSummary?: PersonFinanceSummary | null
   assignments?: PersonDetailAssignment[]
   operationalMetrics?: PersonOperationalMetrics | null
   currentCompensation?: CompensationVersion | null

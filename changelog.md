@@ -6,6 +6,35 @@
 
 ## 2026-03-14
 
+### People and team capacity backend complements
+- `People v3` y `Team Identity & Capacity v2` recibieron complementos backend para dejar contratos más estables antes del frontend.
+- `GET /api/people/meta` ahora expone:
+  - `visibleTabs`
+  - `supportedTabs`
+  - `availableEnrichments`
+  - `canManageTeam`
+- `GET /api/people` ahora también devuelve `filters` para `roleCategories`, `countries` y `payRegimes`.
+- `GET /api/people/[memberId]` ahora puede devolver:
+  - `capacity`
+  - `financeSummary`
+- `GET /api/team/capacity` ahora devuelve semántica explícita de capacidad:
+  - por miembro: `assignedHoursMonth`, `expectedMonthlyThroughput`, `utilizationPercent`, `capacityHealth`
+  - por payload: `healthBuckets` y `roleBreakdown`
+- Se agregó `src/lib/team-capacity/shared.ts` para centralizar benchmarks y reglas server-side de salud de capacity.
+
+### Team Identity and People task reclassification
+- `Team Identity & Capacity` y `People Unified View v2` fueron contrastadas explícitamente contra arquitectura y runtime actual.
+- Resultado:
+  - `People` sí está implementado y alineado como capa read-first del colaborador
+  - `People v2` quedó como brief histórico porque el runtime ya avanzó más allá de su contexto original
+  - `Team Identity & Capacity` sí dejó cerrada la base canónica de identidad, pero no debe tratarse como task completa en capacity
+- Se reclasificaron las tasks:
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como referencia histórica
+  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task activa para cierre 360 del colaborador
+  - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como referencia histórica/fundacional
+  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task activa para formalización de capacity
+  - `docs/tasks/README.md`, `project_context.md` y `Handoff.md` quedaron alineados con este cambio
+
 ### Creative Hub backend runtime closure
 - `Creative Hub v2` dejó de depender solo del snapshot agregado de `Capabilities` y ahora tiene una capa backend específica para cierre real del módulo.
 - Se endureció la activación runtime:

@@ -74,6 +74,17 @@ export interface TeamCapacityProjectBreakdown {
   activeCount: number
 }
 
+export type TeamCapacityHealth = 'idle' | 'balanced' | 'high' | 'overloaded'
+
+export interface TeamCapacityRoleSummary {
+  roleCategory: TeamRoleCategory
+  memberCount: number
+  totalFte: number
+  assignedHoursMonth: number
+  activeAssets: number
+  utilizationPercent: number
+}
+
 export interface TeamCapacityMember extends TeamIdentitySummary {
   memberId: string
   displayName: string
@@ -81,6 +92,10 @@ export interface TeamCapacityMember extends TeamIdentitySummary {
   roleTitle: string
   roleCategory: TeamRoleCategory
   fteAllocation: number
+  assignedHoursMonth: number
+  expectedMonthlyThroughput: number
+  utilizationPercent: number
+  capacityHealth: TeamCapacityHealth
   activeAssets: number
   completedAssets: number
   avgRpa: number | null
@@ -92,11 +107,22 @@ export interface TeamCapacityPayload {
   summary: {
     totalFte: number
     totalHoursMonth: number
+    assignedHoursMonth: number
     utilizedHoursMonth: number
     utilizationPercent: number
     memberCount: number
+    activeAssets: number
+    completedAssets: number
+    expectedMonthlyThroughput: number
+    healthBuckets: {
+      idleMembers: number
+      balancedMembers: number
+      highLoadMembers: number
+      overloadedMembers: number
+    }
   }
   members: TeamCapacityMember[]
+  roleBreakdown: TeamCapacityRoleSummary[]
   period: string
   source: TeamDataSource
   hasOperationalMetrics: boolean
