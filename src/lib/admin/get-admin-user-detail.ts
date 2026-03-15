@@ -2,6 +2,7 @@ import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { buildTenantPublicId, buildUserPublicId } from '@/lib/ids/greenhouse-ids'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface AdminUserProjectScope {
   projectId: string
@@ -20,6 +21,7 @@ export interface AdminUserDetail {
   publicUserId: string
   identityProfileId: string | null
   identityPublicId: string | null
+  linkedMemberId: string | null
   fullName: string
   email: string
   avatarUrl: string | null
@@ -185,11 +187,29 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
     return null
   }
 
+  const identityProfileId = row.identity_profile_id ? String(row.identity_profile_id) : null
+
+  let linkedMemberId: string | null = null
+
+  if (identityProfileId && isGreenhousePostgresConfigured()) {
+    try {
+      const memberRows = await runGreenhousePostgresQuery<{ member_id: string }>(
+        `SELECT member_id FROM greenhouse_core.members WHERE identity_profile_id = $1 LIMIT 1`,
+        [identityProfileId]
+      )
+
+      linkedMemberId = memberRows[0]?.member_id ?? null
+    } catch {
+      // Postgres unavailable — leave linkedMemberId as null
+    }
+  }
+
   return {
     userId: String(row.user_id || ''),
     publicUserId: buildUserPublicId({ userId: String(row.user_id || '') }),
-    identityProfileId: row.identity_profile_id ? String(row.identity_profile_id) : null,
+    identityProfileId,
     identityPublicId: row.identity_public_id ? String(row.identity_public_id) : null,
+    linkedMemberId,
     fullName: String(row.full_name || 'Sin nombre'),
     email: String(row.email || ''),
     avatarUrl: row.avatar_url ? String(row.avatar_url) : null,

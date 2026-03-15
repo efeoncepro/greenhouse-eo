@@ -203,6 +203,7 @@ export interface PersonDetail {
   access: PersonAccess
   summary: PersonSummary
   integrations: PersonIntegrations
+  linkedUserId?: string | null
   capacity?: PersonCapacitySummary | null
   financeSummary?: PersonFinanceSummary | null
   assignments?: PersonDetailAssignment[]

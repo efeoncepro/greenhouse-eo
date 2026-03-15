@@ -752,6 +752,10 @@ export const GH_INTERNAL_MESSAGES = {
   admin_user_detail_commercial_readiness: 'Preparacion comercial',
   admin_user_detail_commercial_readiness_value: (hasContact: boolean) => hasContact ? '65%' : '35%',
 
+  // Cross-links Person 360
+  admin_user_detail_link_people: 'Ver perfil operativo',
+  people_detail_link_admin: 'Ver acceso y permisos',
+
   admin_tenant_preview_title: 'Ver como cliente',
   admin_tenant_preview_subtitle: (clientName: string) =>
     `Estas viendo el dashboard del space cliente ${clientName} desde tu sesion de administrador.`,

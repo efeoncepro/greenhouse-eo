@@ -4,6 +4,7 @@ import type { CompensationVersion } from '@/types/payroll'
 import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMember, PersonIntegrations } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
 import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
 import { getPersonOperationalMetrics } from '@/lib/people/get-person-operational-metrics'
@@ -404,6 +405,21 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null) =
   )
 }
 
+const resolveLinkedUserId = async (identityProfileId: string | null): Promise<string | null> => {
+  if (!identityProfileId || !isGreenhousePostgresConfigured()) return null
+
+  try {
+    const rows = await runGreenhousePostgresQuery<{ user_id: string }>(
+      `SELECT user_id FROM greenhouse_core.client_users WHERE identity_profile_id = $1 AND active LIMIT 1`,
+      [identityProfileId]
+    )
+
+    return rows[0]?.user_id ?? null
+  } catch {
+    return null
+  }
+}
+
 export const getPersonDetail = async ({
   memberId,
   access
@@ -455,6 +471,12 @@ export const getPersonDetail = async ({
   }
 
   const tasks: Array<Promise<void>> = []
+
+  tasks.push(
+    resolveLinkedUserId(member.identityProfileId).then(userId => {
+      detail.linkedUserId = userId
+    })
+  )
 
   tasks.push(
     getAssignmentsByMember(memberId).then(rows => {

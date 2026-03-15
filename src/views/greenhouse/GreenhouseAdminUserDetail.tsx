@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -97,6 +100,17 @@ const TabProfile = ({ data }: Props) => {
                 <InfoRow icon='tabler-fingerprint' label={GH_INTERNAL_MESSAGES.admin_user_detail_label_identity_id} value={data.identityPublicId} />
               )}
             </div>
+            {data.linkedMemberId && (
+              <Button
+                component={Link}
+                href={`/people/${data.linkedMemberId}`}
+                variant='tonal'
+                size='small'
+                startIcon={<i className='tabler-user' />}
+              >
+                {GH_INTERNAL_MESSAGES.admin_user_detail_link_people}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </Grid>

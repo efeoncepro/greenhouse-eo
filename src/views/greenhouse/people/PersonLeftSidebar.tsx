@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -8,6 +10,7 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 
+import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 
 import type { PersonDetail } from '@/types/people'
@@ -105,6 +108,25 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Pro
           ]}
         />
       </CardContent>
+
+      {detail.linkedUserId && (
+        <>
+          <Divider />
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography variant='overline' color='text.secondary'>Portal</Typography>
+            <Button
+              component={Link}
+              href={`/admin/users/${detail.linkedUserId}`}
+              variant='tonal'
+              size='small'
+              startIcon={<i className='tabler-shield-check' />}
+              fullWidth
+            >
+              {GH_INTERNAL_MESSAGES.people_detail_link_admin}
+            </Button>
+          </CardContent>
+        </>
+      )}
 
       {isAdmin && (
         <>
