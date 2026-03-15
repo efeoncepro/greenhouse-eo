@@ -1,5 +1,5 @@
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
-import type { TeamCapacityHealth, TeamMemberProfile, TeamRoleCategory } from '@/types/team'
+import type { TeamCapacityHealth, TeamMemberProfile } from '@/types/team'
 
 export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll' | 'finance'
 
@@ -29,7 +29,7 @@ export interface PeopleListPayload {
   }
   filters: {
     roleCategories: Array<{
-      roleCategory: TeamRoleCategory
+      roleCategory: string
       count: number
     }>
     countries: Array<{
