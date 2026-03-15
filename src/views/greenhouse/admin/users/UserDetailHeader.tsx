@@ -32,7 +32,7 @@ const UserDetailHeader = ({ data }: Props) => {
           opacity: 0.85
         }}
       />
-      <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row !pt-0 md:justify-start'>
+      <CardContent className='flex flex-col items-center justify-center gap-5 !pt-0 md:flex-row md:items-end md:justify-start'>
         <div className='flex rounded-bs-md mbs-[-40px] border-[5px] mis-[-5px] border-be-0 border-backgroundPaper bg-backgroundPaper'>
           <IdentityImageUploader
             alt={data.fullName}
@@ -52,15 +52,17 @@ const UserDetailHeader = ({ data }: Props) => {
             color={tenantTone(data.tenantType)}
           />
         </div>
-        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end'>
-          <div className='flex flex-col items-center sm:items-start gap-2'>
-            <div className='flex items-center gap-3'>
-              <Typography variant='h4'>{data.fullName}</Typography>
+        <div className='flex min-w-0 flex-1 self-end flex-col items-center justify-start gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-0'>
+          <div className='flex min-w-0 flex-col items-center gap-2 sm:items-start'>
+            <div className='flex min-w-0 flex-wrap items-center justify-center gap-3 sm:justify-start'>
+              <Typography variant='h4' sx={{ wordBreak: 'break-word' }}>
+                {data.fullName}
+              </Typography>
               {data.eoId && (
                 <Chip size='small' variant='outlined' color='primary' label={data.eoId} sx={{ fontFamily: 'monospace', fontWeight: 700 }} />
               )}
             </div>
-            <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
+            <div className='flex flex-wrap justify-center gap-6 sm:justify-normal'>
               <div className='flex items-center gap-2'>
                 <i className='tabler-briefcase' />
                 <Typography className='font-medium'>
@@ -88,7 +90,7 @@ const UserDetailHeader = ({ data }: Props) => {
               <Chip size='small' variant='outlined' label={toTitleCase(data.authMode)} />
             </div>
           </div>
-          <div className='flex gap-3'>
+          <div className='flex flex-wrap justify-center gap-3 sm:justify-end'>
             <Button variant='contained' className='flex gap-2' startIcon={<i className='tabler-mail-forward' />}>
               {GH_INTERNAL_MESSAGES.admin_user_detail_resend_onboarding}
             </Button>
