@@ -93,6 +93,49 @@ Campos mínimos sugeridos:
   - `space_ids`
   - `project_ids`
 
+### Delta 2026-03-15 — auditoría real y primer serving materializado
+
+- Ya existe el primer serving real:
+  - `greenhouse_serving.person_360`
+- La vista quedó materializada sobre:
+  - `greenhouse_core.identity_profiles`
+  - `greenhouse_core.members`
+  - `greenhouse_core.client_users`
+  - `greenhouse_crm.contacts`
+- También quedó creado el comando reusable:
+  - `pnpm audit:person-360`
+
+Resultado validado en Cloud SQL:
+- cobertura base:
+  - `members_total = 7`
+  - `members_linked = 7`
+  - `users_total = 39`
+  - `users_linked = 37`
+  - `users_with_member = 7`
+  - `internal_users_total = 8`
+  - `internal_users_with_member = 7`
+  - `contacts_total = 63`
+  - `contacts_linked_profile = 29`
+  - `contacts_linked_user = 29`
+  - `profiles_total = 38`
+- cobertura por facetas:
+  - `profiles_with_member = 7`
+  - `profiles_with_user = 37`
+  - `profiles_with_contact = 29`
+  - `profiles_with_member_and_user = 7`
+  - `profiles_with_user_and_contact = 29`
+  - `profiles_with_all_three = 0`
+  - `profiles_without_any_facet = 1`
+- gaps principales:
+  - `users_without_profile = 2`
+  - `contacts_without_profile = 34`
+  - `internal_users_without_member = 1`
+
+Lectura operativa:
+- el backbone de `Person 360` ya existe y ya sirve perfiles unificados con facetas
+- el mayor gap real no está en `People` ni `Users`, sino en reconciliación de `CRM Contact -> identity_profile`
+- el siguiente trabajo crítico no es crear otra vista, sino subir la cobertura de perfil para contactos y cerrar el único usuario interno sin relación laboral explícita
+
 ## Fases recomendadas
 
 ### Fase 1 — auditoría y reconciliación
@@ -107,11 +150,22 @@ Campos mínimos sugeridos:
   - members sin profile
   - contactos con match ambiguo
 
+Estado:
+- completada parcialmente
+- la auditoría base ya existe y puede rerunearse con `pnpm audit:person-360`
+
 ### Fase 2 — serving
 
 - crear `person_360`
 - dejar `People` y `Users` consumiendo el mismo backbone
 - exponer facetas en vez de duplicar payloads incompatibles
+
+Estado:
+- `greenhouse_serving.person_360` ya existe como primer serving base
+- pendiente:
+  - integrar `route_groups` / `role_codes` cuando Identity V2 quede completamente materializado
+  - integrar participación operacional (`spaces`, `projects`)
+  - cortar consumers de `People` y `Users`
 
 ### Fase 3 — UX
 

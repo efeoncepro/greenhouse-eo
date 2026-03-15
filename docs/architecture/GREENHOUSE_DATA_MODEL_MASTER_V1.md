@@ -231,6 +231,7 @@ Read-only serving views.
 
 Current views:
 - `client_360`
+- `person_360`
 - `space_360`
 - `member_360`
 - `provider_360`

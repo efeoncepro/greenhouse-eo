@@ -26,6 +26,22 @@
 
 ## 2026-03-15
 
+### Person 360 serving baseline materialized in PostgreSQL
+- Se creó `greenhouse_serving.person_360` como primera vista unificada de persona sobre `identity_profiles`, `members`, `client_users` y `crm_contacts`.
+- Se agregó el comando `pnpm audit:person-360` para medir cobertura real de unificación entre facetas.
+- Estado validado:
+  - `profiles_total = 38`
+  - `profiles_with_member = 7`
+  - `profiles_with_user = 37`
+  - `profiles_with_contact = 29`
+  - `profiles_with_member_and_user = 7`
+  - `profiles_with_user_and_contact = 29`
+  - `profiles_with_all_three = 0`
+- Principales gaps detectados:
+  - `users_without_profile = 2`
+  - `contacts_without_profile = 34`
+  - `internal_users_without_member = 1`
+
 ### Person 360 formalized as the canonical human profile strategy
 - Se fijó en arquitectura que Greenhouse debe tratar `identity_profile` como ancla canónica de persona.
 - `member`, `client_user` y `crm_contact` quedan formalizados como facetas del mismo perfil, no como raíces paralelas.

@@ -3,6 +3,31 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Person 360 audit and serving baseline materialized
+- Se materializó `greenhouse_serving.person_360` en Cloud SQL como primer serving unificado de persona sobre:
+  - `greenhouse_core.identity_profiles`
+  - `greenhouse_core.members`
+  - `greenhouse_core.client_users`
+  - `greenhouse_crm.contacts`
+- También se agregó el comando:
+  - `pnpm audit:person-360`
+- Estado validado:
+  - `profiles_total = 38`
+  - `profiles_with_member = 7`
+  - `profiles_with_user = 37`
+  - `profiles_with_contact = 29`
+  - `profiles_with_member_and_user = 7`
+  - `profiles_with_user_and_contact = 29`
+  - `profiles_with_all_three = 0`
+  - `profiles_without_any_facet = 1`
+- Gaps reales identificados:
+  - `users_without_profile = 2`
+  - `contacts_without_profile = 34`
+  - `internal_users_without_member = 1`
+- Conclusión operativa:
+  - el principal bloqueo de `Person 360` ya no es de arquitectura sino de reconciliación CRM/contactos
+  - `People` y `Users` ya tienen un backbone real al cual migrar, pero todavía no lo consumen
+
 ## Delta 2026-03-15 Person 360 formalized as canonical profile strategy
 - Se fijó explícitamente que Greenhouse no debe seguir tratando `People`, `Users`, `CRM Contact` y `Member` como identidades distintas.
 - Decisión de arquitectura:

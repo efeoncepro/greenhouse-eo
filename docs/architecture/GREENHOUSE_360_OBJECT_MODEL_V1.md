@@ -436,12 +436,12 @@ Already in place:
 - identity profile strategy
 - collaborator anchor in `team_members`
 - user anchor in `client_users`
+- `greenhouse_serving.person_360` as first unified serving layer over profile, member, user and CRM contact facets
 - people read models
 - payroll read models
 - finance collaborator overview endpoint
 
 Still needed:
-- explicit `Person 360` runtime view or serving layer
 - reconciliation of `People` and `Users` over `identity_profile_id`
 - CRM contact facet fully unified into the same profile view
 - future richer cross-module skill, tooling, and output history

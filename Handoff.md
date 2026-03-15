@@ -40,6 +40,76 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 13:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar la fase 1 real de `Person 360`: auditar cobertura de identidad y materializar el primer serving `person_360` en PostgreSQL.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Cloud SQL / arquitectura de datos / serving runtime
+
+### Archivos tocados
+- `scripts/audit-person-360-coverage.ts`
+- `scripts/setup-postgres-person-360-serving.sql`
+- `scripts/setup-postgres-person-360-serving.ts`
+- `package.json`
+- `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se creó `greenhouse_serving.person_360` como primer serving unificado de persona sobre:
+  - `identity_profiles`
+  - `members`
+  - `client_users`
+  - `crm_contacts`
+- Se agregó el script reusable:
+  - `pnpm audit:person-360`
+- Auditoría validada en Cloud SQL:
+  - `members_total = 7`, `members_linked = 7`
+  - `users_total = 39`, `users_linked = 37`
+  - `contacts_total = 63`, `contacts_linked_profile = 29`
+  - `profiles_total = 38`
+  - `profiles_with_member = 7`
+  - `profiles_with_user = 37`
+  - `profiles_with_contact = 29`
+  - `profiles_with_member_and_user = 7`
+  - `profiles_with_user_and_contact = 29`
+  - `profiles_with_all_three = 0`
+- Gaps relevantes:
+  - `users_without_profile = 2`
+  - `contacts_without_profile = 34`
+  - `internal_users_without_member = 1`
+  - `profiles_without_any_facet = 1`
+
+### Verificación
+- `pnpm exec eslint scripts/audit-person-360-coverage.ts scripts/setup-postgres-person-360-serving.ts`
+  - correcto
+- `pnpm setup:postgres:person-360`
+  - correcto
+- `pnpm audit:person-360`
+  - correcto
+- query directa sobre `greenhouse_serving.person_360`
+  - correcta
+
+### Riesgos o pendientes
+- `person_360` ya existe, pero `People` y `Users` aún no consumen esta vista.
+- El gap más grande quedó en `CRM Contact -> identity_profile`; ahí está la principal deuda de unificación.
+- `client_users.member_id` todavía no existe materializado en Cloud SQL; hoy la reconciliación se sigue resolviendo por `identity_profile_id`.
+- Próximo paso recomendado:
+  - priorizar reconciliación de `crm_contacts` sin perfil
+  - luego cortar `People` y `Users` a `greenhouse_serving.person_360`
+
 ## 2026-03-15 13:05 America/Santiago
 
 ### Agente
