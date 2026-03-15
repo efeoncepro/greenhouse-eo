@@ -102,6 +102,17 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const handleCountryChange = (value: string) => {
+    setCountry(value)
+    setIsInternational(value !== 'CL')
+
+    if (value !== 'CL' && !paymentCurrency) {
+      setPaymentCurrency('USD')
+    } else if (value === 'CL' && paymentCurrency === 'USD') {
+      setPaymentCurrency('CLP')
+    }
+  }
+
   const resetForm = () => {
     setLegalName('')
     setCategory('')
@@ -227,13 +238,18 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
+              select
               fullWidth
               size='small'
               label='País'
               value={country}
-              onChange={e => setCountry(e.target.value)}
+              onChange={e => handleCountryChange(e.target.value)}
               required
-            />
+            >
+              {COUNTRIES.map(c => (
+                <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+              ))}
+            </CustomTextField>
           </Grid>
         </Grid>
 
@@ -265,12 +281,18 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
         </Grid>
 
         <CustomTextField
+          select
           fullWidth
           size='small'
           label='Tipo de servicio'
           value={serviceType}
           onChange={e => setServiceType(e.target.value)}
-        />
+        >
+          <MenuItem value=''>—</MenuItem>
+          {SERVICE_TYPES.map(t => (
+            <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
+          ))}
+        </CustomTextField>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
