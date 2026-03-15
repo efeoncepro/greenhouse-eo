@@ -223,10 +223,13 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
         )
         SELECT
           tp.project_id,
-          COALESCE(p.nombre_del_proyecto, tp.project_id) AS project_name,
+          COALESCE(dp.project_name, p.nombre_del_proyecto, tp.project_id) AS project_name,
           p.page_url,
           COUNT(DISTINCT cu.user_id) AS assigned_users
         FROM tenant_project_ids AS tp
+        LEFT JOIN \`${projectId}.greenhouse_conformed.delivery_projects\` AS dp
+          ON dp.project_source_id = tp.project_id
+         AND dp.is_deleted = FALSE
         LEFT JOIN \`${projectId}.notion_ops.proyectos\` AS p
           ON p.notion_page_id = tp.project_id
         LEFT JOIN \`${projectId}.greenhouse.user_project_scopes\` AS ups

@@ -35,6 +35,10 @@
 - Se mantuvo fallback a `hubspot_crm.companies` y `hubspot_crm.deals` cuando la proyección todavía no alcanzó el evento live.
 - Esto evita romper el flujo donde HubSpot promociona una empresa a cliente y Greenhouse la crea en tiempo real antes de que corra el sync.
 
+### Admin project scope naming now prefers delivery projections
+- `Admin > tenant detail` y `Admin > user detail` ya priorizan `greenhouse_conformed.delivery_projects.project_name` para resolver nombres de proyecto en scopes.
+- `notion_ops.proyectos` queda temporalmente como fallback y para `page_url`, mientras ese campo no viva en la proyección canónica.
+
 ### HubSpot contacts + owners now project into the canonical runtime graph
 - `Source Sync Runtime Projections` ya materializa:
   - `greenhouse_conformed.crm_contacts`

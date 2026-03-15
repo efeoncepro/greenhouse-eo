@@ -20,6 +20,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no cortar consumers a sync-only cuando el dominio todavía depende de provisioning live
   - el patrón correcto de transición es `canonical first, live fallback`, no `raw only` ni `projection only`
 
+## Delta 2026-03-15 Admin project scope consumers now prefer delivery projections
+- `Admin > tenant detail` y `Admin > user detail` ya no dependen solo de `notion_ops.proyectos` para resolver nombres de proyecto en scopes.
+- Los consumers:
+  - `src/lib/admin/get-admin-tenant-detail.ts`
+  - `src/lib/admin/get-admin-user-detail.ts`
+  ahora priorizan `greenhouse_conformed.delivery_projects.project_name`.
+- `notion_ops.proyectos` queda temporalmente solo como fallback y para `page_url`, porque ese campo todavía no vive en `delivery_projects`.
+- Regla derivada:
+  - cuando la proyección canónica ya resuelve el nombre operativo, usarla primero
+  - mantener source fallback solo para campos que aún no se materializan en el projection
+
 ## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
 - `Source Sync Runtime Projections` ya materializa contactos CRM en:
   - `greenhouse_conformed.crm_contacts`

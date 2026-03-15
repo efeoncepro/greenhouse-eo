@@ -92,6 +92,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Próximo paso recomendado:
   - seguir con consumers legacy que aún leen `hubspot_crm` / `notion_ops`, empezando por los de menor riesgo y mayor beneficio.
 
+## 2026-03-15 09:32 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Seguir el corte de consumers legacy con un slice pequeño en Admin usando delivery projections.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `src/lib/admin/get-admin-tenant-detail.ts`
+- `src/lib/admin/get-admin-user-detail.ts`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `Admin > tenant detail` y `Admin > user detail` ya priorizan `greenhouse_conformed.delivery_projects.project_name` para nombres de proyecto en scopes.
+- `notion_ops.proyectos` queda:
+  - como fallback para nombre si aún no existe proyección
+  - como fuente temporal de `page_url`
+- Esto reduce dependencia directa a `notion_ops` sin arriesgar regresión visible, porque `page_url` todavía no se proyecta en `delivery_projects`.
+
+### Verificación
+- `pnpm exec eslint src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-tenant-detail.ts`
+  - correcto
+- `git diff --check -- src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-tenant-detail.ts`
+  - correcto
+
+### Riesgos o pendientes
+- `page_url` sigue colgando de `notion_ops.proyectos`; si queremos eliminar completamente ese consumer, hay que proyectar ese campo en `delivery_projects`.
+- Próximo paso recomendado:
+  - seguir con consumers legacy que leen `notion_ops.tareas` o `notion_ops.proyectos`, empezando por `projects`, `dashboard` o `admin` según riesgo.
+
 ## 2026-03-16 ~02:00 America/Santiago
 
 ### Agente

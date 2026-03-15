@@ -151,9 +151,12 @@ export const getAdminUserDetail = async (userId: string): Promise<AdminUserDetai
         SELECT
           ups.project_id,
           ups.access_level,
-          COALESCE(p.nombre_del_proyecto, ups.project_id) AS project_name,
+          COALESCE(dp.project_name, p.nombre_del_proyecto, ups.project_id) AS project_name,
           p.page_url
         FROM \`${projectId}.greenhouse.user_project_scopes\` AS ups
+        LEFT JOIN \`${projectId}.greenhouse_conformed.delivery_projects\` AS dp
+          ON dp.project_source_id = ups.project_id
+         AND dp.is_deleted = FALSE
         LEFT JOIN \`${projectId}.notion_ops.proyectos\` AS p
           ON p.notion_page_id = ups.project_id
         WHERE ups.user_id = @userId
