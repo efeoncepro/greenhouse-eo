@@ -1,32 +1,41 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { HrCoreValidationError } from '@/lib/hr-core/shared'
 
 let ensureHrCoreInfrastructurePromise: Promise<void> | null = null
+let hrCoreInfrastructureReadyPromise: Promise<void> | null = null
+let hrCoreInfrastructureReadyAt = 0
 
-const buildStatements = (projectId: string) => [
+const HR_CORE_READY_TTL_MS = 60_000
+
+export const HR_CORE_REQUIRED_TABLES = [
+  'departments',
+  'member_profiles',
+  'leave_types',
+  'leave_balances',
+  'leave_requests',
+  'leave_request_actions',
+  'attendance_daily'
+] as const
+
+export const HR_CORE_REQUIRED_TEAM_MEMBER_COLUMNS = [
+  'department_id',
+  'reports_to',
+  'job_level',
+  'hire_date',
+  'contract_end_date',
+  'daily_required'
+] as const
+
+export const buildHrCoreBootstrapStatements = (projectId: string) => [
   `
     ALTER TABLE \`${projectId}.greenhouse.team_members\`
-    ADD COLUMN IF NOT EXISTS department_id STRING
-  `,
-  `
-    ALTER TABLE \`${projectId}.greenhouse.team_members\`
-    ADD COLUMN IF NOT EXISTS reports_to STRING
-  `,
-  `
-    ALTER TABLE \`${projectId}.greenhouse.team_members\`
-    ADD COLUMN IF NOT EXISTS job_level STRING
-  `,
-  `
-    ALTER TABLE \`${projectId}.greenhouse.team_members\`
-    ADD COLUMN IF NOT EXISTS hire_date DATE
-  `,
-  `
-    ALTER TABLE \`${projectId}.greenhouse.team_members\`
-    ADD COLUMN IF NOT EXISTS contract_end_date DATE
-  `,
-  `
-    ALTER TABLE \`${projectId}.greenhouse.team_members\`
+    ADD COLUMN IF NOT EXISTS department_id STRING,
+    ADD COLUMN IF NOT EXISTS reports_to STRING,
+    ADD COLUMN IF NOT EXISTS job_level STRING,
+    ADD COLUMN IF NOT EXISTS hire_date DATE,
+    ADD COLUMN IF NOT EXISTS contract_end_date DATE,
     ADD COLUMN IF NOT EXISTS daily_required BOOL
   `,
   `
@@ -253,6 +262,45 @@ const buildStatements = (projectId: string) => [
   `
 ]
 
+const getExistingHrCoreTables = async (projectId: string) => {
+  const [rows] = await getBigQueryClient().query({
+    query: `
+      SELECT table_name
+      FROM \`${projectId}.greenhouse.INFORMATION_SCHEMA.TABLES\`
+      WHERE table_name IN UNNEST(@tableNames)
+    `,
+    params: { tableNames: [...HR_CORE_REQUIRED_TABLES] }
+  })
+
+  return new Set((rows as Array<{ table_name: string }>).map(row => row.table_name))
+}
+
+const getExistingTeamMemberColumns = async (projectId: string) => {
+  const [rows] = await getBigQueryClient().query({
+    query: `
+      SELECT column_name
+      FROM \`${projectId}.greenhouse.INFORMATION_SCHEMA.COLUMNS\`
+      WHERE table_name = 'team_members'
+        AND column_name IN UNNEST(@columnNames)
+    `,
+    params: { columnNames: [...HR_CORE_REQUIRED_TEAM_MEMBER_COLUMNS] }
+  })
+
+  return new Set((rows as Array<{ column_name: string }>).map(row => row.column_name))
+}
+
+const getHrCoreInfrastructureMissingState = async (projectId: string) => {
+  const [existingTables, existingColumns] = await Promise.all([
+    getExistingHrCoreTables(projectId),
+    getExistingTeamMemberColumns(projectId)
+  ])
+
+  return {
+    missingTables: HR_CORE_REQUIRED_TABLES.filter(tableName => !existingTables.has(tableName)),
+    missingColumns: HR_CORE_REQUIRED_TEAM_MEMBER_COLUMNS.filter(columnName => !existingColumns.has(columnName))
+  }
+}
+
 export const ensureHrCoreInfrastructure = async () => {
   if (ensureHrCoreInfrastructurePromise) {
     return ensureHrCoreInfrastructurePromise
@@ -262,13 +310,52 @@ export const ensureHrCoreInfrastructure = async () => {
   const bigQuery = getBigQueryClient()
 
   ensureHrCoreInfrastructurePromise = (async () => {
-    for (const query of buildStatements(projectId)) {
+    for (const query of buildHrCoreBootstrapStatements(projectId)) {
       await bigQuery.query({ query })
     }
+
+    hrCoreInfrastructureReadyAt = Date.now()
   })().catch(error => {
     ensureHrCoreInfrastructurePromise = null
     throw error
   })
 
   return ensureHrCoreInfrastructurePromise
+}
+
+export const assertHrCoreInfrastructureReady = async () => {
+  if (Date.now() - hrCoreInfrastructureReadyAt < HR_CORE_READY_TTL_MS) {
+    return
+  }
+
+  if (hrCoreInfrastructureReadyPromise) {
+    return hrCoreInfrastructureReadyPromise
+  }
+
+  const projectId = getBigQueryProjectId()
+
+  hrCoreInfrastructureReadyPromise = (async () => {
+    const { missingTables, missingColumns } = await getHrCoreInfrastructureMissingState(projectId)
+
+    if (missingTables.length > 0 || missingColumns.length > 0) {
+      throw new HrCoreValidationError(
+        'HR Core schema is not ready in this environment. Run the HR Core bootstrap before using this module.',
+        503,
+        {
+          missingTables,
+          missingColumns
+        },
+        'HR_CORE_SCHEMA_NOT_READY'
+      )
+    }
+
+    hrCoreInfrastructureReadyAt = Date.now()
+  })().catch(error => {
+    hrCoreInfrastructureReadyPromise = null
+    throw error
+  })
+
+  return hrCoreInfrastructureReadyPromise.finally(() => {
+    hrCoreInfrastructureReadyPromise = null
+  })
 }

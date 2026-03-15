@@ -1,11 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -16,20 +15,32 @@ import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
+import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import TablePaginationComponent from '@components/TablePaginationComponent'
 
-import type { AiCreditLedgerResponse, AiToolingAdminMetadata } from '@/types/ai-tools'
+import type { AiCreditLedgerEntry, AiCreditLedgerResponse, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { ledgerEntryTypeConfig, formatTimestamp, formatCost } from '../helpers'
+import AiConsumptionFilters from './AiConsumptionFilters'
+
+import tableStyles from '@core/styles/table.module.css'
+
+const columnHelper = createColumnHelper<AiCreditLedgerEntry>()
 
 type Props = {
   meta: AiToolingAdminMetadata | null
@@ -42,6 +53,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
   const [filterMember, setFilterMember] = useState('')
   const [consumeOpen, setConsumeOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([])
 
   // Consume form
   const [formWallet, setFormWallet] = useState('')
@@ -110,146 +122,161 @@ const AiConsumptionTab = ({ meta }: Props) => {
 
   const entries = data?.entries ?? []
   const summary = data?.summary
-  const hasFilters = Boolean(filterWallet || filterMember)
+
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('createdAt', {
+        header: 'Fecha',
+        cell: ({ getValue }) => (
+          <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
+            {formatTimestamp(getValue())}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('entryType', {
+        header: 'Tipo',
+        cell: ({ getValue }) => {
+          const conf = ledgerEntryTypeConfig[getValue()]
+
+          return (
+            <CustomChip
+              round='true' size='small' variant='tonal'
+              icon={<i className={conf?.icon ?? 'tabler-circle'} />}
+              label={conf?.label ?? getValue()}
+              color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
+            />
+          )
+        }
+      }),
+      columnHelper.accessor('creditAmount', {
+        header: 'Créditos',
+        cell: ({ row }) => {
+          const isDebit = row.original.entryType === 'debit'
+
+          return (
+            <Typography
+              variant='body2'
+              sx={{ fontFamily: 'monospace', fontWeight: 600, color: isDebit ? 'error.main' : 'success.main' }}
+            >
+              {isDebit ? '-' : '+'}{row.original.creditAmount}
+            </Typography>
+          )
+        }
+      }),
+      columnHelper.accessor('balanceAfter', {
+        header: 'Balance',
+        cell: ({ getValue }) => (
+          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
+            {getValue()}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('consumedByName', {
+        header: 'Miembro',
+        cell: ({ getValue }) => (
+          <Typography variant='body2'>{getValue() ?? '—'}</Typography>
+        )
+      }),
+      columnHelper.display({
+        id: 'asset',
+        header: 'Asset / Descripción',
+        cell: ({ row }) => (
+          <Typography variant='body2' noWrap sx={{ maxWidth: 200 }}>
+            {row.original.assetDescription ?? row.original.reloadReason ?? '—'}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('projectName', {
+        header: 'Proyecto',
+        cell: ({ getValue }) => (
+          <Typography variant='body2' color='text.secondary'>
+            {getValue() ?? '—'}
+          </Typography>
+        )
+      }),
+      columnHelper.display({
+        id: 'cost',
+        header: 'Costo',
+        cell: ({ row }) => (
+          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
+            {formatCost(row.original.totalCost, row.original.costCurrency)}
+          </Typography>
+        )
+      })
+    ],
+    []
+  )
+
+  const table = useReactTable({
+    data: entries,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 15 } }
+  })
 
   return (
     <>
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <Card>
         <CardHeader
           title='Registro de consumo'
           subheader={summary ? `${summary.totalEntries} movimientos · ${summary.totalDebits} débitos · ${summary.totalCredits} créditos` : undefined}
-          avatar={
-            <CustomAvatar variant='rounded' skin='light' color='warning' size={40}>
-              <i className='tabler-receipt' style={{ fontSize: 22 }} />
-            </CustomAvatar>
-          }
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openConsume}>
               Registrar consumo
             </Button>
           }
         />
-        <Divider />
-        <CardContent>
-          {/* Filters */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <CustomTextField
-                select fullWidth size='small' label='Miembro'
-                value={filterMember} onChange={e => setFilterMember(e.target.value)}
-              >
-                <MenuItem value=''>Todos los miembros</MenuItem>
-                {(meta?.activeMembers ?? []).map(m => (
-                  <MenuItem key={m.memberId} value={m.memberId}>{m.displayName}</MenuItem>
-                ))}
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 5 }}>
-              <CustomTextField
-                fullWidth size='small' label='Wallet ID'
-                value={filterWallet} onChange={e => setFilterWallet(e.target.value)}
-                placeholder='Filtrar por wallet...'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              {hasFilters && (
-                <Button
-                  variant='tonal' color='secondary' size='small' fullWidth
-                  onClick={() => { setFilterWallet(''); setFilterMember('') }}
-                  startIcon={<i className='tabler-filter-off' />}
-                  sx={{ height: 40 }}
-                >
-                  Limpiar
-                </Button>
-              )}
-            </Grid>
-          </Grid>
-
-          {loading ? (
-            <Stack spacing={1}>
-              {[0, 1, 2, 3, 4].map(i => (
-                <Skeleton key={i} variant='rounded' height={44} />
-              ))}
-            </Stack>
-          ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Fecha</TableCell>
-                    <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Tipo</TableCell>
-                    <TableCell align='right' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Créditos</TableCell>
-                    <TableCell align='right' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Balance</TableCell>
-                    <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Miembro</TableCell>
-                    <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Asset / Descripción</TableCell>
-                    <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Proyecto</TableCell>
-                    <TableCell align='right' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Costo</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {entries.map(entry => {
-                    const typeConf = ledgerEntryTypeConfig[entry.entryType]
-                    const isDebit = entry.entryType === 'debit'
-
-                    return (
-                      <TableRow key={entry.ledgerId} hover>
-                        <TableCell>
-                          <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
-                            {formatTimestamp(entry.createdAt)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='center'>
-                          <CustomChip
-                            round='true' size='small' variant='tonal'
-                            icon={<i className={typeConf?.icon ?? 'tabler-circle'} />}
-                            label={typeConf?.label ?? entry.entryType}
-                            color={typeConf?.color === 'default' ? 'secondary' : typeConf?.color ?? 'secondary'}
-                          />
-                        </TableCell>
-                        <TableCell align='right'>
-                          <Typography
-                            variant='body2'
-                            sx={{
-                              fontFamily: 'monospace',
-                              fontWeight: 600,
-                              color: isDebit ? 'error.main' : 'success.main'
-                            }}
-                          >
-                            {isDebit ? '-' : '+'}{entry.creditAmount}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
-                            {entry.balanceAfter}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant='body2'>{entry.consumedByName ?? '—'}</Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ maxWidth: 200 }}>
-                            <Typography variant='body2' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {entry.assetDescription ?? entry.reloadReason ?? '—'}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant='body2' color='text.secondary'>
-                            {entry.projectName ?? '—'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align='right'>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
-                            {formatCost(entry.totalCost, entry.costCurrency)}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                  {entries.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} sx={{ py: 8, border: 0 }}>
-                        <Stack alignItems='center' spacing={2}>
+        <AiConsumptionFilters
+          meta={meta}
+          filterMember={filterMember}
+          filterWallet={filterWallet}
+          setFilterMember={setFilterMember}
+          setFilterWallet={setFilterWallet}
+        />
+        {loading ? (
+          <Stack spacing={1} sx={{ px: 4, pb: 4 }}>
+            {[0, 1, 2, 3, 4].map(i => (
+              <Skeleton key={i} variant='rounded' height={44} />
+            ))}
+          </Stack>
+        ) : (
+          <>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map(header => (
+                        <th key={header.id}>
+                          {header.isPlaceholder ? null : (
+                            <div
+                              className={classnames({
+                                'flex items-center': header.column.getIsSorted(),
+                                'cursor-pointer select-none': header.column.getCanSort()
+                              })}
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {{
+                                asc: <i className='tabler-chevron-up text-xl' />,
+                                desc: <i className='tabler-chevron-down text-xl' />
+                              }[header.column.getIsSorted() as string] ?? null}
+                            </div>
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.length === 0 ? (
+                    <tr>
+                      <td colSpan={columns.length} className='text-center'>
+                        <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
                           <CustomAvatar variant='rounded' skin='light' color='warning' size={56}>
                             <i className='tabler-receipt' style={{ fontSize: 28 }} />
                           </CustomAvatar>
@@ -261,14 +288,29 @@ const AiConsumptionTab = ({ meta }: Props) => {
                             Registrar primer consumo
                           </Button>
                         </Stack>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
+                  ) : (
+                    table.getRowModel().rows.map(row => (
+                      <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => (
+                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                        ))}
+                      </tr>
+                    ))
                   )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
+                </tbody>
+              </table>
+            </div>
+            <TablePagination
+              component={() => <TablePaginationComponent table={table} />}
+              count={table.getFilteredRowModel().rows.length}
+              rowsPerPage={table.getState().pagination.pageSize}
+              page={table.getState().pagination.pageIndex}
+              onPageChange={(_, page) => table.setPageIndex(page)}
+            />
+          </>
+        )}
       </Card>
 
       {/* Consume Dialog */}

@@ -1,39 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
+import TablePagination from '@mui/material/TablePagination'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AiTool, ProviderRecord, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { toolCategoryConfig, costModelConfig, formatCost } from '../helpers'
+import AiCatalogFilters from './AiCatalogFilters'
+
+import tableStyles from '@core/styles/table.module.css'
+
+const columnHelper = createColumnHelper<AiTool>()
 
 type Props = {
   tools: AiTool[]
@@ -49,6 +59,8 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const [filterCategory, setFilterCategory] = useState('')
   const [filterProvider, setFilterProvider] = useState('')
   const [search, setSearch] = useState('')
+  const [filtered, setFiltered] = useState<AiTool[]>(tools)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'toolName', desc: false }])
 
   // Form state
   const [formToolId, setFormToolId] = useState('')
@@ -67,6 +79,17 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const [formDesc, setFormDesc] = useState('')
   const [formIconUrl, setFormIconUrl] = useState('')
   const [formActive, setFormActive] = useState(true)
+
+  const providerOptions = useMemo(() => {
+    const all = [...(meta?.providers ?? []), ...providers]
+
+    return all.reduce<ProviderRecord[]>((acc, p) => {
+      if (!p.providerId || acc.some(item => item.providerId === p.providerId)) return acc
+      acc.push(p)
+
+      return acc
+    }, [])
+  }, [meta, providers])
 
   const resetForm = () => {
     setFormToolId('')
@@ -165,254 +188,222 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const showSubFields = formCostModel === 'subscription' || formCostModel === 'hybrid'
   const showCreditFields = formCostModel === 'per_credit' || formCostModel === 'hybrid'
 
-  const providerOptions = [...(meta?.providers ?? []), ...providers].reduce<ProviderRecord[]>((acc, p) => {
-    if (!p.providerId || acc.some(item => item.providerId === p.providerId)) return acc
-    acc.push(p)
-    return acc
-  }, [])
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('toolName', {
+        header: 'Herramienta',
+        cell: ({ row }) => {
+          const catConf = toolCategoryConfig[row.original.toolCategory]
 
-  const filtered = tools.filter(t => {
-    if (filterCategory && t.toolCategory !== filterCategory) return false
-    if (filterProvider && t.providerId !== filterProvider) return false
-    if (search && !t.toolName.toLowerCase().includes(search.toLowerCase())) return false
-    return true
+          return (
+            <div className='flex items-center gap-3'>
+              <CustomAvatar variant='rounded' skin='light' color={catConf?.color === 'default' ? 'secondary' : catConf?.color ?? 'primary'} size={34}>
+                <i className={catConf?.icon ?? 'tabler-puzzle'} style={{ fontSize: 18 }} />
+              </CustomAvatar>
+              <div className='flex flex-col'>
+                <Typography className='font-medium' color='text.primary'>
+                  {row.original.toolName}
+                </Typography>
+                {row.original.description && (
+                  <Typography variant='body2' color='text.disabled' noWrap sx={{ maxWidth: 220 }}>
+                    {row.original.description}
+                  </Typography>
+                )}
+              </div>
+            </div>
+          )
+        }
+      }),
+      columnHelper.accessor('providerName', {
+        header: 'Proveedor',
+        cell: ({ row }) => (
+          <Typography variant='body2' color='text.secondary'>
+            {row.original.providerName ?? row.original.vendor ?? '—'}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('toolCategory', {
+        header: 'Categoría',
+        cell: ({ getValue }) => {
+          const conf = toolCategoryConfig[getValue()]
+
+          return (
+            <CustomChip
+              round='true' size='small' variant='tonal'
+              label={conf?.label ?? getValue()}
+              color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
+            />
+          )
+        }
+      }),
+      columnHelper.accessor('costModel', {
+        header: 'Modelo',
+        cell: ({ getValue }) => {
+          const conf = costModelConfig[getValue()]
+
+          return (
+            <CustomChip
+              round='true' size='small' variant='tonal'
+              icon={<i className={conf?.icon ?? 'tabler-coin'} />}
+              label={conf?.label ?? getValue()}
+              color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
+            />
+          )
+        }
+      }),
+      columnHelper.display({
+        id: 'unitCost',
+        header: 'Costo',
+        cell: ({ row }) => {
+          const tool = row.original
+
+          return (
+            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+              {tool.costModel === 'per_credit' || tool.costModel === 'hybrid'
+                ? `${formatCost(tool.creditUnitCost, tool.creditUnitCurrency)} / ${tool.creditUnitName ?? 'unit'}`
+                : tool.costModel === 'subscription'
+                  ? `${formatCost(tool.subscriptionAmount, tool.subscriptionCurrency)} / ${tool.subscriptionBillingCycle ?? 'mes'}`
+                  : '—'}
+            </Typography>
+          )
+        }
+      }),
+      columnHelper.accessor('isActive', {
+        header: 'Estado',
+        cell: ({ getValue }) => (
+          <CustomChip
+            round='true' size='small' variant='tonal'
+            icon={<i className={getValue() ? 'tabler-check' : 'tabler-x'} />}
+            label={getValue() ? 'Activa' : 'Inactiva'}
+            color={getValue() ? 'success' : 'secondary'}
+          />
+        )
+      }),
+      columnHelper.display({
+        id: 'actions',
+        cell: ({ row }) => (
+          <Tooltip title='Editar'>
+            <IconButton size='small' color='secondary' onClick={() => openEdit(row.original)}>
+              <i className='tabler-pencil' style={{ fontSize: 18 }} />
+            </IconButton>
+          </Tooltip>
+        ),
+        size: 48
+      })
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
+  const table = useReactTable({
+    data: filtered,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 10 } }
   })
-
-  const hasFilters = Boolean(filterCategory || filterProvider || search)
 
   return (
     <>
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <Card>
         <CardHeader
           title='Catálogo de herramientas AI'
-          subheader={tools.length > 0 ? `${tools.length} herramientas registradas` : undefined}
-          avatar={
-            <CustomAvatar variant='rounded' skin='light' color='primary' size={40}>
-              <i className='tabler-wand' style={{ fontSize: 22 }} />
-            </CustomAvatar>
-          }
+          subheader={`${filtered.length} herramientas`}
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
               Nueva herramienta
             </Button>
           }
         />
-        <Divider />
-        <CardContent>
-          {/* Filters */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <CustomTextField
-                fullWidth
-                size='small'
-                placeholder='Buscar herramienta...'
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <CustomTextField
-                select fullWidth size='small' label='Categoría'
-                value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
-              >
-                <MenuItem value=''>Todas las categorías</MenuItem>
-                {(meta?.toolCategories ?? Object.keys(toolCategoryConfig)).map(cat => (
-                  <MenuItem key={cat} value={cat}>
-                    <Stack direction='row' spacing={1} alignItems='center'>
-                      <i className={toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.icon ?? 'tabler-puzzle'} style={{ fontSize: 16 }} />
-                      <span>{toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.label ?? cat}</span>
+        <AiCatalogFilters
+          data={tools}
+          providers={providers}
+          meta={meta}
+          category={filterCategory}
+          provider={filterProvider}
+          search={search}
+          setCategory={setFilterCategory}
+          setProvider={setFilterProvider}
+          setSearch={setSearch}
+          setFiltered={setFiltered}
+        />
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={classnames({
+                            'flex items-center': header.column.getIsSorted(),
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' />,
+                            desc: <i className='tabler-chevron-down text-xl' />
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className='text-center'>
+                    <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
+                      <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
+                        <i className='tabler-wand' style={{ fontSize: 28 }} />
+                      </CustomAvatar>
+                      <Typography variant='h6' color='text.secondary'>
+                        {filterCategory || filterProvider || search ? 'Sin resultados' : 'Aún no tienes herramientas'}
+                      </Typography>
+                      <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
+                        {filterCategory || filterProvider || search
+                          ? 'No hay herramientas que coincidan con los filtros aplicados.'
+                          : 'Registra las herramientas AI del ecosistema para gestionar licencias y asignar créditos.'}
+                      </Typography>
+                      {!(filterCategory || filterProvider || search) && (
+                        <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
+                          Registrar primera herramienta
+                        </Button>
+                      )}
                     </Stack>
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <CustomTextField
-                select fullWidth size='small' label='Proveedor'
-                value={filterProvider} onChange={e => setFilterProvider(e.target.value)}
-              >
-                <MenuItem value=''>Todos los proveedores</MenuItem>
-                {providerOptions.map(p => (
-                  <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
-                ))}
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 2 }}>
-              {hasFilters && (
-                <Button
-                  variant='tonal'
-                  color='secondary'
-                  size='small'
-                  fullWidth
-                  onClick={() => { setSearch(''); setFilterCategory(''); setFilterProvider('') }}
-                  startIcon={<i className='tabler-filter-off' />}
-                  sx={{ height: 40 }}
-                >
-                  Limpiar
-                </Button>
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map(row => (
+                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                    ))}
+                  </tr>
+                ))
               )}
-            </Grid>
-          </Grid>
-
-          {/* Table */}
-          <TableContainer>
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Herramienta
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Proveedor
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Categoría
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Modelo de costo
-                  </TableCell>
-                  <TableCell align='right' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Costo unitario
-                  </TableCell>
-                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
-                    Estado
-                  </TableCell>
-                  <TableCell sx={{ width: 48 }} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filtered.map(tool => {
-                  const catConf = toolCategoryConfig[tool.toolCategory]
-                  const costConf = costModelConfig[tool.costModel]
-
-                  return (
-                    <TableRow key={tool.toolId} hover sx={{ cursor: 'pointer' }} onClick={() => openEdit(tool)}>
-                      <TableCell>
-                        <Stack direction='row' spacing={2} alignItems='center'>
-                          <CustomAvatar variant='rounded' skin='light' color={catConf?.color === 'default' ? 'secondary' : catConf?.color ?? 'primary'} size={34}>
-                            <i className={catConf?.icon ?? 'tabler-puzzle'} style={{ fontSize: 18 }} />
-                          </CustomAvatar>
-                          <Box>
-                            <Typography variant='body2' fontWeight={600}>{tool.toolName}</Typography>
-                            {tool.description && (
-                              <Typography variant='caption' color='text.disabled' sx={{ display: 'block', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {tool.description}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>{tool.providerName ?? tool.vendor ?? '—'}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          label={catConf?.label ?? tool.toolCategory}
-                          color={catConf?.color === 'default' ? 'secondary' : catConf?.color ?? 'secondary'}
-                          variant='tonal'
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          icon={<i className={costConf?.icon ?? 'tabler-coin'} />}
-                          label={costConf?.label ?? tool.costModel}
-                          color={costConf?.color === 'default' ? 'secondary' : costConf?.color ?? 'secondary'}
-                          variant='tonal'
-                        />
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                          {tool.costModel === 'per_credit' || tool.costModel === 'hybrid'
-                            ? `${formatCost(tool.creditUnitCost, tool.creditUnitCurrency)} / ${tool.creditUnitName ?? 'unit'}`
-                            : tool.costModel === 'subscription'
-                              ? `${formatCost(tool.subscriptionAmount, tool.subscriptionCurrency)} / ${tool.subscriptionBillingCycle ?? 'mes'}`
-                              : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          icon={<i className={tool.isActive ? 'tabler-check' : 'tabler-x'} />}
-                          label={tool.isActive ? 'Activa' : 'Inactiva'}
-                          color={tool.isActive ? 'success' : 'secondary'}
-                          variant='tonal'
-                        />
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Tooltip title='Editar'>
-                          <IconButton size='small' color='secondary' onClick={e => { e.stopPropagation(); openEdit(tool) }}>
-                            <i className='tabler-pencil' style={{ fontSize: 18 }} />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-                {filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} sx={{ py: 8, border: 0 }}>
-                      <Stack alignItems='center' spacing={2}>
-                        <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
-                          <i className='tabler-wand' style={{ fontSize: 28 }} />
-                        </CustomAvatar>
-                        {hasFilters ? (
-                          <>
-                            <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
-                            <Typography variant='body2' color='text.disabled'>
-                              No hay herramientas que coincidan con los filtros aplicados.
-                            </Typography>
-                            <Button
-                              variant='tonal'
-                              size='small'
-                              onClick={() => { setSearch(''); setFilterCategory(''); setFilterProvider('') }}
-                              startIcon={<i className='tabler-filter-off' />}
-                            >
-                              Limpiar filtros
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Typography variant='h6' color='text.secondary'>Aún no tienes herramientas</Typography>
-                            <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
-                              Registra las herramientas AI del ecosistema para gestionar licencias y asignar créditos.
-                            </Typography>
-                            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-                              Registrar primera herramienta
-                            </Button>
-                          </>
-                        )}
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {filtered.length > 0 && (
-            <Typography variant='caption' color='text.disabled' sx={{ mt: 2, display: 'block' }}>
-              Mostrando {filtered.length} de {tools.length} herramientas
-            </Typography>
-          )}
-        </CardContent>
+            </tbody>
+          </table>
+        </div>
+        <TablePagination
+          component={() => <TablePaginationComponent table={table} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          onPageChange={(_, page) => table.setPageIndex(page)}
+        />
       </Card>
 
       {/* Create/Edit Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={() => !saving && setDialogOpen(false)}
-        maxWidth='sm'
-        fullWidth
-        closeAfterTransition={false}
-      >
+      <Dialog open={dialogOpen} onClose={() => !saving && setDialogOpen(false)} maxWidth='sm' fullWidth closeAfterTransition={false}>
         <DialogTitle>
           <Stack direction='row' spacing={2} alignItems='center'>
             <CustomAvatar variant='rounded' skin='light' color='primary' size={36}>

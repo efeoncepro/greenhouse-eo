@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -15,21 +14,33 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
+import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AiTool, MemberToolLicense, AiToolingAdminMetadata } from '@/types/ai-tools'
 import { licenseStatusConfig, accessLevelConfig, formatDate } from '../helpers'
 import { getInitials } from '@/utils/getInitials'
+import AiLicensesFilters from './AiLicensesFilters'
+
+import tableStyles from '@core/styles/table.module.css'
+
+const columnHelper = createColumnHelper<MemberToolLicense>()
 
 type Props = {
   licenses: MemberToolLicense[]
@@ -43,6 +54,8 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
   const [search, setSearch] = useState('')
+  const [filtered, setFiltered] = useState<MemberToolLicense[]>(licenses)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'memberName', desc: false }])
 
   // Form state
   const [formMember, setFormMember] = useState('')
@@ -88,186 +101,192 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
     }
   }
 
-  const filtered = licenses.filter(lic => {
-    if (filterStatus && lic.licenseStatus !== filterStatus) return false
-    if (search && !(lic.memberName ?? '').toLowerCase().includes(search.toLowerCase()) && !lic.toolId.toLowerCase().includes(search.toLowerCase())) return false
-    return true
-  })
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('memberName', {
+        header: 'Colaborador',
+        cell: ({ row }) => (
+          <div className='flex items-center gap-3'>
+            <CustomAvatar skin='light' color='info' size={30}>
+              {getInitials(row.original.memberName || '')}
+            </CustomAvatar>
+            <div className='flex flex-col'>
+              <Typography className='font-medium' color='text.primary'>
+                {row.original.memberName ?? '—'}
+              </Typography>
+              {row.original.memberEmail && (
+                <Typography variant='body2' color='text.disabled'>
+                  {row.original.memberEmail}
+                </Typography>
+              )}
+            </div>
+          </div>
+        )
+      }),
+      columnHelper.display({
+        id: 'toolName',
+        header: 'Herramienta',
+        cell: ({ row }) => (
+          <Typography variant='body2'>{row.original.tool?.toolName ?? row.original.toolId}</Typography>
+        )
+      }),
+      columnHelper.accessor('accessLevel', {
+        header: 'Acceso',
+        cell: ({ getValue }) => {
+          const conf = accessLevelConfig[getValue()]
 
-  const hasFilters = Boolean(filterStatus || search)
+          return (
+            <CustomChip
+              round='true' size='small' variant='tonal'
+              icon={<i className={conf?.icon ?? 'tabler-shield'} />}
+              label={conf?.label ?? getValue()}
+              color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
+            />
+          )
+        }
+      }),
+      columnHelper.accessor('accountEmail', {
+        header: 'Email cuenta',
+        cell: ({ getValue }) => (
+          <Typography
+            variant='body2'
+            color='text.secondary'
+            sx={{ fontFamily: getValue() ? 'monospace' : undefined, fontSize: getValue() ? '0.8rem' : undefined }}
+          >
+            {getValue() ?? '—'}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('licenseStatus', {
+        header: 'Estado',
+        cell: ({ getValue }) => {
+          const conf = licenseStatusConfig[getValue()]
+
+          return (
+            <CustomChip
+              round='true' size='small' variant='tonal'
+              icon={<i className={conf?.icon ?? 'tabler-circle'} />}
+              label={conf?.label ?? getValue()}
+              color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
+            />
+          )
+        }
+      }),
+      columnHelper.display({
+        id: 'assignedDate',
+        header: 'Asignado',
+        cell: ({ row }) => (
+          <Typography variant='body2' color='text.secondary'>
+            {formatDate(row.original.activatedAt ?? row.original.createdAt)}
+          </Typography>
+        )
+      })
+    ],
+    []
+  )
+
+  const table = useReactTable({
+    data: filtered,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 10 } }
+  })
 
   return (
     <>
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <Card>
         <CardHeader
           title='Licencias de herramientas'
-          subheader={licenses.length > 0 ? `${licenses.length} licencias asignadas` : undefined}
-          avatar={
-            <CustomAvatar variant='rounded' skin='light' color='info' size={40}>
-              <i className='tabler-key' style={{ fontSize: 22 }} />
-            </CustomAvatar>
-          }
+          subheader={`${filtered.length} licencias`}
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
               Asignar licencia
             </Button>
           }
         />
-        <Divider />
-        <CardContent>
-          {/* Filters */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 5 }}>
-              <CustomTextField
-                fullWidth size='small'
-                placeholder='Buscar por nombre o herramienta...'
-                value={search} onChange={e => setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
-                }}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <CustomTextField
-                select fullWidth size='small' label='Estado'
-                value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              >
-                <MenuItem value=''>Todos los estados</MenuItem>
-                {(meta?.licenseStatuses ?? Object.keys(licenseStatusConfig)).map(s => (
-                  <MenuItem key={s} value={s}>
-                    <Stack direction='row' spacing={1} alignItems='center'>
-                      <i className={licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.icon ?? 'tabler-circle'} style={{ fontSize: 16 }} />
-                      <span>{licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.label ?? s}</span>
+        <AiLicensesFilters
+          data={licenses}
+          meta={meta}
+          status={filterStatus}
+          search={search}
+          setStatus={setFilterStatus}
+          setSearch={setSearch}
+          setFiltered={setFiltered}
+        />
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={classnames({
+                            'flex items-center': header.column.getIsSorted(),
+                            'cursor-pointer select-none': header.column.getCanSort()
+                          })}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{
+                            asc: <i className='tabler-chevron-up text-xl' />,
+                            desc: <i className='tabler-chevron-down text-xl' />
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className='text-center'>
+                    <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
+                      <CustomAvatar variant='rounded' skin='light' color='info' size={56}>
+                        <i className='tabler-key' style={{ fontSize: 28 }} />
+                      </CustomAvatar>
+                      <Typography variant='h6' color='text.secondary'>
+                        {filterStatus || search ? 'Sin resultados' : 'Sin licencias asignadas'}
+                      </Typography>
+                      <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
+                        {filterStatus || search
+                          ? 'No hay licencias que coincidan con los filtros.'
+                          : 'Asigna herramientas AI a los miembros del equipo para gestionar accesos y controlar el uso.'}
+                      </Typography>
+                      {!(filterStatus || search) && (
+                        <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
+                          Asignar primera licencia
+                        </Button>
+                      )}
                     </Stack>
-                  </MenuItem>
-                ))}
-              </CustomTextField>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              {hasFilters && (
-                <Button
-                  variant='tonal' color='secondary' size='small' fullWidth
-                  onClick={() => { setSearch(''); setFilterStatus('') }}
-                  startIcon={<i className='tabler-filter-off' />}
-                  sx={{ height: 40 }}
-                >
-                  Limpiar
-                </Button>
+                  </td>
+                </tr>
+              ) : (
+                table.getRowModel().rows.map(row => (
+                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                    ))}
+                  </tr>
+                ))
               )}
-            </Grid>
-          </Grid>
-
-          {/* Table */}
-          <TableContainer>
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Colaborador</TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Herramienta</TableCell>
-                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Acceso</TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Email cuenta</TableCell>
-                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Estado</TableCell>
-                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Asignado</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filtered.map(lic => {
-                  const statusConf = licenseStatusConfig[lic.licenseStatus]
-                  const accessConf = accessLevelConfig[lic.accessLevel]
-
-                  return (
-                    <TableRow key={lic.licenseId} hover>
-                      <TableCell>
-                        <Stack direction='row' spacing={1.5} alignItems='center'>
-                          <CustomAvatar skin='light' color='info' size={30}>
-                            {getInitials(lic.memberName || '')}
-                          </CustomAvatar>
-                          <Box>
-                            <Typography variant='body2' fontWeight={500}>{lic.memberName ?? '—'}</Typography>
-                            {lic.memberEmail && (
-                              <Typography variant='caption' color='text.disabled'>{lic.memberEmail}</Typography>
-                            )}
-                          </Box>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{lic.tool?.toolName ?? lic.toolId}</Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip
-                          round='true' size='small' variant='tonal'
-                          icon={<i className={accessConf?.icon ?? 'tabler-shield'} />}
-                          label={accessConf?.label ?? lic.accessLevel}
-                          color={accessConf?.color === 'default' ? 'secondary' : accessConf?.color ?? 'secondary'}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary' sx={{ fontFamily: lic.accountEmail ? 'monospace' : undefined, fontSize: lic.accountEmail ? '0.8rem' : undefined }}>
-                          {lic.accountEmail ?? '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip
-                          round='true' size='small' variant='tonal'
-                          icon={<i className={statusConf?.icon ?? 'tabler-circle'} />}
-                          label={statusConf?.label ?? lic.licenseStatus}
-                          color={statusConf?.color === 'default' ? 'secondary' : statusConf?.color ?? 'secondary'}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>
-                          {formatDate(lic.activatedAt ?? lic.createdAt)}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-                {filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} sx={{ py: 8, border: 0 }}>
-                      <Stack alignItems='center' spacing={2}>
-                        <CustomAvatar variant='rounded' skin='light' color='info' size={56}>
-                          <i className='tabler-key' style={{ fontSize: 28 }} />
-                        </CustomAvatar>
-                        {hasFilters ? (
-                          <>
-                            <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
-                            <Typography variant='body2' color='text.disabled'>
-                              No hay licencias que coincidan con los filtros.
-                            </Typography>
-                            <Button
-                              variant='tonal' size='small'
-                              onClick={() => { setSearch(''); setFilterStatus('') }}
-                              startIcon={<i className='tabler-filter-off' />}
-                            >
-                              Limpiar filtros
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Typography variant='h6' color='text.secondary'>Sin licencias asignadas</Typography>
-                            <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
-                              Asigna herramientas AI a los miembros del equipo para gestionar accesos y controlar el uso.
-                            </Typography>
-                            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-                              Asignar primera licencia
-                            </Button>
-                          </>
-                        )}
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {filtered.length > 0 && (
-            <Typography variant='caption' color='text.disabled' sx={{ mt: 2, display: 'block' }}>
-              Mostrando {filtered.length} de {licenses.length} licencias
-            </Typography>
-          )}
-        </CardContent>
+            </tbody>
+          </table>
+        </div>
+        <TablePagination
+          component={() => <TablePaginationComponent table={table} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          onPageChange={(_, page) => table.setPageIndex(page)}
+        />
       </Card>
 
       {/* Assign License Dialog */}

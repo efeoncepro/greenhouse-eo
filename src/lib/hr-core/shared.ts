@@ -9,12 +9,14 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 export class HrCoreValidationError extends Error {
   statusCode: number
   details?: unknown
+  code?: string
 
-  constructor(message: string, statusCode = 400, details?: unknown) {
+  constructor(message: string, statusCode = 400, details?: unknown, code?: string) {
     super(message)
     this.name = 'HrCoreValidationError'
     this.statusCode = statusCode
     this.details = details
+    this.code = code
   }
 }
 
@@ -23,6 +25,7 @@ export const toHrCoreErrorResponse = (error: unknown, fallbackMessage: string) =
     return NextResponse.json(
       {
         error: error.message,
+        code: error.code ?? null,
         details: error.details ?? null
       },
       { status: error.statusCode }
