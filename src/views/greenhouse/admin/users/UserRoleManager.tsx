@@ -7,6 +7,7 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
@@ -17,6 +18,8 @@ import CustomAutocomplete from '@core/components/mui/Autocomplete'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
+
+// ── Types ──
 
 interface RoleCatalogEntry {
   roleCode: string
@@ -44,6 +47,8 @@ interface Props {
   initialRoleCodes: string[]
 }
 
+// ── Component ──
+
 const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
   const [availableRoles, setAvailableRoles] = useState<RoleCatalogEntry[]>([])
   const [currentAssignments, setCurrentAssignments] = useState<UserRoleAssignment[]>([])
@@ -69,7 +74,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
       setCurrentAssignments(data.currentAssignments || [])
       setSelectedRoleCodes((data.currentAssignments || []).map((a: UserRoleAssignment) => a.roleCode))
     } catch {
-      setError('No fue posible cargar la configuracion de roles. Verifica la conexion e intenta de nuevo.')
+      setError('No fue posible cargar la configuracion de roles. Verifica tu conexion e intenta de nuevo.')
     } finally {
       setIsLoading(false)
     }
@@ -105,7 +110,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
 
   const handleSave = async () => {
     if (selectedRoleCodes.length === 0) {
-      setError('Selecciona al menos un rol antes de guardar. Un usuario sin roles no podra acceder al portal.')
+      setError('Debes asignar al menos un rol. Sin roles, el usuario no podra acceder al portal.')
 
       return
     }
@@ -128,10 +133,10 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
       setCurrentAssignments(data.currentAssignments || [])
       setSelectedRoleCodes((data.currentAssignments || []).map((a: UserRoleAssignment) => a.roleCode))
       setIsEditing(false)
-      setSuccessMessage('Los roles fueron actualizados. Los cambios se aplicaran en el proximo inicio de sesion del usuario.')
+      setSuccessMessage('Roles actualizados. Los cambios se aplicaran en el proximo inicio de sesion del usuario.')
       setTimeout(() => setSuccessMessage(null), 6000)
     } catch {
-      setError('No fue posible guardar los cambios. Verifica la conexion e intenta de nuevo.')
+      setError('No fue posible guardar los cambios. Verifica tu conexion e intenta de nuevo.')
     } finally {
       setIsSaving(false)
     }
@@ -140,11 +145,6 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
   const handleReset = () => {
     setSelectedRoleCodes(currentAssignments.map(a => a.roleCode))
     setError(null)
-  }
-
-  const handleCancel = () => {
-    handleReset()
-    setIsEditing(false)
   }
 
   if (isLoading) {
@@ -159,106 +159,110 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
 
   return (
     <Grid container spacing={6}>
-      {/* ── Card 1: Roles activos ── */}
+      {/* ── Card 1: Perfil de acceso (patron AboutOverview) ── */}
       <Grid size={{ xs: 12 }}>
         <Card>
           <CardContent className='flex flex-col gap-6'>
             <div className='flex flex-col gap-4'>
               <Typography className='uppercase' variant='body2' color='text.disabled'>
-                Roles activos
+                Perfil de acceso
               </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Los roles determinan a que modulos y funcionalidades tiene acceso este usuario dentro del portal.
-                Un usuario puede tener multiples roles que se combinan para formar su perfil de acceso.
+              <Typography>
+                Los roles definen que puede hacer este usuario en Greenhouse. Cada rol habilita modulos y
+                funcionalidades especificas. Un usuario puede tener varios roles que se combinan para formar
+                su perfil de acceso completo.
               </Typography>
             </div>
+            <div className='flex flex-col gap-4'>
+              <Typography className='uppercase' variant='body2' color='text.disabled'>
+                Roles asignados
+              </Typography>
+              <Box role='list' aria-label='Roles asignados actualmente' className='flex flex-wrap gap-2'>
+                {currentAssignments.length === 0 ? (
+                  <Typography color='text.secondary' role='status'>
+                    Este usuario no tiene roles asignados. Agrega al menos un rol para que pueda acceder al portal.
+                  </Typography>
+                ) : (
+                  currentAssignments.map(assignment => (
+                    <Box component='span' role='listitem' key={assignment.roleCode}>
+                      <Chip
+                        icon={<i className={roleIconFor(assignment.roleCode)} aria-hidden='true' />}
+                        label={assignment.roleName || toTitleCase(assignment.roleCode)}
+                        color={roleColorFor(assignment.roleCode)}
+                        variant='tonal'
+                      />
+                    </Box>
+                  ))
+                )}
+              </Box>
+            </div>
+            <div className='flex flex-col gap-4'>
+              <Typography className='uppercase' variant='body2' color='text.disabled'>
+                Modulos habilitados
+              </Typography>
+              {derivedRouteGroups.length > 0 ? (
+                <>
+                  <Typography color='text.secondary'>
+                    La combinacion de roles habilita acceso a los siguientes modulos del portal.
+                  </Typography>
+                  <Box role='group' aria-label='Modulos habilitados' className='flex flex-wrap gap-2'>
+                    {derivedRouteGroups.map(group => (
+                      <div key={group} className='flex items-center gap-2'>
+                        <i className='tabler-circle-filled text-[8px] text-textSecondary' aria-hidden='true' />
+                        <Typography className='font-medium'>{toTitleCase(group)}</Typography>
+                      </div>
+                    ))}
+                  </Box>
+                </>
+              ) : (
+                <Typography color='text.secondary'>
+                  Los roles actuales no habilitan modulos especificos del portal.
+                </Typography>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </Grid>
 
+      {/* ── Card 2: Asignar roles (patron ChangePasswordCard / AccountDetails) ── */}
+      <Grid size={{ xs: 12 }}>
+        <Card>
+          <CardHeader title='Asignar roles' />
+          <CardContent>
             <div aria-live='polite' aria-atomic='true'>
               {successMessage && (
-                <Alert severity='success' icon={<i className='tabler-circle-check' aria-hidden='true' />}>
+                <Alert severity='success' className='mbe-6' icon={<i className='tabler-circle-check' aria-hidden='true' />}>
                   {successMessage}
                 </Alert>
               )}
             </div>
             <div aria-live='assertive' aria-atomic='true'>
               {error && (
-                <Alert severity='error' icon={<i className='tabler-alert-circle' aria-hidden='true' />}>
+                <Alert severity='error' className='mbe-6' icon={<i className='tabler-alert-circle' aria-hidden='true' />}>
                   {error}
                 </Alert>
               )}
             </div>
 
-            <Box role='list' aria-label='Roles asignados actualmente' sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-              {currentAssignments.length === 0 ? (
-                <Typography variant='body2' color='text.secondary' role='status'>
-                  Este usuario no tiene roles asignados. Sin al menos un rol, no podra acceder a ninguna seccion del portal.
-                </Typography>
-              ) : (
-                currentAssignments.map(assignment => (
-                  <Box component='span' role='listitem' key={assignment.roleCode}>
-                    <Chip
-                      icon={<i className={roleIconFor(assignment.roleCode)} aria-hidden='true' />}
-                      label={assignment.roleName || toTitleCase(assignment.roleCode)}
-                      color={roleColorFor(assignment.roleCode)}
-                      variant='tonal'
-                    />
-                  </Box>
-                ))
-              )}
-            </Box>
-
-            {currentAssignments.length > 0 && (
-              <div className='flex flex-col gap-4'>
-                <Typography className='uppercase' variant='body2' color='text.disabled'>
-                  Modulos habilitados
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Acceso derivado de la combinacion de roles asignados. Cada rol habilita uno o mas modulos del portal.
-                </Typography>
-                <Box role='group' aria-label='Modulos de acceso derivados de los roles' sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {derivedRouteGroups.length > 0 ? (
-                    derivedRouteGroups.map(group => (
-                      <Chip key={group} label={toTitleCase(group)} size='small' variant='outlined' />
-                    ))
-                  ) : (
-                    <Typography variant='body2' color='text.secondary'>
-                      Los roles actuales no habilitan modulos especificos.
-                    </Typography>
-                  )}
-                </Box>
-              </div>
-            )}
-
-            {!isEditing && (
-              <div>
+            {!isEditing ? (
+              <div className='flex flex-col items-start gap-6'>
+                <div className='flex flex-col gap-4'>
+                  <Typography variant='h5' color='text.secondary'>
+                    La asignacion de roles esta desactivada
+                  </Typography>
+                  <Typography>
+                    Haz clic en el boton para modificar los roles de este usuario. Los cambios se aplicaran
+                    en su proximo inicio de sesion.
+                  </Typography>
+                </div>
                 <Button
                   variant='contained'
-                  startIcon={<i className='tabler-edit' aria-hidden='true' />}
                   onClick={() => setIsEditing(true)}
                 >
-                  Modificar roles
+                  Modificar asignacion de roles
                 </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </Grid>
-
-      {/* ── Card 2: Formulario de edicion (patron AccountDetails) ── */}
-      {isEditing && (
-        <Grid size={{ xs: 12 }}>
-          <Card>
-            <CardContent className='flex flex-col gap-6'>
-              <div className='flex flex-col gap-4'>
-                <Typography className='uppercase' variant='body2' color='text.disabled'>
-                  Asignar roles
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Selecciona los roles que correspondan a las responsabilidades de este usuario.
-                  Puedes combinar roles internos y de cliente segun sea necesario.
-                </Typography>
-              </div>
-
+            ) : (
               <form onSubmit={e => e.preventDefault()}>
                 <Grid container spacing={6}>
                   <Grid size={{ xs: 12 }}>
@@ -270,13 +274,16 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                       groupBy={option => (option.isInternal ? 'Roles internos (Efeonce)' : 'Roles de cliente')}
                       getOptionLabel={option => option.roleName || toTitleCase(option.roleCode)}
                       isOptionEqualToValue={(option, value) => option.roleCode === value.roleCode}
-                      onChange={(_, newValue) => setSelectedRoleCodes(newValue.map(r => r.roleCode))}
+                      onChange={(_, newValue) => {
+                        setSelectedRoleCodes(newValue.map(r => r.roleCode))
+                        setError(null)
+                      }}
                       renderInput={params => (
                         <CustomTextField
                           {...params}
                           label='Roles del usuario'
                           placeholder={selectedRoleObjects.length === 0 ? 'Escribe para buscar roles disponibles...' : ''}
-                          helperText='Cada rol otorga acceso a modulos especificos. La combinacion de roles define el perfil de acceso completo.'
+                          helperText='Puedes combinar roles internos y de cliente. Cada rol agrega permisos adicionales.'
                           inputProps={{
                             ...params.inputProps,
                             'aria-describedby': 'role-selector-help'
@@ -307,11 +314,11 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
 
                         return (
                           <li key={key} {...optionProps}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                            <Box className='flex items-center gap-2 is-full'>
                               <CustomAvatar variant='rounded' skin='light' color={roleColorFor(option.roleCode)} size={28}>
                                 <i className={roleIconFor(option.roleCode)} style={{ fontSize: 16 }} aria-hidden='true' />
                               </CustomAvatar>
-                              <Box>
+                              <div>
                                 <Typography variant='body2' className='font-medium'>
                                   {option.roleName || toTitleCase(option.roleCode)}
                                 </Typography>
@@ -320,7 +327,7 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                                     {option.description}
                                   </Typography>
                                 )}
-                              </Box>
+                              </div>
                             </Box>
                           </li>
                         )
@@ -328,37 +335,29 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                     />
                   </Grid>
 
-                  {/* Vista previa de acceso resultante */}
-                  {selectedRoleObjects.length > 0 && (
+                  {/* Vista previa de acceso */}
+                  {selectedRoleObjects.length > 0 && derivedRouteGroups.length > 0 && (
                     <Grid size={{ xs: 12 }}>
-                      <div className='flex flex-col gap-4'>
-                        <Typography className='uppercase' variant='body2' color='text.disabled'>
-                          Vista previa de acceso
-                        </Typography>
-                        <Typography variant='body2' color='text.secondary'>
-                          {derivedRouteGroups.length > 0
-                            ? `Con los roles seleccionados, este usuario tendra acceso a ${derivedRouteGroups.length} ${derivedRouteGroups.length === 1 ? 'modulo' : 'modulos'} del portal.`
-                            : 'Los roles seleccionados no habilitan modulos especificos del portal.'}
-                        </Typography>
-                        {derivedRouteGroups.length > 0 && (
-                          <Box role='group' aria-label='Modulos que se habilitaran con los roles seleccionados' sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {derivedRouteGroups.map(group => (
-                              <Chip
-                                key={group}
-                                icon={<i className='tabler-lock-open' aria-hidden='true' style={{ fontSize: 14 }} />}
-                                label={toTitleCase(group)}
-                                size='small'
-                                color='success'
-                                variant='tonal'
-                              />
-                            ))}
-                          </Box>
-                        )}
-                      </div>
+                      <Typography variant='h6' className='mbe-2'>Vista previa de acceso</Typography>
+                      <Typography className='mbe-4' color='text.secondary'>
+                        {`Con esta configuracion, el usuario tendra acceso a ${derivedRouteGroups.length} ${derivedRouteGroups.length === 1 ? 'modulo' : 'modulos'}:`}
+                      </Typography>
+                      <Box className='flex flex-wrap gap-2' role='group' aria-label='Modulos que se habilitaran'>
+                        {derivedRouteGroups.map(group => (
+                          <Chip
+                            key={group}
+                            icon={<i className='tabler-lock-open' aria-hidden='true' style={{ fontSize: 14 }} />}
+                            label={toTitleCase(group)}
+                            size='small'
+                            color='success'
+                            variant='tonal'
+                          />
+                        ))}
+                      </Box>
                     </Grid>
                   )}
 
-                  {/* Botones estilo AccountDetails: Save Changes + Reset */}
+                  {/* Botones patron AccountDetails: Save Changes + Reset */}
                   <Grid size={{ xs: 12 }} className='flex gap-4 flex-wrap'>
                     <Button
                       variant='contained'
@@ -382,18 +381,21 @@ const UserRoleManager = ({ userId, initialRoleCodes }: Props) => {
                       variant='tonal'
                       color='error'
                       disabled={isSaving}
-                      onClick={handleCancel}
-                      aria-label='Cancelar la edicion y volver a la vista de roles'
+                      onClick={() => {
+                        handleReset()
+                        setIsEditing(false)
+                      }}
+                      aria-label='Cancelar la edicion de roles'
                     >
                       Cancelar
                     </Button>
                   </Grid>
                 </Grid>
               </form>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
     </Grid>
   )
 }
