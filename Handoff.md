@@ -40,6 +40,57 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 07:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir la inconsistencia entre `Finance Suppliers` y `AI Tooling Providers` para que el registro canónico `greenhouse.providers` vuelva a poblar el dropdown de `Nueva herramienta` y quede alineado con arquitectura.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/providers/canonical.ts`
+- `src/lib/finance/schema.ts`
+- `src/app/api/finance/suppliers/route.ts`
+- `src/app/api/finance/suppliers/[id]/route.ts`
+- `src/lib/ai-tools/service.ts`
+- `src/views/greenhouse/ai-tools/tabs/AiCatalogTab.tsx`
+- `Handoff.md`
+- `changelog.md`
+- `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+
+### Cambios realizados
+- Se agregó un bridge canónico `Supplier -> Provider` en `src/lib/providers/canonical.ts`.
+- `Finance Suppliers` ahora:
+  - guardan `provider_id`
+  - devuelven `providerId` en sus respuestas
+  - sincronizan `greenhouse.providers` al crear o actualizar un supplier
+- `AI Tooling` ahora sincroniza providers desde suppliers activos antes de cargar metadata o validar `providerId`.
+- `AiCatalogTab` ya no depende de una sola lista vacía:
+  - deduplica providers entre `meta.providers` y `catalog.providers`
+  - muestra estado explícito si no hay providers disponibles
+- Resultado esperado:
+  - un supplier financiero activo ya puede alimentar el provider canónico y aparecer en `Nueva herramienta`
+  - el dropdown de provider deja de quedar vacío por drift entre `Finance` y `AI Tooling`
+
+### Verificación
+- `pnpm exec eslint src/lib/providers/canonical.ts src/lib/finance/schema.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/lib/ai-tools/service.ts src/views/greenhouse/ai-tools/tabs/AiCatalogTab.tsx`
+  - correcto
+- `git diff --check -- src/lib/providers/canonical.ts src/lib/finance/schema.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/lib/ai-tools/service.ts src/views/greenhouse/ai-tools/tabs/AiCatalogTab.tsx`
+  - correcto
+
+### Riesgos o pendientes
+- No se hizo smoke autenticado en preview para confirmar un caso real de supplier ya existente reapareciendo en el dropdown después del bridge.
+- El worktree ya traía un cambio ajeno en `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`; no se tocó en este turno.
+
 ## 2026-03-15 05:52 America/Santiago
 
 ### Agente

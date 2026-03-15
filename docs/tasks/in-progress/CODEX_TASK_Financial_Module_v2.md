@@ -523,6 +523,18 @@ Frontend principal pendiente:
 
 ## QA funcional 2026-03-15
 
+### Delta 2026-03-15 — Supplier -> Provider bridge
+
+- `Finance` ahora participa explícitamente en el bridge canónico `Supplier -> Provider`.
+- Ajuste runtime:
+  - `fin_suppliers` ya puede guardar `provider_id`
+  - crear/editar supplier sincroniza `greenhouse.providers`
+- Beneficio cross-module:
+  - vendors creados en `Finance` ya pueden ser reutilizados por `AI Tooling` sin inventar otra identidad paralela
+- Esto alinea el runtime con la arquitectura:
+  - `fin_suppliers` como perfil financiero
+  - `greenhouse.providers.provider_id` como ancla transversal reusable
+
 ### Alcance auditado
 
 - revisión estática profunda de:

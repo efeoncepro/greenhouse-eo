@@ -157,6 +157,16 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const showSubFields = formCostModel === 'subscription' || formCostModel === 'hybrid'
   const showCreditFields = formCostModel === 'per_credit' || formCostModel === 'hybrid'
 
+  const providerOptions = [...(meta?.providers ?? []), ...providers].reduce<ProviderRecord[]>((accumulator, provider) => {
+    if (!provider.providerId || accumulator.some(item => item.providerId === provider.providerId)) {
+      return accumulator
+    }
+
+    accumulator.push(provider)
+
+    return accumulator
+  }, [])
+
   const filtered = tools.filter(t => {
     if (filterCategory && t.toolCategory !== filterCategory) return false
     if (filterProvider && t.providerId !== filterProvider) return false
@@ -216,7 +226,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
               sx={{ minWidth: 160 }}
             >
               <MenuItem value=''>Todos</MenuItem>
-              {providers.map(p => (
+              {providerOptions.map(p => (
                 <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
               ))}
             </CustomTextField>
@@ -343,11 +353,18 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
             <CustomTextField
               select fullWidth size='small' label='Proveedor'
               value={formProvider} onChange={e => setFormProvider(e.target.value)}
+              helperText={providerOptions.length === 0 ? 'No hay providers canónicos disponibles todavía.' : undefined}
               required
             >
-              {(meta?.providers ?? providers).map(p => (
-                <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
-              ))}
+              {providerOptions.length === 0 ? (
+                <MenuItem disabled value=''>
+                  No hay providers disponibles
+                </MenuItem>
+              ) : (
+                providerOptions.map(p => (
+                  <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
+                ))
+              )}
             </CustomTextField>
             <CustomTextField
               select fullWidth size='small' label='Categoría'

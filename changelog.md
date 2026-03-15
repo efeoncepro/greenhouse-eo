@@ -6,6 +6,13 @@
 
 ## 2026-03-15
 
+### Supplier to Provider canonical bridge for AI Tooling
+- `Finance Suppliers` y `AI Tooling` ahora comparten mejor la identidad canónica de vendor/plataforma a través de `greenhouse.providers`.
+- Se agregó `src/lib/providers/canonical.ts` para sincronizar suppliers financieros activos hacia `greenhouse.providers`.
+- `fin_suppliers` ahora puede persistir `provider_id` y las rutas de suppliers ya devuelven ese vínculo.
+- `AI Tooling` ahora sincroniza providers desde Finance antes de poblar metadata o validar `providerId`.
+- El diálogo `Nueva herramienta` ya no depende de una sola lista vacía y muestra estado explícito si todavía no hay providers disponibles.
+
 ### Finance exchange-rate visibility and HR leave request drawer hardening
 - `Finance Dashboard` ahora muestra warning si `/api/finance/exchange-rates/latest` no devuelve snapshot o responde con error HTTP.
 - `HR Core` ahora evita que `Solicitar permiso` quede con dropdown vacío y silencioso:

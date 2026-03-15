@@ -29,6 +29,7 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { ensureAiToolingInfrastructure } from '@/lib/ai-tools/schema'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { syncProviderRegistryFromFinanceSuppliers } from '@/lib/providers/canonical'
 import {
   ACCESS_LEVELS,
   AiToolingValidationError,
@@ -383,13 +384,14 @@ const assertClient = async (clientId: string) => {
 
 const getProviders = async (activeOnly = false) => {
   await ensureAiToolingInfrastructure()
+  await syncProviderRegistryFromFinanceSuppliers()
   const projectId = getProjectId()
 
   const rows = await runAiToolingQuery<ProviderRow>(
     `
       SELECT *
       FROM \`${projectId}.greenhouse.providers\`
-      ${activeOnly ? 'WHERE is_active = TRUE' : ''}
+      ${activeOnly ? 'WHERE COALESCE(is_active, TRUE) = TRUE' : ''}
       ORDER BY provider_name ASC
     `
   )

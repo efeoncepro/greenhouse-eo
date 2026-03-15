@@ -26,6 +26,7 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
   fin_suppliers: `
     CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_suppliers\` (
       supplier_id STRING NOT NULL,
+      provider_id STRING,
       legal_name STRING NOT NULL,
       trade_name STRING,
       tax_id STRING,
@@ -212,6 +213,9 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
 }
 
 const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
+  fin_suppliers: {
+    provider_id: 'ALTER TABLE `{projectId}.greenhouse.fin_suppliers` ADD COLUMN IF NOT EXISTS provider_id STRING'
+  },
   fin_client_profiles: {
     client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_client_profiles` ADD COLUMN IF NOT EXISTS client_id STRING'
   },

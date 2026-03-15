@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic'
 
 interface SupplierDetailRow {
   supplier_id: string
+  provider_id: string | null
   legal_name: string
   trade_name: string | null
   tax_id: string | null
@@ -94,6 +96,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   return NextResponse.json({
     supplierId: normalizeString(row.supplier_id),
+    providerId: row.provider_id ? normalizeString(row.provider_id) : null,
     legalName: normalizeString(row.legal_name),
     tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
     taxId: row.tax_id ? normalizeString(row.tax_id) : null,
@@ -219,6 +222,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       updateParams.isActive = Boolean(body.isActive)
     }
 
+    if (body.providerId !== undefined) {
+      const providerId = body.providerId ? normalizeString(body.providerId) : null
+
+      updates.push('provider_id = @providerId')
+      updateParams.providerId = providerId
+    }
+
     if (updates.length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
@@ -231,7 +241,29 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       WHERE supplier_id = @supplierId
     `, updateParams)
 
-    return NextResponse.json({ supplierId, updated: true })
+    const [updatedSupplier] = await runFinanceQuery<SupplierDetailRow>(`
+      SELECT *
+      FROM \`${projectId}.greenhouse.fin_suppliers\`
+      WHERE supplier_id = @supplierId
+      LIMIT 1
+    `, { supplierId })
+
+    if (updatedSupplier) {
+      await syncProviderFromFinanceSupplier({
+        supplierId,
+        providerId: updatedSupplier.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
+        legalName: normalizeString(updatedSupplier.legal_name),
+        tradeName: updatedSupplier.trade_name ? normalizeString(updatedSupplier.trade_name) : null,
+        website: updatedSupplier.website ? normalizeString(updatedSupplier.website) : null,
+        isActive: normalizeBoolean(updatedSupplier.is_active)
+      })
+    }
+
+    return NextResponse.json({
+      supplierId,
+      providerId: updatedSupplier?.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
+      updated: true
+    })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

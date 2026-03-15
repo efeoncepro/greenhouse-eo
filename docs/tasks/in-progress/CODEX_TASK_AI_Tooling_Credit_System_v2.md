@@ -37,6 +37,21 @@ Conclusión:
 
 ## Backend activo cerrado en esta v2
 
+### Delta 2026-03-15 — bridge Supplier -> Provider
+
+- Se endureció el alineamiento runtime entre `Finance` y `AI Tooling`:
+  - `AI Tooling` ya no depende solo de providers sembrados/manuales
+  - ahora puede sincronizar providers canónicos desde suppliers financieros activos
+- Objetivo operativo:
+  - que `Nueva herramienta` consuma `provider_id` reutilizable
+  - evitar dropdowns vacíos cuando el vendor ya existe en `Finance`
+- Runtime agregado:
+  - `src/lib/providers/canonical.ts`
+  - bridge `fin_suppliers -> greenhouse.providers`
+- Regla operativa derivada:
+  - `AI Tooling` debe leer providers desde el registry canónico
+  - `fin_suppliers` sigue siendo extensión financiera, pero ahora puede materializar el `provider_id` compartido
+
 ### Infraestructura runtime on-demand
 
 Se agregó `ensureAiToolingInfrastructure()` en:
