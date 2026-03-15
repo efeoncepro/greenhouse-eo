@@ -50,6 +50,18 @@ type ExpenseRow = {
   created_at: string | null
 }
 
+type AssignmentRow = {
+  assignment_id: string
+  client_id: string
+  client_name: string | null
+  fte_allocation: string | number
+  hours_per_month: string | number | null
+  role_title_override: string | null
+  start_date: string | null
+  end_date: string | null
+  active: boolean
+}
+
 type IdentityLinkRow = {
   source_system: string | null
   source_object_id: string | null
@@ -129,7 +141,7 @@ const buildFinanceOverview = async (
   displayNameHint: string | null
 ): Promise<PersonFinanceOverview> => {
   // Run summary + detail queries in parallel
-  const [summaryRows, payrollRows, expenseRows, identityRows] = await Promise.all([
+  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows] = await Promise.all([
     runGreenhousePostgresQuery<FinanceSummaryRow>(
       `SELECT * FROM greenhouse_serving.person_finance_360
        WHERE member_id = $1
@@ -186,7 +198,24 @@ const buildFinanceOverview = async (
          ORDER BY source_system ASC, source_email ASC`,
         [identityProfileId]
       )
-      : Promise.resolve([] as IdentityLinkRow[])
+      : Promise.resolve([] as IdentityLinkRow[]),
+    runGreenhousePostgresQuery<AssignmentRow>(
+      `SELECT
+        a.assignment_id,
+        a.client_id,
+        COALESCE(c.client_name, a.client_id) AS client_name,
+        a.fte_allocation::text,
+        a.hours_per_month,
+        a.role_title_override,
+        a.start_date::text,
+        a.end_date::text,
+        a.active
+      FROM greenhouse_core.client_team_assignments a
+      LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+      WHERE a.member_id = $1
+      ORDER BY a.active DESC, a.start_date DESC`,
+      [memberId]
+    ).catch(() => [] as AssignmentRow[])
   ])
 
   const summary = summaryRows[0]
@@ -198,14 +227,24 @@ const buildFinanceOverview = async (
       identityProfileId: summary?.identity_profile_id ?? identityProfileId
     },
     summary: {
-      activeAssignmentsCount: 0, // client_team_assignments not yet in Postgres
+      activeAssignmentsCount: assignmentRows.filter(r => r.active).length,
       payrollEntriesCount: toNum(summary?.total_payroll_entries),
       expenseCount: toNum(summary?.expense_count),
       paidExpensesCount: toNum(summary?.paid_expense_count),
       totalExpensesClp: toNum(summary?.total_expenses_clp),
       lastExpenseDate: toDateStr(summary?.last_expense_date ?? null)
     },
-    assignments: [], // client_team_assignments not yet in Postgres — populated from BigQuery fallback when needed
+    assignments: assignmentRows.map(r => ({
+      assignmentId: r.assignment_id,
+      clientId: r.client_id,
+      clientName: r.client_name?.trim() || r.client_id,
+      fteAllocation: toNum(r.fte_allocation),
+      hoursPerMonth: toNum(r.hours_per_month),
+      roleTitleOverride: str(r.role_title_override),
+      startDate: toDateStr(r.start_date),
+      endDate: toDateStr(r.end_date),
+      active: Boolean(r.active)
+    })),
     identities: identityRows.map(r => ({
       sourceSystem: str(r.source_system),
       sourceObjectId: str(r.source_object_id),

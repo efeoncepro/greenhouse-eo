@@ -5,6 +5,8 @@ import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMe
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
+import { getPersonHrContext } from '@/lib/person-360/get-person-hr'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
 import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
@@ -541,6 +543,27 @@ export const getPersonDetail = async ({
         console.warn(`[people/${memberId}] finance overview failed:`, error instanceof Error ? error.message : error)
       })
     )
+  }
+
+  // Person 360 contextual enrichment (Postgres-only)
+  if (isGreenhousePostgresConfigured()) {
+    tasks.push(
+      getPersonDeliveryContext(memberId).then(ctx => {
+        detail.deliveryContext = ctx
+      }).catch(error => {
+        console.warn(`[people/${memberId}] delivery context failed:`, error instanceof Error ? error.message : error)
+      })
+    )
+
+    if (access.canViewCompensation) {
+      tasks.push(
+        getPersonHrContext(memberId).then(ctx => {
+          detail.hrContext = ctx
+        }).catch(error => {
+          console.warn(`[people/${memberId}] hr context failed:`, error instanceof Error ? error.message : error)
+        })
+      )
+    }
   }
 
   await Promise.all(tasks)

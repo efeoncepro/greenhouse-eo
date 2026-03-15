@@ -1,3 +1,5 @@
+import type { PersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
+import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
 import type { TeamCapacityHealth, TeamMemberProfile } from '@/types/team'
 
@@ -211,4 +213,6 @@ export interface PersonDetail {
   operationalMetrics?: PersonOperationalMetrics | null
   currentCompensation?: CompensationVersion | null
   recentPayroll?: PayrollEntry[]
+  hrContext?: PersonHrContext | null
+  deliveryContext?: PersonDeliveryContext | null
 }
