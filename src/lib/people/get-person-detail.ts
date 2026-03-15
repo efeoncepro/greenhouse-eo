@@ -5,6 +5,7 @@ import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMe
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
 import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
 import { getPersonOperationalMetrics } from '@/lib/people/get-person-operational-metrics'
@@ -274,6 +275,7 @@ const buildPersonMember = (row: MemberRow): {
 
   return {
     member: {
+      eoId: null, // resolved later via person_360
       memberId: String(row.member_id || ''),
       displayName: String(row.display_name || 'Sin nombre'),
       publicEmail,
@@ -421,12 +423,16 @@ const resolveLinkedUserId = async (identityProfileId: string | null): Promise<st
 }
 
 export const getPersonDetail = async ({
-  memberId,
+  memberId: memberIdOrEoId,
   access
 }: {
   memberId: string
   access: PersonAccess
 }): Promise<PersonDetail> => {
+  // Resolve identifier via person_360 — works with EO-ID or legacy memberId
+  const resolved = await resolvePersonIdentifier(memberIdOrEoId)
+  const memberId = resolved?.memberId ?? memberIdOrEoId
+
   const memberRow = await getMemberById(memberId)
 
   if (!memberRow) {
@@ -434,6 +440,12 @@ export const getPersonDetail = async ({
   }
 
   const { member, emailAliases } = buildPersonMember(memberRow)
+
+  // Set canonical EO-ID and linked userId from person_360
+  if (resolved) {
+    member.eoId = resolved.eoId
+  }
+
   const identityRows = await getIdentityProvidersByProfile(member.identityProfileId)
 
   const linkedProviders = Array.from(
@@ -472,11 +484,8 @@ export const getPersonDetail = async ({
 
   const tasks: Array<Promise<void>> = []
 
-  tasks.push(
-    resolveLinkedUserId(member.identityProfileId).then(userId => {
-      detail.linkedUserId = userId
-    })
-  )
+  // linkedUserId already resolved from person_360
+  detail.linkedUserId = resolved?.userId ?? null
 
   tasks.push(
     getAssignmentsByMember(memberId).then(rows => {

@@ -95,15 +95,15 @@ const TabProfile = ({ data }: Props) => {
               <Typography className='uppercase' variant='body2' color='text.disabled'>
                 {GH_INTERNAL_MESSAGES.admin_user_detail_section_identifiers}
               </Typography>
-              <InfoRow icon='tabler-id' label={GH_INTERNAL_MESSAGES.admin_user_detail_label_public_id} value={data.publicUserId} />
-              {data.identityPublicId && (
-                <InfoRow icon='tabler-fingerprint' label={GH_INTERNAL_MESSAGES.admin_user_detail_label_identity_id} value={data.identityPublicId} />
+              {data.eoId && (
+                <InfoRow icon='tabler-fingerprint' label='EO-ID:' value={data.eoId} />
               )}
+              <InfoRow icon='tabler-id' label={GH_INTERNAL_MESSAGES.admin_user_detail_label_public_id} value={data.publicUserId} />
             </div>
-            {data.linkedMemberId && (
+            {data.eoId && data.linkedMemberId && (
               <Button
                 component={Link}
-                href={`/people/${data.linkedMemberId}`}
+                href={`/people/${data.eoId}`}
                 variant='tonal'
                 size='small'
                 startIcon={<i className='tabler-user' />}

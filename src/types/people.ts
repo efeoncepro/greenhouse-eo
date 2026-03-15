@@ -70,6 +70,7 @@ export interface PersonOperationalMetrics {
 }
 
 export interface PersonDetailMember {
+  eoId: string | null
   memberId: string
   displayName: string
   publicEmail: string

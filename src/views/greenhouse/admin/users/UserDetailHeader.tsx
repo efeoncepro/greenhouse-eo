@@ -54,7 +54,12 @@ const UserDetailHeader = ({ data }: Props) => {
         </div>
         <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end'>
           <div className='flex flex-col items-center sm:items-start gap-2'>
-            <Typography variant='h4'>{data.fullName}</Typography>
+            <div className='flex items-center gap-3'>
+              <Typography variant='h4'>{data.fullName}</Typography>
+              {data.eoId && (
+                <Chip size='small' variant='outlined' color='primary' label={data.eoId} sx={{ fontFamily: 'monospace', fontWeight: 700 }} />
+              )}
+            </div>
             <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
               <div className='flex items-center gap-2'>
                 <i className='tabler-briefcase' />
