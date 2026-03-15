@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { getLatestStoredExchangeRatePair, syncDailyUsdClpExchangeRate } from '@/lib/finance/exchange-rates'
+import {
+  fetchUsdToClpFromProviders,
+  getLatestStoredExchangeRatePair,
+  syncDailyUsdClpExchangeRate
+} from '@/lib/finance/exchange-rates'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,6 +43,19 @@ export async function GET() {
   }
 
   if (!latestRate) {
+    const liveRate = await fetchUsdToClpFromProviders()
+
+    if (liveRate) {
+      return NextResponse.json({
+        available: true,
+        fromCurrency: 'USD',
+        toCurrency: 'CLP',
+        rate: liveRate.usdToClp,
+        rateDate: liveRate.rateDate,
+        source: `${liveRate.source}:live`
+      })
+    }
+
     return NextResponse.json({
       available: false,
       rate: null,
