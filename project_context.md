@@ -19,6 +19,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `HubSpot Owner -> Collaborator / User` ya queda proyectado usando `greenhouse.team_members.hubspot_owner_id`:
   - `owner_member_id` queda poblado en `crm_companies`, `crm_deals` y `crm_contacts`
   - `owner_user_id` se resuelve cuando el colaborador también tiene principal en `greenhouse_core.client_users`
+  - además se sincronizan source links reutilizables en `greenhouse_core`:
+    - `entity_source_links` `member <- hubspot owner`
+    - `entity_source_links` `user <- hubspot owner`
+    - `identity_profile_source_links` `identity_profile <- hubspot owner`
 - Estado validado después de rerun completo:
   - BigQuery conformed `crm_contacts = 63`
   - PostgreSQL runtime `greenhouse_crm.contacts = 63`
@@ -31,10 +35,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - PostgreSQL runtime owner coverage:
     - companies: `owner_member_id = 9`, `owner_user_id = 9`
     - deals: `owner_member_id = 21`, `owner_user_id = 21`
+  - source links de owner:
+    - `member <- hubspot owner = 6`
+    - `user <- hubspot owner = 1`
+    - `identity_profile <- hubspot owner = 6`
 - Regla operativa derivada:
   - no pedirle a la integración live que escriba directo a BigQuery
   - el source sync es quien replica a `raw` / `conformed`
   - la integración live sigue siendo la pieza de provisioning y reconciliación de accesos
+  - la cobertura actual de `owner -> user` depende de cuántos colaboradores internos ya tengan principal en `client_users`; hoy solo `Julio` quedó resuelto en esa capa
 
 ## Delta 2026-03-15 Space model added to canonical 360 and delivery projections
 - `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` ya existen en Cloud SQL como nuevo boundary operativo del 360.

@@ -195,6 +195,10 @@ Puede avanzar en paralelo con ambas porque su output es una capa de datos y no d
   - `linked_identity_profile_id = 29`
   - `owner_member_id = 63`
   - `owner_user_id = 61`
+- source links de owner validados:
+  - `member <- hubspot owner = 6`
+  - `user <- hubspot owner = 1`
+  - `identity_profile <- hubspot owner = 6`
 
 ## Criterios de aceptacion
 

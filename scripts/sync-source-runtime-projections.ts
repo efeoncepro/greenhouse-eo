@@ -1350,17 +1350,28 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
     const ownerMemberRows = await runBigQuery<{
       member_id: string | null
+      display_name: string | null
       email: string | null
+      identity_profile_id: string | null
       hubspot_owner_id: string | null
     }>(
       `
-        SELECT member_id, email, hubspot_owner_id
+        SELECT member_id, display_name, email, identity_profile_id, hubspot_owner_id
         FROM \`${projectId}.greenhouse.team_members\`
         WHERE hubspot_owner_id IS NOT NULL
       `
     )
 
-    const ownerMemberBySourceId = new Map<string, { memberId: string; email: string | null }>()
+    const ownerMemberBySourceId = new Map<
+      string,
+      {
+        memberId: string
+        displayName: string | null
+        email: string | null
+        identityProfileId: string | null
+        userId: string | null
+      }
+    >()
 
     for (const row of ownerMemberRows) {
       const ownerSourceId = toNullableString(row.hubspot_owner_id)
@@ -1372,22 +1383,125 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
       ownerMemberBySourceId.set(ownerSourceId, {
         memberId,
-        email: toNullableString(row.email)?.toLowerCase() || null
+        displayName: toNullableString(row.display_name),
+        email: toNullableString(row.email)?.toLowerCase() || null,
+        identityProfileId: toNullableString(row.identity_profile_id),
+        userId: null
       })
+    }
+
+    for (const owner of ownerMemberBySourceId.values()) {
+      owner.userId = owner.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+    }
+
+    for (const [ownerSourceId, owner] of ownerMemberBySourceId.entries()) {
+      await runGreenhousePostgresQuery(
+        `
+          INSERT INTO greenhouse_core.entity_source_links (
+            link_id,
+            entity_type,
+            entity_id,
+            source_system,
+            source_object_type,
+            source_object_id,
+            source_display_name,
+            is_primary,
+            active
+          )
+          VALUES ($1, 'member', $2, 'hubspot', 'owner', $3, $4, TRUE, TRUE)
+          ON CONFLICT (entity_type, entity_id, source_system, source_object_type, source_object_id) DO UPDATE
+          SET
+            source_display_name = EXCLUDED.source_display_name,
+            is_primary = EXCLUDED.is_primary,
+            active = EXCLUDED.active,
+            updated_at = CURRENT_TIMESTAMP
+        `,
+        [
+          `member-link-hubspot-owner-${ownerSourceId}`,
+          owner.memberId,
+          ownerSourceId,
+          owner.displayName || owner.email || owner.memberId
+        ]
+      )
+
+      if (owner.userId) {
+        await runGreenhousePostgresQuery(
+          `
+            INSERT INTO greenhouse_core.entity_source_links (
+              link_id,
+              entity_type,
+              entity_id,
+              source_system,
+              source_object_type,
+              source_object_id,
+              source_display_name,
+              is_primary,
+              active
+            )
+            VALUES ($1, 'user', $2, 'hubspot', 'owner', $3, $4, TRUE, TRUE)
+            ON CONFLICT (entity_type, entity_id, source_system, source_object_type, source_object_id) DO UPDATE
+            SET
+              source_display_name = EXCLUDED.source_display_name,
+              is_primary = EXCLUDED.is_primary,
+              active = EXCLUDED.active,
+              updated_at = CURRENT_TIMESTAMP
+          `,
+          [
+            `user-link-hubspot-owner-${ownerSourceId}`,
+            owner.userId,
+            ownerSourceId,
+            owner.displayName || owner.email || owner.memberId
+          ]
+        )
+      }
+
+      if (owner.identityProfileId) {
+        await runGreenhousePostgresQuery(
+          `
+            INSERT INTO greenhouse_core.identity_profile_source_links (
+              link_id,
+              profile_id,
+              source_system,
+              source_object_type,
+              source_object_id,
+              source_email,
+              source_display_name,
+              is_primary,
+              is_login_identity,
+              active
+            )
+            VALUES ($1, $2, 'hubspot', 'owner', $3, $4, $5, TRUE, FALSE, TRUE)
+            ON CONFLICT (profile_id, source_system, source_object_type, source_object_id) DO UPDATE
+            SET
+              source_email = EXCLUDED.source_email,
+              source_display_name = EXCLUDED.source_display_name,
+              is_primary = EXCLUDED.is_primary,
+              active = EXCLUDED.active,
+              updated_at = CURRENT_TIMESTAMP
+          `,
+          [
+            `profile-link-hubspot-owner-${ownerSourceId}`,
+            owner.identityProfileId,
+            ownerSourceId,
+            owner.email,
+            owner.displayName || owner.email || owner.memberId
+          ]
+        )
+      }
     }
 
     for (const company of crmCompanies) {
       const owner = company.owner_source_id ? ownerMemberBySourceId.get(company.owner_source_id) || null : null
 
       company.owner_member_id = owner?.memberId || null
-      company.owner_user_id = owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+      company.owner_user_id = owner?.userId || null
     }
 
     for (const deal of crmDeals) {
       const owner = deal.owner_source_id ? ownerMemberBySourceId.get(deal.owner_source_id) || null : null
 
       deal.owner_member_id = owner?.memberId || null
-      deal.owner_user_id = owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+      deal.owner_user_id = owner?.userId || null
     }
 
     const resolvePrimaryCompanySourceId = (assocCompanies: string | null) => {
@@ -1458,11 +1572,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
               : null,
           owner_user_id:
             toNullableString(row.hubspot_owner_id)
-              ? (() => {
-                  const owner = ownerMemberBySourceId.get(toNullableString(row.hubspot_owner_id) || '')
-
-                  return owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
-                })()
+              ? ownerMemberBySourceId.get(toNullableString(row.hubspot_owner_id) || '')?.userId || null
               : null,
           updated_at: toTimestampValue(row.lastmodifieddate),
           payload_hash: buildPayloadHash(row),

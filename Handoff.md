@@ -186,6 +186,9 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `crm_deals.owner_member_id`
   - `crm_contacts.owner_member_id`
   - `owner_user_id` cuando el colaborador tiene principal en `greenhouse_core.client_users`
+  - `entity_source_links` para `member <- hubspot owner`
+  - `entity_source_links` para `user <- hubspot owner`
+  - `identity_profile_source_links` para `identity_profile <- hubspot owner`
 - Regla dejada explícita en docs:
   - el sync modela y reconcilia CRM contacts
   - la integración live/admin sigue siendo la capa de provisioning de accesos
@@ -212,11 +215,15 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - PostgreSQL runtime owners:
     - companies `owner_member_id = 9`, `owner_user_id = 9`
     - deals `owner_member_id = 21`, `owner_user_id = 21`
+  - source links de owner:
+    - `member <- hubspot owner = 6`
+    - `user <- hubspot owner = 1`
+    - `identity_profile <- hubspot owner = 6`
 
 ### Riesgos o pendientes
 - El seed completo sigue siendo lento porque `sync-source-runtime-projections.ts` hace demasiados writes secuenciales; conviene optimizarlo después de cerrar este slice.
 - `crm_contacts` todavía resuelve un `company_source_id` primario; si más adelante necesitamos una relación explícita many-to-many, corresponde agregar `crm_company_contacts`.
-- El siguiente slice lógico del 360 es endurecer `HubSpot Owner -> identity_profile / user` como source link reutilizable para que toda la plataforma lo consuma igual.
+- La cobertura de `owner -> user` depende de cuántos colaboradores internos ya tienen principal en `client_users`; hoy quedó resuelto `1/6`.
 
 ---
 

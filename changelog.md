@@ -38,6 +38,10 @@
   - `HubSpot Contact -> client_user`
   - `HubSpot Contact -> identity_profile`
   - `HubSpot Owner -> member/user`
+- `HubSpot Owner` ahora también se sincroniza como source link reusable en `greenhouse_core`:
+  - `member <- hubspot owner = 6`
+  - `user <- hubspot owner = 1`
+  - `identity_profile <- hubspot owner = 6`
 - Estado validado tras rerun:
   - `crm_contacts = 63`
   - `linked_user_id = 29`

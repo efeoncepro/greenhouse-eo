@@ -493,6 +493,10 @@ Current state:
 Target:
 - `hubspot_owner_id` must resolve to `greenhouse_core.members.member_id` as the operational owner anchor
 - when the collaborator also has a Greenhouse user principal, runtime projections should also populate `owner_user_id`
+- the reusable source-link layer should also be populated:
+  - `entity_source_links` for `member <- hubspot owner`
+  - `entity_source_links` for `user <- hubspot owner` when a principal exists
+  - `identity_profile_source_links` for `identity_profile <- hubspot owner` when the collaborator already has canonical identity
 - this keeps ownership comparable across CRM, delivery, HR and auth without inventing a second internal owner model
 
 ### 4. Service module normalization
