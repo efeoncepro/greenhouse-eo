@@ -3,6 +3,10 @@
     {
       "path": "/api/finance/exchange-rates/sync",
       "schedule": "5 23 * * *"
+    },
+    {
+      "path": "/api/cron/outbox-publish",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
