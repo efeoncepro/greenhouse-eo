@@ -224,6 +224,7 @@ OPTIONS(description = "Append-only raw snapshots of HubSpot line items");
 CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_projects` (
   project_source_id STRING NOT NULL,
   project_database_source_id STRING,
+  space_id STRING,
   client_source_id STRING,
   client_id STRING,
   module_code STRING,
@@ -250,6 +251,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_tasks` 
   project_source_id STRING,
   sprint_source_id STRING,
   project_database_source_id STRING,
+  space_id STRING,
   client_source_id STRING,
   client_id STRING,
   module_code STRING,
@@ -276,6 +278,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_sprints
   sprint_source_id STRING NOT NULL,
   project_source_id STRING,
   project_database_source_id STRING,
+  space_id STRING,
   sprint_name STRING NOT NULL,
   sprint_status STRING,
   start_date DATE,
@@ -339,10 +342,19 @@ CLUSTER BY deal_source_id, company_source_id, client_id
 OPTIONS(description = "Current-state conformed CRM deals derived from HubSpot");
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_projects`
+ADD COLUMN IF NOT EXISTS space_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_projects`
 ADD COLUMN IF NOT EXISTS project_database_source_id STRING;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
+ADD COLUMN IF NOT EXISTS space_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS project_database_source_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_sprints`
+ADD COLUMN IF NOT EXISTS space_id STRING;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_sprints`
 ADD COLUMN IF NOT EXISTS project_database_source_id STRING;

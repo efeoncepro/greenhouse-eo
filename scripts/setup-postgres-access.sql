@@ -41,12 +41,57 @@ GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_runtime;
 GRANT SELECT, REFERENCES ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_runtime;
 
-GRANT USAGE ON SCHEMA greenhouse_core TO greenhouse_migrator;
-GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_migrator;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_core TO greenhouse_migrator;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_serving TO greenhouse_migrator;
 GRANT USAGE, CREATE ON SCHEMA greenhouse_sync TO greenhouse_migrator;
 
 GRANT SELECT, REFERENCES ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_migrator;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_migrator;
+
+DO $$
+DECLARE
+  schema_name TEXT;
+  schema_object RECORD;
+BEGIN
+  FOREACH schema_name IN ARRAY ARRAY[
+    'greenhouse_core',
+    'greenhouse_serving',
+    'greenhouse_sync'
+  ]
+  LOOP
+    IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = schema_name) THEN
+      BEGIN
+        EXECUTE format('ALTER SCHEMA %I OWNER TO greenhouse_migrator', schema_name);
+      EXCEPTION
+        WHEN insufficient_privilege THEN
+          RAISE NOTICE 'Skipping ownership transfer for schema % due to insufficient privilege', schema_name;
+      END;
+
+      FOR schema_object IN
+        SELECT c.relkind, quote_ident(n.nspname) || '.' || quote_ident(c.relname) AS qualified_name
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = schema_name
+          AND c.relkind IN ('r', 'p', 'v', 'm', 'S')
+      LOOP
+        BEGIN
+          IF schema_object.relkind = 'S' THEN
+            EXECUTE format('ALTER SEQUENCE %s OWNER TO greenhouse_migrator', schema_object.qualified_name);
+          ELSIF schema_object.relkind IN ('r', 'p') THEN
+            EXECUTE format('ALTER TABLE %s OWNER TO greenhouse_migrator', schema_object.qualified_name);
+          ELSIF schema_object.relkind = 'm' THEN
+            EXECUTE format('ALTER MATERIALIZED VIEW %s OWNER TO greenhouse_migrator', schema_object.qualified_name);
+          ELSE
+            EXECUTE format('ALTER VIEW %s OWNER TO greenhouse_migrator', schema_object.qualified_name);
+          END IF;
+        EXCEPTION
+          WHEN insufficient_privilege THEN
+            RAISE NOTICE 'Skipping ownership transfer for object % due to insufficient privilege', schema_object.qualified_name;
+        END;
+      END LOOP;
+    END IF;
+  END LOOP;
+END $$;
 
 DO $$
 DECLARE

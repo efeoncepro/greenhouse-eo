@@ -41,7 +41,8 @@ Update `GREENHOUSE_DATA_MODEL_MASTER_V1.md` when any of these happens:
 
 Examples:
 - adding `greenhouse_crm.contacts`
-- turning `project_database_source_id` into the tenant delivery binding
+- adding `greenhouse_core.spaces`
+- turning `project_database_source_id` into the delivery workspace binding
 - changing how `HubSpot Contact -> client_user` reconciliation works
 - adding `greenhouse_finance.reconciliation_periods`
 
@@ -82,7 +83,7 @@ Do not blur them together.
 
 Good:
 - "Current state: tenant mapping still relies on `notion_project_ids`."
-- "Target: tenant binding must move to `project_database_source_id`."
+- "Target: workspace binding must move to `space_id + project_database_source_id`."
 
 Bad:
 - "Notion maps to tenant." without saying whether this is already true in data or only the desired model.
@@ -109,7 +110,7 @@ Whenever a cross-system bridge matters for runtime, the master doc must say it e
 Examples that must always stay explicit:
 - `HubSpot Company -> Greenhouse Client`
 - `HubSpot Contact -> Greenhouse User / Identity Profile`
-- `Notion project database -> tenant delivery workspace`
+- `Notion project database -> Greenhouse Space`
 - `Notion project/task/sprint -> greenhouse_delivery.*`
 - `Provider -> Finance Supplier -> AI Tooling vendor`
 

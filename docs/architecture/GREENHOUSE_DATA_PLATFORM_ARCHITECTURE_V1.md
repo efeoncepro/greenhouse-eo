@@ -108,6 +108,7 @@ Purpose:
 
 Expected objects:
 - Client
+- Space
 - Collaborator
 - Identity Profile
 - Provider
@@ -118,6 +119,21 @@ Rules:
 - every shared object has one canonical anchor
 - source IDs remain references, not primary platform identity
 - write-heavy modules may extend these objects but cannot replace their identity
+
+### Client Versus Space
+
+Greenhouse must stop treating the commercial tenant and the operational workspace as the same object.
+
+Rule:
+- `client` is the commercial and contractual boundary
+- `space` is the operational boundary that owns delivery/ICO context
+
+Implications:
+- a client company may map to one or more `client_space` workspaces
+- internal agency workspaces like `Efeonce` must be modeled as `internal_space`
+- `space` can exist without `client_id`
+- `Agency`, `delivery`, and ICO metrics should resolve against `space_id`
+- `CRM` and `Finance` should resolve against `client_id`
 
 ### Layer D. Serving / Marts
 

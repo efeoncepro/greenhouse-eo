@@ -45,6 +45,26 @@ const toBoolean = (value: unknown, fallback = false) => {
   return fallback
 }
 
+const INTERNAL_SPACE_CLIENT_IDS = new Set(['space-efeonce'])
+
+const isInternalSpaceSeed = (row: Record<string, unknown>) => {
+  const clientId = toNullableString(row.client_id)
+  const tenantType = toNullableString(row.tenant_type)
+
+  return tenantType === 'efeonce_internal' || (clientId ? INTERNAL_SPACE_CLIENT_IDS.has(clientId) : false)
+}
+
+const buildDerivedPublicId = (prefix: string, value: string | null) => {
+  const normalized = (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toUpperCase()
+
+  return normalized ? `${prefix}-${normalized}` : null
+}
+
 const queryBigQuery = async <T>(query: string, params: Record<string, unknown> = {}) => {
   const [rows] = await bigQuery.query({
     query,
@@ -138,6 +158,91 @@ const upsertClient = async (row: Record<string, unknown>) => {
       ]
     )
   }
+}
+
+const upsertSpace = async (row: Record<string, unknown>) => {
+  await runGreenhousePostgresQuery(
+    `
+      INSERT INTO greenhouse_core.spaces (
+        space_id,
+        public_id,
+        client_id,
+        space_name,
+        space_type,
+        primary_project_database_source_id,
+        status,
+        active,
+        notes,
+        created_at,
+        updated_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10::timestamptz, CURRENT_TIMESTAMP), COALESCE($11::timestamptz, CURRENT_TIMESTAMP))
+      ON CONFLICT (space_id) DO UPDATE
+      SET
+        public_id = EXCLUDED.public_id,
+        client_id = EXCLUDED.client_id,
+        space_name = EXCLUDED.space_name,
+        space_type = EXCLUDED.space_type,
+        primary_project_database_source_id = COALESCE(EXCLUDED.primary_project_database_source_id, greenhouse_core.spaces.primary_project_database_source_id),
+        status = EXCLUDED.status,
+        active = EXCLUDED.active,
+        notes = EXCLUDED.notes,
+        updated_at = EXCLUDED.updated_at
+    `,
+    [
+      toNullableString(row.space_id),
+      toNullableString(row.public_id),
+      toNullableString(row.client_id),
+      toNullableString(row.space_name),
+      toNullableString(row.space_type) || 'client_space',
+      toNullableString(row.primary_project_database_source_id),
+      toNullableString(row.status) || 'active',
+      toBoolean(row.active, true),
+      toNullableString(row.notes),
+      toNullableString(row.created_at),
+      toNullableString(row.updated_at)
+    ]
+  )
+}
+
+const upsertSpaceSourceBinding = async (row: Record<string, unknown>) => {
+  await runGreenhousePostgresQuery(
+    `
+      INSERT INTO greenhouse_core.space_source_bindings (
+        binding_id,
+        space_id,
+        source_system,
+        source_object_type,
+        source_object_id,
+        binding_role,
+        source_display_name,
+        is_primary,
+        active,
+        created_at,
+        updated_at
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, COALESCE($10::timestamptz, CURRENT_TIMESTAMP), COALESCE($11::timestamptz, CURRENT_TIMESTAMP))
+      ON CONFLICT (space_id, source_system, source_object_type, source_object_id, binding_role) DO UPDATE
+      SET
+        source_display_name = EXCLUDED.source_display_name,
+        is_primary = EXCLUDED.is_primary,
+        active = EXCLUDED.active,
+        updated_at = EXCLUDED.updated_at
+    `,
+    [
+      toNullableString(row.binding_id),
+      toNullableString(row.space_id),
+      toNullableString(row.source_system),
+      toNullableString(row.source_object_type),
+      toNullableString(row.source_object_id),
+      toNullableString(row.binding_role),
+      toNullableString(row.source_display_name),
+      toBoolean(row.is_primary),
+      toBoolean(row.active, true),
+      toNullableString(row.created_at),
+      toNullableString(row.updated_at)
+    ]
+  )
 }
 
 const upsertIdentityProfile = async (row: Record<string, unknown>) => {
@@ -586,6 +691,7 @@ async function main() {
         active,
         hubspot_company_id,
         timezone,
+        notion_project_ids,
         notes,
         CAST(created_at AS STRING) AS created_at,
         CAST(updated_at AS STRING) AS updated_at
@@ -599,6 +705,120 @@ async function main() {
   }
 
   summary.clients = clients.length
+
+  const primaryWorkspaceBySpace = new Map<string, string>()
+  const spaceNameById = new Map<string, string>()
+  const internalSpaceById = new Map<string, boolean>()
+
+  for (const row of clients) {
+    const clientId = toNullableString(row.client_id)
+
+    if (!clientId) {
+      continue
+    }
+
+    const internalSpace = isInternalSpaceSeed(row)
+    const spaceId = clientId
+    const spaceName = toNullableString(row.client_name) || clientId
+
+    spaceNameById.set(spaceId, spaceName)
+    internalSpaceById.set(spaceId, internalSpace)
+
+    await upsertSpace({
+      space_id: spaceId,
+      public_id: buildDerivedPublicId('EO-SPACE', spaceId),
+      client_id: internalSpace ? null : clientId,
+      space_name: spaceName,
+      space_type: internalSpace ? 'internal_space' : 'client_space',
+      status: toNullableString(row.status) || 'active',
+      active: toBoolean(row.active, true),
+      notes: internalSpace
+        ? 'Internal agency workspace projected from legacy tenant/client scope during spaces migration.'
+        : 'Client delivery workspace projected from legacy tenant/client scope during spaces migration.',
+      created_at: row.created_at,
+      updated_at: row.updated_at
+    })
+
+    for (const notionProjectId of Array.isArray(row.notion_project_ids) ? row.notion_project_ids : []) {
+      const normalizedProjectId = toNullableString(notionProjectId)
+
+      if (!normalizedProjectId) {
+        continue
+      }
+
+      await upsertSpaceSourceBinding({
+        binding_id: `space-${spaceId}-legacy-project-${normalizedProjectId}`,
+        space_id: spaceId,
+        source_system: 'notion',
+        source_object_type: 'project_page',
+        source_object_id: normalizedProjectId,
+        binding_role: 'legacy_project_scope',
+        source_display_name: toNullableString(row.client_name),
+        is_primary: false,
+        active: true,
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      })
+    }
+  }
+
+  const notionWorkspaceBindings = await queryBigQuery<Record<string, unknown>>(
+    `
+      SELECT DISTINCT
+        c.client_id,
+        c.client_name,
+        p._source_database_id AS project_database_source_id
+      FROM ${tableRef('clients')} AS c,
+      UNNEST(COALESCE(c.notion_project_ids, [])) AS notion_project_id
+      INNER JOIN \`${projectId}.notion_ops.proyectos\` AS p
+        ON p.notion_page_id = notion_project_id
+      WHERE p._source_database_id IS NOT NULL
+    `
+  )
+
+  for (const row of notionWorkspaceBindings) {
+    const spaceId = toNullableString(row.client_id)
+    const projectDatabaseSourceId = toNullableString(row.project_database_source_id)
+
+    if (!spaceId || !projectDatabaseSourceId) {
+      continue
+    }
+
+    const isPrimary = !primaryWorkspaceBySpace.has(spaceId)
+
+    if (isPrimary) {
+      primaryWorkspaceBySpace.set(spaceId, projectDatabaseSourceId)
+    }
+
+    await upsertSpaceSourceBinding({
+      binding_id: `space-${spaceId}-workspace-${projectDatabaseSourceId}`,
+      space_id: spaceId,
+      source_system: 'notion',
+      source_object_type: 'project_database',
+      source_object_id: projectDatabaseSourceId,
+      binding_role: 'delivery_workspace',
+      source_display_name: toNullableString(row.client_name),
+      is_primary: isPrimary,
+      active: true
+    })
+  }
+
+  for (const [spaceId, projectDatabaseSourceId] of primaryWorkspaceBySpace.entries()) {
+    await upsertSpace({
+      space_id: spaceId,
+      public_id: buildDerivedPublicId('EO-SPACE', spaceId),
+      client_id: internalSpaceById.get(spaceId) ? null : spaceId,
+      space_name: spaceNameById.get(spaceId) || spaceId,
+      space_type: internalSpaceById.get(spaceId) ? 'internal_space' : 'client_space',
+      primary_project_database_source_id: projectDatabaseSourceId,
+      active: true
+    })
+  }
+
+  summary.spaces = clients.length
+  summary.spaceSourceBindings =
+    clients.reduce((total, row) => total + (Array.isArray(row.notion_project_ids) ? row.notion_project_ids.length : 0), 0) +
+    notionWorkspaceBindings.length
 
   const identityProfiles = await queryBigQuery<Record<string, unknown>>(
     `

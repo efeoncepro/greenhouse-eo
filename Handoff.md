@@ -40,6 +40,152 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 08:15 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Introducir `spaces` como objeto canónico del 360, conectar delivery a `space_id` y formalizar `Efeonce` como `internal_space`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
+
+### Archivos tocados
+- `scripts/setup-postgres-access.sql`
+- `scripts/setup-postgres-canonical-360.sql`
+- `scripts/setup-postgres-source-sync.sql`
+- `scripts/setup-bigquery-source-sync.sql`
+- `scripts/backfill-postgres-canonical-360.ts`
+- `scripts/sync-source-runtime-projections.ts`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se agregó `greenhouse_core.spaces` como nuevo anchor canónico del workspace operativo.
+- Se agregó `greenhouse_core.space_source_bindings` para modelar:
+  - `legacy_project_scope`
+  - `delivery_workspace`
+- Se agregó `greenhouse_serving.space_360`.
+- `Source Sync Runtime Projections` ahora publica `space_id` en `delivery_*` tanto en BigQuery conformed como en PostgreSQL runtime.
+- `space-efeonce` quedó formalizado como:
+  - `space_type = internal_space`
+  - `client_id = null`
+  - `primary_project_database_source_id = 15288d9b145940529acc75439bbd5470`
+- Se ejecutó backfill canónico nuevo:
+  - `clients = 11`
+  - `spaces = 11`
+  - `spaceSourceBindings = 69`
+- Se resembró `Source Sync Runtime Projections` con `space_id`:
+  - Notion: `1245` filas leídas / `1245` proyectadas
+  - HubSpot: `806` filas leídas / `34` proyectadas al runtime cliente
+- Se corrigió una deuda transversal de acceso:
+  - `setup-postgres-canonical-360.sql` ya otorga grants a `greenhouse_runtime` y `greenhouse_migrator`
+  - `setup-postgres-access.sql` ahora intenta normalizar ownership de `greenhouse_core`, `greenhouse_serving` y `greenhouse_sync` hacia `greenhouse_migrator` sin bloquear la evolución si encuentra objetos legacy no transferibles
+
+### Verificación
+- `pnpm exec tsx scripts/setup-postgres-access.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-canonical-360.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/setup-bigquery-source-sync.ts`
+  - correcto
+- `pnpm exec tsx scripts/backfill-postgres-canonical-360.ts`
+  - correcto
+- `pnpm exec tsx scripts/sync-source-runtime-projections.ts`
+  - correcto
+- `pnpm exec eslint scripts/backfill-postgres-canonical-360.ts scripts/sync-source-runtime-projections.ts scripts/setup-postgres-access.ts scripts/setup-postgres-canonical-360.ts scripts/setup-postgres-source-sync.ts scripts/setup-bigquery-source-sync.ts`
+  - correcto
+- `git diff --check`
+  - correcto
+- Conteos verificados en PostgreSQL:
+  - `greenhouse_core.spaces = 11`
+  - `client_space = 10`
+  - `internal_space = 1`
+  - `greenhouse_delivery.projects` con `space_id = 57/59`
+  - `greenhouse_delivery.tasks` con `space_id = 961/1173`
+  - `greenhouse_delivery.sprints` con `space_id = 11/13`
+- Conteos verificados en BigQuery conformed:
+  - `delivery_projects` con `space_id = 57/59`
+  - `delivery_tasks` con `space_id = 961/1173`
+  - `delivery_sprints` con `space_id = 11/13`
+
+### Riesgos o pendientes
+- `Agency` runtime todavía lee el bridge legacy en BigQuery y no consume `greenhouse_core.spaces` directamente; esta pasada deja el modelo listo, no el cutover del módulo.
+- Aún quedan `2` sprints sin `space_id`; no quedaron asociados por tareas/proyectos en la data legacy y requieren reconciliación de source data o una regla adicional de binding.
+- El seed de `spaces` todavía nace de `greenhouse.clients.notion_project_ids`; el target sigue siendo `space -> project_database_source_id` como única fuente canónica.
+- La próxima slice lógica es:
+  - `HubSpot Contacts -> greenhouse_conformed.crm_contacts -> greenhouse_crm.contacts`
+  - reconciliation `HubSpot Contact -> client_user / identity_profile`
+
+## 2026-03-15 ~21:30 America/Santiago
+
+### Agente
+- Claude
+
+### Objetivo del turno
+- Wiring completo de Finance Slice 2 a PostgreSQL: income (GET/POST), expenses (GET/POST), income payments (POST), expense detail (GET), income detail (GET).
+- Lectura y análisis de `GREENHOUSE_IDENTITY_ACCESS_V2.md` para modelar Identity & Access V2 en PostgreSQL.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `src/lib/finance/postgres-store-slice2.ts` (NUEVO — ~1100 líneas)
+- `src/app/api/finance/income/route.ts` (modificado — Postgres-first GET + POST)
+- `src/app/api/finance/income/[id]/route.ts` (modificado — Postgres-first GET)
+- `src/app/api/finance/income/[id]/payment/route.ts` (modificado — Postgres-first POST)
+- `src/app/api/finance/expenses/route.ts` (modificado — Postgres-first GET + POST)
+- `src/app/api/finance/expenses/[id]/route.ts` (modificado — Postgres-first GET)
+- `scripts/setup-postgres-finance-slice2.sql` (existente, no modificado)
+- `scripts/setup-postgres-finance-slice2.ts` (existente, no modificado)
+- `scripts/backfill-postgres-finance-slice2.ts` (existente, no modificado)
+- `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md` (actualizado con delta Slice 2)
+
+### Cambios realizados
+- Creado `postgres-store-slice2.ts` con repository layer completo para Slice 2:
+  - Readiness check independiente (`assertFinanceSlice2PostgresReady()`) con TTL cache 60s
+  - CRUD para income, expenses, income_payments
+  - Sequence ID generator para Postgres (`buildMonthlySequenceIdFromPostgres()`)
+  - Todos los writes publican outbox events
+  - Payment creation transaccional: INSERT payment + UPDATE income con `FOR UPDATE` lock
+- Wired 7 rutas API a Postgres-first con BigQuery fallback:
+  - GET/POST `/api/finance/income`
+  - GET `/api/finance/income/[id]`
+  - POST `/api/finance/income/[id]/payment`
+  - GET/POST `/api/finance/expenses`
+  - GET `/api/finance/expenses/[id]`
+- Income payments normalizados: Postgres usa tabla `income_payments`, BigQuery fallback sigue con JSON `payments_received`
+- Analizados esquemas existentes y spec V2 para proponer modelo PostgreSQL de Identity & Access V2 (no implementado aún)
+
+### Verificación
+- `pnpm tsc --noEmit` — pasó antes del commit
+- Commit `8375edb` pushed a `fix/codex-operational-finance`
+
+### Riesgos o pendientes
+- Backfill Slice 2 **NO ejecutado** — `scripts/backfill-postgres-finance-slice2.ts` está listo pero no se corrió
+- PUT income y PUT expenses siguen solo en BigQuery (migrar como Slice 3)
+- Reconciliation runtime (match/unmatch/exclude/auto-match) aún en BigQuery
+- Identity & Access V2: modelo PostgreSQL propuesto pero DDL no generado aún
+
+---
+
 ## 2026-03-15 18:05 America/Santiago
 
 ### Agente

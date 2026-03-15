@@ -6,6 +6,39 @@
 
 ## 2026-03-15
 
+### Canonical `Space` model added to the 360 backbone
+- Se agregó `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` como nuevo boundary operativo para Agency, delivery e ICO metrics.
+- `Efeonce` ya quedó modelado como `internal_space` con `client_id = null`, en vez de depender solo del pseudo-cliente legacy `space-efeonce`.
+- Se agregó `greenhouse_serving.space_360`.
+- `Source Sync Runtime Projections` ya publica `space_id` en:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.tasks`
+  - `greenhouse_delivery.sprints`
+- Seed validado:
+  - PostgreSQL `spaces = 11` (`10 client_space`, `1 internal_space`)
+  - Delivery con `space_id` en PostgreSQL: projects `57/59`, tasks `961/1173`, sprints `11/13`
+  - Delivery con `space_id` en BigQuery conformed: projects `57/59`, tasks `961/1173`, sprints `11/13`
+- Se endureció además la capa de acceso PostgreSQL para el backbone:
+  - `setup-postgres-canonical-360.sql` ya otorga grants a `greenhouse_runtime` y `greenhouse_migrator`
+  - `setup-postgres-access.sql` intenta normalizar ownership de `greenhouse_core`, `greenhouse_serving` y `greenhouse_sync` hacia `greenhouse_migrator` sin bloquearse por objetos legacy aislados
+
+### Finance Slice 2 PostgreSQL wiring — Income, Expenses, Payments (Claude)
+- Creado `src/lib/finance/postgres-store-slice2.ts` — repository layer completo para Slice 2 con readiness check independiente, CRUD de income/expenses/income_payments, sequence ID generator, y publicación de outbox events.
+- 7 rutas API wired a Postgres-first con BigQuery fallback:
+  - GET/POST `/api/finance/income`
+  - GET `/api/finance/income/[id]`
+  - POST `/api/finance/income/[id]/payment`
+  - GET/POST `/api/finance/expenses`
+  - GET `/api/finance/expenses/[id]`
+- Income payments normalizados: Postgres usa tabla `income_payments` con FK; BigQuery fallback mantiene JSON `payments_received`.
+- Payment creation transaccional con `FOR UPDATE` lock sobre income row.
+- Commit `8375edb` pushed a `fix/codex-operational-finance`.
+- Backfill script escrito pero NO ejecutado aún.
+- PUT income/expenses y reconciliation runtime quedan pendientes para Slice 3.
+
 ### Data model master and first real source-sync seed
 - Se agregó `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` y su operating model para agentes como fuente de verdad del modelo de datos Greenhouse.
 - Se ejecutó el primer seed real de `Source Sync Runtime Projections`: `delivery` quedó proyectado completo a PostgreSQL y `greenhouse_crm` quedó filtrado al universo real de clientes Greenhouse.

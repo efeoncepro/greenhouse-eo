@@ -194,17 +194,21 @@ const firstCsvValue = (value: string | null) => {
 const buildPayloadHash = (payload: unknown) =>
   createHash('sha256').update(JSON.stringify(payload)).digest('hex')
 
-const NON_CANONICAL_DELIVERY_CLIENT_IDS = new Set(['space-efeonce'])
+const INTERNAL_SPACE_IDS = new Set(['space-efeonce'])
 
-const buildPreferredClientMap = (rows: ClientNotionBindingRow[]) => {
-  const bindings = new Map<string, string[]>()
+const isInternalSpaceId = (spaceId: string | null) => (spaceId ? INTERNAL_SPACE_IDS.has(spaceId) : false)
+
+const buildPreferredSpaceMap = (rows: ClientNotionBindingRow[]) => {
+  const bindings = new Map<string, Array<{ spaceId: string; isInternal: boolean }>>()
 
   for (const row of rows) {
-    const clientId = toNullableString(row.client_id)
+    const spaceId = toNullableString(row.client_id)
 
-    if (!clientId) {
+    if (!spaceId) {
       continue
     }
+
+    const internal = isInternalSpaceId(spaceId)
 
     for (const projectId of row.notion_project_ids || []) {
       const normalizedProjectId = toNullableString(projectId)
@@ -215,15 +219,15 @@ const buildPreferredClientMap = (rows: ClientNotionBindingRow[]) => {
 
       const existing = bindings.get(normalizedProjectId) || []
 
-      bindings.set(normalizedProjectId, [...existing, clientId])
+      bindings.set(normalizedProjectId, [...existing, { spaceId, isInternal: internal }])
     }
   }
 
   const preferred = new Map<string, string>()
 
-  for (const [projectId, clientIds] of bindings.entries()) {
-    const canonicalCandidates = clientIds.filter(clientId => !NON_CANONICAL_DELIVERY_CLIENT_IDS.has(clientId))
-    const winner = canonicalCandidates[0] || clientIds[0]
+  for (const [projectId, candidates] of bindings.entries()) {
+    const canonicalCandidates = candidates.filter(candidate => !candidate.isInternal)
+    const winner = (canonicalCandidates[0] || candidates[0])?.spaceId
 
     if (winner) {
       preferred.set(projectId, winner)
@@ -485,7 +489,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
     )
 
     const nowIso = new Date().toISOString()
-    const preferredClientMap = buildPreferredClientMap(clientBindings)
+    const preferredSpaceMap = buildPreferredSpaceMap(clientBindings)
 
     const rawProjectRows = projects.map(row => ({
       sync_run_id: syncRunId,
@@ -549,11 +553,13 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const ownerSourceId = row.propietario_ids?.[0] || null
       const projectSourceId = toNullableString(row.notion_page_id)
       const projectDatabaseSourceId = toNullableString(row._source_database_id)
-      const clientId = projectSourceId ? preferredClientMap.get(projectSourceId) || null : null
+      const spaceId = projectSourceId ? preferredSpaceMap.get(projectSourceId) || null : null
+      const clientId = spaceId && !isInternalSpaceId(spaceId) ? spaceId : null
 
       return {
         project_source_id: projectSourceId,
         project_database_source_id: projectDatabaseSourceId,
+        space_id: spaceId,
         client_source_id: projectDatabaseSourceId,
         client_id: clientId,
         module_code: null,
@@ -562,7 +568,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         project_status: toNullableString(row.estado),
         project_phase: null,
         owner_source_id: ownerSourceId,
-        owner_member_id: null,
+        owner_member_id: null as string | null,
         start_date: toDateValue(row.fechas),
         end_date: toDateValue(row.fechas_end),
         last_edited_time: toTimestampValue(row.last_edited_time),
@@ -597,6 +603,12 @@ const syncNotion = async (): Promise<SyncSummary> => {
         .filter(([projectSourceId]) => Boolean(projectSourceId))
     )
 
+    const projectSpaceMap = new Map(
+      deliveryProjects
+        .map(project => [project.project_source_id, project.space_id] as const)
+        .filter(([projectSourceId]) => Boolean(projectSourceId))
+    )
+
     const projectDatabaseSourceMap = new Map(
       deliveryProjects
         .map(project => [project.project_source_id, project.project_database_source_id] as const)
@@ -612,6 +624,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         (projectSourceId ? projectDatabaseSourceMap.get(projectSourceId) || null : null) ||
         toNullableString(row._source_database_id)
 
+      const spaceId = projectSourceId ? projectSpaceMap.get(projectSourceId) || null : null
       const clientId = projectSourceId ? projectClientMap.get(projectSourceId) || null : null
 
       return {
@@ -619,6 +632,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         project_source_id: projectSourceId,
         sprint_source_id: sprintSourceId,
         project_database_source_id: projectDatabaseSourceId,
+        space_id: spaceId,
         client_source_id: projectDatabaseSourceId,
         client_id: clientId,
         module_code: null,
@@ -639,20 +653,47 @@ const syncNotion = async (): Promise<SyncSummary> => {
       }
     })
 
-    const deliverySprints = sprints.map(row => ({
-      sprint_source_id: toNullableString(row.notion_page_id),
-      project_source_id: null,
-      project_database_source_id: toNullableString(row._source_database_id),
-      sprint_name: toNullableString(row.nombre_del_sprint) || 'Sin nombre',
-      sprint_status: toNullableString(row.estado_del_sprint),
-      start_date: toDateValue(row.fechas),
-      end_date: toDateValue(row.fechas_end),
-      last_edited_time: toTimestampValue(row.last_edited_time),
-      payload_hash: buildPayloadHash(row),
-      is_deleted: false,
-      sync_run_id: syncRunId,
-      synced_at: nowIso
-    }))
+    const sprintProjectMap = new Map(
+      deliveryTasks
+        .map(task => [task.sprint_source_id, task.project_source_id] as const)
+        .filter(([sprintSourceId, projectSourceId]) => Boolean(sprintSourceId) && Boolean(projectSourceId))
+    )
+
+    const sprintProjectDatabaseMap = new Map(
+      deliveryTasks
+        .map(task => [task.sprint_source_id, task.project_database_source_id] as const)
+        .filter(([sprintSourceId, projectDatabaseSourceId]) => Boolean(sprintSourceId) && Boolean(projectDatabaseSourceId))
+    )
+
+    const sprintSpaceMap = new Map(
+      deliveryTasks
+        .map(task => [task.sprint_source_id, task.space_id] as const)
+        .filter(([sprintSourceId, spaceId]) => Boolean(sprintSourceId) && Boolean(spaceId))
+    )
+
+    const deliverySprints = sprints.map(row => {
+      const sprintSourceId = toNullableString(row.notion_page_id)
+
+      const projectDatabaseSourceId =
+        (sprintSourceId ? sprintProjectDatabaseMap.get(sprintSourceId) || null : null) ||
+        toNullableString(row._source_database_id)
+
+      return {
+        sprint_source_id: sprintSourceId,
+        project_source_id: sprintSourceId ? sprintProjectMap.get(sprintSourceId) || null : null,
+        project_database_source_id: projectDatabaseSourceId,
+        space_id: sprintSourceId ? sprintSpaceMap.get(sprintSourceId) || null : null,
+        sprint_name: toNullableString(row.nombre_del_sprint) || 'Sin nombre',
+        sprint_status: toNullableString(row.estado_del_sprint),
+        start_date: toDateValue(row.fechas),
+        end_date: toDateValue(row.fechas_end),
+        last_edited_time: toTimestampValue(row.last_edited_time),
+        payload_hash: buildPayloadHash(row),
+        is_deleted: false,
+        sync_run_id: syncRunId,
+        synced_at: nowIso
+      }
+    })
 
     await Promise.all([
       bigQuery.query({
@@ -680,6 +721,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         `
           INSERT INTO greenhouse_delivery.projects (
             project_record_id,
+            space_id,
             client_id,
             module_id,
             project_database_source_id,
@@ -697,9 +739,10 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::date, $11::date, TRUE, $12, $13::timestamptz, $14::timestamptz, $15, $16)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::date, $12::date, TRUE, $13, $14::timestamptz, $15::timestamptz, $16, $17)
           ON CONFLICT (notion_project_id) DO UPDATE
           SET
+            space_id = EXCLUDED.space_id,
             client_id = EXCLUDED.client_id,
             module_id = EXCLUDED.module_id,
             project_database_source_id = EXCLUDED.project_database_source_id,
@@ -719,6 +762,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         `,
         [
           `project-${project.project_source_id}`,
+          project.space_id,
           project.client_id,
           project.module_id,
           project.project_database_source_id,
@@ -745,6 +789,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
           INSERT INTO greenhouse_delivery.sprints (
             sprint_record_id,
             project_record_id,
+            space_id,
             project_database_source_id,
             notion_sprint_id,
             sprint_name,
@@ -757,10 +802,11 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7::date, $8::date, $9, $10::timestamptz, $11::timestamptz, $12, $13)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11::timestamptz, $12::timestamptz, $13, $14)
           ON CONFLICT (notion_sprint_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
+            space_id = EXCLUDED.space_id,
             project_database_source_id = EXCLUDED.project_database_source_id,
             sprint_name = EXCLUDED.sprint_name,
             sprint_status = EXCLUDED.sprint_status,
@@ -776,6 +822,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         [
           `sprint-${sprint.sprint_source_id}`,
           null,
+          sprint.space_id,
           sprint.project_database_source_id,
           sprint.sprint_source_id,
           sprint.sprint_name,
@@ -799,6 +846,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             task_record_id,
             project_record_id,
             sprint_record_id,
+            space_id,
             client_id,
             module_id,
             assignee_member_id,
@@ -818,11 +866,12 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::date, $16::timestamptz, $17, $18::timestamptz, $19::timestamptz, $20, $21)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16::date, $17::timestamptz, $18, $19::timestamptz, $20::timestamptz, $21, $22)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
             sprint_record_id = EXCLUDED.sprint_record_id,
+            space_id = EXCLUDED.space_id,
             client_id = EXCLUDED.client_id,
             module_id = EXCLUDED.module_id,
             assignee_member_id = EXCLUDED.assignee_member_id,
@@ -846,6 +895,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
           `task-${task.task_source_id}`,
           task.project_source_id ? `project-${task.project_source_id}` : null,
           task.sprint_source_id ? `sprint-${task.sprint_source_id}` : null,
+          task.space_id,
           task.client_id,
           task.module_id,
           task.assignee_member_id,

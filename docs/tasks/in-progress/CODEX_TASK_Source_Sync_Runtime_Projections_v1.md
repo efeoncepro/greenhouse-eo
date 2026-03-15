@@ -121,12 +121,13 @@ Publicar el subset runtime-critico en:
 Relaciones obligatorias:
 - `HubSpot Company -> Greenhouse Client/Tenant`
 - `HubSpot Contact -> Greenhouse User / Identity Profile`
-- `Notion project database -> tenant delivery workspace`
+- `Notion project database -> Greenhouse Space`
 
 Boundary obligatoria:
 - `raw` y `conformed` pueden conservar el universo CRM completo
 - `greenhouse_crm` runtime solo debe proyectar companias que ya pertenecen al universo de clientes Greenhouse
 - sus contactos asociados heredan esa misma frontera de tenant
+- `delivery` debe proyectar `space_id` como boundary operativo y `client_id` solo cuando el space es client-backed
 
 ### 5. Dejar listo el consumo por modulos
 

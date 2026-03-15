@@ -3,6 +3,43 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Space model added to canonical 360 and delivery projections
+- `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` ya existen en Cloud SQL como nuevo boundary operativo del 360.
+- Regla arquitectónica ya documentada y aplicada:
+  - `client` = boundary comercial
+  - `space` = workspace operativo para Agency, delivery e ICO metrics
+- `space-efeonce` ya no depende solo de ser un pseudo-cliente legacy:
+  - vive como `internal_space`
+  - `client_id = null`
+  - conserva binding operativo a `project_database_source_id`
+- `greenhouse_serving.space_360` ya expone el nuevo shape canónico.
+- `Source Sync Runtime Projections` ahora publica `space_id` en:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.tasks`
+  - `greenhouse_delivery.sprints`
+- Estado validado:
+  - `greenhouse_core.spaces = 11`
+  - `client_space = 10`
+  - `internal_space = 1`
+  - `space_source_bindings = 69`
+  - PostgreSQL delivery con `space_id`:
+    - projects `57/59`
+    - tasks `961/1173`
+    - sprints `11/13`
+  - BigQuery conformed delivery con `space_id`:
+    - projects `57/59`
+    - tasks `961/1173`
+    - sprints `11/13`
+- Transitional boundary que sigue viva:
+  - el seed de `spaces` todavía nace desde `greenhouse.clients.notion_project_ids`
+  - el target ya no es ese array, sino `space -> project_database_source_id`
+- También se endureció la capa de acceso PostgreSQL:
+  - `setup-postgres-access.sql` ahora intenta normalizar ownership de `greenhouse_core`, `greenhouse_serving` y `greenhouse_sync` hacia `greenhouse_migrator`
+  - cuando un objeto legacy no puede transferirse, el script continúa con `NOTICE` en vez de bloquear toda la evolución del backbone
+
 ## Delta 2026-03-15 Data model master and source-sync runtime seed
 - Se agregó la fuente de verdad del modelo de datos actual en:
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`

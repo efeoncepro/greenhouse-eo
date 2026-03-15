@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_crm.deals (
 
 CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
   project_record_id TEXT PRIMARY KEY,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   project_database_source_id TEXT,
@@ -120,6 +121,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
 CREATE TABLE IF NOT EXISTS greenhouse_delivery.sprints (
   sprint_record_id TEXT PRIMARY KEY,
   project_record_id TEXT REFERENCES greenhouse_delivery.projects(project_record_id) ON DELETE SET NULL,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   project_database_source_id TEXT,
   notion_sprint_id TEXT NOT NULL UNIQUE,
   sprint_name TEXT NOT NULL,
@@ -139,6 +141,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   task_record_id TEXT PRIMARY KEY,
   project_record_id TEXT REFERENCES greenhouse_delivery.projects(project_record_id) ON DELETE SET NULL,
   sprint_record_id TEXT REFERENCES greenhouse_delivery.sprints(sprint_record_id) ON DELETE SET NULL,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   assignee_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
@@ -195,10 +198,19 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
 GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
 
 ALTER TABLE greenhouse_delivery.projects
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
+
+ALTER TABLE greenhouse_delivery.projects
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
 
 ALTER TABLE greenhouse_delivery.sprints
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
+
+ALTER TABLE greenhouse_delivery.sprints
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
@@ -236,6 +248,9 @@ CREATE INDEX IF NOT EXISTS crm_deals_module_idx
 CREATE INDEX IF NOT EXISTS delivery_projects_client_idx
   ON greenhouse_delivery.projects (client_id);
 
+CREATE INDEX IF NOT EXISTS delivery_projects_space_idx
+  ON greenhouse_delivery.projects (space_id);
+
 CREATE INDEX IF NOT EXISTS delivery_projects_database_source_idx
   ON greenhouse_delivery.projects (project_database_source_id);
 
@@ -244,6 +259,9 @@ CREATE INDEX IF NOT EXISTS delivery_projects_module_idx
 
 CREATE INDEX IF NOT EXISTS delivery_sprints_project_idx
   ON greenhouse_delivery.sprints (project_record_id);
+
+CREATE INDEX IF NOT EXISTS delivery_sprints_space_idx
+  ON greenhouse_delivery.sprints (space_id);
 
 CREATE INDEX IF NOT EXISTS delivery_sprints_database_source_idx
   ON greenhouse_delivery.sprints (project_database_source_id);
@@ -259,6 +277,9 @@ CREATE INDEX IF NOT EXISTS delivery_tasks_sprint_idx
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_client_idx
   ON greenhouse_delivery.tasks (client_id);
+
+CREATE INDEX IF NOT EXISTS delivery_tasks_space_idx
+  ON greenhouse_delivery.tasks (space_id);
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_module_idx
   ON greenhouse_delivery.tasks (module_id);

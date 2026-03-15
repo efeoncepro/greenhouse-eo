@@ -39,6 +39,8 @@ Canonical platform anchors.
 
 Main objects:
 - `clients`
+- `spaces`
+- `space_source_bindings`
 - `identity_profiles`
 - `identity_profile_source_links`
 - `client_users`
@@ -206,6 +208,7 @@ Read-only serving views.
 
 Current views:
 - `client_360`
+- `space_360`
 - `member_360`
 - `provider_360`
 - `user_360`
@@ -281,8 +284,24 @@ Important source links:
 - future delivery workspace binding for `notion project database`
 
 Required meaning:
-- a client is the tenant boundary in Greenhouse
+- a client is the commercial and contractual boundary in Greenhouse
 - it can have users, members, capabilities, finance records, payroll context and CRM source references
+
+## Space / Workspace
+
+Canonical anchor:
+- `greenhouse_core.spaces.space_id`
+
+Important source links:
+- `greenhouse_core.space_source_bindings`
+- `project_database_source_id` through `binding_role = 'delivery_workspace'`
+
+Required meaning:
+- a space is the operational workspace boundary for delivery and ICO metrics
+- a client-facing space is `client_space`
+- an internal agency workspace like `Efeonce` is `internal_space`
+- a space may exist without `client_id`
+- `Agency`, `delivery`, `RpA`, `On Time`, capacity and internal execution metrics should resolve against `space_id`
 
 ## User
 
@@ -347,6 +366,7 @@ Required relationship:
 
 Admission rule:
 - a HubSpot company only enters the Greenhouse runtime graph when it is already part of the Greenhouse client universe
+- operationally, the expected target filter is "belongs to the Greenhouse client universe and its HubSpot lifecycle confirms customer/client state"
 - raw and conformed can keep broader CRM history, but `greenhouse_core` and client-facing runtime projections must stay restricted to client companies
 
 ## CRM Contact
@@ -369,14 +389,16 @@ Non-negotiable rule:
 ## Delivery Workspace
 
 Target canonical meaning:
-- the tenant-scoped `Notion project database` used to operate ICO metrics and execution context for a client
+- the `Notion project database` bound to one Greenhouse `space`
 
 Current state:
 - runtime source rows expose `_source_database_id`
 - legacy tenant mapping still lives mostly through `greenhouse.clients.notion_project_ids`, which currently behaves more like scoped project-page IDs than a formal workspace binding
+- `greenhouse_core.spaces` now exists as the canonical target for this binding, but most runtime joins still depend on the legacy bridge or transitional projection logic
 
 Target rule:
-- delivery workspace binding must become explicit and tenant-level
+- delivery workspace binding must become explicit at the `space` level
+- one `project_database_source_id` maps to one `space_id`
 - project, sprint and task rows must carry `project_database_source_id`
 
 ## Delivery Project
@@ -386,8 +408,9 @@ Operational projection:
 
 Required relationships:
 - `notion_project_id` as source row ID
-- `project_database_source_id` as workspace/tenant context
-- `client_id` resolved from tenant binding
+- `project_database_source_id` as workspace context
+- `space_id` resolved from workspace binding
+- `client_id` only when the space is client-backed
 
 ## Delivery Task
 
@@ -399,6 +422,7 @@ Required relationships:
 - `notion_project_id`
 - `notion_sprint_id`
 - `project_database_source_id`
+- `space_id`
 - `assignee_member_id`
 
 ## Delivery Sprint
@@ -409,6 +433,7 @@ Operational projection:
 Required relationships:
 - `notion_sprint_id`
 - `project_database_source_id`
+- `space_id`
 
 ## Current Transitional Rules
 
@@ -424,9 +449,20 @@ Problem:
 - internal tenants like `space-efeonce` can overlap with client project scopes
 
 Target:
-- explicit tenant binding to `project_database_source_id`
+- explicit `space -> project_database_source_id` binding
 
-### 2. HubSpot contact projection
+### 2. Client versus space
+
+Current state:
+- some runtime paths still use `client_id` as if it were also the workspace identifier
+- internal Efeonce execution has historically used `space-efeonce` as a pseudo-client to make Agency work
+
+Target:
+- `client` remains commercial
+- `space` becomes operational
+- `space-efeonce` remains valid, but as `internal_space`, not as commercial client truth
+
+### 3. HubSpot contact projection
 
 Current state:
 - raw snapshot table exists
@@ -436,7 +472,7 @@ Target:
 - `greenhouse_crm.contacts` must become first-class
 - contact reconciliation to `client_users` and `identity_profiles` must be explicit
 
-### 3. Service module normalization
+### 4. Service module normalization
 
 Current state:
 - some HubSpot `linea_de_servicio` values resolve cleanly to `module_code`
@@ -468,5 +504,6 @@ Target:
 The next mandatory slices for coherence are:
 - `greenhouse_crm.contacts`
 - contact reconciliation to `client_users` and `identity_profiles`
-- explicit tenant binding for `project_database_source_id`
+- runtime consumers progressively moving from `client_id` to `space_id` for Agency/delivery/ICO
+- explicit `space -> project_database_source_id` binding as the only canonical delivery workspace join
 - runtime consumers progressively moving off legacy `notion_ops.*` and `hubspot_crm.*`

@@ -19,6 +19,36 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.clients (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS greenhouse_core.spaces (
+  space_id TEXT PRIMARY KEY,
+  public_id TEXT UNIQUE,
+  client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
+  space_name TEXT NOT NULL,
+  space_type TEXT NOT NULL DEFAULT 'client_space'
+    CHECK (space_type IN ('client_space', 'internal_space')),
+  primary_project_database_source_id TEXT,
+  status TEXT NOT NULL DEFAULT 'active',
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS greenhouse_core.space_source_bindings (
+  binding_id TEXT PRIMARY KEY,
+  space_id TEXT NOT NULL REFERENCES greenhouse_core.spaces(space_id) ON DELETE CASCADE,
+  source_system TEXT NOT NULL,
+  source_object_type TEXT NOT NULL,
+  source_object_id TEXT NOT NULL,
+  binding_role TEXT NOT NULL,
+  source_display_name TEXT,
+  is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT space_source_bindings_unique UNIQUE (space_id, source_system, source_object_type, source_object_id, binding_role)
+);
+
 CREATE TABLE IF NOT EXISTS greenhouse_core.identity_profiles (
   profile_id TEXT PRIMARY KEY,
   public_id TEXT UNIQUE,
@@ -206,6 +236,18 @@ CREATE INDEX IF NOT EXISTS identity_profile_source_links_profile_idx
 CREATE INDEX IF NOT EXISTS client_users_client_idx
   ON greenhouse_core.client_users (client_id);
 
+CREATE INDEX IF NOT EXISTS spaces_client_idx
+  ON greenhouse_core.spaces (client_id);
+
+CREATE INDEX IF NOT EXISTS spaces_workspace_idx
+  ON greenhouse_core.spaces (primary_project_database_source_id);
+
+CREATE INDEX IF NOT EXISTS space_source_bindings_space_idx
+  ON greenhouse_core.space_source_bindings (space_id);
+
+CREATE INDEX IF NOT EXISTS space_source_bindings_lookup_idx
+  ON greenhouse_core.space_source_bindings (source_system, source_object_type, source_object_id, binding_role);
+
 CREATE INDEX IF NOT EXISTS client_users_identity_idx
   ON greenhouse_core.client_users (identity_profile_id);
 
@@ -298,6 +340,56 @@ GROUP BY
   c.notes,
   c.created_at,
   c.updated_at;
+
+CREATE OR REPLACE VIEW greenhouse_serving.space_360 AS
+SELECT
+  s.space_id,
+  s.public_id,
+  s.space_name,
+  s.space_type,
+  s.client_id,
+  c.client_name,
+  c.public_id AS client_public_id,
+  c.tenant_type,
+  s.primary_project_database_source_id,
+  COALESCE(
+    MAX(ssb.source_object_id) FILTER (
+      WHERE ssb.active
+        AND ssb.binding_role = 'delivery_workspace'
+        AND ssb.source_system = 'notion'
+        AND ssb.source_object_type = 'project_database'
+    ),
+    s.primary_project_database_source_id
+  ) AS resolved_project_database_source_id,
+  COUNT(DISTINCT ssb.binding_id) FILTER (WHERE ssb.active) AS source_binding_count,
+  COUNT(DISTINCT cu.user_id) FILTER (WHERE cu.active) AS linked_user_count,
+  s.status,
+  s.active,
+  s.notes,
+  s.created_at,
+  s.updated_at
+FROM greenhouse_core.spaces AS s
+LEFT JOIN greenhouse_core.clients AS c
+  ON c.client_id = s.client_id
+LEFT JOIN greenhouse_core.space_source_bindings AS ssb
+  ON ssb.space_id = s.space_id
+LEFT JOIN greenhouse_core.client_users AS cu
+  ON cu.client_id = s.client_id
+GROUP BY
+  s.space_id,
+  s.public_id,
+  s.space_name,
+  s.space_type,
+  s.client_id,
+  c.client_name,
+  c.public_id,
+  c.tenant_type,
+  s.primary_project_database_source_id,
+  s.status,
+  s.active,
+  s.notes,
+  s.created_at,
+  s.updated_at;
 
 CREATE OR REPLACE VIEW greenhouse_serving.member_360 AS
 SELECT
@@ -449,9 +541,25 @@ GRANT USAGE ON SCHEMA greenhouse_core TO greenhouse_app;
 GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_app;
 GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_app;
 
+GRANT USAGE ON SCHEMA greenhouse_core TO greenhouse_runtime;
+GRANT USAGE ON SCHEMA greenhouse_serving TO greenhouse_runtime;
+GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_runtime;
+
+GRANT USAGE, CREATE ON SCHEMA greenhouse_core TO greenhouse_migrator;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_serving TO greenhouse_migrator;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_sync TO greenhouse_migrator;
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_app;
 GRANT SELECT ON ALL TABLES IN SCHEMA greenhouse_serving TO greenhouse_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_app;
+
+GRANT SELECT, REFERENCES ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_runtime;
+GRANT SELECT ON ALL TABLES IN SCHEMA greenhouse_serving TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_runtime;
+
+GRANT SELECT, REFERENCES ON ALL TABLES IN SCHEMA greenhouse_core TO greenhouse_migrator;
+GRANT SELECT ON ALL TABLES IN SCHEMA greenhouse_serving TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_migrator;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_core
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
@@ -461,3 +569,21 @@ GRANT SELECT ON TABLES TO greenhouse_app;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_core
+GRANT SELECT, REFERENCES ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_serving
+GRANT SELECT ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_core
+GRANT SELECT, REFERENCES ON TABLES TO greenhouse_migrator;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_serving
+GRANT SELECT ON TABLES TO greenhouse_migrator;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_migrator;

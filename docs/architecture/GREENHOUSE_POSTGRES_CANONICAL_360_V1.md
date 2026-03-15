@@ -35,6 +35,8 @@ Canonical business objects and operational anchors.
 
 This schema owns:
 - `clients`
+- `spaces`
+- `space_source_bindings`
 - `identity_profiles`
 - `identity_profile_source_links`
 - `client_users`
@@ -57,6 +59,7 @@ Read-optimized views built from `greenhouse_core`.
 
 Initial views:
 - `client_360`
+- `space_360`
 - `member_360`
 - `provider_360`
 - `user_360`
@@ -117,6 +120,30 @@ Important fields:
 - `billing_currency`
 - `status`
 - `active`
+
+### Space
+
+Anchor:
+- `greenhouse_core.spaces.space_id`
+
+Important fields:
+- `client_id` nullable
+- `space_name`
+- `space_type`
+- `primary_project_database_source_id`
+- `status`
+- `active`
+
+Bridge:
+- `greenhouse_core.space_source_bindings`
+
+Rules:
+- `client` is the commercial boundary
+- `space` is the operational workspace boundary
+- client-facing workspaces are `client_space`
+- internal agency workspaces like `Efeonce` are `internal_space`
+- a space may exist without `client_id`
+- delivery objects should resolve to `space_id` first, then optionally to `client_id`
 
 ### Identity Profile
 
@@ -250,6 +277,18 @@ Includes:
 - core client fields
 - active module list
 - active user count
+
+### `greenhouse_serving.space_360`
+
+Purpose:
+- one stable read shape for operational workspaces
+
+Includes:
+- core space fields
+- linked client context when it exists
+- primary `project_database_source_id`
+- source binding count
+- linked user count through the client bridge when applicable
 
 ### `greenhouse_serving.member_360`
 
