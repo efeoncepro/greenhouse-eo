@@ -219,10 +219,15 @@ WHERE m.active = TRUE;
 -- Grants
 -- ============================================================
 
-GRANT USAGE ON SCHEMA greenhouse_payroll TO greenhouse_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_payroll TO greenhouse_app;
+GRANT USAGE ON SCHEMA greenhouse_payroll TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_payroll TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_payroll TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_payroll TO greenhouse_migrator;
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_payroll
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_payroll
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
 
 -- Ensure serving view is accessible
-GRANT SELECT ON greenhouse_serving.member_payroll_360 TO greenhouse_app;
+GRANT SELECT ON greenhouse_serving.member_payroll_360 TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_serving.member_payroll_360 TO greenhouse_migrator;

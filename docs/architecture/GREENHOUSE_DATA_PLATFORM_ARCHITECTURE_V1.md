@@ -14,6 +14,7 @@ Use together with:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `project_context.md`

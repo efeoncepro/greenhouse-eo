@@ -3,6 +3,34 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 PostgreSQL access model and tooling
+- Se formalizó la capa de acceso escalable a Cloud SQL en:
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- Greenhouse ahora separa explícitamente tres perfiles operativos de PostgreSQL:
+  - `runtime`
+  - `migrator`
+  - `admin`
+- Nuevas variables documentadas:
+  - `GREENHOUSE_POSTGRES_MIGRATOR_USER`
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
+  - `GREENHOUSE_POSTGRES_ADMIN_USER`
+  - `GREENHOUSE_POSTGRES_ADMIN_PASSWORD`
+- Nuevo tooling operativo:
+  - `pnpm setup:postgres:access`
+  - `pnpm pg:doctor`
+- Scripts de setup y backfill PostgreSQL ahora cargan env local de forma consistente y pueden elegir perfil antes de abrir la conexión.
+- Regla operativa derivada:
+  - runtime del portal usa solo credenciales `runtime`
+  - bootstrap de acceso usa `admin`
+  - setup y migraciones de dominio deben correr con `migrator`
+- Estado validado en Cloud SQL:
+  - `greenhouse_runtime` existe y `greenhouse_app` es miembro
+  - `greenhouse_migrator` existe y `greenhouse_migrator_user` es miembro
+  - `greenhouse_hr`, `greenhouse_payroll` y `greenhouse_finance` ya exponen grants consumibles por ambos roles
+- Alcance de esta pasada:
+  - no se cambió el runtime funcional de `Payroll`
+  - se dejó la fundación para que los siguientes cortes de dominio no dependan de grants manuales repetidos
+
 ## Delta 2026-03-15 Finance PostgreSQL first slice
 - Se materializó el primer slice operacional de `Finance` sobre PostgreSQL en `greenhouse-pg-dev / greenhouse_app`.
 - Nuevo schema operativo:

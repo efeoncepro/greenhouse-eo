@@ -6,6 +6,21 @@
 
 ## 2026-03-15
 
+### PostgreSQL access model and `pg:doctor` tooling
+- Se agregó `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` para formalizar la separación de acceso `runtime / migrator / admin`.
+- Se agregaron los comandos:
+  - `pnpm setup:postgres:access`
+  - `pnpm pg:doctor`
+- Se agregó un loader reutilizable de env local para tooling PostgreSQL y un runner compartido para scripts SQL.
+- `setup-postgres-finance.sql`, `setup-postgres-hr-leave.sql` y `setup-postgres-payroll.sql` ahora otorgan acceso a:
+  - `greenhouse_runtime`
+  - `greenhouse_migrator`
+  en vez de atarse a `greenhouse_app`.
+- Se validó en Cloud SQL que:
+  - `greenhouse_app` hereda `greenhouse_runtime`
+  - `greenhouse_migrator_user` hereda `greenhouse_migrator`
+  - `HR`, `Payroll` y `Finance` ya exponen grants consumibles por ambos roles
+
 ### Finance PostgreSQL first slice and canonical provider bridge
 - `Finance` ya tiene materializado su primer slice operacional en PostgreSQL:
   - `greenhouse_finance.accounts`

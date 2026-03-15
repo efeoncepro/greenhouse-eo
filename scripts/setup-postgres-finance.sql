@@ -100,10 +100,16 @@ FROM greenhouse_core.providers AS p
 LEFT JOIN greenhouse_finance.suppliers AS s
   ON s.provider_id = p.provider_id;
 
-GRANT USAGE ON SCHEMA greenhouse_finance TO greenhouse_app;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_app;
+GRANT USAGE ON SCHEMA greenhouse_finance TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_finance TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON ALL TABLES IN SCHEMA greenhouse_finance TO greenhouse_migrator;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_finance
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
 
-GRANT SELECT ON greenhouse_serving.provider_finance_360 TO greenhouse_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_finance
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
+
+GRANT SELECT ON greenhouse_serving.provider_finance_360 TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_serving.provider_finance_360 TO greenhouse_migrator;

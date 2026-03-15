@@ -1,38 +1,17 @@
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
 import process from 'node:process'
 
-import { closeGreenhousePostgres, getGreenhousePostgresMissingConfig, runGreenhousePostgresQuery } from '@/lib/postgres/client'
-
-const splitSqlStatements = (sql: string) =>
-  sql
-    .split(/;\s*\n/g)
-    .map(statement => statement.trim())
-    .filter(Boolean)
+import { runPostgresSqlFile } from './lib/postgres-script-runner'
 
 const main = async () => {
-  const missing = getGreenhousePostgresMissingConfig()
-
-  if (missing.length > 0) {
-    throw new Error(`Greenhouse Postgres is not configured. Missing: ${missing.join(', ')}`)
-  }
-
-  const sqlPath = path.resolve(process.cwd(), 'scripts/setup-postgres-finance.sql')
-  const sql = await readFile(sqlPath, 'utf8')
-  const statements = splitSqlStatements(sql)
-
-  for (const statement of statements) {
-    await runGreenhousePostgresQuery(statement)
-  }
-
-  console.log(`Applied ${statements.length} PostgreSQL statements for Finance foundation.`)
+  await runPostgresSqlFile({
+    sqlPath: 'scripts/setup-postgres-finance.sql',
+    successMessage: 'Applied PostgreSQL setup for Finance foundation',
+    profile: 'migrator'
+  })
 }
 
 main()
   .catch(error => {
     console.error(error)
     process.exitCode = 1
-  })
-  .finally(async () => {
-    await closeGreenhousePostgres()
   })

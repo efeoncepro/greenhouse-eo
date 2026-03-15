@@ -2,6 +2,10 @@ import { BigQuery } from '@google-cloud/bigquery'
 
 import { closeGreenhousePostgres, runGreenhousePostgresQuery } from '../src/lib/postgres/client'
 import { resolveCanonicalProviderId } from '../src/lib/providers/postgres'
+import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
+
+loadGreenhouseToolEnv()
+applyGreenhousePostgresProfile('runtime')
 
 const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
 const datasetId = process.env.GREENHOUSE_BIGQUERY_DATASET || 'greenhouse'

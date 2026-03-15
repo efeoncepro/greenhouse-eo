@@ -9,6 +9,7 @@ Define the first canonical PostgreSQL model that will support Greenhouse as:
 
 This document complements:
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`

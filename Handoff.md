@@ -40,6 +40,84 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 16:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar la capa transversal de acceso a PostgreSQL para que `HR`, `Payroll`, `Finance` y los próximos dominios no vuelvan a requerir grants manuales por ambiente.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Cloud SQL `greenhouse-pg-dev`
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `.env.example`
+- `package.json`
+- `scripts/lib/load-greenhouse-tool-env.ts`
+- `scripts/lib/postgres-script-runner.ts`
+- `scripts/pg-doctor.ts`
+- `scripts/setup-postgres-access.sql`
+- `scripts/setup-postgres-access-runtime.sql`
+- `scripts/setup-postgres-access.ts`
+- `scripts/setup-postgres-finance.sql`
+- `scripts/setup-postgres-hr-leave.sql`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/setup-postgres-canonical-360.ts`
+- `scripts/setup-postgres-source-sync.ts`
+- `scripts/setup-postgres-finance.ts`
+- `scripts/setup-postgres-hr-leave.ts`
+- `scripts/setup-postgres-payroll.ts`
+- `scripts/backfill-postgres-canonical-360.ts`
+- `scripts/backfill-postgres-finance.ts`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se formalizó el modelo de acceso `runtime / migrator / admin` en PostgreSQL.
+- Se agregó `scripts/setup-postgres-access.ts` para bootstrap de roles y grants compartidos.
+- Se agregó `scripts/pg-doctor.ts` para validar:
+  - perfil aplicado
+  - membership de roles
+  - acceso por schema
+- Se agregó carga consistente de env local para tooling en `scripts/lib/load-greenhouse-tool-env.ts`.
+- Se agregó un runner reutilizable para SQL PostgreSQL en `scripts/lib/postgres-script-runner.ts`.
+- Se creó el login dedicado `greenhouse_migrator_user` y quedó mapeado al rol `greenhouse_migrator`.
+- Se dejó `greenhouse_hr`, `greenhouse_payroll` y `greenhouse_finance` con grants explícitos hacia:
+  - `greenhouse_runtime`
+  - `greenhouse_migrator`
+- `setup-postgres-finance.sql`, `setup-postgres-hr-leave.sql` y `setup-postgres-payroll.sql` dejaron de otorgar acceso a `greenhouse_app` directo; ahora apuntan al modelo por roles.
+- No se tocó el runtime funcional de `Payroll`; esta pasada solo deja la base de acceso y tooling para siguientes migraciones.
+
+### Verificación
+- `pnpm exec tsx scripts/setup-postgres-access.ts`
+  - correcto
+- `pnpm exec tsx scripts/pg-doctor.ts --profile=runtime`
+  - correcto
+- `pnpm exec tsx scripts/pg-doctor.ts --profile=migrator`
+  - correcto
+- `pnpm exec eslint scripts/setup-postgres-access.ts scripts/pg-doctor.ts scripts/lib/load-greenhouse-tool-env.ts scripts/lib/postgres-script-runner.ts scripts/setup-postgres-finance.ts scripts/setup-postgres-hr-leave.ts scripts/setup-postgres-payroll.ts scripts/setup-postgres-source-sync.ts scripts/setup-postgres-canonical-360.ts scripts/backfill-postgres-finance.ts scripts/backfill-postgres-canonical-360.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `git diff --check`
+  - correcto
+
+### Riesgos o pendientes
+- Algunos objetos legacy siguen siendo owned por `greenhouse_app`; el modelo nuevo los cubre por grants, pero la propiedad histórica no se normalizó en esta pasada.
+- `Payroll` ya está arriba por Claude; no se debe reabrir ese runtime sin coordinar el boundary actual.
+- Siguiente paso recomendado:
+  - seguir con `Finance -> PostgreSQL` sobre este modelo
+  - usar `pg:doctor` como preflight obligatorio antes de cualquier nuevo corte de dominio
+
 ## 2026-03-15 13:45 America/Santiago
 
 ### Agente
