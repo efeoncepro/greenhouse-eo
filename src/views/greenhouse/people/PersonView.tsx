@@ -15,7 +15,9 @@ import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
+import type { CreateCompensationVersionInput } from '@/types/payroll'
 
+import CompensationDrawer from '@views/greenhouse/payroll/CompensationDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AssignmentDrawer from './drawers/AssignmentDrawer'
 import EditAssignmentDrawer from './drawers/EditAssignmentDrawer'
@@ -37,6 +39,7 @@ const PersonView = ({ memberId }: Props) => {
   const [editAssignment, setEditAssignment] = useState<PersonDetailAssignment | null>(null)
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
+  const [compensationOpen, setCompensationOpen] = useState(false)
 
   const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
 
@@ -95,6 +98,23 @@ const PersonView = ({ memberId }: Props) => {
     await loadDetail()
   }
 
+  const handleSaveCompensation = async (input: CreateCompensationVersionInput) => {
+    const res = await fetch('/api/hr/payroll/compensation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input)
+    })
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+
+      throw new Error(data.error || 'Error al guardar compensación')
+    }
+
+    toast.success('Compensación guardada')
+    await loadDetail()
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
@@ -123,6 +143,7 @@ const PersonView = ({ memberId }: Props) => {
             isAdmin={isAdmin}
             onEditProfile={() => setEditProfileOpen(true)}
             onDeactivate={() => setDeactivateConfirmOpen(true)}
+            onEditCompensation={() => setCompensationOpen(true)}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 7, lg: 8 }}>
@@ -155,6 +176,14 @@ const PersonView = ({ memberId }: Props) => {
             assignment={editAssignment}
             onClose={() => setEditAssignment(null)}
             onSuccess={handleEditAssignmentSuccess}
+          />
+          <CompensationDrawer
+            open={compensationOpen}
+            onClose={() => setCompensationOpen(false)}
+            existingVersion={detail.currentCompensation ?? null}
+            memberId={detail.member.memberId}
+            memberName={detail.member.displayName}
+            onSave={handleSaveCompensation}
           />
           <ConfirmDialog
             open={deactivateConfirmOpen}

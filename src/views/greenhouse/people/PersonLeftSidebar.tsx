@@ -23,9 +23,10 @@ type Props = {
   isAdmin?: boolean
   onEditProfile?: () => void
   onDeactivate?: () => void
+  onEditCompensation?: () => void
 }
 
-const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Props) => {
+const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEditCompensation }: Props) => {
   const { member, integrations, summary } = detail
   const roleCategory = safeRoleCategory(member.roleCategory)
 
@@ -135,11 +136,18 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Pro
         </>
       )}
 
-      {detail.currentCompensation && (
+      {detail.currentCompensation ? (
         <>
           <Divider />
           <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Typography variant='overline' color='text.secondary'>Compensación</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant='overline' color='text.secondary'>Compensación</Typography>
+              {isAdmin && onEditCompensation && (
+                <Button size='small' startIcon={<i className='tabler-edit' style={{ fontSize: 14 }} />} onClick={onEditCompensation} sx={{ minWidth: 0, fontSize: '0.75rem', py: 0 }}>
+                  Editar
+                </Button>
+              )}
+            </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <i className='tabler-cash' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
               <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
@@ -160,7 +168,24 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate }: Pro
             </Box>
           </CardContent>
         </>
-      )}
+      ) : isAdmin && onEditCompensation ? (
+        <>
+          <Divider />
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Typography variant='overline' color='text.secondary'>Compensación</Typography>
+            <Typography variant='body2' color='text.secondary'>Sin compensación configurada</Typography>
+            <Button
+              variant='tonal'
+              size='small'
+              startIcon={<i className='tabler-cash' />}
+              onClick={onEditCompensation}
+              fullWidth
+            >
+              Configurar compensación
+            </Button>
+          </CardContent>
+        </>
+      ) : null}
 
       {isAdmin && (
         <>
