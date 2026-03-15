@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -200,11 +201,14 @@ const FinanceDashboardView = () => {
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
   const [incomeDrawerOpen, setIncomeDrawerOpen] = useState(false)
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
+  const [fetchErrors, setFetchErrors] = useState<string[]>([])
 
   useEffect(() => {
     let cancelled = false
 
     const fetchData = async () => {
+      const errors: string[] = []
+
       try {
         const [accountsRes, rateRes, incomeRes, expenseRes] = await Promise.all([
           fetch('/api/finance/accounts'),
@@ -219,6 +223,8 @@ const FinanceDashboardView = () => {
           const accountsData = await accountsRes.json()
 
           setAccounts(accountsData.items ?? [])
+        } else {
+          errors.push(`Cuentas: ${accountsRes.status}`)
         }
 
         if (rateRes.ok) {
@@ -229,13 +235,26 @@ const FinanceDashboardView = () => {
 
         if (incomeRes.ok) {
           setIncomeSummary(await incomeRes.json())
+        } else {
+          const d = await incomeRes.json().catch(() => ({}))
+
+          errors.push(`Ingresos: ${d.error || incomeRes.status}`)
         }
 
         if (expenseRes.ok) {
           setExpenseSummary(await expenseRes.json())
+        } else {
+          const d = await expenseRes.json().catch(() => ({}))
+
+          errors.push(`Egresos: ${d.error || expenseRes.status}`)
         }
+      } catch (e) {
+        errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) {
+          setFetchErrors(errors)
+          setLoading(false)
+        }
       }
     }
 
@@ -336,6 +355,13 @@ const FinanceDashboardView = () => {
           Vista consolidada de ingresos, egresos y posición financiera
         </Typography>
       </Box>
+
+      {/* API errors (diagnostic) */}
+      {fetchErrors.length > 0 && (
+        <Alert severity='warning' sx={{ whiteSpace: 'pre-line' }}>
+          {`Error cargando datos del dashboard:\n${fetchErrors.join('\n')}`}
+        </Alert>
+      )}
 
       {/* KPI row */}
       <Grid container spacing={6}>
