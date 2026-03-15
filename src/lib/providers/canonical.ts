@@ -159,7 +159,6 @@ export const syncProviderFromFinanceSupplier = async (record: FinanceSupplierPro
 }
 
 // Singleton promise — sync runs once per cold start, not per request.
-// This prevents BigQuery DML quota exhaustion (10 ops/table/10s).
 let syncPromise: Promise<void> | null = null
 
 export const syncProviderRegistryFromFinanceSuppliers = async () => {
@@ -188,6 +187,15 @@ export const syncProviderRegistryFromFinanceSuppliers = async () => {
       `
     })
 
+    // Resolve provider IDs in memory (no DML)
+    const resolved: Array<{
+      supplierId: string
+      providerId: string
+      providerName: string
+      websiteUrl: string
+      isActive: boolean
+    }> = []
+
     for (const row of rows as FinanceSupplierProviderRow[]) {
       const supplierId = normalizeString(row.supplier_id)
       const legalName = normalizeString(row.legal_name)
@@ -196,18 +204,97 @@ export const syncProviderRegistryFromFinanceSuppliers = async () => {
         continue
       }
 
-      try {
-        await syncProviderFromFinanceSupplier({
-          supplierId,
-          providerId: normalizeNullableString(row.provider_id),
-          legalName,
-          tradeName: normalizeNullableString(row.trade_name),
-          website: normalizeNullableString(row.website),
-          isActive: row.is_active ?? true
-        })
-      } catch (err) {
-        console.warn(`[providers/canonical] Failed to sync supplier ${supplierId} (${legalName}):`, err)
+      const record: FinanceSupplierProviderRecord = {
+        supplierId,
+        providerId: normalizeNullableString(row.provider_id),
+        legalName,
+        tradeName: normalizeNullableString(row.trade_name),
+        website: normalizeNullableString(row.website),
+        isActive: row.is_active ?? true
       }
+
+      const resolvedId = resolveCanonicalProviderId(record)
+
+      if (!resolvedId) continue
+
+      const providerName = normalizeString(record.tradeName) || normalizeString(record.legalName)
+
+      if (!providerName) continue
+
+      resolved.push({
+        supplierId,
+        providerId: resolvedId,
+        providerName,
+        websiteUrl: normalizeString(record.website),
+        isActive: record.isActive ?? true
+      })
+    }
+
+    if (resolved.length === 0) return
+
+    // Single batched MERGE into providers (1 DML op instead of N)
+    const unionRows = resolved
+      .map((_, i) => `SELECT @pid${i} AS provider_id, @pname${i} AS provider_name, @pweb${i} AS website_url, @pactive${i} AS is_active`)
+      .join(' UNION ALL ')
+
+    const mergeParams: Record<string, unknown> = {}
+
+    for (let i = 0; i < resolved.length; i++) {
+      mergeParams[`pid${i}`] = resolved[i].providerId
+      mergeParams[`pname${i}`] = resolved[i].providerName
+      mergeParams[`pweb${i}`] = resolved[i].websiteUrl || null
+      mergeParams[`pactive${i}`] = resolved[i].isActive
+    }
+
+    await bigQuery.query({
+      query: `
+        MERGE \`${projectId}.greenhouse.providers\` AS target
+        USING (${unionRows}) AS source
+        ON target.provider_id = source.provider_id
+        WHEN MATCHED THEN
+          UPDATE SET
+            provider_name = source.provider_name,
+            provider_category = 'financial_vendor',
+            provider_kind = 'organization',
+            website_url = COALESCE(NULLIF(source.website_url, ''), target.website_url),
+            is_active = source.is_active,
+            updated_at = CURRENT_TIMESTAMP()
+        WHEN NOT MATCHED THEN
+          INSERT (provider_id, provider_name, provider_category, provider_kind, website_url, is_active, created_at, updated_at)
+          VALUES (source.provider_id, source.provider_name, 'financial_vendor', 'organization',
+                  NULLIF(source.website_url, ''), source.is_active, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
+      `,
+      params: mergeParams
+    })
+
+    // Single batched UPDATE for fin_suppliers provider_id backfill (1 DML op instead of N)
+    // Build a CASE expression to map supplier_id → provider_id
+    const needsBackfill = resolved.filter(r => r.providerId)
+
+    if (needsBackfill.length > 0) {
+      const caseExpression = needsBackfill
+        .map((_, i) => `WHEN supplier_id = @sid${i} THEN @rpid${i}`)
+        .join(' ')
+
+      const supplierIds = needsBackfill.map((_, i) => `@sid${i}`)
+
+      const updateParams: Record<string, unknown> = {}
+
+      for (let i = 0; i < needsBackfill.length; i++) {
+        updateParams[`sid${i}`] = needsBackfill[i].supplierId
+        updateParams[`rpid${i}`] = needsBackfill[i].providerId
+      }
+
+      await bigQuery.query({
+        query: `
+          UPDATE \`${projectId}.greenhouse.fin_suppliers\`
+          SET provider_id = CASE ${caseExpression} ELSE provider_id END,
+              updated_at = CURRENT_TIMESTAMP()
+          WHERE supplier_id IN (${supplierIds.join(', ')})
+            AND COALESCE(provider_id, '') != CASE ${caseExpression} ELSE '' END
+        `,
+        params: updateParams
+      })
     }
   })().catch(error => {
     syncPromise = null
