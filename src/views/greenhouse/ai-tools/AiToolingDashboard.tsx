@@ -170,6 +170,7 @@ const AiToolingDashboard = () => {
         <TabPanel value='licenses' className='p-0'>
           <AiLicensesTab
             licenses={licensesData?.licenses ?? []}
+            tools={catalogData?.tools ?? []}
             meta={meta}
             onRefresh={fetchData}
           />
@@ -177,6 +178,7 @@ const AiToolingDashboard = () => {
         <TabPanel value='wallets' className='p-0'>
           <AiWalletsTab
             wallets={walletsData?.wallets ?? []}
+            tools={catalogData?.tools ?? []}
             meta={meta}
             onRefresh={fetchData}
           />
