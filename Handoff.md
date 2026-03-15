@@ -40,6 +40,58 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 08:31 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir el drift entre el mensaje de `Payroll` y la superficie real de administración del equipo, y endurecer el overview de compensaciones para que no se caiga completo ante un fallo parcial.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/payroll/get-compensation.ts`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+- `src/app/(dashboard)/admin/team/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se confirmó que el repo tenía APIs de `Admin Team` pero no la ruta `/admin/team`.
+- Se agregó `/admin/team` reutilizando `PeopleList`, para que el admin tenga pantalla real donde crear/gestionar colaboradores.
+- El menú `Admin` ahora muestra `Equipo`.
+- `Payroll` ahora apunta explícitamente a `Admin > Equipo` en lugar de referirse a una surface inexistente.
+- `getCompensationOverview()` ahora es resiliente:
+  - si falla la lectura de compensaciones actuales, sigue entregando roster
+  - si falla la lectura enriquecida de members, cae a `greenhouse.team_members`
+  - recompone `eligibleMembers` con la mejor data disponible
+
+### Verificación
+- Query manual sobre `Preview`:
+  - `team_members` activos: `7`
+  - bootstrap `ensurePayrollInfrastructure` ejecutado statement por statement: correcto
+- `pnpm exec eslint src/lib/payroll/get-compensation.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts src/app/(dashboard)/admin/team/page.tsx`
+  - correcto
+- `git diff --check -- src/lib/payroll/get-compensation.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts src/app/(dashboard)/admin/team/page.tsx docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
+  - correcto
+
+### Riesgos o pendientes
+- No se pudo capturar el stack runtime exacto del `500` autenticado de `/api/hr/payroll/compensation`; se endureció el endpoint para evitar que un fallo parcial vuelva a tumbar toda la carga.
+- Falta smoke autenticado en `pre-greenhouse` para validar:
+  - `/admin/team`
+  - creación de primer colaborador desde esa surface
+  - retorno a `Payroll` con `Nueva compensación` habilitado
+
 ## 2026-03-15 08:02 America/Santiago
 
 ### Agente

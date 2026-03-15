@@ -11,6 +11,7 @@ export const GH_CLIENT_NAV = {
 export const GH_INTERNAL_NAV = {
   internalDashboard: { label: 'Control Tower', subtitle: 'Operacion interna de spaces' },
   adminTenants: { label: 'Spaces', subtitle: 'Spaces, acceso y gobierno del portal' },
+  adminTeam: { label: 'Equipo', subtitle: 'Colaboradores, activación y asignaciones' },
   adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' }
 } as const

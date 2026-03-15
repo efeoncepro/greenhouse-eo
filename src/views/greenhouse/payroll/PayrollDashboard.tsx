@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState, useTransition } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -221,12 +223,16 @@ const PayrollDashboard = () => {
                 <Button color='inherit' size='small' onClick={() => setTab('compensation')}>
                   Configurar salarios
                 </Button>
-              ) : undefined
+              ) : (
+                <Button component={Link} href='/admin/team' color='inherit' size='small'>
+                  Gestionar equipo
+                </Button>
+              )
             }
           >
             {hasActivePayrollMembers
               ? 'Antes de calcular nómina, configura salario base, previsión y bonos desde la pestaña Compensaciones.'
-              : 'No hay colaboradores activos disponibles para nómina. Primero debes habilitarlos desde Admin Team.'}
+              : 'No hay colaboradores activos disponibles para nómina. Primero debes habilitarlos desde Admin > Equipo.'}
           </Alert>
         )}
 

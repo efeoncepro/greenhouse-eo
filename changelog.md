@@ -6,6 +6,15 @@
 
 ## 2026-03-15
 
+### HR Payroll admin team surface and compensation overview resilience
+- `Payroll` ya no depende de una ruta inexistente para indicar dónde habilitar o gestionar colaboradores.
+- Se agregó la ruta runtime `/admin/team`, reutilizando la vista de `People`, y el menú `Admin` ahora expone `Equipo`.
+- `GH_INTERNAL_NAV` ahora incluye la entrada canónica `adminTeam`.
+- `getCompensationOverview()` ahora es resiliente a fallos parciales:
+  - si falla la carga de compensaciones actuales, mantiene el roster
+  - si falla la carga enriquecida de miembros, cae al roster base de `greenhouse.team_members`
+- `Payroll` ahora apunta a `Admin > Equipo` como surface real para habilitación del equipo y primera compensación.
+
 ### HR Payroll period creation and compensation onboarding hardening
 - `HR Payroll` ya no depende de inferencia implícita de tipos para params `null` en BigQuery al crear períodos, crear compensaciones o persistir entries.
 - Se agregaron tipos explícitos en los writes de:

@@ -233,6 +233,30 @@ Impacto esperado:
   - crear primera compensación
   - calcular nómina
 
+## Runtime hardening 2026-03-15 — admin team surface and compensation fallback
+
+### Hallazgo
+
+- el producto referenciaba `Admin Team`, pero no existía la ruta runtime `/admin/team`
+- además, `Payroll` dependía de que `getCompensationOverview()` cargara todo correctamente; si fallaba una parte del overview, la pantalla quedaba sin candidatos y parecía que no existían colaboradores habilitados
+
+### Corregido
+
+- se agregó la ruta real `src/app/(dashboard)/admin/team/page.tsx` reutilizando `PeopleList`
+- el menú lateral de `Admin` ahora expone `Equipo`
+- `GH_INTERNAL_NAV` ya tiene la entrada canónica `adminTeam`
+- `getCompensationOverview()` ahora usa carga resiliente:
+  - si falla la lectura de compensaciones actuales, continúa con roster
+  - si falla la lectura de members enriquecidos, cae a roster base desde `greenhouse.team_members`
+  - luego recompone `eligibleMembers` y el estado actual cuando hay data parcial disponible
+- `Payroll` ahora apunta a `Admin > Equipo` como surface real para habilitación/gestión del roster
+
+### Impacto esperado
+
+- el mensaje de `Nómina` ya no manda a una pantalla inexistente
+- admins ya pueden entrar por una ruta explícita y visible para crear/editar/desactivar colaboradores
+- el overview de compensaciones deja de caerse completo por un fallo parcial de lectura
+
 ## Alcance v3
 
 ### A. Alta inicial de compensación

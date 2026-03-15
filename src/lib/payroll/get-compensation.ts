@@ -1,6 +1,11 @@
 import 'server-only'
 
-import type { CompensationVersion, CreateCompensationVersionInput, PayrollCompensationOverview } from '@/types/payroll'
+import type {
+  CompensationVersion,
+  CreateCompensationVersionInput,
+  PayrollCompensationMember,
+  PayrollCompensationOverview
+} from '@/types/payroll'
 
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
@@ -69,6 +74,14 @@ type ApplicableCompensationRow = CompensationRow & {
 type CompensationBoundaryRow = {
   version_id: string | null
   effective_from: { value?: string } | string | null
+}
+
+type FallbackPayrollMemberRow = {
+  member_id: string | null
+  display_name: string | null
+  email: string | null
+  avatar_url: string | null
+  notion_user_id: string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
@@ -199,8 +212,92 @@ export const getCurrentCompensation = async () => {
   return rows.map(normalizeCompensationVersion)
 }
 
+const listFallbackPayrollMembers = async (): Promise<PayrollCompensationMember[]> => {
+  await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+
+  const rows = await runPayrollQuery<FallbackPayrollMemberRow>(
+    `
+      SELECT
+        member_id,
+        display_name,
+        email,
+        avatar_url,
+        notion_user_id
+      FROM \`${projectId}.greenhouse.team_members\`
+      WHERE active = TRUE
+      ORDER BY display_name ASC
+    `
+  )
+
+  return rows.map(row => ({
+    memberId: String(row.member_id || ''),
+    memberName: String(row.display_name || 'Sin nombre'),
+    memberEmail: String(row.email || ''),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
+    notionUserId: normalizeNullableString(row.notion_user_id),
+    active: true,
+    hasCurrentCompensation: false,
+    hasCompensationHistory: false,
+    compensationVersionCount: 0,
+    currentCompensationVersionId: null,
+    currentCompensationEffectiveFrom: null,
+    currentPayRegime: null,
+    currentCurrency: null
+  }))
+}
+
+const mergeCurrentCompensationIntoMembers = ({
+  members,
+  compensations
+}: {
+  members: PayrollCompensationMember[]
+  compensations: CompensationVersion[]
+}) => {
+  const currentCompensationByMember = new Map(compensations.map(compensation => [compensation.memberId, compensation]))
+
+  return members.map(member => {
+    const currentCompensation = currentCompensationByMember.get(member.memberId)
+
+    if (!currentCompensation) {
+      return member
+    }
+
+    return {
+      ...member,
+      hasCurrentCompensation: true,
+      hasCompensationHistory: member.hasCompensationHistory || true,
+      compensationVersionCount: Math.max(member.compensationVersionCount, 1),
+      currentCompensationVersionId: currentCompensation.versionId,
+      currentCompensationEffectiveFrom: currentCompensation.effectiveFrom,
+      currentPayRegime: currentCompensation.payRegime,
+      currentCurrency: currentCompensation.currency
+    }
+  })
+}
+
 export const getCompensationOverview = async (): Promise<PayrollCompensationOverview> => {
-  const [compensations, members] = await Promise.all([getCurrentCompensation(), listPayrollCompensationMembers()])
+  const [compensationsResult, membersResult] = await Promise.allSettled([
+    getCurrentCompensation(),
+    listPayrollCompensationMembers()
+  ])
+
+  const compensations = compensationsResult.status === 'fulfilled' ? compensationsResult.value : []
+
+  if (compensationsResult.status === 'rejected') {
+    console.error('Unable to load current payroll compensations.', compensationsResult.reason)
+  }
+
+  let members =
+    membersResult.status === 'fulfilled'
+      ? membersResult.value
+      : await listFallbackPayrollMembers()
+
+  if (membersResult.status === 'rejected') {
+    console.error('Unable to load payroll compensation members.', membersResult.reason)
+  }
+
+  members = mergeCurrentCompensationIntoMembers({ members, compensations })
   const eligibleMembers = members.filter(member => !member.hasCurrentCompensation)
 
   return {

@@ -202,6 +202,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       icon: 'tabler-shield-lock',
       children: [
         { label: GH_INTERNAL_NAV.adminTenants.label, href: '/admin/tenants' },
+        { label: GH_INTERNAL_NAV.adminTeam.label, href: '/admin/team' },
         { label: GH_INTERNAL_NAV.adminUsers.label, href: '/admin/users' },
         { label: GH_INTERNAL_NAV.adminRoles.label, href: '/admin/roles' },
         { label: 'AI Tooling', href: '/admin/ai-tools' }

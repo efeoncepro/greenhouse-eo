@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from 'react'
 
+import Link from 'next/link'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -207,9 +209,14 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                         <i className='tabler-adjustments-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
                         <Typography color='text.secondary'>No hay compensaciones configuradas.</Typography>
                         {members.length === 0 ? (
-                          <Typography variant='caption' color='text.disabled'>
-                            Primero debes tener colaboradores activos en Admin Team para habilitar nómina.
-                          </Typography>
+                          <>
+                            <Typography variant='caption' color='text.disabled'>
+                              Primero debes tener colaboradores activos en Admin {'>'} Equipo para habilitar nómina.
+                            </Typography>
+                            <Button component={Link} href='/admin/team' variant='tonal' size='small'>
+                              Abrir equipo
+                            </Button>
+                          </>
                         ) : (
                           <>
                             <Typography variant='caption' color='text.disabled'>
