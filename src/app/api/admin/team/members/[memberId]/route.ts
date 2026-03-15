@@ -3,11 +3,28 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
-import { toTeamAdminErrorResponse, updateMember } from '@/lib/team-admin/mutate-team'
+import { getAdminTeamMemberDetail, toTeamAdminErrorResponse, updateMember } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { UpdateMemberInput } from '@/types/team'
 
 export const dynamic = 'force-dynamic'
+
+export async function GET(_request: Request, context: { params: Promise<{ memberId: string }> }) {
+  const { tenant, errorResponse } = await requireAdminTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const { memberId } = await context.params
+    const payload = await getAdminTeamMemberDetail(memberId)
+
+    return NextResponse.json(payload)
+  } catch (error) {
+    return toTeamAdminErrorResponse(error, 'Unable to load team member detail.')
+  }
+}
 
 export async function PATCH(request: Request, context: { params: Promise<{ memberId: string }> }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()

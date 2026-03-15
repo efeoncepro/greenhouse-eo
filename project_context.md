@@ -3,6 +3,171 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-14 Creative Hub task reclassification
+- `Creative Hub` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `Greenhouse_Capabilities_Architecture_v1.md`
+- Resultado operativo:
+  - el módulo sí está alineado estructuralmente con arquitectura
+  - `Creative Hub` sigue siendo una capability surface, no un objeto canónico nuevo
+  - el cliente canónico sigue anclado a `greenhouse.clients.client_id`
+  - el brief original no debe tratarse como completamente implementado
+- Gaps detectados en runtime:
+  - activación demasiado amplia del módulo por `businessLine = globe`
+  - ausencia real de la capa `Brand Intelligence`
+  - `CSC Pipeline Tracker` soportado hoy con heurísticas, no con un modelo explícito de `fase_csc`
+- Regla operativa derivada:
+  - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser la task vigente para cierre runtime
+
+## Delta 2026-03-14 Creative Hub backend runtime closure
+- `Creative Hub v2` ya no depende solo del snapshot genérico de `Capabilities`; ahora tiene backend propio de enriquecimiento creativo para cerrar los gaps detectados.
+- Complementos backend agregados:
+  - `resolveCapabilityModules()` ahora exige match de `business line` y `service module` cuando ambos requisitos existen
+  - `creative-hub` ya soporta activación por:
+    - `agencia_creativa`
+    - `produccion_audiovisual`
+    - `social_media_content`
+  - `src/lib/capability-queries/creative-hub-runtime.ts` agrega snapshot detallado de tareas con:
+    - fase CSC explícita o derivada
+    - aging real
+    - FTR/RpA reales cuando existen columnas soporte
+- Superficie runtime cerrada para frontend:
+  - `GET /api/capabilities/creative-hub/data` ahora devuelve también:
+    - sección `Brand Intelligence`
+    - pipeline CSC por fase real
+    - stuck assets calculados por tarea/fase
+- Boundary vigente:
+  - `Creative Hub` sigue siendo capability surface dentro de `Capabilities`
+  - no crea objeto canónico paralelo de capability, asset o proyecto
+
+## Delta 2026-03-14 HR core backend foundation
+- `HR Core Module` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Resultado operativo:
+  - `Collaborator` sigue anclado a `greenhouse.team_members.member_id`
+  - `Admin Team` mantiene ownership del roster base
+  - `People` sigue siendo la vista read-first del colaborador
+  - `HR Core` queda como capa de extensión para estructura org, perfil HR, permisos, asistencia y acciones de aprobación
+- Infraestructura backend agregada:
+  - `ensureHrCoreInfrastructure()` extiende `team_members` con:
+    - `department_id`
+    - `reports_to`
+    - `job_level`
+    - `hire_date`
+    - `contract_end_date`
+    - `daily_required`
+  - crea:
+    - `greenhouse.departments`
+    - `greenhouse.member_profiles`
+    - `greenhouse.leave_types`
+    - `greenhouse.leave_balances`
+    - `greenhouse.leave_requests`
+    - `greenhouse.leave_request_actions`
+    - `greenhouse.attendance_daily`
+  - seed del rol `employee` con `route_group_scope = ['internal', 'employee']`
+- Superficie backend activa:
+  - `GET /api/hr/core/meta`
+  - `GET/POST /api/hr/core/departments`
+  - `GET/PATCH /api/hr/core/departments/[departmentId]`
+  - `GET/PATCH /api/hr/core/members/[memberId]/profile`
+  - `GET /api/hr/core/leave/balances`
+  - `GET/POST /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+  - `GET /api/hr/core/attendance`
+  - `POST /api/hr/core/attendance/webhook/teams`
+- Ajuste de identidad/acceso:
+  - `tenant/access.ts` y `tenant/authorization.ts` ya reconocen `employee` como route group válido
+- Variable nueva:
+  - `HR_CORE_TEAMS_WEBHOOK_SECRET` para proteger la ingesta externa de asistencia
+
+## Delta 2026-03-14 AI tooling backend foundation
+- `AI Tooling & Credit System` fue contrastada explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md`
+- Resultado operativo:
+  - la task sí quedó alineada con arquitectura
+  - `greenhouse.clients.client_id` sigue siendo el ancla canónica de cliente para wallets y ledger
+  - `greenhouse.team_members.member_id` sigue siendo el ancla canónica de colaborador para licencias y consumos atribuibles
+  - `greenhouse.providers.provider_id` ya existe en runtime como registro reusable de vendor/plataforma
+  - `ai_tool_catalog`, `member_tool_licenses`, `ai_credit_wallets` y `ai_credit_ledger` quedan como tablas de dominio, no como identidades paralelas
+- Infraestructura backend agregada:
+  - `ensureAiToolingInfrastructure()` crea on-demand:
+    - `greenhouse.providers`
+    - `greenhouse.ai_tool_catalog`
+    - `greenhouse.member_tool_licenses`
+    - `greenhouse.ai_credit_wallets`
+    - `greenhouse.ai_credit_ledger`
+  - `scripts/setup-ai-tooling-tables.sql` queda como referencia SQL versionada del mismo bootstrap
+- Superficie backend activa:
+  - operación:
+    - `GET /api/ai-tools/catalog`
+    - `GET /api/ai-tools/licenses`
+  - créditos:
+    - `GET /api/ai-credits/wallets`
+    - `GET /api/ai-credits/ledger`
+    - `GET /api/ai-credits/summary`
+    - `POST /api/ai-credits/consume`
+    - `POST /api/ai-credits/reload`
+  - admin:
+    - `GET /api/admin/ai-tools/meta`
+    - `GET/POST /api/admin/ai-tools/catalog`
+    - `GET/PATCH /api/admin/ai-tools/catalog/[toolId]`
+    - `GET/POST /api/admin/ai-tools/licenses`
+    - `GET/PATCH /api/admin/ai-tools/licenses/[licenseId]`
+    - `GET/POST /api/admin/ai-tools/wallets`
+    - `GET/PATCH /api/admin/ai-tools/wallets/[walletId]`
+- Regla operativa derivada:
+  - frontend de AI Tooling no debe inventar catálogo, providers, enums ni balance derivado si el backend ya entrega esos contratos
+
+## Delta 2026-03-14 Admin team backend complements
+- `Admin Team Module v2` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Resultado operativo:
+  - la task sigue alineada con arquitectura
+  - `Admin Team` mantiene ownership de las mutaciones de roster y asignaciones
+  - `People` sigue siendo read-first y no incorpora writes
+  - `team_members.member_id` sigue siendo el ancla canónica del colaborador
+- Complementos backend agregados para cerrar mejor el módulo:
+  - `GET /api/admin/team/members` ahora devuelve metadata + `members` + `summary`
+  - `GET /api/admin/team/members/[memberId]`
+  - `GET /api/admin/team/assignments`
+  - `GET /api/admin/team/assignments/[assignmentId]`
+- Ajuste de alineación con identidad:
+  - `Admin Team` puede seguir guardando snapshots útiles en `team_members`
+  - cuando el colaborador ya tiene `identity_profile_id`, el backend ahora sincroniza best-effort `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
+
+## Delta 2026-03-14 HR payroll v3 backend complements
+- `HR Payroll v3` ya fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- Resultado operativo:
+  - la `v3` sí está alineada con arquitectura
+  - `Payroll` sigue owning `compensation_versions`, `payroll_periods` y `payroll_entries`
+  - el colaborador sigue anclado a `greenhouse.team_members.member_id`
+  - no se movieron writes hacia `People` ni `Admin`
+- Complementos backend agregados para desbloquear frontend:
+  - `GET /api/hr/payroll/compensation` ahora devuelve `compensations`, `eligibleMembers`, `members` y `summary`
+  - `GET /api/hr/payroll/compensation/eligible-members`
+  - `GET /api/hr/payroll/periods` ahora devuelve `periods` + `summary`
+  - `GET /api/hr/payroll/periods/[periodId]/entries` ahora devuelve `entries` + `summary`
+  - `GET /api/hr/payroll/members/[memberId]/history` ahora incluye `member` además de `entries` y `compensationHistory`
+- Regla operativa derivada:
+  - frontend de `HR Payroll` debe consumir estos contratos como source of truth y no recomputar discovery de colaboradores o KPIs agregados si el backend ya los expone
+
 ## Delta 2026-03-14 Finance backend runtime closure
 - `Finance` ya no debe tratarse solo como dashboard + CRUD parcial; ahora también expone una capa backend de soporte operativo para que frontend cierre conciliación y egresos especializados sin inventar contratos.
 - Superficie backend agregada o endurecida:

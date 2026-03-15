@@ -13,14 +13,16 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | Task | Foco |
 | --- | --- |
 | [CODEX_TASK_Admin_Team_Module_v2.md](in-progress/CODEX_TASK_Admin_Team_Module_v2.md) | Escritura de roster y asignaciones para People |
+| [CODEX_TASK_AI_Tooling_Credit_System_v2.md](in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md) | Foundation backend de AI tooling, licencias y créditos |
+| [CODEX_TASK_Creative_Hub_Module_v2.md](in-progress/CODEX_TASK_Creative_Hub_Module_v2.md) | Cierre runtime real de Creative Hub sobre Capabilities |
 | [CODEX_TASK_Financial_Module_v2.md](in-progress/CODEX_TASK_Financial_Module_v2.md) | Cierre backend/runtime de Finance y handoff para frontend |
+| [CODEX_TASK_HR_Core_Module_v2.md](in-progress/CODEX_TASK_HR_Core_Module_v2.md) | Foundation backend de HR core, permisos, asistencia y estructura org |
 | [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
 
 ## To Do
 
 | Task | Foco |
 | --- | --- |
-| [CODEX_TASK_AI_Tooling_Credit_System.md](to-do/CODEX_TASK_AI_Tooling_Credit_System.md) | AI tooling, licencias y créditos |
 | [CODEX_TASK_SCIM_User_Provisioning.md](to-do/CODEX_TASK_SCIM_User_Provisioning.md) | Provisioning SCIM desde Entra ID |
 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | Ajuste transversal de jerarquía tipográfica |
 
@@ -32,12 +34,14 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md](complete/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md) | Landing interna y control tower |
 | [CODEX_TASK_Admin_Team_Module.md](complete/CODEX_TASK_Admin_Team_Module.md) | Brief histórico de Admin Team reemplazado por v2 |
 | [CODEX_TASK_Agency_Operator_Layer.md](complete/CODEX_TASK_Agency_Operator_Layer.md) | Capa agency transversal |
+| [CODEX_TASK_AI_Tooling_Credit_System.md](complete/CODEX_TASK_AI_Tooling_Credit_System.md) | Brief histórico de AI Tooling reemplazado por v2 |
 | [CODEX_TASK_Client_Dashboard_Redesign.md](complete/CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
 | [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](complete/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual del dashboard cliente |
-| [CODEX_TASK_Creative_Hub_Module.md](complete/CODEX_TASK_Creative_Hub_Module.md) | Capability module Creative Hub |
+| [CODEX_TASK_Creative_Hub_Module.md](complete/CODEX_TASK_Creative_Hub_Module.md) | Brief histórico de Creative Hub reemplazado por v2 |
 | [CODEX_TASK_Financial_Module.md](complete/CODEX_TASK_Financial_Module.md) | Brief histórico de Finance reemplazado por v2 |
 | [CODEX_TASK_Fix_Team_Capacity_Views.md](complete/CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
 | [CODEX_TASK_Google_SSO_Greenhouse.md](complete/CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |
+| [CODEX_TASK_HR_Core_Module.md](complete/CODEX_TASK_HR_Core_Module.md) | Brief histórico de HR Core reemplazado por v2 |
 | [CODEX_TASK_HR_Payroll_Module.md](complete/CODEX_TASK_HR_Payroll_Module.md) | Brief histórico de HR Payroll reemplazado por v2 |
 | [CODEX_TASK_HR_Payroll_Module_v2.md](complete/CODEX_TASK_HR_Payroll_Module_v2.md) | Brief histórico de HR Payroll absorbido por v3 |
 | [CODEX_TASK_Login_Page_Greenhouse.md](complete/CODEX_TASK_Login_Page_Greenhouse.md) | UI de login Greenhouse |

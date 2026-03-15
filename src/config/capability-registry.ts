@@ -10,7 +10,7 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
     priority: 10,
     theme: 'creative',
     requiredBusinessLines: ['globe'],
-    requiredServiceModules: ['agencia_creativa'],
+    requiredServiceModules: ['agencia_creativa', 'produccion_audiovisual', 'social_media_content'],
     dataSources: [
       {
         dataset: 'notion_ops',
@@ -22,13 +22,18 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
           'cumplimiento',
           'completitud',
           'client_change_round_final',
+          'frame_versions',
           'rpa',
           'client_review_open',
           'workflow_review_open',
           'open_frame_comments',
+          'fase_csc',
           'bloqueado_por_ids',
           'created_time',
+          'last_edited_time',
           'fecha_de_completado',
+          'fecha_entrega',
+          'fecha_limite',
           '_synced_at'
         ]
       },
@@ -89,6 +94,29 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         type: 'metrics-row',
         size: 'full',
         description: 'Early Launch Advantage, Iteration Velocity, Creative Throughput y First Time Right.'
+      },
+
+      // ── Brand Intelligence ─────────────────────────────────────────
+      {
+        id: 'brand-header',
+        title: 'Brand Intelligence',
+        type: 'section-header',
+        size: 'full',
+        description: 'Gobernanza y proteccion de marca sobre el flujo creativo.'
+      },
+      {
+        id: 'creative-brand-kpis',
+        title: 'Brand metrics',
+        type: 'metrics-row',
+        size: 'full',
+        description: 'First Time Right, consistencia de marca, salud de revision y base de conocimiento.'
+      },
+      {
+        id: 'creative-rpa-trend',
+        title: 'RpA trend',
+        type: 'chart-bar',
+        size: 'full',
+        description: 'Evolucion mensual de rondas por asset visibles en la cuenta.'
       },
 
       // ── CSC Pipeline Tracker ──────────────────────────────────────

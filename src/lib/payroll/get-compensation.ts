@@ -1,8 +1,9 @@
 import 'server-only'
 
-import type { CompensationVersion, CreateCompensationVersionInput } from '@/types/payroll'
+import type { CompensationVersion, CreateCompensationVersionInput, PayrollCompensationOverview } from '@/types/payroll'
 
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
+import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
 import {
   PayrollValidationError,
   assertPayrollDateString,
@@ -167,6 +168,22 @@ export const getCurrentCompensation = async () => {
   )
 
   return rows.map(normalizeCompensationVersion)
+}
+
+export const getCompensationOverview = async (): Promise<PayrollCompensationOverview> => {
+  const [compensations, members] = await Promise.all([getCurrentCompensation(), listPayrollCompensationMembers()])
+  const eligibleMembers = members.filter(member => !member.hasCurrentCompensation)
+
+  return {
+    compensations,
+    eligibleMembers,
+    members,
+    summary: {
+      activeMembers: members.length,
+      activeCompensations: compensations.length,
+      eligibleMembers: eligibleMembers.length
+    }
+  }
 }
 
 export const getCompensationHistoryByMember = async (memberId: string) => {

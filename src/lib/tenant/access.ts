@@ -82,6 +82,7 @@ export interface TenantAccessRecord {
 
 const rolePriority = [
   'efeonce_admin',
+  'employee',
   'finance_manager',
   'hr_payroll',
   'efeonce_operations',
@@ -135,6 +136,11 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
     if (roleCode === 'hr_payroll') {
       routeGroups.add('internal')
       routeGroups.add('hr')
+    }
+
+    if (roleCode === 'employee') {
+      routeGroups.add('internal')
+      routeGroups.add('employee')
     }
 
     if (roleCode === 'finance_manager') {

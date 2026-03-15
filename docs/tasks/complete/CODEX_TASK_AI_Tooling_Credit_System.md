@@ -1,5 +1,7 @@
 # CODEX TASK — AI Tooling & Credit System: Gestión de Herramientas, Licencias y Créditos de IA
 
+> Brief histórico de descubrimiento. La task operativa vigente es `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`.
+
 ## Resumen
 
 Implementar el **sistema completo de gestión de herramientas tecnológicas, licencias de IA y créditos de producción** en el portal Greenhouse. Cubre tres necesidades:

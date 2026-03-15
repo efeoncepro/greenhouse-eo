@@ -129,14 +129,17 @@ Recommended relationship:
 
 ### Operational rule
 
-Until `greenhouse.providers` exists in runtime:
+`greenhouse.providers` now exists in runtime as the shared provider registry used by AI Tooling.
+
+That means:
 - Finance may keep using `fin_suppliers` for payable workflows
 - modules may still carry `vendor` snapshot labels where needed
+- new cross-module relationships should anchor to `provider_id` whenever the vendor/platform identity must survive across modules
 
-But for new cross-module design:
+But for ongoing cross-module design:
 - do not treat `fin_suppliers.supplier_id` as the universal provider identity
 - do not treat free-text `vendor` as a durable relationship key
-- prefer designing new tooling or AI relationships around future `provider_id`
+- prefer designing new tooling, suites, identity links, or AI relationships around `provider_id`
 
 ## Resolution Rules
 

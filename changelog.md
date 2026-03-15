@@ -6,6 +6,135 @@
 
 ## 2026-03-14
 
+### Creative Hub backend runtime closure
+- `Creative Hub v2` dejó de depender solo del snapshot agregado de `Capabilities` y ahora tiene una capa backend específica para cierre real del módulo.
+- Se endureció la activación runtime:
+  - `resolveCapabilityModules()` ahora exige match de `business line` y `service module` cuando ambos están definidos
+  - `Creative Hub` ya no se activa solo por `globe`; requiere además uno de:
+    - `agencia_creativa`
+    - `produccion_audiovisual`
+    - `social_media_content`
+- Se agregó `src/lib/capability-queries/creative-hub-runtime.ts` para construir snapshot task-level de la capability:
+  - usa `fase_csc` cuando existe
+  - la deriva server-side cuando todavía no existe en `notion_ops.tareas`
+  - calcula aging real, FTR y RpA cuando la data existe
+- `GET /api/capabilities/creative-hub/data` ahora devuelve:
+  - capa `Brand Intelligence`
+  - pipeline CSC basado en fases reales/derivadas
+  - stuck assets por tarea y fase, no por proyecto agregado
+
+### Creative Hub task reclassified to runtime v2
+- `Creative Hub` fue contrastado contra arquitectura y contra el runtime real del repo:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `Greenhouse_Capabilities_Architecture_v1.md`
+- El resultado confirmó que el módulo sí está bien ubicado como `capability surface`, pero no está completo respecto del brief original.
+- Se reclasificó la task:
+  - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser el brief activo orientado a cierre runtime
+- Gaps documentados en la `v2`:
+  - activación demasiado amplia del módulo
+  - ausencia real de la capa `Brand Intelligence`
+  - `CSC Pipeline Tracker` todavía heurístico
+
+### HR core backend foundation and task v2
+- `HR Core Module` dejó de tratarse como brief pendiente únicamente greenfield:
+  - `docs/tasks/complete/CODEX_TASK_HR_Core_Module.md` queda como referencia histórica
+  - `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md` pasa a ser la task activa orientada a runtime/backend
+- La task fue contrastada antes de implementar contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Se implementó la primera foundation backend real del dominio:
+  - `ensureHrCoreInfrastructure()` extiende `team_members` y crea `departments`, `member_profiles`, `leave_types`, `leave_balances`, `leave_requests`, `leave_request_actions` y `attendance_daily`
+  - `scripts/setup-hr-core-tables.sql` queda como referencia SQL versionada
+  - se seedó el rol `employee` con route group `employee`
+- Se agregó la superficie backend operativa:
+  - `GET /api/hr/core/meta`
+  - `GET/POST /api/hr/core/departments`
+  - `GET/PATCH /api/hr/core/departments/[departmentId]`
+  - `GET/PATCH /api/hr/core/members/[memberId]/profile`
+  - `GET /api/hr/core/leave/balances`
+  - `GET/POST /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+  - `GET /api/hr/core/attendance`
+  - `POST /api/hr/core/attendance/webhook/teams`
+- Se documentó la nueva variable:
+  - `HR_CORE_TEAMS_WEBHOOK_SECRET`
+  - agregada en `.env.example` y `.env.local.example`
+
+### AI tooling backend foundation and task v2
+- `AI Tooling & Credit System` dejó de tratarse como brief pendiente puramente greenfield:
+  - `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System.md` queda como referencia histórica
+  - `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md` pasa a ser la task activa orientada a runtime/backend
+- La task fue contrastada antes de implementar contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md`
+- Se implementó la primera foundation backend real del dominio:
+  - `ensureAiToolingInfrastructure()` para bootstrap on-demand de `providers`, `ai_tool_catalog`, `member_tool_licenses`, `ai_credit_wallets` y `ai_credit_ledger`
+  - `scripts/setup-ai-tooling-tables.sql` como referencia SQL versionada del mismo modelo
+  - registro runtime inicial de `greenhouse.providers.provider_id`
+- Se agregó la superficie backend operativa:
+  - `GET /api/ai-tools/catalog`
+  - `GET /api/ai-tools/licenses`
+  - `GET /api/ai-credits/wallets`
+  - `GET /api/ai-credits/ledger`
+  - `GET /api/ai-credits/summary`
+  - `POST /api/ai-credits/consume`
+  - `POST /api/ai-credits/reload`
+  - `GET /api/admin/ai-tools/meta`
+  - `GET/POST /api/admin/ai-tools/catalog`
+  - `GET/PATCH /api/admin/ai-tools/catalog/[toolId]`
+  - `GET/POST /api/admin/ai-tools/licenses`
+  - `GET/PATCH /api/admin/ai-tools/licenses/[licenseId]`
+  - `GET/POST /api/admin/ai-tools/wallets`
+  - `GET/PATCH /api/admin/ai-tools/wallets/[walletId]`
+- `FINANCE_CANONICAL_360_V1.md` quedó alineado con la nueva realidad runtime:
+  - `greenhouse.providers` ya no es solo un objeto futuro de arquitectura
+  - `fin_suppliers` se mantiene como extensión financiera del provider, no como identidad universal del vendor
+
+### Admin team backend complement freeze
+- `Admin Team Module v2` fue contrastado contra arquitectura antes de extender backend:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- El resultado confirmó que el módulo sigue alineado:
+  - `Admin Team` owning roster/assignment writes
+  - `People` conservado como read-first
+  - `team_members.member_id` mantenido como ancla canónica
+- Se agregaron superficies backend propias de Admin Team para no depender solo de `People`:
+  - `GET /api/admin/team/members` ahora devuelve metadata + `members` + `summary`
+  - `GET /api/admin/team/members/[memberId]`
+  - `GET /api/admin/team/assignments`
+  - `GET /api/admin/team/assignments/[assignmentId]`
+- Se endureció la alineación con identidad:
+  - cuando el colaborador ya tiene `identity_profile_id`, `Admin Team` ahora sincroniza best-effort `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
+
+### HR payroll v3 backend complement freeze
+- `HR Payroll v3` fue contrastada contra arquitectura antes de tocar backend:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- El resultado confirmó que la task sigue alineada con el modelo canónico:
+  - `Payroll` mantiene ownership de compensaciones, períodos y entries
+  - el colaborador sigue anclado a `greenhouse.team_members.member_id`
+- Se cerraron complementos backend para que frontend pueda avanzar sin inventar contratos:
+  - `GET /api/hr/payroll/compensation` ahora devuelve `compensations`, `eligibleMembers`, `members` y `summary`
+  - `GET /api/hr/payroll/compensation/eligible-members`
+  - `GET /api/hr/payroll/periods` ahora devuelve `periods` + `summary`
+  - `GET /api/hr/payroll/periods/[periodId]/entries` ahora devuelve `entries` + `summary`
+  - `GET /api/hr/payroll/members/[memberId]/history` ahora incluye `member` y devuelve `404` si el colaborador no existe
+- Se agregó `src/lib/payroll/get-payroll-members.ts` como capa server-side para:
+  - summary canónico de colaborador
+  - discovery de colaboradores activos y elegibilidad de compensación vigente
+
 ### Finance backend runtime closure and task v2
 - `Financial Module` dejó de tratarse como brief greenfield activo:
   - `docs/tasks/complete/CODEX_TASK_Financial_Module.md` queda como referencia histórica

@@ -1,5 +1,7 @@
 # CODEX TASK — Creative Hub: Módulo de Capabilities para Globe
 
+> Estado 2026-03-14: brief histórico. La implementación runtime actual de `Creative Hub` quedó parcialmente absorbida por el framework genérico de `Capabilities`, pero este documento ya no debe tratarse como task cerrada “tal cual implementada”. El brief activo pasa a ser `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`.
+
 ## Resumen
 
 Implementar el módulo **Creative Hub** como la primera capability completa del portal Greenhouse. El Creative Hub es el módulo central para clientes de Globe — expone la producción creativa como un sistema industrial con 3 capas de valor: Revenue Enabled (conexión con negocio), Brand Intelligence (gobernanza de marca), y CSC Pipeline Tracker (visualización de la cadena de producción).

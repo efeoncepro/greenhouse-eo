@@ -17,6 +17,9 @@ Este task implementa las **acciones de mutación** que People v2 dejó explícit
 
 Esta task debe mantenerse alineada con:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 
 Reglas obligatorias:
 - `greenhouse.team_members.member_id` sigue siendo el ancla canónica del objeto `Collaborator`
@@ -27,6 +30,16 @@ Reglas obligatorias:
 No permitido:
 - crear un nuevo “employee master” fuera de `team_members`
 - usar `client_users` como reemplazo de la identidad laboral del colaborador
+
+Resultado del contraste 2026-03-14:
+- la task sí sigue alineada con arquitectura
+- `Admin Team` mantiene ownership de las mutaciones de roster y asignaciones
+- `People` sigue siendo capa read-first y no recibe writes nuevos
+- `team_members.member_id` sigue como ancla canónica del colaborador
+- `client_team_assignments` sigue tratándose como relación operativa sobre objetos canónicos existentes
+- boundary adicional confirmado:
+  - `Admin Team` puede seguir guardando snapshots útiles en `team_members`
+  - cuando existe `identity_profile_id`, conviene sincronizar links reutilizables en `identity_profile_source_links` en vez de tratar `azure_oid` / `notion_user_id` / `hubspot_owner_id` solo como campos aislados
 
 ---
 
@@ -61,6 +74,13 @@ Una vez implementado, People v2 activa los CTAs que hoy están vacíos o behind 
 | `GET /api/team/members` | Lectura de roster (client-facing) |
 | `GET /api/team/capacity` | Lectura de capacidad |
 | People v2 surfaces | `/people` y `/people/[memberId]` (read-only) |
+| `POST /api/admin/team/members` | Crear colaborador |
+| `PATCH /api/admin/team/members/[memberId]` | Editar perfil |
+| `POST /api/admin/team/members/[memberId]/deactivate` | Desactivar colaborador |
+| `POST /api/admin/team/assignments` | Crear o reactivar asignación |
+| `PATCH /api/admin/team/assignments/[assignmentId]` | Editar asignación |
+| `DELETE /api/admin/team/assignments/[assignmentId]` | Desasignar |
+| Drawers admin de People | Ya presentes en `src/views/greenhouse/people/drawers/` |
 
 ### No existe (lo que este task crea)
 
@@ -74,6 +94,28 @@ Una vez implementado, People v2 activa los CTAs que hoy están vacíos o behind 
 | `CreateMemberDrawer.tsx` | No hay UI de creación |
 | `EditProfileDrawer.tsx` | No hay UI de edición |
 | `AssignmentDrawer.tsx` | No hay UI de asignación |
+
+### Complementos backend cerrados en esta pasada
+
+Para dejar el módulo menos dependiente de `People` y más alineado con arquitectura, ya quedó agregada esta capa adicional:
+
+- `GET /api/admin/team/members`
+  - ahora devuelve metadata + `members` + `summary`
+- `GET /api/admin/team/members/[memberId]`
+  - detalle admin del colaborador + assignments + summary
+- `GET /api/admin/team/assignments`
+  - listado admin con filtros opcionales `memberId`, `clientId`, `activeOnly`
+- `GET /api/admin/team/assignments/[assignmentId]`
+  - detalle puntual de assignment
+- sincronización best-effort con `greenhouse.identity_profile_source_links`
+  - si el colaborador ya tiene `identity_profile_id`, los snapshots de `azureOid`, `notionUserId` y `hubspotOwnerId` ahora también se reflejan en links reutilizables
+
+## Lectura actual honesta del task
+
+La parte base del backend CRUD ya no está pendiente. Lo que sigue abierto en esta task es principalmente:
+- consumo frontend consistente de los contratos admin nuevos
+- eventual simplificación de los drawers para usar directamente `Admin Team` y no depender tanto de read models de `People`
+- decidir más adelante si `Admin Team v2` se congela como referencia histórica y pasa a una `v3` más enfocada en runtime real, como ya pasó con Payroll y Finance
 
 ---
 

@@ -40,6 +40,36 @@ const TAX_ID_TYPES = [
   { value: 'OTHER', label: 'Otro' }
 ]
 
+const COUNTRIES = [
+  { value: 'CL', label: 'Chile' },
+  { value: 'AR', label: 'Argentina' },
+  { value: 'BR', label: 'Brasil' },
+  { value: 'CO', label: 'Colombia' },
+  { value: 'MX', label: 'México' },
+  { value: 'PE', label: 'Perú' },
+  { value: 'UY', label: 'Uruguay' },
+  { value: 'EC', label: 'Ecuador' },
+  { value: 'US', label: 'Estados Unidos' },
+  { value: 'ES', label: 'España' },
+  { value: 'GB', label: 'Reino Unido' },
+  { value: 'OTHER', label: 'Otro' }
+]
+
+const SERVICE_TYPES = [
+  { value: 'consulting', label: 'Consultoría' },
+  { value: 'development', label: 'Desarrollo' },
+  { value: 'design', label: 'Diseño' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'media_buying', label: 'Compra de medios' },
+  { value: 'hosting', label: 'Hosting / Cloud' },
+  { value: 'saas', label: 'SaaS / Licencias' },
+  { value: 'legal', label: 'Legal' },
+  { value: 'accounting', label: 'Contabilidad' },
+  { value: 'hr', label: 'Recursos Humanos' },
+  { value: 'office_supplies', label: 'Suministros de oficina' },
+  { value: 'other', label: 'Otro' }
+]
+
 const CURRENCIES = [
   { value: 'CLP', label: 'CLP' },
   { value: 'USD', label: 'USD' }

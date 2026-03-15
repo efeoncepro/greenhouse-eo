@@ -15,9 +15,18 @@ export async function GET() {
   }
 
   try {
-    const data = await listPayrollPeriods()
+    const periods = await listPayrollPeriods()
 
-    return NextResponse.json(data)
+    return NextResponse.json({
+      periods,
+      summary: {
+        total: periods.length,
+        draft: periods.filter(period => period.status === 'draft').length,
+        calculated: periods.filter(period => period.status === 'calculated').length,
+        approved: periods.filter(period => period.status === 'approved').length,
+        exported: periods.filter(period => period.status === 'exported').length
+      }
+    })
   } catch (error) {
     return toPayrollErrorResponse(error, 'Unable to load payroll periods.')
   }

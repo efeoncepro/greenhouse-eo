@@ -72,6 +72,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [description, setDescription] = useState('')
   const [expenseType, setExpenseType] = useState('')
   const [currency, setCurrency] = useState('')
+  const [exchangeRate, setExchangeRate] = useState('')
   const [totalAmount, setTotalAmount] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
   const [supplierId, setSupplierId] = useState('')
@@ -138,6 +139,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     setDescription('')
     setExpenseType('')
     setCurrency('')
+    setExchangeRate('')
     setTotalAmount('')
     setPaymentDate('')
     setSupplierId('')
@@ -152,6 +154,12 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
   const handleSubmit = async () => {
     if (!description.trim() || !expenseType || !currency || !totalAmount || !paymentDate) {
       setError('Descripcion, tipo de egreso, moneda, monto total y fecha de pago son obligatorios.')
+
+      return
+    }
+
+    if (currency !== 'CLP' && (!exchangeRate || Number(exchangeRate) <= 0)) {
+      setError(`Debes ingresar el tipo de cambio ${currency}/CLP.`)
 
       return
     }
@@ -174,6 +182,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
       subtotal: amount,
       totalAmount: amount,
       paymentDate,
+      ...(currency !== 'CLP' && exchangeRate && { exchangeRateToClp: Number(exchangeRate) }),
       ...(supplierId.trim() && { supplierId: supplierId.trim() }),
       ...(documentNumber.trim() && { documentNumber: documentNumber.trim() }),
       ...(documentDate && { documentDate }),
@@ -299,6 +308,25 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
               required
             />
           </Grid>
+
+          {currency && currency !== 'CLP' && (
+            <Grid size={{ xs: 12 }}>
+              <CustomTextField
+                fullWidth
+                size='small'
+                label={`Tipo de cambio ${currency}/CLP`}
+                type='number'
+                value={exchangeRate}
+                onChange={e => setExchangeRate(e.target.value)}
+                required
+                helperText={
+                  exchangeRate && totalAmount
+                    ? `Total CLP: $${Math.round(Number(totalAmount) * Number(exchangeRate)).toLocaleString('es-CL')}`
+                    : `Ingresa el valor de 1 ${currency} en CLP`
+                }
+              />
+            </Grid>
+          )}
 
           <Grid size={{ xs: 12 }}>
             <Divider />

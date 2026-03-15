@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
-import { createMember, getAdminTeamMetadata, toTeamAdminErrorResponse } from '@/lib/team-admin/mutate-team'
+import { createMember, getAdminTeamMembersPayload, toTeamAdminErrorResponse } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { CreateMemberInput } from '@/types/team'
 
@@ -17,9 +17,9 @@ export async function GET() {
   }
 
   try {
-    const metadata = await getAdminTeamMetadata()
+    const payload = await getAdminTeamMembersPayload()
 
-    return NextResponse.json(metadata)
+    return NextResponse.json(payload)
   } catch (error) {
     return toTeamAdminErrorResponse(error, 'Unable to load admin team capabilities.')
   }

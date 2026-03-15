@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
-import { createCompensationVersion, getCurrentCompensation } from '@/lib/payroll/get-compensation'
+import { createCompensationVersion, getCompensationOverview } from '@/lib/payroll/get-compensation'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
@@ -18,7 +18,7 @@ export async function GET() {
   }
 
   try {
-    const data = await getCurrentCompensation()
+    const data = await getCompensationOverview()
 
     return NextResponse.json(data)
   } catch (error) {

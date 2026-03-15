@@ -4,6 +4,7 @@ import type { MemberPayrollHistory, PayrollEntry } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getCompensationHistoryByMember } from '@/lib/payroll/get-compensation'
+import { getPayrollMemberSummary } from '@/lib/payroll/get-payroll-members'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import {
   PayrollValidationError,
@@ -205,6 +206,11 @@ export const getMemberPayrollHistory = async (memberId: string): Promise<MemberP
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
   const baseEntryQuery = buildBaseEntryQuery(projectId)
+  const member = await getPayrollMemberSummary(memberId)
+
+  if (!member) {
+    throw new PayrollValidationError('Payroll member not found.', 404)
+  }
 
   const rows = await runPayrollQuery<PayrollEntryRow>(
     `
@@ -223,6 +229,7 @@ export const getMemberPayrollHistory = async (memberId: string): Promise<MemberP
 
     return {
       memberId,
+      member,
       entries: [],
       compensationHistory: history
     }
@@ -230,6 +237,7 @@ export const getMemberPayrollHistory = async (memberId: string): Promise<MemberP
 
   return {
     memberId,
+    member,
     entries: rows.map(normalizePayrollEntry),
     compensationHistory: await getCompensationHistoryByMember(memberId)
   }

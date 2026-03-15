@@ -10,6 +10,7 @@ Ruta activa:
 
 Backend activo:
 - `/api/hr/payroll/compensation`
+- `/api/hr/payroll/compensation/eligible-members`
 - `/api/hr/payroll/periods`
 - `/api/hr/payroll/periods/[periodId]`
 - `/api/hr/payroll/periods/[periodId]/calculate`
@@ -71,6 +72,36 @@ Reglas obligatorias:
 - no crear una identidad paralela de colaborador; todo debe seguir anclado a `greenhouse.team_members.member_id`
 - no reemplazar el backend actual con lógica cliente; la UI debe orquestar el contrato existente
 - si aparece un gap de datos, extender el contrato real del backend antes de inventar estado local o mocks
+
+Resultado del contraste 2026-03-14:
+- `v3` sí queda alineada con arquitectura
+- mantiene `Payroll` como owner de `compensation_versions`, `payroll_periods` y `payroll_entries`
+- mantiene `greenhouse.team_members.member_id` como ancla canónica del colaborador
+- no mueve writes a `People` ni a `Admin`
+
+## Complementos backend ya cerrados para v3
+
+Estos ajustes ya quedaron listos para que Claude implemente frontend sobre contratos reales:
+
+- `GET /api/hr/payroll/compensation` ahora devuelve:
+  - `compensations`
+  - `eligibleMembers`
+  - `members`
+  - `summary`
+- `GET /api/hr/payroll/compensation/eligible-members` expone solo candidatos activos sin compensación vigente
+- `GET /api/hr/payroll/periods` ahora devuelve `periods` + `summary`
+- `GET /api/hr/payroll/periods/[periodId]/entries` ahora devuelve `entries` + `summary`
+- `GET /api/hr/payroll/members/[memberId]/history` ahora incluye:
+  - `member`
+  - `entries`
+  - `compensationHistory`
+- `GET /api/hr/payroll/members/[memberId]/history` responde `404` si `memberId` no existe en `greenhouse.team_members`
+
+Handoff backend para frontend:
+- usar `eligibleMembers` para el CTA `Nueva compensación`
+- no recalcular candidatos desde la tabla actual de compensaciones
+- usar `history.member` para header y empty states del detalle de colaborador
+- usar `periods.summary` y `entries.summary` si se quieren KPIs rápidos de pantalla, sin recalcularlos localmente por defecto
 
 ## Alcance v3
 
@@ -144,6 +175,8 @@ Resultado esperado:
 Backend ya disponible para reutilizar:
 - `src/app/api/hr/payroll/periods/[periodId]/route.ts`
 - `src/app/api/hr/payroll/entries/[entryId]/route.ts`
+- `src/app/api/hr/payroll/compensation/route.ts`
+- `src/app/api/hr/payroll/compensation/eligible-members/route.ts`
 - `src/lib/payroll/recalculate-entry.ts`
 
 ## Fuera de alcance

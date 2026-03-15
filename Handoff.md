@@ -40,6 +40,407 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 00:12 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cerrar el backend/runtime faltante de `Creative Hub v2` para dejar la capability lista para frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / capabilities runtime
+
+### Archivos tocados
+- `src/lib/capabilities/resolve-capabilities.ts`
+- `src/config/capability-registry.ts`
+- `src/lib/capability-queries/creative-hub-runtime.ts`
+- `src/lib/capability-queries/creative-hub.ts`
+- `src/lib/capability-queries/helpers.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se cerró la activación runtime del módulo:
+  - el resolver de capabilities ya no activa módulos por `businessLine` o `serviceModule` de forma aislada cuando ambos requisitos existen
+  - `Creative Hub` ya exige `globe` + al menos uno de:
+    - `agencia_creativa`
+    - `produccion_audiovisual`
+    - `social_media_content`
+- Se cerró la capa backend de `Brand Intelligence`:
+  - se agregaron cards `brand-header`, `creative-brand-kpis` y `creative-rpa-trend`
+  - el payload ya devuelve FTR, consistencia de marca derivada, RpA operativo y `Knowledge Base` como placeholder honesto
+- Se reemplazó el CSC heurístico por lectura task-level:
+  - `src/lib/capability-queries/creative-hub-runtime.ts` arma snapshot detallado de tareas creativas
+  - si `fase_csc` existe en BigQuery se usa
+  - si no existe, runtime la deriva server-side desde `estado` + revisión abierta + señales de producción
+  - `csc-pipeline`, `csc-metrics` y `stuck-assets` ahora salen de tareas individuales y aging real
+- `Revenue Enabled` quedó endurecido para usar tareas completadas reales cuando hay base suficiente.
+- Se dejó la `v2` documentada como contract freeze para que Claude implemente frontend sobre el runtime actual.
+
+### Verificacion
+- `pnpm exec eslint` sobre el scope Creative Hub backend/runtime: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- No se hizo smoke runtime/manual del endpoint `/api/capabilities/creative-hub/data` contra un tenant real en esta pasada.
+- `Knowledge Base` sigue siendo placeholder honesto; para volverlo real hace falta pipeline de wiki o fuente explícita de aprendizaje de marca.
+- Si en `notion_ops.tareas` faltan columnas de FTR/RpA, el backend ya degrada a `null`/fallback en vez de mentir, y frontend debe respetar esos estados.
+
+## 2026-03-14 23:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Revisar `Creative Hub Module` contra arquitectura y reclasificar la task según el estado real del módulo en runtime.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentación operativa / task governance
+
+### Archivos tocados
+- `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md`
+- `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`
+- `docs/tasks/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastó `Creative Hub` contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `Greenhouse_Capabilities_Architecture_v1.md`
+- Conclusión de arquitectura:
+  - el módulo sí está bien ubicado como `capability surface`
+  - no crea identidad paralela de capability, cliente o proyecto
+  - pero no está realmente cerrado respecto del brief original
+- Gaps principales documentados:
+  - activación demasiado amplia por `globe`
+  - falta de la capa `Brand Intelligence`
+  - `CSC Pipeline Tracker` todavía heurístico, no basado en `fase_csc` explícita o derivación determinística
+- Se reclasificó la task:
+  - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` queda como brief activo para cierre runtime
+- Se actualizó el board de tasks y la documentación viva para reflejar esta reclasificación.
+
+### Verificacion
+- Revisión manual contra arquitectura + runtime del repo: realizada
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Esta entrada queda como contexto de reclasificación histórica; el cierre backend real quedó documentado arriba en la entrada de `2026-03-15 00:12`.
+
+## 2026-03-14 23:04 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Contrastar `HR Core Module` contra arquitectura, crear la foundation backend real del módulo y dejar una `v2` operativa para handoff con frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/types/hr-core.ts`
+- `src/lib/hr-core/shared.ts`
+- `src/lib/hr-core/schema.ts`
+- `src/lib/hr-core/service.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/authorization.ts`
+- `src/app/api/hr/core/meta/route.ts`
+- `src/app/api/hr/core/departments/route.ts`
+- `src/app/api/hr/core/departments/[departmentId]/route.ts`
+- `src/app/api/hr/core/members/[memberId]/profile/route.ts`
+- `src/app/api/hr/core/leave/balances/route.ts`
+- `src/app/api/hr/core/leave/requests/route.ts`
+- `src/app/api/hr/core/leave/requests/[requestId]/route.ts`
+- `src/app/api/hr/core/leave/requests/[requestId]/review/route.ts`
+- `src/app/api/hr/core/attendance/route.ts`
+- `src/app/api/hr/core/attendance/webhook/teams/route.ts`
+- `scripts/setup-hr-core-tables.sql`
+- `.env.example`
+- `.env.local.example`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`
+- `docs/tasks/complete/CODEX_TASK_HR_Core_Module.md`
+- `docs/tasks/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastó explícitamente `HR Core Module` contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Conclusión de arquitectura:
+  - `HR Core` no debe crear una identidad paralela de empleado
+  - `team_members.member_id` sigue siendo el ancla canónica del colaborador
+  - `Admin Team` mantiene ownership del roster base
+  - `People` sigue siendo la vista read-first del colaborador
+  - `HR Core` queda como extensión del colaborador para org/leave/attendance/profile
+- Se agregó foundation backend completa del dominio:
+  - `ensureHrCoreInfrastructure()` extiende `team_members` con `department_id`, `reports_to`, `job_level`, `hire_date`, `contract_end_date` y `daily_required`
+  - crea `departments`, `member_profiles`, `leave_types`, `leave_balances`, `leave_requests`, `leave_request_actions` y `attendance_daily`
+  - seed del rol `employee` con route group `employee`
+  - seed de leave types base
+- Se cerró la superficie backend operativa:
+  - `GET /api/hr/core/meta`
+  - `GET/POST /api/hr/core/departments`
+  - `GET/PATCH /api/hr/core/departments/[departmentId]`
+  - `GET/PATCH /api/hr/core/members/[memberId]/profile`
+  - `GET /api/hr/core/leave/balances`
+  - `GET/POST /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+  - `GET /api/hr/core/attendance`
+  - `POST /api/hr/core/attendance/webhook/teams`
+- Se dejó SQL versionado en `scripts/setup-hr-core-tables.sql`.
+- Se reestructuró la task:
+  - `docs/tasks/complete/CODEX_TASK_HR_Core_Module.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md` queda como brief activo orientado a runtime/backend + handoff para Claude
+- Se documentó la variable nueva `HR_CORE_TEAMS_WEBHOOK_SECRET`.
+
+### Verificacion
+- `pnpm exec eslint` sobre el scope HR Core backend/API: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Falta validación runtime manual contra BigQuery real para confirmar bootstrap y seeds de HR Core.
+- No existe todavía UI real del route group `employee`; solo quedó la foundation backend/authorization.
+- `member_profiles` es una tabla de extensión HR; si más adelante aparece una necesidad de perfil genérico cross-module, no debe reemplazar `team_members` como identidad.
+- El worktree mantiene además cambios previos abiertos de `AI Tooling`, `Admin Team` y `HR Payroll`; cuidar el scope al momento de commit.
+
+## 2026-03-14 22:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Contrastar `AI Tooling & Credit System` contra arquitectura, crear la foundation backend real del módulo y dejar una `v2` operativa para handoff con frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/types/ai-tools.ts`
+- `src/lib/ai-tools/shared.ts`
+- `src/lib/ai-tools/schema.ts`
+- `src/lib/ai-tools/service.ts`
+- `src/app/api/ai-tools/catalog/route.ts`
+- `src/app/api/ai-tools/licenses/route.ts`
+- `src/app/api/ai-credits/wallets/route.ts`
+- `src/app/api/ai-credits/ledger/route.ts`
+- `src/app/api/ai-credits/summary/route.ts`
+- `src/app/api/ai-credits/consume/route.ts`
+- `src/app/api/ai-credits/reload/route.ts`
+- `src/app/api/admin/ai-tools/meta/route.ts`
+- `src/app/api/admin/ai-tools/catalog/route.ts`
+- `src/app/api/admin/ai-tools/catalog/[toolId]/route.ts`
+- `src/app/api/admin/ai-tools/licenses/route.ts`
+- `src/app/api/admin/ai-tools/licenses/[licenseId]/route.ts`
+- `src/app/api/admin/ai-tools/wallets/route.ts`
+- `src/app/api/admin/ai-tools/wallets/[walletId]/route.ts`
+- `scripts/setup-ai-tooling-tables.sql`
+- `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`
+- `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System.md`
+- `docs/tasks/README.md`
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastó explícitamente `AI Tooling & Credit System` contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md`
+- Conclusión de arquitectura:
+  - la task sí queda alineada si se modela como extensión de objetos canónicos existentes
+  - `client_id` sigue siendo la identidad canónica del wallet cliente
+  - `member_id` sigue siendo la identidad canónica para licencias y consumo atribuible
+  - `provider_id` ya quedó implementado en runtime bajo `greenhouse.providers`
+- Se agregó foundation backend completa del dominio:
+  - `ensureAiToolingInfrastructure()` crea on-demand `providers`, `ai_tool_catalog`, `member_tool_licenses`, `ai_credit_wallets` y `ai_credit_ledger`
+  - se dejaron seeds iniciales de providers y tools reales
+  - se agregó `scripts/setup-ai-tooling-tables.sql` como bootstrap SQL versionado
+- Se cerró la superficie backend operativa:
+  - operación:
+    - `GET /api/ai-tools/catalog`
+    - `GET /api/ai-tools/licenses`
+  - créditos:
+    - `GET /api/ai-credits/wallets`
+    - `GET /api/ai-credits/ledger`
+    - `GET /api/ai-credits/summary`
+    - `POST /api/ai-credits/consume`
+    - `POST /api/ai-credits/reload`
+  - admin:
+    - `GET /api/admin/ai-tools/meta`
+    - `GET/POST /api/admin/ai-tools/catalog`
+    - `GET/PATCH /api/admin/ai-tools/catalog/[toolId]`
+    - `GET/POST /api/admin/ai-tools/licenses`
+    - `GET/PATCH /api/admin/ai-tools/licenses/[licenseId]`
+    - `GET/POST /api/admin/ai-tools/wallets`
+    - `GET/PATCH /api/admin/ai-tools/wallets/[walletId]`
+- Se reestructuró la task:
+  - `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md` queda como brief activo orientado a runtime/backend + handoff para Claude
+- Se actualizó la arquitectura/documentación viva para reflejar que `greenhouse.providers` ya existe en runtime.
+
+### Verificacion
+- `pnpm exec eslint` sobre el scope AI Tooling backend/API: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- No se hizo validación runtime manual contra BigQuery real en esta pasada; falta confirmar bootstrap y seeds en entorno autenticado.
+- No existe todavía CRUD de `providers`; por ahora se asume seed inicial + referencia a `provider_id` existente.
+- Claude ya puede construir frontend sobre estos contratos, especialmente:
+  - admin tooling
+  - tab de licencias en People
+  - widget/resumen de créditos para cliente
+- El worktree mantiene además cambios previos abiertos de `Admin Team` y `HR Payroll`; no mezclar scopes por accidente al momento de commit.
+
+## 2026-03-14 21:21 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Contrastar `Admin Team Module v2` contra arquitectura, separar backend ya implementado de gaps reales y cerrar los complementos backend faltantes para handoff con frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/types/team.ts`
+- `src/lib/team-admin/mutate-team.ts`
+- `src/app/api/admin/team/members/route.ts`
+- `src/app/api/admin/team/members/[memberId]/route.ts`
+- `src/app/api/admin/team/assignments/route.ts`
+- `src/app/api/admin/team/assignments/[assignmentId]/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Admin_Team_Module_v2.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastó explícitamente `Admin Team Module v2` contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Conclusión de arquitectura:
+  - la task sigue alineada
+  - `Admin Team` conserva ownership de mutaciones de roster y asignaciones
+  - `People` se mantiene read-first
+  - `team_members.member_id` sigue como ancla canónica del colaborador
+- Se detectó que el backend base CRUD ya existía, pero faltaban contratos de discovery/detail propios del módulo.
+- Complementos backend agregados:
+  - `GET /api/admin/team/members` ahora devuelve metadata + `members` + `summary`
+  - `GET /api/admin/team/members/[memberId]` devuelve detalle admin + assignments + summary
+  - `GET /api/admin/team/assignments` soporta filtros `memberId`, `clientId`, `activeOnly`
+  - `GET /api/admin/team/assignments/[assignmentId]` devuelve detalle puntual
+- Alineación adicional con identidad:
+  - cuando existe `identity_profile_id`, create/update de member ahora sincronizan best-effort los snapshots `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
+
+### Verificacion
+- `pnpm exec eslint` sobre archivos backend tocados: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- La UI de `People` ya usa mutaciones admin, pero todavía puede simplificarse para consumir más directamente estas nuevas superficies admin de list/detail.
+- No se hizo validación runtime manual del módulo en esta pasada.
+- El worktree mantiene además cambios previos no cerrados de `HR Payroll` y un cambio no relacionado en `src/lib/finance/shared.ts`; no deben mezclarse por accidente al commit.
+
+## 2026-03-14 21:40 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Contrastar `HR Payroll v3` contra arquitectura, cerrar los complementos backend reales del brief y dejar congelado el contrato para que Claude implemente frontend.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Backend / documentación operativa
+
+### Archivos tocados
+- `src/types/payroll.ts`
+- `src/lib/payroll/get-payroll-members.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/app/api/hr/payroll/compensation/route.ts`
+- `src/app/api/hr/payroll/compensation/eligible-members/route.ts`
+- `src/app/api/hr/payroll/periods/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/entries/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se contrastó explícitamente `HR Payroll v3` contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- Conclusión de arquitectura:
+  - la `v3` sí está alineada
+  - `Payroll` mantiene ownership transaccional
+  - `member_id` sigue siendo el ancla canónica de colaborador
+- Se agregaron complementos backend para frontend:
+  - `GET /api/hr/payroll/compensation` ahora devuelve `compensations`, `eligibleMembers`, `members` y `summary`
+  - `GET /api/hr/payroll/compensation/eligible-members` expone candidatos activos sin compensación vigente
+  - `GET /api/hr/payroll/periods` ahora devuelve `periods` + `summary`
+  - `GET /api/hr/payroll/periods/[periodId]/entries` ahora devuelve `entries` + `summary`
+  - `GET /api/hr/payroll/members/[memberId]/history` ahora incluye `member`
+  - `GET /api/hr/payroll/members/[memberId]/history` ahora responde `404` para `memberId` inexistente
+- Se agregó `src/lib/payroll/get-payroll-members.ts` para centralizar:
+  - summary canónico de colaborador
+  - discovery de miembros activos para compensación
+
+### Verificacion
+- `pnpm exec eslint` sobre archivos backend tocados: correcto
+- `git diff --check`: correcto
+
+### Riesgos o pendientes
+- Claude ya puede construir frontend sobre contratos más estables de payroll, pero todavía falta el consumo UI de:
+  - `eligibleMembers`
+  - `periods.summary`
+  - `entries.summary`
+  - `history.member`
+- No se hizo validación runtime manual del módulo en esta pasada.
+- El worktree mantiene además un cambio no relacionado en `src/lib/finance/shared.ts`; no fue tocado en este turno y no debe mezclarse con el scope de payroll por accidente.
+
 ## 2026-03-14 21:10 America/Santiago
 
 ### Agente

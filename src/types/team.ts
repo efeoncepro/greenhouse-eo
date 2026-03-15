@@ -206,6 +206,7 @@ export interface TeamAdminMemberRecord {
   contactChannel: TeamContactChannel
   contactHandle: string | null
   relevanceNote: string | null
+  identityProfileId: string | null
   azureOid: string | null
   notionUserId: string | null
   hubspotOwnerId: string | null
@@ -217,6 +218,8 @@ export interface TeamAdminAssignmentRecord {
   clientId: string
   clientName: string | null
   memberId: string
+  memberName: string | null
+  memberEmail: string | null
   fteAllocation: number
   hoursPerMonth: number | null
   roleTitleOverride: string | null
@@ -226,6 +229,16 @@ export interface TeamAdminAssignmentRecord {
   startDate: string | null
   endDate: string | null
   active: boolean
+}
+
+export interface TeamAdminMemberListItem extends TeamAdminMemberRecord {
+  activeAssignmentCount: number
+  totalFte: number
+  totalHoursMonth: number
+}
+
+export interface TeamAdminAssignmentListItem extends TeamAdminAssignmentRecord {
+  clientActive: boolean
 }
 
 export interface TeamAdminClientOption {
@@ -242,4 +255,37 @@ export interface TeamAdminMetadata {
   roleCategories: TeamRoleCategory[]
   contactChannels: TeamContactChannel[]
   activeClients: TeamAdminClientOption[]
+}
+
+export interface TeamAdminMembersPayload extends TeamAdminMetadata {
+  members: TeamAdminMemberListItem[]
+  summary: {
+    totalMembers: number
+    activeMembers: number
+    inactiveMembers: number
+    assignedMembers: number
+    totalFte: number
+  }
+}
+
+export interface TeamAdminAssignmentsPayload extends TeamAdminMetadata {
+  assignments: TeamAdminAssignmentListItem[]
+  summary: {
+    totalAssignments: number
+    activeAssignments: number
+    inactiveAssignments: number
+    distinctMembers: number
+    distinctClients: number
+    totalFte: number
+  }
+}
+
+export interface TeamAdminMemberDetail {
+  member: TeamAdminMemberRecord
+  assignments: TeamAdminAssignmentRecord[]
+  summary: {
+    activeAssignments: number
+    totalFte: number
+    totalHoursMonth: number
+  }
 }
