@@ -271,6 +271,6 @@ export async function POST(request: Request) {
 
     console.error('POST /api/finance/income failed:', detail, error)
 
-    return NextResponse.json({ error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' }, { status: 500 })
+    return NextResponse.json({ error: `[DEBUG] ${detail}` }, { status: 500 })
   }
 }
