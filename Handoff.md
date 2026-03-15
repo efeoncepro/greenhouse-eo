@@ -40,6 +40,54 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 14:18 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Resolver el runtime break de `Admin > Users > detail` después del rollout de `Person 360` enriquecido por Claude.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / Cloud SQL / Admin Users
+
+### Archivos tocados
+- `package.json`
+- `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se identificó que `pre-greenhouse` estaba sirviendo código que espera el contrato enriquecido de `greenhouse_serving.person_360`:
+  - `EO-ID`
+  - `serial_number`
+  - `resolved_*`
+  - campos extendidos de user/member/crm facet
+- La causa del crash no fue frontend ni routing:
+  - Cloud SQL seguía con el `person_360` base materializado por Codex
+  - el runtime nuevo de Claude (`resolve-eo-id`, `get-person-profile`, `get-admin-user-detail`) esperaba el `person_360 v2`
+- Se corrigió el tooling oficial para que:
+  - `pnpm setup:postgres:person-360`
+  ahora apunte a `scripts/setup-postgres-person-360-v2.ts`
+- También se alineó el runner legacy:
+  - `scripts/setup-postgres-person-360-serving.ts` ahora aplica `v2`
+- Se ejecutó `person_360 v2` en Cloud SQL.
+- Validación de datos posterior:
+  - `user-efeonce-internal-andres-carlosama` ya resuelve correctamente en `greenhouse_serving.person_360` con:
+    - `eo_id = EO-ID0006`
+    - `member_id = andres-carlosama`
+    - `user_id = user-efeonce-internal-andres-carlosama`
+    - `tenant_type = efeonce_internal`
+    - `active_role_codes = ['efeonce_operations']`
+
+### Riesgos o pendientes
+- Conviene consolidar más adelante los scripts legacy de `person_360` para dejar una sola ruta de provisioning y evitar duplicidad de nombres.
+- Falta solo validación manual autenticada en `pre-greenhouse` para confirmar el detalle de usuario ya no revienta con tu sesión.
+
 ## 2026-03-15 13:35 America/Santiago
 
 ### Agente

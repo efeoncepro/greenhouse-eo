@@ -27,7 +27,7 @@
     "setup:postgres:finance": "tsx scripts/setup-postgres-finance.ts",
     "setup:postgres:hr-leave": "tsx scripts/setup-postgres-hr-leave.ts",
     "setup:postgres:payroll": "tsx scripts/setup-postgres-payroll.ts",
-    "setup:postgres:person-360": "tsx scripts/setup-postgres-person-360-serving.ts",
+    "setup:postgres:person-360": "tsx scripts/setup-postgres-person-360-v2.ts",
     "setup:postgres:source-sync": "tsx scripts/setup-postgres-source-sync.ts",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",

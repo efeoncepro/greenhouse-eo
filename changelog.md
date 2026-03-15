@@ -6,6 +6,14 @@
 
 ## 2026-03-16
 
+### Person 360 runtime contract aligned to enriched v2 setup
+- Se detectó un desalineamiento entre código y base: `Admin > Users > detail` ya esperaba el contrato enriquecido de `greenhouse_serving.person_360`, pero Cloud SQL seguía con la versión base.
+- Se corrigió el comando canónico `pnpm setup:postgres:person-360` para que apunte a `scripts/setup-postgres-person-360-v2.ts`.
+- También se alineó `scripts/setup-postgres-person-360-serving.ts` a la misma versión para no volver a degradar el serving por accidente.
+- `person_360 v2` quedó aplicado en Cloud SQL.
+- Resultado:
+  - `EO-ID`, `serial_number`, `resolved_*` y facetas extendidas ya están disponibles para `resolve-eo-id`, `get-person-profile` y `get-admin-user-detail`.
+
 ### Identity & Access V2 — Role homologation across TypeScript + frontend (Claude)
 - `TenantRouteGroup` type expandido: +`my`, `people`, `ai_tooling` (10 valores total).
 - `rolePriority` expandido a 15 roles (6 V2: collaborator, hr_manager, finance_analyst, finance_admin, people_viewer, ai_tooling_admin).

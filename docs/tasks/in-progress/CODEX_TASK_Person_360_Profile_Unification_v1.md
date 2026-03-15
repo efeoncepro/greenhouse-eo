@@ -162,6 +162,9 @@ Estado:
 
 Estado:
 - `greenhouse_serving.person_360` ya existe como primer serving base
+- el contrato runtime ya evolucionó a una versión enriquecida con `EO-ID`, resolved fields y facetas expandidas
+- el comando canónico de setup debe ser `pnpm setup:postgres:person-360` apuntando a `setup-postgres-person-360-v2.ts`
+- `person_360 v2` ya quedó aplicado en Cloud SQL para alinear el serving con los consumers nuevos de `Admin Users` y `Person 360`
 - pendiente:
   - integrar `route_groups` / `role_codes` cuando Identity V2 quede completamente materializado
   - integrar participación operacional (`spaces`, `projects`)

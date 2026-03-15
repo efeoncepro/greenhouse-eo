@@ -4,6 +4,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { Person360 } from '@/types/person-360'
 
 type Person360Row = {
+
   // Identity anchor
   identity_profile_id: string
   eo_id: string

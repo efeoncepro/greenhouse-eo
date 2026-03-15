@@ -4,8 +4,8 @@ import { runPostgresSqlFile } from './lib/postgres-script-runner'
 
 const main = async () => {
   await runPostgresSqlFile({
-    sqlPath: 'scripts/setup-postgres-person-360-serving.sql',
-    successMessage: 'Applied PostgreSQL Person 360 serving view for Greenhouse',
+    sqlPath: 'scripts/setup-postgres-person-360-v2.sql',
+    successMessage: 'Applied PostgreSQL Person 360 enriched serving view for Greenhouse',
     profile: 'migrator'
   })
 }
