@@ -129,6 +129,40 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.members (
   daily_required BOOLEAN NOT NULL DEFAULT TRUE,
   status TEXT NOT NULL DEFAULT 'active',
   active BOOLEAN NOT NULL DEFAULT TRUE,
+  -- Profile
+  first_name TEXT,
+  last_name TEXT,
+  preferred_name TEXT,
+  legal_name TEXT,
+  birth_date DATE,
+  biography TEXT,
+  avatar_url TEXT,
+  -- Role & organization
+  role_title TEXT,
+  role_category TEXT,
+  org_role_id TEXT,
+  profession_id TEXT,
+  seniority_level TEXT,
+  -- Location
+  location_city TEXT,
+  location_country TEXT,
+  time_zone TEXT,
+  -- Contact & relevance
+  email_aliases TEXT[],
+  contact_channel TEXT,
+  contact_handle TEXT,
+  relevance_note TEXT,
+  -- External system IDs
+  azure_oid TEXT,
+  notion_user_id TEXT,
+  notion_display_name TEXT,
+  hubspot_owner_id TEXT,
+  teams_user_id TEXT,
+  slack_user_id TEXT,
+  -- Career
+  years_experience NUMERIC(4,1),
+  efeonce_start_date DATE,
+  languages TEXT[],
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -587,3 +621,44 @@ GRANT SELECT ON TABLES TO greenhouse_migrator;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_migrator;
+
+-- ════════════════════════════════════════════════════════════
+-- Additive migration: add member profile columns if table already exists
+-- ════════════════════════════════════════════════════════════
+DO $$
+BEGIN
+  -- Profile
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS first_name TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS last_name TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS preferred_name TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS legal_name TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS birth_date DATE;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS biography TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+  -- Role & organization
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS role_title TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS role_category TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS org_role_id TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS profession_id TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS seniority_level TEXT;
+  -- Location
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS location_city TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS location_country TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS time_zone TEXT;
+  -- Contact & relevance
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS email_aliases TEXT[];
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS contact_channel TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS contact_handle TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS relevance_note TEXT;
+  -- External system IDs
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS azure_oid TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS notion_user_id TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS notion_display_name TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS hubspot_owner_id TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS teams_user_id TEXT;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS slack_user_id TEXT;
+  -- Career
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS years_experience NUMERIC(4,1);
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS efeonce_start_date DATE;
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS languages TEXT[];
+END $$;

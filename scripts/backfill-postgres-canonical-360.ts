@@ -45,6 +45,27 @@ const toBoolean = (value: unknown, fallback = false) => {
   return fallback
 }
 
+const toNullableNumber = (value: unknown): number | null => {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  const s = toNullableString(value)
+  if (!s) return null
+  const n = Number(s)
+
+  return Number.isFinite(n) ? n : null
+}
+
+const toTextArray = (value: unknown): string[] | null => {
+  if (value === null || value === undefined) return null
+  if (Array.isArray(value)) {
+    const filtered = value.map(v => (typeof v === 'string' ? v.trim() : String(v))).filter(Boolean)
+
+    return filtered.length > 0 ? filtered : null
+  }
+
+  return null
+}
+
 const INTERNAL_SPACE_CLIENT_IDS = new Set(['space-efeonce'])
 
 const isInternalSpaceSeed = (row: Record<string, unknown>) => {
@@ -401,23 +422,29 @@ const upsertMember = async (row: Record<string, unknown>) => {
   await runGreenhousePostgresQuery(
     `
       INSERT INTO greenhouse_core.members (
-        member_id,
-        identity_profile_id,
-        display_name,
-        primary_email,
-        phone,
-        job_level,
-        employment_type,
-        hire_date,
-        contract_end_date,
-        status,
-        active,
-        created_at,
-        updated_at
+        member_id, identity_profile_id, display_name, primary_email, phone,
+        job_level, employment_type, hire_date, contract_end_date, status, active,
+        first_name, last_name, preferred_name, legal_name, birth_date, biography, avatar_url,
+        role_title, role_category, org_role_id, profession_id, seniority_level,
+        location_city, location_country, time_zone,
+        email_aliases, contact_channel, contact_handle, relevance_note,
+        azure_oid, notion_user_id, notion_display_name, hubspot_owner_id, teams_user_id, slack_user_id,
+        years_experience, efeonce_start_date, languages,
+        created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, 'active', $10, COALESCE($11::timestamptz, CURRENT_TIMESTAMP), COALESCE($12::timestamptz, CURRENT_TIMESTAMP))
-      ON CONFLICT (member_id) DO UPDATE
-      SET
+      VALUES (
+        $1, $2, $3, $4, $5,
+        $6, $7, $8::date, $9::date, 'active', $10,
+        $11, $12, $13, $14, $15::date, $16, $17,
+        $18, $19, $20, $21, $22,
+        $23, $24, $25,
+        $26::text[], $27, $28, $29,
+        $30, $31, $32, $33, $34, $35,
+        $36, $37::date, $38::text[],
+        COALESCE($39::timestamptz, CURRENT_TIMESTAMP),
+        COALESCE($40::timestamptz, CURRENT_TIMESTAMP)
+      )
+      ON CONFLICT (member_id) DO UPDATE SET
         identity_profile_id = EXCLUDED.identity_profile_id,
         display_name = EXCLUDED.display_name,
         primary_email = EXCLUDED.primary_email,
@@ -427,21 +454,77 @@ const upsertMember = async (row: Record<string, unknown>) => {
         hire_date = EXCLUDED.hire_date,
         contract_end_date = EXCLUDED.contract_end_date,
         active = EXCLUDED.active,
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name,
+        preferred_name = EXCLUDED.preferred_name,
+        legal_name = EXCLUDED.legal_name,
+        birth_date = EXCLUDED.birth_date,
+        biography = EXCLUDED.biography,
+        avatar_url = EXCLUDED.avatar_url,
+        role_title = EXCLUDED.role_title,
+        role_category = EXCLUDED.role_category,
+        org_role_id = EXCLUDED.org_role_id,
+        profession_id = EXCLUDED.profession_id,
+        seniority_level = EXCLUDED.seniority_level,
+        location_city = EXCLUDED.location_city,
+        location_country = EXCLUDED.location_country,
+        time_zone = EXCLUDED.time_zone,
+        email_aliases = EXCLUDED.email_aliases,
+        contact_channel = EXCLUDED.contact_channel,
+        contact_handle = EXCLUDED.contact_handle,
+        relevance_note = EXCLUDED.relevance_note,
+        azure_oid = EXCLUDED.azure_oid,
+        notion_user_id = EXCLUDED.notion_user_id,
+        notion_display_name = EXCLUDED.notion_display_name,
+        hubspot_owner_id = EXCLUDED.hubspot_owner_id,
+        teams_user_id = EXCLUDED.teams_user_id,
+        slack_user_id = EXCLUDED.slack_user_id,
+        years_experience = EXCLUDED.years_experience,
+        efeonce_start_date = EXCLUDED.efeonce_start_date,
+        languages = EXCLUDED.languages,
         updated_at = EXCLUDED.updated_at
     `,
     [
-      toNullableString(row.member_id),
-      toNullableString(row.identity_profile_id),
-      toNullableString(row.display_name),
-      toNullableString(row.email),
-      toNullableString(row.phone),
-      toNullableString(row.job_level) || toNullableString(row.seniority_level),
-      toNullableString(row.employment_type),
-      toNullableString(row.hire_date) || toNullableString(row.efeonce_start_date),
-      toNullableString(row.contract_end_date),
-      toBoolean(row.active, true),
-      toNullableString(row.created_at),
-      toNullableString(row.updated_at)
+      toNullableString(row.member_id),                                    // $1
+      toNullableString(row.identity_profile_id),                          // $2
+      toNullableString(row.display_name),                                 // $3
+      toNullableString(row.email),                                        // $4
+      toNullableString(row.phone),                                        // $5
+      toNullableString(row.job_level) || toNullableString(row.seniority_level), // $6
+      toNullableString(row.employment_type),                              // $7
+      toNullableString(row.hire_date) || toNullableString(row.efeonce_start_date), // $8
+      toNullableString(row.contract_end_date),                            // $9
+      toBoolean(row.active, true),                                        // $10
+      toNullableString(row.first_name),                                   // $11
+      toNullableString(row.last_name),                                    // $12
+      toNullableString(row.preferred_name),                               // $13
+      toNullableString(row.legal_name),                                   // $14
+      toNullableString(row.birth_date),                                   // $15
+      toNullableString(row.biography),                                    // $16
+      toNullableString(row.avatar_url),                                   // $17
+      toNullableString(row.role_title),                                   // $18
+      toNullableString(row.role_category),                                // $19
+      toNullableString(row.org_role_id),                                  // $20
+      toNullableString(row.profession_id),                                // $21
+      toNullableString(row.seniority_level),                              // $22
+      toNullableString(row.location_city),                                // $23
+      toNullableString(row.location_country),                             // $24
+      toNullableString(row.time_zone),                                    // $25
+      toTextArray(row.email_aliases),                                     // $26
+      toNullableString(row.contact_channel),                              // $27
+      toNullableString(row.contact_handle),                               // $28
+      toNullableString(row.relevance_note),                               // $29
+      toNullableString(row.azure_oid),                                    // $30
+      toNullableString(row.notion_user_id),                               // $31
+      toNullableString(row.notion_display_name),                          // $32
+      toNullableString(row.hubspot_owner_id),                             // $33
+      toNullableString(row.teams_user_id),                                // $34
+      toNullableString(row.slack_user_id),                                // $35
+      toNullableNumber(row.years_experience),                             // $36
+      toNullableString(row.efeonce_start_date),                           // $37
+      toTextArray(row.languages),                                         // $38
+      toNullableString(row.created_at),                                   // $39
+      toNullableString(row.updated_at)                                    // $40
     ]
   )
 }
