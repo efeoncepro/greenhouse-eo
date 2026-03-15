@@ -40,57 +40,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
-## 2026-03-15 12:48 America/Santiago
-
-### Agente
-- Codex
-
-### Objetivo del turno
-- Resolver el break en `develop` donde `Admin > Users > detail` revienta con excepción server-side al abrir un usuario desde la lista.
-
-### Rama
-- Rama usada: `feature/codex-person-360-closeout`
-- Rama objetivo del merge: `develop`
-
-### Ambiente objetivo
-- Development / Staging (`dev-greenhouse.efeoncepro.com`)
-
-### Archivos tocados
-- `src/lib/admin/get-admin-user-detail.ts`
-- `Handoff.md`
-- `changelog.md`
-
-### Cambios realizados
-- Se investigó el crash reportado al abrir `user-efeonce-internal-daniela-ferreira` en `Admin > Users`.
-- Hallazgo principal:
-  - el listado de usuarios sigue leyendo desde BigQuery
-  - el detalle de usuario ya había quedado `Postgres-only`
-  - si el ambiente no tiene PostgreSQL listo, o si el lookup Postgres falla, la página moría con excepción server-side en vez de degradar
-- Se restauró un fallback explícito a BigQuery dentro de `getAdminUserDetail`:
-  - primero intenta `person_360` + scopes desde PostgreSQL
-  - si Postgres no está configurado o el lookup falla, y el identificador es un `userId`, cae al query anterior en BigQuery
-- El fallback mantiene además la mejora reciente de nombres de proyecto:
-  - prioriza `greenhouse_conformed.delivery_projects`
-  - usa `notion_ops.proyectos` solo como fallback para `project_name` / `page_url`
-
-### Verificacion
-- `pnpm pg:doctor --profile=runtime`
-  - correcto; runtime `greenhouse_app` operativo contra `greenhouse-pg-dev`
-- Validación SQL puntual con `npx tsx` + `loadGreenhouseToolEnv` para `user-efeonce-internal-daniela-ferreira`
-  - `greenhouse_serving.person_360` responde
-  - `roles.route_group_scope` responde
-  - `user_project_scopes` no rompe y `greenhouse_delivery.projects.project_record_id` existe
-- `git diff --check`
-  - correcto
-- No se pudo correr `eslint` del worktree nuevo de forma limpia:
-  - el worktree `greenhouse-eo-develop` no tiene su propio `node_modules`
-  - al intentar ejecutar `eslint` desde el workspace principal sobre el archivo externo, la resolución de `next/core-web-vitals` no levantó esa config en ese contexto
-
-### Riesgos o pendientes
-- Este fix protege `develop`, pero no reemplaza el objetivo real de la lane:
-  - `Admin > Users detail` debe seguir convergiendo a `Person 360` / PostgreSQL como fuente primaria estable
-- Si el ambiente `develop` efectivamente quedó sin variables o sin acceso PostgreSQL, conviene revisar también la configuración de Vercel para no depender del fallback indefinidamente.
-
 ## 2026-03-15 15:12 America/Santiago
 
 ### Agente

@@ -34,14 +34,6 @@
 
 ## 2026-03-15
 
-### Admin user detail now degrades safely when Postgres is unavailable
-- `Admin > Users > detail` ya no depende ciegamente de PostgreSQL para renderizar en `develop`.
-- `src/lib/admin/get-admin-user-detail.ts` ahora intenta `person_360` primero, pero si PostgreSQL no está configurado o el lookup falla, vuelve a BigQuery para `userId` directos.
-- Esto evita el blank screen server-side al abrir usuarios desde la lista mientras `Person 360` termina su rollout completo en todos los ambientes.
-- El fallback también conserva la mejora reciente para nombres de proyecto:
-  - prioriza `greenhouse_conformed.delivery_projects`
-  - deja `notion_ops.proyectos` como respaldo para `project_name` y `page_url`
-
 ### Person 360 serving baseline materialized in PostgreSQL
 - Se creó `greenhouse_serving.person_360` como primera vista unificada de persona sobre `identity_profiles`, `members`, `client_users` y `crm_contacts`.
 - Se agregó el comando `pnpm audit:person-360` para medir cobertura real de unificación entre facetas.
