@@ -104,7 +104,7 @@ export const getGreenhousePostgresPool = async () => {
   return globalThis.__greenhousePostgresPoolPromise
 }
 
-export const runGreenhousePostgresQuery = async <T>(text: string, values: unknown[] = []) => {
+export const runGreenhousePostgresQuery = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) => {
   const pool = await getGreenhousePostgresPool()
   const result = await pool.query<T>(text, values)
 
