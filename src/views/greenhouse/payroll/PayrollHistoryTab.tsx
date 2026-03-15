@@ -1,9 +1,11 @@
 'use client'
 
+import Avatar from '@mui/material/Avatar'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
-import Chip from '@mui/material/Chip'
+import Divider from '@mui/material/Divider'
+import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -11,6 +13,8 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import CustomChip from '@core/components/mui/Chip'
 
 import type { PayrollPeriod } from '@/types/payroll'
 import { formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
@@ -24,11 +28,17 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
   const closedPeriods = periods.filter(p => p.status === 'approved' || p.status === 'exported')
 
   return (
-    <Card>
+    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
       <CardHeader
         title='Historial de nóminas'
         subheader={`${closedPeriods.length} período${closedPeriods.length !== 1 ? 's' : ''} cerrado${closedPeriods.length !== 1 ? 's' : ''}`}
+        avatar={
+          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+            <i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+          </Avatar>
+        }
       />
+      <Divider />
       <CardContent>
         <TableContainer>
           <Table size='small'>
@@ -58,13 +68,12 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
                       </Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Chip
+                      <CustomChip
+                        round='true'
                         size='small'
                         icon={<i className={status.icon} />}
                         label={status.label}
-                        color={status.color}
-                        variant='tonal'
-                        sx={{ height: 22 }}
+                        color={status.color === 'default' ? 'secondary' : status.color}
                       />
                     </TableCell>
                     <TableCell>
@@ -86,7 +95,13 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
               {closedPeriods.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                    <Typography color='text.secondary'>No hay períodos cerrados todavía.</Typography>
+                    <Stack alignItems='center' spacing={1}>
+                      <i className='tabler-history-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+                      <Typography color='text.secondary'>No hay períodos cerrados todavía.</Typography>
+                      <Typography variant='caption' color='text.disabled'>
+                        Los períodos aparecerán aquí una vez aprobados o exportados.
+                      </Typography>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               )}

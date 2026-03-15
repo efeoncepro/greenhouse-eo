@@ -74,7 +74,7 @@ El dashboard ya no es un placeholder de 4 KPI cards. Estado actual:
 - Bootstrap desde deals closedwon en `bigquery/greenhouse_service_module_bootstrap_v1.sql`
 - El dashboard ya compone narrativa por serviceModules
 
-**Acción:** El `docs/tasks/CODEX_TASK_Creative_Hub_Module.md` ya no necesita asumir que capabilities no existe. El Capability Registry puede estar parcialmente implementado. Verificar contra `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md` en el repo.
+**Acción:** El `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` ya no necesita asumir que capabilities no existe. El Capability Registry puede estar parcialmente implementado. Verificar contra `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md` en el repo.
 
 ### Componentes Greenhouse como capa propia
 
@@ -87,7 +87,7 @@ El repo define:
 
 ---
 
-## Task 1: `docs/tasks/CODEX_TASK_Microsoft_SSO_Greenhouse.md`
+## Task 1: `docs/tasks/complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md`
 
 ### Estado vs repo
 
@@ -111,7 +111,7 @@ El repo define:
 
 ---
 
-## Task 2: `docs/tasks/CODEX_TASK_Google_SSO_Greenhouse.md`
+## Task 2: `docs/tasks/complete/CODEX_TASK_Google_SSO_Greenhouse.md`
 
 ### Estado vs repo
 
@@ -128,7 +128,7 @@ Este task ya asume que Microsoft SSO existe ("Microsoft SSO y Credentials ya est
 
 ---
 
-## Task 3: `docs/tasks/CODEX_TASK_Typography_Hierarchy_Fix.md`
+## Task 3: `docs/tasks/to-do/CODEX_TASK_Typography_Hierarchy_Fix.md`
 
 ### Estado vs repo
 
@@ -148,7 +148,7 @@ Este task ya asume que Microsoft SSO existe ("Microsoft SSO y Credentials ya est
 
 ---
 
-## Task 4: `docs/tasks/CODEX_TASK_Client_Dashboard_Redesign.md`
+## Task 4: `docs/tasks/complete/CODEX_TASK_Client_Dashboard_Redesign.md`
 
 ### Estado vs repo
 
@@ -181,7 +181,7 @@ Este es el task con mayor divergencia. El dashboard ya evolucionó significativa
 
 ---
 
-## Task 5: `docs/tasks/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md`
+## Task 5: `docs/tasks/complete/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md`
 
 ### Estado vs repo
 
@@ -191,13 +191,13 @@ Este addendum describe bugs concretos de la implementación actual. Es el más a
 
 1. **Stack:** MUI v5 → v7
 2. **Verificar si los bugs persisten.** El repo ha tenido 46 commits — algunos bugs pueden haberse corregido.
-3. **El task referencia** `docs/tasks/CODEX_TASK_Client_Dashboard_Redesign.md` como spec principal — si ese task se reclasifica, este addendum se convierte en el task principal de correcciones.
+3. **El task referencia** `docs/tasks/complete/CODEX_TASK_Client_Dashboard_Redesign.md` como spec principal — si ese task se reclasifica, este addendum se convierte en el task principal de correcciones.
 
 ### Veredicto: VÁLIDO — es el task más útil para el estado actual del dashboard
 
 ---
 
-## Task 6: `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md`
+## Task 6: `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md`
 
 ### Estado vs repo
 
@@ -223,7 +223,7 @@ Este addendum describe bugs concretos de la implementación actual. Es el más a
 
 ---
 
-## Task 7: `docs/tasks/CODEX_TASK_Fix_Team_Capacity_Views.md`
+## Task 7: `docs/tasks/complete/CODEX_TASK_Fix_Team_Capacity_Views.md`
 
 ### Estado vs repo
 
@@ -240,7 +240,7 @@ Este task documenta bugs de la Vista 2 y vistas faltantes (1, 3, 4). Los bugs so
 
 ---
 
-## Task 8: `docs/tasks/CODEX_TASK_Space_Admin_View_Redesign.md`
+## Task 8: `docs/tasks/complete/CODEX_TASK_Space_Admin_View_Redesign.md`
 
 ### Estado vs repo
 
@@ -262,7 +262,7 @@ Este task documenta bugs de la Vista 2 y vistas faltantes (1, 3, 4). Los bugs so
 
 ---
 
-## Task 9: `docs/tasks/CODEX_TASK_Agency_Operator_Layer.md`
+## Task 9: `docs/tasks/complete/CODEX_TASK_Agency_Operator_Layer.md`
 
 ### Estado vs repo
 
@@ -286,7 +286,7 @@ Este task documenta bugs de la Vista 2 y vistas faltantes (1, 3, 4). Los bugs so
 
 ---
 
-## Task 10: `docs/tasks/CODEX_TASK_Creative_Hub_Module.md`
+## Task 10: `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md`
 
 ### Estado vs repo
 

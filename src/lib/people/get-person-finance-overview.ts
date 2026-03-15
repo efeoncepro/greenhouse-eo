@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PersonFinanceOverview } from '@/types/people'
+
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { PeopleValidationError, runPeopleQuery, toDateString, toNumber } from '@/lib/people/shared'
@@ -82,7 +84,7 @@ const toTimestampString = (value: unknown) => {
   return null
 }
 
-export const getPersonFinanceOverview = async (memberId: string) => {
+export const getPersonFinanceOverview = async (memberId: string): Promise<PersonFinanceOverview> => {
   await ensureFinanceInfrastructure()
 
   const projectId = getBigQueryProjectId()

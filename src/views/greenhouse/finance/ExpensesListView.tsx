@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -112,12 +115,14 @@ const formatDate = (date: string | null): string => {
 // ---------------------------------------------------------------------------
 
 const ExpensesListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Expense[]>([])
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true)
@@ -135,7 +140,14 @@ const ExpensesListView = () => {
 
         setItems(data.items ?? [])
         setTotal(data.total ?? 0)
+        setFetchError(null)
+      } else {
+        const data = await res.json().catch(() => ({}))
+
+        setFetchError(data.error || `Error ${res.status}`)
       }
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Error de conexión')
     } finally {
       setLoading(false)
     }
@@ -147,8 +159,10 @@ const ExpensesListView = () => {
 
   // Derived KPIs
   const totalExpenses = items.reduce((sum, e) => sum + e.totalAmountClp, 0)
+
   const pendingTotal = items.filter(e => e.paymentStatus === 'pending' || e.paymentStatus === 'scheduled')
     .reduce((sum, e) => sum + e.totalAmountClp, 0)
+
   const paidCount = items.filter(e => e.paymentStatus === 'paid').length
   const recurringCount = items.filter(e => e.isRecurring).length
 
@@ -199,6 +213,8 @@ const ExpensesListView = () => {
           Registrar egreso
         </Button>
       </Box>
+
+      {fetchError && <Alert severity='error'>{fetchError}</Alert>}
 
       {/* KPIs */}
       <Grid container spacing={6}>
@@ -304,7 +320,7 @@ const ExpensesListView = () => {
                   const typeConf = TYPE_CONFIG[item.expenseType] || TYPE_CONFIG.miscellaneous
 
                   return (
-                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/expenses/${item.expenseId}`}>
+                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/expenses/${item.expenseId}`)}>
                       <TableCell>
                         <CustomChip
                           round='true'

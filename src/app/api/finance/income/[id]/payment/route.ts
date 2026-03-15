@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import { parseIncomePaymentsReceived } from '@/lib/finance/income-payments'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   FinanceValidationError,
@@ -13,6 +14,8 @@ import {
   runFinanceQuery,
   toNumber
 } from '@/lib/finance/shared'
+import { createFinanceIncomePaymentInPostgres } from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -24,20 +27,6 @@ interface IncomePaymentRow {
   amount_paid: unknown
   payment_status: string
   payments_received: unknown
-}
-
-const parsePaymentsReceived = (value: unknown) => {
-  try {
-    if (!value) {
-      return []
-    }
-
-    const parsed = typeof value === 'string' ? JSON.parse(value) : value
-
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -59,6 +48,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     const paymentDate = assertDateString(body.paymentDate, 'paymentDate')
+    const paymentId = normalizeString(body.paymentId) || `pay_${randomUUID()}`
+
+    // ── Postgres-first path ──
+    try {
+      const result = await createFinanceIncomePaymentInPostgres({
+        incomeId,
+        paymentId,
+        paymentDate,
+        amount,
+        reference: body.reference ? normalizeString(body.reference) : null,
+        paymentMethod: body.paymentMethod ? normalizeString(body.paymentMethod) : null,
+        paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        actorUserId: tenant.userId || null
+      })
+
+      return NextResponse.json(result, { status: 201 })
+    } catch (pgError) {
+      if (!shouldFallbackFromFinancePostgres(pgError)) {
+        throw pgError
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
     const rows = await runFinanceQuery<IncomePaymentRow>(`
@@ -80,10 +94,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new FinanceValidationError('Payment amount exceeds pending balance.', 409)
     }
 
-    const existingPayments = parsePaymentsReceived(row.payments_received)
+    const existingPayments = parseIncomePaymentsReceived(row.payments_received)
 
     const paymentRecord = {
-      paymentId: normalizeString(body.paymentId) || `pay_${randomUUID()}`,
+      paymentId,
       paymentDate,
       amount,
       currency: normalizeString(row.currency),
@@ -92,7 +106,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
       notes: body.notes ? normalizeString(body.notes) : null,
       recordedBy: tenant.userId || null,
-      recordedAt: new Date().toISOString()
+      recordedAt: new Date().toISOString(),
+      isReconciled: false,
+      reconciliationRowId: null,
+      reconciledAt: null,
+      reconciledBy: null
     }
 
     const nextPayments = [...existingPayments, paymentRecord]

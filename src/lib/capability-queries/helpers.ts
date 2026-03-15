@@ -11,6 +11,7 @@ import type {
   CapabilityToolItem
 } from '@/types/capabilities'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 
 const integerFormatter = new Intl.NumberFormat('es-CL')
@@ -225,11 +226,71 @@ const INDUSTRY_RPA = 3.5
 const INDUSTRY_CYCLE_DAYS = 14.2
 const INDUSTRY_OTD = 0.7
 
-export const buildCreativeRevenueCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
-  const latestSignal = [...snapshot.qualitySignals].reverse()[0] ?? null
-  const avgRpa = latestSignal?.avgRpa ?? null
-  const ftrPct = latestSignal?.firstTimeRightPct ?? null
-  const otdPct = snapshot.summary.avgOnTimePct
+const average = (values: number[]) => {
+  if (values.length === 0) {
+    return null
+  }
+
+  return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+const formatDays = (value: number | null) => (value !== null ? `${Math.round(value * 10) / 10} dias` : null)
+const formatRatio = (value: number | null, suffix = 'x') => (value !== null ? `${Math.round(value * 10) / 10}${suffix}` : null)
+
+const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
+  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
+  const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
+
+  if (completedTasks.length === 0 || firstTimeRightBase.length === 0) {
+    return null
+  }
+
+  const firstTimeRightPct = Math.round(
+    (firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100
+  )
+
+  const lowFrictionBase = completedTasks.filter(task => task.rpaValue !== null)
+
+  const lowFrictionPct =
+    lowFrictionBase.length > 0
+      ? Math.round((lowFrictionBase.filter(task => (task.rpaValue || 0) <= 2).length / lowFrictionBase.length) * 100)
+      : null
+
+  if (lowFrictionPct === null) {
+    return firstTimeRightPct
+  }
+
+  return Math.round((firstTimeRightPct + lowFrictionPct) / 2)
+}
+
+export const buildCreativeRevenueCardData = (
+  snapshot: CapabilityModuleSnapshot,
+  tasks: CreativeHubTask[]
+): CapabilityCardData => {
+  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
+  const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
+
+  const avgRpa = average(
+    completedTasks
+      .map(task => task.rpaValue)
+      .filter((value): value is number => value !== null && value > 0)
+  )
+
+  const ftrPct =
+    firstTimeRightBase.length > 0
+      ? Math.round((firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100)
+      : null
+
+  const otdBase = completedTasks.filter(task => task.completedAt && task.deadlineAt)
+
+  const otdPct =
+    otdBase.length > 0
+      ? Math.round(
+          (otdBase.filter(task => new Date(task.completedAt || '').getTime() <= new Date(task.deadlineAt || '').getTime()).length /
+            otdBase.length) *
+            100
+        )
+      : snapshot.summary.avgOnTimePct
 
   const daysGained =
     otdPct > INDUSTRY_OTD * 100
@@ -276,51 +337,190 @@ export const buildCreativeRevenueCardData = (snapshot: CapabilityModuleSnapshot)
   return { type: 'metrics-row', items }
 }
 
-export const buildCreativePipelineCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
-  const { activeWorkItems, reviewPressureTasks, queuedWorkItems, blockedTasks, completedLast30Days } = snapshot.summary
+export const buildCreativeBrandMetricsCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
+  const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
 
-  const production = Math.max(0, activeWorkItems - reviewPressureTasks - blockedTasks)
+  const firstTimeRightPct =
+    firstTimeRightBase.length > 0
+      ? Math.round((firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100)
+      : null
 
-  const phases: CapabilityPipelinePhase[] = [
-    { id: 'planning',   label: 'Planning',   color: GH_COLORS.cscPhase.planning.source,   count: Math.ceil(queuedWorkItems * 0.5) },
-    { id: 'briefing',   label: 'Briefing',   color: GH_COLORS.cscPhase.briefing.source,   count: Math.floor(queuedWorkItems * 0.5) },
-    { id: 'produccion', label: 'Produccion', color: GH_COLORS.cscPhase.production.source, count: production },
-    { id: 'aprobacion', label: 'Aprobacion', color: GH_COLORS.cscPhase.approval.source,   count: reviewPressureTasks },
-    { id: 'asset-mgmt', label: 'Asset Mgmt', color: GH_COLORS.cscPhase.assetMgmt.source,  count: blockedTasks },
-    { id: 'completado', label: 'Completado', color: GH_COLORS.cscPhase.completed.source,  count: completedLast30Days }
+  const avgRpa = average(
+    completedTasks
+      .map(task => task.rpaValue)
+      .filter((value): value is number => value !== null && value > 0)
+  )
+
+  const reviewOpenCount = tasks.filter(task => task.cscPhase === 'Aprobacion').length
+  const brandConsistency = buildCreativeBrandConsistency(tasks)
+
+  const items: CapabilityMetricsRowItem[] = [
+    {
+      id: 'first-time-right',
+      label: 'First Time Right',
+      value: firstTimeRightPct !== null ? formatPercent(firstTimeRightPct) : null,
+      description: 'Piezas aprobadas sin rondas de cambio dentro del scope visible.',
+      tone:
+        firstTimeRightPct !== null && firstTimeRightPct >= 70
+          ? 'success'
+          : firstTimeRightPct !== null && firstTimeRightPct >= 50
+            ? 'warning'
+            : 'error'
+    },
+    {
+      id: 'brand-consistency',
+      label: 'Brand Consistency',
+      value: brandConsistency !== null ? formatPercent(brandConsistency) : null,
+      description: 'Indice derivado de First Time Right y friccion de revision del portfolio creativo.',
+      tone:
+        brandConsistency !== null && brandConsistency >= 80
+          ? 'success'
+          : brandConsistency !== null && brandConsistency >= 65
+            ? 'warning'
+            : 'error'
+    },
+    {
+      id: 'review-loop-health',
+      label: 'RpA operativo',
+      value: formatRatio(avgRpa),
+      description: `${formatInteger(reviewOpenCount)} assets hoy estan en aprobacion o con feedback abierto.`,
+      tone:
+        avgRpa !== null && avgRpa <= 2
+          ? 'success'
+          : avgRpa !== null && avgRpa <= 3
+            ? 'warning'
+            : 'error'
+    },
+    {
+      id: 'knowledge-base',
+      label: 'Knowledge Base',
+      value: null,
+      description: 'Reservado para la futura lectura de wiki y aprendizaje acumulado por marca.',
+      tone: 'info'
+    }
   ]
+
+  return { type: 'metrics-row', items }
+}
+
+export const buildCreativeRpaTrendCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+  const byMonth = new Map<string, { sum: number; count: number }>()
+
+  for (const task of tasks) {
+    const month = (task.completedAt || task.lastEditedAt || task.createdAt || '').slice(0, 7)
+
+    if (!month || task.rpaValue === null || task.rpaValue <= 0) {
+      continue
+    }
+
+    const current = byMonth.get(month) || { sum: 0, count: 0 }
+
+    current.sum += task.rpaValue
+    current.count += 1
+    byMonth.set(month, current)
+  }
+
+  const points = [...byMonth.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .slice(-6)
+
+  return {
+    type: 'chart-bar',
+    chart: {
+      categories: points.map(([month]) => month),
+      series: [
+        {
+          name: 'RpA promedio',
+          data: points.map(([, value]) => Math.round((value.sum / value.count) * 10) / 10)
+        }
+      ],
+      summaryLabel: 'Tendencia reciente',
+      summaryValue: points.length > 0 ? points[points.length - 1][0] : 'Sin datos',
+      summaryDetail:
+        points.length > 0
+          ? 'La barra muestra la evolucion mensual de rondas por asset visibles en la cuenta.'
+          : 'Todavia no hay suficientes cierres con RpA para construir la tendencia.',
+      totalLabel: 'Meses visibles',
+      totalValue: formatInteger(points.length)
+    }
+  }
+}
+
+export const buildCreativePipelineCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+  const phases: CapabilityPipelinePhase[] = [
+    { id: 'planning', label: 'Planning', color: GH_COLORS.cscPhase.planning.source, count: 0 },
+    { id: 'briefing', label: 'Briefing', color: GH_COLORS.cscPhase.briefing.source, count: 0 },
+    { id: 'produccion', label: 'Produccion', color: GH_COLORS.cscPhase.production.source, count: 0 },
+    { id: 'aprobacion', label: 'Aprobacion', color: GH_COLORS.cscPhase.approval.source, count: 0 },
+    { id: 'asset-mgmt', label: 'Asset Mgmt', color: GH_COLORS.cscPhase.assetMgmt.source, count: 0 },
+    { id: 'activacion', label: 'Activacion', color: GH_COLORS.cscPhase.activation.source, count: 0 },
+    { id: 'completado', label: 'Completado', color: GH_COLORS.cscPhase.completed.source, count: 0 }
+  ]
+
+  for (const task of tasks) {
+    const phase = phases.find(item => item.label === task.cscPhase)
+
+    if (phase) {
+      phase.count += 1
+    }
+  }
 
   const total = phases.reduce((sum, phase) => sum + phase.count, 0)
 
   return { type: 'pipeline', phases, total }
 }
 
-export const buildCreativeCscMetricsCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
-  const { reviewPressureTasks, blockedTasks, completedLast30Days, queuedWorkItems } = snapshot.summary
+export const buildCreativeCscMetricsCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+  const phaseCounts = tasks.reduce<Record<string, number>>((accumulator, task) => {
+    accumulator[task.cscPhase] = (accumulator[task.cscPhase] || 0) + 1
+
+    return accumulator
+  }, {})
+
+  const activeTasks = tasks.filter(task => task.cscPhase !== 'Completado')
+  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
+
+  const cycleDays = completedTasks
+    .filter(task => task.createdAt && task.completedAt)
+    .map(task => (new Date(task.completedAt || '').getTime() - new Date(task.createdAt || '').getTime()) / (1000 * 60 * 60 * 24))
+    .filter(value => Number.isFinite(value) && value >= 0)
+
+  const avgCycleDays = average(cycleDays)
 
   const bottleneck =
-    reviewPressureTasks >= blockedTasks && reviewPressureTasks >= queuedWorkItems
-      ? 'Aprobacion'
-      : blockedTasks >= queuedWorkItems
-        ? 'Asset Mgmt'
-        : 'Planning'
+    Object.entries(phaseCounts)
+      .filter(([phase]) => phase !== 'Completado')
+      .sort((left, right) => right[1] - left[1])[0]?.[0] || 'Sin fase dominante'
 
-  const velocityPerWeek = Math.round((completedLast30Days / 4) * 10) / 10
+  const recentCompleted = completedTasks.filter(task => {
+    if (!task.completedAt) {
+      return false
+    }
+
+    return new Date(task.completedAt).getTime() >= Date.now() - 28 * 24 * 60 * 60 * 1000
+  })
+
+  const velocityPerWeek = Math.round((recentCompleted.length / 4) * 10) / 10
+  const stuckCount = activeTasks.filter(task => (task.hoursSinceUpdate || 0) > 48).length
 
   const items: CapabilityMetricsRowItem[] = [
     {
       id: 'cycle-time',
-      label: 'Cycle time referencia',
-      value: `${INDUSTRY_CYCLE_DAYS}d industria`,
-      description: `${formatInteger(completedLast30Days)} items completados este mes`,
-      tone: 'info'
+      label: 'Cycle time',
+      value: avgCycleDays !== null ? formatDays(avgCycleDays) : `${INDUSTRY_CYCLE_DAYS}d ref`,
+      description:
+        avgCycleDays !== null
+          ? 'Promedio real de dias entre creacion y completado dentro del scope visible.'
+          : 'Sin cierres suficientes; se muestra referencia de industria.',
+      tone: avgCycleDays !== null && avgCycleDays <= INDUSTRY_CYCLE_DAYS ? 'success' : 'info'
     },
     {
       id: 'bottleneck',
       label: 'Bottleneck actual',
       value: bottleneck,
-      description: 'Fase con mayor concentracion de assets activos',
-      tone: reviewPressureTasks > 5 ? 'error' : reviewPressureTasks > 2 ? 'warning' : 'success'
+      description: 'Fase con mayor concentracion de assets visibles hoy.',
+      tone: bottleneck === 'Aprobacion' ? 'error' : bottleneck === 'Asset Mgmt' ? 'warning' : 'info'
     },
     {
       id: 'pipeline-velocity',
@@ -332,28 +532,28 @@ export const buildCreativeCscMetricsCardData = (snapshot: CapabilityModuleSnapsh
     {
       id: 'stuck-count',
       label: 'Stuck assets',
-      value: formatInteger(blockedTasks),
-      description: 'Items bloqueados sin movimiento en el pipeline',
-      tone: blockedTasks === 0 ? 'success' : blockedTasks <= 2 ? 'warning' : 'error'
+      value: formatInteger(stuckCount),
+      description: 'Items sin movimiento por mas de 48h en fases activas.',
+      tone: stuckCount === 0 ? 'success' : stuckCount <= 2 ? 'warning' : 'error'
     }
   ]
 
   return { type: 'metrics-row', items }
 }
 
-export const buildCreativeStuckCardData = (snapshot: CapabilityModuleSnapshot): CapabilityCardData => {
-  const items: CapabilityAlertItem[] = [...snapshot.projects]
-    .filter(project => project.blockedTasks > 0)
-    .sort((a, b) => b.blockedTasks - a.blockedTasks)
+export const buildCreativeStuckCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+  const items: CapabilityAlertItem[] = [...tasks]
+    .filter(task => task.cscPhase !== 'Completado' && (task.hoursSinceUpdate || 0) > 48)
+    .sort((left, right) => (right.hoursSinceUpdate || 0) - (left.hoursSinceUpdate || 0))
     .slice(0, 6)
-    .map(project => ({
-      id: project.id,
-      name: `${formatInteger(project.blockedTasks)} ${project.blockedTasks === 1 ? 'asset bloqueado' : 'assets bloqueados'}`,
-      project: project.name,
-      phase: project.reviewPressureTasks > 0 ? 'Aprobacion' : 'Produccion',
-      daysStuck: 2,
-      severity: project.blockedTasks >= 3 ? 'danger' : 'warning',
-      frameUrl: project.pageUrl
+    .map(task => ({
+      id: task.id,
+      name: task.name,
+      project: task.projectName,
+      phase: task.cscPhase,
+      daysStuck: Math.round(((((task.hoursSinceUpdate || 0) / 24) + Number.EPSILON) * 10)) / 10,
+      severity: (task.hoursSinceUpdate || 0) >= 96 ? 'danger' : 'warning',
+      frameUrl: task.frameUrl || task.projectPageUrl
     }))
 
   return {

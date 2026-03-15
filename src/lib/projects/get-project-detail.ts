@@ -49,12 +49,26 @@ interface TaskRow {
   task_name: string | null
   status: string | null
   rpa_value: number | string | null
+  rpa_semaphore_source: string | null
+  performance_indicator_label: string | null
+  completion_label: string | null
+  delivery_compliance: string | null
+  days_late: number | string | null
+  rescheduled_days: number | string | null
+  is_rescheduled: boolean | null
+  client_change_round_label: string | null
+  client_change_round_final: number | string | null
+  workflow_change_round: number | string | null
   frame_versions: number | string | null
   frame_comments: number | string | null
   open_frame_comments: number | string | null
   client_review_open: boolean | null
   workflow_review_open: boolean | null
   blocker_count: number | string | null
+  original_due_date: { value?: string } | string | null
+  execution_time_label: string | null
+  changes_time_label: string | null
+  review_time_label: string | null
   sprint_name: string | null
   last_frame_comment: string | null
   last_edited_time: { value?: string } | string | null
@@ -98,6 +112,32 @@ const toDateString = (value: { value?: string } | string | null) => {
 
 const clampPercentage = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
 
+const normalizePerformanceIndicatorCode = (value: string | null) => {
+  const normalized = (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (!normalized || normalized === '—' || normalized === '-') {
+    return null
+  }
+
+  if (normalized.includes('on-time') || normalized.includes('on time')) return 'on_time'
+  if (normalized.includes('late drop')) return 'late_drop'
+  if (normalized.includes('overdue')) return 'overdue'
+  if (normalized.includes('carry-over') || normalized.includes('carry over')) return 'carry_over'
+
+  return null
+}
+
+const getDerivedRpaSemaphore = (value: number | null): 'green' | 'yellow' | 'red' | 'default' => {
+  if (value === null || value === 0) return 'default'
+  if (value <= 1.5) return 'green'
+  if (value <= 2.5) return 'yellow'
+
+  return 'red'
+}
+
 const getStatusTone = (status: string): GreenhouseProjectStatusTone => {
   const normalized = status.toLowerCase()
 
@@ -139,7 +179,17 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH project_sprints AS (
+    WITH delivery_sprints AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.delivery_sprints\`
+      WHERE project_source_id = @projectDetailId
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY sprint_source_id
+        ORDER BY last_edited_time DESC NULLS LAST, synced_at DESC NULLS LAST, sprint_source_id
+      ) = 1
+    ),
+    project_sprints AS (
       SELECT
         sprint_id,
         COUNT(*) AS total_tasks,
@@ -150,11 +200,11 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
       GROUP BY sprint_id
     )
     SELECT
-      s.notion_page_id,
-      s.nombre_del_sprint AS sprint_name,
-      s.estado_del_sprint AS status,
-      s.fechas AS start_date,
-      s.fechas_end AS end_date,
+      COALESCE(ds.sprint_source_id, s.notion_page_id) AS notion_page_id,
+      COALESCE(ds.sprint_name, s.nombre_del_sprint) AS sprint_name,
+      COALESCE(ds.sprint_status, s.estado_del_sprint) AS status,
+      COALESCE(ds.start_date, s.fechas) AS start_date,
+      COALESCE(ds.end_date, s.fechas_end) AS end_date,
       COALESCE(project_sprints.total_tasks, SAFE_CAST(s.total_de_tareas AS INT64), 0) AS total_tasks,
       COALESCE(
         project_sprints.completed_tasks,
@@ -163,16 +213,18 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
       ) AS completed_tasks,
       s.page_url
     FROM project_sprints
-    INNER JOIN \`${projectId}.notion_ops.sprints\` s
+    LEFT JOIN delivery_sprints ds
+      ON ds.sprint_source_id = project_sprints.sprint_id
+    LEFT JOIN \`${projectId}.notion_ops.sprints\` s
       ON s.notion_page_id = project_sprints.sprint_id
     ORDER BY
-      CASE s.estado_del_sprint
+      CASE COALESCE(ds.sprint_status, s.estado_del_sprint)
         WHEN 'Actual' THEN 0
         WHEN 'Siguiente' THEN 1
         WHEN 'Último' THEN 2
         ELSE 3
       END,
-      s.last_edited_time DESC
+      COALESCE(ds.last_edited_time, s.last_edited_time) DESC
     LIMIT 1
   `
 
@@ -215,7 +267,17 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH requested_project AS (
+    WITH delivery_projects AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
+      WHERE project_source_id = @projectDetailId
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY project_source_id
+        ORDER BY last_edited_time DESC NULLS LAST, synced_at DESC NULLS LAST, project_source_id
+      ) = 1
+    ),
+    requested_project AS (
       SELECT @projectDetailId AS notion_page_id
     ),
     scoped_tasks AS (
@@ -244,11 +306,11 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
     )
     SELECT
       requested_project.notion_page_id,
-      COALESCE(p.nombre_del_proyecto, requested_project.notion_page_id) AS project_name,
-      COALESCE(p.estado, 'Unknown') AS status,
+      COALESCE(dp.project_name, p.nombre_del_proyecto, requested_project.notion_page_id) AS project_name,
+      COALESCE(dp.project_status, p.estado, 'Unknown') AS status,
       p.resumen AS summary,
-      p.fechas AS start_date,
-      p.fechas_end AS end_date,
+      COALESCE(dp.start_date, p.fechas) AS start_date,
+      COALESCE(dp.end_date, p.fechas_end) AS end_date,
       COALESCE(task_summary.total_tasks, 0) AS total_tasks,
       COALESCE(task_summary.active_tasks, 0) AS active_tasks,
       COALESCE(task_summary.completed_tasks, 0) AS completed_tasks,
@@ -264,6 +326,8 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
       ) AS progress_value,
       p.page_url
     FROM requested_project
+    LEFT JOIN delivery_projects dp
+      ON dp.project_source_id = requested_project.notion_page_id
     LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
       ON p.notion_page_id = requested_project.notion_page_id
     LEFT JOIN task_summary
@@ -338,12 +402,32 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       nombre_de_tarea AS task_name,
       estado AS status,
       COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
+      \`semáforo_rpa\` AS rpa_semaphore_source,
+      indicador_de_performance AS performance_indicator_label,
+      completitud AS completion_label,
+      cumplimiento AS delivery_compliance,
+      SAFE_CAST(\`días_de_retraso\` AS INT64) AS days_late,
+      SAFE_CAST(\`días_reprogramados\` AS INT64) AS rescheduled_days,
+      CASE LOWER(COALESCE(reprogramada, ''))
+        WHEN 'sí' THEN TRUE
+        WHEN 'si' THEN TRUE
+        WHEN 'yes' THEN TRUE
+        WHEN 'true' THEN TRUE
+        ELSE FALSE
+      END AS is_rescheduled,
+      client_change_round AS client_change_round_label,
+      SAFE_CAST(client_change_round_final AS INT64) AS client_change_round_final,
+      SAFE_CAST(workflow_change_round AS INT64) AS workflow_change_round,
       COALESCE(SAFE_CAST(frame_versions AS INT64), 0) AS frame_versions,
       COALESCE(SAFE_CAST(frame_comments AS INT64), 0) AS frame_comments,
       COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
       COALESCE(client_review_open, FALSE) AS client_review_open,
       COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
       COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count,
+      COALESCE(\`fecha_límite_original_end\`, \`fecha_límite_original\`) AS original_due_date,
+      \`tiempo_de_ejecución\` AS execution_time_label,
+      \`tiempo_en_cambios\` AS changes_time_label,
+      \`tiempo_en_revisión\` AS review_time_label,
       sprint AS sprint_name,
       last_frame_comment,
       last_edited_time,
@@ -371,11 +455,33 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       status: row.status || 'Unknown',
       statusTone: getStatusTone(row.status || 'Unknown'),
       rpa: toNumber(row.rpa_value),
+      rpaSemaphoreSource: row.rpa_semaphore_source,
+      rpaSemaphoreDerived: getDerivedRpaSemaphore(toNumber(row.rpa_value)),
+      performanceIndicatorLabel: row.performance_indicator_label,
+      performanceIndicatorCode: normalizePerformanceIndicatorCode(row.performance_indicator_label),
+      deliveryCompliance: row.delivery_compliance,
+      completionLabel: row.completion_label,
+      daysLate: row.days_late === null || row.days_late === undefined ? null : toNumber(row.days_late),
+      rescheduledDays: row.rescheduled_days === null || row.rescheduled_days === undefined ? null : toNumber(row.rescheduled_days),
+      isRescheduled: Boolean(row.is_rescheduled),
+      clientChangeRoundLabel: row.client_change_round_label,
+      clientChangeRoundFinal:
+        row.client_change_round_final === null || row.client_change_round_final === undefined
+          ? null
+          : toNumber(row.client_change_round_final),
+      workflowChangeRound:
+        row.workflow_change_round === null || row.workflow_change_round === undefined
+          ? null
+          : toNumber(row.workflow_change_round),
       frameVersions: toNumber(row.frame_versions),
       frameComments: toNumber(row.frame_comments),
       openFrameComments,
       reviewOpen,
       blocked,
+      originalDueDate: toDateString(row.original_due_date),
+      executionTimeLabel: row.execution_time_label,
+      changesTimeLabel: row.changes_time_label,
+      reviewTimeLabel: row.review_time_label,
       sprintName: row.sprint_name,
       lastFrameComment: row.last_frame_comment,
       lastEditedAt: toDateString(row.last_edited_time),

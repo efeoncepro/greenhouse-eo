@@ -1,9 +1,16 @@
 import 'server-only'
 
-import type { CompensationVersion, CreateCompensationVersionInput } from '@/types/payroll'
+import type {
+  CompensationVersion,
+  CreateCompensationVersionInput,
+  PayrollCompensationMember,
+  PayrollCompensationOverview
+} from '@/types/payroll'
 
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
+import { listPayrollCompensationMembers } from '@/lib/payroll/get-payroll-members'
 import {
+  buildPayrollQueryTypes,
   PayrollValidationError,
   assertPayrollDateString,
   normalizeBoolean,
@@ -17,6 +24,25 @@ import {
   toTimestampString
 } from '@/lib/payroll/shared'
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  isPayrollPostgresEnabled,
+  pgGetCurrentCompensation,
+  pgGetCompensationHistoryByMember,
+  pgGetCompensationVersionById,
+  pgGetApplicableCompensationVersionsForPeriod,
+  pgCreateCompensationVersion,
+  pgGetCompensationOverview
+} from '@/lib/payroll/postgres-store'
+
+const COMPENSATION_MUTATION_TYPES = {
+  afpName: 'STRING',
+  afpRate: 'FLOAT64',
+  healthSystem: 'STRING',
+  healthPlanUf: 'FLOAT64',
+  unemploymentRate: 'FLOAT64',
+  effectiveTo: 'DATE',
+  createdBy: 'STRING'
+} as const
 
 type CompensationRow = {
   version_id: string | null
@@ -59,6 +85,14 @@ type CompensationBoundaryRow = {
   effective_from: { value?: string } | string | null
 }
 
+type FallbackPayrollMemberRow = {
+  member_id: string | null
+  display_name: string | null
+  email: string | null
+  avatar_url: string | null
+  notion_user_id: string | null
+}
+
 const getProjectId = () => getBigQueryProjectId()
 
 const addDaysToDateString = (dateString: string, days: number) => {
@@ -74,37 +108,54 @@ const getCurrentDateString = () =>
     timeZone: 'America/Santiago'
   }).format(new Date())
 
-const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => ({
-  versionId: String(row.version_id || ''),
-  memberId: String(row.member_id || ''),
-  memberName: String(row.display_name || 'Sin nombre'),
-  memberEmail: String(row.email || ''),
-  memberAvatarUrl: normalizeNullableString(row.avatar_url),
-  notionUserId: normalizeNullableString(row.notion_user_id),
-  version: toNumber(row.version),
-  payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
-  currency: row.currency === 'USD' ? 'USD' : 'CLP',
-  baseSalary: toNumber(row.base_salary),
-  remoteAllowance: toNumber(row.remote_allowance),
-  bonusOtdMin: toNumber(row.bonus_otd_min),
-  bonusOtdMax: toNumber(row.bonus_otd_max),
-  bonusRpaMin: toNumber(row.bonus_rpa_min),
-  bonusRpaMax: toNumber(row.bonus_rpa_max),
-  afpName: normalizeNullableString(row.afp_name),
-  afpRate: toNullableNumber(row.afp_rate),
-  healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
-  healthPlanUf: toNullableNumber(row.health_plan_uf),
-  unemploymentRate: toNumber(row.unemployment_rate),
-  contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
-  hasApv: normalizeBoolean(row.has_apv),
-  apvAmount: toNumber(row.apv_amount),
-  effectiveFrom: toDateString(row.effective_from) || '',
-  effectiveTo: toDateString(row.effective_to),
-  isCurrent: normalizeBoolean(row.is_current),
-  changeReason: normalizeNullableString(row.change_reason),
-  createdBy: normalizeNullableString(row.created_by),
-  createdAt: toTimestampString(row.created_at)
-})
+const isCurrentCompensationWindow = ({
+  effectiveFrom,
+  effectiveTo
+}: {
+  effectiveFrom: string
+  effectiveTo: string | null
+}) => {
+  const today = getCurrentDateString()
+
+  return effectiveFrom <= today && (!effectiveTo || effectiveTo >= today)
+}
+
+const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => {
+  const effectiveFrom = toDateString(row.effective_from) || ''
+  const effectiveTo = toDateString(row.effective_to)
+
+  return {
+    versionId: String(row.version_id || ''),
+    memberId: String(row.member_id || ''),
+    memberName: String(row.display_name || 'Sin nombre'),
+    memberEmail: String(row.email || ''),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
+    notionUserId: normalizeNullableString(row.notion_user_id),
+    version: toNumber(row.version),
+    payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+    currency: row.currency === 'USD' ? 'USD' : 'CLP',
+    baseSalary: toNumber(row.base_salary),
+    remoteAllowance: toNumber(row.remote_allowance),
+    bonusOtdMin: toNumber(row.bonus_otd_min),
+    bonusOtdMax: toNumber(row.bonus_otd_max),
+    bonusRpaMin: toNumber(row.bonus_rpa_min),
+    bonusRpaMax: toNumber(row.bonus_rpa_max),
+    afpName: normalizeNullableString(row.afp_name),
+    afpRate: toNullableNumber(row.afp_rate),
+    healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
+    healthPlanUf: toNullableNumber(row.health_plan_uf),
+    unemploymentRate: toNumber(row.unemployment_rate),
+    contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+    hasApv: normalizeBoolean(row.has_apv),
+    apvAmount: toNumber(row.apv_amount),
+    effectiveFrom,
+    effectiveTo,
+    isCurrent: effectiveFrom ? isCurrentCompensationWindow({ effectiveFrom, effectiveTo }) : normalizeBoolean(row.is_current),
+    changeReason: normalizeNullableString(row.change_reason),
+    createdBy: normalizeNullableString(row.created_by),
+    createdAt: toTimestampString(row.created_at)
+  }
+}
 
 const assertCompensationInput = (input: CreateCompensationVersionInput) => {
   if (!normalizeString(input.memberId)) {
@@ -146,6 +197,10 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
 }
 
 export const getCurrentCompensation = async () => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCurrentCompensation()
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -161,7 +216,8 @@ export const getCurrentCompensation = async () => {
       INNER JOIN \`${projectId}.greenhouse.team_members\` AS m
         ON m.member_id = cv.member_id
       WHERE m.active = TRUE
-        AND cv.is_current = TRUE
+        AND cv.effective_from <= CURRENT_DATE('America/Santiago')
+        AND (cv.effective_to IS NULL OR cv.effective_to >= CURRENT_DATE('America/Santiago'))
       ORDER BY m.display_name ASC
     `
   )
@@ -169,7 +225,115 @@ export const getCurrentCompensation = async () => {
   return rows.map(normalizeCompensationVersion)
 }
 
+const listFallbackPayrollMembers = async (): Promise<PayrollCompensationMember[]> => {
+  await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+
+  const rows = await runPayrollQuery<FallbackPayrollMemberRow>(
+    `
+      SELECT
+        member_id,
+        display_name,
+        email,
+        avatar_url,
+        notion_user_id
+      FROM \`${projectId}.greenhouse.team_members\`
+      WHERE active = TRUE
+      ORDER BY display_name ASC
+    `
+  )
+
+  return rows.map(row => ({
+    memberId: String(row.member_id || ''),
+    memberName: String(row.display_name || 'Sin nombre'),
+    memberEmail: String(row.email || ''),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
+    notionUserId: normalizeNullableString(row.notion_user_id),
+    active: true,
+    hasCurrentCompensation: false,
+    hasCompensationHistory: false,
+    compensationVersionCount: 0,
+    currentCompensationVersionId: null,
+    currentCompensationEffectiveFrom: null,
+    currentPayRegime: null,
+    currentCurrency: null
+  }))
+}
+
+const mergeCurrentCompensationIntoMembers = ({
+  members,
+  compensations
+}: {
+  members: PayrollCompensationMember[]
+  compensations: CompensationVersion[]
+}) => {
+  const currentCompensationByMember = new Map(compensations.map(compensation => [compensation.memberId, compensation]))
+
+  return members.map(member => {
+    const currentCompensation = currentCompensationByMember.get(member.memberId)
+
+    if (!currentCompensation) {
+      return member
+    }
+
+    return {
+      ...member,
+      hasCurrentCompensation: true,
+      hasCompensationHistory: member.hasCompensationHistory || true,
+      compensationVersionCount: Math.max(member.compensationVersionCount, 1),
+      currentCompensationVersionId: currentCompensation.versionId,
+      currentCompensationEffectiveFrom: currentCompensation.effectiveFrom,
+      currentPayRegime: currentCompensation.payRegime,
+      currentCurrency: currentCompensation.currency
+    }
+  })
+}
+
+export const getCompensationOverview = async (): Promise<PayrollCompensationOverview> => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationOverview()
+  }
+
+  const [compensationsResult, membersResult] = await Promise.allSettled([
+    getCurrentCompensation(),
+    listPayrollCompensationMembers()
+  ])
+
+  const compensations = compensationsResult.status === 'fulfilled' ? compensationsResult.value : []
+
+  if (compensationsResult.status === 'rejected') {
+    console.error('Unable to load current payroll compensations.', compensationsResult.reason)
+  }
+
+  let members =
+    membersResult.status === 'fulfilled'
+      ? membersResult.value
+      : await listFallbackPayrollMembers()
+
+  if (membersResult.status === 'rejected') {
+    console.error('Unable to load payroll compensation members.', membersResult.reason)
+  }
+
+  members = mergeCurrentCompensationIntoMembers({ members, compensations })
+  const eligibleMembers = members.filter(member => !member.hasCurrentCompensation)
+
+  return {
+    compensations,
+    eligibleMembers,
+    members,
+    summary: {
+      activeMembers: members.length,
+      activeCompensations: compensations.length,
+      eligibleMembers: eligibleMembers.length
+    }
+  }
+}
+
 export const getCompensationHistoryByMember = async (memberId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationHistoryByMember(memberId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -194,6 +358,10 @@ export const getCompensationHistoryByMember = async (memberId: string) => {
 }
 
 export const getCompensationVersionById = async (versionId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetCompensationVersionById(versionId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -218,6 +386,10 @@ export const getCompensationVersionById = async (versionId: string) => {
 }
 
 export const getApplicableCompensationVersionsForPeriod = async (periodStart: string, periodEnd: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetApplicableCompensationVersionsForPeriod(periodStart, periodEnd)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -289,6 +461,17 @@ export const createCompensationVersion = async ({
   input: CreateCompensationVersionInput
   actorEmail: string | null
 }) => {
+  if (isPayrollPostgresEnabled()) {
+    const versionId = await pgCreateCompensationVersion({ input, actorEmail })
+    const [created] = await pgGetCompensationHistoryByMember(input.memberId)
+
+    if (!created) {
+      throw new PayrollValidationError('Unable to read newly created compensation version.', 500)
+    }
+
+    return created
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -402,6 +585,33 @@ export const createCompensationVersion = async ({
     )
   }
 
+  const createParams = {
+    versionId,
+    memberId: input.memberId,
+    version: nextVersion,
+    payRegime: input.payRegime,
+    currency: input.currency,
+    baseSalary: Number(input.baseSalary),
+    remoteAllowance: Number(input.remoteAllowance ?? 0),
+    bonusOtdMin: Number(input.bonusOtdMin ?? 0),
+    bonusOtdMax: Number(input.bonusOtdMax ?? 0),
+    bonusRpaMin: Number(input.bonusRpaMin ?? 0),
+    bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    afpName: normalizeNullableString(input.afpName),
+    afpRate: input.afpRate ?? null,
+    healthSystem: input.healthSystem ?? null,
+    healthPlanUf: input.healthPlanUf ?? null,
+    unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+    contractType: input.contractType ?? 'indefinido',
+    hasApv: Boolean(input.hasApv),
+    apvAmount: Number(input.apvAmount ?? 0),
+    effectiveFrom,
+    effectiveTo: nextEffectiveTo,
+    isCurrent,
+    changeReason: input.changeReason.trim(),
+    createdBy: actorEmail
+  }
+
   await runPayrollQuery(
     `
       INSERT INTO \`${projectId}.greenhouse.compensation_versions\` (
@@ -459,32 +669,8 @@ export const createCompensationVersion = async ({
         CURRENT_TIMESTAMP()
       )
     `,
-    {
-      versionId,
-      memberId: input.memberId,
-      version: nextVersion,
-      payRegime: input.payRegime,
-      currency: input.currency,
-      baseSalary: Number(input.baseSalary),
-      remoteAllowance: Number(input.remoteAllowance ?? 0),
-      bonusOtdMin: Number(input.bonusOtdMin ?? 0),
-      bonusOtdMax: Number(input.bonusOtdMax ?? 0),
-      bonusRpaMin: Number(input.bonusRpaMin ?? 0),
-      bonusRpaMax: Number(input.bonusRpaMax ?? 0),
-      afpName: normalizeNullableString(input.afpName),
-      afpRate: input.afpRate ?? null,
-      healthSystem: input.healthSystem ?? null,
-      healthPlanUf: input.healthPlanUf ?? null,
-      unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-      contractType: input.contractType ?? 'indefinido',
-      hasApv: Boolean(input.hasApv),
-      apvAmount: Number(input.apvAmount ?? 0),
-      effectiveFrom,
-      effectiveTo: nextEffectiveTo,
-      isCurrent,
-      changeReason: input.changeReason.trim(),
-      createdBy: actorEmail
-    }
+    createParams,
+    buildPayrollQueryTypes(createParams, COMPENSATION_MUTATION_TYPES)
   )
 
   const [created] = await getCompensationHistoryByMember(input.memberId)

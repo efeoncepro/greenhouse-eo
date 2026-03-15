@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -12,7 +12,6 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
@@ -21,7 +20,6 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -81,6 +79,7 @@ const CATEGORY_OPTIONS = [
 // ---------------------------------------------------------------------------
 
 const SuppliersListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [total, setTotal] = useState(0)
@@ -117,6 +116,7 @@ const SuppliersListView = () => {
   // Derived KPIs
   const activeCount = suppliers.filter(s => s.isActive).length
   const internationalCount = suppliers.filter(s => s.isInternational).length
+
   const categoryCounts = suppliers.reduce<Record<string, number>>((acc, s) => {
     acc[s.category] = (acc[s.category] || 0) + 1
 
@@ -285,6 +285,7 @@ const SuppliersListView = () => {
                       key={supplier.supplierId}
                       hover
                       sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+                      onClick={() => router.push(`/finance/suppliers/${supplier.supplierId}`)}
                     >
                       <TableCell>
                         <Box>

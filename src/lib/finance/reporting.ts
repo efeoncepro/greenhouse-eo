@@ -1,0 +1,74 @@
+import 'server-only'
+
+import { roundCurrency } from '@/lib/finance/shared'
+
+export type MonthlyAmountEntry = {
+  period: string
+  amountClp: number
+  count?: number
+}
+
+export const getMonthKey = (date: string | null) => (date ? date.slice(0, 7) : null)
+
+export const getRecentMonthKeys = (months: number) => {
+  const totalMonths = Math.max(1, months)
+  const keys: string[] = []
+  const cursor = new Date()
+
+  cursor.setUTCDate(1)
+  cursor.setUTCHours(0, 0, 0, 0)
+  cursor.setUTCMonth(cursor.getUTCMonth() - (totalMonths - 1))
+
+  for (let index = 0; index < totalMonths; index += 1) {
+    const year = cursor.getUTCFullYear()
+    const month = String(cursor.getUTCMonth() + 1).padStart(2, '0')
+
+    keys.push(`${year}-${month}`)
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1)
+  }
+
+  return keys
+}
+
+export const aggregateMonthlyEntries = (entries: MonthlyAmountEntry[], monthKeys: string[]) => {
+  const totals = new Map<string, { totalAmountClp: number; count: number }>()
+
+  for (const key of monthKeys) {
+    totals.set(key, { totalAmountClp: 0, count: 0 })
+  }
+
+  for (const entry of entries) {
+    const bucket = totals.get(entry.period)
+
+    if (!bucket) {
+      continue
+    }
+
+    bucket.totalAmountClp = roundCurrency(bucket.totalAmountClp + entry.amountClp)
+    bucket.count += entry.count ?? 1
+  }
+
+  return monthKeys.map(period => ({
+    period,
+    year: Number(period.slice(0, 4)),
+    month: Number(period.slice(5, 7)),
+    totalAmountClp: roundCurrency(totals.get(period)?.totalAmountClp ?? 0),
+    recordCount: totals.get(period)?.count ?? 0
+  }))
+}
+
+export const buildCurrentMonthMetrics = (series: Array<{ totalAmountClp: number; recordCount: number }>) => {
+  const current = series.at(-1) ?? { totalAmountClp: 0, recordCount: 0 }
+  const previous = series.at(-2) ?? { totalAmountClp: 0, recordCount: 0 }
+
+  const changePercent = previous.totalAmountClp > 0
+    ? Math.round(((current.totalAmountClp - previous.totalAmountClp) / previous.totalAmountClp) * 100)
+    : 0
+
+  return {
+    totalAmountClp: current.totalAmountClp,
+    recordCount: current.recordCount,
+    previousTotalAmountClp: previous.totalAmountClp,
+    changePercent
+  }
+}

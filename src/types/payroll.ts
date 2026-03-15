@@ -5,6 +5,25 @@ export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
 export type PayrollKpiDataSource = 'notion_ops' | 'manual'
 
+export interface PayrollMemberSummary {
+  memberId: string
+  memberName: string
+  memberEmail: string
+  memberAvatarUrl: string | null
+  notionUserId: string | null
+  active: boolean
+}
+
+export interface PayrollCompensationMember extends PayrollMemberSummary {
+  hasCurrentCompensation: boolean
+  hasCompensationHistory: boolean
+  compensationVersionCount: number
+  currentCompensationVersionId: string | null
+  currentCompensationEffectiveFrom: string | null
+  currentPayRegime: PayRegime | null
+  currentCurrency: PayrollCurrency | null
+}
+
 export interface CompensationVersion {
   versionId: string
   memberId: string
@@ -178,6 +197,40 @@ export interface PayrollCalculationResult {
 
 export interface MemberPayrollHistory {
   memberId: string
+  member: PayrollMemberSummary | null
   entries: PayrollEntry[]
   compensationHistory: CompensationVersion[]
+}
+
+export interface PayrollCompensationOverview {
+  compensations: CompensationVersion[]
+  eligibleMembers: PayrollCompensationMember[]
+  members: PayrollCompensationMember[]
+  summary: {
+    activeMembers: number
+    activeCompensations: number
+    eligibleMembers: number
+  }
+}
+
+export interface PayrollPeriodsResponse {
+  periods: PayrollPeriod[]
+  summary: {
+    total: number
+    draft: number
+    calculated: number
+    approved: number
+    exported: number
+  }
+}
+
+export interface PayrollEntriesResponse {
+  entries: PayrollEntry[]
+  summary: {
+    total: number
+    manualKpiEntries: number
+    manualOverrideEntries: number
+    totalGross: number
+    totalNet: number
+  }
 }

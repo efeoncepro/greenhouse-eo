@@ -17,6 +17,7 @@ import type { GreenhouseDashboardData } from '@/types/greenhouse-dashboard'
 import type { TeamMembersPayload } from '@/types/team'
 import ClientAttentionProjectsAccordion from '@views/greenhouse/dashboard/ClientAttentionProjectsAccordion'
 import ClientDashboardHero from '@views/greenhouse/dashboard/ClientDashboardHero'
+import ClientAiCreditsSection from '@views/greenhouse/dashboard/ClientAiCreditsSection'
 import ClientEcosystemSection from '@views/greenhouse/dashboard/ClientEcosystemSection'
 import ClientPortfolioHealthAccordion from '@views/greenhouse/dashboard/ClientPortfolioHealthAccordion'
 import DashboardKpiCard from '@views/greenhouse/dashboard/DashboardKpiCard'
@@ -274,6 +275,10 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
 
         <SectionErrorBoundary sectionName='ecosystem' description='No pudimos cargar la seccion de ecosistema.'>
           <ClientEcosystemSection tooling={data.tooling} onRequest={setRequestIntent} />
+        </SectionErrorBoundary>
+
+        <SectionErrorBoundary sectionName='ai-credits' description='No pudimos cargar los créditos AI.'>
+          <ClientAiCreditsSection />
         </SectionErrorBoundary>
 
         <SectionErrorBoundary sectionName='portfolio-health' description='No pudimos cargar la salud del portafolio.'>

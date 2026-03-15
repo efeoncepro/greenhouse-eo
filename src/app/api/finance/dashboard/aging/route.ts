@@ -32,7 +32,12 @@ export async function GET() {
         WHEN DATE_DIFF(CURRENT_DATE(), due_date, DAY) BETWEEN 61 AND 90 THEN '61_90'
         ELSE '90_plus'
       END AS bucket,
-      SUM(total_amount - COALESCE(amount_paid, 0)) AS total,
+      SUM(
+        COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
+          GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
+          NULLIF(COALESCE(total_amount, 0), 0)
+        )
+      ) AS total,
       COUNT(*) AS count
     FROM \`${projectId}.greenhouse.fin_income\`
     WHERE payment_status IN ('pending', 'overdue', 'partial')

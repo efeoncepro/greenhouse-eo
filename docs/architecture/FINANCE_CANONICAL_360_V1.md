@@ -16,7 +16,7 @@ Use this document together with:
 - `project_context.md`
 - `Handoff.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
-- `docs/tasks/CODEX_TASK_Financial_Module.md`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
 
 ## Status
 
@@ -29,6 +29,7 @@ Current state:
 - collaborator identity is anchored to `greenhouse.team_members.member_id`
 - reads are enriched from shared Greenhouse, HubSpot, Payroll, and identity tables
 - legacy references are still accepted to avoid breaking existing UI and historical rows
+- reconciliation, payroll-to-expense discovery, and finance form metadata now expose dedicated backend support endpoints without moving writes out of Finance
 
 This is not yet a complete product-wide 360 UI spec.
 It is the runtime contract for the current backend model.
@@ -86,6 +87,59 @@ The architectural rule is:
 - keep Finance-owned tables for Finance workflows
 - resolve identity through canonical shared tables
 - build 360 views through enriched read models instead of treating `fin_*` as separate silos
+
+## Supplier vs Provider
+
+Finance already has a concrete vendor-facing entity today:
+- `greenhouse.fin_suppliers`
+
+That means that, in current runtime practice, many external vendors are effectively represented as Finance suppliers.
+
+However, Finance supplier is not enough as a platform-wide object when the same external organization must also relate to:
+- AI tools or suites
+- identity or auth provider mappings
+- admin governance
+- future license, wallet, or usage models
+
+### Current Finance meaning of Supplier
+
+Inside Finance, `Supplier` means the payable/vendor profile used for:
+- bills
+- subscriptions
+- payment terms
+- tax identifiers
+- payable expense linkage
+
+This is a Finance-owned extension concept and remains valid.
+
+### Recommended platform meaning of Provider
+
+At platform level, `Provider` is the broader external organization or platform object.
+
+Examples:
+- Adobe
+- Anthropic
+- OpenAI
+- HubSpot
+
+Recommended relationship:
+- `Provider` is the reusable cross-module object
+- `fin_suppliers` is the Finance extension profile for that provider
+- one Provider may map to one or more Finance supplier profiles over time if operationally needed
+
+### Operational rule
+
+`greenhouse.providers` now exists in runtime as the shared provider registry used by AI Tooling.
+
+That means:
+- Finance may keep using `fin_suppliers` for payable workflows
+- modules may still carry `vendor` snapshot labels where needed
+- new cross-module relationships should anchor to `provider_id` whenever the vendor/platform identity must survive across modules
+
+But for ongoing cross-module design:
+- do not treat `fin_suppliers.supplier_id` as the universal provider identity
+- do not treat free-text `vendor` as a durable relationship key
+- prefer designing new tooling, suites, identity links, or AI relationships around `provider_id`
 
 ## Resolution Rules
 
@@ -275,7 +329,7 @@ Already shared across domains:
 
 What Finance still owns:
 - bank accounts
-- suppliers
+- finance supplier profiles
 - exchange rates
 - reconciliation periods and statement rows
 - client billing profile extensions
@@ -340,12 +394,17 @@ Still pending or partial:
 
 Key implementation files:
 - `src/lib/finance/canonical.ts`
+- `src/lib/finance/reconciliation.ts`
 - `src/app/api/finance/clients/route.ts`
 - `src/app/api/finance/clients/[id]/route.ts`
 - `src/app/api/finance/clients/sync/route.ts`
 - `src/app/api/finance/income/route.ts`
 - `src/app/api/finance/expenses/route.ts`
 - `src/app/api/finance/expenses/bulk/route.ts`
+- `src/app/api/finance/expenses/meta/route.ts`
+- `src/app/api/finance/expenses/payroll-candidates/route.ts`
+- `src/app/api/finance/reconciliation/[id]/candidates/route.ts`
+- `src/app/api/finance/reconciliation/[id]/exclude/route.ts`
 - `src/lib/people/get-person-finance-overview.ts`
 - `src/app/api/people/[memberId]/finance/route.ts`
 

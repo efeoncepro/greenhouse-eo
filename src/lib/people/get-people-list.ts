@@ -47,6 +47,42 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
   }
 }
 
+const buildRoleCategoryFilters = (items: PersonListItem[]) =>
+  Object.entries(
+    items.reduce<Record<string, number>>((acc, item) => {
+      acc[item.roleCategory] = (acc[item.roleCategory] || 0) + 1
+
+      return acc
+    }, {})
+  )
+    .map(([roleCategory, count]) => ({
+      roleCategory: roleCategory as PersonListItem['roleCategory'],
+      count
+    }))
+    .sort((left, right) => right.count - left.count || left.roleCategory.localeCompare(right.roleCategory, 'es'))
+
+const buildCountryFilters = (items: PersonListItem[]) =>
+  Object.entries(
+    items.reduce<Record<string, number>>((acc, item) => {
+      const key = item.locationCountry || 'unknown'
+
+      acc[key] = (acc[key] || 0) + 1
+
+      return acc
+    }, {})
+  )
+    .map(([countryCode, count]) => ({
+      countryCode,
+      count
+    }))
+    .sort((left, right) => right.count - left.count || left.countryCode.localeCompare(right.countryCode, 'es'))
+
+const buildPayRegimeFilters = (items: PersonListItem[]) =>
+  (['chile', 'international', 'unknown'] as const).map(payRegime => ({
+    payRegime,
+    count: items.filter(item => (item.payRegime || 'unknown') === payRegime).length
+  }))
+
 export const getPeopleList = async (): Promise<PeopleListPayload> => {
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
@@ -137,6 +173,11 @@ export const getPeopleList = async (): Promise<PeopleListPayload> => {
       coveredClients: await getCoveredClientsCount(projectId),
       chileCount: items.filter(item => item.payRegime === 'chile').length,
       internationalCount: items.filter(item => item.payRegime === 'international').length
+    },
+    filters: {
+      roleCategories: buildRoleCategoryFilters(items),
+      countries: buildCountryFilters(items),
+      payRegimes: buildPayRegimeFilters(items)
     }
   }
 }

@@ -79,6 +79,14 @@ interface IncomeDetail {
 const formatAmount = (amount: number, currency: string) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
 
+const formatDate = (dateStr: string | null): string => {
+  if (!dateStr) return '—'
+
+  const [y, m, d] = dateStr.split('-')
+
+  return `${d}/${m}/${y}`
+}
+
 const statusColor = (status: string) => {
   switch (status) {
     case 'paid': return 'success'
@@ -250,7 +258,7 @@ const IncomeDetailView = () => {
           <HorizontalWithSubtitle
             title='Pendiente'
             stats={formatAmount(data.amountPending, data.currency)}
-            subtitle={data.dueDate ? `Vence ${data.dueDate}` : 'Sin vencimiento'}
+            subtitle={data.dueDate ? `Vence ${formatDate(data.dueDate)}` : 'Sin vencimiento'}
             avatarIcon='tabler-clock'
             avatarColor={data.paymentStatus === 'overdue' ? 'error' : 'warning'}
           />
@@ -277,11 +285,11 @@ const IncomeDetailView = () => {
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Fecha emisión</Typography>
-              <Typography variant='body2'>{data.invoiceDate || '—'}</Typography>
+              <Typography variant='body2'>{formatDate(data.invoiceDate)}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Fecha vencimiento</Typography>
-              <Typography variant='body2'>{data.dueDate || '—'}</Typography>
+              <Typography variant='body2'>{formatDate(data.dueDate)}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Línea de servicio</Typography>
@@ -383,7 +391,7 @@ const IncomeDetailView = () => {
               ) : (
                 data.paymentsReceived.map((p, i) => (
                   <TableRow key={p.paymentId || i}>
-                    <TableCell>{p.paymentDate}</TableCell>
+                    <TableCell>{formatDate(p.paymentDate)}</TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' fontWeight={600} color='success.main'>
                         {formatAmount(p.amount, p.currency || data.currency)}

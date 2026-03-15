@@ -115,11 +115,11 @@ export async function POST(request: Request) {
           created_at, updated_at
         ) VALUES (
           @expenseId, @clientId, @expenseType, @description, @currency,
-          @subtotal, @taxRate, @taxAmount, @totalAmount,
-          @exchangeRateToClp, @totalAmountClp,
-          @paymentDate, @paymentStatus, @paymentMethod,
+          CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
+          CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
+          IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
           @paymentAccountId, @paymentReference,
-          @documentNumber, @documentDate, @dueDate,
+          @documentNumber, IF(@documentDate = '', NULL, CAST(@documentDate AS DATE)), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
           @supplierId, @supplierName, @supplierInvoiceNumber,
           @payrollPeriodId, @payrollEntryId, @memberId, @memberName,
           @socialSecurityType, @socialSecurityInstitution, @socialSecurityPeriod,

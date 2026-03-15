@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic'
 
 interface SupplierRow {
   supplier_id: string
+  provider_id: string | null
   legal_name: string
   trade_name: string | null
   tax_id: string | null
@@ -52,6 +54,7 @@ interface SupplierRow {
 
 const normalizeSupplier = (row: SupplierRow) => ({
   supplierId: normalizeString(row.supplier_id),
+  providerId: row.provider_id ? normalizeString(row.provider_id) : null,
   legalName: normalizeString(row.legal_name),
   tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
   taxId: row.tax_id ? normalizeString(row.tax_id) : null,
@@ -162,6 +165,17 @@ export async function POST(request: Request) {
     const supplierId = normalizeString(body.supplierId) ||
       legalName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
+    const providerId = normalizeString(body.providerId) ||
+      normalizeString(body.tradeName) ||
+      legalName
+
+    const normalizedProviderId = providerId
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+
     if (!SUPPLIER_CATEGORIES.includes(body.category)) {
       throw new FinanceValidationError(`Invalid category: ${normalizeString(body.category)}.`)
     }
@@ -180,7 +194,7 @@ export async function POST(request: Request) {
 
     await runFinanceQuery(`
       INSERT INTO \`${projectId}.greenhouse.fin_suppliers\` (
-        supplier_id, legal_name, trade_name, tax_id, tax_id_type,
+        supplier_id, provider_id, legal_name, trade_name, tax_id, tax_id_type,
         country, category, service_type, is_international,
         primary_contact_name, primary_contact_email, primary_contact_phone, website,
         bank_name, bank_account_number, bank_account_type, bank_routing,
@@ -188,7 +202,7 @@ export async function POST(request: Request) {
         is_active, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @supplierId, @legalName, @tradeName, @taxId, @taxIdType,
+        @supplierId, @providerId, @legalName, @tradeName, @taxId, @taxIdType,
         @country, @category, @serviceType, @isInternational,
         @contactName, @contactEmail, @contactPhone, @website,
         @bankName, @bankAccountNumber, @bankAccountType, @bankRouting,
@@ -198,6 +212,7 @@ export async function POST(request: Request) {
       )
     `, {
       supplierId,
+      providerId: normalizedProviderId || null,
       legalName,
       tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
       taxId: body.taxId ? normalizeString(body.taxId) : null,
@@ -222,7 +237,20 @@ export async function POST(request: Request) {
       createdBy: tenant.userId || null
     })
 
-    return NextResponse.json({ supplierId, created: true }, { status: 201 })
+    const syncResult = await syncProviderFromFinanceSupplier({
+      supplierId,
+      providerId: normalizedProviderId || null,
+      legalName,
+      tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
+      website: body.website ? normalizeString(body.website) : null,
+      isActive: true
+    })
+
+    return NextResponse.json({
+      supplierId,
+      providerId: syncResult?.providerId ?? normalizedProviderId ?? null,
+      created: true
+    }, { status: 201 })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

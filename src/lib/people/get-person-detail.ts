@@ -4,7 +4,10 @@ import type { CompensationVersion } from '@/types/payroll'
 import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMember, PersonIntegrations } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
+import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
 import { getPersonOperationalMetrics } from '@/lib/people/get-person-operational-metrics'
 import {
   PeopleValidationError,
@@ -22,7 +25,8 @@ import {
   toStringArray,
   enrichProfile
 } from '@/lib/people/shared'
-import type { TeamIdentityProvider } from '@/types/team'
+import { getAssignedHoursMonth, getCapacityHealth, getExpectedMonthlyThroughput, getUtilizationPercent } from '@/lib/team-capacity/shared'
+import type { TeamIdentityProvider, TeamRoleCategory } from '@/types/team'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type MemberRow = {
@@ -137,6 +141,41 @@ const buildAssignmentsSummary = (rows: AssignmentRow[]) => {
   }
 }
 
+const buildCapacitySummary = ({
+  roleCategory,
+  totalFte,
+  metrics
+}: {
+  roleCategory: string
+  totalFte: number
+  metrics: PersonDetail['operationalMetrics'] | null | undefined
+}) => {
+  const assignedHoursMonth = getAssignedHoursMonth(totalFte)
+
+  const expectedMonthlyThroughput = getExpectedMonthlyThroughput({
+    roleCategory: roleCategory as TeamRoleCategory,
+    fteAllocation: totalFte
+  })
+
+  const activeAssets = metrics?.tasksActiveNow || 0
+  const completedAssets = metrics?.tasksCompleted30d || 0
+
+  const utilizationPercent = getUtilizationPercent({
+    activeAssets,
+    expectedMonthlyThroughput
+  })
+
+  return {
+    assignedHoursMonth,
+    activeAssets,
+    completedAssets,
+    projectCount: metrics?.projectBreakdown.length || 0,
+    expectedMonthlyThroughput,
+    utilizationPercent,
+    capacityHealth: getCapacityHealth(utilizationPercent)
+  }
+}
+
 const buildIntegrations = ({
   providers,
   notionUserId,
@@ -236,6 +275,7 @@ const buildPersonMember = (row: MemberRow): {
 
   return {
     member: {
+      eoId: null, // resolved later via person_360
       memberId: String(row.member_id || ''),
       displayName: String(row.display_name || 'Sin nombre'),
       publicEmail,
@@ -367,13 +407,32 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null) =
   )
 }
 
+const resolveLinkedUserId = async (identityProfileId: string | null): Promise<string | null> => {
+  if (!identityProfileId || !isGreenhousePostgresConfigured()) return null
+
+  try {
+    const rows = await runGreenhousePostgresQuery<{ user_id: string }>(
+      `SELECT user_id FROM greenhouse_core.client_users WHERE identity_profile_id = $1 AND active LIMIT 1`,
+      [identityProfileId]
+    )
+
+    return rows[0]?.user_id ?? null
+  } catch {
+    return null
+  }
+}
+
 export const getPersonDetail = async ({
-  memberId,
+  memberId: memberIdOrEoId,
   access
 }: {
   memberId: string
   access: PersonAccess
 }): Promise<PersonDetail> => {
+  // Resolve identifier via person_360 — works with EO-ID or legacy memberId
+  const resolved = await resolvePersonIdentifier(memberIdOrEoId)
+  const memberId = resolved?.memberId ?? memberIdOrEoId
+
   const memberRow = await getMemberById(memberId)
 
   if (!memberRow) {
@@ -381,6 +440,12 @@ export const getPersonDetail = async ({
   }
 
   const { member, emailAliases } = buildPersonMember(memberRow)
+
+  // Set canonical EO-ID and linked userId from person_360
+  if (resolved) {
+    member.eoId = resolved.eoId
+  }
+
   const identityRows = await getIdentityProvidersByProfile(member.identityProfileId)
 
   const linkedProviders = Array.from(
@@ -419,6 +484,9 @@ export const getPersonDetail = async ({
 
   const tasks: Array<Promise<void>> = []
 
+  // linkedUserId already resolved from person_360
+  detail.linkedUserId = resolved?.userId ?? null
+
   tasks.push(
     getAssignmentsByMember(memberId).then(rows => {
       detail.summary = buildAssignmentsSummary(rows)
@@ -426,6 +494,8 @@ export const getPersonDetail = async ({
       if (access.canViewAssignments) {
         detail.assignments = normalizeAssignments(rows)
       }
+    }).catch(error => {
+      console.warn(`[people/${memberId}] assignments failed:`, error instanceof Error ? error.message : error)
     })
   )
 
@@ -441,6 +511,8 @@ export const getPersonDetail = async ({
         notionUserCandidates
       }).then(metrics => {
         detail.operationalMetrics = metrics
+      }).catch(error => {
+        console.warn(`[people/${memberId}] operational metrics failed:`, error instanceof Error ? error.message : error)
       })
     )
   }
@@ -455,11 +527,31 @@ export const getPersonDetail = async ({
         if (access.canViewPayroll) {
           detail.recentPayroll = history.entries.slice(0, 3)
         }
+      }).catch(error => {
+        console.warn(`[people/${memberId}] payroll history failed:`, error instanceof Error ? error.message : error)
+      })
+    )
+  }
+
+  if (access.canViewFinance) {
+    tasks.push(
+      getPersonFinanceOverview(memberId).then(finance => {
+        detail.financeSummary = finance.summary
+      }).catch(error => {
+        console.warn(`[people/${memberId}] finance overview failed:`, error instanceof Error ? error.message : error)
       })
     )
   }
 
   await Promise.all(tasks)
+
+  if (access.canViewActivity || access.canViewAssignments) {
+    detail.capacity = buildCapacitySummary({
+      roleCategory: member.roleCategory,
+      totalFte: detail.summary.totalFte,
+      metrics: detail.operationalMetrics
+    })
+  }
 
   return detail
 }

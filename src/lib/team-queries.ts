@@ -2,6 +2,14 @@ import 'server-only'
 
 import { buildAccountTeam } from '@/lib/dashboard/tenant-dashboard-overrides'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  clampPercent,
+  getAssignedHoursMonth,
+  getCapacityHealth,
+  getExpectedMonthlyThroughput,
+  getUtilizationPercent,
+  roundToTenths
+} from '@/lib/team-capacity/shared'
 import type {
   TeamByProjectMember,
   TeamByProjectPayload,
@@ -165,16 +173,6 @@ const roleOrder: Record<TeamRoleCategory, number> = {
   unknown: 7
 }
 
-const throughputBenchmarks: Record<TeamRoleCategory, number> = {
-  account: 30,
-  operations: 30,
-  strategy: 16,
-  design: 20,
-  development: 14,
-  media: 24,
-  unknown: 18
-}
-
 const completedStatuses = ['Listo', 'Done', 'Finalizado', 'Completado']
 const inactiveStatuses = [...completedStatuses, 'Cancelado', 'Cancelada', 'Cancelled', 'Canceled']
 
@@ -223,10 +221,6 @@ const toDateString = (value: { value?: string } | string | null) => {
 
   return typeof value.value === 'string' ? value.value.slice(0, 10) : null
 }
-
-const roundToTenths = (value: number) => Math.round(value * 10) / 10
-
-const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
 
 const toStringArray = (value: string[] | null | undefined) =>
   Array.isArray(value)
@@ -444,31 +438,59 @@ const toCapacityFallback = (viewer: TeamQueryViewer): TeamCapacityPayload => {
   const totalHoursMonth = Math.round(legacyMembers.footer.totalFte * 160)
   const utilizationPercent = clampPercent(legacy.averageAllocationPct || 0)
 
-  const members: TeamCapacityMember[] = legacyMembers.members.map(member => ({
-    memberId: member.memberId,
-    displayName: member.displayName,
-    avatarUrl: member.avatarUrl,
-    roleTitle: member.roleTitle,
-    roleCategory: member.roleCategory,
-    identityProviders: member.identityProviders,
-    identityConfidence: member.identityConfidence,
-    fteAllocation: member.fteAllocation,
-    activeAssets: 0,
-    completedAssets: 0,
-    avgRpa: null,
-    projectCount: 0,
-    projectBreakdown: []
-  }))
+  const members: TeamCapacityMember[] = []
+
+  for (const member of legacyMembers.members) {
+    const assignedHoursMonth = getAssignedHoursMonth(member.fteAllocation)
+
+    const expectedMonthlyThroughput = getExpectedMonthlyThroughput({
+      roleCategory: member.roleCategory,
+      fteAllocation: member.fteAllocation
+    })
+
+    const memberUtilizationPercent = 0
+
+    members.push({
+      memberId: member.memberId,
+      displayName: member.displayName,
+      avatarUrl: member.avatarUrl,
+      roleTitle: member.roleTitle,
+      roleCategory: member.roleCategory,
+      identityProviders: member.identityProviders,
+      identityConfidence: member.identityConfidence,
+      fteAllocation: member.fteAllocation,
+      assignedHoursMonth,
+      expectedMonthlyThroughput,
+      utilizationPercent: memberUtilizationPercent,
+      capacityHealth: getCapacityHealth(memberUtilizationPercent),
+      activeAssets: 0,
+      completedAssets: 0,
+      avgRpa: null,
+      projectCount: 0,
+      projectBreakdown: []
+    })
+  }
+
+  const activeAssets = members.reduce((sum, member) => sum + member.activeAssets, 0)
+  const completedAssets = members.reduce((sum, member) => sum + member.completedAssets, 0)
+  const expectedMonthlyThroughput = roundToTenths(members.reduce((sum, member) => sum + member.expectedMonthlyThroughput, 0))
+  const healthBuckets = buildHealthBuckets(members)
 
   return {
     summary: {
       totalFte: legacyMembers.footer.totalFte,
       totalHoursMonth,
+      assignedHoursMonth: totalHoursMonth,
       utilizedHoursMonth: Math.round((totalHoursMonth * utilizationPercent) / 100),
       utilizationPercent,
-      memberCount: members.length
+      memberCount: members.length,
+      activeAssets,
+      completedAssets,
+      expectedMonthlyThroughput,
+      healthBuckets
     },
     members,
+    roleBreakdown: buildRoleBreakdown(members),
     period: periodFormatter.format(new Date()),
     source: 'legacy_override',
     hasOperationalMetrics: false
@@ -970,6 +992,18 @@ const buildCapacityMembers = (
         }) || null
 
       const projectBreakdown = breakdownByMemberId.get(assignment.memberId) || []
+      const activeAssets = toNumber(loadRow?.active_assets)
+      const completedAssets = toNumber(loadRow?.completed_assets)
+
+      const expectedMonthlyThroughput = getExpectedMonthlyThroughput({
+        roleCategory: assignment.roleCategory,
+        fteAllocation: assignment.fteAllocation
+      })
+
+      const utilizationPercent = getUtilizationPercent({
+        activeAssets,
+        expectedMonthlyThroughput
+      })
 
       return {
         memberId: assignment.memberId,
@@ -980,8 +1014,12 @@ const buildCapacityMembers = (
         identityProviders: assignment.identityProviders,
         identityConfidence: assignment.identityConfidence,
         fteAllocation: assignment.fteAllocation,
-        activeAssets: toNumber(loadRow?.active_assets),
-        completedAssets: toNumber(loadRow?.completed_assets),
+        assignedHoursMonth: getAssignedHoursMonth(assignment.fteAllocation),
+        expectedMonthlyThroughput,
+        utilizationPercent,
+        capacityHealth: getCapacityHealth(utilizationPercent),
+        activeAssets,
+        completedAssets,
         avgRpa: toNullableNumber(loadRow?.avg_rpa),
         projectCount: Math.max(projectBreakdown.length, toNumber(loadRow?.project_count)),
         projectBreakdown
@@ -990,19 +1028,69 @@ const buildCapacityMembers = (
   )
 }
 
-const getUtilizationPercent = (members: TeamCapacityMember[]) => {
+const getSummaryUtilizationPercent = (members: TeamCapacityMember[]) => {
   const activeAssets = members.reduce((sum, member) => sum + member.activeAssets, 0)
+  const expectedMonthlyThroughput = members.reduce((sum, member) => sum + member.expectedMonthlyThroughput, 0)
 
-  const expectedMonthlyThroughput = members.reduce(
-    (sum, member) => sum + member.fteAllocation * throughputBenchmarks[member.roleCategory],
-    0
+  return getUtilizationPercent({
+    activeAssets,
+    expectedMonthlyThroughput
+  })
+}
+
+const buildHealthBuckets = (members: TeamCapacityMember[]) =>
+  members.reduce(
+    (acc, member) => {
+      if (member.capacityHealth === 'overloaded') {
+        acc.overloadedMembers += 1
+      } else if (member.capacityHealth === 'high') {
+        acc.highLoadMembers += 1
+      } else if (member.capacityHealth === 'balanced') {
+        acc.balancedMembers += 1
+      } else {
+        acc.idleMembers += 1
+      }
+
+      return acc
+    },
+    {
+      idleMembers: 0,
+      balancedMembers: 0,
+      highLoadMembers: 0,
+      overloadedMembers: 0
+    }
   )
 
-  if (expectedMonthlyThroughput <= 0) {
-    return 0
+const buildRoleBreakdown = (members: TeamCapacityMember[]) => {
+  const byRole = new Map<TeamRoleCategory, TeamCapacityMember[]>()
+
+  for (const member of members) {
+    const current = byRole.get(member.roleCategory) || []
+
+    current.push(member)
+    byRole.set(member.roleCategory, current)
   }
 
-  return clampPercent((activeAssets / expectedMonthlyThroughput) * 100)
+  return Array.from(byRole.entries())
+    .map(([roleCategory, roleMembers]) => {
+      const totalFte = roundToTenths(roleMembers.reduce((sum, member) => sum + member.fteAllocation, 0))
+      const assignedHoursMonth = roleMembers.reduce((sum, member) => sum + member.assignedHoursMonth, 0)
+      const activeAssets = roleMembers.reduce((sum, member) => sum + member.activeAssets, 0)
+      const expectedMonthlyThroughput = roleMembers.reduce((sum, member) => sum + member.expectedMonthlyThroughput, 0)
+
+      return {
+        roleCategory,
+        memberCount: roleMembers.length,
+        totalFte,
+        assignedHoursMonth,
+        activeAssets,
+        utilizationPercent: getUtilizationPercent({
+          activeAssets,
+          expectedMonthlyThroughput
+        })
+      }
+    })
+    .sort((left, right) => left.memberCount - right.memberCount || left.roleCategory.localeCompare(right.roleCategory, 'es'))
 }
 
 const getProjectName = async (projectIdValue: string) => {
@@ -1291,17 +1379,27 @@ export const getTeamCapacity = async (viewer: TeamQueryViewer): Promise<TeamCapa
   const members = buildCapacityMembers(assignments, loadRows, projectBreakdownRows)
   const totalFte = roundToTenths(members.reduce((sum, member) => sum + member.fteAllocation, 0))
   const totalHoursMonth = Math.round(totalFte * 160)
-  const utilizationPercent = getUtilizationPercent(members)
+  const utilizationPercent = getSummaryUtilizationPercent(members)
+  const activeAssets = members.reduce((sum, member) => sum + member.activeAssets, 0)
+  const completedAssets = members.reduce((sum, member) => sum + member.completedAssets, 0)
+  const expectedMonthlyThroughput = roundToTenths(members.reduce((sum, member) => sum + member.expectedMonthlyThroughput, 0))
+  const healthBuckets = buildHealthBuckets(members)
 
   return {
     summary: {
       totalFte,
       totalHoursMonth,
+      assignedHoursMonth: totalHoursMonth,
       utilizedHoursMonth: Math.round((totalHoursMonth * utilizationPercent) / 100),
       utilizationPercent,
-      memberCount: members.length
+      memberCount: members.length,
+      activeAssets,
+      completedAssets,
+      expectedMonthlyThroughput,
+      healthBuckets
     },
     members,
+    roleBreakdown: buildRoleBreakdown(members),
     period: periodFormatter.format(new Date()),
     source,
     hasOperationalMetrics: hasOperationalColumns(operationalColumns)

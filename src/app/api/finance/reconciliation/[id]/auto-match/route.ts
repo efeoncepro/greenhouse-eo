@@ -10,6 +10,12 @@ import {
   toDateString,
   FinanceValidationError
 } from '@/lib/finance/shared'
+import {
+  assertReconciliationPeriodIsMutable,
+  listReconciliationCandidates,
+  setReconciliationLink,
+  type ReconciliationCandidate
+} from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,15 +25,6 @@ interface UnmatchedRow {
   description: string
   reference: string | null
   amount: unknown
-}
-
-interface TransactionCandidate {
-  id: string
-  type: 'income' | 'expense'
-  amount: number
-  date: string | null
-  reference: string | null
-  description: string
 }
 
 const amountMatches = (statementAmount: number, candidateAmount: number) => Math.abs(statementAmount - candidateAmount) <= 1
@@ -65,9 +62,9 @@ const hasPartialReferenceMatch = (statementText: string, candidateReference: str
 
 /**
  * Auto-match algorithm (reference-first):
- *  1. Reference match → 0.95 confidence (auto-match)
- *  2. Amount + date + reference partial → 0.85 confidence (auto-match)
- *  3. Amount + date only → 0.70 confidence (suggest, don't auto-match)
+ *  1. Reference match -> 0.95 confidence (auto-match)
+ *  2. Amount + date + reference partial -> 0.85 confidence (auto-match)
+ *  3. Amount + date only -> 0.70 confidence (suggest, don't auto-match)
  */
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -82,24 +79,8 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     const { id: periodId } = await params
     const projectId = getFinanceProjectId()
 
-    // Verify period exists and is in progress
-    const periods = await runFinanceQuery<{ period_id: string; status: string; account_id: string }>(`
-      SELECT period_id, status, account_id
-      FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
-      WHERE period_id = @periodId
-    `, { periodId })
+    await assertReconciliationPeriodIsMutable(periodId)
 
-    if (periods.length === 0) {
-      return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
-    }
-
-    const period = periods[0]
-
-    if (period.status === 'reconciled' || period.status === 'closed') {
-      throw new FinanceValidationError('Cannot auto-match a reconciled or closed period.', 409)
-    }
-
-    // Get unmatched statement rows
     const unmatchedRows = await runFinanceQuery<UnmatchedRow>(`
       SELECT row_id, transaction_date, description, reference, amount
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
@@ -110,43 +91,12 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ matched: 0, suggested: 0, message: 'No unmatched rows to process.' })
     }
 
-    // Load candidate transactions (income + expenses for matching)
-    const incomeRows = await runFinanceQuery<{
-      income_id: string; total_amount: unknown; invoice_date: unknown;
-      payment_reference: string | null; invoice_number: string | null; description: string | null
-    }>(`
-      SELECT income_id, total_amount, invoice_date, NULL as payment_reference, invoice_number, description
-      FROM \`${projectId}.greenhouse.fin_income\`
-      WHERE is_reconciled = FALSE
-    `)
-
-    const expenseRows = await runFinanceQuery<{
-      expense_id: string; total_amount: unknown; payment_date: unknown;
-      payment_reference: string | null; document_number: string | null; description: string
-    }>(`
-      SELECT expense_id, total_amount, payment_date, payment_reference, document_number, description
-      FROM \`${projectId}.greenhouse.fin_expenses\`
-      WHERE is_reconciled = FALSE
-    `)
-
-    const candidates: TransactionCandidate[] = [
-      ...incomeRows.map(r => ({
-        id: normalizeString(r.income_id),
-        type: 'income' as const,
-        amount: toNumber(r.total_amount),
-        date: toDateString(r.invoice_date as string | { value?: string } | null),
-        reference: r.invoice_number ? normalizeString(r.invoice_number) : null,
-        description: r.description ? normalizeString(r.description) : ''
-      })),
-      ...expenseRows.map(r => ({
-        id: normalizeString(r.expense_id),
-        type: 'expense' as const,
-        amount: -toNumber(r.total_amount), // Expenses are negative in bank statement
-        date: toDateString(r.payment_date as string | { value?: string } | null),
-        reference: r.payment_reference || r.document_number ? normalizeString(r.payment_reference || r.document_number || '') : null,
-        description: normalizeString(r.description)
-      }))
-    ]
+    const { items: candidates } = await listReconciliationCandidates({
+      periodId,
+      type: 'all',
+      limit: 400,
+      windowDays: 45
+    })
 
     let matched = 0
     let suggested = 0
@@ -156,17 +106,21 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       const rowAmount = toNumber(row.amount)
       const rowDate = toDateString(row.transaction_date as string | { value?: string } | null)
       const rowText = `${normalizeString(row.description)} ${row.reference ? normalizeString(row.reference) : ''}`.trim().toLowerCase()
-      let bestMatch: { candidate: TransactionCandidate; confidence: number } | null = null
+      let bestMatch: { candidate: ReconciliationCandidate; confidence: number } | null = null
       let bestMatchCount = 0
 
       for (const candidate of candidates) {
-        if (matchedCandidateIds.has(candidate.id)) continue
+        if (matchedCandidateIds.has(candidate.id)) {
+          continue
+        }
 
         const amountMatch = amountMatches(rowAmount, candidate.amount)
 
-        if (!amountMatch) continue
+        if (!amountMatch) {
+          continue
+        }
 
-        const dateMatch = dateMatchesWithinWindow(rowDate, candidate.date)
+        const dateMatch = dateMatchesWithinWindow(rowDate, candidate.transactionDate)
         let confidence = 0
 
         if (rowText.includes(candidate.id.toLowerCase()) || hasPartialReferenceMatch(rowText, candidate.reference)) {
@@ -189,36 +143,49 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
         }
       }
 
-      if (bestMatch && bestMatchCount === 1) {
-        const autoMatch = bestMatch.confidence >= 0.85
-        const newStatus = autoMatch ? 'matched' : 'suggested'
+      if (!bestMatch || bestMatchCount !== 1) {
+        continue
+      }
 
-        await runFinanceQuery(`
-          UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
-          SET
-            match_status = @matchStatus,
-            matched_type = @matchedType,
-            matched_id = @matchedId,
-            match_confidence = @matchConfidence,
-            matched_by = @matchedBy,
-            matched_at = CURRENT_TIMESTAMP()
-          WHERE row_id = @rowId
-        `, {
-          rowId: normalizeString(row.row_id),
-          matchStatus: newStatus,
+      const autoMatch = bestMatch.confidence >= 0.85
+      const newStatus = autoMatch ? 'auto_matched' : 'suggested'
+      const matchedRecordId = bestMatch.candidate.matchedRecordId || bestMatch.candidate.id
+      const matchedPaymentId = bestMatch.candidate.matchedPaymentId || null
+
+      await runFinanceQuery(`
+        UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
+        SET
+          match_status = @matchStatus,
+          matched_type = @matchedType,
+          matched_id = @matchedId,
+          matched_payment_id = @matchedPaymentId,
+          match_confidence = @matchConfidence,
+          matched_by = @matchedBy,
+          matched_at = CURRENT_TIMESTAMP()
+        WHERE row_id = @rowId
+      `, {
+        rowId: normalizeString(row.row_id),
+        matchStatus: newStatus,
+        matchedType: bestMatch.candidate.type,
+        matchedId: matchedRecordId,
+        matchedPaymentId,
+        matchConfidence: bestMatch.confidence,
+        matchedBy: autoMatch ? 'auto' : null
+      })
+
+      if (autoMatch) {
+        await setReconciliationLink({
           matchedType: bestMatch.candidate.type,
-          matchedId: bestMatch.candidate.id,
-          matchConfidence: bestMatch.confidence,
-          matchedBy: autoMatch ? 'auto' : null
+          matchedId: matchedRecordId,
+          matchedPaymentId,
+          rowId: normalizeString(row.row_id),
+          matchedBy: tenant.userId || 'auto'
         })
 
         matchedCandidateIds.add(bestMatch.candidate.id)
-
-        if (autoMatch) {
-          matched++
-        } else {
-          suggested++
-        }
+        matched++
+      } else {
+        suggested++
       }
     }
 

@@ -5,6 +5,7 @@ import type { CreatePayrollPeriodInput, PayrollPeriod, UpdatePayrollPeriodInput 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import {
+  buildPayrollQueryTypes,
   PayrollValidationError,
   buildPeriodId,
   normalizeNullableString,
@@ -13,6 +14,19 @@ import {
   toNumber,
   toTimestampString
 } from '@/lib/payroll/shared'
+import {
+  isPayrollPostgresEnabled,
+  pgListPayrollPeriods,
+  pgGetPayrollPeriod,
+  pgCreatePayrollPeriod,
+  pgUpdatePayrollPeriod
+} from '@/lib/payroll/postgres-store'
+
+const PAYROLL_PERIOD_MUTATION_TYPES = {
+  ufValue: 'FLOAT64',
+  taxTableVersion: 'STRING',
+  notes: 'STRING'
+} as const
 
 type PayrollPeriodRow = {
   period_id: string | null
@@ -49,6 +63,10 @@ const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
 })
 
 export const listPayrollPeriods = async () => {
+  if (isPayrollPostgresEnabled()) {
+    return pgListPayrollPeriods()
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -64,6 +82,10 @@ export const listPayrollPeriods = async () => {
 }
 
 export const getPayrollPeriod = async (periodId: string) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgGetPayrollPeriod(periodId)
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -81,6 +103,17 @@ export const getPayrollPeriod = async (periodId: string) => {
 }
 
 export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
+  if (isPayrollPostgresEnabled()) {
+    const periodId = await pgCreatePayrollPeriod(input)
+    const created = await pgGetPayrollPeriod(periodId)
+
+    if (!created) {
+      throw new PayrollValidationError('Unable to read newly created payroll period.', 500)
+    }
+
+    return created
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -101,6 +134,15 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
 
   if (existing) {
     throw new PayrollValidationError('Payroll period already exists.', 409)
+  }
+
+  const createParams = {
+    periodId,
+    year: input.year,
+    month: input.month,
+    ufValue: input.ufValue ?? null,
+    taxTableVersion: normalizeNullableString(input.taxTableVersion),
+    notes: normalizeNullableString(input.notes)
   }
 
   await runPayrollQuery(
@@ -126,14 +168,8 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
         CURRENT_TIMESTAMP()
       )
     `,
-    {
-      periodId,
-      year: input.year,
-      month: input.month,
-      ufValue: input.ufValue ?? null,
-      taxTableVersion: normalizeNullableString(input.taxTableVersion),
-      notes: normalizeNullableString(input.notes)
-    }
+    createParams,
+    buildPayrollQueryTypes(createParams, PAYROLL_PERIOD_MUTATION_TYPES)
   )
 
   const created = await getPayrollPeriod(periodId)
@@ -146,6 +182,16 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
 }
 
 export const updatePayrollPeriod = async (periodId: string, input: UpdatePayrollPeriodInput) => {
+  if (isPayrollPostgresEnabled()) {
+    const updated = await pgUpdatePayrollPeriod(periodId, input)
+
+    if (!updated) {
+      throw new PayrollValidationError('Unable to read updated payroll period.', 500)
+    }
+
+    return updated
+  }
+
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
@@ -163,6 +209,14 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
 
+  const updateParams = {
+    periodId,
+    ufValue: input.ufValue ?? current.ufValue,
+    taxTableVersion:
+      input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
+    notes: input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
+  }
+
   await runPayrollQuery(
     `
       UPDATE \`${projectId}.greenhouse.payroll_periods\`
@@ -172,13 +226,8 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
         notes = @notes
       WHERE period_id = @periodId
     `,
-    {
-      periodId,
-      ufValue: input.ufValue ?? current.ufValue,
-      taxTableVersion:
-        input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
-      notes: input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
-    }
+    updateParams,
+    buildPayrollQueryTypes(updateParams, PAYROLL_PERIOD_MUTATION_TYPES)
   )
 
   const updated = await getPayrollPeriod(periodId)

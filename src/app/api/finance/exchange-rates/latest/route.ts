@@ -1,18 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { runFinanceQuery, getFinanceProjectId, toNumber, toDateString, normalizeString } from '@/lib/finance/shared'
+import {
+  fetchUsdToClpFromProviders,
+  getLatestStoredExchangeRatePair,
+  syncDailyUsdClpExchangeRate
+} from '@/lib/finance/exchange-rates'
 
 export const dynamic = 'force-dynamic'
-
-interface LatestRateRow {
-  from_currency: string
-  to_currency: string
-  rate: unknown
-  rate_date: unknown
-  source: string | null
-}
 
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -21,19 +16,43 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
+  let latestRate = await getLatestStoredExchangeRatePair({
+    fromCurrency: 'USD',
+    toCurrency: 'CLP'
+  })
 
-  const projectId = getFinanceProjectId()
+  // If no stored rate, attempt a non-blocking sync (best effort, 8s timeout)
+  if (!latestRate) {
+    try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 8000)
 
-  const rows = await runFinanceQuery<LatestRateRow>(`
-    SELECT from_currency, to_currency, rate, rate_date, source
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE from_currency = 'USD' AND to_currency = 'CLP'
-    ORDER BY rate_date DESC
-    LIMIT 1
-  `)
+      await syncDailyUsdClpExchangeRate()
+      clearTimeout(timeout)
 
-  if (rows.length === 0) {
+      latestRate = await getLatestStoredExchangeRatePair({
+        fromCurrency: 'USD',
+        toCurrency: 'CLP'
+      })
+    } catch (syncError) {
+      console.warn('[exchange-rates/latest] sync failed:', syncError instanceof Error ? syncError.message : syncError)
+    }
+  }
+
+  if (!latestRate) {
+    const liveRate = await fetchUsdToClpFromProviders()
+
+    if (liveRate) {
+      return NextResponse.json({
+        available: true,
+        fromCurrency: 'USD',
+        toCurrency: 'CLP',
+        rate: liveRate.usdToClp,
+        rateDate: liveRate.rateDate,
+        source: `${liveRate.source}:live`
+      })
+    }
+
     return NextResponse.json({
       available: false,
       rate: null,
@@ -42,14 +61,12 @@ export async function GET() {
     })
   }
 
-  const row = rows[0]
-
   return NextResponse.json({
     available: true,
-    fromCurrency: normalizeString(row.from_currency),
-    toCurrency: normalizeString(row.to_currency),
-    rate: toNumber(row.rate),
-    rateDate: toDateString(row.rate_date as string | { value?: string } | null),
-    source: row.source ? normalizeString(row.source) : 'manual'
+    fromCurrency: latestRate.fromCurrency,
+    toCurrency: latestRate.toCurrency,
+    rate: latestRate.rate,
+    rateDate: latestRate.rateDate,
+    source: latestRate.source
   })
 }

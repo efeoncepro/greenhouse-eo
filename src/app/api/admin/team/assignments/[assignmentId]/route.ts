@@ -3,11 +3,28 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
-import { deleteAssignment, toTeamAdminErrorResponse, updateAssignment } from '@/lib/team-admin/mutate-team'
+import { deleteAssignment, getAdminTeamAssignmentDetail, toTeamAdminErrorResponse, updateAssignment } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { UpdateAssignmentInput } from '@/types/team'
 
 export const dynamic = 'force-dynamic'
+
+export async function GET(_request: Request, context: { params: Promise<{ assignmentId: string }> }) {
+  const { tenant, errorResponse } = await requireAdminTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const { assignmentId } = await context.params
+    const assignment = await getAdminTeamAssignmentDetail(assignmentId)
+
+    return NextResponse.json(assignment)
+  } catch (error) {
+    return toTeamAdminErrorResponse(error, 'Unable to load assignment detail.')
+  }
+}
 
 export async function PATCH(request: Request, context: { params: Promise<{ assignmentId: string }> }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()

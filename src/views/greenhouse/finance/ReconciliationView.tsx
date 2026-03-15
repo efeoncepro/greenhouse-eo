@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -23,6 +26,8 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
+import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -50,6 +55,34 @@ interface Account {
   accountName: string
 }
 
+interface IncomeMovement {
+  incomeId: string
+  clientName: string
+  invoiceDate: string | null
+  totalAmountClp: number
+  isReconciled: boolean
+}
+
+interface ExpenseMovement {
+  expenseId: string
+  description: string
+  supplierName: string | null
+  memberName: string | null
+  paymentDate: string | null
+  documentDate: string | null
+  totalAmountClp: number
+  isReconciled: boolean
+}
+
+interface PendingMovement {
+  id: string
+  type: 'income' | 'expense'
+  description: string
+  partyName: string | null
+  date: string | null
+  amount: number
+}
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
@@ -70,19 +103,35 @@ const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
 
+const formatDate = (date: string | null): string => {
+  if (!date) {
+    return '—'
+  }
+
+  const [year, month, day] = date.split('-')
+
+  return `${day}/${month}/${year}`
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 const ReconciliationView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [periods, setPeriods] = useState<ReconciliationPeriod[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
+  const [pendingMovements, setPendingMovements] = useState<PendingMovement[]>([])
   const [accountFilter, setAccountFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [fetchErrors, setFetchErrors] = useState<string[]>([])
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
+  const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
+    const errors: string[] = []
 
     try {
       const params = new URLSearchParams()
@@ -90,15 +139,19 @@ const ReconciliationView = () => {
       if (accountFilter) params.set('accountId', accountFilter)
       if (statusFilter) params.set('status', statusFilter)
 
-      const [periodsRes, accountsRes] = await Promise.all([
-        fetch(`/api/finance/reconciliation?${params.toString()}`),
-        fetch('/api/finance/accounts')
+      const [periodsRes, accountsRes, incomeRes, expenseRes] = await Promise.all([
+        fetch(`/api/finance/reconciliation?${params.toString()}`, { cache: 'no-store' }),
+        fetch('/api/finance/accounts', { cache: 'no-store' }),
+        fetch('/api/finance/income?pageSize=20', { cache: 'no-store' }),
+        fetch('/api/finance/expenses?pageSize=20', { cache: 'no-store' })
       ])
 
       if (periodsRes.ok) {
         const data = await periodsRes.json()
 
         setPeriods(data.items ?? [])
+      } else {
+        errors.push(`Períodos: ${periodsRes.status}`)
       }
 
       if (accountsRes.ok) {
@@ -108,8 +161,54 @@ const ReconciliationView = () => {
           accountId: a.accountId,
           accountName: a.accountName
         })) ?? [])
+      } else {
+        errors.push(`Cuentas: ${accountsRes.status}`)
       }
+
+      if (incomeRes.ok && expenseRes.ok) {
+        const incomeData = await incomeRes.json()
+        const expenseData = await expenseRes.json()
+
+        const incomes: PendingMovement[] = (incomeData.items ?? [])
+          .filter((item: IncomeMovement) => !item.isReconciled)
+          .map((item: IncomeMovement) => ({
+            id: item.incomeId,
+            type: 'income',
+            description: item.clientName || item.incomeId,
+            partyName: item.clientName || null,
+            date: item.invoiceDate,
+            amount: item.totalAmountClp
+          }))
+
+        const expenses: PendingMovement[] = (expenseData.items ?? [])
+          .filter((item: ExpenseMovement) => !item.isReconciled)
+          .map((item: ExpenseMovement) => ({
+            id: item.expenseId,
+            type: 'expense',
+            description: item.description,
+            partyName: item.supplierName || item.memberName || null,
+            date: item.paymentDate || item.documentDate,
+            amount: -item.totalAmountClp
+          }))
+
+        setPendingMovements(
+          [...incomes, ...expenses]
+            .sort((left, right) => (right.date || '').localeCompare(left.date || ''))
+            .slice(0, 10)
+        )
+      } else {
+        if (!incomeRes.ok) {
+          errors.push(`Ingresos: ${incomeRes.status}`)
+        }
+
+        if (!expenseRes.ok) {
+          errors.push(`Egresos: ${expenseRes.status}`)
+        }
+      }
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : 'No pudimos cargar la conciliación.')
     } finally {
+      setFetchErrors(errors)
       setLoading(false)
     }
   }, [accountFilter, statusFilter])
@@ -122,6 +221,8 @@ const ReconciliationView = () => {
   const totalPeriods = periods.length
   const reconciledCount = periods.filter(p => p.status === 'reconciled').length
   const inProgressCount = periods.filter(p => p.status === 'in_progress').length
+  const pendingMovementCount = pendingMovements.length
+
   const totalDifference = periods
     .filter(p => p.status !== 'reconciled')
     .reduce((sum, p) => sum + Math.abs(p.difference), 0)
@@ -169,10 +270,35 @@ const ReconciliationView = () => {
             Conciliación bancaria y matching de transacciones
           </Typography>
         </Box>
-        <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />}>
-          Nuevo período
+        <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />} onClick={() => setCreateDrawerOpen(true)}>
+          Nuevo periodo
         </Button>
       </Box>
+
+      {fetchErrors.length > 0 && (
+        <Alert severity='warning' sx={{ whiteSpace: 'pre-line' }}>
+          {`Error cargando conciliación:\n${fetchErrors.join('\n')}`}
+        </Alert>
+      )}
+
+      {accounts.length === 0 && !loading && (
+        <Alert
+          severity='info'
+          action={
+            <Button color='inherit' size='small' onClick={() => setAccountDrawerOpen(true)}>
+              Crear cuenta
+            </Button>
+          }
+        >
+          No existen cuentas bancarias registradas. Crea una cuenta para empezar a conciliar.
+        </Alert>
+      )}
+
+      {accounts.length > 0 && periods.length === 0 && pendingMovementCount > 0 && (
+        <Alert severity='info'>
+          Ya existen movimientos por conciliar, pero aún no hay períodos abiertos. Crea un período para el mes y cuenta correspondiente para empezar el matching bancario.
+        </Alert>
+      )}
 
       {/* KPIs */}
       <Grid container spacing={6}>
@@ -205,14 +331,28 @@ const ReconciliationView = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Diferencia total'
-            stats={formatCLP(totalDifference)}
-            subtitle='Pendiente de conciliar'
+            title='Por conciliar'
+            stats={String(pendingMovementCount)}
+            subtitle={pendingMovementCount === 1 ? 'Movimiento pendiente' : 'Movimientos pendientes'}
             avatarIcon='tabler-alert-triangle'
-            avatarColor={totalDifference > 0 ? 'error' : 'success'}
+            avatarColor={pendingMovementCount > 0 ? 'error' : 'success'}
           />
         </Grid>
       </Grid>
+
+      {periods.length > 0 && (
+        <Grid container spacing={6}>
+          <Grid size={{ xs: 12 }}>
+            <HorizontalWithSubtitle
+              title='Diferencia total abierta'
+              stats={formatCLP(totalDifference)}
+              subtitle='Descuadre acumulado de períodos no conciliados'
+              avatarIcon='tabler-scale'
+              avatarColor={totalDifference > 0 ? 'warning' : 'success'}
+            />
+          </Grid>
+        </Grid>
+      )}
 
       {/* Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -272,7 +412,9 @@ const ReconciliationView = () => {
                 <TableRow>
                   <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
                     <Typography variant='body2' color='text.secondary'>
-                      No hay períodos de conciliación registrados aún
+                      {accounts.length === 0
+                        ? 'No hay períodos de conciliación porque aún no existen cuentas activas registradas.'
+                        : 'No hay períodos de conciliación registrados aún'}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -283,7 +425,12 @@ const ReconciliationView = () => {
                   const hasDifference = period.difference !== 0 && period.status !== 'reconciled'
 
                   return (
-                    <TableRow key={period.periodId} hover>
+                    <TableRow
+                      key={period.periodId}
+                      hover
+                      onClick={() => router.push(`/finance/reconciliation/${period.periodId}`)}
+                      sx={{ cursor: 'pointer' }}
+                    >
                       <TableCell>
                         <Typography variant='body2' fontWeight={600}>
                           {MONTH_NAMES[period.month]} {period.year}
@@ -335,6 +482,97 @@ const ReconciliationView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+        <CardHeader
+          title='Movimientos por conciliar'
+          subheader={pendingMovementCount > 0 ? `${pendingMovementCount} movimientos financieros sin match bancario` : 'Sin movimientos pendientes'}
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
+              <i className='tabler-list-search' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
+            </Avatar>
+          }
+        />
+        <Divider />
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: 80 }}>Tipo</TableCell>
+                <TableCell>Descripción</TableCell>
+                <TableCell sx={{ width: 160 }}>Entidad</TableCell>
+                <TableCell sx={{ width: 110 }}>Fecha</TableCell>
+                <TableCell sx={{ width: 140 }} align='right'>Monto</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pendingMovements.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      No hay movimientos pendientes por conciliar.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                pendingMovements.map(movement => (
+                  <TableRow key={movement.id} hover>
+                    <TableCell>
+                      <CustomChip
+                        round='true'
+                        size='small'
+                        color={movement.type === 'income' ? 'success' : 'error'}
+                        label={movement.type === 'income' ? 'Ingreso' : 'Egreso'}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2' fontWeight={500}>
+                        {movement.description}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {movement.id}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2'>{movement.partyName || '—'}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant='body2'>{formatDate(movement.date)}</Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Typography
+                        variant='body2'
+                        fontWeight={600}
+                        color={movement.amount >= 0 ? 'success.main' : 'error.main'}
+                      >
+                        {formatCLP(movement.amount)}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+
+      <CreateReconciliationPeriodDrawer
+        open={createDrawerOpen}
+        onClose={() => setCreateDrawerOpen(false)}
+        onSuccess={() => {
+          setCreateDrawerOpen(false)
+          fetchData()
+        }}
+      />
+
+      <CreateAccountDrawer
+        open={accountDrawerOpen}
+        onClose={() => setAccountDrawerOpen(false)}
+        onSuccess={() => {
+          setAccountDrawerOpen(false)
+          fetchData()
+        }}
+      />
     </Box>
   )
 }

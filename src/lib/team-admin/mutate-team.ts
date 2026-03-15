@@ -9,10 +9,15 @@ import { getPeopleTableColumns, toContactChannel, toDateString, toNumber, toStri
 import type {
   CreateAssignmentInput,
   CreateMemberInput,
+  TeamAdminAssignmentListItem,
   TeamAdminAssignmentRecord,
   TeamAdminClientOption,
+  TeamAdminAssignmentsPayload,
+  TeamAdminMemberDetail,
+  TeamAdminMemberListItem,
   TeamAdminMetadata,
   TeamAdminMemberRecord,
+  TeamAdminMembersPayload,
   TeamContactChannel,
   TeamRoleCategory,
   UpdateAssignmentInput,
@@ -66,10 +71,14 @@ type MemberRow = {
   contact_channel: string | null
   contact_handle: string | null
   relevance_note: string | null
+  identity_profile_id: string | null
   azure_oid: string | null
   notion_user_id: string | null
   hubspot_owner_id: string | null
   active: boolean | null
+  active_assignment_count?: number | string | null
+  total_fte?: number | string | null
+  total_hours_month?: number | string | null
 }
 
 type AssignmentRow = {
@@ -77,6 +86,8 @@ type AssignmentRow = {
   client_id: string | null
   client_name: string | null
   member_id: string | null
+  member_name: string | null
+  member_email: string | null
   fte_allocation: number | string | null
   hours_per_month: number | string | null
   role_title_override: string | null
@@ -86,6 +97,7 @@ type AssignmentRow = {
   start_date: { value?: string } | string | null
   end_date: { value?: string } | string | null
   active: boolean | null
+  client_active: boolean | null
 }
 
 type ClientRow = {
@@ -309,6 +321,7 @@ const mapMemberRecord = (row: MemberRow): TeamAdminMemberRecord => ({
   contactChannel: toContactChannel(row.contact_channel),
   contactHandle: row.contact_handle || null,
   relevanceNote: row.relevance_note || null,
+  identityProfileId: row.identity_profile_id || null,
   azureOid: row.azure_oid || null,
   notionUserId: row.notion_user_id || null,
   hubspotOwnerId: row.hubspot_owner_id || null,
@@ -320,6 +333,8 @@ const mapAssignmentRecord = (row: AssignmentRow): TeamAdminAssignmentRecord => (
   clientId: String(row.client_id || ''),
   clientName: row.client_name || null,
   memberId: String(row.member_id || ''),
+  memberName: row.member_name || null,
+  memberEmail: row.member_email || null,
   fteAllocation: Math.round(toNumber(row.fte_allocation) * 10) / 10,
   hoursPerMonth: row.hours_per_month === null || row.hours_per_month === undefined ? null : Math.round(toNumber(row.hours_per_month)),
   roleTitleOverride: row.role_title_override || null,
@@ -331,9 +346,22 @@ const mapAssignmentRecord = (row: AssignmentRow): TeamAdminAssignmentRecord => (
   active: Boolean(row.active)
 })
 
+const mapMemberListItem = (row: MemberRow): TeamAdminMemberListItem => ({
+  ...mapMemberRecord(row),
+  activeAssignmentCount: Math.round(toNumber(row.active_assignment_count)),
+  totalFte: Math.round(toNumber(row.total_fte) * 10) / 10,
+  totalHoursMonth: Math.round(toNumber(row.total_hours_month))
+})
+
+const mapAssignmentListItem = (row: AssignmentRow): TeamAdminAssignmentListItem => ({
+  ...mapAssignmentRecord(row),
+  clientActive: Boolean(row.client_active)
+})
+
 const getMemberColumns = async () => getPeopleTableColumns('greenhouse', 'team_members')
 const getAssignmentColumns = async () => getPeopleTableColumns('greenhouse', 'client_team_assignments')
 const getAuditColumns = async () => getPeopleTableColumns('greenhouse', 'audit_events')
+const getIdentityLinkColumns = async () => getPeopleTableColumns('greenhouse', 'identity_profile_source_links')
 
 const getMemberRecord = async (memberId: string) => {
   const projectId = getProjectId()
@@ -358,6 +386,10 @@ const getMemberRecord = async (memberId: string) => {
     ? 'hubspot_owner_id,'
     : 'CAST(NULL AS STRING) AS hubspot_owner_id,'
 
+  const identityProfileIdSelect = memberColumns.has('identity_profile_id')
+    ? 'identity_profile_id,'
+    : 'CAST(NULL AS STRING) AS identity_profile_id,'
+
   const rows = await runQuery<MemberRow>(
     `
       SELECT
@@ -370,6 +402,7 @@ const getMemberRecord = async (memberId: string) => {
         avatar_url,
         ${locationCountrySelect}
         ${locationCitySelect}
+        ${identityProfileIdSelect}
         contact_channel,
         contact_handle,
         relevance_note,
@@ -397,6 +430,8 @@ const getAssignmentRecord = async (assignmentId: string) => {
         a.client_id,
         c.client_name,
         a.member_id,
+        m.display_name AS member_name,
+        m.email AS member_email,
         a.fte_allocation,
         a.hours_per_month,
         a.role_title_override,
@@ -409,6 +444,8 @@ const getAssignmentRecord = async (assignmentId: string) => {
       FROM \`${projectId}.greenhouse.client_team_assignments\` AS a
       LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
         ON c.client_id = a.client_id
+      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
+        ON m.member_id = a.member_id
       WHERE a.assignment_id = @assignmentId
       LIMIT 1
     `,
@@ -456,6 +493,50 @@ const getActiveClients = async (): Promise<TeamAdminClientOption[]> => {
   }))
 }
 
+const buildMembersSummary = (members: TeamAdminMemberListItem[]) => ({
+  totalMembers: members.length,
+  activeMembers: members.filter(member => member.active).length,
+  inactiveMembers: members.filter(member => !member.active).length,
+  assignedMembers: members.filter(member => member.activeAssignmentCount > 0).length,
+  totalFte: Math.round(members.reduce((sum, member) => sum + member.totalFte, 0) * 10) / 10
+})
+
+const buildAssignmentsSummary = (assignments: TeamAdminAssignmentListItem[]) => ({
+  totalAssignments: assignments.length,
+  activeAssignments: assignments.filter(assignment => assignment.active).length,
+  inactiveAssignments: assignments.filter(assignment => !assignment.active).length,
+  distinctMembers: new Set(assignments.map(assignment => assignment.memberId).filter(Boolean)).size,
+  distinctClients: new Set(assignments.map(assignment => assignment.clientId).filter(Boolean)).size,
+  totalFte: Math.round(assignments.reduce((sum, assignment) => sum + assignment.fteAllocation, 0) * 10) / 10
+})
+
+const getMemberIdentitySyncInput = (member: TeamAdminMemberRecord) => [
+  {
+    sourceSystem: 'azure_ad',
+    sourceObjectType: 'user',
+    sourceObjectId: member.azureOid,
+    sourceUserId: member.azureOid,
+    sourceEmail: member.email,
+    sourceDisplayName: member.displayName
+  },
+  {
+    sourceSystem: 'notion',
+    sourceObjectType: 'user',
+    sourceObjectId: member.notionUserId,
+    sourceUserId: member.notionUserId,
+    sourceEmail: member.email,
+    sourceDisplayName: member.displayName
+  },
+  {
+    sourceSystem: 'hubspot_crm',
+    sourceObjectType: 'owner',
+    sourceObjectId: member.hubspotOwnerId,
+    sourceUserId: null,
+    sourceEmail: member.email,
+    sourceDisplayName: member.displayName
+  }
+]
+
 const getAssignmentByClientAndMember = async (clientId: string, memberId: string) => {
   const projectId = getProjectId()
 
@@ -466,6 +547,8 @@ const getAssignmentByClientAndMember = async (clientId: string, memberId: string
         a.client_id,
         c.client_name,
         a.member_id,
+        m.display_name AS member_name,
+        m.email AS member_email,
         a.fte_allocation,
         a.hours_per_month,
         a.role_title_override,
@@ -478,6 +561,8 @@ const getAssignmentByClientAndMember = async (clientId: string, memberId: string
       FROM \`${projectId}.greenhouse.client_team_assignments\` AS a
       LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
         ON c.client_id = a.client_id
+      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
+        ON m.member_id = a.member_id
       WHERE a.client_id = @clientId
         AND a.member_id = @memberId
       ORDER BY a.updated_at DESC
@@ -487,6 +572,208 @@ const getAssignmentByClientAndMember = async (clientId: string, memberId: string
   )
 
   return rows[0] ? mapAssignmentRecord(rows[0]) : null
+}
+
+export const listAdminTeamMembers = async (): Promise<TeamAdminMemberListItem[]> => {
+  const projectId = getProjectId()
+  const memberColumns = await getMemberColumns()
+
+  const emailAliasesSelect = memberColumns.has('email_aliases')
+    ? 'COALESCE(m.email_aliases, ARRAY<STRING>[]) AS email_aliases,'
+    : 'ARRAY<STRING>[] AS email_aliases,'
+
+  const locationCountrySelect = memberColumns.has('location_country')
+    ? 'm.location_country,'
+    : 'CAST(NULL AS STRING) AS location_country,'
+
+  const locationCitySelect = memberColumns.has('location_city')
+    ? 'm.location_city,'
+    : 'CAST(NULL AS STRING) AS location_city,'
+
+  const azureOidSelect = memberColumns.has('azure_oid') ? 'm.azure_oid,' : 'CAST(NULL AS STRING) AS azure_oid,'
+  const notionUserIdSelect = memberColumns.has('notion_user_id') ? 'm.notion_user_id,' : 'CAST(NULL AS STRING) AS notion_user_id,'
+
+  const hubspotOwnerIdSelect = memberColumns.has('hubspot_owner_id')
+    ? 'm.hubspot_owner_id,'
+    : 'CAST(NULL AS STRING) AS hubspot_owner_id,'
+
+  const identityProfileIdSelect = memberColumns.has('identity_profile_id')
+    ? 'm.identity_profile_id,'
+    : 'CAST(NULL AS STRING) AS identity_profile_id,'
+
+  const rows = await runQuery<MemberRow>(
+    `
+      WITH assignment_agg AS (
+        SELECT
+          member_id,
+          COUNTIF(active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE())) AS active_assignment_count,
+          ROUND(SUM(
+            CASE
+              WHEN active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE()) THEN COALESCE(fte_allocation, 0)
+              ELSE 0
+            END
+          ), 2) AS total_fte,
+          SUM(
+            CASE
+              WHEN active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE())
+                THEN COALESCE(hours_per_month, CAST(ROUND(COALESCE(fte_allocation, 0) * 160) AS INT64))
+              ELSE 0
+            END
+          ) AS total_hours_month
+        FROM \`${projectId}.greenhouse.client_team_assignments\`
+        GROUP BY member_id
+      )
+      SELECT
+        m.member_id,
+        m.display_name,
+        m.email,
+        ${emailAliasesSelect}
+        m.role_title,
+        m.role_category,
+        m.avatar_url,
+        ${locationCountrySelect}
+        ${locationCitySelect}
+        ${identityProfileIdSelect}
+        m.contact_channel,
+        m.contact_handle,
+        m.relevance_note,
+        ${azureOidSelect}
+        ${notionUserIdSelect}
+        ${hubspotOwnerIdSelect}
+        m.active,
+        COALESCE(a.active_assignment_count, 0) AS active_assignment_count,
+        COALESCE(a.total_fte, 0) AS total_fte,
+        COALESCE(a.total_hours_month, 0) AS total_hours_month
+      FROM \`${projectId}.greenhouse.team_members\` AS m
+      LEFT JOIN assignment_agg AS a
+        ON a.member_id = m.member_id
+      ORDER BY m.active DESC, m.display_name ASC
+    `
+  )
+
+  return rows.map(mapMemberListItem)
+}
+
+export const getAdminTeamMembersPayload = async (): Promise<TeamAdminMembersPayload> => {
+  const [metadata, members] = await Promise.all([getAdminTeamMetadata(), listAdminTeamMembers()])
+
+  return {
+    ...metadata,
+    members,
+    summary: buildMembersSummary(members)
+  }
+}
+
+export const listAdminTeamAssignments = async ({
+  memberId,
+  clientId,
+  activeOnly = false
+}: {
+  memberId?: string | null
+  clientId?: string | null
+  activeOnly?: boolean
+} = {}): Promise<TeamAdminAssignmentListItem[]> => {
+  const projectId = getProjectId()
+  const filters = ['1 = 1']
+  const params: Record<string, unknown> = {}
+
+  if (memberId) {
+    filters.push('a.member_id = @memberId')
+    params.memberId = memberId
+  }
+
+  if (clientId) {
+    filters.push('a.client_id = @clientId')
+    params.clientId = clientId
+  }
+
+  if (activeOnly) {
+    filters.push('a.active = TRUE')
+    filters.push('(a.end_date IS NULL OR a.end_date >= CURRENT_DATE())')
+  }
+
+  const rows = await runQuery<AssignmentRow>(
+    `
+      SELECT
+        a.assignment_id,
+        a.client_id,
+        c.client_name,
+        a.member_id,
+        m.display_name AS member_name,
+        m.email AS member_email,
+        a.fte_allocation,
+        a.hours_per_month,
+        a.role_title_override,
+        a.relevance_note_override,
+        a.contact_channel_override,
+        a.contact_handle_override,
+        a.start_date,
+        a.end_date,
+        a.active,
+        c.active AS client_active
+      FROM \`${projectId}.greenhouse.client_team_assignments\` AS a
+      LEFT JOIN \`${projectId}.greenhouse.clients\` AS c
+        ON c.client_id = a.client_id
+      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
+        ON m.member_id = a.member_id
+      WHERE ${filters.join(' AND ')}
+      ORDER BY a.active DESC, a.start_date DESC, c.client_name ASC, m.display_name ASC
+    `,
+    params
+  )
+
+  return rows.map(mapAssignmentListItem)
+}
+
+export const getAdminTeamAssignmentsPayload = async ({
+  memberId,
+  clientId,
+  activeOnly = false
+}: {
+  memberId?: string | null
+  clientId?: string | null
+  activeOnly?: boolean
+} = {}): Promise<TeamAdminAssignmentsPayload> => {
+  const [metadata, assignments] = await Promise.all([
+    getAdminTeamMetadata(),
+    listAdminTeamAssignments({ memberId, clientId, activeOnly })
+  ])
+
+  return {
+    ...metadata,
+    assignments,
+    summary: buildAssignmentsSummary(assignments)
+  }
+}
+
+export const getAdminTeamMemberDetail = async (memberId: string): Promise<TeamAdminMemberDetail> => {
+  const [member, assignments] = await Promise.all([getMemberRecord(memberId), listAdminTeamAssignments({ memberId })])
+
+  if (!member) {
+    throw new TeamAdminValidationError('Team member not found.', 404)
+  }
+
+  return {
+    member,
+    assignments,
+    summary: {
+      activeAssignments: assignments.filter(assignment => assignment.active).length,
+      totalFte: Math.round(assignments.filter(assignment => assignment.active).reduce((sum, assignment) => sum + assignment.fteAllocation, 0) * 10) / 10,
+      totalHoursMonth: assignments
+        .filter(assignment => assignment.active)
+        .reduce((sum, assignment) => sum + (assignment.hoursPerMonth ?? Math.round(assignment.fteAllocation * 160)), 0)
+    }
+  }
+}
+
+export const getAdminTeamAssignmentDetail = async (assignmentId: string): Promise<TeamAdminAssignmentRecord> => {
+  const assignment = await getAssignmentRecord(assignmentId)
+
+  if (!assignment) {
+    throw new TeamAdminValidationError('Assignment not found.', 404)
+  }
+
+  return assignment
 }
 
 const getMemberIdCandidates = async (baseSlug: string) => {
@@ -864,6 +1151,104 @@ const buildAssignmentUpdatePayload = async (assignmentId: string, input: UpdateA
   }
 }
 
+const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) => {
+  if (!member.identityProfileId) {
+    return
+  }
+
+  const identityLinkColumns = await getIdentityLinkColumns()
+
+  const requiredColumns = [
+    'profile_id',
+    'source_system',
+    'source_object_type',
+    'source_object_id',
+    'source_user_id',
+    'source_email',
+    'source_display_name',
+    'active'
+  ]
+
+  if (identityLinkColumns.size === 0 || requiredColumns.some(column => !identityLinkColumns.has(column))) {
+    return
+  }
+
+  const projectId = getProjectId()
+  const bigQuery = getBigQueryClient()
+  const syncRows = getMemberIdentitySyncInput(member)
+
+  for (const row of syncRows) {
+    if (!row.sourceObjectId) {
+      continue
+    }
+
+    await bigQuery.query({
+      query: `
+        MERGE \`${projectId}.greenhouse.identity_profile_source_links\` AS target
+        USING (
+          SELECT
+            @profileId AS profile_id,
+            @sourceSystem AS source_system,
+            @sourceObjectType AS source_object_type,
+            @sourceObjectId AS source_object_id,
+            @sourceUserId AS source_user_id,
+            @sourceEmail AS source_email,
+            @sourceDisplayName AS source_display_name
+        ) AS source
+        ON target.profile_id = source.profile_id
+         AND target.source_system = source.source_system
+         AND target.source_object_type = source.source_object_type
+         AND COALESCE(target.source_object_id, '') = COALESCE(source.source_object_id, '')
+        WHEN MATCHED THEN
+          UPDATE SET
+            source_user_id = source.source_user_id,
+            source_email = source.source_email,
+            source_display_name = source.source_display_name,
+            active = TRUE
+        WHEN NOT MATCHED THEN
+          INSERT (
+            profile_id,
+            source_system,
+            source_object_type,
+            source_object_id,
+            source_user_id,
+            source_email,
+            source_display_name,
+            active
+          )
+          VALUES (
+            source.profile_id,
+            source.source_system,
+            source.source_object_type,
+            source.source_object_id,
+            source.source_user_id,
+            source.source_email,
+            source.source_display_name,
+            TRUE
+          )
+      `,
+      params: {
+        profileId: member.identityProfileId,
+        sourceSystem: row.sourceSystem,
+        sourceObjectType: row.sourceObjectType,
+        sourceObjectId: row.sourceObjectId,
+        sourceUserId: row.sourceUserId,
+        sourceEmail: row.sourceEmail,
+        sourceDisplayName: row.sourceDisplayName
+      },
+      types: {
+        profileId: 'STRING',
+        sourceSystem: 'STRING',
+        sourceObjectType: 'STRING',
+        sourceObjectId: 'STRING',
+        sourceUserId: 'STRING',
+        sourceEmail: 'STRING',
+        sourceDisplayName: 'STRING'
+      }
+    })
+  }
+}
+
 export const getAdminTeamMetadata = async (): Promise<TeamAdminMetadata> => ({
   canManageTeam: true,
   memberCrud: true,
@@ -958,6 +1343,8 @@ export const createMember = async ({
     throw new TeamAdminValidationError('Member was created but could not be reloaded.', 500)
   }
 
+  await syncIdentitySourceLinksForMember(created)
+
   await writeAuditEvent({
     actorUserId,
     eventType: 'admin.team_member.created',
@@ -1048,6 +1435,8 @@ export const updateMember = async ({
   if (!updated) {
     throw new TeamAdminValidationError('Updated member could not be reloaded.', 500)
   }
+
+  await syncIdentitySourceLinksForMember(updated)
 
   await writeAuditEvent({
     actorUserId,

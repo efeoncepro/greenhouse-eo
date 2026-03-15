@@ -54,11 +54,27 @@ export interface GreenhouseProjectTaskItem {
   status: string
   statusTone: GreenhouseProjectStatusTone
   rpa: number
+  rpaSemaphoreSource: string | null
+  rpaSemaphoreDerived: 'green' | 'yellow' | 'red' | 'default'
+  performanceIndicatorLabel: string | null
+  performanceIndicatorCode: string | null
+  deliveryCompliance: string | null
+  completionLabel: string | null
+  daysLate: number | null
+  rescheduledDays: number | null
+  isRescheduled: boolean
+  clientChangeRoundLabel: string | null
+  clientChangeRoundFinal: number | null
+  workflowChangeRound: number | null
   frameVersions: number
   frameComments: number
   openFrameComments: number
   reviewOpen: boolean
   blocked: boolean
+  originalDueDate: string | null
+  executionTimeLabel: string | null
+  changesTimeLabel: string | null
+  reviewTimeLabel: string | null
   sprintName: string | null
   lastFrameComment: string | null
   lastEditedAt: string | null

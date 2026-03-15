@@ -8,7 +8,7 @@ import {
   getAgencyWeeklyActivity
 } from '@/lib/agency/agency-queries'
 import type { AgencyPulseKpis, AgencySpaceHealth } from '@/lib/agency/agency-queries'
-import AgencyPulseView from '@/views/agency/AgencyPulseView'
+import AgencyWorkspace from '@/views/agency/AgencyWorkspace'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,25 +31,25 @@ const deriveKpisFromSpaces = (spaces: AgencySpaceHealth[]): AgencyPulseKpis => {
   }
 }
 
-export default async function AgencyPulsePage() {
+export default async function AgencyPage() {
   const tenant = await getTenantContext()
 
   const [kpisResult, spaces, statusMix, weeklyActivity] = await Promise.all([
-    getAgencyPulseKpis().catch(err => { console.error('[AgencyPulse] KPI query error:', err); return null }),
-    getAgencySpacesHealth().catch(err => { console.error('[AgencyPulse] Spaces fetch error:', err); return [] }),
-    getAgencyStatusMix().catch(err => { console.error('[AgencyPulse] StatusMix fetch error:', err); return [] }),
-    getAgencyWeeklyActivity().catch(err => { console.error('[AgencyPulse] Weekly fetch error:', err); return [] })
+    getAgencyPulseKpis().catch(err => { console.error('[Agency] KPI query error:', err); return null }),
+    getAgencySpacesHealth().catch(err => { console.error('[Agency] Spaces fetch error:', err); return [] }),
+    getAgencyStatusMix().catch(err => { console.error('[Agency] StatusMix fetch error:', err); return [] }),
+    getAgencyWeeklyActivity().catch(err => { console.error('[Agency] Weekly fetch error:', err); return [] })
   ])
 
   const kpis = kpisResult ?? (spaces.length > 0 ? deriveKpisFromSpaces(spaces) : null)
 
   return (
     <Suspense>
-      <AgencyPulseView
-        kpis={kpis}
-        spaces={spaces}
-        statusMix={statusMix}
-        weeklyActivity={weeklyActivity}
+      <AgencyWorkspace
+        pulseKpis={kpis}
+        pulseSpaces={spaces}
+        pulseStatusMix={statusMix}
+        pulseWeeklyActivity={weeklyActivity}
         tenantName={tenant?.clientName ?? 'Efeonce'}
       />
     </Suspense>

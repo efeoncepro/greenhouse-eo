@@ -4,6 +4,10 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
+  getFinanceExpenseFromPostgres
+} from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
   runFinanceQuery,
   getFinanceProjectId,
   assertNonEmptyString,
@@ -122,9 +126,25 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { id: expenseId } = await params
+
+  // ── Postgres-first path ──
+  try {
+    const expense = await getFinanceExpenseFromPostgres(expenseId)
+
+    if (!expense) {
+      return NextResponse.json({ error: 'Expense record not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(expense)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<ExpenseDetailRow>(`

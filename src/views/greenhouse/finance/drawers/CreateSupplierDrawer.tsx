@@ -40,6 +40,36 @@ const TAX_ID_TYPES = [
   { value: 'OTHER', label: 'Otro' }
 ]
 
+const COUNTRIES = [
+  { value: 'CL', label: 'Chile' },
+  { value: 'AR', label: 'Argentina' },
+  { value: 'BR', label: 'Brasil' },
+  { value: 'CO', label: 'Colombia' },
+  { value: 'MX', label: 'México' },
+  { value: 'PE', label: 'Perú' },
+  { value: 'UY', label: 'Uruguay' },
+  { value: 'EC', label: 'Ecuador' },
+  { value: 'US', label: 'Estados Unidos' },
+  { value: 'ES', label: 'España' },
+  { value: 'GB', label: 'Reino Unido' },
+  { value: 'OTHER', label: 'Otro' }
+]
+
+const SERVICE_TYPES = [
+  { value: 'consulting', label: 'Consultoría' },
+  { value: 'development', label: 'Desarrollo' },
+  { value: 'design', label: 'Diseño' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'media_buying', label: 'Compra de medios' },
+  { value: 'hosting', label: 'Hosting / Cloud' },
+  { value: 'saas', label: 'SaaS / Licencias' },
+  { value: 'legal', label: 'Legal' },
+  { value: 'accounting', label: 'Contabilidad' },
+  { value: 'hr', label: 'Recursos Humanos' },
+  { value: 'office_supplies', label: 'Suministros de oficina' },
+  { value: 'other', label: 'Otro' }
+]
+
 const CURRENCIES = [
   { value: 'CLP', label: 'CLP' },
   { value: 'USD', label: 'USD' }
@@ -71,6 +101,17 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const handleCountryChange = (value: string) => {
+    setCountry(value)
+    setIsInternational(value !== 'CL')
+
+    if (value !== 'CL' && !paymentCurrency) {
+      setPaymentCurrency('USD')
+    } else if (value === 'CL' && paymentCurrency === 'USD') {
+      setPaymentCurrency('CLP')
+    }
+  }
 
   const resetForm = () => {
     setLegalName('')
@@ -197,13 +238,18 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
+              select
               fullWidth
               size='small'
               label='País'
               value={country}
-              onChange={e => setCountry(e.target.value)}
+              onChange={e => handleCountryChange(e.target.value)}
               required
-            />
+            >
+              {COUNTRIES.map(c => (
+                <MenuItem key={c.value} value={c.value}>{c.label}</MenuItem>
+              ))}
+            </CustomTextField>
           </Grid>
         </Grid>
 
@@ -235,12 +281,18 @@ const CreateSupplierDrawer = ({ open, onClose, onSuccess }: Props) => {
         </Grid>
 
         <CustomTextField
+          select
           fullWidth
           size='small'
           label='Tipo de servicio'
           value={serviceType}
           onChange={e => setServiceType(e.target.value)}
-        />
+        >
+          <MenuItem value=''>—</MenuItem>
+          {SERVICE_TYPES.map(t => (
+            <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
+          ))}
+        </CustomTextField>
 
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>

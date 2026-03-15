@@ -17,7 +17,16 @@ export async function GET(_: Request, { params }: { params: Promise<{ periodId: 
     const { periodId } = await params
     const entries = await getPayrollEntries(periodId)
 
-    return NextResponse.json(entries)
+    return NextResponse.json({
+      entries,
+      summary: {
+        total: entries.length,
+        manualKpiEntries: entries.filter(entry => entry.kpiDataSource === 'manual').length,
+        manualOverrideEntries: entries.filter(entry => entry.manualOverride).length,
+        totalGross: entries.reduce((sum, entry) => sum + entry.grossTotal, 0),
+        totalNet: entries.reduce((sum, entry) => sum + entry.netTotal, 0)
+      }
+    })
   } catch (error) {
     return toPayrollErrorResponse(error, 'Unable to load payroll entries.')
   }

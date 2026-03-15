@@ -51,7 +51,8 @@ src/assets/iconify-icons/generated-icons.css
 .codex/skills/greenhouse-agent/
 .codex/skills/greenhouse-portal-ui-implementer/
 .codex/skills/greenhouse-vuexy-ui-expert/
-CODEX_TASK_*.md
+/CODEX_TASK_*.md
+!docs/tasks/**/CODEX_TASK*.md
 src/app/api/internal/
 src/lib/ai/
 

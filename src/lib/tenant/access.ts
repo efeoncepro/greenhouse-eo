@@ -9,6 +9,17 @@ import {
   isLikelyEfeonceProfileMatch
 } from '@/lib/tenant/internal-email-aliases'
 import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
+import {
+  getSessionFromPostgresByEmail,
+  getSessionFromPostgresByGoogleSub,
+  getSessionFromPostgresByMicrosoftOid,
+  getSessionFromPostgresByUserId,
+  getInternalUsersFromPostgres,
+  linkMicrosoftIdentityInPostgres,
+  linkGoogleIdentityInPostgres,
+  updateLastLoginInPostgres,
+  shouldFallbackFromIdentityPostgres
+} from '@/lib/tenant/identity-store'
 
 type TenantType = 'client' | 'efeonce_internal'
 
@@ -82,10 +93,17 @@ export interface TenantAccessRecord {
 
 const rolePriority = [
   'efeonce_admin',
+  'employee',
   'finance_manager',
+  'finance_admin',
+  'finance_analyst',
   'hr_payroll',
+  'hr_manager',
   'efeonce_operations',
   'efeonce_account',
+  'people_viewer',
+  'ai_tooling_admin',
+  'collaborator',
   'client_executive',
   'client_manager',
   'client_specialist'
@@ -137,6 +155,11 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
       routeGroups.add('hr')
     }
 
+    if (roleCode === 'employee') {
+      routeGroups.add('internal')
+      routeGroups.add('employee')
+    }
+
     if (roleCode === 'finance_manager') {
       routeGroups.add('internal')
       routeGroups.add('finance')
@@ -144,6 +167,26 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
 
     if (roleCode === 'efeonce_admin') {
       routeGroups.add('admin')
+    }
+
+    if (roleCode === 'collaborator') {
+      routeGroups.add('my')
+    }
+
+    if (roleCode === 'hr_manager') {
+      routeGroups.add('hr')
+    }
+
+    if (roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
+      routeGroups.add('finance')
+    }
+
+    if (roleCode === 'people_viewer') {
+      routeGroups.add('people')
+    }
+
+    if (roleCode === 'ai_tooling_admin') {
+      routeGroups.add('ai_tooling')
     }
 
     if (roleCode.startsWith('client_')) {
@@ -194,7 +237,13 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     timezone: row.timezone || 'UTC',
     portalHomePath:
       row.portal_home_path ||
-      (roleCodes.includes('hr_payroll') ? '/hr/payroll' : tenantType === 'efeonce_internal' ? '/internal/dashboard' : '/dashboard'),
+      (roleCodes.includes('hr_payroll') || roleCodes.includes('hr_manager')
+        ? '/hr/payroll'
+        : roleCodes.includes('finance_analyst') || roleCodes.includes('finance_admin')
+          ? '/finance'
+          : tenantType === 'efeonce_internal'
+            ? '/internal/dashboard'
+            : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',
@@ -318,20 +367,46 @@ const getIdentityAccessRecordByUserId = async (userId: string) =>
   })
 
 export const getTenantAccessRecordByEmail = async (email: string) => {
+  try {
+    const pgRow = await getSessionFromPostgresByEmail(email)
+
+    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
   return getIdentityAccessRecordByEmail(email)
 }
 
-export const getTenantAccessRecordByMicrosoftOid = async (oid: string) =>
-  getIdentityAccessRecord({
+export const getTenantAccessRecordByMicrosoftOid = async (oid: string) => {
+  try {
+    const pgRow = await getSessionFromPostgresByMicrosoftOid(oid)
+
+    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  return getIdentityAccessRecord({
     whereClause: 'cu.microsoft_oid = @oid',
     params: { oid }
   })
+}
 
-export const getTenantAccessRecordByGoogleSub = async (sub: string) =>
-  getIdentityAccessRecord({
+export const getTenantAccessRecordByGoogleSub = async (sub: string) => {
+  try {
+    const pgRow = await getSessionFromPostgresByGoogleSub(sub)
+
+    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  return getIdentityAccessRecord({
     whereClause: 'cu.google_sub = @sub',
     params: { sub }
   })
+}
 
 export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
   email,
@@ -348,26 +423,42 @@ export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
     return null
   }
 
-  const projectId = getBigQueryProjectId()
-  const bigQuery = getBigQueryClient()
-
-  const [rows] = await bigQuery.query({
-    query: `
-      SELECT
-        cu.user_id,
-        cu.email,
-        cu.microsoft_email,
-        cu.full_name
-      FROM \`${projectId}.greenhouse.client_users\` AS cu
-      WHERE cu.active = TRUE
-        AND cu.status IN ('active', 'invited')
-        AND cu.tenant_type = 'efeonce_internal'
-    `
-  })
-
   const normalizedEmail = email.trim().toLowerCase()
 
-  const matches = (rows as InternalAliasCandidateRow[]).filter(row => {
+  // Try Postgres-first for internal user list
+  let candidateRows: InternalAliasCandidateRow[] | null = null
+
+  try {
+    const pgRows = await getInternalUsersFromPostgres()
+
+    candidateRows = pgRows as InternalAliasCandidateRow[]
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  // BigQuery fallback
+  if (!candidateRows) {
+    const projectId = getBigQueryProjectId()
+    const bigQuery = getBigQueryClient()
+
+    const [rows] = await bigQuery.query({
+      query: `
+        SELECT
+          cu.user_id,
+          cu.email,
+          cu.microsoft_email,
+          cu.full_name
+        FROM \`${projectId}.greenhouse.client_users\` AS cu
+        WHERE cu.active = TRUE
+          AND cu.status IN ('active', 'invited')
+          AND cu.tenant_type = 'efeonce_internal'
+      `
+    })
+
+    candidateRows = rows as InternalAliasCandidateRow[]
+  }
+
+  const matches = candidateRows.filter(row => {
     const aliases = buildEfeonceEmailAliasCandidates({
       email: row.email,
       fullName: row.full_name,
@@ -394,6 +485,15 @@ export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
     }
 
     return null
+  }
+
+  // Resolve the matched user — Postgres-first via getSessionFromPostgresByUserId
+  try {
+    const pgRow = await getSessionFromPostgresByUserId(matches[0].user_id)
+
+    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
   }
 
   return getIdentityAccessRecordByUserId(matches[0].user_id)
@@ -464,6 +564,19 @@ export const linkMicrosoftIdentity = async ({
   tenantId?: string | null
   microsoftEmail: string
 }) => {
+  // Write to Postgres first
+  try {
+    await linkMicrosoftIdentityInPostgres({
+      userId: tenant.userId,
+      oid,
+      tenantId,
+      microsoftEmail
+    })
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  // Always write to BigQuery (source of truth until full cutover)
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
@@ -506,6 +619,18 @@ export const linkGoogleIdentity = async ({
   sub: string
   googleEmail: string
 }) => {
+  // Write to Postgres first
+  try {
+    await linkGoogleIdentityInPostgres({
+      userId: tenant.userId,
+      sub,
+      googleEmail
+    })
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  // Always write to BigQuery (source of truth until full cutover)
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
@@ -538,6 +663,14 @@ export const linkGoogleIdentity = async ({
 }
 
 export const updateTenantLastLogin = async (tenant: TenantAccessRecord, provider = 'credentials') => {
+  // Write to Postgres first
+  try {
+    await updateLastLoginInPostgres(tenant.userId, provider)
+  } catch (error) {
+    if (!shouldFallbackFromIdentityPostgres(error)) throw error
+  }
+
+  // Always write to BigQuery (source of truth until full cutover)
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 

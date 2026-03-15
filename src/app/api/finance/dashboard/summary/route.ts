@@ -1,20 +1,28 @@
 import { NextResponse } from 'next/server'
 
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { toIncomePaymentCashEntries } from '@/lib/finance/income-payments'
+import { aggregateMonthlyEntries, buildCurrentMonthMetrics, getMonthKey, getRecentMonthKeys } from '@/lib/finance/reporting'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { getFinanceProjectId, runFinanceQuery, toNumber } from '@/lib/finance/shared'
+import { getFinanceProjectId, roundCurrency, runFinanceQuery, toDateString, toNumber } from '@/lib/finance/shared'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-interface SummaryRow {
-  income_month: unknown
-  income_prev: unknown
-  expenses_month: unknown
-  expenses_prev: unknown
-  receivables: unknown
-  receivable_invoices: unknown
-  payables: unknown
-  payable_count: unknown
+interface IncomeDashboardRow {
+  invoice_date: unknown
+  total_amount: unknown
+  total_amount_clp: unknown
+  amount_paid: unknown
+  exchange_rate_to_clp: unknown
+  payments_received: unknown
+  payment_status: string
+}
+
+interface ExpenseDashboardRow {
+  document_date: unknown
+  payment_date: unknown
+  total_amount_clp: unknown
+  payment_status: string
 }
 
 export async function GET() {
@@ -27,77 +35,136 @@ export async function GET() {
   await ensureFinanceInfrastructure()
 
   const projectId = getFinanceProjectId()
+  const monthKeys = getRecentMonthKeys(2)
 
-  const rows = await runFinanceQuery<SummaryRow>(`
-    SELECT
-      -- Income this month (paid or partial)
-      (SELECT COALESCE(SUM(total_amount_clp), 0)
-       FROM \`${projectId}.greenhouse.fin_income\`
-       WHERE payment_status IN ('paid', 'partial')
-         AND FORMAT_DATE('%Y-%m', invoice_date) = FORMAT_DATE('%Y-%m', CURRENT_DATE())
-      ) AS income_month,
+  const [incomeRows, expenseRows] = await Promise.all([
+    runFinanceQuery<IncomeDashboardRow>(`
+      SELECT invoice_date, total_amount, total_amount_clp, amount_paid, exchange_rate_to_clp, payments_received, payment_status
+      FROM \`${projectId}.greenhouse.fin_income\`
+    `),
+    runFinanceQuery<ExpenseDashboardRow>(`
+      SELECT document_date, payment_date, total_amount_clp, payment_status
+      FROM \`${projectId}.greenhouse.fin_expenses\`
+    `)
+  ])
 
-      -- Income previous month
-      (SELECT COALESCE(SUM(total_amount_clp), 0)
-       FROM \`${projectId}.greenhouse.fin_income\`
-       WHERE payment_status IN ('paid', 'partial')
-         AND FORMAT_DATE('%Y-%m', invoice_date) = FORMAT_DATE('%Y-%m', DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
-      ) AS income_prev,
+  const incomeAccrualSeries = aggregateMonthlyEntries(
+    incomeRows
+      .map(row => ({
+        period: getMonthKey(toDateString(row.invoice_date as string | { value?: string } | null)),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period)),
+    monthKeys
+  )
 
-      -- Expenses this month (paid)
-      (SELECT COALESCE(SUM(total_amount_clp), 0)
-       FROM \`${projectId}.greenhouse.fin_expenses\`
-       WHERE payment_status = 'paid'
-         AND FORMAT_DATE('%Y-%m', COALESCE(payment_date, document_date)) = FORMAT_DATE('%Y-%m', CURRENT_DATE())
-      ) AS expenses_month,
+  const incomeCashSeries = aggregateMonthlyEntries(
+    incomeRows
+      .flatMap(row =>
+        toIncomePaymentCashEntries({
+          exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+          paymentsReceived: row.payments_received
+        })
+      )
+      .map(payment => ({
+        period: getMonthKey(payment.paymentDate),
+        amountClp: payment.amountClp
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period)),
+    monthKeys
+  )
 
-      -- Expenses previous month
-      (SELECT COALESCE(SUM(total_amount_clp), 0)
-       FROM \`${projectId}.greenhouse.fin_expenses\`
-       WHERE payment_status = 'paid'
-         AND FORMAT_DATE('%Y-%m', COALESCE(payment_date, document_date)) = FORMAT_DATE('%Y-%m', DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
-      ) AS expenses_prev,
+  const expenseAccrualSeries = aggregateMonthlyEntries(
+    expenseRows
+      .map(row => ({
+        period: getMonthKey(
+          toDateString((row.document_date || row.payment_date) as string | { value?: string } | null)
+        ),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period)),
+    monthKeys
+  )
 
-      -- Accounts receivable
-      (SELECT COALESCE(SUM(total_amount - COALESCE(amount_paid, 0)), 0)
-       FROM \`${projectId}.greenhouse.fin_income\`
-       WHERE payment_status IN ('pending', 'overdue', 'partial')
-      ) AS receivables,
+  const expenseCashSeries = aggregateMonthlyEntries(
+    expenseRows
+      .filter(row => row.payment_status === 'paid')
+      .map(row => ({
+        period: getMonthKey(toDateString(row.payment_date as string | { value?: string } | null)),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period)),
+    monthKeys
+  )
 
-      (SELECT COUNT(*)
-       FROM \`${projectId}.greenhouse.fin_income\`
-       WHERE payment_status IN ('pending', 'overdue')
-      ) AS receivable_invoices,
+  const incomeCashMetrics = buildCurrentMonthMetrics(incomeCashSeries)
+  const expenseCashMetrics = buildCurrentMonthMetrics(expenseCashSeries)
+  const incomeAccrualMetrics = buildCurrentMonthMetrics(incomeAccrualSeries)
+  const expenseAccrualMetrics = buildCurrentMonthMetrics(expenseAccrualSeries)
 
-      -- Accounts payable
-      (SELECT COALESCE(SUM(total_amount_clp), 0)
-       FROM \`${projectId}.greenhouse.fin_expenses\`
-       WHERE payment_status = 'pending'
-      ) AS payables,
+  const receivables = roundCurrency(
+    incomeRows.reduce((sum, row) => {
+      if (!['pending', 'overdue', 'partial'].includes(row.payment_status)) {
+        return sum
+      }
 
-      (SELECT COUNT(*)
-       FROM \`${projectId}.greenhouse.fin_expenses\`
-       WHERE payment_status = 'pending'
-      ) AS payable_count
-  `)
+      const totalAmount = toNumber(row.total_amount)
+      const amountPaid = toNumber(row.amount_paid)
+      const pendingAmount = Math.max(0, totalAmount - amountPaid)
 
-  const row = rows[0] || {}
-  const incomeMonth = toNumber(row.income_month)
-  const incomePrev = toNumber(row.income_prev)
-  const expensesMonth = toNumber(row.expenses_month)
-  const expensesPrev = toNumber(row.expenses_prev)
+      if (pendingAmount <= 0 || totalAmount <= 0) {
+        return sum
+      }
+
+      return sum + (toNumber(row.total_amount_clp) * pendingAmount) / totalAmount
+    }, 0)
+  )
+
+  const receivableInvoices = incomeRows.filter(row => {
+    if (!['pending', 'overdue', 'partial'].includes(row.payment_status)) {
+      return false
+    }
+
+    return Math.max(0, toNumber(row.total_amount) - toNumber(row.amount_paid)) > 0
+  }).length
+
+  const payables = roundCurrency(
+    expenseRows.reduce((sum, row) => (
+      row.payment_status === 'pending' ? sum + toNumber(row.total_amount_clp) : sum
+    ), 0)
+  )
+
+  const payableCount = expenseRows.filter(row => row.payment_status === 'pending').length
 
   return NextResponse.json({
-    incomeMonth,
-    incomePrev,
-    incomeTrend: incomePrev > 0 ? Math.round(((incomeMonth - incomePrev) / incomePrev) * 100) : 0,
-    expensesMonth,
-    expensesPrev,
-    expensesTrend: expensesPrev > 0 ? Math.round(((expensesMonth - expensesPrev) / expensesPrev) * 100) : 0,
-    netFlow: incomeMonth - expensesMonth,
-    receivables: toNumber(row.receivables),
-    receivableInvoices: toNumber(row.receivable_invoices),
-    payables: toNumber(row.payables),
-    payableCount: toNumber(row.payable_count)
+    incomeMonth: incomeCashMetrics.totalAmountClp,
+    incomePrev: incomeCashMetrics.previousTotalAmountClp,
+    incomeTrend: incomeCashMetrics.changePercent,
+    expensesMonth: expenseCashMetrics.totalAmountClp,
+    expensesPrev: expenseCashMetrics.previousTotalAmountClp,
+    expensesTrend: expenseCashMetrics.changePercent,
+    netFlow: incomeCashMetrics.totalAmountClp - expenseCashMetrics.totalAmountClp,
+    receivables,
+    receivableInvoices,
+    payables,
+    payableCount,
+    cash: {
+      incomeMonth: incomeCashMetrics.totalAmountClp,
+      incomePrev: incomeCashMetrics.previousTotalAmountClp,
+      incomeTrend: incomeCashMetrics.changePercent,
+      expensesMonth: expenseCashMetrics.totalAmountClp,
+      expensesPrev: expenseCashMetrics.previousTotalAmountClp,
+      expensesTrend: expenseCashMetrics.changePercent,
+      netFlow: incomeCashMetrics.totalAmountClp - expenseCashMetrics.totalAmountClp
+    },
+    accrual: {
+      incomeMonth: incomeAccrualMetrics.totalAmountClp,
+      incomePrev: incomeAccrualMetrics.previousTotalAmountClp,
+      incomeTrend: incomeAccrualMetrics.changePercent,
+      expensesMonth: expenseAccrualMetrics.totalAmountClp,
+      expensesPrev: expenseAccrualMetrics.previousTotalAmountClp,
+      expensesTrend: expenseAccrualMetrics.changePercent,
+      netFlow: incomeAccrualMetrics.totalAmountClp - expenseAccrualMetrics.totalAmountClp
+    }
   })
 }

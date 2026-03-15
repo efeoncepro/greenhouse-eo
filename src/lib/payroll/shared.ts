@@ -83,6 +83,21 @@ export const normalizeBoolean = (value: unknown) => {
   return Boolean(value)
 }
 
+export const buildPayrollQueryTypes = (
+  params: Record<string, unknown>,
+  columnTypes: Record<string, string>
+) => {
+  const types: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null && columnTypes[key]) {
+      types[key] = columnTypes[key]
+    }
+  }
+
+  return Object.keys(types).length > 0 ? types : undefined
+}
+
 export const parsePayrollNumber = (
   value: unknown,
   fieldName: string,
@@ -148,10 +163,15 @@ export const assertPayrollDateString = (value: unknown, fieldName: string) => {
   return normalized
 }
 
-export const runPayrollQuery = async <T>(query: string, params: Record<string, unknown> = {}) => {
+export const runPayrollQuery = async <T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  types?: Record<string, string>
+) => {
   const [rows] = await getBigQueryClient().query({
     query,
-    params
+    params,
+    types
   })
 
   return rows as T[]

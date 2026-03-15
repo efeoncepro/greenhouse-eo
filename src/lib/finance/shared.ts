@@ -5,12 +5,14 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 export class FinanceValidationError extends Error {
   statusCode: number
   details?: unknown
+  code?: string
 
-  constructor(message: string, statusCode = 400, details?: unknown) {
+  constructor(message: string, statusCode = 400, details?: unknown, code?: string) {
     super(message)
     this.name = 'FinanceValidationError'
     this.statusCode = statusCode
     this.details = details
+    this.code = code
   }
 }
 
@@ -25,8 +27,26 @@ export const toNumber = (value: unknown): number => {
     return Number.isFinite(parsed) ? parsed : 0
   }
 
-  if (value && typeof value === 'object' && 'value' in value) {
-    return toNumber((value as { value?: unknown }).value)
+  if (value && typeof value === 'object') {
+    // BigQuery NUMERIC columns return Big.js instances with valueOf/toNumber
+    if (typeof (value as Record<string, unknown>).valueOf === 'function') {
+      const primitive = (value as { valueOf: () => unknown }).valueOf()
+
+      if (typeof primitive === 'number') {
+        return Number.isFinite(primitive) ? primitive : 0
+      }
+
+      if (typeof primitive === 'string') {
+        const parsed = Number(primitive)
+
+        return Number.isFinite(parsed) ? parsed : 0
+      }
+    }
+
+    // BigQueryTimestamp / BigQueryDate with { value: ... }
+    if ('value' in value) {
+      return toNumber((value as { value?: unknown }).value)
+    }
   }
 
   return 0
@@ -135,6 +155,20 @@ export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
 export const EXPENSE_TYPES = ['supplier', 'payroll', 'social_security', 'tax', 'miscellaneous'] as const
 export type ExpenseType = (typeof EXPENSE_TYPES)[number]
 
+export const SOCIAL_SECURITY_TYPES = ['afp', 'health', 'unemployment', 'mutual', 'caja_compensacion'] as const
+export type SocialSecurityType = (typeof SOCIAL_SECURITY_TYPES)[number]
+
+export const TAX_TYPES = [
+  'iva_mensual',
+  'ppm',
+  'renta_anual',
+  'patente',
+  'contribuciones',
+  'retencion_honorarios',
+  'other'
+] as const
+export type TaxType = (typeof TAX_TYPES)[number]
+
 export const PAYMENT_STATUSES = ['pending', 'partial', 'paid', 'overdue', 'written_off'] as const
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
@@ -169,7 +203,16 @@ export type ContactRole = (typeof CONTACT_ROLES)[number]
 export const runFinanceQuery = async <T>(query: string, params?: Record<string, unknown>): Promise<T[]> => {
   const bigQuery = getBigQueryClient()
 
-  const [rows] = await bigQuery.query({ query, params })
+  // BigQuery throws on null params when it cannot infer the type.
+  // Replace null/undefined with empty string — the normalisation layer
+  // already treats '' and null identically on read.
+  const safeParams = params
+    ? Object.fromEntries(
+        Object.entries(params).map(([key, value]) => [key, value ?? ''])
+      )
+    : undefined
+
+  const [rows] = await bigQuery.query({ query, params: safeParams })
 
   return rows as T[]
 }
@@ -183,19 +226,31 @@ export const getLatestExchangeRate = async ({
   fromCurrency: FinanceCurrency
   toCurrency: FinanceCurrency
 }) => {
-  const projectId = getFinanceProjectId()
+  const { getLatestStoredExchangeRatePair, syncDailyUsdClpExchangeRate } = await import('@/lib/finance/exchange-rates')
 
-  const rows = await runFinanceQuery<{ rate: unknown }>(`
-    SELECT rate
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE from_currency = @fromCurrency AND to_currency = @toCurrency
-    ORDER BY rate_date DESC
-    LIMIT 1
-  `, { fromCurrency, toCurrency })
+  const latest = await getLatestStoredExchangeRatePair({ fromCurrency, toCurrency })
 
-  const rate = toNumber(rows[0]?.rate)
+  if (latest && latest.rate > 0) {
+    return latest.rate
+  }
 
-  return rate > 0 ? rate : null
+  const supportsAutoSync =
+    (fromCurrency === 'USD' && toCurrency === 'CLP') ||
+    (fromCurrency === 'CLP' && toCurrency === 'USD')
+
+  if (!supportsAutoSync) {
+    return null
+  }
+
+  const syncResult = await syncDailyUsdClpExchangeRate()
+
+  if (!syncResult.synced) {
+    return null
+  }
+
+  const synced = await getLatestStoredExchangeRatePair({ fromCurrency, toCurrency })
+
+  return synced && synced.rate > 0 ? synced.rate : null
 }
 
 export const resolveExchangeRateToClp = async ({

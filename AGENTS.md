@@ -11,6 +11,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
+  - los briefs `CODEX_TASK_*` que sigan vivos para el proyecto deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades
 1. Mantener el proyecto desplegable en Vercel.
@@ -26,6 +28,17 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
+- Si el trabajo nace de una `CODEX_TASK_*`, revisar obligatoriamente la arquitectura antes de implementar:
+  - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
+  - revisar `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - revisar `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
+- Si el cambio toca PostgreSQL, Cloud SQL, backfills, source sync o migraciones runtime:
+  - revisar `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
+- Si una `CODEX_TASK_*` contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
@@ -184,6 +197,45 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - No introducir variables nuevas sin documentarlas en `project_context.md`.
 - Mantener `.env.example` alineado con cualquier variable requerida por el proyecto.
 - No asumir que Vercel tiene variables cargadas.
+
+### Acceso PostgreSQL
+- Greenhouse usa tres perfiles de acceso para PostgreSQL:
+  - `runtime`
+  - `migrator`
+  - `admin`
+- Variables por perfil:
+  - `runtime`:
+    - `GREENHOUSE_POSTGRES_USER`
+    - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `migrator`:
+    - `GREENHOUSE_POSTGRES_MIGRATOR_USER`
+    - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
+  - `admin`:
+    - `GREENHOUSE_POSTGRES_ADMIN_USER`
+    - `GREENHOUSE_POSTGRES_ADMIN_PASSWORD`
+- Variables compartidas obligatorias:
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` o `GREENHOUSE_POSTGRES_HOST`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_PORT`
+- Regla operativa:
+  - runtime del portal usa solo credenciales `runtime`
+  - setup y migraciones usan `migrator`
+  - bootstrap de acceso usa `admin`
+  - no hacer DDL con el usuario runtime salvo que exista una razon excepcional y quede documentada
+- Comandos canonicos:
+  - `pnpm setup:postgres:access`
+  - `pnpm pg:doctor`
+  - `pnpm setup:postgres:canonical-360`
+  - `pnpm setup:postgres:hr-leave`
+  - `pnpm setup:postgres:payroll`
+  - `pnpm setup:postgres:finance`
+  - `pnpm setup:postgres:source-sync`
+- Antes de cortar cualquier dominio nuevo a PostgreSQL:
+  - correr `pnpm pg:doctor --profile=runtime`
+  - correr `pnpm pg:doctor --profile=migrator`
+  - confirmar en `Handoff.md` si el dominio ya fue tocado por otro agente
+- Fuente canonica del modelo:
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 
 ## Checklist de Cierre de Turno
 - Cambios acotados y entendibles.

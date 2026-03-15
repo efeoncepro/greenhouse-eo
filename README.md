@@ -9,7 +9,7 @@ Greenhouse ya corre como una aplicación App Router con:
 - autenticación con `next-auth` contra `greenhouse.client_users`
 - login por `credentials`, Microsoft Entra ID y Google OAuth
 - data server-side desde BigQuery
-- superficies cliente, `internal`, `admin`, `agency` y `capabilities`
+- superficies cliente, `internal`, `admin`, `agency`, `capabilities`, `people`, `hr` y `finance`
 - branding y nomenclatura Greenhouse encima de Vuexy, sin crear un theme paralelo
 
 El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecutiva, contexto operativo y gobierno de acceso sobre las fuentes de verdad reales.
@@ -26,6 +26,24 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - `/settings`
 - `/capabilities/[moduleId]`
 - `/updates`
+
+### Operación interna
+
+- `/people`
+- `/people/[memberId]`
+- `/hr/payroll`
+- `/hr/payroll/member/[memberId]`
+- `/finance`
+- `/finance/clients`
+- `/finance/clients/[id]`
+- `/finance/income`
+- `/finance/income/[id]`
+- `/finance/expenses`
+- `/finance/expenses/[id]`
+- `/finance/suppliers`
+- `/finance/suppliers/[id]`
+- `/finance/reconciliation`
+- `/finance/reconciliation/[id]`
 
 ### Acceso
 
@@ -71,6 +89,41 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - `/api/team/by-project/[projectId]`
 - `/api/team/by-sprint/[sprintId]`
 
+### People y HR
+
+- `/api/people`
+- `/api/people/[memberId]`
+- `/api/people/[memberId]/finance`
+- `/api/hr/payroll/compensation`
+- `/api/hr/payroll/entries`
+- `/api/hr/payroll/members`
+- `/api/hr/payroll/periods`
+
+### Finance
+
+- `/api/finance/accounts`
+- `/api/finance/accounts/[id]`
+- `/api/finance/clients`
+- `/api/finance/clients/[id]`
+- `/api/finance/clients/sync`
+- `/api/finance/exchange-rates`
+- `/api/finance/exchange-rates/latest`
+- `/api/finance/expenses`
+- `/api/finance/expenses/[id]`
+- `/api/finance/expenses/bulk`
+- `/api/finance/expenses/summary`
+- `/api/finance/income`
+- `/api/finance/income/[id]`
+- `/api/finance/income/summary`
+- `/api/finance/reconciliation`
+- `/api/finance/reconciliation/[id]`
+- `/api/finance/suppliers`
+- `/api/finance/suppliers/[id]`
+- `/api/finance/dashboard/aging`
+- `/api/finance/dashboard/by-service-line`
+- `/api/finance/dashboard/cashflow`
+- `/api/finance/dashboard/summary`
+
 ### Capabilities
 
 - `/api/capabilities/resolve`
@@ -104,12 +157,17 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - Vuexy como base de shell, navegación y patrones UI
 - `next-auth` para sesión
 - `@google-cloud/bigquery` para lectura de datos
+- PostgreSQL (Cloud SQL) como store transaccional para módulos de dominio
 - PNPM
 - Vercel como plataforma de deploy
 
 ## Fuentes de datos y contratos
 
-- BigQuery es la fuente principal del portal.
+El portal opera con dos capas de datos complementarias:
+
+### BigQuery (lectura analítica)
+
+- Fuente principal para dashboards, reportes y consultas de lectura masiva.
 - Las queries viven server-side; el browser no consulta BigQuery directamente.
 - El modelo real de acceso parte de:
   - `greenhouse.client_users`
@@ -119,12 +177,45 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
   - `greenhouse.user_campaign_scopes`
 - El dashboard, agency, capabilities, team y varias superficies admin ya leen tablas reales de `greenhouse` y `notion_ops`.
 
+### PostgreSQL — Modelo canónico 360 (escritura transaccional)
+
+Cloud SQL (`greenhouse-pg-dev`) aloja el modelo canónico con identidades estables y schemas de dominio. Cada módulo transaccional migra progresivamente de BigQuery a PostgreSQL siguiendo el patrón Postgres-first con fallback a BigQuery.
+
+**Schemas activos:**
+
+| Schema | Propósito | Estado |
+|--------|-----------|--------|
+| `greenhouse_core` | Identidades canónicas: `members`, `clients`, `client_users`, `departments`, `providers` | Productivo |
+| `greenhouse_hr` | Leave requests, balances, policies | Productivo |
+| `greenhouse_payroll` | Compensaciones, períodos, liquidaciones, config de bonos | Productivo |
+| `greenhouse_finance` | Cuentas, ingresos, egresos, proveedores, reconciliación | Productivo |
+| `greenhouse_serving` | Vistas de lectura optimizadas (`member_leave_360`, `member_payroll_360`) | Productivo |
+| `greenhouse_sync` | Outbox de eventos para sync async a BigQuery | Productivo |
+
+**Principios del modelo 360:**
+
+- Una identidad canónica por objeto de negocio (`member_id`, `client_id`, `user_id`)
+- Los módulos de dominio extienden identidades vía FK, nunca las redefinen
+- Snapshots de campos desnormalizados permitidos solo en registros históricos (Rule 6)
+- Todas las escrituras publican a `greenhouse_sync.outbox_events` para consistencia eventual con BigQuery
+
+**Provisioning de schemas:**
+
+```bash
+pnpm setup:postgres:canonical-360   # greenhouse_core + greenhouse_serving + greenhouse_sync
+pnpm setup:postgres:hr-leave        # greenhouse_hr
+pnpm setup:postgres:payroll          # greenhouse_payroll
+pnpm setup:postgres:finance          # greenhouse_finance
+pnpm setup:postgres:source-sync     # source sync tables
+```
+
 ## Estado funcional actual
 
 - El portal ya protege superficies autenticadas con `next-auth`.
 - Microsoft SSO y Google SSO ya conviven con `credentials` sobre el mismo principal canónico.
 - El dashboard cliente ya es una vista ejecutiva real, no una demo.
 - Proyectos, detalle de proyecto, sprints, settings, admin tenants y agency ya existen como módulos vivos.
+- People, HR Payroll y Finance ya existen como superficies reales del portal, con runtime PostgreSQL (modelo canónico 360).
 - Capabilities ya tiene routing, resolución por tenant y preview admin.
 - Team/capacity ya tiene APIs dedicadas y componentes propios de Greenhouse.
 - El runtime ya soporta persistencia de logo de tenant y avatar de usuario.
@@ -180,12 +271,17 @@ Variables activas en `.env.example`:
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`
 - `GREENHOUSE_AGENT_MODEL`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+- `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+- `GREENHOUSE_POSTGRES_DATABASE`
+- `GREENHOUSE_POSTGRES_USER`
+- `GREENHOUSE_POSTGRES_PASSWORD`
 
 Notas operativas:
 
 - `BASEPATH` solo debe definirse si realmente se usa `basePath`.
 - Para previews con login real, las variables de auth y credenciales GCP deben existir también en `Preview`.
 - Para Microsoft SSO y Google SSO, los redirect URIs deben estar registrados en Azure y GCP respectivamente.
+- Las variables `GREENHOUSE_POSTGRES_*` habilitan el runtime PostgreSQL. Si no están definidas, los módulos migrados caen automáticamente a BigQuery.
 
 ## Convenciones del repo
 
@@ -225,7 +321,11 @@ Notas operativas:
 - `docs/ui/*`: sistema visual, orquestación UI y validación visual
 - `docs/roadmap/*`: backlog y matriz de fases
 - `docs/operations/*`: modelo de documentación
-- `docs/tasks/*`: briefs `CODEX_TASK_*`
+- `docs/tasks/README.md`: tablero maestro de briefs `CODEX_TASK_*`
+  - `docs/tasks/in-progress/*`: briefs activos o parcialmente implementados
+  - `docs/tasks/to-do/*`: backlog listo para retomarse
+  - `docs/tasks/complete/*`: briefs cerrados, absorbidos o históricos
+  - los briefs vigentes deben vivir versionados dentro de estas carpetas, no como archivos sueltos en raíz
 
 ## Qué leer primero
 
@@ -241,6 +341,8 @@ Si el cambio toca producto, auth, data o arquitectura:
 1. `../Greenhouse_Portal_Spec_v1.md`
 2. `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 3. `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
+4. `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+5. `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 
 Si el cambio es UI:
 

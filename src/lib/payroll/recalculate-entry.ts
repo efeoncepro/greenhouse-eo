@@ -10,6 +10,7 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
+import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/postgres-store'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -63,13 +64,23 @@ const assertOptionalNumericInput = ({
 }
 
 const getBonusConfigForPeriod = async (periodId: string) => {
-  const projectId = getProjectId()
   const period = await getPayrollPeriod(periodId)
 
   if (!period) {
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
+  if (isPayrollPostgresEnabled()) {
+    const config = await pgGetActiveBonusConfig()
+
+    return {
+      period,
+      otdThreshold: config?.otdThreshold ?? 89,
+      rpaThreshold: config?.rpaThreshold ?? 2
+    }
+  }
+
+  const projectId = getProjectId()
   const { periodEnd } = getPeriodRangeFromId(periodId)
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
@@ -122,7 +133,9 @@ export const recalculatePayrollEntry = async ({
   entryId: string
   input: UpdatePayrollEntryInput
 }): Promise<PayrollEntry> => {
-  await ensurePayrollInfrastructure()
+  if (!isPayrollPostgresEnabled()) {
+    await ensurePayrollInfrastructure()
+  }
 
   assertOptionalNumericInput({ value: input.bonusOtdAmount, fieldName: 'bonusOtdAmount', min: 0 })
   assertOptionalNumericInput({ value: input.bonusRpaAmount, fieldName: 'bonusRpaAmount', min: 0 })

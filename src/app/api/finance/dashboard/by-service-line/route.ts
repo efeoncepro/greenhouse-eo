@@ -1,16 +1,33 @@
 import { NextResponse } from 'next/server'
 
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { toIncomePaymentCashEntries } from '@/lib/finance/income-payments'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { getFinanceProjectId, runFinanceQuery, toNumber } from '@/lib/finance/shared'
+import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber } from '@/lib/finance/shared'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-interface ServiceLineRow {
-  service_line: string
-  income: unknown
-  expenses: unknown
+interface IncomeServiceLineRow {
+  service_line: string | null
+  total_amount_clp: unknown
+  exchange_rate_to_clp: unknown
+  payments_received: unknown
 }
+
+interface ExpenseServiceLineRow {
+  service_line: string | null
+  total_amount_clp: unknown
+  payment_status: string
+}
+
+type ServiceLineTotals = {
+  cashIncome: number
+  cashExpenses: number
+  accrualIncome: number
+  accrualExpenses: number
+}
+
+const getBucket = (serviceLine: string | null) => serviceLine || 'unassigned'
 
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -23,34 +40,75 @@ export async function GET() {
 
   const projectId = getFinanceProjectId()
 
-  const rows = await runFinanceQuery<ServiceLineRow>(`
-    WITH service_income AS (
-      SELECT COALESCE(service_line, 'unassigned') AS service_line, SUM(total_amount_clp) AS total
+  const [incomeRows, expenseRows] = await Promise.all([
+    runFinanceQuery<IncomeServiceLineRow>(`
+      SELECT service_line, total_amount_clp, exchange_rate_to_clp, payments_received
       FROM \`${projectId}.greenhouse.fin_income\`
-      WHERE payment_status IN ('paid', 'partial')
-      GROUP BY 1
-    ),
-    service_expenses AS (
-      SELECT COALESCE(service_line, 'unassigned') AS service_line, SUM(total_amount_clp) AS total
+    `),
+    runFinanceQuery<ExpenseServiceLineRow>(`
+      SELECT service_line, total_amount_clp, payment_status
       FROM \`${projectId}.greenhouse.fin_expenses\`
-      WHERE payment_status = 'paid'
-      GROUP BY 1
-    )
-    SELECT
-      COALESCE(i.service_line, e.service_line) AS service_line,
-      COALESCE(i.total, 0) AS income,
-      COALESCE(e.total, 0) AS expenses
-    FROM service_income i
-    FULL OUTER JOIN service_expenses e ON e.service_line = i.service_line
-    ORDER BY income DESC
-  `)
+    `)
+  ])
 
-  return NextResponse.json({
-    serviceLines: rows.map(r => ({
-      serviceLine: r.service_line,
-      income: toNumber(r.income),
-      expenses: toNumber(r.expenses),
-      net: toNumber(r.income) - toNumber(r.expenses)
-    }))
+  const totalsByServiceLine = new Map<string, ServiceLineTotals>()
+
+  const ensureBucket = (serviceLine: string) => {
+    const existing = totalsByServiceLine.get(serviceLine)
+
+    if (existing) {
+      return existing
+    }
+
+    const next: ServiceLineTotals = {
+      cashIncome: 0,
+      cashExpenses: 0,
+      accrualIncome: 0,
+      accrualExpenses: 0
+    }
+
+    totalsByServiceLine.set(serviceLine, next)
+
+    return next
+  }
+
+  incomeRows.forEach(row => {
+    const bucket = ensureBucket(getBucket(row.service_line))
+
+    bucket.accrualIncome = roundCurrency(bucket.accrualIncome + toNumber(row.total_amount_clp))
+
+    toIncomePaymentCashEntries({
+      exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+      paymentsReceived: row.payments_received
+    }).forEach(payment => {
+      bucket.cashIncome = roundCurrency(bucket.cashIncome + payment.amountClp)
+    })
   })
+
+  expenseRows.forEach(row => {
+    const bucket = ensureBucket(getBucket(row.service_line))
+
+    bucket.accrualExpenses = roundCurrency(bucket.accrualExpenses + toNumber(row.total_amount_clp))
+
+    if (row.payment_status === 'paid') {
+      bucket.cashExpenses = roundCurrency(bucket.cashExpenses + toNumber(row.total_amount_clp))
+    }
+  })
+
+  const serviceLines = Array.from(totalsByServiceLine.entries())
+    .map(([serviceLine, totals]) => ({
+      serviceLine,
+      income: totals.cashIncome,
+      expenses: totals.cashExpenses,
+      net: totals.cashIncome - totals.cashExpenses,
+      cashIncome: totals.cashIncome,
+      cashExpenses: totals.cashExpenses,
+      cashNet: totals.cashIncome - totals.cashExpenses,
+      accrualIncome: totals.accrualIncome,
+      accrualExpenses: totals.accrualExpenses,
+      accrualNet: totals.accrualIncome - totals.accrualExpenses
+    }))
+    .sort((left, right) => right.cashIncome - left.cashIncome)
+
+  return NextResponse.json({ serviceLines })
 }

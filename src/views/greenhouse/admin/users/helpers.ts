@@ -54,6 +54,10 @@ export const roleIconFor = (roleCode: string) => {
   if (normalized.includes('ops') || normalized.includes('operations')) return 'tabler-briefcase'
   if (normalized.includes('finance') || normalized.includes('billing')) return 'tabler-cash'
   if (normalized.includes('campaign')) return 'tabler-speakerphone'
+  if (normalized.includes('hr') || normalized.includes('payroll')) return 'tabler-heart-handshake'
+  if (normalized.includes('people')) return 'tabler-users-group'
+  if (normalized.includes('ai') || normalized.includes('tooling')) return 'tabler-robot'
+  if (normalized.includes('collaborator')) return 'tabler-user-circle'
 
   return 'tabler-user'
 }
@@ -64,6 +68,10 @@ export const roleColorFor = (roleCode: string): ThemeColor => {
   if (normalized.includes('admin')) return 'error'
   if (normalized.includes('internal')) return 'info'
   if (normalized.includes('ops') || normalized.includes('operations')) return 'warning'
+  if (normalized.includes('hr') || normalized.includes('payroll')) return 'success'
+  if (normalized.includes('finance')) return 'info'
+  if (normalized.includes('people')) return 'secondary'
+  if (normalized.includes('ai') || normalized.includes('tooling')) return 'warning'
 
   return 'primary'
 }

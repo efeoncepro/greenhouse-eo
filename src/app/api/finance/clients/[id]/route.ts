@@ -133,20 +133,64 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         PARTITION BY hubspot_company_id
         ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, client_profile_id
       ) = 1
+    ),
+    crm_company_by_client AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.crm_companies\`
+      WHERE client_id IS NOT NULL
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY client_id
+        ORDER BY updated_at DESC NULLS LAST, synced_at DESC NULLS LAST, company_source_id
+      ) = 1
+    ),
+    crm_company_by_hubspot AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.crm_companies\`
+      WHERE is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY company_source_id
+        ORDER BY updated_at DESC NULLS LAST, synced_at DESC NULLS LAST, company_source_id
+      ) = 1
+    ),
+    module_summary_by_client AS (
+      SELECT
+        csm.client_id,
+        STRING_AGG(
+          DISTINCT IF(sm.module_kind = 'business_line', sm.module_code, NULL),
+          ';' IGNORE NULLS
+          ORDER BY IF(sm.module_kind = 'business_line', sm.module_code, NULL)
+        ) AS business_lines_raw,
+        STRING_AGG(
+          DISTINCT IF(sm.module_kind = 'service_module', sm.module_code, NULL),
+          ';' IGNORE NULLS
+          ORDER BY IF(sm.module_kind = 'service_module', sm.module_code, NULL)
+        ) AS service_modules_raw
+      FROM \`${projectId}.greenhouse.client_service_modules\` csm
+      LEFT JOIN \`${projectId}.greenhouse.service_modules\` sm
+        ON sm.module_code = csm.module_code
+      WHERE csm.active = TRUE
+      GROUP BY csm.client_id
     )
     SELECT
       gc.client_id,
       gc.client_name AS greenhouse_client_name,
       COALESCE(fp_client.client_profile_id, fp_legacy.client_profile_id, fp_hubspot.client_profile_id, CAST(gc.client_id AS STRING), CAST(gc.hubspot_company_id AS STRING)) AS client_profile_id,
       COALESCE(fp_client.hubspot_company_id, fp_legacy.hubspot_company_id, fp_hubspot.hubspot_company_id, CAST(gc.hubspot_company_id AS STRING)) AS hubspot_company_id,
-      ${companyExpressions.nameExpr} AS company_name,
-      ${companyExpressions.domainExpr} AS company_domain,
-      ${companyExpressions.countryExpr} AS company_country,
-      ${companyExpressions.businessLineExpr} AS business_line,
-      ${companyExpressions.servicesExpr} AS service_modules_raw,
+      COALESCE(cc.company_name, ${companyExpressions.nameExpr}) AS company_name,
+      COALESCE(
+        NULLIF(REGEXP_EXTRACT(COALESCE(cc.website_url, ''), r'^(?:https?://)?(?:www\\.)?([^/]+)'), ''),
+        ${companyExpressions.domainExpr}
+      ) AS company_domain,
+      COALESCE(cc.country_code, ${companyExpressions.countryExpr}) AS company_country,
+      COALESCE(
+        SPLIT(COALESCE(ms.business_lines_raw, ''), ';')[SAFE_OFFSET(0)],
+        ${companyExpressions.businessLineExpr}
+      ) AS business_line,
+      COALESCE(ms.service_modules_raw, ${companyExpressions.servicesExpr}) AS service_modules_raw,
       COALESCE(fp_client.tax_id, fp_legacy.tax_id, fp_hubspot.tax_id) AS tax_id,
       COALESCE(fp_client.tax_id_type, fp_legacy.tax_id_type, fp_hubspot.tax_id_type) AS tax_id_type,
-      COALESCE(fp_client.legal_name, fp_legacy.legal_name, fp_hubspot.legal_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
+      COALESCE(fp_client.legal_name, fp_legacy.legal_name, fp_hubspot.legal_name, cc.legal_name, cc.company_name, ${companyExpressions.nameExpr}, gc.client_name) AS legal_name,
       COALESCE(fp_client.billing_address, fp_legacy.billing_address, fp_hubspot.billing_address) AS billing_address,
       COALESCE(fp_client.billing_country, fp_legacy.billing_country, fp_hubspot.billing_country, 'CL') AS billing_country,
       COALESCE(fp_client.payment_terms_days, fp_legacy.payment_terms_days, fp_hubspot.payment_terms_days, 30) AS payment_terms_days,
@@ -167,10 +211,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       ON fp_legacy.client_profile_id = gc.client_id
     LEFT JOIN profile_by_hubspot fp_hubspot
       ON fp_hubspot.hubspot_company_id = CAST(gc.hubspot_company_id AS STRING)
+    LEFT JOIN crm_company_by_client cc
+      ON cc.client_id = gc.client_id
+    LEFT JOIN module_summary_by_client ms
+      ON ms.client_id = gc.client_id
     LEFT JOIN \`${projectId}.hubspot_crm.companies\` hc
       ON CAST(gc.hubspot_company_id AS STRING) = ${companyExpressions.idExpr}
     WHERE gc.active = TRUE
-      AND ${companyExpressions.archivedFilter}
+      AND (cc.company_source_id IS NOT NULL OR ${companyExpressions.archivedFilter})
       AND (
         gc.client_id = @lookupId
         OR CAST(gc.hubspot_company_id AS STRING) = @lookupId
@@ -185,19 +233,53 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   if (rows.length === 0) {
     const fallbackRows = await runFinanceQuery<ClientProfileRow>(`
+      WITH crm_company_by_hubspot AS (
+        SELECT *
+        FROM \`${projectId}.greenhouse_conformed.crm_companies\`
+        WHERE is_deleted = FALSE
+        QUALIFY ROW_NUMBER() OVER (
+          PARTITION BY company_source_id
+          ORDER BY updated_at DESC NULLS LAST, synced_at DESC NULLS LAST, company_source_id
+        ) = 1
+      ),
+      module_summary_by_client AS (
+        SELECT
+          csm.client_id,
+          STRING_AGG(
+            DISTINCT IF(sm.module_kind = 'business_line', sm.module_code, NULL),
+            ';' IGNORE NULLS
+            ORDER BY IF(sm.module_kind = 'business_line', sm.module_code, NULL)
+          ) AS business_lines_raw,
+          STRING_AGG(
+            DISTINCT IF(sm.module_kind = 'service_module', sm.module_code, NULL),
+            ';' IGNORE NULLS
+            ORDER BY IF(sm.module_kind = 'service_module', sm.module_code, NULL)
+          ) AS service_modules_raw
+        FROM \`${projectId}.greenhouse.client_service_modules\` csm
+        LEFT JOIN \`${projectId}.greenhouse.service_modules\` sm
+          ON sm.module_code = csm.module_code
+        WHERE csm.active = TRUE
+        GROUP BY csm.client_id
+      )
       SELECT
         fp.client_id AS client_id,
         NULL AS greenhouse_client_name,
         fp.client_profile_id,
         fp.hubspot_company_id,
-        ${companyExpressions.nameExpr} AS company_name,
-        ${companyExpressions.domainExpr} AS company_domain,
-        ${companyExpressions.countryExpr} AS company_country,
-        ${companyExpressions.businessLineExpr} AS business_line,
-        ${companyExpressions.servicesExpr} AS service_modules_raw,
+        COALESCE(cc.company_name, ${companyExpressions.nameExpr}) AS company_name,
+        COALESCE(
+          NULLIF(REGEXP_EXTRACT(COALESCE(cc.website_url, ''), r'^(?:https?://)?(?:www\\.)?([^/]+)'), ''),
+          ${companyExpressions.domainExpr}
+        ) AS company_domain,
+        COALESCE(cc.country_code, ${companyExpressions.countryExpr}) AS company_country,
+        COALESCE(
+          SPLIT(COALESCE(ms.business_lines_raw, ''), ';')[SAFE_OFFSET(0)],
+          ${companyExpressions.businessLineExpr}
+        ) AS business_line,
+        COALESCE(ms.service_modules_raw, ${companyExpressions.servicesExpr}) AS service_modules_raw,
         fp.tax_id,
         fp.tax_id_type,
-        COALESCE(fp.legal_name, ${companyExpressions.nameExpr}) AS legal_name,
+        COALESCE(fp.legal_name, cc.legal_name, cc.company_name, ${companyExpressions.nameExpr}) AS legal_name,
         fp.billing_address,
         fp.billing_country,
         fp.payment_terms_days,
@@ -212,6 +294,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         fp.created_at,
         fp.updated_at
       FROM \`${projectId}.greenhouse.fin_client_profiles\` fp
+      LEFT JOIN crm_company_by_hubspot cc
+        ON fp.hubspot_company_id = cc.company_source_id
+      LEFT JOIN module_summary_by_client ms
+        ON ms.client_id = fp.client_id
       LEFT JOIN \`${projectId}.hubspot_crm.companies\` hc
         ON fp.hubspot_company_id = ${companyExpressions.idExpr}
       WHERE fp.client_profile_id = @lookupId OR fp.hubspot_company_id = @lookupId
@@ -246,7 +332,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     overdue_invoices_count: unknown
   }>(`
     SELECT
-      COALESCE(SUM(total_amount - COALESCE(amount_paid, 0)), 0) AS total_receivable,
+      COALESCE(
+        SUM(
+          COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
+            GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
+            NULLIF(COALESCE(total_amount, 0), 0)
+          )
+        ),
+        0
+      ) AS total_receivable,
       COUNTIF(payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
       COUNTIF(payment_status = 'overdue') AS overdue_invoices_count
     FROM \`${projectId}.greenhouse.fin_income\`
@@ -255,22 +349,43 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const summary = summaryRows[0]
 
-  const deals = dealExpressions.canQueryDeals && hubspotCompanyId
+  const projectedDeals = hubspotCompanyId
     ? await runFinanceQuery<DealRow>(`
       SELECT
-        ${dealExpressions.idExpr} AS deal_id,
-        ${dealExpressions.nameExpr} AS deal_name,
-        ${dealExpressions.stageExpr} AS deal_stage,
-        ${dealExpressions.pipelineExpr} AS pipeline,
-        ${dealExpressions.amountExpr} AS amount,
-        ${dealExpressions.closeDateExpr} AS close_date
-      FROM \`${projectId}.hubspot_crm.deals\` d
-      WHERE ${dealExpressions.companyIdExpr} = @hubspotCompanyId
-        AND ${dealExpressions.archivedFilter}
-      ORDER BY ${dealExpressions.closeDateExpr === 'NULL' ? 'deal_id' : 'close_date'} DESC
+        hubspot_deal_id AS deal_id,
+        deal_name,
+        stage_name AS deal_stage,
+        pipeline_id AS pipeline,
+        amount,
+        close_date
+      FROM \`${projectId}.greenhouse_conformed.crm_deals\`
+      WHERE company_source_id = @hubspotCompanyId
+        AND is_deleted = FALSE
+      ORDER BY close_date DESC, deal_source_id DESC
       LIMIT 25
     `, { hubspotCompanyId })
     : []
+
+  const deals = projectedDeals.length > 0
+    ? projectedDeals
+    : (
+        dealExpressions.canQueryDeals && hubspotCompanyId
+          ? await runFinanceQuery<DealRow>(`
+            SELECT
+              ${dealExpressions.idExpr} AS deal_id,
+              ${dealExpressions.nameExpr} AS deal_name,
+              ${dealExpressions.stageExpr} AS deal_stage,
+              ${dealExpressions.pipelineExpr} AS pipeline,
+              ${dealExpressions.amountExpr} AS amount,
+              ${dealExpressions.closeDateExpr} AS close_date
+            FROM \`${projectId}.hubspot_crm.deals\` d
+            WHERE ${dealExpressions.companyIdExpr} = @hubspotCompanyId
+              AND ${dealExpressions.archivedFilter}
+            ORDER BY ${dealExpressions.closeDateExpr === 'NULL' ? 'deal_id' : 'close_date'} DESC
+            LIMIT 25
+          `, { hubspotCompanyId })
+          : []
+      )
 
   return NextResponse.json({
     company: {

@@ -79,6 +79,7 @@ Examples:
 - Client
 - Collaborator
 - Product or Capability
+- Provider
 - Quote
 - Project
 - Sprint
@@ -330,49 +331,63 @@ Still needed:
 - stronger canonical project linkage under each client
 - future quote and campaign linkage
 
-## Object 2: Collaborator
+## Object 2: Person 360
 
 ### Business meaning
 
-The canonical Efeonce person participating in delivery, payroll, internal operations, or future provider-linked workflows.
+The canonical human profile of a person participating in Greenhouse.
+
+This object must support multiple contextual views of the same human being:
+- employee or collaborator
+- user with access and scopes
+- CRM contact associated with a client company
+- participant inside one or more client or internal spaces
+- future provider-linked or workflow-linked identity contexts
 
 ### Canonical anchor
 
 Primary anchor:
+- `greenhouse.identity_profiles.profile_id`
+
+Primary internal collaborator facet:
 - `greenhouse.team_members.member_id`
 
-Identity root:
-- `greenhouse.team_members.identity_profile_id`
+Primary access facet:
+- `greenhouse.client_users.user_id`
 
 ### Current canonical source
 
 Current base tables:
-- `greenhouse.team_members`
 - `greenhouse.identity_profiles`
 - `greenhouse.identity_profile_source_links`
+- `greenhouse.team_members`
+- `greenhouse.client_users`
 
 ### Supporting references
 
 Secondary identifiers:
+- `greenhouse.team_members.member_id`
 - `greenhouse.client_users.user_id`
+- `greenhouse_crm.contacts.contact_record_id`
 - `greenhouse.payroll_entries.entry_id`
 - provider IDs in identity links
 - module-specific snapshot names
 
 ### Current object responsibilities
 
-The Collaborator object should answer:
+The Person 360 object should answer:
 - who the person is in Greenhouse
-- what identity profile anchors them
-- what role or profession they have
-- which clients or projects they are assigned to
-- what payroll context they have
-- what financial expenses relate to them
-- which external provider identities correspond to them
+- which canonical profile anchors them
+- whether they have internal collaborator context
+- whether they have access principal context
+- whether they are linked to CRM contact context
+- which clients, spaces or projects they participate in
+- what payroll, HR and finance context relates to them
+- which external source identities correspond to them
 
 ### Allowed enrichers
 
-Modules and systems that may enrich Collaborator:
+Modules and systems that may enrich Person 360:
 - People:
   - list and detail views
   - assignments
@@ -391,36 +406,53 @@ Modules and systems that may enrich Collaborator:
   - `greenhouse.client_team_assignments`
   - `notion_ops.tareas` and other operational sources via semantic calculations
 
-### What Collaborator does not own
+### What Person 360 does not own
 
-Collaborator is not:
-- a login row
+Person 360 is not:
 - a payroll row
 - a finance expense row
 - a provider-specific account
 
+Its facets may own contextual behavior:
+- `client_users` owns access principal state
+- `team_members` owns internal collaborator state
+- CRM projections own contact-source state
+
 ### Example read models
 
-Possible Collaborator-centered read models:
+Possible Person-centered read models:
 - People detail
+- Users detail
 - Collaborator finance overview
 - Payroll operator view
 - Assignment capacity view
 - Internal talent profile
+- Client account participant view
 - Future AI assistant context for staffing and expertise routing
 
 ### Current implementation state
 
 Already in place:
-- canonical collaborator anchor in `team_members`
 - identity profile strategy
+- collaborator anchor in `team_members`
+- user anchor in `client_users`
+- `greenhouse_serving.person_360` as first unified serving layer over profile, member, user and CRM contact facets
 - people read models
 - payroll read models
 - finance collaborator overview endpoint
 
 Still needed:
-- broader product-wide reuse of collaborator 360
+- reconciliation of `People` and `Users` over `identity_profile_id`
+- CRM contact facet fully unified into the same profile view
 - future richer cross-module skill, tooling, and output history
+
+### Transitional rule
+
+Until the unified serving layer exists:
+- `People` may keep centering the collaborator facet
+- `Users` may keep centering the access facet
+- but neither surface should be treated as a separate identity root
+- both must converge toward `identity_profile_id` as the canonical person anchor
 
 ## Object 3: Product or Capability
 
@@ -696,6 +728,136 @@ Canonical data architecture is still maturing.
 Architectural rule:
 - every future sprint surface must reuse the same sprint identity contract
 
+## Object 7: Provider
+
+### Business meaning
+
+The canonical external organization or platform that Greenhouse relates to across tooling, AI suites, finance, identity, or future integration workflows.
+
+Examples:
+- Anthropic
+- OpenAI
+- Adobe
+- Freepik
+- HubSpot
+- Deel
+
+### Canonical anchor
+
+Primary anchor:
+- `greenhouse.providers.provider_id`
+
+### Current reality
+
+Today Provider is not yet formalized as a first-class object.
+
+Instead, provider information is fragmented across:
+- free-text vendor labels in domain tables
+- finance supplier rows
+- identity provider codes in `identity_profile_source_links`
+- integration-specific references in module-local payloads
+
+This is enough for isolated screens, but too weak for cross-module tooling, AI, finance, and identity relationships.
+
+### Recommended canonical model
+
+Near-term canonical table:
+- `greenhouse.providers`
+
+Recommended minimum fields:
+- `provider_id`
+- `provider_name`
+- `provider_category`
+- `provider_kind`
+- `website_url`
+- `is_active`
+
+Suggested examples of `provider_category`:
+- `ai_vendor`
+- `software_suite`
+- `identity_provider`
+- `delivery_platform`
+- `financial_vendor`
+
+Suggested examples of `provider_kind`:
+- `organization`
+- `platform`
+- `marketplace`
+
+### Supporting references
+
+Secondary identifiers may include:
+- `greenhouse.fin_suppliers.supplier_id`
+- auth or identity provider codes
+- vendor account IDs
+- external billing account IDs
+- admin-entered aliases or domains
+
+### Current object responsibilities
+
+The Provider object should answer:
+- which external vendor or platform Greenhouse is talking about
+- which tools, suites, or integrations belong to that provider
+- which finance supplier profile represents that provider operationally
+- which collaborator identities or licenses point to that provider
+- which client-level tooling allocations ultimately depend on that provider
+
+### Allowed enrichers
+
+Modules and systems that may enrich Provider:
+- AI Tooling:
+  - tool catalog
+  - suites
+  - licenses
+  - wallets
+  - usage ledgers
+- Finance:
+  - `greenhouse.fin_suppliers`
+  - expenses related to subscriptions, usage, or vendor payments
+- Identity:
+  - `greenhouse.identity_profile_source_links`
+  - auth or directory provider mappings
+- Admin and integrations:
+  - sync metadata
+  - procurement or operations notes
+
+### What Provider does not own
+
+Provider is not:
+- a client
+- a collaborator
+- a supplier invoice
+- a provider-specific account credential
+- a tool license assignment
+- a wallet or usage ledger
+
+### Recommended relationship rule
+
+Provider should be the shared vendor/platform object.
+
+Then:
+- finance-specific payable state lives in `fin_suppliers` as an extension profile
+- AI tooling catalog rows should point to `provider_id`
+- member licenses and client wallets should point to tooling entries, which in turn resolve to a provider
+- provider account IDs remain source references, not the Greenhouse provider identity
+
+### Example read models
+
+Possible Provider-centered read models:
+- provider directory for AI and tooling governance
+- provider cost overview across finance and AI usage
+- provider-linked tooling inventory
+- provider relationship detail with supplier and integration context
+
+### Current implementation state
+
+Not yet formalized as a canonical object.
+
+Architectural rule:
+- future tooling, AI, or vendor-linked modules should not keep `vendor` only as ungoverned free text when the relation is reusable across modules
+- finance supplier profiles should be treated as an extension of Provider once the registry exists, not as the platform-wide provider identity
+- auth provider codes or integration handles must remain source references unless explicitly mapped to `provider_id`
+
 ## Cross-Object Relationships
 
 The object model should be understood as a graph, not isolated islands.
@@ -709,11 +871,15 @@ Core graph:
 - Collaborator has many Assignments
 - Collaborator has many Payroll entries
 - Collaborator has many Finance-related expense records
+- Collaborator may have many Tool licenses
 - Project belongs to a Client
 - Project may be linked to one or more Capabilities
 - Project may later be linked to one or more Quotes
 - Sprint belongs to or references a Project and indirectly a Client
 - Quote belongs to a Client and contains Products or Capabilities
+- Provider has many Tooling catalog entries
+- Provider may have one or more Finance supplier profiles over time
+- Client may have Tool wallets or tool entitlements tied to Provider-linked tooling
 
 Operational rule:
 - every edge in the graph should eventually resolve through canonical IDs, not only source IDs
@@ -734,6 +900,10 @@ Examples of valid separate tables:
 - `fin_exchange_rates`
 - `payroll_entries`
 - `client_service_modules`
+- `ai_tool_catalog`
+- `member_tool_licenses`
+- `ai_credit_wallets`
+- `ai_credit_ledger`
 
 ## When a Module May Not Create a New Primary Identity
 
@@ -996,7 +1166,9 @@ CRM should not:
 Future AI layers should:
 - consume canonical 360 objects
 - avoid inventing assistant-local entity graphs
-- write usage, credits, or recommendations as extensions tied to canonical object IDs
+- write usage, credits, licenses, or recommendations as extensions tied to canonical object IDs
+- resolve tool vendors through a canonical Provider object when vendor relationships must be reused across modules
+- avoid treating a free-text `vendor` label or provider account handle as the durable identity boundary
 
 ## Anti-Patterns to Avoid
 
@@ -1008,7 +1180,7 @@ Creating a new “master” table for an object that already has a canonical Gre
 
 ### Anti-pattern 2: source ID as primary identity
 
-Using `hubspot_company_id`, `deal_id`, or a provider account ID as if it were the Greenhouse object identity.
+Using `hubspot_company_id`, `deal_id`, a provider account ID, or a free-text vendor label as if it were the Greenhouse object identity.
 
 ### Anti-pattern 3: module-local joins only
 
@@ -1060,14 +1232,15 @@ The next platform-wide goal is consistency:
 
 1. Keep using this document as the object-model review gate for new modules.
 2. Continue canonicalizing Finance, Payroll, and People against shared IDs.
-3. Avoid introducing new object identities in future modules such as AI Tooling, Quotes, or deeper Capabilities work.
+3. Formalize the Provider registry before landing deeper AI Tooling or multi-vendor governance work.
+4. Avoid introducing new object identities in future modules such as AI Tooling, Quotes, or deeper Capabilities work.
 
 ### Medium-term
 
 1. Define the canonical `Quote` object.
 2. Define the canonical `Project` identity contract formally.
 3. Define the canonical `Sprint` identity contract formally.
-4. Expand client and collaborator 360 read models into more surfaces.
+4. Expand client, collaborator, and provider 360 read models into more surfaces.
 
 ### Longer-term
 

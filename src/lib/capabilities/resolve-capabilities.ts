@@ -25,14 +25,21 @@ export const resolveCapabilityModules = ({
   CAPABILITY_REGISTRY.map(module => {
     const matchedBusinessLines = getMatches(module.requiredBusinessLines, businessLines)
     const matchedServiceModules = getMatches(module.requiredServiceModules, serviceModules)
+    const businessLineSatisfied = !module.requiredBusinessLines?.length || matchedBusinessLines.length > 0
+    const serviceModuleSatisfied = !module.requiredServiceModules?.length || matchedServiceModules.length > 0
 
     return {
-      ...module,
-      matchedBusinessLines,
-      matchedServiceModules
+      module: {
+        ...module,
+        matchedBusinessLines,
+        matchedServiceModules
+      },
+      businessLineSatisfied,
+      serviceModuleSatisfied
     }
   })
-    .filter(module => module.matchedBusinessLines.length > 0 || module.matchedServiceModules.length > 0)
+    .filter(module => module.businessLineSatisfied && module.serviceModuleSatisfied)
+    .map(({ module }) => module)
     .sort((left, right) => left.priority - right.priority)
 
 export const getResolvedCapabilityModule = (

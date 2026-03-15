@@ -3,6 +3,782 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Person 360 audit and serving baseline materialized
+- Se materializó `greenhouse_serving.person_360` en Cloud SQL como primer serving unificado de persona sobre:
+  - `greenhouse_core.identity_profiles`
+  - `greenhouse_core.members`
+  - `greenhouse_core.client_users`
+  - `greenhouse_crm.contacts`
+- También se agregó el comando:
+  - `pnpm audit:person-360`
+- Estado validado:
+  - `profiles_total = 38`
+  - `profiles_with_member = 7`
+  - `profiles_with_user = 37`
+  - `profiles_with_contact = 29`
+  - `profiles_with_member_and_user = 7`
+  - `profiles_with_user_and_contact = 29`
+  - `profiles_with_all_three = 0`
+  - `profiles_without_any_facet = 1`
+- Gaps reales identificados:
+  - `users_without_profile = 2`
+  - `contacts_without_profile = 34`
+  - `internal_users_without_member = 1`
+- Conclusión operativa:
+  - el principal bloqueo de `Person 360` ya no es de arquitectura sino de reconciliación CRM/contactos
+  - `People` y `Users` ya tienen un backbone real al cual migrar, pero todavía no lo consumen
+
+## Delta 2026-03-15 Person 360 formalized as canonical profile strategy
+- Se fijó explícitamente que Greenhouse no debe seguir tratando `People`, `Users`, `CRM Contact` y `Member` como identidades distintas.
+- Decisión de arquitectura:
+  - `identity_profile` es el ancla canónica de persona
+  - `member` es faceta laboral/interna
+  - `client_user` es faceta de acceso
+  - `crm_contact` es faceta comercial
+- Regla de producto derivada:
+  - `People` debe evolucionar hacia la vista humana/operativa del mismo perfil
+  - `Users` debe evolucionar hacia la vista de acceso/permisos del mismo perfil
+  - ambas superficies deben reconciliarse sobre `identity_profile_id`
+- Se creó la lane activa:
+  - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- Esto no reemplaza `Identity & Access V2`; lo complementa como capa de modelo y serving sobre persona.
+
+## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
+- `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para `catalog`, `licenses`, `wallets` y `metadata`.
+- Se materializó `greenhouse_ai` en Cloud SQL con:
+  - `tool_catalog`
+  - `member_tool_licenses`
+  - `credit_wallets`
+  - `credit_ledger`
+- `src/lib/ai-tools/service.ts` ahora opera en modo `Postgres first`, con fallback controlado al store legacy solo cuando PostgreSQL no está listo o no está configurado.
+- `scripts/setup-postgres-ai-tooling.ts` ya no solo crea schema: también siembra el catálogo mínimo operativo en PostgreSQL.
+- Estado validado tras setup:
+  - `greenhouse_ai.tool_catalog = 9`
+  - `greenhouse_ai.member_tool_licenses = 0`
+  - `greenhouse_ai.credit_wallets = 0`
+  - `greenhouse_ai.credit_ledger = 0`
+  - `greenhouse_core.providers` visibles para AI Tooling = `10`
+- Providers visibles validados en PostgreSQL:
+  - `Adobe`
+  - `Anthropic`
+  - `Black Forest Labs`
+  - `Freepik`
+  - `Google DeepMind`
+  - `Higgsfield AI`
+  - `Kuaishou`
+  - `Microsoft`
+  - `Notion`
+  - `OpenAI`
+- Regla operativa derivada:
+  - `AI Tooling` runtime vive en PostgreSQL
+  - `BigQuery` queda como compatibilidad temporal y eventual fuente de backfill/histórico
+  - no volver a depender de `ensureAiToolingInfrastructure()` como camino principal de request path
+
+## Delta 2026-03-15 Performance indicators and source RpA semaphore identified and wired for runtime
+- Se confirmó contra `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos, no solo señales derivadas:
+  - `🟢 On-Time`
+  - `🟡 Late Drop`
+  - `🔴 Overdue`
+  - `🔵 Carry-Over`
+- También se confirmó que Notion ya trae `semáforo_rpa` como dato fuente separado de `rpa`.
+- Decisión de modelado:
+  - `rpa` y `semáforo_rpa` se tratan como datos distintos
+  - Greenhouse debe preservar ambos:
+    - `rpa_value`
+    - `rpa_semaphore_source`
+    - y puede seguir calculando un `rpa_semaphore_derived` para compatibilidad/guardrails
+- `Project Detail > tasks` ya expone en runtime el set de indicadores fuente:
+  - `rpaSemaphoreSource`
+  - `rpaSemaphoreDerived`
+  - `performanceIndicatorLabel`
+  - `performanceIndicatorCode`
+  - `deliveryCompliance`
+  - `completionLabel`
+  - `daysLate`
+  - `rescheduledDays`
+  - `isRescheduled`
+  - `clientChangeRoundLabel`
+  - `clientChangeRoundFinal`
+  - `workflowChangeRound`
+  - `originalDueDate`
+  - `executionTimeLabel`
+  - `changesTimeLabel`
+  - `reviewTimeLabel`
+- `Source Sync Runtime Projections` quedó ampliado para proyectar ese mismo set a:
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_delivery.tasks`
+  - además de señales fuente nuevas en `delivery_projects` y `delivery_sprints`
+- Restricción operativa vigente:
+  - el apply de BigQuery para estas nuevas columnas sigue bloqueado por `table update quota exceeded`
+  - el consumer de `Project Detail` no depende de esperar ese apply porque lee estos campos directo desde `notion_ops.tareas`
+
+## Delta 2026-03-15 Finance clients consumers migrated to canonical-first, live-compatible reads
+- `Finance > Clients` ya no depende solo de `hubspot_crm.*` live para listar y detallar clientes.
+- Las rutas:
+  - `GET /api/finance/clients`
+  - `GET /api/finance/clients/[id]`
+  ahora usan patrón `canonical first + live fallback`.
+- Fuente primaria nueva:
+  - `greenhouse_conformed.crm_companies`
+  - `greenhouse_conformed.crm_deals`
+  - `greenhouse.client_service_modules`
+- Compatibilidad conservada:
+  - si una compañía o deal todavía no alcanzó a proyectarse por `Source Sync Runtime Projections`, el consumer cae a `hubspot_crm.companies` / `hubspot_crm.deals`
+  - esto protege el flujo live donde HubSpot promociona un lead/empresa a cliente y Greenhouse lo crea en tiempo real
+- Regla operativa derivada:
+  - no cortar consumers a sync-only cuando el dominio todavía depende de provisioning live
+  - el patrón correcto de transición es `canonical first, live fallback`, no `raw only` ni `projection only`
+
+## Delta 2026-03-15 Admin project scope consumers now prefer delivery projections
+- `Admin > tenant detail` y `Admin > user detail` ya no dependen solo de `notion_ops.proyectos` para resolver nombres de proyecto en scopes.
+- Los consumers:
+  - `src/lib/admin/get-admin-tenant-detail.ts`
+  - `src/lib/admin/get-admin-user-detail.ts`
+  ahora priorizan `greenhouse_conformed.delivery_projects.project_name`.
+- `notion_ops.proyectos` queda temporalmente solo como fallback y para `page_url`, porque ese campo todavía no vive en `delivery_projects`.
+- Regla derivada:
+  - cuando la proyección canónica ya resuelve el nombre operativo, usarla primero
+  - mantener source fallback solo para campos que aún no se materializan en el projection
+
+## Delta 2026-03-15 Projects consumers now prefer delivery metadata first
+- `Projects` ya no depende solo de `notion_ops.proyectos` y `notion_ops.sprints` para metadata base.
+- Los consumers:
+  - `src/lib/projects/get-projects-overview.ts`
+  - `src/lib/projects/get-project-detail.ts`
+  ahora priorizan:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_sprints`
+- Alcance de este corte:
+  - `project_name`, `project_status`, `start_date`, `end_date`
+  - `sprint_name`, `sprint_status`, `start_date`, `end_date`
+- Boundary vigente:
+  - `notion_ops.tareas` sigue siendo necesario para métricas finas de tarea (`rpa`, reviews, blockers, frame comments)
+  - `notion_ops.proyectos` sigue aportando `page_url` y `summary`
+  - `notion_ops.sprints` sigue aportando `page_url` y fallback operativo
+- Regla derivada:
+  - mover primero metadata estructural a `delivery_*`
+  - dejar el cálculo fino en legacy hasta que esos campos también estén proyectados de forma canónica
+
+## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
+- `Source Sync Runtime Projections` ya materializa contactos CRM en:
+  - `greenhouse_conformed.crm_contacts`
+  - `greenhouse_crm.contacts`
+- El slice respeta la boundary canónica acordada:
+  - solo entran contactos asociados a compañías que ya pertenecen al universo Greenhouse
+  - el sync modela y reconcilia CRM contacts, pero no auto-provisiona nuevos `client_users`
+  - la provisión de acceso sigue siendo responsabilidad de la integración/admin live de HubSpot -> Greenhouse
+- Reconciliación activa para `HubSpot Contact -> client_user / identity_profile`:
+  - preferencia por `user-hubspot-contact-<contact_id>`
+  - luego source link explícito
+  - luego email único dentro del tenant
+  - si existe user runtime enlazado y no hay profile todavía, el sync crea `profile-hubspot-contact-<contact_id>` y fija el bridge canónico
+- `HubSpot Owner -> Collaborator / User` ya queda proyectado usando `greenhouse.team_members.hubspot_owner_id`:
+  - `owner_member_id` queda poblado en `crm_companies`, `crm_deals` y `crm_contacts`
+  - `owner_user_id` se resuelve cuando el colaborador también tiene principal en `greenhouse_core.client_users`
+  - además se sincronizan source links reutilizables en `greenhouse_core`:
+    - `entity_source_links` `member <- hubspot owner`
+    - `entity_source_links` `user <- hubspot owner`
+    - `identity_profile_source_links` `identity_profile <- hubspot owner`
+- Estado validado después de rerun completo:
+  - BigQuery conformed `crm_contacts = 63`
+  - PostgreSQL runtime `greenhouse_crm.contacts = 63`
+  - contactos con `linked_user_id = 29`
+  - contactos con `linked_identity_profile_id = 29`
+  - `identity_profile_source_links` HubSpot contact = `29`
+  - `entity_source_links` HubSpot contact -> user = `29`
+  - `crm_contacts.owner_member_id = 63`
+  - `crm_contacts.owner_user_id = 61`
+  - PostgreSQL runtime owner coverage:
+    - companies: `owner_member_id = 9`, `owner_user_id = 9`
+    - deals: `owner_member_id = 21`, `owner_user_id = 21`
+  - source links de owner:
+    - `member <- hubspot owner = 6`
+    - `user <- hubspot owner = 1`
+    - `identity_profile <- hubspot owner = 6`
+- Regla operativa derivada:
+  - no pedirle a la integración live que escriba directo a BigQuery
+  - el source sync es quien replica a `raw` / `conformed`
+  - la integración live sigue siendo la pieza de provisioning y reconciliación de accesos
+  - la cobertura actual de `owner -> user` depende de cuántos colaboradores internos ya tengan principal en `client_users`; hoy solo `Julio` quedó resuelto en esa capa
+
+## Delta 2026-03-15 Space model added to canonical 360 and delivery projections
+- `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` ya existen en Cloud SQL como nuevo boundary operativo del 360.
+- Regla arquitectónica ya documentada y aplicada:
+  - `client` = boundary comercial
+  - `space` = workspace operativo para Agency, delivery e ICO metrics
+- `space-efeonce` ya no depende solo de ser un pseudo-cliente legacy:
+  - vive como `internal_space`
+  - `client_id = null`
+  - conserva binding operativo a `project_database_source_id`
+- `greenhouse_serving.space_360` ya expone el nuevo shape canónico.
+- `Source Sync Runtime Projections` ahora publica `space_id` en:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.tasks`
+  - `greenhouse_delivery.sprints`
+- Estado validado:
+  - `greenhouse_core.spaces = 11`
+  - `client_space = 10`
+  - `internal_space = 1`
+  - `space_source_bindings = 69`
+  - PostgreSQL delivery con `space_id`:
+    - projects `57/59`
+    - tasks `961/1173`
+    - sprints `11/13`
+  - BigQuery conformed delivery con `space_id`:
+    - projects `57/59`
+    - tasks `961/1173`
+    - sprints `11/13`
+- Transitional boundary que sigue viva:
+  - el seed de `spaces` todavía nace desde `greenhouse.clients.notion_project_ids`
+  - el target ya no es ese array, sino `space -> project_database_source_id`
+- También se endureció la capa de acceso PostgreSQL:
+  - `setup-postgres-access.sql` ahora intenta normalizar ownership de `greenhouse_core`, `greenhouse_serving` y `greenhouse_sync` hacia `greenhouse_migrator`
+  - cuando un objeto legacy no puede transferirse, el script continúa con `NOTICE` en vez de bloquear toda la evolución del backbone
+
+## Delta 2026-03-15 Data model master and source-sync runtime seed
+- Se agregó la fuente de verdad del modelo de datos actual en:
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- Se agregó la guía operativa para evolucionar ese documento en:
+  - `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
+- `AGENTS.md` y `docs/README.md` ya apuntan a ambos documentos cuando el trabajo toca modelado de datos, source sync, PostgreSQL o BigQuery.
+- `Source Sync Runtime Projections` quedó ejecutado con datos reales:
+  - BigQuery conformed:
+    - `delivery_projects = 59`
+    - `delivery_sprints = 13`
+    - `delivery_tasks = 1173`
+    - `crm_companies = 628`
+    - `crm_deals = 178`
+  - PostgreSQL runtime projections:
+    - `greenhouse_delivery.projects = 59`
+    - `greenhouse_delivery.sprints = 13`
+    - `greenhouse_delivery.tasks = 1173`
+    - `greenhouse_crm.companies = 9`
+    - `greenhouse_crm.deals = 25`
+- Regla 360 explicitada y ya aplicada al runtime:
+  - `HubSpot Company` solo entra a `greenhouse_crm` si ya pertenece al universo de clientes Greenhouse
+  - `raw` y `conformed` pueden conservar universo fuente completo
+  - `greenhouse_crm` runtime mantiene solo companias cliente y sus relaciones comerciales relevantes
+- `HubSpot Contacts` quedó declarado como slice obligatorio siguiente del modelo:
+  - `HubSpot Contact -> client_user / identity_profile`
+  - solo contactos asociados a companias cliente deben entrar al runtime Greenhouse
+- Delivery quedó modelado con soporte explícito para:
+  - `project_database_source_id`
+  - binding tenant-level futuro del workspace de delivery en Notion
+
+## Delta 2026-03-15 PostgreSQL access model and tooling
+- Se formalizó la capa de acceso escalable a Cloud SQL en:
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `AGENTS.md` ya documenta explícitamente cómo acceder y operar PostgreSQL para evitar que otros agentes vuelvan a usar el perfil incorrecto.
+- Greenhouse ahora separa explícitamente tres perfiles operativos de PostgreSQL:
+  - `runtime`
+  - `migrator`
+  - `admin`
+- Nuevas variables documentadas:
+  - `GREENHOUSE_POSTGRES_MIGRATOR_USER`
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
+  - `GREENHOUSE_POSTGRES_ADMIN_USER`
+  - `GREENHOUSE_POSTGRES_ADMIN_PASSWORD`
+- Nuevo tooling operativo:
+  - `pnpm setup:postgres:access`
+  - `pnpm pg:doctor`
+- Scripts de setup y backfill PostgreSQL ahora cargan env local de forma consistente y pueden elegir perfil antes de abrir la conexión.
+- Regla operativa derivada:
+  - runtime del portal usa solo credenciales `runtime`
+  - bootstrap de acceso usa `admin`
+  - setup y migraciones de dominio deben correr con `migrator`
+- Estado validado en Cloud SQL:
+  - `greenhouse_runtime` existe y `greenhouse_app` es miembro
+  - `greenhouse_migrator` existe y `greenhouse_migrator_user` es miembro
+  - `greenhouse_hr`, `greenhouse_payroll` y `greenhouse_finance` ya exponen grants consumibles por ambos roles
+- Alcance de esta pasada:
+  - no se cambió el runtime funcional de `Payroll`
+  - se dejó la fundación para que los siguientes cortes de dominio no dependan de grants manuales repetidos
+
+## Delta 2026-03-15 Finance PostgreSQL first slice
+- Se materializó el primer slice operacional de `Finance` sobre PostgreSQL en `greenhouse-pg-dev / greenhouse_app`.
+- Nuevo schema operativo:
+  - `greenhouse_finance`
+- Objetos materializados:
+  - `greenhouse_finance.accounts`
+  - `greenhouse_finance.suppliers`
+  - `greenhouse_finance.exchange_rates`
+  - `greenhouse_serving.provider_finance_360`
+- Se agregó el repository `src/lib/finance/postgres-store.ts` con validación de infraestructura, writes y lecturas `Postgres first`.
+- Rutas ya cortadas o semi-cortadas a PostgreSQL:
+  - `GET /api/finance/accounts`
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `GET /api/finance/exchange-rates`
+  - `POST /api/finance/exchange-rates`
+  - `GET /api/finance/exchange-rates/latest`
+  - `GET/POST /api/finance/exchange-rates/sync`
+  - `GET /api/finance/expenses/meta` para el subset de cuentas
+- Se ejecutó backfill inicial desde BigQuery:
+  - `accounts`: `1`
+  - `suppliers`: `2`
+  - `exchange_rates`: `0`
+- Alineación 360 aplicada:
+  - `suppliers.provider_id` referencia `greenhouse_core.providers`
+  - el backfill de suppliers también materializa providers canónicos tipo `financial_vendor`
+  - `greenhouse_serving.provider_finance_360` expone la relación `provider -> supplier`
+- Permisos estructurales corregidos en Cloud SQL:
+  - `greenhouse_app` recibió `USAGE` sobre `greenhouse_core`, `greenhouse_sync` y `greenhouse_serving`
+  - `greenhouse_app` recibió `SELECT, REFERENCES` sobre tablas de `greenhouse_core`
+  - `greenhouse_app` recibió `SELECT, INSERT, UPDATE, DELETE` sobre tablas de `greenhouse_sync`
+- Boundary vigente:
+  - `accounts` y `exchange_rates` ya tienen store operativo PostgreSQL
+  - `suppliers` quedó materializado y backfilleado en PostgreSQL, pero el runtime principal todavía no se corta ahí para no romper `AI Tooling`, que sigue leyendo `greenhouse.fin_suppliers` en BigQuery
+  - dashboards y reporting financiero pesado siguen en BigQuery por ahora
+
+## Delta 2026-03-15 Source sync foundation materialized
+- Se ejecutó el primer slice técnico del blueprint de sync externo sobre PostgreSQL y BigQuery.
+- Scripts nuevos agregados:
+  - `pnpm setup:postgres:source-sync`
+  - `pnpm setup:bigquery:source-sync`
+- En PostgreSQL (`greenhouse-pg-dev / greenhouse_app`) quedaron materializados:
+  - schemas:
+    - `greenhouse_crm`
+    - `greenhouse_delivery`
+  - tablas de control:
+    - `greenhouse_sync.source_sync_runs`
+    - `greenhouse_sync.source_sync_watermarks`
+    - `greenhouse_sync.source_sync_failures`
+  - tablas de proyección inicial:
+    - `greenhouse_crm.companies`
+    - `greenhouse_crm.deals`
+    - `greenhouse_delivery.projects`
+    - `greenhouse_delivery.sprints`
+    - `greenhouse_delivery.tasks`
+- En BigQuery (`efeonce-group`) quedaron materializados:
+  - datasets:
+    - `greenhouse_raw`
+    - `greenhouse_conformed`
+    - `greenhouse_marts`
+  - raw snapshots:
+    - `notion_projects_snapshots`
+    - `notion_tasks_snapshots`
+    - `notion_sprints_snapshots`
+    - `notion_people_snapshots`
+    - `notion_databases_snapshots`
+    - `hubspot_companies_snapshots`
+    - `hubspot_deals_snapshots`
+    - `hubspot_contacts_snapshots`
+    - `hubspot_owners_snapshots`
+    - `hubspot_line_items_snapshots`
+  - conformed current-state tables:
+    - `delivery_projects`
+    - `delivery_tasks`
+    - `delivery_sprints`
+    - `crm_companies`
+    - `crm_deals`
+- Regla operativa derivada:
+  - el siguiente paso ya no es “crear estructura”, sino construir jobs de ingestión/backfill que llenen `raw`, materialicen `conformed` y proyecten `greenhouse_crm` / `greenhouse_delivery`
+
+## Delta 2026-03-15 External source sync blueprint
+- Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para formalizar cómo Greenhouse debe desacoplar cálculos y runtime de `Notion` y `HubSpot`.
+- Dirección operativa definida:
+  - `Notion` y `HubSpot` quedan como `source systems`
+  - `BigQuery raw` guarda el backup inmutable y replayable
+  - `BigQuery conformed` normaliza entidades externas
+  - `PostgreSQL` recibe solo proyecciones runtime-críticas para cálculos y pantallas operativas
+  - `BigQuery marts` mantiene analítica, 360 e histórico
+- Datasets y schemas objetivo explícitos:
+  - BigQuery:
+    - `greenhouse_raw`
+    - `greenhouse_conformed`
+    - `greenhouse_marts`
+  - PostgreSQL:
+    - `greenhouse_crm`
+    - `greenhouse_delivery`
+    - `greenhouse_sync.source_sync_runs`
+    - `greenhouse_sync.source_sync_watermarks`
+    - `greenhouse_sync.source_sync_failures`
+- Regla operativa derivada:
+  - ningún cálculo crítico del portal debe seguir leyendo APIs live de `Notion` o `HubSpot` en request-time
+  - el raw externo se respalda en BigQuery y el subset operativo se sirve desde PostgreSQL
+
+## Delta 2026-03-15 HR leave preview rollout hardening
+- El cutover de `HR > Permisos` a PostgreSQL en `Preview` quedó endurecido con fallback operativo a BigQuery para evitar que la vista completa falle si Cloud SQL no está disponible.
+- El slice de `leave` ahora puede caer controladamente al path legacy para:
+  - metadata
+  - balances
+  - requests
+  - create/review
+- Regla operativa derivada:
+  - una rama `Preview` que use Cloud SQL connector debe tener el service account de `GOOGLE_APPLICATION_CREDENTIALS_JSON` con `roles/cloudsql.client`
+  - sin ese rol, el error esperable es `cloudsql.instances.get` / `boss::NOT_AUTHORIZED`
+- Este fallback no cambia la dirección arquitectónica:
+  - PostgreSQL sigue siendo el store objetivo del dominio
+  - BigQuery queda como red de seguridad temporal mientras se estabiliza el rollout por ambiente
+
+## Delta 2026-03-15 HR leave runtime cutover to PostgreSQL
+- `HR > Permisos` se convirtió en el primer dominio operativo del portal que ya usa PostgreSQL en runtime sobre la instancia `greenhouse-pg-dev`.
+- Se agregó el dominio `greenhouse_hr` en Cloud SQL con:
+  - `leave_types`
+  - `leave_balances`
+  - `leave_requests`
+  - `leave_request_actions`
+- El slice migrado ahora resuelve identidad desde el backbone canónico:
+  - `greenhouse_core.client_users`
+  - `greenhouse_core.members`
+- Rutas que ahora prefieren PostgreSQL cuando el ambiente está configurado:
+  - `GET /api/hr/core/meta`
+  - `GET /api/hr/core/leave/balances`
+  - `GET /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+- El resto de `HR Core` dejó de ejecutar `DDL` en request-time:
+  - `ensureHrCoreInfrastructure()` queda como bootstrap explícito
+  - runtime usa `assertHrCoreInfrastructureReady()` como validación no mutante
+- Provisioning ejecutado en datos:
+  - bootstrap único de `greenhouse_hr` en Cloud SQL
+  - bootstrap único de `scripts/setup-hr-core-tables.sql` en BigQuery para dejar `HR Core` listo fuera del request path
+- Infra compartida:
+  - `src/lib/google-credentials.ts` centraliza las credenciales GCP para BigQuery, Cloud SQL connector y media storage
+- Configuración Preview:
+  - la rama `fix/codex-operational-finance` ya tiene env vars de PostgreSQL en Vercel Preview para este corte
+- Boundary vigente:
+  - sólo `HR > Permisos` quedó cortado a PostgreSQL
+  - `departamentos`, `member profile` y `attendance` siguen en BigQuery, pero ya sin bootstraps mutantes en navegación normal
+
+## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
+- Se agregó la arquitectura de datos objetivo en:
+  - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- La dirección formal del stack queda declarada como:
+  - `PostgreSQL` para `OLTP` y workflows mutables
+  - `BigQuery` para `raw`, `conformed`, `core analytics` y `marts`
+- Se provisionó la primera base operacional de referencia en Google Cloud:
+  - proyecto: `efeonce-group`
+  - instancia Cloud SQL: `greenhouse-pg-dev`
+  - motor: `POSTGRES_16`
+  - región: `us-east4`
+  - tier: `db-custom-1-3840`
+  - storage: `20 GB SSD`
+  - base inicial: `greenhouse_app`
+  - usuario inicial: `greenhouse_app`
+- Secretos creados en Secret Manager:
+  - `greenhouse-pg-dev-postgres-password`
+  - `greenhouse-pg-dev-app-password`
+- Boundary vigente:
+  - la app todavía no está conectada a Postgres en runtime
+  - esta pasada deja lista la fundación de infraestructura y el backbone canónico 360, no el cutover runtime
+  - la integración de aplicación debe hacerse vía repository/services, no con rewrites directos módulo por módulo contra Cloud SQL
+- Materialización ejecutada sobre la instancia:
+  - esquemas:
+    - `greenhouse_core`
+    - `greenhouse_serving`
+    - `greenhouse_sync`
+  - vistas 360:
+    - `client_360`
+    - `member_360`
+    - `provider_360`
+    - `user_360`
+    - `client_capability_360`
+  - tabla de publicación:
+    - `greenhouse_sync.outbox_events`
+- Scripts operativos agregados:
+  - `pnpm setup:postgres:canonical-360`
+  - `pnpm backfill:postgres:canonical-360`
+- Backfill inicial ejecutado desde BigQuery hacia Postgres:
+  - `clients`: `11`
+  - `identity_profiles`: `9`
+  - `identity_profile_source_links`: `29`
+  - `client_users`: `39`
+  - `members`: `7`
+  - `providers`: `8` canónicos sobre `11` filas origen, por deduplicación real de `provider_id`
+  - `service_modules`: `9`
+  - `client_service_modules`: `30`
+  - `roles`: `8`
+  - `user_role_assignments`: `40`
+- Variables nuevas documentadas:
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - `GREENHOUSE_POSTGRES_IP_TYPE`
+  - `GREENHOUSE_POSTGRES_HOST`
+  - `GREENHOUSE_POSTGRES_PORT`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`
+  - `GREENHOUSE_POSTGRES_SSL`
+  - `GREENHOUSE_BIGQUERY_DATASET`
+  - `GREENHOUSE_BIGQUERY_LOCATION`
+
+## Delta 2026-03-15 Finance exchange-rate sync persistence
+- `Finance` ahora tiene hidratación automática server-side de `USD/CLP` para evitar que ingresos/egresos en USD dependan de carga manual previa.
+- Proveedores activos para tipo de cambio:
+  - primario: `mindicador.cl`
+  - fallback: `open.er-api.com`
+- Superficie backend agregada:
+  - `POST /api/finance/exchange-rates/sync`
+    - uso interno autenticado por sesión `finance_manager`
+    - también admite acceso interno por cron
+  - `GET /api/finance/exchange-rates/sync`
+    - pensado para `Vercel Cron`
+  - `GET /api/finance/exchange-rates/latest`
+    - ahora intenta hidratar y persistir si no existe ninguna tasa `USD -> CLP` almacenada
+- Persistencia operativa:
+  - se guardan ambos pares por fecha:
+    - `USD -> CLP`
+    - `CLP -> USD`
+  - la tabla sigue siendo `greenhouse.fin_exchange_rates`
+  - el `rate_id` sigue siendo determinístico: `${fromCurrency}_${toCurrency}_${rateDate}`
+- Ajuste de runtime:
+  - `resolveExchangeRateToClp()` ahora puede auto-hidratar `USD/CLP` antes de fallar cuando no encuentra snapshot almacenado
+- Deploy/configuración:
+  - se agregó `vercel.json` con cron diario hacia `/api/finance/exchange-rates/sync`
+  - nueva variable opcional: `CRON_SECRET`
+- Regla operativa derivada:
+  - frontend no debe intentar resolver tipo de cambio desde cliente ni depender de input manual cuando el backend ya puede hidratar la tasa del día
+
+## Delta 2026-03-14 Portal surface consolidation task
+- Se documentó una task `to-do` específica para consolidación UX y arquitectura de surfaces del portal:
+  - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
+- La task no propone cambios de código inmediatos.
+- Su objetivo es resolver con criterio explícito:
+  - qué vistas son troncales
+  - qué vistas se unifican
+  - qué vistas se enriquecen
+  - qué vistas deben pasar a tabs, drilldowns o redirects
+- Regla operativa derivada:
+  - no seguir abriendo rutas nuevas por módulo sin revisar antes esta consolidación de surfaces
+
+## Delta 2026-03-14 People + Team capacity backend complements
+- `People v3` y `Team Identity & Capacity v2` ya no dependen solo de contratos mínimos heredados.
+- Complementos backend activos:
+  - `GET /api/people/meta`
+  - `GET /api/people` ahora también devuelve `filters`
+  - `GET /api/people/[memberId]` ahora puede devolver `capacity` y `financeSummary`
+  - `GET /api/team/capacity` ahora devuelve semántica explícita de capacidad por miembro y por rol
+- Regla operativa derivada:
+  - frontend no debe inferir salud de capacidad desde `FTE` o `activeAssets` si el backend ya devuelve `capacityHealth`
+  - frontend de `People` debe usar `meta`, `capacity` y `financeSummary` como contratos canónicos de lectura 360
+
+## Delta 2026-03-14 Team Identity & People task reclassification
+- `Team Identity & Capacity` y `People Unified View v2` fueron contrastadas explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md` en el caso de `People`
+- Resultado operativo:
+  - `People` sí está alineado con arquitectura y sí existe como módulo real
+  - `People v2` ya debe tratarse como brief histórico porque el runtime avanzó más allá de su contexto original
+  - `Team Identity & Capacity` sí cerró la base canónica de identidad sobre `team_members.member_id`
+  - la parte de capacidad no debe tratarse todavía como cerrada
+- Regla operativa derivada:
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task vigente para cierre 360 del colaborador
+  - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como brief histórico/fundacional
+  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
+
+## Delta 2026-03-14 Creative Hub task reclassification
+- `Creative Hub` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `Greenhouse_Capabilities_Architecture_v1.md`
+- Resultado operativo:
+  - el módulo sí está alineado estructuralmente con arquitectura
+  - `Creative Hub` sigue siendo una capability surface, no un objeto canónico nuevo
+  - el cliente canónico sigue anclado a `greenhouse.clients.client_id`
+  - el brief original no debe tratarse como completamente implementado
+- Gaps detectados en runtime:
+  - activación demasiado amplia del módulo por `businessLine = globe`
+  - ausencia real de la capa `Brand Intelligence`
+  - `CSC Pipeline Tracker` soportado hoy con heurísticas, no con un modelo explícito de `fase_csc`
+- Regla operativa derivada:
+  - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
+  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser la task vigente para cierre runtime
+
+## Delta 2026-03-14 Creative Hub backend runtime closure
+- `Creative Hub v2` ya no depende solo del snapshot genérico de `Capabilities`; ahora tiene backend propio de enriquecimiento creativo para cerrar los gaps detectados.
+- Complementos backend agregados:
+  - `resolveCapabilityModules()` ahora exige match de `business line` y `service module` cuando ambos requisitos existen
+  - `creative-hub` ya soporta activación por:
+    - `agencia_creativa`
+    - `produccion_audiovisual`
+    - `social_media_content`
+  - `src/lib/capability-queries/creative-hub-runtime.ts` agrega snapshot detallado de tareas con:
+    - fase CSC explícita o derivada
+    - aging real
+    - FTR/RpA reales cuando existen columnas soporte
+- Superficie runtime cerrada para frontend:
+  - `GET /api/capabilities/creative-hub/data` ahora devuelve también:
+    - sección `Brand Intelligence`
+    - pipeline CSC por fase real
+    - stuck assets calculados por tarea/fase
+- Boundary vigente:
+  - `Creative Hub` sigue siendo capability surface dentro de `Capabilities`
+  - no crea objeto canónico paralelo de capability, asset o proyecto
+
+## Delta 2026-03-14 HR core backend foundation
+- `HR Core Module` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Resultado operativo:
+  - `Collaborator` sigue anclado a `greenhouse.team_members.member_id`
+  - `Admin Team` mantiene ownership del roster base
+  - `People` sigue siendo la vista read-first del colaborador
+  - `HR Core` queda como capa de extensión para estructura org, perfil HR, permisos, asistencia y acciones de aprobación
+- Infraestructura backend agregada:
+  - `ensureHrCoreInfrastructure()` extiende `team_members` con:
+    - `department_id`
+    - `reports_to`
+    - `job_level`
+    - `hire_date`
+    - `contract_end_date`
+    - `daily_required`
+  - crea:
+    - `greenhouse.departments`
+    - `greenhouse.member_profiles`
+    - `greenhouse.leave_types`
+    - `greenhouse.leave_balances`
+    - `greenhouse.leave_requests`
+    - `greenhouse.leave_request_actions`
+    - `greenhouse.attendance_daily`
+  - seed del rol `employee` con `route_group_scope = ['internal', 'employee']`
+- Superficie backend activa:
+  - `GET /api/hr/core/meta`
+  - `GET/POST /api/hr/core/departments`
+  - `GET/PATCH /api/hr/core/departments/[departmentId]`
+  - `GET/PATCH /api/hr/core/members/[memberId]/profile`
+  - `GET /api/hr/core/leave/balances`
+  - `GET/POST /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+  - `GET /api/hr/core/attendance`
+  - `POST /api/hr/core/attendance/webhook/teams`
+- Ajuste de identidad/acceso:
+  - `tenant/access.ts` y `tenant/authorization.ts` ya reconocen `employee` como route group válido
+- Variable nueva:
+  - `HR_CORE_TEAMS_WEBHOOK_SECRET` para proteger la ingesta externa de asistencia
+
+## Delta 2026-03-14 AI tooling backend foundation
+- `AI Tooling & Credit System` fue contrastada explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `FINANCE_CANONICAL_360_V1.md`
+- Resultado operativo:
+  - la task sí quedó alineada con arquitectura
+  - `greenhouse.clients.client_id` sigue siendo el ancla canónica de cliente para wallets y ledger
+  - `greenhouse.team_members.member_id` sigue siendo el ancla canónica de colaborador para licencias y consumos atribuibles
+  - `greenhouse.providers.provider_id` ya existe en runtime como registro reusable de vendor/plataforma
+  - `ai_tool_catalog`, `member_tool_licenses`, `ai_credit_wallets` y `ai_credit_ledger` quedan como tablas de dominio, no como identidades paralelas
+- Infraestructura backend agregada:
+  - `ensureAiToolingInfrastructure()` crea on-demand:
+    - `greenhouse.providers`
+    - `greenhouse.ai_tool_catalog`
+    - `greenhouse.member_tool_licenses`
+    - `greenhouse.ai_credit_wallets`
+    - `greenhouse.ai_credit_ledger`
+  - `scripts/setup-ai-tooling-tables.sql` queda como referencia SQL versionada del mismo bootstrap
+- Superficie backend activa:
+  - operación:
+    - `GET /api/ai-tools/catalog`
+    - `GET /api/ai-tools/licenses`
+  - créditos:
+    - `GET /api/ai-credits/wallets`
+    - `GET /api/ai-credits/ledger`
+    - `GET /api/ai-credits/summary`
+    - `POST /api/ai-credits/consume`
+    - `POST /api/ai-credits/reload`
+  - admin:
+    - `GET /api/admin/ai-tools/meta`
+    - `GET/POST /api/admin/ai-tools/catalog`
+    - `GET/PATCH /api/admin/ai-tools/catalog/[toolId]`
+    - `GET/POST /api/admin/ai-tools/licenses`
+    - `GET/PATCH /api/admin/ai-tools/licenses/[licenseId]`
+    - `GET/POST /api/admin/ai-tools/wallets`
+    - `GET/PATCH /api/admin/ai-tools/wallets/[walletId]`
+- Regla operativa derivada:
+  - frontend de AI Tooling no debe inventar catálogo, providers, enums ni balance derivado si el backend ya entrega esos contratos
+
+## Delta 2026-03-14 Admin team backend complements
+- `Admin Team Module v2` fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+  - `GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- Resultado operativo:
+  - la task sigue alineada con arquitectura
+  - `Admin Team` mantiene ownership de las mutaciones de roster y asignaciones
+  - `People` sigue siendo read-first y no incorpora writes
+  - `team_members.member_id` sigue siendo el ancla canónica del colaborador
+- Complementos backend agregados para cerrar mejor el módulo:
+  - `GET /api/admin/team/members` ahora devuelve metadata + `members` + `summary`
+  - `GET /api/admin/team/members/[memberId]`
+  - `GET /api/admin/team/assignments`
+  - `GET /api/admin/team/assignments/[assignmentId]`
+- Ajuste de alineación con identidad:
+  - `Admin Team` puede seguir guardando snapshots útiles en `team_members`
+  - cuando el colaborador ya tiene `identity_profile_id`, el backend ahora sincroniza best-effort `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
+
+## Delta 2026-03-14 HR payroll v3 backend complements
+- `HR Payroll v3` ya fue contrastado explícitamente contra:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- Resultado operativo:
+  - la `v3` sí está alineada con arquitectura
+  - `Payroll` sigue owning `compensation_versions`, `payroll_periods` y `payroll_entries`
+  - el colaborador sigue anclado a `greenhouse.team_members.member_id`
+  - no se movieron writes hacia `People` ni `Admin`
+- Complementos backend agregados para desbloquear frontend:
+  - `GET /api/hr/payroll/compensation` ahora devuelve `compensations`, `eligibleMembers`, `members` y `summary`
+  - `GET /api/hr/payroll/compensation/eligible-members`
+  - `GET /api/hr/payroll/periods` ahora devuelve `periods` + `summary`
+  - `GET /api/hr/payroll/periods/[periodId]/entries` ahora devuelve `entries` + `summary`
+  - `GET /api/hr/payroll/members/[memberId]/history` ahora incluye `member` además de `entries` y `compensationHistory`
+- Regla operativa derivada:
+  - frontend de `HR Payroll` debe consumir estos contratos como source of truth y no recomputar discovery de colaboradores o KPIs agregados si el backend ya los expone
+
+## Delta 2026-03-14 Finance backend runtime closure
+- `Finance` ya no debe tratarse solo como dashboard + CRUD parcial; ahora también expone una capa backend de soporte operativo para que frontend cierre conciliación y egresos especializados sin inventar contratos.
+- Superficie backend agregada o endurecida:
+  - `GET /api/finance/reconciliation/[id]/candidates`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `GET /api/finance/expenses/meta`
+  - `GET /api/finance/expenses/payroll-candidates`
+  - `POST /api/finance/expenses` ahora también acepta campos especializados de previsión, impuestos y varios
+- Regla operativa vigente:
+  - conciliación sigue siendo ownership de `Finance`; los writes siguen viviendo en `fin_reconciliation_periods`, `fin_bank_statement_rows`, `fin_income` y `fin_expenses`
+  - la integración con `Payroll` sigue siendo read-only desde `Finance`; la nueva superficie de payroll candidates no convierte a `Finance` en source of truth de nómina
+  - los contratos nuevos siguen anclados a `client_id` y `member_id` cuando corresponde
+- Ajuste de consistencia relevante:
+  - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
+
+## Delta 2026-03-14 Task board reorganization
+- `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.
+- Regla operativa nueva:
+  - las `CODEX_TASK_*` se ordenan en paneles `in-progress`, `to-do` y `complete`
+  - `docs/tasks/README.md` es la vista maestra del board y la única entrada obligatoria para entender estado vigente de tasks
+  - `complete` puede incluir tasks implementadas, absorbidas por una v2 o mantenidas como referencia histórica cerrada
+- Regla de versionado nueva:
+  - los briefs `CODEX_TASK_*` vigentes del proyecto deben vivir dentro de `docs/tasks/**`
+  - el patrón ignorado `CODEX_TASK_*.md` ya no debe ocultar los documentos bajo `docs/tasks/`; queda reservado solo para scratch local en raíz
+- Restricción operativa nueva:
+  - mover una task entre paneles requiere contraste con repo real + `project_context.md` + `Handoff.md` + `changelog.md`, no solo intuición
+
+## Delta 2026-03-14 Provider canonical object alignment
+- La arquitectura 360 ya no debe tratar `provider`, `vendor` o `supplier` como conceptos intercambiables.
+- Regla operativa nueva:
+  - `Provider` pasa a reconocerse como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin
+  - ancla recomendada: `greenhouse.providers.provider_id`
+  - `fin_suppliers` debe tratarse como extensión financiera del Provider, no como identidad global del vendor
+  - `vendor` libre puede existir como snapshot/display label, pero no como relación primaria cuando el vínculo de proveedor sea reusable entre módulos
+- Impacto inmediato en diseño:
+  - la task de `AI Tooling & Credit System` debe relacionar `ai_tool_catalog` con `provider_id`
+  - futuras relaciones de licencias, wallets, costos y mapeos de identidad deben resolver contra `provider_id` cuando aplique
+
 ## Delta 2026-03-14 Greenhouse 360 object model
 - El repo ahora formaliza una regla de arquitectura transversal: Greenhouse debe evolucionar como plataforma de `objetos canónicos enriquecidos`, no como módulos con identidades paralelas por silo.
 - Documento canónico nuevo:
@@ -162,7 +938,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/roadmap/`
   - `docs/operations/`
   - `docs/tasks/`
-- `docs/README.md` es el mapa maestro y `docs/tasks/README.md` concentra el indice de briefs `CODEX_TASK_*`.
+- `docs/README.md` es el mapa maestro y `docs/tasks/README.md` concentra el board de briefs `CODEX_TASK_*`.
+- Estructura viva de tasks:
+  - `docs/tasks/in-progress/`
+  - `docs/tasks/to-do/`
+  - `docs/tasks/complete/`
 
 ## Delta 2026-03-14 Agency data hydration correction
 - La capa `agency` ya no debe asumir que toda la senal operativa vive solo en `notion_project_ids` ni filtrar `greenhouse.clients` por `tenant_type`.
@@ -247,7 +1027,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el modelo ya existe y la UI lo expresa como `en configuracion`
 
 ## Delta 2026-03-13 Team identity and capacity runtime
-- Se implemento una primera capa real del task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
+- Se implemento una primera capa real del task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
   - `GET /api/team/members`
   - `GET /api/team/capacity`
   - `GET /api/team/by-project/[projectId]`
@@ -270,7 +1050,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
   - Ese repo no existe en este workspace.
   - Desde esta sesion no hubo acceso remoto util a `efeoncepro/notion-bigquery`, por lo que no se modifico ni redeployo la Cloud Function externa.
-- El task `docs/tasks/CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
+- El task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` ya no debe asumirse contra columnas ficticias `responsable_*` en BigQuery.
   - La especificacion se alineo al contrato real verificado en `notion_ops.tareas`:
     - `responsables_names`
     - `responsables_ids`

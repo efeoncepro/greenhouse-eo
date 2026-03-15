@@ -23,6 +23,12 @@ import {
   type PaymentStatus,
   type ServiceLine
 } from '@/lib/finance/shared'
+import {
+  listFinanceIncomeFromPostgres,
+  createFinanceIncomeInPostgres,
+  buildMonthlySequenceIdFromPostgres
+} from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,8 +100,6 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
@@ -105,6 +109,22 @@ export async function GET(request: Request) {
   const toDate = searchParams.get('toDate')
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
+
+  // ── Postgres-first path ──
+  try {
+    const result = await listFinanceIncomeFromPostgres({
+      status, clientId, clientProfileId, serviceLine, fromDate, toDate, page, pageSize
+    })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   let filters = ''
@@ -171,8 +191,6 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const body = await request.json()
 
@@ -199,6 +217,62 @@ export async function POST(request: Request) {
 
     const period = invoiceDate.slice(0, 7).replace('-', '')
 
+    const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
+      ? (body.serviceLine as ServiceLine)
+      : null
+
+    const paymentStatus = body.paymentStatus && PAYMENT_STATUSES.includes(body.paymentStatus)
+      ? (body.paymentStatus as PaymentStatus) : 'pending'
+
+    const incomeType = normalizeString(body.incomeType) || 'service_fee'
+
+    // ── Postgres-first path ──
+    try {
+      const incomeId = normalizeString(body.incomeId) ||
+        await buildMonthlySequenceIdFromPostgres({
+          tableName: 'income',
+          idColumn: 'income_id',
+          prefix: 'INC',
+          period
+        })
+
+      await createFinanceIncomeInPostgres({
+        incomeId,
+        clientId: resolvedClient.clientId,
+        clientProfileId: resolvedClient.clientProfileId,
+        hubspotCompanyId: resolvedClient.hubspotCompanyId,
+        hubspotDealId: body.hubspotDealId ? normalizeString(body.hubspotDealId) : null,
+        clientName,
+        invoiceNumber: body.invoiceNumber ? normalizeString(body.invoiceNumber) : null,
+        invoiceDate,
+        dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
+        description: body.description ? normalizeString(body.description) : null,
+        currency,
+        subtotal,
+        taxRate,
+        taxAmount,
+        totalAmount,
+        exchangeRateToClp,
+        totalAmountClp,
+        paymentStatus,
+        poNumber: body.poNumber ? normalizeString(body.poNumber) : null,
+        hesNumber: body.hesNumber ? normalizeString(body.hesNumber) : null,
+        serviceLine,
+        incomeType,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        actorUserId: tenant.userId || null
+      })
+
+      return NextResponse.json({ incomeId, created: true }, { status: 201 })
+    } catch (pgError) {
+      if (!shouldFallbackFromFinancePostgres(pgError)) {
+        throw pgError
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
+
     const incomeId = normalizeString(body.incomeId) ||
       await buildMonthlySequenceId({
         tableName: 'fin_income',
@@ -206,10 +280,6 @@ export async function POST(request: Request) {
         prefix: 'INC',
         period
       })
-
-    const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
-      ? (body.serviceLine as ServiceLine)
-      : null
 
     const projectId = getFinanceProjectId()
 
@@ -224,13 +294,13 @@ export async function POST(request: Request) {
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @incomeId, @clientId, @clientProfileId, @hubspotCompanyId, @hubspotDealId,
-        @clientName, @invoiceNumber, @invoiceDate, @dueDate,
-        @currency, @subtotal, @taxRate, @taxAmount, @totalAmount,
-        @exchangeRateToClp, @totalAmountClp,
+        @incomeId, NULLIF(@clientId, ''), NULLIF(@clientProfileId, ''), NULLIF(@hubspotCompanyId, ''), NULLIF(@hubspotDealId, ''),
+        @clientName, NULLIF(@invoiceNumber, ''), CAST(@invoiceDate AS DATE), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
+        @currency, CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
+        CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
         @paymentStatus, 0,
-        @poNumber, @hesNumber, @serviceLine, @incomeType, @description,
-        FALSE, @notes, @createdBy,
+        NULLIF(@poNumber, ''), NULLIF(@hesNumber, ''), NULLIF(@serviceLine, ''), @incomeType, NULLIF(@description, ''),
+        FALSE, NULLIF(@notes, ''), NULLIF(@createdBy, ''),
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
     `, {
@@ -250,12 +320,11 @@ export async function POST(request: Request) {
       totalAmount,
       exchangeRateToClp,
       totalAmountClp,
-      paymentStatus: body.paymentStatus && PAYMENT_STATUSES.includes(body.paymentStatus)
-        ? (body.paymentStatus as PaymentStatus) : 'pending',
+      paymentStatus,
       poNumber: body.poNumber ? normalizeString(body.poNumber) : null,
       hesNumber: body.hesNumber ? normalizeString(body.hesNumber) : null,
       serviceLine,
-      incomeType: normalizeString(body.incomeType) || 'service_fee',
+      incomeType,
       description: body.description ? normalizeString(body.description) : null,
       notes: body.notes ? normalizeString(body.notes) : null,
       createdBy: tenant.userId || null
@@ -267,6 +336,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    throw error
+    const detail = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('POST /api/finance/income failed:', detail, error)
+
+    return NextResponse.json({ error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' }, { status: 500 })
   }
 }

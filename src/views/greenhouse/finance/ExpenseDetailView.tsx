@@ -58,6 +58,14 @@ interface ExpenseDetail {
 const formatAmount = (amount: number, currency: string) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
 
+const formatDate = (dateStr: string | null): string => {
+  if (!dateStr) return '—'
+
+  const [y, m, d] = dateStr.split('-')
+
+  return `${d}/${m}/${y}`
+}
+
 const typeLabel = (type: string) => {
   switch (type) {
     case 'supplier': return 'Proveedor'
@@ -246,15 +254,15 @@ const ExpenseDetailView = () => {
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Fecha de pago</Typography>
-              <Typography variant='body2'>{data.paymentDate || '—'}</Typography>
+              <Typography variant='body2'>{formatDate(data.paymentDate)}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Fecha documento</Typography>
-              <Typography variant='body2'>{data.documentDate || '—'}</Typography>
+              <Typography variant='body2'>{formatDate(data.documentDate)}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>Vencimiento</Typography>
-              <Typography variant='body2'>{data.dueDate || '—'}</Typography>
+              <Typography variant='body2'>{formatDate(data.dueDate)}</Typography>
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Typography variant='caption' color='text.secondary'>N° Documento</Typography>

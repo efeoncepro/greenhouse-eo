@@ -4,6 +4,10 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
+  getFinanceIncomeFromPostgres
+} from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
   runFinanceQuery,
   getFinanceProjectId,
   assertNonEmptyString,
@@ -109,9 +113,25 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { id: incomeId } = await params
+
+  // ── Postgres-first path ──
+  try {
+    const income = await getFinanceIncomeFromPostgres(incomeId)
+
+    if (!income) {
+      return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(income)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<IncomeDetailRow>(`
@@ -200,12 +220,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     if (body.invoiceDate !== undefined) {
-      updates.push('invoice_date = @invoiceDate')
+      updates.push('invoice_date = IF(@invoiceDate = \'\', NULL, CAST(@invoiceDate AS DATE))')
       updateParams.invoiceDate = normalizeString(body.invoiceDate)
     }
 
     if (body.dueDate !== undefined) {
-      updates.push('due_date = @dueDate')
+      updates.push('due_date = IF(@dueDate = \'\', NULL, CAST(@dueDate AS DATE))')
       updateParams.dueDate = body.dueDate ? normalizeString(body.dueDate) : null
     }
 
