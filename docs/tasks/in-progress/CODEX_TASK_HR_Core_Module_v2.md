@@ -275,6 +275,39 @@ Pueden:
   - propósito: proteger la ingestión externa de asistencia
   - entornos: `Development`, `Preview`, `Staging`, `Production`
 
+## QA runtime 2026-03-15 — flujos activos
+
+### Flujos mapeados
+
+- dashboard HR:
+  - permisos pendientes
+  - departamentos
+  - asistencia reciente
+- departamentos:
+  - lista
+  - alta
+  - edición
+- permisos:
+  - metadata
+  - creación de solicitud
+  - revisión
+  - balances
+- asistencia:
+  - listado y filtros
+
+### Fix aplicado en esta pasada QA
+
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+  - la UI de revisión solo permitía `approve` / `reject`
+  - backend ya soportaba `cancel`, por lo que faltaba el camino operativo para cancelar solicitudes pendientes desde pantalla
+  - ahora el diálogo expone `Cancelar solicitud` y usa el endpoint backend real
+
+### Estado después del QA
+
+- `HR Core` queda con sus flujos principales visibles y operables desde frontend
+- no apareció en esta pasada otro bloqueo de flujo equivalente en departamentos o asistencia
+- falta validación runtime autenticada sobre permisos reales por rol `employee` vs `hr`
+
 ## Fuera de alcance de esta v2
 
 - UI completa de `employee` route group

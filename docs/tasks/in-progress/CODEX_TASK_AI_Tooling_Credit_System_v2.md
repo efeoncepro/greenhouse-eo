@@ -246,6 +246,36 @@ Beneficios del contrato admin:
 - no exponer costos al cliente aunque el admin sí los vea
 - no inventar enums para forms si `GET /api/admin/ai-tools/meta` ya los entrega
 
+## QA runtime 2026-03-15 — frontend + flujos activos
+
+### Flujos mapeados
+
+- dashboard admin:
+  - tabs de catálogo, licencias, wallets y consumo
+- catálogo:
+  - alta
+  - edición
+- licencias:
+  - listado
+  - asignación
+- wallets:
+  - alta
+  - recarga
+  - edición
+- consumo:
+  - ledger
+  - registro manual de débito
+
+### Estado verificado en esta pasada QA
+
+- `AI Tooling` ya tiene operables los flujos admin más importantes:
+  - alta/edición de catálogo
+  - asignación de licencias
+  - alta/edición/recarga de wallets
+  - registro de consumo
+- durante esta pasada no apareció un bloqueo frontend adicional comparable en `AI Tooling`
+- falta smoke autenticado con datos reales para validar permisos y persistencia end-to-end
+
 ## Fuera de alcance de esta v2
 
 - writeback automático a `fin_expenses`

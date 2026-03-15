@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -53,6 +53,33 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [changeReason, setChangeReason] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    setPayRegime(ev?.payRegime ?? 'chile')
+    setCurrency(ev?.currency ?? 'CLP')
+    setBaseSalary(ev?.baseSalary ?? 0)
+    setRemoteAllowance(ev?.remoteAllowance ?? 0)
+    setBonusOtdMin(ev?.bonusOtdMin ?? 0)
+    setBonusOtdMax(ev?.bonusOtdMax ?? 0)
+    setBonusRpaMin(ev?.bonusRpaMin ?? 0)
+    setBonusRpaMax(ev?.bonusRpaMax ?? 0)
+    setAfpName(ev?.afpName ?? '')
+    setAfpRate(ev?.afpRate ?? 0.1144)
+    setHealthSystem(ev?.healthSystem ?? 'fonasa')
+    setHealthPlanUf(ev?.healthPlanUf ?? 0)
+    setUnemploymentRate(ev?.unemploymentRate ?? 0.006)
+    setContractType(ev?.contractType ?? 'indefinido')
+    setHasApv(ev?.hasApv ?? false)
+    setApvAmount(ev?.apvAmount ?? 0)
+    setEffectiveFrom(ev?.effectiveFrom ?? new Date().toISOString().slice(0, 10))
+    setChangeReason('')
+    setSaving(false)
+    setError(null)
+  }, [open, ev, memberId])
 
   const handleRegimeChange = (regime: PayRegime) => {
     setPayRegime(regime)

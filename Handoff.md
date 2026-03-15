@@ -40,6 +40,431 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar QA funcional cruzado sobre `Finance`, `HR Core`, `HR Payroll` y `AI Tooling`, mapear sus flujos activos contra frontend/backend real y corregir los bugs de mayor impacto encontrados.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx`
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+- `src/views/greenhouse/payroll/MemberPayrollHistory.tsx`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se mapearon los flujos activos por módulo desde vistas + rutas API:
+  - `Finance`: dashboard, ingresos, egresos, clientes, proveedores, conciliación
+  - `HR Core`: dashboard, departamentos, permisos, attendance
+  - `HR Payroll`: dashboard, compensaciones, períodos, entries, historial por colaborador
+  - `AI Tooling`: catálogo, licencias, wallets, consumo
+- Fixes aplicados:
+  - `Finance Dashboard` ya no usa `openingBalance` como saldo total; ahora usa `currentBalance` y muestra fecha del snapshot cuando existe
+  - `HR Leave` ahora expone cancelación de solicitudes pendientes, alineado con el backend
+  - `CompensationDrawer` de `HR Payroll` ahora reinicia correctamente su estado al cambiar de colaborador o versión
+- `AI Tooling` quedó validado en esta pasada como operativo en sus flujos admin principales:
+  - catálogo
+  - licencias
+  - wallets
+  - consumo
+
+### Verificación
+- `pnpm exec eslint src/views/greenhouse/finance src/app/api/finance src/lib/finance`
+  - correcto
+- `pnpm exec eslint src/views/greenhouse/hr-core src/app/api/hr/core src/lib/hr-core`
+  - correcto
+- `pnpm exec eslint src/views/greenhouse/payroll src/app/api/hr/payroll src/lib/payroll`
+  - correcto
+- `pnpm exec eslint src/views/greenhouse/ai-tools src/app/api/ai-tools src/app/api/ai-credits src/app/api/admin/ai-tools src/lib/ai-tools`
+  - correcto
+- `pnpm exec tsc --noEmit --pretty false`
+  - el proyecto sigue con ruido previo fuera del scope auditado
+  - no aparecieron errores del scope `finance|hr-core|payroll|ai-tools` al filtrar el resultado
+- `git diff --check -- ...` sobre los archivos tocados
+  - correcto
+
+### Riesgos o pendientes
+- El QA fue estático + contractual; no se hizo smoke autenticado real en Preview contra BigQuery para los cuatro módulos.
+- `Finance`, `HR Core`, `HR Payroll` y `AI Tooling` quedan más coherentes para seguir sobre frontend, pero todavía conviene una siguiente pasada con usuario real para validar permisos y datos vivos.
+- Las tasks vivas de cada módulo ya quedaron actualizadas con:
+  - flujos mapeados
+  - bug corregido en esta pasada
+  - estado operativo después del QA
+
+## 2026-03-15 03:42 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Conectar `Finance` a APIs abiertas de tipo de cambio, persistir snapshots diarios en BigQuery y dejar automatizado el sync para cálculos server-side en USD.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/finance/exchange-rates.ts`
+- `src/lib/finance/shared.ts`
+- `src/app/api/finance/exchange-rates/latest/route.ts`
+- `src/app/api/finance/exchange-rates/sync/route.ts`
+- `vercel.json`
+- `.env.example`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se agregó una capa server-only para sincronización de tipo de cambio:
+  - proveedor primario `mindicador.cl`
+  - fallback `open.er-api.com`
+- La sincronización persiste ambos pares por fecha en `greenhouse.fin_exchange_rates`:
+  - `USD -> CLP`
+  - `CLP -> USD`
+- Se agregó `GET/POST /api/finance/exchange-rates/sync`:
+  - `GET` pensado para cron interno
+  - `POST` disponible para ejecución manual autenticada
+- `GET /api/finance/exchange-rates/latest` ahora intenta hidratar desde proveedor si todavía no existe snapshot almacenado.
+- `getLatestExchangeRate()` y, por arrastre, `resolveExchangeRateToClp()` ahora pueden auto-sincronizar `USD/CLP` antes de fallar, evitando que ingresos y egresos en USD dependan de una carga manual previa.
+- Se agregó `vercel.json` con cron diario hacia `/api/finance/exchange-rates/sync`.
+- Se documentó la nueva variable `CRON_SECRET` y el comportamiento operativo en `project_context.md` y en la task financiera.
+
+### Verificación
+- `pnpm exec eslint src/lib/finance/exchange-rates.ts src/lib/finance/shared.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts`
+  - correcto
+- `git diff --check -- src/lib/finance/exchange-rates.ts src/lib/finance/shared.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts vercel.json .env.example docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md project_context.md Handoff.md changelog.md`
+  - correcto
+- `pnpm exec tsc --noEmit --pretty false`
+  - el proyecto sigue con ruido previo fuera del scope validado
+  - no aparecieron errores del scope `exchange-rates|finance/shared` al filtrar el resultado
+- Verificación de proveedores externos con `node` + `fetch`
+  - `https://mindicador.cl/api/dolar`: `200`
+  - `https://open.er-api.com/v6/latest/USD`: `200`
+
+### Riesgos o pendientes
+- El sync automático queda enfocado solo en `USD/CLP`; si el módulo expande monedas, conviene generalizar la capa FX.
+- `Vercel Cron` quedó configurado, pero requiere que `CRON_SECRET` exista en los ambientes donde se quiera invocar manualmente con bearer token.
+- Falta validar en preview que el cron y la lectura `latest` queden operativos con credenciales reales de BigQuery.
+- Frontend no queda bloqueado por este cambio. Lo sugerido como siguiente mejora UX es:
+  - mostrar `USD/CLP` actual con fecha y fuente usando `GET /api/finance/exchange-rates/latest`
+  - opcionalmente agregar `Sincronizar tipo de cambio` contra `POST /api/finance/exchange-rates/sync`
+  - evitar lógica de conversión en cliente; mantener la resolución de tasa solo en backend
+
+## 2026-03-15 00:49 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Mover el foco backend desde `Finance` hacia `HR-Payroll`, revisar el contrato actual y corregir el primer bug server-side encontrado en la vigencia de compensaciones.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-members.ts`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se auditó `HR-Payroll` backend contra la task v3 y arquitectura antes de seguir.
+- Se detectó un bug real de vigencia:
+  - compensaciones futuras dependían de `is_current` materializado al crearse
+  - no existía rotación automática cuando la fecha efectiva llegaba
+  - el backend podía seguir resolviendo una compensación vencida como “actual”
+- Se corrigió:
+  - `getCurrentCompensation()` ahora resuelve la compensación actual por ventana `effective_from/effective_to`
+  - `listPayrollCompensationMembers()` ahora deriva `hasCurrentCompensation` con el mismo criterio temporal
+  - `normalizeCompensationVersion()` ya no confía ciegamente en `is_current` persistido
+- Se dejó el hardening documentado dentro de la task activa de `HR-Payroll`.
+
+### Verificación
+- `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll`
+  - correcto
+- `git diff --check -- src/lib/payroll src/app/api/hr/payroll docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
+  - correcto
+- `pnpm exec tsc --noEmit --pretty false`
+  - el proyecto sigue con ruido previo fuera de payroll
+  - no aparecieron errores del scope `src/lib/payroll|src/app/api/hr/payroll` al filtrar el resultado
+
+### Riesgos o pendientes
+- `HR-Payroll` backend queda más consistente para compensaciones futuras, pero aún conviene una siguiente tanda backend si se quiere cerrar más:
+  - auditoría explícita en cambios de compensación/período
+  - revisión de queries con params nulos opcionales en writes BigQuery
+  - smoke runtime autenticado con un caso real de compensación futura programada
+- No se tocaron las vistas `src/views/greenhouse/payroll/*` que ya tenían cambios abiertos en el worktree.
+
+## 2026-03-15 00:44 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar re-QA backend de `Finance`, corregir los bugs server-side que todavía quedaban después de la segunda tanda y determinar si el módulo ya puede ceder foco a `HR-Payroll`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/app/api/finance/dashboard/aging/route.ts`
+- `src/app/api/finance/dashboard/by-service-line/route.ts`
+- `src/app/api/finance/clients/route.ts`
+- `src/app/api/finance/clients/[id]/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Re-QA backend de `Finance` detectó tres bugs server-side que seguían abiertos:
+  - `aging` devolvía cuentas por cobrar en moneda nativa aunque la UI las interpreta como CLP
+  - `clients` list y detail calculaban `totalReceivable` mezclando monedas nativas y luego se renderizaban como CLP
+  - `by-service-line` seguía sin separar caja/devengo
+- Se corrigió:
+  - `GET /api/finance/dashboard/aging` para devolver aging en CLP estimado proporcional
+  - `GET /api/finance/clients` para devolver `totalReceivable` en CLP consistente con el render actual
+  - `GET /api/finance/clients/[id]` para devolver `summary.totalReceivable` en CLP consistente
+  - `GET /api/finance/dashboard/by-service-line` para exponer cash y accrual en paralelo, manteniendo `income/expenses/net` como cash legacy-compatible
+- Se dejó esta validación asentada en la task financiera y el módulo backend queda operativo para ceder foco a `HR-Payroll`.
+
+### Verificación
+- `pnpm exec eslint src/app/api/finance src/lib/finance`
+  - correcto
+- `git diff --check -- src/app/api/finance src/lib/finance docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md Handoff.md changelog.md`
+  - correcto
+- `pnpm exec tsc --noEmit --pretty false`
+  - sigue fallando por ruido previo de `.next/types/validator.ts`
+  - no aparecieron errores del scope `finance` al filtrar el resultado
+
+### Riesgos o pendientes
+- `Finance` backend queda suficientemente estable para pasar el siguiente foco a `HR-Payroll`.
+- Las deudas abiertas de `Finance` ya son principalmente:
+  - consumo UI de los nuevos contratos
+  - normalización futura de `payments_received`
+  - soporte de pagos parciales en egresos
+- No se hizo smoke manual en preview en este turno.
+
+## 2026-03-15 00:37 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar la segunda tanda backend pendiente del `Finance Module`: conciliación por pagos parciales, separación caja/devengo en reporting y saldo bancario operativo para dashboard.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/finance/schema.ts`
+- `src/lib/finance/income-payments.ts`
+- `src/lib/finance/reporting.ts`
+- `src/lib/finance/reconciliation.ts`
+- `src/app/api/finance/accounts/route.ts`
+- `src/app/api/finance/income/[id]/payment/route.ts`
+- `src/app/api/finance/income/summary/route.ts`
+- `src/app/api/finance/expenses/summary/route.ts`
+- `src/app/api/finance/dashboard/summary/route.ts`
+- `src/app/api/finance/dashboard/cashflow/route.ts`
+- `src/app/api/finance/reconciliation/[id]/match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/unmatch/route.ts`
+- `src/app/api/finance/reconciliation/[id]/exclude/route.ts`
+- `src/app/api/finance/reconciliation/[id]/auto-match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se extendió conciliación bancaria para soportar pagos parciales de ingresos:
+  - cada fila de extracto puede guardar `matched_payment_id`
+  - candidatos de conciliación para ingresos ahora pueden salir a nivel de pago individual
+  - `match`, `unmatch`, `exclude` y `auto-match` distinguen `matchedRecordId` vs `matchedPaymentId`
+  - `payments_received` ahora persiste metadata de conciliación por pago
+- Se mantuvo backward compatibility del modelo:
+  - `fin_income.is_reconciled` y `fin_income.reconciliation_id` siguen existiendo
+  - ahora se recalculan como resumen de la factura completa cuando aplica
+- Se separó reporting financiero de caja vs devengo sin romper el contrato legacy:
+  - `GET /api/finance/income/summary`
+  - `GET /api/finance/expenses/summary`
+  - `GET /api/finance/dashboard/summary`
+  - `GET /api/finance/dashboard/cashflow`
+  - todos exponen campos nuevos `cash*` / `accrual*`
+- Se corrigió el endpoint de cuentas para que exponga saldo operativo:
+  - `currentBalance`
+  - `balanceAsOf`
+  - `balanceSource`
+  - con prioridad `statement -> period_close -> opening_balance`
+- Se actualizó la task financiera con el handoff explícito de esta segunda tanda backend hacia Claude.
+
+### Verificación
+- `pnpm exec eslint src/lib/finance/income-payments.ts src/lib/finance/reporting.ts src/lib/finance/reconciliation.ts src/lib/finance/schema.ts src/app/api/finance/accounts/route.ts 'src/app/api/finance/income/[id]/payment/route.ts' src/app/api/finance/income/summary/route.ts src/app/api/finance/expenses/summary/route.ts src/app/api/finance/dashboard/summary/route.ts src/app/api/finance/dashboard/cashflow/route.ts 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts'`
+  - correcto
+- No se ejecutó `pnpm build`
+- No se hizo smoke manual en preview en este turno
+
+### Riesgos o pendientes
+- La reconciliación parcial quedó funcional en backend, pero sigue modelada sobre `payments_received` JSON; si el módulo crece, conviene normalizar eso en tabla propia.
+- La UI actual todavía no consume:
+  - `currentBalance`
+  - `balanceSource`
+  - `cash*`
+  - `accrual*`
+  - `matchedPaymentId`
+- Egresos siguen sin modelo de pagos parciales; la métrica de caja depende de `payment_date` para egresos `paid`.
+
+## 2026-03-15 03:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar la primera tanda backend crítica del `Finance Module` después del QA: integridad de conciliación, bloqueo real de períodos y mejor criterio temporal para cobros.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/finance/reconciliation.ts`
+- `src/app/api/finance/reconciliation/[id]/statements/route.ts`
+- `src/app/api/finance/reconciliation/[id]/match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/unmatch/route.ts`
+- `src/app/api/finance/reconciliation/[id]/exclude/route.ts`
+- `src/app/api/finance/reconciliation/[id]/auto-match/route.ts`
+- `src/app/api/finance/reconciliation/[id]/route.ts`
+- `src/app/api/finance/reconciliation/route.ts`
+- `src/app/api/finance/exchange-rates/route.ts`
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se corrigió la importación de extractos para que:
+  - no reinicie la secuencia de `row_id` al reimportar en el mismo período
+  - persista `statement_row_count` con el total acumulado real
+- Se endurecieron las rutas de conciliación para bloquear mutaciones sobre períodos `reconciled` o `closed`:
+  - `match`
+  - `unmatch`
+  - `exclude`
+  - `auto-match`
+- Se endureció `PUT /api/finance/reconciliation/[id]` para impedir:
+  - reconciliar sin extracto importado
+  - reconciliar con filas `unmatched` o `suggested`
+  - reconciliar con `difference != 0`
+  - cerrar un período no reconciliado
+  - mutar un período `closed`
+- Se mejoró el criterio temporal de conciliación para ingresos:
+  - candidatos manuales y auto-match ahora prefieren la fecha y referencia del último `payments_received`
+  - se mantiene `invoice_date` como fallback para no romper el contrato actual
+- Se documentó explícitamente en la task financiera el handoff `Codex -> Claude`:
+  - qué ya quedó cerrado en backend
+  - qué queda mejor para Claude en UI/UX
+  - qué deuda backend no conviene tapar desde frontend
+
+### Verificación
+- `pnpm exec eslint src/lib/finance/reconciliation.ts 'src/app/api/finance/reconciliation/[id]/statements/route.ts' 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts' src/app/api/finance/reconciliation/route.ts src/app/api/finance/exchange-rates/route.ts`
+  - correcto
+- `git diff --check -- src/lib/finance/reconciliation.ts 'src/app/api/finance/reconciliation/[id]/statements/route.ts' 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts' src/app/api/finance/reconciliation/route.ts src/app/api/finance/exchange-rates/route.ts docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md Handoff.md`
+  - correcto
+- No se ejecutó `pnpm build`
+- No se hizo smoke manual en preview en este turno
+
+### Riesgos o pendientes
+- La deuda de conciliación por pagos parciales múltiples sigue abierta:
+  - el modelo actual reconcilia a nivel de factura (`fin_income.reconciliation_id`), no a nivel de cada pago registrado
+- El dashboard sigue con semántica mezclada entre caja y devengo; esa corrección no se tomó en esta tanda para no mezclar integridad backend con refactor de reporting.
+- El siguiente paso recomendado para Claude es tomar la parte UI/UX documentada en la task, ya sobre contratos backend más estables.
+
+## 2026-03-15 02:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar un QA funcional profundo del `Finance Module`, identificar bugs reales en dashboard, listas, detalles y conciliación, y documentarlos dentro de la task activa del módulo.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se auditó estáticamente el módulo `Finance` en:
+  - `src/views/greenhouse/finance/*`
+  - `src/app/api/finance/*`
+  - `src/lib/finance/reconciliation.ts`
+  - `src/lib/finance/shared.ts`
+- Se documentó en la task financiera una sección nueva `QA funcional 2026-03-15` con:
+  - hallazgos priorizados por severidad
+  - evidencia por archivo/línea
+  - impacto funcional
+  - recomendación de corrección por tandas
+- Hallazgos más importantes detectados:
+  - reimportación de extractos recicla `row_id` en conciliación y desincroniza `statement_row_count`
+  - `match` / `unmatch` pueden seguir mutando períodos ya `reconciled` o `closed`
+  - el dashboard mezcla devengo con caja y usa `openingBalance` como `Saldo total`
+  - el orden cronológico del dashboard puede romperse por sort lexicográfico de meses
+  - reconciliación manual de ingresos usa `invoice_date`, lo que omite cobros válidos
+  - proveedores tiene drift de taxonomía entre create/list/detail y la lista no navega al detalle
+  - clientes e ingresos/egresos todavía tienen varios puntos con navegación no SPA o moneda/fecha mal renderizada
+
+### Verificación
+- `pnpm exec eslint src/views/greenhouse/finance src/app/api/finance src/lib/finance`
+  - resultado: falla
+  - se usó como insumo del QA técnico y quedó documentado en la task
+- No se ejecutó `pnpm build`
+- No se hizo smoke manual en preview en este turno
+
+### Riesgos o pendientes
+- El documento de task ya tiene backlog claro de bugs, pero el runtime todavía conserva issues de integridad en conciliación y semántica incorrecta en dashboard.
+- El siguiente paso recomendado es tomar la tanda de mayor severidad:
+  - bloqueo real de períodos reconciliados/cerrados
+  - IDs únicos y conteo correcto en importación de extractos
+  - corrección de criterios temporales para conciliación de cobros
+  - separación explícita entre métricas de caja y métricas por fecha documento/factura
+
 ## 2026-03-15 00:40 America/Santiago
 
 ### Agente

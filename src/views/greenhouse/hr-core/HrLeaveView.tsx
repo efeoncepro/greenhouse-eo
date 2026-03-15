@@ -42,6 +42,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type {
+  HrApprovalAction,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveBalancesResponse,
@@ -77,7 +78,7 @@ const HrLeaveView = () => {
 
   // Review dialog
   const [reviewReq, setReviewReq] = useState<HrLeaveRequest | null>(null)
-  const [reviewAction, setReviewAction] = useState<'approve' | 'reject'>('approve')
+  const [reviewAction, setReviewAction] = useState<HrApprovalAction>('approve')
   const [reviewNotes, setReviewNotes] = useState('')
   const [reviewSaving, setReviewSaving] = useState(false)
 
@@ -95,6 +96,7 @@ const HrLeaveView = () => {
 
       if (reqRes.ok) setReqData(await reqRes.json())
       if (balRes.ok) setBalData(await balRes.json())
+
       if (metaRes.ok) {
         const meta = await metaRes.json()
 
@@ -173,6 +175,12 @@ const HrLeaveView = () => {
     } finally {
       setReviewSaving(false)
     }
+  }
+
+  const handleReviewAction = (action: HrApprovalAction) => {
+    setReviewAction(action)
+
+    void handleReview()
   }
 
   if (loading) {
@@ -416,6 +424,7 @@ const HrLeaveView = () => {
           <Grid container spacing={6}>
             {balancesByType.map(bt => {
               const conf = getLeaveTypeConfig(bt.leaveTypeCode)
+
               const gaugeOptions: ApexOptions = {
                 chart: { parentHeightOffset: 0, sparkline: { enabled: true } },
                 plotOptions: {
@@ -633,12 +642,21 @@ const HrLeaveView = () => {
         )}
         <DialogActions>
           <Button variant='tonal' color='secondary' onClick={() => setReviewReq(null)} disabled={reviewSaving}>
-            Cancelar
+            Cerrar
+          </Button>
+          <Button
+            variant='tonal'
+            color='warning'
+            onClick={() => handleReviewAction('cancel')}
+            disabled={reviewSaving}
+            startIcon={<i className='tabler-ban' />}
+          >
+            Cancelar solicitud
           </Button>
           <Button
             variant='contained'
             color='error'
-            onClick={() => { setReviewAction('reject'); handleReview() }}
+            onClick={() => handleReviewAction('reject')}
             disabled={reviewSaving}
             startIcon={<i className='tabler-circle-x' />}
           >
@@ -647,7 +665,7 @@ const HrLeaveView = () => {
           <Button
             variant='contained'
             color='success'
-            onClick={() => { setReviewAction('approve'); handleReview() }}
+            onClick={() => handleReviewAction('approve')}
             disabled={reviewSaving}
             startIcon={<i className='tabler-circle-check' />}
           >

@@ -103,6 +103,87 @@ Handoff backend para frontend:
 - usar `history.member` para header y empty states del detalle de colaborador
 - usar `periods.summary` y `entries.summary` si se quieren KPIs rápidos de pantalla, sin recalcularlos localmente por defecto
 
+## Backend hardening 2026-03-15
+
+### Hallazgo backend detectado
+
+- la vigencia “actual” de compensaciones dependía de `compensation_versions.is_current` materializado al momento de creación
+- si se programaba una compensación futura:
+  - la versión vigente seguía marcada como `is_current = TRUE`
+  - la futura quedaba `FALSE`
+  - no existía ningún proceso posterior que rotara esa bandera al llegar la fecha efectiva
+- impacto:
+  - `GET /api/hr/payroll/compensation` podía seguir mostrando una compensación vencida como actual
+  - `eligibleMembers` y `members` podían derivar mal `hasCurrentCompensation`
+  - la UI de compensaciones podía quedar desalineada con la vigencia real
+
+### Corregido en backend
+
+- `src/lib/payroll/get-compensation.ts`
+  - `isCurrent` ahora se deriva por ventana efectiva:
+    - `effective_from <= today`
+    - `effective_to IS NULL OR effective_to >= today`
+  - `getCurrentCompensation()` ya no depende de `is_current = TRUE`
+- `src/lib/payroll/get-payroll-members.ts`
+  - la CTE `current_compensation` ahora resuelve la compensación vigente por fechas efectivas, no por la bandera materializada
+
+### Validación
+
+- `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll`
+  - correcto
+- `git diff --check -- src/lib/payroll src/app/api/hr/payroll docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
+  - correcto
+- `pnpm exec tsc --noEmit --pretty false`
+  - el proyecto sigue con ruido previo fuera de payroll, pero no aparecieron errores del scope `src/lib/payroll|src/app/api/hr/payroll` al filtrarlo
+
+### Estado del backend después de esta tanda
+
+- `HR-Payroll` backend vuelve a ser consistente con compensaciones futuras programadas
+- el próximo foco backend, si se abre otra tanda, conviene ir por:
+  - auditoría explícita de cambios de compensación/período
+  - revisión de nulabilidad de params BigQuery en writes con campos opcionales
+  - smoke runtime autenticado sobre período con compensaciones futuras reales
+
+## QA runtime 2026-03-15 — frontend + flujos activos
+
+### Flujos mapeados
+
+- dashboard payroll:
+  - overview de período actual
+  - tabs de período, compensaciones e historial
+- compensaciones:
+  - alta inicial
+  - nueva versión desde fila existente
+- períodos:
+  - creación
+  - edición de metadata
+  - cálculo
+  - aprobación
+  - export CSV
+- entries:
+  - bonos
+  - KPI manual
+  - impuesto manual
+  - override neto
+- historial por colaborador:
+  - entries cerradas
+  - historial de compensación
+
+### Fix aplicado en esta pasada QA
+
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+  - el drawer reutilizaba estado previo entre colaborador/versiones porque sus `useState` no se resincronizaban con props al reabrirse
+  - impacto:
+    - alta inicial podía heredar valores del colaborador anterior
+    - crear nueva versión desde otra fila podía abrir con datos stale
+  - ahora el formulario se rehidrata al abrirse según `existingVersion` o colaborador nuevo
+
+### Estado después del QA
+
+- el flujo de compensaciones vuelve a ser confiable para crear primera versión o nueva versión sin arrastrar estado viejo
+- la vista `MemberPayrollHistory` ya no tiene issues de lint en esta pasada
+- falta smoke autenticado con datos reales de cálculo/aprobación/export
+
 ## Alcance v3
 
 ### A. Alta inicial de compensación

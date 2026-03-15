@@ -43,6 +43,9 @@ interface AccountSummary {
   accountName: string
   currency: string
   openingBalance: number
+  currentBalance?: number
+  balanceAsOf?: string | null
+  balanceSource?: string | null
   isActive: boolean
 }
 
@@ -356,8 +359,17 @@ const FinanceDashboardView = () => {
   }, [fetchData])
 
   // Derived values
-  const totalBalance = accounts.length > 0 ? accounts.reduce((sum, a) => sum + (a.openingBalance ?? 0), 0) : null
+  const totalBalance = accounts.length > 0
+    ? accounts.reduce((sum, account) => sum + (account.currentBalance ?? account.openingBalance ?? 0), 0)
+    : null
+
   const activeAccountCount = accounts.filter(a => a.isActive).length
+
+  const latestBalanceAsOf = [...accounts]
+    .map(account => account.balanceAsOf)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? null
 
   const incomeMonthly = incomeSummary?.monthly ?? []
   const expenseMonthly = expenseSummary?.monthly ?? []
@@ -470,7 +482,9 @@ const FinanceDashboardView = () => {
             stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
             subtitle={accounts.length === 0
               ? 'Sin cuentas activas registradas'
-              : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
+              : latestBalanceAsOf
+                ? `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''} · al ${formatDate(latestBalanceAsOf)}`
+                : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
             avatarIcon='tabler-wallet'
             avatarColor='primary'
           />
@@ -505,7 +519,9 @@ const FinanceDashboardView = () => {
           <HorizontalWithSubtitle
             title='Tipo de cambio'
             stats={exchangeRate.available && exchangeRate.rate ? `$${formatRate(exchangeRate.rate)}` : 'Sin datos'}
-            subtitle={exchangeRate.available ? `USD → CLP · ${exchangeRate.source ?? 'manual'}` : 'Sin registros'}
+            subtitle={exchangeRate.available
+              ? `USD → CLP · ${exchangeRate.source ?? 'manual'}${exchangeRate.rateDate ? ` · ${formatDate(exchangeRate.rateDate)}` : ''}`
+              : 'Sin registros'}
             avatarIcon='tabler-arrows-exchange'
             avatarColor='info'
           />

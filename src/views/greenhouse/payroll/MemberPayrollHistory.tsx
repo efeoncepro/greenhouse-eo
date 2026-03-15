@@ -25,9 +25,9 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-import CustomChip from '@core/components/mui/Chip'
-
 import type { ApexOptions } from 'apexcharts'
+
+import CustomChip from '@core/components/mui/Chip'
 
 import { HorizontalWithSubtitle, StatsWithAreaChart } from '@/components/card-statistics'
 import type { MemberPayrollHistory as MemberHistory } from '@/types/payroll'
