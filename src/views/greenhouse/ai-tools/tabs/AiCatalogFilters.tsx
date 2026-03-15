@@ -18,16 +18,14 @@ type Props = {
   meta: AiToolingAdminMetadata | null
   category: string
   provider: string
-  search: string
   setCategory: (v: string) => void
   setProvider: (v: string) => void
-  setSearch: (v: string) => void
   setFiltered: (d: AiTool[]) => void
 }
 
 const AiCatalogFilters = ({
-  data, providers, meta, category, provider, search,
-  setCategory, setProvider, setSearch, setFiltered
+  data, providers, meta, category, provider,
+  setCategory, setProvider, setFiltered
 }: Props) => {
   const providerOptions = useMemo(() => {
     const all = [...(meta?.providers ?? []), ...providers]
@@ -50,36 +48,21 @@ const AiCatalogFilters = ({
       if (category && item.toolCategory !== category) return false
       if (provider && item.providerId !== provider) return false
 
-      if (search) {
-        const q = search.toLowerCase()
-
-        return item.toolName.toLowerCase().includes(q) || (item.description ?? '').toLowerCase().includes(q)
-      }
-
       return true
     })
 
     setFiltered(filtered)
-  }, [data, category, provider, search, setFiltered])
+  }, [data, category, provider, setFiltered])
 
   return (
     <CardContent>
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <CustomTextField
-            fullWidth
-            size='small'
-            placeholder='Buscar herramienta...'
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <CustomTextField
             select fullWidth size='small' label='Categoría'
             value={category} onChange={e => setCategory(e.target.value)}
           >
-            <MenuItem value=''>Todas</MenuItem>
+            <MenuItem value=''>Todas las categorías</MenuItem>
             {categories.map(cat => (
               <MenuItem key={cat} value={cat}>
                 <Stack direction='row' spacing={1} alignItems='center'>
@@ -90,24 +73,15 @@ const AiCatalogFilters = ({
             ))}
           </CustomTextField>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <CustomTextField
             select fullWidth size='small' label='Proveedor'
             value={provider} onChange={e => setProvider(e.target.value)}
           >
-            <MenuItem value=''>Todos</MenuItem>
+            <MenuItem value=''>Todos los proveedores</MenuItem>
             {providerOptions.map(p => (
               <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
             ))}
-          </CustomTextField>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <CustomTextField
-            select fullWidth size='small' label='Estado'
-            value='' onChange={() => {}}
-            disabled
-          >
-            <MenuItem value=''>Todos</MenuItem>
           </CustomTextField>
         </Grid>
       </Grid>

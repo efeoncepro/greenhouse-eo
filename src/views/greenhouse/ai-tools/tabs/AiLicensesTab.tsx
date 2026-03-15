@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -16,16 +16,19 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
+import type { TextFieldProps } from '@mui/material/TextField'
 
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import type { SortingState } from '@tanstack/react-table'
+import type { ColumnDef, FilterFn } from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -40,6 +43,38 @@ import AiLicensesFilters from './AiLicensesFilters'
 
 import tableStyles from '@core/styles/table.module.css'
 
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  addMeta({ itemRank })
+
+  return itemRank.passed
+}
+
+const DebouncedInput = ({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number
+  onChange: (value: string | number) => void
+  debounce?: number
+} & Omit<TextFieldProps, 'onChange'>) => {
+  const [value, setValue] = useState(initialValue)
+
+  useEffect(() => { setValue(initialValue) }, [initialValue])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => { onChange(value) }, debounce)
+
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
+}
+
 const columnHelper = createColumnHelper<MemberToolLicense>()
 
 type Props = {
@@ -53,9 +88,8 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('')
-  const [search, setSearch] = useState('')
   const [filtered, setFiltered] = useState<MemberToolLicense[]>(licenses)
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'memberName', desc: false }])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   // Form state
   const [formMember, setFormMember] = useState('')
@@ -101,23 +135,21 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
     }
   }
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnDef<MemberToolLicense, any>[]>(
     () => [
       columnHelper.accessor('memberName', {
         header: 'Colaborador',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
-            <CustomAvatar skin='light' color='info' size={30}>
+            <CustomAvatar skin='light' color='info' size={34}>
               {getInitials(row.original.memberName || '')}
             </CustomAvatar>
             <div className='flex flex-col'>
-              <Typography className='font-medium' color='text.primary'>
+              <Typography color='text.primary' className='font-medium'>
                 {row.original.memberName ?? '—'}
               </Typography>
               {row.original.memberEmail && (
-                <Typography variant='body2' color='text.disabled'>
-                  {row.original.memberEmail}
-                </Typography>
+                <Typography variant='body2'>{row.original.memberEmail}</Typography>
               )}
             </div>
           </div>
@@ -127,19 +159,20 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
         id: 'toolName',
         header: 'Herramienta',
         cell: ({ row }) => (
-          <Typography variant='body2'>{row.original.tool?.toolName ?? row.original.toolId}</Typography>
+          <Typography color='text.primary'>{row.original.tool?.toolName ?? row.original.toolId}</Typography>
         )
       }),
       columnHelper.accessor('accessLevel', {
         header: 'Acceso',
-        cell: ({ getValue }) => {
-          const conf = accessLevelConfig[getValue()]
+        cell: ({ row }) => {
+          const al = row.original.accessLevel
+          const conf = accessLevelConfig[al]
 
           return (
             <CustomChip
               round='true' size='small' variant='tonal'
               icon={<i className={conf?.icon ?? 'tabler-shield'} />}
-              label={conf?.label ?? getValue()}
+              label={conf?.label ?? al}
               color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
             />
           )
@@ -148,25 +181,21 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
       columnHelper.accessor('accountEmail', {
         header: 'Email cuenta',
         cell: ({ getValue }) => (
-          <Typography
-            variant='body2'
-            color='text.secondary'
-            sx={{ fontFamily: getValue() ? 'monospace' : undefined, fontSize: getValue() ? '0.8rem' : undefined }}
-          >
+          <Typography sx={{ fontFamily: getValue() ? 'monospace' : undefined, fontSize: getValue() ? '0.8rem' : undefined }}>
             {getValue() ?? '—'}
           </Typography>
         )
       }),
       columnHelper.accessor('licenseStatus', {
         header: 'Estado',
-        cell: ({ getValue }) => {
-          const conf = licenseStatusConfig[getValue()]
+        cell: ({ row }) => {
+          const st = row.original.licenseStatus
+          const conf = licenseStatusConfig[st]
 
           return (
             <CustomChip
               round='true' size='small' variant='tonal'
-              icon={<i className={conf?.icon ?? 'tabler-circle'} />}
-              label={conf?.label ?? getValue()}
+              label={conf?.label ?? st}
               color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
             />
           )
@@ -176,9 +205,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
         id: 'assignedDate',
         header: 'Asignado',
         cell: ({ row }) => (
-          <Typography variant='body2' color='text.secondary'>
-            {formatDate(row.original.activatedAt ?? row.original.createdAt)}
-          </Typography>
+          <Typography>{formatDate(row.original.activatedAt ?? row.original.createdAt)}</Typography>
         )
       })
     ],
@@ -188,9 +215,12 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const table = useReactTable({
     data: filtered,
     columns,
-    state: { sorting },
-    onSortingChange: setSorting,
+    filterFns: { fuzzy: fuzzyFilter },
+    state: { globalFilter },
+    globalFilterFn: fuzzyFilter,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 10 } }
@@ -199,24 +229,42 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   return (
     <>
       <Card>
-        <CardHeader
-          title='Licencias de herramientas'
-          subheader={`${filtered.length} licencias`}
-          action={
-            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-              Asignar licencia
-            </Button>
-          }
-        />
+        <CardHeader title='Filters' className='pbe-4' />
         <AiLicensesFilters
           data={licenses}
           meta={meta}
           status={filterStatus}
-          search={search}
           setStatus={setFilterStatus}
-          setSearch={setSearch}
           setFiltered={setFiltered}
         />
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={e => table.setPageSize(Number(e.target.value))}
+            className='max-sm:is-full sm:is-[70px]'
+          >
+            <MenuItem value='10'>10</MenuItem>
+            <MenuItem value='25'>25</MenuItem>
+            <MenuItem value='50'>50</MenuItem>
+          </CustomTextField>
+          <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              onChange={value => setGlobalFilter(String(value))}
+              placeholder='Buscar licencia'
+              className='max-sm:is-full sm:is-[250px]'
+            />
+            <Button
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              onClick={openCreate}
+              className='max-sm:is-full'
+            >
+              Asignar licencia
+            </Button>
+          </div>
+        </div>
         <div className='overflow-x-auto'>
           <table className={tableStyles.table}>
             <thead>
@@ -225,59 +273,51 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                   {headerGroup.headers.map(header => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
-                        <div
-                          className={classnames({
-                            'flex items-center': header.column.getIsSorted(),
-                            'cursor-pointer select-none': header.column.getCanSort()
-                          })}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{
-                            asc: <i className='tabler-chevron-up text-xl' />,
-                            desc: <i className='tabler-chevron-down text-xl' />
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
+                        <>
+                          <div
+                            className={classnames({
+                              'flex items-center': header.column.getIsSorted(),
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' />,
+                              desc: <i className='tabler-chevron-down text-xl' />
+                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                          </div>
+                        </>
                       )}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
-            <tbody>
-              {table.getRowModel().rows.length === 0 ? (
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
                 <tr>
-                  <td colSpan={columns.length} className='text-center'>
-                    <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
-                      <CustomAvatar variant='rounded' skin='light' color='info' size={56}>
-                        <i className='tabler-key' style={{ fontSize: 28 }} />
-                      </CustomAvatar>
-                      <Typography variant='h6' color='text.secondary'>
-                        {filterStatus || search ? 'Sin resultados' : 'Sin licencias asignadas'}
-                      </Typography>
-                      <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
-                        {filterStatus || search
-                          ? 'No hay licencias que coincidan con los filtros.'
-                          : 'Asigna herramientas AI a los miembros del equipo para gestionar accesos y controlar el uso.'}
-                      </Typography>
-                      {!(filterStatus || search) && (
-                        <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-                          Asignar primera licencia
-                        </Button>
-                      )}
-                    </Stack>
+                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                    <Typography color='text.secondary' sx={{ py: 4 }}>
+                      No se encontraron licencias
+                    </Typography>
                   </td>
                 </tr>
-              ) : (
-                table.getRowModel().rows.map(row => (
-                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                    {row.getVisibleCells().map(cell => (
-                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                    ))}
-                  </tr>
-                ))
-              )}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map(row => (
+                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      ))}
+                    </tr>
+                  ))}
+              </tbody>
+            )}
           </table>
         </div>
         <TablePagination

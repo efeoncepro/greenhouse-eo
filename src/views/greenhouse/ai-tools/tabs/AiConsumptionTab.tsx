@@ -17,16 +17,19 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
+import type { TextFieldProps } from '@mui/material/TextField'
 
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import type { SortingState } from '@tanstack/react-table'
+import type { ColumnDef, FilterFn } from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -39,6 +42,38 @@ import { ledgerEntryTypeConfig, formatTimestamp, formatCost } from '../helpers'
 import AiConsumptionFilters from './AiConsumptionFilters'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  addMeta({ itemRank })
+
+  return itemRank.passed
+}
+
+const DebouncedInput = ({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number
+  onChange: (value: string | number) => void
+  debounce?: number
+} & Omit<TextFieldProps, 'onChange'>) => {
+  const [value, setValue] = useState(initialValue)
+
+  useEffect(() => { setValue(initialValue) }, [initialValue])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => { onChange(value) }, debounce)
+
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
+}
 
 const columnHelper = createColumnHelper<AiCreditLedgerEntry>()
 
@@ -53,7 +88,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
   const [filterMember, setFilterMember] = useState('')
   const [consumeOpen, setConsumeOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   // Consume form
   const [formWallet, setFormWallet] = useState('')
@@ -121,28 +156,28 @@ const AiConsumptionTab = ({ meta }: Props) => {
   }
 
   const entries = data?.entries ?? []
-  const summary = data?.summary
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnDef<AiCreditLedgerEntry, any>[]>(
     () => [
       columnHelper.accessor('createdAt', {
         header: 'Fecha',
         cell: ({ getValue }) => (
-          <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
+          <Typography sx={{ whiteSpace: 'nowrap' }}>
             {formatTimestamp(getValue())}
           </Typography>
         )
       }),
       columnHelper.accessor('entryType', {
         header: 'Tipo',
-        cell: ({ getValue }) => {
-          const conf = ledgerEntryTypeConfig[getValue()]
+        cell: ({ row }) => {
+          const et = row.original.entryType
+          const conf = ledgerEntryTypeConfig[et]
 
           return (
             <CustomChip
               round='true' size='small' variant='tonal'
               icon={<i className={conf?.icon ?? 'tabler-circle'} />}
-              label={conf?.label ?? getValue()}
+              label={conf?.label ?? et}
               color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
             />
           )
@@ -155,7 +190,6 @@ const AiConsumptionTab = ({ meta }: Props) => {
 
           return (
             <Typography
-              variant='body2'
               sx={{ fontFamily: 'monospace', fontWeight: 600, color: isDebit ? 'error.main' : 'success.main' }}
             >
               {isDebit ? '-' : '+'}{row.original.creditAmount}
@@ -166,7 +200,7 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('balanceAfter', {
         header: 'Balance',
         cell: ({ getValue }) => (
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
+          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
             {getValue()}
           </Typography>
         )
@@ -174,14 +208,14 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('consumedByName', {
         header: 'Miembro',
         cell: ({ getValue }) => (
-          <Typography variant='body2'>{getValue() ?? '—'}</Typography>
+          <Typography>{getValue() ?? '—'}</Typography>
         )
       }),
       columnHelper.display({
         id: 'asset',
-        header: 'Asset / Descripción',
+        header: 'Descripción',
         cell: ({ row }) => (
-          <Typography variant='body2' noWrap sx={{ maxWidth: 200 }}>
+          <Typography noWrap sx={{ maxWidth: 200 }}>
             {row.original.assetDescription ?? row.original.reloadReason ?? '—'}
           </Typography>
         )
@@ -189,16 +223,14 @@ const AiConsumptionTab = ({ meta }: Props) => {
       columnHelper.accessor('projectName', {
         header: 'Proyecto',
         cell: ({ getValue }) => (
-          <Typography variant='body2' color='text.secondary'>
-            {getValue() ?? '—'}
-          </Typography>
+          <Typography>{getValue() ?? '—'}</Typography>
         )
       }),
       columnHelper.display({
         id: 'cost',
         header: 'Costo',
         cell: ({ row }) => (
-          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }} color='text.secondary'>
+          <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
             {formatCost(row.original.totalCost, row.original.costCurrency)}
           </Typography>
         )
@@ -210,26 +242,34 @@ const AiConsumptionTab = ({ meta }: Props) => {
   const table = useReactTable({
     data: entries,
     columns,
-    state: { sorting },
-    onSortingChange: setSorting,
+    filterFns: { fuzzy: fuzzyFilter },
+    state: { globalFilter },
+    globalFilterFn: fuzzyFilter,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 15 } }
   })
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader title='Registro de consumo' />
+        <Stack spacing={1} sx={{ p: 6 }}>
+          {[0, 1, 2, 3, 4].map(i => (
+            <Skeleton key={i} variant='rounded' height={44} />
+          ))}
+        </Stack>
+      </Card>
+    )
+  }
+
   return (
     <>
       <Card>
-        <CardHeader
-          title='Registro de consumo'
-          subheader={summary ? `${summary.totalEntries} movimientos · ${summary.totalDebits} débitos · ${summary.totalCredits} créditos` : undefined}
-          action={
-            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openConsume}>
-              Registrar consumo
-            </Button>
-          }
-        />
+        <CardHeader title='Filters' className='pbe-4' />
         <AiConsumptionFilters
           meta={meta}
           filterMember={filterMember}
@@ -237,80 +277,96 @@ const AiConsumptionTab = ({ meta }: Props) => {
           setFilterMember={setFilterMember}
           setFilterWallet={setFilterWallet}
         />
-        {loading ? (
-          <Stack spacing={1} sx={{ px: 4, pb: 4 }}>
-            {[0, 1, 2, 3, 4].map(i => (
-              <Skeleton key={i} variant='rounded' height={44} />
-            ))}
-          </Stack>
-        ) : (
-          <>
-            <div className='overflow-x-auto'>
-              <table className={tableStyles.table}>
-                <thead>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id}>
-                          {header.isPlaceholder ? null : (
-                            <div
-                              className={classnames({
-                                'flex items-center': header.column.getIsSorted(),
-                                'cursor-pointer select-none': header.column.getCanSort()
-                              })}
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                              {{
-                                asc: <i className='tabler-chevron-up text-xl' />,
-                                desc: <i className='tabler-chevron-down text-xl' />
-                              }[header.column.getIsSorted() as string] ?? null}
-                            </div>
-                          )}
-                        </th>
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={e => table.setPageSize(Number(e.target.value))}
+            className='max-sm:is-full sm:is-[70px]'
+          >
+            <MenuItem value='10'>10</MenuItem>
+            <MenuItem value='25'>25</MenuItem>
+            <MenuItem value='50'>50</MenuItem>
+          </CustomTextField>
+          <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              onChange={value => setGlobalFilter(String(value))}
+              placeholder='Buscar movimiento'
+              className='max-sm:is-full sm:is-[250px]'
+            />
+            <Button
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              onClick={openConsume}
+              className='max-sm:is-full'
+            >
+              Registrar consumo
+            </Button>
+          </div>
+        </div>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            className={classnames({
+                              'flex items-center': header.column.getIsSorted(),
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' />,
+                              desc: <i className='tabler-chevron-down text-xl' />
+                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                          </div>
+                        </>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                    <Typography color='text.secondary' sx={{ py: 4 }}>
+                      No se encontraron movimientos
+                    </Typography>
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
                       ))}
                     </tr>
                   ))}
-                </thead>
-                <tbody>
-                  {table.getRowModel().rows.length === 0 ? (
-                    <tr>
-                      <td colSpan={columns.length} className='text-center'>
-                        <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
-                          <CustomAvatar variant='rounded' skin='light' color='warning' size={56}>
-                            <i className='tabler-receipt' style={{ fontSize: 28 }} />
-                          </CustomAvatar>
-                          <Typography variant='h6' color='text.secondary'>Sin movimientos</Typography>
-                          <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
-                            Los consumos y recargas de créditos aparecerán aquí al registrar operaciones.
-                          </Typography>
-                          <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openConsume}>
-                            Registrar primer consumo
-                          </Button>
-                        </Stack>
-                      </td>
-                    </tr>
-                  ) : (
-                    table.getRowModel().rows.map(row => (
-                      <tr key={row.id}>
-                        {row.getVisibleCells().map(cell => (
-                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                        ))}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <TablePagination
-              component={() => <TablePaginationComponent table={table} />}
-              count={table.getFilteredRowModel().rows.length}
-              rowsPerPage={table.getState().pagination.pageSize}
-              page={table.getState().pagination.pageIndex}
-              onPageChange={(_, page) => table.setPageIndex(page)}
-            />
-          </>
-        )}
+              </tbody>
+            )}
+          </table>
+        </div>
+        <TablePagination
+          component={() => <TablePaginationComponent table={table} />}
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          onPageChange={(_, page) => table.setPageIndex(page)}
+        />
       </Card>
 
       {/* Consume Dialog */}

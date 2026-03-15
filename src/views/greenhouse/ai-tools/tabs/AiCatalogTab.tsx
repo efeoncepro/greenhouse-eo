@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -20,21 +20,25 @@ import Switch from '@mui/material/Switch'
 import TablePagination from '@mui/material/TablePagination'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import type { TextFieldProps } from '@mui/material/TextField'
 
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import type { SortingState } from '@tanstack/react-table'
+import type { ColumnDef, FilterFn } from '@tanstack/react-table'
+import { rankItem } from '@tanstack/match-sorter-utils'
 import classnames from 'classnames'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AiTool, ProviderRecord, AiToolingAdminMetadata } from '@/types/ai-tools'
@@ -42,6 +46,38 @@ import { toolCategoryConfig, costModelConfig, formatCost } from '../helpers'
 import AiCatalogFilters from './AiCatalogFilters'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  addMeta({ itemRank })
+
+  return itemRank.passed
+}
+
+const DebouncedInput = ({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number
+  onChange: (value: string | number) => void
+  debounce?: number
+} & Omit<TextFieldProps, 'onChange'>) => {
+  const [value, setValue] = useState(initialValue)
+
+  useEffect(() => { setValue(initialValue) }, [initialValue])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => { onChange(value) }, debounce)
+
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
+}
 
 const columnHelper = createColumnHelper<AiTool>()
 
@@ -58,9 +94,9 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const [saving, setSaving] = useState(false)
   const [filterCategory, setFilterCategory] = useState('')
   const [filterProvider, setFilterProvider] = useState('')
-  const [search, setSearch] = useState('')
   const [filtered, setFiltered] = useState<AiTool[]>(tools)
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'toolName', desc: false }])
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [rowSelection, setRowSelection] = useState({})
 
   // Form state
   const [formToolId, setFormToolId] = useState('')
@@ -188,7 +224,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const showSubFields = formCostModel === 'subscription' || formCostModel === 'hybrid'
   const showCreditFields = formCostModel === 'per_credit' || formCostModel === 'hybrid'
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnDef<AiTool, any>[]>(
     () => [
       columnHelper.accessor('toolName', {
         header: 'Herramienta',
@@ -201,13 +237,11 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                 <i className={catConf?.icon ?? 'tabler-puzzle'} style={{ fontSize: 18 }} />
               </CustomAvatar>
               <div className='flex flex-col'>
-                <Typography className='font-medium' color='text.primary'>
+                <Typography color='text.primary' className='font-medium'>
                   {row.original.toolName}
                 </Typography>
                 {row.original.description && (
-                  <Typography variant='body2' color='text.disabled' noWrap sx={{ maxWidth: 220 }}>
-                    {row.original.description}
-                  </Typography>
+                  <Typography variant='body2'>{row.original.description}</Typography>
                 )}
               </div>
             </div>
@@ -217,20 +251,21 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
       columnHelper.accessor('providerName', {
         header: 'Proveedor',
         cell: ({ row }) => (
-          <Typography variant='body2' color='text.secondary'>
+          <Typography color='text.primary'>
             {row.original.providerName ?? row.original.vendor ?? '—'}
           </Typography>
         )
       }),
       columnHelper.accessor('toolCategory', {
         header: 'Categoría',
-        cell: ({ getValue }) => {
-          const conf = toolCategoryConfig[getValue()]
+        cell: ({ row }) => {
+          const cat = row.original.toolCategory
+          const conf = toolCategoryConfig[cat]
 
           return (
             <CustomChip
               round='true' size='small' variant='tonal'
-              label={conf?.label ?? getValue()}
+              label={conf?.label ?? cat}
               color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
             />
           )
@@ -238,14 +273,15 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
       }),
       columnHelper.accessor('costModel', {
         header: 'Modelo',
-        cell: ({ getValue }) => {
-          const conf = costModelConfig[getValue()]
+        cell: ({ row }) => {
+          const cm = row.original.costModel
+          const conf = costModelConfig[cm]
 
           return (
             <CustomChip
               round='true' size='small' variant='tonal'
               icon={<i className={conf?.icon ?? 'tabler-coin'} />}
-              label={conf?.label ?? getValue()}
+              label={conf?.label ?? cm}
               color={conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'}
             />
           )
@@ -258,7 +294,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
           const tool = row.original
 
           return (
-            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+            <Typography sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
               {tool.costModel === 'per_credit' || tool.costModel === 'hybrid'
                 ? `${formatCost(tool.creditUnitCost, tool.creditUnitCurrency)} / ${tool.creditUnitName ?? 'unit'}`
                 : tool.costModel === 'subscription'
@@ -273,7 +309,6 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
         cell: ({ getValue }) => (
           <CustomChip
             round='true' size='small' variant='tonal'
-            icon={<i className={getValue() ? 'tabler-check' : 'tabler-x'} />}
             label={getValue() ? 'Activa' : 'Inactiva'}
             color={getValue() ? 'success' : 'secondary'}
           />
@@ -281,14 +316,34 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
       }),
       columnHelper.display({
         id: 'actions',
+        header: 'Acciones',
         cell: ({ row }) => (
-          <Tooltip title='Editar'>
-            <IconButton size='small' color='secondary' onClick={() => openEdit(row.original)}>
-              <i className='tabler-pencil' style={{ fontSize: 18 }} />
+          <div className='flex items-center'>
+            <IconButton size='small' onClick={() => openEdit(row.original)}>
+              <i className='tabler-edit text-textSecondary' />
             </IconButton>
-          </Tooltip>
+            <OptionMenu
+              iconButtonProps={{ size: 'medium' }}
+              iconClassName='text-textSecondary'
+              options={[
+                {
+                  text: 'Editar',
+                  icon: 'tabler-pencil',
+                  menuItemProps: {
+                    className: 'flex items-center gap-2 text-textSecondary',
+                    onClick: () => openEdit(row.original)
+                  }
+                },
+                {
+                  text: 'Duplicar',
+                  icon: 'tabler-copy',
+                  menuItemProps: { className: 'flex items-center gap-2 text-textSecondary' }
+                }
+              ]}
+            />
+          </div>
         ),
-        size: 48
+        enableSorting: false
       })
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -298,9 +353,13 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const table = useReactTable({
     data: filtered,
     columns,
-    state: { sorting },
-    onSortingChange: setSorting,
+    filterFns: { fuzzy: fuzzyFilter },
+    state: { rowSelection, globalFilter },
+    globalFilterFn: fuzzyFilter,
+    onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: { pagination: { pageSize: 10 } }
@@ -309,27 +368,45 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   return (
     <>
       <Card>
-        <CardHeader
-          title='Catálogo de herramientas AI'
-          subheader={`${filtered.length} herramientas`}
-          action={
-            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-              Nueva herramienta
-            </Button>
-          }
-        />
+        <CardHeader title='Filters' className='pbe-4' />
         <AiCatalogFilters
           data={tools}
           providers={providers}
           meta={meta}
           category={filterCategory}
           provider={filterProvider}
-          search={search}
           setCategory={setFilterCategory}
           setProvider={setFilterProvider}
-          setSearch={setSearch}
           setFiltered={setFiltered}
         />
+        <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
+          <CustomTextField
+            select
+            value={table.getState().pagination.pageSize}
+            onChange={e => table.setPageSize(Number(e.target.value))}
+            className='max-sm:is-full sm:is-[70px]'
+          >
+            <MenuItem value='10'>10</MenuItem>
+            <MenuItem value='25'>25</MenuItem>
+            <MenuItem value='50'>50</MenuItem>
+          </CustomTextField>
+          <div className='flex flex-col sm:flex-row max-sm:is-full items-start sm:items-center gap-4'>
+            <DebouncedInput
+              value={globalFilter ?? ''}
+              onChange={value => setGlobalFilter(String(value))}
+              placeholder='Buscar herramienta'
+              className='max-sm:is-full sm:is-[250px]'
+            />
+            <Button
+              variant='contained'
+              startIcon={<i className='tabler-plus' />}
+              onClick={openCreate}
+              className='max-sm:is-full'
+            >
+              Nueva herramienta
+            </Button>
+          </div>
+        </div>
         <div className='overflow-x-auto'>
           <table className={tableStyles.table}>
             <thead>
@@ -338,59 +415,51 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                   {headerGroup.headers.map(header => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
-                        <div
-                          className={classnames({
-                            'flex items-center': header.column.getIsSorted(),
-                            'cursor-pointer select-none': header.column.getCanSort()
-                          })}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{
-                            asc: <i className='tabler-chevron-up text-xl' />,
-                            desc: <i className='tabler-chevron-down text-xl' />
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
+                        <>
+                          <div
+                            className={classnames({
+                              'flex items-center': header.column.getIsSorted(),
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' />,
+                              desc: <i className='tabler-chevron-down text-xl' />
+                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                          </div>
+                        </>
                       )}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
-            <tbody>
-              {table.getRowModel().rows.length === 0 ? (
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
                 <tr>
-                  <td colSpan={columns.length} className='text-center'>
-                    <Stack alignItems='center' spacing={2} sx={{ py: 6 }}>
-                      <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
-                        <i className='tabler-wand' style={{ fontSize: 28 }} />
-                      </CustomAvatar>
-                      <Typography variant='h6' color='text.secondary'>
-                        {filterCategory || filterProvider || search ? 'Sin resultados' : 'Aún no tienes herramientas'}
-                      </Typography>
-                      <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
-                        {filterCategory || filterProvider || search
-                          ? 'No hay herramientas que coincidan con los filtros aplicados.'
-                          : 'Registra las herramientas AI del ecosistema para gestionar licencias y asignar créditos.'}
-                      </Typography>
-                      {!(filterCategory || filterProvider || search) && (
-                        <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
-                          Registrar primera herramienta
-                        </Button>
-                      )}
-                    </Stack>
+                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                    <Typography color='text.secondary' sx={{ py: 4 }}>
+                      No se encontraron herramientas
+                    </Typography>
                   </td>
                 </tr>
-              ) : (
-                table.getRowModel().rows.map(row => (
-                  <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                    {row.getVisibleCells().map(cell => (
-                      <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-                    ))}
-                  </tr>
-                ))
-              )}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map(row => (
+                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      ))}
+                    </tr>
+                  ))}
+              </tbody>
+            )}
           </table>
         </div>
         <TablePagination
