@@ -6,6 +6,21 @@
 
 ## 2026-03-15
 
+### Data platform architecture and Cloud SQL operational foundation
+- Se formalizó la arquitectura objetivo `OLTP + OLAP` en `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`.
+- Greenhouse deja explícitamente definido que `PostgreSQL` será la base operacional para workflows mutables y `BigQuery` quedará como warehouse analítico.
+- Se provisionó la primera instancia administrada de PostgreSQL en Google Cloud:
+  - instancia: `greenhouse-pg-dev`
+  - proyecto: `efeonce-group`
+  - región: `us-east4`
+  - motor: `POSTGRES_16`
+  - base creada: `greenhouse_app`
+  - usuario creado: `greenhouse_app`
+- Se crearon los secretos operativos iniciales en Secret Manager:
+  - `greenhouse-pg-dev-postgres-password`
+  - `greenhouse-pg-dev-app-password`
+- Este cambio deja lista la fundación de infraestructura para empezar la migración fuera de BigQuery, pero todavía no conecta el runtime del portal a Postgres.
+
 ### HR Payroll admin team surface and compensation overview resilience
 - `Payroll` ya no depende de una ruta inexistente para indicar dónde habilitar o gestionar colaboradores.
 - Se agregó la ruta runtime `/admin/team`, reutilizando la vista de `People`, y el menú `Admin` ahora expone `Equipo`.

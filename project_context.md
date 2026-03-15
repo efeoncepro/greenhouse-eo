@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
+- Se agregó la arquitectura de datos objetivo en:
+  - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- La dirección formal del stack queda declarada como:
+  - `PostgreSQL` para `OLTP` y workflows mutables
+  - `BigQuery` para `raw`, `conformed`, `core analytics` y `marts`
+- Se provisionó la primera base operacional de referencia en Google Cloud:
+  - proyecto: `efeonce-group`
+  - instancia Cloud SQL: `greenhouse-pg-dev`
+  - motor: `POSTGRES_16`
+  - región: `us-east4`
+  - tier: `db-custom-1-3840`
+  - storage: `20 GB SSD`
+  - base inicial: `greenhouse_app`
+  - usuario inicial: `greenhouse_app`
+- Secretos creados en Secret Manager:
+  - `greenhouse-pg-dev-postgres-password`
+  - `greenhouse-pg-dev-app-password`
+- Boundary vigente:
+  - la app todavía no está conectada a Postgres
+  - esta pasada deja lista la fundación de infraestructura, no el cutover runtime
+  - la integración de aplicación debe hacerse vía repository/services, no con rewrites directos módulo por módulo contra Cloud SQL
+
 ## Delta 2026-03-15 Finance exchange-rate sync persistence
 - `Finance` ahora tiene hidratación automática server-side de `USD/CLP` para evitar que ingresos/egresos en USD dependan de carga manual previa.
 - Proveedores activos para tipo de cambio:

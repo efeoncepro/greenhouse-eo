@@ -40,6 +40,72 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 03:47 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Formalizar la arquitectura de datos objetivo `PostgreSQL + BigQuery` y ejecutar la primera provisión real de Cloud SQL para empezar a sacar workflows operativos de BigQuery.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Architecture / Infrastructure foundation
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se agregó la arquitectura de alto nivel `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`.
+- La dirección oficial queda definida como:
+  - `PostgreSQL` para flujos operativos y mutables
+  - `BigQuery` para capas `raw`, `conformed`, `core analytics` y `marts`
+- Se autenticó por CLI en Google Cloud con la cuenta correcta sobre `efeonce-group`.
+- Se verificó que no existían instancias previas de Cloud SQL en el proyecto.
+- Se provisionó la primera instancia de Cloud SQL:
+  - instancia: `greenhouse-pg-dev`
+  - motor: `POSTGRES_16`
+  - región: `us-east4`
+  - zone: `us-east4-a`
+  - tier: `db-custom-1-3840`
+  - storage: `20 GB SSD`
+  - IP pública primaria: `34.86.135.144`
+  - connection name: `efeonce-group:us-east4:greenhouse-pg-dev`
+- Se crearon:
+  - base `greenhouse_app`
+  - usuario `greenhouse_app`
+- Se registraron credenciales en Secret Manager:
+  - `greenhouse-pg-dev-postgres-password`
+  - `greenhouse-pg-dev-app-password`
+
+### Verificación
+- `gcloud auth login --no-launch-browser --update-adc`
+  - correcto con `julio.reyes@efeonce.org`
+- `gcloud sql instances list --project efeonce-group`
+  - correcto; confirmó ausencia inicial y luego presencia de `greenhouse-pg-dev`
+- `gcloud sql instances describe greenhouse-pg-dev --project efeonce-group`
+  - correcto; estado `RUNNABLE`
+- `gcloud sql databases list --instance=greenhouse-pg-dev --project efeonce-group`
+  - correcto; confirmó `greenhouse_app`
+- `gcloud sql users list --instance=greenhouse-pg-dev --project efeonce-group`
+  - correcto; confirmó `greenhouse_app` y `postgres`
+
+### Riesgos o pendientes
+- La app todavía no usa Postgres en runtime; esta pasada solo deja la fundación de infraestructura.
+- El siguiente paso sano no es conectar módulos directo a la IP pública, sino definir la estrategia de acceso desde aplicación:
+  - idealmente repository layer + Cloud SQL connector / worker de sync
+  - no volver a mezclar writes operativos con BigQuery como primary store
+- Pendiente de arquitectura/técnico:
+  - decidir primer dominio a migrar (`HR > Permisos` es el candidato natural)
+  - definir esquema inicial en Postgres
+  - definir sync `Postgres -> BigQuery`
+
 ## 2026-03-15 08:31 America/Santiago
 
 ### Agente
