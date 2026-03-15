@@ -77,18 +77,26 @@ Rule:
 - PostgreSQL emits operational truth here
 - workers move those changes into BigQuery conformed/mart layers
 
-### 4. Domain schemas, starting with `greenhouse_hr`
+### 4. Domain schemas
 
 Domain workflows extend the canonical core from dedicated schemas instead of pushing module-specific mutable state back into `greenhouse_core`.
 
-The first extension now materialized is:
-- `greenhouse_hr.leave_types`
-- `greenhouse_hr.leave_balances`
-- `greenhouse_hr.leave_requests`
-- `greenhouse_hr.leave_request_actions`
+#### `greenhouse_hr`
+
+- `leave_types`
+- `leave_balances`
+- `leave_requests`
+- `leave_request_actions`
+
+#### `greenhouse_payroll`
+
+- `compensation_versions` — salary/compensation history per collaborator
+- `payroll_periods` — monthly processing periods with lifecycle states
+- `payroll_entries` — per-member calculation snapshots (compensation + KPIs + deductions)
+- `payroll_bonus_config` — global bonus qualification thresholds
 
 Rule:
-- domain tables reference `greenhouse_core` anchors
+- domain tables reference `greenhouse_core` anchors via FK
 - write-heavy workflows live here
 - the core identity graph remains shared and stable
 
@@ -221,6 +229,18 @@ That is the actual platform synergy we want.
 
 The initial serving layer intentionally starts small.
 
+### `greenhouse_serving.member_payroll_360`
+
+Purpose:
+- one stable read shape combining canonical member identity with current compensation
+
+Includes:
+- core member fields (display_name, primary_email, job_level, employment_type, status)
+- department name
+- current compensation version (pay_regime, currency, base_salary, remote_allowance, contract_type)
+- total compensation versions count
+- total payroll entries count
+
 ### `greenhouse_serving.client_360`
 
 Purpose:
@@ -258,17 +278,46 @@ Purpose:
 Purpose:
 - normalized client/module relationship for dashboard, admin and provisioning flows
 
-## Sync Pattern
+## Data Flow Architecture
 
-The PostgreSQL canonical core is not meant to replace BigQuery marts.
+### PostgreSQL = OLTP (source of truth)
+
+All transactional writes land in PostgreSQL first. This is the authoritative operational store for:
+- identity and access (`greenhouse_core`)
+- HR workflows (`greenhouse_hr`)
+- payroll processing (`greenhouse_payroll`)
+- finance operations (`greenhouse_finance`)
+
+The product runtime reads and writes against PostgreSQL. There is no dual-write path.
+
+### BigQuery = OLAP (analytical replica)
+
+BigQuery is the analytical layer. It does not receive direct product writes.
 
 Instead:
 1. product writes land in PostgreSQL
 2. changes are recorded in `greenhouse_sync.outbox_events`
 3. a worker publishes those changes into BigQuery conformed tables and marts
-4. BigQuery continues serving warehouse-style analytics and heavy joins
+4. BigQuery continues serving warehouse-style analytics, heavy joins, and cross-domain reporting
 
-This is the split that removes the `table update quota` problem from the product runtime.
+This split:
+- removes the BigQuery `table update quota` problem from the product runtime
+- gives Payroll, HR and Finance sub-second write latency with ACID guarantees
+- keeps BigQuery available for dashboards, historical analysis, and BI tools that expect a warehouse
+- allows each domain to evolve its PostgreSQL schema independently without breaking analytical consumers
+
+### Outbox consumer (pending)
+
+The outbox consumer that reads `greenhouse_sync.outbox_events` and materializes into BigQuery does not exist yet. Until it is built:
+- PostgreSQL is the only source of truth for migrated modules
+- BigQuery tables for those modules remain empty or stale
+- No data is lost — the outbox accumulates all events for eventual replay
+
+When built, the consumer should:
+- process events in order per aggregate (e.g., per `member_id`)
+- be idempotent (safe to replay)
+- materialize into `greenhouse` dataset tables matching the current BigQuery schema for backward compatibility
+- optionally feed conformed mart tables for cross-domain analytics
 
 ## Provisioning Status
 
@@ -282,11 +331,15 @@ The bootstrap created:
 - `greenhouse_serving`
 - `greenhouse_sync`
 - `greenhouse_hr`
+- `greenhouse_payroll`
+- `greenhouse_finance`
 - canonical tables
-- initial `360` views
+- `360` serving views (`member_360`, `member_payroll_360`, `client_360`, etc.)
 - grants for application user `greenhouse_app`
 
-The first operational cutover executed on top of this model is:
+### Operational cutovers completed
+
+#### HR Leave (`greenhouse_hr`)
 - `GET /api/hr/core/meta`
 - `GET /api/hr/core/leave/balances`
 - `GET /api/hr/core/leave/requests`
@@ -294,7 +347,15 @@ The first operational cutover executed on top of this model is:
 - `POST /api/hr/core/leave/requests`
 - `POST /api/hr/core/leave/requests/[requestId]/review`
 
-These routes now prefer PostgreSQL when the environment is configured, while the rest of `HR Core` stops using request-time DDL and falls back to non-mutating schema validation in BigQuery.
+#### Payroll (`greenhouse_payroll`)
+- `GET/POST /api/hr/payroll/compensation`
+- `GET/POST /api/hr/payroll/periods`
+- `GET /api/hr/payroll/entries`
+- `GET /api/hr/payroll/members`
+- `POST /api/hr/payroll/periods/[periodId]/approve`
+- payroll calculation, recalculation, export, and entry persistence
+
+All migrated routes prefer PostgreSQL when the environment is configured (`isPayrollPostgresEnabled()` / `isHrCoreLeavePostgresEnabled()`), with automatic fallback to BigQuery when PostgreSQL credentials are not present.
 
 ## Immediate Migration Implication
 
@@ -303,3 +364,17 @@ When a module migrates next:
 - it should publish outbox events
 - it should use `greenhouse_serving` only for reads
 - it should stop inventing module-local copies of `client`, `member`, or `provider`
+
+## Migration Checklist
+
+For each domain module migrating from BigQuery to PostgreSQL:
+
+1. **Schema**: create `greenhouse_<domain>` schema with FK references to `greenhouse_core`
+2. **Store**: create `postgres-store.ts` with `is<Module>PostgresEnabled()` guard and `assert<Module>PostgresReady()` TTL check
+3. **Guards**: wrap all business logic functions with Postgres-first / BigQuery-fallback pattern
+4. **Outbox**: publish domain events to `greenhouse_sync.outbox_events`
+5. **Serving view**: add `greenhouse_serving.<entity>_<domain>_360` if cross-domain reads are needed
+6. **Provisioning script**: add `scripts/setup-postgres-<domain>.sql` + `.ts` runner + `package.json` script
+7. **Backfill**: if BigQuery has historical data, create `scripts/backfill-postgres-<domain>.ts`
+8. **TypeScript check**: `pnpm tsc --noEmit` must pass with zero errors
+9. **Deploy**: verify on Vercel preview before merging
