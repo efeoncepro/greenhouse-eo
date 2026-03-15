@@ -6,6 +6,24 @@
 
 ## 2026-03-15
 
+### External source sync architecture for Notion and HubSpot
+- Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para definir el blueprint de ingestión, backup, normalización y serving de datos externos.
+- Greenhouse formaliza que:
+  - `Notion` y `HubSpot` siguen siendo `source systems`
+  - `BigQuery raw` guarda snapshots inmutables y replayables
+  - `BigQuery conformed` expone entidades externas estables
+  - `PostgreSQL` recibe solo proyecciones runtime-críticas para cálculo y pantallas operativas
+- Se definieron como objetos mínimos de control:
+  - `greenhouse_sync.source_sync_runs`
+  - `greenhouse_sync.source_sync_watermarks`
+  - `greenhouse_sync.source_sync_failures`
+- Se definieron como primeras tablas conformed objetivo:
+  - `delivery_projects`
+  - `delivery_tasks`
+  - `delivery_sprints`
+  - `crm_companies`
+  - `crm_deals`
+
 ### HR leave rollout hardening for Preview
 - `HR > Permisos` ya no cae completo en `Preview` si el conector a Cloud SQL falla durante el rollout a PostgreSQL.
 - `src/lib/hr-core/service.ts` ahora hace fallback controlado a BigQuery para metadata, balances, requests, creación y revisión de solicitudes cuando detecta:

@@ -14,6 +14,7 @@ Use together with:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `project_context.md`
 
@@ -233,6 +234,19 @@ Acceptable phase-one patterns:
 Preferred steady-state pattern:
 - transactional outbox from Postgres
 - worker/stream to BigQuery conformed and mart layers
+
+## External Source Sync Boundary
+
+Notion and HubSpot must stop being treated as request-time calculation backends.
+
+The target boundary is:
+- source APIs feed `BigQuery raw`
+- Greenhouse builds `BigQuery conformed`
+- runtime-critical subsets are projected into PostgreSQL
+- product calculations run from PostgreSQL or BigQuery marts, not from source APIs
+
+The operational blueprint for this is defined in:
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 
 ## Migration Order
 

@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 External source sync blueprint
+- Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para formalizar cómo Greenhouse debe desacoplar cálculos y runtime de `Notion` y `HubSpot`.
+- Dirección operativa definida:
+  - `Notion` y `HubSpot` quedan como `source systems`
+  - `BigQuery raw` guarda el backup inmutable y replayable
+  - `BigQuery conformed` normaliza entidades externas
+  - `PostgreSQL` recibe solo proyecciones runtime-críticas para cálculos y pantallas operativas
+  - `BigQuery marts` mantiene analítica, 360 e histórico
+- Datasets y schemas objetivo explícitos:
+  - BigQuery:
+    - `greenhouse_raw`
+    - `greenhouse_conformed`
+    - `greenhouse_marts`
+  - PostgreSQL:
+    - `greenhouse_crm`
+    - `greenhouse_delivery`
+    - `greenhouse_sync.source_sync_runs`
+    - `greenhouse_sync.source_sync_watermarks`
+    - `greenhouse_sync.source_sync_failures`
+- Regla operativa derivada:
+  - ningún cálculo crítico del portal debe seguir leyendo APIs live de `Notion` o `HubSpot` en request-time
+  - el raw externo se respalda en BigQuery y el subset operativo se sirve desde PostgreSQL
+
 ## Delta 2026-03-15 HR leave preview rollout hardening
 - El cutover de `HR > Permisos` a PostgreSQL en `Preview` quedó endurecido con fallback operativo a BigQuery para evitar que la vista completa falle si Cloud SQL no está disponible.
 - El slice de `leave` ahora puede caer controladamente al path legacy para:

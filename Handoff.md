@@ -40,6 +40,66 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:08 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Traducir la decisión `PostgreSQL + BigQuery` a un blueprint concreto para sincronizar y respaldar datos de `Notion` y `HubSpot`, definiendo qué se queda como raw, qué se normaliza y qué subset baja a PostgreSQL para runtime y cálculos.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Architecture / Data platform
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se formalizó el blueprint de sync externo en `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`.
+- El documento deja definidos:
+  - datasets `BigQuery raw`, `conformed` y `marts`
+  - schemas PostgreSQL `greenhouse_crm` y `greenhouse_delivery`
+  - tablas de control `greenhouse_sync.source_sync_runs`, `source_sync_watermarks` y `source_sync_failures`
+  - tablas raw mínimas para:
+    - Notion projects/tasks/sprints/people/databases
+    - HubSpot companies/deals/contacts/owners/line items
+  - tablas conformed mínimas para:
+    - `delivery_projects`
+    - `delivery_tasks`
+    - `delivery_sprints`
+    - `crm_companies`
+    - `crm_deals`
+- Se dejó explícita la regla de serving:
+  - backup y replay en BigQuery
+  - proyección runtime-crítica en PostgreSQL
+  - no más cálculos críticos leyendo APIs live de `Notion` o `HubSpot`
+
+### Verificación
+- Revisión manual del alineamiento entre:
+  - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `git diff --check`
+  - pendiente al cierre del lote completo
+
+### Riesgos o pendientes
+- Falta implementar el primer slice técnico del blueprint:
+  - tablas `greenhouse_sync.source_sync_runs`
+  - tablas `greenhouse_sync.source_sync_watermarks`
+  - raw snapshots BigQuery para Notion/HubSpot
+  - primeras conformed tables `delivery_tasks`, `delivery_projects`, `crm_companies`, `crm_deals`
+- Existe un archivo no trackeado fuera de este lote:
+  - `docs/architecture/POSTGRESQL_ADVANCED_PATTERNS.md`
+  - no fue tocado ni incluido en commit
+
 ## 2026-03-15 04:53 America/Santiago
 
 ### Agente
