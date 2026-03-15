@@ -9,9 +9,11 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
@@ -44,6 +46,7 @@ const AiToolingDashboard = () => {
 
   const fetchData = useCallback(async () => {
     setLoading(true)
+    setError(null)
 
     try {
       const [catRes, licRes, walRes, metaRes] = await Promise.all([
@@ -53,23 +56,41 @@ const AiToolingDashboard = () => {
         fetch('/api/admin/ai-tools/meta')
       ])
 
-      if (catRes.ok) setCatalogData(await catRes.json())
-      if (licRes.ok) setLicensesData(await licRes.json())
-      if (walRes.ok) setWalletsData(await walRes.json())
-      if (metaRes.ok) setMeta(await metaRes.json())
+      const errors: string[] = []
 
-      const failed = [
-        !catRes.ok && 'catálogo',
-        !licRes.ok && 'licencias',
-        !walRes.ok && 'wallets',
-        !metaRes.ok && 'metadata'
-      ].filter(Boolean)
+      if (catRes.ok) {
+        setCatalogData(await catRes.json())
+      } else {
+        const body = await catRes.json().catch(() => ({ error: `HTTP ${catRes.status}` }))
+        errors.push(`Catálogo: ${body.error ?? catRes.statusText}`)
+      }
 
-      if (failed.length > 0) {
-        setError(`No se pudieron cargar: ${failed.join(', ')}. Los formularios pueden estar incompletos.`)
+      if (licRes.ok) {
+        setLicensesData(await licRes.json())
+      } else {
+        const body = await licRes.json().catch(() => ({ error: `HTTP ${licRes.status}` }))
+        errors.push(`Licencias: ${body.error ?? licRes.statusText}`)
+      }
+
+      if (walRes.ok) {
+        setWalletsData(await walRes.json())
+      } else {
+        const body = await walRes.json().catch(() => ({ error: `HTTP ${walRes.status}` }))
+        errors.push(`Wallets: ${body.error ?? walRes.statusText}`)
+      }
+
+      if (metaRes.ok) {
+        setMeta(await metaRes.json())
+      } else {
+        const body = await metaRes.json().catch(() => ({ error: `HTTP ${metaRes.status}` }))
+        errors.push(`Metadata: ${body.error ?? metaRes.statusText}`)
+      }
+
+      if (errors.length > 0) {
+        setError(errors.join(' · '))
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error cargando datos')
+      setError(err instanceof Error ? err.message : 'Error de conexión al cargar datos')
     } finally {
       setLoading(false)
     }
@@ -84,7 +105,13 @@ const AiToolingDashboard = () => {
   if (loading) {
     return (
       <Stack spacing={6}>
-        <Skeleton variant='rounded' height={48} />
+        <Stack direction='row' spacing={2} alignItems='center'>
+          <Skeleton variant='circular' width={40} height={40} />
+          <Box>
+            <Skeleton variant='text' width={200} />
+            <Skeleton variant='text' width={280} />
+          </Box>
+        </Stack>
         <Grid container spacing={6}>
           {[0, 1, 2, 3].map(i => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
@@ -101,25 +128,38 @@ const AiToolingDashboard = () => {
   const catSummary = catalogData?.summary ?? { total: 0, active: 0, categories: {} }
   const licSummary = licensesData?.summary ?? { total: 0, active: 0, members: 0 }
   const walSummary = walletsData?.summary ?? { totalWallets: 0, activeWallets: 0, depletedWallets: 0, totalCreditsAvailable: 0 }
+  const categoryCount = Object.keys(catSummary.categories).length
 
   return (
     <Stack spacing={6}>
       {/* Header */}
-      <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
+      <Stack direction='row' justifyContent='space-between' alignItems='center'>
         <Stack direction='row' spacing={2} alignItems='center'>
-          <Button component={Link} href='/admin' variant='tonal' color='secondary' size='small'>
-            <i className='tabler-arrow-left' />
-          </Button>
+          <Tooltip title='Volver a Admin'>
+            <IconButton component={Link} href='/admin' color='secondary' size='small'>
+              <i className='tabler-arrow-left' />
+            </IconButton>
+          </Tooltip>
           <Box>
-            <Typography variant='h4'>AI Tooling & Créditos</Typography>
+            <Typography variant='h5' fontWeight={600}>AI Tooling & Créditos</Typography>
             <Typography variant='body2' color='text.secondary'>
               Catálogo, licencias y créditos del ecosistema IA
             </Typography>
           </Box>
         </Stack>
+        <Tooltip title='Actualizar datos'>
+          <IconButton onClick={fetchData} color='primary' size='small'>
+            <i className='tabler-refresh' />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
-      {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
+      {error && (
+        <Alert severity='error' variant='outlined' onClose={() => setError(null)}>
+          <Typography variant='body2' fontWeight={500} sx={{ mb: 0.5 }}>No se pudieron cargar algunos datos</Typography>
+          <Typography variant='caption' color='text.secondary'>{error}</Typography>
+        </Alert>
+      )}
 
       {/* KPIs */}
       <Grid container spacing={6}>
@@ -129,7 +169,7 @@ const AiToolingDashboard = () => {
             stats={String(catSummary.total)}
             avatarIcon='tabler-wand'
             avatarColor='primary'
-            subtitle={`${catSummary.active} activas`}
+            subtitle={`${catSummary.active} activas · ${categoryCount} categorías`}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -153,7 +193,7 @@ const AiToolingDashboard = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Créditos disponibles'
-            stats={String(walSummary.totalCreditsAvailable)}
+            stats={walSummary.totalCreditsAvailable.toLocaleString('es-CL')}
             avatarIcon='tabler-coins'
             avatarColor='warning'
             subtitle='Balance total sistema'
@@ -164,9 +204,24 @@ const AiToolingDashboard = () => {
       {/* Tabs */}
       <TabContext value={tab}>
         <CustomTabList onChange={handleTabChange} variant='scrollable' pill='true'>
-          <Tab value='catalog' label='Catálogo' icon={<i className='tabler-wand' />} iconPosition='start' />
-          <Tab value='licenses' label='Licencias' icon={<i className='tabler-key' />} iconPosition='start' />
-          <Tab value='wallets' label='Wallets' icon={<i className='tabler-wallet' />} iconPosition='start' />
+          <Tab
+            value='catalog'
+            label={`Catálogo${catSummary.total > 0 ? ` (${catSummary.total})` : ''}`}
+            icon={<i className='tabler-wand' />}
+            iconPosition='start'
+          />
+          <Tab
+            value='licenses'
+            label={`Licencias${licSummary.total > 0 ? ` (${licSummary.total})` : ''}`}
+            icon={<i className='tabler-key' />}
+            iconPosition='start'
+          />
+          <Tab
+            value='wallets'
+            label={`Wallets${walSummary.totalWallets > 0 ? ` (${walSummary.totalWallets})` : ''}`}
+            icon={<i className='tabler-wallet' />}
+            iconPosition='start'
+          />
           <Tab value='consumption' label='Consumo' icon={<i className='tabler-receipt' />} iconPosition='start' />
         </CustomTabList>
 

@@ -13,6 +13,8 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
@@ -23,8 +25,10 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -64,8 +68,7 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const [formIconUrl, setFormIconUrl] = useState('')
   const [formActive, setFormActive] = useState(true)
 
-  const openCreate = () => {
-    setEditTool(null)
+  const resetForm = () => {
     setFormToolId('')
     setFormName('')
     setFormProvider('')
@@ -82,6 +85,11 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
     setFormDesc('')
     setFormIconUrl('')
     setFormActive(true)
+  }
+
+  const openCreate = () => {
+    setEditTool(null)
+    resetForm()
     setDialogOpen(true)
   }
 
@@ -157,33 +165,31 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
   const showSubFields = formCostModel === 'subscription' || formCostModel === 'hybrid'
   const showCreditFields = formCostModel === 'per_credit' || formCostModel === 'hybrid'
 
-  const providerOptions = [...(meta?.providers ?? []), ...providers].reduce<ProviderRecord[]>((accumulator, provider) => {
-    if (!provider.providerId || accumulator.some(item => item.providerId === provider.providerId)) {
-      return accumulator
-    }
-
-    accumulator.push(provider)
-
-    return accumulator
+  const providerOptions = [...(meta?.providers ?? []), ...providers].reduce<ProviderRecord[]>((acc, p) => {
+    if (!p.providerId || acc.some(item => item.providerId === p.providerId)) return acc
+    acc.push(p)
+    return acc
   }, [])
 
   const filtered = tools.filter(t => {
     if (filterCategory && t.toolCategory !== filterCategory) return false
     if (filterProvider && t.providerId !== filterProvider) return false
     if (search && !t.toolName.toLowerCase().includes(search.toLowerCase())) return false
-
     return true
   })
+
+  const hasFilters = Boolean(filterCategory || filterProvider || search)
 
   return (
     <>
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Catálogo de herramientas AI'
+          subheader={tools.length > 0 ? `${tools.length} herramientas registradas` : undefined}
           avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
-              <i className='tabler-wand' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
-            </Avatar>
+            <CustomAvatar variant='rounded' skin='light' color='primary' size={40}>
+              <i className='tabler-wand' style={{ fontSize: 22 }} />
+            </CustomAvatar>
           }
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
@@ -193,56 +199,88 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
         />
         <Divider />
         <CardContent>
-          <Stack direction='row' spacing={2} sx={{ mb: 3 }} flexWrap='wrap'>
-            <CustomTextField
-              size='small'
-              placeholder='Buscar herramienta...'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              sx={{ width: 220 }}
-              InputProps={{
-                startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
-              }}
-            />
-            <CustomTextField
-              select
-              size='small'
-              label='Categoría'
-              value={filterCategory}
-              onChange={e => setFilterCategory(e.target.value)}
-              sx={{ minWidth: 160 }}
-            >
-              <MenuItem value=''>Todas</MenuItem>
-              {(meta?.toolCategories ?? []).map(cat => (
-                <MenuItem key={cat} value={cat}>{toolCategoryConfig[cat]?.label ?? cat}</MenuItem>
-              ))}
-            </CustomTextField>
-            <CustomTextField
-              select
-              size='small'
-              label='Proveedor'
-              value={filterProvider}
-              onChange={e => setFilterProvider(e.target.value)}
-              sx={{ minWidth: 160 }}
-            >
-              <MenuItem value=''>Todos</MenuItem>
-              {providerOptions.map(p => (
-                <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
-              ))}
-            </CustomTextField>
-          </Stack>
+          {/* Filters */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <CustomTextField
+                fullWidth
+                size='small'
+                placeholder='Buscar herramienta...'
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <CustomTextField
+                select fullWidth size='small' label='Categoría'
+                value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+              >
+                <MenuItem value=''>Todas las categorías</MenuItem>
+                {(meta?.toolCategories ?? Object.keys(toolCategoryConfig)).map(cat => (
+                  <MenuItem key={cat} value={cat}>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <i className={toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.icon ?? 'tabler-puzzle'} style={{ fontSize: 16 }} />
+                      <span>{toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.label ?? cat}</span>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <CustomTextField
+                select fullWidth size='small' label='Proveedor'
+                value={filterProvider} onChange={e => setFilterProvider(e.target.value)}
+              >
+                <MenuItem value=''>Todos los proveedores</MenuItem>
+                {providerOptions.map(p => (
+                  <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 2 }}>
+              {hasFilters && (
+                <Button
+                  variant='tonal'
+                  color='secondary'
+                  size='small'
+                  fullWidth
+                  onClick={() => { setSearch(''); setFilterCategory(''); setFilterProvider('') }}
+                  startIcon={<i className='tabler-filter-off' />}
+                  sx={{ height: 40 }}
+                >
+                  Limpiar
+                </Button>
+              )}
+            </Grid>
+          </Grid>
 
+          {/* Table */}
           <TableContainer>
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <TableCell>Herramienta</TableCell>
-                  <TableCell>Proveedor</TableCell>
-                  <TableCell>Categoría</TableCell>
-                  <TableCell>Modelo de costo</TableCell>
-                  <TableCell align='right'>Costo unitario</TableCell>
-                  <TableCell align='center'>Estado</TableCell>
-                  <TableCell />
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Herramienta
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Proveedor
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Categoría
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Modelo de costo
+                  </TableCell>
+                  <TableCell align='right' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Costo unitario
+                  </TableCell>
+                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>
+                    Estado
+                  </TableCell>
+                  <TableCell sx={{ width: 48 }} />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -251,25 +289,32 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                   const costConf = costModelConfig[tool.costModel]
 
                   return (
-                    <TableRow key={tool.toolId} hover>
+                    <TableRow key={tool.toolId} hover sx={{ cursor: 'pointer' }} onClick={() => openEdit(tool)}>
                       <TableCell>
-                        <Box>
-                          <Typography variant='body2' fontWeight={500}>{tool.toolName}</Typography>
-                          {tool.toolSubcategory && (
-                            <Typography variant='caption' color='text.disabled'>{tool.toolSubcategory}</Typography>
-                          )}
-                        </Box>
+                        <Stack direction='row' spacing={2} alignItems='center'>
+                          <CustomAvatar variant='rounded' skin='light' color={catConf?.color === 'default' ? 'secondary' : catConf?.color ?? 'primary'} size={34}>
+                            <i className={catConf?.icon ?? 'tabler-puzzle'} style={{ fontSize: 18 }} />
+                          </CustomAvatar>
+                          <Box>
+                            <Typography variant='body2' fontWeight={600}>{tool.toolName}</Typography>
+                            {tool.description && (
+                              <Typography variant='caption' color='text.disabled' sx={{ display: 'block', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {tool.description}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Stack>
                       </TableCell>
                       <TableCell>
-                        <CustomChip round='true' size='small' label={tool.providerName ?? tool.vendor ?? '—'} color='info' />
+                        <Typography variant='body2' color='text.secondary'>{tool.providerName ?? tool.vendor ?? '—'}</Typography>
                       </TableCell>
                       <TableCell>
                         <CustomChip
                           round='true'
                           size='small'
-                          icon={<i className={catConf?.icon ?? 'tabler-puzzle'} />}
                           label={catConf?.label ?? tool.toolCategory}
                           color={catConf?.color === 'default' ? 'secondary' : catConf?.color ?? 'secondary'}
+                          variant='tonal'
                         />
                       </TableCell>
                       <TableCell>
@@ -279,10 +324,11 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                           icon={<i className={costConf?.icon ?? 'tabler-coin'} />}
                           label={costConf?.label ?? tool.costModel}
                           color={costConf?.color === 'default' ? 'secondary' : costConf?.color ?? 'secondary'}
+                          variant='tonal'
                         />
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                           {tool.costModel === 'per_credit' || tool.costModel === 'hybrid'
                             ? `${formatCost(tool.creditUnitCost, tool.creditUnitCurrency)} / ${tool.creditUnitName ?? 'unit'}`
                             : tool.costModel === 'subscription'
@@ -297,25 +343,52 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
                           icon={<i className={tool.isActive ? 'tabler-check' : 'tabler-x'} />}
                           label={tool.isActive ? 'Activa' : 'Inactiva'}
                           color={tool.isActive ? 'success' : 'secondary'}
+                          variant='tonal'
                         />
                       </TableCell>
                       <TableCell align='right'>
-                        <Button variant='tonal' size='small' color='secondary' onClick={() => openEdit(tool)}>
-                          Editar
-                        </Button>
+                        <Tooltip title='Editar'>
+                          <IconButton size='small' color='secondary' onClick={e => { e.stopPropagation(); openEdit(tool) }}>
+                            <i className='tabler-pencil' style={{ fontSize: 18 }} />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   )
                 })}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
-                      <Stack alignItems='center' spacing={1}>
-                        <i className='tabler-wand' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                        <Typography color='text.secondary'>No hay herramientas configuradas.</Typography>
-                        <Typography variant='caption' color='text.disabled'>
-                          El catálogo se llenará al registrar herramientas AI del ecosistema.
-                        </Typography>
+                    <TableCell colSpan={7} sx={{ py: 8, border: 0 }}>
+                      <Stack alignItems='center' spacing={2}>
+                        <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
+                          <i className='tabler-wand' style={{ fontSize: 28 }} />
+                        </CustomAvatar>
+                        {hasFilters ? (
+                          <>
+                            <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
+                            <Typography variant='body2' color='text.disabled'>
+                              No hay herramientas que coincidan con los filtros aplicados.
+                            </Typography>
+                            <Button
+                              variant='tonal'
+                              size='small'
+                              onClick={() => { setSearch(''); setFilterCategory(''); setFilterProvider('') }}
+                              startIcon={<i className='tabler-filter-off' />}
+                            >
+                              Limpiar filtros
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Typography variant='h6' color='text.secondary'>Aún no tienes herramientas</Typography>
+                            <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
+                              Registra las herramientas AI del ecosistema para gestionar licencias y asignar créditos.
+                            </Typography>
+                            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
+                              Registrar primera herramienta
+                            </Button>
+                          </>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -323,6 +396,12 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {filtered.length > 0 && (
+            <Typography variant='caption' color='text.disabled' sx={{ mt: 2, display: 'block' }}>
+              Mostrando {filtered.length} de {tools.length} herramientas
+            </Typography>
+          )}
         </CardContent>
       </Card>
 
@@ -334,7 +413,19 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
         fullWidth
         closeAfterTransition={false}
       >
-        <DialogTitle>{editTool ? 'Editar herramienta' : 'Nueva herramienta'}</DialogTitle>
+        <DialogTitle>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <CustomAvatar variant='rounded' skin='light' color='primary' size={36}>
+              <i className={editTool ? 'tabler-pencil' : 'tabler-plus'} style={{ fontSize: 20 }} />
+            </CustomAvatar>
+            <Box>
+              <Typography variant='h6'>{editTool ? 'Editar herramienta' : 'Nueva herramienta'}</Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {editTool ? `Editando ${editTool.toolName}` : 'Registra una herramienta AI en el catálogo'}
+              </Typography>
+            </Box>
+          </Stack>
+        </DialogTitle>
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
@@ -350,107 +441,117 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
               value={formName} onChange={e => setFormName(e.target.value)}
               required
             />
-            <CustomTextField
-              select fullWidth size='small' label='Proveedor'
-              value={formProvider} onChange={e => setFormProvider(e.target.value)}
-              helperText={providerOptions.length === 0 ? 'No hay providers canónicos disponibles todavía.' : undefined}
-              required
-            >
-              {providerOptions.length === 0 ? (
-                <MenuItem disabled value=''>
-                  No hay providers disponibles
-                </MenuItem>
-              ) : (
-                providerOptions.map(p => (
-                  <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
-                ))
-              )}
-            </CustomTextField>
-            <CustomTextField
-              select fullWidth size='small' label='Categoría'
-              value={formCategory} onChange={e => setFormCategory(e.target.value)}
-              required
-            >
-              {(meta?.toolCategories ?? []).map(cat => (
-                <MenuItem key={cat} value={cat}>{toolCategoryConfig[cat]?.label ?? cat}</MenuItem>
-              ))}
-            </CustomTextField>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  select fullWidth size='small' label='Proveedor'
+                  value={formProvider} onChange={e => setFormProvider(e.target.value)}
+                  helperText={providerOptions.length === 0 ? 'Los proveedores se sincronizan desde Finanzas.' : undefined}
+                  required
+                >
+                  {providerOptions.length === 0 ? (
+                    <MenuItem disabled value=''>Sin proveedores disponibles</MenuItem>
+                  ) : (
+                    providerOptions.map(p => (
+                      <MenuItem key={p.providerId} value={p.providerId}>{p.providerName}</MenuItem>
+                    ))
+                  )}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  select fullWidth size='small' label='Categoría'
+                  value={formCategory} onChange={e => setFormCategory(e.target.value)}
+                  required
+                >
+                  {(meta?.toolCategories ?? Object.keys(toolCategoryConfig)).map(cat => (
+                    <MenuItem key={cat} value={cat}>
+                      <Stack direction='row' spacing={1} alignItems='center'>
+                        <i className={toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.icon ?? 'tabler-puzzle'} style={{ fontSize: 16 }} />
+                        <span>{toolCategoryConfig[cat as keyof typeof toolCategoryConfig]?.label ?? cat}</span>
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              </Grid>
+            </Grid>
             <CustomTextField
               select fullWidth size='small' label='Modelo de costo'
               value={formCostModel} onChange={e => setFormCostModel(e.target.value)}
               required
             >
-              {(meta?.costModels ?? []).map(cm => (
-                <MenuItem key={cm} value={cm}>{costModelConfig[cm]?.label ?? cm}</MenuItem>
+              {(meta?.costModels ?? Object.keys(costModelConfig)).map(cm => (
+                <MenuItem key={cm} value={cm}>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    <i className={costModelConfig[cm as keyof typeof costModelConfig]?.icon ?? 'tabler-coin'} style={{ fontSize: 16 }} />
+                    <span>{costModelConfig[cm as keyof typeof costModelConfig]?.label ?? cm}</span>
+                  </Stack>
+                </MenuItem>
               ))}
             </CustomTextField>
 
             {showSubFields && (
               <>
-                <Divider><Typography variant='caption' color='text.secondary'>Suscripción</Typography></Divider>
-                <Stack direction='row' spacing={2}>
-                  <CustomTextField
-                    size='small' label='Monto' type='number'
-                    value={formSubAmount} onChange={e => setFormSubAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    sx={{ flex: 1 }}
-                  />
-                  <CustomTextField
-                    select size='small' label='Moneda'
-                    value={formSubCurrency} onChange={e => setFormSubCurrency(e.target.value)}
-                    sx={{ width: 100 }}
-                  >
-                    <MenuItem value='USD'>USD</MenuItem>
-                    <MenuItem value='CLP'>CLP</MenuItem>
-                  </CustomTextField>
-                </Stack>
-                <Stack direction='row' spacing={2}>
-                  <CustomTextField
-                    select size='small' label='Ciclo'
-                    value={formSubCycle} onChange={e => setFormSubCycle(e.target.value)}
-                    sx={{ flex: 1 }}
-                  >
-                    <MenuItem value='monthly'>Mensual</MenuItem>
-                    <MenuItem value='annual'>Anual</MenuItem>
-                  </CustomTextField>
-                  <CustomTextField
-                    size='small' label='Seats' type='number'
-                    value={formSubSeats} onChange={e => setFormSubSeats(e.target.value === '' ? '' : Number(e.target.value))}
-                    sx={{ width: 100 }}
-                  />
-                </Stack>
+                <Divider><CustomChip round='true' size='small' label='Suscripción' color='primary' variant='tonal' /></Divider>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 5 }}>
+                    <CustomTextField
+                      fullWidth size='small' label='Monto' type='number'
+                      value={formSubAmount} onChange={e => setFormSubAmount(e.target.value === '' ? '' : Number(e.target.value))}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 3 }}>
+                    <CustomTextField select fullWidth size='small' label='Moneda' value={formSubCurrency} onChange={e => setFormSubCurrency(e.target.value)}>
+                      <MenuItem value='USD'>USD</MenuItem>
+                      <MenuItem value='CLP'>CLP</MenuItem>
+                    </CustomTextField>
+                  </Grid>
+                  <Grid size={{ xs: 6, sm: 4 }}>
+                    <CustomTextField select fullWidth size='small' label='Ciclo' value={formSubCycle} onChange={e => setFormSubCycle(e.target.value)}>
+                      <MenuItem value='monthly'>Mensual</MenuItem>
+                      <MenuItem value='annual'>Anual</MenuItem>
+                    </CustomTextField>
+                  </Grid>
+                </Grid>
+                <CustomTextField
+                  fullWidth size='small' label='Seats incluidos' type='number'
+                  value={formSubSeats} onChange={e => setFormSubSeats(e.target.value === '' ? '' : Number(e.target.value))}
+                />
               </>
             )}
 
             {showCreditFields && (
               <>
-                <Divider><Typography variant='caption' color='text.secondary'>Créditos</Typography></Divider>
-                <Stack direction='row' spacing={2}>
-                  <CustomTextField
-                    size='small' label='Unidad de crédito'
-                    value={formCreditUnit} onChange={e => setFormCreditUnit(e.target.value)}
-                    sx={{ flex: 1 }} helperText='Ej: token, render, generation'
-                  />
-                  <CustomTextField
-                    size='small' label='Incluidos/mes' type='number'
-                    value={formCreditsIncluded} onChange={e => setFormCreditsIncluded(e.target.value === '' ? '' : Number(e.target.value))}
-                    sx={{ width: 130 }}
-                  />
-                </Stack>
-                <Stack direction='row' spacing={2}>
-                  <CustomTextField
-                    size='small' label='Costo unitario' type='number'
-                    value={formCreditCost} onChange={e => setFormCreditCost(e.target.value === '' ? '' : Number(e.target.value))}
-                    sx={{ flex: 1 }}
-                  />
-                  <CustomTextField
-                    select size='small' label='Moneda'
-                    value={formCreditCurrency} onChange={e => setFormCreditCurrency(e.target.value)}
-                    sx={{ width: 100 }}
-                  >
-                    <MenuItem value='USD'>USD</MenuItem>
-                    <MenuItem value='CLP'>CLP</MenuItem>
-                  </CustomTextField>
-                </Stack>
+                <Divider><CustomChip round='true' size='small' label='Créditos' color='warning' variant='tonal' /></Divider>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth size='small' label='Unidad de crédito'
+                      value={formCreditUnit} onChange={e => setFormCreditUnit(e.target.value)}
+                      helperText='Ej: token, render, generation'
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth size='small' label='Incluidos/mes' type='number'
+                      value={formCreditsIncluded} onChange={e => setFormCreditsIncluded(e.target.value === '' ? '' : Number(e.target.value))}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth size='small' label='Costo unitario' type='number'
+                      value={formCreditCost} onChange={e => setFormCreditCost(e.target.value === '' ? '' : Number(e.target.value))}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField select fullWidth size='small' label='Moneda' value={formCreditCurrency} onChange={e => setFormCreditCurrency(e.target.value)}>
+                      <MenuItem value='USD'>USD</MenuItem>
+                      <MenuItem value='CLP'>CLP</MenuItem>
+                    </CustomTextField>
+                  </Grid>
+                </Grid>
               </>
             )}
 
@@ -462,19 +563,21 @@ const AiCatalogTab = ({ tools, providers, meta, onRefresh }: Props) => {
             <CustomTextField
               fullWidth size='small' label='URL ícono'
               value={formIconUrl} onChange={e => setFormIconUrl(e.target.value)}
+              helperText='URL de la imagen del ícono de la herramienta'
             />
             <FormControlLabel
-              control={<Switch checked={formActive} onChange={(_, v) => setFormActive(v)} />}
-              label='Activa'
+              control={<Switch checked={formActive} onChange={(_, v) => setFormActive(v)} color='success' />}
+              label={formActive ? 'Activa' : 'Inactiva'}
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <Divider />
+        <DialogActions sx={{ px: 4, py: 2.5 }}>
           <Button variant='tonal' color='secondary' onClick={() => setDialogOpen(false)} disabled={saving}>
             Cancelar
           </Button>
           <Button variant='contained' onClick={handleSave} disabled={saving || !formName || !formProvider || !formCategory || !formCostModel}>
-            {saving ? 'Guardando...' : editTool ? 'Guardar cambios' : 'Crear'}
+            {saving ? 'Guardando...' : editTool ? 'Guardar cambios' : 'Crear herramienta'}
           </Button>
         </DialogActions>
       </Dialog>

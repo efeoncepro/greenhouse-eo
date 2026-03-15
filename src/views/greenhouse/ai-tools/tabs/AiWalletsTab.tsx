@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -24,6 +23,7 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -144,7 +144,6 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
 
   const handleReload = async () => {
     if (!reloadWallet) return
-
     setSaving(true)
 
     try {
@@ -171,7 +170,6 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
 
   const handleEdit = async () => {
     if (!editWallet) return
-
     setSaving(true)
 
     try {
@@ -201,36 +199,35 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
   const filtered = wallets.filter(w => {
     if (filterStatus && w.walletStatus !== filterStatus) return false
     if (filterClient && w.clientId !== filterClient) return false
-
     return true
   })
 
   const healthColor = (health: string) => {
     const conf = balanceHealthConfig[health as keyof typeof balanceHealthConfig]
-
     return conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'
   }
 
   const themeColor = (health: string) => {
     const c = healthColor(health)
     const paletteEntry = theme.palette[c as keyof typeof theme.palette]
-
     if (paletteEntry && typeof paletteEntry === 'object' && 'main' in paletteEntry) {
       return (paletteEntry as { main: string }).main
     }
-
     return theme.palette.secondary.main
   }
+
+  const hasFilters = Boolean(filterStatus || filterClient)
 
   return (
     <>
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Wallets de créditos AI'
+          subheader={wallets.length > 0 ? `${wallets.length} wallets configurados` : undefined}
           avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
-              <i className='tabler-wallet' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
-            </Avatar>
+            <CustomAvatar variant='rounded' skin='light' color='success' size={40}>
+              <i className='tabler-wallet' style={{ fontSize: 22 }} />
+            </CustomAvatar>
           }
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
@@ -240,36 +237,79 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
         />
         <Divider />
         <CardContent>
-          <Stack direction='row' spacing={2} sx={{ mb: 3 }} flexWrap='wrap'>
-            <CustomTextField
-              select size='small' label='Estado'
-              value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              sx={{ minWidth: 150 }}
-            >
-              <MenuItem value=''>Todos</MenuItem>
-              {(meta?.walletStatuses ?? []).map(s => (
-                <MenuItem key={s} value={s}>{walletStatusConfig[s]?.label ?? s}</MenuItem>
-              ))}
-            </CustomTextField>
-            <CustomTextField
-              select size='small' label='Cliente'
-              value={filterClient} onChange={e => setFilterClient(e.target.value)}
-              sx={{ minWidth: 180 }}
-            >
-              <MenuItem value=''>Todos</MenuItem>
-              {(meta?.activeClients ?? []).map(c => (
-                <MenuItem key={c.clientId} value={c.clientId}>{c.clientName}</MenuItem>
-              ))}
-            </CustomTextField>
-          </Stack>
+          {/* Filters */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <CustomTextField
+                select fullWidth size='small' label='Estado'
+                value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              >
+                <MenuItem value=''>Todos los estados</MenuItem>
+                {(meta?.walletStatuses ?? Object.keys(walletStatusConfig)).map(s => (
+                  <MenuItem key={s} value={s}>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <i className={walletStatusConfig[s as keyof typeof walletStatusConfig]?.icon ?? 'tabler-circle'} style={{ fontSize: 16 }} />
+                      <span>{walletStatusConfig[s as keyof typeof walletStatusConfig]?.label ?? s}</span>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 5 }}>
+              <CustomTextField
+                select fullWidth size='small' label='Cliente'
+                value={filterClient} onChange={e => setFilterClient(e.target.value)}
+              >
+                <MenuItem value=''>Todos los clientes</MenuItem>
+                {(meta?.activeClients ?? []).map(c => (
+                  <MenuItem key={c.clientId} value={c.clientId}>{c.clientName}</MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              {hasFilters && (
+                <Button
+                  variant='tonal' color='secondary' size='small' fullWidth
+                  onClick={() => { setFilterStatus(''); setFilterClient('') }}
+                  startIcon={<i className='tabler-filter-off' />}
+                  sx={{ height: 40 }}
+                >
+                  Limpiar
+                </Button>
+              )}
+            </Grid>
+          </Grid>
 
           {filtered.length === 0 ? (
-            <Stack alignItems='center' spacing={1} sx={{ py: 6 }}>
-              <i className='tabler-wallet' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-              <Typography color='text.secondary'>No hay wallets configurados.</Typography>
-              <Typography variant='caption' color='text.disabled'>
-                Crea un wallet para asignar créditos a un cliente o pool interno.
-              </Typography>
+            <Stack alignItems='center' spacing={2} sx={{ py: 8 }}>
+              <CustomAvatar variant='rounded' skin='light' color='success' size={56}>
+                <i className='tabler-wallet' style={{ fontSize: 28 }} />
+              </CustomAvatar>
+              {hasFilters ? (
+                <>
+                  <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
+                  <Typography variant='body2' color='text.disabled'>
+                    No hay wallets que coincidan con los filtros.
+                  </Typography>
+                  <Button
+                    variant='tonal' size='small'
+                    onClick={() => { setFilterStatus(''); setFilterClient('') }}
+                    startIcon={<i className='tabler-filter-off' />}
+                  >
+                    Limpiar filtros
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Typography variant='h6' color='text.secondary'>Sin wallets configurados</Typography>
+                  <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
+                    Crea un wallet para asignar créditos a un cliente o pool interno y gestionar el consumo de herramientas AI.
+                  </Typography>
+                  <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
+                    Crear primer wallet
+                  </Button>
+                </>
+              )}
             </Stack>
           ) : (
             <Grid container spacing={4}>
@@ -310,20 +350,27 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                       sx={{
                         border: t => `1px solid ${t.palette.divider}`,
                         borderTop: '3px solid',
-                        borderTopColor: gaugeColor
+                        borderTopColor: gaugeColor,
+                        transition: 'box-shadow 0.2s',
+                        '&:hover': { boxShadow: theme.shadows[4] }
                       }}
                     >
                       <CardContent>
                         {/* Header */}
                         <Stack direction='row' justifyContent='space-between' alignItems='flex-start' sx={{ mb: 1 }}>
-                          <Box>
-                            <Typography variant='subtitle2' fontWeight={600}>{wallet.toolName}</Typography>
-                            <Typography variant='caption' color='text.secondary'>
-                              {wallet.providerName ?? '—'}
-                            </Typography>
-                          </Box>
+                          <Stack direction='row' spacing={1.5} alignItems='center'>
+                            <CustomAvatar variant='rounded' skin='light' color={statusConf?.color === 'default' ? 'secondary' : statusConf?.color ?? 'success'} size={32}>
+                              <i className='tabler-wallet' style={{ fontSize: 18 }} />
+                            </CustomAvatar>
+                            <Box>
+                              <Typography variant='subtitle2' fontWeight={600}>{wallet.toolName}</Typography>
+                              <Typography variant='caption' color='text.secondary'>
+                                {wallet.providerName ?? '—'}
+                              </Typography>
+                            </Box>
+                          </Stack>
                           <CustomChip
-                            round='true' size='small'
+                            round='true' size='small' variant='tonal'
                             icon={<i className={statusConf?.icon ?? 'tabler-circle'} />}
                             label={statusConf?.label ?? wallet.walletStatus}
                             color={statusConf?.color === 'default' ? 'secondary' : statusConf?.color ?? 'secondary'}
@@ -344,7 +391,7 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                         {/* Health chip */}
                         <Stack alignItems='center' sx={{ mb: 2 }}>
                           <CustomChip
-                            round='true' size='small'
+                            round='true' size='small' variant='tonal'
                             icon={<i className={healthConf?.icon ?? 'tabler-circle'} />}
                             label={healthConf?.label ?? wallet.balanceHealth}
                             color={healthConf?.color === 'default' ? 'secondary' : healthConf?.color ?? 'secondary'}
@@ -370,27 +417,37 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                         )}
 
                         {/* Info rows */}
+                        <Divider sx={{ my: 1.5 }} />
                         <Stack spacing={0.5} sx={{ mb: 2 }}>
-                          <Stack direction='row' justifyContent='space-between'>
-                            <Typography variant='caption' color='text.secondary'>Alcance</Typography>
-                            <CustomChip round='true' size='small' label={wallet.clientName ?? walletScopeLabel[wallet.walletScope] ?? 'Pool'} color={wallet.walletScope === 'client' ? 'info' : 'secondary'} />
+                          <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                            <Typography variant='caption' color='text.secondary'>
+                              <i className='tabler-target' style={{ fontSize: 14, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                              Alcance
+                            </Typography>
+                            <CustomChip round='true' size='small' variant='tonal' label={wallet.clientName ?? walletScopeLabel[wallet.walletScope] ?? 'Pool'} color={wallet.walletScope === 'client' ? 'info' : 'secondary'} />
                           </Stack>
                           <Stack direction='row' justifyContent='space-between'>
-                            <Typography variant='caption' color='text.secondary'>Unidad</Typography>
-                            <Typography variant='caption'>{wallet.creditUnitName}</Typography>
+                            <Typography variant='caption' color='text.secondary'>
+                              <i className='tabler-coins' style={{ fontSize: 14, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                              Unidad
+                            </Typography>
+                            <Typography variant='caption' fontWeight={500}>{wallet.creditUnitName}</Typography>
                           </Stack>
                           <Stack direction='row' justifyContent='space-between'>
-                            <Typography variant='caption' color='text.secondary'>Vigencia</Typography>
+                            <Typography variant='caption' color='text.secondary'>
+                              <i className='tabler-calendar' style={{ fontSize: 14, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                              Vigencia
+                            </Typography>
                             <Typography variant='caption'>{formatDate(wallet.validFrom)} — {formatDate(wallet.validUntil)}</Typography>
                           </Stack>
                         </Stack>
 
                         {/* Actions */}
                         <Stack direction='row' spacing={1}>
-                          <Button variant='tonal' size='small' color='success' fullWidth onClick={() => openReload(wallet)}>
-                            <i className='tabler-plus' style={{ marginRight: 4 }} /> Recargar
+                          <Button variant='tonal' size='small' color='success' fullWidth onClick={() => openReload(wallet)} startIcon={<i className='tabler-plus' />}>
+                            Recargar
                           </Button>
-                          <Button variant='tonal' size='small' color='secondary' fullWidth onClick={() => openEdit(wallet)}>
+                          <Button variant='tonal' size='small' color='secondary' fullWidth onClick={() => openEdit(wallet)} startIcon={<i className='tabler-pencil' />}>
                             Editar
                           </Button>
                         </Stack>
@@ -401,12 +458,28 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
               })}
             </Grid>
           )}
+
+          {filtered.length > 0 && (
+            <Typography variant='caption' color='text.disabled' sx={{ mt: 3, display: 'block' }}>
+              Mostrando {filtered.length} de {wallets.length} wallets
+            </Typography>
+          )}
         </CardContent>
       </Card>
 
       {/* Create Wallet Dialog */}
       <Dialog open={createOpen} onClose={() => !saving && setCreateOpen(false)} maxWidth='sm' fullWidth closeAfterTransition={false}>
-        <DialogTitle>Crear wallet</DialogTitle>
+        <DialogTitle>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <CustomAvatar variant='rounded' skin='light' color='success' size={36}>
+              <i className='tabler-wallet' style={{ fontSize: 20 }} />
+            </CustomAvatar>
+            <Box>
+              <Typography variant='h6'>Crear wallet</Typography>
+              <Typography variant='caption' color='text.secondary'>Asigna créditos a un cliente o pool interno</Typography>
+            </Box>
+          </Stack>
+        </DialogTitle>
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
@@ -425,6 +498,7 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                 value={formClient} onChange={e => setFormClient(e.target.value)}
                 required
               >
+                {(meta?.activeClients ?? []).length === 0 && <MenuItem disabled value=''>Sin clientes activos</MenuItem>}
                 {(meta?.activeClients ?? []).map(c => (
                   <MenuItem key={c.clientId} value={c.clientId}>{c.clientName}</MenuItem>
                 ))}
@@ -442,42 +516,54 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                   <MenuItem key={tool.toolId} value={tool.toolId}>{tool.toolName}</MenuItem>
                 ))}
             </CustomTextField>
-            <Stack direction='row' spacing={2}>
-              <CustomTextField
-                size='small' label='Balance inicial' type='number'
-                value={formBalance} onChange={e => setFormBalance(e.target.value === '' ? '' : Number(e.target.value))}
-                required sx={{ flex: 1 }}
-              />
-              <CustomTextField
-                size='small' label='Límite mensual' type='number'
-                value={formMonthlyLimit} onChange={e => setFormMonthlyLimit(e.target.value === '' ? '' : Number(e.target.value))}
-                sx={{ flex: 1 }}
-              />
-            </Stack>
-            <Stack direction='row' spacing={2}>
-              <CustomTextField
-                size='small' label='Día reset mensual' type='number'
-                value={formResetDay} onChange={e => setFormResetDay(e.target.value === '' ? '' : Number(e.target.value))}
-                sx={{ flex: 1 }} helperText='1-28'
-              />
-              <CustomTextField
-                size='small' label='Umbral bajo' type='number'
-                value={formThreshold} onChange={e => setFormThreshold(e.target.value === '' ? '' : Number(e.target.value))}
-                sx={{ flex: 1 }} helperText='Alerta de balance bajo'
-              />
-            </Stack>
-            <Stack direction='row' spacing={2}>
-              <CustomTextField
-                size='small' label='Válido desde' type='date'
-                value={formValidFrom} onChange={e => setFormValidFrom(e.target.value)}
-                InputLabelProps={{ shrink: true }} required sx={{ flex: 1 }}
-              />
-              <CustomTextField
-                size='small' label='Válido hasta' type='date'
-                value={formValidUntil} onChange={e => setFormValidUntil(e.target.value)}
-                InputLabelProps={{ shrink: true }} sx={{ flex: 1 }}
-              />
-            </Stack>
+            <Divider><CustomChip round='true' size='small' label='Configuración' color='secondary' variant='tonal' /></Divider>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Balance inicial' type='number'
+                  value={formBalance} onChange={e => setFormBalance(e.target.value === '' ? '' : Number(e.target.value))}
+                  required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Límite mensual' type='number'
+                  value={formMonthlyLimit} onChange={e => setFormMonthlyLimit(e.target.value === '' ? '' : Number(e.target.value))}
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Día reset mensual' type='number'
+                  value={formResetDay} onChange={e => setFormResetDay(e.target.value === '' ? '' : Number(e.target.value))}
+                  helperText='1-28'
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Umbral bajo' type='number'
+                  value={formThreshold} onChange={e => setFormThreshold(e.target.value === '' ? '' : Number(e.target.value))}
+                  helperText='Alerta de balance bajo'
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Válido desde' type='date'
+                  value={formValidFrom} onChange={e => setFormValidFrom(e.target.value)}
+                  InputLabelProps={{ shrink: true }} required
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Válido hasta' type='date'
+                  value={formValidUntil} onChange={e => setFormValidUntil(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
             <CustomTextField
               fullWidth size='small' label='Notas'
               value={formNotes} onChange={e => setFormNotes(e.target.value)}
@@ -485,7 +571,8 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <Divider />
+        <DialogActions sx={{ px: 4, py: 2.5 }}>
           <Button variant='tonal' color='secondary' onClick={() => setCreateOpen(false)} disabled={saving}>Cancelar</Button>
           <Button variant='contained' onClick={handleCreate} disabled={saving || !formTool || !formValidFrom || (formScope === 'client' && !formClient)}>
             {saving ? 'Creando...' : 'Crear wallet'}
@@ -495,52 +582,82 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
 
       {/* Edit Wallet Dialog */}
       <Dialog open={editOpen} onClose={() => !saving && setEditOpen(false)} maxWidth='sm' fullWidth closeAfterTransition={false}>
-        <DialogTitle>Editar wallet</DialogTitle>
+        <DialogTitle>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <CustomAvatar variant='rounded' skin='light' color='success' size={36}>
+              <i className='tabler-pencil' style={{ fontSize: 20 }} />
+            </CustomAvatar>
+            <Box>
+              <Typography variant='h6'>Editar wallet</Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {editWallet ? `${editWallet.toolName} · ${editWallet.clientName ?? 'Pool interno'}` : ''}
+              </Typography>
+            </Box>
+          </Stack>
+        </DialogTitle>
         <Divider />
         <DialogContent>
           {editWallet && (
             <Stack spacing={3} sx={{ mt: 1 }}>
               <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-                <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  {editWallet.clientName ?? 'Pool interno'} · {editWallet.walletId}
-                </Typography>
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  <CustomAvatar variant='rounded' skin='light' color='success' size={28}>
+                    <i className='tabler-wallet' style={{ fontSize: 16 }} />
+                  </CustomAvatar>
+                  <Box>
+                    <Typography variant='subtitle2'>{editWallet.toolName}</Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                      {editWallet.walletId}
+                    </Typography>
+                  </Box>
+                </Stack>
               </Box>
-              <Stack direction='row' spacing={2}>
-                <CustomTextField
-                  size='small' label='Límite mensual' type='number'
-                  value={editMonthlyLimit} onChange={e => setEditMonthlyLimit(e.target.value === '' ? '' : Number(e.target.value))}
-                  sx={{ flex: 1 }}
-                />
-                <CustomTextField
-                  size='small' label='Día reset mensual' type='number'
-                  value={editResetDay} onChange={e => setEditResetDay(e.target.value === '' ? '' : Number(e.target.value))}
-                  sx={{ flex: 1 }}
-                />
-              </Stack>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth size='small' label='Límite mensual' type='number'
+                    value={editMonthlyLimit} onChange={e => setEditMonthlyLimit(e.target.value === '' ? '' : Number(e.target.value))}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth size='small' label='Día reset mensual' type='number'
+                    value={editResetDay} onChange={e => setEditResetDay(e.target.value === '' ? '' : Number(e.target.value))}
+                  />
+                </Grid>
+              </Grid>
               <CustomTextField
-                size='small' label='Umbral bajo' type='number'
+                fullWidth size='small' label='Umbral bajo' type='number'
                 value={editThreshold} onChange={e => setEditThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                 helperText='Alerta de balance bajo'
               />
-              <Stack direction='row' spacing={2}>
-                <CustomTextField
-                  size='small' label='Válido desde' type='date'
-                  value={editValidFrom} onChange={e => setEditValidFrom(e.target.value)}
-                  InputLabelProps={{ shrink: true }} required sx={{ flex: 1 }}
-                />
-                <CustomTextField
-                  size='small' label='Válido hasta' type='date'
-                  value={editValidUntil} onChange={e => setEditValidUntil(e.target.value)}
-                  InputLabelProps={{ shrink: true }} sx={{ flex: 1 }}
-                />
-              </Stack>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth size='small' label='Válido desde' type='date'
+                    value={editValidFrom} onChange={e => setEditValidFrom(e.target.value)}
+                    InputLabelProps={{ shrink: true }} required
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth size='small' label='Válido hasta' type='date'
+                    value={editValidUntil} onChange={e => setEditValidUntil(e.target.value)}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+              </Grid>
               <CustomTextField
-                select size='small' label='Estado'
+                select fullWidth size='small' label='Estado'
                 value={editStatus} onChange={e => setEditStatus(e.target.value)}
               >
-                {(meta?.walletStatuses ?? []).map(status => (
-                  <MenuItem key={status} value={status}>{walletStatusConfig[status]?.label ?? status}</MenuItem>
+                {(meta?.walletStatuses ?? Object.keys(walletStatusConfig)).map(status => (
+                  <MenuItem key={status} value={status}>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <i className={walletStatusConfig[status as keyof typeof walletStatusConfig]?.icon ?? 'tabler-circle'} style={{ fontSize: 16 }} />
+                      <span>{walletStatusConfig[status as keyof typeof walletStatusConfig]?.label ?? status}</span>
+                    </Stack>
+                  </MenuItem>
                 ))}
               </CustomTextField>
               <CustomTextField
@@ -551,7 +668,8 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
             </Stack>
           )}
         </DialogContent>
-        <DialogActions>
+        <Divider />
+        <DialogActions sx={{ px: 4, py: 2.5 }}>
           <Button variant='tonal' color='secondary' onClick={() => setEditOpen(false)} disabled={saving}>Cancelar</Button>
           <Button variant='contained' onClick={handleEdit} disabled={saving || !editValidFrom}>
             {saving ? 'Guardando...' : 'Guardar cambios'}
@@ -561,16 +679,33 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
 
       {/* Reload Dialog */}
       <Dialog open={reloadOpen} onClose={() => !saving && setReloadOpen(false)} maxWidth='xs' fullWidth closeAfterTransition={false}>
-        <DialogTitle>Recargar wallet</DialogTitle>
+        <DialogTitle>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <CustomAvatar variant='rounded' skin='light' color='success' size={36}>
+              <i className='tabler-plus' style={{ fontSize: 20 }} />
+            </CustomAvatar>
+            <Box>
+              <Typography variant='h6'>Recargar wallet</Typography>
+              <Typography variant='caption' color='text.secondary'>Agrega créditos al wallet</Typography>
+            </Box>
+          </Stack>
+        </DialogTitle>
         <Divider />
         <DialogContent>
           {reloadWallet && (
             <Stack spacing={3} sx={{ mt: 1 }}>
               <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-                <Typography variant='subtitle2'>{reloadWallet.toolName}</Typography>
-                <Typography variant='caption' color='text.secondary'>
-                  {reloadWallet.clientName ?? 'Pool interno'} · Balance actual: {reloadWallet.currentBalance} {reloadWallet.creditUnitName}
-                </Typography>
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  <CustomAvatar variant='rounded' skin='light' color='success' size={28}>
+                    <i className='tabler-wallet' style={{ fontSize: 16 }} />
+                  </CustomAvatar>
+                  <Box>
+                    <Typography variant='subtitle2'>{reloadWallet.toolName}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {reloadWallet.clientName ?? 'Pool interno'} · Balance: {reloadWallet.currentBalance} {reloadWallet.creditUnitName}
+                    </Typography>
+                  </Box>
+                </Stack>
               </Box>
               <CustomTextField
                 fullWidth size='small' label='Cantidad de créditos' type='number'
@@ -582,8 +717,8 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
                 value={reloadReason} onChange={e => setReloadReasonState(e.target.value as ReloadReason)}
                 required
               >
-                {(meta?.reloadReasons ?? []).map(r => (
-                  <MenuItem key={r} value={r}>{reloadReasonLabel[r] ?? r}</MenuItem>
+                {(meta?.reloadReasons ?? Object.keys(reloadReasonLabel)).map(r => (
+                  <MenuItem key={r} value={r}>{reloadReasonLabel[r as keyof typeof reloadReasonLabel] ?? r}</MenuItem>
                 ))}
               </CustomTextField>
               <CustomTextField
@@ -599,7 +734,8 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
             </Stack>
           )}
         </DialogContent>
-        <DialogActions>
+        <Divider />
+        <DialogActions sx={{ px: 4, py: 2.5 }}>
           <Button variant='tonal' color='secondary' onClick={() => setReloadOpen(false)} disabled={saving}>Cancelar</Button>
           <Button variant='contained' color='success' onClick={handleReload} disabled={saving || !reloadAmount}>
             {saving ? 'Recargando...' : 'Recargar'}

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -13,6 +12,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
@@ -23,6 +23,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -90,19 +91,21 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
   const filtered = licenses.filter(lic => {
     if (filterStatus && lic.licenseStatus !== filterStatus) return false
     if (search && !(lic.memberName ?? '').toLowerCase().includes(search.toLowerCase()) && !lic.toolId.toLowerCase().includes(search.toLowerCase())) return false
-
     return true
   })
+
+  const hasFilters = Boolean(filterStatus || search)
 
   return (
     <>
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Licencias de herramientas'
+          subheader={licenses.length > 0 ? `${licenses.length} licencias asignadas` : undefined}
           avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
-              <i className='tabler-key' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
-            </Avatar>
+            <CustomAvatar variant='rounded' skin='light' color='info' size={40}>
+              <i className='tabler-key' style={{ fontSize: 22 }} />
+            </CustomAvatar>
           }
           action={
             <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
@@ -112,39 +115,59 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
         />
         <Divider />
         <CardContent>
-          <Stack direction='row' spacing={2} sx={{ mb: 3 }} flexWrap='wrap'>
-            <CustomTextField
-              size='small'
-              placeholder='Buscar por nombre o herramienta...'
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              sx={{ width: 260 }}
-              InputProps={{
-                startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
-              }}
-            />
-            <CustomTextField
-              select size='small' label='Estado'
-              value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              sx={{ minWidth: 150 }}
-            >
-              <MenuItem value=''>Todos</MenuItem>
-              {(meta?.licenseStatuses ?? []).map(s => (
-                <MenuItem key={s} value={s}>{licenseStatusConfig[s]?.label ?? s}</MenuItem>
-              ))}
-            </CustomTextField>
-          </Stack>
+          {/* Filters */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 5 }}>
+              <CustomTextField
+                fullWidth size='small'
+                placeholder='Buscar por nombre o herramienta...'
+                value={search} onChange={e => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: <i className='tabler-search' style={{ marginRight: 8, color: 'var(--mui-palette-text-disabled)' }} />
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <CustomTextField
+                select fullWidth size='small' label='Estado'
+                value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+              >
+                <MenuItem value=''>Todos los estados</MenuItem>
+                {(meta?.licenseStatuses ?? Object.keys(licenseStatusConfig)).map(s => (
+                  <MenuItem key={s} value={s}>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      <i className={licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.icon ?? 'tabler-circle'} style={{ fontSize: 16 }} />
+                      <span>{licenseStatusConfig[s as keyof typeof licenseStatusConfig]?.label ?? s}</span>
+                    </Stack>
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              {hasFilters && (
+                <Button
+                  variant='tonal' color='secondary' size='small' fullWidth
+                  onClick={() => { setSearch(''); setFilterStatus('') }}
+                  startIcon={<i className='tabler-filter-off' />}
+                  sx={{ height: 40 }}
+                >
+                  Limpiar
+                </Button>
+              )}
+            </Grid>
+          </Grid>
 
+          {/* Table */}
           <TableContainer>
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <TableCell>Colaborador</TableCell>
-                  <TableCell>Herramienta</TableCell>
-                  <TableCell align='center'>Acceso</TableCell>
-                  <TableCell>Email cuenta</TableCell>
-                  <TableCell align='center'>Estado</TableCell>
-                  <TableCell>Asignado</TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Colaborador</TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Herramienta</TableCell>
+                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Acceso</TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Email cuenta</TableCell>
+                  <TableCell align='center' sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Estado</TableCell>
+                  <TableCell sx={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: 0.5 }}>Asignado</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -156,9 +179,9 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                     <TableRow key={lic.licenseId} hover>
                       <TableCell>
                         <Stack direction='row' spacing={1.5} alignItems='center'>
-                          <Avatar sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
+                          <CustomAvatar skin='light' color='info' size={30}>
                             {getInitials(lic.memberName || '')}
-                          </Avatar>
+                          </CustomAvatar>
                           <Box>
                             <Typography variant='body2' fontWeight={500}>{lic.memberName ?? '—'}</Typography>
                             {lic.memberEmail && (
@@ -172,20 +195,20 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                       </TableCell>
                       <TableCell align='center'>
                         <CustomChip
-                          round='true' size='small'
+                          round='true' size='small' variant='tonal'
                           icon={<i className={accessConf?.icon ?? 'tabler-shield'} />}
                           label={accessConf?.label ?? lic.accessLevel}
                           color={accessConf?.color === 'default' ? 'secondary' : accessConf?.color ?? 'secondary'}
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' color='text.secondary'>
+                        <Typography variant='body2' color='text.secondary' sx={{ fontFamily: lic.accountEmail ? 'monospace' : undefined, fontSize: lic.accountEmail ? '0.8rem' : undefined }}>
                           {lic.accountEmail ?? '—'}
                         </Typography>
                       </TableCell>
                       <TableCell align='center'>
                         <CustomChip
-                          round='true' size='small'
+                          round='true' size='small' variant='tonal'
                           icon={<i className={statusConf?.icon ?? 'tabler-circle'} />}
                           label={statusConf?.label ?? lic.licenseStatus}
                           color={statusConf?.color === 'default' ? 'secondary' : statusConf?.color ?? 'secondary'}
@@ -201,13 +224,36 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
                 })}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} align='center' sx={{ py: 6 }}>
-                      <Stack alignItems='center' spacing={1}>
-                        <i className='tabler-key' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
-                        <Typography color='text.secondary'>No hay licencias asignadas.</Typography>
-                        <Typography variant='caption' color='text.disabled'>
-                          Asigna herramientas AI a los miembros del equipo.
-                        </Typography>
+                    <TableCell colSpan={6} sx={{ py: 8, border: 0 }}>
+                      <Stack alignItems='center' spacing={2}>
+                        <CustomAvatar variant='rounded' skin='light' color='info' size={56}>
+                          <i className='tabler-key' style={{ fontSize: 28 }} />
+                        </CustomAvatar>
+                        {hasFilters ? (
+                          <>
+                            <Typography variant='h6' color='text.secondary'>Sin resultados</Typography>
+                            <Typography variant='body2' color='text.disabled'>
+                              No hay licencias que coincidan con los filtros.
+                            </Typography>
+                            <Button
+                              variant='tonal' size='small'
+                              onClick={() => { setSearch(''); setFilterStatus('') }}
+                              startIcon={<i className='tabler-filter-off' />}
+                            >
+                              Limpiar filtros
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Typography variant='h6' color='text.secondary'>Sin licencias asignadas</Typography>
+                            <Typography variant='body2' color='text.disabled' sx={{ maxWidth: 360, textAlign: 'center' }}>
+                              Asigna herramientas AI a los miembros del equipo para gestionar accesos y controlar el uso.
+                            </Typography>
+                            <Button variant='contained' size='small' startIcon={<i className='tabler-plus' />} onClick={openCreate}>
+                              Asignar primera licencia
+                            </Button>
+                          </>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -215,18 +261,28 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {filtered.length > 0 && (
+            <Typography variant='caption' color='text.disabled' sx={{ mt: 2, display: 'block' }}>
+              Mostrando {filtered.length} de {licenses.length} licencias
+            </Typography>
+          )}
         </CardContent>
       </Card>
 
       {/* Assign License Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={() => !saving && setDialogOpen(false)}
-        maxWidth='sm'
-        fullWidth
-        closeAfterTransition={false}
-      >
-        <DialogTitle>Asignar licencia</DialogTitle>
+      <Dialog open={dialogOpen} onClose={() => !saving && setDialogOpen(false)} maxWidth='sm' fullWidth closeAfterTransition={false}>
+        <DialogTitle>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <CustomAvatar variant='rounded' skin='light' color='info' size={36}>
+              <i className='tabler-key' style={{ fontSize: 20 }} />
+            </CustomAvatar>
+            <Box>
+              <Typography variant='h6'>Asignar licencia</Typography>
+              <Typography variant='caption' color='text.secondary'>Otorga acceso a una herramienta AI</Typography>
+            </Box>
+          </Stack>
+        </DialogTitle>
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
@@ -235,6 +291,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
               value={formMember} onChange={e => setFormMember(e.target.value)}
               required
             >
+              {(meta?.activeMembers ?? []).length === 0 && <MenuItem disabled value=''>Sin miembros disponibles</MenuItem>}
               {(meta?.activeMembers ?? []).map(m => (
                 <MenuItem key={m.memberId} value={m.memberId}>{m.displayName}</MenuItem>
               ))}
@@ -248,9 +305,7 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
               {tools
                 .filter(tool => tool.isActive)
                 .map(tool => (
-                  <MenuItem key={tool.toolId} value={tool.toolId}>
-                    {tool.toolName}
-                  </MenuItem>
+                  <MenuItem key={tool.toolId} value={tool.toolId}>{tool.toolName}</MenuItem>
                 ))}
             </CustomTextField>
             <CustomTextField
@@ -258,7 +313,12 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
               value={formAccess} onChange={e => setFormAccess(e.target.value)}
             >
               {(meta?.accessLevels ?? ['full', 'limited', 'trial', 'viewer']).map(al => (
-                <MenuItem key={al} value={al}>{accessLevelConfig[al]?.label ?? al}</MenuItem>
+                <MenuItem key={al} value={al}>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    <i className={accessLevelConfig[al as keyof typeof accessLevelConfig]?.icon ?? 'tabler-shield'} style={{ fontSize: 16 }} />
+                    <span>{accessLevelConfig[al as keyof typeof accessLevelConfig]?.label ?? al}</span>
+                  </Stack>
+                </MenuItem>
               ))}
             </CustomTextField>
             <CustomTextField
@@ -278,7 +338,8 @@ const AiLicensesTab = ({ licenses, tools, meta, onRefresh }: Props) => {
             />
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <Divider />
+        <DialogActions sx={{ px: 4, py: 2.5 }}>
           <Button variant='tonal' color='secondary' onClick={() => setDialogOpen(false)} disabled={saving}>
             Cancelar
           </Button>
