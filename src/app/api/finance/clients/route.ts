@@ -43,7 +43,7 @@ interface ClientListRow {
 
 interface ClientReceivableMatchRow {
   income_id: string
-  outstanding_amount: unknown
+  outstanding_amount_clp: unknown
   income_key: string
 }
 
@@ -218,11 +218,14 @@ export async function GET(request: Request) {
     try {
       const receivableRows = await runFinanceQuery<ClientReceivableMatchRow>(`
         WITH open_income AS (
-          SELECT income_id, outstanding_amount, income_key
+          SELECT income_id, outstanding_amount_clp, income_key
           FROM (
             SELECT
               income_id,
-              GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) AS outstanding_amount,
+              COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
+                GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
+                NULLIF(COALESCE(total_amount, 0), 0)
+              ) AS outstanding_amount_clp,
               [client_id, client_profile_id, hubspot_company_id] AS income_keys
             FROM \`${projectId}.greenhouse.fin_income\`
             WHERE payment_status IN ('pending', 'overdue', 'partial')
@@ -232,7 +235,7 @@ export async function GET(request: Request) {
             AND income_key != ''
             AND income_key IN UNNEST(@clientKeys)
         )
-        SELECT DISTINCT income_id, outstanding_amount, income_key
+        SELECT DISTINCT income_id, outstanding_amount_clp, income_key
         FROM open_income
       `, { clientKeys: Array.from(clientIdsByKey.keys()) })
 
@@ -255,7 +258,10 @@ export async function GET(request: Request) {
 
           seenIncomeIds.add(row.income_id)
           incomeIdsByClientId.set(clientId, seenIncomeIds)
-          receivableByClientId.set(clientId, (receivableByClientId.get(clientId) ?? 0) + toNumber(row.outstanding_amount))
+          receivableByClientId.set(
+            clientId,
+            (receivableByClientId.get(clientId) ?? 0) + toNumber(row.outstanding_amount_clp)
+          )
         })
       })
 

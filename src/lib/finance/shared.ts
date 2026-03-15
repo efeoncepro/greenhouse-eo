@@ -236,7 +236,36 @@ export const getLatestExchangeRate = async ({
 
   const rate = toNumber(rows[0]?.rate)
 
-  return rate > 0 ? rate : null
+  if (rate > 0) {
+    return rate
+  }
+
+  const supportsAutoSync =
+    (fromCurrency === 'USD' && toCurrency === 'CLP') ||
+    (fromCurrency === 'CLP' && toCurrency === 'USD')
+
+  if (!supportsAutoSync) {
+    return null
+  }
+
+  const { syncDailyUsdClpExchangeRate } = await import('@/lib/finance/exchange-rates')
+  const syncResult = await syncDailyUsdClpExchangeRate()
+
+  if (!syncResult.synced) {
+    return null
+  }
+
+  const syncedRows = await runFinanceQuery<{ rate: unknown }>(`
+    SELECT rate
+    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
+    WHERE from_currency = @fromCurrency AND to_currency = @toCurrency
+    ORDER BY rate_date DESC
+    LIMIT 1
+  `, { fromCurrency, toCurrency })
+
+  const syncedRate = toNumber(syncedRows[0]?.rate)
+
+  return syncedRate > 0 ? syncedRate : null
 }
 
 export const resolveExchangeRateToClp = async ({

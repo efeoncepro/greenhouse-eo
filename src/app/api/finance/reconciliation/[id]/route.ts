@@ -47,6 +47,7 @@ interface StatementRow {
   match_status: string
   matched_type: string | null
   matched_id: string | null
+  matched_payment_id: string | null
   match_confidence: unknown
   notes: string | null
   matched_by: string | null
@@ -115,7 +116,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       matchStatus: normalizeMatchStatus(s.match_status),
       rawMatchStatus: normalizeString(s.match_status),
       matchedType: s.matched_type ? normalizeString(s.matched_type) : null,
-      matchedId: s.matched_id ? normalizeString(s.matched_id) : null,
+      matchedId: s.matched_payment_id ? normalizeString(s.matched_payment_id) : s.matched_id ? normalizeString(s.matched_id) : null,
+      matchedRecordId: s.matched_id ? normalizeString(s.matched_id) : null,
+      matchedPaymentId: s.matched_payment_id ? normalizeString(s.matched_payment_id) : null,
       matchConfidence: toNumber(s.match_confidence),
       notes: s.notes ? normalizeString(s.notes) : null,
       matchedBy: s.matched_by ? normalizeString(s.matched_by) : null,
@@ -138,8 +141,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{ period_id: string }>(`
-      SELECT period_id
+    const existing = await runFinanceQuery<{
+      period_id: string
+      status: string
+      statement_imported: boolean
+      statement_row_count: unknown
+      difference: unknown
+    }>(`
+      SELECT period_id, status, statement_imported, statement_row_count, difference
       FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
       WHERE period_id = @periodId
     `, { periodId })
@@ -148,8 +157,33 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
     }
 
+    const existingPeriod = existing[0]
+    const existingStatus = normalizeString(existingPeriod.status)
+
+    if (existingStatus === 'closed') {
+      throw new FinanceValidationError('Cannot update a closed reconciliation period.', 409)
+    }
+
     const updates: string[] = []
     const updateParams: Record<string, unknown> = { periodId }
+
+    const touchingFinancialFields = (
+      body.closingBalanceBank !== undefined
+      || body.closingBalanceSystem !== undefined
+      || body.difference !== undefined
+    )
+
+    if (existingStatus === 'reconciled') {
+      const onlyClosingTransition = (
+        body.status === 'closed'
+        && !touchingFinancialFields
+        && body.notes === undefined
+      )
+
+      if (!onlyClosingTransition) {
+        throw new FinanceValidationError('Cannot modify a reconciled period. Only a status change to "closed" is allowed.', 409)
+      }
+    }
 
     if (body.closingBalanceBank !== undefined) {
       updates.push('closing_balance_bank = @closingBalanceBank')
@@ -168,11 +202,55 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (body.status !== undefined) {
       const validStatuses = ['open', 'in_progress', 'reconciled', 'closed']
+      const nextStatus = normalizeString(body.status)
+
+      if (!validStatuses.includes(nextStatus)) {
+        throw new FinanceValidationError(`Invalid reconciliation status: ${nextStatus || '(empty)'}.`)
+      }
+
+      if (nextStatus === 'closed' && existingStatus !== 'reconciled') {
+        throw new FinanceValidationError('A reconciliation period can only be closed after it is reconciled.', 409)
+      }
+
+      if (nextStatus === 'reconciled') {
+        const statementCounts = await runFinanceQuery<{ total: unknown }>(`
+          SELECT COUNT(*) AS total
+          FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
+          WHERE period_id = @periodId
+        `, { periodId })
+
+        const pendingRows = await runFinanceQuery<{ total: unknown }>(`
+          SELECT COUNT(*) AS total
+          FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
+          WHERE period_id = @periodId
+            AND match_status IN ('unmatched', 'suggested')
+        `, { periodId })
+
+        const statementImported = normalizeBoolean(existingPeriod.statement_imported)
+        const totalRows = toNumber(statementCounts[0]?.total)
+        const remainingRows = toNumber(pendingRows[0]?.total)
+
+        const nextDifference = body.difference !== undefined
+          ? toNumber(body.difference)
+          : toNumber(existingPeriod.difference)
+
+        if (!statementImported || totalRows <= 0) {
+          throw new FinanceValidationError('Cannot reconcile a period without an imported statement.', 409)
+        }
+
+        if (remainingRows > 0) {
+          throw new FinanceValidationError('Cannot reconcile a period with unmatched or suggested statement rows.', 409)
+        }
+
+        if (Math.abs(nextDifference) > 0.01) {
+          throw new FinanceValidationError('Cannot reconcile a period while difference is not zero.', 409)
+        }
+      }
 
       updates.push('status = @status')
-      updateParams.status = validStatuses.includes(body.status) ? body.status : 'open'
+      updateParams.status = nextStatus
 
-      if (body.status === 'reconciled') {
+      if (nextStatus === 'reconciled') {
         updates.push('reconciled_by = @reconciledBy')
         updates.push('reconciled_at = CURRENT_TIMESTAMP()')
         updateParams.reconciledBy = tenant.userId || null

@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server'
 
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { aggregateMonthlyEntries, buildCurrentMonthMetrics, getMonthKey, getRecentMonthKeys } from '@/lib/finance/reporting'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { runFinanceQuery, getFinanceProjectId, toNumber } from '@/lib/finance/shared'
+import { getFinanceProjectId, roundCurrency, runFinanceQuery, toDateString, toNumber } from '@/lib/finance/shared'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-interface MonthlySummaryRow {
-  year: unknown
-  month: unknown
+interface ExpenseSummaryRow {
+  document_date: unknown
+  payment_date: unknown
   total_amount_clp: unknown
-  expense_count: unknown
-}
-
-interface CurrentMonthRow {
-  total_amount_clp: unknown
-  expense_count: unknown
-  prev_total_amount_clp: unknown
+  payment_status: string
 }
 
 export async function GET() {
@@ -30,56 +25,90 @@ export async function GET() {
     await ensureFinanceInfrastructure()
 
     const projectId = getFinanceProjectId()
+    const monthKeys = getRecentMonthKeys(6)
 
-    const currentMonth = await runFinanceQuery<CurrentMonthRow>(`
-      WITH cur_month AS (
-        SELECT
-          COALESCE(SUM(total_amount_clp), 0) AS total_amount_clp,
-          COUNT(*) AS expense_count
-        FROM \`${projectId}.greenhouse.fin_expenses\`
-        WHERE EXTRACT(YEAR FROM COALESCE(document_date, payment_date)) = EXTRACT(YEAR FROM CURRENT_DATE())
-          AND EXTRACT(MONTH FROM COALESCE(document_date, payment_date)) = EXTRACT(MONTH FROM CURRENT_DATE())
-      ),
-      prev_month AS (
-        SELECT COALESCE(SUM(total_amount_clp), 0) AS prev_total_amount_clp
-        FROM \`${projectId}.greenhouse.fin_expenses\`
-        WHERE EXTRACT(YEAR FROM COALESCE(document_date, payment_date)) = EXTRACT(YEAR FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
-          AND EXTRACT(MONTH FROM COALESCE(document_date, payment_date)) = EXTRACT(MONTH FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
-      )
-      SELECT cur_month.total_amount_clp, cur_month.expense_count, prev_month.prev_total_amount_clp
-      FROM cur_month, prev_month
-    `)
-
-    const monthly = await runFinanceQuery<MonthlySummaryRow>(`
-      SELECT
-        EXTRACT(YEAR FROM COALESCE(document_date, payment_date)) AS year,
-        EXTRACT(MONTH FROM COALESCE(document_date, payment_date)) AS month,
-        COALESCE(SUM(total_amount_clp), 0) AS total_amount_clp,
-        COUNT(*) AS expense_count
+    const rows = await runFinanceQuery<ExpenseSummaryRow>(`
+      SELECT document_date, payment_date, total_amount_clp, payment_status
       FROM \`${projectId}.greenhouse.fin_expenses\`
-      WHERE COALESCE(document_date, payment_date) >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
-      GROUP BY year, month
-      ORDER BY year ASC, month ASC
     `)
 
-    const cur = currentMonth[0]
-    const curTotal = toNumber(cur?.total_amount_clp)
-    const prevTotal = toNumber(cur?.prev_total_amount_clp)
-    const changePercent = prevTotal > 0 ? Math.round(((curTotal - prevTotal) / prevTotal) * 100) : 0
+    const legacyEntries = rows
+      .map(row => ({
+        period: getMonthKey(
+          toDateString((row.document_date || row.payment_date) as string | { value?: string } | null)
+        ),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period))
+
+    const accrualEntries = rows
+      .map(row => ({
+        period: getMonthKey(
+          toDateString((row.document_date || row.payment_date) as string | { value?: string } | null)
+        ),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period))
+
+    const cashEntries = rows
+      .filter(row => row.payment_status === 'paid')
+      .map(row => ({
+        period: getMonthKey(toDateString(row.payment_date as string | { value?: string } | null)),
+        amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      }))
+      .filter((entry): entry is { period: string; amountClp: number } => Boolean(entry.period))
+
+    const legacyMonthlySeries = aggregateMonthlyEntries(legacyEntries, monthKeys)
+    const accrualMonthlySeries = aggregateMonthlyEntries(accrualEntries, monthKeys)
+    const cashMonthlySeries = aggregateMonthlyEntries(cashEntries, monthKeys)
+    const legacyCurrentMonth = buildCurrentMonthMetrics(legacyMonthlySeries)
+    const accrualCurrentMonth = buildCurrentMonthMetrics(accrualMonthlySeries)
+    const cashCurrentMonth = buildCurrentMonthMetrics(cashMonthlySeries)
+
+    const cashDataQuality = {
+      paidExpensesWithoutPaymentDate: rows.filter(row =>
+        row.payment_status === 'paid' && !toDateString(row.payment_date as string | { value?: string } | null)
+      ).length
+    }
 
     return NextResponse.json({
       currentMonth: {
-        totalAmountClp: curTotal,
-        expenseCount: toNumber(cur?.expense_count),
-        changePercent,
-        trend: curTotal <= prevTotal ? 'positive' : 'negative'
+        totalAmountClp: legacyCurrentMonth.totalAmountClp,
+        expenseCount: legacyCurrentMonth.recordCount,
+        changePercent: legacyCurrentMonth.changePercent,
+        trend: legacyCurrentMonth.totalAmountClp <= legacyCurrentMonth.previousTotalAmountClp ? 'positive' : 'negative'
       },
-      monthly: monthly.map(m => ({
-        year: toNumber(m.year),
-        month: toNumber(m.month),
-        totalAmountClp: toNumber(m.total_amount_clp),
-        expenseCount: toNumber(m.expense_count)
-      }))
+      monthly: legacyMonthlySeries.map(point => ({
+        year: point.year,
+        month: point.month,
+        totalAmountClp: point.totalAmountClp,
+        expenseCount: point.recordCount
+      })),
+      accrualCurrentMonth: {
+        totalAmountClp: accrualCurrentMonth.totalAmountClp,
+        expenseCount: accrualCurrentMonth.recordCount,
+        changePercent: accrualCurrentMonth.changePercent,
+        trend: accrualCurrentMonth.totalAmountClp <= accrualCurrentMonth.previousTotalAmountClp ? 'positive' : 'negative'
+      },
+      accrualMonthly: accrualMonthlySeries.map(point => ({
+        year: point.year,
+        month: point.month,
+        totalAmountClp: point.totalAmountClp,
+        expenseCount: point.recordCount
+      })),
+      cashCurrentMonth: {
+        totalAmountClp: cashCurrentMonth.totalAmountClp,
+        paymentCount: cashCurrentMonth.recordCount,
+        changePercent: cashCurrentMonth.changePercent,
+        trend: cashCurrentMonth.totalAmountClp <= cashCurrentMonth.previousTotalAmountClp ? 'positive' : 'negative'
+      },
+      cashMonthly: cashMonthlySeries.map(point => ({
+        year: point.year,
+        month: point.month,
+        totalAmountClp: point.totalAmountClp,
+        paymentCount: point.recordCount
+      })),
+      cashDataQuality
     })
   } catch (error) {
     const detail = error instanceof Error ? error.message : 'Unknown error'

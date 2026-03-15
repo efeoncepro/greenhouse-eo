@@ -246,7 +246,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     overdue_invoices_count: unknown
   }>(`
     SELECT
-      COALESCE(SUM(total_amount - COALESCE(amount_paid, 0)), 0) AS total_receivable,
+      COALESCE(
+        SUM(
+          COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
+            GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
+            NULLIF(COALESCE(total_amount, 0), 0)
+          )
+        ),
+        0
+      ) AS total_receivable,
       COUNTIF(payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
       COUNTIF(payment_status = 'overdue') AS overdue_invoices_count
     FROM \`${projectId}.greenhouse.fin_income\`

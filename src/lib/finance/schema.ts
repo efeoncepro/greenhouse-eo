@@ -190,6 +190,7 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       match_status STRING NOT NULL,
       matched_type STRING,
       matched_id STRING,
+      matched_payment_id STRING,
       match_confidence NUMERIC,
       notes STRING,
       matched_by STRING,
@@ -219,6 +220,9 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
   },
   fin_expenses: {
     client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING'
+  },
+  fin_bank_statement_rows: {
+    matched_payment_id: 'ALTER TABLE `{projectId}.greenhouse.fin_bank_statement_rows` ADD COLUMN IF NOT EXISTS matched_payment_id STRING'
   }
 }
 

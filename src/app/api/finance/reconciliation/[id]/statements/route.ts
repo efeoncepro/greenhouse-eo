@@ -25,6 +25,10 @@ interface StatementInput {
   balance?: number
 }
 
+interface StatementCountRow {
+  total: unknown
+}
+
 /** Convert CSV-parsed rows into the standard StatementInput shape */
 const csvRowsToStatementInput = (parsed: BankStatementRow[]): StatementInput[] =>
   parsed.map(r => ({
@@ -87,6 +91,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new FinanceValidationError('Maximum 500 rows per import.')
     }
 
+    const statementCounts = await runFinanceQuery<StatementCountRow>(`
+      SELECT COUNT(*) AS total
+      FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
+      WHERE period_id = @periodId
+    `, { periodId })
+
+    const existingRowCount = toNumber(statementCounts[0]?.total)
+
     // Insert rows one by one (BigQuery doesn't support multi-row INSERT with params easily)
     let imported = 0
 
@@ -94,7 +106,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const transactionDate = assertDateString(row.transactionDate, 'transactionDate')
       const description = assertNonEmptyString(row.description, 'description')
       const amount = toNumber(row.amount)
-      const rowId = `${periodId}_${String(imported + 1).padStart(4, '0')}`
+      const rowId = `${periodId}_${String(existingRowCount + imported + 1).padStart(4, '0')}`
 
       await runFinanceQuery(`
         INSERT INTO \`${projectId}.greenhouse.fin_bank_statement_rows\` (
@@ -130,7 +142,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         status = CASE WHEN status = 'open' THEN 'in_progress' ELSE status END,
         updated_at = CURRENT_TIMESTAMP()
       WHERE period_id = @periodId
-    `, { periodId, rowCount: imported })
+    `, { periodId, rowCount: existingRowCount + imported })
 
     return NextResponse.json({
       periodId,

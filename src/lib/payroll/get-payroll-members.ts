@@ -116,7 +116,8 @@ export const listPayrollCompensationMembers = async (): Promise<PayrollCompensat
               ORDER BY effective_from DESC, version DESC
             ) AS row_num
           FROM \`${projectId}.greenhouse.compensation_versions\`
-          WHERE is_current = TRUE
+          WHERE effective_from <= CURRENT_DATE('America/Santiago')
+            AND (effective_to IS NULL OR effective_to >= CURRENT_DATE('America/Santiago'))
         )
         WHERE row_num = 1
       )

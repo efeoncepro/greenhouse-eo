@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import { parseIncomePaymentsReceived } from '@/lib/finance/income-payments'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   FinanceValidationError,
@@ -24,20 +25,6 @@ interface IncomePaymentRow {
   amount_paid: unknown
   payment_status: string
   payments_received: unknown
-}
-
-const parsePaymentsReceived = (value: unknown) => {
-  try {
-    if (!value) {
-      return []
-    }
-
-    const parsed = typeof value === 'string' ? JSON.parse(value) : value
-
-    return Array.isArray(parsed) ? parsed : []
-  } catch {
-    return []
-  }
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -80,7 +67,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new FinanceValidationError('Payment amount exceeds pending balance.', 409)
     }
 
-    const existingPayments = parsePaymentsReceived(row.payments_received)
+    const existingPayments = parseIncomePaymentsReceived(row.payments_received)
 
     const paymentRecord = {
       paymentId: normalizeString(body.paymentId) || `pay_${randomUUID()}`,
@@ -92,7 +79,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
       notes: body.notes ? normalizeString(body.notes) : null,
       recordedBy: tenant.userId || null,
-      recordedAt: new Date().toISOString()
+      recordedAt: new Date().toISOString(),
+      isReconciled: false,
+      reconciliationRowId: null,
+      reconciledAt: null,
+      reconciledBy: null
     }
 
     const nextPayments = [...existingPayments, paymentRecord]

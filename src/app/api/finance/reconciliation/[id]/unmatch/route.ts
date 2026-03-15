@@ -9,7 +9,7 @@ import {
   normalizeString,
   runFinanceQuery
 } from '@/lib/finance/shared'
-import { clearReconciliationLink } from '@/lib/finance/reconciliation'
+import { assertReconciliationPeriodIsMutable, clearReconciliationLink } from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +27,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const body = await request.json()
     const rowId = assertNonEmptyString(body.rowId, 'rowId')
 
+    await assertReconciliationPeriodIsMutable(periodId)
+
     const projectId = getFinanceProjectId()
 
     // Get current match info before clearing
@@ -34,9 +36,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       row_id: string
       matched_type: string | null
       matched_id: string | null
+      matched_payment_id: string | null
       match_status: string
     }>(`
-      SELECT row_id, matched_type, matched_id, match_status
+      SELECT row_id, matched_type, matched_id, matched_payment_id, match_status
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
       WHERE row_id = @rowId AND period_id = @periodId
     `, { rowId, periodId })
@@ -53,6 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const previousType = normalizeString(row.matched_type)
     const previousId = normalizeString(row.matched_id)
+    const previousPaymentId = normalizeString(row.matched_payment_id)
 
     // Clear the match on the statement row
     await runFinanceQuery(`
@@ -61,6 +65,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         match_status = 'unmatched',
         matched_type = NULL,
         matched_id = NULL,
+        matched_payment_id = NULL,
         match_confidence = NULL,
         matched_by = NULL,
         matched_at = NULL
@@ -72,6 +77,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       await clearReconciliationLink({
         matchedType: previousType,
         matchedId: previousId,
+        matchedPaymentId: previousPaymentId || null,
         rowId
       })
     }
@@ -80,7 +86,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       unmatched: true,
       rowId,
       previousMatchedType: previousType || null,
-      previousMatchedId: previousId || null
+      previousMatchedId: previousPaymentId || previousId || null,
+      previousMatchedRecordId: previousId || null,
+      previousMatchedPaymentId: previousPaymentId || null
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

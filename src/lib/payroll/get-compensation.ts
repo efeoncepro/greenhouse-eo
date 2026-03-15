@@ -75,37 +75,54 @@ const getCurrentDateString = () =>
     timeZone: 'America/Santiago'
   }).format(new Date())
 
-const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => ({
-  versionId: String(row.version_id || ''),
-  memberId: String(row.member_id || ''),
-  memberName: String(row.display_name || 'Sin nombre'),
-  memberEmail: String(row.email || ''),
-  memberAvatarUrl: normalizeNullableString(row.avatar_url),
-  notionUserId: normalizeNullableString(row.notion_user_id),
-  version: toNumber(row.version),
-  payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
-  currency: row.currency === 'USD' ? 'USD' : 'CLP',
-  baseSalary: toNumber(row.base_salary),
-  remoteAllowance: toNumber(row.remote_allowance),
-  bonusOtdMin: toNumber(row.bonus_otd_min),
-  bonusOtdMax: toNumber(row.bonus_otd_max),
-  bonusRpaMin: toNumber(row.bonus_rpa_min),
-  bonusRpaMax: toNumber(row.bonus_rpa_max),
-  afpName: normalizeNullableString(row.afp_name),
-  afpRate: toNullableNumber(row.afp_rate),
-  healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
-  healthPlanUf: toNullableNumber(row.health_plan_uf),
-  unemploymentRate: toNumber(row.unemployment_rate),
-  contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
-  hasApv: normalizeBoolean(row.has_apv),
-  apvAmount: toNumber(row.apv_amount),
-  effectiveFrom: toDateString(row.effective_from) || '',
-  effectiveTo: toDateString(row.effective_to),
-  isCurrent: normalizeBoolean(row.is_current),
-  changeReason: normalizeNullableString(row.change_reason),
-  createdBy: normalizeNullableString(row.created_by),
-  createdAt: toTimestampString(row.created_at)
-})
+const isCurrentCompensationWindow = ({
+  effectiveFrom,
+  effectiveTo
+}: {
+  effectiveFrom: string
+  effectiveTo: string | null
+}) => {
+  const today = getCurrentDateString()
+
+  return effectiveFrom <= today && (!effectiveTo || effectiveTo >= today)
+}
+
+const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => {
+  const effectiveFrom = toDateString(row.effective_from) || ''
+  const effectiveTo = toDateString(row.effective_to)
+
+  return {
+    versionId: String(row.version_id || ''),
+    memberId: String(row.member_id || ''),
+    memberName: String(row.display_name || 'Sin nombre'),
+    memberEmail: String(row.email || ''),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
+    notionUserId: normalizeNullableString(row.notion_user_id),
+    version: toNumber(row.version),
+    payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+    currency: row.currency === 'USD' ? 'USD' : 'CLP',
+    baseSalary: toNumber(row.base_salary),
+    remoteAllowance: toNumber(row.remote_allowance),
+    bonusOtdMin: toNumber(row.bonus_otd_min),
+    bonusOtdMax: toNumber(row.bonus_otd_max),
+    bonusRpaMin: toNumber(row.bonus_rpa_min),
+    bonusRpaMax: toNumber(row.bonus_rpa_max),
+    afpName: normalizeNullableString(row.afp_name),
+    afpRate: toNullableNumber(row.afp_rate),
+    healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
+    healthPlanUf: toNullableNumber(row.health_plan_uf),
+    unemploymentRate: toNumber(row.unemployment_rate),
+    contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+    hasApv: normalizeBoolean(row.has_apv),
+    apvAmount: toNumber(row.apv_amount),
+    effectiveFrom,
+    effectiveTo,
+    isCurrent: effectiveFrom ? isCurrentCompensationWindow({ effectiveFrom, effectiveTo }) : normalizeBoolean(row.is_current),
+    changeReason: normalizeNullableString(row.change_reason),
+    createdBy: normalizeNullableString(row.created_by),
+    createdAt: toTimestampString(row.created_at)
+  }
+}
 
 const assertCompensationInput = (input: CreateCompensationVersionInput) => {
   if (!normalizeString(input.memberId)) {
@@ -162,7 +179,8 @@ export const getCurrentCompensation = async () => {
       INNER JOIN \`${projectId}.greenhouse.team_members\` AS m
         ON m.member_id = cv.member_id
       WHERE m.active = TRUE
-        AND cv.is_current = TRUE
+        AND cv.effective_from <= CURRENT_DATE('America/Santiago')
+        AND (cv.effective_to IS NULL OR cv.effective_to >= CURRENT_DATE('America/Santiago'))
       ORDER BY m.display_name ASC
     `
   )

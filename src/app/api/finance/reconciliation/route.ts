@@ -6,7 +6,6 @@ import {
   runFinanceQuery,
   getFinanceProjectId,
   assertNonEmptyString,
-  assertPositiveAmount,
   normalizeString,
   normalizeBoolean,
   toNumber,

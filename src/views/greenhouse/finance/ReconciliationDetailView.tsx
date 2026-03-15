@@ -113,6 +113,7 @@ const ReconciliationDetailView = () => {
   const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const [importDrawerOpen, setImportDrawerOpen] = useState(false)
+
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
     open: false,
     message: '',

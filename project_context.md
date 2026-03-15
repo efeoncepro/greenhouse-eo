@@ -3,6 +3,33 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Finance exchange-rate sync persistence
+- `Finance` ahora tiene hidratación automática server-side de `USD/CLP` para evitar que ingresos/egresos en USD dependan de carga manual previa.
+- Proveedores activos para tipo de cambio:
+  - primario: `mindicador.cl`
+  - fallback: `open.er-api.com`
+- Superficie backend agregada:
+  - `POST /api/finance/exchange-rates/sync`
+    - uso interno autenticado por sesión `finance_manager`
+    - también admite acceso interno por cron
+  - `GET /api/finance/exchange-rates/sync`
+    - pensado para `Vercel Cron`
+  - `GET /api/finance/exchange-rates/latest`
+    - ahora intenta hidratar y persistir si no existe ninguna tasa `USD -> CLP` almacenada
+- Persistencia operativa:
+  - se guardan ambos pares por fecha:
+    - `USD -> CLP`
+    - `CLP -> USD`
+  - la tabla sigue siendo `greenhouse.fin_exchange_rates`
+  - el `rate_id` sigue siendo determinístico: `${fromCurrency}_${toCurrency}_${rateDate}`
+- Ajuste de runtime:
+  - `resolveExchangeRateToClp()` ahora puede auto-hidratar `USD/CLP` antes de fallar cuando no encuentra snapshot almacenado
+- Deploy/configuración:
+  - se agregó `vercel.json` con cron diario hacia `/api/finance/exchange-rates/sync`
+  - nueva variable opcional: `CRON_SECRET`
+- Regla operativa derivada:
+  - frontend no debe intentar resolver tipo de cambio desde cliente ni depender de input manual cuando el backend ya puede hidratar la tasa del día
+
 ## Delta 2026-03-14 Portal surface consolidation task
 - Se documentó una task `to-do` específica para consolidación UX y arquitectura de surfaces del portal:
   - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`

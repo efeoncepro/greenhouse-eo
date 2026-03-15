@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { clearReconciliationLink, getReconciliationPeriodContext } from '@/lib/finance/reconciliation'
+import { assertReconciliationPeriodIsMutable, clearReconciliationLink } from '@/lib/finance/reconciliation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -28,11 +28,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const rowId = assertNonEmptyString(body.rowId, 'rowId')
     const notes = body.notes ? normalizeString(body.notes) : null
 
-    const period = await getReconciliationPeriodContext(periodId)
-
-    if (period.status === 'reconciled' || period.status === 'closed') {
-      throw new FinanceValidationError('Cannot exclude rows from a reconciled or closed period.', 409)
-    }
+    await assertReconciliationPeriodIsMutable(periodId)
 
     const projectId = getFinanceProjectId()
 
@@ -40,8 +36,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       row_id: string
       matched_type: string | null
       matched_id: string | null
+      matched_payment_id: string | null
     }>(`
-      SELECT row_id, matched_type, matched_id
+      SELECT row_id, matched_type, matched_id, matched_payment_id
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
       WHERE row_id = @rowId AND period_id = @periodId
       LIMIT 1
@@ -55,11 +52,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     const previousMatchedType = normalizeString(row.matched_type)
     const previousMatchedId = normalizeString(row.matched_id)
+    const previousMatchedPaymentId = normalizeString(row.matched_payment_id)
 
     if (previousMatchedType && previousMatchedId) {
       await clearReconciliationLink({
         matchedType: previousMatchedType,
         matchedId: previousMatchedId,
+        matchedPaymentId: previousMatchedPaymentId || null,
         rowId
       })
     }
@@ -70,6 +69,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         match_status = 'excluded',
         matched_type = NULL,
         matched_id = NULL,
+        matched_payment_id = NULL,
         match_confidence = NULL,
         matched_by = @matchedBy,
         matched_at = CURRENT_TIMESTAMP(),
@@ -86,7 +86,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       excluded: true,
       rowId,
       previousMatchedType: previousMatchedType || null,
-      previousMatchedId: previousMatchedId || null
+      previousMatchedId: previousMatchedPaymentId || previousMatchedId || null,
+      previousMatchedRecordId: previousMatchedId || null,
+      previousMatchedPaymentId: previousMatchedPaymentId || null
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

@@ -6,10 +6,14 @@ import Link from 'next/link'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
-import Chip from '@mui/material/Chip'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -18,6 +22,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
+import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
 
 import type { PayrollEntry, PeriodStatus } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
@@ -28,7 +35,7 @@ import { formatCurrency, formatPercent, formatDecimal, otdSemaphore, rpaSemaphor
 type Props = {
   entries: PayrollEntry[]
   periodStatus: PeriodStatus
-  onEntryUpdate: (entryId: string, field: string, value: number) => void
+  onEntryUpdate: (entryId: string, field: string, value: number | string | boolean | null) => void
 }
 
 const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
@@ -64,13 +71,15 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
             const isExpanded = expandedId === entry.entryId
             const otd = otdSemaphore(entry.kpiOtdPercent)
             const rpa = rpaSemaphore(entry.kpiRpaAvg)
+            const isManualKpi = entry.kpiDataSource === 'manual'
+            const canExpand = isChile || isEditable
 
             return (
               <Fragment key={entry.entryId}>
                 <TableRow hover sx={{ '& > td': { borderBottom: isExpanded ? 'none' : undefined } }}>
                   {/* Expand */}
                   <TableCell>
-                    {isChile && (
+                    {canExpand && (
                       <IconButton size='small' onClick={() => toggleExpand(entry.entryId)}>
                         <i className={isExpanded ? 'tabler-chevron-up' : 'tabler-chevron-down'} />
                       </IconButton>
@@ -92,11 +101,11 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                             {entry.memberName}
                           </Typography>
                         </Link>
-                        <Chip
+                        <CustomChip
+                          round='true'
                           size='small'
                           label={regimeLabel[entry.payRegime]}
                           color={regimeColor[entry.payRegime]}
-                          variant='tonal'
                           sx={{ height: 18, fontSize: '0.65rem' }}
                         />
                       </Box>
@@ -114,10 +123,12 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                   <TableCell align='center'>
                     <Stack alignItems='center' spacing={0.5}>
                       <Typography variant='body2'>{formatPercent(entry.kpiOtdPercent)}</Typography>
-                      <Chip size='small' label={otd.label} color={otd.color} variant='tonal' sx={{ height: 18, fontSize: '0.6rem' }} />
-                      {entry.kpiDataSource === 'manual' && (
+                      <CustomChip round='true' size='small' label={otd.label} color={otd.color} sx={{ height: 18, fontSize: '0.6rem' }} />
+                      {isManualKpi && (
                         <Tooltip title='KPI ingresado manualmente'>
-                          <Chip size='small' label='Manual' color='warning' variant='tonal' sx={{ height: 16, fontSize: '0.55rem' }} />
+                          <span>
+                            <CustomChip round='true' size='small' label='Manual' color='warning' sx={{ height: 16, fontSize: '0.55rem' }} />
+                          </span>
                         </Tooltip>
                       )}
                     </Stack>
@@ -146,7 +157,7 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                   <TableCell align='center'>
                     <Stack alignItems='center' spacing={0.5}>
                       <Typography variant='body2'>{formatDecimal(entry.kpiRpaAvg)}</Typography>
-                      <Chip size='small' label={rpa.label} color={rpa.color} variant='tonal' sx={{ height: 18, fontSize: '0.6rem' }} />
+                      <CustomChip round='true' size='small' label={rpa.label} color={rpa.color} sx={{ height: 18, fontSize: '0.6rem' }} />
                     </Stack>
                   </TableCell>
 
@@ -206,19 +217,191 @@ const PayrollEntryTable = ({ entries, periodStatus, onEntryUpdate }: Props) => {
                     </Typography>
                     {entry.manualOverride && (
                       <Tooltip title={entry.manualOverrideNote || 'Override manual'}>
-                        <Chip size='small' label='Override' color='warning' variant='tonal' sx={{ height: 16, fontSize: '0.55rem', mt: 0.5 }} />
+                        <span>
+                          <CustomChip round='true' size='small' label='Override' color='warning' sx={{ height: 16, fontSize: '0.55rem', mt: 0.5 }} />
+                        </span>
                       </Tooltip>
                     )}
                   </TableCell>
                 </TableRow>
 
-                {/* Chile expanded row */}
-                {isChile && (
+                {/* Expanded detail row */}
+                {canExpand && (
                   <TableRow>
                     <TableCell colSpan={11} sx={{ py: 0, px: 0 }}>
                       <Collapse in={isExpanded} timeout='auto' unmountOnExit>
-                        <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                          <ChileDeductionBreakdown entry={entry} />
+                        <Box sx={{ p: 2 }}>
+                          <Stack spacing={3}>
+                            {/* Chile deduction breakdown */}
+                            {isChile && (
+                              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <ChileDeductionBreakdown entry={entry} />
+                              </Box>
+                            )}
+
+                            {/* Manual KPI fields */}
+                            {isEditable && isManualKpi && (
+                              <Card
+                                elevation={0}
+                                sx={{
+                                  border: t => `1px solid ${t.palette.divider}`,
+                                  borderLeftWidth: '4px',
+                                  borderLeftStyle: 'solid',
+                                  borderLeftColor: 'warning.main'
+                                }}
+                              >
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
+                                    <i className='tabler-edit' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    KPI manual
+                                  </Typography>
+                                  <Grid container spacing={2}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                      <CustomTextField
+                                        fullWidth
+                                        size='small'
+                                        label='OTD %'
+                                        type='number'
+                                        defaultValue={entry.kpiOtdPercent ?? ''}
+                                        onBlur={e => {
+                                          const v = e.target.value === '' ? null : Number(e.target.value)
+
+                                          onEntryUpdate(entry.entryId, 'kpiOtdPercent', v)
+                                        }}
+                                        inputProps={{ min: 0, max: 100, step: 0.1 }}
+                                      />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                      <CustomTextField
+                                        fullWidth
+                                        size='small'
+                                        label='RpA promedio'
+                                        type='number'
+                                        defaultValue={entry.kpiRpaAvg ?? ''}
+                                        onBlur={e => {
+                                          const v = e.target.value === '' ? null : Number(e.target.value)
+
+                                          onEntryUpdate(entry.entryId, 'kpiRpaAvg', v)
+                                        }}
+                                        inputProps={{ min: 0, step: 0.1 }}
+                                      />
+                                    </Grid>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                      <CustomTextField
+                                        fullWidth
+                                        size='small'
+                                        label='Tareas completadas'
+                                        type='number'
+                                        defaultValue={entry.kpiTasksCompleted ?? ''}
+                                        onBlur={e => {
+                                          const v = e.target.value === '' ? null : Number(e.target.value)
+
+                                          onEntryUpdate(entry.entryId, 'kpiTasksCompleted', v)
+                                        }}
+                                        inputProps={{ min: 0 }}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </CardContent>
+                              </Card>
+                            )}
+
+                            {/* Tax override (Chile only) */}
+                            {isEditable && isChile && (
+                              <Card
+                                elevation={0}
+                                sx={{
+                                  border: t => `1px solid ${t.palette.divider}`,
+                                  borderLeftWidth: '4px',
+                                  borderLeftStyle: 'solid',
+                                  borderLeftColor: 'error.main'
+                                }}
+                              >
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
+                                    <i className='tabler-receipt-tax' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    Impuesto
+                                  </Typography>
+                                  <Grid container spacing={2}>
+                                    <Grid size={{ xs: 12, sm: 4 }}>
+                                      <CustomTextField
+                                        fullWidth
+                                        size='small'
+                                        label='Impuesto único (CLP)'
+                                        type='number'
+                                        defaultValue={entry.chileTaxAmount ?? ''}
+                                        onBlur={e => {
+                                          const v = e.target.value === '' ? null : Number(e.target.value)
+
+                                          onEntryUpdate(entry.entryId, 'chileTaxAmount', v)
+                                        }}
+                                        inputProps={{ min: 0 }}
+                                      />
+                                    </Grid>
+                                  </Grid>
+                                </CardContent>
+                              </Card>
+                            )}
+
+                            {/* Manual override */}
+                            {isEditable && (
+                              <Card
+                                elevation={0}
+                                sx={{
+                                  border: t => `1px solid ${t.palette.divider}`,
+                                  borderLeftWidth: '4px',
+                                  borderLeftStyle: 'solid',
+                                  borderLeftColor: 'info.main'
+                                }}
+                              >
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
+                                    <i className='tabler-adjustments' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    Override manual
+                                  </Typography>
+                                  <Stack spacing={2}>
+                                    <FormControlLabel
+                                      control={
+                                        <Switch
+                                          checked={entry.manualOverride}
+                                          onChange={e => onEntryUpdate(entry.entryId, 'manualOverride', e.target.checked)}
+                                        />
+                                      }
+                                      label='Activar override de neto'
+                                    />
+                                    {entry.manualOverride && (
+                                      <Grid container spacing={2}>
+                                        <Grid size={{ xs: 12, sm: 4 }}>
+                                          <CustomTextField
+                                            fullWidth
+                                            size='small'
+                                            label='Neto override'
+                                            type='number'
+                                            defaultValue={entry.netTotalOverride ?? entry.netTotal}
+                                            onBlur={e => {
+                                              const v = Number(e.target.value)
+
+                                              if (!isNaN(v)) onEntryUpdate(entry.entryId, 'netTotal', v)
+                                            }}
+                                            inputProps={{ min: 0 }}
+                                          />
+                                        </Grid>
+                                        <Grid size={{ xs: 12, sm: 8 }}>
+                                          <CustomTextField
+                                            fullWidth
+                                            size='small'
+                                            label='Motivo del override'
+                                            defaultValue={entry.manualOverrideNote ?? ''}
+                                            onBlur={e => onEntryUpdate(entry.entryId, 'manualOverrideNote', e.target.value)}
+                                          />
+                                        </Grid>
+                                      </Grid>
+                                    )}
+                                  </Stack>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </Stack>
                         </Box>
                       </Collapse>
                     </TableCell>

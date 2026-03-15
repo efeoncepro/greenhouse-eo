@@ -236,6 +236,34 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         ) : null}
         {isHrUser || isAdminUser ? (
           <MenuSection label='HR'>
+            <MenuItem href='/hr' icon={<i className='tabler-heart-handshake' />}>
+              <NavigationItemLabel
+                label='Equipo HR'
+                subtitle='Dashboard de gestión de personas'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/hr/departments' icon={<i className='tabler-sitemap' />}>
+              <NavigationItemLabel
+                label='Departamentos'
+                subtitle='Estructura organizacional'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/hr/leave' icon={<i className='tabler-calendar-event' />}>
+              <NavigationItemLabel
+                label='Permisos'
+                subtitle='Solicitudes y saldos de permisos'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
+            <MenuItem href='/hr/attendance' icon={<i className='tabler-clock-check' />}>
+              <NavigationItemLabel
+                label='Asistencia'
+                subtitle='Registros de asistencia del equipo'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
             <MenuItem href='/hr/payroll' icon={<i className='tabler-receipt-2' />}>
               <NavigationItemLabel
                 label='Nómina'

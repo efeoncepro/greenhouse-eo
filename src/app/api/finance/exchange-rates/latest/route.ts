@@ -2,17 +2,9 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { runFinanceQuery, getFinanceProjectId, toNumber, toDateString, normalizeString } from '@/lib/finance/shared'
+import { getLatestStoredExchangeRatePair, syncDailyUsdClpExchangeRate } from '@/lib/finance/exchange-rates'
 
 export const dynamic = 'force-dynamic'
-
-interface LatestRateRow {
-  from_currency: string
-  to_currency: string
-  rate: unknown
-  rate_date: unknown
-  source: string | null
-}
 
 export async function GET() {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -23,17 +15,20 @@ export async function GET() {
 
   await ensureFinanceInfrastructure()
 
-  const projectId = getFinanceProjectId()
+  let latestRate = await getLatestStoredExchangeRatePair({
+    fromCurrency: 'USD',
+    toCurrency: 'CLP'
+  })
 
-  const rows = await runFinanceQuery<LatestRateRow>(`
-    SELECT from_currency, to_currency, rate, rate_date, source
-    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-    WHERE from_currency = 'USD' AND to_currency = 'CLP'
-    ORDER BY rate_date DESC
-    LIMIT 1
-  `)
+  if (!latestRate) {
+    await syncDailyUsdClpExchangeRate()
+    latestRate = await getLatestStoredExchangeRatePair({
+      fromCurrency: 'USD',
+      toCurrency: 'CLP'
+    })
+  }
 
-  if (rows.length === 0) {
+  if (!latestRate) {
     return NextResponse.json({
       available: false,
       rate: null,
@@ -42,14 +37,12 @@ export async function GET() {
     })
   }
 
-  const row = rows[0]
-
   return NextResponse.json({
     available: true,
-    fromCurrency: normalizeString(row.from_currency),
-    toCurrency: normalizeString(row.to_currency),
-    rate: toNumber(row.rate),
-    rateDate: toDateString(row.rate_date as string | { value?: string } | null),
-    source: row.source ? normalizeString(row.source) : 'manual'
+    fromCurrency: latestRate.fromCurrency,
+    toCurrency: latestRate.toCurrency,
+    rate: latestRate.rate,
+    rateDate: latestRate.rateDate,
+    source: latestRate.source
   })
 }

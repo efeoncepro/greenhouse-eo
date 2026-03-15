@@ -5,7 +5,6 @@ import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
   getFinanceProjectId,
-  assertNonEmptyString,
   assertValidCurrency,
   assertDateString,
   assertPositiveAmount,

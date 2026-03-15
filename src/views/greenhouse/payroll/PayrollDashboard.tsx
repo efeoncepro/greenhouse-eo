@@ -5,12 +5,12 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
@@ -22,7 +22,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
-import type { CompensationVersion, PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
@@ -37,6 +37,7 @@ const PayrollDashboard = () => {
   const [currentPeriod, setCurrentPeriod] = useState<PayrollPeriod | null>(null)
   const [entries, setEntries] = useState<PayrollEntry[]>([])
   const [compensations, setCompensations] = useState<CompensationVersion[]>([])
+  const [eligibleMembers, setEligibleMembers] = useState<PayrollCompensationMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -79,6 +80,7 @@ const PayrollDashboard = () => {
         const data = await compRes.json()
 
         setCompensations(data.compensations || [])
+        setEligibleMembers(data.eligibleMembers || [])
       }
     } catch (err: any) {
       setError(err.message || 'Error cargando datos')
@@ -143,9 +145,17 @@ const PayrollDashboard = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
-        <CircularProgress />
-      </Box>
+      <Stack spacing={6}>
+        <Skeleton variant='rounded' height={48} />
+        <Grid container spacing={6}>
+          {[0, 1, 2, 3].map(i => (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
+              <Skeleton variant='rounded' height={120} />
+            </Grid>
+          ))}
+        </Grid>
+        <Skeleton variant='rounded' height={400} />
+      </Stack>
     )
   }
 
@@ -157,7 +167,7 @@ const PayrollDashboard = () => {
 
   return (
     <>
-      <Stack spacing={4}>
+      <Stack spacing={6}>
         {/* Header */}
         <Stack direction='row' justifyContent='space-between' alignItems='flex-start'>
           <Box>
@@ -182,7 +192,7 @@ const PayrollDashboard = () => {
         )}
 
         {/* KPI Stats Row */}
-        <Grid container spacing={3}>
+        <Grid container spacing={6}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Período actual'
@@ -258,6 +268,7 @@ const PayrollDashboard = () => {
           <TabPanel value='compensation' sx={{ p: 0 }}>
             <PayrollCompensationTab
               compensations={compensations}
+              eligibleMembers={eligibleMembers}
               onRefresh={handleRefresh}
             />
           </TabPanel>
