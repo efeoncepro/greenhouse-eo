@@ -32,7 +32,7 @@ export async function GET() {
     const projectId = getFinanceProjectId()
 
     const currentMonth = await runFinanceQuery<CurrentMonthRow>(`
-      WITH current AS (
+      WITH cur_month AS (
         SELECT
           COALESCE(SUM(total_amount_clp), 0) AS total_amount_clp,
           COUNT(*) AS expense_count
@@ -40,14 +40,14 @@ export async function GET() {
         WHERE EXTRACT(YEAR FROM COALESCE(document_date, payment_date)) = EXTRACT(YEAR FROM CURRENT_DATE())
           AND EXTRACT(MONTH FROM COALESCE(document_date, payment_date)) = EXTRACT(MONTH FROM CURRENT_DATE())
       ),
-      previous AS (
+      prev_month AS (
         SELECT COALESCE(SUM(total_amount_clp), 0) AS prev_total_amount_clp
         FROM \`${projectId}.greenhouse.fin_expenses\`
         WHERE EXTRACT(YEAR FROM COALESCE(document_date, payment_date)) = EXTRACT(YEAR FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
           AND EXTRACT(MONTH FROM COALESCE(document_date, payment_date)) = EXTRACT(MONTH FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
       )
-      SELECT current.total_amount_clp, current.expense_count, previous.prev_total_amount_clp
-      FROM current, previous
+      SELECT cur_month.total_amount_clp, cur_month.expense_count, prev_month.prev_total_amount_clp
+      FROM cur_month, prev_month
     `)
 
     const monthly = await runFinanceQuery<MonthlySummaryRow>(`

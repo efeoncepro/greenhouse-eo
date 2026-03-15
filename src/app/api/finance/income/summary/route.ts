@@ -33,7 +33,7 @@ export async function GET() {
 
     // Current month vs previous month
     const currentMonth = await runFinanceQuery<CurrentMonthRow>(`
-      WITH current AS (
+      WITH cur_month AS (
         SELECT
           COALESCE(SUM(total_amount_clp), 0) AS total_amount_clp,
           COUNT(*) AS invoice_count
@@ -41,14 +41,14 @@ export async function GET() {
         WHERE EXTRACT(YEAR FROM invoice_date) = EXTRACT(YEAR FROM CURRENT_DATE())
           AND EXTRACT(MONTH FROM invoice_date) = EXTRACT(MONTH FROM CURRENT_DATE())
       ),
-      previous AS (
+      prev_month AS (
         SELECT COALESCE(SUM(total_amount_clp), 0) AS prev_total_amount_clp
         FROM \`${projectId}.greenhouse.fin_income\`
         WHERE EXTRACT(YEAR FROM invoice_date) = EXTRACT(YEAR FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
           AND EXTRACT(MONTH FROM invoice_date) = EXTRACT(MONTH FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
       )
-      SELECT current.total_amount_clp, current.invoice_count, previous.prev_total_amount_clp
-      FROM current, previous
+      SELECT cur_month.total_amount_clp, cur_month.invoice_count, prev_month.prev_total_amount_clp
+      FROM cur_month, prev_month
     `)
 
     // Last 6 months breakdown
