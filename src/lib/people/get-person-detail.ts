@@ -460,9 +460,11 @@ export const getPersonDetail = async ({
     getAssignmentsByMember(memberId).then(rows => {
       detail.summary = buildAssignmentsSummary(rows)
 
-  if (access.canViewAssignments) {
+      if (access.canViewAssignments) {
         detail.assignments = normalizeAssignments(rows)
       }
+    }).catch(error => {
+      console.warn(`[people/${memberId}] assignments failed:`, error instanceof Error ? error.message : error)
     })
   )
 
@@ -478,6 +480,8 @@ export const getPersonDetail = async ({
         notionUserCandidates
       }).then(metrics => {
         detail.operationalMetrics = metrics
+      }).catch(error => {
+        console.warn(`[people/${memberId}] operational metrics failed:`, error instanceof Error ? error.message : error)
       })
     )
   }
@@ -492,6 +496,8 @@ export const getPersonDetail = async ({
         if (access.canViewPayroll) {
           detail.recentPayroll = history.entries.slice(0, 3)
         }
+      }).catch(error => {
+        console.warn(`[people/${memberId}] payroll history failed:`, error instanceof Error ? error.message : error)
       })
     )
   }
@@ -500,6 +506,8 @@ export const getPersonDetail = async ({
     tasks.push(
       getPersonFinanceOverview(memberId).then(finance => {
         detail.financeSummary = finance.summary
+      }).catch(error => {
+        console.warn(`[people/${memberId}] finance overview failed:`, error instanceof Error ? error.message : error)
       })
     )
   }
