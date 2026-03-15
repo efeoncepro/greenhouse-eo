@@ -167,12 +167,13 @@ export const calculatePayroll = async ({
   }
 
   const range = getPeriodRangeFromId(periodId)
-  const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
-  const missingCompensation = compensationRows.filter(row => !row.hasCompensationVersion)
+  const allRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
+  const compensationRows = allRows.filter(row => row.hasCompensationVersion)
+  const missingCompensationMemberIds = allRows.filter(row => !row.hasCompensationVersion).map(row => row.memberId)
 
-  if (missingCompensation.length > 0) {
-    throw new PayrollValidationError('Missing compensation version for one or more active team members.', 400, {
-      memberIds: missingCompensation.map(row => row.memberId)
+  if (compensationRows.length === 0) {
+    throw new PayrollValidationError('No active team members have a compensation version for this period.', 400, {
+      memberIds: missingCompensationMemberIds
     })
   }
 
@@ -243,6 +244,7 @@ export const calculatePayroll = async ({
     period: updatedPeriod,
     entries: await getPayrollEntries(periodId),
     diagnostics: kpiData.diagnostics,
-    missingKpiMemberIds
+    missingKpiMemberIds,
+    missingCompensationMemberIds
   }
 }

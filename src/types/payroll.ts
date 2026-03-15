@@ -193,6 +193,7 @@ export interface PayrollCalculationResult {
   entries: PayrollEntry[]
   diagnostics: PayrollKpiDiagnostics
   missingKpiMemberIds: string[]
+  missingCompensationMemberIds: string[]
 }
 
 export interface MemberPayrollHistory {
