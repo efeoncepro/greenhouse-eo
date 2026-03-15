@@ -41,9 +41,6 @@
 - El fallback también conserva la mejora reciente para nombres de proyecto:
   - prioriza `greenhouse_conformed.delivery_projects`
   - deja `notion_ops.proyectos` como respaldo para `project_name` y `page_url`
-- Se corrigió además la join del fallback BigQuery:
-  - `delivery_projects` en BigQuery usa `project_source_id`, no `project_record_id`
-  - también se filtran filas borradas con `dp.is_deleted = FALSE`
 
 ### Person 360 serving baseline materialized in PostgreSQL
 - Se creó `greenhouse_serving.person_360` como primera vista unificada de persona sobre `identity_profiles`, `members`, `client_users` y `crm_contacts`.

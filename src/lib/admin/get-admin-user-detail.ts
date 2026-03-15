@@ -349,8 +349,7 @@ const getAdminUserDetailFromBigQuery = async (userId: string): Promise<AdminUser
           COALESCE(dp.page_url, p.page_url) AS page_url
         FROM \`${projectId}.greenhouse.user_project_scopes\` AS ups
         LEFT JOIN \`${projectId}.greenhouse_conformed.delivery_projects\` AS dp
-          ON dp.project_source_id = ups.project_id
-         AND dp.is_deleted = FALSE
+          ON dp.project_record_id = ups.project_id
         LEFT JOIN \`${projectId}.notion_ops.proyectos\` AS p
           ON p.notion_page_id = ups.project_id
         WHERE ups.user_id = @userId

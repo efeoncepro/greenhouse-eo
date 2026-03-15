@@ -72,10 +72,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El fallback mantiene además la mejora reciente de nombres de proyecto:
   - prioriza `greenhouse_conformed.delivery_projects`
   - usa `notion_ops.proyectos` solo como fallback para `project_name` / `page_url`
-- Ajuste adicional tras revisar logs reales de Vercel:
-  - la join del fallback BigQuery estaba usando `dp.project_record_id`
-  - en `greenhouse_conformed.delivery_projects` el campo correcto es `project_source_id`
-  - se corrigió esa join y se agregó `dp.is_deleted = FALSE`
 
 ### Verificacion
 - `pnpm pg:doctor --profile=runtime`
