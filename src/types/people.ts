@@ -1,7 +1,7 @@
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
 import type { TeamCapacityHealth, TeamMemberProfile } from '@/types/team'
 
-export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll' | 'finance' | 'hr-profile'
+export type PersonTab = 'assignments' | 'activity' | 'compensation' | 'payroll' | 'finance' | 'hr-profile' | 'ai-tools'
 
 export interface PersonListItem {
   memberId: string

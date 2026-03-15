@@ -55,7 +55,8 @@ export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
   compensation: ['efeonce_admin', 'hr_payroll'],
   payroll: ['efeonce_admin', 'hr_payroll'],
   finance: ['efeonce_admin', 'finance_manager'],
-  'hr-profile': ['efeonce_admin', 'hr_payroll']
+  'hr-profile': ['efeonce_admin', 'hr_payroll'],
+  'ai-tools': ['efeonce_admin', 'efeonce_operations']
 }
 
 export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }> = [
@@ -63,7 +64,8 @@ export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }
   { value: 'activity', label: 'Actividad', icon: 'tabler-chart-bar' },
   { value: 'compensation', label: 'Compensación', icon: 'tabler-cash' },
   { value: 'payroll', label: 'Nómina', icon: 'tabler-receipt-2' },
-  { value: 'hr-profile', label: 'Perfil HR', icon: 'tabler-user-heart' }
+  { value: 'hr-profile', label: 'Perfil HR', icon: 'tabler-user-heart' },
+  { value: 'ai-tools', label: 'AI Tools', icon: 'tabler-wand' }
 ]
 
 export const getVisibleTabs = (roleCodes: string[]) =>

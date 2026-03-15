@@ -18,6 +18,7 @@ import PersonActivityTab from './tabs/PersonActivityTab'
 import PersonCompensationTab from './tabs/PersonCompensationTab'
 import PersonPayrollTab from './tabs/PersonPayrollTab'
 import PersonHrProfileTab from './tabs/PersonHrProfileTab'
+import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 
 type Props = {
   detail: PersonDetail
@@ -69,6 +70,8 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment }: Prop
               <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
             ) : activeTab === 'hr-profile' ? (
               <PersonHrProfileTab memberId={detail.member.memberId} />
+            ) : activeTab === 'ai-tools' ? (
+              <PersonAiToolsTab memberId={detail.member.memberId} />
             ) : null}
           </TabPanel>
         </Grid>

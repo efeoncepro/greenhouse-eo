@@ -296,6 +296,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 showSubtitle={showNavSubtitles}
               />
             </MenuItem>
+            <MenuItem href='/admin/ai-tools' icon={<i className='tabler-wand' />}>
+              <NavigationItemLabel
+                label='AI Tooling'
+                subtitle='Herramientas, licencias y créditos IA'
+                showSubtitle={showNavSubtitles}
+              />
+            </MenuItem>
           </MenuSection>
         ) : null}
       </Menu>
