@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -121,6 +122,7 @@ const ReconciliationView = () => {
   const [accountFilter, setAccountFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -263,8 +265,8 @@ const ReconciliationView = () => {
             Conciliación bancaria y matching de transacciones
           </Typography>
         </Box>
-        <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />}>
-          Nuevo período
+        <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />} onClick={() => setCreateDrawerOpen(true)}>
+          Nuevo periodo
         </Button>
       </Box>
 
@@ -536,6 +538,15 @@ const ReconciliationView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      <CreateReconciliationPeriodDrawer
+        open={createDrawerOpen}
+        onClose={() => setCreateDrawerOpen(false)}
+        onSuccess={() => {
+          setCreateDrawerOpen(false)
+          fetchData()
+        }}
+      />
     </Box>
   )
 }

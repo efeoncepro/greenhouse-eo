@@ -38,7 +38,6 @@ interface StatementRow {
   amount: number
   balance: number
   matchStatus: string
-  rawMatchStatus?: string
   matchedType: string | null
   matchedId: string | null
   matchConfidence: number | null
@@ -82,6 +81,14 @@ const formatDate = (dateStr: string | null): string => {
   const [year, month, day] = dateStr.split('-')
 
   return `${day}/${month}/${year}`
+}
+
+const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'secondary' | 'error' | 'info' }> = {
+  matched: { label: 'Conciliado', color: 'success' },
+  manual_matched: { label: 'Conciliado', color: 'success' },
+  suggested: { label: 'Sugerido', color: 'warning' },
+  excluded: { label: 'Excluido', color: 'error' },
+  unmatched: { label: 'Sin match', color: 'info' }
 }
 
 // ---------------------------------------------------------------------------
@@ -324,8 +331,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                   <CustomChip
                     round='true'
                     size='small'
-                    color={row.matchStatus === 'matched' ? 'success' : row.matchStatus === 'suggested' ? 'warning' : row.matchStatus === 'excluded' ? 'secondary' : 'info'}
-                    label={row.matchStatus === 'matched' ? 'Conciliado' : row.matchStatus === 'suggested' ? 'Sugerido' : row.matchStatus === 'excluded' ? 'Excluido' : 'Sin match'}
+                    color={(MATCH_STATUS_CONFIG[row.matchStatus] ?? MATCH_STATUS_CONFIG.unmatched).color}
+                    label={(MATCH_STATUS_CONFIG[row.matchStatus] ?? MATCH_STATUS_CONFIG.unmatched).label}
                   />
                 </Box>
               </Grid>

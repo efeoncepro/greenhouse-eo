@@ -26,6 +26,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import ReconciliationMatchDialog from '@views/greenhouse/finance/dialogs/ReconciliationMatchDialog'
+import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportStatementDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -111,6 +112,7 @@ const ReconciliationDetailView = () => {
   const [autoMatchLoading, setAutoMatchLoading] = useState(false)
   const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
+  const [importDrawerOpen, setImportDrawerOpen] = useState(false)
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
     open: false,
     message: '',
@@ -128,7 +130,11 @@ const ReconciliationDetailView = () => {
 
         setPeriod(data.period ?? null)
         setStatementRows(data.statements ?? [])
+      } else {
+        setSnackbar({ open: true, message: 'No pudimos cargar el periodo de conciliacion.', severity: 'error' })
       }
+    } catch {
+      setSnackbar({ open: true, message: 'Error de conexion al cargar conciliacion.', severity: 'error' })
     } finally {
       setLoading(false)
     }
@@ -257,7 +263,7 @@ const ReconciliationDetailView = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant='outlined' startIcon={<i className='tabler-file-import' />}>
+          <Button variant='outlined' startIcon={<i className='tabler-file-import' />} onClick={() => setImportDrawerOpen(true)}>
             Importar extracto
           </Button>
           <Button
@@ -431,6 +437,18 @@ const ReconciliationDetailView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      {/* Import Statement Drawer */}
+      <ImportStatementDrawer
+        open={importDrawerOpen}
+        periodId={id}
+        onClose={() => setImportDrawerOpen(false)}
+        onSuccess={() => {
+          setImportDrawerOpen(false)
+          setSnackbar({ open: true, message: 'Extracto importado correctamente', severity: 'success' })
+          fetchData()
+        }}
+      />
 
       {/* Match Dialog */}
       <ReconciliationMatchDialog
