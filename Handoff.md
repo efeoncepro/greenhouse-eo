@@ -40,6 +40,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 15:12 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir `CODEX_TASK_Financial_Intelligence_Layer` para alinearla con la arquitectura vigente de Finance y del data platform.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Documentacion operativa / arquitectura / Finance
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Financial_Intelligence_Layer.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se reescribio la task de `Financial Intelligence Layer` porque el brief original quedo desalineado respecto al estado actual del repo.
+- Alineaciones aplicadas:
+  - `Finance` queda explicitamente `Postgres-first`, no `BigQuery-first`
+  - nuevas tablas y extensiones se modelan sobre `greenhouse_finance`
+  - `client_id`, `member_id`, `provider_id` y `module_id` quedan como anchors canonicos
+  - `hubspot_company_id`, `client_profile_id`, `supplier_id` y labels de `service_line` quedan solo como compatibilidad o snapshots
+  - montos y porcentajes persistidos pasan a regla de precision exacta (`numeric` / `NUMERIC`), no `FLOAT64`
+  - margen por linea se redefine contra `service_modules` / `client_service_modules`, no contra una taxonomia paralela hardcodeada
+  - el P&L queda diferenciado de cashflow; `cash collected` se trata como metrica complementaria, no como definicion base del resultado
+- Tambien se corrigio la dependencia documental:
+  - `CODEX_TASK_Financial_Module_v2.md` queda como backend activo de referencia
+  - `CODEX_TASK_Financial_Module.md` queda implicitamente como historico
+
+### Verificacion
+- Relectura cruzada contra:
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+  - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md`
+  - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- Validacion mecanica pendiente abajo en este turno:
+  - `git diff --check -- docs/tasks/to-do/CODEX_TASK_Financial_Intelligence_Layer.md Handoff.md`
+
+### Riesgos o pendientes
+- La task ya esta alineada, pero su implementacion real puede destapar un gap previo en el catalogo canonico de `service_modules` si Finance necesita lineas que todavia no existan formalizadas.
+- Si eso ocurre, no hay que hardcodear labels nuevos en Finance; hay que corregir primero el catalogo o documentar la decision de arquitectura.
+
 ## 2026-03-15 14:18 America/Santiago
 
 ### Agente
