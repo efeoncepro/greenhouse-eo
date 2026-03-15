@@ -225,9 +225,9 @@ export async function POST(request: Request) {
         created_at, updated_at
       ) VALUES (
         @incomeId, NULLIF(@clientId, ''), NULLIF(@clientProfileId, ''), NULLIF(@hubspotCompanyId, ''), NULLIF(@hubspotDealId, ''),
-        @clientName, NULLIF(@invoiceNumber, ''), @invoiceDate, IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
-        @currency, @subtotal, @taxRate, @taxAmount, @totalAmount,
-        @exchangeRateToClp, @totalAmountClp,
+        @clientName, NULLIF(@invoiceNumber, ''), CAST(@invoiceDate AS DATE), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
+        @currency, CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
+        CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
         @paymentStatus, 0,
         NULLIF(@poNumber, ''), NULLIF(@hesNumber, ''), NULLIF(@serviceLine, ''), @incomeType, NULLIF(@description, ''),
         FALSE, NULLIF(@notes, ''), NULLIF(@createdBy, ''),
@@ -271,6 +271,6 @@ export async function POST(request: Request) {
 
     console.error('POST /api/finance/income failed:', detail, error)
 
-    return NextResponse.json({ error: `[DEBUG] ${detail}` }, { status: 500 })
+    return NextResponse.json({ error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' }, { status: 500 })
   }
 }

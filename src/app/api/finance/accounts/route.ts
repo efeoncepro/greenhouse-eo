@@ -117,7 +117,7 @@ export async function POST(request: Request) {
         @accountId, @accountName, @bankName,
         @accountNumber, @accountNumberFull,
         @currency, @accountType, @country, TRUE,
-        @openingBalance, IF(@openingBalanceDate = '', NULL, CAST(@openingBalanceDate AS DATE)), @notes,
+        CAST(@openingBalance AS NUMERIC), IF(@openingBalanceDate = '', NULL, CAST(@openingBalanceDate AS DATE)), @notes,
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
     `, {

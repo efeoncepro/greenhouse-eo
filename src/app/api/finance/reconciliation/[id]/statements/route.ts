@@ -103,7 +103,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           match_status, created_at
         ) VALUES (
           @rowId, @periodId, @transactionDate, IF(@valueDate = '', NULL, CAST(@valueDate AS DATE)),
-          @description, @reference, @amount, @balance,
+          @description, @reference, CAST(@amount AS NUMERIC), CAST(@balance AS NUMERIC),
           'unmatched', CURRENT_TIMESTAMP()
         )
       `, {
