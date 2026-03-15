@@ -4,6 +4,10 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
+  getFinanceIncomeFromPostgres
+} from '@/lib/finance/postgres-store-slice2'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
   runFinanceQuery,
   getFinanceProjectId,
   assertNonEmptyString,
@@ -111,7 +115,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const { id: incomeId } = await params
 
-  // ── BigQuery read path (Postgres tables not yet backfilled) ──
+  // ── Postgres-first path ──
+  try {
+    const income = await getFinanceIncomeFromPostgres(incomeId)
+
+    if (!income) {
+      return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(income)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
   await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 

@@ -12,6 +12,10 @@ import {
   runFinanceQuery,
   getFinanceProjectId
 } from '@/lib/finance/shared'
+import {
+  listFinanceAccountsFromPostgres,
+  shouldFallbackFromFinancePostgres
+} from '@/lib/finance/postgres-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -42,7 +46,27 @@ export async function GET() {
 
   const projectId = getFinanceProjectId()
 
-  const [suppliers, accounts, priorInstitutions, payrollInstitutions] = await Promise.all([
+  // ── Postgres-first for accounts ──
+  let accountsList: { accountId: string; accountName: string; currency: string; accountType: string }[] | null = null
+
+  try {
+    const pgAccounts = await listFinanceAccountsFromPostgres()
+
+    accountsList = pgAccounts.map(a => ({
+      accountId: a.accountId,
+      accountName: a.accountName,
+      currency: a.currency,
+      accountType: ACCOUNT_TYPES.includes(normalizeString(a.accountType) as (typeof ACCOUNT_TYPES)[number])
+        ? normalizeString(a.accountType)
+        : 'other'
+    }))
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  const [suppliers, bqAccounts, priorInstitutions, payrollInstitutions] = await Promise.all([
     runFinanceQuery<{
       supplier_id: string
       legal_name: string
@@ -54,7 +78,7 @@ export async function GET() {
       WHERE is_active = TRUE
       ORDER BY COALESCE(trade_name, legal_name) ASC
     `),
-    runFinanceQuery<{
+    accountsList ? Promise.resolve(null) : runFinanceQuery<{
       account_id: string
       account_name: string
       currency: string
@@ -104,7 +128,7 @@ export async function GET() {
       tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
       paymentCurrency: row.payment_currency ? normalizeString(row.payment_currency) : null
     })),
-    accounts: accounts.map(row => ({
+    accounts: accountsList ?? (bqAccounts ?? []).map(row => ({
       accountId: normalizeString(row.account_id),
       accountName: normalizeString(row.account_name),
       currency: normalizeString(row.currency),

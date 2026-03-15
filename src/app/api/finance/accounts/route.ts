@@ -17,6 +17,7 @@ import {
   type AccountType
 } from '@/lib/finance/shared'
 import {
+  listFinanceAccountsFromPostgres,
   createFinanceAccountInPostgres,
   shouldFallbackFromFinancePostgres
 } from '@/lib/finance/postgres-store'
@@ -155,7 +156,36 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // ── BigQuery read path (Postgres tables not yet backfilled) ──
+  // ── Postgres-first path ──
+  try {
+    const accounts = await listFinanceAccountsFromPostgres()
+
+    // Enrich with current balance from BigQuery reconciliation data
+    const { statementMap, periodMap } = await getCurrentBalanceMap()
+
+    const enriched = accounts.map(account => {
+      const statementBalance = statementMap.get(account.accountId)
+      const periodBalance = periodMap.get(account.accountId)
+
+      return {
+        ...account,
+        currentBalance: statementBalance?.currentBalance ?? periodBalance?.currentBalance ?? account.openingBalance,
+        balanceAsOf: statementBalance?.balanceAsOf ?? periodBalance?.balanceAsOf ?? account.openingBalanceDate,
+        balanceSource: statementBalance ? 'statement' : periodBalance ? 'period_close' : 'opening_balance'
+      }
+    })
+
+    return NextResponse.json({
+      items: enriched,
+      total: enriched.length
+    })
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
   {
     await ensureFinanceInfrastructure()
 

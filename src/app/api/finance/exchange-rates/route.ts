@@ -14,6 +14,7 @@ import {
   toTimestampString
 } from '@/lib/finance/shared'
 import {
+  listFinanceExchangeRatesFromPostgres,
   shouldFallbackFromFinancePostgres,
   upsertFinanceExchangeRateInPostgres
 } from '@/lib/finance/postgres-store'
@@ -52,38 +53,50 @@ export async function GET(request: Request) {
   const fromDate = searchParams.get('fromDate')
   const toDate = searchParams.get('toDate')
 
-  // ── BigQuery read path (Postgres tables not yet backfilled) ──
-  {
-    await ensureFinanceInfrastructure()
-
-    const projectId = getFinanceProjectId()
-
-    let dateFilter = ''
-    const params: Record<string, unknown> = {}
-
-    if (fromDate) {
-      dateFilter += ' AND rate_date >= @fromDate'
-      params.fromDate = fromDate
-    }
-
-    if (toDate) {
-      dateFilter += ' AND rate_date <= @toDate'
-      params.toDate = toDate
-    }
-
-    const rows = await runFinanceQuery<ExchangeRateRow>(`
-      SELECT rate_id, from_currency, to_currency, rate, rate_date, source, created_at
-      FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-      WHERE TRUE ${dateFilter}
-      ORDER BY rate_date DESC
-      LIMIT 200
-    `, params)
+  // ── Postgres-first path ──
+  try {
+    const items = await listFinanceExchangeRatesFromPostgres({ fromDate, toDate })
 
     return NextResponse.json({
-      items: rows.map(normalizeRate),
-      total: rows.length
+      items,
+      total: items.length
     })
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
   }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
+
+  const projectId = getFinanceProjectId()
+
+  let dateFilter = ''
+  const params: Record<string, unknown> = {}
+
+  if (fromDate) {
+    dateFilter += ' AND rate_date >= @fromDate'
+    params.fromDate = fromDate
+  }
+
+  if (toDate) {
+    dateFilter += ' AND rate_date <= @toDate'
+    params.toDate = toDate
+  }
+
+  const rows = await runFinanceQuery<ExchangeRateRow>(`
+    SELECT rate_id, from_currency, to_currency, rate, rate_date, source, created_at
+    FROM \`${projectId}.greenhouse.fin_exchange_rates\`
+    WHERE TRUE ${dateFilter}
+    ORDER BY rate_date DESC
+    LIMIT 200
+  `, params)
+
+  return NextResponse.json({
+    items: rows.map(normalizeRate),
+    total: rows.length
+  })
 }
 
 export async function POST(request: Request) {

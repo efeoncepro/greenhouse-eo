@@ -9,33 +9,33 @@ Related docs:
 - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — Postgres schema reference
 - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — data platform overview
 
-## Current State (Phase 1 — BigQuery reads, Postgres dual-write)
+## Current State (Phase 3 — Postgres-first reads, BigQuery fallback)
 
 As of 2026-03-15, Finance API routes follow this pattern:
 
 | Operation | Primary store | Fallback | Notes |
 |-----------|--------------|----------|-------|
-| **GET** (list, detail) | BigQuery | — | Always reads from BigQuery `fin_*` tables |
+| **GET** (list, detail) | PostgreSQL | BigQuery | Reads from Postgres first; falls back to BigQuery on connection/config errors |
 | **POST** (create) | PostgreSQL | BigQuery | Writes to Postgres first; if Postgres is unavailable, writes to BigQuery |
 | **PUT** (update) | BigQuery | — | Updates go to BigQuery only (Postgres update paths not yet wired) |
 
-### Why reads are BigQuery-only
+### Phase history
 
-The Postgres finance tables (`greenhouse_finance.*`) were created via DDL but have **not been backfilled** with existing data from BigQuery. If a GET handler tried Postgres first, it would return empty results — masking the real data that lives in BigQuery.
-
-The Postgres-first read path was removed from GET handlers in commit `fix: route finance reads to BigQuery until Postgres backfill` to prevent this.
+- **Phase 1** (2026-03-15): Removed Postgres-first reads because tables were empty (no backfill). All GETs routed to BigQuery.
+- **Phase 2** (2026-03-15): Backfilled all 9 Postgres tables from BigQuery. Row counts validated.
+- **Phase 3** (2026-03-15): Restored Postgres-first reads in all GET handlers with BigQuery fallback.
 
 ### Affected endpoints
 
 | Endpoint | GET reads from | POST writes to |
 |----------|---------------|----------------|
-| `/api/finance/income` | BigQuery | Postgres → BQ fallback |
-| `/api/finance/income/[id]` | BigQuery | — |
-| `/api/finance/expenses` | BigQuery | Postgres → BQ fallback |
-| `/api/finance/expenses/[id]` | BigQuery | — |
-| `/api/finance/accounts` | BigQuery | Postgres → BQ fallback |
-| `/api/finance/exchange-rates` | BigQuery | Postgres → BQ fallback |
-| `/api/finance/expenses/meta` | BigQuery | — |
+| `/api/finance/income` | Postgres → BQ fallback | Postgres → BQ fallback |
+| `/api/finance/income/[id]` | Postgres → BQ fallback | — |
+| `/api/finance/expenses` | Postgres → BQ fallback | Postgres → BQ fallback |
+| `/api/finance/expenses/[id]` | Postgres → BQ fallback | — |
+| `/api/finance/accounts` | Postgres → BQ fallback (+ BQ balance enrichment) | Postgres → BQ fallback |
+| `/api/finance/exchange-rates` | Postgres → BQ fallback | Postgres → BQ fallback |
+| `/api/finance/expenses/meta` | Postgres (accounts) + BQ (suppliers, institutions) | — |
 | `/api/finance/reconciliation` | BigQuery | BigQuery |
 | `/api/finance/suppliers` | Postgres → BQ fallback | Postgres → BQ fallback |
 
@@ -45,20 +45,20 @@ Schema: `greenhouse_finance`
 
 | Table | Status | Notes |
 |-------|--------|-------|
-| `accounts` | DDL created, empty | Needs backfill from `fin_accounts` |
-| `suppliers` | DDL created, has data | Seeded via supplier sync |
-| `exchange_rates` | DDL created, partial data | New rates go to Postgres |
+| `accounts` | Backfilled, serving reads | Backfilled from `fin_accounts` |
+| `suppliers` | Has data, serving reads | Seeded via supplier sync |
+| `exchange_rates` | Backfilled, serving reads | Backfilled from `fin_exchange_rates` |
 
 ### Postgres tables (Slice 2 — transactions)
 
 | Table | Status | Notes |
 |-------|--------|-------|
-| `income` | DDL created, empty | Needs backfill from `fin_income` |
-| `income_payments` | DDL created, empty | Needs backfill (embedded JSON in BQ) |
-| `expenses` | DDL created, empty | Needs backfill from `fin_expenses` |
-| `client_profiles` | DDL created, empty | Needs backfill from `fin_client_profiles` |
-| `reconciliation_periods` | DDL created, empty | Needs backfill from `fin_reconciliation_periods` |
-| `bank_statement_rows` | DDL created, empty | Needs backfill from `fin_bank_statement_rows` |
+| `income` | Backfilled, serving reads | Backfilled from `fin_income` |
+| `income_payments` | Backfilled, serving reads | Extracted from BQ `payments_received` JSON |
+| `expenses` | Backfilled, serving reads | Backfilled from `fin_expenses` |
+| `client_profiles` | Backfilled, serving reads | Backfilled from `fin_client_profiles` |
+| `reconciliation_periods` | Backfilled, serving reads | Backfilled from `fin_reconciliation_periods` |
+| `bank_statement_rows` | Backfilled, serving reads | Backfilled from `fin_bank_statement_rows` |
 
 ---
 

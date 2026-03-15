@@ -24,6 +24,7 @@ import {
   type ServiceLine
 } from '@/lib/finance/shared'
 import {
+  listFinanceIncomeFromPostgres,
   createFinanceIncomeInPostgres,
   buildMonthlySequenceIdFromPostgres
 } from '@/lib/finance/postgres-store-slice2'
@@ -109,7 +110,20 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
-  // ── BigQuery read path (Postgres tables not yet backfilled) ──
+  // ── Postgres-first path ──
+  try {
+    const result = await listFinanceIncomeFromPostgres({
+      status, clientId, clientProfileId, serviceLine, fromDate, toDate, page, pageSize
+    })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
   await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 

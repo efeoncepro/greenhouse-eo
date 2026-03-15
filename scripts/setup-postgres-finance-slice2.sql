@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.reconciliation_periods (
   closing_balance_system NUMERIC(14, 2),
   difference NUMERIC(14, 2),
   status TEXT NOT NULL DEFAULT 'draft'
-    CHECK (status IN ('draft', 'in_progress', 'reconciled', 'closed')),
+    CHECK (status IN ('draft', 'open', 'in_progress', 'reconciled', 'closed')),
   statement_imported BOOLEAN NOT NULL DEFAULT FALSE,
   statement_imported_at TIMESTAMPTZ,
   statement_row_count INTEGER,
