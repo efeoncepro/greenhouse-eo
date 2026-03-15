@@ -40,6 +40,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:58 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Abrir el programa de migracion `PostgreSQL + source sync` en lanes paralelas y dejar briefs ejecutables para que otro agente, incluido Claude, pueda tomar trabajo sin pisar el runtime ya estabilizado.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Docs / coordinacion operativa
+
+### Archivos tocados
+- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se descompuso la siguiente etapa de plataforma en tres lanes paralelizables:
+  - `HR Payroll -> PostgreSQL`
+  - `Finance operativo -> PostgreSQL`
+  - `Notion/HubSpot -> raw/conformed -> runtime projections`
+- Cada task nueva deja explicitos:
+  - alcance
+  - no scope
+  - boundary de archivos
+  - dependencias
+  - criterios de aceptacion
+  - handoff operativo para Claude
+- Se actualizo el indice `docs/tasks/README.md` para que estas lanes ya aparezcan como `in-progress`.
+
+### Verificación
+- Revision manual de consistencia entre:
+  - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - tasks nuevas
+- `pnpm exec prettier --check` no se uso; esta tanda es documental y se validara con `git diff --check`
+
+### Riesgos o pendientes
+- Estas tasks no ejecutan runtime por si mismas; solo abren el trabajo paralelo.
+- El siguiente paso recomendado es asignar:
+  - `Payroll` a un agente
+  - `Finance` a otro agente
+  - `Source sync` a un tercer agente o dejarlo en Codex
+- Sigue existiendo un archivo no trackeado fuera de este lote:
+  - `docs/architecture/POSTGRESQL_ADVANCED_PATTERNS.md`
+  - no fue tocado ni debe incluirse accidentalmente en commit
+
 ## 2026-03-15 05:48 America/Santiago
 
 ### Agente

@@ -6,6 +6,19 @@
 
 ## 2026-03-15
 
+### Parallel Postgres migration lanes documented for agent work
+- Se agregaron tres tasks nuevas para ejecutar en paralelo la siguiente etapa de plataforma:
+  - `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md`
+  - `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
+  - `CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- Cada brief deja explicitados:
+  - boundaries de archivos
+  - alcance y no scope
+  - dependencias
+  - criterios de aceptacion
+  - handoff sugerido para Claude u otro agente
+- `docs/tasks/README.md` ya refleja estas lanes como `in-progress`.
+
 ### HR leave avatars now use real/fallback profile image data
 - `HR > Permisos` ya no fuerza iniciales en la tabla de solicitudes y en el modal de revisión.
 - `HrLeaveRequest` ahora devuelve `memberAvatarUrl`.

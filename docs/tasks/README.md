@@ -16,9 +16,12 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_AI_Tooling_Credit_System_v2.md](in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md) | Foundation backend de AI tooling, licencias y créditos |
 | [CODEX_TASK_Creative_Hub_Module_v2.md](in-progress/CODEX_TASK_Creative_Hub_Module_v2.md) | Cierre runtime real de Creative Hub sobre Capabilities |
 | [CODEX_TASK_Financial_Module_v2.md](in-progress/CODEX_TASK_Financial_Module_v2.md) | Cierre backend/runtime de Finance y handoff para frontend |
+| [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | Corte de Finance operativo a PostgreSQL sin mover todavía la analítica pesada |
 | [CODEX_TASK_HR_Core_Module_v2.md](in-progress/CODEX_TASK_HR_Core_Module_v2.md) | Foundation backend de HR core, permisos, asistencia y estructura org |
 | [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
+| [CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md](in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md) | Corte de Payroll a PostgreSQL sobre el backbone canónico ya materializado |
 | [CODEX_TASK_People_Unified_View_v3.md](in-progress/CODEX_TASK_People_Unified_View_v3.md) | Cierre 360 de People sobre el runtime actual |
+| [CODEX_TASK_Source_Sync_Runtime_Projections_v1.md](in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md) | Jobs reales de sync para poblar raw/conformed y proyectar CRM/Delivery a PostgreSQL |
 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | Identidad canónica ya sembrada y formalización pendiente de capacity |
 
 ## To Do
