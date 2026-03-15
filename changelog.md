@@ -6,6 +6,34 @@
 
 ## 2026-03-15
 
+### PostgreSQL canonical 360 backbone and initial BigQuery backfill
+- Se agregó `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` para formalizar el modelo canónico 360 en PostgreSQL.
+- Se materializaron en `greenhouse-pg-dev` los esquemas:
+  - `greenhouse_core`
+  - `greenhouse_serving`
+  - `greenhouse_sync`
+- Se agregaron vistas 360 iniciales:
+  - `client_360`
+  - `member_360`
+  - `provider_360`
+  - `user_360`
+  - `client_capability_360`
+- Se agregó `greenhouse_sync.outbox_events` como foundation de publicación `Postgres -> BigQuery`.
+- Se agregaron scripts operativos:
+  - `pnpm setup:postgres:canonical-360`
+  - `pnpm backfill:postgres:canonical-360`
+- Se ejecutó backfill inicial desde BigQuery hacia Postgres:
+  - `clients`: `11`
+  - `identity_profiles`: `9`
+  - `identity_profile_source_links`: `29`
+  - `client_users`: `39`
+  - `members`: `7`
+  - `providers`: `8` canónicos sobre `11` filas origen, por deduplicación de `provider_id`
+  - `service_modules`: `9`
+  - `client_service_modules`: `30`
+  - `roles`: `8`
+  - `user_role_assignments`: `40`
+
 ### Data platform architecture and Cloud SQL operational foundation
 - Se formalizó la arquitectura objetivo `OLTP + OLAP` en `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`.
 - Greenhouse deja explícitamente definido que `PostgreSQL` será la base operacional para workflows mutables y `BigQuery` quedará como warehouse analítico.

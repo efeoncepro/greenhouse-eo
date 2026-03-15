@@ -40,6 +40,82 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 04:15 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Aprovechar la nueva instancia de Cloud SQL para materializar el backbone canónico `360` en PostgreSQL y cargarle datos reales desde BigQuery, antes de seguir migrando dominios operativos.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Architecture / Data platform foundation
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `src/lib/postgres/client.ts`
+- `scripts/setup-postgres-canonical-360.sql`
+- `scripts/setup-postgres-canonical-360.ts`
+- `scripts/backfill-postgres-canonical-360.ts`
+- `.env.example`
+- `.env.local.example`
+- `package.json`
+- `pnpm-lock.yaml`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se modeló y documentó el backbone canónico `360` de PostgreSQL:
+  - `greenhouse_core`
+  - `greenhouse_serving`
+  - `greenhouse_sync`
+- Se creó `src/lib/postgres/client.ts` usando:
+  - `pg`
+  - `@google-cloud/cloud-sql-connector`
+- Se agregaron scripts:
+  - `setup:postgres:canonical-360`
+  - `backfill:postgres:canonical-360`
+- Se materializaron en `greenhouse-pg-dev`:
+  - tablas core canónicas
+  - vistas 360
+  - tabla `outbox_events`
+  - grants para `greenhouse_app`
+- Se ejecutó backfill inicial desde BigQuery hacia PostgreSQL con resultados:
+  - `clients`: `11`
+  - `identity_profiles`: `9`
+  - `identity_profile_source_links`: `29`
+  - `client_users`: `39`
+  - `members`: `7`
+  - `providers`: `8` canónicos sobre `11` filas fuente, por `provider_id` duplicado en origen
+  - `service_modules`: `9`
+  - `client_service_modules`: `30`
+  - `roles`: `8`
+  - `user_role_assignments`: `40`
+
+### Verificación
+- `pnpm exec tsx scripts/setup-postgres-canonical-360.ts`
+  - correcto; `40` statements aplicados
+- `pnpm exec tsx scripts/backfill-postgres-canonical-360.ts`
+  - correcto; backfill inicial ejecutado
+- Querys directas sobre Postgres vía connector:
+  - presencia de tablas en `greenhouse_core`
+  - presencia de vistas en `greenhouse_serving`
+  - grants efectivos para `greenhouse_app`
+  - muestras válidas de `client_360` y `member_360`
+
+### Riesgos o pendientes
+- El portal todavía no lee ni escribe desde Postgres; este turno deja lista la base canónica y sus datos iniciales, no el cutover de runtime.
+- `departments` no existe hoy en BigQuery, así que `member_360` quedó sin esa dimensión poblada en el backfill inicial.
+- El siguiente paso sano es migrar un dominio write-heavy contra este backbone:
+  - prioridad recomendada: `HR > Permisos`
+  - patrón recomendado: repository layer + outbox `Postgres -> BigQuery`
+
 ## 2026-03-15 03:47 America/Santiago
 
 ### Agente

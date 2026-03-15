@@ -6,6 +6,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
 - Se agregó la arquitectura de datos objetivo en:
   - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - La dirección formal del stack queda declarada como:
   - `PostgreSQL` para `OLTP` y workflows mutables
   - `BigQuery` para `raw`, `conformed`, `core analytics` y `marts`
@@ -22,9 +23,48 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `greenhouse-pg-dev-postgres-password`
   - `greenhouse-pg-dev-app-password`
 - Boundary vigente:
-  - la app todavía no está conectada a Postgres
-  - esta pasada deja lista la fundación de infraestructura, no el cutover runtime
+  - la app todavía no está conectada a Postgres en runtime
+  - esta pasada deja lista la fundación de infraestructura y el backbone canónico 360, no el cutover runtime
   - la integración de aplicación debe hacerse vía repository/services, no con rewrites directos módulo por módulo contra Cloud SQL
+- Materialización ejecutada sobre la instancia:
+  - esquemas:
+    - `greenhouse_core`
+    - `greenhouse_serving`
+    - `greenhouse_sync`
+  - vistas 360:
+    - `client_360`
+    - `member_360`
+    - `provider_360`
+    - `user_360`
+    - `client_capability_360`
+  - tabla de publicación:
+    - `greenhouse_sync.outbox_events`
+- Scripts operativos agregados:
+  - `pnpm setup:postgres:canonical-360`
+  - `pnpm backfill:postgres:canonical-360`
+- Backfill inicial ejecutado desde BigQuery hacia Postgres:
+  - `clients`: `11`
+  - `identity_profiles`: `9`
+  - `identity_profile_source_links`: `29`
+  - `client_users`: `39`
+  - `members`: `7`
+  - `providers`: `8` canónicos sobre `11` filas origen, por deduplicación real de `provider_id`
+  - `service_modules`: `9`
+  - `client_service_modules`: `30`
+  - `roles`: `8`
+  - `user_role_assignments`: `40`
+- Variables nuevas documentadas:
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - `GREENHOUSE_POSTGRES_IP_TYPE`
+  - `GREENHOUSE_POSTGRES_HOST`
+  - `GREENHOUSE_POSTGRES_PORT`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`
+  - `GREENHOUSE_POSTGRES_SSL`
+  - `GREENHOUSE_BIGQUERY_DATASET`
+  - `GREENHOUSE_BIGQUERY_LOCATION`
 
 ## Delta 2026-03-15 Finance exchange-rate sync persistence
 - `Finance` ahora tiene hidratación automática server-side de `USD/CLP` para evitar que ingresos/egresos en USD dependan de carga manual previa.

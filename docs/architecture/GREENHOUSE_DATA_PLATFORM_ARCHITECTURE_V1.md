@@ -13,6 +13,7 @@ This document establishes:
 Use together with:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `project_context.md`
 
@@ -298,6 +299,16 @@ Provisioned runtime:
 Initial database objects created:
 - database: `greenhouse_app`
 - application user: `greenhouse_app`
+- canonical PostgreSQL schemas:
+  - `greenhouse_core`
+  - `greenhouse_serving`
+  - `greenhouse_sync`
+- initial serving views:
+  - `client_360`
+  - `member_360`
+  - `provider_360`
+  - `user_360`
+  - `client_capability_360`
 
 Initial secret material stored in Secret Manager:
 - `greenhouse-pg-dev-postgres-password`
@@ -308,6 +319,17 @@ Boundary of this provisioning:
 - the Greenhouse app is not yet cut over to PostgreSQL
 - feature migration must happen behind repository/service boundaries
 - BigQuery remains the active runtime store until each domain is explicitly migrated
+- the canonical PostgreSQL backbone is now materialized and received an initial backfill from BigQuery for:
+  - `clients`
+  - `identity_profiles`
+  - `identity_profile_source_links`
+  - `client_users`
+  - `members`
+  - `providers`
+  - `service_modules`
+  - `client_service_modules`
+  - `roles`
+  - `user_role_assignments`
 
 ## Non-Negotiable Rules
 
