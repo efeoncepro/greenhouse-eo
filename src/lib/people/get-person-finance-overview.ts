@@ -5,6 +5,8 @@ import type { PersonFinanceOverview } from '@/types/people'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { PeopleValidationError, runPeopleQuery, toDateString, toNumber } from '@/lib/people/shared'
+import { isGreenhousePostgresConfigured } from '@/lib/postgres/client'
+import { getPersonFinanceOverviewFromPostgres } from '@/lib/person-360/get-person-finance'
 
 type MemberRow = {
   member_id: string
@@ -85,6 +87,12 @@ const toTimestampString = (value: unknown) => {
 }
 
 export const getPersonFinanceOverview = async (memberId: string): Promise<PersonFinanceOverview> => {
+  // Postgres-first: use person_finance_360 view when Postgres is configured
+  if (isGreenhousePostgresConfigured()) {
+    return getPersonFinanceOverviewFromPostgres(memberId)
+  }
+
+  // BigQuery fallback
   await ensureFinanceInfrastructure()
 
   const projectId = getBigQueryProjectId()

@@ -1,0 +1,136 @@
+import 'server-only'
+
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
+
+// ── Types ──
+
+export interface PersonHrContext {
+  identityProfileId: string
+  eoId: string
+  memberId: string
+  displayName: string
+  email: string | null
+  departmentName: string | null
+  jobLevel: string | null
+  employmentType: string | null
+  hireDate: string | null
+  contractEndDate: string | null
+  dailyRequired: boolean
+  supervisorMemberId: string | null
+  supervisorName: string | null
+  compensation: {
+    payRegime: string | null
+    currency: string | null
+    baseSalary: number | null
+    contractType: string | null
+  }
+  leave: {
+    vacationAllowance: number
+    vacationCarried: number
+    vacationUsed: number
+    vacationReserved: number
+    vacationAvailable: number
+    personalAllowance: number
+    personalUsed: number
+    pendingRequests: number
+    approvedRequestsThisYear: number
+    totalApprovedDaysThisYear: number
+  }
+}
+
+// ── Row type ──
+
+type HrRow = {
+  identity_profile_id: string
+  eo_id: string
+  member_id: string
+  resolved_display_name: string
+  member_email: string | null
+  department_name: string | null
+  job_level: string | null
+  employment_type: string | null
+  hire_date: string | null
+  contract_end_date: string | null
+  daily_required: boolean | null
+  reports_to_member_id: string | null
+  supervisor_name: string | null
+  vacation_allowance: string | number
+  vacation_carried: string | number
+  vacation_used: string | number
+  vacation_reserved: string | number
+  vacation_available: string | number
+  personal_allowance: string | number
+  personal_used: string | number
+  pending_requests: string | number
+  approved_requests_this_year: string | number
+  total_approved_days_this_year: string | number
+  pay_regime: string | null
+  comp_currency: string | null
+  base_salary: string | null
+  contract_type: string | null
+}
+
+// ── Helpers ──
+
+const toNum = (v: unknown): number => {
+  if (typeof v === 'number') return v
+  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  return 0
+}
+
+const toDateStr = (v: string | null): string | null =>
+  v ? v.slice(0, 10) : null
+
+// ── Main function ──
+
+export const getPersonHrContext = async (identifier: string): Promise<PersonHrContext | null> => {
+  const resolved = await resolvePersonIdentifier(identifier)
+  const lookupId = resolved?.memberId ?? identifier
+
+  const rows = await runGreenhousePostgresQuery<HrRow>(
+    `SELECT * FROM greenhouse_serving.person_hr_360
+     WHERE member_id = $1
+     LIMIT 1`,
+    [lookupId]
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  return {
+    identityProfileId: row.identity_profile_id,
+    eoId: row.eo_id,
+    memberId: row.member_id,
+    displayName: row.resolved_display_name,
+    email: row.member_email,
+    departmentName: row.department_name,
+    jobLevel: row.job_level,
+    employmentType: row.employment_type,
+    hireDate: toDateStr(row.hire_date),
+    contractEndDate: toDateStr(row.contract_end_date),
+    dailyRequired: row.daily_required ?? true,
+    supervisorMemberId: row.reports_to_member_id,
+    supervisorName: row.supervisor_name,
+    compensation: {
+      payRegime: row.pay_regime,
+      currency: row.comp_currency,
+      baseSalary: row.base_salary ? toNum(row.base_salary) : null,
+      contractType: row.contract_type
+    },
+    leave: {
+      vacationAllowance: toNum(row.vacation_allowance),
+      vacationCarried: toNum(row.vacation_carried),
+      vacationUsed: toNum(row.vacation_used),
+      vacationReserved: toNum(row.vacation_reserved),
+      vacationAvailable: toNum(row.vacation_available),
+      personalAllowance: toNum(row.personal_allowance),
+      personalUsed: toNum(row.personal_used),
+      pendingRequests: toNum(row.pending_requests),
+      approvedRequestsThisYear: toNum(row.approved_requests_this_year),
+      totalApprovedDaysThisYear: toNum(row.total_approved_days_this_year)
+    }
+  }
+}

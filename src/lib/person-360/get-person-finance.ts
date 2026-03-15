@@ -1,0 +1,245 @@
+import 'server-only'
+
+import type { PersonFinanceOverview } from '@/types/people'
+
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
+
+// ── Row types ──
+
+type FinanceSummaryRow = {
+  identity_profile_id: string
+  eo_id: string
+  member_id: string
+  resolved_display_name: string
+  member_email: string | null
+  total_payroll_entries: number
+  expense_count: number
+  paid_expense_count: number
+  total_expenses_clp: number
+  last_expense_date: string | null
+}
+
+type PayrollRow = {
+  entry_id: string
+  period_id: string
+  year: number
+  month: number
+  status: string | null
+  currency: string | null
+  gross_total: string | null
+  net_total: string | null
+  created_at: string | null
+}
+
+type ExpenseRow = {
+  expense_id: string
+  client_id: string | null
+  client_name: string | null
+  expense_type: string
+  description: string
+  currency: string
+  total_amount: string | null
+  total_amount_clp: string | null
+  payment_status: string
+  payment_date: string | null
+  document_date: string | null
+  supplier_name: string | null
+  service_line: string | null
+  payroll_entry_id: string | null
+  created_at: string | null
+}
+
+type IdentityLinkRow = {
+  source_system: string | null
+  source_object_id: string | null
+  source_user_id: string | null
+  source_email: string | null
+  source_display_name: string | null
+}
+
+// ── Helpers ──
+
+const toNum = (v: unknown): number => {
+  if (typeof v === 'number') return v
+  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  return 0
+}
+
+const toDateStr = (v: string | null): string | null =>
+  v ? v.slice(0, 10) : null
+
+const str = (v: string | null | undefined): string | null =>
+  v ? v.trim() || null : null
+
+// ── Main function ──
+
+export const getPersonFinanceOverviewFromPostgres = async (
+  identifier: string
+): Promise<PersonFinanceOverview> => {
+  const resolved = await resolvePersonIdentifier(identifier)
+
+  if (!resolved?.memberId) {
+    // Try direct member lookup as fallback
+    const directRows = await runGreenhousePostgresQuery<FinanceSummaryRow>(
+      `SELECT
+        ip.profile_id AS identity_profile_id,
+        ip.public_id AS eo_id,
+        m.member_id,
+        COALESCE(m.display_name, ip.full_name, 'Sin nombre') AS resolved_display_name,
+        m.primary_email AS member_email,
+        0 AS total_payroll_entries,
+        0 AS expense_count,
+        0 AS paid_expense_count,
+        0 AS total_expenses_clp,
+        NULL AS last_expense_date
+      FROM greenhouse_core.members m
+      LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = m.identity_profile_id
+      WHERE m.member_id = $1
+      LIMIT 1`,
+      [identifier]
+    )
+
+    if (!directRows[0]) {
+      return {
+        member: { memberId: identifier, displayName: null, identityProfileId: null },
+        summary: {
+          activeAssignmentsCount: 0, payrollEntriesCount: 0, expenseCount: 0,
+          paidExpensesCount: 0, totalExpensesClp: 0, lastExpenseDate: null
+        },
+        assignments: [],
+        identities: [],
+        payrollHistory: [],
+        expenses: []
+      }
+    }
+
+    const row = directRows[0]
+
+    return buildFinanceOverview(row.member_id, row.identity_profile_id, row.resolved_display_name)
+  }
+
+  return buildFinanceOverview(resolved.memberId, resolved.identityProfileId, null)
+}
+
+const buildFinanceOverview = async (
+  memberId: string,
+  identityProfileId: string | null,
+  displayNameHint: string | null
+): Promise<PersonFinanceOverview> => {
+  // Run summary + detail queries in parallel
+  const [summaryRows, payrollRows, expenseRows, identityRows] = await Promise.all([
+    runGreenhousePostgresQuery<FinanceSummaryRow>(
+      `SELECT * FROM greenhouse_serving.person_finance_360
+       WHERE member_id = $1
+       LIMIT 1`,
+      [memberId]
+    ),
+    runGreenhousePostgresQuery<PayrollRow>(
+      `SELECT
+        pe.entry_id,
+        pe.period_id,
+        pp.year,
+        pp.month,
+        pp.status,
+        pe.currency,
+        pe.gross_total::text,
+        pe.net_total::text,
+        pe.created_at::text
+      FROM greenhouse_payroll.payroll_entries pe
+      JOIN greenhouse_payroll.payroll_periods pp ON pp.period_id = pe.period_id
+      WHERE pe.member_id = $1
+      ORDER BY pp.year DESC, pp.month DESC, pe.created_at DESC
+      LIMIT 12`,
+      [memberId]
+    ),
+    runGreenhousePostgresQuery<ExpenseRow>(
+      `SELECT
+        e.expense_id,
+        e.client_id,
+        c.client_name,
+        e.expense_type,
+        e.description,
+        e.currency,
+        e.total_amount::text,
+        e.total_amount_clp::text,
+        e.payment_status,
+        e.payment_date::text,
+        e.document_date::text,
+        e.supplier_name,
+        e.service_line,
+        e.payroll_entry_id,
+        e.created_at::text
+      FROM greenhouse_finance.expenses e
+      LEFT JOIN greenhouse_core.clients c ON c.client_id = e.client_id
+      WHERE e.member_id = $1
+      ORDER BY COALESCE(e.document_date, e.payment_date, e.created_at::date) DESC, e.created_at DESC
+      LIMIT 50`,
+      [memberId]
+    ),
+    identityProfileId
+      ? runGreenhousePostgresQuery<IdentityLinkRow>(
+        `SELECT source_system, source_object_id, source_user_id, source_email, source_display_name
+         FROM greenhouse_core.identity_profile_source_links
+         WHERE active = TRUE AND profile_id = $1
+         ORDER BY source_system ASC, source_email ASC`,
+        [identityProfileId]
+      )
+      : Promise.resolve([] as IdentityLinkRow[])
+  ])
+
+  const summary = summaryRows[0]
+
+  return {
+    member: {
+      memberId,
+      displayName: summary?.resolved_display_name ?? displayNameHint,
+      identityProfileId: summary?.identity_profile_id ?? identityProfileId
+    },
+    summary: {
+      activeAssignmentsCount: 0, // client_team_assignments not yet in Postgres
+      payrollEntriesCount: toNum(summary?.total_payroll_entries),
+      expenseCount: toNum(summary?.expense_count),
+      paidExpensesCount: toNum(summary?.paid_expense_count),
+      totalExpensesClp: toNum(summary?.total_expenses_clp),
+      lastExpenseDate: toDateStr(summary?.last_expense_date ?? null)
+    },
+    assignments: [], // client_team_assignments not yet in Postgres — populated from BigQuery fallback when needed
+    identities: identityRows.map(r => ({
+      sourceSystem: str(r.source_system),
+      sourceObjectId: str(r.source_object_id),
+      sourceUserId: str(r.source_user_id),
+      sourceEmail: str(r.source_email),
+      sourceDisplayName: str(r.source_display_name)
+    })),
+    payrollHistory: payrollRows.map(r => ({
+      entryId: r.entry_id,
+      periodId: r.period_id,
+      year: toNum(r.year),
+      month: toNum(r.month),
+      status: str(r.status),
+      currency: str(r.currency),
+      grossTotal: toNum(r.gross_total),
+      netTotal: toNum(r.net_total),
+      createdAt: r.created_at
+    })),
+    expenses: expenseRows.map(r => ({
+      expenseId: r.expense_id,
+      clientId: str(r.client_id),
+      clientName: str(r.client_name),
+      expenseType: r.expense_type?.trim() || '',
+      description: r.description?.trim() || '',
+      currency: r.currency?.trim() || '',
+      totalAmount: toNum(r.total_amount),
+      totalAmountClp: toNum(r.total_amount_clp),
+      paymentStatus: r.payment_status?.trim() || '',
+      paymentDate: toDateStr(r.payment_date),
+      documentDate: toDateStr(r.document_date),
+      supplierName: str(r.supplier_name),
+      serviceLine: str(r.service_line),
+      payrollEntryId: str(r.payroll_entry_id),
+      createdAt: r.created_at
+    }))
+  }
+}
