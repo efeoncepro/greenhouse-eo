@@ -158,46 +158,61 @@ export const syncProviderFromFinanceSupplier = async (record: FinanceSupplierPro
   }
 }
 
+// Singleton promise — sync runs once per cold start, not per request.
+// This prevents BigQuery DML quota exhaustion (10 ops/table/10s).
+let syncPromise: Promise<void> | null = null
+
 export const syncProviderRegistryFromFinanceSuppliers = async () => {
-  await ensureFinanceInfrastructure()
-  await ensureAiToolingInfrastructure()
+  if (syncPromise) {
+    return syncPromise
+  }
 
-  const bigQuery = getBigQueryClient()
-  const projectId = getBigQueryProjectId()
+  syncPromise = (async () => {
+    await ensureFinanceInfrastructure()
+    await ensureAiToolingInfrastructure()
 
-  const [rows] = await bigQuery.query({
-    query: `
-      SELECT
-        supplier_id,
-        provider_id,
-        legal_name,
-        trade_name,
-        website,
-        is_active
-      FROM \`${projectId}.greenhouse.fin_suppliers\`
-      WHERE COALESCE(is_active, TRUE) = TRUE
-    `
+    const bigQuery = getBigQueryClient()
+    const projectId = getBigQueryProjectId()
+
+    const [rows] = await bigQuery.query({
+      query: `
+        SELECT
+          supplier_id,
+          provider_id,
+          legal_name,
+          trade_name,
+          website,
+          is_active
+        FROM \`${projectId}.greenhouse.fin_suppliers\`
+        WHERE COALESCE(is_active, TRUE) = TRUE
+      `
+    })
+
+    for (const row of rows as FinanceSupplierProviderRow[]) {
+      const supplierId = normalizeString(row.supplier_id)
+      const legalName = normalizeString(row.legal_name)
+
+      if (!supplierId || !legalName) {
+        continue
+      }
+
+      try {
+        await syncProviderFromFinanceSupplier({
+          supplierId,
+          providerId: normalizeNullableString(row.provider_id),
+          legalName,
+          tradeName: normalizeNullableString(row.trade_name),
+          website: normalizeNullableString(row.website),
+          isActive: row.is_active ?? true
+        })
+      } catch (err) {
+        console.warn(`[providers/canonical] Failed to sync supplier ${supplierId} (${legalName}):`, err)
+      }
+    }
+  })().catch(error => {
+    syncPromise = null
+    throw error
   })
 
-  for (const row of rows as FinanceSupplierProviderRow[]) {
-    const supplierId = normalizeString(row.supplier_id)
-    const legalName = normalizeString(row.legal_name)
-
-    if (!supplierId || !legalName) {
-      continue
-    }
-
-    try {
-      await syncProviderFromFinanceSupplier({
-        supplierId,
-        providerId: normalizeNullableString(row.provider_id),
-        legalName,
-        tradeName: normalizeNullableString(row.trade_name),
-        website: normalizeNullableString(row.website),
-        isActive: row.is_active ?? true
-      })
-    } catch (err) {
-      console.warn(`[providers/canonical] Failed to sync supplier ${supplierId} (${legalName}):`, err)
-    }
-  }
+  return syncPromise
 }
