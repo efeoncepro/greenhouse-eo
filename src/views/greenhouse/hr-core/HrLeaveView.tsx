@@ -389,7 +389,10 @@ const HrLeaveView = () => {
                         <TableRow key={req.requestId} hover>
                           <TableCell>
                             <Stack direction='row' spacing={1.5} alignItems='center'>
-                              <Avatar sx={{ width: 28, height: 28, fontSize: '0.75rem' }}>
+                              <Avatar
+                                src={req.memberAvatarUrl || undefined}
+                                sx={{ width: 28, height: 28, fontSize: '0.75rem' }}
+                              >
                                 {getInitials(req.memberName || '')}
                               </Avatar>
                               <Typography variant='body2' fontWeight={500}>{req.memberName}</Typography>
@@ -635,7 +638,7 @@ const HrLeaveView = () => {
           <DialogContent>
             <Stack spacing={3} sx={{ mt: 1 }}>
               <Stack direction='row' spacing={2} alignItems='center'>
-                <Avatar sx={{ width: 40, height: 40 }}>
+                <Avatar src={reviewReq.memberAvatarUrl || undefined} sx={{ width: 40, height: 40 }}>
                   {getInitials(reviewReq.memberName || '')}
                 </Avatar>
                 <Box>

@@ -40,6 +40,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:48 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir la ausencia de avatar real en la tabla de `HR > Permisos` una vez que el flujo de creación ya estaba operativo.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview / `pre-greenhouse`
+
+### Archivos tocados
+- `src/types/hr-core.ts`
+- `src/lib/hr-core/service.ts`
+- `src/lib/hr-core/postgres-leave-store.ts`
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se confirmó que no era un problema de persistencia de la solicitud, sino de contrato:
+  - `HR Leave` no devolvía `memberAvatarUrl`
+  - la UI siempre renderizaba iniciales
+- El contrato `HrLeaveRequest` ahora incluye `memberAvatarUrl`.
+- BigQuery fallback de `HR Leave` ahora expone:
+  - `m.avatar_url` cuando existe
+  - fallback con `resolveAvatarPath(name, email)` si no existe
+- PostgreSQL de `HR Leave` ahora expone:
+  - fallback con `resolveAvatarPath(name, primary_email)` desde `greenhouse_core.members`
+- `HrLeaveView` ahora usa `src={memberAvatarUrl}` tanto en:
+  - la tabla de solicitudes
+  - el modal de revisión
+
+### Verificación
+- `pnpm exec eslint src/types/hr-core.ts src/lib/hr-core/service.ts src/lib/hr-core/postgres-leave-store.ts src/views/greenhouse/hr-core/HrLeaveView.tsx`
+  - correcto
+- `pnpm build`
+  - correcto
+
+### Riesgos o pendientes
+- En PostgreSQL el avatar todavía no viene de una columna canónica dedicada en `greenhouse_core.members`; por ahora usa el resolver compartido por nombre/email.
+- Si queremos cerrar eso de forma estructural, el siguiente paso sano es llevar `avatar_url` al backbone canónico y al backfill `canonical-360`.
+
 ## 2026-03-15 05:34 America/Santiago
 
 ### Agente

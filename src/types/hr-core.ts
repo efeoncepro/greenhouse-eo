@@ -92,6 +92,7 @@ export interface HrLeaveRequest {
   requestId: string
   memberId: string
   memberName: string | null
+  memberAvatarUrl: string | null
   leaveTypeCode: string
   leaveTypeName: string
   startDate: string

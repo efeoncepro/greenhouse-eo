@@ -6,6 +6,12 @@
 
 ## 2026-03-15
 
+### HR leave avatars now use real/fallback profile image data
+- `HR > Permisos` ya no fuerza iniciales en la tabla de solicitudes y en el modal de revisión.
+- `HrLeaveRequest` ahora devuelve `memberAvatarUrl`.
+- En BigQuery se usa `team_members.avatar_url` cuando existe.
+- En PostgreSQL se usa el resolver compartido de avatar por nombre/email hasta que `avatar_url` viva de forma canónica en `greenhouse_core`.
+
 ### Source sync foundation materialized in PostgreSQL and BigQuery
 - Se agregaron los scripts:
   - `pnpm setup:postgres:source-sync`

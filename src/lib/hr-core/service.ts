@@ -58,6 +58,7 @@ import {
   toStringArray,
   toTimestampString
 } from '@/lib/hr-core/shared'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 
 type DepartmentRow = {
@@ -156,6 +157,8 @@ type LeaveRequestRow = {
   request_id: string | null
   member_id: string | null
   member_name: string | null
+  member_email: string | null
+  member_avatar_url: string | null
   leave_type_code: string | null
   leave_type_name: string | null
   start_date: { value?: string } | string | null
@@ -293,6 +296,12 @@ const mapLeaveRequest = (row: LeaveRequestRow): HrLeaveRequest => ({
   requestId: String(row.request_id || ''),
   memberId: String(row.member_id || ''),
   memberName: normalizeNullableString(row.member_name),
+  memberAvatarUrl:
+    normalizeNullableString(row.member_avatar_url) ||
+    resolveAvatarPath({
+      name: normalizeNullableString(row.member_name),
+      email: normalizeNullableString(row.member_email)
+    }),
   leaveTypeCode: String(row.leave_type_code || ''),
   leaveTypeName: String(row.leave_type_name || row.leave_type_code || ''),
   startDate: toDateString(row.start_date) || '',
@@ -703,6 +712,8 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
         r.request_id,
         r.member_id,
         m.display_name AS member_name,
+        m.email AS member_email,
+        m.avatar_url AS member_avatar_url,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -1284,6 +1295,8 @@ export const listLeaveRequests = async ({
           r.request_id,
           r.member_id,
           m.display_name AS member_name,
+          m.email AS member_email,
+          m.avatar_url AS member_avatar_url,
           r.leave_type_code,
           lt.leave_type_name,
           r.start_date,
@@ -1505,6 +1518,10 @@ export const createLeaveRequest = async ({
           requestId,
           memberId: effectiveMemberId,
           memberName: normalizeNullableString(member.display_name),
+          memberAvatarUrl: resolveAvatarPath({
+            name: normalizeNullableString(member.display_name),
+            email: normalizeNullableString(member.email)
+          }),
           leaveTypeCode,
           leaveTypeName: leaveType.leaveTypeName,
           startDate,

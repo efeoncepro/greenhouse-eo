@@ -39,6 +39,7 @@ import {
   toInt,
   toNullableNumber
 } from '@/lib/hr-core/shared'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type PostgresDepartmentRow = {
   department_id: string
@@ -80,6 +81,7 @@ type PostgresLeaveRequestRow = {
   request_id: string
   member_id: string
   member_name: string | null
+  member_email: string | null
   leave_type_code: string
   leave_type_name: string | null
   start_date: string | Date
@@ -198,6 +200,10 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   requestId: row.request_id,
   memberId: row.member_id,
   memberName: normalizeNullableString(row.member_name),
+  memberAvatarUrl: resolveAvatarPath({
+    name: normalizeNullableString(row.member_name),
+    email: normalizeNullableString(row.member_email)
+  }),
   leaveTypeCode: row.leave_type_code,
   leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
   startDate: toPgDateString(row.start_date) || '',
@@ -577,6 +583,7 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
         r.request_id,
         r.member_id,
         member.display_name AS member_name,
+        member.primary_email AS member_email,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -739,6 +746,7 @@ export const listLeaveRequestsFromPostgres = async ({
         r.request_id,
         r.member_id,
         member.display_name AS member_name,
+        member.primary_email AS member_email,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -924,6 +932,10 @@ export const createLeaveRequestInPostgres = async ({
       requestId,
       memberId: effectiveMemberId,
       memberName: normalizeNullableString(member.display_name),
+      memberAvatarUrl: resolveAvatarPath({
+        name: normalizeNullableString(member.display_name),
+        email: normalizeNullableString(member.email)
+      }),
       leaveTypeCode,
       leaveTypeName: leaveType.leaveTypeName,
       startDate,
