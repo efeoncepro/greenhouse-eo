@@ -25,8 +25,26 @@ export const toNumber = (value: unknown): number => {
     return Number.isFinite(parsed) ? parsed : 0
   }
 
-  if (value && typeof value === 'object' && 'value' in value) {
-    return toNumber((value as { value?: unknown }).value)
+  if (value && typeof value === 'object') {
+    // BigQuery NUMERIC columns return Big.js instances with valueOf/toNumber
+    if (typeof (value as Record<string, unknown>).valueOf === 'function') {
+      const primitive = (value as { valueOf: () => unknown }).valueOf()
+
+      if (typeof primitive === 'number') {
+        return Number.isFinite(primitive) ? primitive : 0
+      }
+
+      if (typeof primitive === 'string') {
+        const parsed = Number(primitive)
+
+        return Number.isFinite(parsed) ? parsed : 0
+      }
+    }
+
+    // BigQueryTimestamp / BigQueryDate with { value: ... }
+    if ('value' in value) {
+      return toNumber((value as { value?: unknown }).value)
+    }
   }
 
   return 0
