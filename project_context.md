@@ -3,6 +3,37 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
+- `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para `catalog`, `licenses`, `wallets` y `metadata`.
+- Se materializó `greenhouse_ai` en Cloud SQL con:
+  - `tool_catalog`
+  - `member_tool_licenses`
+  - `credit_wallets`
+  - `credit_ledger`
+- `src/lib/ai-tools/service.ts` ahora opera en modo `Postgres first`, con fallback controlado al store legacy solo cuando PostgreSQL no está listo o no está configurado.
+- `scripts/setup-postgres-ai-tooling.ts` ya no solo crea schema: también siembra el catálogo mínimo operativo en PostgreSQL.
+- Estado validado tras setup:
+  - `greenhouse_ai.tool_catalog = 9`
+  - `greenhouse_ai.member_tool_licenses = 0`
+  - `greenhouse_ai.credit_wallets = 0`
+  - `greenhouse_ai.credit_ledger = 0`
+  - `greenhouse_core.providers` visibles para AI Tooling = `10`
+- Providers visibles validados en PostgreSQL:
+  - `Adobe`
+  - `Anthropic`
+  - `Black Forest Labs`
+  - `Freepik`
+  - `Google DeepMind`
+  - `Higgsfield AI`
+  - `Kuaishou`
+  - `Microsoft`
+  - `Notion`
+  - `OpenAI`
+- Regla operativa derivada:
+  - `AI Tooling` runtime vive en PostgreSQL
+  - `BigQuery` queda como compatibilidad temporal y eventual fuente de backfill/histórico
+  - no volver a depender de `ensureAiToolingInfrastructure()` como camino principal de request path
+
 ## Delta 2026-03-15 Performance indicators and source RpA semaphore identified and wired for runtime
 - Se confirmó contra `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos, no solo señales derivadas:
   - `🟢 On-Time`

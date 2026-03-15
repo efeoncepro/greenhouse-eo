@@ -149,6 +149,29 @@ Key rules:
 - net margin impact: nominal revenue minus factoring costs
 - exposure per factoring provider
 
+### `greenhouse_ai`
+
+Mutable AI Tooling runtime.
+
+Main objects:
+- `tool_catalog`
+- `member_tool_licenses`
+- `credit_wallets`
+- `credit_ledger`
+
+Anchors:
+- `provider_id -> greenhouse_core.providers`
+- `member_id -> greenhouse_core.members`
+- `client_id -> greenhouse_core.clients`
+- `created_by_user_id / assigned_by_user_id -> greenhouse_core.client_users`
+- `fin_supplier_id -> greenhouse_finance.suppliers`
+
+Rules:
+- AI Tooling runtime lives in PostgreSQL, not in BigQuery
+- the operational module must not depend on bootstrap DDL in request path
+- seed catalog and provider visibility must exist directly in PostgreSQL so admin surfaces do not start empty
+- BigQuery legacy AI tables may still exist for compatibility/backfill, but they are not the runtime truth
+
 ### `greenhouse_crm`
 
 Operational projection of commercial source data.

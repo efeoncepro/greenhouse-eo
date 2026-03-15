@@ -28,6 +28,28 @@ import type {
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { ensureAiToolingInfrastructure } from '@/lib/ai-tools/schema'
+import {
+  assertAiToolingPostgresReady,
+  isAiToolingPostgresEnabled,
+  pgConsumeAiCredits,
+  pgCreateAiTool,
+  pgCreateLicense,
+  pgCreateWallet,
+  pgGetAiCreditSummary,
+  pgGetAiCreditWallet,
+  pgGetAiToolCatalogItem,
+  pgGetAiToolLicense,
+  pgGetAiToolingAdminMetadata,
+  pgListAiCreditLedger,
+  pgListAiCreditWallets,
+  pgListAiToolLicenses,
+  pgListAiToolsCatalog,
+  pgReloadAiCredits,
+  pgUpdateAiTool,
+  pgUpdateLicense,
+  pgUpdateWallet,
+  shouldFallbackFromAiToolingPostgres
+} from '@/lib/ai-tools/postgres-store'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { syncProviderRegistryFromFinanceSuppliers } from '@/lib/providers/canonical'
 import {
@@ -426,7 +448,21 @@ const getToolById = async (toolId: string) => {
   return row ? mapTool(row) : null
 }
 
-export const getAiToolCatalogItem = async (toolId: string) => getToolById(toolId)
+export const getAiToolCatalogItem = async (toolId: string) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgGetAiToolCatalogItem(toolId)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
+  return getToolById(toolId)
+}
 
 const getLicenseById = async (licenseId: string) => {
   await ensureAiToolingInfrastructure()
@@ -456,7 +492,21 @@ const getLicenseById = async (licenseId: string) => {
   return row ? mapLicense(row) : null
 }
 
-export const getAiToolLicense = async (licenseId: string) => getLicenseById(licenseId)
+export const getAiToolLicense = async (licenseId: string) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgGetAiToolLicense(licenseId)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
+  return getLicenseById(licenseId)
+}
 
 const getWalletById = async (walletId: string, { includeCost }: { includeCost: boolean }) => {
   await ensureAiToolingInfrastructure()
@@ -504,6 +554,18 @@ export const getAiCreditWallet = async ({
   walletId: string
   tenant: TenantContext
 }) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgGetAiCreditWallet({ walletId, tenant })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   const includeCost = getViewerKind(tenant) === 'admin'
   const wallet = await getWalletById(walletId, { includeCost })
 
@@ -556,6 +618,18 @@ const getUsdToClpRate = async () => {
 }
 
 export const getAiToolingAdminMetadata = async (): Promise<AiToolingAdminMetadata> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgGetAiToolingAdminMetadata()
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   await ensureFinanceInfrastructure()
   const projectId = getProjectId()
@@ -624,6 +698,18 @@ export const listAiToolsCatalog = async ({
   costModel?: string | null
   activeOnly?: boolean
 } = {}): Promise<AiToolsCatalogResponse> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgListAiToolsCatalog({ category, costModel, activeOnly })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const filters = ['1 = 1']
@@ -684,6 +770,18 @@ export const listAiToolLicenses = async ({
   memberId?: string | null
   status?: string | null
 } = {}): Promise<AiToolLicensesResponse> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgListAiToolLicenses({ memberId, status })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const filters = ['1 = 1']
@@ -745,6 +843,24 @@ export const listAiCreditWallets = async ({
   status?: string | null
   scope?: string | null
 }): Promise<AiCreditWalletsResponse> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgListAiCreditWallets({
+        tenant,
+        clientId,
+        toolId,
+        status,
+        scope
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const viewerKind = getViewerKind(tenant)
   const projectId = getProjectId()
@@ -839,6 +955,27 @@ export const listAiCreditLedger = async ({
   limit?: number
   offset?: number
 }): Promise<AiCreditLedgerResponse> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgListAiCreditLedger({
+        tenant,
+        walletId,
+        entryType,
+        dateFrom,
+        dateTo,
+        memberId,
+        limit,
+        offset
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const viewerKind = getViewerKind(tenant)
   const wallet = await getWalletInternal(walletId)
@@ -946,6 +1083,22 @@ export const getAiCreditSummary = async ({
   clientId?: string | null
   period?: string
 }): Promise<ClientCreditSummary | AdminCreditSummary> => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgGetAiCreditSummary({
+        tenant,
+        clientId,
+        period
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const viewerKind = getViewerKind(tenant)
   const effectiveClientId = viewerKind === 'client' ? tenant.clientId : clientId || null
@@ -1060,6 +1213,18 @@ export const getAiCreditSummary = async ({
 }
 
 export const createAiTool = async (input: CreateAiToolInput) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgCreateAiTool(input)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const toolId = slugify(normalizeString(input.toolId || input.toolName))
@@ -1175,6 +1340,18 @@ export const createAiTool = async (input: CreateAiToolInput) => {
 }
 
 export const updateAiTool = async (toolId: string, input: UpdateAiToolInput) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgUpdateAiTool(toolId, input)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const existing = await getToolById(toolId)
@@ -1246,6 +1423,18 @@ export const updateAiTool = async (toolId: string, input: UpdateAiToolInput) => 
 }
 
 export const createLicense = async (input: CreateLicenseInput, actorUserId: string) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgCreateLicense(input, actorUserId)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
 
@@ -1345,6 +1534,18 @@ export const createLicense = async (input: CreateLicenseInput, actorUserId: stri
 }
 
 export const updateLicense = async (licenseId: string, input: UpdateLicenseInput) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgUpdateLicense(licenseId, input)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const existing = await getLicenseById(licenseId)
@@ -1412,6 +1613,21 @@ export const createWallet = async ({
   input: CreateWalletInput
   actorUserId: string
 }) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgCreateWallet({
+        input,
+        actorUserId
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const walletScope = assertEnum(input.walletScope, WALLET_SCOPES, 'walletScope')
@@ -1602,6 +1818,18 @@ export const createWallet = async ({
 }
 
 export const updateWallet = async (walletId: string, input: UpdateWalletInput) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgUpdateWallet(walletId, input)
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const existing = await getWalletById(walletId, { includeCost: true })
@@ -1691,6 +1919,21 @@ export const consumeAiCredits = async ({
   }
   actorUserId: string
 }) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgConsumeAiCredits({
+        input,
+        actorUserId
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const requestId = normalizeString(input.requestId)
@@ -1892,6 +2135,21 @@ export const reloadAiCredits = async ({
   input: ReloadCreditsInput
   actorUserId: string
 }) => {
+  if (isAiToolingPostgresEnabled()) {
+    try {
+      await assertAiToolingPostgresReady()
+
+      return await pgReloadAiCredits({
+        input,
+        actorUserId
+      })
+    } catch (error) {
+      if (!shouldFallbackFromAiToolingPostgres(error)) {
+        throw error
+      }
+    }
+  }
+
   await ensureAiToolingInfrastructure()
   const projectId = getProjectId()
   const wallet = await getWalletInternal(normalizeString(input.walletId))

@@ -26,6 +26,22 @@
 
 ## 2026-03-15
 
+### AI Tooling runtime migrated to PostgreSQL
+- `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para responder catálogo, licencias, wallets y metadata admin.
+- Se creó `greenhouse_ai` en Cloud SQL con:
+  - `tool_catalog`
+  - `member_tool_licenses`
+  - `credit_wallets`
+  - `credit_ledger`
+- `src/lib/ai-tools/service.ts` ahora usa `Postgres first` con fallback controlado al store legacy.
+- `setup-postgres-ai-tooling.ts` ya no solo crea schema: también siembra catálogo mínimo y providers requeridos para que el módulo no arranque vacío.
+- Estado validado tras setup:
+  - `tool_catalog = 9`
+  - `licenses = 0`
+  - `wallets = 0`
+  - `ledger = 0`
+  - providers activos visibles = `10`, incluyendo `Microsoft` y `Notion`
+
 ### Project detail now exposes source performance indicators and RpA semaphore
 - `Project Detail > tasks` ya expone directamente desde fuente:
   - `semáforo_rpa`

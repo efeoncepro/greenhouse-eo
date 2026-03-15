@@ -7,7 +7,8 @@ BEGIN
   FOREACH schema_name IN ARRAY ARRAY[
     'greenhouse_hr',
     'greenhouse_payroll',
-    'greenhouse_finance'
+    'greenhouse_finance',
+    'greenhouse_ai'
   ]
   LOOP
     IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = schema_name) THEN

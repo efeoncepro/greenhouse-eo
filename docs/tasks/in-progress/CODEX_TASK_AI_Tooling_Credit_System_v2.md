@@ -37,6 +37,39 @@ Conclusión:
 
 ## Backend activo cerrado en esta v2
 
+### Delta 2026-03-15 — runtime PostgreSQL operativo para AI Tooling
+
+- `AI Tooling` ya no debe considerarse runtime puramente BigQuery-backed.
+- Se materializó `greenhouse_ai` en PostgreSQL con:
+  - `tool_catalog`
+  - `member_tool_licenses`
+  - `credit_wallets`
+  - `credit_ledger`
+- `src/lib/ai-tools/service.ts` ahora opera `Postgres first` para:
+  - catálogo
+  - licencias
+  - wallets
+  - ledger
+  - summary
+  - metadata admin
+  - create/update/consume/reload
+- `src/lib/ai-tools/postgres-store.ts` quedó como repository runtime real del módulo.
+- `scripts/setup-postgres-ai-tooling.ts` ahora siembra directamente:
+  - `10` providers visibles
+  - `9` herramientas seed
+- Verificación real sobre Cloud SQL:
+  - `tool_catalog = 9`
+  - `member_tool_licenses = 0`
+  - `credit_wallets = 0`
+  - `credit_ledger = 0`
+- Implicación para frontend:
+  - el módulo ya no debe tratarse como superficie dependiente de bootstrap BigQuery para funcionar
+  - los formularios admin pueden confiar en metadata y catálogo servidos desde PostgreSQL
+- Boundary temporal:
+  - el backfill desde BigQuery quedó disponible como script
+  - no existían datos vivos en las tablas legacy al momento del corte, así que el catálogo operativo actual nace del seed en PostgreSQL
+  - BigQuery queda solo como compatibilidad/fallback transicional, no como backend objetivo
+
 ### Delta 2026-03-15 — bridge Supplier -> Provider
 
 - Se endureció el alineamiento runtime entre `Finance` y `AI Tooling`:
@@ -63,6 +96,10 @@ Provisiona on-demand:
 - `greenhouse.member_tool_licenses`
 - `greenhouse.ai_credit_wallets`
 - `greenhouse.ai_credit_ledger`
+
+Estado actual:
+- esta infraestructura legacy sigue existiendo para compatibilidad
+- pero el runtime operativo principal ya no debe depender de ella en ambientes con PostgreSQL configurado
 
 Reglas implementadas:
 - montos y costos en `NUMERIC`

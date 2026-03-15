@@ -40,6 +40,97 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 12:15 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Cortar `AI Tooling` a PostgreSQL runtime y dejar el módulo estable para `Admin > AI Tooling` sin depender del bootstrap frágil en BigQuery.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview
+
+### Archivos tocados
+- `src/lib/ai-tools/service.ts`
+- `src/lib/ai-tools/postgres-store.ts`
+- `scripts/setup-postgres-access-runtime.sql`
+- `scripts/pg-doctor.ts`
+- `scripts/setup-postgres-ai-tooling.sql`
+- `scripts/setup-postgres-ai-tooling.ts`
+- `scripts/backfill-postgres-ai-tooling.ts`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `AI Tooling` quedó `Postgres first` en `src/lib/ai-tools/service.ts` para:
+  - catálogo
+  - licencias
+  - wallets
+  - ledger
+  - summary
+  - metadata admin
+  - create/update de herramientas, licencias, wallets y consumo/recarga de créditos
+- Se creó el store `src/lib/ai-tools/postgres-store.ts` sobre `greenhouse_ai`, anclado a:
+  - `greenhouse_core.providers`
+  - `greenhouse_core.clients`
+  - `greenhouse_core.members`
+  - `greenhouse_core.client_users`
+  - `greenhouse_finance.suppliers`
+  - `greenhouse_finance.exchange_rates`
+  - `greenhouse_sync.outbox_events`
+- Se materializó el schema `greenhouse_ai` con:
+  - `tool_catalog`
+  - `member_tool_licenses`
+  - `credit_wallets`
+  - `credit_ledger`
+- `scripts/setup-postgres-ai-tooling.ts` ahora siembra catálogo mínimo directamente en PostgreSQL:
+  - `9` herramientas
+  - `10` providers visibles incluyendo `Microsoft` y `Notion`
+- El backfill desde BigQuery quedó operativo como script, pero al correrlo no encontró datos vivos:
+  - `toolCount = 0`
+  - `licenseCount = 0`
+  - `walletCount = 0`
+  - `ledgerCount = 0`
+- Se confirmó con `pg:doctor`:
+  - `greenhouse_ai` visible para `runtime`
+  - `greenhouse_ai` con `CREATE` para `migrator`
+
+### Verificación
+- `pnpm exec eslint src/lib/ai-tools/service.ts src/lib/ai-tools/postgres-store.ts scripts/setup-postgres-ai-tooling.ts scripts/backfill-postgres-ai-tooling.ts scripts/pg-doctor.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `pnpm setup:postgres:access`
+  - correcto
+- `pnpm setup:postgres:ai-tooling`
+  - correcto
+- `pnpm backfill:postgres:ai-tooling`
+  - correcto, sin datos para migrar
+- `pnpm pg:doctor --profile=runtime`
+  - correcto
+- `pnpm pg:doctor --profile=migrator`
+  - correcto
+
+### Riesgos o pendientes
+- Esta pasada deja `AI Tooling` estable en runtime, pero todavía no verifica end-to-end el preview con usuario real; falta despliegue y smoke sobre:
+  - `/api/admin/ai-tools/catalog`
+  - `/api/admin/ai-tools/licenses`
+  - `/api/admin/ai-tools/wallets`
+  - `/api/admin/ai-tools/meta`
+- `AI Tooling` ya no necesita BigQuery para funcionar, pero `Finance suppliers` aún sigue teniendo consumidor legacy en BigQuery por otras zonas del portal.
+- Próximo paso recomendado:
+  - `commit + push`
+  - validar preview y repuntar `pre-greenhouse`
+  - confirmar que desaparezca el alert rojo y que el dropdown de proveedores muestre el set canónico
+
 ## 2026-03-15 10:20 America/Santiago
 
 ### Agente
@@ -81,9 +172,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Riesgos o pendientes
 - El fix corrige el bootstrap runtime, pero todavía no materializa vendors financieros faltantes como `Microsoft` y `Notion` dentro del dropdown canónico de AI Tooling.
 - Próximo paso recomendado:
-  - validar localmente `eslint` y `build`
-  - hacer `commit + push`
-  - verificar en preview que desaparezca el alert y vuelvan a responder las 4 rutas admin de AI Tooling
+  - superseded por el corte `AI Tooling -> PostgreSQL runtime` documentado arriba
 
 ## 2026-03-15 09:46 America/Santiago
 
