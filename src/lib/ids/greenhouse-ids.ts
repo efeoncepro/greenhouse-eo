@@ -128,3 +128,14 @@ export const buildIdentityProfilePublicId = ({ sourceSystem, sourceObjectType, s
 
 export const buildIdentitySourceLinkId = ({ profileId, sourceSystem, sourceObjectType, sourceObjectId }: IdentityProfileInput & { profileId: string }) =>
   `identity-link-${normalizeToken(profileId)}-${normalizeToken(sourceSystem)}-${normalizeToken(sourceObjectType)}-${normalizeToken(sourceObjectId)}`
+
+/**
+ * Format a canonical EO-ID from a serial number.
+ * This is the unified person identifier used across all surfaces.
+ * The serial_number is auto-assigned by Postgres on INSERT.
+ *
+ * @example formatEoId(1)  → 'EO-ID0001'
+ * @example formatEoId(42) → 'EO-ID0042'
+ */
+export const formatEoId = (serialNumber: number) =>
+  `EO-ID${String(serialNumber).padStart(4, '0')}`
