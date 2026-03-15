@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -113,6 +115,7 @@ const formatDate = (date: string | null): string => {
 // ---------------------------------------------------------------------------
 
 const ExpensesListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Expense[]>([])
   const [total, setTotal] = useState(0)
@@ -156,8 +159,10 @@ const ExpensesListView = () => {
 
   // Derived KPIs
   const totalExpenses = items.reduce((sum, e) => sum + e.totalAmountClp, 0)
+
   const pendingTotal = items.filter(e => e.paymentStatus === 'pending' || e.paymentStatus === 'scheduled')
     .reduce((sum, e) => sum + e.totalAmountClp, 0)
+
   const paidCount = items.filter(e => e.paymentStatus === 'paid').length
   const recurringCount = items.filter(e => e.isRecurring).length
 
@@ -315,7 +320,7 @@ const ExpensesListView = () => {
                   const typeConf = TYPE_CONFIG[item.expenseType] || TYPE_CONFIG.miscellaneous
 
                   return (
-                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/expenses/${item.expenseId}`}>
+                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/expenses/${item.expenseId}`)}>
                       <TableCell>
                         <CustomChip
                           round='true'

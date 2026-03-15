@@ -108,7 +108,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
   const [mode, setMode] = useState<DialogMode>('match')
   const [excludeNotes, setExcludeNotes] = useState('')
 
-  const isMatched = row?.matchStatus === 'matched' || row?.matchStatus === 'suggested'
+  const isConfirmedMatch = row?.matchStatus === 'matched' || row?.matchStatus === 'manual_matched'
+  const isSuggested = row?.matchStatus === 'suggested'
   const isExcluded = row?.matchStatus === 'excluded'
 
   // Reset state when dialog opens
@@ -119,15 +120,14 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
       setSearch('')
       setExcludeNotes('')
 
-      if (isMatched) {
+      if (isConfirmedMatch) {
         setMode('unmatch')
-      } else if (isExcluded) {
-        setMode('match')
       } else {
+        // suggested, excluded, unmatched all open in match mode
         setMode('match')
       }
     }
-  }, [open, row, isMatched, isExcluded])
+  }, [open, row, isConfirmedMatch])
 
   // Fetch candidates when in match mode
   const fetchCandidates = useCallback(async () => {
@@ -357,6 +357,23 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
           </Box>
         )}
 
+        {/* Suggested match banner — shown above candidates when row is suggested */}
+        {isSuggested && mode === 'match' && row.matchedId && (
+          <Alert
+            severity='info'
+            sx={{ mb: 3 }}
+            action={
+              <Button color='inherit' size='small' onClick={() => {
+                setSelectedCandidateId(row.matchedId)
+              }}>
+                Confirmar sugerencia
+              </Button>
+            }
+          >
+            El sistema sugirió vincular esta fila con {row.matchedType === 'income' ? 'el ingreso' : 'el egreso'} <strong>{row.matchedId}</strong>. Confirma la sugerencia o selecciona otro candidato.
+          </Alert>
+        )}
+
         {/* Mode: Exclude */}
         {mode === 'exclude' && (
           <Stack spacing={3} sx={{ py: 2 }}>
@@ -503,7 +520,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
       <DialogActions sx={{ px: 4, py: 3, justifyContent: 'space-between' }}>
         {/* Left side: mode toggles */}
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {!isExcluded && mode !== 'exclude' && !isMatched && (
+          {!isExcluded && mode !== 'exclude' && !isConfirmedMatch && !isSuggested && (
             <Button
               size='small'
               color='secondary'
@@ -523,7 +540,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
               Volver a candidatos
             </Button>
           )}
-          {isMatched && mode === 'unmatch' && (
+          {isConfirmedMatch && mode === 'unmatch' && (
             <Button
               size='small'
               color='primary'

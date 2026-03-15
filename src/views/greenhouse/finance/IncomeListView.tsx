@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -93,6 +95,7 @@ const formatDate = (date: string | null): string => {
 // ---------------------------------------------------------------------------
 
 const IncomeListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Income[]>([])
   const [total, setTotal] = useState(0)
@@ -126,8 +129,10 @@ const IncomeListView = () => {
 
   // Derived KPIs
   const totalIncome = items.reduce((sum, i) => sum + i.totalAmountClp, 0)
+
   const totalPending = items.filter(i => i.paymentStatus === 'pending' || i.paymentStatus === 'partial')
     .reduce((sum, i) => sum + i.amountPending, 0)
+
   const paidCount = items.filter(i => i.paymentStatus === 'paid').length
   const overdueCount = items.filter(i => i.paymentStatus === 'overdue').length
 
@@ -271,7 +276,7 @@ const IncomeListView = () => {
                   const statusConf = STATUS_CONFIG[item.paymentStatus] || STATUS_CONFIG.pending
 
                   return (
-                    <TableRow key={item.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/income/${item.incomeId}`}>
+                    <TableRow key={item.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/income/${item.incomeId}`)}>
                       <TableCell>
                         <Box>
                           <Typography variant='body2' fontWeight={600}>

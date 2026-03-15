@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
+import { toast } from 'react-toastify'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -46,6 +50,7 @@ interface ClientProfile {
 // ---------------------------------------------------------------------------
 
 const ClientsListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [clients, setClients] = useState<ClientProfile[]>([])
   const [total, setTotal] = useState(0)
@@ -159,15 +164,15 @@ const ClientsListView = () => {
                 if (res.ok) {
                   const data = await res.json()
 
-                  alert(data.message)
+                  toast.success(data.message || 'Clientes sincronizados')
                   fetchClients()
                 } else {
                   const data = await res.json().catch(() => ({}))
 
-                  alert(data.error || `Error al sincronizar (${res.status})`)
+                  toast.error(data.error || `Error al sincronizar (${res.status})`)
                 }
               } catch {
-                alert('Error de conexión al sincronizar')
+                toast.error('Error de conexion al sincronizar')
               } finally {
                 setSyncing(false)
               }
@@ -299,7 +304,7 @@ const ClientsListView = () => {
                     key={client.clientProfileId}
                     hover
                     sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                    onClick={() => window.location.href = `/finance/clients/${client.clientProfileId}`}
+                    onClick={() => router.push(`/finance/clients/${client.clientProfileId}`)}
                   >
                     <TableCell>
                       <Box>

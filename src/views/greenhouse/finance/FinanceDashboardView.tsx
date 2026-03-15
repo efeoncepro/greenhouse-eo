@@ -255,8 +255,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
         fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
-        fetch('/api/finance/income?pageSize=6', { cache: 'no-store' }),
-        fetch('/api/finance/expenses?pageSize=6', { cache: 'no-store' })
+        fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
+        fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -365,8 +365,8 @@ const FinanceDashboardView = () => {
   // Build aligned month labels and data from the last 6 months
   const allMonths = new Set<string>()
 
-  incomeMonthly.forEach(m => allMonths.add(`${m.year}-${m.month}`))
-  expenseMonthly.forEach(m => allMonths.add(`${m.year}-${m.month}`))
+  incomeMonthly.forEach(m => allMonths.add(`${m.year}-${String(m.month).padStart(2, '0')}`))
+  expenseMonthly.forEach(m => allMonths.add(`${m.year}-${String(m.month).padStart(2, '0')}`))
 
   const sortedMonths = Array.from(allMonths).sort()
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
@@ -114,6 +114,9 @@ interface ClientDetailData {
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount)
 
+const formatAmount = (amount: number, currency: string): string =>
+  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
+
 const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—'
 
@@ -150,6 +153,7 @@ const roleLabels: Record<string, string> = {
 
 const ClientDetailView = () => {
   const params = useParams()
+  const router = useRouter()
   const id = params.id as string
 
   const [loading, setLoading] = useState(true)
@@ -414,7 +418,7 @@ const ClientDetailView = () => {
                         const status = statusConfig[inv.paymentStatus] ?? { color: 'secondary' as const, label: inv.paymentStatus }
 
                         return (
-                          <TableRow key={inv.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => window.location.href = `/finance/income/${inv.incomeId}`}>
+                          <TableRow key={inv.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/income/${inv.incomeId}`)}>
                             <TableCell>
                               <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                                 {inv.invoiceNumber || inv.incomeId}
@@ -422,9 +426,9 @@ const ClientDetailView = () => {
                             </TableCell>
                             <TableCell><Typography variant='body2'>{formatDate(inv.invoiceDate)}</Typography></TableCell>
                             <TableCell><Typography variant='body2'>{formatDate(inv.dueDate)}</Typography></TableCell>
-                            <TableCell align='right'><Typography variant='body2' fontWeight={500}>{formatCLP(inv.totalAmount)}</Typography></TableCell>
-                            <TableCell align='right'><Typography variant='body2'>{formatCLP(inv.amountPaid)}</Typography></TableCell>
-                            <TableCell align='right'><Typography variant='body2'>{formatCLP(inv.amountPending)}</Typography></TableCell>
+                            <TableCell align='right'><Typography variant='body2' fontWeight={500}>{formatAmount(inv.totalAmount, inv.currency)}</Typography></TableCell>
+                            <TableCell align='right'><Typography variant='body2'>{formatAmount(inv.amountPaid, inv.currency)}</Typography></TableCell>
+                            <TableCell align='right'><Typography variant='body2'>{formatAmount(inv.amountPending, inv.currency)}</Typography></TableCell>
                             <TableCell align='center'>
                               <CustomChip round='true' size='small' color={status.color} label={status.label} />
                             </TableCell>

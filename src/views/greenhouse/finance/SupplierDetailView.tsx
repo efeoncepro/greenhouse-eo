@@ -77,14 +77,14 @@ interface SupplierDetail {
 // ---------------------------------------------------------------------------
 
 const CATEGORY_LABELS: Record<string, string> = {
-  technology: 'Tecnología',
-  professional_services: 'Servicios profesionales',
-  marketing: 'Marketing',
-  office: 'Oficina',
+  software: 'Software',
   infrastructure: 'Infraestructura',
+  professional_services: 'Servicios profesionales',
+  media: 'Media',
+  creative: 'Creatividad',
   hr_services: 'RRHH',
-  legal: 'Legal',
-  financial: 'Financiero',
+  office: 'Oficina',
+  legal_accounting: 'Legal / Contable',
   other: 'Otro'
 }
 
@@ -104,8 +104,8 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const formatCLP = (amount: number) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+const formatAmount = (amount: number, currency: string) =>
+  new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
 
 const formatDate = (value: string) => {
   const date = value.includes('T') ? new Date(value) : new Date(`${value}T00:00:00`)
@@ -465,7 +465,7 @@ const SupplierDetailView = () => {
                           </TableCell>
                           <TableCell align='right'>
                             <Typography variant='body2'>
-                              {payment.currency === 'CLP' ? formatCLP(payment.amount) : payment.amount.toLocaleString('es-CL')}
+                              {formatAmount(payment.amount, payment.currency)}
                             </Typography>
                           </TableCell>
                           <TableCell>
