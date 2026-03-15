@@ -221,7 +221,7 @@ const getProjectScopes = async (userId: string) => {
       dp.project_name
     FROM greenhouse_core.user_project_scopes ups
     LEFT JOIN greenhouse_delivery.projects dp
-      ON dp.project_id = ups.project_id
+      ON dp.project_record_id = ups.project_id
     WHERE ups.user_id = $1
       AND ups.active = TRUE
     ORDER BY COALESCE(dp.project_name, ups.project_id)`,
