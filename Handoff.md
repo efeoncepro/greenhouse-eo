@@ -40,6 +40,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:52 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Corregir dos bugs reportados después del último QA: snapshot de tipo de cambio ausente en `Finance Dashboard` y dropdown vacío en `Solicitar permiso` de `HR Core`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx`
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `Finance`:
+  - el dashboard ahora deja warning visible si `/api/finance/exchange-rates/latest` responde sin snapshot disponible o con error HTTP
+- `HR Core`:
+  - el drawer `Solicitar permiso` ya no queda vacío sin feedback
+  - si no llegan tipos activos, el CTA se deshabilita y el select muestra estado explícito
+  - si sí existen tipos activos, el formulario preselecciona el primero al abrir
+  - si `meta` falla, ahora el error se expone en pantalla en vez de quedar silencioso
+
+### Verificación
+- `pnpm exec eslint src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/hr-core/HrLeaveView.tsx`
+  - correcto
+- `git diff --check -- src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/hr-core/HrLeaveView.tsx Handoff.md changelog.md`
+  - correcto
+
+### Riesgos o pendientes
+- No se ejecutó smoke autenticado real contra Preview/BigQuery; la mejora de visibilidad del dashboard queda validada por lint y por lectura de contrato, no por roundtrip productivo.
+- Si el problema de permisos persiste con usuarios reales, el siguiente punto a revisar es la respuesta viva de `GET /api/hr/core/meta` en Preview.
+
 ## 2026-03-15 05:05 America/Santiago
 
 ### Agente

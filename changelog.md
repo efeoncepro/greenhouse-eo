@@ -6,6 +6,14 @@
 
 ## 2026-03-15
 
+### Finance exchange-rate visibility and HR leave request drawer hardening
+- `Finance Dashboard` ahora muestra warning si `/api/finance/exchange-rates/latest` no devuelve snapshot o responde con error HTTP.
+- `HR Core` ahora evita que `Solicitar permiso` quede con dropdown vacío y silencioso:
+  - deshabilita el CTA cuando no hay tipos activos
+  - muestra estado explícito en el select
+  - preselecciona el primer tipo activo al abrir
+  - expone error si falla `GET /api/hr/core/meta`
+
 ### Cross-module QA sweep for Finance, HR Core, HR Payroll and AI Tooling
 - Se ejecutó una pasada de QA funcional/contractual sobre los módulos `Finance`, `HR Core`, `HR Payroll` y `AI Tooling`, contrastando pantallas activas con sus rutas API reales.
 - `Finance Dashboard` ahora usa `currentBalance` en vez de `openingBalance` para `Saldo total` y muestra mejor contexto del snapshot de tipo de cambio.

@@ -81,6 +81,7 @@ const HrLeaveView = () => {
   const [reviewAction, setReviewAction] = useState<HrApprovalAction>('approve')
   const [reviewNotes, setReviewNotes] = useState('')
   const [reviewSaving, setReviewSaving] = useState(false)
+  const activeLeaveTypes = leaveTypes.filter(leaveType => leaveType.active)
 
   const fetchData = useCallback(async () => {
     try {
@@ -101,6 +102,10 @@ const HrLeaveView = () => {
         const meta = await metaRes.json()
 
         setLeaveTypes(meta.leaveTypes ?? [])
+      } else {
+        const d = await metaRes.json().catch(() => ({}))
+
+        setError(d.error || 'No fue posible cargar los tipos de permiso.')
       }
     } catch (err: any) {
       setError(err.message || 'Error cargando datos')
@@ -110,6 +115,14 @@ const HrLeaveView = () => {
   }, [filterStatus, filterYear])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  useEffect(() => {
+    if (!createOpen || createType || activeLeaveTypes.length === 0) {
+      return
+    }
+
+    setCreateType(activeLeaveTypes[0]?.leaveTypeCode ?? '')
+  }, [activeLeaveTypes, createOpen, createType])
 
   const handleCreate = async () => {
     setCreateSaving(true)
@@ -232,6 +245,7 @@ const HrLeaveView = () => {
         <Button
           variant='contained'
           startIcon={<i className='tabler-calendar-plus' />}
+          disabled={loading || activeLeaveTypes.length === 0}
           onClick={() => setCreateOpen(true)}
         >
           Solicitar permiso
@@ -511,11 +525,18 @@ const HrLeaveView = () => {
               label='Tipo de permiso'
               value={createType}
               onChange={e => setCreateType(e.target.value)}
+              helperText={activeLeaveTypes.length === 0 ? 'No hay tipos de permiso activos disponibles.' : undefined}
               required
             >
-              {leaveTypes.filter(lt => lt.active).map(lt => (
-                <MenuItem key={lt.leaveTypeCode} value={lt.leaveTypeCode}>{lt.leaveTypeName}</MenuItem>
-              ))}
+              {activeLeaveTypes.length === 0 ? (
+                <MenuItem disabled value=''>
+                  No hay tipos disponibles
+                </MenuItem>
+              ) : (
+                activeLeaveTypes.map(lt => (
+                  <MenuItem key={lt.leaveTypeCode} value={lt.leaveTypeCode}>{lt.leaveTypeName}</MenuItem>
+                ))
+              )}
             </CustomTextField>
             <Grid container spacing={2}>
               <Grid size={{ xs: 6 }}>

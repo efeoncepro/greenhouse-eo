@@ -279,6 +279,14 @@ const FinanceDashboardView = () => {
         const rateData = await rateRes.json()
 
         setExchangeRate(rateData)
+
+        if (!rateData.available) {
+          errors.push('Tipo de cambio: sin snapshot disponible')
+        }
+      } else {
+        const d = await rateRes.json().catch(() => ({}))
+
+        errors.push(`Tipo de cambio: ${d.error || rateRes.status}`)
       }
 
       if (incomeSummaryRes.ok) {
