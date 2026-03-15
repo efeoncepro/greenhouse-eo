@@ -426,7 +426,7 @@ const COMPENSATION_BASE_SELECT = `
     cv.member_id,
     m.display_name,
     m.primary_email,
-    ip.avatar_url,
+    NULL::text AS avatar_url,
     cv.version,
     cv.pay_regime,
     cv.currency,
@@ -452,7 +452,7 @@ const COMPENSATION_BASE_SELECT = `
     cv.created_at
   FROM greenhouse_payroll.compensation_versions AS cv
   INNER JOIN greenhouse_core.members AS m ON m.member_id = cv.member_id
-  LEFT JOIN greenhouse_core.identity_profiles AS ip ON ip.profile_id = m.identity_profile_id
+  -- identity_profiles join removed: avatar_url column not yet in Postgres schema
 `
 
 export const pgGetCurrentCompensation = async () => {
@@ -511,7 +511,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         cv.member_id,
         m.display_name,
         m.primary_email,
-        ip.avatar_url,
+        NULL::text AS avatar_url,
         cv.version,
         cv.pay_regime,
         cv.currency,
@@ -541,7 +541,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         ON cv.member_id = m.member_id
        AND cv.effective_from <= $2::date
        AND (cv.effective_to IS NULL OR cv.effective_to >= $1::date)
-      LEFT JOIN greenhouse_core.identity_profiles AS ip ON ip.profile_id = m.identity_profile_id
+      -- identity_profiles join removed: avatar_url column not yet in Postgres schema
       WHERE m.active = TRUE
       ORDER BY m.member_id, cv.effective_from DESC, cv.version DESC
     `,
@@ -908,7 +908,7 @@ const ENTRY_BASE_SELECT = `
     e.member_id,
     m.display_name,
     m.primary_email,
-    ip.avatar_url,
+    NULL::text AS avatar_url,
     e.compensation_version_id,
     e.pay_regime,
     e.currency,
@@ -951,7 +951,7 @@ const ENTRY_BASE_SELECT = `
     e.updated_at
   FROM greenhouse_payroll.payroll_entries AS e
   INNER JOIN greenhouse_core.members AS m ON m.member_id = e.member_id
-  LEFT JOIN greenhouse_core.identity_profiles AS ip ON ip.profile_id = m.identity_profile_id
+  -- identity_profiles join removed: avatar_url column not yet in Postgres schema
   LEFT JOIN greenhouse_payroll.compensation_versions AS cv ON cv.version_id = e.compensation_version_id
 `
 
@@ -1129,9 +1129,9 @@ export const pgGetPayrollMemberSummary = async (memberId: string): Promise<Payro
 
   const [row] = await runGreenhousePostgresQuery<PgMemberRow>(
     `
-      SELECT m.member_id, m.display_name, m.primary_email, ip.avatar_url, m.active
+      SELECT m.member_id, m.display_name, m.primary_email, NULL::text AS avatar_url, m.active
       FROM greenhouse_core.members AS m
-      LEFT JOIN greenhouse_core.identity_profiles AS ip ON ip.profile_id = m.identity_profile_id
+      -- identity_profiles join removed: avatar_url column not yet in Postgres schema
       WHERE m.member_id = $1
       LIMIT 1
     `,
@@ -1167,7 +1167,7 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
         m.member_id,
         m.display_name,
         m.primary_email,
-        ip.avatar_url,
+        NULL::text AS avatar_url,
         m.active,
         cc.compensation_version_count,
         cur.current_version_id,
@@ -1175,7 +1175,7 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
         cur.current_pay_regime,
         cur.current_currency
       FROM greenhouse_core.members AS m
-      LEFT JOIN greenhouse_core.identity_profiles AS ip ON ip.profile_id = m.identity_profile_id
+      -- identity_profiles join removed: avatar_url column not yet in Postgres schema
       LEFT JOIN compensation_counts AS cc ON cc.member_id = m.member_id
       LEFT JOIN current_compensation AS cur ON cur.member_id = m.member_id
       WHERE m.active = TRUE
