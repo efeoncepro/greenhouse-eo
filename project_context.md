@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Person 360 formalized as canonical profile strategy
+- Se fijó explícitamente que Greenhouse no debe seguir tratando `People`, `Users`, `CRM Contact` y `Member` como identidades distintas.
+- Decisión de arquitectura:
+  - `identity_profile` es el ancla canónica de persona
+  - `member` es faceta laboral/interna
+  - `client_user` es faceta de acceso
+  - `crm_contact` es faceta comercial
+- Regla de producto derivada:
+  - `People` debe evolucionar hacia la vista humana/operativa del mismo perfil
+  - `Users` debe evolucionar hacia la vista de acceso/permisos del mismo perfil
+  - ambas superficies deben reconciliarse sobre `identity_profile_id`
+- Se creó la lane activa:
+  - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- Esto no reemplaza `Identity & Access V2`; lo complementa como capa de modelo y serving sobre persona.
+
 ## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
 - `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para `catalog`, `licenses`, `wallets` y `metadata`.
 - Se materializó `greenhouse_ai` en Cloud SQL con:

@@ -326,6 +326,40 @@ Required meaning:
 - a space may exist without `client_id`
 - `Agency`, `delivery`, `RpA`, `On Time`, capacity and internal execution metrics should resolve against `space_id`
 
+## Person 360
+
+Canonical anchor:
+- `greenhouse_core.identity_profiles.profile_id`
+
+Required meaning:
+- one human profile across Greenhouse
+- the person exists once, and the platform renders different contextual views of that same profile
+- `People`, `Users`, `HR`, `Payroll`, `CRM contacts`, internal collaborator views and tenant participation should all resolve back to this anchor
+
+Core facets:
+- `member` facet:
+  - `greenhouse_core.members.member_id`
+  - internal collaborator or employee context
+- `user` facet:
+  - `greenhouse_core.client_users.user_id`
+  - access, session, roles and scopes
+- `crm_contact` facet:
+  - `greenhouse_crm.contacts.contact_record_id`
+  - external client/company relationship context
+- `space participation` facet:
+  - assignments, delivery participation, client-facing or internal workspace membership
+
+Non-negotiable rule:
+- Greenhouse must not keep treating `People` and `Users` as separate identity roots
+- they are different views over the same `Person 360`
+- module-specific rows may enrich a facet, but they must not replace the canonical person anchor
+- the same person can appear as employee, collaborator, client-account user, CRM contact or admin principal without duplicating person identity
+
+UI rule:
+- `People` should evolve into the human-centered 360 view of the person
+- `Users` should evolve into the access-and-permissions view of the same person
+- both surfaces must reconcile through `identity_profile_id`
+
 ## User
 
 Canonical anchor:
@@ -337,6 +371,7 @@ Important bridge:
 Required meaning:
 - a user belongs to a tenant
 - a user may be enriched by CRM contact identity and internal identity sources
+- a user is an access facet of `Person 360`, not the canonical person root
 
 ## Identity Profile
 
@@ -346,6 +381,7 @@ Canonical anchor:
 Required meaning:
 - one person across systems
 - source links from HubSpot, Microsoft, Google, Notion and others should converge here
+- this is the canonical anchor of `Person 360`
 
 ## Member / Collaborator
 
@@ -355,6 +391,7 @@ Canonical anchor:
 Required meaning:
 - org/collaborator runtime object
 - used by HR, Payroll and Finance
+- this is the internal collaborator or employee facet of `Person 360`, not a separate person identity
 
 ## Provider
 

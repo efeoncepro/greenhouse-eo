@@ -40,6 +40,57 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 13:05 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Formalizar `Person 360` como estrategia canónica de perfil y abrir la lane de reconciliación entre `People`, `Users`, `CRM Contact` y `Member`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Arquitectura y planificación de producto/datos
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- `docs/tasks/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Se dejó explícito en arquitectura que:
+  - `identity_profile` es el ancla canónica de persona
+  - `member` es faceta laboral/interna
+  - `client_user` es faceta de acceso
+  - `crm_contact` es faceta comercial
+- `People` y `Users` ya no deben tratarse como identidades distintas del mismo humano; son vistas contextuales del mismo `Person 360`.
+- Se actualizó `GREENHOUSE_360_OBJECT_MODEL_V1` para reemplazar la visión de `Collaborator` como raíz por `Person 360` como objeto canónico, dejando `member` y `user` como facetas.
+- Se creó la task:
+  - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- Se agregó la lane al índice operativo de tasks.
+
+### Verificación
+- Revisión cruzada con:
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md`
+- No hubo validación de build necesaria porque esta pasada es documental/arquitectónica.
+
+### Riesgos o pendientes
+- Runtime todavía no sirve un `person_360` unificado; esto fija la regla, no el serving final.
+- `People` y `Users` siguen conviviendo sobre facetas distintas hasta que se ejecute la reconciliación.
+- Próximo paso recomendado:
+  - auditar cobertura real de `identity_profile_id` entre `members`, `client_users` y `crm_contacts`
+  - diseñar `greenhouse_serving.person_360`
+  - cortar `People` y `Users` a ese backbone
+
 ## 2026-03-15 12:15 America/Santiago
 
 ### Agente

@@ -331,49 +331,63 @@ Still needed:
 - stronger canonical project linkage under each client
 - future quote and campaign linkage
 
-## Object 2: Collaborator
+## Object 2: Person 360
 
 ### Business meaning
 
-The canonical Efeonce person participating in delivery, payroll, internal operations, or future provider-linked workflows.
+The canonical human profile of a person participating in Greenhouse.
+
+This object must support multiple contextual views of the same human being:
+- employee or collaborator
+- user with access and scopes
+- CRM contact associated with a client company
+- participant inside one or more client or internal spaces
+- future provider-linked or workflow-linked identity contexts
 
 ### Canonical anchor
 
 Primary anchor:
+- `greenhouse.identity_profiles.profile_id`
+
+Primary internal collaborator facet:
 - `greenhouse.team_members.member_id`
 
-Identity root:
-- `greenhouse.team_members.identity_profile_id`
+Primary access facet:
+- `greenhouse.client_users.user_id`
 
 ### Current canonical source
 
 Current base tables:
-- `greenhouse.team_members`
 - `greenhouse.identity_profiles`
 - `greenhouse.identity_profile_source_links`
+- `greenhouse.team_members`
+- `greenhouse.client_users`
 
 ### Supporting references
 
 Secondary identifiers:
+- `greenhouse.team_members.member_id`
 - `greenhouse.client_users.user_id`
+- `greenhouse_crm.contacts.contact_record_id`
 - `greenhouse.payroll_entries.entry_id`
 - provider IDs in identity links
 - module-specific snapshot names
 
 ### Current object responsibilities
 
-The Collaborator object should answer:
+The Person 360 object should answer:
 - who the person is in Greenhouse
-- what identity profile anchors them
-- what role or profession they have
-- which clients or projects they are assigned to
-- what payroll context they have
-- what financial expenses relate to them
-- which external provider identities correspond to them
+- which canonical profile anchors them
+- whether they have internal collaborator context
+- whether they have access principal context
+- whether they are linked to CRM contact context
+- which clients, spaces or projects they participate in
+- what payroll, HR and finance context relates to them
+- which external source identities correspond to them
 
 ### Allowed enrichers
 
-Modules and systems that may enrich Collaborator:
+Modules and systems that may enrich Person 360:
 - People:
   - list and detail views
   - assignments
@@ -392,36 +406,53 @@ Modules and systems that may enrich Collaborator:
   - `greenhouse.client_team_assignments`
   - `notion_ops.tareas` and other operational sources via semantic calculations
 
-### What Collaborator does not own
+### What Person 360 does not own
 
-Collaborator is not:
-- a login row
+Person 360 is not:
 - a payroll row
 - a finance expense row
 - a provider-specific account
 
+Its facets may own contextual behavior:
+- `client_users` owns access principal state
+- `team_members` owns internal collaborator state
+- CRM projections own contact-source state
+
 ### Example read models
 
-Possible Collaborator-centered read models:
+Possible Person-centered read models:
 - People detail
+- Users detail
 - Collaborator finance overview
 - Payroll operator view
 - Assignment capacity view
 - Internal talent profile
+- Client account participant view
 - Future AI assistant context for staffing and expertise routing
 
 ### Current implementation state
 
 Already in place:
-- canonical collaborator anchor in `team_members`
 - identity profile strategy
+- collaborator anchor in `team_members`
+- user anchor in `client_users`
 - people read models
 - payroll read models
 - finance collaborator overview endpoint
 
 Still needed:
-- broader product-wide reuse of collaborator 360
+- explicit `Person 360` runtime view or serving layer
+- reconciliation of `People` and `Users` over `identity_profile_id`
+- CRM contact facet fully unified into the same profile view
 - future richer cross-module skill, tooling, and output history
+
+### Transitional rule
+
+Until the unified serving layer exists:
+- `People` may keep centering the collaborator facet
+- `Users` may keep centering the access facet
+- but neither surface should be treated as a separate identity root
+- both must converge toward `identity_profile_id` as the canonical person anchor
 
 ## Object 3: Product or Capability
 

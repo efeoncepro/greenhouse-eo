@@ -26,6 +26,12 @@
 
 ## 2026-03-15
 
+### Person 360 formalized as the canonical human profile strategy
+- Se fijó en arquitectura que Greenhouse debe tratar `identity_profile` como ancla canónica de persona.
+- `member`, `client_user` y `crm_contact` quedan formalizados como facetas del mismo perfil, no como raíces paralelas.
+- `People` y `Users` pasan a definirse como vistas contextuales del mismo `Person 360`.
+- Se creó la lane activa `CODEX_TASK_Person_360_Profile_Unification_v1.md` para reconciliar runtime y serving sobre `identity_profile_id`.
+
 ### AI Tooling runtime migrated to PostgreSQL
 - `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para responder catálogo, licencias, wallets y metadata admin.
 - Se creó `greenhouse_ai` en Cloud SQL con:

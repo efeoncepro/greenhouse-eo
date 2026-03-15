@@ -21,6 +21,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_HR_Payroll_Module_v3.md](in-progress/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre de gaps runtime y UX del módulo HR Payroll |
 | [CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md](in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md) | Corte de Payroll a PostgreSQL sobre el backbone canónico ya materializado |
 | [CODEX_TASK_People_Unified_View_v3.md](in-progress/CODEX_TASK_People_Unified_View_v3.md) | Cierre 360 de People sobre el runtime actual |
+| [CODEX_TASK_Person_360_Profile_Unification_v1.md](in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md) | Perfil único 360 para reconciliar People, Users, CRM Contact y Member |
 | [CODEX_TASK_Source_Sync_Runtime_Projections_v1.md](in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md) | Jobs reales de sync para poblar raw/conformed y proyectar CRM/Delivery a PostgreSQL |
 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | Identidad canónica ya sembrada y formalización pendiente de capacity |
 | [GREENHOUSE_IDENTITY_ACCESS_V2.md](in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md) | Modelo RBAC composable V2: DDL, backfill, identity store, session resolution Postgres-first |
