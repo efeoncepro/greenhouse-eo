@@ -40,6 +40,77 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 05:34 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Ejecutar el primer slice técnico del blueprint de sync externo para dejar materializada la fundación `raw/conformed + control plane + proyecciones runtime` en BigQuery y PostgreSQL.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Data platform / PostgreSQL / BigQuery
+
+### Archivos tocados
+- `scripts/setup-postgres-source-sync.sql`
+- `scripts/setup-postgres-source-sync.ts`
+- `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-bigquery-source-sync.ts`
+- `package.json`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se agregaron los scripts:
+  - `pnpm setup:postgres:source-sync`
+  - `pnpm setup:bigquery:source-sync`
+- En PostgreSQL quedaron creados:
+  - `greenhouse_sync.source_sync_runs`
+  - `greenhouse_sync.source_sync_watermarks`
+  - `greenhouse_sync.source_sync_failures`
+  - `greenhouse_crm.companies`
+  - `greenhouse_crm.deals`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.sprints`
+  - `greenhouse_delivery.tasks`
+- En BigQuery quedaron creados:
+  - dataset `greenhouse_raw`
+  - dataset `greenhouse_conformed`
+  - dataset `greenhouse_marts`
+  - `10` tablas raw de snapshots para Notion y HubSpot
+  - `5` tablas conformed iniciales para delivery y CRM
+- Se ajustó el runner de BigQuery para no depender de `src/lib/bigquery.ts`, ya que ese módulo es `server-only` y rompía fuera del runtime de Next.
+- Se verificó existencia real de tablas en:
+  - Cloud SQL
+  - BigQuery
+
+### Verificación
+- `pnpm exec eslint scripts/setup-postgres-source-sync.ts scripts/setup-bigquery-source-sync.ts src/lib/postgres/client.ts src/lib/bigquery.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `pnpm setup:postgres:source-sync`
+  - correcto; `37` statements aplicados
+- `pnpm setup:bigquery:source-sync`
+  - correcto; `18` statements aplicados
+- Verificación directa:
+  - `information_schema.tables` en PostgreSQL para `greenhouse_sync`, `greenhouse_crm`, `greenhouse_delivery`
+  - `bq ls` en `greenhouse_raw`, `greenhouse_conformed`, `greenhouse_marts`
+
+### Riesgos o pendientes
+- Este turno deja lista la fundación, pero todavía no llena datos:
+  - faltan jobs de ingestión Notion/HubSpot
+  - falta materialización de conformed desde raw
+  - falta proyección de conformed hacia `greenhouse_crm` y `greenhouse_delivery`
+- Existe un archivo no trackeado fuera de este lote:
+  - `docs/architecture/POSTGRESQL_ADVANCED_PATTERNS.md`
+  - no fue tocado ni incluido en commit
+
 ## 2026-03-15 05:15 America/Santiago
 
 ### Agente

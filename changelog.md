@@ -6,6 +6,25 @@
 
 ## 2026-03-15
 
+### Source sync foundation materialized in PostgreSQL and BigQuery
+- Se agregaron los scripts:
+  - `pnpm setup:postgres:source-sync`
+  - `pnpm setup:bigquery:source-sync`
+- En PostgreSQL se materializaron:
+  - `greenhouse_sync.source_sync_runs`
+  - `greenhouse_sync.source_sync_watermarks`
+  - `greenhouse_sync.source_sync_failures`
+  - `greenhouse_crm.companies`
+  - `greenhouse_crm.deals`
+  - `greenhouse_delivery.projects`
+  - `greenhouse_delivery.sprints`
+  - `greenhouse_delivery.tasks`
+- En BigQuery se materializaron:
+  - datasets `greenhouse_raw`, `greenhouse_conformed`, `greenhouse_marts`
+  - raw snapshots iniciales de Notion y HubSpot
+  - conformed tables iniciales de `delivery_*` y `crm_*`
+- El runner `setup-bigquery-source-sync.ts` quedó desacoplado de `server-only` para poder ejecutarse como tooling externo.
+
 ### HR leave request creation type fix in PostgreSQL
 - Se corrigió la creación de solicitudes en `HR > Permisos` sobre PostgreSQL.
 - El write de `leave_balances` usaba el parámetro `year` como `text` dentro del `INSERT ... SELECT`, lo que rompía `POST /api/hr/core/leave/requests`.

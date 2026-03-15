@@ -3,6 +3,50 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 Source sync foundation materialized
+- Se ejecutó el primer slice técnico del blueprint de sync externo sobre PostgreSQL y BigQuery.
+- Scripts nuevos agregados:
+  - `pnpm setup:postgres:source-sync`
+  - `pnpm setup:bigquery:source-sync`
+- En PostgreSQL (`greenhouse-pg-dev / greenhouse_app`) quedaron materializados:
+  - schemas:
+    - `greenhouse_crm`
+    - `greenhouse_delivery`
+  - tablas de control:
+    - `greenhouse_sync.source_sync_runs`
+    - `greenhouse_sync.source_sync_watermarks`
+    - `greenhouse_sync.source_sync_failures`
+  - tablas de proyección inicial:
+    - `greenhouse_crm.companies`
+    - `greenhouse_crm.deals`
+    - `greenhouse_delivery.projects`
+    - `greenhouse_delivery.sprints`
+    - `greenhouse_delivery.tasks`
+- En BigQuery (`efeonce-group`) quedaron materializados:
+  - datasets:
+    - `greenhouse_raw`
+    - `greenhouse_conformed`
+    - `greenhouse_marts`
+  - raw snapshots:
+    - `notion_projects_snapshots`
+    - `notion_tasks_snapshots`
+    - `notion_sprints_snapshots`
+    - `notion_people_snapshots`
+    - `notion_databases_snapshots`
+    - `hubspot_companies_snapshots`
+    - `hubspot_deals_snapshots`
+    - `hubspot_contacts_snapshots`
+    - `hubspot_owners_snapshots`
+    - `hubspot_line_items_snapshots`
+  - conformed current-state tables:
+    - `delivery_projects`
+    - `delivery_tasks`
+    - `delivery_sprints`
+    - `crm_companies`
+    - `crm_deals`
+- Regla operativa derivada:
+  - el siguiente paso ya no es “crear estructura”, sino construir jobs de ingestión/backfill que llenen `raw`, materialicen `conformed` y proyecten `greenhouse_crm` / `greenhouse_delivery`
+
 ## Delta 2026-03-15 External source sync blueprint
 - Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para formalizar cómo Greenhouse debe desacoplar cálculos y runtime de `Notion` y `HubSpot`.
 - Dirección operativa definida:
