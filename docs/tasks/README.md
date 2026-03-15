@@ -23,6 +23,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_People_Unified_View_v3.md](in-progress/CODEX_TASK_People_Unified_View_v3.md) | Cierre 360 de People sobre el runtime actual |
 | [CODEX_TASK_Source_Sync_Runtime_Projections_v1.md](in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md) | Jobs reales de sync para poblar raw/conformed y proyectar CRM/Delivery a PostgreSQL |
 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | Identidad canónica ya sembrada y formalización pendiente de capacity |
+| [GREENHOUSE_IDENTITY_ACCESS_V2.md](in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md) | Modelo RBAC composable V2: DDL, backfill, identity store, session resolution Postgres-first |
 
 ## To Do
 
@@ -31,7 +32,6 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | Consolidación UX de vistas, shells maestras y navegación del portal |
 | [CODEX_TASK_SCIM_User_Provisioning.md](to-do/CODEX_TASK_SCIM_User_Provisioning.md) | Provisioning SCIM desde Entra ID |
 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | Ajuste transversal de jerarquía tipográfica |
-| [GREENHOUSE_IDENTITY_ACCESS_V2.md](to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md) | Modelo RBAC composable V2: 12 roles, 5 familias, route groups, scopes, PostgreSQL-first |
 
 ## Complete
 

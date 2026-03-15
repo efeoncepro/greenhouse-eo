@@ -40,6 +40,70 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-16 ~00:30 America/Santiago
+
+### Agente
+- Claude
+
+### Objetivo del turno
+- Implementar Identity & Access V2 completo: DDL, backfill, identity store, y wiring Postgres-first en access.ts.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `scripts/setup-postgres-identity-v2.sql` (NUEVO — DDL para Identity V2: ALTER client_users, scope tables, audit_events, feature flags, role seed, session_360 + user_360 views)
+- `scripts/setup-postgres-identity-v2.ts` (NUEVO — runner)
+- `scripts/backfill-postgres-identity-v2.ts` (NUEVO — backfill BigQuery → Postgres: SSO columns, member_id links, role assignments, scopes, feature flags)
+- `src/lib/tenant/identity-store.ts` (NUEVO — Postgres store para session resolution: readiness check, session_360 lookups, SSO linking, last login)
+- `src/lib/tenant/access.ts` (MODIFICADO — Postgres-first + BigQuery fallback en todos los lookups y writes)
+
+### Cambios realizados
+
+**DDL Identity V2** (`setup-postgres-identity-v2.sql`):
+- ALTER `client_users`: 12 columnas nuevas (microsoft_oid, google_sub, password_hash, timezone, member_id FK, etc.)
+- ALTER `user_role_assignments`: effective_from/to, assigned_by_user_id
+- CREATE TABLE: user_project_scopes, user_campaign_scopes, user_client_scopes, audit_events, client_feature_flags
+- Role seed: 6 roles V2 (collaborator, hr_manager, finance_analyst, finance_admin, people_viewer, ai_tooling_admin)
+- Route group scope updates for all existing roles
+- CREATE VIEW: session_360 (fast-path session resolution), user_360 (updated with new columns)
+- Grants for greenhouse_runtime y greenhouse_migrator
+
+**Backfill** (`backfill-postgres-identity-v2.ts`):
+- 6 pasos: SSO columns, member_id resolution, role assignments, project/campaign scopes, feature flags
+- Uses RETURNING para contar rows afectados
+
+**Identity Store** (`identity-store.ts`):
+- Readiness check con TTL 60s, valida 4 tablas + V2 column presence
+- 4 session lookups: by microsoft_oid, google_sub, email, user_id
+- Internal users list for alias resolution
+- SSO link writes + last login update
+
+**Wiring access.ts**:
+- `getTenantAccessRecordByEmail` → Postgres-first
+- `getTenantAccessRecordByMicrosoftOid` → Postgres-first
+- `getTenantAccessRecordByGoogleSub` → Postgres-first
+- `getTenantAccessRecordByInternalMicrosoftAlias` → Postgres-first (both user list and final lookup)
+- `linkMicrosoftIdentity` → dual-write (Postgres + BigQuery)
+- `linkGoogleIdentity` → dual-write (Postgres + BigQuery)
+- `updateTenantLastLogin` → dual-write (Postgres + BigQuery)
+
+### Verificación
+- `pnpm tsc --noEmit` — 0 errores
+- `pnpm build` — build exitoso
+
+### Riesgos o pendientes
+- DDL y backfill **NO ejecutados** aún en Cloud SQL
+- `getTenantAccessRecordByAllowedEmailDomain` y `verifyTenantPassword` quedan solo BigQuery (no en hot path de login)
+- Writes son dual-write: Postgres + BigQuery hasta full cutover
+- Reads fallan gracefully a BigQuery si Postgres no ready
+
+---
+
 ## 2026-03-15 08:15 America/Santiago
 
 ### Agente
