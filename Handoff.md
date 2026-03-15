@@ -40,6 +40,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 10:20 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Investigar el alert rojo de `Admin > AI Tooling` en `pre-greenhouse` y corregir el fallo backend compartido por catálogo, licencias, wallets y metadata.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Preview
+
+### Archivos tocados
+- `src/lib/ai-tools/schema.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- Identificado el error real en logs de Vercel del deployment detrás de `pre-greenhouse`:
+  - `Query parameter 'subscriptionAmount' not found at [12:13]`
+- La causa estaba en `ensureAiToolingInfrastructure()`:
+  - el seed de `ai_tool_catalog` hacía `MERGE` usando placeholders como `@subscriptionAmount`, `@creditUnitCost`, `@creditsIncludedMonthly`
+  - varios `TOOL_SEEDS` no traían esas propiedades, por lo que BigQuery rechazaba la query antes de responder catálogo, licencias, wallets y metadata
+- Corregido el seed para normalizar todos los parámetros opcionales a `null` antes del `MERGE`, manteniendo tipado `NUMERIC` donde aplica
+
+### Verificación
+- `vercel inspect pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`
+  - correcto
+- `vercel logs dpl_HMokKuF3tKsyY46rn9CwJ1TN544d --scope efeonce-7670142f --no-follow --since 2h --status-code 500 --expand`
+  - confirmó el stack compartido por las 4 rutas
+- `pnpm exec eslint src/lib/ai-tools/schema.ts`
+  - pendiente de correr en este lote
+- `pnpm build`
+  - pendiente de correr en este lote
+
+### Riesgos o pendientes
+- El fix corrige el bootstrap runtime, pero todavía no materializa vendors financieros faltantes como `Microsoft` y `Notion` dentro del dropdown canónico de AI Tooling.
+- Próximo paso recomendado:
+  - validar localmente `eslint` y `build`
+  - hacer `commit + push`
+  - verificar en preview que desaparezca el alert y vuelvan a responder las 4 rutas admin de AI Tooling
+
 ## 2026-03-15 09:46 America/Santiago
 
 ### Agente

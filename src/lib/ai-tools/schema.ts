@@ -418,6 +418,28 @@ const seedTools = async (projectId: string) => {
   }
 
   for (const tool of TOOL_SEEDS) {
+    const toolParams = {
+      toolId: tool.toolId,
+      toolName: tool.toolName,
+      providerId: tool.providerId,
+      vendor: tool.vendor ?? null,
+      toolCategory: tool.toolCategory,
+      toolSubcategory: tool.toolSubcategory ?? null,
+      costModel: tool.costModel,
+      subscriptionAmount: tool.subscriptionAmount ?? null,
+      subscriptionCurrency: tool.subscriptionCurrency ?? null,
+      subscriptionBillingCycle: tool.subscriptionBillingCycle ?? null,
+      subscriptionSeats: tool.subscriptionSeats ?? null,
+      creditUnitName: tool.creditUnitName ?? null,
+      creditUnitCost: tool.creditUnitCost ?? null,
+      creditUnitCurrency: tool.creditUnitCurrency ?? null,
+      creditsIncludedMonthly: tool.creditsIncludedMonthly ?? null,
+      description: tool.description ?? null,
+      websiteUrl: tool.websiteUrl ?? null,
+      isActive: tool.isActive ?? true,
+      sortOrder: tool.sortOrder ?? null
+    }
+
     await bigQuery.query({
       query: `
         MERGE \`${projectId}.greenhouse.ai_tool_catalog\` AS target
@@ -513,7 +535,7 @@ const seedTools = async (projectId: string) => {
             CURRENT_TIMESTAMP()
           )
       `,
-      params: tool,
+      params: toolParams,
       types: {
         subscriptionAmount: 'NUMERIC',
         creditUnitCost: 'NUMERIC'
