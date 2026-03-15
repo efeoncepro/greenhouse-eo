@@ -3,6 +3,37 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-15 HR leave runtime cutover to PostgreSQL
+- `HR > Permisos` se convirtió en el primer dominio operativo del portal que ya usa PostgreSQL en runtime sobre la instancia `greenhouse-pg-dev`.
+- Se agregó el dominio `greenhouse_hr` en Cloud SQL con:
+  - `leave_types`
+  - `leave_balances`
+  - `leave_requests`
+  - `leave_request_actions`
+- El slice migrado ahora resuelve identidad desde el backbone canónico:
+  - `greenhouse_core.client_users`
+  - `greenhouse_core.members`
+- Rutas que ahora prefieren PostgreSQL cuando el ambiente está configurado:
+  - `GET /api/hr/core/meta`
+  - `GET /api/hr/core/leave/balances`
+  - `GET /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+- El resto de `HR Core` dejó de ejecutar `DDL` en request-time:
+  - `ensureHrCoreInfrastructure()` queda como bootstrap explícito
+  - runtime usa `assertHrCoreInfrastructureReady()` como validación no mutante
+- Provisioning ejecutado en datos:
+  - bootstrap único de `greenhouse_hr` en Cloud SQL
+  - bootstrap único de `scripts/setup-hr-core-tables.sql` en BigQuery para dejar `HR Core` listo fuera del request path
+- Infra compartida:
+  - `src/lib/google-credentials.ts` centraliza las credenciales GCP para BigQuery, Cloud SQL connector y media storage
+- Configuración Preview:
+  - la rama `fix/codex-operational-finance` ya tiene env vars de PostgreSQL en Vercel Preview para este corte
+- Boundary vigente:
+  - sólo `HR > Permisos` quedó cortado a PostgreSQL
+  - `departamentos`, `member profile` y `attendance` siguen en BigQuery, pero ya sin bootstraps mutantes en navegación normal
+
 ## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
 - Se agregó la arquitectura de datos objetivo en:
   - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`

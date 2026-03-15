@@ -40,6 +40,90 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-15 10:35 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Hacer el primer cutover real de runtime `BigQuery -> PostgreSQL` usando la nueva base operacional, empezando por `HR > Permisos`, y eliminar el patrón de `DDL` en request-time que venía rompiendo `HR Core`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Development / Preview / Data platform migration
+
+### Archivos tocados
+- `src/lib/google-credentials.ts`
+- `src/lib/bigquery.ts`
+- `src/lib/postgres/client.ts`
+- `src/lib/storage/greenhouse-media.ts`
+- `src/lib/hr-core/postgres-leave-store.ts`
+- `src/lib/hr-core/service.ts`
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- `scripts/setup-postgres-hr-leave.sql`
+- `scripts/setup-postgres-hr-leave.ts`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Cambios realizados
+- Se agregó el primer domain schema operativo sobre Postgres:
+  - `greenhouse_hr.leave_types`
+  - `greenhouse_hr.leave_balances`
+  - `greenhouse_hr.leave_requests`
+  - `greenhouse_hr.leave_request_actions`
+- `HR > Permisos` ahora prefiere PostgreSQL para:
+  - `GET /api/hr/core/meta`
+  - `GET /api/hr/core/leave/balances`
+  - `GET /api/hr/core/leave/requests`
+  - `GET /api/hr/core/leave/requests/[requestId]`
+  - `POST /api/hr/core/leave/requests`
+  - `POST /api/hr/core/leave/requests/[requestId]/review`
+- El store nuevo usa ids canónicos:
+  - `greenhouse_core.client_users`
+  - `greenhouse_core.members`
+- Se agregó outbox operativo en `greenhouse_sync.outbox_events` para creación/revisión de solicitudes.
+- Se centralizó la lectura de credenciales GCP en `src/lib/google-credentials.ts` para reutilizarla en:
+  - BigQuery
+  - Cloud SQL connector
+  - media storage
+- El resto de `HR Core` dejó de usar `ensureHrCoreInfrastructure()` en runtime y ahora usa `assertHrCoreInfrastructureReady()` como validación no mutante.
+- Se ejecutó el bootstrap único de `HR Core` en BigQuery con `scripts/setup-hr-core-tables.sql`.
+- Se ejecutó el bootstrap único del dominio `leave` en Cloud SQL con `scripts/setup-postgres-hr-leave.sql`.
+- Se agregaron env vars de PostgreSQL en `Vercel Preview` para la rama `fix/codex-operational-finance`:
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `GREENHOUSE_POSTGRES_IP_TYPE`
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`
+
+### Verificación
+- `pnpm exec eslint src/lib/google-credentials.ts src/lib/bigquery.ts src/lib/postgres/client.ts src/lib/storage/greenhouse-media.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/service.ts src/views/greenhouse/hr-core/HrLeaveView.tsx scripts/setup-postgres-hr-leave.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `pnpm exec tsx scripts/setup-postgres-hr-leave.ts`
+  - correcto; `15` statements aplicados en Cloud SQL
+- `bq query --use_legacy_sql=false < scripts/setup-hr-core-tables.sql`
+  - correcto; tablas HR Core creadas y columna `daily_required` agregada
+- Smoke de datos:
+  - `greenhouse_hr.leave_types`: `4`
+  - tablas `greenhouse_hr.*` presentes
+  - tablas `greenhouse.departments`, `member_profiles`, `leave_types`, `leave_balances`, `leave_requests`, `leave_request_actions`, `attendance_daily` presentes en BigQuery
+
+### Riesgos o pendientes
+- No se hizo smoke autenticado completo en `pre-greenhouse` después del cutover; el siguiente paso sano es validar con sesión real:
+  - carga de `/hr/leave`
+  - creación de solicitud
+  - revisión approve/reject/cancel
+- `departments`, `member_profiles` y `attendance` siguen en BigQuery; el siguiente corte recomendado es migrarlos al mismo patrón `domain schema + outbox`.
+
 ## 2026-03-15 04:15 America/Santiago
 
 ### Agente

@@ -1,5 +1,8 @@
 import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
-import { Pool } from 'pg'
+import { GoogleAuth } from 'google-auth-library'
+import { Pool, type PoolClient } from 'pg'
+
+import { getGoogleCredentials } from '@/lib/google-credentials'
 
 type GreenhousePostgresConfig = {
   instanceConnectionName: string | null
@@ -62,6 +65,7 @@ export const isGreenhousePostgresConfigured = () => getGreenhousePostgresMissing
 
 const buildPool = async () => {
   const config = getGreenhousePostgresConfig()
+  const credentials = getGoogleCredentials()
 
   if (!isGreenhousePostgresConfigured() || !config.database || !config.user || !config.password) {
     throw new Error(`Greenhouse Postgres is not configured. Missing: ${getGreenhousePostgresMissingConfig().join(', ')}`)
@@ -77,7 +81,16 @@ const buildPool = async () => {
   }
 
   if (config.instanceConnectionName) {
-    globalThis.__greenhousePostgresConnector ??= new Connector()
+    globalThis.__greenhousePostgresConnector ??= new Connector(
+      credentials
+        ? {
+            auth: new GoogleAuth({
+              credentials,
+              scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
+            })
+          }
+        : undefined
+    )
 
     const connectorOptions = await globalThis.__greenhousePostgresConnector.getOptions({
       instanceConnectionName: config.instanceConnectionName,
@@ -109,6 +122,26 @@ export const runGreenhousePostgresQuery = async <T extends Record<string, unknow
   const result = await pool.query<T>(text, values)
 
   return result.rows
+}
+
+export const withGreenhousePostgresTransaction = async <T>(callback: (client: PoolClient) => Promise<T>) => {
+  const pool = await getGreenhousePostgresPool()
+  const client = await pool.connect()
+
+  try {
+    await client.query('BEGIN')
+
+    const result = await callback(client)
+
+    await client.query('COMMIT')
+
+    return result
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined)
+    throw error
+  } finally {
+    client.release()
+  }
 }
 
 export const closeGreenhousePostgres = async () => {

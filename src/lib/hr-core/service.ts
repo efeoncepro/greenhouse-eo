@@ -23,7 +23,16 @@ import type {
 } from '@/types/hr-core'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
-import { ensureHrCoreInfrastructure } from '@/lib/hr-core/schema'
+import { assertHrCoreInfrastructureReady } from '@/lib/hr-core/schema'
+import {
+  createLeaveRequestInPostgres,
+  getHrCoreMetadataFromPostgres,
+  getLeaveRequestByIdFromPostgres,
+  isHrCoreLeavePostgresEnabled,
+  listLeaveBalancesFromPostgres,
+  listLeaveRequestsFromPostgres,
+  reviewLeaveRequestInPostgres
+} from '@/lib/hr-core/postgres-leave-store'
 import {
   HR_ATTENDANCE_STATUSES,
   HR_BANK_ACCOUNT_TYPES,
@@ -308,7 +317,7 @@ const mapMemberProfile = (row: MemberProfileRow, { includeSensitive }: { include
 })
 
 const getActiveDepartmentsInternal = async () => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
 
   const rows = await runHrCoreQuery<DepartmentRow>(
@@ -334,7 +343,7 @@ const getActiveDepartmentsInternal = async () => {
 }
 
 const getLeaveTypesInternal = async () => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
 
   const rows = await runHrCoreQuery<LeaveTypeRow>(
@@ -350,7 +359,7 @@ const getLeaveTypesInternal = async () => {
 }
 
 const getMemberResolverById = async (memberId: string) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const reportsToSelect = memberColumns.has('reports_to') ? 'reports_to' : 'CAST(NULL AS STRING) AS reports_to'
@@ -382,7 +391,7 @@ const getMemberResolverById = async (memberId: string) => {
 }
 
 const resolveMemberByEmail = async (email: string) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
 
@@ -410,7 +419,7 @@ const resolveMemberByEmail = async (email: string) => {
 }
 
 const resolveTenantMember = async (tenant: TenantContext) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const userColumns = await getPeopleTableColumns('greenhouse', 'client_users')
@@ -634,7 +643,7 @@ const adjustBalanceForRequest = async ({
 }
 
 const getLeaveRequestByIdInternal = async (requestId: string) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
 
   const [row] = await runHrCoreQuery<LeaveRequestRow>(
@@ -675,6 +684,10 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
 }
 
 export const getHrCoreMetadata = async (): Promise<HrCoreMetadata> => {
+  if (isHrCoreLeavePostgresEnabled()) {
+    return getHrCoreMetadataFromPostgres()
+  }
+
   const [departments, leaveTypes] = await Promise.all([getActiveDepartmentsInternal(), getLeaveTypesInternal()])
 
   return {
@@ -708,7 +721,7 @@ export const getDepartmentById = async (departmentId: string) => {
 }
 
 export const createDepartment = async (input: CreateDepartmentInput) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const departmentId = slugify(normalizeString(input.departmentId || input.name))
 
@@ -773,7 +786,7 @@ export const createDepartment = async (input: CreateDepartmentInput) => {
 }
 
 export const updateDepartment = async (departmentId: string, input: UpdateDepartmentInput) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const existing = await getDepartmentById(departmentId)
 
@@ -824,7 +837,7 @@ export const getMemberHrProfile = async ({
   memberId: string
 }) => {
   await assertMemberVisibleToTenant(tenant, memberId)
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
 
@@ -897,7 +910,7 @@ export const updateMemberHrProfile = async ({
   input: UpdateHrMemberProfileInput
   actorUserId: string
 }) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
 
   await getMemberResolverById(memberId)
@@ -1104,7 +1117,11 @@ export const listLeaveBalances = async ({
   memberId?: string | null
   year?: number | null
 }): Promise<HrLeaveBalancesResponse> => {
-  await ensureHrCoreInfrastructure()
+  if (isHrCoreLeavePostgresEnabled()) {
+    return listLeaveBalancesFromPostgres({ tenant, memberId, year })
+  }
+
+  await assertHrCoreInfrastructureReady()
   const effectiveYear = year || getCurrentYear()
   const effectiveMemberId = memberId || (isHrAdminTenant(tenant) ? null : (await resolveTenantMember(tenant)).member_id)
 
@@ -1174,7 +1191,11 @@ export const listLeaveRequests = async ({
   status?: string | null
   year?: number | null
 }): Promise<HrLeaveRequestsResponse> => {
-  await ensureHrCoreInfrastructure()
+  if (isHrCoreLeavePostgresEnabled()) {
+    return listLeaveRequestsFromPostgres({ tenant, memberId, status, year })
+  }
+
+  await assertHrCoreInfrastructureReady()
   const currentMember = isHrAdminTenant(tenant) ? null : await resolveTenantMember(tenant)
   const effectiveYear = year || null
   const projectId = getProjectId()
@@ -1255,6 +1276,10 @@ export const getLeaveRequestById = async ({
   tenant: TenantContext
   requestId: string
 }) => {
+  if (isHrCoreLeavePostgresEnabled()) {
+    return getLeaveRequestByIdFromPostgres({ tenant, requestId })
+  }
+
   const request = await getLeaveRequestByIdInternal(requestId)
 
   if (!request) {
@@ -1283,7 +1308,11 @@ export const createLeaveRequest = async ({
   input: CreateLeaveRequestInput
   actorUserId: string
 }) => {
-  await ensureHrCoreInfrastructure()
+  if (isHrCoreLeavePostgresEnabled()) {
+    return createLeaveRequestInPostgres({ tenant, input, actorUserId })
+  }
+
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const currentMember = await resolveTenantMember(tenant)
   const effectiveMemberId = isHrAdminTenant(tenant) ? normalizeString(input.memberId || currentMember.member_id) : String(currentMember.member_id || '')
@@ -1454,7 +1483,11 @@ export const reviewLeaveRequest = async ({
   input: ReviewLeaveRequestInput
   actorUserId: string
 }) => {
-  await ensureHrCoreInfrastructure()
+  if (isHrCoreLeavePostgresEnabled()) {
+    return reviewLeaveRequestInPostgres({ tenant, requestId, input, actorUserId })
+  }
+
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const request = await getLeaveRequestByIdInternal(requestId)
 
@@ -1627,7 +1660,7 @@ export const listAttendance = async ({
   dateTo?: string | null
   status?: string | null
 }): Promise<HrAttendanceResponse> => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const currentMember = isHrAdminTenant(tenant) ? null : await resolveTenantMember(tenant)
   const projectId = getProjectId()
   const filters = ['1 = 1']
@@ -1705,7 +1738,7 @@ export const ingestAttendanceRecords = async ({
   entries: RecordAttendanceInput[]
   recordedBy: string
 }) => {
-  await ensureHrCoreInfrastructure()
+  await assertHrCoreInfrastructureReady()
   const projectId = getProjectId()
   const results: HrAttendanceRecord[] = []
 

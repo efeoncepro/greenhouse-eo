@@ -54,6 +54,19 @@ import { leaveStatusConfig, getLeaveTypeConfig, formatDate } from './helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
+const getHrLeaveErrorMessage = (payload: { error?: string | null; code?: string | null } | null | undefined, fallback: string) => {
+  switch (payload?.code) {
+    case 'HR_CORE_SCHEMA_NOT_READY':
+      return 'HR Core no está inicializado todavía en este ambiente. Ejecuta el bootstrap de BigQuery antes de usar Permisos.'
+    case 'HR_CORE_POSTGRES_SCHEMA_NOT_READY':
+      return 'El store PostgreSQL de permisos no está inicializado todavía en este ambiente.'
+    case 'HR_CORE_POSTGRES_NOT_CONFIGURED':
+      return 'El store PostgreSQL de permisos no está configurado en este ambiente.'
+    default:
+      return payload?.error || fallback
+  }
+}
+
 const HrLeaveView = () => {
   const theme = useTheme()
   const [tab, setTab] = useState('requests')
@@ -95,17 +108,30 @@ const HrLeaveView = () => {
         fetch('/api/hr/core/meta')
       ])
 
-      if (reqRes.ok) setReqData(await reqRes.json())
-      if (balRes.ok) setBalData(await balRes.json())
+      if (reqRes.ok) {
+        setReqData(await reqRes.json())
+      } else {
+        const payload = await reqRes.json().catch(() => null)
+
+        setError(getHrLeaveErrorMessage(payload, 'No fue posible cargar las solicitudes de permiso.'))
+      }
+
+      if (balRes.ok) {
+        setBalData(await balRes.json())
+      } else {
+        const payload = await balRes.json().catch(() => null)
+
+        setError(current => current || getHrLeaveErrorMessage(payload, 'No fue posible cargar los saldos de permisos.'))
+      }
 
       if (metaRes.ok) {
         const meta = await metaRes.json()
 
         setLeaveTypes(meta.leaveTypes ?? [])
       } else {
-        const d = await metaRes.json().catch(() => ({}))
+        const payload = await metaRes.json().catch(() => null)
 
-        setError(d.error || 'No fue posible cargar los tipos de permiso.')
+        setError(current => current || getHrLeaveErrorMessage(payload, 'No fue posible cargar los tipos de permiso.'))
       }
     } catch (err: any) {
       setError(err.message || 'Error cargando datos')

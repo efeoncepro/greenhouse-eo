@@ -277,6 +277,68 @@ Pueden:
 
 ## QA runtime 2026-03-15 — flujos activos
 
+## Hotfix estructural 2026-03-15 — permisos migrados a PostgreSQL
+
+### Qué se corrigió
+
+- `HR > Permisos` dejó de depender de `BigQuery` como store operativo para:
+  - metadata de tipos de permiso
+  - saldos
+  - solicitudes
+  - revisión de solicitudes
+- El dominio migrado ahora usa `Cloud SQL` con ids canónicos:
+  - `greenhouse_core.client_users`
+  - `greenhouse_core.members`
+  - `greenhouse_hr.leave_types`
+  - `greenhouse_hr.leave_balances`
+  - `greenhouse_hr.leave_requests`
+  - `greenhouse_hr.leave_request_actions`
+- Se agregó publicación de eventos operativos en `greenhouse_sync.outbox_events` para el flujo de solicitudes de permiso.
+
+### Qué se corrigió en infraestructura
+
+- `ensureHrCoreInfrastructure()` ya no queda en el request path normal del módulo.
+- `HR Core` ahora usa `assertHrCoreInfrastructureReady()` como validación no mutante para el slice que sigue en BigQuery.
+- Se ejecutó una sola vez `scripts/setup-hr-core-tables.sql` directamente sobre BigQuery para evitar nuevos `table update quota exceeded`.
+- Se ejecutó una sola vez `scripts/setup-postgres-hr-leave.sql` sobre `greenhouse-pg-dev`.
+
+### Contrato runtime nuevo
+
+- si PostgreSQL está configurado:
+  - `meta`
+  - `leave balances`
+  - `leave requests`
+  - `leave review`
+  salen por Postgres
+- si PostgreSQL no está configurado:
+  - el fallback legacy sigue disponible
+  - pero sin `DDL` on-demand en request-time
+
+### Validación ejecutada
+
+- `pnpm exec eslint`
+  - `src/lib/google-credentials.ts`
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/service.ts`
+  - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+  - `scripts/setup-postgres-hr-leave.ts`
+- `pnpm build`
+  - correcto
+- smoke de datos:
+  - `greenhouse_hr.leave_types`: `4` seeds activos
+  - tablas `greenhouse_hr.*` presentes
+  - tablas `greenhouse.*` de HR Core presentes en BigQuery
+
+### Siguiente paso recomendado
+
+- migrar `departments`, `member_profiles` y `attendance` al mismo patrón:
+  - schema de dominio en Postgres
+  - ids anclados a `greenhouse_core`
+  - outbox `Postgres -> BigQuery`
+
 ### Flujos mapeados
 
 - dashboard HR:

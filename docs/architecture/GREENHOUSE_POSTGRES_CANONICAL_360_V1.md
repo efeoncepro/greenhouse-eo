@@ -26,7 +26,7 @@ The target must be:
 
 ## Schema Layout
 
-The initial PostgreSQL layout is split into three schemas.
+The initial PostgreSQL layout is split into three foundational schemas plus domain extensions.
 
 ### 1. `greenhouse_core`
 
@@ -75,6 +75,21 @@ Initial tables:
 Rule:
 - PostgreSQL emits operational truth here
 - workers move those changes into BigQuery conformed/mart layers
+
+### 4. Domain schemas, starting with `greenhouse_hr`
+
+Domain workflows extend the canonical core from dedicated schemas instead of pushing module-specific mutable state back into `greenhouse_core`.
+
+The first extension now materialized is:
+- `greenhouse_hr.leave_types`
+- `greenhouse_hr.leave_balances`
+- `greenhouse_hr.leave_requests`
+- `greenhouse_hr.leave_request_actions`
+
+Rule:
+- domain tables reference `greenhouse_core` anchors
+- write-heavy workflows live here
+- the core identity graph remains shared and stable
 
 ## Canonical Object Placement
 
@@ -195,6 +210,10 @@ Examples:
 - `Finance` can point to `clients.client_id`, `members.member_id`, `providers.provider_id`
 - `AI Tooling` can point to `clients.client_id`, `members.member_id`, `providers.provider_id`
 
+The first runtime cutover already follows this pattern:
+- `HR > Permisos` resolves user and collaborator identity from `greenhouse_core.client_users` and `greenhouse_core.members`
+- `HR > Permisos` stores leave types, balances, requests, and review actions in `greenhouse_hr`
+
 That is the actual platform synergy we want.
 
 ## Serving Views
@@ -261,9 +280,20 @@ The bootstrap created:
 - `greenhouse_core`
 - `greenhouse_serving`
 - `greenhouse_sync`
+- `greenhouse_hr`
 - canonical tables
 - initial `360` views
 - grants for application user `greenhouse_app`
+
+The first operational cutover executed on top of this model is:
+- `GET /api/hr/core/meta`
+- `GET /api/hr/core/leave/balances`
+- `GET /api/hr/core/leave/requests`
+- `GET /api/hr/core/leave/requests/[requestId]`
+- `POST /api/hr/core/leave/requests`
+- `POST /api/hr/core/leave/requests/[requestId]/review`
+
+These routes now prefer PostgreSQL when the environment is configured, while the rest of `HR Core` stops using request-time DDL and falls back to non-mutating schema validation in BigQuery.
 
 ## Immediate Migration Implication
 

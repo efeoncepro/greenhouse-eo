@@ -16,6 +16,7 @@
     "backfill:internal-identity-profiles": "tsx scripts/backfill-internal-identity-profiles.ts",
     "backfill:postgres:canonical-360": "tsx scripts/backfill-postgres-canonical-360.ts",
     "setup:postgres:canonical-360": "tsx scripts/setup-postgres-canonical-360.ts",
+    "setup:postgres:hr-leave": "tsx scripts/setup-postgres-hr-leave.ts",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",
     "clear": "node scripts/clean-paths.mjs node_modules .next-local .next"
@@ -65,6 +66,7 @@
     "cmdk": "1.1.1",
     "date-fns": "4.1.0",
     "emoji-mart": "5.6.0",
+    "google-auth-library": "^10.6.1",
     "input-otp": "1.4.2",
     "keen-slider": "6.8.6",
     "mapbox-gl": "3.17.0",
