@@ -5,6 +5,7 @@ import type { PayrollCompensationMember, PayrollCurrency, PayrollMemberSummary, 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { normalizeBoolean, normalizeNullableString, runPayrollQuery, toDateString, toNumber } from '@/lib/payroll/shared'
+import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import {
   isPayrollPostgresEnabled,
   pgGetPayrollMemberSummary,
@@ -50,7 +51,7 @@ const normalizePayrollMemberSummary = (row: PayrollMemberRow): PayrollMemberSumm
   memberId: String(row.member_id || ''),
   memberName: String(row.display_name || 'Sin nombre'),
   memberEmail: String(row.email || ''),
-  memberAvatarUrl: normalizeNullableString(row.avatar_url),
+  memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
   notionUserId: normalizeNullableString(row.notion_user_id),
   active: normalizeBoolean(row.active)
 })
