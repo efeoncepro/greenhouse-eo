@@ -139,7 +139,17 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH project_sprints AS (
+    WITH delivery_sprints AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.delivery_sprints\`
+      WHERE project_source_id = @projectDetailId
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY sprint_source_id
+        ORDER BY last_edited_time DESC NULLS LAST, synced_at DESC NULLS LAST, sprint_source_id
+      ) = 1
+    ),
+    project_sprints AS (
       SELECT
         sprint_id,
         COUNT(*) AS total_tasks,
@@ -150,11 +160,11 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
       GROUP BY sprint_id
     )
     SELECT
-      s.notion_page_id,
-      s.nombre_del_sprint AS sprint_name,
-      s.estado_del_sprint AS status,
-      s.fechas AS start_date,
-      s.fechas_end AS end_date,
+      COALESCE(ds.sprint_source_id, s.notion_page_id) AS notion_page_id,
+      COALESCE(ds.sprint_name, s.nombre_del_sprint) AS sprint_name,
+      COALESCE(ds.sprint_status, s.estado_del_sprint) AS status,
+      COALESCE(ds.start_date, s.fechas) AS start_date,
+      COALESCE(ds.end_date, s.fechas_end) AS end_date,
       COALESCE(project_sprints.total_tasks, SAFE_CAST(s.total_de_tareas AS INT64), 0) AS total_tasks,
       COALESCE(
         project_sprints.completed_tasks,
@@ -163,16 +173,18 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
       ) AS completed_tasks,
       s.page_url
     FROM project_sprints
-    INNER JOIN \`${projectId}.notion_ops.sprints\` s
+    LEFT JOIN delivery_sprints ds
+      ON ds.sprint_source_id = project_sprints.sprint_id
+    LEFT JOIN \`${projectId}.notion_ops.sprints\` s
       ON s.notion_page_id = project_sprints.sprint_id
     ORDER BY
-      CASE s.estado_del_sprint
+      CASE COALESCE(ds.sprint_status, s.estado_del_sprint)
         WHEN 'Actual' THEN 0
         WHEN 'Siguiente' THEN 1
         WHEN 'Último' THEN 2
         ELSE 3
       END,
-      s.last_edited_time DESC
+      COALESCE(ds.last_edited_time, s.last_edited_time) DESC
     LIMIT 1
   `
 
@@ -215,7 +227,17 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH requested_project AS (
+    WITH delivery_projects AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
+      WHERE project_source_id = @projectDetailId
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY project_source_id
+        ORDER BY last_edited_time DESC NULLS LAST, synced_at DESC NULLS LAST, project_source_id
+      ) = 1
+    ),
+    requested_project AS (
       SELECT @projectDetailId AS notion_page_id
     ),
     scoped_tasks AS (
@@ -244,11 +266,11 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
     )
     SELECT
       requested_project.notion_page_id,
-      COALESCE(p.nombre_del_proyecto, requested_project.notion_page_id) AS project_name,
-      COALESCE(p.estado, 'Unknown') AS status,
+      COALESCE(dp.project_name, p.nombre_del_proyecto, requested_project.notion_page_id) AS project_name,
+      COALESCE(dp.project_status, p.estado, 'Unknown') AS status,
       p.resumen AS summary,
-      p.fechas AS start_date,
-      p.fechas_end AS end_date,
+      COALESCE(dp.start_date, p.fechas) AS start_date,
+      COALESCE(dp.end_date, p.fechas_end) AS end_date,
       COALESCE(task_summary.total_tasks, 0) AS total_tasks,
       COALESCE(task_summary.active_tasks, 0) AS active_tasks,
       COALESCE(task_summary.completed_tasks, 0) AS completed_tasks,
@@ -264,6 +286,8 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
       ) AS progress_value,
       p.page_url
     FROM requested_project
+    LEFT JOIN delivery_projects dp
+      ON dp.project_source_id = requested_project.notion_page_id
     LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
       ON p.notion_page_id = requested_project.notion_page_id
     LEFT JOIN task_summary

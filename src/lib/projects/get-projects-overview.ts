@@ -108,7 +108,17 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH scoped_tasks AS (
+    WITH delivery_projects AS (
+      SELECT *
+      FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
+      WHERE project_source_id IN UNNEST(@projectIds)
+        AND is_deleted = FALSE
+      QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY project_source_id
+        ORDER BY last_edited_time DESC NULLS LAST, synced_at DESC NULLS LAST, project_source_id
+      ) = 1
+    ),
+    scoped_tasks AS (
       SELECT
         proyecto AS notion_page_id,
         estado,
@@ -132,10 +142,10 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
     )
     SELECT
       t.notion_page_id,
-      COALESCE(p.nombre_del_proyecto, t.notion_page_id) AS project_name,
-      COALESCE(p.estado, 'Unknown') AS status,
-      p.fechas AS start_date,
-      p.fechas_end AS end_date,
+      COALESCE(dp.project_name, p.nombre_del_proyecto, t.notion_page_id) AS project_name,
+      COALESCE(dp.project_status, p.estado, 'Unknown') AS status,
+      COALESCE(dp.start_date, p.fechas) AS start_date,
+      COALESCE(dp.end_date, p.fechas_end) AS end_date,
       t.total_tasks,
       t.active_tasks,
       t.completed_tasks,
@@ -147,6 +157,8 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
       ) AS progress_value,
       p.page_url
     FROM task_summary t
+    LEFT JOIN delivery_projects dp
+      ON dp.project_source_id = t.notion_page_id
     LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
       ON p.notion_page_id = t.notion_page_id
     ORDER BY t.active_tasks DESC, t.total_tasks DESC

@@ -31,6 +31,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cuando la proyección canónica ya resuelve el nombre operativo, usarla primero
   - mantener source fallback solo para campos que aún no se materializan en el projection
 
+## Delta 2026-03-15 Projects consumers now prefer delivery metadata first
+- `Projects` ya no depende solo de `notion_ops.proyectos` y `notion_ops.sprints` para metadata base.
+- Los consumers:
+  - `src/lib/projects/get-projects-overview.ts`
+  - `src/lib/projects/get-project-detail.ts`
+  ahora priorizan:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_sprints`
+- Alcance de este corte:
+  - `project_name`, `project_status`, `start_date`, `end_date`
+  - `sprint_name`, `sprint_status`, `start_date`, `end_date`
+- Boundary vigente:
+  - `notion_ops.tareas` sigue siendo necesario para métricas finas de tarea (`rpa`, reviews, blockers, frame comments)
+  - `notion_ops.proyectos` sigue aportando `page_url` y `summary`
+  - `notion_ops.sprints` sigue aportando `page_url` y fallback operativo
+- Regla derivada:
+  - mover primero metadata estructural a `delivery_*`
+  - dejar el cálculo fino en legacy hasta que esos campos también estén proyectados de forma canónica
+
 ## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
 - `Source Sync Runtime Projections` ya materializa contactos CRM en:
   - `greenhouse_conformed.crm_contacts`

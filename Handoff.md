@@ -132,6 +132,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Próximo paso recomendado:
   - seguir con consumers legacy que leen `notion_ops.tareas` o `notion_ops.proyectos`, empezando por `projects`, `dashboard` o `admin` según riesgo.
 
+## 2026-03-15 09:27 America/Santiago
+
+### Agente
+- Codex
+
+### Objetivo del turno
+- Seguir el desacople de consumers legacy en `Projects` sin perder métricas que todavía viven en `notion_ops.tareas`.
+
+### Rama
+- Rama usada: `fix/codex-operational-finance`
+- Rama objetivo del merge: `develop`
+
+### Ambiente objetivo
+- Local development
+
+### Archivos tocados
+- `src/lib/projects/get-projects-overview.ts`
+- `src/lib/projects/get-project-detail.ts`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Cambios realizados
+- `Projects Overview` y `Project Detail` ya priorizan `greenhouse_conformed.delivery_projects` para:
+  - `project_name`
+  - `project_status`
+  - `start_date`
+  - `end_date`
+- `Project Detail` también prioriza `greenhouse_conformed.delivery_sprints` para:
+  - `sprint_name`
+  - `sprint_status`
+  - `start_date`
+  - `end_date`
+- Se mantuvo fallback a `notion_ops.proyectos` y `notion_ops.sprints`.
+- No se tocó aún el uso de `notion_ops.tareas` porque ahí siguen viviendo métricas y señales que todavía no están proyectadas (`rpa`, reviews, blockers, frame comments).
+
+### Verificación
+- `pnpm exec eslint src/lib/projects/get-projects-overview.ts src/lib/projects/get-project-detail.ts`
+  - correcto
+- `pnpm build`
+  - correcto
+- `git diff --check -- src/lib/projects/get-projects-overview.ts src/lib/projects/get-project-detail.ts`
+  - correcto
+
+### Riesgos o pendientes
+- `Projects` sigue siendo híbrido; no está completamente desacoplado de `notion_ops`.
+- Para cortar del todo `projects`, primero hay que proyectar en `delivery_tasks`:
+  - `rpa`
+  - flags de review
+  - `open_frame_comments`
+  - blockers
+  - `page_url`
+- Próximo paso recomendado:
+  - decidir si el siguiente corte va por `dashboard`/`agency` o por enriquecer `delivery_tasks` para poder sacar más consumers de `notion_ops.tareas`.
+
 ## 2026-03-16 ~02:00 America/Santiago
 
 ### Agente
