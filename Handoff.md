@@ -40,6 +40,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-16 ~02:00 America/Santiago
+
+### Agente
+- Claude
+
+### Objetivo del turno
+- Homologar roles V2 en todo el stack TypeScript + frontend. 6 roles nuevos y 3 route groups reconocidos end-to-end.
+
+### Rama
+- `fix/codex-operational-finance`
+
+### Archivos tocados
+- `src/lib/tenant/authorization.ts` — TenantRouteGroup expandido (+my, people, ai_tooling), canAccessPeopleModule actualizado, requireAiToolingTenantContext nuevo
+- `src/lib/tenant/access.ts` — rolePriority (15 roles), deriveRouteGroups (6 branches V2), portalHomePath fallback expandido
+- `src/lib/people/permissions.ts` — people_viewer (read-only assignments/activity), hr_manager (compensation/payroll)
+- `src/views/greenhouse/admin/users/helpers.ts` — iconos y colores para roles V2
+- `src/components/layout/vertical/VerticalMenu.tsx` — isPeopleRouteGroup, isAiToolingUser, nav standalone AI Tooling
+- `scripts/sync-source-runtime-projections.ts` — fix TS: owner_user_id type annotation (pre-existing Codex error)
+
+### Verificación
+- `pnpm tsc --noEmit` — 0 errores
+- `pnpm build` — exitoso
+
+### Cambios clave
+- **Backward compatible**: finance_manager, hr_payroll, employee mantienen exactamente el mismo acceso
+- **Additive**: finance_analyst/finance_admin → finance, hr_manager → hr, people_viewer → people, ai_tooling_admin → ai_tooling, collaborator → my
+- **Postgres canonical**: session_360 ya emite route_groups correctos; TypeScript deriveRouteGroups es solo fallback BigQuery
+
+### Riesgos o pendientes
+- Páginas `/my/*` y `/ai-tools/*` (user-facing) no creadas aún — son tasks separadas
+- DDL y backfill Identity V2 aún no ejecutados en Cloud SQL
+- BigQuery `roles` table necesita los 6 roles V2 para que BigQuery fallback derive route_groups correctamente
+
+---
+
 ## 2026-03-16 ~00:30 America/Santiago
 
 ### Agente

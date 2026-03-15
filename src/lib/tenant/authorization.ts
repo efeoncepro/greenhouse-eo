@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
-export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee'
+export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee' | 'my' | 'people' | 'ai_tooling'
 
 export const isClientTenant = (tenant: TenantContext) => tenant.tenantType === 'client' && Boolean(tenant.clientId)
 
@@ -15,8 +15,9 @@ export const hasRouteGroup = (tenant: TenantContext, routeGroup: TenantRouteGrou
 export const canAccessProject = (tenant: TenantContext, projectId: string) => tenant.projectIds.includes(projectId)
 
 export const canAccessPeopleModule = (tenant: TenantContext) =>
-  hasRouteGroup(tenant, 'internal') &&
-  (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll'))
+  hasRouteGroup(tenant, 'people') ||
+  (hasRouteGroup(tenant, 'internal') &&
+    (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll')))
 
 export const requireTenantContext = async () => {
   const tenant = await getTenantContext()
@@ -206,6 +207,29 @@ export const requireAdminTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'admin') || !hasRoleCode(tenant, 'efeonce_admin')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireAiToolingTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!hasRouteGroup(tenant, 'ai_tooling') && !hasRoleCode(tenant, 'efeonce_admin')) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

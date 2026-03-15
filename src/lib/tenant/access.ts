@@ -95,9 +95,15 @@ const rolePriority = [
   'efeonce_admin',
   'employee',
   'finance_manager',
+  'finance_admin',
+  'finance_analyst',
   'hr_payroll',
+  'hr_manager',
   'efeonce_operations',
   'efeonce_account',
+  'people_viewer',
+  'ai_tooling_admin',
+  'collaborator',
   'client_executive',
   'client_manager',
   'client_specialist'
@@ -163,6 +169,26 @@ const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
       routeGroups.add('admin')
     }
 
+    if (roleCode === 'collaborator') {
+      routeGroups.add('my')
+    }
+
+    if (roleCode === 'hr_manager') {
+      routeGroups.add('hr')
+    }
+
+    if (roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
+      routeGroups.add('finance')
+    }
+
+    if (roleCode === 'people_viewer') {
+      routeGroups.add('people')
+    }
+
+    if (roleCode === 'ai_tooling_admin') {
+      routeGroups.add('ai_tooling')
+    }
+
     if (roleCode.startsWith('client_')) {
       routeGroups.add('client')
     }
@@ -211,7 +237,13 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     timezone: row.timezone || 'UTC',
     portalHomePath:
       row.portal_home_path ||
-      (roleCodes.includes('hr_payroll') ? '/hr/payroll' : tenantType === 'efeonce_internal' ? '/internal/dashboard' : '/dashboard'),
+      (roleCodes.includes('hr_payroll') || roleCodes.includes('hr_manager')
+        ? '/hr/payroll'
+        : roleCodes.includes('finance_analyst') || roleCodes.includes('finance_admin')
+          ? '/finance'
+          : tenantType === 'efeonce_internal'
+            ? '/internal/dashboard'
+            : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',

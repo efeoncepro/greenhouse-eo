@@ -59,10 +59,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
   const isFinanceUser = session?.user?.routeGroups?.includes('finance') ?? false
+  const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
+  const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
   const canSeePeople =
+    isPeopleRouteGroup ||
     roleCodes.includes('efeonce_admin') ||
     roleCodes.includes('efeonce_operations') ||
     roleCodes.includes('hr_payroll')
@@ -192,6 +195,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: GH_HR_NAV.leave.label, href: '/hr/leave' },
         { label: GH_HR_NAV.attendance.label, href: '/hr/attendance' }
       ]
+    })
+  }
+
+  // AI Tooling — standalone entry for ai_tooling_admin users who are not admin
+  if (isAiToolingUser && !isAdminUser) {
+    menuData.push({
+      label: <NavLabel label='AI Tooling' subtitle='Herramientas y créditos IA' show={showSub} />,
+      href: '/admin/ai-tools',
+      icon: 'tabler-robot'
     })
   }
 

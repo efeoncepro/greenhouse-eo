@@ -6,6 +6,17 @@
 
 ## 2026-03-16
 
+### Identity & Access V2 — Role homologation across TypeScript + frontend (Claude)
+- `TenantRouteGroup` type expandido: +`my`, `people`, `ai_tooling` (10 valores total).
+- `rolePriority` expandido a 15 roles (6 V2: collaborator, hr_manager, finance_analyst, finance_admin, people_viewer, ai_tooling_admin).
+- `deriveRouteGroups()` fallback BigQuery cubre los 6 roles V2.
+- `canAccessPeopleModule` ahora acepta route group `'people'` (para `people_viewer`).
+- `requireAiToolingTenantContext` guard nuevo para AI Tooling.
+- People permissions: `people_viewer` (read-only assignments/activity), `hr_manager` (compensation/payroll).
+- VerticalMenu: People y AI Tooling visibles por route group, no solo por role code hardcoded.
+- Admin helpers: iconos y colores para roles V2.
+- Backward compatible: usuarios existentes con `finance_manager`, `hr_payroll`, `employee` sin cambios.
+
 ### Identity & Access V2 — PostgreSQL RBAC model + session resolution wiring (Claude)
 - DDL: `setup-postgres-identity-v2.sql` — ALTER client_users (12 cols SSO/auth/session), scope tables (project, campaign, client), audit_events, client_feature_flags, role seed V2 (6 new roles), session_360 + user_360 views.
 - Backfill: `backfill-postgres-identity-v2.ts` — 6-step migration BigQuery → Postgres (SSO columns, member_id links, role assignments, scopes, feature flags).

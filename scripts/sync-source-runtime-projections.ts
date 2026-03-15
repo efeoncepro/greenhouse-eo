@@ -97,6 +97,22 @@ type HubspotDealRow = {
   hs_archived: boolean | null
 }
 
+type HubspotContactRow = {
+  hs_object_id: string | null
+  assoc_companies: string | null
+  email: string | null
+  firstname: string | null
+  lastname: string | null
+  phone: string | null
+  mobilephone: string | null
+  jobtitle: string | null
+  lifecyclestage: string | null
+  hs_lead_status: string | null
+  hubspot_owner_id: string | null
+  lastmodifieddate: { value?: string } | string | null
+  hs_archived: boolean | null
+}
+
 const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
 const bigQueryLocation = process.env.GREENHOUSE_BIGQUERY_LOCATION || 'US'
 
@@ -189,6 +205,21 @@ const firstCsvValue = (value: string | null) => {
     .find(Boolean)
 
   return first || null
+}
+
+const parseCsvValues = (value: string | null) => {
+  if (!value) {
+    return []
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map(part => part.trim())
+        .filter(Boolean)
+    )
+  )
 }
 
 const buildPayloadHash = (payload: unknown) =>
@@ -983,7 +1014,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
   })
 
   try {
-    const [companies, deals] = await Promise.all([
+    const [companies, deals, contacts] = await Promise.all([
       runBigQuery<HubspotCompanyRow>(
         `
           SELECT
@@ -1020,6 +1051,26 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             hs_is_closed_lost,
             hs_archived
           FROM \`${projectId}.hubspot_crm.deals\`
+          WHERE hs_object_id IS NOT NULL
+        `
+      ),
+      runBigQuery<HubspotContactRow>(
+        `
+          SELECT
+            hs_object_id,
+            assoc_companies,
+            email,
+            firstname,
+            lastname,
+            phone,
+            mobilephone,
+            jobtitle,
+            lifecyclestage,
+            hs_lead_status,
+            hubspot_owner_id,
+            lastmodifieddate,
+            hs_archived
+          FROM \`${projectId}.hubspot_crm.contacts\`
           WHERE hs_object_id IS NOT NULL
         `
       )
@@ -1061,8 +1112,26 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       ingested_date: nowIso.slice(0, 10)
     }))
 
+    const rawContactRows = contacts.map(row => ({
+      sync_run_id: syncRunId,
+      source_system: 'hubspot',
+      source_object_type: 'contact',
+      source_object_id: toNullableString(row.hs_object_id),
+      source_parent_object_id: firstCsvValue(toNullableString(row.assoc_companies)),
+      source_created_at: null,
+      source_updated_at: toTimestampValue(row.lastmodifieddate),
+      source_deleted_at: null,
+      archived: toBoolean(row.hs_archived),
+      is_deleted: toBoolean(row.hs_archived),
+      payload_json: JSON.stringify(row),
+      payload_hash: buildPayloadHash(row),
+      ingested_at: nowIso,
+      ingested_date: nowIso.slice(0, 10)
+    }))
+
     await insertBigQueryRows('greenhouse_raw', 'hubspot_companies_snapshots', rawCompanyRows)
     await insertBigQueryRows('greenhouse_raw', 'hubspot_deals_snapshots', rawDealRows)
+    await insertBigQueryRows('greenhouse_raw', 'hubspot_contacts_snapshots', rawContactRows)
 
     const clientRows = await runGreenhousePostgresQuery<{
       client_id: string
@@ -1106,7 +1175,8 @@ const syncHubspot = async (): Promise<SyncSummary> => {
         company_name: toNullableString(row.name) || 'Sin nombre',
         legal_name: toNullableString(row.name),
         owner_source_id: toNullableString(row.hubspot_owner_id),
-        owner_user_id: null,
+        owner_member_id: null as string | null,
+        owner_user_id: null as string | null,
         lifecycle_stage: toNullableString(row.lifecyclestage),
         industry: toNullableString(row.industry),
         country_code: toNullableString(row.country),
@@ -1120,6 +1190,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
     })
 
     const projectedCompanies = crmCompanies.filter(company => Boolean(company.client_id))
+    const projectedCompanyIds = new Set(projectedCompanies.map(company => company.company_source_id).filter(Boolean))
 
     const crmDeals = deals.map(row => {
       const companySourceId = firstCsvValue(toNullableString(row.assoc_companies))
@@ -1137,7 +1208,8 @@ const syncHubspot = async (): Promise<SyncSummary> => {
         currency: toNullableString(row.deal_currency_code),
         close_date: toDateValue(row.closedate),
         owner_source_id: toNullableString(row.hubspot_owner_id),
-        owner_user_id: null,
+        owner_member_id: null as string | null,
+        owner_user_id: null as string | null,
         module_code: moduleCode,
         module_id: moduleCode ? moduleMap.get(moduleCode) || null : null,
         is_closed_won: toBoolean(row.hs_is_closed_won),
@@ -1152,6 +1224,255 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
     const projectedDeals = crmDeals.filter(deal => Boolean(deal.client_id))
 
+    const runtimeUsers = await runGreenhousePostgresQuery<{
+      user_id: string
+      client_id: string | null
+      email: string | null
+      identity_profile_id: string | null
+    }>(
+      `
+        SELECT user_id, client_id, email, identity_profile_id
+        FROM greenhouse_core.client_users
+        WHERE email IS NOT NULL
+      `
+    )
+
+    const runtimeProfiles = await runGreenhousePostgresQuery<{
+      profile_id: string
+      canonical_email: string | null
+    }>(
+      `
+        SELECT profile_id, canonical_email
+        FROM greenhouse_core.identity_profiles
+      `
+    )
+
+    const hubspotProfileLinks = await runGreenhousePostgresQuery<{
+      profile_id: string
+      source_object_id: string
+    }>(
+      `
+        SELECT profile_id, source_object_id
+        FROM greenhouse_core.identity_profile_source_links
+        WHERE source_system = 'hubspot'
+          AND source_object_type = 'contact'
+      `
+    )
+
+    const hubspotUserLinks = await runGreenhousePostgresQuery<{
+      entity_id: string
+      source_object_id: string
+    }>(
+      `
+        SELECT entity_id, source_object_id
+        FROM greenhouse_core.entity_source_links
+        WHERE entity_type = 'user'
+          AND source_system = 'hubspot'
+          AND source_object_type = 'contact'
+      `
+    )
+
+    const userById = new Map(runtimeUsers.map(user => [user.user_id, user]))
+    const userByClientEmail = new Map<string, typeof runtimeUsers>()
+
+    for (const user of runtimeUsers) {
+      const email = toNullableString(user.email)?.toLowerCase()
+      const clientId = toNullableString(user.client_id)
+
+      if (!email || !clientId) {
+        continue
+      }
+
+      const key = `${clientId}::${email}`
+      const existing = userByClientEmail.get(key) || []
+
+      userByClientEmail.set(key, [...existing, user])
+    }
+
+    const uniqueUserByClientEmail = new Map<string, (typeof runtimeUsers)[number]>()
+
+    for (const [key, users] of userByClientEmail.entries()) {
+      if (users.length === 1) {
+        uniqueUserByClientEmail.set(key, users[0])
+      }
+    }
+
+    const profileByEmail = new Map<string, typeof runtimeProfiles>()
+
+    for (const profile of runtimeProfiles) {
+      const email = toNullableString(profile.canonical_email)?.toLowerCase()
+
+      if (!email) {
+        continue
+      }
+
+      const existing = profileByEmail.get(email) || []
+
+      profileByEmail.set(email, [...existing, profile])
+    }
+
+    const uniqueProfileByEmail = new Map<string, (typeof runtimeProfiles)[number]>()
+
+    for (const [email, profiles] of profileByEmail.entries()) {
+      if (profiles.length === 1) {
+        uniqueProfileByEmail.set(email, profiles[0])
+      }
+    }
+
+    const uniqueUserByEmail = new Map<string, (typeof runtimeUsers)[number]>()
+    const usersByEmail = new Map<string, typeof runtimeUsers>()
+
+    for (const user of runtimeUsers) {
+      const email = toNullableString(user.email)?.toLowerCase()
+
+      if (!email) {
+        continue
+      }
+
+      const existing = usersByEmail.get(email) || []
+
+      usersByEmail.set(email, [...existing, user])
+    }
+
+    for (const [email, users] of usersByEmail.entries()) {
+      if (users.length === 1) {
+        uniqueUserByEmail.set(email, users[0])
+      }
+    }
+
+    const profileByHubspotContactId = new Map(
+      hubspotProfileLinks.map(link => [link.source_object_id, link.profile_id] as const)
+    )
+
+    const userByHubspotContactId = new Map(
+      hubspotUserLinks.map(link => [link.source_object_id, link.entity_id] as const)
+    )
+
+    const ownerMemberRows = await runBigQuery<{
+      member_id: string | null
+      email: string | null
+      hubspot_owner_id: string | null
+    }>(
+      `
+        SELECT member_id, email, hubspot_owner_id
+        FROM \`${projectId}.greenhouse.team_members\`
+        WHERE hubspot_owner_id IS NOT NULL
+      `
+    )
+
+    const ownerMemberBySourceId = new Map<string, { memberId: string; email: string | null }>()
+
+    for (const row of ownerMemberRows) {
+      const ownerSourceId = toNullableString(row.hubspot_owner_id)
+      const memberId = toNullableString(row.member_id)
+
+      if (!ownerSourceId || !memberId) {
+        continue
+      }
+
+      ownerMemberBySourceId.set(ownerSourceId, {
+        memberId,
+        email: toNullableString(row.email)?.toLowerCase() || null
+      })
+    }
+
+    for (const company of crmCompanies) {
+      const owner = company.owner_source_id ? ownerMemberBySourceId.get(company.owner_source_id) || null : null
+
+      company.owner_member_id = owner?.memberId || null
+      company.owner_user_id = owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+    }
+
+    for (const deal of crmDeals) {
+      const owner = deal.owner_source_id ? ownerMemberBySourceId.get(deal.owner_source_id) || null : null
+
+      deal.owner_member_id = owner?.memberId || null
+      deal.owner_user_id = owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+    }
+
+    const resolvePrimaryCompanySourceId = (assocCompanies: string | null) => {
+      const candidates = parseCsvValues(assocCompanies)
+
+      for (const candidate of candidates) {
+        if (projectedCompanyIds.has(candidate)) {
+          return candidate
+        }
+      }
+
+      return null
+    }
+
+    const crmContacts = contacts
+      .map(row => {
+        const contactSourceId = toNullableString(row.hs_object_id)
+        const associatedCompanySourceIds = parseCsvValues(toNullableString(row.assoc_companies))
+        const companySourceId = resolvePrimaryCompanySourceId(toNullableString(row.assoc_companies))
+        const clientId = companySourceId ? companyClientMap.get(companySourceId) || null : null
+        const email = toNullableString(row.email)?.toLowerCase() || null
+        const canonicalUserId = contactSourceId ? `user-hubspot-contact-${contactSourceId}` : null
+
+        const linkedByCanonicalUser =
+          canonicalUserId && userById.has(canonicalUserId) ? userById.get(canonicalUserId) || null : null
+
+        const linkedBySourceLink =
+          contactSourceId && userByHubspotContactId.has(contactSourceId)
+            ? userById.get(userByHubspotContactId.get(contactSourceId) || '') || null
+            : null
+
+        const linkedByEmail =
+          clientId && email ? uniqueUserByClientEmail.get(`${clientId}::${email}`) || null : null
+
+        const linkedUser = linkedByCanonicalUser || linkedBySourceLink || linkedByEmail
+
+        const linkedIdentityProfileId =
+          linkedUser?.identity_profile_id ||
+          (contactSourceId ? profileByHubspotContactId.get(contactSourceId) || null : null) ||
+          (email ? uniqueProfileByEmail.get(email)?.profile_id || null : null)
+
+        const firstName = toNullableString(row.firstname)
+        const lastName = toNullableString(row.lastname)
+
+        const displayName =
+          [firstName, lastName].filter(Boolean).join(' ').trim() || email || `HubSpot Contact ${contactSourceId || ''}`.trim()
+
+        return {
+          contact_source_id: contactSourceId,
+          company_source_id: companySourceId,
+          associated_company_source_ids: associatedCompanySourceIds,
+          client_id: clientId,
+          linked_user_id: linkedUser?.user_id || null,
+          linked_identity_profile_id: linkedIdentityProfileId,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          display_name: displayName,
+          job_title: toNullableString(row.jobtitle),
+          phone: toNullableString(row.phone),
+          mobile_phone: toNullableString(row.mobilephone),
+          lifecycle_stage: toNullableString(row.lifecyclestage),
+          lead_status: toNullableString(row.hs_lead_status),
+          owner_source_id: toNullableString(row.hubspot_owner_id),
+          owner_member_id:
+            toNullableString(row.hubspot_owner_id)
+              ? ownerMemberBySourceId.get(toNullableString(row.hubspot_owner_id) || '')?.memberId || null
+              : null,
+          owner_user_id:
+            toNullableString(row.hubspot_owner_id)
+              ? (() => {
+                  const owner = ownerMemberBySourceId.get(toNullableString(row.hubspot_owner_id) || '')
+
+                  return owner?.email ? uniqueUserByEmail.get(owner.email)?.user_id || null : null
+                })()
+              : null,
+          updated_at: toTimestampValue(row.lastmodifieddate),
+          payload_hash: buildPayloadHash(row),
+          is_deleted: toBoolean(row.hs_archived),
+          sync_run_id: syncRunId,
+          synced_at: nowIso
+        }
+      })
+      .filter(contact => Boolean(contact.company_source_id && contact.client_id))
+
     await Promise.all([
       bigQuery.query({
         query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.crm_companies\``,
@@ -1160,11 +1481,16 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       bigQuery.query({
         query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.crm_deals\``,
         location: bigQueryLocation
+      }),
+      bigQuery.query({
+        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.crm_contacts\``,
+        location: bigQueryLocation
       })
     ])
 
     await insertBigQueryRows('greenhouse_conformed', 'crm_companies', crmCompanies)
     await insertBigQueryRows('greenhouse_conformed', 'crm_deals', crmDeals)
+    await insertBigQueryRows('greenhouse_conformed', 'crm_contacts', crmContacts)
 
     await runGreenhousePostgresQuery(
       `
@@ -1180,6 +1506,13 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       `
     )
 
+    await runGreenhousePostgresQuery(
+      `
+        DELETE FROM greenhouse_crm.contacts
+        WHERE client_id IS NULL
+      `
+    )
+
     let projected = 0
 
     for (const company of projectedCompanies) {
@@ -1191,6 +1524,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             hubspot_company_id,
             company_name,
             legal_name,
+            owner_member_id,
             owner_user_id,
             lifecycle_stage,
             industry,
@@ -1203,12 +1537,13 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE, $11, $12::timestamptz, $13::timestamptz, $14, $15)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE, $12, $13::timestamptz, $14::timestamptz, $15, $16)
           ON CONFLICT (hubspot_company_id) DO UPDATE
           SET
             client_id = EXCLUDED.client_id,
             company_name = EXCLUDED.company_name,
             legal_name = EXCLUDED.legal_name,
+            owner_member_id = EXCLUDED.owner_member_id,
             owner_user_id = EXCLUDED.owner_user_id,
             lifecycle_stage = EXCLUDED.lifecycle_stage,
             industry = EXCLUDED.industry,
@@ -1228,6 +1563,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
           company.company_source_id,
           company.company_name,
           company.legal_name,
+          company.owner_member_id,
           company.owner_user_id,
           company.lifecycle_stage,
           company.industry,
@@ -1260,6 +1596,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             amount,
             currency,
             close_date,
+            owner_member_id,
             owner_user_id,
             is_closed_won,
             is_closed_lost,
@@ -1269,7 +1606,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::date, $14, $15, $16, $17, $18::timestamptz, $19::timestamptz, $20, $21)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::date, $14, $15, $16, $17, $18, $19::timestamptz, $20::timestamptz, $21, $22)
           ON CONFLICT (hubspot_deal_id) DO UPDATE
           SET
             client_id = EXCLUDED.client_id,
@@ -1283,6 +1620,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
             amount = EXCLUDED.amount,
             currency = EXCLUDED.currency,
             close_date = EXCLUDED.close_date,
+            owner_member_id = EXCLUDED.owner_member_id,
             owner_user_id = EXCLUDED.owner_user_id,
             is_closed_won = EXCLUDED.is_closed_won,
             is_closed_lost = EXCLUDED.is_closed_lost,
@@ -1307,6 +1645,7 @@ const syncHubspot = async (): Promise<SyncSummary> => {
           deal.amount,
           deal.currency,
           deal.close_date,
+          deal.owner_member_id,
           deal.owner_user_id,
           deal.is_closed_won,
           deal.is_closed_lost,
@@ -1320,15 +1659,227 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       projected += 1
     }
 
-    const hubspotWatermark = [...companies, ...deals]
-      .map(row => toTimestampValue(row.hs_lastmodifieddate))
+    for (const contact of crmContacts) {
+      let linkedIdentityProfileId = contact.linked_identity_profile_id
+
+      if (contact.linked_user_id && !linkedIdentityProfileId && contact.contact_source_id) {
+        linkedIdentityProfileId = `profile-hubspot-contact-${contact.contact_source_id}`
+
+        await runGreenhousePostgresQuery(
+          `
+            INSERT INTO greenhouse_core.identity_profiles (
+              profile_id,
+              profile_type,
+              canonical_email,
+              full_name,
+              job_title,
+              status,
+              active,
+              default_auth_mode,
+              primary_source_system,
+              primary_source_object_type,
+              primary_source_object_id,
+              notes
+            )
+            VALUES ($1, 'external_contact', $2, $3, $4, 'active', TRUE, 'hubspot_contact', 'hubspot', 'contact', $5, 'Created by source sync contact reconciliation.')
+            ON CONFLICT (profile_id) DO UPDATE
+            SET
+              canonical_email = EXCLUDED.canonical_email,
+              full_name = EXCLUDED.full_name,
+              job_title = EXCLUDED.job_title,
+              status = EXCLUDED.status,
+              active = EXCLUDED.active,
+              primary_source_system = EXCLUDED.primary_source_system,
+              primary_source_object_type = EXCLUDED.primary_source_object_type,
+              primary_source_object_id = EXCLUDED.primary_source_object_id,
+              notes = EXCLUDED.notes,
+              updated_at = CURRENT_TIMESTAMP
+          `,
+          [
+            linkedIdentityProfileId,
+            contact.email,
+            contact.display_name,
+            contact.job_title,
+            contact.contact_source_id
+          ]
+        )
+      }
+
+      if (linkedIdentityProfileId && contact.contact_source_id) {
+        await runGreenhousePostgresQuery(
+          `
+            INSERT INTO greenhouse_core.identity_profile_source_links (
+              link_id,
+              profile_id,
+              source_system,
+              source_object_type,
+              source_object_id,
+              source_email,
+              source_display_name,
+              is_primary,
+              is_login_identity,
+              active
+            )
+            VALUES ($1, $2, 'hubspot', 'contact', $3, $4, $5, TRUE, FALSE, TRUE)
+            ON CONFLICT (profile_id, source_system, source_object_type, source_object_id) DO UPDATE
+            SET
+              source_email = EXCLUDED.source_email,
+              source_display_name = EXCLUDED.source_display_name,
+              is_primary = EXCLUDED.is_primary,
+              active = EXCLUDED.active,
+              updated_at = CURRENT_TIMESTAMP
+          `,
+          [
+            `profile-link-hubspot-contact-${contact.contact_source_id}`,
+            linkedIdentityProfileId,
+            contact.contact_source_id,
+            contact.email,
+            contact.display_name
+          ]
+        )
+      }
+
+      if (contact.linked_user_id && contact.contact_source_id) {
+        await runGreenhousePostgresQuery(
+          `
+            INSERT INTO greenhouse_core.entity_source_links (
+              link_id,
+              entity_type,
+              entity_id,
+              source_system,
+              source_object_type,
+              source_object_id,
+              source_display_name,
+              is_primary,
+              active
+            )
+            VALUES ($1, 'user', $2, 'hubspot', 'contact', $3, $4, TRUE, TRUE)
+            ON CONFLICT (entity_type, entity_id, source_system, source_object_type, source_object_id) DO UPDATE
+            SET
+              source_display_name = EXCLUDED.source_display_name,
+              is_primary = EXCLUDED.is_primary,
+              active = EXCLUDED.active,
+              updated_at = CURRENT_TIMESTAMP
+          `,
+          [
+            `user-link-hubspot-contact-${contact.contact_source_id}`,
+            contact.linked_user_id,
+            contact.contact_source_id,
+            contact.display_name
+          ]
+        )
+
+        if (linkedIdentityProfileId) {
+          await runGreenhousePostgresQuery(
+            `
+              UPDATE greenhouse_core.client_users
+              SET
+                identity_profile_id = COALESCE(identity_profile_id, $2),
+                updated_at = CURRENT_TIMESTAMP
+              WHERE user_id = $1
+            `,
+            [contact.linked_user_id, linkedIdentityProfileId]
+          )
+        }
+      }
+
+      await runGreenhousePostgresQuery(
+        `
+          INSERT INTO greenhouse_crm.contacts (
+            contact_record_id,
+            client_id,
+            company_record_id,
+            linked_user_id,
+            linked_identity_profile_id,
+            hubspot_contact_id,
+            hubspot_primary_company_id,
+            hubspot_associated_company_ids,
+            email,
+            first_name,
+            last_name,
+            display_name,
+            job_title,
+            phone,
+            mobile_phone,
+            lifecycle_stage,
+            lead_status,
+            owner_member_id,
+            owner_user_id,
+            active,
+            is_deleted,
+            source_updated_at,
+            synced_at,
+            sync_run_id,
+            payload_hash
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::text[], $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, TRUE, $20, $21::timestamptz, $22::timestamptz, $23, $24)
+          ON CONFLICT (hubspot_contact_id) DO UPDATE
+          SET
+            client_id = EXCLUDED.client_id,
+            company_record_id = EXCLUDED.company_record_id,
+            linked_user_id = EXCLUDED.linked_user_id,
+            linked_identity_profile_id = EXCLUDED.linked_identity_profile_id,
+            hubspot_primary_company_id = EXCLUDED.hubspot_primary_company_id,
+            hubspot_associated_company_ids = EXCLUDED.hubspot_associated_company_ids,
+            email = EXCLUDED.email,
+            first_name = EXCLUDED.first_name,
+            last_name = EXCLUDED.last_name,
+            display_name = EXCLUDED.display_name,
+            job_title = EXCLUDED.job_title,
+            phone = EXCLUDED.phone,
+            mobile_phone = EXCLUDED.mobile_phone,
+            lifecycle_stage = EXCLUDED.lifecycle_stage,
+            lead_status = EXCLUDED.lead_status,
+            owner_member_id = EXCLUDED.owner_member_id,
+            owner_user_id = EXCLUDED.owner_user_id,
+            active = EXCLUDED.active,
+            is_deleted = EXCLUDED.is_deleted,
+            source_updated_at = EXCLUDED.source_updated_at,
+            synced_at = EXCLUDED.synced_at,
+            sync_run_id = EXCLUDED.sync_run_id,
+            payload_hash = EXCLUDED.payload_hash,
+            updated_at = CURRENT_TIMESTAMP
+        `,
+        [
+          `crm-contact-${contact.contact_source_id}`,
+          contact.client_id,
+          contact.company_source_id ? `crm-company-${contact.company_source_id}` : null,
+          contact.linked_user_id,
+          linkedIdentityProfileId,
+          contact.contact_source_id,
+          contact.company_source_id,
+          contact.associated_company_source_ids,
+          contact.email,
+          contact.first_name,
+          contact.last_name,
+          contact.display_name,
+          contact.job_title,
+          contact.phone,
+          contact.mobile_phone,
+          contact.lifecycle_stage,
+          contact.lead_status,
+          contact.owner_member_id,
+          contact.owner_user_id,
+          contact.is_deleted,
+          contact.updated_at,
+          contact.synced_at,
+          syncRunId,
+          contact.payload_hash
+        ]
+      )
+      projected += 1
+    }
+
+    const hubspotWatermark = [...companies, ...deals, ...contacts]
+      .map(row => toTimestampValue('lastmodifieddate' in row ? row.lastmodifieddate : row.hs_lastmodifieddate))
       .filter((value): value is string => Boolean(value))
       .sort()
       .at(-1) || null
 
     await Promise.all([
       writeWatermark({ sourceSystem: 'hubspot', sourceObjectType: 'companies', value: hubspotWatermark, syncRunId }),
-      writeWatermark({ sourceSystem: 'hubspot', sourceObjectType: 'deals', value: hubspotWatermark, syncRunId })
+      writeWatermark({ sourceSystem: 'hubspot', sourceObjectType: 'deals', value: hubspotWatermark, syncRunId }),
+      writeWatermark({ sourceSystem: 'hubspot', sourceObjectType: 'contacts', value: hubspotWatermark, syncRunId })
     ])
 
     await writeSyncRun({
@@ -1336,9 +1887,9 @@ const syncHubspot = async (): Promise<SyncSummary> => {
       sourceSystem: 'hubspot',
       sourceObjectType: 'runtime_projection_seed',
       status: 'succeeded',
-      recordsRead: companies.length + deals.length,
-      recordsWrittenRaw: rawCompanyRows.length + rawDealRows.length,
-      recordsWrittenConformed: crmCompanies.length + crmDeals.length,
+      recordsRead: companies.length + deals.length + contacts.length,
+      recordsWrittenRaw: rawCompanyRows.length + rawDealRows.length + rawContactRows.length,
+      recordsWrittenConformed: crmCompanies.length + crmDeals.length + crmContacts.length,
       recordsProjectedPostgres: projected,
       watermarkEndValue: hubspotWatermark,
       notes: 'Seeded runtime projections from hubspot_crm.'
@@ -1346,9 +1897,9 @@ const syncHubspot = async (): Promise<SyncSummary> => {
 
     return {
       syncRunId,
-      recordsRead: companies.length + deals.length,
-      recordsWrittenRaw: rawCompanyRows.length + rawDealRows.length,
-      recordsWrittenConformed: crmCompanies.length + crmDeals.length,
+      recordsRead: companies.length + deals.length + contacts.length,
+      recordsWrittenRaw: rawCompanyRows.length + rawDealRows.length + rawContactRows.length,
+      recordsWrittenConformed: crmCompanies.length + crmDeals.length + crmContacts.length,
       recordsProjectedPostgres: projected,
       watermarkEndValue: hubspotWatermark
     }
