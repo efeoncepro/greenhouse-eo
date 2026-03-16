@@ -82,6 +82,7 @@ CREATE INDEX IF NOT EXISTS finance_exchange_rates_pair_idx
 CREATE TABLE IF NOT EXISTS greenhouse_finance.client_profiles (
   client_profile_id TEXT PRIMARY KEY,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id),
+  organization_id TEXT REFERENCES greenhouse_core.organizations(organization_id),
   hubspot_company_id TEXT,
   tax_id TEXT,
   tax_id_type TEXT,
@@ -106,6 +107,9 @@ CREATE INDEX IF NOT EXISTS finance_client_profiles_client_idx
 
 CREATE INDEX IF NOT EXISTS finance_client_profiles_hubspot_idx
   ON greenhouse_finance.client_profiles (hubspot_company_id);
+
+CREATE INDEX IF NOT EXISTS finance_client_profiles_org_idx
+  ON greenhouse_finance.client_profiles (organization_id);
 
 -- ------------------------------------------------------------
 -- 5. income — invoices emitted to clients

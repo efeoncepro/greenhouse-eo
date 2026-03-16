@@ -55,6 +55,7 @@ export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
   compensation: ['efeonce_admin', 'hr_payroll'],
   payroll: ['efeonce_admin', 'hr_payroll'],
   finance: ['efeonce_admin', 'finance_manager'],
+  memberships: ['efeonce_admin', 'efeonce_operations'],
   'hr-profile': ['efeonce_admin', 'hr_payroll'],
   'ai-tools': ['efeonce_admin', 'efeonce_operations']
 }
@@ -65,6 +66,7 @@ export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }
   { value: 'compensation', label: 'Compensación', icon: 'tabler-cash' },
   { value: 'payroll', label: 'Nómina', icon: 'tabler-receipt-2' },
   { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
+  { value: 'memberships', label: 'Organizaciones', icon: 'tabler-building' },
   { value: 'hr-profile', label: 'Perfil HR', icon: 'tabler-user-heart' },
   { value: 'ai-tools', label: 'AI Tools', icon: 'tabler-wand' }
 ]
