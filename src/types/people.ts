@@ -185,6 +185,14 @@ export interface PersonFinanceOverview {
     payrollEntryId: string | null
     createdAt: string | null
   }>
+  costAttribution?: Array<{
+    clientId: string
+    clientName: string
+    fteAllocation: number
+    attributedCostClp: number
+    periodYear: number
+    periodMonth: number
+  }>
 }
 
 export interface PeopleMetaPayload {

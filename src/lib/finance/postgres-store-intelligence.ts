@@ -361,3 +361,71 @@ export const listClientEconomicsByPeriod = async (
 
   return rows.map(mapClientEconomics)
 }
+
+/**
+ * Returns client economics snapshots across multiple periods for trend analysis.
+ * If clientId is provided, returns only that client's history.
+ * Otherwise returns all clients for the last N months.
+ */
+export const listClientEconomicsTrend = async (
+  clientId: string | null,
+  months: number
+): Promise<ClientEconomicsRecord[]> => {
+  await assertFinanceSlice2PostgresReady()
+
+  // Compute period range: from (now - months) to now
+  const now = new Date()
+  const endYear = now.getFullYear()
+  const endMonth = now.getMonth() + 1
+
+  let startYear = endYear
+  let startMonth = endMonth - months + 1
+
+  while (startMonth < 1) {
+    startMonth += 12
+    startYear -= 1
+  }
+
+  if (clientId) {
+    const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
+      `
+        SELECT
+          snapshot_id, client_id, client_name,
+          period_year, period_month,
+          total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+          gross_margin_clp, gross_margin_percent,
+          net_margin_clp, net_margin_percent,
+          headcount_fte, revenue_per_fte, cost_per_fte,
+          notes, computed_at, created_at, updated_at
+        FROM greenhouse_finance.client_economics
+        WHERE client_id = $1
+          AND (period_year > $2 OR (period_year = $2 AND period_month >= $3))
+          AND (period_year < $4 OR (period_year = $4 AND period_month <= $5))
+        ORDER BY period_year ASC, period_month ASC
+      `,
+      [clientId, startYear, startMonth, endYear, endMonth]
+    )
+
+    return rows.map(mapClientEconomics)
+  }
+
+  const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
+    `
+      SELECT
+        snapshot_id, client_id, client_name,
+        period_year, period_month,
+        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        gross_margin_clp, gross_margin_percent,
+        net_margin_clp, net_margin_percent,
+        headcount_fte, revenue_per_fte, cost_per_fte,
+        notes, computed_at, created_at, updated_at
+      FROM greenhouse_finance.client_economics
+      WHERE (period_year > $1 OR (period_year = $1 AND period_month >= $2))
+        AND (period_year < $3 OR (period_year = $3 AND period_month <= $4))
+      ORDER BY client_name ASC, period_year ASC, period_month ASC
+    `,
+    [startYear, startMonth, endYear, endMonth]
+  )
+
+  return rows.map(mapClientEconomics)
+}

@@ -12,6 +12,7 @@ import {
   getClientEconomics,
   listClientEconomicsByPeriod
 } from '@/lib/finance/postgres-store-intelligence'
+import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,6 +115,20 @@ export async function POST(request: Request) {
       [periodStart, periodEnd]
     )
 
+    // FTE-weighted labor costs from payroll + assignments
+    let laborCosts: Awaited<ReturnType<typeof computeClientLaborCosts>> = []
+
+    try {
+      laborCosts = await computeClientLaborCosts(year, month)
+    } catch {
+      // Non-blocking: if the view doesn't exist yet or assignments are empty, proceed without
+    }
+
+    // Build FTE lookup
+    const fteMap = new Map<string, { fte: number; laborClp: number }>(
+      laborCosts.map(lc => [lc.clientId, { fte: lc.headcountFte, laborClp: lc.allocatedLaborClp }])
+    )
+
     // Merge all clients
     const clientMap = new Map<string, {
       clientName: string
@@ -150,6 +165,18 @@ export async function POST(request: Request) {
       }
     }
 
+    // Merge labor costs into client map (add as direct cost — this is payroll allocated to client)
+    for (const lc of laborCosts) {
+      const existing = clientMap.get(lc.clientId) || {
+        clientName: lc.clientName,
+        revenue: 0,
+        directCosts: 0,
+        indirectCosts: 0
+      }
+      existing.directCosts += lc.allocatedLaborClp
+      clientMap.set(lc.clientId, existing)
+    }
+
     // Upsert snapshots
     const results = []
 
@@ -157,6 +184,9 @@ export async function POST(request: Request) {
       const totalCosts = roundCurrency(data.directCosts + data.indirectCosts)
       const grossMargin = roundCurrency(data.revenue - data.directCosts)
       const netMargin = roundCurrency(data.revenue - totalCosts)
+
+      const fteData = fteMap.get(clientId)
+      const fte = fteData?.fte ?? null
 
       const snapshot = await upsertClientEconomicsSnapshot({
         clientId,
@@ -170,9 +200,9 @@ export async function POST(request: Request) {
         grossMarginPercent: data.revenue > 0 ? roundCurrency((grossMargin / data.revenue) * 10000) / 10000 : null,
         netMarginClp: netMargin,
         netMarginPercent: data.revenue > 0 ? roundCurrency((netMargin / data.revenue) * 10000) / 10000 : null,
-        headcountFte: null,
-        revenuePerFte: null,
-        costPerFte: null,
+        headcountFte: fte,
+        revenuePerFte: fte && fte > 0 ? roundCurrency(data.revenue / fte) : null,
+        costPerFte: fte && fte > 0 ? roundCurrency(totalCosts / fte) : null,
         notes: null
       })
 

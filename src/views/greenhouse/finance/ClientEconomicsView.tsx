@@ -279,6 +279,7 @@ const ClientEconomicsView = () => {
   }
 
   // Derived values
+  const totalFte = snapshots.reduce((sum, s) => sum + (s.headcountFte ?? 0), 0)
   const totalRevenue = snapshots.reduce((sum, s) => sum + s.totalRevenueClp, 0)
 
   const avgGrossMargin = snapshots.length > 0
@@ -422,7 +423,7 @@ const ClientEconomicsView = () => {
           <HorizontalWithSubtitle
             title='Spaces analizados'
             stats={String(snapshots.length)}
-            subtitle='del período seleccionado'
+            subtitle={totalFte > 0 ? `${totalFte.toFixed(1)} FTE asignados` : 'del período seleccionado'}
             avatarIcon='tabler-building-store'
             avatarColor='info'
           />
@@ -580,6 +581,8 @@ const ClientEconomicsView = () => {
                     </TableSortLabel>
                   </TableCell>
                   <TableCell align='center'>FTE</TableCell>
+                  <TableCell align='right'>Ingreso/FTE</TableCell>
+                  <TableCell align='right'>Costo/FTE</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -622,6 +625,16 @@ const ClientEconomicsView = () => {
                     <TableCell align='center'>
                       <Typography variant='body2'>
                         {snap.headcountFte != null ? snap.headcountFte.toFixed(1) : '—'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {snap.revenuePerFte != null ? formatCLP(snap.revenuePerFte) : '—'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {snap.costPerFte != null ? formatCLP(snap.costPerFte) : '—'}
                       </Typography>
                     </TableCell>
                   </TableRow>

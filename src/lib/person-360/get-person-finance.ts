@@ -70,6 +70,15 @@ type IdentityLinkRow = {
   source_display_name: string | null
 }
 
+type CostAttributionRow = {
+  client_id: string
+  client_name: string
+  fte_allocation: string | number
+  allocated_labor_clp: string | number
+  period_year: string | number
+  period_month: string | number
+}
+
 // ── Helpers ──
 
 const toNum = (v: unknown): number => {
@@ -141,7 +150,7 @@ const buildFinanceOverview = async (
   displayNameHint: string | null
 ): Promise<PersonFinanceOverview> => {
   // Run summary + detail queries in parallel
-  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows] = await Promise.all([
+  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows, costAttributionRows] = await Promise.all([
     runGreenhousePostgresQuery<FinanceSummaryRow>(
       `SELECT * FROM greenhouse_serving.person_finance_360
        WHERE member_id = $1
@@ -215,7 +224,21 @@ const buildFinanceOverview = async (
       WHERE a.member_id = $1
       ORDER BY a.active DESC, a.start_date DESC`,
       [memberId]
-    ).catch(() => [] as AssignmentRow[])
+    ).catch(() => [] as AssignmentRow[]),
+    runGreenhousePostgresQuery<CostAttributionRow>(
+      `SELECT
+        client_id,
+        client_name,
+        fte_contribution AS fte_allocation,
+        allocated_labor_clp,
+        period_year,
+        period_month
+      FROM greenhouse_serving.client_labor_cost_allocation
+      WHERE member_id = $1
+      ORDER BY period_year DESC, period_month DESC, allocated_labor_clp DESC
+      LIMIT 20`,
+      [memberId]
+    ).catch(() => [] as CostAttributionRow[])
   ])
 
   const summary = summaryRows[0]
@@ -279,6 +302,14 @@ const buildFinanceOverview = async (
       serviceLine: str(r.service_line),
       payrollEntryId: str(r.payroll_entry_id),
       createdAt: r.created_at
+    })),
+    costAttribution: costAttributionRows.map(r => ({
+      clientId: r.client_id,
+      clientName: r.client_name,
+      fteAllocation: toNum(r.fte_allocation),
+      attributedCostClp: toNum(r.allocated_labor_clp),
+      periodYear: toNum(r.period_year),
+      periodMonth: toNum(r.period_month)
     }))
   }
 }
