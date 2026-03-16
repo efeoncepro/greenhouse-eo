@@ -1,6 +1,53 @@
-# Changelog — Financial Intelligence Layer
+# Changelog
 
-Registro de cambios implementados como parte del CODEX_TASK_Financial_Intelligence_Layer.
+Registro de cambios principales de Greenhouse EO.
+
+---
+
+## Account 360 Phase 2 — Organization 360 UI + Identity Reconciliation (2026-03-16)
+
+### Nuevas funcionalidades
+
+- **Identity Reconciliation** — Script que vincula `client_users` sin `identity_profile_id` a identity profiles existentes por email, o crea perfiles nuevos. Genera memberships automáticamente.
+- **Finance Bridge** — FK `organization_id` en `greenhouse_finance.client_profiles` con backfill via `spaces.client_id`.
+- **Organization Store** — `organization-store.ts` con CRUD completo: list (paginado + search), detail, update, memberships.
+- **API Layer** — 4 endpoints: `/api/organizations`, `/api/organizations/[id]`, `/api/organizations/[id]/memberships`, `/api/people/[memberId]/memberships`.
+- **Organization List View** (`/agency/organizations`) — Tabla paginada con KPI cards (orgs, spaces, memberships, personas), búsqueda por nombre/ID, paginación server-side.
+- **Organization 360 Detail** (`/agency/organizations/[id]`) — Layout Grid 4/8 con sidebar (identidad, stats, fiscal, HubSpot) + tabs (Resumen, Personas, Finanzas).
+- **Person Memberships Tab** — Nueva pestaña "Organizaciones" en Person 360 que muestra las memberships de la persona con links a Organization 360.
+- **Navigation** — "Organizaciones" en la sección Agencia del sidebar.
+
+### Scripts
+
+| Script | Propósito |
+|--------|-----------|
+| `reconcile-identity-profiles.ts` | Reconcilia client_users → identity_profiles por email |
+| `setup-postgres-finance-bridge-m33.ts` | Agrega organization_id FK a client_profiles |
+
+### Archivos nuevos (19 archivos)
+
+- `src/lib/account-360/organization-store.ts`
+- `src/app/api/organizations/route.ts`, `[id]/route.ts`, `[id]/memberships/route.ts`
+- `src/app/api/people/[memberId]/memberships/route.ts`
+- `src/app/(dashboard)/agency/organizations/page.tsx`, `[id]/page.tsx`
+- `src/views/greenhouse/organizations/` (8 archivos: View, Sidebar, Tabs, types, 3 tab components)
+- `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx`
+
+### Archivos modificados (7 archivos)
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/types/people.ts` | +`'memberships'` en PersonTab |
+| `src/views/greenhouse/people/helpers.ts` | Tab config + permisos |
+| `src/views/greenhouse/people/PersonTabs.tsx` | TabPanel memberships |
+| `src/lib/people/permissions.ts` | `canViewMemberships` |
+| `src/lib/people/get-people-meta.ts` | supportedTabs |
+| `src/components/layout/vertical/VerticalMenu.tsx` | Nav item Organizaciones |
+| `src/config/greenhouse-nomenclature.ts` | GH_AGENCY_NAV.organizations |
+
+### Documentación
+
+- `docs/architecture/ACCOUNT_360_IMPLEMENTATION_V1.md` — Guía de implementación completa
 
 ---
 
