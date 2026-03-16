@@ -15,11 +15,11 @@ El Servicio es la unidad comercial atómica de Efeonce: lo que se vende, lo que 
 Los servicios nacen en **HubSpot** (objeto Services, `objectTypeId: 0-162`) como resultado del ciclo comercial (Product → Deal → Service). Una vez creados, se sincronizan a **PostgreSQL (Cloud SQL)** que actúa como capa transaccional y fuente de verdad operativa para Greenhouse. La gestión diaria (CRUD, cambios de pipeline, asociaciones) ocurre contra PostgreSQL, con write-back async a HubSpot para mantener el CRM actualizado. **BigQuery** se alimenta vía ETL nocturno desde PostgreSQL y sirve como capa OLAP para dashboards, métricas ICO agregadas, y cross-analysis con otros datasets.
 
 **Arquitectura de datos de Greenhouse (decisión transversal):**
-- **PostgreSQL (Cloud SQL):** Capa OLTP. Toda la data transaccional: `services`, `clients`, `fin_*`, `payroll_*`, `compensation_*`. CRUD en tiempo real desde la app.
-- **BigQuery:** Capa OLAP. Analytics, reporting, dashboards. Se alimenta de PostgreSQL (ETL nocturno) y de syncs directos (Notion, HubSpot CRM). JOINs analíticos entre datasets.
-- **HubSpot:** Origen comercial. Products, Deals, Services, Companies. Sync bidireccional con PostgreSQL para Services.
+- **PostgreSQL (Cloud SQL):** Capa OLTP y fuente de verdad operativa. Toda la data transaccional: `services`, `clients`, `fin_*`, `payroll_*`, `compensation_*`, **y capabilities** (las tablas `service_modules` y `client_service_modules` ya existen en `greenhouse_core`; `identity-store.ts` ya lee de PostgreSQL para la sesión). Con la tabla `services`, las capabilities se derivan automáticamente de los servicios activos asignados a un Space/Client, eliminando la escritura manual en `client_service_modules`.
+- **BigQuery:** Capa OLAP. Analytics, reporting, cross-analysis. Se alimenta de syncs directos (Notion, HubSpot CRM via Cloud Function `hubspot-bq-sync`). Las tablas `greenhouse.client_service_modules` y `greenhouse.service_modules` en BigQuery son **legacy fallback** y serán deprecadas. El ETL PG→BQ es **nueva infraestructura a crear** (no existe actualmente).
+- **HubSpot:** Origen comercial. Products, Deals, Services, Companies. Sync bidireccional: inbound vía Cloud Run service `hubspot-greenhouse-integration` (repo `cesargrowth11/hubspot-bigquery`), outbound async vía write-back queue en PostgreSQL procesada por el mismo servicio.
 
-**Cambio respecto a Capabilities Architecture v1:** En la v1, las capabilities se resolvían desde dos propiedades string en el objeto Company (`linea_de_servicio` + `servicios_especificos`). En esta v2, las capabilities se resuelven desde registros individuales de Services activos en PostgreSQL, asociados al Space (tenant) del cliente. Esto aporta temporalidad, granularidad financiera, y estado de pipeline que el modelo anterior no tenía.
+**Cambio respecto a Capabilities Architecture v1:** En la v1, las capabilities se resolvían desde dos propiedades string en el objeto Company (`linea_de_servicio` + `servicios_especificos`) y se almacenaban manualmente en `client_service_modules` (que ya existe en PostgreSQL `greenhouse_core`). En esta v2, las capabilities se **derivan automáticamente** de registros individuales de Services activos en PostgreSQL, asociados al Space (tenant) del cliente. La tabla `services` se convierte en la fuente de verdad para capabilities: una vista `v_client_active_modules` deriva los módulos activos desde los servicios, y `loadServiceModules()` en `identity-store.ts` lee de esta vista para construir el TenantContext. `resolveCapabilityModules()` sigue recibiendo `{ businessLines, serviceModules }` y matcheando contra el registry estático — zero breaking changes en sidebar/guards. Lo que cambia es **de dónde vienen** esos arrays: ya no de una tabla manual, sino derivados de servicios activos.
 
 ---
 
@@ -130,6 +130,8 @@ Greenhouse: resolución de capabilities + módulos + métricas
 | Moneda | `ef_currency` | Enumeration (single) | `CLP`, `USD` | Moneda del contrato |
 | País de operación | `ef_country` | Enumeration (single) | `CL`, `CO`, `MX`, `PE` | País donde se ejecuta el servicio |
 | Notion Project ID | `ef_notion_project_id` | STRING | — | ID del proyecto en Notion asociado a este servicio |
+| Space ID | `ef_space_id` | STRING | — | ID del Space de Greenhouse una vez sincronizado. Permite el bridge Space→Organization |
+| Organization ID | `ef_organization_id` | STRING | — | ID de Organization en Greenhouse (query rápido, evita JOIN con spaces) |
 
 ### 3.4 Catálogo de servicios específicos
 
@@ -162,130 +164,91 @@ En la v1, una Capability era un módulo que se encendía por string match. Ahora
 
 El paquete es la **unidad de producto** de Efeonce — cómo se empaquetan los servicios para entregar valor integrado. No se vende directamente; lo que se vende son los servicios individuales. Pero el cliente experimenta el valor a nivel de paquete.
 
-### 4.2 Capability Registry v2
+### 4.2 Capabilities derivadas de Services (migración del modelo)
 
-```typescript
-// /src/config/capability-registry.ts
+> **Corrección arquitectónica**: La sección original proponía un registry completamente nuevo (`CapabilityPackage`, `ServiceRequirement`, `resolveCapabilities()` v2). En la arquitectura real, **ya existen** las piezas de capabilities en PostgreSQL y el sistema de resolución actual funciona correctamente. Lo que cambia es **de dónde vienen los datos**, no cómo se resuelven.
 
-export interface ServiceRequirement {
-  serviceKey: string           // ef_servicio_especifico value
-  required: boolean            // TRUE = obligatorio para activar el paquete
-                               // FALSE = enriquece el módulo si está presente
-}
+**Estado actual de la infraestructura (ya existente en PostgreSQL):**
 
-export interface CapabilityPackage {
-  id: string                   // Identificador único del paquete
-  label: string                // Nombre visible en sidebar
-  icon: string                 // Ícono MUI para sidebar
-  route: string                // Ruta en el portal
-  services: ServiceRequirement[] // Servicios que componen este paquete
-  activationRule: 'any_required' | 'all_required' | 'minimum'
-  minimumServices?: number     // Solo si activationRule = 'minimum'
-  cards: CapabilityCard[]      // Cards que componen el módulo
-  dataSources: DataSourceRef[] // Fuentes de datos que consulta (PostgreSQL para OLTP, BigQuery para analytics)
-  priority: number             // Orden en el sidebar
-}
+| Componente | Ubicación | Función |
+|---|---|---|
+| `greenhouse_core.service_modules` | `scripts/setup-postgres-canonical-360.sql` L187-198 | Catálogo de módulos (module_id, module_code, business_line, active) |
+| `greenhouse_core.client_service_modules` | `scripts/setup-postgres-canonical-360.sql` L200-212 | Asignaciones cliente→módulo (client_id, module_id, active) — **actualmente escritas manualmente** |
+| `loadServiceModules(clientId)` | `src/lib/tenant/identity-store.ts` L107-125 | Ya lee de PostgreSQL para session init |
+| `resolveCapabilityModules()` | `src/lib/capabilities/resolve-capabilities.ts` | Matchea `{ businessLines, serviceModules }` contra registry estático |
+| `capability-registry.ts` | `src/config/capability-registry.ts` | Define 4 módulos con `requiredBusinessLines` y `requiredServiceModules` |
+| BigQuery `greenhouse.client_service_modules` | `src/lib/tenant/access.ts` L298-331 | **Legacy fallback** — se usa solo si PostgreSQL no tiene datos |
 
-export interface CapabilityGroup {
-  lineaDeServicio: string      // Valor de linea_de_servicio en Company
-  label: string                // Nombre visible del grupo
-  icon: string                 // Ícono del grupo
-  packages: CapabilityPackage[] // Paquetes disponibles para esta línea
-}
+**Modelo nuevo — Services como fuente de verdad para Capabilities:**
+
+La tabla `services` (§5.1) contiene `linea_de_servicio` y `servicio_especifico` por cada servicio activo. La derivación es:
+
+1. **`services` (PostgreSQL)** almacena cada servicio contratado por un Space
+   - `linea_de_servicio` → mapea a `business_line` en `service_modules`
+   - `servicio_especifico` → mapea a `module_code` en `service_modules`
+
+2. **Vista derivada** que reemplaza la escritura manual en `client_service_modules`:
+
+```sql
+-- Los módulos activos de un cliente se derivan de sus servicios activos
+-- Esta vista ya está definida en §5.1 como v_client_active_modules
+CREATE OR REPLACE VIEW greenhouse_core.v_client_active_modules AS
+SELECT DISTINCT
+  s.space_id,
+  sp.client_id,
+  sm.module_id,
+  sm.module_code,
+  sm.business_line
+FROM greenhouse_core.services s
+JOIN greenhouse_core.spaces sp ON sp.space_id = s.space_id
+JOIN greenhouse_core.service_modules sm
+  ON sm.module_code = s.servicio_especifico AND sm.active = TRUE
+WHERE s.active = TRUE
+  AND s.pipeline_stage IN ('active', 'renewal_pending', 'renewed');
 ```
 
-### 4.3 Lógica de resolución v2
+3. **`loadServiceModules(clientId)`** en `identity-store.ts` se actualiza para leer de esta vista (o query equivalente) en lugar de `client_service_modules` directamente
 
-```typescript
-// /src/lib/resolve-capabilities.ts
+4. **`resolveCapabilityModules()` NO cambia** — sigue recibiendo `{ businessLines, serviceModules }` del TenantContext y matcheando contra el registry estático. Zero breaking changes en sidebar/guards.
 
-export interface ActiveService {
-  serviceId: string            // PostgreSQL UUID
-  hubspotServiceId: string | null // hs_object_id (null si aún no sincronizado)
-  serviceKey: string           // servicio_especifico
-  pipelineStage: string        // Stage actual del pipeline
-  startDate: string | null     // Fecha de inicio
-  endDate: string | null       // Fecha de fin
-  totalCost: number | null     // Valor total
-  amountPaid: number | null    // Monto pagado
-  modalidad: string | null     // continua | sprint | proyecto
-  notionProjectId: string | null
-  spaceId: string              // UUID del Space (tenant)
-}
+5. **`capability-registry.ts` NO cambia** — sigue definiendo la presentación (cards, dataSources, icons, themes). Lo que cambia es la fuente de activación.
 
-export interface ResolvedPackage {
-  package: CapabilityPackage
-  activeServices: ActiveService[]  // Services del cliente que matchean
-  completeness: number             // 0-1: qué porcentaje de services tiene
-  status: 'onboarding' | 'active' | 'renewal' | 'partial'
-}
+6. **`client_service_modules` tabla** se mantiene como fallback/override manual pero ya NO es la fuente primaria. La vista derivada de `services` tiene precedencia.
 
-export function resolveCapabilities(
-  lineaDeServicio: string,
-  clientServices: ActiveService[]
-): ResolvedPackage[] {
+### 4.3 Compatibilidad y transición
 
-  // 1. Encontrar el grupo de la línea de servicio
-  const group = CAPABILITY_REGISTRY.find(
-    g => g.lineaDeServicio === lineaDeServicio
-  )
-  if (!group) return []
+**Qué NO cambia:**
+- `resolveCapabilityModules({ businessLines, serviceModules })` — misma signature, misma lógica
+- `capability-registry.ts` — mismas definiciones de módulos, cards, dataSources
+- Sidebar, guards, route access — todo se resuelve desde TenantContext como hoy
+- BigQuery legacy path en `access.ts` — se mantiene como fallback de último recurso
 
-  // 2. Solo considerar services con stages operativos
-  const operationalServices = clientServices.filter(s =>
-    ['onboarding', 'active', 'renewal_pending', 'paused'].includes(s.pipelineStage)
-  )
+**Qué SÍ cambia:**
+- `loadServiceModules(clientId)` lee primero de `v_client_active_modules`; si vacía, fallback a `client_service_modules`
+- Las capabilities son un reflejo automático de los servicios activos — no requieren mantenimiento manual
+- Cuando todos los clientes tengan sus servicios registrados, se corta el fallback a `client_service_modules`
 
-  // 3. Evaluar cada paquete contra los services del cliente
-  const resolved: ResolvedPackage[] = []
+**Estrategia de UNION durante transición:**
+```sql
+-- loadServiceModules() durante la transición
+-- Lee de la vista derivada + fallback a asignaciones manuales
+SELECT DISTINCT module_code, business_line
+FROM (
+  -- Fuente primaria: derivada de services activos
+  SELECT sm.module_code, sm.business_line
+  FROM greenhouse_core.v_client_active_modules v
+  JOIN greenhouse_core.service_modules sm ON sm.module_id = v.module_id
+  WHERE v.client_id = $1
 
-  for (const pkg of group.packages) {
-    const matchedServices = operationalServices.filter(s =>
-      pkg.services.some(req => req.serviceKey === s.serviceKey)
-    )
+  UNION
 
-    if (matchedServices.length === 0) continue
-
-    // Evaluar regla de activación
-    const requiredServices = pkg.services.filter(s => s.required)
-    const requiredMatched = requiredServices.filter(req =>
-      matchedServices.some(ms => ms.serviceKey === req.serviceKey)
-    )
-
-    let activated = false
-    switch (pkg.activationRule) {
-      case 'any_required':
-        activated = requiredMatched.length > 0
-        break
-      case 'all_required':
-        activated = requiredMatched.length === requiredServices.length
-        break
-      case 'minimum':
-        activated = matchedServices.length >= (pkg.minimumServices || 1)
-        break
-    }
-
-    if (!activated) continue
-
-    // Calcular completeness y status
-    const completeness = matchedServices.length / pkg.services.length
-    const stages = matchedServices.map(s => s.pipelineStage)
-    const status = stages.every(s => s === 'onboarding') ? 'onboarding'
-      : stages.some(s => s === 'renewal_pending') ? 'renewal'
-      : completeness < 1 ? 'partial'
-      : 'active'
-
-    resolved.push({
-      package: pkg,
-      activeServices: matchedServices,
-      completeness,
-      status
-    })
-  }
-
-  // 4. Ordenar por prioridad
-  return resolved.sort((a, b) => a.package.priority - b.package.priority)
-}
+  -- Fallback: asignaciones manuales (legacy)
+  SELECT sm.module_code, sm.business_line
+  FROM greenhouse_core.client_service_modules csm
+  JOIN greenhouse_core.service_modules sm ON sm.module_id = csm.module_id
+  WHERE csm.client_id = $1 AND csm.active = TRUE AND sm.active = TRUE
+) combined;
+```
 ```
 
 ### 4.4 Ejemplo de paquetes por línea
@@ -317,129 +280,156 @@ export function resolveCapabilities(
 
 ## 5. Modelo de datos
 
-### 5.1 Capa OLTP: PostgreSQL (Cloud SQL) — Tabla `services`
+### 5.1 Capa OLTP: PostgreSQL (Cloud SQL) — Tabla `greenhouse_core.services`
 
 Fuente de verdad operativa. Greenhouse lee y escribe aquí en tiempo real.
 
+**Convenciones del proyecto (Account 360):**
+- Schema: `greenhouse_core` (todas las tablas transaccionales)
+- PKs: `TEXT` (IDs generados en app, no UUID auto-generado)
+- Public ID: `TEXT UNIQUE` con prefijo `EO-SVC-XXXX`
+- Soft delete: `active BOOLEAN NOT NULL DEFAULT TRUE`
+- FKs: `TEXT` matching el tipo de la tabla referenciada
+- Trigger: reusar `update_timestamp_trigger()` existente en Account 360 M0
+- `amount_remaining`: eliminado — calcular como `total_cost - amount_paid` en queries
+
 ```sql
-CREATE TABLE services (
+CREATE TABLE IF NOT EXISTS greenhouse_core.services (
   -- Identidad
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  hubspot_service_id VARCHAR(50) UNIQUE,    -- hs_object_id del Service record en HubSpot (NULL si creado en GH primero)
-  name VARCHAR(255) NOT NULL,               -- Nombre del servicio
-  
+  service_id TEXT PRIMARY KEY,              -- ID generado en app (ej: svc-20260316-123456)
+  public_id TEXT UNIQUE,                    -- EO-SVC-XXXX (display ID para UI)
+  hubspot_service_id TEXT UNIQUE,           -- hs_object_id del Service record en HubSpot (NULL si creado en GH primero)
+  name TEXT NOT NULL,                       -- Nombre del servicio
+
   -- Relaciones
-  space_id UUID NOT NULL REFERENCES spaces(id),           -- Tenant (client Space)
-  hubspot_company_id VARCHAR(50),           -- HubSpot Company ID asociada
-  hubspot_deal_id VARCHAR(50),              -- Deal de origen
-  
+  space_id TEXT NOT NULL REFERENCES greenhouse_core.spaces(space_id),  -- Tenant (client Space)
+  organization_id TEXT REFERENCES greenhouse_core.organizations(organization_id),  -- FK directa para queries rápidos (pattern M3.3)
+  hubspot_company_id TEXT,                  -- HubSpot Company ID asociada
+  hubspot_deal_id TEXT,                     -- Deal de origen
+
   -- Pipeline
-  pipeline_stage VARCHAR(50) NOT NULL DEFAULT 'onboarding',  -- onboarding | active | renewal_pending | renewed | closed | paused
-  
+  pipeline_stage TEXT NOT NULL DEFAULT 'onboarding'
+    CHECK (pipeline_stage IN ('onboarding','active','renewal_pending','renewed','closed','paused')),
+
   -- Temporalidad
   start_date DATE,                          -- Fecha de inicio del servicio
   target_end_date DATE,                     -- Fecha de fin contractual
-  
+
   -- Financiero
-  total_cost DECIMAL(14,2),                 -- Valor total del servicio
-  amount_paid DECIMAL(14,2) DEFAULT 0,      -- Monto pagado a la fecha
-  amount_remaining DECIMAL(14,2),           -- Saldo pendiente (puede ser computed)
-  currency VARCHAR(3) NOT NULL DEFAULT 'CLP', -- CLP | USD
-  
+  total_cost NUMERIC(14,2),                 -- Valor total del servicio
+  amount_paid NUMERIC(14,2) DEFAULT 0,      -- Monto pagado a la fecha
+  currency TEXT NOT NULL DEFAULT 'CLP',     -- CLP | USD
+
   -- Clasificación Efeonce
-  linea_de_servicio VARCHAR(50) NOT NULL,   -- globe | efeonce_digital | reach | wave | crm_solutions
-  servicio_especifico VARCHAR(100) NOT NULL, -- Valor del catálogo (ver §3.4)
-  modalidad VARCHAR(30) DEFAULT 'continua', -- continua | sprint | proyecto
-  billing_frequency VARCHAR(20) DEFAULT 'monthly', -- monthly | quarterly | project
-  country VARCHAR(2) DEFAULT 'CL',         -- ISO 3166-1 alpha-2
-  
+  linea_de_servicio TEXT NOT NULL
+    CHECK (linea_de_servicio IN ('globe','efeonce_digital','reach','wave','crm_solutions')),
+  servicio_especifico TEXT NOT NULL,         -- Valor del catálogo (ver §3.4)
+  modalidad TEXT DEFAULT 'continua'
+    CHECK (modalidad IN ('continua','sprint','proyecto')),
+  billing_frequency TEXT DEFAULT 'monthly'
+    CHECK (billing_frequency IN ('monthly','quarterly','project')),
+  country TEXT DEFAULT 'CL',                -- ISO 3166-1 alpha-2
+
   -- Vínculos operativos
-  notion_project_id VARCHAR(100),           -- ID del proyecto en Notion asociado
-  
+  notion_project_id TEXT,                   -- ID del proyecto en Notion asociado
+
   -- Sync con HubSpot
   hubspot_last_synced_at TIMESTAMPTZ,       -- Último sync exitoso con HubSpot
-  hubspot_sync_status VARCHAR(20) DEFAULT 'pending', -- pending | synced | error | conflict
-  hubspot_sync_direction VARCHAR(10),       -- inbound (HS→PG) | outbound (PG→HS)
-  
+  hubspot_sync_status TEXT DEFAULT 'pending', -- pending | synced | error | conflict
+
   -- Metadata
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID,                          -- Usuario que creó el registro
-  updated_by UUID                           -- Último usuario que modificó
+  active BOOLEAN NOT NULL DEFAULT TRUE,     -- Soft delete (convención del proyecto)
+  status TEXT NOT NULL DEFAULT 'active',
+  created_by TEXT,                          -- User ID que creó el registro
+  updated_by TEXT,                          -- Último user ID que modificó
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Índices para queries frecuentes
-CREATE INDEX idx_services_space_id ON services(space_id);
-CREATE INDEX idx_services_pipeline_stage ON services(pipeline_stage);
-CREATE INDEX idx_services_linea ON services(linea_de_servicio);
-CREATE INDEX idx_services_servicio ON services(servicio_especifico);
-CREATE INDEX idx_services_hubspot_id ON services(hubspot_service_id);
-CREATE INDEX idx_services_company_id ON services(hubspot_company_id);
+CREATE INDEX IF NOT EXISTS idx_services_space_id ON greenhouse_core.services(space_id);
+CREATE INDEX IF NOT EXISTS idx_services_org_id ON greenhouse_core.services(organization_id);
+CREATE INDEX IF NOT EXISTS idx_services_pipeline_stage ON greenhouse_core.services(pipeline_stage);
+CREATE INDEX IF NOT EXISTS idx_services_linea ON greenhouse_core.services(linea_de_servicio);
+CREATE INDEX IF NOT EXISTS idx_services_servicio ON greenhouse_core.services(servicio_especifico);
+CREATE INDEX IF NOT EXISTS idx_services_hubspot_id ON greenhouse_core.services(hubspot_service_id);
 
--- Trigger para updated_at
-CREATE OR REPLACE FUNCTION update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
+-- Trigger: reusar update_timestamp_trigger() existente (scripts/setup-postgres-account-360-m0.sql)
 CREATE TRIGGER services_updated_at
-  BEFORE UPDATE ON services
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+  BEFORE UPDATE ON greenhouse_core.services
+  FOR EACH ROW EXECUTE FUNCTION update_timestamp_trigger();
+
+-- Vista derivada: capabilities se resuelven desde servicios activos
+CREATE OR REPLACE VIEW greenhouse_core.v_client_active_modules AS
+SELECT DISTINCT
+  s.space_id,
+  sp.client_id,
+  sm.module_id,
+  sm.module_code,
+  sm.business_line
+FROM greenhouse_core.services s
+JOIN greenhouse_core.spaces sp ON sp.space_id = s.space_id
+JOIN greenhouse_core.service_modules sm
+  ON sm.module_code = s.servicio_especifico AND sm.active = TRUE
+WHERE s.active = TRUE
+  AND s.pipeline_stage IN ('active', 'renewal_pending', 'renewed');
 ```
 
-### 5.2 Tabla auxiliar: `service_sync_queue`
+> **Nota:** `loadServiceModules(clientId)` en `src/lib/tenant/identity-store.ts` se actualizará para leer de `v_client_active_modules` con fallback a `client_service_modules` durante la transición.
 
-Cola de cambios pendientes de sincronizar con HubSpot (write-back async).
+### 5.2 Tabla auxiliar: `greenhouse_sync.service_sync_queue`
+
+Cola de cambios pendientes de sincronizar con HubSpot (write-back async). Vive en schema `greenhouse_sync` (alineado con `greenhouse_sync.outbox_events` existente). Considerar si la tabla genérica `outbox_events` ya cubre este caso.
 
 ```sql
-CREATE TABLE service_sync_queue (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id),
-  operation VARCHAR(20) NOT NULL,           -- create | update | delete
+CREATE TABLE IF NOT EXISTS greenhouse_sync.service_sync_queue (
+  queue_id TEXT PRIMARY KEY,
+  service_id TEXT NOT NULL REFERENCES greenhouse_core.services(service_id),
+  operation TEXT NOT NULL,                  -- create | update | delete
   payload JSONB NOT NULL,                   -- Properties a sincronizar
-  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending | processing | completed | failed
+  status TEXT NOT NULL DEFAULT 'pending',   -- pending | processing | completed | failed
   attempts INT DEFAULT 0,
   last_error TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   processed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_sync_queue_status ON service_sync_queue(status);
+CREATE INDEX IF NOT EXISTS idx_sync_queue_status ON greenhouse_sync.service_sync_queue(status);
 ```
 
-### 5.3 Tabla auxiliar: `service_history`
+### 5.3 Tabla auxiliar: `greenhouse_core.service_history`
 
-Historial de cambios de pipeline stage para auditoría y analytics.
+Historial de cambios de pipeline stage para auditoría y analytics. Alineado con `audit_events` existente.
 
 ```sql
-CREATE TABLE service_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  service_id UUID NOT NULL REFERENCES services(id),
-  field_changed VARCHAR(100) NOT NULL,      -- 'pipeline_stage', 'total_cost', etc.
+CREATE TABLE IF NOT EXISTS greenhouse_core.service_history (
+  history_id TEXT PRIMARY KEY,
+  service_id TEXT NOT NULL REFERENCES greenhouse_core.services(service_id),
+  field_changed TEXT NOT NULL,              -- 'pipeline_stage', 'total_cost', etc.
   old_value TEXT,
   new_value TEXT,
-  changed_by UUID,
-  changed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  changed_by TEXT,                          -- User ID
+  changed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_service_history_service ON service_history(service_id);
-CREATE INDEX idx_service_history_field ON service_history(field_changed);
+CREATE INDEX IF NOT EXISTS idx_service_history_service ON greenhouse_core.service_history(service_id);
+CREATE INDEX IF NOT EXISTS idx_service_history_field ON greenhouse_core.service_history(field_changed);
 ```
 
-### 5.4 Capa OLAP: BigQuery — Tabla `greenhouse_olap.services`
+### 5.4 Capa OLAP: BigQuery — Tabla `greenhouse_conformed.services`
 
-ETL nocturno desde PostgreSQL. Se usa para dashboards, reportes, y JOINs analíticos con otros datasets.
+**NOTA:** El ETL PG→BQ es **nueva infraestructura a crear** — no existe actualmente. Los datasets existentes son: `greenhouse_raw`, `greenhouse_conformed`, `greenhouse_marts`, `greenhouse`. Usar `greenhouse_conformed` para alinearse con entidades conformadas existentes.
 
 ```sql
--- BigQuery DDL (destino del ETL nocturno)
-CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse_olap.services` (
-  id STRING NOT NULL,
+-- BigQuery DDL (destino del ETL nocturno — INFRA NUEVA)
+-- NO usar DEFAULT en BigQuery CREATE TABLE (no soportado)
+CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse_conformed.services` (
+  service_id STRING NOT NULL,
+  public_id STRING,
   hubspot_service_id STRING,
   name STRING,
   space_id STRING,
+  organization_id STRING,
   hubspot_company_id STRING,
   hubspot_deal_id STRING,
   pipeline_stage STRING,
@@ -447,7 +437,6 @@ CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse_olap.services` (
   target_end_date DATE,
   total_cost FLOAT64,
   amount_paid FLOAT64,
-  amount_remaining FLOAT64,
   currency STRING,
   linea_de_servicio STRING,
   servicio_especifico STRING,
@@ -455,16 +444,18 @@ CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse_olap.services` (
   billing_frequency STRING,
   country STRING,
   notion_project_id STRING,
+  active BOOL,
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
-  _etl_loaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+  ingested_at TIMESTAMP,
+  ingested_date DATE
 );
 ```
 
-### 5.5 Vista analítica: BigQuery `greenhouse_olap.v_active_services_by_company`
+### 5.5 Vista analítica: BigQuery `greenhouse_conformed.v_active_services_by_company`
 
 ```sql
-CREATE VIEW `efeonce-group.greenhouse_olap.v_active_services_by_company` AS
+CREATE VIEW `efeonce-group.greenhouse_conformed.v_active_services_by_company` AS
 SELECT
   s.hubspot_company_id,
   c.name AS company_name,
@@ -492,7 +483,7 @@ SELECT
     WHEN s.pipeline_stage = 'paused' THEN 'paused'
     ELSE s.pipeline_stage
   END AS service_health
-FROM `efeonce-group.greenhouse_olap.services` s
+FROM `efeonce-group.greenhouse_conformed.services` s
 LEFT JOIN `efeonce-group.hubspot_crm.companies` c
   ON s.hubspot_company_id = CAST(c.hs_object_id AS STRING)
 WHERE s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending', 'paused')
@@ -513,43 +504,45 @@ HubSpot Service Records (objeto 0-162)
   │ Asociados a Company + Deal
   │ Properties nativas + custom ef_*
   ↓
-Inbound sync (webhook o polling cada 15 min)
-  │ Cloud Function: hubspot-services-sync
-  │ GET /crm/v3/objects/0-162 (cambios recientes)
-  │ UPSERT en PostgreSQL tabla `services`
+Inbound sync (webhook o polling)
+  │ Cloud Run service: hubspot-greenhouse-integration (repo cesargrowth11/hubspot-bigquery)
+  │ GET /companies/{id}/services → HubSpot API (intermediado)
+  │ UPSERT en PostgreSQL tabla `greenhouse_core.services`
   ↓
 PostgreSQL (Cloud SQL) — FUENTE DE VERDAD OPERATIVA
   │ Greenhouse/Ops lee y escribe aquí en tiempo real
-  │ API Routes: /api/services/* → PostgreSQL directo
-  │ Capabilities resolution: query a `services` WHERE pipeline_stage IN (...)
+  │ API Routes: /api/agency/services/* → PostgreSQL directo
+  │ Capabilities resolution: vista v_client_active_modules → loadServiceModules() → TenantContext
   │
   ├─→ Write-back async a HubSpot
-  │   │ service_sync_queue → Cloud Function procesa cola
-  │   │ PATCH /crm/v3/objects/0-162/{id}
+  │   │ greenhouse_sync.service_sync_queue → Cloud Run service procesa cola
+  │   │ Cloud Run → HubSpot API PATCH /crm/v3/objects/p_services/{id}
   │   └─→ HubSpot actualizado (equipo comercial ve cambios en CRM)
   │
-  └─→ ETL nocturno a BigQuery (03:30 AM)
-      │ Cloud Function: pg-to-bq-etl
-      │ SELECT * FROM services → WRITE_TRUNCATE greenhouse_olap.services
+  └─→ ETL nocturno a BigQuery (NUEVA INFRA a crear)
+      │ Script/Cloud Run: pg-to-bq-etl
+      │ SELECT * FROM greenhouse_core.services → WRITE_TRUNCATE greenhouse_conformed.services
       └─→ BigQuery: dashboards, métricas ICO agregadas, cross-analysis
 ```
 
 ### 6.2 Sync HubSpot → PostgreSQL (inbound)
 
+**IMPORTANTE:** Toda la integración HubSpot pasa por el servicio Cloud Run intermediario `hubspot-greenhouse-integration` (repo `cesargrowth11/hubspot-bigquery`, servicio `hubspot-greenhouse-integration-*.us-central1.run.app`). Greenhouse Next.js app NO llama a HubSpot directamente — usa el client en `src/lib/integrations/hubspot-greenhouse-service.ts` con `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`.
+
 | Trigger | Mecanismo | Frecuencia | Acción |
 |---|---|---|---|
-| Service creado en HubSpot | Polling (GET /crm/v3/objects/0-162 con filtro `lastmodifieddate`) | Cada 15 min | INSERT en PostgreSQL si no existe |
-| Service modificado en HubSpot | Polling (mismo endpoint) | Cada 15 min | UPDATE en PostgreSQL, marcar `hubspot_sync_direction = 'inbound'` |
-| Reconciliación completa | Full scan de todos los Services | Diario 03:00 AM | UPSERT completo, detectar conflictos |
+| Service creado en HubSpot | Cloud Function `hubspot-bq-sync` con `?object=services` (full refresh) | Diario 03:30 AM | BigQuery `hubspot_crm.services` actualizado |
+| Service modificado en HubSpot | Webhook → Cloud Run `POST /webhooks/hubspot` | Tiempo real | UPSERT en PostgreSQL via Greenhouse API |
+| Reconciliación completa | Cloud Function full sync + script PG backfill | Diario | Detectar conflictos BQ vs PG |
 
-**Nota:** HubSpot Data Hub Starter no soporta webhooks. Polling cada 15 min es consistente con el patrón ya implementado en `hubspot-notion-sync` (CF1/CF2).
+**Nota:** El sync diario de `hubspot-bq-sync` (Cloud Function en `main.py`) ya soporta agregar nuevos objetos via `SYNC_OBJECTS` dict. Los syncs inbound a PostgreSQL son scripts Node.js (`scripts/`) o endpoints del Cloud Run service — no Cloud Functions separadas.
 
 ### 6.3 Sync PostgreSQL → HubSpot (outbound / write-back)
 
 Cuando Greenhouse escribe a PostgreSQL, se encola un registro en `service_sync_queue`:
 
 ```typescript
-// /src/lib/services/update-service.ts
+// /src/lib/services/service-store.ts (pattern: organization-store.ts)
 
 export async function updateService(serviceId: string, updates: Partial<Service>) {
   const db = await getPool()
@@ -582,30 +575,32 @@ export async function updateService(serviceId: string, updates: Partial<Service>
 }
 ```
 
-La cola se procesa con una Cloud Function separada (`hubspot-writeback`) cada 5 minutos, que toma los registros `pending`, hace el PATCH a HubSpot API, y marca como `completed` o `failed`.
+La cola se procesa con un endpoint del Cloud Run service `hubspot-greenhouse-integration` o un script Node.js en `scripts/`, que toma los registros `pending`, llama al Cloud Run service para hacer el PATCH a HubSpot API, y marca como `completed` o `failed`. No usar Cloud Functions separadas — el proyecto no tiene Cloud Functions independientes.
 
-### 6.4 ETL PostgreSQL → BigQuery (nocturno)
+### 6.4 ETL PostgreSQL → BigQuery (nocturno) — NUEVA INFRA
 
-Cloud Function `pg-to-bq-etl` (ejecuta diario 03:30 AM):
+**NOTA:** Este ETL PG→BQ es **infraestructura nueva a crear**. No existe actualmente. Los flujos existentes son en dirección opuesta: Notion/HubSpot → BigQuery raw (append snapshots) → PostgreSQL conformed (via source sync system). Este será el primer flujo PG → BQ.
 
-1. Conecta a Cloud SQL vía Cloud SQL Auth Proxy
-2. `SELECT * FROM services` (full table)
-3. `WRITE_TRUNCATE` a `greenhouse_olap.services` en BigQuery
-4. Repite para otras tablas transaccionales: `spaces`, `fin_*`, `payroll_*`
-5. Log en `greenhouse_olap.etl_log`
+Script Node.js o endpoint Cloud Run (ejecuta diario vía Cloud Scheduler):
 
-**Patrón:** Mismo full-refresh diario que ya usan los syncs de Notion y HubSpot. Simple, idempotente, sin CDC complejo.
+1. Conecta a Cloud SQL vía Cloud SQL Connector (misma pool que `src/lib/postgres/client.ts`, max 5 connections)
+2. `SELECT * FROM greenhouse_core.services` (full table)
+3. `WRITE_TRUNCATE` a `greenhouse_conformed.services` en BigQuery
+4. Repite para otras tablas transaccionales si se necesitan en BigQuery
+5. Log en `greenhouse_conformed.etl_log`
+
+**Patrón:** Full-refresh simple, idempotente, sin CDC complejo. Alineado con el full-refresh de `hubspot-bq-sync`.
 ---
 
 ## 7. Administración de servicios en Greenhouse (Efeonce Ops)
 
 ### 7.1 Sección en Efeonce Ops
 
-La administración de servicios vive en Efeonce Ops (`ops.efeoncepro.com`), no en el portal de clientes. Ruta: `/services`.
+La administración de servicios vive en Efeonce Ops, no en el portal de clientes. Ruta: `/agency/services` (concepto de agencia, no admin técnico).
 
 ```
-src/app/(dashboard)/services/
-  ├── layout.tsx                  # Guard: requiere rol admin/operator
+src/app/(dashboard)/agency/services/
+  ├── layout.tsx                  # Guard: requireAgencyTenantContext() (routeGroups.includes('internal') OR roleCodes.includes('efeonce_admin'))
   ├── page.tsx                    # Lista de todos los servicios (filtrable por company, línea, stage)
   ├── [serviceId]/
   │   └── page.tsx                # Detalle del servicio: timeline, financiero, métricas
@@ -628,20 +623,33 @@ src/app/(dashboard)/services/
 
 ### 7.3 Asignación a Spaces (tenants)
 
-Los servicios se asignan a **Spaces** en Greenhouse. Un Space = un tenant = una Company en HubSpot. La relación vive en PostgreSQL:
+Los servicios se asignan a **Spaces** en Greenhouse. **Spaces y Clients coexisten** — NO son un rename:
+- `greenhouse_core.clients` — legacy tenant, PK para auth/session/BigQuery
+- `greenhouse_core.spaces` — Account 360 concept, child of Organization, tiene FK `client_id → clients`
+
+Un Service se asigna a un Space (que tiene `client_id` FK). El bridge a Organization es via `spaces.organization_id`:
+- Service → Space → Organization (para Organization 360)
+- Service → Space → Client (para legacy tenant context / capabilities)
 
 ```
-PostgreSQL:
-  spaces (antes greenhouse.clients)
-    │ id (UUID, PK)
-    │ hubspot_company_id ──→ HubSpot Company
+PostgreSQL (greenhouse_core):
+  organizations
+    │ organization_id (TEXT, PK)
+    │
+  spaces
+    │ space_id (TEXT, PK)
+    │ organization_id (FK → organizations)
+    │ client_id (FK → clients)       ← bridge a legacy tenant
+    │ hubspot_company_id
     │
   services
-    │ space_id (FK → spaces.id)
-    │ Cada servicio pertenece a un Space
+    │ service_id (TEXT, PK)
+    │ space_id (FK → spaces.space_id)
+    │ organization_id (FK → organizations.organization_id)  ← FK directa para queries rápidos
     │
     └── Los servicios del Space se resuelven via:
-        SELECT * FROM services WHERE space_id = ? AND pipeline_stage IN ('onboarding','active','renewal_pending','paused')
+        SELECT * FROM greenhouse_core.services WHERE space_id = $1 AND active = TRUE
+          AND pipeline_stage IN ('onboarding','active','renewal_pending','paused')
 ```
 
 Cuando un admin crea un Space para un nuevo cliente, el sistema:
@@ -724,35 +732,34 @@ El módulo financiero (CODEX_TASK_Financial_Module.md) opera con ingresos y egre
 | `ef_linea_de_servicio` | Ingresos por unidad de negocio (Globe vs Digital vs Reach vs Wave) |
 | `start_date` / `target_end_date` | Revenue recognition: distribución temporal del ingreso a lo largo del contrato |
 
-**Vista sugerida:**
+**Sinergias en PostgreSQL** (donde vive el módulo financiero):
+- Service.`total_cost` se cruza con `greenhouse_finance.income.total_amount_clp` por `client_id` (via Space→Client bridge)
+- Service.`linea_de_servicio` enriquece `greenhouse_finance.client_economics` con desglose por línea de servicio
+- Vista analítica sugerida en `greenhouse_serving`:
 
 ```sql
-CREATE VIEW `efeonce-group.greenhouse_olap.v_revenue_by_service` AS
+-- PostgreSQL vista (NO BigQuery — Finance vive en PostgreSQL)
+CREATE OR REPLACE VIEW greenhouse_serving.v_revenue_by_service AS
 SELECT
-  s.hubspot_company_id,
-  c.name AS company_name,
+  s.service_id,
+  s.name AS service_name,
+  s.organization_id,
+  sp.client_id,
   s.linea_de_servicio,
   s.servicio_especifico,
-  s.modalidad,
   s.currency,
   s.total_cost,
   s.amount_paid,
-  s.amount_remaining,
+  s.total_cost - COALESCE(s.amount_paid, 0) AS amount_remaining,
   s.start_date,
-  s.target_end_date,
-  -- Revenue mensual estimado
-  CASE
-    WHEN s.billing_frequency = 'monthly' THEN s.total_cost
-    WHEN s.billing_frequency = 'quarterly' THEN ROUND(s.total_cost / 3, 2)
-    WHEN s.billing_frequency = 'project' THEN
-      ROUND(s.total_cost / GREATEST(DATE_DIFF(s.target_end_date, s.start_date, MONTH), 1), 2)
-    ELSE NULL
-  END AS estimated_monthly_revenue
-FROM `efeonce-group.greenhouse_olap.services` s
-LEFT JOIN `efeonce-group.hubspot_crm.companies` c
-  ON s.hubspot_company_id = CAST(c.hs_object_id AS STRING)
-WHERE s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending')
+  s.target_end_date
+FROM greenhouse_core.services s
+JOIN greenhouse_core.spaces sp ON sp.space_id = s.space_id
+WHERE s.active = TRUE
+  AND s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending');
 ```
+
+Para analytics cross-dataset (Notion × HubSpot × Services), ahí sí BigQuery vía ETL nocturno (§6.4).
 
 ### 9.2 HR & People
 
@@ -760,10 +767,12 @@ El módulo HR (CODEX_TASK_HR_Payroll_Module_v2.md) gestiona compensaciones y KPI
 
 | Conexión | Mecanismo | Valor |
 |---|---|---|
-| Equipo asignado a servicio | `ef_notion_project_id` → Notion Proyectos → miembros del equipo | Saber quién trabaja en qué servicio |
-| Utilización por servicio | Horas de equipo (Notion tareas) agrupadas por servicio | % de capacidad dedicada a cada servicio. Alimenta `v_team_utilization` en Efeonce Ops |
-| Costo de servicio | Compensación del equipo asignado vs `total_cost` del servicio | Margen operativo por servicio |
-| KPIs por servicio | Métricas ICO (RpA, OTD%) filtradas por `ef_notion_project_id` | Performance review contextualizada: "tu OTD% en Agencia Creativa para Acme Corp fue 92%" |
+| Equipo asignado a servicio | Service → Space → Client → `client_team_assignments` (client_id + member_id + fte_allocation) | Saber quién trabaja en qué servicio y su dedicación |
+| Utilización por servicio | Service.`notion_project_id` → `greenhouse_delivery.projects/tasks` (Notion synced) | % de capacidad dedicada a cada servicio |
+| Costo de servicio | Compensación del equipo asignado (via assignments) vs `total_cost` del servicio | Margen operativo por servicio |
+| KPIs por servicio | Métricas ICO (RpA, OTD%) filtradas por `notion_project_id` | Performance review contextualizada |
+
+**Bridge real**: Service → Space → Client → Assignments → Members (via `client_team_assignments.client_id` + `client_team_assignments.member_id`)
 
 ### 9.3 Operación ICO (Core)
 
@@ -792,40 +801,60 @@ Cuando se implemente facturación en Greenhouse/Ops:
 
 ---
 
-## 10. Migración desde Capabilities v1
+## 10. Migración de Capabilities a modelo basado en Services
+
+> **Corrección arquitectónica**: Esto es una **migración real** del modelo de capabilities. El modelo actual (escritura manual en `client_service_modules`) se reemplaza por un modelo derivado de la tabla `services`. Los componentes de resolución (`resolveCapabilityModules()`, `capability-registry.ts`) se mantienen sin cambios — solo cambia la fuente de datos.
 
 ### 10.1 Qué se depreca
 
-| Componente v1 | Estado en v2 | Acción |
+| Componente actual | Destino | Acción |
 |---|---|---|
-| `servicios_especificos` (multi-select en Company) | Deprecated — se mantiene como fallback durante transición | No borrar. Dejar de actualizar una vez que Services esté operativo |
-| `parseMultiSelect()` | Deprecated — reemplazado por query a `hubspot_crm.services` | Mantener durante transición |
-| `resolveCapabilities(linea, servicios[])` | Reemplazado por `resolveCapabilities(linea, ActiveService[])` | Nuevo archivo |
-| `verifyModuleAccess()` con JOIN a companies | Reemplazado por JOIN a services | Nuevo query |
+| Escritura manual en `client_service_modules` | Derivado automático desde `services` via `v_client_active_modules` | Dejar de escribir manualmente cuando `services` esté poblado |
+| BigQuery `greenhouse.client_service_modules` | Legacy fallback en `access.ts` | Deprecar después de que PostgreSQL sea fuente única |
+| BigQuery `greenhouse.service_modules` | Legacy fallback | Deprecar junto con la tabla anterior |
+| `servicios_especificos` (multi-select en Company HubSpot) | No usado por resolución (era input manual) | Dejar de actualizar; mantener como referencia histórica |
 
-### 10.2 Plan de transición
+### 10.2 Qué NO cambia
 
-**Fase 1: Infraestructura (sin romper nada)**
+| Componente | Ubicación | Motivo |
+|---|---|---|
+| `resolveCapabilityModules()` | `src/lib/capabilities/resolve-capabilities.ts` | Misma signature `{ businessLines, serviceModules }` — zero breaking changes |
+| `capability-registry.ts` | `src/config/capability-registry.ts` | Define presentación (cards, dataSources, icons) — se mantiene |
+| Sidebar/guards/route access | Resuelto desde TenantContext | TenantContext sigue conteniendo `businessLines` y `serviceModules` |
+| `verify-module-access.ts` | `src/lib/capabilities/verify-module-access.ts` | Sigue leyendo de TenantContext |
+
+### 10.3 Plan de migración (5 fases)
+
+**Fase 1: Infraestructura** (sin romper nada)
 1. Activar Services object en HubSpot (ya hecho)
 2. Configurar pipeline con stages definidos en §3.2
 3. Crear custom properties `ef_*` definidas en §3.3
-4. Agregar sync de Services a `hubspot-bq-sync` → `hubspot_crm.services`
-5. Crear vista `v_active_services_by_company`
+4. Agregar sync de Services al Cloud Run service `hubspot-bq-sync` → `greenhouse_conformed.services` (BigQuery analytics)
+5. Crear tabla `greenhouse_core.services` en PostgreSQL (§5.1)
+6. Crear vista `greenhouse_core.v_client_active_modules` (§5.1)
+7. Seedear catálogo `service_modules` con los 14 servicios específicos del doc si no existen
 
-**Fase 2: Datos (poblar Services)**
-6. Crear Service records para clientes actuales (manual o script) basado en el multi-select existente
-7. Asociar cada Service a su Company y Deal correspondiente
-8. Validar que la vista en BigQuery devuelve datos correctos
+**Fase 2: Poblado inicial** (datos)
+8. Script de migración que crea registros `services` a partir de las asignaciones existentes en `client_service_modules`
+9. Para cada `client_service_module` activo: crear un `service` correspondiente con `pipeline_stage = 'active'`, `linea_de_servicio` y `servicio_especifico` derivados del `service_modules` referenciado
+10. Crear Service records en HubSpot para los servicios migrados, asociar a Company y Deal
+11. Validar que `v_client_active_modules` devuelve los mismos módulos que `client_service_modules` para cada cliente
 
-**Fase 3: Código (reemplazar resolución)**
-9. Implementar `resolveCapabilities()` v2 con ActiveService[]
-10. Actualizar API Route `/api/capabilities/resolve`
-11. Actualizar sidebar para mostrar paquetes con sub-secciones
-12. Actualizar guards de acceso con nuevo query
+**Fase 3: Código** (cambio de fuente de datos)
+12. Actualizar `loadServiceModules(clientId)` en `identity-store.ts` para leer con UNION de `v_client_active_modules` + `client_service_modules` (transición, ver §4.3)
+13. Verificar que todas las capabilities se resuelven correctamente con la nueva fuente
+14. Agregar endpoints Cloud Run para Services (§6.1-6.3)
+15. Crear UI de administración de servicios en `/agency/services` (§7.1)
 
-**Fase 4: Deprecación**
-13. Dejar de escribir `servicios_especificos` en Company (los nuevos clientes solo usan Services)
-14. Remover código legacy de v1 después de 30 días sin incidentes
+**Fase 4: Enriquecimiento**
+16. Capabilities UI muestra datos de Service (pipeline stage, fechas, montos, modalidad)
+17. Dashboard de servicios por Space con indicadores de rentabilidad (sinergia Finance §9.1)
+18. `loadServiceModules()` corta el fallback a `client_service_modules` — solo `v_client_active_modules`
+
+**Fase 5: Deprecación**
+19. Marcar `client_service_modules` como read-only (no más escritura manual)
+20. Deprecar BigQuery `greenhouse.client_service_modules` y `greenhouse.service_modules` (legacy fallback en `access.ts`)
+21. Remover UNION fallback en `loadServiceModules()` después de 30 días sin incidentes
 
 ---
 
@@ -858,49 +887,62 @@ Misma estrategia que Capabilities v1:
 
 ---
 
-## 12. Estructura de archivos (cambios respecto a v1)
+## 12. Estructura de archivos
+
+> **Corrección arquitectónica**: Rutas corregidas según convenciones reales del proyecto. Archivos existentes marcados como "ya existe". La ruta de administración es `/agency/services` (no `/services`). El patrón de store es `service-store.ts` (como `organization-store.ts`).
 
 ```
 /src
 ├── config/
-│   └── capability-registry.ts          # v2: CapabilityPackage[] con ServiceRequirement[]
+│   └── capability-registry.ts          # YA EXISTE — sin cambios (define presentación: cards, dataSources, icons)
 ├── lib/
-│   ├── resolve-capabilities.ts         # v2: recibe ActiveService[], retorna ResolvedPackage[]
-│   ├── parse-hubspot-multiselect.ts    # DEPRECATED — mantener para fallback
-│   ├── verify-module-access.ts         # v2: query a hubspot_crm.services
-│   ├── hubspot-services.ts             # NUEVO: read/write de Services vía HubSpot API
-│   ├── cache.ts                        # Sin cambios
-│   └── capability-queries/
-│       ├── index.ts                    # v2: query builders reciben ActiveService context
-│       ├── creative-production.ts      # Query builder: Creative Production (antes creative-hub)
-│       ├── growth-engine.ts            # Query builder: Growth Engine
-│       └── ...
-├── components/
-│   └── capabilities/
-│       ├── PackagePage.tsx             # NUEVO: página genérica de paquete con tabs por servicio
-│       ├── ServiceSection.tsx          # NUEVO: sub-sección de servicio dentro de un paquete
-│       ├── ServiceStatusBadge.tsx      # NUEVO: badge de estado del servicio
-│       ├── CapabilityCard.tsx          # Sin cambios
-│       └── cards/
-│           └── ...                     # Sin cambios
+│   ├── capabilities/
+│   │   ├── resolve-capabilities.ts     # YA EXISTE — sin cambios (resolveCapabilityModules)
+│   │   └── verify-module-access.ts     # YA EXISTE — sin cambios (lee de TenantContext)
+│   ├── tenant/
+│   │   ├── identity-store.ts           # YA EXISTE — MODIFICAR: loadServiceModules() lee de v_client_active_modules
+│   │   └── access.ts                   # YA EXISTE — sin cambios (legacy BigQuery fallback se mantiene durante transición)
+│   ├── services/
+│   │   └── service-store.ts            # NUEVO: CRUD PostgreSQL para services (pattern: organization-store.ts)
+│   └── integrations/
+│       └── hubspot-greenhouse-service.ts # YA EXISTE — EXTENDER: agregar métodos getCompanyServices(), getService()
+├── views/
+│   └── greenhouse/
+│       └── agency/
+│           └── services/
+│               ├── ServicesListView.tsx     # NUEVO: lista de servicios con filtros
+│               └── ServiceDetailView.tsx    # NUEVO: detalle de servicio individual
 ├── app/
 │   ├── api/
 │   │   ├── capabilities/
-│   │   │   ├── resolve/route.ts        # v2: query a services, no a companies
-│   │   │   └── [packageId]/
-│   │   │       └── data/route.ts       # v2: recibe service context
-│   │   └── services/                   # NUEVO: CRUD de services (Ops)
-│   │       ├── route.ts                # GET (list), POST (create)
-│   │       └── [serviceId]/
-│   │           └── route.ts            # GET, PATCH, DELETE
-│   └── capabilities/
-│       └── [packageId]/
-│           ├── layout.tsx              # v2: guard con ResolvedPackage
-│           └── page.tsx                # v2: PackagePage con tabs
-└── layouts/
-    └── components/
-        └── sidebar/
-            └── SidebarMenu.tsx         # v2: paquetes con sub-secciones expandibles
+│   │   │   └── resolve/route.ts        # YA EXISTE — sin cambios (resolución desde TenantContext)
+│   │   └── agency/
+│   │       └── services/               # NUEVO: CRUD de services (Ops)
+│   │           ├── route.ts            # GET (list), POST (create) — requireAgencyTenantContext()
+│   │           └── [serviceId]/
+│   │               └── route.ts        # GET, PATCH, DELETE
+│   └── (dashboard)/
+│       └── agency/
+│           └── services/               # NUEVO: UI pages
+│               ├── page.tsx            # Lista de servicios
+│               └── [serviceId]/
+│                   └── page.tsx        # Detalle de servicio
+└── scripts/
+    └── setup-postgres-services.sql     # NUEVO: DDL de §5.1 (tabla + vista + triggers)
+```
+
+**Archivos en repo `hubspot-bigquery` (Cloud Run service):**
+```
+services/hubspot_greenhouse_integration/
+├── app.py                # EXTENDER: +GET /services/<id>, +GET /companies/<id>/services
+├── hubspot_client.py     # EXTENDER: +get_service(), +list_company_service_ids(), +get_services_by_ids()
+├── models.py             # EXTENDER: +build_service_profile()
+├── contract.py           # EXTENDER: +services en sourceFields
+├── config.py             # Sin cambios
+├── greenhouse_client.py  # Sin cambios
+└── webhooks.py           # FUTURO: extender para webhook events de Services
+
+main.py                   # EXTENDER: +services en _CORE_PROPS y SYNC_OBJECTS
 ```
 
 ---
