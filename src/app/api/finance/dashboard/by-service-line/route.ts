@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { toIncomePaymentCashEntries } from '@/lib/finance/income-payments'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber } from '@/lib/finance/shared'
+import { isFinanceSlice2PostgresEnabled } from '@/lib/finance/postgres-store-slice2'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -20,11 +22,20 @@ interface ExpenseServiceLineRow {
   payment_status: string
 }
 
+type LaborCostRow = Record<string, unknown>
+
 type ServiceLineTotals = {
   cashIncome: number
   cashExpenses: number
   accrualIncome: number
   accrualExpenses: number
+  laborCosts: {
+    directLabor: number
+    indirectLabor: number
+    operational: number
+    infrastructure: number
+    taxSocial: number
+  }
 }
 
 const getBucket = (serviceLine: string | null) => serviceLine || 'unassigned'
@@ -51,6 +62,25 @@ export async function GET() {
     `)
   ])
 
+  // Fetch cost breakdown by service_line from Postgres (if enabled)
+  let laborRows: LaborCostRow[] = []
+
+  if (isFinanceSlice2PostgresEnabled()) {
+    try {
+      laborRows = await runGreenhousePostgresQuery<LaborCostRow>(
+        `SELECT
+           service_line,
+           cost_category,
+           COALESCE(SUM(total_amount_clp), 0) AS total_clp
+         FROM greenhouse_finance.expenses
+         WHERE cost_category IS NOT NULL
+         GROUP BY service_line, cost_category`
+      )
+    } catch {
+      // Non-blocking: if Postgres is unavailable, proceed without labor data
+    }
+  }
+
   const totalsByServiceLine = new Map<string, ServiceLineTotals>()
 
   const ensureBucket = (serviceLine: string) => {
@@ -64,7 +94,14 @@ export async function GET() {
       cashIncome: 0,
       cashExpenses: 0,
       accrualIncome: 0,
-      accrualExpenses: 0
+      accrualExpenses: 0,
+      laborCosts: {
+        directLabor: 0,
+        indirectLabor: 0,
+        operational: 0,
+        infrastructure: 0,
+        taxSocial: 0
+      }
     }
 
     totalsByServiceLine.set(serviceLine, next)
@@ -95,6 +132,20 @@ export async function GET() {
     }
   })
 
+  // Merge labor cost data by service line
+  for (const row of laborRows) {
+    const sl = String(row['service_line'] || 'unassigned')
+    const cat = String(row['cost_category'] || 'operational')
+    const amount = toNumber(row['total_clp'])
+    const bucket = ensureBucket(sl)
+
+    if (cat === 'direct_labor') bucket.laborCosts.directLabor = roundCurrency(bucket.laborCosts.directLabor + amount)
+    else if (cat === 'indirect_labor') bucket.laborCosts.indirectLabor = roundCurrency(bucket.laborCosts.indirectLabor + amount)
+    else if (cat === 'infrastructure') bucket.laborCosts.infrastructure = roundCurrency(bucket.laborCosts.infrastructure + amount)
+    else if (cat === 'tax_social') bucket.laborCosts.taxSocial = roundCurrency(bucket.laborCosts.taxSocial + amount)
+    else bucket.laborCosts.operational = roundCurrency(bucket.laborCosts.operational + amount)
+  }
+
   const serviceLines = Array.from(totalsByServiceLine.entries())
     .map(([serviceLine, totals]) => ({
       serviceLine,
@@ -106,7 +157,8 @@ export async function GET() {
       cashNet: totals.cashIncome - totals.cashExpenses,
       accrualIncome: totals.accrualIncome,
       accrualExpenses: totals.accrualExpenses,
-      accrualNet: totals.accrualIncome - totals.accrualExpenses
+      accrualNet: totals.accrualIncome - totals.accrualExpenses,
+      laborCosts: totals.laborCosts
     }))
     .sort((left, right) => right.cashIncome - left.cashIncome)
 

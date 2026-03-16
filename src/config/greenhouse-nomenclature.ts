@@ -33,7 +33,8 @@ export const GH_FINANCE_NAV = {
   expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   clients: { label: 'Clientes', subtitle: 'Perfil financiero' },
-  reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' }
+  reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
+  intelligence: { label: 'Inteligencia', subtitle: 'Rentabilidad y economía por Space' }
 } as const
 
 export const GH_HR_NAV = {
