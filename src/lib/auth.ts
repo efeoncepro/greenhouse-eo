@@ -367,6 +367,10 @@ export const authOptions: NextAuthOptions = {
         token.provider = user.provider
         token.microsoftEmail = user.microsoftEmail
         token.googleEmail = user.googleEmail
+        // Account 360
+        token.spaceId = user.spaceId
+        token.organizationId = user.organizationId
+        token.organizationName = user.organizationName
       }
 
       if (account?.provider === 'azure-ad') {
@@ -414,6 +418,10 @@ export const authOptions: NextAuthOptions = {
           token.authMode = tenant.authMode
           token.provider = 'microsoft_sso'
           token.microsoftEmail = tenant.microsoftEmail || normalizedEmail
+          // Account 360
+          token.spaceId = tenant.spaceId ?? undefined
+          token.organizationId = tenant.organizationId ?? undefined
+          token.organizationName = tenant.organizationName ?? undefined
         }
       }
 
@@ -462,6 +470,10 @@ export const authOptions: NextAuthOptions = {
           token.authMode = tenant.authMode
           token.provider = 'google_sso'
           token.googleEmail = tenant.googleEmail || normalizedEmail
+          // Account 360
+          token.spaceId = tenant.spaceId ?? undefined
+          token.organizationId = tenant.organizationId ?? undefined
+          token.organizationName = tenant.organizationName ?? undefined
         }
       }
 
@@ -499,6 +511,10 @@ export const authOptions: NextAuthOptions = {
         session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'
         session.user.microsoftEmail = typeof token.microsoftEmail === 'string' ? token.microsoftEmail : null
         session.user.googleEmail = typeof token.googleEmail === 'string' ? token.googleEmail : null
+        // Account 360
+        session.user.spaceId = typeof token.spaceId === 'string' ? token.spaceId : undefined
+        session.user.organizationId = typeof token.organizationId === 'string' ? token.organizationId : undefined
+        session.user.organizationName = typeof token.organizationName === 'string' ? token.organizationName : undefined
       }
 
       return session

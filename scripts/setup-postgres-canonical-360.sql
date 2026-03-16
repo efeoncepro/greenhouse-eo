@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.clients (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS greenhouse_core.spaces (
+CREATE TABLE IF NOT EXISTS greenhouse_core.notion_workspaces (
   space_id TEXT PRIMARY KEY,
   public_id TEXT UNIQUE,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.spaces (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS greenhouse_core.space_source_bindings (
+CREATE TABLE IF NOT EXISTS greenhouse_core.notion_workspace_source_bindings (
   binding_id TEXT PRIMARY KEY,
-  space_id TEXT NOT NULL REFERENCES greenhouse_core.spaces(space_id) ON DELETE CASCADE,
+  space_id TEXT NOT NULL REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE CASCADE,
   source_system TEXT NOT NULL,
   source_object_type TEXT NOT NULL,
   source_object_id TEXT NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.space_source_bindings (
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT space_source_bindings_unique UNIQUE (space_id, source_system, source_object_type, source_object_id, binding_role)
+  CONSTRAINT notion_workspace_source_bindings_unique UNIQUE (space_id, source_system, source_object_type, source_object_id, binding_role)
 );
 
 CREATE TABLE IF NOT EXISTS greenhouse_core.identity_profiles (
@@ -270,17 +270,17 @@ CREATE INDEX IF NOT EXISTS identity_profile_source_links_profile_idx
 CREATE INDEX IF NOT EXISTS client_users_client_idx
   ON greenhouse_core.client_users (client_id);
 
-CREATE INDEX IF NOT EXISTS spaces_client_idx
-  ON greenhouse_core.spaces (client_id);
+CREATE INDEX IF NOT EXISTS notion_workspaces_client_idx
+  ON greenhouse_core.notion_workspaces (client_id);
 
-CREATE INDEX IF NOT EXISTS spaces_workspace_idx
-  ON greenhouse_core.spaces (primary_project_database_source_id);
+CREATE INDEX IF NOT EXISTS notion_workspaces_workspace_idx
+  ON greenhouse_core.notion_workspaces (primary_project_database_source_id);
 
-CREATE INDEX IF NOT EXISTS space_source_bindings_space_idx
-  ON greenhouse_core.space_source_bindings (space_id);
+CREATE INDEX IF NOT EXISTS notion_workspace_source_bindings_space_idx
+  ON greenhouse_core.notion_workspace_source_bindings (space_id);
 
-CREATE INDEX IF NOT EXISTS space_source_bindings_lookup_idx
-  ON greenhouse_core.space_source_bindings (source_system, source_object_type, source_object_id, binding_role);
+CREATE INDEX IF NOT EXISTS notion_workspace_source_bindings_lookup_idx
+  ON greenhouse_core.notion_workspace_source_bindings (source_system, source_object_type, source_object_id, binding_role);
 
 CREATE INDEX IF NOT EXISTS client_users_identity_idx
   ON greenhouse_core.client_users (identity_profile_id);
@@ -375,55 +375,55 @@ GROUP BY
   c.created_at,
   c.updated_at;
 
-CREATE OR REPLACE VIEW greenhouse_serving.space_360 AS
+CREATE OR REPLACE VIEW greenhouse_serving.notion_workspace_360 AS
 SELECT
-  s.space_id,
-  s.public_id,
-  s.space_name,
-  s.space_type,
-  s.client_id,
+  nw.space_id       AS notion_workspace_id,
+  nw.public_id,
+  nw.space_name     AS notion_workspace_name,
+  nw.space_type,
+  nw.client_id,
   c.client_name,
-  c.public_id AS client_public_id,
+  c.public_id       AS client_public_id,
   c.tenant_type,
-  s.primary_project_database_source_id,
+  nw.primary_project_database_source_id,
   COALESCE(
-    MAX(ssb.source_object_id) FILTER (
-      WHERE ssb.active
-        AND ssb.binding_role = 'delivery_workspace'
-        AND ssb.source_system = 'notion'
-        AND ssb.source_object_type = 'project_database'
+    MAX(nwsb.source_object_id) FILTER (
+      WHERE nwsb.active
+        AND nwsb.binding_role = 'delivery_workspace'
+        AND nwsb.source_system = 'notion'
+        AND nwsb.source_object_type = 'project_database'
     ),
-    s.primary_project_database_source_id
+    nw.primary_project_database_source_id
   ) AS resolved_project_database_source_id,
-  COUNT(DISTINCT ssb.binding_id) FILTER (WHERE ssb.active) AS source_binding_count,
+  COUNT(DISTINCT nwsb.binding_id) FILTER (WHERE nwsb.active) AS source_binding_count,
   COUNT(DISTINCT cu.user_id) FILTER (WHERE cu.active) AS linked_user_count,
-  s.status,
-  s.active,
-  s.notes,
-  s.created_at,
-  s.updated_at
-FROM greenhouse_core.spaces AS s
+  nw.status,
+  nw.active,
+  nw.notes,
+  nw.created_at,
+  nw.updated_at
+FROM greenhouse_core.notion_workspaces AS nw
 LEFT JOIN greenhouse_core.clients AS c
-  ON c.client_id = s.client_id
-LEFT JOIN greenhouse_core.space_source_bindings AS ssb
-  ON ssb.space_id = s.space_id
+  ON c.client_id = nw.client_id
+LEFT JOIN greenhouse_core.notion_workspace_source_bindings AS nwsb
+  ON nwsb.space_id = nw.space_id
 LEFT JOIN greenhouse_core.client_users AS cu
-  ON cu.client_id = s.client_id
+  ON cu.client_id = nw.client_id
 GROUP BY
-  s.space_id,
-  s.public_id,
-  s.space_name,
-  s.space_type,
-  s.client_id,
+  nw.space_id,
+  nw.public_id,
+  nw.space_name,
+  nw.space_type,
+  nw.client_id,
   c.client_name,
   c.public_id,
   c.tenant_type,
-  s.primary_project_database_source_id,
-  s.status,
-  s.active,
-  s.notes,
-  s.created_at,
-  s.updated_at;
+  nw.primary_project_database_source_id,
+  nw.status,
+  nw.active,
+  nw.notes,
+  nw.created_at,
+  nw.updated_at;
 
 CREATE OR REPLACE VIEW greenhouse_serving.member_360 AS
 SELECT

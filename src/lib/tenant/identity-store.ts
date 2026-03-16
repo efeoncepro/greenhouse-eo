@@ -155,6 +155,12 @@ type Session360Row = Record<string, unknown> & {
   role_codes: string[]
   route_groups: string[]
   feature_flags: string[]
+  // Account 360 — nullable until M1 migration populates spaces/organizations
+  space_id: string | null
+  space_public_id: string | null
+  organization_id: string | null
+  organization_public_id: string | null
+  organization_name: string | null
 }
 
 // ── Main lookup functions ───────────────────────────────────
@@ -200,7 +206,13 @@ const sessionRowToAccessRow = async (row: Session360Row) => {
     active: row.active,
     status: row.status,
     password_hash: row.password_hash,
-    password_hash_algorithm: row.password_hash_algorithm
+    password_hash_algorithm: row.password_hash_algorithm,
+    // Account 360
+    space_id: row.space_id ?? null,
+    space_public_id: row.space_public_id ?? null,
+    organization_id: row.organization_id ?? null,
+    organization_public_id: row.organization_public_id ?? null,
+    organization_name: row.organization_name ?? null
   }
 }
 

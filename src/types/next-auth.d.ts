@@ -23,6 +23,10 @@ declare module 'next-auth' {
     provider: string
     microsoftEmail: string | null
     googleEmail: string | null
+    // Account 360
+    spaceId?: string
+    organizationId?: string
+    organizationName?: string
   }
 
   interface Session {
@@ -49,6 +53,10 @@ declare module 'next-auth' {
       provider: string
       microsoftEmail: string | null
       googleEmail: string | null
+      // Account 360
+      spaceId?: string
+      organizationId?: string
+      organizationName?: string
     } & DefaultSession['user']
   }
 }
@@ -78,5 +86,9 @@ declare module 'next-auth/jwt' {
     provider?: string
     microsoftEmail?: string | null
     googleEmail?: string | null
+    // Account 360
+    spaceId?: string
+    organizationId?: string
+    organizationName?: string
   }
 }

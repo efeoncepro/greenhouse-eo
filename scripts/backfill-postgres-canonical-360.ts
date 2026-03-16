@@ -66,13 +66,13 @@ const toTextArray = (value: unknown): string[] | null => {
   return null
 }
 
-const INTERNAL_SPACE_CLIENT_IDS = new Set(['space-efeonce'])
+const INTERNAL_NOTION_WORKSPACE_CLIENT_IDS = new Set(['space-efeonce'])
 
-const isInternalSpaceSeed = (row: Record<string, unknown>) => {
+const isInternalNotionWorkspaceSeed = (row: Record<string, unknown>) => {
   const clientId = toNullableString(row.client_id)
   const tenantType = toNullableString(row.tenant_type)
 
-  return tenantType === 'efeonce_internal' || (clientId ? INTERNAL_SPACE_CLIENT_IDS.has(clientId) : false)
+  return tenantType === 'efeonce_internal' || (clientId ? INTERNAL_NOTION_WORKSPACE_CLIENT_IDS.has(clientId) : false)
 }
 
 const buildDerivedPublicId = (prefix: string, value: string | null) => {
@@ -181,10 +181,10 @@ const upsertClient = async (row: Record<string, unknown>) => {
   }
 }
 
-const upsertSpace = async (row: Record<string, unknown>) => {
+const upsertNotionWorkspace = async (row: Record<string, unknown>) => {
   await runGreenhousePostgresQuery(
     `
-      INSERT INTO greenhouse_core.spaces (
+      INSERT INTO greenhouse_core.notion_workspaces (
         space_id,
         public_id,
         client_id,
@@ -204,7 +204,7 @@ const upsertSpace = async (row: Record<string, unknown>) => {
         client_id = EXCLUDED.client_id,
         space_name = EXCLUDED.space_name,
         space_type = EXCLUDED.space_type,
-        primary_project_database_source_id = COALESCE(EXCLUDED.primary_project_database_source_id, greenhouse_core.spaces.primary_project_database_source_id),
+        primary_project_database_source_id = COALESCE(EXCLUDED.primary_project_database_source_id, greenhouse_core.notion_workspaces.primary_project_database_source_id),
         status = EXCLUDED.status,
         active = EXCLUDED.active,
         notes = EXCLUDED.notes,
@@ -226,10 +226,10 @@ const upsertSpace = async (row: Record<string, unknown>) => {
   )
 }
 
-const upsertSpaceSourceBinding = async (row: Record<string, unknown>) => {
+const upsertNotionWorkspaceSourceBinding = async (row: Record<string, unknown>) => {
   await runGreenhousePostgresQuery(
     `
-      INSERT INTO greenhouse_core.space_source_bindings (
+      INSERT INTO greenhouse_core.notion_workspace_source_bindings (
         binding_id,
         space_id,
         source_system,
@@ -800,24 +800,24 @@ async function main() {
       continue
     }
 
-    const internalSpace = isInternalSpaceSeed(row)
-    const spaceId = clientId
-    const spaceName = toNullableString(row.client_name) || clientId
+    const internalWorkspace = isInternalNotionWorkspaceSeed(row)
+    const workspaceId = clientId
+    const workspaceName = toNullableString(row.client_name) || clientId
 
-    spaceNameById.set(spaceId, spaceName)
-    internalSpaceById.set(spaceId, internalSpace)
+    spaceNameById.set(workspaceId, workspaceName)
+    internalSpaceById.set(workspaceId, internalWorkspace)
 
-    await upsertSpace({
-      space_id: spaceId,
-      public_id: buildDerivedPublicId('EO-SPACE', spaceId),
-      client_id: internalSpace ? null : clientId,
-      space_name: spaceName,
-      space_type: internalSpace ? 'internal_space' : 'client_space',
+    await upsertNotionWorkspace({
+      space_id: workspaceId,
+      public_id: buildDerivedPublicId('EO-SPACE', workspaceId),
+      client_id: internalWorkspace ? null : clientId,
+      space_name: workspaceName,
+      space_type: internalWorkspace ? 'internal_space' : 'client_space',
       status: toNullableString(row.status) || 'active',
       active: toBoolean(row.active, true),
-      notes: internalSpace
-        ? 'Internal agency workspace projected from legacy tenant/client scope during spaces migration.'
-        : 'Client delivery workspace projected from legacy tenant/client scope during spaces migration.',
+      notes: internalWorkspace
+        ? 'Internal agency workspace projected from legacy tenant/client scope during notion workspaces migration.'
+        : 'Client delivery workspace projected from legacy tenant/client scope during notion workspaces migration.',
       created_at: row.created_at,
       updated_at: row.updated_at
     })
@@ -829,9 +829,9 @@ async function main() {
         continue
       }
 
-      await upsertSpaceSourceBinding({
-        binding_id: `space-${spaceId}-legacy-project-${normalizedProjectId}`,
-        space_id: spaceId,
+      await upsertNotionWorkspaceSourceBinding({
+        binding_id: `space-${workspaceId}-legacy-project-${normalizedProjectId}`,
+        space_id: workspaceId,
         source_system: 'notion',
         source_object_type: 'project_page',
         source_object_id: normalizedProjectId,
@@ -873,7 +873,7 @@ async function main() {
       primaryWorkspaceBySpace.set(spaceId, projectDatabaseSourceId)
     }
 
-    await upsertSpaceSourceBinding({
+    await upsertNotionWorkspaceSourceBinding({
       binding_id: `space-${spaceId}-workspace-${projectDatabaseSourceId}`,
       space_id: spaceId,
       source_system: 'notion',
@@ -887,7 +887,7 @@ async function main() {
   }
 
   for (const [spaceId, projectDatabaseSourceId] of primaryWorkspaceBySpace.entries()) {
-    await upsertSpace({
+    await upsertNotionWorkspace({
       space_id: spaceId,
       public_id: buildDerivedPublicId('EO-SPACE', spaceId),
       client_id: internalSpaceById.get(spaceId) ? null : spaceId,
@@ -898,8 +898,8 @@ async function main() {
     })
   }
 
-  summary.spaces = clients.length
-  summary.spaceSourceBindings =
+  summary.notionWorkspaces = clients.length
+  summary.notionWorkspaceSourceBindings =
     clients.reduce((total, row) => total + (Array.isArray(row.notion_project_ids) ? row.notion_project_ids.length : 0), 0) +
     notionWorkspaceBindings.length
 

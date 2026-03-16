@@ -47,6 +47,29 @@ contact_rollup AS (
   FROM greenhouse_crm.contacts c
   WHERE c.linked_identity_profile_id IS NOT NULL
   GROUP BY c.linked_identity_profile_id
+),
+membership_rollup AS (
+  SELECT
+    pm.profile_id AS identity_profile_id,
+    COUNT(*)::int AS membership_count,
+    (
+      SELECT json_agg(json_build_object(
+        'membershipId', sub.membership_id,
+        'organizationId', sub.organization_id,
+        'organizationName', o.organization_name,
+        'spaceId', sub.space_id,
+        'membershipType', sub.membership_type,
+        'roleLabel', sub.role_label,
+        'isPrimary', sub.is_primary
+      ) ORDER BY sub.is_primary DESC, o.organization_name NULLS LAST)
+      FROM greenhouse_core.person_memberships sub
+      LEFT JOIN greenhouse_core.organizations o ON o.organization_id = sub.organization_id
+      WHERE sub.profile_id = pm.profile_id AND sub.active = TRUE
+    ) AS memberships_json,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT pm.organization_id), NULL) AS organization_ids
+  FROM greenhouse_core.person_memberships pm
+  WHERE pm.active = TRUE
+  GROUP BY pm.profile_id
 )
 SELECT
   p.profile_id AS identity_profile_id,
@@ -98,14 +121,20 @@ SELECT
   (m.primary_member_id IS NOT NULL) AS has_member_facet,
   (u.primary_user_id IS NOT NULL) AS has_user_facet,
   (c.primary_contact_record_id IS NOT NULL) AS has_crm_contact_facet,
+  (mbr.membership_count IS NOT NULL AND mbr.membership_count > 0) AS has_membership_facet,
   ARRAY_REMOVE(
     ARRAY[
       CASE WHEN m.primary_member_id IS NOT NULL THEN 'member' END,
       CASE WHEN u.primary_user_id IS NOT NULL THEN 'user' END,
-      CASE WHEN c.primary_contact_record_id IS NOT NULL THEN 'crm_contact' END
+      CASE WHEN c.primary_contact_record_id IS NOT NULL THEN 'crm_contact' END,
+      CASE WHEN mbr.membership_count IS NOT NULL AND mbr.membership_count > 0 THEN 'membership' END
     ]::text[],
     NULL
   ) AS person_facets,
+  -- Account 360: memberships
+  COALESCE(mbr.membership_count, 0) AS membership_count,
+  mbr.memberships_json AS memberships,
+  COALESCE(mbr.organization_ids, ARRAY[]::text[]) AS organization_ids,
   p.created_at,
   p.updated_at
 FROM greenhouse_core.identity_profiles p
@@ -114,7 +143,9 @@ LEFT JOIN member_rollup m
 LEFT JOIN user_rollup u
   ON u.identity_profile_id = p.profile_id
 LEFT JOIN contact_rollup c
-  ON c.identity_profile_id = p.profile_id;
+  ON c.identity_profile_id = p.profile_id
+LEFT JOIN membership_rollup mbr
+  ON mbr.identity_profile_id = p.profile_id;
 
 GRANT SELECT ON greenhouse_serving.person_360 TO greenhouse_runtime;
 GRANT SELECT ON greenhouse_serving.person_360 TO greenhouse_migrator;

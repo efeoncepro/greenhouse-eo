@@ -207,6 +207,12 @@ SELECT
   u.default_portal_home_path,
   u.last_login_at,
   u.last_login_provider,
+  -- Account 360: space + organization context (nullable until M1 migration runs)
+  spc.space_id,
+  spc.public_id AS space_public_id,
+  org.organization_id,
+  org.public_id AS organization_public_id,
+  org.organization_name,
   -- Active role codes (temporal filter)
   COALESCE(
     ARRAY_AGG(DISTINCT ura.role_code) FILTER (
@@ -229,6 +235,10 @@ SELECT
 FROM greenhouse_core.client_users AS u
 LEFT JOIN greenhouse_core.clients AS c
   ON c.client_id = u.client_id
+LEFT JOIN greenhouse_core.spaces AS spc
+  ON spc.client_id = u.client_id AND spc.active = TRUE
+LEFT JOIN greenhouse_core.organizations AS org
+  ON org.organization_id = spc.organization_id AND org.active = TRUE
 LEFT JOIN greenhouse_core.user_role_assignments AS ura
   ON ura.user_id = u.user_id
 LEFT JOIN greenhouse_core.roles AS r
@@ -244,7 +254,9 @@ GROUP BY
   u.google_sub, u.google_email, u.avatar_url,
   u.password_hash, u.password_hash_algorithm,
   u.timezone, u.default_portal_home_path,
-  u.last_login_at, u.last_login_provider;
+  u.last_login_at, u.last_login_provider,
+  spc.space_id, spc.public_id,
+  org.organization_id, org.public_id, org.organization_name;
 
 -- Update user_360 to include new columns
 CREATE OR REPLACE VIEW greenhouse_serving.user_360 AS
