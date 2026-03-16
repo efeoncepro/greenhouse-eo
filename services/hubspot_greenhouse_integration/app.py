@@ -9,6 +9,7 @@ try:
         build_company_profile,
         build_contact_profile,
         build_owner_profile,
+        build_service_profile,
     )
     from .webhooks import (
         extract_company_ids_from_webhook_events,
@@ -23,7 +24,7 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_contact_profile, build_owner_profile
+    from models import build_company_profile, build_contact_profile, build_owner_profile, build_service_profile
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -142,6 +143,51 @@ def create_app() -> Flask:
                     "hubspotCompanyId": company_id,
                     "count": len(ordered_contacts),
                     "contacts": ordered_contacts,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/services/<service_id>")
+    def service_profile(service_id: str):
+        try:
+            contract = build_contract(app.config)
+            service = _client().get_service(
+                service_id,
+                properties=contract["sourceFields"]["services"],
+            )
+            return jsonify(build_service_profile(service))
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/companies/<company_id>/services")
+    def company_services(company_id: str):
+        try:
+            contract = build_contract(app.config)
+            client = _client()
+            service_ids = client.list_company_service_ids(company_id)
+            services = client.get_services_by_ids(
+                service_ids,
+                properties=contract["sourceFields"]["services"],
+            )
+            services_by_id = {
+                str(svc.get("id")): build_service_profile(svc)
+                for svc in services
+            }
+            ordered_services = [
+                services_by_id[service_id]
+                for service_id in service_ids
+                if service_id in services_by_id
+            ]
+            return jsonify(
+                {
+                    "hubspotCompanyId": company_id,
+                    "count": len(ordered_services),
+                    "services": ordered_services,
                 }
             )
         except HubSpotIntegrationError as exc:

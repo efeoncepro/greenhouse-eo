@@ -122,3 +122,54 @@ def build_contact_profile(contact: dict[str, Any]) -> dict[str, Any]:
         "hsLeadStatus": props.get("hs_lead_status"),
         "company": props.get("company"),
     }
+
+
+def _safe_number(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return None
+
+
+def build_service_profile(service: dict[str, Any]) -> dict[str, Any]:
+    props = service.get("properties") or {}
+    return {
+        "hubspotServiceId": str(service.get("id")),
+        "identity": {
+            "name": props.get("hs_object_id"),
+            "pipelineStage": props.get("ef_pipeline_stage"),
+            "hsPipeline": props.get("hs_pipeline"),
+            "hsPipelineStage": props.get("hs_pipeline_stage"),
+        },
+        "classification": {
+            "lineaDeServicio": props.get("ef_linea_de_servicio"),
+            "servicioEspecifico": props.get("ef_servicio_especifico"),
+            "modalidad": props.get("ef_modalidad"),
+            "billingFrequency": props.get("ef_billing_frequency"),
+            "country": props.get("ef_country"),
+        },
+        "financial": {
+            "totalCost": _safe_number(props.get("ef_total_cost")),
+            "amountPaid": _safe_number(props.get("ef_amount_paid")),
+            "currency": props.get("ef_currency"),
+        },
+        "dates": {
+            "startDate": props.get("ef_start_date"),
+            "targetEndDate": props.get("ef_target_end_date"),
+            "createdAt": props.get("createdate"),
+            "updatedAt": props.get("hs_lastmodifieddate"),
+        },
+        "references": {
+            "spaceId": props.get("ef_space_id"),
+            "organizationId": props.get("ef_organization_id"),
+            "notionProjectId": props.get("ef_notion_project_id"),
+            "hubspotOwnerId": props.get("hubspot_owner_id"),
+        },
+        "source": {
+            "sourceSystem": "hubspot_crm",
+            "sourceObjectType": "p_services",
+            "sourceObjectId": str(service.get("id")),
+        },
+    }

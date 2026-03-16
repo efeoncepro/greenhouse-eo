@@ -150,3 +150,93 @@ class HubSpotClient:
             payload = response.json()
             results.extend(payload.get("results") or [])
         return results
+
+    # ------------------------------------------------------------------
+    # Services (custom object: p_services / objectTypeId 0-162)
+    # ------------------------------------------------------------------
+
+    def get_service(self, service_id: str, *, properties: list[str]) -> dict[str, Any]:
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/objects/p_services/{service_id}",
+            headers=self._headers(),
+            params={"properties": ",".join(properties)},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def list_company_service_ids(self, company_id: str, *, limit: int = 100) -> list[str]:
+        service_ids: list[str] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": limit}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/p_services",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            for result in payload.get("results") or []:
+                service_id = result.get("toObjectId")
+                if service_id is not None:
+                    service_ids.append(str(service_id))
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        deduped_service_ids: list[str] = []
+        seen = set()
+        for service_id in service_ids:
+            if service_id in seen:
+                continue
+            seen.add(service_id)
+            deduped_service_ids.append(service_id)
+        return deduped_service_ids
+
+    def get_services_by_ids(
+        self,
+        service_ids: list[str],
+        *,
+        properties: list[str],
+    ) -> list[dict[str, Any]]:
+        if not service_ids:
+            return []
+
+        results: list[dict[str, Any]] = []
+        for start in range(0, len(service_ids), 100):
+            batch_ids = service_ids[start : start + 100]
+            response = self.session.post(
+                f"{HUBSPOT_API}/crm/v3/objects/p_services/batch/read",
+                headers=self._headers(),
+                json={
+                    "properties": properties,
+                    "inputs": [{"id": service_id} for service_id in batch_ids],
+                },
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+        return results
