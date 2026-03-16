@@ -4,6 +4,22 @@ Registro de cambios implementados como parte del CODEX_TASK_Financial_Intelligen
 
 ---
 
+## Phase 5b — Dashboard payroll integration en KPIs y charts (2026-03-16)
+
+### Fixes
+
+- **Egresos del mes no incluía nómina** — el KPI usaba `expenseSummary.currentMonth.totalAmountClp` (solo gastos registrados). Ahora usa `pnl.costs.totalExpenses` que incluye gastos registrados + payroll no vinculado. Subtitle muestra "Incluye nómina de N personas".
+- **Bar chart "Ingresos vs Egresos" no incluía nómina** — la serie de egresos ahora usa `adjustedExpenseData` que reemplaza el mes del P&L con el total correcto (incluyendo payroll).
+- **Flujo de caja no reflejaba nómina** — `cashFlowData` se calcula desde la serie ajustada, produciendo un flujo neto que descuenta los costos laborales.
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/views/greenhouse/finance/FinanceDashboardView.tsx` | +adjustedExpenseData con payroll del P&L, KPI "Egresos" usa pnl.costs.totalExpenses, charts usan serie ajustada |
+
+---
+
 ## Phase 5 — Visualización de tendencias, Person 360 Finance Tab, CSV export, fix P&L (2026-03-16)
 
 ### Nuevas funcionalidades

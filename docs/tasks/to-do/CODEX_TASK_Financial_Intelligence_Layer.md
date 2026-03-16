@@ -533,6 +533,7 @@ Implementado fuera de spec pero alineado:
 - [x] Trend chart de evolución de márgenes en ClientEconomicsView (Phase 5)
 - [x] CSV export en ClientEconomicsView (Phase 5)
 - [x] Fix: payroll gross → directLabor en P&L con anti-doble-conteo (Phase 5)
+- [x] Fix: dashboard KPI "Egresos del mes" + charts integran payroll via P&L (Phase 5b)
 
 ### Fase 3. Partnerships P1
 

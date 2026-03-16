@@ -58,7 +58,20 @@ Phase 5 cierra el ciclo de visualización de la capa de inteligencia financiera.
 
 **Permisos**: Visible para roles `efeonce_admin` y `finance_manager` (ya definido en TAB_PERMISSIONS).
 
-### 4. Fix P&L — Payroll no fluía al Estado de Resultados
+### 4. Fix Dashboard completo — Payroll no se reflejaba en KPIs ni charts
+
+**Problema**: Además del P&L endpoint (fix 4a abajo), la vista `FinanceDashboardView` usaba `expenseSummary` (que solo consulta gastos registrados) para el KPI "Egresos del mes", el bar chart "Ingresos vs Egresos" y el chart "Flujo de caja". Payroll nunca aparecía en ninguno de estos elementos.
+
+**Fix aplicado**:
+- `adjustedExpenseData`: para el mes cubierto por el P&L, reemplaza el valor de egresos con `pnl.costs.totalExpenses` (que ya incluye `unlinkedPayrollCost`)
+- KPI "Egresos del mes": usa `pnl.costs.totalExpenses` como fuente primaria, con subtitle "Incluye nómina de N personas"
+- Bar chart: la serie "Egresos" usa `adjustedExpenseData`
+- Cash flow: `cashFlowData` se recalcula desde la serie ajustada
+- Meses históricos sin P&L mantienen el valor de `expenseSummary` (limitación conocida)
+
+**Archivo**: `src/views/greenhouse/finance/FinanceDashboardView.tsx`
+
+### 4a. Fix P&L — Payroll no fluía al Estado de Resultados
 
 **Problema**: El endpoint `GET /api/finance/dashboard/pnl` consultaba payroll por separado y lo devolvía como `pnl.payroll`, pero nunca sumaba el gross de payroll a `directLabor` ni a `totalExpenses`. Resultado: margen bruto 100% y costo laboral $0 en la card de Estado de Resultados.
 
@@ -83,7 +96,7 @@ Phase 5 cierra el ciclo de visualización de la capa de inteligencia financiera.
 
 ### Funcionalidad futura
 - **Cost allocations CRUD UI**: el store existe pero no hay vista para crear/editar manualmente
-- **Dashboard summary enriquecido**: el endpoint `GET /api/finance/dashboard/summary` no incluye labor costs
+- **Dashboard summary enriquecido para meses históricos**: el endpoint `GET /api/finance/dashboard/summary` no incluye labor costs — los meses históricos en los charts solo muestran gastos registrados sin payroll
 - **Partnership income UI**: columnas de partner en schema/mappers pero sin UI
 - **Trend chart drill-down**: click en punto del trend → filtrar tabla por ese período
 
@@ -100,6 +113,7 @@ Phase 5 cierra el ciclo de visualización de la capa de inteligencia financiera.
 2. **CSV export**: En la misma vista, click en menú de 3 puntos de la tabla → "Exportar CSV"
 3. **PersonFinanceTab**: Navegar a `/people/{memberId}?tab=finance` (requiere rol admin o finance_manager)
 4. **Fix P&L**: Navegar a `/finance`, verificar que "Costo laboral directo" muestre el gross de payroll y que los márgenes reflejen este costo
+5. **Fix Dashboard payroll**: En `/finance`, verificar que el KPI "Egresos del mes" incluya nómina (debe mostrar "Incluye nómina de N personas"), que la barra de egresos en el chart sea mayor que solo los gastos registrados, y que el flujo de caja descuente el costo laboral
 
 ---
 

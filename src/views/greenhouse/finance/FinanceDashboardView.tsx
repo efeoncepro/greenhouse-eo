@@ -451,11 +451,22 @@ const FinanceDashboardView = () => {
     return expenseMonthly.find(m => m.year === y && m.month === mo)?.totalAmountClp ?? 0
   })
 
-  const cashFlowData = incomeData.map((inc, i) => inc - expenseData[i])
+  // Adjust expenses: include unlinked payroll costs for the P&L month
+  const pnlMonthKey = pnl ? `${pnl.year}-${String(pnl.month).padStart(2, '0')}` : null
+
+  const adjustedExpenseData = expenseData.map((val, i) => {
+    if (pnlMonthKey && sortedMonths[i] === pnlMonthKey) {
+      return pnl!.costs.totalExpenses
+    }
+
+    return val
+  })
+
+  const cashFlowData = incomeData.map((inc, i) => inc - adjustedExpenseData[i])
 
   const barSeries = [
     { name: 'Ingresos', data: incomeData },
-    { name: 'Egresos', data: expenseData }
+    { name: 'Egresos', data: adjustedExpenseData }
   ]
 
   const areaSeries = [
@@ -556,14 +567,14 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Egresos del mes'
-            stats={formatCLP(expenseSummary?.currentMonth.totalAmountClp ?? 0)}
-            subtitle={expenseSummary?.currentMonth.changePercent !== undefined && expenseSummary.currentMonth.changePercent !== 0
-              ? `${expenseSummary.currentMonth.changePercent > 0 ? '+' : ''}${expenseSummary.currentMonth.changePercent}% vs mes anterior`
-              : 'Sin variación'}
+            stats={formatCLP(pnl ? pnl.costs.totalExpenses : (expenseSummary?.currentMonth.totalAmountClp ?? 0))}
+            subtitle={pnl && pnl.payroll.headcount > 0
+              ? `Incluye nómina de ${pnl.payroll.headcount} persona${pnl.payroll.headcount !== 1 ? 's' : ''}`
+              : expenseSummary?.currentMonth.changePercent !== undefined && expenseSummary.currentMonth.changePercent !== 0
+                ? `${expenseSummary.currentMonth.changePercent > 0 ? '+' : ''}${expenseSummary.currentMonth.changePercent}% vs mes anterior`
+                : 'Sin variación'}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
-            trend={expenseSummary?.currentMonth.trend === 'positive' ? 'positive' : 'negative'}
-            trendNumber={expenseSummary?.currentMonth.changePercent !== undefined ? `${Math.abs(expenseSummary.currentMonth.changePercent)}%` : undefined}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
