@@ -536,6 +536,32 @@ export const searchProfiles = async (query: string): Promise<Array<{ profileId: 
   }))
 }
 
+// ── Organization search ───────────────────────────────────────────────
+
+interface OrgSearchRow extends Record<string, unknown> {
+  organization_id: string
+  organization_name: string
+  public_id: string
+}
+
+export const searchOrganizations = async (query: string): Promise<Array<{ organizationId: string; organizationName: string; publicId: string }>> => {
+  const pattern = `%${query}%`
+
+  const rows = await runGreenhousePostgresQuery<OrgSearchRow>(`
+    SELECT organization_id, organization_name, public_id
+    FROM greenhouse_core.organizations
+    WHERE (organization_name ILIKE $1 OR legal_name ILIKE $1) AND active = TRUE
+    ORDER BY organization_name
+    LIMIT 10
+  `, [pattern])
+
+  return rows.map(r => ({
+    organizationId: r.organization_id,
+    organizationName: r.organization_name,
+    publicId: r.public_id
+  }))
+}
+
 // ── Person memberships ─────────────────────────────────────────────────
 
 export const getPersonMemberships = async (profileId: string): Promise<PersonMembership[]> => {

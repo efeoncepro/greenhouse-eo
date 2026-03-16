@@ -33,18 +33,24 @@ interface PersonMembership {
   isPrimary: boolean
 }
 
-const TYPE_LABEL: Record<string, string> = {
-  team_member: 'Equipo',
-  client_user: 'Usuario',
-  contact: 'Contacto',
-  billing: 'Facturación'
+const TYPE_CONFIG: Record<string, { label: string; color: 'info' | 'secondary' | 'warning' }> = {
+  team_member: { label: 'Equipo Efeonce', color: 'info' },
+  client_user: { label: 'Usuario', color: 'secondary' },
+  client_contact: { label: 'Contacto', color: 'secondary' },
+  contact: { label: 'Contacto', color: 'secondary' },
+  billing: { label: 'Facturación', color: 'warning' },
+  contractor: { label: 'Contratista', color: 'secondary' },
+  partner: { label: 'Partner', color: 'secondary' },
+  advisor: { label: 'Asesor', color: 'secondary' }
 }
 
 type Props = {
   memberId: string
+  isAdmin?: boolean
+  onAddMembership?: () => void
 }
 
-const PersonMembershipsTab = ({ memberId }: Props) => {
+const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => {
   const [memberships, setMemberships] = useState<PersonMembership[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -111,45 +117,80 @@ const PersonMembershipsTab = ({ memberId }: Props) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {memberships.map(m => (
-                    <TableRow key={m.membershipId} hover>
-                      <TableCell>
-                        <Typography
-                          component={Link}
-                          href={`/agency/organizations/${m.organizationId}`}
-                          variant='body2'
-                          fontWeight={600}
-                          sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-                        >
-                          {m.organizationName}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          variant='tonal'
-                          color='secondary'
-                          label={TYPE_LABEL[m.membershipType] ?? m.membershipType}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>
-                          {m.roleLabel ?? '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        {m.isPrimary ? (
-                          <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
-                        ) : (
-                          <Typography variant='body2' color='text.secondary'>—</Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {memberships.map(m => {
+                    const cfg = TYPE_CONFIG[m.membershipType]
+
+                    return (
+                      <TableRow key={m.membershipId} hover>
+                        <TableCell>
+                          <Typography
+                            component={Link}
+                            href={`/agency/organizations/${m.organizationId}`}
+                            variant='body2'
+                            fontWeight={600}
+                            sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                          >
+                            {m.organizationName}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            variant='tonal'
+                            color={cfg?.color ?? 'secondary'}
+                            label={cfg?.label ?? m.membershipType}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant='body2' color='text.secondary'>
+                            {m.roleLabel ?? '—'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                          {m.isPrimary ? (
+                            <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
+                          ) : (
+                            <Typography variant='body2' color='text.secondary'>—</Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
+          )}
+
+          {/* Ghost slot — admin only */}
+          {isAdmin && onAddMembership && (
+            <CardContent sx={{ pt: memberships.length > 0 ? 2 : 0 }}>
+              <Box
+                onClick={onAddMembership}
+                onKeyDown={e => {
+                  if ((e.key === 'Enter' || e.key === ' ') && onAddMembership) {
+                    e.preventDefault()
+                    onAddMembership()
+                  }
+                }}
+                tabIndex={0}
+                role='button'
+                aria-label='Vincular a organización'
+                sx={{
+                  p: 2,
+                  border: '1px dashed',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  textAlign: 'center',
+                  color: 'text.secondary',
+                  cursor: 'pointer',
+                  '&:hover': { borderColor: 'primary.main', color: 'primary.main' }
+                }}
+              >
+                <i className='tabler-plus' style={{ fontSize: 16, marginRight: 6 }} />
+                Vincular a organización
+              </Box>
+            </CardContent>
           )}
         </Card>
       </Grid>

@@ -19,8 +19,6 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { OrganizationSpace } from '../types'
-
 const MEMBERSHIP_TYPES = [
   { value: 'team_member', label: 'Equipo Efeonce' },
   { value: 'contact', label: 'Contacto' },
@@ -28,29 +26,28 @@ const MEMBERSHIP_TYPES = [
   { value: 'billing', label: 'Facturación' }
 ]
 
-interface SearchResult {
-  profileId: string
-  fullName: string | null
-  canonicalEmail: string | null
+interface OrgSearchResult {
+  organizationId: string
+  organizationName: string
+  publicId: string
 }
 
 type Props = {
   open: boolean
-  organizationId: string
-  spaces: OrganizationSpace[] | null
+  memberId: string
+  memberName: string
   onClose: () => void
   onSuccess: () => void
 }
 
-const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess }: Props) => {
+const AddPersonMembershipDrawer = ({ open, memberId, memberName, onClose, onSuccess }: Props) => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searchResults, setSearchResults] = useState<OrgSearchResult[]>([])
   const [searching, setSearching] = useState(false)
-  const [selectedProfile, setSelectedProfile] = useState<SearchResult | null>(null)
-  const [membershipType, setMembershipType] = useState('contact')
+  const [selectedOrg, setSelectedOrg] = useState<OrgSearchResult | null>(null)
+  const [membershipType, setMembershipType] = useState('team_member')
   const [roleLabel, setRoleLabel] = useState('')
   const [department, setDepartment] = useState('')
-  const [spaceId, setSpaceId] = useState('')
   const [isPrimary, setIsPrimary] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,11 +56,10 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
   const resetForm = useCallback(() => {
     setSearchQuery('')
     setSearchResults([])
-    setSelectedProfile(null)
-    setMembershipType('contact')
+    setSelectedOrg(null)
+    setMembershipType('team_member')
     setRoleLabel('')
     setDepartment('')
-    setSpaceId('')
     setIsPrimary(false)
     setError(null)
   }, [])
@@ -74,7 +70,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    setSelectedProfile(null)
+    setSelectedOrg(null)
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
@@ -88,7 +84,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       setSearching(true)
 
       try {
-        const res = await fetch(`/api/organizations/people-search?q=${encodeURIComponent(query.trim())}`)
+        const res = await fetch(`/api/organizations/org-search?q=${encodeURIComponent(query.trim())}`)
 
         if (res.ok) {
           const data = await res.json()
@@ -103,15 +99,15 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
     }, 400)
   }
 
-  const handleSelectProfile = (profile: SearchResult) => {
-    setSelectedProfile(profile)
-    setSearchQuery(profile.fullName ?? profile.canonicalEmail ?? profile.profileId)
+  const handleSelectOrg = (org: OrgSearchResult) => {
+    setSelectedOrg(org)
+    setSearchQuery(org.organizationName)
     setSearchResults([])
   }
 
   const handleSubmit = async () => {
-    if (!selectedProfile) {
-      setError('Selecciona una persona de la lista.')
+    if (!selectedOrg) {
+      setError('Selecciona una organización de la lista.')
 
       return
     }
@@ -120,15 +116,14 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
     setError(null)
 
     try {
-      const res = await fetch(`/api/organizations/${organizationId}/memberships`, {
+      const res = await fetch(`/api/people/${memberId}/memberships`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          profileId: selectedProfile.profileId,
+          organizationId: selectedOrg.organizationId,
           membershipType,
           roleLabel: roleLabel.trim() || undefined,
           department: department.trim() || undefined,
-          spaceId: spaceId || undefined,
           isPrimary
         })
       })
@@ -136,7 +131,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
 
-        setError(data.error || 'Error al agregar membresía')
+        setError(data.error || 'Error al crear membresía')
         setSaving(false)
 
         return
@@ -159,7 +154,10 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       PaperProps={{ sx: { width: { xs: '100%', sm: 480 } } }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
-        <Typography variant='h6'>Agregar persona</Typography>
+        <Box>
+          <Typography variant='h6'>Vincular a organización</Typography>
+          <Typography variant='caption' color='text.secondary'>{memberName}</Typography>
+        </Box>
         <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
           <i className='tabler-x' />
         </IconButton>
@@ -170,20 +168,20 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       <Stack spacing={3} sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
         {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
 
-        {/* Person search */}
+        {/* Organization search */}
         <Box sx={{ position: 'relative' }}>
           <CustomTextField
             fullWidth
             size='small'
-            label='Buscar persona'
-            placeholder='Nombre o email...'
+            label='Buscar organización'
+            placeholder='Nombre de la organización...'
             value={searchQuery}
             onChange={e => handleSearch(e.target.value)}
             InputProps={{
               endAdornment: searching ? <CircularProgress size={16} /> : undefined
             }}
           />
-          {searchResults.length > 0 && !selectedProfile && (
+          {searchResults.length > 0 && !selectedOrg && (
             <List
               dense
               sx={{
@@ -200,13 +198,13 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
               }}
             >
               {searchResults.map(r => (
-                <ListItemButton key={r.profileId} onClick={() => handleSelectProfile(r)}>
+                <ListItemButton key={r.organizationId} onClick={() => handleSelectOrg(r)}>
                   <ListItemText
-                    primary={r.fullName ?? 'Sin nombre'}
-                    secondary={r.canonicalEmail}
+                    primary={r.organizationName}
+                    secondary={r.publicId}
                     slotProps={{
                       primary: { variant: 'body2', fontWeight: 600 },
-                      secondary: { variant: 'caption' }
+                      secondary: { variant: 'caption', sx: { fontFamily: 'monospace', fontSize: '0.75rem' } }
                     }}
                   />
                 </ListItemButton>
@@ -215,12 +213,15 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           )}
         </Box>
 
-        {selectedProfile && (
+        {selectedOrg && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
-            <i className='tabler-user-check' style={{ fontSize: 18, color: 'var(--mui-palette-success-main)' }} />
-            <Typography variant='body2' fontWeight={600}>
-              {selectedProfile.fullName ?? selectedProfile.canonicalEmail}
-            </Typography>
+            <i className='tabler-building-check' style={{ fontSize: 18, color: 'var(--mui-palette-success-main)' }} />
+            <Box>
+              <Typography variant='body2' fontWeight={600}>{selectedOrg.organizationName}</Typography>
+              <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                {selectedOrg.publicId}
+              </Typography>
+            </Box>
           </Box>
         )}
 
@@ -241,7 +242,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           fullWidth
           size='small'
           label='Rol'
-          placeholder='ej. CEO, Gerente de marketing...'
+          placeholder='ej. Account Manager, Director creativo...'
           value={roleLabel}
           onChange={e => setRoleLabel(e.target.value)}
         />
@@ -254,22 +255,6 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           onChange={e => setDepartment(e.target.value)}
         />
 
-        {spaces && spaces.length > 0 && (
-          <CustomTextField
-            select
-            fullWidth
-            size='small'
-            label='Space (opcional)'
-            value={spaceId}
-            onChange={e => setSpaceId(e.target.value)}
-          >
-            <MenuItem value=''>Sin asignar</MenuItem>
-            {spaces.map(s => (
-              <MenuItem key={s.spaceId} value={s.spaceId}>{s.spaceName}</MenuItem>
-            ))}
-          </CustomTextField>
-        )}
-
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant='body2'>Contacto principal</Typography>
           <Switch checked={isPrimary} onChange={e => setIsPrimary(e.target.checked)} />
@@ -281,12 +266,12 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
         <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
           Cancelar
         </Button>
-        <Button variant='contained' onClick={handleSubmit} disabled={saving || !selectedProfile} fullWidth>
-          {saving ? 'Guardando...' : 'Agregar persona'}
+        <Button variant='contained' onClick={handleSubmit} disabled={saving || !selectedOrg} fullWidth>
+          {saving ? 'Guardando...' : 'Vincular'}
         </Button>
       </Box>
     </Drawer>
   )
 }
 
-export default AddMembershipDrawer
+export default AddPersonMembershipDrawer

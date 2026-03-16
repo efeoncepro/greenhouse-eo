@@ -21,6 +21,7 @@ import CompensationDrawer from '@views/greenhouse/payroll/CompensationDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AssignmentDrawer from './drawers/AssignmentDrawer'
 import EditAssignmentDrawer from './drawers/EditAssignmentDrawer'
+import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import PersonLeftSidebar from './PersonLeftSidebar'
 import PersonTabs from './PersonTabs'
 
@@ -40,6 +41,7 @@ const PersonView = ({ memberId }: Props) => {
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
+  const [membershipDrawerOpen, setMembershipDrawerOpen] = useState(false)
 
   const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
 
@@ -98,6 +100,11 @@ const PersonView = ({ memberId }: Props) => {
     await loadDetail()
   }
 
+  const handleMembershipSuccess = async () => {
+    toast.success('Vinculado a la organización.')
+    await loadDetail()
+  }
+
   const handleSaveCompensation = async (input: CreateCompensationVersionInput) => {
     const res = await fetch('/api/hr/payroll/compensation', {
       method: 'POST',
@@ -152,6 +159,7 @@ const PersonView = ({ memberId }: Props) => {
             isAdmin={isAdmin}
             onNewAssignment={() => setAssignmentOpen(true)}
             onEditAssignment={a => setEditAssignment(a)}
+            onNewMembership={() => setMembershipDrawerOpen(true)}
           />
         </Grid>
       </Grid>
@@ -184,6 +192,13 @@ const PersonView = ({ memberId }: Props) => {
             memberId={detail.member.memberId}
             memberName={detail.member.displayName}
             onSave={handleSaveCompensation}
+          />
+          <AddPersonMembershipDrawer
+            open={membershipDrawerOpen}
+            memberId={detail.member.memberId}
+            memberName={detail.member.displayName}
+            onClose={() => setMembershipDrawerOpen(false)}
+            onSuccess={handleMembershipSuccess}
           />
           <ConfirmDialog
             open={deactivateConfirmOpen}

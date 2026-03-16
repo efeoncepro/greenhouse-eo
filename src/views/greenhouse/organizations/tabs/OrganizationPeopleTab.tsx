@@ -30,11 +30,15 @@ type Props = {
   onAddMembership?: () => void
 }
 
-const TYPE_LABEL: Record<string, string> = {
-  team_member: 'Equipo',
-  client_user: 'Usuario',
-  contact: 'Contacto',
-  billing: 'Facturación'
+const TYPE_CONFIG: Record<string, { label: string; color: 'info' | 'secondary' | 'warning' }> = {
+  team_member: { label: 'Equipo Efeonce', color: 'info' },
+  client_user: { label: 'Usuario', color: 'secondary' },
+  client_contact: { label: 'Contacto', color: 'secondary' },
+  contact: { label: 'Contacto', color: 'secondary' },
+  billing: { label: 'Facturación', color: 'warning' },
+  contractor: { label: 'Contratista', color: 'secondary' },
+  partner: { label: 'Partner', color: 'secondary' },
+  advisor: { label: 'Asesor', color: 'secondary' }
 }
 
 const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Props) => {
@@ -112,7 +116,10 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {memberships.map(m => (
+                  {memberships.map(m => {
+                    const cfg = TYPE_CONFIG[m.membershipType]
+
+                    return (
                     <TableRow key={m.membershipId} hover>
                       <TableCell>
                         <Box>
@@ -131,8 +138,8 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
                           round='true'
                           size='small'
                           variant='tonal'
-                          color='secondary'
-                          label={TYPE_LABEL[m.membershipType] ?? m.membershipType}
+                          color={cfg?.color ?? 'secondary'}
+                          label={cfg?.label ?? m.membershipType}
                         />
                       </TableCell>
                       <TableCell>
@@ -153,7 +160,8 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
                         )}
                       </TableCell>
                     </TableRow>
-                  ))}
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

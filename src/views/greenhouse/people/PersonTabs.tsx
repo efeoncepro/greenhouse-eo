@@ -30,9 +30,10 @@ type Props = {
   isAdmin?: boolean
   onNewAssignment?: () => void
   onEditAssignment?: (a: PersonDetailAssignment) => void
+  onNewMembership?: () => void
 }
 
-const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment }: Props) => {
+const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment, onNewMembership }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -155,7 +156,11 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment }: Prop
 
             <TabPanel value='memberships' className='p-0'>
               {activeTab === 'memberships' && (
-                <PersonMembershipsTab memberId={detail.member.memberId} />
+                <PersonMembershipsTab
+                  memberId={detail.member.memberId}
+                  isAdmin={isAdmin}
+                  onAddMembership={onNewMembership}
+                />
               )}
             </TabPanel>
 
