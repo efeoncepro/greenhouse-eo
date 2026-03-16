@@ -21,6 +21,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { PersonDetailAssignment } from '@/types/people'
@@ -93,6 +96,8 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
     }
   }
 
+  const canEditRows = isAdmin && !!onEditMembership
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -136,16 +141,16 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                     <TableCell>Desde</TableCell>
                     <TableCell>Estado</TableCell>
                     <TableCell align='center'>Principal</TableCell>
+                    {canEditRows && <TableCell align='center' sx={{ width: 48 }} />}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {memberships.map(m => {
                     const cfg = TYPE_CONFIG[m.membershipType]
                     const assignment = m.clientId ? assignmentMap.get(m.clientId) : undefined
-                    const canEdit = isAdmin && onEditMembership
 
-                    const handleRowClick = () => {
-                      if (!canEdit) return
+                    const handleEdit = () => {
+                      if (!onEditMembership) return
 
                       const rowData: MembershipRowData = {
                         membershipId: m.membershipId,
@@ -165,11 +170,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                       <TableRow
                         key={m.membershipId}
                         hover
-                        onClick={handleRowClick}
-                        sx={{
-                          ...(assignment && !assignment.active ? { opacity: 0.6 } : undefined),
-                          ...(canEdit ? { cursor: 'pointer' } : undefined)
-                        }}
+                        sx={assignment && !assignment.active ? { opacity: 0.6 } : undefined}
                       >
                         <TableCell>
                           <Typography
@@ -228,6 +229,15 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                             <Typography variant='body2' color='text.secondary'>—</Typography>
                           )}
                         </TableCell>
+                        {canEditRows && (
+                          <TableCell align='center' sx={{ px: 0.5 }}>
+                            <Tooltip title='Editar membresía'>
+                              <IconButton size='small' onClick={handleEdit} aria-label={`Editar membresía en ${m.organizationName}`}>
+                                <i className='tabler-pencil' style={{ fontSize: 16 }} />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                        )}
                       </TableRow>
                     )
                   })}
