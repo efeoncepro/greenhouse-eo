@@ -20,6 +20,7 @@ import PersonAssignmentsTab from './tabs/PersonAssignmentsTab'
 import PersonActivityTab from './tabs/PersonActivityTab'
 import PersonCompensationTab from './tabs/PersonCompensationTab'
 import PersonPayrollTab from './tabs/PersonPayrollTab'
+import PersonFinanceTab from './tabs/PersonFinanceTab'
 import PersonHrProfileTab from './tabs/PersonHrProfileTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 
@@ -142,6 +143,12 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment }: Prop
             <TabPanel value='payroll' className='p-0'>
               {activeTab === 'payroll' && (
                 <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
+              )}
+            </TabPanel>
+
+            <TabPanel value='finance' className='p-0'>
+              {activeTab === 'finance' && (
+                <PersonFinanceTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 

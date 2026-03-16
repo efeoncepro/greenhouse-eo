@@ -509,70 +509,83 @@ Si se publican estos nuevos objetos a BigQuery:
 
 ## Orden de ejecucion sugerido
 
-### Fase 1. Foundation de datos
+### Fase 1. Foundation de datos — COMPLETADA (2026-03-15, commit c3facc0)
 
-1. Extender `greenhouse_finance.income`
-2. Extender `greenhouse_finance.expenses`
-3. Crear `greenhouse_finance.cost_allocations`
-4. Crear `greenhouse_finance.client_economics`
-5. Crear script de backfill de `cost_category`
+1. [x] Extender `greenhouse_finance.income` (partner columns)
+2. [x] Extender `greenhouse_finance.expenses` (cost_category, cost_is_direct, allocated_client_id)
+3. [x] Crear `greenhouse_finance.cost_allocations`
+4. [x] Crear `greenhouse_finance.client_economics`
+5. [x] Crear script de backfill de `cost_category` (script existe, pendiente ejecutar)
 
-### Fase 2. Analytics P0
+### Fase 2. Analytics P0 — PARCIALMENTE COMPLETADA
 
-6. Implementar `pnl`
-7. Implementar `pnl/summary`
-8. Implementar `trends/expenses`
-9. Implementar `trends/payroll`
-10. Implementar `trends/tools`
-11. Extender dashboard `/finance`
-12. Crear `/finance/analytics` tab `P&L` y `Trends`
+6. [x] Implementar `pnl` (commit f876d49 + fix payroll integration en Phase 5)
+7. [ ] Implementar `pnl/summary`
+8. [ ] Implementar `trends/expenses`
+9. [ ] Implementar `trends/payroll`
+10. [ ] Implementar `trends/tools`
+11. [x] Extender dashboard `/finance` (P&L card + Costo de Personal card)
+12. [x] Crear `/finance/intelligence` con vista de client economics (commit e59ba03)
+
+Implementado fuera de spec pero alineado:
+- [x] `GET /api/finance/intelligence/client-economics` (GET + POST compute)
+- [x] `GET /api/finance/intelligence/client-economics/trend` (commit 5a69c3d)
+- [x] Trend chart de evolución de márgenes en ClientEconomicsView (Phase 5)
+- [x] CSV export en ClientEconomicsView (Phase 5)
+- [x] Fix: payroll gross → directLabor en P&L con anti-doble-conteo (Phase 5)
 
 ### Fase 3. Partnerships P1
 
-13. Implementar soporte partnership en `income`
-14. Implementar endpoint `partnerships`
-15. Implementar tab `Partnerships`
+13. [ ] Implementar soporte partnership en `income` (columnas ya existen en schema)
+14. [ ] Implementar endpoint `partnerships`
+15. [ ] Implementar tab `Partnerships`
 
 ### Fase 4. Cost allocation y module margin P1
 
-16. Implementar CRUD de allocations
-17. Implementar `margin/service-line`
-18. Implementar tab `Capabilities`
+16. [ ] Implementar CRUD de allocations (store CRUD existe, falta UI)
+17. [x] `margin/service-line` parcial — by-service-line enriquecido con labor costs (commit e59ba03)
+18. [ ] Implementar tab `Capabilities`
+
+Implementado fuera de spec:
+- [x] Vista SQL `greenhouse_serving.client_labor_cost_allocation` (FTE-weighted payroll, commit 5a69c3d)
+- [x] `computeClientLaborCosts()` engine (commit 5a69c3d)
+- [x] PersonFinanceTab en Person 360 — cost attribution por Space (Phase 5)
+- [x] Finance tab wired en TAB_CONFIG + PersonTabs (Phase 5)
 
 ### Fase 5. Client economics P2
 
-19. Implementar `unit-economics/calculate`
-20. Implementar `unit-economics`
-21. Implementar `margin/client`
-22. Implementar tab `Clients`
+19. [ ] Implementar `unit-economics/calculate` (compute batch parcial en client-economics POST)
+20. [ ] Implementar `unit-economics` (LTV/CAC pendiente)
+21. [x] `margin/client` parcial — client economics con margen por Space (commit e59ba03)
+22. [x] Tab `Clients` parcial — ClientEconomicsView con KPIs, charts, tabla (commit e59ba03)
 
 ## Criterios de aceptacion
 
 ### Datos
 
-- [ ] Nuevas columnas y tablas persisten en `greenhouse_finance`, no solo en BigQuery legacy
-- [ ] Todos los montos y porcentajes persistidos usan precision exacta
-- [ ] `cost_allocations` valida sumas por source y periodo
-- [ ] `client_economics` usa `client_id` como anchor de negocio
+- [x] Nuevas columnas y tablas persisten en `greenhouse_finance`, no solo en BigQuery legacy
+- [x] Todos los montos y porcentajes persistidos usan precision exacta
+- [ ] `cost_allocations` valida sumas por source y periodo (CRUD existe, validación parcial)
+- [x] `client_economics` usa `client_id` como anchor de negocio
 
 ### Arquitectura
 
-- [ ] Ninguna API nueva depende de raw source APIs
-- [ ] Ninguna superficie nueva usa `hubspot_company_id` o `supplier_id` como identidad primaria
-- [ ] Margen por capability usa catalogo canonico de modules
-- [ ] La task no reabre un silo de `service_line` fuera de `service_modules`
+- [x] Ninguna API nueva depende de raw source APIs
+- [x] Ninguna superficie nueva usa `hubspot_company_id` o `supplier_id` como identidad primaria
+- [ ] Margen por capability usa catalogo canonico de modules (pendiente Fase 4)
+- [x] La task no reabre un silo de `service_line` fuera de `service_modules`
 
 ### Producto
 
-- [ ] `/finance` muestra KPIs y charts nuevos sin romper el dashboard actual
-- [ ] `/finance/analytics` resuelve P&L y tendencias como primera entrega util
-- [ ] partnerships quedan separados del revenue operacional
-- [ ] client economics muestra `LTV/CAC` solo cuando existe CAC confiable
+- [x] `/finance` muestra KPIs y charts nuevos sin romper el dashboard actual
+- [x] `/finance/intelligence` resuelve client economics y tendencias como primera entrega util
+- [ ] partnerships quedan separados del revenue operacional (pendiente Fase 3)
+- [ ] client economics muestra `LTV/CAC` solo cuando existe CAC confiable (pendiente Fase 5)
 
 ### Operacion
 
-- [ ] backfills y calculos batch corren fuera del hot path
-- [ ] el calculo mensual es idempotente
+- [x] backfills y calculos batch corren fuera del hot path
+- [x] el calculo mensual es idempotente (upsert por client_id + period)
 - [ ] la respuesta API indica cuando un margen usa prorrateo de fallback
 
 ## Fuera de alcance

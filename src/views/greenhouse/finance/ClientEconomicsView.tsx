@@ -201,6 +201,78 @@ const buildDonutOptions = (theme: Theme): ApexOptions => ({
 })
 
 // ---------------------------------------------------------------------------
+// Trend chart config
+// ---------------------------------------------------------------------------
+
+interface TrendPoint {
+  label: string
+  grossMarginAvg: number
+  netMarginAvg: number
+}
+
+const buildTrendAreaOptions = (theme: Theme, categories: string[]): ApexOptions => ({
+  chart: {
+    parentHeightOffset: 0,
+    toolbar: { show: false },
+    sparkline: { enabled: false }
+  },
+  stroke: {
+    curve: 'smooth',
+    width: 2.5,
+    dashArray: [0, 6]
+  },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.4,
+      opacityTo: 0.05,
+      stops: [0, 95, 100]
+    }
+  },
+  markers: { strokeWidth: 2 },
+  colors: ['var(--mui-palette-success-main)', 'var(--mui-palette-primary-main)'],
+  legend: {
+    position: 'bottom',
+    labels: { colors: 'var(--mui-palette-text-secondary)' },
+    fontFamily: theme.typography.fontFamily,
+    markers: { offsetX: -2 }
+  },
+  grid: {
+    borderColor: 'var(--mui-palette-divider)',
+    strokeDashArray: 4,
+    padding: { left: 8, right: 8, top: -8, bottom: 0 }
+  },
+  xaxis: {
+    categories,
+    labels: {
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    },
+    axisBorder: { show: false },
+    axisTicks: { show: false }
+  },
+  yaxis: {
+    labels: {
+      formatter: (val: number) => `${val.toFixed(0)}%`,
+      style: {
+        colors: 'var(--mui-palette-text-disabled)',
+        fontFamily: theme.typography.fontFamily,
+        fontSize: theme.typography.body2.fontSize as string
+      }
+    }
+  },
+  tooltip: {
+    shared: true,
+    y: { formatter: (val: number) => `${val.toFixed(1)}%` }
+  },
+  dataLabels: { enabled: false }
+})
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -216,6 +288,8 @@ const ClientEconomicsView = () => {
   const [error, setError] = useState('')
   const [sortField, setSortField] = useState<SortField>('netMargin')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [trendData, setTrendData] = useState<TrendPoint[]>([])
+  const [trendLoading, setTrendLoading] = useState(false)
 
   const fetchData = useCallback(async (y: number, m: number) => {
     setLoading(true)
@@ -278,6 +352,68 @@ const ClientEconomicsView = () => {
     }
   }
 
+  // Fetch trend data when snapshots change
+  useEffect(() => {
+    if (snapshots.length === 0) {
+      setTrendData([])
+
+      return
+    }
+
+    let cancelled = false
+
+    const fetchTrend = async () => {
+      setTrendLoading(true)
+
+      try {
+        const res = await fetch('/api/finance/intelligence/client-economics/trend?months=6', { cache: 'no-store' })
+
+        if (!res.ok || cancelled) return
+
+        const data = await res.json()
+        const clients: Array<{ periods: ClientEconomicsSnapshot[] }> = data.clients ?? []
+
+        // Build a map: "YYYY-MM" → { sumWeightedGross, sumWeightedNet, sumRevenue }
+        const periodMap = new Map<string, { wGross: number; wNet: number; rev: number }>()
+
+        for (const c of clients) {
+          for (const p of c.periods) {
+            const key = `${p.periodYear}-${String(p.periodMonth).padStart(2, '0')}`
+            const entry = periodMap.get(key) ?? { wGross: 0, wNet: 0, rev: 0 }
+
+            entry.wGross += (p.grossMarginPercent ?? 0) * p.totalRevenueClp
+            entry.wNet += (p.netMarginPercent ?? 0) * p.totalRevenueClp
+            entry.rev += p.totalRevenueClp
+            periodMap.set(key, entry)
+          }
+        }
+
+        // Convert to sorted TrendPoint array
+        const points: TrendPoint[] = [...periodMap.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([key, v]) => {
+            const [yr, mo] = key.split('-')
+
+            return {
+              label: `${MONTH_SHORT[Number(mo)]} ${yr}`,
+              grossMarginAvg: v.rev > 0 ? (v.wGross / v.rev) * 100 : 0,
+              netMarginAvg: v.rev > 0 ? (v.wNet / v.rev) * 100 : 0
+            }
+          })
+
+        if (!cancelled) setTrendData(points)
+      } catch {
+        // Non-blocking — trend is supplementary
+      } finally {
+        if (!cancelled) setTrendLoading(false)
+      }
+    }
+
+    void fetchTrend()
+
+    return () => { cancelled = true }
+  }, [snapshots])
+
   // Derived values
   const totalFte = snapshots.reduce((sum, s) => sum + (s.headcountFte ?? 0), 0)
   const totalRevenue = snapshots.reduce((sum, s) => sum + s.totalRevenueClp, 0)
@@ -319,6 +455,36 @@ const ClientEconomicsView = () => {
 
     return sortDir === 'asc' ? av - bv : bv - av
   })
+
+  // CSV export handler
+  const handleExportCsv = useCallback(() => {
+    if (sorted.length === 0) return
+
+    const headers = ['Space', 'Ingreso', 'C. Directos', 'C. Indirectos', 'Margen Bruto %', 'Margen Neto %', 'FTE', 'Ingreso/FTE', 'Costo/FTE']
+
+    const rows = sorted.map(s => [
+      `"${s.clientName}"`,
+      s.totalRevenueClp,
+      s.directCostsClp,
+      s.indirectCostsClp,
+      s.grossMarginPercent != null ? (s.grossMarginPercent * 100).toFixed(1) : '',
+      s.netMarginPercent != null ? (s.netMarginPercent * 100).toFixed(1) : '',
+      s.headcountFte != null ? s.headcountFte.toFixed(1) : '',
+      s.revenuePerFte != null ? Math.round(s.revenuePerFte) : '',
+      s.costPerFte != null ? Math.round(s.costPerFte) : ''
+    ])
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+
+    a.href = url
+    a.download = `economia_spaces_${MONTH_SHORT[month]}_${year}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success('Reporte exportado. Revisa tu carpeta de descargas.')
+  }, [sorted, month, year])
 
   // Chart data
   const barCategories = sorted.map(s => s.clientName.length > 20 ? s.clientName.slice(0, 20) + '…' : s.clientName)
@@ -517,6 +683,62 @@ const ClientEconomicsView = () => {
         </Grid>
       )}
 
+      {/* ROW 2.5 — Trend chart (6-month margin evolution) */}
+      {trendLoading && (
+        <Skeleton variant='rounded' height={360} />
+      )}
+      {!trendLoading && trendData.length >= 2 && (
+        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+          <CardHeader
+            title='Evolución de márgenes'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+                <i className='tabler-trending-up' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
+              </Avatar>
+            }
+            action={
+              <CustomChip
+                round='true'
+                size='small'
+                color='secondary'
+                variant='tonal'
+                label='Últimos 6 meses'
+              />
+            }
+          />
+          <Divider />
+          <CardContent>
+            <figure
+              role='img'
+              aria-label='Gráfico de evolución: margen bruto promedio y margen neto promedio de los últimos 6 meses'
+              style={{ margin: 0 }}
+            >
+              <AppReactApexCharts
+                type='area'
+                height={300}
+                options={buildTrendAreaOptions(theme, trendData.map(p => p.label))}
+                series={[
+                  { name: 'Margen bruto promedio', data: trendData.map(p => Number(p.grossMarginAvg.toFixed(1))) },
+                  { name: 'Margen neto promedio', data: trendData.map(p => Number(p.netMarginAvg.toFixed(1))) }
+                ]}
+              />
+            </figure>
+          </CardContent>
+        </Card>
+      )}
+      {!trendLoading && trendData.length > 0 && trendData.length < 2 && (
+        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+          <CardContent>
+            <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
+              <Typography variant='h6' sx={{ mb: 1 }}>Aún no hay suficiente historial</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Calcula la rentabilidad en al menos 2 períodos para ver cómo evolucionan tus márgenes.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
       {/* ROW 3 — Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
@@ -526,7 +748,7 @@ const ClientEconomicsView = () => {
               <i className='tabler-report-analytics' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
             </Avatar>
           }
-          action={<OptionMenu options={['Exportar CSV']} />}
+          action={<OptionMenu options={[{ text: 'Exportar CSV', menuItemProps: { onClick: handleExportCsv } }]} />}
         />
         <Divider />
         {snapshots.length === 0 ? (
