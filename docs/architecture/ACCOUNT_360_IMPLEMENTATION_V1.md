@@ -55,7 +55,7 @@ All tables live in `greenhouse_core` schema, owned by `migrator` role.
 | profile_id | TEXT FK → identity_profiles | The person |
 | organization_id | TEXT FK → organizations | The org |
 | space_id | TEXT FK → spaces | Optional space scope |
-| membership_type | TEXT | team_member, client_user, contact, billing |
+| membership_type | TEXT | team_member, client_contact, client_user, contact, billing, contractor, partner, advisor |
 | role_label / department | TEXT | Human-readable role |
 | is_primary | BOOLEAN | Primary contact flag |
 | status / active | TEXT / BOOLEAN | Lifecycle |
@@ -94,7 +94,8 @@ GROUP BY o.organization_id
 | `/api/organizations/[id]/finance` | GET | internal | Finance summary (year, month) |
 | `/api/organizations/[id]/hubspot-sync` | POST | admin | Sync org fields + contacts from HubSpot |
 | `/api/organizations/people-search` | GET | internal | Search identity profiles (ILIKE, ?q=) |
-| `/api/people/[memberId]/memberships` | GET | internal | Person's org memberships |
+| `/api/organizations/org-search` | GET | internal | Search organizations (ILIKE name/legal_name, ?q=) |
+| `/api/people/[memberId]/memberships` | GET, POST | GET: internal, POST: admin | Person's org memberships + create |
 
 ### Query Parameters (GET /api/organizations)
 
@@ -135,6 +136,7 @@ GROUP BY o.organization_id
 | `membershipExists(profileId, organizationId)` | Check if membership already exists |
 | `createIdentityProfile(data)` | Create identity profile (ON CONFLICT DO NOTHING) |
 | `searchProfiles(query)` | ILIKE search on name/email, limit 10 |
+| `searchOrganizations(query)` | ILIKE search on org name/legal_name, limit 10 |
 
 ---
 
@@ -162,7 +164,7 @@ GROUP BY o.organization_id
 - **Tabs** (`OrganizationTabs.tsx`):
   - URL-driven via `?tab=` query param
   - **Resumen**: Spaces table with type, status, client_id links
-  - **Personas**: Fetches memberships from API, shows name, type, role, primary flag. "Agregar persona" button (admin-gated)
+  - **Personas**: Fetches memberships from API, shows name, type (color-coded: "Equipo Efeonce" blue, "Facturación" orange, others gray), role, primary flag. "Agregar persona" button (admin-gated)
   - **Finanzas**: Real data from `client_economics` — period selectors, 4 KPI cards, client breakdown table with margin semaphore chips
 
 ### Person 360 Memberships Tab
@@ -170,8 +172,11 @@ GROUP BY o.organization_id
 - **Tab**: "Organizaciones" in Person 360 tabs
 - **Component**: `PersonMembershipsTab.tsx`
 - **Data**: Fetches from `/api/people/[memberId]/memberships`
-- **Table**: Organization name (link to detail), membership type, role, primary flag
-- **Permissions**: Visible to `efeonce_admin` and `efeonce_operations`
+- **Table**: Organization name (link to detail), membership type (color-coded chip), role, primary flag
+- **Ghost slot**: Admin-only "+ Vincular a organización" dashed-border button below the table, triggers `AddPersonMembershipDrawer`
+- **Drawer**: `AddPersonMembershipDrawer.tsx` — search organizations by name, select type (default: "Equipo Efeonce"), role, department, primary flag. Submits to `POST /api/people/[memberId]/memberships`
+- **TYPE_CONFIG**: `team_member` → "Equipo Efeonce" (info/blue), `billing` → "Facturación" (warning), others → secondary/gray
+- **Permissions**: Visible to `efeonce_admin` and `efeonce_operations`; CRUD admin-only
 
 ### Navigation
 
@@ -200,6 +205,12 @@ Adds `organization_id` FK column to `greenhouse_finance.client_profiles` and bac
 
 **Run**: `npx tsx scripts/setup-postgres-finance-bridge-m33.ts`
 
+### Fix CHECK Constraint (`scripts/migrations/fix-membership-type-check.ts`)
+
+Expands the CHECK constraint on `person_memberships.membership_type` to accept all valid values (original DB set + UI set): `team_member`, `client_contact`, `client_user`, `contact`, `billing`, `contractor`, `partner`, `advisor`.
+
+**Run**: `npx tsx scripts/migrations/fix-membership-type-check.ts`
+
 ---
 
 ## ID Generation
@@ -224,6 +235,7 @@ Adds `organization_id` FK column to `greenhouse_finance.client_profiles` and bac
 | M3: Organization 360 serving view | `setup-postgres-organization-360.ts` | migrator | Deployed |
 | M3.3: Finance bridge | `setup-postgres-finance-bridge-m33.ts` | admin | Deployed |
 | Reconciliation: Identity profiles | `reconcile-identity-profiles.ts` | migrator | Deployed |
+| Fix: membership_type CHECK constraint | `fix-membership-type-check.ts` | migrator | Deployed |
 
 ---
 
@@ -245,7 +257,7 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 
 ## File Inventory
 
-### New Files (33)
+### New Files (37)
 
 | File | Layer | Phase | Purpose |
 |------|-------|-------|---------|
@@ -272,9 +284,13 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 | `src/views/greenhouse/organizations/tabs/OrganizationFinanceTab.tsx` | View | P3 | Finance with real data |
 | `src/views/greenhouse/organizations/drawers/EditOrganizationDrawer.tsx` | View | P3 | Edit org drawer |
 | `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | View | P3 | Add person drawer |
-| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | View | P2 | Person orgs tab |
+| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | View | P2+P4 | Person orgs tab + ghost slot + TYPE_CONFIG |
+| `scripts/migrations/fix-membership-type-check.sql` | Script | P4 | CHECK constraint migration DDL |
+| `scripts/migrations/fix-membership-type-check.ts` | Script | P4 | CHECK constraint migration runner |
+| `src/app/api/organizations/org-search/route.ts` | API | P4 | Organization search (typeahead) |
+| `src/views/greenhouse/people/drawers/AddPersonMembershipDrawer.tsx` | View | P4 | Drawer to link person → org |
 
-### Modified Files (9 from P2, 2 additional from P3)
+### Modified Files (9 from P2, 2 from P3, 5 from P4)
 
 | File | Change |
 |------|--------|
@@ -285,3 +301,9 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 | `src/lib/people/get-people-meta.ts` | `'memberships'` in supportedTabs |
 | `src/components/layout/vertical/VerticalMenu.tsx` | +Organizaciones nav, -Clientes nav (finance) |
 | `src/config/greenhouse-nomenclature.ts` | +`organizations` in GH_AGENCY_NAV, -`clients` from GH_FINANCE_NAV |
+| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()` (P4) |
+| `src/app/api/people/[memberId]/memberships/route.ts` | +POST handler with admin auth, duplicate check (P4) |
+| `src/views/greenhouse/people/PersonTabs.tsx` | +`onNewMembership` prop (P4) |
+| `src/views/greenhouse/people/PersonView.tsx` | +membership drawer state, +AddPersonMembershipDrawer (P4) |
+| `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_CONFIG with "Equipo Efeonce" + color differentiation (P4) |
+| `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels synced: "Equipo Efeonce", reordered (P4) |

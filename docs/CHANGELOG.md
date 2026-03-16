@@ -4,6 +4,38 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+## Account 360 Phase 4 — Person 360 Membership Management + Equipo Efeonce (2026-03-16)
+
+### Nuevas funcionalidades
+
+- **Person 360 → Vincular a organización** — Ghost slot "+ Vincular a organización" en la pestaña Organizaciones de Person 360. Click abre un drawer lateral (480px) con búsqueda typeahead de organizaciones, selector de tipo de membresía (default: "Equipo Efeonce"), rol, departamento, contacto principal. Admin-only. `POST /api/people/[memberId]/memberships` con validación de duplicados y resolución automática de `identity_profile_id`.
+- **Organization search API** — `GET /api/organizations/org-search?q=` para typeahead de organizaciones (ILIKE nombre/razón social, limit 10). Usado por el nuevo drawer.
+- **Diferenciación visual "Equipo Efeonce"** — En Organization 360 (Personas) y Person 360 (Organizaciones), los chips de tipo de membresía ahora usan colores diferenciados: "Equipo Efeonce" (info/azul) para equipo interno, "Facturación" (warning/naranja), otros tipos en gris. Mismo patrón TYPE_CONFIG en ambos lados.
+- **Fix CHECK constraint** — Migración `fix-membership-type-check.sql` expande el constraint de `person_memberships.membership_type` para aceptar todos los valores válidos (DB originales + UI): `team_member`, `client_contact`, `client_user`, `contact`, `billing`, `contractor`, `partner`, `advisor`.
+
+### Archivos nuevos (4)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `scripts/migrations/fix-membership-type-check.sql` | Migración CHECK constraint |
+| `scripts/migrations/fix-membership-type-check.ts` | Runner de migración (profile: migrator) |
+| `src/app/api/organizations/org-search/route.ts` | GET búsqueda de organizaciones |
+| `src/views/greenhouse/people/drawers/AddPersonMembershipDrawer.tsx` | Drawer para vincular persona a organización |
+
+### Archivos modificados (7)
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()` |
+| `src/app/api/people/[memberId]/memberships/route.ts` | +POST handler (admin, duplicate check, profileId resolution) |
+| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | Ghost slot, TYPE_CONFIG con colores, props `isAdmin`/`onAddMembership` |
+| `src/views/greenhouse/people/PersonTabs.tsx` | +`onNewMembership` prop, pasado a PersonMembershipsTab |
+| `src/views/greenhouse/people/PersonView.tsx` | +`membershipDrawerOpen` state, +`AddPersonMembershipDrawer` render |
+| `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_LABEL → TYPE_CONFIG con "Equipo Efeonce" (info) y colores diferenciados |
+| `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels sincronizados: "Equipo Efeonce", reordenados |
+
+---
+
 ## Account 360 Phase 3 — Finance Tab, CRUD, HubSpot Sync, Memberships (2026-03-16)
 
 ### Nuevas funcionalidades
