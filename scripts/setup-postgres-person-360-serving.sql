@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS greenhouse_serving.person_360;
 CREATE OR REPLACE VIEW greenhouse_serving.person_360 AS
 WITH member_rollup AS (
   SELECT

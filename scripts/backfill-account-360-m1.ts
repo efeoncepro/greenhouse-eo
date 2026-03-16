@@ -30,6 +30,7 @@ applyGreenhousePostgresProfile('runtime')
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') { const t = v.trim(); return t || null }
+  if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v && 'value' in v) return toStr((v as { value?: unknown }).value)
   return String(v)
 }

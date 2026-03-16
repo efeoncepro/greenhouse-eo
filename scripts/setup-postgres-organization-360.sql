@@ -8,6 +8,7 @@
 --   - Finance summary (via client bridge)
 -- ════════════════════════════════════════════════════════════════════════════
 
+DROP VIEW IF EXISTS greenhouse_serving.organization_360;
 CREATE OR REPLACE VIEW greenhouse_serving.organization_360 AS
 SELECT
   o.organization_id,

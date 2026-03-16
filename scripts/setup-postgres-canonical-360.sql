@@ -306,6 +306,7 @@ CREATE INDEX IF NOT EXISTS user_role_assignments_user_idx
 CREATE INDEX IF NOT EXISTS outbox_events_pending_idx
   ON greenhouse_sync.outbox_events (status, occurred_at);
 
+DROP VIEW IF EXISTS greenhouse_serving.client_capability_360;
 CREATE OR REPLACE VIEW greenhouse_serving.client_capability_360 AS
 SELECT
   csm.assignment_id,
@@ -330,6 +331,7 @@ LEFT JOIN greenhouse_core.clients AS c
 LEFT JOIN greenhouse_core.service_modules AS sm
   ON sm.module_id = csm.module_id;
 
+DROP VIEW IF EXISTS greenhouse_serving.client_360;
 CREATE OR REPLACE VIEW greenhouse_serving.client_360 AS
 SELECT
   c.client_id,
@@ -375,6 +377,7 @@ GROUP BY
   c.created_at,
   c.updated_at;
 
+DROP VIEW IF EXISTS greenhouse_serving.notion_workspace_360;
 CREATE OR REPLACE VIEW greenhouse_serving.notion_workspace_360 AS
 SELECT
   nw.space_id       AS notion_workspace_id,
@@ -425,6 +428,7 @@ GROUP BY
   nw.created_at,
   nw.updated_at;
 
+DROP VIEW IF EXISTS greenhouse_serving.member_360;
 CREATE OR REPLACE VIEW greenhouse_serving.member_360 AS
 SELECT
   m.member_id,
@@ -485,6 +489,7 @@ GROUP BY
   m.created_at,
   m.updated_at;
 
+DROP VIEW IF EXISTS greenhouse_serving.provider_360;
 CREATE OR REPLACE VIEW greenhouse_serving.provider_360 AS
 SELECT
   p.provider_id,
@@ -522,6 +527,7 @@ GROUP BY
   p.created_at,
   p.updated_at;
 
+DROP VIEW IF EXISTS greenhouse_serving.user_360;
 CREATE OR REPLACE VIEW greenhouse_serving.user_360 AS
 SELECT
   u.user_id,

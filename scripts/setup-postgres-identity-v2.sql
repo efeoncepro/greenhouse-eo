@@ -181,6 +181,7 @@ WHERE role_code = 'efeonce_admin'
 -- Fast-path session resolution for login
 -- ────────────────────────────────────────────────────────────
 
+DROP VIEW IF EXISTS greenhouse_serving.session_360;
 CREATE OR REPLACE VIEW greenhouse_serving.session_360 AS
 SELECT
   u.user_id,
@@ -259,6 +260,7 @@ GROUP BY
   org.organization_id, org.public_id, org.organization_name;
 
 -- Update user_360 to include new columns
+DROP VIEW IF EXISTS greenhouse_serving.user_360;
 CREATE OR REPLACE VIEW greenhouse_serving.user_360 AS
 SELECT
   u.user_id,
