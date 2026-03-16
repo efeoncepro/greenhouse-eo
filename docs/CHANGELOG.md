@@ -4,6 +4,42 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+## Account 360 Phase 3 — Finance Tab, CRUD, HubSpot Sync, Memberships (2026-03-16)
+
+### Nuevas funcionalidades
+
+- **Organization Finance Tab** — Datos reales de rentabilidad por Space dentro de una organización. Selectores de período (mes/año), 4 KPIs (spaces con datos, ingreso total, margen bruto/neto promedio ponderado), tabla de desglose por Space con márgenes (chips con semáforo), FTE. Datos desde `client_economics JOIN client_profiles` por `organization_id`.
+- **Edit Organization Drawer** — Drawer lateral (480px) para editar organización: nombre, razón social, ID fiscal (tipo + valor), industria, país, estado, notas. Admin-only vía `PUT /api/organizations/[id]`.
+- **HubSpot Sync** — Botón "Sincronizar con HubSpot" en el sidebar de la organización. `POST /api/organizations/[id]/hubspot-sync` sincroniza campos de la empresa (nombre, industria, país) y crea membresías desde contactos de HubSpot (busca perfiles existentes por email o crea nuevos `identity_profile`).
+- **Add Membership Drawer** — Drawer para agregar personas a una organización. Búsqueda typeahead con debounce (400ms) contra `GET /api/organizations/people-search`. Campos: tipo de membresía, rol, departamento, Space (opcional), contacto principal.
+- **Deprecated "Clientes" nav removed** — Eliminada la pestaña "Clientes" del menú de Finanzas (daba error 500, reemplazada por la sección de Organizaciones).
+
+### Archivos nuevos (5)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/app/api/organizations/[id]/finance/route.ts` | GET finance summary por organización |
+| `src/app/api/organizations/[id]/hubspot-sync/route.ts` | POST sync con HubSpot |
+| `src/app/api/organizations/people-search/route.ts` | GET búsqueda de identity profiles |
+| `src/views/greenhouse/organizations/drawers/EditOrganizationDrawer.tsx` | Drawer de edición |
+| `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Drawer de agregar persona |
+
+### Archivos modificados (9)
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/account-360/organization-store.ts` | +`getOrganizationFinanceSummary`, `findProfileByEmail`, `membershipExists`, `createIdentityProfile`, `searchProfiles` |
+| `src/views/greenhouse/organizations/OrganizationView.tsx` | +useSession, drawer states, HubSpot sync handler, toast |
+| `src/views/greenhouse/organizations/OrganizationLeftSidebar.tsx` | +admin actions (editar, sync HubSpot) |
+| `src/views/greenhouse/organizations/OrganizationTabs.tsx` | +isAdmin, onAddMembership props |
+| `src/views/greenhouse/organizations/tabs/OrganizationFinanceTab.tsx` | Rewrite completo: period selectors, KPIs, tabla de clientes |
+| `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | +botón "Agregar persona" (admin-gated) |
+| `src/views/greenhouse/organizations/types.ts` | +OrganizationClientFinance, OrganizationFinanceSummary |
+| `src/components/layout/vertical/VerticalMenu.tsx` | -"Clientes" del submenu de finanzas |
+| `src/config/greenhouse-nomenclature.ts` | -`clients` de GH_FINANCE_NAV |
+
+---
+
 ## Account 360 Phase 2 — Organization 360 UI + Identity Reconciliation (2026-03-16)
 
 ### Nuevas funcionalidades

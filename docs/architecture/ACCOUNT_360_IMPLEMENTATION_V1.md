@@ -91,6 +91,9 @@ GROUP BY o.organization_id
 | `/api/organizations` | GET | internal | Paginated list with search/filter |
 | `/api/organizations/[id]` | GET, PUT | GET: internal, PUT: admin | Detail + update |
 | `/api/organizations/[id]/memberships` | GET, POST | GET: internal, POST: admin | Org memberships |
+| `/api/organizations/[id]/finance` | GET | internal | Finance summary (year, month) |
+| `/api/organizations/[id]/hubspot-sync` | POST | admin | Sync org fields + contacts from HubSpot |
+| `/api/organizations/people-search` | GET | internal | Search identity profiles (ILIKE, ?q=) |
 | `/api/people/[memberId]/memberships` | GET | internal | Person's org memberships |
 
 ### Query Parameters (GET /api/organizations)
@@ -127,6 +130,11 @@ GROUP BY o.organization_id
 | `getOrganizationMemberships(orgId)` | People linked to org |
 | `createMembership(input)` | INSERT with auto-generated IDs |
 | `getPersonMemberships(profileId)` | Orgs linked to person |
+| `getOrganizationFinanceSummary(orgId, year, month)` | Finance snapshot from `client_economics` via finance bridge |
+| `findProfileByEmail(email)` | Lookup identity profile by canonical email |
+| `membershipExists(profileId, organizationId)` | Check if membership already exists |
+| `createIdentityProfile(data)` | Create identity profile (ON CONFLICT DO NOTHING) |
+| `searchProfiles(query)` | ILIKE search on name/email, limit 10 |
 
 ---
 
@@ -142,18 +150,20 @@ GROUP BY o.organization_id
 
 ### Organization Detail (`/agency/organizations/[id]`)
 
-- **Component**: `OrganizationView.tsx` — Grid 4/8 split
+- **Component**: `OrganizationView.tsx` — Grid 4/8 split, `useSession` for admin detection
+- **Drawers**: `EditOrganizationDrawer.tsx` (edit org fields), `AddMembershipDrawer.tsx` (add person via search)
 - **Left sidebar** (`OrganizationLeftSidebar.tsx`):
   - Avatar with initial, name, industry, status chip, country
   - Stats: spaces, memberships, people
   - Fiscal section: legal name, tax ID
-  - Identifiers: public_id, HubSpot ID
+  - Identifiers: public_id, HubSpot ID + "Sincronizar con HubSpot" button (admin, when hubspotCompanyId exists)
   - Notes (if any)
+  - Admin actions: "Editar organización" button
 - **Tabs** (`OrganizationTabs.tsx`):
   - URL-driven via `?tab=` query param
   - **Resumen**: Spaces table with type, status, client_id links
-  - **Personas**: Fetches memberships from API, shows name, type, role, primary flag
-  - **Finanzas**: Placeholder for finance bridge integration
+  - **Personas**: Fetches memberships from API, shows name, type, role, primary flag. "Agregar persona" button (admin-gated)
+  - **Finanzas**: Real data from `client_economics` — period selectors, 4 KPI cards, client breakdown table with margin semaphore chips
 
 ### Person 360 Memberships Tab
 
@@ -235,31 +245,36 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 
 ## File Inventory
 
-### New Files (28)
+### New Files (33)
 
-| File | Layer | Purpose |
-|------|-------|---------|
-| `scripts/reconcile-identity-profiles.ts` | Script | Identity reconciliation |
-| `scripts/setup-postgres-finance-bridge-m33.sql` | Script | Finance bridge DDL |
-| `scripts/setup-postgres-finance-bridge-m33.ts` | Script | Finance bridge runner |
-| `src/lib/account-360/organization-store.ts` | Backend | Store layer (CRUD) |
-| `src/app/api/organizations/route.ts` | API | Organization list |
-| `src/app/api/organizations/[id]/route.ts` | API | Organization detail + update |
-| `src/app/api/organizations/[id]/memberships/route.ts` | API | Org memberships |
-| `src/app/api/people/[memberId]/memberships/route.ts` | API | Person memberships |
-| `src/app/(dashboard)/agency/organizations/page.tsx` | Page | List page route |
-| `src/app/(dashboard)/agency/organizations/[id]/page.tsx` | Page | Detail page route |
-| `src/views/greenhouse/organizations/OrganizationListView.tsx` | View | List with table + KPIs |
-| `src/views/greenhouse/organizations/OrganizationView.tsx` | View | Detail layout |
-| `src/views/greenhouse/organizations/OrganizationLeftSidebar.tsx` | View | Sidebar card |
-| `src/views/greenhouse/organizations/OrganizationTabs.tsx` | View | Tab container |
-| `src/views/greenhouse/organizations/types.ts` | View | TypeScript types |
-| `src/views/greenhouse/organizations/tabs/OrganizationOverviewTab.tsx` | View | Spaces tab |
-| `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | View | People tab |
-| `src/views/greenhouse/organizations/tabs/OrganizationFinanceTab.tsx` | View | Finance placeholder |
-| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | View | Person orgs tab |
+| File | Layer | Phase | Purpose |
+|------|-------|-------|---------|
+| `scripts/reconcile-identity-profiles.ts` | Script | P2 | Identity reconciliation |
+| `scripts/setup-postgres-finance-bridge-m33.sql` | Script | P2 | Finance bridge DDL |
+| `scripts/setup-postgres-finance-bridge-m33.ts` | Script | P2 | Finance bridge runner |
+| `src/lib/account-360/organization-store.ts` | Backend | P2+P3 | Store layer (CRUD + finance + search) |
+| `src/app/api/organizations/route.ts` | API | P2 | Organization list |
+| `src/app/api/organizations/[id]/route.ts` | API | P2 | Organization detail + update |
+| `src/app/api/organizations/[id]/memberships/route.ts` | API | P2 | Org memberships |
+| `src/app/api/organizations/[id]/finance/route.ts` | API | P3 | Finance summary by period |
+| `src/app/api/organizations/[id]/hubspot-sync/route.ts` | API | P3 | HubSpot sync (fields + contacts) |
+| `src/app/api/organizations/people-search/route.ts` | API | P3 | Identity profile search |
+| `src/app/api/people/[memberId]/memberships/route.ts` | API | P2 | Person memberships |
+| `src/app/(dashboard)/agency/organizations/page.tsx` | Page | P2 | List page route |
+| `src/app/(dashboard)/agency/organizations/[id]/page.tsx` | Page | P2 | Detail page route |
+| `src/views/greenhouse/organizations/OrganizationListView.tsx` | View | P2 | List with table + KPIs |
+| `src/views/greenhouse/organizations/OrganizationView.tsx` | View | P2+P3 | Detail layout + drawers + sync |
+| `src/views/greenhouse/organizations/OrganizationLeftSidebar.tsx` | View | P2+P3 | Sidebar card + admin actions |
+| `src/views/greenhouse/organizations/OrganizationTabs.tsx` | View | P2+P3 | Tab container |
+| `src/views/greenhouse/organizations/types.ts` | View | P2+P3 | TypeScript types |
+| `src/views/greenhouse/organizations/tabs/OrganizationOverviewTab.tsx` | View | P2 | Spaces tab |
+| `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | View | P2+P3 | People tab + add button |
+| `src/views/greenhouse/organizations/tabs/OrganizationFinanceTab.tsx` | View | P3 | Finance with real data |
+| `src/views/greenhouse/organizations/drawers/EditOrganizationDrawer.tsx` | View | P3 | Edit org drawer |
+| `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | View | P3 | Add person drawer |
+| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | View | P2 | Person orgs tab |
 
-### Modified Files (7)
+### Modified Files (9 from P2, 2 additional from P3)
 
 | File | Change |
 |------|--------|
@@ -268,5 +283,5 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 | `src/views/greenhouse/people/PersonTabs.tsx` | TabPanel for memberships |
 | `src/lib/people/permissions.ts` | `canViewMemberships` access control |
 | `src/lib/people/get-people-meta.ts` | `'memberships'` in supportedTabs |
-| `src/components/layout/vertical/VerticalMenu.tsx` | Organizaciones nav item |
-| `src/config/greenhouse-nomenclature.ts` | `organizations` in GH_AGENCY_NAV |
+| `src/components/layout/vertical/VerticalMenu.tsx` | +Organizaciones nav, -Clientes nav (finance) |
+| `src/config/greenhouse-nomenclature.ts` | +`organizations` in GH_AGENCY_NAV, -`clients` from GH_FINANCE_NAV |
