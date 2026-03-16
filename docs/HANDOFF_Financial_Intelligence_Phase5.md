@@ -58,7 +58,20 @@ Phase 5 cierra el ciclo de visualización de la capa de inteligencia financiera.
 
 **Permisos**: Visible para roles `efeonce_admin` y `finance_manager` (ya definido en TAB_PERMISSIONS).
 
-### 4. Fix Dashboard completo — Payroll no se reflejaba en KPIs ni charts
+### 4. Fix Conversión USD→CLP en payroll
+
+**Problema**: El endpoint P&L sumaba `gross_total` de payroll_entries directamente, sin considerar que los entries pueden estar en USD. $2,450 USD se contabilizaba como $2,450 CLP (~$2.50 USD), cuando el valor real a tipo de cambio $912 es ~$2,235,000 CLP.
+
+**Fix aplicado**:
+- La query de payroll ahora separa sumas con `CASE WHEN e.currency = 'CLP' ... ELSE 0 END` y `CASE WHEN e.currency = 'USD' ...`
+- 5ta query en paralelo: `SELECT rate FROM greenhouse_finance.exchange_rates WHERE from_currency = 'USD' AND to_currency = 'CLP' ORDER BY rate_date DESC LIMIT 1`
+- Conversión: `payrollGross = gross_clp + gross_usd × usdToClp` (ídem net, deductions, bonuses)
+- Fallback: si no hay tipo de cambio almacenado, usa factor 1 (sin conversión)
+- La card de "Costo de Personal" y el ratio "Costo laboral / Ingreso" ahora muestran CLP reales
+
+**Archivo**: `src/app/api/finance/dashboard/pnl/route.ts`
+
+### 4b. Fix Dashboard completo — Payroll no se reflejaba en KPIs ni charts
 
 **Problema**: Además del P&L endpoint (fix 4a abajo), la vista `FinanceDashboardView` usaba `expenseSummary` (que solo consulta gastos registrados) para el KPI "Egresos del mes", el bar chart "Ingresos vs Egresos" y el chart "Flujo de caja". Payroll nunca aparecía en ninguno de estos elementos.
 

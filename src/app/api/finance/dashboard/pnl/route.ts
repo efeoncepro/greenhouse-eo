@@ -32,8 +32,8 @@ export async function GET(request: Request) {
   const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
   const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
 
-  // Run all four queries in parallel
-  const [incomeRows, expenseRows, payrollRows, linkedPayrollRows] = await Promise.all([
+  // Run all five queries in parallel
+  const [incomeRows, expenseRows, payrollRows, linkedPayrollRows, rateRows] = await Promise.all([
     // Income for the period (accrual: by invoice_date)
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
@@ -56,14 +56,18 @@ export async function GET(request: Request) {
        GROUP BY cost_category`,
       [periodStart, periodEnd]
     ),
-    // Personnel expense from payroll (approved/exported periods for this month)
+    // Personnel expense from payroll — split by currency for proper conversion
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
          COUNT(DISTINCT e.member_id) AS headcount,
-         COALESCE(SUM(e.gross_total), 0) AS total_gross,
-         COALESCE(SUM(e.net_total), 0) AS total_net,
-         COALESCE(SUM(COALESCE(e.chile_total_deductions, 0)), 0) AS total_deductions,
-         COALESCE(SUM(COALESCE(e.bonus_otd_amount, 0) + COALESCE(e.bonus_rpa_amount, 0) + COALESCE(e.bonus_other_amount, 0)), 0) AS total_bonuses
+         COALESCE(SUM(CASE WHEN e.currency = 'CLP' THEN e.gross_total ELSE 0 END), 0) AS gross_clp,
+         COALESCE(SUM(CASE WHEN e.currency = 'USD' THEN e.gross_total ELSE 0 END), 0) AS gross_usd,
+         COALESCE(SUM(CASE WHEN e.currency = 'CLP' THEN e.net_total ELSE 0 END), 0) AS net_clp,
+         COALESCE(SUM(CASE WHEN e.currency = 'USD' THEN e.net_total ELSE 0 END), 0) AS net_usd,
+         COALESCE(SUM(CASE WHEN e.currency = 'CLP' THEN COALESCE(e.chile_total_deductions, 0) ELSE 0 END), 0) AS deductions_clp,
+         COALESCE(SUM(CASE WHEN e.currency = 'USD' THEN COALESCE(e.chile_total_deductions, 0) ELSE 0 END), 0) AS deductions_usd,
+         COALESCE(SUM(CASE WHEN e.currency = 'CLP' THEN COALESCE(e.bonus_otd_amount, 0) + COALESCE(e.bonus_rpa_amount, 0) + COALESCE(e.bonus_other_amount, 0) ELSE 0 END), 0) AS bonuses_clp,
+         COALESCE(SUM(CASE WHEN e.currency = 'USD' THEN COALESCE(e.bonus_otd_amount, 0) + COALESCE(e.bonus_rpa_amount, 0) + COALESCE(e.bonus_other_amount, 0) ELSE 0 END), 0) AS bonuses_usd
        FROM greenhouse_payroll.payroll_entries e
        INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
        WHERE p.year = $1 AND p.month = $2 AND p.status IN ('approved', 'exported')`,
@@ -77,6 +81,14 @@ export async function GET(request: Request) {
          AND COALESCE(document_date, payment_date) >= $1::date
          AND COALESCE(document_date, payment_date) <= $2::date`,
       [periodStart, periodEnd]
+    ),
+    // Latest USD → CLP exchange rate for payroll conversion
+    runGreenhousePostgresQuery<PnlRow>(
+      `SELECT rate
+       FROM greenhouse_finance.exchange_rates
+       WHERE from_currency = 'USD' AND to_currency = 'CLP'
+       ORDER BY rate_date DESC
+       LIMIT 1`
     )
   ])
 
@@ -86,7 +98,22 @@ export async function GET(request: Request) {
   const netRevenue = roundCurrency(totalRevenue - partnerShare)
 
   const payroll = payrollRows[0] || {}
-  const payrollGross = toNumber(payroll['total_gross'])
+  const usdToClp = toNumber((rateRows[0] || {})['rate']) || 1
+
+  // Convert payroll to CLP: CLP entries stay as-is, USD entries × exchange rate
+  const payrollGross = roundCurrency(
+    toNumber(payroll['gross_clp']) + toNumber(payroll['gross_usd']) * usdToClp
+  )
+  const payrollNet = roundCurrency(
+    toNumber(payroll['net_clp']) + toNumber(payroll['net_usd']) * usdToClp
+  )
+  const payrollDeductions = roundCurrency(
+    toNumber(payroll['deductions_clp']) + toNumber(payroll['deductions_usd']) * usdToClp
+  )
+  const payrollBonuses = roundCurrency(
+    toNumber(payroll['bonuses_clp']) + toNumber(payroll['bonuses_usd']) * usdToClp
+  )
+
   const linkedPayrollExpenses = toNumber((linkedPayrollRows[0] || {})['linked_clp'])
 
   // Payroll cost not yet represented as expenses → feed into directLabor
@@ -148,10 +175,10 @@ export async function GET(request: Request) {
     },
     payroll: {
       headcount: toNumber(payroll['headcount']),
-      totalGross: toNumber(payroll['total_gross']),
-      totalNet: toNumber(payroll['total_net']),
-      totalDeductions: toNumber(payroll['total_deductions']),
-      totalBonuses: toNumber(payroll['total_bonuses'])
+      totalGross: payrollGross,
+      totalNet: payrollNet,
+      totalDeductions: payrollDeductions,
+      totalBonuses: payrollBonuses
     }
   })
 }

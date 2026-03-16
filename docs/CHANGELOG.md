@@ -4,6 +4,20 @@ Registro de cambios implementados como parte del CODEX_TASK_Financial_Intelligen
 
 ---
 
+## Phase 5c — Conversión USD→CLP en payroll del P&L (2026-03-16)
+
+### Fixes
+
+- **Payroll en USD no se convertía a CLP** — el endpoint P&L sumaba `gross_total` de payroll_entries sin considerar la moneda. Entries en USD (ej. $2,450 USD) se sumaban como $2,450 CLP en vez de ~$2,235,000 CLP. Ahora la query separa sumas por currency (CLP/USD) y convierte USD usando el tipo de cambio más reciente de `greenhouse_finance.exchange_rates`. Todas las cifras del P&L y la card de Costo de Personal ahora reflejan valores en CLP.
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/app/api/finance/dashboard/pnl/route.ts` | Payroll query split por currency, 5ta query para exchange rate, conversión USD×rate en gross/net/deductions/bonuses |
+
+---
+
 ## Phase 5b — Dashboard payroll integration en KPIs y charts (2026-03-16)
 
 ### Fixes

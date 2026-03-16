@@ -534,6 +534,7 @@ Implementado fuera de spec pero alineado:
 - [x] CSV export en ClientEconomicsView (Phase 5)
 - [x] Fix: payroll gross → directLabor en P&L con anti-doble-conteo (Phase 5)
 - [x] Fix: dashboard KPI "Egresos del mes" + charts integran payroll via P&L (Phase 5b)
+- [x] Fix: conversión USD→CLP en payroll del P&L — entries en USD ahora se convierten con exchange rate (Phase 5c)
 
 ### Fase 3. Partnerships P1
 
