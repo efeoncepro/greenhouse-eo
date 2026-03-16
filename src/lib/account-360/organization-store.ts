@@ -58,6 +58,7 @@ export interface PersonMembership {
   organizationId: string
   organizationName: string
   spaceId: string | null
+  clientId: string | null
   membershipType: string
   roleLabel: string | null
   isPrimary: boolean
@@ -178,6 +179,7 @@ const normalizePersonMembership = (r: MembershipRow): PersonMembership => ({
   organizationId: r.organization_id,
   organizationName: r.organization_name || '',
   spaceId: r.space_id,
+  clientId: (r as Record<string, unknown>).client_id as string | null ?? null,
   membershipType: r.membership_type,
   roleLabel: r.role_label,
   isPrimary: r.is_primary
@@ -572,11 +574,17 @@ export const getPersonMemberships = async (profileId: string): Promise<PersonMem
       pm.organization_id,
       o.organization_name,
       pm.space_id,
+      COALESCE(s.client_id, (
+        SELECT s2.client_id FROM greenhouse_core.spaces s2
+        WHERE s2.organization_id = pm.organization_id AND s2.client_id IS NOT NULL
+        LIMIT 1
+      )) AS client_id,
       ip.full_name, ip.canonical_email,
       pm.membership_type, pm.role_label, pm.department, pm.is_primary
     FROM greenhouse_core.person_memberships pm
     JOIN greenhouse_core.organizations o ON o.organization_id = pm.organization_id
     JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
+    LEFT JOIN greenhouse_core.spaces s ON s.space_id = pm.space_id
     WHERE pm.profile_id = $1 AND pm.active = TRUE
     ORDER BY pm.is_primary DESC, o.organization_name
   `, [profileId])

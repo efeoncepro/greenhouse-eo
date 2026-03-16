@@ -1,6 +1,6 @@
 import type { PersonAccess, PersonTab } from '@/types/people'
 
-const personTabOrder: PersonTab[] = ['assignments', 'activity', 'compensation', 'payroll', 'finance', 'memberships']
+const personTabOrder: PersonTab[] = ['memberships', 'activity', 'compensation', 'payroll', 'finance']
 
 export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
   const isAdmin = roleCodes.includes('efeonce_admin')
@@ -23,11 +23,10 @@ export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
     canViewPayroll,
     canViewFinance,
     visibleTabs: personTabOrder.filter(tab => {
-      if (tab === 'assignments') return canViewAssignments
+      if (tab === 'memberships') return canViewMemberships
       if (tab === 'activity') return canViewActivity
       if (tab === 'compensation') return canViewCompensation
       if (tab === 'finance') return canViewFinance
-      if (tab === 'memberships') return canViewMemberships
 
       return canViewPayroll
     })

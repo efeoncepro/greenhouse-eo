@@ -50,7 +50,6 @@ export type { PersonTab } from '@/types/people'
 import type { PersonTab } from '@/types/people'
 
 export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
-  assignments: ['efeonce_admin', 'efeonce_operations'],
   activity: ['efeonce_admin', 'efeonce_operations'],
   compensation: ['efeonce_admin', 'hr_payroll'],
   payroll: ['efeonce_admin', 'hr_payroll'],
@@ -61,12 +60,11 @@ export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
 }
 
 export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }> = [
-  { value: 'assignments', label: 'Asignaciones', icon: 'tabler-briefcase' },
+  { value: 'memberships', label: 'Organizaciones', icon: 'tabler-building' },
   { value: 'activity', label: 'Actividad', icon: 'tabler-chart-bar' },
   { value: 'compensation', label: 'Compensación', icon: 'tabler-cash' },
   { value: 'payroll', label: 'Nómina', icon: 'tabler-receipt-2' },
   { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
-  { value: 'memberships', label: 'Organizaciones', icon: 'tabler-building' },
   { value: 'hr-profile', label: 'Perfil HR', icon: 'tabler-user-heart' },
   { value: 'ai-tools', label: 'AI Tools', icon: 'tabler-wand' }
 ]

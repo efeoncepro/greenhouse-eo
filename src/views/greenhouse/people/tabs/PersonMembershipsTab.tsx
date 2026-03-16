@@ -9,6 +9,7 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
@@ -22,12 +23,16 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import type { PersonDetailAssignment } from '@/types/people'
+import { formatFte } from '../helpers'
+
 interface PersonMembership {
   membershipId: string
   publicId: string
   organizationId: string
   organizationName: string
   spaceId: string | null
+  clientId: string | null
   membershipType: string
   roleLabel: string | null
   isPrimary: boolean
@@ -46,11 +51,12 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'info' | 'secondary' |
 
 type Props = {
   memberId: string
+  assignments?: PersonDetailAssignment[]
   isAdmin?: boolean
   onAddMembership?: () => void
 }
 
-const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => {
+const PersonMembershipsTab = ({ memberId, assignments, isAdmin, onAddMembership }: Props) => {
   const [memberships, setMemberships] = useState<PersonMembership[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -74,6 +80,15 @@ const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => 
     void load()
   }, [memberId])
 
+  // Build assignment lookup by clientId for fast matching
+  const assignmentMap = new Map<string, PersonDetailAssignment>()
+
+  if (assignments) {
+    for (const a of assignments) {
+      assignmentMap.set(a.clientId, a)
+    }
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -88,7 +103,7 @@ const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => 
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
             title={`Organizaciones (${memberships.length})`}
-            subheader='Membresías de esta persona en organizaciones del sistema'
+            subheader='Membresías y asignaciones operativas en organizaciones'
             avatar={
               <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
                 <i className='tabler-building' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -113,15 +128,19 @@ const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => 
                     <TableCell>Organización</TableCell>
                     <TableCell>Tipo</TableCell>
                     <TableCell>Rol</TableCell>
+                    <TableCell align='right'>FTE</TableCell>
+                    <TableCell>Desde</TableCell>
+                    <TableCell>Estado</TableCell>
                     <TableCell align='center'>Principal</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {memberships.map(m => {
                     const cfg = TYPE_CONFIG[m.membershipType]
+                    const assignment = m.clientId ? assignmentMap.get(m.clientId) : undefined
 
                     return (
-                      <TableRow key={m.membershipId} hover>
+                      <TableRow key={m.membershipId} hover sx={assignment && !assignment.active ? { opacity: 0.6 } : undefined}>
                         <TableCell>
                           <Typography
                             component={Link}
@@ -146,6 +165,31 @@ const PersonMembershipsTab = ({ memberId, isAdmin, onAddMembership }: Props) => 
                           <Typography variant='body2' color='text.secondary'>
                             {m.roleLabel ?? '—'}
                           </Typography>
+                        </TableCell>
+                        <TableCell align='right'>
+                          {assignment ? (
+                            <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                              {formatFte(assignment.fteAllocation)}
+                            </Typography>
+                          ) : (
+                            <Typography variant='body2' color='text.secondary'>—</Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant='body2'>
+                            {assignment?.startDate ?? '—'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {assignment ? (
+                            assignment.active ? (
+                              <Chip size='small' label='Activo' color='success' variant='tonal' />
+                            ) : (
+                              <Chip size='small' label={assignment.endDate ? `Cerrado ${assignment.endDate}` : 'Inactivo'} color='default' variant='tonal' />
+                            )
+                          ) : (
+                            <Typography variant='body2' color='text.secondary'>—</Typography>
+                          )}
                         </TableCell>
                         <TableCell align='center'>
                           {m.isPrimary ? (

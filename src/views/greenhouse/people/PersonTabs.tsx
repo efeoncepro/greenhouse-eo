@@ -13,10 +13,9 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
+import type { PersonDetail } from '@/types/people'
 import type { PersonTab } from './helpers'
 import { TAB_CONFIG } from './helpers'
-import PersonAssignmentsTab from './tabs/PersonAssignmentsTab'
 import PersonActivityTab from './tabs/PersonActivityTab'
 import PersonCompensationTab from './tabs/PersonCompensationTab'
 import PersonPayrollTab from './tabs/PersonPayrollTab'
@@ -28,12 +27,10 @@ import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 type Props = {
   detail: PersonDetail
   isAdmin?: boolean
-  onNewAssignment?: () => void
-  onEditAssignment?: (a: PersonDetailAssignment) => void
   onNewMembership?: () => void
 }
 
-const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment, onNewMembership }: Props) => {
+const PersonTabs = ({ detail, isAdmin, onNewMembership }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -43,7 +40,7 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment, onNewM
 
   // Read initial tab from URL, fallback to first visible
   const urlTab = searchParams.get('tab') as PersonTab | null
-  const initialTab = urlTab && visibleValues.includes(urlTab) ? urlTab : visibleTabs[0]?.value ?? 'assignments'
+  const initialTab = urlTab && visibleValues.includes(urlTab) ? urlTab : visibleTabs[0]?.value ?? 'memberships'
 
   const [activeTab, setActiveTab] = useState<PersonTab>(initialTab)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -119,13 +116,13 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment, onNewM
               sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
             />
 
-            <TabPanel value='assignments' className='p-0'>
-              {activeTab === 'assignments' && (
-                <PersonAssignmentsTab
+            <TabPanel value='memberships' className='p-0'>
+              {activeTab === 'memberships' && (
+                <PersonMembershipsTab
+                  memberId={detail.member.memberId}
                   assignments={detail.assignments}
                   isAdmin={isAdmin}
-                  onNewAssignment={onNewAssignment}
-                  onEditAssignment={onEditAssignment}
+                  onAddMembership={onNewMembership}
                 />
               )}
             </TabPanel>
@@ -151,16 +148,6 @@ const PersonTabs = ({ detail, isAdmin, onNewAssignment, onEditAssignment, onNewM
             <TabPanel value='finance' className='p-0'>
               {activeTab === 'finance' && (
                 <PersonFinanceTab memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='memberships' className='p-0'>
-              {activeTab === 'memberships' && (
-                <PersonMembershipsTab
-                  memberId={detail.member.memberId}
-                  isAdmin={isAdmin}
-                  onAddMembership={onNewMembership}
-                />
               )}
             </TabPanel>
 

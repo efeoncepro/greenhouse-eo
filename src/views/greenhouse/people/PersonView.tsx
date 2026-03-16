@@ -14,13 +14,11 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
-import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
+import type { PersonDetail } from '@/types/people'
 import type { CreateCompensationVersionInput } from '@/types/payroll'
 
 import CompensationDrawer from '@views/greenhouse/payroll/CompensationDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
-import AssignmentDrawer from './drawers/AssignmentDrawer'
-import EditAssignmentDrawer from './drawers/EditAssignmentDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import PersonLeftSidebar from './PersonLeftSidebar'
 import PersonTabs from './PersonTabs'
@@ -36,8 +34,6 @@ const PersonView = ({ memberId }: Props) => {
 
   // Admin drawer state
   const [editProfileOpen, setEditProfileOpen] = useState(false)
-  const [assignmentOpen, setAssignmentOpen] = useState(false)
-  const [editAssignment, setEditAssignment] = useState<PersonDetailAssignment | null>(null)
   const [deactivateConfirmOpen, setDeactivateConfirmOpen] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
@@ -87,16 +83,6 @@ const PersonView = ({ memberId }: Props) => {
 
   const handleEditProfileSuccess = async () => {
     toast.success('Perfil actualizado')
-    await loadDetail()
-  }
-
-  const handleAssignmentSuccess = async () => {
-    toast.success('Asignación creada')
-    await loadDetail()
-  }
-
-  const handleEditAssignmentSuccess = async () => {
-    toast.success('Asignación actualizada')
     await loadDetail()
   }
 
@@ -157,8 +143,6 @@ const PersonView = ({ memberId }: Props) => {
           <PersonTabs
             detail={detail}
             isAdmin={isAdmin}
-            onNewAssignment={() => setAssignmentOpen(true)}
-            onEditAssignment={a => setEditAssignment(a)}
             onNewMembership={() => setMembershipDrawerOpen(true)}
           />
         </Grid>
@@ -171,19 +155,6 @@ const PersonView = ({ memberId }: Props) => {
             member={detail.member}
             onClose={() => setEditProfileOpen(false)}
             onSuccess={handleEditProfileSuccess}
-          />
-          <AssignmentDrawer
-            open={assignmentOpen}
-            memberId={detail.member.memberId}
-            memberName={detail.member.displayName}
-            onClose={() => setAssignmentOpen(false)}
-            onSuccess={handleAssignmentSuccess}
-          />
-          <EditAssignmentDrawer
-            open={!!editAssignment}
-            assignment={editAssignment}
-            onClose={() => setEditAssignment(null)}
-            onSuccess={handleEditAssignmentSuccess}
           />
           <CompensationDrawer
             open={compensationOpen}
