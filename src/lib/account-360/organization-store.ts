@@ -61,6 +61,7 @@ export interface PersonMembership {
   clientId: string | null
   membershipType: string
   roleLabel: string | null
+  department: string | null
   isPrimary: boolean
 }
 
@@ -182,6 +183,7 @@ const normalizePersonMembership = (r: MembershipRow): PersonMembership => ({
   clientId: (r as Record<string, unknown>).client_id as string | null ?? null,
   membershipType: r.membership_type,
   roleLabel: r.role_label,
+  department: r.department,
   isPrimary: r.is_primary
 })
 
@@ -358,6 +360,59 @@ export const createMembership = async (input: CreateMembershipInput) => {
   ])
 
   return { membershipId, publicId, created: true }
+}
+
+export const updateMembership = async (
+  membershipId: string,
+  data: Partial<{
+    membershipType: string
+    roleLabel: string
+    department: string
+    isPrimary: boolean
+  }>
+) => {
+  const updates: string[] = []
+  const params: unknown[] = [membershipId]
+  let idx = 1
+
+  const fieldMap: Record<string, string> = {
+    membershipType: 'membership_type',
+    roleLabel: 'role_label',
+    department: 'department',
+    isPrimary: 'is_primary'
+  }
+
+  for (const [key, column] of Object.entries(fieldMap)) {
+    const value = data[key as keyof typeof data]
+
+    if (value !== undefined) {
+      idx++
+      updates.push(`${column} = $${idx}`)
+      params.push(value)
+    }
+  }
+
+  if (updates.length === 0) return { updated: false }
+
+  updates.push('updated_at = CURRENT_TIMESTAMP')
+
+  await runGreenhousePostgresQuery(`
+    UPDATE greenhouse_core.person_memberships
+    SET ${updates.join(', ')}
+    WHERE membership_id = $1
+  `, params)
+
+  return { updated: true }
+}
+
+export const deactivateMembership = async (membershipId: string) => {
+  await runGreenhousePostgresQuery(`
+    UPDATE greenhouse_core.person_memberships
+    SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
+    WHERE membership_id = $1
+  `, [membershipId])
+
+  return { deactivated: true }
 }
 
 // ── Finance ────────────────────────────────────────────────────────────

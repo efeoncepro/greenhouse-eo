@@ -14,12 +14,13 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
-import type { PersonDetail } from '@/types/people'
+import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 import type { CreateCompensationVersionInput } from '@/types/payroll'
 
 import CompensationDrawer from '@views/greenhouse/payroll/CompensationDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
+import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'
 import PersonLeftSidebar from './PersonLeftSidebar'
 import PersonTabs from './PersonTabs'
 
@@ -38,6 +39,8 @@ const PersonView = ({ memberId }: Props) => {
   const [deactivating, setDeactivating] = useState(false)
   const [compensationOpen, setCompensationOpen] = useState(false)
   const [membershipDrawerOpen, setMembershipDrawerOpen] = useState(false)
+  const [editMembership, setEditMembership] = useState<{ membership: MembershipRowData; assignment?: PersonDetailAssignment } | null>(null)
+  const [membershipReloadKey, setMembershipReloadKey] = useState(0)
 
   const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
 
@@ -88,6 +91,13 @@ const PersonView = ({ memberId }: Props) => {
 
   const handleMembershipSuccess = async () => {
     toast.success('Vinculado a la organización.')
+    setMembershipReloadKey(k => k + 1)
+    await loadDetail()
+  }
+
+  const handleEditMembershipSuccess = async () => {
+    toast.success('Membresía actualizada.')
+    setMembershipReloadKey(k => k + 1)
     await loadDetail()
   }
 
@@ -143,7 +153,9 @@ const PersonView = ({ memberId }: Props) => {
           <PersonTabs
             detail={detail}
             isAdmin={isAdmin}
+            membershipReloadKey={membershipReloadKey}
             onNewMembership={() => setMembershipDrawerOpen(true)}
+            onEditMembership={(membership, assignment) => setEditMembership({ membership, assignment })}
           />
         </Grid>
       </Grid>
@@ -170,6 +182,14 @@ const PersonView = ({ memberId }: Props) => {
             memberName={detail.member.displayName}
             onClose={() => setMembershipDrawerOpen(false)}
             onSuccess={handleMembershipSuccess}
+          />
+          <EditPersonMembershipDrawer
+            open={!!editMembership}
+            memberId={detail.member.memberId}
+            membership={editMembership?.membership ?? null}
+            assignment={editMembership?.assignment}
+            onClose={() => setEditMembership(null)}
+            onSuccess={handleEditMembershipSuccess}
           />
           <ConfirmDialog
             open={deactivateConfirmOpen}

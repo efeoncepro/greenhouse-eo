@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 
 import type { PersonDetailAssignment } from '@/types/people'
+import type { MembershipRowData } from '../drawers/EditPersonMembershipDrawer'
 import { formatFte } from '../helpers'
 
 interface PersonMembership {
@@ -35,6 +36,7 @@ interface PersonMembership {
   clientId: string | null
   membershipType: string
   roleLabel: string | null
+  department: string | null
   isPrimary: boolean
 }
 
@@ -53,10 +55,12 @@ type Props = {
   memberId: string
   assignments?: PersonDetailAssignment[]
   isAdmin?: boolean
+  reloadKey?: number
   onAddMembership?: () => void
+  onEditMembership?: (membership: MembershipRowData, assignment?: PersonDetailAssignment) => void
 }
 
-const PersonMembershipsTab = ({ memberId, assignments, isAdmin, onAddMembership }: Props) => {
+const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAddMembership, onEditMembership }: Props) => {
   const [memberships, setMemberships] = useState<PersonMembership[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -78,7 +82,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, onAddMembership 
     }
 
     void load()
-  }, [memberId])
+  }, [memberId, reloadKey])
 
   // Build assignment lookup by clientId for fast matching
   const assignmentMap = new Map<string, PersonDetailAssignment>()
@@ -138,9 +142,35 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, onAddMembership 
                   {memberships.map(m => {
                     const cfg = TYPE_CONFIG[m.membershipType]
                     const assignment = m.clientId ? assignmentMap.get(m.clientId) : undefined
+                    const canEdit = isAdmin && onEditMembership
+
+                    const handleRowClick = () => {
+                      if (!canEdit) return
+
+                      const rowData: MembershipRowData = {
+                        membershipId: m.membershipId,
+                        organizationId: m.organizationId,
+                        organizationName: m.organizationName,
+                        clientId: m.clientId,
+                        membershipType: m.membershipType,
+                        roleLabel: m.roleLabel,
+                        department: m.department,
+                        isPrimary: m.isPrimary
+                      }
+
+                      onEditMembership(rowData, assignment)
+                    }
 
                     return (
-                      <TableRow key={m.membershipId} hover sx={assignment && !assignment.active ? { opacity: 0.6 } : undefined}>
+                      <TableRow
+                        key={m.membershipId}
+                        hover
+                        onClick={handleRowClick}
+                        sx={{
+                          ...(assignment && !assignment.active ? { opacity: 0.6 } : undefined),
+                          ...(canEdit ? { cursor: 'pointer' } : undefined)
+                        }}
+                      >
                         <TableCell>
                           <Typography
                             component={Link}

@@ -95,7 +95,7 @@ GROUP BY o.organization_id
 | `/api/organizations/[id]/hubspot-sync` | POST | admin | Sync org fields + contacts from HubSpot |
 | `/api/organizations/people-search` | GET | internal | Search identity profiles (ILIKE, ?q=) |
 | `/api/organizations/org-search` | GET | internal | Search organizations (ILIKE name/legal_name, ?q=) |
-| `/api/people/[memberId]/memberships` | GET, POST | GET: internal, POST: admin | Person's org memberships + create |
+| `/api/people/[memberId]/memberships` | GET, POST, PATCH, DELETE | GET: internal, others: admin | Person's org memberships CRUD |
 
 ### Query Parameters (GET /api/organizations)
 
@@ -137,6 +137,8 @@ GROUP BY o.organization_id
 | `createIdentityProfile(data)` | Create identity profile (ON CONFLICT DO NOTHING) |
 | `searchProfiles(query)` | ILIKE search on name/email, limit 10 |
 | `searchOrganizations(query)` | ILIKE search on org name/legal_name, limit 10 |
+| `updateMembership(membershipId, data)` | Dynamic UPDATE on person_memberships (type, role, department, isPrimary) |
+| `deactivateMembership(membershipId)` | Soft delete: sets active=FALSE, status='inactive' |
 
 ---
 
@@ -291,21 +293,29 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 | `scripts/migrations/fix-membership-type-check.ts` | Script | P4 | CHECK constraint migration runner |
 | `src/app/api/organizations/org-search/route.ts` | API | P4 | Organization search (typeahead) |
 | `src/views/greenhouse/people/drawers/AddPersonMembershipDrawer.tsx` | View | P4 | Drawer to link person → org |
+| `src/views/greenhouse/people/drawers/EditPersonMembershipDrawer.tsx` | View | P4 | Drawer to edit membership + assignment |
+
+### Deleted Files (3 from P4)
+
+| File | Reason |
+|------|--------|
+| `src/views/greenhouse/people/tabs/PersonAssignmentsTab.tsx` | Replaced by PersonMembershipsTab with assignment data |
+| `src/views/greenhouse/people/drawers/AssignmentDrawer.tsx` | Replaced by AddPersonMembershipDrawer |
+| `src/views/greenhouse/people/drawers/EditAssignmentDrawer.tsx` | Replaced by EditPersonMembershipDrawer |
 
 ### Modified Files (9 from P2, 2 from P3, 5 from P4)
 
 | File | Change |
 |------|--------|
-| `src/types/people.ts` | Added `'memberships'` to PersonTab |
-| `src/views/greenhouse/people/helpers.ts` | Tab config + permissions for memberships |
-| `src/views/greenhouse/people/PersonTabs.tsx` | TabPanel for memberships |
-| `src/lib/people/permissions.ts` | `canViewMemberships` access control |
-| `src/lib/people/get-people-meta.ts` | `'memberships'` in supportedTabs |
+| `src/types/people.ts` | Added `'memberships'` to PersonTab, removed `'assignments'` |
+| `src/views/greenhouse/people/helpers.ts` | Tab config + permissions for memberships, removed assignments |
+| `src/views/greenhouse/people/PersonTabs.tsx` | TabPanel for memberships, +`onEditMembership`/`membershipReloadKey` props |
+| `src/lib/people/permissions.ts` | `canViewMemberships` access control, removed assignments from tab order |
+| `src/lib/people/get-people-meta.ts` | `'memberships'` in supportedTabs, removed `'assignments'` |
 | `src/components/layout/vertical/VerticalMenu.tsx` | +Organizaciones nav, -Clientes nav (finance) |
 | `src/config/greenhouse-nomenclature.ts` | +`organizations` in GH_AGENCY_NAV, -`clients` from GH_FINANCE_NAV |
-| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()` (P4) |
-| `src/app/api/people/[memberId]/memberships/route.ts` | +POST handler with admin auth, duplicate check (P4) |
-| `src/views/greenhouse/people/PersonTabs.tsx` | +`onNewMembership` prop (P4) |
-| `src/views/greenhouse/people/PersonView.tsx` | +membership drawer state, +AddPersonMembershipDrawer (P4) |
+| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()`, +`updateMembership()`, +`deactivateMembership()`, +`department` in PersonMembership (P4) |
+| `src/app/api/people/[memberId]/memberships/route.ts` | +POST, +PATCH, +DELETE handlers with admin auth (P4) |
+| `src/views/greenhouse/people/PersonView.tsx` | +EditPersonMembershipDrawer state, +AddPersonMembershipDrawer (P4) |
 | `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_CONFIG with "Equipo Efeonce" + color differentiation (P4) |
 | `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels synced: "Equipo Efeonce", reordered (P4) |

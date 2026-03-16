@@ -9,12 +9,14 @@ Registro de cambios principales de Greenhouse EO.
 ### Nuevas funcionalidades
 
 - **Person 360 → Vincular a organización** — Ghost slot "+ Vincular a organización" en la pestaña Organizaciones de Person 360. Click abre un drawer lateral (480px) con búsqueda typeahead de organizaciones, selector de tipo de membresía (default: "Equipo Efeonce"), rol, departamento, contacto principal. Admin-only. `POST /api/people/[memberId]/memberships` con validación de duplicados y resolución automática de `identity_profile_id`.
+- **Person 360 → Editar membresía** — Click en fila de la tabla de organizaciones abre `EditPersonMembershipDrawer` (admin-only). Editor combinado: campos de membresía (tipo, rol, departamento, contacto principal) + asignación operativa (FTE slider 0.1-1.0, horas/mes override). Permite crear asignación si no existe (cuando hay Space vinculado) o desactivar membresía + asignación. `PATCH /api/people/[memberId]/memberships` + `PATCH/DELETE /api/admin/team/assignments/:id`.
 - **Organization search API** — `GET /api/organizations/org-search?q=` para typeahead de organizaciones (ILIKE nombre/razón social, limit 10). Usado por el nuevo drawer.
 - **Diferenciación visual "Equipo Efeonce"** — En Organization 360 (Personas) y Person 360 (Organizaciones), los chips de tipo de membresía ahora usan colores diferenciados: "Equipo Efeonce" (info/azul) para equipo interno, "Facturación" (warning/naranja), otros tipos en gris. Mismo patrón TYPE_CONFIG en ambos lados.
 - **Fix CHECK constraint** — Migración `fix-membership-type-check.sql` expande el constraint de `person_memberships.membership_type` para aceptar todos los valores válidos (DB originales + UI): `team_member`, `client_contact`, `client_user`, `contact`, `billing`, `contractor`, `partner`, `advisor`.
 - **Merge Asignaciones → Organizaciones** — Eliminada la pestaña "Asignaciones" de Person 360. Los datos de asignación (FTE, fecha de inicio, estado activo/inactivo) ahora se muestran como columnas adicionales en la pestaña "Organizaciones", vinculados por `clientId` vía la tabla `spaces`. "Organizaciones" es ahora la primera pestaña por defecto.
+- **Limpieza de archivos legacy** — Eliminados `PersonAssignmentsTab.tsx`, `AssignmentDrawer.tsx` y `EditAssignmentDrawer.tsx` que ya no se usan.
 
-### Archivos nuevos (4)
+### Archivos nuevos (5)
 
 | Archivo | Propósito |
 |---------|-----------|
@@ -22,16 +24,25 @@ Registro de cambios principales de Greenhouse EO.
 | `scripts/migrations/fix-membership-type-check.ts` | Runner de migración (profile: migrator) |
 | `src/app/api/organizations/org-search/route.ts` | GET búsqueda de organizaciones |
 | `src/views/greenhouse/people/drawers/AddPersonMembershipDrawer.tsx` | Drawer para vincular persona a organización |
+| `src/views/greenhouse/people/drawers/EditPersonMembershipDrawer.tsx` | Drawer para editar membresía + asignación operativa |
 
-### Archivos modificados (7)
+### Archivos eliminados (3)
+
+| Archivo | Razón |
+|---------|-------|
+| `src/views/greenhouse/people/tabs/PersonAssignmentsTab.tsx` | Reemplazado por datos en PersonMembershipsTab |
+| `src/views/greenhouse/people/drawers/AssignmentDrawer.tsx` | Reemplazado por AddPersonMembershipDrawer |
+| `src/views/greenhouse/people/drawers/EditAssignmentDrawer.tsx` | Reemplazado por EditPersonMembershipDrawer |
+
+### Archivos modificados (11)
 
 | Archivo | Cambio |
 |---------|--------|
-| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()` |
-| `src/app/api/people/[memberId]/memberships/route.ts` | +POST handler (admin, duplicate check, profileId resolution) |
-| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | Ghost slot, TYPE_CONFIG con colores, props `isAdmin`/`onAddMembership` |
-| `src/views/greenhouse/people/PersonTabs.tsx` | +`onNewMembership` prop, pasado a PersonMembershipsTab |
-| `src/views/greenhouse/people/PersonView.tsx` | +`membershipDrawerOpen` state, +`AddPersonMembershipDrawer` render |
+| `src/lib/account-360/organization-store.ts` | +`searchOrganizations()`, +`updateMembership()`, +`deactivateMembership()`, +`department` en PersonMembership |
+| `src/app/api/people/[memberId]/memberships/route.ts` | +POST, +PATCH, +DELETE handlers (admin, profileId resolution) |
+| `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` | Ghost slot, TYPE_CONFIG con colores, clickable rows para editar, reloadKey |
+| `src/views/greenhouse/people/PersonTabs.tsx` | +`onNewMembership`, +`onEditMembership`, +`membershipReloadKey` props |
+| `src/views/greenhouse/people/PersonView.tsx` | +AddPersonMembershipDrawer, +EditPersonMembershipDrawer, state management |
 | `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_LABEL → TYPE_CONFIG con "Equipo Efeonce" (info) y colores diferenciados |
 | `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels sincronizados: "Equipo Efeonce", reordenados |
 | `src/types/people.ts` | -`'assignments'` de PersonTab |

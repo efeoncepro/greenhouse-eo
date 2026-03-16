@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireInternalTenantContext, requireAdminTenantContext } from '@/lib/tenant/authorization'
-import { getPersonMemberships, membershipExists, createMembership } from '@/lib/account-360/organization-store'
+import { getPersonMemberships, membershipExists, createMembership, updateMembership, deactivateMembership } from '@/lib/account-360/organization-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export const dynamic = 'force-dynamic'
@@ -78,4 +78,41 @@ export async function POST(request: Request, { params }: { params: Promise<{ mem
   })
 
   return NextResponse.json(result, { status: 201 })
+}
+
+export async function PATCH(request: Request) {
+  const { tenant, errorResponse } = await requireAdminTenantContext()
+  if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await request.json()
+  const membershipId = body.membershipId?.trim()
+
+  if (!membershipId) {
+    return NextResponse.json({ error: 'membershipId es requerido.' }, { status: 400 })
+  }
+
+  const result = await updateMembership(membershipId, {
+    membershipType: body.membershipType,
+    roleLabel: body.roleLabel,
+    department: body.department,
+    isPrimary: body.isPrimary
+  })
+
+  return NextResponse.json(result)
+}
+
+export async function DELETE(request: Request) {
+  const { tenant, errorResponse } = await requireAdminTenantContext()
+  if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await request.json()
+  const membershipId = body.membershipId?.trim()
+
+  if (!membershipId) {
+    return NextResponse.json({ error: 'membershipId es requerido.' }, { status: 400 })
+  }
+
+  const result = await deactivateMembership(membershipId)
+
+  return NextResponse.json(result)
 }

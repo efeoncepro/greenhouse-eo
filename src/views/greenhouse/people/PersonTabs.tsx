@@ -13,7 +13,8 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import type { PersonDetail } from '@/types/people'
+import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
+import type { MembershipRowData } from './drawers/EditPersonMembershipDrawer'
 import type { PersonTab } from './helpers'
 import { TAB_CONFIG } from './helpers'
 import PersonActivityTab from './tabs/PersonActivityTab'
@@ -27,10 +28,12 @@ import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 type Props = {
   detail: PersonDetail
   isAdmin?: boolean
+  membershipReloadKey?: number
   onNewMembership?: () => void
+  onEditMembership?: (membership: MembershipRowData, assignment?: PersonDetailAssignment) => void
 }
 
-const PersonTabs = ({ detail, isAdmin, onNewMembership }: Props) => {
+const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onEditMembership }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -122,7 +125,9 @@ const PersonTabs = ({ detail, isAdmin, onNewMembership }: Props) => {
                   memberId={detail.member.memberId}
                   assignments={detail.assignments}
                   isAdmin={isAdmin}
+                  reloadKey={membershipReloadKey}
                   onAddMembership={onNewMembership}
+                  onEditMembership={onEditMembership}
                 />
               )}
             </TabPanel>
