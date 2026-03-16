@@ -1,8 +1,10 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 
@@ -13,6 +15,10 @@ import type { OrganizationDetailData } from './types'
 
 type Props = {
   detail: OrganizationDetailData
+  isAdmin?: boolean
+  syncing?: boolean
+  onEditOrganization?: () => void
+  onSyncHubspot?: () => void
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
@@ -33,7 +39,7 @@ const STATUS_LABEL: Record<string, string> = {
   churned: 'Churned'
 }
 
-const OrganizationLeftSidebar = ({ detail }: Props) => {
+const OrganizationLeftSidebar = ({ detail, isAdmin, syncing, onEditOrganization, onSyncHubspot }: Props) => {
   const initial = detail.organizationName.charAt(0).toUpperCase()
   const flag = detail.country ? COUNTRY_FLAGS[detail.country.toUpperCase()] ?? '🌐' : null
 
@@ -110,12 +116,27 @@ const OrganizationLeftSidebar = ({ detail }: Props) => {
           <Typography variant='body2' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{detail.publicId}</Typography>
         </Box>
         {detail.hubspotCompanyId && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <i className='tabler-brand-hubspot' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-              HubSpot: {detail.hubspotCompanyId}
-            </Typography>
-          </Box>
+          <>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <i className='tabler-brand-hubspot' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
+              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                HubSpot: {detail.hubspotCompanyId}
+              </Typography>
+            </Box>
+            {isAdmin && onSyncHubspot && (
+              <Button
+                variant='tonal'
+                size='small'
+                color='warning'
+                startIcon={syncing ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-refresh' />}
+                disabled={syncing}
+                onClick={onSyncHubspot}
+                sx={{ mt: 0.5 }}
+              >
+                {syncing ? 'Sincronizando...' : 'Sincronizar con HubSpot'}
+              </Button>
+            )}
+          </>
         )}
       </CardContent>
 
@@ -128,6 +149,23 @@ const OrganizationLeftSidebar = ({ detail }: Props) => {
             <Typography variant='body2' color='text.secondary' sx={{ whiteSpace: 'pre-wrap' }}>
               {detail.notes}
             </Typography>
+          </CardContent>
+        </>
+      )}
+
+      {/* Admin actions */}
+      {isAdmin && onEditOrganization && (
+        <>
+          <Divider />
+          <CardContent>
+            <Button
+              variant='tonal'
+              fullWidth
+              startIcon={<i className='tabler-edit' />}
+              onClick={onEditOrganization}
+            >
+              Editar organización
+            </Button>
           </CardContent>
         </>
       )}

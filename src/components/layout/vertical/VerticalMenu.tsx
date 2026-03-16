@@ -183,7 +183,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: GH_FINANCE_NAV.income.label, href: '/finance/income' },
         { label: GH_FINANCE_NAV.expenses.label, href: '/finance/expenses' },
         { label: GH_FINANCE_NAV.suppliers.label, href: '/finance/suppliers' },
-        { label: GH_FINANCE_NAV.clients.label, href: '/finance/clients' },
         { label: GH_FINANCE_NAV.reconciliation.label, href: '/finance/reconciliation' },
         { label: GH_FINANCE_NAV.intelligence.label, href: '/finance/intelligence' }
       ]

@@ -26,9 +26,11 @@ const TAB_CONFIG: Array<{ value: OrganizationTab; label: string; icon: string }>
 
 type Props = {
   detail: OrganizationDetailData
+  isAdmin?: boolean
+  onAddMembership?: () => void
 }
 
-const OrganizationTabs = ({ detail }: Props) => {
+const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -90,7 +92,7 @@ const OrganizationTabs = ({ detail }: Props) => {
           </TabPanel>
 
           <TabPanel value='people' className='p-0'>
-            {activeTab === 'people' && <OrganizationPeopleTab organizationId={detail.organizationId} />}
+            {activeTab === 'people' && <OrganizationPeopleTab organizationId={detail.organizationId} isAdmin={isAdmin} onAddMembership={onAddMembership} />}
           </TabPanel>
 
           <TabPanel value='finance' className='p-0'>

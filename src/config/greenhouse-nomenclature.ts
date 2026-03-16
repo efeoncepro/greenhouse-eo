@@ -33,7 +33,6 @@ export const GH_FINANCE_NAV = {
   income: { label: 'Ingresos', subtitle: 'Facturación y cobros' },
   expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
-  clients: { label: 'Clientes', subtitle: 'Perfil financiero' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
   intelligence: { label: 'Inteligencia', subtitle: 'Rentabilidad y economía por Space' }
 } as const

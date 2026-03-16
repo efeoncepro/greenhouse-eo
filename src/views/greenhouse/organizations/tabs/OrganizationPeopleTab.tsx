@@ -18,12 +18,16 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import Button from '@mui/material/Button'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import type { OrganizationPerson } from '../types'
 
 type Props = {
   organizationId: string
+  isAdmin?: boolean
+  onAddMembership?: () => void
 }
 
 const TYPE_LABEL: Record<string, string> = {
@@ -33,7 +37,7 @@ const TYPE_LABEL: Record<string, string> = {
   billing: 'Facturación'
 }
 
-const OrganizationPeopleTab = ({ organizationId }: Props) => {
+const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Props) => {
   const [memberships, setMemberships] = useState<OrganizationPerson[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -76,6 +80,13 @@ const OrganizationPeopleTab = ({ organizationId }: Props) => {
               <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
                 <i className='tabler-users' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
               </Avatar>
+            }
+            action={
+              isAdmin && onAddMembership ? (
+                <Button variant='tonal' size='small' startIcon={<i className='tabler-user-plus' />} onClick={onAddMembership}>
+                  Agregar persona
+                </Button>
+              ) : undefined
             }
           />
           <Divider />

@@ -358,6 +358,186 @@ export const createMembership = async (input: CreateMembershipInput) => {
   return { membershipId, publicId, created: true }
 }
 
+// ── Finance ────────────────────────────────────────────────────────────
+
+export interface OrganizationClientFinance {
+  clientId: string
+  clientName: string
+  totalRevenueClp: number
+  directCostsClp: number
+  indirectCostsClp: number
+  grossMarginPercent: number | null
+  netMarginPercent: number | null
+  headcountFte: number | null
+}
+
+export interface OrganizationFinanceSummary {
+  organizationId: string
+  periodYear: number
+  periodMonth: number
+  clientCount: number
+  totalRevenueClp: number
+  totalDirectCostsClp: number
+  totalIndirectCostsClp: number
+  avgGrossMarginPercent: number | null
+  avgNetMarginPercent: number | null
+  totalFte: number | null
+  clients: OrganizationClientFinance[]
+}
+
+interface OrgFinanceRow extends Record<string, unknown> {
+  client_id: string
+  client_name: string
+  total_revenue_clp: string | number
+  direct_costs_clp: string | number
+  indirect_costs_clp: string | number
+  gross_margin_percent: string | number | null
+  net_margin_percent: string | number | null
+  headcount_fte: string | number | null
+}
+
+export const getOrganizationFinanceSummary = async (
+  orgId: string,
+  year: number,
+  month: number
+): Promise<OrganizationFinanceSummary> => {
+  const rows = await runGreenhousePostgresQuery<OrgFinanceRow>(`
+    SELECT
+      ce.client_id, ce.client_name,
+      ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
+      ce.gross_margin_percent, ce.net_margin_percent,
+      ce.headcount_fte
+    FROM greenhouse_finance.client_economics ce
+    JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
+    WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
+    ORDER BY ce.total_revenue_clp DESC
+  `, [orgId, year, month])
+
+  const clients: OrganizationClientFinance[] = rows.map(r => ({
+    clientId: String(r.client_id),
+    clientName: String(r.client_name),
+    totalRevenueClp: toNum(r.total_revenue_clp),
+    directCostsClp: toNum(r.direct_costs_clp),
+    indirectCostsClp: toNum(r.indirect_costs_clp),
+    grossMarginPercent: r.gross_margin_percent != null ? toNum(r.gross_margin_percent) : null,
+    netMarginPercent: r.net_margin_percent != null ? toNum(r.net_margin_percent) : null,
+    headcountFte: r.headcount_fte != null ? toNum(r.headcount_fte) : null
+  }))
+
+  const totalRev = clients.reduce((s, c) => s + c.totalRevenueClp, 0)
+  const totalDirect = clients.reduce((s, c) => s + c.directCostsClp, 0)
+  const totalIndirect = clients.reduce((s, c) => s + c.indirectCostsClp, 0)
+  const totalFte = clients.reduce((s, c) => s + (c.headcountFte ?? 0), 0)
+
+  // Revenue-weighted average margins
+  let avgGross: number | null = null
+  let avgNet: number | null = null
+
+  if (totalRev > 0) {
+    avgGross = clients.reduce((s, c) => s + (c.grossMarginPercent ?? 0) * c.totalRevenueClp, 0) / totalRev
+    avgNet = clients.reduce((s, c) => s + (c.netMarginPercent ?? 0) * c.totalRevenueClp, 0) / totalRev
+  }
+
+  return {
+    organizationId: orgId,
+    periodYear: year,
+    periodMonth: month,
+    clientCount: clients.length,
+    totalRevenueClp: totalRev,
+    totalDirectCostsClp: totalDirect,
+    totalIndirectCostsClp: totalIndirect,
+    avgGrossMarginPercent: avgGross,
+    avgNetMarginPercent: avgNet,
+    totalFte: totalFte > 0 ? totalFte : null,
+    clients
+  }
+}
+
+// ── Identity helpers (for HubSpot sync) ────────────────────────────────
+
+interface ProfileRow extends Record<string, unknown> {
+  profile_id: string
+  full_name: string | null
+  canonical_email: string | null
+}
+
+export const findProfileByEmail = async (email: string): Promise<{ profileId: string; fullName: string | null } | null> => {
+  const rows = await runGreenhousePostgresQuery<ProfileRow>(`
+    SELECT profile_id, full_name, canonical_email
+    FROM greenhouse_core.identity_profiles
+    WHERE LOWER(canonical_email) = LOWER($1) AND active = TRUE
+    LIMIT 1
+  `, [email])
+
+  if (rows.length === 0) return null
+
+  return { profileId: rows[0].profile_id, fullName: rows[0].full_name ?? null }
+}
+
+export const membershipExists = async (profileId: string, organizationId: string): Promise<boolean> => {
+  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(`
+    SELECT 1 FROM greenhouse_core.person_memberships
+    WHERE profile_id = $1 AND organization_id = $2 AND active = TRUE
+    LIMIT 1
+  `, [profileId, organizationId])
+
+  return rows.length > 0
+}
+
+const normalizeToken = (v: string) => v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+const buildIdentityProfileId = (source: { sourceSystem: string; sourceObjectType: string; sourceObjectId: string }) =>
+  `identity-${normalizeToken(source.sourceSystem)}-${normalizeToken(source.sourceObjectType)}-${normalizeToken(source.sourceObjectId)}`
+
+export const createIdentityProfile = async (data: {
+  sourceSystem: string
+  sourceObjectType: string
+  sourceObjectId: string
+  fullName: string
+  canonicalEmail: string
+}): Promise<string> => {
+  const profileId = buildIdentityProfileId(data)
+
+  await runGreenhousePostgresQuery(`
+    INSERT INTO greenhouse_core.identity_profiles (
+      profile_id, full_name, canonical_email, source_system,
+      source_object_type, source_object_id, active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ON CONFLICT (profile_id) DO NOTHING
+  `, [
+    profileId,
+    data.fullName,
+    data.canonicalEmail.toLowerCase(),
+    data.sourceSystem,
+    data.sourceObjectType,
+    data.sourceObjectId
+  ])
+
+  return profileId
+}
+
+// ── People search ──────────────────────────────────────────────────────
+
+export const searchProfiles = async (query: string): Promise<Array<{ profileId: string; fullName: string | null; canonicalEmail: string | null }>> => {
+  const pattern = `%${query}%`
+
+  const rows = await runGreenhousePostgresQuery<ProfileRow>(`
+    SELECT profile_id, full_name, canonical_email
+    FROM greenhouse_core.identity_profiles
+    WHERE (full_name ILIKE $1 OR canonical_email ILIKE $1) AND active = TRUE
+    ORDER BY full_name NULLS LAST
+    LIMIT 10
+  `, [pattern])
+
+  return rows.map(r => ({
+    profileId: r.profile_id,
+    fullName: r.full_name ?? null,
+    canonicalEmail: r.canonical_email ?? null
+  }))
+}
+
+// ── Person memberships ─────────────────────────────────────────────────
+
 export const getPersonMemberships = async (profileId: string): Promise<PersonMembership[]> => {
   const rows = await runGreenhousePostgresQuery<MembershipRow>(`
     SELECT

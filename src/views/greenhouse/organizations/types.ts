@@ -1,5 +1,30 @@
 export type OrganizationTab = 'overview' | 'people' | 'finance'
 
+export interface OrganizationClientFinance {
+  clientId: string
+  clientName: string
+  totalRevenueClp: number
+  directCostsClp: number
+  indirectCostsClp: number
+  grossMarginPercent: number | null
+  netMarginPercent: number | null
+  headcountFte: number | null
+}
+
+export interface OrganizationFinanceSummary {
+  organizationId: string
+  periodYear: number
+  periodMonth: number
+  clientCount: number
+  totalRevenueClp: number
+  totalDirectCostsClp: number
+  totalIndirectCostsClp: number
+  avgGrossMarginPercent: number | null
+  avgNetMarginPercent: number | null
+  totalFte: number | null
+  clients: OrganizationClientFinance[]
+}
+
 export interface OrganizationSpace {
   spaceId: string
   publicId: string
