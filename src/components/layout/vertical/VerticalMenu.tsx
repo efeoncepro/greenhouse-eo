@@ -153,6 +153,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />,
           href: '/agency/organizations',
           icon: 'tabler-building-community'
+        },
+        {
+          label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />,
+          href: '/agency/services',
+          icon: 'tabler-packages'
         }
       ]
     })

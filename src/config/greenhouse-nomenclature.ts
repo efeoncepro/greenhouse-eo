@@ -25,7 +25,8 @@ export const GH_AGENCY_NAV = {
   pulseGlobal: { label: 'Pulse Global', subtitle: 'KPIs agregados de todos los Spaces' },
   spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
-  organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' }
+  organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
+  services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' }
 } as const
 
 export const GH_FINANCE_NAV = {

@@ -105,11 +105,23 @@ const loadCampaignScopes = async (userId: string): Promise<string[]> => {
 }
 
 const loadServiceModules = async (clientId: string): Promise<{ businessLines: string[]; serviceModules: string[] }> => {
+  // UNION transition: reads from both v_client_active_modules (derived from services)
+  // and legacy client_service_modules (manual assignments). DISTINCT deduplicates.
+  // After migration validation, the legacy leg will be removed (§10.3 Phase 5).
   const rows = await runGreenhousePostgresQuery<{ module_code: string; business_line: string | null }>(
-    `SELECT sm.module_code, sm.business_line
-     FROM greenhouse_core.client_service_modules csm
-     JOIN greenhouse_core.service_modules sm ON sm.module_id = csm.module_id
-     WHERE csm.client_id = $1 AND csm.active = TRUE AND sm.active = TRUE`,
+    `SELECT DISTINCT sub.module_code, sub.business_line FROM (
+       SELECT sm.module_code, sm.business_line
+       FROM greenhouse_core.v_client_active_modules vam
+       JOIN greenhouse_core.service_modules sm ON sm.module_id = vam.module_id
+       WHERE vam.client_id = $1
+
+       UNION
+
+       SELECT sm.module_code, sm.business_line
+       FROM greenhouse_core.client_service_modules csm
+       JOIN greenhouse_core.service_modules sm ON sm.module_id = csm.module_id
+       WHERE csm.client_id = $1 AND csm.active = TRUE AND sm.active = TRUE
+     ) sub`,
     [clientId]
   )
 

@@ -82,6 +82,46 @@ export interface HubSpotGreenhouseCompanyContactsResponse {
   contacts: HubSpotGreenhouseContactProfile[]
 }
 
+export interface HubSpotGreenhouseServiceProfile {
+  identity: {
+    serviceId: string
+    name: string | null
+    hubspotServiceId: string | null
+  }
+  classification: {
+    lineaDeServicio: string | null
+    servicioEspecifico: string | null
+    modalidad: string | null
+    billingFrequency: string | null
+    country: string | null
+  }
+  financial: {
+    totalCost: number | null
+    amountPaid: number | null
+    currency: string | null
+  }
+  dates: {
+    startDate: string | null
+    targetEndDate: string | null
+  }
+  references: {
+    notionProjectId: string | null
+    hubspotCompanyId: string | null
+    hubspotDealId: string | null
+  }
+  source: {
+    sourceSystem: string
+    sourceObjectType: string
+    sourceObjectId: string
+  }
+}
+
+export interface HubSpotGreenhouseCompanyServicesResponse {
+  hubspotCompanyId: string
+  services: HubSpotGreenhouseServiceProfile[]
+  count: number
+}
+
 export interface HubSpotGreenhouseLiveContext {
   serviceConfigured: boolean
   serviceBaseUrl: string | null
@@ -90,6 +130,7 @@ export interface HubSpotGreenhouseLiveContext {
   company: HubSpotGreenhouseCompanyProfile | null
   owner: HubSpotGreenhouseOwnerProfile | null
   contacts: HubSpotGreenhouseContactProfile[]
+  services: HubSpotGreenhouseServiceProfile[]
   error: string | null
 }
 
@@ -148,6 +189,12 @@ export const getHubSpotGreenhouseCompanyProfile = async (hubspotCompanyId: strin
 export const getHubSpotGreenhouseCompanyOwner = async (hubspotCompanyId: string) =>
   fetchJson<HubSpotGreenhouseCompanyOwnerResponse>(`/companies/${hubspotCompanyId}/owner`)
 
+export const getHubSpotGreenhouseCompanyServices = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyServicesResponse>(`/companies/${hubspotCompanyId}/services`)
+
+export const getHubSpotGreenhouseService = async (serviceId: string) =>
+  fetchJson<HubSpotGreenhouseServiceProfile>(`/services/${serviceId}`)
+
 export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: string) =>
   {
     const response = await fetchJson<HubSpotGreenhouseCompanyContactsResponse>(`/companies/${hubspotCompanyId}/contacts`)
@@ -175,18 +222,20 @@ export const getHubSpotGreenhouseLiveContext = async (
       company: null,
       owner: null,
       contacts: [],
+      services: [],
       error: null
     }
   }
 
-  const [contractResult, companyResult, ownerResult, contactsResult] = await Promise.allSettled([
+  const [contractResult, companyResult, ownerResult, contactsResult, servicesResult] = await Promise.allSettled([
     getHubSpotGreenhouseServiceContract(),
     getHubSpotGreenhouseCompanyProfile(hubspotCompanyId),
     getHubSpotGreenhouseCompanyOwner(hubspotCompanyId),
-    getHubSpotGreenhouseCompanyContacts(hubspotCompanyId)
+    getHubSpotGreenhouseCompanyContacts(hubspotCompanyId),
+    getHubSpotGreenhouseCompanyServices(hubspotCompanyId)
   ])
 
-  const errors = [contractResult, companyResult, ownerResult, contactsResult]
+  const errors = [contractResult, companyResult, ownerResult, contactsResult, servicesResult]
     .filter(result => result.status === 'rejected')
     .map(result => toErrorMessage((result as PromiseRejectedResult).reason))
 
@@ -198,6 +247,7 @@ export const getHubSpotGreenhouseLiveContext = async (
     company: companyResult.status === 'fulfilled' ? companyResult.value : null,
     owner: ownerResult.status === 'fulfilled' ? ownerResult.value.owner : null,
     contacts: contactsResult.status === 'fulfilled' ? contactsResult.value.contacts : [],
+    services: servicesResult.status === 'fulfilled' ? servicesResult.value.services : [],
     error: errors.length > 0 ? errors.join(' | ') : null
   }
 }

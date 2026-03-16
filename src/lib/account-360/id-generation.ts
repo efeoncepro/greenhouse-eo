@@ -7,13 +7,15 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 export const generateOrganizationId = () => `org-${randomUUID()}`
 export const generateSpaceId = () => `spc-${randomUUID()}`
 export const generateMembershipId = () => `mbr-${randomUUID()}`
+export const generateServiceId = () => `svc-${randomUUID()}`
 
 // ── Public IDs (EO-IDs, human-readable, sequential) ────────────────────
 
 const SEQUENCE_MAP = {
   'EO-ORG': 'greenhouse_core.seq_organization_public_id',
   'EO-SPC': 'greenhouse_core.seq_space_public_id',
-  'EO-MBR': 'greenhouse_core.seq_membership_public_id'
+  'EO-MBR': 'greenhouse_core.seq_membership_public_id',
+  'EO-SVC': 'greenhouse_core.seq_service_public_id'
 } as const
 
 type PublicIdPrefix = keyof typeof SEQUENCE_MAP
