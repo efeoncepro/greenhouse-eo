@@ -21,6 +21,18 @@ Los servicios nacen en **HubSpot** (objeto Services, `objectTypeId: 0-162`) como
 
 **Cambio respecto a Capabilities Architecture v1:** En la v1, las capabilities se resolvían desde dos propiedades string en el objeto Company (`linea_de_servicio` + `servicios_especificos`) y se almacenaban manualmente en `client_service_modules` (que ya existe en PostgreSQL `greenhouse_core`). En esta v2, las capabilities se **derivan automáticamente** de registros individuales de Services activos en PostgreSQL, asociados al Space (tenant) del cliente. La tabla `services` se convierte en la fuente de verdad para capabilities: una vista `v_client_active_modules` deriva los módulos activos desde los servicios, y `loadServiceModules()` en `identity-store.ts` lee de esta vista para construir el TenantContext. `resolveCapabilityModules()` sigue recibiendo `{ businessLines, serviceModules }` y matcheando contra el registry estático — zero breaking changes en sidebar/guards. Lo que cambia es **de dónde vienen** esos arrays: ya no de una tabla manual, sino derivados de servicios activos.
 
+### 1.1 Relación con otros documentos
+
+| Documento | Relación |
+|---|---|
+| `Greenhouse_ICO_Engine_v1.md` | Define la capa de cálculo de métricas ICO. Los módulos de capabilities consumen del ICO Engine — nunca calculan métricas al vuelo. El engine ya incluye la granularidad de Service en su diseño (view `v_tareas_by_service`). |
+| `Greenhouse_Capabilities_Architecture_v1.md` | Spec original de capabilities (v1). Esta spec (Services Architecture) la reemplaza conceptualmente: capabilities ahora se derivan de services activos. Los componentes de resolución (`resolveCapabilityModules()`, `capability-registry.ts`) se mantienen sin cambios. |
+| `Greenhouse_Account_360_Object_Model_v1.md` | Define `organizations` y `spaces`. Services tiene FK a `spaces.space_id` y `organizations.organization_id`. |
+| `Greenhouse_Data_Node_Architecture_v1.md` | Define mecanismos de export. El Data Node puede exponer servicios y sus métricas ICO asociadas via CSV, XLSX, JSON y API. |
+| `CODEX_TASK_Financial_Module.md` | Módulo financiero. Services enriquece ingresos/egresos con desglose por servicio, línea de negocio, y revenue recognition temporal. |
+| `CODEX_TASK_HR_Payroll_Module_v2.md` | Módulo HR. Services conecta equipo → servicio → margen operativo via `notion_project_id` y team assignments. |
+| `Greenhouse_Services_Architecture_v1.md` (Greenhouse repo) | **Este documento.** La versión corregida por Claude Code con convenciones del proyecto es la definitiva. |
+
 ---
 
 ## 2. Modelo conceptual: tres niveles
@@ -83,8 +95,8 @@ Webhook / Polling → PostgreSQL (Cloud SQL)
   │ Write-back async a HubSpot para mantener CRM sincronizado
   ↓
 ETL nocturno → BigQuery (OLAP)
-  │ Tabla `greenhouse_olap.services` para analytics
-  │ JOINs con notion_ops, hubspot_crm para cross-analysis
+  │ Tabla `greenhouse_conformed.services` para analytics
+  │ JOINs con notion_ops, hubspot_crm, ico_engine para cross-analysis
   ↓
 Greenhouse: resolución de capabilities + módulos + métricas
 ```
@@ -248,7 +260,6 @@ FROM (
   JOIN greenhouse_core.service_modules sm ON sm.module_id = csm.module_id
   WHERE csm.client_id = $1 AND csm.active = TRUE AND sm.active = TRUE
 ) combined;
-```
 ```
 
 ### 4.4 Ejemplo de paquetes por línea
@@ -459,7 +470,7 @@ CREATE VIEW `efeonce-group.greenhouse_conformed.v_active_services_by_company` AS
 SELECT
   s.hubspot_company_id,
   c.name AS company_name,
-  s.id AS service_id,
+  s.service_id,
   s.name AS service_name,
   s.pipeline_stage,
   s.linea_de_servicio,
@@ -469,7 +480,7 @@ SELECT
   s.target_end_date,
   s.total_cost,
   s.amount_paid,
-  s.amount_remaining,
+  s.total_cost - COALESCE(s.amount_paid, 0) AS amount_remaining,
   s.currency,
   s.country,
   s.notion_project_id,
@@ -590,6 +601,7 @@ Script Node.js o endpoint Cloud Run (ejecuta diario vía Cloud Scheduler):
 5. Log en `greenhouse_conformed.etl_log`
 
 **Patrón:** Full-refresh simple, idempotente, sin CDC complejo. Alineado con el full-refresh de `hubspot-bq-sync`.
+
 ---
 
 ## 7. Administración de servicios en Greenhouse (Efeonce Ops)
@@ -774,22 +786,52 @@ El módulo HR (CODEX_TASK_HR_Payroll_Module_v2.md) gestiona compensaciones y KPI
 
 **Bridge real**: Service → Space → Client → Assignments → Members (via `client_team_assignments.client_id` + `client_team_assignments.member_id`)
 
-### 9.3 Operación ICO (Core)
+### 9.3 Operación ICO (ICO Engine)
+
+> **Referencia clave:** `Greenhouse_ICO_Engine_v1.md` define la infraestructura de cálculo de métricas ICO. Los módulos de capabilities **no calculan métricas** — las consumen del ICO Engine (dataset `ico_engine` en BigQuery). Esta sección describe cómo Services habilita una nueva dimensión de agregación en el engine.
 
 Las métricas ICO en Greenhouse hoy se calculan a nivel de proyecto (Notion). Con Services, se agrega una capa de agregación:
 
 ```
 Notion Tarea (unidad atómica)
   └── Notion Proyecto (agrupación operativa)
-       └── Service (contexto comercial: ef_notion_project_id)
+       └── Service (contexto comercial: notion_project_id)
             └── Capability/Paquete (experiencia del cliente)
 ```
 
-Esto permite:
-- **Métricas por servicio:** RpA promedio del servicio "Agencia Creativa" para Acme Corp
-- **Métricas por paquete:** OTD% del paquete "Creative Production" (combina Agencia Creativa + Producción Audiovisual)
-- **Métricas por Company:** Dashboard consolidado de todos los servicios del cliente
-- **Benchmarks por servicio:** Comparar el RpA de "Agencia Creativa" entre todos los clientes que lo tienen
+**Mecanismo concreto (ya diseñado en ICO Engine §2.3 y §03-views-service.sql):**
+
+El ICO Engine tiene dos caminos de agregación:
+
+1. **Sin Services (MVP, ya operativo):** Tareas se asocian a un Space vía `space.notion_project_ids[]`:
+```sql
+SELECT t.* FROM notion_ops.tareas t
+JOIN UNNEST(@notion_project_ids) AS pid
+  ON t.proyecto LIKE CONCAT('%', pid, '%')
+```
+
+2. **Con Services (activar cuando `greenhouse_core.services` esté poblada):** Tareas se asocian a un Service vía `service.notion_project_id`:
+```sql
+SELECT t.* FROM notion_ops.tareas t
+JOIN greenhouse_conformed.services s
+  ON t.proyecto LIKE CONCAT('%', s.notion_project_id, '%')
+WHERE s.space_id = @space_id
+  AND s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending', 'paused')
+```
+
+La view `ico_engine.v_tareas_by_service` (archivo `sql/ico-engine/03-views-service.sql`) implementa el camino 2. Se activa cuando Services esté operativo — es un enriquecimiento, no un prerequisito para el engine.
+
+**Granularidades habilitadas por Services:**
+
+| Granularidad | Qué permite | Consumidor |
+|---|---|---|
+| Métricas por servicio | RpA promedio del servicio "Agencia Creativa" para Acme Corp | Capability module (sub-sección de servicio) |
+| Métricas por paquete | OTD% del paquete "Creative Production" (combina servicios del paquete) | Capability module (header del paquete) |
+| Métricas por Space | Dashboard consolidado de todos los servicios del cliente | Pulse (dashboard principal) |
+| Benchmarks por servicio | Comparar el RpA de "Agencia Creativa" entre todos los clientes | Efeonce Ops (benchmarks internos) |
+| Margen por servicio | Costo de equipo (HR) vs `total_cost` del servicio, contextualizado por métricas ICO | Financial Intelligence Layer |
+
+**Importante:** Cuando las capability queries (`/src/lib/capability-queries/*.ts`) necesiten métricas ICO, deben leer de las views de consumo del ICO Engine (`ico_engine.v_metrics_*`), nunca calcular al vuelo. El engine calcula una vez, los consumidores leen muchas veces.
 
 ### 9.4 Facturación y cobranza (futuro)
 
@@ -881,7 +923,7 @@ Verificar si estos scopes están disponibles en el tier actual (Service Hub Pro)
 ### 11.3 Cache
 
 Misma estrategia que Capabilities v1:
-- `resolveCapabilities()` cacheado con `unstable_cache`, revalidate cada 1 hora
+- `resolveCapabilityModules()` cacheado con `unstable_cache`, revalidate cada 1 hora
 - Data de módulos cacheada por 1 hora
 - Invalidación on-demand: cuando un admin cambia un Service en Greenhouse, se invalida el cache del client
 
@@ -966,26 +1008,29 @@ main.py                   # EXTENDER: +services en _CORE_PROPS y SYNC_OBJECTS
 
 | Fase | Entregable | Estimado |
 |---|---|---|
-| **S0** | Pipeline + custom properties en HubSpot | 0.5 día |
-| **S0** | Agregar Services a `hubspot-bq-sync` (nuevo endpoint + tabla) | 1 día |
-| **S0** | Vista `v_active_services_by_company` en BigQuery | 0.5 día |
-| **S1** | Crear Service records para clientes actuales (migración) | 1 día |
-| **S1** | Capability Registry v2 con paquetes | 0.5 día |
-| **S1** | `resolveCapabilities()` v2 + tests | 1 día |
-| **S1** | API `/api/capabilities/resolve` v2 | 0.5 día |
-| **S1** | Sidebar dinámico con paquetes + sub-secciones | 1 día |
-| **S2** | PackagePage + ServiceSection components | 1.5 días |
-| **S2** | Service status badges + estados contextuales | 0.5 día |
-| **S2** | Guards de acceso v2 | 0.5 día |
-| **S3** | Admin de servicios en Ops (`/services`) | 2 días |
-| **S3** | Write-back Greenhouse → HubSpot | 1 día |
-| **S3** | Workflow Deal Closed-Won → Create Service | 0.5 día |
+| **S0** | Pipeline + custom properties en HubSpot | — |
+| **S0** | Agregar Services a `hubspot-bq-sync` + Cloud Run endpoints (ya hecho, §12) | — |
+| **S0** | Crear tabla `greenhouse_core.services` + vista `v_client_active_modules` en PostgreSQL (§5.1) | — |
+| **S0** | Seedear `service_modules` con los 14 servicios del catálogo si no existen | — |
+| **S1** | Script de migración: poblar `services` desde `client_service_modules` existentes (§10.3 Fase 2) | — |
+| **S1** | Crear Service records en HubSpot para servicios migrados | — |
+| **S1** | Validar `v_client_active_modules` vs `client_service_modules` (mismos resultados) | — |
+| **S1** | Actualizar `loadServiceModules()` con UNION transicional (§4.3) | — |
+| **S2** | `service-store.ts` — CRUD PostgreSQL para services (§12) | — |
+| **S2** | Extender `hubspot-greenhouse-service.ts` con `getCompanyServices()`, `getService()` | — |
+| **S2** | API routes `/api/agency/services/` con `requireAgencyTenantContext()` | — |
+| **S2** | UI: ServicesListView + ServiceDetailView en `/agency/services` (§7.1) | — |
+| **S3** | Write-back Greenhouse → HubSpot via `service_sync_queue` (§6.3) | — |
+| **S3** | Workflow Deal Closed-Won → Create Service (HubSpot automation) | — |
+| **S3** | Capabilities UI enriquecida con datos de Service (pipeline, fechas, montos) | — |
+| **S4** | Cortar fallback en `loadServiceModules()` — solo `v_client_active_modules` | — |
+| **S4** | Deprecar BigQuery `greenhouse.client_service_modules` legacy | — |
 
-**Infraestructura (S0):** ~2 días
-**Core capabilities v2 (S1):** ~3 días
-**UI completa (S2):** ~2.5 días
-**Admin + sync bidireccional (S3):** ~3.5 días
-**Total estimado:** ~11 días
+**Infraestructura (S0):** Tabla PG + vista + HubSpot config + sync (parcialmente hecho)
+**Migración de datos (S1):** Poblar services + validar capabilities equivalentes
+**CRUD + UI (S2):** Store, API routes, views de administración
+**Bidireccional + enriquecimiento (S3):** Write-back, workflow automation, UI rica
+**Deprecación (S4):** Cortar fallbacks, limpiar legacy
 
 ---
 
