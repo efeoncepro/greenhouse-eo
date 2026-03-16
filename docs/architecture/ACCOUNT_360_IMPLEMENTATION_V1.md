@@ -172,10 +172,12 @@ GROUP BY o.organization_id
 - **Tab**: "Organizaciones" in Person 360 tabs
 - **Component**: `PersonMembershipsTab.tsx`
 - **Data**: Fetches from `/api/people/[memberId]/memberships`
-- **Table**: Organization name (link to detail), membership type (color-coded chip), role, primary flag
+- **Table**: Organization name (link to detail), membership type (color-coded chip), role, FTE, start date, active status, primary flag
+- **Assignment data**: Matched from `PersonDetail.assignments` by `clientId` (resolved via `spaces.client_id` LEFT JOIN in the Postgres query). Shows FTE (monospace), start date, and active/inactive chip per row.
 - **Ghost slot**: Admin-only "+ Vincular a organización" dashed-border button below the table, triggers `AddPersonMembershipDrawer`
 - **Drawer**: `AddPersonMembershipDrawer.tsx` — search organizations by name, select type (default: "Equipo Efeonce"), role, department, primary flag. Submits to `POST /api/people/[memberId]/memberships`
 - **TYPE_CONFIG**: `team_member` → "Equipo Efeonce" (info/blue), `billing` → "Facturación" (warning), others → secondary/gray
+- **Default tab**: "Organizaciones" is now the first tab in Person 360 (replaces former "Asignaciones" tab which was removed)
 - **Permissions**: Visible to `efeonce_admin` and `efeonce_operations`; CRUD admin-only
 
 ### Navigation

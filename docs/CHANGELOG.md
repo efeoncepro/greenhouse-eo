@@ -12,6 +12,7 @@ Registro de cambios principales de Greenhouse EO.
 - **Organization search API** — `GET /api/organizations/org-search?q=` para typeahead de organizaciones (ILIKE nombre/razón social, limit 10). Usado por el nuevo drawer.
 - **Diferenciación visual "Equipo Efeonce"** — En Organization 360 (Personas) y Person 360 (Organizaciones), los chips de tipo de membresía ahora usan colores diferenciados: "Equipo Efeonce" (info/azul) para equipo interno, "Facturación" (warning/naranja), otros tipos en gris. Mismo patrón TYPE_CONFIG en ambos lados.
 - **Fix CHECK constraint** — Migración `fix-membership-type-check.sql` expande el constraint de `person_memberships.membership_type` para aceptar todos los valores válidos (DB originales + UI): `team_member`, `client_contact`, `client_user`, `contact`, `billing`, `contractor`, `partner`, `advisor`.
+- **Merge Asignaciones → Organizaciones** — Eliminada la pestaña "Asignaciones" de Person 360. Los datos de asignación (FTE, fecha de inicio, estado activo/inactivo) ahora se muestran como columnas adicionales en la pestaña "Organizaciones", vinculados por `clientId` vía la tabla `spaces`. "Organizaciones" es ahora la primera pestaña por defecto.
 
 ### Archivos nuevos (4)
 
@@ -33,6 +34,10 @@ Registro de cambios principales de Greenhouse EO.
 | `src/views/greenhouse/people/PersonView.tsx` | +`membershipDrawerOpen` state, +`AddPersonMembershipDrawer` render |
 | `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_LABEL → TYPE_CONFIG con "Equipo Efeonce" (info) y colores diferenciados |
 | `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels sincronizados: "Equipo Efeonce", reordenados |
+| `src/types/people.ts` | -`'assignments'` de PersonTab |
+| `src/views/greenhouse/people/helpers.ts` | -assignments de TAB_CONFIG/TAB_PERMISSIONS, memberships ahora primera tab |
+| `src/lib/people/permissions.ts` | -assignments de personTabOrder, memberships primera |
+| `src/lib/people/get-people-meta.ts` | -assignments de supportedTabs |
 
 ---
 
