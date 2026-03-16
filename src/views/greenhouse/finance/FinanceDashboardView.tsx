@@ -29,6 +29,8 @@ import type { ApexOptions } from 'apexcharts'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import OptionMenu from '@core/components/option-menu'
+import Chip from '@mui/material/Chip'
+
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
@@ -99,6 +101,41 @@ interface RecentMovement {
   accountName: string | null
   date: string | null
   amount: number
+}
+
+interface PnlData {
+  year: number
+  month: number
+  revenue: {
+    totalRevenue: number
+    partnerShare: number
+    netRevenue: number
+    invoiceCount: number
+  }
+  costs: {
+    directLabor: number
+    indirectLabor: number
+    operational: number
+    infrastructure: number
+    taxSocial: number
+    totalExpenses: number
+  }
+  margins: {
+    grossMargin: number
+    grossMarginPercent: number
+    operatingExpenses: number
+    ebitda: number
+    ebitdaPercent: number
+    netResult: number
+    netMarginPercent: number
+  }
+  payroll: {
+    headcount: number
+    totalGross: number
+    totalNet: number
+    totalDeductions: number
+    totalBonuses: number
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -241,6 +278,7 @@ const FinanceDashboardView = () => {
   const [incomeSummary, setIncomeSummary] = useState<SummaryData | null>(null)
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
   const [recentMovements, setRecentMovements] = useState<RecentMovement[]>([])
+  const [pnl, setPnl] = useState<PnlData | null>(null)
   const [incomeDrawerOpen, setIncomeDrawerOpen] = useState(false)
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
@@ -253,13 +291,14 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes] = await Promise.all([
+      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
         fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
         fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
-        fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' })
+        fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' }),
+        fetch('/api/finance/dashboard/pnl', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -343,6 +382,10 @@ const FinanceDashboardView = () => {
         if (!expenseListRes.ok) {
           errors.push(`Movimientos egresos: ${expenseListRes.status}`)
         }
+      }
+
+      if (pnlRes.ok) {
+        setPnl(await pnlRes.json())
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -599,6 +642,169 @@ const FinanceDashboardView = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* P&L Section */}
+      {pnl && (
+        <Grid container spacing={6}>
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+              <CardHeader
+                title='Estado de Resultados'
+                subheader={`${MONTH_SHORT[pnl.month]} ${pnl.year}`}
+                avatar={
+                  <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
+                    <i className='tabler-report-analytics' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
+                  </Avatar>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Table size='small'>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600 }}>Ingresos brutos</TableCell>
+                      <TableCell align='right'>{formatCLP(pnl.revenue.totalRevenue)}</TableCell>
+                    </TableRow>
+                    {pnl.revenue.partnerShare > 0 && (
+                      <TableRow>
+                        <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Partner share</TableCell>
+                        <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.revenue.partnerShare)}</TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600 }}>Ingreso neto</TableCell>
+                      <TableCell align='right' sx={{ fontWeight: 600 }}>{formatCLP(pnl.revenue.netRevenue)}</TableCell>
+                    </TableRow>
+
+                    <TableRow><TableCell colSpan={2} sx={{ py: 1 }}><Divider /></TableCell></TableRow>
+
+                    <TableRow>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral directo</TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.directLabor)}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral indirecto</TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.indirectLabor)}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Gastos operacionales</TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.operational)}</TableCell>
+                    </TableRow>
+                    {pnl.costs.infrastructure > 0 && (
+                      <TableRow>
+                        <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Infraestructura</TableCell>
+                        <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.infrastructure)}</TableCell>
+                      </TableRow>
+                    )}
+                    <TableRow>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Impuestos y previsión</TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.taxSocial)}</TableCell>
+                    </TableRow>
+
+                    <TableRow><TableCell colSpan={2} sx={{ py: 1 }}><Divider /></TableCell></TableRow>
+
+                    <TableRow sx={{ bgcolor: 'action.hover' }}>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        Margen bruto
+                        <Chip label={`${pnl.margins.grossMarginPercent}%`} size='small' color={pnl.margins.grossMargin >= 0 ? 'success' : 'error'} sx={{ ml: 1 }} />
+                      </TableCell>
+                      <TableCell align='right' sx={{ fontWeight: 700, color: pnl.margins.grossMargin >= 0 ? 'success.main' : 'error.main' }}>
+                        {formatCLP(pnl.margins.grossMargin)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow sx={{ bgcolor: 'action.hover' }}>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        EBITDA
+                        <Chip label={`${pnl.margins.ebitdaPercent}%`} size='small' color={pnl.margins.ebitda >= 0 ? 'success' : 'error'} sx={{ ml: 1 }} />
+                      </TableCell>
+                      <TableCell align='right' sx={{ fontWeight: 700, color: pnl.margins.ebitda >= 0 ? 'success.main' : 'error.main' }}>
+                        {formatCLP(pnl.margins.ebitda)}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow sx={{ bgcolor: pnl.margins.netResult >= 0 ? 'success.lightOpacity' : 'error.lightOpacity' }}>
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        Resultado neto
+                        <Chip label={`${pnl.margins.netMarginPercent}%`} size='small' color={pnl.margins.netResult >= 0 ? 'success' : 'error'} sx={{ ml: 1 }} />
+                      </TableCell>
+                      <TableCell align='right' sx={{ fontWeight: 700, color: pnl.margins.netResult >= 0 ? 'success.main' : 'error.main' }}>
+                        {formatCLP(pnl.margins.netResult)}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, height: '100%' }}>
+              <CardHeader
+                title='Costo de Personal'
+                subheader={`${MONTH_SHORT[pnl.month]} ${pnl.year}`}
+                avatar={
+                  <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+                    <i className='tabler-users' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
+                  </Avatar>
+                }
+              />
+              <Divider />
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {pnl.payroll.headcount > 0 ? (
+                  <>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <Typography variant='body2' color='text.secondary'>Dotación</Typography>
+                      <Typography variant='h5' sx={{ fontWeight: 600 }}>{pnl.payroll.headcount}</Typography>
+                    </Box>
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <Typography variant='body2' color='text.secondary'>Total bruto</Typography>
+                      <Typography variant='body1' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                        {formatCLP(pnl.payroll.totalGross)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <Typography variant='body2' color='text.secondary'>Total líquido</Typography>
+                      <Typography variant='body1' sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                        {formatCLP(pnl.payroll.totalNet)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <Typography variant='body2' color='text.secondary'>Descuentos legales</Typography>
+                      <Typography variant='body1' sx={{ fontFamily: 'monospace' }}>
+                        {formatCLP(pnl.payroll.totalDeductions)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <Typography variant='body2' color='text.secondary'>Bonos</Typography>
+                      <Typography variant='body1' sx={{ fontFamily: 'monospace' }}>
+                        {formatCLP(pnl.payroll.totalBonuses)}
+                      </Typography>
+                    </Box>
+                    {pnl.revenue.netRevenue > 0 && (
+                      <>
+                        <Divider />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <Typography variant='body2' color='text.secondary'>Costo laboral / Ingreso</Typography>
+                          <Chip
+                            label={`${Math.round((pnl.payroll.totalGross / pnl.revenue.netRevenue) * 100)}%`}
+                            size='small'
+                            color='warning'
+                          />
+                        </Box>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <Box sx={{ py: 4, textAlign: 'center' }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Sin nómina aprobada para este período
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
 
       {/* Quick actions */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
