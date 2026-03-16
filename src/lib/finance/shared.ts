@@ -178,6 +178,12 @@ export type ExpensePaymentStatus = (typeof EXPENSE_PAYMENT_STATUSES)[number]
 export const SERVICE_LINES = ['globe', 'efeonce_digital', 'reach', 'wave', 'crm_solutions'] as const
 export type ServiceLine = (typeof SERVICE_LINES)[number]
 
+export const COST_CATEGORIES = ['direct_labor', 'indirect_labor', 'operational', 'infrastructure', 'tax_social'] as const
+export type CostCategoryValue = (typeof COST_CATEGORIES)[number]
+
+export const ALLOCATION_METHODS = ['manual', 'fte_weighted', 'revenue_weighted', 'headcount'] as const
+export type AllocationMethodValue = (typeof ALLOCATION_METHODS)[number]
+
 export const SUPPLIER_CATEGORIES = [
   'software', 'infrastructure', 'professional_services', 'media',
   'creative', 'hr_services', 'office', 'legal_accounting', 'other'

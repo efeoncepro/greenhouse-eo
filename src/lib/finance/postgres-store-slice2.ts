@@ -51,6 +51,11 @@ type PostgresIncomeRow = {
   income_type: string | null
   is_reconciled: boolean
   reconciliation_id: string | null
+  partner_id: string | null
+  partner_name: string | null
+  partner_share_percent: unknown
+  partner_share_amount: unknown
+  net_after_partner: unknown
   notes: string | null
   created_by_user_id: string | null
   created_at: string | Date | null
@@ -97,6 +102,9 @@ type PostgresExpenseRow = {
   is_reconciled: boolean
   reconciliation_id: string | null
   linked_income_id: string | null
+  cost_category: string | null
+  cost_is_direct: boolean | null
+  allocated_client_id: string | null
   notes: string | null
   created_by_user_id: string | null
   created_at: string | Date | null
@@ -151,11 +159,20 @@ export type FinanceIncomeRecord = {
   incomeType: string | null
   isReconciled: boolean
   reconciliationId: string | null
+  partnerId: string | null
+  partnerName: string | null
+  partnerSharePercent: number | null
+  partnerShareAmount: number | null
+  netAfterPartner: number | null
   notes: string | null
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
 }
+
+export type CostCategory = 'direct_labor' | 'indirect_labor' | 'operational' | 'infrastructure' | 'tax_social'
+
+export type AllocationMethod = 'manual' | 'fte_weighted' | 'revenue_weighted' | 'headcount'
 
 export type FinanceExpenseRecord = {
   expenseId: string
@@ -197,8 +214,49 @@ export type FinanceExpenseRecord = {
   isReconciled: boolean
   reconciliationId: string | null
   linkedIncomeId: string | null
+  costCategory: CostCategory | null
+  costIsDirect: boolean
+  allocatedClientId: string | null
   notes: string | null
   createdBy: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type CostAllocationRecord = {
+  allocationId: string
+  expenseId: string
+  clientId: string
+  clientName: string
+  allocationPercent: number
+  allocatedAmountClp: number
+  periodYear: number
+  periodMonth: number
+  allocationMethod: AllocationMethod
+  notes: string | null
+  createdBy: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type ClientEconomicsRecord = {
+  snapshotId: string
+  clientId: string
+  clientName: string
+  periodYear: number
+  periodMonth: number
+  totalRevenueClp: number
+  directCostsClp: number
+  indirectCostsClp: number
+  grossMarginClp: number
+  grossMarginPercent: number | null
+  netMarginClp: number
+  netMarginPercent: number | null
+  headcountFte: number | null
+  revenuePerFte: number | null
+  costPerFte: number | null
+  notes: string | null
+  computedAt: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -262,6 +320,11 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     incomeType: str(row.income_type) || 'service_fee',
     isReconciled: normalizeBoolean(row.is_reconciled),
     reconciliationId: str(row.reconciliation_id),
+    partnerId: str(row.partner_id),
+    partnerName: str(row.partner_name),
+    partnerSharePercent: toNullableNumber(row.partner_share_percent),
+    partnerShareAmount: toNullableNumber(row.partner_share_amount),
+    netAfterPartner: toNullableNumber(row.net_after_partner),
     notes: str(row.notes),
     createdBy: str(row.created_by_user_id),
     createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
@@ -309,6 +372,9 @@ const mapExpense = (row: PostgresExpenseRow): FinanceExpenseRecord => ({
   isReconciled: normalizeBoolean(row.is_reconciled),
   reconciliationId: str(row.reconciliation_id),
   linkedIncomeId: str(row.linked_income_id),
+  costCategory: str(row.cost_category) as CostCategory | null,
+  costIsDirect: normalizeBoolean(row.cost_is_direct),
+  allocatedClientId: str(row.allocated_client_id),
   notes: str(row.notes),
   createdBy: str(row.created_by_user_id),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
@@ -510,7 +576,9 @@ export const listFinanceIncomeFromPostgres = async ({
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
-        is_reconciled, reconciliation_id, notes, created_by_user_id,
+        is_reconciled, reconciliation_id,
+        partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
+        notes, created_by_user_id,
         created_at, updated_at
       FROM greenhouse_finance.income
       ${whereClause}
@@ -536,7 +604,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
         collection_method, po_number, hes_number, service_line, income_type,
-        is_reconciled, reconciliation_id, notes, created_by_user_id,
+        is_reconciled, reconciliation_id,
+        partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
+        notes, created_by_user_id,
         created_at, updated_at
       FROM greenhouse_finance.income
       WHERE income_id = $1
@@ -595,6 +665,11 @@ export const createFinanceIncomeInPostgres = async ({
   hesNumber,
   serviceLine,
   incomeType,
+  partnerId,
+  partnerName,
+  partnerSharePercent,
+  partnerShareAmount,
+  netAfterPartner,
   notes,
   actorUserId
 }: {
@@ -620,6 +695,11 @@ export const createFinanceIncomeInPostgres = async ({
   hesNumber: string | null
   serviceLine: string | null
   incomeType: string
+  partnerId: string | null
+  partnerName: string | null
+  partnerSharePercent: number | null
+  partnerShareAmount: number | null
+  netAfterPartner: number | null
   notes: string | null
   actorUserId: string | null
 }) => {
@@ -635,7 +715,9 @@ export const createFinanceIncomeInPostgres = async ({
           exchange_rate_to_clp, total_amount_clp,
           payment_status, amount_paid,
           po_number, hes_number, service_line, income_type,
-          is_reconciled, notes, created_by_user_id,
+          is_reconciled,
+          partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
+          notes, created_by_user_id,
           created_at, updated_at
         )
         VALUES (
@@ -645,7 +727,9 @@ export const createFinanceIncomeInPostgres = async ({
           $16, $17,
           $18, 0,
           $19, $20, $21, $22,
-          FALSE, $23, $24,
+          FALSE,
+          $23, $24, $25, $26, $27,
+          $28, $29,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -657,6 +741,7 @@ export const createFinanceIncomeInPostgres = async ({
         exchangeRateToClp, totalAmountClp,
         paymentStatus,
         poNumber, hesNumber, serviceLine, incomeType,
+        partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
         notes, actorUserId
       ],
       client
@@ -865,7 +950,9 @@ export const listFinanceExpensesFromPostgres = async ({
         social_security_type, social_security_institution, social_security_period,
         tax_type, tax_period, tax_form_number,
         miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-        is_reconciled, reconciliation_id, linked_income_id, notes, created_by_user_id,
+        is_reconciled, reconciliation_id, linked_income_id,
+        cost_category, cost_is_direct, allocated_client_id,
+        notes, created_by_user_id,
         created_at, updated_at
       FROM greenhouse_finance.expenses
       ${whereClause}
@@ -896,7 +983,9 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         social_security_type, social_security_institution, social_security_period,
         tax_type, tax_period, tax_form_number,
         miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-        is_reconciled, reconciliation_id, linked_income_id, notes, created_by_user_id,
+        is_reconciled, reconciliation_id, linked_income_id,
+        cost_category, cost_is_direct, allocated_client_id,
+        notes, created_by_user_id,
         created_at, updated_at
       FROM greenhouse_finance.expenses
       WHERE expense_id = $1
@@ -947,6 +1036,9 @@ export const createFinanceExpenseInPostgres = async ({
   serviceLine,
   isRecurring,
   recurrenceFrequency,
+  costCategory,
+  costIsDirect,
+  allocatedClientId,
   notes,
   actorUserId
 }: {
@@ -986,6 +1078,9 @@ export const createFinanceExpenseInPostgres = async ({
   serviceLine: string | null
   isRecurring: boolean
   recurrenceFrequency: string | null
+  costCategory: string | null
+  costIsDirect: boolean
+  allocatedClientId: string | null
   notes: string | null
   actorUserId: string | null
 }) => {
@@ -1005,7 +1100,9 @@ export const createFinanceExpenseInPostgres = async ({
           social_security_type, social_security_institution, social_security_period,
           tax_type, tax_period, tax_form_number,
           miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-          is_reconciled, notes, created_by_user_id,
+          is_reconciled,
+          cost_category, cost_is_direct, allocated_client_id,
+          notes, created_by_user_id,
           created_at, updated_at
         )
         VALUES (
@@ -1019,7 +1116,9 @@ export const createFinanceExpenseInPostgres = async ({
           $27, $28, $29,
           $30, $31, $32,
           $33, $34, $35, $36,
-          FALSE, $37, $38,
+          FALSE,
+          $37, $38, $39,
+          $40, $41,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1035,6 +1134,7 @@ export const createFinanceExpenseInPostgres = async ({
         socialSecurityType, socialSecurityInstitution, socialSecurityPeriod,
         taxType, taxPeriod, taxFormNumber,
         miscellaneousCategory, serviceLine, isRecurring, recurrenceFrequency,
+        costCategory, costIsDirect, allocatedClientId,
         notes, actorUserId
       ],
       client

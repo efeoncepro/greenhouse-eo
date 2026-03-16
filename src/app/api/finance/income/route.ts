@@ -259,6 +259,11 @@ export async function POST(request: Request) {
         hesNumber: body.hesNumber ? normalizeString(body.hesNumber) : null,
         serviceLine,
         incomeType,
+        partnerId: body.partnerId ? normalizeString(body.partnerId) : null,
+        partnerName: body.partnerName ? normalizeString(body.partnerName) : null,
+        partnerSharePercent: body.partnerSharePercent != null ? toNumber(body.partnerSharePercent) : null,
+        partnerShareAmount: body.partnerShareAmount != null ? toNumber(body.partnerShareAmount) : null,
+        netAfterPartner: body.netAfterPartner != null ? toNumber(body.netAfterPartner) : null,
         notes: body.notes ? normalizeString(body.notes) : null,
         actorUserId: tenant.userId || null
       })

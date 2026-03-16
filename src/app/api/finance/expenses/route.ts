@@ -337,6 +337,9 @@ export async function POST(request: Request) {
         serviceLine,
         isRecurring: Boolean(body.isRecurring),
         recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,
+        costCategory: body.costCategory ? normalizeString(body.costCategory) : null,
+        costIsDirect: Boolean(body.costIsDirect),
+        allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null,
         notes: body.notes ? normalizeString(body.notes) : null,
         actorUserId: tenant.userId || null
       })
