@@ -123,7 +123,11 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
           c.created_at,
           c.updated_at,
           c.last_login_at,
-          ARRAY_LENGTH(COALESCE(c.notion_project_ids, [])) AS notion_project_count,
+          (SELECT COUNT(DISTINCT pr.notion_page_id)
+           FROM \`${projectId}.greenhouse.space_notion_sources\` sns
+           INNER JOIN \`${projectId}.notion_ops.proyectos\` pr ON pr.space_id = sns.space_id
+           WHERE sns.client_id = c.client_id AND sns.sync_enabled = TRUE
+          ) AS notion_project_count,
           COUNT(DISTINCT IF(cu.active = TRUE, cu.user_id, NULL)) AS active_users,
           COUNT(DISTINCT IF(cu.status = 'invited', cu.user_id, NULL)) AS invited_users,
           COUNT(DISTINCT IF(ups.active = TRUE, ups.project_id, NULL)) AS scoped_projects,
@@ -206,39 +210,48 @@ export const getAdminTenantDetail = async (clientId: string): Promise<AdminTenan
     }),
     bigQuery.query({
       query: `
-        WITH tenant_project_ids AS (
-          SELECT project_id
-          FROM \`${projectId}.greenhouse.clients\` AS c,
-          UNNEST(COALESCE(c.notion_project_ids, [])) AS project_id
-          WHERE c.client_id = @clientId
-
-          UNION DISTINCT
-
-          SELECT ups.project_id
+        WITH space_projects AS (
+          SELECT DISTINCT
+            pr.notion_page_id AS project_id,
+            pr.nombre_del_proyecto,
+            pr.page_url
+          FROM \`${projectId}.greenhouse.space_notion_sources\` sns
+          INNER JOIN \`${projectId}.notion_ops.proyectos\` pr
+            ON pr.space_id = sns.space_id
+          WHERE sns.client_id = @clientId
+            AND sns.sync_enabled = TRUE
+        ),
+        scoped_projects AS (
+          SELECT DISTINCT ups.project_id
           FROM \`${projectId}.greenhouse.user_project_scopes\` AS ups
           INNER JOIN \`${projectId}.greenhouse.client_users\` AS cu
             ON cu.user_id = ups.user_id
           WHERE cu.client_id = @clientId
             AND ups.active = TRUE
+        ),
+        tenant_project_ids AS (
+          SELECT project_id FROM space_projects
+          UNION DISTINCT
+          SELECT project_id FROM scoped_projects
         )
         SELECT
           tp.project_id,
-          COALESCE(dp.project_name, p.nombre_del_proyecto, tp.project_id) AS project_name,
-          p.page_url,
+          COALESCE(dp.project_name, sp.nombre_del_proyecto, tp.project_id) AS project_name,
+          sp.page_url,
           COUNT(DISTINCT cu.user_id) AS assigned_users
         FROM tenant_project_ids AS tp
         LEFT JOIN \`${projectId}.greenhouse_conformed.delivery_projects\` AS dp
           ON dp.project_source_id = tp.project_id
          AND dp.is_deleted = FALSE
-        LEFT JOIN \`${projectId}.notion_ops.proyectos\` AS p
-          ON p.notion_page_id = tp.project_id
+        LEFT JOIN space_projects AS sp
+          ON sp.project_id = tp.project_id
         LEFT JOIN \`${projectId}.greenhouse.user_project_scopes\` AS ups
           ON ups.project_id = tp.project_id
          AND ups.active = TRUE
         LEFT JOIN \`${projectId}.greenhouse.client_users\` AS cu
           ON cu.user_id = ups.user_id
          AND cu.client_id = @clientId
-        GROUP BY tp.project_id, project_name, p.page_url
+        GROUP BY tp.project_id, project_name, sp.page_url
         ORDER BY project_name
       `,
       params: { clientId }

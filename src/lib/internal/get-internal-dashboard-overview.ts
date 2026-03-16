@@ -95,7 +95,11 @@ export const getInternalDashboardOverview = async (): Promise<InternalDashboardO
             c.created_at,
             c.updated_at,
             c.last_login_at,
-            ARRAY_LENGTH(COALESCE(c.notion_project_ids, [])) AS notion_project_count
+            (SELECT COUNT(DISTINCT pr.notion_page_id)
+             FROM \`${projectId}.greenhouse.space_notion_sources\` sns
+             INNER JOIN \`${projectId}.notion_ops.proyectos\` pr ON pr.space_id = sns.space_id
+             WHERE sns.client_id = c.client_id AND sns.sync_enabled = TRUE
+            ) AS notion_project_count
           FROM \`${projectId}.greenhouse.clients\` AS c
           WHERE c.active = TRUE
         ),

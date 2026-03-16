@@ -90,7 +90,11 @@ export const getAdminTenantsOverview = async (): Promise<AdminTenantsOverview> =
           c.timezone,
           c.updated_at,
           c.last_login_at,
-          ARRAY_LENGTH(COALESCE(c.notion_project_ids, [])) AS notion_project_count,
+          (SELECT COUNT(DISTINCT pr.notion_page_id)
+           FROM \`${projectId}.greenhouse.space_notion_sources\` sns
+           INNER JOIN \`${projectId}.notion_ops.proyectos\` pr ON pr.space_id = sns.space_id
+           WHERE sns.client_id = c.client_id AND sns.sync_enabled = TRUE
+          ) AS notion_project_count,
           COUNT(DISTINCT IF(cu.active = TRUE, cu.user_id, NULL)) AS active_users,
           COUNT(DISTINCT IF(cu.status = 'invited', cu.user_id, NULL)) AS invited_users,
           COUNT(DISTINCT IF(ups.active = TRUE, ups.project_id, NULL)) AS scoped_projects,

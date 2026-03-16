@@ -136,10 +136,19 @@ const getAgencyClientScopeCtes = (projectId: string) => `
   WITH active_clients AS (
     SELECT
       c.client_id,
-      c.client_name,
-      COALESCE(c.notion_project_ids, []) AS notion_project_ids
+      c.client_name
     FROM \`${projectId}.greenhouse.clients\` c
     WHERE c.active = TRUE
+  ),
+  client_spaces AS (
+    SELECT
+      ac.client_id,
+      ac.client_name,
+      sns.space_id
+    FROM active_clients ac
+    INNER JOIN \`${projectId}.greenhouse.space_notion_sources\` sns
+      ON sns.client_id = ac.client_id
+     AND sns.sync_enabled = TRUE
   ),
   user_summary AS (
     SELECT
@@ -163,41 +172,22 @@ const getAgencyClientScopeCtes = (projectId: string) => `
       AND cu.tenant_type = 'client'
     GROUP BY cu.client_id, ups.project_id
   ),
-  client_project_ids AS (
-    SELECT
-      client_rows.client_id,
-      client_rows.client_name,
-      client_rows.project_id
-    FROM (
-      SELECT
-        ac.client_id,
-        ac.client_name,
-        project_id
-      FROM active_clients ac, UNNEST(ac.notion_project_ids) AS project_id
-
-      UNION DISTINCT
-
-      SELECT
-        ac.client_id,
-        ac.client_name,
-        sp.project_id
-      FROM active_clients ac
-      INNER JOIN scoped_project_ids sp
-        ON sp.client_id = ac.client_id
-    ) AS client_rows
-  ),
   project_inventory AS (
     SELECT
       ac.client_id,
-      ARRAY_LENGTH(ac.notion_project_ids) AS notion_project_count,
+      COALESCE(pc.notion_project_count, 0) AS notion_project_count,
       COUNT(DISTINCT sp.project_id) AS scoped_project_count,
-      COUNT(DISTINCT cp.project_id) AS project_count
+      GREATEST(COALESCE(pc.notion_project_count, 0), COUNT(DISTINCT sp.project_id)) AS project_count
     FROM active_clients ac
+    LEFT JOIN (
+      SELECT cs.client_id, COUNT(DISTINCT pr.notion_page_id) AS notion_project_count
+      FROM client_spaces cs
+      INNER JOIN \`${projectId}.notion_ops.proyectos\` pr ON pr.space_id = cs.space_id
+      GROUP BY cs.client_id
+    ) pc ON pc.client_id = ac.client_id
     LEFT JOIN scoped_project_ids sp
       ON sp.client_id = ac.client_id
-    LEFT JOIN client_project_ids cp
-      ON cp.client_id = ac.client_id
-    GROUP BY ac.client_id, ARRAY_LENGTH(ac.notion_project_ids)
+    GROUP BY ac.client_id, pc.notion_project_count
   ),
   assignment_summary AS (
     SELECT
@@ -224,15 +214,15 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente,
           MAX(t.last_edited_time) AS last_synced_at
         FROM \`${projectId}.notion_ops.tareas\` t
-        WHERE t.proyecto IN (SELECT project_id FROM client_project_ids)
+        WHERE t.space_id IN (SELECT space_id FROM client_spaces)
       ),
       project_agg AS (
         SELECT
-          COUNT(DISTINCT cp.project_id) AS total_projects,
+          COUNT(DISTINCT pr.notion_page_id) AS total_projects,
           AVG(SAFE_CAST(REGEXP_REPLACE(COALESCE(pr.pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64)) AS otd_pct_global
-        FROM client_project_ids cp
+        FROM client_spaces cs
         LEFT JOIN \`${projectId}.notion_ops.proyectos\` pr
-          ON pr.notion_page_id = cp.project_id
+          ON pr.space_id = cs.space_id
       )
       SELECT
         ta.rpa_global,
@@ -269,23 +259,23 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
       ${getAgencyClientScopeCtes(projectId)},
       task_health AS (
         SELECT
-          cp.client_id,
+          cs.client_id,
           AVG(SAFE_CAST(t.rpa AS FLOAT64)) AS rpa_avg,
           COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente
-        FROM client_project_ids cp
+        FROM client_spaces cs
         LEFT JOIN \`${projectId}.notion_ops.tareas\` t
-          ON t.proyecto = cp.project_id
-        GROUP BY cp.client_id
+          ON t.space_id = cs.space_id
+        GROUP BY cs.client_id
       ),
       project_health AS (
         SELECT
-          cp.client_id,
+          cs.client_id,
           AVG(SAFE_CAST(REGEXP_REPLACE(COALESCE(pr.pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64)) AS otd_pct
-        FROM client_project_ids cp
+        FROM client_spaces cs
         LEFT JOIN \`${projectId}.notion_ops.proyectos\` pr
-          ON pr.notion_page_id = cp.project_id
-        GROUP BY cp.client_id
+          ON pr.space_id = cs.space_id
+        GROUP BY cs.client_id
       ),
       module_agg AS (
         SELECT
@@ -370,7 +360,7 @@ export const getAgencyWeeklyActivity = async (): Promise<AgencyChartWeeklyPoint[
         DATE_TRUNC(DATE(t.fecha_de_completado), WEEK(MONDAY)) AS week_start,
         COUNT(*) AS completed
       FROM \`${projectId}.notion_ops.tareas\` t
-      WHERE t.proyecto IN (SELECT project_id FROM client_project_ids)
+      WHERE t.space_id IN (SELECT space_id FROM client_spaces)
         AND t.estado = 'Listo'
         AND t.fecha_de_completado IS NOT NULL
         AND DATE(t.fecha_de_completado) >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 WEEK)
@@ -403,7 +393,7 @@ export const getAgencyStatusMix = async (): Promise<AgencyChartStatusItem[]> => 
         t.estado AS group_key,
         COUNT(*) AS item_count
       FROM \`${projectId}.notion_ops.tareas\` t
-      WHERE t.proyecto IN (SELECT project_id FROM client_project_ids)
+      WHERE t.space_id IN (SELECT space_id FROM client_spaces)
         AND t.estado IN ('En Curso', 'Listo para Revision', 'Cambios Solicitados', 'Listo')
       GROUP BY t.estado
     `
