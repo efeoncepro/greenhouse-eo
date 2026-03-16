@@ -49,13 +49,6 @@ WHERE pp.status IN ('approved', 'exported')
 COMMENT ON VIEW greenhouse_serving.client_labor_cost_allocation IS
   'FTE-weighted allocation of payroll costs to clients via active assignments';
 
--- Ensure supporting indexes exist (idempotent)
-CREATE INDEX IF NOT EXISTS idx_cta_member_active
-  ON greenhouse_core.client_team_assignments(member_id)
-  WHERE active = TRUE;
-
-CREATE INDEX IF NOT EXISTS idx_payroll_entries_member
-  ON greenhouse_payroll.payroll_entries(member_id);
-
-CREATE INDEX IF NOT EXISTS idx_payroll_periods_year_month
-  ON greenhouse_payroll.payroll_periods(year, month);
+-- Note: supporting indexes on greenhouse_core.client_team_assignments and
+-- greenhouse_payroll tables already exist from their respective setup scripts.
+-- (client_assignments_member_idx, payroll_entries_member_idx, etc.)
