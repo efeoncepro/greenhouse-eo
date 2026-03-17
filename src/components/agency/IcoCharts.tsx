@@ -18,6 +18,7 @@ const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexChart
 
 export interface RpaTrendBySpace {
   spaceId: string
+  clientName?: string | null
   periods: Array<{
     periodYear: number
     periodMonth: number
@@ -151,9 +152,11 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     .filter(s => s.cscDistribution.length > 0)
     .slice(0, 8)
 
-  const cscCategories = spacesWithCsc.map(s =>
-    s.spaceId.length > 12 ? s.spaceId.slice(0, 12) + '…' : s.spaceId
-  )
+  const cscCategories = spacesWithCsc.map(s => {
+    const label = s.clientName || s.spaceId
+
+    return label.length > 12 ? label.slice(0, 12) + '…' : label
+  })
 
   const cscPhases: CscPhase[] = ['briefing', 'produccion', 'revision_interna', 'cambios_cliente', 'entrega']
 
@@ -221,15 +224,19 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     return `${MONTH_SHORT[Number(m) - 1]} ${y}`
   })
 
-  const trendSeries = trendSpaces.map(space => ({
-    name: space.spaceId.length > 15 ? space.spaceId.slice(0, 15) + '…' : space.spaceId,
-    data: sortedPeriods.map(period => {
-      const [y, m] = period.split('-')
-      const match = space.periods.find(p => p.periodYear === Number(y) && p.periodMonth === Number(m))
+  const trendSeries = trendSpaces.map(space => {
+    const label = space.clientName || space.spaceId
 
-      return match?.rpaAvg ?? null
-    })
-  }))
+    return {
+      name: label.length > 15 ? label.slice(0, 15) + '…' : label,
+      data: sortedPeriods.map(period => {
+        const [y, m] = period.split('-')
+        const match = space.periods.find(p => p.periodYear === Number(y) && p.periodMonth === Number(m))
+
+        return match?.rpaAvg ?? null
+      })
+    }
+  })
 
   const trendOpts = buildRpaTrendOptions(
     trendCategories,

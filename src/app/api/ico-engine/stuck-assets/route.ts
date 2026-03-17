@@ -15,6 +15,8 @@ interface StuckAssetRow {
   hours_since_update: unknown
   days_since_update: unknown
   severity: unknown
+  rpa_value: unknown
+  client_review_open: unknown
 }
 
 export async function GET(request: Request) {
@@ -43,7 +45,7 @@ export async function GET(request: Request) {
       SELECT
         task_source_id, task_name, space_id, project_source_id,
         fase_csc, hours_since_update, days_since_update,
-        severity
+        severity, rpa_value, client_review_open
       FROM \`${projectId}.${ICO_DATASET}.stuck_assets_detail\`
       ${filter}
       ORDER BY
@@ -59,7 +61,9 @@ export async function GET(request: Request) {
       faseCsc: normalizeString(row.fase_csc),
       hoursSinceUpdate: toNumber(row.hours_since_update),
       daysSinceUpdate: toNumber(row.days_since_update),
-      severity: normalizeString(row.severity) as 'warning' | 'danger'
+      severity: normalizeString(row.severity) as 'warning' | 'danger',
+      rpaValue: toNumber(row.rpa_value) || null,
+      clientReviewOpen: row.client_review_open === true
     }))
 
     return NextResponse.json({ assets, total: assets.length })

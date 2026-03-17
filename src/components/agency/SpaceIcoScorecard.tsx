@@ -148,7 +148,7 @@ const SpaceIcoScorecard = ({ spaces }: Props) => {
                   {/* Space */}
                   <Stack sx={{ minWidth: 0 }}>
                     <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
-                      {snapshot.spaceId}
+                      {snapshot.clientName || snapshot.spaceId}
                     </Typography>
                     <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
                       {snapshot.context.totalTasks} tareas · {snapshot.context.activeTasks} activas

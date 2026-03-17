@@ -78,8 +78,19 @@ export async function GET(request: Request) {
       })
     }
 
+    // Resolve client names
+    const nameRows = await runIcoEngineQuery<{ space_id: string; client_name: unknown }>(`
+      SELECT sns.space_id, c.client_name
+      FROM \`${projectId}.greenhouse.space_notion_sources\` sns
+      INNER JOIN \`${projectId}.greenhouse.clients\` c ON c.client_id = sns.client_id
+      WHERE sns.sync_enabled = TRUE
+    `)
+
+    const nameMap = new Map(nameRows.map(r => [normalizeString(r.space_id), String(r.client_name ?? '').trim()]))
+
     const spaces = Array.from(bySpace.entries()).map(([sid, periods]) => ({
       spaceId: sid,
+      clientName: nameMap.get(sid) || null,
       periods
     }))
 

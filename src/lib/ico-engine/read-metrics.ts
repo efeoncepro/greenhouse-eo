@@ -29,6 +29,7 @@ interface SnapshotRow {
   active_tasks: unknown
   computed_at: unknown
   engine_version: unknown
+  client_name?: unknown
 }
 
 interface LiveMetricRow {
@@ -72,6 +73,7 @@ export interface CscDistributionEntry {
 export interface SpaceMetricSnapshot {
   spaceId: string
   clientId: string | null
+  clientName: string | null
   periodYear: number
   periodMonth: number
   metrics: MetricValue[]
@@ -125,6 +127,7 @@ const normalizeSnapshot = (
   return {
     spaceId: normalizeString(row.space_id),
     clientId: row.client_id ? normalizeString(row.client_id) : null,
+    clientName: row.client_name ? normalizeString(row.client_name) : null,
     periodYear: toNumber(row.period_year),
     periodMonth: toNumber(row.period_month),
     metrics: [
@@ -198,11 +201,15 @@ export const readAgencyMetrics = async (
   const projectId = getIcoEngineProjectId()
 
   const rows = await runIcoEngineQuery<SnapshotRow>(`
-    SELECT *
-    FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-    WHERE period_year = @periodYear
-      AND period_month = @periodMonth
-    ORDER BY space_id
+    SELECT ms.*, c.client_name
+    FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
+    LEFT JOIN \`${projectId}.greenhouse.space_notion_sources\` sns
+      ON sns.space_id = ms.space_id
+    LEFT JOIN \`${projectId}.greenhouse.clients\` c
+      ON c.client_id = COALESCE(ms.client_id, sns.client_id)
+    WHERE ms.period_year = @periodYear
+      AND ms.period_month = @periodMonth
+    ORDER BY c.client_name, ms.space_id
   `, { periodYear, periodMonth })
 
   return rows.map(row => normalizeSnapshot(row, 'materialized'))
@@ -222,8 +229,11 @@ export const computeSpaceMetricsLive = async (
     runIcoEngineQuery<LiveMetricRow>(`
       SELECT
         space_id,
-        -- RPA: not available in delivery_tasks yet (column not synced)
-        CAST(NULL AS FLOAT64) AS rpa_avg,
+        -- RPA: average of non-zero rpa_value for completed tasks in period
+        ROUND(AVG(CASE
+          WHEN completed_at IS NOT NULL AND rpa_value > 0
+          THEN SAFE_CAST(rpa_value AS FLOAT64)
+        END), 2) AS rpa_avg,
 
         -- OTD: on-time / (on-time + late)
         ROUND(SAFE_DIVIDE(
@@ -231,8 +241,11 @@ export const computeSpaceMetricsLive = async (
           COUNTIF(delivery_signal IN ('on_time', 'late'))
         ) * 100, 1) AS otd_pct,
 
-        -- FTR: not available in delivery_tasks yet (column not synced)
-        CAST(NULL AS FLOAT64) AS ftr_pct,
+        -- FTR: no client changes / total completed
+        ROUND(SAFE_DIVIDE(
+          COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
+          COUNTIF(completed_at IS NOT NULL)
+        ) * 100, 1) AS ftr_pct,
 
         -- Cycle time avg (completed tasks only)
         ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
@@ -318,6 +331,7 @@ export const computeSpaceMetricsLive = async (
   return {
     spaceId: normalizeString(row.space_id),
     clientId: null,
+    clientName: null,
     periodYear,
     periodMonth,
     metrics: [

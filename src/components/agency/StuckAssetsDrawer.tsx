@@ -26,6 +26,8 @@ interface StuckAsset {
   hoursSinceUpdate: number
   daysSinceUpdate: number
   severity: 'warning' | 'danger'
+  rpaValue: number | null
+  clientReviewOpen: boolean
 }
 
 type Props = {
@@ -114,9 +116,10 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
         ) : (
           <Stack spacing={0}>
             {/* Column headers */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1.5fr 80px 70px 70px', px: 1, py: 1, gap: 1 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1.5fr 80px 50px 70px 70px', px: 1, py: 1, gap: 1 }}>
               <Typography sx={COL}>{GH_AGENCY.ico_stuck_col_task}</Typography>
               <Typography sx={COL}>{GH_AGENCY.ico_stuck_col_phase}</Typography>
+              <Typography sx={COL}>RpA</Typography>
               <Typography sx={COL}>{GH_AGENCY.ico_stuck_col_days}</Typography>
               <Typography sx={COL}>{GH_AGENCY.ico_stuck_col_severity}</Typography>
             </Box>
@@ -130,7 +133,7 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
                 <Box
                   sx={{
                     display: 'grid',
-                    gridTemplateColumns: '1.5fr 80px 70px 70px',
+                    gridTemplateColumns: '1.5fr 80px 50px 70px 70px',
                     alignItems: 'center',
                     px: 1,
                     py: 1.5,
@@ -146,6 +149,11 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
                   {/* CSC Phase */}
                   <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
                     {CSC_PHASE_LABELS[asset.faseCsc as CscPhase] ?? asset.faseCsc}
+                  </Typography>
+
+                  {/* RPA */}
+                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                    {asset.rpaValue != null ? asset.rpaValue.toFixed(1) : '—'}
                   </Typography>
 
                   {/* Days stuck */}

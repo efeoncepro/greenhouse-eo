@@ -51,12 +51,15 @@ export const materializeMonthlySnapshots = async (
       SELECT
         CONCAT(space_id, '-', CAST(@periodYear AS STRING), '-', LPAD(CAST(@periodMonth AS STRING), 2, '0')) AS snapshot_id,
         space_id,
-        CAST(NULL AS STRING) AS client_id,
+        ANY_VALUE(client_id) AS client_id,
         @periodYear AS period_year,
         @periodMonth AS period_month,
 
-        -- RPA: not available in delivery_tasks yet (column not synced)
-        CAST(NULL AS FLOAT64) AS rpa_avg,
+        -- RPA: average of non-zero rpa_value for completed tasks in period
+        ROUND(AVG(CASE
+          WHEN completed_at IS NOT NULL AND rpa_value > 0
+          THEN SAFE_CAST(rpa_value AS FLOAT64)
+        END), 2) AS rpa_avg,
 
         -- OTD: on-time / (on-time + late)
         ROUND(SAFE_DIVIDE(
@@ -64,8 +67,11 @@ export const materializeMonthlySnapshots = async (
           COUNTIF(delivery_signal IN ('on_time', 'late'))
         ) * 100, 1) AS otd_pct,
 
-        -- FTR: not available in delivery_tasks yet (column not synced)
-        CAST(NULL AS FLOAT64) AS ftr_pct,
+        -- FTR: no client changes / total completed
+        ROUND(SAFE_DIVIDE(
+          COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
+          COUNTIF(completed_at IS NOT NULL)
+        ) * 100, 1) AS ftr_pct,
 
         -- Cycle time avg (completed only)
         ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
@@ -250,7 +256,8 @@ const materializeStuckAssetsDetail = async (projectId: string): Promise<number> 
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.stuck_assets_detail\`
       (task_source_id, task_name, space_id, project_source_id, fase_csc,
-       hours_since_update, days_since_update, severity, materialized_at)
+       hours_since_update, days_since_update, severity,
+       rpa_value, client_review_open, materialized_at)
     SELECT
       task_source_id,
       task_name,
@@ -260,6 +267,8 @@ const materializeStuckAssetsDetail = async (projectId: string): Promise<number> 
       hours_since_update,
       ROUND(hours_since_update / 24.0, 1) AS days_since_update,
       CASE WHEN hours_since_update >= 96 THEN 'danger' ELSE 'warning' END AS severity,
+      SAFE_CAST(rpa_value AS FLOAT64),
+      client_review_open,
       CURRENT_TIMESTAMP()
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
     WHERE is_stuck = TRUE
@@ -289,9 +298,10 @@ const materializeRpaTrend = async (projectId: string): Promise<number> => {
       space_id,
       EXTRACT(YEAR FROM completed_at) AS period_year,
       EXTRACT(MONTH FROM completed_at) AS period_month,
-      -- RPA: not available in delivery_tasks yet (column not synced)
-      CAST(NULL AS FLOAT64) AS rpa_avg,
-      CAST(NULL AS FLOAT64) AS rpa_median,
+      ROUND(AVG(CASE WHEN rpa_value > 0 THEN SAFE_CAST(rpa_value AS FLOAT64) END), 2) AS rpa_avg,
+      ROUND(APPROX_QUANTILES(
+        CASE WHEN rpa_value > 0 THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
+      )[SAFE_OFFSET(50)], 2) AS rpa_median,
       COUNT(*) AS tasks_completed,
       CURRENT_TIMESTAMP() AS materialized_at
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
@@ -334,12 +344,20 @@ const materializeProjectMetrics = async (
       @periodYear AS period_year,
       @periodMonth AS period_month,
 
-      -- RPA: not available in delivery_tasks yet (column not synced)
-      CAST(NULL AS FLOAT64) AS rpa_avg,
-      CAST(NULL AS FLOAT64) AS rpa_median,
+      ROUND(AVG(CASE
+        WHEN completed_at IS NOT NULL AND rpa_value > 0
+        THEN SAFE_CAST(rpa_value AS FLOAT64)
+      END), 2) AS rpa_avg,
 
-      -- FTR: not available in delivery_tasks yet (column not synced)
-      CAST(NULL AS FLOAT64) AS ftr_pct,
+      ROUND(APPROX_QUANTILES(
+        CASE WHEN completed_at IS NOT NULL AND rpa_value > 0
+        THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
+      )[SAFE_OFFSET(50)], 2) AS rpa_median,
+
+      ROUND(SAFE_DIVIDE(
+        COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
+        COUNTIF(completed_at IS NOT NULL)
+      ) * 100, 1) AS ftr_pct,
 
       COUNT(*) AS total_tasks,
       COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
