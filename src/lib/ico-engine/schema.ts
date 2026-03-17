@@ -34,16 +34,8 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
-    dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
-    dt.is_rescheduled,
-    dt.client_change_round_final,
-    dt.rpa_value,
-    dt.open_frame_comments,
-    dt.client_review_open,
-    dt.workflow_review_open,
-    dt.blocker_count,
     dt.due_date,
     dt.completed_at,
     dt.last_edited_time,
@@ -190,8 +182,6 @@ const buildStuckAssetsDetailTable = (projectId: string) => `
     hours_since_update FLOAT64,
     days_since_update FLOAT64,
     severity STRING,
-    rpa_value FLOAT64,
-    client_review_open BOOL,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, severity
@@ -254,55 +244,70 @@ export const ensureIcoEngineInfrastructure = async () => {
   const bigQuery = getBigQueryClient()
 
   ensureIcoEngineInfrastructurePromise = (async () => {
-    // 1. Ensure dataset exists (may fail if service account lacks datasets.create — safe to ignore if dataset was pre-created)
+    // All infrastructure steps are wrapped in try/catch to be resilient.
+    // The service account may lack CREATE permissions — tables/views are
+    // pre-created via admin CLI. If any step fails, log and continue.
+
+    // 1. Ensure dataset exists
     try {
       await bigQuery.query({ query: buildDatasetDDL(projectId) })
-    } catch (datasetError) {
-      const msg = datasetError instanceof Error ? datasetError.message : ''
-
-      if (!msg.includes('Already Exists') && !msg.includes('Access Denied') && !msg.includes('already exists')) {
-        throw datasetError
-      }
+    } catch {
+      // Dataset may already exist or service account lacks datasets.create — safe to continue
     }
 
-    // 2. Check which tables exist
-    const [tableRows] = await bigQuery.query({
-      query: `
-        SELECT table_name
-        FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.TABLES\`
-        WHERE table_name IN (
-          'metric_snapshots_monthly', 'ai_metric_scores',
-          'stuck_assets_detail', 'rpa_trend', 'metrics_by_project'
-        )
-      `
-    })
+    // 2. Check which tables exist and create missing ones
+    try {
+      const [tableRows] = await bigQuery.query({
+        query: `
+          SELECT table_name
+          FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.TABLES\`
+          WHERE table_name IN (
+            'metric_snapshots_monthly', 'ai_metric_scores',
+            'stuck_assets_detail', 'rpa_trend', 'metrics_by_project'
+          )
+        `
+      })
 
-    const existingTables = new Set(
-      (tableRows as Array<{ table_name: string }>).map(r => r.table_name)
-    )
+      const existingTables = new Set(
+        (tableRows as Array<{ table_name: string }>).map(r => r.table_name)
+      )
 
-    // 3. Create tables that don't exist yet
-    const tableBuilders: Array<[string, string]> = [
-      ['metric_snapshots_monthly', buildMonthlySnapshotTable(projectId)],
-      ['ai_metric_scores', buildAiMetricScoresTable(projectId)],
-      ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
-      ['rpa_trend', buildRpaTrendTable(projectId)],
-      ['metrics_by_project', buildMetricsByProjectTable(projectId)]
-    ]
+      const tableBuilders: Array<[string, string]> = [
+        ['metric_snapshots_monthly', buildMonthlySnapshotTable(projectId)],
+        ['ai_metric_scores', buildAiMetricScoresTable(projectId)],
+        ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
+        ['rpa_trend', buildRpaTrendTable(projectId)],
+        ['metrics_by_project', buildMetricsByProjectTable(projectId)]
+      ]
 
-    for (const [tableName, ddl] of tableBuilders) {
-      if (!existingTables.has(tableName)) {
-        await bigQuery.query({ query: ddl })
+      for (const [tableName, ddl] of tableBuilders) {
+        if (!existingTables.has(tableName)) {
+          try {
+            await bigQuery.query({ query: ddl })
+          } catch (tableError) {
+            console.warn(`[ICO] Could not create table ${tableName}:`, tableError instanceof Error ? tableError.message : tableError)
+          }
+        }
       }
+    } catch (schemaCheckError) {
+      console.warn('[ICO] Could not check INFORMATION_SCHEMA:', schemaCheckError instanceof Error ? schemaCheckError.message : schemaCheckError)
     }
 
-    // 4. Create or replace views (idempotent)
-    await bigQuery.query({ query: buildTasksEnrichedView(projectId) })
-    await bigQuery.query({ query: buildLatestMetricsView(projectId) })
-  })().catch(error => {
-    ensureIcoEngineInfrastructurePromise = null
-    throw error
-  })
+    // 3. Create or replace views (idempotent)
+    try {
+      await bigQuery.query({ query: buildTasksEnrichedView(projectId) })
+    } catch (viewError) {
+      console.warn('[ICO] Could not create v_tasks_enriched:', viewError instanceof Error ? viewError.message : viewError)
+    }
 
+    try {
+      await bigQuery.query({ query: buildLatestMetricsView(projectId) })
+    } catch (viewError) {
+      console.warn('[ICO] Could not create v_metric_latest:', viewError instanceof Error ? viewError.message : viewError)
+    }
+  })()
+
+  // Never reset the promise — if infra fails, queries against pre-created
+  // tables will still work. Resetting would cause repeated retry storms.
   return ensureIcoEngineInfrastructurePromise
 }

@@ -222,11 +222,8 @@ export const computeSpaceMetricsLive = async (
     runIcoEngineQuery<LiveMetricRow>(`
       SELECT
         space_id,
-        -- RPA: average of non-zero rpa_value for completed tasks in period
-        ROUND(AVG(CASE
-          WHEN completed_at IS NOT NULL AND rpa_value > 0
-          THEN SAFE_CAST(rpa_value AS FLOAT64)
-        END), 2) AS rpa_avg,
+        -- RPA: not available in delivery_tasks yet (column not synced)
+        CAST(NULL AS FLOAT64) AS rpa_avg,
 
         -- OTD: on-time / (on-time + late)
         ROUND(SAFE_DIVIDE(
@@ -234,11 +231,8 @@ export const computeSpaceMetricsLive = async (
           COUNTIF(delivery_signal IN ('on_time', 'late'))
         ) * 100, 1) AS otd_pct,
 
-        -- FTR: no client changes / total completed
-        ROUND(SAFE_DIVIDE(
-          COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
-          COUNTIF(completed_at IS NOT NULL)
-        ) * 100, 1) AS ftr_pct,
+        -- FTR: not available in delivery_tasks yet (column not synced)
+        CAST(NULL AS FLOAT64) AS ftr_pct,
 
         -- Cycle time avg (completed tasks only)
         ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,

@@ -26,8 +26,6 @@ interface StuckAsset {
   hoursSinceUpdate: number
   daysSinceUpdate: number
   severity: 'warning' | 'danger'
-  rpaValue: number
-  clientReviewOpen: boolean
 }
 
 type Props = {
