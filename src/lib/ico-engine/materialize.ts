@@ -112,14 +112,14 @@ export const materializeMonthlySnapshots = async (
         @engineVersion AS engine_version
 
       FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
-      WHERE (
-          completed_at IS NOT NULL
-          AND EXTRACT(YEAR FROM completed_at) = @periodYear
-          AND EXTRACT(MONTH FROM completed_at) = @periodMonth
-        )
-        OR (
-          completed_at IS NULL
-          AND task_status NOT IN (${DONE_STATUSES})
+      WHERE space_id IS NOT NULL
+        AND (
+          (completed_at IS NOT NULL
+           AND EXTRACT(YEAR FROM completed_at) = @periodYear
+           AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
+          OR
+          (completed_at IS NULL
+           AND task_status NOT IN (${DONE_STATUSES}))
         )
       GROUP BY space_id
     ) AS source
@@ -174,7 +174,8 @@ export const materializeMonthlySnapshots = async (
       fase_csc,
       COUNT(*) AS task_count
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
-    WHERE completed_at IS NULL
+    WHERE space_id IS NOT NULL
+      AND completed_at IS NULL
       AND task_status NOT IN (${DONE_STATUSES})
       AND fase_csc != 'otros'
     GROUP BY space_id, fase_csc
@@ -271,7 +272,7 @@ const materializeStuckAssetsDetail = async (projectId: string): Promise<number> 
       client_review_open,
       CURRENT_TIMESTAMP()
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
-    WHERE is_stuck = TRUE
+    WHERE space_id IS NOT NULL AND is_stuck = TRUE
   `)
 
   const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
@@ -305,7 +306,8 @@ const materializeRpaTrend = async (projectId: string): Promise<number> => {
       COUNT(*) AS tasks_completed,
       CURRENT_TIMESTAMP() AS materialized_at
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
-    WHERE completed_at IS NOT NULL
+    WHERE space_id IS NOT NULL
+      AND completed_at IS NOT NULL
       AND completed_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 365 DAY)
     GROUP BY space_id, period_year, period_month
     HAVING tasks_completed > 0
@@ -381,7 +383,8 @@ const materializeProjectMetrics = async (
       CURRENT_TIMESTAMP() AS materialized_at
 
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
-    WHERE project_source_id IS NOT NULL
+    WHERE space_id IS NOT NULL
+      AND project_source_id IS NOT NULL
       AND project_source_id != ''
       AND (
         (completed_at IS NOT NULL

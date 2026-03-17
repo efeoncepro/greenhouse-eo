@@ -58,15 +58,14 @@ export async function GET(request: Request) {
         }
       }
 
-      // Enrich with client names
-      const nameRows = await runIcoEngineQuery<{ space_id: string; client_name: unknown }>(`
-        SELECT sns.space_id, c.client_name
-        FROM \`${projectId}.greenhouse.space_notion_sources\` sns
-        INNER JOIN \`${projectId}.greenhouse.clients\` c ON c.client_id = sns.client_id
-        WHERE sns.sync_enabled = TRUE
+      // Enrich with client names (clients table has client_id matching space_id)
+      const nameRows = await runIcoEngineQuery<{ client_id: string; client_name: unknown }>(`
+        SELECT client_id, client_name
+        FROM \`${projectId}.greenhouse.clients\`
+        WHERE client_name IS NOT NULL
       `)
 
-      const nameMap = new Map(nameRows.map(r => [String(r.space_id).trim(), String(r.client_name ?? '').trim()]))
+      const nameMap = new Map(nameRows.map(r => [String(r.client_id).trim(), String(r.client_name ?? '').trim()]))
 
       for (const snap of snapshots) {
         snap.clientName = nameMap.get(snap.spaceId) || null

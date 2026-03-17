@@ -839,8 +839,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
     const deliverySprints = sprints.map(row => {
       const sprintSourceId = toNullableString(row.notion_page_id)
-      const completedTasksCount = toNumber(row.tareas_completadas)
-      const totalTasksCount = toNumber(row.total_de_tareas)
+      const completedTasksCount = Math.round(toNumber(row.tareas_completadas) ?? 0)
+      const totalTasksCount = Math.round(toNumber(row.total_de_tareas) ?? 0)
 
       const projectDatabaseSourceId =
         (sprintSourceId ? sprintProjectDatabaseMap.get(sprintSourceId) || null : null) ||
@@ -993,7 +993,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11, $12, $13, $14::timestamptz, $15::timestamptz, $16, $17)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11, $12, $13, $14, $15::timestamptz, $16::timestamptz, $17, $18)
           ON CONFLICT (notion_sprint_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -1089,7 +1089,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35::date, $36, $37, $38, $39, $40, $41::date, $42::timestamptz, $43, $44, $45::timestamptz, $46::timestamptz, $47, $48)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34::date, $35, $36, $37, $38, $39::date, $40::timestamptz, $41, $42, $43::timestamptz, $44::timestamptz, $45, $46)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,

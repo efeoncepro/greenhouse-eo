@@ -201,15 +201,15 @@ export const readAgencyMetrics = async (
   const projectId = getIcoEngineProjectId()
 
   const rows = await runIcoEngineQuery<SnapshotRow>(`
-    SELECT ms.*, c.client_name
+    SELECT ms.*, COALESCE(c1.client_name, c2.client_name) AS client_name
     FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
-    LEFT JOIN \`${projectId}.greenhouse.space_notion_sources\` sns
-      ON sns.space_id = ms.space_id
-    LEFT JOIN \`${projectId}.greenhouse.clients\` c
-      ON c.client_id = COALESCE(ms.client_id, sns.client_id)
+    LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+      ON c1.client_id = ms.client_id
+    LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+      ON c2.client_id = ms.space_id
     WHERE ms.period_year = @periodYear
       AND ms.period_month = @periodMonth
-    ORDER BY c.client_name, ms.space_id
+    ORDER BY COALESCE(c1.client_name, c2.client_name), ms.space_id
   `, { periodYear, periodMonth })
 
   return rows.map(row => normalizeSnapshot(row, 'materialized'))
