@@ -254,8 +254,16 @@ export const ensureIcoEngineInfrastructure = async () => {
   const bigQuery = getBigQueryClient()
 
   ensureIcoEngineInfrastructurePromise = (async () => {
-    // 1. Ensure dataset exists
-    await bigQuery.query({ query: buildDatasetDDL(projectId) })
+    // 1. Ensure dataset exists (may fail if service account lacks datasets.create — safe to ignore if dataset was pre-created)
+    try {
+      await bigQuery.query({ query: buildDatasetDDL(projectId) })
+    } catch (datasetError) {
+      const msg = datasetError instanceof Error ? datasetError.message : ''
+
+      if (!msg.includes('Already Exists') && !msg.includes('Access Denied') && !msg.includes('already exists')) {
+        throw datasetError
+      }
+    }
 
     // 2. Check which tables exist
     const [tableRows] = await bigQuery.query({
