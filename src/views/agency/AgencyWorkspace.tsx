@@ -231,12 +231,12 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
           ))}
         </CustomTabList>
 
-        <div ref={panelRef} tabIndex={-1} style={{ outline: 'none' }}>
-          {/* aria-live region for screen reader announcements */}
+        <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', position: 'relative' }}>
+          {/* aria-live region for screen reader announcements (visually hidden) */}
           <Box
             aria-live='polite'
             aria-atomic='true'
-            sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
+            sx={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
           >
             {spacesLoading ? 'Cargando datos de Spaces...' : ''}
             {capacityLoading ? 'Cargando datos de capacidad...' : ''}
