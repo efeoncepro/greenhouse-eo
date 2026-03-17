@@ -384,7 +384,14 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
   try {
     const pgRow = await getSessionFromPostgresByEmail(email)
 
-    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+    if (pgRow) {
+      const record = normalizeTenantAccessRow(pgRow as TenantAccessRow)
+
+      // If PG has the password hash, use it directly.
+      // Otherwise fall through to BigQuery where hashes are authoritative
+      // (password_hash not yet migrated to PostgreSQL for all users).
+      if (record.passwordHash) return record
+    }
   } catch (error) {
     if (!shouldFallbackFromIdentityPostgres(error)) throw error
   }
