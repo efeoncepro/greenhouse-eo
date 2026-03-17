@@ -4,6 +4,65 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+## ICO Engine — Implementación completa (2026-03-17)
+
+### Nuevas funcionalidades
+
+- **ICO Engine — Metric Registry** — 10 métricas determinísticas (RPA, OTD%, FTR%, cycle time, cycle time variance, throughput, pipeline velocity, stuck assets, stuck asset %, CSC distribution) con umbrales semáforo configurables. Tipo `AIMetricConfig` exportado para futura integración AI.
+- **ICO Engine — Schema provisioning** — 6 tablas BigQuery auto-creadas via `ensureIcoEngineInfrastructure()`: `metric_snapshots_monthly`, `metrics_by_project`, `rpa_trend`, `stuck_assets_detail`, `ai_metric_scores` (vacía), más view `v_tasks_enriched` y `v_metric_latest`.
+- **ICO Engine — Materialización** — Cron diario 06:15 UTC (`/api/cron/ico-materialize`) que ejecuta: MERGE de snapshots mensuales por Space, INSERT de stuck assets detail (severity warning 72h / danger 96h), INSERT de RPA trend (12 meses), INSERT de métricas por proyecto.
+- **ICO Engine — Live compute** — Botón "Calcular en vivo" en la pestaña ICO de Agency calcula métricas para todos los Spaces en paralelo (batches de 5) desde `v_tasks_enriched` sin necesidad de materialización previa. `maxDuration=120` para timeout en Vercel.
+- **ICO Engine — 6 API endpoints**:
+  - `GET /api/ico-engine/registry` — definiciones de métricas
+  - `GET /api/ico-engine/metrics?spaceId&year&month` — métricas por Space
+  - `GET /api/ico-engine/metrics/agency?year&month&live` — métricas agregadas de agencia
+  - `GET /api/ico-engine/metrics/project?spaceId&year&month` — métricas por proyecto
+  - `GET /api/ico-engine/stuck-assets?spaceId` — detalle de activos estancados
+  - `GET /api/ico-engine/trends/rpa?spaceId&months` — tendencia RPA por Space
+- **ICO Engine — Tab en Agency** — Nueva pestaña "ICO Engine" en AgencyWorkspace con: 6 KPI cards (RPA, OTD, FTR, throughput, velocity, stuck), gráfico de distribución CSC (stacked bar), gauge de velocidad pipeline (radialBar), gráfico de tendencia RPA (line chart, top 5 spaces), scorecard sortable por Space.
+- **ICO Engine — Stuck Assets Drawer** — Click en el conteo de stuck assets del scorecard abre drawer lateral (480px) con detalle: nombre de tarea, fase CSC, días detenido, severidad (warning/danger).
+- **ICO Engine → Creative Hub** — `buildCreativeRevenueCardData` y `buildCreativeBrandMetricsCardData` ahora consumen métricas ICO (RPA, FTR, OTD) cuando están disponibles, con fallback a cómputo inline desde tareas de Notion. `readMetricsSummaryByClientId()` se ejecuta en paralelo con las queries existentes.
+
+### Archivos nuevos (19)
+
+| Archivo | Propósito |
+|---------|-----------|
+| `src/lib/ico-engine/shared.ts` | IcoEngineError, runIcoEngineQuery, utilidades de coerción |
+| `src/lib/ico-engine/metric-registry.ts` | 10 MetricDefinition[], FormulaConfig, CSC mapping, AIMetricConfig |
+| `src/lib/ico-engine/schema.ts` | ensureIcoEngineInfrastructure() — dataset + 6 tables + views |
+| `src/lib/ico-engine/read-metrics.ts` | 7 funciones de lectura (space, agency, project, live, summary) |
+| `src/lib/ico-engine/materialize.ts` | materializeMonthlySnapshots (space + stuck + rpa_trend + project) |
+| `src/app/api/ico-engine/registry/route.ts` | GET metric definitions |
+| `src/app/api/ico-engine/metrics/route.ts` | GET space metrics |
+| `src/app/api/ico-engine/metrics/agency/route.ts` | GET agency metrics + live compute |
+| `src/app/api/ico-engine/metrics/project/route.ts` | GET project-level metrics |
+| `src/app/api/ico-engine/stuck-assets/route.ts` | GET stuck assets detail |
+| `src/app/api/ico-engine/trends/rpa/route.ts` | GET RPA trend by space |
+| `src/app/api/cron/ico-materialize/route.ts` | Cron: daily materialization |
+| `src/components/agency/IcoGlobalKpis.tsx` | 6 KPI cards for ICO tab |
+| `src/components/agency/IcoCharts.tsx` | CSC bar + velocity gauge + RPA trend chart |
+| `src/components/agency/SpaceIcoScorecard.tsx` | Sortable space metrics table |
+| `src/components/agency/StuckAssetsDrawer.tsx` | Right drawer for stuck asset details |
+| `src/components/agency/SpacesCharts.tsx` | Spaces view charts |
+| `src/components/agency/space-health.ts` | Space health computation |
+| `src/views/agency/AgencyIcoEngineView.tsx` | ICO Engine tab orchestrator |
+
+### Archivos modificados (10)
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/views/agency/AgencyWorkspace.tsx` | +ICO tab, +handleComputeLive, +icoData state |
+| `src/views/agency/AgencySpacesView.tsx` | Spaces redesign con health table + filters |
+| `src/components/agency/SpaceCard.tsx` | Refactored for new Spaces view |
+| `src/components/agency/SpaceFilters.tsx` | +health/service filters |
+| `src/components/agency/SpaceHealthTable.tsx` | +sortable health metrics |
+| `src/config/greenhouse-nomenclature.ts` | +ICO labels, +stuck drawer labels, +RPA trend labels |
+| `src/lib/capability-queries/creative-hub.ts` | +readMetricsSummaryByClientId in Promise.all |
+| `src/lib/capability-queries/helpers.ts` | +optional icoSummary param for RPA/FTR/OTD override |
+| `vercel.json` | +cron schedule for ico-materialize |
+
+---
+
 ## Account 360 Phase 4 — Person 360 Membership Management + Equipo Efeonce (2026-03-16)
 
 ### Nuevas funcionalidades

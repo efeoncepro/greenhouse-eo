@@ -40,6 +40,108 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-17 — ICO Engine: Implementación completa (Groups A–E)
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Completar todos los gaps restantes del ICO Engine identificados en `Greenhouse_ICO_Engine_v1.md`. 5 grupos: wire onComputeLive + AI DDL (A), stuck assets detail (B), RPA trend (C), project-level metrics (D), Creative Hub migration (E).
+
+### Rama
+- Rama usada: `develop`
+- Commit: `d2483fd`
+
+### Ambiente objetivo
+- Preview / BigQuery (`ico_engine` dataset) / Agency ICO tab
+
+### Archivos tocados
+
+**Nuevos (19 archivos):**
+- `src/lib/ico-engine/shared.ts` — IcoEngineError, runIcoEngineQuery, coercion utils
+- `src/lib/ico-engine/metric-registry.ts` — 10 MetricDefinition[], FormulaConfig, CSC mapping, AIMetricConfig
+- `src/lib/ico-engine/schema.ts` — ensureIcoEngineInfrastructure() — dataset + 6 tables + views
+- `src/lib/ico-engine/read-metrics.ts` — 7 funciones de lectura (space, agency, project, live, summary, byClientId)
+- `src/lib/ico-engine/materialize.ts` — materializeMonthlySnapshots (4 materializations)
+- `src/app/api/ico-engine/registry/route.ts` — GET metric definitions
+- `src/app/api/ico-engine/metrics/route.ts` — GET space metrics
+- `src/app/api/ico-engine/metrics/agency/route.ts` — GET agency metrics + `?live=true`
+- `src/app/api/ico-engine/metrics/project/route.ts` — GET project-level metrics
+- `src/app/api/ico-engine/stuck-assets/route.ts` — GET stuck assets detail
+- `src/app/api/ico-engine/trends/rpa/route.ts` — GET RPA trend
+- `src/app/api/cron/ico-materialize/route.ts` — Vercel cron diario 06:15 UTC
+- `src/components/agency/IcoGlobalKpis.tsx` — 6 KPI cards
+- `src/components/agency/IcoCharts.tsx` — CSC bar + velocity gauge + RPA trend line
+- `src/components/agency/SpaceIcoScorecard.tsx` — Sortable space metrics table + stuck click
+- `src/components/agency/StuckAssetsDrawer.tsx` — Right drawer (480px) stuck asset details
+- `src/components/agency/SpacesCharts.tsx` — Spaces view charts
+- `src/components/agency/space-health.ts` — Space health computation
+- `src/views/agency/AgencyIcoEngineView.tsx` — ICO tab orchestrator
+
+**Modificados (10 archivos):**
+- `src/views/agency/AgencyWorkspace.tsx` — +ICO tab, +handleComputeLive, +icoData state
+- `src/views/agency/AgencySpacesView.tsx` — Spaces redesign
+- `src/components/agency/SpaceCard.tsx` — Refactored for Spaces view
+- `src/components/agency/SpaceFilters.tsx` — +health/service filters
+- `src/components/agency/SpaceHealthTable.tsx` — +sortable health metrics
+- `src/config/greenhouse-nomenclature.ts` — +ICO labels, +stuck drawer, +RPA trend
+- `src/lib/capability-queries/creative-hub.ts` — +readMetricsSummaryByClientId en Promise.all
+- `src/lib/capability-queries/helpers.ts` — +optional icoSummary param (RPA/FTR/OTD override)
+- `vercel.json` — +cron schedule
+
+### Cambios realizados
+
+**Group A — Quick Fixes:**
+- Wired `onComputeLive` en AgencyWorkspace → live compute button funcional
+- `ai_metric_scores` DDL creado (tabla vacía, forward-compatible)
+- `AIMetricConfig` type exportado desde metric-registry.ts
+- Agency API soporta `?live=true` — busca distinct space_ids, computa en batches de 5
+
+**Group B — Stuck Assets Detail:**
+- DDL `stuck_assets_detail` (CLUSTER BY space_id, severity)
+- Materialización: DELETE all + INSERT desde `v_tasks_enriched WHERE is_stuck = TRUE`
+- Severity: warning (72-95h) / danger (96h+) — alineado con is_stuck del view (72h)
+- API `/api/ico-engine/stuck-assets?spaceId` con auth `requireAgencyTenantContext`
+- StuckAssetsDrawer: MUI Drawer, fetch on open, grid layout, empty state con checkmark
+- SpaceIcoScorecard: stuck count clickable → abre drawer
+
+**Group C — RPA Trend:**
+- DDL `rpa_trend` (CLUSTER BY space_id)
+- Materialización: DELETE all + INSERT últimos 12 meses, AVG + APPROX_QUANTILES P50
+- API `/api/ico-engine/trends/rpa?spaceId&months` — agrupa por space, optional filter
+- IcoCharts: line chart (top 5 spaces), annotation at y=1.5 (óptimo), smooth curves
+- AgencyIcoEngineView: lazy-fetch trend después de que ICO data cargue
+
+**Group D — Project-Level Metrics:**
+- DDL `metrics_by_project` (CLUSTER BY space_id, project_source_id)
+- Materialización: DELETE período actual + INSERT agrupado por project_source_id
+- `readProjectMetrics()` en read-metrics.ts + API `/api/ico-engine/metrics/project`
+
+**Group E — Creative Hub → ICO Engine:**
+- `readMetricsSummaryByClientId(clientId)` — query `v_metric_latest WHERE client_id = @clientId`
+- creative-hub.ts: fetch en paralelo con Promise.all, `.catch(() => null)` para graceful degradation
+- helpers.ts: `buildCreativeRevenueCardData` + `buildCreativeBrandMetricsCardData` aceptan optional `icoSummary` — prefieren ICO values (RPA, FTR, OTD), fallback a cómputo inline
+
+### Verificación
+- `pnpm tsc --noEmit` → 0 errores (verificado después de cada grupo)
+- `git push origin develop` → `d2483fd` exitoso
+
+### Decisiones de arquitectura
+- **Singleton Promise pattern**: `ensureIcoEngineInfrastructure()` verifica 5 tablas en una sola query a INFORMATION_SCHEMA, crea solo las faltantes
+- **Cron via Vercel**: `/api/cron/ico-materialize` con `maxDuration=120`, triggered by vercel.json cron schedule
+- **Batch live compute**: agency live compute ejecuta `computeSpaceMetricsLive()` en batches de 5 concurrent para evitar overload de BigQuery
+- **Stuck severity**: 72h = warning, 96h = danger (alineado con `is_stuck` de `v_tasks_enriched`, no 48h del spec original)
+- **Creative Hub graceful fallback**: ICO fetch wrapped en `.catch(() => null)` — si BigQuery falla o no hay datos, helpers usan cómputo inline sin cambio visible
+
+### Riesgos o pendientes
+- **Primera materialización**: el cron corre a las 06:15 UTC diario. Para ver datos inmediatamente, llamar `GET /api/cron/ico-materialize` manualmente o usar el botón "Calcular en vivo"
+- **client_id mapping**: `readMetricsSummaryByClientId` depende de que `client_id` esté populado en los snapshots. Si un Space no tiene mapping, el fallback a inline funciona transparentemente
+- **`metrics_by_service`**: bloqueado hasta que Services Architecture esté operativa
+- **AI layer**: `ai_metric_scores` tabla vacía — activar LEFT JOINs cuando AI agents escriban scores
+- **Deploy staging**: el cron necesita Vercel staging para funcionar — verificar que `vercel.json` crons se activen
+
+---
+
 ## 2026-03-16 — Sistematización Pre-Nómina (5 fases)
 
 ### Agente
