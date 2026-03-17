@@ -240,7 +240,7 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
   )
 
   return (
-    <Grid container spacing={6}>
+    <Grid container spacing={6} sx={{ overflow: 'hidden' }}>
       {/* CSC Distribution */}
       <Grid size={{ xs: 12, md: 8 }}>
         <ExecutiveCardShell

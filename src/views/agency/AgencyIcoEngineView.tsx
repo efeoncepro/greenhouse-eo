@@ -63,7 +63,7 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
   }, [hasData, rpaTrend, fetchRpaTrend])
 
   return (
-    <Stack spacing={6}>
+    <Stack spacing={6} sx={{ overflow: 'hidden' }}>
       {/* Header */}
       <Card
         elevation={0}
