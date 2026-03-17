@@ -271,7 +271,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                     />
                   ) : null}
                   {activeTab === 'proyectos' ? (
-                    <TenantProjectsPanel projects={data.projects} />
+                    <TenantProjectsPanel clientId={data.clientId} clientName={data.clientName} projects={data.projects} />
                   ) : null}
                   {activeTab === 'configuracion' ? (
                     <TenantSettingsPanel data={data} />
