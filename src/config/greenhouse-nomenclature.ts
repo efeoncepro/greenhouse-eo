@@ -959,6 +959,7 @@ export const GH_INTERNAL_MESSAGES = {
   admin_tenant_tabs_users: 'Usuarios',
   admin_tenant_tabs_crm: 'CRM',
   admin_tenant_tabs_projects: 'Proyectos',
+  admin_tenant_tabs_notion: 'Notion',
   admin_tenant_tabs_settings: 'Configuracion',
   admin_tenant_error_title: 'No pudimos renderizar esta seccion',
   admin_tenant_error_description:
