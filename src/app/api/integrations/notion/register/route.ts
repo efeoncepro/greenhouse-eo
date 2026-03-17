@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { sampleDatabase } from '@/lib/notion/client'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +45,8 @@ export async function POST(request: Request) {
     }
     const space = spaces[0]
 
-    // 2. Optionally verify Notion access to each database
+    // 2. Optionally verify Notion access via Cloud Run pipeline
+    const pipelineUrl = (process.env.NOTION_PIPELINE_URL || 'https://notion-bq-sync-183008134038.us-central1.run.app').replace(/\/$/, '')
     const verification: Record<string, { ok: boolean; sampleTitle?: string; error?: string }> = {}
     if (verify) {
       const dbsToVerify: Array<[string, string]> = [
@@ -58,9 +58,18 @@ export async function POST(request: Request) {
 
       for (const [dbId, label] of dbsToVerify) {
         try {
-          const records = await sampleDatabase(dbId, 1)
-          const sampleTitle = records.length > 0
-            ? findTitleProp(records[0].properties)
+          const res = await fetch(
+            `${pipelineUrl}/discover/${encodeURIComponent(dbId)}/sample?limit=1`,
+            { signal: AbortSignal.timeout(15_000) }
+          )
+          if (!res.ok) {
+            verification[label] = { ok: false, error: `Pipeline returned ${res.status}` }
+            continue
+          }
+          const data = await res.json()
+          const sample = data.sample as Array<{ properties?: Record<string, unknown> }> | undefined
+          const sampleTitle = sample && sample.length > 0
+            ? findTitleProp(sample[0].properties || {})
             : '(empty database)'
           verification[label] = { ok: true, sampleTitle }
         } catch (err) {
@@ -170,9 +179,6 @@ export async function POST(request: Request) {
     }, { status: 201 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Registration failed'
-    if (message.includes('NOTION_TOKEN')) {
-      return NextResponse.json({ error: 'Notion integration not configured' }, { status: 503 })
-    }
     return NextResponse.json({ error: message }, { status: 400 })
   }
 }
