@@ -16,10 +16,15 @@ import {
   buildToolItems
 } from '@/lib/capability-queries/helpers'
 import { getCapabilityModuleSnapshot } from '@/lib/capability-queries/shared'
+import { readMetricsSummaryByClientId } from '@/lib/ico-engine/read-metrics'
 import type { CapabilityQueryBuilder } from '@/lib/capability-queries/types'
 
 export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
-  const [snapshot, tasks] = await Promise.all([getCapabilityModuleSnapshot(viewer), getCreativeHubTasks(viewer)])
+  const [snapshot, tasks, icoSummary] = await Promise.all([
+    getCapabilityModuleSnapshot(viewer),
+    getCreativeHubTasks(viewer),
+    readMetricsSummaryByClientId(viewer.clientId).catch(() => null)
+  ])
   const content = buildCapabilityModuleContent({ moduleId: 'creative-hub', snapshot })
 
   if (!content) {
@@ -39,9 +44,9 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
     cardData: {
       ...buildCreativeHubCardData({ snapshot, metrics: content.metrics, projects, quality }),
       'revenue-header':        { type: 'section-header', subtitle: 'El impacto de tu produccion creativa en el negocio', icon: 'tabler-trending-up' },
-      'creative-revenue-kpis': buildCreativeRevenueCardData(snapshot, tasks),
+      'creative-revenue-kpis': buildCreativeRevenueCardData(snapshot, tasks, icoSummary),
       'brand-header':          { type: 'section-header', subtitle: 'Gobernanza y proteccion de marca sobre el flujo creativo', icon: 'tabler-shield-check' },
-      'creative-brand-kpis':   buildCreativeBrandMetricsCardData(tasks),
+      'creative-brand-kpis':   buildCreativeBrandMetricsCardData(tasks, icoSummary),
       'creative-rpa-trend':    buildCreativeRpaTrendCardData(tasks),
       'pipeline-header':       { type: 'section-header', subtitle: 'El pipeline completo de tu produccion creativa', icon: 'tabler-git-branch' },
       'csc-pipeline':          buildCreativePipelineCardData(tasks),

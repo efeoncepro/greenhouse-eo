@@ -8,10 +8,13 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CustomChip from '@core/components/mui/Chip'
+import ExecutiveMiniStatCard from '@/components/greenhouse/ExecutiveMiniStatCard'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import SpaceCard from '@/components/agency/SpaceCard'
 import SpaceFilters from '@/components/agency/SpaceFilters'
+import SpaceHealthTable from '@/components/agency/SpaceHealthTable'
+import SpacesCharts from '@/components/agency/SpacesCharts'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 
@@ -19,112 +22,135 @@ type Props = {
   spaces: AgencySpaceHealth[]
 }
 
-const getRpaSemaphore = (v: number | null): { color: 'success' | 'warning' | 'error'; label: string } => {
-  if (v === null) return { color: 'success', label: 'Sin datos' }
-  if (v <= 1.5) return { color: 'success', label: 'Óptimo' }
-  if (v <= 2.5) return { color: 'warning', label: 'Atención' }
+type ViewMode = 'table' | 'cards'
 
-  return { color: 'error', label: 'Crítico' }
-}
+// ─── Semaphore Tone Helpers ─────────────────────────────────────────────────
 
-const getOtdSemaphore = (v: number | null): { color: 'success' | 'warning' | 'error'; label: string } => {
-  if (v === null) return { color: 'success', label: 'Sin datos' }
-  if (v >= 90) return { color: 'success', label: 'Óptimo' }
-  if (v >= 70) return { color: 'warning', label: 'Atención' }
+const getRpaTone = (v: number | null) =>
+  v === null ? 'info' as const : v <= 1.5 ? 'success' as const : v <= 2.5 ? 'warning' as const : 'error' as const
 
-  return { color: 'error', label: 'Crítico' }
-}
+const getOtdTone = (v: number | null) =>
+  v === null ? 'info' as const : v >= 90 ? 'success' as const : v >= 70 ? 'warning' as const : 'error' as const
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 const AgencySpacesView = ({ spaces }: Props) => {
   const [filtered, setFiltered] = useState<AgencySpaceHealth[]>(spaces)
+  const [viewMode, setViewMode] = useState<ViewMode>('table')
 
-  // Aggregated KPIs from all spaces (not filtered)
+  // KPIs computed from filtered data (respond to filter changes)
   const kpis = useMemo(() => {
-    const totalSpaces = spaces.length
-    const rpaValues = spaces.map(s => s.rpaAvg).filter((v): v is number => v !== null)
+    const totalSpaces = filtered.length
+    const rpaValues = filtered.map(s => s.rpaAvg).filter((v): v is number => v !== null)
     const rpaAvg = rpaValues.length > 0 ? rpaValues.reduce((a, b) => a + b, 0) / rpaValues.length : null
-    const otdValues = spaces.map(s => s.otdPct).filter((v): v is number => v !== null)
+    const otdValues = filtered.map(s => s.otdPct).filter((v): v is number => v !== null)
     const otdAvg = otdValues.length > 0 ? otdValues.reduce((a, b) => a + b, 0) / otdValues.length : null
-    const assetsTotal = spaces.reduce((sum, s) => sum + s.assetsActivos, 0)
-    const feedbackTotal = spaces.reduce((sum, s) => sum + s.feedbackPendiente, 0)
+    const totalMembers = filtered.reduce((sum, s) => sum + s.assignedMembers, 0)
+    const totalFte = filtered.reduce((sum, s) => sum + s.allocatedFte, 0)
 
-    return { totalSpaces, rpaAvg, otdAvg, assetsTotal, feedbackTotal }
-  }, [spaces])
+    // Sparkline data for mini charts
+    const rpaSparkline = filtered
+      .filter(s => s.rpaAvg !== null)
+      .sort((a, b) => (a.rpaAvg ?? 0) - (b.rpaAvg ?? 0))
+      .map(s => Number((s.rpaAvg ?? 0).toFixed(1)))
 
-  const rpaSemaphore = getRpaSemaphore(kpis.rpaAvg)
-  const otdSemaphore = getOtdSemaphore(kpis.otdAvg)
+    const otdSparkline = filtered
+      .filter(s => s.otdPct !== null)
+      .sort((a, b) => (a.otdPct ?? 0) - (b.otdPct ?? 0))
+      .map(s => Math.round(s.otdPct ?? 0))
+
+    return { totalSpaces, rpaAvg, otdAvg, totalMembers, totalFte, rpaSparkline, otdSparkline }
+  }, [filtered])
 
   return (
     <Stack spacing={6}>
-      {/* Header */}
+      {/* ── Header ───────────────────────────────────────────────────────────── */}
       <Card
         elevation={0}
         sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
       >
-        <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}>
-          {GH_AGENCY.spaces_title}
-        </Typography>
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-          {GH_AGENCY.spaces_subtitle}
-        </Typography>
+        <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap gap={1}>
+          <Box>
+            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}>
+              {GH_AGENCY.spaces_title}
+            </Typography>
+            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+              {GH_AGENCY.spaces_subtitle}
+            </Typography>
+          </Box>
+          <CustomChip
+            round='true'
+            size='small'
+            color='secondary'
+            variant='tonal'
+            label={GH_AGENCY.meta_spaces(spaces.length)}
+            sx={{ fontWeight: 500 }}
+          />
+        </Stack>
       </Card>
 
-      {/* KPI Row */}
-      <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='Total Spaces'
-            stats={String(kpis.totalSpaces)}
-            subtitle='Clientes activos'
-            avatarIcon='tabler-building-community'
-            avatarColor='primary'
-          />
+      {/* ── KPI Row ──────────────────────────────────────────────────────────── */}
+      <SectionErrorBoundary sectionName='spaces-kpis' description='No pudimos calcular los KPIs.'>
+        <Grid container spacing={6}>
+          <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+            <ExecutiveMiniStatCard
+              title={GH_AGENCY.spaces_kpi_total}
+              value={String(kpis.totalSpaces)}
+              detail={GH_AGENCY.spaces_kpi_total_detail(kpis.totalSpaces)}
+              tone='info'
+              icon='tabler-building-community'
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+            <ExecutiveMiniStatCard
+              title={GH_AGENCY.spaces_kpi_rpa}
+              value={kpis.rpaAvg !== null ? kpis.rpaAvg.toFixed(1) : '—'}
+              detail={GH_AGENCY.spaces_kpi_rpa_detail(kpis.rpaAvg)}
+              tone={getRpaTone(kpis.rpaAvg)}
+              icon='tabler-chart-dots-2'
+              miniChart={kpis.rpaSparkline.length >= 3 ? { variant: 'bars', data: kpis.rpaSparkline } : undefined}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+            <ExecutiveMiniStatCard
+              title={GH_AGENCY.spaces_kpi_otd}
+              value={kpis.otdAvg !== null ? `${Math.round(kpis.otdAvg)}%` : '—'}
+              detail={GH_AGENCY.spaces_kpi_otd_detail(kpis.otdAvg)}
+              tone={getOtdTone(kpis.otdAvg)}
+              icon='tabler-clock-check'
+              miniChart={kpis.otdSparkline.length >= 3 ? { variant: 'area', data: kpis.otdSparkline } : undefined}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, xl: 3 }}>
+            <ExecutiveMiniStatCard
+              title={GH_AGENCY.spaces_kpi_team}
+              value={String(kpis.totalMembers)}
+              detail={GH_AGENCY.spaces_kpi_team_detail(kpis.totalMembers, kpis.totalFte)}
+              tone='info'
+              icon='tabler-users'
+            />
+          </Grid>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='RpA Promedio'
-            stats={kpis.rpaAvg !== null ? kpis.rpaAvg.toFixed(1) : '—'}
-            subtitle='Revisiones por asset'
-            avatarIcon='tabler-chart-dots-2'
-            avatarColor={rpaSemaphore.color}
-            statusLabel={rpaSemaphore.label}
-            statusColor={rpaSemaphore.color}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='OTD Promedio'
-            stats={kpis.otdAvg !== null ? `${Math.round(kpis.otdAvg)}%` : '—'}
-            subtitle='On-time delivery'
-            avatarIcon='tabler-clock-check'
-            avatarColor={otdSemaphore.color}
-            statusLabel={otdSemaphore.label}
-            statusColor={otdSemaphore.color}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='Assets Activos'
-            stats={String(kpis.assetsTotal)}
-            subtitle='En producción'
-            avatarIcon='tabler-subtask'
-            avatarColor='info'
-            {...(kpis.feedbackTotal > 0 ? {
-              statusLabel: `${kpis.feedbackTotal} feedback pendiente`,
-              statusColor: 'warning' as const,
-              statusIcon: 'tabler-alert-triangle'
-            } : {})}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Filters */}
-      <SectionErrorBoundary sectionName='agency-spaces-filters' description='No pudimos cargar los filtros.'>
-        <SpaceFilters spaces={spaces} onChange={setFiltered} filteredCount={filtered.length} />
       </SectionErrorBoundary>
 
-      {/* Spaces Grid */}
-      <SectionErrorBoundary sectionName='agency-spaces-grid' description='No pudimos cargar los Spaces.'>
+      {/* ── Charts Row ───────────────────────────────────────────────────────── */}
+      <SectionErrorBoundary sectionName='spaces-charts' description='No pudimos cargar los gráficos.'>
+        <SpacesCharts spaces={filtered} />
+      </SectionErrorBoundary>
+
+      {/* ── Filters ──────────────────────────────────────────────────────────── */}
+      <SectionErrorBoundary sectionName='agency-spaces-filters' description='No pudimos cargar los filtros.'>
+        <SpaceFilters
+          spaces={spaces}
+          onChange={setFiltered}
+          filteredCount={filtered.length}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      </SectionErrorBoundary>
+
+      {/* ── Data View ────────────────────────────────────────────────────────── */}
+      <SectionErrorBoundary sectionName='agency-spaces-data' description='No pudimos cargar los Spaces.'>
         {filtered.length === 0 ? (
           <Card elevation={0} sx={{ border: `1px solid ${GH_COLORS.neutral.border}`, textAlign: 'center', py: 8 }}>
             <i className='tabler-search' style={{ fontSize: '2.5rem', color: GH_COLORS.neutral.border }} />
@@ -132,6 +158,8 @@ const AgencySpacesView = ({ spaces }: Props) => {
               {GH_AGENCY.empty_spaces}
             </Typography>
           </Card>
+        ) : viewMode === 'table' ? (
+          <SpaceHealthTable spaces={filtered} />
         ) : (
           <Box
             sx={{

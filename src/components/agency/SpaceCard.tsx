@@ -17,6 +17,7 @@ import CustomIconButton from '@core/components/mui/IconButton'
 
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
+import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR } from './space-health'
 
 type Props = {
   space: AgencySpaceHealth
@@ -69,6 +70,7 @@ const SpaceCard = ({ space }: Props) => {
   const color = getServiceColor(space.businessLines)
   const rpa = getRpaSemaphore(space.rpaAvg)
   const otd = getOtdSemaphore(space.otdPct)
+  const healthZone = getSpaceHealth(space)
 
   return (
     <Card
@@ -109,29 +111,30 @@ const SpaceCard = ({ space }: Props) => {
               <CustomChip round='true' size='small' color='secondary' variant='tonal' label='Interno' sx={{ height: 18, fontSize: '0.65rem' }} />
             )}
           </Stack>
-          <Stack direction='row' spacing={0.5} sx={{ mt: 0.5 }} flexWrap='wrap' useFlexGap>
-            {space.businessLines.length > 0 ? (
-              space.businessLines.map(line => (
-                <CustomChip
-                  key={line}
-                  round='true'
-                  size='small'
-                  label={SERVICE_LINE_LABELS[line] ?? line.replace(/_/g, ' ')}
-                  sx={{
-                    height: 20,
-                    fontSize: '0.65rem',
-                    fontWeight: 500,
-                    bgcolor: alpha(color.text, 0.08),
-                    color: color.text,
-                    border: 'none'
-                  }}
-                />
-              ))
-            ) : (
-              <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                Sin línea asignada
-              </Typography>
+          <Stack direction='row' spacing={0.5} sx={{ mt: 0.5 }} flexWrap='wrap' useFlexGap alignItems='center'>
+            {space.businessLines.length > 0 && (
+              <CustomChip
+                round='true'
+                size='small'
+                label={SERVICE_LINE_LABELS[space.businessLines[0]] ?? space.businessLines[0].replace(/_/g, ' ')}
+                sx={{
+                  height: 20,
+                  fontSize: '0.65rem',
+                  fontWeight: 500,
+                  bgcolor: alpha(color.text, 0.08),
+                  color: color.text,
+                  border: 'none'
+                }}
+              />
             )}
+            <CustomChip
+              round='true'
+              size='small'
+              color={HEALTH_ZONE_COLOR[healthZone]}
+              variant='tonal'
+              label={HEALTH_ZONE_LABEL[healthZone]}
+              sx={{ height: 20, fontSize: '0.65rem', fontWeight: 600 }}
+            />
           </Stack>
         </Box>
 
@@ -188,91 +191,16 @@ const SpaceCard = ({ space }: Props) => {
 
       <Divider />
 
-      {/* ── Support metrics as chips ─────────────────────────── */}
-      <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap' sx={{ px: 2.5, py: 1.5 }}>
-        <Tooltip title='Proyectos activos'>
-          <span>
-            <CustomChip
-              round='true'
-              size='small'
-              color='success'
-              variant='tonal'
-              icon={<i className='tabler-folders' style={{ fontSize: '0.8rem' }} />}
-              label={String(space.projectCount)}
-              sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-            />
-          </span>
-        </Tooltip>
-        <Tooltip title='Miembros asignados'>
-          <span>
-            <CustomChip
-              round='true'
-              size='small'
-              color='info'
-              variant='tonal'
-              icon={<i className='tabler-users' style={{ fontSize: '0.8rem' }} />}
-              label={String(space.assignedMembers)}
-              sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-            />
-          </span>
-        </Tooltip>
-        <Tooltip title='FTE asignados'>
-          <span>
-            <CustomChip
-              round='true'
-              size='small'
-              color='primary'
-              variant='tonal'
-              icon={<i className='tabler-clock-hour-4' style={{ fontSize: '0.8rem' }} />}
-              label={space.allocatedFte.toFixed(1)}
-              sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-            />
-          </span>
-        </Tooltip>
-        {space.totalUsers > 0 && (
-          <Tooltip title={`${space.activeUsers} activos de ${space.totalUsers} usuarios`}>
-            <span>
-              <CustomChip
-                round='true'
-                size='small'
-                color='secondary'
-                variant='tonal'
-                icon={<i className='tabler-user-check' style={{ fontSize: '0.8rem' }} />}
-                label={`${space.activeUsers}/${space.totalUsers}`}
-                sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-              />
-            </span>
-          </Tooltip>
-        )}
-        <Tooltip title='Assets activos'>
-          <span>
-            <CustomChip
-              round='true'
-              size='small'
-              color='warning'
-              variant='tonal'
-              icon={<i className='tabler-subtask' style={{ fontSize: '0.8rem' }} />}
-              label={String(space.assetsActivos)}
-              sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-            />
-          </span>
-        </Tooltip>
-      </Stack>
-
-      {/* ── Feedback alert ───────────────────────────────────── */}
-      {space.feedbackPendiente > 0 && (
-        <Box sx={{ px: 2.5, pb: 1.5 }}>
-          <CustomChip
-            round='true'
-            size='small'
-            color='warning'
-            variant='tonal'
-            icon={<i className='tabler-alert-triangle' style={{ fontSize: '0.8rem' }} />}
-            label={`${space.feedbackPendiente} feedback pendiente`}
-            sx={{ height: 22, fontSize: '0.7rem', fontWeight: 500 }}
-          />
-        </Box>
-      )}
+      {/* ── Metadata line ─────────────────────────────────────── */}
+      <Box sx={{ px: 2.5, py: 1.5 }}>
+        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          {[
+            `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
+            `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,
+            `${space.allocatedFte.toFixed(1)} FTE`
+          ].join(' · ')}
+        </Typography>
+      </Box>
     </Card>
   )
 }

@@ -29,15 +29,18 @@ import type {
 import AgencyPulseView from './AgencyPulseView'
 import AgencySpacesView from './AgencySpacesView'
 import AgencyCapacityView from './AgencyCapacityView'
+import AgencyIcoEngineView from './AgencyIcoEngineView'
+import type { AgencyIcoData } from './AgencyIcoEngineView'
 
-type AgencyTab = 'pulse' | 'spaces' | 'capacidad'
+type AgencyTab = 'pulse' | 'spaces' | 'capacidad' | 'ico'
 
-const VALID_TABS: AgencyTab[] = ['pulse', 'spaces', 'capacidad']
+const VALID_TABS: AgencyTab[] = ['pulse', 'spaces', 'capacidad', 'ico']
 
 const TAB_CONFIG: Array<{ value: AgencyTab; label: string; icon: string; ariaLabel: string }> = [
   { value: 'pulse', label: 'Pulse', icon: 'tabler-activity-heartbeat', ariaLabel: 'Pulse: KPIs globales de la agencia' },
   { value: 'spaces', label: 'Spaces', icon: 'tabler-grid-4x4', ariaLabel: 'Spaces: lista de clientes activos' },
-  { value: 'capacidad', label: 'Capacidad', icon: 'tabler-chart-bar', ariaLabel: 'Capacidad: utilización del equipo' }
+  { value: 'capacidad', label: 'Capacidad', icon: 'tabler-chart-bar', ariaLabel: 'Capacidad: utilización del equipo' },
+  { value: 'ico', label: 'ICO Engine', icon: 'tabler-cpu', ariaLabel: 'ICO Engine: métricas operativas por Space' }
 ]
 
 type Props = {
@@ -61,8 +64,10 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
   const [activeTab, setActiveTab] = useState<AgencyTab>(defaultTab)
   const [spacesData, setSpacesData] = useState<AgencySpaceHealth[] | null>(null)
   const [capacityData, setCapacityData] = useState<AgencyCapacityOverview | null>(null)
+  const [icoData, setIcoData] = useState<AgencyIcoData | null>(null)
   const [spacesLoading, setSpacesLoading] = useState(false)
   const [capacityLoading, setCapacityLoading] = useState(false)
+  const [icoLoading, setIcoLoading] = useState(false)
 
   const panelRef = useRef<HTMLDivElement>(null)
   const isInitialMount = useRef(true)
@@ -125,11 +130,54 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
     }
   }, [capacityData])
 
+  // Lazy fetch ICO data
+  const fetchIco = useCallback(async () => {
+    if (icoData !== null) return
+
+    setIcoLoading(true)
+
+    try {
+      const now = new Date()
+      const res = await fetch(`/api/ico-engine/metrics/agency?year=${now.getFullYear()}&month=${now.getMonth() + 1}`)
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setIcoData(data)
+      }
+    } catch {
+      setIcoData(null)
+    } finally {
+      setIcoLoading(false)
+    }
+  }, [icoData])
+
+  // Live compute for ICO (when no materialized data exists)
+  const handleComputeLive = useCallback(async () => {
+    setIcoLoading(true)
+
+    try {
+      const now = new Date()
+      const res = await fetch(`/api/ico-engine/metrics/agency?year=${now.getFullYear()}&month=${now.getMonth() + 1}&live=true`)
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setIcoData(data)
+      }
+    } catch {
+      // Keep existing data (or null) on error
+    } finally {
+      setIcoLoading(false)
+    }
+  }, [])
+
   // Fetch data when switching to lazy tabs
   useEffect(() => {
     if (activeTab === 'spaces') fetchSpaces()
     if (activeTab === 'capacidad') fetchCapacity()
-  }, [activeTab, fetchSpaces, fetchCapacity])
+    if (activeTab === 'ico') fetchIco()
+  }, [activeTab, fetchSpaces, fetchCapacity, fetchIco])
 
   const handleChange = (_: SyntheticEvent, value: string) => {
     const newTab = value as AgencyTab
@@ -192,6 +240,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
           >
             {spacesLoading ? 'Cargando datos de Spaces...' : ''}
             {capacityLoading ? 'Cargando datos de capacidad...' : ''}
+            {icoLoading ? 'Cargando métricas ICO...' : ''}
           </Box>
 
           <TabPanel value='pulse' className='p-0'>
@@ -227,6 +276,21 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
             ) : (
               <SectionErrorBoundary sectionName='agency-capacity-tab' description='No pudimos cargar la capacidad.'>
                 <AgencyCapacityView capacity={capacityData} />
+              </SectionErrorBoundary>
+            )}
+          </TabPanel>
+
+          <TabPanel value='ico' className='p-0'>
+            {icoLoading ? (
+              <Stack spacing={4}>
+                <Skeleton variant='rounded' height={80} />
+                <Skeleton variant='rounded' height={100} />
+                <Skeleton variant='rounded' height={300} />
+                <Skeleton variant='rounded' height={400} />
+              </Stack>
+            ) : (
+              <SectionErrorBoundary sectionName='agency-ico-tab' description='No pudimos cargar las métricas ICO.'>
+                <AgencyIcoEngineView data={icoData} onComputeLive={handleComputeLive} computingLive={icoLoading} />
               </SectionErrorBoundary>
             )}
           </TabPanel>

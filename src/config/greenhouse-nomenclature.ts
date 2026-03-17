@@ -77,7 +77,83 @@ export const GH_AGENCY = {
   col_feedback: 'Feedback',
   meta_spaces: (n: number) => `${n} Space${n !== 1 ? 's' : ''} activo${n !== 1 ? 's' : ''}`,
   meta_projects: (n: number) => `${n} proyecto${n !== 1 ? 's' : ''}`,
-  meta_sync: (label: string) => `Última sync: ${label}`
+  meta_sync: (label: string) => `Última sync: ${label}`,
+
+  // Spaces view — enhanced labels with data storytelling
+  spaces_kpi_total: 'Spaces activos',
+  spaces_kpi_rpa: 'RpA promedio',
+  spaces_kpi_otd: 'OTD promedio',
+  spaces_kpi_team: 'Equipo asignado',
+  spaces_kpi_total_detail: (n: number) =>
+    `${n} Space${n !== 1 ? 's' : ''} con operación activa`,
+  spaces_kpi_rpa_detail: (v: number | null) =>
+    v === null ? 'Sin datos de revisiones'
+    : v <= 1.5 ? 'Dentro del rango óptimo'
+    : v <= 2.5 ? 'Atención: sobre 1.5 revisiones'
+    : 'Crítico: sobre 2.5 revisiones',
+  spaces_kpi_otd_detail: (v: number | null) =>
+    v === null ? 'Sin datos de entrega'
+    : v >= 90 ? 'Cumplimiento dentro de meta'
+    : v >= 70 ? 'Atención: bajo 90%'
+    : 'Crítico: bajo 70%',
+  spaces_kpi_team_detail: (members: number, fte: number) =>
+    `${members} persona${members !== 1 ? 's' : ''} · ${fte.toFixed(1)} FTE dedicados`,
+  spaces_chart_rpa_title: 'RpA por Space',
+  spaces_chart_rpa_subtitle: 'Revisiones promedio por activo. Menos es mejor.',
+  spaces_chart_health_title: 'Salud operativa',
+  spaces_chart_health_subtitle: 'Spaces según su semáforo de salud',
+  spaces_filter_health: 'Salud',
+  spaces_filter_health_all: 'Todos',
+  spaces_filter_health_optimal: 'Óptimo',
+  spaces_filter_health_attention: 'Atención',
+  spaces_filter_health_critical: 'Crítico',
+  spaces_view_table: 'Tabla',
+  spaces_view_cards: 'Tarjetas',
+  spaces_col_projects: 'Proyectos',
+  spaces_col_team: 'Equipo',
+  spaces_col_health: 'Salud',
+
+  // ICO Engine tab
+  ico_title: 'ICO Engine',
+  ico_subtitle: 'Métricas de Intelligent Creative Operations por Space',
+  ico_kpi_rpa: 'RpA Promedio',
+  ico_kpi_otd: 'OTD%',
+  ico_kpi_ftr: 'FTR%',
+  ico_kpi_throughput: 'Throughput',
+  ico_kpi_cycle_time: 'Ciclo promedio',
+  ico_kpi_stuck: 'Activos estancados',
+  ico_kpi_velocity: 'Velocidad pipeline',
+  ico_empty_title: 'Aún no hay métricas ICO',
+  ico_empty_description: 'El engine calculará las métricas automáticamente después de la próxima sincronización nocturna. También puedes calcular en vivo.',
+  ico_compute_live: 'Calcular en vivo',
+  ico_col_space: 'Space',
+  ico_col_rpa: 'RpA',
+  ico_col_otd: 'OTD%',
+  ico_col_ftr: 'FTR%',
+  ico_col_throughput: 'Throughput',
+  ico_col_cycle: 'Ciclo (días)',
+  ico_col_stuck: 'Estancados',
+  ico_col_zone: 'Estado',
+  ico_period_label: (month: number, year: number) => {
+    const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
+    return `${MONTHS[month - 1]} ${year}`
+  },
+
+  // Stuck assets drawer
+  ico_stuck_drawer_title: 'Activos estancados',
+  ico_stuck_col_task: 'Activo',
+  ico_stuck_col_phase: 'Fase CSC',
+  ico_stuck_col_days: 'Días detenido',
+  ico_stuck_col_severity: 'Severidad',
+  ico_stuck_severity_warning: 'Advertencia',
+  ico_stuck_severity_danger: 'Crítico',
+  ico_stuck_empty: 'No hay activos estancados en este Space',
+
+  // RPA trend
+  ico_rpa_trend_title: 'Evolución RpA',
+  ico_rpa_trend_subtitle: 'Promedio mensual de revisiones por activo por Space',
+  ico_rpa_trend_empty: 'Aún no hay suficiente historial para mostrar tendencias.'
 } as const
 
 export const GH_LABELS = {
