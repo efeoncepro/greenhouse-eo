@@ -80,6 +80,9 @@ export const shouldFallbackFromIdentityPostgres = (error: unknown) => {
     message.includes('ECONNREFUSED') ||
     message.includes('connection refused') ||
     message.includes('does not exist') ||
+    message.includes('password authentication failed') ||
+    message.includes('timeout expired') ||
+    message.includes('ENOTFOUND') ||
     (message.includes('relation') && message.includes('does not exist'))
   )
 }
