@@ -40,6 +40,130 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-18 — Identity Reconciliation Service + Person Activity ICO merge
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Construir un servicio escalable de reconciliación de identidades entre source systems (Notion, extensible a HubSpot/Azure AD) y team members de Greenhouse.
+- Descubrimiento automático de IDs no vinculados, matching por señales con scoring de confianza, auto-link para alta confianza, cola de propuestas para revisión admin.
+- Enriquecimiento del discovery con `responsable_texto` como fallback de nombres cuando Notion devuelve UUIDs para usuarios externos/invitados.
+- Merge de métricas ICO Engine en el tab Activity de Person 360.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Staging (Vercel) + Cloud SQL (greenhouse_sync schema)
+
+### Archivos tocados
+
+**Reconciliation engine (NEW):**
+- `src/lib/identity/reconciliation/types.ts` — tipos, thresholds, interfaces
+- `src/lib/identity/reconciliation/normalize.ts` — normalización de nombres, Levenshtein
+- `src/lib/identity/reconciliation/discovery-notion.ts` — descubrimiento de Notion IDs no vinculados con fallback `responsable_texto`
+- `src/lib/identity/reconciliation/matching-engine.ts` — matching source-agnostic con scoring de confianza
+- `src/lib/identity/reconciliation/apply-link.ts` — escritura de links en BigQuery + Postgres
+- `src/lib/identity/reconciliation/reconciliation-service.ts` — orquestador: discover → match → propose/auto-link
+
+**Admin API (NEW):**
+- `src/app/api/admin/identity/reconciliation/route.ts` — GET proposals + POST trigger run
+- `src/app/api/admin/identity/reconciliation/[proposalId]/resolve/route.ts` — resolve (approve/reject/dismiss/reassign)
+- `src/app/api/admin/identity/reconciliation/stats/route.ts` — summary por source_system y status
+
+**Postgres DDL + Scripts (NEW):**
+- `scripts/setup-identity-reconciliation.sql` — DDL tabla `greenhouse_sync.identity_reconciliation_proposals`
+- `scripts/setup-identity-reconciliation.ts` — runner del DDL
+- `scripts/run-identity-reconciliation.ts` — ejecución CLI del reconciliation service
+
+**Pipeline integration (MODIFIED):**
+- `src/lib/sync/sync-notion-conformed.ts` — tail step no-blocking de reconciliación al final del sync
+
+### Verificación
+- DDL ejecutado en Cloud SQL: tabla creada en `greenhouse_sync`
+- TypeScript: `tsc --noEmit` limpio
+- Dry run: 13 IDs descubiertos, 0 auto-linked (todos externos), 1 fuzzy match (Daniela I → Daniela Ferreira, rechazado por ser persona distinta)
+- Run real: 13 propuestas creadas. 1 rechazada (Daniela Infante, ex-colaboradora). 12 descartadas (ex-colaboradores externos).
+- Vercel deploy: staging OK
+
+### Riesgos o pendientes
+- **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion. Requiere vinculación manual o verificación en el workspace de Notion.
+- Cuando se agreguen nuevos team members, el próximo sync-conformed automáticamente descubrirá y propondrá vínculos.
+- Para agregar HubSpot: crear `discovery-hubspot.ts` con la misma interfaz `DiscoveredIdentity`. No requiere cambios en schema ni API.
+
+## 2026-03-18 — Campaign 360: baseline canonica v2
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la idea original de `Campaign 360` a una baseline de implementacion alineada con la arquitectura viva del proyecto.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentacion operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Campaign_360_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Campaign_360.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/tasks/to-do/Greenhouse_Account_360_Object_Model_v1.md`
+  - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La task original de `Campaign 360` sigue teniendo mucho detalle historico de infraestructura; ahora ya esta guardraileada, pero una futura pasada deberia depurarla o absorberla por completo en la `v2`.
+- Falta decidir, cuando se implemente, si `Campaign` tendra una serving view explicita `campaign_360` desde fase 1 o si eso queda para fase 2.
+
+## 2026-03-18 — Documentación: normalización de índice y jerarquía de lectura
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Alinear la documentación viva después de la actualización reciente de Claude Code, para que tasks e índices no contradigan la arquitectura actual.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `docs/tasks/complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md`
+- `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md`
+- `docs/tasks/to-do/CODEX_TASK_Tenant_Notion_Mapping.md`
+- `changelog.md`
+
+### Verificación
+- Revisión manual de consistencia entre:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+  - `docs/tasks/**`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- `Greenhouse_ICO_Engine_v1.md` y `CODEX_TASK_Tenant_Notion_Mapping.md` ya quedaron con guardrails de lectura, pero siguen teniendo secciones históricas largas que convendría depurar en una pasada posterior.
+- Queda pendiente reconciliar de forma definitiva la historia documental entre `space_notion_sources`, `notion_workspaces` y `space_property_mappings`.
+- `Handoff.md` sigue sobredimensionado para su propósito de snapshot; esta pasada no intentó compactarlo.
+
 ## 2026-03-18 — ICO Engine: Context-Agnostic Metrics Service + Person ICO Tab
 
 ### Agente
