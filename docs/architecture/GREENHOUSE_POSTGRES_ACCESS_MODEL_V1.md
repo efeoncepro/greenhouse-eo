@@ -82,6 +82,8 @@ Each operational domain must live in its own schema:
 - `greenhouse_hr`
 - `greenhouse_payroll`
 - `greenhouse_finance`
+- `greenhouse_delivery` — runtime projection of external source data (tasks, projects, sprints) + config tables (space_property_mappings)
+- `greenhouse_crm` — runtime projection of CRM data (companies, deals, contacts)
 - future: `greenhouse_ai`, `greenhouse_access`, etc.
 
 Each domain schema must follow this pattern:

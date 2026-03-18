@@ -199,6 +199,7 @@ Current tables:
 - `projects`
 - `sprints`
 - `tasks`
+- `space_property_mappings` — config table for per-Space Notion property → conformed field mappings
 
 Important fields:
 - `notion_project_id`
@@ -210,6 +211,12 @@ Core rule:
 - one `Notion project database` belongs to one tenant delivery workspace
 - that database contains project rows, tasks and sprints
 - a `Notion project page` is not the tenant; it is a delivery object inside the tenant workspace
+
+`space_property_mappings` enables config-driven normalization:
+- stores how each Space's Notion property names map to conformed field names
+- includes type coercion rules (16 built-in rules for handling Notion type heterogeneity)
+- Spaces without entries use hardcoded default mapping (backward compatible)
+- populated via `scripts/notion-schema-discovery.ts` during Space onboarding
 
 ### `greenhouse_sync`
 

@@ -101,6 +101,13 @@ Rules:
 - unify naming and types
 - centralize source cleanup logic instead of repeating it in endpoints
 
+Implementation status (2026-03-18):
+- `greenhouse_conformed.delivery_tasks` — fully implemented, config-driven property mappings
+- `greenhouse_conformed.crm_companies` / `crm_deals` — implemented via HubSpot sync
+- Property normalization is **config-driven**: `greenhouse_delivery.space_property_mappings` (Postgres) stores per-Space property name → conformed field mappings with type coercion rules
+- Spaces without explicit config fall back to hardcoded default mapping (backward compatible)
+- See `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` § "Conformed Data Layer" for full details
+
 ### Layer C. Core / Canonical
 
 Purpose:
@@ -332,16 +339,26 @@ Provisioned runtime:
 Initial database objects created:
 - database: `greenhouse_app`
 - application user: `greenhouse_app`
+- migration user: `greenhouse_migrator_user` (DDL permissions)
 - canonical PostgreSQL schemas:
   - `greenhouse_core`
   - `greenhouse_serving`
   - `greenhouse_sync`
+  - `greenhouse_delivery`
+  - `greenhouse_hr`
+  - `greenhouse_finance`
+  - `greenhouse_crm`
 - initial serving views:
   - `client_360`
   - `member_360`
   - `provider_360`
   - `user_360`
   - `client_capability_360`
+- delivery projection tables:
+  - `greenhouse_delivery.tasks` — runtime projection of conformed delivery tasks
+  - `greenhouse_delivery.projects` — runtime projection of conformed delivery projects
+  - `greenhouse_delivery.sprints` — runtime projection of conformed delivery sprints
+  - `greenhouse_delivery.space_property_mappings` — config table for per-Space Notion property → conformed field mappings (added 2026-03-18)
 
 Initial secret material stored in Secret Manager:
 - `greenhouse-pg-dev-postgres-password`

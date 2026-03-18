@@ -34,8 +34,16 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
+    dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
+    dt.is_rescheduled,
+    dt.client_change_round_final,
+    dt.rpa_value,
+    dt.open_frame_comments,
+    dt.client_review_open,
+    dt.workflow_review_open,
+    dt.blocker_count,
     dt.due_date,
     dt.completed_at,
     dt.last_edited_time,
@@ -182,6 +190,8 @@ const buildStuckAssetsDetailTable = (projectId: string) => `
     hours_since_update FLOAT64,
     days_since_update FLOAT64,
     severity STRING,
+    rpa_value FLOAT64,
+    client_review_open BOOL,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, severity
