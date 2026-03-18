@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runIcoEngineQuery, getIcoEngineProjectId, toNumber } from './shared'
+import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL, EXCLUDED_STATUSES_SQL } from './shared'
 import { ensureIcoEngineInfrastructure, ICO_DATASET, ENGINE_VERSION } from './schema'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -11,6 +11,7 @@ interface MaterializationResult {
   stuckAssetsWritten: number
   rpaTrendRowsWritten: number
   projectMetricsWritten: number
+  memberMetricsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
@@ -22,11 +23,6 @@ interface CscDistributionRow {
   fase_csc: string
   task_count: unknown
 }
-
-// ─── Done / Excluded Status Lists ───────────────────────────────────────────
-
-const DONE_STATUSES = `'Listo','Done','Finalizado','Completado'`
-const EXCLUDED_STATUSES = `'Listo','Done','Finalizado','Completado','Archivadas','Cancelada','Canceled','Cancelled'`
 
 // ─── Materialization ────────────────────────────────────────────────────────
 
@@ -55,72 +51,17 @@ export const materializeMonthlySnapshots = async (
         @periodYear AS period_year,
         @periodMonth AS period_month,
 
-        -- RPA: average of non-zero rpa_value for completed tasks in period
-        ROUND(AVG(CASE
-          WHEN completed_at IS NOT NULL AND rpa_value > 0
-          THEN SAFE_CAST(rpa_value AS FLOAT64)
-        END), 2) AS rpa_avg,
-
-        -- OTD: on-time / (on-time + late)
-        ROUND(SAFE_DIVIDE(
-          COUNTIF(delivery_signal = 'on_time'),
-          COUNTIF(delivery_signal IN ('on_time', 'late'))
-        ) * 100, 1) AS otd_pct,
-
-        -- FTR: no client changes / total completed
-        ROUND(SAFE_DIVIDE(
-          COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
-          COUNTIF(completed_at IS NOT NULL)
-        ) * 100, 1) AS ftr_pct,
-
-        -- Cycle time avg (completed only)
-        ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
-
-        -- Cycle time P50
-        ROUND(APPROX_QUANTILES(
-          CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END, 100
-        )[SAFE_OFFSET(50)], 1) AS cycle_time_p50_days,
-
-        -- Cycle time variance (stddev)
-        ROUND(STDDEV(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_variance,
-
-        -- Throughput (completed count)
-        COUNTIF(completed_at IS NOT NULL) AS throughput_count,
-
-        -- Pipeline velocity (completed / active)
-        ROUND(SAFE_DIVIDE(
-          COUNTIF(completed_at IS NOT NULL),
-          COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES}))
-        ), 2) AS pipeline_velocity,
-
-        -- Stuck assets
-        COUNTIF(is_stuck = TRUE) AS stuck_asset_count,
-        ROUND(SAFE_DIVIDE(
-          COUNTIF(is_stuck = TRUE),
-          COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES}))
-        ) * 100, 1) AS stuck_asset_pct,
+        ${buildMetricSelectSQL()},
 
         -- Will be populated in step 2
         CAST(NULL AS STRING) AS csc_distribution,
-
-        -- Context
-        COUNT(*) AS total_tasks,
-        COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
-        COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES})) AS active_tasks,
 
         CURRENT_TIMESTAMP() AS computed_at,
         @engineVersion AS engine_version
 
       FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
       WHERE space_id IS NOT NULL
-        AND (
-          (completed_at IS NOT NULL
-           AND EXTRACT(YEAR FROM completed_at) = @periodYear
-           AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
-          OR
-          (completed_at IS NULL
-           AND task_status NOT IN (${DONE_STATUSES}))
-        )
+        AND (${buildPeriodFilterSQL()})
       GROUP BY space_id
     ) AS source
     ON target.snapshot_id = source.snapshot_id
@@ -176,7 +117,7 @@ export const materializeMonthlySnapshots = async (
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
     WHERE space_id IS NOT NULL
       AND completed_at IS NULL
-      AND task_status NOT IN (${DONE_STATUSES})
+      AND task_status NOT IN (${DONE_STATUSES_SQL})
       AND fase_csc != 'otros'
     GROUP BY space_id, fase_csc
     ORDER BY space_id, fase_csc
@@ -241,12 +182,16 @@ export const materializeMonthlySnapshots = async (
   // Step 6: Materialize project-level metrics for current period
   const projectMetricsWritten = await materializeProjectMetrics(projectId, periodYear, periodMonth)
 
+  // Step 7: Materialize member-level metrics for current period
+  const memberMetricsWritten = await materializeMemberMetrics(projectId, periodYear, periodMonth)
+
   return {
     spacesProcessed: totalSnapshots,
     snapshotsWritten: totalSnapshots,
     stuckAssetsWritten,
     rpaTrendRowsWritten,
     projectMetricsWritten,
+    memberMetricsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,
@@ -346,48 +291,19 @@ const materializeProjectMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_project\`
       (project_source_id, space_id, period_year, period_month,
-       rpa_avg, rpa_median, ftr_pct, total_tasks, completed_tasks,
+       rpa_avg, rpa_median, otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-       otd_pct, throughput_count, stuck_asset_count, materialized_at)
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       materialized_at)
     SELECT
       project_source_id,
       space_id,
       @periodYear AS period_year,
       @periodMonth AS period_month,
 
-      ROUND(AVG(CASE
-        WHEN completed_at IS NOT NULL AND rpa_value > 0
-        THEN SAFE_CAST(rpa_value AS FLOAT64)
-      END), 2) AS rpa_avg,
-
-      ROUND(APPROX_QUANTILES(
-        CASE WHEN completed_at IS NOT NULL AND rpa_value > 0
-        THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
-      )[SAFE_OFFSET(50)], 2) AS rpa_median,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
-        COUNTIF(completed_at IS NOT NULL)
-      ) * 100, 1) AS ftr_pct,
-
-      COUNT(*) AS total_tasks,
-      COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
-
-      ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
-
-      ROUND(APPROX_QUANTILES(
-        CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END, 100
-      )[SAFE_OFFSET(50)], 1) AS cycle_time_p50_days,
-
-      ROUND(STDDEV(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_variance,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(delivery_signal = 'on_time'),
-        COUNTIF(delivery_signal IN ('on_time', 'late'))
-      ) * 100, 1) AS otd_pct,
-
-      COUNTIF(completed_at IS NOT NULL) AS throughput_count,
-      COUNTIF(is_stuck = TRUE) AS stuck_asset_count,
+      ${buildMetricSelectSQL()},
 
       CURRENT_TIMESTAMP() AS materialized_at
 
@@ -395,20 +311,61 @@ const materializeProjectMetrics = async (
     WHERE space_id IS NOT NULL
       AND project_source_id IS NOT NULL
       AND project_source_id != ''
-      AND (
-        (completed_at IS NOT NULL
-          AND EXTRACT(YEAR FROM completed_at) = @periodYear
-          AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
-        OR
-        (completed_at IS NULL
-          AND task_status NOT IN (${DONE_STATUSES}))
-      )
+      AND (${buildPeriodFilterSQL()})
     GROUP BY project_source_id, space_id
   `, { periodYear, periodMonth })
 
   const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
     SELECT COUNT(*) AS cnt
     FROM \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(countRows[0]?.cnt)
+}
+
+// ─── Member-Level Metrics Materialization ────────────────────────────────────
+
+const materializeMemberMetrics = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  // Delete current period rows then re-insert (idempotent)
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+      (member_id, period_year, period_month,
+       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       materialized_at)
+    SELECT
+      member_id,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+
+      ${buildMetricSelectSQL()},
+
+      CURRENT_TIMESTAMP() AS materialized_at
+
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
+         UNNEST(te.assignee_member_ids) AS member_id
+    WHERE member_id IS NOT NULL
+      AND member_id != ''
+      AND (${buildPeriodFilterSQL()})
+    GROUP BY member_id
+  `, { periodYear, periodMonth })
+
+  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
     WHERE period_year = @periodYear AND period_month = @periodMonth
   `, { periodYear, periodMonth })
 

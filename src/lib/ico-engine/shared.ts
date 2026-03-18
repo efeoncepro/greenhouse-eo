@@ -68,6 +68,102 @@ export const toTimestampString = (value: { value?: string } | string | null): st
   return typeof value.value === 'string' ? value.value : null
 }
 
+// ─── ICO Dimension System ───────────────────────────────────────────────────
+
+/**
+ * Supported dimensions for ICO context queries.
+ * Column names come from v_tasks_enriched — the allowlist prevents SQL injection.
+ */
+export const ICO_DIMENSIONS = {
+  space:   { column: 'space_id' },
+  project: { column: 'project_source_id' },
+  member:  { column: 'assignee_member_id' },
+  client:  { column: 'client_id' },
+  sprint:  { column: 'sprint_source_id' }
+} as const
+
+export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
+
+// ─── Canonical Status Lists ────────────────────────────────────────────────
+
+export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado'`
+export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Archivadas','Cancelada','Canceled','Cancelled'`
+
+// ─── Shared Metric SQL Builders ────────────────────────────────────────────
+
+/**
+ * Canonical metric SELECT expressions used by all ICO computations.
+ * Defined ONCE — every materializer and live query reuses this.
+ */
+export const buildMetricSelectSQL = () => `
+    -- RPA: average of non-zero rpa_value for completed tasks in period
+    ROUND(AVG(CASE
+      WHEN completed_at IS NOT NULL AND rpa_value > 0
+      THEN SAFE_CAST(rpa_value AS FLOAT64)
+    END), 2) AS rpa_avg,
+
+    -- RPA median
+    ROUND(APPROX_QUANTILES(
+      CASE WHEN completed_at IS NOT NULL AND rpa_value > 0
+      THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
+    )[SAFE_OFFSET(50)], 2) AS rpa_median,
+
+    -- OTD: on-time / (on-time + late)
+    ROUND(SAFE_DIVIDE(
+      COUNTIF(delivery_signal = 'on_time'),
+      COUNTIF(delivery_signal IN ('on_time', 'late'))
+    ) * 100, 1) AS otd_pct,
+
+    -- FTR: no client changes / total completed
+    ROUND(SAFE_DIVIDE(
+      COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
+      COUNTIF(completed_at IS NOT NULL)
+    ) * 100, 1) AS ftr_pct,
+
+    -- Cycle time avg (completed only)
+    ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
+
+    -- Cycle time P50
+    ROUND(APPROX_QUANTILES(
+      CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END, 100
+    )[SAFE_OFFSET(50)], 1) AS cycle_time_p50_days,
+
+    -- Cycle time variance (stddev)
+    ROUND(STDDEV(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_variance,
+
+    -- Throughput (completed count)
+    COUNTIF(completed_at IS NOT NULL) AS throughput_count,
+
+    -- Pipeline velocity (completed / active)
+    ROUND(SAFE_DIVIDE(
+      COUNTIF(completed_at IS NOT NULL),
+      COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+    ), 2) AS pipeline_velocity,
+
+    -- Stuck assets
+    COUNTIF(is_stuck = TRUE) AS stuck_asset_count,
+    ROUND(SAFE_DIVIDE(
+      COUNTIF(is_stuck = TRUE),
+      COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+    ) * 100, 1) AS stuck_asset_pct,
+
+    -- Context
+    COUNT(*) AS total_tasks,
+    COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
+    COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL})) AS active_tasks`
+
+/**
+ * Canonical period + active tasks WHERE filter.
+ * Uses @periodYear and @periodMonth query parameters.
+ */
+export const buildPeriodFilterSQL = () => `
+    (completed_at IS NOT NULL
+      AND EXTRACT(YEAR FROM completed_at) = @periodYear
+      AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
+    OR
+    (completed_at IS NULL
+      AND task_status NOT IN (${DONE_STATUSES_SQL}))`
+
 // ─── Query Runner ───────────────────────────────────────────────────────────
 
 export const runIcoEngineQuery = async <T>(query: string, params?: Record<string, unknown>): Promise<T[]> => {

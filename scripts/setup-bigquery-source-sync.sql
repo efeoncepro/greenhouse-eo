@@ -267,6 +267,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_tasks` 
   task_priority STRING,
   assignee_source_id STRING,
   assignee_member_id STRING,
+  assignee_member_ids ARRAY<STRING>,
   completion_label STRING,
   delivery_compliance STRING,
   days_late INT64,

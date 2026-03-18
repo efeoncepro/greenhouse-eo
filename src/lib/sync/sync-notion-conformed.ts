@@ -161,6 +161,19 @@ const insertBigQueryRows = async (dataset: string, table: string, rows: Record<s
   await bq.dataset(dataset).table(table).insert(rows)
 }
 
+/** Ensure delivery_tasks has the assignee_member_ids ARRAY column (idempotent). */
+const ensureMultiAssigneeColumn = async (projectId: string) => {
+  const bq = getBigQueryClient()
+
+  try {
+    await bq.query({
+      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS assignee_member_ids ARRAY<STRING>`
+    })
+  } catch {
+    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  }
+}
+
 // ─── Main Sync Function ─────────────────────────────────────────────────────
 
 export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
@@ -296,6 +309,9 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     const projectSourceId = row.proyecto_ids?.[0] || null
     const sprintSourceId = row.sprint_ids?.[0] || null
     const assigneeSourceId = row.responsables_ids?.[0] || null
+    const assigneeMemberIds = (row.responsables_ids || [])
+      .map((id: string) => notionMemberMap.get(id))
+      .filter((mid): mid is string => !!mid)
     const projectDatabaseSourceId =
       (projectSourceId ? projectDatabaseSourceMap.get(projectSourceId) || null : null) ||
       toNullableString(row._source_database_id)
@@ -318,6 +334,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       task_priority: toNullableString(row.prioridad),
       assignee_source_id: assigneeSourceId,
       assignee_member_id: assigneeSourceId ? (notionMemberMap.get(assigneeSourceId) || null) : null,
+      assignee_member_ids: assigneeMemberIds.length > 0 ? assigneeMemberIds : null,
       completion_label: toNullableString(row.completitud),
       delivery_compliance: toNullableString(row.cumplimiento),
       days_late: toNumber(row['días_de_retraso']),
@@ -403,6 +420,9 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   }
 
   const bq = getBigQueryClient()
+
+  // Ensure multi-assignee column exists before inserting
+  await ensureMultiAssigneeColumn(projectId)
 
   await Promise.all([
     bq.query({ query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE` }),

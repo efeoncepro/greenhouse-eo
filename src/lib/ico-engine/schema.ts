@@ -34,6 +34,7 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
+    COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], [])) AS assignee_member_ids,
     dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
@@ -231,18 +232,49 @@ const buildMetricsByProjectTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    otd_pct FLOAT64,
     ftr_pct FLOAT64,
-    total_tasks INT64,
-    completed_tasks INT64,
     cycle_time_avg_days FLOAT64,
     cycle_time_p50_days FLOAT64,
     cycle_time_variance FLOAT64,
-    otd_pct FLOAT64,
     throughput_count INT64,
+    pipeline_velocity FLOAT64,
     stuck_asset_count INT64,
+    stuck_asset_pct FLOAT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, project_source_id
+`
+
+/**
+ * Member-level metrics. Same structure as metrics_by_project but keyed by member_id.
+ * Uses UNNEST(assignee_member_ids) to credit tasks to all assignees.
+ */
+const buildMetricsByMemberTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.metrics_by_member\` (
+    member_id STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    rpa_avg FLOAT64,
+    rpa_median FLOAT64,
+    otd_pct FLOAT64,
+    ftr_pct FLOAT64,
+    cycle_time_avg_days FLOAT64,
+    cycle_time_p50_days FLOAT64,
+    cycle_time_variance FLOAT64,
+    throughput_count INT64,
+    pipeline_velocity FLOAT64,
+    stuck_asset_count INT64,
+    stuck_asset_pct FLOAT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
+    materialized_at TIMESTAMP
+  )
+  CLUSTER BY member_id
 `
 
 /**
@@ -293,7 +325,7 @@ export const ensureIcoEngineInfrastructure = async () => {
           WHERE table_name IN (
             'metric_snapshots_monthly', 'ai_metric_scores',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
-            'status_phase_config'
+            'metrics_by_member', 'status_phase_config'
           )
         `
       })
@@ -308,6 +340,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
         ['rpa_trend', buildRpaTrendTable(projectId)],
         ['metrics_by_project', buildMetricsByProjectTable(projectId)],
+        ['metrics_by_member', buildMetricsByMemberTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 
