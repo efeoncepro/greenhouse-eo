@@ -4,12 +4,14 @@ import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { DiscoveredIdentity } from './types'
+import { isUuidAsName } from './normalize'
 
 // ── Raw Notion user from BigQuery ─────────────────────────────────────
 
 interface RawNotionUser {
   source_object_id: string
   source_display_name: string | null
+  text_display_name: string | null
   occurrence_count: number
 }
 
@@ -23,19 +25,37 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
   const bq = getBigQueryClient()
   const projectId = getBigQueryProjectId()
 
-  // 1. All unique Notion person IDs + display names from task responsables
+  // 1. All unique Notion person IDs + display names from task responsables.
+  //    responsables_names often stores UUIDs for external/guest users.
+  //    responsable_texto has the real comma-separated names. We extract
+  //    the positional name by matching the UUID's position in the
+  //    responsables comma-separated field against responsable_texto.
   const [allUsersRows] = await bq.query({
     query: `
+      WITH raw AS (
+        SELECT
+          rid AS source_object_id,
+          rname AS source_display_name,
+          -- Extract positional name from responsable_texto
+          -- responsables = "uuid1, uuid2", responsable_texto = "Name1, Name2"
+          CASE
+            WHEN t.responsable_texto IS NOT NULL AND t.responsables IS NOT NULL
+            THEN TRIM(SPLIT(t.responsable_texto, ',')[SAFE_OFFSET(idx)])
+            ELSE NULL
+          END AS text_display_name
+        FROM \`${projectId}.notion_ops.tareas\` t,
+             UNNEST(COALESCE(t.responsables_ids, t.responsable_ids, ARRAY<STRING>[])) AS rid WITH OFFSET idx
+        LEFT JOIN UNNEST(COALESCE(t.responsables_names, t.responsable_names, ARRAY<STRING>[])) AS rname WITH OFFSET nidx
+          ON idx = nidx
+        WHERE rid IS NOT NULL AND TRIM(rid) != ''
+      )
       SELECT
-        rid AS source_object_id,
-        ANY_VALUE(rname) AS source_display_name,
+        source_object_id,
+        ANY_VALUE(source_display_name) AS source_display_name,
+        ANY_VALUE(text_display_name) AS text_display_name,
         COUNT(*) AS occurrence_count
-      FROM \`${projectId}.notion_ops.tareas\` t,
-           UNNEST(COALESCE(t.responsables_ids, t.responsable_ids, ARRAY<STRING>[])) AS rid WITH OFFSET idx
-      LEFT JOIN UNNEST(COALESCE(t.responsables_names, t.responsable_names, ARRAY<STRING>[])) AS rname WITH OFFSET nidx
-        ON idx = nidx
-      WHERE rid IS NOT NULL AND TRIM(rid) != ''
-      GROUP BY rid
+      FROM raw
+      GROUP BY source_object_id
     `
   }) as [RawNotionUser[], unknown]
 
@@ -68,16 +88,25 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
     // Table may not exist yet; proceed without exclusion
   }
 
-  // 4. Filter to unlinked + unproposed
+  // 4. Filter to unlinked + unproposed, prefer text name over UUID-as-name
   return allUsersRows
     .filter(r => !linkedIds.has(r.source_object_id) && !activeProposalIds.has(r.source_object_id))
-    .map(r => ({
-      sourceSystem: 'notion' as const,
-      sourceObjectType: 'person',
-      sourceObjectId: r.source_object_id,
-      sourceDisplayName: r.source_display_name || null,
-      sourceEmail: null,
-      discoveredIn: 'notion_ops.tareas.responsables_ids',
-      occurrenceCount: Number(r.occurrence_count)
-    }))
+    .map(r => {
+      // When responsables_names has the UUID echoed back, fall back to
+      // the positional name extracted from responsable_texto
+      const apiName = r.source_display_name
+      const displayName = isUuidAsName(apiName) && r.text_display_name
+        ? r.text_display_name
+        : apiName
+
+      return {
+        sourceSystem: 'notion' as const,
+        sourceObjectType: 'person',
+        sourceObjectId: r.source_object_id,
+        sourceDisplayName: displayName || null,
+        sourceEmail: null,
+        discoveredIn: 'notion_ops.tareas.responsables_ids',
+        occurrenceCount: Number(r.occurrence_count)
+      }
+    })
 }
