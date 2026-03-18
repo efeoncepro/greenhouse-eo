@@ -9,6 +9,10 @@
       "schedule": "*/5 * * * *"
     },
     {
+      "path": "/api/cron/sync-conformed",
+      "schedule": "45 3 * * *"
+    },
+    {
       "path": "/api/cron/ico-materialize",
       "schedule": "15 6 * * *"
     }

@@ -48,26 +48,29 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.completed_at,
     dt.last_edited_time,
     dt.synced_at,
+    dt.created_at,
 
-    -- Derived: CSC phase
-    CASE
-      WHEN dt.task_status IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar')
-        THEN 'briefing'
-      WHEN dt.task_status IN ('En curso', 'En Curso')
-        THEN 'produccion'
-      WHEN dt.task_status LIKE 'Listo para revis%'
-        THEN 'revision_interna'
-      WHEN dt.task_status = 'Cambios Solicitados'
-        THEN 'cambios_cliente'
-      WHEN dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado')
-        THEN 'entrega'
-      ELSE 'otros'
-    END AS fase_csc,
+    -- Derived: CSC phase (configurable per space via status_phase_config, fallback to hardcoded CASE)
+    COALESCE(spc.fase_csc,
+      CASE
+        WHEN dt.task_status IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar')
+          THEN 'briefing'
+        WHEN dt.task_status IN ('En curso', 'En Curso')
+          THEN 'produccion'
+        WHEN dt.task_status LIKE 'Listo para revis%'
+          THEN 'revision_interna'
+        WHEN dt.task_status = 'Cambios Solicitados'
+          THEN 'cambios_cliente'
+        WHEN dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+          THEN 'entrega'
+        ELSE 'otros'
+      END
+    ) AS fase_csc,
 
     -- Derived: Cycle time (days from creation to completion or now)
     DATE_DIFF(
       COALESCE(DATE(dt.completed_at), CURRENT_DATE()),
-      DATE(dt.synced_at),
+      COALESCE(DATE(dt.created_at), DATE(dt.synced_at)),
       DAY
     ) AS cycle_time_days,
 
@@ -81,6 +84,7 @@ const buildTasksEnrichedView = (projectId: string) => `
         'Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled',
         'Sin empezar', 'Backlog', 'Pendiente'
       )
+      AND dt.last_edited_time IS NOT NULL
       AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), dt.last_edited_time, HOUR) >= 72
     ) AS is_stuck,
 
@@ -94,6 +98,8 @@ const buildTasksEnrichedView = (projectId: string) => `
     END AS delivery_signal
 
   FROM \`${projectId}.${CONFORMED_DATASET}.delivery_tasks\` dt
+  LEFT JOIN \`${projectId}.${ICO_DATASET}.status_phase_config\` spc
+    ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status
   WHERE dt.is_deleted = FALSE
     AND dt.task_status NOT IN ('Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled')
 `
@@ -239,6 +245,19 @@ const buildMetricsByProjectTable = (projectId: string) => `
   CLUSTER BY space_id, project_source_id
 `
 
+/**
+ * Configurable mapping of task_status → CSC phase per space.
+ * Used by v_tasks_enriched via LEFT JOIN — unmapped statuses fall back to the
+ * hardcoded CASE (Efeonce defaults).
+ */
+const buildStatusPhaseConfigTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.status_phase_config\` (
+    space_id STRING NOT NULL,
+    task_status STRING NOT NULL,
+    fase_csc STRING NOT NULL
+  )
+`
+
 // ─── Infrastructure Provisioning (Singleton Promise) ────────────────────────
 
 let ensureIcoEngineInfrastructurePromise: Promise<void> | null = null
@@ -273,7 +292,8 @@ export const ensureIcoEngineInfrastructure = async () => {
           FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.TABLES\`
           WHERE table_name IN (
             'metric_snapshots_monthly', 'ai_metric_scores',
-            'stuck_assets_detail', 'rpa_trend', 'metrics_by_project'
+            'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
+            'status_phase_config'
           )
         `
       })
@@ -287,7 +307,8 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['ai_metric_scores', buildAiMetricScoresTable(projectId)],
         ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
         ['rpa_trend', buildRpaTrendTable(projectId)],
-        ['metrics_by_project', buildMetricsByProjectTable(projectId)]
+        ['metrics_by_project', buildMetricsByProjectTable(projectId)],
+        ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 
       for (const [tableName, ddl] of tableBuilders) {

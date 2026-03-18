@@ -197,20 +197,29 @@ export const materializeMonthlySnapshots = async (
     cscBySpace.get(spaceId)![phase] = count
   }
 
-  // Update csc_distribution for each space that has data
+  // Update csc_distribution for all spaces in a single batched UPDATE
   const spacesProcessed = cscBySpace.size
   let snapshotsWritten = 0
 
-  for (const [spaceId, distribution] of cscBySpace) {
-    const snapshotId = `${spaceId}-${periodYear}-${String(periodMonth).padStart(2, '0')}`
+  if (cscBySpace.size > 0) {
+    const whenClauses: string[] = []
+    const snapshotIds: string[] = []
+
+    for (const [spaceId, distribution] of cscBySpace) {
+      const snapshotId = `${spaceId}-${periodYear}-${String(periodMonth).padStart(2, '0')}`
+      snapshotIds.push(snapshotId)
+
+      const escapedJson = JSON.stringify(distribution).replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+      whenClauses.push(`WHEN snapshot_id = '${snapshotId}' THEN '${escapedJson}'`)
+    }
 
     await runIcoEngineQuery(`
       UPDATE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-      SET csc_distribution = @cscJson
-      WHERE snapshot_id = @snapshotId
-    `, { cscJson: JSON.stringify(distribution), snapshotId })
+      SET csc_distribution = CASE ${whenClauses.join(' ')} ELSE csc_distribution END
+      WHERE snapshot_id IN UNNEST(@ids)
+    `, { ids: snapshotIds })
 
-    snapshotsWritten++
+    snapshotsWritten = cscBySpace.size
   }
 
   // Step 3: Count total snapshots written/updated this run

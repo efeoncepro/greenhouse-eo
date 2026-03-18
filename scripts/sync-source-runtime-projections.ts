@@ -798,16 +798,47 @@ const syncNotion = async (): Promise<SyncSummary> => {
       )
     ])
 
-    const clientBindings = await runBigQuery<ClientNotionBindingRow>(
-      `
-        SELECT client_id, client_name, notion_project_ids
-        FROM \`${projectId}.greenhouse.clients\`
-        WHERE notion_project_ids IS NOT NULL
-      `
+    // Primary: resolve space_id via space_notion_sources (canonical, multi-tenant)
+    const spaceNotionSources = await runGreenhousePostgresQuery<{
+      space_id: string
+      notion_db_proyectos: string
+      client_id: string | null
+    }>(
+      `SELECT sns.space_id, sns.notion_db_proyectos, s.client_id
+       FROM greenhouse_core.space_notion_sources sns
+       JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
+       WHERE sns.sync_enabled = TRUE`
     )
 
+    // Map database_id → space_id (each project reports _source_database_id)
+    const databaseSpaceMap = new Map<string, string>()
+    const databaseClientMap = new Map<string, string | null>()
+
+    for (const src of spaceNotionSources) {
+      databaseSpaceMap.set(src.notion_db_proyectos, src.space_id)
+      databaseClientMap.set(src.notion_db_proyectos, src.client_id)
+    }
+
+    // Fallback: legacy clients.notion_project_ids (if no space_notion_sources configured)
+    let preferredSpaceMap: Map<string, string> | null = null
+
+    if (databaseSpaceMap.size === 0) {
+      console.warn('[sync] No space_notion_sources found — falling back to clients.notion_project_ids')
+
+      const clientBindings = await runBigQuery<ClientNotionBindingRow>(
+        `
+          SELECT client_id, client_name, notion_project_ids
+          FROM \`${projectId}.greenhouse.clients\`
+          WHERE notion_project_ids IS NOT NULL
+        `
+      )
+
+      preferredSpaceMap = buildPreferredSpaceMap(clientBindings)
+    } else {
+      console.log(`  🗂️  Space resolution via space_notion_sources: ${spaceNotionSources.length} active source(s)`)
+    }
+
     const nowIso = new Date().toISOString()
-    const preferredSpaceMap = buildPreferredSpaceMap(clientBindings)
 
     const rawProjectRows = projects.map(row => ({
       sync_run_id: syncRunId,
@@ -871,8 +902,13 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const ownerSourceId = row.propietario_ids?.[0] || null
       const projectSourceId = toNullableString(row.notion_page_id)
       const projectDatabaseSourceId = toNullableString(row._source_database_id)
-      const spaceId = projectSourceId ? preferredSpaceMap.get(projectSourceId) || null : null
-      const clientId = spaceId && !isInternalSpaceId(spaceId) ? spaceId : null
+      // Resolve space_id: canonical (database ID → space) or legacy fallback (page ID → space)
+      const spaceId = projectDatabaseSourceId
+        ? (databaseSpaceMap.get(projectDatabaseSourceId) || preferredSpaceMap?.get(projectSourceId!) || null)
+        : (preferredSpaceMap?.get(projectSourceId!) || null)
+      const clientId = spaceId
+        ? (databaseClientMap.get(projectDatabaseSourceId!) || (!isInternalSpaceId(spaceId) ? spaceId : null))
+        : null
 
       return {
         project_source_id: projectSourceId,
@@ -1008,7 +1044,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
         payload_hash: buildPayloadHash(row),
         is_deleted: false,
         sync_run_id: syncRunId,
-        synced_at: nowIso
+        synced_at: nowIso,
+        created_at: toTimestampValue(row.created_time)
       }
 
       // Config-driven override: if this space has property mappings, apply them on top
@@ -1075,24 +1112,31 @@ const syncNotion = async (): Promise<SyncSummary> => {
       }
     })
 
-    await Promise.all([
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_projects\``,
-        location: bigQueryLocation
-      }),
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\``,
-        location: bigQueryLocation
-      }),
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_sprints\``,
-        location: bigQueryLocation
-      })
-    ])
+    // Safe DELETE pattern: only delete if we have data to replace.
+    // Uses DELETE WHERE TRUE (DML) instead of TRUNCATE (DDL) for BigQuery snapshot safety.
+    // If notion_ops returned zero tasks, skip the delete to preserve existing conformed data.
+    if (deliveryTasks.length === 0) {
+      console.warn('[sync] No delivery tasks found — skipping conformed write to preserve existing data')
+    } else {
+      await Promise.all([
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE`,
+          location: bigQueryLocation
+        }),
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` WHERE TRUE`,
+          location: bigQueryLocation
+        }),
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_sprints\` WHERE TRUE`,
+          location: bigQueryLocation
+        })
+      ])
 
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+    }
 
     let projected = 0
 
