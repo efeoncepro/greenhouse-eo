@@ -120,14 +120,36 @@ Project list and detail, sprint list and detail, and activity feed. Source data 
 
 ### ICO Engine (In-flight Creative Optimization)
 
-10 deterministic metrics: RPA, OTD, FTR, cycle time, throughput, stuck assets, and related indicators.
+Context-agnostic metrics service. 10 deterministic metrics (RPA, OTD, FTR, cycle time, throughput, stuck assets, and related indicators) computed from a single canonical SQL definition (`buildMetricSelectSQL()`) and queryable by **any dimension**: Space, Project, Member (person), Client, Sprint — and extensible to future objects (Service, Campaign) without formula duplication.
 
 Infrastructure:
-- BigQuery dataset `ico_engine` (5 tables + 2 views)
+- BigQuery dataset `ico_engine` (7 tables + 2 views)
+  - `metric_snapshots_monthly` — space-level monthly aggregates
+  - `metrics_by_project` — project-level monthly aggregates
+  - `metrics_by_member` — person-level monthly aggregates (via UNNEST of multi-assignee array)
+  - `rpa_trend` — 12-month rolling RPA by space
+  - `stuck_assets_detail` — currently stuck assets with severity
+  - `ai_metric_scores` — reserved for future AI-driven metrics
+  - `status_phase_config` — configurable CSC phase mapping
+  - `v_tasks_enriched` — enriched view on `greenhouse_conformed.delivery_tasks`
+  - `v_metric_latest` — convenience view for latest snapshot per space
 - Daily materialization via Vercel cron (6:15 AM UTC)
-- 6 API endpoints (`/api/ico-engine/*`)
+- Dimension allowlist (`ICO_DIMENSIONS` in `shared.ts`) prevents SQL injection while enabling parameterized queries
+- 9 API endpoints (`/api/ico-engine/*`):
+  - `GET /api/ico-engine/context` — **generic context endpoint**: `?dimension=space|project|member|client|sprint&value=X&year=Y&month=Z`
+  - `GET /api/ico-engine/metrics` — space metrics (materialized + live fallback)
+  - `GET /api/ico-engine/metrics/agency` — agency-wide metrics
+  - `GET /api/ico-engine/metrics/project` — project-level metrics
+  - `GET /api/ico-engine/stuck-assets` — stuck asset detail
+  - `GET /api/ico-engine/trends/rpa` — RPA trend data
+  - `GET /api/ico-engine/registry` — metric definitions
+  - `GET /api/ico-engine/health` — materialization freshness
+  - `GET /api/people/[memberId]/ico` — person-level ICO metrics (convenience)
+- Multi-assignee support: `delivery_tasks.assignee_member_ids ARRAY<STRING>` stores all Notion responsables resolved to Greenhouse member IDs; member-dimension queries use BigQuery `UNNEST` to credit all assignees
 
-Surfaces: Agency tab with charts and scorecard.
+Surfaces: Agency tab, Organization ICO tab, Person ICO tab (KPIs, CSC donut, health radar, velocity gauge).
+
+Adding a new dimension requires only: (1) column in `v_tasks_enriched`, (2) entry in `ICO_DIMENSIONS`.
 
 ### Finance Module
 

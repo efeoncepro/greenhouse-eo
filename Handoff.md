@@ -40,6 +40,93 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-18 — ICO Engine: Context-Agnostic Metrics Service + Person ICO Tab
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Refactorizar el ICO Engine de space-only a un servicio de métricas agnóstico al contexto. Agregar multi-assignee, materialización por persona, API genérica, y tab ICO en Person 360.
+
+### Rama
+- Rama usada: `develop`
+- Commit: `b7b9d80`
+
+### Ambiente objetivo
+- Preview / BigQuery (`ico_engine` dataset) / Person 360 ICO tab / Organization ICO tab / Agency ICO tab
+
+### Archivos tocados
+
+**Nuevos (3 archivos):**
+- `src/app/api/ico-engine/context/route.ts` — Generic context API: `?dimension=X&value=Y&year=Z&month=W`
+- `src/app/api/people/[memberId]/ico/route.ts` — Person ICO convenience endpoint
+- `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — Person ICO tab (KPIs, donut, radar, gauge)
+
+**Modificados (9 archivos):**
+- `src/lib/ico-engine/shared.ts` — `ICO_DIMENSIONS`, `buildMetricSelectSQL()`, `buildPeriodFilterSQL()`, status constants
+- `src/lib/ico-engine/materialize.ts` — Refactored to use shared builders + `materializeMemberMetrics()`
+- `src/lib/ico-engine/read-metrics.ts` — `IcoMetricSnapshot`, `computeMetricsByContext()`, `readMemberMetrics()`
+- `src/lib/ico-engine/schema.ts` — `metrics_by_member` DDL, `assignee_member_ids` in `v_tasks_enriched`
+- `src/lib/sync/sync-notion-conformed.ts` — Multi-assignee array + `ensureMultiAssigneeColumn()`
+- `src/types/people.ts` — Added `'ico'` to `PersonTab`
+- `src/views/greenhouse/people/helpers.ts` — Tab config + permissions
+- `src/views/greenhouse/people/PersonTabs.tsx` — Registered ICO tab
+- `scripts/setup-bigquery-source-sync.sql` — Added `assignee_member_ids` column
+
+### Cambios realizados
+
+**Phase 0 — Shared SQL Builders:**
+- Fórmulas de métricas extraídas a `buildMetricSelectSQL()` (definidas UNA vez, consumidas por 5 funciones)
+- `buildPeriodFilterSQL()` para filtro canónico de período
+- `ICO_DIMENSIONS` allowlist con dimensiones válidas
+- Refactored `materialize.ts` y `computeSpaceMetricsLive` para usar builders compartidos
+- Corregido mismatch de columnas en `metrics_by_project` INSERT (faltaban `pipeline_velocity`, `stuck_asset_pct`, `active_tasks`)
+
+**Phase 1 — Generalized Types + Context Query:**
+- `IcoMetricSnapshot` — tipo genérico con `dimension`, `dimensionValue`, `dimensionLabel`
+- `computeMetricsByContext(dimensionKey, dimensionValue, year, month)` — live compute para cualquier dimensión
+- Member dimension usa UNNEST en `assignee_member_ids` para acreditar todos los asignados
+
+**Phase 2 — Multi-Assignee Enrichment:**
+- `assignee_member_ids ARRAY<STRING>` en `delivery_tasks` (todas las resoluciones de `responsables_ids`)
+- `v_tasks_enriched` expone con fallback: `COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], []))`
+- `ensureMultiAssigneeColumn()` agrega columna idempotentemente via ALTER TABLE
+
+**Phase 3 — Person-Level Materialization:**
+- `metrics_by_member` DDL (clustered by member_id) registrado en `ensureIcoEngineInfrastructure()`
+- `materializeMemberMetrics()` — DELETE period + INSERT desde UNNEST(assignee_member_ids)
+- `readMemberMetrics()` — lectura desde caché materializado
+
+**Phase 4 — Generic Context API:**
+- `GET /api/ico-engine/context?dimension=space|project|member|client|sprint&value=X&year=Y&month=Z`
+- Valida dimensión contra allowlist, intenta caché materializado, fallback a live compute
+
+**Phase 5 — Person ICO Tab:**
+- `PersonIcoTab.tsx` con KPIs, CSC donut, health radar, velocity gauge
+- Period selectors (mes/año)
+- `GET /api/people/[memberId]/ico` convenience endpoint
+- Tab registrado en `PersonTabs.tsx`, permisos `efeonce_admin` + `efeonce_operations`
+
+### Verificación
+- `npx tsc --noEmit` — 0 errores TypeScript
+- Pushed to `origin/develop`
+
+### Riesgos o pendientes
+- La tabla `metrics_by_member` no tiene datos hasta que se ejecute la materialización (cron 6:15 AM UTC) después de un sync que pueble `assignee_member_ids`. Mientras tanto, la API cae a live compute.
+- BigQuery `ALTER TABLE ADD COLUMN IF NOT EXISTS` requiere que el service account tenga permisos de TABLE admin — si falla, el sync continúa (la columna no se crea) y los datos multi-assignee no se guardan.
+- Agregar dimensiones futuras: solo 3 pasos (columna en view, entrada en allowlist, opcionalmente tabla de materialización).
+
+### Documentación actualizada
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` — ICO Engine section reescrita
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` — `ico_engine` dataset completo + `assignee_member_ids`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — Layer D con tablas ICO
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` — Multi-assignee enrichment
+- `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md` — Apéndice B: Context-Agnostic Metrics Service
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md` — ICO Engine endpoints table
+- `docs/CHANGELOG.md` — Nueva entrada
+
+---
+
 ## 2026-03-17 — ICO Engine: Implementación completa (Groups A–E)
 
 ### Agente

@@ -1841,6 +1841,144 @@ src/lib/capability-queries/
 
 ---
 
-*Efeonce Greenhouse™ • ICO Engine Spec v1.0*
+## Apéndice B: Context-Agnostic Metrics Service (2026-03-18)
+
+> Este apéndice documenta la evolución del ICO Engine de un sistema space-only a un servicio de métricas
+> agnóstico al contexto, capaz de responder consultas para cualquier dimensión del modelo de datos.
+
+### B.1 Principio rector
+
+**"ICO siempre debe poderse consultar por cualquier otro objeto y entregar métricas consistentes basadas en el contexto que se le solicite."**
+
+Antes de esta refactorización, las fórmulas de métricas estaban duplicadas en 3 ubicaciones (`materializeMonthlySnapshots`, `materializeProjectMetrics`, `computeSpaceMetricsLive`), cada una hardcoded a una dimensión específica. Agregar cualquier consumidor nuevo requería copiar el SQL.
+
+### B.2 Shared SQL Metric Builder
+
+Todas las fórmulas de métricas ICO se definen **una sola vez** en `buildMetricSelectSQL()` (`src/lib/ico-engine/shared.ts`). Esta función genera el fragmento SQL canónico para las 14 columnas de métricas:
+
+```
+rpa_avg, rpa_median, otd_pct, ftr_pct,
+cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+throughput_count, pipeline_velocity,
+stuck_asset_count, stuck_asset_pct,
+total_tasks, completed_tasks, active_tasks
+```
+
+`buildPeriodFilterSQL()` genera el WHERE canónico para filtrar por período + activos.
+
+Consumidores: `materializeMonthlySnapshots`, `materializeProjectMetrics`, `materializeMemberMetrics`, `computeSpaceMetricsLive`, `computeMetricsByContext`.
+
+### B.3 ICO_DIMENSIONS — Allowlist de dimensiones
+
+```typescript
+export const ICO_DIMENSIONS = {
+  space:   { column: 'space_id' },
+  project: { column: 'project_source_id' },
+  member:  { column: 'assignee_member_id' },
+  client:  { column: 'client_id' },
+  sprint:  { column: 'sprint_source_id' },
+} as const
+```
+
+El allowlist previene SQL injection mientras habilita consultas parametrizadas. La columna se inyecta via interpolación de string (segura — proviene del allowlist); el valor se pasa como parámetro de BigQuery.
+
+### B.4 computeMetricsByContext()
+
+Función genérica de cómputo en vivo para CUALQUIER dimensión:
+
+```typescript
+export const computeMetricsByContext = async (
+  dimensionKey: IcoDimensionKey,  // 'space' | 'project' | 'member' | 'client' | 'sprint'
+  dimensionValue: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<IcoMetricSnapshot | null>
+```
+
+Para la dimensión `member`, usa `UNNEST(assignee_member_ids)` para acreditar todas las asignaciones (sin doble conteo para otras dimensiones).
+
+### B.5 Multi-Assignee Enrichment
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `assignee_member_id` | `STRING` | Primer responsable de Notion resuelto a member ID (backward compat) |
+| `assignee_member_ids` | `ARRAY<STRING>` | Todos los responsables de Notion resueltos a member IDs |
+
+`v_tasks_enriched` expone `assignee_member_ids` con fallback: `COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], []))`.
+
+### B.6 Tablas materializadas nuevas
+
+| Tabla | Clave | Fuente |
+|-------|-------|--------|
+| `metrics_by_member` | `member_id + period_year + period_month` | `UNNEST(assignee_member_ids)` de `v_tasks_enriched` |
+
+Mismas columnas que `metrics_by_project` pero agrupadas por `member_id`. Se materializa en el cron diario junto con las demás tablas.
+
+### B.7 API de contexto genérico
+
+```
+GET /api/ico-engine/context?dimension=member&value=mem-xxx&year=2026&month=3
+GET /api/ico-engine/context?dimension=space&value=spc-xxx&year=2026&month=3
+GET /api/ico-engine/context?dimension=project&value=proj-xxx&year=2026&month=3
+```
+
+Valida dimensión contra `ICO_DIMENSIONS`, intenta caché materializado primero, y cae a `computeMetricsByContext()` en vivo.
+
+Retorna `IcoMetricSnapshot`:
+```typescript
+interface IcoMetricSnapshot {
+  dimension: IcoDimensionKey
+  dimensionValue: string
+  dimensionLabel: string | null
+  periodYear: number
+  periodMonth: number
+  metrics: MetricValue[]
+  cscDistribution: CscDistributionEntry[]
+  context: { totalTasks: number; completedTasks: number; activeTasks: number }
+  computedAt: string | null
+  engineVersion: string
+  source: 'materialized' | 'live'
+}
+```
+
+### B.8 Person ICO Tab
+
+Nueva pestaña ICO en Person 360:
+- Consume de `GET /api/ico-engine/context?dimension=member&value={memberId}`
+- KPIs: RpA, OTD%, FTR%, Throughput, Ciclo, Stuck assets
+- Charts: CSC donut, health radar, pipeline velocity gauge
+- Selectores de período (mes/año)
+
+Permisos: `efeonce_admin`, `efeonce_operations`.
+
+### B.9 Agregar dimensiones futuras (Service, Campaign, etc.)
+
+Solo 3 pasos necesarios:
+1. Asegurar que la columna existe en `delivery_tasks` → `v_tasks_enriched`
+2. Agregar entrada a `ICO_DIMENSIONS` en `shared.ts`
+3. Opcionalmente agregar tabla de materialización + función
+
+No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos endpoints.
+
+### B.10 Archivos modificados
+
+| Archivo | Acción |
+|---------|--------|
+| `src/lib/ico-engine/shared.ts` | `ICO_DIMENSIONS`, `buildMetricSelectSQL()`, `buildPeriodFilterSQL()`, status constants |
+| `src/lib/ico-engine/materialize.ts` | Refactored to use shared builders + `materializeMemberMetrics()` |
+| `src/lib/ico-engine/read-metrics.ts` | `IcoMetricSnapshot`, `computeMetricsByContext()`, `readMemberMetrics()` |
+| `src/lib/ico-engine/schema.ts` | `metrics_by_member` DDL, `assignee_member_ids` in view |
+| `src/lib/sync/sync-notion-conformed.ts` | Multi-assignee array + `ensureMultiAssigneeColumn()` |
+| `src/app/api/ico-engine/context/route.ts` | NEW — generic context API |
+| `src/app/api/people/[memberId]/ico/route.ts` | NEW — person ICO convenience endpoint |
+| `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` | NEW — person ICO tab with charts |
+| `src/types/people.ts` | Added `'ico'` to `PersonTab` |
+| `src/views/greenhouse/people/helpers.ts` | Tab config + permissions |
+| `src/views/greenhouse/people/PersonTabs.tsx` | Registered ICO tab |
+| `scripts/setup-bigquery-source-sync.sql` | Added `assignee_member_ids` column |
+
+---
+
+*Efeonce Greenhouse™ • ICO Engine Spec v1.0 + Apéndice B (v2 Context-Agnostic)*
 *Efeonce Group — Marzo 2026 — CONFIDENCIAL*
 *Documento técnico interno. Su reproducción o distribución sin autorización escrita está prohibida.*

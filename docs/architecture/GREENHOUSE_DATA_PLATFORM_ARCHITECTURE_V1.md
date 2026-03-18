@@ -154,6 +154,12 @@ Examples:
 - finance marts
 - payroll marts
 - capability-level operational views
+- ICO Engine materialized tables (`ico_engine` dataset):
+  - `metric_snapshots_monthly` — space-level
+  - `metrics_by_project` — project-level
+  - `metrics_by_member` — person-level (via multi-assignee UNNEST)
+  - `rpa_trend`, `stuck_assets_detail`
+  - All metric formulas defined ONCE in `buildMetricSelectSQL()`; context-agnostic via `ICO_DIMENSIONS` allowlist
 
 Rules:
 - read-optimized only

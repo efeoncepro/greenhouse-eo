@@ -233,12 +233,19 @@ Recommended business fields for tasks:
 - `task_phase`
 - `task_priority`
 - `assignee_source_id`
-- `assignee_member_id`
+- `assignee_member_id` — first Notion responsable resolved to Greenhouse member ID (backward compat)
+- `assignee_member_ids` — `ARRAY<STRING>` all Notion responsables resolved to Greenhouse member IDs (enables person-level ICO metrics via UNNEST; added 2026-03-18)
 - `due_date`
 - `completed_at`
 - `last_edited_time`
 - `is_deleted`
 - `sync_run_id`
+
+Multi-assignee enrichment:
+- `responsables_ids` (Notion array) is mapped through `team_members.notion_user_id` → `member_id`
+- `assignee_member_id` keeps first assignee for backward compatibility
+- `assignee_member_ids` stores all resolved IDs; `v_tasks_enriched` falls back to wrapping the singular `assignee_member_id` for legacy rows
+- Column added idempotently via `ALTER TABLE ADD COLUMN IF NOT EXISTS` at sync time
 
 ### HubSpot conformed tables
 

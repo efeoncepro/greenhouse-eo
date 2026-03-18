@@ -4,6 +4,25 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### ICO Engine — Context-Agnostic Metrics Service + Person ICO Tab (2026-03-18)
+
+Refactorización del ICO Engine de un sistema space-only a un **servicio de métricas agnóstico al contexto** que responde consultas para cualquier dimensión (Space, Project, Member, Client, Sprint) con fórmulas consistentes.
+
+| Fase | Cambio | Archivos clave |
+|------|--------|----------------|
+| Phase 0 | SQL metric builder compartido — fórmulas definidas UNA VEZ en `buildMetricSelectSQL()` | `shared.ts`, `materialize.ts`, `read-metrics.ts` |
+| Phase 1 | `IcoMetricSnapshot` genérico + `computeMetricsByContext()` para cualquier dimensión | `read-metrics.ts` |
+| Phase 2 | Multi-assignee: `assignee_member_ids ARRAY<STRING>` almacena todos los responsables de Notion | `sync-notion-conformed.ts`, `schema.ts` |
+| Phase 3 | Tabla `metrics_by_member` + materialización persona via UNNEST | `schema.ts`, `materialize.ts` |
+| Phase 4 | `GET /api/ico-engine/context?dimension=X&value=Y` — API genérica | `context/route.ts` (nuevo) |
+| Phase 5 | Pestaña ICO en Person 360 (KPIs, donut CSC, radar, gauge velocidad) | `PersonIcoTab.tsx` (nuevo), `[memberId]/ico/route.ts` (nuevo) |
+
+**Agregar dimensiones futuras** (Service, Campaign): (1) columna en `v_tasks_enriched`, (2) entrada en `ICO_DIMENSIONS`. Sin duplicar SQL ni crear nuevos endpoints.
+
+Archivos nuevos: `src/app/api/ico-engine/context/route.ts`, `src/app/api/people/[memberId]/ico/route.ts`, `src/views/greenhouse/people/tabs/PersonIcoTab.tsx`
+
+---
+
 ### ETL Pipeline Hardening — Conformed Layer + ICO Engine (2026-03-18)
 
 **8 fixes** across the ETL pipeline (Notion → BigQuery conformed → ICO Engine):

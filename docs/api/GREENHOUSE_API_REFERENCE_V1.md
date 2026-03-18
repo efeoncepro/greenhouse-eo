@@ -80,6 +80,27 @@ Key rules:
 - `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/tenants`
 - `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/tenants/capabilities/sync`
 
+### ICO Engine API
+
+Internal endpoints for ICO metrics. Auth: `requireAgencyTenantContext()` or `requirePeopleTenantContext()`.
+
+| Method | Endpoint | Description | Key Params |
+|--------|----------|-------------|------------|
+| GET | `/api/ico-engine/context` | **Generic context endpoint** — metrics for any dimension | `dimension` (space\|project\|member\|client\|sprint), `value`, `year`, `month` |
+| GET | `/api/ico-engine/metrics` | Space metrics (materialized + live fallback) | `spaceId`, `year`, `month`, `live` |
+| GET | `/api/ico-engine/metrics/agency` | Agency-wide metrics across all spaces | `year`, `month`, `live` |
+| GET | `/api/ico-engine/metrics/project` | Project-level metrics | `spaceId`, `year`, `month` |
+| GET | `/api/ico-engine/stuck-assets` | Stuck asset detail list | `spaceId` |
+| GET | `/api/ico-engine/trends/rpa` | RPA trend data (last N months) | `spaceId`, `months` |
+| GET | `/api/ico-engine/registry` | Metric definitions (MetricDefinition[]) | — |
+| GET | `/api/ico-engine/health` | Materialization freshness | — |
+| GET | `/api/people/[memberId]/ico` | Person-level ICO metrics (convenience) | `year`, `month` |
+| GET | `/api/organizations/[id]/ico` | Organization ICO metrics (all active spaces) | `year`, `month` |
+
+**Context endpoint** (`/api/ico-engine/context`) is the preferred generic entry point for new consumers. It validates dimension against `ICO_DIMENSIONS` allowlist, tries materialized cache first, and falls back to live compute.
+
+Response type: `IcoMetricSnapshot` — includes `dimension`, `dimensionValue`, `metrics[]`, `cscDistribution[]`, `context`, `computedAt`, `engineVersion`, `source`.
+
 ## Notes
 
 - BigQuery remains the historical backup and analytical layer.
