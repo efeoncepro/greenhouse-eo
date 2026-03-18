@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
@@ -20,6 +20,7 @@ import Stack from '@mui/material/Stack'
 import Step from '@mui/material/Step'
 import StepLabel from '@mui/material/StepLabel'
 import Stepper from '@mui/material/Stepper'
+import TextField from '@mui/material/TextField'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -150,6 +151,10 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   const [registering, setRegistering] = useState(false)
   const [error, setError] = useState('')
 
+  // State — space creation
+  const [creatingSpace, setCreatingSpace] = useState(false)
+  const spaceNameRef = useRef(clientName)
+
   // ---------------------------------------------------------------------------
   // Fetch current status
   // ---------------------------------------------------------------------------
@@ -173,6 +178,56 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   useEffect(() => {
     void fetchStatus()
   }, [fetchStatus])
+
+  // ---------------------------------------------------------------------------
+  // Space creation
+  // ---------------------------------------------------------------------------
+
+  const handleCreateSpace = async () => {
+    const spaceName = spaceNameRef.current.trim()
+
+    if (!spaceName) {
+      setError('El nombre del Space es requerido.')
+
+      return
+    }
+
+    setCreatingSpace(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/admin/spaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spaceName,
+          clientId
+        })
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+
+        setError(data.error || `Error ${res.status}`)
+
+        return
+      }
+
+      toast.success(`Space "${spaceName}" creado. Ahora conecta las bases de Notion.`)
+
+      // Refresh status — now the Space exists, wizard will be available
+      setLoading(true)
+      await fetchStatus()
+
+      // Auto-open the wizard after Space creation
+      setWizardOpen(true)
+      setWizardStep(0)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error de conexión')
+    } finally {
+      setCreatingSpace(false)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Discovery
@@ -303,11 +358,37 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
         />
         <Divider />
         <CardContent>
-          <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-            <Typography variant='h6' sx={{ mb: 1 }}>Sin Space operativo</Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Este tenant no tiene un Space registrado. Créalo primero desde Organizaciones para habilitar la integración con Notion.
+          <Box sx={{ py: 2 }}>
+            <Typography variant='h6' sx={{ mb: 1 }}>Crear Space operativo</Typography>
+            <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
+              Este tenant no tiene un Space registrado. Crea uno para habilitar la integración con Notion y el pipeline de datos.
             </Typography>
+
+            <Stack spacing={2.5} sx={{ maxWidth: 420 }}>
+              <TextField
+                label='Nombre del Space'
+                defaultValue={clientName}
+                size='small'
+                fullWidth
+                helperText='La Organización se resuelve automáticamente desde HubSpot.'
+                onChange={e => { spaceNameRef.current = e.target.value }}
+              />
+
+              {error && (
+                <Alert severity='error' onClose={() => setError('')}>{error}</Alert>
+              )}
+
+              <Box>
+                <Button
+                  variant='contained'
+                  onClick={handleCreateSpace}
+                  disabled={creatingSpace}
+                  startIcon={creatingSpace ? <CircularProgress size={16} /> : <i className='tabler-plus' />}
+                >
+                  {creatingSpace ? 'Creando…' : 'Crear Space'}
+                </Button>
+              </Box>
+            </Stack>
           </Box>
         </CardContent>
       </Card>
