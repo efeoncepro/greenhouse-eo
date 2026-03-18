@@ -49,6 +49,7 @@ export async function GET(request: Request) {
       filter: raw.filter ?? null,
       groups: ((raw.groups ?? []) as Array<Record<string, unknown>>).map((g: Record<string, unknown>) => ({
         parentKey: g.parent_key ?? g.parentKey ?? '',
+        groupLabel: g.group_label ?? g.groupLabel ?? '',
         hasCoreDatabases: g.has_core_databases ?? g.hasCoreDatabases ?? false,
         classificationsFound: g.classifications_found ?? g.classificationsFound ?? [],
         databases: ((g.databases ?? []) as Array<Record<string, unknown>>).map((d: Record<string, unknown>) => ({
@@ -57,6 +58,7 @@ export async function GET(request: Request) {
           classification: d.classification ?? null,
           parentType: d.parent_type ?? d.parentType ?? '',
           parentId: d.parent_id ?? d.parentId ?? '',
+          parentName: d.parent_name ?? d.parentName ?? null,
           url: d.url ?? '',
           createdTime: d.created_time ?? d.createdTime ?? '',
           lastEditedTime: d.last_edited_time ?? d.lastEditedTime ?? ''
