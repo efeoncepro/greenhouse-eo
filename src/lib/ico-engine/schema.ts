@@ -34,7 +34,10 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
-    COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], [])) AS assignee_member_ids,
+    IF(dt.assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(dt.assignee_member_ids) > 0,
+       dt.assignee_member_ids,
+       IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], [])
+    ) AS assignee_member_ids,
     dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
