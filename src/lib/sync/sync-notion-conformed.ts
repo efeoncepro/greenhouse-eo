@@ -19,6 +19,7 @@ export interface SyncConformedResult {
 type NotionProjectRow = {
   notion_page_id: string | null
   _source_database_id: string | null
+  space_id: string | null
   created_time: { value?: string } | string | null
   last_edited_time: { value?: string } | string | null
   nombre_del_proyecto: string | null
@@ -37,6 +38,7 @@ type NotionProjectRow = {
 type NotionTaskRow = {
   notion_page_id: string | null
   _source_database_id: string | null
+  space_id: string | null
   created_time: { value?: string } | string | null
   last_edited_time: { value?: string } | string | null
   nombre_de_tarea: string | null
@@ -78,6 +80,7 @@ type NotionTaskRow = {
 type NotionSprintRow = {
   notion_page_id: string | null
   _source_database_id: string | null
+  space_id: string | null
   created_time: { value?: string } | string | null
   last_edited_time: { value?: string } | string | null
   nombre_del_sprint: string | null
@@ -169,14 +172,14 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   // 1. Read from notion_ops (populated by external notion-bq-sync Cloud Run)
   const [projects, tasks, sprints] = await Promise.all([
     runBigQuery<NotionProjectRow>(`
-      SELECT notion_page_id, _source_database_id, created_time, last_edited_time,
+      SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_del_proyecto, resumen, estado, \`finalización\`, pct_on_time,
              prioridad, rpa_promedio, fechas, fechas_end, page_url, propietario_ids
       FROM \`${projectId}.notion_ops.proyectos\`
       WHERE notion_page_id IS NOT NULL
     `),
     runBigQuery<NotionTaskRow>(`
-      SELECT notion_page_id, _source_database_id, created_time, last_edited_time,
+      SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_de_tarea, estado, prioridad, \`priorización\`, completitud,
              cumplimiento, \`días_de_retraso\`, \`días_reprogramados\`, reprogramada,
              indicador_de_performance, client_change_round, client_change_round_final,
@@ -191,7 +194,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       WHERE notion_page_id IS NOT NULL
     `),
     runBigQuery<NotionSprintRow>(`
-      SELECT notion_page_id, _source_database_id, created_time, last_edited_time,
+      SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_del_sprint, estado_del_sprint, fechas, fechas_end,
              tareas_completadas, total_de_tareas, page_url
       FROM \`${projectId}.notion_ops.sprints\`
@@ -199,24 +202,27 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     `)
   ])
 
-  // 2. Resolve space_id via space_notion_sources (canonical)
-  const spaceNotionSources = await runGreenhousePostgresQuery<{
-    space_id: string
-    notion_db_proyectos: string
-    client_id: string | null
-  }>(
-    `SELECT sns.space_id, sns.notion_db_proyectos, s.client_id
-     FROM greenhouse_core.space_notion_sources sns
-     JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
-     WHERE sns.sync_enabled = TRUE`
-  )
+  // 2. Resolve client_id via space_notion_sources (space_id comes from raw data)
+  //    Cloud Run v3.0 stamps every row with space_id, so we use it directly.
+  //    PostgreSQL lookup is only needed to resolve space_id → client_id.
+  const spaceClientMap = new Map<string, string | null>()
 
-  const databaseSpaceMap = new Map<string, string>()
-  const databaseClientMap = new Map<string, string | null>()
+  try {
+    const spaceNotionSources = await runGreenhousePostgresQuery<{
+      space_id: string
+      client_id: string | null
+    }>(
+      `SELECT sns.space_id, s.client_id
+       FROM greenhouse_core.space_notion_sources sns
+       JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
+       WHERE sns.sync_enabled = TRUE`
+    )
 
-  for (const src of spaceNotionSources) {
-    databaseSpaceMap.set(src.notion_db_proyectos, src.space_id)
-    databaseClientMap.set(src.notion_db_proyectos, src.client_id)
+    for (const src of spaceNotionSources) {
+      spaceClientMap.set(src.space_id, src.client_id)
+    }
+  } catch (err) {
+    console.warn('[sync-cron] Could not load space_notion_sources from PostgreSQL — client_id will be null:', err instanceof Error ? err.message : err)
   }
 
   // Resolve team members for assignee mapping
@@ -236,10 +242,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   const deliveryProjects = projects.map(row => {
     const projectSourceId = toNullableString(row.notion_page_id)
     const projectDatabaseSourceId = toNullableString(row._source_database_id)
-    const spaceId = projectDatabaseSourceId ? (databaseSpaceMap.get(projectDatabaseSourceId) || null) : null
-    const clientId = spaceId
-      ? (databaseClientMap.get(projectDatabaseSourceId!) || (!isInternalSpaceId(spaceId) ? spaceId : null))
-      : null
+    const spaceId = toNullableString(row.space_id)
+    const clientId = spaceId ? (spaceClientMap.get(spaceId) ?? null) : null
     const ownerSourceId = row.propietario_ids?.[0] || null
 
     return {
@@ -289,8 +293,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     const projectDatabaseSourceId =
       (projectSourceId ? projectDatabaseSourceMap.get(projectSourceId) || null : null) ||
       toNullableString(row._source_database_id)
-    const spaceId = projectSourceId ? (projectSpaceMap.get(projectSourceId) || null) : null
-    const clientId = projectSourceId ? (projectClientMap.get(projectSourceId) || null) : null
+    const spaceId = (projectSourceId ? (projectSpaceMap.get(projectSourceId) || null) : null) || toNullableString(row.space_id)
+    const clientId = spaceId ? (projectSourceId ? (projectClientMap.get(projectSourceId) || null) : null) || (spaceClientMap.get(spaceId) ?? null) : null
 
     return {
       task_source_id: toNullableString(row.notion_page_id),
@@ -353,7 +357,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
 
   const deliverySprints = sprints.map(row => {
     const sprintSourceId = toNullableString(row.notion_page_id)
-    const spaceId = sprintSourceId ? (sprintSpaceMap.get(sprintSourceId) || null) : null
+    const spaceId = (sprintSourceId ? (sprintSpaceMap.get(sprintSourceId) || null) : null) || toNullableString(row.space_id)
     const completedTasks = toNumber(row.tareas_completadas)
     const totalTasks = toNumber(row.total_de_tareas)
 
