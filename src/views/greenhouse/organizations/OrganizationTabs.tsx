@@ -17,12 +17,14 @@ import type { OrganizationDetailData, OrganizationTab } from './types'
 import OrganizationOverviewTab from './tabs/OrganizationOverviewTab'
 import OrganizationPeopleTab from './tabs/OrganizationPeopleTab'
 import OrganizationFinanceTab from './tabs/OrganizationFinanceTab'
+import OrganizationIcoTab from './tabs/OrganizationIcoTab'
 import OrganizationIntegrationsTab from './tabs/OrganizationIntegrationsTab'
 
 const TAB_CONFIG: Array<{ value: OrganizationTab; label: string; icon: string }> = [
   { value: 'overview', label: 'Resumen', icon: 'tabler-layout-dashboard' },
   { value: 'people', label: 'Personas', icon: 'tabler-users' },
   { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
+  { value: 'ico', label: 'ICO', icon: 'tabler-cpu' },
   { value: 'integrations', label: 'Integraciones', icon: 'tabler-plug-connected' }
 ]
 
@@ -99,6 +101,10 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
 
           <TabPanel value='finance' className='p-0'>
             {activeTab === 'finance' && <OrganizationFinanceTab detail={detail} />}
+          </TabPanel>
+
+          <TabPanel value='ico' className='p-0'>
+            {activeTab === 'ico' && <OrganizationIcoTab detail={detail} />}
           </TabPanel>
 
           <TabPanel value='integrations' className='p-0'>

@@ -1,4 +1,4 @@
-export type OrganizationTab = 'overview' | 'people' | 'finance' | 'integrations'
+export type OrganizationTab = 'overview' | 'people' | 'finance' | 'ico' | 'integrations'
 
 export interface OrganizationClientFinance {
   clientId: string
