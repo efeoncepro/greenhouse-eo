@@ -2,1452 +2,497 @@
 
 ## Purpose
 
-This document is the working architecture and execution plan for Greenhouse as a multi-tenant client portal for Efeonce.
+This document is the master architecture reference for Greenhouse EO.
 
-It is intentionally detailed so any agent can:
-- understand the product target
-- see what already exists
-- know what must be built next
-- identify what can be done in parallel
-- avoid turning Greenhouse into a second Notion
+It describes the product, data model, module inventory, route structure, access model, deployment topology, and architectural principles as they exist in production as of March 2026.
 
-This document should be treated as the master architecture reference for product, data, access model, route structure, API design, and phased execution.
-
-When this document conflicts with the starter-template shape, the Greenhouse product direction in this document wins unless a newer documented decision supersedes it.
+Any agent, engineer, or contributor entering this repo should:
+- read this document before changing architecture, auth, routes, or data models
+- treat this document as the authoritative source when it conflicts with older design docs or template defaults
+- update this document when architecture-changing work lands
 
 Use together with:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
+- `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 
 ## Product Thesis
 
-Greenhouse is not a project management tool.
+Greenhouse EO is a multi-tenant executive operations portal for Efeonce Group.
 
-Notion remains the system of work.
+It serves three roles:
+1. **Executive visibility layer** — lets clients and internal stakeholders understand operational performance without entering Notion or any system of work.
+2. **Operational context system** — provides delivery, finance, HR, and capacity context for decision-making.
+3. **Internal governance platform** — supports tenant management, access control, AI tooling administration, and cross-client operational oversight.
 
-Greenhouse is the executive and operational visibility layer that lets:
-- clients understand how their operation is performing
-- client stakeholders understand what is being produced and how fast it is moving
-- Efeonce understand account health, delivery health, capacity, and risk across tenants
+Notion remains the system of work. Greenhouse consumes operational truth from source systems and exposes decision-ready views.
 
-Terminology contract:
+### Terminology contract
+
 - `tenant`, `client`, and `company` refer to the same business entity in the portal
 - one tenant can have one or many users
-- tenant metadata and user identity must remain separate tables and separate runtime concepts
+- tenant metadata and user identity remain separate tables and separate runtime concepts
+- `organization` is the parent entity above `space` and `client` in the hierarchy
 
-The portal must answer:
-- what is being delivered
-- how fast it is moving
-- what is slowing it down
-- what capacity is available
-- which campaigns or projects are consuming capacity
-- how current operational behavior affects client KPIs
+### Product boundaries
 
-## Product Boundaries
-
-### What Greenhouse must do
-
-- show executive dashboards
-- show tenant-scoped operational context
-- show projects, deliverables, tasks, and sprints as drilldown context
-- show team assignment and capacity
+Greenhouse must:
+- show executive dashboards and tenant-scoped operational context
+- show projects, deliverables, sprints, and team capacity as drilldown context
+- support finance, HR/payroll, and people 360 for internal operations
 - relate campaigns, projects, deliverables, and indicators
 - support different user roles and visibility levels
-- support internal Efeonce admin and internal KPI views
+- support internal Efeonce admin and governance views
+- provide AI tooling administration and credit metering
 
-### What Greenhouse must not become
-
-- a second Notion
-- a task editing workspace
+Greenhouse must not become:
+- a second Notion or task editing workspace
 - a full CRUD project management app
 - a workflow board where daily work is performed
-- a place where users re-enter operational data already living in Notion
+- a place where users re-enter operational data already living in source systems
 
-## Core Product Principles
+## Technology Stack
 
-1. Read-model first
-- Greenhouse consumes operational truth from source systems and exposes decision-ready views.
+| Layer | Technology | Version |
+|---|---|---|
+| Framework | Next.js | 16.1.1 |
+| UI Library | React | 19.2.3 |
+| Language | TypeScript | 5.9.3 |
+| Component Library | MUI | 7.3.6 |
+| CSS | Tailwind CSS | 4.1 |
+| Design System | Vuexy patterns | — |
+| OLTP Database | PostgreSQL 16 | Cloud SQL (us-east4) |
+| OLAP Warehouse | BigQuery | US multi-region |
+| Auth | NextAuth.js | 4.24 |
+| AI | Google Vertex AI (Gemini) | — |
+| Hosting | Vercel | — |
+| Sync Runtime | Cloud Functions (Python 3.12) + Cloud Run | — |
+| Orchestration | Cloud Scheduler | — |
 
-2. Tenant isolation first
-- all data access is scoped by tenant and role
-- browser-supplied ids never define authorization
+## Architecture Principles
 
-3. Executive-first UX
-- dashboard and summary views are primary
-- detailed tables are drilldowns, not the center of the app
+1. **Read-model first** — Greenhouse consumes operational truth from source systems and exposes decision-ready views. It is not a system of record for operational work.
 
-4. Role-aware views
-- the same route family may render different depth depending on role
-- internal Efeonce routes stay clearly separated from client routes
+2. **Canonical object graph** — Greenhouse evolves around canonical enriched objects, not module-local identity silos. Modules may own transactions and extensions, but shared business objects keep one canonical identity. Cross-module 360 views come from read-model composition, not duplicated master tables.
 
-5. Semantic metric layer
-- business KPIs should not be recomputed ad hoc in every endpoint
-- derived metrics belong in semantic marts or reusable query functions
+3. **PostgreSQL = OLTP, BigQuery = OLAP** — transactional writes (finance, payroll, identity, organizations) live in PostgreSQL. Analytics, reporting, and legacy delivery data live in BigQuery. No request-time DDL or source API calculation.
 
-6. Small vertical slices
-- each phase should end with usable product value
-- do not block all progress on a grand rewrite
+4. **Config-driven property mappings** — multi-client normalization uses config-driven mappings (`src/config/property-maps/`) so new tenants onboard without code changes. The conformed data layer resolves source-system naming heterogeneity at sync time, not query time.
 
-7. Reusable executive UI system
-- dashboard and executive surfaces must share a stable visual language
-- Vuexy analytics is a composition reference, not a screen to copy
-- reusable executive cards belong in `src/components/greenhouse/**`
+5. **Auth via layout-level guards** — authentication and authorization are enforced at the layout level using route group wrappers. There is no `middleware.ts` auth layer. Route groups define access boundaries.
 
-8. Canonical object graph
-- Greenhouse should evolve around canonical enriched objects, not module-local identity silos
-- modules may own transactions and extensions, but shared business objects must keep one canonical identity
-- cross-module 360 views should come from read-model composition, not duplicated master tables
+6. **Executive-first UX** — dashboard and summary views are primary. Detailed tables are drilldowns, not the center of the app. The first screen has clear hierarchy and no visually flat wall of cards.
 
-## Personas
+7. **Semantic metric layer** — business KPIs are not recomputed ad hoc in every endpoint. Derived metrics belong in materialized tables, semantic marts, or reusable query functions.
 
-### Client personas
+8. **Tenant isolation first** — all data access is scoped by tenant and role. Browser-supplied IDs never define authorization.
 
-#### Client Executive
-- usually a head of marketing, marketing director, growth lead, brand lead, or business owner
-- needs a high-level but trustworthy read of operation health
-- cares about output, speed, visibility, and bottlenecks
-- rarely needs raw task-level detail
+## Module Inventory
 
-#### Client Manager
-- usually a marketing manager, marketing operations lead, campaign lead, or internal coordinator
-- needs deeper operational context
-- cares about projects, campaigns, pending approvals, blocked work, and team load
-- may drill into tasks and sprint context
+### Identity & Access
 
-#### Client Specialist
-- optional lower-level client user
-- sees only a subset of projects or campaigns
-- may be restricted to a team, market, brand, or initiative
+NextAuth.js with three providers: Azure AD, Google OAuth, and Credentials.
 
-### Efeonce personas
+Auth guards are enforced at the layout level using route group wrappers — there is no `middleware.ts`. Route groups define the access boundary: `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`.
 
-#### Efeonce Account
-- owns one or more client relationships
-- needs a client health view, major risks, throughput, review pressure, and current delivery story
+Roles are composable (not hierarchical). `efeonce_admin` serves as the universal override role.
 
-#### Efeonce Operations
-- needs cross-tenant operational visibility
-- tracks capacity, blocked work, team utilization, review backlog, and speed-to-market
+The `TenantContext` carries: `userId`, `clientId`, `roleCodes`, `routeGroups`, `spaceId`, `organizationId`.
 
-#### Efeonce Admin
-- manages tenants, users, scopes, roles, feature flags, and access policy
-- must see internal admin routes unavailable to client users
+Tables live in `greenhouse_core`: `client_users`, `roles`, `user_role_assignments`, `identity_profiles`.
 
-## Access Model
+### Executive Dashboard
 
-Access must be modeled with both tenant and role.
+Route: `/dashboard`
 
-### Axis 1: tenant_type
+Client-facing executive home with hero card, KPI strip, charts, team section, and capacity overview. Composition is data-driven — widgets appear based on capability availability, not hardcoded per tenant.
 
-- `client`
-- `efeonce_internal`
+Built on the reusable Executive UI System:
+- `ExecutiveCardShell`, `ExecutiveHeroCard`, `ExecutiveMiniStatCard`, `MetricStatCard`
+- 32 shared Greenhouse primitives in `src/components/greenhouse/`
 
-### Axis 2: role_code
+### Delivery Context
 
-Initial recommended roles:
-- `client_executive`
-- `client_manager`
-- `client_specialist`
-- `efeonce_account`
-- `efeonce_operations`
-- `efeonce_admin`
+Routes: `/proyectos`, `/proyectos/[id]`, `/sprints`, `/sprints/[id]`, `/updates`
 
-### Axis 3: scope_level
+Project list and detail, sprint list and detail, and activity feed. Source data comes from BigQuery (`notion_ops` legacy tables and `greenhouse_conformed` normalized layer).
 
-- `tenant_all`
-- `campaign_subset`
-- `project_subset`
-- `metric_subset`
+### ICO Engine (In-flight Creative Optimization)
 
-### Required access outcomes
+10 deterministic metrics: RPA, OTD, FTR, cycle time, throughput, stuck assets, and related indicators.
 
-- client users only see their tenant
-- client users may still have partial visibility within the tenant
-- Efeonce internal users may see one client, many clients, or all clients depending on role
-- admin-only actions must be separated from operational read-only views
-
-## Information Architecture
-
-### Client app
-
-- `/dashboard`
-- `/entrega`
-- `/proyectos`
-- `/proyectos/[id]`
-- `/campanas`
-- `/campanas/[id]`
-- `/equipo`
-- `/settings`
-
-### Internal Efeonce app
-
-- `/internal/dashboard`
-- `/internal/clientes`
-- `/internal/clientes/[id]`
-- `/internal/capacidad`
-- `/internal/riesgos`
-- `/internal/kpis`
-
-### Admin app
-
-- `/admin/tenants`
-- `/admin/tenants/[id]`
-- `/admin/users`
-- `/admin/users/[id]`
-- `/admin/roles`
-- `/admin/scopes`
-- `/admin/feature-flags`
-
-### Route design rules
-
-- client routes and internal routes stay visibly separated
-- admin routes must not share casual navigation with client routes
-- tasks do not get a first-level top-nav route by default
-- project detail and campaign detail are drilldown contexts
-
-## Service Module Capability Layer
-
-Greenhouse needs one more axis beyond tenant, role, and scope:
-- business line
-- service modules
-
-Purpose:
-- adapt product surfaces to the services the client actually contracted
-- avoid hardcoding dashboard variants by tenant name
-- keep CRM, creative, and web experiences composable
-
-Canonical Greenhouse model:
-- capability catalog lives in `greenhouse.service_modules`
-- client capability assignments live in `greenhouse.client_service_modules`
-
-Current external commercial signal:
-- HubSpot company properties such as `hubspot_crm.companies.linea_de_servicio`
-- HubSpot company properties such as `hubspot_crm.companies.servicios_especificos`
-
-Historical discovery and bootstrap signal:
-- closedwon `hubspot_crm.deals` helped identify initial families and combinations
-- deals must not remain the long-term canonical capability identity layer inside Greenhouse
-
-Historical business families observed from closedwon deal data:
-- `crm_solutions`
-- `globe`
-- `wave`
-
-Historical service-module values observed from closedwon deal data:
-- `licenciamiento_hubspot`
-- `implementacion_onboarding`
-- `consultoria_crm`
-- `agencia_creativa`
-- `desarrollo_web`
-
-Rules:
-- service modules are not the primary security model
-- security still comes from roles and scopes
-- service modules decide which parts of the product are relevant for a tenant
-
-Recommended runtime outcomes:
-- navigation filtered by `routeGroups` plus `serviceModules`
-- dashboard widgets selected by module applicability
-- admin and billing views show business line and active modules
-
-Reference:
-- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
-
-## Product Modules
-
-### 1. Executive Visibility
-
-Primary consumer:
-- client_executive
-- client_manager
-- efeonce_account
-- efeonce_operations
-
-Primary outputs:
-- KPI strip
-- throughput trends
-- time-to-market trends
-- review pressure
-- capacity usage
-- operational risk flags
-
-### 2. Delivery Context
-
-Primary consumer:
-- client_manager
-- efeonce_account
-- efeonce_operations
-
-Primary outputs:
-- projects
-- tasks as context only
-- sprint context
-- delivery timeline
-- review bottlenecks
-
-### 3. Team and Capacity
-
-Primary consumer:
-- client_executive
-- client_manager
-- efeonce_operations
-- efeonce_admin
-
-Primary outputs:
-- assigned team
-- role mix
-- capacity contracted
-- capacity used
-- saturation and gap indicators
-
-### 4. Campaign Intelligence
-
-Primary consumer:
-- client_executive
-- client_manager
-- efeonce_account
-
-Primary outputs:
-- campaign to project mapping
-- deliverables by campaign
-- effort by campaign
-- time-to-market by campaign
-- campaign KPI context
-
-### 5. Internal Operations and Governance
-
-Primary consumer:
-- efeonce_account
-- efeonce_operations
-- efeonce_admin
-
-Primary outputs:
-- cross-tenant health
-- cross-tenant capacity
-- admin controls
-- access management
-- feature enablement
-
-## Data Sources
-
-### Current sources
-
-- `efeonce-group.notion_ops.tareas`
-- `efeonce-group.notion_ops.proyectos`
-- `efeonce-group.notion_ops.sprints`
-- `efeonce-group.hubspot_crm.*`
-- `efeonce-group.greenhouse.clients`
-
-### Recommended future sources
-
-- staffing or assignment source if team assignment is not derivable from Notion alone
-- campaign-to-project mapping source if not reliable in current Notion structure
-- commercial scope metadata if needed from HubSpot
+Infrastructure:
+- BigQuery dataset `ico_engine` (5 tables + 2 views)
+- Daily materialization via Vercel cron (6:15 AM UTC)
+- 6 API endpoints (`/api/ico-engine/*`)
+
+Surfaces: Agency tab with charts and scorecard.
+
+### Finance Module
+
+Routes: `/finance` (dashboard, P&L, cash flow, aging), `/finance/clients`, `/finance/clients/[id]`, `/finance/income`, `/finance/income/[id]`, `/finance/expenses`, `/finance/expenses/[id]`, `/finance/suppliers`, `/finance/suppliers/[id]`, `/finance/reconciliation`, `/finance/reconciliation/[id]`, `/finance/intelligence`
+
+Finance intelligence includes client economics, cost allocation, and trend analysis.
+
+Dual-store architecture:
+- Income/expenses: Postgres-first with BigQuery fallback
+- Accounts/suppliers/reconciliation: still BigQuery-primary
+- Reconciliation engine with auto-match
+- Exchange rate sync via Vercel cron (daily 11:05 PM UTC)
+- 40+ API routes
+
+### HR Core + Payroll
+
+Routes: `/hr` (dashboard, departments, leave, attendance), `/hr/payroll`, `/hr/payroll/member/[memberId]`
+
+Payroll with full period lifecycle: draft → approved → exported. Chilean payroll calculations including AFP, health, unemployment, and tax. KPI-driven bonuses (OTD%, RPA). Teams attendance webhook integration.
+
+Data stores:
+- Payroll and leave: Postgres-first
+- HR core tables: BigQuery
+- 25+ API routes
+
+### People & Person 360
+
+Routes: `/people`, `/people/[memberId]`
+
+Unified team directory and tabbed 360 view per person: activity, payroll, compensation, HR, finance, AI tools, memberships.
+
+Cross-domain composition from `identity_profiles`, `members`, and `client_users`. Access governed by `canAccessPeopleModule()` for cross-group visibility.
+
+### Account 360 / Organizations
+
+Routes: `/agency/organizations`, `/agency/organizations/[id]`
+
+Organization list with KPIs and detail view with overview, people, and finance tabs.
+
+Entity hierarchy:
+- Organization (EO-ORG) → Space (EO-SPC) → Client
+- Person memberships (EO-MBR) with type coding
+
+PostgreSQL-only (`greenhouse_core.organizations`, `spaces`, `person_memberships`). HubSpot sync integration for organization data.
+
+### Agency Workspace
+
+Routes: `/agency` (operational dashboard with pulse, spaces, ICO), `/agency/spaces`, `/agency/capacity`, `/agency/services`, `/agency/services/[serviceId]`
+
+Available to `internal` and `admin` route groups.
+
+### AI Tooling & Credits
+
+Route: `/admin/ai-tools`
+
+Catalog, licenses, wallets, and consumption tracking. Credit-based metering system. Postgres-primary with BigQuery fallback. 12+ API routes.
+
+### Capabilities System
+
+Route: `/capabilities/[moduleId]`
+
+Config-driven registry (`src/config/capability-registry.ts`) that maps module IDs to dynamic capability pages.
+
+Module-specific query pages include: CRM Command Center, Creative Hub, Web Delivery Lab, Onboarding Center.
+
+Access governed by `verifyCapabilityModuleAccess()` for tenant-level gating.
+
+### Admin & Governance
+
+Routes: `/admin/tenants`, `/admin/tenants/[id]`, `/admin/tenants/[id]/capability-preview/[moduleId]`, `/admin/tenants/[id]/view-as/dashboard`, `/admin/users`, `/admin/users/[id]`, `/admin/roles`, `/admin/ai-tools`, `/admin/team`
+
+Tenant list and detail with capability management. User list with access control. Role management. Admin impersonation via view-as. AI tools administration.
+
+### Internal Operations
+
+Route: `/internal/dashboard`
+
+Control tower for cross-tenant operational oversight. Greenhouse AI agent powered by Vertex AI with modes: plan, pair, review, implement.
 
 ## Data Architecture
 
-Greenhouse should move from direct-table ad hoc reads toward a layered object and analytics model.
+### PostgreSQL
 
-### Layer A: source operational tables
+Instance: `greenhouse-pg-dev` (Cloud SQL, us-east4)
+Database: `greenhouse_app`
 
-This is where current reality already lives.
+Schemas:
+- `greenhouse_core` — identity, roles, organizations, spaces, memberships
+- `greenhouse_serving` — materialized read models
+- `greenhouse_sync` — sync state and outbox
+- `greenhouse_hr` — HR domain tables
+- `greenhouse_payroll` — payroll periods, calculations, bonuses
+- `greenhouse_finance` — income, expenses, reconciliation
+- `greenhouse_delivery` — delivery tracking
+- `greenhouse_crm` — CRM extensions
+- `greenhouse_ai` — AI tool catalog, wallets, consumption
 
-Examples:
-- `notion_ops.tareas`
-- `notion_ops.proyectos`
-- `notion_ops.sprints`
-- `hubspot_crm.deals`
-- `hubspot_crm.companies`
-- `hubspot_crm.contacts`
+### BigQuery
 
-### Layer B: Greenhouse canonical and control tables
+Project: `efeonce-group` (US multi-region)
 
-This is where canonical object anchors, access, tenant metadata, and app governance live.
+| Dataset | Tables/Views | Purpose |
+|---|---|---|
+| `greenhouse` | 41 tables | Core platform data |
+| `greenhouse_raw` | 11 tables | Immutable source snapshots |
+| `greenhouse_conformed` | 6 tables | Normalized delivery + CRM via config-driven property maps |
+| `greenhouse_marts` | 5 views | Outbox-derived analytical marts |
+| `ico_engine` | 7 tables/views | ICO metrics materialization |
+| `hubspot_crm` | 35 tables | HubSpot CRM mirror (legacy) |
+| `notion_ops` | 10 tables | Notion operational mirror (legacy) |
+| `analytics_486264460` | — | GA4 export |
+| `searchconsole` | — | Search Console data |
 
-Recommended tables:
-- `greenhouse.clients`
-- `greenhouse.team_members`
-- `greenhouse.identity_profiles`
-- `greenhouse.identity_profile_source_links`
-- `greenhouse.service_modules`
-- `greenhouse.client_service_modules`
-- `greenhouse.client_users`
-- `greenhouse.roles`
-- `greenhouse.user_role_assignments`
-- `greenhouse.user_project_scopes`
-- `greenhouse.user_campaign_scopes`
-- `greenhouse.client_feature_flags`
-- `greenhouse.audit_events`
+### Data Flow Layers
 
-Recommended rule:
-- objects such as `Client`, `Collaborator`, and `Product/Capability` should resolve here first
-- module-owned transaction or extension tables should point back to these canonical anchors
-- use `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` as the object-model contract
+**Layer A: Source operational tables** — immutable mirrors of source systems in `greenhouse_raw`, `notion_ops`, `hubspot_crm`.
 
-### Layer B2: domain extension and transaction tables
+**Layer B: Greenhouse canonical and control tables** — canonical object anchors, access, tenant metadata, and app governance in PostgreSQL (`greenhouse_core`) and BigQuery (`greenhouse`).
 
-This is where modules keep their own transactional or extension data without taking ownership of shared object identity.
+**Layer C: Conformed data layer** — config-driven property mappings normalize heterogeneous source data into `greenhouse_conformed`. Resolves naming differences at sync time, not query time.
 
-Examples:
-- `greenhouse.fin_*`
-- `greenhouse.payroll_*`
-- future quote, campaign, or AI usage extension tables
+**Layer D: Semantic marts** — `greenhouse_marts` provides outbox-derived views for cross-domain analytics. ICO Engine maintains its own materialized dataset.
 
-Rule:
-- these tables may store snapshots and source references
-- they should not redefine the canonical identity of shared Greenhouse objects
+### Sync Pipelines
 
-### Layer C: semantic marts
+Cloud Functions (Python 3.12) + Cloud Run services, orchestrated by Cloud Scheduler:
 
-This is the key missing layer.
+| Pipeline | Direction | Schedule |
+|---|---|---|
+| `notion-bq-sync` | Notion → BigQuery | Daily 3:00 AM CL |
+| `hubspot-bq-sync` | HubSpot → BigQuery | Daily 3:30 AM CL |
+| `hubspot-notion-deal-sync` | HubSpot deals → Notion | Every 15 min |
+| `notion-hubspot-reverse-sync` | Notion → HubSpot | Every 15 min |
+| `notion-frameio-sync` | Frame.io ↔ Notion reviews | Event-driven |
+| `notion-teams-notify` | Notion → MS Teams | Event-driven |
+| `hubspot-greenhouse-integration` | HubSpot ↔ Greenhouse | Bidirectional |
+| Outbox consumer | Postgres → BigQuery | Vercel cron every 5 min |
 
-Recommended dataset:
-- `greenhouse_marts`
+## Canonical Object Graph
 
-Recommended dimensions:
-- `dim_clients`
-- `dim_projects`
-- `dim_campaigns`
-- `dim_sprints`
-- `dim_users`
-- `dim_roles`
-- `dim_teams`
+Greenhouse is modeled around canonical enriched objects. Each object has one canonical identity; modules may contribute attributes, transactions, and extensions but must not create parallel identities.
 
-Recommended facts:
-- `fact_tasks`
-- `fact_deliverables`
-- `fact_project_health_daily`
-- `fact_sprint_health_daily`
-- `fact_capacity_daily`
-- `fact_market_speed_daily`
-- `fact_review_friction_daily`
-- `fact_campaign_performance_daily`
+| Object | Canonical Anchor | ID Pattern | Primary Store |
+|---|---|---|---|
+| Client | `greenhouse_core.clients` | UUID | PostgreSQL |
+| Person 360 | `greenhouse_core.identity_profiles` | UUID | PostgreSQL |
+| Organization | `greenhouse_core.organizations` | EO-ORG-### | PostgreSQL |
+| Space | `greenhouse_core.spaces` | EO-SPC-### | PostgreSQL |
+| Person Membership | `greenhouse_core.person_memberships` | EO-MBR-### | PostgreSQL |
+| Service Module | `greenhouse.service_modules` | slug | BigQuery |
+| Project | `greenhouse_conformed.projects` | source ID | BigQuery |
+| Sprint | `greenhouse_conformed.sprints` | source ID | BigQuery |
+| Provider | `greenhouse_core.providers` | UUID | PostgreSQL |
 
-### Why semantic marts matter
+Cross-module 360 views (Person 360, Account 360) are assembled by composing data from multiple domain schemas through read-model joins, not by duplicating master records.
 
-Without semantic marts:
-- metrics get duplicated across endpoints
-- meaning drifts across screens
-- campaign, project, and tenant metrics become inconsistent
-- performance and maintainability degrade
+Reference: `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 
-With semantic marts:
-- KPIs have one canonical definition
-- charts and detail pages use the same semantics
-- internal and client dashboards can share metric logic safely
+## Access Model
 
-## Recommended Control Schema
+### Authentication
 
-### `greenhouse.clients`
+NextAuth.js 4.24 with three providers:
+- Azure AD (SSO for enterprise clients)
+- Google OAuth (Efeonce internal)
+- Credentials (fallback with bcrypt-hashed passwords)
 
-Keep for tenant metadata:
-- `client_id`
-- `client_name`
-- `status`
-- `active`
-- `primary_contact_email`
-- `hubspot_company_id`
-- `feature_flags`
-- `timezone`
-- `portal_home_path`
-- `notes`
-- `created_at`
-- `updated_at`
+### Authorization axes
 
-This table should stop being the long-term home for user credentials.
+**Axis 1: Route groups** — layout-level guards partition the app into access zones: `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`.
 
-### `greenhouse.client_users`
+**Axis 2: Role codes** — composable roles assigned per user. A user may hold multiple roles. `efeonce_admin` is the universal override.
 
-Recommended fields:
-- `user_id`
-- `client_id`
-- `email`
-- `full_name`
-- `status`
-- `active`
-- `tenant_type`
-- `password_hash`
-- `password_hash_algorithm`
-- `auth_mode`
-- `last_login_at`
-- `created_at`
-- `updated_at`
+**Axis 3: Tenant scope** — all data access is filtered by the authenticated user's `clientId` and `organizationId`. Internal users may access one, many, or all tenants depending on role.
 
-### `greenhouse.roles`
+**Axis 4: Capability modules** — `verifyCapabilityModuleAccess()` gates access to service-module-specific pages based on tenant configuration.
 
-Recommended fields:
-- `role_code`
-- `role_name`
-- `role_family`
-- `description`
-- `is_internal`
-- `created_at`
-- `updated_at`
+### Session payload (TenantContext)
 
-### `greenhouse.user_role_assignments`
-
-Recommended fields:
-- `assignment_id`
-- `user_id`
-- `role_code`
-- `client_id`
-- `effective_from`
-- `effective_to`
-- `active`
-
-### `greenhouse.user_project_scopes`
-
-Recommended fields:
-- `scope_id`
-- `user_id`
-- `client_id`
-- `project_id`
-- `active`
-
-### `greenhouse.user_campaign_scopes`
-
-Recommended fields:
-- `scope_id`
-- `user_id`
-- `client_id`
-- `campaign_id`
-- `active`
-
-## Metric Taxonomy
-
-The portal should standardize metric domains.
-
-### Delivery volume
-
-- deliverables completed
-- tasks completed
-- active work items
-- throughput weekly
-- throughput monthly
-
-### Speed
-
-- lead time
-- cycle time
-- review time
-- changes time
-- time to market
-- projected time to market
-
-### Quality and friction
-
-- review rounds
-- open comments
-- blocked items
-- rework ratio
-- aging work
-- on-time delivery rate
-
-### Capacity
-
-- capacity contracted
-- capacity assigned
-- capacity used
-- utilization by role
-- overload by role
-- idle capacity
-
-### Campaign intelligence
-
-- output by campaign
-- effort by campaign
-- speed by campaign
-- campaign load on team
-- campaign share of total output
-
-## API Architecture
-
-Endpoints should be organized by domain, not by source table.
-
-### Client endpoints
-
-Dashboard:
-- `/api/dashboard/summary`
-- `/api/dashboard/charts`
-- `/api/dashboard/capacity`
-- `/api/dashboard/market-speed`
-- `/api/dashboard/risks`
-
-Delivery:
-- `/api/projects`
-- `/api/projects/[id]`
-- `/api/projects/[id]/tasks`
-- `/api/projects/[id]/timeline`
-- `/api/projects/[id]/review-pressure`
-- `/api/sprints`
-- `/api/sprints/[id]`
-
-Campaigns:
-- `/api/campaigns`
-- `/api/campaigns/[id]`
-- `/api/campaigns/[id]/deliverables`
-- `/api/campaigns/[id]/kpis`
-
-Team:
-- `/api/team`
-- `/api/capacity`
-- `/api/capacity/roles`
-
-Settings:
-- `/api/settings/profile`
-- `/api/settings/preferences`
-
-### Internal endpoints
-
-- `/api/internal/dashboard`
-- `/api/internal/clients`
-- `/api/internal/clients/[id]/health`
-- `/api/internal/capacity`
-- `/api/internal/risks`
-- `/api/internal/kpis`
-
-### Admin endpoints
-
-- `/api/admin/tenants`
-- `/api/admin/users`
-- `/api/admin/roles`
-- `/api/admin/scopes`
-- `/api/admin/feature-flags`
-
-## Authorization Architecture
-
-### Short-term target
-
-Use a central auth helper set:
-- `requireSession()`
-- `requireTenantContext()`
-- `requireRole()`
-- `requireProjectScope()`
-- `requireCampaignScope()`
-
-### Session payload target
-
-Session should carry:
 - `userId`
 - `clientId`
-- `tenantType`
 - `roleCodes`
-- `projectScopes`
-- `campaignScopes`
-- `featureFlags`
-- `timezone`
-- `portalHomePath`
+- `routeGroups`
+- `spaceId`
+- `organizationId`
 
 ### Rules
 
-- never trust browser-provided client ids
-- never trust browser-provided project ids for access
-- every cache key must include tenant identity when data is tenant-specific
-- internal routes should still check role and scope, not just presence of session
+- Never trust browser-provided client or project IDs for access decisions
+- Every cache key must include tenant identity when data is tenant-specific
+- Internal routes still check role and scope, not just session presence
+
+## Route Map
+
+### Client routes
+
+| Route | Purpose |
+|---|---|
+| `/dashboard` | Executive dashboard |
+| `/proyectos` | Project list |
+| `/proyectos/[id]` | Project detail |
+| `/sprints` | Sprint list |
+| `/sprints/[id]` | Sprint detail |
+| `/updates` | Activity feed |
+| `/settings` | User preferences |
+
+### Finance routes
+
+| Route | Purpose |
+|---|---|
+| `/finance` | Finance dashboard (P&L, cash flow, aging) |
+| `/finance/clients` | Client accounts |
+| `/finance/clients/[id]` | Client account detail |
+| `/finance/income` | Income records |
+| `/finance/income/[id]` | Income detail |
+| `/finance/expenses` | Expense records |
+| `/finance/expenses/[id]` | Expense detail |
+| `/finance/suppliers` | Supplier directory |
+| `/finance/suppliers/[id]` | Supplier detail |
+| `/finance/reconciliation` | Reconciliation queue |
+| `/finance/reconciliation/[id]` | Reconciliation detail |
+| `/finance/intelligence` | Client economics and trends |
+
+### HR routes
+
+| Route | Purpose |
+|---|---|
+| `/hr` | HR dashboard |
+| `/hr/departments` | Department list |
+| `/hr/leave` | Leave management |
+| `/hr/attendance` | Attendance tracking |
+| `/hr/payroll` | Payroll periods |
+| `/hr/payroll/member/[memberId]` | Member payroll detail |
+
+### People routes
+
+| Route | Purpose |
+|---|---|
+| `/people` | Unified team directory |
+| `/people/[memberId]` | Person 360 (tabbed) |
+
+### Agency routes
+
+| Route | Purpose |
+|---|---|
+| `/agency` | Agency operational dashboard |
+| `/agency/organizations` | Organization list with KPIs |
+| `/agency/organizations/[id]` | Organization detail (overview, people, finance) |
+| `/agency/spaces` | Space management |
+| `/agency/capacity` | Capacity overview |
+| `/agency/services` | Service catalog |
+| `/agency/services/[serviceId]` | Service detail |
+
+### Admin routes
+
+| Route | Purpose |
+|---|---|
+| `/admin` | Admin landing |
+| `/admin/tenants` | Tenant list |
+| `/admin/tenants/[id]` | Tenant detail with capabilities |
+| `/admin/tenants/[id]/capability-preview/[moduleId]` | Capability preview |
+| `/admin/tenants/[id]/view-as/dashboard` | Admin impersonation |
+| `/admin/users` | User list |
+| `/admin/users/[id]` | User detail |
+| `/admin/roles` | Role management |
+| `/admin/ai-tools` | AI tools administration |
+| `/admin/team` | Team roster |
+
+### Internal routes
+
+| Route | Purpose |
+|---|---|
+| `/internal/dashboard` | Control tower |
+
+### Capability routes
+
+| Route | Purpose |
+|---|---|
+| `/capabilities/[moduleId]` | Dynamic capability module pages |
+
+### Other routes
+
+| Route | Purpose |
+|---|---|
+| `/home` | Landing redirect |
+| `/about` | About page |
+| `/auth/landing` | Auth landing |
+| `/login` | Login page |
+| `/auth/access-denied` | Access denied |
+| `/developers/api` | Developer API docs |
 
-## UI Component Reuse Strategy
+## Service Module Capability Layer
 
-The `full-version` folder is reference material, not merge material.
+Greenhouse adapts product surfaces to the services a client has contracted. This avoids hardcoding dashboard variants by tenant name and keeps CRM, creative, and web experiences composable.
 
-### Good candidates to adapt
+Architecture:
+- Capability catalog lives in `src/config/capability-registry.ts`
+- Module assignments are tenant-level configuration
+- Navigation is filtered by `routeGroups` plus capability availability
+- Dashboard widgets are selected by module applicability
 
-Dashboard patterns:
-- cards and chart framing from `src/views/dashboards/analytics/*`
-- status and chart layout from `src/views/dashboards/crm/*`
-- executive hierarchy from `WebsiteAnalyticsSlider`, `EarningReports`, `SupportTracker`, and `ProjectsTable`
+Current capability modules: CRM Command Center, Creative Hub, Web Delivery Lab, Onboarding Center.
 
-Table patterns:
-- searchable and sortable table patterns from `src/views/react-table/*`
-- filtered list patterns from `src/views/apps/user/list/*`
+## UI Component Architecture
 
-Admin patterns:
-- role and permission list layouts from `src/views/apps/roles/*`
-- permission management structure from `src/views/apps/permissions/*`
-- user list and user detail layouts from `src/views/apps/user/list/*` and `src/views/apps/user/view/*`
+### Executive UI System
 
-Admin detail reuse rule:
-- Vuexy `overview`, `security`, and `billing-plans` tabs are acceptable structural references for `/admin/users/[id]`
-- but they must be semantically remapped to Greenhouse instead of copied as template business meaning
-- recommended reinterpretation:
-- `overview` -> tenant, roles, scopes, feature flags, project access, activity summary
-- `security` -> auth mode, last login, reset flows, MFA readiness, audit events
-- `billing-plans` -> invoices, contracted fee, commercial plan, usage and account billing context
-- do not import template fake invoices, payment methods, or device history as product truth
+Dashboard and executive surfaces converge on a stable visual hierarchy:
+- One dominant hero card (`ExecutiveHeroCard`)
+- Compact summary cards (`ExecutiveMiniStatCard`, `MetricStatCard`)
+- Medium analysis cards with `CardHeader` framing (`ExecutiveCardShell`)
+- Bottom contextual lists or tables
 
-### What must be adapted before reuse
+Reference: `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
-- naming
-- metric semantics
-- navigation labels
-- fake data assumptions
-- action menus implying CRUD workflows not wanted in Greenhouse
+### Shared primitives
 
-### Executive UI system rule
+32 shared Greenhouse primitives in `src/components/greenhouse/`, including: `ExecutiveCardShell`, `ExecutiveHeroCard`, `ExecutiveMiniStatCard`, `MetricStatCard`, `ChipGroup`, `EmptyState`, `SectionHeading`, `TeamMemberCard`, `TeamAvatar`, `BrandLogo`, `BrandWordmark`, `UpsellBanner`, and others.
 
-Reference:
-- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
+### Component boundary rules
 
-The dashboard and future executive surfaces should converge on:
-- one dominant hero card
-- compact summary cards
-- medium analysis cards with `CardHeader`
-- bottom contextual lists or tables
+- Shared Greenhouse UI primitives belong in `src/components/greenhouse/`
+- Route or module composition belongs in `src/views/greenhouse/`
+- No view should recreate cards, headings, or chip groups ad hoc if they can be promoted to the shared layer
 
-This rule applies to:
-- `/dashboard`
-- future `/equipo`
-- future `/campanas`
-- internal executive views
-- admin overview surfaces when they need executive readability
+## Deployment Topology
 
-### What must not be imported as-is
+### Vercel
 
-- fake-db logic
-- ecommerce semantics
-- invoice semantics
-- academy semantics
-- template search data and unrelated menu trees
+- Next.js hosting (production)
+- 3 cron jobs:
+  - ICO Engine materialization (daily 6:15 AM UTC)
+  - Exchange rate sync (daily 11:05 PM UTC)
+  - Outbox consumer (every 5 min)
 
-## Phase Plan
+### Google Cloud
 
-The phases below are ordered by value and dependencies.
-
-Each phase is split into activities.
-
-Each activity includes:
-- goal
-- outputs
-- dependencies
-- parallelization notes
-- validation expectations
-
-## Phase 0: Alignment and Foundations
-
-### Objective
-
-Lock product boundaries, role model, semantic model, and data architecture before scale creates inconsistencies.
-
-### Activity 0.1: Product framing lock
-
-Goal:
-- document Greenhouse as executive visibility portal, not second Notion
-
-Outputs:
-- architecture document
-- updated backlog
-- updated project context
-- updated handoff references
-
-Dependencies:
-- none
-
-Parallelization:
-- can run in parallel with technical discovery
-
-Validation:
-- docs reviewed and referenced by repo context files
-
-### Activity 0.2: Service module taxonomy
-
-Goal:
-- define how Greenhouse composes product slices by contracted services
-
-Outputs:
-- service module taxonomy
-- mapping rules from HubSpot commercial data
-- runtime contract for `businessLines` and `serviceModules`
-
-Dependencies:
-- Activity 0.1
-
-Parallelization:
-- can run in parallel with KPI and semantic model work
-
-Validation:
-- module composition rules are documented and tied to real source fields in BigQuery
-
-### Activity 0.3: Role model definition
-
-Goal:
-- define official roles, access depth, and route access
-
-Outputs:
-- role matrix
-- route matrix
-- permission policy draft
-
-Dependencies:
-- Activity 0.1
-
-Parallelization:
-- can run in parallel with data model design
-
-Validation:
-- every route family mapped to at least one role
-
-### Activity 0.4: Semantic KPI model
-
-Goal:
-- define metric formulas and ownership
-
-Outputs:
-- KPI dictionary
-- metric source mapping
-- known gaps list
-
-Dependencies:
-- Activity 0.1
-
-Parallelization:
-- can run in parallel with role design
-
-Validation:
-- each KPI has definition, grain, source, and intended audience
-
-### Activity 0.5: Data mart design
-
-Goal:
-- design dimensions and fact tables that support dashboards and drilldowns
-
-Outputs:
-- draft schema for `greenhouse_marts`
-- refresh strategy
-- dependency map from source tables
-
-Dependencies:
-- Activity 0.3
-
-Parallelization:
-- can run in parallel with access model implementation planning
-
-Validation:
-- each target dashboard metric can be sourced from marts without per-endpoint reinvention
-
-## Phase 1: Identity, Access, and Multi-User Model
-
-### Objective
-
-Stop treating tenant and user as the same thing.
-
-### Activity 1.1: Create `client_users`
-
-Goal:
-- separate users from tenants
-
-Outputs:
-- DDL
-- seed strategy
-- migration plan from `greenhouse.clients`
-
-Dependencies:
-- Phase 0 role model
-
-Parallelization:
-- can run in parallel with session helper refactor
-
-Validation:
-- one tenant can support multiple users
-
-### Activity 1.2: Session payload redesign
-
-Goal:
-- move session from single-tenant-contact model to user-plus-scope model
-
-Outputs:
-- updated auth callbacks
-- typed session extensions
-- central auth helper layer
-
-Dependencies:
-- Activity 1.1
-
-Parallelization:
-- can run in parallel with admin route skeleton work
-
-Validation:
-- session contains user, tenant, roles, and scopes
-
-### Activity 1.3: Scope enforcement helpers
-
-Goal:
-- ensure project and campaign access are consistent everywhere
-
-Outputs:
-- `requireTenantContext`
-- `requireRole`
-- `requireProjectScope`
-- `requireCampaignScope`
-
-Dependencies:
-- Activity 1.2
-
-Parallelization:
-- can run in parallel with endpoint migrations
-
-Validation:
-- existing and new endpoints reject out-of-scope ids
-
-### Activity 1.4: Remove `env_demo`
-
-Goal:
-- eliminate bootstrap auth mode from runtime path except local emergency fallback if explicitly kept
-
-Outputs:
-- real `password_hash` or SSO flow
-- updated seed strategy
-- updated docs
-
-Dependencies:
-- Activity 1.1
-
-Parallelization:
-- can run in parallel with role matrix implementation
-
-Validation:
-- login no longer depends on demo password env for seeded tenant
-
-## Phase 2: Executive Client Dashboard
-
-### Objective
-
-Make `/dashboard` the real product center.
-
-### Activity 2.1: Build semantic dashboard endpoints
-
-Goal:
-- provide dashboard-specific data contracts
-
-Outputs:
-- `/api/dashboard/summary`
-- `/api/dashboard/charts`
-- `/api/dashboard/capacity`
-- `/api/dashboard/market-speed`
-- `/api/dashboard/risks`
-- module-aware widget contract
-
-Dependencies:
-- Phase 0 service module taxonomy
-- Phase 0 KPI model
-- Phase 1 auth helpers
-
-Parallelization:
-- endpoint work can be split by domain between agents
-
-Validation:
-- each endpoint documented with payload and role access
-- dashboard payloads can be composed by `serviceModules`
-
-### Activity 2.2: Redesign dashboard UI
-
-Goal:
-- deliver executive-facing home experience
-
-Outputs:
-- KPI strip
-- trend charts
-- capacity section
-- risk section
-- campaigns-in-focus block
-- reusable executive UI layer aligned to `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
-
-Dependencies:
-- Activity 2.1
-
-Parallelization:
-- UI blocks can be split across agents if payloads are stable
-
-Validation:
-- client_executive can understand operation health from one page
-- the first screen has clear hierarchy and no visually flat wall of cards
-
-### Activity 2.3: Drilldown contracts
-
-Goal:
-- ensure dashboard widgets point to meaningful secondary views
-
-Outputs:
-- links to projects, campaigns, team, and risks
-
-Dependencies:
-- Activity 2.2
-
-Parallelization:
-- can run in parallel with project and campaign detail refinement
-
-Validation:
-- every dashboard card links to a supporting context view where appropriate
-
-## Phase 3: Delivery Context and Operational Drilldowns
-
-### Objective
-
-Provide enough project, task, and sprint context to explain indicators.
-
-### Activity 3.1: Stabilize project detail
-
-Goal:
-- improve project detail from raw slice to productized drilldown
-
-Outputs:
-- timeline section
-- aging section
-- review-pressure section
-- campaign relation block
-
-Dependencies:
-- existing `/proyectos/[id]`
-
-Parallelization:
-- timeline and review-pressure can be separate agent tasks
-
-Validation:
-- a client manager can explain project health without leaving Greenhouse
-
-### Activity 3.2: Real sprint module
-
-Goal:
-- build sprint context only as a speed and predictability lens
-
-Outputs:
-- `/api/sprints`
-- `/api/sprints/[id]`
-- `/sprints`
-
-Dependencies:
-- Phase 1 auth helpers
-
-Parallelization:
-- endpoint and UI can be split
-
-Validation:
-- sprint view explains delivery speed, not task management workflow
-
-### Activity 3.3: Delivery overview route
-
-Goal:
-- aggregate projects, deliverables, and operational load into one route
-
-Outputs:
-- `/entrega`
-
-Dependencies:
-- dashboard metrics
-- project and sprint contracts
-
-Parallelization:
-- can be split by section
-
-Validation:
-- route provides a delivery operations narrative, not a backlog board
-
-## Phase 4: Team and Capacity
-
-### Objective
-
-Expose the assigned team and operational capacity clearly.
-
-### Activity 4.1: Team assignment model
-
-Goal:
-- model which people or roles are assigned to a client, campaign, or project
-
-Outputs:
-- schema decision
-- source-of-truth mapping
-- team assignment query layer
-
-Dependencies:
-- staffing source clarity
-
-Parallelization:
-- schema and source research can run in parallel
-
-Validation:
-- every visible team member or role has an authoritative source
-
-### Activity 4.2: Capacity metrics
-
-Goal:
-- define and expose capacity metrics by role and tenant
-
-Outputs:
-- `/api/team`
-- `/api/capacity`
-- `/api/capacity/roles`
-
-Dependencies:
-- Activity 4.1
-
-Parallelization:
-- endpoint work can be split from UI work
-
-Validation:
-- users can see contracted capacity, assigned capacity, and actual usage
-
-### Activity 4.3: Team route
-
-Goal:
-- create `/equipo`
-
-Outputs:
-- assigned team cards
-- role mix
-- load by role
-- capacity risks
-
-Dependencies:
-- Activity 4.2
-
-Parallelization:
-- card sections can be parallelized
-
-Validation:
-- client_executive can understand who is supporting the account and how loaded the team is
-
-## Phase 5: Campaign Intelligence
-
-### Objective
-
-Relate campaigns to operational output and KPIs.
-
-### Activity 5.1: Campaign mapping model
-
-Goal:
-- define how campaigns map to projects, tasks, and deliverables
-
-Outputs:
-- campaign dimension design
-- mapping rules
-- gap list where manual mapping may be needed
-- service-module interpretation per campaign
-
-Dependencies:
-- semantic mart design
-
-Parallelization:
-- can run in parallel with dashboard iteration
-
-Validation:
-- every campaign shown in Greenhouse has a reproducible mapping to operational work
-
-### Activity 5.2: Campaign endpoints
-
-Goal:
-- create campaign-serving APIs
-
-Outputs:
-- `/api/campaigns`
-- `/api/campaigns/[id]`
-- `/api/campaigns/[id]/deliverables`
-- `/api/campaigns/[id]/kpis`
-
-Dependencies:
-- Activity 5.1
-
-Parallelization:
-- each endpoint family can be separate
-
-Validation:
-- campaign views reconcile to project and deliverable facts
-
-### Activity 5.3: Campaign UI
-
-Goal:
-- create `/campanas` and `/campanas/[id]`
-
-Outputs:
-- campaign summary
-- output and effort by campaign
-- speed to market by campaign
-- KPI relation blocks
-
-Dependencies:
-- Activity 5.2
-
-Parallelization:
-- list and detail can be split
-
-Validation:
-- client_executive can connect campaigns to operational performance and output
-
-## Phase 6: Internal Efeonce Visibility
-
-### Objective
-
-Enable internal operational and account oversight across tenants.
-
-### Activity 6.1: Internal dashboard
-
-Goal:
-- create cross-tenant operational dashboard
-
-Outputs:
-- `/internal/dashboard`
-
-Dependencies:
-- semantic marts
-- role model
-
-Parallelization:
-- KPI blocks can be split
-
-Validation:
-- internal users can rank clients by risk and health
-
-### Activity 6.2: Client health detail
-
-Goal:
-- create `/internal/clientes` and `/internal/clientes/[id]`
-
-Outputs:
-- client health cards
-- risk and opportunity views
-- client-specific capacity and delivery context
-
-Dependencies:
-- Activity 6.1
-
-Parallelization:
-- list and detail can be split
-
-Validation:
-- account leads can prepare client conversations directly from Greenhouse
-
-### Activity 6.3: Internal capacity and risk
-
-Goal:
-- expose cross-tenant staffing and risk views
-
-Outputs:
-- `/internal/capacidad`
-- `/internal/riesgos`
-- `/internal/kpis`
-
-Dependencies:
-- Phase 4 capacity model
-
-Parallelization:
-- each route family can be separate
-
-Validation:
-- operations can identify overloaded disciplines and systemic delivery risk
-
-## Phase 7: Admin and Governance
-
-### Objective
-
-Provide safe and explicit admin capabilities.
-
-### Activity 7.1: Tenant admin
-
-Goal:
-- manage tenants and metadata
-
-Outputs:
-- `/admin/tenants`
-- `/admin/tenants/[id]`
-
-Dependencies:
-- multi-user model
-
-Parallelization:
-- list and detail can be split
-
-Current runtime status:
-- `/admin/tenants` and `/admin/tenants/[id]` already exist as read-only governance surfaces
-- the current implementation treats tenant as the company-level unit of governance
-- detail pages already consolidate users, service modules, feature flags, and visible projects for a tenant
-
-Validation:
-- admins can onboard and maintain tenants without direct table edits
-
-### Activity 7.2: User and role admin
-
-Goal:
-- manage users and access
-
-Outputs:
-- `/admin/users`
-- `/admin/users/[id]`
-- `/admin/roles`
-
-Recommended reuse:
-- adapt Vuexy `src/views/apps/user/list/*` for `/admin/users`
-- adapt Vuexy `src/views/apps/roles/*` for `/admin/roles`
-- adapt Vuexy `src/views/apps/user/view/*` for `/admin/users/[id]`
-- treat `billing-plans` as future invoice and commercial context surface, not payment-method demo UI
-
-Dependencies:
-- Phase 1 tables
-
-Parallelization:
-- user views and role views can be split
-
-Validation:
-- admins can inspect and change role assignments safely
-
-### Activity 7.3: Scope and feature admin
-
-Goal:
-- manage project, campaign, and feature access
-
-Outputs:
-- `/admin/scopes`
-- `/admin/feature-flags`
-- service module governance visibility
-
-Dependencies:
-- scope tables
-
-Parallelization:
-- flags and scopes can be separate workstreams
-
-Validation:
-- admin can restrict or enable slices without code edits
-
-## Parallelization Guide
-
-The following streams can often proceed in parallel after Phase 0:
-
-### Stream A: access and identity
-- client_users
-- auth callbacks
-- session typing
-- scope guards
-
-### Stream B: semantic data
-- KPI dictionary
-- marts design
-- materialized queries
-- refresh jobs
-
-### Stream C: client product UI
-- dashboard
-- team
-- campaign list
-- project and sprint drilldowns
-
-### Stream D: internal product UI
-- internal dashboard
-- internal clients
-- internal capacity
-- internal risks
-
-### Stream E: admin
-- tenants
-- users
-- roles
-- scopes
-- feature flags
-
-### Coordination rules for parallel work
-
-- no agent should redefine KPI semantics in UI code
-- no agent should add a new role without documenting it in the role matrix
-- no agent should create an endpoint payload without documenting the contract if it will be consumed by another agent
-- shared contracts must live in `src/types/**`
-- shared query logic must live in `src/lib/**`
-- all new route families must be documented in `project_context.md` and `Handoff.md`
-
-## Recommended Repo Structure Evolution
-
-Current structure is acceptable for the MVP but should evolve.
-
-Recommended additions:
-- `src/components/greenhouse/**`
-- `src/lib/authz/**`
-- `src/lib/campaigns/**`
-- `src/lib/capacity/**`
-- `src/lib/internal/**`
-- `src/lib/marts/**`
-- `src/types/api/**`
-- `src/views/greenhouse/dashboard/**`
-- `src/views/greenhouse/projects/**`
-- `src/views/greenhouse/campaigns/**`
-- `src/views/greenhouse/team/**`
-- `src/views/greenhouse/internal/**`
-- `src/views/greenhouse/admin/**`
-
-Component boundary rule:
-- shared Greenhouse UI primitives belong in `src/components/greenhouse/**`
-- route or module composition belongs in `src/views/greenhouse/**`
-- no view should recreate cards, headings, or chip groups ad hoc if they can be promoted to the shared Greenhouse layer
-
-## Validation Strategy
-
-### For docs and architecture changes
-
-- update `project_context.md`
-- update `docs/roadmap/BACKLOG.md`
-- update `Handoff.md`
-- update `changelog.md` when architecture or roadmap changes materially
-
-### For API changes
-
-- validate authorization
-- validate out-of-scope rejection
-- validate tenant filtering
-- validate payload shape
-
-### For UI changes
-
-- validate desktop and mobile
-- validate empty state
-- validate error state
-- validate role-based visibility
-
-### For data changes
-
-- validate source columns exist
-- validate metric formulas against samples
-- validate no cross-tenant leakage
-- validate internal and client numbers reconcile when expected
-
-## Known Risks
-
-- auth remains partially bootstrap-based until `client_users` and real credentials land
-- campaign mapping may be incomplete in current operational data
-- capacity may need source enrichment beyond current Notion tables
-- BigQuery query logic may drift unless semantic marts are introduced early
-- internal and client views may fork semantically if KPI definitions are not centralized
-- tenant-specific KPI requests can push the product into misleading metrics if source quality is not validated first
-- current RpA source quality is not yet strong enough to justify tenant-facing `First-Time Right` claims by default
-
-## Tenant-Specific Implementation Notes
-
-The architecture must allow tenant-specific emphasis without hardcoding product semantics by tenant name.
-
-Current active tenant-specific initiative:
-- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
-
-Rule:
-- a tenant-specific request may change copy, emphasis, or sequencing
-- it must not bypass KPI governance, semantic consistency, or source-of-truth rules
-
-For Sky specifically, the current architecture stance is:
-- monthly `on-time` is allowed if derived from defendable task-level delivery status
-- tenure is allowed once the canonical start-date rule is approved
-- monthly RpA and `First-Time Right` remain blocked until source quality improves
-- assigned account team, capacity, technology tools, and AI tools require explicit models and must not be inferred from incidental task assignees or raw JSON keyword matches
-- provider relationships for tooling or AI suites must resolve through an explicit provider registry, not loose `vendor` strings scattered per module
+| Service | Region | Purpose |
+|---|---|---|
+| Cloud SQL (`greenhouse-pg-dev`) | us-east4 | PostgreSQL 16 OLTP |
+| BigQuery (`efeonce-group`) | US | OLAP warehouse |
+| Cloud Run (10 services) | us-central1 | Sync pipelines and integrations |
+| Cloud Scheduler (6 jobs) | — | 4 active, 2 paused (staging) |
 
 ## Decisions Locked By This Document
 
-- Greenhouse is not a second Notion
-- project, task, and sprint views are context views, not primary workflow views
-- executive dashboard is the primary client landing experience
-- user identity must be separated from tenant metadata
-- client and internal Efeonce views must be separated at route level
-- semantic marts are a required medium-term architecture step, not an optional cleanup
+- Greenhouse is not a second Notion — project, task, and sprint views are context views, not primary workflow views
+- Executive dashboard is the primary client landing experience
+- User identity is separated from tenant metadata
+- Client and internal Efeonce views are separated at route level
+- PostgreSQL is the OLTP store; BigQuery is the OLAP store
+- Auth is layout-level, not middleware-level
+- Roles are composable, not hierarchical
+- Config-driven property mappings normalize multi-client data at sync time
+- Canonical object graph prevents module-local identity silos
+- Service module capabilities gate product surfaces, not security
 
-## Immediate Next Actions
+## Related Design Documents
 
-1. Refactor `/dashboard` into the reusable executive UI system defined in `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`.
-2. Build `/admin/scopes` and `/admin/feature-flags`.
-3. Build `/api/sprints` and the real `/sprints`.
-4. Extend `serviceModules` from dashboard composition into navigation and billing context.
-5. Formalize team/capacity, tooling, quality, and provider-linked tooling APIs so the new dashboard cards stop depending on controlled overrides.
-6. Continue KPI dictionary and semantic mart design so dashboard, team, and campaigns do not drift.
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` — canonical object model and enrichment rules
+- `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md` — ID generation patterns and prefix conventions
+- `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md` — internal identity and person model
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md` — service module taxonomy and capability composition
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md` — finance canonicalization architecture
+- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` — executive UI contract and component hierarchy
 
 ## Agent Working Notes
 
@@ -1457,13 +502,6 @@ If you are a new agent entering this repo:
 2. Read `project_context.md`.
 3. Read `Handoff.md`.
 4. Read this document fully before changing architecture, auth, routes, or data models.
-5. If your task touches roles, KPIs, routes, marts, or tenant model, update this document or explicitly state why not.
+5. If your task touches roles, KPIs, routes, data stores, or tenant model, update this document or explicitly state why not.
 
 This document is not optional context for architecture-changing work.
-
-## Related Design Documents
-
-- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`: Phase 1 identity, roles, scopes, session model, and migration design
-- `bigquery/greenhouse_identity_access_v1.sql`: proposed BigQuery schema and bootstrap seed for users, roles, and scopes
-- `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`: validated scope and feasibility notes for the Sky Airline dashboard slice
-- `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`: reusable executive UI contract derived from Vuexy analytics hierarchy

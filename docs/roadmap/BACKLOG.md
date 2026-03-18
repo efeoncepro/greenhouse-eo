@@ -7,6 +7,8 @@ This backlog is the execution summary of `docs/architecture/GREENHOUSE_ARCHITECT
 Use it to decide what to build next.
 Use the architecture document to understand why, how, and in what order.
 
+Last updated: March 2026.
+
 ## Working Rule
 
 - keep tasks small, mergeable, and verifiable
@@ -32,6 +34,7 @@ Greenhouse is:
 - an executive visibility layer
 - an operational context layer
 - a place to explain delivery, speed, capacity, and risk
+- an internal operations platform for finance, HR, and agency management
 
 Greenhouse is not:
 - a second Notion
@@ -46,15 +49,15 @@ Goal:
 - lock product boundaries, role model, KPI semantics, and architecture direction
 
 Status:
-- in progress
+- **COMPLETE**
 
-Open activities:
-- finalize role matrix
-- finalize KPI dictionary
-- finalize semantic mart design
-- finalize service module taxonomy from HubSpot commercial data
-- define module mapping rules from `linea_de_servicio` and `servicios_especificos`
-- align all repo docs to `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+Completed:
+- role matrix finalized
+- KPI dictionary finalized
+- semantic mart design finalized
+- service module taxonomy derived from HubSpot commercial data
+- module mapping rules from `linea_de_servicio` and `servicios_especificos` defined
+- repo docs aligned to `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 
 ### Phase 1. Identity, Access, and Multi-User Model
 
@@ -62,20 +65,19 @@ Goal:
 - separate tenant metadata from user identity and scope
 
 Status:
-- completed
+- **COMPLETE**
 
 Completed:
 - removed legacy fallback to `greenhouse.clients` from runtime auth
-- added route guards by route group and role family for client, internal, and admin surfaces
+- added route guards by route group and role family for client, internal, admin, finance, hr, people, and agency surfaces
 - removed `auth_mode = env_demo` from normal runtime and seeded bcrypt credentials for demo access
 - created `/auth/landing` and portal-home redirects by tenant type
 - created minimum `/internal/dashboard` and `/admin/users` surfaces
 - bootstrapped HubSpot closedwon companies into `greenhouse.clients` and `greenhouse.client_users`
 - mapped confident project scopes for imported tenants where a defendable Notion match existed
-
-Residual operational follow-up:
-- replace invited bootstrap users with real activation or SSO onboarding flow when customer onboarding starts
-- expand campaign scope consumers once campaign routes exist
+- SSO via Microsoft (Azure AD) and Google OAuth operational alongside credentials provider
+- multi-user model with composable roles via `user_role_assignments`
+- identity profiles and source links for canonical person identity
 
 ### Phase 2. Executive Client Dashboard
 
@@ -83,24 +85,17 @@ Goal:
 - make `/dashboard` the true product center for client stakeholders
 
 Status:
-- partially started
+- **COMPLETE**
 
-Open activities:
-- review and promote the new executive dashboard through `Preview`, `staging` and `Production`
-- refactor `/dashboard` to the reusable `Executive UI System` documented in `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
-- create reusable executive card families in `src/components/greenhouse/*`
-- add `/api/dashboard/capacity` once team and staffing data are modeled
-- add `/api/dashboard/market-speed` when time fields become numerically reliable
-- add campaign-aware slices once `/campanas` exists
-
-Completed in current iteration:
-- created `/api/dashboard/summary`
-- created `/api/dashboard/charts`
-- created `/api/dashboard/risks`
+Completed:
+- created `/api/dashboard/summary`, `/api/dashboard/charts`, `/api/dashboard/risks`
 - redesigned `/dashboard` around executive visibility
+- hero section, KPI cards, charts, team section, capacity overview
+- reusable card system (`src/components/greenhouse/*`) with executive card families
 - composed dashboard widgets and narrative by `businessLines` and `serviceModules`
-- adopted Vuexy chart stack with `apexcharts` + `react-apexcharts` and the `AppReactApexCharts` wrapper pattern from `full-version`
-- validated the new dashboard queries against real tenant scope in BigQuery
+- adopted Vuexy chart stack with `apexcharts` + `react-apexcharts` and `AppReactApexCharts` wrapper
+- validated dashboard queries against real tenant scope
+- dashboard promoted through Preview, staging, and Production
 
 ### Phase 3. Delivery Context and Operational Drilldowns
 
@@ -108,21 +103,15 @@ Goal:
 - provide enough context to explain indicators without duplicating Notion
 
 Status:
-- partially started
+- **COMPLETE**
 
-Done:
-- `/api/projects`
-- `/api/projects/[id]`
-- `/api/projects/[id]/tasks`
-- `/proyectos`
-- `/proyectos/[id]`
-
-Open activities:
-- create `/api/sprints`
-- create `/api/sprints/[id]`
-- build real `/sprints`
-- add project timeline and aging to project detail
-- add delivery overview route `/entrega`
+Completed:
+- `/api/projects`, `/api/projects/[id]`, `/api/projects/[id]/tasks` with tenant authorization
+- `/proyectos` and `/proyectos/[id]` with KPI header, tasks table, review pressure, sprint context
+- `/api/sprints` and `/api/sprints/[id]`
+- sprint views operational
+- project timeline and aging in project detail
+- updates working
 
 ### Phase 4. Team and Capacity
 
@@ -130,15 +119,17 @@ Goal:
 - expose assigned team, role mix, capacity, and load
 
 Status:
-- not started
+- **SUBSTANTIALLY COMPLETE**
 
-Open activities:
-- define source of truth for assignments
-- create team and capacity semantic layer
-- create `/api/team`
-- create `/api/capacity`
-- create `/api/capacity/roles`
-- build `/equipo`
+Completed:
+- People module operational with route group and `canAccessPeopleModule()` access
+- team directory with search and filters
+- Person 360 with tabbed views (overview, projects, capacity, activity)
+- capacity views per person and per team
+- `/api/team` and `/api/capacity` endpoints
+
+Remaining:
+- formal allocation model (planned hours vs actual by person/project/period)
 
 ### Phase 5. Campaign Intelligence
 
@@ -146,18 +137,19 @@ Goal:
 - relate campaigns, projects, deliverables, and KPIs
 
 Status:
-- not started
+- **PARTIALLY COMPLETE** — no formal campaign model, but ICO Engine operates as operational intelligence proxy
 
-Open activities:
-- design campaign mapping model
-- connect campaign KPI context to `serviceModules`
-- create campaign semantic layer
-- create `/api/campaigns`
-- create `/api/campaigns/[id]`
-- create `/api/campaigns/[id]/deliverables`
-- create `/api/campaigns/[id]/kpis`
-- build `/campanas`
-- build `/campanas/[id]`
+Completed:
+- ICO Engine with 10 operational metrics (velocity, throughput, stuck assets, revision pressure, first-time right, on-time delivery, sprint health, resource utilization, backlog aging, scope changes)
+- daily materialization pipeline
+- stuck asset detection and alerting
+- agency scorecard powered by ICO metrics
+
+Not started:
+- formal campaign entity model
+- campaign-level KPI attribution
+- `/campanas` and `/campanas/[id]` routes
+- campaign scope consumers
 
 ### Phase 6. Internal Efeonce Visibility
 
@@ -165,14 +157,15 @@ Goal:
 - give Efeonce internal users cross-tenant operational and account visibility
 
 Status:
-- partially started
+- **COMPLETE**
 
-Open activities:
-- create `/internal/clientes`
-- create `/internal/clientes/[id]`
-- create `/internal/capacidad`
-- create `/internal/riesgos`
-- create `/internal/kpis`
+Completed:
+- agency workspace with internal dashboard
+- operational pulse view
+- organizations management (hierarchy, memberships)
+- services catalog and module management
+- ICO Engine tab in agency workspace
+- cross-tenant operational views
 
 ### Phase 7. Admin and Governance
 
@@ -180,142 +173,133 @@ Goal:
 - provide safe tenant, user, role, scope, and feature administration
 
 Status:
-- partially started
+- **SUBSTANTIALLY COMPLETE**
 
-Open activities:
-- create `/admin/scopes`
-- create `/admin/feature-flags`
-- expose business line and active service modules in admin governance
+Completed:
+- `/admin/tenants`, `/admin/tenants/[id]`, `/admin/tenants/[id]/view-as/dashboard`
+- `/admin/users`, `/admin/users/[id]`
+- `/admin/roles`
+- tenant-centric admin views backed by `clients`, `client_users`, `client_service_modules`, and `client_feature_flags`
+- capability module administration with `verifyCapabilityModuleAccess()`
+- AI tools catalog and license management
+- `requireAdminTenantContext()` enforcing both admin route group and efeonce_admin role
 
-Completed in current iteration:
-- created `/admin/tenants`
-- created `/admin/tenants/[id]`
-- created `/admin/tenants/[id]/view-as/dashboard`
-- created `/admin/users`
-- created `/admin/users/[id]`
-- created `/admin/roles`
-- adapted Vuexy `user/list/*`, `user/view/*`, and `roles/*` into read-only admin surfaces backed by BigQuery
-- added tenant-centric admin views backed by `clients`, `client_users`, `client_service_modules`, and `client_feature_flags`
-- reinterpreted `overview`, `security`, and `billing-plans` as user context, access/audit, and future invoice/commercial context
+Remaining:
+- SCIM provisioning for automated user lifecycle from IdP
+- fine-grained scopes (`/admin/scopes`, `/admin/feature-flags` as dedicated governance surfaces)
 
-Current adaptation rule:
-- use `full-version/src/views/apps/user/list/*` as base for `/admin/users`
-- use `full-version/src/views/apps/roles/*` as base for `/admin/roles`
-- use `full-version/src/views/apps/user/view/*` as base for `/admin/users/[id]`
-- keep `/admin/tenants` as a Greenhouse-specific governance surface centered on company/tenant health, not a direct copy of Vuexy demo business modules
-- reinterpret Vuexy tabs:
-- `overview` -> user context and scope
-- `security` -> access and audit
-- `billing-plans` -> invoices and commercial context
+## Modules Beyond Original Phases
 
-## Now
+The following modules were not in the original phased roadmap but are now operational:
 
-### N0.1 Promotion and Documentation Alignment
+### Finance Module
+- 40+ API routes under `/api/finance/*`
+- finance dashboard with P&L views
+- reconciliation workflows
+- financial intelligence (cost allocation, client economics, trend analysis)
+- route group: `finance` (requires `'finance'` route group or `efeonce_admin`)
 
-- keep `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` aligned with repo reality
-- keep `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` aligned with runtime reality
-- align `docs/roadmap/BACKLOG.md`, `project_context.md`, `README.md`, `Handoff.md`, and `changelog.md`
-- validate dashboard and admin surfaces in `Preview` or `staging` before the next promotion to `main`
+### HR Core + Payroll
+- 25+ API routes under `/api/hr/*`
+- Chilean payroll processing and compliance
+- leave management and attendance tracking
+- department and position management
+- route group: `hr` (requires `'hr'` route group or `efeonce_admin`)
 
-### N2.1 Dashboard Hardening
+### Account 360 / Organizations
+- organization hierarchy management (EO-ORG)
+- person memberships and relationships
+- HubSpot company sync for commercial data enrichment
+- organization-level analytics
 
-- avoid recomputing the same overview payload when only one slice needs refresh
-- decide if tenant-level cache is safe for summary, charts, and risks
-- stop adding one-off cards and migrate the current dashboard to the reusable executive card hierarchy
-- make `/dashboard` visually closer to Vuexy analytics in hierarchy, density, and chart framing while keeping Greenhouse semantics and brand
+### AI Tooling & Credits
+- AI tool catalog with license management
+- credit wallet system and metering
+- per-tenant AI tool allocation
+- capability module access control
 
-### N2.2 Sky tenant dashboard slice
+### ICO Engine
+- 10 operational metrics with daily materialization
+- stuck asset detection and detail views
+- agency scorecard with cross-tenant rollup
+- NULL safety and client name resolution in materialization
 
-- use `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md` as the source of truth before implementation
-- completed in current iteration:
-- monthly on-time grouped by task creation month
-- tenure from first visible operational activity
-- deliverables visible by month
-- adjustment proxy by month
-- reusable monthly quality section with `RpA` and `First-Time Right`
-- reusable account team and initial capacity section
-- reusable technology tooling and AI tooling sections
-- the reusable layer mixes measured signals, Notion-derived signals, service-module defaults, and tenant overrides
-- next:
-- validate the Sky slice visually in the dashboard
-- formalize source models and APIs for team/capacity, tooling, and quality
+### Financial Intelligence
+- cost allocation models
+- client economics and profitability analysis
+- trend analysis and forecasting
+- integrated with finance module data
 
-### N2.3 Executive UI System rollout
+## Current Focus (March 2026)
 
-- use `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md` as UI contract
-- introduce reusable wrappers for hero, mini stat, chart, list, and table cards
-- keep tenant-specific emphasis in config and payload capabilities, not in custom JSX per client
+### Conformed Data Layer
+- config-driven property mappings across source systems — **just completed**
+- discovery script for schema introspection
 
-### N7.1 Governance Surfaces
+### Source Sync Runtime Projections
+- runtime projection layer for source sync pipelines — **in progress**
+- goal: predictable sync windows and data freshness guarantees
 
-- expose `businessLines` and `serviceModules`
-- create `/admin/scopes`
-- create `/admin/feature-flags`
-- keep mutations out until tenant-safe write paths and audit strategy are defined
+### Person 360 Profile Unification
+- canonical identity consolidation across Notion, HubSpot, Google, Microsoft sources — **in progress**
+- identity profile source links for deduplication
 
-### N3.1 Sprints Slice
+### PostgreSQL Migration for Finance and Payroll
+- migrating finance and payroll tables from BigQuery to PostgreSQL `greenhouse_core` — **in progress**
+- goal: transactional consistency for write-heavy financial operations
 
-- create `/api/sprints`
-- create `/api/sprints/[id]`
-- build `/sprints`
-- connect sprint velocity and health as drilldown, not as a task-management center
+### Identity Access V2 (Postgres-First RBAC)
+- completing the migration of all auth tables to PostgreSQL — **in progress**
+- fine-grained permission model beyond route groups
+- SCIM provisioning groundwork
 
 ## Parallel Streams
 
 ### Stream A. Access and Identity
-
-Can move in parallel:
-- `client_users`
-- auth refactor
-- scope helpers
-- role matrix implementation
+- identity access v2 (Postgres-first RBAC)
+- SCIM provisioning
+- fine-grained scopes
+- Person 360 profile unification
 
 ### Stream B. Semantic Data
-
-Can move in parallel:
-- KPI dictionary
-- marts design
-- campaign mapping design
-- capacity model design
+- conformed data layer
+- source sync runtime projections
+- ICO Engine metric expansion
+- campaign model design (when prioritized)
 
 ### Stream C. Client Product UI
-
-Can move in parallel after endpoint contracts are stable:
-- dashboard
-- project detail refinement
-- sprint views
-- team views
-- campaign views
+- Person 360 tabs and allocation model
+- capability module expansion
+- campaign views (when campaign model exists)
 
 ### Stream D. Internal UI
+- agency workspace refinement
+- cross-tenant capacity and risk views
+- financial intelligence dashboards
 
-Can move in parallel after role model is stable:
-- internal dashboard
-- client health
-- internal capacity
-- internal risks
+### Stream E. Admin and Governance
+- SCIM provisioning
+- fine-grained scopes and feature flag governance
+- audit logging expansion
 
-### Stream E. Admin
-
-Can move in parallel after access schema exists:
-- tenants
-- users
-- roles
-- scopes
-- feature flags
+### Stream F. Finance and HR
+- PostgreSQL migration for transactional data
+- payroll automation expansion
+- reconciliation workflow refinement
+- financial intelligence models
 
 ## Cross-Cutting Technical Tasks
 
 - add tests for authz helpers
 - add tests for tenant isolation on API routes
 - add cache strategy per tenant and role where safe
-- add error logging for BigQuery failures
+- add error logging for database failures (PostgreSQL + BigQuery)
 - add audit logging for auth events and admin actions
 - add observability for failed auth, failed queries, and empty-state anomalies
 - move repeated metric logic into semantic query functions or marts
-- move repeated executive card layout patterns into `src/components/greenhouse/*` before extending `/equipo`, `/campanas`, or internal overviews
+- expand ICO Engine materialization coverage
 
-## Done Already
+## Done Already (Historical)
 
 - Greenhouse shell routes and navigation
 - demo auth with `next-auth`
@@ -337,3 +321,10 @@ Can move in parallel after access schema exists:
 - `/internal/dashboard` and `/admin/users` as minimum guarded surfaces
 - HubSpot closedwon companies bootstrapped as Greenhouse tenants
 - confident project scopes bootstrapped for DDSoft, SSilva, and Sky Airline
+- SSO (Microsoft + Google) operational
+- PostgreSQL `greenhouse_core` as auth store
+- finance module (40+ routes), HR/payroll module (25+ routes)
+- ICO Engine with 10 metrics and daily materialization
+- agency workspace and internal operations platform
+- AI tooling catalog and credit metering
+- conformed data layer with config-driven property mappings

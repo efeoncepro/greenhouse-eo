@@ -397,3 +397,48 @@ When this architecture is adopted:
 - BigQuery becomes simpler and cheaper to reason about
 - 360 views become safer because they are built from stable canonical data, not ad hoc runtime joins
 - the platform can scale with clearer boundaries between operations and analytics
+
+## Runtime Reality Notes (March 2026)
+
+### Confirmed Operational
+- PostgreSQL instance `greenhouse-pg-dev` deployed (Postgres 16, us-east4, db-custom-1-3840)
+- Database: `greenhouse_app` with schemas: greenhouse_core, greenhouse_serving, greenhouse_sync, greenhouse_hr, greenhouse_payroll, greenhouse_finance, greenhouse_delivery, greenhouse_crm, greenhouse_ai
+- Outbox consumer operational (Vercel cron every 5 min, publishes to `greenhouse_raw.postgres_outbox_events`)
+- Outbox marts deployed: `greenhouse_marts` with 5 views (fin_accounts, fin_expenses, payroll_entries from outbox)
+- `greenhouse_raw` dataset exists with 11 tables (Notion + HubSpot snapshots + outbox events)
+- `greenhouse_conformed` dataset has 6 tables (delivery_projects/tasks/sprints, crm_companies/deals/contacts) — all partitioned + clustered
+
+### Migration Status by Module
+| Module | Postgres-First | BigQuery Fallback | Notes |
+|--------|---------------|-------------------|-------|
+| Finance — Income/Expenses | ✅ | ✅ | Dual-store operational |
+| Finance — Accounts/Suppliers | ❌ | Primary | Still BigQuery-only in API routes |
+| Finance — Reconciliation | ❌ | Primary | BigQuery-only |
+| Finance — Exchange Rates | ❌ | Primary | BigQuery + Vercel cron sync |
+| Finance — Intelligence | ❌ | Primary | BigQuery analytical queries |
+| HR Payroll | ✅ | ✅ | Postgres-first for periods, entries, compensation |
+| HR Core (leave, attendance) | ✅ (Postgres) | ✅ (BigQuery schema bootstrap) | Mixed: leave store is Postgres, schema.ts bootstraps BigQuery tables |
+| AI Tooling | ✅ | ✅ | Postgres-primary with BigQuery fallback |
+| Account 360 | ✅ | ❌ | Postgres-only |
+| Team Admin | ✅ | ❌ | Postgres-only |
+| ICO Engine | ❌ | Primary | BigQuery-only (analytical, correct per architecture) |
+| Dashboard | ❌ | Primary | BigQuery-only (read model) |
+| People | ❌ | Primary | BigQuery for list/detail queries |
+| Projects/Sprints | ❌ | Primary | BigQuery (notion_ops legacy + greenhouse_conformed) |
+
+### Legacy Dataset Status
+- `hubspot_crm` (35 tables): Still actively read by Finance client queries and dashboard. Target: migrate to greenhouse_conformed.crm_* + Postgres projections
+- `notion_ops` (10 tables): Still actively read by delivery/project queries and ICO Engine. Target: migrate to greenhouse_conformed.delivery_*
+- `greenhouse` dataset (41 tables): Mix of canonical tables and operational tables. Some should migrate to Postgres, others remain as BigQuery source of truth
+
+### External Sync Pipeline Infrastructure
+7 Cloud Functions/Cloud Run services in us-central1:
+- notion-bq-sync (Cloud Run, daily 3AM CL)
+- hubspot-bq-sync (Cloud Function, daily 3:30AM CL)
+- hubspot-notion-deal-sync (Cloud Function, every 15min)
+- notion-hubspot-reverse-sync (Cloud Function, every 15min)
+- notion-frameio-sync (Cloud Function, on-demand)
+- notion-teams-notify (Cloud Function, on-demand)
+- hubspot-greenhouse-integration (Cloud Run, on-demand)
+
+4 active Cloud Scheduler jobs + 2 paused staging jobs orchestrating the above.

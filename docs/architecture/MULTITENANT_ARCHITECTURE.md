@@ -2,155 +2,188 @@
 
 ## Status
 
-This document remains useful as the tenant-focused reference.
+Last updated: March 2026.
 
-For the full product architecture, phased roadmap, role hierarchy, internal/admin route model, KPI semantics, and multi-agent execution plan, use:
+This document is the tenant-focused reference for Greenhouse EO. It covers the tenancy model, auth boundaries, route group authorization, and data isolation.
+
+For the full product architecture, phased roadmap, and object model, see:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 
-If both documents overlap, `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` is the broader source of truth and this document should stay focused on tenant isolation and auth boundaries.
-
 ## Objective
 
-Greenhouse must serve multiple clients from one Next.js application without exposing cross-tenant data. The tenant boundary is `client_id`.
+Greenhouse serves multiple clients from one Next.js application without exposing cross-tenant data. The tenant boundary is `client_id`.
 
-Terminology used in this repo:
-- `tenant` = `client` = `company`
-- a tenant is the company-level container used for isolation, governance, and product composition
-- users are not the tenant; they are identities associated to a tenant through `client_id`
-- the intended runtime model is one tenant to many users, even if bootstrap data started with one contact per company
+## Terminology
 
-Object-model clarification:
-- in the 360 architecture, `greenhouse.clients.client_id` is the canonical Client object anchor
-- modules may enrich the client, but they must not create a parallel tenant identity if `client_id` already exists
+- `tenant` = `client` = `company` — the company-level container used for isolation, governance, and product composition
+- `organization` (EO-ORG) — parent commercial entity; one organization may own multiple spaces
+- `space` (EO-SPC) — operational workspace; child of an organization, scopes operational data and team membership
+- users are identities associated to a tenant through `client_id`; a user is not the tenant
+- the runtime model is one tenant to many users
 
-## Tenant Boundary
+## Three-Level Hierarchy
 
-- Every authenticated session carries a single `client_id`.
-- Every business query must derive scope from tenant context, never from browser-supplied ids.
-- The first filter boundary for MVP is `notion_project_ids`.
-- Admin access is explicit and role-based. It is not implied by knowing a URL.
+Greenhouse uses a three-level hierarchy for commercial and operational scoping:
+
+```
+Organization (EO-ORG)
+  └── Space (EO-SPC)
+        └── Client
+```
+
+- **Organization**: the parent commercial entity (e.g., a holding company, agency group, or single company that contracts Efeonce services). Represented by the `organizations` table.
+- **Space**: an operational workspace within an organization. A space scopes team membership, service delivery, and operational data. Represented by the `spaces` table.
+- **Client**: the tenant-level identity that anchors isolation, access, and product composition. Represented by the `clients` table.
+
+A client always belongs to a space, and a space always belongs to an organization.
 
 ## Source of Truth
 
-Current system of record:
-- BigQuery dataset: `efeonce-group.greenhouse`
-- Tenant metadata and canonical Client anchor: `greenhouse.clients`
-- User identity and access: `greenhouse.client_users`, `greenhouse.roles`, `greenhouse.user_role_assignments`, `greenhouse.user_project_scopes`, `greenhouse.user_campaign_scopes`
-- Current admin governance surfaces: `/admin/tenants`, `/admin/tenants/[id]`, `/admin/users`, `/admin/users/[id]`, `/admin/roles`
+### Auth Store: PostgreSQL (`greenhouse_core`)
 
-Current source systems for operational data:
+All identity, access, and tenant metadata lives in PostgreSQL — not BigQuery. BigQuery is used exclusively for analytical and operational data (Notion ops, HubSpot CRM, semantic marts, materialized views).
+
+### Core Tables
+
+| Table | Purpose |
+|---|---|
+| `clients` | Tenant metadata — name, status, feature flags, timezone, portal home path, Notion/HubSpot links |
+| `organizations` | Parent commercial entities (EO-ORG) |
+| `spaces` | Operational workspaces (EO-SPC), child of organization |
+| `client_users` | Auth principals — login identity, password hash, status, client association |
+| `identity_profiles` | Canonical person root — one row per real person across all tenants and sources |
+| `identity_profile_source_links` | SSO and external source links (Microsoft, Google, HubSpot, Notion) tied to an identity profile |
+| `roles` | Role catalog — code, label, description, route groups granted |
+| `user_role_assignments` | Multi-role support — one user may hold multiple roles |
+| `person_memberships` | Organization-to-person relationships with membership type and status |
+
+### Operational Data (BigQuery)
+
+Source systems for delivery and commercial data remain in BigQuery:
 - `efeonce-group.notion_ops.tareas`
 - `efeonce-group.notion_ops.proyectos`
 - `efeonce-group.notion_ops.sprints`
 - `efeonce-group.hubspot_crm.*`
+- `efeonce-group.greenhouse.*` (semantic marts, materialized views)
 
-Rule:
-- external systems may enrich the Client object
-- external systems are not the canonical Client identity inside Greenhouse
+Rule: external systems may enrich the Client object; external systems are not the canonical Client identity inside Greenhouse.
 
-## MVP Tenant Table
+## Authentication
 
-`greenhouse.clients` currently stores:
-- `client_id`
-- `client_name`
-- `status`
-- `active`
-- `primary_contact_email`
-- `password_hash`
-- `password_hash_algorithm`
-- `role`
-- `notion_project_ids`
-- `hubspot_company_id`
-- `allowed_email_domains`
-- `feature_flags`
-- `timezone`
-- `portal_home_path`
-- `auth_mode`
-- `notes`
-- `created_at`
-- `updated_at`
-- `last_login_at`
+### Providers
 
-This is enough to replace the current env-based demo scope and move the portal into a real multi-tenant model.
+Greenhouse uses NextAuth.js 4.24 with three auth providers:
 
-## Runtime Flow
+1. **Azure AD** — Microsoft SSO for enterprise tenants
+2. **Google OAuth** — Google SSO for tenants on Google Workspace
+3. **Credentials** — email + bcrypt password for demo, internal, and tenants not yet on SSO
 
-### 1. Authentication
+All three providers resolve to the same PostgreSQL-backed identity model. SSO source links are tracked in `identity_profile_source_links`.
 
-Current flow:
-1. User submits email and password.
-2. NextAuth queries `greenhouse.client_users` and joins `greenhouse.clients` only for tenant metadata.
-3. Reject login if `active = false` or `status != 'active'`.
-4. Verify password against `password_hash` when `auth_mode = 'credentials'`.
-5. Build session token with:
-   - `userId`
-   - `clientId`
-   - `tenantType`
-   - `roleCodes`
-   - `primaryRoleCode`
-   - `routeGroups`
-   - `projectScopes`
-   - `campaignScopes`
-   - `featureFlags`
-   - `timezone`
-   - `portalHomePath`
-   - legacy compatibility aliases for existing routes
+### Auth Flow
 
-Current production-ready baseline:
-- Runtime auth no longer falls back to `greenhouse.clients`.
-- Demo and internal admin users authenticate with bcrypt credentials.
-- Imported HubSpot contacts remain in `invited` state until onboarding activates them.
-- `src/lib/bigquery.ts` already handles both the minified JSON form and the legacy escaped JSON form of `GOOGLE_APPLICATION_CREDENTIALS_JSON` used by Vercel Preview envs.
-- A failed login in `Preview` is not enough to conclude wrong credentials; first isolate whether BigQuery credentials were parsed correctly in the running deployment.
-- Vuexy's generic JWT session pattern is compatible with this, but its ACL/permissions demo is not the source of truth for Greenhouse authorization.
-- Greenhouse authorization is server-side and tenant-aware; it must not rely on template-only client ACL checks.
+1. User authenticates via one of the three providers.
+2. NextAuth callbacks query PostgreSQL `client_users` (joined with `clients` for tenant metadata, `roles` and `user_role_assignments` for authorization).
+3. Login is rejected if `active = false` or `status != 'active'`.
+4. For credentials provider, password is verified against `password_hash` (bcrypt).
+5. Session token (JWT) is built with the full TenantContext.
 
-### 2. Session and Tenant Context
+### No middleware.ts
 
-Create a single tenant helper that returns:
-- `userId`
-- `clientId`
-- `tenantType`
-- `roleCodes`
-- `primaryRoleCode`
-- `projectScopes`
-- `campaignScopes`
-- `role`
-- `projectIds`
-- `featureFlags`
-- `timezone`
+Greenhouse does **not** use Next.js middleware for auth. Authorization is enforced at the layout level via `getTenantContext()` + `getServerSession()`. Each route group layout checks its own access requirements.
 
-Every server route should use that helper instead of reading raw session fields in multiple places.
+## TenantContext
 
-## JWT and ACL Clarification
+The `getTenantContext()` helper is the single entry point for authorization on every server route. It returns:
 
-- Greenhouse already uses JWT sessions through NextAuth.
-- The JWT is only the session transport for identity and claims.
-- Authorization is a separate concern and is resolved from BigQuery-backed role and scope tables.
-- Vuexy's permissions/ACL examples are useful for admin UI patterns and navigation concepts.
-- They are not sufficient for:
-  - tenant isolation
-  - project-level scoping
-  - campaign-level scoping
-  - internal vs client route separation
-- The correct Greenhouse model is:
-  - JWT session
-  - server-side tenant context
-  - role-based route access
-  - project and campaign scopes
-  - API-level enforcement on every business query
+```ts
+{
+  userId: string
+  clientId: string
+  clientName: string
+  tenantType: string
+  roleCodes: string[]
+  primaryRoleCode: string
+  routeGroups: string[]
+  projectScopes: string[]
+  campaignScopes: string[]       // currently empty, reserved
+  businessLines: string[]
+  serviceModules: string[]
+  featureFlags: Record<string, boolean>
+  timezone: string
+  portalHomePath: string
+  spaceId: string
+  organizationId: string
+  organizationName: string
+}
+```
 
-### 3. Query Layer
+Every API route and server component must derive scope from this context — never from browser-supplied IDs.
+
+## Role Model
+
+### Composable Roles
+
+Roles are **composable, not hierarchical**. A user may hold multiple roles simultaneously via `user_role_assignments`. Each role grants one or more route groups.
+
+Core roles:
+- `client_executive` — client route group
+- `client_manager` — client route group
+- `client_specialist` — client route group
+- `efeonce_account` — internal route group
+- `efeonce_operations` — internal route group
+- `efeonce_finance` — finance route group
+- `efeonce_hr` — hr route group
+- `efeonce_admin` — admin route group; **universal override** for all access checks
 
 Rules:
-- Browser never sends arbitrary project ids for authorization.
-- API routes always use tenant context from session.
-- Queries must filter by `projectIds` or by joining tenant scope from `greenhouse.clients`.
-- Reusable server-side query functions live under `src/lib/**`.
+- a user's effective permissions are the union of all assigned roles' route groups
+- `efeonce_admin` is the universal override — it grants access to any route group and any module
+- `client` roles never bypass `projectScopes`
+- admin access is always explicit and role-based, never implied by knowing a URL
 
-Recommended pattern:
+## Route Group Authorization
+
+Authorization is enforced at the **layout level** in each route group. There is no centralized middleware.
+
+### Route Groups
+
+| Route Group | Layout | Access Rule |
+|---|---|---|
+| `(dashboard)` | `(dashboard)/layout.tsx` | Requires valid session (any authenticated user) |
+| `admin` | `admin/layout.tsx` | Requires `'admin'` in `routeGroups` |
+| `internal` | `internal/layout.tsx` | Requires `'internal'` in `routeGroups` |
+| `agency` | `agency/layout.tsx` | Requires `'internal'` OR `'admin'` in `routeGroups` |
+| `finance` | `finance/layout.tsx` | Requires `'finance'` in `routeGroups` OR `efeonce_admin` role |
+| `hr` | `hr/layout.tsx` | Requires `'hr'` in `routeGroups` OR `efeonce_admin` role |
+| `people` | `people/layout.tsx` | Requires `canAccessPeopleModule()` |
+| `capabilities` | `capabilities/[moduleId]/layout.tsx` | Requires client + `verifyCapabilityModuleAccess()` |
+
+### Special Access Logic
+
+**`canAccessPeopleModule()`**: Cross-group access function. The People module is accessible to users from multiple route groups (internal, hr, admin) rather than being gated to a single group. This function encapsulates the composite check.
+
+**`requireAdminTenantContext()`**: Requires **both** the `'admin'` route group in the user's `routeGroups` **and** the `efeonce_admin` role code. Having only one is insufficient. This is the strictest access check in the system.
+
+## Data Isolation Rules
+
+- All dashboard, project, sprint, finance, HR, and module routes must use tenant scope from server session via `getTenantContext()`.
+- No route should trust `client_id` from query params or request body for authorization.
+- No route should expose raw database access to the browser.
+- Any cache key must include tenant identity when data is tenant-specific.
+- Queries must filter by `projectScopes`, `spaceId`, or `organizationId` as appropriate for the domain.
+
+## Query Layer
+
+### PostgreSQL (Auth + Governance)
+
+All identity, role, and tenant queries go to PostgreSQL `greenhouse_core`.
+
+### BigQuery (Operational + Analytical)
+
+Operational queries use tenant context for scoping:
 
 ```ts
 const tenant = await getTenantContext()
@@ -161,82 +194,27 @@ const [rows] = await bigQuery.query({
     FROM \`efeonce-group.notion_ops.tareas\`
     WHERE proyecto IN UNNEST(@projectIds)
   `,
-  params: { projectIds: tenant.projectIds }
+  params: { projectIds: tenant.projectScopes }
 })
 ```
 
-## Role Model
-
-Initial roles:
-- `client_executive`
-- `client_manager`
-- `client_specialist`
-- `efeonce_account`
-- `efeonce_operations`
-- `efeonce_admin`
-
 Rules:
-- `client` never bypasses `projectIds`
-- `admin` access must be explicit in code, not accidental by missing filters
-- admin-only routes should live under separate route groups when they exist
+- browser never sends arbitrary project IDs for authorization
+- API routes always derive scope from `getTenantContext()`
+- reusable server-side query functions live under `src/lib/**`
 
-## Recommended NextAuth Evolution
+## JWT and ACL Clarification
 
-### Phase 1
-
-- Keep `CredentialsProvider`
-- Use BigQuery lookup to `greenhouse.client_users` plus scopes
-- Continue JWT sessions
-- Seed demo/internal credentials with bcrypt hashes
-- Add route-group guards for `client`, `internal`, and `admin`
-- Add `portalHomePath` redirects after login
-
-### Phase 2
-
-- Expand onboarding flows for invited users
-- Keep `greenhouse.clients` as tenant metadata only
-
-Recommended future split:
-- `greenhouse.clients`: tenant metadata and project scope
-- `greenhouse.client_users`: login principals and per-user roles
-
-Current runtime interpretation:
-- `greenhouse.clients` is the company/tenant table
-- `greenhouse.client_users` is the user table
-- the current admin tenant views are intentionally centered on company-level governance, then drill down into users linked to that tenant
-
-## Data Isolation Rules
-
-- All dashboard, project and sprint routes must use tenant scope from server session.
-- No route should trust `client_id` from query params.
-- No route should expose raw BigQuery table access to the browser.
-- Any cache key must include tenant identity when data is tenant-specific.
+- Greenhouse uses JWT sessions through NextAuth.js 4.24.
+- The JWT is the session transport for identity and claims.
+- Authorization is a separate concern resolved from PostgreSQL-backed role and scope tables.
+- Vuexy's permissions/ACL examples are useful for admin UI patterns and navigation concepts but are not sufficient for tenant isolation, project-level scoping, campaign-level scoping, or internal vs client route separation.
+- The Greenhouse model is: JWT session → server-side tenant context → composable role-based route access → project and campaign scopes → API-level enforcement on every business query.
 
 ## Configuration Rules
 
-- `greenhouse.client_users` plus role/scope tables are the source of truth for runtime auth.
-- `greenhouse.clients` remains tenant metadata and legacy scope compatibility.
-- `.env.example` should only hold app-level runtime configuration.
-- `staging` and `production` should read the same table shape, not different auth logic.
-
-## Migration Path
-
-1. Replace env-based login with `greenhouse.client_users`.
-2. Add password hashing and verification.
-3. Introduce `getTenantContext()` helper.
-4. Guard `/dashboard`, `/proyectos`, `/sprints`, `/settings`, `/internal/**`, and `/admin/**` by route group.
-5. Move business APIs to the same tenant helper and project scope checks.
-
-## Current Remote Assets
-
-Already created in BigQuery:
-- dataset: `efeonce-group.greenhouse`
-- table: `efeonce-group.greenhouse.clients`
-- tables: `client_users`, `roles`, `user_role_assignments`, `user_project_scopes`, `user_campaign_scopes`, `client_feature_flags`, `audit_events`
-- seed tenant: `greenhouse-demo-client`
-- seed users: `user-greenhouse-demo-client-executive`, `user-efeonce-admin-bootstrap`
-- active internal admin: `julio.reyes@efeonce.org`
-- closedwon HubSpot tenants imported as `hubspot-company-*`
-
-Versioned schema file:
-- `bigquery/greenhouse_clients.sql`
+- PostgreSQL `greenhouse_core` is the source of truth for all runtime auth.
+- `clients` table is tenant metadata and scope configuration.
+- `client_users` + role/scope tables are auth principals and authorization.
+- `.env.example` holds app-level runtime configuration only.
+- `staging` and `production` read the same schema — no environment-specific auth logic.

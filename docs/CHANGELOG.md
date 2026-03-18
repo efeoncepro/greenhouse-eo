@@ -4,6 +4,21 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### Documentation Architecture Audit (2026-03-18)
+- Full audit of 80+ docs against 127 API routes, 45+ pages, 119 lib files, 87+ scripts, and GCP infrastructure
+- Rewrote GREENHOUSE_ARCHITECTURE_V1.md to reflect actual modular architecture (vs old 7-phase linear plan)
+- Rewrote MULTITENANT_ARCHITECTURE.md with Organization→Space→Client hierarchy and Postgres-first auth
+- Updated BACKLOG.md and PHASE_TASK_MATRIX.md with real phase progress and new modules
+- Created GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md — full GCP inventory (Cloud SQL, BigQuery 13 datasets, 10 Cloud Run services, 6 Scheduler jobs, 3 Vercel crons)
+- Created GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md — all 10 sync pipelines documented
+- Updated GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md with runtime reality notes and migration status
+- Updated GREENHOUSE_ID_STRATEGY_V1.md with Account 360 prefixes (EO-ORG, EO-SPC, EO-MBR)
+- Added superseded notice to GREENHOUSE_IDENTITY_ACCESS_V1.md (V2 Postgres-first in progress)
+- Added implementation status to Greenhouse_Capabilities_Architecture_v1.md
+- Updated Greenhouse_Nomenclatura_Portal_v3.md with actual route map
+
+---
+
 ## ICO Engine — Implementación completa (2026-03-17)
 
 ### Nuevas funcionalidades
