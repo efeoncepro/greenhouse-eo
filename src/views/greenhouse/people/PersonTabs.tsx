@@ -23,7 +23,6 @@ import PersonPayrollTab from './tabs/PersonPayrollTab'
 import PersonFinanceTab from './tabs/PersonFinanceTab'
 import PersonMembershipsTab from './tabs/PersonMembershipsTab'
 import PersonHrProfileTab from './tabs/PersonHrProfileTab'
-import PersonIcoTab from './tabs/PersonIcoTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 
 type Props = {
@@ -135,7 +134,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
             <TabPanel value='activity' className='p-0'>
               {activeTab === 'activity' && (
-                <PersonActivityTab metrics={detail.operationalMetrics} />
+                <PersonActivityTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
@@ -160,12 +159,6 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
             <TabPanel value='hr-profile' className='p-0'>
               {activeTab === 'hr-profile' && (
                 <PersonHrProfileTab memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='ico' className='p-0'>
-              {activeTab === 'ico' && (
-                <PersonIcoTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
