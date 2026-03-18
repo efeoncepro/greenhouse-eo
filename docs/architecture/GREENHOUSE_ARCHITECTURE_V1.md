@@ -458,10 +458,11 @@ Reference: `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 ### Vercel
 
 - Next.js hosting (production)
-- 3 cron jobs:
+- 4 cron jobs:
+  - Outbox consumer (every 5 min)
+  - Conformed data layer sync (daily 3:45 AM UTC)
   - ICO Engine materialization (daily 6:15 AM UTC)
   - Exchange rate sync (daily 11:05 PM UTC)
-  - Outbox consumer (every 5 min)
 
 ### Google Cloud
 

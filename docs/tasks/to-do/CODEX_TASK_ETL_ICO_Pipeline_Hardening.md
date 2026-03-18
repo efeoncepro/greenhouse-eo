@@ -9,6 +9,7 @@
 | **Prioridad** | P0 — prerequisito para pipeline end-to-end automático y multi-tenant |
 | **Dependencias** | `CODEX_TASK_Tenant_Notion_Mapping`, `Greenhouse_ICO_Engine_v1.md`, `CODEX_TASK_Conformed_Data_Layer` |
 | **Afecta** | ICO Engine, Agency Dashboard, Pulse, conformed layer, sync pipeline |
+| **Estado** | IMPLEMENTADO (2026-03-18) |
 | **Versión** | v1.0 |
 
 ---

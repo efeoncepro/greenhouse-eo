@@ -65,13 +65,21 @@ Greenhouse uses a multi-layer sync architecture to move data between external so
 - Function: Reads postgres outbox table, publishes events to greenhouse_raw.postgres_outbox_events. Tracks sync runs.
 - Consumer: src/lib/sync/outbox-consumer.ts
 
-### 9. ICO Engine Materialization (Vercel Cron)
+### 9. Conformed Data Layer Sync (Vercel Cron)
+- Path: /api/cron/sync-conformed
+- Schedule: Daily 3:45 AM UTC
+- Function: Reads notion_ops.* (raw Notion data), transforms to normalized conformed layer. Writes greenhouse_conformed.delivery_tasks/projects/sprints. Uses safe DELETE pattern (no TRUNCATE). Resolves space_id via space_notion_sources (canonical, multi-tenant).
+- Source: src/lib/sync/sync-notion-conformed.ts
+- Dependency: Runs after notion-bq-sync Cloud Run (3:00 AM) and before ico-materialize (6:15 AM)
+
+### 10. ICO Engine Materialization (Vercel Cron)
 - Path: /api/cron/ico-materialize
 - Schedule: Daily 6:15 AM UTC
-- Function: Computes monthly ICO metrics from greenhouse_conformed.delivery_tasks, writes snapshots to ico_engine.metric_snapshots_monthly + related tables
+- Function: Computes monthly ICO metrics from greenhouse_conformed.delivery_tasks, writes snapshots to ico_engine.metric_snapshots_monthly + related tables. Batched CSC distribution update. Configurable fase_csc via status_phase_config table.
 - Source: src/lib/ico-engine/materialize.ts
+- Health: /api/ico-engine/health — returns materialization freshness (status, lastMaterializedAt, hoursSinceLastMaterialization)
 
-### 10. Exchange Rate Sync (Vercel Cron)
+### 11. Exchange Rate Sync (Vercel Cron)
 - Path: /api/finance/exchange-rates/sync
 - Schedule: Daily 11:05 PM UTC
 - Function: Fetches latest exchange rates, writes to greenhouse.fin_exchange_rates

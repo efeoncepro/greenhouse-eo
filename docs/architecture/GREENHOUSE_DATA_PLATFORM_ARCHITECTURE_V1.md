@@ -442,3 +442,11 @@ When this architecture is adopted:
 - hubspot-greenhouse-integration (Cloud Run, on-demand)
 
 4 active Cloud Scheduler jobs + 2 paused staging jobs orchestrating the above.
+
+4 Vercel Crons (in-app):
+- `/api/cron/outbox-publish` — every 5 min (Postgres outbox → BigQuery)
+- `/api/cron/sync-conformed` — daily 3:45 AM UTC (notion_ops → greenhouse_conformed, automated since 2026-03-18)
+- `/api/cron/ico-materialize` — daily 6:15 AM UTC (conformed → ICO Engine snapshots)
+- `/api/finance/exchange-rates/sync` — daily 11:05 PM UTC
+
+Automated pipeline: notion-bq-sync (3:00 AM) → sync-conformed (3:45 AM) → ico-materialize (6:15 AM)

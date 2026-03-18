@@ -4,6 +4,25 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### ETL Pipeline Hardening — Conformed Layer + ICO Engine (2026-03-18)
+
+**8 fixes** across the ETL pipeline (Notion → BigQuery conformed → ICO Engine):
+
+| # | Fix | Archivos |
+|---|-----|----------|
+| 1 | NULL guard on `is_stuck` — prevents NULL propagation from missing `last_edited_time` | `schema.ts` |
+| 2 | `created_at` column + `cycle_time_days` fix — uses task creation date instead of sync date | `schema.ts`, `sync-source-runtime-projections.ts`, `setup-bigquery-source-sync.sql` |
+| 3 | ICO Engine health endpoint — `/api/ico-engine/health` returns materialization freshness | `route.ts` (new) |
+| 4 | Batched CSC distribution UPDATE — single CASE expression replaces N+1 loop | `materialize.ts` |
+| 5 | Safe DELETE pattern — replaces `TRUNCATE TABLE` with guarded `DELETE FROM ... WHERE TRUE` | `sync-source-runtime-projections.ts` |
+| 6 | Space resolution via `space_notion_sources` — canonical Postgres mapping replaces deprecated `clients.notion_project_ids` | `sync-source-runtime-projections.ts` |
+| 7 | Configurable `fase_csc` — BigQuery lookup table `status_phase_config` with LEFT JOIN + COALESCE fallback | `schema.ts` |
+| 8 | Automated sync-conformed cron — extracted core transform to `sync-notion-conformed.ts`, new Vercel cron at 3:45 AM UTC | `sync-notion-conformed.ts` (new), `route.ts` (new), `vercel.json` |
+
+Archivos nuevos: `src/lib/sync/sync-notion-conformed.ts`, `src/app/api/cron/sync-conformed/route.ts`, `src/app/api/ico-engine/health/route.ts`
+
+---
+
 ### Documentation Architecture Audit (2026-03-18)
 - Full audit of 80+ docs against 127 API routes, 45+ pages, 119 lib files, 87+ scripts, and GCP infrastructure
 - Rewrote GREENHOUSE_ARCHITECTURE_V1.md to reflect actual modular architecture (vs old 7-phase linear plan)

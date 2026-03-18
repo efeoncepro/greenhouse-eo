@@ -51,7 +51,7 @@ Remaining:
 ## Phase 5. Campaign Intelligence — PARTIALLY COMPLETE
 
 No formal campaign model exists. Intelligence is delivered through two operational engines:
-- **ICO Engine** — 10 deterministic metrics (RPA, OTD%, FTR%, cycle time, cycle time variance, throughput, pipeline velocity, stuck assets, stuck asset %, CSC distribution), daily materialization, agency scorecard
+- **ICO Engine** — 10 deterministic metrics (RPA, OTD%, FTR%, cycle time, cycle time variance, throughput, pipeline velocity, stuck assets, stuck asset %, CSC distribution), daily materialization, agency scorecard. ETL pipeline hardened: automated sync-conformed cron, safe DELETE pattern, configurable fase_csc, canonical space resolution, health endpoint.
 - **Financial Intelligence** — cost allocation, client economics snapshots, trend analysis, margin tracking
 
 Remaining:
@@ -87,6 +87,6 @@ These modules were not part of the original 7-phase plan but are now operational
 - **HR Core + Payroll** (OPERATIONAL) — departments, leave, attendance, payroll with Chilean calculations, period lifecycle, Postgres-first
 - **Account 360 / Organizations** (OPERATIONAL) — org hierarchy, spaces, memberships, HubSpot sync
 - **AI Tooling & Credits** (OPERATIONAL) — catalog, licenses, wallets, credit metering
-- **ICO Engine** (OPERATIONAL) — 10 metrics, daily materialization, stuck assets, agency scorecard
+- **ICO Engine** (OPERATIONAL) — 10 metrics, daily materialization (automated pipeline), stuck assets, agency scorecard, health endpoint, configurable fase_csc
 - **Financial Intelligence** (OPERATIONAL) — cost allocation, client economics, trend analysis
 - **Conformed Data Layer** (OPERATIONAL) — config-driven property mappings, multi-client Notion normalization

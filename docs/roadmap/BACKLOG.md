@@ -141,7 +141,9 @@ Status:
 
 Completed:
 - ICO Engine with 10 operational metrics (velocity, throughput, stuck assets, revision pressure, first-time right, on-time delivery, sprint health, resource utilization, backlog aging, scope changes)
-- daily materialization pipeline
+- daily materialization pipeline (automated: notion-bq-sync → sync-conformed → ico-materialize)
+- ETL pipeline hardening: safe DELETE pattern, NULL guards, cycle_time_days fix, batched CSC, configurable fase_csc, space resolution via space_notion_sources
+- ICO Engine health endpoint (`/api/ico-engine/health`)
 - stuck asset detection and alerting
 - agency scorecard powered by ICO metrics
 
