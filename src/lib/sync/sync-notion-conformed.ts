@@ -451,6 +451,18 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     // Non-critical — sync succeeded even if audit record fails
   }
 
+  // Identity reconciliation — non-blocking tail step
+  try {
+    const { runIdentityReconciliation } = await import('@/lib/identity/reconciliation/reconciliation-service')
+    const reconResult = await runIdentityReconciliation({ syncRunId })
+
+    console.log(
+      `[sync-conformed] Identity reconciliation: discovered=${reconResult.discoveredCount}, auto_linked=${reconResult.autoLinkedCount}, pending=${reconResult.pendingReviewCount}, no_match=${reconResult.noMatchCount}`
+    )
+  } catch (err) {
+    console.warn('[sync-conformed] Identity reconciliation failed (non-critical):', err)
+  }
+
   return {
     syncRunId,
     projectsRead: projects.length,
