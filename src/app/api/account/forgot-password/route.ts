@@ -33,18 +33,6 @@ function expandEmailAliases(email: string): string[] {
   return aliases
 }
 
-/** Given a user email, resolve the best deliverable address */
-function resolveDeliverableEmail(email: string): string {
-  const [, domain] = email.split('@')
-
-  for (const group of DOMAIN_ALIAS_GROUPS) {
-    if (group.includes(domain) && group[0] !== domain) {
-      return email.replace(`@${domain}`, `@${group[0]}`)
-    }
-  }
-
-  return email
-}
 
 export async function POST(request: Request) {
   try {
@@ -102,19 +90,20 @@ export async function POST(request: Request) {
 
       const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/reset-password?token=${token}`
 
-      // Send to the deliverable domain, not the stored one (which may lack MX)
-      const deliverableEmail = resolveDeliverableEmail(user.email)
+      // Send to the email the user typed — they know where they receive mail.
+      // This also handles cases where the stored email domain lacks MX records.
+      const sendTo = normalizedEmail
 
       try {
         const result = await resend.emails.send({
           from: EMAIL_FROM,
-          to: deliverableEmail,
+          to: sendTo,
           subject: 'Restablece tu contraseña — Greenhouse',
           react: PasswordResetEmail({ resetUrl, userName: user.full_name ?? undefined })
         })
 
         await logEmail({
-          email_to: deliverableEmail,
+          email_to: sendTo,
           email_type: 'password_reset',
           user_id: user.user_id,
           client_id: user.client_id ?? undefined,
@@ -125,7 +114,7 @@ export async function POST(request: Request) {
         console.error('[forgot-password] Resend error:', err)
 
         await logEmail({
-          email_to: deliverableEmail,
+          email_to: sendTo,
           email_type: 'password_reset',
           user_id: user.user_id,
           status: 'failed',
