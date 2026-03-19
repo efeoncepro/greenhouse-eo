@@ -1,5 +1,23 @@
 # Greenhouse Data Node Architecture v1
 
+## Estado 2026-03-19
+
+Este documento se conserva como spec original de vision de producto para `Data Node`.
+
+Para implementacion nueva y decisiones tecnicas, usar como baseline:
+- `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
+
+En particular, no implementar literalmente desde esta `v1`:
+- `BigQuery` como store principal de configuracion y control plane
+- `middleware.ts` como boundary central de auth para la API externa
+- servicios o repos externos adicionales como primer paso si el portal actual ya puede resolver la fase
+
+Ante conflicto, prevalecen:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
+
 **Del Dashboard al Nodo de Datos: Greenhouse como extensión del ecosistema operativo del cliente**
 
 Especificación Técnica de Implementación — Efeonce Greenhouse™

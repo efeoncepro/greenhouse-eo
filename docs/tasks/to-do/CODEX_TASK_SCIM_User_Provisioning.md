@@ -1,5 +1,23 @@
 # CODEX TASK — SCIM User Provisioning: Entra ID → Greenhouse
 
+## Estado 2026-03-19
+
+Este brief se conserva como framing original del provisioning SCIM con Entra.
+
+Para implementacion nueva y decisiones tecnicas, usar como baseline:
+- `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md`
+
+En particular, no implementar literalmente desde esta version:
+- provisioning write path principal en BigQuery
+- `GREENHOUSE_IDENTITY_ACCESS_V1.md` como referencia principal de auth
+- modelado de autorizacion basado en un `role` unico o en defaults legacy fuera del modelo V2
+
+Ante conflicto, prevalecen:
+- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md`
+
 ## Resumen
 
 Implementar provisioning automático de usuarios desde Microsoft Entra ID (Azure AD) hacia el portal Greenhouse usando el protocolo SCIM 2.0. Cuando un usuario se crea en el Active Directory de un cliente o de Efeonce, se crea automáticamente en Greenhouse. Cuando se desactiva o elimina en Entra, se desactiva en Greenhouse. Sin intervención manual.

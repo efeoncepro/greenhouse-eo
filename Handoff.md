@@ -40,6 +40,169 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — SCIM v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de SCIM a una baseline de implementación alineada con `Identity & Access V2`, PostgreSQL y el modelo de identidad actual.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+  - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+  - `src/lib/tenant/access.ts`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` ya corrige el write path y el modelo de auth, pero todavía conviene un task más corto de ejecución si se quiere implementar solo el slice `ServiceProviderConfig + Users create/update/deactivate`.
+- Si SCIM se activa de verdad para clientes enterprise, conviene definir desde temprano la política exacta de rol baseline y cómo reconciliar `identity_profile_id` en casos ambiguos.
+
+## 2026-03-19 — Data Node v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de `Data Node` a una baseline de implementación alineada al runtime actual del portal y al patrón `Postgres-first`.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
+- `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v1.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md`
+  - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` deja claro el orden correcto (`export -> reports -> API -> MCP`), pero todavia falta una task ejecutiva más corta si se quiere implementar `DN0` de inmediato.
+- Si el proyecto decide monetizar `API` o `MCP`, conviene luego separar el brief de pricing/comercial del brief técnico de implementación.
+
+## 2026-03-19 — Resend helper added, local key validation blocked
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Agregar el helper runtime de `Resend` para el futuro sistema de emails transaccionales y validar que lea la configuración local.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development local / foundation backend
+
+### Archivos tocados
+- `package.json`
+- `pnpm-lock.yaml`
+- `src/lib/resend.ts`
+- `changelog.md`
+
+### Verificacion
+- Instalación de dependencia `resend`: correcta
+- Helper `src/lib/resend.ts`: creado
+- Chequeo local contra API `GET /api-keys`: falló con `400 API key is invalid`
+
+### Riesgos o pendientes
+- El helper quedó listo, pero no se debe avanzar con envíos reales hasta corregir `RESEND_API_KEY` en `.env.local`.
+- La key presente localmente no empieza con el patrón esperado `re_`; probablemente fue pegada con un valor incompleto, inválido o ya rotado.
+- Si se va a seguir con el módulo, el siguiente paso sano es corregir la key y reintentar la validación antes de implementar routes o templates.
+
+## 2026-03-19 — Env placeholders for Resend / transactional email
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Preparar el espacio local y los archivos de ejemplo para `RESEND_API_KEY` y `EMAIL_FROM`, sin escribir secretos reales en archivos versionados.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development local / documentación operativa del repo
+
+### Archivos tocados
+- `.env.example`
+- `.env.local.example`
+- `.env.local`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+- Confirmado por búsqueda de claves:
+  - `RESEND_API_KEY`
+  - `EMAIL_FROM`
+- Los placeholders quedaron presentes en `.env.example`, `.env.local.example` y `.env.local`
+
+### Riesgos o pendientes
+- No se escribió ninguna clave real en archivos versionados.
+- Si se va a usar la API key de Resend que apareció en la conversación, conviene rotarla antes de usarla en serio porque ya quedó expuesta fuera del gestor de secretos.
+
+## 2026-03-19 — Transactional Email task normalized to live auth/runtime
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir la spec de `Transactional Email System` para que no choque con la arquitectura viva de auth, tenant isolation y setup PostgreSQL del repo.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Transactional_Email_System.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+  - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `src/lib/tenant/access.ts`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La task ya quedó sana en arquitectura, pero todavía conviene una pasada futura para alinear detalles de naming con el runtime exacto de tablas/columnas si el módulo se va a implementar de inmediato.
+- Si se ejecuta este task, conviene arrancar por `forgot-password` y `auth_tokens` como P0 antes de tocar invitaciones y verificación de email.
+
 ## 2026-03-19 — Testing: baseline unitario formalizado
 
 ### Agente

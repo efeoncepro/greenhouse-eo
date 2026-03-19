@@ -1542,6 +1542,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- `RESEND_API_KEY`
+- `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
@@ -1553,10 +1555,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `NEXTAUTH_URL`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+- `RESEND_API_KEY`
+- `EMAIL_FROM`
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
+- `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
 - Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
