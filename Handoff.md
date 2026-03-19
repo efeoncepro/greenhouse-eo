@@ -40,6 +40,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Testing: baseline unitario formalizado
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Cerrar una base de unit testing reutilizable para el repo usando el `Vitest` ya instalado y extenderlo a tests de componentes React.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Tooling local / CI futura
+
+### Archivos tocados
+- `AGENTS.md`
+- `package.json`
+- `pnpm-lock.yaml`
+- `vitest.config.ts`
+- `src/test/setup.ts`
+- `src/test/render.tsx`
+- `src/components/greenhouse/EmptyState.test.tsx`
+
+### Verificacion
+- `pnpm test`
+- Resultado: `3` archivos y `33` tests pasando
+
+### Riesgos o pendientes
+- La base de testing ya soporta `node` y `jsdom`, pero todavia hay poca cobertura del repo real; el siguiente ROI alto esta en `ICO Engine`, scopes de acceso, normalizacion de source sync y helpers de Finance/Payroll.
+- Si se agregan tests de componentes con providers extra, conviene extender `src/test/render.tsx` en vez de repetir wrappers por archivo.
+
 ## 2026-03-19 — Person Activity Tab ICO merge + sidebar FTE alignment + KPI layout fix
 
 ### Agente
