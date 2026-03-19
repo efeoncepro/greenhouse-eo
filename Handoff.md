@@ -40,6 +40,62 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Person Activity Tab ICO merge + sidebar FTE alignment + KPI layout fix
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Merge de métricas ICO Engine en el tab Actividad de Person 360 (reemplaza `PersonOperationalMetrics` vacío).
+- Corregir KPI cards que se recortaban por overflow en el contenedor.
+- Alinear los stats del sidebar (FTE, Hrs/mes, Spaces) con lo que muestra el tab Organizaciones.
+- Verificación de infraestructura: `v_tasks_enriched` vista confirmada con 3850 filas, 92 tareas para Andrés Carlosama.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Staging (Vercel `dev-greenhouse.efeoncepro.com`)
+
+### Archivos tocados
+
+**Person Activity Tab (REWRITTEN — commit `fbd2cb0`):**
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Antes: mostraba `PersonOperationalMetrics` (siempre vacío). Ahora: fetch client-side a `/api/ico-engine/context?dimension=member&value={memberId}`. Props cambiaron de `{ metrics?: PersonOperationalMetrics }` a `{ memberId: string }`.
+  - 6 KPI cards: RpA, OTD%, FTR%, Throughput, Ciclo promedio, Stuck assets
+  - Selectores de período (mes/año)
+  - Donut CSC (distribución por fase)
+  - Radar de salud operativa (6 dimensiones normalizadas)
+  - Gauge de velocidad pipeline (radialBar)
+- `src/views/greenhouse/people/PersonTabs.tsx` — Activity tab ahora pasa `memberId={detail.member.memberId}` en vez de `metrics`.
+- `src/views/greenhouse/people/helpers.ts` — Eliminado tab `ico` de `TAB_PERMISSIONS` y `TAB_CONFIG`.
+- `src/types/people.ts` — Eliminado `'ico'` de `PersonTab` union type.
+- `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — **ELIMINADO** (orphan después del merge).
+
+**KPI overflow fix (commit `67b93aa`):**
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Reemplaza Grid anidado por flex con `overflowX: auto`. Cada card tiene `minWidth: 160px` y `flex: 1 1 0` para distribuirse equitativamente sin recortarse.
+
+**Sidebar FTE alignment (commit `b04bb8f`):**
+- `src/lib/people/get-person-detail.ts` — El summary (`totalFte`, `totalHoursMonth`, `activeAssignments`) ahora solo cuenta assignments que tienen una membresía correspondiente en Postgres (`person_memberships`), no todos los `client_team_assignments` de BigQuery. Import de `getPersonMemberships` agregado.
+  - **Antes**: Andrés mostraba 2.0 FTE, 320 hrs, 2 Spaces (Efeonce + Sky Airline en BQ).
+  - **Ahora**: Muestra 1.0 FTE, 160 hrs, 1 Space (solo Sky Airline, la única membresía en Postgres).
+  - Fallback: si la consulta de membresías falla, usa todos los assignments (backward compatible).
+
+**BigQuery view fix (commit `e44c3be`):**
+- `src/lib/ico-engine/schema.ts` — `v_tasks_enriched` COALESCE bug: empty array `[]` no es NULL, por lo que COALESCE no aplicaba fallback. Cambiado a `IF(ARRAY_LENGTH > 0)`.
+
+### Verificación
+- TypeScript: `tsc --noEmit` limpio en todos los commits
+- BigQuery: `ico_engine.v_tasks_enriched` existe con 3850 filas. Andrés tiene 92 tareas asignadas.
+- Postgres: `greenhouse_sync.identity_reconciliation_proposals` creada y operativa. 13 propuestas procesadas (1 rejected, 12 dismissed).
+- Vercel: deploy staging Ready con commit `b04bb8f`.
+- clientId matching verificado: Postgres membership Sky Airline (`hubspot-company-30825221458`) ↔ BigQuery assignment match correcto. Efeonce (`space-efeonce`) filtrado.
+
+### Riesgos o pendientes
+- **Cache del browser** puede causar que los cambios no se vean inmediatamente. Hard refresh (`Cmd+Shift+R`) o incógnito resuelve.
+- **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion.
+- **Asignaciones huérfanas en BigQuery**: `space-efeonce` sigue en `client_team_assignments` para todos los miembros pero no tiene membresía en Postgres. Considerar limpiar o crear las membresías correspondientes.
+
 ## 2026-03-18 — Identity Reconciliation Service + Person Activity ICO merge
 
 ### Agente
