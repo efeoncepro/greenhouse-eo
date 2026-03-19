@@ -40,6 +40,165 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Nubox DTE Integration: API discovery, org mapping, data seeding
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Verificar credenciales API de Nubox, descubrir base URL y endpoints disponibles.
+- Mapear clientes Nubox ↔ organizaciones Greenhouse por RUT.
+- Importar historial de ventas Nubox como income en Finance module.
+- Crear proveedores faltantes desde facturas de compra de Nubox.
+- Documentar todo en task brief para implementación futura de emisión + sync.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- Production (datos escritos directamente en Postgres Cloud SQL)
+
+### Archivos tocados
+- `scripts/nubox-extractor.py` — movido desde `docs/tasks/to-do/`, credenciales via env vars
+- `docs/tasks/to-do/CODEX_TASK_Nubox_DTE_Integration.md` — task brief completo (8 fases)
+- `changelog.md` — entrada de Nubox
+- `Handoff.md` — este archivo
+- `.env.local` — variables NUBOX_API_BASE_URL, NUBOX_BEARER_TOKEN, NUBOX_X_API_KEY
+
+### Datos escritos en Postgres (Cloud SQL)
+- `greenhouse_core.organizations`: 4 UPDATE (tax_id, legal_name, industry) + 2 INSERT (SGI, Sika)
+- `greenhouse_core.clients`: 2 INSERT (nubox-client-76438378-8, nubox-client-91947000-3)
+- `greenhouse_finance.suppliers`: 17 INSERT + 1 UPDATE (Microsoft RUT)
+- `greenhouse_finance.income`: 78 INSERT (15 meses de ventas Nubox, $163.8M CLP)
+
+### Verificacion
+- `GET /v1/sales?period=2026-02` → 200 OK, datos reales de facturación
+- `GET /v1/purchases?period=2026-02` → 200 OK, 8 facturas de proveedores
+- `GET /v1/expenses?period=2026-02` → 200 OK, 1 egreso bancario
+- Todas las organizaciones con RUT mapean a clientes Nubox: 0 huérfanos en import
+- 78 income records visibles en `/finance/income` del portal
+
+### Riesgos o pendientes
+- Credenciales Nubox (`NP_SECRET_PROD_...`, `NP_KEY_PROD_...`) estuvieron hardcodeadas en el script original — ya limpiadas, pero el historial de git las tiene. Rotar en Nubox cuando sea conveniente.
+- 5 organizaciones sin RUT (ANAM, BeFUN, Ecoriles, Efeonce, Municipalidad PAC, SSilva, Greenhouse Demo) — no tienen facturación en Nubox actualmente.
+- `income_type: 'quote'` se usa para cotizaciones (COT) de Nubox — verificar si deben tratarse como income real o solo referencia.
+- Próximo paso: implementar Fase 1-3 del task brief (cliente API TypeScript, schema DTE columns, emisión desde Greenhouse).
+
+## 2026-03-19 — Advanced tasks split into complete foundations and focused follow-ups
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Dejar de tratar algunas lanes fundacionales muy avanzadas como backlog abierto amplio y reemplazarlas por follow-ups chicos con solo el remanente real.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `project_context.md`
+- `changelog.md`
+- `docs/tasks/complete/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `docs/tasks/complete/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+- `docs/tasks/complete/CODEX_TASK_People_Unified_View_v3.md`
+- `docs/tasks/to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md`
+- `docs/tasks/to-do/CODEX_TASK_People_360_Enrichments_v1.md`
+
+### Verificacion
+- Contraste manual contra:
+  - `project_context.md`
+  - `changelog.md`
+  - `scripts/sync-source-runtime-projections.ts`
+  - `scripts/setup-postgres-person-360-v2.sql`
+  - `src/lib/tenant/identity-store.ts`
+  - rutas y consumers activos de `People`, `Finance`, `Payroll`, `Creative Hub` y auth
+- Sin build ni lint: cambio documental y de taxonomía únicamente
+
+### Riesgos o pendientes
+- Se movieron a `complete` solo las tasks cuyo objetivo fundacional ya se ve cumplido en runtime:
+  - `Source Sync Runtime Projections v1`
+  - `Person 360 Profile Unification v1`
+  - `People Unified View v3`
+- No se cerraron `Identity & Access`, `Finance PG migration`, `Financial Module`, `HR Payroll Module` ni `Creative Hub`, porque sus propios briefs todavía declaran gaps abiertos.
+- Los follow-ups nuevos ahora concentran solo el remanente real:
+  - `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md`
+  - `CODEX_TASK_People_360_Enrichments_v1.md`
+
+## 2026-03-19 — To-do task index synced to real implementation status
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Contrastar el backlog `docs/tasks/to-do/` contra el estado real del repo y reflejar ese resultado en el índice operativo.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual contra:
+  - `project_context.md`
+  - `changelog.md`
+  - `src/lib/auth.ts`
+  - `src/lib/tenant/access.ts`
+  - `src/lib/tenant/identity-store.ts`
+  - rutas activas en `src/app/**`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- El índice ahora refleja mejor la realidad técnica, pero todavía hay drift entre taxonomía documental y cierre formal de algunas lanes muy avanzadas.
+- `CODEX_TASK_Financial_Intelligence_Layer.md` quedó reintegrada al índice después de detectar que vivía en `to-do` pero no en `docs/tasks/README.md`.
+- Si el usuario quiere seguir endureciendo la taxonomía, el siguiente paso sano es abrir una auditoría de cierre real de las lanes `Avanzadas` para decidir cuáles ya merecen moverse a `complete`.
+
+## 2026-03-19 — To-do backlog prioritized by priority, impact and effort
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Reordenar el panel `docs/tasks/to-do/` para que funcione como backlog operativo real y no solo como inventario de briefs.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de `docs/tasks/to-do/*` contra:
+  - `project_context.md`
+  - `Handoff.md`
+  - `docs/tasks/README.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La priorización es operativa, no contractual: si el usuario decide empujar una lane distinta, conviene reabrir `docs/tasks/in-progress/` solo con ese subconjunto.
+- El backlog ahora separa correctamente:
+  - foundations `P0`
+  - cierres de módulo `P1`
+  - expansión estratégica `P2`
+  - polish `P3`
+  - briefs históricos de referencia que no deben ejecutarse antes de su `v2`
+
 ## 2026-03-19 — Transactional Email System closed + email template redesign
 
 ### Agente
