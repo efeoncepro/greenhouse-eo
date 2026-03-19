@@ -4,6 +4,16 @@
 
 **Efeonce Group — Marzo 2026 — CONFIDENCIAL**
 
+> **Status: Implemented** — The capabilities architecture described here has been implemented as of March 2026.
+> Key implementation details:
+> - Route: /capabilities/[moduleId] — operational with layout-level access verification
+> - Capability Registry: src/config/capability-registry.ts (code-versioned)
+> - Module queries: CRM Command Center, Creative Hub, Web Delivery Lab, Onboarding Center
+> - Resolution endpoint: /api/capabilities/resolve
+> - Data endpoint: /api/capabilities/[moduleId]/data
+> - Components: CapabilityOverviewHero, ModuleLayout, CapabilityCard
+> - Note: ICO Engine was built as a SEPARATE system (not a capability module) with its own BigQuery dataset (ico_engine), dedicated API endpoints (/api/ico-engine/*), and Vercel cron materialization.
+
 ---
 
 ## 1. Resumen

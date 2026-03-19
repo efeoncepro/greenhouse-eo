@@ -29,6 +29,22 @@ export const getSpaceNotionSource = async (spaceId: string): Promise<SpaceNotion
   return rows.length > 0 ? normalizeRow(rows[0]) : null
 }
 
+/** Get the Notion source mapping for a client (resolves client_id → space_id → source) */
+export const getSpaceNotionSourceByClientId = async (clientId: string): Promise<(SpaceNotionSource & { clientId: string }) | null> => {
+  const rows = await runGreenhousePostgresQuery<SpaceNotionSourceRow & { client_id: string }>(
+    `SELECT sns.*, s.client_id
+     FROM greenhouse_core.space_notion_sources sns
+     JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
+     WHERE s.client_id = $1 AND s.active = TRUE AND sns.sync_enabled = TRUE
+     LIMIT 1`,
+    [clientId]
+  )
+
+  if (rows.length === 0) return null
+
+  return { ...normalizeRow(rows[0]), clientId: rows[0].client_id }
+}
+
 /** Get all active (sync_enabled = true) Notion source mappings */
 export const getActiveSpaceNotionSources = async (): Promise<SpaceNotionSource[]> => {
   const rows = await runGreenhousePostgresQuery<SpaceNotionSourceRow>(

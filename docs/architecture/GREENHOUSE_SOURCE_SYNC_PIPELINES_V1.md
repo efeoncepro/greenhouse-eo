@@ -233,12 +233,19 @@ Recommended business fields for tasks:
 - `task_phase`
 - `task_priority`
 - `assignee_source_id`
-- `assignee_member_id`
+- `assignee_member_id` — first Notion responsable resolved to Greenhouse member ID (backward compat)
+- `assignee_member_ids` — `ARRAY<STRING>` all Notion responsables resolved to Greenhouse member IDs (enables person-level ICO metrics via UNNEST; added 2026-03-18)
 - `due_date`
 - `completed_at`
 - `last_edited_time`
 - `is_deleted`
 - `sync_run_id`
+
+Multi-assignee enrichment:
+- `responsables_ids` (Notion array) is mapped through `team_members.notion_user_id` → `member_id`
+- `assignee_member_id` keeps first assignee for backward compatibility
+- `assignee_member_ids` stores all resolved IDs; `v_tasks_enriched` falls back to wrapping the singular `assignee_member_id` for legacy rows
+- Column added idempotently via `ALTER TABLE ADD COLUMN IF NOT EXISTS` at sync time
 
 ### HubSpot conformed tables
 
@@ -507,6 +514,112 @@ If the incoming `payload_hash` did not change, projection to Postgres can be ski
 - every raw ingestion must be replayable
 - every operational projection in PostgreSQL must preserve `source_updated_at` and `synced_at`
 - every module must read through Greenhouse service layers, never directly from source raw tables
+
+## Conformed Data Layer — Config-Driven Property Mappings
+
+### Status: Implemented (2026-03-18)
+
+The conformed data layer now supports **config-driven property mappings** via a Postgres configuration table. This enables onboarding new Spaces (clients) with different Notion property names or types without modifying the sync script.
+
+### Architecture
+
+```
+Notion Teamspace (Space A) ─┐
+Notion Teamspace (Space B) ─┤  Notion API
+Notion Teamspace (Space N) ─┘
+        │
+        ▼
+notion-bq-sync (Python, Cloud Run)
+  • Generic service — syncs Notion → BigQuery
+  • NO Greenhouse business logic
+  • Writes raw to notion_ops.tareas (Spanish names)
+        │
+        ▼
+sync-source-runtime-projections.ts (TypeScript)
+  │
+  ├── 1. Reads notion_ops.tareas from BigQuery (raw)
+  ├── 2. Assigns space_id via preferredSpaceMap (client_notion_bindings)
+  ├── 3. Loads property mappings from Postgres (cached per space_id)
+  │      └── greenhouse_delivery.space_property_mappings
+  ├── 4. For each task:
+  │      ├── Builds result with hardcoded default mapping (always)
+  │      ├── If space has config mappings → applies overrides via applyPropertyMappings()
+  │      │   ├── normalizeNotionKey() matches raw property names
+  │      │   ├── applyCoercion() converts types (16 rules)
+  │      │   └── Overwrites default result fields with config-driven values
+  │      └── If no mappings → uses default result (backward compatible)
+  ├── 5. Writes to greenhouse_raw.tasks_snapshots (BQ, immutable)
+  ├── 6. Writes to greenhouse_conformed.delivery_tasks (BQ, normalized)
+  └── 7. Writes to greenhouse_delivery.tasks (Postgres, projection)
+```
+
+### Configuration table
+
+Table: `greenhouse_delivery.space_property_mappings` (Postgres)
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `id` | TEXT PK | Unique identifier |
+| `space_id` | TEXT NOT NULL | Space that this mapping belongs to |
+| `notion_property_name` | TEXT NOT NULL | Exact Notion property name (case-sensitive) |
+| `conformed_field_name` | TEXT NOT NULL | Target field in conformed schema (snake_case, English) |
+| `notion_type` | TEXT NOT NULL | Notion property type: number, formula, select, rollup, etc. |
+| `target_type` | TEXT NOT NULL | Target type: STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP |
+| `coercion_rule` | TEXT NOT NULL | How to convert: direct, formula_to_int, status_to_string, etc. |
+| `is_required` | BOOLEAN | Log warning if property not found |
+| `fallback_value` | TEXT | Default value if null (JSON encoded) |
+
+Constraints:
+- `UNIQUE (space_id, conformed_field_name)` — one source per conformed field per Space
+- `UNIQUE (space_id, notion_property_name)` — one target per Notion property per Space
+
+### Coercion rules
+
+16 built-in rules handle Notion type heterogeneity:
+
+| Rule | Converts | Example |
+|------|----------|---------|
+| `direct` | Same type cast | `number → INTEGER` |
+| `formula_to_int/float/string/bool` | Notion formula result | `"2.0" → 2` |
+| `rollup_to_int/float/string` | Notion rollup result | `"5" → 5` |
+| `select_to_string` / `status_to_string` | Select/Status objects | `{name:"Done"} → "Done"` |
+| `checkbox_to_bool` | Checkbox | `true → true` |
+| `extract_number_from_text` | First number from text | `"v2.1" → 2.1` |
+| `relation_first_id` | First ID from relation | `["abc","def"] → "abc"` |
+| `people_first_email` | First email from people | `["a@b.com"] → "a@b.com"` |
+| `ignore` | Excluded from output | — |
+
+### Fallback behavior
+
+Spaces without entries in `space_property_mappings` use the hardcoded default mapping. This is the permanent fallback for Efeonce and any Space whose Notion properties match the default schema.
+
+If the Postgres query for mappings fails (connection error, table missing), the pipeline logs a warning and continues with the default mapping. The sync never blocks on a configuration error.
+
+### Discovery script
+
+`scripts/notion-schema-discovery.ts` automates new Space onboarding:
+
+```bash
+npx tsx scripts/notion-schema-discovery.ts --space-id EO-SPC-SKY
+```
+
+Output:
+1. `discovery_report.md` — property catalog, suggested mappings with confidence levels, type conflicts, seed SQL
+2. `discovery_raw.json` — full raw schema data
+
+The script reads Space configurations from `greenhouse_core.space_notion_sources` (with fallback to `greenhouse_core.clients`), calls the Notion API to enumerate database properties, and matches them against the conformed schema using name patterns and type compatibility.
+
+### New Space onboarding workflow
+
+1. Register Space in Greenhouse (API: `POST /api/admin/spaces`)
+2. Run discovery: `npx tsx scripts/notion-schema-discovery.ts --space-id <SPACE_ID>`
+3. Review `discovery_report.md` — adjust mappings as needed
+4. Execute seed SQL in Postgres (from the report)
+5. Run sync: `npx tsx scripts/sync-source-runtime-projections.ts`
+6. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
+7. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
+
+---
 
 ## Immediate Next Step
 

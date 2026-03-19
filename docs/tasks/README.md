@@ -30,9 +30,22 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 | Task | Foco |
 | --- | --- |
-| [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | Consolidación UX de vistas, shells maestras y navegación del portal |
+| [CODEX_TASK_Campaign_360.md](to-do/CODEX_TASK_Campaign_360.md) | Modelo canonico de campanas y su capa 360 |
+| [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | Baseline canonica de implementacion de Campaign sobre `greenhouse_core` + `ICO Engine` |
 | [CODEX_TASK_SCIM_User_Provisioning.md](to-do/CODEX_TASK_SCIM_User_Provisioning.md) | Provisioning SCIM desde Entra ID |
+| [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | Convergencia del mapping canonico `Space -> Notion` y corte de `notion_project_ids` |
+| [CODEX_TASK_Transactional_Email_System.md](to-do/CODEX_TASK_Transactional_Email_System.md) | Reset, invitaciones y verificacion por email sobre PostgreSQL + Resend |
+| [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | Consolidación UX de vistas, shells maestras y navegación del portal |
 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | Ajuste transversal de jerarquía tipográfica |
+
+## Supporting Specs
+
+| Documento | Rol actual |
+| --- | --- |
+| [Greenhouse_Account_360_Object_Model_v1.md](to-do/Greenhouse_Account_360_Object_Model_v1.md) | Spec estructural de Organizations, Spaces y convenciones `EO-*` |
+| [Greenhouse_Data_Node_Architecture_v1.md](to-do/Greenhouse_Data_Node_Architecture_v1.md) | Estrategia de export, API y MCP para exponer datos del portal |
+| [Greenhouse_ICO_Engine_v1.md](to-do/Greenhouse_ICO_Engine_v1.md) | Spec amplia del motor ICO; conservar como referencia de diseño junto a la arquitectura viva |
+| [Greenhouse_Services_Architecture_v1.md](to-do/Greenhouse_Services_Architecture_v1.md) | Spec del objeto `Service` y derivación de capabilities desde servicios activos |
 
 ## Complete
 
@@ -46,6 +59,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Client_Dashboard_Redesign.md](complete/CODEX_TASK_Client_Dashboard_Redesign.md) | Rediseño dashboard cliente |
 | [CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md](complete/CODEX_TASK_Client_Dashboard_Visual_Diagnosis.md) | Diagnóstico visual del dashboard cliente |
 | [CODEX_TASK_Creative_Hub_Module.md](complete/CODEX_TASK_Creative_Hub_Module.md) | Brief histórico de Creative Hub reemplazado por v2 |
+| [CODEX_TASK_ETL_ICO_Pipeline_Hardening.md](complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md) | Hardening del pipeline `notion-bq-sync -> sync-conformed -> ico-materialize` |
 | [CODEX_TASK_Financial_Module.md](complete/CODEX_TASK_Financial_Module.md) | Brief histórico de Finance reemplazado por v2 |
 | [CODEX_TASK_Fix_Team_Capacity_Views.md](complete/CODEX_TASK_Fix_Team_Capacity_Views.md) | Ajustes a vistas de capacidad de equipo |
 | [CODEX_TASK_Google_SSO_Greenhouse.md](complete/CODEX_TASK_Google_SSO_Greenhouse.md) | Google SSO |

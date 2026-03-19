@@ -14,6 +14,9 @@ import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
 
@@ -37,9 +40,11 @@ type Props = {
   capabilities: TenantCapabilityRecord[]
   onCapabilitiesChange: (caps: TenantCapabilityRecord[]) => void
   capabilityManagerRef: React.RefObject<TenantCapabilityManagerHandle | null>
+  onSave?: () => void
+  isSaving?: boolean
 }
 
-const TenantCapabilitiesPanel = ({ data, capabilities, onCapabilitiesChange, capabilityManagerRef }: Props) => {
+const TenantCapabilitiesPanel = ({ data, capabilities, onCapabilitiesChange, capabilityManagerRef, onSave, isSaving }: Props) => {
   const businessLineCards = useMemo(
     () =>
       capabilities
@@ -66,6 +71,20 @@ const TenantCapabilitiesPanel = ({ data, capabilities, onCapabilitiesChange, cap
             subheader={GH_INTERNAL_MESSAGES.admin_tenant_capabilities_business_lines_subtitle}
             titleTypographyProps={{ variant: 'h5' }}
             subheaderTypographyProps={{ variant: 'body2' }}
+            action={
+              onSave ? (
+                <Button
+                  variant='tonal'
+                  color='warning'
+                  size='small'
+                  onClick={onSave}
+                  disabled={isSaving}
+                  startIcon={isSaving ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-device-floppy' />}
+                >
+                  {GH_INTERNAL_MESSAGES.admin_tenant_detail_save_manual}
+                </Button>
+              ) : undefined
+            }
           />
           <Divider />
           <CardContent>

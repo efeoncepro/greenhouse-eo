@@ -13,6 +13,7 @@ import type {
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
+import type { MetricsSummary } from '@/lib/ico-engine/read-metrics'
 
 const integerFormatter = new Intl.NumberFormat('es-CL')
 const percentFormatter = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 })
@@ -265,32 +266,33 @@ const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
 
 export const buildCreativeRevenueCardData = (
   snapshot: CapabilityModuleSnapshot,
-  tasks: CreativeHubTask[]
+  tasks: CreativeHubTask[],
+  icoSummary?: MetricsSummary | null
 ): CapabilityCardData => {
   const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
   const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
 
-  const avgRpa = average(
+  const avgRpa = icoSummary?.rpaAvg ?? average(
     completedTasks
       .map(task => task.rpaValue)
       .filter((value): value is number => value !== null && value > 0)
   )
 
-  const ftrPct =
-    firstTimeRightBase.length > 0
+  const ftrPct = icoSummary?.ftrPct ??
+    (firstTimeRightBase.length > 0
       ? Math.round((firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100)
-      : null
+      : null)
 
   const otdBase = completedTasks.filter(task => task.completedAt && task.deadlineAt)
 
-  const otdPct =
-    otdBase.length > 0
+  const otdPct = icoSummary?.otdPct ??
+    (otdBase.length > 0
       ? Math.round(
           (otdBase.filter(task => new Date(task.completedAt || '').getTime() <= new Date(task.deadlineAt || '').getTime()).length /
             otdBase.length) *
             100
         )
-      : snapshot.summary.avgOnTimePct
+      : snapshot.summary.avgOnTimePct)
 
   const daysGained =
     otdPct > INDUSTRY_OTD * 100
@@ -337,16 +339,19 @@ export const buildCreativeRevenueCardData = (
   return { type: 'metrics-row', items }
 }
 
-export const buildCreativeBrandMetricsCardData = (tasks: CreativeHubTask[]): CapabilityCardData => {
+export const buildCreativeBrandMetricsCardData = (
+  tasks: CreativeHubTask[],
+  icoSummary?: MetricsSummary | null
+): CapabilityCardData => {
   const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
   const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
 
-  const firstTimeRightPct =
-    firstTimeRightBase.length > 0
+  const firstTimeRightPct = icoSummary?.ftrPct ??
+    (firstTimeRightBase.length > 0
       ? Math.round((firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100)
-      : null
+      : null)
 
-  const avgRpa = average(
+  const avgRpa = icoSummary?.rpaAvg ?? average(
     completedTasks
       .map(task => task.rpaValue)
       .filter((value): value is number => value !== null && value > 0)

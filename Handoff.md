@@ -40,6 +40,407 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Testing: baseline unitario formalizado
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Cerrar una base de unit testing reutilizable para el repo usando el `Vitest` ya instalado y extenderlo a tests de componentes React.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Tooling local / CI futura
+
+### Archivos tocados
+- `AGENTS.md`
+- `package.json`
+- `pnpm-lock.yaml`
+- `vitest.config.ts`
+- `src/test/setup.ts`
+- `src/test/render.tsx`
+- `src/components/greenhouse/EmptyState.test.tsx`
+
+### Verificacion
+- `pnpm test`
+- Resultado: `3` archivos y `33` tests pasando
+
+### Riesgos o pendientes
+- La base de testing ya soporta `node` y `jsdom`, pero todavia hay poca cobertura del repo real; el siguiente ROI alto esta en `ICO Engine`, scopes de acceso, normalizacion de source sync y helpers de Finance/Payroll.
+- Si se agregan tests de componentes con providers extra, conviene extender `src/test/render.tsx` en vez de repetir wrappers por archivo.
+
+## 2026-03-19 — Person Activity Tab ICO merge + sidebar FTE alignment + KPI layout fix
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Merge de métricas ICO Engine en el tab Actividad de Person 360 (reemplaza `PersonOperationalMetrics` vacío).
+- Corregir KPI cards que se recortaban por overflow en el contenedor.
+- Alinear los stats del sidebar (FTE, Hrs/mes, Spaces) con lo que muestra el tab Organizaciones.
+- Verificación de infraestructura: `v_tasks_enriched` vista confirmada con 3850 filas, 92 tareas para Andrés Carlosama.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Staging (Vercel `dev-greenhouse.efeoncepro.com`)
+
+### Archivos tocados
+
+**Person Activity Tab (REWRITTEN — commit `fbd2cb0`):**
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Antes: mostraba `PersonOperationalMetrics` (siempre vacío). Ahora: fetch client-side a `/api/ico-engine/context?dimension=member&value={memberId}`. Props cambiaron de `{ metrics?: PersonOperationalMetrics }` a `{ memberId: string }`.
+  - 6 KPI cards: RpA, OTD%, FTR%, Throughput, Ciclo promedio, Stuck assets
+  - Selectores de período (mes/año)
+  - Donut CSC (distribución por fase)
+  - Radar de salud operativa (6 dimensiones normalizadas)
+  - Gauge de velocidad pipeline (radialBar)
+- `src/views/greenhouse/people/PersonTabs.tsx` — Activity tab ahora pasa `memberId={detail.member.memberId}` en vez de `metrics`.
+- `src/views/greenhouse/people/helpers.ts` — Eliminado tab `ico` de `TAB_PERMISSIONS` y `TAB_CONFIG`.
+- `src/types/people.ts` — Eliminado `'ico'` de `PersonTab` union type.
+- `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — **ELIMINADO** (orphan después del merge).
+
+**KPI overflow fix (commit `67b93aa`):**
+- `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Reemplaza Grid anidado por flex con `overflowX: auto`. Cada card tiene `minWidth: 160px` y `flex: 1 1 0` para distribuirse equitativamente sin recortarse.
+
+**Sidebar FTE alignment (commit `b04bb8f`):**
+- `src/lib/people/get-person-detail.ts` — El summary (`totalFte`, `totalHoursMonth`, `activeAssignments`) ahora solo cuenta assignments que tienen una membresía correspondiente en Postgres (`person_memberships`), no todos los `client_team_assignments` de BigQuery. Import de `getPersonMemberships` agregado.
+  - **Antes**: Andrés mostraba 2.0 FTE, 320 hrs, 2 Spaces (Efeonce + Sky Airline en BQ).
+  - **Ahora**: Muestra 1.0 FTE, 160 hrs, 1 Space (solo Sky Airline, la única membresía en Postgres).
+  - Fallback: si la consulta de membresías falla, usa todos los assignments (backward compatible).
+
+**BigQuery view fix (commit `e44c3be`):**
+- `src/lib/ico-engine/schema.ts` — `v_tasks_enriched` COALESCE bug: empty array `[]` no es NULL, por lo que COALESCE no aplicaba fallback. Cambiado a `IF(ARRAY_LENGTH > 0)`.
+
+### Verificación
+- TypeScript: `tsc --noEmit` limpio en todos los commits
+- BigQuery: `ico_engine.v_tasks_enriched` existe con 3850 filas. Andrés tiene 92 tareas asignadas.
+- Postgres: `greenhouse_sync.identity_reconciliation_proposals` creada y operativa. 13 propuestas procesadas (1 rejected, 12 dismissed).
+- Vercel: deploy staging Ready con commit `b04bb8f`.
+- clientId matching verificado: Postgres membership Sky Airline (`hubspot-company-30825221458`) ↔ BigQuery assignment match correcto. Efeonce (`space-efeonce`) filtrado.
+
+### Riesgos o pendientes
+- **Cache del browser** puede causar que los cambios no se vean inmediatamente. Hard refresh (`Cmd+Shift+R`) o incógnito resuelve.
+- **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion.
+- **Asignaciones huérfanas en BigQuery**: `space-efeonce` sigue en `client_team_assignments` para todos los miembros pero no tiene membresía en Postgres. Considerar limpiar o crear las membresías correspondientes.
+
+## 2026-03-18 — Identity Reconciliation Service + Person Activity ICO merge
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Construir un servicio escalable de reconciliación de identidades entre source systems (Notion, extensible a HubSpot/Azure AD) y team members de Greenhouse.
+- Descubrimiento automático de IDs no vinculados, matching por señales con scoring de confianza, auto-link para alta confianza, cola de propuestas para revisión admin.
+- Enriquecimiento del discovery con `responsable_texto` como fallback de nombres cuando Notion devuelve UUIDs para usuarios externos/invitados.
+- Merge de métricas ICO Engine en el tab Activity de Person 360.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Staging (Vercel) + Cloud SQL (greenhouse_sync schema)
+
+### Archivos tocados
+
+**Reconciliation engine (NEW):**
+- `src/lib/identity/reconciliation/types.ts` — tipos, thresholds, interfaces
+- `src/lib/identity/reconciliation/normalize.ts` — normalización de nombres, Levenshtein
+- `src/lib/identity/reconciliation/discovery-notion.ts` — descubrimiento de Notion IDs no vinculados con fallback `responsable_texto`
+- `src/lib/identity/reconciliation/matching-engine.ts` — matching source-agnostic con scoring de confianza
+- `src/lib/identity/reconciliation/apply-link.ts` — escritura de links en BigQuery + Postgres
+- `src/lib/identity/reconciliation/reconciliation-service.ts` — orquestador: discover → match → propose/auto-link
+
+**Admin API (NEW):**
+- `src/app/api/admin/identity/reconciliation/route.ts` — GET proposals + POST trigger run
+- `src/app/api/admin/identity/reconciliation/[proposalId]/resolve/route.ts` — resolve (approve/reject/dismiss/reassign)
+- `src/app/api/admin/identity/reconciliation/stats/route.ts` — summary por source_system y status
+
+**Postgres DDL + Scripts (NEW):**
+- `scripts/setup-identity-reconciliation.sql` — DDL tabla `greenhouse_sync.identity_reconciliation_proposals`
+- `scripts/setup-identity-reconciliation.ts` — runner del DDL
+- `scripts/run-identity-reconciliation.ts` — ejecución CLI del reconciliation service
+
+**Pipeline integration (MODIFIED):**
+- `src/lib/sync/sync-notion-conformed.ts` — tail step no-blocking de reconciliación al final del sync
+
+### Verificación
+- DDL ejecutado en Cloud SQL: tabla creada en `greenhouse_sync`
+- TypeScript: `tsc --noEmit` limpio
+- Dry run: 13 IDs descubiertos, 0 auto-linked (todos externos), 1 fuzzy match (Daniela I → Daniela Ferreira, rechazado por ser persona distinta)
+- Run real: 13 propuestas creadas. 1 rechazada (Daniela Infante, ex-colaboradora). 12 descartadas (ex-colaboradores externos).
+- Vercel deploy: staging OK
+
+### Riesgos o pendientes
+- **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion. Requiere vinculación manual o verificación en el workspace de Notion.
+- Cuando se agreguen nuevos team members, el próximo sync-conformed automáticamente descubrirá y propondrá vínculos.
+- Para agregar HubSpot: crear `discovery-hubspot.ts` con la misma interfaz `DiscoveredIdentity`. No requiere cambios en schema ni API.
+
+## 2026-03-18 — Campaign 360: baseline canonica v2
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la idea original de `Campaign 360` a una baseline de implementacion alineada con la arquitectura viva del proyecto.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentacion operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Campaign_360_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Campaign_360.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/tasks/to-do/Greenhouse_Account_360_Object_Model_v1.md`
+  - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La task original de `Campaign 360` sigue teniendo mucho detalle historico de infraestructura; ahora ya esta guardraileada, pero una futura pasada deberia depurarla o absorberla por completo en la `v2`.
+- Falta decidir, cuando se implemente, si `Campaign` tendra una serving view explicita `campaign_360` desde fase 1 o si eso queda para fase 2.
+
+## 2026-03-18 — Documentación: normalización de índice y jerarquía de lectura
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Alinear la documentación viva después de la actualización reciente de Claude Code, para que tasks e índices no contradigan la arquitectura actual.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `docs/tasks/complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md`
+- `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md`
+- `docs/tasks/to-do/CODEX_TASK_Tenant_Notion_Mapping.md`
+- `changelog.md`
+
+### Verificación
+- Revisión manual de consistencia entre:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+  - `docs/tasks/**`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- `Greenhouse_ICO_Engine_v1.md` y `CODEX_TASK_Tenant_Notion_Mapping.md` ya quedaron con guardrails de lectura, pero siguen teniendo secciones históricas largas que convendría depurar en una pasada posterior.
+- Queda pendiente reconciliar de forma definitiva la historia documental entre `space_notion_sources`, `notion_workspaces` y `space_property_mappings`.
+- `Handoff.md` sigue sobredimensionado para su propósito de snapshot; esta pasada no intentó compactarlo.
+
+## 2026-03-18 — ICO Engine: Context-Agnostic Metrics Service + Person ICO Tab
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Refactorizar el ICO Engine de space-only a un servicio de métricas agnóstico al contexto. Agregar multi-assignee, materialización por persona, API genérica, y tab ICO en Person 360.
+
+### Rama
+- Rama usada: `develop`
+- Commit: `b7b9d80`
+
+### Ambiente objetivo
+- Preview / BigQuery (`ico_engine` dataset) / Person 360 ICO tab / Organization ICO tab / Agency ICO tab
+
+### Archivos tocados
+
+**Nuevos (3 archivos):**
+- `src/app/api/ico-engine/context/route.ts` — Generic context API: `?dimension=X&value=Y&year=Z&month=W`
+- `src/app/api/people/[memberId]/ico/route.ts` — Person ICO convenience endpoint
+- `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — Person ICO tab (KPIs, donut, radar, gauge)
+
+**Modificados (9 archivos):**
+- `src/lib/ico-engine/shared.ts` — `ICO_DIMENSIONS`, `buildMetricSelectSQL()`, `buildPeriodFilterSQL()`, status constants
+- `src/lib/ico-engine/materialize.ts` — Refactored to use shared builders + `materializeMemberMetrics()`
+- `src/lib/ico-engine/read-metrics.ts` — `IcoMetricSnapshot`, `computeMetricsByContext()`, `readMemberMetrics()`
+- `src/lib/ico-engine/schema.ts` — `metrics_by_member` DDL, `assignee_member_ids` in `v_tasks_enriched`
+- `src/lib/sync/sync-notion-conformed.ts` — Multi-assignee array + `ensureMultiAssigneeColumn()`
+- `src/types/people.ts` — Added `'ico'` to `PersonTab`
+- `src/views/greenhouse/people/helpers.ts` — Tab config + permissions
+- `src/views/greenhouse/people/PersonTabs.tsx` — Registered ICO tab
+- `scripts/setup-bigquery-source-sync.sql` — Added `assignee_member_ids` column
+
+### Cambios realizados
+
+**Phase 0 — Shared SQL Builders:**
+- Fórmulas de métricas extraídas a `buildMetricSelectSQL()` (definidas UNA vez, consumidas por 5 funciones)
+- `buildPeriodFilterSQL()` para filtro canónico de período
+- `ICO_DIMENSIONS` allowlist con dimensiones válidas
+- Refactored `materialize.ts` y `computeSpaceMetricsLive` para usar builders compartidos
+- Corregido mismatch de columnas en `metrics_by_project` INSERT (faltaban `pipeline_velocity`, `stuck_asset_pct`, `active_tasks`)
+
+**Phase 1 — Generalized Types + Context Query:**
+- `IcoMetricSnapshot` — tipo genérico con `dimension`, `dimensionValue`, `dimensionLabel`
+- `computeMetricsByContext(dimensionKey, dimensionValue, year, month)` — live compute para cualquier dimensión
+- Member dimension usa UNNEST en `assignee_member_ids` para acreditar todos los asignados
+
+**Phase 2 — Multi-Assignee Enrichment:**
+- `assignee_member_ids ARRAY<STRING>` en `delivery_tasks` (todas las resoluciones de `responsables_ids`)
+- `v_tasks_enriched` expone con fallback: `COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], []))`
+- `ensureMultiAssigneeColumn()` agrega columna idempotentemente via ALTER TABLE
+
+**Phase 3 — Person-Level Materialization:**
+- `metrics_by_member` DDL (clustered by member_id) registrado en `ensureIcoEngineInfrastructure()`
+- `materializeMemberMetrics()` — DELETE period + INSERT desde UNNEST(assignee_member_ids)
+- `readMemberMetrics()` — lectura desde caché materializado
+
+**Phase 4 — Generic Context API:**
+- `GET /api/ico-engine/context?dimension=space|project|member|client|sprint&value=X&year=Y&month=Z`
+- Valida dimensión contra allowlist, intenta caché materializado, fallback a live compute
+
+**Phase 5 — Person ICO Tab:**
+- `PersonIcoTab.tsx` con KPIs, CSC donut, health radar, velocity gauge
+- Period selectors (mes/año)
+- `GET /api/people/[memberId]/ico` convenience endpoint
+- Tab registrado en `PersonTabs.tsx`, permisos `efeonce_admin` + `efeonce_operations`
+
+### Verificación
+- `npx tsc --noEmit` — 0 errores TypeScript
+- Pushed to `origin/develop`
+
+### Riesgos o pendientes
+- La tabla `metrics_by_member` no tiene datos hasta que se ejecute la materialización (cron 6:15 AM UTC) después de un sync que pueble `assignee_member_ids`. Mientras tanto, la API cae a live compute.
+- BigQuery `ALTER TABLE ADD COLUMN IF NOT EXISTS` requiere que el service account tenga permisos de TABLE admin — si falla, el sync continúa (la columna no se crea) y los datos multi-assignee no se guardan.
+- Agregar dimensiones futuras: solo 3 pasos (columna en view, entrada en allowlist, opcionalmente tabla de materialización).
+
+### Documentación actualizada
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` — ICO Engine section reescrita
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` — `ico_engine` dataset completo + `assignee_member_ids`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — Layer D con tablas ICO
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` — Multi-assignee enrichment
+- `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md` — Apéndice B: Context-Agnostic Metrics Service
+- `docs/api/GREENHOUSE_API_REFERENCE_V1.md` — ICO Engine endpoints table
+- `docs/CHANGELOG.md` — Nueva entrada
+
+---
+
+## 2026-03-17 — ICO Engine: Implementación completa (Groups A–E)
+
+### Agente
+- Claude (Opus 4.6)
+
+### Objetivo del turno
+- Completar todos los gaps restantes del ICO Engine identificados en `Greenhouse_ICO_Engine_v1.md`. 5 grupos: wire onComputeLive + AI DDL (A), stuck assets detail (B), RPA trend (C), project-level metrics (D), Creative Hub migration (E).
+
+### Rama
+- Rama usada: `develop`
+- Commit: `d2483fd`
+
+### Ambiente objetivo
+- Preview / BigQuery (`ico_engine` dataset) / Agency ICO tab
+
+### Archivos tocados
+
+**Nuevos (19 archivos):**
+- `src/lib/ico-engine/shared.ts` — IcoEngineError, runIcoEngineQuery, coercion utils
+- `src/lib/ico-engine/metric-registry.ts` — 10 MetricDefinition[], FormulaConfig, CSC mapping, AIMetricConfig
+- `src/lib/ico-engine/schema.ts` — ensureIcoEngineInfrastructure() — dataset + 6 tables + views
+- `src/lib/ico-engine/read-metrics.ts` — 7 funciones de lectura (space, agency, project, live, summary, byClientId)
+- `src/lib/ico-engine/materialize.ts` — materializeMonthlySnapshots (4 materializations)
+- `src/app/api/ico-engine/registry/route.ts` — GET metric definitions
+- `src/app/api/ico-engine/metrics/route.ts` — GET space metrics
+- `src/app/api/ico-engine/metrics/agency/route.ts` — GET agency metrics + `?live=true`
+- `src/app/api/ico-engine/metrics/project/route.ts` — GET project-level metrics
+- `src/app/api/ico-engine/stuck-assets/route.ts` — GET stuck assets detail
+- `src/app/api/ico-engine/trends/rpa/route.ts` — GET RPA trend
+- `src/app/api/cron/ico-materialize/route.ts` — Vercel cron diario 06:15 UTC
+- `src/components/agency/IcoGlobalKpis.tsx` — 6 KPI cards
+- `src/components/agency/IcoCharts.tsx` — CSC bar + velocity gauge + RPA trend line
+- `src/components/agency/SpaceIcoScorecard.tsx` — Sortable space metrics table + stuck click
+- `src/components/agency/StuckAssetsDrawer.tsx` — Right drawer (480px) stuck asset details
+- `src/components/agency/SpacesCharts.tsx` — Spaces view charts
+- `src/components/agency/space-health.ts` — Space health computation
+- `src/views/agency/AgencyIcoEngineView.tsx` — ICO tab orchestrator
+
+**Modificados (10 archivos):**
+- `src/views/agency/AgencyWorkspace.tsx` — +ICO tab, +handleComputeLive, +icoData state
+- `src/views/agency/AgencySpacesView.tsx` — Spaces redesign
+- `src/components/agency/SpaceCard.tsx` — Refactored for Spaces view
+- `src/components/agency/SpaceFilters.tsx` — +health/service filters
+- `src/components/agency/SpaceHealthTable.tsx` — +sortable health metrics
+- `src/config/greenhouse-nomenclature.ts` — +ICO labels, +stuck drawer, +RPA trend
+- `src/lib/capability-queries/creative-hub.ts` — +readMetricsSummaryByClientId en Promise.all
+- `src/lib/capability-queries/helpers.ts` — +optional icoSummary param (RPA/FTR/OTD override)
+- `vercel.json` — +cron schedule
+
+### Cambios realizados
+
+**Group A — Quick Fixes:**
+- Wired `onComputeLive` en AgencyWorkspace → live compute button funcional
+- `ai_metric_scores` DDL creado (tabla vacía, forward-compatible)
+- `AIMetricConfig` type exportado desde metric-registry.ts
+- Agency API soporta `?live=true` — busca distinct space_ids, computa en batches de 5
+
+**Group B — Stuck Assets Detail:**
+- DDL `stuck_assets_detail` (CLUSTER BY space_id, severity)
+- Materialización: DELETE all + INSERT desde `v_tasks_enriched WHERE is_stuck = TRUE`
+- Severity: warning (72-95h) / danger (96h+) — alineado con is_stuck del view (72h)
+- API `/api/ico-engine/stuck-assets?spaceId` con auth `requireAgencyTenantContext`
+- StuckAssetsDrawer: MUI Drawer, fetch on open, grid layout, empty state con checkmark
+- SpaceIcoScorecard: stuck count clickable → abre drawer
+
+**Group C — RPA Trend:**
+- DDL `rpa_trend` (CLUSTER BY space_id)
+- Materialización: DELETE all + INSERT últimos 12 meses, AVG + APPROX_QUANTILES P50
+- API `/api/ico-engine/trends/rpa?spaceId&months` — agrupa por space, optional filter
+- IcoCharts: line chart (top 5 spaces), annotation at y=1.5 (óptimo), smooth curves
+- AgencyIcoEngineView: lazy-fetch trend después de que ICO data cargue
+
+**Group D — Project-Level Metrics:**
+- DDL `metrics_by_project` (CLUSTER BY space_id, project_source_id)
+- Materialización: DELETE período actual + INSERT agrupado por project_source_id
+- `readProjectMetrics()` en read-metrics.ts + API `/api/ico-engine/metrics/project`
+
+**Group E — Creative Hub → ICO Engine:**
+- `readMetricsSummaryByClientId(clientId)` — query `v_metric_latest WHERE client_id = @clientId`
+- creative-hub.ts: fetch en paralelo con Promise.all, `.catch(() => null)` para graceful degradation
+- helpers.ts: `buildCreativeRevenueCardData` + `buildCreativeBrandMetricsCardData` aceptan optional `icoSummary` — prefieren ICO values (RPA, FTR, OTD), fallback a cómputo inline
+
+### Verificación
+- `pnpm tsc --noEmit` → 0 errores (verificado después de cada grupo)
+- `git push origin develop` → `d2483fd` exitoso
+
+### Decisiones de arquitectura
+- **Singleton Promise pattern**: `ensureIcoEngineInfrastructure()` verifica 5 tablas en una sola query a INFORMATION_SCHEMA, crea solo las faltantes
+- **Cron via Vercel**: `/api/cron/ico-materialize` con `maxDuration=120`, triggered by vercel.json cron schedule
+- **Batch live compute**: agency live compute ejecuta `computeSpaceMetricsLive()` en batches de 5 concurrent para evitar overload de BigQuery
+- **Stuck severity**: 72h = warning, 96h = danger (alineado con `is_stuck` de `v_tasks_enriched`, no 48h del spec original)
+- **Creative Hub graceful fallback**: ICO fetch wrapped en `.catch(() => null)` — si BigQuery falla o no hay datos, helpers usan cómputo inline sin cambio visible
+
+### Riesgos o pendientes
+- **Primera materialización**: el cron corre a las 06:15 UTC diario. Para ver datos inmediatamente, llamar `GET /api/cron/ico-materialize` manualmente o usar el botón "Calcular en vivo"
+- **client_id mapping**: `readMetricsSummaryByClientId` depende de que `client_id` esté populado en los snapshots. Si un Space no tiene mapping, el fallback a inline funciona transparentemente
+- **`metrics_by_service`**: bloqueado hasta que Services Architecture esté operativa
+- **AI layer**: `ai_metric_scores` tabla vacía — activar LEFT JOINs cuando AI agents escriban scores
+- **Deploy staging**: el cron necesita Vercel staging para funcionar — verificar que `vercel.json` crons se activen
+
+---
+
 ## 2026-03-16 — Sistematización Pre-Nómina (5 fases)
 
 ### Agente

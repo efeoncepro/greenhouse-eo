@@ -1,0 +1,2009 @@
+# EFEONCE GREENHOUSE™ — ICO Engine
+
+## Especificación Técnica v1.0
+
+**Efeonce Group — Marzo 2026 — CONFIDENCIAL**
+
+---
+
+## Estado 2026-03-18
+
+Este documento sigue siendo una spec amplia de diseno del `ICO Engine`, pero ya no debe leerse como snapshot exacto del runtime por si solo.
+
+Fuente operativa vigente para el estado actual:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+- `docs/tasks/complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md`
+
+Estado real ya absorbido en la arquitectura viva:
+- el `ICO Engine` ya se documenta como servicio de metricas agnostico a dimension
+- ya existen `metrics_by_member`, `GET /api/ico-engine/context`, multi-assignee support y `GET /api/ico-engine/health`
+- el pipeline operativo ya se documenta como `notion-bq-sync -> /api/cron/sync-conformed -> /api/cron/ico-materialize`
+
+Lectura correcta de este documento:
+- usarlo para entender la intencion funcional, el registro de metricas y extensiones futuras
+- no tomar como source of truth literal las secciones que aun describen:
+  - scoping por `notion_project_ids`
+  - supuestos single-tenant del sync
+  - pasos historicos ya corregidos por el hardening del pipeline
+
+Cuando este documento choque con la arquitectura actualizada del 2026-03-18, prevalece la arquitectura.
+
+## 1. Resumen ejecutivo
+
+Este documento define el **ICO Engine**: la capa transversal de métricas de delivery de Greenhouse que calcula, materializa y expone las métricas operativas de Intelligent Creative Operations (ICO) para todos los servicios de Efeonce.
+
+El ICO Engine no es un módulo de UI — es infraestructura de datos. Toma la data cruda que ya existe en BigQuery (sincronizada desde Notion, Frame.io, y otros sistemas operativos) y la transforma en métricas pre-calculadas, materializadas a distintos niveles de agregación, listas para ser consumidas por cualquier componente de Greenhouse.
+
+**Principio rector:** Ningún módulo de presentación calcula métricas ICO al vuelo. Todo módulo que necesite RpA, OTD%, Cycle Time o cualquier métrica operativa lee del ICO Engine. El engine calcula una vez, los consumidores leen muchas veces.
+
+### 1.1 Posición en la arquitectura de Greenhouse
+
+```
+Greenhouse (plataforma)
+  │
+  ├── Data Sources (BigQuery — capa cruda)
+  │     notion_ops.tareas, notion_ops.proyectos, notion_ops.sprints
+  │     notion_ops.revisiones (pendiente de agregar al sync)
+  │     hubspot_crm.companies, hubspot_crm.deals
+  │
+  ├── ICO Engine (BigQuery — capa de cálculo, dataset: ico_engine)
+  │     Metric Registry (TypeScript, código versionado)
+  │     Scheduled queries (materialización diaria post-sync)
+  │     Tablas materializadas por granularidad
+  │     Views de consumo por módulo
+  │
+  ├── PostgreSQL (Cloud SQL — capa OLTP)
+  │     greenhouse_core.organizations, spaces, services
+  │     Fuente de verdad operativa para CRUD
+  │     Recibe resúmenes ICO si se necesita real-time (futuro)
+  │
+  ├── Capabilities (capa de experiencia, por línea de servicio)
+  │     Creative Production (Globe) — consume ICO + portfolio/pipeline UX
+  │     Growth Engine (Digital) — consume ICO + performance/SEO UX
+  │     CRM Suite (CRM Solutions) — consume ICO + CRM health UX
+  │
+  ├── Data Node (capa de export/API) — consume ICO directamente
+  │
+  └── Efeonce Ops (capa interna) — consume ICO para utilización, margen, benchmarks
+```
+
+### 1.2 Relación con otros documentos
+
+| Documento | Relación |
+|---|---|
+| `Greenhouse_Services_Architecture_v1.md` | Define el objeto Service que el ICO Engine usa para agregar métricas por servicio. Services se implementa en paralelo; el engine ya incluye la granularidad de Service en su diseño. |
+| `Greenhouse_Account_360_Object_Model_v1.md` | Define `organizations` y `spaces`. El ICO Engine agrega métricas a nivel Space (tenant). |
+| `Greenhouse_Capabilities_Architecture_v1.md` | Define cómo se resuelven los módulos de UI. Los módulos consumen del ICO Engine; el engine no depende de capabilities. |
+| `Greenhouse_Data_Node_Architecture_v1.md` | Define los mecanismos de export. El Data Node lee views del ICO Engine para generar CSV, XLSX, JSON y API responses. |
+| `CODEX_TASK_Creative_Hub_Module.md` | Será actualizado para consumir del ICO Engine en vez de calcular métricas inline. |
+| `ICO_Intelligent_Creative_Operations_v1.docx` | Define el framework conceptual de ICO. El engine es la implementación técnica de las métricas definidas ahí. |
+
+### 1.3 Orden de implementación
+
+```
+1. Pipelines de data (prerequisito)
+   Completar notion-bq-sync: agregar Proyectos, Sprints, Revisiones
+   Verificar que las columnas necesarias fluyen a BigQuery
+
+2. ICO Engine (este documento)
+   Metric Registry en TypeScript
+   Views base en BigQuery (capa conformed)
+   Tablas materializadas (scheduled queries)
+   Views de consumo
+
+3. Services Architecture (en paralelo)
+   PostgreSQL tables, HubSpot sync, CRUD
+   Cuando esté listo: el engine agrega la dimensión Service
+
+4. Capabilities / módulos de UI (después)
+   Creative Production, Growth Engine, etc.
+   Consumen del ICO Engine — no calculan nada
+```
+
+El ICO Engine y Services Architecture pueden avanzar en paralelo. El engine funciona sin Services (agrega por tarea → proyecto → space). Cuando Services esté operativo, el engine agrega la dimensión de servicio — es un enriquecimiento, no un prerequisito.
+
+---
+
+## 2. Fuentes de datos
+
+### 2.1 Data que ya fluye a BigQuery
+
+| Tabla | Dataset | Sync | Columnas relevantes para ICO |
+|---|---|---|---|
+| `tareas` | `notion_ops` | `notion-bq-sync` diario 03:00 AM | `estado`, `frame_versions`, `frame_comments`, `open_frame_comments`, `client_change_round`, `client_review_open`, `rpa`, `semaforo_rpa`, `created_time`, `last_edited_time`, `proyecto`, `sprint`, `url_frame_io`, `workflow_change_round`, `workflow_review_open`, `review_source`, `last_reviewed_version` |
+
+### 2.2 Data que debe agregarse al sync
+
+| Tabla | Dataset | Database ID | Estado actual | Acción requerida |
+|---|---|---|---|---|
+| `proyectos` | `notion_ops` | `15288d9b145940529acc75439bbd5470` | DB ID vacío en `.env.yaml` | Configurar `NOTION_DB_PROYECTOS` en `.env.yaml` y re-deploy |
+| `sprints` | `notion_ops` | `0c40f928047a4879ae702bfd0183520d` | DB ID vacío en `.env.yaml` | Configurar `NOTION_DB_SPRINTS` en `.env.yaml` y re-deploy |
+| `revisiones` | `notion_ops` | `f791ecc4f84c4cfc9d19fe0d42ec9a7f` | No incluida en el sync | Agregar como cuarta tabla en `SYNC_TABLES` del pipeline `notion-bq-sync` |
+
+**Sobre el campo Responsable:** La tabla `tareas` no extrae actualmente el campo People de Notion. El Codex Task de Team Identity (`CODEX_TASK_Team_Identity_Capacity_System.md`) ya documenta este cambio. El ICO Engine funciona sin él para el MVP — las métricas se agregan por tarea/proyecto/servicio, no por persona. Cuando Responsable esté disponible, se habilita la granularidad por miembro del equipo.
+
+### 2.3 Cadena de scope: cómo el engine sabe qué tareas pertenecen a qué
+
+```
+Space (PostgreSQL: greenhouse_core.spaces)
+  │ notion_project_ids: TEXT[] — IDs de proyectos Notion del space
+  │
+  ├── [Hoy] Tarea pertenece a Space si:
+  │     tarea.proyecto ∈ space.notion_project_ids
+  │
+  └── [Con Services] Tarea pertenece a Service si:
+        service.notion_project_id = tarea.proyecto
+        AND service.space_id = space.id
+        Y a Space transitivamente via service.space_id
+```
+
+Para el MVP (sin Services), el JOIN es:
+
+```sql
+-- Tareas de un Space
+SELECT t.*
+FROM `notion_ops.tareas` t
+JOIN UNNEST(@notion_project_ids) AS pid
+  ON t.proyecto LIKE CONCAT('%', pid, '%')
+```
+
+Con Services operativo, el JOIN cambia a:
+
+```sql
+-- Tareas de un Service
+SELECT t.*
+FROM `notion_ops.tareas` t
+JOIN `greenhouse_olap.services` s
+  ON t.proyecto LIKE CONCAT('%', s.notion_project_id, '%')
+WHERE s.space_id = @space_id
+  AND s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending', 'paused')
+```
+
+El engine materializa ambos caminos: métricas por proyecto (siempre disponible) y métricas por servicio (cuando el JOIN sea posible).
+
+---
+
+## 3. Metric Registry
+
+### 3.1 Concepto
+
+El Metric Registry es un archivo TypeScript versionado en el repositorio de Greenhouse que define cada métrica ICO: su identidad, su fórmula, las granularidades donde aplica, los umbrales de calidad, y los servicios donde es relevante.
+
+Agregar una métrica nueva = agregar una entrada al registry. El scheduled query de BigQuery lee del registry (indirectamente, a través de las views que genera) para materializar los resultados.
+
+### 3.2 Tipos
+
+```typescript
+// /src/config/ico-metric-registry.ts
+
+// ─── Tipos base ───
+
+export type MetricCategory =
+  | 'quality'        // Calidad de entrega: RpA, FTR%
+  | 'speed'          // Velocidad: Cycle Time, OTD%
+  | 'efficiency'     // Eficiencia: Throughput, utilización
+  | 'pipeline'       // Estado del pipeline: fase CSC, stuck, velocity
+  | 'intelligence'   // AI-driven: Brief Clarity Score, Brand Consistency
+  | 'custom'         // Métricas custom por cliente (futuro)
+
+export type MetricFormulaType =
+  | 'avg_field'           // Promedio de un campo numérico
+  | 'count_where'         // Conteo de registros que cumplen condición
+  | 'ratio'               // Numerador / denominador como porcentaje
+  | 'percentile'          // Percentil de un campo (P50, P90, etc.)
+  | 'days_diff'           // Diferencia en días entre dos timestamps
+  | 'variance'            // Desviación estándar o coeficiente de variación
+  | 'distribution'        // Conteo por categoría (pipeline phases, etc.)
+  | 'threshold_count'     // Conteo de registros que exceden umbral
+  | 'custom_sql'          // SQL custom (para métricas que no encajan en los tipos anteriores)
+
+export type Granularity = 'task' | 'project' | 'service' | 'package' | 'space'
+
+export type AggregationPeriod = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'all_time'
+
+export interface ThresholdBands {
+  green: number       // Valor debajo (o arriba, según direction) = verde
+  yellow: number      // Entre green y red = amarillo
+  red: number         // Valor arriba (o abajo) = rojo
+  direction: 'lower_is_better' | 'higher_is_better'
+}
+
+export interface Benchmark {
+  industry: number | null    // Promedio de industria (null si no disponible)
+  ico_target: number | null  // Objetivo ICO (la promesa de Efeonce)
+  source: string             // De dónde viene el benchmark
+}
+
+// ─── Definición de métrica ───
+
+export interface ICOMetricDefinition {
+  // Identidad
+  id: string                          // Identificador único: 'rpa', 'otd_pct', 'cycle_time'
+  name: string                        // Nombre en inglés (nunca se traduce)
+  description: string                 // Descripción para tooltips (español neutro)
+  category: MetricCategory
+  
+  // Cálculo
+  formulaType: MetricFormulaType
+  formulaConfig: Record<string, any>  // Configuración específica del tipo de fórmula
+  
+  // Alcance
+  granularities: Granularity[]        // Niveles donde esta métrica se materializa
+  aggregationPeriods: AggregationPeriod[]  // Períodos de agregación
+  applicableServices: string[] | '*'  // Servicios donde aplica (* = todos)
+  
+  // Presentación
+  format: 'number' | 'percentage' | 'days' | 'count' | 'ratio' | 'distribution'
+  decimals: number
+  suffix?: string                     // 'días', '%', 'x', 'assets/sem'
+  thresholds: ThresholdBands | null   // null si no tiene semáforo
+  benchmarks: Benchmark | null
+  
+  // Estado
+  active: boolean                     // false = no se materializa
+  comingSoon: boolean                 // true = se muestra placeholder en UI
+  dependsOn: string[]                 // IDs de métricas de las que depende
+  
+  // Data source
+  primaryTable: string                // Tabla fuente: 'notion_ops.tareas'
+  requiredColumns: string[]           // Columnas que necesita de la tabla fuente
+}
+```
+
+### 3.3 Registry: métricas MVP
+
+```typescript
+// /src/config/ico-metric-registry.ts (continuación)
+
+export const ICO_METRIC_REGISTRY: ICOMetricDefinition[] = [
+
+  // ═══════════════════════════════════════
+  // CALIDAD
+  // ═══════════════════════════════════════
+
+  {
+    id: 'rpa',
+    name: 'Rounds per Asset',
+    description: 'Promedio de rondas de revisión por pieza. La promesa ICO es máximo 2.',
+    category: 'quality',
+    formulaType: 'avg_field',
+    formulaConfig: {
+      field: 'client_change_round',
+      nullHandling: 'exclude',           // Tareas sin rondas no cuentan
+      filter: "estado NOT IN ('Backlog', 'Por hacer')"  // Solo tareas que entraron a producción
+    },
+    granularities: ['task', 'project', 'service', 'package', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: '*',
+    format: 'number',
+    decimals: 1,
+    thresholds: {
+      green: 2.0,
+      yellow: 3.0,
+      red: 3.0,
+      direction: 'lower_is_better'
+    },
+    benchmarks: {
+      industry: 3.5,
+      ico_target: 2.0,
+      source: 'ICO Framework v1 + Adobe/Forrester CSC benchmark'
+    },
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['client_change_round', 'estado']
+  },
+
+  {
+    id: 'ftr_pct',
+    name: 'First Time Right',
+    description: 'Porcentaje de assets aprobados sin solicitar cambios. FTR alto = brief claro + alineación de marca.',
+    category: 'quality',
+    formulaType: 'ratio',
+    formulaConfig: {
+      numerator: "COUNT(CASE WHEN IFNULL(client_change_round, 0) = 0 THEN 1 END)",
+      denominator: "COUNT(*)",
+      filter: "fase_csc = 'Completado'",  // Solo assets terminados
+      multiplyBy: 100
+    },
+    granularities: ['project', 'service', 'package', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: '*',
+    format: 'percentage',
+    decimals: 0,
+    suffix: '%',
+    thresholds: {
+      green: 70,
+      yellow: 50,
+      red: 50,
+      direction: 'higher_is_better'
+    },
+    benchmarks: {
+      industry: null,
+      ico_target: 70,
+      source: 'Objetivo interno Efeonce'
+    },
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['client_change_round', 'fase_csc']
+  },
+
+  // ═══════════════════════════════════════
+  // VELOCIDAD
+  // ═══════════════════════════════════════
+
+  {
+    id: 'cycle_time',
+    name: 'Cycle Time',
+    description: 'Tiempo promedio en días desde la creación hasta la completación de un asset.',
+    category: 'speed',
+    formulaType: 'days_diff',
+    formulaConfig: {
+      startField: 'created_time',
+      endField: 'last_edited_time',       // Proxy: última edición como completación
+      filter: "fase_csc = 'Completado'",
+      aggregation: 'avg'
+    },
+    granularities: ['task', 'project', 'service', 'package', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: '*',
+    format: 'days',
+    decimals: 1,
+    suffix: 'días',
+    thresholds: {
+      green: 10,
+      yellow: 14,
+      red: 14,
+      direction: 'lower_is_better'
+    },
+    benchmarks: {
+      industry: 14.2,
+      ico_target: 10.0,
+      source: 'ICO Framework v1 — promedio agencia LATAM'
+    },
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['created_time', 'last_edited_time', 'fase_csc']
+  },
+
+  {
+    id: 'cycle_time_variance',
+    name: 'Cycle Time Variance',
+    description: 'Coeficiente de variación del cycle time. Mide la predictibilidad de la entrega.',
+    category: 'speed',
+    formulaType: 'variance',
+    formulaConfig: {
+      field: 'cycle_time_days',           // Campo derivado calculado en la view base
+      type: 'coefficient_of_variation',   // stddev / avg * 100
+      filter: "fase_csc = 'Completado'"
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: '*',
+    format: 'percentage',
+    decimals: 0,
+    suffix: '%',
+    thresholds: {
+      green: 25,
+      yellow: 40,
+      red: 40,
+      direction: 'lower_is_better'
+    },
+    benchmarks: {
+      industry: null,
+      ico_target: 25,
+      source: 'Objetivo interno — operación predecible'
+    },
+    active: true,
+    comingSoon: false,
+    dependsOn: ['cycle_time'],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['created_time', 'last_edited_time', 'fase_csc']
+  },
+
+  {
+    id: 'otd_pct',
+    name: 'OTD%',
+    description: 'Porcentaje de assets entregados dentro del cycle time benchmark de industria.',
+    category: 'speed',
+    formulaType: 'ratio',
+    formulaConfig: {
+      numerator: "COUNT(CASE WHEN cycle_time_days <= 14.2 THEN 1 END)",
+      denominator: "COUNT(*)",
+      filter: "fase_csc = 'Completado'",
+      multiplyBy: 100
+    },
+    granularities: ['project', 'service', 'package', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: '*',
+    format: 'percentage',
+    decimals: 0,
+    suffix: '%',
+    thresholds: {
+      green: 89,
+      yellow: 75,
+      red: 75,
+      direction: 'higher_is_better'
+    },
+    benchmarks: {
+      industry: 70,
+      ico_target: 89,
+      source: 'ICO Framework v1 — HR Payroll Module v2 fija umbral en ≥89%'
+    },
+    active: true,
+    comingSoon: false,
+    dependsOn: ['cycle_time'],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['created_time', 'last_edited_time', 'fase_csc']
+  },
+
+  // ═══════════════════════════════════════
+  // EFICIENCIA
+  // ═══════════════════════════════════════
+
+  {
+    id: 'throughput',
+    name: 'Throughput',
+    description: 'Assets completados por semana. Mide la capacidad de producción efectiva.',
+    category: 'efficiency',
+    formulaType: 'custom_sql',
+    formulaConfig: {
+      sql: `
+        COUNT(CASE WHEN fase_csc = 'Completado'
+          AND last_edited_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 28 DAY)
+        THEN 1 END) / 4.0
+      `,
+      description: 'Assets completados en últimas 4 semanas / 4'
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['monthly', 'all_time'],
+    applicableServices: '*',
+    format: 'ratio',
+    decimals: 1,
+    suffix: 'assets/sem',
+    thresholds: null,
+    benchmarks: null,
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['fase_csc', 'last_edited_time']
+  },
+
+  // ═══════════════════════════════════════
+  // PIPELINE
+  // ═══════════════════════════════════════
+
+  {
+    id: 'csc_distribution',
+    name: 'CSC Pipeline Distribution',
+    description: 'Distribución de assets activos por fase de la Creative Supply Chain.',
+    category: 'pipeline',
+    formulaType: 'distribution',
+    formulaConfig: {
+      groupByField: 'fase_csc',
+      expectedValues: ['Planning', 'Briefing', 'Producción', 'Aprobación', 'Asset Mgmt', 'Activación', 'Completado']
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['daily', 'all_time'],
+    applicableServices: '*',
+    format: 'distribution',
+    decimals: 0,
+    thresholds: null,
+    benchmarks: null,
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['fase_csc']
+  },
+
+  {
+    id: 'stuck_assets',
+    name: 'Stuck Assets',
+    description: 'Assets que llevan más de 48 horas en la misma fase sin cambio de estado.',
+    category: 'pipeline',
+    formulaType: 'threshold_count',
+    formulaConfig: {
+      field: 'hours_since_update',
+      threshold: 48,
+      filter: "fase_csc NOT IN ('Completado', 'Planning')",
+      severity: {
+        warning: 48,
+        danger: 96
+      }
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['daily'],
+    applicableServices: '*',
+    format: 'count',
+    decimals: 0,
+    thresholds: {
+      green: 0,
+      yellow: 1,
+      red: 3,
+      direction: 'lower_is_better'
+    },
+    benchmarks: null,
+    active: true,
+    comingSoon: false,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['last_edited_time', 'fase_csc']
+  },
+
+  {
+    id: 'pipeline_velocity',
+    name: 'Pipeline Velocity',
+    description: 'Tasa de assets que completan el pipeline por semana.',
+    category: 'pipeline',
+    formulaType: 'custom_sql',
+    formulaConfig: {
+      sql: `
+        COUNT(CASE WHEN fase_csc = 'Completado'
+          AND last_edited_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 28 DAY)
+        THEN 1 END) / 4.0
+      `,
+      description: 'Idéntico a throughput — mismo cálculo, contexto diferente (pipeline vs eficiencia)'
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['monthly'],
+    applicableServices: '*',
+    format: 'ratio',
+    decimals: 1,
+    suffix: 'assets/sem',
+    thresholds: null,
+    benchmarks: null,
+    active: true,
+    comingSoon: false,
+    dependsOn: ['throughput'],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['fase_csc', 'last_edited_time']
+  },
+
+  // ═══════════════════════════════════════
+  // INTELLIGENCE (coming soon)
+  // ═══════════════════════════════════════
+
+  {
+    id: 'brief_clarity_score',
+    name: 'Brief Clarity Score',
+    description: 'Score de completitud del brief generado por IA. Quality gate: sin brief completo, no entra a producción.',
+    category: 'intelligence',
+    formulaType: 'avg_field',
+    formulaConfig: {
+      field: 'brief_clarity_score',
+      nullHandling: 'exclude'
+    },
+    granularities: ['task', 'project', 'service', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: ['agencia_creativa', 'produccion_audiovisual', 'social_media_content'],
+    format: 'percentage',
+    decimals: 0,
+    suffix: '%',
+    thresholds: {
+      green: 80,
+      yellow: 60,
+      red: 60,
+      direction: 'higher_is_better'
+    },
+    benchmarks: null,
+    active: false,
+    comingSoon: true,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['brief_clarity_score']
+  },
+
+  {
+    id: 'brand_consistency_score',
+    name: 'Brand Consistency Score',
+    description: 'Porcentaje de assets validados como alineados a marca por el AI Agent de gobernanza.',
+    category: 'intelligence',
+    formulaType: 'ratio',
+    formulaConfig: {
+      numerator: "COUNT(CASE WHEN brand_validation_passed = true THEN 1 END)",
+      denominator: "COUNT(CASE WHEN brand_validation_passed IS NOT NULL THEN 1 END)",
+      multiplyBy: 100
+    },
+    granularities: ['project', 'service', 'space'],
+    aggregationPeriods: ['monthly', 'quarterly', 'all_time'],
+    applicableServices: ['agencia_creativa', 'produccion_audiovisual'],
+    format: 'percentage',
+    decimals: 0,
+    suffix: '%',
+    thresholds: {
+      green: 85,
+      yellow: 70,
+      red: 70,
+      direction: 'higher_is_better'
+    },
+    benchmarks: null,
+    active: false,
+    comingSoon: true,
+    dependsOn: [],
+    primaryTable: 'notion_ops.tareas',
+    requiredColumns: ['brand_validation_passed']
+  }
+]
+```
+
+### 3.4 Extensibilidad
+
+Para agregar una métrica nueva:
+
+1. Agregar un objeto `ICOMetricDefinition` al array `ICO_METRIC_REGISTRY`
+2. Si usa `formulaType: 'custom_sql'`, escribir el SQL en `formulaConfig.sql`
+3. Si necesita una columna nueva en BigQuery, documentarla en `requiredColumns` y asegurar que el pipeline de sync la incluya
+4. Correr el generador de views (§5) para que la métrica aparezca en las tablas materializadas
+5. La UI la levanta automáticamente si está en el registry de un módulo que la referencia
+
+Para métricas custom por cliente (futuro):
+
+- Agregar campo `spaceId: string | null` a `ICOMetricDefinition`
+- `null` = métrica global (aplica a todos)
+- Un UUID = métrica exclusiva de ese Space
+- El scheduled query filtra por `spaceId` al materializar
+- El CRUD de métricas custom vive en Efeonce Ops y escribe a PostgreSQL; un ETL sincroniza las definiciones a BigQuery para el scheduled query
+
+---
+
+## 4. Capa conformed: views base en BigQuery
+
+### 4.1 Dataset
+
+```
+BigQuery dataset: ico_engine
+Proyecto: efeonce-group
+Región: us-central1
+```
+
+### 4.2 View base: `ico_engine.v_tareas_enriched`
+
+View que toma las tareas crudas de `notion_ops.tareas` y agrega campos derivados que el engine necesita. Esta es la única view que toca la data cruda — todo lo demás parte de aquí.
+
+```sql
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_tareas_enriched` AS
+SELECT
+  t.notion_page_id,
+  t.titulo,
+  t.estado,
+  t.proyecto,
+  t.sprint,
+  t.url_frame_io,
+  
+  -- Frame.io / Review data
+  t.frame_versions,
+  t.frame_comments,
+  t.open_frame_comments,
+  IFNULL(t.client_change_round, 0) AS client_change_round,
+  IFNULL(t.workflow_change_round, 0) AS workflow_change_round,
+  t.client_review_open,
+  t.workflow_review_open,
+  t.review_source,
+  t.rpa AS rpa_notion,                -- RpA calculado por fórmula de Notion
+  t.semaforo_rpa,
+  t.last_reviewed_version,
+  
+  -- Timestamps
+  t.created_time,
+  t.last_edited_time,
+  
+  -- ═══ Campos derivados ═══
+  
+  -- Fase CSC (calculada server-side)
+  CASE
+    WHEN t.estado IN ('Backlog', 'Por hacer')
+      THEN 'Planning'
+    WHEN t.estado IN ('Brief en revisión')
+      OR (t.estado = 'En curso' AND IFNULL(t.frame_versions, 0) = 0 
+          AND IFNULL(t.client_review_open, false) = false)
+      THEN 'Briefing'
+    WHEN t.estado = 'En curso' AND IFNULL(t.frame_versions, 0) > 0 
+         AND IFNULL(t.client_review_open, false) = false
+      THEN 'Producción'
+    WHEN t.estado IN ('Listo para revisión', 'Cambios Solicitados') 
+         OR IFNULL(t.client_review_open, false) = true
+      THEN 'Aprobación'
+    WHEN t.estado IN ('Aprobado', 'En entrega')
+      THEN 'Asset Mgmt'
+    WHEN t.estado IN ('Publicado', 'Activado', 'En distribución')
+      THEN 'Activación'
+    WHEN t.estado IN ('Listo', 'Completado')
+      THEN 'Completado'
+    ELSE 'Producción'  -- Fallback conservador
+  END AS fase_csc,
+  
+  -- Cycle time en días (created → last_edited como proxy de completación)
+  TIMESTAMP_DIFF(t.last_edited_time, t.created_time, HOUR) / 24.0 AS cycle_time_days,
+  
+  -- Horas desde última actualización (para stuck detection)
+  TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), t.last_edited_time, HOUR) AS hours_since_update,
+  
+  -- First Time Right (booleano)
+  CASE WHEN IFNULL(t.client_change_round, 0) = 0 
+       AND t.estado IN ('Listo', 'Completado', 'Aprobado', 'Publicado', 'Activado')
+    THEN true ELSE false 
+  END AS first_time_right,
+  
+  -- RpA unificado: usa client_change_round como fuente primaria
+  -- (Frame Versions puede sobre-contar si hay versiones técnicas)
+  IFNULL(t.client_change_round, 0) + IFNULL(t.workflow_change_round, 0) AS rpa_calculated,
+  
+  -- Período de completación (para agregaciones temporales)
+  CASE WHEN t.estado IN ('Listo', 'Completado')
+    THEN FORMAT_TIMESTAMP('%Y-%m', t.last_edited_time)
+    ELSE NULL
+  END AS completion_month,
+  
+  -- Metadata de sync
+  t._synced_at
+
+FROM `efeonce-group.notion_ops.tareas` t
+```
+
+**IMPORTANTE:** El mapeo `estado → fase_csc` es una propuesta basada en los estados documentados. Antes de implementar, verificar los valores reales:
+
+```sql
+SELECT estado, COUNT(*) as count
+FROM `efeonce-group.notion_ops.tareas`
+GROUP BY estado
+ORDER BY count DESC;
+```
+
+### 4.3 View de scope: `ico_engine.v_tareas_by_project`
+
+Agrega la relación tarea → proyecto con metadata del proyecto.
+
+```sql
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_tareas_by_project` AS
+SELECT
+  te.*,
+  p.notion_page_id AS project_id,
+  p.titulo AS project_name
+FROM `efeonce-group.ico_engine.v_tareas_enriched` te
+LEFT JOIN `efeonce-group.notion_ops.proyectos` p
+  ON te.proyecto LIKE CONCAT('%', p.notion_page_id, '%')
+```
+
+### 4.4 View de scope con Service (disponible cuando Services esté operativo)
+
+```sql
+-- FUTURO: activar cuando greenhouse_olap.services tenga data
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_tareas_by_service` AS
+SELECT
+  tp.*,
+  s.id AS service_id,
+  s.name AS service_name,
+  s.servicio_especifico,
+  s.linea_de_servicio,
+  s.space_id,
+  s.pipeline_stage AS service_stage,
+  s.modalidad
+FROM `efeonce-group.ico_engine.v_tareas_by_project` tp
+JOIN `efeonce-group.greenhouse_olap.services` s
+  ON tp.project_id = s.notion_project_id
+WHERE s.pipeline_stage IN ('onboarding', 'active', 'renewal_pending', 'paused')
+```
+
+---
+
+## 5. Tablas materializadas
+
+### 5.1 Estrategia de materialización
+
+Un scheduled query de BigQuery corre diario a las **03:15 AM** (15 minutos después del sync de Notion). Materializa las métricas a tres niveles de granularidad. Cada tabla se sobrescribe completamente (WRITE_TRUNCATE) — simple, idempotente, sin CDC.
+
+### 5.2 Tabla: `ico_engine.metrics_by_project`
+
+Métricas ICO agregadas por proyecto y período.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.metrics_by_project` (
+  -- Dimensiones
+  project_id STRING NOT NULL,
+  project_name STRING,
+  period STRING NOT NULL,               -- 'all_time' | '2026-03' | '2026-Q1'
+  period_type STRING NOT NULL,          -- 'all_time' | 'monthly' | 'quarterly'
+  
+  -- Métricas de calidad
+  rpa_avg FLOAT64,                      -- Promedio RpA
+  rpa_median FLOAT64,                   -- Mediana RpA
+  ftr_pct FLOAT64,                      -- First Time Right %
+  total_tasks INT64,                    -- Total de tareas en el período
+  completed_tasks INT64,                -- Tareas completadas
+  
+  -- Métricas de velocidad
+  cycle_time_avg FLOAT64,              -- Cycle Time promedio (días)
+  cycle_time_p50 FLOAT64,             -- Cycle Time mediana
+  cycle_time_p90 FLOAT64,             -- Cycle Time P90
+  cycle_time_variance FLOAT64,         -- Coeficiente de variación (%)
+  otd_pct FLOAT64,                     -- On-Time Delivery %
+  
+  -- Métricas de eficiencia
+  throughput_weekly FLOAT64,           -- Assets completados por semana
+  
+  -- Métricas de pipeline (solo para period_type = 'all_time' o 'daily')
+  pipeline_planning INT64,
+  pipeline_briefing INT64,
+  pipeline_production INT64,
+  pipeline_approval INT64,
+  pipeline_asset_mgmt INT64,
+  pipeline_activation INT64,
+  pipeline_completed INT64,
+  stuck_count_48h INT64,               -- Assets stuck >48h
+  stuck_count_96h INT64,               -- Assets stuck >96h
+  
+  -- Metadata
+  _materialized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
+
+### 5.3 Tabla: `ico_engine.metrics_by_service`
+
+Métricas ICO agregadas por servicio y período. **Disponible cuando Services Architecture esté operativo.** Mientras tanto, la tabla existe vacía.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.metrics_by_service` (
+  -- Dimensiones
+  service_id STRING NOT NULL,
+  service_name STRING,
+  servicio_especifico STRING,
+  linea_de_servicio STRING,
+  space_id STRING NOT NULL,
+  period STRING NOT NULL,
+  period_type STRING NOT NULL,
+  
+  -- Métricas (misma estructura que metrics_by_project)
+  rpa_avg FLOAT64,
+  rpa_median FLOAT64,
+  ftr_pct FLOAT64,
+  total_tasks INT64,
+  completed_tasks INT64,
+  cycle_time_avg FLOAT64,
+  cycle_time_p50 FLOAT64,
+  cycle_time_p90 FLOAT64,
+  cycle_time_variance FLOAT64,
+  otd_pct FLOAT64,
+  throughput_weekly FLOAT64,
+  pipeline_planning INT64,
+  pipeline_briefing INT64,
+  pipeline_production INT64,
+  pipeline_approval INT64,
+  pipeline_asset_mgmt INT64,
+  pipeline_activation INT64,
+  pipeline_completed INT64,
+  stuck_count_48h INT64,
+  stuck_count_96h INT64,
+  
+  -- Metadata
+  _materialized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
+
+### 5.4 Tabla: `ico_engine.metrics_by_space`
+
+Métricas ICO agregadas por Space (tenant). Es la agregación que ve el dashboard principal del cliente.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.metrics_by_space` (
+  -- Dimensiones
+  space_id STRING NOT NULL,             -- UUID del Space en PostgreSQL (o legacy client_id)
+  period STRING NOT NULL,
+  period_type STRING NOT NULL,
+  
+  -- Métricas (misma estructura)
+  rpa_avg FLOAT64,
+  rpa_median FLOAT64,
+  ftr_pct FLOAT64,
+  total_tasks INT64,
+  completed_tasks INT64,
+  cycle_time_avg FLOAT64,
+  cycle_time_p50 FLOAT64,
+  cycle_time_p90 FLOAT64,
+  cycle_time_variance FLOAT64,
+  otd_pct FLOAT64,
+  throughput_weekly FLOAT64,
+  pipeline_planning INT64,
+  pipeline_briefing INT64,
+  pipeline_production INT64,
+  pipeline_approval INT64,
+  pipeline_asset_mgmt INT64,
+  pipeline_activation INT64,
+  pipeline_completed INT64,
+  stuck_count_48h INT64,
+  stuck_count_96h INT64,
+  
+  -- Metadata
+  _materialized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
+
+### 5.5 Tabla: `ico_engine.stuck_assets_detail`
+
+Detalle de assets detenidos, actualizado diariamente. Los módulos de UI consumen esta tabla para mostrar la lista de stuck assets sin recalcular.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.stuck_assets_detail` (
+  notion_page_id STRING NOT NULL,
+  titulo STRING,
+  project_id STRING,
+  project_name STRING,
+  fase_csc STRING,
+  hours_since_update FLOAT64,
+  days_since_update FLOAT64,
+  severity STRING,                     -- 'warning' (>48h) | 'danger' (>96h)
+  rpa_calculated INT64,
+  url_frame_io STRING,
+  client_review_open BOOL,
+  _materialized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
+
+### 5.6 Tabla: `ico_engine.rpa_trend`
+
+Serie temporal de RpA por proyecto y mes, pre-calculada para charts de tendencia.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.rpa_trend` (
+  project_id STRING,
+  project_name STRING,
+  month STRING NOT NULL,               -- 'YYYY-MM'
+  rpa_avg FLOAT64,
+  rpa_median FLOAT64,
+  tasks_completed INT64,
+  _materialized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
+
+---
+
+## 6. Scheduled queries
+
+### 6.1 Orquestación
+
+```
+Cloud Scheduler
+  │
+  ├── 03:00 AM — notion-bq-sync (data cruda)
+  ├── 03:15 AM — ico-engine-materialize (scheduled query de BigQuery)
+  └── 03:30 AM — hubspot-bq-sync (CRM data)
+```
+
+El scheduled query `ico-engine-materialize` es un BigQuery scheduled query nativo (no Cloud Function). Se configura vía `bq mk --transfer_config` o desde la consola de BigQuery.
+
+### 6.2 Query de materialización: metrics_by_project
+
+```sql
+-- Scheduled query: ico_engine.metrics_by_project
+-- Schedule: diario 03:15 AM (America/Santiago)
+-- Write disposition: WRITE_TRUNCATE
+
+-- Materializar métricas por proyecto, all_time
+INSERT INTO `efeonce-group.ico_engine.metrics_by_project`
+SELECT
+  project_id,
+  project_name,
+  'all_time' AS period,
+  'all_time' AS period_type,
+  
+  -- Calidad
+  AVG(CASE WHEN rpa_calculated > 0 THEN rpa_calculated END) AS rpa_avg,
+  APPROX_QUANTILES(CASE WHEN rpa_calculated > 0 THEN rpa_calculated END, 2)[SAFE_OFFSET(1)] AS rpa_median,
+  SAFE_DIVIDE(
+    COUNTIF(first_time_right = true AND fase_csc = 'Completado'),
+    COUNTIF(fase_csc = 'Completado')
+  ) * 100 AS ftr_pct,
+  COUNT(*) AS total_tasks,
+  COUNTIF(fase_csc = 'Completado') AS completed_tasks,
+  
+  -- Velocidad
+  AVG(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END) AS cycle_time_avg,
+  APPROX_QUANTILES(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END, 2)[SAFE_OFFSET(1)] AS cycle_time_p50,
+  APPROX_QUANTILES(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END, 10)[SAFE_OFFSET(9)] AS cycle_time_p90,
+  SAFE_DIVIDE(
+    STDDEV(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END),
+    AVG(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END)
+  ) * 100 AS cycle_time_variance,
+  SAFE_DIVIDE(
+    COUNTIF(fase_csc = 'Completado' AND cycle_time_days <= 14.2),
+    COUNTIF(fase_csc = 'Completado')
+  ) * 100 AS otd_pct,
+  
+  -- Eficiencia
+  SAFE_DIVIDE(
+    COUNTIF(fase_csc = 'Completado' 
+      AND last_edited_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 28 DAY)),
+    4.0
+  ) AS throughput_weekly,
+  
+  -- Pipeline
+  COUNTIF(fase_csc = 'Planning') AS pipeline_planning,
+  COUNTIF(fase_csc = 'Briefing') AS pipeline_briefing,
+  COUNTIF(fase_csc = 'Producción') AS pipeline_production,
+  COUNTIF(fase_csc = 'Aprobación') AS pipeline_approval,
+  COUNTIF(fase_csc = 'Asset Mgmt') AS pipeline_asset_mgmt,
+  COUNTIF(fase_csc = 'Activación') AS pipeline_activation,
+  COUNTIF(fase_csc = 'Completado') AS pipeline_completed,
+  COUNTIF(hours_since_update > 48 AND fase_csc NOT IN ('Completado', 'Planning')) AS stuck_count_48h,
+  COUNTIF(hours_since_update > 96 AND fase_csc NOT IN ('Completado', 'Planning')) AS stuck_count_96h,
+  
+  CURRENT_TIMESTAMP() AS _materialized_at
+
+FROM `efeonce-group.ico_engine.v_tareas_by_project`
+WHERE project_id IS NOT NULL
+GROUP BY project_id, project_name
+
+UNION ALL
+
+-- Materializar métricas por proyecto, por mes (últimos 12 meses)
+SELECT
+  project_id,
+  project_name,
+  FORMAT_TIMESTAMP('%Y-%m', last_edited_time) AS period,
+  'monthly' AS period_type,
+  
+  AVG(CASE WHEN rpa_calculated > 0 THEN rpa_calculated END) AS rpa_avg,
+  APPROX_QUANTILES(CASE WHEN rpa_calculated > 0 THEN rpa_calculated END, 2)[SAFE_OFFSET(1)] AS rpa_median,
+  SAFE_DIVIDE(
+    COUNTIF(first_time_right = true AND fase_csc = 'Completado'),
+    COUNTIF(fase_csc = 'Completado')
+  ) * 100 AS ftr_pct,
+  COUNT(*) AS total_tasks,
+  COUNTIF(fase_csc = 'Completado') AS completed_tasks,
+  AVG(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END) AS cycle_time_avg,
+  APPROX_QUANTILES(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END, 2)[SAFE_OFFSET(1)] AS cycle_time_p50,
+  APPROX_QUANTILES(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END, 10)[SAFE_OFFSET(9)] AS cycle_time_p90,
+  SAFE_DIVIDE(
+    STDDEV(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END),
+    AVG(CASE WHEN fase_csc = 'Completado' THEN cycle_time_days END)
+  ) * 100 AS cycle_time_variance,
+  SAFE_DIVIDE(
+    COUNTIF(fase_csc = 'Completado' AND cycle_time_days <= 14.2),
+    COUNTIF(fase_csc = 'Completado')
+  ) * 100 AS otd_pct,
+  NULL AS throughput_weekly,          -- No aplica a período mensual
+  NULL AS pipeline_planning,          -- Pipeline es snapshot, no histórico
+  NULL AS pipeline_briefing,
+  NULL AS pipeline_production,
+  NULL AS pipeline_approval,
+  NULL AS pipeline_asset_mgmt,
+  NULL AS pipeline_activation,
+  NULL AS pipeline_completed,
+  NULL AS stuck_count_48h,
+  NULL AS stuck_count_96h,
+  
+  CURRENT_TIMESTAMP() AS _materialized_at
+
+FROM `efeonce-group.ico_engine.v_tareas_by_project`
+WHERE project_id IS NOT NULL
+  AND last_edited_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 365 DAY)
+GROUP BY project_id, project_name, FORMAT_TIMESTAMP('%Y-%m', last_edited_time)
+```
+
+### 6.3 Query de materialización: stuck_assets_detail
+
+```sql
+-- Scheduled query: ico_engine.stuck_assets_detail
+-- Schedule: diario 03:15 AM
+-- Write disposition: WRITE_TRUNCATE
+
+SELECT
+  notion_page_id,
+  titulo,
+  project_id,
+  project_name,
+  fase_csc,
+  hours_since_update,
+  ROUND(hours_since_update / 24.0, 1) AS days_since_update,
+  CASE 
+    WHEN hours_since_update > 96 THEN 'danger'
+    WHEN hours_since_update > 48 THEN 'warning'
+  END AS severity,
+  rpa_calculated,
+  url_frame_io,
+  client_review_open,
+  CURRENT_TIMESTAMP() AS _materialized_at
+
+FROM `efeonce-group.ico_engine.v_tareas_by_project`
+WHERE hours_since_update > 48
+  AND fase_csc NOT IN ('Completado', 'Planning')
+ORDER BY hours_since_update DESC
+```
+
+### 6.4 Query de materialización: rpa_trend
+
+```sql
+-- Scheduled query: ico_engine.rpa_trend
+-- Schedule: diario 03:15 AM
+-- Write disposition: WRITE_TRUNCATE
+
+SELECT
+  project_id,
+  project_name,
+  completion_month AS month,
+  AVG(rpa_calculated) AS rpa_avg,
+  APPROX_QUANTILES(rpa_calculated, 2)[SAFE_OFFSET(1)] AS rpa_median,
+  COUNT(*) AS tasks_completed,
+  CURRENT_TIMESTAMP() AS _materialized_at
+
+FROM `efeonce-group.ico_engine.v_tareas_by_project`
+WHERE fase_csc = 'Completado'
+  AND completion_month IS NOT NULL
+  AND last_edited_time >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 365 DAY)
+GROUP BY project_id, project_name, completion_month
+ORDER BY project_id, month
+```
+
+---
+
+## 7. Views de consumo
+
+Cada consumidor del ICO Engine tiene su view dedicada que proyecta exactamente los datos que necesita, con el scope correcto.
+
+### 7.1 View para módulos client-facing (capabilities)
+
+```sql
+-- Los módulos de UI llaman a esta view filtrada por project_ids del Space
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_client_metrics` AS
+SELECT
+  project_id,
+  project_name,
+  period,
+  period_type,
+  rpa_avg,
+  ftr_pct,
+  cycle_time_avg,
+  cycle_time_p50,
+  cycle_time_variance,
+  otd_pct,
+  throughput_weekly,
+  total_tasks,
+  completed_tasks,
+  pipeline_planning,
+  pipeline_briefing,
+  pipeline_production,
+  pipeline_approval,
+  pipeline_asset_mgmt,
+  pipeline_activation,
+  pipeline_completed,
+  stuck_count_48h,
+  stuck_count_96h,
+  _materialized_at
+FROM `efeonce-group.ico_engine.metrics_by_project`
+-- El filtro por Space se aplica en el query builder del módulo:
+-- WHERE project_id IN (SELECT project_id FROM space_projects WHERE space_id = @space_id)
+```
+
+### 7.2 View para Efeonce Ops (internal)
+
+```sql
+-- Efeonce Ops ve todas las métricas de todos los proyectos, sin filtro de Space
+-- Incluye benchmarks cross-client para comparación
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_ops_metrics` AS
+SELECT
+  m.*,
+  -- Benchmarks cross-project (percentiles globales)
+  p50.rpa_avg AS global_rpa_p50,
+  p50.cycle_time_avg AS global_cycle_time_p50,
+  p50.otd_pct AS global_otd_p50
+FROM `efeonce-group.ico_engine.metrics_by_project` m
+CROSS JOIN (
+  SELECT
+    APPROX_QUANTILES(rpa_avg, 2)[SAFE_OFFSET(1)] AS rpa_avg,
+    APPROX_QUANTILES(cycle_time_avg, 2)[SAFE_OFFSET(1)] AS cycle_time_avg,
+    APPROX_QUANTILES(otd_pct, 2)[SAFE_OFFSET(1)] AS otd_pct
+  FROM `efeonce-group.ico_engine.metrics_by_project`
+  WHERE period_type = 'all_time'
+) p50
+```
+
+### 7.3 View para Data Node (export)
+
+```sql
+-- El Data Node exporta un subset limpio, sin datos internos
+CREATE OR REPLACE VIEW `efeonce-group.ico_engine.v_export_metrics` AS
+SELECT
+  project_name,
+  period,
+  period_type,
+  rpa_avg AS rounds_per_asset,
+  ftr_pct AS first_time_right_pct,
+  cycle_time_avg AS avg_cycle_time_days,
+  otd_pct AS on_time_delivery_pct,
+  throughput_weekly AS weekly_throughput,
+  total_tasks,
+  completed_tasks,
+  _materialized_at AS data_as_of
+FROM `efeonce-group.ico_engine.metrics_by_project`
+```
+
+---
+
+## 8. API de consumo desde Greenhouse
+
+### 8.1 Patrón de lectura
+
+Los módulos de Greenhouse leen del ICO Engine vía BigQuery client en las API Routes. El patrón reemplaza al query builder monolítico del Creative Hub actual.
+
+```typescript
+// /src/lib/ico-engine/read-metrics.ts
+
+import { BigQuery } from '@google-cloud/bigquery'
+
+const bq = new BigQuery()
+
+export interface ICOMetricsQuery {
+  projectIds: string[]          // IDs de proyectos Notion del Space
+  period?: string               // 'all_time' | 'YYYY-MM' | 'YYYY-QN'
+  periodType?: string           // 'all_time' | 'monthly' | 'quarterly'
+}
+
+export async function getMetricsByProject(query: ICOMetricsQuery) {
+  const [rows] = await bq.query({
+    query: `
+      SELECT * FROM \`efeonce-group.ico_engine.v_client_metrics\`
+      WHERE project_id IN UNNEST(@projectIds)
+        AND period_type = @periodType
+      ORDER BY project_name, period
+    `,
+    params: {
+      projectIds: query.projectIds,
+      periodType: query.periodType || 'all_time'
+    }
+  })
+  return rows
+}
+
+export async function getMetricsBySpace(spaceProjectIds: string[]) {
+  // Agrega todas las métricas de los proyectos del Space
+  const [rows] = await bq.query({
+    query: `
+      SELECT
+        'space' AS scope,
+        period,
+        period_type,
+        AVG(rpa_avg) AS rpa_avg,
+        AVG(ftr_pct) AS ftr_pct,
+        AVG(cycle_time_avg) AS cycle_time_avg,
+        AVG(otd_pct) AS otd_pct,
+        SUM(throughput_weekly) AS throughput_weekly,
+        SUM(total_tasks) AS total_tasks,
+        SUM(completed_tasks) AS completed_tasks,
+        SUM(pipeline_planning) AS pipeline_planning,
+        SUM(pipeline_briefing) AS pipeline_briefing,
+        SUM(pipeline_production) AS pipeline_production,
+        SUM(pipeline_approval) AS pipeline_approval,
+        SUM(pipeline_asset_mgmt) AS pipeline_asset_mgmt,
+        SUM(pipeline_activation) AS pipeline_activation,
+        SUM(pipeline_completed) AS pipeline_completed,
+        SUM(stuck_count_48h) AS stuck_count_48h,
+        SUM(stuck_count_96h) AS stuck_count_96h,
+        MAX(_materialized_at) AS _materialized_at
+      FROM \`efeonce-group.ico_engine.v_client_metrics\`
+      WHERE project_id IN UNNEST(@projectIds)
+      GROUP BY period, period_type
+    `,
+    params: { projectIds: spaceProjectIds }
+  })
+  return rows
+}
+
+export async function getStuckAssets(projectIds: string[]) {
+  const [rows] = await bq.query({
+    query: `
+      SELECT * FROM \`efeonce-group.ico_engine.stuck_assets_detail\`
+      WHERE project_id IN UNNEST(@projectIds)
+      ORDER BY hours_since_update DESC
+    `,
+    params: { projectIds }
+  })
+  return rows
+}
+
+export async function getRpaTrend(projectIds: string[]) {
+  const [rows] = await bq.query({
+    query: `
+      SELECT
+        month,
+        AVG(rpa_avg) AS rpa_avg,
+        SUM(tasks_completed) AS tasks_completed
+      FROM \`efeonce-group.ico_engine.rpa_trend\`
+      WHERE project_id IN UNNEST(@projectIds)
+      GROUP BY month
+      ORDER BY month
+    `,
+    params: { projectIds }
+  })
+  return rows
+}
+```
+
+### 8.2 Cómo un módulo de capability consume
+
+El query builder de un módulo (ej: Creative Production) ya no calcula métricas — solo lee del engine y estructura la respuesta para el frontend:
+
+```typescript
+// /src/lib/capability-queries/creative-production.ts
+
+import { getMetricsBySpace, getStuckAssets, getRpaTrend } from '@/lib/ico-engine/read-metrics'
+
+export async function creativeProductionQuery(
+  spaceProjectIds: string[],
+  activeServices: ActiveService[]     // Disponible cuando Services esté operativo
+) {
+  // Leer métricas pre-calculadas del ICO Engine
+  const [spaceMetrics, stuckAssets, rpaTrend] = await Promise.all([
+    getMetricsBySpace(spaceProjectIds),
+    getStuckAssets(spaceProjectIds),
+    getRpaTrend(spaceProjectIds)
+  ])
+
+  const allTime = spaceMetrics.find(m => m.period_type === 'all_time')
+
+  // Estructurar para el frontend — sin calcular nada
+  return {
+    // Capa 1: Revenue Enabled (lógica de presentación, usa métricas del engine)
+    earlyLaunch: allTime?.cycle_time_avg
+      ? Math.max(0, Math.round((14.2 - allTime.cycle_time_avg) * 10) / 10)
+      : null,
+    iterationVelocity: allTime?.cycle_time_avg && allTime.cycle_time_avg > 0
+      ? Math.round((14.2 / allTime.cycle_time_avg) * 10) / 10
+      : null,
+    throughput: allTime?.rpa_avg && allTime.rpa_avg > 0
+      ? Math.round(((3.5 / allTime.rpa_avg) - 1) * 100)
+      : null,
+
+    // Capa 2: Brand Intelligence (métricas directas del engine)
+    firstTimeRight: allTime?.ftr_pct,
+    rpaTrend,
+    brandConsistency: null,    // Coming soon
+    knowledgeBase: null,       // Coming soon
+
+    // Capa 3: CSC Pipeline (métricas directas del engine)
+    cscPipeline: allTime ? {
+      Planning: allTime.pipeline_planning,
+      Briefing: allTime.pipeline_briefing,
+      Producción: allTime.pipeline_production,
+      Aprobación: allTime.pipeline_approval,
+      'Asset Mgmt': allTime.pipeline_asset_mgmt,
+      Activación: allTime.pipeline_activation,
+      Completado: allTime.pipeline_completed,
+    } : null,
+    pipelineMetrics: {
+      cycleTime: allTime?.cycle_time_avg,
+      otd: allTime?.otd_pct,
+      velocity: allTime?.throughput_weekly,
+      stuckCount: allTime?.stuck_count_48h,
+    },
+    stuckAssets,
+
+    // Metadata
+    _materializedAt: allTime?._materialized_at,
+  }
+}
+```
+
+---
+
+## 9. Prerequisitos de pipeline
+
+Antes de que el ICO Engine pueda materializar métricas, los pipelines de data deben estar completos.
+
+### 9.1 Acciones requeridas en `notion-bq-sync`
+
+| Acción | Detalle | Esfuerzo |
+|---|---|---|
+| Configurar `NOTION_DB_PROYECTOS` | Valor: `15288d9b145940529acc75439bbd5470` en `.env.yaml` | 5 min |
+| Configurar `NOTION_DB_SPRINTS` | Valor: `0c40f928047a4879ae702bfd0183520d` en `.env.yaml` | 5 min |
+| Agregar `revisiones` al sync | Agregar a `SYNC_TABLES`: `"revisiones": DB_REVISIONES` con env var `NOTION_DB_REVISIONES: "f791ecc4f84c4cfc9d19fe0d42ec9a7f"` | 30 min |
+| Re-deploy Cloud Function | `./deploy.sh` | 5 min |
+| Ejecutar sync manual | `curl -X POST <URL>` para poblar las tablas | 5 min |
+| Verificar data en BigQuery | Confirmar que las 4 tablas tienen datos y las columnas esperadas | 15 min |
+
+### 9.2 Verificación post-sync
+
+```sql
+-- Verificar tareas
+SELECT COUNT(*) AS total, COUNT(DISTINCT proyecto) AS projects
+FROM `efeonce-group.notion_ops.tareas`;
+
+-- Verificar columnas clave para ICO
+SELECT
+  COUNTIF(estado IS NOT NULL) AS has_estado,
+  COUNTIF(frame_versions IS NOT NULL) AS has_frame_versions,
+  COUNTIF(client_change_round IS NOT NULL) AS has_client_change_round,
+  COUNTIF(client_review_open IS NOT NULL) AS has_client_review_open,
+  COUNTIF(created_time IS NOT NULL) AS has_created_time,
+  COUNTIF(last_edited_time IS NOT NULL) AS has_last_edited_time,
+  COUNT(*) AS total
+FROM `efeonce-group.notion_ops.tareas`;
+
+-- Verificar proyectos
+SELECT COUNT(*) FROM `efeonce-group.notion_ops.proyectos`;
+
+-- Verificar sprints
+SELECT COUNT(*) FROM `efeonce-group.notion_ops.sprints`;
+
+-- Verificar revisiones
+SELECT COUNT(*) FROM `efeonce-group.notion_ops.revisiones`;
+
+-- Verificar estados existentes (para ajustar mapeo CSC)
+SELECT estado, COUNT(*) AS count
+FROM `efeonce-group.notion_ops.tareas`
+GROUP BY estado ORDER BY count DESC;
+```
+
+---
+
+## 10. Consideraciones técnicas
+
+### 12.1 Costos de BigQuery
+
+Las scheduled queries operan sobre data que ya está en BigQuery — no hay costos de ingesta adicionales. El costo es por bytes procesados en cada query.
+
+Estimación: con ~5,000 tareas (escala actual), cada materialización procesa ~5-10 MB. A $5/TB, el costo diario es negligible (~$0.001/día).
+
+### 12.2 Latencia
+
+Las métricas se refrescan una vez al día (03:15 AM). Los módulos de UI muestran el timestamp de última materialización (`_materialized_at`) para que el cliente sepa la frescura de los datos. El patrón es consistente con el refresh diario de los syncs de Notion y HubSpot.
+
+Si en el futuro se necesita refresh más frecuente (ej: durante horario laboral), se puede agregar un segundo scheduled query a las 12:00 PM sin cambiar nada en la arquitectura.
+
+### 12.3 Multi-tenant enforcement
+
+El ICO Engine materializa métricas por proyecto, no por Space. El filtro de tenant se aplica en la capa de consumo: el query builder del módulo filtra por `projectIds` que pertenecen al Space autenticado. Esto es el mismo patrón que usa el sistema actual — el engine no agrega surface de ataque.
+
+### 12.4 Evolución hacia Services
+
+Cuando `greenhouse_olap.services` tenga data (post implementación de Services Architecture):
+
+1. Activar la view `v_tareas_by_service`
+2. Agregar un scheduled query que materialice `metrics_by_service` (mismo SQL, agrupado por `service_id` en vez de `project_id`)
+3. Los módulos de UI que necesiten métricas por servicio consumen de `metrics_by_service`
+4. La view `v_tareas_by_project` sigue existiendo — ambas granularidades coexisten
+
+No hay migración — es aditivo.
+
+### 12.5 Intelligence Layer (Fase futura)
+
+El ICO Engine está diseñado para incorporar métricas generadas por inteligencia artificial sin cambiar su arquitectura de consumo. Esta sección documenta el diseño de la extensión para que las bases queden listas desde la Fase 1.
+
+#### 12.5.1 Concepto
+
+Hoy todas las métricas del engine son **determinísticas**: SQL puro que promedia, cuenta, o calcula ratios sobre data estructurada. La Intelligence Layer agrega métricas **probabilísticas**: un AI Agent analiza contenido no-estructurado (briefs, assets visuales, guidelines de marca) y produce scores que se materializan en BigQuery como cualquier otra métrica.
+
+Desde el punto de vista del consumidor (módulos de UI, Data Node, Ops), una métrica generada por IA es indistinguible de una métrica SQL. Se lee igual, se agrega igual, se exporta igual. Lo que cambia es el **pipeline de generación**, no la arquitectura de consumo.
+
+#### 12.5.2 Métricas candidatas para IA
+
+| Métrica | Qué hace el AI Agent | Input | Output | Prioridad |
+|---|---|---|---|---|
+| **Brief Clarity Score** | Evalúa completitud del brief contra criterios de calidad (audiencia, objetivo, deliverables, restricciones, tono, referencias) | Texto del brief en Notion (page content) | Score 0-100 + desglose por criterio | Alta — quality gate para producción |
+| **Brand Consistency Score** | Valida que un asset final esté alineado a las brand guidelines documentadas | Asset visual (Frame.io thumbnail/URL) + brand guidelines (Notion wiki) | passed/failed + score 0-100 + observaciones | Alta — diferenciador Globe |
+| **Brief-to-Output Alignment** | Compara el output final contra el brief original para medir fidelidad | Brief (Notion) + asset final (Frame.io) | Score 0-100 + delta analysis | Media |
+| **Feedback Quality Score** | Evalúa la calidad del feedback del cliente (específico vs ambiguo) | Comentarios de Frame.io | Score 0-100 + clasificación | Baja — experimental |
+
+#### 12.5.3 Tabla de scores: `ico_engine.ai_metric_scores`
+
+Esta tabla se crea en la Fase 1 (vacía) para que la infraestructura esté lista. Se pobla cuando los AI Agents se implementen.
+
+```sql
+CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.ai_metric_scores` (
+  -- Identidad
+  id STRING NOT NULL,                      -- UUID generado por el AI Agent
+  task_id STRING NOT NULL,                 -- notion_page_id de la tarea evaluada
+  metric_id STRING NOT NULL,               -- ID del Metric Registry: 'brief_clarity_score', 'brand_consistency_score'
+  
+  -- Resultado
+  score FLOAT64,                           -- Valor numérico producido (0-100 para scores, boolean cast para passed/failed)
+  passed BOOL,                             -- Para métricas binarias (brand validation)
+  breakdown JSON,                          -- Desglose por criterio (JSON: { "audiencia": 85, "objetivo": 90, ... })
+  reasoning STRING,                        -- Explicación del AI Agent (para auditoría y transparencia)
+  
+  -- Trazabilidad del modelo
+  model STRING NOT NULL,                   -- Modelo usado: 'claude-sonnet-4-20250514', 'gemini-2.0-flash', etc.
+  prompt_version STRING NOT NULL,          -- Versión del prompt (tag de Git: 'bcs-v1.0', 'brand-v1.2')
+  prompt_hash STRING,                      -- SHA-256 del prompt efectivo (para reproducibilidad)
+  confidence FLOAT64,                      -- Confianza del modelo si aplica (0-1)
+  tokens_used INT64,                       -- Tokens consumidos (para tracking de costos)
+  latency_ms INT64,                        -- Latencia de la llamada al modelo
+  
+  -- Contexto
+  input_snapshot_url STRING,               -- URL o referencia al input que evaluó (para auditoría)
+  space_id STRING,                         -- Space al que pertenece la tarea
+  project_id STRING,                       -- Proyecto al que pertenece la tarea
+  
+  -- Metadata
+  processed_at TIMESTAMP NOT NULL,         -- Cuándo se generó el score
+  _synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+)
+PARTITION BY DATE(processed_at)
+CLUSTER BY metric_id, task_id;
+```
+
+#### 12.5.4 Integración con la view base
+
+Cuando `ai_metric_scores` tenga data, la view `v_tareas_enriched` se extiende con un LEFT JOIN:
+
+```sql
+-- FUTURO: agregar a v_tareas_enriched cuando los AI Agents estén operativos
+LEFT JOIN (
+  SELECT task_id, score AS brief_clarity_score
+  FROM `efeonce-group.ico_engine.ai_metric_scores`
+  WHERE metric_id = 'brief_clarity_score'
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY task_id ORDER BY processed_at DESC) = 1
+) bcs ON te.notion_page_id = bcs.task_id
+
+LEFT JOIN (
+  SELECT task_id, score AS brand_consistency_score, passed AS brand_validation_passed
+  FROM `efeonce-group.ico_engine.ai_metric_scores`
+  WHERE metric_id = 'brand_consistency_score'
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY task_id ORDER BY processed_at DESC) = 1
+) brand ON te.notion_page_id = brand.task_id
+```
+
+La lógica toma el score **más reciente** por tarea y métrica (`QUALIFY ROW_NUMBER`), lo que permite re-evaluar un asset sin perder el historial.
+
+#### 12.5.5 Pipeline de procesamiento (diseño, no implementación)
+
+```
+Trigger: nueva tarea entra a fase "Producción" (Brief Clarity Score)
+         o tarea pasa a "Completado" (Brand Consistency Score)
+  │
+  ├── Opción A: Event-driven (webhook de Notion → Cloud Function)
+  │     Cloud Function detecta cambio de estado
+  │     Lee contenido del brief/asset via Notion API + Frame.io API
+  │     Llama al AI Agent (Claude via Vertex AI)
+  │     Escribe score a ico_engine.ai_metric_scores en BigQuery
+  │
+  └── Opción B: Batch (scheduled, post-sync)
+        Scheduled query a las 03:20 AM identifica tareas sin score
+        Cloud Function lee tareas pendientes, las procesa en batch
+        Escribe scores a BigQuery
+        Más simple, consistente con el patrón batch del engine
+```
+
+**Recomendación:** Opción B para el MVP de IA (batch, simple, predecible). Opción A cuando la latencia importe (ej: Brief Clarity Score como quality gate en tiempo real que bloquea el paso a producción).
+
+#### 12.5.6 Gobernanza
+
+Reglas que aplican a toda métrica generada por IA dentro del ICO Engine:
+
+1. **Prompts versionados en Git.** Cada prompt tiene un tag (`bcs-v1.0`) y el `prompt_version` se registra en cada score. Si un prompt cambia, se pueden comparar resultados entre versiones.
+2. **Nunca acción automática.** Los scores de IA informan, nunca bloquean ni ejecutan. Si Brief Clarity Score < 60, la UI muestra una alerta; no impide que la tarea entre a producción. Esta restricción se puede relajar por Space (opt-in) cuando la confianza en los scores sea alta.
+3. **Auditable.** El campo `reasoning` almacena la explicación del modelo. El campo `input_snapshot_url` referencia el input exacto que se evaluó. Cualquier score se puede reconstruir.
+4. **Sin cross-contamination.** Un AI Agent que evalúa briefs de un cliente no tiene acceso a data de otros clientes. El `space_id` en cada score refuerza el tenant boundary.
+5. **Modelo configurable por métrica.** El Metric Registry puede definir qué modelo usar por métrica (Claude para análisis de texto, Gemini para análisis visual). No hay lock-in a un solo proveedor.
+
+#### 12.5.7 Extensión al Metric Registry
+
+Las métricas de IA ya están en el registry con `active: false, comingSoon: true` (§3.3). Cuando se implementen, solo cambian esos flags y se agrega el campo opcional `aiConfig`:
+
+```typescript
+// Extensión futura al ICOMetricDefinition (agregar como campo opcional)
+export interface AIMetricConfig {
+  agentId: string                    // ID del AI Agent que genera el score
+  model: string                      // Modelo default: 'claude-sonnet-4-20250514'
+  promptVersionTag: string           // Tag del prompt en Git
+  triggerEvent: 'phase_change' | 'batch' | 'manual'
+  triggerPhase?: string              // Si triggerEvent = 'phase_change', qué fase lo dispara
+  maxTokens: number                  // Límite de tokens por evaluación
+  costPerEvalUsd: number             // Costo estimado por evaluación (para tracking)
+}
+
+// Agregar a ICOMetricDefinition:
+//   aiConfig?: AIMetricConfig        // Solo para métricas de categoría 'intelligence'
+
+// Ejemplo de uso en el registry:
+{
+  id: 'brief_clarity_score',
+  // ... (resto de la definición existente en §3.3) ...
+  active: true,                      // Flip cuando esté listo
+  comingSoon: false,
+  aiConfig: {
+    agentId: 'ico-brief-evaluator',
+    model: 'claude-sonnet-4-20250514',
+    promptVersionTag: 'bcs-v1.0',
+    triggerEvent: 'batch',
+    maxTokens: 2000,
+    costPerEvalUsd: 0.003
+  }
+}
+```
+
+#### 12.5.8 Stack técnico alineado
+
+La Intelligence Layer usa el mismo stack definido para Kortex (`Kortex_Arquitectura_Tecnica_v1_1.docx`):
+
+| Componente | Tecnología | Rol |
+|---|---|---|
+| Framework de agentes | Google ADK | Orquestación de agentes |
+| LLM primario | Claude via Vertex AI | Análisis de texto, evaluación de briefs |
+| LLM visual (futuro) | Gemini via Vertex AI | Análisis de assets visuales |
+| Ejecución | Cloud Functions (Python 3.12) | Serverless, misma infra que los syncs |
+| Secrets | GCP Secret Manager | API keys, tokens (mismo patrón que Frame.io) |
+| Versionado de prompts | Git (repo del engine o dedicado) | Trazabilidad |
+| Output | BigQuery `ico_engine.ai_metric_scores` | Materialización al data lake |
+
+#### 12.5.9 Qué se crea en Fase 1 (ahora) vs Fase AI (futuro)
+
+| Artefacto | Fase 1 | Motivo |
+|---|---|---|
+| Tabla `ico_engine.ai_metric_scores` (DDL) | **Crear vacía** | La infraestructura existe lista para cuando los agents escriban |
+| Tipo `AIMetricConfig` en TypeScript | **Crear como tipo exportado** | El registry ya lo importa aunque ninguna métrica lo use aún |
+| Métricas `brief_clarity_score` y `brand_consistency_score` en el registry | **Ya creadas** con `active: false, comingSoon: true` | La UI sabe que existen y muestra placeholders |
+| LEFT JOINs en `v_tareas_enriched` | **No crear aún** | Se agregan cuando la tabla tenga data, para no degradar performance de la view con JOINs a tablas vacías |
+| Cloud Functions de AI Agents | **No crear** | Se implementan cuando los prompts estén diseñados y validados |
+| Prompts | **No crear** | Requieren diseño deliberado con datos reales de briefs/assets |
+
+---
+
+## 11. Estructura de archivos (actualizada)
+
+```
+/src
+├── config/
+│   ├── capability-registry.ts           # Existente — sin cambios
+│   └── ico-metric-registry.ts           # NUEVO: definiciones de métricas ICO
+├── lib/
+│   ├── ico-engine/
+│   │   ├── read-metrics.ts              # NUEVO: funciones de lectura del engine
+│   │   ├── metric-types.ts              # NUEVO: tipos TypeScript (incluye AIMetricConfig)
+│   │   └── benchmarks.ts                # NUEVO: constantes de benchmarks de industria
+│   ├── capability-queries/
+│   │   ├── creative-production.ts       # ACTUALIZAR: consumir del ICO Engine
+│   │   └── ...
+│   └── ...
+├── sql/
+│   └── ico-engine/
+│       ├── 01-create-dataset.sql        # CREATE SCHEMA ico_engine
+│       ├── 02-views-base.sql            # v_tareas_enriched, v_tareas_by_project
+│       ├── 03-views-service.sql         # v_tareas_by_service (futuro — activar con Services)
+│       ├── 04-tables-materialized.sql   # DDL de tablas materializadas
+│       ├── 05-table-ai-scores.sql       # DDL de ai_metric_scores (crear vacía en Fase 1)
+│       ├── 06-scheduled-metrics.sql     # Query de materialización
+│       ├── 07-scheduled-stuck.sql       # Query de stuck assets
+│       ├── 08-scheduled-rpa-trend.sql   # Query de RpA trend
+│       └── 09-views-consumption.sql     # Views de consumo por módulo
+└── ...
+```
+
+---
+
+## 12. Roadmap de implementación
+
+| Fase | Entregable | Dependencia | Estimado |
+|---|---|---|---|
+| **ICO-0** | Completar pipelines de sync (Proyectos, Sprints, Revisiones) | Acceso a `.env.yaml` y deploy | 1 hora |
+| **ICO-0** | Verificar data en BigQuery, ajustar mapeo CSC | ICO-0 sync completo | 0.5 día |
+| **ICO-1** | Crear dataset `ico_engine` en BigQuery | GCP access | 10 min |
+| **ICO-1** | Crear views base (`v_tareas_enriched`, `v_tareas_by_project`) | ICO-0 verificación | 0.5 día |
+| **ICO-1** | Crear tablas materializadas (DDL) + tabla `ai_metric_scores` vacía | ICO-1 views | 0.5 día |
+| **ICO-2** | Metric Registry TypeScript (incluye tipo `AIMetricConfig`) | — | 0.5 día |
+| **ICO-2** | Configurar scheduled queries en BigQuery | ICO-1 tablas | 0.5 día |
+| **ICO-2** | Ejecutar materialización manual y verificar | ICO-2 scheduled queries | 0.5 día |
+| **ICO-3** | Crear views de consumo (client, ops, export) | ICO-2 verificado | 0.5 día |
+| **ICO-3** | API de lectura TypeScript (`/lib/ico-engine/read-metrics.ts`) | ICO-2 tablas con data | 1 día |
+| **ICO-3** | Tests: verificar queries con data real | ICO-3 API | 0.5 día |
+| — | — | — | — |
+| **ICO-AI** *(futuro)* | Diseñar y validar prompts para Brief Clarity Score | Domain expertise + test data | 2-3 días |
+| **ICO-AI** *(futuro)* | Cloud Function: AI Agent para BCS (batch) | Prompts validados + Vertex AI access | 2 días |
+| **ICO-AI** *(futuro)* | Activar LEFT JOINs en `v_tareas_enriched` | `ai_metric_scores` con data | 0.5 día |
+| **ICO-AI** *(futuro)* | Flip `active: true` en registry + integrar en módulos de UI | Agent operativo | 0.5 día |
+
+**Total Fase 1 (determinístico): ~5.5 días**
+**Total Fase AI (futuro, por métrica): ~5 días adicionales por métrica**
+
+---
+
+## Apéndice A: Correcciones post-validación arquitectónica (2026-03-16)
+
+> Este apéndice documenta las correcciones necesarias identificadas al contrastar esta especificación
+> contra la arquitectura real de Greenhouse, el modelo de datos en producción, y los patrones de código
+> existentes en el repositorio.
+
+### A.1 Scoping de Spaces: `space_id` directo, NO `notion_project_ids`
+
+**Spec original:** Proponía JOIN de tareas a Spaces via `notion_project_ids TEXT[]` en tabla `clients`.
+
+**Corrección:** El sync multi-tenant ya estampa `space_id` directamente en `notion_ops.tareas` y `notion_ops.proyectos`. Todas las queries de agency usan este patrón:
+```sql
+FROM notion_ops.tareas t WHERE t.space_id IN (SELECT space_id FROM ...)
+```
+El ICO Engine debe usar `space_id` directo, no el array `notion_project_ids`.
+
+### A.2 DDL de BigQuery: Sin cláusulas `DEFAULT`
+
+**Spec original:** Incluía `DEFAULT CURRENT_TIMESTAMP()` y `DEFAULT 'v1.0.0'`.
+
+**Corrección:** BigQuery `CREATE TABLE` no soporta `DEFAULT`. Los valores por defecto se aplican en las sentencias INSERT o en el código de aplicación.
+
+### A.3 Materialización: `WRITE_TRUNCATE` es configuración de job, no SQL
+
+**Spec original:** Mezclaba `INSERT INTO ... SELECT` con `WRITE_TRUNCATE`.
+
+**Corrección:** En BigQuery scheduled queries, `WRITE_TRUNCATE` es una configuración del job (`writeDisposition`), no una instrucción SQL. El SQL debe ser un `SELECT` puro; la tabla destino y `WRITE_TRUNCATE` se configuran en el job.
+
+### A.4 Dataset `greenhouse_olap` no existe
+
+**Spec original:** Referenciaba `greenhouse_olap.services`.
+
+**Corrección:** Los módulos de servicio viven en `greenhouse.service_modules` y `greenhouse.client_service_modules` (BigQuery), y en `greenhouse_core.service_modules` (PostgreSQL).
+
+### A.5 Capa conformada ya existe — no duplicar
+
+**Spec original:** Proponía crear `v_tareas_enriched` desde `notion_ops.tareas` directamente.
+
+**Corrección:** `greenhouse_conformed.delivery_tasks` (47 columnas, nombres en inglés) ya existe con `space_id`, `client_id`, `module_id` y campos normalizados. El ICO Engine debe construir sus views SOBRE la capa conformada, agregando solo los campos derivados (`fase_csc`, `cycle_time_days`, `is_stuck`, `delivery_signal`).
+
+**Columnas clave de `greenhouse_conformed.delivery_tasks`:**
+- `task_status` (no `estado`)
+- `completed_at` (no `fecha_de_completado`)
+- `due_date` (no `fecha_límite`)
+- `rpa_value` (no `rpa`)
+- `client_change_round_final` (mismo nombre)
+- `blocker_count` (derivado de `bloqueado_por_ids`)
+- `last_edited_time`, `synced_at`, `space_id`, `client_id`
+
+### A.6 TypeScript: Sin `any`
+
+**Spec original:** Usaba `formulaConfig: Record<string, any>`.
+
+**Corrección:** Implementado con tipo `FormulaConfig` con unión discriminada (`kind: MetricKind`).
+
+### A.7 Throughput vs Pipeline Velocity — diferenciados
+
+**Spec original:** Ambas métricas usaban SQL idéntico.
+
+**Corrección:**
+- **Throughput** = `COUNT(completed_at IS NOT NULL)` — conteo absoluto
+- **Pipeline velocity** = `throughput / active_tasks` — ratio de flujo
+
+### A.8 Métricas AI (brief_clarity_score, brand_consistency_score)
+
+**Spec original:** Incluidas en MVP con SQL determinístico.
+
+**Corrección:** Requieren NLP y análisis de imagen respectivamente. Diferidas a Phase 4 (Intelligence Layer). No hay infraestructura de IA para procesamiento batch aún.
+
+### A.9 Implementación Phase 1 completada
+
+Los siguientes archivos fueron creados como implementación de la Phase 1:
+
+```
+src/lib/ico-engine/
+├── shared.ts              # IcoEngineError, runIcoEngineQuery, coercion utils
+├── metric-registry.ts     # 10 MetricDefinition[], FormulaConfig, CSC mapping
+├── schema.ts              # ensureIcoEngineInfrastructure() — dataset + view + table
+└── read-metrics.ts        # readSpaceMetrics(), computeSpaceMetricsLive()
+
+src/app/api/ico-engine/
+├── registry/route.ts      # GET /api/ico-engine/registry
+├── metrics/route.ts       # GET /api/ico-engine/metrics?spaceId=X&year=Y&month=M
+└── metrics/agency/route.ts # GET /api/ico-engine/metrics/agency?year=Y&month=M
+```
+
+### A.10 Implementación completa — Phases 2-5 (2026-03-17)
+
+Todas las fases determinísticas del ICO Engine están implementadas. Commit `d2483fd` en `develop`.
+
+#### Estado por sección del spec
+
+| Sección | Estado | Notas |
+|---------|--------|-------|
+| §1 Resumen ejecutivo | ✅ Implementado | — |
+| §2 Fuentes de datos | ✅ Implementado | Usa `greenhouse_conformed.delivery_tasks` (ver A.5) |
+| §3 Metric Registry | ✅ Implementado | 10 métricas determinísticas + `AIMetricConfig` type |
+| §4 Capa conformed | ✅ Implementado | `v_tasks_enriched` sobre `delivery_tasks` |
+| §5.1 `metric_snapshots_monthly` | ✅ Implementado | MERGE mensual + cron diario 06:15 UTC |
+| §5.2 `metrics_by_project` | ✅ Implementado | DELETE+INSERT por período, ORDER BY throughput |
+| §5.3 `rpa_trend` | ✅ Implementado | DELETE+INSERT últimos 12 meses, AVG + APPROX_QUANTILES |
+| §5.4 `stuck_assets_detail` | ✅ Implementado | DELETE+INSERT, severity warning (72h) / danger (96h) |
+| §5.5 `ai_metric_scores` | ✅ DDL creado | Tabla vacía — se llena cuando AI layer esté activo |
+| §6 Scheduled queries | ✅ Implementado | Vercel cron `/api/cron/ico-materialize` diario |
+| §7 Views de consumo | ✅ Implementado | `v_metric_latest` |
+| §8 API de consumo | ✅ Implementado | 6 endpoints (ver tabla abajo) |
+| §9 Prerequisitos pipeline | ✅ Resuelto | `delivery_tasks` provee la data necesaria |
+| §10 Consideraciones técnicas | ✅ Implementado | Auth guards, pagination, error handling |
+| §11 Estructura de archivos | ✅ Implementado | Ver estructura actualizada abajo |
+| §12 Roadmap ICO-0 a ICO-3 | ✅ Completado | Todo lo determinístico implementado |
+| §12 Roadmap ICO-AI | ⏳ Futuro | Requiere Vertex AI + prompt engineering |
+
+#### Archivos implementados (estructura final)
+
+```
+src/lib/ico-engine/
+├── shared.ts              # IcoEngineError, runIcoEngineQuery, coercion utils
+├── metric-registry.ts     # 10 MetricDefinition[], FormulaConfig, CSC mapping, AIMetricConfig
+├── schema.ts              # ensureIcoEngineInfrastructure() — 6 tables + dataset + view
+├── read-metrics.ts        # readSpaceMetrics, readLatestSpaceMetrics, readAgencyMetrics,
+│                          # computeSpaceMetricsLive, readProjectMetrics,
+│                          # readLatestMetricsSummary, readMetricsSummaryByClientId
+└── materialize.ts         # materializeMonthlySnapshots (space + stuck + rpa_trend + project)
+
+src/app/api/ico-engine/
+├── registry/route.ts          # GET /api/ico-engine/registry
+├── metrics/route.ts           # GET /api/ico-engine/metrics?spaceId&year&month
+├── metrics/agency/route.ts    # GET /api/ico-engine/metrics/agency?year&month&live
+├── metrics/project/route.ts   # GET /api/ico-engine/metrics/project?spaceId&year&month
+├── stuck-assets/route.ts      # GET /api/ico-engine/stuck-assets?spaceId
+└── trends/rpa/route.ts        # GET /api/ico-engine/trends/rpa?spaceId&months
+
+src/app/api/cron/
+└── ico-materialize/route.ts   # GET (cron) — materialización diaria
+
+src/components/agency/
+├── IcoGlobalKpis.tsx          # KPI cards (RPA, OTD, FTR, throughput, velocity, stuck)
+├── IcoCharts.tsx              # CSC distribution bar + velocity gauge + RPA trend line
+├── SpaceIcoScorecard.tsx      # Sortable table with per-space metrics
+└── StuckAssetsDrawer.tsx      # Right drawer with stuck asset details
+
+src/views/agency/
+└── AgencyIcoEngineView.tsx    # ICO Engine tab orchestrator (data + trend fetch)
+
+src/lib/capability-queries/
+├── creative-hub.ts            # MODIFIED: fetches ICO summary in parallel
+└── helpers.ts                 # MODIFIED: buildCreativeRevenueCardData + buildCreativeBrandMetricsCardData
+                               # accept optional icoSummary for RPA/FTR/OTD override
+```
+
+#### Lo que queda fuera (explícitamente diferido)
+
+| Item | Razón | Dependencia |
+|------|-------|-------------|
+| `metrics_by_service` | Blocked hasta que Services Architecture esté operativa | `greenhouse_core.services` + mapping |
+| AI Cloud Functions / prompts | Futuro — requiere Vertex AI batch processing | Prompt engineering + test data |
+| LEFT JOINs a `ai_metric_scores` | Tabla vacía, no activar hasta que AI layer escriba scores | AI layer operativo |
+| `brief_clarity_score`, `brand_consistency_score` | Métricas AI, no determinísticas | AI layer |
+
+---
+
+## Apéndice B: Context-Agnostic Metrics Service (2026-03-18)
+
+> Este apéndice documenta la evolución del ICO Engine de un sistema space-only a un servicio de métricas
+> agnóstico al contexto, capaz de responder consultas para cualquier dimensión del modelo de datos.
+
+### B.1 Principio rector
+
+**"ICO siempre debe poderse consultar por cualquier otro objeto y entregar métricas consistentes basadas en el contexto que se le solicite."**
+
+Antes de esta refactorización, las fórmulas de métricas estaban duplicadas en 3 ubicaciones (`materializeMonthlySnapshots`, `materializeProjectMetrics`, `computeSpaceMetricsLive`), cada una hardcoded a una dimensión específica. Agregar cualquier consumidor nuevo requería copiar el SQL.
+
+### B.2 Shared SQL Metric Builder
+
+Todas las fórmulas de métricas ICO se definen **una sola vez** en `buildMetricSelectSQL()` (`src/lib/ico-engine/shared.ts`). Esta función genera el fragmento SQL canónico para las 14 columnas de métricas:
+
+```
+rpa_avg, rpa_median, otd_pct, ftr_pct,
+cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+throughput_count, pipeline_velocity,
+stuck_asset_count, stuck_asset_pct,
+total_tasks, completed_tasks, active_tasks
+```
+
+`buildPeriodFilterSQL()` genera el WHERE canónico para filtrar por período + activos.
+
+Consumidores: `materializeMonthlySnapshots`, `materializeProjectMetrics`, `materializeMemberMetrics`, `computeSpaceMetricsLive`, `computeMetricsByContext`.
+
+### B.3 ICO_DIMENSIONS — Allowlist de dimensiones
+
+```typescript
+export const ICO_DIMENSIONS = {
+  space:   { column: 'space_id' },
+  project: { column: 'project_source_id' },
+  member:  { column: 'assignee_member_id' },
+  client:  { column: 'client_id' },
+  sprint:  { column: 'sprint_source_id' },
+} as const
+```
+
+El allowlist previene SQL injection mientras habilita consultas parametrizadas. La columna se inyecta via interpolación de string (segura — proviene del allowlist); el valor se pasa como parámetro de BigQuery.
+
+### B.4 computeMetricsByContext()
+
+Función genérica de cómputo en vivo para CUALQUIER dimensión:
+
+```typescript
+export const computeMetricsByContext = async (
+  dimensionKey: IcoDimensionKey,  // 'space' | 'project' | 'member' | 'client' | 'sprint'
+  dimensionValue: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<IcoMetricSnapshot | null>
+```
+
+Para la dimensión `member`, usa `UNNEST(assignee_member_ids)` para acreditar todas las asignaciones (sin doble conteo para otras dimensiones).
+
+### B.5 Multi-Assignee Enrichment
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `assignee_member_id` | `STRING` | Primer responsable de Notion resuelto a member ID (backward compat) |
+| `assignee_member_ids` | `ARRAY<STRING>` | Todos los responsables de Notion resueltos a member IDs |
+
+`v_tasks_enriched` expone `assignee_member_ids` con fallback: `COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], []))`.
+
+### B.6 Tablas materializadas nuevas
+
+| Tabla | Clave | Fuente |
+|-------|-------|--------|
+| `metrics_by_member` | `member_id + period_year + period_month` | `UNNEST(assignee_member_ids)` de `v_tasks_enriched` |
+
+Mismas columnas que `metrics_by_project` pero agrupadas por `member_id`. Se materializa en el cron diario junto con las demás tablas.
+
+### B.7 API de contexto genérico
+
+```
+GET /api/ico-engine/context?dimension=member&value=mem-xxx&year=2026&month=3
+GET /api/ico-engine/context?dimension=space&value=spc-xxx&year=2026&month=3
+GET /api/ico-engine/context?dimension=project&value=proj-xxx&year=2026&month=3
+```
+
+Valida dimensión contra `ICO_DIMENSIONS`, intenta caché materializado primero, y cae a `computeMetricsByContext()` en vivo.
+
+Retorna `IcoMetricSnapshot`:
+```typescript
+interface IcoMetricSnapshot {
+  dimension: IcoDimensionKey
+  dimensionValue: string
+  dimensionLabel: string | null
+  periodYear: number
+  periodMonth: number
+  metrics: MetricValue[]
+  cscDistribution: CscDistributionEntry[]
+  context: { totalTasks: number; completedTasks: number; activeTasks: number }
+  computedAt: string | null
+  engineVersion: string
+  source: 'materialized' | 'live'
+}
+```
+
+### B.8 Person ICO Tab
+
+Nueva pestaña ICO en Person 360:
+- Consume de `GET /api/ico-engine/context?dimension=member&value={memberId}`
+- KPIs: RpA, OTD%, FTR%, Throughput, Ciclo, Stuck assets
+- Charts: CSC donut, health radar, pipeline velocity gauge
+- Selectores de período (mes/año)
+
+Permisos: `efeonce_admin`, `efeonce_operations`.
+
+### B.9 Agregar dimensiones futuras (Service, Campaign, etc.)
+
+Solo 3 pasos necesarios:
+1. Asegurar que la columna existe en `delivery_tasks` → `v_tasks_enriched`
+2. Agregar entrada a `ICO_DIMENSIONS` en `shared.ts`
+3. Opcionalmente agregar tabla de materialización + función
+
+No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos endpoints.
+
+### B.10 Archivos modificados
+
+| Archivo | Acción |
+|---------|--------|
+| `src/lib/ico-engine/shared.ts` | `ICO_DIMENSIONS`, `buildMetricSelectSQL()`, `buildPeriodFilterSQL()`, status constants |
+| `src/lib/ico-engine/materialize.ts` | Refactored to use shared builders + `materializeMemberMetrics()` |
+| `src/lib/ico-engine/read-metrics.ts` | `IcoMetricSnapshot`, `computeMetricsByContext()`, `readMemberMetrics()` |
+| `src/lib/ico-engine/schema.ts` | `metrics_by_member` DDL, `assignee_member_ids` in view |
+| `src/lib/sync/sync-notion-conformed.ts` | Multi-assignee array + `ensureMultiAssigneeColumn()` |
+| `src/app/api/ico-engine/context/route.ts` | NEW — generic context API |
+| `src/app/api/people/[memberId]/ico/route.ts` | NEW — person ICO convenience endpoint |
+| `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` | NEW — person ICO tab with charts |
+| `src/types/people.ts` | Added `'ico'` to `PersonTab` |
+| `src/views/greenhouse/people/helpers.ts` | Tab config + permissions |
+| `src/views/greenhouse/people/PersonTabs.tsx` | Registered ICO tab |
+| `scripts/setup-bigquery-source-sync.sql` | Added `assignee_member_ids` column |
+
+---
+
+*Efeonce Greenhouse™ • ICO Engine Spec v1.0 + Apéndice B (v2 Context-Agnostic)*
+*Efeonce Group — Marzo 2026 — CONFIDENCIAL*
+*Documento técnico interno. Su reproducción o distribución sin autorización escrita está prohibida.*

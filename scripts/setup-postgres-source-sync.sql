@@ -230,6 +230,24 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS greenhouse_delivery.space_property_mappings (
+  id                    TEXT PRIMARY KEY,
+  space_id              TEXT NOT NULL,
+  notion_property_name  TEXT NOT NULL,
+  conformed_field_name  TEXT NOT NULL,
+  notion_type           TEXT NOT NULL,
+  target_type           TEXT NOT NULL,
+  coercion_rule         TEXT NOT NULL DEFAULT 'direct',
+  is_required           BOOLEAN NOT NULL DEFAULT FALSE,
+  fallback_value        TEXT,
+  notes                 TEXT,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at            TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_by            TEXT,
+  CONSTRAINT spm_space_conformed_uq UNIQUE (space_id, conformed_field_name),
+  CONSTRAINT spm_space_notion_uq UNIQUE (space_id, notion_property_name)
+);
+
 GRANT USAGE ON SCHEMA greenhouse_crm TO greenhouse_runtime;
 GRANT USAGE, CREATE ON SCHEMA greenhouse_crm TO greenhouse_migrator;
 GRANT USAGE ON SCHEMA greenhouse_delivery TO greenhouse_runtime;
@@ -483,3 +501,6 @@ CREATE INDEX IF NOT EXISTS delivery_tasks_module_idx
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_assignee_idx
   ON greenhouse_delivery.tasks (assignee_member_id);
+
+CREATE INDEX IF NOT EXISTS delivery_spm_space_idx
+  ON greenhouse_delivery.space_property_mappings (space_id);

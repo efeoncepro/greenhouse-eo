@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
@@ -12,8 +13,11 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import CustomChip from '@core/components/mui/Chip'
+
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
+import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR, HEALTH_ZONE_ORDER } from './space-health'
 
 type Props = {
   spaces: AgencySpaceHealth[]
@@ -47,7 +51,20 @@ const SemaphoreDot = ({ value, type }: { value: number | null; type: 'rpa' | 'ot
 const SpaceHealthTable = ({ spaces }: Props) => {
   const router = useRouter()
 
-  if (spaces.length === 0) {
+  // Sort by health (critical first), then by name
+  const sorted = useMemo(() =>
+    [...spaces].sort((a, b) => {
+      const ha = HEALTH_ZONE_ORDER[getSpaceHealth(a)]
+      const hb = HEALTH_ZONE_ORDER[getSpaceHealth(b)]
+
+      if (ha !== hb) return ha - hb
+
+      return a.clientName.localeCompare(b.clientName)
+    }),
+    [spaces]
+  )
+
+  if (sorted.length === 0) {
     return (
       <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary, p: 3 }}>
         No hay Spaces activos.
@@ -56,6 +73,8 @@ const SpaceHealthTable = ({ spaces }: Props) => {
   }
 
   const COL = { color: GH_COLORS.neutral.textSecondary, fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }
+
+  const GRID = '2fr 1fr 70px 70px 80px 90px 80px 36px'
 
   return (
     <Box
@@ -70,21 +89,31 @@ const SpaceHealthTable = ({ spaces }: Props) => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: '2fr 1fr 80px 80px 70px 70px 40px',
+          gridTemplateColumns: GRID,
           px: 2.5,
           py: 1.25,
           bgcolor: GH_COLORS.neutral.bgSurface
         }}
       >
-        {[GH_AGENCY.col_space, GH_AGENCY.col_service_line, GH_AGENCY.col_rpa, GH_AGENCY.col_otd, GH_AGENCY.col_assets, GH_AGENCY.col_feedback, ''].map((label, i) => (
+        {[
+          GH_AGENCY.col_space,
+          GH_AGENCY.col_service_line,
+          GH_AGENCY.col_rpa,
+          GH_AGENCY.col_otd,
+          GH_AGENCY.spaces_col_projects,
+          GH_AGENCY.spaces_col_team,
+          GH_AGENCY.spaces_col_health,
+          ''
+        ].map((label, i) => (
           <Typography key={i} sx={COL}>{label}</Typography>
         ))}
       </Box>
 
       <Divider />
 
-      {spaces.map((space, idx) => {
+      {sorted.map((space, idx) => {
         const color = getServiceColor(space.businessLines)
+        const healthZone = getSpaceHealth(space)
 
         return (
           <Box key={space.clientId}>
@@ -93,7 +122,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
               onClick={() => router.push(`/agency/spaces/${space.clientId}`)}
               sx={{
                 display: 'grid',
-                gridTemplateColumns: '2fr 1fr 80px 80px 70px 70px 40px',
+                gridTemplateColumns: GRID,
                 alignItems: 'center',
                 px: 2.5,
                 py: 1.5,
@@ -143,12 +172,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                     )}
                   </Stack>
                   <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                    {[
-                      `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
-                      `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,
-                      `${space.allocatedFte.toFixed(1)} FTE`,
-                      ...(space.totalUsers > 0 ? [`${space.totalUsers} usuario${space.totalUsers !== 1 ? 's' : ''}`] : [])
-                    ].join(' · ')}
+                    {`${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''} · ${space.allocatedFte.toFixed(1)} FTE`}
                   </Typography>
                 </Box>
               </Stack>
@@ -182,21 +206,25 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                 </Typography>
               </Stack>
 
-              {/* Assets */}
+              {/* Projects */}
               <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
-                {space.assetsActivos}
+                {space.projectCount}
               </Typography>
 
-              {/* Feedback */}
-              <Stack direction='row' spacing={0.5} alignItems='center'>
-                <Typography
-                  variant='body2'
-                  sx={{ color: space.feedbackPendiente > 0 ? GH_COLORS.semaphore.yellow.source : GH_COLORS.neutral.textPrimary, fontWeight: space.feedbackPendiente > 0 ? 600 : 400 }}
-                >
-                  {space.feedbackPendiente}
-                </Typography>
-                {space.feedbackPendiente > 0 && <i className='tabler-alert-triangle' style={{ fontSize: '0.8rem', color: GH_COLORS.semaphore.yellow.source }} />}
-              </Stack>
+              {/* Team */}
+              <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
+                {space.assignedMembers} · {space.allocatedFte.toFixed(1)}
+              </Typography>
+
+              {/* Health */}
+              <CustomChip
+                round='true'
+                size='small'
+                color={HEALTH_ZONE_COLOR[healthZone]}
+                variant='tonal'
+                label={HEALTH_ZONE_LABEL[healthZone]}
+                sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600 }}
+              />
 
               {/* Nav arrow */}
               <Tooltip title={`Ir a ${space.clientName}`}>

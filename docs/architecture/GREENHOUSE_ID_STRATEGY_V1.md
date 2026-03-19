@@ -47,6 +47,13 @@ Recommended prefixes:
 - tenant capability assignment: `EO-CAP-...`
 - role assignment: `EO-ROLE-...`
 - feature flag assignment: `EO-FLG-...`
+- organization: `EO-ORG-XXXX` (sequential, from `greenhouse_core.organizations`)
+- space: `EO-SPC-XXXX` (sequential, from `greenhouse_core.spaces`)
+- membership: `EO-MBR-XXXX` (sequential, from `greenhouse_core.person_memberships`)
+- identity profile: `EO-ID-{HSO|GH|NOT|AAD}-...`
+- sequential format: `EO-IDNNNN` via `formatEoId()`
+
+The organization, space, and membership prefixes were added as part of the Account 360 implementation. The sequential ID generation uses `formatEoId()` (e.g., `EO-ID0001`).
 
 ## Public ID Rules
 
@@ -120,11 +127,23 @@ This lets Greenhouse persist product-facing IDs without breaking internal refere
 Shared logic now lives in:
 - `src/lib/ids/greenhouse-ids.ts`
 
+Available ID functions in `greenhouse-ids.ts`:
+- `buildTenantPublicId()` — `EO-{hubspot_id}` or `EO-TEN-{slug}`
+- `buildUserPublicId()` — `EO-USR-{id}`
+- `buildModulePublicId()` — `EO-BL-{code}` or `EO-SVC-{code}`
+- `buildClientServiceAssignmentPublicId()` — `EO-CAP-*`
+- `buildRoleAssignmentPublicId()` — `EO-ROLE-*`
+- `buildFeatureFlagPublicId()` — `EO-FLG-*`
+- `buildIdentityProfileId()` — `identity-{system}-{type}-{id}`
+- `buildIdentityProfilePublicId()` — `EO-ID-{HSO|GH|NOT|AAD}-*`
+- `formatEoId()` — `EO-IDNNNN` sequential format
+
 Current runtime usage:
 - tenant admin detail
 - tenant dashboard preview
 - user admin detail
 - tenant capability governance
+- Account 360 (organizations, spaces, memberships)
 
 ## Migration Order
 

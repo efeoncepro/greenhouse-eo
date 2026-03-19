@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
@@ -20,6 +20,7 @@ import Stack from '@mui/material/Stack'
 import Step from '@mui/material/Step'
 import StepLabel from '@mui/material/StepLabel'
 import Stepper from '@mui/material/Stepper'
+import TextField from '@mui/material/TextField'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -72,6 +73,7 @@ interface DiscoveryDatabase {
   classification: string | null
   parentType: string
   parentId: string
+  parentName: string | null
   url: string
   createdTime: string
   lastEditedTime: string
@@ -79,6 +81,7 @@ interface DiscoveryDatabase {
 
 interface DiscoveryGroup {
   parentKey: string
+  groupLabel: string
   databases: DiscoveryDatabase[]
   hasCoreDatabases: boolean
   classificationsFound: string[]
@@ -150,6 +153,10 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   const [registering, setRegistering] = useState(false)
   const [error, setError] = useState('')
 
+  // State — space creation
+  const [creatingSpace, setCreatingSpace] = useState(false)
+  const spaceNameRef = useRef(clientName)
+
   // ---------------------------------------------------------------------------
   // Fetch current status
   // ---------------------------------------------------------------------------
@@ -173,6 +180,56 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   useEffect(() => {
     void fetchStatus()
   }, [fetchStatus])
+
+  // ---------------------------------------------------------------------------
+  // Space creation
+  // ---------------------------------------------------------------------------
+
+  const handleCreateSpace = async () => {
+    const spaceName = spaceNameRef.current.trim()
+
+    if (!spaceName) {
+      setError('El nombre del Space es requerido.')
+
+      return
+    }
+
+    setCreatingSpace(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/admin/spaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spaceName,
+          clientId
+        })
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+
+        setError(data.error || `Error ${res.status}`)
+
+        return
+      }
+
+      toast.success(`Space "${spaceName}" creado. Ahora conecta las bases de Notion.`)
+
+      // Refresh status — now the Space exists, wizard will be available
+      setLoading(true)
+      await fetchStatus()
+
+      // Auto-open the wizard after Space creation
+      setWizardOpen(true)
+      setWizardStep(0)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error de conexión')
+    } finally {
+      setCreatingSpace(false)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Discovery
@@ -303,11 +360,37 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
         />
         <Divider />
         <CardContent>
-          <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-            <Typography variant='h6' sx={{ mb: 1 }}>Sin Space operativo</Typography>
-            <Typography variant='body2' color='text.secondary'>
-              Este tenant no tiene un Space registrado. Créalo primero desde Organizaciones para habilitar la integración con Notion.
+          <Box sx={{ py: 2 }}>
+            <Typography variant='h6' sx={{ mb: 1 }}>Crear Space operativo</Typography>
+            <Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
+              Este tenant no tiene un Space registrado. Crea uno para habilitar la integración con Notion y el pipeline de datos.
             </Typography>
+
+            <Stack spacing={2.5} sx={{ maxWidth: 420 }}>
+              <TextField
+                label='Nombre del Space'
+                defaultValue={clientName}
+                size='small'
+                fullWidth
+                helperText='La Organización se resuelve automáticamente desde HubSpot.'
+                onChange={e => { spaceNameRef.current = e.target.value }}
+              />
+
+              {error && (
+                <Alert severity='error' onClose={() => setError('')}>{error}</Alert>
+              )}
+
+              <Box>
+                <Button
+                  variant='contained'
+                  onClick={handleCreateSpace}
+                  disabled={creatingSpace}
+                  startIcon={creatingSpace ? <CircularProgress size={16} /> : <i className='tabler-plus' />}
+                >
+                  {creatingSpace ? 'Creando…' : 'Crear Space'}
+                </Button>
+              </Box>
+            </Stack>
           </Box>
         </CardContent>
       </Card>
@@ -520,80 +603,94 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
         )}
 
         {/* Step 1: Select group */}
-        {wizardStep === 1 && discovery && (
-          <Box>
-            <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-              Se encontraron {discovery.totalDatabases} bases de datos en {discovery.groups.length} grupos.
-              {discovery.groups.filter(g => g.hasCoreDatabases).length > 0
-                ? ' Selecciona el grupo que corresponde a este Space.'
-                : ' Ningún grupo tiene las bases de datos requeridas (Proyectos + Tareas).'}
-            </Typography>
-            <Stack spacing={2}>
-              {discovery.groups.map(group => {
-                const isSelected = selectedGroup?.parentKey === group.parentKey
-                const hasCore = group.hasCoreDatabases
+        {wizardStep === 1 && discovery && (() => {
+          // Only show groups that have at least one classified database (filter noise)
+          const relevantGroups = discovery.groups.filter(
+            g => g.classificationsFound.length > 0
+          )
 
-                return (
-                  <Card
-                    key={group.parentKey}
-                    elevation={0}
-                    onClick={() => { if (hasCore) setSelectedGroup(group) }}
-                    sx={{
-                      border: t => `${isSelected ? 2 : 1}px solid ${isSelected ? t.palette.primary.main : t.palette.divider}`,
-                      cursor: hasCore ? 'pointer' : 'default',
-                      opacity: hasCore ? 1 : 0.5,
-                      transition: 'border-color 0.15s',
-                      '&:hover': hasCore ? { borderColor: 'primary.main' } : {}
-                    }}
-                  >
-                    <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
-                      <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1 }}>
-                        <Stack direction='row' spacing={1} alignItems='center'>
-                          <i className='tabler-database' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-                          <Typography variant='subtitle2'>
-                            {group.parentKey.length > 40 ? `${group.parentKey.slice(0, 40)}…` : group.parentKey}
-                          </Typography>
+          const coreCount = relevantGroups.filter(g => g.hasCoreDatabases).length
+
+          return (
+            <Box>
+              <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                Se encontraron {discovery.totalDatabases} bases de datos en {relevantGroups.length} grupos relevantes.
+                {coreCount > 0
+                  ? ' Selecciona el grupo que corresponde a este Space.'
+                  : ' Ningún grupo tiene las bases de datos requeridas (Proyectos + Tareas).'}
+              </Typography>
+              <Stack spacing={2}>
+                {relevantGroups.map(group => {
+                  const isSelected = selectedGroup?.parentKey === group.parentKey
+                  const hasCore = group.hasCoreDatabases
+                  const classifiedDbs = group.databases.filter(d => d.classification)
+
+                  // Build display label: prefer groupLabel, fallback to parentKey
+                  const displayLabel = group.groupLabel || group.parentKey
+
+                  return (
+                    <Card
+                      key={group.parentKey}
+                      elevation={0}
+                      onClick={() => { if (hasCore) setSelectedGroup(group) }}
+                      sx={{
+                        border: t => `${isSelected ? 2 : 1}px solid ${isSelected ? t.palette.primary.main : t.palette.divider}`,
+                        cursor: hasCore ? 'pointer' : 'default',
+                        opacity: hasCore ? 1 : 0.5,
+                        transition: 'border-color 0.15s',
+                        '&:hover': hasCore ? { borderColor: 'primary.main' } : {}
+                      }}
+                    >
+                      <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                        <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1 }}>
+                          <Stack direction='row' spacing={1} alignItems='center'>
+                            <i className={hasCore ? 'tabler-folder-check' : 'tabler-folder'} style={{ fontSize: 18, color: hasCore ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-text-secondary)' }} />
+                            <Typography variant='subtitle2'>{displayLabel}</Typography>
+                            <Typography variant='caption' color='text.disabled'>
+                              {classifiedDbs.length} base{classifiedDbs.length !== 1 ? 's' : ''}
+                            </Typography>
+                          </Stack>
+                          <Stack direction='row' spacing={0.5}>
+                            {hasCore && (
+                              <CustomChip round='true' size='small' color='success' variant='tonal' label='Compatible' />
+                            )}
+                            {isSelected && (
+                              <CustomChip round='true' size='small' color='primary' label='Seleccionado' />
+                            )}
+                          </Stack>
                         </Stack>
-                        <Stack direction='row' spacing={0.5}>
-                          {hasCore && (
-                            <CustomChip round='true' size='small' color='success' variant='tonal' label='Compatible' />
-                          )}
-                          {isSelected && (
-                            <CustomChip round='true' size='small' color='primary' label='Seleccionado' />
-                          )}
+                        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                          {classifiedDbs.map(db => (
+                            <CustomChip
+                              key={db.databaseId}
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color='info'
+                              label={`${db.title} (${db.classification})`}
+                            />
+                          ))}
                         </Stack>
-                      </Stack>
-                      <Stack direction='row' spacing={1} flexWrap='wrap'>
-                        {group.databases.map(db => (
-                          <CustomChip
-                            key={db.databaseId}
-                            round='true'
-                            size='small'
-                            variant='tonal'
-                            color={db.classification ? 'info' : 'secondary'}
-                            label={`${db.title}${db.classification ? ` (${db.classification})` : ''}`}
-                          />
-                        ))}
-                      </Stack>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </Stack>
-            <Stack direction='row' justifyContent='space-between' sx={{ mt: 3 }}>
-              <Button variant='tonal' color='secondary' onClick={() => setWizardStep(0)}>
-                Atrás
-              </Button>
-              <Button
-                variant='contained'
-                disabled={!selectedGroup}
-                onClick={() => setWizardStep(2)}
-              >
-                Continuar
-              </Button>
-            </Stack>
-          </Box>
-        )}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </Stack>
+              <Stack direction='row' justifyContent='space-between' sx={{ mt: 3 }}>
+                <Button variant='tonal' color='secondary' onClick={() => setWizardStep(0)}>
+                  Atrás
+                </Button>
+                <Button
+                  variant='contained'
+                  disabled={!selectedGroup}
+                  onClick={() => setWizardStep(2)}
+                >
+                  Continuar
+                </Button>
+              </Stack>
+            </Box>
+          )
+        })()}
 
         {/* Step 2: Confirm and register */}
         {wizardStep === 2 && selectedGroup && (

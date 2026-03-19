@@ -5,6 +5,7 @@ import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMe
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getPersonMemberships } from '@/lib/account-360/organization-store'
 import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import { getPersonHrContext } from '@/lib/person-360/get-person-hr'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
@@ -490,13 +491,33 @@ export const getPersonDetail = async ({
   detail.linkedUserId = resolved?.userId ?? null
 
   tasks.push(
-    getAssignmentsByMember(memberId).then(rows => {
-      detail.summary = buildAssignmentsSummary(rows)
+    (async () => {
+      const rows = await getAssignmentsByMember(memberId)
+
+      // Derive summary only from assignments that have a corresponding membership
+      // so the sidebar stats align with what the Organizations tab shows.
+      let membershipClientIds: Set<string> | null = null
+
+      if (member.identityProfileId) {
+        try {
+          const memberships = await getPersonMemberships(member.identityProfileId)
+
+          membershipClientIds = new Set(memberships.map(m => m.clientId).filter(Boolean) as string[])
+        } catch {
+          // If memberships lookup fails, fall back to all assignments
+        }
+      }
+
+      const summaryRows = membershipClientIds
+        ? rows.filter(r => membershipClientIds!.has(String(r.client_id || '')))
+        : rows
+
+      detail.summary = buildAssignmentsSummary(summaryRows)
 
       if (access.canViewAssignments) {
         detail.assignments = normalizeAssignments(rows)
       }
-    }).catch(error => {
+    })().catch(error => {
       console.warn(`[people/${memberId}] assignments failed:`, error instanceof Error ? error.message : error)
     })
   )

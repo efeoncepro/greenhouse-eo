@@ -14,6 +14,7 @@ import {
   type HubSpotGreenhouseContactProfile
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
+import { getSpaceNotionSourceByClientId } from '@/lib/space-notion/space-notion-store'
 
 type TenantProvisioningContext = {
   clientId: string
@@ -21,6 +22,7 @@ type TenantProvisioningContext = {
   hubspotCompanyId: string | null
   portalHomePath: string | null
   timezone: string | null
+  spaceId: string | null
   notionProjectIds: string[]
 }
 
@@ -100,8 +102,7 @@ const getTenantProvisioningContext = async (clientId: string): Promise<TenantPro
         client_name,
         hubspot_company_id,
         portal_home_path,
-        timezone,
-        notion_project_ids
+        timezone
       FROM \`${projectId}.greenhouse.clients\`
       WHERE client_id = @clientId
       LIMIT 1
@@ -115,17 +116,67 @@ const getTenantProvisioningContext = async (clientId: string): Promise<TenantPro
     return null
   }
 
+  // Resolve project IDs via space_notion_sources (canonical) → notion_ops.proyectos
+  let spaceId: string | null = null
+  let notionProjectIds: string[] = []
+
+  try {
+    const spaceSource = await getSpaceNotionSourceByClientId(clientId)
+
+    if (spaceSource) {
+      spaceId = spaceSource.spaceId
+
+      const [projectRows] = await bigQuery.query({
+        query: `
+          SELECT DISTINCT notion_page_id
+          FROM \`${projectId}.notion_ops.proyectos\`
+          WHERE space_id = @spaceId
+            AND notion_page_id IS NOT NULL
+        `,
+        params: { spaceId }
+      })
+
+      notionProjectIds = (projectRows as Array<Record<string, unknown>>)
+        .map(r => String(r.notion_page_id || '').trim())
+        .filter(Boolean)
+    }
+  } catch {
+    // Non-fatal: fall through to legacy fallback
+  }
+
+  // Legacy fallback: read notion_project_ids from clients table
+  if (notionProjectIds.length === 0 && !spaceId) {
+    try {
+      const [legacyRows] = await bigQuery.query({
+        query: `
+          SELECT notion_project_ids
+          FROM \`${projectId}.greenhouse.clients\`
+          WHERE client_id = @clientId
+          LIMIT 1
+        `,
+        params: { clientId }
+      })
+
+      const legacyRow = (legacyRows as Array<Record<string, unknown>>)[0]
+
+      if (legacyRow && Array.isArray(legacyRow.notion_project_ids)) {
+        notionProjectIds = legacyRow.notion_project_ids
+          .map(item => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean)
+      }
+    } catch {
+      // Non-fatal
+    }
+  }
+
   return {
     clientId: String(row.client_id || ''),
     clientName: String(row.client_name || row.client_id || ''),
     hubspotCompanyId: row.hubspot_company_id ? String(row.hubspot_company_id) : null,
     portalHomePath: row.portal_home_path ? String(row.portal_home_path) : null,
     timezone: row.timezone ? String(row.timezone) : null,
-    notionProjectIds: Array.isArray(row.notion_project_ids)
-      ? row.notion_project_ids
-          .map(item => (typeof item === 'string' ? item.trim() : ''))
-          .filter(Boolean)
-      : []
+    spaceId,
+    notionProjectIds
   }
 }
 

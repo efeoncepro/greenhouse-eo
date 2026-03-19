@@ -267,6 +267,7 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_tasks` 
   task_priority STRING,
   assignee_source_id STRING,
   assignee_member_id STRING,
+  assignee_member_ids ARRAY<STRING>,
   completion_label STRING,
   delivery_compliance STRING,
   days_late INT64,
@@ -536,3 +537,7 @@ ADD COLUMN IF NOT EXISTS owner_member_id STRING;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.crm_contacts`
 ADD COLUMN IF NOT EXISTS owner_member_id STRING;
+
+-- ETL Pipeline Hardening: cycle_time_days needs task creation timestamp from Notion
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;

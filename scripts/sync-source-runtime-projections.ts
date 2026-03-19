@@ -299,6 +299,187 @@ const parseCsvValues = (value: string | null) => {
 const buildPayloadHash = (payload: unknown) =>
   createHash('sha256').update(JSON.stringify(payload)).digest('hex')
 
+// ---------------------------------------------------------------------------
+// Config-driven property mappings (Conformed Data Layer)
+// ---------------------------------------------------------------------------
+
+interface PropertyMapping {
+  notionPropertyName: string
+  conformedFieldName: string
+  notionType: string
+  targetType: string
+  coercionRule: string
+  isRequired: boolean
+  fallbackValue: string | null
+}
+
+const propertyMappingsCache = new Map<string, PropertyMapping[]>()
+
+const loadPropertyMappings = async (spaceId: string): Promise<PropertyMapping[]> => {
+  if (propertyMappingsCache.has(spaceId)) {
+    return propertyMappingsCache.get(spaceId)!
+  }
+
+  try {
+    const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+      `SELECT notion_property_name, conformed_field_name, notion_type, target_type,
+              coercion_rule, is_required, fallback_value
+       FROM greenhouse_delivery.space_property_mappings
+       WHERE space_id = $1`,
+      [spaceId]
+    )
+
+    const mappings: PropertyMapping[] = rows.map(r => ({
+      notionPropertyName: String(r.notion_property_name ?? ''),
+      conformedFieldName: String(r.conformed_field_name ?? ''),
+      notionType: String(r.notion_type ?? ''),
+      targetType: String(r.target_type ?? ''),
+      coercionRule: String(r.coercion_rule ?? 'direct'),
+      isRequired: Boolean(r.is_required),
+      fallbackValue: r.fallback_value != null ? String(r.fallback_value) : null
+    }))
+
+    propertyMappingsCache.set(spaceId, mappings)
+
+    return mappings
+  } catch (error) {
+    console.warn(`[sync] Failed to load property mappings for space ${spaceId}:`, error instanceof Error ? error.message : error)
+    propertyMappingsCache.set(spaceId, [])
+
+    return []
+  }
+}
+
+const applyCoercion = (value: unknown, rule: string, targetType: string): unknown => {
+  if (value === null || value === undefined) return null
+
+  switch (rule) {
+    case 'direct':
+      return castToTargetType(value, targetType)
+
+    case 'formula_to_int':
+    case 'rollup_to_int': {
+      const n = toNumber(value)
+
+      return n != null ? Math.round(n) : null
+    }
+
+    case 'formula_to_float':
+    case 'rollup_to_float':
+      return toNumber(value)
+
+    case 'formula_to_string':
+    case 'rollup_to_string':
+    case 'select_to_string':
+    case 'status_to_string':
+    case 'number_to_string':
+      return toNullableString(value)
+
+    case 'formula_to_bool':
+    case 'checkbox_to_bool':
+      return toBoolean(value)
+
+    case 'extract_number_from_text': {
+      if (typeof value === 'number') return value
+
+      const str = String(value)
+      const match = str.match(/[\d]+\.?[\d]*/)
+
+      return match ? parseFloat(match[0]) : null
+    }
+
+    case 'relation_first_id':
+      return firstCsvValue(toNullableString(value))
+
+    case 'people_first_email': {
+      const str = toNullableString(value)
+
+      return str?.includes(',') ? str.split(',')[0].trim() : str
+    }
+
+    case 'ignore':
+      return undefined
+
+    default:
+      console.warn(`[sync] Unknown coercion rule: '${rule}'. Using direct cast.`)
+
+      return castToTargetType(value, targetType)
+  }
+}
+
+const castToTargetType = (value: unknown, targetType: string): unknown => {
+  switch (targetType.toUpperCase()) {
+    case 'STRING': return toNullableString(value)
+    case 'INTEGER': { const n = toNumber(value); return n != null ? Math.round(n) : null }
+    case 'FLOAT': return toNumber(value)
+    case 'BOOLEAN': return toBoolean(value)
+    case 'TIMESTAMP': return toTimestampValue(value)
+    case 'DATE': return toDateValue(value)
+    default: return toNullableString(value)
+  }
+}
+
+/**
+ * Normalize a Notion property name to the BigQuery column format used by notion-bq-sync:
+ * lowercase, trim, spaces → underscores, dots → underscores, accented chars → ASCII.
+ */
+const normalizeNotionKey = (name: string): string =>
+  name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[\s.]+/g, '_')
+
+/**
+ * Apply config-driven property mappings to a raw Notion row.
+ * Returns a partial record with conformed field names and coerced values.
+ * Only produces the fields that have explicit mappings.
+ */
+const applyPropertyMappings = (
+  rawRow: Record<string, unknown>,
+  mappings: PropertyMapping[]
+): Record<string, unknown> => {
+  const result: Record<string, unknown> = {}
+
+  for (const m of mappings) {
+    const sourceKey = normalizeNotionKey(m.notionPropertyName)
+    let rawValue: unknown = rawRow[sourceKey]
+
+    // Try exact key if normalized didn't match
+    if (rawValue === undefined && sourceKey !== m.notionPropertyName) {
+      for (const key of Object.keys(rawRow)) {
+        if (normalizeNotionKey(key) === sourceKey) {
+          rawValue = rawRow[key]
+          break
+        }
+      }
+    }
+
+    if (rawValue !== null && rawValue !== undefined) {
+      const coerced = applyCoercion(rawValue, m.coercionRule, m.targetType)
+
+      if (coerced !== undefined) {
+        result[m.conformedFieldName] = coerced
+      }
+    } else if (m.fallbackValue != null) {
+      try {
+        result[m.conformedFieldName] = m.fallbackValue === 'null' ? null : JSON.parse(m.fallbackValue)
+      } catch {
+        result[m.conformedFieldName] = m.fallbackValue
+      }
+    } else {
+      if (m.isRequired) {
+        console.warn(`[sync] Required field '${m.conformedFieldName}' missing (source: '${m.notionPropertyName}')`)
+      }
+
+      result[m.conformedFieldName] = null
+    }
+  }
+
+  return result
+}
+
 const INTERNAL_SPACE_IDS = new Set(['space-efeonce'])
 
 const isInternalSpaceId = (spaceId: string | null) => (spaceId ? INTERNAL_SPACE_IDS.has(spaceId) : false)
@@ -617,16 +798,47 @@ const syncNotion = async (): Promise<SyncSummary> => {
       )
     ])
 
-    const clientBindings = await runBigQuery<ClientNotionBindingRow>(
-      `
-        SELECT client_id, client_name, notion_project_ids
-        FROM \`${projectId}.greenhouse.clients\`
-        WHERE notion_project_ids IS NOT NULL
-      `
+    // Primary: resolve space_id via space_notion_sources (canonical, multi-tenant)
+    const spaceNotionSources = await runGreenhousePostgresQuery<{
+      space_id: string
+      notion_db_proyectos: string
+      client_id: string | null
+    }>(
+      `SELECT sns.space_id, sns.notion_db_proyectos, s.client_id
+       FROM greenhouse_core.space_notion_sources sns
+       JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
+       WHERE sns.sync_enabled = TRUE`
     )
 
+    // Map database_id → space_id (each project reports _source_database_id)
+    const databaseSpaceMap = new Map<string, string>()
+    const databaseClientMap = new Map<string, string | null>()
+
+    for (const src of spaceNotionSources) {
+      databaseSpaceMap.set(src.notion_db_proyectos, src.space_id)
+      databaseClientMap.set(src.notion_db_proyectos, src.client_id)
+    }
+
+    // Fallback: legacy clients.notion_project_ids (if no space_notion_sources configured)
+    let preferredSpaceMap: Map<string, string> | null = null
+
+    if (databaseSpaceMap.size === 0) {
+      console.warn('[sync] No space_notion_sources found — falling back to clients.notion_project_ids')
+
+      const clientBindings = await runBigQuery<ClientNotionBindingRow>(
+        `
+          SELECT client_id, client_name, notion_project_ids
+          FROM \`${projectId}.greenhouse.clients\`
+          WHERE notion_project_ids IS NOT NULL
+        `
+      )
+
+      preferredSpaceMap = buildPreferredSpaceMap(clientBindings)
+    } else {
+      console.log(`  🗂️  Space resolution via space_notion_sources: ${spaceNotionSources.length} active source(s)`)
+    }
+
     const nowIso = new Date().toISOString()
-    const preferredSpaceMap = buildPreferredSpaceMap(clientBindings)
 
     const rawProjectRows = projects.map(row => ({
       sync_run_id: syncRunId,
@@ -690,8 +902,13 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const ownerSourceId = row.propietario_ids?.[0] || null
       const projectSourceId = toNullableString(row.notion_page_id)
       const projectDatabaseSourceId = toNullableString(row._source_database_id)
-      const spaceId = projectSourceId ? preferredSpaceMap.get(projectSourceId) || null : null
-      const clientId = spaceId && !isInternalSpaceId(spaceId) ? spaceId : null
+      // Resolve space_id: canonical (database ID → space) or legacy fallback (page ID → space)
+      const spaceId = projectDatabaseSourceId
+        ? (databaseSpaceMap.get(projectDatabaseSourceId) || preferredSpaceMap?.get(projectSourceId!) || null)
+        : (preferredSpaceMap?.get(projectSourceId!) || null)
+      const clientId = spaceId
+        ? (databaseClientMap.get(projectDatabaseSourceId!) || (!isInternalSpaceId(spaceId) ? spaceId : null))
+        : null
 
       return {
         project_source_id: projectSourceId,
@@ -757,6 +974,17 @@ const syncNotion = async (): Promise<SyncSummary> => {
         .filter(([projectSourceId]) => Boolean(projectSourceId))
     )
 
+    // Pre-load property mappings for all known spaces (config-driven conformed layer)
+    const allSpaceIds = [...new Set(projectSpaceMap.values())].filter(Boolean) as string[]
+
+    await Promise.all(allSpaceIds.map(sid => loadPropertyMappings(sid)))
+
+    const spacesWithMappings = allSpaceIds.filter(sid => (propertyMappingsCache.get(sid) ?? []).length > 0)
+
+    if (spacesWithMappings.length > 0) {
+      console.log(`  📋 Config-driven mappings loaded for ${spacesWithMappings.length} space(s): ${spacesWithMappings.join(', ')}`)
+    }
+
     const deliveryTasks = tasks.map(row => {
       const assigneeSourceId = row.responsables_ids?.[0] || null
       const projectSourceId = row.proyecto_ids?.[0] || null
@@ -769,7 +997,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const spaceId = projectSourceId ? projectSpaceMap.get(projectSourceId) || null : null
       const clientId = projectSourceId ? projectClientMap.get(projectSourceId) || null : null
 
-      return {
+      // Default mapping (hardcoded — works for Efeonce and spaces with identical property names)
+      const result = {
         task_source_id: toNullableString(row.notion_page_id),
         project_source_id: projectSourceId,
         sprint_source_id: sprintSourceId,
@@ -777,8 +1006,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
         space_id: spaceId,
         client_source_id: projectDatabaseSourceId,
         client_id: clientId,
-        module_code: null,
-        module_id: null,
+        module_code: null as string | null,
+        module_id: null as string | null,
         task_name: toNullableString(row.nombre_de_tarea) || 'Sin nombre',
         task_status: toNullableString(row.estado),
         task_phase: toNullableString(row.priorización),
@@ -815,8 +1044,24 @@ const syncNotion = async (): Promise<SyncSummary> => {
         payload_hash: buildPayloadHash(row),
         is_deleted: false,
         sync_run_id: syncRunId,
-        synced_at: nowIso
+        synced_at: nowIso,
+        created_at: toTimestampValue(row.created_time)
       }
+
+      // Config-driven override: if this space has property mappings, apply them on top
+      const spaceMappings = spaceId ? (propertyMappingsCache.get(spaceId) ?? []) : []
+
+      if (spaceMappings.length > 0) {
+        const overrides = applyPropertyMappings(row as unknown as Record<string, unknown>, spaceMappings)
+
+        for (const [key, value] of Object.entries(overrides)) {
+          if (key in result) {
+            ;(result as Record<string, unknown>)[key] = value
+          }
+        }
+      }
+
+      return result
     })
 
     const sprintProjectMap = new Map(
@@ -839,8 +1084,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
     const deliverySprints = sprints.map(row => {
       const sprintSourceId = toNullableString(row.notion_page_id)
-      const completedTasksCount = toNumber(row.tareas_completadas)
-      const totalTasksCount = toNumber(row.total_de_tareas)
+      const completedTasksCount = Math.round(toNumber(row.tareas_completadas) ?? 0)
+      const totalTasksCount = Math.round(toNumber(row.total_de_tareas) ?? 0)
 
       const projectDatabaseSourceId =
         (sprintSourceId ? sprintProjectDatabaseMap.get(sprintSourceId) || null : null) ||
@@ -867,24 +1112,31 @@ const syncNotion = async (): Promise<SyncSummary> => {
       }
     })
 
-    await Promise.all([
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_projects\``,
-        location: bigQueryLocation
-      }),
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\``,
-        location: bigQueryLocation
-      }),
-      bigQuery.query({
-        query: `TRUNCATE TABLE \`${projectId}.greenhouse_conformed.delivery_sprints\``,
-        location: bigQueryLocation
-      })
-    ])
+    // Safe DELETE pattern: only delete if we have data to replace.
+    // Uses DELETE WHERE TRUE (DML) instead of TRUNCATE (DDL) for BigQuery snapshot safety.
+    // If notion_ops returned zero tasks, skip the delete to preserve existing conformed data.
+    if (deliveryTasks.length === 0) {
+      console.warn('[sync] No delivery tasks found — skipping conformed write to preserve existing data')
+    } else {
+      await Promise.all([
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE`,
+          location: bigQueryLocation
+        }),
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` WHERE TRUE`,
+          location: bigQueryLocation
+        }),
+        bigQuery.query({
+          query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_sprints\` WHERE TRUE`,
+          location: bigQueryLocation
+        })
+      ])
 
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
-    await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
+      await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+    }
 
     let projected = 0
 
@@ -993,7 +1245,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11, $12, $13, $14::timestamptz, $15::timestamptz, $16, $17)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9::date, $10, $11, $12, $13, $14, $15::timestamptz, $16::timestamptz, $17, $18)
           ON CONFLICT (notion_sprint_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -1089,7 +1341,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35::date, $36, $37, $38, $39, $40, $41::date, $42::timestamptz, $43, $44, $45::timestamptz, $46::timestamptz, $47, $48)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34::date, $35, $36, $37, $38, $39::date, $40::timestamptz, $41, $42, $43::timestamptz, $44::timestamptz, $45, $46)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,

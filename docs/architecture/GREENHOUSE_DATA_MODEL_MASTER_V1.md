@@ -199,6 +199,7 @@ Current tables:
 - `projects`
 - `sprints`
 - `tasks`
+- `space_property_mappings` — config table for per-Space Notion property → conformed field mappings
 
 Important fields:
 - `notion_project_id`
@@ -210,6 +211,12 @@ Core rule:
 - one `Notion project database` belongs to one tenant delivery workspace
 - that database contains project rows, tasks and sprints
 - a `Notion project page` is not the tenant; it is a delivery object inside the tenant workspace
+
+`space_property_mappings` enables config-driven normalization:
+- stores how each Space's Notion property names map to conformed field names
+- includes type coercion rules (16 built-in rules for handling Notion type heterogeneity)
+- Spaces without entries use hardcoded default mapping (backward compatible)
+- populated via `scripts/notion-schema-discovery.ts` during Space onboarding
 
 ### `greenhouse_sync`
 
@@ -279,7 +286,7 @@ Normalized external entities.
 
 Current tables:
 - `delivery_projects`
-- `delivery_tasks`
+- `delivery_tasks` — includes `assignee_member_id STRING` (first Notion responsable resolved to Greenhouse member ID) and `assignee_member_ids ARRAY<STRING>` (all Notion responsables resolved; enables person-level ICO metrics via UNNEST)
 - `delivery_sprints`
 - `crm_companies`
 - `crm_deals`
@@ -287,6 +294,30 @@ Current tables:
 
 Required next slice:
 - if needed, `crm_company_contacts`
+
+### `ico_engine`
+
+Analytical materialization layer for ICO metrics. BigQuery-native (correct per architecture — analytical, not OLTP). Managed by `ensureIcoEngineInfrastructure()` in `src/lib/ico-engine/schema.ts`.
+
+Current tables:
+- `metric_snapshots_monthly` — space-level monthly aggregates (partitioned by year, clustered by space_id)
+- `metrics_by_project` — project-level monthly aggregates (clustered by space_id, project_source_id)
+- `metrics_by_member` — person-level monthly aggregates via UNNEST(assignee_member_ids) (clustered by member_id)
+- `rpa_trend` — 12-month rolling RPA by space and month
+- `stuck_assets_detail` — currently stuck assets (severity: warning 72h / danger 96h)
+- `ai_metric_scores` — reserved for future AI-driven metric scoring (empty)
+- `status_phase_config` — configurable task_status → CSC phase mapping per space
+
+Current views:
+- `v_tasks_enriched` — enriched view on `greenhouse_conformed.delivery_tasks` adding: `fase_csc`, `cycle_time_days`, `hours_since_update`, `is_stuck`, `delivery_signal`, `assignee_member_ids` (with fallback for legacy single-assignee rows)
+- `v_metric_latest` — latest snapshot per space
+
+Architecture:
+- All metric formulas defined ONCE in `buildMetricSelectSQL()` (shared.ts)
+- Context-agnostic: `ICO_DIMENSIONS` allowlist maps dimension keys (space, project, member, client, sprint) to column names
+- `computeMetricsByContext(dimension, value, year, month)` provides live compute for any dimension
+- Materialized tables serve as cache; live compute falls back when cache is empty
+- Member dimension uses `UNNEST(assignee_member_ids)` to credit all assignees (no double-counting for other dimensions)
 
 ### `greenhouse_marts`
 

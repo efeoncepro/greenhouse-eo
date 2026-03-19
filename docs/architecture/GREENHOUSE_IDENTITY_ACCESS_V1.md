@@ -1,5 +1,15 @@
 # Greenhouse Identity and Access V1
 
+> **Status: Superseded** — This document describes the V1 identity and access design (BigQuery-based).
+> The active implementation is migrating to V2 (PostgreSQL-first) documented in `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+> Key differences in V2:
+> - Auth store moved from BigQuery to PostgreSQL (greenhouse_core)
+> - Route groups expanded: client, admin, internal, finance, hr, people, agency
+> - No middleware.ts — protection is layout-level
+> - Roles are composable not hierarchical
+> - efeonce_admin as universal override
+> - TenantContext includes spaceId, organizationId from Account 360
+
 ## Purpose
 
 This document is the implementation design for Phase 1 of Greenhouse Architecture V1.

@@ -134,7 +134,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
             <TabPanel value='activity' className='p-0'>
               {activeTab === 'activity' && (
-                <PersonActivityTab metrics={detail.operationalMetrics} />
+                <PersonActivityTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 

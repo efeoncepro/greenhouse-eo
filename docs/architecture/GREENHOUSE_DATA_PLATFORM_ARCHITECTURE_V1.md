@@ -101,6 +101,13 @@ Rules:
 - unify naming and types
 - centralize source cleanup logic instead of repeating it in endpoints
 
+Implementation status (2026-03-18):
+- `greenhouse_conformed.delivery_tasks` — fully implemented, config-driven property mappings
+- `greenhouse_conformed.crm_companies` / `crm_deals` — implemented via HubSpot sync
+- Property normalization is **config-driven**: `greenhouse_delivery.space_property_mappings` (Postgres) stores per-Space property name → conformed field mappings with type coercion rules
+- Spaces without explicit config fall back to hardcoded default mapping (backward compatible)
+- See `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` § "Conformed Data Layer" for full details
+
 ### Layer C. Core / Canonical
 
 Purpose:
@@ -147,6 +154,12 @@ Examples:
 - finance marts
 - payroll marts
 - capability-level operational views
+- ICO Engine materialized tables (`ico_engine` dataset):
+  - `metric_snapshots_monthly` — space-level
+  - `metrics_by_project` — project-level
+  - `metrics_by_member` — person-level (via multi-assignee UNNEST)
+  - `rpa_trend`, `stuck_assets_detail`
+  - All metric formulas defined ONCE in `buildMetricSelectSQL()`; context-agnostic via `ICO_DIMENSIONS` allowlist
 
 Rules:
 - read-optimized only
@@ -332,16 +345,26 @@ Provisioned runtime:
 Initial database objects created:
 - database: `greenhouse_app`
 - application user: `greenhouse_app`
+- migration user: `greenhouse_migrator_user` (DDL permissions)
 - canonical PostgreSQL schemas:
   - `greenhouse_core`
   - `greenhouse_serving`
   - `greenhouse_sync`
+  - `greenhouse_delivery`
+  - `greenhouse_hr`
+  - `greenhouse_finance`
+  - `greenhouse_crm`
 - initial serving views:
   - `client_360`
   - `member_360`
   - `provider_360`
   - `user_360`
   - `client_capability_360`
+- delivery projection tables:
+  - `greenhouse_delivery.tasks` — runtime projection of conformed delivery tasks
+  - `greenhouse_delivery.projects` — runtime projection of conformed delivery projects
+  - `greenhouse_delivery.sprints` — runtime projection of conformed delivery sprints
+  - `greenhouse_delivery.space_property_mappings` — config table for per-Space Notion property → conformed field mappings (added 2026-03-18)
 
 Initial secret material stored in Secret Manager:
 - `greenhouse-pg-dev-postgres-password`
@@ -380,3 +403,56 @@ When this architecture is adopted:
 - BigQuery becomes simpler and cheaper to reason about
 - 360 views become safer because they are built from stable canonical data, not ad hoc runtime joins
 - the platform can scale with clearer boundaries between operations and analytics
+
+## Runtime Reality Notes (March 2026)
+
+### Confirmed Operational
+- PostgreSQL instance `greenhouse-pg-dev` deployed (Postgres 16, us-east4, db-custom-1-3840)
+- Database: `greenhouse_app` with schemas: greenhouse_core, greenhouse_serving, greenhouse_sync, greenhouse_hr, greenhouse_payroll, greenhouse_finance, greenhouse_delivery, greenhouse_crm, greenhouse_ai
+- Outbox consumer operational (Vercel cron every 5 min, publishes to `greenhouse_raw.postgres_outbox_events`)
+- Outbox marts deployed: `greenhouse_marts` with 5 views (fin_accounts, fin_expenses, payroll_entries from outbox)
+- `greenhouse_raw` dataset exists with 11 tables (Notion + HubSpot snapshots + outbox events)
+- `greenhouse_conformed` dataset has 6 tables (delivery_projects/tasks/sprints, crm_companies/deals/contacts) — all partitioned + clustered
+
+### Migration Status by Module
+| Module | Postgres-First | BigQuery Fallback | Notes |
+|--------|---------------|-------------------|-------|
+| Finance — Income/Expenses | ✅ | ✅ | Dual-store operational |
+| Finance — Accounts/Suppliers | ❌ | Primary | Still BigQuery-only in API routes |
+| Finance — Reconciliation | ❌ | Primary | BigQuery-only |
+| Finance — Exchange Rates | ❌ | Primary | BigQuery + Vercel cron sync |
+| Finance — Intelligence | ❌ | Primary | BigQuery analytical queries |
+| HR Payroll | ✅ | ✅ | Postgres-first for periods, entries, compensation |
+| HR Core (leave, attendance) | ✅ (Postgres) | ✅ (BigQuery schema bootstrap) | Mixed: leave store is Postgres, schema.ts bootstraps BigQuery tables |
+| AI Tooling | ✅ | ✅ | Postgres-primary with BigQuery fallback |
+| Account 360 | ✅ | ❌ | Postgres-only |
+| Team Admin | ✅ | ❌ | Postgres-only |
+| ICO Engine | ❌ | Primary | BigQuery-only (analytical, correct per architecture) |
+| Dashboard | ❌ | Primary | BigQuery-only (read model) |
+| People | ❌ | Primary | BigQuery for list/detail queries |
+| Projects/Sprints | ❌ | Primary | BigQuery (notion_ops legacy + greenhouse_conformed) |
+
+### Legacy Dataset Status
+- `hubspot_crm` (35 tables): Still actively read by Finance client queries and dashboard. Target: migrate to greenhouse_conformed.crm_* + Postgres projections
+- `notion_ops` (10 tables): Still actively read by delivery/project queries and ICO Engine. Target: migrate to greenhouse_conformed.delivery_*
+- `greenhouse` dataset (41 tables): Mix of canonical tables and operational tables. Some should migrate to Postgres, others remain as BigQuery source of truth
+
+### External Sync Pipeline Infrastructure
+7 Cloud Functions/Cloud Run services in us-central1:
+- notion-bq-sync (Cloud Run, daily 3AM CL)
+- hubspot-bq-sync (Cloud Function, daily 3:30AM CL)
+- hubspot-notion-deal-sync (Cloud Function, every 15min)
+- notion-hubspot-reverse-sync (Cloud Function, every 15min)
+- notion-frameio-sync (Cloud Function, on-demand)
+- notion-teams-notify (Cloud Function, on-demand)
+- hubspot-greenhouse-integration (Cloud Run, on-demand)
+
+4 active Cloud Scheduler jobs + 2 paused staging jobs orchestrating the above.
+
+4 Vercel Crons (in-app):
+- `/api/cron/outbox-publish` — every 5 min (Postgres outbox → BigQuery)
+- `/api/cron/sync-conformed` — daily 3:45 AM UTC (notion_ops → greenhouse_conformed, automated since 2026-03-18)
+- `/api/cron/ico-materialize` — daily 6:15 AM UTC (conformed → ICO Engine snapshots)
+- `/api/finance/exchange-rates/sync` — daily 11:05 PM UTC
+
+Automated pipeline: notion-bq-sync (3:00 AM) → sync-conformed (3:45 AM) → ico-materialize (6:15 AM)

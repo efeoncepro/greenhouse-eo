@@ -21,24 +21,92 @@ La metáfora del Greenhouse se aplica en **dos capas con reglas distintas:**
 
 ---
 
-## 2. Navegación principal (Sidebar)
+## 2. Navegación principal (Sidebar) y mapa de rutas
 
-| Ruta técnica | Nombre actual (spec v1) | Nombre Greenhouse | Icono sugerido | Subtítulo en sidebar |
-|---|---|---|---|---|
-| `/dashboard` | Dashboard | **Pulse** | Actividad / pulso | Vista general de tu operación |
-| `/proyectos` | Proyectos | **Proyectos** | Carpeta / grid | Proyectos activos |
-| `/proyectos/[id]` | Detalle de proyecto | **[Nombre del proyecto]** | — | — |
-| `/sprints` | Sprints | **Ciclos** | Reloj circular | Sprints de producción |
-| `/settings` | Settings | **Mi Greenhouse** | Invernadero / gear | Perfil y preferencias |
-| *(P2)* Notificaciones | — | **Updates** | Campana | Novedades del ecosistema |
+### 2.1 Rutas client-facing (visibles para roles client)
 
-**Decisiones de naming:**
+| Ruta técnica | Nombre Greenhouse | Icono sugerido | Subtítulo en sidebar |
+|---|---|---|---|
+| `/dashboard` | **Pulse** | Actividad / pulso | Vista general de tu operación |
+| `/proyectos` | **Proyectos** | Carpeta / grid | Proyectos activos |
+| `/proyectos/[id]` | **[Nombre del proyecto]** | — | — |
+| `/sprints` | **Ciclos** | Reloj circular | Sprints de producción |
+| `/sprints/[id]` | **[Nombre del sprint]** | — | — |
+| `/updates` | **Actualizaciones** | Campana | Activity feed |
+| `/settings` | **Configuración** | Gear | Perfil y preferencias |
+| `/capabilities/[moduleId]` | **[Nombre del módulo]** | Dinámico por módulo | Módulo de capability dinámico |
+
+### 2.2 Rutas finance (requiere finance route group)
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/finance` | **Finanzas** | Dashboard financiero |
+| `/finance/clients` | **Clientes** | — |
+| `/finance/income` | **Ingresos** | — |
+| `/finance/expenses` | **Egresos** | — |
+| `/finance/suppliers` | **Proveedores** | — |
+| `/finance/reconciliation` | **Conciliación** | — |
+| `/finance/intelligence` | **Inteligencia financiera** | — |
+
+### 2.3 Rutas HR (requiere hr route group)
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/hr` | **Recursos Humanos** | Dashboard HR |
+| `/hr/payroll` | **Nómina** | — |
+| `/hr/departments` | **Departamentos** | — |
+| `/hr/leave` | **Ausencias** | — |
+| `/hr/attendance` | **Asistencia** | — |
+
+### 2.4 Rutas people
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/people` | **Personas** | Team directory |
+| `/people/[memberId]` | **Person 360** | Detalle de persona |
+
+### 2.5 Rutas agency (requiere internal/admin)
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/agency` | **Agency** | Workspace de agencia |
+| `/agency/organizations` | **Organizaciones** | — |
+| `/agency/organizations/[id]` | **[Nombre de organización]** | Detalle de organización |
+| `/agency/services` | **Servicios** | — |
+
+### 2.6 Rutas admin
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/admin/tenants` | **Espacios** | Gestión de tenants |
+| `/admin/users` | **Usuarios** | — |
+| `/admin/roles` | **Roles** | — |
+| `/admin/ai-tools` | **AI Tools** | — |
+| `/admin/team` | **Equipo** | Gestión de equipo interno |
+
+### 2.7 Rutas internal
+
+| Ruta técnica | Nombre Greenhouse | Notas |
+|---|---|---|
+| `/internal/dashboard` | **Control Tower** | Dashboard operativo interno |
+
+### 2.8 Rutas eliminadas
+
+Las siguientes rutas referenciadas en documentos anteriores **no existen** en el sistema actual y no deben implementarse:
+
+| Ruta eliminada | Reemplazada por | Nota |
+|---|---|---|
+| `/entrega` | N/A | No existe como ruta standalone |
+| `/campanas` | N/A | No existe como ruta standalone |
+| `/equipo` | `/people` (directory) y `/admin/team` (gestión) | La funcionalidad de equipo se divide entre people y admin |
+
+### 2.9 Decisiones de naming
 
 - **Pulse** se mantiene: es terminología real de dashboards operativos ("pulse check", "pulse report"). No suena infantil, suena tech.
 - **Proyectos** vuelve a su nombre funcional. El cliente busca "sus proyectos", no "sus cultivos". El nombre del proyecto real siempre es visible tal cual lo nombró el cliente.
 - **Ciclos** funciona bien como reemplazo de "Sprints" porque es más accesible para un perfil de marketing que no vive en Scrum, y coincide con la metáfora de "ciclos de cultivo" sin forzarla.
-- **Mi Greenhouse** es el único nombre 100% metafórico en el sidebar — apropiado porque settings es la sección más personal y menos operativa.
-- **Updates** en vez de "Novedades" porque es el spanglish natural del equipo y los clientes.
+- **Configuración** reemplaza "Mi Greenhouse" para alinear con la nomenclatura funcional del sistema expandido.
+- **Actualizaciones** en `/updates` es el activity feed del sistema.
 
 **Nota para implementación:** El subtítulo en sidebar aparece en texto secundario (gris, font-size menor) debajo del label principal. Puede ocultarse en sidebar colapsado.
 
@@ -230,8 +298,14 @@ Referencia rápida para agentes de desarrollo.
 | Pulse | Dashboard (`/dashboard`) | Sidebar, título de página |
 | Proyectos | Proyectos (`/proyectos`) | Sidebar, títulos, breadcrumbs |
 | Ciclo / Ciclos | Sprint / Sprints (`/sprints`) | Sidebar, títulos, charts |
-| Mi Greenhouse | Settings (`/settings`) | Sidebar, título de página |
-| Updates | Notificaciones (P2) | Sidebar |
+| Configuración | Settings (`/settings`) | Sidebar, título de página |
+| Actualizaciones | Activity feed (`/updates`) | Sidebar |
+| Personas | Team directory (`/people`) | Sidebar, título de página |
+| Finanzas | Finance (`/finance`) | Sidebar (route group: finance) |
+| Recursos Humanos | HR (`/hr`) | Sidebar (route group: hr) |
+| Agency | Agency workspace (`/agency`) | Sidebar (route group: internal/admin) |
+| Control Tower | Internal dashboard (`/internal/dashboard`) | Sidebar (route group: internal) |
+| Espacios | Tenants (`/admin/tenants`) | Admin section |
 | Assets | Tareas (`notion_ops.tareas`) | Tablas, KPI cards |
 | Rondas | `frame_versions` | Columna de tabla |
 | Feedback | `frame_comments` / `open_frame_comments` | Columna de tabla, KPI card |

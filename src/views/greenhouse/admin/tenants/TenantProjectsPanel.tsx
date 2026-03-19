@@ -20,7 +20,6 @@ import CustomChip from '@core/components/mui/Chip'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantProjectRow } from '@/lib/admin/get-admin-tenant-detail'
 import TenantDetailEmptyState from '@views/greenhouse/admin/tenants/TenantDetailEmptyState'
-import TenantNotionPanel from '@views/greenhouse/admin/tenants/TenantNotionPanel'
 
 type Props = {
   clientId: string
@@ -31,11 +30,6 @@ type Props = {
 const TenantProjectsPanel = ({ clientId, clientName, projects }: Props) => {
   return (
     <Grid container spacing={6}>
-      {/* Notion integration status */}
-      <Grid size={{ xs: 12 }}>
-        <TenantNotionPanel clientId={clientId} clientName={clientName} />
-      </Grid>
-
       <Grid size={{ xs: 12 }}>
         <Stack direction={{ xs: 'column', md: 'row' }} gap={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'center' }}>
           <div>

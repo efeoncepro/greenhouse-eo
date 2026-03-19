@@ -68,7 +68,13 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Todo cambio debe intentar validar al menos una de estas rutas:
   - `pnpm build`
   - `pnpm lint`
+  - `pnpm test`
   - prueba manual local o en preview de Vercel
+- Baseline vigente de unit tests:
+  - `Vitest` es el framework canonico para tests unitarios del repo.
+  - Para tests de componentes React, usar `Vitest + Testing Library + jsdom`, no introducir otro runner sin una razon fuerte.
+  - El helper canonico de render para UI es `src/test/render.tsx`.
+  - Priorizar tests unitarios en logica de dominio (`src/lib/**`) y componentes UI compartidos antes de sumar suites mas pesadas.
 - Si no se pudo validar, registrar exactamente que no se valido y por que en `Handoff.md`.
 
 ### 6. Regla de despliegue
