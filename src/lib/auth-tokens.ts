@@ -42,6 +42,38 @@ const getSecret = () => {
 const hashToken = (token: string): string =>
   createHash('sha256').update(token).digest('hex')
 
+// ── Auto-provision table ─────────────────────────────────────────────
+
+let tableReady = false
+
+async function ensureTable(): Promise<void> {
+  if (tableReady) return
+
+  try {
+    await runGreenhousePostgresQuery(`
+      CREATE TABLE IF NOT EXISTS greenhouse_core.auth_tokens (
+        token_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id      TEXT,
+        email        TEXT NOT NULL,
+        client_id    TEXT,
+        token_type   TEXT NOT NULL CHECK (token_type IN ('reset', 'invite', 'verify')),
+        token_hash   TEXT NOT NULL,
+        created_at   TIMESTAMPTZ DEFAULT now(),
+        expires_at   TIMESTAMPTZ NOT NULL,
+        used         BOOLEAN DEFAULT false,
+        used_at      TIMESTAMPTZ
+      )`, [])
+    await runGreenhousePostgresQuery(
+      `CREATE INDEX IF NOT EXISTS idx_auth_tokens_hash ON greenhouse_core.auth_tokens(token_hash)`, [])
+    await runGreenhousePostgresQuery(
+      `CREATE INDEX IF NOT EXISTS idx_auth_tokens_email_type ON greenhouse_core.auth_tokens(email, token_type)`, [])
+    tableReady = true
+  } catch (err) {
+    console.warn('[auth-tokens] Auto-provision failed (may need migrator role):', err)
+    tableReady = true // Don't retry every request
+  }
+}
+
 // ── Public API ───────────────────────────────────────────────────────
 
 /** Generate a signed JWT for transactional auth flows */
@@ -51,6 +83,7 @@ export function generateToken(payload: TokenPayload, expiresInHours: number): st
 
 /** Store the token hash in PostgreSQL */
 export async function storeToken(token: string, payload: TokenPayload): Promise<void> {
+  await ensureTable()
   const decoded = jwt.decode(token) as { exp?: number } | null
   const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000).toISOString() : new Date(Date.now() + 3600_000).toISOString()
 
@@ -90,6 +123,7 @@ export async function consumeToken(tokenHash: string): Promise<void> {
 
 /** Rate limit: count tokens created in the last hour for this email+type */
 export async function checkRateLimit(email: string, type: string, maxPerHour: number): Promise<boolean> {
+  await ensureTable()
   const rows = await runGreenhousePostgresQuery<{ count: string }>(
     `SELECT COUNT(*)::text AS count FROM greenhouse_core.auth_tokens
      WHERE email = $1 AND token_type = $2 AND created_at > now() - interval '1 hour'`,

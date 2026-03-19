@@ -37,7 +37,7 @@ export default function AcceptInvitePage() {
       return
     }
 
-    fetch('/api/auth/validate-token', {
+    fetch('/api/account/validate-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token })
@@ -67,7 +67,7 @@ export default function AcceptInvitePage() {
     setError(null)
 
     try {
-      const res = await fetch('/api/auth/accept-invite', {
+      const res = await fetch('/api/account/accept-invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password })
