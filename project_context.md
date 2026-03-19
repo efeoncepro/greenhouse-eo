@@ -40,7 +40,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Users` debe evolucionar hacia la vista de acceso/permisos del mismo perfil
   - ambas superficies deben reconciliarse sobre `identity_profile_id`
 - Se creó la lane activa:
-  - `docs/tasks/to-do/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+  - `docs/tasks/to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md`
 - Esto no reemplaza `Identity & Access V2`; lo complementa como capa de modelo y serving sobre persona.
 
 ## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
@@ -572,7 +572,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la parte de capacidad no debe tratarse todavía como cerrada
 - Regla operativa derivada:
   - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como brief histórico
-  - `docs/tasks/to-do/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task vigente para cierre 360 del colaborador
+  - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v3.md` queda como cierre fundacional de la surface
+  - `docs/tasks/to-do/CODEX_TASK_People_360_Enrichments_v1.md` pasa a ser la task vigente para enrichments 360 del colaborador
   - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como brief histórico/fundacional
   - `docs/tasks/to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
 

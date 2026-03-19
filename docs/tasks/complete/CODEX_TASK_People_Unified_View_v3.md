@@ -1,5 +1,21 @@
 # CODEX TASK — People Unified View: Collaborator 360 Runtime Closure (v3)
 
+## Estado 2026-03-19
+
+Esta task se considera cerrada para su alcance fundacional.
+
+Quedó resuelto:
+- surface `People` viva en runtime
+- detalle de colaborador
+- tabs operativas base
+- integración con `Admin Team`
+- enrichments iniciales de capacity, payroll y finance summary
+
+Lo pendiente ya no es "cerrar People", sino ampliar enrichments cross-module:
+- `docs/tasks/to-do/CODEX_TASK_People_360_Enrichments_v1.md`
+
+---
+
 ## Resumen
 
 `People` ya existe como módulo real en Greenhouse. Esta `v3` no busca rediseñarlo desde cero, sino cerrarlo como superficie 360 del colaborador sobre el runtime actual del repo.

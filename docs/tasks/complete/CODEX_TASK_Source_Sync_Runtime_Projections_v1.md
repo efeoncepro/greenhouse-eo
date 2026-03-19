@@ -1,5 +1,24 @@
 # CODEX TASK — Source Sync Runtime Projections (v1)
 
+## Estado 2026-03-19
+
+Esta task se considera cerrada para su alcance fundacional.
+
+Quedó resuelto:
+- control plane en `greenhouse_sync`
+- `raw` poblado
+- `greenhouse_conformed` materializado
+- proyecciones runtime en `greenhouse_crm` y `greenhouse_delivery`
+- seeds reales ejecutados y documentados
+
+El trabajo pendiente ya no vive como una lane separada de source sync, sino distribuido en tasks consumidoras:
+- `Tenant Notion Mapping`
+- `Finance PostgreSQL Runtime Migration`
+- `HR Payroll PostgreSQL Runtime Migration`
+- cutovers de consumers específicos
+
+---
+
 ## Resumen
 
 Esta task abre la lane de pipelines reales para desacoplar el portal de lecturas live a `Notion` y `HubSpot`.

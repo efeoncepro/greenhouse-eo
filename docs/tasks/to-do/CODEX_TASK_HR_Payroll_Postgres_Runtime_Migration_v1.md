@@ -167,7 +167,7 @@ Depende de:
 
 Puede avanzar en paralelo con:
 - `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
-- `CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
+- `docs/tasks/complete/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
 
 ## Entregables esperados
 

@@ -1,5 +1,20 @@
 # CODEX TASK — Person 360 Profile Unification (v1)
 
+## Estado 2026-03-19
+
+Esta task se considera cerrada para su alcance fundacional.
+
+Quedó resuelto:
+- `identity_profile` como ancla canónica de persona
+- `greenhouse_serving.person_360` materializado
+- auditoría real de reconciliación
+- backbone inicial entre `member`, `client_user` y `crm_contact`
+
+Lo pendiente queda concentrado en:
+- `docs/tasks/to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md`
+
+---
+
 ## Resumen
 
 Greenhouse ya tiene piezas reales de identidad, pero sigue mostrando a la misma persona como si fueran objetos distintos en superficies distintas:
