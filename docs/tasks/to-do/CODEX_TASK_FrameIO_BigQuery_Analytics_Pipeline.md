@@ -1,5 +1,18 @@
 # CODEX_TASK: Frame.io → BigQuery Analytics Pipeline
 
+## Estado 2026-03-19
+
+Este brief sigue capturando bien el problema de negocio y el gap real de data para `Creative Hub` e `ICO`, pero ya no debe implementarse literalmente como baseline tecnica del proyecto.
+
+Usar como referencia activa:
+- `docs/tasks/to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md`
+
+Guardrails obligatorios antes de implementar:
+- no crear `greenhouse_conformed.tasks_enriched` como nueva surface paralela de tareas
+- no tratar BigQuery como control plane primario de `space -> Frame.io project`
+- no reintroducir `UUID` ni `greenhouse_core.spaces(id)` en una zona que ya viene migrando a `TEXT` + `space_id`
+- cualquier enrichment de Frame.io debe entrar por el contrato vigente de `delivery_tasks` y/o `ico_engine.v_tasks_enriched`
+
 ## Meta
 
 | Campo | Valor |

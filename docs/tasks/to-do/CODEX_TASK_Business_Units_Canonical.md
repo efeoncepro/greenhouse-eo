@@ -1,5 +1,24 @@
 # CODEX TASK — Business Units: Dimension Table Canónica y Sinergias Cross-System
 
+## Estado 2026-03-19
+
+Este brief se conserva como framing del problema de negocio y de la necesidad de normalizar Business Units en Greenhouse.
+
+Para implementación nueva y decisiones técnicas, usar como baseline:
+- `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical_v2.md`
+
+En particular, no implementar literalmente desde esta versión:
+- una segunda identidad canónica de catálogo que compita con `service_modules`
+- `lead_person_id UUID` apuntando a `persons(id)` legacy
+- enum PostgreSQL duplicado del mismo catálogo si la fuente de verdad ya es tabular
+- una sola semántica de BU mezclando sin distinguir BU comercial y BU operativa
+
+Ante conflicto, prevalecen:
+- `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical_v2.md`
+
 ## Resumen
 
 Crear el objeto **Business Unit** como tabla de referencia canónica en Greenhouse y conectarlo con HubSpot (origen comercial), Notion (operación creativa) y BigQuery (analytics conformed). El objetivo es eliminar los strings mágicos dispersos en 5+ tablas y establecer una fuente de verdad única con FKs validadas que habilite P&L por BU, métricas ICO por BU, y cost allocation por BU.
