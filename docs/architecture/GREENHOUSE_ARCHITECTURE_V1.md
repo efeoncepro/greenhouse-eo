@@ -495,6 +495,36 @@ Reference: `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 | Cloud Run (10 services) | us-central1 | Sync pipelines and integrations |
 | Cloud Scheduler (6 jobs) | — | 4 active, 2 paused (staging) |
 
+## Testing
+
+Vitest con `@testing-library/react` para unit tests de funciones puras.
+
+### Config
+
+- `vitest.config.ts` — environment `node`, path aliases (`@/`, `@core/`, etc.)
+- `src/test/setup.ts` — mock `server-only`, jest-dom matchers
+- `src/test/render.tsx` — `renderWithTheme()` helper (MUI ThemeProvider)
+
+### Convenciones
+
+- Tests co-located: `foo.ts` → `foo.test.ts` en el mismo directorio
+- Solo se testean **funciones puras** que no dependen de DB o servicios externos
+- No mockear BigQuery ni Postgres — si la función necesita la DB, no es candidata a unit test
+
+### Cobertura actual
+
+| Suite | Módulo | Qué valida |
+|-------|--------|------------|
+| `bonus-proration.test.ts` | `src/lib/payroll/` | Prorrateo OTD% y RPA para cálculo de bonos |
+| `fetch-attendance-for-period.test.ts` | `src/lib/payroll/` | Conteo de días hábiles |
+
+### Ejecución
+
+```bash
+npx vitest run        # una vez (~1s)
+npx vitest --watch    # modo watch durante desarrollo
+```
+
 ## Decisions Locked By This Document
 
 - Greenhouse is not a second Notion — project, task, and sprint views are context views, not primary workflow views
