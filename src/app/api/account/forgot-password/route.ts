@@ -9,6 +9,43 @@ import PasswordResetEmail from '@/emails/PasswordResetEmail'
 
 const GENERIC_MESSAGE = 'Si tu email está registrado, recibirás un enlace para restablecer tu contraseña.'
 
+// Domain aliases — emails on these domains are interchangeable for lookup.
+// The first domain in each group is the primary (deliverable) domain.
+const DOMAIN_ALIAS_GROUPS: string[][] = [
+  ['efeoncepro.com', 'efeonce.org'],
+]
+
+/** Given an email, return all alias variants to search for */
+function expandEmailAliases(email: string): string[] {
+  const [local, domain] = email.split('@')
+  const aliases = [email]
+
+  for (const group of DOMAIN_ALIAS_GROUPS) {
+    if (group.includes(domain)) {
+      for (const d of group) {
+        const variant = `${local}@${d}`
+
+        if (variant !== email) aliases.push(variant)
+      }
+    }
+  }
+
+  return aliases
+}
+
+/** Given a user email, resolve the best deliverable address */
+function resolveDeliverableEmail(email: string): string {
+  const [, domain] = email.split('@')
+
+  for (const group of DOMAIN_ALIAS_GROUPS) {
+    if (group.includes(domain) && group[0] !== domain) {
+      return email.replace(`@${domain}`, `@${group[0]}`)
+    }
+  }
+
+  return email
+}
+
 export async function POST(request: Request) {
   try {
     const { email } = await request.json()
@@ -29,7 +66,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Lookup user in PostgreSQL
+    // Lookup user in PostgreSQL — expand aliases to match across domains
+    const emailVariants = expandEmailAliases(normalizedEmail)
+    const placeholders = emailVariants.map((_, i) => `$${i + 1}`).join(', ')
+
     const users = await runGreenhousePostgresQuery<{
       user_id: string
       email: string
@@ -38,9 +78,9 @@ export async function POST(request: Request) {
     }>(
       `SELECT user_id, email, full_name, client_id
        FROM greenhouse_core.client_users
-       WHERE LOWER(email) = $1 AND status = 'active'
+       WHERE LOWER(email) IN (${placeholders}) AND status = 'active'
        LIMIT 1`,
-      [normalizedEmail]
+      emailVariants
     )
 
     const user = users[0]
@@ -62,16 +102,19 @@ export async function POST(request: Request) {
 
       const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/reset-password?token=${token}`
 
+      // Send to the deliverable domain, not the stored one (which may lack MX)
+      const deliverableEmail = resolveDeliverableEmail(user.email)
+
       try {
         const result = await resend.emails.send({
           from: EMAIL_FROM,
-          to: user.email,
+          to: deliverableEmail,
           subject: 'Restablece tu contraseña — Greenhouse',
           react: PasswordResetEmail({ resetUrl, userName: user.full_name ?? undefined })
         })
 
         await logEmail({
-          email_to: user.email,
+          email_to: deliverableEmail,
           email_type: 'password_reset',
           user_id: user.user_id,
           client_id: user.client_id ?? undefined,
@@ -82,7 +125,7 @@ export async function POST(request: Request) {
         console.error('[forgot-password] Resend error:', err)
 
         await logEmail({
-          email_to: user.email,
+          email_to: deliverableEmail,
           email_type: 'password_reset',
           user_id: user.user_id,
           status: 'failed',
