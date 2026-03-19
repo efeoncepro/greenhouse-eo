@@ -1,5 +1,27 @@
 # CODEX TASK — Sistema de Emails Transaccionales para Greenhouse
 
+## Estado 2026-03-19
+
+Brief normalizado contra la arquitectura viva de auth y runtime del repo.
+
+La direccion funcional del task se mantiene:
+- Resend para envio
+- PostgreSQL para tokens y mutaciones de auth
+- BigQuery solo para logging y auditoria
+- flujos de `forgot password`, `invite`, `accept invite` y `verify email`
+
+Pero la implementacion debe respetar estas reglas actuales:
+- Greenhouse no usa `middleware.ts` como boundary de auth
+- PostgreSQL se monta con scripts especializados por dominio, no con un `setup-postgres.sql` monolitico
+- la capa de auth runtime ya vive sobre `greenhouse_core.client_users` y helpers compartidos de acceso PostgreSQL
+- `client_id` sigue siendo el tenant base del auth principal, pero el runtime ya carga tambien `space_id` y `organization_id` como contexto adicional cuando corresponde
+
+Ante conflicto, prevalecen:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
+- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+
 ## Resumen
 
 Implementar el sistema de emails transaccionales de Efeonce Greenhouse™ que cubre reset de contraseña, invitación de usuarios y verificación de email. Utiliza Resend como servicio de envío, React Email para templates con branding Greenhouse, PostgreSQL como data store transaccional (tokens, user lookup, password updates), y BigQuery como log de auditoría (OLAP).
@@ -30,6 +52,9 @@ Implementar el sistema de emails transaccionales de Efeonce Greenhouse™ que cu
 Leer antes de implementar:
 
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md` — modelo RBAC, `client_users`, `user_role_assignments`, session payload
+- `GREENHOUSE_ARCHITECTURE_V1.md` — principios base del portal y reglas de auth/runtime
+- `MULTITENANT_ARCHITECTURE.md` — boundary de tenant, session resolution y guardas por layout
+- `GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` — perfiles de acceso y patron operativo para PostgreSQL
 - `Greenhouse_Services_Architecture_v1.md` — decisión PostgreSQL OLTP + BigQuery OLAP
 - `Greenhouse_Portal_Spec_v1.md` — arquitectura base del portal
 - `Greenhouse_Nomenclatura_Portal_v3.md` — convenciones de naming, microcopy, constants
@@ -102,9 +127,24 @@ CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse.email_logs` (
 
 Esta tabla es write-only desde el contexto de este sistema. Se usa para analytics y auditoría.
 
-#### A3. Agregar DDL al archivo de referencia
+#### A3. Agregar DDL al setup PostgreSQL del dominio
 
-Agregar el SQL de A1 y A2 a `scripts/setup-postgres.sql` (o crear si no existe) como sección separada con comentario:
+No usar un `scripts/setup-postgres.sql` genérico como fuente principal. Este repo ya opera con scripts especializados por dominio.
+
+Implementación recomendada:
+- crear `scripts/setup-postgres-transactional-email.sql`
+- crear `scripts/setup-postgres-transactional-email.ts`
+- agregar comando canónico en `package.json`, por ejemplo:
+
+```json
+{
+  "scripts": {
+    "setup:postgres:transactional-email": "tsx scripts/setup-postgres-transactional-email.ts"
+  }
+}
+```
+
+El SQL de `auth_tokens` debe vivir en ese archivo dedicado, con comentario:
 
 ```sql
 -- ══════════════════════════════════════════════════════
@@ -175,7 +215,12 @@ function hashToken(jwt: string): string {
 }
 ```
 
-**Queries contra PostgreSQL**, no BigQuery. Usar el helper de PostgreSQL existente (`src/lib/db.ts` o `src/lib/postgres.ts` — verificar cuál está en uso).
+**Queries contra PostgreSQL**, no BigQuery. Reutilizar la capa de acceso PostgreSQL compartida del repo y sus perfiles runtime/migrator.
+
+No asumir `src/lib/db.ts` como contrato principal. Revisar primero:
+- `src/lib/postgres/client.ts`
+- `src/lib/tenant/access.ts`
+- `src/lib/tenant/identity-store.ts`
 
 ---
 
@@ -642,34 +687,27 @@ src/
 │   ├── email-log.ts                  # NUEVO
 │   ├── auth.ts                       # ya existe, no modificar
 │   ├── bigquery.ts                   # ya existe, usar para email_logs
-│   └── db.ts                         # ya existe, usar para PostgreSQL queries
-├── middleware.ts                      # ya existe, agregar rutas de auth a exclusiones
+│   └── postgres/
+│       └── client.ts                 # capa compartida existente, reutilizar
 └── types/
     └── next-auth.d.ts                # ya existe, no modificar
 scripts/
-└── setup-postgres.sql                # agregar DDL de auth_tokens
+├── setup-postgres-transactional-email.sql
+└── setup-postgres-transactional-email.ts
 ```
 
 ---
 
-## Middleware — rutas a excluir
+## Superficie pública de auth
 
-El middleware existente (`src/middleware.ts`) protege todas las rutas excepto login y access-denied. **Agregar las nuevas rutas de auth a la lista de exclusiones:**
+Greenhouse no usa `middleware.ts` como boundary de autenticación. La protección de rutas ocurre por layout guards y por `getTenantContext()` / `getServerSession()`.
 
-```typescript
-// Rutas públicas (no requieren sesión)
-const publicRoutes = [
-  '/login',
-  '/auth/access-denied',
-  '/auth/forgot-password',    // NUEVO
-  '/auth/reset-password',     // NUEVO
-  '/auth/accept-invite',      // NUEVO
-]
-```
+Para este task, el criterio correcto es:
+- las páginas bajo `src/app/(blank-layout-pages)/auth/*` deben permanecer públicas
+- las API routes de reset/invite/verify deben validar token o payload por sí mismas, sin requerir sesión
+- `/api/admin/invite` sí debe requerir sesión válida y rol `efeonce_admin`
 
-Las API Routes de auth (`/api/auth/forgot-password`, `/api/auth/reset-password`, `/api/auth/validate-token`, `/api/auth/accept-invite`) tampoco requieren sesión. Verificar que el middleware no las bloquea.
-
-La API Route `/api/admin/invite` SÍ requiere sesión y rol `efeonce_admin`.
+No introducir lógica nueva en `middleware.ts` para este sistema salvo que la arquitectura cambie explícitamente.
 
 ---
 
@@ -678,7 +716,7 @@ La API Route `/api/admin/invite` SÍ requiere sesión y rol `efeonce_admin`.
 **Infraestructura:**
 - [ ] Tabla `greenhouse_core.auth_tokens` creada en Cloud SQL con los índices especificados
 - [ ] Tabla `greenhouse.email_logs` creada en BigQuery
-- [ ] DDL documentado en `scripts/setup-postgres.sql`
+- [ ] DDL documentado en un setup dedicado tipo `scripts/setup-postgres-transactional-email.sql`
 - [ ] Variable `RESEND_API_KEY` configurada en Vercel (no hardcodeada)
 - [ ] Variable `EMAIL_FROM` configurada en Vercel
 
@@ -715,7 +753,7 @@ La API Route `/api/admin/invite` SÍ requiere sesión y rol `efeonce_admin`.
 - [ ] JWT firmado con NEXTAUTH_SECRET
 - [ ] Token hasheado (SHA-256) en PostgreSQL, nunca almacenado plano
 - [ ] Todos los links apuntan a HTTPS (greenhouse.efeoncepro.com)
-- [ ] Middleware permite acceso a rutas de auth sin sesión
+- [ ] Las páginas públicas de auth funcionan sin sesión y sin depender de `middleware.ts`
 - [ ] `/api/admin/invite` valida rol `efeonce_admin` antes de proceder
 - [ ] Logging a BigQuery no rompe el flujo si falla
 
@@ -734,10 +772,10 @@ La API Route `/api/admin/invite` SÍ requiere sesión y rol `efeonce_admin`.
 ## Notas técnicas
 
 - Usar `next-auth` v4.x (ya instalado). No modificar la configuración de auth existente.
-- PostgreSQL queries via el helper existente (`src/lib/db.ts`). No crear conexiones nuevas.
+- PostgreSQL queries via la capa compartida ya vigente del repo (`src/lib/postgres/client.ts` y helpers de auth/tenant cuando aplique). No crear conexiones nuevas ad-hoc.
 - BigQuery queries via el helper existente (`src/lib/bigquery.ts`). Solo INSERT para email_logs.
 - El campo `user_id` en Identity & Access V2 es UUID. Todos los FKs en auth_tokens son UUID.
 - El JWT payload de los tokens transaccionales es independiente del JWT de sesión de NextAuth. Usan el mismo secret (NEXTAUTH_SECRET) pero son tokens diferentes con payloads diferentes.
 - Para Google Fonts en emails (Poppins, DM Sans): usar `@import` web fonts con fallback a `-apple-system, BlinkMacSystemFont, sans-serif`. Los clientes de email que no soporten web fonts caerán al fallback.
 - bcrypt salt rounds = 12, consistente con el flujo de Credentials auth existente.
-- El `client_id` en este contexto es el tenant (Company/Space), no el identificador de persona. El identificador de persona es `user_id`.
+- El `client_id` en este contexto sigue siendo el tenant base del auth principal. El identificador de persona/principal es `user_id`. Si el runtime necesita contexto operativo adicional, resolverlo desde `space_id` y `organization_id` sin cambiar la semántica del token transaccional.

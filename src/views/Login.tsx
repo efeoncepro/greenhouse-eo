@@ -236,6 +236,9 @@ const LoginV2 = ({
                   }
                 }}
               />
+              <Link href='/auth/forgot-password' style={{ textDecoration: 'none', alignSelf: 'flex-end' }}>
+                <Typography variant='body2' color='primary'>¿Olvidaste tu contraseña?</Typography>
+              </Link>
               <Button fullWidth variant='outlined' type='submit' disabled={isSubmitting} color='secondary'>
                 {isSubmitting ? GH_MESSAGES.login_validating : GH_MESSAGES.login_button}
               </Button>
