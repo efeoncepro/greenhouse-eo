@@ -1,6 +1,6 @@
 # CODEX TASK — Sistema de Identidad y Capacidad del Equipo
 
-> Estado 2026-03-14: brief histórico/fundacional. La base de identidad del colaborador sí quedó absorbida en el runtime actual, pero la parte de capacidad no debe tratarse como cerrada. La task activa pasa a ser `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md`.
+> Estado 2026-03-14: brief histórico/fundacional. La base de identidad del colaborador sí quedó absorbida en el runtime actual, pero la parte de capacidad no debe tratarse como cerrada. La task vigente pasa a ser `docs/tasks/to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md`.
 
 ## Resumen
 

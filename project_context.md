@@ -40,7 +40,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Users` debe evolucionar hacia la vista de acceso/permisos del mismo perfil
   - ambas superficies deben reconciliarse sobre `identity_profile_id`
 - Se creó la lane activa:
-  - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
+  - `docs/tasks/to-do/CODEX_TASK_Person_360_Profile_Unification_v1.md`
 - Esto no reemplaza `Identity & Access V2`; lo complementa como capa de modelo y serving sobre persona.
 
 ## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
@@ -572,9 +572,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la parte de capacidad no debe tratarse todavía como cerrada
 - Regla operativa derivada:
   - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como brief histórico
-  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task vigente para cierre 360 del colaborador
+  - `docs/tasks/to-do/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task vigente para cierre 360 del colaborador
   - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como brief histórico/fundacional
-  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
+  - `docs/tasks/to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
 
 ## Delta 2026-03-14 Creative Hub task reclassification
 - `Creative Hub` fue contrastado explícitamente contra:
@@ -593,7 +593,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `CSC Pipeline Tracker` soportado hoy con heurísticas, no con un modelo explícito de `fase_csc`
 - Regla operativa derivada:
   - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
-  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser la task vigente para cierre runtime
+  - `docs/tasks/to-do/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser la task vigente para cierre runtime
 
 ## Delta 2026-03-14 Creative Hub backend runtime closure
 - `Creative Hub v2` ya no depende solo del snapshot genérico de `Capabilities`; ahora tiene backend propio de enriquecimiento creativo para cerrar los gaps detectados.

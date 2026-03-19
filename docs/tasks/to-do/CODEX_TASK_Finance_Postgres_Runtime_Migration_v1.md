@@ -223,7 +223,7 @@ Revisar antes de implementar:
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
-- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 
 Reglas obligatorias:
 - `Finance` sigue siendo owner de su dominio transaccional

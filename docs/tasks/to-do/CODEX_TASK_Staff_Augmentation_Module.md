@@ -16,7 +16,7 @@ En particular, no implementar literalmente desde esta versión:
 Ante conflicto, prevalecen:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
-- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md`
 
 ## Resumen

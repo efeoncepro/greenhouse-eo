@@ -16,7 +16,7 @@ Use this document together with:
 - `project_context.md`
 - `Handoff.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
-- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 
 ## Status
 

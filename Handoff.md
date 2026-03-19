@@ -40,6 +40,95 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Transactional Email System closed + email template redesign
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Cerrar el sistema de emails transaccionales: rediseñar templates de email (branding, UX writing, accesibilidad), limpiar código temporal, marcar task como complete, sincronizar ramas.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main` (producción)
+
+### Ambiente objetivo
+- Production (`greenhouse.efeoncepro.com`)
+
+### Archivos tocados
+- `src/emails/constants.ts` — tokens de diseño expandidos (border, footerBg, success, secondary, LOGO_URL, APP_URL)
+- `src/emails/components/EmailLayout.tsx` — header gradient, logo PNG clickable, `lang="es"`, color-scheme meta, footer con separador
+- `src/emails/components/EmailButton.tsx` — border sutil, border-radius 8px, padding ajustado
+- `src/emails/PasswordResetEmail.tsx` — copy mejorado, first-name greeting, fallback URL, separador visual
+- `src/emails/InvitationEmail.tsx` — misma estructura de mejoras
+- `src/emails/VerifyEmail.tsx` — misma estructura de mejoras
+- `public/branding/logo-white-email.png` — logo convertido de SVG a PNG (280px) para compatibilidad email
+- `scripts/fix-user-email.ts` — eliminado (temporal)
+- `src/app/api/admin/fix-email/route.ts` — eliminado (temporal)
+- `docs/tasks/complete/CODEX_TASK_Transactional_Email_System.md` — movido desde to-do
+- `docs/tasks/README.md` — task movida a Complete
+
+### Verificacion
+- `tsc --noEmit` limpio
+- `render()` de React Email produce HTML válido con `lang="es"`, logo URL correcta, 6175 chars
+- Email de forgot-password confirmado recibido en `jreyes@efeoncepro.com`
+- Push a `main` y deploy a Vercel confirmado
+
+### Riesgos o pendientes
+- Verificar visualmente el email rediseñado en producción (solicitar reset de contraseña y revisar en Outlook)
+- Otros usuarios con `@efeonce.org` en `client_users` pueden necesitar actualización de email
+- `CODEX_TASK_Greenhouse_Email_Catalog_v1.md` queda como siguiente paso para ampliar el catálogo de emails más allá del baseline transaccional
+
+---
+
+## 2026-03-19 — In-progress tasks audit and reclassification
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Auditar todas las tasks en `docs/tasks/in-progress/`, verificar cuáles estaban realmente cerradas y reubicar las parcialmente implementadas fuera de la carpeta de trabajo activo.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/README.md`
+- `project_context.md`
+- `changelog.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V1.md`
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- múltiples briefs movidos desde `docs/tasks/in-progress/` hacia `docs/tasks/to-do/` o `docs/tasks/complete/`
+
+### Verificacion
+- Revisión manual del alcance declarado y estado del repo para cada brief de `in-progress`
+- Cruce documental contra:
+  - `project_context.md`
+  - `changelog.md`
+  - rutas y servicios actualmente presentes en `src/app/api/**` y `src/lib/**`
+- Sin build ni lint: cambio documental y de taxonomía únicamente
+
+### Riesgos o pendientes
+- La carpeta `in-progress/` quedó vacía: eso no significa que no existan lanes abiertas, sino que ninguna estaba bien clasificada como “trabajo activo” al momento de esta auditoría.
+- `AI Tooling v2` y `HR Core v2` se consideraron cerradas para el alcance que declaran.
+- Se devolvieron a `to-do` por implementación parcial o gaps explícitos:
+  - `Admin Team v2`
+  - `Creative Hub v2`
+  - `Financial Module v2`
+  - `Finance Postgres Runtime Migration v1`
+  - `HR Payroll Module v3`
+  - `HR Payroll Postgres Runtime Migration v1`
+  - `People Unified View v3`
+  - `Person 360 Profile Unification v1`
+  - `Source Sync Runtime Projections v1`
+  - `Team Identity & Capacity System v2`
+  - `GREENHOUSE_IDENTITY_ACCESS_V2`
+- El siguiente paso sano es volver a abrir `in-progress/` solo con las 1-3 lanes que de verdad se vayan a empujar ahora.
+
 ## 2026-03-19 — Greenhouse Email Catalog task added
 
 ### Agente

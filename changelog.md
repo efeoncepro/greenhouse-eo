@@ -6,6 +6,24 @@
 
 ## 2026-03-19
 
+### Transactional Email System — complete
+- Sistema completo en producción: forgot-password, reset-password, invite, verify-email.
+- Stack: Resend + React Email + PostgreSQL auth_tokens + BigQuery email_logs.
+- DNS configurado: SPF combinado (Outlook + HubSpot + Amazon SES), DKIM, DMARC.
+- Microsoft 365 whitelisting: `amazonses.com` en anti-spam policies para recibir emails de Resend.
+- Rutas movidas de `/api/auth/*` a `/api/account/*` para evitar colisión con NextAuth catch-all.
+- Domain alias expansion: `efeoncepro.com` ↔ `efeonce.org` en lookup de usuario.
+- Email se envía a la dirección que el usuario escribió (no la almacenada), resolviendo el caso de dominios sin MX.
+- Templates rediseñados: header gradient (Midnight Navy → Core Blue), logo PNG, `lang="es"`, copy en español con first-name greeting, fallback URL en texto plano, accesibilidad (color-scheme, alt descriptivo, contraste 7.5:1).
+- Limpieza: endpoint temporal `fix-email` y script `fix-user-email.ts` eliminados.
+- Task movida a `docs/tasks/complete/`.
+
+### In-progress tasks audit completed
+- Se auditó todo el panel `docs/tasks/in-progress/` contra el estado real del repo y el alcance declarado de cada brief.
+- `CODEX_TASK_AI_Tooling_Credit_System_v2.md` y `CODEX_TASK_HR_Core_Module_v2.md` se movieron a `docs/tasks/complete/` por considerarse cerradas para el alcance que declaran.
+- Las demás lanes parcialmente implementadas o con gaps explícitos se reubicaron en `docs/tasks/to-do/` para dejar de tratarlas como trabajo activo.
+- `docs/tasks/README.md` quedó alineado con esta nueva clasificación y la carpeta `in-progress/` quedó vacía tras la auditoría.
+
 ### Greenhouse Email Catalog task added
 - Se agregó `docs/tasks/to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md` para separar el catalogo de emails de producto de la task puramente tecnica de `Transactional Email`.
 - La nueva task ordena los emails en cuatro familias: `Access & Identity`, `Security`, `Executive Digests & Decision Support` y `Domain Notifications`.
@@ -530,9 +548,9 @@
   - `Team Identity & Capacity` sí dejó cerrada la base canónica de identidad, pero no debe tratarse como task completa en capacity
 - Se reclasificaron las tasks:
   - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md` queda como referencia histórica
-  - `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task activa para cierre 360 del colaborador
+  - `docs/tasks/to-do/CODEX_TASK_People_Unified_View_v3.md` pasa a ser la task activa para cierre 360 del colaborador
   - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` queda como referencia histórica/fundacional
-  - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task activa para formalización de capacity
+  - `docs/tasks/to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task activa para formalización de capacity
   - `docs/tasks/README.md`, `project_context.md` y `Handoff.md` quedaron alineados con este cambio
 
 ### Creative Hub backend runtime closure
@@ -561,7 +579,7 @@
 - El resultado confirmó que el módulo sí está bien ubicado como `capability surface`, pero no está completo respecto del brief original.
 - Se reclasificó la task:
   - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md` queda como brief histórico
-  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser el brief activo orientado a cierre runtime
+  - `docs/tasks/to-do/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser el brief activo orientado a cierre runtime
 - Gaps documentados en la `v2`:
   - activación demasiado amplia del módulo
   - ausencia real de la capa `Brand Intelligence`
@@ -570,7 +588,7 @@
 ### HR core backend foundation and task v2
 - `HR Core Module` dejó de tratarse como brief pendiente únicamente greenfield:
   - `docs/tasks/complete/CODEX_TASK_HR_Core_Module.md` queda como referencia histórica
-  - `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md` pasa a ser la task activa orientada a runtime/backend
+  - `docs/tasks/complete/CODEX_TASK_HR_Core_Module_v2.md` pasa a ser la task activa orientada a runtime/backend
 - La task fue contrastada antes de implementar contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -598,7 +616,7 @@
 ### AI tooling backend foundation and task v2
 - `AI Tooling & Credit System` dejó de tratarse como brief pendiente puramente greenfield:
   - `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System.md` queda como referencia histórica
-  - `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md` pasa a ser la task activa orientada a runtime/backend
+  - `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System_v2.md` pasa a ser la task activa orientada a runtime/backend
 - La task fue contrastada antes de implementar contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -667,7 +685,7 @@
 ### Finance backend runtime closure and task v2
 - `Financial Module` dejó de tratarse como brief greenfield activo:
   - `docs/tasks/complete/CODEX_TASK_Financial_Module.md` queda como referencia histórica
-  - `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md` pasa a ser el brief vigente para cierre runtime/backend y handoff con frontend
+  - `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md` pasa a ser el brief vigente para cierre runtime/backend y handoff con frontend
 - Se agregó backend operativo para cerrar conciliación y egresos especializados:
   - `GET /api/finance/reconciliation/[id]/candidates`
   - `POST /api/finance/reconciliation/[id]/exclude`
@@ -685,7 +703,7 @@
 
 ### HR payroll brief split: baseline vs runtime gaps
 - `CODEX_TASK_HR_Payroll_Module_v2.md` dejó de tratarse como brief vigente greenfield y quedó marcado como referencia histórica de la implementación base.
-- Se creó `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md` como brief activo para cerrar los gaps reales del módulo actual:
+- Se creó `docs/tasks/to-do/CODEX_TASK_HR_Payroll_Module_v3.md` como brief activo para cerrar los gaps reales del módulo actual:
   - alta inicial de compensación desde UI
   - edición visible de metadata del período en `draft`
   - fallback manual de KPI y override de entry en la vista de nómina

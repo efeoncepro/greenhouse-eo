@@ -1,6 +1,6 @@
 # CODEX TASK — AI Tooling & Credit System: Gestión de Herramientas, Licencias y Créditos de IA
 
-> Brief histórico de descubrimiento. La task operativa vigente es `docs/tasks/in-progress/CODEX_TASK_AI_Tooling_Credit_System_v2.md`.
+> Brief histórico de descubrimiento. La task operativa vigente es `docs/tasks/complete/CODEX_TASK_AI_Tooling_Credit_System_v2.md`.
 
 ## Resumen
 

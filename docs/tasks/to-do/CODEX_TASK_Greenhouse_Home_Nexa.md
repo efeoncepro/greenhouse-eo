@@ -15,7 +15,7 @@ En particular, no implementar literalmente desde esta versión:
 
 Ante conflicto, prevalecen:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
-- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `project_context.md`
 - `docs/tasks/to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md`
 

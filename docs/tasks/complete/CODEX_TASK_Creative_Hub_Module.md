@@ -1,6 +1,6 @@
 # CODEX TASK — Creative Hub: Módulo de Capabilities para Globe
 
-> Estado 2026-03-14: brief histórico. La implementación runtime actual de `Creative Hub` quedó parcialmente absorbida por el framework genérico de `Capabilities`, pero este documento ya no debe tratarse como task cerrada “tal cual implementada”. El brief activo pasa a ser `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`.
+> Estado 2026-03-14: brief histórico. La implementación runtime actual de `Creative Hub` quedó parcialmente absorbida por el framework genérico de `Capabilities`, pero este documento ya no debe tratarse como task cerrada “tal cual implementada”. El brief vigente pasa a ser `docs/tasks/to-do/CODEX_TASK_Creative_Hub_Module_v2.md`.
 
 ## Resumen
 
