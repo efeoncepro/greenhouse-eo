@@ -32,10 +32,18 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | --- | --- |
 | [CODEX_TASK_Campaign_360.md](to-do/CODEX_TASK_Campaign_360.md) | Modelo canonico de campanas y su capa 360 |
 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | Baseline canonica de implementacion de Campaign sobre `greenhouse_core` + `ICO Engine` |
+| [CODEX_TASK_Business_Units_Canonical.md](to-do/CODEX_TASK_Business_Units_Canonical.md) | Normalización de Business Units y su metadata transversal |
+| [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | Baseline canonica de implementación de BU como metadata sobre `business_line` existente |
+| [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline.md) | Pipeline analitico de Frame.io para enriquecer Creative Hub e ICO |
+| [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | Baseline canonica de implementacion de Frame.io sobre source sync, delivery e ICO vigentes |
+| [CODEX_TASK_Greenhouse_Email_Catalog_v1.md](to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md) | Catalogo oficial de emails de Greenhouse mas alla del baseline transaccional |
+| [CODEX_TASK_Greenhouse_Home_Nexa.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa.md) | Home conversacional con Nexa como superficie de entrada del portal |
+| [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | Baseline canonica de implementacion de Home + Nexa sobre `portalHomePath` y el runtime real del portal |
 | [CODEX_TASK_SCIM_User_Provisioning.md](to-do/CODEX_TASK_SCIM_User_Provisioning.md) | Provisioning SCIM desde Entra ID |
 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | Baseline canonica de implementacion de SCIM sobre `Identity & Access V2` y PostgreSQL |
+| [CODEX_TASK_Staff_Augmentation_Module.md](to-do/CODEX_TASK_Staff_Augmentation_Module.md) | Placements de Staff Augmentation como capa comercial sobre assignments |
+| [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | Baseline canonica de implementacion de Staff Augmentation sobre assignments, PostgreSQL y Services |
 | [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | Convergencia del mapping canonico `Space -> Notion` y corte de `notion_project_ids` |
-| [CODEX_TASK_Transactional_Email_System.md](to-do/CODEX_TASK_Transactional_Email_System.md) | Reset, invitaciones y verificacion por email sobre PostgreSQL + Resend |
 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | Consolidación UX de vistas, shells maestras y navegación del portal |
 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | Ajuste transversal de jerarquía tipográfica |
 
@@ -75,6 +83,7 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 | [CODEX_TASK_Space_Admin_View_Redesign.md](complete/CODEX_TASK_Space_Admin_View_Redesign.md) | Brief histórico de vista admin de space |
 | [CODEX_TASK_Team_Identity_Capacity_System.md](complete/CODEX_TASK_Team_Identity_Capacity_System.md) | Brief histórico de Team Identity & Capacity reemplazado por v2 |
 | [CODEX_TASK_Tenant_Detail_View_Redesign.md](complete/CODEX_TASK_Tenant_Detail_View_Redesign.md) | Detalle admin de tenant |
+| [CODEX_TASK_Transactional_Email_System.md](complete/CODEX_TASK_Transactional_Email_System.md) | Sistema transaccional de email: reset, invitaciones, verificación — Resend + React Email + PostgreSQL |
 
 ## Regla operativa
 
