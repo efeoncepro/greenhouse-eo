@@ -10,7 +10,7 @@ Estado al `2026-03-14`:
 - los cierres operativos reales ya no deben trabajarse desde este documento greenfield
 
 Brief vigente para continuar el módulo:
-- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 
 ## Resumen
 

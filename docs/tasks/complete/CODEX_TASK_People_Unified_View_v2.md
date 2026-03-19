@@ -12,7 +12,7 @@ Estado 2026-03-14:
   - el backend 360 por colaborador siguió creciendo más allá del scope original
 
 Brief activo vigente:
-- `docs/tasks/in-progress/CODEX_TASK_People_Unified_View_v3.md`
+- `docs/tasks/to-do/CODEX_TASK_People_Unified_View_v3.md`
 
 ---
 

@@ -74,7 +74,7 @@ Revisar antes de implementar:
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
-- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `docs/tasks/to-do/CODEX_TASK_HR_Payroll_Module_v3.md`
 
 Reglas obligatorias:
 - `member_id` sigue siendo el ancla canonica del colaborador

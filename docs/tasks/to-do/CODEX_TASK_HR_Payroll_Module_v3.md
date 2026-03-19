@@ -131,7 +131,7 @@ Handoff backend para frontend:
 
 - `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll`
   - correcto
-- `git diff --check -- src/lib/payroll src/app/api/hr/payroll docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
+- `git diff --check -- src/lib/payroll src/app/api/hr/payroll docs/tasks/to-do/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
   - correcto
 - `pnpm exec tsc --noEmit --pretty false`
   - el proyecto sigue con ruido previo fuera de payroll, pero no aparecieron errores del scope `src/lib/payroll|src/app/api/hr/payroll` al filtrarlo

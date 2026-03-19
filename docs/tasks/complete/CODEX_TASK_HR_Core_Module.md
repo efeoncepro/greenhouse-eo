@@ -1,6 +1,6 @@
 # CODEX TASK — HR Core: Gestión de Personas, Permisos, Asistencia y Estructura Organizacional
 
-> Brief histórico de descubrimiento. La task operativa vigente es `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`.
+> Brief histórico de descubrimiento. La task operativa vigente es `docs/tasks/complete/CODEX_TASK_HR_Core_Module_v2.md`.
 
 ## Resumen
 

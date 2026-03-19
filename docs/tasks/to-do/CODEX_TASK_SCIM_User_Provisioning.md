@@ -13,7 +13,7 @@ En particular, no implementar literalmente desde esta version:
 - modelado de autorizacion basado en un `role` unico o en defaults legacy fuera del modelo V2
 
 Ante conflicto, prevalecen:
-- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md`

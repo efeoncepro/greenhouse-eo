@@ -6,7 +6,7 @@ Este documento reemplaza la version inicial de `Financial Intelligence Layer` y 
 
 No parte desde cero:
 - `Finance` ya existe como modulo operativo
-- el backend activo de referencia es `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- el backend activo de referencia es `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 - `docs/tasks/complete/CODEX_TASK_Financial_Module.md` queda solo como referencia historica
 
 ## Resumen
@@ -40,7 +40,7 @@ Antes de implementar, revisar:
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
-- `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 
 ## Correcciones arquitectonicas bloqueadas
 

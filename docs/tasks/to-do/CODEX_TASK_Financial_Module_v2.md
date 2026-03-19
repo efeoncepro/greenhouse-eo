@@ -1037,7 +1037,7 @@ Frontend principal pendiente:
 
 - `pnpm exec eslint src/app/api/finance src/lib/finance`
   - correcto
-- `git diff --check -- src/app/api/finance src/lib/finance docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md Handoff.md changelog.md`
+- `git diff --check -- src/app/api/finance src/lib/finance docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md Handoff.md changelog.md`
   - correcto
 - `pnpm exec tsc --noEmit --pretty false`
   - el proyecto sigue con ruido previo en `.next/types`, pero no aparecieron errores del scope `finance` al filtrarlo

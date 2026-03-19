@@ -10,7 +10,7 @@ Estado al `2026-03-14`:
 - los gaps operativos restantes ya no deben trabajarse desde este documento greenfield
 
 Brief vigente para continuar el módulo:
-- `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
+- `docs/tasks/to-do/CODEX_TASK_HR_Payroll_Module_v3.md`
 
 ## Resumen
 

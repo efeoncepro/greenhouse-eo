@@ -1,7 +1,7 @@
 # Greenhouse Identity and Access V1
 
 > **Status: Superseded** — This document describes the V1 identity and access design (BigQuery-based).
-> The active implementation is migrating to V2 (PostgreSQL-first) documented in `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+> The active implementation is migrating to V2 (PostgreSQL-first) documented in `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
 > Key differences in V2:
 > - Auth store moved from BigQuery to PostgreSQL (greenhouse_core)
 > - Route groups expanded: client, admin, internal, finance, hr, people, agency

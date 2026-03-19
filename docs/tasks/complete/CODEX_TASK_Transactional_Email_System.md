@@ -19,7 +19,7 @@ Pero la implementacion debe respetar estas reglas actuales:
 Ante conflicto, prevalecen:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
-- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 
 ## Resumen

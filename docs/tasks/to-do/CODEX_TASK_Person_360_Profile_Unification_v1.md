@@ -28,7 +28,7 @@ Esta task debe revisarse contra:
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
-- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 
 Reglas obligatorias:
 - `identity_profile` es el ancla canónica de persona
