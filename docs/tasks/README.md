@@ -41,19 +41,20 @@ Las lanes parcialmente implementadas se devolvieron a `to-do` y las realmente ce
 | 6 | [CODEX_TASK_Admin_Team_Module_v2.md](to-do/CODEX_TASK_Admin_Team_Module_v2.md) | P1 | Alto | Medio | Parcial | Escritura de roster y asignaciones que aterrizan Team/People en operación real |
 | 7 | [CODEX_TASK_People_360_Enrichments_v1.md](to-do/CODEX_TASK_People_360_Enrichments_v1.md) | P1 | Alto | Medio | Parcial | Enrichments cross-module para consolidar `People` como lectura 360 |
 | 8 | [CODEX_TASK_Financial_Module_v2.md](to-do/CODEX_TASK_Financial_Module_v2.md) | P1 | Alto | Medio | Avanzada | Cierre funcional de Finance una vez asegurado el runtime migration |
-| 9 | [CODEX_TASK_HR_Payroll_Module_v3.md](to-do/CODEX_TASK_HR_Payroll_Module_v3.md) | P1 | Alto | Medio | Avanzada | Cierre funcional y UX de Payroll después del corte runtime |
-| 10 | [CODEX_TASK_Creative_Hub_Module_v2.md](to-do/CODEX_TASK_Creative_Hub_Module_v2.md) | P1 | Alto | Alto | Avanzada | Cierre productivo de Creative Hub sobre capabilities y datos operativos reales |
-| 11 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
-| 12 | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
-| 13 | [CODEX_TASK_Financial_Intelligence_Layer.md](to-do/CODEX_TASK_Financial_Intelligence_Layer.md) | P2 | Alto | Medio | Parcial | Capa analítica y de unit economics sobre Finance ya parcialmente sembrada |
-| 14 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
-| 15 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
-| 16 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
-| 17 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
-| 18 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
-| 19 | [CODEX_TASK_Greenhouse_Email_Catalog_v1.md](to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md) | P2 | Medio | Medio | Diseño | Extensión del baseline transaccional hacia digests, seguridad y alerts de producto |
-| 20 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
-| 21 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | P3 | Medio | Bajo | Parcial | Ajuste transversal de jerarquía tipográfica y legibilidad |
+| 9 | [CODEX_TASK_Nubox_DTE_Integration.md](to-do/CODEX_TASK_Nubox_DTE_Integration.md) | P1 | Alto | Medio | Diseño | Integración bidireccional Nubox ↔ Finance: emisión DTE, sync ventas/compras/pagos, reconciliación SII |
+| 10 | [CODEX_TASK_HR_Payroll_Module_v3.md](to-do/CODEX_TASK_HR_Payroll_Module_v3.md) | P1 | Alto | Medio | Avanzada | Cierre funcional y UX de Payroll después del corte runtime |
+| 11 | [CODEX_TASK_Creative_Hub_Module_v2.md](to-do/CODEX_TASK_Creative_Hub_Module_v2.md) | P1 | Alto | Alto | Avanzada | Cierre productivo de Creative Hub sobre capabilities y datos operativos reales |
+| 12 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
+| 13 | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
+| 14 | [CODEX_TASK_Financial_Intelligence_Layer.md](to-do/CODEX_TASK_Financial_Intelligence_Layer.md) | P2 | Alto | Medio | Parcial | Capa analítica y de unit economics sobre Finance ya parcialmente sembrada |
+| 15 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
+| 16 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
+| 17 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
+| 18 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
+| 19 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
+| 20 | [CODEX_TASK_Greenhouse_Email_Catalog_v1.md](to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md) | P2 | Medio | Medio | Diseño | Extensión del baseline transaccional hacia digests, seguridad y alerts de producto |
+| 21 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
+| 22 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | P3 | Medio | Bajo | Parcial | Ajuste transversal de jerarquía tipográfica y legibilidad |
 
 ### Briefs Históricos o de Producto
 

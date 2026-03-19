@@ -3,6 +3,32 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-19 Nubox DTE integration — API discovery, org mapping, supplier seeding, income import
+- Se descubrió y validó la New API de Nubox (Integraciones/Pyme) con credenciales productivas:
+  - Base URL: `https://api.pyme.nubox.com/nbxpymapi-environment-pyme/v1`
+  - Auth: `Authorization: Bearer <token>` + `x-api-key: <key>`
+  - 4 dominios verificados: `/v1/sales`, `/v1/purchases`, `/v1/expenses`, `/v1/incomes`
+- Mapeo de organizaciones Greenhouse ↔ clientes Nubox via RUT (`organizations.tax_id`):
+  - 4 organizaciones existentes enriquecidas con RUT: Corp Aldea (65258560-4), DDSoft (76613599-4), Gobierno RM (61923200-3), Sky Airline (88417000-1)
+  - 2 organizaciones nuevas creadas desde Nubox: SGI (76438378-8), Sika (91947000-3)
+  - 2 clientes nuevos creados: `nubox-client-76438378-8`, `nubox-client-91947000-3`
+- Proveedores sembrados desde compras Nubox:
+  - 19 proveedores en `greenhouse_finance.suppliers` con RUT, categoría y datos fiscales
+  - Categorías: banking, software, services, accounting, freelancer, hosting, travel, supplies, marketplace
+- Ingresos importados desde ventas Nubox (15 meses):
+  - 78 registros en `greenhouse_finance.income` — ID format: `INC-NB-{nubox_id}`
+  - Total: $163,820,646 CLP
+  - Tipos: `service_fee` (facturas), `credit_note` (notas de crédito negativas), `quote` (cotizaciones), `debit_note`
+  - 0 huérfanos: todos los ingresos tienen `client_id` válido
+- Credenciales almacenadas en `.env.local`: `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN`, `NUBOX_X_API_KEY`
+- Task brief creado: `docs/tasks/to-do/CODEX_TASK_Nubox_DTE_Integration.md` (8 fases, bidireccional)
+- Script de descubrimiento: `scripts/nubox-extractor.py`
+- Regla operativa derivada:
+  - RUT es el bridge canónico entre Greenhouse y Nubox en ambas direcciones
+  - `organizations.tax_id` debe estar poblado para cualquier cliente que emita DTE
+  - Finance income de Nubox usa prefijo `INC-NB-` para evitar colisiones con income manual o HubSpot
+  - Nubox New API es la única API activa; la Old API (`api.nubox.com`) NO se usa
+
 ## Delta 2026-03-15 Person 360 audit and serving baseline materialized
 - Se materializó `greenhouse_serving.person_360` en Cloud SQL como primer serving unificado de persona sobre:
   - `greenhouse_core.identity_profiles`
