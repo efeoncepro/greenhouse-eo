@@ -317,14 +317,14 @@ const PersonActivityTab = ({ memberId }: Props) => {
           {/* KPI Row */}
           <Grid size={{ xs: 12 }}>
             <SectionErrorBoundary sectionName='person-activity-kpis' description='No pudimos calcular los KPIs de actividad.'>
-              <Grid container spacing={6}>
+              <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', pb: 1 }}>
                 {KPI_CONFIG.map(kpi => {
                   const metric = getMetric(data, kpi.id)
                   const value = metric?.value ?? null
                   const zoneColor = getZoneColor(metric?.zone ?? null)
 
                   return (
-                    <Grid key={kpi.id} size={{ xs: 6, sm: 4, md: 2 }}>
+                    <Box key={kpi.id} sx={{ minWidth: 160, flex: '1 1 0' }}>
                       <HorizontalWithSubtitle
                         title={kpi.label}
                         stats={kpi.format(value)}
@@ -332,10 +332,10 @@ const PersonActivityTab = ({ memberId }: Props) => {
                         avatarColor={zoneColor}
                         subtitle={`${MONTH_SHORT[month]} ${year}`}
                       />
-                    </Grid>
+                    </Box>
                   )
                 })}
-              </Grid>
+              </Box>
             </SectionErrorBoundary>
           </Grid>
 
