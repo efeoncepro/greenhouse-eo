@@ -4,6 +4,81 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### Person Activity Tab — ICO Metrics + Sidebar Stats Alignment + Identity Reconciliation (2026-03-19)
+
+Consolidación de métricas operativas en Person 360: el tab ICO se elimina y sus datos se integran en el tab Actividad. Se corrige la desconexión entre el sidebar de persona y las membresías reales. Se implementa un servicio escalable de reconciliación de identidades.
+
+#### ICO → Activity tab merge
+
+El tab "ICO" separado se elimina. El tab "Actividad" (antes vacío) ahora consume `/api/ico-engine/context?dimension=member&value={memberId}` y muestra:
+- 6 KPI cards (RpA, OTD%, FTR%, Throughput, Ciclo promedio, Stuck assets)
+- Selectores de período (mes/año)
+- Distribución CSC (donut chart)
+- Salud operativa (radar chart)
+- Velocidad pipeline (radialBar gauge)
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` | Rewrite completo: fetch ICO Engine por `memberId`, 6 KPIs, 3 charts |
+| `src/views/greenhouse/people/PersonTabs.tsx` | Activity tab pasa `memberId` en vez de `metrics`, elimina ICO tab panel |
+| `src/views/greenhouse/people/helpers.ts` | Elimina `ico` de TAB_PERMISSIONS y TAB_CONFIG |
+| `src/types/people.ts` | Elimina `'ico'` de PersonTab union |
+| `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` | Eliminado (orphaned) |
+
+#### Fix KPI card overflow
+
+Los iconos de los KPI cards se cortaban al borde derecho del contenedor.
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` | `overflow: 'visible'` en el Grid container de KPIs, `minWidth: 0` en cada card |
+
+#### Sidebar FTE derivado de membresías
+
+El sidebar mostraba FTE/Hrs/Spaces de `client_team_assignments` en BigQuery (2.0 FTE, 320h, 2 Spaces) mientras el tab Organizaciones mostraba 1 membresía con 1.0 FTE. Ahora el sidebar filtra los assignments que corresponden a las membresías activas en Postgres.
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/people/get-person-detail.ts` | `buildAssignmentsSummary()` filtra assignments por `clientId` de membresías activas |
+
+#### Identity Reconciliation Service
+
+Sistema escalable y source-agnostic para descubrir, puntuar y vincular IDs de source systems (Notion, HubSpot, Azure AD) a team members.
+
+**Flujo:** Discovery → Matching (confidence scoring) → Auto-link (≥ 0.85) o Proposal queue (0.40-0.84) → Admin review
+
+**Señales de matching:**
+- `email_exact` (0.90), `name_exact` (0.70), `name_fuzzy` (0.45 — Levenshtein ≤ 3), `name_first_token` (0.30), `existing_cross_link` (0.15 bonus)
+- UUIDs-como-nombre (bots) → confianza 0
+
+**Ejecución:** Automática al final de cada sync-conformed (no-blocking), o manual via API.
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/identity/reconciliation/types.ts` | Tipos: SourceSystem, MatchSignal, ReconciliationProposal, thresholds |
+| `src/lib/identity/reconciliation/normalize.ts` | normalizeMatchValue, stripOrgSuffix, isUuidAsName, levenshtein |
+| `src/lib/identity/reconciliation/discovery-notion.ts` | discoverUnlinkedNotionUsers — BigQuery + Postgres |
+| `src/lib/identity/reconciliation/matching-engine.ts` | matchIdentity — source-agnostic confidence scoring |
+| `src/lib/identity/reconciliation/apply-link.ts` | applyIdentityLink — BigQuery MERGE + Postgres update |
+| `src/lib/identity/reconciliation/reconciliation-service.ts` | runIdentityReconciliation — orchestrator |
+| `src/app/api/admin/identity/reconciliation/route.ts` | GET proposals, POST trigger run |
+| `src/app/api/admin/identity/reconciliation/[proposalId]/resolve/route.ts` | POST resolve (approve/reject/dismiss) |
+| `src/app/api/admin/identity/reconciliation/stats/route.ts` | GET summary stats |
+| `src/lib/sync/sync-notion-conformed.ts` | Tail call a reconciliation (non-blocking) |
+| `scripts/setup-identity-reconciliation.sql` | Postgres DDL for proposals table |
+| `scripts/debug-recon-proposals.ts` | CLI: list proposal queue |
+| `scripts/debug-recon-resolve.ts` | CLI: resolve proposals (dismiss/reject/approve) |
+
+#### BigQuery v_tasks_enriched fix
+
+`COALESCE(dt.assignee_member_ids, ...)` no funcionaba porque `ADD COLUMN` inicializa ARRAY como `[]` (no NULL). Corregido a `IF(ARRAY_LENGTH > 0, ...)`.
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/ico-engine/schema.ts` | assignee fallback usa `IF` en vez de `COALESCE` para arrays vacíos |
+
+---
+
 ### ICO Engine — Context-Agnostic Metrics Service + Person ICO Tab (2026-03-18)
 
 Refactorización del ICO Engine de un sistema space-only a un **servicio de métricas agnóstico al contexto** que responde consultas para cualquier dimensión (Space, Project, Member, Client, Sprint) con fórmulas consistentes.
