@@ -1,5 +1,24 @@
 # CODEX TASK — Staff Augmentation Module: Gestión de Placements y Capa Comercial para Greenhouse
 
+## Estado 2026-03-19
+
+Este brief se conserva como framing funcional y de producto del módulo de `Staff Augmentation`.
+
+Para implementación nueva y decisiones técnicas, usar como baseline:
+- `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md`
+
+En particular, no implementar literalmente desde esta versión:
+- PK/FK `UUID` como convención principal del core
+- `service_id UUID` como contrato estable frente al modelo vivo de `services`
+- `ICO by placement` como dimensión cerrada sin bridge inequívoco de atribución
+- dependencias híbridas donde BigQuery siga funcionando como write path operativo del módulo
+
+Ante conflicto, prevalecen:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md`
+
 ## Resumen
 
 Implementar el módulo de **Staff Augmentation** como sistema de dos capas en Greenhouse: (A) enriquecimiento del modelo de asignaciones existente para distinguir placements de Staff Augmentation de asignaciones internas, y (B) módulo comercial con vista de agencia para gestionar el ciclo de vida completo de cada placement — desde pipeline hasta cierre, con métricas ICO por placement, tracking de contratos Deel, análisis de margen, y experiencia client-facing.

@@ -40,6 +40,181 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-19 — Greenhouse Email Catalog task added
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Formalizar una task separada para el catalogo de emails de Greenhouse, desacoplando la infraestructura base de `Transactional Email` del roadmap mas amplio de emails de producto, seguridad, digests y notificaciones de dominio.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/tasks/to-do/CODEX_TASK_Transactional_Email_System.md`
+  - `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La task deja claro el catalogo y la prioridad, pero no resuelve todavía qué eventos serán opt-in, opt-out u obligatorios por seguridad.
+- El siguiente paso natural no es implementar todo el catalogo, sino abrir un task corto para el `P0` de emails adicionales sobre la infraestructura que ya está montando Claude.
+
+## 2026-03-19 — Frame.io Analytics Pipeline v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de `Frame.io` a una baseline de implementación alineada con el source sync actual, `space_id` como boundary, y el contrato vivo de `delivery_tasks` + `ico_engine.v_tasks_enriched`.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+  - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` deja resuelto el drift principal: Frame.io debe enriquecer el contrato vigente de delivery/ICO, no crear otra vista maestra de tareas.
+- Si esta lane se implementa pronto, conviene un `P0/P1` corto:
+  - `space_frameio_sources`
+  - extract `files/versions/comments`
+  - enrich controlado de `ico_engine.v_tasks_enriched`
+- Todavía queda abierta una decisión práctica de implementación: si el landing dataset MVP seguirá siendo `frameio_ops` por compatibilidad con el repo externo, o si conviene mover desde el inicio parte del extract a naming más cercano a `greenhouse_raw` / `greenhouse_conformed`.
+
+## 2026-03-19 — Business Units v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de `Business Units` a una baseline de implementación alineada con `service_modules` como catálogo ya existente, evitando duplicar identidad y separando BU comercial vs BU operativa.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+  - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/tasks/to-do/Greenhouse_Account_360_Object_Model_v1.md`
+  - `src/lib/tenant/identity-store.ts`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` reduce el riesgo principal de la task original, pero deja una decisión importante abierta para implementación real: si de verdad se quiere medir BU en el `ICO Engine`, primero hay que fijar si esa dimensión será comercial o operativa.
+- Si esto se implementa pronto, conviene un `P0` mucho más corto: metadata 1:1 para `business_line` existente + helper de enrichment server-side.
+- La última iteración ya deja la semántica recomendada explícita:
+  - `commercial_business_unit` para Finance / Services
+  - `operating_business_unit` para ICO / delivery
+  Si se implementa analítica por BU, no mezclar ambas en una sola tabla o KPI sin nombrarlo.
+
+## 2026-03-19 — Home Nexa v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de `Home + Nexa` a una baseline de implementación alineada con el runtime real del portal, `portalHomePath`, los route groups vigentes y la coexistencia con `/dashboard` e `/internal/dashboard`.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Greenhouse_Home_Nexa.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `src/lib/auth.ts`
+  - `src/lib/tenant/access.ts`
+  - `src/app/(dashboard)/home/page.tsx`
+  - `package.json`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` deja explícito que `client -> /home` es la dirección deseada, pero sin romper los homes especializados de `internal`, `finance` y `hr`.
+- Si se implementa pronto, conviene separar un `P0` de Home client-first y un `P1` de Nexa conversacional real para no mezclar landing UX con toda la infraestructura del agente.
+
+## 2026-03-19 — Staff Augmentation v2 as implementation baseline
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Traducir la spec original de `Staff Augmentation` a una baseline de implementación alineada con assignments como anchor, `PostgreSQL` como write path, `Services` como relación opcional y el modelo vivo de IDs/FKs del core.
+
+### Rama
+- Rama usada: workspace actual
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Documentación operativa del repo
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md`
+- `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Verificacion
+- Revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+  - `docs/tasks/to-do/Greenhouse_Account_360_Object_Model_v1.md`
+- Sin build ni lint: cambio documental únicamente
+
+### Riesgos o pendientes
+- La `v2` deja al módulo mucho mejor alineado, pero `ICO by placement` sigue siendo una fase posterior mientras no exista un bridge inequívoco `task -> assignment/placement`.
+- Si el módulo se implementa pronto, conviene sacar un task ejecutivo más corto para `P0`: `assignment_type`, placements, onboarding, event log y People enrichment.
+
 ## 2026-03-19 — SCIM v2 as implementation baseline
 
 ### Agente

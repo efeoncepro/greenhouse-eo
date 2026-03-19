@@ -1,8 +1,8 @@
 import {
-  Body, Container, Head, Html, Img, Preview, Section, Text
+  Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text
 } from '@react-email/components'
 
-import { EMAIL_COLORS, EMAIL_FONTS } from '../constants'
+import { APP_URL, EMAIL_COLORS, EMAIL_FONTS, LOGO_URL } from '../constants'
 
 interface EmailLayoutProps {
   children: React.ReactNode
@@ -11,9 +11,13 @@ interface EmailLayoutProps {
 
 export default function EmailLayout({ children, previewText }: EmailLayoutProps) {
   return (
-    <Html>
+    <Html lang="es" dir="ltr">
       <Head>
-        <style>{`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=DM+Sans:wght@400;500&display=swap');`}</style>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light" />
+        <meta name="supported-color-schemes" content="light" />
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap');`}</style>
       </Head>
       {previewText && <Preview>{previewText}</Preview>}
       <Body style={{
@@ -21,43 +25,68 @@ export default function EmailLayout({ children, previewText }: EmailLayoutProps)
         fontFamily: EMAIL_FONTS.body,
         margin: 0,
         padding: 0,
+        WebkitTextSizeAdjust: '100%',
       }}>
-        {/* Header */}
+        {/* Header with gradient */}
         <Section style={{
+          background: `linear-gradient(135deg, ${EMAIL_COLORS.headerBg} 0%, ${EMAIL_COLORS.headerAccent} 100%)`,
           backgroundColor: EMAIL_COLORS.headerBg,
-          padding: '24px 0',
+          padding: '28px 0 24px',
           textAlign: 'center' as const,
         }}>
-          <Img
-            src="https://greenhouse.efeoncepro.com/images/logos/efeonce-wordmark-white.png"
-            alt="Efeonce"
-            width={140}
-            height={32}
-            style={{ margin: '0 auto' }}
-          />
+          <Link href={APP_URL} style={{ textDecoration: 'none' }}>
+            <Img
+              src={LOGO_URL}
+              alt="Efeonce Greenhouse — Plataforma de gestión"
+              width={160}
+              height={37}
+              style={{ margin: '0 auto', display: 'block' }}
+            />
+          </Link>
         </Section>
 
         {/* Body card */}
         <Container style={{
-          maxWidth: '600px',
-          margin: '32px auto',
+          maxWidth: '560px',
+          margin: '-20px auto 0',
           backgroundColor: EMAIL_COLORS.containerBg,
-          borderRadius: '8px',
-          padding: '40px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          borderRadius: '12px',
+          padding: '40px 36px 32px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.1)',
+          position: 'relative' as const,
         }}>
           {children}
         </Container>
 
         {/* Footer */}
-        <Section style={{ textAlign: 'center' as const, padding: '0 0 32px' }}>
+        <Section style={{
+          textAlign: 'center' as const,
+          padding: '24px 20px 32px',
+          maxWidth: '560px',
+          margin: '0 auto',
+        }}>
+          <Hr style={{
+            borderColor: EMAIL_COLORS.border,
+            borderTop: 'none',
+            margin: '0 0 20px',
+          }} />
           <Text style={{
             fontFamily: EMAIL_FONTS.body,
             fontSize: '13px',
             color: EMAIL_COLORS.muted,
             lineHeight: '20px',
+            margin: '0 0 4px',
           }}>
             Efeonce Greenhouse™ · Empower your Growth
+          </Text>
+          <Text style={{
+            fontFamily: EMAIL_FONTS.body,
+            fontSize: '12px',
+            color: EMAIL_COLORS.muted,
+            lineHeight: '18px',
+            margin: '0',
+          }}>
+            Este es un correo automático. Si tienes dudas, contacta a tu administrador.
           </Text>
         </Section>
       </Body>
