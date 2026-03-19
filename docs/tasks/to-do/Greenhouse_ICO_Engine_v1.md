@@ -6,6 +6,31 @@
 
 ---
 
+## Estado 2026-03-18
+
+Este documento sigue siendo una spec amplia de diseno del `ICO Engine`, pero ya no debe leerse como snapshot exacto del runtime por si solo.
+
+Fuente operativa vigente para el estado actual:
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+- `docs/tasks/complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md`
+
+Estado real ya absorbido en la arquitectura viva:
+- el `ICO Engine` ya se documenta como servicio de metricas agnostico a dimension
+- ya existen `metrics_by_member`, `GET /api/ico-engine/context`, multi-assignee support y `GET /api/ico-engine/health`
+- el pipeline operativo ya se documenta como `notion-bq-sync -> /api/cron/sync-conformed -> /api/cron/ico-materialize`
+
+Lectura correcta de este documento:
+- usarlo para entender la intencion funcional, el registro de metricas y extensiones futuras
+- no tomar como source of truth literal las secciones que aun describen:
+  - scoping por `notion_project_ids`
+  - supuestos single-tenant del sync
+  - pasos historicos ya corregidos por el hardening del pipeline
+
+Cuando este documento choque con la arquitectura actualizada del 2026-03-18, prevalece la arquitectura.
+
 ## 1. Resumen ejecutivo
 
 Este documento define el **ICO Engine**: la capa transversal de métricas de delivery de Greenhouse que calcula, materializa y expone las métricas operativas de Intelligent Creative Operations (ICO) para todos los servicios de Efeonce.
