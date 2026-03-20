@@ -14,8 +14,23 @@
  * Usage:
  *   npx tsx scripts/backfill-unified-org.ts
  */
+import { randomUUID } from 'node:crypto'
 import { runGreenhousePostgresQuery } from '../src/lib/postgres/client'
-import { generateOrganizationId, nextPublicId } from '../src/lib/account-360/id-generation'
+
+// Inline id-generation functions to avoid server-only import chain
+const generateOrganizationId = () => `org-${randomUUID()}`
+
+const nextPublicId = async (prefix: string): Promise<string> => {
+  const seqMap: Record<string, string> = {
+    'EO-ORG': 'greenhouse_core.seq_organization_public_id'
+  }
+  const seqName = seqMap[prefix]
+  if (!seqName) throw new Error(`Unknown prefix: ${prefix}`)
+  const rows = await runGreenhousePostgresQuery<{ nextval: string }>(
+    `SELECT nextval('${seqName}')::text`
+  )
+  return `${prefix}-${String(rows[0].nextval).padStart(4, '0')}`
+}
 
 type SupplierRow = {
   supplier_id: string

@@ -21,11 +21,33 @@ const runSqlFile = async (filename: string) => {
   const filePath = path.join(__dirname, filename)
   const sql = fs.readFileSync(filePath, 'utf-8')
 
-  // Split on semicolons but handle DO $$ blocks
-  const statements = sql
-    .split(/;\s*$/m)
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'))
+  // Split on semicolons at end-of-line, but preserve DO $$ ... END $$; blocks
+  const statements: string[] = []
+  let current = ''
+  let inDollarBlock = false
+
+  for (const line of sql.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('--')) {
+      if (inDollarBlock) current += line + '\n'
+      continue
+    }
+
+    if (/^DO\s+\$\$/.test(trimmed)) inDollarBlock = true
+
+    current += line + '\n'
+
+    if (inDollarBlock && /END\s+\$\$\s*;/.test(trimmed)) {
+      statements.push(current.trim())
+      current = ''
+      inDollarBlock = false
+    } else if (!inDollarBlock && trimmed.endsWith(';')) {
+      statements.push(current.trim().replace(/;$/, ''))
+      current = ''
+    }
+  }
+
+  if (current.trim()) statements.push(current.trim())
 
   for (const stmt of statements) {
     try {
