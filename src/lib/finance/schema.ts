@@ -220,10 +220,22 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
     client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_client_profiles` ADD COLUMN IF NOT EXISTS client_id STRING'
   },
   fin_income: {
-    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS client_id STRING'
+    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS client_id STRING',
+    nubox_document_id: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_document_id STRING',
+    nubox_sii_track_id: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_sii_track_id STRING',
+    nubox_emission_status: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_emission_status STRING',
+    dte_type_code: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_type_code STRING',
+    dte_folio: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS dte_folio STRING',
+    nubox_emitted_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_emitted_at TIMESTAMP',
+    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_income` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP'
   },
   fin_expenses: {
-    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING'
+    client_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS client_id STRING',
+    nubox_purchase_id: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_purchase_id STRING',
+    nubox_document_status: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_document_status STRING',
+    nubox_supplier_rut: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_supplier_rut STRING',
+    nubox_origin: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_origin STRING',
+    nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP'
   },
   fin_bank_statement_rows: {
     matched_payment_id: 'ALTER TABLE `{projectId}.greenhouse.fin_bank_statement_rows` ADD COLUMN IF NOT EXISTS matched_payment_id STRING'

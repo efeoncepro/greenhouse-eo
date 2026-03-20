@@ -60,6 +60,14 @@ type PostgresIncomeRow = {
   created_by_user_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
+  // Nubox DTE fields
+  nubox_document_id: string | number | null
+  nubox_sii_track_id: string | number | null
+  nubox_emission_status: string | null
+  dte_type_code: string | null
+  dte_folio: string | null
+  nubox_emitted_at: string | Date | null
+  nubox_last_synced_at: string | Date | null
 }
 
 type PostgresExpenseRow = {
@@ -109,6 +117,13 @@ type PostgresExpenseRow = {
   created_by_user_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
+  // Nubox purchase fields
+  nubox_purchase_id: string | number | null
+  nubox_document_status: string | null
+  nubox_supplier_rut: string | null
+  nubox_supplier_name: string | null
+  nubox_origin: string | null
+  nubox_last_synced_at: string | Date | null
 }
 
 type PostgresIncomePaymentRow = {
@@ -168,6 +183,14 @@ export type FinanceIncomeRecord = {
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
+  // Nubox DTE fields
+  nuboxDocumentId: string | null
+  nuboxSiiTrackId: string | null
+  nuboxEmissionStatus: string | null
+  dteTypeCode: string | null
+  dteFolio: string | null
+  nuboxEmittedAt: string | null
+  nuboxLastSyncedAt: string | null
 }
 
 export type CostCategory = 'direct_labor' | 'indirect_labor' | 'operational' | 'infrastructure' | 'tax_social'
@@ -221,6 +244,13 @@ export type FinanceExpenseRecord = {
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
+  // Nubox purchase fields
+  nuboxPurchaseId: string | null
+  nuboxDocumentStatus: string | null
+  nuboxSupplierRut: string | null
+  nuboxSupplierName: string | null
+  nuboxOrigin: string | null
+  nuboxLastSyncedAt: string | null
 }
 
 export type CostAllocationRecord = {
@@ -328,11 +358,18 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     notes: str(row.notes),
     createdBy: str(row.created_by_user_id),
     createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
-    updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+    updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null),
+    nuboxDocumentId: str(row.nubox_document_id != null ? String(row.nubox_document_id) : null),
+    nuboxSiiTrackId: str(row.nubox_sii_track_id != null ? String(row.nubox_sii_track_id) : null),
+    nuboxEmissionStatus: str(row.nubox_emission_status),
+    dteTypeCode: str(row.dte_type_code),
+    dteFolio: str(row.dte_folio),
+    nuboxEmittedAt: toTimestampString(row.nubox_emitted_at as string | { value?: string } | null),
+    nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
   }
 }
 
-const mapExpense = (row: PostgresExpenseRow): FinanceExpenseRecord => ({
+const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   expenseId: normalizeString(row.expense_id),
   clientId: str(row.client_id),
   expenseType: normalizeString(row.expense_type),
@@ -378,10 +415,16 @@ const mapExpense = (row: PostgresExpenseRow): FinanceExpenseRecord => ({
   notes: str(row.notes),
   createdBy: str(row.created_by_user_id),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
-  updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+  updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null),
+  nuboxPurchaseId: str(row.nubox_purchase_id != null ? String(row.nubox_purchase_id) : null),
+  nuboxDocumentStatus: str(row.nubox_document_status),
+  nuboxSupplierRut: str(row.nubox_supplier_rut),
+  nuboxSupplierName: str(row.nubox_supplier_name),
+  nuboxOrigin: str(row.nubox_origin),
+  nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
 })
 
-const mapIncomePayment = (row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({
+const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({
   paymentId: normalizeString(row.payment_id),
   incomeId: normalizeString(row.income_id),
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
@@ -579,7 +622,9 @@ export const listFinanceIncomeFromPostgres = async ({
         is_reconciled, reconciliation_id,
         partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
         notes, created_by_user_id,
-        created_at, updated_at
+        created_at, updated_at,
+        nubox_document_id, nubox_sii_track_id, nubox_emission_status,
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
       FROM greenhouse_finance.income
       ${whereClause}
       ORDER BY invoice_date DESC
@@ -607,7 +652,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
         is_reconciled, reconciliation_id,
         partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
         notes, created_by_user_id,
-        created_at, updated_at
+        created_at, updated_at,
+        nubox_document_id, nubox_sii_track_id, nubox_emission_status,
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
       FROM greenhouse_finance.income
       WHERE income_id = $1
       LIMIT 1
@@ -953,7 +1000,9 @@ export const listFinanceExpensesFromPostgres = async ({
         is_reconciled, reconciliation_id, linked_income_id,
         cost_category, cost_is_direct, allocated_client_id,
         notes, created_by_user_id,
-        created_at, updated_at
+        created_at, updated_at,
+        nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at
       FROM greenhouse_finance.expenses
       ${whereClause}
       ORDER BY COALESCE(document_date, payment_date, created_at::date) DESC
@@ -986,7 +1035,9 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         is_reconciled, reconciliation_id, linked_income_id,
         cost_category, cost_is_direct, allocated_client_id,
         notes, created_by_user_id,
-        created_at, updated_at
+        created_at, updated_at,
+        nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at
       FROM greenhouse_finance.expenses
       WHERE expense_id = $1
       LIMIT 1
