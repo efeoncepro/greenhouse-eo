@@ -6,6 +6,18 @@
 
 ## 2026-03-20
 
+### Sidebar navigation — reestructuración de idioma, jerarquía y consistencia
+- Labels en inglés eliminados del sidebar: `Updates` → `Novedades`, `Control Tower` → `Torre de control`, `Admin` → `Administración`, `AI Tooling` → `Herramientas IA`.
+- Sección `HR` eliminada como SubMenu independiente; sus 4 items se fusionaron en la sección `Equipo` junto con `Personas`, con lógica condicional por permisos.
+- Sección `Operacion` eliminada (tenía 1 solo hijo); `Torre de control` queda como flat item.
+- Sección `Agencia` renombrada a `Gestión` para resolver colisión con el item `Agencia` dentro de ella.
+- Sección `Servicios` renombrada a `Módulos` para capability modules de cliente.
+- Todos los hijos de SubMenu (Finanzas, Administración) ahora usan `NavLabel` con subtítulo, igualando la consistencia visual del resto del menú.
+- Items HR promovidos a sección ahora tienen iconos propios (`tabler-receipt`, `tabler-sitemap`, `tabler-calendar-event`, `tabler-clock-check`).
+- `DefaultSuggestions.tsx` (barra de búsqueda): corregidas rutas obsoletas (`/dashboards` → `/dashboard`, `/finance/clients` → `/finance/suppliers`), sección `People` → `Equipo`, `Control Tower` → `Torre de control`.
+- Archivos tocados: `greenhouse-nomenclature.ts`, `VerticalMenu.tsx`, `DefaultSuggestions.tsx`.
+- Commit: `62f6abd`.
+
 ### Organization finance snapshots auto-compute on cache miss
 - `Agency > Organizations > Finanzas` ya no queda vacío solo porque falte el snapshot mensual en `greenhouse_finance.client_economics`. Si la organización no encuentra datos para el período, el backend intenta calcular ese mes y vuelve a consultar.
 - El cálculo mensual de `client_economics` quedó centralizado en un helper reutilizable para evitar duplicar lógica entre `Finance Intelligence` y `Organization Finance`.

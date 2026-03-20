@@ -4,6 +4,52 @@ Registro de cambios principales de Greenhouse EO.
 
 ---
 
+### Sidebar Navigation — Reestructuración de idioma, jerarquía y consistencia (2026-03-20)
+
+Refactor completo del sidebar de navegación para eliminar 7 problemas arquitectónicos: idioma mixto, secciones de 1 hijo, colisión de nombres, dominios fragmentados, NavLabel inconsistente, nombres ambiguos y falta de regla para Section vs SubMenu vs Flat.
+
+#### Regla de diseño establecida
+
+| Patrón | Cuándo usar | Comportamiento |
+|--------|-------------|----------------|
+| **Flat MenuItem** | Navegación primaria, siempre visible | Click directo |
+| **MenuSection** | Frontera de dominio, 2+ hijos | Header uppercase, sin acordeón |
+| **SubMenu** | Módulo funcional, 3+ rutas, ocultar reduce ruido | Acordeón colapsable |
+
+#### Cambios de labels (inglés → español)
+
+| Antes | Después | Razón |
+|-------|---------|-------|
+| Updates | Novedades | Español |
+| Control Tower | Torre de control | Español |
+| Admin | Administración | Español |
+| HR | *(fusionado en Equipo)* | Español + dominio unificado |
+| AI Tooling | Herramientas IA | Español |
+| Sección "Agencia" | Gestión | Colisión con item Agencia |
+| Sección "Servicios" | Módulos | Ambigüedad |
+| Sección "Operacion" | *(eliminada)* | 1 solo hijo |
+
+#### Fusión Equipo + HR
+
+La sección `Equipo` (1 hijo: Personas) y el SubMenu `HR` (4 hijos) se unifican en una sola sección `Equipo` con lógica condicional:
+- People + HR → sección con 5 items
+- Solo People → flat item (sin sección)
+- Solo HR → sección con 4 items
+
+Items HR promovidos a sección reciben iconos propios: `tabler-receipt`, `tabler-sitemap`, `tabler-calendar-event`, `tabler-clock-check`.
+
+#### NavLabel universal
+
+Todos los hijos de SubMenu (Finanzas, Administración) ahora usan `NavLabel` con subtítulo, igualando la consistencia visual del resto del menú. Antes usaban strings planos.
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/config/greenhouse-nomenclature.ts` | Labels renombrados + nueva entrada `adminAiTools` |
+| `src/components/layout/vertical/VerticalMenu.tsx` | Reestructura completa del menu builder |
+| `src/components/layout/shared/search/DefaultSuggestions.tsx` | Rutas y labels corregidos |
+
+---
+
 ### Person Activity Tab — ICO Metrics + Sidebar Stats Alignment + Identity Reconciliation (2026-03-19)
 
 Consolidación de métricas operativas en Person 360: el tab ICO se elimina y sus datos se integran en el tab Actividad. Se corrige la desconexión entre el sidebar de persona y las membresías reales. Se implementa un servicio escalable de reconciliación de identidades.

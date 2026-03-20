@@ -40,6 +40,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 14:30 -03
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Reestructurar el sidebar de navegación del portal para eliminar inconsistencias de idioma, jerarquía y UX writing.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- Development / Preview / `staging` / Production (cambio puramente frontend)
+
+### Archivos tocados
+- `src/config/greenhouse-nomenclature.ts` — labels: Updates→Novedades, Control Tower→Torre de control, nueva entrada adminAiTools
+- `src/components/layout/vertical/VerticalMenu.tsx` — reestructura completa: elimina secciones de 1 hijo, fusiona Equipo+HR, renombra Agencia→Gestión / Servicios→Módulos / Admin→Administración, NavLabel en todos los SubMenu children
+- `src/components/layout/shared/search/DefaultSuggestions.tsx` — corrige rutas obsoletas, sección People→Equipo, labels en inglés→español
+
+### Verificacion
+- `npx tsc --noEmit` ✅ — sin errores de tipo
+- Commit `62f6abd` pusheado a `develop`
+- Cambios de label se propagan automáticamente a `verticalMenuData.tsx` y `horizontalMenuData.tsx` vía constantes de nomenclatura
+
+### Riesgos o pendientes
+- Los items HR ahora son hijos de sección (no de SubMenu), lo que los hace siempre visibles en lugar de colapsados. Verificar que el sidebar colapsado no se desborde cuando un usuario tiene todos los permisos (agency + people + hr + finance + admin).
+- Los capability modules (Creative Hub, CRM Command, etc.) siguen en inglés — son brand names, no labels de navegación. Si se decide traducirlos, el cambio va en `capability-registry.ts`.
+- Falta validación visual en cada tipo de usuario (cliente, interno, agency, admin, hr, finance, ai_tooling).
+
+---
+
 ## 2026-03-20 11:05 -03
 
 ### Agente

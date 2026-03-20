@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-20 Sidebar navigation — reestructuración arquitectónica
+- Se eliminó todo label en inglés del sidebar: `Updates`, `Control Tower`, `HR`, `Admin`, `AI Tooling` pasan a español.
+- Se definió una regla explícita de cuándo usar cada patrón de menú:
+  - **Flat MenuItem**: navegación primaria siempre visible (click directo)
+  - **MenuSection**: frontera de dominio con 2+ hijos del mismo contexto (header uppercase, sin acordeón)
+  - **SubMenu**: módulo funcional con 3+ rutas donde ocultar reduce ruido (acordeón colapsable)
+- Se fusionaron las secciones `Equipo` (1 hijo: Personas) y `HR` (4 hijos: Nómina, Departamentos, Permisos, Asistencia) en una sola sección `Equipo` con lógica condicional: people+HR → sección unificada; solo people → flat item; solo HR → sección HR.
+- Sección `Agencia` renombrada a `Gestión` (colisión con item `Agencia`).
+- Sección `Servicios` renombrada a `Módulos` (ambigüedad).
+- Sección `Operacion` eliminada (single-child anti-pattern).
+- Regla de producto derivada:
+  - Todo label de navegación del portal debe estar en español; los nombres de producto (`Pulse`, `Greenhouse`, `Creative Hub`) son excepciones por ser brand names
+  - Las secciones de 1 solo hijo no deben existir; usar flat item en su lugar
+  - Los hijos de SubMenu deben usar `NavLabel` con subtítulo, igual que los items de nivel superior
+
 ## Delta 2026-03-20 Nubox DTE staging runtime aligned + DTE labeling clarified
 - `staging` / `dev-greenhouse.efeoncepro.com` no tenía cargadas las env vars Nubox aunque `Development`, `Preview` y `Production` sí.
 - Se alineó `staging` con:
