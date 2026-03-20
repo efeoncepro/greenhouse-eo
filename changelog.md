@@ -6,6 +6,12 @@
 
 ## 2026-03-20
 
+### Finance DTE staging rollout + visual clarification
+- `staging` / `dev-greenhouse.efeoncepro.com` ahora sí tiene `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY`; antes de eso el detalle de ingresos podía descargar mal por falta de env vars en ese ambiente.
+- Se redeployó `staging` y el dominio quedó re-apuntado al deployment sano con runtime Nubox habilitado.
+- `Finance > Ingresos > detalle` ya no induce a leer “factura 33”: la vista separa `Tipo de documento`, `Código SII 33` y `Folio DTE 114`.
+- Se verificó contra la fuente real de Nubox que el documento `26639047` corresponde a `TipoDTE 33` y `Folio 114`; no había cruce de data.
+
 ### Finance income detail — fechas DTE visibles y descargas Nubox corregidas
 - `Finance > Ingresos > detalle` ya no pierde fechas de emisión/vencimiento cuando Postgres devuelve `Date` objects; el normalizador compartido ahora soporta `Date` además de `string`.
 - La descarga XML del DTE ahora decodifica correctamente la respuesta real de Nubox, que llega como JSON con el XML en base64.

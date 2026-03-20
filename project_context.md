@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-20 Nubox DTE staging runtime aligned + DTE labeling clarified
+- `staging` / `dev-greenhouse.efeoncepro.com` no tenía cargadas las env vars Nubox aunque `Development`, `Preview` y `Production` sí.
+- Se alineó `staging` con:
+  - `NUBOX_API_BASE_URL`
+  - `NUBOX_BEARER_TOKEN`
+  - `NUBOX_X_API_KEY`
+- Regla operativa derivada:
+  - cualquier ambiente que deba emitir, refrescar estado o descargar PDF/XML de DTE desde Nubox debe tener las 3 `NUBOX_*` presentes; no basta con cargarlas solo en `Development`, `Preview` o `Production`
+- Validación de documento real:
+  - Nubox `sale 26639047` corresponde a `type.legalCode = 33` y `number = 114`
+  - por lo tanto `33` es código SII del tipo de DTE y `114` es el folio real
+- Ajuste de UX derivado:
+  - `Finance > Ingresos > detalle` debe separar visualmente `Tipo de documento`, `Código SII` y `Folio DTE` para evitar interpretar `33` como número de factura
+
 ## Delta 2026-03-19 Nubox DTE integration — API discovery, org mapping, supplier seeding, income import
 - Se descubrió y validó la New API de Nubox (Integraciones/Pyme) con credenciales productivas:
   - Base URL: `https://api.pyme.nubox.com/nbxpymapi-environment-pyme/v1`

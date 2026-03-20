@@ -40,6 +40,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 09:33 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Cerrar el rollout operativo de `Finance > Ingresos > DTE detail` en `staging` y verificar que el dato de Nubox no estuviera cruzado.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- `staging` / `dev-greenhouse.efeoncepro.com`
+
+### Archivos tocados
+- `src/views/greenhouse/finance/IncomeDetailView.tsx` — copy/UI para separar tipo de documento vs código SII vs folio real
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+- Verificación directa contra Nubox del documento `26639047`:
+  - `number = 114`
+  - `type.legalCode = 33`
+  - `type.name = Factura electrónica`
+  - XML real: `<TipoDTE>33</TipoDTE>` y `<Folio>114</Folio>`
+- Conclusión: no había cruce de documentos; el problema era de lectura visual, no de data.
+- Vercel:
+  - se detectó que `staging` no tenía `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN`, `NUBOX_X_API_KEY`
+  - esas 3 variables se cargaron en `staging`
+  - se redeployó `staging`
+  - `dev-greenhouse.efeoncepro.com` quedó apuntando a `https://greenhouse-qlxcf9v6s-efeonce-7670142f.vercel.app`
+- Git:
+  - `2e88190 fix: restore finance income dte dates and downloads`
+  - `1cd824b fix: clarify dte type vs folio in income detail`
+
+### Riesgos o pendientes
+- `staging` quedó sano para Nubox DTE, pero si se crea otro ambiente custom o preview compartido que necesite descargas DTE, hay que replicar explícitamente las 3 variables `NUBOX_*`.
+- Queda recomendado mantener el label visual como:
+  - tipo de documento
+  - código SII
+  - folio DTE
+  para no volver a inducir lectura de “factura 33”.
+
 ## 2026-03-20 09:03 -03
 
 ### Agente
