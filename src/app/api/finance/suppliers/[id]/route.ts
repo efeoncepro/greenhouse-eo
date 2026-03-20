@@ -20,6 +20,7 @@ import {
   type PaymentMethod
 } from '@/lib/finance/shared'
 import { getFinanceSupplierFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { listFinanceExpensesFromPostgres } from '@/lib/finance/postgres-store-slice2'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +59,8 @@ interface ExpenseHistoryRow {
   total_amount: unknown
   currency: string
   payment_date: unknown
+  document_date: unknown
+  due_date: unknown
   payment_method: string | null
   document_number: string | null
   description: string
@@ -77,9 +80,23 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const supplier = await getFinanceSupplierFromPostgres(supplierId)
 
     if (supplier) {
+      const expenses = await listFinanceExpensesFromPostgres({
+        supplierId,
+        page: 1,
+        pageSize: 20
+      })
+
       return NextResponse.json({
         ...supplier,
-        paymentHistory: []
+        paymentHistory: expenses.items.map(expense => ({
+          expenseId: expense.expenseId,
+          amount: expense.totalAmount,
+          currency: expense.currency,
+          paymentDate: expense.paymentDate || expense.documentDate || expense.dueDate,
+          paymentMethod: expense.paymentMethod,
+          documentNumber: expense.documentNumber,
+          description: expense.description
+        }))
       })
     }
 
@@ -108,10 +125,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const row = rows[0]
 
   const expenses = await runFinanceQuery<ExpenseHistoryRow>(`
-    SELECT expense_id, total_amount, currency, payment_date, payment_method, document_number, description
+    SELECT expense_id, total_amount, currency, payment_date, document_date, due_date, payment_method, document_number, description
     FROM \`${projectId}.greenhouse.fin_expenses\`
     WHERE supplier_id = @supplierId
-    ORDER BY payment_date DESC
+    ORDER BY COALESCE(payment_date, document_date, due_date) DESC
     LIMIT 20
   `, { supplierId })
 
@@ -147,7 +164,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       expenseId: normalizeString(e.expense_id),
       amount: toNumber(e.total_amount),
       currency: normalizeString(e.currency),
-      paymentDate: toDateString(e.payment_date as string | { value?: string } | null),
+      paymentDate:
+        toDateString(e.payment_date as string | { value?: string } | null) ||
+        toDateString(e.document_date as string | { value?: string } | null) ||
+        toDateString(e.due_date as string | { value?: string } | null),
       paymentMethod: e.payment_method ? normalizeString(e.payment_method) : null,
       documentNumber: e.document_number ? normalizeString(e.document_number) : null,
       description: normalizeString(e.description)

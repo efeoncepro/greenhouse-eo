@@ -40,6 +40,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 10:12 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir `Finance > Proveedores > Historial de pagos`, que en runtime Postgres mostraba vacío aunque los egresos sí existían y estaban asociados al proveedor.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development / Preview / `staging`
+
+### Archivos tocados
+- `src/app/api/finance/suppliers/[id]/route.ts` — el path Postgres ahora consulta `greenhouse_finance.expenses` y arma `paymentHistory` real en vez de devolver `[]`
+- `src/views/greenhouse/finance/SupplierDetailView.tsx` — tabla robustecida para fechas, documentos y métodos nulos; el encabezado de fecha queda neutral porque algunos egresos pagados/importados no traen `payment_date`
+
+### Verificacion
+- Revisión del endpoint confirmó el bug raíz: `GET /api/finance/suppliers/[id]` en Postgres devolvía el proveedor pero forzaba `paymentHistory: []`
+- `pnpm eslint 'src/app/api/finance/suppliers/[id]/route.ts' src/views/greenhouse/finance/SupplierDetailView.tsx` ✅
+- No se pudo completar una consulta manual directa a Cloud SQL desde la terminal local por un error OpenSSL del flujo de firma del conector (`ERR_OSSL_UNSUPPORTED`), así que la validación de data real quedó inferida por:
+  - el `expense detail` ya muestra `supplier_id` asociado
+  - la API tenía un `[]` hardcodeado en Postgres
+  - el fallback BigQuery ya contemplaba consultar egresos del proveedor
+
+### Riesgos o pendientes
+- Algunos egresos Nubox/importados pueden venir con `payment_status = 'paid'` pero sin `payment_date` ni `payment_method`; por eso la tabla ahora usa fallback de fecha (`payment_date -> document_date -> due_date`) y muestra `—` si falta el método.
+- Falta validación manual en `dev-greenhouse.efeoncepro.com` para confirmar que el proveedor ya lista sus registros en `Historial de pagos`.
+
 ## 2026-03-20 09:33 -03
 
 ### Agente

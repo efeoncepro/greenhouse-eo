@@ -36,9 +36,9 @@ interface PaymentRecord {
   expenseId: string
   amount: number
   currency: string
-  paymentDate: string
-  paymentMethod: string
-  documentNumber: string
+  paymentDate: string | null
+  paymentMethod: string | null
+  documentNumber: string | null
   description: string
 }
 
@@ -107,8 +107,17 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
 const formatAmount = (amount: number, currency: string) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency, maximumFractionDigits: currency === 'CLP' ? 0 : 2 }).format(amount)
 
-const formatDate = (value: string) => {
+const formatDate = (value: string | null | undefined) => {
+  if (!value) {
+    return '—'
+  }
+
   const date = value.includes('T') ? new Date(value) : new Date(`${value}T00:00:00`)
+
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+
   const dd = String(date.getDate()).padStart(2, '0')
   const mm = String(date.getMonth() + 1).padStart(2, '0')
   const yyyy = date.getFullYear()
@@ -450,7 +459,7 @@ const SupplierDetailView = () => {
                         <TableCell>Descripción</TableCell>
                         <TableCell align='right'>Monto</TableCell>
                         <TableCell>Moneda</TableCell>
-                        <TableCell>Fecha pago</TableCell>
+                        <TableCell>Fecha</TableCell>
                         <TableCell>Método</TableCell>
                       </TableRow>
                     </TableHead>
@@ -458,7 +467,7 @@ const SupplierDetailView = () => {
                       {supplier.paymentHistory.map(payment => (
                         <TableRow key={payment.expenseId}>
                           <TableCell>
-                            <Typography variant='body2'>{payment.documentNumber}</Typography>
+                            <Typography variant='body2'>{payment.documentNumber ?? '—'}</Typography>
                           </TableCell>
                           <TableCell>
                             <Typography variant='body2'>{payment.description}</Typography>
@@ -476,7 +485,7 @@ const SupplierDetailView = () => {
                           </TableCell>
                           <TableCell>
                             <Typography variant='body2'>
-                              {PAYMENT_METHOD_LABELS[payment.paymentMethod] ?? payment.paymentMethod}
+                              {payment.paymentMethod ? (PAYMENT_METHOD_LABELS[payment.paymentMethod] ?? payment.paymentMethod) : '—'}
                             </Typography>
                           </TableCell>
                         </TableRow>

@@ -6,6 +6,10 @@
 
 ## 2026-03-20
 
+### Finance supplier payment history restored in Postgres path
+- `Finance > Proveedores > Historial de pagos` ya no queda vacío en runtime Postgres por devolver `paymentHistory: []` hardcodeado. El endpoint del proveedor ahora consulta los egresos asociados y expone hasta 20 registros recientes.
+- La tabla de historial del proveedor ahora tolera fechas, documentos y métodos nulos sin renderizar valores inválidos; cuando falta `payment_date`, usa fallback de `document_date` o `due_date`.
+
 ### Finance DTE staging rollout + visual clarification
 - `staging` / `dev-greenhouse.efeoncepro.com` ahora sí tiene `NUBOX_API_BASE_URL`, `NUBOX_BEARER_TOKEN` y `NUBOX_X_API_KEY`; antes de eso el detalle de ingresos podía descargar mal por falta de env vars en ese ambiente.
 - Se redeployó `staging` y el dominio quedó re-apuntado al deployment sano con runtime Nubox habilitado.
