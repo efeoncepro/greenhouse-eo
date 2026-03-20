@@ -293,6 +293,61 @@ const buildStatusPhaseConfigTable = (projectId: string) => `
   )
 `
 
+/**
+ * Existing BigQuery tables are not auto-migrated by CREATE TABLE IF NOT EXISTS.
+ * Run additive ALTERs on every boot so cron paths self-heal column drift.
+ */
+const buildColumnMigrationStatements = (projectId: string) => [
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS active_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS computed_at TIMESTAMP`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+   ADD COLUMN IF NOT EXISTS engine_version STRING`,
+
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS otd_pct FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS throughput_count INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS stuck_asset_count INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
+   ADD COLUMN IF NOT EXISTS active_tasks INT64`,
+
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS otd_pct FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS throughput_count INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS stuck_asset_count INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
+  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+   ADD COLUMN IF NOT EXISTS active_tasks INT64`
+]
+
 // ─── Infrastructure Provisioning (Singleton Promise) ────────────────────────
 
 let ensureIcoEngineInfrastructurePromise: Promise<void> | null = null
@@ -360,7 +415,16 @@ export const ensureIcoEngineInfrastructure = async () => {
       console.warn('[ICO] Could not check INFORMATION_SCHEMA:', schemaCheckError instanceof Error ? schemaCheckError.message : schemaCheckError)
     }
 
-    // 3. Create or replace views (idempotent)
+    // 3. Apply additive schema migrations for existing tables.
+    for (const statement of buildColumnMigrationStatements(projectId)) {
+      try {
+        await bigQuery.query({ query: statement })
+      } catch (migrationError) {
+        console.warn('[ICO] Could not apply column migration:', migrationError instanceof Error ? migrationError.message : migrationError)
+      }
+    }
+
+    // 4. Create or replace views (idempotent)
     try {
       await bigQuery.query({ query: buildTasksEnrichedView(projectId) })
     } catch (viewError) {

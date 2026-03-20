@@ -1,6 +1,9 @@
 import 'server-only'
 
 import { randomUUID, createHash } from 'node:crypto'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -96,78 +99,123 @@ type NotionSprintRow = {
 
 const toNullableString = (value: unknown): string | null => {
   if (value === null || value === undefined) return null
-  if (typeof value === 'string') { const t = value.trim(); return t || null }
+
+  if (typeof value === 'string') {
+    const t = value.trim()
+
+    return t || null
+  }
+
   if (typeof value === 'object' && value && 'value' in value) {
     return toNullableString((value as { value?: unknown }).value)
   }
+
   return String(value)
 }
 
 const toNumber = (value: unknown) => {
   const s = toNullableString(value)
-  if (!s) return null
-  const n = Number(s.replace(/,/g, ''))
-  return Number.isFinite(n) ? n : null
-}
 
-const toBoolean = (value: unknown) => {
-  if (typeof value === 'boolean') return value
-  return toNullableString(value)?.toLowerCase() === 'true'
+  if (!s) return null
+
+  const n = Number(s.replace(/,/g, ''))
+
+  return Number.isFinite(n) ? n : null
 }
 
 const toYesNoBoolean = (value: unknown) => {
   if (typeof value === 'boolean') return value
+
   const n = toNullableString(value)?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
   return n === 'si' || n === 'yes' || n === 'true'
 }
 
 const toDateValue = (value: unknown) => {
   const s = toNullableString(value)
+
   return s ? s.slice(0, 10) : null
 }
 
 const toTimestampValue = (value: unknown) => {
   const s = toNullableString(value)
+
   if (!s) return null
+
   return s.includes('T') ? s : `${s}T00:00:00.000Z`
 }
 
 const normalizePerformanceIndicatorCode = (value: unknown) => {
   const n = toNullableString(value)?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
   if (!n || n === '—' || n === '-') return null
   if (n.includes('on-time') || n.includes('on time')) return 'on_time'
   if (n.includes('late drop')) return 'late_drop'
   if (n.includes('overdue')) return 'overdue'
   if (n.includes('carry-over') || n.includes('carry over')) return 'carry_over'
+
   return null
 }
 
 const buildPayloadHash = (payload: unknown) =>
   createHash('sha256').update(JSON.stringify(payload)).digest('hex')
 
-const INTERNAL_SPACE_IDS = new Set(['space-efeonce'])
-const isInternalSpaceId = (spaceId: string | null) => (spaceId ? INTERNAL_SPACE_IDS.has(spaceId) : false)
-
 // ─── BigQuery Runners ───────────────────────────────────────────────────────
 
 const runBigQuery = async <T extends Record<string, unknown>>(query: string) => {
   const bq = getBigQueryClient()
   const [rows] = await bq.query({ query })
+
   return rows as T[]
 }
 
-const insertBigQueryRows = async (dataset: string, table: string, rows: Record<string, unknown>[]) => {
+const replaceBigQueryTableWithLoadJob = async (
+  projectId: string,
+  dataset: string,
+  table: string,
+  rows: Record<string, unknown>[]
+) => {
   const bq = getBigQueryClient()
-  await bq.dataset(dataset).table(table).insert(rows)
+
+  if (rows.length === 0) {
+    await bq.query({
+      query: `DELETE FROM \`${projectId}.${dataset}.${table}\` WHERE TRUE`
+    })
+
+    return
+  }
+
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), `greenhouse-bq-${table}-`))
+  const tempFilePath = path.join(tempDir, `${table}.jsonl`)
+
+  try {
+    const jsonLines = rows.map(row => JSON.stringify(row)).join('\n')
+
+    await writeFile(tempFilePath, `${jsonLines}\n`, 'utf8')
+    await bq.dataset(dataset).table(table).load(tempFilePath, {
+      sourceFormat: 'NEWLINE_DELIMITED_JSON',
+      writeDisposition: 'WRITE_TRUNCATE'
+    })
+  } finally {
+    await rm(tempDir, { recursive: true, force: true })
+  }
 }
 
-/** Ensure delivery_tasks has the assignee_member_ids ARRAY column (idempotent). */
-const ensureMultiAssigneeColumn = async (projectId: string) => {
+/** Ensure delivery_tasks has additive columns required by the sync runtime. */
+const ensureDeliveryTaskColumns = async (projectId: string) => {
   const bq = getBigQueryClient()
 
   try {
     await bq.query({
       query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS assignee_member_ids ARRAY<STRING>`
+    })
+  } catch {
+    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  }
+
+  try {
+    await bq.query({
+      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`
     })
   } catch {
     // Column may already exist or service account lacks ALTER permissions — safe to continue
@@ -297,9 +345,11 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   const projectSpaceMap = new Map(
     deliveryProjects.map(p => [p.project_source_id, p.space_id] as const).filter(([id]) => Boolean(id))
   )
+
   const projectClientMap = new Map(
     deliveryProjects.map(p => [p.project_source_id, p.client_id] as const).filter(([id]) => Boolean(id))
   )
+
   const projectDatabaseSourceMap = new Map(
     deliveryProjects.map(p => [p.project_source_id, p.project_database_source_id] as const).filter(([id]) => Boolean(id))
   )
@@ -309,12 +359,15 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     const projectSourceId = row.proyecto_ids?.[0] || null
     const sprintSourceId = row.sprint_ids?.[0] || null
     const assigneeSourceId = row.responsables_ids?.[0] || null
+
     const assigneeMemberIds = (row.responsables_ids || [])
       .map((id: string) => notionMemberMap.get(id))
       .filter((mid): mid is string => !!mid)
+
     const projectDatabaseSourceId =
       (projectSourceId ? projectDatabaseSourceMap.get(projectSourceId) || null : null) ||
       toNullableString(row._source_database_id)
+
     const spaceId = (projectSourceId ? (projectSpaceMap.get(projectSourceId) || null) : null) || toNullableString(row.space_id)
     const clientId = spaceId ? (projectSourceId ? (projectClientMap.get(projectSourceId) || null) : null) || (spaceClientMap.get(spaceId) ?? null) : null
 
@@ -374,6 +427,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   const sprintProjectMap = new Map(
     deliveryTasks.map(t => [t.sprint_source_id, t.project_source_id] as const).filter(([s, p]) => Boolean(s) && Boolean(p))
   )
+
   const sprintSpaceMap = new Map(
     deliveryTasks.map(t => [t.sprint_source_id, t.space_id] as const).filter(([s, sp]) => Boolean(s) && Boolean(sp))
   )
@@ -419,20 +473,13 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     }
   }
 
-  const bq = getBigQueryClient()
+  await ensureDeliveryTaskColumns(projectId)
 
-  // Ensure multi-assignee column exists before inserting
-  await ensureMultiAssigneeColumn(projectId)
-
-  await Promise.all([
-    bq.query({ query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_projects\` WHERE TRUE` }),
-    bq.query({ query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` WHERE TRUE` }),
-    bq.query({ query: `DELETE FROM \`${projectId}.greenhouse_conformed.delivery_sprints\` WHERE TRUE` })
-  ])
-
-  await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
-  await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
-  await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+  // Use load jobs instead of streaming inserts so future runs can replace the
+  // same tables without hitting BigQuery streaming buffer DELETE restrictions.
+  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_projects', deliveryProjects)
+  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_tasks', deliveryTasks)
+  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_sprints', deliverySprints)
 
   const conformedRowsWritten = deliveryProjects.length + deliveryTasks.length + deliverySprints.length
 

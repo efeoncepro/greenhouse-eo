@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-20 BigQuery cron hardening — schema drift + streaming buffer
+- Se confirmó que el readiness hacia producción no estaba bloqueado por `build`, sino por dos fallos de cron en BigQuery:
+  - `GET /api/cron/ico-materialize` fallaba cuando `ico_engine.metrics_by_project` existía pero sin columnas nuevas como `pipeline_velocity`
+  - `GET /api/cron/sync-conformed` fallaba por `streaming buffer` al ejecutar `DELETE` sobre `greenhouse_conformed.delivery_*` después de escribir con `insertAll`
+- Regla operativa derivada:
+  - en BigQuery, `CREATE TABLE IF NOT EXISTS` no migra tablas ya existentes; cuando una tabla analítica vive mucho tiempo, el runtime debe aplicar `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` para cerrar drift de esquema antes de depender de columnas nuevas
+  - para reemplazos completos de tablas `greenhouse_conformed.delivery_*`, no usar `DELETE + streaming insert`; usar `load jobs` o un patrón equivalente sin streaming buffer
+- Runtime actualizado:
+  - `src/lib/ico-engine/schema.ts` ahora aplica migraciones aditivas en tablas ICO existentes antes de recrear views
+  - `src/lib/sync/sync-notion-conformed.ts` ahora reemplaza `delivery_projects`, `delivery_tasks` y `delivery_sprints` con load jobs `WRITE_TRUNCATE`
+
 ## Delta 2026-03-20 Sidebar navigation — reestructuración arquitectónica
 - Se eliminó todo label en inglés del sidebar: `Updates`, `Control Tower`, `HR`, `Admin`, `AI Tooling` pasan a español.
 - Se definió una regla explícita de cuándo usar cada patrón de menú:

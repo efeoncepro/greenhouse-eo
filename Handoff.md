@@ -40,6 +40,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 17:10 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir los bloqueadores reales de promoción a producción detectados en `staging`: `sync-conformed` con error de `streaming buffer` y `ico-materialize` con drift de esquema BigQuery.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- `staging` / Production
+
+### Archivos tocados
+- `src/lib/ico-engine/schema.ts` — migraciones aditivas `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` para tablas ICO existentes
+- `src/lib/sync/sync-notion-conformed.ts` — reemplazo de `DELETE + insertAll` por `BigQuery load jobs` con `WRITE_TRUNCATE`; ensure runtime para `delivery_tasks.created_at`
+
+### Verificacion
+- Diagnóstico confirmado con `vercel logs` y `vercel curl` sobre `staging`:
+  - `/api/cron/ico-materialize` ⇒ `502 Column pipeline_velocity is not present in table ... metrics_by_project`
+  - `/api/cron/sync-conformed` ⇒ `502 UPDATE or DELETE statement ... would affect rows in the streaming buffer`
+- Validación local del patch:
+  - `pnpm eslint src/lib/ico-engine/schema.ts src/lib/sync/sync-notion-conformed.ts` ✅
+  - `pnpm build` ✅
+- Confirmación de drift en BigQuery productivo con consulta directa a `INFORMATION_SCHEMA`:
+  - `ico_engine.metrics_by_project` no tenía `pipeline_velocity`
+  - `greenhouse_conformed.delivery_tasks` sí tenía `created_at` y `assignee_member_ids`
+
+### Riesgos o pendientes
+- Falta desplegar este patch a `staging` y reprobar ambos cron endpoints con `vercel curl`.
+- El helper de runtime quedó robusto, pero si otro script externo sigue usando `streaming insert` contra `greenhouse_conformed.delivery_*`, puede reintroducir presión sobre el buffer. Revisar especialmente `scripts/sync-source-runtime-projections.ts` si vuelve a usarse operativamente.
+- No tocar `.claude/settings.json`; sigue siendo un cambio ajeno local.
+
 ## 2026-03-20 14:30 -03
 
 ### Agente
