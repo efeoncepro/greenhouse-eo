@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Backend + UI completo al 2026-03-20.** Pipeline multi-capa implementado y verificado con backfill histórico completo. UI de emisión, descarga y estado de DTEs integrada en las vistas de Finance.
+**Implementación completa al 2026-03-20.** Pipeline multi-capa (Nubox API → BQ Raw → BQ Conformed → PostgreSQL) implementado y verificado con backfill histórico. UI completa: emisión individual y masiva, descarga PDF/XML, estado DTE, panel de sync, reconciliación automática, badge Nubox en expenses. Pendiente solo verificación end-to-end contra Nubox API (primer DTE real).
 
 ### Implementado (backend)
 - Cliente API Nubox con retry/backoff, paginación correcta (array + `x-total-count` header)
@@ -662,7 +662,7 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 - [x] Nubox expenses → BigQuery Raw → Conformed bank_movements (debit)
 - [x] Nubox incomes → BigQuery Raw → Conformed bank_movements (credit)
 - [x] linked_purchase_id extraído de HATEOAS links
-- [ ] Reconciliación automática expense ↔ purchase (futuro)
+- [x] Reconciliación automática expense ↔ purchase vía bank movements conformed
 
 ### Fase 7 (cron orquestador)
 - [x] `/api/cron/nubox-sync` ejecuta Phase A → B → C secuencialmente
@@ -677,8 +677,8 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 - [x] Acciones post-emisión (Descargar PDF, Descargar XML, Actualizar estado)
 - [x] Columna DTE en lista de ingresos con chips de estado (Emitido/Pendiente/Rechazado/Anulado)
 - [x] Badge "Nubox" en expenses importados
-- [ ] Panel de sync status con trigger manual (8.5)
-- [ ] Emisión masiva (8.6 — fase futura)
+- [x] Panel de sync status con trigger manual (8.5)
+- [x] Emisión masiva con selección múltiple + diálogo de confirmación + API batch (8.6)
 
 ## Archivos implementados
 
@@ -695,7 +695,9 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 ### API routes
 - `src/app/api/cron/nubox-sync/route.ts` — cron diario (Phase A→B→C)
 - `src/app/api/finance/nubox/sync/route.ts` — trigger manual
-- `src/app/api/finance/income/[id]/emit-dte/route.ts` — emisión DTE
+- `src/app/api/finance/nubox/sync-status/route.ts` — sync status (último sync, runs recientes)
+- `src/app/api/finance/income/[id]/emit-dte/route.ts` — emisión DTE individual
+- `src/app/api/finance/income/batch-emit-dte/route.ts` — emisión DTE masiva (hasta 50)
 - `src/app/api/finance/income/[id]/dte-status/route.ts` — refresh estado
 - `src/app/api/finance/income/[id]/dte-pdf/route.ts` — proxy PDF
 - `src/app/api/finance/income/[id]/dte-xml/route.ts` — proxy XML
@@ -707,8 +709,9 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 
 ### UI views (modified)
 - `src/views/greenhouse/finance/IncomeDetailView.tsx` — sección DTE, diálogo emisión, descarga PDF/XML, refresh estado
-- `src/views/greenhouse/finance/IncomeListView.tsx` — columna DTE con chips de estado
+- `src/views/greenhouse/finance/IncomeListView.tsx` — columna DTE con chips, checkbox selection, batch emission dialog
 - `src/views/greenhouse/finance/ExpensesListView.tsx` — badge "Nubox" en egresos importados
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx` — panel sync status con trigger manual
 
 ### Modified
 - `src/lib/nubox/types.ts` — campos opcionales agregados (totalOtherTaxesAmount, saleType, etc.)
