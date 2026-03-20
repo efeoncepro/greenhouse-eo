@@ -2,9 +2,26 @@
 
 ## Estado
 
-Baseline de implementación al 2026-03-19.
+**Backend completo al 2026-03-20.** Pipeline multi-capa implementado y verificado con backfill histórico completo.
 
-Credenciales de API verificadas y funcionando contra 4 endpoints: sales, purchases, expenses, incomes. Script de discovery ejecutado con resultados positivos.
+### Implementado (backend)
+- Cliente API Nubox con retry/backoff, paginación correcta (array + `x-total-count` header)
+- Tipos TypeScript para los 4 dominios + emisión + conformados
+- Mappers puros (raw + conformed) con 19 unit tests
+- BigQuery Raw: 4 tablas append-only (partitioned, clustered) con 304 registros históricos
+- BigQuery Conformed: 3 tablas current-state (97 sales, 120 purchases, 87 bank movements)
+- PostgreSQL: columnas DTE en income/expenses, tabla emission_log, 72 incomes + 105 expenses + 10 suppliers creados
+- Cron diario (`/api/cron/nubox-sync` a 7:30 AM UTC)
+- Sync manual (`/api/finance/nubox/sync`)
+- Endpoints DTE: emit, status, PDF proxy, XML proxy
+- Identity resolution: RUT → organizations (vía spaces bridge) → client_id
+- Auto-provisioning de suppliers por RUT
+
+### Pendiente (UI)
+- Botón "Emitir DTE" en detalle de income
+- Columna DTE en lista de ingresos
+- Badge "Nubox" en expenses importados
+- Panel de sync status
 
 ## Resumen
 
@@ -106,14 +123,22 @@ Antes de implementar, revisar:
 - `docs/tasks/to-do/CODEX_TASK_Financial_Module_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_Financial_Intelligence_Layer.md`
 
-## Reglas arquitectónicas
+## Arquitectura implementada
 
-1. **Postgres-first**: nuevas tablas y escrituras en `greenhouse_finance`, BigQuery solo para marts/reporting
-2. **Identidades canónicas obligatorias**: `client_id`, `organization_id`, `tax_id` — no crear identidades paralelas
+```
+Nubox API → BigQuery Raw (append-only) → BigQuery Conformed (current-state) → PostgreSQL (operacional)
+```
+
+### Principios aplicados
+
+1. **Multi-layer data platform**: datos de Nubox pasan por la misma arquitectura que Notion/HubSpot (raw → conformed → operational)
+2. **Identidades canónicas obligatorias**: `client_id`, `organization_id`, `tax_id` — resolución vía `organizations → spaces → clients`
 3. **El puente es el RUT**: `organizations.tax_id` ↔ `nubox.client.identification.value`
-4. **Nubox es sistema de emisión, no maestro de clientes**: los datos canónicos de cliente viven en Greenhouse, Nubox recibe el payload por emisión
-5. **Idempotencia**: toda emisión debe incluir `x-idempotence-id` para prevenir duplicados
-6. **No bloquear el flujo**: la emisión puede fallar (SII caído, rechazo) — el estado se trackea pero no bloquea la operación financiera en Greenhouse
+4. **Nubox es sistema de emisión, no maestro de clientes**: datos canónicos en Greenhouse
+5. **Idempotencia**: `x-idempotence-id` en toda emisión POST
+6. **No bloquear el flujo**: cada fase del sync es independiente — si purchases falla, sales no se bloquea
+7. **Sync tracking centralizado**: `greenhouse_sync.source_sync_runs` con `source_system = 'nubox'` (no tabla custom)
+8. **Outbox events**: toda escritura a Postgres publica evento al outbox para BigQuery downstream
 
 ## Schemas de respuesta de Nubox (referencia)
 
@@ -590,46 +615,54 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 
 ## Criterios de aceptación
 
-### Fase 1-2 (infraestructura + schema)
-- [ ] Cliente Nubox con retry y logging (sales, purchases, expenses, incomes)
-- [ ] Tipos TypeScript completos para los 4 dominios
-- [ ] Columnas DTE en `greenhouse_finance.income`
-- [ ] Columnas Nubox en `greenhouse_finance.expenses`
-- [ ] Tablas `nubox_emission_log` y `nubox_sync_log` creadas
-- [ ] Env vars en Vercel
+### Fase 1-2 (infraestructura + schema + data layer)
+- [x] Cliente Nubox con retry/backoff (sales, purchases, expenses, incomes)
+- [x] Tipos TypeScript completos para los 4 dominios + emisión + conformados
+- [x] BigQuery Raw: 4 tablas append-only (nubox_sales/purchases/expenses/incomes_snapshots)
+- [x] BigQuery Conformed: 3 tablas current-state (nubox_sales, nubox_purchases, nubox_bank_movements)
+- [x] Columnas DTE en `greenhouse_finance.income` (7 columnas)
+- [x] Columnas Nubox en `greenhouse_finance.expenses` (6 columnas)
+- [x] Tabla `nubox_emission_log` creada
+- [x] Sync tracking via `greenhouse_sync.source_sync_runs` (centralizado, no custom)
+- [x] Env vars en `.env.local` (NUBOX_BEARER_TOKEN, NUBOX_X_API_KEY, NUBOX_API_BASE_URL)
+- [x] 19 unit tests para mappers
 
 ### Fase 3 (emisión de ventas)
-- [ ] `POST /api/finance/income/[id]/emit-dte` emite factura y almacena resultado
-- [ ] `GET /api/finance/income/[id]/dte-status` actualiza estado desde Nubox
-- [ ] `GET /api/finance/income/[id]/dte-pdf` descarga PDF
-- [ ] `GET /api/finance/income/[id]/dte-xml` descarga XML
-- [ ] Idempotencia verificada (reenviar no duplica)
-- [ ] Errores de Nubox se loguean y se muestran al usuario
+- [x] `POST /api/finance/income/[id]/emit-dte` — endpoint creado
+- [x] `GET /api/finance/income/[id]/dte-status` — endpoint creado
+- [x] `GET /api/finance/income/[id]/dte-pdf` — proxy stream creado
+- [x] `GET /api/finance/income/[id]/dte-xml` — proxy stream creado
+- [x] Idempotencia con `x-idempotence-id` UUID por request
+- [ ] Verificación end-to-end de emisión contra Nubox API (pendiente primer DTE real)
 
-### Fase 4 (sync ventas)
-- [ ] Sync de ventas de Nubox → income
-- [ ] Documentos nuevos se crean con `origin: nubox_sync`
-- [ ] Documentos existentes se actualizan (estado, folio)
-- [ ] Huérfanos se loguean sin romper el sync
+### Fase 4 (sync ventas — multi-layer)
+- [x] Phase A: Nubox API → BigQuery Raw (append-only snapshots con payload_hash)
+- [x] Phase B: BigQuery Raw → BigQuery Conformed (identity resolution vía RUT → org → client)
+- [x] Phase C: BigQuery Conformed → PostgreSQL (upsert income con campos DTE)
+- [x] Documentos nuevos se crean como `INC-NB-{nubox_sale_id}`
+- [x] Documentos existentes se actualizan (estado, folio, SII track ID)
+- [x] Huérfanos se cuentan sin romper el sync (17 de 97 en backfill inicial)
 
-### Fase 5 (sync compras)
-- [ ] Sync de purchases → expenses (tipo supplier)
-- [ ] Auto-provisioning de proveedores en `fin_suppliers` si no existen
-- [ ] Detalles de compra almacenados como metadata
-- [ ] Balance tracking (pagado vs pendiente)
+### Fase 5 (sync compras — multi-layer)
+- [x] Phase A-C: Nubox purchases → BigQuery Raw → Conformed → PostgreSQL expenses
+- [x] Auto-provisioning de suppliers en `fin_suppliers` por RUT (10 creados en backfill)
+- [x] Balance tracking (balance=0 → paid, else → pending)
+- [x] Huérfanos contados (10 de 120 en backfill inicial)
 
-### Fase 6 (sync pagos)
-- [ ] Sync de expenses → bank_statement_rows o payment status
-- [ ] Sync de incomes → income_payments
-- [ ] Vinculación automática expense ↔ purchase via link `document`
+### Fase 6 (sync pagos — multi-layer)
+- [x] Nubox expenses → BigQuery Raw → Conformed bank_movements (debit)
+- [x] Nubox incomes → BigQuery Raw → Conformed bank_movements (credit)
+- [x] linked_purchase_id extraído de HATEOAS links
+- [ ] Reconciliación automática expense ↔ purchase (futuro)
 
 ### Fase 7 (cron orquestador)
-- [ ] `/api/finance/nubox/sync` ejecuta las 3 fases en secuencia
-- [ ] Protegido por `CRON_SECRET`
-- [ ] Cron diario configurado en `vercel.json`
-- [ ] `nubox_sync_log` registra cada ejecución
+- [x] `/api/cron/nubox-sync` ejecuta Phase A → B → C secuencialmente
+- [x] Protegido por `hasInternalSyncAccess()` (CRON_SECRET / Vercel header)
+- [x] Cron diario en `vercel.json` (7:30 AM UTC)
+- [x] `/api/finance/nubox/sync` trigger manual con periodos opcionales
+- [x] Cada fase con error handling independiente
 
-### Fase 8 (UI)
+### Fase 8 (UI) — pendiente
 - [ ] Botón "Emitir DTE" en detalle de factura
 - [ ] Dialog de confirmación con preview
 - [ ] Acciones post-emisión (PDF, XML, estado)
@@ -637,14 +670,46 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 - [ ] Badge "Nubox" en expenses importados
 - [ ] Panel de sync status con trigger manual
 
-## Archivos clave existentes
+## Archivos implementados
 
-- `src/lib/finance/postgres-store-slice2.ts` — store de income (agregar campos DTE)
-- `src/app/api/finance/income/[id]/route.ts` — detalle de income (agregar subrutas DTE)
-- `src/views/greenhouse/finance/income/` — vistas de income (agregar UI de DTE)
-- `scripts/setup-postgres-finance-slice2.sql` — DDL base (agregar ALTER)
-- `src/lib/nubox/` — **nuevo**: cliente API, tipos, mappers
+### Core library (`src/lib/nubox/`)
+- `types.ts` — tipos completos para 4 dominios API + conformados + emisión
+- `client.ts` — HTTP client con retry/backoff, paginación (array + x-total-count)
+- `mappers.ts` — funciones puras: raw snapshot + conformed + identity resolution
+- `mappers.test.ts` — 19 unit tests (vitest)
+- `sync-nubox-raw.ts` — Phase A: Nubox API → BigQuery Raw
+- `sync-nubox-conformed.ts` — Phase B: BigQuery Raw → Conformed (identity resolution)
+- `sync-nubox-to-postgres.ts` — Phase C: Conformed → PostgreSQL operational
+- `emission.ts` — DTE emission logic (POST /v1/sales/issuance + Postgres transaction)
 
-## Script de discovery
+### API routes
+- `src/app/api/cron/nubox-sync/route.ts` — cron diario (Phase A→B→C)
+- `src/app/api/finance/nubox/sync/route.ts` — trigger manual
+- `src/app/api/finance/income/[id]/emit-dte/route.ts` — emisión DTE
+- `src/app/api/finance/income/[id]/dte-status/route.ts` — refresh estado
+- `src/app/api/finance/income/[id]/dte-pdf/route.ts` — proxy PDF
+- `src/app/api/finance/income/[id]/dte-xml/route.ts` — proxy XML
 
-`scripts/nubox-extractor.py` — script Python para probar credenciales y explorar endpoints. Verificado 2026-03-19.
+### Schema scripts
+- `scripts/setup-bigquery-nubox-raw.sql` + `.ts` — 4 tablas raw
+- `scripts/setup-bigquery-nubox-conformed.sql` + `.ts` — 3 tablas conformed
+- `scripts/setup-postgres-nubox-extensions.sql` + `.ts` — ALTER income/expenses + emission_log
+
+### Modified
+- `src/lib/finance/schema.ts` — FINANCE_COLUMN_REQUIREMENTS con columnas Nubox
+- `src/lib/finance/postgres-store-slice2.ts` — tipos + mappers + queries extendidos
+- `vercel.json` — cron entry
+
+### Test / debug
+- `scripts/test-nubox-sync.ts` — test manual por fases (fetch/raw/conformed/postgres/all)
+- `scripts/nubox-extractor.py` — script discovery original (verificado 2026-03-19)
+
+## Datos del backfill histórico (2023-01 → 2026-03)
+
+| Dominio | Raw (BQ) | Conformed (BQ) | Postgres | Huérfanos |
+|---------|----------|----------------|----------|-----------|
+| Sales | 97 | 97 | 72 incomes creados, 4 actualizados | 17 (sin org match) |
+| Purchases | 120 | 120 | 105 expenses creados, 15 actualizados | 10 (sin supplier match) |
+| Expenses | 55 | 87 bank movements (debit) | — | — |
+| Incomes | 32 | (credit) | — | — |
+| Suppliers | — | — | 10 auto-provisionados | — |
