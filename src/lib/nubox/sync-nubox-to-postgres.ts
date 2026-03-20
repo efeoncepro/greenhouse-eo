@@ -124,7 +124,16 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         $16, $17, $18, NOW(),
         NULL, NOW(), NOW()
       )
-      ON CONFLICT (income_id) DO NOTHING`,
+      ON CONFLICT (income_id) DO UPDATE SET
+        nubox_document_id = COALESCE(greenhouse_finance.income.nubox_document_id, EXCLUDED.nubox_document_id),
+        nubox_sii_track_id = COALESCE(EXCLUDED.nubox_sii_track_id, greenhouse_finance.income.nubox_sii_track_id),
+        nubox_emission_status = COALESCE(EXCLUDED.nubox_emission_status, greenhouse_finance.income.nubox_emission_status),
+        dte_type_code = COALESCE(EXCLUDED.dte_type_code, greenhouse_finance.income.dte_type_code),
+        dte_folio = COALESCE(EXCLUDED.dte_folio, greenhouse_finance.income.dte_folio),
+        nubox_emitted_at = COALESCE(EXCLUDED.nubox_emitted_at, greenhouse_finance.income.nubox_emitted_at),
+        organization_id = COALESCE(greenhouse_finance.income.organization_id, EXCLUDED.organization_id),
+        nubox_last_synced_at = NOW(),
+        updated_at = NOW()`,
       [
         incomeId,
         sale.client_id,

@@ -19,6 +19,7 @@ import {
   type SupplierCategory,
   type PaymentMethod
 } from '@/lib/finance/shared'
+import { listFinanceSuppliersFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,8 +90,6 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { searchParams } = new URL(request.url)
   const category = searchParams.get('category')
   const country = searchParams.get('country')
@@ -98,6 +97,27 @@ export async function GET(request: Request) {
   const active = searchParams.get('active')
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
+
+  // ── Postgres-first path ──
+  try {
+    const result = await listFinanceSuppliersFromPostgres({
+      category,
+      country,
+      international: international === 'true' ? true : international === 'false' ? false : null,
+      active: active === 'false' ? false : true,
+      page,
+      pageSize
+    })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   let filters = ''

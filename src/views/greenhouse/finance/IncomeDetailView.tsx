@@ -137,7 +137,9 @@ const DTE_TYPE_NAMES: Record<string, string> = {
 }
 
 const getDteStatus = (data: IncomeDetail): keyof typeof DTE_STATUS_CONFIG => {
-  if (!data.nuboxDocumentId) return 'pending'
+  const hasDte = Boolean(data.nuboxDocumentId || data.dteFolio || data.nuboxEmittedAt)
+
+  if (!hasDte) return 'pending'
   if (data.nuboxEmissionStatus === 'Anulado') return 'annulled'
   if (data.nuboxEmissionStatus === 'Rechazado') return 'rejected'
 
@@ -471,7 +473,7 @@ const IncomeDetailView = () => {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                       <Typography variant='caption' color='text.secondary'>Folio</Typography>
-                      <Typography variant='body2'>#{data.dteFolio || '—'}</Typography>
+                      <Typography variant='body2'>#{data.dteFolio || data.invoiceNumber || '—'}</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                       <Typography variant='caption' color='text.secondary'>Track SII</Typography>

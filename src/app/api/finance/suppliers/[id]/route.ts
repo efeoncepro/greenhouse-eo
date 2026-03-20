@@ -19,6 +19,7 @@ import {
   type SupplierCategory,
   type PaymentMethod
 } from '@/lib/finance/shared'
+import { getFinanceSupplierFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -69,9 +70,29 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { id: supplierId } = await params
+
+  // ── Postgres-first path ──
+  try {
+    const supplier = await getFinanceSupplierFromPostgres(supplierId)
+
+    if (supplier) {
+      return NextResponse.json({
+        ...supplier,
+        paymentHistory: []
+      })
+    }
+
+    // Not found in Postgres — fall through to BigQuery
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
   await ensureFinanceInfrastructure()
 
-  const { id: supplierId } = await params
   const projectId = getFinanceProjectId()
 
   const rows = await runFinanceQuery<SupplierDetailRow>(`

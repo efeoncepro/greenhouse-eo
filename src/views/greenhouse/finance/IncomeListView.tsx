@@ -56,6 +56,7 @@ interface Income {
   // Nubox DTE fields
   nuboxDocumentId: string | null
   nuboxEmissionStatus: string | null
+  nuboxEmittedAt: string | null
   dteTypeCode: string | null
   dteFolio: string | null
 }
@@ -87,8 +88,11 @@ const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'war
   annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
 }
 
+const hasDte = (item: Income): boolean =>
+  Boolean(item.nuboxDocumentId || item.dteFolio || item.nuboxEmittedAt)
+
 const getDteStatusKey = (item: Income): string => {
-  if (!item.nuboxDocumentId) return 'pending'
+  if (!hasDte(item)) return 'pending'
   if (item.nuboxEmissionStatus === 'Anulado') return 'annulled'
   if (item.nuboxEmissionStatus === 'Rechazado') return 'rejected'
 
@@ -168,7 +172,7 @@ const IncomeListView = () => {
   const overdueCount = items.filter(i => i.paymentStatus === 'overdue').length
 
   // Batch DTE — only items without an existing DTE are eligible
-  const eligibleForDte = items.filter(i => !i.nuboxDocumentId)
+  const eligibleForDte = items.filter(i => !hasDte(i))
   const selectedEligible = eligibleForDte.filter(i => selected.has(i.incomeId))
 
   const toggleSelect = (id: string) => {
@@ -400,7 +404,7 @@ const IncomeListView = () => {
                         <Checkbox
                           size='small'
                           checked={selected.has(item.incomeId)}
-                          disabled={!!item.nuboxDocumentId}
+                          disabled={hasDte(item)}
                           onChange={() => toggleSelect(item.incomeId)}
                           inputProps={{ 'aria-label': `Seleccionar ${item.invoiceNumber || item.incomeId}` }}
                         />

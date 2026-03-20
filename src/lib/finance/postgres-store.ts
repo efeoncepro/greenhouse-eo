@@ -616,16 +616,34 @@ export const listFinanceSuppliersFromPostgres = async ({
   category,
   country,
   international,
-  active = true
+  active = true,
+  page = 1,
+  pageSize = 50
 }: {
   category?: string | null
   country?: string | null
   international?: boolean | null
   active?: boolean | null
+  page?: number
+  pageSize?: number
 } = {}) => {
   await assertFinancePostgresReady()
 
-  const values: unknown[] = [category || null, country || null, international, active]
+  const filterValues: unknown[] = [category || null, country || null, international, active]
+
+  const filterClause = `
+    WHERE ($1::text IS NULL OR category = $1)
+      AND ($2::text IS NULL OR country_code = $2)
+      AND ($3::boolean IS NULL OR is_international = $3)
+      AND ($4::boolean IS NULL OR is_active = $4)
+  `
+
+  const countRows = await runGreenhousePostgresQuery<{ total: string }>(
+    `SELECT COUNT(*)::text AS total FROM greenhouse_finance.suppliers ${filterClause}`,
+    filterValues
+  )
+
+  const total = toNumber(countRows[0]?.total)
 
   const rows = await runGreenhousePostgresQuery<PostgresFinanceSupplierRow>(
     `
@@ -659,16 +677,58 @@ export const listFinanceSuppliersFromPostgres = async ({
         created_at,
         updated_at
       FROM greenhouse_finance.suppliers
-      WHERE ($1::text IS NULL OR category = $1)
-        AND ($2::text IS NULL OR country_code = $2)
-        AND ($3::boolean IS NULL OR is_international = $3)
-        AND ($4::boolean IS NULL OR is_active = $4)
+      ${filterClause}
       ORDER BY COALESCE(trade_name, legal_name) ASC
+      LIMIT $5 OFFSET $6
     `,
-    values
+    [...filterValues, pageSize, (page - 1) * pageSize]
   )
 
-  return rows.map(mapSupplier)
+  return { items: rows.map(mapSupplier), total, page, pageSize }
+}
+
+export const getFinanceSupplierFromPostgres = async (supplierId: string) => {
+  await assertFinancePostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<PostgresFinanceSupplierRow>(
+    `
+      SELECT
+        supplier_id,
+        provider_id,
+        organization_id,
+        legal_name,
+        trade_name,
+        tax_id,
+        tax_id_type,
+        country_code,
+        category,
+        service_type,
+        is_international,
+        primary_contact_name,
+        primary_contact_email,
+        primary_contact_phone,
+        website_url,
+        bank_name,
+        bank_account_number,
+        bank_account_type,
+        bank_routing,
+        payment_currency,
+        default_payment_terms,
+        default_payment_method,
+        requires_po,
+        is_active,
+        notes,
+        created_by_user_id,
+        created_at,
+        updated_at
+      FROM greenhouse_finance.suppliers
+      WHERE supplier_id = $1
+      LIMIT 1
+    `,
+    [supplierId]
+  )
+
+  return rows[0] ? mapSupplier(rows[0]) : null
 }
 
 export const listFinanceExchangeRatesFromPostgres = async ({
