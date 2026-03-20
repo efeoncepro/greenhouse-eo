@@ -40,6 +40,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 11:05 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir el vacío en `Agency > Organizations > Finanzas` cuando la organización sí tenía ingresos pero faltaba el snapshot mensual de `client_economics`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development / Preview / `staging`
+
+### Archivos tocados
+- `src/lib/finance/postgres-store-intelligence.ts` — nueva función reutilizable `computeClientEconomicsSnapshots(year, month, notes?)`
+- `src/app/api/finance/intelligence/client-economics/route.ts` — ahora reutiliza el helper compartido en vez de duplicar la lógica
+- `src/lib/account-360/organization-store.ts` — `getOrganizationFinanceSummary()` intenta auto-computar el período cuando la organización no encuentra snapshot
+
+### Verificacion
+- `pnpm pg:doctor --profile=runtime` ✅
+- Validación directa en Postgres para Sky Airline (`org-b9977f96-f7ef-4afb-bb26-7355d78c981f`):
+  - `client_profiles.organization_id` sí estaba bien puenteado
+  - `greenhouse_finance.income` sí tenía registros de marzo 2026
+  - `greenhouse_finance.client_economics` estaba vacío para marzo 2026
+- Se ejecutó backfill puntual de `client_economics` para `2026-03` y quedó snapshot para Sky:
+  - `total_revenue_clp = 13804000`
+  - `direct_costs_clp = 1225`
+- `pnpm eslint src/lib/finance/postgres-store-intelligence.ts src/app/api/finance/intelligence/client-economics/route.ts src/lib/account-360/organization-store.ts` ✅
+
+### Riesgos o pendientes
+- La tab de organización ahora puede auto-hidratar el snapshot faltante al primer acceso del período, pero sigue dependiendo de `client_economics`; no es una vista live de `income`/`expenses`.
+- Queda recomendada una automatización explícita mensual del compute de `client_economics` para evitar que la primera visita del usuario dispare ese cálculo.
+
 ## 2026-03-20 10:12 -03
 
 ### Agente

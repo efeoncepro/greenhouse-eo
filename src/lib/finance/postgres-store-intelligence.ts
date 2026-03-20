@@ -7,7 +7,6 @@ import {
 } from '@/lib/postgres/client'
 import {
   normalizeString,
-  normalizeBoolean,
   roundCurrency,
   toNumber,
   toNullableNumber,
@@ -19,6 +18,7 @@ import {
   type ClientEconomicsRecord,
   type AllocationMethod
 } from '@/lib/finance/postgres-store-slice2'
+import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
 
 // ─── Row types ──────────────────────────────────────────────────────
 
@@ -307,6 +307,156 @@ export const upsertClientEconomicsSnapshot = async ({
   )
 
   return mapClientEconomics(rows[0])
+}
+
+export const computeClientEconomicsSnapshots = async (
+  year: number,
+  month: number,
+  notes: string | null = null
+): Promise<ClientEconomicsRecord[]> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
+  const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
+
+  const revenueRows = await runGreenhousePostgresQuery<{
+    client_id: string
+    client_name: string
+    total_revenue_clp: string
+  }>(
+    `SELECT
+       COALESCE(client_id, client_profile_id) AS client_id,
+       client_name,
+       COALESCE(SUM(total_amount_clp), 0) AS total_revenue_clp
+     FROM greenhouse_finance.income
+     WHERE invoice_date >= $1::date AND invoice_date <= $2::date
+       AND COALESCE(client_id, client_profile_id) IS NOT NULL
+     GROUP BY COALESCE(client_id, client_profile_id), client_name`,
+    [periodStart, periodEnd]
+  )
+
+  const allocationRows = await runGreenhousePostgresQuery<{
+    client_id: string
+    client_name: string
+    total_allocated_clp: string
+  }>(
+    `SELECT
+       client_id,
+       client_name,
+       COALESCE(SUM(allocated_amount_clp), 0) AS total_allocated_clp
+     FROM greenhouse_finance.cost_allocations
+     WHERE period_year = $1 AND period_month = $2
+     GROUP BY client_id, client_name`,
+    [year, month]
+  )
+
+  const directExpenseRows = await runGreenhousePostgresQuery<{
+    allocated_client_id: string
+    total_direct_clp: string
+  }>(
+    `SELECT
+       allocated_client_id,
+       COALESCE(SUM(total_amount_clp), 0) AS total_direct_clp
+     FROM greenhouse_finance.expenses
+     WHERE allocated_client_id IS NOT NULL
+       AND COALESCE(document_date, payment_date) >= $1::date
+       AND COALESCE(document_date, payment_date) <= $2::date
+     GROUP BY allocated_client_id`,
+    [periodStart, periodEnd]
+  )
+
+  let laborCosts: Awaited<ReturnType<typeof computeClientLaborCosts>> = []
+
+  try {
+    laborCosts = await computeClientLaborCosts(year, month)
+  } catch {
+    laborCosts = []
+  }
+
+  const fteMap = new Map<string, { fte: number; laborClp: number }>(
+    laborCosts.map(lc => [lc.clientId, { fte: lc.headcountFte, laborClp: lc.allocatedLaborClp }])
+  )
+
+  const clientMap = new Map<string, {
+    clientName: string
+    revenue: number
+    directCosts: number
+    indirectCosts: number
+  }>()
+
+  for (const row of revenueRows) {
+    clientMap.set(row.client_id, {
+      clientName: row.client_name,
+      revenue: toNumber(row.total_revenue_clp),
+      directCosts: 0,
+      indirectCosts: 0
+    })
+  }
+
+  for (const row of allocationRows) {
+    const existing = clientMap.get(row.client_id) || {
+      clientName: row.client_name,
+      revenue: 0,
+      directCosts: 0,
+      indirectCosts: 0
+    }
+
+    existing.directCosts += toNumber(row.total_allocated_clp)
+    clientMap.set(row.client_id, existing)
+  }
+
+  for (const row of directExpenseRows) {
+    const existing = clientMap.get(row.allocated_client_id)
+
+    if (existing) {
+      existing.directCosts += toNumber(row.total_direct_clp)
+    }
+  }
+
+  for (const lc of laborCosts) {
+    const existing = clientMap.get(lc.clientId) || {
+      clientName: lc.clientName,
+      revenue: 0,
+      directCosts: 0,
+      indirectCosts: 0
+    }
+
+    existing.directCosts += lc.allocatedLaborClp
+    clientMap.set(lc.clientId, existing)
+  }
+
+  const results: ClientEconomicsRecord[] = []
+
+  for (const [clientId, data] of clientMap.entries()) {
+    const totalCosts = roundCurrency(data.directCosts + data.indirectCosts)
+    const grossMargin = roundCurrency(data.revenue - data.directCosts)
+    const netMargin = roundCurrency(data.revenue - totalCosts)
+
+    const fteData = fteMap.get(clientId)
+    const fte = fteData?.fte ?? null
+
+    const snapshot = await upsertClientEconomicsSnapshot({
+      clientId,
+      clientName: data.clientName,
+      periodYear: year,
+      periodMonth: month,
+      totalRevenueClp: data.revenue,
+      directCostsClp: data.directCosts,
+      indirectCostsClp: data.indirectCosts,
+      grossMarginClp: grossMargin,
+      grossMarginPercent: data.revenue > 0 ? roundCurrency((grossMargin / data.revenue) * 10000) / 10000 : null,
+      netMarginClp: netMargin,
+      netMarginPercent: data.revenue > 0 ? roundCurrency((netMargin / data.revenue) * 10000) / 10000 : null,
+      headcountFte: fte,
+      revenuePerFte: fte && fte > 0 ? roundCurrency(data.revenue / fte) : null,
+      costPerFte: fte && fte > 0 ? roundCurrency(totalCosts / fte) : null,
+      notes
+    })
+
+    results.push(snapshot)
+  }
+
+  return results
 }
 
 export const getClientEconomics = async (

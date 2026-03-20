@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
+import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -128,12 +129,14 @@ interface CountRow extends Record<string, unknown> {
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
   if (typeof v === 'string') return Number(v) || 0
+
   return 0
 }
 
 const toTs = (v: unknown): string => {
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'string') return v
+
   return ''
 }
 
@@ -210,6 +213,7 @@ export const getOrganizationList = async (params: {
   if (params.search) {
     paramIdx++
     const searchParam = `%${params.search}%`
+
     filters += ` AND (o.organization_name ILIKE $${paramIdx} OR o.legal_name ILIKE $${paramIdx} OR o.public_id ILIKE $${paramIdx})`
     queryParams.push(searchParam)
   }
@@ -236,6 +240,7 @@ export const getOrganizationList = async (params: {
 
   paramIdx++
   const limitParam = paramIdx
+
   paramIdx++
   const offsetParam = paramIdx
 
@@ -308,6 +313,7 @@ export const updateOrganization = async (
 
   for (const [key, column] of Object.entries(fieldMap)) {
     const value = data[key as keyof typeof data]
+
     if (value !== undefined) {
       idx++
       updates.push(`${column} = $${idx}`)
@@ -470,17 +476,29 @@ export const getOrganizationFinanceSummary = async (
   year: number,
   month: number
 ): Promise<OrganizationFinanceSummary> => {
-  const rows = await runGreenhousePostgresQuery<OrgFinanceRow>(`
-    SELECT
-      ce.client_id, ce.client_name,
-      ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
-      ce.gross_margin_percent, ce.net_margin_percent,
-      ce.headcount_fte
-    FROM greenhouse_finance.client_economics ce
-    JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
-    WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
-    ORDER BY ce.total_revenue_clp DESC
-  `, [orgId, year, month])
+  const queryRows = () =>
+    runGreenhousePostgresQuery<OrgFinanceRow>(`
+      SELECT
+        ce.client_id, ce.client_name,
+        ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
+        ce.gross_margin_percent, ce.net_margin_percent,
+        ce.headcount_fte
+      FROM greenhouse_finance.client_economics ce
+      JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
+      WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
+      ORDER BY ce.total_revenue_clp DESC
+    `, [orgId, year, month])
+
+  let rows = await queryRows()
+
+  if (rows.length === 0) {
+    await computeClientEconomicsSnapshots(
+      year,
+      month,
+      `Auto-computed on organization finance access for org ${orgId}`
+    )
+    rows = await queryRows()
+  }
 
   const clients: OrganizationClientFinance[] = rows.map(r => ({
     clientId: String(r.client_id),
