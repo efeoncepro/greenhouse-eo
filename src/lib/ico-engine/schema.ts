@@ -293,60 +293,39 @@ const buildStatusPhaseConfigTable = (projectId: string) => `
   )
 `
 
-/**
- * Existing BigQuery tables are not auto-migrated by CREATE TABLE IF NOT EXISTS.
- * Run additive ALTERs on every boot so cron paths self-heal column drift.
- */
-const buildColumnMigrationStatements = (projectId: string) => [
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS active_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS computed_at TIMESTAMP`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-   ADD COLUMN IF NOT EXISTS engine_version STRING`,
+type TableColumnSpec = Record<string, string>
 
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS otd_pct FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS throughput_count INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS stuck_asset_count INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_project\`
-   ADD COLUMN IF NOT EXISTS active_tasks INT64`,
-
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS otd_pct FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS throughput_count INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS pipeline_velocity FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS stuck_asset_count INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS stuck_asset_pct FLOAT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS total_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS completed_tasks INT64`,
-  `ALTER TABLE \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-   ADD COLUMN IF NOT EXISTS active_tasks INT64`
-]
+const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
+  metric_snapshots_monthly: {
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64',
+    computed_at: 'TIMESTAMP',
+    engine_version: 'STRING'
+  },
+  metrics_by_project: {
+    otd_pct: 'FLOAT64',
+    throughput_count: 'INT64',
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_count: 'INT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64'
+  },
+  metrics_by_member: {
+    otd_pct: 'FLOAT64',
+    throughput_count: 'INT64',
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_count: 'INT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64'
+  }
+}
 
 // ─── Infrastructure Provisioning (Singleton Promise) ────────────────────────
 
@@ -416,12 +395,52 @@ export const ensureIcoEngineInfrastructure = async () => {
     }
 
     // 3. Apply additive schema migrations for existing tables.
-    for (const statement of buildColumnMigrationStatements(projectId)) {
-      try {
-        await bigQuery.query({ query: statement })
-      } catch (migrationError) {
-        console.warn('[ICO] Could not apply column migration:', migrationError instanceof Error ? migrationError.message : migrationError)
+    try {
+      const tablesToInspect = Object.keys(REQUIRED_COLUMN_MIGRATIONS)
+
+      const [columnRows] = await bigQuery.query({
+        query: `
+          SELECT table_name, column_name
+          FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.COLUMNS\`
+          WHERE table_name IN UNNEST(@tables)
+        `,
+        params: { tables: tablesToInspect }
+      })
+
+      const existingColumns = new Map<string, Set<string>>()
+
+      for (const row of columnRows as Array<{ table_name: string; column_name: string }>) {
+        if (!existingColumns.has(row.table_name)) {
+          existingColumns.set(row.table_name, new Set())
+        }
+
+        existingColumns.get(row.table_name)!.add(row.column_name)
       }
+
+      for (const [tableName, requiredColumns] of Object.entries(REQUIRED_COLUMN_MIGRATIONS)) {
+        const presentColumns = existingColumns.get(tableName) ?? new Set<string>()
+
+        const missingDefinitions = Object.entries(requiredColumns)
+          .filter(([columnName]) => !presentColumns.has(columnName))
+          .map(([columnName, dataType]) => `ADD COLUMN IF NOT EXISTS ${columnName} ${dataType}`)
+
+        if (missingDefinitions.length === 0) {
+          continue
+        }
+
+        try {
+          await bigQuery.query({
+            query: `
+              ALTER TABLE \`${projectId}.${ICO_DATASET}.${tableName}\`
+              ${missingDefinitions.join(',\n              ')}
+            `
+          })
+        } catch (migrationError) {
+          console.warn('[ICO] Could not apply column migration:', migrationError instanceof Error ? migrationError.message : migrationError)
+        }
+      }
+    } catch (migrationDiscoveryError) {
+      console.warn('[ICO] Could not inspect existing columns:', migrationDiscoveryError instanceof Error ? migrationDiscoveryError.message : migrationDiscoveryError)
     }
 
     // 4. Create or replace views (idempotent)
