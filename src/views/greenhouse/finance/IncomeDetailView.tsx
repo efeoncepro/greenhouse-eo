@@ -144,6 +144,12 @@ const DTE_TYPE_NAMES: Record<string, string> = {
   '52': 'Guía de despacho electrónica'
 }
 
+const getDteTypeName = (dteTypeCode: string | null) => {
+  if (!dteTypeCode) return '—'
+
+  return DTE_TYPE_NAMES[dteTypeCode] || dteTypeCode
+}
+
 const getDteStatus = (data: IncomeDetail): keyof typeof DTE_STATUS_CONFIG => {
   const hasDte = Boolean(data.nuboxDocumentId || data.dteFolio || data.nuboxEmittedAt)
 
@@ -479,14 +485,16 @@ const IncomeDetailView = () => {
                 <>
                   <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Typography variant='caption' color='text.secondary'>Tipo DTE</Typography>
-                      <Typography variant='body2'>
-                        {DTE_TYPE_NAMES[data.dteTypeCode || ''] || data.dteTypeCode || '—'}
-                        {data.dteTypeCode ? ` (${data.dteTypeCode})` : ''}
-                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>Tipo de documento</Typography>
+                      <Typography variant='body2'>{getDteTypeName(data.dteTypeCode)}</Typography>
+                      {data.dteTypeCode && (
+                        <Typography variant='caption' color='text.secondary'>
+                          Código SII {data.dteTypeCode}
+                        </Typography>
+                      )}
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <Typography variant='caption' color='text.secondary'>Folio</Typography>
+                      <Typography variant='caption' color='text.secondary'>Folio DTE</Typography>
                       <Typography variant='body2'>#{data.dteFolio || data.invoiceNumber || '—'}</Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
