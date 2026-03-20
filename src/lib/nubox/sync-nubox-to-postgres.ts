@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
-import type { NuboxConformedSale, NuboxConformedPurchase } from '@/lib/nubox/types'
+import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -16,6 +16,8 @@ export type SyncNuboxToPostgresResult = {
   expensesUpdated: number
   suppliersAutoProvisioned: number
   orphanedRecords: number
+  expensesReconciled: number
+  incomesReconciled: number
   durationMs: number
 }
 
@@ -293,6 +295,109 @@ const upsertExpenseFromPurchase = async (
   return { action: 'created', autoProvisioned }
 }
 
+// ─── Bank Movement Reconciliation ─────────────────────────────────────────
+
+const readConformedBankMovements = async (projectId: string): Promise<NuboxConformedBankMovement[]> => {
+  const bq = getBigQueryClient()
+
+  const [rows] = await bq.query({
+    query: `SELECT * REPLACE(
+      CAST(payment_date AS STRING) AS payment_date,
+      CAST(synced_at AS STRING) AS synced_at
+    ) FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\`
+    WHERE linked_purchase_id IS NOT NULL OR linked_sale_id IS NOT NULL`
+  })
+
+  return rows as unknown as NuboxConformedBankMovement[]
+}
+
+const reconcileExpenseFromBankMovement = async (
+  movement: NuboxConformedBankMovement
+): Promise<boolean> => {
+  if (!movement.linked_purchase_id) return false
+
+  const updated = await runGreenhousePostgresQuery<{ expense_id: string }>(
+    `UPDATE greenhouse_finance.expenses SET
+      payment_status = 'paid',
+      payment_date = $2,
+      payment_method = $3,
+      updated_at = NOW()
+    WHERE nubox_purchase_id = $1
+      AND payment_status != 'paid'
+    RETURNING expense_id`,
+    [
+      Number(movement.linked_purchase_id),
+      movement.payment_date,
+      movement.payment_method_description
+    ]
+  )
+
+  if (updated.length > 0) {
+    await publishOutboxEvent(
+      'finance.expense',
+      updated[0].expense_id,
+      'finance.expense.paid_via_nubox',
+      {
+        nubox_movement_id: movement.nubox_movement_id,
+        linked_purchase_id: movement.linked_purchase_id,
+        amount: movement.total_amount,
+        payment_date: movement.payment_date
+      }
+    )
+
+    return true
+  }
+
+  return false
+}
+
+const reconcileIncomeFromBankMovement = async (
+  movement: NuboxConformedBankMovement
+): Promise<boolean> => {
+  if (!movement.linked_sale_id) return false
+
+  // Find the income by nubox_document_id matching the linked sale
+  const incomeRows = await runGreenhousePostgresQuery<{ income_id: string; total_amount: number; amount_paid: number }>(
+    `SELECT income_id, total_amount, amount_paid
+     FROM greenhouse_finance.income
+     WHERE nubox_document_id = $1
+       AND payment_status != 'paid'
+     LIMIT 1`,
+    [Number(movement.linked_sale_id)]
+  )
+
+  if (incomeRows.length === 0) return false
+
+  const income = incomeRows[0]
+  const paymentAmount = Number(movement.total_amount ?? 0)
+  const newAmountPaid = Number(income.amount_paid) + paymentAmount
+  const newStatus = newAmountPaid >= Number(income.total_amount) ? 'paid' : 'partial'
+
+  await runGreenhousePostgresQuery(
+    `UPDATE greenhouse_finance.income SET
+      payment_status = $2,
+      amount_paid = $3,
+      updated_at = NOW()
+    WHERE income_id = $1`,
+    [income.income_id, newStatus, newAmountPaid]
+  )
+
+  await publishOutboxEvent(
+    'finance.income',
+    income.income_id,
+    'finance.income.payment_received_via_nubox',
+    {
+      nubox_movement_id: movement.nubox_movement_id,
+      linked_sale_id: movement.linked_sale_id,
+      amount: paymentAmount,
+      payment_date: movement.payment_date,
+      new_status: newStatus
+    }
+  )
+
+  return true
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const mapDteTypeToIncomeType = (dteCode: string | null): string => {
@@ -397,13 +502,36 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
       if (result.autoProvisioned) suppliersAutoProvisioned++
     }
 
+    // 4. Reconcile bank movements (expenses paid + income collections)
+    let expensesReconciled = 0
+    let incomesReconciled = 0
+
+    try {
+      const bankMovements = await readConformedBankMovements(projectId)
+
+      for (const movement of bankMovements) {
+        if (movement.movement_direction === 'debit' && movement.linked_purchase_id) {
+          const reconciled = await reconcileExpenseFromBankMovement(movement)
+
+          if (reconciled) expensesReconciled++
+        } else if (movement.movement_direction === 'credit' && movement.linked_sale_id) {
+          const reconciled = await reconcileIncomeFromBankMovement(movement)
+
+          if (reconciled) incomesReconciled++
+        }
+      }
+    } catch (error) {
+      // Reconciliation is best-effort — don't fail the entire sync
+      console.error('Bank movement reconciliation error:', error)
+    }
+
     const totalRead = conformedSales.length + conformedPurchases.length
 
     await writeSyncRun({
       runId: syncRunId,
       status: 'succeeded',
       recordsRead: totalRead,
-      notes: `Income: ${incomesCreated} created, ${incomesUpdated} updated. Expenses: ${expensesCreated} created, ${expensesUpdated} updated. Suppliers auto-provisioned: ${suppliersAutoProvisioned}. Orphaned: ${orphanedRecords}`
+      notes: `Income: ${incomesCreated} created, ${incomesUpdated} updated. Expenses: ${expensesCreated} created, ${expensesUpdated} updated. Suppliers auto-provisioned: ${suppliersAutoProvisioned}. Reconciled: ${expensesReconciled} expenses, ${incomesReconciled} incomes. Orphaned: ${orphanedRecords}`
     })
 
     return {
@@ -414,6 +542,8 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
       expensesUpdated,
       suppliersAutoProvisioned,
       orphanedRecords,
+      expensesReconciled,
+      incomesReconciled,
       durationMs: Date.now() - startMs
     }
   } catch (error) {

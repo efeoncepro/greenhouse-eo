@@ -10,6 +10,11 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Checkbox from '@mui/material/Checkbox'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
@@ -21,6 +26,8 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
@@ -45,6 +52,11 @@ interface Income {
   amountPending: number
   serviceLine: string | null
   description: string | null
+  // Nubox DTE fields
+  nuboxDocumentId: string | null
+  nuboxEmissionStatus: string | null
+  dteTypeCode: string | null
+  dteFolio: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -66,6 +78,21 @@ const STATUS_OPTIONS = [
   { value: 'paid', label: 'Pagado' },
   { value: 'overdue', label: 'Vencido' }
 ]
+
+const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
+  emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
+  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
+  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
+}
+
+const getDteStatusKey = (item: Income): string => {
+  if (!item.nuboxDocumentId) return 'pending'
+  if (item.nuboxEmissionStatus === 'Anulado') return 'annulled'
+  if (item.nuboxEmissionStatus === 'Rechazado') return 'rejected'
+
+  return 'emitted'
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -101,6 +128,9 @@ const IncomeListView = () => {
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [batchDialogOpen, setBatchDialogOpen] = useState(false)
+  const [batchEmitting, setBatchEmitting] = useState(false)
 
   const fetchIncome = useCallback(async () => {
     setLoading(true)
@@ -135,6 +165,72 @@ const IncomeListView = () => {
 
   const paidCount = items.filter(i => i.paymentStatus === 'paid').length
   const overdueCount = items.filter(i => i.paymentStatus === 'overdue').length
+
+  // Batch DTE — only items without an existing DTE are eligible
+  const eligibleForDte = items.filter(i => !i.nuboxDocumentId)
+  const selectedEligible = eligibleForDte.filter(i => selected.has(i.incomeId))
+
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedEligible.length === eligibleForDte.length) {
+      // Deselect all eligible
+      setSelected(prev => {
+        const next = new Set(prev)
+
+        eligibleForDte.forEach(i => next.delete(i.incomeId))
+
+        return next
+      })
+    } else {
+      // Select all eligible
+      setSelected(prev => {
+        const next = new Set(prev)
+
+        eligibleForDte.forEach(i => next.add(i.incomeId))
+
+        return next
+      })
+    }
+  }
+
+  const handleBatchEmit = async () => {
+    if (selectedEligible.length === 0) return
+
+    setBatchEmitting(true)
+
+    try {
+      const res = await fetch('/api/finance/income/batch-emit-dte', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ incomeIds: selectedEligible.map(i => i.incomeId), dteTypeCode: '33' })
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        toast.success(`${data.succeeded} DTE emitidos${data.failed > 0 ? `, ${data.failed} con errores` : ''}`)
+        setSelected(new Set())
+        fetchIncome()
+      } else {
+        toast.error(data.error || 'Error al emitir DTEs')
+      }
+    } catch {
+      toast.error('Error de conexión al emitir DTEs')
+    } finally {
+      setBatchEmitting(false)
+      setBatchDialogOpen(false)
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Loading
@@ -179,9 +275,21 @@ const IncomeListView = () => {
             Facturación, cobros y cuentas por cobrar
           </Typography>
         </Box>
-        <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
-          Registrar ingreso
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+          {selectedEligible.length > 0 && (
+            <Button
+              variant='contained'
+              color='primary'
+              startIcon={<i className='tabler-file-invoice' />}
+              onClick={() => setBatchDialogOpen(true)}
+            >
+              Emitir {selectedEligible.length} DTE{selectedEligible.length > 1 ? 's' : ''}
+            </Button>
+          )}
+          <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+            Registrar ingreso
+          </Button>
+        </Box>
       </Box>
 
       {/* KPIs */}
@@ -253,19 +361,29 @@ const IncomeListView = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell padding='checkbox' sx={{ width: 42 }}>
+                  <Checkbox
+                    size='small'
+                    checked={eligibleForDte.length > 0 && selectedEligible.length === eligibleForDte.length}
+                    indeterminate={selectedEligible.length > 0 && selectedEligible.length < eligibleForDte.length}
+                    onChange={toggleSelectAll}
+                    inputProps={{ 'aria-label': 'Seleccionar todos los ingresos sin DTE' }}
+                  />
+                </TableCell>
                 <TableCell>Factura</TableCell>
                 <TableCell>Cliente</TableCell>
                 <TableCell sx={{ width: 100 }}>Fecha</TableCell>
                 <TableCell sx={{ width: 100 }}>Vencimiento</TableCell>
                 <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
                 <TableCell sx={{ width: 100 }}>Estado</TableCell>
+                <TableCell sx={{ width: 90 }}>DTE</TableCell>
                 <TableCell sx={{ width: 120 }} align='right'>Pendiente</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
+                  <TableCell colSpan={9} align='center' sx={{ py: 6 }}>
                     <Typography variant='body2' color='text.secondary'>
                       No hay ingresos registrados aún
                     </Typography>
@@ -277,6 +395,15 @@ const IncomeListView = () => {
 
                   return (
                     <TableRow key={item.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/income/${item.incomeId}`)}>
+                      <TableCell padding='checkbox' onClick={e => e.stopPropagation()}>
+                        <Checkbox
+                          size='small'
+                          checked={selected.has(item.incomeId)}
+                          disabled={!!item.nuboxDocumentId}
+                          onChange={() => toggleSelect(item.incomeId)}
+                          inputProps={{ 'aria-label': `Seleccionar ${item.invoiceNumber || item.incomeId}` }}
+                        />
+                      </TableCell>
                       <TableCell>
                         <Box>
                           <Typography variant='body2' fontWeight={600}>
@@ -311,6 +438,22 @@ const IncomeListView = () => {
                           label={statusConf.label}
                         />
                       </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const dteKey = getDteStatusKey(item)
+                          const dteConf = DTE_STATUS_CONFIG[dteKey]
+
+                          return (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              color={dteConf.color}
+                              label={dteConf.label}
+                              icon={<i className={dteConf.icon} />}
+                            />
+                          )
+                        })()}
+                      </TableCell>
                       <TableCell align='right'>
                         <Typography
                           variant='body2'
@@ -328,6 +471,57 @@ const IncomeListView = () => {
           </Table>
         </TableContainer>
       </Card>
+
+      {/* Batch DTE confirmation dialog */}
+      <Dialog open={batchDialogOpen} onClose={() => !batchEmitting && setBatchDialogOpen(false)} maxWidth='sm' fullWidth>
+        <DialogTitle>Emitir DTEs en lote</DialogTitle>
+        <DialogContent>
+          <Typography variant='body2' sx={{ mb: 2 }}>
+            Se emitirán {selectedEligible.length} factura{selectedEligible.length > 1 ? 's' : ''} electrónica{selectedEligible.length > 1 ? 's' : ''} (código 33) ante el SII vía Nubox.
+          </Typography>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell>Factura</TableCell>
+                <TableCell>Cliente</TableCell>
+                <TableCell align='right'>Monto</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {selectedEligible.map(item => (
+                <TableRow key={item.incomeId}>
+                  <TableCell>
+                    <Typography variant='body2' fontWeight={600}>{item.invoiceNumber || item.incomeId}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant='body2'>{item.clientName}</Typography>
+                  </TableCell>
+                  <TableCell align='right'>
+                    <Typography variant='body2'>{formatAmount(item.totalAmount, item.currency)}</Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Typography variant='caption' color='text.secondary' sx={{ mt: 2, display: 'block' }}>
+            Esta acción no se puede deshacer. Cada DTE será enviado al SII para timbrado.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBatchDialogOpen(false)} disabled={batchEmitting}>
+            Cancelar
+          </Button>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={handleBatchEmit}
+            disabled={batchEmitting}
+            startIcon={batchEmitting ? <i className='tabler-loader-2' /> : <i className='tabler-file-invoice' />}
+          >
+            {batchEmitting ? 'Emitiendo...' : `Emitir ${selectedEligible.length} DTE${selectedEligible.length > 1 ? 's' : ''}`}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <CreateIncomeDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchIncome() }} />
     </Box>

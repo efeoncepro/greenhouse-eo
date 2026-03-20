@@ -14,6 +14,10 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
@@ -70,6 +74,14 @@ interface IncomeDetail {
   isReconciled: boolean
   notes: string | null
   createdAt: string | null
+  // Nubox DTE fields
+  nuboxDocumentId: string | null
+  nuboxSiiTrackId: string | null
+  nuboxEmissionStatus: string | null
+  dteTypeCode: string | null
+  dteFolio: string | null
+  nuboxEmittedAt: string | null
+  nuboxLastSyncedAt: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -108,6 +120,29 @@ const statusLabel = (status: string) => {
   }
 }
 
+const DTE_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'warning' | 'error' | 'secondary'; icon: string }> = {
+  emitted: { label: 'Emitido', color: 'success', icon: 'tabler-check' },
+  pending: { label: 'Pendiente', color: 'warning', icon: 'tabler-clock' },
+  rejected: { label: 'Rechazado', color: 'error', icon: 'tabler-x' },
+  annulled: { label: 'Anulado', color: 'secondary', icon: 'tabler-ban' }
+}
+
+const DTE_TYPE_NAMES: Record<string, string> = {
+  '33': 'Factura electrónica',
+  '34': 'Factura no afecta o exenta electrónica',
+  '56': 'Nota de débito electrónica',
+  '61': 'Nota de crédito electrónica',
+  '52': 'Guía de despacho electrónica'
+}
+
+const getDteStatus = (data: IncomeDetail): keyof typeof DTE_STATUS_CONFIG => {
+  if (!data.nuboxDocumentId) return 'pending'
+  if (data.nuboxEmissionStatus === 'Anulado') return 'annulled'
+  if (data.nuboxEmissionStatus === 'Rechazado') return 'rejected'
+
+  return 'emitted'
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -125,6 +160,11 @@ const IncomeDetailView = () => {
   const [payDate, setPayDate] = useState('')
   const [payReference, setPayReference] = useState('')
   const [paying, setPaying] = useState(false)
+
+  // DTE emission
+  const [emitDialogOpen, setEmitDialogOpen] = useState(false)
+  const [emitting, setEmitting] = useState(false)
+  const [refreshingDte, setRefreshingDte] = useState(false)
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -187,6 +227,80 @@ const IncomeDetailView = () => {
       toast.error('Error de conexión')
     } finally {
       setPaying(false)
+    }
+  }
+
+  const handleEmitDte = async () => {
+    setEmitting(true)
+
+    try {
+      const res = await fetch(`/api/finance/income/${incomeId}/emit-dte`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dteTypeCode: '33' })
+      })
+
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+
+        toast.error(d.error || 'No se pudo emitir el DTE. Intenta de nuevo.')
+
+        return
+      }
+
+      const result = await res.json()
+
+      toast.success(`DTE emitido. Folio #${result.dteFolio || ''} registrado en SII.`)
+      setEmitDialogOpen(false)
+      fetchDetail()
+    } catch {
+      toast.error('No se pudo emitir el DTE. Intenta de nuevo.')
+    } finally {
+      setEmitting(false)
+    }
+  }
+
+  const handleRefreshDteStatus = async () => {
+    setRefreshingDte(true)
+
+    try {
+      const res = await fetch(`/api/finance/income/${incomeId}/dte-status`)
+
+      if (!res.ok) {
+        toast.error('No se pudo consultar el estado. Intenta de nuevo.')
+
+        return
+      }
+
+      toast.success('Estado del DTE actualizado.')
+      fetchDetail()
+    } catch {
+      toast.error('No se pudo consultar el estado. Intenta de nuevo.')
+    } finally {
+      setRefreshingDte(false)
+    }
+  }
+
+  const handleDownloadDte = async (format: 'pdf' | 'xml') => {
+    try {
+      const res = await fetch(`/api/finance/income/${incomeId}/dte-${format}`)
+
+      if (!res.ok) {
+        toast.error(`No se pudo descargar el ${format.toUpperCase()}.`)
+
+        return
+      }
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+
+      a.href = url
+      a.download = `DTE-${data?.dteFolio || incomeId}.${format}`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      toast.error(`No se pudo descargar el ${format.toUpperCase()}.`)
     }
   }
 
@@ -320,6 +434,131 @@ const IncomeDetailView = () => {
           </Grid>
         </CardContent>
       </Card>
+
+      {/* DTE Section */}
+      {(() => {
+        const dteStatus = getDteStatus(data)
+        const dteConf = DTE_STATUS_CONFIG[dteStatus]
+        const hasEmittedDte = dteStatus === 'emitted' || dteStatus === 'annulled' || dteStatus === 'rejected'
+
+        return (
+          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }} component='article' aria-label={`Documento tributario electrónico: ${dteConf.label}`}>
+            <CardHeader
+              title='Documento tributario electrónico'
+              avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-file-certificate' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} /></Avatar>}
+              action={
+                <CustomChip
+                  round='true'
+                  size='small'
+                  color={dteConf.color}
+                  label={dteConf.label}
+                  icon={<i className={dteConf.icon} />}
+                />
+              }
+            />
+            <Divider />
+            <CardContent>
+              {hasEmittedDte ? (
+                <>
+                  <Grid container spacing={3} sx={{ mb: 3 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Typography variant='caption' color='text.secondary'>Tipo DTE</Typography>
+                      <Typography variant='body2'>
+                        {DTE_TYPE_NAMES[data.dteTypeCode || ''] || data.dteTypeCode || '—'}
+                        {data.dteTypeCode ? ` (${data.dteTypeCode})` : ''}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Typography variant='caption' color='text.secondary'>Folio</Typography>
+                      <Typography variant='body2'>#{data.dteFolio || '—'}</Typography>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Typography variant='caption' color='text.secondary'>Track SII</Typography>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        {data.nuboxSiiTrackId || '—'}
+                      </Typography>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                      <Typography variant='caption' color='text.secondary'>Fecha emisión</Typography>
+                      <Typography variant='body2'>{formatDate(data.nuboxEmittedAt?.slice(0, 10) ?? null)}</Typography>
+                    </Grid>
+                  </Grid>
+                  <Stack direction='row' spacing={2} sx={{ flexWrap: 'wrap' }}>
+                    <Button
+                      variant='outlined'
+                      size='small'
+                      startIcon={<i className='tabler-file-type-pdf' />}
+                      onClick={() => handleDownloadDte('pdf')}
+                      aria-label={`Descargar PDF del DTE folio ${data.dteFolio || ''}`}
+                    >
+                      Descargar PDF
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      size='small'
+                      startIcon={<i className='tabler-file-type-xml' />}
+                      onClick={() => handleDownloadDte('xml')}
+                      aria-label={`Descargar XML del DTE folio ${data.dteFolio || ''}`}
+                    >
+                      Descargar XML
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      size='small'
+                      startIcon={<i className='tabler-refresh' />}
+                      onClick={handleRefreshDteStatus}
+                      disabled={refreshingDte}
+                      aria-label='Actualizar estado del DTE en SII'
+                    >
+                      {refreshingDte ? 'Consultando...' : 'Actualizar estado'}
+                    </Button>
+                  </Stack>
+                </>
+              ) : (
+                <Box sx={{ textAlign: 'center', py: 3 }}>
+                  <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                    Este ingreso aún no tiene un DTE emitido en Nubox.
+                  </Typography>
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    startIcon={<i className='tabler-file-upload' />}
+                    onClick={() => setEmitDialogOpen(true)}
+                    aria-label='Emitir documento tributario electrónico'
+                  >
+                    Emitir DTE
+                  </Button>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        )
+      })()}
+
+      {/* Emit DTE Confirmation Dialog */}
+      <Dialog
+        open={emitDialogOpen}
+        onClose={() => !emitting && setEmitDialogOpen(false)}
+        aria-labelledby='emit-dte-dialog-title'
+        maxWidth='xs'
+        fullWidth
+      >
+        <DialogTitle id='emit-dte-dialog-title'>¿Emitir DTE para este ingreso?</DialogTitle>
+        <DialogContent>
+          <Typography variant='body2' sx={{ mb: 2 }}>
+            Se emitirá una Factura electrónica por <strong>{formatAmount(data.totalAmount, data.currency)}</strong> a nombre de <strong>{data.clientName}</strong>.
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Esta acción se registra en el SII y no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEmitDialogOpen(false)} disabled={emitting}>Cancelar</Button>
+          <Button variant='contained' color='primary' onClick={handleEmitDte} disabled={emitting}>
+            {emitting ? 'Emitiendo...' : 'Emitir DTE'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Register payment form (if not fully paid) */}
       {data.paymentStatus !== 'paid' && data.paymentStatus !== 'written_off' && (

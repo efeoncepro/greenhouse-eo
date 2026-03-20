@@ -27,7 +27,10 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
+import { toast } from 'react-toastify'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import CustomChip from '@core/components/mui/Chip'
 import OptionMenu from '@core/components/option-menu'
 import Chip from '@mui/material/Chip'
 
@@ -91,6 +94,22 @@ interface ExpenseListItem {
   paymentDate: string | null
   documentDate: string | null
   totalAmountClp: number
+}
+
+interface NuboxSyncRun {
+  syncRunId: string
+  type: string
+  status: string
+  recordsRead: number | null
+  notes: string | null
+  startedAt: string | null
+  finishedAt: string | null
+}
+
+interface NuboxSyncStatus {
+  lastSync: NuboxSyncRun | null
+  lastProjection: Omit<NuboxSyncRun, 'type' | 'startedAt'> | null
+  recentRuns: NuboxSyncRun[]
 }
 
 interface RecentMovement {
@@ -282,6 +301,8 @@ const FinanceDashboardView = () => {
   const [incomeDrawerOpen, setIncomeDrawerOpen] = useState(false)
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
+  const [nuboxSync, setNuboxSync] = useState<NuboxSyncStatus | null>(null)
+  const [syncing, setSyncing] = useState(false)
 
   const fetchData = useCallback(async () => {
     let cancelled = false
@@ -291,14 +312,15 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes] = await Promise.all([
+      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
         fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
         fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
         fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' }),
-        fetch('/api/finance/dashboard/pnl', { cache: 'no-store' })
+        fetch('/api/finance/dashboard/pnl', { cache: 'no-store' }),
+        fetch('/api/finance/nubox/sync-status', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -386,6 +408,10 @@ const FinanceDashboardView = () => {
 
       if (pnlRes.ok) {
         setPnl(await pnlRes.json())
+      }
+
+      if (nuboxSyncRes.ok) {
+        setNuboxSync(await nuboxSyncRes.json())
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -847,6 +873,89 @@ const FinanceDashboardView = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Nubox sync status */}
+      {nuboxSync && nuboxSync.lastSync && (
+        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+          <CardHeader
+            title='Sincronización Nubox'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+                <i className='tabler-refresh' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
+              </Avatar>
+            }
+            action={
+              <Button
+                variant='outlined'
+                size='small'
+                startIcon={<i className='tabler-refresh' />}
+                disabled={syncing}
+                onClick={async () => {
+                  setSyncing(true)
+
+                  try {
+                    const res = await fetch('/api/finance/nubox/sync', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: '{}'
+                    })
+
+                    if (!res.ok) {
+                      toast.error('No se pudo iniciar la sincronización.')
+
+                      return
+                    }
+
+                    toast.success('Sincronización completada.')
+                    void fetchData()
+                  } catch {
+                    toast.error('Error de conexión al sincronizar.')
+                  } finally {
+                    setSyncing(false)
+                  }
+                }}
+              >
+                {syncing ? 'Sincronizando...' : 'Sincronizar ahora'}
+              </Button>
+            }
+          />
+          <Divider />
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Último sync</Typography>
+                <Typography variant='body2'>
+                  {nuboxSync.lastSync.finishedAt
+                    ? new Date(nuboxSync.lastSync.finishedAt).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })
+                    : '—'}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Estado</Typography>
+                <Box sx={{ mt: 0.25 }}>
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    color={nuboxSync.lastSync.status === 'succeeded' ? 'success' : nuboxSync.lastSync.status === 'running' ? 'warning' : 'error'}
+                    label={nuboxSync.lastSync.status === 'succeeded' ? 'Exitoso' : nuboxSync.lastSync.status === 'running' ? 'En progreso' : 'Error'}
+                    icon={<i className={nuboxSync.lastSync.status === 'succeeded' ? 'tabler-check' : nuboxSync.lastSync.status === 'running' ? 'tabler-loader' : 'tabler-alert-triangle'} />}
+                  />
+                </Box>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Registros procesados</Typography>
+                <Typography variant='body2'>{nuboxSync.lastSync.recordsRead ?? '—'}</Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Typography variant='caption' color='text.secondary'>Detalle</Typography>
+                <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                  {nuboxSync.lastProjection?.notes || nuboxSync.lastSync.notes || '—'}
+                </Typography>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent transactions table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>

@@ -48,6 +48,8 @@ interface Expense {
   supplierName: string | null
   serviceLine: string | null
   isRecurring: boolean
+  // Nubox fields
+  nuboxPurchaseId: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -334,11 +336,16 @@ const ExpensesListView = () => {
                           <Typography variant='body2' fontWeight={600} sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {item.description}
                           </Typography>
-                          {item.documentNumber ? (
-                            <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                              Doc: {item.documentNumber}
-                            </Typography>
-                          ) : null}
+                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.25 }}>
+                            {item.documentNumber ? (
+                              <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                Doc: {item.documentNumber}
+                              </Typography>
+                            ) : null}
+                            {item.nuboxPurchaseId ? (
+                              <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' />
+                            ) : null}
+                          </Box>
                         </Box>
                       </TableCell>
                       <TableCell>

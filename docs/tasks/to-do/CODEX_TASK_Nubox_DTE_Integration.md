@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Backend completo al 2026-03-20.** Pipeline multi-capa implementado y verificado con backfill histórico completo.
+**Backend + UI completo al 2026-03-20.** Pipeline multi-capa implementado y verificado con backfill histórico completo. UI de emisión, descarga y estado de DTEs integrada en las vistas de Finance.
 
 ### Implementado (backend)
 - Cliente API Nubox con retry/backoff, paginación correcta (array + `x-total-count` header)
@@ -17,11 +17,20 @@
 - Identity resolution: RUT → organizations (vía spaces bridge) → client_id
 - Auto-provisioning de suppliers por RUT
 
-### Pendiente (UI)
-- Botón "Emitir DTE" en detalle de income
-- Columna DTE en lista de ingresos
-- Badge "Nubox" en expenses importados
-- Panel de sync status
+### Implementado (UI)
+- Sección "Documento tributario electrónico" en detalle de ingreso con estado, tipo DTE, folio, track SII
+- Botón "Emitir DTE" con diálogo de confirmación
+- Acciones post-emisión: Descargar PDF, Descargar XML, Actualizar estado
+- Columna DTE en lista de ingresos con chips de estado (Emitido/Pendiente/Rechazado/Anulado)
+- Badge "Nubox" en egresos importados desde purchases
+- Accesibilidad: chips con ícono + texto, aria-labels en botones de acción
+- Panel de sync status en Finance dashboard con último sync, conteos y botón "Sincronizar ahora"
+- Reconciliación automática expense ↔ purchase vía bank movements conformed
+- Emisión masiva: checkbox selection en lista de ingresos + diálogo de confirmación + API batch (hasta 50)
+- Env vars deployed a Vercel (production, preview, development)
+
+### Pendiente
+- [ ] Verificación end-to-end de emisión contra Nubox API (primer DTE real)
 
 ## Resumen
 
@@ -662,13 +671,14 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 - [x] `/api/finance/nubox/sync` trigger manual con periodos opcionales
 - [x] Cada fase con error handling independiente
 
-### Fase 8 (UI) — pendiente
-- [ ] Botón "Emitir DTE" en detalle de factura
-- [ ] Dialog de confirmación con preview
-- [ ] Acciones post-emisión (PDF, XML, estado)
-- [ ] Columna DTE en lista de ingresos con badges de estado
-- [ ] Badge "Nubox" en expenses importados
-- [ ] Panel de sync status con trigger manual
+### Fase 8 (UI)
+- [x] Sección DTE en detalle de ingreso (estado, tipo, folio, track SII, fecha emisión)
+- [x] Botón "Emitir DTE" con dialog de confirmación
+- [x] Acciones post-emisión (Descargar PDF, Descargar XML, Actualizar estado)
+- [x] Columna DTE en lista de ingresos con chips de estado (Emitido/Pendiente/Rechazado/Anulado)
+- [x] Badge "Nubox" en expenses importados
+- [ ] Panel de sync status con trigger manual (8.5)
+- [ ] Emisión masiva (8.6 — fase futura)
 
 ## Archivos implementados
 
@@ -695,7 +705,13 @@ expense.links.document.href              → (extraer purchase_id para vincular 
 - `scripts/setup-bigquery-nubox-conformed.sql` + `.ts` — 3 tablas conformed
 - `scripts/setup-postgres-nubox-extensions.sql` + `.ts` — ALTER income/expenses + emission_log
 
+### UI views (modified)
+- `src/views/greenhouse/finance/IncomeDetailView.tsx` — sección DTE, diálogo emisión, descarga PDF/XML, refresh estado
+- `src/views/greenhouse/finance/IncomeListView.tsx` — columna DTE con chips de estado
+- `src/views/greenhouse/finance/ExpensesListView.tsx` — badge "Nubox" en egresos importados
+
 ### Modified
+- `src/lib/nubox/types.ts` — campos opcionales agregados (totalOtherTaxesAmount, saleType, etc.)
 - `src/lib/finance/schema.ts` — FINANCE_COLUMN_REQUIREMENTS con columnas Nubox
 - `src/lib/finance/postgres-store-slice2.ts` — tipos + mappers + queries extendidos
 - `vercel.json` — cron entry

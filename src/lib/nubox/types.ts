@@ -50,6 +50,12 @@ export type NuboxDataClSale = {
   annulled: boolean
 }
 
+export type NuboxSaleType = {
+  id: number
+  legalCode: string
+  name: string
+}
+
 export type NuboxSale = {
   id: number
   number: string // folio
@@ -58,6 +64,8 @@ export type NuboxSale = {
   totalExemptAmount: number
   totalTaxVatAmount: number
   totalAmount: number
+  totalOtherTaxesAmount?: number
+  totalWithholdingAmount?: number
   balance?: number
   emissionDate: string // ISO timestamp
   periodMonth: number
@@ -68,6 +76,7 @@ export type NuboxSale = {
   dataCl?: NuboxDataClSale
   client: NuboxClient
   emissionStatus: NuboxEmissionStatus
+  saleType?: NuboxSaleType
   links?: NuboxLink[]
 }
 
@@ -94,8 +103,9 @@ export type NuboxDocumentStatus = {
 }
 
 export type NuboxPurchaseType = {
+  id?: number
   legalCode: string
-  name: string // "Ventas del Giro"
+  name: string // "Compras del Giro"
 }
 
 export type NuboxDataClPurchase = {
