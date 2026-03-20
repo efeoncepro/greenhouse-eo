@@ -83,17 +83,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // Build menu data array based on user roles
   const menuData: VerticalMenuDataType[] = []
 
+  // ── Primary navigation ──────────────────────────────────────────────
   if (isInternalUser) {
+    // Flat item — no section wrapper (single item doesn't warrant a section)
     menuData.push({
-      isSection: true,
-      label: 'Operacion',
-      children: [
-        {
-          label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
-          href: dashboardHref,
-          icon: 'tabler-smart-home'
-        }
-      ]
+      label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
+      href: dashboardHref,
+      icon: 'tabler-smart-home'
     })
   } else {
     menuData.push(
@@ -125,11 +121,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     )
   }
 
-  // Client capability modules
+  // ── Módulos (client capability modules) ─────────────────────────────
   if (!isInternalUser && capabilityModules.length > 0) {
     menuData.push({
       isSection: true,
-      label: 'Servicios',
+      label: 'Módulos',
       children: capabilityModules.map(module => ({
         label: module.label,
         href: module.route,
@@ -138,11 +134,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     })
   }
 
-  // Agency section
+  // ── Gestión (agency) ────────────────────────────────────────────────
   if (isAgencyUser) {
     menuData.push({
       isSection: true,
-      label: 'Agencia',
+      label: 'Gestión',
       children: [
         {
           label: <NavLabel label={GH_AGENCY_NAV.workspace.label} subtitle={GH_AGENCY_NAV.workspace.subtitle} show={showSub} />,
@@ -163,8 +159,35 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     })
   }
 
-  // People section
-  if (canSeePeople) {
+  // ── Equipo (people + HR unified) ────────────────────────────────────
+  const hasHrAccess = isHrUser || isAdminUser
+  const hrItems: VerticalMenuDataType[] = hasHrAccess
+    ? [
+        {
+          label: <NavLabel label={GH_HR_NAV.payroll.label} subtitle={GH_HR_NAV.payroll.subtitle} show={showSub} />,
+          href: '/hr/payroll',
+          icon: 'tabler-receipt'
+        },
+        {
+          label: <NavLabel label={GH_HR_NAV.departments.label} subtitle={GH_HR_NAV.departments.subtitle} show={showSub} />,
+          href: '/hr/departments',
+          icon: 'tabler-sitemap'
+        },
+        {
+          label: <NavLabel label={GH_HR_NAV.leave.label} subtitle={GH_HR_NAV.leave.subtitle} show={showSub} />,
+          href: '/hr/leave',
+          icon: 'tabler-calendar-event'
+        },
+        {
+          label: <NavLabel label={GH_HR_NAV.attendance.label} subtitle={GH_HR_NAV.attendance.subtitle} show={showSub} />,
+          href: '/hr/attendance',
+          icon: 'tabler-clock-check'
+        }
+      ]
+    : []
+
+  if (canSeePeople && hasHrAccess) {
+    // Both people + HR → unified section
     menuData.push({
       isSection: true,
       label: 'Equipo',
@@ -173,61 +196,62 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           label: <NavLabel label={GH_PEOPLE_NAV.people.label} subtitle={GH_PEOPLE_NAV.people.subtitle} show={showSub} />,
           href: '/people',
           icon: 'tabler-users-group'
-        }
+        },
+        ...hrItems
       ]
+    })
+  } else if (canSeePeople) {
+    // Only people, no HR → flat item (avoid single-item section)
+    menuData.push({
+      label: <NavLabel label={GH_PEOPLE_NAV.people.label} subtitle={GH_PEOPLE_NAV.people.subtitle} show={showSub} />,
+      href: '/people',
+      icon: 'tabler-users-group'
+    })
+  } else if (hasHrAccess) {
+    // Only HR, no people → section with HR items
+    menuData.push({
+      isSection: true,
+      label: 'Equipo',
+      children: hrItems
     })
   }
 
-  // Finance submenu
+  // ── Finanzas (submenu — 6 children, collapse reduces noise) ─────────
   if (isFinanceUser || isAdminUser) {
     menuData.push({
       label: 'Finanzas',
       icon: 'tabler-report-money',
       children: [
-        { label: GH_FINANCE_NAV.dashboard.label, href: '/finance' },
-        { label: GH_FINANCE_NAV.income.label, href: '/finance/income' },
-        { label: GH_FINANCE_NAV.expenses.label, href: '/finance/expenses' },
-        { label: GH_FINANCE_NAV.suppliers.label, href: '/finance/suppliers' },
-        { label: GH_FINANCE_NAV.reconciliation.label, href: '/finance/reconciliation' },
-        { label: GH_FINANCE_NAV.intelligence.label, href: '/finance/intelligence' }
+        { label: <NavLabel label={GH_FINANCE_NAV.dashboard.label} subtitle={GH_FINANCE_NAV.dashboard.subtitle} show={showSub} />, href: '/finance' },
+        { label: <NavLabel label={GH_FINANCE_NAV.income.label} subtitle={GH_FINANCE_NAV.income.subtitle} show={showSub} />, href: '/finance/income' },
+        { label: <NavLabel label={GH_FINANCE_NAV.expenses.label} subtitle={GH_FINANCE_NAV.expenses.subtitle} show={showSub} />, href: '/finance/expenses' },
+        { label: <NavLabel label={GH_FINANCE_NAV.suppliers.label} subtitle={GH_FINANCE_NAV.suppliers.subtitle} show={showSub} />, href: '/finance/suppliers' },
+        { label: <NavLabel label={GH_FINANCE_NAV.reconciliation.label} subtitle={GH_FINANCE_NAV.reconciliation.subtitle} show={showSub} />, href: '/finance/reconciliation' },
+        { label: <NavLabel label={GH_FINANCE_NAV.intelligence.label} subtitle={GH_FINANCE_NAV.intelligence.subtitle} show={showSub} />, href: '/finance/intelligence' }
       ]
     })
   }
 
-  // HR submenu
-  if (isHrUser || isAdminUser) {
-    menuData.push({
-      label: 'HR',
-      icon: 'tabler-heart-handshake',
-      children: [
-        { label: GH_HR_NAV.payroll.label, href: '/hr/payroll' },
-        { label: GH_HR_NAV.departments.label, href: '/hr/departments' },
-        { label: GH_HR_NAV.leave.label, href: '/hr/leave' },
-        { label: GH_HR_NAV.attendance.label, href: '/hr/attendance' }
-      ]
-    })
-  }
-
-  // AI Tooling — standalone entry for ai_tooling_admin users who are not admin
+  // ── Herramientas IA (standalone for non-admin ai_tooling users) ─────
   if (isAiToolingUser && !isAdminUser) {
     menuData.push({
-      label: <NavLabel label='AI Tooling' subtitle='Herramientas y créditos IA' show={showSub} />,
+      label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />,
       href: '/admin/ai-tools',
       icon: 'tabler-robot'
     })
   }
 
-  // Admin submenu
+  // ── Administración (submenu — 5 children) ───────────────────────────
   if (isAdminUser) {
     menuData.push({
-      label: 'Admin',
+      label: 'Administración',
       icon: 'tabler-shield-lock',
       children: [
-        { label: GH_INTERNAL_NAV.adminTenants.label, href: '/admin/tenants' },
-        { label: GH_INTERNAL_NAV.adminTeam.label, href: '/admin/team' },
-        { label: GH_INTERNAL_NAV.adminUsers.label, href: '/admin/users' },
-        { label: GH_INTERNAL_NAV.adminRoles.label, href: '/admin/roles' },
-        { label: 'AI Tooling', href: '/admin/ai-tools' }
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminTenants.label} subtitle={GH_INTERNAL_NAV.adminTenants.subtitle} show={showSub} />, href: '/admin/tenants' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminTeam.label} subtitle={GH_INTERNAL_NAV.adminTeam.subtitle} show={showSub} />, href: '/admin/team' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminUsers.label} subtitle={GH_INTERNAL_NAV.adminUsers.subtitle} show={showSub} />, href: '/admin/users' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminRoles.label} subtitle={GH_INTERNAL_NAV.adminRoles.subtitle} show={showSub} />, href: '/admin/roles' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />, href: '/admin/ai-tools' }
       ]
     })
   }

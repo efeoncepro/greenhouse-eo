@@ -19,8 +19,8 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
     items: [
       {
         label: 'Pulse',
-        href: '/dashboards',
-        icon: 'tabler-trending-up'
+        href: '/dashboard',
+        icon: 'tabler-smart-home'
       },
       {
         label: 'Spaces',
@@ -33,8 +33,8 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-users'
       },
       {
-        label: 'Equipo',
-        href: '/admin/team',
+        label: 'Personas',
+        href: '/people',
         icon: 'tabler-users-group'
       }
     ]
@@ -43,7 +43,7 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
     sectionLabel: 'Finanzas',
     items: [
       {
-        label: 'Dashboard financiero',
+        label: 'Resumen',
         href: '/finance',
         icon: 'tabler-chart-bar'
       },
@@ -58,34 +58,34 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-receipt'
       },
       {
-        label: 'Clientes',
-        href: '/finance/clients',
+        label: 'Proveedores',
+        href: '/finance/suppliers',
         icon: 'tabler-address-book'
       }
     ]
   },
   {
-    sectionLabel: 'People',
+    sectionLabel: 'Equipo',
     items: [
       {
         label: 'Nómina',
         href: '/hr/payroll',
-        icon: 'tabler-report-money'
+        icon: 'tabler-receipt'
       },
       {
-        label: 'Personas',
-        href: '/hr/people',
-        icon: 'tabler-user-heart'
+        label: 'Departamentos',
+        href: '/hr/departments',
+        icon: 'tabler-sitemap'
       },
       {
-        label: 'Estructura',
-        href: '/hr/structure',
-        icon: 'tabler-hierarchy-2'
+        label: 'Permisos',
+        href: '/hr/leave',
+        icon: 'tabler-calendar-event'
       },
       {
-        label: 'Configuración HR',
-        href: '/hr/settings',
-        icon: 'tabler-settings'
+        label: 'Asistencia',
+        href: '/hr/attendance',
+        icon: 'tabler-clock-check'
       }
     ]
   },
@@ -98,19 +98,19 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-lock'
       },
       {
-        label: 'Configuración',
-        href: '/admin/settings',
-        icon: 'tabler-settings'
+        label: 'Herramientas IA',
+        href: '/admin/ai-tools',
+        icon: 'tabler-robot'
       },
       {
-        label: 'Control Tower',
-        href: '/admin',
-        icon: 'tabler-dashboard'
+        label: 'Torre de control',
+        href: '/internal/dashboard',
+        icon: 'tabler-smart-home'
       },
       {
-        label: 'Capacidad',
-        href: '/admin/capacity',
-        icon: 'tabler-chart-dots-3'
+        label: 'Agencia',
+        href: '/agency',
+        icon: 'tabler-building'
       }
     ]
   }
