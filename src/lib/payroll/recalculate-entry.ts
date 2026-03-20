@@ -188,8 +188,8 @@ export const recalculatePayrollEntry = async ({
   const nextKpiRpaAvg = input.kpiRpaAvg !== undefined ? input.kpiRpaAvg : entry.kpiRpaAvg
   const nextKpiTasksCompleted = input.kpiTasksCompleted !== undefined ? input.kpiTasksCompleted : entry.kpiTasksCompleted
 
-  const otdResult = calculateOtdBonus(nextKpiOtdPercent, compensation.bonusOtdMin, bonusConfig)
-  const rpaResult = calculateRpaBonus(nextKpiRpaAvg, compensation.bonusRpaMin, bonusConfig)
+  const otdResult = calculateOtdBonus(nextKpiOtdPercent, compensation.bonusOtdMax, bonusConfig)
+  const rpaResult = calculateRpaBonus(nextKpiRpaAvg, compensation.bonusRpaMax, bonusConfig)
 
   const nextBonusOtdAmount = input.bonusOtdAmount ?? entry.bonusOtdAmount
   const nextBonusRpaAmount = input.bonusRpaAmount ?? entry.bonusRpaAmount

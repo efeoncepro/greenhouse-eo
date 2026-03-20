@@ -93,7 +93,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
           subheader={
             compensations.length > 0
               ? `${compensations.length} colaborador${compensations.length !== 1 ? 'es' : ''} con compensación activa`
-              : 'Aquí defines salario base, teletrabajo, bonos y previsión para calcular nómina.'
+              : 'Aquí defines salario base, conectividad, bonos y previsión para calcular nómina.'
           }
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
@@ -136,7 +136,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                   <TableCell>Colaborador</TableCell>
                   <TableCell align='center'>Régimen</TableCell>
                   <TableCell align='right'>Salario base</TableCell>
-                  <TableCell align='right'>Teletrabajo</TableCell>
+                  <TableCell align='right'>Conectividad</TableCell>
                   <TableCell align='right'>Bono OTD</TableCell>
                   <TableCell align='right'>Bono RpA</TableCell>
                   <TableCell align='center'>Versión</TableCell>
@@ -184,12 +184,12 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
-                        {formatCurrency(comp.bonusOtdMin, comp.currency)} – {formatCurrency(comp.bonusOtdMax, comp.currency)}
+                        {formatCurrency(comp.bonusOtdMax, comp.currency)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
-                        {formatCurrency(comp.bonusRpaMin, comp.currency)} – {formatCurrency(comp.bonusRpaMax, comp.currency)}
+                        {formatCurrency(comp.bonusRpaMax, comp.currency)}
                       </Typography>
                     </TableCell>
                     <TableCell align='center'>

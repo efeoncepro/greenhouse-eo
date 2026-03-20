@@ -1145,3 +1145,11 @@ export const GH_COLORS = {
     completed:  { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' }
   }
 } as const
+
+export const GH_COMPENSATION = {
+  baseSalary: { label: 'Salario base' },
+  connectivityBonus: { label: 'Bono conectividad' },
+  bonusOtd: { label: 'Bono On-Time' },
+  bonusRpa: { label: 'Bono RpA' },
+  bonusHelperText: 'Monto al 100% de cumplimiento'
+} as const

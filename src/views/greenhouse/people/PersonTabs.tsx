@@ -31,9 +31,10 @@ type Props = {
   membershipReloadKey?: number
   onNewMembership?: () => void
   onEditMembership?: (membership: MembershipRowData, assignment?: PersonDetailAssignment) => void
+  onEditCompensation?: () => void
 }
 
-const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onEditMembership }: Props) => {
+const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onEditMembership, onEditCompensation }: Props) => {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -140,7 +141,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
             <TabPanel value='compensation' className='p-0'>
               {activeTab === 'compensation' && (
-                <PersonCompensationTab compensation={detail.currentCompensation} />
+                <PersonCompensationTab compensation={detail.currentCompensation} onEdit={onEditCompensation} />
               )}
             </TabPanel>
 

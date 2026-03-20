@@ -156,6 +156,7 @@ const PersonView = ({ memberId }: Props) => {
             membershipReloadKey={membershipReloadKey}
             onNewMembership={() => setMembershipDrawerOpen(true)}
             onEditMembership={(membership, assignment) => setEditMembership({ membership, assignment })}
+            onEditCompensation={isAdmin ? () => setCompensationOpen(true) : undefined}
           />
         </Grid>
       </Grid>

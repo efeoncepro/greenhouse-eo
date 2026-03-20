@@ -37,10 +37,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [currency, setCurrency] = useState(ev?.currency ?? 'CLP')
   const [baseSalary, setBaseSalary] = useState(ev?.baseSalary ?? 0)
   const [remoteAllowance, setRemoteAllowance] = useState(ev?.remoteAllowance ?? 0)
-  const [bonusOtdMin, setBonusOtdMin] = useState(ev?.bonusOtdMin ?? 0)
-  const [bonusOtdMax, setBonusOtdMax] = useState(ev?.bonusOtdMax ?? 0)
-  const [bonusRpaMin, setBonusRpaMin] = useState(ev?.bonusRpaMin ?? 0)
-  const [bonusRpaMax, setBonusRpaMax] = useState(ev?.bonusRpaMax ?? 0)
+  const [bonusOtd, setBonusOtd] = useState(ev?.bonusOtdMax ?? 0)
+  const [bonusRpa, setBonusRpa] = useState(ev?.bonusRpaMax ?? 0)
   const [afpName, setAfpName] = useState(ev?.afpName ?? '')
   const [afpRate, setAfpRate] = useState(ev?.afpRate ?? 0.1144)
   const [healthSystem, setHealthSystem] = useState<HealthSystem>(ev?.healthSystem ?? 'fonasa')
@@ -63,10 +61,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setCurrency(ev?.currency ?? 'CLP')
     setBaseSalary(ev?.baseSalary ?? 0)
     setRemoteAllowance(ev?.remoteAllowance ?? 0)
-    setBonusOtdMin(ev?.bonusOtdMin ?? 0)
-    setBonusOtdMax(ev?.bonusOtdMax ?? 0)
-    setBonusRpaMin(ev?.bonusRpaMin ?? 0)
-    setBonusRpaMax(ev?.bonusRpaMax ?? 0)
+    setBonusOtd(ev?.bonusOtdMax ?? 0)
+    setBonusRpa(ev?.bonusRpaMax ?? 0)
     setAfpName(ev?.afpName ?? '')
     setAfpRate(ev?.afpRate ?? 0.1144)
     setHealthSystem(ev?.healthSystem ?? 'fonasa')
@@ -112,10 +108,10 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         currency,
         baseSalary,
         remoteAllowance,
-        bonusOtdMin,
-        bonusOtdMax,
-        bonusRpaMin,
-        bonusRpaMax,
+        bonusOtdMin: 0,
+        bonusOtdMax: bonusOtd,
+        bonusRpaMin: 0,
+        bonusRpaMax: bonusRpa,
         effectiveFrom,
         changeReason: changeReason.trim(),
         ...(payRegime === 'chile' && {
@@ -190,10 +186,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <CustomTextField
               fullWidth
               size='small'
-              label='Asignación teletrabajo'
+              label='Bono conectividad'
               type='number'
               value={remoteAllowance}
               onChange={e => setRemoteAllowance(Number(e.target.value))}
+              helperText='Monto fijo mensual (ej. $50 USD)'
             />
 
             {/* Bonos */}
@@ -201,16 +198,10 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <Typography variant='subtitle2' color='text.secondary'>Bonos variables</Typography>
             <Grid container spacing={2}>
               <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono OTD mín' type='number' value={bonusOtdMin} onChange={e => setBonusOtdMin(Number(e.target.value))} />
+                <CustomTextField fullWidth size='small' label='Bono On-Time' type='number' value={bonusOtd} onChange={e => setBonusOtd(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono OTD máx' type='number' value={bonusOtdMax} onChange={e => setBonusOtdMax(Number(e.target.value))} />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono RpA mín' type='number' value={bonusRpaMin} onChange={e => setBonusRpaMin(Number(e.target.value))} />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono RpA máx' type='number' value={bonusRpaMax} onChange={e => setBonusRpaMax(Number(e.target.value))} />
+                <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa} onChange={e => setBonusRpa(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
               </Grid>
             </Grid>
 

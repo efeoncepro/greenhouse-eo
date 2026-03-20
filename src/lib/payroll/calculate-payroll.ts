@@ -91,8 +91,8 @@ const buildPayrollEntry = ({
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
 
-  const otdResult = calculateOtdBonus(kpiOtdPercent, compensation.bonusOtdMin, bonusConfig)
-  const rpaResult = calculateRpaBonus(kpiRpaAvg, compensation.bonusRpaMin, bonusConfig)
+  const otdResult = calculateOtdBonus(kpiOtdPercent, compensation.bonusOtdMax, bonusConfig)
+  const rpaResult = calculateRpaBonus(kpiRpaAvg, compensation.bonusRpaMax, bonusConfig)
 
   const bonusOtdAmount = otdResult.amount
   const bonusRpaAmount = rpaResult.amount
