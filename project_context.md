@@ -3,6 +3,16 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-20 HR Payroll — contraste arquitectónico confirma cierre completo
+- Se contrastaron las 2 tasks de Payroll contra la arquitectura 360 real:
+  - `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` — schema `greenhouse_payroll` materializado, 25+ funciones en postgres-store, 11/11 rutas Postgres-first
+  - `CODEX_TASK_HR_Payroll_Module_v3` — 4 gaps UX cerrados (alta compensación, edición período, KPI manual, ficha colaborador)
+- Backfill BQ → PG ejecutado: 0 rows transaccionales en BigQuery, módulo nunca usado en producción
+- Regla operativa derivada:
+  - Payroll está listo para primer uso real; el siguiente paso es onboarding de datos reales (compensaciones + primer período) directamente en Postgres
+  - BigQuery queda como fallback pasivo; no debe recibir writes nuevos del módulo
+- Ambas tasks cerradas y movidas a `docs/tasks/complete/`
+
 ## Delta 2026-03-20 BigQuery cron hardening — schema drift + streaming buffer
 - Se confirmó que el readiness hacia producción no estaba bloqueado por `build`, sino por dos fallos de cron en BigQuery:
   - `GET /api/cron/ico-materialize` fallaba cuando `ico_engine.metrics_by_project` existía pero sin columnas nuevas como `pipeline_velocity`

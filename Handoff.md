@@ -40,6 +40,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 18:00 -03
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Contrastar `CODEX_TASK_HR_Payroll_Module_v3` y `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` contra arquitectura real, ejecutar backfill y cerrar tasks.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- Development (backfill ejecutado contra Cloud SQL)
+
+### Archivos tocados
+- `docs/tasks/to-do/ → docs/tasks/complete/` — movidas ambas tasks de Payroll
+- `docs/tasks/README.md` — backlog renumerado, entries agregadas en Complete
+- `changelog.md` — entrada de cierre
+- `project_context.md` — delta de contraste arquitectónico
+- No se tocó código de aplicación — el módulo ya estaba implementado
+
+### Verificacion
+- `isPayrollPostgresEnabled()` → delega a `isGreenhousePostgresConfigured()` ✅
+- Tab payroll confirmado en `PersonTabs.tsx:147` con `PersonPayrollTab` ✅
+- Backfill payroll ejecutado: 0 rows BQ transaccionales, 1 bonus_config migrado ✅
+- Backfill leave ejecutado: 4 leave_types migrados ✅
+- Contraste contra `GREENHOUSE_360_OBJECT_MODEL_V1`, `GREENHOUSE_POSTGRES_CANONICAL_360_V1`: 6/6 reglas cumplidas ✅
+
+### Riesgos o pendientes
+- El módulo Payroll nunca tuvo datos transaccionales reales. El primer uso real requiere crear compensaciones y un período directamente en Postgres.
+- Falta smoke test autenticado end-to-end en Preview/Staging: crear compensación → crear período → calcular → aprobar → exportar.
+- BigQuery sigue como fallback pasivo. No desactivarlo hasta confirmar runtime Postgres estable en Preview.
+
+---
+
 ## 2026-03-20 17:10 -03
 
 ### Agente

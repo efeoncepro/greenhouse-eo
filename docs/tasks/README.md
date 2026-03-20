@@ -37,24 +37,22 @@ Las lanes parcialmente implementadas se devolvieron a `to-do` y las realmente ce
 | 2 | [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | P0 | Muy alto | Medio | Parcial | Subir cobertura de reconciliación y cortar consumers vivos a `person_360` |
 | 3 | [GREENHOUSE_IDENTITY_ACCESS_V2.md](to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md) | P0 | Muy alto | Alto | Avanzada | RBAC composable, access model y cierre del cutover `Postgres-first` |
 | 4 | [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | P0 | Alto | Medio | Avanzada | Cierre del runtime de Finance sobre PostgreSQL antes de seguir ampliando Finance |
-| 5 | [CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md) | P0 | Alto | Medio | Parcial | Cierre del runtime de Payroll sobre PostgreSQL y salida del doble carril legacy |
-| 6 | [CODEX_TASK_Admin_Team_Module_v2.md](to-do/CODEX_TASK_Admin_Team_Module_v2.md) | P1 | Alto | Medio | Parcial | Escritura de roster y asignaciones que aterrizan Team/People en operación real |
-| 7 | [CODEX_TASK_People_360_Enrichments_v1.md](to-do/CODEX_TASK_People_360_Enrichments_v1.md) | P1 | Alto | Medio | Parcial | Enrichments cross-module para consolidar `People` como lectura 360 |
-| 8 | [CODEX_TASK_Financial_Module_v2.md](to-do/CODEX_TASK_Financial_Module_v2.md) | P1 | Alto | Medio | Avanzada | Cierre funcional de Finance una vez asegurado el runtime migration |
-| 9 | [CODEX_TASK_Nubox_DTE_Integration.md](to-do/CODEX_TASK_Nubox_DTE_Integration.md) | P1 | Alto | Medio | Avanzada | Integración bidireccional Nubox ↔ Finance: emisión DTE, sync ventas/compras/pagos, reconciliación SII. Modelo unificado de organizaciones implementado (organization_type, income→org, supplier→org). |
-| 10 | [CODEX_TASK_HR_Payroll_Module_v3.md](to-do/CODEX_TASK_HR_Payroll_Module_v3.md) | P1 | Alto | Medio | Avanzada | Cierre funcional y UX de Payroll después del corte runtime |
-| 11 | [CODEX_TASK_Creative_Hub_Module_v2.md](to-do/CODEX_TASK_Creative_Hub_Module_v2.md) | P1 | Alto | Alto | Avanzada | Cierre productivo de Creative Hub sobre capabilities y datos operativos reales |
-| 12 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
-| 13 | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
-| 14 | [CODEX_TASK_Financial_Intelligence_Layer.md](to-do/CODEX_TASK_Financial_Intelligence_Layer.md) | P2 | Alto | Medio | Parcial | Capa analítica y de unit economics sobre Finance ya parcialmente sembrada |
-| 15 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
-| 16 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
-| 17 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
-| 18 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
-| 19 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
-| 20 | [CODEX_TASK_Greenhouse_Email_Catalog_v1.md](to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md) | P2 | Medio | Medio | Diseño | Extensión del baseline transaccional hacia digests, seguridad y alerts de producto |
-| 21 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
-| 22 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | P3 | Medio | Bajo | Parcial | Ajuste transversal de jerarquía tipográfica y legibilidad |
+| 5 | [CODEX_TASK_Admin_Team_Module_v2.md](to-do/CODEX_TASK_Admin_Team_Module_v2.md) | P1 | Alto | Medio | Parcial | Escritura de roster y asignaciones que aterrizan Team/People en operación real |
+| 6 | [CODEX_TASK_People_360_Enrichments_v1.md](to-do/CODEX_TASK_People_360_Enrichments_v1.md) | P1 | Alto | Medio | Parcial | Enrichments cross-module para consolidar `People` como lectura 360 |
+| 7 | [CODEX_TASK_Financial_Module_v2.md](to-do/CODEX_TASK_Financial_Module_v2.md) | P1 | Alto | Medio | Avanzada | Cierre funcional de Finance una vez asegurado el runtime migration |
+| 8 | [CODEX_TASK_Nubox_DTE_Integration.md](to-do/CODEX_TASK_Nubox_DTE_Integration.md) | P1 | Alto | Medio | Avanzada | Integración bidireccional Nubox ↔ Finance: emisión DTE, sync ventas/compras/pagos, reconciliación SII. Modelo unificado de organizaciones implementado (organization_type, income→org, supplier→org). |
+| 9 | [CODEX_TASK_Creative_Hub_Module_v2.md](to-do/CODEX_TASK_Creative_Hub_Module_v2.md) | P1 | Alto | Alto | Avanzada | Cierre productivo de Creative Hub sobre capabilities y datos operativos reales |
+| 10 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
+| 11 | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
+| 12 | [CODEX_TASK_Financial_Intelligence_Layer.md](to-do/CODEX_TASK_Financial_Intelligence_Layer.md) | P2 | Alto | Medio | Parcial | Capa analítica y de unit economics sobre Finance ya parcialmente sembrada |
+| 13 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
+| 14 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
+| 15 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
+| 16 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
+| 17 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
+| 18 | [CODEX_TASK_Greenhouse_Email_Catalog_v1.md](to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md) | P2 | Medio | Medio | Diseño | Extensión del baseline transaccional hacia digests, seguridad y alerts de producto |
+| 19 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
+| 20 | [CODEX_TASK_Typography_Hierarchy_Fix.md](to-do/CODEX_TASK_Typography_Hierarchy_Fix.md) | P3 | Medio | Bajo | Parcial | Ajuste transversal de jerarquía tipográfica y legibilidad |
 
 ### Briefs Históricos o de Producto
 
@@ -101,6 +99,8 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [CODEX_TASK_HR_Core_Module_v2.md](complete/CODEX_TASK_HR_Core_Module_v2.md) | Foundation backend de HR Core ya cerrada para el alcance declarado |
 | [CODEX_TASK_HR_Payroll_Module.md](complete/CODEX_TASK_HR_Payroll_Module.md) | Brief histórico de HR Payroll reemplazado por v2 |
 | [CODEX_TASK_HR_Payroll_Module_v2.md](complete/CODEX_TASK_HR_Payroll_Module_v2.md) | Brief histórico de HR Payroll absorbido por v3 |
+| [CODEX_TASK_HR_Payroll_Module_v3.md](complete/CODEX_TASK_HR_Payroll_Module_v3.md) | Cierre UX de Payroll: alta compensación, edición período, KPI manual, override, ficha colaborador |
+| [CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md](complete/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md) | Runtime Payroll cortado a PostgreSQL: schema, store, 11 rutas Postgres-first, serving view, backfill |
 | [CODEX_TASK_Login_Page_Greenhouse.md](complete/CODEX_TASK_Login_Page_Greenhouse.md) | UI de login Greenhouse |
 | [CODEX_TASK_Microsoft_SSO_Greenhouse.md](complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md) | Microsoft SSO |
 | [CODEX_TASK_People_Unified_View.md](complete/CODEX_TASK_People_Unified_View.md) | Brief histórico de People reemplazado por v2 |

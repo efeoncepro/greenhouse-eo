@@ -11,6 +11,16 @@
 - `sync-conformed` deja de reemplazar `greenhouse_conformed.delivery_*` con `DELETE + insertAll(streaming)` y pasa a `BigQuery load jobs` con `WRITE_TRUNCATE`, evitando el error `streaming buffer` al intentar borrar tablas que fueron escritas por streaming.
 - Se agregó también autocorrección de `delivery_tasks.created_at` en el runtime del sync para no depender solo del script de setup.
 
+### HR Payroll — contraste arquitectónico, backfill ejecutado y tasks cerradas
+- Se contrastaron `CODEX_TASK_HR_Payroll_Module_v3` y `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` contra la arquitectura real (`GREENHOUSE_360_OBJECT_MODEL_V1`, `GREENHOUSE_POSTGRES_CANONICAL_360_V1`).
+- Resultado: ambas tasks están **100% implementadas** a nivel de código — schema, store, 11 rutas Postgres-first, frontend completo con 13 vistas/componentes.
+- Backfill `BQ → PostgreSQL` ejecutado: payroll (0 rows transaccionales, 1 bonus_config) + leave (4 tipos de permiso).
+- BigQuery no tenía datos transaccionales de payroll — el módulo nunca fue usado en producción con datos reales.
+- `isPayrollPostgresEnabled()` delega a `isGreenhousePostgresConfigured()` — no requiere env var separada.
+- Tab `payroll` confirmado en `PersonTabs.tsx:147` con `PersonPayrollTab` component.
+- Ambas tasks movidas a `docs/tasks/complete/`.
+- `docs/tasks/README.md` actualizado: backlog renumerado (20 items, antes 22).
+
 ### Sidebar navigation — reestructuración de idioma, jerarquía y consistencia
 - Labels en inglés eliminados del sidebar: `Updates` → `Novedades`, `Control Tower` → `Torre de control`, `Admin` → `Administración`, `AI Tooling` → `Herramientas IA`.
 - Sección `HR` eliminada como SubMenu independiente; sus 4 items se fusionaron en la sección `Equipo` junto con `Personas`, con lógica condicional por permisos.
