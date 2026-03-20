@@ -27,6 +27,7 @@ type QueryableClient = Pick<PoolClient, 'query'>
 type PostgresIncomeRow = {
   income_id: string
   client_id: string | null
+  organization_id: string | null
   client_profile_id: string | null
   hubspot_company_id: string | null
   hubspot_deal_id: string | null
@@ -149,6 +150,7 @@ type PostgresIncomePaymentRow = {
 export type FinanceIncomeRecord = {
   incomeId: string
   clientId: string | null
+  organizationId: string | null
   clientProfileId: string | null
   hubspotCompanyId: string | null
   hubspotDealId: string | null
@@ -325,6 +327,7 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
   return {
     incomeId: normalizeString(row.income_id),
     clientId: str(row.client_id),
+    organizationId: str(row.organization_id),
     clientProfileId: str(row.client_profile_id),
     hubspotCompanyId: str(row.hubspot_company_id),
     hubspotDealId: str(row.hubspot_deal_id),
@@ -554,6 +557,7 @@ export const listFinanceIncomeFromPostgres = async ({
   status,
   clientId,
   clientProfileId,
+  organizationId,
   serviceLine,
   fromDate,
   toDate,
@@ -563,6 +567,7 @@ export const listFinanceIncomeFromPostgres = async ({
   status?: string | null
   clientId?: string | null
   clientProfileId?: string | null
+  organizationId?: string | null
   serviceLine?: string | null
   fromDate?: string | null
   toDate?: string | null
@@ -590,6 +595,7 @@ export const listFinanceIncomeFromPostgres = async ({
     values.push(clientProfileId)
   }
 
+  if (organizationId) push('organization_id = $?', organizationId)
   if (serviceLine) push('service_line = $?', serviceLine)
   if (fromDate) push('invoice_date >= $?::date', fromDate)
   if (toDate) push('invoice_date <= $?::date', toDate)
@@ -614,7 +620,7 @@ export const listFinanceIncomeFromPostgres = async ({
   const rows = await runGreenhousePostgresQuery<PostgresIncomeRow>(
     `
       SELECT
-        income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
+        income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
@@ -644,7 +650,7 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
   const rows = await runGreenhousePostgresQuery<PostgresIncomeRow>(
     `
       SELECT
-        income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
+        income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date, description,
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp, payment_status, amount_paid,
@@ -692,6 +698,7 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
 export const createFinanceIncomeInPostgres = async ({
   incomeId,
   clientId,
+  organizationId,
   clientProfileId,
   hubspotCompanyId,
   hubspotDealId,
@@ -722,6 +729,7 @@ export const createFinanceIncomeInPostgres = async ({
 }: {
   incomeId: string
   clientId: string | null
+  organizationId: string | null
   clientProfileId: string | null
   hubspotCompanyId: string | null
   hubspotDealId: string | null
@@ -756,7 +764,7 @@ export const createFinanceIncomeInPostgres = async ({
     const rows = await queryRows<PostgresIncomeRow>(
       `
         INSERT INTO greenhouse_finance.income (
-          income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
+          income_id, client_id, organization_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
           client_name, invoice_number, invoice_date, due_date, description,
           currency, subtotal, tax_rate, tax_amount, total_amount,
           exchange_rate_to_clp, total_amount_clp,
@@ -768,21 +776,21 @@ export const createFinanceIncomeInPostgres = async ({
           created_at, updated_at
         )
         VALUES (
-          $1, $2, $3, $4, $5,
-          $6, $7, $8::date, $9::date, $10,
-          $11, $12, $13, $14, $15,
-          $16, $17,
-          $18, 0,
-          $19, $20, $21, $22,
+          $1, $2, $3, $4, $5, $6,
+          $7, $8, $9::date, $10::date, $11,
+          $12, $13, $14, $15, $16,
+          $17, $18,
+          $19, 0,
+          $20, $21, $22, $23,
           FALSE,
-          $23, $24, $25, $26, $27,
-          $28, $29,
+          $24, $25, $26, $27, $28,
+          $29, $30,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
       `,
       [
-        incomeId, clientId, clientProfileId, hubspotCompanyId, hubspotDealId,
+        incomeId, clientId, organizationId, clientProfileId, hubspotCompanyId, hubspotDealId,
         clientName, invoiceNumber, invoiceDate, dueDate, description,
         currency, subtotal, taxRate, taxAmount, totalAmount,
         exchangeRateToClp, totalAmountClp,

@@ -169,10 +169,11 @@ export const mapSaleToConformed = (
 export const mapPurchaseToConformed = (
   purchase: NuboxPurchase,
   syncRunId: string,
-  identityMaps: Pick<IdentityMaps, 'supplierByRut' | 'expenseByNuboxId'>
+  identityMaps: Pick<IdentityMaps, 'orgByRut' | 'supplierByRut' | 'expenseByNuboxId'>
 ): NuboxConformedPurchase => {
   const supplierRut = purchase.supplier?.identification?.value || null
   const supplierId = supplierRut ? identityMaps.supplierByRut.get(supplierRut) || null : null
+  const orgEntry = supplierRut ? identityMaps.orgByRut.get(supplierRut) || null : null
   const expenseId = identityMaps.expenseByNuboxId.get(String(purchase.id)) || null
 
   return {
@@ -200,6 +201,7 @@ export const mapPurchaseToConformed = (
     supplier_rut: supplierRut,
     supplier_trade_name: purchase.supplier?.tradeName || null,
     supplier_id: supplierId,
+    organization_id: orgEntry?.organization_id || null,
     expense_id: expenseId,
     payload_hash: buildPayloadHash(purchase),
     sync_run_id: syncRunId,

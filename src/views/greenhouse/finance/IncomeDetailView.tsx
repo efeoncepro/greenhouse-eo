@@ -52,6 +52,7 @@ interface PaymentRecord {
 interface IncomeDetail {
   incomeId: string
   clientName: string
+  organizationId: string | null
   invoiceNumber: string | null
   invoiceDate: string | null
   dueDate: string | null

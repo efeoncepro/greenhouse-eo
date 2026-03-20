@@ -41,6 +41,7 @@ import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDr
 interface Income {
   incomeId: string
   clientName: string
+  organizationId: string | null
   invoiceNumber: string | null
   invoiceDate: string | null
   dueDate: string | null

@@ -247,6 +247,7 @@ describe('mapSaleToConformed', () => {
 
 describe('mapPurchaseToConformed', () => {
   const identityMaps = {
+    orgByRut: new Map([['76543210-K', { organization_id: 'org-chita', client_id: null }]]),
     supplierByRut: new Map([['76543210-K', 'sup-chita']]),
     expenseByNuboxId: new Map<string, string>()
   }
@@ -259,10 +260,11 @@ describe('mapPurchaseToConformed', () => {
     expect(conformed.total_amount).toBe(37990)
     expect(conformed.supplier_rut).toBe('76543210-K')
     expect(conformed.supplier_id).toBe('sup-chita')
+    expect(conformed.organization_id).toBe('org-chita')
     expect(conformed.expense_id).toBeNull()
   })
 
-  it('returns null supplier_id when RUT not found', () => {
+  it('returns null supplier_id and organization_id when RUT not found', () => {
     const purchase = makePurchase({
       supplier: { tradeName: 'Unknown', identification: { value: '11111111-1' } }
     })
@@ -270,6 +272,7 @@ describe('mapPurchaseToConformed', () => {
 
     expect(conformed.supplier_rut).toBe('11111111-1')
     expect(conformed.supplier_id).toBeNull()
+    expect(conformed.organization_id).toBeNull()
   })
 })
 

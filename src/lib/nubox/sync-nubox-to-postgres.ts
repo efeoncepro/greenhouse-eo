@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -66,13 +67,14 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
   )
 
   if (existing.length > 0) {
-    // Update existing income with latest Nubox data
+    // Update existing income with latest Nubox data + backfill organization_id if missing
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_finance.income SET
         nubox_sii_track_id = $2,
         nubox_emission_status = $3,
         dte_type_code = $4,
         dte_folio = $5,
+        organization_id = COALESCE(organization_id, $6),
         nubox_last_synced_at = NOW(),
         updated_at = NOW()
       WHERE nubox_document_id = $1`,
@@ -81,7 +83,8 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.sii_track_id ? Number(sale.sii_track_id) : null,
         sale.emission_status_name,
         sale.dte_type_code,
-        sale.folio
+        sale.folio,
+        sale.organization_id || null
       ]
     )
 
@@ -105,7 +108,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.income (
-        income_id, client_id, client_name, invoice_number, invoice_date, due_date,
+        income_id, client_id, organization_id, client_name, invoice_number, invoice_date, due_date,
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_status, amount_paid, income_type, service_line,
@@ -113,18 +116,19 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
         created_by_user_id, created_at, updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6,
-        'CLP', $7, 0.19, $8, $9,
-        1, $9,
-        $10, 0, $11, NULL,
-        $12, $13, $14,
-        $15, $16, $17, NOW(),
+        $1, $2, $3, $4, $5, $6, $7,
+        'CLP', $8, 0.19, $9, $10,
+        1, $10,
+        $11, 0, $12, NULL,
+        $13, $14, $15,
+        $16, $17, $18, NOW(),
         NULL, NOW(), NOW()
       )
       ON CONFLICT (income_id) DO NOTHING`,
       [
         incomeId,
         sale.client_id,
+        sale.organization_id || null,
         sale.client_trade_name || 'Unknown',
         sale.folio,
         sale.emission_date,
@@ -169,15 +173,35 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
 const autoProvisionSupplier = async (purchase: NuboxConformedPurchase): Promise<string> => {
   const supplierId = `sup-nubox-${purchase.supplier_rut}`
 
+  // Ensure an organization exists for this supplier (find-or-create by tax_id)
+  let organizationId: string | null = null
+
+  if (purchase.supplier_rut) {
+    try {
+      organizationId = await ensureOrganizationForSupplier({
+        taxId: purchase.supplier_rut,
+        taxIdType: 'RUT',
+        legalName: purchase.supplier_trade_name || 'Unknown',
+        country: 'CL'
+      })
+    } catch {
+      // Non-blocking: log but don't fail supplier provisioning
+      console.warn(`[autoProvisionSupplier] Failed to ensure org for ${purchase.supplier_rut}`)
+    }
+  }
+
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_finance.suppliers (
-      supplier_id, legal_name, trade_name, tax_id, tax_id_type,
+      supplier_id, organization_id, legal_name, trade_name, tax_id, tax_id_type,
       country_code, category, is_active, payment_currency,
       created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, 'RUT', 'CL', 'other', TRUE, 'CLP', NOW(), NOW())
-    ON CONFLICT (supplier_id) DO NOTHING`,
+    ) VALUES ($1, $2, $3, $4, $5, 'RUT', 'CL', 'other', TRUE, 'CLP', NOW(), NOW())
+    ON CONFLICT (supplier_id) DO UPDATE SET
+      organization_id = COALESCE(greenhouse_finance.suppliers.organization_id, EXCLUDED.organization_id),
+      updated_at = NOW()`,
     [
       supplierId,
+      organizationId,
       purchase.supplier_trade_name || 'Unknown',
       purchase.supplier_trade_name,
       purchase.supplier_rut

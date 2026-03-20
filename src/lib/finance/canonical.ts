@@ -6,6 +6,7 @@ import {
   normalizeString,
   runFinanceQuery
 } from '@/lib/finance/shared'
+import { resolveOrganizationForClient } from '@/lib/account-360/organization-identity'
 
 type ClientRow = {
   client_id: string
@@ -37,6 +38,7 @@ export type ResolvedFinanceClientContext = {
   hubspotCompanyId: string | null
   clientName: string | null
   legalName: string | null
+  organizationId: string | null
 }
 
 export type ResolvedFinanceMemberContext = {
@@ -137,7 +139,8 @@ export const resolveFinanceClientContext = async ({
       clientProfileId: null,
       hubspotCompanyId: null,
       clientName: null,
-      legalName: null
+      legalName: null,
+      organizationId: null
     }
   }
 
@@ -250,12 +253,18 @@ export const resolveFinanceClientContext = async ({
     throw new FinanceValidationError('clientProfileId points to a different HubSpot company than hubspotCompanyId.', 409)
   }
 
+  // Resolve organization_id via spaces bridge (PostgreSQL)
+  const organizationId = canonicalClientId
+    ? await resolveOrganizationForClient(canonicalClientId)
+    : null
+
   return {
     clientId: canonicalClientId || null,
     clientProfileId: normalizeString(preferredProfile?.client_profile_id) || null,
     hubspotCompanyId: canonicalHubspotCompanyId || null,
     clientName: normalizeString(preferredClient?.client_name) || null,
-    legalName: normalizeString(preferredProfile?.legal_name) || null
+    legalName: normalizeString(preferredProfile?.legal_name) || null,
+    organizationId
   }
 }
 

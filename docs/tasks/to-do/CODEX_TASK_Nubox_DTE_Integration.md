@@ -2,7 +2,7 @@
 
 ## Estado
 
-**Implementación completa al 2026-03-20.** Pipeline multi-capa (Nubox API → BQ Raw → BQ Conformed → PostgreSQL) implementado y verificado con backfill histórico. UI completa: emisión individual y masiva, descarga PDF/XML, estado DTE, panel de sync, reconciliación automática, badge Nubox en expenses. Pendiente solo verificación end-to-end contra Nubox API (primer DTE real).
+**Implementación completa al 2026-03-20.** Pipeline multi-capa (Nubox API → BQ Raw → BQ Conformed → PostgreSQL) implementado y verificado con backfill histórico. UI completa: emisión individual y masiva, descarga PDF/XML, estado DTE, panel de sync, reconciliación automática, badge Nubox en expenses. Modelo unificado de organizaciones implementado (organization_type, income→org, supplier→org). Pendiente solo verificación end-to-end contra Nubox API (primer DTE real) y ejecución de migraciones en producción.
 
 ### Implementado (backend)
 - Cliente API Nubox con retry/backoff, paginación correcta (array + `x-total-count` header)
@@ -17,6 +17,17 @@
 - Identity resolution: RUT → organizations (vía spaces bridge) → client_id
 - Auto-provisioning de suppliers por RUT
 
+### Implementado (modelo unificado de organizaciones — 2026-03-20)
+- Schema: `organization_type` en organizations (client/supplier/both/other), `organization_id` FK en income y suppliers
+- Backfill idempotente: clasifica orgs como client, vincula incomes vía spaces, vincula/crea orgs para suppliers
+- Identity resolution: `findOrganizationByTaxId`, `ensureOrganizationForSupplier` (find-or-create con upgrade client→both), `resolveOrganizationForClient` (vía spaces bridge)
+- Store layer: `organizationId` en FinanceIncomeRecord, FinanceSupplierRecord, OrganizationListItem
+- Nubox sync: income INSERT incluye `organization_id`, `autoProvisionSupplier` crea org via `ensureOrganizationForSupplier`, purchases conformados incluyen `organization_id`
+- API: income GET acepta `?organizationId=`, organizations GET acepta `?type=`, income POST pasa `organizationId` desde `resolveFinanceClientContext`
+- `canonical.ts`: `ResolvedFinanceClientContext` ahora retorna `organizationId`
+- 8 unit tests nuevos para `organization-identity.ts` (98 tests totales, 0 errores TS)
+- Soporte internacional: `tax_id_type` no es solo RUT — soporta RFC, CUIT, EIN, VAT, NIT, etc.
+
 ### Implementado (UI)
 - Sección "Documento tributario electrónico" en detalle de ingreso con estado, tipo DTE, folio, track SII
 - Botón "Emitir DTE" con diálogo de confirmación
@@ -27,9 +38,12 @@
 - Panel de sync status en Finance dashboard con último sync, conteos y botón "Sincronizar ahora"
 - Reconciliación automática expense ↔ purchase vía bank movements conformed
 - Emisión masiva: checkbox selection en lista de ingresos + diálogo de confirmación + API batch (hasta 50)
+- `organizationId` disponible en tipos de IncomeDetail e Income (UI list)
 - Env vars deployed a Vercel (production, preview, development)
 
 ### Pendiente
+- [ ] Ejecutar migración schema: `npx tsx scripts/setup-postgres-unified-org.ts`
+- [ ] Ejecutar backfill: `npx tsx scripts/backfill-unified-org.ts`
 - [ ] Verificación end-to-end de emisión contra Nubox API (primer DTE real)
 
 ## Resumen

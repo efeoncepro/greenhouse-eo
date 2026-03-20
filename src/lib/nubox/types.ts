@@ -306,6 +306,7 @@ export type NuboxConformedPurchase = {
   supplier_trade_name: string | null
   // Identity resolution
   supplier_id: string | null
+  organization_id: string | null
   expense_id: string | null
   payload_hash: string | null
   sync_run_id: string

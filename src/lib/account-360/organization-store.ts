@@ -10,6 +10,7 @@ export interface OrganizationListItem {
   publicId: string
   organizationName: string
   legalName: string | null
+  organizationType: string
   industry: string | null
   country: string | null
   hubspotCompanyId: string | null
@@ -82,6 +83,7 @@ interface OrgListRow extends Record<string, unknown> {
   public_id: string
   organization_name: string
   legal_name: string | null
+  organization_type: string
   industry: string | null
   country: string | null
   hubspot_company_id: string | null
@@ -140,6 +142,7 @@ const normalizeListItem = (r: OrgListRow): OrganizationListItem => ({
   publicId: r.public_id,
   organizationName: r.organization_name,
   legalName: r.legal_name,
+  organizationType: r.organization_type ?? 'other',
   industry: r.industry,
   country: r.country,
   hubspotCompanyId: r.hubspot_company_id,
@@ -194,6 +197,7 @@ export const getOrganizationList = async (params: {
   pageSize?: number
   search?: string
   status?: string
+  type?: string
 }) => {
   const page = Math.max(1, params.page ?? 1)
   const pageSize = Math.min(200, Math.max(1, params.pageSize ?? 50))
@@ -216,6 +220,12 @@ export const getOrganizationList = async (params: {
     queryParams.push(params.status)
   }
 
+  if (params.type && params.type !== 'all') {
+    paramIdx++
+    filters += ` AND o.organization_type = $${paramIdx}`
+    queryParams.push(params.type)
+  }
+
   const countRows = await runGreenhousePostgresQuery<CountRow>(`
     SELECT COUNT(*)::text AS total
     FROM greenhouse_serving.organization_360 o
@@ -232,7 +242,7 @@ export const getOrganizationList = async (params: {
   const rows = await runGreenhousePostgresQuery<OrgListRow>(`
     SELECT
       organization_id, public_id, organization_name, legal_name,
-      industry, country, hubspot_company_id, status, active,
+      organization_type, industry, country, hubspot_company_id, status, active,
       space_count::text, membership_count::text, unique_person_count::text,
       created_at, updated_at
     FROM greenhouse_serving.organization_360 o
@@ -253,7 +263,7 @@ export const getOrganizationDetail = async (id: string): Promise<OrganizationDet
   const rows = await runGreenhousePostgresQuery<OrgDetailRow>(`
     SELECT
       organization_id, public_id, organization_name, legal_name,
-      tax_id, tax_id_type, industry, country, hubspot_company_id,
+      organization_type, tax_id, tax_id_type, industry, country, hubspot_company_id,
       status, active, notes,
       space_count::text, membership_count::text, unique_person_count::text,
       spaces, people,
@@ -275,6 +285,7 @@ export const updateOrganization = async (
     taxIdType: string
     industry: string
     country: string
+    organizationType: string
     status: string
     notes: string
   }>
@@ -290,6 +301,7 @@ export const updateOrganization = async (
     taxIdType: 'tax_id_type',
     industry: 'industry',
     country: 'country',
+    organizationType: 'organization_type',
     status: 'status',
     notes: 'notes'
   }

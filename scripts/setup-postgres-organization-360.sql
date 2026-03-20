@@ -25,6 +25,7 @@ SELECT
   o.notes,
   o.created_at,
   o.updated_at,
+  COALESCE(o.organization_type, 'other') AS organization_type,
   -- Spaces facet: operational tenants under this organization
   (
     SELECT json_agg(json_build_object(

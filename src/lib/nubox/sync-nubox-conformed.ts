@@ -311,7 +311,7 @@ export const syncNuboxToConformed = async (): Promise<SyncNuboxConformedResult> 
     )
 
     const conformedPurchases = rawPurchases.map(p =>
-      mapPurchaseToConformed(p, syncRunId, { supplierByRut, expenseByNuboxId })
+      mapPurchaseToConformed(p, syncRunId, { orgByRut, supplierByRut, expenseByNuboxId })
     )
 
     const bankMovements = [

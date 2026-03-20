@@ -104,6 +104,7 @@ export async function GET(request: Request) {
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
   const clientProfileId = searchParams.get('clientProfileId')
+  const organizationId = searchParams.get('organizationId')
   const serviceLine = searchParams.get('serviceLine')
   const fromDate = searchParams.get('fromDate')
   const toDate = searchParams.get('toDate')
@@ -113,7 +114,7 @@ export async function GET(request: Request) {
   // ── Postgres-first path ──
   try {
     const result = await listFinanceIncomeFromPostgres({
-      status, clientId, clientProfileId, serviceLine, fromDate, toDate, page, pageSize
+      status, clientId, clientProfileId, organizationId, serviceLine, fromDate, toDate, page, pageSize
     })
 
     return NextResponse.json(result)
@@ -239,6 +240,7 @@ export async function POST(request: Request) {
       await createFinanceIncomeInPostgres({
         incomeId,
         clientId: resolvedClient.clientId,
+        organizationId: resolvedClient.organizationId,
         clientProfileId: resolvedClient.clientProfileId,
         hubspotCompanyId: resolvedClient.hubspotCompanyId,
         hubspotDealId: body.hubspotDealId ? normalizeString(body.hubspotDealId) : null,

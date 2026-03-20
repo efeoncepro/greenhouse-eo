@@ -46,6 +46,7 @@ type PostgresFinanceAccountRow = {
 type PostgresFinanceSupplierRow = {
   supplier_id: string
   provider_id: string | null
+  organization_id: string | null
   legal_name: string
   trade_name: string | null
   tax_id: string | null
@@ -104,6 +105,7 @@ export type FinanceAccountRecord = {
 export type FinanceSupplierRecord = {
   supplierId: string
   providerId: string | null
+  organizationId: string | null
   legalName: string
   tradeName: string | null
   taxId: string | null
@@ -175,6 +177,7 @@ const mapAccount = (row: PostgresFinanceAccountRow): FinanceAccountRecord => ({
 const mapSupplier = (row: PostgresFinanceSupplierRow): FinanceSupplierRecord => ({
   supplierId: normalizeString(row.supplier_id),
   providerId: row.provider_id ? normalizeString(row.provider_id) : null,
+  organizationId: row.organization_id ? normalizeString(row.organization_id) : null,
   legalName: normalizeString(row.legal_name),
   tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
   taxId: row.tax_id ? normalizeString(row.tax_id) : null,
@@ -629,6 +632,7 @@ export const listFinanceSuppliersFromPostgres = async ({
       SELECT
         supplier_id,
         provider_id,
+        organization_id,
         legal_name,
         trade_name,
         tax_id,
@@ -800,6 +804,7 @@ export const upsertFinanceExchangeRateInPostgres = async ({
 export const seedFinanceSupplierInPostgres = async ({
   supplierId,
   providerId,
+  organizationId,
   legalName,
   tradeName,
   taxId,
@@ -828,6 +833,7 @@ export const seedFinanceSupplierInPostgres = async ({
 }: {
   supplierId: string
   providerId?: string | null
+  organizationId?: string | null
   legalName: string
   tradeName?: string | null
   taxId?: string | null
@@ -874,6 +880,7 @@ export const seedFinanceSupplierInPostgres = async ({
         INSERT INTO greenhouse_finance.suppliers (
           supplier_id,
           provider_id,
+          organization_id,
           legal_name,
           trade_name,
           tax_id,
@@ -901,13 +908,14 @@ export const seedFinanceSupplierInPostgres = async ({
           updated_at
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
-          $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-          $21, $22, $23, $24, $25, COALESCE($26::timestamptz, CURRENT_TIMESTAMP), COALESCE($27::timestamptz, CURRENT_TIMESTAMP)
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+          $12, $13, $14, $15, $16, $17, $18, $19, $20, $21,
+          $22, $23, $24, $25, $26, COALESCE($27::timestamptz, CURRENT_TIMESTAMP), COALESCE($28::timestamptz, CURRENT_TIMESTAMP)
         )
         ON CONFLICT (supplier_id) DO UPDATE
         SET
           provider_id = EXCLUDED.provider_id,
+          organization_id = COALESCE(EXCLUDED.organization_id, greenhouse_finance.suppliers.organization_id),
           legal_name = EXCLUDED.legal_name,
           trade_name = EXCLUDED.trade_name,
           tax_id = EXCLUDED.tax_id,
@@ -935,6 +943,7 @@ export const seedFinanceSupplierInPostgres = async ({
         RETURNING
           supplier_id,
           provider_id,
+          organization_id,
           legal_name,
           trade_name,
           tax_id,
@@ -964,6 +973,7 @@ export const seedFinanceSupplierInPostgres = async ({
       [
         supplierId,
         provider?.providerId ?? providerId ?? null,
+        organizationId ?? null,
         legalName,
         tradeName ?? null,
         taxId ?? null,
