@@ -90,6 +90,7 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     if (attempt > 0) {
       const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt - 1)
+
       await sleep(backoff)
     }
 
@@ -137,6 +138,31 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
   }
 
   throw lastError || new Error(`Nubox API ${method} ${path} failed after retries`)
+}
+
+export const decodeNuboxXmlPayload = (body: string): string => {
+  const trimmedBody = body.trim()
+
+  if (!trimmedBody) {
+    return ''
+  }
+
+  if (trimmedBody.startsWith('<')) {
+    return body
+  }
+
+  try {
+    const parsed = JSON.parse(trimmedBody) as { xml?: string }
+
+    if (typeof parsed.xml === 'string' && parsed.xml) {
+      return Buffer.from(parsed.xml, 'base64').toString('utf8')
+    }
+
+  } catch {
+    // Fall back to the raw body if Nubox changes the response shape.
+  }
+
+  return body
 }
 
 // ─── Sales ──────────────────────────────────────────────────────────────────
@@ -198,7 +224,7 @@ export const getNuboxSaleXml = async (id: number): Promise<string> => {
     throw new Error(`Nubox XML download failed with ${response.status}`)
   }
 
-  return response.text()
+  return decodeNuboxXmlPayload(await response.text())
 }
 
 // ─── Purchases ──────────────────────────────────────────────────────────────

@@ -4,6 +4,13 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-20
+
+### Finance income detail — fechas DTE visibles y descargas Nubox corregidas
+- `Finance > Ingresos > detalle` ya no pierde fechas de emisión/vencimiento cuando Postgres devuelve `Date` objects; el normalizador compartido ahora soporta `Date` además de `string`.
+- La descarga XML del DTE ahora decodifica correctamente la respuesta real de Nubox, que llega como JSON con el XML en base64.
+- La descarga PDF/XML desde el detalle de ingreso ahora usa el filename del header y retrasa el `revokeObjectURL`, evitando cancelaciones tempranas del navegador.
+
 ## 2026-03-19
 
 ### Nubox DTE Integration — data seeding and task brief

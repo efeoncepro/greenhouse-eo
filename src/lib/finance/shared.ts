@@ -62,9 +62,13 @@ export const toNullableNumber = (value: unknown) => {
   return Number.isFinite(parsed) ? parsed : null
 }
 
-export const toDateString = (value: { value?: string } | string | null) => {
+export const toDateString = (value: { value?: string } | string | Date | null) => {
   if (!value) {
     return null
+  }
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString().slice(0, 10)
   }
 
   if (typeof value === 'string') {
@@ -74,9 +78,13 @@ export const toDateString = (value: { value?: string } | string | null) => {
   return typeof value.value === 'string' ? value.value.slice(0, 10) : null
 }
 
-export const toTimestampString = (value: { value?: string } | string | null) => {
+export const toTimestampString = (value: { value?: string } | string | Date | null) => {
   if (!value) {
     return null
+  }
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString()
   }
 
   if (typeof value === 'string') {

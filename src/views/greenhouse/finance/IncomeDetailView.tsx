@@ -75,6 +75,7 @@ interface IncomeDetail {
   isReconciled: boolean
   notes: string | null
   createdAt: string | null
+
   // Nubox DTE fields
   nuboxDocumentId: string | null
   nuboxSiiTrackId: string | null
@@ -98,6 +99,13 @@ const formatDate = (dateStr: string | null): string => {
   const [y, m, d] = dateStr.split('-')
 
   return `${d}/${m}/${y}`
+}
+
+const getDownloadFilename = (response: Response, fallbackFilename: string) => {
+  const disposition = response.headers.get('content-disposition') || ''
+  const match = disposition.match(/filename="?([^"]+)"?/i)
+
+  return match?.[1] || fallbackFilename
 }
 
 const statusColor = (status: string) => {
@@ -289,7 +297,9 @@ const IncomeDetailView = () => {
       const res = await fetch(`/api/finance/income/${incomeId}/dte-${format}`)
 
       if (!res.ok) {
-        toast.error(`No se pudo descargar el ${format.toUpperCase()}.`)
+        const detail = await res.json().catch(() => ({}))
+
+        toast.error(detail.error || `No se pudo descargar el ${format.toUpperCase()}.`)
 
         return
       }
@@ -297,11 +307,15 @@ const IncomeDetailView = () => {
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
+      const filename = getDownloadFilename(res, `DTE-${data?.dteFolio || incomeId}.${format}`)
 
       a.href = url
-      a.download = `DTE-${data?.dteFolio || incomeId}.${format}`
+      a.download = filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
       a.click()
-      URL.revokeObjectURL(url)
+      a.remove()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
     } catch {
       toast.error(`No se pudo descargar el ${format.toUpperCase()}.`)
     }

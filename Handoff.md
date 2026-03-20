@@ -40,6 +40,45 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 09:03 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir el detalle de ingresos Nubox en `/finance/income/[id]` donde fechas visibles quedaban en `—` y las descargas DTE PDF/XML fallaban desde el navegador.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/finance/shared.ts` — `toDateString` y `toTimestampString` ahora soportan `Date` de Postgres
+- `src/lib/nubox/client.ts` — decode correcto del XML Nubox cuando responde JSON con base64
+- `src/views/greenhouse/finance/IncomeDetailView.tsx` — descarga DTE más robusta, filename desde header y error detail
+- `src/lib/finance/shared.test.ts` — cobertura para normalización de fechas
+- `src/lib/nubox/client.test.ts` — cobertura para decode de XML Nubox
+
+### Verificacion
+- `pnpm pg:doctor` ✅
+- Validación directa del registro `INC-NB-26639047` en Postgres:
+  - `invoice_date = 2026-03-06`
+  - `due_date = 2026-04-06`
+  - `nubox_emitted_at = 2026-03-06`
+- Validación directa contra Nubox:
+  - `GET /sales/26639047/pdf?template=TEMPLATE_A4` → `200 application/pdf`
+  - `GET /sales/26639047/xml` → `200 application/json` con payload `{ xml: <base64> }`
+- `pnpm vitest run src/lib/finance/shared.test.ts src/lib/nubox/client.test.ts` ✅
+- `pnpm eslint src/lib/finance/shared.ts src/lib/finance/shared.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/views/greenhouse/finance/IncomeDetailView.tsx` ✅
+
+### Riesgos o pendientes
+- La causa de fechas en `—` no era data faltante sino normalización incompleta de `Date` objects devueltos por `pg`; esto puede haber afectado otras superficies que usan `toDateString` / `toTimestampString`, aunque el fix quedó centralizado.
+- El XML de Nubox no llega como XML plano sino como JSON con base64; si Nubox cambia otra vez el contrato, revisar `decodeNuboxXmlPayload()`.
+- Falta validación manual en navegador sobre el ambiente desplegado para confirmar que Chrome ya descarga PDF/XML sin cancelar el archivo.
+
 ## 2026-03-19 — Nubox DTE Integration: API discovery, org mapping, data seeding
 
 ### Agente
