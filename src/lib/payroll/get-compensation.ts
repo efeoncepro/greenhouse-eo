@@ -4,7 +4,8 @@ import type {
   CompensationVersion,
   CreateCompensationVersionInput,
   PayrollCompensationMember,
-  PayrollCompensationOverview
+  PayrollCompensationOverview,
+  UpdateCompensationVersionInput
 } from '@/types/payroll'
 
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
@@ -32,6 +33,7 @@ import {
   pgGetCompensationVersionById,
   pgGetApplicableCompensationVersionsForPeriod,
   pgCreateCompensationVersion,
+  pgUpdateCompensationVersion,
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
 
@@ -158,11 +160,9 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
   }
 }
 
-const assertCompensationInput = (input: CreateCompensationVersionInput) => {
-  if (!normalizeString(input.memberId)) {
-    throw new PayrollValidationError('memberId is required.')
-  }
+type CompensationValueInput = Omit<CreateCompensationVersionInput, 'memberId'>
 
+const assertCompensationValues = (input: CompensationValueInput | UpdateCompensationVersionInput) => {
   if (!normalizeString(input.changeReason)) {
     throw new PayrollValidationError('changeReason is required.')
   }
@@ -195,6 +195,18 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
   if (Number(input.bonusRpaMax ?? 0) < Number(input.bonusRpaMin ?? 0)) {
     throw new PayrollValidationError('bonusRpaMax must be greater than or equal to bonusRpaMin.')
   }
+}
+
+const assertCompensationInput = (input: CreateCompensationVersionInput) => {
+  if (!normalizeString(input.memberId)) {
+    throw new PayrollValidationError('memberId is required.')
+  }
+
+  assertCompensationValues(input)
+}
+
+const assertCompensationUpdateInput = (input: UpdateCompensationVersionInput) => {
+  assertCompensationValues(input)
 }
 
 export const getCurrentCompensation = async () => {
@@ -463,7 +475,7 @@ export const createCompensationVersion = async ({
   actorEmail: string | null
 }) => {
   if (isPayrollPostgresEnabled()) {
-    const versionId = await pgCreateCompensationVersion({ input, actorEmail })
+    await pgCreateCompensationVersion({ input, actorEmail })
     const [created] = await pgGetCompensationHistoryByMember(input.memberId)
 
     if (!created) {
@@ -681,4 +693,129 @@ export const createCompensationVersion = async ({
   }
 
   return created
+}
+
+export const updateCompensationVersion = async ({
+  versionId,
+  input,
+  actorEmail: _actorEmail
+}: {
+  versionId: string
+  input: UpdateCompensationVersionInput
+  actorEmail: string | null
+}) => {
+  if (isPayrollPostgresEnabled()) {
+    return pgUpdateCompensationVersion({ versionId, input, actorEmail: _actorEmail })
+  }
+
+  await ensurePayrollInfrastructure()
+  const projectId = getProjectId()
+
+  assertCompensationUpdateInput(input)
+  const effectiveFrom = assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
+
+  const [existingVersion] = await runPayrollQuery<CompensationRow>(
+    `
+      SELECT
+        cv.*,
+        m.display_name,
+        m.email,
+        m.avatar_url,
+        m.notion_user_id
+      FROM \`${projectId}.greenhouse.compensation_versions\` AS cv
+      INNER JOIN \`${projectId}.greenhouse.team_members\` AS m
+        ON m.member_id = cv.member_id
+      WHERE cv.version_id = @versionId
+      LIMIT 1
+    `,
+    { versionId }
+  )
+
+  if (!existingVersion?.version_id) {
+    throw new PayrollValidationError('Compensation version not found.', 404)
+  }
+
+  const normalizedExisting = normalizeCompensationVersion(existingVersion)
+
+  if (normalizedExisting.effectiveFrom !== effectiveFrom) {
+    throw new PayrollValidationError(
+      'Changing the effective date requires creating a new compensation version.',
+      409,
+      { versionId }
+    )
+  }
+
+  const [usedEntry] = await runPayrollQuery<{ entry_id: string | null }>(
+    `
+      SELECT entry_id
+      FROM \`${projectId}.greenhouse.payroll_entries\`
+      WHERE compensation_version_id = @versionId
+      LIMIT 1
+    `,
+    { versionId }
+  )
+
+  if (usedEntry?.entry_id) {
+    throw new PayrollValidationError(
+      'This compensation version has already been used in payroll. Choose a new effective date to create a new version.',
+      409,
+      { versionId }
+    )
+  }
+
+  const updateParams = {
+    versionId,
+    payRegime: input.payRegime,
+    currency: input.currency,
+    baseSalary: Number(input.baseSalary),
+    remoteAllowance: Number(input.remoteAllowance ?? 0),
+    bonusOtdMin: Number(input.bonusOtdMin ?? 0),
+    bonusOtdMax: Number(input.bonusOtdMax ?? 0),
+    bonusRpaMin: Number(input.bonusRpaMin ?? 0),
+    bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    afpName: normalizeNullableString(input.afpName),
+    afpRate: input.afpRate ?? null,
+    healthSystem: input.healthSystem ?? null,
+    healthPlanUf: input.healthPlanUf ?? null,
+    unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+    contractType: input.contractType ?? 'indefinido',
+    hasApv: Boolean(input.hasApv),
+    apvAmount: Number(input.apvAmount ?? 0),
+    changeReason: input.changeReason.trim()
+  }
+
+  await runPayrollQuery(
+    `
+      UPDATE \`${projectId}.greenhouse.compensation_versions\`
+      SET
+        pay_regime = @payRegime,
+        currency = @currency,
+        base_salary = @baseSalary,
+        remote_allowance = @remoteAllowance,
+        bonus_otd_min = @bonusOtdMin,
+        bonus_otd_max = @bonusOtdMax,
+        bonus_rpa_min = @bonusRpaMin,
+        bonus_rpa_max = @bonusRpaMax,
+        afp_name = @afpName,
+        afp_rate = @afpRate,
+        health_system = @healthSystem,
+        health_plan_uf = @healthPlanUf,
+        unemployment_rate = @unemploymentRate,
+        contract_type = @contractType,
+        has_apv = @hasApv,
+        apv_amount = @apvAmount,
+        change_reason = @changeReason
+      WHERE version_id = @versionId
+    `,
+    updateParams,
+    buildPayrollQueryTypes(updateParams, COMPENSATION_MUTATION_TYPES)
+  )
+
+  const updated = await getCompensationVersionById(versionId)
+
+  if (!updated) {
+    throw new PayrollValidationError('Unable to read updated compensation version.', 500)
+  }
+
+  return updated
 }

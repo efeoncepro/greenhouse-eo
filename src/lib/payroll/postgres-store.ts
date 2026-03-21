@@ -13,6 +13,7 @@ import type {
   PayrollEntry,
   PayrollMemberSummary,
   PayrollPeriod,
+  UpdateCompensationVersionInput,
   UpdatePayrollPeriodInput
 } from '@/types/payroll'
 
@@ -237,20 +238,24 @@ const queryRows = async <T extends Record<string, unknown>>(
 ) => {
   if (client) {
     const result = await client.query<T>(text, values)
+
     return result.rows
   }
+
   return runGreenhousePostgresQuery<T>(text, values)
 }
 
 const toPgDateString = (value: string | Date | null | undefined): string | null => {
   if (!value) return null
   if (value instanceof Date) return value.toISOString().slice(0, 10)
+
   return typeof value === 'string' ? value.slice(0, 10) : null
 }
 
 const toPgTimestampString = (value: string | Date | null | undefined): string | null => {
   if (!value) return null
   if (value instanceof Date) return value.toISOString()
+
   return typeof value === 'string' ? value : null
 }
 
@@ -259,12 +264,15 @@ const getCurrentDateString = () =>
 
 const addDaysToDateString = (dateString: string, days: number) => {
   const date = new Date(`${dateString}T00:00:00.000Z`)
+
   date.setUTCDate(date.getUTCDate() + days)
+
   return date.toISOString().slice(0, 10)
 }
 
 const isCurrentCompensationWindow = (effectiveFrom: string, effectiveTo: string | null) => {
   const today = getCurrentDateString()
+
   return effectiveFrom <= today && (!effectiveTo || effectiveTo >= today)
 }
 
@@ -584,11 +592,13 @@ export const pgCreateCompensationVersion = async ({
   if (!normalizeString(input.memberId)) {
     throw new PayrollValidationError('memberId is required.')
   }
+
   if (!normalizeString(input.changeReason)) {
     throw new PayrollValidationError('changeReason is required.')
   }
 
   const effectiveFrom = assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
+
   parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
   parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
   parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
@@ -600,15 +610,19 @@ export const pgCreateCompensationVersion = async ({
   if (input.afpRate !== undefined && input.afpRate !== null) {
     parsePayrollNumber(input.afpRate, 'afpRate', { min: 0, max: 1 })
   }
+
   if (input.healthPlanUf !== undefined && input.healthPlanUf !== null) {
     parsePayrollNumber(input.healthPlanUf, 'healthPlanUf', { min: 0 })
   }
+
   if (input.unemploymentRate !== undefined && input.unemploymentRate !== null) {
     parsePayrollNumber(input.unemploymentRate, 'unemploymentRate', { min: 0, max: 1 })
   }
+
   if (Number(input.bonusOtdMax ?? 0) < Number(input.bonusOtdMin ?? 0)) {
     throw new PayrollValidationError('bonusOtdMax must be greater than or equal to bonusOtdMin.')
   }
+
   if (Number(input.bonusRpaMax ?? 0) < Number(input.bonusRpaMin ?? 0)) {
     throw new PayrollValidationError('bonusRpaMax must be greater than or equal to bonusRpaMin.')
   }
@@ -620,18 +634,21 @@ export const pgCreateCompensationVersion = async ({
       [input.memberId],
       client
     )
+
     if (memberRows.length === 0) {
       throw new PayrollValidationError('Active team member not found for compensation version.', 404)
     }
 
     // Resolve actor user_id from email
     let actorUserId: string | null = null
+
     if (actorEmail) {
       const [actorRow] = await queryRows<{ user_id: string }>(
         `SELECT user_id FROM greenhouse_core.client_users WHERE email = $1 LIMIT 1`,
         [actorEmail],
         client
       )
+
       actorUserId = actorRow?.user_id ?? null
     }
 
@@ -641,6 +658,7 @@ export const pgCreateCompensationVersion = async ({
       [input.memberId],
       client
     )
+
     const nextVersion = toNumber(versionRow?.next_version)
     const versionId = `${input.memberId}_v${nextVersion}`
 
@@ -650,6 +668,7 @@ export const pgCreateCompensationVersion = async ({
       [input.memberId, effectiveFrom],
       client
     )
+
     if (duplicate) {
       throw new PayrollValidationError('A compensation version already exists for that effectiveFrom date.', 409, {
         versionId: duplicate.version_id
@@ -686,6 +705,7 @@ export const pgCreateCompensationVersion = async ({
     )
 
     const nextScheduledFrom = toPgDateString(nextScheduled?.effective_from ?? null)
+
     const nextEffectiveTo =
       nextScheduledFrom && nextScheduledFrom > effectiveFrom
         ? addDaysToDateString(nextScheduledFrom, -1)
@@ -763,6 +783,178 @@ export const pgCreateCompensationVersion = async ({
   })
 }
 
+export const pgUpdateCompensationVersion = async ({
+  versionId,
+  input,
+  actorEmail
+}: {
+  versionId: string
+  input: UpdateCompensationVersionInput
+  actorEmail: string | null
+}) => {
+  await assertPayrollPostgresReady()
+
+  if (!normalizeString(versionId)) {
+    throw new PayrollValidationError('versionId is required.')
+  }
+
+  if (!normalizeString(input.changeReason)) {
+    throw new PayrollValidationError('changeReason is required.')
+  }
+
+  const effectiveFrom = assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
+
+  parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
+  parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
+  parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
+  parsePayrollNumber(input.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 })
+  parsePayrollNumber(input.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 })
+  parsePayrollNumber(input.bonusRpaMax ?? 0, 'bonusRpaMax', { min: 0 })
+  parsePayrollNumber(input.apvAmount ?? 0, 'apvAmount', { min: 0 })
+
+  if (input.afpRate !== undefined && input.afpRate !== null) {
+    parsePayrollNumber(input.afpRate, 'afpRate', { min: 0, max: 1 })
+  }
+
+  if (input.healthPlanUf !== undefined && input.healthPlanUf !== null) {
+    parsePayrollNumber(input.healthPlanUf, 'healthPlanUf', { min: 0 })
+  }
+
+  if (input.unemploymentRate !== undefined && input.unemploymentRate !== null) {
+    parsePayrollNumber(input.unemploymentRate, 'unemploymentRate', { min: 0, max: 1 })
+  }
+
+  if (Number(input.bonusOtdMax ?? 0) < Number(input.bonusOtdMin ?? 0)) {
+    throw new PayrollValidationError('bonusOtdMax must be greater than or equal to bonusOtdMin.')
+  }
+
+  if (Number(input.bonusRpaMax ?? 0) < Number(input.bonusRpaMin ?? 0)) {
+    throw new PayrollValidationError('bonusRpaMax must be greater than or equal to bonusRpaMin.')
+  }
+
+  return withGreenhousePostgresTransaction(async client => {
+    const [versionRow] = await queryRows<PgCompensationRow>(
+      `
+        ${COMPENSATION_BASE_SELECT}
+        WHERE cv.version_id = $1
+        LIMIT 1
+      `,
+      [versionId],
+      client
+    )
+
+    if (!versionRow) {
+      throw new PayrollValidationError('Compensation version not found.', 404)
+    }
+
+    const existingVersion = mapCompensationVersion(versionRow)
+
+    if (existingVersion.effectiveFrom !== effectiveFrom) {
+      throw new PayrollValidationError(
+        'Changing the effective date requires creating a new compensation version.',
+        409,
+        { versionId }
+      )
+    }
+
+    const [usedEntry] = await queryRows<{ entry_id: string }>(
+      `
+        SELECT entry_id
+        FROM greenhouse_payroll.payroll_entries
+        WHERE compensation_version_id = $1
+        LIMIT 1
+      `,
+      [versionId],
+      client
+    )
+
+    if (usedEntry) {
+      throw new PayrollValidationError(
+        'This compensation version has already been used in payroll. Choose a new effective date to create a new version.',
+        409,
+        { versionId }
+      )
+    }
+
+    await client.query(
+      `
+        UPDATE greenhouse_payroll.compensation_versions
+        SET
+          pay_regime = $1,
+          currency = $2,
+          base_salary = $3,
+          remote_allowance = $4,
+          bonus_otd_min = $5,
+          bonus_otd_max = $6,
+          bonus_rpa_min = $7,
+          bonus_rpa_max = $8,
+          afp_name = $9,
+          afp_rate = $10,
+          health_system = $11,
+          health_plan_uf = $12,
+          unemployment_rate = $13,
+          contract_type = $14,
+          has_apv = $15,
+          apv_amount = $16,
+          change_reason = $17
+        WHERE version_id = $18
+      `,
+      [
+        input.payRegime,
+        input.currency,
+        Number(input.baseSalary),
+        Number(input.remoteAllowance ?? 0),
+        Number(input.bonusOtdMin ?? 0),
+        Number(input.bonusOtdMax ?? 0),
+        Number(input.bonusRpaMin ?? 0),
+        Number(input.bonusRpaMax ?? 0),
+        normalizeNullableString(input.afpName),
+        input.afpRate ?? null,
+        input.healthSystem ?? null,
+        input.healthPlanUf ?? null,
+        input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+        input.contractType ?? 'indefinido',
+        Boolean(input.hasApv),
+        Number(input.apvAmount ?? 0),
+        input.changeReason.trim(),
+        versionId
+      ]
+    )
+
+    await publishPayrollOutboxEvent({
+      eventType: 'compensation_version.updated',
+      aggregateType: 'compensation_version',
+      aggregateId: versionId,
+      payload: {
+        versionId,
+        memberId: existingVersion.memberId,
+        effectiveFrom,
+        payRegime: input.payRegime,
+        currency: input.currency,
+        baseSalary: Number(input.baseSalary),
+        updatedBy: normalizeNullableString(actorEmail)
+      },
+      client
+    })
+
+    const [updatedRow] = await queryRows<PgCompensationRow>(
+      `
+        ${COMPENSATION_BASE_SELECT}
+        WHERE cv.version_id = $1
+        LIMIT 1
+      `,
+      [versionId],
+      client
+    )
+
+    if (!updatedRow) {
+      throw new PayrollValidationError('Unable to read updated compensation version.', 500)
+    }
+
+    return mapCompensationVersion(updatedRow)
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Period queries
 // ---------------------------------------------------------------------------
@@ -798,15 +990,18 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
   if (!Number.isInteger(input.year) || input.year < 2024) {
     throw new PayrollValidationError('year must be a valid integer.')
   }
+
   if (!Number.isInteger(input.month) || input.month < 1 || input.month > 12) {
     throw new PayrollValidationError('month must be between 1 and 12.')
   }
+
   if (input.ufValue !== undefined && input.ufValue !== null && (!Number.isFinite(input.ufValue) || input.ufValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
 
   const periodId = buildPeriodId(input.year, input.month)
   const existing = await pgGetPayrollPeriod(periodId)
+
   if (existing) {
     throw new PayrollValidationError('Payroll period already exists.', 409)
   }
@@ -843,12 +1038,15 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
   await assertPayrollPostgresReady()
 
   const current = await pgGetPayrollPeriod(periodId)
+
   if (!current) {
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
+
   if (current.status !== 'draft') {
     throw new PayrollValidationError('Only draft payroll periods can be updated.', 409)
   }
+
   if (input.ufValue !== undefined && input.ufValue !== null && (!Number.isFinite(input.ufValue) || input.ufValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
@@ -874,11 +1072,13 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
   await assertPayrollPostgresReady()
 
   let actorUserId: string | null = null
+
   if (actorEmail) {
     const [actorRow] = await runGreenhousePostgresQuery<{ user_id: string }>(
       `SELECT user_id FROM greenhouse_core.client_users WHERE email = $1 LIMIT 1`,
       [actorEmail]
     )
+
     actorUserId = actorRow?.user_id ?? null
   }
 
@@ -896,11 +1096,13 @@ export const pgSetPeriodApproved = async (periodId: string, actorEmail: string |
   await assertPayrollPostgresReady()
 
   let actorUserId: string | null = null
+
   if (actorEmail) {
     const [actorRow] = await runGreenhousePostgresQuery<{ user_id: string }>(
       `SELECT user_id FROM greenhouse_core.client_users WHERE email = $1 LIMIT 1`,
       [actorEmail]
     )
+
     actorUserId = actorRow?.user_id ?? null
   }
 
@@ -1274,20 +1476,25 @@ export const pgGetCompensationOverview = async (): Promise<PayrollCompensationOv
   ])
 
   const compensations = compensationsResult.status === 'fulfilled' ? compensationsResult.value : []
+
   if (compensationsResult.status === 'rejected') {
     console.error('Unable to load current payroll compensations from Postgres.', compensationsResult.reason)
   }
 
   let members = membersResult.status === 'fulfilled' ? membersResult.value : []
+
   if (membersResult.status === 'rejected') {
     console.error('Unable to load payroll compensation members from Postgres.', membersResult.reason)
   }
 
   // Merge current compensation into members
   const currentByMember = new Map(compensations.map(c => [c.memberId, c]))
+
   members = members.map(member => {
     const current = currentByMember.get(member.memberId)
+
     if (!current) return member
+
     return {
       ...member,
       hasCurrentCompensation: true,

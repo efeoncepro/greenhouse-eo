@@ -15,9 +15,8 @@ import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
-import type { CreateCompensationVersionInput } from '@/types/payroll'
 
-import CompensationDrawer from '@views/greenhouse/payroll/CompensationDrawer'
+import CompensationDrawer, { type CompensationSavePayload } from '@views/greenhouse/payroll/CompensationDrawer'
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'
@@ -101,9 +100,11 @@ const PersonView = ({ memberId }: Props) => {
     await loadDetail()
   }
 
-  const handleSaveCompensation = async (input: CreateCompensationVersionInput) => {
-    const res = await fetch('/api/hr/payroll/compensation', {
-      method: 'POST',
+  const handleSaveCompensation = async ({ mode, input, versionId }: CompensationSavePayload) => {
+    const isUpdate = mode === 'update' && versionId
+
+    const res = await fetch(isUpdate ? `/api/hr/payroll/compensation/${versionId}` : '/api/hr/payroll/compensation', {
+      method: isUpdate ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input)
     })
@@ -114,7 +115,7 @@ const PersonView = ({ memberId }: Props) => {
       throw new Error(data.error || 'Error al guardar compensación')
     }
 
-    toast.success('Compensación guardada')
+    toast.success(isUpdate ? 'Compensación actualizada' : 'Nueva versión de compensación creada')
     await loadDetail()
   }
 

@@ -29,9 +29,9 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
-import type { CompensationVersion, CreateCompensationVersionInput, PayrollCompensationMember } from '@/types/payroll'
+import type { CompensationVersion, PayrollCompensationMember } from '@/types/payroll'
 import { getInitials } from '@/utils/getInitials'
-import CompensationDrawer from './CompensationDrawer'
+import CompensationDrawer, { type CompensationSavePayload } from './CompensationDrawer'
 import { formatCurrency, regimeLabel, regimeColor } from './helpers'
 
 type Props = {
@@ -64,9 +64,11 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
   }
 
   const handleSave = useCallback(
-    async (input: CreateCompensationVersionInput) => {
-      const res = await fetch('/api/hr/payroll/compensation', {
-        method: 'POST',
+    async ({ mode, input, versionId }: CompensationSavePayload) => {
+      const isUpdate = mode === 'update' && versionId
+
+      const res = await fetch(isUpdate ? `/api/hr/payroll/compensation/${versionId}` : '/api/hr/payroll/compensation', {
+        method: isUpdate ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input)
       })

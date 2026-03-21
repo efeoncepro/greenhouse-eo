@@ -84,6 +84,27 @@ export interface CreateCompensationVersionInput {
   changeReason: string
 }
 
+export interface UpdateCompensationVersionInput {
+  payRegime: PayRegime
+  currency: PayrollCurrency
+  baseSalary: number
+  remoteAllowance?: number
+  bonusOtdMin?: number
+  bonusOtdMax?: number
+  bonusRpaMin?: number
+  bonusRpaMax?: number
+  afpName?: string | null
+  afpRate?: number | null
+  healthSystem?: HealthSystem | null
+  healthPlanUf?: number | null
+  unemploymentRate?: number | null
+  contractType?: ContractType
+  hasApv?: boolean
+  apvAmount?: number
+  effectiveFrom: string
+  changeReason: string
+}
+
 export interface PayrollPeriod {
   periodId: string
   year: number

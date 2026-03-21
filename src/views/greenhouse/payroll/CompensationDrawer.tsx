@@ -20,6 +20,13 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CompensationVersion, CreateCompensationVersionInput, PayRegime, HealthSystem, ContractType } from '@/types/payroll'
+import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
+
+export type CompensationSavePayload = {
+  mode: 'create' | 'update'
+  input: CreateCompensationVersionInput
+  versionId?: string
+}
 
 type Props = {
   open: boolean
@@ -27,7 +34,7 @@ type Props = {
   existingVersion: CompensationVersion | null
   memberId: string
   memberName: string
-  onSave: (input: CreateCompensationVersionInput) => Promise<void>
+  onSave: (payload: CompensationSavePayload) => Promise<void>
 }
 
 const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberName, onSave }: Props) => {
@@ -51,6 +58,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [changeReason, setChangeReason] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const saveMode = getCompensationSaveMode({
+    existingVersion: ev,
+    effectiveFrom
+  })
 
   useEffect(() => {
     if (!open) {
@@ -126,7 +138,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         })
       }
 
-      await onSave(input)
+      await onSave({
+        mode: saveMode,
+        input,
+        versionId: ev?.versionId
+      })
       onClose()
     } catch (err: any) {
       setError(err.message || 'Error al guardar')
@@ -265,6 +281,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               value={effectiveFrom}
               onChange={e => setEffectiveFrom(e.target.value)}
               slotProps={{ inputLabel: { shrink: true } }}
+              helperText={
+                ev
+                  ? saveMode === 'update'
+                    ? 'Si mantienes esta fecha, actualizarás la compensación vigente.'
+                    : 'Si cambias la fecha, se creará una nueva versión desde esa vigencia.'
+                  : undefined
+              }
             />
 
             {/* Motivo */}
@@ -290,7 +313,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         <Divider />
         <Stack direction='row' spacing={2} sx={{ p: 3 }}>
           <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving}>
-            {saving ? 'Guardando...' : ev ? 'Crear nueva versión' : 'Crear compensación'}
+            {saving
+              ? 'Guardando...'
+              : ev
+                ? saveMode === 'update'
+                  ? 'Guardar cambios'
+                  : 'Crear nueva versión'
+                : 'Crear compensación'}
           </Button>
           <Button variant='tonal' color='secondary' fullWidth onClick={onClose} disabled={saving}>
             Cancelar

@@ -40,6 +40,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 06:58 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir el flujo de compensación de Payroll/People para que "editar compensación" no fuerce crear una nueva versión con la misma fecha efectiva.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/types/payroll.ts`
+- `src/lib/payroll/compensation-versioning.ts`
+- `src/lib/payroll/compensation-versioning.test.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/app/api/hr/payroll/compensation/[versionId]/route.ts`
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+- `src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+- `src/views/greenhouse/people/PersonView.tsx`
+- `changelog.md`
+
+### Verificacion
+- `pnpm exec eslint src/types/payroll.ts src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/get-compensation.ts 'src/app/api/hr/payroll/compensation/[versionId]/route.ts' src/views/greenhouse/payroll/CompensationDrawer.tsx src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx src/views/greenhouse/people/PersonView.tsx` ✅
+- `pnpm vitest run src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- No mezclar este slice con los cambios locales de `People 360`.
+- Mantener intacto el modelo versionado: misma fecha efectiva debe corregir la versión vigente; una fecha nueva debe seguir creando una nueva versión.
+- El siguiente slice funcional sigue pendiente: mover la fuente de `On-Time` y `RpA` desde `notion_ops.tareas` hacia ICO.
+
 ## 2026-03-21 06:22 -03
 
 ### Agente

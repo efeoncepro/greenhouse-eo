@@ -1,0 +1,63 @@
+import { NextResponse } from 'next/server'
+
+import { getServerSession } from 'next-auth'
+
+import { authOptions } from '@/lib/auth'
+import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
+import { updateCompensationVersion } from '@/lib/payroll/get-compensation'
+import { assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
+import { requireHrTenantContext } from '@/lib/tenant/authorization'
+
+export const dynamic = 'force-dynamic'
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ versionId: string }> }) {
+  const { tenant, errorResponse } = await requireHrTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = (await request.json().catch(() => null)) as Record<string, unknown> | null
+
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+
+    const session = await getServerSession(authOptions)
+    const { versionId } = await params
+
+    const updated = await updateCompensationVersion({
+      versionId,
+      input: {
+        payRegime: body.payRegime === 'international' ? 'international' : 'chile',
+        currency: body.currency === 'USD' ? 'USD' : 'CLP',
+        baseSalary: parsePayrollNumber(body.baseSalary, 'baseSalary', { min: 0 }) ?? 0,
+        remoteAllowance: parsePayrollNumber(body.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 }) ?? 0,
+        bonusOtdMin: parsePayrollNumber(body.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 }) ?? 0,
+        bonusOtdMax: parsePayrollNumber(body.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 }) ?? 0,
+        bonusRpaMin: parsePayrollNumber(body.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 }) ?? 0,
+        bonusRpaMax: parsePayrollNumber(body.bonusRpaMax ?? 0, 'bonusRpaMax', { min: 0 }) ?? 0,
+        afpName: typeof body.afpName === 'string' ? body.afpName : null,
+        afpRate: parsePayrollNumber(body.afpRate, 'afpRate', { allowNull: true, min: 0, max: 1 }),
+        healthSystem: body.healthSystem === 'isapre' ? 'isapre' : body.healthSystem === 'fonasa' ? 'fonasa' : null,
+        healthPlanUf: parsePayrollNumber(body.healthPlanUf, 'healthPlanUf', { allowNull: true, min: 0 }),
+        unemploymentRate: parsePayrollNumber(body.unemploymentRate, 'unemploymentRate', {
+          allowNull: true,
+          min: 0,
+          max: 1
+        }),
+        contractType: body.contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+        hasApv: Boolean(body.hasApv),
+        apvAmount: parsePayrollNumber(body.apvAmount ?? 0, 'apvAmount', { min: 0 }) ?? 0,
+        effectiveFrom: assertPayrollDateString(body.effectiveFrom, 'effectiveFrom'),
+        changeReason: String(body.changeReason || '')
+      },
+      actorEmail: session?.user?.email || tenant.userId
+    })
+
+    return NextResponse.json(updated)
+  } catch (error) {
+    return toPayrollErrorResponse(error, 'Unable to update compensation version.')
+  }
+}
