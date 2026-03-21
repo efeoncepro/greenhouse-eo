@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
@@ -91,29 +92,33 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
   return (
     <TabContext value={activeTab}>
-      <CustomTabList
-        onChange={handleChange}
-        variant='scrollable'
-        pill='true'
-        aria-label='Secciones del perfil del colaborador'
-      >
-        {visibleTabs.map(tab => (
-          <Tab
-            key={tab.value}
-            value={tab.value}
-            label={tab.label}
-            icon={<i className={tab.icon} aria-hidden='true' />}
-            iconPosition='start'
-          />
-        ))}
-      </CustomTabList>
-      <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', marginTop: 24 }}>
-        {/* Screen reader announcement for async tab loading */}
-        <Box
-          aria-live='polite'
-          aria-atomic='true'
-          sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
-        />
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12 }}>
+          <CustomTabList
+            onChange={handleChange}
+            variant='scrollable'
+            pill='true'
+            aria-label='Secciones del perfil del colaborador'
+          >
+            {visibleTabs.map(tab => (
+              <Tab
+                key={tab.value}
+                value={tab.value}
+                label={tab.label}
+                icon={<i className={tab.icon} aria-hidden='true' />}
+                iconPosition='start'
+              />
+            ))}
+          </CustomTabList>
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <div ref={panelRef} tabIndex={-1} style={{ outline: 'none' }}>
+            {/* Screen reader announcement for async tab loading */}
+            <Box
+              aria-live='polite'
+              aria-atomic='true'
+              sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
+            />
 
             <TabPanel value='memberships' className='p-0'>
               {activeTab === 'memberships' && (
@@ -163,7 +168,9 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
                 <PersonAiToolsTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
-      </div>
+          </div>
+        </Grid>
+      </Grid>
     </TabContext>
   )
 }

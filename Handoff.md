@@ -40,6 +40,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 06:22 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Aislar y corregir la regresión de overflow en `/people/[memberId]` sin seguir tocando el shell global del dashboard.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/views/greenhouse/people/PersonTabs.tsx` — se restaura el wrapper `Grid` alrededor del pill `CustomTabList` y del panel
+- `src/views/greenhouse/people/PersonTabs.test.tsx` — test de regresión para blindar la estructura del tabstrip
+
+### Verificacion
+- Diagnóstico: la regresión coincide con `e97c6b6 fix: remove nested Grid container causing horizontal scroll in person detail`
+- Evidencia revisada:
+  - `src/@core/components/mui/TabList.tsx` usa `margin` negativa en modo `pill`
+  - al “aplanar” `PersonTabs`, ese buffer dejó de existir en la ficha de persona
+- Validación local del patch:
+  - `pnpm exec eslint src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonTabs.test.tsx` ✅
+  - `pnpm vitest run src/views/greenhouse/people/PersonTabs.test.tsx` ✅
+  - `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- La preview directa sigue protegida por Vercel SSO, así que el DOM real no se pudo inspeccionar con Playwright autenticado.
+- Si el fix en `PersonTabs` no elimina el overflow en `staging`, el siguiente sospechoso real ya no es el shell global: será `PersonView.tsx` root grid o un hijo puntual de la ficha de persona.
+- No mezclar este commit con los cambios locales de `People 360` (`get-people-meta`, `get-person-detail`, `permissions`, `types`) ni con los movimientos ajenos de `docs/tasks/**`.
+
 ## 2026-03-20 18:00 -03
 
 ### Agente

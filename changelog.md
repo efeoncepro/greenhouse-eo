@@ -4,6 +4,12 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-21
+
+### People detail overflow — local regression fix in tab strip
+- `/people/[memberId]` vuelve a envolver el `CustomTabList` pill y el panel en filas `Grid`, restaurando el buffer estructural que absorbía los márgenes negativos del tabstrip.
+- Se agregó un test unitario de regresión para `PersonTabs`, de modo que futuras refactorizaciones no vuelvan a “aplanar” esa estructura sin detectar el riesgo de overflow.
+
 ## 2026-03-20
 
 ### Cron hardening before production — BigQuery schema self-heal + load-job writes
