@@ -10,7 +10,9 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 ## In Progress
 
-Actualmente sin tasks activas.
+| Task | Agente | Rama | Objetivo |
+|------|--------|------|----------|
+| [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](in-progress/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | Claude Opus | `develop` | Consumer cutover de People a Postgres-first + cobertura de reconciliación |
 
 ## To Do
 
@@ -33,7 +35,7 @@ Actualmente sin tasks activas.
 | Orden | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | P0 | Alto | Medio | Parcial | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion` |
-| 2 | [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | P0 | Muy alto | Medio | Parcial | Subir cobertura de reconciliación y cortar consumers vivos a `person_360` |
+| 2 | [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](in-progress/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | P0 | Muy alto | Medio | **In Progress** | Subir cobertura de reconciliación y cortar consumers vivos a `person_360` |
 | 3 | ~~GREENHOUSE_IDENTITY_ACCESS_V2.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de arquitectura → `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. 12/12 items implementados |
 | 4 | ~~CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md~~ | — | — | — | **Cerrada** | 3 slices completos: accounts/suppliers/rates, income/expenses CRUD, reconciliación runtime — todo Postgres-first con BigQuery fallback |
 | 5 | [CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md) | P1 | Alto | Medio | Diseño | Migración de mutaciones Admin Team de BigQuery a PostgreSQL; convergencia con People memberships |

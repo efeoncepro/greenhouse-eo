@@ -4,7 +4,7 @@ import type { CompensationVersion } from '@/types/payroll'
 import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMember, PersonIntegrations } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { isGreenhousePostgresConfigured } from '@/lib/postgres/client'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getPersonMemberships } from '@/lib/account-360/organization-store'
 import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import { getPersonHrContext } from '@/lib/person-360/get-person-hr'
@@ -301,7 +301,182 @@ const buildPersonMember = (row: MemberRow): {
   }
 }
 
-const getMemberById = async (memberId: string) => {
+// ---------------------------------------------------------------------------
+// Postgres-first query helpers
+// ---------------------------------------------------------------------------
+
+const shouldFallbackToLegacy = (error: unknown) => {
+  if (!(error instanceof Error)) return false
+
+  const msg = error.message.toLowerCase()
+
+  return (
+    msg.includes('not configured') ||
+    msg.includes('econnrefused') ||
+    msg.includes('timeout') ||
+    msg.includes('connect') ||
+    msg.includes('cloud sql') ||
+    msg.includes('cloudsql') ||
+    msg.includes('does not exist') ||
+    msg.includes('relation') ||
+    msg.includes('not authorized')
+  )
+}
+
+const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | null> => {
+  const rows = await runGreenhousePostgresQuery<{
+    member_id: string | null
+    display_name: string | null
+    primary_email: string | null
+    email_aliases: string[] | null
+    role_title: string | null
+    role_category: string | null
+    avatar_url: string | null
+    active: boolean | null
+    contact_channel: string | null
+    contact_handle: string | null
+    identity_profile_id: string | null
+    notion_user_id: string | null
+    azure_oid: string | null
+    hubspot_owner_id: string | null
+    first_name: string | null
+    last_name: string | null
+    preferred_name: string | null
+    legal_name: string | null
+    org_role_id: string | null
+    profession_id: string | null
+    seniority_level: string | null
+    employment_type: string | null
+    birth_date: string | null
+    phone: string | null
+    teams_user_id: string | null
+    slack_user_id: string | null
+    location_city: string | null
+    location_country: string | null
+    time_zone: string | null
+    years_experience: string | number | null
+    efeonce_start_date: string | null
+    biography: string | null
+    languages: string[] | null
+  }>(`
+    SELECT
+      m.member_id,
+      m.display_name,
+      m.primary_email,
+      COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
+      m.role_title,
+      m.role_category,
+      m.avatar_url,
+      m.active,
+      m.contact_channel,
+      m.contact_handle,
+      m.identity_profile_id,
+      m.notion_user_id,
+      m.azure_oid,
+      m.hubspot_owner_id,
+      m.first_name,
+      m.last_name,
+      m.preferred_name,
+      m.legal_name,
+      m.org_role_id,
+      m.profession_id,
+      m.seniority_level,
+      m.employment_type,
+      m.birth_date::text,
+      m.phone,
+      m.teams_user_id,
+      m.slack_user_id,
+      m.location_city,
+      m.location_country,
+      m.time_zone,
+      m.years_experience,
+      m.efeonce_start_date::text,
+      m.biography,
+      COALESCE(m.languages, ARRAY[]::text[]) AS languages
+    FROM greenhouse_core.members m
+    WHERE m.member_id = $1
+    LIMIT 1
+  `, [memberId])
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  return {
+    member_id: row.member_id,
+    display_name: row.display_name,
+    email: row.primary_email,
+    email_aliases: row.email_aliases,
+    role_title: row.role_title,
+    role_category: row.role_category,
+    avatar_url: row.avatar_url,
+    active: row.active,
+    contact_channel: row.contact_channel,
+    contact_handle: row.contact_handle,
+    identity_profile_id: row.identity_profile_id,
+    notion_user_id: row.notion_user_id,
+    azure_oid: row.azure_oid,
+    hubspot_owner_id: row.hubspot_owner_id,
+    first_name: row.first_name,
+    last_name: row.last_name,
+    preferred_name: row.preferred_name,
+    legal_name: row.legal_name,
+    org_role_id: row.org_role_id,
+    org_role_name: null, // catalogs not in Postgres
+    profession_id: row.profession_id,
+    profession_name: null, // catalogs not in Postgres
+    seniority_level: row.seniority_level,
+    employment_type: row.employment_type,
+    birth_date: row.birth_date,
+    phone: row.phone,
+    teams_user_id: row.teams_user_id,
+    slack_user_id: row.slack_user_id,
+    location_city: row.location_city,
+    location_country: row.location_country,
+    time_zone: row.time_zone,
+    years_experience: row.years_experience,
+    efeonce_start_date: row.efeonce_start_date,
+    biography: row.biography,
+    languages: row.languages
+  }
+}
+
+const getAssignmentsByMemberFromPostgres = async (memberId: string): Promise<AssignmentRow[]> =>
+  runGreenhousePostgresQuery<AssignmentRow>(`
+    SELECT
+      a.assignment_id,
+      a.client_id,
+      COALESCE(c.client_name, a.client_id) AS client_name,
+      a.fte_allocation,
+      a.hours_per_month,
+      a.role_title_override,
+      a.start_date::text AS start_date,
+      a.end_date::text AS end_date,
+      a.active
+    FROM greenhouse_core.client_team_assignments a
+    LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+    WHERE a.member_id = $1
+    ORDER BY a.active DESC, a.start_date DESC, c.client_name
+  `, [memberId])
+
+const getIdentityProvidersByProfileFromPostgres = async (identityProfileId: string): Promise<IdentitySourceRow[]> =>
+  runGreenhousePostgresQuery<IdentitySourceRow>(`
+    SELECT
+      source_system,
+      source_object_id,
+      source_user_id,
+      source_email,
+      source_display_name
+    FROM greenhouse_core.identity_profile_source_links
+    WHERE active = TRUE
+      AND profile_id = $1
+  `, [identityProfileId])
+
+// ---------------------------------------------------------------------------
+// BigQuery fallback query helpers
+// ---------------------------------------------------------------------------
+
+const getMemberByIdFromBigQuery = async (memberId: string) => {
   const projectId = getProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const roleCatalogColumns = await getPeopleTableColumns('greenhouse', 'team_role_catalog')
@@ -364,7 +539,7 @@ const getMemberById = async (memberId: string) => {
   return rows[0] || null
 }
 
-const getAssignmentsByMember = async (memberId: string) => {
+const getAssignmentsByMemberFromBigQuery = async (memberId: string) => {
   const projectId = getProjectId()
 
   return runPeopleQuery<AssignmentRow>(
@@ -389,11 +564,7 @@ const getAssignmentsByMember = async (memberId: string) => {
   )
 }
 
-const getIdentityProvidersByProfile = async (identityProfileId: string | null) => {
-  if (!identityProfileId) {
-    return [] as IdentitySourceRow[]
-  }
-
+const getIdentityProvidersByProfileFromBigQuery = async (identityProfileId: string) => {
   const projectId = getProjectId()
 
   return runPeopleQuery<IdentitySourceRow>(
@@ -410,6 +581,51 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null) =
     `,
     { identityProfileId }
   )
+}
+
+// ---------------------------------------------------------------------------
+// Postgres-first with BigQuery fallback wrappers
+// ---------------------------------------------------------------------------
+
+const getMemberById = async (memberId: string): Promise<MemberRow | null> => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      return await getMemberByIdFromPostgres(memberId)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[people/detail] member lookup Postgres failed, falling back:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getMemberByIdFromBigQuery(memberId)
+}
+
+const getAssignmentsByMember = async (memberId: string): Promise<AssignmentRow[]> => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      return await getAssignmentsByMemberFromPostgres(memberId)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[people/detail] assignments Postgres failed, falling back:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getAssignmentsByMemberFromBigQuery(memberId)
+}
+
+const getIdentityProvidersByProfile = async (identityProfileId: string | null): Promise<IdentitySourceRow[]> => {
+  if (!identityProfileId) return []
+
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      return await getIdentityProvidersByProfileFromPostgres(identityProfileId)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[people/detail] identity links Postgres failed, falling back:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getIdentityProvidersByProfileFromBigQuery(identityProfileId)
 }
 
 export const getPersonDetail = async ({
