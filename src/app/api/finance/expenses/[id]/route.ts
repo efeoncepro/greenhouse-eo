@@ -4,7 +4,8 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
-  getFinanceExpenseFromPostgres
+  getFinanceExpenseFromPostgres,
+  updateFinanceExpenseInPostgres
 } from '@/lib/finance/postgres-store-slice2'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import {
@@ -167,22 +168,126 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: expenseId } = await params
     const body = await request.json()
+
+    // ── Build validated update payload ──
+
+    const pgUpdates: Record<string, unknown> = {}
+
+    // Client context resolution
+    if (body.clientId !== undefined || body.clientProfileId !== undefined || body.hubspotCompanyId !== undefined) {
+      const resolvedClient = await resolveFinanceClientContext({
+        clientId: body.clientId,
+        clientProfileId: body.clientProfileId,
+        hubspotCompanyId: body.hubspotCompanyId
+      })
+
+      pgUpdates.clientId = resolvedClient.clientId
+    }
+
+    // Member context resolution
+    if (body.memberId !== undefined || body.payrollEntryId !== undefined) {
+      const resolvedMember = await resolveFinanceMemberContext({
+        memberId: body.memberId,
+        payrollEntryId: body.payrollEntryId
+      })
+
+      pgUpdates.memberId = resolvedMember.memberId
+      pgUpdates.memberName = body.memberName
+        ? normalizeString(body.memberName)
+        : resolvedMember.memberName
+      pgUpdates.payrollEntryId = resolvedMember.payrollEntryId
+      pgUpdates.payrollPeriodId = body.payrollPeriodId
+        ? normalizeString(body.payrollPeriodId)
+        : resolvedMember.payrollPeriodId
+    } else {
+      if (body.memberName !== undefined) pgUpdates.memberName = body.memberName ? normalizeString(body.memberName) : null
+      if (body.payrollPeriodId !== undefined) pgUpdates.payrollPeriodId = body.payrollPeriodId ? normalizeString(body.payrollPeriodId) : null
+    }
+
+    if (body.description !== undefined) {
+      pgUpdates.description = assertNonEmptyString(body.description, 'description')
+    }
+
+    if (body.expenseType !== undefined) {
+      pgUpdates.expenseType = EXPENSE_TYPES.includes(body.expenseType)
+        ? (body.expenseType as ExpenseType) : 'supplier'
+    }
+
+    if (body.currency !== undefined) {
+      pgUpdates.currency = assertValidCurrency(body.currency)
+    }
+
+    const numericFields: [string, string][] = [
+      ['subtotal', 'subtotal'], ['taxRate', 'taxRate'], ['taxAmount', 'taxAmount'],
+      ['totalAmount', 'totalAmount'], ['exchangeRateToClp', 'exchangeRateToClp'],
+      ['totalAmountClp', 'totalAmountClp']
+    ]
+
+    for (const [bodyKey, pgKey] of numericFields) {
+      if (body[bodyKey] !== undefined) pgUpdates[pgKey] = toNumber(body[bodyKey])
+    }
+
+    if (body.paymentStatus !== undefined) {
+      pgUpdates.paymentStatus = EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
+        ? (body.paymentStatus as ExpensePaymentStatus) : 'pending'
+    }
+
+    if (body.paymentMethod !== undefined) {
+      pgUpdates.paymentMethod = body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod)
+        ? (body.paymentMethod as PaymentMethod) : null
+    }
+
+    if (body.serviceLine !== undefined) {
+      pgUpdates.serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
+        ? (body.serviceLine as ServiceLine) : null
+    }
+
+    const nullableStringFields = [
+      'paymentDate', 'paymentAccountId', 'paymentReference', 'documentNumber',
+      'documentDate', 'dueDate', 'supplierId', 'supplierName', 'supplierInvoiceNumber',
+      'socialSecurityType', 'socialSecurityInstitution', 'socialSecurityPeriod',
+      'taxType', 'taxPeriod', 'taxFormNumber', 'miscellaneousCategory', 'notes'
+    ]
+
+    for (const key of nullableStringFields) {
+      if (body[key] !== undefined) {
+        pgUpdates[key] = body[key] ? normalizeString(body[key]) : null
+      }
+    }
+
+    if (body.isRecurring !== undefined) pgUpdates.isRecurring = Boolean(body.isRecurring)
+    if (body.recurrenceFrequency !== undefined) {
+      pgUpdates.recurrenceFrequency = body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null
+    }
+
+    if (Object.keys(pgUpdates).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    // ── Postgres-first path ──
+    try {
+      const result = await updateFinanceExpenseInPostgres(expenseId, pgUpdates)
+
+      if (!result) {
+        return NextResponse.json({ error: 'Expense record not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({ expenseId, updated: true })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{
-      expense_id: string
-      client_id: string | null
-      member_id: string | null
-      member_name: string | null
-      payroll_entry_id: string | null
-      payroll_period_id: string | null
-    }>(`
-      SELECT expense_id, client_id, member_id, member_name, payroll_entry_id, payroll_period_id
+    const existing = await runFinanceQuery<{ expense_id: string }>(`
+      SELECT expense_id
       FROM \`${projectId}.greenhouse.fin_expenses\`
       WHERE expense_id = @expenseId
     `, { expenseId })
@@ -191,135 +296,43 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Expense record not found' }, { status: 404 })
     }
 
-    const updates: string[] = []
-    const updateParams: Record<string, unknown> = { expenseId }
-    const existingExpense = existing[0]
+    const bqUpdates: string[] = []
+    const bqParams: Record<string, unknown> = { expenseId }
 
-    if (body.clientId !== undefined || body.clientProfileId !== undefined || body.hubspotCompanyId !== undefined) {
-      const resolvedClient = await resolveFinanceClientContext({
-        clientId: body.clientId ?? existingExpense.client_id,
-        clientProfileId: body.clientProfileId,
-        hubspotCompanyId: body.hubspotCompanyId
-      })
-
-      updates.push('client_id = @clientId')
-      updateParams.clientId = resolvedClient.clientId
+    const colMap: Record<string, string> = {
+      clientId: 'client_id', expenseType: 'expense_type', description: 'description',
+      currency: 'currency', subtotal: 'subtotal', taxRate: 'tax_rate', taxAmount: 'tax_amount',
+      totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
+      totalAmountClp: 'total_amount_clp', paymentDate: 'payment_date',
+      paymentStatus: 'payment_status', paymentMethod: 'payment_method',
+      paymentAccountId: 'payment_account_id', paymentReference: 'payment_reference',
+      documentNumber: 'document_number', documentDate: 'document_date', dueDate: 'due_date',
+      supplierId: 'supplier_id', supplierName: 'supplier_name',
+      supplierInvoiceNumber: 'supplier_invoice_number', payrollPeriodId: 'payroll_period_id',
+      payrollEntryId: 'payroll_entry_id', memberId: 'member_id', memberName: 'member_name',
+      socialSecurityType: 'social_security_type', socialSecurityInstitution: 'social_security_institution',
+      socialSecurityPeriod: 'social_security_period', taxType: 'tax_type', taxPeriod: 'tax_period',
+      taxFormNumber: 'tax_form_number', miscellaneousCategory: 'miscellaneous_category',
+      serviceLine: 'service_line', isRecurring: 'is_recurring',
+      recurrenceFrequency: 'recurrence_frequency', notes: 'notes'
     }
 
-    if (body.memberId !== undefined || body.memberName !== undefined || body.payrollEntryId !== undefined || body.payrollPeriodId !== undefined) {
-      const resolvedMember = await resolveFinanceMemberContext({
-        memberId: body.memberId ?? existingExpense.member_id,
-        payrollEntryId: body.payrollEntryId ?? existingExpense.payroll_entry_id
-      })
+    for (const [key, value] of Object.entries(pgUpdates)) {
+      const col = colMap[key]
 
-      updates.push('member_id = @memberId')
-      updateParams.memberId = resolvedMember.memberId
-
-      updates.push('member_name = @memberName')
-      updateParams.memberName = body.memberName
-        ? normalizeString(body.memberName)
-        : (resolvedMember.memberName || existingExpense.member_name)
-
-      updates.push('payroll_entry_id = @payrollEntryId')
-      updateParams.payrollEntryId = resolvedMember.payrollEntryId
-
-      updates.push('payroll_period_id = @payrollPeriodId')
-      updateParams.payrollPeriodId = normalizeString(body.payrollPeriodId)
-        || resolvedMember.payrollPeriodId
-        || existingExpense.payroll_period_id
-    }
-
-    if (body.description !== undefined) {
-      updates.push('description = @description')
-      updateParams.description = assertNonEmptyString(body.description, 'description')
-    }
-
-    if (body.expenseType !== undefined) {
-      updates.push('expense_type = @expenseType')
-      updateParams.expenseType = EXPENSE_TYPES.includes(body.expenseType)
-        ? (body.expenseType as ExpenseType) : 'supplier'
-    }
-
-    if (body.currency !== undefined) {
-      updates.push('currency = @currency')
-      updateParams.currency = assertValidCurrency(body.currency)
-    }
-
-    const numericFields: [string, string][] = [
-      ['subtotal', 'subtotal'], ['taxRate', 'tax_rate'], ['taxAmount', 'tax_amount'],
-      ['totalAmount', 'total_amount'], ['exchangeRateToClp', 'exchange_rate_to_clp'],
-      ['totalAmountClp', 'total_amount_clp']
-    ]
-
-    for (const [bodyKey, dbCol] of numericFields) {
-      if (body[bodyKey] !== undefined) {
-        updates.push(`${dbCol} = @${bodyKey}`)
-        updateParams[bodyKey] = toNumber(body[bodyKey])
+      if (col) {
+        bqUpdates.push(`${col} = @${key}`)
+        bqParams[key] = value
       }
     }
 
-    if (body.paymentStatus !== undefined) {
-      updates.push('payment_status = @paymentStatus')
-      updateParams.paymentStatus = EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
-        ? (body.paymentStatus as ExpensePaymentStatus) : 'pending'
-    }
-
-    if (body.paymentMethod !== undefined) {
-      updates.push('payment_method = @paymentMethod')
-      updateParams.paymentMethod = body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod)
-        ? (body.paymentMethod as PaymentMethod) : null
-    }
-
-    if (body.serviceLine !== undefined) {
-      updates.push('service_line = @serviceLine')
-      updateParams.serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
-        ? (body.serviceLine as ServiceLine) : null
-    }
-
-    const nullableStringFields: [string, string][] = [
-      ['paymentDate', 'payment_date'], ['paymentAccountId', 'payment_account_id'],
-      ['paymentReference', 'payment_reference'], ['documentNumber', 'document_number'],
-      ['documentDate', 'document_date'], ['dueDate', 'due_date'],
-      ['supplierId', 'supplier_id'], ['supplierName', 'supplier_name'],
-      ['supplierInvoiceNumber', 'supplier_invoice_number'],
-      ['socialSecurityType', 'social_security_type'],
-      ['socialSecurityInstitution', 'social_security_institution'],
-      ['socialSecurityPeriod', 'social_security_period'],
-      ['taxType', 'tax_type'],
-      ['taxPeriod', 'tax_period'],
-      ['taxFormNumber', 'tax_form_number'],
-      ['miscellaneousCategory', 'miscellaneous_category'],
-      ['notes', 'notes']
-    ]
-
-    for (const [bodyKey, dbCol] of nullableStringFields) {
-      if (body[bodyKey] !== undefined) {
-        updates.push(`${dbCol} = @${bodyKey}`)
-        updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
-      }
-    }
-
-    if (body.isRecurring !== undefined) {
-      updates.push('is_recurring = @isRecurring')
-      updateParams.isRecurring = Boolean(body.isRecurring)
-    }
-
-    if (body.recurrenceFrequency !== undefined) {
-      updates.push('recurrence_frequency = @recurrenceFrequency')
-      updateParams.recurrenceFrequency = body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null
-    }
-
-    if (updates.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
-    }
-
-    updates.push('updated_at = CURRENT_TIMESTAMP()')
+    bqUpdates.push('updated_at = CURRENT_TIMESTAMP()')
 
     await runFinanceQuery(`
       UPDATE \`${projectId}.greenhouse.fin_expenses\`
-      SET ${updates.join(', ')}
+      SET ${bqUpdates.join(', ')}
       WHERE expense_id = @expenseId
-    `, updateParams)
+    `, bqParams)
 
     return NextResponse.json({ expenseId, updated: true })
   } catch (error) {

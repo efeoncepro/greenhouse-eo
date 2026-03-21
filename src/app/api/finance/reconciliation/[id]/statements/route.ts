@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  assertReconciliationPeriodIsMutableFromPostgres,
+  importBankStatementsToPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -46,27 +51,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: periodId } = await params
     const body = await request.json()
-    const projectId = getFinanceProjectId()
-
-    // Verify period exists
-    const existing = await runFinanceQuery<{ period_id: string; status: string }>(`
-      SELECT period_id, status
-      FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
-      WHERE period_id = @periodId
-    `, { periodId })
-
-    if (existing.length === 0) {
-      return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
-    }
-
-    if (existing[0].status === 'reconciled' || existing[0].status === 'closed') {
-      throw new FinanceValidationError('Cannot import statements into a reconciled or closed period.', 409)
-    }
 
     // Resolve rows: either from CSV content or from pre-parsed JSON
     let rows: StatementInput[]
@@ -91,6 +78,51 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       throw new FinanceValidationError('Maximum 500 rows per import.')
     }
 
+    // Validate all rows before insert
+    const validatedRows = rows.map(row => ({
+      transactionDate: assertDateString(row.transactionDate, 'transactionDate'),
+      valueDate: row.valueDate ? normalizeString(row.valueDate) : null,
+      description: assertNonEmptyString(row.description, 'description'),
+      reference: row.reference ? normalizeString(row.reference) : null,
+      amount: toNumber(row.amount),
+      balance: row.balance !== undefined ? toNumber(row.balance) : null
+    }))
+
+    // ── Postgres-first path ──
+    try {
+      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+
+      const result = await importBankStatementsToPostgres(periodId, validatedRows)
+
+      return NextResponse.json({
+        periodId,
+        imported: result.imported,
+        ...(body.bankFormat && { bankFormat: body.bankFormat })
+      }, { status: 201 })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
+    const projectId = getFinanceProjectId()
+
+    const existing = await runFinanceQuery<{ period_id: string; status: string }>(`
+      SELECT period_id, status
+      FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
+      WHERE period_id = @periodId
+    `, { periodId })
+
+    if (existing.length === 0) {
+      return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
+    }
+
+    if (existing[0].status === 'reconciled' || existing[0].status === 'closed') {
+      throw new FinanceValidationError('Cannot import statements into a reconciled or closed period.', 409)
+    }
+
     const statementCounts = await runFinanceQuery<StatementCountRow>(`
       SELECT COUNT(*) AS total
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
@@ -98,14 +130,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     `, { periodId })
 
     const existingRowCount = toNumber(statementCounts[0]?.total)
-
-    // Insert rows one by one (BigQuery doesn't support multi-row INSERT with params easily)
     let imported = 0
 
-    for (const row of rows) {
-      const transactionDate = assertDateString(row.transactionDate, 'transactionDate')
-      const description = assertNonEmptyString(row.description, 'description')
-      const amount = toNumber(row.amount)
+    for (const row of validatedRows) {
       const rowId = `${periodId}_${String(existingRowCount + imported + 1).padStart(4, '0')}`
 
       await runFinanceQuery(`
@@ -121,18 +148,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       `, {
         rowId,
         periodId,
-        transactionDate,
-        valueDate: row.valueDate ? normalizeString(row.valueDate) : null,
-        description,
-        reference: row.reference ? normalizeString(row.reference) : null,
-        amount,
-        balance: row.balance !== undefined ? toNumber(row.balance) : null
+        transactionDate: row.transactionDate,
+        valueDate: row.valueDate,
+        description: row.description,
+        reference: row.reference,
+        amount: row.amount,
+        balance: row.balance
       })
 
       imported++
     }
 
-    // Update period metadata
     await runFinanceQuery(`
       UPDATE \`${projectId}.greenhouse.fin_reconciliation_periods\`
       SET

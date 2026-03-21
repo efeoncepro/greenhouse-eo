@@ -140,6 +140,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Slice 2 parcial (income GET/POST, expenses GET/POST, payments POST) — 7 rutas Postgres-first
 - PUT income/expenses y reconciliación siguen en BigQuery
 
+### Resultado (Slice 3)
+- PUT income wired a `updateFinanceIncomeInPostgres()` con BigQuery fallback
+- PUT expenses wired a `updateFinanceExpenseInPostgres()` con BigQuery fallback
+- Creado `src/lib/finance/postgres-reconciliation.ts` (~650 líneas) — store completo
+- 10 rutas de reconciliación migradas a Postgres-first:
+  - GET/POST `/reconciliation` (list + create periods)
+  - GET/PUT `/reconciliation/[id]` (detail + update period)
+  - POST `/reconciliation/[id]/statements` (import)
+  - GET `/reconciliation/[id]/candidates` (list candidates)
+  - POST `/reconciliation/[id]/match` (manual match)
+  - POST `/reconciliation/[id]/unmatch` (unmatch)
+  - POST `/reconciliation/[id]/exclude` (exclude)
+  - POST `/reconciliation/[id]/auto-match` (auto-match)
+- `npx tsc --noEmit` — limpio
+- Diferencia clave: income reconciliation en Postgres usa tabla `income_payments` directamente (sin JSON manipulation)
+
+### Verificación
+- `npx tsc --noEmit` ✅
+
+### Pendientes
+- Ejecutar backfill: `pnpm exec tsx scripts/backfill-postgres-finance-slice2.ts`
+- Smoke test end-to-end de reconciliación en Postgres
+
 ---
 
 ## 2026-03-21 07:35 -03

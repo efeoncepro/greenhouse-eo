@@ -4,7 +4,8 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
-  getFinanceIncomeFromPostgres
+  getFinanceIncomeFromPostgres,
+  updateFinanceIncomeInPostgres
 } from '@/lib/finance/postgres-store-slice2'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import {
@@ -154,21 +155,103 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: incomeId } = await params
     const body = await request.json()
+
+    // ── Build validated update payload ──
+
+    const pgUpdates: Record<string, unknown> = {}
+
+    // Client context resolution
+    if (
+      body.clientId !== undefined
+      || body.clientProfileId !== undefined
+      || body.hubspotCompanyId !== undefined
+      || body.clientName !== undefined
+    ) {
+      const resolvedClient = await resolveFinanceClientContext({
+        clientId: body.clientId,
+        clientProfileId: body.clientProfileId,
+        hubspotCompanyId: body.hubspotCompanyId
+      })
+
+      pgUpdates.clientId = resolvedClient.clientId
+      pgUpdates.clientProfileId = resolvedClient.clientProfileId
+      pgUpdates.hubspotCompanyId = resolvedClient.hubspotCompanyId
+      pgUpdates.clientName = assertNonEmptyString(
+        body.clientName ?? resolvedClient.clientName ?? resolvedClient.legalName ?? '',
+        'clientName'
+      )
+
+      if (resolvedClient.organizationId) {
+        pgUpdates.organizationId = resolvedClient.organizationId
+      }
+    }
+
+    if (body.clientName !== undefined && pgUpdates.clientName === undefined) {
+      pgUpdates.clientName = assertNonEmptyString(body.clientName, 'clientName')
+    }
+
+    if (body.invoiceNumber !== undefined) pgUpdates.invoiceNumber = body.invoiceNumber ? normalizeString(body.invoiceNumber) : null
+    if (body.invoiceDate !== undefined) pgUpdates.invoiceDate = body.invoiceDate ? normalizeString(body.invoiceDate) : null
+    if (body.dueDate !== undefined) pgUpdates.dueDate = body.dueDate ? normalizeString(body.dueDate) : null
+
+    if (body.currency !== undefined) pgUpdates.currency = assertValidCurrency(body.currency)
+
+    const numericFields: [string, string][] = [
+      ['subtotal', 'subtotal'], ['taxRate', 'taxRate'], ['taxAmount', 'taxAmount'],
+      ['totalAmount', 'totalAmount'], ['exchangeRateToClp', 'exchangeRateToClp'],
+      ['totalAmountClp', 'totalAmountClp'], ['amountPaid', 'amountPaid']
+    ]
+
+    for (const [bodyKey, pgKey] of numericFields) {
+      if (body[bodyKey] !== undefined) pgUpdates[pgKey] = toNumber(body[bodyKey])
+    }
+
+    if (body.paymentStatus !== undefined) {
+      pgUpdates.paymentStatus = PAYMENT_STATUSES.includes(body.paymentStatus)
+        ? (body.paymentStatus as PaymentStatus) : 'pending'
+    }
+
+    if (body.poNumber !== undefined) pgUpdates.poNumber = body.poNumber ? normalizeString(body.poNumber) : null
+    if (body.hesNumber !== undefined) pgUpdates.hesNumber = body.hesNumber ? normalizeString(body.hesNumber) : null
+
+    if (body.serviceLine !== undefined) {
+      pgUpdates.serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
+        ? (body.serviceLine as ServiceLine) : null
+    }
+
+    if (body.description !== undefined) pgUpdates.description = body.description ? normalizeString(body.description) : null
+    if (body.notes !== undefined) pgUpdates.notes = body.notes ? normalizeString(body.notes) : null
+    if (body.hubspotDealId !== undefined) pgUpdates.hubspotDealId = body.hubspotDealId ? normalizeString(body.hubspotDealId) : null
+    if (body.incomeType !== undefined) pgUpdates.incomeType = body.incomeType ? normalizeString(body.incomeType) : null
+
+    if (Object.keys(pgUpdates).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    // ── Postgres-first path ──
+    try {
+      const result = await updateFinanceIncomeInPostgres(incomeId, pgUpdates)
+
+      if (!result) {
+        return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({ incomeId, updated: true })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{
-      income_id: string
-      client_id: string | null
-      client_profile_id: string | null
-      hubspot_company_id: string | null
-      client_name: string
-    }>(`
-      SELECT income_id, client_id, client_profile_id, hubspot_company_id, client_name
+    const existing = await runFinanceQuery<{ income_id: string }>(`
+      SELECT income_id
       FROM \`${projectId}.greenhouse.fin_income\`
       WHERE income_id = @incomeId
     `, { incomeId })
@@ -177,153 +260,36 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Income record not found' }, { status: 404 })
     }
 
-    const updates: string[] = []
-    const updateParams: Record<string, unknown> = { incomeId }
-    const existingIncome = existing[0]
+    const bqUpdates: string[] = []
+    const bqParams: Record<string, unknown> = { incomeId }
 
-    if (
-      body.clientId !== undefined
-      || body.clientProfileId !== undefined
-      || body.hubspotCompanyId !== undefined
-      || body.clientName !== undefined
-    ) {
-      const resolvedClient = await resolveFinanceClientContext({
-        clientId: body.clientId ?? existingIncome.client_id,
-        clientProfileId: body.clientProfileId ?? existingIncome.client_profile_id,
-        hubspotCompanyId: body.hubspotCompanyId ?? existingIncome.hubspot_company_id
-      })
+    for (const [key, value] of Object.entries(pgUpdates)) {
+      const colMap: Record<string, string> = {
+        clientId: 'client_id', organizationId: 'organization_id', clientProfileId: 'client_profile_id',
+        hubspotCompanyId: 'hubspot_company_id', hubspotDealId: 'hubspot_deal_id', clientName: 'client_name',
+        invoiceNumber: 'invoice_number', invoiceDate: 'invoice_date', dueDate: 'due_date',
+        description: 'description', currency: 'currency', subtotal: 'subtotal', taxRate: 'tax_rate',
+        taxAmount: 'tax_amount', totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
+        totalAmountClp: 'total_amount_clp', paymentStatus: 'payment_status', amountPaid: 'amount_paid',
+        poNumber: 'po_number', hesNumber: 'hes_number', serviceLine: 'service_line', incomeType: 'income_type',
+        notes: 'notes'
+      }
 
-      updates.push('client_id = @clientId')
-      updateParams.clientId = resolvedClient.clientId
+      const col = colMap[key]
 
-      updates.push('client_profile_id = @clientProfileId')
-      updateParams.clientProfileId = resolvedClient.clientProfileId
-
-      updates.push('hubspot_company_id = @hubspotCompanyId')
-      updateParams.hubspotCompanyId = resolvedClient.hubspotCompanyId
-
-      updates.push('client_name = @clientName')
-      updateParams.clientName = assertNonEmptyString(
-        body.clientName ?? resolvedClient.clientName ?? resolvedClient.legalName ?? existingIncome.client_name,
-        'clientName'
-      )
-    }
-
-    if (body.clientName !== undefined && !updates.includes('client_name = @clientName')) {
-      updates.push('client_name = @clientName')
-      updateParams.clientName = assertNonEmptyString(body.clientName, 'clientName')
-    }
-
-    if (body.invoiceNumber !== undefined) {
-      updates.push('invoice_number = @invoiceNumber')
-      updateParams.invoiceNumber = body.invoiceNumber ? normalizeString(body.invoiceNumber) : null
-    }
-
-    if (body.invoiceDate !== undefined) {
-      updates.push('invoice_date = IF(@invoiceDate = \'\', NULL, CAST(@invoiceDate AS DATE))')
-      updateParams.invoiceDate = normalizeString(body.invoiceDate)
-    }
-
-    if (body.dueDate !== undefined) {
-      updates.push('due_date = IF(@dueDate = \'\', NULL, CAST(@dueDate AS DATE))')
-      updateParams.dueDate = body.dueDate ? normalizeString(body.dueDate) : null
-    }
-
-    if (body.currency !== undefined) {
-      updates.push('currency = @currency')
-      updateParams.currency = assertValidCurrency(body.currency)
-    }
-
-    if (body.subtotal !== undefined) {
-      updates.push('subtotal = @subtotal')
-      updateParams.subtotal = toNumber(body.subtotal)
-    }
-
-    if (body.taxRate !== undefined) {
-      updates.push('tax_rate = @taxRate')
-      updateParams.taxRate = toNumber(body.taxRate)
-    }
-
-    if (body.taxAmount !== undefined) {
-      updates.push('tax_amount = @taxAmount')
-      updateParams.taxAmount = toNumber(body.taxAmount)
-    }
-
-    if (body.totalAmount !== undefined) {
-      updates.push('total_amount = @totalAmount')
-      updateParams.totalAmount = toNumber(body.totalAmount)
-    }
-
-    if (body.exchangeRateToClp !== undefined) {
-      updates.push('exchange_rate_to_clp = @exchangeRateToClp')
-      updateParams.exchangeRateToClp = toNumber(body.exchangeRateToClp)
-    }
-
-    if (body.totalAmountClp !== undefined) {
-      updates.push('total_amount_clp = @totalAmountClp')
-      updateParams.totalAmountClp = toNumber(body.totalAmountClp)
-    }
-
-    if (body.paymentStatus !== undefined) {
-      updates.push('payment_status = @paymentStatus')
-      updateParams.paymentStatus = PAYMENT_STATUSES.includes(body.paymentStatus)
-        ? (body.paymentStatus as PaymentStatus) : 'pending'
-    }
-
-    if (body.amountPaid !== undefined) {
-      updates.push('amount_paid = @amountPaid')
-      updateParams.amountPaid = toNumber(body.amountPaid)
-    }
-
-    if (body.poNumber !== undefined) {
-      updates.push('po_number = @poNumber')
-      updateParams.poNumber = body.poNumber ? normalizeString(body.poNumber) : null
-    }
-
-    if (body.hesNumber !== undefined) {
-      updates.push('hes_number = @hesNumber')
-      updateParams.hesNumber = body.hesNumber ? normalizeString(body.hesNumber) : null
-    }
-
-    if (body.serviceLine !== undefined) {
-      updates.push('service_line = @serviceLine')
-      updateParams.serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
-        ? (body.serviceLine as ServiceLine) : null
-    }
-
-    if (body.description !== undefined) {
-      updates.push('description = @description')
-      updateParams.description = body.description ? normalizeString(body.description) : null
-    }
-
-    if (body.notes !== undefined) {
-      updates.push('notes = @notes')
-      updateParams.notes = body.notes ? normalizeString(body.notes) : null
-    }
-
-    const stringFields: [string, string][] = [
-      ['hubspotDealId', 'hubspot_deal_id'],
-      ['incomeType', 'income_type']
-    ]
-
-    for (const [bodyKey, dbCol] of stringFields) {
-      if (body[bodyKey] !== undefined) {
-        updates.push(`${dbCol} = @${bodyKey}`)
-        updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
+      if (col) {
+        bqUpdates.push(`${col} = @${key}`)
+        bqParams[key] = value
       }
     }
 
-    if (updates.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
-    }
-
-    updates.push('updated_at = CURRENT_TIMESTAMP()')
+    bqUpdates.push('updated_at = CURRENT_TIMESTAMP()')
 
     await runFinanceQuery(`
       UPDATE \`${projectId}.greenhouse.fin_income\`
-      SET ${updates.join(', ')}
+      SET ${bqUpdates.join(', ')}
       WHERE income_id = @incomeId
-    `, updateParams)
+    `, bqParams)
 
     return NextResponse.json({ incomeId, updated: true })
   } catch (error) {

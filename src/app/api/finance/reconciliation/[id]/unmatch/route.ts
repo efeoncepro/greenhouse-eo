@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  assertReconciliationPeriodIsMutableFromPostgres,
+  getStatementRowFromPostgres,
+  clearStatementRowMatchInPostgres,
+  clearReconciliationLinkInPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import {
   FinanceValidationError,
   assertNonEmptyString,
@@ -20,18 +27,61 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: periodId } = await params
     const body = await request.json()
     const rowId = assertNonEmptyString(body.rowId, 'rowId')
 
+    // ── Postgres-first path ──
+    try {
+      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+
+      const row = await getStatementRowFromPostgres(rowId, periodId)
+
+      if (!row) {
+        return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
+      }
+
+      if (row.match_status === 'unmatched') {
+        return NextResponse.json({ error: 'Row is already unmatched' }, { status: 400 })
+      }
+
+      const previousType = normalizeString(row.matched_type)
+      const previousId = normalizeString(row.matched_id)
+      const previousPaymentId = normalizeString(row.matched_payment_id)
+
+      await clearStatementRowMatchInPostgres(rowId, periodId)
+
+      if (previousType && previousId) {
+        await clearReconciliationLinkInPostgres({
+          matchedType: previousType,
+          matchedId: previousId,
+          matchedPaymentId: previousPaymentId || null,
+          rowId
+        })
+      }
+
+      return NextResponse.json({
+        unmatched: true,
+        rowId,
+        previousMatchedType: previousType || null,
+        previousMatchedId: previousPaymentId || previousId || null,
+        previousMatchedRecordId: previousId || null,
+        previousMatchedPaymentId: previousPaymentId || null
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
+
     await assertReconciliationPeriodIsMutable(periodId)
 
     const projectId = getFinanceProjectId()
 
-    // Get current match info before clearing
     const rows = await runFinanceQuery<{
       row_id: string
       matched_type: string | null
@@ -48,17 +98,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
     }
 
-    const row = rows[0]
+    const bqRow = rows[0]
 
-    if (row.match_status === 'unmatched') {
+    if (bqRow.match_status === 'unmatched') {
       return NextResponse.json({ error: 'Row is already unmatched' }, { status: 400 })
     }
 
-    const previousType = normalizeString(row.matched_type)
-    const previousId = normalizeString(row.matched_id)
-    const previousPaymentId = normalizeString(row.matched_payment_id)
+    const previousType = normalizeString(bqRow.matched_type)
+    const previousId = normalizeString(bqRow.matched_id)
+    const previousPaymentId = normalizeString(bqRow.matched_payment_id)
 
-    // Clear the match on the statement row
     await runFinanceQuery(`
       UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
       SET
@@ -72,7 +121,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       WHERE row_id = @rowId AND period_id = @periodId
     `, { rowId, periodId })
 
-    // Revert reconciliation on the income/expense if it was matched
     if (previousType && previousId) {
       await clearReconciliationLink({
         matchedType: previousType,

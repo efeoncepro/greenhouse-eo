@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  getReconciliationPeriodDetailFromPostgres,
+  updateReconciliationPeriodInPostgres,
+  validateReconciledTransitionFromPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -61,9 +67,25 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { id: periodId } = await params
+
+  // ── Postgres-first path ──
+  try {
+    const detail = await getReconciliationPeriodDetailFromPostgres(periodId)
+
+    if (!detail) {
+      return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(detail)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   const periods = await runFinanceQuery<PeriodDetailRow>(`
@@ -134,14 +156,111 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: periodId } = await params
     const body = await request.json()
+
+    // ── Shared validation logic ──
+
+    const touchingFinancialFields = (
+      body.closingBalanceBank !== undefined
+      || body.closingBalanceSystem !== undefined
+      || body.difference !== undefined
+    )
+
+    const pgUpdates: Record<string, unknown> = {}
+
+    if (body.closingBalanceBank !== undefined) pgUpdates.closingBalanceBank = toNumber(body.closingBalanceBank)
+    if (body.closingBalanceSystem !== undefined) pgUpdates.closingBalanceSystem = toNumber(body.closingBalanceSystem)
+    if (body.difference !== undefined) pgUpdates.difference = toNumber(body.difference)
+    if (body.notes !== undefined) pgUpdates.notes = body.notes ? normalizeString(body.notes) : null
+
+    if (body.status !== undefined) {
+      const validStatuses = ['open', 'in_progress', 'reconciled', 'closed']
+      const nextStatus = normalizeString(body.status)
+
+      if (!validStatuses.includes(nextStatus)) {
+        throw new FinanceValidationError(`Invalid reconciliation status: ${nextStatus || '(empty)'}.`)
+      }
+
+      pgUpdates.status = nextStatus
+    }
+
+    if (Object.keys(pgUpdates).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    // ── Postgres-first path ──
+    try {
+      // Fetch existing period for state validation
+      const existing = await (await import('@/lib/finance/postgres-reconciliation'))
+        .getReconciliationPeriodContextFromPostgres(periodId)
+
+      // Note: getReconciliationPeriodContextFromPostgres throws 404 if not found
+
+      const existingStatus = existing.status
+
+      if (existingStatus === 'closed') {
+        throw new FinanceValidationError('Cannot update a closed reconciliation period.', 409)
+      }
+
+      if (existingStatus === 'reconciled') {
+        const onlyClosingTransition = (
+          pgUpdates.status === 'closed'
+          && !touchingFinancialFields
+          && body.notes === undefined
+        )
+
+        if (!onlyClosingTransition) {
+          throw new FinanceValidationError('Cannot modify a reconciled period. Only a status change to "closed" is allowed.', 409)
+        }
+      }
+
+      if (pgUpdates.status === 'closed' && existingStatus !== 'reconciled') {
+        throw new FinanceValidationError('A reconciliation period can only be closed after it is reconciled.', 409)
+      }
+
+      if (pgUpdates.status === 'reconciled') {
+        const { totalRows, remainingRows, statementImported } =
+          await validateReconciledTransitionFromPostgres(periodId, true)
+
+        const nextDifference = pgUpdates.difference !== undefined
+          ? toNumber(pgUpdates.difference)
+          : 0
+
+        if (!statementImported || totalRows <= 0) {
+          throw new FinanceValidationError('Cannot reconcile a period without an imported statement.', 409)
+        }
+
+        if (remainingRows > 0) {
+          throw new FinanceValidationError('Cannot reconcile a period with unmatched or suggested statement rows.', 409)
+        }
+
+        if (Math.abs(nextDifference) > 0.01) {
+          throw new FinanceValidationError('Cannot reconcile a period while difference is not zero.', 409)
+        }
+      }
+
+      const result = await updateReconciliationPeriodInPostgres(periodId, pgUpdates, {
+        reconciledByUserId: tenant.userId || null
+      })
+
+      if (!result) {
+        return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({ periodId, updated: true })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{
+    const existingBq = await runFinanceQuery<{
       period_id: string
       status: string
       statement_imported: boolean
@@ -153,29 +272,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       WHERE period_id = @periodId
     `, { periodId })
 
-    if (existing.length === 0) {
+    if (existingBq.length === 0) {
       return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
     }
 
-    const existingPeriod = existing[0]
+    const existingPeriod = existingBq[0]
     const existingStatus = normalizeString(existingPeriod.status)
 
     if (existingStatus === 'closed') {
       throw new FinanceValidationError('Cannot update a closed reconciliation period.', 409)
     }
 
-    const updates: string[] = []
-    const updateParams: Record<string, unknown> = { periodId }
-
-    const touchingFinancialFields = (
-      body.closingBalanceBank !== undefined
-      || body.closingBalanceSystem !== undefined
-      || body.difference !== undefined
-    )
-
     if (existingStatus === 'reconciled') {
       const onlyClosingTransition = (
-        body.status === 'closed'
+        pgUpdates.status === 'closed'
         && !touchingFinancialFields
         && body.notes === undefined
       )
@@ -185,32 +295,35 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
     }
 
-    if (body.closingBalanceBank !== undefined) {
-      updates.push('closing_balance_bank = @closingBalanceBank')
-      updateParams.closingBalanceBank = toNumber(body.closingBalanceBank)
+    if (pgUpdates.status === 'closed' && existingStatus !== 'reconciled') {
+      throw new FinanceValidationError('A reconciliation period can only be closed after it is reconciled.', 409)
     }
 
-    if (body.closingBalanceSystem !== undefined) {
-      updates.push('closing_balance_system = @closingBalanceSystem')
-      updateParams.closingBalanceSystem = toNumber(body.closingBalanceSystem)
+    const bqUpdates: string[] = []
+    const bqParams: Record<string, unknown> = { periodId }
+
+    if (pgUpdates.closingBalanceBank !== undefined) {
+      bqUpdates.push('closing_balance_bank = @closingBalanceBank')
+      bqParams.closingBalanceBank = pgUpdates.closingBalanceBank
     }
 
-    if (body.difference !== undefined) {
-      updates.push('difference = @difference')
-      updateParams.difference = toNumber(body.difference)
+    if (pgUpdates.closingBalanceSystem !== undefined) {
+      bqUpdates.push('closing_balance_system = @closingBalanceSystem')
+      bqParams.closingBalanceSystem = pgUpdates.closingBalanceSystem
     }
 
-    if (body.status !== undefined) {
-      const validStatuses = ['open', 'in_progress', 'reconciled', 'closed']
-      const nextStatus = normalizeString(body.status)
+    if (pgUpdates.difference !== undefined) {
+      bqUpdates.push('difference = @difference')
+      bqParams.difference = pgUpdates.difference
+    }
 
-      if (!validStatuses.includes(nextStatus)) {
-        throw new FinanceValidationError(`Invalid reconciliation status: ${nextStatus || '(empty)'}.`)
-      }
+    if (pgUpdates.notes !== undefined) {
+      bqUpdates.push('notes = @notes')
+      bqParams.notes = pgUpdates.notes
+    }
 
-      if (nextStatus === 'closed' && existingStatus !== 'reconciled') {
-        throw new FinanceValidationError('A reconciliation period can only be closed after it is reconciled.', 409)
-      }
+    if (pgUpdates.status !== undefined) {
+      const nextStatus = pgUpdates.status as string
 
       if (nextStatus === 'reconciled') {
         const statementCounts = await runFinanceQuery<{ total: unknown }>(`
@@ -230,8 +343,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         const totalRows = toNumber(statementCounts[0]?.total)
         const remainingRows = toNumber(pendingRows[0]?.total)
 
-        const nextDifference = body.difference !== undefined
-          ? toNumber(body.difference)
+        const nextDifference = pgUpdates.difference !== undefined
+          ? toNumber(pgUpdates.difference)
           : toNumber(existingPeriod.difference)
 
         if (!statementImported || totalRows <= 0) {
@@ -247,32 +360,27 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         }
       }
 
-      updates.push('status = @status')
-      updateParams.status = nextStatus
+      bqUpdates.push('status = @status')
+      bqParams.status = nextStatus
 
       if (nextStatus === 'reconciled') {
-        updates.push('reconciled_by = @reconciledBy')
-        updates.push('reconciled_at = CURRENT_TIMESTAMP()')
-        updateParams.reconciledBy = tenant.userId || null
+        bqUpdates.push('reconciled_by = @reconciledBy')
+        bqUpdates.push('reconciled_at = CURRENT_TIMESTAMP()')
+        bqParams.reconciledBy = tenant.userId || null
       }
     }
 
-    if (body.notes !== undefined) {
-      updates.push('notes = @notes')
-      updateParams.notes = body.notes ? normalizeString(body.notes) : null
-    }
-
-    if (updates.length === 0) {
+    if (bqUpdates.length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    updates.push('updated_at = CURRENT_TIMESTAMP()')
+    bqUpdates.push('updated_at = CURRENT_TIMESTAMP()')
 
     await runFinanceQuery(`
       UPDATE \`${projectId}.greenhouse.fin_reconciliation_periods\`
-      SET ${updates.join(', ')}
+      SET ${bqUpdates.join(', ')}
       WHERE period_id = @periodId
-    `, updateParams)
+    `, bqParams)
 
     return NextResponse.json({ periodId, updated: true })
   } catch (error) {

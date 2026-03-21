@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  assertReconciliationPeriodIsMutableFromPostgres,
+  listUnmatchedStatementRowsFromPostgres,
+  listReconciliationCandidatesFromPostgres,
+  updateStatementRowMatchInPostgres,
+  setReconciliationLinkInPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -61,11 +69,106 @@ const hasPartialReferenceMatch = (statementText: string, candidateReference: str
 }
 
 /**
- * Auto-match algorithm (reference-first):
- *  1. Reference match -> 0.95 confidence (auto-match)
- *  2. Amount + date + reference partial -> 0.85 confidence (auto-match)
- *  3. Amount + date only -> 0.70 confidence (suggest, don't auto-match)
+ * Run the auto-match algorithm against a list of unmatched rows and candidates.
+ * Returns { matched, suggested } counts.
  */
+const runAutoMatchAlgorithm = async ({
+  unmatchedRows,
+  candidates,
+  updateRow,
+  linkMatch
+}: {
+  unmatchedRows: UnmatchedRow[]
+  candidates: ReconciliationCandidate[]
+  updateRow: (rowId: string, match: {
+    matchStatus: string
+    matchedType: string
+    matchedId: string
+    matchedPaymentId: string | null
+    matchConfidence: number
+    matchedBy: string | null
+  }) => Promise<void>
+  linkMatch: (match: {
+    matchedType: 'income' | 'expense'
+    matchedId: string
+    matchedPaymentId: string | null
+    rowId: string
+    matchedBy: string | null
+  }) => Promise<void>
+}) => {
+  let matched = 0
+  let suggested = 0
+  const matchedCandidateIds = new Set<string>()
+
+  for (const row of unmatchedRows) {
+    const rowAmount = toNumber(row.amount)
+    const rowDate = toDateString(row.transaction_date as string | { value?: string } | null)
+    const rowText = `${normalizeString(row.description)} ${row.reference ? normalizeString(row.reference) : ''}`.trim().toLowerCase()
+    let bestMatch: { candidate: ReconciliationCandidate; confidence: number } | null = null
+    let bestMatchCount = 0
+
+    for (const candidate of candidates) {
+      if (matchedCandidateIds.has(candidate.id)) continue
+
+      if (!amountMatches(rowAmount, candidate.amount)) continue
+
+      const dateMatch = dateMatchesWithinWindow(rowDate, candidate.transactionDate)
+      let confidence = 0
+
+      if (rowText.includes(candidate.id.toLowerCase()) || hasPartialReferenceMatch(rowText, candidate.reference)) {
+        confidence = 0.95
+      } else if (dateMatch && hasPartialReferenceMatch(rowText, candidate.reference)) {
+        confidence = 0.85
+      } else if (dateMatch) {
+        confidence = 0.70
+      }
+
+      if (confidence === 0) continue
+
+      if (!bestMatch || confidence > bestMatch.confidence) {
+        bestMatch = { candidate, confidence }
+        bestMatchCount = 1
+      } else if (bestMatch && confidence === bestMatch.confidence) {
+        bestMatchCount += 1
+      }
+    }
+
+    if (!bestMatch || bestMatchCount !== 1) continue
+
+    const autoMatch = bestMatch.confidence >= 0.85
+    const newStatus = autoMatch ? 'auto_matched' : 'suggested'
+    const matchedRecordId = bestMatch.candidate.matchedRecordId || bestMatch.candidate.id
+    const matchedPaymentId = bestMatch.candidate.matchedPaymentId || null
+    const rowId = normalizeString(row.row_id)
+
+    await updateRow(rowId, {
+      matchStatus: newStatus,
+      matchedType: bestMatch.candidate.type,
+      matchedId: matchedRecordId,
+      matchedPaymentId,
+      matchConfidence: bestMatch.confidence,
+      matchedBy: autoMatch ? 'auto' : null
+    })
+
+    if (autoMatch) {
+      await linkMatch({
+        matchedType: bestMatch.candidate.type,
+        matchedId: matchedRecordId,
+        matchedPaymentId,
+        rowId,
+        matchedBy: 'auto'
+      })
+
+      matchedCandidateIds.add(bestMatch.candidate.id)
+      matched++
+    } else {
+      suggested++
+    }
+  }
+
+  return { matched, suggested }
+}
+
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -73,127 +176,105 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: periodId } = await params
-    const projectId = getFinanceProjectId()
+
+    // ── Postgres-first path ──
+    try {
+      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+
+      const pgUnmatched = await listUnmatchedStatementRowsFromPostgres(periodId)
+
+      if (pgUnmatched.length === 0) {
+        return NextResponse.json({ matched: 0, suggested: 0, message: 'No unmatched rows to process.' })
+      }
+
+      const { items: pgCandidates } = await listReconciliationCandidatesFromPostgres({
+        periodId, type: 'all', limit: 400, windowDays: 45
+      })
+
+      const unmatchedRows: UnmatchedRow[] = pgUnmatched.map(r => ({
+        row_id: r.row_id,
+        transaction_date: r.transaction_date,
+        description: r.description,
+        reference: r.reference,
+        amount: r.amount
+      }))
+
+      const { matched, suggested } = await runAutoMatchAlgorithm({
+        unmatchedRows,
+        candidates: pgCandidates,
+        updateRow: (rowId, match) => updateStatementRowMatchInPostgres(rowId, periodId, {
+          ...match,
+          matchedByUserId: match.matchedBy,
+        }),
+        linkMatch: (match) => setReconciliationLinkInPostgres(match)
+      })
+
+      return NextResponse.json({
+        matched,
+        suggested,
+        unmatched: unmatchedRows.length - matched - suggested,
+        total: unmatchedRows.length
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
 
     await assertReconciliationPeriodIsMutable(periodId)
 
-    const unmatchedRows = await runFinanceQuery<UnmatchedRow>(`
+    const projectId = getFinanceProjectId()
+
+    const bqUnmatched = await runFinanceQuery<UnmatchedRow>(`
       SELECT row_id, transaction_date, description, reference, amount
       FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
       WHERE period_id = @periodId AND match_status = 'unmatched'
     `, { periodId })
 
-    if (unmatchedRows.length === 0) {
+    if (bqUnmatched.length === 0) {
       return NextResponse.json({ matched: 0, suggested: 0, message: 'No unmatched rows to process.' })
     }
 
-    const { items: candidates } = await listReconciliationCandidates({
-      periodId,
-      type: 'all',
-      limit: 400,
-      windowDays: 45
+    const { items: bqCandidates } = await listReconciliationCandidates({
+      periodId, type: 'all', limit: 400, windowDays: 45
     })
 
-    let matched = 0
-    let suggested = 0
-    const matchedCandidateIds = new Set<string>()
-
-    for (const row of unmatchedRows) {
-      const rowAmount = toNumber(row.amount)
-      const rowDate = toDateString(row.transaction_date as string | { value?: string } | null)
-      const rowText = `${normalizeString(row.description)} ${row.reference ? normalizeString(row.reference) : ''}`.trim().toLowerCase()
-      let bestMatch: { candidate: ReconciliationCandidate; confidence: number } | null = null
-      let bestMatchCount = 0
-
-      for (const candidate of candidates) {
-        if (matchedCandidateIds.has(candidate.id)) {
-          continue
-        }
-
-        const amountMatch = amountMatches(rowAmount, candidate.amount)
-
-        if (!amountMatch) {
-          continue
-        }
-
-        const dateMatch = dateMatchesWithinWindow(rowDate, candidate.transactionDate)
-        let confidence = 0
-
-        if (rowText.includes(candidate.id.toLowerCase()) || hasPartialReferenceMatch(rowText, candidate.reference)) {
-          confidence = 0.95
-        } else if (dateMatch && hasPartialReferenceMatch(rowText, candidate.reference)) {
-          confidence = 0.85
-        } else if (dateMatch) {
-          confidence = 0.70
-        }
-
-        if (confidence === 0) {
-          continue
-        }
-
-        if (!bestMatch || confidence > bestMatch.confidence) {
-          bestMatch = { candidate, confidence }
-          bestMatchCount = 1
-        } else if (bestMatch && confidence === bestMatch.confidence) {
-          bestMatchCount += 1
-        }
-      }
-
-      if (!bestMatch || bestMatchCount !== 1) {
-        continue
-      }
-
-      const autoMatch = bestMatch.confidence >= 0.85
-      const newStatus = autoMatch ? 'auto_matched' : 'suggested'
-      const matchedRecordId = bestMatch.candidate.matchedRecordId || bestMatch.candidate.id
-      const matchedPaymentId = bestMatch.candidate.matchedPaymentId || null
-
-      await runFinanceQuery(`
-        UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
-        SET
-          match_status = @matchStatus,
-          matched_type = @matchedType,
-          matched_id = @matchedId,
-          matched_payment_id = @matchedPaymentId,
-          match_confidence = @matchConfidence,
-          matched_by = @matchedBy,
-          matched_at = CURRENT_TIMESTAMP()
-        WHERE row_id = @rowId
-      `, {
-        rowId: normalizeString(row.row_id),
-        matchStatus: newStatus,
-        matchedType: bestMatch.candidate.type,
-        matchedId: matchedRecordId,
-        matchedPaymentId,
-        matchConfidence: bestMatch.confidence,
-        matchedBy: autoMatch ? 'auto' : null
+    const { matched, suggested } = await runAutoMatchAlgorithm({
+      unmatchedRows: bqUnmatched,
+      candidates: bqCandidates,
+      updateRow: async (rowId, match) => {
+        await runFinanceQuery(`
+          UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
+          SET
+            match_status = @matchStatus,
+            matched_type = @matchedType,
+            matched_id = @matchedId,
+            matched_payment_id = @matchedPaymentId,
+            match_confidence = @matchConfidence,
+            matched_by = @matchedBy,
+            matched_at = CURRENT_TIMESTAMP()
+          WHERE row_id = @rowId
+        `, { rowId, ...match })
+      },
+      linkMatch: (match) => setReconciliationLink({
+        matchedType: match.matchedType,
+        matchedId: match.matchedId,
+        matchedPaymentId: match.matchedPaymentId,
+        rowId: match.rowId,
+        matchedBy: tenant.userId || 'auto'
       })
-
-      if (autoMatch) {
-        await setReconciliationLink({
-          matchedType: bestMatch.candidate.type,
-          matchedId: matchedRecordId,
-          matchedPaymentId,
-          rowId: normalizeString(row.row_id),
-          matchedBy: tenant.userId || 'auto'
-        })
-
-        matchedCandidateIds.add(bestMatch.candidate.id)
-        matched++
-      } else {
-        suggested++
-      }
-    }
+    })
 
     return NextResponse.json({
       matched,
       suggested,
-      unmatched: unmatchedRows.length - matched - suggested,
-      total: unmatchedRows.length
+      unmatched: bqUnmatched.length - matched - suggested,
+      total: bqUnmatched.length
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

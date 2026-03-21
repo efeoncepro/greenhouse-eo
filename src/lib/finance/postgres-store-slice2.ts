@@ -816,6 +816,195 @@ export const createFinanceIncomeInPostgres = async ({
   })
 }
 
+// ─── Income: update ─────────────────────────────────────────────────
+
+export const updateFinanceIncomeInPostgres = async (
+  incomeId: string,
+  updates: Record<string, unknown>
+) => {
+  await assertFinanceSlice2PostgresReady()
+
+  // Map camelCase body keys → snake_case column names
+  const fieldMap: Record<string, string> = {
+    clientId: 'client_id',
+    organizationId: 'organization_id',
+    clientProfileId: 'client_profile_id',
+    hubspotCompanyId: 'hubspot_company_id',
+    hubspotDealId: 'hubspot_deal_id',
+    clientName: 'client_name',
+    invoiceNumber: 'invoice_number',
+    invoiceDate: 'invoice_date',
+    dueDate: 'due_date',
+    description: 'description',
+    currency: 'currency',
+    subtotal: 'subtotal',
+    taxRate: 'tax_rate',
+    taxAmount: 'tax_amount',
+    totalAmount: 'total_amount',
+    exchangeRateToClp: 'exchange_rate_to_clp',
+    totalAmountClp: 'total_amount_clp',
+    paymentStatus: 'payment_status',
+    amountPaid: 'amount_paid',
+    poNumber: 'po_number',
+    hesNumber: 'hes_number',
+    serviceLine: 'service_line',
+    incomeType: 'income_type',
+    notes: 'notes'
+  }
+
+  const dateColumns = new Set(['invoice_date', 'due_date'])
+  const setClauses: string[] = []
+  const values: unknown[] = []
+  let paramIdx = 1
+
+  for (const [bodyKey, value] of Object.entries(updates)) {
+    const col = fieldMap[bodyKey]
+
+    if (!col) continue
+
+    if (dateColumns.has(col)) {
+      setClauses.push(`${col} = $${paramIdx}::date`)
+    } else {
+      setClauses.push(`${col} = $${paramIdx}`)
+    }
+
+    values.push(value)
+    paramIdx++
+  }
+
+  if (setClauses.length === 0) return null
+
+  setClauses.push('updated_at = CURRENT_TIMESTAMP')
+  values.push(incomeId)
+
+  return withGreenhousePostgresTransaction(async client => {
+    const rows = await queryRows<PostgresIncomeRow>(
+      `
+        UPDATE greenhouse_finance.income
+        SET ${setClauses.join(', ')}
+        WHERE income_id = $${paramIdx}
+        RETURNING *
+      `,
+      values,
+      client
+    )
+
+    if (rows.length === 0) return null
+
+    const updated = mapIncome(rows[0])
+
+    await publishFinanceOutboxEvent({
+      client,
+      aggregateType: 'finance_income',
+      aggregateId: incomeId,
+      eventType: 'finance.income.updated',
+      payload: updated
+    })
+
+    return updated
+  })
+}
+
+// ─── Expenses: update ───────────────────────────────────────────────
+
+export const updateFinanceExpenseInPostgres = async (
+  expenseId: string,
+  updates: Record<string, unknown>
+) => {
+  await assertFinanceSlice2PostgresReady()
+
+  const fieldMap: Record<string, string> = {
+    clientId: 'client_id',
+    expenseType: 'expense_type',
+    description: 'description',
+    currency: 'currency',
+    subtotal: 'subtotal',
+    taxRate: 'tax_rate',
+    taxAmount: 'tax_amount',
+    totalAmount: 'total_amount',
+    exchangeRateToClp: 'exchange_rate_to_clp',
+    totalAmountClp: 'total_amount_clp',
+    paymentDate: 'payment_date',
+    paymentStatus: 'payment_status',
+    paymentMethod: 'payment_method',
+    paymentAccountId: 'payment_account_id',
+    paymentReference: 'payment_reference',
+    documentNumber: 'document_number',
+    documentDate: 'document_date',
+    dueDate: 'due_date',
+    supplierId: 'supplier_id',
+    supplierName: 'supplier_name',
+    supplierInvoiceNumber: 'supplier_invoice_number',
+    payrollPeriodId: 'payroll_period_id',
+    payrollEntryId: 'payroll_entry_id',
+    memberId: 'member_id',
+    memberName: 'member_name',
+    socialSecurityType: 'social_security_type',
+    socialSecurityInstitution: 'social_security_institution',
+    socialSecurityPeriod: 'social_security_period',
+    taxType: 'tax_type',
+    taxPeriod: 'tax_period',
+    taxFormNumber: 'tax_form_number',
+    miscellaneousCategory: 'miscellaneous_category',
+    serviceLine: 'service_line',
+    isRecurring: 'is_recurring',
+    recurrenceFrequency: 'recurrence_frequency',
+    notes: 'notes'
+  }
+
+  const dateColumns = new Set(['payment_date', 'document_date', 'due_date'])
+  const setClauses: string[] = []
+  const values: unknown[] = []
+  let paramIdx = 1
+
+  for (const [bodyKey, value] of Object.entries(updates)) {
+    const col = fieldMap[bodyKey]
+
+    if (!col) continue
+
+    if (dateColumns.has(col)) {
+      setClauses.push(`${col} = $${paramIdx}::date`)
+    } else {
+      setClauses.push(`${col} = $${paramIdx}`)
+    }
+
+    values.push(value)
+    paramIdx++
+  }
+
+  if (setClauses.length === 0) return null
+
+  setClauses.push('updated_at = CURRENT_TIMESTAMP')
+  values.push(expenseId)
+
+  return withGreenhousePostgresTransaction(async client => {
+    const rows = await queryRows<PostgresExpenseRow>(
+      `
+        UPDATE greenhouse_finance.expenses
+        SET ${setClauses.join(', ')}
+        WHERE expense_id = $${paramIdx}
+        RETURNING *
+      `,
+      values,
+      client
+    )
+
+    if (rows.length === 0) return null
+
+    const updated = mapExpense(rows[0])
+
+    await publishFinanceOutboxEvent({
+      client,
+      aggregateType: 'finance_expense',
+      aggregateId: expenseId,
+      eventType: 'finance.expense.updated',
+      payload: updated
+    })
+
+    return updated
+  })
+}
+
 // ─── Income payments: create ────────────────────────────────────────
 
 export const createFinanceIncomePaymentInPostgres = async ({

@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  listReconciliationPeriodsFromPostgres,
+  createReconciliationPeriodInPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -62,11 +67,23 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   const { searchParams } = new URL(request.url)
   const accountId = searchParams.get('accountId')
   const status = searchParams.get('status')
+
+  // ── Postgres-first path ──
+  try {
+    const result = await listReconciliationPeriodsFromPostgres({ accountId, status })
+
+    return NextResponse.json(result)
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
+
+  // ── BigQuery fallback ──
+  await ensureFinanceInfrastructure()
   const projectId = getFinanceProjectId()
 
   let filters = ''
@@ -103,8 +120,6 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const body = await request.json()
     const accountId = assertNonEmptyString(body.accountId, 'accountId')
@@ -121,9 +136,25 @@ export async function POST(request: Request) {
 
     const openingBalance = toNumber(body.openingBalance)
     const periodId = `${accountId}_${year}_${String(month).padStart(2, '0')}`
+    const notes = body.notes ? normalizeString(body.notes) : null
+
+    // ── Postgres-first path ──
+    try {
+      const result = await createReconciliationPeriodInPostgres({
+        periodId, accountId, year, month, openingBalance, notes
+      })
+
+      return NextResponse.json(result, { status: 201 })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
     const projectId = getFinanceProjectId()
 
-    // Check for duplicate
     const existing = await runFinanceQuery<{ period_id: string }>(`
       SELECT period_id
       FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
@@ -144,14 +175,7 @@ export async function POST(request: Request) {
         'open', FALSE, 0,
         @notes, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
-    `, {
-      periodId,
-      accountId,
-      year,
-      month,
-      openingBalance,
-      notes: body.notes ? normalizeString(body.notes) : null
-    })
+    `, { periodId, accountId, year, month, openingBalance, notes })
 
     return NextResponse.json({ periodId, created: true }, { status: 201 })
   } catch (error) {

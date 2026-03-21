@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { assertReconciliationPeriodIsMutable, clearReconciliationLink } from '@/lib/finance/reconciliation'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  assertReconciliationPeriodIsMutableFromPostgres,
+  getStatementRowFromPostgres,
+  clearReconciliationLinkInPostgres,
+  excludeStatementRowInPostgres
+} from '@/lib/finance/postgres-reconciliation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -20,13 +27,56 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: periodId } = await params
     const body = await request.json()
     const rowId = assertNonEmptyString(body.rowId, 'rowId')
     const notes = body.notes ? normalizeString(body.notes) : null
+
+    // ── Postgres-first path ──
+    try {
+      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+
+      const row = await getStatementRowFromPostgres(rowId, periodId)
+
+      if (!row) {
+        return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
+      }
+
+      const previousMatchedType = normalizeString(row.matched_type)
+      const previousMatchedId = normalizeString(row.matched_id)
+      const previousMatchedPaymentId = normalizeString(row.matched_payment_id)
+
+      if (previousMatchedType && previousMatchedId) {
+        await clearReconciliationLinkInPostgres({
+          matchedType: previousMatchedType,
+          matchedId: previousMatchedId,
+          matchedPaymentId: previousMatchedPaymentId || null,
+          rowId
+        })
+      }
+
+      await excludeStatementRowInPostgres(rowId, periodId, {
+        matchedByUserId: tenant.userId || null,
+        notes
+      })
+
+      return NextResponse.json({
+        excluded: true,
+        rowId,
+        previousMatchedType: previousMatchedType || null,
+        previousMatchedId: previousMatchedPaymentId || previousMatchedId || null,
+        previousMatchedRecordId: previousMatchedId || null,
+        previousMatchedPaymentId: previousMatchedPaymentId || null
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+    }
+
+    // ── BigQuery fallback ──
+    await ensureFinanceInfrastructure()
 
     await assertReconciliationPeriodIsMutable(periodId)
 
