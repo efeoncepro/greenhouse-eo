@@ -6,6 +6,11 @@
 
 ## 2026-03-21
 
+### Payroll period correction now commits the renamed period atomically
+- `Editar período` ya no falla con `Unable to read updated payroll period.` cuando se corrige el mes/año imputable de una nómina no exportada.
+- Causa raíz corregida: `pgUpdatePayrollPeriod()` releía el período corregido fuera de la transacción que acababa de cambiar `period_id`; ahora la relectura final ocurre dentro de la misma transacción y el `PATCH` devuelve el período actualizado de forma consistente.
+- Se agregó un test unitario de regresión para blindar el caso real `2026-03 -> 2026-02`.
+
 ### Payroll KPI source now comes from ICO member metrics
 - `Payroll` ya no calcula `On-Time` y `RpA` mensual leyendo directo desde `notion_ops.tareas`. El cálculo del período ahora consulta `ICO` por `member_id`.
 - La estrategia es `materialized-first`: primero intenta leer `ico_engine.metrics_by_member` para el mes y, si faltan colaboradores, cae a cálculo live por miembro como fallback.

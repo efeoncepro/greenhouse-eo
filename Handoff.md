@@ -40,6 +40,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 08:05 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir el fallo al guardar `Editar período` en `Payroll` cuando se cambiaba el mes/año imputable y el backend respondía `Unable to read updated payroll period.`
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/postgres-store.test.ts`
+
+### Verificacion
+- `pnpm exec eslint src/lib/payroll/postgres-store.ts src/lib/payroll/postgres-store.test.ts` ✅
+- `pnpm vitest run src/lib/payroll/postgres-store.test.ts` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- Causa raíz confirmada: `pgUpdatePayrollPeriod()` actualizaba el período dentro de la transacción y luego intentaba releerlo con `pgGetPayrollPeriod()` fuera de esa misma transacción; si el `period_id` cambiaba (`2026-03 -> 2026-02`), la lectura podía no ver aún el nuevo row y disparaba el `500`.
+- La relectura final ahora ocurre con `client.query(...)` dentro de la transacción y quedó cubierta por un test unitario de regresión.
+- Pendiente: probar manualmente en `staging` el caso real `Marzo 2026 -> Febrero 2026` para confirmar que el modal ya guarda, cierra y deja el período corregido en `draft`.
+
 ## 2026-03-21 07:55 -03
 
 ### Agente

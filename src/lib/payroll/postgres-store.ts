@@ -1161,7 +1161,18 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
       ]
     )
 
-    const updated = await pgGetPayrollPeriod(nextPeriodId)
+    const [updatedRow] = await queryRows<PgPeriodRow>(
+      `
+        SELECT *
+        FROM greenhouse_payroll.payroll_periods
+        WHERE period_id = $1
+        LIMIT 1
+      `,
+      [nextPeriodId],
+      client
+    )
+
+    const updated = updatedRow ? mapPeriod(updatedRow) : null
 
     if (!updated) {
       throw new PayrollValidationError('Unable to read updated payroll period.', 500)
