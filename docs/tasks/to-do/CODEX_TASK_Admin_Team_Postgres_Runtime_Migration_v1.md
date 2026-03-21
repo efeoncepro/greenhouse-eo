@@ -1,5 +1,9 @@
 # CODEX TASK — Admin Team: Migración de Mutaciones BigQuery → PostgreSQL (v1)
 
+## Delta 2026-03-21
+- Person 360 Consumer Cutover completado: `get-people-list.ts` y `get-person-detail.ts` ahora Postgres-first — cerrado por trabajo en `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1`
+- Implicación: los consumers de People ya leen de `greenhouse_core.members` como fuente primaria; las mutaciones Admin Team deben priorizar `identity_profile_id` linkage en DDL para mantener consistencia con People enrichments
+
 ## Estado
 
 Nuevo. Derivado del cierre de `CODEX_TASK_Admin_Team_Module_v2.md`, cuyo scope funcional (CRUD + drawers + APIs) quedó completamente implementado sobre BigQuery.
