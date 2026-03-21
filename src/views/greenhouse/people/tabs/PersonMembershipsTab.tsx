@@ -107,9 +107,9 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
   }
 
   return (
-    <Grid container spacing={6}>
-      <Grid size={{ xs: 12 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+    <Grid container spacing={6} sx={{ minWidth: 0 }}>
+      <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
+        <Card elevation={0} sx={{ minWidth: 0, width: '100%', border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
             title={`Organizaciones (${memberships.length})`}
             subheader='Membresías y asignaciones operativas en organizaciones'
@@ -130,8 +130,8 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
               </Box>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
+            <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
+              <Table size='small' sx={{ minWidth: 860 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Organización</TableCell>
