@@ -48,7 +48,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Objetivo del turno
 - Reabrir el diagnóstico del scroll horizontal en `/people/[memberId]` porque seguía ocurriendo en cualquier tab.
 - Hallazgo estructural: el problema no era solo `PersonTabs`; el shell vertical del dashboard no estaba forzando `min-width: 0` ni conteniendo overflow horizontal en el wrapper/content main, así que cualquier hijo con ancho de min-content podía inflar el ancho total del documento.
-- Hallazgo raíz adicional: `src/@layouts/VerticalLayout.tsx` montaba el content wrapper como `is-full` al lado del sidebar, lo que podía producir `sidebar + 100%` de ancho total. Se corrige a `flex-auto min-is-0`.
 
 ### Rama
 - Rama usada: `develop`
@@ -58,12 +57,10 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Development / Preview
 
 ### Archivos tocados
-- `src/@layouts/VerticalLayout.tsx` — content wrapper pasa de `is-full` a `flex-auto min-is-0` para ocupar el espacio restante junto al sidebar en vez de sumar `100% + nav`
 - `src/@layouts/styles/shared/StyledMain.tsx` — `min-inline-size: 0`, `max-inline-size: 100%` y `overflow-x: hidden` en el `main` compartido
 - `src/@layouts/styles/vertical/StyledContentWrapper.tsx` — `min-inline-size: 0` y `overflow-x: hidden` en el wrapper del layout vertical
 
 ### Verificacion
-- `pnpm exec eslint src/@layouts/VerticalLayout.tsx src/@layouts/styles/shared/StyledMain.tsx src/@layouts/styles/vertical/StyledContentWrapper.tsx` ✅
 - `pnpm exec eslint src/@layouts/styles/shared/StyledMain.tsx src/@layouts/styles/vertical/StyledContentWrapper.tsx src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonView.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/PersonLeftSidebar.tsx` ✅
 
 ### Riesgos o pendientes
