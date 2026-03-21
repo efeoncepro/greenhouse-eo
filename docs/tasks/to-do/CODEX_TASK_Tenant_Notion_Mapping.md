@@ -436,3 +436,22 @@ Esto NO está en scope de este task. Se documenta para el Codex task de Admin UI
 - **PKs usan TEXT con prefijo `sns-`** — consistente con la convención del codebase donde todas las tablas core usan TEXT PKs con prefijos (org-, svc-, etc.). El `source_id` de `space_notion_sources` usa formato `sns-{uuid}`.
 - **`notion-frame-io`** (repo: cesargrowth11/notion-frame-io) comparte el database ID de Tareas con `notion-bigquery`. Eventualmente necesita space_id awareness para multi-tenant, pero es un task separado.
 - **`notion_workspace_source_bindings` coexiste** con `space_notion_sources` durante la transición. La primera FK a `notion_workspaces` (legacy), la segunda FK a `spaces` (Account 360). Cuando `notion_workspaces` se deprece completamente, `space_notion_sources` será la única tabla de binding.
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.spaces` (Account 360 — ya implementado)
+  - `greenhouse_core.organizations` (Account 360 — ya implementado)
+  - Pipeline `notion-bigquery` (repo externo `cesargrowth11/notion-bigquery`)
+- **Impacta a:**
+  - `CODEX_TASK_Services_Runtime_Closure_v1` — services BQ ETL puede usar `space_id` estampado por este task
+  - `CODEX_TASK_Campaign_360_v2` — campaigns se vinculan a projects por space; `space_id` en `notion_ops` mejora el join
+  - `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2` — Frame.io analytics necesita `space_id` consistency
+  - `CODEX_TASK_Business_Units_Canonical_v2` — BU operativa derivada de Notion se beneficia de `space_id` directo
+- **Archivos owned:**
+  - `src/types/space-notion.ts`
+  - DDL de `greenhouse_core.space_notion_sources`
+  - Queries que usan `UNNEST(@notion_project_ids)` → migran a `WHERE space_id = @space_id`
+  - `src/lib/tenant/access.ts` (carga de `projectScopes`)

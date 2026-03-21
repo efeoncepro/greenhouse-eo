@@ -99,11 +99,16 @@ export interface PersonIntegrations {
 }
 
 export interface PersonAccess {
+  canViewMemberships: boolean
   canViewAssignments: boolean
   canViewActivity: boolean
   canViewCompensation: boolean
   canViewPayroll: boolean
   canViewFinance: boolean
+  canViewHrProfile: boolean
+  canViewAiTools: boolean
+  canViewIdentityContext: boolean
+  canViewAccessContext: boolean
   visibleTabs: PersonTab[]
 }
 
@@ -195,6 +200,37 @@ export interface PersonFinanceOverview {
   }>
 }
 
+export interface PersonIdentityContext {
+  eoId: string | null
+  identityProfileId: string | null
+  linkedUserId: string | null
+  canonicalEmail: string | null
+  primarySourceSystem: string | null
+  defaultAuthMode: string | null
+  linkedSystems: string[]
+  sourceLinkCount: number
+  userCount: number
+  hasMemberFacet: boolean
+  hasUserFacet: boolean
+  hasCrmFacet: boolean
+  crmContactId: string | null
+}
+
+export interface PersonAccessContext {
+  userId: string
+  userPublicId: string | null
+  email: string | null
+  tenantType: string
+  authMode: string | null
+  status: string
+  active: boolean
+  lastLoginAt: string | null
+  defaultPortalHomePath: string | null
+  roleCodes: string[]
+  routeGroups: string[]
+  canOpenAdminUser: boolean
+}
+
 export interface PeopleMetaPayload {
   canManageTeam: boolean
   visibleTabs: PersonTab[]
@@ -205,6 +241,11 @@ export interface PeopleMetaPayload {
     payroll: boolean
     finance: boolean
     capacity: boolean
+    identity: boolean
+    access: boolean
+    hrProfile: boolean
+    aiTools: boolean
+    deliveryContext: boolean
   }
   allowedRoleCodes: string[]
 }
@@ -215,6 +256,8 @@ export interface PersonDetail {
   summary: PersonSummary
   integrations: PersonIntegrations
   linkedUserId?: string | null
+  identityContext?: PersonIdentityContext | null
+  accessContext?: PersonAccessContext | null
   capacity?: PersonCapacitySummary | null
   financeSummary?: PersonFinanceSummary | null
   assignments?: PersonDetailAssignment[]

@@ -256,3 +256,19 @@ La `v2` es la referencia operativa de implementacion porque alinea SCIM con:
 - `client_users` como auth principal
 - `identity_profile` como persona canonica
 - el runtime real de Greenhouse a marzo de 2026
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.client_users` (auth principal — ya implementado)
+  - `greenhouse_core.roles`, `greenhouse_core.user_role_assignments` (Identity & Access V2 — ya implementado)
+  - `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` — bridge a `identity_profile` depende de cobertura de reconciliación
+- **Impacta a:**
+  - `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` — nuevos usuarios SCIM deben reconciliarse con `identity_profiles`
+  - `CODEX_TASK_Greenhouse_Home_Nexa_v2` — usuarios SCIM deben poder aterrizar en `/home`
+- **Archivos owned:**
+  - `src/app/api/scim/v2/**` (endpoints SCIM)
+  - DDL de `greenhouse_core.scim_tenant_mappings`
+  - Helper de auth SCIM (bearer token validation)

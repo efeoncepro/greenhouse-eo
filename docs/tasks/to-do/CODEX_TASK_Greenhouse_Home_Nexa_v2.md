@@ -316,3 +316,23 @@ Ante conflicto, prevalecen:
 - `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `project_context.md`
 - `AGENTS.md`
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - Auth y tenant context del portal (ya implementado)
+  - `portalHomePath` redirect mechanism (ya implementado)
+  - `@google/genai` (ya instalado)
+  - Capabilities y route groups existentes
+- **Impacta a:**
+  - Ninguna otra task directamente — `/home` es una nueva superficie aditiva
+- **Archivos owned:**
+  - `src/app/(dashboard)/home/page.tsx`
+  - `src/views/greenhouse/home/*`
+  - `src/app/api/home/*`
+  - `src/lib/nexa/*`
+  - `src/config/greenhouse-home-greetings.ts`
+  - `src/config/greenhouse-home-suggestions.ts`
+  - `src/types/home.ts`

@@ -393,3 +393,21 @@ Ante conflicto, prevalecen:
 - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/Greenhouse_Account_360_Object_Model_v1.md`
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.service_modules` (catálogo canónico — ya implementado)
+  - `greenhouse_core.client_service_modules` (asignaciones — ya implementado)
+  - Services Architecture spec (`docs/architecture/Greenhouse_Services_Architecture_v1.md`)
+- **Impacta a:**
+  - `CODEX_TASK_Financial_Intelligence_Layer_v2` — analytics por BU comercial consume metadata
+  - `CODEX_TASK_Campaign_360_v2` — campaigns pueden asociarse a BU derivada
+  - `CODEX_TASK_Services_Runtime_Closure_v1` — `linea_de_servicio` se alinea con `module_code`
+  - `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2` — ICO metrics por BU operativa
+- **Archivos owned:**
+  - DDL de `greenhouse_core.business_line_metadata`
+  - Helper/query de enrichment de BU metadata
+  - `greenhouse_conformed.dim_business_lines` (BigQuery derivada)

@@ -383,3 +383,21 @@ Si Claude toma esta lane:
 - debe evitar mover widgets analiticos a PostgreSQL antes de tener sync listo
 - debe privilegiar el corte de estados mutables y conciliacion
 - cualquier cambio UI se deja para una fase separada salvo que sea indispensable para mantener contratos
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.clients`, `greenhouse_core.members`, `greenhouse_core.providers` (ya implementados)
+  - `greenhouse_sync.outbox_events` (ya implementado)
+  - Source sync pipelines (`GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`)
+- **Impacta a:**
+  - `CODEX_TASK_Financial_Intelligence_Layer_v2` — requiere Finance runtime en Postgres para trends, P&L summary, allocations UI
+  - `CODEX_TASK_Staff_Augmentation_Module_v2` — placement economics dependen de Finance operational
+  - `CODEX_TASK_Business_Units_Canonical_v2` — Finance BU analytics necesita store Postgres estable
+- **Archivos owned:**
+  - `src/lib/finance/postgres-store.ts`
+  - `src/lib/finance/postgres-store-slice2.ts`
+  - `src/app/api/finance/income/**`, `src/app/api/finance/expenses/**`, `src/app/api/finance/accounts/**`
+  - `scripts/setup-postgres-finance*.sql`, `scripts/backfill-postgres-finance*.ts`

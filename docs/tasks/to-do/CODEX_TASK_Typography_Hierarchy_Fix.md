@@ -268,3 +268,18 @@ Si durante la implementación hay un elemento que no está en la tabla de arriba
 - **Poppins es estática.** Cargar solo los pesos necesarios: 400, 500, 600, 700. No cargar 800 ni 900 — no se usan en el dashboard.
 - **`next/font` es el método preferido** para cargar fuentes en Next.js 14+ porque optimiza automáticamente (self-hosting, preload, font-display swap).
 - **Probar en Chrome DevTools** después de los cambios: inspeccionar elementos y verificar que Computed Style muestra la familia y peso correctos. Buscar cualquier elemento donde "Poppins" aparezca en computed font-family pero debería ser "DM Sans".
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - Brand Guideline v1.0, sección 6 (Tipografía)
+  - MUI theme config en `src/@core/theme/`
+  - Poppins + DM Sans Google Fonts disponibles
+- **Impacta a:**
+  - Ninguna otra task directamente — cambio puramente visual/tipográfico
+- **Archivos owned:**
+  - `src/@core/theme/typography.ts` (o equivalente de config tipográfica MUI)
+  - Font imports en `src/app/layout.tsx` o global styles
+  - Component-level `sx` overrides que hardcodeen fontWeight/fontFamily

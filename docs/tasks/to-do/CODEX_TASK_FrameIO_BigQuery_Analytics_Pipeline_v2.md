@@ -303,3 +303,22 @@ Con foco en:
 - `frameio_ops.versions`
 - `frameio_ops.comments`
 - enrich controlado de `ico_engine.v_tasks_enriched`
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.spaces` (Account 360 — ya implementado)
+  - ICO Engine y `ico_engine.v_tasks_enriched` (ya implementado)
+  - `notion-frameio-sync` repo externo (auth OAuth existente)
+  - `CODEX_TASK_Tenant_Notion_Mapping` — `space_id` consistency en `notion_ops.*`
+- **Impacta a:**
+  - Creative Hub — gallery de assets, CSC timing, comparativas entre proyectos
+  - `CODEX_TASK_Campaign_360_v2` — Frame.io enrichment por campaign
+  - `CODEX_TASK_Business_Units_Canonical_v2` — ICO metrics por BU operativa con Frame.io data
+- **Archivos owned:**
+  - DDL de `greenhouse_core.space_frameio_sources`
+  - BigQuery `frameio_ops.*` tables
+  - BigQuery `greenhouse_conformed.frameio_*` conformed tables
+  - Extensions a `ico_engine.v_tasks_enriched`

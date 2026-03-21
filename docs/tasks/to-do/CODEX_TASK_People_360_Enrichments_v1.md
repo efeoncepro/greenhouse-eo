@@ -49,3 +49,19 @@ Extender `People` como capa de lectura transversal del colaborador, consumiendo 
 - `People` expone mejor el contexto cross-module del colaborador
 - los enrichments nuevos vienen de modulos dueños ya existentes
 - no se duplican namespaces ni ownership de mutacion
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` — enrichments requieren cobertura alta de `person_360`
+  - `CODEX_TASK_People_Unified_View_v3` (completada — base del módulo)
+  - HR Core, Finance, AI Tooling módulos existentes (como fuentes de enrichment)
+- **Impacta a:**
+  - `CODEX_TASK_Team_Identity_Capacity_System_v2` — capacity enrichment converge con People 360
+  - `CODEX_TASK_Staff_Augmentation_Module_v2` — People enrichment muestra `assignment_type` badges
+- **Archivos owned:**
+  - `src/views/greenhouse/people/tabs/*` (extensiones de tabs)
+  - `src/app/api/people/meta/route.ts` (contrato de enrichments)
+  - `src/lib/people/get-people-meta.ts`, `src/lib/people/get-person-detail.ts`

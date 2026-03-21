@@ -300,3 +300,20 @@ La `v2` es la referencia operativa para implementacion porque:
 - respeta `Space` como boundary
 - evita arrays como semantica estructural
 - encaja con el `ICO Engine` context-agnostic actual
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.spaces` (Account 360 — ya implementado)
+  - ICO Engine pattern context-agnostic (ya implementado)
+  - `CODEX_TASK_Tenant_Notion_Mapping` — `space_id` en `notion_ops.*` mejora el join project → campaign
+- **Impacta a:**
+  - `CODEX_TASK_Financial_Intelligence_Layer_v2` — financial attribution por campaña (fase posterior)
+  - `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2` — Frame.io enrichment por campaign dimension
+- **Archivos owned:**
+  - DDL de `greenhouse_core.campaigns`, `greenhouse_core.campaign_project_links`
+  - `src/app/api/campaigns/**` (routes internas)
+  - `src/app/api/client/campaigns/**` (routes client-facing)
+  - Store CRUD helpers de campaigns

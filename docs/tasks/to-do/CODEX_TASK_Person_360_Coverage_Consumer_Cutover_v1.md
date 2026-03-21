@@ -50,3 +50,20 @@ Completar la adopcion real de `Person 360` en Greenhouse sobre dos frentes:
 - baja medible en perfiles incompletos o no reconciliados
 - consumers nuevos o migrados usan `identity_profile_id` como raiz
 - `person_360` queda explicitamente reconocido como backbone de lectura de persona
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.identity_profiles` (ya implementado)
+  - `greenhouse_serving.person_360` (ya implementado)
+  - `CODEX_TASK_Person_360_Profile_Unification_v1` (completada)
+- **Impacta a:**
+  - `CODEX_TASK_People_360_Enrichments_v1` — enrichments requieren cobertura alta de `person_360` para ser útiles
+  - `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1` — convergencia memberships/assignments depende de identidad resuelta
+  - `CODEX_TASK_SCIM_User_Provisioning_v2` — SCIM bridge a `identity_profile` depende de cobertura de reconciliación
+- **Archivos owned:**
+  - Consumers en `src/lib/people/` que lean de fuentes fragmentadas
+  - `greenhouse_serving.person_360` view (extensiones de reconciliación)
+  - Queries que resuelven `member`, `client_user`, `crm_contact` como raíces separadas

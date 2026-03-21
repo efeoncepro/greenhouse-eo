@@ -4,7 +4,7 @@ import type { CompensationVersion } from '@/types/payroll'
 import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMember, PersonIntegrations } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isGreenhousePostgresConfigured } from '@/lib/postgres/client'
 import { getPersonMemberships } from '@/lib/account-360/organization-store'
 import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import { getPersonHrContext } from '@/lib/person-360/get-person-hr'
@@ -12,6 +12,7 @@ import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
 import { getMemberPayrollHistory } from '@/lib/payroll/get-payroll-entries'
 import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
 import { getPersonOperationalMetrics } from '@/lib/people/get-person-operational-metrics'
+import { buildPersonAccessContext, buildPersonIdentityContext } from '@/lib/people/person-context'
 import {
   PeopleValidationError,
   getIdentityConfidence,
@@ -28,6 +29,7 @@ import {
   toStringArray,
   enrichProfile
 } from '@/lib/people/shared'
+import { getPersonProfileByEoId, getPersonProfileByMemberId } from '@/lib/person-360/get-person-profile'
 import { getAssignedHoursMonth, getCapacityHealth, getExpectedMonthlyThroughput, getUtilizationPercent } from '@/lib/team-capacity/shared'
 import type { TeamIdentityProvider, TeamRoleCategory } from '@/types/team'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
@@ -410,21 +412,6 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null) =
   )
 }
 
-const resolveLinkedUserId = async (identityProfileId: string | null): Promise<string | null> => {
-  if (!identityProfileId || !isGreenhousePostgresConfigured()) return null
-
-  try {
-    const rows = await runGreenhousePostgresQuery<{ user_id: string }>(
-      `SELECT user_id FROM greenhouse_core.client_users WHERE identity_profile_id = $1 AND active LIMIT 1`,
-      [identityProfileId]
-    )
-
-    return rows[0]?.user_id ?? null
-  } catch {
-    return null
-  }
-}
-
 export const getPersonDetail = async ({
   memberId: memberIdOrEoId,
   access
@@ -568,6 +555,26 @@ export const getPersonDetail = async ({
 
   // Person 360 contextual enrichment (Postgres-only)
   if (isGreenhousePostgresConfigured()) {
+    if (access.canViewIdentityContext || access.canViewAccessContext) {
+      tasks.push(
+        (resolved?.eoId ? getPersonProfileByEoId(resolved.eoId) : getPersonProfileByMemberId(memberId)).then(profile => {
+          if (!profile) {
+            return
+          }
+
+          if (access.canViewIdentityContext) {
+            detail.identityContext = buildPersonIdentityContext(profile, detail.linkedUserId ?? null)
+          }
+
+          if (access.canViewAccessContext) {
+            detail.accessContext = buildPersonAccessContext(profile)
+          }
+        }).catch(error => {
+          console.warn(`[people/${memberId}] person_360 context failed:`, error instanceof Error ? error.message : error)
+        })
+      )
+    }
+
     tasks.push(
       getPersonDeliveryContext(memberId).then(ctx => {
         detail.deliveryContext = ctx
@@ -576,7 +583,7 @@ export const getPersonDetail = async ({
       })
     )
 
-    if (access.canViewCompensation) {
+    if (access.canViewHrProfile) {
       tasks.push(
         getPersonHrContext(memberId).then(ctx => {
           detail.hrContext = ctx

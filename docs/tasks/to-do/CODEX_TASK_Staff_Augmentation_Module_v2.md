@@ -351,3 +351,22 @@ Ante conflicto, prevalecen:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse_core.client_team_assignments` (anchor operacional — ya implementado en BigQuery)
+  - `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1` — `assignment_type` column requiere assignments en Postgres
+  - `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1` — rate tracking y economics dependen de Finance operacional
+  - Services Architecture (opcional: link a `service_id`)
+- **Impacta a:**
+  - `CODEX_TASK_People_360_Enrichments_v1` — People muestra `assignment_type` badges
+  - `CODEX_TASK_Team_Identity_Capacity_System_v2` — capacity planning integra placements
+  - `CODEX_TASK_Financial_Intelligence_Layer_v2` — placement economics como input de analytics
+- **Archivos owned:**
+  - DDL de `greenhouse_core.staff_aug_placements`, `staff_aug_onboarding_items`, `staff_aug_events`
+  - `src/app/api/internal/staff-augmentation/**` (routes)
+  - `src/app/(dashboard)/internal/staff-augmentation/**` (pages)
+  - ALTER de `client_team_assignments.assignment_type`

@@ -146,3 +146,22 @@ Todo enriquecimiento de capacidad debe seguir colgando del mismo `Collaborator`:
 - mover writes de roster fuera de `/api/admin/team/*`
 - crear una identidad paralela de colaborador
 - tratar señales heurísticas actuales como cierre definitivo del dominio de capacity
+
+---
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - `greenhouse.team_members.member_id` (ancla canónica — ya implementado)
+  - `greenhouse.client_team_assignments` (relación operativa — ya implementado)
+  - `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1` — capacity APIs se benefician de store Postgres
+- **Impacta a:**
+  - `CODEX_TASK_People_360_Enrichments_v1` — capacity contracts estables alimentan enrichments de People
+  - `CODEX_TASK_Staff_Augmentation_Module_v2` — capacity planning integra placements
+  - `CODEX_TASK_Greenhouse_Home_Nexa_v2` — Home puede mostrar capacity summary como pendiente/contexto
+- **Archivos owned:**
+  - `src/lib/team-queries.ts`
+  - `src/app/api/team/members/route.ts`
+  - `src/app/api/team/capacity/route.ts`
+  - `src/app/api/team/by-project/[projectId]/route.ts`
+  - `src/app/api/team/by-sprint/[sprintId]/route.ts`
