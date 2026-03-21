@@ -6,6 +6,10 @@
 
 ## 2026-03-20
 
+### Dashboard layout shell — contención horizontal estructural
+- El `main` compartido del dashboard vertical ahora fuerza `min-inline-size: 0`, `max-inline-size: 100%` y `overflow-x: hidden`, evitando que un hijo con ancho de min-content infle el ancho total del documento.
+- El wrapper vertical del layout también quedó con `min-inline-size: 0` y contención horizontal, para que el overflow local se resuelva dentro del módulo y no termine creando scroll horizontal de página completa.
+
 ### People detail — scroll horizontal contenido en tabs y sidebar
 - `/people/[memberId]` ya no deja que la tablist estilo pill empuje el ancho total de la página: la superficie de tabs ahora recorta overflow horizontal y fija `minWidth: 0` en el contenedor del panel.
 - La columna izquierda del detail también quedó protegida contra strings largos (`emails`, handles de contacto), usando `overflowWrap: anywhere` y wrappers con `minWidth: 0` para que el contenido rompa línea en vez de ensanchar el layout completo.
