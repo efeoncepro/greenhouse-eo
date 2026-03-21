@@ -149,7 +149,7 @@ const PersonView = ({ memberId }: Props) => {
             onEditCompensation={() => setCompensationOpen(true)}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+        <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={{ minWidth: 0 }}>
           <PersonTabs
             detail={detail}
             isAdmin={isAdmin}
