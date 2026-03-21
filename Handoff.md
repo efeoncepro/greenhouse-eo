@@ -40,6 +40,133 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-20 21:35 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Resolver el scroll horizontal residual en `/people/[memberId]` antes de seguir con `People 360 Enrichments`.
+- Diagnóstico confirmado: el desborde no venía del layout global sino de la combinación entre `CustomTabList` con márgenes negativos estilo Vuexy y contenido lateral con strings largos sin wrap defensivo.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/views/greenhouse/people/PersonTabs.tsx` — wrapper con `overflowX: hidden`, `minWidth: 0` en el panel root y `TabPanel` acotados para que la tablist pill no empuje el ancho total de la página
+- `src/views/greenhouse/people/PersonView.tsx` — `Grid` izquierdo con `minWidth: 0` para evitar que el flex/grid child fuerce overflow horizontal
+- `src/views/greenhouse/people/PersonLeftSidebar.tsx` — filas de contacto con `minWidth: 0` y `overflowWrap: anywhere` para emails/handles largos
+
+### Verificacion
+- `pnpm exec eslint src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonView.tsx src/views/greenhouse/people/PersonLeftSidebar.tsx` ✅
+- Verificación visual pendiente en `dev-greenhouse.efeoncepro.com/people/andres-carlosama`
+
+### Riesgos o pendientes
+- El fix ataca las dos causas más probables del overflow reportado, pero falta validación manual en navegador para confirmar que no queda un tercer desborde dentro de alguna tab específica.
+- Si el scroll persiste, siguiente sospechoso: contenedores de tabla en tabs (`memberships`, `payroll` o `finance`) que necesiten `overflowX: auto` local en vez de dejar que el overflow suba al page root.
+
+---
+
+## 2026-03-20 21:18 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Revisar `CODEX_TASK_People_360_Enrichments_v1` contra el runtime actual de `People` y cerrar el primer slice de implementacion sin cruzarse con el trabajo activo de Claude.
+- Scope ejecutado: contrato backend de `People` (`meta`, `permissions`, tipos y enrichments declarativos).
+- Scope adicional ejecutado: `identityContext` y `accessContext` read-only desde `person_360` para que `People` exponga mejor facetas canónicas y contexto de acceso sin duplicar `Admin > Users`.
+- Scope explicitamente evitado por ahora: `PersonTabs.tsx`, `PersonView.tsx`, `PersonCompensationTab.tsx` y superficies Payroll/scroll que Claude esta tocando hoy.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: por definir
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/people/get-people-meta.ts`
+- `src/lib/people/permissions.ts`
+- `src/types/people.ts`
+- `src/lib/people/get-person-detail.ts` — `hrContext` ahora se carga cuando el acceso real es `hr-profile`, no cuando el usuario solo puede ver compensación
+- `src/lib/people/permissions.test.ts` — test unitario de matriz de acceso y contrato meta
+- `src/lib/people/person-context.ts` — helper puro para mapear `person_360` a `identityContext` / `accessContext`
+- `src/lib/people/person-context.test.ts` — tests unitarios de mapeo 360
+
+### Verificacion
+- Revisión previa de coordinación en `Handoff.md` ✅
+- Contraste inicial de task + runtime:
+  - `CODEX_TASK_People_360_Enrichments_v1` leída ✅
+  - `People` ya expone tabs/componentes `hr-profile` y `ai-tools`, pero `people/meta` y `permissions` aún no los oficializan ✅
+- Implementado:
+  - `supportedTabs` ahora incluye `hr-profile` y `ai-tools`
+  - `availableEnrichments` ahora declara `identity`, `access`, `hrProfile`, `aiTools`, `deliveryContext`
+  - `PersonAccess` ahora incluye `canViewMemberships`, `canViewHrProfile`, `canViewAiTools`
+  - `visibleTabs` queda alineado con los permisos reales de HR Core y AI Tooling
+- Implementado también:
+  - `PersonDetail.identityContext` resume `EO-ID`, `identityProfileId`, `canonicalEmail`, `linkedSystems`, facets y CRM link desde `person_360`
+  - `PersonDetail.accessContext` resume `userId`, estado, auth mode, roles, route groups y último login cuando existe user facet y el viewer tiene permiso
+  - `getPersonDetail()` usa `person_360` solo como enrich read-only; no mueve ownership de mutación
+- `pnpm exec eslint src/lib/people/get-people-meta.ts src/lib/people/permissions.ts src/lib/people/get-person-detail.ts src/types/people.ts src/lib/people/permissions.test.ts` ✅
+- `pnpm vitest run src/lib/people/permissions.test.ts` ✅
+- `pnpm exec eslint src/lib/people/get-people-meta.ts src/lib/people/permissions.ts src/lib/people/get-person-detail.ts src/lib/people/person-context.ts src/lib/people/permissions.test.ts src/lib/people/person-context.test.ts src/types/people.ts` ✅
+- `pnpm vitest run src/lib/people/permissions.test.ts src/lib/people/person-context.test.ts` ✅
+
+### Riesgos o pendientes
+- Riesgo de cruce con Claude sigue vigente si se toca UI de persona durante su fix de Payroll/scroll.
+- `PersonAiToolsTab` sigue dependiendo de un `walletId` para ledger; la task `People 360 Enrichments` todavía necesita una segunda fase para exponer un summary o contrato consumible sin adivinanza desde la vista de persona.
+- La UI todavía no consume `identityContext` ni `accessContext`; eso debe entrar en un slice posterior coordinado con Claude.
+- Siguiente paso recomendado: summary backend para AI Tooling en persona y luego consumo UI de `identity/access` cuando se libere la zona visual.
+
+---
+
+## 2026-03-20 21:00 -03
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Corregir bug crítico en cálculo de bonos payroll (`bonusOtdMin` → `bonusOtdMax`)
+- Simplificar UI de compensaciones: 4 campos bonus → 2, renombrar labels
+- Agregar CTA "Editar compensación" en ficha del colaborador
+- Agregar tests de integración del flujo de bonos
+- Fix scroll horizontal en vista de persona (Grid anidado)
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- Development / Preview
+
+### Archivos tocados
+- `src/lib/payroll/calculate-payroll.ts` — bug fix: líneas 94-95, `bonusMin` → `bonusMax`
+- `src/lib/payroll/recalculate-entry.ts` — mismo bug fix: líneas 191-192
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx` — 4 campos bonus → 2 ("Bono On-Time", "Bono RpA"), "Asignación teletrabajo" → "Bono conectividad"
+- `src/views/greenhouse/people/tabs/PersonCompensationTab.tsx` — CTA editar, labels simplificados, eliminado Grid wrapper
+- `src/views/greenhouse/people/PersonTabs.tsx` — prop `onEditCompensation`, eliminado Grid container anidado (fix scroll)
+- `src/views/greenhouse/people/PersonView.tsx` — cableado `onEditCompensation` a PersonTabs
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx` — columnas tabla simplificadas, "Teletrabajo" → "Conectividad"
+- `src/config/greenhouse-nomenclature.ts` — `GH_COMPENSATION` con labels centralizados
+- `src/lib/payroll/compensation-bonus-flow.test.ts` — 13 scenario tests nuevos (44 tests totales payroll)
+
+### Verificacion
+- `npx tsc --noEmit` ✅
+- `npx vitest run src/lib/payroll/` — 44 tests passing ✅
+- Commits: `c028aba`, `fc5086a`, `e97c6b6`
+
+### Riesgos o pendientes
+- **Scroll horizontal en person detail** — Se eliminaron Grid containers anidados en PersonTabs y PersonCompensationTab, pero el usuario reporta que sigue. Pendiente investigar si otra vista/tab tiene un elemento desbordante.
+- **Threshold OTD**: `payroll_bonus_config` tiene 94%, usuario indica que debería ser 89%. Ajustar en BD.
+- **Smoke test e2e**: Crear compensación desde ficha → período → calcular → verificar bonos correctos post-fix.
+
+---
+
 ## 2026-03-20 18:00 -03
 
 ### Agente

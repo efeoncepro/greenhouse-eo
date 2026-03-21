@@ -77,20 +77,20 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
       {/* Contact */}
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant='overline' color='text.secondary'>Contacto</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
           <i className='tabler-mail' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-          <Typography variant='body2'>{member.publicEmail}</Typography>
+          <Typography variant='body2' sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>{member.publicEmail}</Typography>
         </Box>
         {member.internalEmail && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
             <i className='tabler-mail' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-            <Typography variant='body2' color='text.secondary'>{member.internalEmail}</Typography>
+            <Typography variant='body2' color='text.secondary' sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>{member.internalEmail}</Typography>
           </Box>
         )}
         {member.contactChannel && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
             <i className='tabler-message' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-            <Typography variant='body2'>
+            <Typography variant='body2' sx={{ minWidth: 0, overflowWrap: 'anywhere' }}>
               {member.contactChannel}{member.contactHandle ? ` · ${member.contactHandle}` : ''}
             </Typography>
           </Box>

@@ -91,23 +91,25 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
   return (
     <TabContext value={activeTab}>
-      <CustomTabList
-        onChange={handleChange}
-        variant='scrollable'
-        pill='true'
-        aria-label='Secciones del perfil del colaborador'
-      >
-        {visibleTabs.map(tab => (
-          <Tab
-            key={tab.value}
-            value={tab.value}
-            label={tab.label}
-            icon={<i className={tab.icon} aria-hidden='true' />}
-            iconPosition='start'
-          />
-        ))}
-      </CustomTabList>
-      <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', marginTop: 24 }}>
+      <Box sx={{ minWidth: 0, width: '100%', overflowX: 'hidden' }}>
+        <CustomTabList
+          onChange={handleChange}
+          variant='scrollable'
+          pill='true'
+          aria-label='Secciones del perfil del colaborador'
+        >
+          {visibleTabs.map(tab => (
+            <Tab
+              key={tab.value}
+              value={tab.value}
+              label={tab.label}
+              icon={<i className={tab.icon} aria-hidden='true' />}
+              iconPosition='start'
+            />
+          ))}
+        </CustomTabList>
+      </Box>
+      <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', marginTop: 24, minWidth: 0 }}>
         {/* Screen reader announcement for async tab loading */}
         <Box
           aria-live='polite'
@@ -115,7 +117,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
           sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
         />
 
-            <TabPanel value='memberships' className='p-0'>
+            <TabPanel value='memberships' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'memberships' && (
                 <PersonMembershipsTab
                   memberId={detail.member.memberId}
@@ -128,37 +130,37 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
               )}
             </TabPanel>
 
-            <TabPanel value='activity' className='p-0'>
+            <TabPanel value='activity' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'activity' && (
                 <PersonActivityTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
-            <TabPanel value='compensation' className='p-0'>
+            <TabPanel value='compensation' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'compensation' && (
                 <PersonCompensationTab compensation={detail.currentCompensation} onEdit={onEditCompensation} />
               )}
             </TabPanel>
 
-            <TabPanel value='payroll' className='p-0'>
+            <TabPanel value='payroll' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'payroll' && (
                 <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
-            <TabPanel value='finance' className='p-0'>
+            <TabPanel value='finance' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'finance' && (
                 <PersonFinanceTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
-            <TabPanel value='hr-profile' className='p-0'>
+            <TabPanel value='hr-profile' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'hr-profile' && (
                 <PersonHrProfileTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
-            <TabPanel value='ai-tools' className='p-0'>
+            <TabPanel value='ai-tools' className='p-0' sx={{ minWidth: 0, overflowX: 'hidden' }}>
               {activeTab === 'ai-tools' && (
                 <PersonAiToolsTab memberId={detail.member.memberId} />
               )}
