@@ -16,7 +16,7 @@
 - `Payroll` y la ficha de `People` ya no fuerzan crear una nueva compensación cuando solo se quiere corregir la versión vigente con la misma fecha efectiva.
 - Si se mantiene la fecha `Vigente desde`, el sistema actualiza la versión actual; si se cambia la fecha, crea una nueva versión y conserva el histórico.
 - La UI del drawer ahora hace explícito ese comportamiento con copy y CTA distintos (`Guardar cambios` vs `Crear nueva versión`).
-- El backend valida que una versión ya usada en una nómina calculada no pueda reescribirse; en ese caso obliga a crear una nueva versión con nueva vigencia.
+- La regla backend se afinó: si la versión solo fue usada en períodos `calculated`, todavía puede corregirse in-place; el bloqueo con nueva vigencia aplica recién cuando esa versión ya participó en períodos `approved` o `exported`.
 - Se agregaron tests unitarios/componentes para blindar el modo de guardado de compensación y evitar que esta UX vuelva a parecer mensual.
 
 ### People detail overflow — local regression fix in tab strip

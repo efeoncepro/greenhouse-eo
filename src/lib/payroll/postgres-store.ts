@@ -33,6 +33,10 @@ import {
   toNullableNumber,
   toNumber
 } from '@/lib/payroll/shared'
+import {
+  getCompensationVersionLockedMessage,
+  isCompensationVersionLockedByPayroll
+} from '@/lib/payroll/compensation-versioning'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 // ---------------------------------------------------------------------------
@@ -857,20 +861,29 @@ export const pgUpdateCompensationVersion = async ({
       )
     }
 
-    const [usedEntry] = await queryRows<{ entry_id: string }>(
+    const usedStatuses = await queryRows<{ status: string | null }>(
       `
-        SELECT entry_id
-        FROM greenhouse_payroll.payroll_entries
-        WHERE compensation_version_id = $1
-        LIMIT 1
+        SELECT DISTINCT p.status
+        FROM greenhouse_payroll.payroll_entries AS e
+        INNER JOIN greenhouse_payroll.payroll_periods AS p
+          ON p.period_id = e.period_id
+        WHERE e.compensation_version_id = $1
       `,
       [versionId],
       client
     )
 
-    if (usedEntry) {
+    if (
+      isCompensationVersionLockedByPayroll(
+        usedStatuses.map(row =>
+          row.status === 'approved' || row.status === 'exported' || row.status === 'calculated'
+            ? row.status
+            : 'draft'
+        )
+      )
+    ) {
       throw new PayrollValidationError(
-        'This compensation version has already been used in payroll. Choose a new effective date to create a new version.',
+        getCompensationVersionLockedMessage(),
         409,
         { versionId }
       )

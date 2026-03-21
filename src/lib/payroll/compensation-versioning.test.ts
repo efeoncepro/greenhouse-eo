@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getCompensationSaveMode } from './compensation-versioning'
+import {
+  getCompensationSaveMode,
+  getCompensationVersionLockedMessage,
+  isCompensationVersionLockedByPayroll
+} from './compensation-versioning'
 
 describe('getCompensationSaveMode', () => {
   it('updates the existing version when the effective date is unchanged', () => {
@@ -32,5 +36,21 @@ describe('getCompensationSaveMode', () => {
         effectiveFrom: '2026-03-01'
       })
     ).toBe('create')
+  })
+
+  it('allows updating when payroll usage is only in recalculable periods', () => {
+    expect(isCompensationVersionLockedByPayroll(['calculated', 'draft'])).toBe(false)
+  })
+
+  it('locks updating when payroll usage already reached an approved period', () => {
+    expect(isCompensationVersionLockedByPayroll(['calculated', 'approved'])).toBe(true)
+  })
+
+  it('locks updating when payroll usage already reached an exported period', () => {
+    expect(isCompensationVersionLockedByPayroll(['exported'])).toBe(true)
+  })
+
+  it('documents the locked message shown when the version is already frozen by payroll', () => {
+    expect(getCompensationVersionLockedMessage()).toContain('approved or exported payroll period')
   })
 })

@@ -24,6 +24,10 @@ import {
   toNumber,
   toTimestampString
 } from '@/lib/payroll/shared'
+import {
+  getCompensationVersionLockedMessage,
+  isCompensationVersionLockedByPayroll
+} from '@/lib/payroll/compensation-versioning'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import {
@@ -745,19 +749,28 @@ export const updateCompensationVersion = async ({
     )
   }
 
-  const [usedEntry] = await runPayrollQuery<{ entry_id: string | null }>(
+  const usedStatuses = await runPayrollQuery<{ status: string | null }>(
     `
-      SELECT entry_id
-      FROM \`${projectId}.greenhouse.payroll_entries\`
-      WHERE compensation_version_id = @versionId
-      LIMIT 1
+      SELECT DISTINCT p.status
+      FROM \`${projectId}.greenhouse.payroll_entries\` AS e
+      INNER JOIN \`${projectId}.greenhouse.payroll_periods\` AS p
+        ON p.period_id = e.period_id
+      WHERE e.compensation_version_id = @versionId
     `,
     { versionId }
   )
 
-  if (usedEntry?.entry_id) {
+  if (
+    isCompensationVersionLockedByPayroll(
+      usedStatuses.map(row =>
+        row.status === 'approved' || row.status === 'exported' || row.status === 'calculated'
+          ? row.status
+          : 'draft'
+      )
+    )
+  ) {
     throw new PayrollValidationError(
-      'This compensation version has already been used in payroll. Choose a new effective date to create a new version.',
+      getCompensationVersionLockedMessage(),
       409,
       { versionId }
     )

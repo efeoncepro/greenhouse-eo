@@ -40,6 +40,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 07:35 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Corregir el bloqueo excesivo al editar compensaciones en `People` / `Payroll`: la versión vigente ya no debe quedar congelada solo por existir una `payroll_entry` en un período recalculable.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/lib/payroll/compensation-versioning.ts`
+- `src/lib/payroll/compensation-versioning.test.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/get-compensation.ts`
+
+### Verificacion
+- `pnpm exec eslint src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/get-compensation.ts` ✅
+- `pnpm vitest run src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- La edición in-place queda permitida si la compensación solo fue usada en períodos `calculated`; si ya fue usada en períodos `approved` o `exported`, el backend sigue obligando a crear una nueva versión con nueva vigencia.
+- Sigue pendiente validar manualmente en `staging` que el drawer de `People` guarde bien cambios de bono cuando el período todavía es recalculable.
+
 ## 2026-03-21 07:22 -03
 
 ### Agente
