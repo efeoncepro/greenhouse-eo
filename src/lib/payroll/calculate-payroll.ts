@@ -10,6 +10,7 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { canRecalculatePayrollPeriod } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import {
@@ -203,8 +204,8 @@ export const calculatePayroll = async ({
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
-  if (period.status === 'approved' || period.status === 'exported') {
-    throw new PayrollValidationError('Approved payroll periods cannot be recalculated.', 409)
+  if (!canRecalculatePayrollPeriod(period.status)) {
+    throw new PayrollValidationError('Exported payroll periods cannot be recalculated.', 409)
   }
 
   const range = getPeriodRangeFromId(periodId)
@@ -272,7 +273,9 @@ export const calculatePayroll = async ({
         SET
           status = 'calculated',
           calculated_at = CURRENT_TIMESTAMP(),
-          calculated_by = @actorIdentifier
+          calculated_by = @actorIdentifier,
+          approved_at = NULL,
+          approved_by = NULL
         WHERE period_id = @periodId
       `,
       {

@@ -323,7 +323,50 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                   </Button>
                 </>
               )}
-              {(period.status === 'approved' || period.status === 'exported') && (
+              {period.status === 'approved' && (
+                <>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='info'
+                    startIcon={<i className='tabler-refresh' />}
+                    onClick={handleCalculate}
+                    disabled={isPending}
+                  >
+                    Recalcular
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='success'
+                    startIcon={<i className='tabler-file-type-pdf' />}
+                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    disabled={isPending}
+                  >
+                    PDF
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    color='success'
+                    startIcon={<i className='tabler-file-spreadsheet' />}
+                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
+                    disabled={isPending}
+                  >
+                    Excel
+                  </Button>
+                  <Button
+                    variant='tonal'
+                    size='small'
+                    startIcon={<i className='tabler-file-export' />}
+                    onClick={handleExport}
+                    disabled={isPending}
+                  >
+                    CSV
+                  </Button>
+                </>
+              )}
+              {period.status === 'exported' && (
                 <>
                   <Button
                     variant='tonal'
@@ -411,7 +454,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
         open={confirmApprove}
         setOpen={setConfirmApprove}
         title='¿Aprobar esta nómina?'
-        description='Una vez aprobada, las entries no podrán editarse. Esta acción no se puede revertir.'
+        description='Después de aprobar, aún podrás hacer ajustes hasta exportar/cerrar la nómina. Si recalculas o editas entries, el período volverá a Calculado y deberá aprobarse nuevamente antes de exportar.'
         confirmLabel='Sí, aprobar'
         confirmColor='success'
         onConfirm={handleApprove}

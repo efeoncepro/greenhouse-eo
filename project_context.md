@@ -3,6 +3,22 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-21 Payroll period lifecycle — approved is editable, exported is final
+- Se ajustó la semántica operativa de estados de `Payroll` para alinearla con el flujo real de pago:
+  - el período imputable sigue siendo el mes calendario (`2026-02`, `2026-03`, etc.)
+  - la nómina puede aprobarse dentro del flujo de revisión y seguir ajustándose antes de su pago/exportación
+- Regla operativa derivada:
+  - `approved` ya no significa “cerrado final”; significa “listo para pago/revisión”
+  - `exported` pasa a ser el candado final del período
+  - por lo tanto, un período `approved` todavía puede:
+    - recalcularse
+    - editar entries manuales
+    - reutilizar la compensación vigente para correcciones in-place
+- Comportamiento derivado:
+  - si un período `approved` se recalcula o se edita una entry, el sistema lo devuelve a `calculated`
+  - después de eso, debe aprobarse nuevamente antes de exportar
+  - solo los períodos `exported` quedan completamente congelados para recalcular, editar entries o bloquear cambios de compensación reutilizada
+
 ## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
 - Se confirmó una brecha entre la intención funcional de `Payroll` y su runtime real:
   - los montos de compensación (`salario base`, `bono conectividad`, `bono máximo On-Time`, `bono máximo RpA`) ya vivían correctamente versionados en `compensation_versions`

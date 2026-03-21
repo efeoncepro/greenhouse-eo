@@ -42,8 +42,8 @@ describe('getCompensationSaveMode', () => {
     expect(isCompensationVersionLockedByPayroll(['calculated', 'draft'])).toBe(false)
   })
 
-  it('locks updating when payroll usage already reached an approved period', () => {
-    expect(isCompensationVersionLockedByPayroll(['calculated', 'approved'])).toBe(true)
+  it('keeps approved periods editable until payroll is exported', () => {
+    expect(isCompensationVersionLockedByPayroll(['calculated', 'approved'])).toBe(false)
   })
 
   it('locks updating when payroll usage already reached an exported period', () => {
@@ -51,6 +51,6 @@ describe('getCompensationSaveMode', () => {
   })
 
   it('documents the locked message shown when the version is already frozen by payroll', () => {
-    expect(getCompensationVersionLockedMessage()).toContain('approved or exported payroll period')
+    expect(getCompensationVersionLockedMessage()).toContain('exported payroll period')
   })
 })

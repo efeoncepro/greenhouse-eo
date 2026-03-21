@@ -27,6 +27,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { PayrollEntry, PayrollPeriod, PeriodStatus } from '@/types/payroll'
+import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
 import BonusInput from './BonusInput'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
@@ -44,7 +45,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
 
-  const isEditable = periodStatus === 'calculated'
+  const isEditable = canEditPayrollEntries(periodStatus)
 
   const toggleExpand = (entryId: string) => {
     setExpandedId(prev => (prev === entryId ? null : entryId))

@@ -16,8 +16,14 @@
 - `Payroll` y la ficha de `People` ya no fuerzan crear una nueva compensación cuando solo se quiere corregir la versión vigente con la misma fecha efectiva.
 - Si se mantiene la fecha `Vigente desde`, el sistema actualiza la versión actual; si se cambia la fecha, crea una nueva versión y conserva el histórico.
 - La UI del drawer ahora hace explícito ese comportamiento con copy y CTA distintos (`Guardar cambios` vs `Crear nueva versión`).
-- La regla backend se afinó: si la versión solo fue usada en períodos `calculated`, todavía puede corregirse in-place; el bloqueo con nueva vigencia aplica recién cuando esa versión ya participó en períodos `approved` o `exported`.
+- La regla backend se afinó: si la versión solo fue usada en períodos `draft`, `calculated` o `approved`, todavía puede corregirse in-place; el bloqueo con nueva vigencia aplica recién cuando esa versión ya participó en períodos `exported`.
 - Se agregaron tests unitarios/componentes para blindar el modo de guardado de compensación y evitar que esta UX vuelva a parecer mensual.
+
+### Payroll period lifecycle now treats export as the final lock
+- `Payroll` ya no trata `approved` como estado final. Ahora una nómina aprobada todavía puede recalcularse y sus entries siguen editables hasta que se exporta/cierra.
+- `exported` pasa a ser el candado real del período: los períodos exportados ya no pueden recalcularse ni aceptar cambios manuales en entries o compensaciones reutilizadas.
+- Si un período `approved` se recalcula o se edita una entry, el sistema lo devuelve automáticamente a `calculated` para exigir una nueva aprobación antes de exportar.
+- La UI del período ahora explica esta regla al aprobar, muestra `Recalcular` también para `approved`, y mantiene `CSV/PDF/Excel` como acciones de salida cuando el período está listo o ya exportado.
 
 ### People detail overflow — local regression fix in tab strip
 - `/people/[memberId]` vuelve a envolver el `CustomTabList` pill y el panel en filas `Grid`, restaurando el buffer estructural que absorbía los márgenes negativos del tabstrip.

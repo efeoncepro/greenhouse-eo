@@ -1098,7 +1098,13 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
   await runGreenhousePostgresQuery(
     `
       UPDATE greenhouse_payroll.payroll_periods
-      SET status = 'calculated', calculated_at = CURRENT_TIMESTAMP, calculated_by_user_id = $1, updated_at = CURRENT_TIMESTAMP
+      SET
+        status = 'calculated',
+        calculated_at = CURRENT_TIMESTAMP,
+        calculated_by_user_id = $1,
+        approved_at = NULL,
+        approved_by_user_id = NULL,
+        updated_at = CURRENT_TIMESTAMP
       WHERE period_id = $2
     `,
     [actorUserId, periodId]

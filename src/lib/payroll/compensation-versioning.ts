@@ -1,5 +1,7 @@
 import type { CompensationVersion, PeriodStatus } from '@/types/payroll'
 
+import { isPayrollPeriodFinalized } from '@/lib/payroll/period-lifecycle'
+
 export type CompensationSaveMode = 'create' | 'update'
 
 export const getCompensationSaveMode = ({
@@ -16,11 +18,9 @@ export const getCompensationSaveMode = ({
   return 'create'
 }
 
-const LOCKED_PAYROLL_STATUSES: PeriodStatus[] = ['approved', 'exported']
-
 export const isCompensationVersionLockedByPayroll = (
   statuses: Array<PeriodStatus | null | undefined>
-) => statuses.some(status => !!status && LOCKED_PAYROLL_STATUSES.includes(status))
+) => statuses.some(status => !!status && isPayrollPeriodFinalized(status))
 
 export const getCompensationVersionLockedMessage = () =>
-  'This compensation version has already been used in an approved or exported payroll period. Choose a new effective date to create a new version.'
+  'This compensation version has already been used in an exported payroll period. Choose a new effective date to create a new version.'

@@ -40,6 +40,71 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 07:43 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Ajustar la semántica de estados de `Payroll` para que una nómina `approved` siga siendo editable/recalculable hasta el momento de exportarla/cerrarla.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/lib/payroll/period-lifecycle.ts`
+- `src/lib/payroll/period-lifecycle.test.ts`
+- `src/lib/payroll/compensation-versioning.ts`
+- `src/lib/payroll/compensation-versioning.test.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/route.ts`
+- `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+
+### Verificacion
+- `pnpm exec eslint src/lib/payroll/period-lifecycle.ts src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/lib/payroll/get-compensation.ts src/lib/payroll/postgres-store.ts 'src/app/api/hr/payroll/entries/[entryId]/route.ts' src/views/greenhouse/payroll/PayrollEntryTable.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx` ✅
+- `pnpm vitest run src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- `approved` ahora significa “listo para pago/revisión”, no “cerrado final”; el candado definitivo pasa a ser `exported`.
+- Si se recalcula un período `approved` o se edita una entry dentro de él, el período vuelve a `calculated` y debe aprobarse nuevamente antes de exportar.
+- Sigue pendiente validar manualmente en `staging` que el flujo `approved -> edición/recálculo -> calculated -> reapprove -> export` se vea claro para HR.
+
+---
+
+## 2026-03-21 — Finance Postgres Runtime Migration
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Cerrar pendientes de `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`:
+  1. Migrar PUT income y PUT expenses a Postgres-first
+  2. Migrar reconciliación runtime (match/unmatch/exclude/auto-match)
+  3. Verificar TypeScript limpio
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Task
+- `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
+
+### Estado al iniciar
+- Slice 1 completo (accounts, suppliers, exchange_rates) — 7 rutas Postgres-first
+- Slice 2 parcial (income GET/POST, expenses GET/POST, payments POST) — 7 rutas Postgres-first
+- PUT income/expenses y reconciliación siguen en BigQuery
+
+---
+
 ## 2026-03-21 07:35 -03
 
 ### Agente

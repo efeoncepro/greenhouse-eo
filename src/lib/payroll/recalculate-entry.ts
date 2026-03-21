@@ -8,10 +8,11 @@ import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { canEditPayrollEntries, shouldReopenApprovedPayrollPeriod } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
-import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/postgres-store'
+import { isPayrollPostgresEnabled, pgGetActiveBonusConfig, pgSetPeriodCalculated } from '@/lib/payroll/postgres-store'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -130,10 +131,12 @@ const validateBonusAmount = ({
 
 export const recalculatePayrollEntry = async ({
   entryId,
-  input
+  input,
+  actorIdentifier
 }: {
   entryId: string
   input: UpdatePayrollEntryInput
+  actorIdentifier?: string | null
 }): Promise<PayrollEntry> => {
   if (!isPayrollPostgresEnabled()) {
     await ensurePayrollInfrastructure()
@@ -168,8 +171,8 @@ export const recalculatePayrollEntry = async ({
 
   const { period, otdThreshold, otdFloor, rpaThreshold } = await getBonusConfigForPeriod(entry.periodId)
 
-  if (period.status === 'approved' || period.status === 'exported') {
-    throw new PayrollValidationError('Approved payroll entries cannot be edited.', 409)
+  if (!canEditPayrollEntries(period.status)) {
+    throw new PayrollValidationError('Exported payroll entries cannot be edited.', 409)
   }
 
   const bonusConfig: BonusProrationConfig = { otdThreshold, otdFloor, rpaThreshold }
@@ -271,6 +274,29 @@ export const recalculatePayrollEntry = async ({
   }
 
   await upsertPayrollEntry(updatedEntry)
+
+  if (shouldReopenApprovedPayrollPeriod(period.status)) {
+    if (isPayrollPostgresEnabled()) {
+      await pgSetPeriodCalculated(entry.periodId, actorIdentifier ?? null)
+    } else {
+      await runPayrollQuery(
+        `
+          UPDATE \`${getProjectId()}.greenhouse.payroll_periods\`
+          SET
+            status = 'calculated',
+            calculated_at = CURRENT_TIMESTAMP(),
+            calculated_by = @actorIdentifier,
+            approved_at = NULL,
+            approved_by = NULL
+          WHERE period_id = @periodId
+        `,
+        {
+          periodId: entry.periodId,
+          actorIdentifier: actorIdentifier ?? null
+        }
+      )
+    }
+  }
 
   const persisted = await getPayrollEntryById(entryId)
 
