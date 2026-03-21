@@ -162,7 +162,11 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
             <TabPanel value='hr-profile' className='p-0'>
               {activeTab === 'hr-profile' && (
-                <PersonHrProfileTab memberId={detail.member.memberId} />
+                <PersonHrProfileTab
+                  memberId={detail.member.memberId}
+                  hrContext={detail.hrContext ?? null}
+                  defaultOperationalMetrics={detail.operationalMetrics ?? null}
+                />
               )}
             </TabPanel>
 

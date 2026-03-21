@@ -9,6 +9,7 @@ import type { PersonDetail } from '@/types/people'
 import PersonTabs from './PersonTabs'
 
 const replace = vi.fn()
+const hrProfileTabCapture = vi.hoisted(() => ({ current: null as unknown }))
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
@@ -37,7 +38,11 @@ vi.mock('./tabs/PersonFinanceTab', () => ({
 }))
 
 vi.mock('./tabs/PersonHrProfileTab', () => ({
-  default: () => <div>HR content</div>
+  default: (props: unknown) => {
+    hrProfileTabCapture.current = props
+
+    return <div>HR content</div>
+  }
 }))
 
 vi.mock('./tabs/PersonAiToolsTab', () => ({
@@ -129,6 +134,7 @@ const detail: PersonDetail = {
 describe('PersonTabs', () => {
   beforeEach(() => {
     replace.mockReset()
+    hrProfileTabCapture.current = null
   })
 
   it('keeps the pill tablist and panel inside grid rows to avoid root overflow', () => {
@@ -142,5 +148,73 @@ describe('PersonTabs', () => {
     expect(activePanel.closest('.MuiGrid-root')).toBeInTheDocument()
     expect(container.querySelector('.MuiGrid-container')).toBeInTheDocument()
     expect(liveRegion).toHaveStyle({ width: '1px', height: '1px' })
+  })
+
+  it('passes hrContext and operational metrics into the HR profile tab', () => {
+    const hrDetail: PersonDetail = {
+      ...detail,
+      access: {
+        ...detail.access,
+        canViewHrProfile: true,
+        visibleTabs: ['hr-profile']
+      },
+      operationalMetrics: {
+        rpaAvg30d: 1.8,
+        otdPercent30d: 90,
+        tasksCompleted30d: 12,
+        tasksActiveNow: 4,
+        projectBreakdown: []
+      },
+      hrContext: {
+        identityProfileId: 'ip-1',
+        eoId: 'EO-001',
+        memberId: 'member-1',
+        displayName: 'Andres Carlosama',
+        email: 'andres@efeoncepro.com',
+        departmentName: 'Diseño',
+        jobLevel: 'senior',
+        employmentType: 'full_time',
+        hireDate: '2026-03-15',
+        contractEndDate: null,
+        dailyRequired: true,
+        supervisorMemberId: 'member-2',
+        supervisorName: 'Daniela Ferreira',
+        compensation: {
+          payRegime: 'international',
+          currency: 'USD',
+          baseSalary: 675,
+          contractType: 'indefinido'
+        },
+        leave: {
+          vacationAllowance: 15,
+          vacationCarried: 2,
+          vacationUsed: 3,
+          vacationReserved: 1,
+          vacationAvailable: 13,
+          personalAllowance: 2,
+          personalUsed: 1,
+          pendingRequests: 1,
+          approvedRequestsThisYear: 2,
+          totalApprovedDaysThisYear: 4
+        }
+      }
+    }
+
+    renderWithTheme(<PersonTabs detail={hrDetail} />)
+
+    expect(screen.getByText('HR content')).toBeInTheDocument()
+    expect(hrProfileTabCapture.current).toEqual(
+      expect.objectContaining({
+        memberId: 'member-1',
+        hrContext: expect.objectContaining({
+          departmentName: 'Diseño',
+          supervisorName: 'Daniela Ferreira'
+        }),
+        defaultOperationalMetrics: expect.objectContaining({
+          rpaAvg30d: 1.8,
+          otdPercent30d: 90
+        })
+      })
+    )
   })
 })
