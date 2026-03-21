@@ -37,6 +37,10 @@ import {
   getCompensationVersionLockedMessage,
   isCompensationVersionLockedByPayroll
 } from '@/lib/payroll/compensation-versioning'
+import {
+  canEditPayrollPeriodMetadata,
+  doesPayrollPeriodUpdateRequireReset
+} from '@/lib/payroll/period-lifecycle'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 // ---------------------------------------------------------------------------
@@ -1056,29 +1060,115 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
-  if (current.status !== 'draft') {
-    throw new PayrollValidationError('Only draft payroll periods can be updated.', 409)
+  if (!canEditPayrollPeriodMetadata(current.status)) {
+    throw new PayrollValidationError('Exported payroll periods cannot be updated.', 409)
   }
 
-  if (input.ufValue !== undefined && input.ufValue !== null && (!Number.isFinite(input.ufValue) || input.ufValue < 0)) {
+  const nextYear = input.year ?? current.year
+  const nextMonth = input.month ?? current.month
+  const nextUfValue = input.ufValue ?? current.ufValue
+
+  const nextTaxTableVersion =
+    input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)
+
+  const nextNotes = input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
+
+  if (!Number.isInteger(nextYear) || nextYear < 2024) {
+    throw new PayrollValidationError('year must be a valid integer.')
+  }
+
+  if (!Number.isInteger(nextMonth) || nextMonth < 1 || nextMonth > 12) {
+    throw new PayrollValidationError('month must be between 1 and 12.')
+  }
+
+  if (nextUfValue !== undefined && nextUfValue !== null && (!Number.isFinite(nextUfValue) || nextUfValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
 
-  await runGreenhousePostgresQuery(
-    `
-      UPDATE greenhouse_payroll.payroll_periods
-      SET uf_value = $1, tax_table_version = $2, notes = $3, updated_at = CURRENT_TIMESTAMP
-      WHERE period_id = $4
-    `,
-    [
-      input.ufValue ?? current.ufValue,
-      input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
-      input.notes === undefined ? current.notes : normalizeNullableString(input.notes),
-      periodId
-    ]
-  )
+  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
+  const identityChanged = nextPeriodId !== current.periodId
 
-  return pgGetPayrollPeriod(periodId)
+  const requiresReset = doesPayrollPeriodUpdateRequireReset({
+    currentYear: current.year,
+    currentMonth: current.month,
+    currentUfValue: current.ufValue,
+    currentTaxTableVersion: current.taxTableVersion,
+    nextYear,
+    nextMonth,
+    nextUfValue: nextUfValue ?? null,
+    nextTaxTableVersion
+  })
+
+  return withGreenhousePostgresTransaction(async client => {
+    if (identityChanged) {
+      const [existing] = await queryRows<{ period_id: string }>(
+        `
+          SELECT period_id
+          FROM greenhouse_payroll.payroll_periods
+          WHERE period_id = $1
+          LIMIT 1
+        `,
+        [nextPeriodId],
+        client
+      )
+
+      if (existing) {
+        throw new PayrollValidationError('Payroll period already exists.', 409)
+      }
+    }
+
+    if (requiresReset) {
+      await client.query(
+        `
+          DELETE FROM greenhouse_payroll.payroll_entries
+          WHERE period_id = $1
+        `,
+        [periodId]
+      )
+    }
+
+    await client.query(
+      `
+        UPDATE greenhouse_payroll.payroll_periods
+        SET
+          period_id = $1,
+          year = $2,
+          month = $3,
+          status = $4,
+          calculated_at = $5,
+          calculated_by_user_id = $6,
+          approved_at = $7,
+          approved_by_user_id = $8,
+          uf_value = $9,
+          tax_table_version = $10,
+          notes = $11,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE period_id = $12
+      `,
+      [
+        nextPeriodId,
+        nextYear,
+        nextMonth,
+        requiresReset ? 'draft' : current.status,
+        requiresReset ? null : current.calculatedAt,
+        requiresReset ? null : current.calculatedBy,
+        requiresReset ? null : current.approvedAt,
+        requiresReset ? null : current.approvedBy,
+        nextUfValue ?? null,
+        nextTaxTableVersion,
+        nextNotes,
+        periodId
+      ]
+    )
+
+    const updated = await pgGetPayrollPeriod(nextPeriodId)
+
+    if (!updated) {
+      throw new PayrollValidationError('Unable to read updated payroll period.', 500)
+    }
+
+    return updated
+  })
 }
 
 export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string | null) => {

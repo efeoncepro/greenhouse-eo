@@ -19,6 +19,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - después de eso, debe aprobarse nuevamente antes de exportar
   - solo los períodos `exported` quedan completamente congelados para recalcular, editar entries o bloquear cambios de compensación reutilizada
 
+## Delta 2026-03-21 Payroll period correction — imputed month/year can be fixed before export
+- Se detectó un caso operativo real: una nómina puede haberse creado como `2026-03` solo para prueba aunque en realidad corresponda al mes imputable `2026-02`.
+- Regla operativa derivada:
+  - `year` y `month` del período son la identidad del mes imputable, no del mes de pago
+  - por lo tanto, deben poder corregirse mientras el período no haya sido `exported`
+- Comportamiento derivado:
+  - `Editar período` ahora permite corregir `year/month` además de `ufValue`, `taxTableVersion` y `notes`
+  - si ese cambio altera la base de cálculo (`year`, `month`, `ufValue` o `taxTableVersion`), el período vuelve a `draft` y sus `payroll_entries` se eliminan para obligar un recálculo limpio
+  - no se permite “renombrar” un período exportado ni moverlo encima de un `periodId` ya existente
+
 ## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
 - Se confirmó una brecha entre la intención funcional de `Payroll` y su runtime real:
   - los montos de compensación (`salario base`, `bono conectividad`, `bono máximo On-Time`, `bono máximo RpA`) ya vivían correctamente versionados en `compensation_versions`

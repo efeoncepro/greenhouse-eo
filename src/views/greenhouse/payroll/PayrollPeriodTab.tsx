@@ -16,6 +16,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -25,6 +26,10 @@ import CustomTextField from '@core/components/mui/TextField'
 import { ConfirmDialog } from '@/components/dialogs'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import {
+  canEditPayrollPeriodMetadata,
+  doesPayrollPeriodUpdateRequireReset
+} from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
 import { formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
@@ -39,6 +44,8 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const [error, setError] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
   const [editMetaOpen, setEditMetaOpen] = useState(false)
+  const [editYear, setEditYear] = useState<number | ''>('')
+  const [editMonth, setEditMonth] = useState<number | ''>('')
   const [editUf, setEditUf] = useState<number | ''>('')
   const [editTaxTable, setEditTaxTable] = useState('')
   const [editNotes, setEditNotes] = useState('')
@@ -131,6 +138,8 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const openEditMeta = useCallback(() => {
     if (!period) return
 
+    setEditYear(period.year)
+    setEditMonth(period.month)
     setEditUf(period.ufValue ?? '')
     setEditTaxTable(period.taxTableVersion ?? '')
     setEditNotes(period.notes ?? '')
@@ -144,13 +153,18 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     setError(null)
 
     try {
+      const nextYear = editYear === '' ? period.year : editYear
+      const nextMonth = editMonth === '' ? period.month : editMonth
+
       const res = await fetch(`/api/hr/payroll/periods/${period.periodId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...(editUf !== '' && { ufValue: editUf }),
-          ...(editTaxTable && { taxTableVersion: editTaxTable }),
-          ...(editNotes && { notes: editNotes })
+          year: nextYear,
+          month: nextMonth,
+          ufValue: editUf === '' ? null : editUf,
+          taxTableVersion: editTaxTable || null,
+          notes: editNotes || null
         })
       })
 
@@ -167,7 +181,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     } finally {
       setEditSaving(false)
     }
-  }, [period, editUf, editTaxTable, editNotes, onRefresh])
+  }, [period, editYear, editMonth, editUf, editTaxTable, editNotes, onRefresh])
 
   if (!period) {
     return (
@@ -185,6 +199,22 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   }
 
   const status = periodStatusConfig[period.status]
+  const canEditPeriod = canEditPayrollPeriodMetadata(period.status)
+  const nextYearPreview = editYear === '' ? period.year : editYear
+  const nextMonthPreview = editMonth === '' ? period.month : editMonth
+  const nextUfPreview = editUf === '' ? null : editUf
+
+  const resetWarning =
+    canEditPeriod && doesPayrollPeriodUpdateRequireReset({
+      currentYear: period.year,
+      currentMonth: period.month,
+      currentUfValue: period.ufValue,
+      currentTaxTableVersion: period.taxTableVersion,
+      nextYear: typeof nextYearPreview === 'number' ? nextYearPreview : period.year,
+      nextMonth: typeof nextMonthPreview === 'number' ? nextMonthPreview : period.month,
+      nextUfValue: nextUfPreview,
+      nextTaxTableVersion: editTaxTable || null
+    })
 
   const totals = entries.reduce(
     (acc, e) => ({
@@ -299,6 +329,18 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                   </Button>
                 </>
               )}
+              {period.status === 'calculated' && canEditPeriod && (
+                <Button
+                  variant='tonal'
+                  size='small'
+                  color='secondary'
+                  startIcon={<i className='tabler-edit' />}
+                  onClick={openEditMeta}
+                  disabled={isPending}
+                >
+                  Editar período
+                </Button>
+              )}
               {period.status === 'calculated' && (
                 <>
                   <Button
@@ -325,6 +367,18 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
               )}
               {period.status === 'approved' && (
                 <>
+                  {canEditPeriod && (
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      color='secondary'
+                      startIcon={<i className='tabler-edit' />}
+                      onClick={openEditMeta}
+                      disabled={isPending}
+                    >
+                      Editar período
+                    </Button>
+                  )}
                   <Button
                     variant='tonal'
                     size='small'
@@ -472,6 +526,49 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
+            <Stack direction='row' spacing={2}>
+              <CustomTextField
+                select
+                fullWidth
+                size='small'
+                label='Año imputable'
+                value={editYear}
+                onChange={e => setEditYear(Number(e.target.value))}
+              >
+                {[2024, 2025, 2026, 2027, 2028].map(year => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+              <CustomTextField
+                select
+                fullWidth
+                size='small'
+                label='Mes imputable'
+                value={editMonth}
+                onChange={e => setEditMonth(Number(e.target.value))}
+              >
+                {[
+                  'Enero',
+                  'Febrero',
+                  'Marzo',
+                  'Abril',
+                  'Mayo',
+                  'Junio',
+                  'Julio',
+                  'Agosto',
+                  'Septiembre',
+                  'Octubre',
+                  'Noviembre',
+                  'Diciembre'
+                ].map((label, index) => (
+                  <MenuItem key={label} value={index + 1}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            </Stack>
             <CustomTextField
               fullWidth
               size='small'
@@ -498,6 +595,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
               value={editNotes}
               onChange={e => setEditNotes(e.target.value)}
             />
+            {resetWarning && (
+              <Alert severity='warning'>
+                Cambiar mes/año imputable, UF o tabla impositiva reiniciará este período a borrador y eliminará las entries calculadas para que puedas recalcularlo con el mes correcto.
+              </Alert>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>

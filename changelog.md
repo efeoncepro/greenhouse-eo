@@ -25,6 +25,11 @@
 - Si un período `approved` se recalcula o se edita una entry, el sistema lo devuelve automáticamente a `calculated` para exigir una nueva aprobación antes de exportar.
 - La UI del período ahora explica esta regla al aprobar, muestra `Recalcular` también para `approved`, y mantiene `CSV/PDF/Excel` como acciones de salida cuando el período está listo o ya exportado.
 
+### Payroll periods can now correct the imputed month before export
+- `Editar período` ya no sirve solo para `UF` y notas: ahora permite corregir `año` y `mes` imputable en cualquier período no exportado.
+- Si el cambio altera la base de cálculo (`year`, `month`, `ufValue` o `taxTableVersion`), el sistema elimina las `payroll_entries` existentes y devuelve el período a `draft` para forzar un recálculo limpio con el mes correcto.
+- Esto evita arrastrar KPI, asistencia y compensaciones aplicables desde un mes mal creado, por ejemplo cuando una nómina de febrero se creó por error como `2026-03`.
+
 ### People detail overflow — local regression fix in tab strip
 - `/people/[memberId]` vuelve a envolver el `CustomTabList` pill y el panel en filas `Grid`, restaurando el buffer estructural que absorbía los márgenes negativos del tabstrip.
 - Se agregó un test unitario de regresión para `PersonTabs`, de modo que futuras refactorizaciones no vuelvan a “aplanar” esa estructura sin detectar el riesgo de overflow.

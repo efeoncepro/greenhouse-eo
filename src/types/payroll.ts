@@ -130,6 +130,8 @@ export interface CreatePayrollPeriodInput {
 }
 
 export interface UpdatePayrollPeriodInput {
+  year?: number
+  month?: number
   ufValue?: number | null
   taxTableVersion?: string | null
   notes?: string | null

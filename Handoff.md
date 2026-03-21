@@ -40,6 +40,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 07:55 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Permitir corregir `mes/año imputable` en períodos de `Payroll` no exportados, reseteando el período y limpiando entries cuando el cambio altera la base de cálculo.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/types/payroll.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/route.ts`
+- `src/lib/payroll/period-lifecycle.ts`
+- `src/lib/payroll/period-lifecycle.test.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+
+### Verificacion
+- `pnpm pg:doctor --profile=runtime` ✅
+- `pnpm exec eslint src/types/payroll.ts 'src/app/api/hr/payroll/periods/[periodId]/route.ts' src/lib/payroll/period-lifecycle.ts src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/get-payroll-periods.ts src/lib/payroll/postgres-store.ts src/views/greenhouse/payroll/PayrollPeriodTab.tsx` ✅
+- `pnpm vitest run src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- Cambiar `year/month`, `ufValue` o `taxTableVersion` en un período no exportado ahora elimina las `payroll_entries` existentes y lo devuelve a `draft`; esto es intencional para no arrastrar KPIs/attendance del mes equivocado.
+- El período `exported` sigue siendo inmutable.
+- Queda pendiente validar manualmente en `staging` el caso concreto `2026-03 -> 2026-02` y comprobar que el dashboard vuelve a mostrar el período corregido como borrador, listo para recalcular.
+
+---
+
 ## 2026-03-21 07:43 -03
 
 ### Agente

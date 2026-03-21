@@ -44,6 +44,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pe
     }
 
     const updated = await updatePayrollPeriod(periodId, {
+      year:
+        body.year === undefined ? undefined : parsePayrollNumber(body.year, 'year', { integer: true, min: 2024 }) ?? undefined,
+      month:
+        body.month === undefined
+          ? undefined
+          : parsePayrollNumber(body.month, 'month', { integer: true, min: 1, max: 12 }) ?? undefined,
       ufValue:
         body.ufValue === undefined ? undefined : parsePayrollNumber(body.ufValue, 'ufValue', { allowNull: true, min: 0 }),
       taxTableVersion: body.taxTableVersion === undefined ? undefined : normalizeNullableString(body.taxTableVersion),

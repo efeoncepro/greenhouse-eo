@@ -15,6 +15,10 @@ import {
   toTimestampString
 } from '@/lib/payroll/shared'
 import {
+  canEditPayrollPeriodMetadata,
+  doesPayrollPeriodUpdateRequireReset
+} from '@/lib/payroll/period-lifecycle'
+import {
   isPayrollPostgresEnabled,
   pgListPayrollPeriods,
   pgGetPayrollPeriod,
@@ -23,6 +27,10 @@ import {
 } from '@/lib/payroll/postgres-store'
 
 const PAYROLL_PERIOD_MUTATION_TYPES = {
+  calculatedAt: 'TIMESTAMP',
+  calculatedBy: 'STRING',
+  approvedAt: 'TIMESTAMP',
+  approvedBy: 'STRING',
   ufValue: 'FLOAT64',
   taxTableVersion: 'STRING',
   notes: 'STRING'
@@ -201,36 +209,100 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
-  if (current.status !== 'draft') {
-    throw new PayrollValidationError('Only draft payroll periods can be updated.', 409)
+  if (!canEditPayrollPeriodMetadata(current.status)) {
+    throw new PayrollValidationError('Exported payroll periods cannot be updated.', 409)
   }
 
-  if (input.ufValue !== undefined && input.ufValue !== null && (!Number.isFinite(input.ufValue) || input.ufValue < 0)) {
+  const nextYear = input.year ?? current.year
+  const nextMonth = input.month ?? current.month
+  const nextUfValue = input.ufValue ?? current.ufValue
+
+  const nextTaxTableVersion =
+    input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)
+
+  const nextNotes = input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
+
+  if (!Number.isInteger(nextYear) || nextYear < 2024) {
+    throw new PayrollValidationError('year must be a valid integer.')
+  }
+
+  if (!Number.isInteger(nextMonth) || nextMonth < 1 || nextMonth > 12) {
+    throw new PayrollValidationError('month must be between 1 and 12.')
+  }
+
+  if (nextUfValue !== undefined && nextUfValue !== null && (!Number.isFinite(nextUfValue) || nextUfValue < 0)) {
     throw new PayrollValidationError('ufValue must be a non-negative number when provided.')
   }
 
+  const nextPeriodId = buildPeriodId(nextYear, nextMonth)
+  const identityChanged = nextPeriodId !== current.periodId
+
+  const requiresReset = doesPayrollPeriodUpdateRequireReset({
+    currentYear: current.year,
+    currentMonth: current.month,
+    currentUfValue: current.ufValue,
+    currentTaxTableVersion: current.taxTableVersion,
+    nextYear,
+    nextMonth,
+    nextUfValue: nextUfValue ?? null,
+    nextTaxTableVersion
+  })
+
+  if (identityChanged) {
+    const existing = await getPayrollPeriod(nextPeriodId)
+
+    if (existing) {
+      throw new PayrollValidationError('Payroll period already exists.', 409)
+    }
+  }
+
   const updateParams = {
-    periodId,
-    ufValue: input.ufValue ?? current.ufValue,
-    taxTableVersion:
-      input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion),
-    notes: input.notes === undefined ? current.notes : normalizeNullableString(input.notes)
+    currentPeriodId: periodId,
+    nextPeriodId,
+    year: nextYear,
+    month: nextMonth,
+    ufValue: nextUfValue ?? null,
+    taxTableVersion: nextTaxTableVersion,
+    notes: nextNotes,
+    status: requiresReset ? 'draft' : current.status,
+    calculatedAt: requiresReset ? null : current.calculatedAt,
+    calculatedBy: requiresReset ? null : current.calculatedBy,
+    approvedAt: requiresReset ? null : current.approvedAt,
+    approvedBy: requiresReset ? null : current.approvedBy
+  }
+
+  if (requiresReset) {
+    await runPayrollQuery(
+      `
+        DELETE FROM \`${projectId}.greenhouse.payroll_entries\`
+        WHERE period_id = @currentPeriodId
+      `,
+      { currentPeriodId: periodId }
+    )
   }
 
   await runPayrollQuery(
     `
       UPDATE \`${projectId}.greenhouse.payroll_periods\`
       SET
+        period_id = @nextPeriodId,
+        year = @year,
+        month = @month,
+        status = @status,
+        calculated_at = @calculatedAt,
+        calculated_by = @calculatedBy,
+        approved_at = @approvedAt,
+        approved_by = @approvedBy,
         uf_value = @ufValue,
         tax_table_version = @taxTableVersion,
         notes = @notes
-      WHERE period_id = @periodId
+      WHERE period_id = @currentPeriodId
     `,
     updateParams,
     buildPayrollQueryTypes(updateParams, PAYROLL_PERIOD_MUTATION_TYPES)
   )
 
-  const updated = await getPayrollPeriod(periodId)
+  const updated = await getPayrollPeriod(nextPeriodId)
 
   if (!updated) {
     throw new PayrollValidationError('Unable to read updated payroll period.', 500)
