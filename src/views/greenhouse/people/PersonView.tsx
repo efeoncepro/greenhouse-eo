@@ -139,8 +139,8 @@ const PersonView = ({ memberId }: Props) => {
 
   return (
     <>
-      <Grid container spacing={6} sx={{ minWidth: 0, width: '100%', maxWidth: '100%' }}>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }} sx={{ minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, md: 5, lg: 4 }} sx={{ minWidth: 0 }}>
           <PersonLeftSidebar
             detail={detail}
             isAdmin={isAdmin}
@@ -149,7 +149,7 @@ const PersonView = ({ memberId }: Props) => {
             onEditCompensation={() => setCompensationOpen(true)}
           />
         </Grid>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={{ minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
+        <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={{ minWidth: 0 }}>
           <PersonTabs
             detail={detail}
             isAdmin={isAdmin}

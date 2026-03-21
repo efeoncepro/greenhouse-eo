@@ -90,28 +90,26 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
   if (visibleTabs.length === 0) return null
 
   return (
-    <Box sx={{ minWidth: 0, width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
-      <TabContext value={activeTab}>
-        <Box sx={{ minWidth: 0, width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
-          <CustomTabList
-            onChange={handleChange}
-            variant='scrollable'
-            pill='true'
-            aria-label='Secciones del perfil del colaborador'
-            sx={{ minWidth: 0, maxWidth: '100%' }}
-          >
-            {visibleTabs.map(tab => (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                icon={<i className={tab.icon} aria-hidden='true' />}
-                iconPosition='start'
-              />
-            ))}
-          </CustomTabList>
-        </Box>
-        <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', marginTop: 24, minWidth: 0, maxWidth: '100%' }}>
+    <TabContext value={activeTab}>
+      <Box sx={{ minWidth: 0, width: '100%', overflowX: 'hidden' }}>
+        <CustomTabList
+          onChange={handleChange}
+          variant='scrollable'
+          pill='true'
+          aria-label='Secciones del perfil del colaborador'
+        >
+          {visibleTabs.map(tab => (
+            <Tab
+              key={tab.value}
+              value={tab.value}
+              label={tab.label}
+              icon={<i className={tab.icon} aria-hidden='true' />}
+              iconPosition='start'
+            />
+          ))}
+        </CustomTabList>
+      </Box>
+      <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', marginTop: 24, minWidth: 0 }}>
         {/* Screen reader announcement for async tab loading */}
         <Box
           aria-live='polite'
@@ -167,9 +165,8 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
                 <PersonAiToolsTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
-        </div>
-      </TabContext>
-    </Box>
+      </div>
+    </TabContext>
   )
 }
 
