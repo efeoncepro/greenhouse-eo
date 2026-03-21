@@ -7,6 +7,7 @@
 ## 2026-03-20
 
 ### Dashboard layout shell — contención horizontal estructural
+- El `VerticalLayout` ya no monta la columna de contenido como `w-full` (`is-full`) al lado del sidebar. Ahora usa `flex-auto min-is-0`, evitando sumar `sidebar + 100%` y creando overflow horizontal en páginas del dashboard.
 - El `main` compartido del dashboard vertical ahora fuerza `min-inline-size: 0`, `max-inline-size: 100%` y `overflow-x: hidden`, evitando que un hijo con ancho de min-content infle el ancho total del documento.
 - El wrapper vertical del layout también quedó con `min-inline-size: 0` y contención horizontal, para que el overflow local se resuelva dentro del módulo y no termine creando scroll horizontal de página completa.
 
