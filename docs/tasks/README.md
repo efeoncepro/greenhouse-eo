@@ -10,8 +10,9 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 ## In Progress
 
-Actualmente sin tasks activas en esta carpeta despues de la auditoria documental del `2026-03-19`.
-Las lanes parcialmente implementadas se devolvieron a `to-do` y las realmente cerradas se movieron a `complete`.
+| Task | Agente | Rama | Objetivo |
+|------|--------|------|----------|
+| [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | Claude Opus | `develop` | Slice 3 completo: PUT income/expenses + reconciliación runtime en Postgres-first. Pendiente: backfill y smoke test |
 
 ## To Do
 
@@ -36,7 +37,7 @@ Las lanes parcialmente implementadas se devolvieron a `to-do` y las realmente ce
 | 1 | [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | P0 | Alto | Medio | Parcial | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion` |
 | 2 | [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](to-do/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | P0 | Muy alto | Medio | Parcial | Subir cobertura de reconciliación y cortar consumers vivos a `person_360` |
 | 3 | ~~GREENHOUSE_IDENTITY_ACCESS_V2.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de arquitectura → `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. 12/12 items implementados |
-| 4 | [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | P0 | Alto | Medio | Avanzada | Cierre del runtime de Finance sobre PostgreSQL antes de seguir ampliando Finance |
+| 4 | [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | P0 | Alto | Medio | **In Progress** | Cierre del runtime de Finance sobre PostgreSQL antes de seguir ampliando Finance |
 | 5 | [CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md) | P1 | Alto | Medio | Diseño | Migración de mutaciones Admin Team de BigQuery a PostgreSQL; convergencia con People memberships |
 | 6 | [CODEX_TASK_People_360_Enrichments_v1.md](to-do/CODEX_TASK_People_360_Enrichments_v1.md) | P1 | Alto | Medio | Parcial | Enrichments cross-module para consolidar `People` como lectura 360 |
 | 7 | ~~CODEX_TASK_Creative_Hub_Module_v2.md~~ | — | — | — | **Cerrada** | 4/4 gaps resueltos: AND gate activación, Brand Intelligence con KPIs reales, CSC pipeline con fases explícitas, métricas con aging real por item |

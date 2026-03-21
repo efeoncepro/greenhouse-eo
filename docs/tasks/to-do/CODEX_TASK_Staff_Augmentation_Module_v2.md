@@ -1,5 +1,9 @@
 # CODEX TASK -- Staff Augmentation Module v2: Placements como extension canonica de Assignments
 
+## Delta 2026-03-21
+- Finance Postgres Runtime Migration Slice 3 completo: reconciliación y mutaciones de income/expenses ahora Postgres-first — cerrado por trabajo en `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`
+- Placement economics (`cost_rate_amount`, `billing_rate_amount`) pueden asumir write path Postgres estable
+
 ## Estado
 
 Baseline canonica de implementacion al 2026-03-19.

@@ -1,5 +1,9 @@
 # CODEX TASK — Financial Intelligence Layer v2
 
+## Delta 2026-03-21
+- Finance Postgres Runtime Migration Slice 3 completo: `updateFinanceIncomeInPostgres`, `updateFinanceExpenseInPostgres`, y reconciliación runtime ahora operacionales en Postgres-first — cerrado por trabajo en `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`
+- Prerequisito de runtime Postgres para trends, P&L summary y allocations UI ahora satisfecho
+
 ## Estado
 
 Nuevo. Derivado del cierre de `CODEX_TASK_Financial_Intelligence_Layer.md` (v1), cuya foundation de datos, client economics y P&L parcial quedaron implementados.
