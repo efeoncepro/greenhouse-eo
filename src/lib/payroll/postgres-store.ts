@@ -378,7 +378,7 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   kpiOtdQualifies: normalizeBoolean(row.kpi_otd_qualifies),
   kpiRpaQualifies: normalizeBoolean(row.kpi_rpa_qualifies),
   kpiTasksCompleted: toNullableNumber(row.kpi_tasks_completed),
-  kpiDataSource: row.kpi_data_source === 'manual' ? 'manual' : 'notion_ops',
+  kpiDataSource: row.kpi_data_source === 'manual' ? 'manual' : row.kpi_data_source === 'ico' ? 'ico' : 'notion_ops',
   bonusOtdAmount: toNumber(row.bonus_otd_amount),
   bonusRpaAmount: toNumber(row.bonus_rpa_amount),
   bonusOtherAmount: toNumber(row.bonus_other_amount),

@@ -57,7 +57,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
                 integer: true,
                 min: 0
               }),
-        kpiDataSource: body.kpiDataSource === 'manual' ? 'manual' : body.kpiDataSource === 'notion_ops' ? 'notion_ops' : undefined
+        kpiDataSource:
+          body.kpiDataSource === 'manual'
+            ? 'manual'
+            : body.kpiDataSource === 'ico'
+              ? 'ico'
+              : body.kpiDataSource === 'notion_ops'
+                ? 'notion_ops'
+                : undefined
       }
     })
 

@@ -1,9 +1,26 @@
 import 'server-only'
 
-import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, toNullableNumber, normalizeString, toTimestampString, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL, EXCLUDED_STATUSES_SQL, ICO_DIMENSIONS, type IcoDimensionKey } from './shared'
+import {
+  runIcoEngineQuery,
+  getIcoEngineProjectId,
+  toNumber,
+  toNullableNumber,
+  normalizeString,
+  toTimestampString,
+  buildMetricSelectSQL,
+  buildPeriodFilterSQL,
+  DONE_STATUSES_SQL,
+  ICO_DIMENSIONS,
+  type IcoDimensionKey
+} from './shared'
 import { ICO_DATASET, ENGINE_VERSION } from './schema'
-import type { ThresholdZone } from './metric-registry'
-import { ICO_METRIC_REGISTRY, getThresholdZone, CSC_PHASE_LABELS, type CscPhase } from './metric-registry'
+import {
+  ICO_METRIC_REGISTRY,
+  getThresholdZone,
+  CSC_PHASE_LABELS,
+  type CscPhase,
+  type ThresholdZone
+} from './metric-registry'
 
 // ─── Row Types (match BigQuery columns) ─────────────────────────────────────
 
@@ -356,9 +373,11 @@ export const computeMetricsByContext = async (
 
   // Member dimension uses UNNEST on assignee_member_ids to credit all assignees
   const isMember = dimensionKey === 'member'
+
   const fromClause = isMember
     ? `${baseTable} te, UNNEST(te.assignee_member_ids) AS member_id`
     : baseTable
+
   const whereColumn = isMember ? 'member_id' : column
 
   const [metricRows, cscRows] = await Promise.all([
@@ -524,6 +543,7 @@ interface MemberMetricRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  materialized_at: unknown
 }
 
 export const readMemberMetrics = async (
@@ -569,10 +589,74 @@ export const readMemberMetrics = async (
       completedTasks: toNumber(row.completed_tasks),
       activeTasks: toNumber(row.active_tasks)
     },
-    computedAt: null,
+    computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
     engineVersion: ENGINE_VERSION,
     source: 'materialized'
   }
+}
+
+export const readMemberMetricsBatch = async (
+  memberIds: string[],
+  periodYear: number,
+  periodMonth: number
+): Promise<Map<string, IcoMetricSnapshot>> => {
+  const normalizedMemberIds = Array.from(
+    new Set(memberIds.map(memberId => normalizeString(memberId)).filter(Boolean))
+  )
+
+  if (normalizedMemberIds.length === 0) {
+    return new Map()
+  }
+
+  const projectId = getIcoEngineProjectId()
+
+  const rows = await runIcoEngineQuery<MemberMetricRow>(`
+    SELECT *
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+    WHERE member_id IN UNNEST(@memberIds)
+      AND period_year = @periodYear
+      AND period_month = @periodMonth
+  `, { memberIds: normalizedMemberIds, periodYear, periodMonth })
+
+  const snapshots = new Map<string, IcoMetricSnapshot>()
+
+  for (const row of rows) {
+    const memberId = normalizeString(row.member_id)
+
+    if (!memberId) {
+      continue
+    }
+
+    snapshots.set(memberId, {
+      dimension: 'member',
+      dimensionValue: memberId,
+      dimensionLabel: null,
+      periodYear: toNumber(row.period_year),
+      periodMonth: toNumber(row.period_month),
+      metrics: [
+        metricValueFromRow('rpa', row.rpa_avg),
+        metricValueFromRow('otd_pct', row.otd_pct),
+        metricValueFromRow('ftr_pct', row.ftr_pct),
+        metricValueFromRow('cycle_time', row.cycle_time_avg_days),
+        metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
+        metricValueFromRow('throughput', row.throughput_count),
+        metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
+        metricValueFromRow('stuck_assets', row.stuck_asset_count),
+        metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
+      ],
+      cscDistribution: [],
+      context: {
+        totalTasks: toNumber(row.total_tasks),
+        completedTasks: toNumber(row.completed_tasks),
+        activeTasks: toNumber(row.active_tasks)
+      },
+      computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
+      engineVersion: ENGINE_VERSION,
+      source: 'materialized'
+    })
+  }
+
+  return snapshots
 }
 
 // ─── Summary for Creative Hub / Capability consumption ──────────────────────

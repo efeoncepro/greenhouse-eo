@@ -1,8 +1,8 @@
 import 'server-only'
 
-import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
-
 import ExcelJS from 'exceljs'
+
+import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
@@ -21,16 +21,11 @@ const formatCurrency = (value: number | null, currency: string): string => {
     : `US$${value.toFixed(2)}`
 }
 
-const formatPercent = (value: number | null): string => {
-  if (value === null) return '—'
+const formatKpiSourceLabel = (source: PayrollEntry['kpiDataSource']) => {
+  if (source === 'manual') return 'Manual'
+  if (source === 'ico') return 'ICO'
 
-  return `${value.toFixed(1)}%`
-}
-
-const formatFactor = (value: number | null): string => {
-  if (value === null) return '—'
-
-  return `${(value * 100).toFixed(1)}%`
+  return 'Notion Ops'
 }
 
 const applyHeaderStyle = (row: ExcelJS.Row) => {
@@ -68,12 +63,14 @@ const buildResumenSheet = (
 
   // Title
   const titleRow = sheet.addRow(['Resumen Nómina', ''])
+
   titleRow.getCell(1).font = { bold: true, size: 14 }
   sheet.mergeCells(titleRow.number, 1, titleRow.number, 2)
   sheet.addRow([])
 
   // Period metadata
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
+
   const metaData: [string, string][] = [
     ['Período', `${monthName} ${period.year}`],
     ['ID Período', period.periodId],
@@ -86,6 +83,7 @@ const buildResumenSheet = (
 
   for (const [label, value] of metaData) {
     const row = sheet.addRow([label, value])
+
     row.getCell(1).font = { bold: true }
   }
 
@@ -96,10 +94,12 @@ const buildResumenSheet = (
   const intlEntries = entries.filter(e => e.payRegime === 'international')
 
   const summaryTitle = sheet.addRow(['Totales', ''])
+
   summaryTitle.getCell(1).font = { bold: true, size: 12 }
   sheet.addRow([])
 
   const summaryHeaders = sheet.addRow(['Concepto', 'Valor'])
+
   applyHeaderStyle(summaryHeaders)
 
   const summaryData: [string, string][] = [
@@ -158,10 +158,12 @@ const buildDetalleSheet = (
   }))
 
   const headerRow = sheet.getRow(1)
+
   applyHeaderStyle(headerRow)
 
   for (const entry of entries) {
     const currency = entry.currency
+
     const row = sheet.addRow([
       entry.memberName,
       entry.memberEmail,
@@ -239,6 +241,7 @@ const buildAsistenciaSheet = (
   }))
 
   const headerRow = sheet.getRow(1)
+
   applyHeaderStyle(headerRow)
 
   for (const entry of entries) {
@@ -255,17 +258,20 @@ const buildAsistenciaSheet = (
       entry.kpiRpaAvg,
       entry.bonusRpaProrationFactor != null ? entry.bonusRpaProrationFactor : null,
       entry.bonusRpaAmount,
-      entry.kpiDataSource === 'manual' ? 'Manual' : 'Notion Ops'
+      formatKpiSourceLabel(entry.kpiDataSource)
     ])
 
     // Percent format for OTD% and factors
     const otdCell = row.getCell(7)
+
     if (typeof otdCell.value === 'number') applyPercentFormat(otdCell)
 
     const factorOtdCell = row.getCell(8)
+
     if (typeof factorOtdCell.value === 'number') applyPercentFormat(factorOtdCell)
 
     const factorRpaCell = row.getCell(11)
+
     if (typeof factorRpaCell.value === 'number') applyPercentFormat(factorRpaCell)
 
     // Currency for bonus amounts
@@ -297,6 +303,7 @@ export const generatePayrollExcel = async (periodId: string): Promise<Buffer> =>
   const entries = await getPayrollEntries(periodId)
 
   const workbook = new ExcelJS.Workbook()
+
   workbook.creator = 'Greenhouse EO'
   workbook.created = new Date()
 

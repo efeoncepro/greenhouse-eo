@@ -3,6 +3,19 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
+- Se confirmó una brecha entre la intención funcional de `Payroll` y su runtime real:
+  - los montos de compensación (`salario base`, `bono conectividad`, `bono máximo On-Time`, `bono máximo RpA`) ya vivían correctamente versionados en `compensation_versions`
+  - pero el cálculo mensual de `On-Time` y `RpA` todavía dependía de `notion_ops.tareas`
+- Regla operativa derivada:
+  - `Payroll` debe tomar los KPI mensuales de desempeño desde `ICO` por `member_id`, no directo desde Notion
+  - la fuente preferida es `ico_engine.metrics_by_member` para el `year/month` del período
+  - si ese mes aún no está materializado para un colaborador, el runtime puede hacer fallback live por miembro y congelar el snapshot resultante en `payroll_entries`
+- Impacto práctico:
+  - `Payroll` deja de depender del primer `responsable_id` de `notion_ops.tareas` para calcular bonos
+  - el match de KPI queda alineado con la identidad canónica de colaborador (`member_id`) y con la capa `ICO`
+  - períodos históricos con `kpi_data_source = notion_ops` se siguen leyendo por compatibilidad, pero los nuevos cálculos deben registrar `kpi_data_source = ico`
+
 ## Delta 2026-03-21 MUI live-region sizing pitfall — width/height numeric shorthand is unsafe for visually hidden nodes
 - Se confirmó un bug real de layout en `People`: un `aria-live` oculto dentro de `PersonTabs` usaba `sx={{ width: 1, height: 1 }}`.
 - Regla operativa derivada:

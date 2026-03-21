@@ -2,151 +2,92 @@ import 'server-only'
 
 import type { PayrollKpiDiagnostics, PayrollKpiSnapshot } from '@/types/payroll'
 
-import { getBigQueryProjectId } from '@/lib/bigquery'
-import { getTableColumns, payrollCompletedStatuses, runPayrollQuery, toNullableNumber, toNumber } from '@/lib/payroll/shared'
-
-type PayrollKpiRow = {
-  notion_user_id: string | null
-  avg_rpa: number | string | null
-  tasks_completed: number | string | null
-}
-
-type PayrollOtdRow = {
-  notion_user_id: string | null
-  otd_percent: number | string | null
-}
+import { computeMetricsByContext, readMemberMetricsBatch } from '@/lib/ico-engine/read-metrics'
+import { ensureIcoEngineInfrastructure } from '@/lib/ico-engine/schema'
 
 type FetchKpisInput = {
-  periodStart: string
-  periodEndExclusive: string
+  memberIds: string[]
+  periodYear: number
+  periodMonth: number
 }
 
-const getProjectId = () => getBigQueryProjectId()
-
-const pickFirstExistingColumn = (columns: Set<string>, candidates: string[]) => candidates.find(column => columns.has(column)) || null
-const quoteIdentifier = (identifier: string) => `\`${identifier.replace(/`/g, '``')}\``
+const getMetricValue = (
+  snapshot: { metrics: Array<{ metricId: string; value: number | null }> },
+  metricId: string
+) => snapshot.metrics.find(metric => metric.metricId === metricId)?.value ?? null
 
 export const fetchKpisForPeriod = async ({
-  periodStart,
-  periodEndExclusive
+  memberIds,
+  periodYear,
+  periodMonth
 }: FetchKpisInput): Promise<{
   snapshots: Map<string, PayrollKpiSnapshot>
   diagnostics: PayrollKpiDiagnostics
 }> => {
-  const projectId = getProjectId()
-  const columns = await getTableColumns('notion_ops', 'tareas')
-  const timeFilterColumn = pickFirstExistingColumn(columns, ['last_edited_time', 'updated_at', 'created_time'])
-  const statusColumn = pickFirstExistingColumn(columns, ['estado', 'status'])
-  const identityColumn = columns.has('responsables_ids') ? 'responsables_ids' : null
-  const rpaColumn = pickFirstExistingColumn(columns, ['rpa', 'frame_versions', 'client_change_round'])
-  const actualDateColumn = pickFirstExistingColumn(columns, ['fecha_de_completado', 'fecha_entrega', 'completed_at', 'done_at'])
-  const deadlineColumn = pickFirstExistingColumn(columns, ['fecha_límite', 'deadline', 'due_date', 'fecha_limite'])
+  const uniqueMemberIds = Array.from(new Set(memberIds.map(memberId => memberId.trim()).filter(Boolean)))
 
   const diagnostics: PayrollKpiDiagnostics = {
-    canMatchByNotionUserId: Boolean(identityColumn && timeFilterColumn && statusColumn),
-    otdAutoAvailable: Boolean(identityColumn && timeFilterColumn && statusColumn && actualDateColumn && deadlineColumn),
-    identityColumn,
-    actualDateColumn,
-    deadlineColumn,
-    timeFilterColumn
+    source: 'ico',
+    strategy: 'materialized_first_with_live_fallback',
+    periodYear,
+    periodMonth,
+    materializedMembers: 0,
+    liveComputedMembers: 0,
+    missingMembers: 0
   }
 
-  if (!identityColumn || !timeFilterColumn || !statusColumn || !rpaColumn) {
+  if (uniqueMemberIds.length === 0) {
     return {
       snapshots: new Map<string, PayrollKpiSnapshot>(),
       diagnostics
     }
   }
 
-  const kpiRows = await runPayrollQuery<PayrollKpiRow>(
-    `
-      SELECT
-        t.responsables_ids[SAFE_OFFSET(0)] AS notion_user_id,
-        ROUND(AVG(CASE
-          WHEN SAFE_CAST(t.${quoteIdentifier(rpaColumn)} AS FLOAT64) > 0 THEN SAFE_CAST(t.${quoteIdentifier(rpaColumn)} AS FLOAT64)
-        END), 2) AS avg_rpa,
-        COUNT(*) AS tasks_completed
-      FROM \`${projectId}.notion_ops.tareas\` AS t
-      WHERE t.${quoteIdentifier(statusColumn)} IN UNNEST(@completedStatuses)
-        AND t.${quoteIdentifier(timeFilterColumn)} >= TIMESTAMP(@periodStart)
-        AND t.${quoteIdentifier(timeFilterColumn)} < TIMESTAMP(@periodEndExclusive)
-        AND t.responsables_ids[SAFE_OFFSET(0)] IS NOT NULL
-        AND TRIM(t.responsables_ids[SAFE_OFFSET(0)]) != ''
-      GROUP BY notion_user_id
-    `,
-    {
-      completedStatuses: payrollCompletedStatuses,
-      periodStart,
-      periodEndExclusive
-    }
-  )
+  await ensureIcoEngineInfrastructure()
 
-  let otdMap = new Map<string, number | null>()
-
-  if (diagnostics.otdAutoAvailable && actualDateColumn && deadlineColumn) {
-    const otdRows = await runPayrollQuery<PayrollOtdRow>(
-      `
-        SELECT
-          t.responsables_ids[SAFE_OFFSET(0)] AS notion_user_id,
-          ROUND(
-            SAFE_MULTIPLY(
-              100,
-              SAFE_DIVIDE(
-                COUNTIF(
-                  SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(actualDateColumn)} AS STRING), 1, 10) AS DATE) IS NOT NULL
-                  AND SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(deadlineColumn)} AS STRING), 1, 10) AS DATE) IS NOT NULL
-                  AND SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(actualDateColumn)} AS STRING), 1, 10) AS DATE)
-                    <= SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(deadlineColumn)} AS STRING), 1, 10) AS DATE)
-                ),
-                COUNTIF(
-                  SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(actualDateColumn)} AS STRING), 1, 10) AS DATE) IS NOT NULL
-                  AND SAFE_CAST(SUBSTR(CAST(t.${quoteIdentifier(deadlineColumn)} AS STRING), 1, 10) AS DATE) IS NOT NULL
-                )
-              )
-            ),
-            2
-          ) AS otd_percent
-        FROM \`${projectId}.notion_ops.tareas\` AS t
-        WHERE t.${quoteIdentifier(statusColumn)} IN UNNEST(@completedStatuses)
-          AND t.${quoteIdentifier(timeFilterColumn)} >= TIMESTAMP(@periodStart)
-          AND t.${quoteIdentifier(timeFilterColumn)} < TIMESTAMP(@periodEndExclusive)
-          AND t.responsables_ids[SAFE_OFFSET(0)] IS NOT NULL
-          AND TRIM(t.responsables_ids[SAFE_OFFSET(0)]) != ''
-        GROUP BY notion_user_id
-      `,
-      {
-        completedStatuses: payrollCompletedStatuses,
-        periodStart,
-        periodEndExclusive
-      }
-    )
-
-    otdMap = new Map<string, number | null>(
-      otdRows
-        .map(
-          row =>
-            [String(row.notion_user_id || ''), toNullableNumber(row.otd_percent)] as [string, number | null]
-        )
-        .filter(([key]) => Boolean(key))
-    )
-  }
-
+  const materializedSnapshots = await readMemberMetricsBatch(uniqueMemberIds, periodYear, periodMonth)
   const snapshots = new Map<string, PayrollKpiSnapshot>()
 
-  for (const row of kpiRows) {
-    const notionUserId = String(row.notion_user_id || '').trim()
-
-    if (!notionUserId) {
-      continue
-    }
-
-    snapshots.set(notionUserId, {
-      notionUserId,
-      otdPercent: otdMap.get(notionUserId) ?? null,
-      rpaAvg: toNullableNumber(row.avg_rpa),
-      tasksCompleted: toNumber(row.tasks_completed),
-      dataSource: 'notion_ops'
+  for (const [memberId, snapshot] of materializedSnapshots.entries()) {
+    snapshots.set(memberId, {
+      memberId,
+      otdPercent: getMetricValue(snapshot, 'otd_pct'),
+      rpaAvg: getMetricValue(snapshot, 'rpa'),
+      tasksCompleted: snapshot.context.completedTasks,
+      dataSource: 'ico',
+      sourceMode: 'materialized'
     })
+  }
+
+  diagnostics.materializedMembers = snapshots.size
+
+  const missingMemberIds = uniqueMemberIds.filter(memberId => !snapshots.has(memberId))
+
+  if (missingMemberIds.length > 0) {
+    const liveResults = await Promise.all(
+      missingMemberIds.map(async memberId => {
+        const liveSnapshot = await computeMetricsByContext('member', memberId, periodYear, periodMonth)
+
+        return { memberId, liveSnapshot }
+      })
+    )
+
+    for (const { memberId, liveSnapshot } of liveResults) {
+      if (!liveSnapshot) {
+        diagnostics.missingMembers += 1
+        continue
+      }
+
+      snapshots.set(memberId, {
+        memberId,
+        otdPercent: getMetricValue(liveSnapshot, 'otd_pct'),
+        rpaAvg: getMetricValue(liveSnapshot, 'rpa'),
+        tasksCompleted: liveSnapshot.context.completedTasks,
+        dataSource: 'ico',
+        sourceMode: 'live'
+      })
+      diagnostics.liveComputedMembers += 1
+    }
   }
 
   return {

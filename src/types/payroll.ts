@@ -3,7 +3,7 @@ export type PayrollCurrency = 'CLP' | 'USD'
 export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
-export type PayrollKpiDataSource = 'notion_ops' | 'manual'
+export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
 
 export interface BonusProrationConfig {
   otdThreshold: number
@@ -208,20 +208,22 @@ export interface UpdatePayrollEntryInput {
 }
 
 export interface PayrollKpiSnapshot {
-  notionUserId: string
+  memberId: string
   otdPercent: number | null
   rpaAvg: number | null
   tasksCompleted: number
-  dataSource: 'notion_ops'
+  dataSource: 'ico'
+  sourceMode: 'materialized' | 'live'
 }
 
 export interface PayrollKpiDiagnostics {
-  canMatchByNotionUserId: boolean
-  otdAutoAvailable: boolean
-  identityColumn: string | null
-  actualDateColumn: string | null
-  deadlineColumn: string | null
-  timeFilterColumn: string | null
+  source: 'ico'
+  strategy: 'materialized_first_with_live_fallback'
+  periodYear: number
+  periodMonth: number
+  materializedMembers: number
+  liveComputedMembers: number
+  missingMembers: number
 }
 
 export interface PayrollCalculationResult {

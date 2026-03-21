@@ -6,6 +6,12 @@
 
 ## 2026-03-21
 
+### Payroll KPI source now comes from ICO member metrics
+- `Payroll` ya no calcula `On-Time` y `RpA` mensual leyendo directo desde `notion_ops.tareas`. El cálculo del período ahora consulta `ICO` por `member_id`.
+- La estrategia es `materialized-first`: primero intenta leer `ico_engine.metrics_by_member` para el mes y, si faltan colaboradores, cae a cálculo live por miembro como fallback.
+- Las `payroll_entries` nuevas ya guardan `kpi_data_source = 'ico'`; el runtime sigue tolerando valores legacy `notion_ops` para períodos históricos ya calculados.
+- Se agregaron tests unitarios para blindar el fetch híbrido `materialized + live fallback` y evitar que Payroll vuelva a depender de Notion como source of truth de KPI mensual.
+
 ### Payroll compensation editing now respects the versioned model
 - `Payroll` y la ficha de `People` ya no fuerzan crear una nueva compensación cuando solo se quiere corregir la versión vigente con la misma fecha efectiva.
 - Si se mantiene la fecha `Vigente desde`, el sistema actualiza la versión actual; si se cambia la fecha, crea una nueva versión y conserva el histórico.

@@ -83,6 +83,13 @@ type PayrollEntryRow = {
 
 const getProjectId = () => getBigQueryProjectId()
 
+const normalizePayrollKpiDataSource = (value: string | null) => {
+  if (value === 'manual') return 'manual'
+  if (value === 'ico') return 'ico'
+
+  return 'notion_ops'
+}
+
 const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   entryId: String(row.entry_id || ''),
   periodId: String(row.period_id || ''),
@@ -100,7 +107,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   kpiOtdQualifies: normalizeBoolean(row.kpi_otd_qualifies),
   kpiRpaQualifies: normalizeBoolean(row.kpi_rpa_qualifies),
   kpiTasksCompleted: toNullableNumber(row.kpi_tasks_completed),
-  kpiDataSource: row.kpi_data_source === 'manual' ? 'manual' : 'notion_ops',
+  kpiDataSource: normalizePayrollKpiDataSource(row.kpi_data_source),
   bonusOtdAmount: toNumber(row.bonus_otd_amount),
   bonusRpaAmount: toNumber(row.bonus_rpa_amount),
   bonusOtherAmount: toNumber(row.bonus_other_amount),

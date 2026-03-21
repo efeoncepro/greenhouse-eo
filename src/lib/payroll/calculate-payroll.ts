@@ -105,6 +105,7 @@ const buildPayrollEntry = ({
   const adjustedBaseSalary = deductibleDays > 0
     ? roundCurrency(compensation.baseSalary * attendanceRatio)
     : compensation.baseSalary
+
   const adjustedRemoteAllowance = deductibleDays > 0
     ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
     : compensation.remoteAllowance
@@ -145,7 +146,7 @@ const buildPayrollEntry = ({
     kpiOtdQualifies: otdResult.qualifies,
     kpiRpaQualifies: rpaResult.qualifies,
     kpiTasksCompleted: kpi ? kpi.tasksCompleted : null,
-    kpiDataSource: kpi ? 'notion_ops' : 'manual',
+    kpiDataSource: kpi ? kpi.dataSource : 'manual',
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
@@ -230,8 +231,9 @@ export const calculatePayroll = async ({
   const [bonusConfig, kpiData, attendanceData] = await Promise.all([
     getBonusConfigForDate(range.periodEnd),
     fetchKpisForPeriod({
-      periodStart: range.periodStart,
-      periodEndExclusive: range.periodEndExclusive
+      memberIds,
+      periodYear: range.year,
+      periodMonth: range.month
     }),
     fetchAttendanceForAllMembers(memberIds, range.periodStart, range.periodEnd)
   ])
@@ -240,7 +242,7 @@ export const calculatePayroll = async ({
   const missingKpiMemberIds: string[] = []
 
   for (const compensation of compensationRows) {
-    const kpi = compensation.notionUserId ? kpiData.snapshots.get(compensation.notionUserId) || null : null
+    const kpi = kpiData.snapshots.get(compensation.memberId) || null
 
     if (!kpi) {
       missingKpiMemberIds.push(compensation.memberId)

@@ -40,6 +40,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-21 07:22 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Cambiar `Payroll` para que el cálculo mensual de `On-Time` y `RpA` tome la fuente desde `ICO` por `member_id`, usando cache materializado cuando exista y fallback live solo para miembros faltantes.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos tocados
+- `src/types/payroll.ts`
+- `src/lib/ico-engine/read-metrics.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/fetch-kpis-for-period.test.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/route.ts`
+
+### Verificacion
+- `pnpm exec eslint src/types/payroll.ts src/lib/ico-engine/read-metrics.ts src/lib/payroll/fetch-kpis-for-period.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/get-payroll-entries.ts src/lib/payroll/postgres-store.ts src/lib/payroll/generate-payroll-excel.ts 'src/app/api/hr/payroll/entries/[entryId]/route.ts'` ✅
+- `pnpm vitest run src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/lib/payroll/compensation-versioning.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
+- `npx tsc --noEmit` ✅
+
+### Riesgos o pendientes
+- No mezclar este slice con los cambios locales abiertos en `People 360`, `.claude/settings.json`, `AGENTS.md` ni `docs/tasks/**`.
+- `PayrollEntry.kpiDataSource` ahora puede ser `ico`; los consumidores legacy siguen tolerando `notion_ops` para historial ya calculado.
+- Queda pendiente validar manualmente en `staging` un cálculo de nómina real para confirmar que el período devuelve métricas ICO materializadas o fallback live según el mes.
+
 ## 2026-03-21 06:58 -03
 
 ### Agente
