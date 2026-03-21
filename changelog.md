@@ -6,17 +6,6 @@
 
 ## 2026-03-20
 
-### People detail — scroll horizontal contenido en tabs y sidebar
-- `/people/[memberId]` ya no deja que la tablist estilo pill empuje el ancho total de la página: la superficie de tabs ahora recorta overflow horizontal y fija `minWidth: 0` en el contenedor del panel.
-- La columna izquierda del detail también quedó protegida contra strings largos (`emails`, handles de contacto), usando `overflowWrap: anywhere` y wrappers con `minWidth: 0` para que el contenido rompa línea en vez de ensanchar el layout completo.
-
-### People 360 enrichments — contrato oficializado para HR y AI tabs
-- `GET /api/people/meta` ahora declara oficialmente `hr-profile` y `ai-tools` dentro de `supportedTabs`, en vez de dejar esas tabs solo implícitas en la UI.
-- El contrato de enrichments de `People` ahora explicita `identity`, `access`, `hrProfile`, `aiTools` y `deliveryContext`, además de los enrichments ya existentes.
-- La matriz backend de `People` ahora alinea `visibleTabs` con permisos reales de cada dominio: `hr-profile` para roles HR/admin y `ai-tools` para operations/admin.
-- `getPersonDetail()` ya no carga `hrContext` por tener acceso a compensación; ahora lo hace por permiso específico de `hr-profile`.
-- `PersonDetail` ahora puede exponer `identityContext` y `accessContext` derivados de `greenhouse_serving.person_360`, para resumir facetas canónicas, sistemas enlazados, roles, route groups y estado de acceso sin duplicar el detalle de `Admin > Users`.
-
 ### Cron hardening before production — BigQuery schema self-heal + load-job writes
 - `ICO Engine` ya no depende de que `metrics_by_project` y `metrics_by_member` tengan exactamente el schema esperado desde un setup previo. El runtime ahora aplica `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` para columnas críticas como `pipeline_velocity`, `stuck_asset_pct` y `active_tasks` antes de materializar.
 - `sync-conformed` deja de reemplazar `greenhouse_conformed.delivery_*` con `DELETE + insertAll(streaming)` y pasa a `BigQuery load jobs` con `WRITE_TRUNCATE`, evitando el error `streaming buffer` al intentar borrar tablas que fueron escritas por streaming.
