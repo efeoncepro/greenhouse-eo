@@ -136,9 +136,11 @@ describe('PersonTabs', () => {
 
     const tablist = screen.getByRole('tablist')
     const activePanel = screen.getByRole('tabpanel')
+    const liveRegion = container.querySelector('[aria-live="polite"]')
 
     expect(tablist.closest('.MuiGrid-root')).toBeInTheDocument()
     expect(activePanel.closest('.MuiGrid-root')).toBeInTheDocument()
     expect(container.querySelector('.MuiGrid-container')).toBeInTheDocument()
+    expect(liveRegion).toHaveStyle({ width: '1px', height: '1px' })
   })
 })

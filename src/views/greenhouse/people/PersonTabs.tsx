@@ -94,22 +94,24 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
     <TabContext value={activeTab}>
       <Grid container spacing={6}>
         <Grid size={{ xs: 12 }}>
-          <CustomTabList
-            onChange={handleChange}
-            variant='scrollable'
-            pill='true'
-            aria-label='Secciones del perfil del colaborador'
-          >
-            {visibleTabs.map(tab => (
-              <Tab
-                key={tab.value}
-                value={tab.value}
-                label={tab.label}
-                icon={<i className={tab.icon} aria-hidden='true' />}
-                iconPosition='start'
-              />
-            ))}
-          </CustomTabList>
+          <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
+            <CustomTabList
+              onChange={handleChange}
+              variant='scrollable'
+              pill='true'
+              aria-label='Secciones del perfil del colaborador'
+            >
+              {visibleTabs.map(tab => (
+                <Tab
+                  key={tab.value}
+                  value={tab.value}
+                  label={tab.label}
+                  icon={<i className={tab.icon} aria-hidden='true' />}
+                  iconPosition='start'
+                />
+              ))}
+            </CustomTabList>
+          </Box>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <div ref={panelRef} tabIndex={-1} style={{ outline: 'none' }}>
@@ -117,7 +119,18 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
             <Box
               aria-live='polite'
               aria-atomic='true'
-              sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
+              sx={{
+                position: 'absolute',
+                width: '1px',
+                height: '1px',
+                p: 0,
+                m: '-1px',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                border: 0,
+                clip: 'rect(0, 0, 0, 0)',
+                clipPath: 'inset(50%)'
+              }}
             />
 
             <TabPanel value='memberships' className='p-0'>

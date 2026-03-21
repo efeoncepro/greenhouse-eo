@@ -64,6 +64,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Evidencia revisada:
   - `src/@core/components/mui/TabList.tsx` usa `margin` negativa en modo `pill`
   - al “aplanar” `PersonTabs`, ese buffer dejó de existir en la ficha de persona
+- Causa raíz final confirmada con medición local en navegador:
+  - el `Box` oculto con `aria-live='polite'` en `PersonTabs.tsx` usaba `sx={{ width: 1, height: 1 }}` y en MUI eso equivale a `100%`, no a `1px`
+  - ese nodo absoluto inflaba `documentElement.scrollWidth` y `scrollHeight`, generando el scroll horizontal y vertical del documento
+  - medición local en `/debug-people-overflow` con Playwright:
+    - antes del fix: `maxX = 411`
+    - después del fix: `maxX = 0`
 - Validación local del patch:
   - `pnpm exec eslint src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonTabs.test.tsx` ✅
   - `pnpm vitest run src/views/greenhouse/people/PersonTabs.test.tsx` ✅
