@@ -4,6 +4,12 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-21
+
+### People detail — layout local sin `MUI Grid` raíz para cortar overflow
+- `/people/[memberId]` dejó de depender de un `MUI Grid container` como shell principal de la vista. La composición ahora usa `Box` + CSS grid local, reduciendo el riesgo de que gutters/cálculos del container inflen el ancho o alto de toda la página.
+- La tab `Organizaciones` también dejó de envolver su card en un `Grid container` innecesario; la tabla sigue con scroll local dentro de `TableContainer`, pero el módulo ya no expande el layout general.
+
 ## 2026-03-20
 
 ### Dashboard layout shell — contención horizontal estructural

@@ -12,7 +12,6 @@ import CardHeader from '@mui/material/CardHeader'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -107,9 +106,8 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
   }
 
   return (
-    <Grid container spacing={6} sx={{ minWidth: 0 }}>
-      <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
-        <Card elevation={0} sx={{ minWidth: 0, width: '100%', border: t => `1px solid ${t.palette.divider}` }}>
+    <Box sx={{ minWidth: 0, width: '100%', maxWidth: '100%' }}>
+      <Card elevation={0} sx={{ minWidth: 0, width: '100%', border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
             title={`Organizaciones (${memberships.length})`}
             subheader='Membresías y asignaciones operativas en organizaciones'
@@ -130,7 +128,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
               </Box>
             </CardContent>
           ) : (
-            <TableContainer sx={{ width: '100%', overflowX: 'auto' }}>
+            <TableContainer sx={{ width: '100%', maxWidth: '100%', overflowX: 'auto' }}>
               <Table size='small' sx={{ minWidth: 860 }}>
                 <TableHead>
                   <TableRow>
@@ -276,9 +274,8 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
               </Box>
             </CardContent>
           )}
-        </Card>
-      </Grid>
-    </Grid>
+      </Card>
+    </Box>
   )
 }
 

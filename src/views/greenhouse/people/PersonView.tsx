@@ -10,7 +10,6 @@ import { toast } from 'react-toastify'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
@@ -139,8 +138,23 @@ const PersonView = ({ memberId }: Props) => {
 
   return (
     <>
-      <Grid container spacing={6} sx={{ minWidth: 0, width: '100%', maxWidth: '100%' }}>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }} sx={{ minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: 'minmax(0, 1fr)',
+            md: 'minmax(320px, 5fr) minmax(0, 7fr)',
+            lg: 'minmax(340px, 4fr) minmax(0, 8fr)'
+          },
+          gap: 6,
+          alignItems: 'start',
+          minWidth: 0,
+          width: '100%',
+          maxWidth: '100%',
+          overflowX: 'clip'
+        }}
+      >
+        <Box sx={{ minWidth: 0, maxWidth: '100%' }}>
           <PersonLeftSidebar
             detail={detail}
             isAdmin={isAdmin}
@@ -148,8 +162,8 @@ const PersonView = ({ memberId }: Props) => {
             onDeactivate={() => setDeactivateConfirmOpen(true)}
             onEditCompensation={() => setCompensationOpen(true)}
           />
-        </Grid>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={{ minWidth: 0, maxWidth: '100%', overflowX: 'hidden' }}>
+        </Box>
+        <Box sx={{ minWidth: 0, maxWidth: '100%' }}>
           <PersonTabs
             detail={detail}
             isAdmin={isAdmin}
@@ -158,8 +172,8 @@ const PersonView = ({ memberId }: Props) => {
             onEditMembership={(membership, assignment) => setEditMembership({ membership, assignment })}
             onEditCompensation={isAdmin ? () => setCompensationOpen(true) : undefined}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {isAdmin && (
         <>
