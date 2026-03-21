@@ -16,8 +16,9 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
 
+import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
-import { GH_AGENCY, GH_AGENCY_NAV, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type {
   AgencyCapacityOverview,
   AgencyChartStatusItem,
@@ -57,6 +58,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
   const searchParams = useSearchParams()
 
   const initialTab = searchParams.get('tab')
+
   const defaultTab: AgencyTab = VALID_TABS.includes(initialTab as AgencyTab)
     ? (initialTab as AgencyTab)
     : 'pulse'
@@ -236,7 +238,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
           <Box
             aria-live='polite'
             aria-atomic='true'
-            sx={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+            sx={visuallyHiddenSx}
           >
             {spacesLoading ? 'Cargando datos de Spaces...' : ''}
             {capacityLoading ? 'Cargando datos de capacidad...' : ''}

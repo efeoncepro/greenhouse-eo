@@ -79,6 +79,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - La preview directa sigue protegida por Vercel SSO, así que el DOM real no se pudo inspeccionar con Playwright autenticado.
 - Si el fix en `PersonTabs` no elimina el overflow en `staging`, el siguiente sospechoso real ya no es el shell global: será `PersonView.tsx` root grid o un hijo puntual de la ficha de persona.
 - No mezclar este commit con los cambios locales de `People 360` (`get-people-meta`, `get-person-detail`, `permissions`, `types`) ni con los movimientos ajenos de `docs/tasks/**`.
+- Se agregó una utilidad compartida `src/components/greenhouse/accessibility.ts` para live regions visualmente ocultas; `AgencyWorkspace`, `PersonTabs` y `OrganizationTabs` deben usar esta fuente única en vez de copiar `sx` manual.
 
 ## 2026-03-20 18:00 -03
 

@@ -11,6 +11,7 @@
 - Se agregó un test unitario de regresión para `PersonTabs`, de modo que futuras refactorizaciones no vuelvan a “aplanar” esa estructura sin detectar el riesgo de overflow.
 - Causa raíz confirmada: el `aria-live` oculto de `PersonTabs` usaba `sx={{ width: 1, height: 1 }}`; en MUI eso renderiza `100%`, no `1px`. Se corrigió a un visually-hidden real (`1px`, `clip`, `clipPath`) y desapareció el overflow horizontal del documento.
 - Se saneó el duplicado equivalente en `OrganizationTabs` y la regla quedó documentada en `docs/ui/GREENHOUSE_ACCESSIBILITY_GUIDELINES_V1.md` y `project_context.md` para evitar futuras regresiones del mismo tipo.
+- El patrón seguro quedó extraído a `src/components/greenhouse/accessibility.ts` como fuente compartida para live regions visualmente ocultas, y ahora lo usan `People`, `Organizations` y `AgencyWorkspace`.
 
 ## 2026-03-20
 

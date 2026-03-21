@@ -12,6 +12,7 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
+import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 
 import type { OrganizationDetailData, OrganizationTab } from './types'
 import OrganizationOverviewTab from './tabs/OrganizationOverviewTab'
@@ -92,18 +93,7 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
           <Box
             aria-live='polite'
             aria-atomic='true'
-            sx={{
-              position: 'absolute',
-              width: '1px',
-              height: '1px',
-              p: 0,
-              m: '-1px',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap',
-              border: 0,
-              clip: 'rect(0, 0, 0, 0)',
-              clipPath: 'inset(50%)'
-            }}
+            sx={visuallyHiddenSx}
           />
 
           <TabPanel value='overview' className='p-0'>

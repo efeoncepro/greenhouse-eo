@@ -12,6 +12,7 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import CustomTabList from '@core/components/mui/TabList'
+import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 import type { MembershipRowData } from './drawers/EditPersonMembershipDrawer'
@@ -119,18 +120,7 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
             <Box
               aria-live='polite'
               aria-atomic='true'
-              sx={{
-                position: 'absolute',
-                width: '1px',
-                height: '1px',
-                p: 0,
-                m: '-1px',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                border: 0,
-                clip: 'rect(0, 0, 0, 0)',
-                clipPath: 'inset(50%)'
-              }}
+              sx={visuallyHiddenSx}
             />
 
             <TabPanel value='memberships' className='p-0'>
