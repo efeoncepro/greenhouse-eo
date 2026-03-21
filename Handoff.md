@@ -40,35 +40,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
-## 2026-03-20 21:45 -03
-
-### Agente
-- Codex (GPT-5)
-
-### Objetivo del turno
-- Reabrir el diagnóstico del scroll horizontal en `/people/[memberId]` porque seguía ocurriendo en cualquier tab.
-- Hallazgo estructural: el problema no era solo `PersonTabs`; el shell vertical del dashboard no estaba forzando `min-width: 0` ni conteniendo overflow horizontal en el wrapper/content main, así que cualquier hijo con ancho de min-content podía inflar el ancho total del documento.
-
-### Rama
-- Rama usada: `develop`
-- Rama objetivo: por definir
-
-### Ambiente objetivo
-- Development / Preview
-
-### Archivos tocados
-- `src/@layouts/styles/shared/StyledMain.tsx` — `min-inline-size: 0`, `max-inline-size: 100%` y `overflow-x: hidden` en el `main` compartido
-- `src/@layouts/styles/vertical/StyledContentWrapper.tsx` — `min-inline-size: 0` y `overflow-x: hidden` en el wrapper del layout vertical
-
-### Verificacion
-- `pnpm exec eslint src/@layouts/styles/shared/StyledMain.tsx src/@layouts/styles/vertical/StyledContentWrapper.tsx src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonView.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/PersonLeftSidebar.tsx` ✅
-
-### Riesgos o pendientes
-- Este fix es más estructural y debería corregir cualquier desborde horizontal heredado por el `main` vertical, no solo `People`.
-- Falta verificación manual en `dev-greenhouse` después del push para confirmar que el scrollbar horizontal desaparece y que tablas con scroll local siguen funcionando.
-
----
-
 ## 2026-03-20 21:35 -03
 
 ### Agente
