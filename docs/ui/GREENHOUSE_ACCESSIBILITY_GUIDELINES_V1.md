@@ -539,6 +539,33 @@ function LiveAnnouncer() {
 5. Use `role="status"` (implicit `aria-live="polite"`) for status messages
 6. Use `role="alert"` (implicit `aria-live="assertive"`) for urgent alerts
 7. In React: **keep the container mounted at all times** -- React's virtual DOM can destroy and recreate elements, breaking the live region connection
+8. In MUI `sx`, **do not use** `width: 1` or `height: 1` for visually hidden live regions. In the sizing system, `1` means `100%`, not `1px`, and an absolutely positioned node can create document-level horizontal and vertical scroll.
+
+**Safe MUI pattern for visually hidden live regions:**
+
+```tsx
+<Box
+  aria-live="polite"
+  aria-atomic="true"
+  sx={{
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    p: 0,
+    m: '-1px',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    border: 0,
+    clip: 'rect(0, 0, 0, 0)',
+    clipPath: 'inset(50%)'
+  }}
+/>
+```
+
+**Why this matters in Greenhouse:**
+- `sx={{ width: 1, height: 1 }}` is a common mental-model trap when coming from plain CSS, inline styles, or Tailwind-like utility thinking
+- in MUI sizing, values `<= 1` are transformed into percentages
+- if the live region is also `position: absolute`, it can silently stretch across the panel and inflate `documentElement.scrollWidth` / `scrollHeight`
 
 ### Announcing State Changes
 

@@ -89,7 +89,22 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
           </CustomTabList>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Box aria-live='polite' aria-atomic='true' sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }} />
+          <Box
+            aria-live='polite'
+            aria-atomic='true'
+            sx={{
+              position: 'absolute',
+              width: '1px',
+              height: '1px',
+              p: 0,
+              m: '-1px',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              border: 0,
+              clip: 'rect(0, 0, 0, 0)',
+              clipPath: 'inset(50%)'
+            }}
+          />
 
           <TabPanel value='overview' className='p-0'>
             {activeTab === 'overview' && <OrganizationOverviewTab detail={detail} />}

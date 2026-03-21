@@ -3,6 +3,16 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-21 MUI live-region sizing pitfall — width/height numeric shorthand is unsafe for visually hidden nodes
+- Se confirmó un bug real de layout en `People`: un `aria-live` oculto dentro de `PersonTabs` usaba `sx={{ width: 1, height: 1 }}`.
+- Regla operativa derivada:
+  - en MUI `sx`, para propiedades de tamaño (`width`, `height`, etc.), el valor numérico `1` significa `100%`, no `1px`
+  - por lo tanto, **no usar** `width: 1` / `height: 1` para regiones visualmente ocultas, especialmente si además llevan `position: 'absolute'`
+  - el patrón seguro para live regions visualmente ocultas debe usar strings explícitos (`'1px'`) más `clip`, `clipPath`, `whiteSpace: 'nowrap'` y `margin: '-1px'`
+- Impacto práctico:
+  - un `aria-live` aparentemente inocuo puede inflar `documentElement.scrollWidth` y `scrollHeight`, generando scroll horizontal y vertical a nivel de página aunque el resto del layout esté correcto
+  - se corrigió `PersonTabs` y se saneó el duplicado equivalente en `OrganizationTabs`
+
 ## Delta 2026-03-20 HR Payroll — contraste arquitectónico confirma cierre completo
 - Se contrastaron las 2 tasks de Payroll contra la arquitectura 360 real:
   - `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` — schema `greenhouse_payroll` materializado, 25+ funciones en postgres-store, 11/11 rutas Postgres-first
