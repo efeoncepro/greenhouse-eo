@@ -289,6 +289,7 @@ Notas operativas:
 - `develop` es la rama de integración y staging.
 - El trabajo normal sale desde ramas `feature/*`, `fix/*`, `docs/*` o `hotfix/*`.
 - `full-version` se usa solo como referencia local de Vuexy; no es parte del producto ni debe volverse source of truth.
+- El mapa de repos hermanos y ownership cross-repo vive en `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`.
 - Los componentes reutilizables de Greenhouse viven en `src/components/greenhouse/*`.
 - La composición por ruta vive en `src/views/greenhouse/*` o en la capa App Router correspondiente.
 
@@ -320,7 +321,7 @@ Notas operativas:
 - `docs/api/*`: contratos de integración y API
 - `docs/ui/*`: sistema visual, orquestación UI y validación visual
 - `docs/roadmap/*`: backlog y matriz de fases
-- `docs/operations/*`: modelo de documentación
+- `docs/operations/*`: modelo de documentación, mapa de repos hermanos y runbooks operativos
 - `docs/tasks/README.md`: tablero maestro de briefs `CODEX_TASK_*`
   - `docs/tasks/in-progress/*`: briefs activos o parcialmente implementados
   - `docs/tasks/to-do/*`: backlog listo para retomarse

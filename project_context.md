@@ -3,6 +3,30 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-22 Repo ecosystem canonized
+- Ya no queda implícito qué repos externos son hermanos operativos de `greenhouse-eo`.
+- La fuente canónica para ownership multi-repo y selección de upstream quedó fijada en:
+  - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- Repos hermanos documentados:
+  - `cesargrowth11/notion-bigquery`
+  - `cesargrowth11/hubspot-bigquery`
+  - `cesargrowth11/notion-teams`
+  - `cesargrowth11/notion-frame-io`
+  - `efeoncepro/kortex`
+- Regla operativa derivada:
+  - si un cambio toca una integración o pipeline cuyo runtime vive fuera del portal, el agente debe revisar primero ese repo hermano antes de asumir que el fix o la evolución pertenece a `greenhouse-eo`
+
+## Delta 2026-03-21 Payroll architecture canonized
+- `Payroll` ya no depende solo de contexto distribuido entre tasks y código: su contrato completo de módulo quedó consolidado en `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`.
+- Ese documento fija como canon:
+  - compensación versionada por vigencia, no mensual
+  - período imputable como mes calendario, no mes de pago
+  - lifecycle `draft -> calculated -> approved -> exported`, con `approved` todavía editable y `exported` como candado final
+  - KPI mensual de `On-Time` y `RpA` sourced desde `ICO`
+  - `People 360` como ficha individual oficial del colaborador, dejando `/hr/payroll/member/[memberId]` como redirect operativo
+- Regla documental derivada:
+  - cambios futuros de semantics o ownership de `Payroll` deben actualizar primero `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, y solo dejar deltas breves en `project_context.md`, `Handoff.md` y `changelog.md`
+
 ## Delta 2026-03-21 Payroll period lifecycle — approved is editable, exported is final
 - Se ajustó la semántica operativa de estados de `Payroll` para alinearla con el flujo real de pago:
   - el período imputable sigue siendo el mes calendario (`2026-02`, `2026-03`, etc.)

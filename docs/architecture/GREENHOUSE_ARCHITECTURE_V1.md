@@ -168,12 +168,14 @@ Dual-store architecture:
 
 Routes: `/hr` (dashboard, departments, leave, attendance), `/hr/payroll`, `/hr/payroll/member/[memberId]`
 
-Payroll with full period lifecycle: draft → approved → exported. Chilean payroll calculations including AFP, health, unemployment, and tax. KPI-driven bonuses (OTD%, RPA). Teams attendance webhook integration.
+Payroll with full period lifecycle: draft → calculated → approved → exported. `approved` remains editable until export; `exported` is the final lock. Chilean payroll calculations including AFP, health, unemployment, and tax. KPI-driven bonuses (OTD%, RPA) sourced from ICO. Teams attendance and HR leave context are applied to the monthly snapshot.
 
 Data stores:
 - Payroll and leave: Postgres-first
 - HR core tables: BigQuery
 - 25+ API routes
+
+See `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` for period semantics, compensation versioning, KPI source, exports, and cross-module consumers.
 
 ### People & Person 360
 
