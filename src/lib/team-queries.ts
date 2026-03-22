@@ -2,6 +2,7 @@ import 'server-only'
 
 import { buildAccountTeam } from '@/lib/dashboard/tenant-dashboard-overrides'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   clampPercent,
   getAssignedHoursMonth,
@@ -554,7 +555,25 @@ const getOptionalNumberSelect = (columns: Set<string>, columnName: string, expre
 const getOptionalArrayStringSelect = (columns: Set<string>, columnName: string, expression = `m.${columnName}`) =>
   columns.has(columnName) ? `COALESCE(${expression}, ARRAY<STRING>[]) AS ${columnName},` : `ARRAY<STRING>[] AS ${columnName},`
 
-const getAssignmentRows = async (clientId: string) => {
+const shouldFallbackToLegacy = (error: unknown) => {
+  if (!(error instanceof Error)) return false
+
+  const msg = error.message.toLowerCase()
+
+  return (
+    msg.includes('not configured') ||
+    msg.includes('econnrefused') ||
+    msg.includes('timeout') ||
+    msg.includes('connect') ||
+    msg.includes('cloud sql') ||
+    msg.includes('cloudsql') ||
+    msg.includes('does not exist') ||
+    msg.includes('relation') ||
+    msg.includes('not authorized')
+  )
+}
+
+const getAssignmentRowsFromBigQuery = async (clientId: string) => {
   const projectId = getBigQueryProjectId()
   const memberColumns = await getTableColumns('greenhouse', 'team_members')
   const roleCatalogColumns = await getTableColumns('greenhouse', 'team_role_catalog')
@@ -637,6 +656,79 @@ const getAssignmentRows = async (clientId: string) => {
   )
 }
 
+const getAssignmentRows = async (clientId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<TeamAssignmentRow>(
+        `SELECT
+           m.member_id,
+           m.display_name,
+           m.primary_email AS email,
+           m.avatar_url,
+           COALESCE(a.role_title_override, m.role_title) AS role_title,
+           m.role_category,
+           COALESCE(a.relevance_note_override, m.relevance_note) AS relevance_note,
+           COALESCE(a.contact_channel_override, m.contact_channel) AS contact_channel,
+           COALESCE(a.contact_handle_override, m.contact_handle) AS contact_handle,
+           a.fte_allocation,
+           a.start_date::text AS start_date,
+           m.notion_display_name,
+           m.notion_user_id,
+           m.identity_profile_id,
+           COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
+           m.azure_oid,
+           m.hubspot_owner_id,
+           m.first_name,
+           m.last_name,
+           m.preferred_name,
+           m.legal_name,
+           m.org_role_id,
+           NULL::text AS org_role_name,
+           m.profession_id,
+           NULL::text AS profession_name,
+           m.seniority_level,
+           m.employment_type,
+           m.birth_date::text AS birth_date,
+           m.phone,
+           m.teams_user_id,
+           m.slack_user_id,
+           m.location_city,
+           m.location_country,
+           m.time_zone,
+           m.years_experience,
+           m.efeonce_start_date::text AS efeonce_start_date,
+           m.biography,
+           COALESCE(m.languages, ARRAY[]::text[]) AS languages
+         FROM greenhouse_core.client_team_assignments AS a
+         INNER JOIN greenhouse_core.members AS m ON m.member_id = a.member_id
+         WHERE a.client_id = $1
+           AND a.active = TRUE
+           AND m.active = TRUE
+           AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+         ORDER BY
+           CASE m.role_category
+             WHEN 'account' THEN 1
+             WHEN 'operations' THEN 2
+             WHEN 'strategy' THEN 3
+             WHEN 'design' THEN 4
+             WHEN 'development' THEN 5
+             WHEN 'media' THEN 6
+             ELSE 7
+           END,
+           m.display_name`,
+        [clientId]
+      )
+
+      return rows
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-queries] getAssignmentRows Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getAssignmentRowsFromBigQuery(clientId)
+}
+
 const toAssignments = (rows: TeamAssignmentRow[]): TeamAssignment[] =>
   rows.map(row => {
     const startDate = toDateString(row.start_date)
@@ -694,11 +786,7 @@ const toAssignments = (rows: TeamAssignmentRow[]): TeamAssignment[] =>
     }
   })
 
-const getIdentitySourceRows = async (profileIds: string[]) => {
-  if (profileIds.length === 0) {
-    return [] as TeamIdentitySourceRow[]
-  }
-
+const getIdentitySourceRowsFromBigQuery = async (profileIds: string[]) => {
   const projectId = getBigQueryProjectId()
 
   try {
@@ -726,6 +814,39 @@ const getIdentitySourceRows = async (profileIds: string[]) => {
 
     throw error
   }
+}
+
+const getIdentitySourceRows = async (profileIds: string[]) => {
+  if (profileIds.length === 0) {
+    return [] as TeamIdentitySourceRow[]
+  }
+
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<TeamIdentitySourceRow>(
+        `SELECT
+           profile_id,
+           source_system,
+           source_object_type,
+           source_object_id,
+           source_user_id,
+           source_email,
+           source_display_name,
+           is_login_identity
+         FROM greenhouse_core.identity_profile_source_links
+         WHERE active = TRUE
+           AND profile_id = ANY($1)`,
+        [profileIds]
+      )
+
+      return rows
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-queries] getIdentitySourceRows Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getIdentitySourceRowsFromBigQuery(profileIds)
 }
 
 const enrichAssignmentsWithIdentity = async (assignments: TeamAssignment[]) => {

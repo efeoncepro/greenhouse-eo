@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { getPeopleTableColumns, toContactChannel, toDateString, toNumber, toStringArray } from '@/lib/people/shared'
 import type {
   CreateAssignmentInput,
@@ -162,6 +162,30 @@ const currentDate = () =>
   new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Santiago'
   }).format(new Date())
+
+const shouldFallbackToLegacy = (error: unknown) => {
+  if (!(error instanceof Error)) return false
+
+  const msg = error.message.toLowerCase()
+
+  return (
+    msg.includes('not configured') ||
+    msg.includes('econnrefused') ||
+    msg.includes('timeout') ||
+    msg.includes('connect') ||
+    msg.includes('cloud sql') ||
+    msg.includes('cloudsql') ||
+    msg.includes('does not exist') ||
+    msg.includes('relation') ||
+    msg.includes('not authorized')
+  )
+}
+
+const syncToBigQuery = (label: string, fn: () => Promise<unknown>) => {
+  fn().catch(error => {
+    console.warn(`[team-admin] BigQuery sync (${label}) failed:`, error instanceof Error ? error.message : error)
+  })
+}
 
 const normalizeText = (value: unknown) => {
   if (typeof value !== 'string') {
@@ -364,7 +388,7 @@ const getAssignmentColumns = async () => getPeopleTableColumns('greenhouse', 'cl
 const getAuditColumns = async () => getPeopleTableColumns('greenhouse', 'audit_events')
 const getIdentityLinkColumns = async () => getPeopleTableColumns('greenhouse', 'identity_profile_source_links')
 
-const getMemberRecord = async (memberId: string) => {
+const getMemberRecordFromBigQuery = async (memberId: string) => {
   const projectId = getProjectId()
   const memberColumns = await getMemberColumns()
 
@@ -421,7 +445,45 @@ const getMemberRecord = async (memberId: string) => {
   return rows[0] ? mapMemberRecord(rows[0]) : null
 }
 
-const getAssignmentRecord = async (assignmentId: string) => {
+const getMemberRecord = async (memberId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<MemberRow>(
+        `SELECT
+           member_id,
+           display_name,
+           primary_email AS email,
+           COALESCE(email_aliases, ARRAY[]::text[]) AS email_aliases,
+           role_title,
+           role_category,
+           avatar_url,
+           location_country,
+           location_city,
+           identity_profile_id,
+           contact_channel,
+           contact_handle,
+           relevance_note,
+           azure_oid,
+           notion_user_id,
+           hubspot_owner_id,
+           active
+         FROM greenhouse_core.members
+         WHERE member_id = $1
+         LIMIT 1`,
+        [memberId]
+      )
+
+      return rows[0] ? mapMemberRecord(rows[0]) : null
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getMemberRecord Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getMemberRecordFromBigQuery(memberId)
+}
+
+const getAssignmentRecordFromBigQuery = async (assignmentId: string) => {
   const projectId = getProjectId()
 
   const rows = await runQuery<AssignmentRow>(
@@ -456,7 +518,45 @@ const getAssignmentRecord = async (assignmentId: string) => {
   return rows[0] ? mapAssignmentRecord(rows[0]) : null
 }
 
-const getClientRecord = async (clientId: string) => {
+const getAssignmentRecord = async (assignmentId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<AssignmentRow>(
+        `SELECT
+           a.assignment_id,
+           a.client_id,
+           c.client_name,
+           a.member_id,
+           m.display_name AS member_name,
+           m.primary_email AS member_email,
+           a.fte_allocation,
+           a.hours_per_month,
+           a.role_title_override,
+           a.relevance_note_override,
+           a.contact_channel_override,
+           a.contact_handle_override,
+           a.start_date::text AS start_date,
+           a.end_date::text AS end_date,
+           a.active
+         FROM greenhouse_core.client_team_assignments AS a
+         LEFT JOIN greenhouse_core.clients AS c ON c.client_id = a.client_id
+         LEFT JOIN greenhouse_core.members AS m ON m.member_id = a.member_id
+         WHERE a.assignment_id = $1
+         LIMIT 1`,
+        [assignmentId]
+      )
+
+      return rows[0] ? mapAssignmentRecord(rows[0]) : null
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getAssignmentRecord Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getAssignmentRecordFromBigQuery(assignmentId)
+}
+
+const getClientRecordFromBigQuery = async (clientId: string) => {
   const projectId = getProjectId()
 
   const rows = await runQuery<ClientRow>(
@@ -472,7 +572,34 @@ const getClientRecord = async (clientId: string) => {
   return rows[0] || null
 }
 
-const getActiveClients = async (): Promise<TeamAdminClientOption[]> => {
+const getClientRecord = async (clientId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<ClientRow>(
+        `SELECT client_id, client_name, active
+         FROM greenhouse_core.clients
+         WHERE client_id = $1
+         LIMIT 1`,
+        [clientId]
+      )
+
+      return rows[0] || null
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getClientRecord Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getClientRecordFromBigQuery(clientId)
+}
+
+const mapClientOption = (row: ClientRow): TeamAdminClientOption => ({
+  clientId: String(row.client_id || ''),
+  clientName: String(row.client_name || row.client_id || ''),
+  active: Boolean(row.active)
+})
+
+const getActiveClientsFromBigQuery = async (): Promise<TeamAdminClientOption[]> => {
   const projectId = getProjectId()
 
   const rows = await runQuery<ClientRow>(
@@ -487,11 +614,27 @@ const getActiveClients = async (): Promise<TeamAdminClientOption[]> => {
     `
   )
 
-  return rows.map(row => ({
-    clientId: String(row.client_id || ''),
-    clientName: String(row.client_name || row.client_id || ''),
-    active: Boolean(row.active)
-  }))
+  return rows.map(mapClientOption)
+}
+
+const getActiveClients = async (): Promise<TeamAdminClientOption[]> => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<ClientRow>(
+        `SELECT client_id, client_name, active
+         FROM greenhouse_core.clients
+         WHERE active = TRUE
+         ORDER BY client_name ASC`
+      )
+
+      return rows.map(mapClientOption)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getActiveClients Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getActiveClientsFromBigQuery()
 }
 
 const buildMembersSummary = (members: TeamAdminMemberListItem[]) => ({
@@ -538,7 +681,7 @@ const getMemberIdentitySyncInput = (member: TeamAdminMemberRecord) => [
   }
 ]
 
-const getAssignmentByClientAndMember = async (clientId: string, memberId: string) => {
+const getAssignmentByClientAndMemberFromBigQuery = async (clientId: string, memberId: string) => {
   const projectId = getProjectId()
 
   const rows = await runQuery<AssignmentRow>(
@@ -575,7 +718,46 @@ const getAssignmentByClientAndMember = async (clientId: string, memberId: string
   return rows[0] ? mapAssignmentRecord(rows[0]) : null
 }
 
-export const listAdminTeamMembers = async (): Promise<TeamAdminMemberListItem[]> => {
+const getAssignmentByClientAndMember = async (clientId: string, memberId: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<AssignmentRow>(
+        `SELECT
+           a.assignment_id,
+           a.client_id,
+           c.client_name,
+           a.member_id,
+           m.display_name AS member_name,
+           m.primary_email AS member_email,
+           a.fte_allocation,
+           a.hours_per_month,
+           a.role_title_override,
+           a.relevance_note_override,
+           a.contact_channel_override,
+           a.contact_handle_override,
+           a.start_date::text AS start_date,
+           a.end_date::text AS end_date,
+           a.active
+         FROM greenhouse_core.client_team_assignments AS a
+         LEFT JOIN greenhouse_core.clients AS c ON c.client_id = a.client_id
+         LEFT JOIN greenhouse_core.members AS m ON m.member_id = a.member_id
+         WHERE a.client_id = $1 AND a.member_id = $2
+         ORDER BY a.updated_at DESC
+         LIMIT 1`,
+        [clientId, memberId]
+      )
+
+      return rows[0] ? mapAssignmentRecord(rows[0]) : null
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getAssignmentByClientAndMember Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getAssignmentByClientAndMemberFromBigQuery(clientId, memberId)
+}
+
+const listAdminTeamMembersFromBigQuery = async (): Promise<TeamAdminMemberListItem[]> => {
   const projectId = getProjectId()
   const memberColumns = await getMemberColumns()
 
@@ -655,6 +837,62 @@ export const listAdminTeamMembers = async (): Promise<TeamAdminMemberListItem[]>
   return rows.map(mapMemberListItem)
 }
 
+export const listAdminTeamMembers = async (): Promise<TeamAdminMemberListItem[]> => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<MemberRow>(
+        `WITH assignment_agg AS (
+           SELECT
+             member_id,
+             COUNT(*) FILTER (WHERE active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE)) AS active_assignment_count,
+             ROUND(SUM(
+               CASE WHEN active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+                 THEN COALESCE(fte_allocation, 0) ELSE 0 END
+             )::numeric, 2) AS total_fte,
+             SUM(
+               CASE WHEN active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+                 THEN COALESCE(hours_per_month, ROUND(COALESCE(fte_allocation, 0) * 160)::int)
+                 ELSE 0 END
+             ) AS total_hours_month
+           FROM greenhouse_core.client_team_assignments
+           GROUP BY member_id
+         )
+         SELECT
+           m.member_id,
+           m.display_name,
+           m.primary_email AS email,
+           COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
+           m.role_title,
+           m.role_category,
+           m.avatar_url,
+           m.location_country,
+           m.location_city,
+           m.identity_profile_id,
+           m.contact_channel,
+           m.contact_handle,
+           m.relevance_note,
+           m.azure_oid,
+           m.notion_user_id,
+           m.hubspot_owner_id,
+           m.active,
+           COALESCE(a.active_assignment_count, 0) AS active_assignment_count,
+           COALESCE(a.total_fte, 0) AS total_fte,
+           COALESCE(a.total_hours_month, 0) AS total_hours_month
+         FROM greenhouse_core.members AS m
+         LEFT JOIN assignment_agg AS a ON a.member_id = m.member_id
+         ORDER BY m.active DESC, m.display_name ASC`
+      )
+
+      return rows.map(mapMemberListItem)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] listAdminTeamMembers Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return listAdminTeamMembersFromBigQuery()
+}
+
 export const getAdminTeamMembersPayload = async (): Promise<TeamAdminMembersPayload> => {
   const [metadata, members] = await Promise.all([getAdminTeamMetadata(), listAdminTeamMembers()])
 
@@ -665,7 +903,7 @@ export const getAdminTeamMembersPayload = async (): Promise<TeamAdminMembersPayl
   }
 }
 
-export const listAdminTeamAssignments = async ({
+const listAdminTeamAssignmentsFromBigQuery = async ({
   memberId,
   clientId,
   activeOnly = false
@@ -726,6 +964,72 @@ export const listAdminTeamAssignments = async ({
   return rows.map(mapAssignmentListItem)
 }
 
+export const listAdminTeamAssignments = async ({
+  memberId,
+  clientId,
+  activeOnly = false
+}: {
+  memberId?: string | null
+  clientId?: string | null
+  activeOnly?: boolean
+} = {}): Promise<TeamAdminAssignmentListItem[]> => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const filters = ['TRUE']
+      const values: unknown[] = []
+      let pi = 1
+
+      if (memberId) {
+        filters.push(`a.member_id = $${pi++}`)
+        values.push(memberId)
+      }
+
+      if (clientId) {
+        filters.push(`a.client_id = $${pi++}`)
+        values.push(clientId)
+      }
+
+      if (activeOnly) {
+        filters.push('a.active = TRUE')
+        filters.push('(a.end_date IS NULL OR a.end_date >= CURRENT_DATE)')
+      }
+
+      const rows = await runGreenhousePostgresQuery<AssignmentRow>(
+        `SELECT
+           a.assignment_id,
+           a.client_id,
+           c.client_name,
+           a.member_id,
+           m.display_name AS member_name,
+           m.primary_email AS member_email,
+           a.fte_allocation,
+           a.hours_per_month,
+           a.role_title_override,
+           a.relevance_note_override,
+           a.contact_channel_override,
+           a.contact_handle_override,
+           a.start_date::text AS start_date,
+           a.end_date::text AS end_date,
+           a.active,
+           c.active AS client_active
+         FROM greenhouse_core.client_team_assignments AS a
+         LEFT JOIN greenhouse_core.clients AS c ON c.client_id = a.client_id
+         LEFT JOIN greenhouse_core.members AS m ON m.member_id = a.member_id
+         WHERE ${filters.join(' AND ')}
+         ORDER BY a.active DESC, a.start_date DESC, c.client_name ASC, m.display_name ASC`,
+        values
+      )
+
+      return rows.map(mapAssignmentListItem)
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] listAdminTeamAssignments Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return listAdminTeamAssignmentsFromBigQuery({ memberId, clientId, activeOnly })
+}
+
 export const getAdminTeamAssignmentsPayload = async ({
   memberId,
   clientId,
@@ -777,7 +1081,7 @@ export const getAdminTeamAssignmentDetail = async (assignmentId: string): Promis
   return assignment
 }
 
-const getMemberIdCandidates = async (baseSlug: string) => {
+const getMemberIdCandidatesFromBigQuery = async (baseSlug: string) => {
   const projectId = getProjectId()
 
   const rows = await runQuery<{ member_id: string | null }>(
@@ -791,6 +1095,26 @@ const getMemberIdCandidates = async (baseSlug: string) => {
   )
 
   return new Set(rows.map(row => String(row.member_id || '')).filter(Boolean))
+}
+
+const getMemberIdCandidates = async (baseSlug: string) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const rows = await runGreenhousePostgresQuery<{ member_id: string | null }>(
+        `SELECT member_id
+         FROM greenhouse_core.members
+         WHERE member_id = $1 OR member_id LIKE $2`,
+        [baseSlug, `${baseSlug}-%`]
+      )
+
+      return new Set(rows.map(row => String(row.member_id || '')).filter(Boolean))
+    } catch (error) {
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] getMemberIdCandidates Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return getMemberIdCandidatesFromBigQuery(baseSlug)
 }
 
 const buildNextMemberId = async (displayName: string) => {
@@ -815,7 +1139,7 @@ const buildNextMemberId = async (displayName: string) => {
   return `${baseSlug}-${suffix}`
 }
 
-const ensureUniqueMemberEmails = async ({
+const ensureUniqueMemberEmailsFromBigQuery = async ({
   email,
   emailAliases,
   excludeMemberId
@@ -885,6 +1209,70 @@ const ensureUniqueMemberEmails = async ({
       conflictingEmail: principalConflict.email || principalConflict.microsoft_email || null
     })
   }
+}
+
+const ensureUniqueMemberEmails = async ({
+  email,
+  emailAliases,
+  excludeMemberId
+}: {
+  email: string
+  emailAliases: string[]
+  excludeMemberId?: string
+}) => {
+  if (isGreenhousePostgresConfigured()) {
+    try {
+      const candidateEmails = Array.from(new Set([email, ...emailAliases]))
+
+      const memberRows = await runGreenhousePostgresQuery<ExistingMemberConflictRow>(
+        `SELECT member_id, primary_email AS email, COALESCE(email_aliases, ARRAY[]::text[]) AS email_aliases
+         FROM greenhouse_core.members
+         WHERE LOWER(primary_email) = ANY($1)
+            OR EXISTS (
+              SELECT 1 FROM unnest(COALESCE(email_aliases, ARRAY[]::text[])) AS alias
+              WHERE LOWER(alias) = ANY($1)
+            )`,
+        [candidateEmails]
+      )
+
+      const conflict = memberRows.find(row => String(row.member_id || '') !== excludeMemberId)
+
+      if (conflict) {
+        throw new TeamAdminValidationError('A team member already uses this email or one of the provided aliases.', 409, {
+          conflictingMemberId: String(conflict.member_id || '')
+        })
+      }
+
+      const principalRows = await runGreenhousePostgresQuery<ExistingPrincipalConflictRow>(
+        `SELECT user_id, email, microsoft_email
+         FROM greenhouse_core.client_users
+         WHERE LOWER(email) = ANY($1)
+            OR LOWER(COALESCE(microsoft_email, '')) = ANY($1)`,
+        [candidateEmails]
+      )
+
+      const principalConflict = principalRows.find(row => {
+        const principalUserId = String(row.user_id || '')
+
+        return !excludeMemberId || !principalUserId.includes(excludeMemberId)
+      })
+
+      if (principalConflict) {
+        throw new TeamAdminValidationError('A Greenhouse login principal already uses this email or alias.', 409, {
+          conflictingUserId: String(principalConflict.user_id || ''),
+          conflictingEmail: principalConflict.email || principalConflict.microsoft_email || null
+        })
+      }
+
+      return
+    } catch (error) {
+      if (error instanceof TeamAdminValidationError) throw error
+      if (!shouldFallbackToLegacy(error)) throw error
+      console.warn('[team-admin] ensureUniqueMemberEmails Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+    }
+  }
+
+  return ensureUniqueMemberEmailsFromBigQuery({ email, emailAliases, excludeMemberId })
 }
 
 const writeAuditEvent = async ({
@@ -1062,14 +1450,6 @@ const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInp
   }
 }
 
-const syncAssignmentToPostgres = (label: string, query: string, values: unknown[]) => {
-  if (!isGreenhousePostgresConfigured()) return
-
-  runGreenhousePostgresQuery(query, values).catch(error => {
-    console.warn(`[team-admin] Postgres sync (${label}) failed:`, error instanceof Error ? error.message : error)
-  })
-}
-
 const buildAssignmentUpsertPayload = async (input: CreateAssignmentInput) => {
   const clientId = normalizeText(input.clientId)
   const memberId = normalizeText(input.memberId)
@@ -1160,11 +1540,7 @@ const buildAssignmentUpdatePayload = async (assignmentId: string, input: UpdateA
   }
 }
 
-const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) => {
-  if (!member.identityProfileId) {
-    return
-  }
-
+const syncIdentitySourceLinksToBigQuery = async (member: TeamAdminMemberRecord) => {
   const identityLinkColumns = await getIdentityLinkColumns()
 
   const requiredColumns = [
@@ -1258,6 +1634,44 @@ const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) =
   }
 }
 
+const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) => {
+  if (!member.identityProfileId) {
+    return
+  }
+
+  if (isGreenhousePostgresConfigured()) {
+    const syncRows = getMemberIdentitySyncInput(member)
+
+    for (const row of syncRows) {
+      if (!row.sourceObjectId) continue
+
+      await runGreenhousePostgresQuery(
+        `INSERT INTO greenhouse_core.identity_profile_source_links (
+           profile_id, source_system, source_object_type, source_object_id,
+           source_user_id, source_email, source_display_name, active
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
+         ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
+         DO UPDATE SET
+           source_user_id = EXCLUDED.source_user_id,
+           source_email = EXCLUDED.source_email,
+           source_display_name = EXCLUDED.source_display_name,
+           active = TRUE`,
+        [
+          member.identityProfileId,
+          row.sourceSystem, row.sourceObjectType, row.sourceObjectId,
+          row.sourceUserId, row.sourceEmail, row.sourceDisplayName
+        ]
+      )
+    }
+
+    syncToBigQuery('syncIdentitySourceLinks', () => syncIdentitySourceLinksToBigQuery(member))
+
+    return
+  }
+
+  await syncIdentitySourceLinksToBigQuery(member)
+}
+
 export const getAdminTeamMetadata = async (): Promise<TeamAdminMetadata> => ({
   canManageTeam: true,
   memberCrud: true,
@@ -1268,18 +1682,9 @@ export const getAdminTeamMetadata = async (): Promise<TeamAdminMetadata> => ({
   activeClients: await getActiveClients()
 })
 
-export const createMember = async ({
-  input,
-  actorUserId,
-  actorEmail
-}: {
-  input: CreateMemberInput
-  actorUserId: string
-  actorEmail: string | null
-}) => {
+const createMemberInBigQuery = async (payload: Awaited<ReturnType<typeof buildMemberInsertPayload>>) => {
   const projectId = getProjectId()
   const memberColumns = await getMemberColumns()
-  const payload = await buildMemberInsertPayload(input)
   const insertColumns = ['member_id', 'display_name', 'email', 'role_title', 'role_category', 'contact_channel', 'active', 'created_at', 'updated_at']
   const insertValues = ['@memberId', '@displayName', '@email', '@roleTitle', '@roleCategory', '@contactChannel', 'TRUE', 'CURRENT_TIMESTAMP()', 'CURRENT_TIMESTAMP()']
 
@@ -1345,6 +1750,45 @@ export const createMember = async ({
     params,
     types: Object.keys(createTypes).length > 0 ? createTypes : undefined
   })
+}
+
+export const createMember = async ({
+  input,
+  actorUserId,
+  actorEmail
+}: {
+  input: CreateMemberInput
+  actorUserId: string
+  actorEmail: string | null
+}) => {
+  const payload = await buildMemberInsertPayload(input)
+
+  if (isGreenhousePostgresConfigured()) {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_core.members (
+         member_id, display_name, primary_email, email_aliases,
+         role_title, role_category, avatar_url,
+         location_country, location_city,
+         contact_channel, contact_handle, relevance_note,
+         azure_oid, notion_user_id, hubspot_owner_id,
+         active, created_at, updated_at
+       ) VALUES (
+         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+         TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+       )`,
+      [
+        payload.memberId, payload.displayName, payload.email, payload.emailAliases,
+        payload.roleTitle, payload.roleCategory, payload.avatarUrl,
+        payload.locationCountry, payload.locationCity,
+        payload.contactChannel, payload.contactHandle, payload.relevanceNote,
+        payload.azureOid, payload.notionUserId, payload.hubspotOwnerId
+      ]
+    )
+
+    syncToBigQuery('createMember', () => createMemberInBigQuery(payload))
+  } else {
+    await createMemberInBigQuery(payload)
+  }
 
   const created = await getMemberRecord(payload.memberId)
 
@@ -1369,20 +1813,9 @@ export const createMember = async ({
   return created
 }
 
-export const updateMember = async ({
-  memberId,
-  input,
-  actorUserId,
-  actorEmail
-}: {
-  memberId: string
-  input: UpdateMemberInput
-  actorUserId: string
-  actorEmail: string | null
-}) => {
+const updateMemberInBigQuery = async (memberId: string, updates: Record<string, unknown>) => {
   const projectId = getProjectId()
   const memberColumns = await getMemberColumns()
-  const { existing, updates } = await buildMemberUpdatePayload(memberId, input)
   const setClauses: string[] = []
   const params: Record<string, unknown> = { memberId }
 
@@ -1397,9 +1830,7 @@ export const updateMember = async ({
     params[paramKey] = value
   }
 
-  if (setClauses.length === 0) {
-    return existing
-  }
+  if (setClauses.length === 0) return
 
   setClauses.push('updated_at = CURRENT_TIMESTAMP()')
 
@@ -1438,6 +1869,54 @@ export const updateMember = async ({
     params,
     types: Object.keys(types).length > 0 ? types : undefined
   })
+}
+
+export const updateMember = async ({
+  memberId,
+  input,
+  actorUserId,
+  actorEmail
+}: {
+  memberId: string
+  input: UpdateMemberInput
+  actorUserId: string
+  actorEmail: string | null
+}) => {
+  const { existing, updates } = await buildMemberUpdatePayload(memberId, input)
+
+  if (Object.keys(updates).length === 0) {
+    return existing
+  }
+
+  // Map column names: BigQuery `email` → Postgres `primary_email`
+  const pgColumnMap: Record<string, string> = { email: 'primary_email' }
+
+  if (isGreenhousePostgresConfigured()) {
+    const pgClauses: string[] = []
+    const pgValues: unknown[] = []
+    let pi = 1
+
+    for (const [col, val] of Object.entries(updates)) {
+      if (!writableMemberColumns.has(col)) continue
+      const pgCol = pgColumnMap[col] || col
+      pgClauses.push(`${pgCol} = $${pi++}`)
+      pgValues.push(val)
+    }
+
+    if (pgClauses.length > 0) {
+      pgClauses.push('updated_at = CURRENT_TIMESTAMP')
+      pgValues.push(memberId)
+
+      await runGreenhousePostgresQuery(
+        `UPDATE greenhouse_core.members SET ${pgClauses.join(', ')} WHERE member_id = $${pi}`,
+        pgValues
+      )
+    }
+
+    syncToBigQuery('updateMember', () => updateMemberInBigQuery(memberId, updates))
+  } else {
+    await updateMemberInBigQuery(memberId, updates)
+  }
 
   const updated = await getMemberRecord(memberId)
 
@@ -1471,46 +1950,54 @@ export const deactivateMember = async ({
   actorUserId: string
   actorEmail: string | null
 }) => {
-  const projectId = getProjectId()
   const existing = await getMemberRecord(memberId)
 
   if (!existing) {
     throw new TeamAdminValidationError('Team member not found.', 404)
   }
 
-  await Promise.all([
-    getBigQueryClient().query({
-      query: `
-        UPDATE \`${projectId}.greenhouse.team_members\`
-        SET
-          active = FALSE,
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE member_id = @memberId
-      `,
-      params: { memberId }
-    }),
-    getBigQueryClient().query({
-      query: `
-        UPDATE \`${projectId}.greenhouse.client_team_assignments\`
-        SET
-          active = FALSE,
-          end_date = CURRENT_DATE(),
-          updated_at = CURRENT_TIMESTAMP()
-        WHERE member_id = @memberId
-          AND active = TRUE
-      `,
-      params: { memberId }
+  if (isGreenhousePostgresConfigured()) {
+    await withGreenhousePostgresTransaction(async (client) => {
+      await client.query(
+        `UPDATE greenhouse_core.members SET active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE member_id = $1`,
+        [memberId]
+      )
+      await client.query(
+        `UPDATE greenhouse_core.client_team_assignments
+         SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
+         WHERE member_id = $1 AND active = TRUE`,
+        [memberId]
+      )
     })
-  ])
 
-  // ── Postgres dual-write (assignments only) ──
-  syncAssignmentToPostgres(
-    'deactivate-member-assignments',
-    `UPDATE greenhouse_core.client_team_assignments
-     SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
-     WHERE member_id = $1 AND active = TRUE`,
-    [memberId]
-  )
+    const projectId = getProjectId()
+
+    syncToBigQuery('deactivateMember', async () => {
+      await Promise.all([
+        getBigQueryClient().query({
+          query: `UPDATE \`${projectId}.greenhouse.team_members\` SET active = FALSE, updated_at = CURRENT_TIMESTAMP() WHERE member_id = @memberId`,
+          params: { memberId }
+        }),
+        getBigQueryClient().query({
+          query: `UPDATE \`${projectId}.greenhouse.client_team_assignments\` SET active = FALSE, end_date = CURRENT_DATE(), updated_at = CURRENT_TIMESTAMP() WHERE member_id = @memberId AND active = TRUE`,
+          params: { memberId }
+        })
+      ])
+    })
+  } else {
+    const projectId = getProjectId()
+
+    await Promise.all([
+      getBigQueryClient().query({
+        query: `UPDATE \`${projectId}.greenhouse.team_members\` SET active = FALSE, updated_at = CURRENT_TIMESTAMP() WHERE member_id = @memberId`,
+        params: { memberId }
+      }),
+      getBigQueryClient().query({
+        query: `UPDATE \`${projectId}.greenhouse.client_team_assignments\` SET active = FALSE, end_date = CURRENT_DATE(), updated_at = CURRENT_TIMESTAMP() WHERE member_id = @memberId AND active = TRUE`,
+        params: { memberId }
+      })
+    ])
+  }
 
   const updated = await getMemberRecord(memberId)
 
@@ -1532,24 +2019,11 @@ export const deactivateMember = async ({
   return updated
 }
 
-export const createAssignment = async ({
-  input,
-  actorUserId,
-  actorEmail
-}: {
-  input: CreateAssignmentInput
-  actorUserId: string
-  actorEmail: string | null
-}) => {
+const createAssignmentInBigQuery = async (
+  payload: Awaited<ReturnType<typeof buildAssignmentUpsertPayload>>,
+  existing: TeamAdminAssignmentRecord | null
+) => {
   const projectId = getProjectId()
-  const payload = await buildAssignmentUpsertPayload(input)
-  const existing = await getAssignmentByClientAndMember(payload.clientId, payload.memberId)
-
-  if (existing?.active) {
-    throw new TeamAdminValidationError('This member already has an active assignment for the selected account.', 409, {
-      assignmentId: existing.assignmentId
-    })
-  }
 
   const ASSIGNMENT_NULL_TYPES: Record<string, string> = {
     roleTitleOverride: 'STRING',
@@ -1593,67 +2067,74 @@ export const createAssignment = async ({
     await getBigQueryClient().query({
       query: `
         INSERT INTO \`${projectId}.greenhouse.client_team_assignments\` (
-          assignment_id,
-          client_id,
-          member_id,
-          fte_allocation,
-          hours_per_month,
-          role_title_override,
-          relevance_note_override,
-          contact_channel_override,
-          contact_handle_override,
-          active,
-          start_date,
-          created_at,
-          updated_at
+          assignment_id, client_id, member_id, fte_allocation, hours_per_month,
+          role_title_override, relevance_note_override,
+          contact_channel_override, contact_handle_override,
+          active, start_date, created_at, updated_at
         )
         VALUES (
-          @assignmentId,
-          @clientId,
-          @memberId,
-          @fteAllocation,
-          @hoursPerMonth,
-          @roleTitleOverride,
-          @relevanceNoteOverride,
-          @contactChannelOverride,
-          @contactHandleOverride,
-          TRUE,
-          @startDate,
-          CURRENT_TIMESTAMP(),
-          CURRENT_TIMESTAMP()
+          @assignmentId, @clientId, @memberId, @fteAllocation, @hoursPerMonth,
+          @roleTitleOverride, @relevanceNoteOverride,
+          @contactChannelOverride, @contactHandleOverride,
+          TRUE, @startDate, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
         )
       `,
       params: payload,
       types: typesOpt
     })
   }
+}
 
-  // ── Postgres dual-write ──
-  syncAssignmentToPostgres(
-    existing ? 'reactivate' : 'create',
-    `INSERT INTO greenhouse_core.client_team_assignments (
-       assignment_id, client_id, member_id, fte_allocation, hours_per_month,
-       role_title_override, relevance_note_override,
-       contact_channel_override, contact_handle_override,
-       active, start_date, end_date, created_at, updated_at
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE, $10::date, NULL,
-       CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-     ON CONFLICT (assignment_id) DO UPDATE SET
-       fte_allocation = EXCLUDED.fte_allocation,
-       hours_per_month = EXCLUDED.hours_per_month,
-       role_title_override = EXCLUDED.role_title_override,
-       relevance_note_override = EXCLUDED.relevance_note_override,
-       contact_channel_override = EXCLUDED.contact_channel_override,
-       contact_handle_override = EXCLUDED.contact_handle_override,
-       active = TRUE, start_date = EXCLUDED.start_date, end_date = NULL,
-       updated_at = CURRENT_TIMESTAMP`,
-    [
-      payload.assignmentId, payload.clientId, payload.memberId,
-      payload.fteAllocation, payload.hoursPerMonth, payload.roleTitleOverride,
-      payload.relevanceNoteOverride, payload.contactChannelOverride,
-      payload.contactHandleOverride, payload.startDate
-    ]
-  )
+export const createAssignment = async ({
+  input,
+  actorUserId,
+  actorEmail
+}: {
+  input: CreateAssignmentInput
+  actorUserId: string
+  actorEmail: string | null
+}) => {
+  const payload = await buildAssignmentUpsertPayload(input)
+  const existing = await getAssignmentByClientAndMember(payload.clientId, payload.memberId)
+
+  if (existing?.active) {
+    throw new TeamAdminValidationError('This member already has an active assignment for the selected account.', 409, {
+      assignmentId: existing.assignmentId
+    })
+  }
+
+  const pgValues = [
+    payload.assignmentId, payload.clientId, payload.memberId,
+    payload.fteAllocation, payload.hoursPerMonth, payload.roleTitleOverride,
+    payload.relevanceNoteOverride, payload.contactChannelOverride,
+    payload.contactHandleOverride, payload.startDate
+  ]
+
+  if (isGreenhousePostgresConfigured()) {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_core.client_team_assignments (
+         assignment_id, client_id, member_id, fte_allocation, hours_per_month,
+         role_title_override, relevance_note_override,
+         contact_channel_override, contact_handle_override,
+         active, start_date, end_date, created_at, updated_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE, $10::date, NULL,
+         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+       ON CONFLICT (assignment_id) DO UPDATE SET
+         fte_allocation = EXCLUDED.fte_allocation,
+         hours_per_month = EXCLUDED.hours_per_month,
+         role_title_override = EXCLUDED.role_title_override,
+         relevance_note_override = EXCLUDED.relevance_note_override,
+         contact_channel_override = EXCLUDED.contact_channel_override,
+         contact_handle_override = EXCLUDED.contact_handle_override,
+         active = TRUE, start_date = EXCLUDED.start_date, end_date = NULL,
+         updated_at = CURRENT_TIMESTAMP`,
+      pgValues
+    )
+
+    syncToBigQuery('createAssignment', () => createAssignmentInBigQuery(payload, existing))
+  } else {
+    await createAssignmentInBigQuery(payload, existing)
+  }
 
   const created = await getAssignmentRecord(payload.assignmentId)
 
@@ -1677,37 +2158,21 @@ export const createAssignment = async ({
   return created
 }
 
-export const updateAssignment = async ({
-  assignmentId,
-  input,
-  actorUserId,
-  actorEmail
-}: {
-  assignmentId: string
-  input: UpdateAssignmentInput
-  actorUserId: string
-  actorEmail: string | null
-}) => {
+const updateAssignmentInBigQuery = async (assignmentId: string, updates: Record<string, unknown>) => {
   const projectId = getProjectId()
   const assignmentColumns = await getAssignmentColumns()
-  const { existing, updates } = await buildAssignmentUpdatePayload(assignmentId, input)
   const setClauses: string[] = []
   const params: Record<string, unknown> = { assignmentId }
 
   for (const [column, value] of Object.entries(updates)) {
-    if (!writableAssignmentColumns.has(column) || !assignmentColumns.has(column)) {
-      continue
-    }
+    if (!writableAssignmentColumns.has(column) || !assignmentColumns.has(column)) continue
 
     const paramKey = column.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
-
     setClauses.push(`${column} = @${paramKey}`)
     params[paramKey] = value
   }
 
-  if (setClauses.length === 0) {
-    return existing
-  }
+  if (setClauses.length === 0) return
 
   setClauses.push('updated_at = CURRENT_TIMESTAMP()')
 
@@ -1737,29 +2202,49 @@ export const updateAssignment = async ({
     params,
     types: Object.keys(assignTypes).length > 0 ? assignTypes : undefined
   })
+}
 
-  // ── Postgres dual-write ──
-  {
+export const updateAssignment = async ({
+  assignmentId,
+  input,
+  actorUserId,
+  actorEmail
+}: {
+  assignmentId: string
+  input: UpdateAssignmentInput
+  actorUserId: string
+  actorEmail: string | null
+}) => {
+  const { existing, updates } = await buildAssignmentUpdatePayload(assignmentId, input)
+
+  if (Object.keys(updates).length === 0) {
+    return existing
+  }
+
+  if (isGreenhousePostgresConfigured()) {
     const pgClauses: string[] = []
     const pgValues: unknown[] = []
     let pi = 1
 
     for (const [col, val] of Object.entries(updates)) {
       if (!writableAssignmentColumns.has(col)) continue
-      pgClauses.push(`${col} = $${pi}`)
+      pgClauses.push(`${col} = $${pi++}`)
       pgValues.push(val)
-      pi++
     }
 
     if (pgClauses.length > 0) {
       pgClauses.push('updated_at = CURRENT_TIMESTAMP')
       pgValues.push(assignmentId)
-      syncAssignmentToPostgres(
-        'update',
+
+      await runGreenhousePostgresQuery(
         `UPDATE greenhouse_core.client_team_assignments SET ${pgClauses.join(', ')} WHERE assignment_id = $${pi}`,
         pgValues
       )
     }
+
+    syncToBigQuery('updateAssignment', () => updateAssignmentInBigQuery(assignmentId, updates))
+  } else {
+    await updateAssignmentInBigQuery(assignmentId, updates)
   }
 
   const updated = await getAssignmentRecord(assignmentId)
@@ -1793,33 +2278,40 @@ export const deleteAssignment = async ({
   actorUserId: string
   actorEmail: string | null
 }) => {
-  const projectId = getProjectId()
   const existing = await getAssignmentRecord(assignmentId)
 
   if (!existing) {
     throw new TeamAdminValidationError('Assignment not found.', 404)
   }
 
-  await getBigQueryClient().query({
-    query: `
-      UPDATE \`${projectId}.greenhouse.client_team_assignments\`
-      SET
-        active = FALSE,
-        end_date = CURRENT_DATE(),
-        updated_at = CURRENT_TIMESTAMP()
-      WHERE assignment_id = @assignmentId
-    `,
-    params: { assignmentId }
-  })
+  if (isGreenhousePostgresConfigured()) {
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_core.client_team_assignments
+       SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
+       WHERE assignment_id = $1`,
+      [assignmentId]
+    )
 
-  // ── Postgres dual-write ──
-  syncAssignmentToPostgres(
-    'delete',
-    `UPDATE greenhouse_core.client_team_assignments
-     SET active = FALSE, end_date = CURRENT_DATE, updated_at = CURRENT_TIMESTAMP
-     WHERE assignment_id = $1`,
-    [assignmentId]
-  )
+    const projectId = getProjectId()
+
+    syncToBigQuery('deleteAssignment', () =>
+      getBigQueryClient().query({
+        query: `UPDATE \`${projectId}.greenhouse.client_team_assignments\` SET active = FALSE, end_date = CURRENT_DATE(), updated_at = CURRENT_TIMESTAMP() WHERE assignment_id = @assignmentId`,
+        params: { assignmentId }
+      })
+    )
+  } else {
+    const projectId = getProjectId()
+
+    await getBigQueryClient().query({
+      query: `
+        UPDATE \`${projectId}.greenhouse.client_team_assignments\`
+        SET active = FALSE, end_date = CURRENT_DATE(), updated_at = CURRENT_TIMESTAMP()
+        WHERE assignment_id = @assignmentId
+      `,
+      params: { assignmentId }
+    })
+  }
 
   const updated = await getAssignmentRecord(assignmentId)
 

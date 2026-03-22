@@ -40,6 +40,94 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-22 09:15 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Abrir `CODEX_TASK_HR_Payroll_Operational_Hardening_v1`.
+- Primer slice tomado:
+  - readiness/preflight por período
+  - exponer antes del cálculo quién entra, quién queda fuera y qué bloquea realmente el período
+  - agregar feedback mínimo en `Período actual`
+  - cubrir el contrato con tests unitarios
+- Segundo slice ya implementado:
+  - explainability por `payroll_entry`
+  - endpoint dedicado de detalle de cálculo
+  - diálogo UI para auditar snapshot de compensación, KPI, asistencia, bruto/descuentos/neto y banderas manuales
+- Ajuste adicional de robustez:
+  - la asistencia quedó explícitamente modelada como `non-blocking` en readiness
+  - se agregó `attendanceDiagnostics` al contrato para dejar lista la futura integración con `Microsoft Teams`
+  - fuente actual declarada: `legacy_attendance_daily_plus_hr_leave`
+  - integración objetivo declarada: `microsoft_teams`
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos previstos
+- `src/lib/payroll/payroll-readiness.ts`
+- `src/lib/payroll/payroll-readiness.test.ts`
+- `src/types/payroll.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/readiness/route.ts`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `src/lib/payroll/payroll-entry-explain.ts`
+- `src/lib/payroll/payroll-entry-explain.test.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/explain/route.ts`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+
+### Verificación
+- `pnpm exec eslint src/types/payroll.ts src/lib/payroll/payroll-readiness.ts src/lib/payroll/payroll-readiness.test.ts 'src/app/api/hr/payroll/periods/[periodId]/readiness/route.ts' src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx src/lib/payroll/payroll-entry-explain.ts src/lib/payroll/payroll-entry-explain.test.ts 'src/app/api/hr/payroll/entries/[entryId]/explain/route.ts' src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx` ✅
+- `pnpm vitest run src/lib/payroll/payroll-readiness.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx src/lib/payroll/payroll-entry-explain.test.ts src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx` ✅
+- `npx tsc --noEmit` ⚠️ bloqueado por errores preexistentes fuera del scope en `src/lib/team-admin/mutate-team.ts`
+
+### Riesgos o pendientes
+- No cambiar todavía la semántica del cálculo ni bloquear `calculate` por warnings meramente informativos.
+- Los únicos bloqueantes nuevos del readiness deben corresponder a condiciones ya bloqueantes en runtime:
+  - período sin miembros con compensación vigente
+  - `UF` faltante cuando una compensación Chile/Isapre lo exige
+- La señal de “attendance faltante” en esta primera pasada se tratará como warning, no como bloqueo final, porque el runtime actual todavía consolida asistencia/licencias desde fuentes mixtas.
+- La task activa ya fue movida a `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md` para respetar la taxonomía operativa del repo.
+- Gap explícito que sigue abierto:
+  - el snapshot actual de `payroll_entry` no conserva si el KPI `ICO` vino por `materialized` o `live`; el detalle de cálculo ya lo comunica como limitación conocida
+- La futura integración de asistencia con `Microsoft Teams` ya tiene costura técnica abierta en el contrato; todavía no cambia el source runtime actual.
+- Próximo slice recomendado:
+  - endurecimiento de fuentes de asistencia/licencias o motor tributario Chile, según prioridad operativa
+
+## 2026-03-22 — Admin Team PG Migration -03
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Implementar y cerrar `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
+- 3 slices: member reads/mutations, assignment reads/mutations (dual-write flipped), team-queries roster + identity
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Archivos tocados
+- `src/lib/team-admin/mutate-team.ts` — Postgres-first reads + Postgres-primary mutations + identity sync
+- `src/lib/team-queries.ts` — Postgres-first roster + identity reads
+
+### Verificación
+- `npx tsc --noEmit` ✅
+- `pnpm test` — 179 tests pass ✅
+
+### Riesgos o pendientes
+- `org_role_name` / `profession_name` NULL en Postgres path (catálogos solo en BigQuery) — mismo tratamiento que People
+- `notion_ops` queries se mantienen en BigQuery (no hay Postgres equivalente)
+- BigQuery fallback funcional si Postgres falla
+- Cross-impact deltas aplicados a: Team Identity Capacity, Staff Augmentation, People 360 Enrichments
+
 ## 2026-03-22 — Task Closure -03
 
 ### Agente

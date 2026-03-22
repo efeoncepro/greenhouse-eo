@@ -5,6 +5,7 @@
 - `get-person-detail.ts` es archivo owned por esta task y fue modificado: ahora tiene Postgres queries directas para member, assignments e identity links
 - Implicación: enrichments nuevos pueden asumir que `identity_profile_id` está disponible en el path primario de lectura; no necesitan hacer resolución separada
 - `person_360` ya se usa como backbone para identity context y access context en person detail
+- Admin Team module now also Postgres-first; member reads in `mutate-team.ts` use same `shouldFallbackToLegacy` pattern; enrichments from team capacity can now assume Postgres path for roster data — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
 
 ## Estado
 

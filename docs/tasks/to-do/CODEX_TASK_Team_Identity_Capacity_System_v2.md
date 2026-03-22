@@ -1,5 +1,9 @@
 # CODEX TASK — Team Identity & Capacity: Canonical Identity Closed, Formal Capacity Pending (v2)
 
+## Delta 2026-03-22
+- Admin Team mutations and reads now Postgres-first; `client_team_assignments` dual-write flipped to Postgres-primary; `syncAssignmentToPostgres` removed — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
+- Capacity queries in `team-queries.ts` now read roster from Postgres (operational load stays in BigQuery via `notion_ops`)
+
 ## Resumen
 
 Esta task no parte desde cero. La base canónica de identidad del colaborador ya existe en runtime y esta `v2` se enfoca en cerrar lo que sigue realmente abierto: la formalización del modelo y de las APIs de capacidad.

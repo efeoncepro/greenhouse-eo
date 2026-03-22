@@ -1,5 +1,8 @@
 # CODEX TASK -- Staff Augmentation Module v2: Placements como extension canonica de Assignments
 
+## Delta 2026-03-22
+- Admin Team assignments now Postgres-primary; `team-queries.ts` reads roster from Postgres; assignment_type enrichments can assume Postgres as source of truth for assignments — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
+
 ## Delta 2026-03-21
 - Finance Postgres Runtime Migration Slice 3 completo: reconciliación y mutaciones de income/expenses ahora Postgres-first — cerrado por trabajo en `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`
 - Placement economics (`cost_rate_amount`, `billing_rate_amount`) pueden asumir write path Postgres estable

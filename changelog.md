@@ -6,6 +6,20 @@
 
 ## 2026-03-22
 
+### Admin Team now Postgres-first with BigQuery fallback
+- `mutate-team.ts` migrado: todas las reads (members, assignments, clients) y mutations (create/update/deactivate member, create/update/delete assignment) ahora escriben y leen desde PostgreSQL como fuente primaria
+- Dual-write invertido: `syncAssignmentToPostgres` eliminado, reemplazado por `syncToBigQuery` fire-and-forget
+- `syncIdentitySourceLinksForMember` ahora hace UPSERT en Postgres como primario
+- `team-queries.ts`: roster y identity source links ahora Postgres-first; queries `notion_ops` se mantienen en BigQuery
+- Column mapping: `primary_email AS email` en todo SELECT Postgres
+
+### Payroll now exposes period readiness and entry-level calculation detail
+- `Payroll` ahora puede exponer un `readiness` explícito por período antes de calcular, indicando quién entra al cálculo, quién queda fuera por falta de compensación y qué bloquea realmente el período, como `UF` faltante para casos Chile/Isapre.
+- La tab `Período actual` ya muestra esos bloqueos/warnings y deshabilita `Calcular` solo cuando hay bloqueantes reales del runtime.
+- Cada `payroll_entry` ahora tiene un detalle de cálculo auditable vía endpoint dedicado y diálogo UI: período, compensación aplicada, KPI usados, asistencia, base/teletrabajo efectivos, bonos, bruto, descuentos, neto y banderas manuales.
+- El detalle también comunica una limitación todavía abierta del modelo actual: el snapshot conserva `kpi_data_source = ico`, pero aún no persiste si ese KPI vino de lectura `materialized` o `live`.
+- La asistencia quedó modelada explícitamente como `non-blocking` en el readiness actual y ahora expone `attendanceDiagnostics`, declarando la fuente runtime vigente (`legacy_attendance_daily_plus_hr_leave`) y el target de integración futura (`microsoft_teams`).
+
 ### People consumers now Postgres-first with BigQuery fallback
 - `People list` y `Person detail` ya no leen primero de BigQuery. La fuente primaria es PostgreSQL (`greenhouse_core.members`, `client_team_assignments`, `compensation_versions`, `identity_profile_source_links`).
 - BigQuery queda como fallback automático para errores transitorios de infraestructura (connection refused, timeout, Cloud SQL, relation not found) via `shouldFallbackToLegacy()`.

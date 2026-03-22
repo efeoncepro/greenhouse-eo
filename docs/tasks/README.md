@@ -10,7 +10,9 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 ## In Progress
 
-_(Sin tasks activas)_
+| Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
+| --- | --- | --- | --- | --- | --- |
+| [CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md](in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md) | P1 | Alto | Alto | Parcial | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
 
 ## To Do
 
@@ -36,7 +38,7 @@ _(Sin tasks activas)_
 | 2 | ~~CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md~~ | — | — | — | **Cerrada** | People consumers migrados a Postgres-first con BigQuery fallback; backfill script para reconciliación de orphan profiles; 22 tests unitarios |
 | 3 | ~~GREENHOUSE_IDENTITY_ACCESS_V2.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de arquitectura → `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. 12/12 items implementados |
 | 4 | ~~CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md~~ | — | — | — | **Cerrada** | 3 slices completos: accounts/suppliers/rates, income/expenses CRUD, reconciliación runtime — todo Postgres-first con BigQuery fallback |
-| 5 | [CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md](to-do/CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md) | P1 | Alto | Medio | Diseño | Migración de mutaciones Admin Team de BigQuery a PostgreSQL; convergencia con People memberships |
+| 5 | ~~CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md~~ | — | — | — | **Cerrada** | 3 slices: member reads/mutations, assignment reads/mutations, team-queries — todo Postgres-first con BigQuery fallback |
 | 6 | [CODEX_TASK_People_360_Enrichments_v1.md](to-do/CODEX_TASK_People_360_Enrichments_v1.md) | P1 | Alto | Medio | Parcial | Enrichments cross-module para consolidar `People` como lectura 360 |
 | 7 | ~~CODEX_TASK_Creative_Hub_Module_v2.md~~ | — | — | — | **Cerrada** | 4/4 gaps resueltos: AND gate activación, Brand Intelligence con KPIs reales, CSC pipeline con fases explícitas, métricas con aging real por item |
 | 8 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
@@ -115,6 +117,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [CODEX_TASK_Transactional_Email_System.md](complete/CODEX_TASK_Transactional_Email_System.md) | Sistema transaccional de email: reset, invitaciones, verificación — Resend + React Email + PostgreSQL |
 | [CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md](complete/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md) | 3 slices: Slice 1 (accounts, suppliers, rates — 7 rutas), Slice 2 (income/expenses CRUD + PUT — 5 rutas), Slice 3 (reconciliación runtime completa — 10 rutas). Todo Postgres-first con BigQuery fallback. Feature-flag gating via `assertFinanceSlice2PostgresReady()` |
 | [CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md](complete/CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md) | 3 slices: People list Postgres-first, Person detail Postgres-first (3 sub-queries), reconciliation coverage (backfill script). 22 tests unitarios. BigQuery fallback con `shouldFallbackToLegacy()` |
+| [CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md](complete/CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md) | 3 slices: Slice 1 (member reads/mutations + identity sync), Slice 2 (assignment reads/mutations — dual-write flipped), Slice 3 (team-queries roster + identity). Todo Postgres-first con BigQuery fallback. `syncAssignmentToPostgres` eliminado, reemplazado por `syncToBigQuery` |
 
 ## Mapa de dependencias cruzadas
 
