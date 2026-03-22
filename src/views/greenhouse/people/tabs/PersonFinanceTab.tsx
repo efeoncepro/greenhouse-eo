@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+
 import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -274,6 +277,21 @@ const PersonFinanceTab = ({ memberId }: Props) => {
             </TableContainer>
           )}
         </Card>
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Button
+            component={Link}
+            href='/finance'
+            variant='tonal'
+            size='small'
+            color='secondary'
+            startIcon={<i className='tabler-external-link' aria-hidden='true' />}
+            aria-label='Ir al módulo de finanzas'
+          >
+            Ver en módulo de finanzas
+          </Button>
+        </Box>
       </Grid>
     </Grid>
   )

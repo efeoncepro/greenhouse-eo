@@ -40,6 +40,86 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-22 08:36 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Canonizar el mapa de repos hermanos de `greenhouse-eo` para que futuros agentes sepan qué repo consultar primero según el dominio.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Documentación / coordinación multi-repo
+
+### Archivos tocados
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- `docs/README.md`
+- `AGENTS.md`
+- `README.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificación
+- Validación documental/manual del contenido contra GitHub CLI:
+  - `gh repo view cesargrowth11/notion-bigquery`
+  - `gh repo view cesargrowth11/hubspot-bigquery`
+  - `gh repo view cesargrowth11/notion-teams`
+  - `gh repo view cesargrowth11/notion-frame-io`
+  - `gh repo view efeoncepro/kortex`
+- `pnpm lint` ❌
+  - falla por deuda preexistente fuera del alcance documental de este turno
+  - se observaron errores masivos de lint en `scripts/**`, `src/app/**`, `src/lib/**`, `src/views/**` y otros archivos ya modificados fuera de esta tarea
+  - no aparecieron fallos vinculados a `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ni a los enlaces documentales agregados
+
+### Riesgos o pendientes
+- La lista actual es deliberadamente corta y cubre solo los repos hermanos confirmados como operativos para Greenhouse en esta sesión.
+- Si aparece otro repo upstream real, debe agregarse en `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` y dejar solo deltas breves en los documentos vivos.
+
+## 2026-03-22 — People 360 Enrichments (CERRADA)
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Implementar y cerrar `CODEX_TASK_People_360_Enrichments_v1`:
+  - Slice 1: Wire `identity` tab en type system + permissions
+  - Slice 2: `PersonIdentityTab.tsx` — 4 cards read-only:
+    - Card 1 "Identidad": EO-ID, email canónico, sistema primario, facetas, sistemas vinculados
+    - Card 2 "Acceso al portal": estado, roles, grupos de rutas, CTA admin
+    - Card 3 "Perfil laboral": departamento, nivel, tipo empleo/contrato, ingreso, supervisor, régimen (HR Core)
+    - Card 4 "Actividad operativa": KPIs proyectos/tareas/completadas/vencidas, RpA, OTD, CRM (delivery context)
+  - Slice 3: Render en `PersonTabs.tsx` con lazy-loading
+  - Slice 4: CTAs cross-module en PersonPayrollTab y PersonFinanceTab
+
+### Rama
+- `develop`
+
+### Archivos tocados
+- `src/types/people.ts` — added `'identity'` to PersonTab
+- `src/lib/people/permissions.ts` — identity tab visibility + filter
+- `src/views/greenhouse/people/helpers.ts` — TAB_PERMISSIONS + TAB_CONFIG
+- `src/lib/people/get-people-meta.ts` — supportedTabs
+- `src/views/greenhouse/people/tabs/PersonIdentityTab.tsx` — NEW (4 cards)
+- `src/views/greenhouse/people/PersonTabs.tsx` — import + TabPanel + props
+- `src/views/greenhouse/people/tabs/PersonPayrollTab.tsx` — CTA link
+- `src/views/greenhouse/people/tabs/PersonFinanceTab.tsx` — CTA link
+- `src/lib/people/permissions.test.ts` — updated expectations
+
+### Verificación
+- `npx tsc --noEmit` — clean
+- `pnpm test` — 179/179 passing
+
+### Riesgos o pendientes
+- Tab visible para `efeonce_admin`, `efeonce_operations`, `hr_payroll` — sin datos si person_360 no está poblado (muestra empty state)
+- Task CERRADA — scope completo
+
+---
+
 ## 2026-03-22 09:15 -03
 
 ### Agente

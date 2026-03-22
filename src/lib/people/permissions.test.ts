@@ -14,7 +14,8 @@ describe('people access matrix', () => {
       'payroll',
       'finance',
       'hr-profile',
-      'ai-tools'
+      'ai-tools',
+      'identity'
     ])
     expect(access.canViewMemberships).toBe(true)
     expect(access.canViewHrProfile).toBe(true)
@@ -30,7 +31,8 @@ describe('people access matrix', () => {
       'compensation',
       'payroll',
       'finance',
-      'hr-profile'
+      'hr-profile',
+      'identity'
     ])
     expect(access.canViewMemberships).toBe(false)
     expect(access.canViewHrProfile).toBe(true)
@@ -46,7 +48,8 @@ describe('people access matrix', () => {
       'memberships',
       'activity',
       'finance',
-      'ai-tools'
+      'ai-tools',
+      'identity'
     ])
     expect(access.canViewMemberships).toBe(true)
     expect(access.canViewHrProfile).toBe(false)
@@ -78,7 +81,8 @@ describe('people meta contract', () => {
       'payroll',
       'finance',
       'hr-profile',
-      'ai-tools'
+      'ai-tools',
+      'identity'
     ])
     expect(meta.availableEnrichments).toMatchObject({
       activity: true,

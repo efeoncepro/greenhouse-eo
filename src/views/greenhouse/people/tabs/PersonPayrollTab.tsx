@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -168,6 +170,21 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
             </TableContainer>
           </CardContent>
         </Card>
+      </Grid>
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Button
+            component={Link}
+            href='/hr/payroll'
+            variant='tonal'
+            size='small'
+            color='secondary'
+            startIcon={<i className='tabler-external-link' aria-hidden='true' />}
+            aria-label='Ir al módulo de nómina'
+          >
+            Ver en módulo de nómina
+          </Button>
+        </Box>
       </Grid>
     </Grid>
   )

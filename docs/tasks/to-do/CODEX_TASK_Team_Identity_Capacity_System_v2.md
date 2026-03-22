@@ -3,6 +3,7 @@
 ## Delta 2026-03-22
 - Admin Team mutations and reads now Postgres-first; `client_team_assignments` dual-write flipped to Postgres-primary; `syncAssignmentToPostgres` removed — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
 - Capacity queries in `team-queries.ts` now read roster from Postgres (operational load stays in BigQuery via `notion_ops`)
+- People 360 Enrichments cerrada: tab "Identidad" ahora muestra capacity-adjacent data (actividad operativa con KPIs de proyectos/tareas, delivery context) — capacity enrichments que esta task planee pueden asumir que People ya consume `deliveryContext` y `hrContext` como read-only — cerrado por `CODEX_TASK_People_360_Enrichments_v1`
 
 ## Resumen
 

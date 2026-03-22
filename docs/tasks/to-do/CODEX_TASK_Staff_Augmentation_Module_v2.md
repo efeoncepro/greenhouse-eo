@@ -2,6 +2,7 @@
 
 ## Delta 2026-03-22
 - Admin Team assignments now Postgres-primary; `team-queries.ts` reads roster from Postgres; assignment_type enrichments can assume Postgres as source of truth for assignments — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
+- People 360 Enrichments cerrada: tab "Identidad" ya muestra assignment_type-adjacent data (actividad operativa, perfil laboral); People enrichment de `assignment_type` badges puede construirse sobre el tab existente — cerrado por `CODEX_TASK_People_360_Enrichments_v1`
 
 ## Delta 2026-03-21
 - Finance Postgres Runtime Migration Slice 3 completo: reconciliación y mutaciones de income/expenses ahora Postgres-first — cerrado por trabajo en `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`

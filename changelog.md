@@ -6,6 +6,21 @@
 
 ## 2026-03-22
 
+### Repo ecosystem map canonized for multi-repo work
+- Se agregó `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` como fuente canónica para saber qué repos hermanos consultar antes de tocar pipelines, notificaciones o tooling externo a `greenhouse-eo`.
+- Quedaron documentados como repos hermanos operativos: `notion-bigquery`, `hubspot-bigquery`, `notion-teams`, `notion-frame-io` y `kortex`.
+
+### People 360 identity tab and cross-module CTAs (CODEX_TASK cerrada)
+- Nuevo tab "Identidad" en People detail con 4 cards read-only:
+  - **Identidad**: EO-ID, email canónico, sistema primario, modo de autenticación, facetas member/user/CRM, sistemas vinculados
+  - **Acceso al portal**: estado activo/inactivo, roles, grupos de rutas, último acceso, CTA a admin de usuario (solo admin/ops)
+  - **Perfil laboral**: departamento, nivel de cargo, tipo empleo/contrato, fecha ingreso, supervisor, régimen de pago (consume HR Core vía `hrContext`)
+  - **Actividad operativa**: 4 KPIs (proyectos activos, tareas activas, completadas 30d, vencidas), RpA, OTD, empresas y deals CRM (consume delivery context)
+- Tab visible para `efeonce_admin`, `efeonce_operations`, `hr_payroll`
+- Empty state cuando el colaborador no tiene ningún contexto Person 360
+- CTAs cross-module: "Ver en módulo de nómina" en PersonPayrollTab y "Ver en módulo de finanzas" en PersonFinanceTab
+- Meta endpoint declara `identity` en `supportedTabs`; 0 endpoints nuevos — todo consume datos ya cargados en `getPersonDetail()`
+
 ### Admin Team now Postgres-first with BigQuery fallback
 - `mutate-team.ts` migrado: todas las reads (members, assignments, clients) y mutations (create/update/deactivate member, create/update/delete assignment) ahora escriben y leen desde PostgreSQL como fuente primaria
 - Dual-write invertido: `syncAssignmentToPostgres` eliminado, reemplazado por `syncToBigQuery` fire-and-forget
