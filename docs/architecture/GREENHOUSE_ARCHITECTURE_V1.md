@@ -16,6 +16,7 @@ Use together with:
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
+- `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 
 ## Product Thesis
 
@@ -218,6 +219,19 @@ Config-driven registry (`src/config/capability-registry.ts`) that maps module ID
 Module-specific query pages include: CRM Command Center, Creative Hub, Web Delivery Lab, Onboarding Center.
 
 Access governed by `verifyCapabilityModuleAccess()` for tenant-level gating.
+
+### Integrations & Event Delivery
+
+Greenhouse currently combines:
+- a token-based integrations API
+- one inbound Teams attendance webhook
+- an outbox-driven publication path from PostgreSQL to BigQuery
+
+Reusable inbound and outbound webhook infrastructure is now standardized separately in `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
+
+Rule:
+- do not keep adding one-off webhook routes as permanent integration strategy
+- new webhook or callback work should align with the shared webhook architecture and the existing outbox model
 
 ### Admin & Governance
 

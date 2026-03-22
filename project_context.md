@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-22 Webhook architecture canonized
+- La infraestructura de webhooks de Greenhouse ya no queda como idea difusa entre una ruta aislada de Teams, el outbox y la API de integraciones.
+- La fuente canonica para webhook architecture quedo fijada en:
+  - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- Decision operativa derivada:
+  - los futuros webhooks inbound y outbound deben montarse sobre una capa reusable encima de `greenhouse_sync`
+  - `greenhouse_sync.outbox_events` sigue siendo la fuente de eventos operativos para delivery externo
+  - la API `/api/integrations/v1/*` sigue viva para sync/pull/push explicito; webhooks no la reemplazan
+- Lane derivada creada:
+  - `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md`
+
 ## Delta 2026-03-22 Repo ecosystem canonized
 - Ya no queda implícito qué repos externos son hermanos operativos de `greenhouse-eo`.
 - La fuente canónica para ownership multi-repo y selección de upstream quedó fijada en:

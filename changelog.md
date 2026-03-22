@@ -6,6 +6,14 @@
 
 ## 2026-03-22
 
+### Lint debt burn-down lane documented
+- Se agrego `docs/tasks/to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md` para cerrar la deuda actual de `eslint` en una lane dedicada y no seguir mezclando higiene mecanica con cambios funcionales.
+- La task fija el baseline actual (`399` errores, `11` warnings), el orden recomendado de burn-down por carpetas y la estrategia de ejecucion en slices con autofix controlado y cleanup manual.
+
+### Webhook architecture and MVP implementation lane canonized
+- Se agrego `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` como contrato canonico para inbound/outbound webhooks sobre `greenhouse_sync` y `outbox_events`.
+- Se agrego `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md` como lane de implementacion para gateway inbound, dispatcher outbound, firmas, retries y dead letters.
+
 ### Repo ecosystem map canonized for multi-repo work
 - Se agregó `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` como fuente canónica para saber qué repos hermanos consultar antes de tocar pipelines, notificaciones o tooling externo a `greenhouse-eo`.
 - Quedaron documentados como repos hermanos operativos: `notion-bigquery`, `hubspot-bigquery`, `notion-teams`, `notion-frame-io` y `kortex`.

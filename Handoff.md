@@ -40,6 +40,84 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-22 09:32 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Documentar la deuda vigente de `eslint` como una `CODEX_TASK` ejecutable despues, sin tocar todavia el baseline de codigo.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Documentacion / task planning
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificación
+- Analisis previo de `eslint` reutilizado para fijar alcance y slices del burn-down:
+  - `399` errores
+  - `11` warnings
+  - `108` archivos afectados
+  - `365` errores y `4` warnings autofixables
+- Verificacion documental manual de que la task quedo indexada en `docs/tasks/README.md`.
+- No se ejecuto `pnpm lint` en este turno porque la task creada existe precisamente para cerrar esa deuda despues en una lane dedicada.
+
+### Riesgos o pendientes
+- La deuda de lint sigue abierta; esta entrada solo deja el plan operativo y el orden recomendado de ejecucion.
+- El arbol trae cambios ajenos en `src/components/theme/types.ts` y en la reclasificacion/cierre de `CODEX_TASK_Typography_Hierarchy_Fix`; no mezclar esos cambios con el commit documental de esta lane.
+
+## 2026-03-22 09:05 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Canonizar la arquitectura de webhooks para Greenhouse y dejar creada la lane MVP de implementacion.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Documentacion / arquitectura / task planning
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/tasks/README.md`
+- `docs/README.md`
+- `AGENTS.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificación
+- Contraste documental/manual contra el runtime actual del repo:
+  - webhook inbound real: `src/app/api/hr/core/attendance/webhook/teams/route.ts`
+  - secreto compartido: `src/lib/hr-core/shared.ts`
+  - outbox consumer: `src/lib/sync/outbox-consumer.ts`
+  - cron actual: `src/app/api/cron/outbox-publish/route.ts`
+  - contrato de integraciones: `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+- Verificacion GitHub:
+  - `gh api repos/efeoncepro/greenhouse-eo/hooks` -> sin webhooks de repo configurados
+- No se ejecuto `pnpm lint` en este turno porque el repo ya arrastra una deuda de lint documentada previamente y el alcance aqui fue solo documental.
+
+### Riesgos o pendientes
+- La arquitectura deja claro el target, pero no implementa todavia las tablas ni el gateway compartido.
+- La nueva lane debe coordinarse especialmente con:
+  - `CODEX_TASK_Notification_System.md`
+  - `CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md`
+  - `CODEX_TASK_Services_Runtime_Closure_v1.md`
+
 ## 2026-03-22 08:36 -03
 
 ### Agente

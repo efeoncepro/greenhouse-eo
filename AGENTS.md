@@ -36,6 +36,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - revisar `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
 - Si el cambio toca pipelines externos, notificaciones, sync con Notion/HubSpot/Frame.io/Teams o dependencias multi-repo:
   - revisar `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- Si el cambio toca webhooks, event delivery, callbacks o integraciones near-real-time:
+  - revisar `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - Si el cambio toca PostgreSQL, Cloud SQL, backfills, source sync o migraciones runtime:
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`

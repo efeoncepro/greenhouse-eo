@@ -27,6 +27,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md](architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md)
 - [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 - [GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md](architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md)
+- [GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md](architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md)
 - [GREENHOUSE_SERVICE_MODULES_V1.md](architecture/GREENHOUSE_SERVICE_MODULES_V1.md)
 - [FINANCE_CANONICAL_360_V1.md](architecture/FINANCE_CANONICAL_360_V1.md)
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
