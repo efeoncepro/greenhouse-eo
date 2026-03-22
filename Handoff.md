@@ -40,6 +40,116 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-22 — Task Closure -03
+
+### Agente
+- Claude Opus
+
+### Objetivo del turno
+- Cerrar `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` — consumer cutover de People a Postgres-first completado
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Archivos tocados
+- `src/lib/people/get-people-list.ts` — Postgres-first con BigQuery fallback
+- `src/lib/people/get-person-detail.ts` — 3 sub-queries Postgres-first con BigQuery fallback independiente
+- `src/lib/people/get-people-list.test.ts` — 11 tests unitarios (Postgres path, fallback, error propagation)
+- `src/lib/people/get-person-detail.test.ts` — 11 tests unitarios (member, assignments, identity links, fallback)
+- `scripts/backfill-orphan-member-profiles.ts` — reconciliación de members sin identity_profile_id
+
+### Verificación
+- `npx tsc --noEmit` ✅
+- `pnpm test` — 22 tests pass ✅
+
+### Riesgos o pendientes
+- Ejecutar `backfill-orphan-member-profiles.ts` en staging/production (operativo)
+- Ejecutar `audit-person-360-coverage.ts` para verificar cobertura post-backfill (operativo)
+- Smoke test en staging: People list + person detail navigation
+- Cross-impact deltas aplicados a: People 360 Enrichments, SCIM Provisioning
+
+## 2026-03-21 08:40 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Alinear `People > Perfil HR` con la arquitectura 360:
+  - usar `detail.hrContext` como fuente primaria del perfil HR
+  - usar métricas ICO como fuente primaria de KPI operativos en la tab
+  - dejar `HR Core`/`member_profiles` solo como enriquecimiento opcional de datos personales y skills
+  - agregar tests unitarios para evitar nueva desalineación entre `People`, `HR Core` e `ICO`
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- `staging`
+
+### Archivos previstos
+- `src/views/greenhouse/people/PersonTabs.tsx`
+- `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx`
+- `src/views/greenhouse/people/tabs/person-hr-profile-view-model.ts`
+- `src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts`
+- `src/views/greenhouse/people/PersonTabs.test.tsx`
+- `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+
+### Riesgos o pendientes
+- No tocar layout global ni volver a parchear CSS base del dashboard para este problema.
+- Mantener `Payroll` fuera de este slice: la preocupación del usuario es válida, pero la fuente del cálculo de nómina no es esta tab.
+- Estado actual del slice:
+  - `PersonTabs` ya pasa `hrContext` y `operationalMetrics` a `PersonHrProfileTab`.
+  - `PersonHrProfileTab` ahora usa `detail.hrContext` como fuente primaria para información laboral y ausencias, consulta ICO vía `/api/people/[memberId]/ico` para KPI operativos y deja `/api/hr/core/members/[memberId]/profile` solo como enriquecimiento opcional de datos personales, skills y links.
+  - Tests agregados:
+    - `src/views/greenhouse/people/PersonTabs.test.tsx`
+    - `src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts`
+    - `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- Verificación ejecutada:
+  - `pnpm exec eslint src/views/greenhouse/people/PersonTabs.tsx src/views/greenhouse/people/PersonTabs.test.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx src/views/greenhouse/people/tabs/person-hr-profile-view-model.ts src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts` ✅
+  - `pnpm vitest run src/views/greenhouse/people/PersonTabs.test.tsx src/views/greenhouse/people/tabs/person-hr-profile-view-model.test.ts src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx` ✅
+  - `npx tsc --noEmit` ✅
+- Pendiente recomendado:
+  - validación manual en `staging` de `/people/[memberId]?tab=hr-profile` para confirmar que el tab ya muestra `hrContext` aunque `member_profiles` esté incompleto, y que los KPI operativos salen desde ICO.
+
+## 2026-03-21 08:18 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Consolidar el contrato arquitectónico de `Payroll` en un documento canónico único para evitar que el módulo siga dependiendo de reconstrucción desde tasks, código y handoff.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Documentación / arquitectura
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/README.md`
+- `project_context.md`
+
+### Verificacion
+- Revisión cruzada contra runtime actual de `Payroll`:
+  - `scripts/setup-postgres-payroll.sql`
+  - `src/lib/payroll/calculate-payroll.ts`
+  - `src/lib/payroll/fetch-kpis-for-period.ts`
+  - `src/lib/payroll/get-compensation.ts`
+  - `src/lib/payroll/recalculate-entry.ts`
+  - `src/lib/payroll/export-payroll.ts`
+  - `src/lib/payroll/personnel-expense.ts`
+  - `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+  - `src/app/api/hr/payroll/**`
+
+### Riesgos o pendientes
+- La nueva fuente canónica de arquitectura para `Payroll` ya existe y debe actualizarse primero cuando cambien semánticas del módulo.
+- No se hizo `commit` ni `push` en esta pasada.
+
 ## 2026-03-21 08:05 -03
 
 ### Agente

@@ -1,5 +1,10 @@
 # CODEX TASK -- SCIM User Provisioning v2: Entra ID -> Greenhouse
 
+## Delta 2026-03-22
+- Dependencia `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` cerrada — People consumers ahora Postgres-first
+- Implicación para SCIM: el bridge `identity_profile_id` ahora es el path primario de lectura en People; nuevos usuarios provisionados por SCIM que creen o reconcilien un `identity_profile` serán visibles inmediatamente en People sin depender de BigQuery sync
+- Script `backfill-orphan-member-profiles.ts` disponible como referencia de patrón para reconciliación de auth principals con identity profiles
+
 ## Estado
 
 Baseline canonica de implementacion al 2026-03-19.

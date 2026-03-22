@@ -1,5 +1,11 @@
 # CODEX TASK -- People 360 Enrichments (v1)
 
+## Delta 2026-03-22
+- Dependencia `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` cerrada — People consumers (`get-people-list.ts`, `get-person-detail.ts`) ahora Postgres-first con BigQuery fallback
+- `get-person-detail.ts` es archivo owned por esta task y fue modificado: ahora tiene Postgres queries directas para member, assignments e identity links
+- Implicación: enrichments nuevos pueden asumir que `identity_profile_id` está disponible en el path primario de lectura; no necesitan hacer resolución separada
+- `person_360` ya se usa como backbone para identity context y access context en person detail
+
 ## Estado
 
 Follow-up operativo creado el `2026-03-19` despues de cerrar la task fundacional:

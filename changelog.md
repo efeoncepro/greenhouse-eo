@@ -4,7 +4,28 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-22
+
+### People consumers now Postgres-first with BigQuery fallback
+- `People list` y `Person detail` ya no leen primero de BigQuery. La fuente primaria es PostgreSQL (`greenhouse_core.members`, `client_team_assignments`, `compensation_versions`, `identity_profile_source_links`).
+- BigQuery queda como fallback automático para errores transitorios de infraestructura (connection refused, timeout, Cloud SQL, relation not found) via `shouldFallbackToLegacy()`.
+- Person detail tiene fallback independiente por sub-query: member, assignments e identity links pueden caer a BigQuery de forma aislada sin afectar a los otros.
+- Se eliminó column introspection dinámica (`getPeopleTableColumns`) del path Postgres — schema fijo y conocido.
+- `org_role_name` y `profession_name` son null en path Postgres (catálogos solo en BigQuery); `role_title` y `role_category` disponibles directamente en `members`.
+- Script `backfill-orphan-member-profiles.ts` creado para reconciliar members sin `identity_profile_id` (pendiente ejecución en staging/production).
+- 22 tests unitarios agregados cubriendo Postgres path, BigQuery fallback y error propagation.
+
 ## 2026-03-21
+
+### People HR profile now reads from 360 context first and ICO for operational KPIs
+- `People > Perfil HR` ya no depende de que `member_profiles` esté completo para renderizar información útil del colaborador.
+- La tab ahora usa `detail.hrContext` como fuente primaria para información laboral, compensación resumida y ausencias, y consulta ICO vía `/api/people/[memberId]/ico` para KPI operativos (`volumen`, `throughput`, `OTD`, `RpA`).
+- `HR Core` queda como enriquecimiento opcional para datos personales, skills, links y notas; si esos datos faltan, la vista lo comunica sin dejar toda la tab vacía.
+- Se agregaron tests unitarios para blindar la precedence de fuentes, el passthrough desde `PersonTabs` y el render del tab cuando `hrContext` existe pero `member_profiles` viene vacío.
+
+### Payroll architecture now has a dedicated canonical module doc
+- Se consolidó el contrato completo de `Payroll` en `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`.
+- La documentación ahora fija en un solo lugar la semántica de compensación versionada, período imputable, lifecycle, fuente KPI desde ICO, exports y consumers aguas abajo.
 
 ### Payroll period correction now commits the renamed period atomically
 - `Editar período` ya no falla con `Unable to read updated payroll period.` cuando se corrige el mes/año imputable de una nómina no exportada.
