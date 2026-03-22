@@ -192,6 +192,24 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
         fontWeight: 600,
         letterSpacing: '1px',
         fontSize: '0.75rem'
+      },
+      monoId: {
+        fontFamily: 'monospace',
+        fontWeight: 600,
+        fontSize: '0.875rem',
+        lineHeight: 1.54
+      },
+      monoAmount: {
+        fontFamily: 'monospace',
+        fontWeight: 700,
+        fontSize: '0.8125rem',
+        lineHeight: 1.54
+      },
+      kpiValue: {
+        fontFamily: "var(--font-poppins), 'Poppins', system-ui, sans-serif",
+        fontWeight: 800,
+        fontSize: '1.75rem',
+        lineHeight: 1.05
       }
     }
   }

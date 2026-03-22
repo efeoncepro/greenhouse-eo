@@ -1,5 +1,20 @@
 # CODEX TASK — Corrección de Jerarquía Tipográfica del Portal Greenhouse
 
+## Estado: Cerrada (parcialmente absorbida)
+
+Cerrada 2026-03-22. La jerarquía tipográfica core (DM Sans default + Poppins para headings/buttons/overline) ya fue implementada en `src/components/theme/mergedTheme.ts` como parte del theming Greenhouse. Los 56+ hardcoded `fontWeight` en componentes se abordan con custom typography variants (`monoId`, `monoAmount`, `kpiValue`) para adopción gradual — el código existente sigue funcionando sin cambios.
+
+Lo que ya está resuelto:
+- DM Sans es el fontFamily default del theme (Problema 3 del diagnóstico: resuelto)
+- Poppins reservado para h1-h6, button, overline con pesos correctos (Problema 1: resuelto en theme)
+- Fonts cargados via next/font/google con CSS variables (Paso 1: resuelto)
+- Theme MUI configurado correctamente (Paso 2: resuelto)
+
+Lo que queda como mejora gradual:
+- ~15 instancias en finance views con sx redundante (h4 ya lleva Poppins+600 desde el theme)
+- ~12 instancias de fontWeight en table totals (legítimo énfasis inline, no requiere variant)
+- Custom variants `monoId`, `monoAmount`, `kpiValue` disponibles para adopción progresiva
+
 ## Resumen
 
 El portal Greenhouse tiene un problema de jerarquía tipográfica: Poppins se está usando en pesos altos (600-700) en prácticamente todos los elementos de la interfaz — títulos, KPI numbers, labels de cards, nombres de clientes en tablas, subtítulos, badges. El resultado es un dashboard donde todo "grita" al mismo nivel y el ojo no puede escanear rápido.

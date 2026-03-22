@@ -131,6 +131,18 @@ declare module '@mui/material/styles' {
     }
   }
 
+  // Custom Typography Variants
+  interface TypographyVariants {
+    monoId: React.CSSProperties
+    monoAmount: React.CSSProperties
+    kpiValue: React.CSSProperties
+  }
+  interface TypographyVariantsOptions {
+    monoId?: React.CSSProperties
+    monoAmount?: React.CSSProperties
+    kpiValue?: React.CSSProperties
+  }
+
   // Palette Color
   interface PaletteColor {
     lighterOpacity?: string
@@ -219,6 +231,14 @@ declare module '@mui/material/styles' {
       defaultProps?: ComponentsPropsList['MuiCustomImage']
       styleOverrides?: ComponentsOverrides<Theme>['MuiCustomImage']
     }
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    monoId: true
+    monoAmount: true
+    kpiValue: true
   }
 }
 

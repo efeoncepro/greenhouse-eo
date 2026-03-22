@@ -10,6 +10,12 @@
 - Se agrego `docs/tasks/to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md` para cerrar la deuda actual de `eslint` en una lane dedicada y no seguir mezclando higiene mecanica con cambios funcionales.
 - La task fija el baseline actual (`399` errores, `11` warnings), el orden recomendado de burn-down por carpetas y la estrategia de ejecucion en slices con autofix controlado y cleanup manual.
 
+### Custom typography variants for scalable font system
+- 3 custom MUI typography variants added to `mergedTheme.ts`: `monoId` (monospace IDs), `monoAmount` (monospace currency), `kpiValue` (hero KPI numbers)
+- Full TypeScript support via module augmentation in `types.ts` — `<Typography variant="monoId">` works with type checking
+- Enables gradual migration of 56+ hardcoded `fontWeight`/`fontFamily` overrides across 37 files
+- `CODEX_TASK_Typography_Hierarchy_Fix` cerrada: core hierarchy (DM Sans default, Poppins headings) already implemented
+
 ### Webhook architecture and MVP implementation lane canonized
 - Se agrego `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` como contrato canonico para inbound/outbound webhooks sobre `greenhouse_sync` y `outbox_events`.
 - Se agrego `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md` como lane de implementacion para gateway inbound, dispatcher outbound, firmas, retries y dead letters.

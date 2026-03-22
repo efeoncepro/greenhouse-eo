@@ -74,6 +74,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - La deuda de lint sigue abierta; esta entrada solo deja el plan operativo y el orden recomendado de ejecucion.
 - El arbol trae cambios ajenos en `src/components/theme/types.ts` y en la reclasificacion/cierre de `CODEX_TASK_Typography_Hierarchy_Fix`; no mezclar esos cambios con el commit documental de esta lane.
 
+## 2026-03-22 — Typography task closure + scalable font system
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Cerrar `CODEX_TASK_Typography_Hierarchy_Fix` como parcialmente absorbida
+- Implementar custom typography variants en theme para reemplazo gradual de hardcoded fontWeights
+
+### Rama
+- `develop`
+
+### Archivos tocados
+- `src/components/theme/mergedTheme.ts` — 3 custom variants: `monoId`, `monoAmount`, `kpiValue`
+- `src/components/theme/types.ts` — MUI module augmentation para TypographyVariants + TypographyPropsVariantOverrides
+- `docs/tasks/complete/CODEX_TASK_Typography_Hierarchy_Fix.md` — movida de to-do, nota de cierre
+- `docs/tasks/README.md` — actualizado backlog y Complete
+
+### Verificación
+- `npx tsc --noEmit` — clean, 0 errores
+- No se tocaron componentes existentes — las 56+ instancias existentes siguen funcionando sin cambios
+- Nuevos componentes pueden usar `<Typography variant="monoId">` etc. con TypeScript support completo
+
+### Próximo paso
+- Adopción gradual: al tocar archivos con hardcoded fontWeight, migrar a los nuevos variants
+- Los ~15 finance section headers con `sx={{ fontFamily: 'Poppins', fontWeight: 600 }}` en `variant='h4'` son redundantes y pueden simplificarse a solo `variant='h4'`
+
+---
+
 ## 2026-03-22 09:05 -03
 
 ### Agente
