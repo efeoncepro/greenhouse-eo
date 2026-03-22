@@ -8686,3 +8686,28 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Pendientes menores (no bloqueantes)
 - **Formularios modales**: Botones de creación (ingreso/egreso/período/proveedor) sin drawer/modal aún — abren links a las list views por ahora
 - **Reconciliation detail view**: UI para ver filas de cartola y aceptar/rechazar matches sugeridos
+
+---
+
+## 2026-03-22 11:35 America/Santiago
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Mapear como backlog pendiente una lane específica para robustecer el puente `Permisos/Asistencia -> Payroll`, sin mezclar todavía implementación runtime.
+
+### Rama
+- `develop`
+
+### Ambiente objetivo
+- Documentación / backlog
+
+### Archivos tocados
+- `docs/tasks/to-do/CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md`
+- `docs/tasks/README.md`
+
+### Nota operativa
+- La task nueva queda en `to-do` y no reemplaza la lane ya activa `CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md`.
+- Su foco es distinto: exactitud de permisos/asistencia, work entries canónicos, colisiones, aprobaciones tardías y seam futuro para `Microsoft Teams`.
+- No se hicieron cambios de runtime en este subturno.

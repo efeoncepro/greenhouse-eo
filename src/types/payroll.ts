@@ -4,6 +4,7 @@ export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
+export type PayrollAttendanceSource = 'legacy_attendance_daily_plus_hr_leave' | 'microsoft_teams'
 
 export interface BonusProrationConfig {
   otdThreshold: number
@@ -228,12 +229,66 @@ export interface PayrollKpiDiagnostics {
   missingMembers: number
 }
 
+export type PayrollReadinessIssueCode =
+  | 'no_compensated_members'
+  | 'missing_compensation'
+  | 'missing_kpi'
+  | 'missing_attendance_signal'
+  | 'missing_uf_value'
+  | 'missing_tax_table_version'
+
+export interface PayrollReadinessIssue {
+  code: PayrollReadinessIssueCode
+  severity: 'blocking' | 'warning'
+  message: string
+  memberIds?: string[]
+}
+
+export interface PayrollPeriodReadiness {
+  periodId: string
+  ready: boolean
+  includedMemberIds: string[]
+  missingCompensationMemberIds: string[]
+  missingKpiMemberIds: string[]
+  missingAttendanceMemberIds: string[]
+  requiresUfValue: boolean
+  attendanceDiagnostics: PayrollAttendanceDiagnostics
+  warnings: PayrollReadinessIssue[]
+  blockingIssues: PayrollReadinessIssue[]
+}
+
+export interface PayrollAttendanceDiagnostics {
+  source: PayrollAttendanceSource
+  integrationTarget: 'microsoft_teams'
+  blocking: boolean
+  notes: string[]
+}
+
 export interface PayrollCalculationResult {
   period: PayrollPeriod
   entries: PayrollEntry[]
   diagnostics: PayrollKpiDiagnostics
+  attendanceDiagnostics: PayrollAttendanceDiagnostics
   missingKpiMemberIds: string[]
   missingCompensationMemberIds: string[]
+}
+
+export interface PayrollEntryExplain {
+  entry: PayrollEntry
+  period: PayrollPeriod
+  compensationVersion: CompensationVersion | null
+  calculation: {
+    deductibleDays: number
+    attendanceRatio: number | null
+    effectiveBaseSalary: number
+    effectiveRemoteAllowance: number
+    totalVariableBonus: number
+    hasAttendanceAdjustment: boolean
+    usesManualKpi: boolean
+    usesManualOverride: boolean
+    kpiSourceModeAvailable: boolean
+    warnings: string[]
+  }
 }
 
 export interface MemberPayrollHistory {

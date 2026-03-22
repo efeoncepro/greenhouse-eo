@@ -1,0 +1,148 @@
+import type { PayrollPeriod, PayrollPeriodReadiness, PayrollReadinessIssue } from '@/types/payroll'
+
+import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
+import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
+import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
+import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { PayrollValidationError, getPeriodRangeFromId } from '@/lib/payroll/shared'
+
+type ApplicableCompensation = Awaited<ReturnType<typeof getApplicableCompensationVersionsForPeriod>>[number]
+type AttendanceSnapshot = Awaited<ReturnType<typeof fetchAttendanceForPayrollPeriod>>['snapshots'] extends Map<string, infer TValue>
+  ? TValue
+  : never
+
+const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) => {
+  if (!attendance) {
+    return false
+  }
+
+  return (
+    attendance.daysPresent > 0
+    || attendance.daysAbsent > 0
+    || attendance.daysOnLeave > 0
+    || attendance.daysOnUnpaidLeave > 0
+  )
+}
+
+export const buildPayrollPeriodReadiness = ({
+  period,
+  compensationRows,
+  missingKpiMemberIds,
+  missingAttendanceMemberIds,
+  attendanceDiagnostics
+}: {
+  period: PayrollPeriod
+  compensationRows: ApplicableCompensation[]
+  missingKpiMemberIds: string[]
+  missingAttendanceMemberIds: string[]
+  attendanceDiagnostics: PayrollPeriodReadiness['attendanceDiagnostics']
+}): PayrollPeriodReadiness => {
+  const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
+  const includedMemberIds = includedCompensations.map(row => row.memberId)
+  const missingCompensationMemberIds = compensationRows.filter(row => !row.hasCompensationVersion).map(row => row.memberId)
+
+  const requiresUfValue = includedCompensations.some(
+    row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
+  )
+
+  const blockingIssues: PayrollReadinessIssue[] = []
+  const warnings: PayrollReadinessIssue[] = []
+
+  if (includedMemberIds.length === 0) {
+    blockingIssues.push({
+      code: 'no_compensated_members',
+      severity: 'blocking',
+      message: 'No hay colaboradores activos con compensación vigente para este período.'
+    })
+  }
+
+  if (requiresUfValue && typeof period.ufValue !== 'number') {
+    blockingIssues.push({
+      code: 'missing_uf_value',
+      severity: 'blocking',
+      message: 'Falta el valor UF y este período lo requiere para calcular descuentos Isapre.'
+    })
+  }
+
+  if (missingCompensationMemberIds.length > 0) {
+    warnings.push({
+      code: 'missing_compensation',
+      severity: 'warning',
+      message: `${missingCompensationMemberIds.length} colaborador(es) activos quedarían fuera por no tener compensación vigente.`,
+      memberIds: missingCompensationMemberIds
+    })
+  }
+
+  if (missingKpiMemberIds.length > 0) {
+    warnings.push({
+      code: 'missing_kpi',
+      severity: 'warning',
+      message: `${missingKpiMemberIds.length} colaborador(es) no tienen KPI ICO disponibles para este período.`,
+      memberIds: missingKpiMemberIds
+    })
+  }
+
+  if (missingAttendanceMemberIds.length > 0) {
+    warnings.push({
+      code: 'missing_attendance_signal',
+      severity: 'warning',
+      message: `${missingAttendanceMemberIds.length} colaborador(es) no muestran señales de asistencia/licencias en el período.`,
+      memberIds: missingAttendanceMemberIds
+    })
+  }
+
+  if (includedCompensations.some(row => row.payRegime === 'chile') && !period.taxTableVersion) {
+    warnings.push({
+      code: 'missing_tax_table_version',
+      severity: 'warning',
+      message: 'Este período incluye colaboradores Chile y no tiene versión de tabla impositiva configurada.'
+    })
+  }
+
+  return {
+    periodId: period.periodId,
+    ready: blockingIssues.length === 0,
+    includedMemberIds,
+    missingCompensationMemberIds,
+    missingKpiMemberIds,
+    missingAttendanceMemberIds,
+    requiresUfValue,
+    attendanceDiagnostics,
+    warnings,
+    blockingIssues
+  }
+}
+
+export const getPayrollPeriodReadiness = async (periodId: string): Promise<PayrollPeriodReadiness> => {
+  const period = await getPayrollPeriod(periodId)
+
+  if (!period) {
+    throw new PayrollValidationError('Payroll period not found.', 404)
+  }
+
+  const range = getPeriodRangeFromId(periodId)
+  const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
+  const includedMemberIds = compensationRows.filter(row => row.hasCompensationVersion).map(row => row.memberId)
+
+  const [kpiData, attendanceResult] = await Promise.all([
+    fetchKpisForPeriod({
+      memberIds: includedMemberIds,
+      periodYear: range.year,
+      periodMonth: range.month
+    }),
+    fetchAttendanceForPayrollPeriod(includedMemberIds, range.periodStart, range.periodEnd)
+  ])
+
+  const attendanceData = attendanceResult.snapshots
+
+  const missingKpiMemberIds = includedMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
+  const missingAttendanceMemberIds = includedMemberIds.filter(memberId => !hasAttendanceSignal(attendanceData.get(memberId)))
+
+  return buildPayrollPeriodReadiness({
+    period,
+    compensationRows,
+    missingKpiMemberIds,
+    missingAttendanceMemberIds,
+    attendanceDiagnostics: attendanceResult.diagnostics
+  })
+}

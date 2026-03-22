@@ -5,7 +5,7 @@ import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResul
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
-import { fetchAttendanceForAllMembers } from '@/lib/payroll/fetch-attendance-for-period'
+import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
@@ -229,15 +229,17 @@ export const calculatePayroll = async ({
 
   const memberIds = compensationRows.map(row => row.memberId)
 
-  const [bonusConfig, kpiData, attendanceData] = await Promise.all([
+  const [bonusConfig, kpiData, attendanceResult] = await Promise.all([
     getBonusConfigForDate(range.periodEnd),
     fetchKpisForPeriod({
       memberIds,
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForAllMembers(memberIds, range.periodStart, range.periodEnd)
+    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, range.periodEnd)
   ])
+
+  const attendanceData = attendanceResult.snapshots
 
   const entries: PayrollEntry[] = []
   const missingKpiMemberIds: string[] = []
@@ -295,6 +297,7 @@ export const calculatePayroll = async ({
     period: updatedPeriod,
     entries: await getPayrollEntries(periodId),
     diagnostics: kpiData.diagnostics,
+    attendanceDiagnostics: attendanceResult.diagnostics,
     missingKpiMemberIds,
     missingCompensationMemberIds
   }

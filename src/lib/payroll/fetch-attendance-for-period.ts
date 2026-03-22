@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PayrollAttendanceDiagnostics } from '@/types/payroll'
+
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { runPayrollQuery } from '@/lib/payroll/shared'
@@ -25,6 +27,16 @@ type LeaveCountRow = {
 }
 
 const getProjectId = () => getBigQueryProjectId()
+
+export const getPayrollAttendanceDiagnostics = (): PayrollAttendanceDiagnostics => ({
+  source: 'legacy_attendance_daily_plus_hr_leave',
+  integrationTarget: 'microsoft_teams',
+  blocking: false,
+  notes: [
+    'La asistencia aún se resume desde attendance_daily + leave_requests.',
+    'La integración futura objetivo para asistencia es Microsoft Teams.'
+  ]
+})
 
 /**
  * Count weekdays (Mon-Fri) between two dates inclusive.
@@ -138,6 +150,19 @@ export const fetchAttendanceForAllMembers = async (
   }
 
   return result
+}
+
+export const fetchAttendanceForPayrollPeriod = async (
+  memberIds: string[],
+  periodStart: string,
+  periodEnd: string
+) => {
+  const snapshots = await fetchAttendanceForAllMembers(memberIds, periodStart, periodEnd)
+
+  return {
+    snapshots,
+    diagnostics: getPayrollAttendanceDiagnostics()
+  }
 }
 
 /**

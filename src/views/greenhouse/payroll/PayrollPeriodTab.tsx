@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -25,7 +25,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { ConfirmDialog } from '@/components/dialogs'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
-import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import type { PayrollEntry, PayrollPeriod, PayrollPeriodReadiness } from '@/types/payroll'
 import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
@@ -50,6 +50,57 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const [editTaxTable, setEditTaxTable] = useState('')
   const [editNotes, setEditNotes] = useState('')
   const [editSaving, setEditSaving] = useState(false)
+  const [readiness, setReadiness] = useState<PayrollPeriodReadiness | null>(null)
+  const [readinessError, setReadinessError] = useState<string | null>(null)
+  const [readinessLoading, setReadinessLoading] = useState(false)
+  const periodId = period?.periodId ?? null
+
+  useEffect(() => {
+    if (!periodId) {
+      setReadiness(null)
+      setReadinessError(null)
+
+      return
+    }
+
+    let active = true
+
+    const loadReadiness = async () => {
+      setReadinessLoading(true)
+      setReadinessError(null)
+
+      try {
+        const res = await fetch(`/api/hr/payroll/periods/${periodId}/readiness`)
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null)
+
+          throw new Error(data?.error || 'No se pudo cargar el readiness del período.')
+        }
+
+        const data = (await res.json()) as PayrollPeriodReadiness
+
+        if (active) {
+          setReadiness(data)
+        }
+      } catch (loadError) {
+        if (active) {
+          setReadiness(null)
+          setReadinessError(loadError instanceof Error ? loadError.message : 'No se pudo cargar el readiness del período.')
+        }
+      } finally {
+        if (active) {
+          setReadinessLoading(false)
+        }
+      }
+    }
+
+    void loadReadiness()
+
+    return () => {
+      active = false
+    }
+  }, [periodId, period?.status, entries.length])
 
   const handleCalculate = useCallback(() => {
     if (!period) return
@@ -297,6 +348,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                 color={status.color === 'default' ? 'secondary' : status.color}
               />
               {isPending && <CircularProgress size={18} />}
+              {readinessLoading && <CircularProgress size={18} color='inherit' />}
             </Stack>
           }
           subheader={
@@ -323,7 +375,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     size='small'
                     startIcon={<i className='tabler-calculator' />}
                     onClick={handleCalculate}
-                    disabled={isPending}
+                    disabled={isPending || readinessLoading || readiness?.ready === false}
                   >
                     Calcular
                   </Button>
@@ -464,12 +516,59 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
             </Alert>
           )}
 
+          {readinessError && (
+            <Alert severity='warning' sx={{ mb: 2 }} onClose={() => setReadinessError(null)}>
+              {readinessError}
+            </Alert>
+          )}
+
+          {readiness && (
+            <Stack spacing={2} sx={{ mb: 3 }}>
+              {readiness.blockingIssues.map(issue => (
+                <Alert key={issue.code} severity='error'>
+                  {issue.message}
+                </Alert>
+              ))}
+              {readiness.warnings.map(issue => (
+                <Alert key={issue.code} severity='warning'>
+                  {issue.message}
+                </Alert>
+              ))}
+              {readiness.attendanceDiagnostics.notes.map(note => (
+                <Alert key={note} severity='info'>
+                  {note}
+                </Alert>
+              ))}
+              {(readiness.blockingIssues.length > 0 || readiness.warnings.length > 0) && (
+                <Alert severity='info'>
+                  Readiness del período:
+                  {' '}
+                  {readiness.includedMemberIds.length}
+                  {' '}
+                  colaborador(es) entrarían al cálculo;
+                  {' '}
+                  {readiness.missingCompensationMemberIds.length}
+                  {' '}
+                  quedarían fuera por compensación;
+                  {' '}
+                  {readiness.missingKpiMemberIds.length}
+                  {' '}
+                  no tienen KPI ICO;
+                  {' '}
+                  {readiness.missingAttendanceMemberIds.length}
+                  {' '}
+                  no muestran señales de asistencia/licencias.
+                </Alert>
+              )}
+            </Stack>
+          )}
+
           {entries.length === 0 && period.status === 'draft' ? (
             <Box sx={{ py: 6, textAlign: 'center' }}>
               <Stack alignItems='center' spacing={1}>
                 <i className='tabler-calculator' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
                 <Typography color='text.secondary'>
-                  Período en borrador. Presiona &quot;Calcular&quot; para generar la nómina.
+                  Período en borrador. Revisa el readiness y luego presiona &quot;Calcular&quot; para generar la nómina.
                 </Typography>
               </Stack>
             </Box>

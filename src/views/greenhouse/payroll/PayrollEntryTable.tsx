@@ -31,6 +31,7 @@ import { canEditPayrollEntries } from '@/lib/payroll/period-lifecycle'
 import { getInitials } from '@/utils/getInitials'
 import BonusInput from './BonusInput'
 import ChileDeductionBreakdown from './ChileDeductionBreakdown'
+import PayrollEntryExplainDialog from './PayrollEntryExplainDialog'
 import PayrollReceiptDialog from './PayrollReceiptDialog'
 import { formatCurrency, formatPercent, formatDecimal, formatFactor, formatAttendanceRatio, otdSemaphore, rpaSemaphore, regimeLabel, regimeColor } from './helpers'
 
@@ -44,6 +45,7 @@ type Props = {
 const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Props) => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [receiptEntry, setReceiptEntry] = useState<PayrollEntry | null>(null)
+  const [explainEntry, setExplainEntry] = useState<PayrollEntry | null>(null)
 
   const isEditable = canEditPayrollEntries(periodStatus)
 
@@ -261,13 +263,20 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
                   {/* Receipt */}
                   <TableCell>
-                    {(periodStatus === 'approved' || periodStatus === 'exported') && (
-                      <Tooltip title='Ver recibo'>
-                        <IconButton size='small' onClick={() => setReceiptEntry(entry)}>
-                          <i className='tabler-file-invoice' />
+                    <Stack direction='row' spacing={0.5}>
+                      <Tooltip title='Detalle de cálculo'>
+                        <IconButton size='small' onClick={() => setExplainEntry(entry)}>
+                          <i className='tabler-search' />
                         </IconButton>
                       </Tooltip>
-                    )}
+                      {(periodStatus === 'approved' || periodStatus === 'exported') && (
+                        <Tooltip title='Ver recibo'>
+                          <IconButton size='small' onClick={() => setReceiptEntry(entry)}>
+                            <i className='tabler-file-invoice' />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </TableCell>
                 </TableRow>
 
@@ -513,6 +522,12 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
       onClose={() => setReceiptEntry(null)}
       entry={receiptEntry}
       period={period}
+    />
+    <PayrollEntryExplainDialog
+      open={!!explainEntry}
+      onClose={() => setExplainEntry(null)}
+      entryId={explainEntry?.entryId ?? null}
+      memberName={explainEntry?.memberName ?? null}
     />
     </>
   )
