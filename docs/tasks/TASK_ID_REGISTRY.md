@@ -55,9 +55,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-039` | `to-do` | `Greenhouse_Data_Node_Architecture_v1` (supporting spec) | `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md` |
 | `TASK-040` | `to-do` | `Greenhouse_Data_Node_Architecture_v2` (supporting spec) | `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md` |
 
+| `TASK-041` | `to-do` | `CODEX_TASK_Staff_Augmentation_HRIS_Addendum` | `docs/tasks/to-do/TASK-041-staff-augmentation-hris-addendum.md` |
+
 ## Siguiente ID disponible
 
-- `TASK-041`
+- `TASK-042`
 
 ## Regla de asignacion desde aqui
 
