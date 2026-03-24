@@ -133,6 +133,18 @@ const GreenhouseBrandPanel = () => {
           {GH_MESSAGES.login_hero_title}
         </Typography>
 
+        {/* Gradient accent line */}
+        <Box
+          aria-hidden='true'
+          sx={{
+            width: 64,
+            height: 3,
+            borderRadius: 2,
+            background: `linear-gradient(90deg, ${GH_COLORS.brand.greenhouseGreen}, ${GH_COLORS.brand.coreBlue})`,
+            mb: 2.5
+          }}
+        />
+
         {/* Subtitle with inline Efeonce logo */}
         <Typography
           component='p'
@@ -161,6 +173,20 @@ const GreenhouseBrandPanel = () => {
           ))}
         </Stack>
       </Box>
+
+      {/* Right edge glow — depth at panel boundary */}
+      <Box
+        aria-hidden='true'
+        sx={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: 120,
+          height: '100%',
+          background: 'linear-gradient(90deg, transparent, rgba(3,117,219, 0.06))',
+          pointerEvents: 'none'
+        }}
+      />
 
       {/* Footer */}
       <Typography

@@ -52,16 +52,23 @@ const LoginValueCard = ({ data }: LoginValueCardProps) => {
         display: 'flex',
         alignItems: 'center',
         gap: 2,
-        bgcolor: 'rgba(255,255,255, 0.06)',
-        border: '0.5px solid rgba(255,255,255, 0.08)',
-        borderRadius: '10px',
-        padding: '14px 16px'
+        bgcolor: 'rgba(255,255,255, 0.05)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255, 0.1)',
+        borderRadius: '12px',
+        padding: '16px 18px',
+        transition: 'background-color 0.2s ease, border-color 0.2s ease',
+        '&:hover': {
+          bgcolor: 'rgba(255,255,255, 0.08)',
+          borderColor: 'rgba(255,255,255, 0.15)'
+        }
       }}
     >
       <Box
         sx={{
-          width: 32,
-          height: 32,
+          width: 36,
+          height: 36,
           borderRadius: '8px',
           bgcolor: iconBg,
           display: 'flex',
