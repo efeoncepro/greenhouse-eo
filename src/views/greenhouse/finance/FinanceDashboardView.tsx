@@ -77,6 +77,33 @@ interface SummaryData {
     trend: 'positive' | 'negative'
   }
   monthly: MonthlyDataPoint[]
+  accrualCurrentMonth?: {
+    totalAmountClp: number
+    changePercent: number
+    trend: 'positive' | 'negative'
+  }
+  accrualMonthly?: MonthlyDataPoint[]
+  cashCurrentMonth?: {
+    totalAmountClp: number
+    changePercent: number
+    trend: 'positive' | 'negative'
+  }
+  cashMonthly?: MonthlyDataPoint[]
+}
+
+interface CashflowMonth {
+  period: string
+  cashIncome: number
+  cashExpenses: number
+  cashNet: number
+  cumulativeBalance: number
+  accrualIncome: number
+  accrualExpenses: number
+  accrualNet: number
+}
+
+interface CashflowData {
+  months: CashflowMonth[]
 }
 
 interface IncomeListItem {
@@ -130,6 +157,8 @@ interface PnlData {
     totalRevenue: number
     partnerShare: number
     netRevenue: number
+    collectedRevenue?: number
+    accountsReceivable?: number
     invoiceCount: number
   }
   costs: {
@@ -139,6 +168,7 @@ interface PnlData {
     infrastructure: number
     taxSocial: number
     totalExpenses: number
+    unlinkedPayrollCost?: number
   }
   margins: {
     grossMargin: number
@@ -156,6 +186,8 @@ interface PnlData {
     totalDeductions: number
     totalBonuses: number
   }
+  completeness?: 'complete' | 'partial'
+  missingComponents?: string[]
 }
 
 // ---------------------------------------------------------------------------
@@ -303,6 +335,7 @@ const FinanceDashboardView = () => {
   const [expenseDrawerOpen, setExpenseDrawerOpen] = useState(false)
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
   const [nuboxSync, setNuboxSync] = useState<NuboxSyncStatus | null>(null)
+  const [cashflow, setCashflow] = useState<CashflowData | null>(null)
   const [syncing, setSyncing] = useState(false)
 
   const fetchData = useCallback(async () => {
@@ -313,7 +346,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes] = await Promise.all([
+      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -321,7 +354,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
         fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/pnl', { cache: 'no-store' }),
-        fetch('/api/finance/nubox/sync-status', { cache: 'no-store' })
+        fetch('/api/finance/nubox/sync-status', { cache: 'no-store' }),
+        fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -414,6 +448,10 @@ const FinanceDashboardView = () => {
       if (nuboxSyncRes.ok) {
         setNuboxSync(await nuboxSyncRes.json())
       }
+
+      if (cashflowRes.ok) {
+        setCashflow(await cashflowRes.json())
+      }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
     } finally {
@@ -449,10 +487,18 @@ const FinanceDashboardView = () => {
     .sort()
     .at(-1) ?? null
 
-  const incomeMonthly = incomeSummary?.monthly ?? []
-  const expenseMonthly = expenseSummary?.monthly ?? []
+  // Use accrual series (Postgres-first) for bar chart — consistent base across all months
+  const incomeMonthly = incomeSummary?.accrualMonthly ?? incomeSummary?.monthly ?? []
+  const expenseMonthly = expenseSummary?.accrualMonthly ?? expenseSummary?.monthly ?? []
 
-  // Build aligned month labels and data from the last 6 months
+  // Dual KPI values
+  const accrualIncomeClp = incomeSummary?.accrualCurrentMonth?.totalAmountClp ?? incomeSummary?.currentMonth.totalAmountClp ?? 0
+  const cashIncomeClp = incomeSummary?.cashCurrentMonth?.totalAmountClp ?? 0
+  const accrualExpenseClp = expenseSummary?.accrualCurrentMonth?.totalAmountClp ?? expenseSummary?.currentMonth.totalAmountClp ?? 0
+  const expenseWithPayroll = pnl ? pnl.costs.totalExpenses : accrualExpenseClp
+  const payrollIncluded = pnl ? pnl.payroll.headcount > 0 : false
+
+  // Build aligned month labels from accrual series (same base for all months)
   const allMonths = new Set<string>()
 
   incomeMonthly.forEach(m => allMonths.add(`${m.year}-${String(m.month).padStart(2, '0')}`))
@@ -478,26 +524,25 @@ const FinanceDashboardView = () => {
     return expenseMonthly.find(m => m.year === y && m.month === mo)?.totalAmountClp ?? 0
   })
 
-  // Adjust expenses: include unlinked payroll costs for the P&L month
-  const pnlMonthKey = pnl ? `${pnl.year}-${String(pnl.month).padStart(2, '0')}` : null
-
-  const adjustedExpenseData = expenseData.map((val, i) => {
-    if (pnlMonthKey && sortedMonths[i] === pnlMonthKey) {
-      return pnl!.costs.totalExpenses
-    }
-
-    return val
-  })
-
-  const cashFlowData = incomeData.map((inc, i) => inc - adjustedExpenseData[i])
-
+  // Bar chart uses consistent accrual base — no more single-month P&L patch
   const barSeries = [
-    { name: 'Ingresos', data: incomeData },
-    { name: 'Egresos', data: adjustedExpenseData }
+    { name: 'Facturado', data: incomeData },
+    { name: 'Costos', data: expenseData }
   ]
 
+  // Cash flow from real cashflow endpoint (payment_date based)
+  const cashflowMonths = cashflow?.months?.slice(-6) ?? []
+
+  const cashflowLabels = cashflowMonths.map(m => {
+    const month = parseInt(m.period.split('-')[1])
+
+    return MONTH_SHORT[month] || m.period
+  })
+
   const areaSeries = [
-    { name: 'Flujo neto', data: cashFlowData }
+    { name: 'Cobros', data: cashflowMonths.map(m => m.cashIncome) },
+    { name: 'Pagos', data: cashflowMonths.map(m => m.cashExpenses) },
+    { name: 'Flujo neto', data: cashflowMonths.map(m => m.cashNet) }
   ]
 
   // ---------------------------------------------------------------------------
@@ -580,26 +625,52 @@ const FinanceDashboardView = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Ingresos del mes'
-            stats={formatCLP(incomeSummary?.currentMonth.totalAmountClp ?? 0)}
-            subtitle={incomeSummary?.currentMonth.changePercent !== undefined && incomeSummary.currentMonth.changePercent !== 0
-              ? `${incomeSummary.currentMonth.changePercent > 0 ? '+' : ''}${incomeSummary.currentMonth.changePercent}% vs mes anterior`
-              : 'Sin variación'}
-            avatarIcon='tabler-cash'
+            title='Facturación del mes'
+            titleTooltip='Facturado = emitido por invoice_date. Cobrado = recibido por payment_date.'
+            stats={formatCLP(accrualIncomeClp)}
+            subtitle={(() => {
+              if (cashIncomeClp > 0 && cashIncomeClp < accrualIncomeClp) {
+                return `Cobrado: ${formatCLP(cashIncomeClp)} · Por cobrar: ${formatCLP(accrualIncomeClp - cashIncomeClp)}`
+              }
+
+              if (cashIncomeClp > 0) {
+                return `Cobrado: ${formatCLP(cashIncomeClp)}`
+              }
+
+              const change = incomeSummary?.accrualCurrentMonth?.changePercent ?? incomeSummary?.currentMonth.changePercent
+
+              return change !== undefined && change !== 0
+                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
+                : 'Sin cobros registrados'
+            })()}
+            avatarIcon='tabler-file-invoice'
             avatarColor='success'
-            trend={incomeSummary?.currentMonth.trend === 'positive' ? 'positive' : 'negative'}
-            trendNumber={incomeSummary?.currentMonth.changePercent !== undefined ? `${Math.abs(incomeSummary.currentMonth.changePercent)}%` : undefined}
+            trend={incomeSummary?.accrualCurrentMonth?.trend ?? incomeSummary?.currentMonth.trend ?? 'positive'}
+            trendNumber={incomeSummary?.accrualCurrentMonth?.changePercent !== undefined ? `${Math.abs(incomeSummary.accrualCurrentMonth.changePercent)}%` : undefined}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Egresos del mes'
-            stats={formatCLP(pnl ? pnl.costs.totalExpenses : (expenseSummary?.currentMonth.totalAmountClp ?? 0))}
-            subtitle={pnl && pnl.payroll.headcount > 0
-              ? `Incluye nómina de ${pnl.payroll.headcount} persona${pnl.payroll.headcount !== 1 ? 's' : ''}`
-              : expenseSummary?.currentMonth.changePercent !== undefined && expenseSummary.currentMonth.changePercent !== 0
-                ? `${expenseSummary.currentMonth.changePercent > 0 ? '+' : ''}${expenseSummary.currentMonth.changePercent}% vs mes anterior`
-                : 'Sin variación'}
+            title='Costos del mes'
+            titleTooltip='Incluye gastos operacionales y costo de personal cuando hay nómina aprobada.'
+            stats={formatCLP(expenseWithPayroll)}
+            subtitle={(() => {
+              if (pnl && payrollIncluded) {
+                const opex = pnl.costs.totalExpenses - (pnl.costs.unlinkedPayrollCost ?? 0)
+
+                return `Operacional: ${formatCLP(opex)} · Personal: ${formatCLP(pnl.costs.unlinkedPayrollCost ?? 0)}`
+              }
+
+              if (pnl && !payrollIncluded) {
+                return 'Sin nómina aprobada para este período'
+              }
+
+              const change = expenseSummary?.currentMonth.changePercent
+
+              return change !== undefined && change !== 0
+                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
+                : 'Sin nómina aprobada'
+            })()}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
           />
@@ -622,7 +693,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, md: 7 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardHeader
-              title='Ingresos vs Egresos'
+              title='Facturado vs Costos (base devengada)'
               avatar={
                 <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
                   <i className='tabler-chart-bar' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -652,7 +723,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, md: 5 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardHeader
-              title='Flujo de caja'
+              title='Flujo de caja real'
               avatar={
                 <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
                   <i className='tabler-trending-up' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
@@ -662,7 +733,7 @@ const FinanceDashboardView = () => {
             />
             <Divider />
             <CardContent>
-              {sortedMonths.length === 0 ? (
+              {cashflowMonths.length === 0 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6, gap: 2 }}>
                   <Typography variant='body2' color='text.secondary'>
                     Sin datos de flujo de caja aún
@@ -672,7 +743,7 @@ const FinanceDashboardView = () => {
                 <AppReactApexCharts
                   type='area'
                   height={300}
-                  options={buildCashFlowAreaOptions(theme, chartLabels)}
+                  options={buildCashFlowAreaOptions(theme, cashflowLabels)}
                   series={areaSeries}
                 />
               )}
@@ -688,7 +759,15 @@ const FinanceDashboardView = () => {
             <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
               <CardHeader
                 title='Estado de Resultados'
-                subheader={`${MONTH_SHORT[pnl.month]} ${pnl.year}`}
+                subheader={(() => {
+                  const period = `${MONTH_SHORT[pnl.month]} ${pnl.year}`
+
+                  if (pnl.completeness === 'complete') return `${period} · P&L completo`
+                  if (pnl.completeness === 'partial' && pnl.missingComponents?.includes('payroll')) return `${period} · Parcial (falta nomina)`
+                  if (pnl.payroll.headcount > 0) return `${period} · P&L completo`
+
+                  return `${period} · Parcial (falta nomina)`
+                })()}
                 avatar={
                   <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
                     <i className='tabler-report-analytics' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
@@ -700,30 +779,54 @@ const FinanceDashboardView = () => {
                 <Table size='small'>
                   <TableBody>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Ingresos brutos</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>Ingresos brutos (facturado)</TableCell>
                       <TableCell align='right'>{formatCLP(pnl.revenue.totalRevenue)}</TableCell>
                     </TableRow>
-                    {pnl.revenue.partnerShare > 0 && (
+                    {(() => {
+                      const collectedVal = pnl.revenue.collectedRevenue ?? cashIncomeClp
+                      const receivableVal = pnl.revenue.accountsReceivable ?? (pnl.revenue.totalRevenue > collectedVal ? pnl.revenue.totalRevenue - collectedVal : 0)
+
+                      return (
+                        <>
+                          {collectedVal > 0 && (
+                            <TableRow>
+                              <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Cobrado del periodo</TableCell>
+                              <TableCell align='right' sx={{ color: 'success.main' }}>{formatCLP(collectedVal)}</TableCell>
+                            </TableRow>
+                          )}
+                          {receivableVal > 0 && (
+                            <TableRow>
+                              <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Cuentas por cobrar</TableCell>
+                              <TableCell align='right' sx={{ color: 'warning.main' }}>{formatCLP(receivableVal)}</TableCell>
+                            </TableRow>
+                          )}
+                        </>
+                      )
+                    })()}
+                    {pnl.payroll.headcount > 0 ? (
+                      <>
+                        <TableRow>
+                          <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral directo</TableCell>
+                          <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.directLabor)}</TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral indirecto</TableCell>
+                          <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.indirectLabor)}</TableCell>
+                        </TableRow>
+                      </>
+                    ) : (
                       <TableRow>
-                        <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Partner share</TableCell>
-                        <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.revenue.partnerShare)}</TableCell>
+                        <TableCell sx={{ pl: 4, color: 'warning.main' }}>Costo de personal</TableCell>
+                        <TableCell align='right' sx={{ color: 'warning.main', fontStyle: 'italic' }}>Pendiente de aprobación</TableCell>
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600 }}>Ingreso neto</TableCell>
-                      <TableCell align='right' sx={{ fontWeight: 600 }}>{formatCLP(pnl.revenue.netRevenue)}</TableCell>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Gastos operacionales</TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.operational)}</TableCell>
                     </TableRow>
 
                     <TableRow><TableCell colSpan={2} sx={{ py: 1 }}><Divider /></TableCell></TableRow>
 
-                    <TableRow>
-                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral directo</TableCell>
-                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.directLabor)}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Costo laboral indirecto</TableCell>
-                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.indirectLabor)}</TableCell>
-                    </TableRow>
                     <TableRow>
                       <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Gastos operacionales</TableCell>
                       <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.operational)}</TableCell>
@@ -735,8 +838,10 @@ const FinanceDashboardView = () => {
                       </TableRow>
                     )}
                     <TableRow>
-                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>Impuestos y previsión</TableCell>
-                      <TableCell align='right' sx={{ color: 'error.main' }}>−{formatCLP(pnl.costs.taxSocial)}</TableCell>
+                      <TableCell sx={{ pl: 4, color: 'text.secondary' }}>
+                        {pnl.payroll.headcount > 0 ? 'Impuestos y prevision' : 'Impuestos y prevision (sin nomina)'}
+                      </TableCell>
+                      <TableCell align='right' sx={{ color: 'error.main' }}>-{formatCLP(pnl.costs.taxSocial)}</TableCell>
                     </TableRow>
 
                     <TableRow><TableCell colSpan={2} sx={{ py: 1 }}><Divider /></TableCell></TableRow>
@@ -770,6 +875,24 @@ const FinanceDashboardView = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
+                {pnl.completeness === 'partial' && pnl.missingComponents && pnl.missingComponents.length > 0 && (
+                  <Alert severity='info' sx={{ mt: 2 }}>
+                    {pnl.missingComponents.includes('payroll')
+                      ? 'Este P&L tiene datos parciales: falta nomina aprobada para el periodo'
+                      : `Este P&L tiene datos parciales (faltan: ${pnl.missingComponents.join(', ')})`}
+                  </Alert>
+                )}
+                {(pnl.completeness === 'complete' || (!pnl.completeness && pnl.payroll.headcount > 0)) && (
+                  <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Chip
+                      size='small'
+                      color='success'
+                      variant='outlined'
+                      icon={<i className='tabler-check' />}
+                      label='P&L completo'
+                    />
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
