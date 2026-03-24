@@ -6,6 +6,11 @@
 
 ## 2026-03-24
 
+### TASK-015 Financial Intelligence Layer v2 implemented (reduced scope)
+- **Slice 1**: Expense Trends API — `GET /api/finance/analytics/trends?type=expenses|payroll|tools&months=12`. Monthly evolution by cost_category, payroll cost+headcount trend, top software/infrastructure providers.
+- **Slice 2**: LTV/CAC extension — `computeClientEconomicsSnapshots()` now computes `acquisitionCostClp` (from expenses with `cost_category = 'client_acquisition'`) and `ltvToCacRatio` (lifetime gross margin / CAC). Only populated when CAC > 0.
+- **Slice 3**: Cost Allocations UI — `/finance/cost-allocations` page with period selectors, summary cards, full CRUD table with create dialog. Consumes existing `/api/finance/intelligence/allocations`.
+
 ### TASK-022 Services Runtime Closure implemented
 - HubSpot services inbound sync: `service-sync.ts` store, `POST /api/integrations/hubspot/services/sync`, cron `/api/cron/services-sync`.
 - Legacy UNION cutover: `loadServiceModules()` reads only from `v_client_active_modules`, legacy `client_service_modules` leg removed.

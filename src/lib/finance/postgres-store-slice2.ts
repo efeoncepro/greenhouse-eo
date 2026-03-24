@@ -291,6 +291,8 @@ export type ClientEconomicsRecord = {
   headcountFte: number | null
   revenuePerFte: number | null
   costPerFte: number | null
+  acquisitionCostClp: number | null
+  ltvToCacRatio: number | null
   notes: string | null
   computedAt: string | null
   createdAt: string | null

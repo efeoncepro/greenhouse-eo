@@ -101,6 +101,8 @@ const mapClientEconomics = (row: ClientEconomicsRow): ClientEconomicsRecord => (
   headcountFte: toNullableNumber(row.headcount_fte),
   revenuePerFte: toNullableNumber(row.revenue_per_fte),
   costPerFte: toNullableNumber(row.cost_per_fte),
+  acquisitionCostClp: null,
+  ltvToCacRatio: null,
   notes: str(row.notes),
   computedAt: toTimestampString(row.computed_at as string | { value?: string } | null),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
@@ -425,6 +427,40 @@ export const computeClientEconomicsSnapshots = async (
     clientMap.set(lc.clientId, existing)
   }
 
+  // LTV/CAC: fetch acquisition costs per client (all-time)
+  const cacRows = await runGreenhousePostgresQuery<{
+    allocated_client_id: string
+    acquisition_cost_clp: string
+  }>(
+    `SELECT
+       allocated_client_id,
+       COALESCE(SUM(total_amount_clp), 0) AS acquisition_cost_clp
+     FROM greenhouse_finance.expenses
+     WHERE cost_category = 'client_acquisition'
+       AND allocated_client_id IS NOT NULL
+     GROUP BY allocated_client_id`
+  )
+
+  const cacMap = new Map<string, number>(
+    cacRows.map(r => [r.allocated_client_id, toNumber(r.acquisition_cost_clp)])
+  )
+
+  // LTV: lifetime gross margin per client (all-time)
+  const ltvRows = await runGreenhousePostgresQuery<{
+    client_id: string
+    lifetime_margin_clp: string
+  }>(
+    `SELECT
+       client_id,
+       COALESCE(SUM(gross_margin_clp), 0) AS lifetime_margin_clp
+     FROM greenhouse_finance.client_economics
+     GROUP BY client_id`
+  )
+
+  const ltvMap = new Map<string, number>(
+    ltvRows.map(r => [r.client_id, toNumber(r.lifetime_margin_clp)])
+  )
+
   const results: ClientEconomicsRecord[] = []
 
   for (const [clientId, data] of clientMap.entries()) {
@@ -452,6 +488,15 @@ export const computeClientEconomicsSnapshots = async (
       costPerFte: fte && fte > 0 ? roundCurrency(totalCosts / fte) : null,
       notes
     })
+
+    // Enrich with LTV/CAC (computed, not stored)
+    const cac = cacMap.get(clientId) ?? null
+    const ltv = ltvMap.get(clientId) ?? null
+
+    snapshot.acquisitionCostClp = cac && cac > 0 ? roundCurrency(cac) : null
+    snapshot.ltvToCacRatio = cac && cac > 0 && ltv != null
+      ? roundCurrency(ltv / cac)
+      : null
 
     results.push(snapshot)
   }
