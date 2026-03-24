@@ -32,8 +32,8 @@ export async function GET(request: Request) {
   const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
   const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
 
-  // Run all five queries in parallel
-  const [incomeRows, expenseRows, payrollRows, linkedPayrollRows, rateRows] = await Promise.all([
+  // Run all six queries in parallel
+  const [incomeRows, collectedRows, expenseRows, payrollRows, linkedPayrollRows, rateRows] = await Promise.all([
     // Income for the period (accrual: by invoice_date)
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
@@ -42,6 +42,18 @@ export async function GET(request: Request) {
          COALESCE(SUM(partner_share_amount * COALESCE(exchange_rate_to_clp, 1)), 0) AS partner_share_clp
        FROM greenhouse_finance.income
        WHERE invoice_date >= $1::date AND invoice_date <= $2::date`,
+      [periodStart, periodEnd]
+    ),
+
+    // Collected revenue in the period (cash: by payment_date in income_payments)
+    runGreenhousePostgresQuery<PnlRow>(
+      `SELECT
+         COALESCE(SUM(ROUND(ip.amount * COALESCE(i.exchange_rate_to_clp, 1), 2)), 0) AS collected_clp,
+         COUNT(*) AS payment_count
+       FROM greenhouse_finance.income_payments ip
+       INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
+       WHERE ip.payment_date >= $1::date AND ip.payment_date <= $2::date
+         AND ip.amount > 0`,
       [periodStart, periodEnd]
     ),
 
@@ -101,6 +113,10 @@ export async function GET(request: Request) {
   const partnerShare = toNumber(income['partner_share_clp'])
   const netRevenue = roundCurrency(totalRevenue - partnerShare)
 
+  const collected = collectedRows[0] || {}
+  const collectedRevenue = roundCurrency(toNumber(collected['collected_clp']))
+  const accountsReceivable = roundCurrency(totalRevenue - collectedRevenue)
+
   const payroll = payrollRows[0] || {}
   const usdToClp = toNumber((rateRows[0] || {})['rate']) || 1
 
@@ -155,6 +171,21 @@ export async function GET(request: Request) {
   const netResult = roundCurrency(netRevenue - totalExpenses)
   const netMarginPercent = netRevenue > 0 ? roundCurrency((netResult / netRevenue) * 100) : 0
 
+  const headcount = toNumber(payroll['headcount'])
+  const hasPayroll = headcount > 0
+  const hasExpenses = totalExpenses > 0
+  const completeness: ('complete' | 'partial') = hasPayroll && hasExpenses ? 'complete' : 'partial'
+
+  const missingComponents: string[] = []
+
+  if (!hasPayroll) {
+    missingComponents.push('payroll')
+  }
+
+  if (!hasExpenses && !hasPayroll) {
+    missingComponents.push('expenses')
+  }
+
   return NextResponse.json({
     year,
     month,
@@ -162,6 +193,8 @@ export async function GET(request: Request) {
       totalRevenue,
       partnerShare,
       netRevenue,
+      collectedRevenue,
+      accountsReceivable,
       invoiceCount: toNumber(income['record_count'])
     },
     costs: {
@@ -170,7 +203,8 @@ export async function GET(request: Request) {
       operational,
       infrastructure,
       taxSocial,
-      totalExpenses: roundCurrency(totalExpenses)
+      totalExpenses: roundCurrency(totalExpenses),
+      unlinkedPayrollCost
     },
     margins: {
       grossMargin,
@@ -182,11 +216,13 @@ export async function GET(request: Request) {
       netMarginPercent
     },
     payroll: {
-      headcount: toNumber(payroll['headcount']),
+      headcount,
       totalGross: payrollGross,
       totalNet: payrollNet,
       totalDeductions: payrollDeductions,
       totalBonuses: payrollBonuses
-    }
+    },
+    completeness,
+    missingComponents
   })
 }

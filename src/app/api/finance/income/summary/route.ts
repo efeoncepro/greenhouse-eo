@@ -19,12 +19,12 @@ interface IncomeSummaryRow {
   amount_paid: unknown
 }
 
-interface PgIncomeRow {
+interface PgIncomeRow extends Record<string, unknown> {
   invoice_date: string | null
   total_amount_clp: string | number
 }
 
-interface PgPaymentRow {
+interface PgPaymentRow extends Record<string, unknown> {
   payment_date: string | null
   amount: string | number
   exchange_rate_to_clp: string | number | null

@@ -40,6 +40,70 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 — TASK-004 Finance Dashboard Calculation Correction
+
+### Agente
+- Claude Opus 4.6 (Agent SDK worktree)
+
+### Objetivo del turno
+- Implementacion de TASK-004: corregir 6 problemas de calculo del dashboard financiero
+
+### Rama
+- develop
+
+### Archivos tocados
+- `src/app/api/finance/income/summary/route.ts` — Postgres-first con BQ fallback
+- `src/app/api/finance/expenses/summary/route.ts` — Postgres-first con BQ fallback
+- `src/app/api/finance/dashboard/cashflow/route.ts` — ya tenia Postgres, verificado
+- `src/app/api/finance/dashboard/summary/route.ts` — Postgres-first con BQ fallback
+- `src/app/api/finance/dashboard/pnl/route.ts` — collectedRevenue, accountsReceivable, completeness
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx` — KPIs duales, bar chart consistente, cash flow real, P&L mejorado
+- `src/lib/finance/finance-dashboard-calculations.test.ts` — 10 tests nuevos
+
+### Verificacion
+- No se pudo ejecutar tsc ni vitest por restricciones de bash en worktree
+- Revision manual de tipos completada
+
+### Riesgos o pendientes
+- Ejecutar `npx tsc --noEmit`, `pnpm test`, `pnpm lint`
+- Query de income_payments asume tabla existe en Postgres
+- Dependencia parcial con TASK-003 (Invoice Payment Ledger)
+
+---
+
+## 2026-03-24 — TASK-013 Nubox Finance Reconciliation Bridge
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Implementacion completa de TASK-013: matching engine DTE ↔ Finance, proposals store, DTE coverage metrics, API endpoints
+
+### Rama
+- develop
+
+### Archivos tocados
+- `src/lib/nubox/dte-matching.ts` — Matching engine con scoring multi-signal (amount/folio/RUT/date/org)
+- `src/lib/nubox/dte-matching.test.ts` — 12 unit tests para matching engine
+- `src/lib/nubox/reconciliation.ts` — Orchestrator, proposal CRUD, resolve con outbox events
+- `src/lib/finance/dte-coverage.ts` — Coverage metrics y discrepancies per org/period
+- `src/app/api/finance/dte-reconciliation/route.ts` — GET list proposals, POST trigger reconciliation
+- `src/app/api/finance/dte-reconciliation/[proposalId]/route.ts` — GET proposal, PATCH approve/reject
+- `src/app/api/organizations/[id]/dte-coverage/route.ts` — GET DTE coverage per org
+- `scripts/setup-postgres-dte-reconciliation.sql` — DDL for dte_reconciliation_proposals table
+- `docs/tasks/README.md` — Task moved to Complete
+
+### Verificacion
+- `pnpm exec tsc --noEmit` — 0 new errors (6 pre-existing in unrelated files)
+- `pnpm exec vitest run src/lib/nubox/dte-matching.test.ts` — 12/12 passed
+
+### Riesgos o pendientes
+- DDL script `setup-postgres-dte-reconciliation.sql` must be run in production before use
+- Pre-existing TS errors in `finance/expenses/summary`, `finance/income/summary`, `finance/dashboard/summary` (unrelated)
+- No UI components created (task spec Slice 3 — reconciliation UI card is a follow-up)
+
+---
+
 ## 2026-03-24 21:00 -03
 
 ### Agente
