@@ -14,7 +14,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | --- | --- | --- | --- |
-| `TASK-001` | `in-progress` | `CODEX_TASK_HR_Payroll_Operational_Hardening_v1` | `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md` |
+| `TASK-001` | `in-progress` | `CODEX_TASK_HR_Payroll_Operational_Hardening_v1` | `docs/tasks/in-progress/TASK-001-hr-payroll-operational-hardening.md` |
 | `TASK-002` | `to-do` | `CODEX_TASK_Tenant_Notion_Mapping` | `docs/tasks/to-do/TASK-002-tenant-notion-mapping.md` |
 | `TASK-003` | `to-do` | `CODEX_TASK_Invoice_Payment_Ledger_Correction_v1` | `docs/tasks/to-do/TASK-003-invoice-payment-ledger-correction.md` |
 | `TASK-004` | `to-do` | `CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1` | `docs/tasks/to-do/TASK-004-finance-dashboard-calculation-correction.md` |

@@ -30,7 +30,7 @@ Primer bloque operativo asignado:
 
 | Task ID | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
 | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-001` | [CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md](in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md) | P1 | Alto | Alto | Parcial | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
+| `TASK-001` | [TASK-001-hr-payroll-operational-hardening.md](in-progress/TASK-001-hr-payroll-operational-hardening.md) | P1 | Alto | Alto | Parcial | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
 
 ## To Do
 
