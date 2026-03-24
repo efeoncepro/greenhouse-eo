@@ -193,6 +193,7 @@ export interface PersonFinanceOverview {
   costAttribution?: Array<{
     clientId: string
     clientName: string
+    organizationName: string | null
     fteAllocation: number
     attributedCostClp: number
     periodYear: number

@@ -73,6 +73,7 @@ type IdentityLinkRow = {
 type CostAttributionRow = {
   client_id: string
   client_name: string
+  organization_name: string | null
   fte_allocation: string | number
   allocated_labor_clp: string | number
   period_year: string | number
@@ -232,15 +233,18 @@ const buildFinanceOverview = async (
     ).catch(() => [] as AssignmentRow[]),
     runGreenhousePostgresQuery<CostAttributionRow>(
       `SELECT
-        client_id,
-        client_name,
-        fte_contribution AS fte_allocation,
-        allocated_labor_clp,
-        period_year,
-        period_month
-      FROM greenhouse_serving.client_labor_cost_allocation
-      WHERE member_id = $1
-      ORDER BY period_year DESC, period_month DESC, allocated_labor_clp DESC
+        clca.client_id,
+        clca.client_name,
+        o.organization_name,
+        clca.fte_contribution AS fte_allocation,
+        clca.allocated_labor_clp,
+        clca.period_year,
+        clca.period_month
+      FROM greenhouse_serving.client_labor_cost_allocation clca
+      LEFT JOIN greenhouse_core.spaces sp ON sp.client_id = clca.client_id AND sp.active = TRUE
+      LEFT JOIN greenhouse_core.organizations o ON o.organization_id = sp.organization_id
+      WHERE clca.member_id = $1
+      ORDER BY clca.period_year DESC, clca.period_month DESC, clca.allocated_labor_clp DESC
       LIMIT 20`,
       [memberId]
     ).catch(() => [] as CostAttributionRow[])
@@ -311,6 +315,7 @@ const buildFinanceOverview = async (
     costAttribution: costAttributionRows.map(r => ({
       clientId: r.client_id,
       clientName: r.client_name,
+      organizationName: r.organization_name || null,
       fteAllocation: toNum(r.fte_allocation),
       attributedCostClp: toNum(r.allocated_labor_clp),
       periodYear: toNum(r.period_year),

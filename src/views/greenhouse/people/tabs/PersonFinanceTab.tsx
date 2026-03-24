@@ -175,6 +175,7 @@ const PersonFinanceTab = ({ memberId }: Props) => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Space</TableCell>
+                    <TableCell>Organización</TableCell>
                     <TableCell>Dedicación</TableCell>
                     <TableCell align='right'>Costo atribuido</TableCell>
                     <TableCell align='right'>Período</TableCell>
@@ -185,6 +186,9 @@ const PersonFinanceTab = ({ memberId }: Props) => {
                     <TableRow key={`${row.clientId}-${row.periodYear}-${row.periodMonth}-${i}`} hover>
                       <TableCell>
                         <Typography variant='body2' fontWeight={600}>{row.clientName}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>{row.organizationName || '—'}</Typography>
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 120 }}>
