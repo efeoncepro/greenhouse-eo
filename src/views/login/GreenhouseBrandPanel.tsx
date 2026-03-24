@@ -23,6 +23,34 @@ const GreenhouseBrandPanel = () => {
         p: { md: 6, lg: 8 }
       }}
     >
+      {/* Radial glow — adds depth behind content */}
+      <Box
+        aria-hidden='true'
+        sx={{
+          position: 'absolute',
+          width: '130%',
+          height: '130%',
+          top: '-15%',
+          left: '-15%',
+          background: 'radial-gradient(ellipse at 30% 50%, rgba(27,122,78, 0.12) 0%, transparent 60%)',
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Secondary glow — top right accent */}
+      <Box
+        aria-hidden='true'
+        sx={{
+          position: 'absolute',
+          width: '80%',
+          height: '80%',
+          top: '-20%',
+          right: '-20%',
+          background: 'radial-gradient(ellipse at 70% 30%, rgba(3,117,219, 0.08) 0%, transparent 55%)',
+          pointerEvents: 'none'
+        }}
+      />
+
       {/* Decorative circles — placeholders for future 3D elements */}
       {DECORATIVE_CIRCLES.map((circle, i) => (
         <Box
@@ -31,22 +59,23 @@ const GreenhouseBrandPanel = () => {
           sx={{
             position: 'absolute',
             borderRadius: '50%',
-            border: `1px solid ${circle.borderColor}`,
+            border: circle.border,
             background: 'transparent',
             pointerEvents: 'none',
             width: circle.width,
             height: circle.height,
             top: circle.top,
+            left: circle.left,
             right: circle.right,
             bottom: circle.bottom
           }}
         />
       ))}
 
-      {/* Content container — centered, constrained width for readability */}
-      <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 480 }}>
+      {/* Content container — centered, constrained width */}
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 500 }}>
         {/* Logo row */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: { md: 6, lg: 8 } }}>
           <Box
             sx={{
               width: 48,
@@ -56,7 +85,8 @@ const GreenhouseBrandPanel = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              flexShrink: 0
+              flexShrink: 0,
+              boxShadow: '0 4px 20px rgba(27,122,78, 0.3)'
             }}
           >
             <Box
@@ -70,44 +100,44 @@ const GreenhouseBrandPanel = () => {
             component='img'
             src='/images/greenhouse/SVG/negative-sin-claim.svg'
             alt='Greenhouse logotipo'
-            sx={{ height: 26, ml: 1.5 }}
+            sx={{ height: 28, ml: 1.5 }}
           />
         </Box>
 
         {/* Hero copy */}
         <Typography
           sx={{
-            fontSize: { md: 28, lg: 32 },
+            fontSize: { md: 32, lg: 38 },
             fontWeight: 600,
             color: '#fff',
-            lineHeight: 1.3,
-            mb: 2,
-            whiteSpace: 'pre-line'
+            lineHeight: 1.2,
+            mb: 2.5,
+            whiteSpace: 'pre-line',
+            letterSpacing: '-0.02em'
           }}
         >
           {GH_MESSAGES.login_hero_title}
         </Typography>
+
+        {/* Subtitle with inline Efeonce logo */}
         <Typography
-          sx={{
-            fontSize: 15,
-            color: 'rgba(255,255,255, 0.55)',
-            mb: 5,
-            maxWidth: 380,
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0 5px',
-            lineHeight: 1.6
-          }}
+          component='p'
+          sx={{ fontSize: 15, color: 'rgba(255,255,255, 0.5)', mb: 6, lineHeight: 1.7 }}
         >
-          La plataforma de
+          {'La plataforma de '}
           <Box
             component='img'
             src='/branding/logo-negative.svg'
             alt='Efeonce'
-            sx={{ height: 14, opacity: 0.55 }}
+            sx={{
+              height: 12,
+              display: 'inline',
+              verticalAlign: 'middle',
+              opacity: 0.5,
+              mx: 0.5
+            }}
           />
-          donde todo se conecta y todo se mide.
+          {' donde todo se conecta y todo se mide.'}
         </Typography>
 
         {/* Value proposition cards */}

@@ -34,34 +34,42 @@ export const LOGIN_VALUE_CARDS: ValueCardData[] = [
 
 export interface DecorativeCircle {
   top?: string
+  left?: string
   right?: string
   bottom?: string
   width: number
   height: number
-  borderColor: string
+  border: string
 }
 
 export const DECORATIVE_CIRCLES: DecorativeCircle[] = [
   {
-    top: '8%',
-    right: '-5%',
+    top: '-8%',
+    right: '-12%',
+    width: 340,
+    height: 340,
+    border: '1.5px solid rgba(27, 122, 78, 0.18)'
+  },
+  {
+    top: '5%',
+    right: '2%',
+    width: 200,
+    height: 200,
+    border: '1px solid rgba(255, 255, 255, 0.06)'
+  },
+  {
+    bottom: '-5%',
+    right: '-6%',
+    width: 280,
+    height: 280,
+    border: '1px solid rgba(27, 122, 78, 0.1)'
+  },
+  {
+    bottom: '10%',
+    left: '-15%',
     width: 180,
     height: 180,
-    borderColor: 'rgba(27, 122, 78, 0.15)'
-  },
-  {
-    top: '2%',
-    right: '8%',
-    width: 120,
-    height: 120,
-    borderColor: 'rgba(255, 255, 255, 0.06)'
-  },
-  {
-    bottom: '15%',
-    right: '-8%',
-    width: 220,
-    height: 220,
-    borderColor: 'rgba(27, 122, 78, 0.08)'
+    border: '1px solid rgba(255, 255, 255, 0.04)'
   }
 ]
 
