@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { NOTIFICATION_CATEGORIES } from '@/config/notification-categories'
+import { ensureNotificationSchema } from '@/lib/notifications/schema'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,7 @@ export async function GET() {
   }
 
   try {
+    await ensureNotificationSchema()
     const userPrefs = await NotificationService.getPreferences(tenant.userId)
     const prefMap = new Map(userPrefs.map(p => [p.category as string, p]))
 
@@ -50,6 +52,7 @@ export async function PUT(request: Request) {
   }
 
   try {
+    await ensureNotificationSchema()
     const body = await request.json()
     const updates = body.preferences
 

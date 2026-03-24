@@ -89,10 +89,17 @@ export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
 // ── Reactive event types (events that trigger downstream actions) ──
 
 export const REACTIVE_EVENT_TYPES = [
+  // Organization 360 invalidation
   EVENT_TYPES.assignmentCreated,
   EVENT_TYPES.assignmentUpdated,
   EVENT_TYPES.assignmentRemoved,
   EVENT_TYPES.membershipCreated,
   EVENT_TYPES.membershipUpdated,
-  EVENT_TYPES.membershipDeactivated
+  EVENT_TYPES.membershipDeactivated,
+
+  // Notification triggers
+  EVENT_TYPES.serviceCreated,
+  EVENT_TYPES.reconciliationApproved,
+  EVENT_TYPES.dteDiscrepancyFound,
+  EVENT_TYPES.profileLinked
 ] as const

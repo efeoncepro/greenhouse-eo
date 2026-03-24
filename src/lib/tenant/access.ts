@@ -9,6 +9,7 @@ import {
   isLikelyEfeonceProfileMatch
 } from '@/lib/tenant/internal-email-aliases'
 import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
+import { dispatchWelcomeNotification } from '@/lib/notifications/welcome'
 import {
   getSessionFromPostgresByEmail,
   getSessionFromPostgresByGoogleSub,
@@ -632,6 +633,15 @@ export const linkMicrosoftIdentity = async ({
       microsoftEmail: microsoftEmail.trim().toLowerCase()
     }
   })
+
+  // Welcome notification on first SSO (invited → active)
+  if (tenant.status === 'invited') {
+    void dispatchWelcomeNotification({
+      userId: tenant.userId,
+      email: tenant.email,
+      fullName: tenant.fullName
+    })
+  }
 }
 
 export const linkGoogleIdentity = async ({
@@ -684,6 +694,15 @@ export const linkGoogleIdentity = async ({
       googleEmail: googleEmail.trim().toLowerCase()
     }
   })
+
+  // Welcome notification on first SSO (invited → active)
+  if (tenant.status === 'invited') {
+    void dispatchWelcomeNotification({
+      userId: tenant.userId,
+      email: tenant.email,
+      fullName: tenant.fullName
+    })
+  }
 }
 
 export const updateTenantLastLogin = async (tenant: TenantAccessRecord, provider = 'credentials') => {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { NotificationService } from '@/lib/notifications/notification-service'
+import { ensureNotificationSchema } from '@/lib/notifications/schema'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +17,7 @@ export async function PATCH(
   }
 
   try {
+    await ensureNotificationSchema()
     const { id } = await params
 
     await NotificationService.markAsRead(id, tenant.userId)

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { NotificationService } from '@/lib/notifications/notification-service'
+import { ensureNotificationSchema } from '@/lib/notifications/schema'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,7 @@ export async function GET() {
   }
 
   try {
+    await ensureNotificationSchema()
     const count = await NotificationService.getUnreadCount(tenant.userId)
 
     return NextResponse.json({ unreadCount: count })
