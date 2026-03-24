@@ -6,6 +6,12 @@
 
 ## 2026-03-24
 
+### TASK-010 Organization Economics Dashboard implemented
+- **Slice 1**: `organization-economics.ts` store con 4 funciones: `getOrganizationEconomics()` (revenue + labor cost + adjusted margin), `getOrganizationEconomicsTrend()` (6 meses), `getOrganizationProfitabilityBreakdown()` (per-client), `getOrganizationIcoSummary()` (ICO on-read from BigQuery).
+- **Slice 2**: ICO bridge compute-on-read via dynamic import de ICO engine. Agrega avg RPA, OTD%, FTR% al response.
+- **Slice 3**: Tab "Rentabilidad" en vista de organizacion con 6 KPI cards, trend chart Recharts (6 meses), tabla de breakdown por Space con margen color-coded.
+- API: `GET /api/organizations/{id}/economics?year=&month=&trend=6`
+
 ### TASK-006 Webhook Infrastructure MVP implemented
 - **Slice 1**: 5 PostgreSQL tables in `greenhouse_sync`: `webhook_endpoints`, `webhook_inbox_events`, `webhook_subscriptions`, `webhook_deliveries`, `webhook_delivery_attempts` + indexes + grants.
 - **Slice 2**: Shared library `src/lib/webhooks/`: HMAC-SHA256 signing/verification, canonical envelope builder (v1), retry policy (5 attempts, exponential backoff), database store, inbound handler registry, outbound filter matching + delivery execution.
