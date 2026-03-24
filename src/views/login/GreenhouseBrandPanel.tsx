@@ -87,8 +87,27 @@ const GreenhouseBrandPanel = () => {
         >
           {GH_MESSAGES.login_hero_title}
         </Typography>
-        <Typography sx={{ fontSize: 15, color: 'rgba(255,255,255, 0.55)', mb: 5, maxWidth: 380 }}>
-          {GH_MESSAGES.login_hero_subtitle}
+        <Typography
+          sx={{
+            fontSize: 15,
+            color: 'rgba(255,255,255, 0.55)',
+            mb: 5,
+            maxWidth: 380,
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0 5px',
+            lineHeight: 1.6
+          }}
+        >
+          La plataforma de
+          <Box
+            component='img'
+            src='/branding/logo-negative.svg'
+            alt='Efeonce'
+            sx={{ height: 14, opacity: 0.55 }}
+          />
+          donde todo se conecta y todo se mide.
         </Typography>
 
         {/* Value proposition cards */}
