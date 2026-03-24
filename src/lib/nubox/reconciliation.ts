@@ -751,24 +751,18 @@ export async function resolveDteProposal(opts: {
       }
 
       // Publish outbox event for the match
-      await client.query(
-        `INSERT INTO greenhouse_sync.outbox_events (
-           event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
-         ) VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', NOW())`,
-        [
-          `evt-${randomUUID()}`,
-          dte.dteSource === 'nubox_sale' ? 'finance.income' : 'finance.expense',
-          proposal.financeId,
-          'finance.dte.matched',
-          JSON.stringify({
-            proposal_id: opts.proposalId,
-            dte_source: dte.dteSource,
-            dte_source_id: dte.dteSourceId,
-            finance_id: proposal.financeId,
-            resolved_by: opts.resolvedBy
-          })
-        ]
-      )
+      await publishOutboxEvent({
+        aggregateType: AGGREGATE_TYPES.dteReconciliation,
+        aggregateId: proposal.financeId,
+        eventType: EVENT_TYPES.dteMatched,
+        payload: {
+          proposal_id: opts.proposalId,
+          dte_source: dte.dteSource,
+          dte_source_id: dte.dteSourceId,
+          finance_id: proposal.financeId,
+          resolved_by: opts.resolvedBy
+        }
+      }, client)
     }
 
     // Publish discrepancy event if mismatch detected on approve
@@ -777,23 +771,17 @@ export async function resolveDteProposal(opts: {
       proposal.amountDiscrepancy != null &&
       Math.abs(proposal.amountDiscrepancy) > 0
     ) {
-      await client.query(
-        `INSERT INTO greenhouse_sync.outbox_events (
-           event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
-         ) VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', NOW())`,
-        [
-          `evt-${randomUUID()}`,
-          proposal.dteSource === 'nubox_sale' ? 'finance.income' : 'finance.expense',
-          proposal.financeId || proposal.dteSourceId,
-          'finance.dte.discrepancy_found',
-          JSON.stringify({
-            proposal_id: opts.proposalId,
-            dte_amount: proposal.dteTotalAmount,
-            finance_amount: proposal.financeTotalAmount,
-            discrepancy: proposal.amountDiscrepancy
-          })
-        ]
-      )
+      await publishOutboxEvent({
+        aggregateType: AGGREGATE_TYPES.dteReconciliation,
+        aggregateId: proposal.financeId || proposal.dteSourceId,
+        eventType: EVENT_TYPES.dteDiscrepancyFound,
+        payload: {
+          proposal_id: opts.proposalId,
+          dte_amount: proposal.dteTotalAmount,
+          finance_amount: proposal.financeTotalAmount,
+          discrepancy: proposal.amountDiscrepancy
+        }
+      }, client)
     }
 
     return updatedRows.rows.length > 0 ? mapProposal(updatedRows.rows[0]) : null

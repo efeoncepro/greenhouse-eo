@@ -145,7 +145,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         Number(sale.net_amount ?? 0),
         Number(sale.tax_vat_amount ?? 0),
         Number(sale.total_amount ?? 0),
-        Number(sale.balance ?? -1) === 0 ? 'paid' : 'pending',
+        'pending', // Always 'pending' for new invoices — payment_status is derived from income_payments ledger
         mapDteTypeToIncomeType(sale.dte_type_code),
         Number(sale.nubox_sale_id),
         sale.sii_track_id ? Number(sale.sii_track_id) : null,
