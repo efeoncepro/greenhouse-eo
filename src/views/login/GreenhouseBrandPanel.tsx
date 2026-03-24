@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import { GH_MESSAGES, GH_COLORS } from '@/config/greenhouse-nomenclature'
 
 import LoginValueCard from './LoginValueCard'
-import { LOGIN_VALUE_CARDS, DECORATIVE_CIRCLES } from './login-constants'
+import { LOGIN_VALUE_CARDS } from './login-constants'
 
 const GreenhouseBrandPanel = () => {
   return (
@@ -51,26 +51,40 @@ const GreenhouseBrandPanel = () => {
         }}
       />
 
-      {/* Decorative circles — placeholders for future 3D elements */}
-      {DECORATIVE_CIRCLES.map((circle, i) => (
-        <Box
-          key={i}
-          aria-hidden='true'
-          sx={{
-            position: 'absolute',
-            borderRadius: '50%',
-            border: circle.border,
-            background: 'transparent',
-            pointerEvents: 'none',
-            width: circle.width,
-            height: circle.height,
-            top: circle.top,
-            left: circle.left,
-            right: circle.right,
-            bottom: circle.bottom
-          }}
-        />
-      ))}
+      {/* Brand arrow — large watermark, top right */}
+      <Box
+        component='img'
+        src='/images/greenhouse/SVG/arrow-greenhouse.svg'
+        alt=''
+        aria-hidden='true'
+        sx={{
+          position: 'absolute',
+          top: '-4%',
+          right: '-2%',
+          width: { md: 280, lg: 340 },
+          height: 'auto',
+          opacity: 0.04,
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Brand arrow — smaller accent, bottom left, rotated */}
+      <Box
+        component='img'
+        src='/images/greenhouse/SVG/arrow-greenhouse.svg'
+        alt=''
+        aria-hidden='true'
+        sx={{
+          position: 'absolute',
+          bottom: '8%',
+          left: '-3%',
+          width: { md: 140, lg: 180 },
+          height: 'auto',
+          opacity: 0.03,
+          transform: 'rotate(180deg)',
+          pointerEvents: 'none'
+        }}
+      />
 
       {/* Content container — centered, constrained width */}
       <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 500 }}>
