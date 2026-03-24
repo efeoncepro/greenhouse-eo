@@ -1,10 +1,8 @@
 'use client'
 
-// React Imports
-import { useRef, useState, useEffect } from 'react'
-import type { MouseEvent, ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
-// MUI Imports
 import IconButton from '@mui/material/IconButton'
 import Badge from '@mui/material/Badge'
 import Popper from '@mui/material/Popper'
@@ -15,144 +13,174 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Tooltip from '@mui/material/Tooltip'
 import Divider from '@mui/material/Divider'
-import Avatar from '@mui/material/Avatar'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Box from '@mui/material/Box'
 import type { Theme } from '@mui/material/styles'
 
-// Third Party Components
 import classnames from 'classnames'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
-// Type Imports
-import type { ThemeColor } from '@core/types'
-import type { CustomAvatarProps } from '@core/components/mui/Avatar'
-
-// Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
-
-// Config Imports
 import themeConfig from '@configs/themeConfig'
-
-// Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
 
-// Util Imports
-import { getInitials } from '@/utils/getInitials'
+// ── Types ──
 
-export type NotificationsType = {
+interface ApiNotification {
+  notification_id: string
+  category: string
   title: string
-  subtitle: string
-  time: string
-  read: boolean
-} & (
-  | {
-      avatarImage?: string
-      avatarIcon?: never
-      avatarText?: never
-      avatarColor?: never
-      avatarSkin?: never
-    }
-  | {
-      avatarIcon?: string
-      avatarColor?: ThemeColor
-      avatarSkin?: CustomAvatarProps['skin']
-      avatarImage?: never
-      avatarText?: never
-    }
-  | {
-      avatarText?: string
-      avatarColor?: ThemeColor
-      avatarSkin?: CustomAvatarProps['skin']
-      avatarImage?: never
-      avatarIcon?: never
-    }
-)
+  body: string | null
+  action_url: string | null
+  icon: string | null
+  read_at: string | null
+  created_at: string
+}
+
+// ── Helpers ──
+
+const CATEGORY_ICONS: Record<string, { icon: string; color: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
+  delivery_update: { icon: 'tabler-package', color: 'info' },
+  sprint_milestone: { icon: 'tabler-flag', color: 'primary' },
+  feedback_requested: { icon: 'tabler-message-circle', color: 'warning' },
+  report_ready: { icon: 'tabler-file-analytics', color: 'success' },
+  leave_status: { icon: 'tabler-calendar-event', color: 'info' },
+  payroll_ready: { icon: 'tabler-currency-dollar', color: 'success' },
+  assignment_change: { icon: 'tabler-user-plus', color: 'primary' },
+  ico_alert: { icon: 'tabler-alert-triangle', color: 'error' },
+  capacity_warning: { icon: 'tabler-users', color: 'warning' },
+  system_event: { icon: 'tabler-settings', color: 'secondary' }
+}
+
+const timeAgo = (dateStr: string): string => {
+  const now = Date.now()
+  const then = new Date(dateStr).getTime()
+  const diffMs = now - then
+
+  if (diffMs < 60_000) return 'Ahora'
+
+  const mins = Math.floor(diffMs / 60_000)
+
+  if (mins < 60) return `Hace ${mins}m`
+
+  const hours = Math.floor(mins / 60)
+
+  if (hours < 24) return `Hace ${hours}h`
+
+  const days = Math.floor(hours / 24)
+
+  if (days < 7) return `Hace ${days}d`
+
+  return new Date(dateStr).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
+}
 
 const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: boolean }) => {
   if (hidden) {
     return <div className='overflow-x-hidden bs-full'>{children}</div>
-  } else {
-    return (
-      <PerfectScrollbar className='bs-full' options={{ wheelPropagation: false, suppressScrollX: true }}>
-        {children}
-      </PerfectScrollbar>
-    )
   }
+
+  return (
+    <PerfectScrollbar className='bs-full' options={{ wheelPropagation: false, suppressScrollX: true }}>
+      {children}
+    </PerfectScrollbar>
+  )
 }
 
-const getAvatar = (
-  params: Pick<NotificationsType, 'avatarImage' | 'avatarIcon' | 'title' | 'avatarText' | 'avatarColor' | 'avatarSkin'>
-) => {
-  const { avatarImage, avatarIcon, avatarText, title, avatarColor, avatarSkin } = params
+// ── Component ──
 
-  if (avatarImage) {
-    return <Avatar src={avatarImage} />
-  } else if (avatarIcon) {
-    return (
-      <CustomAvatar color={avatarColor} skin={avatarSkin || 'light-static'}>
-        <i className={avatarIcon} />
-      </CustomAvatar>
-    )
-  } else {
-    return (
-      <CustomAvatar color={avatarColor} skin={avatarSkin || 'light-static'}>
-        {avatarText || getInitials(title)}
-      </CustomAvatar>
-    )
-  }
-}
-
-const NotificationDropdown = ({ notifications }: { notifications: NotificationsType[] }) => {
-  // States
+const NotificationDropdown = () => {
   const [open, setOpen] = useState(false)
-  const [notificationsState, setNotificationsState] = useState(notifications)
+  const [notifications, setNotifications] = useState<ApiNotification[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [loading, setLoading] = useState(false)
 
-  // Vars
-  const notificationCount = notificationsState.filter(notification => !notification.read).length
-  const readAll = notificationsState.every(notification => notification.read)
-
-  // Refs
   const anchorRef = useRef<HTMLButtonElement>(null)
   const ref = useRef<HTMLDivElement | null>(null)
 
-  // Hooks
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
   const { settings } = useSettings()
 
-  const handleClose = () => {
-    setOpen(false)
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const res = await fetch('/api/notifications/unread-count')
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setUnreadCount(data.unreadCount ?? 0)
+      }
+    } catch {
+      // Silent fail — badge just won't update
+    }
+  }, [])
+
+  const fetchNotifications = useCallback(async () => {
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/notifications?pageSize=10')
+
+      if (res.ok) {
+        const data = await res.json()
+
+        setNotifications(data.items ?? [])
+      }
+    } catch {
+      // Silent fail
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Poll unread count every 30s
+  useEffect(() => {
+    void fetchUnreadCount()
+    const interval = setInterval(() => void fetchUnreadCount(), 30_000)
+
+    return () => clearInterval(interval)
+  }, [fetchUnreadCount])
+
+  // Fetch full list when dropdown opens
+  useEffect(() => {
+    if (open) void fetchNotifications()
+  }, [open, fetchNotifications])
+
+  const handleToggle = () => setOpen(prev => !prev)
+  const handleClose = () => setOpen(false)
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    // Optimistic update
+    setNotifications(prev => prev.map(n =>
+      n.notification_id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
+    ))
+    setUnreadCount(prev => Math.max(0, prev - 1))
+
+    try {
+      await fetch(`/api/notifications/${notificationId}`, { method: 'PATCH' })
+    } catch {
+      // Revert on failure
+      void fetchNotifications()
+      void fetchUnreadCount()
+    }
   }
 
-  const handleToggle = () => {
-    setOpen(prevOpen => !prevOpen)
+  const handleMarkAllRead = async () => {
+    // Optimistic
+    setNotifications(prev => prev.map(n => ({ ...n, read_at: n.read_at || new Date().toISOString() })))
+    setUnreadCount(0)
+
+    try {
+      await fetch('/api/notifications/mark-all-read', { method: 'POST' })
+    } catch {
+      void fetchNotifications()
+      void fetchUnreadCount()
+    }
   }
 
-  const handleReadNotification = (event: MouseEvent<HTMLElement>, value: boolean, index: number) => {
-    event.stopPropagation()
-    const newNotifications = [...notificationsState]
-
-    newNotifications[index].read = value
-    setNotificationsState(newNotifications)
-  }
-
-  const handleRemoveNotification = (event: MouseEvent<HTMLElement>, index: number) => {
-    event.stopPropagation()
-    const newNotifications = [...notificationsState]
-
-    newNotifications.splice(index, 1)
-    setNotificationsState(newNotifications)
-  }
-
-  const readAllNotifications = () => {
-    const newNotifications = [...notificationsState]
-
-    newNotifications.forEach(notification => {
-      notification.read = !readAll
-    })
-    setNotificationsState(newNotifications)
-  }
+  const readAll = notifications.length > 0 && notifications.every(n => n.read_at !== null)
 
   useEffect(() => {
     const adjustPopoverHeight = () => {
@@ -176,7 +204,7 @@ const NotificationDropdown = ({ notifications }: { notifications: NotificationsT
           className='cursor-pointer'
           variant='dot'
           overlap='circular'
-          invisible={notificationCount === 0}
+          invisible={unreadCount === 0}
           sx={{
             '& .MuiBadge-dot': { top: 6, right: 5, boxShadow: 'var(--mui-palette-background-paper) 0px 0px 0px 2px' }
           }}
@@ -198,9 +226,7 @@ const NotificationDropdown = ({ notifications }: { notifications: NotificationsT
               modifiers: [
                 {
                   name: 'preventOverflow',
-                  options: {
-                    padding: themeConfig.layoutPadding
-                  }
+                  options: { padding: themeConfig.layoutPadding }
                 }
               ]
             }
@@ -215,11 +241,11 @@ const NotificationDropdown = ({ notifications }: { notifications: NotificationsT
                     <Typography variant='h6' className='flex-auto'>
                       Notificaciones
                     </Typography>
-                    {notificationCount > 0 && (
-                      <Chip size='small' variant='tonal' color='primary' label={`${notificationCount} Nuevas`} />
+                    {unreadCount > 0 && (
+                      <Chip size='small' variant='tonal' color='primary' label={`${unreadCount > 9 ? '9+' : unreadCount} Nuevas`} />
                     )}
                     <Tooltip
-                      title={readAll ? 'Marcar como no leídas' : 'Marcar como leídas'}
+                      title={readAll ? 'Marcar como no leídas' : 'Marcar todas como leídas'}
                       placement={placement === 'bottom-end' ? 'left' : 'right'}
                       slotProps={{
                         popper: {
@@ -232,8 +258,8 @@ const NotificationDropdown = ({ notifications }: { notifications: NotificationsT
                         }
                       }}
                     >
-                      {notificationsState.length > 0 ? (
-                        <IconButton size='small' onClick={() => readAllNotifications()} className='text-textPrimary'>
+                      {notifications.length > 0 ? (
+                        <IconButton size='small' onClick={handleMarkAllRead} className='text-textPrimary'>
                           <i className={readAll ? 'tabler-mail' : 'tabler-mail-opened'} />
                         </IconButton>
                       ) : (
@@ -243,60 +269,69 @@ const NotificationDropdown = ({ notifications }: { notifications: NotificationsT
                   </div>
                   <Divider />
                   <ScrollWrapper hidden={hidden}>
-                    {notificationsState.map((notification, index) => {
-                      const {
-                        title,
-                        subtitle,
-                        time,
-                        read,
-                        avatarImage,
-                        avatarIcon,
-                        avatarText,
-                        avatarColor,
-                        avatarSkin
-                      } = notification
+                    {loading ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : notifications.length === 0 ? (
+                      <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <Typography variant='body2' color='text.secondary'>
+                          No hay notificaciones nuevas
+                        </Typography>
+                      </Box>
+                    ) : (
+                      notifications.map((notification, index) => {
+                        const catConfig = CATEGORY_ICONS[notification.category] || { icon: 'tabler-bell', color: 'primary' as const }
+                        const isRead = notification.read_at !== null
 
-                      return (
-                        <div
-                          key={index}
-                          className={classnames('flex plb-3 pli-4 gap-3 cursor-pointer hover:bg-actionHover group', {
-                            'border-be': index !== notificationsState.length - 1
-                          })}
-                          onClick={e => handleReadNotification(e, true, index)}
-                        >
-                          {getAvatar({ avatarImage, avatarIcon, title, avatarText, avatarColor, avatarSkin })}
-                          <div className='flex flex-col flex-auto'>
-                            <Typography variant='body2' className='font-medium mbe-1' color='text.primary'>
-                              {title}
-                            </Typography>
-                            <Typography variant='caption' color='text.secondary' className='mbe-2'>
-                              {subtitle}
-                            </Typography>
-                            <Typography variant='caption' color='text.disabled'>
-                              {time}
-                            </Typography>
+                        return (
+                          <div
+                            key={notification.notification_id}
+                            className={classnames('flex plb-3 pli-4 gap-3 cursor-pointer hover:bg-actionHover group', {
+                              'border-be': index !== notifications.length - 1
+                            })}
+                            onClick={() => {
+                              if (!isRead) void handleMarkAsRead(notification.notification_id)
+                              if (notification.action_url) window.location.href = notification.action_url
+                            }}
+                          >
+                            <CustomAvatar color={catConfig.color} skin='light-static'>
+                              <i className={notification.icon || catConfig.icon} />
+                            </CustomAvatar>
+                            <div className='flex flex-col flex-auto'>
+                              <Typography variant='body2' className='font-medium mbe-1' color='text.primary'>
+                                {notification.title}
+                              </Typography>
+                              {notification.body && (
+                                <Typography variant='caption' color='text.secondary' className='mbe-2'>
+                                  {notification.body}
+                                </Typography>
+                              )}
+                              <Typography variant='caption' color='text.disabled'>
+                                {timeAgo(notification.created_at)}
+                              </Typography>
+                            </div>
+                            <div className='flex flex-col items-end gap-2'>
+                              <Badge
+                                variant='dot'
+                                color={isRead ? 'secondary' : 'primary'}
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  if (!isRead) void handleMarkAsRead(notification.notification_id)
+                                }}
+                                className={classnames('mbs-1 mie-1', {
+                                  'invisible group-hover:visible': isRead
+                                })}
+                              />
+                            </div>
                           </div>
-                          <div className='flex flex-col items-end gap-2'>
-                            <Badge
-                              variant='dot'
-                              color={read ? 'secondary' : 'primary'}
-                              onClick={e => handleReadNotification(e, !read, index)}
-                              className={classnames('mbs-1 mie-1', {
-                                'invisible group-hover:visible': read
-                              })}
-                            />
-                            <i
-                              className='tabler-x text-xl invisible group-hover:visible'
-                              onClick={e => handleRemoveNotification(e, index)}
-                            />
-                          </div>
-                        </div>
-                      )
-                    })}
+                        )
+                      })
+                    )}
                   </ScrollWrapper>
                   <Divider />
                   <div className='p-4'>
-                    <Button fullWidth variant='contained' size='small'>
+                    <Button fullWidth variant='contained' size='small' href='/notifications'>
                       Ver todas las notificaciones
                     </Button>
                   </div>

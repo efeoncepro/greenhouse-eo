@@ -24,18 +24,6 @@ const shortcuts = [
   { url: '/admin/settings', icon: 'tabler-settings', title: 'Configuración', subtitle: 'Sistema' }
 ]
 
-// Notifications data (placeholder — replace with real data source)
-const notifications = [
-  {
-    title: 'Bienvenido a Greenhouse',
-    subtitle: 'Tu portal operativo está listo',
-    time: 'Ahora',
-    read: false,
-    avatarIcon: 'tabler-plant-2',
-    avatarColor: 'success' as const
-  }
-]
-
 const NavbarContent = () => {
   return (
     <div className={classnames(verticalLayoutClasses.navbarContent, 'flex items-center justify-between gap-4 is-full')}>
@@ -46,7 +34,7 @@ const NavbarContent = () => {
       <div className='flex items-center gap-1'>
         <ModeDropdown />
         <ShortcutsDropdown shortcuts={shortcuts} />
-        <NotificationDropdown notifications={notifications} />
+        <NotificationDropdown />
         <UserDropdown />
       </div>
     </div>
