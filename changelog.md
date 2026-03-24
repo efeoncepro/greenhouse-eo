@@ -6,6 +6,29 @@
 
 ## 2026-03-24
 
+### Login page redesigned with Greenhouse brand identity
+- Two-panel layout: left (60%) brand moment with Midnight Navy bg, Greenhouse logo, hero copy, value proposition cards with glassmorphism, gradient accent line; right (40%) auth form with Microsoft/Google SSO + credentials.
+- Official multicolor Microsoft and Google brand icons from Iconify.
+- Efeonce logo inline in subtitle. Responsive: left panel hidden below 1024px with mobile logo fallback.
+- All copy updated to UX Writing approved Spanish text via `GH_MESSAGES`.
+- Dark mode polish deferred to TASK-032.
+
+### Sidebar and favicon rebranded to Greenhouse
+- Sidebar expanded: `negative-sin-claim.svg`, collapsed: `negative-isotipo.svg`.
+- Favicon: `favicon-blue-negative.svg`.
+- All Greenhouse SVG assets added to `public/images/greenhouse/SVG/`.
+
+### CODEX_TASK files migrated to TASK-### naming convention
+- 38 files renamed from `CODEX_TASK_*` to `TASK-###-kebab-case.md` (TASK-001 through TASK-041).
+- `README.md` and `TASK_ID_REGISTRY.md` updated. Next available: TASK-042.
+
+### TASK-012 Outbox Event Expansion implemented
+- **Slice 1**: `publishOutboxEvent()` helper in `src/lib/sync/publish-event.ts` — reutilizable, soporta modo transaccional y standalone. Event catalog en `src/lib/sync/event-catalog.ts` con tipos y constantes.
+- **Slice 2**: Publicacion de eventos agregada en 4 stores: Account 360 (organization.updated, membership CRUD), HR Core/Team Admin (member CRUD, assignment CRUD), Identity (reconciliation approved/rejected, profile linked), Services (service CRUD).
+- **Slice 3**: Consumer reactivo en `src/lib/sync/reactive-consumer.ts` — procesa eventos de assignment y membership para invalidar cache de organization_360. Cron en `/api/cron/outbox-react`. Tabla de tracking `outbox_reactive_log` auto-provisionada.
+- **Slice 4**: Catalogo documentado en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` con 30+ event types.
+- `pnpm lint` y `tsc --noEmit` pasan limpio.
+
 ### Task system normalized around stable TASK-### IDs
 - Las tasks nuevas pasan a nacer con IDs estables `TASK-###` en vez de abrirse como convención nueva bajo `CODEX_TASK_*`.
 - Se agregó `docs/tasks/TASK_TEMPLATE.md` como plantilla canónica para que humanos y agentes creen e interpreten tasks con la misma estructura mínima.

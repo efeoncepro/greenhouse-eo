@@ -3,6 +3,8 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -331,6 +333,13 @@ export const updateOrganization = async (
     WHERE organization_id = $1
   `, params)
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.organization,
+    aggregateId: id,
+    eventType: EVENT_TYPES.organizationUpdated,
+    payload: { organizationId: id, updatedFields: Object.keys(data).filter(k => data[k as keyof typeof data] !== undefined) }
+  })
+
   return { updated: true }
 }
 
@@ -377,6 +386,13 @@ export const createMembership = async (input: CreateMembershipInput) => {
     input.isPrimary ?? false
   ])
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.membership,
+    aggregateId: membershipId,
+    eventType: EVENT_TYPES.membershipCreated,
+    payload: { membershipId, profileId: input.profileId, organizationId: input.organizationId, spaceId: input.spaceId ?? null }
+  })
+
   return { membershipId, publicId, created: true }
 }
 
@@ -420,6 +436,13 @@ export const updateMembership = async (
     WHERE membership_id = $1
   `, params)
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.membership,
+    aggregateId: membershipId,
+    eventType: EVENT_TYPES.membershipUpdated,
+    payload: { membershipId, updatedFields: Object.keys(data).filter(k => data[k as keyof typeof data] !== undefined) }
+  })
+
   return { updated: true }
 }
 
@@ -429,6 +452,13 @@ export const deactivateMembership = async (membershipId: string) => {
     SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
     WHERE membership_id = $1
   `, [membershipId])
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.membership,
+    aggregateId: membershipId,
+    eventType: EVENT_TYPES.membershipDeactivated,
+    payload: { membershipId }
+  })
 
   return { deactivated: true }
 }

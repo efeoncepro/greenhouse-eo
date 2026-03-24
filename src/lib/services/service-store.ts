@@ -2,6 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateServiceId, nextPublicId } from '@/lib/account-360/id-generation'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -392,6 +394,13 @@ export const createService = async (input: CreateServiceInput) => {
     input.createdBy ?? null
   ])
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.service,
+    aggregateId: serviceId,
+    eventType: EVENT_TYPES.serviceCreated,
+    payload: { serviceId, spaceId: input.spaceId, organizationId: input.organizationId ?? null, lineaDeServicio: input.lineaDeServicio }
+  })
+
   return { serviceId, publicId, created: true }
 }
 
@@ -491,6 +500,13 @@ export const updateService = async (
     `, [historyId, serviceId, h.field, h.oldVal, h.newVal, actorUserId ?? null])
   }
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.service,
+    aggregateId: serviceId,
+    eventType: EVENT_TYPES.serviceUpdated,
+    payload: { serviceId, updatedFields: historyInserts.map(h => h.field) }
+  })
+
   return { updated: true }
 }
 
@@ -509,6 +525,13 @@ export const deactivateService = async (serviceId: string, actorUserId?: string)
       history_id, service_id, field_changed, old_value, new_value, changed_by, changed_at
     ) VALUES ($1, $2, 'status', 'active', 'inactive', $3, CURRENT_TIMESTAMP)
   `, [historyId, serviceId, actorUserId ?? null])
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.service,
+    aggregateId: serviceId,
+    eventType: EVENT_TYPES.serviceDeactivated,
+    payload: { serviceId }
+  })
 
   return { deactivated: true }
 }

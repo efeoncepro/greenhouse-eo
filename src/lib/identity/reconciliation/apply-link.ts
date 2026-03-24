@@ -3,6 +3,8 @@ import 'server-only'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { buildIdentitySourceLinkId } from '@/lib/ids/greenhouse-ids'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import type { SourceSystem, ReconciliationProposal, ProposalStatus } from './types'
 import { SOURCE_MEMBER_COLUMN } from './types'
@@ -92,7 +94,21 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
     })
   }
 
-  // 3. Update Postgres members table (if available)
+  // 3. Publish outbox event
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.identityProfile,
+    aggregateId: proposal.candidateProfileId || proposal.candidateMemberId!,
+    eventType: EVENT_TYPES.profileLinked,
+    payload: {
+      proposalId: proposal.proposalId,
+      profileId: proposal.candidateProfileId,
+      memberId: proposal.candidateMemberId,
+      sourceSystem: proposal.sourceSystem,
+      sourceObjectId: proposal.sourceObjectId
+    }
+  })
+
+  // 4. Update Postgres members table (if available)
   if (isGreenhousePostgresConfigured()) {
     try {
       await runGreenhousePostgresQuery(
@@ -119,6 +135,19 @@ export async function updateProposalStatus(
      WHERE proposal_id = $4`,
     [status, resolvedBy, note || null, proposalId]
   )
+
+  const eventType = status === 'admin_approved' || status === 'auto_linked'
+    ? EVENT_TYPES.reconciliationApproved
+    : status === 'admin_rejected' || status === 'dismissed'
+      ? EVENT_TYPES.reconciliationRejected
+      : EVENT_TYPES.reconciliationProposed
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.identityReconciliation,
+    aggregateId: proposalId,
+    eventType,
+    payload: { proposalId, status, resolvedBy }
+  })
 }
 
 // ── Insert proposal ───────────────────────────────────────────────────

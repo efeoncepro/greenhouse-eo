@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { getPeopleTableColumns, toContactChannel, toDateString, toNumber, toStringArray } from '@/lib/people/shared'
 import type {
   CreateAssignmentInput,
@@ -1810,6 +1812,13 @@ export const createMember = async ({
     }
   })
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.member,
+    aggregateId: created.memberId,
+    eventType: EVENT_TYPES.memberCreated,
+    payload: { memberId: created.memberId, email: created.email, displayName: created.displayName }
+  })
+
   return created
 }
 
@@ -1939,6 +1948,13 @@ export const updateMember = async ({
     }
   })
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.member,
+    aggregateId: updated.memberId,
+    eventType: EVENT_TYPES.memberUpdated,
+    payload: { memberId: updated.memberId, updatedFields: Object.keys(updates) }
+  })
+
   return updated
 }
 
@@ -2015,6 +2031,13 @@ export const deactivateMember = async ({
       actorEmail,
       memberId: updated.memberId
     }
+  })
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.member,
+    aggregateId: updated.memberId,
+    eventType: EVENT_TYPES.memberDeactivated,
+    payload: { memberId: updated.memberId }
   })
 
   return updated
@@ -2156,6 +2179,13 @@ export const createAssignment = async ({
     }
   })
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.assignment,
+    aggregateId: created.assignmentId,
+    eventType: EVENT_TYPES.assignmentCreated,
+    payload: { assignmentId: created.assignmentId, memberId: created.memberId, clientId: created.clientId, fteAllocation: created.fteAllocation }
+  })
+
   return created
 }
 
@@ -2268,6 +2298,13 @@ export const updateAssignment = async ({
     }
   })
 
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.assignment,
+    aggregateId: updated.assignmentId,
+    eventType: EVENT_TYPES.assignmentUpdated,
+    payload: { assignmentId: updated.assignmentId, memberId: updated.memberId, clientId: updated.clientId, updatedFields: Object.keys(updates) }
+  })
+
   return updated
 }
 
@@ -2332,6 +2369,13 @@ export const deleteAssignment = async ({
       assignmentId: updated.assignmentId,
       memberId: updated.memberId
     }
+  })
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.assignment,
+    aggregateId: updated.assignmentId,
+    eventType: EVENT_TYPES.assignmentRemoved,
+    payload: { assignmentId: updated.assignmentId, memberId: updated.memberId, clientId: updated.clientId }
   })
 
   return updated

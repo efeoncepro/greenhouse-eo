@@ -40,6 +40,65 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 19:30 -03
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Rebrand sidebar y favicon a Greenhouse identity
+- Rediseno completo de login page con identidad Greenhouse
+- Migracion de CODEX_TASK a convencion TASK-###
+- Implementacion de TASK-012 Outbox Event Expansion (4 slices)
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: pendiente merge a `main`
+
+### Ambiente objetivo
+- staging (dev-greenhouse.efeoncepro.com)
+
+### Archivos tocados
+
+**Login redesign:**
+- `src/views/Login.tsx` — reescrito con layout de dos paneles
+- `src/views/login/GreenhouseBrandPanel.tsx` — panel izquierdo de marca (nuevo)
+- `src/views/login/LoginValueCard.tsx` — card de propuesta de valor (nuevo)
+- `src/views/login/login-constants.ts` — constantes del login (nuevo)
+- `src/components/layout/shared/Logo.tsx` — sidebar usa logos Greenhouse
+- `src/app/layout.tsx` — favicon actualizado
+- `src/config/greenhouse-nomenclature.ts` — brand colors + login copy actualizado
+- `public/images/greenhouse/SVG/` — todos los SVGs de Greenhouse
+
+**TASK-012 Outbox Event Expansion:**
+- `src/lib/sync/publish-event.ts` — helper reutilizable (nuevo)
+- `src/lib/sync/event-catalog.ts` — catalogo de tipos (nuevo)
+- `src/lib/sync/reactive-consumer.ts` — consumer reactivo (nuevo)
+- `src/app/api/cron/outbox-react/route.ts` — cron endpoint (nuevo)
+- `src/lib/account-360/organization-store.ts` — eventos de org/membership
+- `src/lib/team-admin/mutate-team.ts` — eventos de member/assignment
+- `src/lib/identity/reconciliation/apply-link.ts` — eventos de identity
+- `src/lib/services/service-store.ts` — eventos de services
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` — catalogo documentado (nuevo)
+
+**Task migration:**
+- 38 archivos en `docs/tasks/` renombrados de CODEX_TASK a TASK-###
+
+### Verificacion
+- `npx tsc --noEmit` — clean
+- `pnpm lint` — clean
+- Login desplegado y verificado visualmente en staging
+- Outbox: codigo compilado, no testeado en runtime (requiere Postgres + eventos reales)
+
+### Riesgos o pendientes
+- **Login dark mode**: deferido a TASK-032 (botón Microsoft y logo mobile)
+- **Outbox reactive consumer**: la tabla `outbox_reactive_log` se auto-provisiona en primer run del cron. Verificar que funcione en staging
+- **Cron outbox-react**: necesita configurarse en Vercel cron o `vercel.json` para ejecutar cada 5 min
+- **Merge a main**: pendiente decision del usuario
+- Proximo paso recomendado: configurar cron en Vercel, testear outbox-react end-to-end con un cambio de assignment real
+
+---
+
 ## 2026-03-24 17:24 -03
 
 ### Agente
