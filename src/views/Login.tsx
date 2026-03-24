@@ -174,7 +174,7 @@ const LoginV2 = ({
               size='large'
               onClick={handleMicrosoftSignIn}
               disabled={!hasMicrosoftAuth}
-              startIcon={<i className='tabler-brand-windows' />}
+              startIcon={<Box component='img' src='/images/greenhouse/SVG/icon-microsoft.svg' alt='' sx={{ width: 20, height: 20 }} />}
               sx={{
                 py: 1.8,
                 bgcolor: GH_COLORS.brand.midnightNavy,
@@ -198,7 +198,7 @@ const LoginV2 = ({
               size='large'
               onClick={handleGoogleSignIn}
               disabled={!hasGoogleAuth}
-              startIcon={<i className='tabler-brand-google-filled' />}
+              startIcon={<Box component='img' src='/images/greenhouse/SVG/icon-google.svg' alt='' sx={{ width: 20, height: 20 }} />}
               sx={{
                 py: 1.8,
                 borderRadius: '8px',
