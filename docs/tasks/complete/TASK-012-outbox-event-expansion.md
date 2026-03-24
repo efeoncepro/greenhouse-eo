@@ -1,3 +1,6 @@
+## Delta 2026-03-24
+- Nubox DTE reconciliation (TASK-013) now publishes 3 new outbox event types: `finance.dte.auto_matched`, `finance.dte.matched`, `finance.dte.discrepancy_found` — these are candidates for the event catalog and webhook dispatch.
+
 # CODEX_TASK_Outbox_Event_Expansion_v1
 
 ## Summary

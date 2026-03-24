@@ -1,5 +1,8 @@
 # CODEX TASK — Financial Intelligence Layer v2
 
+## Delta 2026-03-24
+- DTE reconciliation proposals and coverage metrics now available (TASK-013). `dte_reconciliation_proposals` table tracks matching confidence, discrepancies, and approval status — enriches financial analytics with DTE coverage data per organization.
+
 ## Delta 2026-03-21
 - Finance Postgres Runtime Migration Slice 3 completo: `updateFinanceIncomeInPostgres`, `updateFinanceExpenseInPostgres`, y reconciliación runtime ahora operacionales en Postgres-first — cerrado por trabajo en `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`
 - Prerequisito de runtime Postgres para trends, P&L summary y allocations UI ahora satisfecho

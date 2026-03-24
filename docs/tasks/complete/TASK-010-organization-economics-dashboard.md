@@ -1,3 +1,6 @@
+## Delta 2026-03-24
+- DTE coverage metrics per organization now available via `getDteCoverage()` / `getDteCoverageSummary()` in `src/lib/finance/dte-coverage.ts` and API `GET /api/organizations/[id]/dte-coverage` — closed by TASK-013. Can be integrated as a "tax health" card in the economics dashboard.
+
 # CODEX_TASK_Organization_Economics_Dashboard_v1
 
 ## Summary
