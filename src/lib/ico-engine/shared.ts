@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { NextResponse } from 'next/server'
+
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 
 // ─── Error Class ────────────────────────────────────────────────────────────
@@ -34,6 +36,7 @@ export const toNumber = (value: unknown): number => {
       const primitive = (value as { valueOf: () => unknown }).valueOf()
 
       if (typeof primitive === 'number') return Number.isFinite(primitive) ? primitive : 0
+
       if (typeof primitive === 'string') {
         const parsed = Number(primitive)
 
@@ -185,8 +188,6 @@ export const getIcoEngineProjectId = () => getBigQueryProjectId()
 // ─── Response Helpers ───────────────────────────────────────────────────────
 
 export const toIcoEngineErrorResponse = (error: unknown, fallbackMessage: string) => {
-  const { NextResponse } = require('next/server') as typeof import('next/server')
-
   if (error instanceof IcoEngineError) {
     return NextResponse.json(
       { error: error.message, details: error.details ?? null },

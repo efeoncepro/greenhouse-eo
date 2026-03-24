@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ serviceId: string }> }) {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { serviceId } = await params
@@ -21,6 +22,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ser
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ serviceId: string }> }) {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { serviceId } = await params
@@ -37,6 +39,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ se
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ serviceId: string }> }) {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { serviceId } = await params

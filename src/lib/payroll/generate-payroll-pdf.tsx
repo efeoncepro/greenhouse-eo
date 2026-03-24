@@ -1,15 +1,12 @@
 import 'server-only'
 
+import { Document, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
+
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 
-import ReactPDF from '@react-pdf/renderer'
-
-import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
-import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
+import { getPayrollEntries, getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
-
-const { Document, Page, View, Text, StyleSheet } = ReactPDF
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -496,7 +493,7 @@ export const generatePayrollPeriodPdf = async (periodId: string): Promise<Buffer
   }
 
   const entries = await getPayrollEntries(periodId)
-  const stream = await ReactPDF.renderToStream(<PeriodReportDocument period={period} entries={entries} />)
+  const stream = await renderToStream(<PeriodReportDocument period={period} entries={entries} />)
 
   const chunks: Uint8Array[] = []
 
@@ -524,7 +521,7 @@ export const generatePayrollReceiptPdf = async (entryId: string): Promise<Buffer
     throw new PayrollValidationError('Only approved or exported periods can generate receipts.', 409)
   }
 
-  const stream = await ReactPDF.renderToStream(<ReceiptDocument entry={entry} period={period} />)
+  const stream = await renderToStream(<ReceiptDocument entry={entry} period={period} />)
 
   const chunks: Uint8Array[] = []
 

@@ -1,10 +1,11 @@
+import type { ReactElement, ReactNode } from 'react'
+
 import { render } from '@testing-library/react'
 
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import type { RenderOptions } from '@testing-library/react'
-import type { ReactElement, ReactNode } from 'react'
 
 const theme = createTheme()
 

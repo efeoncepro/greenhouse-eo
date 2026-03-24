@@ -19,7 +19,6 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
-import OptionMenu from '@core/components/option-menu'
 
 import { IdentityImageUploader } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
@@ -206,7 +205,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
                 />
               ) : null}
               {activeTab === 'proyectos' ? (
-                <TenantProjectsPanel clientId={data.clientId} clientName={data.clientName} projects={data.projects} />
+                <TenantProjectsPanel projects={data.projects} />
               ) : null}
               {activeTab === 'notion' ? (
                 <TenantNotionPanel clientId={data.clientId} clientName={data.clientName} />

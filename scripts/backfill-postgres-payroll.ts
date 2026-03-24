@@ -8,30 +8,38 @@ const toNum = (v: unknown): number => {
   if (v === null || v === undefined) return 0
   if (typeof v === 'number') return v
   if (typeof v === 'string') return Number(v) || 0
+
   if (typeof v === 'object' && v !== null && 'valueOf' in v) {
     const prim = (v as { valueOf: () => unknown }).valueOf()
-    return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
+
+
+return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
   }
-  return 0
+
+
+return 0
 }
 
 const toNullNum = (v: unknown): number | null => {
   if (v === null || v === undefined) return null
-  return toNum(v)
+
+return toNum(v)
 }
 
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.trim() || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 const toDate = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.split('T')[0] || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toDate((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toTs = (v: unknown): string | null => {
@@ -39,7 +47,8 @@ const toTs = (v: unknown): string | null => {
   if (typeof v === 'string') return v || null
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v !== null && 'value' in v) return toTs((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toBool = (v: unknown): boolean => Boolean(v)
@@ -55,9 +64,11 @@ const main = async () => {
   try {
     // ─── 1. Compensation Versions ──────────────────────────────
     console.log('\n--- compensation_versions ---')
+
     const [compRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.compensation_versions\``
     })
+
     console.log(`  BigQuery: ${compRows.length} rows`)
 
     for (const r of compRows as any[]) {
@@ -90,13 +101,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${compRows.length}`)
 
     // ─── 2. Payroll Periods ────────────────────────────────────
     console.log('\n--- payroll_periods ---')
+
     const [periodRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.payroll_periods\``
     })
+
     console.log(`  BigQuery: ${periodRows.length} rows`)
 
     for (const r of periodRows as any[]) {
@@ -121,13 +135,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${periodRows.length}`)
 
     // ─── 3. Payroll Entries ────────────────────────────────────
     console.log('\n--- payroll_entries ---')
+
     const [entryRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.payroll_entries\``
     })
+
     console.log(`  BigQuery: ${entryRows.length} rows`)
 
     for (const r of entryRows as any[]) {
@@ -177,13 +194,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${entryRows.length}`)
 
     // ─── 4. Bonus Config ───────────────────────────────────────
     console.log('\n--- payroll_bonus_config ---')
+
     const [configRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.payroll_bonus_config\``
     })
+
     console.log(`  BigQuery: ${configRows.length} rows`)
 
     for (const r of configRows as any[]) {
@@ -202,6 +222,7 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${configRows.length}`)
 
     console.log('\n✅ Payroll backfill complete')

@@ -286,6 +286,7 @@ export async function POST(request: Request) {
     const socialSecurityType = body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
       ? normalizeString(body.socialSecurityType)
       : null
+
     const taxType = body.taxType && TAX_TYPES.includes(body.taxType)
       ? normalizeString(body.taxType)
       : null

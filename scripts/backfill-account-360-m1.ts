@@ -29,17 +29,25 @@ applyGreenhousePostgresProfile('runtime')
 
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
-  if (typeof v === 'string') { const t = v.trim(); return t || null }
+
+  if (typeof v === 'string') { const t = v.trim();
+
+
+
+return t || null }
+
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 const toBool = (v: unknown, fallback = false): boolean => {
   if (typeof v === 'boolean') return v
   if (v === 'true' || v === 1) return true
   if (v === 'false' || v === 0) return false
-  return fallback
+
+return fallback
 }
 
 // ── ID generators ───────────────────────────────────────────────────────
@@ -55,11 +63,15 @@ const nextPublicId = async (prefix: string): Promise<string> => {
     'EO-SPC': 'greenhouse_core.seq_space_public_id',
     'EO-MBR': 'greenhouse_core.seq_membership_public_id'
   }
+
   const seq = seqMap[prefix]
+
   if (!seq) throw new Error(`Unknown public ID prefix: ${prefix}`)
   const rows = await runGreenhousePostgresQuery<{ next_val: string }>(`SELECT nextval('${seq}') AS next_val`)
   const n = Number(rows[0]?.next_val ?? 1)
-  return `${prefix}-${String(n).padStart(4, '0')}`
+
+
+return `${prefix}-${String(n).padStart(4, '0')}`
 }
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -144,6 +156,7 @@ const main = async () => {
   `).catch(() => [] as ClientProfileRow[]) // Table may not exist yet
 
   const profileByClient = new Map<string, ClientProfileRow>()
+
   for (const p of financeProfiles) {
     if (p.client_id) profileByClient.set(p.client_id, p)
   }
@@ -154,6 +167,7 @@ const main = async () => {
 
   for (const client of clients) {
     const clientId = toStr(client.client_id)
+
     if (!clientId) continue
 
     const profile = profileByClient.get(clientId)
@@ -254,8 +268,10 @@ const main = async () => {
   `)
 
   const rolesByUserId = new Map<string, string[]>()
+
   for (const ra of roleAssignments) {
     const existing = rolesByUserId.get(ra.user_id) || []
+
     existing.push(ra.role_code)
     rolesByUserId.set(ra.user_id, existing)
   }
@@ -266,16 +282,19 @@ const main = async () => {
   for (const cu of clientUsers) {
     const profileId = toStr(cu.identity_profile_id)
     const clientId = toStr(cu.client_id)
+
     if (!profileId || !clientId) continue
 
     const organizationId = orgByClientId.get(clientId)
     const spaceIdVal = spaceByClientId.get(clientId)
+
     if (!organizationId) {
       summary.skipped++
       continue
     }
 
     const dedupKey = `${profileId}:${organizationId}`
+
     if (existingMemberships.has(dedupKey)) continue
     existingMemberships.add(dedupKey)
 
@@ -324,12 +343,15 @@ const main = async () => {
   for (const contact of crmContacts) {
     const profileId = toStr(contact.linked_identity_profile_id)
     const clientId = toStr(contact.client_id)
+
     if (!profileId || !clientId) continue
 
     const organizationId = orgByClientId.get(clientId)
+
     if (!organizationId) continue
 
     const dedupKey = `${profileId}:${organizationId}`
+
     if (existingMemberships.has(dedupKey)) continue
     existingMemberships.add(dedupKey)
 

@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireInternalTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)

@@ -48,6 +48,7 @@ interface Expense {
   supplierName: string | null
   serviceLine: string | null
   isRecurring: boolean
+
   // Nubox fields
   nuboxPurchaseId: string | null
 }

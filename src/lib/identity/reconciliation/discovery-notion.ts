@@ -95,6 +95,7 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
       // When responsables_names has the UUID echoed back, fall back to
       // the positional name extracted from responsable_texto
       const apiName = r.source_display_name
+
       const displayName = isUuidAsName(apiName) && r.text_display_name
         ? r.text_display_name
         : apiName

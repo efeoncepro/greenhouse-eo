@@ -26,6 +26,11 @@
 - Se crearon y agregaron al Project las issues bootstrap `#9` a `#18`, una por cada `TASK-001..010` del registro inicial.
 - La fase operativa fina quedó modelada en el campo custom `Pipeline`; el `Status` built-in de GitHub se mantiene como estado coarse.
 
+### Lint baseline recovered and TASK-007 closed
+- `pnpm lint` vuelve a pasar limpio despues de ejecutar `CODEX_TASK_Lint_Debt_Burn_Down_v1` con autofix masivo controlado y cleanup manual del remanente.
+- El burn-down toco `scripts/*`, `src/app/api/*`, `src/lib/*`, `src/views/*`, `src/components/*`, `src/types/*` y `src/test/*` sin introducir desactivaciones globales de reglas.
+- La lane quedo validada con `pnpm lint`, `pnpm test` (`179/179`) y `pnpm build`.
+
 ## 2026-03-22
 
 ### Lint debt burn-down lane documented

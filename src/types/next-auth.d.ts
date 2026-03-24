@@ -23,6 +23,7 @@ declare module 'next-auth' {
     provider: string
     microsoftEmail: string | null
     googleEmail: string | null
+
     // Account 360
     spaceId?: string
     organizationId?: string
@@ -53,6 +54,7 @@ declare module 'next-auth' {
       provider: string
       microsoftEmail: string | null
       googleEmail: string | null
+
       // Account 360
       spaceId?: string
       organizationId?: string
@@ -86,6 +88,7 @@ declare module 'next-auth/jwt' {
     provider?: string
     microsoftEmail?: string | null
     googleEmail?: string | null
+
     // Account 360
     spaceId?: string
     organizationId?: string

@@ -9,10 +9,17 @@ applyGreenhousePostgresProfile('migrator')
 
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
-  if (typeof v === 'string') { const t = v.trim(); return t || null }
+
+  if (typeof v === 'string') { const t = v.trim();
+
+
+
+return t || null }
+
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 // ── Types ───────────────────────────────────────────────────────────────
@@ -62,9 +69,12 @@ const main = async () => {
 
   const nextPublicId = async (prefix: string): Promise<string> => {
     const seq = SEQUENCE_MAP[prefix]
+
     if (!seq) throw new Error(`No sequence for prefix ${prefix}`)
     const rows = await runGreenhousePostgresQuery<{ next_val: string }>(`SELECT nextval('${seq}') AS next_val`)
-    return `${prefix}-${String(Number(rows[0]?.next_val ?? 1)).padStart(4, '0')}`
+
+
+return `${prefix}-${String(Number(rows[0]?.next_val ?? 1)).padStart(4, '0')}`
   }
 
   try {
@@ -91,7 +101,8 @@ const main = async () => {
 
     if (unlinkedUsers.length === 0) {
       console.log('Nothing to reconcile. Done.')
-      return
+
+return
     }
 
     // ── Step 2: Load all identity_profiles for email matching ────────
@@ -102,6 +113,7 @@ const main = async () => {
     `)
 
     const profileByEmail = new Map<string, string>()
+
     for (const p of profiles) {
       if (p.canonical_email) profileByEmail.set(p.canonical_email, p.profile_id)
     }
@@ -119,6 +131,7 @@ const main = async () => {
 
     for (const cu of unlinkedUsers) {
       const email = toStr(cu.email)?.toLowerCase()
+
       if (!email) { summary.skipped++; continue }
 
       let profileId = profileByEmail.get(email)
@@ -194,6 +207,7 @@ const main = async () => {
     `)
 
     const spaceByClientId = new Map<string, { spaceId: string; organizationId: string }>()
+
     for (const s of spaces) {
       if (s.client_id) spaceByClientId.set(s.client_id, { spaceId: s.space_id, organizationId: s.organization_id })
     }
@@ -206,8 +220,10 @@ const main = async () => {
     `)
 
     const rolesByUserId = new Map<string, string[]>()
+
     for (const ra of roleAssignments) {
       const existing = rolesByUserId.get(ra.user_id) || []
+
       existing.push(ra.role_code)
       rolesByUserId.set(ra.user_id, existing)
     }
@@ -220,15 +236,18 @@ const main = async () => {
     `)
 
     const existingKeys = new Set<string>()
+
     for (const m of existingMbr) {
       existingKeys.add(`${m.profile_id}:${m.organization_id}`)
     }
 
     for (const cu of reconciledUsers) {
       const space = spaceByClientId.get(cu.clientId)
+
       if (!space) { continue }
 
       const dedupKey = `${cu.profileId}:${space.organizationId}`
+
       if (existingKeys.has(dedupKey)) continue
       existingKeys.add(dedupKey)
 

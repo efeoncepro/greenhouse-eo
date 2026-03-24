@@ -19,7 +19,6 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTabList from '@core/components/mui/TabList'
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
@@ -29,7 +28,7 @@ import UserActivityTimeline from './admin/users/UserActivityTimeline'
 import UserDetailHeader from './admin/users/UserDetailHeader'
 import UserProjectListTable from './admin/users/UserProjectListTable'
 import UserRoleManager from './admin/users/UserRoleManager'
-import { formatDateTime, roleColorFor, roleIconFor, statusTone, tenantTone, toTitleCase } from './admin/users/helpers'
+import { formatDateTime, roleColorFor, roleIconFor, statusTone, toTitleCase } from './admin/users/helpers'
 
 type Props = {
   data: AdminUserDetail
@@ -50,8 +49,6 @@ const InfoRow = ({ icon, label, value }: { icon: string; label: string; value: s
 // ── Tab: Perfil ──
 
 const TabProfile = ({ data }: Props) => {
-  const projectProgress = data.projectScopes.length === 0 ? 0 : Math.min(100, 28 + data.projectScopes.length * 18)
-
   return (
     <Grid container spacing={6}>
       {/* Card 1: Sobre el usuario (AboutOverview pattern) */}
@@ -264,8 +261,6 @@ const TabSecurity = ({ data }: Props) => (
 // ── Tab: Organizacion ──
 
 const TabOrganization = ({ data }: Props) => {
-  const projectProgress = data.projectScopes.length === 0 ? 0 : Math.min(100, 28 + data.projectScopes.length * 18)
-
   return (
     <Grid container spacing={6}>
       {/* Card 1: Relacion con el tenant (AccountDetails Grid 6/6 pattern) */}

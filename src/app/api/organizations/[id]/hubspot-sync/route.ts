@@ -18,6 +18,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
@@ -91,6 +92,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       } else {
         // Create new identity profile then membership
         const displayName = contact.displayName || [contact.firstName, contact.lastName].filter(Boolean).join(' ') || contact.email
+
         const profileId = await createIdentityProfile({
           sourceSystem: 'hubspot',
           sourceObjectType: 'contact',

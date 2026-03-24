@@ -8,30 +8,32 @@ const toNum = (v: unknown): number => {
   if (v === null || v === undefined) return 0
   if (typeof v === 'number') return v
   if (typeof v === 'string') return Number(v) || 0
+
   if (typeof v === 'object' && v !== null && 'valueOf' in v) {
     const prim = (v as { valueOf: () => unknown }).valueOf()
-    return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
-  }
-  return 0
-}
 
-const toNullNum = (v: unknown): number | null => {
-  if (v === null || v === undefined) return null
-  return toNum(v)
+
+return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
+  }
+
+
+return 0
 }
 
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.trim() || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 const toDate = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.split('T')[0] || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toDate((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toTs = (v: unknown): string | null => {
@@ -39,7 +41,8 @@ const toTs = (v: unknown): string | null => {
   if (typeof v === 'string') return v || null
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v !== null && 'value' in v) return toTs((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toBool = (v: unknown): boolean => Boolean(v)
@@ -57,9 +60,11 @@ const main = async () => {
     // Seed data is already in the DDL (setup-postgres-hr-leave.sql)
     // Only backfill if BigQuery has custom types beyond the defaults
     console.log('\n--- leave_types ---')
+
     const [typeRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.leave_types\``
     })
+
     console.log(`  BigQuery: ${typeRows.length} rows`)
 
     for (const r of typeRows as any[]) {
@@ -89,13 +94,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Upserted: ${typeRows.length}`)
 
     // ─── 2. Leave Balances ─────────────────────────────────────
     console.log('\n--- leave_balances ---')
+
     const [balanceRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.leave_balances\``
     })
+
     console.log(`  BigQuery: ${balanceRows.length} rows`)
 
     for (const r of balanceRows as any[]) {
@@ -117,13 +125,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${balanceRows.length}`)
 
     // ─── 3. Leave Requests ─────────────────────────────────────
     console.log('\n--- leave_requests ---')
+
     const [requestRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.leave_requests\``
     })
+
     console.log(`  BigQuery: ${requestRows.length} rows`)
 
     for (const r of requestRows as any[]) {
@@ -150,13 +161,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${requestRows.length}`)
 
     // ─── 4. Leave Request Actions ──────────────────────────────
     console.log('\n--- leave_request_actions ---')
+
     const [actionRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.leave_request_actions\``
     })
+
     console.log(`  BigQuery: ${actionRows.length} rows`)
 
     for (const r of actionRows as any[]) {
@@ -175,6 +189,7 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${actionRows.length}`)
 
     console.log('\n✅ HR Leave backfill complete')

@@ -17,8 +17,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { CreateMemberInput } from '@/types/team'
-import type { TeamContactChannel, TeamRoleCategory } from '@/types/team'
+import type { CreateMemberInput , TeamContactChannel, TeamRoleCategory } from '@/types/team'
 
 const ROLE_CATEGORIES: TeamRoleCategory[] = ['account', 'operations', 'strategy', 'design', 'development', 'media']
 const COUNTRIES = ['CL', 'CO', 'VE', 'MX', 'PE', 'US', 'AR', 'BR', 'EC']

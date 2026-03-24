@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+
 import ClientDetailView from '@views/greenhouse/finance/ClientDetailView'
 
 export const dynamic = 'force-dynamic'

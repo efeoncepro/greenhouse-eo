@@ -124,6 +124,7 @@ export async function consumeToken(tokenHash: string): Promise<void> {
 /** Rate limit: count tokens created in the last hour for this email+type */
 export async function checkRateLimit(email: string, type: string, maxPerHour: number): Promise<boolean> {
   await ensureTable()
+
   const rows = await runGreenhousePostgresQuery<{ count: string }>(
     `SELECT COUNT(*)::text AS count FROM greenhouse_core.auth_tokens
      WHERE email = $1 AND token_type = $2 AND created_at > now() - interval '1 hour'`,

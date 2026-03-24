@@ -19,6 +19,7 @@ export async function GET(
     return NextResponse.json(result)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('DTE status refresh failed:', error)
 
     return NextResponse.json({ error: message }, { status: 502 })

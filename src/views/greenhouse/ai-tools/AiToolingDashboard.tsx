@@ -7,7 +7,6 @@ import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
@@ -63,6 +62,7 @@ const AiToolingDashboard = () => {
         setCatalogData(await catRes.json())
       } else {
         const body = await catRes.json().catch(() => ({ error: `HTTP ${catRes.status}` }))
+
         errors.push(`Catálogo: ${body.error ?? catRes.statusText}`)
       }
 
@@ -70,6 +70,7 @@ const AiToolingDashboard = () => {
         setLicensesData(await licRes.json())
       } else {
         const body = await licRes.json().catch(() => ({ error: `HTTP ${licRes.status}` }))
+
         errors.push(`Licencias: ${body.error ?? licRes.statusText}`)
       }
 
@@ -77,6 +78,7 @@ const AiToolingDashboard = () => {
         setWalletsData(await walRes.json())
       } else {
         const body = await walRes.json().catch(() => ({ error: `HTTP ${walRes.status}` }))
+
         errors.push(`Wallets: ${body.error ?? walRes.statusText}`)
       }
 
@@ -84,6 +86,7 @@ const AiToolingDashboard = () => {
         setMeta(await metaRes.json())
       } else {
         const body = await metaRes.json().catch(() => ({ error: `HTTP ${metaRes.status}` }))
+
         errors.push(`Metadata: ${body.error ?? metaRes.statusText}`)
       }
 

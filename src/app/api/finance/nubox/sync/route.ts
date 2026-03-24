@@ -20,6 +20,7 @@ export async function POST(request: Request) {
     results.raw = await syncNuboxToRaw(body.periods ? { periods: body.periods } : undefined)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('Nubox raw sync failed:', error)
     results.raw = { error: message }
   }
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
     results.conformed = await syncNuboxToConformed()
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('Nubox conformed sync failed:', error)
     results.conformed = { error: message }
   }
@@ -38,6 +40,7 @@ export async function POST(request: Request) {
     results.postgres = await syncNuboxToPostgres()
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('Nubox postgres projection failed:', error)
     results.postgres = { error: message }
   }

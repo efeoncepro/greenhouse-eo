@@ -109,6 +109,7 @@ describe('compensation → bonus calculation flow', () => {
 
       expect(result.otd.amount).toBe(500)
       expect(result.otd.prorationFactor).toBe(1)
+
       // RpA: (3 - 1.5) / 3 = 0.5
       expect(result.rpa.prorationFactor).toBe(0.5)
       expect(result.rpa.amount).toBe(150)
@@ -121,6 +122,7 @@ describe('compensation → bonus calculation flow', () => {
       // OTD: (82 - 70) / (94 - 70) = 12/24 = 0.5 → $250
       expect(result.otd.prorationFactor).toBe(0.5)
       expect(result.otd.amount).toBe(250)
+
       // RpA: (3 - 2.5) / 3 = 0.1667 → $50.01
       expect(result.rpa.prorationFactor).toBe(0.1667)
       expect(result.rpa.amount).toBe(50.01)
@@ -132,6 +134,7 @@ describe('compensation → bonus calculation flow', () => {
 
       expect(result.otd.amount).toBe(0)
       expect(result.otd.qualifies).toBe(false)
+
       // RpA still valid: (3 - 1) / 3 = 0.6667 → 300 * 0.6667 = $200.01
       expect(result.rpa.amount).toBe(200.01)
       expect(result.grossTotal).toBe(2000 + 50 + 0 + 200.01) // $2,250.01

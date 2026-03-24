@@ -50,7 +50,8 @@ const main = async () => {
 
     if (orphans.length === 0) {
       console.log('Nothing to backfill. Done.')
-      return
+
+return
     }
 
     // Step 2: Load existing profiles for email matching

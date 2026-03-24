@@ -127,33 +127,39 @@ interface CountRow extends Record<string, unknown> {
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
   if (typeof v === 'string') return Number(v) || 0
-  return 0
+
+return 0
 }
 
 const toNullableNum = (v: unknown): number | null => {
   if (v == null) return null
   const n = toNum(v)
-  return n
+
+
+return n
 }
 
 const toTs = (v: unknown): string => {
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'string') return v
-  return ''
+
+return ''
 }
 
 const toNullableTs = (v: unknown): string | null => {
   if (v == null) return null
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'string') return v
-  return null
+
+return null
 }
 
 const toDateStr = (v: unknown): string | null => {
   if (v == null) return null
   if (v instanceof Date) return v.toISOString().slice(0, 10)
   if (typeof v === 'string') return v.slice(0, 10)
-  return null
+
+return null
 }
 
 const normalizeListItem = (r: ServiceListRow): ServiceListItem => ({
@@ -246,6 +252,7 @@ export const getServiceList = async (params: {
   if (params.search) {
     paramIdx++
     const searchParam = `%${params.search}%`
+
     filters += ` AND (s.name ILIKE $${paramIdx} OR s.public_id ILIKE $${paramIdx})`
     queryParams.push(searchParam)
   }
@@ -288,6 +295,7 @@ export const getServiceList = async (params: {
 
   paramIdx++
   const limitParam = paramIdx
+
   paramIdx++
   const offsetParam = paramIdx
 
@@ -440,6 +448,7 @@ export const updateService = async (
 
   for (const [key, column] of Object.entries(fieldMap)) {
     const value = data[key as keyof typeof data]
+
     if (value !== undefined) {
       idx++
       updates.push(`${column} = $${idx}`)

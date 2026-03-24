@@ -35,6 +35,7 @@ export async function GET(
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('DTE PDF download failed:', error)
 
     return NextResponse.json({ error: message }, { status: 502 })

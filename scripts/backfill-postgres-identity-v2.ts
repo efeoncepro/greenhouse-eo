@@ -8,7 +8,8 @@ const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.trim() || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 const toTs = (v: unknown): string | null => {
@@ -16,7 +17,8 @@ const toTs = (v: unknown): string | null => {
   if (typeof v === 'string') return v || null
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v !== null && 'value' in v) return toTs((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toBool = (v: unknown): boolean => Boolean(v)
@@ -32,6 +34,7 @@ const main = async () => {
   try {
     // ─── 1. Backfill SSO + auth columns into client_users ────
     console.log('\n--- client_users SSO/auth columns ---')
+
     const [userRows] = await bq.query({
       query: `
         SELECT
@@ -43,6 +46,7 @@ const main = async () => {
         WHERE active = TRUE
       `
     })
+
     console.log(`  BigQuery: ${userRows.length} users`)
 
     let updatedCount = 0
@@ -80,10 +84,12 @@ const main = async () => {
 
       if (updated.length > 0) updatedCount++
     }
+
     console.log(`  Updated: ${updatedCount}`)
 
     // ─── 2. Resolve member_id for internal users ─────────────
     console.log('\n--- Resolve member_id links ---')
+
     const memberLinked = await runGreenhousePostgresQuery(
       `UPDATE greenhouse_core.client_users u SET
         member_id = m.member_id,
@@ -95,10 +101,12 @@ const main = async () => {
         AND m.active = TRUE
       RETURNING u.user_id`
     )
+
     console.log(`  Linked: ${memberLinked.length}`)
 
     // ─── 3. Backfill role assignments ────────────────────────
     console.log('\n--- user_role_assignments ---')
+
     const [roleRows] = await bq.query({
       query: `
         SELECT
@@ -110,6 +118,7 @@ const main = async () => {
         FROM \`${projectId}.greenhouse.user_role_assignments\`
       `
     })
+
     console.log(`  BigQuery: ${roleRows.length} assignments`)
 
     for (const r of roleRows as any[]) {
@@ -138,13 +147,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Upserted: ${roleRows.length}`)
 
     // ─── 4. Backfill project scopes ──────────────────────────
     console.log('\n--- user_project_scopes ---')
+
     const [projScopeRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.user_project_scopes\``
     })
+
     console.log(`  BigQuery: ${projScopeRows.length} scopes`)
 
     for (const r of projScopeRows as any[]) {
@@ -158,13 +170,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${projScopeRows.length}`)
 
     // ─── 5. Backfill campaign scopes ─────────────────────────
     console.log('\n--- user_campaign_scopes ---')
+
     const [campScopeRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.user_campaign_scopes\``
     })
+
     console.log(`  BigQuery: ${campScopeRows.length} scopes`)
 
     for (const r of campScopeRows as any[]) {
@@ -178,16 +193,19 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${campScopeRows.length}`)
 
     // ─── 6. Backfill feature flags ───────────────────────────
     console.log('\n--- client_feature_flags ---')
+
     const [flagRows] = await bq.query({
       query: `
         SELECT flag_id, client_id, feature_code AS flag_code, active AS enabled, created_at
         FROM \`${projectId}.greenhouse.client_feature_flags\`
       `
     })
+
     console.log(`  BigQuery: ${flagRows.length} flags`)
 
     for (const r of flagRows as any[]) {
@@ -201,6 +219,7 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${flagRows.length}`)
 
     console.log('\n✅ Identity V2 backfill complete')

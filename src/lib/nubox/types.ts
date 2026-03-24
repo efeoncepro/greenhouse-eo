@@ -271,6 +271,7 @@ export type NuboxConformedSale = {
   origin_name: string | null
   client_rut: string | null
   client_trade_name: string | null
+
   // Identity resolution (populated during conformed sync)
   organization_id: string | null
   client_id: string | null
@@ -304,6 +305,7 @@ export type NuboxConformedPurchase = {
   origin_name: string | null
   supplier_rut: string | null
   supplier_trade_name: string | null
+
   // Identity resolution
   supplier_id: string | null
   organization_id: string | null

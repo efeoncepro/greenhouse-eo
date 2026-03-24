@@ -120,6 +120,7 @@ describe('matchIdentity — email matching', () => {
       sourceDisplayName: 'Unknown Person',
       sourceEmail: 'daniela@efeoncepro.com'
     })
+
     const candidate = makeCandidate({ email: 'daniela@efeoncepro.com' })
 
     const result = matchIdentity(discovered, [candidate])
@@ -135,6 +136,7 @@ describe('matchIdentity — email matching', () => {
       sourceDisplayName: 'Unknown',
       sourceEmail: 'dani@efeonce.org'
     })
+
     const candidate = makeCandidate({
       email: 'daniela@efeoncepro.com',
       emailAliases: ['dani@efeonce.org']
@@ -154,6 +156,7 @@ describe('matchIdentity — combined signals', () => {
       sourceDisplayName: 'Daniela Ferreira',
       sourceEmail: 'daniela@efeoncepro.com'
     })
+
     const candidate = makeCandidate({
       displayName: 'Daniela Ferreira',
       email: 'daniela@efeoncepro.com'
@@ -169,6 +172,7 @@ describe('matchIdentity — combined signals', () => {
   it('cross-link bonus adds to confidence', () => {
     const discovered = makeDiscovered({ sourceDisplayName: 'Daniela Ferreira' })
     const withoutCrossLink = makeCandidate({ displayName: 'Daniela Ferreira' })
+
     const withCrossLink = makeCandidate({
       displayName: 'Daniela Ferreira',
       memberId: 'member-cross',
@@ -192,6 +196,7 @@ describe('matchIdentity — candidate selection', () => {
     })
 
     const weak = makeCandidate({ displayName: 'Daniel Ferreira', memberId: 'member-wrong', email: null })
+
     const strong = makeCandidate({
       displayName: 'Daniela Ferreira',
       email: 'daniela@efeoncepro.com',

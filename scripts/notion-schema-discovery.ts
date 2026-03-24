@@ -163,20 +163,6 @@ const getDatabaseSchema = async (databaseId: string): Promise<{ title: string; p
   return { title, properties }
 }
 
-const getSamplePages = async (databaseId: string, limit = 5): Promise<Array<Record<string, unknown>>> => {
-  const res = await fetch(`${NOTION_API}/databases/${databaseId}/query`, {
-    method: 'POST',
-    headers: notionHeaders(),
-    body: JSON.stringify({ page_size: limit })
-  })
-
-  if (!res.ok) return []
-
-  const data = await res.json()
-
-  return data.results || []
-}
-
 // ---------------------------------------------------------------------------
 // Matching engine
 // ---------------------------------------------------------------------------
@@ -202,20 +188,24 @@ const typesCompatible = (notionType: string, bqType: string): boolean => {
 
 const suggestCoercion = (notionType: string, bqType: string): string => {
   if (typesCompatible(notionType, bqType)) return 'direct'
+
   if (notionType === 'formula') {
     if (bqType === 'INTEGER') return 'formula_to_int'
     if (bqType === 'FLOAT') return 'formula_to_float'
     if (bqType === 'STRING') return 'formula_to_string'
     if (bqType === 'BOOLEAN') return 'formula_to_bool'
   }
+
   if (notionType === 'rollup') {
     if (bqType === 'INTEGER') return 'rollup_to_int'
     if (bqType === 'FLOAT') return 'rollup_to_float'
     if (bqType === 'STRING') return 'rollup_to_string'
   }
+
   if (['rich_text', 'title'].includes(notionType) && ['INTEGER', 'FLOAT'].includes(bqType)) {
     return 'extract_number_from_text'
   }
+
   if (notionType === 'number' && bqType === 'STRING') return 'number_to_string'
 
   return `custom_${notionType}_to_${bqType.toLowerCase()}`
@@ -614,6 +604,7 @@ async function main() {
 
   // Save raw data
   const rawPath = 'discovery_raw.json'
+
   const rawExport = spacesData.map(s => ({
     spaceName: s.spaceName,
     spaceId: s.spaceId,

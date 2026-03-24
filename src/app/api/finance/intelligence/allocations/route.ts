@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { FinanceValidationError, assertNonEmptyString, assertPositiveAmount, toNumber } from '@/lib/finance/shared'
-import { COST_CATEGORIES, ALLOCATION_METHODS } from '@/lib/finance/shared'
+import { FinanceValidationError, assertNonEmptyString, assertPositiveAmount, toNumber, ALLOCATION_METHODS } from '@/lib/finance/shared'
 import {
   createCostAllocation,
   getCostAllocationsByExpense,

@@ -26,6 +26,7 @@ export async function GET() {
     const row = rows[0]
     const ts = row?.last_computed_at
     const lastComputedStr = typeof ts === 'string' ? ts : ts?.value ?? null
+
     const hoursSince = lastComputedStr
       ? (Date.now() - new Date(lastComputedStr).getTime()) / 3_600_000
       : null

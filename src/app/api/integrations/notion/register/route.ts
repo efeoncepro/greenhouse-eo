@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -40,19 +42,23 @@ export async function POST(request: Request) {
       `SELECT space_id, space_name, client_id FROM greenhouse_core.spaces WHERE space_id = $1`,
       [spaceId]
     )
+
     if (spaces.length === 0) {
       return NextResponse.json({ error: `Space not found: ${spaceId}` }, { status: 404 })
     }
+
     const space = spaces[0]
 
     // 2. Optionally verify Notion access via Cloud Run pipeline
     const pipelineUrl = (process.env.NOTION_PIPELINE_URL || 'https://notion-bq-sync-183008134038.us-central1.run.app').replace(/\/$/, '')
     const verification: Record<string, { ok: boolean; sampleTitle?: string; error?: string }> = {}
+
     if (verify) {
       const dbsToVerify: Array<[string, string]> = [
         [notionDbProyectos, 'proyectos'],
         [notionDbTareas, 'tareas']
       ]
+
       if (notionDbSprints) dbsToVerify.push([notionDbSprints, 'sprints'])
       if (notionDbRevisiones) dbsToVerify.push([notionDbRevisiones, 'revisiones'])
 
@@ -62,15 +68,19 @@ export async function POST(request: Request) {
             `${pipelineUrl}/discover/${encodeURIComponent(dbId)}/sample?limit=1`,
             { signal: AbortSignal.timeout(15_000) }
           )
+
           if (!res.ok) {
             verification[label] = { ok: false, error: `Pipeline returned ${res.status}` }
             continue
           }
+
           const data = await res.json()
           const sample = data.sample as Array<{ properties?: Record<string, unknown> }> | undefined
+
           const sampleTitle = sample && sample.length > 0
             ? findTitleProp(sample[0].properties || {})
             : '(empty database)'
+
           verification[label] = { ok: true, sampleTitle }
         } catch (err) {
           verification[label] = {
@@ -81,6 +91,7 @@ export async function POST(request: Request) {
       }
 
       const failed = Object.entries(verification).filter(([, v]) => !v.ok)
+
       if (failed.length > 0) {
         return NextResponse.json({
           error: 'Notion database verification failed',
@@ -179,7 +190,9 @@ export async function POST(request: Request) {
     }, { status: 201 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Registration failed'
-    return NextResponse.json({ error: message }, { status: 400 })
+
+
+return NextResponse.json({ error: message }, { status: 400 })
   }
 }
 
@@ -190,6 +203,7 @@ export async function POST(request: Request) {
  */
 export async function GET() {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
@@ -233,11 +247,15 @@ function assertNotionField(value: unknown, name: string, isDbId: boolean): strin
   if (typeof value !== 'string' || !value.trim()) {
     throw new Error(`${name} is required`)
   }
+
   const trimmed = value.trim()
+
   if (isDbId && !/^[a-f0-9]{32}$/i.test(trimmed)) {
     throw new Error(`${name} must be a 32-character hex Notion database ID`)
   }
-  return trimmed
+
+
+return trimmed
 }
 
 function assertNotionDbId(value: unknown, name: string): string {
@@ -248,5 +266,7 @@ function findTitleProp(props: Record<string, unknown>): string {
   for (const [, val] of Object.entries(props)) {
     if (typeof val === 'string' && val.length > 0) return val
   }
-  return '(untitled)'
+
+
+return '(untitled)'
 }

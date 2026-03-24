@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 import { hash } from 'bcryptjs'
 
 import { consumeToken, validateToken } from '@/lib/auth-tokens'

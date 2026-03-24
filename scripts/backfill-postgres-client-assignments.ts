@@ -14,7 +14,13 @@ const bigQuery = new BigQuery({ projectId })
 
 const toNullableString = (value: unknown): string | null => {
   if (value === null || value === undefined) return null
-  if (typeof value === 'string') { const t = value.trim(); return t || null }
+
+  if (typeof value === 'string') { const t = value.trim();
+
+
+
+return t || null }
+
   if (typeof value === 'object' && value && 'value' in value) {
     return toNullableString((value as { value?: unknown }).value)
   }
@@ -32,6 +38,7 @@ const toNumber = (value: unknown, fallback = 0) => {
 
 const toBoolean = (value: unknown, fallback = false) => {
   if (typeof value === 'boolean') return value
+
   if (typeof value === 'string') {
     const n = value.trim().toLowerCase()
 

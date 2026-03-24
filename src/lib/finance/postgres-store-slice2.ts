@@ -61,6 +61,7 @@ type PostgresIncomeRow = {
   created_by_user_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
+
   // Nubox DTE fields
   nubox_document_id: string | number | null
   nubox_sii_track_id: string | number | null
@@ -118,6 +119,7 @@ type PostgresExpenseRow = {
   created_by_user_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
+
   // Nubox purchase fields
   nubox_purchase_id: string | number | null
   nubox_document_status: string | null
@@ -185,6 +187,7 @@ export type FinanceIncomeRecord = {
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
+
   // Nubox DTE fields
   nuboxDocumentId: string | null
   nuboxSiiTrackId: string | null
@@ -246,6 +249,7 @@ export type FinanceExpenseRecord = {
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
+
   // Nubox purchase fields
   nuboxPurchaseId: string | null
   nuboxDocumentStatus: string | null
@@ -613,8 +617,10 @@ export const listFinanceIncomeFromPostgres = async ({
   // Page
   idx++
   const limitIdx = idx
+
   idx++
   const offsetIdx = idx
+
   values.push(pageSize, (page - 1) * pageSize)
 
   const rows = await runGreenhousePostgresQuery<PostgresIncomeRow>(
@@ -1177,8 +1183,10 @@ export const listFinanceExpensesFromPostgres = async ({
 
   idx++
   const limitIdx = idx
+
   idx++
   const offsetIdx = idx
+
   values.push(pageSize, (page - 1) * pageSize)
 
   const rows = await runGreenhousePostgresQuery<PostgresExpenseRow>(

@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL, EXCLUDED_STATUSES_SQL } from './shared'
+import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL } from './shared'
 import { ensureIcoEngineInfrastructure, ICO_DATASET, ENGINE_VERSION } from './schema'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -139,18 +139,17 @@ export const materializeMonthlySnapshots = async (
   }
 
   // Update csc_distribution for all spaces in a single batched UPDATE
-  const spacesProcessed = cscBySpace.size
-  let snapshotsWritten = 0
-
   if (cscBySpace.size > 0) {
     const whenClauses: string[] = []
     const snapshotIds: string[] = []
 
     for (const [spaceId, distribution] of cscBySpace) {
       const snapshotId = `${spaceId}-${periodYear}-${String(periodMonth).padStart(2, '0')}`
+
       snapshotIds.push(snapshotId)
 
       const escapedJson = JSON.stringify(distribution).replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+
       whenClauses.push(`WHEN snapshot_id = '${snapshotId}' THEN '${escapedJson}'`)
     }
 
@@ -160,7 +159,6 @@ export const materializeMonthlySnapshots = async (
       WHERE snapshot_id IN UNNEST(@ids)
     `, { ids: snapshotIds })
 
-    snapshotsWritten = cscBySpace.size
   }
 
   // Step 3: Count total snapshots written/updated this run

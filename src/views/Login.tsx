@@ -26,7 +26,6 @@ import GreenhouseBrandPanel from '@/views/login/GreenhouseBrandPanel'
 import { BRAND_PANEL_BREAKPOINT } from '@/views/login/login-constants'
 
 const LoginV2 = ({
-  mode,
   hasMicrosoftAuth,
   hasGoogleAuth
 }: {

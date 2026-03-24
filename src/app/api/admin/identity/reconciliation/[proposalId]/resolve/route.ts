@@ -73,7 +73,7 @@ export async function POST(request: Request, { params }: Params) {
           return NextResponse.json({ error: 'Cannot approve: no candidate member' }, { status: 400 })
         }
 
-        await applyIdentityLink(proposal, resolvedBy)
+        await applyIdentityLink(proposal)
         await updateProposalStatus(proposalId, 'admin_approved', resolvedBy, note)
         break
       }
@@ -85,7 +85,7 @@ export async function POST(request: Request, { params }: Params) {
 
         const reassigned = { ...proposal, candidateMemberId: memberId }
 
-        await applyIdentityLink(reassigned, resolvedBy)
+        await applyIdentityLink(reassigned)
         await updateProposalStatus(proposalId, 'admin_approved', resolvedBy, note || `Reassigned to ${memberId}`)
         break
       }

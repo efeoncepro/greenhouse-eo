@@ -130,6 +130,7 @@ export const publishPendingOutboxEvents = async (options?: {
 
     // 3. Map to BigQuery format
     const publishedAt = new Date().toISOString()
+
     const bigQueryRows = events.map(event => ({
       event_id: event.event_id,
       aggregate_type: event.aggregate_type,

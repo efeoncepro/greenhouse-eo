@@ -23,6 +23,7 @@ const main = async () => {
       LEFT JOIN greenhouse_core.spaces s ON s.organization_id = o.organization_id
       WHERE s.space_id IS NULL
     `)
+
     console.log('\nOrphan organizations (no space):', orphans.length)
 
     const org360 = await runGreenhousePostgresQuery<{
@@ -36,7 +37,9 @@ const main = async () => {
       ORDER BY organization_name
       LIMIT 5
     `)
+
     console.log('\n=== organization_360 (top 5) ===')
+
     for (const r of org360) {
       console.log(`  ${r.organization_name}: ${r.space_count} spaces, ${r.membership_count} memberships, ${r.unique_person_count} people`)
     }
@@ -52,7 +55,9 @@ const main = async () => {
       ORDER BY membership_count DESC
       LIMIT 5
     `)
+
     console.log('\n=== person_360 with memberships (top 5) ===')
+
     for (const r of person360) {
       console.log(`  ${r.display_name}: ${r.membership_count} memberships, facets: ${JSON.stringify(r.person_facets)}`)
     }
@@ -69,10 +74,13 @@ const main = async () => {
       WHERE organization_id IS NOT NULL
       LIMIT 3
     `)
+
     console.log('\n=== session_360 with org context (top 3) ===')
+
     for (const r of session360) {
       console.log(`  ${r.full_name}: space=${r.space_id}, org=${r.organization_name}`)
     }
+
     if (session360.length === 0) {
       console.log('  (none yet — spaces.client_id JOIN populates after M1)')
     }

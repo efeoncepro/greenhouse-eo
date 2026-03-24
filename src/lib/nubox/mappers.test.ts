@@ -168,6 +168,7 @@ describe('mapExpenseToRawRow', () => {
 
     expect(row.source_object_type).toBe('expense')
     expect(row.source_object_id).toBe('2488688')
+
     // Date-only paymentDate should be converted to full timestamp
     expect(row.source_created_at).toBe('2025-09-01T00:00:00Z')
   })
@@ -221,6 +222,7 @@ describe('mapSaleToConformed', () => {
     const sale = makeSale({
       client: { tradeName: 'Unknown', identification: { value: '99999999-9' } }
     })
+
     const conformed = mapSaleToConformed(sale, 'sync-1', identityMaps)
 
     expect(conformed.organization_id).toBeNull()
@@ -268,6 +270,7 @@ describe('mapPurchaseToConformed', () => {
     const purchase = makePurchase({
       supplier: { tradeName: 'Unknown', identification: { value: '11111111-1' } }
     })
+
     const conformed = mapPurchaseToConformed(purchase, 'sync-2', identityMaps)
 
     expect(conformed.supplier_rut).toBe('11111111-1')
@@ -294,6 +297,7 @@ describe('mapExpenseToConformedBankMovement', () => {
     const expense = makeExpense({
       links: [{ rel: 'document', href: 'https://api.pyme.nubox.com/v1/purchases/12345' }]
     })
+
     const movement = mapExpenseToConformedBankMovement(expense, 'sync-3')
 
     expect(movement.linked_purchase_id).toBe('12345')

@@ -53,6 +53,7 @@ interface Income {
   amountPending: number
   serviceLine: string | null
   description: string | null
+
   // Nubox DTE fields
   nuboxDocumentId: string | null
   nuboxEmissionStatus: string | null

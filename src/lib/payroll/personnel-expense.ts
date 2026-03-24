@@ -4,7 +4,7 @@ import type { PayRegime } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
-import { runPayrollQuery, toNumber, toNullableNumber } from '@/lib/payroll/shared'
+import { runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface PersonnelExpensePeriod {

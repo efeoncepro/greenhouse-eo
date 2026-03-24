@@ -149,6 +149,7 @@ export const syncNuboxToRaw = async (options?: {
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
+
     errors.push(`sales: ${msg}`)
     await writeSyncFailure({ runId: syncRunId, errorMessage: `sales sync failed: ${msg}` }).catch(() => {})
   }
@@ -164,6 +165,7 @@ export const syncNuboxToRaw = async (options?: {
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
+
     errors.push(`purchases: ${msg}`)
     await writeSyncFailure({ runId: syncRunId, errorMessage: `purchases sync failed: ${msg}` }).catch(() => {})
   }
@@ -179,6 +181,7 @@ export const syncNuboxToRaw = async (options?: {
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
+
     errors.push(`expenses: ${msg}`)
     await writeSyncFailure({ runId: syncRunId, errorMessage: `expenses sync failed: ${msg}` }).catch(() => {})
   }
@@ -194,6 +197,7 @@ export const syncNuboxToRaw = async (options?: {
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
+
     errors.push(`incomes: ${msg}`)
     await writeSyncFailure({ runId: syncRunId, errorMessage: `incomes sync failed: ${msg}` }).catch(() => {})
   }

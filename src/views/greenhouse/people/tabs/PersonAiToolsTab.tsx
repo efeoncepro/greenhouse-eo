@@ -80,7 +80,6 @@ const PersonAiToolsTab = ({ memberId }: Props) => {
     )
   }
 
-  const activeLicenses = licenses.filter(l => l.licenseStatus === 'active')
   const uniqueTools = new Set(licenses.map(l => l.toolId))
   const totalCreditsConsumed = ledger.filter(e => e.entryType === 'debit').reduce((sum, e) => sum + e.creditAmount, 0)
 

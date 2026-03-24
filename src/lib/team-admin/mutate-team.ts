@@ -1899,6 +1899,7 @@ export const updateMember = async ({
     for (const [col, val] of Object.entries(updates)) {
       if (!writableMemberColumns.has(col)) continue
       const pgCol = pgColumnMap[col] || col
+
       pgClauses.push(`${pgCol} = $${pi++}`)
       pgValues.push(val)
     }
@@ -2168,6 +2169,7 @@ const updateAssignmentInBigQuery = async (assignmentId: string, updates: Record<
     if (!writableAssignmentColumns.has(column) || !assignmentColumns.has(column)) continue
 
     const paramKey = column.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
+
     setClauses.push(`${column} = @${paramKey}`)
     params[paramKey] = value
   }

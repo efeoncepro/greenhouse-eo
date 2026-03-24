@@ -25,6 +25,7 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
     getCreativeHubTasks(viewer),
     readMetricsSummaryByClientId(viewer.clientId).catch(() => null)
   ])
+
   const content = buildCapabilityModuleContent({ moduleId: 'creative-hub', snapshot })
 
   if (!content) {

@@ -28,6 +28,7 @@ const runSqlFile = async (filename: string) => {
 
   for (const line of sql.split('\n')) {
     const trimmed = line.trim()
+
     if (!trimmed || trimmed.startsWith('--')) {
       if (inDollarBlock) current += line + '\n'
       continue
@@ -84,6 +85,7 @@ const main = async () => {
     WHERE table_schema = 'greenhouse_core' AND table_name = 'organizations'
       AND column_name = 'organization_type'
   `)
+
   console.log(`   organization_type on organizations: ${orgTypeCheck.length > 0 ? '✅' : '❌'}`)
 
   const incomeOrgCheck = await runGreenhousePostgresQuery<{ column_name: string }>(`
@@ -91,6 +93,7 @@ const main = async () => {
     WHERE table_schema = 'greenhouse_finance' AND table_name = 'income'
       AND column_name = 'organization_id'
   `)
+
   console.log(`   organization_id on income: ${incomeOrgCheck.length > 0 ? '✅' : '❌'}`)
 
   const supplierOrgCheck = await runGreenhousePostgresQuery<{ column_name: string }>(`
@@ -98,6 +101,7 @@ const main = async () => {
     WHERE table_schema = 'greenhouse_finance' AND table_name = 'suppliers'
       AND column_name = 'organization_id'
   `)
+
   console.log(`   organization_id on suppliers: ${supplierOrgCheck.length > 0 ? '✅' : '❌'}`)
 
   console.log('\n═══ Done ═══')

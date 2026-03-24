@@ -259,6 +259,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 
     if (body.isRecurring !== undefined) pgUpdates.isRecurring = Boolean(body.isRecurring)
+
     if (body.recurrenceFrequency !== undefined) {
       pgUpdates.recurrenceFrequency = body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null
     }

@@ -22,12 +22,10 @@ import type { AdminTenantProjectRow } from '@/lib/admin/get-admin-tenant-detail'
 import TenantDetailEmptyState from '@views/greenhouse/admin/tenants/TenantDetailEmptyState'
 
 type Props = {
-  clientId: string
-  clientName: string
   projects: AdminTenantProjectRow[]
 }
 
-const TenantProjectsPanel = ({ clientId, clientName, projects }: Props) => {
+const TenantProjectsPanel = ({ projects }: Props) => {
   return (
     <Grid container spacing={6}>
       <Grid size={{ xs: 12 }}>

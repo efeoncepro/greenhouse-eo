@@ -358,6 +358,7 @@ const applyCoercion = (value: unknown, rule: string, targetType: string): unknow
       return castToTargetType(value, targetType)
 
     case 'formula_to_int':
+
     case 'rollup_to_int': {
       const n = toNumber(value)
 
@@ -410,7 +411,13 @@ const applyCoercion = (value: unknown, rule: string, targetType: string): unknow
 const castToTargetType = (value: unknown, targetType: string): unknown => {
   switch (targetType.toUpperCase()) {
     case 'STRING': return toNullableString(value)
-    case 'INTEGER': { const n = toNumber(value); return n != null ? Math.round(n) : null }
+
+    case 'INTEGER': { const n = toNumber(value);
+
+
+
+return n != null ? Math.round(n) : null }
+
     case 'FLOAT': return toNumber(value)
     case 'BOOLEAN': return toBoolean(value)
     case 'TIMESTAMP': return toTimestampValue(value)
@@ -902,10 +909,13 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const ownerSourceId = row.propietario_ids?.[0] || null
       const projectSourceId = toNullableString(row.notion_page_id)
       const projectDatabaseSourceId = toNullableString(row._source_database_id)
+
+
       // Resolve space_id: canonical (database ID → space) or legacy fallback (page ID → space)
       const spaceId = projectDatabaseSourceId
         ? (databaseSpaceMap.get(projectDatabaseSourceId) || preferredSpaceMap?.get(projectSourceId!) || null)
         : (preferredSpaceMap?.get(projectSourceId!) || null)
+
       const clientId = spaceId
         ? (databaseClientMap.get(projectDatabaseSourceId!) || (!isInternalSpaceId(spaceId) ? spaceId : null))
         : null

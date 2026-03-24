@@ -13,12 +13,14 @@ const main = async () => {
     const viewCheck = await runGreenhousePostgresQuery<{ viewname: string }>(
       `SELECT viewname FROM pg_views WHERE schemaname = 'greenhouse_serving' AND viewname = 'client_labor_cost_allocation'`
     )
+
     console.log('View exists:', viewCheck.length > 0)
 
     // Try querying it
     const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
       `SELECT * FROM greenhouse_serving.client_labor_cost_allocation LIMIT 5`
     )
+
     console.log('Rows returned:', rows.length)
 
     if (rows.length > 0) {
@@ -33,6 +35,7 @@ const main = async () => {
        WHERE table_schema = 'greenhouse_serving' AND table_name = 'client_labor_cost_allocation'
        ORDER BY ordinal_position`
     )
+
     console.log('Columns:', cols.map(c => c.column_name).join(', '))
   } finally {
     await closeGreenhousePostgres()

@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
@@ -28,6 +29,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()

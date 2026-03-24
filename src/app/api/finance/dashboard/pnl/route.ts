@@ -44,6 +44,7 @@ export async function GET(request: Request) {
        WHERE invoice_date >= $1::date AND invoice_date <= $2::date`,
       [periodStart, periodEnd]
     ),
+
     // Expenses by cost_category for the period (accrual: by document_date or payment_date)
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
@@ -56,6 +57,7 @@ export async function GET(request: Request) {
        GROUP BY cost_category`,
       [periodStart, periodEnd]
     ),
+
     // Personnel expense from payroll — split by currency for proper conversion
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
@@ -73,6 +75,7 @@ export async function GET(request: Request) {
        WHERE p.year = $1 AND p.month = $2 AND p.status IN ('approved', 'exported')`,
       [year, month]
     ),
+
     // Expenses already linked to payroll entries (to avoid double-counting)
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT COALESCE(SUM(total_amount_clp), 0) AS linked_clp
@@ -82,6 +85,7 @@ export async function GET(request: Request) {
          AND COALESCE(document_date, payment_date) <= $2::date`,
       [periodStart, periodEnd]
     ),
+
     // Latest USD → CLP exchange rate for payroll conversion
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT rate
@@ -104,12 +108,15 @@ export async function GET(request: Request) {
   const payrollGross = roundCurrency(
     toNumber(payroll['gross_clp']) + toNumber(payroll['gross_usd']) * usdToClp
   )
+
   const payrollNet = roundCurrency(
     toNumber(payroll['net_clp']) + toNumber(payroll['net_usd']) * usdToClp
   )
+
   const payrollDeductions = roundCurrency(
     toNumber(payroll['deductions_clp']) + toNumber(payroll['deductions_usd']) * usdToClp
   )
+
   const payrollBonuses = roundCurrency(
     toNumber(payroll['bonuses_clp']) + toNumber(payroll['bonuses_usd']) * usdToClp
   )
@@ -126,6 +133,7 @@ export async function GET(request: Request) {
   for (const row of expenseRows) {
     const cat = String(row['cost_category'] || 'operational')
     const amount = toNumber(row['total_clp'])
+
     expenseByCat[cat] = (expenseByCat[cat] || 0) + amount
     totalExpenses += amount
   }

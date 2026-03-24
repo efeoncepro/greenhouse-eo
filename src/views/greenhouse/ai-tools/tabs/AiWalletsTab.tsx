@@ -199,21 +199,27 @@ const AiWalletsTab = ({ wallets, tools, meta, onRefresh }: Props) => {
   const filtered = wallets.filter(w => {
     if (filterStatus && w.walletStatus !== filterStatus) return false
     if (filterClient && w.clientId !== filterClient) return false
-    return true
+
+return true
   })
 
   const healthColor = (health: string) => {
     const conf = balanceHealthConfig[health as keyof typeof balanceHealthConfig]
-    return conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'
+
+
+return conf?.color === 'default' ? 'secondary' : conf?.color ?? 'secondary'
   }
 
   const themeColor = (health: string) => {
     const c = healthColor(health)
     const paletteEntry = theme.palette[c as keyof typeof theme.palette]
+
     if (paletteEntry && typeof paletteEntry === 'object' && 'main' in paletteEntry) {
       return (paletteEntry as { main: string }).main
     }
-    return theme.palette.secondary.main
+
+
+return theme.palette.secondary.main
   }
 
   const hasFilters = Boolean(filterStatus || filterClient)

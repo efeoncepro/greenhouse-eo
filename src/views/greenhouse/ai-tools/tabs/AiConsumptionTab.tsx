@@ -100,11 +100,13 @@ const AiConsumptionTab = ({ meta }: Props) => {
     setLoading(true)
 
     const params = new URLSearchParams()
+
     if (filterWallet) params.set('walletId', filterWallet)
     if (filterMember) params.set('memberId', filterMember)
     params.set('limit', '100')
 
     const res = await fetch(`/api/ai-credits/ledger?${params}`)
+
     if (res.ok) setData(await res.json())
     setLoading(false)
   }, [filterWallet, filterMember])

@@ -131,6 +131,7 @@ export const emitDte = async ({
 
   try {
     const response = await issuNuboxSales(request)
+
     responseBody = response
     const result = response.results?.[0]
 

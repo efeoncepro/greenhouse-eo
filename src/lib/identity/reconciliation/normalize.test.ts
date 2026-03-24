@@ -115,6 +115,7 @@ describe('levenshtein', () => {
   it('works for realistic name typos', () => {
     // "valentina" vs "valetina" (missing n) = 1
     expect(levenshtein('valentina', 'valetina')).toBe(1)
+
     // "andres" vs "andrs" (missing e) = 1
     expect(levenshtein('andres', 'andrs')).toBe(1)
   })

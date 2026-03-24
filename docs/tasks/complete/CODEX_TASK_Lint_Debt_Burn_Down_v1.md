@@ -1,5 +1,27 @@
 # CODEX_TASK_Lint_Debt_Burn_Down_v1
 
+## Delta 2026-03-24
+
+Lane ejecutada y cerrada.
+
+Resultado:
+- `pnpm lint` vuelve a pasar limpio
+- `pnpm test` validado: `27` archivos, `179/179` tests OK
+- `pnpm build` validado localmente
+
+Trabajo realizado:
+- autofix masivo controlado con `pnpm exec eslint . --ext .js,.jsx,.ts,.tsx --fix`
+- cleanup manual del remanente en `scripts/*`, `src/app/api/*`, `src/lib/*`, `src/views/*`, `src/components/*`, `src/types/*` y `src/test/*`
+- correcciones puntuales de tipado/runtime derivadas del burn-down para conservar build verde, sin introducir desactivaciones masivas de reglas
+
+Chequeo de impacto cruzado:
+- se escanearon las tasks vivas que referencian archivos tocados
+- no se detecto ninguna task cuyo estado funcional real cambiara por este trabajo; el efecto de esta lane es de higiene compartida y desbloqueo de verificacion
+
+## Estado
+
+Cerrada 2026-03-24.
+
 ## Resumen
 
 Cerrar la deuda actual de `eslint` del repo para recuperar un camino confiable de verificación con `pnpm lint` y evitar que cambios pequeños sigan chocando contra una base ruidosa de errores mecánicos.
@@ -48,7 +70,7 @@ Recuperar un baseline donde:
 - follow-ups de `Notification System`, `Webhook Infrastructure`, `Payroll`, `Finance`, `People` y módulos transversales porque todos comparten el mismo baseline de lint
 
 ### Archivos owned
-- `docs/tasks/to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
+- `docs/tasks/complete/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
 - `docs/tasks/README.md`
 - opcionalmente `Handoff.md` al iniciar/cerrar ejecución
 - durante implementación: solo los archivos corregidos por la lane, idealmente en slices acotados por carpeta

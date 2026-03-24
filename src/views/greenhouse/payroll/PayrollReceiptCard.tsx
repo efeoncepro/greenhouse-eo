@@ -12,7 +12,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
-import { formatCurrency, formatFactor, formatPercent, formatPeriodLabel } from './helpers'
+import { formatCurrency, formatFactor, formatPercent } from './helpers'
 
 type Props = {
   entry: PayrollEntry

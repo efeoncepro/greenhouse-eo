@@ -8,30 +8,38 @@ const toNum = (v: unknown): number => {
   if (v === null || v === undefined) return 0
   if (typeof v === 'number') return v
   if (typeof v === 'string') return Number(v) || 0
+
   if (typeof v === 'object' && v !== null && 'valueOf' in v) {
     const prim = (v as { valueOf: () => unknown }).valueOf()
-    return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
+
+
+return typeof prim === 'number' ? prim : typeof prim === 'string' ? Number(prim) || 0 : 0
   }
-  return 0
+
+
+return 0
 }
 
 const toNullNum = (v: unknown): number | null => {
   if (v === null || v === undefined) return null
-  return toNum(v)
+
+return toNum(v)
 }
 
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.trim() || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toStr((v as { value?: unknown }).value)
-  return String(v)
+
+return String(v)
 }
 
 const toDate = (v: unknown): string | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'string') return v.split('T')[0] || null
   if (typeof v === 'object' && v !== null && 'value' in v) return toDate((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toTs = (v: unknown): string | null => {
@@ -39,7 +47,8 @@ const toTs = (v: unknown): string | null => {
   if (typeof v === 'string') return v || null
   if (v instanceof Date) return v.toISOString()
   if (typeof v === 'object' && v !== null && 'value' in v) return toTs((v as { value?: unknown }).value)
-  return null
+
+return null
 }
 
 const toBool = (v: unknown): boolean => Boolean(v)
@@ -55,9 +64,11 @@ const main = async () => {
   try {
     // ─── 1. Client Profiles ────────────────────────────────────
     console.log('\n--- client_profiles ---')
+
     const [cpRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.fin_client_profiles\``
     })
+
     console.log(`  BigQuery: ${cpRows.length} rows`)
 
     for (const r of cpRows as any[]) {
@@ -84,13 +95,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${cpRows.length}`)
 
     // ─── 2. Income ─────────────────────────────────────────────
     console.log('\n--- income ---')
+
     const [incRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.fin_income\``
     })
+
     console.log(`  BigQuery: ${incRows.length} rows`)
 
     for (const r of incRows as any[]) {
@@ -122,16 +136,20 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${incRows.length}`)
 
     // ─── 2b. Income Payments (from JSON field) ──────────────────
     console.log('\n--- income_payments (from JSON) ---')
     let paymentCount = 0
+
     for (const r of incRows as any[]) {
       const payments = r.payments_received
+
       if (!payments) continue
 
       let parsed: any[]
+
       try {
         parsed = typeof payments === 'string' ? JSON.parse(payments) : Array.isArray(payments) ? payments : []
       } catch {
@@ -163,13 +181,16 @@ const main = async () => {
         paymentCount++
       }
     }
+
     console.log(`  Inserted: ${paymentCount}`)
 
     // ─── 3. Expenses ───────────────────────────────────────────
     console.log('\n--- expenses ---')
+
     const [expRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.fin_expenses\``
     })
+
     console.log(`  BigQuery: ${expRows.length} rows`)
 
     for (const r of expRows as any[]) {
@@ -212,13 +233,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${expRows.length}`)
 
     // ─── 4. Reconciliation Periods ─────────────────────────────
     console.log('\n--- reconciliation_periods ---')
+
     const [recRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.fin_reconciliation_periods\``
     })
+
     console.log(`  BigQuery: ${recRows.length} rows`)
 
     for (const r of recRows as any[]) {
@@ -243,13 +267,16 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${recRows.length}`)
 
     // ─── 5. Bank Statement Rows ────────────────────────────────
     console.log('\n--- bank_statement_rows ---')
+
     const [bsRows] = await bq.query({
       query: `SELECT * FROM \`${projectId}.greenhouse.fin_bank_statement_rows\``
     })
+
     console.log(`  BigQuery: ${bsRows.length} rows`)
 
     for (const r of bsRows as any[]) {
@@ -274,6 +301,7 @@ const main = async () => {
         ]
       )
     }
+
     console.log(`  Inserted: ${bsRows.length}`)
 
     // ─── Summary ───────────────────────────────────────────────

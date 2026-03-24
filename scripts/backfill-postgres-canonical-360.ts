@@ -49,6 +49,7 @@ const toNullableNumber = (value: unknown): number | null => {
   if (value === null || value === undefined) return null
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
   const s = toNullableString(value)
+
   if (!s) return null
   const n = Number(s)
 
@@ -57,6 +58,7 @@ const toNullableNumber = (value: unknown): number | null => {
 
 const toTextArray = (value: unknown): string[] | null => {
   if (value === null || value === undefined) return null
+
   if (Array.isArray(value)) {
     const filtered = value.map(v => (typeof v === 'string' ? v.trim() : String(v))).filter(Boolean)
 

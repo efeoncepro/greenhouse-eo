@@ -2,10 +2,18 @@
  * Create BigQuery email_logs table for transactional email audit logging.
  * Usage: npx tsx scripts/setup-bigquery-email-logs.ts
  */
+import { createRequire } from 'node:module'
+
 import { loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 // Bypass server-only restriction for CLI scripts
-require('module').Module._cache[require.resolve('server-only')] = { id: 'server-only', exports: {} }
+const require = createRequire(import.meta.url)
+
+const moduleWithCache = require('module') as {
+  _cache: Record<string, { id: string; exports: Record<string, never>; loaded?: boolean }>
+}
+
+moduleWithCache._cache[require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 loadGreenhouseToolEnv()
 

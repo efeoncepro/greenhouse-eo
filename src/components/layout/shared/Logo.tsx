@@ -66,12 +66,15 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   // Greenhouse platform logos for sidebar, Efeonce brand for default
   const isSidebar = variant === 'sidebar'
   const efeonceAssets = resolveBrandAssets('efeonce')
+
   const wordmarkSrc = isSidebar
     ? '/images/greenhouse/SVG/negative-sin-claim.svg'
     : useNegativeWordmark ? efeonceAssets?.negativeWordmarkSrc || '/branding/logo-negative.svg' : efeonceAssets?.wordmarkSrc || '/branding/logo-full.svg'
+
   const markSrc = isSidebar
     ? '/images/greenhouse/SVG/negative-isotipo.svg'
     : useNegativeWordmark ? efeonceAssets?.negativeMarkSrc || '/branding/avatar.png' : efeonceAssets?.markSrc || '/branding/avatar.png'
+
   const showCollapsedMarkOnly = variant === 'sidebar' && layout === 'collapsed' && !isHovered && !isBreakpointReached
 
   return (

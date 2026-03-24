@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
+
+import { NextResponse } from 'next/server'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -147,6 +149,7 @@ export async function POST(request: Request) {
     }, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('Space creation failed:', error)
 
     return NextResponse.json({ error: message }, { status: 500 })
@@ -160,6 +163,7 @@ export async function POST(request: Request) {
  */
 export async function GET() {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -206,6 +210,7 @@ export async function GET() {
     return NextResponse.json({ spaces, total: spaces.length })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
     console.error('Spaces list failed:', error)
 
     return NextResponse.json({ error: message }, { status: 500 })

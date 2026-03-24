@@ -256,10 +256,12 @@ describe('getPersonDetail — Postgres-first member lookup', () => {
     // Member lookup fails with transient error
     mockPgQuery
       .mockRejectedValueOnce(new Error('connect ECONNREFUSED 10.0.0.1:5432'))
+
       // Assignments also try Postgres first — also fail
       .mockRejectedValueOnce(new Error('connect ECONNREFUSED 10.0.0.1:5432'))
 
     setupBqMemberFallback()
+
     // BQ: 1st call → member, 2nd call → assignments
     mockBqQuery
       .mockResolvedValueOnce([makeBqMemberRow()])

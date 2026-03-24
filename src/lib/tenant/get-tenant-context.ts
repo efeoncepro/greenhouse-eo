@@ -22,6 +22,7 @@ export interface TenantContext {
   timezone: string
   portalHomePath: string
   authMode: string
+
   // Account 360 — nullable until M1 migration populates data
   spaceId?: string
   organizationId?: string
@@ -53,6 +54,7 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     timezone: session.user.timezone,
     portalHomePath: session.user.portalHomePath,
     authMode: session.user.authMode,
+
     // Account 360
     ...(session.user.spaceId ? { spaceId: session.user.spaceId } : {}),
     ...(session.user.organizationId ? { organizationId: session.user.organizationId } : {}),

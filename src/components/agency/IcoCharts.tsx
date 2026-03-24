@@ -218,6 +218,7 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
   }
 
   const sortedPeriods = Array.from(allPeriods).sort()
+
   const trendCategories = sortedPeriods.map(p => {
     const [y, m] = p.split('-')
 

@@ -161,6 +161,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   // ── Equipo (people + HR unified) ────────────────────────────────────
   const hasHrAccess = isHrUser || isAdminUser
+
   const hrItems: VerticalMenuDataType[] = hasHrAccess
     ? [
         {

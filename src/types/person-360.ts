@@ -57,6 +57,7 @@ export interface Person360Resolved {
 }
 
 export interface Person360 {
+
   // Canonical identity — THE one ID
   identityProfileId: string
   eoId: string

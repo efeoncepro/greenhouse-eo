@@ -40,6 +40,88 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 17:31 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Cerrar `CODEX_TASK_Lint_Debt_Burn_Down_v1` dejando el repo nuevamente con baseline confiable de lint.
+- Documentar el cierre de la lane y verificar que no hubiera impacto cruzado funcional sobre otras tasks vivas.
+
+### Rama
+- Rama usada: `fix/codex-lint-debt-burn-down`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Development / workflow de calidad previo a staging y production
+
+### Archivos tocados
+- `docs/tasks/complete/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+- `scripts/*`
+- `src/app/api/*`
+- `src/lib/*`
+- `src/views/*`
+- `src/components/*`
+- `src/types/*`
+- `src/test/*`
+
+### Verificación
+- `pnpm exec eslint . --ext .js,.jsx,.ts,.tsx --fix`:
+  - reducido el baseline desde `403` errores y `11` warnings a un remanente manual acotado
+- `pnpm lint`:
+  - OK, baseline recuperado en cero errores
+- `pnpm test`:
+  - `27` archivos
+  - `179/179` tests OK
+- `pnpm build`:
+  - OK local con Next.js 16.1.1
+- chequeo de impacto cruzado sobre `docs/tasks/{to-do,in-progress,complete}`:
+  - sin cambios de estado funcional detectados en otras tasks; solo desbloqueo compartido de higiene/verificacion
+
+### Riesgos o pendientes
+- El diff de esta lane es grande por naturaleza porque absorbe el autofix masivo y el cleanup manual del remanente.
+- Conviene revisar por slices al momento de abrir PR o mergear para hacer el review mas legible.
+
+## 2026-03-24 16:56 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Ejecutar `CODEX_TASK_Lint_Debt_Burn_Down_v1` para recuperar un baseline confiable de `pnpm lint`.
+- Empezar con autofix controlado y luego cerrar el remanente manual por slices, comenzando en `scripts/*`.
+
+### Rama
+- Rama usada: `fix/codex-lint-debt-burn-down`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Development / workflow de calidad previo a staging y production
+
+### Archivos tocados
+- `docs/tasks/in-progress/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificación
+- `pnpm lint` antes de intervenir:
+  - `403` errores
+  - `11` warnings
+  - `368` errores y `4` warnings potencialmente autofixables
+- `pnpm test`:
+  - `27` archivos
+  - `179/179` tests OK
+- `pnpm build`:
+  - OK local con Next.js 16.1.1
+
+### Riesgos o pendientes
+- La deuda está distribuida entre `scripts/*`, `src/app/api/*`, `src/lib/*`, `src/views/*`, `src/components/*`, `src/types/*` y `src/test/*`.
+- El burn-down debe mantenerse mecánico; si aparece una corrección funcional disfrazada de lint, se separa o se documenta explícitamente.
+
 ## 2026-03-24 16:41 -03
 
 ### Agente

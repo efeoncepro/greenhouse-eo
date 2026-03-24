@@ -23,6 +23,7 @@ const resolveProfileId = async (memberId: string): Promise<string | null> => {
 
 export async function GET(_request: Request, { params }: { params: Promise<{ memberId: string }> }) {
   const { tenant, errorResponse } = await requireInternalTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { memberId } = await params
@@ -39,6 +40,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ mem
 
 export async function POST(request: Request, { params }: { params: Promise<{ memberId: string }> }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { memberId } = await params
@@ -82,6 +84,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ mem
 
 export async function PATCH(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
@@ -103,6 +106,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()

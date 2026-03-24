@@ -66,6 +66,7 @@ describe('ensureOrganizationForSupplier', () => {
     })
 
     expect(orgId).toBe('org-existing')
+
     // Should NOT call UPDATE (type is already 'supplier', not 'client')
     expect(mockQuery).toHaveBeenCalledTimes(1)
   })
@@ -75,6 +76,7 @@ describe('ensureOrganizationForSupplier', () => {
     mockQuery.mockResolvedValueOnce([
       { organization_id: 'org-client', organization_type: 'client' }
     ])
+
     // UPDATE to set type = 'both'
     mockQuery.mockResolvedValueOnce([])
 
@@ -86,6 +88,7 @@ describe('ensureOrganizationForSupplier', () => {
 
     expect(orgId).toBe('org-client')
     expect(mockQuery).toHaveBeenCalledTimes(2)
+
     // Verify the UPDATE was called with the right org_id
     expect(mockQuery.mock.calls[1][0]).toContain("organization_type = 'both'")
     expect(mockQuery.mock.calls[1][1]).toEqual(['org-client'])
@@ -94,6 +97,7 @@ describe('ensureOrganizationForSupplier', () => {
   it('creates new org with type supplier when no match exists', async () => {
     // findOrganizationByTaxId returns empty
     mockQuery.mockResolvedValueOnce([])
+
     // nextPublicId is mocked to return EO-ORG-0001
     // INSERT new org
     mockQuery.mockResolvedValueOnce([])
@@ -108,8 +112,10 @@ describe('ensureOrganizationForSupplier', () => {
 
     expect(orgId).toBe('org-test-123')
     expect(mockQuery).toHaveBeenCalledTimes(2)
+
     // Verify INSERT params
     const insertParams = mockQuery.mock.calls[1][1]
+
     expect(insertParams[0]).toBe('org-test-123') // organization_id
     expect(insertParams[1]).toBe('EO-ORG-0001') // public_id
     expect(insertParams[2]).toBe('ArgCorp') // organization_name (tradeName)
@@ -129,6 +135,7 @@ describe('ensureOrganizationForSupplier', () => {
     })
 
     const insertParams = mockQuery.mock.calls[1][1]
+
     expect(insertParams[2]).toBe('Chilean SpA') // organization_name = legalName (no tradeName)
     expect(insertParams[5]).toBeNull() // tax_id_type not provided
     expect(insertParams[6]).toBe('CL') // default country

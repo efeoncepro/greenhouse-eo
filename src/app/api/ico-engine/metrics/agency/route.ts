@@ -49,6 +49,7 @@ export async function GET(request: Request) {
 
       for (let i = 0; i < spaceIds.length; i += BATCH_SIZE) {
         const batch = spaceIds.slice(i, i + BATCH_SIZE)
+
         const results = await Promise.all(
           batch.map(spaceId => computeSpaceMetricsLive(spaceId, periodYear, periodMonth))
         )

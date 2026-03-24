@@ -9,7 +9,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
@@ -21,7 +20,7 @@ import IcoGlobalKpis from '@/components/agency/IcoGlobalKpis'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import type { SpaceMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
+import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-metrics'
 import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 
 import type { OrganizationDetailData } from '../types'
@@ -134,7 +133,11 @@ const OrganizationIcoTab = ({ detail }: Props) => {
   const fetchRpaTrend = useCallback(async () => {
     const activeSpaces = (detail.spaces ?? []).filter(s => s.status === 'active' && s.spaceId)
 
-    if (activeSpaces.length === 0) { setRpaTrend([]); return }
+    if (activeSpaces.length === 0) {
+      setRpaTrend([])
+
+      return
+    }
 
     setRpaTrendLoading(true)
 

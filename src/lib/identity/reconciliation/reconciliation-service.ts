@@ -8,7 +8,7 @@ import type { MemberCandidate, ReconciliationRunResult } from './types'
 import { AUTO_LINK_THRESHOLD } from './types'
 import { discoverUnlinkedNotionUsers } from './discovery-notion'
 import { matchIdentity } from './matching-engine'
-import { applyIdentityLink, insertProposal, updateProposalStatus } from './apply-link'
+import { applyIdentityLink, insertProposal } from './apply-link'
 
 // ── Load member candidates from BigQuery ──────────────────────────────
 
@@ -111,10 +111,12 @@ export async function runIdentityReconciliation(opts?: {
           }
 
           await insertProposal({ ...proposal, sourceEmail: identity.sourceEmail })
-          await applyIdentityLink(
-            { ...proposal, resolvedAt: new Date().toISOString(), resolutionNote: null, createdAt: new Date().toISOString() },
-            'system'
-          )
+          await applyIdentityLink({
+            ...proposal,
+            resolvedAt: new Date().toISOString(),
+            resolutionNote: null,
+            createdAt: new Date().toISOString()
+          })
           result.autoLinkedCount++
         } else if (match.confidence >= AUTO_LINK_THRESHOLD && match.candidateMemberId && dryRun) {
           // Dry run: would auto-link

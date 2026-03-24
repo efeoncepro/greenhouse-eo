@@ -16,7 +16,7 @@ import { SOURCE_MEMBER_COLUMN } from './types'
  *   3. Update greenhouse_core.members.<source_column> in Postgres (if available)
  *   4. Update proposal status in Postgres
  */
-export async function applyIdentityLink(proposal: ReconciliationProposal, resolvedBy: string): Promise<void> {
+export async function applyIdentityLink(proposal: ReconciliationProposal): Promise<void> {
   if (!proposal.candidateMemberId) {
     throw new Error(`Cannot apply link: proposal ${proposal.proposalId} has no candidate member`)
   }

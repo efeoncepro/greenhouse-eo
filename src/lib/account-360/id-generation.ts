@@ -1,5 +1,6 @@
 import 'server-only'
 import { randomUUID } from 'node:crypto'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ── Internal IDs (PKs) ─────────────────────────────────────────────────
@@ -30,9 +31,11 @@ type PublicIdPrefix = keyof typeof SEQUENCE_MAP
  */
 export const nextPublicId = async (prefix: PublicIdPrefix): Promise<string> => {
   const sequenceName = SEQUENCE_MAP[prefix]
+
   const rows = await runGreenhousePostgresQuery<{ next_val: string }>(
     `SELECT nextval('${sequenceName}') AS next_val`
   )
+
   const seq = Number(rows[0]?.next_val ?? 1)
 
   return `${prefix}-${String(seq).padStart(4, '0')}`

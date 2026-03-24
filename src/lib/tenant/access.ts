@@ -50,6 +50,7 @@ interface TenantAccessRow {
   status: string | null
   password_hash: string | null
   password_hash_algorithm: string | null
+
   // Account 360 — nullable until M1 migration
   space_id?: string | null
   space_public_id?: string | null
@@ -95,6 +96,7 @@ export interface TenantAccessRecord {
   status: string
   passwordHash: string | null
   passwordHashAlgorithm: string | null
+
   // Account 360
   spaceId: string | null
   organizationId: string | null
@@ -259,6 +261,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     status: row.status || 'disabled',
     passwordHash: row.password_hash,
     passwordHashAlgorithm: row.password_hash_algorithm,
+
     // Account 360
     spaceId: row.space_id ?? null,
     organizationId: row.organization_id ?? null,

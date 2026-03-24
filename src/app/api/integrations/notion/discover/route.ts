@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,7 @@ const NOTION_PIPELINE_URL = (process.env.NOTION_PIPELINE_URL || 'https://notion-
  */
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
+
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
@@ -35,7 +37,9 @@ export async function GET(request: Request) {
 
     if (!discoverRes.ok) {
       const text = await discoverRes.text().catch(() => '')
-      return NextResponse.json(
+
+
+return NextResponse.json(
         { error: `Pipeline discovery failed (${discoverRes.status}): ${text}` },
         { status: discoverRes.status >= 500 ? 502 : discoverRes.status }
       )
@@ -68,6 +72,7 @@ export async function GET(request: Request) {
 
     // 2. Optionally sample a specific database
     let sample = undefined
+
     if (sampleDbId) {
       try {
         const sampleRes = await fetch(
@@ -101,6 +106,8 @@ export async function GET(request: Request) {
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Discovery failed'
-    return NextResponse.json({ error: message }, { status: 502 })
+
+
+return NextResponse.json({ error: message }, { status: 502 })
   }
 }
