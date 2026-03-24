@@ -6,6 +6,19 @@
 
 ## 2026-03-24
 
+### TASK-023 Notification System implemented (core infrastructure)
+- PostgreSQL DDL: `greenhouse_notifications` schema with `notifications`, `notification_preferences`, `notification_log` tables.
+- Category catalog: 10 notification categories (delivery_update, sprint_milestone, feedback_requested, report_ready, leave_status, payroll_ready, assignment_change, ico_alert, capacity_warning, system_event).
+- `NotificationService` with dispatch(), resolveChannels(), markAsRead(), getUnreadCount(), preferences CRUD. Email via Resend.
+- API: GET/PATCH notifications, mark-all-read, unread-count, GET/PUT preferences.
+
+### TASK-011 ICO Person 360 Integration implemented
+- PostgreSQL table `greenhouse_serving.ico_member_metrics` — projection from BigQuery `ico_engine.metrics_by_member`.
+- Backfill script: `scripts/backfill-ico-member-metrics.ts`.
+- Store: `getPersonIcoProfile(memberId, trendMonths)` returns current metrics, 6-month trend, health score.
+- API: `GET /api/people/[memberId]/ico-profile?trend=6`.
+- Cron: `/api/cron/ico-member-sync` syncs last 3 months from BigQuery to Postgres.
+
 ### TASK-015 Financial Intelligence Layer v2 implemented (reduced scope)
 - **Slice 1**: Expense Trends API — `GET /api/finance/analytics/trends?type=expenses|payroll|tools&months=12`. Monthly evolution by cost_category, payroll cost+headcount trend, top software/infrastructure providers.
 - **Slice 2**: LTV/CAC extension — `computeClientEconomicsSnapshots()` now computes `acquisitionCostClp` (from expenses with `cost_category = 'client_acquisition'`) and `ltvToCacRatio` (lifetime gross margin / CAC). Only populated when CAC > 0.
