@@ -6,50 +6,24 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 
-import classnames from 'classnames'
 import { signIn } from 'next-auth/react'
 
 import type { SystemMode } from '@core/types'
 
 import Link from '@components/Link'
-import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { useImageVariant } from '@core/hooks/useImageVariant'
-import { useSettings } from '@core/hooks/useSettings'
 import { GH_COLORS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
-
-const LoginIllustration = styled('img')(({ theme }) => ({
-  zIndex: 2,
-  blockSize: 'auto',
-  maxBlockSize: 680,
-  maxInlineSize: '100%',
-  margin: theme.spacing(12),
-  [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550
-  },
-  [theme.breakpoints.down('lg')]: {
-    maxBlockSize: 450
-  }
-}))
-
-const MaskImg = styled('img')({
-  blockSize: 'auto',
-  maxBlockSize: 355,
-  inlineSize: '100%',
-  position: 'absolute',
-  insetBlockEnd: 0,
-  zIndex: -1
-})
+import GreenhouseBrandPanel from '@/views/login/GreenhouseBrandPanel'
+import { BRAND_PANEL_BREAKPOINT } from '@/views/login/login-constants'
 
 const LoginV2 = ({
   mode,
@@ -66,26 +40,7 @@ const LoginV2 = ({
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const darkImg = '/images/pages/auth-mask-dark.png'
-  const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
-
   const router = useRouter()
-  const { settings } = useSettings()
-  const theme = useTheme()
-  const hidden = useMediaQuery(theme.breakpoints.down('md'))
-  const authBackground = useImageVariant(mode, lightImg, darkImg)
-
-  const characterIllustration = useImageVariant(
-    mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
-  )
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
@@ -128,36 +83,91 @@ const LoginV2 = ({
     })
   }
 
+  const bpUp = `@media (min-width: ${BRAND_PANEL_BREAKPOINT}px)`
+
   return (
-    <div className='flex bs-full justify-center'>
-      <div
-        className={classnames(
-          'flex bs-full items-center justify-center flex-1 min-bs-[100dvh] relative p-6 max-md:hidden',
-          {
-            'border-ie': settings.skin === 'bordered'
-          }
-        )}
+    <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+      {/* Visually hidden h1 for screen readers */}
+      <Typography
+        component='h1'
+        sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
       >
-        <LoginIllustration src={characterIllustration} alt='portal-illustration' />
-        {!hidden && (
-          <MaskImg
-            alt='mask'
-            src={authBackground}
-            className={classnames({ 'scale-x-[-1]': theme.direction === 'rtl' })}
-          />
-        )}
-      </div>
-      <div className='flex justify-center items-center bs-full bg-backgroundPaper !min-is-full p-6 md:!min-is-[unset] md:p-12 md:is-[480px]'>
-        <Link className='absolute block-start-5 sm:block-start-[33px] inline-start-6 sm:inline-start-[38px]'>
-          <Logo />
-        </Link>
-        <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
-          <div className='flex flex-col gap-1'>
-            <Typography variant='h4'>{GH_MESSAGES.login_title}</Typography>
-            <Typography>{GH_MESSAGES.login_subtitle}</Typography>
-          </div>
-          <Stack spacing={4}>
+        Greenhouse Portal - Inicio de sesi&oacute;n
+      </Typography>
+
+      {/* Left panel — brand moment (hidden below 1024px) */}
+      <Box
+        sx={{
+          display: 'none',
+          [bpUp]: { display: 'flex' },
+          width: '60%',
+          flexShrink: 0
+        }}
+      >
+        <GreenhouseBrandPanel />
+      </Box>
+
+      {/* Right panel — auth form */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          [bpUp]: { width: '40%' },
+          bgcolor: 'background.paper',
+          p: { xs: 3, sm: 4, md: 6 }
+        }}
+      >
+        <Box sx={{ width: '100%', maxWidth: 400 }}>
+          {/* Mobile logo — visible only below breakpoint */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mb: 4,
+              [bpUp]: { display: 'none' }
+            }}
+          >
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '6px',
+                bgcolor: GH_COLORS.brand.greenhouseGreen,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}
+            >
+              <Box
+                component='img'
+                src='/images/greenhouse/SVG/negative-isotipo.svg'
+                alt='Greenhouse'
+                sx={{ width: 20, height: 20 }}
+              />
+            </Box>
+            <Box
+              component='img'
+              src='/images/greenhouse/SVG/greenhouse-full.svg'
+              alt='Greenhouse logotipo'
+              sx={{ height: 18, ml: 1 }}
+            />
+          </Box>
+
+          {/* Auth header */}
+          <Typography variant='h5' sx={{ fontWeight: 500, mb: 0.5 }}>
+            {GH_MESSAGES.login_title}
+          </Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mb: 4 }}>
+            {GH_MESSAGES.login_subtitle}
+          </Typography>
+
+          <Stack spacing={2}>
             {error ? <Alert severity='error'>{error}</Alert> : null}
+
+            {/* Microsoft SSO — primary */}
             <Button
               fullWidth
               variant='contained'
@@ -166,22 +176,22 @@ const LoginV2 = ({
               disabled={!hasMicrosoftAuth}
               startIcon={<i className='tabler-brand-windows' />}
               sx={{
-                py: 2.2,
-                bgcolor: GH_COLORS.semantic.info.source,
+                py: 1.8,
+                bgcolor: GH_COLORS.brand.midnightNavy,
                 color: '#fff',
-                boxShadow: `0 14px 32px ${GH_COLORS.semantic.info.bg}`,
-                '&:hover': {
-                  bgcolor: GH_COLORS.role.development.textDark
-                },
-                '&.Mui-disabled': {
-                  bgcolor: 'action.disabledBackground',
-                  color: 'text.disabled'
-                }
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontSize: 14,
+                fontWeight: 500,
+                '&:hover': { bgcolor: '#03345e' },
+                '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'text.disabled' }
               }}
             >
               {GH_MESSAGES.login_with_microsoft}
             </Button>
             {!hasMicrosoftAuth ? <Alert severity='info'>{GH_MESSAGES.login_microsoft_unavailable}</Alert> : null}
+
+            {/* Google SSO — secondary */}
             <Button
               fullWidth
               variant='outlined'
@@ -190,66 +200,93 @@ const LoginV2 = ({
               disabled={!hasGoogleAuth}
               startIcon={<i className='tabler-brand-google-filled' />}
               sx={{
-                py: 2.2,
+                py: 1.8,
+                borderRadius: '8px',
                 borderColor: 'divider',
                 color: 'text.primary',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: 'action.hover'
-                },
-                '&.Mui-disabled': {
-                  borderColor: 'divider',
-                  color: 'text.disabled'
-                }
+                textTransform: 'none',
+                fontSize: 14,
+                fontWeight: 500,
+                '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' },
+                '&.Mui-disabled': { borderColor: 'divider', color: 'text.disabled' }
               }}
             >
               {GH_MESSAGES.login_with_google}
             </Button>
             {!hasGoogleAuth ? <Alert severity='info'>{GH_MESSAGES.login_google_unavailable}</Alert> : null}
-            <Divider sx={{ '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
-            <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
-              <CustomTextField
-                autoFocus
-                fullWidth
-                label={GH_MESSAGES.login_email_placeholder}
-                placeholder={GH_MESSAGES.login_email_placeholder}
-                value={email}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-              />
-              <CustomTextField
-                fullWidth
-                label='Password'
-                placeholder={GH_MESSAGES.login_password_placeholder}
-                id='outlined-adornment-password'
-                type={isPasswordShown ? 'text' : 'password'}
-                value={password}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position='end'>
-                        <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                          <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }
-                }}
-              />
-              <Link href='/auth/forgot-password' style={{ textDecoration: 'none', alignSelf: 'flex-end' }}>
-                <Typography variant='body2' color='primary'>¿Olvidaste tu contraseña?</Typography>
-              </Link>
-              <Button fullWidth variant='outlined' type='submit' disabled={isSubmitting} color='secondary'>
-                {isSubmitting ? GH_MESSAGES.login_validating : GH_MESSAGES.login_button}
-              </Button>
+
+            {/* Separator */}
+            <Divider sx={{ my: 1, '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
+
+            {/* Credentials form */}
+            <form noValidate autoComplete='off' onSubmit={handleSubmit}>
+              <Stack spacing={2.5}>
+                <CustomTextField
+                  autoFocus
+                  fullWidth
+                  label={GH_MESSAGES.login_email_placeholder}
+                  placeholder={GH_MESSAGES.login_email_placeholder}
+                  value={email}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                />
+                <CustomTextField
+                  fullWidth
+                  label={GH_MESSAGES.login_password_placeholder}
+                  placeholder={GH_MESSAGES.login_password_placeholder}
+                  id='outlined-adornment-password'
+                  type={isPasswordShown ? 'text' : 'password'}
+                  value={password}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onClick={handleClickShowPassword}
+                            onMouseDown={e => e.preventDefault()}
+                            aria-label={isPasswordShown ? 'Ocultar contrase\u00f1a' : 'Mostrar contrase\u00f1a'}
+                          >
+                            <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }
+                  }}
+                />
+                <Box sx={{ textAlign: 'right' }}>
+                  <Link href='/auth/forgot-password' style={{ textDecoration: 'none' }}>
+                    <Typography variant='body2' sx={{ color: GH_COLORS.brand.coreBlue }}>
+                      {GH_MESSAGES.login_forgot_password}
+                    </Typography>
+                  </Link>
+                </Box>
+                <Button
+                  fullWidth
+                  variant='outlined'
+                  type='submit'
+                  disabled={isSubmitting}
+                  color='secondary'
+                  sx={{ borderRadius: '8px', py: 1.5, textTransform: 'none', fontSize: 14, fontWeight: 500 }}
+                >
+                  {isSubmitting ? GH_MESSAGES.login_validating : GH_MESSAGES.login_button}
+                </Button>
+              </Stack>
             </form>
-            <Typography variant='body2' color='text.secondary'>
+
+            {/* Access note */}
+            <Typography
+              variant='caption'
+              sx={{ display: 'block', color: 'text.disabled', textAlign: 'center', mt: 1 }}
+            >
               {GH_MESSAGES.login_access_note}
             </Typography>
           </Stack>
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   )
 }
 

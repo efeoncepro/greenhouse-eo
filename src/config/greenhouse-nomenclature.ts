@@ -325,8 +325,8 @@ export const GH_TEAM = {
 } as const
 
 export const GH_MESSAGES = {
-  login_title: 'Entra al Greenhouse',
-  login_subtitle: 'Tu espacio de crecimiento te espera',
+  login_title: 'Entra a tu Greenhouse',
+  login_subtitle: 'Accede con tu cuenta',
   login_button: 'Entrar',
   logout_button: 'Salir del Greenhouse',
   login_with_microsoft: 'Entrar con Microsoft',
@@ -335,10 +335,20 @@ export const GH_MESSAGES = {
   login_validating: 'Validando acceso...',
   login_email_placeholder: 'Tu email corporativo',
   login_password_placeholder: 'Password',
+  login_forgot_password: '\u00bfOlvidaste tu contrase\u00f1a?',
   login_error_credentials:
     'Las credenciales no coinciden. Intenta de nuevo o contacta a tu equipo de cuenta.',
   login_access_note:
-    'El acceso al portal se provisiona internamente. Si tu cuenta aun no aparece, contacta a tu equipo de cuenta.',
+    'El acceso se provisiona internamente. \u00bfNo tienes cuenta? Contacta a tu administrador.',
+  login_hero_title: 'Todo tu ecosistema.\nUn solo lugar.',
+  login_hero_subtitle: 'La plataforma de Efeonce donde todo se conecta y todo se mide.',
+  login_vp_1_title: 'Visibilidad en tiempo real',
+  login_vp_1_subtitle: 'Lo que necesitas ver, siempre actualizado',
+  login_vp_2_title: 'Datos que importan',
+  login_vp_2_subtitle: 'Las m\u00e9tricas correctas para tus decisiones',
+  login_vp_3_title: 'Mejora continua',
+  login_vp_3_subtitle: 'Cada mes es mejor que el anterior',
+  login_footer: 'Greenhouse\u2122 \u00b7 Efeonce Group \u00b7 2026',
   login_microsoft_unavailable:
     'Microsoft SSO aun no esta configurado en este ambiente. Puedes usar credenciales mientras se cargan AZURE_AD_CLIENT_ID y AZURE_AD_CLIENT_SECRET.',
   login_google_unavailable:
@@ -1108,6 +1118,14 @@ export const GH_COLORS = {
     warning: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
     danger: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' },
     info: { source: '#0375db', bg: '#eaf3fc', text: '#0375db' }
+  },
+
+  brand: {
+    midnightNavy: '#022a4e',
+    greenhouseGreen: '#1B7A4E',
+    leaf: '#4CAF6E',
+    coreBlue: '#0375db',
+    softBlue: '#85B7EB'
   },
 
   neutral: {
