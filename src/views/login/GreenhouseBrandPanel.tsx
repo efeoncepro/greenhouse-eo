@@ -51,41 +51,6 @@ const GreenhouseBrandPanel = () => {
         }}
       />
 
-      {/* Brand arrow — large watermark, top right */}
-      <Box
-        component='img'
-        src='/images/greenhouse/SVG/arrow-greenhouse.svg'
-        alt=''
-        aria-hidden='true'
-        sx={{
-          position: 'absolute',
-          top: '-6%',
-          right: '-4%',
-          width: { md: 300, lg: 360 },
-          height: 'auto',
-          opacity: 0.08,
-          pointerEvents: 'none'
-        }}
-      />
-
-      {/* Brand arrow — smaller accent, bottom left, rotated */}
-      <Box
-        component='img'
-        src='/images/greenhouse/SVG/arrow-greenhouse.svg'
-        alt=''
-        aria-hidden='true'
-        sx={{
-          position: 'absolute',
-          bottom: '-4%',
-          left: '-6%',
-          width: { md: 160, lg: 200 },
-          height: 'auto',
-          opacity: 0.05,
-          transform: 'rotate(180deg)',
-          pointerEvents: 'none'
-        }}
-      />
-
       {/* Content container — centered, constrained width */}
       <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 500 }}>
         {/* Logo row */}
