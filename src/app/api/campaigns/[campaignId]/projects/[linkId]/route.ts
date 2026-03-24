@@ -1,0 +1,36 @@
+import { NextResponse } from 'next/server'
+
+import { requireTenantContext } from '@/lib/tenant/authorization'
+import { removeProjectFromCampaign } from '@/lib/campaigns/campaign-store'
+
+export const dynamic = 'force-dynamic'
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ campaignId: string; linkId: string }> }
+) {
+  const { tenant, errorResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes('efeonce_admin')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  try {
+    const { linkId } = await params
+
+    await removeProjectFromCampaign(linkId)
+
+    return NextResponse.json({ deleted: true })
+  } catch (error) {
+    console.error('DELETE /api/campaigns/[campaignId]/projects/[linkId] failed:', error)
+
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}

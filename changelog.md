@@ -6,6 +6,13 @@
 
 ## 2026-03-24
 
+### TASK-017 Campaign 360 implemented (Fase 1 MVP)
+- DDL: `greenhouse_core.campaigns` + `greenhouse_core.campaign_project_links` with space boundary, EO-ID sequence, and unique constraint (1 project per campaign per space).
+- Store: `campaign-store.ts` with CRUD (create, list, get, update) + project link management (add, remove, list). Auto-provisioning schema singleton.
+- API: 6 endpoints unified under `/api/campaigns` — list/create, get/patch by ID, project links CRUD, metrics. Guards: internal for write, any auth for read with campaign_subset enforcement.
+- Metrics: `campaign-metrics.ts` resolves ICO metrics (RPA, OTD%, FTR%, cycle time, throughput, stuck assets) by aggregating BigQuery tasks across linked projects. No engine fork needed.
+- Corrections applied: project_source_id = notion_page_id (not separate system), unified API routes with differentiated guards (no separate /api/client/campaigns).
+
 ### TASK-023 Notification System implemented (core infrastructure)
 - PostgreSQL DDL: `greenhouse_notifications` schema with `notifications`, `notification_preferences`, `notification_log` tables.
 - Category catalog: 10 notification categories (delivery_update, sprint_milestone, feedback_requested, report_ready, leave_status, payroll_ready, assignment_change, ico_alert, capacity_warning, system_event).

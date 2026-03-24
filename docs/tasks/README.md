@@ -85,7 +85,7 @@ Primer bloque operativo asignado:
 
 | Task | Estado operativo actual | Uso recomendado |
 | --- | --- | --- |
-| [TASK-033-campaign-360-brief.md](to-do/TASK-033-campaign-360-brief.md) | Brief original desalineado en modelo técnico | Usar solo como framing de producto; implementar sobre `v2` |
+| [TASK-033-campaign-360-brief.md](to-do/TASK-033-campaign-360-brief.md) | Brief histórico de producto saneado; no normativo para runtime | Usar solo como framing de producto; implementar sobre `TASK-017` |
 | [TASK-034-business-units-canonical-brief.md](to-do/TASK-034-business-units-canonical-brief.md) | Brief original que competía con `service_modules` | Usar solo como contexto; implementar sobre `v2` |
 | [TASK-035-frameio-analytics-brief.md](to-do/TASK-035-frameio-analytics-brief.md) | Brief original `BigQuery-first` | Usar solo como referencia de objetivo; implementar sobre `v2` |
 | [TASK-036-greenhouse-home-nexa-brief.md](to-do/TASK-036-greenhouse-home-nexa-brief.md) | Brief original previo al runtime actual del portal | Usar solo como visión UX; implementar sobre `v2` |
