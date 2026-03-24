@@ -59,11 +59,11 @@ const GreenhouseBrandPanel = () => {
         aria-hidden='true'
         sx={{
           position: 'absolute',
-          top: '-2%',
-          right: '2%',
-          width: { md: 300, lg: 380 },
+          top: '-4%',
+          right: '0%',
+          width: { md: 380, lg: 480 },
           height: 'auto',
-          opacity: 0.1,
+          opacity: 0.22,
           pointerEvents: 'none'
         }}
       />
@@ -76,11 +76,11 @@ const GreenhouseBrandPanel = () => {
         aria-hidden='true'
         sx={{
           position: 'absolute',
-          bottom: '5%',
-          left: '-2%',
-          width: { md: 160, lg: 200 },
+          bottom: '3%',
+          left: '-3%',
+          width: { md: 200, lg: 260 },
           height: 'auto',
-          opacity: 0.06,
+          opacity: 0.12,
           transform: 'rotate(180deg)',
           pointerEvents: 'none'
         }}
