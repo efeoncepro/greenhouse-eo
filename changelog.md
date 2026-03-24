@@ -6,6 +6,16 @@
 
 ## 2026-03-24
 
+### TASK-022 Services Runtime Closure implemented
+- HubSpot services inbound sync: `service-sync.ts` store, `POST /api/integrations/hubspot/services/sync`, cron `/api/cron/services-sync`.
+- Legacy UNION cutover: `loadServiceModules()` reads only from `v_client_active_modules`, legacy `client_service_modules` leg removed.
+- ETL script: `scripts/etl-services-to-bigquery.ts` for nightly sync to `greenhouse_conformed.services`.
+
+### TASK-014 Projects Account 360 Bridge implemented
+- `organization-projects.ts` store resolves Organization → Spaces → SpaceNotionSources → Projects chain.
+- API: `GET /api/organizations/{id}/projects` returns projects grouped by space with health scores.
+- Tab "Proyectos" added to organization detail view with KPIs (total projects, tasks, RPA, health) and tables grouped by space.
+
 ### TASK-004 Finance Dashboard Calculation Correction implemented
 - Income/expense summary APIs migrated to Postgres-first with BigQuery fallback.
 - Dual KPI cards: "Facturación del mes" shows accrual + cobrado subtitle; "Costos del mes" always includes payroll.

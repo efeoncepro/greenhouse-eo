@@ -19,6 +19,7 @@ import OrganizationOverviewTab from './tabs/OrganizationOverviewTab'
 import OrganizationPeopleTab from './tabs/OrganizationPeopleTab'
 import OrganizationFinanceTab from './tabs/OrganizationFinanceTab'
 import OrganizationEconomicsTab from './tabs/OrganizationEconomicsTab'
+import OrganizationProjectsTab from './tabs/OrganizationProjectsTab'
 import OrganizationIcoTab from './tabs/OrganizationIcoTab'
 import OrganizationIntegrationsTab from './tabs/OrganizationIntegrationsTab'
 
@@ -27,6 +28,7 @@ const TAB_CONFIG: Array<{ value: OrganizationTab; label: string; icon: string }>
   { value: 'people', label: 'Personas', icon: 'tabler-users' },
   { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
   { value: 'economics', label: 'Rentabilidad', icon: 'tabler-chart-dots' },
+  { value: 'projects', label: 'Proyectos', icon: 'tabler-folders' },
   { value: 'ico', label: 'ICO', icon: 'tabler-cpu' },
   { value: 'integrations', label: 'Integraciones', icon: 'tabler-plug-connected' }
 ]
@@ -112,6 +114,10 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
 
           <TabPanel value='economics' className='p-0'>
             {activeTab === 'economics' && <OrganizationEconomicsTab detail={detail} />}
+          </TabPanel>
+
+          <TabPanel value='projects' className='p-0'>
+            {activeTab === 'projects' && <OrganizationProjectsTab detail={detail} />}
           </TabPanel>
 
           <TabPanel value='ico' className='p-0'>
