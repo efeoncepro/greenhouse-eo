@@ -1,7 +1,8 @@
 # Greenhouse Portal — Sistema de UI / Frontend
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Nuevas dependencias (Tiptap, React Email, PDF renderer, ExcelJS), Organizations UI, dynamic tabs pattern
 
 ---
 
@@ -25,6 +26,11 @@
 | keen-slider | 6.8.6 | Carouseles |
 | cmdk | 1.1.1 | Command palette |
 | react-toastify | 11.0.5 | Notificaciones toast |
+| Tiptap | 3.14.0 | Rich text editing (editor extensible) |
+| React Email | — | Templates de email transaccional |
+| Resend | — | Envío de emails transaccionales |
+| @react-pdf/renderer | — | Generación de PDFs en React |
+| ExcelJS | — | Generación de archivos Excel |
 
 ---
 
@@ -156,6 +162,23 @@ Componentes de vista completa que componen componentes de Nivel 1 y 2 para forma
 | `hr-core/` | HR Core views | Módulo HR |
 | `internal/dashboard/` | Internal dashboard | Dashboard interno |
 | `ai-tools/` | AI Tools views + `tabs/` | Módulo AI Tools |
+| `organizations/` | `OrganizationListView`, `OrganizationView` + `tabs/`, `drawers/` | *(nuevo)* Account 360 — Organizations |
+
+#### `src/views/greenhouse/organizations/` *(nuevo)*
+
+| Componente | Props | Uso |
+|-----------|-------|-----|
+| `OrganizationListView` | — | Lista paginada de organizaciones |
+| `OrganizationView` | organizationId | Detalle con sidebar + tabs |
+| `OrganizationTabs` | — | Orquestador de tabs dinámicos |
+| `OrganizationLeftSidebar` | — | Sidebar con metadata de la org |
+| `OverviewTab` | — | Datos generales, spaces |
+| `PeopleTab` | — | Membresías y personas |
+| `FinanceTab` | — | Resumen financiero |
+| `IcoTab` | — | Métricas ICO Engine |
+| `IntegrationsTab` | — | Estado HubSpot sync |
+| `EditOrganizationDrawer` | — | Editar organización |
+| `AddMembershipDrawer` | — | Agregar persona |
 
 #### `src/views/agency/`
 
@@ -272,6 +295,19 @@ useEffect(() => {
   return () => controller.abort()
 }, [])
 ```
+
+### Patrón de tabs dinámicos por rol *(nuevo)*
+
+Algunas vistas resuelven qué tabs mostrar según el rol del usuario. El módulo People usa `/api/people/meta` para determinar tabs visibles:
+
+```tsx
+// El server resuelve qué tabs puede ver el usuario según sus roles
+const meta = await fetch('/api/people/meta')
+// meta.visibleTabs: ['overview', 'assignments', 'compensation', 'payroll', 'hr', 'delivery', 'identity']
+// Cada tab se renderiza condicionalmente
+```
+
+Este patrón permite que un `people_viewer` vea solo overview y assignments, mientras que un `efeonce_admin` ve todos los tabs incluyendo compensación y payroll.
 
 ### Patrón de error boundary
 

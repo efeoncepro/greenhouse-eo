@@ -1,7 +1,8 @@
 # Greenhouse Portal — Infraestructura y Deploy
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Nuevos cron jobs (ICO materialize, sync conformed), Nubox env vars, Account 360 scripts
 
 ---
 
@@ -46,6 +47,14 @@
     {
       "path": "/api/cron/outbox-publish",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/ico-materialize",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/sync-conformed",
+      "schedule": "30 * * * *"
     }
   ]
 }
@@ -54,6 +63,8 @@
 **Cron jobs:**
 1. **Exchange rates sync** — Diario a las 23:05 UTC. Sincroniza tipos de cambio.
 2. **Outbox publisher** — Cada 5 minutos. Publica eventos de PostgreSQL hacia BigQuery.
+3. **ICO materialize** — *(nuevo)* Cada 6 horas. Materializa métricas de delivery del ICO Engine (snapshots, stuck assets, trends).
+4. **Sync conformed** — *(nuevo)* Cada hora. Sincroniza datos conformados desde fuentes externas.
 
 ### Next.js Configuration (`next.config.ts`)
 
@@ -121,6 +132,14 @@
 | `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` | Cond. | URL del microservicio HubSpot |
 | `CRON_SECRET` | Sí | Secret para verificar cron jobs |
 | `HR_CORE_TEAMS_WEBHOOK_SECRET` | Cond. | Secret para webhook Teams |
+
+### Nubox *(nuevo)*
+
+| Variable | Requerida | Descripción |
+|----------|-----------|-------------|
+| `NUBOX_API_TOKEN` | Cond. | Bearer token para API Nubox |
+| `NUBOX_API_KEY` | Cond. | API key adicional (dual header auth) |
+| `NUBOX_API_BASE_URL` | Cond. | URL base de la API de Nubox |
 
 ---
 
@@ -241,6 +260,15 @@ Configuración del pool de conexiones (`src/lib/postgres/client.ts`):
 | `setup:postgres:access` | Access control tables |
 | `setup:postgres:client-assignments` | Client assignments |
 | `setup:postgres:source-sync` | Source sync infrastructure |
+| `setup:postgres:account-360-m0` | *(nuevo)* Account 360: organizations, spaces, person_memberships |
+| `setup:postgres:organization-360` | *(nuevo)* Organization 360 serving views |
+| `setup:postgres:services` | *(nuevo)* Services table + service_history |
+| `setup:postgres:space-notion-sources` | *(nuevo)* Space-Notion source mapping |
+| `setup:postgres:identity-v2` | *(nuevo)* Identity profiles v2 + reconciliation |
+| `setup:postgres:nubox-extensions` | *(nuevo)* Nubox extensions en greenhouse_finance |
+| `setup:postgres:finance-intelligence-p1/p2` | *(nuevo)* Finance intelligence tables |
+| `setup:bigquery:nubox-raw` | *(nuevo)* BigQuery nubox_raw_snapshots dataset |
+| `setup:bigquery:nubox-conformed` | *(nuevo)* BigQuery nubox_conformed dataset |
 
 ### Backfill
 
@@ -252,6 +280,8 @@ Configuración del pool de conexiones (`src/lib/postgres/client.ts`):
 | `backfill:postgres:payroll` | Datos payroll |
 | `backfill:postgres:finance` | Datos finance |
 | `backfill:postgres:ai-tooling` | Datos AI tools |
+| `backfill:account-360-m1` | *(nuevo)* Poblar organizations y spaces |
+| `backfill:identity-v2` | *(nuevo)* Identity profiles v2 |
 
 ### Operaciones
 
@@ -260,6 +290,9 @@ Configuración del pool de conexiones (`src/lib/postgres/client.ts`):
 | `pg:doctor` | Health check de PostgreSQL |
 | `audit:person-360` | Auditoría de cobertura Person 360 |
 | `sync:outbox` | Ejecutar outbox consumer manualmente |
+| `run:identity-reconciliation` | *(nuevo)* Ejecutar reconciliación de identidades |
+| `verify:account-360` | *(nuevo)* Verificar integridad del modelo Account 360 |
+| `test:nubox-sync` | *(nuevo)* Smoke test del pipeline Nubox |
 
 ---
 

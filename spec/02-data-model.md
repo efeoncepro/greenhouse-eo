@@ -1,7 +1,8 @@
 # Greenhouse Portal — Modelo de Datos
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Account 360 (Organizations/Spaces/Memberships), ICO Engine schema, Nubox conformed, Services, Finance tables extendidas, Identity Reconciliation
 
 ---
 
@@ -272,6 +273,127 @@ Datos crudos de sincronización.
 Datos conformados/transformados.
 
 - `delivery_projects` — Vista conformada de proyectos de entrega
+- `delivery_tasks` — Tareas conformadas de Notion con metadata enriquecida (fuente para ICO Engine)
+
+### Dataset: `greenhouse_ico` *(nuevo — ICO Engine)*
+
+Motor de inteligencia de delivery con métricas materializadas.
+
+#### `metric_snapshots_monthly`
+
+Métricas agregadas por espacio y mes.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `snapshot_id` | STRING | PK |
+| `space_id` | STRING | FK → espacio |
+| `client_id` | STRING | FK → cliente |
+| `period_year` | INT | Año |
+| `period_month` | INT | Mes |
+| `rpa_avg` | FLOAT | RPA promedio |
+| `otd_pct` | FLOAT | % On-Time Delivery |
+| `ftr_pct` | FLOAT | % First-Time-Right |
+| `cycle_time_avg_days` | FLOAT | Cycle time promedio |
+| `cycle_time_p50_days` | FLOAT | Mediana cycle time |
+| `cycle_time_variance` | FLOAT | Varianza cycle time |
+| `throughput_count` | INT | Total completadas |
+| `pipeline_velocity` | FLOAT | Velocity ratio |
+| `stuck_asset_count` | INT | Assets estancados |
+| `stuck_asset_pct` | FLOAT | % estancados |
+| `csc_distribution` | JSON | Distribución por fase CSC |
+| `total_tasks` | INT | Total tareas |
+| `completed_tasks` | INT | Completadas |
+| `active_tasks` | INT | Activas |
+| `computed_at` | TIMESTAMP | Fecha de cálculo |
+| `engine_version` | STRING | Versión del engine |
+
+#### `stuck_assets_detail`
+
+Lista diaria de tareas estancadas (72h+ sin movimiento).
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `task_source_id` | STRING | ID de la tarea en Notion |
+| `task_name` | STRING | Nombre |
+| `space_id` | STRING | FK → espacio |
+| `project_source_id` | STRING | FK → proyecto |
+| `fase_csc` | STRING | Fase CSC actual |
+| `hours_since_update` | FLOAT | Horas sin movimiento |
+| `days_since_update` | FLOAT | Días sin movimiento |
+| `severity` | STRING | Severidad |
+| `rpa_value` | FLOAT | RPA de la tarea |
+| `client_review_open` | BOOLEAN | Review abierto |
+| `materialized_at` | TIMESTAMP | Fecha de materialización |
+
+#### `rpa_trend`
+
+Últimos 12 meses de RPA agregado.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `space_id` | STRING | FK → espacio |
+| `period_year` | INT | Año |
+| `period_month` | INT | Mes |
+| `rpa_avg` | FLOAT | RPA promedio |
+| `rpa_median` | FLOAT | RPA mediana |
+| `tasks_completed` | INT | Tareas completadas |
+| `materialized_at` | TIMESTAMP | Materialización |
+
+#### `metrics_by_project` / `metrics_by_member`
+
+Métricas desglosadas por proyecto o miembro del equipo. Misma estructura que `metric_snapshots_monthly` pero agrupada por `project_source_id` o `member_id`.
+
+#### `ai_metric_scores`
+
+Scoring AI de tareas individuales.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | STRING | PK |
+| `task_id` | STRING | FK → tarea |
+| `metric_id` | STRING | FK → metric registry |
+| `score` | FLOAT | Score |
+| `passed` | BOOLEAN | Pasó umbral |
+| `reasoning` | STRING | Razonamiento del modelo |
+| `model` | STRING | Modelo AI usado |
+| `confidence` | FLOAT | Confianza |
+| `space_id` | STRING | FK → espacio |
+| `project_id` | STRING | FK → proyecto |
+| `processed_at` | TIMESTAMP | Procesado |
+
+#### `status_phase_config`
+
+Mapeo configurable de estados de tarea a fases CSC por espacio.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `space_id` | STRING | FK → espacio |
+| `task_status` | STRING | Estado de la tarea |
+| `fase_csc` | STRING | Fase CSC: `briefing`, `produccion`, `revision_interna`, `cambios_cliente`, `entrega` |
+
+#### Vista: `v_tasks_enriched`
+
+Vista derivada de `greenhouse_conformed.delivery_tasks` con campos calculados: `fase_csc`, `cycle_time_days`, `hours_since_update`, `is_stuck`, `delivery_signal`.
+
+#### Vista: `v_metric_latest`
+
+Convenience view: último snapshot por espacio.
+
+### Dataset: `nubox_raw_snapshots` *(nuevo)*
+
+Datos crudos de sincronización Nubox (archivo por sync run).
+
+- `sales_raw` — Ventas (DTEs emitidos)
+- `purchases_raw` — Compras (DTEs recibidos)
+- `expenses_raw` — Egresos bancarios
+- `incomes_raw` — Ingresos bancarios
+
+### Dataset: `nubox_conformed` *(nuevo)*
+
+Datos transformados de Nubox con identity resolution.
+
+- `conformed_sales` — Ventas conformadas con `organization_id`, `client_id`, `income_id`
+- `conformed_purchases` — Compras conformadas con `organization_id`, `supplier_id`
 
 ---
 
@@ -319,6 +441,131 @@ Mirror transaccional de la tabla BigQuery homónima, con campos adicionales para
 | `head_member_id` | UUID | FK → members. Jefe del depto |
 | `business_unit` | VARCHAR | Unidad de negocio |
 | `active` | BOOLEAN | Flag de actividad |
+
+#### `organizations` *(nuevo — Account 360)*
+
+Entidades jurídicas canónicas (clientes, proveedores, o ambos).
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `organization_id` | UUID | PK (formato: `org-{uuid}`) |
+| `public_id` | VARCHAR | ID público secuencial `EO-ORG-{NNNN}` |
+| `organization_name` | VARCHAR | Nombre comercial |
+| `legal_name` | VARCHAR | Razón social |
+| `organization_type` | VARCHAR | `client`, `supplier`, `both` |
+| `tax_id` | VARCHAR | RUT, RFC, EIN, VAT, etc. |
+| `tax_id_type` | VARCHAR | Tipo de tax ID |
+| `industry` | VARCHAR | Industria |
+| `country` | VARCHAR | País |
+| `hubspot_company_id` | VARCHAR | FK HubSpot |
+| `notes` | TEXT | Notas |
+| `status` | VARCHAR | Estado |
+| `active` | BOOLEAN | Flag de actividad |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
+
+#### `spaces` *(nuevo — Account 360)*
+
+Espacios operativos (tenants), 1:N por organización. Reemplaza la relación directa con `clients`.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `space_id` | UUID | PK (formato: `spc-{uuid}`) |
+| `public_id` | VARCHAR | ID público `EO-SPC-{NNNN}` |
+| `organization_id` | UUID | FK → organizations |
+| `client_id` | VARCHAR | FK → clients (bridge legacy) |
+| `space_name` | VARCHAR | Nombre del espacio |
+| `status` | VARCHAR | Estado |
+| `active` | BOOLEAN | Flag de actividad |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
+
+#### `person_memberships` *(nuevo — Account 360)*
+
+Membresías de personas a organizaciones, vía espacios.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `membership_id` | UUID | PK (formato: `mbr-{uuid}`) |
+| `public_id` | VARCHAR | ID público `EO-MBR-{NNNN}` |
+| `organization_id` | UUID | FK → organizations |
+| `profile_id` | UUID | FK → identity_profiles |
+| `space_id` | UUID | FK → spaces (nullable) |
+| `client_id` | VARCHAR | FK legacy (nullable) |
+| `membership_type` | VARCHAR | Tipo de membresía |
+| `role_label` | VARCHAR | Rol dentro de la organización |
+| `department` | VARCHAR | Departamento |
+| `is_primary` | BOOLEAN | Es membresía principal |
+| `active` | BOOLEAN | Flag de actividad |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
+
+#### `services` *(nuevo — Service Modules)*
+
+Servicios de Efeonce vinculados a espacios y organizaciones.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `service_id` | UUID | PK (formato: `svc-{uuid}`) |
+| `public_id` | VARCHAR | ID público `EO-SVC-{NNNN}` |
+| `name` | VARCHAR | Nombre del servicio |
+| `space_id` | UUID | FK → spaces |
+| `organization_id` | UUID | FK → organizations |
+| `pipeline_stage` | VARCHAR | Etapa del pipeline |
+| `linea_de_servicio` | VARCHAR | Línea de servicio |
+| `servicio_especifico` | VARCHAR | Servicio específico |
+| `modalidad` | VARCHAR | Modalidad de entrega |
+| `billing_frequency` | VARCHAR | Frecuencia de facturación |
+| `country` | VARCHAR | País |
+| `total_cost` | DECIMAL | Costo total |
+| `amount_paid` | DECIMAL | Monto pagado |
+| `currency` | VARCHAR | Moneda |
+| `start_date` | DATE | Fecha de inicio |
+| `target_end_date` | DATE | Fecha objetivo de fin |
+| `hubspot_service_id` | VARCHAR | ID en HubSpot |
+| `hubspot_company_id` | VARCHAR | FK HubSpot Company |
+| `hubspot_deal_id` | VARCHAR | FK HubSpot Deal |
+| `notion_project_id` | VARCHAR | FK Notion Project |
+| `status` | VARCHAR | Estado |
+| `active` | BOOLEAN | Flag de actividad |
+| `created_by` | VARCHAR | Creado por |
+| `updated_by` | VARCHAR | Actualizado por |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
+
+#### `service_history` *(nuevo)*
+
+Historial de cambios a servicios (field-level tracking).
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `history_id` | UUID | PK |
+| `service_id` | UUID | FK → services |
+| `field_name` | VARCHAR | Campo modificado |
+| `old_value` | TEXT | Valor anterior |
+| `new_value` | TEXT | Valor nuevo |
+| `changed_by` | VARCHAR | Actor |
+| `changed_at` | TIMESTAMPTZ | Timestamp del cambio |
+
+#### `space_notion_sources` *(nuevo)*
+
+Mapeo de fuentes Notion por espacio.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `source_id` | UUID | PK |
+| `space_id` | UUID | FK → spaces |
+| `notion_db_proyectos` | VARCHAR | Notion DB ID de proyectos |
+| `notion_db_tareas` | VARCHAR | Notion DB ID de tareas |
+| `notion_db_sprints` | VARCHAR | Notion DB ID de sprints |
+| `notion_db_revisiones` | VARCHAR | Notion DB ID de revisiones |
+| `notion_workspace_id` | VARCHAR | Workspace ID de Notion |
+| `sync_enabled` | BOOLEAN | Sincronización habilitada |
+| `sync_frequency` | VARCHAR | `daily`, `weekly`, `monthly` |
+| `last_synced_at` | TIMESTAMPTZ | Última sincronización |
+| `created_by` | VARCHAR | Creado por |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
 
 #### `providers`
 
@@ -524,9 +771,52 @@ Versiones de compensación por miembro, con vigencia temporal.
 | `source` | VARCHAR | Fuente del dato |
 | `rate_date` | DATE | Fecha del tipo de cambio |
 
-#### `reconciliation_sessions` / `reconciliation_matches`
+#### `income_payments` *(nuevo — normalizado)*
 
-Tablas para el flujo de reconciliación bancaria con sesiones, statements y matcheos.
+Pagos individuales de ingresos (antes eran JSON array dentro de `income`).
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `payment_id` | UUID | PK |
+| `income_id` | UUID | FK → income |
+| `paid_date` | DATE | Fecha de pago |
+| `amount` | DECIMAL | Monto del pago |
+| `notes` | TEXT | Notas |
+| `created_at` | TIMESTAMPTZ | Creación |
+
+#### `bank_statement_rows` *(nuevo)*
+
+Filas de extractos bancarios para reconciliación.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `row_id` | UUID | PK |
+| `reconciliation_period_id` | UUID | FK → reconciliation_periods |
+| `account_id` | UUID | FK → accounts |
+| `transaction_date` | DATE | Fecha de transacción |
+| `description` | VARCHAR | Descripción |
+| `amount` | DECIMAL | Monto |
+| `balance` | DECIMAL | Saldo |
+| `reference` | VARCHAR | Referencia |
+| `match_status` | VARCHAR | `unmatched`, `matched`, `excluded` |
+
+#### `reconciliation_periods` *(actualizado)*
+
+Períodos de reconciliación bancaria con estados.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `period_id` | UUID | PK |
+| `account_id` | UUID | FK → accounts |
+| `year` | INT | Año |
+| `month` | INT | Mes |
+| `status` | VARCHAR | `draft`, `matched`, `closed` |
+| `created_at` | TIMESTAMPTZ | Creación |
+| `updated_at` | TIMESTAMPTZ | Última actualización |
+
+#### `reconciliation_matches`
+
+Matcheos entre statements e income/expenses.
 
 ### Schema: `greenhouse_serving`
 
@@ -614,31 +904,55 @@ Person360 (identity_profiles)
 
 Greenhouse genera IDs públicos legibles con prefijo `EO-`:
 
-| Entidad | Formato | Ejemplo |
-|---------|---------|---------|
-| Cliente | `EO-{hubspotId}` o `EO-SPACE-{name}` o `EO-TEN-{id}` | EO-12345 |
-| Usuario | `EO-USR-{hubspotContactId}` o `EO-USR-{suffix}` | EO-USR-67890 |
-| Identidad | `EO-ID{sequence}` | EO-ID0042 |
-| Service Module | `EO-BL-{code}` o `EO-SVC-{code}` | EO-BL-globe |
-| Capability | `EO-CAP-{tenantId}-{moduleCode}` | EO-CAP-123-crm |
-| Role Assignment | `EO-ROLE-{tenantId}-{userId}-{roleCode}` | EO-ROLE-1-5-admin |
-| Feature Flag | `EO-FLG-{tenantId}-{featureCode}` | EO-FLG-1-dashboard |
+| Entidad | Formato | Ejemplo | Generación |
+|---------|---------|---------|------------|
+| Organization | `EO-ORG-{NNNN}` | EO-ORG-0012 | Secuencia PostgreSQL |
+| Space | `EO-SPC-{NNNN}` | EO-SPC-0034 | Secuencia PostgreSQL |
+| Person Membership | `EO-MBR-{NNNN}` | EO-MBR-0056 | Secuencia PostgreSQL |
+| Service | `EO-SVC-{NNNN}` | EO-SVC-0078 | Secuencia PostgreSQL |
+| Identidad | `EO-ID{sequence}` | EO-ID0042 | Secuencia PostgreSQL |
+| Cliente (legacy) | `EO-{hubspotId}` o `EO-TEN-{id}` | EO-12345 | Derivado |
+| Usuario | `EO-USR-{hubspotContactId}` | EO-USR-67890 | Derivado |
+| Business Line | `EO-BL-{code}` | EO-BL-globe | Derivado |
+| Capability | `EO-CAP-{tenantId}-{moduleCode}` | EO-CAP-123-crm | Derivado |
+| Role Assignment | `EO-ROLE-{tenantId}-{userId}-{roleCode}` | EO-ROLE-1-5-admin | Derivado |
+| Feature Flag | `EO-FLG-{tenantId}-{featureCode}` | EO-FLG-1-dashboard | Derivado |
+| Income Sequence | `INC-{YYYY}-{MM}-{NNN}` | INC-2026-03-001 | Mensual |
 
 ---
 
 ## Relaciones entre entidades
 
-### Tenant → Usuarios y scoping
+### Account 360 (Organizations → Spaces → People) *(nuevo)*
 
 ```
-Client (tenant)
+Organization (EO-ORG-*)
+├── org_type: 'client' | 'supplier' | 'both'
+├── tax_id (RUT, RFC, EIN, VAT)
+├── spaces[] (EO-SPC-*)
+│   ├── client_id (bridge legacy)
+│   ├── space_notion_sources[] (Notion DB mappings)
+│   └── services[] (EO-SVC-*)
+│       ├── linea_de_servicio, servicio_especifico
+│       ├── hubspot_deal_id, notion_project_id
+│       └── service_history[] (field-level audit)
+└── person_memberships[] (EO-MBR-*)
+    ├── profile_id → identity_profiles
+    ├── membership_type, role_label, department
+    └── is_primary
+```
+
+### Tenant → Usuarios y scoping (legacy, puente a Account 360)
+
+```
+Client (tenant) ←→ Space (via client_id bridge)
 ├── client_users[] (usuarios del portal)
 │   ├── user_role_assignments[] (roles asignados)
 │   ├── user_project_scopes[] (proyectos visibles)
 │   └── user_campaign_scopes[] (campañas visibles)
 ├── client_service_modules[] (capabilities contratadas)
 ├── client_feature_flags[] (features habilitados)
-└── notionProjectIds[] (proyectos asociados)
+└── notionProjectIds[] (proyectos asociados) → migra a space_notion_sources
 ```
 
 ### Compensación → Payroll
@@ -685,3 +999,23 @@ Account
 ### Flujo exchange rates
 
 Cron diario a las 23:05 UTC invoca `/api/finance/exchange-rates/sync` para actualizar tipos de cambio.
+
+### Flujo Nubox (3 fases) *(nuevo)*
+
+Pipeline de sincronización de documentos tributarios chilenos:
+
+1. **Fase A — Raw**: Fetch de API Nubox (ventas, compras, egresos, ingresos) → archive en `nubox_raw_snapshots` (BigQuery)
+2. **Fase B — Conformed**: Transform raw → conformed con identity resolution (supplier → organization mapping) → `nubox_conformed` (BigQuery)
+3. **Fase C — Postgres**: Project conformed → tablas operativas PostgreSQL (`greenhouse_finance`)
+
+Trigger: `POST /api/finance/nubox/sync` (manual o cron). Soporta `periods` para backfill histórico. Max duration: 120s.
+
+### Flujo ICO Engine Materialization *(nuevo)*
+
+Materialización periódica de métricas de delivery:
+
+1. Cron invoca `/api/cron/ico-materialize`
+2. Lee `v_tasks_enriched` (derivada de `greenhouse_conformed.delivery_tasks`)
+3. Agrega métricas por espacio, proyecto, miembro
+4. Escribe en `greenhouse_ico.metric_snapshots_monthly`, `stuck_assets_detail`, `rpa_trend`, `metrics_by_project`, `metrics_by_member`
+5. `ensureIcoEngineInfrastructure()` crea schema idempotentemente si no existe

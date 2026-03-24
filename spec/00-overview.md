@@ -1,8 +1,9 @@
 # Greenhouse Portal — Visión General del Sistema
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
 > Audiencia: Desarrolladores, arquitectos, stakeholders técnicos
+> Actualizado: Nuevas superficies (Organizations, ICO Engine, Services), Nubox integration, Identity Reconciliation
 
 ---
 
@@ -68,12 +69,15 @@ Greenhouse organiza su UI en **superficies** — conjuntos cohesivos de rutas qu
 | **People** | Ops internos, HR | Directorio de equipo, perfil 360, asignaciones, métricas |
 | **HR Core** | HR managers | Leave management, attendance, departments |
 | **HR Payroll** | HR/Finance | Períodos de nómina, compensaciones, cálculo Chile, exportación |
-| **Finance** | Finance team | Ingresos, egresos, proveedores, reconciliación, dashboard financiero |
+| **Finance** | Finance team | Ingresos, egresos, proveedores, reconciliación, dashboard financiero, intelligence |
 | **Agency** | Leadership, ops | Vista transversal de salud de cuentas, capacidad, pulse |
+| **Organizations** | Ops internos, leadership | *(nuevo)* Account 360: organizaciones, spaces, memberships, servicios |
+| **ICO Engine** | Agency, ops | *(nuevo)* Delivery intelligence: métricas materializadas, stuck assets, trends |
 | **Admin** | Admins Efeonce | Gestión de tenants, usuarios, roles, AI tools, team |
 | **Internal** | Equipo Efeonce | Dashboard interno, métricas operativas |
 | **Capabilities** | Clientes | Módulos de capacidad contratados por tenant |
 | **Integrations** | Sistemas externos | APIs para sincronización de tenants y capabilities |
+| **Nubox** | Finance team | *(nuevo)* Sync de documentos tributarios chilenos (3-phase pipeline) |
 
 ## Modelo de datos dual
 
@@ -89,11 +93,11 @@ Los dos stores se sincronizan mediante un patrón de **outbox events**: todas la
 
 | Schema | Propósito |
 |--------|-----------|
-| `greenhouse_core` | Identidades canónicas: members, clients, client_users, departments, providers |
+| `greenhouse_core` | Identidades canónicas: members, clients, client_users, departments, providers, **organizations, spaces, person_memberships, services** |
 | `greenhouse_hr` | Leave requests, balances, policies |
 | `greenhouse_payroll` | Compensaciones, períodos, liquidaciones, config de bonos |
-| `greenhouse_finance` | Cuentas, ingresos, egresos, proveedores, reconciliación |
-| `greenhouse_serving` | Vistas de lectura optimizadas (member_leave_360, member_payroll_360) |
+| `greenhouse_finance` | Cuentas, ingresos, egresos, proveedores, reconciliación, **income_payments, bank_statement_rows** |
+| `greenhouse_serving` | Vistas de lectura optimizadas (member_leave_360, member_payroll_360, **person_360**) |
 | `greenhouse_sync` | Outbox de eventos para sync async a BigQuery |
 
 ## Principios de diseño

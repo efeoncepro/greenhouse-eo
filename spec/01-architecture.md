@@ -1,7 +1,8 @@
 # Greenhouse Portal — Arquitectura de Alto Nivel
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: ICO Engine dataset, Nubox datasets, Account 360 en lib layer, nuevos módulos en api tree
 
 ---
 
@@ -30,6 +31,8 @@
 │  │  admin/      agency/      capabilities/ finance/ payroll/   │  │
 │  │  hr-core/    ai/          ai-tools/   integrations/         │  │
 │  │  team-capacity/ team-admin/ storage/  sync/  ids/  postgres/│  │
+│  │  account-360/ ico-engine/ nubox/ services/ identity/        │  │
+│  │  space-notion/ providers/                                   │  │
 │  └────────┬──────────────────────────┬─────────────────────────┘  │
 │           │                          │                            │
 │  ┌────────▼─────────┐  ┌────────────▼──────────────┐            │
@@ -45,11 +48,11 @@
    │  notion_ops       │  │                            │
    │  greenhouse_raw   │  │  Schemas:                  │
    │  greenhouse_      │  │  greenhouse_core           │
-   │  conformed        │  │  greenhouse_hr             │
-   │                   │  │  greenhouse_payroll        │
-   │                   │  │  greenhouse_finance        │
-   │                   │  │  greenhouse_serving        │
-   │                   │  │  greenhouse_sync           │
+   │    conformed      │  │  greenhouse_hr             │
+   │  greenhouse_ico   │  │  greenhouse_payroll        │
+   │  nubox_raw_       │  │  greenhouse_finance        │
+   │    snapshots      │  │  greenhouse_serving        │
+   │  nubox_conformed  │  │  greenhouse_sync           │
    └───────────────────┘  └───────────────────────────┘
 ```
 
@@ -87,7 +90,9 @@ Todas las superficies autenticadas con sidebar, header y branding del tenant:
 │   └── reconciliation/[id]/ # Reconciliación
 ├── agency/
 │   ├── spaces/             # Espacios/cuentas
-│   └── capacity/           # Capacidad agencia
+│   ├── capacity/           # Capacidad agencia
+│   └── organizations/      # Account 360 (nuevo)
+│       └── [id]/           # Detalle org + tabs
 ├── admin/
 │   ├── users/[id]/         # Gestión de usuarios
 │   ├── roles/              # Gestión de roles
@@ -139,8 +144,13 @@ api/
 │   ├── core/               # Members, departments, attendance, leave
 │   └── payroll/            # Periods, entries, compensation, export
 ├── finance/                # Accounts, income, expenses, suppliers, reconciliation, dashboard, exchange-rates
+│   ├── intelligence/       # Client economics, allocations (nuevo)
+│   └── nubox/              # Nubox 3-phase sync (nuevo)
 ├── capabilities/           # Resolve, module data
 ├── agency/                 # Pulse, spaces, capacity
+│   └── services/           # Service CRUD (nuevo)
+├── organizations/          # Account 360 CRUD, memberships (nuevo)
+├── ico-engine/             # Delivery metrics, stuck assets, trends (nuevo)
 ├── ai-credits/             # Wallets, ledger, consume, reload, summary
 ├── ai-tools/               # Catalog, licenses (user-facing)
 ├── admin/
@@ -151,7 +161,7 @@ api/
 ├── integrations/v1/        # Tenants, capabilities catalog, sync
 ├── internal/               # Greenhouse AI agent
 ├── media/                  # Logo/avatar serving
-└── cron/                   # Outbox publisher
+└── cron/                   # Outbox publisher, ICO materialization, sync conformed
 ```
 
 ## Lib Layer — Módulos de negocio
@@ -182,6 +192,12 @@ La capa `src/lib/` contiene toda la lógica de negocio, queries, y transformacio
 | `contacts/` | 1 | In-memory | Resolución de display names |
 | `postgres/` | 1 | — | Pool de conexión, transacciones, query runner |
 | `providers/` | 2 | PostgreSQL | Registro de proveedores, sync con finance |
+| `account-360/` | 4 | PostgreSQL | *(nuevo)* Organizations, identity, ID generation, store |
+| `ico-engine/` | 5 | BigQuery | *(nuevo)* Schema, metric registry, materialización, read metrics |
+| `nubox/` | 8 | Nubox API + BigQuery + PostgreSQL | *(nuevo)* Client HTTP, 3-phase sync, mappers, emission |
+| `services/` | 1 | PostgreSQL | *(nuevo)* Service CRUD con history tracking |
+| `identity/` | 6 | PostgreSQL + BigQuery | *(nuevo)* Reconciliation engine, matching, normalization |
+| `space-notion/` | 1 | PostgreSQL | *(nuevo)* Space-Notion source mapping |
 
 ## Patrón de datos dual: BigQuery + PostgreSQL
 
@@ -193,6 +209,9 @@ La capa `src/lib/` contiene toda la lógica de negocio, queries, y transformacio
 - Team members y assignments (para superficies de lectura)
 - Capabilities resolution (datos de tenant)
 - Bootstrap e identidad (tablas `greenhouse.*`)
+- ICO Engine — métricas materializadas de delivery (`greenhouse_ico`) *(nuevo)*
+- Nubox — raw snapshots y datos conformados (`nubox_raw_snapshots`, `nubox_conformed`) *(nuevo)*
+- Identity reconciliation — discovery de identidades no vinculadas *(nuevo)*
 
 ### Cuándo se usa PostgreSQL
 
@@ -203,6 +222,9 @@ La capa `src/lib/` contiene toda la lógica de negocio, queries, y transformacio
 - AI Tools (catálogo, licencias, wallets, ledger)
 - Team Admin (mutaciones de equipo)
 - Identity store (linkeo de SSO, last login)
+- Account 360 — organizations, spaces, person memberships *(nuevo)*
+- Services — CRUD con history tracking *(nuevo)*
+- Space-Notion sources — mapping de Notion DBs por espacio *(nuevo)*
 
 ### Patrón Postgres-first con fallback
 
@@ -259,7 +281,8 @@ src/views/greenhouse/   ← Vistas compuestas por ruta
   ├── people/
   ├── hr-core/
   ├── internal/
-  └── ai-tools/
+  ├── ai-tools/
+  └── organizations/    ← Account 360 (nuevo)
 ```
 
 ### Patrón de composición de vistas

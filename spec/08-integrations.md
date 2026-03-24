@@ -1,7 +1,8 @@
 # Greenhouse Portal — Integraciones Externas
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Nubox (pipeline completo), Space-Notion mapping formalizado, HubSpot bidireccional vía Organizations
 
 ---
 
@@ -9,7 +10,7 @@
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌───────────────────┐
-│  HubSpot    │────▶│ Integration  │────▶│   Greenhouse      │
+│  HubSpot    │◀───▶│ Integration  │◀───▶│   Greenhouse      │
 │  CRM        │     │ Microservice │     │   Portal          │
 └─────────────┘     └──────────────┘     └───────────────────┘
                                                    │
@@ -308,13 +309,112 @@ Usa `requireIntegrationRequest()` — autenticación separada del sistema de usu
 
 ---
 
+## 8. Nubox — Contabilidad Chile *(nuevo)*
+
+### Rol
+
+Nubox es la plataforma contable para operaciones Chile. Greenhouse sincroniza documentos tributarios electrónicos (DTEs) y movimientos bancarios desde Nubox para alimentar el módulo financiero.
+
+### Arquitectura de integración
+
+Pipeline de 3 fases gestionado por `src/lib/nubox/`:
+
+```
+Nubox API → Fase A (Raw) → BigQuery → Fase B (Conformed) → BigQuery → Fase C → PostgreSQL
+```
+
+### Fase A — Raw Sync
+
+- **Endpoint interno**: `sync-nubox-raw.ts`
+- **Datos**: ventas (DTEs emitidos), compras (DTEs recibidos), egresos bancarios, ingresos bancarios
+- **Destino**: BigQuery `nubox_raw_snapshots` (archivo JSON crudo por sync run)
+- **Auth**: Bearer token + API key (`NUBOX_API_TOKEN`, `NUBOX_API_KEY`)
+
+### Fase B — Conformed
+
+- **Endpoint interno**: `sync-nubox-conformed.ts`
+- **Transform**: Normalización de campos, resolución de identidad (supplier → `organization_id` vía tax ID match)
+- **Destino**: BigQuery `nubox_conformed` (ventas y compras conformadas con FKs canónicos)
+
+### Fase C — Postgres Projection
+
+- **Endpoint interno**: `sync-nubox-to-postgres.ts`
+- **Destino**: Tablas operativas de `greenhouse_finance` en PostgreSQL
+
+### Cliente HTTP
+
+| Config | Valor |
+|--------|-------|
+| Auth | Bearer token + API key (dual header) |
+| Retry | Automático en HTTP 429 y 5xx |
+| Paginación | Automática (cursor-based) |
+| Timeout | Configurable por request |
+
+### Tipos de documento Nubox
+
+| Tipo | Descripción | Campos clave |
+|------|-------------|-------------|
+| Sale | DTE emitido (factura, boleta, NC, ND) | folio, dte_type, net/exempt/tax/total amounts, emission_date, client RUT |
+| Purchase | DTE recibido | folio, dte_type, amounts, emission_date, supplier RUT |
+| Expense | Egreso bancario | folio, bank, payment_method, supplier, total_amount, payment_date |
+| Income | Ingreso bancario | folio, bank, payment_method, client, total_amount, payment_date |
+
+### Emisión de documentos
+
+`emission.ts` — Generación de documentos tributarios a través de la API de Nubox (facturación electrónica).
+
+---
+
+## 9. Space-Notion Mapping *(nuevo)*
+
+### Rol
+
+Formaliza la relación entre Spaces (tenants operativos) y workspaces/databases de Notion. Reemplaza el campo legacy `notionProjectIds` de `clients` con un modelo relacional.
+
+### Store
+
+`src/lib/space-notion/space-notion-store.ts`
+
+### Datos mapeados por Space
+
+| Campo | Descripción |
+|-------|-------------|
+| `notion_db_proyectos` | Notion database ID de proyectos |
+| `notion_db_tareas` | Notion database ID de tareas |
+| `notion_db_sprints` | Notion database ID de sprints |
+| `notion_db_revisiones` | Notion database ID de revisiones |
+| `notion_workspace_id` | Workspace ID de Notion |
+| `sync_enabled` | Flag de sincronización |
+| `sync_frequency` | `daily`, `weekly`, `monthly` |
+| `last_synced_at` | Última sincronización |
+
+### Funciones
+
+- `getSpaceNotionSource(spaceId)` — Obtener mapping de un espacio
+- `getSpaceNotionSourceByClientId(clientId)` — Resolver vía bridge legacy `client_id → space_id → notion_source`
+- `getActiveSpaceNotionSources()` — Todos los mappings habilitados
+
+---
+
+## 10. HubSpot — Bidireccional vía Organizations *(actualización)*
+
+Además del flujo original (HubSpot → Greenhouse), ahora existe sincronización bidireccional a través del módulo Organizations:
+
+- **`POST /api/organizations/[id]/hubspot-sync`** — Trigger manual de sync desde la UI de Organizations
+- El sync puede actualizar datos de la organización desde HubSpot Company y viceversa
+- La resolución de identidad `ensureOrganizationForSupplier()` puede crear organizaciones nuevas y vincularlas con HubSpot Companies existentes
+
+---
+
 ## Resumen de flujos de datos
 
 | Fuente | → | Destino | Mecanismo | Frecuencia |
 |--------|---|---------|-----------|-----------|
-| HubSpot | → | BigQuery | Bootstrap SQL + Integration API | On-demand / sync |
-| Notion | → | BigQuery | Pipeline externo | Continuo |
+| HubSpot | ↔ | BigQuery + PostgreSQL | Bootstrap SQL + Integration API + Org sync | On-demand / sync |
+| Notion | → | BigQuery | Pipeline externo + Space-Notion mapping | Continuo |
+| Nubox | → | BigQuery → PostgreSQL | 3-phase sync (raw→conformed→postgres) | On-demand / cron |
 | BigQuery | → | Portal (browser) | API routes server-side | Request-time |
+| BigQuery | → | BigQuery (ICO) | ICO Engine materialization | Cron periódico |
 | Portal | → | PostgreSQL | API routes (write) | Request-time |
 | PostgreSQL | → | BigQuery | Outbox consumer | Cada 5 min |
 | Exchange Rate service | → | PostgreSQL | Cron sync | Diario 23:05 UTC |

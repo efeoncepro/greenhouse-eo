@@ -1,7 +1,8 @@
 # Greenhouse Portal — Catálogo de Scripts
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Account 360 scripts, Nubox setup/sync, Identity Reconciliation, Services, Space-Notion, Finance Intelligence
 
 ---
 
@@ -110,6 +111,105 @@ Estos scripts crean las tablas, indexes y constraints necesarios. Usan el perfil
 - **Comando**: `pnpm setup:postgres:source-sync`
 - **Crea**: Infraestructura de source sync (tablas de tracking de sincronización)
 - **Dependencias**: `canonical-360`
+
+### Account 360 Setup *(nuevo)*
+
+### `setup-postgres-account-360-m0.ts`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: `organizations`, `spaces`, `person_memberships` con secuencias para IDs públicos (`EO-ORG-*`, `EO-SPC-*`, `EO-MBR-*`)
+- **DDL**: `setup-postgres-account-360-m0.sql`
+- **Dependencias**: `canonical-360` debe existir
+
+### `setup-postgres-organization-360.ts`
+
+- **Schema**: `greenhouse_core`, `greenhouse_serving`
+- **Crea**: Serving views para Organization 360 (consolidación de organizations + spaces + memberships)
+- **DDL**: `setup-postgres-organization-360.sql`
+- **Dependencias**: `account-360-m0`
+
+### `setup-postgres-services.sql`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: `services`, `service_history` con secuencia `EO-SVC-*`
+- **Dependencias**: `account-360-m0` (FK a organizations y spaces)
+
+### `setup-postgres-space-notion-sources.sql`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: `space_notion_sources` (mapeo Notion DB IDs por espacio)
+- **Dependencias**: `account-360-m0` (FK a spaces)
+
+### `setup-postgres-unified-org.ts`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: Vista unificada de organizaciones para queries cross-module
+- **DDL**: `setup-postgres-unified-org.sql`
+
+### Identity & Reconciliation Setup *(nuevo)*
+
+### `setup-postgres-identity-v2.ts`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: Identity profiles v2 con campos extendidos
+- **DDL**: `setup-postgres-identity-v2.sql`
+- **Dependencias**: `canonical-360`
+
+### `setup-identity-reconciliation.ts`
+
+- **Schema**: `greenhouse_core`
+- **Crea**: `reconciliation_proposals`, `reconciliation_runs` para tracking de identity matching
+- **DDL**: `setup-identity-reconciliation.sql`
+- **Dependencias**: `identity-v2`
+
+### Finance Extensions Setup *(nuevo)*
+
+### `setup-postgres-finance-intelligence-p1.ts` / `p2.ts`
+
+- **Schema**: `greenhouse_finance`
+- **Crea**: Tablas y vistas para finance intelligence (client economics, allocations)
+- **DDL**: `setup-postgres-finance-intelligence-p1.sql`, `p2.sql`
+- **Dependencias**: `finance` base
+
+### `setup-postgres-finance-bridge-m33.ts`
+
+- **Schema**: `greenhouse_finance`
+- **Crea**: Bridge tables para vincular finance con Account 360 (organization_id en income/expenses)
+- **DDL**: `setup-postgres-finance-bridge-m33.sql`
+- **Dependencias**: `finance` + `account-360-m0`
+
+### `setup-postgres-nubox-extensions.ts`
+
+- **Schema**: `greenhouse_finance`
+- **Crea**: Extensiones de tablas para datos sincronizados desde Nubox
+- **DDL**: `setup-postgres-nubox-extensions.sql`
+- **Dependencias**: `finance` base
+
+### Nubox BigQuery Setup *(nuevo)*
+
+### `setup-bigquery-nubox-raw.ts`
+
+- **Crea**: Dataset `nubox_raw_snapshots` con tablas de archivo JSON crudo
+- **DDL**: `setup-bigquery-nubox-raw.sql`
+- **Propósito**: Destino para Fase A del pipeline Nubox
+
+### `setup-bigquery-nubox-conformed.ts`
+
+- **Crea**: Dataset `nubox_conformed` con tablas conformadas (ventas, compras con identity resolution)
+- **DDL**: `setup-bigquery-nubox-conformed.sql`
+- **Propósito**: Destino para Fase B del pipeline Nubox
+
+### Other Infrastructure Setup *(nuevo)*
+
+### `setup-postgres-transactional-email.ts`
+
+- **Schema**: Email transaccional
+- **Crea**: Tablas para tracking de emails enviados
+- **DDL**: `setup-postgres-transactional-email.sql`
+
+### `setup-bigquery-email-logs.ts`
+
+- **Crea**: Tabla de logs de email en BigQuery
 
 ### BigQuery Setup Scripts
 
@@ -317,15 +417,29 @@ pnpm setup:postgres:hr-leave
 pnpm setup:postgres:payroll
 pnpm setup:postgres:finance
 
-# 3. Extensiones
-pnpm setup:postgres:finance-slice2    # después de finance
+# 3. Extensiones de dominio
+pnpm setup:postgres:finance-slice2        # después de finance
 pnpm setup:postgres:ai-tooling
 pnpm setup:postgres:access
 pnpm setup:postgres:client-assignments
 pnpm setup:postgres:source-sync
 
-# 4. Serving layer (después de todos los schemas)
+# 4. Account 360 (después de canonical-360)
+pnpm setup:postgres:account-360-m0        # organizations, spaces, person_memberships
+pnpm setup:postgres:services              # services + service_history
+pnpm setup:postgres:space-notion-sources  # space-notion source mapping
+
+# 5. Identity v2 (después de canonical-360 y account-360)
+pnpm setup:postgres:identity-v2           # identity_profiles v2 + reconciliation
+
+# 6. Finance extensions (después de finance y account-360)
+pnpm setup:postgres:nubox-extensions      # nubox extensions en greenhouse_finance
+pnpm setup:postgres:finance-intelligence-p1  # finance intelligence tables
+pnpm setup:postgres:finance-intelligence-p2  # finance intelligence advanced
+
+# 7. Serving layer (después de todos los schemas)
 pnpm setup:postgres:person-360
+pnpm setup:postgres:organization-360      # organization serving views
 ```
 
 ### Backfill (carga de datos)
@@ -342,15 +456,32 @@ pnpm backfill:postgres:finance-slice2
 pnpm backfill:postgres:client-assignments
 pnpm backfill:postgres:ai-tooling
 
-# 3. Identidad y serving (al final)
+# 3. Account 360 y identity (después de core)
+pnpm backfill:account-360-m1              # organizations y spaces
+pnpm backfill:identity-v2                 # identity profiles v2
+
+# 4. Identidad y serving (al final)
 pnpm backfill:postgres:person-360-coverage
 
-# 4. Verificación
+# 5. Verificación
 pnpm pg:doctor
 pnpm audit:person-360
+pnpm verify:account-360
+pnpm run:identity-reconciliation
 ```
 
-### BigQuery (una vez, o para re-bootstrap)
+### BigQuery — Setup programático
+
+```bash
+# Nubox datasets (ejecutar antes de activar sync)
+pnpm setup:bigquery:nubox-raw             # nubox_raw_snapshots dataset
+pnpm setup:bigquery:nubox-conformed       # nubox_conformed dataset
+
+# Email logs (si se usa transactional email)
+# Ejecutar setup-bigquery-email-logs.ts
+```
+
+### BigQuery — Scripts SQL legacy (una vez, o para re-bootstrap)
 
 Los scripts SQL de `bigquery/` se ejecutan directamente en la consola de BigQuery o vía `bq query`. El orden recomendado:
 

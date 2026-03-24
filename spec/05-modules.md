@@ -1,7 +1,8 @@
 # Greenhouse Portal — Módulos Funcionales
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: ICO Engine, Account 360 / Organizations, Services, Finance Intelligence, Nubox Integration
 
 ---
 
@@ -467,3 +468,168 @@ Cálculos de capacidad y utilización del equipo.
 - Por proyecto
 - Por sprint
 - Health buckets (idle, balanced, high, overloaded)
+
+---
+
+## 14. ICO Engine (Delivery Intelligence) *(nuevo)*
+
+**Lib**: `src/lib/ico-engine/`
+**API**: `/api/ico-engine/*`
+**Fuente de datos**: BigQuery (`greenhouse_ico`, `greenhouse_conformed`)
+**Materialización**: Cron periódico `/api/cron/ico-materialize`
+
+### Propósito
+
+Motor de inteligencia de delivery que materializa métricas operativas (RPA, OTD, FTR, cycle time, stuck assets) a partir de datos de Notion conformados. Provee tanto métricas materializadas como cálculo live bajo demanda.
+
+### Metric Registry
+
+10 métricas definidas con umbrales de zona (optimal, attention, critical):
+
+| Métrica | Kind | Optimal | Attention | Critical |
+|---------|------|---------|-----------|----------|
+| `rpa` | average | 0–1.5 | 1.5–2.5 | >2.5 |
+| `otd_pct` | percentage | 90–100% | 70–90% | <70% |
+| `ftr_pct` | percentage | 80–100% | 60–80% | <60% |
+| `cycle_time` | duration | 0–7 días | 7–14 | >14 |
+| `throughput` | count | 20+ | 10–20 | <10 |
+| `pipeline_velocity` | ratio | 0.8+ | 0.5–0.8 | <0.5 |
+| `stuck_assets` | count | 0–2 | 2–5 | >5 |
+| `stuck_asset_pct` | percentage | 0–10% | 10–25% | >25% |
+
+### Fases CSC
+
+Pipeline creativo-operativo: `briefing` → `produccion` → `revision_interna` → `cambios_cliente` → `entrega`. Mapeo configurable por espacio vía `status_phase_config`.
+
+### Dimensiones de análisis
+
+- **Por espacio** — `readSpaceMetrics()`, `readLatestSpaceMetrics()`
+- **Por proyecto** — `readProjectMetrics()`
+- **Por miembro** — `readMemberMetrics()`, `readMemberMetricsBatch()`
+- **Agencia completa** — `readAgencyMetrics()` (rollup de todos los espacios)
+- **Live vs materializado** — `computeSpaceMetricsLive()` para cálculo on-demand
+
+### Stuck Assets
+
+Tareas con 72h+ sin movimiento. Detalle completo: tarea, fase CSC, horas/días estancado, severidad, RPA, review status.
+
+### Infrastructure
+
+`ensureIcoEngineInfrastructure()` — provisioning idempotente del schema BigQuery con migraciones resilientes. Si las tablas/vistas ya existen, no se recrean.
+
+---
+
+## 15. Account 360 / Organizations *(nuevo)*
+
+**Superficie**: `/agency/organizations`, `/agency/organizations/[id]`
+**Lib**: `src/lib/account-360/`
+**API**: `/api/organizations/*`
+**Vista**: `src/views/greenhouse/organizations/`
+**Fuente de datos**: PostgreSQL (`greenhouse_core`)
+
+### Propósito
+
+Vista unificada B2B que modela organizaciones (entidades jurídicas), espacios operativos (tenants), y membresías de personas. Reemplaza la relación plana `clients` con un modelo jerárquico.
+
+### Modelo de objetos
+
+- **Organization** (`EO-ORG-*`) — Entidad jurídica (cliente, proveedor, o ambos). VK a HubSpot Company.
+- **Space** (`EO-SPC-*`) — Espacio operativo 1:N por organización. Puente a `clients` legacy vía `client_id`.
+- **Person Membership** (`EO-MBR-*`) — Membresía de `identity_profile` en una organización, opcionalmente scoped a un espacio.
+
+### UI — Tabs
+
+| Tab | Contenido |
+|-----|-----------|
+| Overview | Datos de la organización, spaces, metadata |
+| People | Membresías y personas vinculadas |
+| Finance | Resumen financiero de la organización |
+| ICO | Métricas de delivery (ICO Engine) |
+| Integrations | Estado de sync con HubSpot |
+
+### Drawers
+
+- **EditOrganizationDrawer** — Editar datos de la organización
+- **AddMembershipDrawer** — Agregar persona a la organización
+
+### Identity Resolution
+
+- `findOrganizationByTaxId()` — Lookup por tax ID (RUT, RFC, EIN, VAT)
+- `ensureOrganizationForSupplier()` — Find-or-create para proveedores; upgrade a `both` si existe como client
+- `resolveOrganizationForClient()` — Resolver `organization_id` para income records vía `client_id → spaces` bridge
+
+---
+
+## 16. Services *(nuevo)*
+
+**Lib**: `src/lib/services/`
+**API**: `/api/agency/services/*`
+**Fuente de datos**: PostgreSQL (`greenhouse_core`)
+
+### Propósito
+
+CRUD de servicios de Efeonce vinculados a espacios, organizaciones, y sistemas externos (HubSpot deals, Notion projects).
+
+### Campos clave
+
+Nombre, espacio, organización, línea de servicio, servicio específico, modalidad, billing frequency, montos (total_cost, amount_paid), currency, pipeline stage, fechas, links a HubSpot/Notion.
+
+### History tracking
+
+Cada actualización registra un `service_history` entry con field_name, old_value, new_value, actor y timestamp.
+
+### IDs
+
+IDs públicos secuenciales `EO-SVC-{NNNN}` generados por secuencia PostgreSQL.
+
+---
+
+## 17. Finance Intelligence *(nuevo)*
+
+**API**: `/api/finance/intelligence/*`
+**Fuente de datos**: PostgreSQL (`greenhouse_finance`)
+
+### Propósito
+
+Capa analítica sobre el módulo financiero que expone métricas de rentabilidad por cliente, tendencias en el tiempo, y allocaciones de costos.
+
+### Endpoints
+
+- **Client Economics** — Rentabilidad por cliente: ingresos, gastos directos, margen
+- **Client Economics Trend** — Evolución temporal de la rentabilidad
+- **Allocations** — Distribución de costos por categoría/servicio
+
+---
+
+## 18. Nubox Integration *(nuevo)*
+
+**Lib**: `src/lib/nubox/`
+**API**: `/api/finance/nubox/*`
+**Fuente de datos**: Nubox API → BigQuery → PostgreSQL
+
+### Propósito
+
+Integración con Nubox (plataforma contable chilena) para sincronizar documentos tributarios electrónicos (DTEs): ventas, compras, egresos bancarios, ingresos bancarios.
+
+### Pipeline de 3 fases
+
+| Fase | Descripción | Destino |
+|------|-------------|---------|
+| A — Raw | Fetch de API Nubox, archive JSON crudo | BigQuery `nubox_raw_snapshots` |
+| B — Conformed | Transform + identity resolution (supplier → organization) | BigQuery `nubox_conformed` |
+| C — Postgres | Project a tablas operativas | PostgreSQL `greenhouse_finance` |
+
+### Cliente HTTP
+
+- Auth: Bearer token + API key
+- Retry automático en 429 (rate limit) y 5xx
+- Paginación automática
+- Timeout configurable
+
+### Mappers
+
+Transformaciones: `Sale → RawRow`, `Purchase → RawRow`, `Expense → RawRow`, `Income → RawRow` para normalización de esquemas entre Nubox y modelo interno.
+
+### Emisión
+
+`emission.ts` — Lógica para emisión (generación) de documentos tributarios a través de Nubox API.

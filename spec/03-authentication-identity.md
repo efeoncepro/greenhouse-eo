@@ -1,7 +1,8 @@
 # Greenhouse Portal — Autenticación e Identidad
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Identity Reconciliation Engine, Person 360 operacional, reconciliation proposals
 
 ---
 
@@ -224,3 +225,78 @@ La función `getTenantAccessRecordByEmail(email)` hace un JOIN complejo de 8+ ta
 4. **Domain allowlist** — Los tenants pueden configurar dominios de email permitidos para auto-provisioning
 5. **Token refresh con re-lookup** — Cada refresh del JWT re-consulta la base de datos para permisos actualizados
 6. **Feature flags por tenant** — Solo flags con status `enabled` o `staged` se cargan en sesión
+
+---
+
+## Identity Reconciliation Engine *(nuevo)*
+
+**Lib**: `src/lib/identity/reconciliation/`
+
+### Propósito
+
+Motor de unificación de identidades entre Notion, HubSpot CRM y Azure AD. Descubre identidades no vinculadas y las reconcilia contra la base de miembros canónica (`identity_profiles`).
+
+### Source Systems
+
+| Sistema | sourceObjectType | Ejemplo de sourceObjectId |
+|---------|-----------------|--------------------------|
+| `notion` | `user` | Notion user ID |
+| `hubspot_crm` | `contact`, `owner` | HubSpot contact/owner ID |
+| `azure_ad` | `user` | Azure AD OID |
+
+### Thresholds
+
+- **Auto-link**: Confidence ≥ 0.85 → vinculación automática sin intervención humana
+- **Review**: Confidence ≥ 0.40 → propuesta pendiente de revisión por admin
+- **No match**: Confidence < 0.40 → descartado
+
+### Matching Engine
+
+Multi-señal matching (`src/lib/identity/reconciliation/matching-engine.ts`):
+
+1. **Email exacto** — Match de email normalizado (lowercase, strip diacritics)
+2. **Name similarity** — Levenshtein distance + normalización (strip org suffix, collapse whitespace)
+3. **Display name patterns** — Coincidencia de displayName entre sistemas
+4. **Cross-reference** — Si un miembro ya tiene `notionUserId`, `hubspotOwnerId`, o `azureOid` en su registro
+
+### Normalización
+
+`normalize.ts` provee:
+- `normalizeMatchValue()` — lowercase, strip diacritics, collapse whitespace
+- `stripOrgSuffix()` — remover sufijos corporativos de nombres
+- `isUuidAsName()` — detectar UUIDs usados como nombres (Notion)
+- `levenshtein()` — distancia de edición para fuzzy matching
+
+### Discovery
+
+`discovery-notion.ts` — Descubre usuarios de Notion que aparecen en tareas/proyectos pero no están vinculados a ningún `identity_profile`.
+
+### Proposal Workflow
+
+```
+pending → pending_review → admin_approved / rejected
+pending → auto_linked (confidence ≥ 0.85)
+pending_review → dismissed
+```
+
+Cada propuesta (`ReconciliationProposal`) registra: sistema fuente, objeto fuente, candidato sugerido, confianza, señales de match, status, resolución.
+
+### Orquestación
+
+```typescript
+runIdentityReconciliation(opts?: { dryRun?: boolean, syncRunId?: string }): Promise<ReconciliationRunResult>
+```
+
+Retorna: `{ discoveredCount, alreadyLinkedCount, autoLinkedCount, pendingReviewCount, noMatchCount, errors, durationMs }`
+
+### Person 360 — Estado operacional
+
+La vista materializada `greenhouse_serving.person_360` está activa en producción. Consolida facets (member, user, crm_contact) con `identity_profile` como ancla canónica (`EO-ID{NNNN}`).
+
+Para obtener estadísticas actualizadas de cobertura y reconciliación, ejecutar:
+
+```bash
+pnpm audit:person-360
+```
+
+El script reporta: total de identity profiles, miembros vinculados, usuarios vinculados, contactos CRM vinculados, y contactos pendientes de reconciliación.

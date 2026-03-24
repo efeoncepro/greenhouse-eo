@@ -1,7 +1,8 @@
 # Greenhouse Portal — Referencia de API Routes
 
-> Versión: 1.0
-> Fecha: 2026-03-15
+> Versión: 2.0
+> Fecha: 2026-03-22
+> Actualizado: Organizations, ICO Engine, Finance Intelligence, Nubox, Services, Identity Reconciliation routes
 
 ---
 
@@ -542,9 +543,191 @@ Excluir item de reconciliación.
 | `/api/finance/dashboard/aging` | GET | Aging de cuentas por cobrar |
 | `/api/finance/dashboard/by-service-line` | GET | Breakdown por línea de servicio |
 
+### Finance Intelligence *(nuevo)*
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/intelligence/client-economics` | GET | Métricas de rentabilidad por cliente |
+| `/api/finance/intelligence/client-economics/trend` | GET | Tendencia de rentabilidad en el tiempo |
+| `/api/finance/intelligence/allocations` | GET | Allocaciones de costos |
+
+- **Auth**: `requireFinanceTenantContext()`
+
+### Nubox Sync *(nuevo)*
+
+### `POST /api/finance/nubox/sync`
+
+Orquestar sincronización de 3 fases (raw → conformed → postgres).
+
+- **Auth**: `requireFinanceTenantContext()`
+- **Body**: `{ periods?: string[] }` (opcional, para backfill histórico)
+- **Max Duration**: 120s
+- **Response**: `{ phase, status, rawCount, conformedCount, postgresCount, errors[] }`
+
+### `GET /api/finance/nubox/sync-status`
+
+Status del último sync run.
+
+- **Auth**: `requireFinanceTenantContext()`
+
 ---
 
-## 9. Capabilities
+## 9. Organizations (Account 360) *(nuevo)*
+
+### `GET /api/organizations`
+
+Lista de organizaciones con paginación y filtros.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `search?`, `type?`, `country?`, `page?`, `pageSize?`
+- **Response**: `{ items: OrganizationListItem[], total, page, pageSize }`
+
+### `GET /api/organizations/[id]`
+
+Detalle de organización con spaces y people.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Response**: `OrganizationDetail` (incluye spaces[], people[])
+
+### `PATCH /api/organizations/[id]`
+
+Actualizar datos de organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET/POST /api/organizations/[id]/memberships`
+
+Listar o crear membresías de personas en la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+- **POST Body**: `{ profileId, membershipType, roleLabel?, department?, spaceId?, isPrimary? }`
+
+### `GET /api/organizations/[id]/ico`
+
+Métricas ICO de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/finance`
+
+Datos financieros de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `POST /api/organizations/[id]/hubspot-sync`
+
+Trigger de sincronización HubSpot para la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/org-search`
+
+Búsqueda de organizaciones.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/people-search`
+
+Búsqueda de personas a través de organizaciones.
+
+- **Auth**: `requireInternalTenantContext()`
+
+---
+
+## 10. ICO Engine *(nuevo)*
+
+### `GET /api/ico-engine/metrics`
+
+Métricas de un espacio (live o materializadas).
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId` (required), `year?`, `month?`, `live?`
+- **Response**: `SpaceMetricSnapshot`
+
+### `GET /api/ico-engine/metrics/agency`
+
+Rollup de métricas a nivel agencia.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `year?`, `month?`
+- **Response**: `SpaceMetricSnapshot[]`
+
+### `GET /api/ico-engine/metrics/project`
+
+Métricas a nivel proyecto.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId` (required), `year?`, `month?`
+- **Response**: `ProjectMetricSnapshot[]`
+
+### `GET /api/ico-engine/health`
+
+Health check del ICO Engine.
+
+- **Auth**: `requireAgencyTenantContext()`
+
+### `GET /api/ico-engine/registry`
+
+Registro de métricas disponibles con umbrales.
+
+- **Auth**: `requireAgencyTenantContext()`
+
+### `GET /api/ico-engine/context`
+
+Contexto de espacio/proyecto.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId?`, `projectId?`
+
+### `GET /api/ico-engine/stuck-assets`
+
+Lista de tareas estancadas (72h+ sin movimiento).
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId` (required)
+- **Response**: `StuckAssetDetail[]`
+
+### `GET /api/ico-engine/trends/rpa`
+
+Tendencia de RPA últimos 12 meses.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId` (required)
+
+---
+
+## 11. Services *(nuevo)*
+
+### `GET /api/agency/services`
+
+Lista de servicios con filtros.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `search?`, `spaceId?`, `organizationId?`, `lineaDeServicio?`, `pipelineStage?`, `page?`, `pageSize?`
+- **Response**: `{ items: ServiceListItem[], total, page, pageSize }`
+
+### `GET /api/agency/services/[id]`
+
+Detalle de servicio con historial.
+
+- **Auth**: `requireAgencyTenantContext()`
+
+### `POST /api/agency/services`
+
+Crear servicio.
+
+- **Auth**: `requireAgencyTenantContext()`
+- **Response**: `{ serviceId, publicId, created }`
+
+### `PUT /api/agency/services/[id]`
+
+Actualizar servicio (field-level history tracking).
+
+- **Auth**: `requireAgencyTenantContext()`
+
+---
+
+## 12. Capabilities
 
 ### `GET /api/capabilities/resolve`
 
@@ -563,7 +746,7 @@ Datos de un módulo de capability específico.
 
 ---
 
-## 10. Agency
+## 13. Agency
 
 ### `GET /api/agency/pulse`
 
@@ -588,7 +771,7 @@ Capacidad de la agencia.
 
 ---
 
-## 11. AI Credits
+## 14. AI Credits
 
 ### `GET /api/ai-credits/wallets`
 
@@ -624,7 +807,7 @@ Recargar créditos.
 
 ---
 
-## 12. AI Tools (user-facing)
+## 15. AI Tools (user-facing)
 
 ### `GET /api/ai-tools/catalog`
 
@@ -640,7 +823,7 @@ Licencias de herramientas AI.
 
 ---
 
-## 13. Admin
+## 16. Admin
 
 ### Admin — Tenants
 
@@ -693,7 +876,7 @@ Licencias de herramientas AI.
 
 ---
 
-## 14. Integrations
+## 17. Integrations
 
 ### `GET /api/integrations/v1/tenants`
 
@@ -717,7 +900,7 @@ Sincronizar capabilities de un tenant desde integración.
 
 ---
 
-## 15. Internal
+## 18. Internal
 
 ### `GET/POST /api/internal/greenhouse-agent`
 
@@ -730,7 +913,7 @@ Agente AI de Greenhouse (Vertex AI).
 
 ---
 
-## 16. Media
+## 19. Media
 
 ### `GET /api/media/tenants/[id]/logo`
 
@@ -748,7 +931,7 @@ Servir avatar del usuario.
 
 ---
 
-## 17. Cron
+## 20. Cron
 
 ### `POST /api/cron/outbox-publish`
 
@@ -757,3 +940,17 @@ Publicar eventos del outbox PostgreSQL hacia BigQuery.
 - **Auth**: Cron secret verification (`CRON_SECRET`)
 - **Frecuencia**: Cada 5 minutos (Vercel cron)
 - **Response**: `{ eventsRead, eventsPublished, eventsFailed, durationMs }`
+
+### `POST /api/cron/ico-materialize` *(nuevo)*
+
+Materializar métricas ICO Engine (snapshots, stuck assets, trends).
+
+- **Auth**: Cron secret verification (`CRON_SECRET`)
+- **Frecuencia**: Periódica (configurable)
+- **Response**: `{ spacesProcessed, snapshotsCreated, stuckAssetsRefreshed, durationMs }`
+
+### `POST /api/cron/sync-conformed` *(nuevo)*
+
+Sincronizar datos conformados desde fuentes externas.
+
+- **Auth**: Cron secret verification (`CRON_SECRET`)
