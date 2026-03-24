@@ -108,7 +108,7 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
   const bigQuery = getBigQueryClient()
 
   const query = `
-    WITH delivery_projects AS (
+    WITH projects AS (
       SELECT *
       FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
       WHERE project_source_id IN UNNEST(@projectIds)
@@ -120,14 +120,15 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
     ),
     scoped_tasks AS (
       SELECT
-        proyecto AS notion_page_id,
-        estado,
-        COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
-        COALESCE(client_review_open, FALSE) AS client_review_open,
-        COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
-        COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments
-      FROM \`${projectId}.notion_ops.tareas\`
-      WHERE proyecto IN UNNEST(@projectIds)
+        dt.project_source_id AS notion_page_id,
+        dt.task_status AS estado,
+        COALESCE(SAFE_CAST(dt.rpa_value AS FLOAT64), 0) AS rpa_value,
+        COALESCE(dt.client_review_open, FALSE) AS client_review_open,
+        COALESCE(dt.workflow_review_open, FALSE) AS workflow_review_open,
+        COALESCE(dt.open_frame_comments, 0) AS open_frame_comments
+      FROM \`${projectId}.greenhouse_conformed.delivery_tasks\` dt
+      WHERE dt.project_source_id IN UNNEST(@projectIds)
+        AND dt.is_deleted = FALSE
     ),
     task_summary AS (
       SELECT
@@ -141,27 +142,22 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
       GROUP BY notion_page_id
     )
     SELECT
-      t.notion_page_id,
-      COALESCE(dp.project_name, p.nombre_del_proyecto, t.notion_page_id) AS project_name,
-      COALESCE(dp.project_status, p.estado, 'Unknown') AS status,
-      COALESCE(dp.start_date, p.fechas) AS start_date,
-      COALESCE(dp.end_date, p.fechas_end) AS end_date,
-      t.total_tasks,
-      t.active_tasks,
-      t.completed_tasks,
+      COALESCE(p.project_source_id, t.notion_page_id) AS notion_page_id,
+      COALESCE(p.project_name, t.notion_page_id) AS project_name,
+      COALESCE(p.project_status, 'Unknown') AS status,
+      p.start_date,
+      p.end_date,
+      COALESCE(t.total_tasks, 0) AS total_tasks,
+      COALESCE(t.active_tasks, 0) AS active_tasks,
+      COALESCE(t.completed_tasks, 0) AS completed_tasks,
       t.avg_rpa,
-      t.open_review_items,
-      COALESCE(
-        SAFE_CAST(REPLACE(p.pct_on_time, ' %', '') AS FLOAT64),
-        ROUND(SAFE_DIVIDE(t.completed_tasks, t.total_tasks) * 100, 0)
-      ) AS progress_value,
+      COALESCE(t.open_review_items, 0) AS open_review_items,
+      ROUND(SAFE_DIVIDE(COALESCE(t.completed_tasks, 0), NULLIF(COALESCE(t.total_tasks, 0), 0)) * 100, 0) AS progress_value,
       p.page_url
-    FROM task_summary t
-    LEFT JOIN delivery_projects dp
-      ON dp.project_source_id = t.notion_page_id
-    LEFT JOIN \`${projectId}.notion_ops.proyectos\` p
-      ON p.notion_page_id = t.notion_page_id
-    ORDER BY t.active_tasks DESC, t.total_tasks DESC
+    FROM projects p
+    LEFT JOIN task_summary t
+      ON t.notion_page_id = p.project_source_id
+    ORDER BY COALESCE(t.active_tasks, 0) DESC, COALESCE(t.total_tasks, 0) DESC
   `
 
   const response = await bigQuery.query({

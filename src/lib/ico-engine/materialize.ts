@@ -12,6 +12,7 @@ interface MaterializationResult {
   rpaTrendRowsWritten: number
   projectMetricsWritten: number
   memberMetricsWritten: number
+  sprintMetricsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
@@ -183,6 +184,9 @@ export const materializeMonthlySnapshots = async (
   // Step 7: Materialize member-level metrics for current period
   const memberMetricsWritten = await materializeMemberMetrics(projectId, periodYear, periodMonth)
 
+  // Step 8: Materialize sprint-level metrics for current period
+  const sprintMetricsWritten = await materializeSprintMetrics(projectId, periodYear, periodMonth)
+
   return {
     spacesProcessed: totalSnapshots,
     snapshotsWritten: totalSnapshots,
@@ -190,6 +194,7 @@ export const materializeMonthlySnapshots = async (
     rpaTrendRowsWritten,
     projectMetricsWritten,
     memberMetricsWritten,
+    sprintMetricsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,
@@ -368,4 +373,52 @@ const materializeMemberMetrics = async (
   `, { periodYear, periodMonth })
 
   return toNumber(countRows[0]?.cnt)
+}
+
+// ─── Sprint-Level Metrics Materialization ────────────────────────────────────
+
+const materializeSprintMetrics = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
+      (sprint_source_id, space_id, period_year, period_month,
+       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       materialized_at)
+    SELECT
+      sprint_source_id,
+      space_id,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+
+      ${buildMetricSelectSQL()},
+
+      CURRENT_TIMESTAMP() AS materialized_at
+
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    WHERE space_id IS NOT NULL
+      AND sprint_source_id IS NOT NULL
+      AND sprint_source_id != ''
+      AND (${buildPeriodFilterSQL()})
+    GROUP BY sprint_source_id, space_id
+  `, { periodYear, periodMonth })
+
+  const sprintCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(sprintCountRows[0]?.cnt)
 }

@@ -34,10 +34,16 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
-    IF(dt.assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(dt.assignee_member_ids) > 0,
-       dt.assignee_member_ids,
-       IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], [])
-    ) AS assignee_member_ids,
+    -- Multi-assignee resolution: prefer explicit array, fall back to single ID.
+    -- When notion-bq-sync populates responsables_member_ids (future), this will
+    -- automatically pick up multi-assignee data. Until then, single-ID fallback.
+    CASE
+      WHEN dt.assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(dt.assignee_member_ids) > 0
+        THEN dt.assignee_member_ids
+      WHEN dt.assignee_member_id IS NOT NULL
+        THEN [dt.assignee_member_id]
+      ELSE []
+    END AS assignee_member_ids,
     dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
@@ -281,6 +287,34 @@ const buildMetricsByMemberTable = (projectId: string) => `
 `
 
 /**
+ * Sprint-level metrics. Same structure as metrics_by_project but keyed by sprint_source_id.
+ */
+const buildMetricsBySprintTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.metrics_by_sprint\` (
+    sprint_source_id STRING NOT NULL,
+    space_id STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    rpa_avg FLOAT64,
+    rpa_median FLOAT64,
+    otd_pct FLOAT64,
+    ftr_pct FLOAT64,
+    cycle_time_avg_days FLOAT64,
+    cycle_time_p50_days FLOAT64,
+    cycle_time_variance FLOAT64,
+    throughput_count INT64,
+    pipeline_velocity FLOAT64,
+    stuck_asset_count INT64,
+    stuck_asset_pct FLOAT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
+    materialized_at TIMESTAMP
+  )
+  CLUSTER BY space_id, sprint_source_id
+`
+
+/**
  * Configurable mapping of task_status → CSC phase per space.
  * Used by v_tasks_enriched via LEFT JOIN — unmapped statuses fall back to the
  * hardcoded CASE (Efeonce defaults).
@@ -378,6 +412,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['rpa_trend', buildRpaTrendTable(projectId)],
         ['metrics_by_project', buildMetricsByProjectTable(projectId)],
         ['metrics_by_member', buildMetricsByMemberTable(projectId)],
+        ['metrics_by_sprint', buildMetricsBySprintTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 

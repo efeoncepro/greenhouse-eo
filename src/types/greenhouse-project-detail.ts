@@ -76,6 +76,9 @@ export interface GreenhouseProjectTaskItem {
   changesTimeLabel: string | null
   reviewTimeLabel: string | null
   sprintName: string | null
+  cycleTimeDays: number | null
+  faseCsc: string | null
+  isStuck: boolean
   lastFrameComment: string | null
   lastEditedAt: string | null
   pageUrl: string | null

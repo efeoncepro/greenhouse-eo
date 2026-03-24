@@ -69,6 +69,9 @@ interface TaskRow {
   execution_time_label: string | null
   changes_time_label: string | null
   review_time_label: string | null
+  cycle_time_days: number | string | null
+  fase_csc: string | null
+  is_stuck: boolean | null
   sprint_name: string | null
   last_frame_comment: string | null
   last_edited_time: { value?: string } | string | null
@@ -428,6 +431,27 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       \`tiempo_de_ejecución\` AS execution_time_label,
       \`tiempo_en_cambios\` AS changes_time_label,
       \`tiempo_en_revisión\` AS review_time_label,
+      -- Computed: cycle time in days (creation to completion or now)
+      DATE_DIFF(
+        COALESCE(DATE(\`fecha_de_completado\`), CURRENT_DATE()),
+        COALESCE(DATE(created_time), CURRENT_DATE()),
+        DAY
+      ) AS cycle_time_days,
+      -- Computed: CSC phase
+      CASE
+        WHEN estado IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar') THEN 'briefing'
+        WHEN estado IN ('En curso', 'En Curso') THEN 'produccion'
+        WHEN estado LIKE 'Listo para revis%' THEN 'revision_interna'
+        WHEN estado = 'Cambios Solicitados' THEN 'cambios_cliente'
+        WHEN estado IN ('Listo', 'Done', 'Finalizado', 'Completado') THEN 'entrega'
+        ELSE 'otros'
+      END AS fase_csc,
+      -- Computed: is stuck (72+ hours no edit while active)
+      (
+        estado NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada', 'Sin empezar', 'Backlog', 'Pendiente')
+        AND last_edited_time IS NOT NULL
+        AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), last_edited_time, HOUR) >= 72
+      ) AS is_stuck,
       sprint AS sprint_name,
       last_frame_comment,
       last_edited_time,
@@ -482,6 +506,9 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       executionTimeLabel: row.execution_time_label,
       changesTimeLabel: row.changes_time_label,
       reviewTimeLabel: row.review_time_label,
+      cycleTimeDays: row.cycle_time_days === null || row.cycle_time_days === undefined ? null : toNumber(row.cycle_time_days),
+      faseCsc: row.fase_csc || null,
+      isStuck: Boolean(row.is_stuck),
       sprintName: row.sprint_name,
       lastFrameComment: row.last_frame_comment,
       lastEditedAt: toDateString(row.last_edited_time),
