@@ -6,7 +6,14 @@
 
 ## 2026-03-24
 
-### TASK-017 Campaign 360 implemented (Fase 1 MVP)
+### TASK-017 Campaign 360 completed (full implementation)
+- **Budget/Margin**: `budget_clp` and `currency` columns added to campaigns. `getCampaignFinancials()` computes revenue, labor cost, direct costs, margin, and budget utilization per campaign via client economics.
+- **Derived Roster**: `getCampaignRoster()` resolves team members from BigQuery delivery_tasks assignees across linked projects. No separate roster table — team is always derived from actual work.
+- **Campaign 360 API**: `GET /api/campaigns/{id}/360` returns campaign + metrics + financials + team in a single call. Plus individual endpoints for `/financials`, `/roster`.
+- **UI List View**: `/campaigns` page with status/type filters, campaign cards grid, create dialog with budget field.
+- **UI Detail View**: `/campaigns/[id]` with 6 KPI cards, 4 tabs (Resumen with budget bar, Proyectos, Equipo with roster table, Finanzas with margin KPIs).
+
+### TASK-017 Campaign 360 — Fase 1 MVP (backend)
 - DDL: `greenhouse_core.campaigns` + `greenhouse_core.campaign_project_links` with space boundary, EO-ID sequence, and unique constraint (1 project per campaign per space).
 - Store: `campaign-store.ts` with CRUD (create, list, get, update) + project link management (add, remove, list). Auto-provisioning schema singleton.
 - API: 6 endpoints unified under `/api/campaigns` — list/create, get/patch by ID, project links CRUD, metrics. Guards: internal for write, any auth for read with campaign_subset enforcement.

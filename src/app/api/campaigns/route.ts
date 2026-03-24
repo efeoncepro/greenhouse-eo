@@ -74,7 +74,9 @@ export async function POST(request: Request) {
       createdByUserId: tenant.userId,
       tags: body.tags,
       channels: body.channels,
-      notes: body.notes
+      notes: body.notes,
+      budgetClp: body.budgetClp,
+      currency: body.currency
     })
 
     return NextResponse.json(campaign, { status: 201 })

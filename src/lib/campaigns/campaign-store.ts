@@ -26,6 +26,8 @@ export interface Campaign {
   tags: string[]
   channels: string[]
   notes: string | null
+  budgetClp: number | null
+  currency: string
   projectCount: number
   createdAt: string
   updatedAt: string
@@ -60,6 +62,8 @@ interface CampaignRow extends Record<string, unknown> {
   tags: string[]
   channels: string[]
   notes: string | null
+  budget_clp: string | number | null
+  currency: string
   project_count?: string | number
   created_at: string
   updated_at: string
@@ -103,10 +107,19 @@ export const ensureCampaignSchema = async (): Promise<void> => {
         tags TEXT[] NOT NULL DEFAULT '{}',
         channels TEXT[] NOT NULL DEFAULT '{}',
         notes TEXT,
+        budget_clp NUMERIC(14,2),
+        currency TEXT NOT NULL DEFAULT 'CLP',
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `)
+    // Add budget columns if table existed before this change
+    await runGreenhousePostgresQuery(`
+      ALTER TABLE greenhouse_core.campaigns ADD COLUMN IF NOT EXISTS budget_clp NUMERIC(14,2)
+    `).catch(() => {})
+    await runGreenhousePostgresQuery(`
+      ALTER TABLE greenhouse_core.campaigns ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'CLP'
+    `).catch(() => {})
     await runGreenhousePostgresQuery(`
       CREATE TABLE IF NOT EXISTS greenhouse_core.campaign_project_links (
         campaign_project_link_id TEXT PRIMARY KEY,
@@ -156,6 +169,8 @@ const mapCampaign = (row: CampaignRow): Campaign => ({
   tags: row.tags || [],
   channels: row.channels || [],
   notes: row.notes,
+  budgetClp: row.budget_clp != null ? Number(row.budget_clp) : null,
+  currency: row.currency || 'CLP',
   projectCount: Number(row.project_count ?? 0),
   createdAt: String(row.created_at),
   updatedAt: String(row.updated_at)
@@ -243,6 +258,8 @@ export const createCampaign = async (input: {
   tags?: string[]
   channels?: string[]
   notes?: string
+  budgetClp?: number
+  currency?: string
 }): Promise<Campaign> => {
   await ensureCampaignSchema()
 
@@ -261,6 +278,7 @@ export const createCampaign = async (input: {
       planned_start_date, planned_end_date, planned_launch_date,
       owner_user_id, created_by_user_id,
       tags, channels, notes,
+      budget_clp, currency,
       created_at, updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6,
@@ -268,6 +286,7 @@ export const createCampaign = async (input: {
       $9::date, $10::date, $11::date,
       $12, $13,
       $14, $15, $16,
+      $17, $18,
       NOW(), NOW()
     )
     RETURNING *, 0 AS project_count`,
@@ -276,7 +295,8 @@ export const createCampaign = async (input: {
       input.campaignType || 'campaign', input.status || 'draft',
       input.plannedStartDate || null, input.plannedEndDate || null, input.plannedLaunchDate || null,
       input.ownerUserId || null, input.createdByUserId || null,
-      input.tags || [], input.channels || [], input.notes || null
+      input.tags || [], input.channels || [], input.notes || null,
+      input.budgetClp ?? null, input.currency || 'CLP'
     ]
   )
 
@@ -322,7 +342,9 @@ export const updateCampaign = async (
     ownerUserId: 'owner_user_id',
     tags: 'tags',
     channels: 'channels',
-    notes: 'notes'
+    notes: 'notes',
+    budgetClp: 'budget_clp',
+    currency: 'currency'
   }
 
   for (const [key, col] of Object.entries(fieldMap)) {
