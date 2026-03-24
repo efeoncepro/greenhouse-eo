@@ -25,6 +25,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import CustomAvatar from '@core/components/mui/Avatar'
 import themeConfig from '@configs/themeConfig'
 import { useSettings } from '@core/hooks/useSettings'
+import { CATEGORY_ICONS, timeAgo } from '@/config/notification-ui'
 
 // ── Types ──
 
@@ -37,43 +38,6 @@ interface ApiNotification {
   icon: string | null
   read_at: string | null
   created_at: string
-}
-
-// ── Helpers ──
-
-const CATEGORY_ICONS: Record<string, { icon: string; color: 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary' }> = {
-  delivery_update: { icon: 'tabler-package', color: 'info' },
-  sprint_milestone: { icon: 'tabler-flag', color: 'primary' },
-  feedback_requested: { icon: 'tabler-message-circle', color: 'warning' },
-  report_ready: { icon: 'tabler-file-analytics', color: 'success' },
-  leave_status: { icon: 'tabler-calendar-event', color: 'info' },
-  payroll_ready: { icon: 'tabler-currency-dollar', color: 'success' },
-  assignment_change: { icon: 'tabler-user-plus', color: 'primary' },
-  ico_alert: { icon: 'tabler-alert-triangle', color: 'error' },
-  capacity_warning: { icon: 'tabler-users', color: 'warning' },
-  system_event: { icon: 'tabler-settings', color: 'secondary' }
-}
-
-const timeAgo = (dateStr: string): string => {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diffMs = now - then
-
-  if (diffMs < 60_000) return 'Ahora'
-
-  const mins = Math.floor(diffMs / 60_000)
-
-  if (mins < 60) return `Hace ${mins}m`
-
-  const hours = Math.floor(mins / 60)
-
-  if (hours < 24) return `Hace ${hours}h`
-
-  const days = Math.floor(hours / 24)
-
-  if (days < 7) return `Hace ${days}d`
-
-  return new Date(dateStr).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' })
 }
 
 const ScrollWrapper = ({ children, hidden }: { children: ReactNode; hidden: boolean }) => {
