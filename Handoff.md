@@ -40,6 +40,117 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 16:41 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Materializar en GitHub el Project operativo definido documentalmente y enlazarlo de forma real con `efeoncepro/greenhouse-eo`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- GitHub / workflow operativo
+
+### Archivos tocados
+- `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Acciones externas ejecutadas
+- Project creado:
+  - `efeoncepro / Greenhouse Delivery`
+  - `https://github.com/orgs/efeoncepro/projects/2`
+- README del Project cargada desde CLI
+- Campos custom creados:
+  - `Pipeline`
+  - `Task ID`
+  - `Rank`
+  - `Priority`
+  - `Domain`
+  - `Blocked`
+  - `Blocker Note`
+  - `Task Doc`
+  - `Legacy ID`
+  - `Preview URL`
+  - `Target Env`
+  - `Impact`
+  - `Effort`
+- Issues bootstrap creadas en `efeoncepro/greenhouse-eo` y agregadas al Project:
+  - `#9` `[TASK-001] HR Payroll Operational Hardening`
+  - `#10` `[TASK-002] Tenant Notion Mapping`
+  - `#11` `[TASK-003] Invoice Payment Ledger Correction`
+  - `#12` `[TASK-004] Finance Dashboard Calculation Correction`
+  - `#13` `[TASK-005] HR Payroll Attendance Leave Work Entries`
+  - `#14` `[TASK-006] Webhook Infrastructure MVP`
+  - `#15` `[TASK-007] Lint Debt Burn Down`
+  - `#16` `[TASK-008] Team Identity Capacity System v2`
+  - `#17` `[TASK-009] Greenhouse Home Nexa v2`
+  - `#18` `[TASK-010] Organization Economics Dashboard`
+
+### Verificación
+- `gh project view 2 --owner efeoncepro` confirma existencia del Project
+- `gh issue list -R efeoncepro/greenhouse-eo` confirma creación de las issues `#9` a `#18`
+- GraphQL verificado contra GitHub:
+  - `TASK-001` quedó con `Status = In Progress` y `Pipeline = In Progress`
+  - `TASK-002` a `TASK-010` quedaron con `Status = Todo` y `Pipeline = Ready`
+  - `Task ID`, `Rank`, `Priority`, `Domain`, `Blocked`, `Task Doc`, `Legacy ID`, `Impact` y `Effort` quedaron poblados en los items bootstrap
+
+### Riesgos o pendientes
+- Las vistas del Project (`Board - Execution`, `Table - Backlog`, etc.) siguen pendientes de crearse manualmente en la UI o por una ruta GraphQL adicional.
+- El campo `Iteration` no quedó creado desde CLI en este turno; si se quiere roadmap vivo por sprint, habrá que completarlo desde la UI o con una mutación GraphQL específica.
+- El repo ya quedó enlazado operacionalmente al Project vía issues reales; el siguiente paso natural es decidir owners iniciales y comenzar a mover `TASK-002+` según capacidad real.
+
+## 2026-03-24 12:30 America/Santiago
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Normalizar la gobernanza del sistema de tasks sin renombrar masivamente el backlog legacy.
+- Dejar una plantilla canonica para crear e interpretar tasks nuevas con IDs estables `TASK-###`.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `develop`
+
+### Ambiente objetivo
+- Documentacion / workflow operativo
+
+### Archivos tocados
+- `docs/tasks/TASK_TEMPLATE.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
+- `.github/ISSUE_TEMPLATE/task_execution.yml`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `docs/tasks/README.md`
+- `docs/README.md`
+- `AGENTS.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificación
+- Validacion documental/manual de consistencia entre:
+  - template nuevo
+  - registro de IDs bootstrap
+  - operating model de GitHub Project
+  - issue template nuevo
+  - PR template
+  - reglas del índice de tasks
+  - reglas operativas de `AGENTS.md`
+- Pendiente de este turno: crear el Project real en GitHub, cargar `TASK-001..010` y migracion masiva de archivos legacy `CODEX_TASK_*` a `TASK-###`.
+
+### Riesgos o pendientes
+- El repo queda en modo mixto por diseño: `TASK-###` para tasks nuevas y `CODEX_TASK_*` legacy hasta migracion.
+- No se renombraron briefs existentes en este turno para evitar churn documental y rotura de referencias historicas.
+- El primer bloque `TASK-001..010` ya quedó reservado documentalmente; falta materializarlo en GitHub Issues / Project.
+- Siguiente paso recomendado: crear el Project `Greenhouse Delivery`, cargar `TASK-001..010` y decidir si los items iniciales se crean como issues reales o draft items.
+
 ## 2026-03-22 09:32 -03
 
 ### Agente

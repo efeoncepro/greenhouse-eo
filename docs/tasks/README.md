@@ -1,6 +1,24 @@
-# Codex Tasks
+# Task Index
 
-Panel operativo de briefs `CODEX_TASK_*` del repo.
+Panel operativo de tasks del repo.
+
+## Convencion vigente
+
+- Las tasks nuevas deben usar `TASK-###` como ID estable.
+- Los `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion.
+- El numero de `TASK-###` no define prioridad mutable; el orden actual vive en `Rank` y en el backlog priorizado de este indice.
+- Plantilla canonica para crear y leer tasks:
+  - [TASK_TEMPLATE.md](TASK_TEMPLATE.md)
+- Registro canonico de IDs bootstrap:
+  - [TASK_ID_REGISTRY.md](TASK_ID_REGISTRY.md)
+
+## Bootstrap actual
+
+Primer bloque operativo asignado:
+
+- `TASK-001` a `TASK-010` ya reservados para la lane activa y el top 9 abierto del backlog
+- siguiente ID disponible: `TASK-011`
+- cualquier fila sin `Task ID` fuera de ese bloque sigue pendiente de bootstrap
 
 ## Estados
 
@@ -10,9 +28,9 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 ## In Progress
 
-| Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
-| --- | --- | --- | --- | --- | --- |
-| [CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md](in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md) | P1 | Alto | Alto | Parcial | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
+| Task ID | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
+| --- | --- | --- | --- | --- | --- | --- |
+| `TASK-001` | [CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md](in-progress/CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md) | P1 | Alto | Alto | Parcial | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
 
 ## To Do
 
@@ -32,30 +50,37 @@ Panel operativo de briefs `CODEX_TASK_*` del repo.
 
 ### Backlog Priorizado
 
-| Orden | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1 | [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | P0 | Alto | Medio | Parcial | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion` |
-| 2 | ~~CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md~~ | — | — | — | **Cerrada** | People consumers migrados a Postgres-first con BigQuery fallback; backfill script para reconciliación de orphan profiles; 22 tests unitarios |
-| 3 | ~~GREENHOUSE_IDENTITY_ACCESS_V2.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de arquitectura → `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. 12/12 items implementados |
-| 4 | ~~CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md~~ | — | — | — | **Cerrada** | 3 slices completos: accounts/suppliers/rates, income/expenses CRUD, reconciliación runtime — todo Postgres-first con BigQuery fallback |
-| 5 | ~~CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md~~ | — | — | — | **Cerrada** | 3 slices: member reads/mutations, assignment reads/mutations, team-queries — todo Postgres-first con BigQuery fallback |
-| 6 | ~~CODEX_TASK_People_360_Enrichments_v1.md~~ | — | — | — | **Cerrada** | Tab Identidad (4 cards: identidad, acceso, perfil laboral, actividad operativa), CTAs cross-module en Nómina y Finanzas |
-| 7 | [CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md](to-do/CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md) | P1 | Alto | Alto | Diseño | Capa canónica de work entries para reconciliar permisos, asistencia y futura integración con Microsoft Teams antes de nómina |
-| 8 | [CODEX_TASK_Webhook_Infrastructure_MVP_v1.md](to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md) | P1 | Alto | Medio | Diseño | Foundation reusable para inbound/outbound webhooks, delivery logs, retries y dead letters encima de `greenhouse_sync.outbox_events` |
-| 9 | [CODEX_TASK_Lint_Debt_Burn_Down_v1.md](to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md) | P1 | Alto | Medio | Diseño | Recuperar baseline `pnpm lint` limpio con autofix controlado + cleanup manual de imports, unused vars y `require()` legacy |
-| 10 | ~~CODEX_TASK_Creative_Hub_Module_v2.md~~ | — | — | — | **Cerrada** | 4/4 gaps resueltos: AND gate activación, Brand Intelligence con KPIs reales, CSC pipeline con fases explícitas, métricas con aging real por item |
-| 11 | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
-| 12 | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
-| 13 | [CODEX_TASK_Financial_Intelligence_Layer_v2.md](to-do/CODEX_TASK_Financial_Intelligence_Layer_v2.md) | P2 | Alto | Medio | Diseño | Trends, partnerships, cost allocations UI, LTV/CAC y vista analytics consolidada sobre foundation ya implementada |
-| 14 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
-| 15 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
-| 16 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
-| 17 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
-| 18 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
-| 19 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
-| 20 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
-| 21 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
-| 22 | [CODEX_TASK_Typography_Variant_Adoption_v1.md](to-do/CODEX_TASK_Typography_Variant_Adoption_v1.md) | P3 | Medio | Bajo | Diseño | Migrar 56+ fontWeight/fontFamily hardcodeados a theme variants en 4 slices: redundantes finance, executive cards, monoId/monoAmount, kpiValue |
+| Rank | Task ID | Task | Prioridad | Impacto | Esfuerzo | Estado real | Foco |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | `TASK-002` | [CODEX_TASK_Tenant_Notion_Mapping.md](to-do/CODEX_TASK_Tenant_Notion_Mapping.md) | P0 | Alto | Medio | Parcial | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion` |
+| 2 | `TASK-003` | [CODEX_TASK_Invoice_Payment_Ledger_Correction_v1.md](to-do/CODEX_TASK_Invoice_Payment_Ledger_Correction_v1.md) | P0 | Muy alto | Medio | Diseño | **Corrección de integridad.** Nubox bank movements escriben `income.amount_paid` directamente sin crear registros en `income_payments`. Pagos sin trazabilidad, reconciliación bancaria incompleta, riesgo de duplicación. Corregir flujo para que todo pago pase por ledger. |
+| 3 | `TASK-004` | [CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1.md](to-do/CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1.md) | P0 | Muy alto | Medio | Diseño | **Corrección de cálculos.** Dashboard financiero muestra facturado como ingreso, flujo de caja falso (accrual - accrual), egresos inconsistentes (con/sin nómina), fuentes divergentes (BigQuery vs Postgres). 6 problemas documentados. Migrar a Postgres-first, KPIs duales facturado/cobrado, cash flow real. |
+| 4 | ~~CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1.md~~ | — | — | — | — | **Cerrada** | People consumers migrados a Postgres-first con BigQuery fallback; backfill script para reconciliación de orphan profiles; 22 tests unitarios |
+| 5 | ~~GREENHOUSE_IDENTITY_ACCESS_V2.md~~ | — | — | — | — | **Movida a spec** | Reclasificada como documento de arquitectura → `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. 12/12 items implementados |
+| 6 | ~~CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md~~ | — | — | — | — | **Cerrada** | 3 slices completos: accounts/suppliers/rates, income/expenses CRUD, reconciliación runtime — todo Postgres-first con BigQuery fallback |
+| 7 | ~~CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1.md~~ | — | — | — | — | **Cerrada** | 3 slices: member reads/mutations, assignment reads/mutations, team-queries — todo Postgres-first con BigQuery fallback |
+| 8 | ~~CODEX_TASK_People_360_Enrichments_v1.md~~ | — | — | — | — | **Cerrada** | Tab Identidad (4 cards: identidad, acceso, perfil laboral, actividad operativa), CTAs cross-module en Nómina y Finanzas |
+| 9 | `TASK-005` | [CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md](to-do/CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md) | P1 | Alto | Alto | Diseño | Capa canónica de work entries para reconciliar permisos, asistencia y futura integración con Microsoft Teams antes de nómina |
+| 10 | `TASK-006` | [CODEX_TASK_Webhook_Infrastructure_MVP_v1.md](to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md) | P1 | Alto | Medio | Diseño | Foundation reusable para inbound/outbound webhooks, delivery logs, retries y dead letters encima de `greenhouse_sync.outbox_events` |
+| 11 | `TASK-007` | [CODEX_TASK_Lint_Debt_Burn_Down_v1.md](to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md) | P1 | Alto | Medio | Diseño | Recuperar baseline `pnpm lint` limpio con autofix controlado + cleanup manual de imports, unused vars y `require()` legacy |
+| 12 | ~~CODEX_TASK_Creative_Hub_Module_v2.md~~ | — | — | — | — | **Cerrada** | 4/4 gaps resueltos: AND gate activación, Brand Intelligence con KPIs reales, CSC pipeline con fases explícitas, métricas con aging real por item |
+| 13 | `TASK-008` | [CODEX_TASK_Team_Identity_Capacity_System_v2.md](to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md) | P1 | Alto | Alto | Parcial | Formalización de capacity y su encaje con People, assignments e identidad canónica |
+| 14 | `TASK-009` | [CODEX_TASK_Greenhouse_Home_Nexa_v2.md](to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md) | P1 | Alto | Medio | Diseño | Nueva entrada `client-first` al portal con `Home` como puerta principal del usuario |
+| 15 | `TASK-010` | [CODEX_TASK_Organization_Economics_Dashboard_v1.md](to-do/CODEX_TASK_Organization_Economics_Dashboard_v1.md) | P1 | Muy alto | Medio | Diseño | **Sinergia cross-module.** Dashboard ejecutivo por org que correlaciona revenue (Finance) + costo laboral real (Payroll/FTE) + eficiencia operativa (ICO Engine) + margen ajustado. Cierra el loop completo de rentabilidad. |
+| 16 | `reservar TASK-011` | [CODEX_TASK_ICO_Person_360_Integration_v1.md](to-do/CODEX_TASK_ICO_Person_360_Integration_v1.md) | P1 | Alto | Medio | Diseño | **Sinergia cross-module.** Proyectar métricas ICO (RPA, OTD, FTR, cycle time) a `person_delivery_360` vía Postgres. Perfil operativo completo: compensación × FTE × eficiencia. |
+| 17 | [CODEX_TASK_Outbox_Event_Expansion_v1.md](to-do/CODEX_TASK_Outbox_Event_Expansion_v1.md) | P1 | Alto | Medio | Diseño | **Sinergia cross-module.** Expandir outbox a Account 360, HR Core, Identity. Construir primer consumer reactivo (assignment change → recalculate cost allocation). Catálogo de eventos. |
+| 18 | [CODEX_TASK_Nubox_Finance_Reconciliation_Bridge_v1.md](to-do/CODEX_TASK_Nubox_Finance_Reconciliation_Bridge_v1.md) | P1 | Alto | Medio | Diseño | **Sinergia cross-module.** Matching automático DTE↔income/expense, propuestas de reconciliación, cobertura DTE por organización. Cierra circuito Nubox→Finance. |
+| 19 | [CODEX_TASK_Projects_Account_360_Bridge_v1.md](to-do/CODEX_TASK_Projects_Account_360_Bridge_v1.md) | P1 | Alto | Medio | Diseño | **Sinergia cross-module.** Conectar Projects con Account 360 vía Space-Notion bridge. Tab de proyectos por org, project counts en `organization_360`, cadena Org→Space→Notion→Projects. |
+| 20 | [CODEX_TASK_Financial_Intelligence_Layer_v2.md](to-do/CODEX_TASK_Financial_Intelligence_Layer_v2.md) | P2 | Alto | Medio | Diseño | Trends, partnerships, cost allocations UI, LTV/CAC y vista analytics consolidada sobre foundation ya implementada |
+| 21 | [CODEX_TASK_Business_Units_Canonical_v2.md](to-do/CODEX_TASK_Business_Units_Canonical_v2.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
+| 22 | [CODEX_TASK_Campaign_360_v2.md](to-do/CODEX_TASK_Campaign_360_v2.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
+| 23 | [CODEX_TASK_SCIM_User_Provisioning_v2.md](to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
+| 24 | [CODEX_TASK_Staff_Augmentation_Module_v2.md](to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
+| 25 | [CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md](to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
+| 26 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
+| 27 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
+| 28 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
+| 29 | [CODEX_TASK_Typography_Variant_Adoption_v1.md](to-do/CODEX_TASK_Typography_Variant_Adoption_v1.md) | P3 | Medio | Bajo | Diseño | Migrar 56+ fontWeight/fontFamily hardcodeados a theme variants en 4 slices: redundantes finance, executive cards, monoId/monoAmount, kpiValue |
 
 ### Briefs Históricos o de Producto
 
@@ -151,6 +176,39 @@ Admin Team PG Migration ──────────────────�
         └──→ Staff Augmentation (assignment_type)
 ```
 
+#### Cadena de sinergias cross-module (nuevas)
+
+```
+Organization Economics Dashboard ←── Finance Intelligence (foundation)
+        │                    │
+        ├── consume ← ICO Person 360 Integration (métricas per-person)
+        │                    │
+        ├── consume ← Projects Account 360 Bridge (delivery per org)
+        │                    │
+        ├── consume ← Nubox Finance Reconciliation (cobertura DTE)
+        │
+        └── reactivo ← Outbox Event Expansion (invalidación automática)
+                │
+                ├──→ Webhook Infrastructure MVP (más eventos para dispatch)
+                ├──→ Notification System (eventos para notificar)
+                └──→ Data Node v2 (event stream para consumers externos)
+
+ICO Person 360 ──→ Team Identity Capacity v2 (utilización real)
+        │
+        └──→ Staff Augmentation (eficiencia de placements)
+
+Projects Account 360 ──→ Campaign 360 (resolución Space → Projects)
+        │
+        └──→ FrameIO Analytics (delivery assets per project per org)
+
+Nubox Finance Reconciliation ──→ Financial Intelligence v2 (analytics enriquecidos)
+
+Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash flow preciso)
+        │
+        ├──→ Organization Economics Dashboard (métricas financieras correctas)
+        └──→ Financial Intelligence v2 (trends sobre base contable correcta)
+```
+
 ### Tabla de impacto: "si cierro X, reviso Y"
 
 | Al cerrar esta task | Revisar estas tasks |
@@ -161,23 +219,31 @@ Admin Team PG Migration ──────────────────�
 | Admin Team PG Migration | Team Identity Capacity, Staff Augmentation, People 360 Enrichments |
 | HR Payroll Attendance/Leave Work Entries | HR Payroll Operational Hardening, HRIS Contract Type Consolidation |
 | Services Runtime Closure | Business Units, Campaign 360, Staff Augmentation, Tenant Notion Mapping |
-| Webhook Infrastructure MVP | Notification System, HR Payroll Attendance/Leave Work Entries, Services Runtime Closure, Greenhouse Data Node v2 |
+| Webhook Infrastructure MVP | Notification System, HR Payroll Attendance/Leave Work Entries, Services Runtime Closure, Greenhouse Data Node v2, **Outbox Event Expansion** |
 | Lint Debt Burn Down | Cualquier lane activa que necesite `pnpm lint`, especialmente Webhook Infrastructure, Notification System, Payroll Operational Hardening y módulos compartidos |
 | Business Units Canonical | Financial Intelligence v2, Campaign 360, FrameIO Analytics, Services Runtime Closure |
 | Campaign 360 | Financial Intelligence v2, FrameIO Analytics |
 | Typography Hierarchy Fix | (ninguna — cambio aislado) |
 | Typography Variant Adoption | Portal View Surface Consolidation (reduce deuda visual transversal) |
 | Greenhouse Home Nexa | (ninguna — superficie aditiva) |
+| **Organization Economics Dashboard** | Financial Intelligence v2, Business Units Canonical, Campaign 360, Greenhouse Home Nexa |
+| **ICO Person 360 Integration** | Organization Economics Dashboard, Team Identity Capacity v2, Staff Augmentation |
+| **Outbox Event Expansion** | Webhook Infrastructure MVP, Organization Economics (invalidación reactiva), Notification System, Data Node v2 |
+| **Nubox Finance Reconciliation Bridge** | Organization Economics Dashboard (cobertura DTE), Financial Intelligence v2 |
+| **Projects Account 360 Bridge** | Organization Economics Dashboard (delivery per org), Campaign 360 (Space→Projects), FrameIO Analytics |
+| **Invoice Payment Ledger Correction** | Nubox Finance Reconciliation Bridge (prerequisito: ledger completo), Organization Economics Dashboard (revenue cobrado vs. facturado), Financial Intelligence v2 (aging, DSO, cash flow), **Finance Dashboard Calculation Correction** (cash flow preciso depende de payments en ledger) |
+| **Finance Dashboard Calculation Correction** | Organization Economics Dashboard (métricas financieras correctas), Financial Intelligence v2 (trends sobre base contable correcta), Nubox Finance Reconciliation Bridge (cobertura DTE necesita distinguir facturado de cobrado) |
 
 ---
 
 ## Regla operativa
 
-- Mantener todos los `CODEX_TASK_*` dentro de `docs/tasks/` y sus subcarpetas de estado.
+- Mantener todas las tasks del sistema dentro de `docs/tasks/` y sus subcarpetas de estado.
+- Toda task nueva debe nacer desde `docs/tasks/TASK_TEMPLATE.md` y usar `TASK-###` como ID estable.
 - Los briefs vivos del proyecto deben quedar versionados dentro de `docs/tasks/**`; no usar archivos sueltos en raíz como source of truth.
 - No asumir que un task está vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
-- Toda `CODEX_TASK_*` nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse.
-- Revisión mínima obligatoria para cualquier `CODEX_TASK_*`:
+- Toda task del sistema nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse.
+- Revisión mínima obligatoria para cualquier task del sistema:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - Además de esa base, cada task debe contrastarse con la arquitectura especializada que le corresponda.

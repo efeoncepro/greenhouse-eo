@@ -3,6 +3,28 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-24 Task system normalization
+- El sistema de tasks deja de nacer bajo el prefijo `CODEX_TASK_*` como convencion nueva.
+- Regla operativa derivada:
+  - toda task nueva debe usar un ID estable `TASK-###`
+  - el numero no define prioridad mutable; el orden operativo vive en `Rank` y en `docs/tasks/README.md`
+  - la plantilla canonica para crear e interpretar tasks queda fijada en `docs/tasks/TASK_TEMPLATE.md`
+  - la reserva de IDs bootstrap y el siguiente ID disponible quedan fijados en `docs/tasks/TASK_ID_REGISTRY.md`
+  - la capa operativa de seguimiento para tasks activas queda definida en `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
+- Compatibilidad:
+  - los `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y no deben renumerarse de forma masiva sin una lane dedicada
+
+## Delta 2026-03-24 GitHub Project materialized
+- El Project operativo recomendado ya no es hipotetico: quedó creado en GitHub bajo `efeoncepro`.
+- Estado real:
+  - Project: `Greenhouse Delivery`
+  - URL: `https://github.com/orgs/efeoncepro/projects/2`
+  - issues bootstrap creadas: `#9` a `#18` en `efeoncepro/greenhouse-eo`
+- Regla operativa derivada:
+  - el repo queda enlazado al Project a traves de issues reales `[TASK-###] ...`
+  - el campo custom `Pipeline` es la fase operativa del equipo
+  - el `Status` built-in de GitHub queda como estado coarse (`Todo`, `In Progress`, `Done`)
+
 ## Delta 2026-03-22 Webhook architecture canonized
 - La infraestructura de webhooks de Greenhouse ya no queda como idea difusa entre una ruta aislada de Teams, el outbox y la API de integraciones.
 - La fuente canonica para webhook architecture quedo fijada en:

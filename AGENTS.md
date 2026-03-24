@@ -12,7 +12,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
   - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
-  - los briefs `CODEX_TASK_*` que sigan vivos para el proyecto deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
+  - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla canonica.
+  - los briefs `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades
 1. Mantener el proyecto desplegable en Vercel.
@@ -28,7 +29,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
 - Leer la especificacion externa `../Greenhouse_Portal_Spec_v1.md` cuando el cambio afecte producto, autenticacion, data, rutas principales o arquitectura.
 - Si el trabajo requiere specs o briefs, buscarlos primero en `docs/README.md` y luego en la categoria correspondiente dentro de `docs/`.
-- Si el trabajo nace de una `CODEX_TASK_*`, revisar obligatoriamente la arquitectura antes de implementar:
+- Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
 - Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
@@ -42,7 +43,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
   - revisar `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
-- Si una `CODEX_TASK_*` contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
+- Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
@@ -250,7 +251,14 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ## Task Lifecycle Protocol
 
 ### Regla general
-Todo agente que trabaje sobre una `CODEX_TASK_*` debe gestionar su estado en el pipeline de tareas. Las tareas viven en `docs/tasks/{to-do,in-progress,complete}/` y su índice es `docs/tasks/README.md`.
+Todo agente que trabaje sobre una task del sistema debe gestionar su estado en el pipeline de tareas. Las tasks nuevas usan `TASK-###`; las `CODEX_TASK_*` existentes se consideran legacy hasta su migracion. Todas viven en `docs/tasks/{to-do,in-progress,complete}/` y su índice es `docs/tasks/README.md`.
+
+Antes de crear una task nueva:
+1. Revisar `docs/tasks/TASK_TEMPLATE.md`
+2. Revisar `docs/tasks/TASK_ID_REGISTRY.md`
+3. Asignar el siguiente `TASK-###` disponible sin renumerar tasks existentes
+4. Registrar el nuevo ID en `docs/tasks/TASK_ID_REGISTRY.md`
+5. Crear la task en la carpeta de lifecycle correcta
 
 ### Al iniciar trabajo en una task
 1. Mover el archivo de la task de `to-do/` a `in-progress/`
@@ -289,6 +297,15 @@ Cada task activa debe tener un bloque `## Dependencies & Impact` que declare:
 - **Archivos owned:** qué archivos son propiedad de esta task (para detectar impacto cruzado)
 
 Cuando un agente modifica archivos listados como "owned" por otra task, debe revisar esa task y actualizar su estado si corresponde.
+
+### GitHub Project mirror
+- El Project de GitHub es la capa operativa de seguimiento; la task markdown sigue siendo la fuente canonica de alcance.
+- Toda task activa o priorizada para iteracion debe idealmente tener:
+  - issue con titulo `[TASK-###] ...`
+  - `Task ID` y `Task Doc` visibles
+  - estado alineado con el pipeline del Project
+- La referencia canonica para este flujo queda en:
+  - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 
 ## Checklist de Cierre de Turno
 - Cambios acotados y entendibles.

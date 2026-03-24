@@ -1,0 +1,108 @@
+name: Task execution
+description: Track an execution-ready TASK-### in the repo and GitHub Project.
+title: "[TASK-###] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form only for work that already has a task markdown in `docs/tasks/**` or will be created immediately.
+        The markdown task remains the source of truth for scope, dependencies, acceptance criteria, and verification.
+
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: Stable task identifier used in docs and GitHub Project.
+      placeholder: TASK-003
+    validations:
+      required: true
+
+  - type: input
+    id: legacy_id
+    attributes:
+      label: Legacy ID
+      description: Optional legacy brief identifier during migration.
+      placeholder: CODEX_TASK_Finance_Dashboard_Calculation_Correction_v1
+
+  - type: input
+    id: task_doc
+    attributes:
+      label: Task doc
+      description: Repo-relative path to the markdown task.
+      placeholder: docs/tasks/to-do/TASK-003-finance-dashboard-calculation-correction.md
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      options:
+        - finance
+        - hr
+        - identity
+        - platform
+        - data
+        - ui
+        - ops
+        - docs
+    validations:
+      required: true
+
+  - type: input
+    id: rank
+    attributes:
+      label: Rank
+      description: Current operational order in the backlog.
+      placeholder: "3"
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Short operational summary of the lane.
+      placeholder: What will change and why does it matter right now?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Keep this short. The markdown task should carry the full detail.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies or blockers
+      description: Note the most relevant dependencies, open questions, or current blockers.
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: How will we validate this lane?
+      placeholder: |
+        - pnpm lint
+        - pnpm test
+        - Preview QA
+    validations:
+      required: true

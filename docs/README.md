@@ -57,6 +57,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
+- [GITHUB_PROJECT_OPERATING_MODEL_V1.md](operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_REPO_ECOSYSTEM_V1.md](operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md)
 - [GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md)
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
@@ -64,9 +65,12 @@ Indice maestro de la documentacion no operativa del repo.
 ### Tasks
 
 - [Task Index](tasks/README.md)
+- [Task Template](tasks/TASK_TEMPLATE.md)
+- [Task ID Registry](tasks/TASK_ID_REGISTRY.md)
 - Paneles activos bajo `docs/tasks/`:
   - `in-progress/`
   - `to-do/`
   - `complete/`
 - Regla obligatoria:
-  - toda `CODEX_TASK_*` debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
+  - toda task nueva debe usar `TASK-###` y nacer desde `docs/tasks/TASK_TEMPLATE.md`
+  - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse

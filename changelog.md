@@ -4,6 +4,28 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-24
+
+### Task system normalized around stable TASK-### IDs
+- Las tasks nuevas pasan a nacer con IDs estables `TASK-###` en vez de abrirse como convención nueva bajo `CODEX_TASK_*`.
+- Se agregó `docs/tasks/TASK_TEMPLATE.md` como plantilla canónica para que humanos y agentes creen e interpreten tasks con la misma estructura mínima.
+- `docs/tasks/README.md`, `docs/README.md` y `AGENTS.md` quedaron alineados para convivir con tasks legacy mientras ocurre la migración gradual.
+
+### GitHub Project operating model and task issue template added
+- Se agregó `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md` para fijar pipeline, campos, vistas, automatizaciones y convención `[TASK-###] ...` en GitHub Project.
+- Se agregó `.github/ISSUE_TEMPLATE/task_execution.yml` para abrir issues de ejecución alineados a `TASK-###`.
+- `PULL_REQUEST_TEMPLATE.md` ahora pide `Task ID`, `GitHub Issue` y `Task Doc` para reforzar trazabilidad entre markdown, issue y PR.
+
+### Bootstrap registry for TASK-001 to TASK-010 added
+- Se agregó `docs/tasks/TASK_ID_REGISTRY.md` para reservar el primer bloque estable `TASK-001..010` sobre la lane activa y el backlog abierto más prioritario.
+- `docs/tasks/README.md` ahora refleja esos IDs bootstrap y deja `TASK-011` como siguiente ID disponible.
+
+### GitHub Project and bootstrap issues created
+- Se creó el Project `Greenhouse Delivery` en GitHub para `efeoncepro`: `https://github.com/orgs/efeoncepro/projects/2`.
+- Se agregaron los campos custom del modelo operativo (`Pipeline`, `Task ID`, `Rank`, `Priority`, `Domain`, `Blocked`, `Task Doc`, `Legacy ID`, `Impact`, `Effort`, etc.).
+- Se crearon y agregaron al Project las issues bootstrap `#9` a `#18`, una por cada `TASK-001..010` del registro inicial.
+- La fase operativa fina quedó modelada en el campo custom `Pipeline`; el `Status` built-in de GitHub se mantiene como estado coarse.
+
 ## 2026-03-22
 
 ### Lint debt burn-down lane documented
