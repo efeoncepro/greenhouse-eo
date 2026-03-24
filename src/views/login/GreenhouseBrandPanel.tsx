@@ -16,10 +16,11 @@ const GreenhouseBrandPanel = () => {
         bgcolor: GH_COLORS.brand.midnightNavy,
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        p: { md: 5, lg: 6 }
+        p: { md: 6, lg: 8 }
       }}
     >
       {/* Decorative circles — placeholders for future 3D elements */}
@@ -42,15 +43,15 @@ const GreenhouseBrandPanel = () => {
         />
       ))}
 
-      {/* Content container — constrained width for readability */}
-      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 420 }}>
+      {/* Content container — centered, constrained width for readability */}
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 480 }}>
         {/* Logo row */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
-              borderRadius: '8px',
+              width: 48,
+              height: 48,
+              borderRadius: '10px',
               bgcolor: GH_COLORS.brand.greenhouseGreen,
               display: 'flex',
               alignItems: 'center',
@@ -62,31 +63,31 @@ const GreenhouseBrandPanel = () => {
               component='img'
               src='/images/greenhouse/SVG/negative-isotipo.svg'
               alt='Greenhouse'
-              sx={{ width: 24, height: 24 }}
+              sx={{ width: 28, height: 28 }}
             />
           </Box>
           <Box
             component='img'
             src='/images/greenhouse/SVG/negative-sin-claim.svg'
             alt='Greenhouse logotipo'
-            sx={{ height: 20, ml: 1.25 }}
+            sx={{ height: 26, ml: 1.5 }}
           />
         </Box>
 
         {/* Hero copy */}
         <Typography
           sx={{
-            fontSize: 22,
-            fontWeight: 500,
+            fontSize: { md: 28, lg: 32 },
+            fontWeight: 600,
             color: '#fff',
-            lineHeight: 1.35,
-            mb: 1.5,
+            lineHeight: 1.3,
+            mb: 2,
             whiteSpace: 'pre-line'
           }}
         >
           {GH_MESSAGES.login_hero_title}
         </Typography>
-        <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255, 0.55)', mb: 4, maxWidth: 320 }}>
+        <Typography sx={{ fontSize: 15, color: 'rgba(255,255,255, 0.55)', mb: 5, maxWidth: 380 }}>
           {GH_MESSAGES.login_hero_subtitle}
         </Typography>
 
@@ -102,8 +103,7 @@ const GreenhouseBrandPanel = () => {
       <Typography
         sx={{
           position: 'absolute',
-          bottom: { md: 24, lg: 32 },
-          left: { md: 40, lg: 48 },
+          bottom: { md: 28, lg: 36 },
           fontSize: 11,
           color: 'rgba(255,255,255, 0.35)'
         }}
