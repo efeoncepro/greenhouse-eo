@@ -6,6 +6,16 @@
 
 ## 2026-03-24
 
+### TASK-006 Webhook Infrastructure MVP implemented
+- **Slice 1**: 5 PostgreSQL tables in `greenhouse_sync`: `webhook_endpoints`, `webhook_inbox_events`, `webhook_subscriptions`, `webhook_deliveries`, `webhook_delivery_attempts` + indexes + grants.
+- **Slice 2**: Shared library `src/lib/webhooks/`: HMAC-SHA256 signing/verification, canonical envelope builder (v1), retry policy (5 attempts, exponential backoff), database store, inbound handler registry, outbound filter matching + delivery execution.
+- **Slice 3**: Generic inbound gateway at `POST /api/webhooks/[endpointKey]` with auth, idempotency, handler dispatch. Teams attendance migrated as first adopter.
+- **Slice 4**: Outbound dispatcher at `/api/cron/webhook-dispatch` (every 2 min). Matches outbox events to active subscriptions, delivers signed HTTP requests, retries or dead-letters.
+- **Slice 5**: Finance event family seeded as first outbound subscription (inactive by default).
+- **Slice 6**: Internal observability at `/api/internal/webhooks/{inbox,deliveries,failures}`.
+- Vercel crons added for `outbox-react` (5 min) and `webhook-dispatch` (2 min).
+- `pnpm lint` y `tsc --noEmit` pasan limpio.
+
 ### Login page redesigned with Greenhouse brand identity
 - Two-panel layout: left (60%) brand moment with Midnight Navy bg, Greenhouse logo, hero copy, value proposition cards with glassmorphism, gradient accent line; right (40%) auth form with Microsoft/Google SSO + credentials.
 - Official multicolor Microsoft and Google brand icons from Iconify.

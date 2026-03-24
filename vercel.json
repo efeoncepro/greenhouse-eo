@@ -19,6 +19,14 @@
     {
       "path": "/api/cron/nubox-sync",
       "schedule": "30 7 * * *"
+    },
+    {
+      "path": "/api/cron/outbox-react",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/webhook-dispatch",
+      "schedule": "*/2 * * * *"
     }
   ]
 }

@@ -40,6 +40,55 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 21:00 -03
+
+### Agente
+- Claude Opus 4.6
+
+### Objetivo del turno
+- Implementacion de TASK-006 Webhook Infrastructure MVP (6 slices)
+
+### Rama
+- Rama usada: `develop`
+
+### Ambiente objetivo
+- staging
+
+### Archivos tocados
+
+**Webhook infrastructure (17 archivos nuevos):**
+- `scripts/setup-postgres-webhooks.sql` — DDL 5 tablas + indexes + grants + seed
+- `scripts/setup-postgres-webhooks.ts` — TS runner
+- `src/lib/webhooks/types.ts` — tipos compartidos
+- `src/lib/webhooks/signing.ts` — HMAC-SHA256 signing/verification
+- `src/lib/webhooks/envelope.ts` — canonical envelope builder
+- `src/lib/webhooks/retry-policy.ts` — retry schedule + dead-letter logic
+- `src/lib/webhooks/store.ts` — database operations para 5 tablas
+- `src/lib/webhooks/inbound.ts` — handler registry + orchestration
+- `src/lib/webhooks/outbound.ts` — subscription matching + delivery
+- `src/lib/webhooks/dispatcher.ts` — outbound dispatch loop
+- `src/lib/webhooks/handlers/teams-attendance.ts` — Teams handler migrado
+- `src/lib/webhooks/handlers/index.ts` — lazy handler registration
+- `src/app/api/webhooks/[endpointKey]/route.ts` — generic inbound gateway
+- `src/app/api/cron/webhook-dispatch/route.ts` — outbound dispatch cron
+- `src/app/api/internal/webhooks/inbox/route.ts` — observability: inbound
+- `src/app/api/internal/webhooks/deliveries/route.ts` — observability: outbound
+- `src/app/api/internal/webhooks/failures/route.ts` — observability: failures
+- `vercel.json` — 2 crons nuevos
+
+### Verificacion
+- `npx tsc --noEmit` — clean
+- `pnpm lint` — clean
+- No runtime testing (requiere Postgres con tablas provisionadas)
+
+### Riesgos o pendientes
+- **Provisioning**: ejecutar `npx tsx scripts/setup-postgres-webhooks.ts` en staging para crear las tablas
+- **Teams compat**: ruta legacy `/api/hr/core/attendance/webhook/teams` sigue activa; la nueva ruta genérica es `/api/webhooks/teams-attendance`
+- **Finance subscription**: seeded como inactive; activar manualmente para testing
+- Proximo paso: TASK-010 Organization Economics Dashboard
+
+---
+
 ## 2026-03-24 19:30 -03
 
 ### Agente
