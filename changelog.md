@@ -6,6 +6,18 @@
 
 ## 2026-03-24
 
+### TASK-004 Finance Dashboard Calculation Correction implemented
+- Income/expense summary APIs migrated to Postgres-first with BigQuery fallback.
+- Dual KPI cards: "Facturación del mes" shows accrual + cobrado subtitle; "Costos del mes" always includes payroll.
+- Real cash flow from payment_date via cashflow endpoint replaces fake accrual-minus-accrual.
+- Bar chart uses consistent accrual base for all months (no more single-month P&L patch).
+- P&L shows completeness indicator, cobrado del período, cuentas por cobrar.
+
+### TASK-003 Invoice Payment Ledger Correction implemented
+- `reconcileIncomeFromBankMovement()` now creates proper `income_payments` records with deduplication by Nubox reference.
+- `income.amount_paid` derived from `SUM(income_payments.amount)` — single source of truth.
+- Backfill script for historical payments: `scripts/backfill-income-payments-from-nubox.ts`.
+
 ### TASK-010 Organization Economics Dashboard implemented
 - **Slice 1**: `organization-economics.ts` store con 4 funciones: `getOrganizationEconomics()` (revenue + labor cost + adjusted margin), `getOrganizationEconomicsTrend()` (6 meses), `getOrganizationProfitabilityBreakdown()` (per-client), `getOrganizationIcoSummary()` (ICO on-read from BigQuery).
 - **Slice 2**: ICO bridge compute-on-read via dynamic import de ICO engine. Agrega avg RPA, OTD%, FTR% al response.

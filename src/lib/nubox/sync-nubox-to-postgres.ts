@@ -403,7 +403,37 @@ const reconcileIncomeFromBankMovement = async (
 
   const income = incomeRows[0]
   const paymentAmount = Number(movement.total_amount ?? 0)
-  const newAmountPaid = Number(income.amount_paid) + paymentAmount
+  const nuboxRef = `nubox-mvmt-${movement.nubox_movement_id}`
+
+  // Deduplication: skip if this Nubox movement was already registered as a payment
+  const existingPayment = await runGreenhousePostgresQuery<{ payment_id: string }>(
+    `SELECT payment_id FROM greenhouse_finance.income_payments
+     WHERE income_id = $1 AND reference = $2 LIMIT 1`,
+    [income.income_id, nuboxRef]
+  )
+
+  if (existingPayment.length > 0) return false
+
+  // Create proper payment record in income_payments ledger
+  const paymentId = `PAY-NUBOX-${movement.nubox_movement_id}`
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_finance.income_payments (
+      payment_id, income_id, payment_date, amount, currency,
+      reference, payment_method, payment_source, notes, recorded_at
+    ) VALUES ($1, $2, $3::date, $4, 'CLP', $5, 'bank_transfer', 'nubox_bank_sync',
+      'Auto-registrado desde movimiento bancario Nubox', NOW())`,
+    [paymentId, income.income_id, movement.payment_date, paymentAmount, nuboxRef]
+  )
+
+  // Derive amount_paid from SUM(income_payments.amount) — single source of truth
+  const sumResult = await runGreenhousePostgresQuery<{ total: string }>(
+    `SELECT COALESCE(SUM(amount), 0)::text AS total
+     FROM greenhouse_finance.income_payments WHERE income_id = $1`,
+    [income.income_id]
+  )
+
+  const newAmountPaid = Number(sumResult[0]?.total ?? 0)
   const newStatus = newAmountPaid >= Number(income.total_amount) ? 'paid' : 'partial'
 
   await runGreenhousePostgresQuery(
@@ -424,7 +454,8 @@ const reconcileIncomeFromBankMovement = async (
       linked_sale_id: movement.linked_sale_id,
       amount: paymentAmount,
       payment_date: movement.payment_date,
-      new_status: newStatus
+      new_status: newStatus,
+      payment_id: paymentId
     }
   )
 
