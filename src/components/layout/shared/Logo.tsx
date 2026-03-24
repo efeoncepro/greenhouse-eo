@@ -67,7 +67,7 @@ const Logo = ({ variant = 'default' }: { variant?: 'default' | 'sidebar' }) => {
   const isSidebar = variant === 'sidebar'
   const efeonceAssets = resolveBrandAssets('efeonce')
   const wordmarkSrc = isSidebar
-    ? '/images/greenhouse/SVG/greenhouse-negative.svg'
+    ? '/images/greenhouse/SVG/negative-sin-claim.svg'
     : useNegativeWordmark ? efeonceAssets?.negativeWordmarkSrc || '/branding/logo-negative.svg' : efeonceAssets?.wordmarkSrc || '/branding/logo-full.svg'
   const markSrc = isSidebar
     ? '/images/greenhouse/SVG/negative-isotipo.svg'
