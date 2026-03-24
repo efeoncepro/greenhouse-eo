@@ -16,7 +16,7 @@ interface ExpenseSummaryRow {
   payment_status: string
 }
 
-interface PgExpenseRow {
+interface PgExpenseRow extends Record<string, unknown> {
   document_date: string | null
   payment_date: string | null
   total_amount_clp: string | number

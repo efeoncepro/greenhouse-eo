@@ -14,6 +14,9 @@ export const AGGREGATE_TYPES = {
   nuboxEmission: 'nubox_emission',
   nuboxSync: 'nubox_sync',
 
+  // DTE Reconciliation
+  dteReconciliation: 'dte_reconciliation',
+
   // HR
   leaveRequest: 'leave_request',
   leaveBalance: 'leave_balance',
@@ -69,6 +72,11 @@ export const EVENT_TYPES = {
   reconciliationApproved: 'identity.reconciliation.approved',
   reconciliationRejected: 'identity.reconciliation.rejected',
   profileLinked: 'identity.profile.linked',
+
+  // DTE Reconciliation
+  dteAutoMatched: 'finance.dte.auto_matched',
+  dteMatched: 'finance.dte.matched',
+  dteDiscrepancyFound: 'finance.dte.discrepancy_found',
 
   // Services
   serviceCreated: 'service.created',

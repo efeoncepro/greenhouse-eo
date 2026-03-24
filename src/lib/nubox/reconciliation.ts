@@ -6,6 +6,8 @@ import {
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import {
   matchDte,
   DTE_AUTO_MATCH_THRESHOLD,
@@ -456,23 +458,17 @@ async function applyAutoMatch(proposal: {
   }
 
   // Publish outbox event
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_sync.outbox_events (
-       event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
-     ) VALUES ($1, $2, $3, $4, $5::jsonb, 'pending', NOW())`,
-    [
-      `evt-${randomUUID()}`,
-      proposal.dte.dteSource === 'nubox_sale' ? 'finance.income' : 'finance.expense',
-      proposal.financeId,
-      'finance.dte.auto_matched',
-      JSON.stringify({
-        dte_source: proposal.dte.dteSource,
-        dte_source_id: proposal.dte.dteSourceId,
-        finance_id: proposal.financeId,
-        folio: proposal.dte.folio
-      })
-    ]
-  )
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.dteReconciliation,
+    aggregateId: proposal.financeId,
+    eventType: EVENT_TYPES.dteAutoMatched,
+    payload: {
+      dte_source: proposal.dte.dteSource,
+      dte_source_id: proposal.dte.dteSourceId,
+      finance_id: proposal.financeId,
+      folio: proposal.dte.folio
+    }
+  })
 }
 
 // ── Orchestrator ─────────────────────────────────────────────────────────────

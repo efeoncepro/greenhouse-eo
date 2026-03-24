@@ -12,7 +12,7 @@
 import { runGreenhousePostgresQuery } from '../src/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '../src/lib/bigquery'
 
-interface OrphanIncome {
+interface OrphanIncome extends Record<string, unknown> {
   income_id: string
   nubox_document_id: string | null
   total_amount: number

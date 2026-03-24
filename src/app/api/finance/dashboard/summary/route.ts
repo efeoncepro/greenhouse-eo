@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 
 // ── Postgres types ─────────────────────────────────────────────────
 
-interface PgIncomeRow {
+interface PgIncomeRow extends Record<string, unknown> {
   invoice_date: string | Date | null
   total_amount: string | number
   total_amount_clp: string | number
@@ -20,12 +20,12 @@ interface PgIncomeRow {
   payment_status: string
 }
 
-interface PgPaymentRow {
+interface PgPaymentRow extends Record<string, unknown> {
   payment_date: string | Date | null
   amount_clp: string | number
 }
 
-interface PgExpenseRow {
+interface PgExpenseRow extends Record<string, unknown> {
   document_date: string | Date | null
   payment_date: string | Date | null
   total_amount_clp: string | number
