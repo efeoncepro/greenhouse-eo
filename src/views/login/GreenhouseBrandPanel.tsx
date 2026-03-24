@@ -17,6 +17,7 @@ const GreenhouseBrandPanel = () => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        width: '100%',
         height: '100%',
         p: { md: 5, lg: 6 }
       }}
