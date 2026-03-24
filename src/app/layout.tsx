@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   title: 'Greenhouse Portal',
   description: 'Client portal for project visibility, delivery performance, and sprint health.',
   icons: {
-    icon: [{ url: '/branding/SVG/isotipo-full-efeonce.svg', type: 'image/svg+xml' }],
-    shortcut: ['/branding/SVG/isotipo-full-efeonce.svg'],
-    apple: ['/branding/SVG/isotipo-full-efeonce.svg']
+    icon: [{ url: '/images/greenhouse/SVG/favicon-blue-negative.svg', type: 'image/svg+xml' }],
+    shortcut: ['/images/greenhouse/SVG/favicon-blue-negative.svg'],
+    apple: ['/images/greenhouse/SVG/favicon-blue-negative.svg']
   }
 }
 
