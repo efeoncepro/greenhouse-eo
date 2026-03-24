@@ -10,10 +10,18 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 | Helper publicacion | `src/lib/sync/publish-event.ts` | `publishOutboxEvent()` — helper reutilizable |
 | Catalogo tipos | `src/lib/sync/event-catalog.ts` | Constantes de aggregate types y event types |
 | Consumer BigQuery | `src/lib/sync/outbox-consumer.ts` | Publica eventos a `greenhouse_raw.postgres_outbox_events` |
-| Consumer reactivo | `src/lib/sync/reactive-consumer.ts` | Procesa eventos para invalidar caches y recalcular vistas |
+| Consumer reactivo | `src/lib/sync/reactive-consumer.ts` | Procesa eventos via projection registry |
+| Projection registry | `src/lib/sync/projection-registry.ts` | Mapa declarativo evento → proyecciones afectadas |
+| Projections | `src/lib/sync/projections/*.ts` | Definiciones individuales por proyeccion |
+| Refresh queue | `src/lib/sync/refresh-queue.ts` | Cola persistente con dedup, prioridad y retry |
 | Cron publish | `/api/cron/outbox-publish` | Cada 5 min — publica a BigQuery |
-| Cron react | `/api/cron/outbox-react` | Cada 5 min — procesa eventos reactivos |
-| Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking de eventos ya procesados por el consumer reactivo |
+| Cron react (all) | `/api/cron/outbox-react` | Procesa todos los dominios (secuencial) |
+| Cron react (org) | `/api/cron/outbox-react-org` | Solo dominio `organization` |
+| Cron react (people) | `/api/cron/outbox-react-people` | Solo dominio `people` |
+| Cron react (finance) | `/api/cron/outbox-react-finance` | Solo dominio `finance` |
+| Cron react (notify) | `/api/cron/outbox-react-notify` | Solo dominio `notifications` |
+| Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter |
+| Observabilidad | `/api/internal/projections` | Stats por proyeccion + queue health |
 
 ## Ciclo de vida de un evento
 
@@ -100,28 +108,37 @@ Mutacion en store
 | `service` | `service.updated` | `services/service-store.ts` | `{ serviceId, updatedFields }` | — |
 | `service` | `service.deactivated` | `services/service-store.ts` | `{ serviceId }` | — |
 
-## Consumer reactivo — handlers
+## Consumer reactivo — Projection Registry
 
-| Event Type | Handler | Accion |
-|---|---|---|
-| `assignment.created` | `invalidateOrganization360` | Toca `updated_at` de la organizacion afectada para invalidar cache de serving view |
-| `assignment.updated` | `invalidateOrganization360` | Idem |
-| `assignment.removed` | `invalidateOrganization360` | Idem |
-| `membership.created` | `invalidateOrganization360` | Idem |
-| `membership.updated` | `invalidateOrganization360` | Idem |
-| `membership.deactivated` | `invalidateOrganization360` | Idem |
+El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarativo:
+
+| Projection | Domain | Trigger Events | Accion |
+|---|---|---|---|
+| `organization_360` | organization | assignment.*, membership.* | Invalida `updated_at` de la organizacion afectada |
+| `notification_dispatch` | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked | Despacha notificacion in-app + email via NotificationService |
+| `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
+| `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
 
 ## Extensibilidad
 
-Para agregar un nuevo evento:
+### Para agregar un nuevo evento:
 
 1. Agregar aggregate type y event type en `src/lib/sync/event-catalog.ts`
 2. Llamar `publishOutboxEvent()` en la mutacion del store
-3. Si necesita procesamiento reactivo: agregar event type a `REACTIVE_EVENT_TYPES` y registrar handler en `reactive-consumer.ts`
-4. Documentar en esta tabla
+3. Documentar en esta tabla
 
-Para agregar un nuevo consumer reactivo:
+### Para agregar una nueva proyeccion reactiva:
 
-1. Agregar handler en `reactive-consumer.ts` → objeto `handlers`
-2. Agregar event type a `REACTIVE_EVENT_TYPES` en `event-catalog.ts`
-3. Documentar accion en la tabla de handlers
+1. Crear archivo en `src/lib/sync/projections/my-projection.ts` con `ProjectionDefinition`
+2. Registrar en `src/lib/sync/projections/index.ts`
+3. Declarar `domain`, `triggerEvents`, `extractScope`, `refresh`
+4. NO tocar `reactive-consumer.ts` ni crear crons nuevos
+5. Documentar en esta tabla
+
+Ver playbook completo: `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+
+### Para agregar un nuevo dominio de cron:
+
+1. Agregar el dominio a `ProjectionDomain` type en `projection-registry.ts`
+2. Crear cron route en `src/app/api/cron/outbox-react-{domain}/route.ts`
+3. Registrar en Vercel cron config si aplica
