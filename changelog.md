@@ -31,6 +31,11 @@
 - El burn-down toco `scripts/*`, `src/app/api/*`, `src/lib/*`, `src/views/*`, `src/components/*`, `src/types/*` y `src/test/*` sin introducir desactivaciones globales de reglas.
 - La lane quedo validada con `pnpm lint`, `pnpm test` (`179/179`) y `pnpm build`.
 
+### Release promoted from develop to production
+- `develop` y `main` quedaron alineados en `ac63e62` despues de promover el release validado en staging.
+- Staging quedo validado sobre `dev-greenhouse.efeoncepro.com` con smoke exitoso de `/api/auth/session` y `/login`.
+- Production quedo validada sobre `greenhouse.efeoncepro.com` y sobre el deployment `https://greenhouse-e0rixnral-efeonce-7670142f.vercel.app`, ambos con smoke exitoso de auth.
+
 ## 2026-03-22
 
 ### Lint debt burn-down lane documented

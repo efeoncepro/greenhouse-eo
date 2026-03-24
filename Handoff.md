@@ -40,6 +40,54 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 17:24 -03
+
+### Agente
+- Codex (GPT-5)
+
+### Objetivo del turno
+- Promover `develop` a `main` despues de validar la lane de lint debt burn-down.
+- Verificar staging y luego confirmar el deploy productivo real en Vercel.
+
+### Rama
+- Rama usada: `develop`
+- Rama objetivo: `main`
+
+### Ambiente objetivo
+- staging y Production
+
+### Archivos tocados
+- `Handoff.md`
+- `changelog.md`
+
+### Acciones externas ejecutadas
+- `develop` se publico en `origin/main` por fast-forward remoto:
+  - `ac63e62` en `origin/develop`
+  - `ac63e62` en `origin/main`
+- Release productivo nuevo en Vercel:
+  - deployment: `https://greenhouse-e0rixnral-efeonce-7670142f.vercel.app`
+  - dominio productivo: `https://greenhouse.efeoncepro.com`
+- Staging validado sobre:
+  - deployment: `https://greenhouse-f20jw83an-efeonce-7670142f.vercel.app`
+  - dominio: `https://dev-greenhouse.efeoncepro.com`
+
+### Verificación
+- staging:
+  - `/api/auth/session` en deployment nuevo: `{}`
+  - `/api/auth/session` en `dev-greenhouse.efeoncepro.com`: `{}`
+  - `/login` en `dev-greenhouse.efeoncepro.com`: `200`
+- production:
+  - `/api/auth/session` en deployment productivo nuevo: `{}`
+  - `/login` en deployment productivo nuevo: `200`
+  - `/api/auth/session` en `greenhouse.efeoncepro.com`: `{}`
+- GitHub Actions:
+  - `main` CI `Lint and build` completado en `success`
+  - run: `https://github.com/efeoncepro/greenhouse-eo/actions/runs/23510433202`
+
+### Riesgos o pendientes
+- El release productivo quedo sano en smoke minimo, pero no se ejecuto una QA funcional profunda de todos los modulos.
+- Warning no bloqueante detectado en GitHub Actions: `actions/checkout@v4` y `actions/setup-node@v4` siguen corriendo bajo Node 20 deprecado; conviene actualizar ese workflow antes de junio 2026.
+
 ## 2026-03-24 17:31 -03
 
 ### Agente
