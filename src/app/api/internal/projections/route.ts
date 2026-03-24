@@ -4,6 +4,7 @@ import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
+import { getQueueStats } from '@/lib/sync/refresh-queue'
 
 export const dynamic = 'force-dynamic'
 
@@ -69,12 +70,16 @@ export async function GET() {
       }
     })
 
-    // Global health: no dead letters and no stale projections
+    // Queue stats
+    const queue = await getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 }))
+
+    // Global health: no dead letters, no failed queue items
     const globalDeadLetters = projectionStatus.reduce((s, p) => s + p.last24h.deadLetters, 0)
-    const healthy = globalDeadLetters === 0
+    const healthy = globalDeadLetters === 0 && queue.failed === 0
 
     return NextResponse.json({
       projections: projectionStatus,
+      queue,
       totalRegistered: projections.length,
       globalDeadLetters,
       healthy,

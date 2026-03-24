@@ -3,8 +3,9 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { getProjectionsForEvent, getAllTriggerEventTypes } from './projection-registry'
+import { getProjectionsForEvent, getAllTriggerEventTypes, type ProjectionDomain } from './projection-registry'
 import { ensureProjectionsRegistered } from './projections'
+import { enqueueRefresh } from './refresh-queue'
 
 // ── Types ──
 
@@ -56,10 +57,12 @@ export const ensureReactiveSchema = async () => {
 
 export const processReactiveEvents = async (options?: {
   batchSize?: number
+  domain?: ProjectionDomain
 }): Promise<ReactiveConsumerResult> => {
   const startMs = Date.now()
   const runId = `react-${randomUUID()}`
   const batchSize = options?.batchSize ?? 50
+  const domain = options?.domain
   const actions: string[] = []
   let eventsFailed = 0
   let projectionsTriggered = 0
@@ -67,7 +70,7 @@ export const processReactiveEvents = async (options?: {
   // Ensure projections are registered
   ensureProjectionsRegistered()
 
-  const triggerEventTypes = getAllTriggerEventTypes()
+  const triggerEventTypes = getAllTriggerEventTypes(domain)
 
   if (triggerEventTypes.length === 0) {
     return { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: Date.now() - startMs }
@@ -79,7 +82,7 @@ export const processReactiveEvents = async (options?: {
      FROM greenhouse_sync.outbox_events
      WHERE status = 'published'
        AND event_type = ANY($1)
-       AND occurred_at > NOW() - INTERVAL '1 hour'
+       AND occurred_at > NOW() - INTERVAL '6 hours'
        AND event_id NOT IN (
          SELECT event_id FROM greenhouse_sync.outbox_reactive_log
          WHERE last_error IS NULL
@@ -101,13 +104,21 @@ export const processReactiveEvents = async (options?: {
     // Inject event type into payload for notification routing
     payload._eventType = event.event_type
 
-    const projections = getProjectionsForEvent(event.event_type)
+    const projections = getProjectionsForEvent(event.event_type, domain)
 
     for (const projection of projections) {
       try {
         const scope = projection.extractScope(payload)
 
         if (!scope) continue
+
+        // Enqueue persistent intent (survives outbox expiration)
+        await enqueueRefresh({
+          projectionName: projection.name,
+          entityType: scope.entityType,
+          entityId: scope.entityId,
+          priority: projection.maxRetries ?? 2
+        }).catch(() => {})
 
         const actionDescription = await projection.refresh(scope, payload)
 

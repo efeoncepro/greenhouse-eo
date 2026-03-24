@@ -1,10 +1,22 @@
 import 'server-only'
 
 import type { ProjectionDefinition } from '../projection-registry'
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+
+const toNum = (v: unknown): number | null => {
+  if (v === null || v === undefined) return null
+  if (typeof v === 'number') return v
+  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : null }
+  if (typeof v === 'object' && v !== null && 'value' in v) return toNum((v as { value: unknown }).value)
+
+  return null
+}
 
 export const icoMemberProjection: ProjectionDefinition = {
   name: 'ico_member_metrics',
-  description: 'Flag ICO member metrics for refresh when member assignments change',
+  description: 'Refresh ICO member metrics when member assignments change',
+  domain: 'people',
 
   triggerEvents: [
     'member.created',
@@ -23,12 +35,68 @@ export const icoMemberProjection: ProjectionDefinition = {
   },
 
   refresh: async (scope) => {
-    // ICO member metrics are materialized nightly from BigQuery.
-    // Reactive refresh here just logs the intent — the actual compute
-    // runs via /api/cron/ico-member-sync which pulls from BigQuery.
-    // Future: direct Postgres refresh for real-time member metrics.
-    return `flagged ico_member_metrics refresh for member ${scope.entityId}`
+    // Targeted refresh: pull this member's latest metrics from BigQuery → Postgres
+    const memberId = scope.entityId
+
+    try {
+      const projectId = getBigQueryProjectId()
+      const bigQuery = getBigQueryClient()
+
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+
+      const [rows] = await bigQuery.query({
+        query: `SELECT *
+                FROM \`${projectId}.ico_engine.metrics_by_member\`
+                WHERE member_id = @memberId
+                  AND period_year = @year AND period_month = @month
+                LIMIT 1`,
+        params: { memberId, year, month }
+      })
+
+      if (rows.length === 0) return `no ICO data for member ${memberId}`
+
+      const r = rows[0] as Record<string, unknown>
+
+      await runGreenhousePostgresQuery(
+        `INSERT INTO greenhouse_serving.ico_member_metrics (
+          member_id, period_year, period_month,
+          rpa_avg, rpa_median, otd_pct, ftr_pct,
+          cycle_time_avg_days, throughput_count, pipeline_velocity,
+          stuck_asset_count, stuck_asset_pct,
+          total_tasks, completed_tasks, active_tasks,
+          materialized_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
+        ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
+          rpa_avg = EXCLUDED.rpa_avg,
+          rpa_median = EXCLUDED.rpa_median,
+          otd_pct = EXCLUDED.otd_pct,
+          ftr_pct = EXCLUDED.ftr_pct,
+          cycle_time_avg_days = EXCLUDED.cycle_time_avg_days,
+          throughput_count = EXCLUDED.throughput_count,
+          pipeline_velocity = EXCLUDED.pipeline_velocity,
+          stuck_asset_count = EXCLUDED.stuck_asset_count,
+          stuck_asset_pct = EXCLUDED.stuck_asset_pct,
+          total_tasks = EXCLUDED.total_tasks,
+          completed_tasks = EXCLUDED.completed_tasks,
+          active_tasks = EXCLUDED.active_tasks,
+          materialized_at = NOW()`,
+        [
+          memberId, year, month,
+          toNum(r.rpa_avg), toNum(r.rpa_median), toNum(r.otd_pct), toNum(r.ftr_pct),
+          toNum(r.cycle_time_avg_days), toNum(r.throughput_count), toNum(r.pipeline_velocity),
+          toNum(r.stuck_asset_count), toNum(r.stuck_asset_pct),
+          toNum(r.total_tasks), toNum(r.completed_tasks), toNum(r.active_tasks)
+        ]
+      )
+
+      return `refreshed ico_member_metrics for ${memberId} (${year}-${month})`
+    } catch {
+      // BigQuery may not have data yet — non-blocking
+      return `flagged ico_member_metrics refresh for ${memberId} (no BQ data)`
+    }
   },
 
-  maxRetries: 0
+  maxRetries: 1
 }

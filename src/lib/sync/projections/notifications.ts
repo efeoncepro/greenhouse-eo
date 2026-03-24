@@ -23,6 +23,7 @@ const getFinanceUsers = async () =>
 export const notificationProjection: ProjectionDefinition = {
   name: 'notification_dispatch',
   description: 'Dispatch notifications for key domain events',
+  domain: 'notifications',
 
   triggerEvents: [
     'service.created',

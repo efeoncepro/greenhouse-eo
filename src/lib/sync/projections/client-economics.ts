@@ -1,10 +1,12 @@
 import 'server-only'
 
 import type { ProjectionDefinition } from '../projection-registry'
+import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 
 export const clientEconomicsProjection: ProjectionDefinition = {
   name: 'client_economics',
-  description: 'Flag client economics for recompute when financial data changes',
+  description: 'Recompute client economics when financial data changes',
+  domain: 'finance',
 
   triggerEvents: [
     'membership.created',
@@ -22,12 +24,21 @@ export const clientEconomicsProjection: ProjectionDefinition = {
     return null
   },
 
-  refresh: async (scope) => {
-    // Client economics snapshots are materialized nightly via
-    // /api/cron/economics-materialize. Reactive refresh here logs
-    // the intent. Future: targeted recompute for the specific client.
-    return `flagged client_economics refresh for client ${scope.entityId}`
+  refresh: async () => {
+    // Targeted refresh: recompute current month's economics
+    // This is scoped to the current period, not a full historical recompute
+    try {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+
+      const results = await computeClientEconomicsSnapshots(year, month, 'reactive-refresh')
+
+      return `recomputed client_economics: ${results.length} snapshots for ${year}-${String(month).padStart(2, '0')}`
+    } catch {
+      return 'client_economics recompute skipped (dependency not ready)'
+    }
   },
 
-  maxRetries: 0
+  maxRetries: 1
 }

@@ -5,12 +5,13 @@ import 'server-only'
  *
  * Each projection declares:
  * - Which outbox event types trigger a refresh
- * - How to extract the entity scope from the event payload (e.g., organizationId, memberId)
+ * - How to extract the entity scope from the event payload
  * - The refresh function to call (idempotent, safe for re-runs)
  * - Max retries before dead-lettering
- *
- * The reactive consumer iterates this registry instead of hardcoding handlers.
+ * - Domain partition for parallel cron execution
  */
+
+export type ProjectionDomain = 'organization' | 'people' | 'finance' | 'notifications' | 'delivery'
 
 export interface ProjectionDefinition {
   /** Unique name for logging and observability */
@@ -18,6 +19,9 @@ export interface ProjectionDefinition {
 
   /** Human description */
   description: string
+
+  /** Domain partition — crons can filter by domain for parallel execution */
+  domain: ProjectionDomain
 
   /** Domain event types that trigger this projection */
   triggerEvents: string[]
@@ -42,8 +46,18 @@ export const registerProjection = (def: ProjectionDefinition): void => {
 
 export const getRegisteredProjections = (): readonly ProjectionDefinition[] => registry
 
-export const getProjectionsForEvent = (eventType: string): ProjectionDefinition[] =>
-  registry.filter(p => p.triggerEvents.includes(eventType))
+export const getProjectionsForEvent = (eventType: string, domain?: ProjectionDomain): ProjectionDefinition[] =>
+  registry.filter(p =>
+    p.triggerEvents.includes(eventType) &&
+    (domain === undefined || p.domain === domain)
+  )
 
-export const getAllTriggerEventTypes = (): string[] =>
-  [...new Set(registry.flatMap(p => p.triggerEvents))]
+export const getAllTriggerEventTypes = (domain?: ProjectionDomain): string[] =>
+  [...new Set(
+    registry
+      .filter(p => domain === undefined || p.domain === domain)
+      .flatMap(p => p.triggerEvents)
+  )]
+
+export const getRegisteredDomains = (): ProjectionDomain[] =>
+  [...new Set(registry.map(p => p.domain))]

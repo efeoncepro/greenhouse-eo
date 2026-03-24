@@ -6,6 +6,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 export const organization360Projection: ProjectionDefinition = {
   name: 'organization_360',
   description: 'Invalidate organization_360 cache when assignments or memberships change',
+  domain: 'organization',
 
   triggerEvents: [
     'assignment.created',
