@@ -1,6 +1,7 @@
 # Handoff.md
 
 ## Uso
+
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 Mantener aqui solo estado activo, validacion reciente y proximos pasos.
 Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
@@ -8,30 +9,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## Formato Recomendado
 
 ### Fecha
+
 - YYYY-MM-DD HH:MM zona horaria
 
 ### Agente
+
 - Nombre del agente o persona
 
 ### Objetivo del turno
+
 - Que se hizo o que se intento resolver
 
 ### Rama
+
 - Rama usada
 - Rama objetivo del merge
 
 ### Ambiente objetivo
+
 - Development, Preview, staging o Production
 
 ### Archivos tocados
+
 - Lista corta de archivos relevantes
 
 ### Verificacion
+
 - Comandos ejecutados
 - Resultado
 - Lo que no se pudo verificar
 
 ### Riesgos o pendientes
+
 - Riesgos activos
 - Decisiones bloqueadas
 - Proximo paso recomendado
@@ -40,18 +49,217 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-24 — Sesión Claude Opus 4.6
+
+### Agente
+
+- Claude Opus 4.6 (1M context)
+
+### Objetivo del turno
+
+Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
+
+### Rama
+
+- `develop` → deploy a staging vía Vercel
+
+### Tasks completadas en esta sesión
+
+| Task | Descripción |
+|------|------------|
+| TASK-024 | Login Redesign (two-panel layout, Greenhouse branding) |
+| TASK-012 | Outbox Event Expansion (4 slices, 30+ event types) |
+| TASK-006 | Webhook Infrastructure MVP |
+| TASK-010 | Organization Economics Dashboard |
+| TASK-004 | Finance Dashboard Calculation Correction |
+| TASK-003 | Invoice Payment Ledger Correction |
+| TASK-013 | Nubox Finance Reconciliation Bridge |
+| TASK-022 | Services Runtime Closure (HubSpot sync + legacy cutover + ETL) |
+| TASK-014 | Projects Account 360 Bridge |
+| TASK-015 | Financial Intelligence Layer v2 (trends, LTV/CAC, allocations UI) |
+| TASK-023 | Notification System (full: schema, service, API, UI, outbox integration, welcome) |
+| TASK-011 | ICO Person 360 Integration |
+| TASK-017 | Campaign 360 (full: DDL, CRUD, metrics, budget, roster, UI) |
+| TASK-045 | Reactive Projection Refresh + Scalability Hardening |
+
+### Auditorías ejecutadas
+
+1. **Module Integration Audit** (Finance ↔ HRM ↔ People ↔ Account 360): 5 brechas detectadas y cerradas
+2. **Delivery Layer Audit**: 5 brechas detectadas y cerradas (multi-assignee, sprint materialization, legacy dual-read, health check)
+3. **TASK-008 Architecture Contrast**: alineada, no requiere cambios
+
+### Client-Facing Delivery Views implementadas
+
+| Vista | Ruta | APIs |
+|-------|------|------|
+| Review Queue | `/reviews` | `GET /api/reviews/queue` |
+| Client Campaigns | `/campanas` + `/campanas/[id]` | Reutiliza campaign APIs existentes |
+| Project Detail (assignees) | `/proyectos/[id]` | `GET /api/projects/[id]/ico` |
+| Mi Equipo | `/equipo` | Reutiliza `/api/team/capacity` |
+| Delivery Analytics | `/analytics` | `GET /api/analytics/delivery` |
+| Notifications | `/notifications` + `/notifications/preferences` | 5 endpoints notification |
+
+### Infraestructura platform
+
+- Projection Registry declarativo con 4 proyecciones registradas
+- 4 crons domain-partitioned (org, people, finance, notifications)
+- Refresh queue persistente con dedup, retry, dead-letter
+- Materialization health check (`/api/cron/materialization-health`)
+- Projection observability (`/api/internal/projections`)
+- Playbook documentado: `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+
+### Pendientes para próxima sesión
+
+- Agregar nuevas vistas al sidebar navigation del cliente (verticalMenuData.tsx)
+- TASK-009 Greenhouse Home (Nexa) — dashboard de entrada
+- TASK-021 Typography Variant Adoption — deuda técnica visual
+- TASK-008 Team Identity Capacity System — formalizar modelo de capacidad
+- Sprint burndown chart API (`GET /api/sprints/[id]/burndown`)
+
+### Verificación
+
+- `npx tsc --noEmit` — limpio en cada commit
+- Todos los commits pushed a `develop`
+
+---
+
+## 2026-03-24 23:20 -03
+
+### Agente
+
+- GitHub Copilot (GPT-5.4)
+
+### Objetivo del turno
+
+- Revisar HR + Finanzas contra el codebase y el modelo actual, documentar brechas reales y derivar las tasks necesarias sin duplicar lanes ya existentes
+
+### Rama
+
+- develop
+
+### Ambiente objetivo
+
+- documentation / backlog
+
+### Archivos tocados
+
+- `docs/roadmap/GREENHOUSE_HR_FINANCE_RUNTIME_GAPS_V1.md` — documento canónico de brechas HR + Finance runtime
+- `docs/tasks/to-do/TASK-050-finance-client-canonical-runtime-cutover.md` — lane para cortar `Finance Clients` al grafo canónico actual
+- `docs/tasks/to-do/TASK-051-finance-payroll-bridge-postgres-alignment.md` — lane para alinear Finance <-> Payroll sobre `greenhouse_payroll`
+- `docs/tasks/to-do/TASK-052-person-360-finance-access-alignment.md` — lane para habilitar consumo financiero de persona desde `Person 360`
+- `docs/tasks/README.md` — índice actualizado con TASK-050..052 y dependencias cruzadas HR/Finance
+- `docs/tasks/TASK_ID_REGISTRY.md` — registro actualizado, siguiente ID `TASK-053`
+- `docs/README.md` — roadmap enlaza el nuevo documento de brechas HR/Finance
+- `changelog.md` — registro del cambio documental
+
+### Verificacion
+
+- Revisión manual de consistencia documental entre roadmap, índice, registry y nuevas tasks
+- No se ejecutaron `lint`, `test` ni `build` porque el cambio es exclusivamente documental
+
+### Riesgos o pendientes
+
+- Hallazgo de runtime real: `src/app/api/finance/analytics/trends/route.ts` sigue consultando `greenhouse_hr.payroll_*` en vez de `greenhouse_payroll.*`; quedó documentado como gap principal en `TASK-051`
+- Hallazgo de permisos real: Finance no puede consumir `Person 360` financiero con el contrato actual; quedó documentado en `TASK-052`
+- El bug de prorrateo de permisos que cruzan período no recibió task nueva porque ya está cubierto por `TASK-001` y `TASK-005`; conviene ejecutar esas lanes antes de asumir correctitud plena de nómina
+
+## 2026-03-24 22:45 -03
+
+### Agente
+
+- GitHub Copilot (GPT-5.4)
+
+### Objetivo del turno
+
+- Crear las tasks derivadas para cerrar las brechas del runtime client-facing de Delivery detectadas en el audit de codebase
+
+### Rama
+
+- develop
+
+### Ambiente objetivo
+
+- documentation / backlog
+
+### Archivos tocados
+
+- `docs/roadmap/GREENHOUSE_DELIVERY_CLIENT_RUNTIME_GAPS_V1.md` — documento canonico de brechas Delivery client-facing
+- `docs/tasks/to-do/TASK-046-delivery-performance-metrics-ico-cutover.md` — lane para cortar performance Delivery a ICO y eliminar el falso RpA
+- `docs/tasks/to-do/TASK-047-delivery-project-scope-visibility-correction.md` — lane para corregir inventario visible de proyectos segun scope canónico
+- `docs/tasks/to-do/TASK-048-delivery-sprint-runtime-completion.md` — lane para cerrar la superficie client-facing de Sprints
+- `docs/tasks/to-do/TASK-049-delivery-client-runtime-consolidation.md` — lane para consolidar contracts y fan-out del read path Delivery
+- `docs/tasks/README.md` — índice actualizado con TASK-046..049 y dependencias cruzadas Delivery
+- `docs/tasks/TASK_ID_REGISTRY.md` — registro actualizado, siguiente ID `TASK-050`
+- `docs/README.md` — roadmap enlaza el nuevo documento de brechas Delivery
+- `changelog.md` — registro del cambio documental
+
+### Verificacion
+
+- Revisión manual de consistencia documental entre roadmap, índice, registry y nuevas tasks
+- `get_errors` sin errores en los markdown tocados
+- No se ejecutaron `lint`, `test` ni `build` porque el cambio es exclusivamente documental
+
+### Riesgos o pendientes
+
+- El índice de tasks arrastra drift previo: `TASK-014` aparece enlazada en `docs/tasks/README.md` pero el archivo no existe en `docs/tasks/to-do/`, mientras `changelog.md` la declara implementada; conviene normalizar esa inconsistencia en una lane documental aparte
+- Próximo paso recomendado: decidir si se toma primero `TASK-046` para corregir la semántica KPI visible al cliente o `TASK-047` para corregir el inventario de proyectos antes de tocar UX más amplia
+
+## 2026-03-24 22:10 -03
+
+### Agente
+
+- GitHub Copilot (GPT-5.4)
+
+### Objetivo del turno
+
+- Crear una fuente canónica de brechas runtime cross-module basada en codebase real y derivar tasks nuevas, completas y ejecutables para cerrarlas
+
+### Rama
+
+- develop
+
+### Ambiente objetivo
+
+- documentation / backlog
+
+### Archivos tocados
+
+- `docs/roadmap/GREENHOUSE_RUNTIME_SYNERGY_GAPS_V1.md` — documento canonico de brechas runtime
+- `docs/tasks/to-do/TASK-042-person-operational-serving-cutover.md` — nueva lane para cortar People a métricas operativas canónicas
+- `docs/tasks/to-do/TASK-043-person-360-runtime-consolidation.md` — nueva lane para consolidar Person 360 serving-first
+- `docs/tasks/to-do/TASK-044-organization-executive-snapshot.md` — nueva lane para snapshot ejecutivo por organización
+- `docs/tasks/to-do/TASK-045-reactive-projection-refresh.md` — nueva lane para refresh reactivo de proyecciones
+- `docs/tasks/README.md` — índice actualizado con nuevas tasks y dependencias cruzadas
+- `docs/tasks/TASK_ID_REGISTRY.md` — registro actualizado, siguiente ID `TASK-046`
+- `docs/README.md` — roadmap enlaza el nuevo documento de brechas
+- `changelog.md` — registro del cambio documental
+
+### Verificacion
+
+- Revisión manual de consistencia documental entre índice, registry y nuevas tasks
+- No se ejecutaron `lint`, `test` ni `build` porque el cambio es exclusivamente documental
+
+### Riesgos o pendientes
+
+- El backlog histórico del índice sigue teniendo drift previo en algunos estados legacy/completados y conviene normalizarlo en una lane separada para no mezclarlo con esta creación de brechas
+- Próximo paso recomendado: decidir si `TASK-042` o `TASK-044` entra primero a `in-progress` según si la prioridad inmediata está en `People` o en superficies ejecutivas de organización
+
 ## 2026-03-24 — TASK-004 Finance Dashboard Calculation Correction
 
 ### Agente
+
 - Claude Opus 4.6 (Agent SDK worktree)
 
 ### Objetivo del turno
+
 - Implementacion de TASK-004: corregir 6 problemas de calculo del dashboard financiero
 
 ### Rama
+
 - develop
 
 ### Archivos tocados
+
 - `src/app/api/finance/income/summary/route.ts` — Postgres-first con BQ fallback
 - `src/app/api/finance/expenses/summary/route.ts` — Postgres-first con BQ fallback
 - `src/app/api/finance/dashboard/cashflow/route.ts` — ya tenia Postgres, verificado
@@ -61,10 +269,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/lib/finance/finance-dashboard-calculations.test.ts` — 10 tests nuevos
 
 ### Verificacion
+
 - No se pudo ejecutar tsc ni vitest por restricciones de bash en worktree
 - Revision manual de tipos completada
 
 ### Riesgos o pendientes
+
 - Ejecutar `npx tsc --noEmit`, `pnpm test`, `pnpm lint`
 - Query de income_payments asume tabla existe en Postgres
 - Dependencia parcial con TASK-003 (Invoice Payment Ledger)
@@ -74,15 +284,19 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-24 — TASK-013 Nubox Finance Reconciliation Bridge
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Implementacion completa de TASK-013: matching engine DTE ↔ Finance, proposals store, DTE coverage metrics, API endpoints
 
 ### Rama
+
 - develop
 
 ### Archivos tocados
+
 - `src/lib/nubox/dte-matching.ts` — Matching engine con scoring multi-signal (amount/folio/RUT/date/org)
 - `src/lib/nubox/dte-matching.test.ts` — 12 unit tests para matching engine
 - `src/lib/nubox/reconciliation.ts` — Orchestrator, proposal CRUD, resolve con outbox events
@@ -94,10 +308,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/README.md` — Task moved to Complete
 
 ### Verificacion
+
 - `pnpm exec tsc --noEmit` — 0 new errors (6 pre-existing in unrelated files)
 - `pnpm exec vitest run src/lib/nubox/dte-matching.test.ts` — 12/12 passed
 
 ### Riesgos o pendientes
+
 - DDL script `setup-postgres-dte-reconciliation.sql` must be run in production before use
 - Pre-existing TS errors in `finance/expenses/summary`, `finance/income/summary`, `finance/dashboard/summary` (unrelated)
 - No UI components created (task spec Slice 3 — reconciliation UI card is a follow-up)
@@ -107,20 +323,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-24 21:00 -03
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Implementacion de TASK-006 Webhook Infrastructure MVP (6 slices)
 
 ### Rama
+
 - Rama usada: `develop`
 
 ### Ambiente objetivo
+
 - staging
 
 ### Archivos tocados
 
 **Webhook infrastructure (17 archivos nuevos):**
+
 - `scripts/setup-postgres-webhooks.sql` — DDL 5 tablas + indexes + grants + seed
 - `scripts/setup-postgres-webhooks.ts` — TS runner
 - `src/lib/webhooks/types.ts` — tipos compartidos
@@ -141,11 +362,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `vercel.json` — 2 crons nuevos
 
 ### Verificacion
+
 - `npx tsc --noEmit` — clean
 - `pnpm lint` — clean
 - No runtime testing (requiere Postgres con tablas provisionadas)
 
 ### Riesgos o pendientes
+
 - **Provisioning**: ejecutar `npx tsx scripts/setup-postgres-webhooks.ts` en staging para crear las tablas
 - **Teams compat**: ruta legacy `/api/hr/core/attendance/webhook/teams` sigue activa; la nueva ruta genérica es `/api/webhooks/teams-attendance`
 - **Finance subscription**: seeded como inactive; activar manualmente para testing
@@ -156,24 +379,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-24 19:30 -03
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Rebrand sidebar y favicon a Greenhouse identity
 - Rediseno completo de login page con identidad Greenhouse
 - Migracion de CODEX_TASK a convencion TASK-###
 - Implementacion de TASK-012 Outbox Event Expansion (4 slices)
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: pendiente merge a `main`
 
 ### Ambiente objetivo
+
 - staging (dev-greenhouse.efeoncepro.com)
 
 ### Archivos tocados
 
 **Login redesign:**
+
 - `src/views/Login.tsx` — reescrito con layout de dos paneles
 - `src/views/login/GreenhouseBrandPanel.tsx` — panel izquierdo de marca (nuevo)
 - `src/views/login/LoginValueCard.tsx` — card de propuesta de valor (nuevo)
@@ -184,6 +412,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `public/images/greenhouse/SVG/` — todos los SVGs de Greenhouse
 
 **TASK-012 Outbox Event Expansion:**
+
 - `src/lib/sync/publish-event.ts` — helper reutilizable (nuevo)
 - `src/lib/sync/event-catalog.ts` — catalogo de tipos (nuevo)
 - `src/lib/sync/reactive-consumer.ts` — consumer reactivo (nuevo)
@@ -195,15 +424,18 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` — catalogo documentado (nuevo)
 
 **Task migration:**
+
 - 38 archivos en `docs/tasks/` renombrados de CODEX_TASK a TASK-###
 
 ### Verificacion
+
 - `npx tsc --noEmit` — clean
 - `pnpm lint` — clean
 - Login desplegado y verificado visualmente en staging
 - Outbox: codigo compilado, no testeado en runtime (requiere Postgres + eventos reales)
 
 ### Riesgos o pendientes
+
 - **Login dark mode**: deferido a TASK-032 (botón Microsoft y logo mobile)
 - **Outbox reactive consumer**: la tabla `outbox_reactive_log` se auto-provisiona en primer run del cron. Verificar que funcione en staging
 - **Cron outbox-react**: necesita configurarse en Vercel cron o `vercel.json` para ejecutar cada 5 min
@@ -215,24 +447,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-24 17:24 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Promover `develop` a `main` despues de validar la lane de lint debt burn-down.
 - Verificar staging y luego confirmar el deploy productivo real en Vercel.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main`
 
 ### Ambiente objetivo
+
 - staging y Production
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Acciones externas ejecutadas
+
 - `develop` se publico en `origin/main` por fast-forward remoto:
   - `ac63e62` en `origin/develop`
   - `ac63e62` en `origin/main`
@@ -244,6 +482,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - dominio: `https://dev-greenhouse.efeoncepro.com`
 
 ### Verificación
+
 - staging:
   - `/api/auth/session` en deployment nuevo: `{}`
   - `/api/auth/session` en `dev-greenhouse.efeoncepro.com`: `{}`
@@ -257,26 +496,32 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - run: `https://github.com/efeoncepro/greenhouse-eo/actions/runs/23510433202`
 
 ### Riesgos o pendientes
+
 - El release productivo quedo sano en smoke minimo, pero no se ejecuto una QA funcional profunda de todos los modulos.
 - Warning no bloqueante detectado en GitHub Actions: `actions/checkout@v4` y `actions/setup-node@v4` siguen corriendo bajo Node 20 deprecado; conviene actualizar ese workflow antes de junio 2026.
 
 ## 2026-03-24 17:31 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Cerrar `CODEX_TASK_Lint_Debt_Burn_Down_v1` dejando el repo nuevamente con baseline confiable de lint.
 - Documentar el cierre de la lane y verificar que no hubiera impacto cruzado funcional sobre otras tasks vivas.
 
 ### Rama
+
 - Rama usada: `fix/codex-lint-debt-burn-down`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Development / workflow de calidad previo a staging y production
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
@@ -290,6 +535,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/test/*`
 
 ### Verificación
+
 - `pnpm exec eslint . --ext .js,.jsx,.ts,.tsx --fix`:
   - reducido el baseline desde `403` errores y `11` warnings a un remanente manual acotado
 - `pnpm lint`:
@@ -303,31 +549,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - sin cambios de estado funcional detectados en otras tasks; solo desbloqueo compartido de higiene/verificacion
 
 ### Riesgos o pendientes
+
 - El diff de esta lane es grande por naturaleza porque absorbe el autofix masivo y el cleanup manual del remanente.
 - Conviene revisar por slices al momento de abrir PR o mergear para hacer el review mas legible.
 
 ## 2026-03-24 16:56 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Ejecutar `CODEX_TASK_Lint_Debt_Burn_Down_v1` para recuperar un baseline confiable de `pnpm lint`.
 - Empezar con autofix controlado y luego cerrar el remanente manual por slices, comenzando en `scripts/*`.
 
 ### Rama
+
 - Rama usada: `fix/codex-lint-debt-burn-down`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Development / workflow de calidad previo a staging y production
 
 ### Archivos tocados
+
 - `docs/tasks/in-progress/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 
 ### Verificación
+
 - `pnpm lint` antes de intervenir:
   - `403` errores
   - `11` warnings
@@ -339,31 +592,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - OK local con Next.js 16.1.1
 
 ### Riesgos o pendientes
+
 - La deuda está distribuida entre `scripts/*`, `src/app/api/*`, `src/lib/*`, `src/views/*`, `src/components/*`, `src/types/*` y `src/test/*`.
 - El burn-down debe mantenerse mecánico; si aparece una corrección funcional disfrazada de lint, se separa o se documenta explícitamente.
 
 ## 2026-03-24 16:41 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Materializar en GitHub el Project operativo definido documentalmente y enlazarlo de forma real con `efeoncepro/greenhouse-eo`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - GitHub / workflow operativo
 
 ### Archivos tocados
+
 - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
 
 ### Acciones externas ejecutadas
+
 - Project creado:
   - `efeoncepro / Greenhouse Delivery`
   - `https://github.com/orgs/efeoncepro/projects/2`
@@ -395,6 +655,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `#18` `[TASK-010] Organization Economics Dashboard`
 
 ### Verificación
+
 - `gh project view 2 --owner efeoncepro` confirma existencia del Project
 - `gh issue list -R efeoncepro/greenhouse-eo` confirma creación de las issues `#9` a `#18`
 - GraphQL verificado contra GitHub:
@@ -403,6 +664,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `Task ID`, `Rank`, `Priority`, `Domain`, `Blocked`, `Task Doc`, `Legacy ID`, `Impact` y `Effort` quedaron poblados en los items bootstrap
 
 ### Riesgos o pendientes
+
 - Las vistas del Project (`Board - Execution`, `Table - Backlog`, etc.) siguen pendientes de crearse manualmente en la UI o por una ruta GraphQL adicional.
 - El campo `Iteration` no quedó creado desde CLI en este turno; si se quiere roadmap vivo por sprint, habrá que completarlo desde la UI o con una mutación GraphQL específica.
 - El repo ya quedó enlazado operacionalmente al Project vía issues reales; el siguiente paso natural es decidir owners iniciales y comenzar a mover `TASK-002+` según capacidad real.
@@ -410,20 +672,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-24 12:30 America/Santiago
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Normalizar la gobernanza del sistema de tasks sin renombrar masivamente el backlog legacy.
 - Dejar una plantilla canonica para crear e interpretar tasks nuevas con IDs estables `TASK-###`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Documentacion / workflow operativo
 
 ### Archivos tocados
+
 - `docs/tasks/TASK_TEMPLATE.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
@@ -437,6 +704,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificación
+
 - Validacion documental/manual de consistencia entre:
   - template nuevo
   - registro de IDs bootstrap
@@ -448,6 +716,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Pendiente de este turno: crear el Project real en GitHub, cargar `TASK-001..010` y migracion masiva de archivos legacy `CODEX_TASK_*` a `TASK-###`.
 
 ### Riesgos o pendientes
+
 - El repo queda en modo mixto por diseño: `TASK-###` para tasks nuevas y `CODEX_TASK_*` legacy hasta migracion.
 - No se renombraron briefs existentes en este turno para evitar churn documental y rotura de referencias historicas.
 - El primer bloque `TASK-001..010` ya quedó reservado documentalmente; falta materializarlo en GitHub Issues / Project.
@@ -456,25 +725,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 09:32 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Documentar la deuda vigente de `eslint` como una `CODEX_TASK` ejecutable despues, sin tocar todavia el baseline de codigo.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Documentacion / task planning
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificación
+
 - Analisis previo de `eslint` reutilizado para fijar alcance y slices del burn-down:
   - `399` errores
   - `11` warnings
@@ -484,33 +759,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se ejecuto `pnpm lint` en este turno porque la task creada existe precisamente para cerrar esa deuda despues en una lane dedicada.
 
 ### Riesgos o pendientes
+
 - La deuda de lint sigue abierta; esta entrada solo deja el plan operativo y el orden recomendado de ejecucion.
 - El arbol trae cambios ajenos en `src/components/theme/types.ts` y en la reclasificacion/cierre de `CODEX_TASK_Typography_Hierarchy_Fix`; no mezclar esos cambios con el commit documental de esta lane.
 
 ## 2026-03-22 — Typography task closure + scalable font system
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Cerrar `CODEX_TASK_Typography_Hierarchy_Fix` como parcialmente absorbida
 - Implementar custom typography variants en theme para reemplazo gradual de hardcoded fontWeights
 
 ### Rama
+
 - `develop`
 
 ### Archivos tocados
+
 - `src/components/theme/mergedTheme.ts` — 3 custom variants: `monoId`, `monoAmount`, `kpiValue`
 - `src/components/theme/types.ts` — MUI module augmentation para TypographyVariants + TypographyPropsVariantOverrides
 - `docs/tasks/complete/CODEX_TASK_Typography_Hierarchy_Fix.md` — movida de to-do, nota de cierre
 - `docs/tasks/README.md` — actualizado backlog y Complete
 
 ### Verificación
+
 - `npx tsc --noEmit` — clean, 0 errores
 - No se tocaron componentes existentes — las 56+ instancias existentes siguen funcionando sin cambios
 - Nuevos componentes pueden usar `<Typography variant="monoId">` etc. con TypeScript support completo
 
 ### Próximo paso
+
 - Adopción gradual: al tocar archivos con hardcoded fontWeight, migrar a los nuevos variants
 - Los ~15 finance section headers con `sx={{ fontFamily: 'Poppins', fontWeight: 600 }}` en `variant='h4'` son redundantes y pueden simplificarse a solo `variant='h4'`
 
@@ -519,19 +801,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 09:05 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Canonizar la arquitectura de webhooks para Greenhouse y dejar creada la lane MVP de implementacion.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Documentacion / arquitectura / task planning
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
@@ -543,6 +830,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificación
+
 - Contraste documental/manual contra el runtime actual del repo:
   - webhook inbound real: `src/app/api/hr/core/attendance/webhook/teams/route.ts`
   - secreto compartido: `src/lib/hr-core/shared.ts`
@@ -554,6 +842,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se ejecuto `pnpm lint` en este turno porque el repo ya arrastra una deuda de lint documentada previamente y el alcance aqui fue solo documental.
 
 ### Riesgos o pendientes
+
 - La arquitectura deja claro el target, pero no implementa todavia las tablas ni el gateway compartido.
 - La nueva lane debe coordinarse especialmente con:
   - `CODEX_TASK_Notification_System.md`
@@ -563,19 +852,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 08:36 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Canonizar el mapa de repos hermanos de `greenhouse-eo` para que futuros agentes sepan qué repo consultar primero según el dominio.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / coordinación multi-repo
 
 ### Archivos tocados
+
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 - `docs/README.md`
 - `AGENTS.md`
@@ -585,6 +879,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificación
+
 - Validación documental/manual del contenido contra GitHub CLI:
   - `gh repo view cesargrowth11/notion-bigquery`
   - `gh repo view cesargrowth11/hubspot-bigquery`
@@ -597,15 +892,18 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no aparecieron fallos vinculados a `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ni a los enlaces documentales agregados
 
 ### Riesgos o pendientes
+
 - La lista actual es deliberadamente corta y cubre solo los repos hermanos confirmados como operativos para Greenhouse en esta sesión.
 - Si aparece otro repo upstream real, debe agregarse en `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` y dejar solo deltas breves en los documentos vivos.
 
 ## 2026-03-22 — People 360 Enrichments (CERRADA)
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Implementar y cerrar `CODEX_TASK_People_360_Enrichments_v1`:
   - Slice 1: Wire `identity` tab en type system + permissions
   - Slice 2: `PersonIdentityTab.tsx` — 4 cards read-only:
@@ -617,9 +915,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - Slice 4: CTAs cross-module en PersonPayrollTab y PersonFinanceTab
 
 ### Rama
+
 - `develop`
 
 ### Archivos tocados
+
 - `src/types/people.ts` — added `'identity'` to PersonTab
 - `src/lib/people/permissions.ts` — identity tab visibility + filter
 - `src/views/greenhouse/people/helpers.ts` — TAB_PERMISSIONS + TAB_CONFIG
@@ -631,10 +931,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/lib/people/permissions.test.ts` — updated expectations
 
 ### Verificación
+
 - `npx tsc --noEmit` — clean
 - `pnpm test` — 179/179 passing
 
 ### Riesgos o pendientes
+
 - Tab visible para `efeonce_admin`, `efeonce_operations`, `hr_payroll` — sin datos si person_360 no está poblado (muestra empty state)
 - Task CERRADA — scope completo
 
@@ -643,9 +945,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 09:15 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Abrir `CODEX_TASK_HR_Payroll_Operational_Hardening_v1`.
 - Primer slice tomado:
   - readiness/preflight por período
@@ -663,13 +967,16 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - integración objetivo declarada: `microsoft_teams`
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos previstos
+
 - `src/lib/payroll/payroll-readiness.ts`
 - `src/lib/payroll/payroll-readiness.test.ts`
 - `src/types/payroll.ts`
@@ -684,11 +991,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
 
 ### Verificación
+
 - `pnpm exec eslint src/types/payroll.ts src/lib/payroll/payroll-readiness.ts src/lib/payroll/payroll-readiness.test.ts 'src/app/api/hr/payroll/periods/[periodId]/readiness/route.ts' src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx src/lib/payroll/payroll-entry-explain.ts src/lib/payroll/payroll-entry-explain.test.ts 'src/app/api/hr/payroll/entries/[entryId]/explain/route.ts' src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx` ✅
 - `pnpm vitest run src/lib/payroll/payroll-readiness.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx src/lib/payroll/payroll-entry-explain.test.ts src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx` ✅
 - `npx tsc --noEmit` ⚠️ bloqueado por errores preexistentes fuera del scope en `src/lib/team-admin/mutate-team.ts`
 
 ### Riesgos o pendientes
+
 - No cambiar todavía la semántica del cálculo ni bloquear `calculate` por warnings meramente informativos.
 - Los únicos bloqueantes nuevos del readiness deben corresponder a condiciones ya bloqueantes en runtime:
   - período sin miembros con compensación vigente
@@ -704,25 +1013,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 — Admin Team PG Migration -03
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Implementar y cerrar `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
 - 3 slices: member reads/mutations, assignment reads/mutations (dual-write flipped), team-queries roster + identity
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Archivos tocados
+
 - `src/lib/team-admin/mutate-team.ts` — Postgres-first reads + Postgres-primary mutations + identity sync
 - `src/lib/team-queries.ts` — Postgres-first roster + identity reads
 
 ### Verificación
+
 - `npx tsc --noEmit` ✅
 - `pnpm test` — 179 tests pass ✅
 
 ### Riesgos o pendientes
+
 - `org_role_name` / `profession_name` NULL en Postgres path (catálogos solo en BigQuery) — mismo tratamiento que People
 - `notion_ops` queries se mantienen en BigQuery (no hay Postgres equivalente)
 - BigQuery fallback funcional si Postgres falla
@@ -731,16 +1046,20 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 — Task Closure -03
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Cerrar `CODEX_TASK_Person_360_Coverage_Consumer_Cutover_v1` — consumer cutover de People a Postgres-first completado
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Archivos tocados
+
 - `src/lib/people/get-people-list.ts` — Postgres-first con BigQuery fallback
 - `src/lib/people/get-person-detail.ts` — 3 sub-queries Postgres-first con BigQuery fallback independiente
 - `src/lib/people/get-people-list.test.ts` — 11 tests unitarios (Postgres path, fallback, error propagation)
@@ -748,10 +1067,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `scripts/backfill-orphan-member-profiles.ts` — reconciliación de members sin identity_profile_id
 
 ### Verificación
+
 - `npx tsc --noEmit` ✅
 - `pnpm test` — 22 tests pass ✅
 
 ### Riesgos o pendientes
+
 - Ejecutar `backfill-orphan-member-profiles.ts` en staging/production (operativo)
 - Ejecutar `audit-person-360-coverage.ts` para verificar cobertura post-backfill (operativo)
 - Smoke test en staging: People list + person detail navigation
@@ -760,9 +1081,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 08:40 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Alinear `People > Perfil HR` con la arquitectura 360:
   - usar `detail.hrContext` como fuente primaria del perfil HR
   - usar métricas ICO como fuente primaria de KPI operativos en la tab
@@ -770,13 +1093,16 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - agregar tests unitarios para evitar nueva desalineación entre `People`, `HR Core` e `ICO`
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos previstos
+
 - `src/views/greenhouse/people/PersonTabs.tsx`
 - `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx`
 - `src/views/greenhouse/people/tabs/person-hr-profile-view-model.ts`
@@ -785,6 +1111,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
 
 ### Riesgos o pendientes
+
 - No tocar layout global ni volver a parchear CSS base del dashboard para este problema.
 - Mantener `Payroll` fuera de este slice: la preocupación del usuario es válida, pero la fuente del cálculo de nómina no es esta tab.
 - Estado actual del slice:
@@ -804,25 +1131,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 08:18 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Consolidar el contrato arquitectónico de `Payroll` en un documento canónico único para evitar que el módulo siga dependiendo de reconstrucción desde tasks, código y handoff.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / arquitectura
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/README.md`
 - `project_context.md`
 
 ### Verificacion
+
 - Revisión cruzada contra runtime actual de `Payroll`:
   - `scripts/setup-postgres-payroll.sql`
   - `src/lib/payroll/calculate-payroll.ts`
@@ -835,34 +1168,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `src/app/api/hr/payroll/**`
 
 ### Riesgos o pendientes
+
 - La nueva fuente canónica de arquitectura para `Payroll` ya existe y debe actualizarse primero cuando cambien semánticas del módulo.
 - No se hizo `commit` ni `push` en esta pasada.
 
 ## 2026-03-21 08:05 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir el fallo al guardar `Editar período` en `Payroll` cuando se cambiaba el mes/año imputable y el backend respondía `Unable to read updated payroll period.`
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/lib/payroll/postgres-store.ts`
 - `src/lib/payroll/postgres-store.test.ts`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/payroll/postgres-store.ts src/lib/payroll/postgres-store.test.ts` ✅
 - `pnpm vitest run src/lib/payroll/postgres-store.test.ts` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - Causa raíz confirmada: `pgUpdatePayrollPeriod()` actualizaba el período dentro de la transacción y luego intentaba releerlo con `pgGetPayrollPeriod()` fuera de esa misma transacción; si el `period_id` cambiaba (`2026-03 -> 2026-02`), la lectura podía no ver aún el nuevo row y disparaba el `500`.
 - La relectura final ahora ocurre con `client.query(...)` dentro de la transacción y quedó cubierta por un test unitario de regresión.
 - Pendiente: probar manualmente en `staging` el caso real `Marzo 2026 -> Febrero 2026` para confirmar que el modal ya guarda, cierra y deja el período corregido en `draft`.
@@ -870,19 +1211,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 07:55 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Permitir corregir `mes/año imputable` en períodos de `Payroll` no exportados, reseteando el período y limpiando entries cuando el cambio altera la base de cálculo.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/types/payroll.ts`
 - `src/app/api/hr/payroll/periods/[periodId]/route.ts`
 - `src/lib/payroll/period-lifecycle.ts`
@@ -892,12 +1238,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
 
 ### Verificacion
+
 - `pnpm pg:doctor --profile=runtime` ✅
 - `pnpm exec eslint src/types/payroll.ts 'src/app/api/hr/payroll/periods/[periodId]/route.ts' src/lib/payroll/period-lifecycle.ts src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/get-payroll-periods.ts src/lib/payroll/postgres-store.ts src/views/greenhouse/payroll/PayrollPeriodTab.tsx` ✅
 - `pnpm vitest run src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - Cambiar `year/month`, `ufValue` o `taxTableVersion` en un período no exportado ahora elimina las `payroll_entries` existentes y lo devuelve a `draft`; esto es intencional para no arrastrar KPIs/attendance del mes equivocado.
 - El período `exported` sigue siendo inmutable.
 - Queda pendiente validar manualmente en `staging` el caso concreto `2026-03 -> 2026-02` y comprobar que el dashboard vuelve a mostrar el período corregido como borrador, listo para recalcular.
@@ -907,19 +1255,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 07:43 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Ajustar la semántica de estados de `Payroll` para que una nómina `approved` siga siendo editable/recalculable hasta el momento de exportarla/cerrarla.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/lib/payroll/period-lifecycle.ts`
 - `src/lib/payroll/period-lifecycle.test.ts`
 - `src/lib/payroll/compensation-versioning.ts`
@@ -933,11 +1286,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/payroll/period-lifecycle.ts src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/lib/payroll/get-compensation.ts src/lib/payroll/postgres-store.ts 'src/app/api/hr/payroll/entries/[entryId]/route.ts' src/views/greenhouse/payroll/PayrollEntryTable.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx` ✅
 - `pnpm vitest run src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - `approved` ahora significa “listo para pago/revisión”, no “cerrado final”; el candado definitivo pasa a ser `exported`.
 - Si se recalcula un período `approved` o se edita una entry dentro de él, el período vuelve a `calculated` y debe aprobarse nuevamente antes de exportar.
 - Sigue pendiente validar manualmente en `staging` que el flujo `approved -> edición/recálculo -> calculated -> reapprove -> export` se vea claro para HR.
@@ -947,27 +1302,33 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 — Finance Postgres Runtime Migration
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Cerrar pendientes de `CODEX_TASK_Finance_Postgres_Runtime_Migration_v1`:
   1. Migrar PUT income y PUT expenses a Postgres-first
   2. Migrar reconciliación runtime (match/unmatch/exclude/auto-match)
   3. Verificar TypeScript limpio
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Task
+
 - `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
 
 ### Estado al iniciar
+
 - Slice 1 completo (accounts, suppliers, exchange_rates) — 7 rutas Postgres-first
 - Slice 2 parcial (income GET/POST, expenses GET/POST, payments POST) — 7 rutas Postgres-first
 - PUT income/expenses y reconciliación siguen en BigQuery
 
 ### Resultado (Slice 3)
+
 - PUT income wired a `updateFinanceIncomeInPostgres()` con BigQuery fallback
 - PUT expenses wired a `updateFinanceExpenseInPostgres()` con BigQuery fallback
 - Creado `src/lib/finance/postgres-reconciliation.ts` (~650 líneas) — store completo
@@ -984,9 +1345,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Diferencia clave: income reconciliation en Postgres usa tabla `income_payments` directamente (sin JSON manipulation)
 
 ### Verificación
+
 - `npx tsc --noEmit` ✅
 
 ### Pendientes
+
 - Ejecutar backfill: `pnpm exec tsx scripts/backfill-postgres-finance-slice2.ts`
 - Smoke test end-to-end de reconciliación en Postgres
 
@@ -995,49 +1358,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 07:35 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir el bloqueo excesivo al editar compensaciones en `People` / `Payroll`: la versión vigente ya no debe quedar congelada solo por existir una `payroll_entry` en un período recalculable.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/lib/payroll/compensation-versioning.ts`
 - `src/lib/payroll/compensation-versioning.test.ts`
 - `src/lib/payroll/postgres-store.ts`
 - `src/lib/payroll/get-compensation.ts`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/get-compensation.ts` ✅
 - `pnpm vitest run src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - La edición in-place queda permitida si la compensación solo fue usada en períodos `calculated`; si ya fue usada en períodos `approved` o `exported`, el backend sigue obligando a crear una nueva versión con nueva vigencia.
 - Sigue pendiente validar manualmente en `staging` que el drawer de `People` guarde bien cambios de bono cuando el período todavía es recalculable.
 
 ## 2026-03-21 07:22 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Cambiar `Payroll` para que el cálculo mensual de `On-Time` y `RpA` tome la fuente desde `ICO` por `member_id`, usando cache materializado cuando exista y fallback live solo para miembros faltantes.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/types/payroll.ts`
 - `src/lib/ico-engine/read-metrics.ts`
 - `src/lib/payroll/fetch-kpis-for-period.ts`
@@ -1049,11 +1424,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/app/api/hr/payroll/entries/[entryId]/route.ts`
 
 ### Verificacion
+
 - `pnpm exec eslint src/types/payroll.ts src/lib/ico-engine/read-metrics.ts src/lib/payroll/fetch-kpis-for-period.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/get-payroll-entries.ts src/lib/payroll/postgres-store.ts src/lib/payroll/generate-payroll-excel.ts 'src/app/api/hr/payroll/entries/[entryId]/route.ts'` ✅
 - `pnpm vitest run src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/lib/payroll/compensation-versioning.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - No mezclar este slice con los cambios locales abiertos en `People 360`, `.claude/settings.json`, `AGENTS.md` ni `docs/tasks/**`.
 - `PayrollEntry.kpiDataSource` ahora puede ser `ico`; los consumidores legacy siguen tolerando `notion_ops` para historial ya calculado.
 - Queda pendiente validar manualmente en `staging` un cálculo de nómina real para confirmar que el período devuelve métricas ICO materializadas o fallback live según el mes.
@@ -1061,19 +1438,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 06:58 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir el flujo de compensación de Payroll/People para que "editar compensación" no fuerce crear una nueva versión con la misma fecha efectiva.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/types/payroll.ts`
 - `src/lib/payroll/compensation-versioning.ts`
 - `src/lib/payroll/compensation-versioning.test.ts`
@@ -1087,11 +1469,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - `pnpm exec eslint src/types/payroll.ts src/lib/payroll/compensation-versioning.ts src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/get-compensation.ts 'src/app/api/hr/payroll/compensation/[versionId]/route.ts' src/views/greenhouse/payroll/CompensationDrawer.tsx src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx src/views/greenhouse/people/PersonView.tsx` ✅
 - `pnpm vitest run src/lib/payroll/compensation-versioning.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx` ✅
 - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - No mezclar este slice con los cambios locales de `People 360`.
 - Mantener intacto el modelo versionado: misma fecha efectiva debe corregir la versión vigente; una fecha nueva debe seguir creando una nueva versión.
 - El siguiente slice funcional sigue pendiente: mover la fuente de `On-Time` y `RpA` desde `notion_ops.tareas` hacia ICO.
@@ -1099,23 +1483,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-21 06:22 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Aislar y corregir la regresión de overflow en `/people/[memberId]` sin seguir tocando el shell global del dashboard.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - `staging`
 
 ### Archivos tocados
+
 - `src/views/greenhouse/people/PersonTabs.tsx` — se restaura el wrapper `Grid` alrededor del pill `CustomTabList` y del panel
 - `src/views/greenhouse/people/PersonTabs.test.tsx` — test de regresión para blindar la estructura del tabstrip
 
 ### Verificacion
+
 - Diagnóstico: la regresión coincide con `e97c6b6 fix: remove nested Grid container causing horizontal scroll in person detail`
 - Evidencia revisada:
   - `src/@core/components/mui/TabList.tsx` usa `margin` negativa en modo `pill`
@@ -1132,6 +1522,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `npx tsc --noEmit` ✅
 
 ### Riesgos o pendientes
+
 - La preview directa sigue protegida por Vercel SSO, así que el DOM real no se pudo inspeccionar con Playwright autenticado.
 - Si el fix en `PersonTabs` no elimina el overflow en `staging`, el siguiente sospechoso real ya no es el shell global: será `PersonView.tsx` root grid o un hijo puntual de la ficha de persona.
 - No mezclar este commit con los cambios locales de `People 360` (`get-people-meta`, `get-person-detail`, `permissions`, `types`) ni con los movimientos ajenos de `docs/tasks/**`.
@@ -1140,19 +1531,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-20 18:00 -03
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Contrastar `CODEX_TASK_HR_Payroll_Module_v3` y `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` contra arquitectura real, ejecutar backfill y cerrar tasks.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main`
 
 ### Ambiente objetivo
+
 - Development (backfill ejecutado contra Cloud SQL)
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/ → docs/tasks/complete/` — movidas ambas tasks de Payroll
 - `docs/tasks/README.md` — backlog renumerado, entries agregadas en Complete
 - `changelog.md` — entrada de cierre
@@ -1160,6 +1556,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se tocó código de aplicación — el módulo ya estaba implementado
 
 ### Verificacion
+
 - `isPayrollPostgresEnabled()` → delega a `isGreenhousePostgresConfigured()` ✅
 - Tab payroll confirmado en `PersonTabs.tsx:147` con `PersonPayrollTab` ✅
 - Backfill payroll ejecutado: 0 rows BQ transaccionales, 1 bonus_config migrado ✅
@@ -1167,6 +1564,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Contraste contra `GREENHOUSE_360_OBJECT_MODEL_V1`, `GREENHOUSE_POSTGRES_CANONICAL_360_V1`: 6/6 reglas cumplidas ✅
 
 ### Riesgos o pendientes
+
 - El módulo Payroll nunca tuvo datos transaccionales reales. El primer uso real requiere crear compensaciones y un período directamente en Postgres.
 - Falta smoke test autenticado end-to-end en Preview/Staging: crear compensación → crear período → calcular → aprobar → exportar.
 - BigQuery sigue como fallback pasivo. No desactivarlo hasta confirmar runtime Postgres estable en Preview.
@@ -1176,23 +1574,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-20 17:10 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir los bloqueadores reales de promoción a producción detectados en `staging`: `sync-conformed` con error de `streaming buffer` y `ico-materialize` con drift de esquema BigQuery.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main`
 
 ### Ambiente objetivo
+
 - `staging` / Production
 
 ### Archivos tocados
+
 - `src/lib/ico-engine/schema.ts` — migraciones aditivas `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` para tablas ICO existentes
 - `src/lib/sync/sync-notion-conformed.ts` — reemplazo de `DELETE + insertAll` por `BigQuery load jobs` con `WRITE_TRUNCATE`; ensure runtime para `delivery_tasks.created_at`
 
 ### Verificacion
+
 - Diagnóstico confirmado con `vercel logs` y `vercel curl` sobre `staging`:
   - `/api/cron/ico-materialize` ⇒ `502 Column pipeline_velocity is not present in table ... metrics_by_project`
   - `/api/cron/sync-conformed` ⇒ `502 UPDATE or DELETE statement ... would affect rows in the streaming buffer`
@@ -1204,6 +1608,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `greenhouse_conformed.delivery_tasks` sí tenía `created_at` y `assignee_member_ids`
 
 ### Riesgos o pendientes
+
 - Falta desplegar este patch a `staging` y reprobar ambos cron endpoints con `vercel curl`.
 - El helper de runtime quedó robusto, pero si otro script externo sigue usando `streaming insert` contra `greenhouse_conformed.delivery_*`, puede reintroducir presión sobre el buffer. Revisar especialmente `scripts/sync-source-runtime-projections.ts` si vuelve a usarse operativamente.
 - No tocar `.claude/settings.json`; sigue siendo un cambio ajeno local.
@@ -1211,29 +1616,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-20 14:30 -03
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Reestructurar el sidebar de navegación del portal para eliminar inconsistencias de idioma, jerarquía y UX writing.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main`
 
 ### Ambiente objetivo
+
 - Development / Preview / `staging` / Production (cambio puramente frontend)
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts` — labels: Updates→Novedades, Control Tower→Torre de control, nueva entrada adminAiTools
 - `src/components/layout/vertical/VerticalMenu.tsx` — reestructura completa: elimina secciones de 1 hijo, fusiona Equipo+HR, renombra Agencia→Gestión / Servicios→Módulos / Admin→Administración, NavLabel en todos los SubMenu children
 - `src/components/layout/shared/search/DefaultSuggestions.tsx` — corrige rutas obsoletas, sección People→Equipo, labels en inglés→español
 
 ### Verificacion
+
 - `npx tsc --noEmit` ✅ — sin errores de tipo
 - Commit `62f6abd` pusheado a `develop`
 - Cambios de label se propagan automáticamente a `verticalMenuData.tsx` y `horizontalMenuData.tsx` vía constantes de nomenclatura
 
 ### Riesgos o pendientes
+
 - Los items HR ahora son hijos de sección (no de SubMenu), lo que los hace siempre visibles en lugar de colapsados. Verificar que el sidebar colapsado no se desborde cuando un usuario tiene todos los permisos (agency + people + hr + finance + admin).
 - Los capability modules (Creative Hub, CRM Command, etc.) siguen en inglés — son brand names, no labels de navegación. Si se decide traducirlos, el cambio va en `capability-registry.ts`.
 - Falta validación visual en cada tipo de usuario (cliente, interno, agency, admin, hr, finance, ai_tooling).
@@ -1243,24 +1655,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-20 11:05 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir el vacío en `Agency > Organizations > Finanzas` cuando la organización sí tenía ingresos pero faltaba el snapshot mensual de `client_economics`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Development / Preview / `staging`
 
 ### Archivos tocados
+
 - `src/lib/finance/postgres-store-intelligence.ts` — nueva función reutilizable `computeClientEconomicsSnapshots(year, month, notes?)`
 - `src/app/api/finance/intelligence/client-economics/route.ts` — ahora reutiliza el helper compartido en vez de duplicar la lógica
 - `src/lib/account-360/organization-store.ts` — `getOrganizationFinanceSummary()` intenta auto-computar el período cuando la organización no encuentra snapshot
 
 ### Verificacion
+
 - `pnpm pg:doctor --profile=runtime` ✅
 - Validación directa en Postgres para Sky Airline (`org-b9977f96-f7ef-4afb-bb26-7355d78c981f`):
   - `client_profiles.organization_id` sí estaba bien puenteado
@@ -1272,29 +1690,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `pnpm eslint src/lib/finance/postgres-store-intelligence.ts src/app/api/finance/intelligence/client-economics/route.ts src/lib/account-360/organization-store.ts` ✅
 
 ### Riesgos o pendientes
+
 - La tab de organización ahora puede auto-hidratar el snapshot faltante al primer acceso del período, pero sigue dependiendo de `client_economics`; no es una vista live de `income`/`expenses`.
 - Queda recomendada una automatización explícita mensual del compute de `client_economics` para evitar que la primera visita del usuario dispare ese cálculo.
 
 ## 2026-03-20 10:12 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir `Finance > Proveedores > Historial de pagos`, que en runtime Postgres mostraba vacío aunque los egresos sí existían y estaban asociados al proveedor.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Development / Preview / `staging`
 
 ### Archivos tocados
+
 - `src/app/api/finance/suppliers/[id]/route.ts` — el path Postgres ahora consulta `greenhouse_finance.expenses` y arma `paymentHistory` real en vez de devolver `[]`
 - `src/views/greenhouse/finance/SupplierDetailView.tsx` — tabla robustecida para fechas, documentos y métodos nulos; el encabezado de fecha queda neutral porque algunos egresos pagados/importados no traen `payment_date`
 
 ### Verificacion
+
 - Revisión del endpoint confirmó el bug raíz: `GET /api/finance/suppliers/[id]` en Postgres devolvía el proveedor pero forzaba `paymentHistory: []`
 - `pnpm eslint 'src/app/api/finance/suppliers/[id]/route.ts' src/views/greenhouse/finance/SupplierDetailView.tsx` ✅
 - No se pudo completar una consulta manual directa a Cloud SQL desde la terminal local por un error OpenSSL del flujo de firma del conector (`ERR_OSSL_UNSUPPORTED`), así que la validación de data real quedó inferida por:
@@ -1303,31 +1728,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el fallback BigQuery ya contemplaba consultar egresos del proveedor
 
 ### Riesgos o pendientes
+
 - Algunos egresos Nubox/importados pueden venir con `payment_status = 'paid'` pero sin `payment_date` ni `payment_method`; por eso la tabla ahora usa fallback de fecha (`payment_date -> document_date -> due_date`) y muestra `—` si falta el método.
 - Falta validación manual en `dev-greenhouse.efeoncepro.com` para confirmar que el proveedor ya lista sus registros en `Historial de pagos`.
 
 ## 2026-03-20 09:33 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Cerrar el rollout operativo de `Finance > Ingresos > DTE detail` en `staging` y verificar que el dato de Nubox no estuviera cruzado.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - `staging` / `dev-greenhouse.efeoncepro.com`
 
 ### Archivos tocados
+
 - `src/views/greenhouse/finance/IncomeDetailView.tsx` — copy/UI para separar tipo de documento vs código SII vs folio real
 - `Handoff.md`
 - `changelog.md`
 - `project_context.md`
 
 ### Verificacion
+
 - Verificación directa contra Nubox del documento `26639047`:
   - `number = 114`
   - `type.legalCode = 33`
@@ -1344,29 +1776,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `1cd824b fix: clarify dte type vs folio in income detail`
 
 ### Riesgos o pendientes
+
 - `staging` quedó sano para Nubox DTE, pero si se crea otro ambiente custom o preview compartido que necesite descargas DTE, hay que replicar explícitamente las 3 variables `NUBOX_*`.
 - Queda recomendado mantener el label visual como:
   - tipo de documento
   - código SII
   - folio DTE
-  para no volver a inducir lectura de “factura 33”.
+    para no volver a inducir lectura de “factura 33”.
 
 ## 2026-03-20 09:03 -03
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir el detalle de ingresos Nubox en `/finance/income/[id]` donde fechas visibles quedaban en `—` y las descargas DTE PDF/XML fallaban desde el navegador.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/finance/shared.ts` — `toDateString` y `toTimestampString` ahora soportan `Date` de Postgres
 - `src/lib/nubox/client.ts` — decode correcto del XML Nubox cuando responde JSON con base64
 - `src/views/greenhouse/finance/IncomeDetailView.tsx` — descarga DTE más robusta, filename desde header y error detail
@@ -1374,6 +1812,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/lib/nubox/client.test.ts` — cobertura para decode de XML Nubox
 
 ### Verificacion
+
 - `pnpm pg:doctor` ✅
 - Validación directa del registro `INC-NB-26639047` en Postgres:
   - `invoice_date = 2026-03-06`
@@ -1386,6 +1825,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `pnpm eslint src/lib/finance/shared.ts src/lib/finance/shared.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/views/greenhouse/finance/IncomeDetailView.tsx` ✅
 
 ### Riesgos o pendientes
+
 - La causa de fechas en `—` no era data faltante sino normalización incompleta de `Date` objects devueltos por `pg`; esto puede haber afectado otras superficies que usan `toDateString` / `toTimestampString`, aunque el fix quedó centralizado.
 - El XML de Nubox no llega como XML plano sino como JSON con base64; si Nubox cambia otra vez el contrato, revisar `decodeNuboxXmlPayload()`.
 - Falta validación manual en navegador sobre el ambiente desplegado para confirmar que Chrome ya descarga PDF/XML sin cancelar el archivo.
@@ -1393,9 +1833,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Nubox DTE Integration: API discovery, org mapping, data seeding
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Verificar credenciales API de Nubox, descubrir base URL y endpoints disponibles.
 - Mapear clientes Nubox ↔ organizaciones Greenhouse por RUT.
 - Importar historial de ventas Nubox como income en Finance module.
@@ -1403,13 +1845,16 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Documentar todo en task brief para implementación futura de emisión + sync.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main`
 
 ### Ambiente objetivo
+
 - Production (datos escritos directamente en Postgres Cloud SQL)
 
 ### Archivos tocados
+
 - `scripts/nubox-extractor.py` — movido desde `docs/tasks/to-do/`, credenciales via env vars
 - `docs/tasks/to-do/CODEX_TASK_Nubox_DTE_Integration.md` — task brief completo (8 fases)
 - `changelog.md` — entrada de Nubox
@@ -1417,12 +1862,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `.env.local` — variables NUBOX_API_BASE_URL, NUBOX_BEARER_TOKEN, NUBOX_X_API_KEY
 
 ### Datos escritos en Postgres (Cloud SQL)
+
 - `greenhouse_core.organizations`: 4 UPDATE (tax_id, legal_name, industry) + 2 INSERT (SGI, Sika)
 - `greenhouse_core.clients`: 2 INSERT (nubox-client-76438378-8, nubox-client-91947000-3)
 - `greenhouse_finance.suppliers`: 17 INSERT + 1 UPDATE (Microsoft RUT)
 - `greenhouse_finance.income`: 78 INSERT (15 meses de ventas Nubox, $163.8M CLP)
 
 ### Verificacion
+
 - `GET /v1/sales?period=2026-02` → 200 OK, datos reales de facturación
 - `GET /v1/purchases?period=2026-02` → 200 OK, 8 facturas de proveedores
 - `GET /v1/expenses?period=2026-02` → 200 OK, 1 egreso bancario
@@ -1430,6 +1877,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - 78 income records visibles en `/finance/income` del portal
 
 ### Riesgos o pendientes
+
 - Credenciales Nubox (`NP_SECRET_PROD_...`, `NP_KEY_PROD_...`) estuvieron hardcodeadas en el script original — ya limpiadas, pero el historial de git las tiene. Rotar en Nubox cuando sea conveniente.
 - 5 organizaciones sin RUT (ANAM, BeFUN, Ecoriles, Efeonce, Municipalidad PAC, SSilva, Greenhouse Demo) — no tienen facturación en Nubox actualmente.
 - `income_type: 'quote'` se usa para cotizaciones (COT) de Nubox — verificar si deben tratarse como income real o solo referencia.
@@ -1438,19 +1886,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Advanced tasks split into complete foundations and focused follow-ups
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Dejar de tratar algunas lanes fundacionales muy avanzadas como backlog abierto amplio y reemplazarlas por follow-ups chicos con solo el remanente real.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/README.md`
 - `project_context.md`
 - `changelog.md`
@@ -1461,6 +1914,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/to-do/CODEX_TASK_People_360_Enrichments_v1.md`
 
 ### Verificacion
+
 - Contraste manual contra:
   - `project_context.md`
   - `changelog.md`
@@ -1471,6 +1925,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental y de taxonomía únicamente
 
 ### Riesgos o pendientes
+
 - Se movieron a `complete` solo las tasks cuyo objetivo fundacional ya se ve cumplido en runtime:
   - `Source Sync Runtime Projections v1`
   - `Person 360 Profile Unification v1`
@@ -1483,23 +1938,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — To-do task index synced to real implementation status
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Contrastar el backlog `docs/tasks/to-do/` contra el estado real del repo y reflejar ese resultado en el índice operativo.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual contra:
   - `project_context.md`
   - `changelog.md`
@@ -1510,6 +1971,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - El índice ahora refleja mejor la realidad técnica, pero todavía hay drift entre taxonomía documental y cierre formal de algunas lanes muy avanzadas.
 - `CODEX_TASK_Financial_Intelligence_Layer.md` quedó reintegrada al índice después de detectar que vivía en `to-do` pero no en `docs/tasks/README.md`.
 - Si el usuario quiere seguir endureciendo la taxonomía, el siguiente paso sano es abrir una auditoría de cierre real de las lanes `Avanzadas` para decidir cuáles ya merecen moverse a `complete`.
@@ -1517,23 +1979,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — To-do backlog prioritized by priority, impact and effort
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Reordenar el panel `docs/tasks/to-do/` para que funcione como backlog operativo real y no solo como inventario de briefs.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de `docs/tasks/to-do/*` contra:
   - `project_context.md`
   - `Handoff.md`
@@ -1541,6 +2009,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La priorización es operativa, no contractual: si el usuario decide empujar una lane distinta, conviene reabrir `docs/tasks/in-progress/` solo con ese subconjunto.
 - El backlog ahora separa correctamente:
   - foundations `P0`
@@ -1552,19 +2021,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Transactional Email System closed + email template redesign
 
 ### Agente
+
 - Claude Opus 4.6
 
 ### Objetivo del turno
+
 - Cerrar el sistema de emails transaccionales: rediseñar templates de email (branding, UX writing, accesibilidad), limpiar código temporal, marcar task como complete, sincronizar ramas.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `main` (producción)
 
 ### Ambiente objetivo
+
 - Production (`greenhouse.efeoncepro.com`)
 
 ### Archivos tocados
+
 - `src/emails/constants.ts` — tokens de diseño expandidos (border, footerBg, success, secondary, LOGO_URL, APP_URL)
 - `src/emails/components/EmailLayout.tsx` — header gradient, logo PNG clickable, `lang="es"`, color-scheme meta, footer con separador
 - `src/emails/components/EmailButton.tsx` — border sutil, border-radius 8px, padding ajustado
@@ -1578,12 +2052,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/README.md` — task movida a Complete
 
 ### Verificacion
+
 - `tsc --noEmit` limpio
 - `render()` de React Email produce HTML válido con `lang="es"`, logo URL correcta, 6175 chars
 - Email de forgot-password confirmado recibido en `jreyes@efeoncepro.com`
 - Push a `main` y deploy a Vercel confirmado
 
 ### Riesgos o pendientes
+
 - Verificar visualmente el email rediseñado en producción (solicitar reset de contraseña y revisar en Outlook)
 - Otros usuarios con `@efeonce.org` en `client_users` pueden necesitar actualización de email
 - `CODEX_TASK_Greenhouse_Email_Catalog_v1.md` queda como siguiente paso para ampliar el catálogo de emails más allá del baseline transaccional
@@ -1593,19 +2069,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — In-progress tasks audit and reclassification
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Auditar todas las tasks en `docs/tasks/in-progress/`, verificar cuáles estaban realmente cerradas y reubicar las parcialmente implementadas fuera de la carpeta de trabajo activo.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/README.md`
 - `project_context.md`
 - `changelog.md`
@@ -1614,6 +2095,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - múltiples briefs movidos desde `docs/tasks/in-progress/` hacia `docs/tasks/to-do/` o `docs/tasks/complete/`
 
 ### Verificacion
+
 - Revisión manual del alcance declarado y estado del repo para cada brief de `in-progress`
 - Cruce documental contra:
   - `project_context.md`
@@ -1622,6 +2104,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental y de taxonomía únicamente
 
 ### Riesgos o pendientes
+
 - La carpeta `in-progress/` quedó vacía: eso no significa que no existan lanes abiertas, sino que ninguna estaba bien clasificada como “trabajo activo” al momento de esta auditoría.
 - `AI Tooling v2` y `HR Core v2` se consideraron cerradas para el alcance que declaran.
 - Se devolvieron a `to-do` por implementación parcial o gaps explícitos:
@@ -1641,24 +2124,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Greenhouse Email Catalog task added
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Formalizar una task separada para el catalogo de emails de Greenhouse, desacoplando la infraestructura base de `Transactional Email` del roadmap mas amplio de emails de producto, seguridad, digests y notificaciones de dominio.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Greenhouse_Email_Catalog_v1.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/tasks/to-do/CODEX_TASK_Transactional_Email_System.md`
   - `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
@@ -1666,31 +2155,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La task deja claro el catalogo y la prioridad, pero no resuelve todavía qué eventos serán opt-in, opt-out u obligatorios por seguridad.
 - El siguiente paso natural no es implementar todo el catalogo, sino abrir un task corto para el `P0` de emails adicionales sobre la infraestructura que ya está montando Claude.
 
 ## 2026-03-19 — Frame.io Analytics Pipeline v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de `Frame.io` a una baseline de implementación alineada con el source sync actual, `space_id` como boundary, y el contrato vivo de `delivery_tasks` + `ico_engine.v_tasks_enriched`.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
@@ -1700,6 +2196,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` deja resuelto el drift principal: Frame.io debe enriquecer el contrato vigente de delivery/ICO, no crear otra vista maestra de tareas.
 - Si esta lane se implementa pronto, conviene un `P0/P1` corto:
   - `space_frameio_sources`
@@ -1710,25 +2207,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Business Units v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de `Business Units` a una baseline de implementación alineada con `service_modules` como catálogo ya existente, evitando duplicar identidad y separando BU comercial vs BU operativa.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
   - `docs/tasks/to-do/Greenhouse_Services_Architecture_v1.md`
@@ -1738,35 +2241,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` reduce el riesgo principal de la task original, pero deja una decisión importante abierta para implementación real: si de verdad se quiere medir BU en el `ICO Engine`, primero hay que fijar si esa dimensión será comercial o operativa.
 - Si esto se implementa pronto, conviene un `P0` mucho más corto: metadata 1:1 para `business_line` existente + helper de enrichment server-side.
 - La última iteración ya deja la semántica recomendada explícita:
   - `commercial_business_unit` para Finance / Services
   - `operating_business_unit` para ICO / delivery
-  Si se implementa analítica por BU, no mezclar ambas en una sola tabla o KPI sin nombrarlo.
+    Si se implementa analítica por BU, no mezclar ambas en una sola tabla o KPI sin nombrarlo.
 
 ## 2026-03-19 — Home Nexa v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de `Home + Nexa` a una baseline de implementación alineada con el runtime real del portal, `portalHomePath`, los route groups vigentes y la coexistencia con `/dashboard` e `/internal/dashboard`.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Greenhouse_Home_Nexa_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_Greenhouse_Home_Nexa.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
@@ -1777,31 +2287,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` deja explícito que `client -> /home` es la dirección deseada, pero sin romper los homes especializados de `internal`, `finance` y `hr`.
 - Si se implementa pronto, conviene separar un `P0` de Home client-first y un `P1` de Nexa conversacional real para no mezclar landing UX con toda la infraestructura del agente.
 
 ## 2026-03-19 — Staff Augmentation v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de `Staff Augmentation` a una baseline de implementación alineada con assignments como anchor, `PostgreSQL` como write path, `Services` como relación opcional y el modelo vivo de IDs/FKs del core.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_Staff_Augmentation_Module.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -1810,31 +2327,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` deja al módulo mucho mejor alineado, pero `ICO by placement` sigue siendo una fase posterior mientras no exista un bridge inequívoco `task -> assignment/placement`.
 - Si el módulo se implementa pronto, conviene sacar un task ejecutivo más corto para `P0`: `assignment_type`, placements, onboarding, event log y People enrichment.
 
 ## 2026-03-19 — SCIM v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de SCIM a una baseline de implementación alineada con `Identity & Access V2`, PostgreSQL y el modelo de identidad actual.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_SCIM_User_Provisioning.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/tasks/in-progress/GREENHOUSE_IDENTITY_ACCESS_V2.md`
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
@@ -1844,31 +2368,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` ya corrige el write path y el modelo de auth, pero todavía conviene un task más corto de ejecución si se quiere implementar solo el slice `ServiceProviderConfig + Users create/update/deactivate`.
 - Si SCIM se activa de verdad para clientes enterprise, conviene definir desde temprano la política exacta de rol baseline y cómo reconciliar `identity_profile_id` en casos ambiguos.
 
 ## 2026-03-19 — Data Node v2 as implementation baseline
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la spec original de `Data Node` a una baseline de implementación alineada al runtime actual del portal y al patrón `Postgres-first`.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v2.md`
 - `docs/tasks/to-do/Greenhouse_Data_Node_Architecture_v1.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
@@ -1878,36 +2409,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La `v2` deja claro el orden correcto (`export -> reports -> API -> MCP`), pero todavia falta una task ejecutiva más corta si se quiere implementar `DN0` de inmediato.
 - Si el proyecto decide monetizar `API` o `MCP`, conviene luego separar el brief de pricing/comercial del brief técnico de implementación.
 
 ## 2026-03-19 — Resend helper added, local key validation blocked
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Agregar el helper runtime de `Resend` para el futuro sistema de emails transaccionales y validar que lea la configuración local.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Development local / foundation backend
 
 ### Archivos tocados
+
 - `package.json`
 - `pnpm-lock.yaml`
 - `src/lib/resend.ts`
 - `changelog.md`
 
 ### Verificacion
+
 - Instalación de dependencia `resend`: correcta
 - Helper `src/lib/resend.ts`: creado
 - Chequeo local contra API `GET /api-keys`: falló con `400 API key is invalid`
 
 ### Riesgos o pendientes
+
 - El helper quedó listo, pero no se debe avanzar con envíos reales hasta corregir `RESEND_API_KEY` en `.env.local`.
 - La key presente localmente no empieza con el patrón esperado `re_`; probablemente fue pegada con un valor incompleto, inválido o ya rotado.
 - Si se va a seguir con el módulo, el siguiente paso sano es corregir la key y reintentar la validación antes de implementar routes o templates.
@@ -1915,19 +2454,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-19 — Env placeholders for Resend / transactional email
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Preparar el espacio local y los archivos de ejemplo para `RESEND_API_KEY` y `EMAIL_FROM`, sin escribir secretos reales en archivos versionados.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Development local / documentación operativa del repo
 
 ### Archivos tocados
+
 - `.env.example`
 - `.env.local.example`
 - `.env.local`
@@ -1935,35 +2479,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - Confirmado por búsqueda de claves:
   - `RESEND_API_KEY`
   - `EMAIL_FROM`
 - Los placeholders quedaron presentes en `.env.example`, `.env.local.example` y `.env.local`
 
 ### Riesgos o pendientes
+
 - No se escribió ninguna clave real en archivos versionados.
 - Si se va a usar la API key de Resend que apareció en la conversación, conviene rotarla antes de usarla en serio porque ya quedó expuesta fuera del gestor de secretos.
 
 ## 2026-03-19 — Transactional Email task normalized to live auth/runtime
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Corregir la spec de `Transactional Email System` para que no choque con la arquitectura viva de auth, tenant isolation y setup PostgreSQL del repo.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Transactional_Email_System.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
@@ -1973,25 +2525,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La task ya quedó sana en arquitectura, pero todavía conviene una pasada futura para alinear detalles de naming con el runtime exacto de tablas/columnas si el módulo se va a implementar de inmediato.
 - Si se ejecuta este task, conviene arrancar por `forgot-password` y `auth_tokens` como P0 antes de tocar invitaciones y verificación de email.
 
 ## 2026-03-19 — Testing: baseline unitario formalizado
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Cerrar una base de unit testing reutilizable para el repo usando el `Vitest` ya instalado y extenderlo a tests de componentes React.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Tooling local / CI futura
 
 ### Archivos tocados
+
 - `AGENTS.md`
 - `package.json`
 - `pnpm-lock.yaml`
@@ -2001,34 +2559,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/components/greenhouse/EmptyState.test.tsx`
 
 ### Verificacion
+
 - `pnpm test`
 - Resultado: `3` archivos y `33` tests pasando
 
 ### Riesgos o pendientes
+
 - La base de testing ya soporta `node` y `jsdom`, pero todavia hay poca cobertura del repo real; el siguiente ROI alto esta en `ICO Engine`, scopes de acceso, normalizacion de source sync y helpers de Finance/Payroll.
 - Si se agregan tests de componentes con providers extra, conviene extender `src/test/render.tsx` en vez de repetir wrappers por archivo.
 
 ## 2026-03-19 — Person Activity Tab ICO merge + sidebar FTE alignment + KPI layout fix
 
 ### Agente
+
 - Claude (Opus 4.6)
 
 ### Objetivo del turno
+
 - Merge de métricas ICO Engine en el tab Actividad de Person 360 (reemplaza `PersonOperationalMetrics` vacío).
 - Corregir KPI cards que se recortaban por overflow en el contenedor.
 - Alinear los stats del sidebar (FTE, Hrs/mes, Spaces) con lo que muestra el tab Organizaciones.
 - Verificación de infraestructura: `v_tasks_enriched` vista confirmada con 3850 filas, 92 tareas para Andrés Carlosama.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Staging (Vercel `dev-greenhouse.efeoncepro.com`)
 
 ### Archivos tocados
 
 **Person Activity Tab (REWRITTEN — commit `fbd2cb0`):**
+
 - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Antes: mostraba `PersonOperationalMetrics` (siempre vacío). Ahora: fetch client-side a `/api/ico-engine/context?dimension=member&value={memberId}`. Props cambiaron de `{ metrics?: PersonOperationalMetrics }` a `{ memberId: string }`.
   - 6 KPI cards: RpA, OTD%, FTR%, Throughput, Ciclo promedio, Stuck assets
   - Selectores de período (mes/año)
@@ -2041,18 +2606,22 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — **ELIMINADO** (orphan después del merge).
 
 **KPI overflow fix (commit `67b93aa`):**
+
 - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — Reemplaza Grid anidado por flex con `overflowX: auto`. Cada card tiene `minWidth: 160px` y `flex: 1 1 0` para distribuirse equitativamente sin recortarse.
 
 **Sidebar FTE alignment (commit `b04bb8f`):**
+
 - `src/lib/people/get-person-detail.ts` — El summary (`totalFte`, `totalHoursMonth`, `activeAssignments`) ahora solo cuenta assignments que tienen una membresía correspondiente en Postgres (`person_memberships`), no todos los `client_team_assignments` de BigQuery. Import de `getPersonMemberships` agregado.
   - **Antes**: Andrés mostraba 2.0 FTE, 320 hrs, 2 Spaces (Efeonce + Sky Airline en BQ).
   - **Ahora**: Muestra 1.0 FTE, 160 hrs, 1 Space (solo Sky Airline, la única membresía en Postgres).
   - Fallback: si la consulta de membresías falla, usa todos los assignments (backward compatible).
 
 **BigQuery view fix (commit `e44c3be`):**
+
 - `src/lib/ico-engine/schema.ts` — `v_tasks_enriched` COALESCE bug: empty array `[]` no es NULL, por lo que COALESCE no aplicaba fallback. Cambiado a `IF(ARRAY_LENGTH > 0)`.
 
 ### Verificación
+
 - TypeScript: `tsc --noEmit` limpio en todos los commits
 - BigQuery: `ico_engine.v_tasks_enriched` existe con 3850 filas. Andrés tiene 92 tareas asignadas.
 - Postgres: `greenhouse_sync.identity_reconciliation_proposals` creada y operativa. 13 propuestas procesadas (1 rejected, 12 dismissed).
@@ -2060,6 +2629,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - clientId matching verificado: Postgres membership Sky Airline (`hubspot-company-30825221458`) ↔ BigQuery assignment match correcto. Efeonce (`space-efeonce`) filtrado.
 
 ### Riesgos o pendientes
+
 - **Cache del browser** puede causar que los cambios no se vean inmediatamente. Hard refresh (`Cmd+Shift+R`) o incógnito resuelve.
 - **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion.
 - **Asignaciones huérfanas en BigQuery**: `space-efeonce` sigue en `client_team_assignments` para todos los miembros pero no tiene membresía en Postgres. Considerar limpiar o crear las membresías correspondientes.
@@ -2067,24 +2637,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-18 — Identity Reconciliation Service + Person Activity ICO merge
 
 ### Agente
+
 - Claude (Opus 4.6)
 
 ### Objetivo del turno
+
 - Construir un servicio escalable de reconciliación de identidades entre source systems (Notion, extensible a HubSpot/Azure AD) y team members de Greenhouse.
 - Descubrimiento automático de IDs no vinculados, matching por señales con scoring de confianza, auto-link para alta confianza, cola de propuestas para revisión admin.
 - Enriquecimiento del discovery con `responsable_texto` como fallback de nombres cuando Notion devuelve UUIDs para usuarios externos/invitados.
 - Merge de métricas ICO Engine en el tab Activity de Person 360.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo: `develop`
 
 ### Ambiente objetivo
+
 - Staging (Vercel) + Cloud SQL (greenhouse_sync schema)
 
 ### Archivos tocados
 
 **Reconciliation engine (NEW):**
+
 - `src/lib/identity/reconciliation/types.ts` — tipos, thresholds, interfaces
 - `src/lib/identity/reconciliation/normalize.ts` — normalización de nombres, Levenshtein
 - `src/lib/identity/reconciliation/discovery-notion.ts` — descubrimiento de Notion IDs no vinculados con fallback `responsable_texto`
@@ -2093,19 +2668,23 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/lib/identity/reconciliation/reconciliation-service.ts` — orquestador: discover → match → propose/auto-link
 
 **Admin API (NEW):**
+
 - `src/app/api/admin/identity/reconciliation/route.ts` — GET proposals + POST trigger run
 - `src/app/api/admin/identity/reconciliation/[proposalId]/resolve/route.ts` — resolve (approve/reject/dismiss/reassign)
 - `src/app/api/admin/identity/reconciliation/stats/route.ts` — summary por source_system y status
 
 **Postgres DDL + Scripts (NEW):**
+
 - `scripts/setup-identity-reconciliation.sql` — DDL tabla `greenhouse_sync.identity_reconciliation_proposals`
 - `scripts/setup-identity-reconciliation.ts` — runner del DDL
 - `scripts/run-identity-reconciliation.ts` — ejecución CLI del reconciliation service
 
 **Pipeline integration (MODIFIED):**
+
 - `src/lib/sync/sync-notion-conformed.ts` — tail step no-blocking de reconciliación al final del sync
 
 ### Verificación
+
 - DDL ejecutado en Cloud SQL: tabla creada en `greenhouse_sync`
 - TypeScript: `tsc --noEmit` limpio
 - Dry run: 13 IDs descubiertos, 0 auto-linked (todos externos), 1 fuzzy match (Daniela I → Daniela Ferreira, rechazado por ser persona distinta)
@@ -2113,6 +2692,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Vercel deploy: staging OK
 
 ### Riesgos o pendientes
+
 - **Humberly** sigue sin `notion_user_id` — no aparece como responsable en tareas de Notion. Requiere vinculación manual o verificación en el workspace de Notion.
 - Cuando se agreguen nuevos team members, el próximo sync-conformed automáticamente descubrirá y propondrá vínculos.
 - Para agregar HubSpot: crear `discovery-hubspot.ts` con la misma interfaz `DiscoveredIdentity`. No requiere cambios en schema ni API.
@@ -2120,25 +2700,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-18 — Campaign 360: baseline canonica v2
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Traducir la idea original de `Campaign 360` a una baseline de implementacion alineada con la arquitectura viva del proyecto.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentacion operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Campaign_360_v2.md`
 - `docs/tasks/to-do/CODEX_TASK_Campaign_360.md`
 - `docs/tasks/README.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión manual de consistencia contra:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2149,25 +2735,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - La task original de `Campaign 360` sigue teniendo mucho detalle historico de infraestructura; ahora ya esta guardraileada, pero una futura pasada deberia depurarla o absorberla por completo en la `v2`.
 - Falta decidir, cuando se implemente, si `Campaign` tendra una serving view explicita `campaign_360` desde fase 1 o si eso queda para fase 2.
 
 ## 2026-03-18 — Documentación: normalización de índice y jerarquía de lectura
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Alinear la documentación viva después de la actualización reciente de Claude Code, para que tasks e índices no contradigan la arquitectura actual.
 
 ### Rama
+
 - Rama usada: workspace actual
 - Rama objetivo: por definir
 
 ### Ambiente objetivo
+
 - Documentación operativa del repo
 
 ### Archivos tocados
+
 - `docs/tasks/README.md`
 - `docs/tasks/complete/CODEX_TASK_ETL_ICO_Pipeline_Hardening.md`
 - `docs/tasks/to-do/Greenhouse_ICO_Engine_v1.md`
@@ -2175,6 +2767,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificación
+
 - Revisión manual de consistencia entre:
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
@@ -2184,6 +2777,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Sin build ni lint: cambio documental únicamente
 
 ### Riesgos o pendientes
+
 - `Greenhouse_ICO_Engine_v1.md` y `CODEX_TASK_Tenant_Notion_Mapping.md` ya quedaron con guardrails de lectura, pero siguen teniendo secciones históricas largas que convendría depurar en una pasada posterior.
 - Queda pendiente reconciliar de forma definitiva la historia documental entre `space_notion_sources`, `notion_workspaces` y `space_property_mappings`.
 - `Handoff.md` sigue sobredimensionado para su propósito de snapshot; esta pasada no intentó compactarlo.
@@ -2191,26 +2785,32 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-18 — ICO Engine: Context-Agnostic Metrics Service + Person ICO Tab
 
 ### Agente
+
 - Claude (Opus 4.6)
 
 ### Objetivo del turno
+
 - Refactorizar el ICO Engine de space-only a un servicio de métricas agnóstico al contexto. Agregar multi-assignee, materialización por persona, API genérica, y tab ICO en Person 360.
 
 ### Rama
+
 - Rama usada: `develop`
 - Commit: `b7b9d80`
 
 ### Ambiente objetivo
+
 - Preview / BigQuery (`ico_engine` dataset) / Person 360 ICO tab / Organization ICO tab / Agency ICO tab
 
 ### Archivos tocados
 
 **Nuevos (3 archivos):**
+
 - `src/app/api/ico-engine/context/route.ts` — Generic context API: `?dimension=X&value=Y&year=Z&month=W`
 - `src/app/api/people/[memberId]/ico/route.ts` — Person ICO convenience endpoint
 - `src/views/greenhouse/people/tabs/PersonIcoTab.tsx` — Person ICO tab (KPIs, donut, radar, gauge)
 
 **Modificados (9 archivos):**
+
 - `src/lib/ico-engine/shared.ts` — `ICO_DIMENSIONS`, `buildMetricSelectSQL()`, `buildPeriodFilterSQL()`, status constants
 - `src/lib/ico-engine/materialize.ts` — Refactored to use shared builders + `materializeMemberMetrics()`
 - `src/lib/ico-engine/read-metrics.ts` — `IcoMetricSnapshot`, `computeMetricsByContext()`, `readMemberMetrics()`
@@ -2224,6 +2824,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Cambios realizados
 
 **Phase 0 — Shared SQL Builders:**
+
 - Fórmulas de métricas extraídas a `buildMetricSelectSQL()` (definidas UNA vez, consumidas por 5 funciones)
 - `buildPeriodFilterSQL()` para filtro canónico de período
 - `ICO_DIMENSIONS` allowlist con dimensiones válidas
@@ -2231,40 +2832,48 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Corregido mismatch de columnas en `metrics_by_project` INSERT (faltaban `pipeline_velocity`, `stuck_asset_pct`, `active_tasks`)
 
 **Phase 1 — Generalized Types + Context Query:**
+
 - `IcoMetricSnapshot` — tipo genérico con `dimension`, `dimensionValue`, `dimensionLabel`
 - `computeMetricsByContext(dimensionKey, dimensionValue, year, month)` — live compute para cualquier dimensión
 - Member dimension usa UNNEST en `assignee_member_ids` para acreditar todos los asignados
 
 **Phase 2 — Multi-Assignee Enrichment:**
+
 - `assignee_member_ids ARRAY<STRING>` en `delivery_tasks` (todas las resoluciones de `responsables_ids`)
 - `v_tasks_enriched` expone con fallback: `COALESCE(dt.assignee_member_ids, IF(dt.assignee_member_id IS NOT NULL, [dt.assignee_member_id], []))`
 - `ensureMultiAssigneeColumn()` agrega columna idempotentemente via ALTER TABLE
 
 **Phase 3 — Person-Level Materialization:**
+
 - `metrics_by_member` DDL (clustered by member_id) registrado en `ensureIcoEngineInfrastructure()`
 - `materializeMemberMetrics()` — DELETE period + INSERT desde UNNEST(assignee_member_ids)
 - `readMemberMetrics()` — lectura desde caché materializado
 
 **Phase 4 — Generic Context API:**
+
 - `GET /api/ico-engine/context?dimension=space|project|member|client|sprint&value=X&year=Y&month=Z`
 - Valida dimensión contra allowlist, intenta caché materializado, fallback a live compute
 
 **Phase 5 — Person ICO Tab:**
+
 - `PersonIcoTab.tsx` con KPIs, CSC donut, health radar, velocity gauge
 - Period selectors (mes/año)
 - `GET /api/people/[memberId]/ico` convenience endpoint
 - Tab registrado en `PersonTabs.tsx`, permisos `efeonce_admin` + `efeonce_operations`
 
 ### Verificación
+
 - `npx tsc --noEmit` — 0 errores TypeScript
 - Pushed to `origin/develop`
 
 ### Riesgos o pendientes
+
 - La tabla `metrics_by_member` no tiene datos hasta que se ejecute la materialización (cron 6:15 AM UTC) después de un sync que pueble `assignee_member_ids`. Mientras tanto, la API cae a live compute.
 - BigQuery `ALTER TABLE ADD COLUMN IF NOT EXISTS` requiere que el service account tenga permisos de TABLE admin — si falla, el sync continúa (la columna no se crea) y los datos multi-assignee no se guardan.
 - Agregar dimensiones futuras: solo 3 pasos (columna en view, entrada en allowlist, opcionalmente tabla de materialización).
 
 ### Documentación actualizada
+
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` — ICO Engine section reescrita
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` — `ico_engine` dataset completo + `assignee_member_ids`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — Layer D con tablas ICO
@@ -2278,21 +2887,26 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-17 — ICO Engine: Implementación completa (Groups A–E)
 
 ### Agente
+
 - Claude (Opus 4.6)
 
 ### Objetivo del turno
+
 - Completar todos los gaps restantes del ICO Engine identificados en `Greenhouse_ICO_Engine_v1.md`. 5 grupos: wire onComputeLive + AI DDL (A), stuck assets detail (B), RPA trend (C), project-level metrics (D), Creative Hub migration (E).
 
 ### Rama
+
 - Rama usada: `develop`
 - Commit: `d2483fd`
 
 ### Ambiente objetivo
+
 - Preview / BigQuery (`ico_engine` dataset) / Agency ICO tab
 
 ### Archivos tocados
 
 **Nuevos (19 archivos):**
+
 - `src/lib/ico-engine/shared.ts` — IcoEngineError, runIcoEngineQuery, coercion utils
 - `src/lib/ico-engine/metric-registry.ts` — 10 MetricDefinition[], FormulaConfig, CSC mapping, AIMetricConfig
 - `src/lib/ico-engine/schema.ts` — ensureIcoEngineInfrastructure() — dataset + 6 tables + views
@@ -2314,6 +2928,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/agency/AgencyIcoEngineView.tsx` — ICO tab orchestrator
 
 **Modificados (10 archivos):**
+
 - `src/views/agency/AgencyWorkspace.tsx` — +ICO tab, +handleComputeLive, +icoData state
 - `src/views/agency/AgencySpacesView.tsx` — Spaces redesign
 - `src/components/agency/SpaceCard.tsx` — Refactored for Spaces view
@@ -2327,12 +2942,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Cambios realizados
 
 **Group A — Quick Fixes:**
+
 - Wired `onComputeLive` en AgencyWorkspace → live compute button funcional
 - `ai_metric_scores` DDL creado (tabla vacía, forward-compatible)
 - `AIMetricConfig` type exportado desde metric-registry.ts
 - Agency API soporta `?live=true` — busca distinct space_ids, computa en batches de 5
 
 **Group B — Stuck Assets Detail:**
+
 - DDL `stuck_assets_detail` (CLUSTER BY space_id, severity)
 - Materialización: DELETE all + INSERT desde `v_tasks_enriched WHERE is_stuck = TRUE`
 - Severity: warning (72-95h) / danger (96h+) — alineado con is_stuck del view (72h)
@@ -2341,6 +2958,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - SpaceIcoScorecard: stuck count clickable → abre drawer
 
 **Group C — RPA Trend:**
+
 - DDL `rpa_trend` (CLUSTER BY space_id)
 - Materialización: DELETE all + INSERT últimos 12 meses, AVG + APPROX_QUANTILES P50
 - API `/api/ico-engine/trends/rpa?spaceId&months` — agrupa por space, optional filter
@@ -2348,20 +2966,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - AgencyIcoEngineView: lazy-fetch trend después de que ICO data cargue
 
 **Group D — Project-Level Metrics:**
+
 - DDL `metrics_by_project` (CLUSTER BY space_id, project_source_id)
 - Materialización: DELETE período actual + INSERT agrupado por project_source_id
 - `readProjectMetrics()` en read-metrics.ts + API `/api/ico-engine/metrics/project`
 
 **Group E — Creative Hub → ICO Engine:**
+
 - `readMetricsSummaryByClientId(clientId)` — query `v_metric_latest WHERE client_id = @clientId`
 - creative-hub.ts: fetch en paralelo con Promise.all, `.catch(() => null)` para graceful degradation
 - helpers.ts: `buildCreativeRevenueCardData` + `buildCreativeBrandMetricsCardData` aceptan optional `icoSummary` — prefieren ICO values (RPA, FTR, OTD), fallback a cómputo inline
 
 ### Verificación
+
 - `pnpm tsc --noEmit` → 0 errores (verificado después de cada grupo)
 - `git push origin develop` → `d2483fd` exitoso
 
 ### Decisiones de arquitectura
+
 - **Singleton Promise pattern**: `ensureIcoEngineInfrastructure()` verifica 5 tablas en una sola query a INFORMATION_SCHEMA, crea solo las faltantes
 - **Cron via Vercel**: `/api/cron/ico-materialize` con `maxDuration=120`, triggered by vercel.json cron schedule
 - **Batch live compute**: agency live compute ejecuta `computeSpaceMetricsLive()` en batches de 5 concurrent para evitar overload de BigQuery
@@ -2369,6 +2991,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - **Creative Hub graceful fallback**: ICO fetch wrapped en `.catch(() => null)` — si BigQuery falla o no hay datos, helpers usan cómputo inline sin cambio visible
 
 ### Riesgos o pendientes
+
 - **Primera materialización**: el cron corre a las 06:15 UTC diario. Para ver datos inmediatamente, llamar `GET /api/cron/ico-materialize` manualmente o usar el botón "Calcular en vivo"
 - **client_id mapping**: `readMetricsSummaryByClientId` depende de que `client_id` esté populado en los snapshots. Si un Space no tiene mapping, el fallback a inline funciona transparentemente
 - **`metrics_by_service`**: bloqueado hasta que Services Architecture esté operativa
@@ -2380,21 +3003,26 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-16 — Sistematización Pre-Nómina (5 fases)
 
 ### Agente
+
 - Claude (Opus 4.6)
 
 ### Objetivo del turno
+
 - Sistematización completa del motor de nómina: prorrateo gradual de bonos, integración asistencia/licencias, generación PDF/Excel, actualización de vistas, y dashboard de gasto de personal.
 
 ### Rama
+
 - Rama usada: `develop`
 - Commit: `1d4ed3f`
 
 ### Ambiente objetivo
+
 - Preview / Cloud SQL / HR Payroll
 
 ### Archivos tocados
 
 **Nuevos (10 archivos):**
+
 - `src/lib/payroll/bonus-proration.ts` — funciones puras de prorrateo OTD/RpA
 - `src/lib/payroll/fetch-attendance-for-period.ts` — query combinada BigQuery attendance + Postgres leave_requests
 - `src/lib/payroll/generate-payroll-excel.ts` — workbook 3 hojas (Resumen, Detalle, Asistencia & Bonos) con exceljs
@@ -2407,6 +3035,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx` — dashboard con charts, cards, tabla
 
 **Modificados (14 archivos):**
+
 - `src/types/payroll.ts` — +BonusProrationConfig, +9 campos en PayrollEntry (proration factors, attendance snapshot, adjusted salary)
 - `src/lib/payroll/calculate-payroll.ts` — prorrateo gradual reemplaza lógica binaria, integración asistencia en buildPayrollEntry
 - `src/lib/payroll/recalculate-entry.ts` — prorrateo en recálculo individual, validación [0, max] en vez de [min, max]
@@ -2425,23 +3054,27 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Cambios realizados
 
 **Fase 1 — Motor de prorrateo de bonos:**
+
 - OTD: >=94% → 100%, 70-94% → prorrateo lineal `(otd - 70) / (94 - 70)`, <70% → $0
 - RpA: <=3 → prorrateo inverso `(3 - rpa) / 3`, >3 → $0
 - Funciones puras en `bonus-proration.ts` con tipo `BonusProrationConfig`
 - Thresholds configurables desde `payroll_bonus_config` (nuevo campo `otd_floor`)
 
 **Fase 2 — Integración asistencia/licencias:**
+
 - Combina BigQuery `attendance_daily` (Teams webhook) + Postgres `leave_requests` (flujo aprobación)
 - Días deducibles = `daysAbsent + daysOnUnpaidLeave` → reducen base y teletrabajo proporcionalmente
 - 9 campos nuevos en `payroll_entries`: proration factors (2), attendance snapshot (5), adjusted salary (2)
 - Postgres-first: nuevas columnas solo en Cloud SQL, BigQuery devuelve CAST(NULL)
 
 **Fase 3 — Generación PDF/Excel:**
+
 - Excel (exceljs): 3 hojas con formato, colores por régimen, auto-filter, porcentajes
 - PDF (@react-pdf/renderer): reporte período landscape + recibo individual (haberes, asistencia, descuentos, neto)
 - 3 endpoints GET que validan período aprobado/exportado y devuelven buffer con Content-Disposition
 
 **Fase 4 — Actualización UI:**
+
 - Semáforos OTD 3 niveles con color (success/warning/error) y factor %
 - Columna asistencia con ratio present/total y chip de ausencias
 - Tooltips en base y teletrabajo ajustados ("Original: $X | Ajustado por inasistencia")
@@ -2449,21 +3082,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Botón recibo por entry, botones PDF/Excel/CSV en período
 
 **Fase 5 — Gasto de personal:**
+
 - Query agregada sobre entries de períodos aprobados con totales y breakdown por régimen
 - Dashboard: 4 KPI cards, gráfico líneas (bruto vs neto), donut (Chile vs Internacional), tabla detalle
 - Filtro por rango de fechas (año/mes desde-hasta)
 - Integrado como nueva pestaña en PayrollDashboard
 
 ### Verificación
+
 - `npx tsc --noEmit` → 0 errores en todas las fases
 - `git push origin develop` → `1d4ed3f` exitoso
 
 ### Decisiones de arquitectura
+
 - **Postgres-first, BigQuery OLAP**: nuevos campos solo persisten en Cloud SQL. BigQuery SELECT retorna `CAST(NULL AS ...)` para backward compat. BigQuery MERGE no se modificó.
 - **PDF server-side**: se eligió `@react-pdf/renderer` (JSX → PDF) sobre `window.print()` de Vuexy porque necesitamos generación sin browser para API endpoints.
 - **Prorrateo gradual**: reemplaza completamente la lógica binaria previa. El rango de validación pasó de `[min, max]` a `[0, max]` para acomodar montos prorrateados.
 
 ### Riesgos o pendientes
+
 - **DDL migration**: el bloque `ALTER TABLE ADD COLUMN IF NOT EXISTS` en `setup-postgres-payroll.sql` debe ejecutarse en Cloud SQL si la tabla ya existe.
 - **Seed data**: insertar nuevo registro en `payroll_bonus_config` con `otd_threshold=94, rpa_threshold=3, otd_floor=70` y `effective_from='2026-04-01'`.
 - **Recibo sin logo**: el PDF usa texto "Greenhouse EO" como header; si se quiere logo gráfico, hay que registrar fuente/imagen en @react-pdf.
@@ -2475,23 +3112,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 15:12 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir `CODEX_TASK_Financial_Intelligence_Layer` para alinearla con la arquitectura vigente de Finance y del data platform.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentacion operativa / arquitectura / Finance
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Financial_Intelligence_Layer.md`
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se reescribio la task de `Financial Intelligence Layer` porque el brief original quedo desalineado respecto al estado actual del repo.
 - Alineaciones aplicadas:
   - `Finance` queda explicitamente `Postgres-first`, no `BigQuery-first`
@@ -2506,6 +3149,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `CODEX_TASK_Financial_Module.md` queda implicitamente como historico
 
 ### Verificacion
+
 - Relectura cruzada contra:
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
   - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
@@ -2516,31 +3160,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `git diff --check -- docs/tasks/to-do/CODEX_TASK_Financial_Intelligence_Layer.md Handoff.md`
 
 ### Riesgos o pendientes
+
 - La task ya esta alineada, pero su implementacion real puede destapar un gap previo en el catalogo canonico de `service_modules` si Finance necesita lineas que todavia no existan formalizadas.
 - Si eso ocurre, no hay que hardcodear labels nuevos en Finance; hay que corregir primero el catalogo o documentar la decision de arquitectura.
 
 ## 2026-03-15 14:18 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Resolver el runtime break de `Admin > Users > detail` después del rollout de `Person 360` enriquecido por Claude.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Cloud SQL / Admin Users
 
 ### Archivos tocados
+
 - `package.json`
 - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se identificó que `pre-greenhouse` estaba sirviendo código que espera el contrato enriquecido de `greenhouse_serving.person_360`:
   - `EO-ID`
   - `serial_number`
@@ -2551,7 +3202,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el runtime nuevo de Claude (`resolve-eo-id`, `get-person-profile`, `get-admin-user-detail`) esperaba el `person_360 v2`
 - Se corrigió el tooling oficial para que:
   - `pnpm setup:postgres:person-360`
-  ahora apunte a `scripts/setup-postgres-person-360-v2.ts`
+    ahora apunte a `scripts/setup-postgres-person-360-v2.ts`
 - También se alineó el runner legacy:
   - `scripts/setup-postgres-person-360-serving.ts` ahora aplica `v2`
 - Se ejecutó `person_360 v2` en Cloud SQL.
@@ -2564,25 +3215,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
     - `active_role_codes = ['efeonce_operations']`
 
 ### Riesgos o pendientes
+
 - Conviene consolidar más adelante los scripts legacy de `person_360` para dejar una sola ruta de provisioning y evitar duplicidad de nombres.
 - Falta solo validación manual autenticada en `pre-greenhouse` para confirmar el detalle de usuario ya no revienta con tu sesión.
 
 ## 2026-03-15 13:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar la fase 1 real de `Person 360`: auditar cobertura de identidad y materializar el primer serving `person_360` en PostgreSQL.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Cloud SQL / arquitectura de datos / serving runtime
 
 ### Archivos tocados
+
 - `scripts/audit-person-360-coverage.ts`
 - `scripts/setup-postgres-person-360-serving.sql`
 - `scripts/setup-postgres-person-360-serving.ts`
@@ -2595,6 +3252,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se creó `greenhouse_serving.person_360` como primer serving unificado de persona sobre:
   - `identity_profiles`
   - `members`
@@ -2620,6 +3278,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `profiles_without_any_facet = 1`
 
 ### Verificación
+
 - `pnpm exec eslint scripts/audit-person-360-coverage.ts scripts/setup-postgres-person-360-serving.ts`
   - correcto
 - `pnpm setup:postgres:person-360`
@@ -2630,6 +3289,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcta
 
 ### Riesgos o pendientes
+
 - `person_360` ya existe, pero `People` y `Users` aún no consumen esta vista.
 - El gap más grande quedó en `CRM Contact -> identity_profile`; ahí está la principal deuda de unificación.
 - `client_users.member_id` todavía no existe materializado en Cloud SQL; hoy la reconciliación se sigue resolviendo por `identity_profile_id`.
@@ -2640,19 +3300,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 13:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Formalizar `Person 360` como estrategia canónica de perfil y abrir la lane de reconciliación entre `People`, `Users`, `CRM Contact` y `Member`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Arquitectura y planificación de producto/datos
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/tasks/in-progress/CODEX_TASK_Person_360_Profile_Unification_v1.md`
@@ -2662,6 +3327,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se dejó explícito en arquitectura que:
   - `identity_profile` es el ancla canónica de persona
   - `member` es faceta laboral/interna
@@ -2674,6 +3340,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se agregó la lane al índice operativo de tasks.
 
 ### Verificación
+
 - Revisión cruzada con:
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
@@ -2681,6 +3348,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No hubo validación de build necesaria porque esta pasada es documental/arquitectónica.
 
 ### Riesgos o pendientes
+
 - Runtime todavía no sirve un `person_360` unificado; esto fija la regla, no el serving final.
 - `People` y `Users` siguen conviviendo sobre facetas distintas hasta que se ejecute la reconciliación.
 - Próximo paso recomendado:
@@ -2691,19 +3359,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 12:15 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cortar `AI Tooling` a PostgreSQL runtime y dejar el módulo estable para `Admin > AI Tooling` sin depender del bootstrap frágil en BigQuery.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview
 
 ### Archivos tocados
+
 - `src/lib/ai-tools/service.ts`
 - `src/lib/ai-tools/postgres-store.ts`
 - `scripts/setup-postgres-access-runtime.sql`
@@ -2718,6 +3391,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `AI Tooling` quedó `Postgres first` en `src/lib/ai-tools/service.ts` para:
   - catálogo
   - licencias
@@ -2752,6 +3426,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `greenhouse_ai` con `CREATE` para `migrator`
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/ai-tools/service.ts src/lib/ai-tools/postgres-store.ts scripts/setup-postgres-ai-tooling.ts scripts/backfill-postgres-ai-tooling.ts scripts/pg-doctor.ts`
   - correcto
 - `pnpm build`
@@ -2768,6 +3443,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - Esta pasada deja `AI Tooling` estable en runtime, pero todavía no verifica end-to-end el preview con usuario real; falta despliegue y smoke sobre:
   - `/api/admin/ai-tools/catalog`
   - `/api/admin/ai-tools/licenses`
@@ -2782,24 +3458,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 10:20 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Investigar el alert rojo de `Admin > AI Tooling` en `pre-greenhouse` y corregir el fallo backend compartido por catálogo, licencias, wallets y metadata.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview
 
 ### Archivos tocados
+
 - `src/lib/ai-tools/schema.ts`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Identificado el error real en logs de Vercel del deployment detrás de `pre-greenhouse`:
   - `Query parameter 'subscriptionAmount' not found at [12:13]`
 - La causa estaba en `ensureAiToolingInfrastructure()`:
@@ -2808,6 +3490,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Corregido el seed para normalizar todos los parámetros opcionales a `null` antes del `MERGE`, manteniendo tipado `NUMERIC` donde aplica
 
 ### Verificación
+
 - `vercel inspect pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`
   - correcto
 - `vercel logs dpl_HMokKuF3tKsyY46rn9CwJ1TN544d --scope efeonce-7670142f --no-follow --since 2h --status-code 500 --expand`
@@ -2818,6 +3501,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - pendiente de correr en este lote
 
 ### Riesgos o pendientes
+
 - El fix corrige el bootstrap runtime, pero todavía no materializa vendors financieros faltantes como `Microsoft` y `Notion` dentro del dropdown canónico de AI Tooling.
 - Próximo paso recomendado:
   - superseded por el corte `AI Tooling -> PostgreSQL runtime` documentado arriba
@@ -2825,19 +3509,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 09:46 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Levantar todos los campos semánticamente indicadores desde `Notion` hacia el modelo runtime y exponerlos ya en el consumer de `Project Detail`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `scripts/sync-source-runtime-projections.ts`
 - `scripts/setup-bigquery-source-sync.sql`
 - `scripts/setup-postgres-source-sync.sql`
@@ -2849,6 +3538,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Confirmado directamente en `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos:
   - `🟢 On-Time`
   - `🟡 Late Drop`
@@ -2885,6 +3575,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Source Sync Runtime Projections` quedó extendido para proyectar ese mismo set a `delivery_tasks`, más señales fuente de `delivery_projects` y `delivery_sprints`.
 
 ### Verificación
+
 - `pnpm exec eslint scripts/sync-source-runtime-projections.ts src/lib/projects/get-project-detail.ts src/types/greenhouse-project-detail.ts`
   - correcto
 - `pnpm build`
@@ -2897,6 +3588,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - `setup-bigquery-source-sync.ts` sigue bloqueado por `BigQuery table update quota exceeded`; el cambio quedó implementado en SQL y sync script, pero no materializado todavía en `greenhouse_conformed`.
 - El consumer de `Project Detail` ya puede usar estos indicadores directo desde `notion_ops`, así que el portal no queda esperando ese apply.
 - Próximo paso recomendado:
@@ -2906,19 +3598,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 09:18 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Empezar el corte de consumers legacy hacia capas canónicas sin romper el provisioning live de HubSpot -> Greenhouse.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `src/app/api/finance/clients/route.ts`
 - `src/app/api/finance/clients/[id]/route.ts`
 - `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
@@ -2927,6 +3624,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `Finance > Clients` ahora usa patrón `canonical first + live fallback`.
 - `GET /api/finance/clients`:
   - prioriza `greenhouse_conformed.crm_companies`
@@ -2942,6 +3640,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - preferir `canonical first, live fallback`
 
 ### Verificación
+
 - `pnpm exec eslint src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts'`
   - correcto
 - `pnpm build`
@@ -2950,6 +3649,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - Este corte todavía usa `hubspot_crm.*` como compatibilidad; no es el estado final.
 - El siguiente consumer debe seguir el mismo criterio híbrido mientras exista provisioning live.
 - Próximo paso recomendado:
@@ -2958,19 +3658,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 09:32 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Seguir el corte de consumers legacy con un slice pequeño en Admin usando delivery projections.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `src/lib/admin/get-admin-tenant-detail.ts`
 - `src/lib/admin/get-admin-user-detail.ts`
 - `project_context.md`
@@ -2978,6 +3683,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `Admin > tenant detail` y `Admin > user detail` ya priorizan `greenhouse_conformed.delivery_projects.project_name` para nombres de proyecto en scopes.
 - `notion_ops.proyectos` queda:
   - como fallback para nombre si aún no existe proyección
@@ -2985,12 +3691,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Esto reduce dependencia directa a `notion_ops` sin arriesgar regresión visible, porque `page_url` todavía no se proyecta en `delivery_projects`.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-tenant-detail.ts`
   - correcto
 - `git diff --check -- src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-tenant-detail.ts`
   - correcto
 
 ### Riesgos o pendientes
+
 - `page_url` sigue colgando de `notion_ops.proyectos`; si queremos eliminar completamente ese consumer, hay que proyectar ese campo en `delivery_projects`.
 - Próximo paso recomendado:
   - seguir con consumers legacy que leen `notion_ops.tareas` o `notion_ops.proyectos`, empezando por `projects`, `dashboard` o `admin` según riesgo.
@@ -2998,19 +3706,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 09:27 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Seguir el desacople de consumers legacy en `Projects` sin perder métricas que todavía viven en `notion_ops.tareas`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `src/lib/projects/get-projects-overview.ts`
 - `src/lib/projects/get-project-detail.ts`
 - `project_context.md`
@@ -3018,6 +3731,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `Projects Overview` y `Project Detail` ya priorizan `greenhouse_conformed.delivery_projects` para:
   - `project_name`
   - `project_status`
@@ -3032,6 +3746,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se tocó aún el uso de `notion_ops.tareas` porque ahí siguen viviendo métricas y señales que todavía no están proyectadas (`rpa`, reviews, blockers, frame comments).
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/projects/get-projects-overview.ts src/lib/projects/get-project-detail.ts`
   - correcto
 - `pnpm build`
@@ -3040,6 +3755,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - `Projects` sigue siendo híbrido; no está completamente desacoplado de `notion_ops`.
 - Para cortar del todo `projects`, primero hay que proyectar en `delivery_tasks`:
   - `rpa`
@@ -3053,15 +3769,19 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-16 ~02:00 America/Santiago
 
 ### Agente
+
 - Claude
 
 ### Objetivo del turno
+
 - Homologar roles V2 en todo el stack TypeScript + frontend. 6 roles nuevos y 3 route groups reconocidos end-to-end.
 
 ### Rama
+
 - `fix/codex-operational-finance`
 
 ### Archivos tocados
+
 - `src/lib/tenant/authorization.ts` — TenantRouteGroup expandido (+my, people, ai_tooling), canAccessPeopleModule actualizado, requireAiToolingTenantContext nuevo
 - `src/lib/tenant/access.ts` — rolePriority (15 roles), deriveRouteGroups (6 branches V2), portalHomePath fallback expandido
 - `src/lib/people/permissions.ts` — people_viewer (read-only assignments/activity), hr_manager (compensation/payroll)
@@ -3070,15 +3790,18 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `scripts/sync-source-runtime-projections.ts` — fix TS: owner_user_id type annotation (pre-existing Codex error)
 
 ### Verificación
+
 - `pnpm tsc --noEmit` — 0 errores
 - `pnpm build` — exitoso
 
 ### Cambios clave
+
 - **Backward compatible**: finance_manager, hr_payroll, employee mantienen exactamente el mismo acceso
 - **Additive**: finance_analyst/finance_admin → finance, hr_manager → hr, people_viewer → people, ai_tooling_admin → ai_tooling, collaborator → my
 - **Postgres canonical**: session_360 ya emite route_groups correctos; TypeScript deriveRouteGroups es solo fallback BigQuery
 
 ### Riesgos o pendientes
+
 - Páginas `/my/*` y `/ai-tools/*` (user-facing) no creadas aún — son tasks separadas
 - DDL y backfill Identity V2 aún no ejecutados en Cloud SQL
 - BigQuery `roles` table necesita los 6 roles V2 para que BigQuery fallback derive route_groups correctamente
@@ -3088,19 +3811,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-16 ~00:30 America/Santiago
 
 ### Agente
+
 - Claude
 
 ### Objetivo del turno
+
 - Implementar Identity & Access V2 completo: DDL, backfill, identity store, y wiring Postgres-first en access.ts.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `scripts/setup-postgres-identity-v2.sql` (NUEVO — DDL para Identity V2: ALTER client_users, scope tables, audit_events, feature flags, role seed, session_360 + user_360 views)
 - `scripts/setup-postgres-identity-v2.ts` (NUEVO — runner)
 - `scripts/backfill-postgres-identity-v2.ts` (NUEVO — backfill BigQuery → Postgres: SSO columns, member_id links, role assignments, scopes, feature flags)
@@ -3110,6 +3838,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Cambios realizados
 
 **DDL Identity V2** (`setup-postgres-identity-v2.sql`):
+
 - ALTER `client_users`: 12 columnas nuevas (microsoft_oid, google_sub, password_hash, timezone, member_id FK, etc.)
 - ALTER `user_role_assignments`: effective_from/to, assigned_by_user_id
 - CREATE TABLE: user_project_scopes, user_campaign_scopes, user_client_scopes, audit_events, client_feature_flags
@@ -3119,16 +3848,19 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Grants for greenhouse_runtime y greenhouse_migrator
 
 **Backfill** (`backfill-postgres-identity-v2.ts`):
+
 - 6 pasos: SSO columns, member_id resolution, role assignments, project/campaign scopes, feature flags
 - Uses RETURNING para contar rows afectados
 
 **Identity Store** (`identity-store.ts`):
+
 - Readiness check con TTL 60s, valida 4 tablas + V2 column presence
 - 4 session lookups: by microsoft_oid, google_sub, email, user_id
 - Internal users list for alias resolution
 - SSO link writes + last login update
 
 **Wiring access.ts**:
+
 - `getTenantAccessRecordByEmail` → Postgres-first
 - `getTenantAccessRecordByMicrosoftOid` → Postgres-first
 - `getTenantAccessRecordByGoogleSub` → Postgres-first
@@ -3138,10 +3870,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `updateTenantLastLogin` → dual-write (Postgres + BigQuery)
 
 ### Verificación
+
 - `pnpm tsc --noEmit` — 0 errores
 - `pnpm build` — build exitoso
 
 ### Riesgos o pendientes
+
 - DDL y backfill **NO ejecutados** aún en Cloud SQL
 - `getTenantAccessRecordByAllowedEmailDomain` y `verifyTenantPassword` quedan solo BigQuery (no en hot path de login)
 - Writes son dual-write: Postgres + BigQuery hasta full cutover
@@ -3150,19 +3884,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 09:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar el slice `HubSpot Contacts -> greenhouse_conformed.crm_contacts -> greenhouse_crm.contacts -> client_users / identity_profiles`, incorporando además `HubSpot Owner -> Member/User`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
 
 ### Archivos tocados
+
 - `scripts/setup-bigquery-source-sync.sql`
 - `scripts/setup-postgres-source-sync.sql`
 - `scripts/sync-source-runtime-projections.ts`
@@ -3173,6 +3912,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se agregó `greenhouse_conformed.crm_contacts`.
 - Se agregó `greenhouse_crm.contacts`.
 - El sync ahora replica `hubspot_crm.contacts` a `greenhouse_raw.hubspot_contacts_snapshots`, luego a `crm_contacts`, y finalmente a `greenhouse_crm.contacts`.
@@ -3205,6 +3945,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no exigir que la integración live escriba directo a BigQuery
 
 ### Verificación
+
 - `pnpm exec eslint scripts/sync-source-runtime-projections.ts`
   - correcto
 - `pnpm exec tsx scripts/setup-bigquery-source-sync.ts`
@@ -3231,6 +3972,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
     - `identity_profile <- hubspot owner = 6`
 
 ### Riesgos o pendientes
+
 - El seed completo sigue siendo lento porque `sync-source-runtime-projections.ts` hace demasiados writes secuenciales; conviene optimizarlo después de cerrar este slice.
 - `crm_contacts` todavía resuelve un `company_source_id` primario; si más adelante necesitamos una relación explícita many-to-many, corresponde agregar `crm_company_contacts`.
 - La cobertura de `owner -> user` depende de cuántos colaboradores internos ya tienen principal en `client_users`; hoy quedó resuelto `1/6`.
@@ -3240,19 +3982,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 08:15 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Introducir `spaces` como objeto canónico del 360, conectar delivery a `space_id` y formalizar `Efeonce` como `internal_space`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
 
 ### Archivos tocados
+
 - `scripts/setup-postgres-access.sql`
 - `scripts/setup-postgres-canonical-360.sql`
 - `scripts/setup-postgres-source-sync.sql`
@@ -3269,6 +4016,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se agregó `greenhouse_core.spaces` como nuevo anchor canónico del workspace operativo.
 - Se agregó `greenhouse_core.space_source_bindings` para modelar:
   - `legacy_project_scope`
@@ -3291,6 +4039,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `setup-postgres-access.sql` ahora intenta normalizar ownership de `greenhouse_core`, `greenhouse_serving` y `greenhouse_sync` hacia `greenhouse_migrator` sin bloquear la evolución si encuentra objetos legacy no transferibles
 
 ### Verificación
+
 - `pnpm exec tsx scripts/setup-postgres-access.ts`
   - correcto
 - `pnpm exec tsx scripts/setup-postgres-canonical-360.ts`
@@ -3320,6 +4069,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `delivery_sprints` con `space_id = 11/13`
 
 ### Riesgos o pendientes
+
 - `Agency` runtime todavía lee el bridge legacy en BigQuery y no consume `greenhouse_core.spaces` directamente; esta pasada deja el modelo listo, no el cutover del módulo.
 - Aún quedan `2` sprints sin `space_id`; no quedaron asociados por tareas/proyectos en la data legacy y requieren reconciliación de source data o una regla adicional de binding.
 - El seed de `spaces` todavía nace de `greenhouse.clients.notion_project_ids`; el target sigue siendo `space -> project_database_source_id` como única fuente canónica.
@@ -3330,9 +4080,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 ~22:30 America/Santiago
 
 ### Agente
+
 - Claude
 
 ### Objetivo del turno
+
 - Wiring completo de Finance Slice 2 a PostgreSQL: income, expenses, payments.
 - Backfill scripts para HR Payroll y HR Leave (BigQuery → PostgreSQL).
 - Serving view `member_leave_360` para HR Leave.
@@ -3340,13 +4092,16 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Validación completa del proyecto (TypeScript + build).
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local development
 
 ### Archivos tocados
+
 - `src/lib/finance/postgres-store-slice2.ts` (NUEVO — ~1100 líneas)
 - `src/app/api/finance/income/route.ts` (modificado — Postgres-first GET + POST)
 - `src/app/api/finance/income/[id]/route.ts` (modificado — Postgres-first GET)
@@ -3365,25 +4120,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ### Cambios realizados
 
 **Finance Slice 2**:
+
 - Creado `postgres-store-slice2.ts` con repository layer completo
 - 7 rutas API wired a Postgres-first con BigQuery fallback
 - Income payments normalizados a tabla propia en Postgres
 
 **HR Payroll backfill**:
+
 - `scripts/backfill-postgres-payroll.ts` — backfilla 4 tablas: compensation_versions, payroll_periods, payroll_entries, payroll_bonus_config
 
 **HR Leave backfill + serving view**:
+
 - `scripts/backfill-postgres-hr-leave.ts` — backfilla 4 tablas: leave_types, leave_balances, leave_requests, leave_request_actions
 - `greenhouse_serving.member_leave_360` — vista 360 de leave por member con balances y solicitudes
 
 **Fix TS de Codex**:
+
 - `sync-source-runtime-projections.ts:571` — `owner_member_id: null` tipado como `null as string | null` para que el build pase
 
 ### Verificación
+
 - `pnpm tsc --noEmit` — pasó limpio (0 errores)
 - `pnpm build` — build exitoso, todas las rutas finance + hr compiladas correctamente
 
 ### Riesgos o pendientes
+
 - Backfills **NO ejecutados** aún (finance slice 2, payroll, leave)
 - DDL leave actualizado no ejecutado en Cloud SQL (para crear `member_leave_360`)
 - PUT income y PUT expenses siguen solo en BigQuery
@@ -3395,19 +4156,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 18:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar el primer seed real de `Source Sync Runtime Projections`, ajustar el modelado 360 de delivery/CRM y dejar un documento maestro del modelo de datos para agentes.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Local tooling + Cloud SQL `greenhouse-pg-dev` + BigQuery `efeonce-group`
 
 ### Archivos tocados
+
 - `scripts/setup-postgres-access.sql`
 - `scripts/setup-postgres-source-sync.sql`
 - `scripts/setup-postgres-source-sync.ts`
@@ -3425,6 +4191,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se creó `GREENHOUSE_DATA_MODEL_MASTER_V1.md` como snapshot maestro del modelo de datos Greenhouse.
 - Se creó `GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md` para definir cómo los agentes deben evolucionar el master doc.
 - Se ejecutó `Source Sync Runtime Projections` con datos reales desde datasets legacy hacia:
@@ -3458,6 +4225,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - solo contactos asociados a companias cliente deben entrar al runtime
 
 ### Verificación
+
 - `pnpm exec eslint scripts/sync-source-runtime-projections.ts scripts/setup-postgres-source-sync.ts scripts/setup-bigquery-source-sync.ts scripts/setup-postgres-access.ts`
   - correcto
 - `pnpm exec tsx scripts/setup-postgres-access.ts`
@@ -3486,6 +4254,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - watermarks activos en `greenhouse_sync.source_sync_watermarks`
 
 ### Riesgos o pendientes
+
 - `HubSpot Contacts` aun no estan materializados en `greenhouse_conformed` ni `greenhouse_crm`; quedaron declarados como slice obligatorio siguiente.
 - El binding tenant-level definitivo para delivery aun no existe como objeto canonico separado; hoy el seed usa:
   - `_source_database_id` como contexto de workspace
@@ -3495,19 +4264,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 16:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar la capa transversal de acceso a PostgreSQL para que `HR`, `Payroll`, `Finance` y los próximos dominios no vuelvan a requerir grants manuales por ambiente.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Cloud SQL `greenhouse-pg-dev`
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
@@ -3534,6 +4308,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se formalizó el modelo de acceso `runtime / migrator / admin` en PostgreSQL.
 - `AGENTS.md` quedó actualizado con:
   - perfiles de acceso
@@ -3555,6 +4330,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se tocó el runtime funcional de `Payroll`; esta pasada solo deja la base de acceso y tooling para siguientes migraciones.
 
 ### Verificación
+
 - `pnpm exec tsx scripts/setup-postgres-access.ts`
   - correcto
 - `pnpm exec tsx scripts/pg-doctor.ts --profile=runtime`
@@ -3569,6 +4345,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - Algunos objetos legacy siguen siendo owned por `greenhouse_app`; el modelo nuevo los cubre por grants, pero la propiedad histórica no se normalizó en esta pasada.
 - `Payroll` ya está arriba por Claude; no se debe reabrir ese runtime sin coordinar el boundary actual.
 - Siguiente paso recomendado:
@@ -3578,19 +4355,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 13:45 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Materializar el primer slice `Finance -> PostgreSQL` sin romper la alineacion 360 ni el bridge activo con `AI Tooling`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Cloud SQL `greenhouse-pg-dev`
 
 ### Archivos tocados
+
 - `src/lib/providers/postgres.ts`
 - `src/lib/finance/postgres-store.ts`
 - `src/lib/finance/shared.ts`
@@ -3610,6 +4392,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se materializo `greenhouse_finance` en Cloud SQL con:
   - `accounts`
   - `suppliers`
@@ -3633,6 +4416,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El backfill de suppliers tambien materializa providers canonicos `financial_vendor` en `greenhouse_core.providers`.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/providers/postgres.ts src/lib/finance/postgres-store.ts src/lib/finance/shared.ts src/lib/finance/exchange-rates.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts src/app/api/finance/expenses/meta/route.ts scripts/setup-postgres-finance.ts scripts/backfill-postgres-finance.ts`
   - correcto
 - `git diff --check -- ...` sobre el scope financiero tocado
@@ -3649,6 +4433,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `backfill-postgres-finance` correcto
 
 ### Riesgos o pendientes
+
 - `suppliers` runtime sigue en BigQuery por dependencia viva con `AI Tooling`.
 - `exchange_rates` quedo con `0` filas por no existir snapshots previos en BigQuery; el path runtime igual se mantiene sano porque el sync diario/live ya persiste en el store operativo cuando se invoque.
 - El siguiente corte sano es:
@@ -3658,19 +4443,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 ~12:00 America/Santiago
 
 ### Agente
+
 - Claude
 
 ### Objetivo del turno
+
 - Tomar la lane `HR Payroll Postgres Runtime Migration v1` y ejecutar el corte operativo de Payroll desde BigQuery hacia PostgreSQL, alineado al modelo canonico 360.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md` — registro de asignacion y plan 360
 - `scripts/setup-postgres-payroll.sql` — DDL schema `greenhouse_payroll`
 - `src/lib/payroll/postgres-store.ts` — repository layer PostgreSQL
@@ -3682,6 +4472,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Alineacion 360
+
 - Schema: `greenhouse_payroll` como domain extension
 - FKs canonicas: `member_id` → `greenhouse_core.members`, user IDs → `greenhouse_core.client_users`
 - Outbox events en `greenhouse_sync.outbox_events`
@@ -3689,6 +4480,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Patron replicado de `greenhouse_hr` (Leave)
 
 ### Riesgos o pendientes
+
 - Schema `greenhouse_payroll` debe ser provisionado en Cloud SQL antes del deploy
 - Backfill de datos existentes de BigQuery a PostgreSQL pendiente (script separado)
 - KPIs de Notion (`kpi_otd_percent`, `kpi_rpa_avg`) siguen viniendo de source sync, no de PostgreSQL
@@ -3698,19 +4490,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 05:58 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Abrir el programa de migracion `PostgreSQL + source sync` en lanes paralelas y dejar briefs ejecutables para que otro agente, incluido Claude, pueda tomar trabajo sin pisar el runtime ya estabilizado.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Docs / coordinacion operativa
 
 ### Archivos tocados
+
 - `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1.md`
 - `docs/tasks/in-progress/CODEX_TASK_Finance_Postgres_Runtime_Migration_v1.md`
 - `docs/tasks/in-progress/CODEX_TASK_Source_Sync_Runtime_Projections_v1.md`
@@ -3719,6 +4516,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se descompuso la siguiente etapa de plataforma en tres lanes paralelizables:
   - `HR Payroll -> PostgreSQL`
   - `Finance operativo -> PostgreSQL`
@@ -3733,6 +4531,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizo el indice `docs/tasks/README.md` para que estas lanes ya aparezcan como `in-progress`.
 
 ### Verificación
+
 - Revision manual de consistencia entre:
   - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
   - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
@@ -3741,6 +4540,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `pnpm exec prettier --check` no se uso; esta tanda es documental y se validara con `git diff --check`
 
 ### Riesgos o pendientes
+
 - Estas tasks no ejecutan runtime por si mismas; solo abren el trabajo paralelo.
 - El siguiente paso recomendado es asignar:
   - `Payroll` a un agente
@@ -3753,19 +4553,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 05:48 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir la ausencia de avatar real en la tabla de `HR > Permisos` una vez que el flujo de creación ya estaba operativo.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `src/types/hr-core.ts`
 - `src/lib/hr-core/service.ts`
 - `src/lib/hr-core/postgres-leave-store.ts`
@@ -3774,6 +4579,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se confirmó que no era un problema de persistencia de la solicitud, sino de contrato:
   - `HR Leave` no devolvía `memberAvatarUrl`
   - la UI siempre renderizaba iniciales
@@ -3788,31 +4594,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el modal de revisión
 
 ### Verificación
+
 - `pnpm exec eslint src/types/hr-core.ts src/lib/hr-core/service.ts src/lib/hr-core/postgres-leave-store.ts src/views/greenhouse/hr-core/HrLeaveView.tsx`
   - correcto
 - `pnpm build`
   - correcto
 
 ### Riesgos o pendientes
+
 - En PostgreSQL el avatar todavía no viene de una columna canónica dedicada en `greenhouse_core.members`; por ahora usa el resolver compartido por nombre/email.
 - Si queremos cerrar eso de forma estructural, el siguiente paso sano es llevar `avatar_url` al backbone canónico y al backfill `canonical-360`.
 
 ## 2026-03-15 05:34 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar el primer slice técnico del blueprint de sync externo para dejar materializada la fundación `raw/conformed + control plane + proyecciones runtime` en BigQuery y PostgreSQL.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Data platform / PostgreSQL / BigQuery
 
 ### Archivos tocados
+
 - `scripts/setup-postgres-source-sync.sql`
 - `scripts/setup-postgres-source-sync.ts`
 - `scripts/setup-bigquery-source-sync.sql`
@@ -3823,6 +4636,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se agregaron los scripts:
   - `pnpm setup:postgres:source-sync`
   - `pnpm setup:bigquery:source-sync`
@@ -3847,6 +4661,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - BigQuery
 
 ### Verificación
+
 - `pnpm exec eslint scripts/setup-postgres-source-sync.ts scripts/setup-bigquery-source-sync.ts src/lib/postgres/client.ts src/lib/bigquery.ts`
   - correcto
 - `pnpm build`
@@ -3860,6 +4675,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `bq ls` en `greenhouse_raw`, `greenhouse_conformed`, `greenhouse_marts`
 
 ### Riesgos o pendientes
+
 - Este turno deja lista la fundación, pero todavía no llena datos:
   - faltan jobs de ingestión Notion/HubSpot
   - falta materialización de conformed desde raw
@@ -3871,24 +4687,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 05:15 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el error vivo al crear solicitudes en `HR > Permisos` después de que la vista ya había quedado operativa.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `src/lib/hr-core/postgres-leave-store.ts`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se inspeccionaron logs reales de `POST /api/hr/core/leave/requests` en `pre-greenhouse`.
 - La causa exacta fue un error PostgreSQL:
   - `column "year" is of type integer but expression is of type text`
@@ -3900,6 +4722,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `$2::integer` para la columna `year`
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/hr-core/postgres-leave-store.ts`
   - correcto
 - `pnpm build`
@@ -3908,6 +4731,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - se confirmó el error exacto antes del fix en `POST /api/hr/core/leave/requests`
 
 ### Riesgos o pendientes
+
 - Falta smoke autenticado después del deploy para confirmar que la solicitud ya se crea y aparece en la tabla.
 - Sigue existiendo un archivo no trackeado fuera de este lote:
   - `docs/architecture/POSTGRESQL_ADVANCED_PATTERNS.md`
@@ -3915,19 +4739,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 05:08 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Traducir la decisión `PostgreSQL + BigQuery` a un blueprint concreto para sincronizar y respaldar datos de `Notion` y `HubSpot`, definiendo qué se queda como raw, qué se normaliza y qué subset baja a PostgreSQL para runtime y cálculos.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Architecture / Data platform
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `project_context.md`
@@ -3935,6 +4764,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se formalizó el blueprint de sync externo en `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`.
 - El documento deja definidos:
   - datasets `BigQuery raw`, `conformed` y `marts`
@@ -3955,6 +4785,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no más cálculos críticos leyendo APIs live de `Notion` o `HubSpot`
 
 ### Verificación
+
 - Revisión manual del alineamiento entre:
   - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
   - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
@@ -3963,6 +4794,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - pendiente al cierre del lote completo
 
 ### Riesgos o pendientes
+
 - Falta implementar el primer slice técnico del blueprint:
   - tablas `greenhouse_sync.source_sync_runs`
   - tablas `greenhouse_sync.source_sync_watermarks`
@@ -3975,19 +4807,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 04:53 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Resolver la caída real de `HR > Permisos` en `pre-greenhouse` después del cutover a PostgreSQL y endurecer el rollout para que el módulo no vuelva a caer completo si Cloud SQL falla en `Preview`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `src/lib/hr-core/service.ts`
 - `docs/tasks/in-progress/CODEX_TASK_HR_Core_Module_v2.md`
 - `project_context.md`
@@ -3995,6 +4832,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se identificó en logs de Vercel que la caída de `GET /api/hr/core/meta`, `GET /api/hr/core/leave/balances` y `GET /api/hr/core/leave/requests` no venía del frontend sino de Cloud SQL:
   - `boss::NOT_AUTHORIZED`
   - falta de permiso `cloudsql.instances.get`
@@ -4014,6 +4852,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El objetivo del ajuste es que `Preview` siga operativo durante rollout o incidentes de infraestructura sin perder el camino a PostgreSQL como store principal del dominio.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/hr-core/service.ts`
   - correcto
 - `pnpm build`
@@ -4024,6 +4863,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto; binding presente
 
 ### Riesgos o pendientes
+
 - Todavía falta smoke autenticado manual en `pre-greenhouse` para confirmar la UX final del flujo:
   - carga de la vista
   - creación de solicitud
@@ -4033,19 +4873,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 10:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Hacer el primer cutover real de runtime `BigQuery -> PostgreSQL` usando la nueva base operacional, empezando por `HR > Permisos`, y eliminar el patrón de `DDL` en request-time que venía rompiendo `HR Core`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview / Data platform migration
 
 ### Archivos tocados
+
 - `src/lib/google-credentials.ts`
 - `src/lib/bigquery.ts`
 - `src/lib/postgres/client.ts`
@@ -4062,6 +4907,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se agregó el primer domain schema operativo sobre Postgres:
   - `greenhouse_hr.leave_types`
   - `greenhouse_hr.leave_balances`
@@ -4094,6 +4940,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/google-credentials.ts src/lib/bigquery.ts src/lib/postgres/client.ts src/lib/storage/greenhouse-media.ts src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/service.ts src/views/greenhouse/hr-core/HrLeaveView.tsx scripts/setup-postgres-hr-leave.ts`
   - correcto
 - `pnpm build`
@@ -4108,6 +4955,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - tablas `greenhouse.departments`, `member_profiles`, `leave_types`, `leave_balances`, `leave_requests`, `leave_request_actions`, `attendance_daily` presentes en BigQuery
 
 ### Riesgos o pendientes
+
 - No se hizo smoke autenticado completo en `pre-greenhouse` después del cutover; el siguiente paso sano es validar con sesión real:
   - carga de `/hr/leave`
   - creación de solicitud
@@ -4117,19 +4965,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 04:15 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Aprovechar la nueva instancia de Cloud SQL para materializar el backbone canónico `360` en PostgreSQL y cargarle datos reales desde BigQuery, antes de seguir migrando dominios operativos.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Architecture / Data platform foundation
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `src/lib/postgres/client.ts`
@@ -4145,6 +4998,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se modeló y documentó el backbone canónico `360` de PostgreSQL:
   - `greenhouse_core`
   - `greenhouse_serving`
@@ -4173,6 +5027,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `user_role_assignments`: `40`
 
 ### Verificación
+
 - `pnpm exec tsx scripts/setup-postgres-canonical-360.ts`
   - correcto; `40` statements aplicados
 - `pnpm exec tsx scripts/backfill-postgres-canonical-360.ts`
@@ -4184,6 +5039,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - muestras válidas de `client_360` y `member_360`
 
 ### Riesgos o pendientes
+
 - El portal todavía no lee ni escribe desde Postgres; este turno deja lista la base canónica y sus datos iniciales, no el cutover de runtime.
 - `departments` no existe hoy en BigQuery, así que `member_360` quedó sin esa dimensión poblada en el backfill inicial.
 - El siguiente paso sano es migrar un dominio write-heavy contra este backbone:
@@ -4193,25 +5049,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 03:47 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Formalizar la arquitectura de datos objetivo `PostgreSQL + BigQuery` y ejecutar la primera provisión real de Cloud SQL para empezar a sacar workflows operativos de BigQuery.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Architecture / Infrastructure foundation
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
 - `project_context.md`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se agregó la arquitectura de alto nivel `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`.
 - La dirección oficial queda definida como:
   - `PostgreSQL` para flujos operativos y mutables
@@ -4235,6 +5097,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `greenhouse-pg-dev-app-password`
 
 ### Verificación
+
 - `gcloud auth login --no-launch-browser --update-adc`
   - correcto con `julio.reyes@efeonce.org`
 - `gcloud sql instances list --project efeonce-group`
@@ -4247,6 +5110,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto; confirmó `greenhouse_app` y `postgres`
 
 ### Riesgos o pendientes
+
 - La app todavía no usa Postgres en runtime; esta pasada solo deja la fundación de infraestructura.
 - El siguiente paso sano no es conectar módulos directo a la IP pública, sino definir la estrategia de acceso desde aplicación:
   - idealmente repository layer + Cloud SQL connector / worker de sync
@@ -4259,19 +5123,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 08:31 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el drift entre el mensaje de `Payroll` y la superficie real de administración del equipo, y endurecer el overview de compensaciones para que no se caiga completo ante un fallo parcial.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/payroll/get-compensation.ts`
 - `src/views/greenhouse/payroll/PayrollDashboard.tsx`
 - `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
@@ -4283,6 +5152,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se confirmó que el repo tenía APIs de `Admin Team` pero no la ruta `/admin/team`.
 - Se agregó `/admin/team` reutilizando `PeopleList`, para que el admin tenga pantalla real donde crear/gestionar colaboradores.
 - El menú `Admin` ahora muestra `Equipo`.
@@ -4293,6 +5163,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - recompone `eligibleMembers` con la mejor data disponible
 
 ### Verificación
+
 - Query manual sobre `Preview`:
   - `team_members` activos: `7`
   - bootstrap `ensurePayrollInfrastructure` ejecutado statement por statement: correcto
@@ -4302,6 +5173,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - No se pudo capturar el stack runtime exacto del `500` autenticado de `/api/hr/payroll/compensation`; se endureció el endpoint para evitar que un fallo parcial vuelva a tumbar toda la carga.
 - Falta smoke autenticado en `pre-greenhouse` para validar:
   - `/admin/team`
@@ -4311,19 +5183,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 08:02 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el fallo de creación de períodos en `HR Payroll` y revisar por qué `Compensaciones` aparecía con CTA apagado pese a existir colaboradores activos en preview.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/payroll/shared.ts`
 - `src/lib/payroll/get-payroll-periods.ts`
 - `src/lib/payroll/get-compensation.ts`
@@ -4335,6 +5212,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se endurecieron writes de `Payroll` para BigQuery cuando existen params opcionales `null`:
   - períodos
   - compensaciones
@@ -4352,6 +5230,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El modal `Nuevo período` ahora aclara que salario base, AFP, salud y bonos se configuran en la pestaña `Compensaciones`.
 
 ### Verificación
+
 - Query manual a BigQuery con env de `Preview`:
   - `team_members`: `7` activos
   - `current compensation`: `0`
@@ -4361,6 +5240,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - No se hizo smoke autenticado completo en `pre-greenhouse` después del fix, así que falta confirmar el roundtrip real de:
   - crear período
   - crear primera compensación
@@ -4370,19 +5250,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 07:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir la inconsistencia entre `Finance Suppliers` y `AI Tooling Providers` para que el registro canónico `greenhouse.providers` vuelva a poblar el dropdown de `Nueva herramienta` y quede alineado con arquitectura.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/providers/canonical.ts`
 - `src/lib/finance/schema.ts`
 - `src/app/api/finance/suppliers/route.ts`
@@ -4395,6 +5280,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
 
 ### Cambios realizados
+
 - Se agregó un bridge canónico `Supplier -> Provider` en `src/lib/providers/canonical.ts`.
 - `Finance Suppliers` ahora:
   - guardan `provider_id`
@@ -4409,37 +5295,45 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el dropdown de provider deja de quedar vacío por drift entre `Finance` y `AI Tooling`
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/providers/canonical.ts src/lib/finance/schema.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/lib/ai-tools/service.ts src/views/greenhouse/ai-tools/tabs/AiCatalogTab.tsx`
   - correcto
 - `git diff --check -- src/lib/providers/canonical.ts src/lib/finance/schema.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/lib/ai-tools/service.ts src/views/greenhouse/ai-tools/tabs/AiCatalogTab.tsx`
   - correcto
 
 ### Riesgos o pendientes
+
 - No se hizo smoke autenticado en preview para confirmar un caso real de supplier ya existente reapareciendo en el dropdown después del bridge.
 - El worktree ya traía un cambio ajeno en `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`; no se tocó en este turno.
 
 ## 2026-03-15 05:52 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir dos bugs reportados después del último QA: snapshot de tipo de cambio ausente en `Finance Dashboard` y dropdown vacío en `Solicitar permiso` de `HR Core`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/views/greenhouse/finance/FinanceDashboardView.tsx`
 - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - `Finance`:
   - el dashboard ahora deja warning visible si `/api/finance/exchange-rates/latest` responde sin snapshot disponible o con error HTTP
 - `HR Core`:
@@ -4449,31 +5343,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - si `meta` falla, ahora el error se expone en pantalla en vez de quedar silencioso
 
 ### Verificación
+
 - `pnpm exec eslint src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/hr-core/HrLeaveView.tsx`
   - correcto
 - `git diff --check -- src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/hr-core/HrLeaveView.tsx Handoff.md changelog.md`
   - correcto
 
 ### Riesgos o pendientes
+
 - No se ejecutó smoke autenticado real contra Preview/BigQuery; la mejora de visibilidad del dashboard queda validada por lint y por lectura de contrato, no por roundtrip productivo.
 - Si el problema de permisos persiste con usuarios reales, el siguiente punto a revisar es la respuesta viva de `GET /api/hr/core/meta` en Preview.
 
 ## 2026-03-15 05:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar QA funcional cruzado sobre `Finance`, `HR Core`, `HR Payroll` y `AI Tooling`, mapear sus flujos activos contra frontend/backend real y corregir los bugs de mayor impacto encontrados.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/views/greenhouse/finance/FinanceDashboardView.tsx`
 - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
 - `src/views/greenhouse/payroll/CompensationDrawer.tsx`
@@ -4486,6 +5387,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se mapearon los flujos activos por módulo desde vistas + rutas API:
   - `Finance`: dashboard, ingresos, egresos, clientes, proveedores, conciliación
   - `HR Core`: dashboard, departamentos, permisos, attendance
@@ -4502,6 +5404,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - consumo
 
 ### Verificación
+
 - `pnpm exec eslint src/views/greenhouse/finance src/app/api/finance src/lib/finance`
   - correcto
 - `pnpm exec eslint src/views/greenhouse/hr-core src/app/api/hr/core src/lib/hr-core`
@@ -4517,6 +5420,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - correcto
 
 ### Riesgos o pendientes
+
 - El QA fue estático + contractual; no se hizo smoke autenticado real en Preview contra BigQuery para los cuatro módulos.
 - `Finance`, `HR Core`, `HR Payroll` y `AI Tooling` quedan más coherentes para seguir sobre frontend, pero todavía conviene una siguiente pasada con usuario real para validar permisos y datos vivos.
 - Las tasks vivas de cada módulo ya quedaron actualizadas con:
@@ -4527,19 +5431,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 03:42 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Conectar `Finance` a APIs abiertas de tipo de cambio, persistir snapshots diarios en BigQuery y dejar automatizado el sync para cálculos server-side en USD.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/finance/exchange-rates.ts`
 - `src/lib/finance/shared.ts`
 - `src/app/api/finance/exchange-rates/latest/route.ts`
@@ -4552,6 +5461,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se agregó una capa server-only para sincronización de tipo de cambio:
   - proveedor primario `mindicador.cl`
   - fallback `open.er-api.com`
@@ -4567,6 +5477,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se documentó la nueva variable `CRON_SECRET` y el comportamiento operativo en `project_context.md` y en la task financiera.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/finance/exchange-rates.ts src/lib/finance/shared.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts`
   - correcto
 - `git diff --check -- src/lib/finance/exchange-rates.ts src/lib/finance/shared.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/exchange-rates/sync/route.ts vercel.json .env.example docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md project_context.md Handoff.md changelog.md`
@@ -4579,6 +5490,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `https://open.er-api.com/v6/latest/USD`: `200`
 
 ### Riesgos o pendientes
+
 - El sync automático queda enfocado solo en `USD/CLP`; si el módulo expande monedas, conviene generalizar la capa FX.
 - `Vercel Cron` quedó configurado, pero requiere que `CRON_SECRET` exista en los ambientes donde se quiera invocar manualmente con bearer token.
 - Falta validar en preview que el cron y la lectura `latest` queden operativos con credenciales reales de BigQuery.
@@ -4590,19 +5502,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 00:49 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Mover el foco backend desde `Finance` hacia `HR-Payroll`, revisar el contrato actual y corregir el primer bug server-side encontrado en la vigencia de compensaciones.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/payroll/get-compensation.ts`
 - `src/lib/payroll/get-payroll-members.ts`
 - `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
@@ -4610,6 +5527,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se auditó `HR-Payroll` backend contra la task v3 y arquitectura antes de seguir.
 - Se detectó un bug real de vigencia:
   - compensaciones futuras dependían de `is_current` materializado al crearse
@@ -4622,6 +5540,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se dejó el hardening documentado dentro de la task activa de `HR-Payroll`.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/payroll src/app/api/hr/payroll`
   - correcto
 - `git diff --check -- src/lib/payroll src/app/api/hr/payroll docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md Handoff.md changelog.md`
@@ -4631,6 +5550,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no aparecieron errores del scope `src/lib/payroll|src/app/api/hr/payroll` al filtrar el resultado
 
 ### Riesgos o pendientes
+
 - `HR-Payroll` backend queda más consistente para compensaciones futuras, pero aún conviene una siguiente tanda backend si se quiere cerrar más:
   - auditoría explícita en cambios de compensación/período
   - revisión de queries con params nulos opcionales en writes BigQuery
@@ -4640,19 +5560,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 00:44 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar re-QA backend de `Finance`, corregir los bugs server-side que todavía quedaban después de la segunda tanda y determinar si el módulo ya puede ceder foco a `HR-Payroll`.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/app/api/finance/dashboard/aging/route.ts`
 - `src/app/api/finance/dashboard/by-service-line/route.ts`
 - `src/app/api/finance/clients/route.ts`
@@ -4662,6 +5587,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Re-QA backend de `Finance` detectó tres bugs server-side que seguían abiertos:
   - `aging` devolvía cuentas por cobrar en moneda nativa aunque la UI las interpreta como CLP
   - `clients` list y detail calculaban `totalReceivable` mezclando monedas nativas y luego se renderizaban como CLP
@@ -4674,6 +5600,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se dejó esta validación asentada en la task financiera y el módulo backend queda operativo para ceder foco a `HR-Payroll`.
 
 ### Verificación
+
 - `pnpm exec eslint src/app/api/finance src/lib/finance`
   - correcto
 - `git diff --check -- src/app/api/finance src/lib/finance docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md Handoff.md changelog.md`
@@ -4683,6 +5610,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no aparecieron errores del scope `finance` al filtrar el resultado
 
 ### Riesgos o pendientes
+
 - `Finance` backend queda suficientemente estable para pasar el siguiente foco a `HR-Payroll`.
 - Las deudas abiertas de `Finance` ya son principalmente:
   - consumo UI de los nuevos contratos
@@ -4693,19 +5621,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 00:37 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar la segunda tanda backend pendiente del `Finance Module`: conciliación por pagos parciales, separación caja/devengo en reporting y saldo bancario operativo para dashboard.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/finance/schema.ts`
 - `src/lib/finance/income-payments.ts`
 - `src/lib/finance/reporting.ts`
@@ -4726,6 +5659,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se extendió conciliación bancaria para soportar pagos parciales de ingresos:
   - cada fila de extracto puede guardar `matched_payment_id`
   - candidatos de conciliación para ingresos ahora pueden salir a nivel de pago individual
@@ -4748,12 +5682,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizó la task financiera con el handoff explícito de esta segunda tanda backend hacia Claude.
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/finance/income-payments.ts src/lib/finance/reporting.ts src/lib/finance/reconciliation.ts src/lib/finance/schema.ts src/app/api/finance/accounts/route.ts 'src/app/api/finance/income/[id]/payment/route.ts' src/app/api/finance/income/summary/route.ts src/app/api/finance/expenses/summary/route.ts src/app/api/finance/dashboard/summary/route.ts src/app/api/finance/dashboard/cashflow/route.ts 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts'`
   - correcto
 - No se ejecutó `pnpm build`
 - No se hizo smoke manual en preview en este turno
 
 ### Riesgos o pendientes
+
 - La reconciliación parcial quedó funcional en backend, pero sigue modelada sobre `payments_received` JSON; si el módulo crece, conviene normalizar eso en tabla propia.
 - La UI actual todavía no consume:
   - `currentBalance`
@@ -4766,19 +5702,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 03:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar la primera tanda backend crítica del `Finance Module` después del QA: integridad de conciliación, bloqueo real de períodos y mejor criterio temporal para cobros.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/lib/finance/reconciliation.ts`
 - `src/app/api/finance/reconciliation/[id]/statements/route.ts`
 - `src/app/api/finance/reconciliation/[id]/match/route.ts`
@@ -4793,6 +5734,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se corrigió la importación de extractos para que:
   - no reinicie la secuencia de `row_id` al reimportar en el mismo período
   - persista `statement_row_count` con el total acumulado real
@@ -4816,6 +5758,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - qué deuda backend no conviene tapar desde frontend
 
 ### Verificación
+
 - `pnpm exec eslint src/lib/finance/reconciliation.ts 'src/app/api/finance/reconciliation/[id]/statements/route.ts' 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts' src/app/api/finance/reconciliation/route.ts src/app/api/finance/exchange-rates/route.ts`
   - correcto
 - `git diff --check -- src/lib/finance/reconciliation.ts 'src/app/api/finance/reconciliation/[id]/statements/route.ts' 'src/app/api/finance/reconciliation/[id]/match/route.ts' 'src/app/api/finance/reconciliation/[id]/unmatch/route.ts' 'src/app/api/finance/reconciliation/[id]/exclude/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' 'src/app/api/finance/reconciliation/[id]/route.ts' src/app/api/finance/reconciliation/route.ts src/app/api/finance/exchange-rates/route.ts docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md Handoff.md`
@@ -4824,6 +5767,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se hizo smoke manual en preview en este turno
 
 ### Riesgos o pendientes
+
 - La deuda de conciliación por pagos parciales múltiples sigue abierta:
   - el modelo actual reconcilia a nivel de factura (`fin_income.reconciliation_id`), no a nivel de cada pago registrado
 - El dashboard sigue con semántica mezclada entre caja y devengo; esa corrección no se tomó en esta tanda para no mezclar integridad backend con refactor de reporting.
@@ -4832,23 +5776,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 02:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar un QA funcional profundo del `Finance Module`, identificar bugs reales en dashboard, listas, detalles y conciliación, y documentarlos dentro de la task activa del módulo.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `docs/tasks/in-progress/CODEX_TASK_Financial_Module_v2.md`
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se auditó estáticamente el módulo `Finance` en:
   - `src/views/greenhouse/finance/*`
   - `src/app/api/finance/*`
@@ -4869,6 +5819,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - clientes e ingresos/egresos todavía tienen varios puntos con navegación no SPA o moneda/fecha mal renderizada
 
 ### Verificación
+
 - `pnpm exec eslint src/views/greenhouse/finance src/app/api/finance src/lib/finance`
   - resultado: falla
   - se usó como insumo del QA técnico y quedó documentado en la task
@@ -4876,6 +5827,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se hizo smoke manual en preview en este turno
 
 ### Riesgos o pendientes
+
 - El documento de task ya tiene backlog claro de bugs, pero el runtime todavía conserva issues de integridad en conciliación y semántica incorrecta en dashboard.
 - El siguiente paso recomendado es tomar la tanda de mayor severidad:
   - bloqueo real de períodos reconciliados/cerrados
@@ -4886,25 +5838,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-15 00:40 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Verificar por qué `Finance` mostraba saldo total en cero, sin movimientos en dashboard y sin señal visible en conciliación bancaria; corregir la superficie frontend para reflejar mejor el estado real.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos tocados
+
 - `src/views/greenhouse/finance/FinanceDashboardView.tsx`
 - `src/views/greenhouse/finance/ReconciliationView.tsx`
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se verificó el estado real del dataset financiero:
   - `fin_accounts`: `0` cuentas activas
   - `fin_income`: `2` movimientos
@@ -4921,11 +5879,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - explique explícitamente cuando el bloqueo real es ausencia de cuentas activas o de períodos de conciliación
 
 ### Verificación
+
 - Consulta manual a BigQuery para contrastar tablas `fin_accounts`, `fin_income`, `fin_expenses`, `fin_reconciliation_periods` y `fin_bank_statement_rows`: realizada
 - `pnpm exec eslint src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/finance/ReconciliationView.tsx`: correcto
 - `git diff --check -- src/views/greenhouse/finance/FinanceDashboardView.tsx src/views/greenhouse/finance/ReconciliationView.tsx`: correcto
 
 ### Riesgos o pendientes
+
 - El KPI de `Saldo total` sigue dependiendo de cuentas activas; mientras no exista UI o seed para `fin_accounts`, no habrá saldo bancario real.
 - `Nuevo período` en `ReconciliationView` y `Importar extracto` en `ReconciliationDetailView` siguen sin flujo UI implementado.
 - Si se quiere cerrar conciliación end-to-end desde portal, el siguiente paso natural es agregar UI para crear cuentas financieras, crear períodos e importar cartolas.
@@ -4933,19 +5893,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 23:42 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Documentar una task `to-do` para consolidación de vistas/surfaces del portal sin hacer cambios runtime.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación operativa / UX architecture
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
 - `docs/tasks/README.md`
 - `project_context.md`
@@ -4953,6 +5918,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se creó una task nueva en `to-do` para ordenar la arquitectura UX de vistas del portal.
 - La task documenta, con alto nivel de detalle:
   - surfaces actuales
@@ -4962,29 +5928,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se dejó explícito que esta task no ejecuta cambios de código todavía.
 
 ### Verificacion
+
 - Revisión manual del contenido creado: realizada
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Esta task no reemplaza una futura implementación; solo deja el criterio rector para una siguiente fase.
 - El siguiente paso natural es priorizar si esta consolidación entra antes o después de que Claude cierre frontend de `People`, `Finance` y `Payroll`.
 
 ## 2026-03-14 23:18 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar complementos backend de `People v3` y `Team Identity & Capacity v2` para dejar contratos más completos antes del frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/lib/team-capacity/shared.ts`
 - `src/lib/team-queries.ts`
 - `src/types/team.ts`
@@ -5002,6 +5975,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `People` quedó con contratos backend más cerrados:
   - `GET /api/people/meta`
   - `GET /api/people` ahora devuelve `filters`
@@ -5014,10 +5988,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizaron las tasks activas para dejar el handoff backend explícito a frontend.
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el scope tocado: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - No corrí smoke runtime/manual de `/api/people/*` ni `/api/team/capacity`.
 - `People` ya expone `finance` en permisos backend, pero frontend todavía no tiene ese tab.
 - La semántica de capacity sigue siendo operativa; todavía no reemplaza una futura capa contractual/planning de capacidad más formal.
@@ -5025,19 +6001,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 22:44 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ajustar `Team Identity & Capacity` y `People Unified View v2` contra arquitectura y reclasificarlas a versiones activas coherentes con el runtime real.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación operativa / task governance
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md`
 - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
 - `docs/tasks/in-progress/CODEX_TASK_Team_Identity_Capacity_System_v2.md`
@@ -5048,6 +6029,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastaron ambas tasks contra arquitectura y runtime actual.
 - Conclusiones:
   - `People` sí está vivo y alineado como capa read-first del colaborador
@@ -5062,29 +6044,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizó el board de tasks y la documentación viva asociada.
 
 ### Verificacion
+
 - Revisión manual contra arquitectura + runtime del repo: realizada
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Esta pasada no cambia runtime ni backend; deja gobernanza y alcance correctos para una futura implementación.
 - El siguiente paso natural es contrastar `People v3` y `Team Identity & Capacity v2` contra runtime antes de tocar código para no reabrir silos entre `People`, `Admin Team` y `Capacity`.
 
 ## 2026-03-15 00:12 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar el backend/runtime faltante de `Creative Hub v2` para dejar la capability lista para frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / capabilities runtime
 
 ### Archivos tocados
+
 - `src/lib/capabilities/resolve-capabilities.ts`
 - `src/config/capability-registry.ts`
 - `src/lib/capability-queries/creative-hub-runtime.ts`
@@ -5096,6 +6085,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se cerró la activación runtime del módulo:
   - el resolver de capabilities ya no activa módulos por `businessLine` o `serviceModule` de forma aislada cuando ambos requisitos existen
   - `Creative Hub` ya exige `globe` + al menos uno de:
@@ -5114,10 +6104,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se dejó la `v2` documentada como contract freeze para que Claude implemente frontend sobre el runtime actual.
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el scope Creative Hub backend/runtime: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - No se hizo smoke runtime/manual del endpoint `/api/capabilities/creative-hub/data` contra un tenant real en esta pasada.
 - `Knowledge Base` sigue siendo placeholder honesto; para volverlo real hace falta pipeline de wiki o fuente explícita de aprendizaje de marca.
 - Si en `notion_ops.tareas` faltan columnas de FTR/RpA, el backend ya degrada a `null`/fallback en vez de mentir, y frontend debe respetar esos estados.
@@ -5125,19 +6117,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 23:40 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar `Creative Hub Module` contra arquitectura y reclasificar la task según el estado real del módulo en runtime.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación operativa / task governance
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md`
 - `docs/tasks/in-progress/CODEX_TASK_Creative_Hub_Module_v2.md`
 - `docs/tasks/README.md`
@@ -5146,6 +6143,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastó `Creative Hub` contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5165,28 +6163,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizó el board de tasks y la documentación viva para reflejar esta reclasificación.
 
 ### Verificacion
+
 - Revisión manual contra arquitectura + runtime del repo: realizada
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Esta entrada queda como contexto de reclasificación histórica; el cierre backend real quedó documentado arriba en la entrada de `2026-03-15 00:12`.
 
 ## 2026-03-14 23:04 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Contrastar `HR Core Module` contra arquitectura, crear la foundation backend real del módulo y dejar una `v2` operativa para handoff con frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/types/hr-core.ts`
 - `src/lib/hr-core/shared.ts`
 - `src/lib/hr-core/schema.ts`
@@ -5214,6 +6219,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastó explícitamente `HR Core Module` contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5248,10 +6254,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se documentó la variable nueva `HR_CORE_TEAMS_WEBHOOK_SECRET`.
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el scope HR Core backend/API: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Falta validación runtime manual contra BigQuery real para confirmar bootstrap y seeds de HR Core.
 - No existe todavía UI real del route group `employee`; solo quedó la foundation backend/authorization.
 - `member_profiles` es una tabla de extensión HR; si más adelante aparece una necesidad de perfil genérico cross-module, no debe reemplazar `team_members` como identidad.
@@ -5260,19 +6268,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 22:18 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Contrastar `AI Tooling & Credit System` contra arquitectura, crear la foundation backend real del módulo y dejar una `v2` operativa para handoff con frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/types/ai-tools.ts`
 - `src/lib/ai-tools/shared.ts`
 - `src/lib/ai-tools/schema.ts`
@@ -5301,6 +6314,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastó explícitamente `AI Tooling & Credit System` contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5340,10 +6354,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se actualizó la arquitectura/documentación viva para reflejar que `greenhouse.providers` ya existe en runtime.
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el scope AI Tooling backend/API: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - No se hizo validación runtime manual contra BigQuery real en esta pasada; falta confirmar bootstrap y seeds en entorno autenticado.
 - No existe todavía CRUD de `providers`; por ahora se asume seed inicial + referencia a `provider_id` existente.
 - Claude ya puede construir frontend sobre estos contratos, especialmente:
@@ -5355,19 +6371,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 21:21 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Contrastar `Admin Team Module v2` contra arquitectura, separar backend ya implementado de gaps reales y cerrar los complementos backend faltantes para handoff con frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/types/team.ts`
 - `src/lib/team-admin/mutate-team.ts`
 - `src/app/api/admin/team/members/route.ts`
@@ -5380,6 +6401,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastó explícitamente `Admin Team Module v2` contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5400,10 +6422,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - cuando existe `identity_profile_id`, create/update de member ahora sincronizan best-effort los snapshots `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre archivos backend tocados: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - La UI de `People` ya usa mutaciones admin, pero todavía puede simplificarse para consumir más directamente estas nuevas superficies admin de list/detail.
 - No se hizo validación runtime manual del módulo en esta pasada.
 - El worktree mantiene además cambios previos no cerrados de `HR Payroll` y un cambio no relacionado en `src/lib/finance/shared.ts`; no deben mezclarse por accidente al commit.
@@ -5411,19 +6435,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 21:40 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Contrastar `HR Payroll v3` contra arquitectura, cerrar los complementos backend reales del brief y dejar congelado el contrato para que Claude implemente frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/types/payroll.ts`
 - `src/lib/payroll/get-payroll-members.ts`
 - `src/lib/payroll/get-compensation.ts`
@@ -5438,6 +6467,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se contrastó explícitamente `HR Payroll v3` contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5458,10 +6488,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - discovery de miembros activos para compensación
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre archivos backend tocados: correcto
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Claude ya puede construir frontend sobre contratos más estables de payroll, pero todavía falta el consumo UI de:
   - `eligibleMembers`
   - `periods.summary`
@@ -5473,19 +6505,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 21:10 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Contrastar `Financial Module` con arquitectura, cerrar la capa backend faltante del módulo y reescribir la task activa como `v2` basada en runtime real para handoff con frontend.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Backend / documentación operativa
 
 ### Archivos tocados
+
 - `src/lib/finance/shared.ts`
 - `src/lib/finance/reconciliation.ts`
 - `src/app/api/finance/reconciliation/[id]/route.ts`
@@ -5506,6 +6543,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se revisó explícitamente el trabajo contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -5529,10 +6567,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - ejemplos concretos para conciliación, payroll, previsión e impuestos
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre los archivos backend tocados: correcto
 - Falta todavía una validación de runtime manual o `pnpm build` completa en este turno
 
 ### Riesgos o pendientes
+
 - El backend ya quedó listo para que Claude monte frontend de conciliación y egresos especializados, pero la UI actual todavía no consume estas rutas nuevas.
 - Queda pendiente confirmar en runtime real:
   - flujo completo de importación + auto-match + exclude + unmatch
@@ -5542,19 +6582,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 20:17 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar si `CODEX_TASK_HR_Payroll_Module_v2.md` seguía siendo un brief realmente listo y convertirlo en documentación operativa más fiel al estado actual del módulo.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / gobernanza operativa
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`
 - `docs/tasks/in-progress/CODEX_TASK_HR_Payroll_Module_v3.md`
 - `docs/tasks/README.md`
@@ -5562,6 +6607,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `HR Payroll v2` quedó marcado explícitamente como brief histórico de la implementación base ya absorbida por el runtime actual.
 - Se creó `HR Payroll v3` como brief activo para los gaps reales detectados en la revisión contra el módulo:
   - alta inicial de compensación desde UI
@@ -5571,6 +6617,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El board de `docs/tasks/README.md` vuelve a tratar `HR Payroll` como trabajo `in-progress`, no como task completamente cerrada.
 
 ### Verificacion
+
 - Revisión manual contra runtime del módulo:
   - `/hr/payroll`
   - `/hr/payroll/member/[memberId]`
@@ -5578,24 +6625,30 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git diff --check`: pendiente al cierre del turno
 
 ### Riesgos o pendientes
+
 - Esta actualización ordena el brief, pero no implementa todavía los gaps v3; el módulo sigue funcional pero no debe considerarse “cerrado” hasta resolverlos.
 
 ## 2026-03-14 20:20 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Reordenar los `CODEX_TASK_*` en paneles operativos `in-progress`, `to-do` y `complete`, y alinear la documentación troncal del repo a esa convención.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / gobernanza operativa
 
 ### Archivos tocados
+
 - `.gitignore`
 - `README.md`
 - `AGENTS.md`
@@ -5609,6 +6662,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - `docs/tasks/` ahora opera como board con tres paneles explícitos:
   - `in-progress`
   - `to-do`
@@ -5619,62 +6673,77 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `.gitignore` se corrigió para que los `CODEX_TASK_*` dentro de `docs/tasks/**` puedan quedar versionados; el patrón ignorado en raíz se conserva solo para scratch local.
 
 ### Verificacion
+
 - `find docs/tasks -maxdepth 2 -type f | sort`: correcto
 - `git diff --check`: correcto
 - `git status --short --untracked-files=all docs/tasks`: confirma `23` task briefs visibles para versionado bajo el nuevo árbol
 
 ### Riesgos o pendientes
+
 - Históricamente varios `CODEX_TASK_*` estaban fuera del índice Git por la regla vieja de `.gitignore`; tras esta corrección quedarán visibles como archivos versionables y habrá que incorporarlos formalmente en el siguiente ciclo de commit.
 - La clasificación actual del board es un snapshot operativo al 2026-03-14; si cambian el repo o los handoffs, habrá que mover tasks entre paneles con el mismo criterio documental.
 
 ## 2026-03-14 20:02 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Endurecer la regla de gobernanza para que toda `CODEX_TASK_*` deba revisarse contra la arquitectura antes de ejecutarse.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / gobernanza operativa
 
 ### Archivos tocados
+
 - `AGENTS.md`
 - `docs/tasks/README.md`
 - `docs/README.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - `AGENTS.md` ahora obliga explícitamente a revisar arquitectura base y especializada cuando el trabajo nace desde una `CODEX_TASK_*`.
 - `docs/tasks/README.md` ahora trata la revisión arquitectónica como gate obligatorio y ya no solo como alineación deseable al 360.
 - `docs/README.md` ahora refleja esa misma regla en el índice maestro para que no quede escondida solo dentro de `tasks/README.md`.
 
 ### Verificacion
+
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - La regla ya quedó documentada, pero las tasks históricas siguen necesitando disciplina de revisión humana; esta edición no audita una por una todas las `CODEX_TASK_*`.
 
 ## 2026-03-14 19:45 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar si `Provider` debía entrar al modelo 360 como objeto canónico y alinear la task de `AI Tooling & Credit System` para evitar que nazca con vendors libres sin relación reusable.
 
 ### Rama
+
 - Rama usada: `fix/codex-operational-finance`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / arquitectura transversal
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/CODEX_TASK_AI_Tooling_Credit_System.md`
@@ -5682,6 +6751,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se agregó `Provider` al modelo 360 como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin.
 - Se dejó explícito el boundary recomendado:
   - ancla objetivo `greenhouse.providers.provider_id`
@@ -5694,30 +6764,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md` ahora documenta explícitamente la distinción `Supplier vs Provider` para evitar que el equipo siga leyendo `fin_suppliers` como identidad vendor transversal por defecto.
 
 ### Verificacion
+
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Aún no existe implementación runtime de `greenhouse.providers`; por ahora esto deja la decisión de arquitectura cerrada y la task alineada, pero falta una iteración posterior para materializar la tabla y sus mapeos con `fin_suppliers` e identidades externas.
 
 ## 2026-03-14 19:20 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el modal de ingresos para que reutilice el mismo directorio de clientes visible en `/finance/clients` y no falle en silencio cuando la carga del dropdown se rompe.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Staging
 
 ### Archivos tocados
+
 - `src/views/greenhouse/finance/drawers/CreateIncomeDrawer.tsx`
 
 ### Cambios realizados
+
 - `CreateIncomeDrawer` ahora vuelve a pedir `/api/finance/clients` cada vez que se abre el modal y usa `cache: 'no-store'`, alineándose con la vista de clientes.
 - El dropdown de clientes ya no se queda vacío sin contexto si la API falla:
   - limpia la lista rota
@@ -5727,31 +6805,39 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - El submit del ingreso ahora también envía `clientId` y `clientProfileId` del cliente seleccionado, para no perder la referencia canónica cuando el cliente no tiene `hubspotCompanyId`.
 
 ### Verificacion
+
 - `pnpm exec eslint src/views/greenhouse/finance/drawers/CreateIncomeDrawer.tsx`: correcto
 
 ### Riesgos o pendientes
+
 - El patrón de carga silenciosa sin `no-store` también existe en otros drawers de Finance, por ejemplo proveedores/egresos; no se tocó en este turno para mantener el cambio acotado.
 
 ## 2026-03-14 19:18 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Resolver definitivamente por qué `/finance/clients` seguía mostrando una lista vacía aun cuando `greenhouse.clients` sí tenía tenants activos.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Staging
 
 ### Archivos tocados
+
 - `src/app/api/finance/clients/route.ts`
 - `src/views/greenhouse/finance/ClientsListView.tsx`
 
 ### Cambios realizados
+
 - Se confirmó con consulta BigQuery real que `greenhouse.clients` sí tiene 11 clientes activos; el problema no era falta de data.
 - Se endureció `GET /api/finance/clients` para que el directorio salga primero desde `greenhouse.clients` y no dependa de que HubSpot o el rollup de `fin_income` estén sanos.
   - si falla la introspección o lectura de `hubspot_crm.companies`, el endpoint cae a modo degradado y sigue devolviendo clientes base
@@ -5762,6 +6848,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - si `/api/finance/clients` responde no-`ok`, muestra un `Alert` con el error real
 
 ### Verificacion
+
 - Consulta directa contra BigQuery real usando las credenciales locales del repo:
   - `greenhouse.clients` devuelve `11` clientes activos
   - el SQL base de `base_clients` devuelve los `11` clientes esperados
@@ -5769,25 +6856,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - Falta validar el preview nuevo con tráfico autenticado real para confirmar si el problema visible del usuario venía de HubSpot, `fin_income` o de otro error de entorno; la diferencia es que ahora esa falla ya no debe esconderse como lista vacía.
 - Si el endpoint sigue devolviendo error en preview, la UI ahora mostrará el mensaje explícito y los logs deberían ser mucho más accionables.
 
 ## 2026-03-14 18:36 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Auditar los `CODEX_TASK_*` más sensibles para detectar si contradicen o desvían la nueva arquitectura de `objetos canónicos enriquecidos`, y corregirlos para que funcionen como briefs alineados al modelo 360.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / tasks
 
 ### Archivos tocados
+
 - `docs/tasks/in-progress/CODEX_TASK_Financial_Module.md`
 - `docs/tasks/to-do/CODEX_TASK_AI_Tooling_Credit_System.md`
 - `docs/tasks/complete/CODEX_TASK_Creative_Hub_Module.md`
@@ -5799,6 +6892,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/README.md`
 
 ### Cambios realizados
+
 - Se agregaron secciones explícitas de alineación con `GREENHOUSE_360_OBJECT_MODEL_V1.md` en las tasks con mayor riesgo de deriva arquitectónica.
 - Criterios que ahora quedan explícitos dentro de los briefs:
   - no crear identidades paralelas de `Client` o `Collaborator`
@@ -5810,6 +6904,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/tasks/README.md` ahora exige alinear cualquier task nueva o reactivada con `GREENHOUSE_360_OBJECT_MODEL_V1.md`.
 
 ### Verificacion
+
 - Revisión manual comparando cada task contra:
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
@@ -5817,31 +6912,38 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git diff --check`: pendiente de corrida final del paquete completo, pero los parches aplicados no introdujeron conflictos de formato en las ediciones visibles
 
 ### Riesgos o pendientes
+
 - No todas las tasks del repo requerían edición; se tocaron las que realmente podían empujar al equipo hacia silos o identidades paralelas.
 - Si se reactiva una task antigua no auditada todavía, usar `GREENHOUSE_360_OBJECT_MODEL_V1.md` como gate antes de implementarla.
 
 ## 2026-03-14 18:24 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar la carpeta `docs/architecture` para detectar contradicciones con el nuevo modelo `GREENHOUSE_360_OBJECT_MODEL_V1` y corregirlas sin duplicar arquitectura innecesariamente.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / coherencia arquitectónica
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
 
 ### Cambios realizados
+
 - Se alineó `GREENHOUSE_ARCHITECTURE_V1.md` con el modelo 360:
   - nuevo principio de `canonical object graph`
   - distinción explícita entre tablas canónicas, tablas de extensión y marts
@@ -5857,6 +6959,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - se corrigió lenguaje heredado de MVP que trataba `greenhouse.clients` como tabla de auth
 
 ### Verificacion
+
 - `git diff --check`: correcto
 - Barrido manual con `rg` sobre `docs/architecture` para detectar lenguaje conflictivo de:
   - `closedwon deals` como canónico
@@ -5864,30 +6967,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `Capability Registry` como si fuera catálogo de producto
 
 ### Riesgos o pendientes
+
 - Aún quedan referencias históricas a `closedwon deals` como fuente de observación o bootstrap; ya no están presentadas como identidad canónica, pero conviene seguir puliendo el lenguaje si se hace otra pasada editorial más amplia.
 
 ## 2026-03-14 18:12 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Formalizar a nivel de arquitectura de plataforma la regla de `objetos canónicos enriquecidos` para evitar que futuros módulos sigan creando silos o identidades paralelas.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / arquitectura transversal
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` (nuevo)
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `docs/README.md`
 - `project_context.md`
 
 ### Cambios realizados
+
 - Se creó `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` como fuente canónica de la regla transversal:
   - tesis de plataforma basada en objetos canónicos enriquecidos
   - definición de `canonical object`, `extension table`, `snapshot field`, `360 read model` y `domain owner`
@@ -5905,6 +7015,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se dejó un delta corto en `project_context.md` para que el estado operativo del repo también refleje esta regla.
 
 ### Verificacion
+
 - Revisión manual de consistencia contra la arquitectura ya documentada en:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_ID_STRATEGY_V1.md`
@@ -5913,6 +7024,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - La regla de arquitectura ya quedó formalizada, pero todavía hay objetos cuyo contrato canónico debe aterrizarse más en runtime:
   - `Quote`
   - `Project`
@@ -5922,23 +7034,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 18:00 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Consolidar en una sola fuente canónica la documentación del modelo Finance 360 y de la lógica enriquecida cliente/persona que ya estaba dispersa entre código, `project_context.md` y handoffs previos.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentación / arquitectura
 
 ### Archivos tocados
+
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md` (nuevo)
 - `docs/README.md`
 
 ### Cambios realizados
+
 - Se creó `docs/architecture/FINANCE_CANONICAL_360_V1.md` como fuente canónica del modelo actual:
   - llaves canónicas de cliente y colaborador
   - reglas de resolución en `src/lib/finance/canonical.ts`
@@ -5950,33 +7068,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se enlazó el documento desde `docs/README.md` para que no dependa de conocer el nombre del archivo de memoria.
 
 ### Verificacion
+
 - Revisión manual de consistencia contra el código ya implementado en `clients`, `income`, `expenses` y `people/[memberId]/finance`
 
 ### Riesgos o pendientes
+
 - La documentación 360 ya está centralizada, pero todavía falta que el frontend consuma más de estas lecturas enriquecidas fuera de las vistas actuales de Finance y People.
 
 ## 2026-03-14 17:52 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir fallos runtime de `Finance` detectados en `Staging` antes de cualquier promoción a `Production`, con foco en:
   - bootstrap BigQuery demasiado agresivo en lecturas
   - `GET /api/finance/clients` devolviendo `500` y dejando la vista sin clientes
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Staging / Preview de `develop`
 
 ### Archivos tocados
+
 - `src/lib/finance/schema.ts`
 - `src/app/api/finance/clients/route.ts`
 
 ### Cambios realizados
+
 - Se reescribió `ensureFinanceInfrastructure()` para dejar de ejecutar DDL/DML ciegos en cada cold start:
   - ahora primero inspecciona `INFORMATION_SCHEMA.TABLES` y `INFORMATION_SCHEMA.COLUMNS`
   - solo crea tablas `fin_*` faltantes
@@ -5989,6 +7115,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - esto ataca el `500` real que dejaba `/finance/clients` sin datos en el preview de `develop`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/finance/schema.ts src/app/api/finance/clients/route.ts src/app/api/finance/income/summary/route.ts src/app/api/finance/accounts/route.ts src/app/api/finance/exchange-rates/latest/route.ts src/app/api/finance/expenses/summary/route.ts`: correcto
 - `git diff --check`: correcto
 - Revisión de logs de Vercel previa al fix:
@@ -5997,25 +7124,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Aún no se valida un preview nuevo post-fix; sigue pendiente push/deploy y smoke real contra `Staging`
 
 ### Riesgos o pendientes
+
 - El cambio reduce drásticamente el riesgo de cuota BigQuery en lectura, pero falta confirmarlo con un deployment nuevo.
 - Los backfills históricos de `client_id` ya no corren automáticamente en `ensureFinanceInfrastructure()`; si se necesitan como operación explícita, conviene moverlos a un script o endpoint administrativo dedicado.
 
 ## 2026-03-14 17:45 America/Santiago
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Integrar componentes Vuexy de navbar: NavSearch (⌘K), ShortcutsDropdown, NotificationsDropdown al portal Greenhouse
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview → `pre-greenhouse.efeoncepro.com`
 
 ### Archivos tocados
+
 - `src/components/layout/shared/search/index.tsx` (nuevo) — Command palette con ⌘K
 - `src/components/layout/shared/search/DefaultSuggestions.tsx` (nuevo) — Sugerencias por defecto en español
 - `src/components/layout/shared/search/NoResult.tsx` (nuevo) — Estado vacío
@@ -6027,6 +7160,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/components/layout/horizontal/NavbarContent.tsx` (modificado) — Idem horizontal
 
 ### Cambios realizados
+
 - Portados desde `full-version/` los 4 componentes de Vuexy navbar que faltaban
 - Adaptación: eliminado i18n/locale routing (Greenhouse no lo usa), textos en español
 - Search indexa: Dashboards, Finanzas (7 rutas), People (3 rutas), Administración (5 rutas)
@@ -6034,11 +7168,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Notificaciones: placeholder estático (1 notificación de bienvenida), listo para conectar backend
 
 ### Verificacion
+
 - `pnpm tsc --noEmit`: solo errores preexistentes (LayoutRoutes, SCIM)
 - `pnpm eslint` sobre los 9 archivos: limpio
 - Dependencias ya instaladas: cmdk, react-perfect-scrollbar, classnames, @radix-ui/react-dialog
 
 ### Riesgos o pendientes
+
 - NotificationsDropdown tiene data estática — necesita backend de notificaciones
 - ShortcutsDropdown tiene shortcuts hardcodeados — podría personalizarse por rol
 - searchData.ts es estático — se podría generar dinámicamente según permisos del usuario
@@ -6048,25 +7184,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 17:16 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Hacer la revisión final previa a commit/push del paquete canónico de Finance y corregir los últimos riesgos funcionales detectados.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / backend finance + people
 
 ### Archivos tocados
+
 - `src/app/api/finance/clients/route.ts`
 - `src/lib/finance/canonical.ts`
 - `src/lib/people/get-person-finance-overview.ts`
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se corrigió un bug de runtime en `GET /api/finance/clients`:
   - los filtros `requiresPo` y `requiresHes` apuntaban a un alias inexistente (`cp`)
   - ahora filtran correctamente sobre el read-model derivado
@@ -6077,30 +7219,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - ahora ejecuta `ensureFinanceInfrastructure()` antes de leer `fin_expenses`, para no depender de que el schema canónico ya haya sido aplicado previamente en el entorno
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre las rutas/helper tocados de finance + people: correcto
 - `git diff --check`: correcto
 - Revisión manual adicional del diff para detectar aliases rotos y referencias no resueltas: corregida
 
 ### Riesgos o pendientes
+
 - El working tree sigue con cambios locales listos para commit; todavía no se ha hecho `git add` / `git commit` / `git push` de este último paquete.
 - `pnpm exec tsc --noEmit --pretty false` sigue arrastrando errores globales preexistentes de `.next-local/.next` y rutas SCIM faltantes.
 
 ## 2026-03-14 17:15 America/Santiago
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Crear bank statement CSV parser por banco y agregar `finance_manager` a `rolePriority`
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / backend finance
 
 ### Archivos tocados
+
 - `src/lib/finance/csv-parser.ts` (nuevo) — parsers por banco
 - `src/app/api/finance/reconciliation/[id]/statements/route.ts` (modificado) — acepta CSV
 - `src/lib/tenant/access.ts` (modificado) — rolePriority
@@ -6109,6 +7258,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - 6 archivos de API routes (de Codex) — validación mejorada
 
 ### Cambios realizados
+
 - **CSV parser** (`src/lib/finance/csv-parser.ts`):
   - 4 parsers: BCI (comma, DD/MM/YYYY, Cargo/Abono/Saldo), Santander (semicolon, DD/MM/YYYY, Nro Documento), BancoChile (comma, DD-MM-YYYY, Monto único), Scotiabank (comma, MM/DD/YYYY, English headers)
   - Manejo de formato numérico chileno (puntos como separador de miles, coma como decimal)
@@ -6120,15 +7270,18 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - **Codex changes commiteados**: canonical.ts, schema hardening, validation improvements en 9 archivos
 
 ### Verificacion
+
 - `pnpm eslint` sobre csv-parser.ts y statements/route.ts: limpio
 - `pnpm tsc --noEmit`: solo errores preexistentes (SCIM module, no relacionados)
 - `git status`: working tree clean, 2 commits ahead of origin
 
 ### Commits
+
 - `ad2093f` — feat: add bank statement CSV parser and finance_manager role priority
 - `4ce5020` — feat: codex finance hardening — canonical labels, schema constraints, validation improvements
 
 ### Riesgos o pendientes
+
 - **No pusheado** — 2 commits pendientes de push a origin
 - Dashboard frontend (`FinanceDashboardView.tsx`) sigue consumiendo `/income/summary` y `/expenses/summary`, no los endpoints `/dashboard/*` (aging, cashflow, by-service-line)
 - CSV parser no tiene tests unitarios — validar con cartolas reales de cada banco
@@ -6139,19 +7292,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 17:08 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar la fase canónica del backend de Finance sin romper el módulo actual: anclaje por `client_id`, resolución de referencias cliente/persona y endpoint read-only de finance para People.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / backend finance + people
 
 ### Archivos tocados
+
 - `src/app/api/finance/clients/route.ts`
 - `src/app/api/finance/clients/[id]/route.ts`
 - `src/app/api/finance/clients/sync/route.ts`
@@ -6163,6 +7321,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/app/api/people/[memberId]/finance/route.ts` (nuevo)
 
 ### Cambios realizados
+
 - Se cerró la resolución canónica de referencias financieras:
   - `resolveFinanceClientContext()` ya se usa en `income`, `expenses` y `clients`
   - `resolveFinanceMemberContext()` se usa en egresos para validar `memberId` vs `payrollEntryId`
@@ -6182,11 +7341,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - no se tocaron las páginas/detail views actuales
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/finance/canonical.ts src/lib/finance/schema.ts src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/clients/route.ts src/app/api/finance/clients/sync/route.ts src/app/api/finance/clients/[id]/route.ts src/lib/people/get-person-finance-overview.ts src/app/api/people/[memberId]/finance/route.ts`: correcto
 - `git diff --check`: correcto
 - `pnpm exec tsc --noEmit --pretty false`: sigue fallando por errores globales preexistentes en `.next-local/.next` y rutas SCIM faltantes, no por este paquete
 
 ### Riesgos o pendientes
+
 - El endpoint nuevo `/api/people/[memberId]/finance` todavía no está consumido por el frontend.
 - Sigue pendiente una corrida manual o por preview que dispare `ensureFinanceInfrastructure()` en un entorno real para aplicar el add/backfill de `client_id` si todavía no corrió después de estos cambios.
 - La capa 360 de cliente ya está mejor anclada, pero todavía no existe una vista unificada equivalente dentro del frontend de People o de Finance dashboard.
@@ -6194,19 +7355,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 15:10 America/Santiago
 
 ### Agente
+
 - Claude Opus
 
 ### Objetivo del turno
+
 - Cerrar los gaps restantes del Finance Module contra la CODEX_TASK_Financial_Module.md. Codex había dejado cambios sin commitear + gaps abiertos documentados en el Handoff anterior.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / backend + frontend finance
 
 ### Archivos tocados
+
 - `src/app/api/finance/dashboard/summary/route.ts` (nuevo)
 - `src/app/api/finance/dashboard/cashflow/route.ts` (nuevo)
 - `src/app/api/finance/dashboard/aging/route.ts` (nuevo)
@@ -6224,6 +7390,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Commit previo de Codex: `src/app/api/finance/expenses/bulk/route.ts`, `src/app/api/finance/income/[id]/payment/route.ts`, `src/lib/finance/hubspot.ts`, + 11 archivos modificados
 
 ### Cambios realizados
+
 - Commiteados y pusheados los cambios pendientes de Codex (commit `6fbb567`):
   - POST /expenses/bulk, POST /income/[id]/payment, GET /income/[id], GET /expenses/[id]
   - hubspot.ts para introspección de columnas
@@ -6248,12 +7415,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Rows de listas ahora navegan a detalle (income, expenses, clients)
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre los 14 archivos nuevos/modificados: pasa (4 warnings preexistentes en IncomeListView y ExpensesListView, no introducidos)
 - `pnpm exec tsc --noEmit`: 2 errores preexistentes de LayoutRoutes type, no relacionados con finance
 - `git diff --check`: correcto
 - Push exitoso a `origin/feature/finance-module`
 
 ### Riesgos o pendientes
+
 - El dashboard frontend (`FinanceDashboardView.tsx`) actualmente consume `/income/summary` y `/expenses/summary` (rutas bonus), NO los nuevos endpoints `/dashboard/*`. Para aprovechar los nuevos endpoints (aging, cashflow, by-service-line) se necesita actualizar el frontend del dashboard.
 - CSV parser por banco (BCI, Santander, BancoChile) sigue pendiente — el importador actual acepta JSON pre-parseado.
 - `finance_manager` no está en el array `rolePriority` de `access.ts`. Funcional pero podría afectar si un usuario tiene múltiples roles.
@@ -6264,19 +7433,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 13:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar los ajustes recientes de Claude sobre `Finance Module`, confirmar qué hallazgos previos seguían abiertos y cerrar el paquete backend mínimo para dejar el módulo más consistente con la task.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / backend finance
 
 ### Archivos tocados
+
 - `src/lib/finance/shared.ts`
 - `src/app/api/finance/income/route.ts`
 - `src/app/api/finance/income/[id]/route.ts`
@@ -6294,6 +7468,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Cambios realizados
+
 - Hallazgos previos ya corregidos por Claude:
   - contract fix del detalle de conciliación (`statements`, `matched`, `matchedType`)
   - drawers de ingresos/egresos ya envían `subtotal`
@@ -6315,6 +7490,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
     - se agregó `src/lib/finance/hubspot.ts` para introspección de columnas vía `hubspot_crm.INFORMATION_SCHEMA.COLUMNS`, evitando hardcodes frágiles de `companies`/`deals`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/finance/shared.ts src/app/api/finance/income/route.ts 'src/app/api/finance/income/[id]/route.ts' 'src/app/api/finance/income/[id]/payment/route.ts' src/app/api/finance/expenses/route.ts 'src/app/api/finance/expenses/[id]/route.ts' 'src/app/api/finance/expenses/bulk/route.ts' src/app/api/finance/suppliers/route.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' 'src/app/api/finance/reconciliation/[id]/auto-match/route.ts' src/views/greenhouse/finance/drawers/CreateSupplierDrawer.tsx src/views/greenhouse/finance/drawers/CreateClientDrawer.tsx`
 - `pnpm exec eslint src/lib/finance/hubspot.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts'`
 - `git diff --check`
@@ -6325,6 +7501,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `tsc`: sigue fallando por problemas globales preexistentes en `.next-local` / `.next` y rutas SCIM faltantes, no por estos cambios de Finance
 
 ### Riesgos o pendientes
+
 - Sigue pendiente el gap grande contra la task en clientes:
   - el enrichment de clientes ya existe, pero el frontend actual aún no consume `company`, `summary` ni `deals`
   - no se implementó todavía CRUD dedicado para contactos financieros; solo persiste el JSON completo `finance_contacts`
@@ -6339,19 +7516,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 12:20 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Promover `feature/admin-team-crud` a `develop` después del QA manual del usuario y dejar la integración local validada.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `main` cuando staging quede aprobado
 
 ### Ambiente objetivo
+
 - Development / integración hacia Staging
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 - `src/views/greenhouse/people/PeopleList.tsx`
@@ -6359,6 +7541,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/people/PersonView.tsx`
 
 ### Verificacion
+
 - Merge local ejecutado:
   - `merge: integrate admin team module`
 - Validación post-merge en worktree `develop`:
@@ -6371,30 +7554,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - se eliminó un import no usado en `PersonLeftSidebar.tsx`
 
 ### Riesgos o pendientes
+
 - `develop` queda listo para push y posterior validación compartida en `Staging`.
 - No se tocó `.claude/`; sigue fuera del flujo de Git.
 
 ## 2026-03-14 11:55 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Capturar en la skill local de Vercel el patrón repetido de fallos por env vars faltantes en previews (`NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT`, credenciales Google) para evitar futuros ciclos de alias roto en `pre-greenhouse`.
 
 ### Rama
+
 - Rama usada: `feature/admin-team-crud`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Operación Vercel / documentación operativa
 
 ### Archivos tocados
+
 - `.codex/skills/vercel-operations/SKILL.md`
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Se enriqueció la skill `vercel-operations` con:
   - checklist mínimo de env vars por branch preview
   - regla explícita de tratar `next-auth NO_SECRET` como problema de infraestructura
@@ -6402,28 +7592,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - playbook corto para previews que caen antes de login
 
 ### Riesgos o pendientes
+
 - Este conocimiento ya queda en la skill local, pero no reemplaza la disciplina operativa: si una rama nueva va a usar `pre-greenhouse`, sigue siendo obligatorio confirmar env vars branch-scoped antes de mover el alias.
 
 ## 2026-03-14 11:46 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Publicar `feature/admin-team-crud`, confirmar su preview oficial y mover `pre-greenhouse` al deployment actual del módulo para QA compartido.
 
 ### Rama
+
 - Rama usada: `feature/admin-team-crud`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Vercel
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Git:
   - commit publicado: `f894eba` `feat: implement admin team module foundation`
   - push correcto a `origin/feature/admin-team-crud`
@@ -6437,25 +7634,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - confirmación vía `vercel alias ls`: correcta
 
 ### Riesgos o pendientes
+
 - `pre-greenhouse` ahora muestra `feature/admin-team-crud`, así que cualquier QA compartido verá este módulo hasta que otro agente vuelva a mover el alias.
 - Queda pendiente el siguiente QA autenticado real de `Admin Team` ya sobre el preview oficial de la rama.
 
 ## 2026-03-14 11:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Endurecer el backend de `Admin Team` para preview real: eliminar lecturas `GCP_PROJECT` en import-time, corregir dos regressions de frontend que estaban rompiendo `next build`, desplegar un preview funcional y validar el handshake runtime del módulo.
 
 ### Rama
+
 - Rama usada: `feature/admin-team-crud`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Vercel / Admin Team parallel implementation
 
 ### Archivos tocados
+
 - `src/lib/team-admin/mutate-team.ts`
 - `src/app/api/admin/team/**`
 - `src/lib/payroll/export-payroll.ts`
@@ -6476,6 +7679,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - Validación local:
   - `pnpm exec eslint src/components/Providers.tsx src/lib/people src/app/api/people src/lib/team-admin src/app/api/admin/team src/types/team.ts src/views/greenhouse/people/drawers/EditProfileDrawer.tsx scripts/admin-team-runtime-smoke.ts src/lib/payroll 'src/app/api/hr/payroll/periods/[periodId]/approve/route.ts'`
   - `pnpm exec tsc --noEmit --pretty false`
@@ -6492,6 +7696,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - ya no hay `500` en el handshake sin sesión
 
 ### Riesgos o pendientes
+
 - El preview funcional actual depende de envs inyectadas en el deployment puntual (`NEXTAUTH_SECRET`, `GCP_PROJECT`, `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`); la rama `feature/admin-team-crud` todavía no existe en el Git remoto conectado a Vercel, así que no fue posible sembrar env vars branch-scoped permanentes.
 - Claude puede seguir con frontend de `Admin Team` sobre este backend:
   - el mutation contract freeze sigue vigente
@@ -6505,22 +7710,28 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 10:55 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Arrancar `Admin Team Module v2` como siguiente módulo post-release, dejando explícita la coordinación Codex/Claude y congelando primero el contrato backend de mutaciones.
 
 ### Rama
+
 - Rama usada: `feature/admin-team-crud`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / parallel implementation kickoff
 
 ### Archivos tocados
+
 - `Handoff.md`
 
 ### Cambios realizados
+
 - Se fija la división de trabajo para `CODEX_TASK_Admin_Team_Module_v2.md`:
   - Codex implementa todo el backend de `Admin Team`
   - Claude implementa todo el frontend de `Admin Team`
@@ -6533,6 +7744,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - solo `efeonce_admin` puede ejecutar esas mutaciones
 
 ### Verificacion
+
 - Se revisó la task vigente:
   - `docs/tasks/in-progress/CODEX_TASK_Admin_Team_Module_v2.md`
 - Se confirmó contra el runtime real del repo que ya existe la base necesaria:
@@ -6543,6 +7755,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `requireAdminTenantContext()` ya disponible en `authorization.ts`
 
 ### Riesgos o pendientes
+
 - Claude debe esperar solo al freeze de contrato backend, no al backend completo.
 - No se debe implementar CRUD dentro de `/api/people/*`; todo write debe vivir en `/api/admin/team/*`.
 - Freeze backend ya disponible para Claude:
@@ -6565,23 +7778,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 10:40 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Promover `develop` a `main`, desplegar `Production` y validar el primer release operativo de Greenhouse.
 
 ### Rama
+
 - Rama usada: `main`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Production / Vercel
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Promocion Git:
   - `origin/main` fue actualizado por fast-forward desde `origin/develop`
   - release commit en producción: `361d36e`
@@ -6599,6 +7818,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/api/hr/payroll/periods`: `200 OK`, responde `[]`
 
 ### Riesgos o pendientes
+
 - El primer release de Greenhouse queda ya activo en `Production`.
 - `develop` y `main` deben conservarse sincronizadas desde este punto como ramas base de staging y producción.
 - El siguiente trabajo recomendado ya no es release, sino el próximo módulo funcional sobre esta base estable.
@@ -6606,19 +7826,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 11:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Integrar `feature/hr-payroll` en `develop`, validar el árbol mergeado y confirmar el runtime de `staging` en Vercel.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / staging
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 - `src/components/greenhouse/TeamCapacitySection.tsx`
@@ -6627,6 +7852,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
 
 ### Verificacion
+
 - Merge realizado:
   - `ad63aa5` `merge: integrate hr payroll and people unified modules`
 - Validacion local sobre el árbol mergeado:
@@ -6649,6 +7875,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/api/hr/payroll/periods`: `200 OK`, responde `[]`
 
 ### Riesgos o pendientes
+
 - `develop` queda listo para validación compartida y base de primera release.
 - `pre-greenhouse` sigue siendo alias compartido de preview y `dev-greenhouse` ya refleja `develop`.
 - Si se quiere cerrar el circuito de release completo, el siguiente paso es promover desde `develop` hacia `main` con revisión final de `staging`.
@@ -6656,23 +7883,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 10:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar el QA autenticado de `People` en preview con roles reales y confirmar la matriz efectiva de acceso.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Vercel / authenticated QA by role
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Preview usado:
   - `https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
 - Flujo de QA ejecutado con `vercel curl` sobre preview protegido y login real por `credentials`.
@@ -6698,6 +7931,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - por eso no se pudo cerrar aun el smoke autenticado de ese tercer rol
 
 ### Riesgos o pendientes
+
 - `People` queda tecnicamente validado para `operations` y bloqueado correctamente para `account`.
 - `Julio Reyes` conserva rol `efeonce_admin`, por lo que backend y sidebar deben permitir acceso; falta solo la comprobacion manual/autenticada en runtime con su propia sesion si se quiere evidencia de UI final.
 - Para cerrar la matriz completa de QA falta provisionar o identificar un usuario real `hr_payroll`.
@@ -6705,23 +7939,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 10:55 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Activar `hr_payroll` para Humberly y cerrar la validacion real del tercer rol permitido en `People`.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / BigQuery real / role provisioning and QA
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se activo la asignacion `hr_payroll` para `Humberly Henriquez` en `greenhouse.user_role_assignments`:
   - `assignment-efeonce-internal-humberly-henriquez-hr-payroll`
 - La lectura efectiva de acceso ya devuelve para Humberly:
@@ -6730,6 +7970,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `routeGroups`: `['hr', 'internal']`
 
 ### Verificacion
+
 - BigQuery real:
   - `humberly.henriquez@efeonce.org` ahora resuelve `efeonce_operations` + `hr_payroll`
 - Preview real:
@@ -6739,6 +7980,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `GET /api/hr/payroll/periods`: `200 OK`, responde `[]`
 
 ### Riesgos o pendientes
+
 - La matriz de acceso real queda ya validada para los tres roles esperados:
   - `efeonce_admin`: permitido por contrato backend
   - `efeonce_operations`: validado en runtime
@@ -6749,52 +7991,65 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 11:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Re-apuntar `pre-greenhouse.efeoncepro.com` al preview actual de `feature/hr-payroll` para QA compartido.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / shared domain alias
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 
 ### Cambios realizados
+
 - Se reasigno el alias compartido:
   - `pre-greenhouse.efeoncepro.com` -> `https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
 
 ### Verificacion
+
 - `pnpm dlx vercel alias set https://greenhouse-79pl7kuct-efeonce-7670142f.vercel.app pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto
 - `pnpm dlx vercel alias ls -S efeonce-7670142f`: correcto, `pre-greenhouse.efeoncepro.com` ya figura bajo el source `greenhouse-79pl7kuct-efeonce-7670142f.vercel.app`
 - `pnpm dlx vercel curl /login --deployment https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, responde el login del deployment `dpl_46Xq4TodnJcuLY4z4qJ2hRa6g2BT`
 - `pnpm dlx vercel curl /api/people --deployment https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, responde `Unauthorized` sin sesion
 
 ### Riesgos o pendientes
+
 - `pre-greenhouse` vuelve a ser un alias compartido; otro agente podria moverlo despues.
 - La validacion visual/autenticada final del modulo `People` ahora puede hacerse directamente sobre `https://pre-greenhouse.efeoncepro.com`.
 
 ## 2026-03-14 14:30 America/Santiago
 
 ### Agente
+
 - Claude
 
 ### Objetivo del turno
+
 - Implementar el frontend completo de `People Unified View v2`: lista, ficha, sidebar, tabs y navegacion.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / frontend implementation
 
 ### Archivos tocados
+
 - `src/app/(dashboard)/people/layout.tsx` (nuevo)
 - `src/app/(dashboard)/people/page.tsx` (nuevo)
 - `src/app/(dashboard)/people/[memberId]/page.tsx` (nuevo)
@@ -6816,11 +8071,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/components/layout/vertical/VerticalMenu.tsx` (modificado: seccion Equipo)
 
 ### Verificacion
+
 - `pnpm exec tsc --noEmit`: solo errores de `.next-local` cache (no del delta)
 - `pnpm build`: correcto, artefacto incluye `/people` y `/people/[memberId]`
 - 18 archivos nuevos, 2 modificados
 
 ### Riesgos o pendientes
+
 - El frontend consume los contratos `PeopleListPayload` y `PersonDetail` del backend de Codex.
 - Codex modifico los tipos del backend agregando `access.visibleTabs`, `summary.*` y `integrations.identityConfidence`. El frontend ya se adapto a estos cambios (linter/user hizo ajustes a `PersonView`, `PersonLeftSidebar`, `PersonTabs`).
 - Tab Asignaciones es read-only con ghost slot oculto (`display: none`) listo para activar cuando Admin Team CRUD exista.
@@ -6832,19 +8089,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 13:10 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar el backend base de `People Unified View v2` para congelar contrato y habilitar trabajo paralelo de frontend.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / backend contract freeze
 
 ### Archivos tocados
+
 - `src/types/people.ts`
 - `src/lib/people/shared.ts`
 - `src/lib/people/get-people-list.ts`
@@ -6858,6 +8120,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - `pnpm exec eslint src/lib/people src/app/api/people src/types/people.ts src/lib/tenant/authorization.ts`: correcto
 - `pnpm exec tsc --noEmit --pretty false`: correcto en el momento del freeze backend
 - `pnpm build`: correcto en el momento del freeze backend
@@ -6867,6 +8130,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/api/people/[memberId]`
 
 ### Riesgos o pendientes
+
 - Claude ya puede avanzar en paralelo con frontend usando estos payloads:
   - `PeopleListPayload`
   - `PersonDetail`
@@ -6897,19 +8161,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 13:42 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar la integración entre el backend de `People` y el frontend ya implementado por Claude, dejando el módulo compilando end-to-end.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / module integration
 
 ### Archivos tocados
+
 - `src/views/greenhouse/people/PersonView.tsx`
 - `src/views/greenhouse/people/PersonTabs.tsx`
 - `src/views/greenhouse/people/PersonLeftSidebar.tsx`
@@ -6921,6 +8190,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - `pnpm exec eslint src/views/greenhouse/people 'src/app/(dashboard)/people' src/app/api/people src/lib/people src/types/people.ts src/lib/tenant/authorization.ts src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts`: correcto
 - `pnpm exec tsc --noEmit --pretty false`: correcto
 - `pnpm build`: correcto
@@ -6932,6 +8202,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/api/people/[memberId]`
 
 ### Riesgos o pendientes
+
 - El modulo `People` ya esta listo para smoke en preview, pero aun no se ha publicado este delta.
 - Integracion cerrada importante:
   - `PersonTabs` ahora usa `detail.access.visibleTabs` del backend
@@ -6944,25 +8215,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 12:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar la factibilidad tecnica de la task `People Unified View` contra el estado real del repo y reescribir el brief como una version ejecutable.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentation / implementation planning
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 - `changelog.md`
 
 ### Verificacion
+
 - Revisión contrastada contra runtime y docs vivas del repo:
   - `project_context.md`
   - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
@@ -6980,6 +8257,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No hubo cambios de runtime ni de base de datos; este turno fue documental.
 
 ### Riesgos o pendientes
+
 - La task vigente para People debe tomarse desde `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`, no desde la version original.
 - La `v2` deja People como surface inicialmente read-first; si se quiere editar assignments desde esa vista, hace falta una task adicional de CRUD de team.
 - Sigue pendiente decidir si `efeonce_account` debe ver `/people` en lectura o si queda fuera del alcance inicial.
@@ -6987,23 +8265,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 12:28 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Leer tambien `CODEX_TASK_Admin_Team_Module.md` y dejar explicitado como coordinar `People Unified View` ahora sin bloquear ni retrabajar el futuro modulo `Admin Team`.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Documentation / implementation planning
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
 - `Handoff.md`
 
 ### Verificacion
+
 - Lectura comparada entre:
   - `docs/tasks/complete/CODEX_TASK_People_Unified_View_v2.md`
   - `docs/tasks/complete/CODEX_TASK_Admin_Team_Module.md`
@@ -7014,6 +8298,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - la capa `src/lib/people/*` debe diseñarse reusable para que `Admin Team` la consuma despues
 
 ### Riesgos o pendientes
+
 - Division de trabajo acordada para la siguiente implementacion:
   - Codex hace todo el backend de `People Unified View v2`
   - Claude hace todo el frontend de `People Unified View v2`
@@ -7026,23 +8311,29 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 09:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Rescatar el trabajo no committeado de `HR Payroll`, publicarlo en una rama propia y dejar un preview real de Vercel listo para prueba de backend + UI.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / integration validation
 
 ### Archivos tocados
+
 - No hubo cambios de código adicionales fuera del trabajo ya existente; el objetivo del turno fue reubicar, commitear, publicar y desplegar.
 - `Handoff.md`
 
 ### Verificacion
+
 - Se creó la rama `feature/hr-payroll` desde el worktree actual sin usar `stash`.
 - Se hicieron 2 commits:
   - `a30b0dc` `feat: add reusable payroll ui infrastructure`
@@ -7067,6 +8358,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `https://github.com/efeoncepro/greenhouse-eo/pull/new/feature/hr-payroll`
 
 ### Riesgos o pendientes
+
 - Claude puede tomar esta rama como base oficial del frontend `HR Payroll`; ya no depende del worktree mezclado de `feature/admin-tenant-detail-redesign`.
 - El preview listo para prueba es el manual de Vercel arriba indicado; el auto-preview anterior de la rama falló antes de que se crearan las env vars de `feature/hr-payroll`.
 - Si se quiere probar el módulo completo más allá de `/login`, hace falta autenticarse con un principal que tenga acceso `hr` o `efeonce_admin`.
@@ -7074,28 +8366,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 08:45 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Dejar documentada la estrategia acordada para rescatar y reubicar el trabajo no committeado de `HR Payroll` que hoy está mezclado en `feature/admin-tenant-detail-redesign`.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / branch coordination
 
 ### Archivos tocados
+
 - `Handoff.md`
 
 ### Verificacion
+
 - Confirmado sin mover rama:
   - el worktree actual está en `feature/admin-tenant-detail-redesign`
   - el trabajo actual de payroll (backend + frontend + infraestructura) vive en este árbol como cambios sin commit
   - `fix/team-capacity-views-vuexy` sí existe, pero sus commits guardados corresponden a iniciativas anteriores y no al delta actual sin commit de payroll
 
 ### Riesgos o pendientes
+
 - Estrategia recomendada para reubicar el trabajo de payroll:
   - crear `feature/hr-payroll` desde el estado actual del worktree, sin perder el árbol sucio
   - hacer 2 commits lógicos dentro de `feature/hr-payroll`
@@ -7132,19 +8431,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 08:32 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar validación runtime real del backend `HR Payroll` contra BigQuery y aplicar el bootstrap del módulo en el dataset `greenhouse`.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / BigQuery runtime validation
 
 ### Archivos tocados
+
 - `src/lib/payroll/fetch-kpis-for-period.ts`
 - `src/lib/payroll/schema.ts`
 - `bigquery/greenhouse_hr_payroll_v1.sql`
@@ -7153,6 +8457,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - Query read-only a `efeonce-group.notion_ops.INFORMATION_SCHEMA.COLUMNS`: confirmó schema real de `tareas`
 - Bootstrap aplicado en BigQuery real desde `bigquery/greenhouse_hr_payroll_v1.sql`
 - Revalidación posterior:
@@ -7164,6 +8469,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `pnpm build`: correcto
 
 ### Riesgos o pendientes
+
 - El bootstrap BigQuery ya quedó aplicado, pero sigue pendiente la provisión real de usuarios `client_users` / `user_role_assignments` con el rol `hr_payroll`; hoy existe el role, no necesariamente los principals de HR.
 - `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` sigue ignorado por Git; la implementación ya avanzó más que el brief trackeado.
 - Existen archivos UI no trackeados fuera del scope backend en el working tree; no fueron tocados en este turno.
@@ -7171,19 +8477,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 08:08 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Endurecer el backend de `HR Payroll` para dejarlo listo para integración real con frontend: validaciones numéricas server-side, versionado de compensación sin solapes, bloqueo de edición de períodos fuera de `draft`, aprobación con validación final de bonos y auditoría consistente por email de sesión.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / backend hardening
 
 ### Archivos tocados
+
 - `src/lib/payroll/shared.ts`
 - `src/lib/payroll/get-compensation.ts`
 - `src/lib/payroll/get-payroll-periods.ts`
@@ -7198,11 +8509,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el delta endurecido de payroll: correcto
 - `git diff --check`: correcto
 - `pnpm build`: correcto
 
 ### Riesgos o pendientes
+
 - El backend ya quedó buildable y con rutas `HR Payroll` incluidas en el artefacto de producción, pero sigue faltando validación runtime contra BigQuery real para confirmar:
   - columnas vivas de `notion_ops.tareas` para OTD automático
   - permisos efectivos de creación sobre `greenhouse.payroll_*`
@@ -7213,19 +8526,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 07:53 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar la primera entrega backend de `HR Payroll`: route group `hr`, guard/layout server-side, tipos, capa `lib/payroll`, SQL bootstrap y API routes base para compensaciones, periodos, calculo, edicion, aprobacion, export e historial.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / backend implementation
 
 ### Archivos tocados
+
 - `src/lib/tenant/access.ts`
 - `src/lib/tenant/authorization.ts`
 - `src/app/(dashboard)/hr/layout.tsx`
@@ -7256,12 +8574,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `pnpm exec eslint` sobre el delta backend de payroll: correcto
 - `git diff --check`: correcto
 - `pnpm exec tsc --noEmit`: el proyecto sigue teniendo ruido previo en `.next-local`; al filtrar errores por paths del delta backend de payroll no aparecieron errores nuevos del trabajo actual
 - No se ejecuto `pnpm build` todavia
 
 ### Riesgos o pendientes
+
 - La implementacion backend ya existe, pero falta validacion runtime real contra BigQuery:
   - schema vivo de `notion_ops.tareas`
   - presencia o ausencia real de columnas para OTD automatico
@@ -7273,26 +8593,33 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 07:34 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Dejar registrada la division operativa para `HR Payroll`: Codex implementara el backend completo del modulo y Claude implementara todo el frontend, ambos tomando como base `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / implementation handoff
 
 ### Archivos tocados
+
 - `Handoff.md`
 
 ### Verificacion
+
 - Revision final del brief `HR Payroll v2`: correcta como base de implementacion, con pendientes acotados de verificacion runtime antes de escribir codigo
 - `git diff --check`: pendiente de re-ejecucion tras esta actualizacion de handoff
 
 ### Riesgos o pendientes
+
 - Alcance operativo acordado:
   - Codex: backend completo del modulo `HR Payroll`
   - Claude: frontend completo del modulo `HR Payroll`
@@ -7308,29 +8635,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 07:31 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Revisar y corregir `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` para dejar el brief mas implementable y alineado con el repo real: route group `hr`, versionado por vigencia del periodo, persistencia de KPIs manuales y auditabilidad de overrides.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / docs alignment
 
 ### Archivos tocados
+
 - `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md`
 - `docs/tasks/README.md`
 - `Handoff.md`
 
 ### Verificacion
+
 - Revision manual del brief corregido: correcta
 - `git diff --check`: correcto
 - No aplica `pnpm lint` ni `pnpm build` porque no hubo cambios de runtime
 
 ### Riesgos o pendientes
+
 - El brief ya no depende de `/admin/payroll`, pero la implementacion futura todavia debe resolver el wiring real de auth para `hr`: role seed, `TenantRouteGroup`, guard reusable y redirect post-login.
 - Antes de implementar, sigue siendo obligatorio verificar el schema vivo de `notion_ops.tareas` para definir la query final de KPIs y confirmar si OTD por persona es calculable o queda manual.
 - `docs/tasks/complete/CODEX_TASK_HR_Payroll_Module_v2.md` esta afectado por la regla `.gitignore: CODEX_TASK_*.md`; el archivo quedo corregido en disco pero no aparece como cambio trackeado del repo. Si esta version debe compartirse por Git, habra que ajustar esa regla o versionar el archivo por otra via.
@@ -7338,19 +8672,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 09:45 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar la capa faltante de buenas practicas GitHub del repo sin tocar producto: CI, templates de PR/issues, Dependabot, `CODEOWNERS`, soporte/seguridad y housekeeping documental.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / repo hygiene
 
 ### Archivos tocados
+
 - `.github/workflows/ci.yml`
 - `.github/PULL_REQUEST_TEMPLATE.md`
 - `.github/ISSUE_TEMPLATE/bug_report.yml`
@@ -7369,6 +8708,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `scripts/mint-local-admin-jwt (1).js`
 
 ### Verificacion
+
 - Verificacion estructural prevista:
   - `.github/` ahora debe contener CI, templates y metadata de repo
   - `README.md` y `CONTRIBUTING.md` deben reflejar el flujo GitHub actual
@@ -7380,25 +8720,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - este shell no tiene `node`/`pnpm`, asi que no se puede ejecutar `pnpm lint` ni `pnpm build` localmente en este turno
 
 ### Riesgos o pendientes
+
 - `.github/CODEOWNERS` queda como template seguro hasta confirmar un username o team slug valido con permisos de escritura en GitHub.
 - No se agrego `LICENSE` porque el repo es `private` y `Commercial`; eso requiere decision legal explicita y no debe inventarse.
 
 ## 2026-03-14 01:10 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Reorganizar la documentacion Markdown del repo para limpiar la raiz, mover specs y tasks a `docs/`, y actualizar referencias sin romper el flujo operativo entre agentes.
 
 ### Rama
+
 - Rama usada: `feature/admin-tenant-detail-redesign`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / docs hygiene
 
 ### Archivos tocados
+
 - `README.md`
 - `AGENTS.md`
 - `project_context.md`
@@ -7411,6 +8757,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - multiples docs movidos a `docs/architecture/*`, `docs/api/*`, `docs/ui/*`, `docs/roadmap/*` y `docs/tasks/*`
 
 ### Verificacion
+
 - `find . -maxdepth 1 -name '*.md'` ahora devuelve solo:
   - `README.md`
   - `AGENTS.md`
@@ -7423,25 +8770,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git diff --check`: correcto
 
 ### Riesgos o pendientes
+
 - No se dejaron stubs en raiz para los documentos movidos; cualquier referencia externa fuera del repo que use paths antiguos debera actualizarse.
 - Conviene revisar futuros PRs para que no vuelvan a caer `.md` especializados en raiz por inercia.
 
 ## 2026-03-13 23:58 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Integrar `feature/agency-operator-layer` sobre la punta real de `develop` sin romper Google SSO ni el rediseño de team, corrigiendo el delta minimo para que la integracion cumpla lint y build.
 
 ### Rama
+
 - Rama usada: `mergecheck-agency-operator-layer`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / staging
 
 ### Archivos tocados
+
 - `src/app/(dashboard)/agency/capacity/page.tsx`
 - `src/app/(dashboard)/agency/layout.tsx`
 - `src/app/(dashboard)/agency/page.tsx`
@@ -7461,6 +8814,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `project_context.md`
 
 ### Verificacion
+
 - Merge simulado sobre `origin/develop`: sin conflictos de Git
 - Delta final del merge:
   - solo entran 22 archivos del modulo `agency`, mas `VerticalMenu`, nomenclatura y `tenant/authorization`
@@ -7472,6 +8826,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - se corrigieron en la integracion antes de promover a `develop`
 
 ### Riesgos o pendientes
+
 - El acceso agency hoy reutiliza `internal/admin`; no existe aun un principal dedicado con `routeGroup = 'agency'` en runtime.
 - `/agency/spaces/[spaceId]` por ahora redirige a `/dashboard?space=<id>`; no existe todavia una surface propia de detalle agency para cada space.
 - Despues del merge a `develop`, conviene validar visualmente `dev-greenhouse.efeoncepro.com/agency`, `/agency/spaces` y `/agency/capacity`.
@@ -7479,25 +8834,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 23:42 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Integrar Google SSO sobre la punta actual de `develop` sin tocar el rediseño de team y dejar `pre-greenhouse` apuntando a una rama merge-safe.
 
 ### Rama
+
 - Rama usada: `mergecheck-google-sso`
 - Rama objetivo del merge: `develop`
 - Rama remota lista para PR: `fix/google-sso-develop-safe`
 
 ### Ambiente objetivo
+
 - Preview branch / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `Handoff.md`
 - `changelog.md`
 - `project_context.md`
 
 ### Verificacion
+
 - Delta contra `origin/develop` validado:
   - solo cambia `.env.example`, `.env.local.example`, `Handoff.md`, `README.md`, `changelog.md`, `project_context.md`, `scripts/setup-bigquery.sql`, `src/app/(blank-layout-pages)/login/page.tsx`, `src/app/(dashboard)/settings/page.tsx`, `src/config/greenhouse-nomenclature.ts`, `src/lib/auth.ts`, `src/lib/tenant/access.ts`, `src/types/next-auth.d.ts`, `src/views/Login.tsx` y `src/views/greenhouse/GreenhouseSettings.tsx`
   - no entran `TeamCapacitySection`, `TeamDossierSection`, `GreenhouseDashboard` ni `GreenhouseAdminTenantDashboardPreview`
@@ -7512,6 +8873,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `https://pre-greenhouse.efeoncepro.com/login` contiene `Entrar con Google` y `Entrar con Microsoft`
 
 ### Riesgos o pendientes
+
 - `pre-greenhouse` ya no apunta al preview experimental `feature/google-sso`; ahora refleja la rama merge-safe `fix/google-sso-develop-safe`.
 - El alias estable del branch safe (`greenhouse-eo-git-fix-google-sso-develop-safe-efeonce-7670142f.vercel.app`) no esta agregado como redirect URI en GCP; para pruebas humanas usar `pre-greenhouse.efeoncepro.com`, que si esta autorizado.
 - Queda pendiente solo la validacion humana final del flujo OAuth completo en navegador antes del merge a `develop`.
@@ -7519,19 +8881,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 22:59 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar `docs/tasks/complete/CODEX_TASK_Google_SSO_Greenhouse.md` en una rama paralela sobre `develop`, agregando Google SSO al runtime actual de NextAuth sin romper Microsoft ni credentials.
 
 ### Rama
+
 - Rama usada: `feature/google-sso`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview branch / `pre-greenhouse`
 
 ### Archivos tocados
+
 - `src/lib/auth.ts`
 - `src/lib/tenant/access.ts`
 - `src/types/next-auth.d.ts`
@@ -7549,6 +8916,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `git diff --check`: correcto
 - `pnpm lint`: correcto
 - Referencia Vuexy revisada:
@@ -7575,6 +8943,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/api/auth/providers` expone `azure-ad`, `google` y `credentials`
 
 ### Riesgos o pendientes
+
 - Regla operativa importante: esta rama mantiene el principio vigente del portal; Google SSO solo vincula principals existentes en `greenhouse.client_users` y no auto-provisiona acceso solo por `allowed_email_domains`.
 - El `pnpm build` local en este shell siguio fallando por un issue local de Next.js alrededor de `/developers/api`, pero el build remoto de Vercel para `feature/google-sso` quedo `Ready`.
 - Falta validacion humana final del redirect completo en navegador contra una cuenta Google real; desde CLI quedo validado el provider, el callback URL y el principal Efeonce existente.
@@ -7582,19 +8951,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 21:00 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Investigar la documentacion oficial de Vercel y dejar una skill reusable para operar previews, staging, production, dominios protegidos y promociones desde este repo.
 
 ### Rama
+
 - Rama usada: `fix/team-identity-task-closeout`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Operacion Vercel cross-environment
 
 ### Archivos tocados
+
 - `.codex/skills/vercel-operations/SKILL.md`
 - `.codex/skills/vercel-operations/references/official-vercel-reference.md`
 - `.codex/skills/vercel-operations/references/greenhouse-vercel-map.md`
@@ -7603,6 +8977,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - Fuentes usadas: documentacion oficial de Vercel sobre CLI, project linking, env, logs, promote, rollback, deployment protection, protection bypass, custom environments y Vercel MCP.
 - `git diff --check`: correcto
 - Limitacion actual del entorno:
@@ -7610,25 +8985,31 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - por eso la skill ya quedo versionada, pero la CLI real aun no puede ejecutarse desde esta sesion
 
 ### Riesgos o pendientes
+
 - Para usar la skill de forma operativa aqui mismo, hace falta que el entorno tenga `vercel` disponible o que otro shell autenticado la ejecute.
 - `pre-greenhouse.efeoncepro.com` fue verificado por `curl` y responde Vercel Authentication `401`; eso confirma proteccion activa, no el deployment exacto detras del dominio.
 
 ## 2026-03-13 23:59 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar los gaps literales que quedaban entre el task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` y la implementacion ya mergeada en `develop`, pero haciendolo en una rama aislada para no tocar integracion aun.
 
 ### Rama
+
 - Rama usada: `fix/team-identity-task-closeout`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Preview / development branch
 
 ### Archivos tocados
+
 - `src/components/greenhouse/TeamSignalChip.tsx`
 - `src/components/greenhouse/TeamProgressBar.tsx`
 - `src/components/greenhouse/TeamMemberCard.tsx`
@@ -7644,6 +9025,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `git diff --check`: correcto
 - Validacion automatica pendiente:
   - `pnpm lint`: no ejecutado en este shell porque `node`, `npx` y `pnpm` no estan disponibles
@@ -7656,6 +9038,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el task doc ya quedo alineado al schema real de `notion_ops.tareas`
 
 ### Riesgos o pendientes
+
 - Hace falta correr `pnpm lint` y `pnpm build` en un entorno con Node antes de mergear esta rama.
 - El cierre documental del task asume como contrato valido el schema real (`responsables_names`, `responsables_ids`, `responsable_texto`), no el supuesto original de columnas directas `responsable_*`.
 - Conviene validar visualmente en Preview la nueva Vista 3 porque cambio de cards siempre abiertas a resumen compacto + expandible.
@@ -7663,20 +9046,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 23:58 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Endurecer de verdad la identidad canonica del roster Efeonce para que Greenhouse sea la identidad base y los providers externos queden enlazados como enrichment.
 - Dar una pasada visual adicional a las 4 surfaces live del task usando patrones Vuexy ya presentes en el repo.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / BigQuery real / preview readiness
 
 ### Archivos tocados
+
 - `src/types/team.ts`
 - `src/lib/team-queries.ts`
 - `scripts/setup-team-tables.sql`
@@ -7692,6 +9080,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `pnpm lint`: correcto
 - `pnpm build`: correcto
 - `scripts/setup-team-tables.sql` reaplicado en BigQuery real: correcto
@@ -7704,6 +9093,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `greenhouse.team_role_catalog` y `greenhouse.team_profession_catalog` ya quedaron sembradas en BigQuery real
 
 ### Riesgos o pendientes
+
 - Falta validacion visual autenticada en Preview para confirmar la nueva jerarquia visual de las 4 cards con datos reales en navegador.
 - La capa ya soporta futuros providers en `identity_profile_source_links`, pero todavia no existe ingestion real para `google_workspace`, `deel`, `frame_io` o `adobe`; el modelo quedo listo, no el sync.
 - El perfil ampliado ya existe a nivel schema y runtime, pero varios atributos siguen `NULL` en seed porque no habia dato confirmado; para cerrar la ficha completa faltaria una fuente canonica de RRHH o un backoffice admin de talento.
@@ -7712,21 +9102,26 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 19:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar operativamente la iniciativa de alineacion Greenhouse + identidad visual persistente y dejar trazabilidad del promote flow hasta `staging` y `Production`.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Promocion ejecutada:
   - `fix/internal-nav-nomenclature-hydration` -> `develop`
   - `develop` -> `main`
 
 ### Ambiente objetivo
+
 - Preview, `staging` y `Production` en Vercel
 
 ### Verificacion
+
 - `pre-greenhouse.efeoncepro.com` ya no apunta al preview viejo; fue re-asignado al deployment `greenhouse-mwp8lexfz-efeonce-7670142f.vercel.app` del branch `fix/internal-nav-nomenclature-hydration`.
 - `dev-greenhouse.efeoncepro.com` quedo en `Ready` sobre `greenhouse-521mddeos-efeonce-7670142f.vercel.app` despues del merge a `develop`.
 - `greenhouse.efeoncepro.com` quedo en `Ready` sobre `greenhouse-2jwy203sv-efeonce-7670142f.vercel.app` despues del merge a `main`.
@@ -7735,28 +9130,34 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `vercel inspect` sobre preview, staging y production
 
 ### Riesgos o pendientes
+
 - El cierre tecnico y de deploy ya quedo realizado, pero sigue pendiente validacion visual humana final en `pre-greenhouse`, `dev-greenhouse` y `greenhouse` para confirmar jerarquia, contraste y el flujo real de upload de logo/foto.
 - El worktree local puede seguir mostrando cambios ajenos en `.env.example`, `.env.local.example`, `package.json` y `pnpm-lock.yaml`; no forman parte del cierre de esta iniciativa.
 
 ## 2026-03-13 23:20 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar los pendientes reales del runtime de team identity + capacity:
   - validar con Node local
   - endurecer y aplicar el bootstrap SQL en BigQuery
   - confirmar el nombre correcto del repo externo del sync
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / BigQuery real / preview readiness
 
 ### Archivos tocados
+
 - `.eslintrc.js`
 - `src/lib/team-queries.ts`
 - `src/components/greenhouse/TeamDossierSection.tsx`
@@ -7766,6 +9167,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `pnpm lint`: correcto
 - `pnpm build`: correcto
 - `scripts/setup-team-tables.sql` aplicado en BigQuery real: correcto
@@ -7778,6 +9180,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `git ls-remote git@github.com:efeoncepro/notion-bigquery.git HEAD`: `Repository not found`
 
 ### Riesgos o pendientes
+
 - El repo externo correcto del pipeline es `notion-bigquery`, no `notion-bq-sync`.
 - Esa parte externa sigue pendiente porque el repo no esta en este workspace y no hubo acceso remoto valido desde esta sesion.
 - La validacion ad hoc por import directo de `src/lib/team-queries.ts` con `tsx` choco con `server-only`; no indica fallo del feature, pero si que una smoke script reusable tendria que correr via entorno Next/server real o con un harness dedicado.
@@ -7785,19 +9188,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 20:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar upload persistente de logo/foto para spaces y usuarios en los lugares donde hoy existian placeholders de identidad visual.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / admin e internal / identidad visual persistente
 
 ### Archivos tocados
+
 - `src/lib/storage/greenhouse-media.ts`
 - `src/lib/admin/media-assets.ts`
 - `src/lib/bigquery.ts`
@@ -7828,10 +9236,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/lib/bigquery.ts src/lib/storage/greenhouse-media.ts src/lib/admin/media-assets.ts 'src/app/api/admin/tenants/[id]/logo/route.ts' 'src/app/api/admin/users/[id]/avatar/route.ts' 'src/app/api/media/tenants/[id]/logo/route.ts' 'src/app/api/media/users/[id]/avatar/route.ts' src/components/greenhouse/IdentityImageUploader.tsx src/components/greenhouse/index.ts src/lib/admin/get-admin-tenant-detail.ts src/lib/admin/get-admin-tenants-overview.ts src/lib/admin/get-admin-user-detail.ts src/lib/admin/get-admin-access-overview.ts src/lib/internal/get-internal-dashboard-overview.ts src/lib/tenant/access.ts src/lib/auth.ts src/types/next-auth.d.ts src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseAdminUserDetail.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/views/greenhouse/admin/tenants/TenantUsersTable.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/internal/dashboard/InternalControlTowerTable.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/config/greenhouse-nomenclature.ts`: correcto
 - `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: sigue bloqueado solo por el archivo duplicado ajeno `src/config/capability-registry (1).ts`
 
 ### Riesgos o pendientes
+
 - No se hizo smoke visual autenticado real del flujo de upload ni prueba end-to-end contra GCS/BigQuery en este turno; la validacion fue estatica.
 - `package.json` y `pnpm-lock.yaml` siguen modificados en el worktree por trabajo ajeno y no deben mezclarse por accidente con este commit.
 - Si el bucket `${GCP_PROJECT}-greenhouse-media` no existe en un ambiente dado, hay que crearlo o definir `GREENHOUSE_MEDIA_BUCKET` antes de probar uploads reales.
@@ -7839,49 +9249,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 20:28 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Verificar por que `pre-greenhouse.efeoncepro.com` no mostraba el estado nuevo de la rama y corregir el bloqueo de Preview en Vercel.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Preview de Vercel / branch `fix/internal-nav-nomenclature-hydration`
 
 ### Archivos tocados
+
 - `tsconfig.json`
 - `project_context.md`
 - `changelog.md`
 - `Handoff.md`
 
 ### Verificacion
+
 - `vercel inspect pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: el alias `pre-greenhouse.efeoncepro.com` sigue apuntando a `greenhouse-5jepkohhj-efeonce-7670142f.vercel.app`, no al preview activo de la rama.
 - `vercel inspect greenhouse-o05bk3bl7-efeonce-7670142f.vercel.app --logs -S efeonce-7670142f`: el ultimo deploy del branch `fix/internal-nav-nomenclature-hydration` estaba fallando en build por `src/config/capability-registry (1).ts`.
 - `npx pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto despues de excluir duplicados `* (1).ts(x)` del typecheck.
 
 ### Riesgos o pendientes
+
 - Aunque el branch vuelva a desplegar en `Ready`, `pre-greenhouse.efeoncepro.com` seguira mostrando el deployment viejo hasta que se re-asigne o se promueva manualmente el alias.
 - Sigue pendiente confirmar visualmente que el uploader y los logos cargados ya aparecen en la preview nueva una vez que Vercel termine el deploy sano.
 
 ## 2026-03-13 18:46 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Incorporar los nuevos SVG de branding cargados en `public/branding/SVG` y reemplazar placeholders previos en el shell y en superficies donde `Globe`, `Reach`, `Wave` y `Efeonce` ya forman parte visible de la experiencia.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / branding / shell autenticado / business lines
 
 ### Archivos tocados
+
 - `src/components/greenhouse/brand-assets.ts`
 - `src/components/greenhouse/BrandWordmark.tsx`
 - `src/components/greenhouse/BrandLogo.tsx`
@@ -7906,28 +9328,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/components/greenhouse/brand-assets.ts src/components/greenhouse/BusinessLineBadge.tsx src/components/greenhouse/BrandLogo.tsx src/components/greenhouse/AccountTeamDossierSection.tsx src/components/greenhouse/index.ts src/components/layout/shared/Logo.tsx src/app/layout.tsx src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx`: correcto
 
 ### Riesgos o pendientes
+
 - El typo del asset `public/branding/SVG/isotipo-goble-full.svg` se consume tal como existe en disco; si luego se corrige el nombre del archivo, hay que ajustar el registry.
 - Esta ronda ya cubre shell, hero cliente, footers, business lines visibles y superficies principales de admin/internal; conviene hacer una pasada visual real para confirmar tamaños y contraste de wordmarks negativos sobre fondos oscuros.
 
 ## 2026-03-13 14:58 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir la interpretacion de `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` para no mezclar la navegacion cliente del documento con labels de `internal/admin`, y realinear la distribucion del sidebar cliente.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / preview / sidebar cliente / nomenclatura operativa
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts`
 - `src/components/layout/vertical/VerticalMenu.tsx`
 - `src/components/layout/shared/UserDropdown.tsx`
@@ -7948,29 +9377,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx src/views/greenhouse/GreenhouseDashboard.tsx src/views/greenhouse/GreenhouseProjects.tsx src/views/greenhouse/GreenhouseSprints.tsx src/views/greenhouse/GreenhouseSettings.tsx src/views/greenhouse/dashboard/ClientDashboardHero.tsx src/views/greenhouse/GreenhouseAdminTenants.tsx src/views/greenhouse/GreenhouseAdminRoles.tsx src/views/greenhouse/admin/users/UserListTable.tsx src/components/layout/vertical/FooterContent.tsx src/components/layout/horizontal/FooterContent.tsx src/data/navigation/verticalMenuData.tsx src/data/navigation/horizontalMenuData.tsx`: correcto
 - No se hizo validacion visual autenticada real del sidebar cliente o admin despues de este ajuste.
 
 ### Riesgos o pendientes
+
 - La separacion cliente vs internal/admin ya corrige el boundary conceptual, pero aun falta un barrido route-by-route del microcopy cliente contra el documento completo.
 - La seccion dinamica `Servicios` sigue viva en el sidebar cliente por necesidad de runtime de capabilities; conviene validarla despues contra la arquitectura de navegacion del producto y no solo contra el doc de nomenclatura.
 
 ## 2026-03-13 14:24 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Endurecer el parseo de credenciales BigQuery para Preview de branch en Vercel y revisar desalineaciones de microcopy contra `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Preview / login / branding publico / runtime auth BigQuery
 
 ### Archivos tocados
+
 - `src/lib/bigquery.ts`
 - `src/config/greenhouse-nomenclature.ts`
 - `src/views/greenhouse/GreenhouseAdminTenants.tsx`
@@ -7981,12 +9417,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/views/Login.tsx src/lib/bigquery.ts`: correcto antes de la ronda final de microcopy
 - `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivos duplicados ajenos ya presentes en el worktree (`*(1).ts`, `*(1).tsx`) fuera de este cambio
 - `vercel inspect https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f`: correcto, alias apuntando a la preview vigente de la branch
 - `vercel logs https://pre-greenhouse.efeoncepro.com -S efeonce-7670142f --no-follow --since 10m --expand`: detecto fallo previo de parseo en `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 
 ### Riesgos o pendientes
+
 - Falta rerun de lint sobre el slice final con microcopy admin/settings.
 - Falta volver a publicar la ronda final de microcopy en Vercel.
 - Si el branch sigue fallando en credenciales despues del fallback base64, cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` en Preview de la branch y redeployar antes de volver a diagnosticar password o provisionamiento.
@@ -7994,19 +9432,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 12:46 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el desalineamiento post-branding donde `/internal/dashboard` y superficies admin arrancaban con nomenclatura Greenhouse parcial y luego hidrataban a labels legacy/Vuexy, ademas de revisar escapes de tema por cookies viejas.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo del merge: `main`
 
 ### Ambiente objetivo
+
 - Development / production fix candidate / shell autenticado / branding runtime
 
 ### Archivos tocados
+
 - `src/@core/utils/brandSettings.ts`
 - `src/@core/contexts/settingsContext.tsx`
 - `src/@core/utils/serverHelpers.ts`
@@ -8021,12 +9464,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/@core/utils/brandSettings.ts src/@core/contexts/settingsContext.tsx src/@core/utils/serverHelpers.ts src/components/auth/AuthSessionProvider.tsx src/components/Providers.tsx "src/app/(dashboard)/layout.tsx" src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx`: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
 - `npx pnpm build`: correcto
 - No se ejecuto smoke visual autenticado en navegador real despues del fix; la validacion fue estatico + build
 
 ### Riesgos o pendientes
+
 - El fix elimina el flicker del shell autenticado y bloquea `primaryColor/skin/semiDark` legacy en cookie, pero no reescribe aun copy legacy fuera del nav/dropdown en vistas admin como headers o tablas.
 - Si algun usuario esperaba seguir personalizando color primario o `skin` desde cookies legacy/customizer, ese comportamiento ya no se preserva; se mantiene solo `mode`, `layout` y widths.
 - Conviene hacer smoke visual real en `/internal/dashboard`, `/admin/tenants`, `/admin/users` y `/admin/roles` en preview o staging para confirmar que no queda ningun escape visual de Vuexy en runtime autenticado.
@@ -8034,19 +9479,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 12:01 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar la ejecucion real de `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`, no solo a nivel de labels, sino tambien en theming, tipografia, sidebar branded y copy secundaria del dashboard cliente activo.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / client portal / nomenclature + branding runtime / Vuexy theme-safe rollout
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts`
 - `src/configs/primaryColorConfig.ts`
 - `src/configs/themeConfig.ts`
@@ -8074,12 +9524,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint ...` sobre el slice tocado de nomenclatura, theme y dashboard cliente: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
 - `npx pnpm build`: correcto
 - No se ejecuto validacion visual autenticada real en `/login`, `/dashboard`, `/proyectos`, `/sprints` o `/settings`
 
 ### Riesgos o pendientes
+
 - Falta smoke visual autenticado real del sidebar branded, login y dashboard cliente siguiendo `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md`; este turno valido estructura y build, no jerarquia visual final.
 - `themeConfig.mode` queda en `light` como default del documento, pero el switch runtime de `light/dark/system` sigue existiendo; conviene revisar que el look & feel en `dark` no necesite ajuste fino despues del smoke visual.
 - El documento completo sigue siendo mas amplio que este slice: admin e internal aun conservan copy legacy fuera de la capa centralizada y no fueron objetivo de este turno.
@@ -8087,19 +9539,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 11:09 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` sobre las superficies cliente principales sin romper el sistema de theming oficial de Vuexy.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / client portal / nomenclature rollout / Vuexy theme-safe UI wiring
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts`
 - `src/views/Login.tsx`
 - `src/views/greenhouse/GreenhouseDashboard.tsx`
@@ -8117,10 +9574,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint ...` sobre los archivos tocados de nomenclatura y superficies cliente: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false`: timeout en este worktree (`124s`), no verificado
 
 ### Riesgos o pendientes
+
 - La nomenclatura v3 ya cubre login, navegacion y las rutas cliente principales, pero todavia quedan textos legacy fuera de este slice en componentes secundarios de dashboard, admin e internal.
 - Se ratifico que Vuexy debe seguir siendo la capa de theming base; si otro agente quiere tocar paleta global u overrides compartidos, debe hacerlo por `src/components/theme/mergedTheme.ts` o `@core/theme/*`, no con un theme custom paralelo.
 - Conviene correr una validacion visual autenticada real sobre `/dashboard`, `/proyectos`, `/sprints`, `/settings` y `/login` antes de promover este cambio.
@@ -8128,19 +9587,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 14:39 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Subir la barra visual de `Creative Hub` para que la capability no solo cumpla el runtime del documento, sino que reutilice de forma explicita patrones Vuexy de `full-version`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / capability runtime / Creative Hub / visual refactor / smoke autenticado
 
 ### Archivos tocados
+
 - `src/components/capabilities/CapabilityOverviewHero.tsx`
 - `src/components/capabilities/CapabilityCard.tsx`
 - `src/components/card-statistics/HorizontalWithSubtitle.tsx`
@@ -8150,6 +9614,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/components/card-statistics/HorizontalWithSubtitle.tsx src/components/capabilities/CapabilityOverviewHero.tsx src/components/capabilities/CapabilityCard.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false --incremental false`: correcto
 - `npx pnpm lint`: correcto
@@ -8157,6 +9622,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
 
 ### Riesgos o pendientes
+
 - `Creative Hub` ya usa de forma activa patrones visuales adaptados de `full-version`, pero solo este modulo quedo llevado a esa barra; el resto de capabilities aun usan el dispatcher declarativo con visuales mas sobrios.
 - `HorizontalWithSubtitle` ahora admite ocultar trend cuando no existe una delta real; si otro agente lo reutiliza, esa flexibilidad ya es parte del contrato del componente.
 - `next build` sigue mostrando el mensaje de reconfiguracion de `tsconfig.json`; en este turno no dejo basura porque el archivo se limpio antes de cerrar.
@@ -8164,19 +9630,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 11:42 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Consolidar `Creative Hub` como el primer modulo enriquecido del runtime declarativo de capabilities y ampliar el card catalog real sin romper los otros modules.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / capability runtime / Creative Hub / smoke autenticado
 
 ### Archivos tocados
+
 - `src/types/capabilities.ts`
 - `src/config/capability-registry.ts`
 - `src/lib/capability-queries/helpers.ts`
@@ -8191,6 +9662,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `tsconfig.json`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/types/capabilities.ts src/config/capability-registry.ts src/lib/capability-queries/helpers.ts src/lib/capability-queries/creative-hub.ts src/lib/capability-queries/crm-command-center.ts src/lib/capability-queries/onboarding-center.ts src/lib/capability-queries/web-delivery-lab.ts src/components/capabilities/CapabilityCard.tsx`: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
 - `npx pnpm lint`: correcto
@@ -8198,6 +9670,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
 
 ### Riesgos o pendientes
+
 - `Creative Hub` ya usa `cardData` propio y dos card types nuevos (`metric-list`, `chart-bar`), pero el catalogo del documento completo aun es mayor y sigue siendo backlog.
 - `next build` sigue reinyectando includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes de cerrar este turno.
 - El siguiente bloque natural, si se sigue expandiendo capabilities, es extraer otro modulo real sobre el mismo patron declarativo enriquecido, probablemente `CRM Command` o un modulo nuevo del documento.
@@ -8205,19 +9678,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 09:11 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cubrir la parte literal restante del documento en frontend: `CapabilityCard` dispatcher y `ModuleLayout` declarativo guiado por `data.module.cards`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / capability runtime / frontend declarativo / smoke autenticado
 
 ### Archivos tocados
+
 - `src/components/capabilities/CapabilityCard.tsx`
 - `src/components/capabilities/ModuleLayout.tsx`
 - `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
@@ -8227,6 +9705,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `tsconfig.json`
 
 ### Verificacion
+
 - `npx pnpm exec eslint src/components/capabilities/CapabilityCard.tsx src/components/capabilities/ModuleLayout.tsx src/views/greenhouse/GreenhouseCapabilityModule.tsx`: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
 - `npx pnpm lint`: correcto
@@ -8234,6 +9713,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `powershell -ExecutionPolicy Bypass -File .\\scripts\\run-capability-preview-smoke.ps1`: correcto
 
 ### Riesgos o pendientes
+
 - El dispatcher declarativo cubre los card types reales del registry actual (`metric`, `project-list`, `tooling-list`, `quality-list`), no aun el catalogo amplio completo del documento.
 - `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; se mantuvo el cleanup manual antes del commit.
 - Los modulos futuros y pipelines nuevas del documento siguen siendo backlog, no deuda de esta iteracion.
@@ -8241,19 +9721,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 08:39 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar la siguiente capa pendiente de `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`: query builders dedicados, cache por capability y guard server-side reusable, dejando el flujo validado y publicado.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / capability runtime / BigQuery / smoke autenticado / build local
 
 ### Archivos tocados
+
 - `src/config/capability-registry.ts`
 - `src/types/capabilities.ts`
 - `src/lib/capabilities/get-capability-module-data.ts`
@@ -8270,6 +9755,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint ...` sobre la nueva capa de capabilities: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
 - `npx pnpm lint`: correcto
@@ -8278,6 +9764,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `node .\\scripts\\mint-local-admin-jwt.js`: correcto
 
 ### Riesgos o pendientes
+
 - La UI de capabilities sigue siendo una composicion ejecutiva compartida; el avance de este turno separa la data layer y el guard, pero no implementa aun el dispatcher completo de card types propuesto por la spec.
 - `next build` sigue intentando reinyectar includes especificos en `tsconfig.json`; el workaround operativo sigue siendo limpiar esos paths autogenerados antes de commitear.
 - El documento original menciona modulos futuros como `Review Engine`, `Performance Center` o `SEO Monitor`; esos siguen fuera del scope activo y requeriran nuevas pipelines de datos.
@@ -8285,19 +9772,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 07:21 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar la validacion pendiente de `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` con preview admin autenticada, smoke local real y estabilizacion de la verificacion TypeScript en este worktree.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / admin preview / capability runtime / smoke local autenticado
 
 ### Archivos tocados
+
 - `src/lib/capabilities/get-capability-module-data.ts`
 - `src/lib/capabilities/module-content-builders.ts`
 - `src/types/capabilities.ts`
@@ -8312,6 +9804,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `gcloud auth login --update-adc`: correcto
 - `gcloud auth application-default print-access-token`: correcto
 - `npx pnpm exec eslint ...` sobre archivos de capabilities y preview admin: correcto
@@ -8323,6 +9816,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `/admin/tenants/space-efeonce/capability-preview/creative-hub`
 
 ### Riesgos o pendientes
+
 - El documento original sigue proponiendo query builders dedicados por module; hoy la data de cada capability sigue montada sobre el contrato de `/dashboard` con builders editoriales separados.
 - La ruta preview admin se movio a `capability-preview` porque el nesting anterior bajo `view-as/capabilities` provocaba corrupcion de route types en Next 16 durante typegen.
 - `tsconfig.json` deja fuera validators historicos de `.next-local/build-*`; la intencion es estabilizar la verificacion del repo actual y no compilar caches de ramas antiguas.
@@ -8330,19 +9824,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 00:54 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` sobre la arquitectura real del repo, alineando capabilities con `businessLines` y `serviceModules` ya resueltos en sesion y no con el modelo legacy de `greenhouse.clients`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / client portal / navegacion dinamica / capabilities runtime
 
 ### Archivos tocados
+
 - `src/types/capabilities.ts`
 - `src/config/capability-registry.ts`
 - `src/lib/capabilities/resolve-capabilities.ts`
@@ -8358,12 +9857,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm exec eslint ...` sobre los archivos tocados de capabilities y `VerticalMenu`: correcto
 - `npx tsc -p tsconfig.json --noEmit --pretty false`: correcto
 - `npx pnpm lint`: timeout en este worktree
 - `npx pnpm build`: timeout en este worktree
 
 ### Riesgos o pendientes
+
 - La capa nueva ejecuta la spec usando el runtime vigente (`client_users` + `client_service_modules` + tenant session) y no el JOIN legacy sugerido por el documento original; esa diferencia queda intencional.
 - La data de `/capabilities/[moduleId]` reutiliza el payload del dashboard actual; aun no existen query builders dedicados por module ni cache dedicada.
 - Conviene hacer smoke visual autenticado del sidebar dinamico y al menos un module route real (`/capabilities/creative-hub` o equivalente) antes de promover cambios mayores sobre esta linea.
@@ -8371,19 +9872,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-13 01:40 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar `docs/tasks/complete/CODEX_TASK_Microsoft_SSO_Greenhouse.md` adaptandolo al modelo real de Greenhouse (`greenhouse.client_users`) y no al esquema legacy de login sobre `greenhouse.clients`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development + auth runtime + BigQuery + configuracion Vercel
 
 ### Archivos tocados
+
 - `src/lib/auth.ts`
 - `src/lib/tenant/access.ts`
 - `src/types/next-auth.d.ts`
@@ -8403,6 +9909,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `changelog.md`
 
 ### Verificacion
+
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
 - Migracion BigQuery aplicada con el cliente Node del repo:
@@ -8418,6 +9925,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `Preview (develop)`: ahora tiene `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET`
 
 ### Riesgos o pendientes
+
 - El runtime auth ahora incluye un fallback para internos Efeonce que resuelve aliases `@efeonce.org` y `@efeoncepro.com` usando el perfil Microsoft antes de rechazar el SSO.
 - El task original pedía resolver SSO contra `greenhouse.clients`, pero el runtime real ya vive en `greenhouse.client_users`; el cambio se implemento sobre el modelo actual para no reintroducir el principal legacy.
 - Por seguridad, el flujo no auto-provisiona usuarios solo por `allowed_email_domains`; si el dominio coincide pero no existe un principal explicito en `client_users`, el login Microsoft cae en `/auth/access-denied`.
@@ -8427,30 +9935,37 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-12 16:10 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar el brief `docs/tasks/complete/CODEX_TASK_Admin_Landing_Control_Tower_Redesign.md` sobre la landing interna real `/internal/dashboard`.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / landing interna Efeonce
 
 ### Archivos tocados
+
 - `src/views/greenhouse/GreenhouseInternalDashboard.tsx`
 - `src/views/greenhouse/internal/dashboard/*`
 - `src/lib/internal/get-internal-dashboard-overview.ts`
 - `src/app/(dashboard)/internal/dashboard/loading.tsx`
 
 ### Verificacion
+
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
 - No se ejecuto validacion visual autenticada real en `/internal/dashboard`.
 
 ### Riesgos o pendientes
+
 - El CTA `Crear space` quedo visible pero deshabilitado porque el repo aun no tiene mutacion ni ruta real para onboarding de un nuevo space desde UI.
 - `Editar` y `Desactivar` existen como acciones del menu contextual pero siguen deshabilitadas; no hay workflow admin implementado para esas mutaciones.
 - La priorizacion operativa usa las senales disponibles hoy (`createdAt`, `lastLoginAt`, `scopedProjects`, `pendingResetUsers`, `avgOnTimePct`) y no una auditoria formal de onboarding multi-evento.
@@ -8458,19 +9973,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-12 13:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar el brief `docs/tasks/complete/CODEX_TASK_Client_Dashboard_Redesign.md` sobre la vista cliente real del dashboard.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / dashboard cliente y preview admin `view-as`
 
 ### Archivos tocados
+
 - `src/views/greenhouse/GreenhouseDashboard.tsx`
 - `src/views/greenhouse/dashboard/*`
 - `src/lib/dashboard/get-dashboard-overview.ts`
@@ -8487,11 +10007,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/types/next-auth.d.ts`
 
 ### Verificacion
+
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
 - No se ejecuto validacion visual autenticada real en `/dashboard` ni en `/admin/tenants/[id]/view-as/dashboard`.
 
 ### Riesgos o pendientes
+
 - El modal de ampliacion de equipo/ecosistema no dispara una notificacion real porque el repo aun no tiene endpoint ni workflow para enviar esa solicitud a owner, email o webhook; quedo como mensaje copiable.
 - La zona de `Tu stack` solo muestra herramientas con URL configurada; si la cuenta no tiene links reales guardados, cae al empty state aunque existan defaults por modulo.
 - La seccion de capacidad usa la capacidad visible hoy en la cuenta (`monthlyHours` + `averageAllocationPct`) y no una serie formal de utilization historica por 2+ meses.
@@ -8500,19 +10022,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-12 07:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Cerrar el modelado inicial de identidad interna Efeonce para no depender solo de `client_users` y dejar preparada la futura unificacion con Azure AD.
 
 ### Rama
+
 - Rama usada: actual de trabajo local
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - Development con aplicacion real en BigQuery
 
 ### Archivos tocados
+
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `bigquery/greenhouse_internal_identity_v1.sql`
 - `scripts/backfill-internal-identity-profiles.ts`
@@ -8521,6 +10048,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/GreenhouseAdminUserDetail.tsx`
 
 ### Verificacion
+
 - `npx pnpm backfill:internal-identity-profiles --dry-run`: correcto
 - `npx pnpm backfill:internal-identity-profiles`: correcto
 - Resultado real en BigQuery:
@@ -8530,28 +10058,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - ADC verificado sano con `gcloud auth application-default print-access-token`
 
 ### Riesgos o pendientes
+
 - No se hizo auto-merge entre `julio.reyes@efeonce.org` y `jreyes@efeoncepro.com`; esa clase de alias entre dominios queda como reconciliacion manual o futura regla revisada.
 - Falta corrida final de `lint` y `build` despues del bootstrap de identidad interna antes de commit si el turno se retoma desde aqui.
 - Azure AD no esta implementado; solo quedo la base canonica para enlazarlo despues.
 
 ### Fecha
+
 - 2026-03-12 09:15 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Documentar un sistema formal de orquestacion UI para Greenhouse basado en Vuexy/MUI.
 - Dejar un skill local reusable para que solicitudes de Claude, Codex u otros agentes se normalicen y mapeen al mismo criterio.
 
 ### Rama
+
 - Rama usada: `develop`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / documentacion operativa
 
 ### Archivos tocados
+
 - `docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
 - `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
@@ -8563,6 +10098,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `C:/Users/jreye/.codex/skills/greenhouse-ui-orchestrator/agents/openai.yaml`
 
 ### Verificacion
+
 - Revision documental del modelo actual en:
   - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
   - `references/ui-ux-vuexy.md` del skill `greenhouse-vuexy-portal`
@@ -8582,33 +10118,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - No se ejecuto `lint` ni `build` porque el cambio es documental y de skill local.
 
 ### Riesgos o pendientes
+
 - El skill local nuevo no queda automaticamente disponible en el listado de skills de esta sesion; puede requerir nueva sesion o recarga de entorno para ser invocable como skill registrada.
 - El catalogo es una primera curacion; falta sumar patrones especificos de `/admin/tenants`, futuras scopes y feature flags, y surfaces de `/equipo` y `/campanas`.
 - Falta decidir si el siguiente paso sera solo consulta o si tambien se construira una herramienta interna que consuma el brief y recomiende patrones desde UI.
 
 ### Proximo paso recomendado
+
 - Aplicar este sistema al siguiente trabajo visual real sobre `/admin/tenants/[id]` o `/dashboard`.
 - Si el flujo resulta estable, promover el orquestador a una practica obligatoria en todas las solicitudes UI del repo.
 
 ### Fecha
+
 - 2026-03-12 09:02 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Preparar el smoke funcional del nuevo modelo escalable de provisioning por batches.
 - Dejar explicitado que este trabajo sigue abierto y no debe mezclarse aun con `develop`.
 
 ### Rama
+
 - Rama usada: `feature/scalable-tenant-contact-provisioning`
 - Commit actual del feature: `bc8b546`
 - Rama objetivo del merge: ninguna aun; smoke pendiente antes de promover a `develop`
 
 ### Ambiente objetivo
+
 - Development local / feature branch aislada
 
 ### Archivos tocados
+
 - `src/lib/admin/tenant-member-provisioning-shared.ts`
 - `src/lib/admin/tenant-contact-provisioning-snapshot.ts`
 - `src/lib/admin/get-admin-tenant-detail.ts`
@@ -8617,6 +10161,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 
 ### Verificacion
+
 - `npx pnpm lint`: correcto
 - `npx tsc -p tsconfig.json --noEmit`: correcto
 - `npx pnpm build`: bloqueado en este worktree por limitacion de Turbopack/Windows/OneDrive con paths largos, no por error de tipos del cambio
@@ -8629,32 +10174,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - verificacion final contra BigQuery + Cloud Run: `tenantUserCount = 6`, `liveContactCount = 6`, `missingCount = 0`
 
 ### Riesgos o pendientes
+
 - El batching nuevo ya fue smokeado funcionalmente; falta solo decidir promocion.
 - No mergear aun esta rama a `develop` ni `main`.
 - El checkout principal del usuario sigue con `.gitignore` modificado; este feature se esta trabajando aparte para no colisionar con ese estado local.
 
 ### Proximo paso recomendado
+
 - Promover `feature/scalable-tenant-contact-provisioning` a `develop`.
 - Despues validar en preview o staging una corrida equivalente antes de llevarlo a `main`.
 
 ### Fecha
+
 - 2026-03-12 08:45 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Hacer escalable el provisioning de contactos HubSpot sin romper el boundary por tenant.
 - Eliminar la dependencia de una sola request larga para corridas bulk.
 
 ### Rama
+
 - Rama usada: `docs/production-closeout`
 - Rama objetivo del merge: por definir antes de promover a `develop` y `main`
 
 ### Ambiente objetivo
+
 - Development / pre-merge
 
 ### Archivos tocados
+
 - `src/lib/admin/tenant-member-provisioning-shared.ts`
 - `src/lib/admin/tenant-contact-provisioning-snapshot.ts`
 - `src/lib/admin/get-admin-tenant-detail.ts`
@@ -8663,6 +10216,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 
 ### Verificacion
+
 - Cambio funcional implementado:
   - la pantalla admin ahora hace una sola lectura live inicial de contactos y reutiliza un snapshot firmado por el servidor
   - el endpoint ya no acepta corridas largas: limita el request a `4` contactos por llamada
@@ -8674,31 +10228,39 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `npx pnpm build`: bloqueado por limitacion de Turbopack/Windows/OneDrive con paths largos en el worktree largo, no por un error de tipos del cambio
 
 ### Riesgos o pendientes
+
 - Falta smoke funcional del batching nuevo en un runtime real antes de promover.
 - La rama de trabajo actual nacio como cierre documental y ahora contiene codigo; conviene reetiquetarla o mover estos commits a una rama de feature antes del merge.
 
 ### Proximo paso recomendado
+
 - Crear una rama de feature limpia para este cambio escalable.
 - Hacer smoke local o preview de la UI admin ejecutando varios lotes secuenciales.
 - Si el smoke sale bien, promover primero a `develop`.
 
 ### Fecha
+
 - 2026-03-12 22:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Ejecutar `docs/tasks/complete/CODEX_TASK_Tenant_Detail_View_Redesign.md` y rediseñar `/admin/tenants/[id]` con header, tabs y patrones Vuexy reutilizados desde `full-version`.
 
 ### Rama
+
 - Rama usada: actual de trabajo local
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - Admin surface del repo `starter-kit`
 
 ### Archivos tocados
+
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 - `src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx`
 - `src/views/greenhouse/admin/tenants/TenantUsersTable.tsx`
@@ -8712,35 +10274,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - `npx pnpm lint`: correcto
 - `npx pnpm build`: correcto
 - La ruta `ƒ /admin/tenants/[id]` sigue compilando en el build de Next.js
 - No se ejecuto validacion visual autenticada real en navegador sobre la ruta; solo validacion estatica y de build
 
 ### Riesgos o pendientes
+
 - El brief pedia notas operativas editables, pero no existe una mutacion ya expuesta para `notes`; la vista quedo preparada como lectura clara, no como editor persistente.
 - El repo no trae `@mui/x-data-grid`; la tabla de usuarios y la de service modules quedaron resueltas con el patron Vuexy existente sobre `@tanstack/react-table` y `TablePaginationComponent`.
 - Conviene correr la validacion visual autentica descrita en `docs/ui/GREENHOUSE_VISUAL_VALIDATION_METHOD_V1.md` sobre `/admin/tenants/[id]` y revisar responsive en tablet antes de cerrar commit final.
 
 ### Fecha
+
 - 2026-03-13 11:35 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Implementar la fase principal de alineacion a `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` sin mezclar trabajo de agente/runtime AI.
 - Canonicalizar microcopy cliente e `internal/admin` en `src/config/greenhouse-nomenclature.ts`.
 - Completar piezas faltantes del portal cliente: `Updates`, `Tu equipo de cuenta` en `Mi Greenhouse`, y `Ciclos` con modulos base adicionales.
 
 ### Rama
+
 - Rama usada: actual de trabajo local
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - Cliente + `internal/admin` en `starter-kit`
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts`
 - `src/components/greenhouse/AccountTeamDossierSection.tsx`
 - `src/components/greenhouse/index.ts`
@@ -8773,6 +10343,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `Handoff.md`
 
 ### Verificacion
+
 - Cambio funcional implementado:
   - se agrego la ruta cliente `/updates` y su navegacion asociada
   - `Mi Greenhouse` ahora incorpora el dossier `Tu equipo de cuenta`
@@ -8785,32 +10356,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `pnpm exec tsc -p tsconfig.json --noEmit --pretty false --incremental false`: bloqueado por archivo ajeno `src/config/capability-registry (1).ts`
 
 ### Riesgos o pendientes
+
 - Sigue quedando copy residual legacy en superficies internas grandes no barridas completas en este turno, especialmente `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`.
 - No se ejecuto smoke visual autenticado real; la validacion fue estatica.
 - `tsc` sigue bloqueado por el archivo duplicado ajeno `src/config/capability-registry (1).ts`, fuera del alcance de esta alineacion.
 
 ### Proximo paso recomendado
+
 - Barrer `GreenhouseAdminTenantDetail.tsx` y `GreenhouseAdminTenantDashboardPreview.tsx` para terminar de sacar copy residual interna.
 - Ejecutar smoke visual autenticado de `/dashboard`, `/proyectos/[id]`, `/settings`, `/sprints`, `/updates`, `/admin`, `/admin/users/[id]`.
 - Resolver o eliminar el archivo duplicado `src/config/capability-registry (1).ts` antes del siguiente `build/tsc` integral.
 
 ### Fecha
+
 - 2026-03-13 18:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Extender la alineacion de nomenclatura Greenhouse a `admin/tenants/[id]`, `view-as/dashboard` y los subcomponentes operativos del detalle de space.
 
 ### Rama
+
 - Rama usada: `fix/internal-nav-nomenclature-hydration`
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - `internal/admin` del repo `starter-kit`
 
 ### Archivos tocados
+
 - `src/config/greenhouse-nomenclature.ts`
 - `src/views/greenhouse/GreenhouseAdminTenantDetail.tsx`
 - `src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx`
@@ -8822,59 +10401,75 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `project_context.md`
 
 ### Verificacion
+
 - `pnpm exec eslint src/config/greenhouse-nomenclature.ts src/views/greenhouse/GreenhouseAdminTenantDetail.tsx src/views/greenhouse/GreenhouseAdminTenantDashboardPreview.tsx src/views/greenhouse/admin/tenants/TenantCapabilityManager.tsx src/views/greenhouse/admin/tenants/TenantServiceModulesTable.tsx src/views/greenhouse/admin/tenants/TenantDetailErrorBoundary.tsx`: correcto
 
 ### Riesgos o pendientes
+
 - El detalle de tenant queda mucho mas alineado, pero aun puede sobrevivir copy residual menor ligado a labels tecnicas de HubSpot owner/base URL o textos de dominio que el equipo quiera hispanizar mas adelante.
 - Sigue pendiente smoke visual autenticado de `admin/tenants/[id]` y `view-as/dashboard`.
 
 ### Fecha
+
 - 2026-03-14 10:05 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Re-asignar `pre-greenhouse.efeoncepro.com` para que apunte al preview activo de `HR Payroll` y dejar claro el nuevo destino compartido de pruebas.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - Vercel Preview compartido / `pre-greenhouse`
 
 ### Cambios realizados
+
 - Se confirmo que `feature/hr-payroll` tenia previews `Ready` propios, pero `pre-greenhouse.efeoncepro.com` no apuntaba a esa rama.
 - Se detecto que el scope correcto para operar el dominio era `efeonce-7670142f`, no el scope personal `efeonce`.
 - Se reasigno `pre-greenhouse.efeoncepro.com` al deployment `greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app` correspondiente al preview actual de `feature/hr-payroll`.
 
 ### Verificacion
+
 - `pnpm dlx vercel@latest alias set greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto
 - `pnpm dlx vercel@latest curl /login --deployment https://pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto, responde login con `Entrar con Microsoft` y `Entrar con Google`
 - `pnpm dlx vercel@latest curl /api/hr/payroll/periods --deployment https://pre-greenhouse.efeoncepro.com --scope efeonce-7670142f`: correcto, responde `{\"error\":\"Unauthorized\"}` sin sesion
 
 ### Riesgos o pendientes
+
 - `pre-greenhouse` es un alias compartido; cualquier otro agente que lo necesite para otra rama tendra que re-asignarlo conscientemente.
 - Falta validacion humana autenticada del flujo completo de `HR Payroll` sobre `pre-greenhouse`.
 
 ### Fecha
+
 - 2026-03-14 10:28 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Corregir el bloqueo real de login en `pre-greenhouse` para `feature/hr-payroll` y aislar si el rechazo restante era de infraestructura o de password.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - Vercel Preview compartido / `pre-greenhouse`
 
 ### Cambios realizados
+
 - Se detecto por logs que el login por `credentials` estaba fallando antes de validar password por un error de BigQuery:
   - `Cannot parse REYES@EFEONCE as CloudRegion`
 - Se corrigieron las env vars branch-specific de `Preview (feature/hr-payroll)`:
@@ -8885,6 +10480,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Se re-asigno `pre-greenhouse.efeoncepro.com` a ese deployment corregido.
 
 ### Verificacion
+
 - `vercel logs` antes del fix: confirmo error de infraestructura en callback `credentials`
 - `vercel env add ... --force` para `GCP_PROJECT` y `NEXTAUTH_URL`: correcto
 - `vercel redeploy greenhouse-hpw9s8fkp-efeonce-7670142f.vercel.app --scope efeonce-7670142f`: correcto
@@ -8897,26 +10493,33 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el rechazo restante es `password mismatch or inactive user`, por lo que el bloqueo de infraestructura quedo resuelto y el fallo actual es solo de password no coincidente
 
 ### Riesgos o pendientes
+
 - El preview ya no rompe por BigQuery durante login, pero el acceso por email/password seguira fallando mientras no se use la password correcta o no se resetee la credencial del usuario.
 - Para usuarios internos de Efeonce, el flujo recomendado sigue siendo `Entrar con Microsoft`; el principal ya existe y el path SSO es mas apropiado que depender de password manual.
 
 ### Fecha
+
 - 2026-03-14 10:52 America/Santiago
 
 ### Agente
+
 - Codex
 
 ### Objetivo del turno
+
 - Provisionar accesos internos nuevos para el equipo Efeonce en Greenhouse sin tocar la cuenta existente de Julio y dejar sus claves temporales en un archivo local separado.
 
 ### Rama
+
 - Rama usada: `feature/hr-payroll`
 - Rama objetivo: la rama activa del repo
 
 ### Ambiente objetivo
+
 - BigQuery real / `pre-greenhouse`
 
 ### Cambios realizados
+
 - Se confirmo que, de la lista entregada, solo `Julio Reyes` ya existia como `client_user`; su cuenta y password no se tocaron.
 - Se verifico que las otras 6 personas ya existian en `greenhouse.team_members` / `greenhouse.identity_profiles`, por lo que se provisiono solo la capa de acceso en `greenhouse.client_users`.
 - Se crearon 6 usuarios internos nuevos en `greenhouse.client_users`, enlazados por `identity_profile_id` y con `microsoft_email` igual al correo `@efeoncepro.com`:
@@ -8934,6 +10537,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - el archivo fue agregado a `.git/info/exclude` para no commitearlo por accidente
 
 ### Verificacion
+
 - Query real a BigQuery despues del alta:
   - las 6 cuentas nuevas aparecen activas en `greenhouse.client_users`
   - cada una con `identity_profile_id` y `role_codes` esperados
@@ -8941,6 +10545,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `POST /api/auth/callback/credentials` devolvio `https://pre-greenhouse.efeoncepro.com/auth/landing`
 
 ### Riesgos o pendientes
+
 - El archivo `LOCAL_INTERNAL_TEAM_ACCESS_CREDENTIALS_2026-03-14.md` es sensible y local-only; no debe compartirse ni commitearse.
 - Algunos perfiles canonicos siguen anclados a HubSpot o `greenhouse_team`; hoy eso no bloquea login porque `client_users.identity_profile_id` y `identity_profile_source_links` ya quedaron creados.
 - Si se quiere endurecer la gobernanza, el siguiente paso seria crear un flujo formal de reset/rotacion de passwords temporales para internos.
@@ -8950,35 +10555,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 21:00 America/Santiago
 
 ### Agente
+
 - Claude (claude-opus-4-6)
 
 ### Objetivo del turno
+
 - Implementación de Phase 1 del módulo financiero (CODEX_TASK_Financial_Module.md): infraestructura BigQuery, auth, guards, sidebar, API routes, placeholder pages y diseño UX del dashboard.
 
 ### Rama
+
 - Rama usada: `feature/finance-module` (desde `origin/develop`)
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos creados
 
 #### Infraestructura backend
+
 - `src/lib/finance/schema.ts` — `ensureFinanceInfrastructure()`: provisioning on-demand de 8 tablas BigQuery (`fin_accounts`, `fin_suppliers`, `fin_client_profiles`, `fin_income`, `fin_expenses`, `fin_reconciliation_periods`, `fin_bank_statement_rows`, `fin_exchange_rates`) + seed del rol `finance_manager`. Patrón singleton promise idempotente.
 - `src/lib/finance/shared.ts` — `FinanceValidationError`, validators (`assertValidCurrency`, `assertPositiveAmount`, `assertNonEmptyString`, `assertDateString`), tipos (`FinanceCurrency`, `AccountType`, `PaymentMethod`, `ExpenseType`, `PaymentStatus`, `ServiceLine`), helper `runFinanceQuery<T>()`, normalizadores.
 
 #### Auth y access
+
 - `src/lib/tenant/authorization.ts` — Agregado `'finance'` al tipo `TenantRouteGroup` + función `requireFinanceTenantContext()` (permite `routeGroups.includes('finance') || roleCodes.includes('efeonce_admin')`).
 - `src/lib/tenant/access.ts` — Agregado mapeo `finance_manager` → `['internal', 'finance']` en `deriveRouteGroups()`.
 
 #### API Routes
+
 - `src/app/api/finance/accounts/route.ts` — GET (lista cuentas activas), POST (crear cuenta con validación)
 - `src/app/api/finance/accounts/[id]/route.ts` — PUT (actualización parcial dinámica con check 404)
 - `src/app/api/finance/exchange-rates/route.ts` — GET (lista con filtros de fecha), POST (upsert con MERGE)
 - `src/app/api/finance/exchange-rates/latest/route.ts` — GET (último tipo de cambio USD/CLP)
 
 #### Pages y layout
+
 - `src/app/(dashboard)/finance/layout.tsx` — Guard de ruta: requiere route group `finance` o `efeonce_admin`
 - `src/app/(dashboard)/finance/page.tsx` — Placeholder dashboard
 - `src/app/(dashboard)/finance/income/page.tsx` — Placeholder ingresos
@@ -8988,15 +10601,18 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/app/(dashboard)/finance/reconciliation/page.tsx` — Placeholder conciliación
 
 #### Navegación
+
 - `src/components/layout/vertical/VerticalMenu.tsx` — Agregada sección "Finanzas" con 6 items (Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación). Visible solo para `isFinanceUser || isAdminUser`.
 
 ### Verificación
+
 - `pnpm exec tsc --noEmit`: sin errores en código fuente (errores solo en `.next` cache stale de SCIM/smoke tests, no relacionados)
 - Todos los campos monetarios usan `NUMERIC` (no `FLOAT64`) en DDL
 - `amount_pending` no existe como columna física — se calcula como `total_amount - COALESCE(amount_paid, 0)`
 - Tipos `unknown` en BigQuery rows resueltos con type assertions explícitas
 
 ### Finance Dashboard — Implementado
+
 - **View component creado**: `src/views/greenhouse/finance/FinanceDashboardView.tsx` (client component, ~450 líneas)
 - **Spec UX producida por greenhouse-ux skill e implementada completa:**
   - 4 KPIs (`HorizontalWithSubtitle`): Saldo total (primary), Ingresos del mes (success), Egresos del mes (error), Tipo de cambio (info)
@@ -9011,11 +10627,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - **tsc --noEmit**: sin errores en código fuente
 
 ### Paralelismo con SCIM (Codex)
+
 - **Zero conflicto confirmado**: SCIM trabaja en `src/app/api/scim/`, `src/lib/scim/` — Finance en `src/app/api/finance/`, `src/lib/finance/`
 - No comparten tablas BQ, rutas, componentes UI ni auth mechanisms
 - Ramas independientes: `feature/scim-provisioning` vs `feature/finance-module`
 
 ### Riesgos o pendientes
+
 - **Phase 3**: Income y Expenses CRUD con tablas TanStack
 - **Phase 4**: Reconciliación bancaria con auto-match algorithm
 - **Endpoints de summary**: `/api/finance/income/summary` y `/api/finance/expenses/summary` no existen aún — dashboard muestra placeholder
@@ -9026,32 +10644,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 22:00 America/Santiago
 
 ### Agente
+
 - Claude (claude-opus-4-6)
 
 ### Objetivo del turno
+
 - Phase 2 del módulo financiero: Suppliers y Clients CRUD completo (API routes + UI views con KPIs, filtros y tablas).
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos creados/modificados
 
 #### shared.ts ampliado
+
 - `src/lib/finance/shared.ts` — Agregados tipos: `SUPPLIER_CATEGORIES`, `TAX_ID_TYPES`, `CONTACT_ROLES` con sus type exports
 
 #### API Routes — Suppliers
+
 - `src/app/api/finance/suppliers/route.ts` — GET (lista con paginación + filtros: category, country, international, active) + POST (crear con validación, slug auto-generado desde legalName)
 - `src/app/api/finance/suppliers/[id]/route.ts` — GET (detalle + payment history de fin_expenses) + PUT (actualización parcial dinámica, 15+ campos editables)
 
 #### API Routes — Clients
+
 - `src/app/api/finance/clients/route.ts` — GET (lista con paginación + filtros: search, requiresPo, requiresHes) + POST (upsert con MERGE por client_profile_id)
 - `src/app/api/finance/clients/[id]/route.ts` — GET (perfil financiero + invoices de fin_income, JSON parse finance_contacts) + PUT (actualización parcial, incluyendo finance_contacts JSON)
 
 #### UI Views
+
 - `src/views/greenhouse/finance/SuppliersListView.tsx` — Client component con:
   - 4 KPIs: Total proveedores, Activos, Internacionales, Categoría principal
   - Filtros: categoría (9 opciones), nacional/internacional
@@ -9064,10 +10690,12 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - Loading skeleton, empty state
 
 #### Pages actualizadas
+
 - `src/app/(dashboard)/finance/suppliers/page.tsx` — Usa `SuppliersListView`
 - `src/app/(dashboard)/finance/clients/page.tsx` — Usa `ClientsListView`
 
 ### Verificación
+
 - `pnpm exec tsc --noEmit`: 0 errores en código fuente
 - CustomChip `round` prop usa `'true'` string (no boolean) — patrón Vuexy v5
 - Grid usa `size={{ xs, sm, md }}` — patrón MUI v6
@@ -9075,6 +10703,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Paginación implementada con `page/pageSize` query params, max 200
 
 ### Riesgos o pendientes
+
 - **Phase 4**: Reconciliación bancaria con auto-match algorithm
 - **Detail views**: Suppliers y Clients tienen API GET [id] listas pero las pages de detalle (`/finance/suppliers/[id]`, `/finance/clients/[id]`) aún no existen como views con tabs
 - **Endpoints de summary**: `/api/finance/income/summary` y `/api/finance/expenses/summary` no existen aún — dashboard muestra placeholder
@@ -9084,29 +10713,36 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 22:45 America/Santiago
 
 ### Agente
+
 - Claude (claude-opus-4-6)
 
 ### Objetivo del turno
+
 - Phase 3 del módulo financiero: Income y Expenses CRUD completo (API routes con paginación/filtros + UI views con KPIs, filtros y tablas).
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos creados
 
 #### API Routes — Income
+
 - `src/app/api/finance/income/route.ts` — GET (lista con paginación + filtros: status, clientProfileId, serviceLine, fromDate, toDate) + POST (crear factura con cálculo automático de IVA, tipo de cambio, total CLP, ID auto-generado `INC-YYYYMM-NNNNNN`)
 - `src/app/api/finance/income/[id]/route.ts` — PUT (actualización parcial, 20+ campos editables)
 
 #### API Routes — Expenses
+
 - `src/app/api/finance/expenses/route.ts` — GET (lista con paginación + filtros: expenseType, status, supplierId, serviceLine, fromDate, toDate) + POST (crear egreso con 5 tipos: supplier/payroll/social_security/tax/miscellaneous, ID auto-generado `EXP-YYYYMM-NNNNNN`)
 - `src/app/api/finance/expenses/[id]/route.ts` — PUT (actualización parcial con campos numéricos, strings y enums tipados)
 
 #### UI Views
+
 - `src/views/greenhouse/finance/IncomeListView.tsx` — Client component con:
   - 4 KPIs: Total facturado (CLP), Por cobrar, Cobrados, Vencidos
   - Filtro por estado de pago (pending/partial/paid/overdue)
@@ -9119,13 +10755,16 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - Chips de tipo con colores semánticos (supplier=primary, payroll=info, tax=error, etc.)
 
 #### Pages actualizadas
+
 - `src/app/(dashboard)/finance/income/page.tsx` — Usa `IncomeListView`
 - `src/app/(dashboard)/finance/expenses/page.tsx` — Usa `ExpensesListView`
 
 #### shared.ts ampliado
+
 - `src/lib/finance/shared.ts` — Ya incluía `SUPPLIER_CATEGORIES`, `TAX_ID_TYPES`, `CONTACT_ROLES` de Phase 2
 
 ### Verificación
+
 - `pnpm exec tsc --noEmit`: 0 errores en código fuente
 - Income POST calcula automáticamente: taxAmount = subtotal × taxRate, totalAmount = subtotal + taxAmount, totalAmountClp = totalAmount × exchangeRateToClp
 - Expenses soporta los 5 expense_types del DDL con campos específicos por tipo (supplier_id para supplier, payroll_period_id para payroll, etc.)
@@ -9133,23 +10772,24 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Resumen acumulado del módulo financiero
 
-| Componente | Archivos | Estado |
-|---|---|---|
-| Infraestructura BQ (8 tablas + rol) | `schema.ts` | Completo |
-| Shared validators/types | `shared.ts` | Completo |
-| Auth + access control | `authorization.ts`, `access.ts` | Completo |
-| Layout + guard | `finance/layout.tsx` | Completo |
-| Sidebar navigation | `VerticalMenu.tsx` | Completo |
-| Dashboard (KPIs + charts) | `FinanceDashboardView.tsx` | Completo |
-| Accounts API | `accounts/route.ts`, `accounts/[id]/route.ts` | Completo |
-| Exchange Rates API | `exchange-rates/route.ts`, `latest/route.ts` | Completo |
-| Suppliers API + UI | 2 API routes + `SuppliersListView.tsx` | Completo |
-| Clients API + UI | 2 API routes + `ClientsListView.tsx` | Completo |
-| Income API + UI | 2 API routes + `IncomeListView.tsx` | Completo |
-| Expenses API + UI | 2 API routes + `ExpensesListView.tsx` | Completo |
-| Reconciliation | Placeholder page only | Pendiente (Phase 4) |
+| Componente                          | Archivos                                      | Estado              |
+| ----------------------------------- | --------------------------------------------- | ------------------- |
+| Infraestructura BQ (8 tablas + rol) | `schema.ts`                                   | Completo            |
+| Shared validators/types             | `shared.ts`                                   | Completo            |
+| Auth + access control               | `authorization.ts`, `access.ts`               | Completo            |
+| Layout + guard                      | `finance/layout.tsx`                          | Completo            |
+| Sidebar navigation                  | `VerticalMenu.tsx`                            | Completo            |
+| Dashboard (KPIs + charts)           | `FinanceDashboardView.tsx`                    | Completo            |
+| Accounts API                        | `accounts/route.ts`, `accounts/[id]/route.ts` | Completo            |
+| Exchange Rates API                  | `exchange-rates/route.ts`, `latest/route.ts`  | Completo            |
+| Suppliers API + UI                  | 2 API routes + `SuppliersListView.tsx`        | Completo            |
+| Clients API + UI                    | 2 API routes + `ClientsListView.tsx`          | Completo            |
+| Income API + UI                     | 2 API routes + `IncomeListView.tsx`           | Completo            |
+| Expenses API + UI                   | 2 API routes + `ExpensesListView.tsx`         | Completo            |
+| Reconciliation                      | Placeholder page only                         | Pendiente (Phase 4) |
 
 ### Riesgos o pendientes
+
 - **Detail views con tabs**: Suppliers [id], Clients [id] — APIs GET listas, falta UI con tabs
 - **Dashboard data real**: Endpoints de summary para alimentar KPIs y charts del dashboard
 - **Formularios de creación**: Botones "Registrar ingreso/egreso/período" existen pero no abren drawer/modal aún
@@ -9159,21 +10799,26 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 23:30 America/Santiago
 
 ### Agente
+
 - Claude (claude-opus-4-6)
 
 ### Objetivo del turno
+
 - Phase 4 del módulo financiero: Reconciliación bancaria completa con auto-match algorithm, import de cartolas y gestión de períodos.
 
 ### Rama
+
 - Rama usada: `feature/finance-module`
 - Rama objetivo del merge: `develop`
 
 ### Ambiente objetivo
+
 - Development / Preview
 
 ### Archivos creados
 
 #### API Routes — Reconciliation
+
 - `src/app/api/finance/reconciliation/route.ts` — GET (lista de períodos con filtros: accountId, status) + POST (crear período con validación de duplicados, ID auto-generado `{accountId}_{year}_{month}`)
 - `src/app/api/finance/reconciliation/[id]/route.ts` — GET (detalle del período + todas las filas de cartola bancaria) + PUT (actualizar saldos, status, marcar como reconciled con timestamp y user)
 - `src/app/api/finance/reconciliation/[id]/statements/route.ts` — POST (importar filas de cartola bancaria, máximo 500 rows, actualiza metadata del período, cambia status a in_progress)
@@ -9185,6 +10830,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - Retorna `{ matched, suggested, unmatched, total }`
 
 #### UI View
+
 - `src/views/greenhouse/finance/ReconciliationView.tsx` — Client component con:
   - 4 KPIs: Períodos totales, Conciliados, En proceso, Diferencia total pendiente
   - Filtros: cuenta bancaria (dinámico desde API accounts), estado
@@ -9192,9 +10838,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - Nombres de mes en español
 
 #### Page actualizada
+
 - `src/app/(dashboard)/finance/reconciliation/page.tsx` — Usa `ReconciliationView`
 
 ### Verificación
+
 - `pnpm exec tsc --noEmit`: 0 errores en código fuente
 - Auto-match algorithm protegido: no permite match en períodos reconciled/closed
 - Import de statements protegido contra períodos cerrados
@@ -9202,24 +10850,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Resumen final del módulo financiero completo
 
-| Componente | API Routes | UI View | Estado |
-|---|---|---|---|
-| Infraestructura BQ (8 tablas + rol) | — | — | ✅ |
-| Auth + access control | — | — | ✅ |
-| Dashboard | — | `FinanceDashboardView` | ✅ |
-| Accounts | GET, POST, PUT | — | ✅ |
-| Exchange Rates | GET, POST, GET latest | — | ✅ |
-| Suppliers | GET, POST, GET [id], PUT [id] | `SuppliersListView` | ✅ |
-| Clients | GET, POST, GET [id], PUT [id] | `ClientsListView` | ✅ |
-| Income | GET, POST, PUT [id] | `IncomeListView` | ✅ |
-| Expenses | GET, POST, PUT [id] | `ExpensesListView` | ✅ |
-| Reconciliation | GET, POST, GET [id], PUT [id] | `ReconciliationView` | ✅ |
-| Statement Import | POST [id]/statements | — | ✅ |
-| Auto-match | POST [id]/auto-match | — | ✅ |
+| Componente                          | API Routes                    | UI View                | Estado |
+| ----------------------------------- | ----------------------------- | ---------------------- | ------ |
+| Infraestructura BQ (8 tablas + rol) | —                             | —                      | ✅     |
+| Auth + access control               | —                             | —                      | ✅     |
+| Dashboard                           | —                             | `FinanceDashboardView` | ✅     |
+| Accounts                            | GET, POST, PUT                | —                      | ✅     |
+| Exchange Rates                      | GET, POST, GET latest         | —                      | ✅     |
+| Suppliers                           | GET, POST, GET [id], PUT [id] | `SuppliersListView`    | ✅     |
+| Clients                             | GET, POST, GET [id], PUT [id] | `ClientsListView`      | ✅     |
+| Income                              | GET, POST, PUT [id]           | `IncomeListView`       | ✅     |
+| Expenses                            | GET, POST, PUT [id]           | `ExpensesListView`     | ✅     |
+| Reconciliation                      | GET, POST, GET [id], PUT [id] | `ReconciliationView`   | ✅     |
+| Statement Import                    | POST [id]/statements          | —                      | ✅     |
+| Auto-match                          | POST [id]/auto-match          | —                      | ✅     |
 
 **Total: 20 API endpoints + 6 UI views + 8 BigQuery tables + sidebar navigation + route guards**
 
 ### Pendientes menores (no bloqueantes)
+
 - ~~**Detail views con tabs**: Suppliers [id] y Clients [id] tienen API GET lista pero no UI de detalle~~ ✅ Resuelto
 - ~~**Dashboard data real**: Summary endpoints para alimentar charts y KPIs 2-3 con datos reales~~ ✅ Resuelto
 - **Formularios modales**: Botones de creación (ingreso/egreso/período/proveedor) sin drawer/modal aún
@@ -9229,28 +10878,35 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-14 14:55 America/Santiago
 
 ### Agente
+
 - Claude Code (Opus 4.6)
 
 ### Objetivo del turno
+
 - Completar pendientes del módulo financiero: wiring de dashboard a datos reales, detail views con tabs para Suppliers/Clients/Reconciliation
 
 ### Rama
+
 - `feature/admin-team-crud` (continuación del trabajo financiero)
 - Target: `develop`
 
 ### Ambiente objetivo
+
 - Preview / Development
 
 ### Archivos tocados
 
 **Summary API endpoints (nuevos)**:
+
 - `src/app/api/finance/income/summary/route.ts` — Current month vs previous + last 6 months breakdown
 - `src/app/api/finance/expenses/summary/route.ts` — Same pattern for expenses
 
 **Dashboard wiring (actualizado)**:
+
 - `src/views/greenhouse/finance/FinanceDashboardView.tsx` — Ahora consume `/api/finance/income/summary` y `/api/finance/expenses/summary` para KPIs reales (Ingresos del mes con trend, Egresos del mes con trend) y charts con datos mensuales dinámicos
 
 **Detail pages (nuevos)**:
+
 - `src/app/(dashboard)/finance/suppliers/[id]/page.tsx` — Server page
 - `src/views/greenhouse/finance/SupplierDetailView.tsx` — Detalle con 2 tabs (Información + Historial de pagos), datos bancarios, contacto, categoría
 - `src/app/(dashboard)/finance/clients/[id]/page.tsx` — Server page
@@ -9259,6 +10915,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `src/views/greenhouse/finance/ReconciliationDetailView.tsx` — Detalle con KPIs, tabla de statement rows, botón auto-match, chips de match status
 
 ### Verificación
+
 - `pnpm exec tsc --noEmit`: 0 errores en código fuente (solo cache artifacts de `.next`/`.next-local`)
 - Dashboard KPIs 2-3 ahora muestran datos reales con trend arrows
 - Charts bar/area reciben categorías dinámicas de los últimos 6 meses
@@ -9266,24 +10923,25 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ### Resumen actualizado del módulo financiero
 
-| Componente | API Routes | UI Views | Estado |
-|---|---|---|---|
-| Infraestructura BQ (8 tablas + rol) | — | — | ✅ |
-| Auth + access control | — | — | ✅ |
-| Dashboard | GET income/summary, GET expenses/summary | `FinanceDashboardView` (wired) | ✅ |
-| Accounts | GET, POST, PUT | — | ✅ |
-| Exchange Rates | GET, POST, GET latest | — | ✅ |
-| Suppliers | GET, POST, GET [id], PUT [id] | `SuppliersListView` + `SupplierDetailView` | ✅ |
-| Clients | GET, POST, GET [id], PUT [id] | `ClientsListView` + `ClientDetailView` | ✅ |
-| Income | GET, POST, PUT [id], GET summary | `IncomeListView` | ✅ |
-| Expenses | GET, POST, PUT [id], GET summary | `ExpensesListView` | ✅ |
-| Reconciliation | GET, POST, GET [id], PUT [id] | `ReconciliationView` + `ReconciliationDetailView` | ✅ |
-| Statement Import | POST [id]/statements | — | ✅ |
-| Auto-match | POST [id]/auto-match | — | ✅ |
+| Componente                          | API Routes                               | UI Views                                          | Estado |
+| ----------------------------------- | ---------------------------------------- | ------------------------------------------------- | ------ |
+| Infraestructura BQ (8 tablas + rol) | —                                        | —                                                 | ✅     |
+| Auth + access control               | —                                        | —                                                 | ✅     |
+| Dashboard                           | GET income/summary, GET expenses/summary | `FinanceDashboardView` (wired)                    | ✅     |
+| Accounts                            | GET, POST, PUT                           | —                                                 | ✅     |
+| Exchange Rates                      | GET, POST, GET latest                    | —                                                 | ✅     |
+| Suppliers                           | GET, POST, GET [id], PUT [id]            | `SuppliersListView` + `SupplierDetailView`        | ✅     |
+| Clients                             | GET, POST, GET [id], PUT [id]            | `ClientsListView` + `ClientDetailView`            | ✅     |
+| Income                              | GET, POST, PUT [id], GET summary         | `IncomeListView`                                  | ✅     |
+| Expenses                            | GET, POST, PUT [id], GET summary         | `ExpensesListView`                                | ✅     |
+| Reconciliation                      | GET, POST, GET [id], PUT [id]            | `ReconciliationView` + `ReconciliationDetailView` | ✅     |
+| Statement Import                    | POST [id]/statements                     | —                                                 | ✅     |
+| Auto-match                          | POST [id]/auto-match                     | —                                                 | ✅     |
 
 **Total: 22 API endpoints + 9 UI views + 8 BigQuery tables + sidebar navigation + route guards**
 
 ### Pendientes menores (no bloqueantes)
+
 - **Formularios modales**: Botones de creación (ingreso/egreso/período/proveedor) sin drawer/modal aún — abren links a las list views por ahora
 - **Reconciliation detail view**: UI para ver filas de cartola y aceptar/rechazar matches sugeridos
 
@@ -9292,22 +10950,28 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 ## 2026-03-22 11:35 America/Santiago
 
 ### Agente
+
 - Codex (GPT-5)
 
 ### Objetivo del turno
+
 - Mapear como backlog pendiente una lane específica para robustecer el puente `Permisos/Asistencia -> Payroll`, sin mezclar todavía implementación runtime.
 
 ### Rama
+
 - `develop`
 
 ### Ambiente objetivo
+
 - Documentación / backlog
 
 ### Archivos tocados
+
 - `docs/tasks/to-do/CODEX_TASK_HR_Payroll_Attendance_Leave_Work_Entries_v1.md`
 - `docs/tasks/README.md`
 
 ### Nota operativa
+
 - La task nueva queda en `to-do` y no reemplaza la lane ya activa `CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md`.
 - Su foco es distinto: exactitud de permisos/asistencia, work entries canónicos, colisiones, aprobaciones tardías y seam futuro para `Microsoft Teams`.
 - No se hicieron cambios de runtime en este subturno.

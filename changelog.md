@@ -7,7 +7,34 @@
 
 ## 2026-03-24
 
+### Client-Facing Delivery Views — Full Implementation
+- **Review Queue** (`/reviews`): Tabla de items pendientes de aprobación con banners de urgencia (48h/96h), filtros por estado, historial de reviews recientes. API: `GET /api/reviews/queue`.
+- **Client Campaigns** (`/campanas`): Lista de campañas del cliente con cards + detalle con KPIs (completion, RPA, OTD%), tabs Resumen/Proyectos/Equipo. Sin financials para clientes.
+- **Project Detail**: Columna "Asignado" agregada a tabla de tasks (JOIN a team_members). API: `GET /api/projects/[id]/ico` para métricas ICO por proyecto.
+- **Mi Equipo** (`/equipo`): Cards de miembros del equipo con FTE, rol, contacto, "trabajando en" con breakdown de proyectos.
+- **Delivery Analytics** (`/analytics`): Trend charts (RPA, OTD%, throughput, cycle time) + tabla comparativa por proyecto con métricas color-coded. API: `GET /api/analytics/delivery`.
+
+### Delivery Layer — 5 Gaps Closed
+- Multi-assignee ICO view robustificado, sprint materialization, cycle_time/fase_csc/is_stuck en project detail, legacy dual-read eliminado, materialization health check.
+
+### Module Integration — 5 Gaps Closed
+- FK en expenses.allocated_client_id, economics materialization cron, identity reconciliation cron, organization context en PersonFinanceTab.
+
+### TASK-045 Reactive Projection Refresh + Scalability Hardening
+- Projection Registry declarativo (4 proyecciones), consumer reescrito con retry/dead-letter, domain partitioning (4 crons paralelos), refresh queue persistente, observabilidad per-projection.
+
+### TASK-017 Campaign 360 — Full Implementation
+- DDL + store + 9 API endpoints + budget/margin + roster derivado + UI (list + detail con 4 tabs).
+
+### HR and Finance runtime gaps document and derived tasks added
+
+- Se agregó `docs/roadmap/GREENHOUSE_HR_FINANCE_RUNTIME_GAPS_V1.md` como fuente canónica de brechas runtime de HR + Finance verificadas contra el codebase y el modelo actual.
+- Se derivaron 3 tasks nuevas para cerrar esas brechas: `TASK-050` Finance Client Canonical Runtime Cutover, `TASK-051` Finance Payroll Bridge Postgres Alignment y `TASK-052` Person 360 Finance Access Alignment.
+- El gap de imputación incorrecta de permisos que cruzan períodos quedó documentado como ya owned por `TASK-001` y `TASK-005`, evitando duplicar lanes.
+- `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `docs/README.md` quedaron alineados con los nuevos IDs y el nuevo documento de brechas.
+
 ### Reactive Projection Refresh — Scalability Hardening
+
 - **Domain partitioning**: 4 dedicated cron routes (`outbox-react-org`, `outbox-react-people`, `outbox-react-finance`, `outbox-react-notify`) run in parallel instead of one sequential batch. Each only processes events for its domain.
 - **Targeted entity refresh**: `ico_member_metrics` now pulls specific member data from BigQuery → Postgres on event. `client_economics` recomputes current month snapshots reactively. No more "flag and wait for nightly batch".
 - **Persistent refresh queue**: `projection_refresh_queue` table with dedup by (projection, entity_type, entity_id), priority ordering, atomic claim via `FOR UPDATE SKIP LOCKED`, and automatic retry with configurable max attempts.
