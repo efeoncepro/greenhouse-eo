@@ -55,13 +55,18 @@ CREATE INDEX IF NOT EXISTS idx_client_profiles_hubspot_id
   ON greenhouse_finance.client_profiles (hubspot_company_id)
   WHERE hubspot_company_id IS NOT NULL;
 
--- 6. Document migration
-INSERT INTO greenhouse_sync.migration_log (migration_id, domain, applied_by, description)
-VALUES (
-  'task-050-051-052-postgres-alignment',
-  'finance',
-  CURRENT_USER,
-  'Ensures Postgres-first tables and indexes for finance client resolution, payroll bridge, and person access alignment.'
-)
-ON CONFLICT (migration_id) DO UPDATE
-SET applied_at = CURRENT_TIMESTAMP;
+-- 6. Document migration (skip if migration_log doesn't exist)
+DO $$
+BEGIN
+  INSERT INTO greenhouse_sync.migration_log (migration_id, domain, applied_by, description)
+  VALUES (
+    'task-050-051-052-postgres-alignment',
+    'finance',
+    CURRENT_USER,
+    'Ensures Postgres-first tables and indexes for finance client resolution, payroll bridge, and person access alignment.'
+  )
+  ON CONFLICT (migration_id) DO UPDATE
+  SET applied_at = CURRENT_TIMESTAMP;
+EXCEPTION WHEN undefined_table THEN
+  RAISE NOTICE 'migration_log table does not exist, skipping migration tracking';
+END $$;
