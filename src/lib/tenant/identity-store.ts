@@ -219,7 +219,11 @@ const sessionRowToAccessRow = async (row: Session360Row) => {
     space_public_id: row.space_public_id ?? null,
     organization_id: row.organization_id ?? null,
     organization_public_id: row.organization_public_id ?? null,
-    organization_name: row.organization_name ?? null
+    organization_name: row.organization_name ?? null,
+
+    // Collaborator identity
+    member_id: row.member_id ?? null,
+    identity_profile_id: row.identity_profile_id ?? null
   }
 }
 

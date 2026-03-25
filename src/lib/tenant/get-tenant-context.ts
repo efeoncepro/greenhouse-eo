@@ -27,6 +27,10 @@ export interface TenantContext {
   spaceId?: string
   organizationId?: string
   organizationName?: string
+
+  // Collaborator identity
+  memberId?: string
+  identityProfileId?: string
 }
 
 export const getTenantContext = async (): Promise<TenantContext | null> => {
@@ -58,6 +62,10 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     // Account 360
     ...(session.user.spaceId ? { spaceId: session.user.spaceId } : {}),
     ...(session.user.organizationId ? { organizationId: session.user.organizationId } : {}),
-    ...(session.user.organizationName ? { organizationName: session.user.organizationName } : {})
+    ...(session.user.organizationName ? { organizationName: session.user.organizationName } : {}),
+
+    // Collaborator identity
+    ...(session.user.memberId ? { memberId: session.user.memberId } : {}),
+    ...(session.user.identityProfileId ? { identityProfileId: session.user.identityProfileId } : {})
   }
 }

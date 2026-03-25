@@ -1,0 +1,30 @@
+import { NextResponse } from 'next/server'
+
+import { requireMyTenantContext } from '@/lib/tenant/authorization'
+import { getPersonFinanceOverviewFromPostgres } from '@/lib/person-360/get-person-finance'
+
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const { tenant, memberId, errorResponse } = await requireMyTenantContext()
+
+  if (!tenant || !memberId) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const overview = await getPersonFinanceOverviewFromPostgres(memberId)
+
+    return NextResponse.json({
+      assignments: overview?.assignments ?? [],
+      summary: overview?.summary ?? null
+    })
+  } catch (error) {
+    console.error('GET /api/my/assignments failed:', error)
+
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}

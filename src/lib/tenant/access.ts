@@ -58,6 +58,10 @@ interface TenantAccessRow {
   organization_id?: string | null
   organization_public_id?: string | null
   organization_name?: string | null
+
+  // Collaborator identity
+  member_id?: string | null
+  identity_profile_id?: string | null
 }
 
 interface InternalAliasCandidateRow {
@@ -102,6 +106,10 @@ export interface TenantAccessRecord {
   spaceId: string | null
   organizationId: string | null
   organizationName: string | null
+
+  // Collaborator identity
+  memberId: string | null
+  identityProfileId: string | null
 }
 
 const rolePriority = [
@@ -254,9 +262,11 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
         ? '/hr/payroll'
         : roleCodes.includes('finance_analyst') || roleCodes.includes('finance_admin')
           ? '/finance'
-          : tenantType === 'efeonce_internal'
-            ? '/internal/dashboard'
-            : '/dashboard'),
+          : roleCodes.includes('collaborator') && !roleCodes.includes('efeonce_admin') && !roleCodes.includes('efeonce_operations')
+            ? '/my'
+            : tenantType === 'efeonce_internal'
+              ? '/internal/dashboard'
+              : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',
@@ -266,7 +276,11 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     // Account 360
     spaceId: row.space_id ?? null,
     organizationId: row.organization_id ?? null,
-    organizationName: row.organization_name ?? null
+    organizationName: row.organization_name ?? null,
+
+    // Collaborator identity
+    memberId: row.member_id ?? null,
+    identityProfileId: row.identity_profile_id ?? null
   }
 }
 

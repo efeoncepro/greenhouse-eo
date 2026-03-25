@@ -28,6 +28,10 @@ declare module 'next-auth' {
     spaceId?: string
     organizationId?: string
     organizationName?: string
+
+    // Collaborator identity
+    memberId?: string
+    identityProfileId?: string
   }
 
   interface Session {
@@ -59,6 +63,10 @@ declare module 'next-auth' {
       spaceId?: string
       organizationId?: string
       organizationName?: string
+
+      // Collaborator identity
+      memberId?: string
+      identityProfileId?: string
     } & DefaultSession['user']
   }
 }
@@ -93,5 +101,9 @@ declare module 'next-auth/jwt' {
     spaceId?: string
     organizationId?: string
     organizationName?: string
+
+    // Collaborator identity
+    memberId?: string
+    identityProfileId?: string
   }
 }

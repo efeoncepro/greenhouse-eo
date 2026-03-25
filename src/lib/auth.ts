@@ -372,6 +372,10 @@ export const authOptions: NextAuthOptions = {
         token.spaceId = user.spaceId
         token.organizationId = user.organizationId
         token.organizationName = user.organizationName
+
+        // Collaborator identity
+        token.memberId = user.memberId
+        token.identityProfileId = user.identityProfileId
       }
 
       if (account?.provider === 'azure-ad') {
@@ -424,6 +428,10 @@ export const authOptions: NextAuthOptions = {
           token.spaceId = tenant.spaceId ?? undefined
           token.organizationId = tenant.organizationId ?? undefined
           token.organizationName = tenant.organizationName ?? undefined
+
+          // Collaborator identity
+          token.memberId = tenant.memberId ?? undefined
+          token.identityProfileId = tenant.identityProfileId ?? undefined
         }
       }
 
@@ -477,6 +485,10 @@ export const authOptions: NextAuthOptions = {
           token.spaceId = tenant.spaceId ?? undefined
           token.organizationId = tenant.organizationId ?? undefined
           token.organizationName = tenant.organizationName ?? undefined
+
+          // Collaborator identity
+          token.memberId = tenant.memberId ?? undefined
+          token.identityProfileId = tenant.identityProfileId ?? undefined
         }
       }
 
@@ -519,6 +531,10 @@ export const authOptions: NextAuthOptions = {
         session.user.spaceId = typeof token.spaceId === 'string' ? token.spaceId : undefined
         session.user.organizationId = typeof token.organizationId === 'string' ? token.organizationId : undefined
         session.user.organizationName = typeof token.organizationName === 'string' ? token.organizationName : undefined
+
+        // Collaborator identity
+        session.user.memberId = typeof token.memberId === 'string' ? token.memberId : undefined
+        session.user.identityProfileId = typeof token.identityProfileId === 'string' ? token.identityProfileId : undefined
       }
 
       return session

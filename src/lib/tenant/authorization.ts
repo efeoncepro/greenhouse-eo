@@ -19,6 +19,30 @@ export const canAccessPeopleModule = (tenant: TenantContext) =>
   (hasRouteGroup(tenant, 'internal') &&
     (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll') || hasRoleCode(tenant, 'finance_manager')))
 
+export const requireMyTenantContext = async (): Promise<{
+  tenant: TenantContext | null
+  memberId: string | null
+  errorResponse: NextResponse | null
+}> => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return { tenant: null, memberId: null, errorResponse: unauthorizedResponse }
+  }
+
+  if (tenant.tenantType !== 'efeonce_internal') {
+    return { tenant: null, memberId: null, errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
+  }
+
+  const memberId = tenant.memberId || null
+
+  if (!memberId) {
+    return { tenant: null, memberId: null, errorResponse: NextResponse.json({ error: 'Member identity not linked' }, { status: 422 }) }
+  }
+
+  return { tenant, memberId, errorResponse: null }
+}
+
 export const requireTenantContext = async () => {
   const tenant = await getTenantContext()
 
