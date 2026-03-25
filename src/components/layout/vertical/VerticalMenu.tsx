@@ -61,6 +61,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isFinanceUser = session?.user?.routeGroups?.includes('finance') ?? false
   const isPeopleRouteGroup = session?.user?.routeGroups?.includes('people') ?? false
   const isAiToolingUser = session?.user?.routeGroups?.includes('ai_tooling') ?? false
+  const isMyUser = session?.user?.routeGroups?.includes('my') ?? false
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
@@ -255,6 +256,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />, href: '/admin/ai-tools' }
       ]
     })
+  }
+
+  // ── Collaborator self-service ("Mi Ficha") ────────────────────────
+  if (isMyUser) {
+    // If pure collaborator (no internal), show full My sidebar
+    // If dual role (internal + my), add as bottom section
+    if (!isInternalUser) {
+      // Pure collaborator — their primary nav
+      menuData.splice(0, 0,
+        { label: <NavLabel label='Mi Greenhouse' subtitle='Tu operación personal' show={showSub} />, href: '/my', icon: 'tabler-smart-home' }
+      )
+    }
+
+    menuData.push(
+      { isSection: true, label: 'MI FICHA' } as VerticalMenuDataType,
+      { label: <NavLabel label='Mis Asignaciones' subtitle='Clientes y capacidad' show={showSub} />, href: '/my/assignments', icon: 'tabler-users' },
+      { label: <NavLabel label='Mi Desempeño' subtitle='Métricas ICO' show={showSub} />, href: '/my/performance', icon: 'tabler-chart-bar' },
+      { label: <NavLabel label='Mi Delivery' subtitle='Tareas y proyectos' show={showSub} />, href: '/my/delivery', icon: 'tabler-list-check' },
+      { label: <NavLabel label='Mi Perfil' subtitle='Datos personales' show={showSub} />, href: '/my/profile', icon: 'tabler-user-circle' },
+      { label: <NavLabel label='Mi Nómina' subtitle='Liquidaciones' show={showSub} />, href: '/my/payroll', icon: 'tabler-receipt' },
+      { label: <NavLabel label='Mis Permisos' subtitle='Vacaciones y días' show={showSub} />, href: '/my/leave', icon: 'tabler-calendar-event' }
+    )
   }
 
   return (

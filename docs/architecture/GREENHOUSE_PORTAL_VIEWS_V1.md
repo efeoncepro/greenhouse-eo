@@ -21,13 +21,13 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 
 | Vista | Ruta | Estado | Descripción |
 |-------|------|--------|-------------|
-| Mi Greenhouse | `/my` | API lista, UI pendiente | Dashboard personal: KPIs, tasks, nómina, permisos |
-| Mi Perfil | `/my/profile` | API lista, UI pendiente | Identidad, datos profesionales, sistemas vinculados |
-| Mis Asignaciones | `/my/assignments` | API lista, UI pendiente | Clientes, FTE, capacidad contratada vs usada |
-| Mi Desempeño | `/my/performance` | API lista, UI pendiente | ICO metrics, trend 6 meses, health |
-| Mi Nómina | `/my/payroll` | API lista, UI pendiente | Liquidaciones, compensación, historial |
-| Mis Permisos | `/my/leave` | API lista, UI pendiente | Balance vacaciones, solicitudes |
-| Mi Delivery | `/my/delivery` | API lista, UI pendiente | Proyectos propios, tasks, CRM |
+| Mi Greenhouse | `/my` | Implementada | Dashboard personal: KPIs, tasks, notificaciones |
+| Mi Perfil | `/my/profile` | Implementada | Identidad, datos profesionales, sistemas vinculados |
+| Mis Asignaciones | `/my/assignments` | Implementada | Clientes, FTE, capacidad contratada vs usada |
+| Mi Desempeño | `/my/performance` | Implementada | ICO metrics, trend 6 meses, health, operational |
+| Mi Nómina | `/my/payroll` | Implementada | Liquidaciones, compensación, historial |
+| Mis Permisos | `/my/leave` | Implementada | Balance vacaciones, solicitudes |
+| Mi Delivery | `/my/delivery` | Implementada | Proyectos propios, tasks, CRM |
 | Configuración | `/my/settings` | Pendiente | Notificaciones, timezone |
 
 ## Internal/Agency (Operadores Efeonce)

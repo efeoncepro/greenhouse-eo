@@ -46,6 +46,17 @@ export const GH_HR_NAV = {
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }
 } as const
 
+export const GH_MY_NAV = {
+  dashboard: { label: 'Mi Greenhouse', subtitle: 'Tu operación personal' },
+  assignments: { label: 'Mis Asignaciones', subtitle: 'Clientes, FTE y capacidad' },
+  performance: { label: 'Mi Desempeño', subtitle: 'ICO, OTD y métricas' },
+  delivery: { label: 'Mi Delivery', subtitle: 'Tareas, proyectos y CRM' },
+  profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
+  payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
+  leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
+  settings: { label: 'Configuración', subtitle: 'Notificaciones y preferencias' }
+} as const
+
 export const GH_AGENCY = {
   pulse_title: 'Pulse Global',
   pulse_subtitle: 'La operación completa de Efeonce, en un vistazo',

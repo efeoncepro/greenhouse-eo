@@ -5,6 +5,17 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-25
+
+### Collaborator Portal — Full Implementation
+- **Session Bridge**: `memberId` + `identityProfileId` propagated through JWT, Session, TenantContext.
+- **requireMyTenantContext()**: Auth guard for self-service — resolves memberId from JWT, enforces efeonce_internal.
+- **7 Self-Service APIs**: `/api/my/dashboard`, `/api/my/profile`, `/api/my/assignments`, `/api/my/performance`, `/api/my/payroll`, `/api/my/leave`, `/api/my/delivery`.
+- **7 View Components**: MyDashboardView (hero+KPIs+notifs), MyProfileView (identity+professional+linked systems), MyAssignmentsView (table+capacity), MyPerformanceView (ICO+trend+operational), MyPayrollView (compensation+history), MyLeaveView (balances), MyDeliveryView (projects+tasks+CRM).
+- **Sidebar Navigation**: `MI FICHA` section added for collaborator role with 7 nav items.
+- **GH_MY_NAV** nomenclature constants added.
+- **Portal Views Doc** updated — all collaborator views marked as Implemented.
+
 ## 2026-03-24
 
 ### TASK-042/043/044 — Person + Organization Serving Consolidation
