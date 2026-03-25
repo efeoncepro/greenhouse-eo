@@ -7,6 +7,21 @@
 
 ## 2026-03-25
 
+### Agency Operator Layer Redesign — Fase 1
+- **Architecture**: Tab monolítico → 9 rutas independientes bajo `/agency/`.
+- **Navigation**: Gestión expandida de 3 a 9 items (Agencia, Spaces, Economía, Equipo, Delivery, Campañas, Servicios, Operaciones, Organizaciones).
+- **Economics** (`/agency/economics`): P&L KPIs (revenue, costs, margin, EBITDA) + expense trend chart + top clients by revenue table.
+- **Team** (`/agency/team`): 4-type capacity model (contracted/assigned/used/available) + health distribution + overcommitted alerts + member table.
+- **Campaigns** (`/agency/campaigns`): Cross-space campaign overview con KPIs + campaign table completa.
+- **Backend**: `listAllCampaigns()` sin filtro spaceId, `getServicesExpiringBefore(days)` para renewal risk.
+- Delivery y Operations como stubs listos para implementación.
+
+### Client Organization Identity Bridge
+- Migration backfill `identity_profile_id` + create `person_memberships` para client_users.
+- `ensureClientMembership()` auto-link en login.
+- APIs `/api/my/organization` + `/api/my/organization/members` para directorio de colegas.
+- Vista `MyOrganizationView` con KPIs y tabla de miembros.
+
 ### Collaborator Portal — Full Implementation
 - **Session Bridge**: `memberId` + `identityProfileId` propagated through JWT, Session, TenantContext.
 - **requireMyTenantContext()**: Auth guard for self-service — resolves memberId from JWT, enforces efeonce_internal.

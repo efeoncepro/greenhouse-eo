@@ -36,7 +36,13 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Vista | Ruta | Estado | Descripción |
 |-------|------|--------|-------------|
 | Torre de Control | `/internal/dashboard` | Implementada | Overview de clientes + equipo interno |
-| Agencia | `/agency` | Implementada | Pulse Global, métricas cross-space |
+| Agencia (Command Center) | `/agency` | Existente (pendiente redesign) | Pulse Global, métricas cross-space |
+| Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team |
+| Economía | `/agency/economics` | Implementada | P&L KPIs, expense trends, top clients by revenue |
+| Equipo | `/agency/team` | Implementada | 4-type capacity model, health distribution, overcommitted alerts |
+| Delivery | `/agency/delivery` | Stub | ICO + sprints + stuck assets (pendiente) |
+| Campañas | `/agency/campaigns` | Implementada | Cross-space campaigns con KPIs y tabla |
+| Operaciones | `/agency/operations` | Stub | Health monitoring del platform (pendiente) |
 | Organizaciones | `/agency/organizations` | Implementada | Lista + detalle con economics, projects, equipo |
 | Servicios | `/agency/services` | Implementada | Servicios por space con sync HubSpot |
 | Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador |

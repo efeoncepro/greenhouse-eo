@@ -49,6 +49,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-25 — Sesión Claude Opus 4.6 (continuación)
+
+### Agente
+
+- Claude Opus 4.6 (1M context)
+
+### Objetivo del turno
+
+Continuación de sesión: Collaborator Portal, Organization Identity Bridge, Agency Redesign, Production Deploy.
+
+### Rama
+
+- `develop` → `main` (merged to production)
+
+### Lo completado en esta sesión
+
+| Área | Detalle |
+|------|---------|
+| **Collaborator Portal** | Session bridge (memberId en JWT), 7 APIs self-service, 7 view components, sidebar MI FICHA, GH_MY_NAV nomenclature |
+| **Organization Identity Bridge** | Migration backfill identity + person_memberships, ensureClientMembership auto-link, directorio de colegas API + UI |
+| **Agency Redesign Fase 1** | Nav 3→9 items, Economics view (P&L + clients), Team view (4-type capacity), Campaigns view (cross-space). Backend: listAllCampaigns, getServicesExpiringBefore |
+| **Production Deploy** | develop → main merged (114 commits, 20+ tasks). Deploy successful. |
+| **Brand Icons** | Outlook, Teams, Slack SVGs. Integration logos enlarged. Notion SVG fixed. |
+| **Build Fixes** | requireTenantContext destructuring (20 routes), horizontal NavbarContent, organization-projects property names, publishOutboxEvent signature |
+| **TASK-001** | Payroll hardening: kpi_source_mode, attendance snapshots, Chile tax brackets, calculation diagnostics |
+| **TASK-008** | Capacity formal model: contracted_hours_month + 4-type breakdown API |
+| **TASK-042/043/044** | Person operational serving, Person 360 runtime consolidation, Organization executive snapshot |
+| **TASK-046/047/048/049** | False RPA fix, project scope count, sprint store + APIs, consolidated project endpoint |
+| **TASK-050/051/052** | Finance client Postgres cutover, payroll bridge alignment, Person 360 finance access |
+
+### Portal Views completadas
+
+| Audiencia | Vistas | Estado |
+|-----------|--------|--------|
+| **Clientes** | 10 vistas (Pulse, Proyectos, Campañas, Revisiones, Ciclos, Equipo, Analytics, Novedades, Settings, Mi Organización) | Todas implementadas |
+| **Colaboradores** | 8 vistas (Mi Greenhouse, Asignaciones, Desempeño, Delivery, Perfil, Nómina, Permisos, Mi Organización) | Todas implementadas |
+| **Agency/Operadores** | 9 secciones (Agencia, Spaces, Economía, Equipo, Delivery*, Campañas, Servicios, Operaciones*, Organizaciones) | 7 implementadas, 2 stubs |
+
+### Pendientes para próxima sesión
+
+- Agency Delivery view (reemplazar stub con ICO + sprints)
+- Agency Operations view (reemplazar stub con health monitoring)
+- Agency Command Center (reemplazar vista actual con dashboard ejecutivo)
+- Client sidebar navigation (agregar nuevas vistas al nav del cliente)
+- Tests unitarios para evitar build failures
+- TASK-009 Greenhouse Home (Nexa)
+
+### Verificación
+
+- `pnpm build` limpio en cada commit
+- Production deploy exitoso (ae864d8 → main)
+- All migrations executed against Postgres
+
+---
+
 ## 2026-03-24 — Sesión Claude Opus 4.6
 
 ### Agente
