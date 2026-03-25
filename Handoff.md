@@ -85,7 +85,10 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Hallazgo confirmado: `Agency > Spaces` seguía leyendo `RpA` desde `notion_ops.tareas.rpa` y `OTD` desde `notion_ops.proyectos`, no desde `ICO`
 - Fix aplicado: `getAgencySpacesHealth()` y `getAgencyPulseKpis()` ahora leen `RpA/OTD` desde el snapshot ICO más reciente por `space_id` (`ico_engine.metric_snapshots_monthly`), agregando luego por cliente/space visible en Agency
 - La deuda documental sigue desalineada: `docs/tasks/complete/TASK-046-delivery-performance-metrics-ico-cutover.md` todavía conserva metadatos de `to-do/diseño` aunque el handoff previo la reporta como cerrada
-- Si staging sigue mostrando `—`, el próximo paso es validar que existan snapshots recientes para esos `space_id` en `ico_engine.metric_snapshots_monthly`; la vista ya no depende del campo legacy `notion_ops.tareas.rpa`
+- Validación de datos completada: los 2 spaces activos visibles hoy (`Efeonce`, `Sky Airline`) sí tienen snapshots ICO recientes para marzo 2026; no hay gaps ni snapshots stale en `ico_engine.metric_snapshots_monthly`
+- Validación de staging: `dev-greenhouse.efeoncepro.com` apunta al deployment `greenhouse-akc7llk32-efeonce-7670142f.vercel.app` (commit `988d06d`, `develop`, creado 2026-03-25 20:48 -03) y el dominio está protegido por Vercel (`401` sin bypass). `vercel curl /api/auth/session` responde `{}` y `vercel curl /api/agency/spaces` responde `{"error":"Unauthorized"}` como esperado sin sesión de app
+- Conclusión operativa: el fix local de `Agency > Spaces` todavía no puede verse en staging porque no fue `commit`/`push`/deployado aún
+- Follow-up detectado: `src/views/agency/AgencyDeliveryView.tsx` sigue siendo un stub. Hace `fetch('/api/agency/pulse')` dos veces, trata `statusMix` como si fuera `spaces` y fabrica una tendencia `RPA/OTD` a partir de `weeklyActivity`; no debe considerarse una surface ICO-correcta
 
 ## 2026-03-25 — Sesión Claude Opus 4.6 (continuación)
 
