@@ -99,9 +99,9 @@ export const getOrganizationProjects = async (
         projectIds: [] // empty = all projects for this client
       })
 
-      const projects: ProjectSummary[] = projectsData.projects.map(p => ({
-        notionPageId: p.notionPageId,
-        projectName: p.projectName,
+      const projects: ProjectSummary[] = projectsData.items.map(p => ({
+        notionPageId: p.id,
+        projectName: p.name,
         status: p.status,
         totalTasks: p.totalTasks,
         activeTasks: p.activeTasks,
