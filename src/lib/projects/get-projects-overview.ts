@@ -198,7 +198,7 @@ export const getProjectsOverview = async (scope: ProjectViewerScope): Promise<Gr
     items,
     scope: {
       clientId: scope.clientId,
-      projectCount: items.length,
+      projectCount: scope.projectIds.length,
       projectIds: scope.projectIds
     }
   }

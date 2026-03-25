@@ -1012,7 +1012,7 @@ const getOperationalLoadRows = async (projectIds: string[], columns: Set<string>
         COUNT(*) AS total_assets,
         COUNTIF(t.estado NOT IN UNNEST(@inactiveStatuses)) AS active_assets,
         COUNTIF(t.estado IN UNNEST(@completedStatuses)) AS completed_assets,
-        ROUND(AVG(CASE WHEN SAFE_CAST(t.frame_versions AS FLOAT64) > 0 THEN SAFE_CAST(t.frame_versions AS FLOAT64) END), 2) AS avg_rpa,
+        ROUND(AVG(CASE WHEN SAFE_CAST(t.rpa AS FLOAT64) > 0 THEN SAFE_CAST(t.rpa AS FLOAT64) END), 2) AS avg_rpa,
         COUNT(DISTINCT t.proyecto) AS project_count
       FROM \`${projectId}.notion_ops.tareas\` AS t
       WHERE t.proyecto IN UNNEST(@projectIds)
@@ -1253,7 +1253,7 @@ const getProjectTeamRows = async (projectIdValue: string, columns: Set<string>) 
         COUNT(*) AS total_assets,
         COUNTIF(t.estado NOT IN UNNEST(@inactiveStatuses)) AS active_assets,
         COUNTIF(t.estado IN UNNEST(@completedStatuses)) AS completed_assets,
-        ROUND(AVG(CASE WHEN SAFE_CAST(t.frame_versions AS FLOAT64) > 0 THEN SAFE_CAST(t.frame_versions AS FLOAT64) END), 2) AS avg_rpa,
+        ROUND(AVG(CASE WHEN SAFE_CAST(t.rpa AS FLOAT64) > 0 THEN SAFE_CAST(t.rpa AS FLOAT64) END), 2) AS avg_rpa,
         COUNTIF(t.estado IN ('Listo para revisión', 'Listo para revision')) AS in_review,
         COUNTIF(t.estado = 'Cambios Solicitados') AS changes_requested
       FROM \`${projectId}.notion_ops.tareas\` AS t
@@ -1361,7 +1361,7 @@ const getSprintTeamRows = async (sprintId: string, projectIds: string[], columns
         COUNT(*) AS total_in_sprint,
         COUNTIF(t.estado IN UNNEST(@completedStatuses)) AS completed,
         COUNTIF(t.estado NOT IN UNNEST(@inactiveStatuses)) AS pending,
-        ROUND(AVG(CASE WHEN SAFE_CAST(t.frame_versions AS FLOAT64) > 0 THEN SAFE_CAST(t.frame_versions AS FLOAT64) END), 2) AS avg_rpa
+        ROUND(AVG(CASE WHEN SAFE_CAST(t.rpa AS FLOAT64) > 0 THEN SAFE_CAST(t.rpa AS FLOAT64) END), 2) AS avg_rpa
       FROM \`${projectId}.notion_ops.tareas\` AS t
       WHERE t.proyecto IN UNNEST(@projectIds)
         AND (
