@@ -100,12 +100,12 @@ const upsertServiceFromHubSpot = async (
   const action = (result[0]?.action ?? 'skipped') as 'created' | 'updated' | 'skipped'
 
   if (action === 'created' || action === 'updated') {
-    await publishOutboxEvent(
-      'service',
-      serviceId,
-      `service.${action}`,
-      { hubspotServiceId, name, lineaDeServicio, servicioEspecifico, spaceId: space.space_id }
-    )
+    await publishOutboxEvent({
+      aggregateType: 'service',
+      aggregateId: serviceId,
+      eventType: `service.${action}`,
+      payload: { hubspotServiceId, name, lineaDeServicio, servicioEspecifico, spaceId: space.space_id }
+    })
   }
 
   return action
