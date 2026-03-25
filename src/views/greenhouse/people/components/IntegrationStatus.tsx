@@ -29,8 +29,8 @@ const IntegrationStatus = ({ items }: Props) => (
               width: 24,
               height: 24,
               objectFit: 'contain',
-              opacity: item.linked ? 1 : 0.35,
-              filter: item.linked ? 'none' : 'grayscale(100%)'
+              opacity: item.linked ? 1 : 0.5,
+              filter: item.linked ? 'none' : 'grayscale(80%)'
             }}
           />
         ) : (
