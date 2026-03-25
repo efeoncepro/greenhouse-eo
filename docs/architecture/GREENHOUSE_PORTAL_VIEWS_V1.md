@@ -28,6 +28,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Mi Nómina | `/my/payroll` | Implementada | Liquidaciones, compensación, historial |
 | Mis Permisos | `/my/leave` | Implementada | Balance vacaciones, solicitudes |
 | Mi Delivery | `/my/delivery` | Implementada | Proyectos propios, tasks, CRM |
+| Mi Organización | `/my/organization` | Implementada | Directorio de colegas, datos de la organización |
 | Configuración | `/my/settings` | Pendiente | Notificaciones, timezone |
 
 ## Internal/Agency (Operadores Efeonce)
