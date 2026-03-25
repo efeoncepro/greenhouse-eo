@@ -64,8 +64,8 @@ export async function GET() {
 
   // KPIs — parallel
   const [outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs] = await Promise.all([
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.projection_refresh_queue WHERE status = 'pending'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'pending'`),
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE created_at > NOW() - INTERVAL '24 hours'`),
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`)
   ])
@@ -77,16 +77,16 @@ export async function GET() {
     notifTotal, notifFailed,
     notionLastSync, servicesLastSync, icoLastSync
   ] = await Promise.all([
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'processed'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'failed'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'processed'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'failed'`),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
-      `SELECT MAX(occurred_at)::text AS last_run FROM greenhouse_core.outbox_events`
+      `SELECT MAX(occurred_at)::text AS last_run FROM greenhouse_sync.outbox_events`
     ).then(r => r[0]?.last_run ?? null).catch(() => null),
 
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.projection_refresh_queue WHERE status = 'completed'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.projection_refresh_queue WHERE status = 'failed'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed'`),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
-      `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_core.projection_refresh_queue WHERE status = 'completed'`
+      `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
     ).then(r => r[0]?.last_run ?? null).catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications`),
@@ -107,8 +107,8 @@ export async function GET() {
 
   // Check which tables exist
   const [hasOutbox, hasProjections, hasNotifications, hasServices, hasIcoMetrics] = await Promise.all([
-    tableExists('greenhouse_core', 'outbox_events'),
-    tableExists('greenhouse_core', 'projection_refresh_queue'),
+    tableExists('greenhouse_sync', 'outbox_events'),
+    tableExists('greenhouse_sync', 'projection_refresh_queue'),
     tableExists('greenhouse_notifications', 'notifications'),
     tableExists('greenhouse_core', 'services'),
     tableExists('greenhouse_serving', 'ico_member_metrics')
@@ -136,7 +136,7 @@ export async function GET() {
   try {
     const rows = await runGreenhousePostgresQuery<EventRow>(
       `SELECT event_type, aggregate_type, aggregate_id, occurred_at::text, COALESCE(status, 'processed') AS status
-       FROM greenhouse_core.outbox_events
+       FROM greenhouse_sync.outbox_events
        ORDER BY occurred_at DESC LIMIT 20`
     )
 
@@ -161,7 +161,7 @@ export async function GET() {
   try {
     const rows = await runGreenhousePostgresQuery<ProjRow>(
       `SELECT projection_name, entity_type, entity_id, updated_at::text, error_message
-       FROM greenhouse_core.projection_refresh_queue
+       FROM greenhouse_sync.projection_refresh_queue
        WHERE status = 'failed'
        ORDER BY updated_at DESC LIMIT 10`
     )
