@@ -7,6 +7,20 @@
 
 ## 2026-03-24
 
+### TASK-042/043/044 — Person + Organization Serving Consolidation
+- **Person Operational Serving**: `person_operational_metrics` table + Postgres-first store + reactive projection.
+- **Person 360 Runtime**: Consolidated `getPersonRuntimeSnapshot()` reads from 3 serving views instead of 8+ stores.
+- **Organization Executive Snapshot**: `getOrganizationExecutiveSnapshot()` consolidates economics + delivery + trend. API: `GET /api/organizations/{id}/executive`.
+
+### TASK-046/047/048/049 — Delivery Runtime Fixes
+- **TASK-046**: Fixed false RPA — 3 calculations in team-queries.ts changed from `AVG(frame_versions)` to `AVG(rpa)`.
+- **TASK-047**: Project scope count now uses authorized scope length, not activity-dependent items.length.
+- **TASK-048**: Sprint store + 3 API routes (list, detail with ICO, burndown). Sprints no longer depend on dashboard data.
+- **TASK-049**: `GET /api/projects/[id]/full` consolidates detail + tasks + ICO in 1 call.
+
+### TASK-050/051/052 — Finance + Payroll Postgres Alignment
+- Finance client resolver Postgres-first, payroll schema corrected, finance_manager access to People.
+
 ### Client-Facing Delivery Views — Full Implementation
 - **Review Queue** (`/reviews`): Tabla de items pendientes de aprobación con banners de urgencia (48h/96h), filtros por estado, historial de reviews recientes. API: `GET /api/reviews/queue`.
 - **Client Campaigns** (`/campanas`): Lista de campañas del cliente con cards + detalle con KPIs (completion, RPA, OTD%), tabs Resumen/Proyectos/Equipo. Sin financials para clientes.
