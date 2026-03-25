@@ -26,8 +26,8 @@ const IntegrationStatus = ({ items }: Props) => (
             src={TOOL_LOGOS[item.label]}
             alt={item.label}
             sx={{
-              width: 18,
-              height: 18,
+              width: 24,
+              height: 24,
               objectFit: 'contain',
               opacity: item.linked ? 1 : 0.35,
               filter: item.linked ? 'none' : 'grayscale(100%)'

@@ -78,12 +78,12 @@ const PersonLeftSidebar = ({ detail, isAdmin, onEditProfile, onDeactivate, onEdi
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant='overline' color='text.secondary'>Contacto</Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Box component='img' src='/images/integrations/outlook.svg' alt='Email' sx={{ width: 18, height: 18, objectFit: 'contain' }} />
+          <i className='tabler-mail' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
           <Typography variant='body2'>{member.publicEmail}</Typography>
         </Box>
         {member.internalEmail && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box component='img' src='/images/integrations/outlook.svg' alt='Email' sx={{ width: 18, height: 18, objectFit: 'contain', opacity: 0.6 }} />
+            <i className='tabler-mail' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
             <Typography variant='body2' color='text.secondary'>{member.internalEmail}</Typography>
           </Box>
         )}
