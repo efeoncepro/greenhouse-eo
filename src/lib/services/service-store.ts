@@ -557,3 +557,17 @@ export const getServicesByOrganization = async (organizationId: string): Promise
 
   return rows.map(normalizeListItem)
 }
+
+export const getServicesExpiringBefore = async (days: number): Promise<ServiceListItem[]> => {
+  const rows = await runGreenhousePostgresQuery<ServiceListRow>(`
+    SELECT ${LIST_COLUMNS}
+    ${LIST_JOINS}
+    WHERE s.active = TRUE
+      AND s.target_end_date IS NOT NULL
+      AND s.target_end_date >= CURRENT_DATE
+      AND s.target_end_date <= CURRENT_DATE + ($1 || ' days')::interval
+    ORDER BY s.target_end_date ASC
+  `, [days])
+
+  return rows.map(normalizeListItem)
+}

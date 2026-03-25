@@ -230,6 +230,36 @@ export const listCampaigns = async (
   return rows.map(mapCampaign)
 }
 
+export const listAllCampaigns = async (
+  options?: { status?: string; limit?: number }
+): Promise<Campaign[]> => {
+  await ensureCampaignSchema()
+
+  const params: unknown[] = []
+  let filters = 'WHERE TRUE'
+  let idx = 1
+
+  if (options?.status) {
+    filters += ` AND c.status = $${idx}`
+    params.push(options.status)
+    idx++
+  }
+
+  const limit = options?.limit ?? 100
+
+  const rows = await runGreenhousePostgresQuery<CampaignRow>(
+    `SELECT c.*,
+       (SELECT COUNT(*) FROM greenhouse_core.campaign_project_links cpl WHERE cpl.campaign_id = c.campaign_id) AS project_count
+     FROM greenhouse_core.campaigns c
+     ${filters}
+     ORDER BY c.updated_at DESC
+     LIMIT $${idx}`,
+    [...params, limit]
+  )
+
+  return rows.map(mapCampaign)
+}
+
 export const getCampaign = async (campaignId: string): Promise<Campaign | null> => {
   await ensureCampaignSchema()
 
