@@ -79,6 +79,8 @@ export interface GreenhouseProjectTaskItem {
   cycleTimeDays: number | null
   faseCsc: string | null
   isStuck: boolean
+  assigneeName: string | null
+  assigneeRole: string | null
   lastFrameComment: string | null
   lastEditedAt: string | null
   pageUrl: string | null

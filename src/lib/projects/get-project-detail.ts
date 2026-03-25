@@ -72,6 +72,8 @@ interface TaskRow {
   cycle_time_days: number | string | null
   fase_csc: string | null
   is_stuck: boolean | null
+  assignee_name: string | null
+  assignee_role: string | null
   sprint_name: string | null
   last_frame_comment: string | null
   last_edited_time: { value?: string } | string | null
@@ -401,64 +403,67 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
 
   const query = `
     SELECT
-      notion_page_id,
-      nombre_de_tarea AS task_name,
-      estado AS status,
-      COALESCE(CAST(rpa AS FLOAT64), 0) AS rpa_value,
-      \`semáforo_rpa\` AS rpa_semaphore_source,
-      indicador_de_performance AS performance_indicator_label,
-      completitud AS completion_label,
-      cumplimiento AS delivery_compliance,
-      SAFE_CAST(\`días_de_retraso\` AS INT64) AS days_late,
-      SAFE_CAST(\`días_reprogramados\` AS INT64) AS rescheduled_days,
-      CASE LOWER(COALESCE(reprogramada, ''))
+      t.notion_page_id,
+      t.nombre_de_tarea AS task_name,
+      t.estado AS status,
+      COALESCE(CAST(t.rpa AS FLOAT64), 0) AS rpa_value,
+      t.\`semáforo_rpa\` AS rpa_semaphore_source,
+      t.indicador_de_performance AS performance_indicator_label,
+      t.completitud AS completion_label,
+      t.cumplimiento AS delivery_compliance,
+      SAFE_CAST(t.\`días_de_retraso\` AS INT64) AS days_late,
+      SAFE_CAST(t.\`días_reprogramados\` AS INT64) AS rescheduled_days,
+      CASE LOWER(COALESCE(t.reprogramada, ''))
         WHEN 'sí' THEN TRUE
         WHEN 'si' THEN TRUE
         WHEN 'yes' THEN TRUE
         WHEN 'true' THEN TRUE
         ELSE FALSE
       END AS is_rescheduled,
-      client_change_round AS client_change_round_label,
-      SAFE_CAST(client_change_round_final AS INT64) AS client_change_round_final,
-      SAFE_CAST(workflow_change_round AS INT64) AS workflow_change_round,
-      COALESCE(SAFE_CAST(frame_versions AS INT64), 0) AS frame_versions,
-      COALESCE(SAFE_CAST(frame_comments AS INT64), 0) AS frame_comments,
-      COALESCE(SAFE_CAST(open_frame_comments AS INT64), 0) AS open_frame_comments,
-      COALESCE(client_review_open, FALSE) AS client_review_open,
-      COALESCE(workflow_review_open, FALSE) AS workflow_review_open,
-      COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count,
-      COALESCE(\`fecha_límite_original_end\`, \`fecha_límite_original\`) AS original_due_date,
-      \`tiempo_de_ejecución\` AS execution_time_label,
-      \`tiempo_en_cambios\` AS changes_time_label,
-      \`tiempo_en_revisión\` AS review_time_label,
-      -- Computed: cycle time in days (creation to completion or now)
+      t.client_change_round AS client_change_round_label,
+      SAFE_CAST(t.client_change_round_final AS INT64) AS client_change_round_final,
+      SAFE_CAST(t.workflow_change_round AS INT64) AS workflow_change_round,
+      COALESCE(SAFE_CAST(t.frame_versions AS INT64), 0) AS frame_versions,
+      COALESCE(SAFE_CAST(t.frame_comments AS INT64), 0) AS frame_comments,
+      COALESCE(SAFE_CAST(t.open_frame_comments AS INT64), 0) AS open_frame_comments,
+      COALESCE(t.client_review_open, FALSE) AS client_review_open,
+      COALESCE(t.workflow_review_open, FALSE) AS workflow_review_open,
+      COALESCE(ARRAY_LENGTH(t.bloqueado_por_ids), 0) AS blocker_count,
+      COALESCE(t.\`fecha_límite_original_end\`, t.\`fecha_límite_original\`) AS original_due_date,
+      t.\`tiempo_de_ejecución\` AS execution_time_label,
+      t.\`tiempo_en_cambios\` AS changes_time_label,
+      t.\`tiempo_en_revisión\` AS review_time_label,
       DATE_DIFF(
-        COALESCE(DATE(\`fecha_de_completado\`), CURRENT_DATE()),
-        COALESCE(DATE(created_time), CURRENT_DATE()),
+        COALESCE(DATE(t.\`fecha_de_completado\`), CURRENT_DATE()),
+        COALESCE(DATE(t.created_time), CURRENT_DATE()),
         DAY
       ) AS cycle_time_days,
-      -- Computed: CSC phase
       CASE
-        WHEN estado IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar') THEN 'briefing'
-        WHEN estado IN ('En curso', 'En Curso') THEN 'produccion'
-        WHEN estado LIKE 'Listo para revis%' THEN 'revision_interna'
-        WHEN estado = 'Cambios Solicitados' THEN 'cambios_cliente'
-        WHEN estado IN ('Listo', 'Done', 'Finalizado', 'Completado') THEN 'entrega'
+        WHEN t.estado IN ('Sin empezar', 'Backlog', 'Pendiente', 'Listo para diseñar') THEN 'briefing'
+        WHEN t.estado IN ('En curso', 'En Curso') THEN 'produccion'
+        WHEN t.estado LIKE 'Listo para revis%' THEN 'revision_interna'
+        WHEN t.estado = 'Cambios Solicitados' THEN 'cambios_cliente'
+        WHEN t.estado IN ('Listo', 'Done', 'Finalizado', 'Completado') THEN 'entrega'
         ELSE 'otros'
       END AS fase_csc,
-      -- Computed: is stuck (72+ hours no edit while active)
       (
-        estado NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada', 'Sin empezar', 'Backlog', 'Pendiente')
-        AND last_edited_time IS NOT NULL
-        AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), last_edited_time, HOUR) >= 72
+        t.estado NOT IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Archivadas', 'Cancelada', 'Sin empezar', 'Backlog', 'Pendiente')
+        AND t.last_edited_time IS NOT NULL
+        AND TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), t.last_edited_time, HOUR) >= 72
       ) AS is_stuck,
-      sprint AS sprint_name,
-      last_frame_comment,
-      last_edited_time,
-      page_url
-    FROM \`${projectId}.notion_ops.tareas\`
-    WHERE proyecto = @projectDetailId
-    ORDER BY last_edited_time DESC, created_time DESC
+      tm.display_name AS assignee_name,
+      tm.role_title AS assignee_role,
+      t.sprint AS sprint_name,
+      t.last_frame_comment,
+      t.last_edited_time,
+      t.page_url
+    FROM \`${projectId}.notion_ops.tareas\` t
+    LEFT JOIN \`${projectId}.greenhouse_conformed.delivery_tasks\` dt
+      ON dt.task_source_id = t.notion_page_id AND dt.is_deleted = FALSE
+    LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
+      ON tm.member_id = dt.assignee_member_id
+    WHERE t.proyecto = @projectDetailId
+    ORDER BY t.last_edited_time DESC, t.created_time DESC
   `
 
   const [rows] = await bigQuery.query({
@@ -509,6 +514,8 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
       cycleTimeDays: row.cycle_time_days === null || row.cycle_time_days === undefined ? null : toNumber(row.cycle_time_days),
       faseCsc: row.fase_csc || null,
       isStuck: Boolean(row.is_stuck),
+      assigneeName: row.assignee_name || null,
+      assigneeRole: row.assignee_role || null,
       sprintName: row.sprint_name,
       lastFrameComment: row.last_frame_comment,
       lastEditedAt: toDateString(row.last_edited_time),
