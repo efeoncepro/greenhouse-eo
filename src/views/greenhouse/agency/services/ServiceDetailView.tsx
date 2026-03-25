@@ -353,7 +353,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
             <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
               <CardHeader
                 title='HubSpot'
-                avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-brand-hubspot' /></Avatar>}
+                avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 22, height: 22 }} /></Avatar>}
               />
               <Divider />
               <CardContent>

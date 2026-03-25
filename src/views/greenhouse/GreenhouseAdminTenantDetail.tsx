@@ -122,7 +122,7 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
         </Box>
         {data.hubspotCompanyId && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <i className='tabler-brand-hubspot' style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
+            <Box component='img' src='/images/integrations/hubspot.svg' alt='HubSpot' sx={{ width: 16, height: 16, objectFit: 'contain' }} />
             <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
               HubSpot: {data.hubspotCompanyId}
             </Typography>

@@ -55,6 +55,7 @@ const GreenhouseSettings = ({
     {
       key: 'microsoft',
       iconClassName: 'tabler-brand-windows',
+      logoSrc: '/images/integrations/microsoft.svg',
       email: microsoftEmail,
       linked: isMicrosoftLinked,
       available: hasMicrosoftAuth,
@@ -66,6 +67,7 @@ const GreenhouseSettings = ({
     {
       key: 'google',
       iconClassName: 'tabler-brand-google-filled',
+      logoSrc: '/images/greenhouse/SVG/google-icon.svg',
       email: googleEmail,
       linked: isGoogleLinked,
       available: hasGoogleAuth,
@@ -101,7 +103,7 @@ const GreenhouseSettings = ({
                   {linkedAccounts.map(account => (
                     <Stack key={account.key} spacing={1.5}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-                        <i className={`${account.iconClassName} text-[24px]`} />
+                        <Box component='img' src={account.logoSrc} alt={account.key} sx={{ width: 24, height: 24, objectFit: 'contain' }} />
                         <Typography className='font-medium'>{account.email || account.emptyLabel}</Typography>
                         {account.linked ? (
                           <Chip size='small' color='success' label={GH_MESSAGES.settings_verified} />
@@ -110,7 +112,7 @@ const GreenhouseSettings = ({
                       {!account.linked && account.available ? (
                         <Button
                           variant='contained'
-                          startIcon={<i className={account.iconClassName} />}
+                          startIcon={<Box component='img' src={account.logoSrc} alt={account.key} sx={{ width: 18, height: 18, objectFit: 'contain' }} />}
                           onClick={account.onLink}
                           sx={{
                             alignSelf: 'flex-start',
