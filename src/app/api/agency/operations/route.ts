@@ -21,17 +21,36 @@ const safeCount = async (query: string, params?: unknown[]): Promise<number> => 
 
 // ── Subsystem health derivation ──
 
-type HealthStatus = 'healthy' | 'degraded' | 'down'
+type HealthStatus = 'healthy' | 'degraded' | 'down' | 'not_configured'
 
-const deriveHealth = (processed: number, failed: number, lastRun: string | null): HealthStatus => {
-  if (!lastRun) return 'down'
+const deriveHealth = (processed: number, failed: number, lastRun: string | null, tableExists: boolean): HealthStatus => {
+  // No table or no data yet — not a failure, just not configured
+  if (!tableExists || (processed === 0 && failed === 0 && !lastRun)) return 'not_configured'
+  if (!lastRun && failed === 0) return 'healthy' // Table exists, no failures, no timestamp tracked
 
-  const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
+  if (lastRun) {
+    const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
 
-  if (failed > 0 && hoursAgo > 48) return 'down'
-  if (failed > 0 || hoursAgo > 24) return 'degraded'
+    if (failed > 0 && hoursAgo > 48) return 'down'
+    if (failed > 0 || hoursAgo > 24) return 'degraded'
+  } else if (failed > 0) {
+    return 'down'
+  }
 
   return 'healthy'
+}
+
+const tableExists = async (schema: string, table: string): Promise<boolean> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
+      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = $1 AND table_name = $2) AS exists`,
+      [schema, table]
+    )
+
+    return rows[0]?.exists === true
+  } catch {
+    return false
+  }
 }
 
 // ── Main handler ──
@@ -86,13 +105,25 @@ export async function GET() {
     ).then(r => r[0]?.last_sync ?? null).catch(() => null)
   ])
 
+  // Check which tables exist
+  const [hasOutbox, hasProjections, hasNotifications, hasServices, hasIcoMetrics] = await Promise.all([
+    tableExists('greenhouse_core', 'outbox_events'),
+    tableExists('greenhouse_core', 'projection_refresh_queue'),
+    tableExists('greenhouse_notifications', 'notifications'),
+    tableExists('greenhouse_core', 'services'),
+    tableExists('greenhouse_serving', 'ico_member_metrics')
+  ])
+
+  // space_notion_sources always exists if activeSyncs > 0
+  const hasNotionSync = activeSyncs > 0
+
   const subsystems = [
-    { name: 'Outbox', status: deriveHealth(outboxProcessed, outboxFailed, outboxLastRun as string | null), processed: outboxProcessed, failed: outboxFailed, lastRun: outboxLastRun },
-    { name: 'Proyecciones', status: deriveHealth(projCompleted, projFailed, projLastRun as string | null), processed: projCompleted, failed: projFailed, lastRun: projLastRun },
-    { name: 'Notificaciones', status: deriveHealth(notifTotal, notifFailed, null), processed: notifTotal, failed: notifFailed, lastRun: null },
-    { name: 'Notion Sync', status: deriveHealth(1, 0, notionLastSync as string | null), processed: 0, failed: 0, lastRun: notionLastSync },
-    { name: 'Services Sync', status: deriveHealth(1, 0, servicesLastSync as string | null), processed: 0, failed: 0, lastRun: servicesLastSync },
-    { name: 'ICO Sync', status: deriveHealth(1, 0, icoLastSync as string | null), processed: 0, failed: 0, lastRun: icoLastSync }
+    { name: 'Outbox', status: deriveHealth(outboxProcessed, outboxFailed, outboxLastRun as string | null, hasOutbox), processed: outboxProcessed, failed: outboxFailed, lastRun: outboxLastRun },
+    { name: 'Proyecciones', status: deriveHealth(projCompleted, projFailed, projLastRun as string | null, hasProjections), processed: projCompleted, failed: projFailed, lastRun: projLastRun },
+    { name: 'Notificaciones', status: deriveHealth(notifTotal, notifFailed, null, hasNotifications), processed: notifTotal, failed: notifFailed, lastRun: null },
+    { name: 'Notion Sync', status: deriveHealth(activeSyncs, 0, notionLastSync as string | null, hasNotionSync), processed: activeSyncs, failed: 0, lastRun: notionLastSync },
+    { name: 'Services Sync', status: deriveHealth(1, 0, servicesLastSync as string | null, hasServices), processed: 0, failed: 0, lastRun: servicesLastSync },
+    { name: 'ICO Sync', status: deriveHealth(1, 0, icoLastSync as string | null, hasIcoMetrics), processed: 0, failed: 0, lastRun: icoLastSync }
   ]
 
   // Recent events

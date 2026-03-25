@@ -64,9 +64,10 @@ interface OpsData {
 
 // ── Helpers ──
 
-const statusColor = (s: string): 'success' | 'warning' | 'error' => {
+const statusColor = (s: string): 'success' | 'warning' | 'error' | 'secondary' => {
   if (s === 'healthy' || s === 'processed') return 'success'
   if (s === 'degraded' || s === 'pending') return 'warning'
+  if (s === 'not_configured') return 'secondary'
 
   return 'error'
 }
@@ -75,6 +76,7 @@ const statusLabel = (s: string): string => {
   if (s === 'healthy') return 'Saludable'
   if (s === 'degraded') return 'Degradado'
   if (s === 'down') return 'Caído'
+  if (s === 'not_configured') return 'No configurado'
   if (s === 'processed') return 'Procesado'
   if (s === 'pending') return 'Pendiente'
   if (s === 'failed') return 'Fallido'
