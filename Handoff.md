@@ -49,6 +49,44 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-25 20:45 -03
+
+### Agente
+
+- Codex GPT-5
+
+### Objetivo del turno
+
+- Revisar por qué `Agency > Spaces` no mostraba `RpA` y confirmar si la vista estaba consumiendo la capa `ICO`
+
+### Rama
+
+- `develop`
+- destino esperado: `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/agency/agency-queries.ts`
+- `src/lib/agency/agency-queries.test.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/agency/agency-queries.test.ts` — ok
+- `pnpm lint -- src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts` — el script del repo ejecuta lint global y falla por deuda preexistente en archivos no tocados; este cambio no introdujo errores reportados en los archivos editados
+
+### Riesgos o pendientes
+
+- Hallazgo confirmado: `Agency > Spaces` seguía leyendo `RpA` desde `notion_ops.tareas.rpa` y `OTD` desde `notion_ops.proyectos`, no desde `ICO`
+- Fix aplicado: `getAgencySpacesHealth()` y `getAgencyPulseKpis()` ahora leen `RpA/OTD` desde el snapshot ICO más reciente por `space_id` (`ico_engine.metric_snapshots_monthly`), agregando luego por cliente/space visible en Agency
+- La deuda documental sigue desalineada: `docs/tasks/complete/TASK-046-delivery-performance-metrics-ico-cutover.md` todavía conserva metadatos de `to-do/diseño` aunque el handoff previo la reporta como cerrada
+- Si staging sigue mostrando `—`, el próximo paso es validar que existan snapshots recientes para esos `space_id` en `ico_engine.metric_snapshots_monthly`; la vista ya no depende del campo legacy `notion_ops.tareas.rpa`
+
 ## 2026-03-25 — Sesión Claude Opus 4.6 (continuación)
 
 ### Agente

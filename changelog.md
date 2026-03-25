@@ -7,6 +7,11 @@
 
 ## 2026-03-25
 
+### Agency Spaces — RpA/OTD cutover a ICO
+- `Agency > Spaces` dejó de leer `RpA` desde `notion_ops.tareas.rpa` y `OTD` desde `notion_ops.proyectos`.
+- `getAgencySpacesHealth()` y `getAgencyPulseKpis()` ahora toman ambos KPIs desde el snapshot ICO más reciente por `space_id` en `ico_engine.metric_snapshots_monthly`, agregando luego por cliente visible en Agency.
+- Se agregó test de regresión para impedir que la vista vuelva a calcular o leer `RpA` desde la capa legacy.
+
 ### Agency Operator Layer Redesign — Fase 1
 - **Architecture**: Tab monolítico → 9 rutas independientes bajo `/agency/`.
 - **Navigation**: Gestión expandida de 3 a 9 items (Agencia, Spaces, Economía, Equipo, Delivery, Campañas, Servicios, Operaciones, Organizaciones).
