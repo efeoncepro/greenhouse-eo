@@ -6,7 +6,7 @@ import { listCampaigns, createCampaign } from '@/lib/campaigns/campaign-store'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireTenantContext()
+  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireTenantContext()
+  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

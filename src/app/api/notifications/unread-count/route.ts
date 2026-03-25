@@ -7,7 +7,7 @@ import { ensureNotificationSchema } from '@/lib/notifications/schema'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const { tenant, errorResponse } = await requireTenantContext()
+  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -32,7 +32,7 @@ const toNum = (v: unknown): number => {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireTenantContext()
+  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

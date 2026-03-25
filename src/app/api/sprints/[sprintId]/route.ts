@@ -9,7 +9,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ sprintId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireTenantContext()
+  const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
