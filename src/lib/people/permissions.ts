@@ -7,6 +7,7 @@ export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
   const isOps = roleCodes.includes('efeonce_operations')
   const isHrPayroll = roleCodes.includes('hr_payroll')
   const isHrManager = roleCodes.includes('hr_manager')
+  const isFinance = roleCodes.includes('finance_manager')
   const isPeopleViewer = roleCodes.includes('people_viewer')
 
   const canViewMemberships = isAdmin || isOps
@@ -14,7 +15,7 @@ export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
   const canViewActivity = isAdmin || isOps || isPeopleViewer
   const canViewCompensation = isAdmin || isHrPayroll || isHrManager
   const canViewPayroll = isAdmin || isHrPayroll || isHrManager
-  const canViewFinance = isAdmin || isOps || isHrPayroll
+  const canViewFinance = isAdmin || isOps || isHrPayroll || isFinance
   const canViewHrProfile = isAdmin || isHrPayroll || isHrManager
   const canViewAiTools = isAdmin || isOps
   const canViewIdentityContext = isAdmin || isOps || isHrPayroll

@@ -17,7 +17,7 @@ export const canAccessProject = (tenant: TenantContext, projectId: string) => te
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   (hasRouteGroup(tenant, 'internal') &&
-    (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll')))
+    (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll') || hasRoleCode(tenant, 'finance_manager')))
 
 export const requireTenantContext = async () => {
   const tenant = await getTenantContext()

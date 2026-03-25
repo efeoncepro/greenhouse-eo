@@ -85,8 +85,8 @@ export async function GET(request: Request) {
            pp.period_month,
            COALESCE(SUM(pe.total_cost), 0) AS total_cost_clp,
            COUNT(DISTINCT pe.member_id) AS headcount
-         FROM greenhouse_hr.payroll_entries pe
-         JOIN greenhouse_hr.payroll_periods pp ON pp.period_id = pe.period_id
+         FROM greenhouse_payroll.payroll_entries pe
+         JOIN greenhouse_payroll.payroll_periods pp ON pp.period_id = pe.period_id
          WHERE (pp.period_year * 100 + pp.period_month) >= (
            EXTRACT(YEAR FROM (CURRENT_DATE - ($1 || ' months')::interval)) * 100 +
            EXTRACT(MONTH FROM (CURRENT_DATE - ($1 || ' months')::interval))

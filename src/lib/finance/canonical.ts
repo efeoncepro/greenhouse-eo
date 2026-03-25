@@ -144,34 +144,60 @@ export const resolveFinanceClientContext = async ({
     }
   }
 
-  const projectId = getFinanceProjectId()
+  // Postgres-first: resolve from greenhouse_core.clients and greenhouse_finance.client_profiles
+  const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 
-  const clientRows = await runFinanceQuery<ClientRow>(`
-    SELECT client_id, client_name, CAST(hubspot_company_id AS STRING) AS hubspot_company_id
-    FROM \`${projectId}.greenhouse.clients\`
-    WHERE active = TRUE
-      AND (
-        (@clientId != '' AND client_id = @clientId)
-        OR (@hubspotCompanyId != '' AND CAST(hubspot_company_id AS STRING) = @hubspotCompanyId)
-      )
-  `, {
-    clientId: normalizedClientId,
-    hubspotCompanyId: normalizedHubspotCompanyId
-  })
+  let clientRows: ClientRow[] = []
+  let profileRows: ClientProfileRow[] = []
 
-  const profileRows = await runFinanceQuery<ClientProfileRow>(`
-    SELECT client_profile_id, client_id, hubspot_company_id, legal_name
-    FROM \`${projectId}.greenhouse.fin_client_profiles\`
-    WHERE (
-      (@clientProfileId != '' AND client_profile_id = @clientProfileId)
-      OR (@clientId != '' AND (client_id = @clientId OR client_profile_id = @clientId))
-      OR (@hubspotCompanyId != '' AND hubspot_company_id = @hubspotCompanyId)
+  try {
+    clientRows = await runGreenhousePostgresQuery<ClientRow>(
+      `SELECT client_id, client_name, hubspot_company_id
+       FROM greenhouse_core.clients
+       WHERE active = TRUE
+         AND (
+           ($1 != '' AND client_id = $1)
+           OR ($2 != '' AND hubspot_company_id = $2)
+         )`,
+      [normalizedClientId, normalizedHubspotCompanyId]
     )
-  `, {
-    clientProfileId: normalizedClientProfileId,
-    clientId: normalizedClientId,
-    hubspotCompanyId: normalizedHubspotCompanyId
-  })
+
+    profileRows = await runGreenhousePostgresQuery<ClientProfileRow>(
+      `SELECT client_profile_id, client_id, hubspot_company_id, legal_name
+       FROM greenhouse_finance.client_profiles
+       WHERE (
+         ($1 != '' AND client_profile_id = $1)
+         OR ($2 != '' AND (client_id = $2 OR client_profile_id = $2))
+         OR ($3 != '' AND hubspot_company_id = $3)
+       )`,
+      [normalizedClientProfileId, normalizedClientId, normalizedHubspotCompanyId]
+    )
+  } catch {
+    // Fallback to BigQuery if Postgres not available
+    console.warn('[canonical] resolveFinanceClientContext: Postgres unavailable, falling back to BigQuery')
+
+    const projectId = getFinanceProjectId()
+
+    clientRows = await runFinanceQuery<ClientRow>(`
+      SELECT client_id, client_name, CAST(hubspot_company_id AS STRING) AS hubspot_company_id
+      FROM \`${projectId}.greenhouse.clients\`
+      WHERE active = TRUE
+        AND (
+          (@clientId != '' AND client_id = @clientId)
+          OR (@hubspotCompanyId != '' AND CAST(hubspot_company_id AS STRING) = @hubspotCompanyId)
+        )
+    `, { clientId: normalizedClientId, hubspotCompanyId: normalizedHubspotCompanyId })
+
+    profileRows = await runFinanceQuery<ClientProfileRow>(`
+      SELECT client_profile_id, client_id, hubspot_company_id, legal_name
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      WHERE (
+        (@clientProfileId != '' AND client_profile_id = @clientProfileId)
+        OR (@clientId != '' AND (client_id = @clientId OR client_profile_id = @clientId))
+        OR (@hubspotCompanyId != '' AND hubspot_company_id = @hubspotCompanyId)
+      )
+    `, { clientProfileId: normalizedClientProfileId, clientId: normalizedClientId, hubspotCompanyId: normalizedHubspotCompanyId })
+  }
 
   const preferredClient = preferClientRow({
     clientRows,
@@ -287,18 +313,40 @@ export const resolveFinanceMemberContext = async ({
     }
   }
 
-  const projectId = getFinanceProjectId()
+  // Postgres-first: resolve from greenhouse_payroll and greenhouse_core.members
+  let payrollRow: PayrollEntryRow | null = null
 
-  const payrollRows = normalizedPayrollEntryId
-    ? await runFinanceQuery<PayrollEntryRow>(`
-      SELECT entry_id, period_id, member_id
-      FROM \`${projectId}.greenhouse.payroll_entries\`
-      WHERE entry_id = @payrollEntryId
-      LIMIT 1
-    `, { payrollEntryId: normalizedPayrollEntryId })
-    : []
+  if (normalizedPayrollEntryId) {
+    const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 
-  const payrollRow = payrollRows[0] ?? null
+    const pgPayrollRows = await runGreenhousePostgresQuery<PayrollEntryRow>(
+      `SELECT entry_id, period_id, member_id
+       FROM greenhouse_payroll.payroll_entries
+       WHERE entry_id = $1
+       LIMIT 1`,
+      [normalizedPayrollEntryId]
+    ).catch(() => [] as PayrollEntryRow[])
+
+    payrollRow = pgPayrollRows[0] ?? null
+
+    // Fallback to BigQuery only if Postgres has no data
+    if (!payrollRow) {
+      const projectId = getFinanceProjectId()
+
+      const bqRows = await runFinanceQuery<PayrollEntryRow>(`
+        SELECT entry_id, period_id, member_id
+        FROM \`${projectId}.greenhouse.payroll_entries\`
+        WHERE entry_id = @payrollEntryId
+        LIMIT 1
+      `, { payrollEntryId: normalizedPayrollEntryId })
+
+      payrollRow = bqRows[0] ?? null
+
+      if (payrollRow) {
+        console.warn(`[canonical] resolveFinanceMemberContext: payrollEntryId ${normalizedPayrollEntryId} resolved from BigQuery fallback`)
+      }
+    }
+  }
 
   if (normalizedPayrollEntryId && !payrollRow) {
     throw new FinanceValidationError('payrollEntryId does not exist.', 409)
@@ -310,16 +358,40 @@ export const resolveFinanceMemberContext = async ({
 
   const resolvedMemberId = normalizedMemberId || normalizeString(payrollRow?.member_id)
 
-  const memberRows = resolvedMemberId
-    ? await runFinanceQuery<MemberRow>(`
-      SELECT member_id, display_name
-      FROM \`${projectId}.greenhouse.team_members\`
-      WHERE member_id = @memberId
-      LIMIT 1
-    `, { memberId: resolvedMemberId })
-    : []
+  // Postgres-first: resolve member from greenhouse_core.members
+  let memberRow: MemberRow | null = null
 
-  const memberRow = memberRows[0] ?? null
+  if (resolvedMemberId) {
+    const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+
+    const pgMemberRows = await runGreenhousePostgresQuery<MemberRow>(
+      `SELECT member_id, display_name
+       FROM greenhouse_core.members
+       WHERE member_id = $1
+       LIMIT 1`,
+      [resolvedMemberId]
+    ).catch(() => [] as MemberRow[])
+
+    memberRow = pgMemberRows[0] ?? null
+
+    // Fallback to BigQuery
+    if (!memberRow) {
+      const projectId = getFinanceProjectId()
+
+      const bqRows = await runFinanceQuery<MemberRow>(`
+        SELECT member_id, display_name
+        FROM \`${projectId}.greenhouse.team_members\`
+        WHERE member_id = @memberId
+        LIMIT 1
+      `, { memberId: resolvedMemberId })
+
+      memberRow = bqRows[0] ?? null
+
+      if (memberRow) {
+        console.warn(`[canonical] resolveFinanceMemberContext: memberId ${resolvedMemberId} resolved from BigQuery fallback`)
+      }
+    }
+  }
 
   if (resolvedMemberId && !memberRow) {
     throw new FinanceValidationError('memberId does not exist.', 409)
