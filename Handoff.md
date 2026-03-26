@@ -49,6 +49,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 12:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Mitigar un freeze de ingreso reportado en `dev-greenhouse` sospechado sobre el rollout de `Home/Nexa`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/app/(dashboard)/home/page.tsx`
+- `src/lib/tenant/access.ts`
+- `Handoff.md`
+- `changelog.md`
+- `docs/tasks/complete/TASK-009-greenhouse-home-nexa.md`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- smoke técnico de rutas por diff local
+
+### Riesgos o pendientes
+
+- Se desactivó `Home/Nexa` como landing por defecto para clientes y `/home` vuelve a redirigir a `/dashboard` mientras se audita el freeze.
+- La implementación de `Home/Nexa` no se eliminó; quedó fuera del camino crítico de login hasta aislar el problema real.
+
 ## 2026-03-26 08:16 -03
 
 ### Agente

@@ -1,5 +1,5 @@
-import HomeView from '@/views/greenhouse/home/HomeView'
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return <HomeView />
+  redirect('/dashboard')
 }

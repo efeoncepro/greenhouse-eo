@@ -266,7 +266,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
             ? '/my'
             : tenantType === 'efeonce_internal'
               ? '/internal/dashboard'
-              : '/home'),
+              : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',

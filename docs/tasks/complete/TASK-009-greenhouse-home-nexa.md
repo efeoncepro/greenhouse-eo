@@ -355,3 +355,6 @@ Ante conflicto, prevalecen:
   - `src/config/greenhouse-home-greetings.ts`
   - `src/config/greenhouse-home-suggestions.ts`
   - `src/types/home.ts`
+## Delta 2026-03-26
+- Se retiró temporalmente el rollout de `/home` como landing por defecto del portal y `/home` volvió a redirigir a `/dashboard` para estabilizar ingreso en `staging`.
+- La implementación del módulo `Home/Nexa` sigue presente en código, pero quedó fuera del camino crítico hasta aislar el freeze reportado por usuarios.

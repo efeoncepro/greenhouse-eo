@@ -7,6 +7,11 @@
 
 ## 2026-03-26
 
+### Home / Nexa — rollout retirado del camino crítico de ingreso
+- Se desactivó temporalmente `Home/Nexa` como landing por defecto para clientes.
+- `/home` volvió a redirigir a `/dashboard` y el fallback de `portalHomePath` para clientes dejó de resolver `/home`.
+- Motivo: mitigación rápida de un freeze reportado al ingresar a `dev-greenhouse`, mientras se aísla la causa raíz del rollout.
+
 ### Home / Nexa — MVP client-first implementado
 - `/home` dejó de redirigir automáticamente a `/dashboard`; ahora renderiza `HomeView` como nueva superficie de entrada client-first.
 - `portalHomePath` para clientes quedó alineado a `/home`.
