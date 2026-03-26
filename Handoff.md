@@ -89,6 +89,10 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - uso operativo
   - disponibilidad
 - Se creó `TASK-056` como lane específica para cerrar esa definición antes de seguir iterando implementación.
+- `TASK-056` se amplió además para incluir una segunda capa hermana de economía de capacidad:
+  - costo hora por persona/período
+  - costo hundido de capacidad interna
+  - tarifa sugerida de venta
 - La siguiente decisión de producto/dominio pendiente es si `Uso operativo` se mostrará como horas reales, horas estimadas o índice/porcentaje operativo.
 
 ## 2026-03-26 12:32 -03

@@ -15,6 +15,10 @@
   - uso operativo
   - disponibilidad
 - También deja propuesta una capa reusable de conversiones `FTE <-> horas` sin meter lógica de negocio en el helper.
+- La misma lane ahora incluye una segunda capa reusable de economía de capacidad para convertir compensación del período en:
+  - `costPerHour`
+  - costo hundido interno
+  - `suggestedBillRate` como referencia de venta, sin confundirlo con pricing comercial final.
 - `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
 
 ### Agency Team — capacidad cliente efectiva corregida

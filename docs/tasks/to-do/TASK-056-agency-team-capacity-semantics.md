@@ -15,7 +15,12 @@
 
 `Agency > Team` ya dejó de sobrecontar assignments internos y FTE imposibles, pero la vista sigue mezclando conceptos de capacidad comercial con señales de uso operativo. Esta task formaliza el contrato de dominio antes de seguir iterando backend/UI.
 
-El objetivo es separar de forma explícita `capacidad contractual`, `dedicación comprometida`, `uso operativo` y `disponibilidad`, y dejar una capa canónica de conversiones `FTE <-> horas` reutilizable sin meter heurísticas de negocio dentro del helper.
+El objetivo es separar de forma explícita `capacidad contractual`, `dedicación comprometida`, `uso operativo` y `disponibilidad`, y dejar dos capas canónicas reutilizables:
+
+- unidades de capacidad: `FTE <-> horas`
+- economía de capacidad: `costo hora`, `costo hundido`, `tarifa sugerida`
+
+Ninguna de estas capas debe mezclar por sí sola reglas comerciales específicas de una vista.
 
 ## Why This Task Exists
 
@@ -34,10 +39,17 @@ El runtime reciente confirmó tres problemas semánticos distintos:
 - hoy se repite `FTE * 160` e inferencias similares en varias zonas
 - eso facilita drift entre Team, People, Finance y futuras vistas operativas
 
+4. Tampoco existe una capa canónica para cuantificar el costo real de una hora de capacidad
+- salario base, bonos y costos variables hoy viven en módulos relacionados pero no en una abstracción reusable para pricing/capacidad
+- sin esa capa, distintas vistas pueden terminar calculando distinto:
+  - cuánto le cuesta una hora a la agencia
+  - cuánto debería sugerirse cobrar por esa hora
+
 ## Goal
 
 - Definir el contrato canónico de `Agency > Team` sin mezclar capacidad comercial y uso operativo.
 - Dejar una propuesta explícita de helper reusable para conversiones `FTE <-> horas`.
+- Dejar una propuesta explícita de cuantificador económico por persona/período para traducir compensación a `costo hora` y `tarifa sugerida`.
 - Preparar el refactor posterior de backend/UI con reglas de negocio y fallback claros.
 
 ## Architecture Alignment
@@ -56,6 +68,7 @@ Reglas obligatorias:
 - `client_team_assignments` expresa compromiso comercial, no uso operativo real.
 - `Efeonce` interno no debe computarse como carga cliente en esta vista.
 - un helper de unidades no debe decidir semántica de negocio; solo convertir, normalizar y capear.
+- un cuantificador económico no debe decidir descuentos comerciales ni pricing final de venta; solo producir costos y referencias defendibles por período/persona.
 - si `usedHours` no tiene fuente defendible, la UI no debe inventarlas ni equipararlas a `assignedHours`.
 
 ## Dependencies & Impact
@@ -129,7 +142,23 @@ Reglas obligatorias:
   - pertenencia de miembros a una vista
   - inferencia de `usedHours`
 
-### Slice 3 - Contrato de API + UX
+### Slice 3 - Cuantificador económico de capacidad
+
+- Diseñar una segunda capa reusable para convertir compensación del período en economía horaria:
+  - `baseSalary`
+  - `fixedBonuses`
+  - `variableBonuses`
+  - `employerCosts`
+  - `monthlyCapacityHours`
+  - `costPerHour`
+  - `suggestedBillRate`
+- Separar explícitamente:
+  - costo agencia por hora
+  - referencia sugerida de venta por hora
+  - margen objetivo aplicado
+- Dejar claro qué inputs son obligatorios y cuáles son opcionales o parametrizables por país/período.
+
+### Slice 4 - Contrato de API + UX
 
 - Proponer payload estable para `GET /api/team/capacity-breakdown`.
 - Renombrar en diseño si hace falta:
@@ -137,7 +166,7 @@ Reglas obligatorias:
   - `Disponibles` -> `Disponible comercial`
 - Definir qué copy de fallback mostrar cuando falte fuente confiable.
 
-### Slice 4 - Follow-up técnico
+### Slice 5 - Follow-up técnico
 
 - Derivar implementación posterior en backend/UI una vez cerrado el contrato.
 - Revisar si `person_operational_360` y consumers relacionados siguen materializando semántica vieja de assignments.
@@ -146,7 +175,7 @@ Reglas obligatorias:
 
 - Implementar time tracking real.
 - Rehacer toda la capa de `People 360`.
-- Resolver costos financieros por FTE en esta misma lane.
+- Resolver pricing comercial final de contratos en esta misma lane.
 - Mezclar este trabajo con migraciones grandes de UI o refactors de otras vistas.
 
 ## Open Questions
@@ -157,6 +186,16 @@ Reglas obligatorias:
   - saturación operativa
   - ambas por separado?
 - ¿La vista debe exponer dos disponibilidades (`comercial` y `operativa`) o una sola principal?
+- ¿La `tarifa sugerida` debe ser:
+  - solo `costPlus`
+  - derivada de margen objetivo por rol
+  - configurable por organización/servicio?
+- ¿Qué componentes del costo deben entrar en `costPerHour`:
+  - salario base
+  - bonos fijos
+  - bonos variables
+  - cargas empleador
+  - overhead de agencia?
 
 ## Acceptance Criteria
 
@@ -164,6 +203,7 @@ Reglas obligatorias:
 - [ ] Queda documentado que `Asignadas` no equivale a `Usadas`.
 - [ ] Queda definido el comportamiento de `Efeonce` interno como costo hundido/autogestión, fuera de carga cliente.
 - [ ] Queda propuesta una capa reusable de conversiones `FTE <-> horas` sin lógica de negocio embebida.
+- [ ] Queda propuesta una capa reusable de cuantificación económica por persona/período para `costPerHour` y `suggestedBillRate`.
 - [ ] El siguiente trabajo de implementación puede ejecutarse sin depender de memoria conversacional.
 
 ## Verification
