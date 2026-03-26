@@ -16,16 +16,18 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+import tableStyles from '@core/styles/table.module.css'
 
 interface Allocation {
   allocationId: string
@@ -64,6 +66,7 @@ const CostAllocationsView = () => {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [allocSorting, setAllocSorting] = useState<SortingState>([])
 
   // Form state
   const [formExpenseId, setFormExpenseId] = useState('')
@@ -134,6 +137,28 @@ const CostAllocationsView = () => {
       // Non-blocking
     }
   }
+
+  const allocColumnHelper = createColumnHelper<Allocation>()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allocColumns: ColumnDef<Allocation, any>[] = [
+    allocColumnHelper.accessor('clientName', { header: 'Cliente', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
+    allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{getValue().slice(0, 12)}…</Typography> }),
+    allocColumnHelper.accessor('allocationMethod', { header: 'Método', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color='info' label={METHOD_LABELS[getValue()] || getValue()} />, meta: { align: 'center' } }),
+    allocColumnHelper.accessor('allocationPercent', { header: '%', cell: ({ getValue }) => `${getValue()}%`, meta: { align: 'right' } }),
+    allocColumnHelper.accessor('allocatedAmountClp', { header: 'Monto CLP', cell: ({ getValue }) => formatClp(getValue()), meta: { align: 'right' } }),
+    allocColumnHelper.accessor('notes', { header: 'Notas', cell: ({ getValue }) => <Typography variant='caption' color='text.secondary'>{getValue() || '—'}</Typography> }),
+    { id: 'actions', header: 'Acciones', cell: ({ row }: { row: { original: Allocation } }) => <Button size='small' color='error' onClick={() => handleDelete(row.original.allocationId)}><i className='tabler-trash' /></Button>, enableSorting: false, meta: { align: 'center' } }
+  ]
+
+  const allocTable = useReactTable({
+    data: allocations,
+    columns: allocColumns,
+    state: { sorting: allocSorting },
+    onSortingChange: setAllocSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   const resetForm = () => {
     setFormExpenseId('')
@@ -234,60 +259,33 @@ const CostAllocationsView = () => {
               </Box>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Cliente</TableCell>
-                    <TableCell>Expense ID</TableCell>
-                    <TableCell align='center'>Método</TableCell>
-                    <TableCell align='right'>%</TableCell>
-                    <TableCell align='right'>Monto CLP</TableCell>
-                    <TableCell>Notas</TableCell>
-                    <TableCell align='center'>Acciones</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {allocations.map(a => (
-                    <TableRow key={a.allocationId} hover>
-                      <TableCell>
-                        <Typography variant='body2' fontWeight={600}>{a.clientName}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                          {a.expenseId.slice(0, 12)}…
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          variant='tonal'
-                          color='info'
-                          label={METHOD_LABELS[a.allocationMethod] || a.allocationMethod}
-                        />
-                      </TableCell>
-                      <TableCell align='right'>{a.allocationPercent}%</TableCell>
-                      <TableCell align='right'>{formatClp(a.allocatedAmountClp)}</TableCell>
-                      <TableCell>
-                        <Typography variant='caption' color='text.secondary'>
-                          {a.notes || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <Button
-                          size='small'
-                          color='error'
-                          onClick={() => handleDelete(a.allocationId)}
-                        >
-                          <i className='tabler-trash' />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {allocTable.getHeaderGroups().map(hg => (
+                    <tr key={hg.id}>
+                      {hg.headers.map(header => (
+                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </thead>
+                <tbody>
+                  {allocTable.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       </Grid>
