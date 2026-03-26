@@ -91,21 +91,25 @@ export const getOrganizationEconomics = async (
     const direct = toNum(row.direct_costs_clp)
     const indirect = toNum(row.indirect_costs_clp)
     const labor = laborByClient.get(String(row.client_id))
+    const laborCost = labor?.allocatedLaborClp ?? 0
+    const nonLaborDirect = Math.max(0, direct - laborCost)
 
     totalRevenue += rev
-    totalDirectCosts += direct
+    totalDirectCosts += nonLaborDirect
     totalIndirectCosts += indirect
-    totalLaborCost += labor?.allocatedLaborClp ?? 0
+    totalLaborCost += laborCost
     totalFte += labor?.headcountFte ?? toNum(row.headcount_fte)
   }
 
   // Also include labor costs for clients in this org that may not have revenue
   for (const lc of laborCosts) {
     if (!orgClientIds.has(lc.clientId)) continue
+
     // Already counted above
   }
 
-  const adjustedMargin = roundCurrency(totalRevenue - totalLaborCost - totalDirectCosts)
+  const adjustedMargin = roundCurrency(totalRevenue - totalLaborCost - totalDirectCosts - totalIndirectCosts)
+
   const adjustedMarginPercent = totalRevenue > 0
     ? Math.round((adjustedMargin / totalRevenue) * 10000) / 100
     : null
@@ -122,7 +126,7 @@ export const getOrganizationEconomics = async (
     adjustedMarginPercent,
     activeFte: totalFte > 0 ? Math.round(totalFte * 100) / 100 : null,
     revenuePerFte: totalFte > 0 ? roundCurrency(totalRevenue / totalFte) : null,
-    costPerFte: totalFte > 0 ? roundCurrency((totalLaborCost + totalDirectCosts) / totalFte) : null,
+    costPerFte: totalFte > 0 ? roundCurrency((totalLaborCost + totalDirectCosts + totalIndirectCosts) / totalFte) : null,
     clientCount: financeRows.length
   }
 }
@@ -173,16 +177,18 @@ export const getOrganizationProfitabilityBreakdown = async (
   return financeRows.map(row => {
     const rev = toNum(row.total_revenue_clp)
     const direct = toNum(row.direct_costs_clp)
+    const indirect = toNum(row.indirect_costs_clp)
     const labor = laborByClient.get(String(row.client_id))
     const laborCost = labor?.allocatedLaborClp ?? 0
-    const marginClp = roundCurrency(rev - laborCost - direct)
+    const nonLaborDirect = Math.max(0, direct - laborCost)
+    const marginClp = roundCurrency(rev - laborCost - nonLaborDirect - indirect)
 
     return {
       clientId: String(row.client_id),
       clientName: String(row.client_name),
       revenueClp: roundCurrency(rev),
       laborCostClp: roundCurrency(laborCost),
-      directCostsClp: roundCurrency(direct),
+      directCostsClp: roundCurrency(nonLaborDirect),
       marginClp,
       marginPercent: rev > 0 ? Math.round((marginClp / rev) * 10000) / 100 : null,
       headcountFte: labor?.headcountFte ?? (row.headcount_fte != null ? toNum(row.headcount_fte) : null)

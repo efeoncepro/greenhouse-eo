@@ -49,6 +49,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:50 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir consumers de Organization que seguían leyendo `client_economics` con semántica vieja: márgenes incompletos como válidos y doble conteo de costo laboral.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/finance/client-economics-presentation.ts`
+- `src/lib/finance/client-economics-presentation.test.ts`
+- `src/app/api/finance/intelligence/client-economics/route.ts`
+- `src/app/api/finance/intelligence/client-economics/trend/route.ts`
+- `src/lib/account-360/organization-store.ts`
+- `src/lib/account-360/organization-economics.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+- `docs/tasks/complete/TASK-010-organization-economics-dashboard.md`
+
+### Verificacion
+
+- `pnpm test src/lib/finance/client-economics-presentation.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- `sanitizeSnapshotForPresentation()` salió del route y quedó como helper reusable en `finance/client-economics-presentation.ts`; ahora Finance y Organization consumen el mismo contrato de completitud.
+- `organization-store.ts` dejó de promediar `grossMarginPercent` / `netMarginPercent` nulos como `0`; ahora pondera solo clientes con cobertura válida.
+- `organization-economics.ts` dejó de doble-contar nómina:
+  - `client_economics.direct_costs_clp` se trata como costo canónico total
+  - `laborCostClp` pasa a ser desglose/subset
+  - el margen ajustado ya no resta nómina dos veces
+- Próximo paso recomendado:
+  - smoke test visual de `OrganizationFinanceTab` y `OrganizationEconomicsTab` en `dev-greenhouse` para confirmar que los KPIs bajaron a valores coherentes después del recálculo semántico
+
 ## 2026-03-26 07:42 -03
 
 ### Agente

@@ -85,6 +85,16 @@
   - `CLP_USD_2026-02-27 = 0.001161`
 - Con esto, la capa de FX queda utilizable no solo para FI sino también para cualquier servicio futuro que necesite pares inversos con precisión estable.
 
+## Delta 2026-03-26 (consumers de Organization alineados)
+
+- `sanitizeSnapshotForPresentation()` salió de la route de FI y quedó como helper reusable en `src/lib/finance/client-economics-presentation.ts`.
+- `organization-store.ts` ahora aplica ese mismo contrato al resumen por organización, evitando ponderar márgenes incompletos como si fueran `0`.
+- Se corrigió además `organization-economics.ts`, que estaba doble-contando nómina:
+  - `client_economics.direct_costs_clp` se trata como costo canónico total del snapshot
+  - `laborCostClp` queda como desglose/subset visible
+  - el margen ajustado deja de restar costo laboral dos veces
+- Con esto, Organization Finance y Organization Economics quedan alineados con la semántica actual de `client_economics` y con el fix de febrero.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.

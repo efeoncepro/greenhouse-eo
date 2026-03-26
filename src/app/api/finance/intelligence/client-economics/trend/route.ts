@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { listClientEconomicsTrend } from '@/lib/finance/postgres-store-intelligence'
-import { sanitizeSnapshotForPresentation } from '../route'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   }
 
   // Group by client for portfolio view
-  const byClient = new Map<string, { clientName: string; periods: typeof snapshots }>()
+  const byClient = new Map<string, { clientName: string; periods: typeof sanitized }>()
 
   for (const snap of sanitized) {
     const entry = byClient.get(snap.clientId) || { clientName: snap.clientName, periods: [] }
