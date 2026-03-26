@@ -156,6 +156,7 @@ const buildMarginBarOptions = (theme: Theme, categories: string[], colors: strin
     padding: { left: 0, right: 16, top: -12, bottom: -8 }
   },
   xaxis: {
+    categories,
     labels: {
       formatter: (val: string) => `${Number(val).toFixed(0)}%`,
       style: {
@@ -583,7 +584,7 @@ const ClientEconomicsView = () => {
           <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>Inteligencia financiera</Typography>
           <Typography variant='body2' color='text.secondary'>Rentabilidad y economía por Space</Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
           <CustomTextField
             select
             size='small'
@@ -611,9 +612,11 @@ const ClientEconomicsView = () => {
           <Button
             variant='contained'
             color='primary'
+            size='large'
             startIcon={computing ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-calculator' />}
             onClick={handleCompute}
             disabled={computing}
+            sx={{ height: 40 }}
           >
             {computing ? 'Calculando…' : 'Calcular'}
           </Button>
