@@ -25,10 +25,10 @@ describe('AgencyTeamView', () => {
       ok: true,
       json: async () => ({
         team: {
-          contractedHoursMonth: 528,
-          assignedHoursMonth: 528,
+          contractedHoursMonth: 320,
+          assignedHoursMonth: 208,
           usedHoursMonth: null,
-          availableHoursMonth: 0,
+          availableHoursMonth: 112,
           overcommitted: false
         },
         members: [
@@ -36,11 +36,11 @@ describe('AgencyTeamView', () => {
             memberId: 'member-1',
             displayName: 'Andres Carlosama',
             roleTitle: 'Operations Lead',
-            fteAllocation: 2,
+            fteAllocation: 1,
             capacityHealth: 'high',
             capacity: {
-              contractedHoursMonth: 320,
-              assignedHoursMonth: 320,
+              contractedHoursMonth: 160,
+              assignedHoursMonth: 160,
               usedHoursMonth: null,
               availableHoursMonth: 0,
               overcommitted: false
@@ -61,8 +61,8 @@ describe('AgencyTeamView', () => {
     })
 
     expect(screen.getByText('Sin métricas operativas')).toBeInTheDocument()
-    expect(screen.getByText('Las horas usadas aún no están disponibles en este entorno. La carga se está leyendo desde capacidad comprometida, no desde producción efectiva.')).toBeInTheDocument()
+    expect(screen.getByText('Las horas usadas aún no están disponibles en este entorno. La carga comprometida excluye Efeonce interno y no reemplaza producción efectiva.')).toBeInTheDocument()
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('0h').length).toBeGreaterThan(0)
+    expect(screen.getByText('112h')).toBeInTheDocument()
   })
 })

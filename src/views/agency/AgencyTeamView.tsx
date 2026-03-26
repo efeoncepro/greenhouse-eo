@@ -188,7 +188,7 @@ return acc }, {} as Record<string, number>)
         <HorizontalWithSubtitle title='Contratadas' stats={`${data.team.contractedHoursMonth}h`} avatarIcon='tabler-file-certificate' avatarColor='primary' subtitle='Horas contrato/mes' />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Asignadas' stats={`${data.team.assignedHoursMonth}h`} avatarIcon='tabler-clock' avatarColor='info' subtitle='FTE comprometido' />
+        <HorizontalWithSubtitle title='Asignadas' stats={`${data.team.assignedHoursMonth}h`} avatarIcon='tabler-clock' avatarColor='info' subtitle='Carga cliente comprometida' />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle title='Usadas' stats={formatHours(data.team.usedHoursMonth)} avatarIcon='tabler-bolt' avatarColor='warning' subtitle={data.hasOperationalMetrics ? 'Horas efectivas' : 'Sin métricas operativas'} />
@@ -217,7 +217,7 @@ return acc }, {} as Record<string, number>)
       {!data.hasOperationalMetrics && (
         <Grid size={{ xs: 12 }}>
           <Alert severity='info' variant='outlined'>
-            Las horas usadas aún no están disponibles en este entorno. La carga se está leyendo desde capacidad comprometida, no desde producción efectiva.
+            Las horas usadas aún no están disponibles en este entorno. La carga comprometida excluye Efeonce interno y no reemplaza producción efectiva.
           </Alert>
         </Grid>
       )}

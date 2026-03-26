@@ -16,6 +16,8 @@ export const roundToTenths = (value: number) => Math.round(value * 10) / 10
 
 export const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
 
+export const clampFte = (value: number, maxFte = 1) => roundToTenths(Math.max(0, Math.min(maxFte, value)))
+
 export const getAssignedHoursMonth = (fteAllocation: number) => Math.round(Math.max(0, fteAllocation) * CAPACITY_HOURS_PER_FTE)
 
 export const getExpectedMonthlyThroughput = ({

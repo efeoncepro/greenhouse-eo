@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 12:32 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir la semántica de `Agency > Team` para que la capacidad no sume asignaciones internas de Efeonce ni permita más de `1.0 FTE` por persona.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/app/api/team/capacity-breakdown/route.ts`
+- `src/app/api/team/capacity-breakdown/route.test.ts`
+- `src/lib/team-capacity/shared.ts`
+- `src/views/agency/AgencyTeamView.tsx`
+- `src/views/agency/AgencyTeamView.test.tsx`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx src/lib/team-capacity/shared.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- `Agency > Team` ahora modela capacidad cliente efectiva por miembro:
+  - excluye `Efeonce Internal` de la carga comprometida
+  - limita el sobre contractual a `1.0 FTE` por persona
+  - evita sumar `contracted_hours_month` por assignment como si fueran horas distintas
+- Si más adelante se necesita distinguir explícitamente billable vs non-billable fuera del cliente interno, conviene formalizar ese atributo en `greenhouse_core.client_team_assignments`.
+
 ## 2026-03-26 12:18 -03
 
 ### Agente

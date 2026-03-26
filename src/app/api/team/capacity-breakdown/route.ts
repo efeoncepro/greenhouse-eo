@@ -5,6 +5,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   computeCapacityBreakdown,
   aggregateCapacityBreakdown,
+  clampFte,
   getExpectedMonthlyThroughput,
   getUtilizationPercent,
   getCapacityHealth,
@@ -20,6 +21,8 @@ interface AssignmentRow extends Record<string, unknown> {
   role_title: string | null
   fte_allocation: string | number
   contracted_hours_month: number | null
+  client_id: string | null
+  client_name: string | null
   active_assets: string | number
 }
 
@@ -48,6 +51,13 @@ const inferRoleCategory = (roleTitle: string | null): TeamRoleCategory => {
   if (lower.includes('media') || lower.includes('pauta') || lower.includes('social')) return 'media'
 
   return 'unknown'
+}
+
+const isInternalClientAssignment = (row: AssignmentRow) => {
+  const clientId = String(row.client_id || '').trim().toLowerCase()
+  const clientName = String(row.client_name || '').trim().toLowerCase()
+
+  return clientId === 'efeonce_internal' || clientId === 'client_internal' || clientName === 'efeonce internal'
 }
 
 const getCommitmentHealth = ({
@@ -97,33 +107,50 @@ export async function GET() {
     // Get assignments with contracted hours from Postgres
     const query = pomExists
       ? `SELECT
-          a.member_id, m.display_name,
-          COALESCE(MAX(a.role_title_override), m.role_title) AS role_title,
-          SUM(a.fte_allocation) AS fte_allocation,
-          SUM(COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160)))::int AS contracted_hours_month,
+          a.member_id,
+          m.display_name,
+          COALESCE(a.role_title_override, m.role_title) AS role_title,
+          a.client_id,
+          c.client_name,
+          a.fte_allocation,
+          COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
           COALESCE(pom.tasks_active, 0) AS active_assets
         FROM greenhouse_core.client_team_assignments a
         JOIN greenhouse_core.members m ON m.member_id = a.member_id
+        LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
         LEFT JOIN greenhouse_serving.person_operational_metrics pom
           ON pom.member_id = a.member_id
           AND pom.period_year = EXTRACT(YEAR FROM CURRENT_DATE)
           AND pom.period_month = EXTRACT(MONTH FROM CURRENT_DATE)
         WHERE a.active = TRUE
-        GROUP BY a.member_id, m.display_name, m.role_title, pom.tasks_active
-        ORDER BY m.display_name`
+          AND m.active = TRUE
+          AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+        ORDER BY m.display_name, a.client_id`
       : `SELECT
-          a.member_id, m.display_name,
-          COALESCE(MAX(a.role_title_override), m.role_title) AS role_title,
-          SUM(a.fte_allocation) AS fte_allocation,
-          SUM(COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160)))::int AS contracted_hours_month,
+          a.member_id,
+          m.display_name,
+          COALESCE(a.role_title_override, m.role_title) AS role_title,
+          a.client_id,
+          c.client_name,
+          a.fte_allocation,
+          COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
           0 AS active_assets
         FROM greenhouse_core.client_team_assignments a
         JOIN greenhouse_core.members m ON m.member_id = a.member_id
+        LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
         WHERE a.active = TRUE
-        GROUP BY a.member_id, m.display_name, m.role_title
-        ORDER BY m.display_name`
+          AND m.active = TRUE
+          AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+        ORDER BY m.display_name, a.client_id`
 
     const rows = await runGreenhousePostgresQuery<AssignmentRow>(query)
+    const rowsByMember = new Map<string, AssignmentRow[]>()
+
+    for (const row of rows) {
+      const memberRows = rowsByMember.get(row.member_id) || []
+      memberRows.push(row)
+      rowsByMember.set(row.member_id, memberRows)
+    }
 
     const memberBreakdowns: Array<{
       memberId: string
@@ -135,25 +162,30 @@ export async function GET() {
       capacity: CapacityBreakdown
     }> = []
 
-    for (const row of rows) {
-      const fteAllocation = toNum(row.fte_allocation)
-      const roleCategory = inferRoleCategory(row.role_title)
-      const activeAssets = toNum(row.active_assets)
-      const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation })
+    for (const [memberId, memberRows] of rowsByMember.entries()) {
+      const primaryRow = memberRows[0]
+      const totalActiveFte = memberRows.reduce((sum, row) => sum + toNum(row.fte_allocation), 0)
+      const clientFacingFte = memberRows.reduce((sum, row) => sum + (isInternalClientAssignment(row) ? 0 : toNum(row.fte_allocation)), 0)
+      const contractedFte = clampFte(totalActiveFte)
+      const assignedFte = Math.min(clientFacingFte, contractedFte)
+      const contractedHoursMonth = Math.round(contractedFte * 160)
+      const roleCategory = inferRoleCategory(primaryRow.role_title)
+      const activeAssets = toNum(primaryRow.active_assets)
+      const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation: assignedFte })
       const utilizationPercent = getUtilizationPercent({ activeAssets, expectedMonthlyThroughput: expectedThroughput })
 
       const capacity = computeCapacityBreakdown({
-        fteAllocation,
-        contractedHoursMonth: row.contracted_hours_month,
+        fteAllocation: assignedFte,
+        contractedHoursMonth,
         utilizationPercent,
         hasUsageData: pomExists
       })
 
       memberBreakdowns.push({
-        memberId: row.member_id,
-        displayName: row.display_name,
-        roleTitle: row.role_title,
-        fteAllocation,
+        memberId,
+        displayName: primaryRow.display_name,
+        roleTitle: primaryRow.role_title,
+        fteAllocation: assignedFte,
         utilizationPercent,
         capacityHealth: pomExists
           ? getCapacityHealth(utilizationPercent)
