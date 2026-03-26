@@ -49,6 +49,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:44 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Verificar por qué `Finance > Intelligence` seguía mostrando marzo 2026 con `costos incompletos` después del fix de febrero.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `Handoff.md`
+- `changelog.md`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- Query directa a PostgreSQL para `greenhouse_payroll.payroll_periods`, `greenhouse_finance.client_economics` y `greenhouse_serving.client_labor_cost_allocation`
+- Sanitización runtime con `sanitizeSnapshotForPresentation()`
+- `vercel inspect https://greenhouse-fi5qtnqhf-efeonce-7670142f.vercel.app --scope efeonce-7670142f`
+
+### Riesgos o pendientes
+
+- Marzo 2026 ya no está incompleto en backend:
+  - `2026-03` quedó `approved`
+  - `Sky Airline` quedó con `direct_costs_clp = 1,119,441.76`
+  - `gross_margin_percent = net_margin_percent = 0.9189`
+  - `hasCompleteCostCoverage = true`
+- El dominio `dev-greenhouse.efeoncepro.com` apunta al deployment `Ready` `greenhouse-fi5qtnqhf-efeonce-7670142f.vercel.app`.
+- Si el usuario sigue viendo el warning naranja en la UI, el estado visible corresponde a una carga anterior al recompute de marzo; el backend actual ya no devuelve ese estado para `2026-03`.
+
 ## 2026-03-26 08:00 -03
 
 ### Agente
@@ -183,6 +223,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `grossMarginPercent = 0.8924`
 - No quedan pendientes abiertos de este slice de febrero; el siguiente paso opcional sería reutilizar `invertExchangeRate()` donde hoy existan conversiones ad hoc fuera de `finance/exchange-rates`.
 
+---
+
+## 2026-03-26 10:40 -03
+
+### Agente
+- Antigravity
+
+### Objetivo del turno
+- Completar **TASK-014** (Account Operational Metrics) y **TASK-044** (Organization Executive Snapshot).
+- Integrar mallas operativas de **ICO** (BigQuery) y métricas de salud tributaria (**DTE Coverage**) en un solo snapshot ejecutivo para organizaciones.
+
+### Rama
+- `develop`
+
+### Archivos tocados
+- `src/lib/ico-engine/schema.ts`
+- `src/lib/ico-engine/materialize.ts`
+- `scripts/setup-postgres-organization-operational-serving.ts` (Nuevo)
+- `scripts/setup-postgres-organization-operational-serving.sql` (Nuevo)
+- `src/lib/account-360/get-organization-operational-serving.ts` (Nuevo)
+- `src/lib/sync/projections/ico-organization-metrics.ts` (Nuevo)
+- `src/lib/sync/projections/organization-operational.ts` (Nuevo)
+- `src/lib/account-360/organization-executive.ts` (Enriquecido con operations y taxHealth)
+- `package.json` (Añadido script de setup)
+
+### Verificación
+- DDL aplicado en PostgreSQL con éxito.
+- Store `getOrganizationExecutiveSnapshot` probado con `economics`, `delivery`, `operations` y `taxHealth`.
+- Proyecciones registradas en el consumer reactivo.
+
+### Riesgos o pendientes
+- El frontend aún debe adoptar `OrganizationExecutiveSnapshot` en la pestaña de Overview del detalle de organización para reducir el fan-out de la red.
+- La consistencia de BQ necesita que corra un ciclo de materialización total para poblar `metrics_by_organization`.
+
+---
+
 ## 2026-03-26 07:34 -03
 
 ### Agente
@@ -229,65 +305,6 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - Gap menor detectado:
   - el rate reverso `CLP -> USD` sigue redondeando a `0` por precisión insuficiente en `buildUsdClpRatePairs()`
   - no bloquea este caso porque FI consume `USD -> CLP`, pero conviene corregirlo en una lane corta de finance rates
-
-## 2026-03-26 07:26 -03
-
-### Agente
-
-- Codex
-
-### Objetivo del turno
-
-- Habilitar febrero 2026 para `Finance Intelligence` sin mezclar monedas: backfill billable de assignments, fix de rango mensual corto y bridge laboral con moneda fuente + CLP diferido.
-
-### Rama
-
-- `develop`
-
-### Ambiente objetivo
-
-- Development / staging
-
-### Archivos tocados
-
-- `scripts/backfill-february-billable-assignments.ts`
-- `scripts/setup-postgres-finance-intelligence-p2.sql`
-- `src/lib/finance/periods.ts`
-- `src/lib/finance/periods.test.ts`
-- `src/lib/finance/postgres-store-intelligence.ts`
-- `src/lib/finance/payroll-cost-allocation.ts`
-- `src/lib/finance/payroll-cost-allocation.test.ts`
-- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
-
-### Verificacion
-
-- `pnpm test src/lib/finance/periods.test.ts src/lib/finance/payroll-cost-allocation.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx src/lib/sync/projections/client-economics.test.ts`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm exec tsx scripts/setup-postgres-finance-intelligence-p2.ts`
-- `pnpm exec tsx scripts/backfill-february-billable-assignments.ts`
-- `pnpm exec tsx scripts/verify-p2-view.ts`
-
-### Riesgos o pendientes
-
-- `computeClientEconomicsSnapshots()` ya no rompe febrero con `YYYY-MM-31`; ahora usa rango mensual real con tests para febrero normal, bisiesto y meses de 31 días.
-- Se backdateó solo la asignación billable de `Sky Airline`:
-  - `daniela-ferreira` → `2024-12-01`
-  - `melkin-hernandez` → `2025-08-01`
-  - `andres-carlosama` → `2025-08-01`
-- `greenhouse_serving.client_labor_cost_allocation` ahora preserva:
-  - `payroll_currency`
-  - `gross_total_source` / `allocated_labor_source`
-  - `exchange_rate_to_clp`
-  - `allocated_labor_clp` solo cuando existe FX histórico
-- Para febrero 2026 el bridge quedó honesto:
-  - hay filas en la view para `Sky Airline`
-  - `payroll_currency = USD`
-  - `allocated_labor_source` existe
-  - `allocated_labor_clp = null` porque no hay `USD/CLP` histórico `<= 2026-02-28`
-- `syncDailyUsdClpExchangeRate('2026-02-28')` hizo fallback a `2026-03-26` desde `open-er-api`; por diseño ese fallback no se usa para febrero porque el bridge exige tasa histórica no posterior al período.
-- Próximo paso recomendado en `TASK-055`:
-  - poblar `USD/CLP` histórico para febrero 2026
-  - luego recomputar `client_economics(2026, 2)` para obtener costo laboral en CLP confiable
 
 ## 2026-03-26 10:15 -03
 

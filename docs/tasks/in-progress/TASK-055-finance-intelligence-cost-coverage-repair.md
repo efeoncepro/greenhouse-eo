@@ -95,6 +95,20 @@
   - el margen ajustado deja de restar costo laboral dos veces
 - Con esto, Organization Finance y Organization Economics quedan alineados con la semántica actual de `client_economics` y con el fix de febrero.
 
+## Delta 2026-03-26 (marzo 2026 materializado)
+
+- Se verificó el motivo del warning visible en `/finance/intelligence`: el screenshot seguía mostrando un estado anterior al recompute de marzo, no un bug nuevo en `sanitizeSnapshotForPresentation()`.
+- Estado real validado en PostgreSQL:
+  - `greenhouse_payroll.payroll_periods.period_id = 2026-03` quedó `approved`
+  - `greenhouse_serving.client_labor_cost_allocation` ya tiene 3 filas billables para `Sky Airline` en marzo
+  - `greenhouse_finance.client_economics` quedó con:
+    - `direct_costs_clp = 1,119,441.76`
+    - `gross_margin_percent = net_margin_percent = 0.9189`
+    - `headcount_fte = 3`
+    - `notes = march-payroll-materialization`
+- Se comprobó además que `sanitizeSnapshotForPresentation()` devuelve `hasCompleteCostCoverage = true` para ese snapshot, por lo que el backend actual ya no pide ocultar márgenes en marzo.
+- Se verificó Vercel: `dev-greenhouse.efeoncepro.com` apunta al deployment `staging` `greenhouse-fi5qtnqhf-efeonce-7670142f.vercel.app`, `Ready`.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.

@@ -7,6 +7,16 @@
 
 ## 2026-03-26
 
+### Finance Intelligence — marzo 2026 materializado correctamente
+- `2026-03` dejó de quedar en estado parcial para `Sky Airline`: el período de payroll quedó `approved` y el snapshot de `greenhouse_finance.client_economics` se rematerializó con costos laborales canonizados.
+- Resultado operativo validado:
+  - `directCostsClp = 1,119,441.76`
+  - `grossMarginPercent = netMarginPercent = 0.9189`
+  - `headcountFte = 3`
+  - `notes = march-payroll-materialization`
+- La sanitización de presentación ya no oculta marzo: `sanitizeSnapshotForPresentation()` devuelve `hasCompleteCostCoverage = true` para ese snapshot.
+- `dev-greenhouse.efeoncepro.com` quedó apuntando al deployment `staging` `greenhouse-fi5qtnqhf-efeonce-7670142f.vercel.app`; si todavía se ve el warning viejo en navegador, corresponde a un estado previo al recompute y no al backend actual.
+
 ### Finance Intelligence — febrero trazable sin mezclar monedas
 - `computeClientEconomicsSnapshots()` dejó de romperse en meses cortos: el fin de mes ya no se hardcodea como `31`, sino que se deriva con un helper de rango mensual real cubierto por `Vitest`.
 - `greenhouse_serving.client_labor_cost_allocation` dejó de asumir que `gross_total` de Payroll ya está en CLP. Ahora la view preserva `payroll_currency`, montos fuente (`gross_total_source`, `allocated_labor_source`) y solo llena `allocated_labor_clp` cuando la entry ya viene en CLP o existe `USD/CLP` histórico no posterior al cierre del período.
