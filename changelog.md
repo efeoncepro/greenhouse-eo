@@ -7,6 +7,16 @@
 
 ## 2026-03-26
 
+### ICO Engine Expansion — Person Operational Intelligence
+- **Metric Registry**: Extended with `MetricScope`, `composite` MetricKind. 6 new person-scoped derived metrics.
+- **Metrics**: `utilization_pct`, `allocation_variance`, `cost_per_asset`, `cost_per_hour`, `quality_index`, `dedication_index`
+- **Storage**: `person_operational_360` table (9 ICO + 6 derived + capacity + cost, 12-month retention)
+- **Enterprise**: `metric_threshold_overrides` table for per-organization threshold configuration
+- **Reactive**: `personIntelligenceProjection` replaces old person_operational projection. Unified refresh from Postgres only.
+- **API**: `GET /api/people/:memberId/intelligence?trend=6`
+- **Tests**: 15 unit tests for compute functions
+- **TASK-055**: Frontend integration + event publishing wiring pendiente
+
 ### Finance Intelligence — proyección reactiva por período afectado
 - `client_economics` dejó de recomputarse ciegamente sobre el mes actual cuando el outbox procesa eventos reactivos.
 - La proyección ahora escucha eventos relevantes de `finance` y `payroll`, deriva `year/month` desde payloads reales (`invoiceDate`, `documentDate`, `paymentDate`, `periodId`, `periodYear/periodMonth`) y recomputa el período afectado.
