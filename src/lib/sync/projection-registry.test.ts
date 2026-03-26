@@ -15,7 +15,7 @@ const makeTestProjection = (name: string, triggers: string[]): ProjectionDefinit
   domain: 'delivery',
   triggerEvents: triggers,
   extractScope: () => ({ entityType: 'test', entityId: 'test-1' }),
-  refresh: async () => `refreshed ${name}`,
+  refresh: async (_scope, _payload) => `refreshed ${name}`,
   maxRetries: 1
 })
 
@@ -70,7 +70,7 @@ describe('projection registry', () => {
 
   it('refresh returns a string result', async () => {
     const proj = makeTestProjection('vitest_proj_refresh', ['test.refresh_test'])
-    const result = await proj.refresh({ entityType: 'test', entityId: 'test-1' })
+    const result = await proj.refresh({ entityType: 'test', entityId: 'test-1' }, {})
 
     expect(result).toBe('refreshed vitest_proj_refresh')
   })

@@ -55,26 +55,40 @@ export async function GET() {
   }
 
   try {
+    // Check if person_operational_metrics exists for LEFT JOIN
+    const pomExists = await runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'greenhouse_serving' AND table_name = 'person_operational_metrics'
+      ) AS exists`
+    ).then(r => r[0]?.exists === true).catch(() => false)
+
     // Get assignments with contracted hours from Postgres
-    const rows = await runGreenhousePostgresQuery<AssignmentRow>(
-      `SELECT
-        a.assignment_id,
-        a.member_id,
-        a.client_id,
-        m.display_name,
-        COALESCE(a.role_title_override, m.role_title) AS role_title,
-        a.fte_allocation,
-        a.contracted_hours_month,
-        COALESCE(pom.tasks_active, 0) AS active_assets
-      FROM greenhouse_core.client_team_assignments a
-      JOIN greenhouse_core.members m ON m.member_id = a.member_id
-      LEFT JOIN greenhouse_serving.person_operational_metrics pom
-        ON pom.member_id = a.member_id
-        AND pom.period_year = EXTRACT(YEAR FROM CURRENT_DATE)
-        AND pom.period_month = EXTRACT(MONTH FROM CURRENT_DATE)
-      WHERE a.active = TRUE
-      ORDER BY m.display_name`
-    )
+    const query = pomExists
+      ? `SELECT
+          a.assignment_id, a.member_id, a.client_id, m.display_name,
+          COALESCE(a.role_title_override, m.role_title) AS role_title,
+          a.fte_allocation, a.contracted_hours_month,
+          COALESCE(pom.tasks_active, 0) AS active_assets
+        FROM greenhouse_core.client_team_assignments a
+        JOIN greenhouse_core.members m ON m.member_id = a.member_id
+        LEFT JOIN greenhouse_serving.person_operational_metrics pom
+          ON pom.member_id = a.member_id
+          AND pom.period_year = EXTRACT(YEAR FROM CURRENT_DATE)
+          AND pom.period_month = EXTRACT(MONTH FROM CURRENT_DATE)
+        WHERE a.active = TRUE
+        ORDER BY m.display_name`
+      : `SELECT
+          a.assignment_id, a.member_id, a.client_id, m.display_name,
+          COALESCE(a.role_title_override, m.role_title) AS role_title,
+          a.fte_allocation, a.contracted_hours_month,
+          0 AS active_assets
+        FROM greenhouse_core.client_team_assignments a
+        JOIN greenhouse_core.members m ON m.member_id = a.member_id
+        WHERE a.active = TRUE
+        ORDER BY m.display_name`
+
+    const rows = await runGreenhousePostgresQuery<AssignmentRow>(query)
 
     const memberBreakdowns: Array<{
       memberId: string
