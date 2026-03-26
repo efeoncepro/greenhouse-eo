@@ -72,7 +72,18 @@
   - febrero 2026 ya no está solo “trazable en USD”
   - febrero 2026 quedó materializado en CLP defendible para FI usando el último tipo de cambio válido no posterior al cierre del período
 - Pendiente menor detectado:
-  - el par reverso `CLP -> USD` sigue redondeándose a `0` por precisión insuficiente; no bloquea este slice, pero conviene abrir follow-up corto.
+- el par reverso `CLP -> USD` sigue redondeándose a `0` por precisión insuficiente; no bloquea este slice, pero conviene abrir follow-up corto.
+
+## Delta 2026-03-26 (helper reusable para par inverso)
+
+- Se extrajo helper reusable de conversión en `finance/shared`:
+  - `roundDecimal()`
+  - `invertExchangeRate()`
+- `buildUsdClpRatePairs()` dejó de reutilizar `roundCurrency()` para tasas inversas, evitando que `CLP -> USD` colapse a `0`.
+- Resultado validado:
+  - `USD_CLP_2026-02-27 = 861.19`
+  - `CLP_USD_2026-02-27 = 0.001161`
+- Con esto, la capa de FX queda utilizable no solo para FI sino también para cualquier servicio futuro que necesite pares inversos con precisión estable.
 
 ## Summary
 

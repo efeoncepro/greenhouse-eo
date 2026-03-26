@@ -49,6 +49,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:42 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir la precisión del par inverso `CLP -> USD` y extraer un helper de conversión reutilizable para tasas.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/finance/shared.ts`
+- `src/lib/finance/exchange-rates.ts`
+- `src/lib/finance/exchange-rates.test.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- `pnpm test src/lib/finance/exchange-rates.test.ts src/lib/finance/periods.test.ts src/lib/finance/payroll-cost-allocation.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx src/lib/sync/projections/client-economics.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec tsx scripts/backfill-february-billable-assignments.ts`
+
+### Riesgos o pendientes
+
+- Se agregó helper reusable en `finance/shared`:
+  - `roundDecimal()`
+  - `invertExchangeRate()`
+- `buildUsdClpRatePairs()` dejó de redondear las tasas FX con precisión de monto (`2` decimales); ahora:
+  - `USD -> CLP` se mantiene con `2`
+  - `CLP -> USD` conserva `6`
+- Verificación runtime:
+  - `USD_CLP_2026-02-27 = 861.19`
+  - `CLP_USD_2026-02-27 = 0.001161`
+- Febrero 2026 sigue materializado correctamente para `Sky Airline` con:
+  - `directCostsClp = 1,485,552.75`
+  - `grossMarginPercent = 0.8924`
+- No quedan pendientes abiertos de este slice de febrero; el siguiente paso opcional sería reutilizar `invertExchangeRate()` donde hoy existan conversiones ad hoc fuera de `finance/exchange-rates`.
+
 ## 2026-03-26 07:34 -03
 
 ### Agente

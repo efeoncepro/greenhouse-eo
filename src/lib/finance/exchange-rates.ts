@@ -2,7 +2,9 @@ import 'server-only'
 
 import {
   getFinanceProjectId,
+  invertExchangeRate,
   normalizeString,
+  roundDecimal,
   roundCurrency,
   runFinanceQuery,
   toDateString,
@@ -235,18 +237,20 @@ const buildRatePair = ({
   toCurrency,
   rate,
   rateDate,
-  source
+  source,
+  decimals = 6
 }: {
   fromCurrency: FinanceCurrency
   toCurrency: FinanceCurrency
   rate: number
   rateDate: string
   source: string
+  decimals?: number
 }): PersistedExchangeRate => ({
   rateId: `${fromCurrency}_${toCurrency}_${rateDate}`,
   fromCurrency,
   toCurrency,
-  rate: roundCurrency(rate),
+  rate: roundDecimal(rate, decimals),
   rateDate,
   source
 })
@@ -261,7 +265,7 @@ export const buildUsdClpRatePairs = ({
   source: string
 }) => {
   const normalizedUsdToClp = roundCurrency(usdToClp)
-  const clpToUsd = roundCurrency(1 / normalizedUsdToClp)
+  const clpToUsd = invertExchangeRate({ rate: normalizedUsdToClp })
 
   return [
     buildRatePair({
@@ -269,7 +273,8 @@ export const buildUsdClpRatePairs = ({
       toCurrency: 'CLP',
       rate: normalizedUsdToClp,
       rateDate,
-      source
+      source,
+      decimals: 2
     }),
     buildRatePair({
       fromCurrency: 'CLP',

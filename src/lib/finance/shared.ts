@@ -96,6 +96,26 @@ export const toTimestampString = (value: { value?: string } | string | Date | nu
 
 export const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
+export const roundDecimal = (value: number, decimals: number) => {
+  const factor = 10 ** decimals
+
+  return Math.round(value * factor) / factor
+}
+
+export const invertExchangeRate = ({
+  rate,
+  decimals = 6
+}: {
+  rate: number
+  decimals?: number
+}) => {
+  if (!Number.isFinite(rate) || rate <= 0) {
+    return 0
+  }
+
+  return roundDecimal(1 / rate, decimals)
+}
+
 export const normalizeString = (value: unknown) => {
   if (typeof value === 'string') {
     return value.trim()
