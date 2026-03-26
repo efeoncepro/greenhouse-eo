@@ -49,6 +49,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 21:00 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Canonizar en arquitectura la capa de team capacity para que futuros agentes/humanos reutilicen `member_capacity_economics` y escalen desde ahí.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Documentación / arquitectura
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- `docs/README.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Revisión manual de enlaces y alineación conceptual con:
+  - `member_capacity_economics`
+  - `src/lib/team-capacity/*`
+  - `Agency > Team`
+  - `Reactive Projections Playbook`
+
+### Riesgos o pendientes
+
+- La arquitectura ya quedó canónica, pero falta el siguiente corte funcional de consumers:
+  - `Person Intelligence`
+  - `My Assignments`
+- Si en el futuro aparece otra necesidad de capacidad por persona/período, la regla ahora es extender esta capa, no abrir un modelo paralelo.
+
 ## 2026-03-26 20:35 -03
 
 ### Agente

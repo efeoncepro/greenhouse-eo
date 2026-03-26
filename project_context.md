@@ -3,6 +3,16 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-26 Team capacity architecture canonized
+- La arquitectura de capacidad/economía de equipo ya no vive solo en una task o en el código.
+- La fuente canónica quedó fijada en:
+  - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+- Regla operativa derivada:
+  - futuros consumers de capacidad/economía por persona deben escalar desde:
+    - helpers puros `src/lib/team-capacity/*`
+    - snapshot reactivo `greenhouse_serving.member_capacity_economics`
+  - no crear una segunda capa paralela de capacidad por miembro/período si el problema es solo un nuevo consumer o un nuevo campo del mismo dominio
+
 ## Delta 2026-03-26 TASK-056 reactive capacity economics slice
 - Se materializó la nueva proyección reactiva `member_capacity_economics` en `greenhouse_serving.member_capacity_economics`.
 - El snapshot quedó centrado en `member_id + period_year + period_month` y materializa:

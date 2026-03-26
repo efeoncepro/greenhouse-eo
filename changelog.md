@@ -7,6 +7,18 @@
 
 ## 2026-03-26
 
+### Arquitectura — team capacity canónica
+- Se agregó `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md` como fuente canónica de:
+  - helpers puros de capacidad/economía
+  - snapshot reactivo `member_capacity_economics`
+  - reglas de consumer y de escalamiento
+- Se enlazó esta arquitectura desde:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `docs/README.md`
+  - `project_context.md`
+
 ### TASK-056 — `Agency > Team` ya consume el contrato nuevo de capacidad
 - `Agency > Team` ahora lee `member_capacity_economics` para el período actual en vez de mezclar joins y fórmulas híbridas on-read.
 - La card/columna `Usadas` fue reemplazada por `Uso operativo`:

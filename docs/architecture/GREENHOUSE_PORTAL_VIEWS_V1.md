@@ -23,7 +23,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 |-------|------|--------|-------------|
 | Mi Greenhouse | `/my` | Implementada | Dashboard personal: KPIs, tasks, notificaciones |
 | Mi Perfil | `/my/profile` | Implementada | Identidad, datos profesionales, sistemas vinculados |
-| Mis Asignaciones | `/my/assignments` | Implementada | Clientes, FTE, capacidad contratada vs usada |
+| Mis Asignaciones | `/my/assignments` | Implementada | Clientes, FTE y capacidad personal; candidato a converger al snapshot `member_capacity_economics` |
 | Mi Desempeño | `/my/performance` | Implementada | ICO metrics, trend 6 meses, health, operational |
 | Mi Nómina | `/my/payroll` | Implementada | Liquidaciones, compensación, historial |
 | Mis Permisos | `/my/leave` | Implementada | Balance vacaciones, solicitudes |
@@ -39,13 +39,13 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Agencia (Command Center) | `/agency` | Existente (pendiente redesign) | Pulse Global, métricas cross-space |
 | Spaces | `/agency/spaces` | Existente | Per-space health, RPA, OTD, team |
 | Economía | `/agency/economics` | Implementada | P&L KPIs, expense trends, top clients by revenue |
-| Equipo | `/agency/team` | Implementada | 4-type capacity model, health distribution, overcommitted alerts |
+| Equipo | `/agency/team` | Implementada | Capacidad contractual, compromiso comercial y uso operativo por miembro; consume `member_capacity_economics` |
 | Delivery | `/agency/delivery` | Stub | ICO + sprints + stuck assets (pendiente) |
 | Campañas | `/agency/campaigns` | Implementada | Cross-space campaigns con KPIs y tabla |
 | Operaciones | `/agency/operations` | Stub | Health monitoring del platform (pendiente) |
 | Organizaciones | `/agency/organizations` | Implementada | Lista + detalle con economics, projects, equipo |
 | Servicios | `/agency/services` | Implementada | Servicios por space con sync HubSpot |
-| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador |
+| Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; debe escalar capacidad/economía desde `member_capacity_economics` cuando aplique |
 | Nómina | `/hr/payroll` | Implementada | Períodos, cálculo, entries, readiness |
 | Departamentos | `/hr/departments` | Implementada | Estructura organizacional |
 | Permisos | `/hr/leave` | Implementada | Solicitudes y saldos del equipo |

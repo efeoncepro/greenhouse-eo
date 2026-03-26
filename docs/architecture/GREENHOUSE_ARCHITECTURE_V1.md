@@ -17,6 +17,7 @@ Use together with:
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
 
 ## Product Thesis
 
@@ -185,6 +186,34 @@ Routes: `/people`, `/people/[memberId]`
 Unified team directory and tabbed 360 view per person: activity, payroll, compensation, HR, finance, AI tools, memberships.
 
 Cross-domain composition from `identity_profiles`, `members`, and `client_users`. Access governed by `canAccessPeopleModule()` for cross-group visibility.
+
+### Team Capacity & Capacity Economics
+
+Primary surfaces:
+
+- `/agency/team`
+- consumers under `People 360`
+- consumers under `/my/*`
+
+Greenhouse now treats team capacity as its own reusable domain:
+
+- pure helpers in `src/lib/team-capacity/*`
+- reactive snapshot in `greenhouse_serving.member_capacity_economics`
+
+This split exists to prevent semantic drift between:
+
+- contractual capacity
+- commercial commitment
+- operational usage
+- cost per hour / loaded cost
+
+Rules:
+
+- helpers remain pure and reusable
+- consumers should read the persisted snapshot instead of recomputing mixed semantics on-read
+- new consumers should extend the existing snapshot before inventing a parallel serving model
+
+See `GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`.
 
 ### Account 360 / Organizations
 
