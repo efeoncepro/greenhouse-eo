@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 06:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir el bridge laboral histórico de `Finance Intelligence` para que `client_labor_cost_allocation` use assignments válidos para el período de nómina, no para `CURRENT_DATE`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `scripts/setup-postgres-finance-intelligence-p2.sql`
+- `src/lib/finance/payroll-cost-allocation.test.ts`
+- `src/lib/sync/projections/client-economics.test.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- `pnpm test src/lib/finance/payroll-cost-allocation.test.ts src/lib/sync/projections/client-economics.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec tsx scripts/setup-postgres-finance-intelligence-p2.ts`
+- `pnpm exec tsx scripts/verify-p2-view.ts`
+- Query runtime adicional:
+  - `greenhouse_payroll.payroll_periods` -> solo `2026-03`, estado `draft`
+  - `greenhouse_core.client_team_assignments` -> `11` filas
+
+### Riesgos o pendientes
+
+- El bug temporal del view quedó corregido: ahora usa solape `start_date/end_date` con `period_start/period_end` del payroll period.
+- El view sigue devolviendo `0` filas en este entorno porque no hay payroll `approved/exported` todavía; eso ya es un gap operativo de datos, no de semántica temporal.
+- Para que `Finance > Intelligence` muestre costo laboral real después de este fix, el siguiente paso es aprobar/exportar el período correspondiente o backfillear payroll ya validado.
+
 ## 2026-03-26 06:48 -03
 
 ### Agente

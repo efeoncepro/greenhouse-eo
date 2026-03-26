@@ -136,9 +136,14 @@ export const CLIENT_ECONOMICS_TRIGGER_EVENTS = [
   'finance.income.updated',
   'finance.expense.created',
   'finance.expense.updated',
+  'finance.income_payment.created',
+  'finance.income_payment.recorded',
   'finance.cost_allocation.created',
   'finance.cost_allocation.deleted',
+  'payroll_period.created',
+  'payroll_period.updated',
   'payroll_entry.upserted',
+  'payroll_period.calculated',
   'payroll_period.approved'
 ] as const
 

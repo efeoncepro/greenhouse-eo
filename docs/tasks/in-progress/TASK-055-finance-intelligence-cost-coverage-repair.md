@@ -18,6 +18,12 @@
 - `cost_allocations` comenzó a publicar eventos outbox canónicos (`finance.cost_allocation.created/deleted`) y payroll ahora publica cambios de período (`updated/calculated/approved`) con `year/month`.
 - Cerrado parcialmente por trabajo en `TASK-055`; siguen abiertos el bridge laboral histórico por período y la cobertura canónica de costos.
 
+## Delta 2026-03-26 (bridge laboral histórico)
+
+- El view `greenhouse_serving.client_labor_cost_allocation` dejó de resolver assignments con `CURRENT_DATE`; ahora usa solape entre `start_date/end_date` y la ventana del `payroll_period`.
+- Se aplicó de nuevo `scripts/setup-postgres-finance-intelligence-p2.sql` sobre Postgres y el view quedó materializado con la nueva semántica histórica.
+- La verificación runtime confirmó que el view hoy devuelve `0` filas no por bug temporal sino porque el período visible `2026-03` sigue en estado `draft`; todavía no hay payroll `approved/exported` para poblar costo laboral canónico.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.

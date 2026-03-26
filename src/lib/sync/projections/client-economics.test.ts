@@ -39,13 +39,11 @@ describe('clientEconomicsProjection', () => {
   })
 
   it('listens to finance and payroll events that materially affect client economics', () => {
-    expect(clientEconomicsProjection.triggerEvents).toEqual(expect.arrayContaining([
-      'finance.income.created',
-      'finance.expense.updated',
-      'finance.cost_allocation.created',
-      'payroll_period.calculated',
-      'payroll_entry.upserted'
-    ]))
+    expect(clientEconomicsProjection.triggerEvents).toContain('finance.income.created')
+    expect(clientEconomicsProjection.triggerEvents).toContain('finance.expense.updated')
+    expect(clientEconomicsProjection.triggerEvents).toContain('finance.cost_allocation.created')
+    expect(clientEconomicsProjection.triggerEvents).toContain('payroll_period.calculated')
+    expect(clientEconomicsProjection.triggerEvents).toContain('payroll_entry.upserted')
   })
 
   it('recomputes the specific affected period instead of current month', async () => {
