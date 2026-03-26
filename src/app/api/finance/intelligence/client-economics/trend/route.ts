@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { listClientEconomicsTrend } from '@/lib/finance/postgres-store-intelligence'
+import { sanitizeSnapshotForPresentation } from '../route'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,19 +18,20 @@ export async function GET(request: Request) {
   const months = Math.min(Math.max(Number(searchParams.get('months')) || 6, 1), 24)
 
   const snapshots = await listClientEconomicsTrend(clientId, months)
+  const sanitized = snapshots.map(sanitizeSnapshotForPresentation)
 
   if (clientId) {
     return NextResponse.json({
       clientId,
       months,
-      periods: snapshots
+      periods: sanitized
     })
   }
 
   // Group by client for portfolio view
   const byClient = new Map<string, { clientName: string; periods: typeof snapshots }>()
 
-  for (const snap of snapshots) {
+  for (const snap of sanitized) {
     const entry = byClient.get(snap.clientId) || { clientName: snap.clientName, periods: [] }
 
     entry.periods.push(snap)

@@ -60,6 +60,7 @@ interface ClientEconomicsSnapshot {
   revenuePerFte: number | null
   costPerFte: number | null
   notes: string | null
+  hasCompleteCostCoverage?: boolean
   computedAt: string
   createdAt: string
   updatedAt: string
@@ -396,6 +397,8 @@ const ClientEconomicsView = () => {
 
         for (const c of clients) {
           for (const p of c.periods) {
+            if (p.grossMarginPercent == null && p.netMarginPercent == null) continue
+
             const key = `${p.periodYear}-${String(p.periodMonth).padStart(2, '0')}`
             const entry = periodMap.get(key) ?? { wGross: 0, wNet: 0, rev: 0 }
 
@@ -437,12 +440,26 @@ const ClientEconomicsView = () => {
   const totalRevenue = snapshots.reduce((sum, s) => sum + s.totalRevenueClp, 0)
 
   const avgGrossMargin = snapshots.length > 0
-    ? snapshots.reduce((sum, s) => sum + (s.grossMarginPercent ?? 0), 0) / snapshots.length
+    ? (() => {
+        const valid = snapshots.filter(s => s.hasCompleteCostCoverage !== false && s.grossMarginPercent != null)
+
+        return valid.length > 0
+          ? valid.reduce((sum, s) => sum + (s.grossMarginPercent ?? 0), 0) / valid.length
+          : 0
+      })()
     : 0
 
   const avgNetMargin = snapshots.length > 0
-    ? snapshots.reduce((sum, s) => sum + (s.netMarginPercent ?? 0), 0) / snapshots.length
+    ? (() => {
+        const valid = snapshots.filter(s => s.hasCompleteCostCoverage !== false && s.netMarginPercent != null)
+
+        return valid.length > 0
+          ? valid.reduce((sum, s) => sum + (s.netMarginPercent ?? 0), 0) / valid.length
+          : 0
+      })()
     : 0
+
+  const hasAnyCompleteCostCoverage = snapshots.some(s => s.hasCompleteCostCoverage !== false)
 
   const avgGrossPct = avgGrossMargin * 100
   const avgNetPct = avgNetMargin * 100
@@ -631,28 +648,34 @@ const ClientEconomicsView = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Margen bruto prom.'
-            stats={snapshots.length > 0 ? `${avgGrossPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? '' : 'sin datos'}
+            stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgGrossPct.toFixed(1)}%` : '—'}
+            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
             avatarIcon='tabler-chart-arrows-vertical'
-            avatarColor={snapshots.length > 0 ? grossSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 ? grossSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 ? grossSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 ? grossSemaphore.icon : undefined}
+            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : 'secondary'}
+            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.label : undefined}
+            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : undefined}
+            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.icon : undefined}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Margen neto prom.'
-            stats={snapshots.length > 0 ? `${avgNetPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? '' : 'sin datos'}
+            stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgNetPct.toFixed(1)}%` : '—'}
+            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
             avatarIcon='tabler-trending-up'
-            avatarColor={snapshots.length > 0 ? netSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 ? netSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 ? netSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 ? netSemaphore.icon : undefined}
+            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : 'secondary'}
+            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.label : undefined}
+            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : undefined}
+            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.icon : undefined}
           />
         </Grid>
       </Grid>
+
+      {snapshots.length > 0 && !hasAnyCompleteCostCoverage && (
+        <Alert severity='warning'>
+          La rentabilidad del período todavía no tiene cobertura de costos suficiente. Los ingresos sí están cargados, pero los márgenes quedan ocultos hasta que existan costos directos y/o laborales canonizados.
+        </Alert>
+      )}
 
       {/* ROW 2 — Charts (only when >= 2 clients) */}
       {snapshots.length >= 2 && (

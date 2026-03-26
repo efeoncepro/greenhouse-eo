@@ -49,6 +49,52 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 06:26 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Auditar `Finance > Intelligence` porque la vista estaba mostrando márgenes `100%` con costos prácticamente nulos.
+- Corregir la presentación para no tratar snapshots incompletos como rentabilidad válida.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/api/finance/intelligence/client-economics/route.ts`
+- `src/app/api/finance/intelligence/client-economics/trend/route.ts`
+- `src/views/greenhouse/finance/ClientEconomicsView.tsx`
+- `src/app/api/finance/intelligence/client-economics/route.test.ts`
+- `src/views/greenhouse/finance/ClientEconomicsView.test.tsx`
+
+### Verificacion
+
+- `pnpm test src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- Auditoría runtime con `pnpm pg:doctor --profile=runtime`
+- Queries ad hoc contra Postgres confirmaron para `Sky Airline` en `2026-03`:
+  - `greenhouse_finance.client_economics` tenía snapshot persistido con `total_revenue_clp = 13804000` y `direct_costs_clp = 1225`
+  - `greenhouse_finance.cost_allocations` del período: vacío
+  - `greenhouse_finance.expenses` directos asignados al cliente: vacío
+  - `greenhouse_serving.client_labor_cost_allocation` del período: vacío
+  - el snapshot provenía de un backfill puntual (`notes = Backfill from Codex for organization finance visibility`)
+
+### Riesgos o pendientes
+
+- `Finance > Intelligence` ya no debe mostrar `100% / Óptimo` cuando el snapshot tiene ingresos pero no cobertura defendible de costos; ahora oculta márgenes y muestra warning.
+- La tendencia de márgenes quedó alineada con la misma sanitización; ya no debería pintar líneas artificialmente optimistas desde snapshots incompletos.
+- El problema de fondo sigue abierto en data pipeline: falta materializar costos canónicos del período para `client_economics` (`cost_allocations`, `expenses` asignados y/o `client_labor_cost_allocation`).
+- Siguiente paso real si se quiere rentabilidad correcta: poblar `greenhouse_serving.client_labor_cost_allocation` y automatizar recompute mensual de `client_economics` con cobertura completa.
+
 ## 2026-03-26 06:18 -03
 
 ### Agente
