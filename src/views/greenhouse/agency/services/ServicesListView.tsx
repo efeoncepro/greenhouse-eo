@@ -154,7 +154,6 @@ const ServicesListView = () => {
   const [lineaFilter, setLineaFilter] = useState('')
   const [stageFilter, setStageFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'name', desc: false }])
-  const [svcSorting, setSvcSorting] = useState<SortingState>([{ id: 'name', desc: false }])
 
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 400)
@@ -192,14 +191,6 @@ const ServicesListView = () => {
   const items = data?.items ?? []
   const totalCount = data?.total ?? 0
 
-  const svcTable = useReactTable({
-    data: items,
-    columns: svcColumns,
-    state: { sorting: svcSorting },
-    onSortingChange: setSvcSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel()
-  })
   const activeCount = items.filter(s => s.pipelineStage === 'active').length
   const renewalCount = items.filter(s => s.pipelineStage === 'renewal_pending').length
   const onboardingCount = items.filter(s => s.pipelineStage === 'onboarding').length
@@ -238,7 +229,7 @@ const ServicesListView = () => {
           />
           <Divider />
           <CardContent>
-            <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <CustomTextField
                 placeholder='Buscar por nombre o ID...'
                 value={search}
