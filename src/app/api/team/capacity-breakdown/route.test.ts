@@ -24,12 +24,12 @@ describe('GET /api/team/capacity-breakdown', () => {
 
   it('excludes internal efeonce assignments and caps the contractual envelope at 1.0 FTE', async () => {
     mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([{ exists: false }])
       .mockResolvedValueOnce([
         {
           member_id: 'member-1',
           display_name: 'Andres Carlosama',
           role_title: 'Operations Lead',
+          role_category: 'operations',
           fte_allocation: '1.000',
           contracted_hours_month: 160,
           client_id: 'client_internal',
@@ -40,6 +40,7 @@ describe('GET /api/team/capacity-breakdown', () => {
           member_id: 'member-1',
           display_name: 'Andres Carlosama',
           role_title: 'Operations Lead',
+          role_category: 'operations',
           fte_allocation: '1.000',
           contracted_hours_month: 160,
           client_id: 'client-sky',
@@ -50,6 +51,7 @@ describe('GET /api/team/capacity-breakdown', () => {
           member_id: 'member-2',
           display_name: 'Luis Reyes',
           role_title: 'Hubspot Specialist',
+          role_category: 'media',
           fte_allocation: '1.000',
           contracted_hours_month: 160,
           client_id: 'client_internal',
@@ -60,6 +62,7 @@ describe('GET /api/team/capacity-breakdown', () => {
           member_id: 'member-2',
           display_name: 'Luis Reyes',
           role_title: 'Hubspot Specialist',
+          role_category: 'media',
           fte_allocation: '0.300',
           contracted_hours_month: 48,
           client_id: 'client-sky',
@@ -67,18 +70,28 @@ describe('GET /api/team/capacity-breakdown', () => {
           active_assets: 0
         }
       ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          period_year: 2026,
+          period_month: 3,
+          active_tasks: 0,
+          completed_tasks: 28,
+          throughput_count: 28
+        }
+      ])
 
     const response = await GET()
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(body.memberCount).toBe(2)
-    expect(body.hasOperationalMetrics).toBe(false)
+    expect(body.memberCount).toBe(1)
+    expect(body.hasOperationalMetrics).toBe(true)
     expect(body.team).toMatchObject({
-      contractedHoursMonth: 320,
-      assignedHoursMonth: 208,
-      usedHoursMonth: null,
-      availableHoursMonth: 112
+      contractedHoursMonth: 160,
+      assignedHoursMonth: 160,
+      usedHoursMonth: 149,
+      availableHoursMonth: 0
     })
     expect(body.members[0]).toMatchObject({
       displayName: 'Andres Carlosama',
@@ -90,30 +103,30 @@ describe('GET /api/team/capacity-breakdown', () => {
       assignedHoursMonth: 160,
       availableHoursMonth: 0
     })
-    expect(body.members[1]).toMatchObject({
-      displayName: 'Luis Reyes',
-      fteAllocation: 0.3
-    })
-    expect(body.members[1].capacity).toMatchObject({
-      contractedHoursMonth: 160,
-      assignedHoursMonth: 48,
-      availableHoursMonth: 112
-    })
   })
 
-  it('uses operational metrics when the serving table is available', async () => {
+  it('uses latest operational metrics to compute used hours from throughput activity', async () => {
     mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([{ exists: true }])
       .mockResolvedValueOnce([
         {
           member_id: 'member-1',
           display_name: 'Daniela Ferreira',
           role_title: 'Designer',
+          role_category: 'design',
           fte_allocation: '1.000',
           contracted_hours_month: 160,
           client_id: 'client-sky',
-          client_name: 'Sky Airline',
-          active_assets: 10
+          client_name: 'Sky Airline'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          period_year: 2026,
+          period_month: 3,
+          active_tasks: 3,
+          completed_tasks: 65,
+          throughput_count: 65
         }
       ])
 
@@ -122,8 +135,8 @@ describe('GET /api/team/capacity-breakdown', () => {
 
     expect(response.status).toBe(200)
     expect(body.hasOperationalMetrics).toBe(true)
-    expect(body.team.usedHoursMonth).toBeGreaterThan(0)
+    expect(body.team.usedHoursMonth).toBe(160)
     expect(body.team.availableHoursMonth).toBe(0)
-    expect(body.members[0].capacityHealth).toBe('balanced')
+    expect(body.members[0].capacityHealth).toBe('overloaded')
   })
 })

@@ -88,9 +88,14 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - excluye `Efeonce Internal` de la carga comprometida
   - limita el sobre contractual a `1.0 FTE` por persona
   - evita sumar `contracted_hours_month` por assignment como si fueran horas distintas
+- En runtime el cliente interno real venía como `space-efeonce / Efeonce`, no solo como `efeonce_internal`; el filtro quedó alineado con ese dato real.
 - Si más adelante se necesita distinguir explícitamente billable vs non-billable fuera del cliente interno, conviene formalizar ese atributo en `greenhouse_core.client_team_assignments`.
 - Se agregó `no-store` en la API y en el fetch client-side de `AgencyTeamView` porque `staging` llegó a mostrar el copy anterior aun después del deploy correcto; el síntoma era consistente con caché de cliente/respuesta.
 - Se agregó timeout + fallback en `GET /api/team/capacity-breakdown` y `AbortSignal.timeout()` en el fetch del cliente para que `Agency > Team` no vuelva a colgar la navegación completa si Postgres se pone lento.
+- Diagnóstico de runtime verificado con PostgreSQL:
+  - assignments activos externos con señal ICO: `Andres Carlosama`, `Daniela Ferreira`, `Melkin Hernandez`
+  - assignments solo internos: `Julio Reyes`, `Valentina Hoyos`, `Humberly Henriquez`
+  - `Luis Reyes` tiene assignment externo en `ANAM` pero sin `ico_member_metrics`, por eso la nueva lógica lo excluye de esta vista operativa.
 
 ## 2026-03-26 12:18 -03
 
