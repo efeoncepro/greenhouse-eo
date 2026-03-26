@@ -4,23 +4,27 @@ import { useEffect, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
-import Button from '@mui/material/Button'
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel,
+  getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
+import CustomTextField from '@core/components/mui/TextField'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
 
 import type { OrganizationPerson } from '../types'
 
@@ -41,9 +45,53 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'info' | 'secondary' |
   advisor: { label: 'Asesor', color: 'secondary' }
 }
 
+// ── Columns ──
+
+const colHelper = createColumnHelper<OrganizationPerson>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const columns: ColumnDef<OrganizationPerson, any>[] = [
+  colHelper.accessor('fullName', {
+    header: 'Persona',
+    cell: ({ row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={600}>{row.original.fullName ?? 'Sin nombre'}</Typography>
+        {row.original.canonicalEmail && <Typography variant='caption' color='text.secondary'>{row.original.canonicalEmail}</Typography>}
+      </Box>
+    )
+  }),
+  colHelper.accessor('membershipType', {
+    header: 'Tipo',
+    cell: ({ getValue }) => {
+      const cfg = TYPE_CONFIG[getValue()]
+
+      return <CustomChip round='true' size='small' variant='tonal' color={cfg?.color ?? 'secondary'} label={cfg?.label ?? getValue()} />
+    }
+  }),
+  colHelper.accessor('roleLabel', {
+    header: 'Rol',
+    cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+  }),
+  colHelper.accessor('department', {
+    header: 'Departamento',
+    cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+  }),
+  colHelper.accessor('isPrimary', {
+    header: 'Principal',
+    cell: ({ getValue }) => getValue()
+      ? <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
+      : <Typography variant='body2' color='text.secondary'>—</Typography>,
+    meta: { align: 'center' }
+  })
+]
+
+// ── Component ──
+
 const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Props) => {
   const [memberships, setMemberships] = useState<OrganizationPerson[]>([])
   const [loading, setLoading] = useState(true)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'fullName', desc: false }])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -64,6 +112,18 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
 
     void load()
   }, [organizationId])
+
+  const table = useReactTable({
+    data: memberships,
+    columns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel()
+  })
 
   if (loading) {
     return (
@@ -104,67 +164,41 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
               </Box>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Persona</TableCell>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>Rol</TableCell>
-                    <TableCell>Departamento</TableCell>
-                    <TableCell align='center'>Principal</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {memberships.map(m => {
-                    const cfg = TYPE_CONFIG[m.membershipType]
-
-                    return (
-                    <TableRow key={m.membershipId} hover>
-                      <TableCell>
-                        <Box>
-                          <Typography variant='body2' fontWeight={600}>
-                            {m.fullName ?? 'Sin nombre'}
-                          </Typography>
-                          {m.canonicalEmail && (
-                            <Typography variant='caption' color='text.secondary'>
-                              {m.canonicalEmail}
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          variant='tonal'
-                          color={cfg?.color ?? 'secondary'}
-                          label={cfg?.label ?? m.membershipType}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>
-                          {m.roleLabel ?? '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>
-                          {m.department ?? '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        {m.isPrimary ? (
-                          <i className='tabler-star-filled' style={{ fontSize: 16, color: 'var(--mui-palette-warning-main)' }} aria-label='Contacto principal' />
-                        ) : (
-                          <Typography variant='body2' color='text.secondary'>—</Typography>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <>
+              <CardContent sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                <CustomTextField value={globalFilter} onChange={e => setGlobalFilter(e.target.value)} placeholder='Buscar persona…' sx={{ minWidth: 220 }} />
+                <Typography variant='caption' color='text.secondary' sx={{ alignSelf: 'center' }}>{table.getFilteredRowModel().rows.length} de {memberships.length}</Typography>
+              </CardContent>
+              <div className='overflow-x-auto'>
+                <table className={tableStyles.table}>
+                  <thead>
+                    {table.getHeaderGroups().map(hg => (
+                      <tr key={hg.id}>
+                        {hg.headers.map(header => (
+                          <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody>
+                    {table.getRowModel().rows.length === 0 ? (
+                      <tr><td colSpan={columns.length} style={{ textAlign: 'center', padding: '2rem' }}><Typography variant='body2' color='text.secondary'>Sin resultados</Typography></td></tr>
+                    ) : table.getRowModel().rows.map(row => (
+                      <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => (
+                          <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </Card>
       </Grid>
