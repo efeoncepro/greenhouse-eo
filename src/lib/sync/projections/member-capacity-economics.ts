@@ -10,8 +10,16 @@ import {
 import type { TeamRoleCategory } from '@/types/team'
 import type { CompensationBreakdown, FxContext } from '@/lib/team-capacity/economics'
 import { buildLaborEconomicsSnapshot } from '@/lib/team-capacity/economics'
-import { buildMemberOverheadSnapshot } from '@/lib/team-capacity/overhead'
-import { getLoadedCostPerHour, getSuggestedBillRate } from '@/lib/team-capacity/pricing'
+import {
+  allocateSharedOverheadTarget,
+  buildMemberOverheadSnapshot,
+  type SharedOverheadPool
+} from '@/lib/team-capacity/overhead'
+import {
+  getBasePricingPolicy,
+  getLoadedCostPerHour,
+  getSuggestedBillRate
+} from '@/lib/team-capacity/pricing'
 import { buildCapacityEnvelope, fteToHours } from '@/lib/team-capacity/units'
 import {
   ensureMemberCapacityEconomicsSchema,
@@ -75,6 +83,12 @@ type ExchangeRateRow = {
   source: string | null
 }
 
+type SharedOverheadPoolRow = {
+  expense_count: number | string
+  total_shared_overhead_target: number | string | null
+  active_member_count: number | string
+}
+
 type Period = {
   year: number
   month: number
@@ -88,6 +102,8 @@ type MemberCapacityEconomicsInputs = {
   payrollEntry: PayrollEntryRow | null
   icoMetrics: IcoMemberMetricsRow | null
   exchangeRate: ExchangeRateRow | null
+  sharedOverheadPool: SharedOverheadPool | null
+  sharedOverheadTotalWeight: number
 }
 
 const toNum = (value: unknown): number => {
@@ -322,6 +338,34 @@ const getExchangeRateContext = (
   }
 }
 
+const buildSharedOverheadPool = (
+  period: Period,
+  row: SharedOverheadPoolRow | null
+): { pool: SharedOverheadPool | null; totalWeight: number } => {
+  if (!row) {
+    return { pool: null, totalWeight: 0 }
+  }
+
+  const totalSharedOverheadTarget = toNullableNum(row.total_shared_overhead_target)
+  const activeMemberCount = Math.max(0, Math.round(toNum(row.active_member_count)))
+  const totalWeight = activeMemberCount * CAPACITY_HOURS_PER_FTE
+
+  if (totalSharedOverheadTarget === null || activeMemberCount <= 0 || totalWeight <= 0) {
+    return { pool: null, totalWeight: 0 }
+  }
+
+  return {
+    pool: {
+      periodYear: period.year,
+      periodMonth: period.month,
+      targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
+      totalSharedOverheadTarget,
+      allocationMethod: 'contracted_hours'
+    },
+    totalWeight
+  }
+}
+
 export const buildMemberCapacityEconomicsSnapshot = ({
   member,
   period,
@@ -329,7 +373,9 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   compensation,
   payrollEntry,
   icoMetrics,
-  exchangeRate
+  exchangeRate,
+  sharedOverheadPool,
+  sharedOverheadTotalWeight
 }: MemberCapacityEconomicsInputs): MemberCapacityEconomicsSnapshot => {
   const activeAssignments = assignments.filter(row => row.active !== false && !isInternalAssignment(row))
   const contractedFte = 1
@@ -388,9 +434,14 @@ export const buildMemberCapacityEconomicsSnapshot = ({
     targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
     fx: normalizedFx
   })
+  const sharedOverheadTarget = allocateSharedOverheadTarget({
+    pool: sharedOverheadPool,
+    memberWeight: contractedHours,
+    totalWeight: sharedOverheadTotalWeight
+  })
   const overheadSnapshot = buildMemberOverheadSnapshot({
     directOverheadTarget: 0,
-    sharedOverheadTarget: 0,
+    sharedOverheadTarget,
     contractedHours
   })
   const loadedCostPerHourTarget = getLoadedCostPerHour({
@@ -399,7 +450,10 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   })
   const pricingSnapshot = getSuggestedBillRate({
     loadedCostPerHourTarget,
-    pricingPolicy: { markupMultiplier: 1.35 },
+    pricingPolicy: getBasePricingPolicy({
+      roleCategory: getRoleCategory(member),
+      targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
+    }),
     targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
   })
   const loadedCostTarget =
@@ -409,7 +463,8 @@ export const buildMemberCapacityEconomicsSnapshot = ({
 
   const snapshotStatus =
     laborSnapshot.snapshotStatus === 'complete' &&
-    usageContext.usageKind !== 'none'
+    usageContext.usageKind !== 'none' &&
+    overheadSnapshot.snapshotStatus === 'complete'
       ? 'complete'
       : 'partial'
 
@@ -548,6 +603,28 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
       )
     : [null]
 
+  const [sharedOverheadPoolRow] = await runGreenhousePostgresQuery<SharedOverheadPoolRow>(
+    `
+      SELECT
+        COUNT(*)::int AS expense_count,
+        COALESCE(SUM(total_amount_clp), 0) AS total_shared_overhead_target,
+        (
+          SELECT COUNT(*)::int
+          FROM greenhouse_core.members
+          WHERE active = TRUE
+        ) AS active_member_count
+      FROM greenhouse_finance.expenses
+      WHERE allocated_client_id IS NULL
+        AND COALESCE(cost_is_direct, FALSE) = FALSE
+        AND cost_category IN ('operational', 'infrastructure', 'tax_social')
+        AND COALESCE(document_date, payment_date) >= $1::date
+        AND COALESCE(document_date, payment_date) <= $2::date
+    `,
+    [periodStart, periodEnd]
+  )
+
+  const sharedOverheadContext = buildSharedOverheadPool(period, sharedOverheadPoolRow || null)
+
   return {
     member,
     period,
@@ -555,7 +632,9 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     compensation: compensation || null,
     payrollEntry: payrollEntry || null,
     icoMetrics: icoMetrics || null,
-    exchangeRate: exchangeRate || null
+    exchangeRate: exchangeRate || null,
+    sharedOverheadPool: sharedOverheadContext.pool,
+    sharedOverheadTotalWeight: sharedOverheadContext.totalWeight
   }
 }
 
@@ -614,6 +693,8 @@ export const memberCapacityEconomicsProjection: ProjectionDefinition = {
     'payroll_period.calculated',
     'payroll_period.approved',
     'payroll_entry.upserted',
+    'finance.expense.created',
+    'finance.expense.updated',
     'finance.exchange_rate.upserted',
     'finance.overhead.updated',
     'finance.license_cost.updated',

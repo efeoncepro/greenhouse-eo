@@ -128,7 +128,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `notification_dispatch` | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked | Despacha notificacion in-app + email via NotificationService |
 | `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
 | `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
-| `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
+| `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 
 ## Extensibilidad
 

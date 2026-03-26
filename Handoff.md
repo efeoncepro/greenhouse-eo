@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 20:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Enriquecer el slice inmediato de `TASK-056` con overhead compartido canónico y pricing policy base sobre `member_capacity_economics`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/team-capacity/pricing.ts`
+- `src/lib/team-capacity/pricing.test.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/member-capacity-economics.test.ts`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/team-capacity/pricing.test.ts src/lib/team-capacity/overhead.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Riesgos o pendientes
+
+- `shared_overhead_target` ya sale de `greenhouse_finance.expenses`, pero depende de la calidad de `cost_category`; si el backfill/clasificación está incompleto, el loaded cost puede quedar subcontado.
+- `direct_overhead_target` sigue en `0` por decisión consciente: no hay fuente canónica madura de licencias/tooling por miembro.
+- `suggestedBillRateTarget` ahora es una referencia base alineada a margen objetivo `35%`, no pricing comercial final ni rate card negociado.
+
 ## 2026-03-26 20:45 -03
 
 ### Agente

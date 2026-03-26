@@ -111,7 +111,15 @@ describe('memberCapacityEconomicsProjection', () => {
         rate: 900,
         rate_date: '2026-03-27',
         source: 'mindicador'
-      }
+      },
+      sharedOverheadPool: {
+        periodYear: 2026,
+        periodMonth: 3,
+        targetCurrency: 'CLP',
+        totalSharedOverheadTarget: 320000,
+        allocationMethod: 'contracted_hours'
+      },
+      sharedOverheadTotalWeight: 640
     })
 
     expect(snapshot).toMatchObject({
@@ -130,9 +138,11 @@ describe('memberCapacityEconomicsProjection', () => {
       targetCurrency: 'CLP',
       totalCompSource: 2100,
       totalLaborCostTarget: 1890000,
-      loadedCostTarget: 1890000,
+      directOverheadTarget: 0,
+      sharedOverheadTarget: 80000,
+      loadedCostTarget: 1970000,
       costPerHourTarget: 11812.5,
-      suggestedBillRateTarget: 15946.88,
+      suggestedBillRateTarget: 18942.31,
       snapshotStatus: 'complete',
       sourceCompensationVersionId: 'cv-1',
       sourcePayrollPeriodId: null,
@@ -196,6 +206,13 @@ describe('memberCapacityEconomicsProjection', () => {
           source: 'mindicador'
         }
       ])
+      .mockResolvedValueOnce([
+        {
+          expense_count: 2,
+          total_shared_overhead_target: 320000,
+          active_member_count: 4
+        }
+      ])
 
     const result = await memberCapacityEconomicsProjection.refresh(
       { entityType: 'member', entityId: 'member-1' },
@@ -209,13 +226,16 @@ describe('memberCapacityEconomicsProjection', () => {
       assignedHours: 80,
       assignmentCount: 1,
       sourceCurrency: 'USD',
-      fxProvider: 'mindicador'
+      fxProvider: 'mindicador',
+      sharedOverheadTarget: 80000,
+      suggestedBillRateTarget: 18942.31
     })
   })
 
   it('registers the expected trigger events', () => {
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('assignment.created')
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('compensation_version.updated')
+    expect(memberCapacityEconomicsProjection.triggerEvents).toContain('finance.expense.updated')
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('finance.exchange_rate.upserted')
   })
 

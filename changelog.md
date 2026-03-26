@@ -7,6 +7,13 @@
 
 ## 2026-03-26
 
+### TASK-056 — overhead compartido y pricing base ya alimentan `member_capacity_economics`
+- `member_capacity_economics` dejó de persistir `sharedOverheadTarget = 0` por defecto: ahora toma overhead compartido desde `greenhouse_finance.expenses` no asignados a cliente, limitado en esta iteración a `cost_category IN ('operational', 'infrastructure', 'tax_social')`.
+- El prorrateo inicial del overhead compartido quedó canonizado por `contracted_hours`, evitando cargar el costo a partir de ruido operativo.
+- `directOverheadTarget` se mantiene en `0` por ahora: no se infiere overhead por miembro desde `expenses.member_id` ni desde tooling no canonizado.
+- `suggestedBillRateTarget` dejó de usar `markupMultiplier: 1.35` inline; ahora usa una policy base centralizada en `team-capacity/pricing` con `targetMarginPct: 0.35`, alineada a la semántica de margen ya documentada para Staff Aug.
+- La proyección reactiva `member_capacity_economics` ahora refresca también ante `finance.expense.created` y `finance.expense.updated`.
+
 ### TASK-056 — People y My ya escalan desde `member_capacity_economics`
 - `GET /api/people/[memberId]/intelligence` ahora hace overlay de capacidad/costo desde `member_capacity_economics` para alinear `Person Intelligence` con la misma semántica de `Agency > Team`.
 - `My > Assignments` ahora consume el resumen del snapshot para:

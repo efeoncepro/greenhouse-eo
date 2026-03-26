@@ -1,4 +1,5 @@
 import type { FinanceCurrency } from '@/lib/finance/shared'
+import type { TeamRoleCategory } from '@/types/team'
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
@@ -14,6 +15,22 @@ export type PricingSnapshot = {
   targetCurrency: FinanceCurrency
   policyType: 'margin' | 'markup' | 'minimum_floor'
   snapshotStatus: 'complete' | 'missing_cost'
+}
+
+export const getBasePricingPolicy = ({
+  roleCategory,
+  targetCurrency
+}: {
+  roleCategory: TeamRoleCategory
+  targetCurrency: FinanceCurrency
+}): PricingPolicy => {
+  void roleCategory
+  void targetCurrency
+
+  return {
+    targetMarginPct: 0.35,
+    minimumBillRateTarget: null
+  }
 }
 
 export const getLoadedCostPerHour = ({

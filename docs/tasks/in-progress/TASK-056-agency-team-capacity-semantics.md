@@ -2,6 +2,22 @@
 
 ## Delta 2026-03-26
 
+- Se enriqueció `member_capacity_economics` con `shared_overhead_target` desde `greenhouse_finance.expenses`:
+  - fuente mínima defendible: egresos no asignados a cliente
+  - categorías incluidas en esta iteración: `operational`, `infrastructure`, `tax_social`
+  - prorrateo canónico inicial: `contracted_hours`
+- `direct_overhead_target` se mantiene explícitamente en `0` por ahora:
+  - no existe aún una fuente canónica madura para licencias/tooling por miembro dentro de esta cadena
+  - se evita sobreasumir `expenses.member_id` como overhead directo
+- `suggestedBillRateTarget` dejó de usar `markupMultiplier: 1.35` inline y ahora usa una policy base canónica desde `pricing.ts`:
+  - política actual: `targetMarginPct: 0.35`
+  - razón: alinear el baseline con la semántica de margen más defendible ya presente en Staff Aug
+- La proyección ahora refresca también ante `finance.expense.created` y `finance.expense.updated`, porque el overhead compartido depende de `greenhouse_finance.expenses`.
+- Validación ejecutada en este sub-slice:
+  - `pnpm test src/lib/team-capacity/pricing.test.ts src/lib/team-capacity/overhead.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 - Se implementaron los helpers puros canónicos en `src/lib/team-capacity/`:
   - `units.ts`
   - `economics.ts`

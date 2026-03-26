@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLoadedCostPerHour, getSuggestedBillRate } from '@/lib/team-capacity/pricing'
+import { getBasePricingPolicy, getLoadedCostPerHour, getSuggestedBillRate } from '@/lib/team-capacity/pricing'
 
 describe('team-capacity/pricing', () => {
   it('builds loaded cost from labor and overhead', () => {
@@ -27,5 +27,12 @@ describe('team-capacity/pricing', () => {
 
     expect(snapshot.suggestedBillRateTarget).toBe(1500)
     expect(snapshot.policyType).toBe('minimum_floor')
+  })
+
+  it('exposes the base pricing policy as a target-margin baseline', () => {
+    expect(getBasePricingPolicy({ roleCategory: 'development', targetCurrency: 'CLP' })).toEqual({
+      targetMarginPct: 0.35,
+      minimumBillRateTarget: null
+    })
   })
 })
