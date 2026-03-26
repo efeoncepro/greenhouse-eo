@@ -13,6 +13,7 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { getMonthDateRange } from '@/lib/finance/periods'
 import {
   assertFinanceSlice2PostgresReady,
   type CostAllocationRecord,
@@ -366,8 +367,7 @@ export const computeClientEconomicsSnapshots = async (
 ): Promise<ClientEconomicsRecord[]> => {
   await assertFinanceSlice2PostgresReady()
 
-  const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
-  const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
+  const { periodStart, periodEnd } = getMonthDateRange(year, month)
 
   const revenueRows = await runGreenhousePostgresQuery<{
     client_id: string

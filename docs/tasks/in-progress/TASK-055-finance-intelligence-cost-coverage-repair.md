@@ -37,6 +37,26 @@
 - `client_labor_cost_allocation` siguió vacío para `2026-02` por una razón válida de datos: los assignments activos de ambos miembros comienzan el `2026-03-13`, así que no existe solape temporal con febrero para atribuir costo a cliente.
 - Conclusión: el pipeline ya no está bloqueado por falta de payroll en febrero; el gap remanente para Finance Intelligence es que no existe asignación cliente-período compatible con ese payroll.
 
+## Delta 2026-03-26 (febrero billable + moneda fuente preservada)
+
+- Se backdateó de forma quirúrgica solo la asignación billable de `Sky Airline` para:
+  - `daniela-ferreira` → `2024-12-01`
+  - `melkin-hernandez` → `2025-08-01`
+  - `andres-carlosama` → `2025-08-01`
+- No se tocó la asignación interna de `Efeonce`, para no fabricar costo histórico en un cliente interno sin confirmación.
+- Durante el recompute apareció un bug de engine ya corregido: `computeClientEconomicsSnapshots()` construía `periodEnd` como `YYYY-MM-31` para todos los meses. Quedó reemplazado por helper testeado de rango mensual real.
+- Se endureció además la serving view `greenhouse_serving.client_labor_cost_allocation` para no asumir CLP implícito:
+  - ahora expone `payroll_currency`
+  - preserva `gross_total_source` / `allocated_labor_source`
+  - expone `exchange_rate_to_clp`
+  - solo materializa `allocated_labor_clp` cuando la entry ya está en `CLP` o existe tasa histórica `USD -> CLP` no posterior al cierre del período
+- Resultado real para `2026-02`:
+  - la view ya devuelve filas para `Sky Airline`
+  - las filas de febrero quedaron en `USD`
+  - `allocated_labor_clp` sigue `NULL` porque no existe `USD/CLP` histórico en `greenhouse_finance.exchange_rates` para `<= 2026-02-28`
+  - `syncDailyUsdClpExchangeRate('2026-02-28')` cayó al fallback más reciente (`2026-03-26`), que el bridge ignora por ser posterior al período
+- Conclusión: febrero quedó habilitado y trazable en moneda fuente, pero el margen en CLP sigue pendiente hasta poblar FX histórico de febrero.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.

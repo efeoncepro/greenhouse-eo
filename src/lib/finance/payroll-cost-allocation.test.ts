@@ -30,6 +30,7 @@ describe('computeClientLaborCosts', () => {
       expect.stringContaining('FROM greenhouse_serving.client_labor_cost_allocation'),
       [2026, 3]
     )
+    expect(mockRunGreenhousePostgresQuery.mock.calls[0][0]).toContain('allocated_labor_clp IS NOT NULL')
     expect(result).toEqual([
       {
         clientId: 'client-1',

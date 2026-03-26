@@ -49,6 +49,108 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:26 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Habilitar febrero 2026 para `Finance Intelligence` sin mezclar monedas: backfill billable de assignments, fix de rango mensual corto y bridge laboral con moneda fuente + CLP diferido.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `scripts/backfill-february-billable-assignments.ts`
+- `scripts/setup-postgres-finance-intelligence-p2.sql`
+- `src/lib/finance/periods.ts`
+- `src/lib/finance/periods.test.ts`
+- `src/lib/finance/postgres-store-intelligence.ts`
+- `src/lib/finance/payroll-cost-allocation.ts`
+- `src/lib/finance/payroll-cost-allocation.test.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- `pnpm test src/lib/finance/periods.test.ts src/lib/finance/payroll-cost-allocation.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx src/lib/sync/projections/client-economics.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec tsx scripts/setup-postgres-finance-intelligence-p2.ts`
+- `pnpm exec tsx scripts/backfill-february-billable-assignments.ts`
+- `pnpm exec tsx scripts/verify-p2-view.ts`
+
+### Riesgos o pendientes
+
+- `computeClientEconomicsSnapshots()` ya no rompe febrero con `YYYY-MM-31`; ahora usa rango mensual real con tests para febrero normal, bisiesto y meses de 31 días.
+- Se backdateó solo la asignación billable de `Sky Airline`:
+  - `daniela-ferreira` → `2024-12-01`
+  - `melkin-hernandez` → `2025-08-01`
+  - `andres-carlosama` → `2025-08-01`
+- `greenhouse_serving.client_labor_cost_allocation` ahora preserva:
+  - `payroll_currency`
+  - `gross_total_source` / `allocated_labor_source`
+  - `exchange_rate_to_clp`
+  - `allocated_labor_clp` solo cuando existe FX histórico
+- Para febrero 2026 el bridge quedó honesto:
+  - hay filas en la view para `Sky Airline`
+  - `payroll_currency = USD`
+  - `allocated_labor_source` existe
+  - `allocated_labor_clp = null` porque no hay `USD/CLP` histórico `<= 2026-02-28`
+- `syncDailyUsdClpExchangeRate('2026-02-28')` hizo fallback a `2026-03-26` desde `open-er-api`; por diseño ese fallback no se usa para febrero porque el bridge exige tasa histórica no posterior al período.
+- Próximo paso recomendado en `TASK-055`:
+  - poblar `USD/CLP` histórico para febrero 2026
+  - luego recomputar `client_economics(2026, 2)` para obtener costo laboral en CLP confiable
+
+## 2026-03-26 10:15 -03
+
+### Agente
+
+- Antigravity
+
+### Objetivo del turno
+
+- Completar la implementación de Account Operational Metrics (TASK-014) y agregar `metrics_by_organization` al engine ICO e insertarlo en el `organization-store.ts`.
+
+### Rama
+
+- develop
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/ico-engine/schema.ts`
+- `src/lib/ico-engine/materialize.ts`
+- `scripts/setup-postgres-organization-operational-serving.sql`
+- `src/lib/account-360/get-organization-operational-serving.ts`
+- `src/lib/sync/projections/ico-organization-metrics.ts`
+- `src/lib/sync/projections/organization-operational.ts`
+- `src/lib/sync/projections/index.ts`
+- `src/lib/account-360/organization-store.ts`
+- `docs/tasks/README.md`
+- `docs/tasks/complete/TASK-014-projects-account-360-bridge.md`
+
+### Verificacion
+
+- `pnpm lint --fix` para los archivos tocados
+- `pnpm exec tsc --noEmit` compiló sin problemas en mis archivos
+- Confirmé que los handlers tienen tipados sólidos y extraen data correcta desde BQ hacia Postgres y desde Postgres hacia el FE en el store.
+- Completé la migración del .md a "complete"
+
+### Riesgos o pendientes
+
+- Hay que correr en production el script `scripts/setup-postgres-organization-operational-serving.sql` para crear las tablas base en Postgres antes de hacer queries a esas tablas.
+- Integración final en UI (dashboard frontend) puede necesitar ser cableada para consumir el nuevo exporter de `getOrganizationOperationalMetrics` de `organization-store.ts`.
+
 ## 2026-03-26 07:15 -03
 
 ### Agente

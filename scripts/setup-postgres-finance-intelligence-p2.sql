@@ -11,10 +11,13 @@
 -- For each approved payroll entry, distributes gross_total proportionally
 -- across the member's active client assignments by fte_allocation.
 
-CREATE OR REPLACE VIEW greenhouse_serving.client_labor_cost_allocation AS
+DROP VIEW IF EXISTS greenhouse_serving.client_labor_cost_allocation;
+
+CREATE VIEW greenhouse_serving.client_labor_cost_allocation AS
 WITH payroll_period_window AS (
   SELECT
     pe.member_id,
+    pe.currency,
     pe.gross_total,
     pe.net_total,
     pp.year,
@@ -28,6 +31,7 @@ WITH payroll_period_window AS (
 assignment_overlap AS (
   SELECT
     pw.member_id,
+    pw.currency,
     pw.gross_total,
     pw.net_total,
     pw.year,
@@ -57,13 +61,26 @@ SELECT
   COALESCE(c.client_name, ao.client_id) AS client_name,
   ao.year AS period_year,
   ao.month AS period_month,
+  ao.currency AS payroll_currency,
   ao.fte_allocation,
   mpt.total_fte,
-  ao.gross_total,
-  ao.net_total,
-  -- Proportional allocation: gross * (this_assignment_fte / total_member_fte)
-  ROUND(ao.gross_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2) AS allocated_labor_clp,
-  ROUND(ao.net_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2) AS allocated_net_clp,
+  fx.rate AS exchange_rate_to_clp,
+  ao.gross_total AS gross_total_source,
+  ao.net_total AS net_total_source,
+  -- Proportional allocation in source payroll currency.
+  ROUND(ao.gross_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2) AS allocated_labor_source,
+  ROUND(ao.net_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2) AS allocated_net_source,
+  -- CLP materialization is explicit: only when source currency is already CLP or a historical FX rate exists.
+  CASE
+    WHEN ao.currency = 'CLP' THEN ROUND(ao.gross_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2)
+    WHEN fx.rate IS NOT NULL THEN ROUND((ao.gross_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0)) * fx.rate, 2)
+    ELSE NULL
+  END AS allocated_labor_clp,
+  CASE
+    WHEN ao.currency = 'CLP' THEN ROUND(ao.net_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0), 2)
+    WHEN fx.rate IS NOT NULL THEN ROUND((ao.net_total * ao.fte_allocation / NULLIF(mpt.total_fte, 0)) * fx.rate, 2)
+    ELSE NULL
+  END AS allocated_net_clp,
   -- FTE contribution: member counts as fte_allocation toward this client's headcount
   ao.fte_allocation AS fte_contribution
 FROM assignment_overlap ao
@@ -73,6 +90,15 @@ JOIN member_period_total mpt
   AND mpt.month = ao.month
 JOIN greenhouse_core.members m ON m.member_id = ao.member_id
 JOIN greenhouse_core.clients c ON c.client_id = ao.client_id
+LEFT JOIN LATERAL (
+  SELECT rate
+  FROM greenhouse_finance.exchange_rates fx
+  WHERE fx.from_currency = ao.currency
+    AND fx.to_currency = 'CLP'
+    AND fx.rate_date <= MAKE_DATE(ao.year, ao.month, 1) + INTERVAL '1 month' - INTERVAL '1 day'
+  ORDER BY fx.rate_date DESC
+  LIMIT 1
+) fx ON ao.currency <> 'CLP'
 WHERE mpt.total_fte > 0;
 
 COMMENT ON VIEW greenhouse_serving.client_labor_cost_allocation IS
