@@ -1,7 +1,8 @@
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type MetricGranularity = 'monthly' | 'weekly'
-export type MetricKind = 'average' | 'percentage' | 'count' | 'duration' | 'distribution' | 'ratio'
+export type MetricKind = 'average' | 'percentage' | 'count' | 'duration' | 'distribution' | 'ratio' | 'composite'
+export type MetricScope = 'space' | 'project' | 'member' | 'sprint' | 'person'
 export type ThresholdZone = 'optimal' | 'attention' | 'critical'
 
 export interface MetricThreshold {
@@ -32,6 +33,10 @@ export interface MetricDefinition {
   higherIsBetter: boolean
   icon: string
   color: 'success' | 'warning' | 'error' | 'primary' | 'info'
+  /** Scopes where this metric is available. Defaults to all if omitted. */
+  scopes?: readonly MetricScope[]
+  /** For composite metrics: input metric codes or data source fields needed. */
+  compositeInputs?: readonly string[]
 }
 
 /** Forward-compatible config for AI-generated metrics (spec §12.5.7). */
