@@ -80,6 +80,8 @@ describe('GET /api/team/capacity-breakdown', () => {
           throughput_count: 28
         }
       ])
+      // Intelligence query (person_operational_360 enrichment)
+      .mockResolvedValueOnce([])
 
     const response = await GET()
     const body = await response.json()
@@ -129,6 +131,8 @@ describe('GET /api/team/capacity-breakdown', () => {
           throughput_count: 65
         }
       ])
+      // Intelligence query (person_operational_360 enrichment)
+      .mockResolvedValueOnce([])
 
     const response = await GET()
     const body = await response.json()

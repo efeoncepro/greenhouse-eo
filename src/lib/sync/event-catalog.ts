@@ -106,6 +106,7 @@ export const EVENT_TYPES = {
 
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
+  compensationVersionCreated: 'compensation_version.created',
   icoMaterializationCompleted: 'ico.materialization.completed'
 } as const
 
@@ -148,5 +149,5 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.memberUpdated,
 
   // Payroll compensation (published by payroll store directly)
-  'compensation_version.created' as EventType
+  EVENT_TYPES.compensationVersionCreated
 ] as const
