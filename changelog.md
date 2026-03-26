@@ -29,6 +29,10 @@
 - Se agregó test `Vitest` para `computeClientLaborCosts()`.
 - La verificación runtime confirmó que el view sigue vacío en este entorno porque `2026-03` está en `draft`, no porque el bridge temporal siga roto.
 
+### Payroll backfill — credencial de servicio restaurada
+- `scripts/backfill-postgres-payroll.ts` pasó a usar `GOOGLE_APPLICATION_CREDENTIALS_JSON` vía `getGoogleCredentials()`, evitando fallos `invalid_rapt` por refresh token OAuth local.
+- Con la autenticación corregida, el backfill confirmó que la fuente BigQuery actual no tiene filas de `payroll_periods`, `payroll_entries` ni `compensation_versions`; el gap de febrero está en la fuente, no en el import a PostgreSQL.
+
 ### Finance Intelligence — márgenes ocultos cuando el snapshot está incompleto
 - `Finance > Intelligence` dejó de mostrar márgenes `100% / Óptimo` cuando el snapshot mensual tiene ingresos pero cobertura insuficiente de costos.
 - El route de `client-economics` ahora marca snapshots incompletos y oculta `grossMarginPercent` / `netMarginPercent` cuando detecta costos faltantes o placeholder de backfill.

@@ -49,6 +49,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:06 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Verificar si existía un payroll de febrero en la fuente canónica y destrabar el backfill hacia `greenhouse_payroll`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `scripts/backfill-postgres-payroll.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- `pnpm exec tsx scripts/backfill-postgres-payroll.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- El script de backfill de payroll quedó corregido para usar `GOOGLE_APPLICATION_CREDENTIALS_JSON` y no caer al refresh token OAuth local (`invalid_rapt`).
+- Con auth ya sana, BigQuery devolvió `0` filas para `greenhouse.payroll_periods`, `greenhouse.payroll_entries` y `greenhouse.compensation_versions`; por eso PostgreSQL no tiene febrero.
+- El siguiente cuello de botella ya no es runtime de este repo: hay que identificar dónde vive realmente ese payroll de febrero y materializarlo a BigQuery o cargarlo directo a PostgreSQL con un import controlado.
+
 ## 2026-03-26 06:55 -03
 
 ### Agente

@@ -24,6 +24,12 @@
 - Se aplicó de nuevo `scripts/setup-postgres-finance-intelligence-p2.sql` sobre Postgres y el view quedó materializado con la nueva semántica histórica.
 - La verificación runtime confirmó que el view hoy devuelve `0` filas no por bug temporal sino porque el período visible `2026-03` sigue en estado `draft`; todavía no hay payroll `approved/exported` para poblar costo laboral canónico.
 
+## Delta 2026-03-26 (auditoría febrero payroll)
+
+- Se corrigió `scripts/backfill-postgres-payroll.ts` para que use `GOOGLE_APPLICATION_CREDENTIALS_JSON` vía `getGoogleCredentials()` en vez de caer al refresh token OAuth del host (`invalid_rapt`).
+- Con el backfill ya autenticando correctamente, BigQuery devolvió `0` filas para `greenhouse.payroll_periods`, `greenhouse.payroll_entries` y `greenhouse.compensation_versions`.
+- Conclusión operativa: el payroll de febrero no falta solo en PostgreSQL; tampoco está materializado en la fuente BigQuery que este repo usa como origen de backfill.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.
