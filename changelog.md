@@ -5,6 +5,19 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-26
+
+### TanStack React Table Mass Migration — 22 of 48 tables
+- **Agency views:** Team, Campaigns, Economics, Delivery, Operations (5 tables) — all with Vuexy tableStyles + sorting
+- **Finance lists:** Income, Expenses, Suppliers, Clients, ClientEconomics, Reconciliation (2 tables), CostAllocations — search + sort + pagination
+- **Organization:** OrgList (server-side pagination + sort), OrgPeopleTab (search + sort)
+- **Admin:** Tenants (search + sort + pagination), Roles (sort-only matrix)
+- **Client-facing:** DeliveryAnalytics (project metrics sort), ReviewQueue (2 tables: queue + history)
+- **Services:** ServicesListView (sort + server-side pagination)
+- **Brand icons:** Notion SVG fixed (was invisible on white bg), HubSpot SVG replaced with 24x24 sprocket
+- **Operations health:** `not_configured` status for missing Postgres tables (was showing false "down")
+- **Tasks created:** TASK-053 (25 remaining low-impact), TASK-054 (4 remaining high-impact)
+
 ## 2026-03-25
 
 ### React Table migration — build/test compatibility restored
