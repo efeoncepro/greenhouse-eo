@@ -26,6 +26,7 @@ import PersonMembershipsTab from './tabs/PersonMembershipsTab'
 import PersonHrProfileTab from './tabs/PersonHrProfileTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
 import PersonIdentityTab from './tabs/PersonIdentityTab'
+import PersonIntelligenceTab from './tabs/PersonIntelligenceTab'
 
 type Props = {
   detail: PersonDetail
@@ -168,6 +169,12 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
                   hrContext={detail.hrContext ?? null}
                   defaultOperationalMetrics={detail.operationalMetrics ?? null}
                 />
+              )}
+            </TabPanel>
+
+            <TabPanel value='intelligence' className='p-0'>
+              {activeTab === 'intelligence' && (
+                <PersonIntelligenceTab memberId={detail.member.memberId} />
               )}
             </TabPanel>
 
