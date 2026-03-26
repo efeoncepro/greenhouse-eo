@@ -118,6 +118,48 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
       setIcoLoaded(false)
 
       try {
+        // Primary: read from unified person_operational_360 via intelligence API
+        const intelligenceRes = await fetch(`/api/people/${memberId}/intelligence?trend=1`)
+
+        if (intelligenceRes.ok && active) {
+          const intel = await intelligenceRes.json()
+
+          if (intel.current) {
+            // Map intelligence response to IcoMetricSnapshot-compatible format
+            const getMetricValue = (metrics: Array<{ metricId: string; value: number | null }>, id: string) =>
+              metrics?.find((m: { metricId: string }) => m.metricId === id)?.value ?? null
+
+            const syntheticIco: IcoMetricSnapshot = {
+              dimension: 'member',
+              dimensionValue: memberId,
+              dimensionLabel: null,
+              periodYear: intel.current.period.year,
+              periodMonth: intel.current.period.month,
+              metrics: [
+                ...intel.current.deliveryMetrics,
+                ...intel.current.derivedMetrics
+              ],
+              cscDistribution: [],
+              context: {
+                totalTasks: 0,
+                completedTasks: 0,
+                activeTasks: 0
+              },
+              computedAt: intel.current.materializedAt,
+              engineVersion: intel.current.engineVersion,
+              source: 'materialized'
+            }
+
+            setIcoSnapshot(syntheticIco)
+            setIcoLoaded(true)
+
+            return
+          }
+        }
+
+        // Fallback: read from ICO API directly
+        if (!active) return
+
         const { year, month } = periodRef.current
         const res = await fetch(`/api/people/${memberId}/ico?year=${year}&month=${month}`)
         const data = res.ok ? await res.json() : null

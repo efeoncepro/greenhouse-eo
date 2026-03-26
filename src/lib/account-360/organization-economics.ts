@@ -275,6 +275,70 @@ export const getOrganizationIcoSummary = async (
   }
 }
 
+/**
+ * Get team intelligence summary from person_operational_360 for an organization's members.
+ * Aggregates quality/dedication/cost metrics across all active members assigned to the org's spaces.
+ */
+export const getOrganizationTeamIntelligence = async (
+  orgId: string,
+  year: number,
+  month: number
+): Promise<{
+  memberCount: number
+  avgQualityIndex: number | null
+  avgDedicationIndex: number | null
+  avgUtilizationPct: number | null
+  totalCostPerAsset: number | null
+  avgRpa: number | null
+  avgOtdPct: number | null
+} | null> => {
+  try {
+    interface TeamIntelRow extends Record<string, unknown> {
+      member_count: string | number
+      avg_quality: string | number | null
+      avg_dedication: string | number | null
+      avg_utilization: string | number | null
+      avg_cost_per_asset: string | number | null
+      avg_rpa: string | number | null
+      avg_otd: string | number | null
+    }
+
+    const rows = await runGreenhousePostgresQuery<TeamIntelRow>(`
+      SELECT
+        COUNT(DISTINCT po.member_id) AS member_count,
+        AVG(po.quality_index) AS avg_quality,
+        AVG(po.dedication_index) AS avg_dedication,
+        AVG(po.utilization_pct) AS avg_utilization,
+        AVG(po.cost_per_asset) AS avg_cost_per_asset,
+        AVG(po.rpa_avg) AS avg_rpa,
+        AVG(po.otd_pct) AS avg_otd
+      FROM greenhouse_serving.person_operational_360 po
+      JOIN greenhouse_core.client_team_assignments a ON a.member_id = po.member_id AND a.active = TRUE
+      JOIN greenhouse_core.spaces s ON s.client_id = a.client_id AND s.organization_id = $1
+      WHERE po.period_year = $2 AND po.period_month = $3
+    `, [orgId, year, month])
+
+    if (rows.length === 0) return null
+
+    const r = rows[0]
+    const mc = toNum(r.member_count)
+
+    if (mc === 0) return null
+
+    return {
+      memberCount: mc,
+      avgQualityIndex: r.avg_quality != null ? Math.round(toNum(r.avg_quality)) : null,
+      avgDedicationIndex: r.avg_dedication != null ? Math.round(toNum(r.avg_dedication)) : null,
+      avgUtilizationPct: r.avg_utilization != null ? Math.round(toNum(r.avg_utilization) * 10) / 10 : null,
+      totalCostPerAsset: r.avg_cost_per_asset != null ? Math.round(toNum(r.avg_cost_per_asset)) : null,
+      avgRpa: r.avg_rpa != null ? Math.round(toNum(r.avg_rpa) * 100) / 100 : null,
+      avgOtdPct: r.avg_otd != null ? Math.round(toNum(r.avg_otd) * 10) / 10 : null
+    }
+  } catch {
+    return null
+  }
+}
+
 // ── Internal helpers ──
 
 const toNum = (v: unknown): number => {
