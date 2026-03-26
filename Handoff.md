@@ -49,6 +49,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:34 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Poblar el tipo de cambio histórico válido de febrero 2026 y recomputar `Finance Intelligence` para que el costo laboral en USD sí se materialice en CLP.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/finance/exchange-rates.ts`
+- `src/lib/finance/exchange-rates.test.ts`
+- `scripts/backfill-february-billable-assignments.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- `pnpm test src/lib/finance/exchange-rates.test.ts src/lib/finance/periods.test.ts src/lib/finance/payroll-cost-allocation.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx src/lib/sync/projections/client-economics.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec tsx scripts/backfill-february-billable-assignments.ts`
+- Verificación directa de fuente:
+  - `curl https://mindicador.cl/api/dolar/28-02-2026` → `serie: []`
+  - `curl https://mindicador.cl/api/dolar/27-02-2026` → `valor: 861.19`
+
+### Riesgos o pendientes
+
+- `syncDailyUsdClpExchangeRate('2026-02-28')` ahora busca automáticamente el último día hábil disponible en `mindicador`; para febrero 2026 resolvió correctamente `2026-02-27`.
+- `scripts/backfill-february-billable-assignments.ts` volvió a materializar febrero con:
+  - `USD_CLP_2026-02-27 = 861.19`
+  - `allocatedLaborClp = 1,485,552.75`
+  - `headcountFte = 2`
+  - `Sky Airline directCostsClp = 1,485,552.75`
+  - `grossMarginPercent = netMarginPercent = 0.8924`
+- Gap menor detectado:
+  - el rate reverso `CLP -> USD` sigue redondeando a `0` por precisión insuficiente en `buildUsdClpRatePairs()`
+  - no bloquea este caso porque FI consume `USD -> CLP`, pero conviene corregirlo en una lane corta de finance rates
+
 ## 2026-03-26 07:26 -03
 
 ### Agente

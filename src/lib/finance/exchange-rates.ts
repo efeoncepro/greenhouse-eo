@@ -33,6 +33,21 @@ type PersistedExchangeRate = {
   source: string
 }
 
+export const buildHistoricalMindicadorLookupDates = (requestedDate: string, lookbackDays = 7) => {
+  const baseDate = new Date(`${requestedDate}T00:00:00Z`)
+
+  if (Number.isNaN(baseDate.getTime())) {
+    return [requestedDate]
+  }
+
+  return Array.from({ length: Math.max(1, lookbackDays + 1) }, (_, offset) => {
+    const candidate = new Date(baseDate)
+    candidate.setUTCDate(baseDate.getUTCDate() - offset)
+
+    return candidate.toISOString().slice(0, 10)
+  })
+}
+
 const formatDateAsMindicador = (date: string) => {
   const [year, month, day] = date.split('-')
 
@@ -114,10 +129,24 @@ const fetchOpenExchangeRateUsdToClp = async (): Promise<ExchangeRateProviderResu
 export const fetchUsdToClpFromProviders = async (rateDate?: string | null) => {
   const requestedDate = normalizeString(rateDate) || null
 
+  if (requestedDate) {
+    for (const lookupDate of buildHistoricalMindicadorLookupDates(requestedDate)) {
+      const historical = await fetchMindicadorUsdToClp(lookupDate)
+
+      if (historical) {
+        return historical
+      }
+    }
+  }
+
   const primary = await fetchMindicadorUsdToClp(requestedDate)
 
   if (primary) {
     return primary
+  }
+
+  if (requestedDate) {
+    return null
   }
 
   const fallback = await fetchOpenExchangeRateUsdToClp()

@@ -63,11 +63,13 @@ const main = async () => {
 
     const exchangeRateSync = await syncDailyUsdClpExchangeRate('2026-02-28')
     const labor = await computeClientLaborCosts(2026, 2)
+
     const snapshots = await computeClientEconomicsSnapshots(
       2026,
       2,
       'backfill-february-billable-assignments'
     )
+
     const skySnapshot = await getClientEconomics(BILLABLE_CLIENT_ID, 2026, 2)
 
     console.log(JSON.stringify({

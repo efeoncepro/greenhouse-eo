@@ -57,6 +57,23 @@
   - `syncDailyUsdClpExchangeRate('2026-02-28')` cayó al fallback más reciente (`2026-03-26`), que el bridge ignora por ser posterior al período
 - Conclusión: febrero quedó habilitado y trazable en moneda fuente, pero el margen en CLP sigue pendiente hasta poblar FX histórico de febrero.
 
+## Delta 2026-03-26 (FX histórico de febrero materializado)
+
+- Se endureció `fetchUsdToClpFromProviders()` para que, cuando se pide una fecha histórica, retroceda automáticamente hasta encontrar el último día con dato en `mindicador` en vez de caer al tipo de cambio más reciente.
+- Cobertura añadida en `Vitest` para ese lookup histórico.
+- Resultado real:
+  - `2026-02-28` no tenía dato (`sábado`)
+  - el sync resolvió `2026-02-27` con `USD/CLP = 861.19`
+- Con esa tasa histórica ya persistida, `scripts/backfill-february-billable-assignments.ts` recomputó febrero y `Sky Airline` quedó con:
+  - `directCostsClp = 1,485,552.75`
+  - `headcountFte = 2`
+  - `grossMarginPercent = netMarginPercent = 0.8924`
+- Estado actualizado:
+  - febrero 2026 ya no está solo “trazable en USD”
+  - febrero 2026 quedó materializado en CLP defendible para FI usando el último tipo de cambio válido no posterior al cierre del período
+- Pendiente menor detectado:
+  - el par reverso `CLP -> USD` sigue redondeándose a `0` por precisión insuficiente; no bloquea este slice, pero conviene abrir follow-up corto.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.
