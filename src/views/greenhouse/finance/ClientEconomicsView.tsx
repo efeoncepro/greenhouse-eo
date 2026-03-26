@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
@@ -479,7 +479,7 @@ const ClientEconomicsView = () => {
     }
   }
 
-  const sorted = [...snapshots].sort((a, b) => {
+  const sorted = useMemo(() => [...snapshots].sort((a, b) => {
     let av = 0
     let bv = 0
 
@@ -492,7 +492,7 @@ const ClientEconomicsView = () => {
     }
 
     return sortDir === 'asc' ? av - bv : bv - av
-  })
+  }), [snapshots, sortField, sortDir])
 
   const ceTable = useReactTable({
     data: sorted,
