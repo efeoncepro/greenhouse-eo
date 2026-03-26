@@ -143,7 +143,7 @@ const AgencyTeamView = () => {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/team/capacity-breakdown')
+      const res = await fetch('/api/team/capacity-breakdown', { cache: 'no-store' })
 
       if (res.ok) setData(await res.json())
     } catch { /* silent */ } finally {

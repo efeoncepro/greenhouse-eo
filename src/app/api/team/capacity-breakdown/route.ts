@@ -200,18 +200,26 @@ export async function GET() {
     const teamTotal = aggregateCapacityBreakdown(memberBreakdowns.map(m => m.capacity))
     const overcommittedCount = memberBreakdowns.filter(m => m.capacity.overcommitted).length
 
-    return NextResponse.json({
-      team: teamTotal,
-      members: memberBreakdowns,
-      memberCount: memberBreakdowns.length,
-      hasOperationalMetrics: pomExists,
-      overcommittedCount,
-      overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
-        memberId: m.memberId,
-        displayName: m.displayName,
-        deficit: Math.abs(m.capacity.availableHoursMonth)
-      }))
-    })
+    return NextResponse.json(
+      {
+        team: teamTotal,
+        members: memberBreakdowns,
+        memberCount: memberBreakdowns.length,
+        hasOperationalMetrics: pomExists,
+        overcommittedCount,
+        overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
+          memberId: m.memberId,
+          displayName: m.displayName,
+          deficit: Math.abs(m.capacity.availableHoursMonth)
+        }))
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          Pragma: 'no-cache'
+        }
+      }
+    )
   } catch (error) {
     console.error('GET /api/team/capacity-breakdown failed:', error)
 
