@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { ensureCampaignSchema } from './campaign-store'
+import { assertCampaignSchemaReady } from './campaign-store'
 
 export interface CampaignMetrics {
   campaignId: string
@@ -53,7 +53,7 @@ const toNullNum = (v: unknown): number | null => {
 }
 
 export const getCampaignMetrics = async (campaignId: string): Promise<CampaignMetrics> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   // 1. Get linked project source IDs
   const links = await runGreenhousePostgresQuery<LinkRow>(

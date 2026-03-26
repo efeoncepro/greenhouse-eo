@@ -2,7 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ── Types ──
 
@@ -78,66 +78,81 @@ interface LinkRow extends Record<string, unknown> {
   created_at: string
 }
 
-// ── Schema provisioning ──
+interface CampaignSchemaStatusRow extends Record<string, unknown> {
+  spaces_regclass: string | null
+  campaigns_regclass: string | null
+  campaign_project_links_regclass: string | null
+  campaigns_eo_id_seq_regclass: string | null
+  has_budget_clp: boolean
+  has_currency: boolean
+}
 
-let ensurePromise: Promise<void> | null = null
+// ── Schema readiness ──
 
-export const ensureCampaignSchema = async (): Promise<void> => {
-  if (ensurePromise) return ensurePromise
+let schemaReadyPromise: Promise<void> | null = null
+let schemaReadyAt = 0
 
-  ensurePromise = (async () => {
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_core.campaigns (
-        campaign_id TEXT PRIMARY KEY,
-        eo_id TEXT NOT NULL UNIQUE,
-        slug TEXT NOT NULL UNIQUE,
-        space_id TEXT NOT NULL REFERENCES greenhouse_core.spaces(space_id),
-        display_name TEXT NOT NULL,
-        description TEXT,
-        campaign_type TEXT NOT NULL DEFAULT 'campaign',
-        status TEXT NOT NULL DEFAULT 'draft',
-        planned_start_date DATE,
-        planned_end_date DATE,
-        actual_start_date DATE,
-        actual_end_date DATE,
-        planned_launch_date DATE,
-        actual_launch_date DATE,
-        owner_user_id TEXT,
-        created_by_user_id TEXT,
-        tags TEXT[] NOT NULL DEFAULT '{}',
-        channels TEXT[] NOT NULL DEFAULT '{}',
-        notes TEXT,
-        budget_clp NUMERIC(14,2),
-        currency TEXT NOT NULL DEFAULT 'CLP',
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+const SCHEMA_READY_TTL_MS = 60_000
+
+export const assertCampaignSchemaReady = async (): Promise<void> => {
+  if (!isGreenhousePostgresConfigured()) {
+    throw new Error('Campaign Postgres store is not configured in this environment.')
+  }
+
+  if (Date.now() - schemaReadyAt < SCHEMA_READY_TTL_MS) {
+    return
+  }
+
+  if (schemaReadyPromise) return schemaReadyPromise
+
+  schemaReadyPromise = (async () => {
+    const rows = await runGreenhousePostgresQuery<CampaignSchemaStatusRow>(
+      `SELECT
+         to_regclass('greenhouse_core.spaces')::text AS spaces_regclass,
+         to_regclass('greenhouse_core.campaigns')::text AS campaigns_regclass,
+         to_regclass('greenhouse_core.campaign_project_links')::text AS campaign_project_links_regclass,
+         to_regclass('greenhouse_core.campaigns_eo_id_seq')::text AS campaigns_eo_id_seq_regclass,
+         EXISTS (
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'greenhouse_core'
+             AND table_name = 'campaigns'
+             AND column_name = 'budget_clp'
+         ) AS has_budget_clp,
+         EXISTS (
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'greenhouse_core'
+             AND table_name = 'campaigns'
+             AND column_name = 'currency'
+         ) AS has_currency`
+    )
+
+    const status = rows[0]
+    const missing: string[] = []
+
+    if (!status?.spaces_regclass) missing.push('greenhouse_core.spaces')
+    if (!status?.campaigns_regclass) missing.push('greenhouse_core.campaigns')
+    if (!status?.campaign_project_links_regclass) missing.push('greenhouse_core.campaign_project_links')
+    if (!status?.campaigns_eo_id_seq_regclass) missing.push('greenhouse_core.campaigns_eo_id_seq')
+    if (!status?.has_budget_clp) missing.push('greenhouse_core.campaigns.budget_clp')
+    if (!status?.has_currency) missing.push('greenhouse_core.campaigns.currency')
+
+    if (missing.length > 0) {
+      throw new Error(
+        `Campaign PostgreSQL schema is not ready. Missing: ${missing.join(', ')}. Run pnpm setup:postgres:campaigns with migrator credentials after pnpm setup:postgres:canonical-360 if needed.`
       )
-    `)
-    // Add budget columns if table existed before this change
-    await runGreenhousePostgresQuery(`
-      ALTER TABLE greenhouse_core.campaigns ADD COLUMN IF NOT EXISTS budget_clp NUMERIC(14,2)
-    `).catch(() => {})
-    await runGreenhousePostgresQuery(`
-      ALTER TABLE greenhouse_core.campaigns ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'CLP'
-    `).catch(() => {})
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_core.campaign_project_links (
-        campaign_project_link_id TEXT PRIMARY KEY,
-        campaign_id TEXT NOT NULL REFERENCES greenhouse_core.campaigns(campaign_id),
-        space_id TEXT NOT NULL REFERENCES greenhouse_core.spaces(space_id),
-        project_source_system TEXT NOT NULL DEFAULT 'notion',
-        project_source_id TEXT NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        CONSTRAINT uq_campaign_project_space UNIQUE (space_id, project_source_id)
-      )
-    `)
+    }
+
+    schemaReadyAt = Date.now()
   })().catch(err => {
-    ensurePromise = null
+    schemaReadyPromise = null
     throw err
   })
 
-  return ensurePromise
+  return schemaReadyPromise.finally(() => {
+    schemaReadyPromise = null
+  })
 }
 
 // ── Mappers ──
@@ -200,7 +215,7 @@ export const listCampaigns = async (
   spaceId: string,
   options?: { status?: string; campaignIds?: string[] }
 ): Promise<Campaign[]> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const params: unknown[] = [spaceId]
   let filters = 'WHERE c.space_id = $1'
@@ -231,9 +246,9 @@ export const listCampaigns = async (
 }
 
 export const listAllCampaigns = async (
-  options?: { status?: string; limit?: number }
+  options?: { status?: string; limit?: number; campaignIds?: string[] }
 ): Promise<Campaign[]> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const params: unknown[] = []
   let filters = 'WHERE TRUE'
@@ -242,6 +257,12 @@ export const listAllCampaigns = async (
   if (options?.status) {
     filters += ` AND c.status = $${idx}`
     params.push(options.status)
+    idx++
+  }
+
+  if (options?.campaignIds?.length) {
+    filters += ` AND c.campaign_id = ANY($${idx})`
+    params.push(options.campaignIds)
     idx++
   }
 
@@ -261,7 +282,7 @@ export const listAllCampaigns = async (
 }
 
 export const getCampaign = async (campaignId: string): Promise<Campaign | null> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const rows = await runGreenhousePostgresQuery<CampaignRow>(
     `SELECT c.*,
@@ -291,7 +312,7 @@ export const createCampaign = async (input: {
   budgetClp?: number
   currency?: string
 }): Promise<Campaign> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const campaignId = randomUUID()
   const seq = await runGreenhousePostgresQuery<{ nextval: string } & Record<string, unknown>>(
@@ -352,7 +373,7 @@ export const updateCampaign = async (
     notes: string | null
   }>
 ): Promise<Campaign | null> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const updates: string[] = []
   const params: unknown[] = [campaignId]
@@ -409,7 +430,7 @@ export const updateCampaign = async (
 // ── Project Links ──
 
 export const listCampaignProjects = async (campaignId: string): Promise<CampaignProjectLink[]> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const rows = await runGreenhousePostgresQuery<LinkRow>(
     `SELECT * FROM greenhouse_core.campaign_project_links WHERE campaign_id = $1 ORDER BY created_at`,
@@ -425,7 +446,7 @@ export const addProjectToCampaign = async (input: {
   projectSourceId: string
   projectSourceSystem?: string
 }): Promise<CampaignProjectLink> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const linkId = randomUUID()
 
@@ -441,7 +462,7 @@ export const addProjectToCampaign = async (input: {
 }
 
 export const removeProjectFromCampaign = async (campaignProjectLinkId: string): Promise<void> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   await runGreenhousePostgresQuery(
     `DELETE FROM greenhouse_core.campaign_project_links WHERE campaign_project_link_id = $1`,

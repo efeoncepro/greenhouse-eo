@@ -11071,3 +11071,212 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - La task nueva queda en `to-do` y no reemplaza la lane ya activa `CODEX_TASK_HR_Payroll_Operational_Hardening_v1.md`.
 - Su foco es distinto: exactitud de permisos/asistencia, work entries canónicos, colisiones, aprobaciones tardías y seam futuro para `Microsoft Teams`.
 - No se hicieron cambios de runtime en este subturno.
+
+---
+
+## 2026-03-25 21:12 America/Santiago
+
+### Agente
+
+- Codex (GPT-5)
+
+### Objetivo del turno
+
+- Corregir y blindar el flujo `Agency > Campaigns` para que usuarios internos no queden con estado vacío silencioso cuando la API no recibe `spaceId`, y dejar cobertura unitaria temprana con `Vitest`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Runtime local / staging follow-up
+
+### Archivos tocados
+
+- `src/app/api/campaigns/route.ts`
+- `src/lib/campaigns/campaign-store.ts`
+- `src/views/agency/AgencyCampaignsView.tsx`
+- `src/app/api/campaigns/route.test.ts`
+- `src/views/agency/AgencyCampaignsView.test.tsx`
+
+### Hallazgos
+
+- `AgencyCampaignsView` consumía `GET /api/campaigns` sin `spaceId`; para usuarios internos, esa ruta devolvía `400` y la UI lo tragaba como si fueran `0` campañas.
+- Se ajustó `GET /api/campaigns` para que usuarios internos sin `spaceId` usen `listAllCampaigns()` y mantengan `campaignScopes` cuando existan.
+- La vista `AgencyCampaignsView` ahora muestra estado de error explícito si la API responde `non-OK`, en vez de mostrar `Sin campañas registradas`.
+- El entorno actual sigue teniendo una deuda adicional de datos/bootstrap: la verificación contra Cloud SQL indicó que `greenhouse_core.campaigns` no existe todavía en esta base, así que un `0` posterior al fix ya no debe asumirse como bug de UI.
+
+### Verificación
+
+- `pnpm test src/app/api/campaigns/route.test.ts`
+- `pnpm test src/views/agency/AgencyCampaignsView.test.tsx`
+- `pnpm test src/lib/agency/agency-queries.test.ts src/app/api/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
+
+### Resultado
+
+- `Vitest`: `3 files passed`, `7 tests passed`
+
+### Próximo paso recomendado
+
+- Validar bootstrap/schema de campañas en PostgreSQL con el flujo canónico del dominio, porque el fix de contrato/UI ya no explica por sí solo un listado en `0`.
+
+---
+
+## 2026-03-25 21:21 America/Santiago
+
+### Agente
+
+- Codex (GPT-5)
+
+### Objetivo del turno
+
+- Completar el corte canónico de `Campaign 360` en PostgreSQL para que el runtime de campañas deje de hacer `DDL` request-time y el diagnóstico de `Agency > Campaigns` quede cerrado de punta a punta.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Cloud SQL dev / runtime local
+
+### Archivos tocados
+
+- `package.json`
+- `scripts/setup-postgres-campaigns.sql`
+- `scripts/setup-postgres-campaigns.ts`
+- `src/lib/campaigns/campaign-store.ts`
+- `src/lib/campaigns/campaign-store.test.ts`
+- `src/lib/campaigns/campaign-extended.ts`
+- `src/lib/campaigns/campaign-metrics.ts`
+- `docs/tasks/complete/TASK-017-campaign-360.md`
+
+### Hallazgos
+
+- El repo ya tenía `scripts/setup-postgres-campaigns.sql`, pero no estaba conectado al flujo canónico del proyecto ni reemplazaba realmente el `DDL` request-time del runtime.
+- El problema original de `Agency > Campaigns` quedó partido en dos:
+  - contrato/UI: ya corregido en el turno previo
+  - dominio canónico: faltaba bootstrap explícito y el runtime seguía intentando crear tablas/columnas
+- Después del bootstrap explícito, runtime ve correctamente:
+  - `greenhouse_core.campaigns`
+  - `greenhouse_core.campaign_project_links`
+  - `greenhouse_core.campaigns_eo_id_seq`
+- El schema ya existe, pero sigue con `0` campañas y `0` links. Si staging sigue vacío, el gap remanente es seed/canonización, no ausencia de schema.
+
+### Cambios aplicados
+
+- Se agregó `pnpm setup:postgres:campaigns` con wrapper TS y se alineó el SQL a grants `greenhouse_runtime` / `greenhouse_migrator` más migration log.
+- `campaign-store` dejó de hacer `CREATE TABLE` / `ALTER TABLE` en runtime y ahora usa validación no-mutante (`assertCampaignSchemaReady()`), con error explícito si falta bootstrap.
+- `campaign-extended` y `campaign-metrics` ahora dependen de la misma validación no-mutante.
+- Se agregó test unitario para el store de campañas, cubriendo:
+  - falla clara cuando el schema no está provisionado
+  - lectura correcta cuando el schema está listo
+
+### Verificación
+
+- `pnpm pg:doctor --profile=runtime`
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm setup:postgres:campaigns`
+- `pnpm test src/lib/campaigns/campaign-store.test.ts src/app/api/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- Query runtime posterior al setup:
+  - `campaigns_table = greenhouse_core.campaigns`
+  - `links_table = greenhouse_core.campaign_project_links`
+  - `eo_seq = greenhouse_core.campaigns_eo_id_seq`
+  - `campaigns_count = 0`
+  - `links_count = 0`
+
+### Resultado
+
+- `Vitest`: `3 files passed`, `7 tests passed`
+- `TypeScript`: sin errores
+- `Campaign 360` ya no depende de `DDL` request-time para operar
+
+### Próximo paso recomendado
+
+- Poblar o canonizar campañas reales en `greenhouse_core.campaigns` y `greenhouse_core.campaign_project_links`, o conectar el backfill/seed correspondiente, porque el schema ya no es el bloqueo.
+
+---
+
+## 2026-03-25 21:31 America/Santiago
+
+### Agente
+
+- Codex (GPT-5)
+
+### Objetivo del turno
+
+- Resolver el gap restante de `Agency > Campaigns` poblando el dominio canónico con datos reales y dejar una ruta reusable de backfill/seed.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Cloud SQL dev / staging-backed data
+
+### Archivos tocados
+
+- `src/lib/campaigns/backfill-heuristics.ts`
+- `src/lib/campaigns/backfill-heuristics.test.ts`
+- `scripts/backfill-postgres-campaigns.ts`
+- `package.json`
+- `postcss.config.mjs`
+- `docs/tasks/complete/TASK-017-campaign-360.md`
+
+### Hallazgos
+
+- No existía un backfill histórico reutilizable para campañas.
+- `greenhouse_delivery.projects` sí trae proyectos reales por `space_id`, pero ese `space_id` todavía llega desde `greenhouse_core.notion_workspaces`, no desde `greenhouse_core.spaces`.
+- El backfill necesitó puentear:
+  - `greenhouse_delivery.projects.space_id`
+  - `greenhouse_core.notion_workspaces`
+  - `greenhouse_core.spaces`
+- Para client spaces, el bridge útil es `spaces.client_id = notion_workspaces.client_id`.
+- Para `Efeonce`, donde el `client_id` legacy viene `NULL`, el bridge útil fue `space_name`.
+
+### Cambios aplicados
+
+- Se agregó `pnpm backfill:postgres:campaigns`.
+- El script usa una heurística conservadora:
+  - cluster por prefijo semántico del `project_name`
+  - dentro del mismo `space_id` canónico
+  - solo si hay `>= 2` proyectos por cluster
+- Además se agregó un seed manual curado:
+  - `Sky Airlines Kick-Off`
+- Se agregó test unitario de heurística y se corrigió `postcss.config.mjs` para destrabar la suite de UI en Vitest.
+
+### Verificación
+
+- `pnpm test src/lib/campaigns/backfill-heuristics.test.ts src/lib/campaigns/campaign-store.test.ts src/app/api/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm backfill:postgres:campaigns`
+- `pnpm backfill:postgres:campaigns --apply`
+
+### Resultado
+
+- `Vitest`: `4 files passed`, `9 tests passed`
+- `TypeScript`: sin errores
+- Backfill aplicado:
+  - `7` campañas en `greenhouse_core.campaigns`
+  - `24` links en `greenhouse_core.campaign_project_links`
+
+### Snapshot final de seed
+
+- `spc-c0cf6478-1bf1-4804-8e04-db7bc73655ad`
+  - `Comercial` (`7` proyectos)
+  - `Gtm` (`6`)
+  - `Operaciones` (`4`)
+  - `Gore` (`2`)
+  - `Web Design` (`2`)
+- `spc-8641519f-12a0-456f-b03a-e94522d35e3a`
+  - `Content` (`2`)
+- `spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9`
+  - `Sky Airlines Kick-Off` (`1`)
+
+### Próximo paso recomendado
+
+- Revalidar `Agency > Campaigns` en staging UI ya con datos presentes.
+- Si la vista sigue vacía, el siguiente problema ya no es datos ni schema; sería consumo runtime/deploy o auth/session del entorno.

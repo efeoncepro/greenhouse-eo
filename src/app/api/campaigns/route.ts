@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
-import { listCampaigns, createCampaign } from '@/lib/campaigns/campaign-store'
+import { listAllCampaigns, listCampaigns, createCampaign } from '@/lib/campaigns/campaign-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,22 +14,24 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status') || undefined
+  const campaignIds = tenant.campaignScopes.length > 0 ? tenant.campaignScopes : undefined
 
-  // Client users: filter by their space + campaign_subset
-  // Internal users: filter by spaceId param or show all
-  const spaceId = tenant.tenantType === 'client'
-    ? tenant.clientId
-    : searchParams.get('spaceId') || ''
-
-  if (!spaceId) {
-    return NextResponse.json({ error: 'spaceId is required' }, { status: 400 })
-  }
+  const requestedSpaceId = searchParams.get('spaceId') || undefined
+  const isClientUser = tenant.tenantType === 'client'
+  const spaceId = isClientUser ? tenant.clientId : requestedSpaceId
 
   try {
-    // Apply campaign_subset if user has restricted scopes
-    const campaignIds = tenant.campaignScopes.length > 0 ? tenant.campaignScopes : undefined
+    if (spaceId) {
+      const campaigns = await listCampaigns(spaceId, { status, campaignIds })
 
-    const campaigns = await listCampaigns(spaceId, { status, campaignIds })
+      return NextResponse.json({ items: campaigns, total: campaigns.length })
+    }
+
+    if (isClientUser) {
+      return NextResponse.json({ error: 'spaceId is required' }, { status: 400 })
+    }
+
+    const campaigns = await listAllCampaigns({ status, campaignIds })
 
     return NextResponse.json({ items: campaigns, total: campaigns.length })
   } catch (error) {

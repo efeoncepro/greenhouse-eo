@@ -22,16 +22,30 @@ import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 import { toast } from 'react-toastify'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
 import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDrawer'
 
 // ---------------------------------------------------------------------------
@@ -137,6 +151,8 @@ const IncomeListView = () => {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [batchDialogOpen, setBatchDialogOpen] = useState(false)
   const [batchEmitting, setBatchEmitting] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'invoiceDate', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const fetchIncome = useCallback(async () => {
     setLoading(true)
@@ -237,6 +253,109 @@ const IncomeListView = () => {
       setBatchDialogOpen(false)
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // TanStack table
+  // ---------------------------------------------------------------------------
+
+  const incomeColumnHelper = createColumnHelper<Income>()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const incomeColumns: ColumnDef<Income, any>[] = [
+    {
+      id: 'select',
+      header: () => (
+        <Checkbox
+          size='small'
+          checked={eligibleForDte.length > 0 && selectedEligible.length === eligibleForDte.length}
+          indeterminate={selectedEligible.length > 0 && selectedEligible.length < eligibleForDte.length}
+          onChange={toggleSelectAll}
+          inputProps={{ 'aria-label': 'Seleccionar todos los ingresos sin DTE' }}
+        />
+      ),
+      cell: ({ row }) => (
+        <span onClick={e => e.stopPropagation()}>
+          <Checkbox
+            size='small'
+            checked={selected.has(row.original.incomeId)}
+            disabled={hasDte(row.original)}
+            onChange={() => toggleSelect(row.original.incomeId)}
+            inputProps={{ 'aria-label': `Seleccionar ${row.original.invoiceNumber || row.original.incomeId}` }}
+          />
+        </span>
+      ),
+      enableSorting: false,
+      meta: { width: 42 }
+    },
+    incomeColumnHelper.accessor('invoiceNumber', {
+      header: 'Factura',
+      cell: ({ row }) => (
+        <Box>
+          <Typography variant='body2' fontWeight={600}>{row.original.invoiceNumber || row.original.incomeId}</Typography>
+          {row.original.description && (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {row.original.description}
+            </Typography>
+          )}
+        </Box>
+      )
+    }),
+    incomeColumnHelper.accessor('clientName', { header: 'Cliente' }),
+    incomeColumnHelper.accessor('invoiceDate', {
+      header: 'Fecha',
+      cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+    }),
+    incomeColumnHelper.accessor('dueDate', {
+      header: 'Vencimiento',
+      cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+    }),
+    incomeColumnHelper.accessor('totalAmount', {
+      header: 'Monto',
+      cell: ({ row }) => <Typography variant='body2' fontWeight={600}>{formatAmount(row.original.totalAmount, row.original.currency)}</Typography>,
+      meta: { align: 'right' }
+    }),
+    incomeColumnHelper.accessor('paymentStatus', {
+      header: 'Estado',
+      cell: ({ getValue }) => {
+        const conf = STATUS_CONFIG[getValue()] || STATUS_CONFIG.pending
+
+        return <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
+      }
+    }),
+    {
+      id: 'dte',
+      header: 'DTE',
+      cell: ({ row }: { row: { original: Income } }) => {
+        const dteKey = getDteStatusKey(row.original)
+        const dteConf = DTE_STATUS_CONFIG[dteKey]
+
+        return <CustomChip round='true' size='small' color={dteConf.color} label={dteConf.label} icon={<i className={dteConf.icon} />} />
+      },
+      enableSorting: false
+    },
+    incomeColumnHelper.accessor('amountPending', {
+      header: 'Pendiente',
+      cell: ({ row }) => (
+        <Typography variant='body2' fontWeight={500} color={row.original.amountPending > 0 ? 'error.main' : 'success.main'}>
+          {row.original.amountPending > 0 ? formatAmount(row.original.amountPending, row.original.currency) : '—'}
+        </Typography>
+      ),
+      meta: { align: 'right' }
+    })
+  ]
+
+  const incomeTable = useReactTable({
+    data: items,
+    columns: incomeColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
 
   // ---------------------------------------------------------------------------
   // Loading
@@ -363,119 +482,36 @@ const IncomeListView = () => {
           </CustomTextField>
         </CardContent>
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding='checkbox' sx={{ width: 42 }}>
-                  <Checkbox
-                    size='small'
-                    checked={eligibleForDte.length > 0 && selectedEligible.length === eligibleForDte.length}
-                    indeterminate={selectedEligible.length > 0 && selectedEligible.length < eligibleForDte.length}
-                    onChange={toggleSelectAll}
-                    inputProps={{ 'aria-label': 'Seleccionar todos los ingresos sin DTE' }}
-                  />
-                </TableCell>
-                <TableCell>Factura</TableCell>
-                <TableCell>Cliente</TableCell>
-                <TableCell sx={{ width: 100 }}>Fecha</TableCell>
-                <TableCell sx={{ width: 100 }}>Vencimiento</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
-                <TableCell sx={{ width: 100 }}>Estado</TableCell>
-                <TableCell sx={{ width: 90 }}>DTE</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Pendiente</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay ingresos registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                items.map(item => {
-                  const statusConf = STATUS_CONFIG[item.paymentStatus] || STATUS_CONFIG.pending
-
-                  return (
-                    <TableRow key={item.incomeId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/income/${item.incomeId}`)}>
-                      <TableCell padding='checkbox' onClick={e => e.stopPropagation()}>
-                        <Checkbox
-                          size='small'
-                          checked={selected.has(item.incomeId)}
-                          disabled={hasDte(item)}
-                          onChange={() => toggleSelect(item.incomeId)}
-                          inputProps={{ 'aria-label': `Seleccionar ${item.invoiceNumber || item.incomeId}` }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant='body2' fontWeight={600}>
-                            {item.invoiceNumber || item.incomeId}
-                          </Typography>
-                          {item.description ? (
-                            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {item.description}
-                            </Typography>
-                          ) : null}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{item.clientName}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{formatDate(item.invoiceDate)}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{formatDate(item.dueDate)}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2' fontWeight={600}>
-                          {formatAmount(item.totalAmount, item.currency)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={statusConf.color}
-                          label={statusConf.label}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {(() => {
-                          const dteKey = getDteStatusKey(item)
-                          const dteConf = DTE_STATUS_CONFIG[dteKey]
-
-                          return (
-                            <CustomChip
-                              round='true'
-                              size='small'
-                              color={dteConf.color}
-                              label={dteConf.label}
-                              icon={<i className={dteConf.icon} />}
-                            />
-                          )
-                        })()}
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography
-                          variant='body2'
-                          fontWeight={500}
-                          color={item.amountPending > 0 ? 'error.main' : 'success.main'}
-                        >
-                          {item.amountPending > 0 ? formatAmount(item.amountPending, item.currency) : '—'}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {incomeTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {incomeTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={incomeColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay ingresos registrados aún</Typography></td></tr>
+              ) : incomeTable.getRowModel().rows.map(row => (
+                <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/income/${row.original.incomeId}`)}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePaginationComponent table={incomeTable as ReturnType<typeof useReactTable>} />
       </Card>
 
       {/* Batch DTE confirmation dialog */}
