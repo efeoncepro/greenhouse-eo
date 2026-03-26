@@ -228,17 +228,65 @@ export async function GET() {
       })
     }
 
+    // Enrich with person_operational_360 intelligence (quality, dedication, cost)
+    const enrichedMemberIds = memberBreakdowns.map(m => m.memberId)
+
+    interface IntelligenceRow extends Record<string, unknown> {
+      member_id: string
+      quality_index: string | number | null
+      dedication_index: string | number | null
+      cost_per_asset: string | number | null
+      cost_per_hour: string | number | null
+      rpa_avg: string | number | null
+      otd_pct: string | number | null
+      ftr_pct: string | number | null
+    }
+
+    const intelligenceRows = enrichedMemberIds.length > 0
+      ? await withTimeout(
+          runGreenhousePostgresQuery<IntelligenceRow>(
+            `SELECT member_id, quality_index, dedication_index, cost_per_asset, cost_per_hour,
+                    rpa_avg, otd_pct, ftr_pct
+             FROM greenhouse_serving.person_operational_360
+             WHERE member_id = ANY($1::text[])
+               AND period_year = EXTRACT(YEAR FROM CURRENT_DATE)
+               AND period_month = EXTRACT(MONTH FROM CURRENT_DATE)`,
+            [enrichedMemberIds]
+          ),
+          'person intelligence query'
+        ).catch(() => [] as IntelligenceRow[])
+      : []
+
+    const intelligenceByMember = new Map(intelligenceRows.map(r => [r.member_id, r]))
+
+    const enrichedMembers = memberBreakdowns.map(m => {
+      const intel = intelligenceByMember.get(m.memberId)
+
+      return {
+        ...m,
+        intelligence: intel ? {
+          qualityIndex: toNum(intel.quality_index) || null,
+          dedicationIndex: toNum(intel.dedication_index) || null,
+          costPerAsset: toNum(intel.cost_per_asset) || null,
+          costPerHour: toNum(intel.cost_per_hour) || null,
+          rpaAvg: toNum(intel.rpa_avg) || null,
+          otdPct: toNum(intel.otd_pct) || null,
+          ftrPct: toNum(intel.ftr_pct) || null
+        } : null
+      }
+    })
+
     const teamTotal = aggregateCapacityBreakdown(memberBreakdowns.map(m => m.capacity))
     const overcommittedCount = memberBreakdowns.filter(m => m.capacity.overcommitted).length
 
     return NextResponse.json(
       {
         team: teamTotal,
-        members: memberBreakdowns,
-        memberCount: memberBreakdowns.length,
-        hasOperationalMetrics: memberBreakdowns.length > 0,
+        members: enrichedMembers,
+        memberCount: enrichedMembers.length,
+        hasOperationalMetrics: enrichedMembers.length > 0,
         overcommittedCount,
-        overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
+        overcommittedMembers: enrichedMembers.filter(m => m.capacity.overcommitted).map(m => ({
           memberId: m.memberId,
           displayName: m.displayName,
           deficit: Math.abs(m.capacity.availableHoursMonth)
