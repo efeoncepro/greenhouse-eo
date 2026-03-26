@@ -10,17 +10,19 @@ import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomerStats from '@components/card-statistics/CustomerStats'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──
 
@@ -115,6 +117,57 @@ const subsystemIcon = (name: string): string => {
   return map[name] || 'tabler-server'
 }
 
+// ── TanStack columns ──
+
+const eventColumnHelper = createColumnHelper<RecentEvent>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const eventColumns: ColumnDef<RecentEvent, any>[] = [
+  eventColumnHelper.accessor('eventType', {
+    header: 'Tipo',
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue()}</Typography>
+  }),
+  {
+    id: 'aggregate',
+    header: 'Agregado',
+    accessorFn: (row: RecentEvent) => `${row.aggregateType}:${row.aggregateId}`,
+    cell: ({ row }: { row: { original: RecentEvent } }) => <Typography variant='body2' color='text.secondary'>{row.original.aggregateType}:{row.original.aggregateId.slice(0, 12)}</Typography>
+  },
+  eventColumnHelper.accessor('occurredAt', {
+    header: 'Hora',
+    cell: ({ getValue }) => <Typography variant='caption' color='text.secondary'>{timeAgo(getValue())}</Typography>
+  }),
+  eventColumnHelper.accessor('status', {
+    header: 'Estado',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={statusColor(getValue())} label={statusLabel(getValue())} />,
+    meta: { align: 'center' }
+  })
+]
+
+const projColumnHelper = createColumnHelper<FailedProjection>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projColumns: ColumnDef<FailedProjection, any>[] = [
+  projColumnHelper.accessor('projectionName', {
+    header: 'Proyección',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
+  }),
+  {
+    id: 'entity',
+    header: 'Entidad',
+    accessorFn: (row: FailedProjection) => `${row.entityType}:${row.entityId}`,
+    cell: ({ row }: { row: { original: FailedProjection } }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{row.original.entityType}:{row.original.entityId.slice(0, 12)}</Typography>
+  },
+  projColumnHelper.accessor('failedAt', {
+    header: 'Hora',
+    cell: ({ getValue }) => <Typography variant='caption' color='text.secondary'>{timeAgo(getValue())}</Typography>
+  }),
+  projColumnHelper.accessor('errorMessage', {
+    header: 'Error',
+    cell: ({ getValue }) => <Typography variant='body2' color='error.main' sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getValue().length > 80 ? `${getValue().slice(0, 80)}…` : getValue()}</Typography>
+  })
+]
+
 // ── Component ──
 
 const AgencyOperationsView = () => {
@@ -134,6 +187,27 @@ const AgencyOperationsView = () => {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const [eventSorting, setEventSorting] = useState<SortingState>([])
+  const [projSorting, setProjSorting] = useState<SortingState>([])
+
+  const eventTable = useReactTable({
+    data: data?.recentEvents ?? [],
+    columns: eventColumns,
+    state: { sorting: eventSorting },
+    onSortingChange: setEventSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
+
+  const projTable = useReactTable({
+    data: data?.failedProjections ?? [],
+    columns: projColumns,
+    state: { sorting: projSorting },
+    onSortingChange: setProjSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
@@ -196,36 +270,33 @@ const AgencyOperationsView = () => {
               <Typography variant='body2' color='text.secondary'>Sin eventos recientes</Typography>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Tipo</TableCell>
-                    <TableCell>Agregado</TableCell>
-                    <TableCell>Hora</TableCell>
-                    <TableCell align='center'>Estado</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {events.map((e, i) => (
-                    <TableRow key={i} hover>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{e.eventType}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='text.secondary'>{e.aggregateType}:{e.aggregateId.slice(0, 12)}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='caption' color='text.secondary'>{timeAgo(e.occurredAt)}</Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip round='true' size='small' variant='tonal' color={statusColor(e.status)} label={statusLabel(e.status)} />
-                      </TableCell>
-                    </TableRow>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {eventTable.getHeaderGroups().map(hg => (
+                    <tr key={hg.id}>
+                      {hg.headers.map(header => (
+                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </thead>
+                <tbody>
+                  {eventTable.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       </Grid>
@@ -240,34 +311,31 @@ const AgencyOperationsView = () => {
               avatar={<Avatar variant='rounded' sx={{ bgcolor: 'error.lightOpacity' }}><i className='tabler-alert-triangle' style={{ fontSize: 22, color: 'var(--mui-palette-error-main)' }} /></Avatar>}
             />
             <Divider />
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Proyección</TableCell>
-                    <TableCell>Entidad</TableCell>
-                    <TableCell>Hora</TableCell>
-                    <TableCell>Error</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {failed.map((f, i) => (
-                    <TableRow key={i}>
-                      <TableCell><Typography variant='body2' fontWeight={600}>{f.projectionName}</Typography></TableCell>
-                      <TableCell>
-                        <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{f.entityType}:{f.entityId.slice(0, 12)}</Typography>
-                      </TableCell>
-                      <TableCell><Typography variant='caption' color='text.secondary'>{timeAgo(f.failedAt)}</Typography></TableCell>
-                      <TableCell>
-                        <Typography variant='body2' color='error.main' sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {f.errorMessage.length > 80 ? `${f.errorMessage.slice(0, 80)}…` : f.errorMessage}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {projTable.getHeaderGroups().map(hg => (
+                    <tr key={hg.id}>
+                      {hg.headers.map(header => (
+                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </thead>
+                <tbody>
+                  {projTable.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </Card>
         </Grid>
       )}

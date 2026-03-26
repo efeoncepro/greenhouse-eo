@@ -10,20 +10,22 @@ import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomerStats from '@components/card-statistics/CustomerStats'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──
 
@@ -63,6 +65,50 @@ const semaphore = (v: number | null | undefined): { color: SemaphoreColor; label
 
 const fmtPct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 
+// ── Delivery table columns ──
+
+const spaceColumnHelper = createColumnHelper<SpaceHealth>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
+  spaceColumnHelper.accessor('clientName', {
+    header: 'Space',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
+  }),
+  spaceColumnHelper.accessor('rpaAvg', {
+    header: 'RPA',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={semaphore(getValue()).color} label={fmtPct(getValue())} />,
+    meta: { align: 'center' }
+  }),
+  spaceColumnHelper.accessor('otdPct', {
+    header: 'OTD',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={semaphore(getValue()).color} label={fmtPct(getValue())} />,
+    meta: { align: 'center' }
+  }),
+  spaceColumnHelper.accessor('projectCount', {
+    header: 'Proyectos',
+    meta: { align: 'right' }
+  }),
+  spaceColumnHelper.accessor('assetsActivos', {
+    header: 'Stuck',
+    cell: ({ getValue }) => getValue() > 0
+      ? <CustomChip round='true' size='small' variant='tonal' color='error' label={String(getValue())} />
+      : '0',
+    meta: { align: 'right' }
+  }),
+  {
+    id: 'health',
+    header: 'Health',
+    accessorFn: (row: SpaceHealth) => row.rpaAvg,
+    cell: ({ row }: { row: { original: SpaceHealth } }) => {
+      const h = semaphore(row.original.rpaAvg)
+
+      return <CustomChip round='true' size='small' variant='tonal' color={h.color} label={h.label} />
+    },
+    meta: { align: 'center' }
+  }
+]
+
 // ── Component ──
 
 const AgencyDeliveryView = () => {
@@ -71,6 +117,7 @@ const AgencyDeliveryView = () => {
   const [spaces, setSpaces] = useState<SpaceHealth[]>([])
   const [trend, setTrend] = useState<TrendPoint[]>([])
   const [loading, setLoading] = useState(true)
+  const [spaceSorting, setSpaceSorting] = useState<SortingState>([{ id: 'rpaAvg', desc: false }])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -110,6 +157,15 @@ const AgencyDeliveryView = () => {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const spaceTable = useReactTable({
+    data: spaces,
+    columns: spaceColumns,
+    state: { sorting: spaceSorting },
+    onSortingChange: setSpaceSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
@@ -225,46 +281,33 @@ const AgencyDeliveryView = () => {
               <Typography variant='body2' color='text.secondary'>Sin datos de delivery</Typography>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Space</TableCell>
-                    <TableCell align='center'>RPA</TableCell>
-                    <TableCell align='center'>OTD</TableCell>
-                    <TableCell align='right'>Proyectos</TableCell>
-                    <TableCell align='right'>Stuck</TableCell>
-                    <TableCell align='center'>Health</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {spaces.sort((a, b) => (a.rpaAvg ?? 0) - (b.rpaAvg ?? 0)).map(s => {
-                    const h = semaphore(s.rpaAvg)
-
-                    return (
-                      <TableRow key={s.clientId} hover>
-                        <TableCell><Typography variant='body2' fontWeight={600}>{s.clientName}</Typography></TableCell>
-                        <TableCell align='center'>
-                          <CustomChip round='true' size='small' variant='tonal' color={semaphore(s.rpaAvg).color} label={fmtPct(s.rpaAvg)} />
-                        </TableCell>
-                        <TableCell align='center'>
-                          <CustomChip round='true' size='small' variant='tonal' color={semaphore(s.otdPct).color} label={fmtPct(s.otdPct)} />
-                        </TableCell>
-                        <TableCell align='right'>{s.projectCount}</TableCell>
-                        <TableCell align='right'>
-                          {s.assetsActivos > 0 ? (
-                            <CustomChip round='true' size='small' variant='tonal' color='error' label={String(s.assetsActivos)} />
-                          ) : '0'}
-                        </TableCell>
-                        <TableCell align='center'>
-                          <CustomChip round='true' size='small' variant='tonal' color={h.color} label={h.label} />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {spaceTable.getHeaderGroups().map(hg => (
+                    <tr key={hg.id}>
+                      {hg.headers.map(header => (
+                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                        </th>
+                      ))}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {spaceTable.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       </Grid>
