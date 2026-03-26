@@ -6,6 +6,14 @@
 - Usar entradas cortas, fechadas y accionables.
 
 ## 2026-03-26
+ 
+### Greenhouse Home Nexa v2 — TASK-009 implementation
+- **Orchestration**: Implemented `getHomeSnapshot.ts` to aggregate user context, capability-based modules, and pending task counts.
+- **Nexa AI Assistant**: Deployed `nexa-service.ts` using Google GenAI (Gemini) with a persona-driven system prompt and operational context.
+- **UI Components**: Built a suite of premium components (`GreetingCard`, `NexaPanel`, `ModuleGrid`, `TaskShortlist`) adapting Vuexy advanced widgets.
+- **API Surface**: Created `/api/home/snapshot` and `/api/home/nexa` for state management and conversational streams.
+- **Rollout**: Updated `portalHomePath` in `src/lib/tenant/access.ts` to default client users to the new `/home` experience.
+- **Verification**: Fixed all lint errors in the new components and verified type safety.
 
 ### Finance Intelligence — marzo 2026 materializado correctamente
 - `2026-03` dejó de quedar en estado parcial para `Sky Airline`: el período de payroll quedó `approved` y el snapshot de `greenhouse_finance.client_economics` se rematerializó con costos laborales canonizados.

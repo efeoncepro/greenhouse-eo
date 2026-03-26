@@ -30,7 +30,13 @@ interface BqRow {
 const toNum = (v: unknown): number | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : null }
+
+  if (typeof v === 'string') { const n = Number(v);
+
+ 
+
+return Number.isFinite(n) ? n : null }
+
   if (typeof v === 'object' && v !== null && 'value' in v) return toNum((v as { value: unknown }).value)
 
   return null

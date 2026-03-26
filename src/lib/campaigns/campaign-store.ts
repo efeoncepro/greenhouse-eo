@@ -315,6 +315,7 @@ export const createCampaign = async (input: {
   await assertCampaignSchemaReady()
 
   const campaignId = randomUUID()
+
   const seq = await runGreenhousePostgresQuery<{ nextval: string } & Record<string, unknown>>(
     `SELECT nextval('greenhouse_core.campaigns_eo_id_seq'::regclass)::text`
   ).catch(() => [{ nextval: String(Date.now()).slice(-6) } as { nextval: string } & Record<string, unknown>])

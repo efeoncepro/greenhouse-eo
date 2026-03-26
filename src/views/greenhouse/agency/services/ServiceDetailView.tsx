@@ -16,16 +16,16 @@ import Grid from '@mui/material/Grid'
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -141,6 +141,32 @@ const FIELD_LABELS: Record<string, string> = {
   hubspot_sync_status: 'Sync status'
 }
 
+const historyColumnHelper = createColumnHelper<ServiceHistoryEntry>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const historyColumns: ColumnDef<ServiceHistoryEntry, any>[] = [
+  historyColumnHelper.accessor('fieldChanged', {
+    header: 'Campo',
+    cell: ({ getValue }) => (
+      <Typography variant='body2' fontWeight={600}>
+        {FIELD_LABELS[getValue()] ?? getValue()}
+      </Typography>
+    )
+  }),
+  historyColumnHelper.accessor('oldValue', {
+    header: 'Valor anterior',
+    cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+  }),
+  historyColumnHelper.accessor('newValue', {
+    header: 'Valor nuevo',
+    cell: ({ getValue }) => <Typography variant='body2'>{getValue() ?? '—'}</Typography>
+  }),
+  historyColumnHelper.accessor('changedAt', {
+    header: 'Fecha',
+    cell: ({ getValue }) => <Typography variant='caption'>{formatTimestamp(getValue())}</Typography>
+  })
+]
+
 // ── Component ──────────────────────────────────────────────────────────
 
 interface Props {
@@ -151,6 +177,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
   const [detail, setDetail] = useState<ServiceDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('overview')
+  const [historySorting, setHistorySorting] = useState<SortingState>([{ id: 'changedAt', desc: true }])
 
   useEffect(() => {
     const load = async () => {
@@ -198,6 +225,15 @@ const ServiceDetailView = ({ serviceId }: Props) => {
   }
 
   const amountRemaining = (detail.totalCost ?? 0) - (detail.amountPaid ?? 0)
+
+  const historyTable = useReactTable({
+    data: detail.history,
+    columns: historyColumns,
+    state: { sorting: historySorting },
+    onSortingChange: setHistorySorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   return (
     <Grid container spacing={6}>
@@ -311,38 +347,39 @@ const ServiceDetailView = ({ serviceId }: Props) => {
                     </Typography>
                   </Box>
                 ) : (
-                  <TableContainer>
-                    <Table size='small'>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Campo</TableCell>
-                          <TableCell>Valor anterior</TableCell>
-                          <TableCell>Valor nuevo</TableCell>
-                          <TableCell>Fecha</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {detail.history.map(h => (
-                          <TableRow key={h.historyId}>
-                            <TableCell>
-                              <Typography variant='body2' fontWeight={600}>
-                                {FIELD_LABELS[h.fieldChanged] ?? h.fieldChanged}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant='body2' color='text.secondary'>{h.oldValue ?? '—'}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant='body2'>{h.newValue ?? '—'}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant='caption'>{formatTimestamp(h.changedAt)}</Typography>
-                            </TableCell>
-                          </TableRow>
+                  <div className='overflow-x-auto'>
+                    <table className={tableStyles.table}>
+                      <thead>
+                        {historyTable.getHeaderGroups().map(headerGroup => (
+                          <tr key={headerGroup.id}>
+                            {headerGroup.headers.map(header => (
+                              <th
+                                key={header.id}
+                                onClick={header.column.getToggleSortingHandler()}
+                                className={classnames({
+                                  'cursor-pointer select-none': header.column.getCanSort()
+                                })}
+                              >
+                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                              </th>
+                            ))}
+                          </tr>
                         ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                      </thead>
+                      <tbody>
+                        {historyTable.getRowModel().rows.map(row => (
+                          <tr key={row.id}>
+                            {row.getVisibleCells().map(cell => (
+                              <td key={cell.id}>
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </CardContent>
             </Card>

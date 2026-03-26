@@ -113,6 +113,7 @@ export const computeDerivedMetrics = (
 
   // Cost metrics
   const monthlyComp = compensation.monthlyTotalComp
+
   const costPerAsset = monthlyComp != null && ico.throughputCount != null && ico.throughputCount > 0
     ? Math.round(monthlyComp / ico.throughputCount)
     : null

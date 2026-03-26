@@ -17,6 +17,10 @@ import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/loa
 // Built from Notion responsable values + Greenhouse members table.
 // This is the manual resolution for names that can't be fuzzy-matched.
 
+/** Strip accents for fuzzy matching */
+const normalize = (s: string): string =>
+  s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
 const EXPLICIT_NAME_MAP: Record<string, string> = {
   'daniela': 'daniela-ferreira',
   'daniela ferreira': 'daniela-ferreira',
@@ -55,14 +59,14 @@ const main = async () => {
   const nameToMember = new Map<string, string>()
 
   for (const m of members) {
-    // Full display name (lowercase)
-    nameToMember.set(m.display_name.toLowerCase(), m.member_id)
+    // Full display name (normalized — strips accents)
+    nameToMember.set(normalize(m.display_name), m.member_id)
 
     // First name only
-    if (m.first_name) nameToMember.set(m.first_name.toLowerCase(), m.member_id)
+    if (m.first_name) nameToMember.set(normalize(m.first_name), m.member_id)
 
     // "Name | Efeonce" pattern
-    nameToMember.set(`${m.display_name.toLowerCase()} | efeonce`, m.member_id)
+    nameToMember.set(`${normalize(m.display_name)} | efeonce`, m.member_id)
 
     // Notion user ID
     if (m.notion_user_id) nameToMember.set(m.notion_user_id, m.member_id)
@@ -70,7 +74,7 @@ const main = async () => {
 
   // Add explicit overrides
   for (const [name, memberId] of Object.entries(EXPLICIT_NAME_MAP)) {
-    if (memberId) nameToMember.set(name.toLowerCase(), memberId)
+    if (memberId) nameToMember.set(normalize(name), memberId)
   }
 
   console.log(`Name lookup has ${nameToMember.size} entries\n`)
@@ -96,14 +100,14 @@ const main = async () => {
     const memberIds: string[] = []
 
     for (const part of parts) {
-      const lower = part.toLowerCase()
+      const norm = normalize(part)
 
-      // Try exact match first
-      let memberId = nameToMember.get(lower)
+      // Try exact match first (accent-normalized)
+      let memberId = nameToMember.get(norm)
 
       // Try without " | Efeonce" suffix
-      if (!memberId && lower.includes('|')) {
-        const clean = lower.split('|')[0].trim()
+      if (!memberId && norm.includes('|')) {
+        const clean = norm.split('|')[0].trim()
 
         memberId = nameToMember.get(clean)
       }

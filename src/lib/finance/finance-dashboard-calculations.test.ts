@@ -27,11 +27,13 @@ describe('income summary Postgres-first calculation', () => {
 
     // Accrual for March: 5M + 2M = 7M
     expect(accrualSeries[1].totalAmountClp).toBe(7_000_000)
+
     // Cash for March: 2M (only what was actually collected)
     expect(cashSeries[1].totalAmountClp).toBe(2_000_000)
 
     // Accrual for February: 3M
     expect(accrualSeries[0].totalAmountClp).toBe(3_000_000)
+
     // Cash for February: 4.5M (collected from prior invoices)
     expect(cashSeries[0].totalAmountClp).toBe(4_500_000)
   })
@@ -50,6 +52,7 @@ describe('income summary Postgres-first calculation', () => {
 
     expect(metrics.totalAmountClp).toBe(3_000_000)
     expect(metrics.previousTotalAmountClp).toBe(2_000_000)
+
     // Change: (3M - 2M) / 2M = 50%
     expect(metrics.changePercent).toBe(50)
   })
@@ -110,8 +113,10 @@ describe('cashflow calculation', () => {
 
     // Jan: 3M - 2M = 1M
     expect(netFlows[0]).toBe(1_000_000)
+
     // Feb: 5M - 4M = 1M
     expect(netFlows[1]).toBe(1_000_000)
+
     // Mar: 1M - 3M = -2M
     expect(netFlows[2]).toBe(-2_000_000)
   })
@@ -148,8 +153,10 @@ describe('cashflow calculation', () => {
 
     // Accrual shows $2M profit
     expect(accrualNet).toBe(2_000_000)
+
     // Cash shows $1M actual flow
     expect(cashNet).toBe(1_000_000)
+
     // They differ — this was the bug the task fixes
     expect(accrualNet).not.toBe(cashNet)
   })

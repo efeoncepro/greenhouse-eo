@@ -72,6 +72,7 @@ const cliColumns: ColumnDef<ClientProfile, any>[] = [
     meta: { align: 'center' }
   })
 ]
+
 import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDrawer'
 
 // ---------------------------------------------------------------------------

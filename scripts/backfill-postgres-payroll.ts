@@ -61,6 +61,7 @@ const main = async () => {
   const { closeGreenhousePostgres, runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
   const projectId = process.env.GCP_PROJECT!
   const credentials = getGoogleCredentials()
+
   const bq = new BigQuery({
     projectId,
     ...(credentials ? { credentials } : {})

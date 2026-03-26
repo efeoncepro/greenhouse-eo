@@ -139,9 +139,11 @@ export const getOrganizationProjects = async (
   const totalTasks = allProjects.reduce((s, p) => s + p.totalTasks, 0)
   const activeTasks = allProjects.reduce((s, p) => s + p.activeTasks, 0)
   const completedTasks = allProjects.reduce((s, p) => s + p.completedTasks, 0)
+
   const avgRpa = allProjects.length > 0
     ? Math.round(allProjects.reduce((s, p) => s + p.avgRpa, 0) / allProjects.length)
     : 0
+
   const avgHealth = spaceGroups.length > 0
     ? Math.round(spaceGroups.reduce((s, g) => s + g.healthScore, 0) / spaceGroups.length)
     : 0

@@ -44,6 +44,7 @@ export const buildHistoricalMindicadorLookupDates = (requestedDate: string, look
 
   return Array.from({ length: Math.max(1, lookbackDays + 1) }, (_, offset) => {
     const candidate = new Date(baseDate)
+
     candidate.setUTCDate(baseDate.getUTCDate() - offset)
 
     return candidate.toISOString().slice(0, 10)

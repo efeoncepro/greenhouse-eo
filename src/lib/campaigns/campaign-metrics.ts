@@ -39,7 +39,13 @@ interface MetricRow {
 
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  if (typeof v === 'string') { const n = Number(v);
+
+ 
+
+return Number.isFinite(n) ? n : 0 }
+
   if (v && typeof v === 'object' && 'value' in v) return toNum((v as { value: unknown }).value)
 
   return 0

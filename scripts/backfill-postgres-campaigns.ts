@@ -108,6 +108,7 @@ const buildManualCandidates = (projects: DeliveryProjectSeedSource[]): CampaignS
 
       const startDates = matched.map(project => project.startDate).filter(Boolean) as string[]
       const endDates = matched.map(project => project.endDate).filter(Boolean) as string[]
+
       const isActive = matched.some(project =>
         ['en curso', 'trabajo acumulado', 'backlog'].includes((project.projectStatus || '').toLowerCase())
       )
@@ -144,9 +145,11 @@ const ensureCampaign = async (seed: CampaignSeedCandidate) => {
   }
 
   const campaignId = `cmp-${randomUUID()}`
+
   const [seqRow] = await runGreenhousePostgresQuery<{ nextval: string } & Record<string, unknown>>(
     `SELECT nextval('greenhouse_core.campaigns_eo_id_seq'::regclass)::text`
   )
+
   const eoId = `EO-CMP-${String(seqRow?.nextval ?? Date.now()).padStart(4, '0')}`
   const slug = `${toSlug(seed.displayName)}-${eoId.slice(-4).toLowerCase()}`
 

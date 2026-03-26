@@ -172,7 +172,9 @@ const AgencyTeamView = () => {
 
   if (!data) return <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}><Box sx={{ textAlign: 'center', py: 6 }}><Typography variant='h6'>Sin datos de capacidad</Typography></Box></Card>
 
-  const healthCounts = data.members.reduce((acc, m) => { acc[m.capacityHealth] = (acc[m.capacityHealth] || 0) + 1; return acc }, {} as Record<string, number>)
+  const healthCounts = data.members.reduce((acc, m) => { acc[m.capacityHealth] = (acc[m.capacityHealth] || 0) + 1; 
+
+return acc }, {} as Record<string, number>)
 
   return (
     <Grid container spacing={6}>

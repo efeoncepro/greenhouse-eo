@@ -46,10 +46,12 @@ export const deriveSeedPrefix = (projectName: string): string | null => {
   if (!normalized) return null
 
   const firstSegment = normalized.split(/\s*-\s*/)[0]?.trim() || normalized
+
   const collapsed = firstSegment.replace(
     /\b(q[1-4]|h[12]|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|\d{4})\b.*$/i,
     ''
   ).trim()
+
   const prefix = collapsed || firstSegment
 
   if (GENERIC_PREFIXES.has(prefix)) {
@@ -87,6 +89,7 @@ export const buildAutoCampaignSeedCandidates = (
     const [spaceId, prefix] = groupKey.split('::')
     const startDates = bucket.map(project => toDateOnly(project.startDate)).filter(Boolean) as string[]
     const endDates = bucket.map(project => toDateOnly(project.endDate)).filter(Boolean) as string[]
+
     const hasActiveProject = bucket.some(project =>
       project.projectStatus ? ACTIVE_STATUSES.has(normalizeText(project.projectStatus)) : false
     )

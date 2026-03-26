@@ -23,6 +23,7 @@ const parsePeriodId = (value: unknown): { year: number; month: number } | null =
 
 const toFiniteInteger = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isInteger(value)) return value
+
   if (typeof value === 'string' && value.trim()) {
     const parsed = Number(value)
 
@@ -173,6 +174,7 @@ export const clientEconomicsProjection: ProjectionDefinition = {
       }
 
       const eventType = typeof payload._eventType === 'string' ? payload._eventType : 'reactive-refresh'
+
       const results = await computeClientEconomicsSnapshots(
         year,
         month,

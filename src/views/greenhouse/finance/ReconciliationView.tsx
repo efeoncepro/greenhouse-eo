@@ -280,7 +280,11 @@ const ReconciliationView = () => {
     periodColumnHelper.accessor('statementRowCount', { header: 'Filas', cell: ({ getValue }) => getValue() || 0, meta: { align: 'center' } }),
     periodColumnHelper.accessor('status', {
       header: 'Estado',
-      cell: ({ getValue }) => { const c = STATUS_CONFIG[getValue()] || STATUS_CONFIG.open; return <CustomChip round='true' size='small' color={c.color} label={c.label} /> }
+      cell: ({ getValue }) => { const c = STATUS_CONFIG[getValue()] || STATUS_CONFIG.open;
+
+ 
+
+return <CustomChip round='true' size='small' color={c.color} label={c.label} /> }
     })
   ]
 

@@ -23,14 +23,15 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import TablePaginationComponent from '@components/TablePaginationComponent'
 
-import tableStyles from '@core/styles/table.module.css'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+
+import tableStyles from '@core/styles/table.module.css'
+import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
@@ -84,6 +85,7 @@ const ceColumns: ColumnDef<ClientEconomicsSnapshot, any>[] = [
   ceColumnHelper.accessor('revenuePerFte', { header: 'Ingreso/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } }),
   ceColumnHelper.accessor('costPerFte', { header: 'Costo/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } })
 ]
+
 type SortDir = 'asc' | 'desc'
 
 // ---------------------------------------------------------------------------

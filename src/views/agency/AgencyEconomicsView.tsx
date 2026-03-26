@@ -118,6 +118,7 @@ const AgencyEconomicsView = () => {
       ])
 
       if (pnlRes.status === 'fulfilled' && pnlRes.value.ok) setPnl(await pnlRes.value.json())
+
       if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
         const d = await clientsRes.value.json()
 

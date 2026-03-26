@@ -18,6 +18,7 @@ export interface SprintListItem {
 }
 
 export interface SprintDetail extends SprintListItem {
+
   // ICO metrics (from metrics_by_sprint)
   rpaAvg: number | null
   otdPct: number | null
@@ -37,7 +38,13 @@ export interface SprintBurndownPoint {
 
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  if (typeof v === 'string') { const n = Number(v);
+
+ 
+
+return Number.isFinite(n) ? n : 0 }
+
   if (v && typeof v === 'object' && 'value' in v) return toNum((v as { value: unknown }).value)
 
   return 0

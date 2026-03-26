@@ -50,6 +50,7 @@ export interface DteDiscrepancy {
 
 const safeNumber = (v: unknown): number => {
   if (typeof v === 'number') return v
+
   if (typeof v === 'string') {
     const n = Number(v)
 

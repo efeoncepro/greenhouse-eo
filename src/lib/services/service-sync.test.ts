@@ -12,6 +12,7 @@ describe('service sync ID generation', () => {
 
 describe('service line validation', () => {
   const VALID_LINES = ['globe', 'efeonce_digital', 'reach', 'wave', 'crm_solutions'] as const
+
   type ServiceLine = (typeof VALID_LINES)[number]
 
   const normalizeServiceLine = (v: string | null | undefined): ServiceLine => {
