@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -10,19 +10,25 @@ import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──
 
@@ -64,6 +70,33 @@ const marginColor = (v: number | null | undefined): 'success' | 'warning' | 'err
   return 'error'
 }
 
+// ── Client columns ──
+
+const clientColumnHelper = createColumnHelper<ClientEcon>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const clientColumns: ColumnDef<ClientEcon, any>[] = [
+  clientColumnHelper.accessor('clientName', {
+    header: 'Cliente',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
+  }),
+  clientColumnHelper.accessor('totalRevenueClp', {
+    header: 'Revenue CLP',
+    cell: ({ getValue }) => fmtClp(getValue()),
+    meta: { align: 'right' }
+  }),
+  clientColumnHelper.accessor('grossMarginPercent', {
+    header: 'Margen',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={marginColor(getValue())} label={pct(getValue())} />,
+    meta: { align: 'center' }
+  }),
+  clientColumnHelper.accessor('headcountFte', {
+    header: 'FTE',
+    cell: ({ getValue }) => getValue() ?? '—',
+    meta: { align: 'right' }
+  })
+]
+
 // ── Component ──
 
 const AgencyEconomicsView = () => {
@@ -72,6 +105,7 @@ const AgencyEconomicsView = () => {
   const [clients, setClients] = useState<ClientEcon[]>([])
   const [trends, setTrends] = useState<TrendPeriod[]>([])
   const [loading, setLoading] = useState(true)
+  const [clientSorting, setClientSorting] = useState<SortingState>([{ id: 'totalRevenueClp', desc: true }])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -101,6 +135,17 @@ const AgencyEconomicsView = () => {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const top15 = useMemo(() => [...clients].sort((a, b) => b.totalRevenueClp - a.totalRevenueClp).slice(0, 15), [clients])
+
+  const clientTable = useReactTable({
+    data: top15,
+    columns: clientColumns,
+    state: { sorting: clientSorting },
+    onSortingChange: setClientSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
@@ -177,30 +222,33 @@ const AgencyEconomicsView = () => {
               <Typography variant='body2' color='text.secondary'>Sin datos de client economics</Typography>
             </CardContent>
           ) : (
-            <TableContainer>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Cliente</TableCell>
-                    <TableCell align='right'>Revenue CLP</TableCell>
-                    <TableCell align='center'>Margen</TableCell>
-                    <TableCell align='right'>FTE</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {clients.sort((a, b) => b.totalRevenueClp - a.totalRevenueClp).slice(0, 15).map(c => (
-                    <TableRow key={c.clientId} hover>
-                      <TableCell><Typography variant='body2' fontWeight={600}>{c.clientName}</Typography></TableCell>
-                      <TableCell align='right'>{fmtClp(c.totalRevenueClp)}</TableCell>
-                      <TableCell align='center'>
-                        <CustomChip round='true' size='small' variant='tonal' color={marginColor(c.grossMarginPercent)} label={pct(c.grossMarginPercent)} />
-                      </TableCell>
-                      <TableCell align='right'>{c.headcountFte ?? '—'}</TableCell>
-                    </TableRow>
+            <div className='overflow-x-auto'>
+              <table className={tableStyles.table}>
+                <thead>
+                  {clientTable.getHeaderGroups().map(hg => (
+                    <tr key={hg.id}>
+                      {hg.headers.map(header => (
+                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                        </th>
+                      ))}
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                </thead>
+                <tbody>
+                  {clientTable.getRowModel().rows.map(row => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map(cell => (
+                        <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       </Grid>
