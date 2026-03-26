@@ -14,17 +14,22 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel,
+  getPaginationRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
 import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
 
 // ---------------------------------------------------------------------------
@@ -78,9 +83,57 @@ const CATEGORY_OPTIONS = [
 // Component
 // ---------------------------------------------------------------------------
 
+const supColumnHelper = createColumnHelper<Supplier>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supColumns: ColumnDef<Supplier, any>[] = [
+  supColumnHelper.accessor('legalName', {
+    header: 'Proveedor',
+    cell: ({ row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={600}>{row.original.tradeName || row.original.legalName}</Typography>
+        {row.original.tradeName && <Typography variant='caption' color='text.secondary'>{row.original.legalName}</Typography>}
+      </Box>
+    )
+  }),
+  supColumnHelper.accessor('category', {
+    header: 'Categoría',
+    cell: ({ getValue }) => {
+      const c = CATEGORY_LABELS[getValue()] || CATEGORY_LABELS.other
+
+      return <CustomChip round='true' size='small' color={c.color} label={c.label} />
+    }
+  }),
+  supColumnHelper.accessor('country', { header: 'País' }),
+  supColumnHelper.accessor('paymentCurrency', {
+    header: 'Moneda',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
+  }),
+  supColumnHelper.accessor('defaultPaymentTerms', {
+    header: 'Plazo',
+    cell: ({ getValue }) => `${getValue()} días`
+  }),
+  supColumnHelper.accessor('primaryContactName', {
+    header: 'Contacto',
+    cell: ({ row }) => row.original.primaryContactName ? (
+      <Box>
+        <Typography variant='body2' fontSize='0.8rem'>{row.original.primaryContactName}</Typography>
+        {row.original.primaryContactEmail && <Typography variant='caption' color='text.secondary'>{row.original.primaryContactEmail}</Typography>}
+      </Box>
+    ) : <Typography variant='caption' color='text.secondary'>—</Typography>
+  }),
+  supColumnHelper.accessor('isActive', {
+    header: 'Estado',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' color={getValue() ? 'success' : 'secondary'} label={getValue() ? 'Activo' : 'Inactivo'} />,
+    meta: { align: 'center' }
+  })
+]
+
 const SuppliersListView = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'legalName', desc: false }])
+  const [globalFilter, setGlobalFilter] = useState('')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [total, setTotal] = useState(0)
   const [categoryFilter, setCategoryFilter] = useState('')
@@ -112,6 +165,19 @@ const SuppliersListView = () => {
   useEffect(() => {
     fetchSuppliers()
   }, [fetchSuppliers])
+
+  const supTable = useReactTable({
+    data: suppliers,
+    columns: supColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
 
   // Derived KPIs
   const activeCount = suppliers.filter(s => s.isActive).length
@@ -254,95 +320,36 @@ const SuppliersListView = () => {
           </CustomTextField>
         </CardContent>
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Proveedor</TableCell>
-                <TableCell sx={{ width: 150 }}>Categoría</TableCell>
-                <TableCell sx={{ width: 80 }}>País</TableCell>
-                <TableCell sx={{ width: 80 }}>Moneda</TableCell>
-                <TableCell sx={{ width: 100 }}>Plazo</TableCell>
-                <TableCell sx={{ width: 160 }}>Contacto</TableCell>
-                <TableCell sx={{ width: 60 }} align='center'>Estado</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {suppliers.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay proveedores registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                suppliers.map(supplier => {
-                  const catConfig = CATEGORY_LABELS[supplier.category] || CATEGORY_LABELS.other
-
-                  return (
-                    <TableRow
-                      key={supplier.supplierId}
-                      hover
-                      sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                      onClick={() => router.push(`/finance/suppliers/${supplier.supplierId}`)}
-                    >
-                      <TableCell>
-                        <Box>
-                          <Typography variant='body2' fontWeight={600}>
-                            {supplier.tradeName || supplier.legalName}
-                          </Typography>
-                          {supplier.tradeName ? (
-                            <Typography variant='caption' color='text.secondary'>
-                              {supplier.legalName}
-                            </Typography>
-                          ) : null}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={catConfig.color}
-                          label={catConfig.label}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{supplier.country}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2' fontWeight={500}>{supplier.paymentCurrency}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{supplier.defaultPaymentTerms} días</Typography>
-                      </TableCell>
-                      <TableCell>
-                        {supplier.primaryContactName ? (
-                          <Box>
-                            <Typography variant='body2' fontSize='0.8rem'>{supplier.primaryContactName}</Typography>
-                            {supplier.primaryContactEmail ? (
-                              <Typography variant='caption' color='text.secondary'>{supplier.primaryContactEmail}</Typography>
-                            ) : null}
-                          </Box>
-                        ) : (
-                          <Typography variant='caption' color='text.secondary'>—</Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align='center'>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={supplier.isActive ? 'success' : 'secondary'}
-                          label={supplier.isActive ? 'Activo' : 'Inactivo'}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {supTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {supTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={supColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay proveedores registrados aún</Typography></td></tr>
+              ) : supTable.getRowModel().rows.map(row => (
+                <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/suppliers/${row.original.supplierId}`)}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePaginationComponent table={supTable as ReturnType<typeof useReactTable>} />
       </Card>
 
       <CreateSupplierDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchSuppliers() }} />
