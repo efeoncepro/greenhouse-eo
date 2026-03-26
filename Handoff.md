@@ -93,6 +93,11 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - costo hora por persona/período
   - costo hundido de capacidad interna
   - tarifa sugerida de venta
+- La task quedó anclada a la integración FX ya existente:
+  - `src/lib/finance/exchange-rates.ts`
+  - `greenhouse_finance.exchange_rates`
+  - `mindicador` como proveedor primario
+  - estrategia canónica propuesta: último día hábil del período
 - La siguiente decisión de producto/dominio pendiente es si `Uso operativo` se mostrará como horas reales, horas estimadas o índice/porcentaje operativo.
 
 ## 2026-03-26 12:32 -03

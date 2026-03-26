@@ -60,7 +60,9 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md`
 - `docs/tasks/complete/TASK-008-team-identity-capacity-system.md`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
 
 Reglas obligatorias:
 
@@ -78,7 +80,10 @@ Reglas obligatorias:
 - `greenhouse_core.client_team_assignments`
 - `greenhouse_serving.ico_member_metrics`
 - `greenhouse_serving.person_operational_metrics` o su reemplazo canónico futuro
+- `greenhouse_finance.exchange_rates`
+- `src/lib/finance/exchange-rates.ts`
 - `TASK-008` como baseline de capacidad pendiente
+- `TASK-055` como baseline activa de FX histórico y costo laboral canonizado
 - `TASK-011` y `TASK-042` si se necesita consolidar señales operativas por persona
 
 ### Impacts to
@@ -96,6 +101,7 @@ Reglas obligatorias:
 - `src/lib/person-intelligence/**`
 - `src/lib/person-360/**`
 - `src/lib/team-capacity/**`
+- `src/lib/finance/exchange-rates.ts`
 - `docs/tasks/to-do/TASK-056-agency-team-capacity-semantics.md`
 
 ## Current Repo State
@@ -112,6 +118,7 @@ Reglas obligatorias:
 - `Usadas` todavía no tiene una definición de negocio cerrada.
 - La vista sigue usando el mismo lienzo para capacidad comercial y ocupación operativa.
 - No existe helper canónico para conversiones y envelopes de capacidad.
+- No existe todavía una política de moneda/FX explícita para capacidad y pricing aunque el repo ya tiene una integración funcional `USD/CLP`.
 - Sigue faltando una decisión explícita sobre si `Uso operativo` se mostrará como:
   - horas reales
   - horas estimadas
@@ -158,7 +165,28 @@ Reglas obligatorias:
   - margen objetivo aplicado
 - Dejar claro qué inputs son obligatorios y cuáles son opcionales o parametrizables por país/período.
 
-### Slice 4 - Contrato de API + UX
+### Slice 4 - Moneda y FX
+
+- Anclar la spec a la integración existente en `src/lib/finance/exchange-rates.ts`.
+- Regla base:
+  - la compensación conserva siempre su moneda fuente (`CLP` o `USD`)
+  - el costo calculado puede persistirse en moneda objetivo además de la fuente
+  - ninguna conversión debe perder `rate`, `rateDate`, `provider` ni `strategy`
+- Política propuesta para esta lane:
+  - moneda fuente: la del payroll/compensación
+  - moneda objetivo por defecto en Agency: `CLP`
+  - estrategia FX canónica: último día hábil del período
+  - fuente primaria: `mindicador`
+  - fallback operativo: el fallback ya implementado en `exchange-rates.ts`
+- Toda conversión debe poder explicar:
+  - `sourceCurrency`
+  - `targetCurrency`
+  - `fxRate`
+  - `fxDate`
+  - `fxProvider`
+  - `fxStrategy`
+
+### Slice 5 - Contrato de API + UX
 
 - Proponer payload estable para `GET /api/team/capacity-breakdown`.
 - Renombrar en diseño si hace falta:
@@ -166,7 +194,7 @@ Reglas obligatorias:
   - `Disponibles` -> `Disponible comercial`
 - Definir qué copy de fallback mostrar cuando falte fuente confiable.
 
-### Slice 5 - Follow-up técnico
+### Slice 6 - Follow-up técnico
 
 - Derivar implementación posterior en backend/UI una vez cerrado el contrato.
 - Revisar si `person_operational_360` y consumers relacionados siguen materializando semántica vieja de assignments.
@@ -196,6 +224,60 @@ Reglas obligatorias:
   - bonos variables
   - cargas empleador
   - overhead de agencia?
+- ¿Qué vistas deben exponer ambos montos:
+  - fuente (`USD`)
+  - convertidos (`CLP`)?
+- ¿La `tarifa sugerida` debe mostrarse en una sola moneda o en par dual `USD/CLP` cuando el servicio se comercializa en dólares?
+
+## Mini Spec Propuesto
+
+### Conceptos
+
+- `contractedCapacity`
+  - capacidad contractual del período
+  - unidad base: `FTE` y `hours`
+- `assignedCommercialLoad`
+  - dedicación externa comprometida a clientes
+  - excluye `Efeonce` interno
+- `operationalUsage`
+  - uso real o estimado del período
+  - no equivale a asignación comercial
+- `capacityEconomics`
+  - traducción de compensación + overhead a costo hora y referencia de venta
+
+### Fórmulas base
+
+- `contractedHours = contractedFte * monthlyBaseHours`
+- `commercialAvailabilityHours = max(contractedHours - assignedHours, 0)`
+- `operationalAvailabilityHours = max(contractedHours - usedHours, 0)` si `usedHours` existe
+- `totalLaborCostSource = baseSalary + fixedBonuses + variableBonuses + employerCosts`
+- `costPerHourTarget = loadedCostTarget / contractedHours`
+- `suggestedBillRateTarget = loadedCostTarget / contractedHours * pricingMultiplier`
+
+### Moneda y FX
+
+- Monedas soportadas en la lane inicial: `CLP`, `USD`
+- La compensación debe conservar:
+  - monto fuente
+  - moneda fuente
+- La conversión a moneda objetivo debe usar la integración actual:
+  - helper/fuente: `src/lib/finance/exchange-rates.ts`
+  - tabla persistida: `greenhouse_finance.exchange_rates`
+  - proveedor primario: `mindicador`
+  - estrategia canónica: último día hábil del período
+- Si no existe FX defendible:
+  - no inventar conversión
+  - marcar el snapshot como parcial
+  - degradar UI a fuente o `—`
+
+### Fallbacks UX
+
+- Si no hay `usedHours` defendibles:
+  - mostrar `Uso operativo` como índice/porcentaje o `—`
+- Si no hay costo laboral completo:
+  - no mostrar `costPerHour` como definitivo
+- Si no hay FX válido:
+  - mantener moneda fuente y explicitar ausencia de conversión
 
 ## Acceptance Criteria
 

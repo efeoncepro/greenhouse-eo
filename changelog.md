@@ -19,6 +19,10 @@
   - `costPerHour`
   - costo hundido interno
   - `suggestedBillRate` como referencia de venta, sin confundirlo con pricing comercial final.
+- La spec quedó alineada además con la integración FX existente del repo:
+  - `mindicador` como fuente primaria de `USD/CLP`
+  - `greenhouse_finance.exchange_rates` como persistencia
+  - estrategia sugerida para capacidad/pricing: último día hábil del período
 - `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
 
 ### Agency Team — capacidad cliente efectiva corregida
