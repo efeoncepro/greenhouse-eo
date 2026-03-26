@@ -89,8 +89,8 @@ export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 
 // ─── Canonical Status Lists ────────────────────────────────────────────────
 
-export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado'`
-export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Archivadas','Cancelada','Canceled','Cancelled'`
+export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado'`
+export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado'`
 
 // ─── Shared Metric SQL Builders ────────────────────────────────────────────
 

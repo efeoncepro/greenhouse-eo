@@ -57,48 +57,48 @@ const main = async () => {
       @month AS period_month,
 
       ROUND(AVG(CASE
-        WHEN te.task_status IN ('Listo','Done','Finalizado','Completado')
+        WHEN te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
           AND SAFE_CAST(te.rpa_value AS FLOAT64) > 0
         THEN SAFE_CAST(te.rpa_value AS FLOAT64)
       END), 2) AS rpa_avg,
 
       ROUND(APPROX_QUANTILES(
         CASE
-          WHEN te.task_status IN ('Listo','Done','Finalizado','Completado')
+          WHEN te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
             AND SAFE_CAST(te.rpa_value AS FLOAT64) > 0
           THEN SAFE_CAST(te.rpa_value AS FLOAT64)
         END, 100
       )[SAFE_OFFSET(50)], 2) AS rpa_median,
 
       ROUND(SAFE_DIVIDE(
-        COUNTIF(te.delivery_signal = 'on_time' AND te.task_status IN ('Listo','Done','Finalizado','Completado')),
-        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado')), 0)
+        COUNTIF(te.delivery_signal = 'on_time' AND te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')),
+        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')), 0)
       ) * 100, 1) AS otd_pct,
 
       ROUND(SAFE_DIVIDE(
-        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado') AND COALESCE(te.client_review_open, FALSE) = FALSE),
-        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado')), 0)
+        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado') AND COALESCE(te.client_review_open, FALSE) = FALSE),
+        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')), 0)
       ) * 100, 1) AS ftr_pct,
 
       ROUND(AVG(CASE WHEN te.cycle_time_days > 0 THEN te.cycle_time_days END), 1) AS cycle_time_avg_days,
 
-      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado')) AS throughput_count,
+      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')) AS throughput_count,
 
       ROUND(SAFE_DIVIDE(
-        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado')),
-        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Archivada','Cancelada','Canceled','Cancelled')), 0)
+        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')),
+        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')), 0)
       ), 2) AS pipeline_velocity,
 
       COUNTIF(te.is_stuck = TRUE) AS stuck_asset_count,
 
       ROUND(SAFE_DIVIDE(
         COUNTIF(te.is_stuck = TRUE),
-        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Archivada','Cancelada','Canceled','Cancelled')), 0)
+        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')), 0)
       ) * 100, 1) AS stuck_asset_pct,
 
       COUNT(*) AS total_tasks,
-      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado')) AS completed_tasks,
-      COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Archivada','Cancelada','Canceled','Cancelled')) AS active_tasks,
+      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')) AS completed_tasks,
+      COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')) AS active_tasks,
 
       CURRENT_TIMESTAMP() AS materialized_at
 
@@ -107,11 +107,11 @@ const main = async () => {
 
     WHERE member_id IS NOT NULL AND member_id != ''
       AND (
-        (te.task_status IN ('Listo','Done','Finalizado','Completado')
+        (te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
          AND EXTRACT(YEAR FROM te.completed_at) = @year
          AND EXTRACT(MONTH FROM te.completed_at) = @month)
         OR
-        te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Archivada','Cancelada','Canceled','Cancelled')
+        te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')
       )
 
     GROUP BY member_id
