@@ -44,7 +44,11 @@ export const AGGREGATE_TYPES = {
   identityProfile: 'identity_profile',
 
   // Services
-  service: 'service'
+  service: 'service',
+
+  // Person Intelligence
+  compensation: 'compensation',
+  icoMaterialization: 'ico_materialization'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -98,7 +102,11 @@ export const EVENT_TYPES = {
   // Services
   serviceCreated: 'service.created',
   serviceUpdated: 'service.updated',
-  serviceDeactivated: 'service.deactivated'
+  serviceDeactivated: 'service.deactivated',
+
+  // Person Intelligence
+  compensationUpdated: 'compensation.updated',
+  icoMaterializationCompleted: 'ico.materialization.completed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -131,5 +139,11 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.serviceCreated,
   EVENT_TYPES.reconciliationApproved,
   EVENT_TYPES.dteDiscrepancyFound,
-  EVENT_TYPES.profileLinked
+  EVENT_TYPES.profileLinked,
+
+  // Person Intelligence triggers
+  EVENT_TYPES.compensationUpdated,
+  EVENT_TYPES.icoMaterializationCompleted,
+  EVENT_TYPES.memberCreated,
+  EVENT_TYPES.memberUpdated
 ] as const
