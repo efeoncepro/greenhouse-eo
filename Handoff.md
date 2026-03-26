@@ -49,6 +49,52 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 21:20 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el sub-slice de `People/My` sobre la semántica canónica de capacidad y ajustar el overhead compartido al cohort billable del período.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/api/my/performance/route.ts`
+- `src/app/api/people/[memberId]/intelligence/route.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/member-capacity-economics.test.ts`
+- `src/lib/sync/projections/person-intelligence.ts`
+- `src/lib/sync/projections/person-intelligence.test.ts`
+- `src/views/greenhouse/people/tabs/PersonIntelligenceTab.tsx`
+- `src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx`
+- `src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+- `src/app/api/my/assignments/route.test.ts`
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projections/person-intelligence.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx src/app/api/my/assignments/route.test.ts src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Riesgos o pendientes
+
+- `shared_overhead_target` ya usa solo el cohort billable externo, lo que sube el loaded cost por miembro respecto al reparto anterior sobre todos los activos.
+- `direct_overhead_target` sigue sin fuente canónica; no se tocó para evitar falsa precisión.
+- La siguiente lane natural después de este lote es definir la fuente canónica de overhead/licencias por miembro o dejar explícitamente ese gap en arquitectura y finance.
+
 ## 2026-03-26 20:55 -03
 
 ### Agente

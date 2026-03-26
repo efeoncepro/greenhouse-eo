@@ -7,6 +7,17 @@
 
 ## 2026-03-26
 
+### TASK-056 — People/My alineados al snapshot canónico y overhead sobre cohort billable
+- `GET /api/people/[memberId]/intelligence` y `GET /api/my/performance` ahora resuelven el período actual usando `America/Santiago`, evitando drift por mes UTC implícito.
+- `Person Intelligence` ya no presenta compensación fuente en `CLP` cuando la fuente real es `USD`; la UI preserva la moneda original para salario base y compensación mensual.
+- `person_intelligence` dejó de fabricar `costPerHour` y `costPerAsset` desde derivaciones locales cuando falta el snapshot canónico; ahora cae a `null` en vez de inventar precisión.
+- `member_capacity_economics` cambió el reparto de `sharedOverheadTarget`: ahora usa solo el cohort billable externo del período y no todos los miembros activos.
+- Se agregaron/ajustaron tests Vitest para:
+  - `person_intelligence` projection
+  - `PersonIntelligenceTab`
+  - `My Assignments` route
+  - snapshot de `member_capacity_economics`
+
 ### TASK-056 — overhead compartido y pricing base ya alimentan `member_capacity_economics`
 - `member_capacity_economics` dejó de persistir `sharedOverheadTarget = 0` por defecto: ahora toma overhead compartido desde `greenhouse_finance.expenses` no asignados a cliente, limitado en esta iteración a `cost_category IN ('operational', 'infrastructure', 'tax_social')`.
 - El prorrateo inicial del overhead compartido quedó canonizado por `contracted_hours`, evitando cargar el costo a partir de ruido operativo.
