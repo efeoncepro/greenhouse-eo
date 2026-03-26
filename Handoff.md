@@ -49,6 +49,89 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 02:00 -03
+
+### Agente
+
+- Claude Opus 4.6 (1M context)
+
+### Objetivo del turno
+
+- Migración masiva de tablas MUI → TanStack React Table v8 con Vuexy styling
+
+### Rama
+
+- `develop`
+
+### Progreso
+
+**17 de 48 tablas migradas.** Archivos completados:
+
+| # | Archivo | Tipo |
+|---|---------|------|
+| 1 | `AgencyTeamView.tsx` | search+sort+pagination |
+| 2 | `AgencyCampaignsView.tsx` | search+sort+pagination |
+| 3 | `AgencyEconomicsView.tsx` | sort-only (top clients) |
+| 4 | `AgencyDeliveryView.tsx` | sort-only (spaces) |
+| 5 | `AgencyOperationsView.tsx` | sort-only (2 tables: events + projections) |
+| 6 | `GreenhouseAdminRoles.tsx` | sort-only (matrix) |
+| 7 | `GreenhouseAdminTenants.tsx` | search+sort+pagination |
+| 8 | `OrganizationListView.tsx` | sort + server-side pagination |
+| 9 | `IncomeListView.tsx` | search+sort+pagination + checkbox |
+| 10 | `ExpensesListView.tsx` | search+sort+pagination |
+| 11 | `SuppliersListView.tsx` | search+sort+pagination |
+| 12 | `ClientsListView.tsx` | search+sort+pagination |
+| 13 | `ClientEconomicsView.tsx` | pagination (existing sort preserved) |
+| 14 | `ReconciliationView.tsx` | 2 tables: periods sort+pagination, movements sort |
+| 15 | `CostAllocationsView.tsx` | sort + delete action |
+| 16 | `ServicesListView.tsx` | sort + server-side pagination |
+
+### Inventario restante (31 tablas en ~28 archivos)
+
+**Batch 2 remaining — Finance detail views:**
+- `ServiceDetailView.tsx` — 1 table (sort-only)
+- `IncomeDetailView.tsx` — 1 table (payment history, small)
+- `ClientDetailView.tsx` — 2 tables (invoices + deals, small)
+- `SupplierDetailView.tsx` — 1 table (expense history)
+- `ReconciliationDetailView.tsx` — 1 table (statement rows, large)
+- `FinanceDashboardView.tsx` — embedded summary tables
+
+**Batch 3 — Org/People tabs:**
+- `OrganizationPeopleTab.tsx`, `OrganizationProjectsTab.tsx`, `OrganizationFinanceTab.tsx`
+- `OrganizationEconomicsTab.tsx`, `OrganizationOverviewTab.tsx`
+- `PersonMembershipsTab.tsx`, `PersonPayrollTab.tsx`, `PersonFinanceTab.tsx`, `PersonAiToolsTab.tsx`
+
+**Batch 4 — HR & Payroll:**
+- `HrCoreDashboard.tsx`, `HrDepartmentsView.tsx`, `HrLeaveView.tsx`, `HrAttendanceView.tsx`
+- `PayrollEntryTable.tsx`, `PayrollHistoryTab.tsx`, `PayrollCompensationTab.tsx`
+- `PayrollPersonnelExpenseTab.tsx`, `PayrollReceiptCard.tsx`, `MemberPayrollHistory.tsx`
+
+**Batch 5 — My + Admin + Other:**
+- `MyAssignmentsView.tsx`, `MyPayrollView.tsx`, `MyOrganizationView.tsx`
+- `NotificationPreferencesView.tsx`
+- `TenantCrmPanel.tsx`, `TenantNotionPanel.tsx`, `TenantProjectsPanel.tsx`
+- `GreenhouseDeliveryAnalytics.tsx`, `GreenhouseProjectDetail.tsx`
+- `GreenhouseReviewQueue.tsx`, `GreenhouseClientCampaignDetail.tsx`
+
+### Patrón de migración
+
+Cada archivo sigue el mismo patrón (referencia: `AgencyTeamView.tsx`):
+1. Reemplazar imports MUI Table → TanStack + classnames + tableStyles
+2. Definir columns con `createColumnHelper<RowType>()`, tipo `ColumnDef<T, any>[]`
+3. Agregar `[sorting, setSorting] = useState<SortingState>([])`
+4. Crear instancia `useReactTable({ data, columns, state, ...Models })`
+5. Reemplazar `<TableContainer><Table>` con `<div className='overflow-x-auto'><table className={tableStyles.table}>`
+6. Para list views: agregar `CustomTextField` búsqueda + `TablePaginationComponent`
+7. Para detail/embedded: sort-only sin paginación
+
+### Verificación
+
+- `npx tsc --noEmit` limpio después de cada batch
+- `pnpm build` limpio
+- 37 test files, 256 tests passing
+
+---
+
 ## 2026-03-25 21:50 -03
 
 ### Agente
