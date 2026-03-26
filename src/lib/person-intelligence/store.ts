@@ -15,7 +15,12 @@ import type {
 
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  if (typeof v === 'string') {
+    const n = Number(v)
+
+    return Number.isFinite(n) ? n : 0
+  }
 
   return 0
 }
@@ -23,7 +28,12 @@ const toNum = (v: unknown): number => {
 const toNullNum = (v: unknown): number | null => {
   if (v == null) return null
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : null }
+
+  if (typeof v === 'string') {
+    const n = Number(v)
+
+    return Number.isFinite(n) ? n : null
+  }
 
   return null
 }

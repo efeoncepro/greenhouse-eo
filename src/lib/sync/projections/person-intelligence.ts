@@ -45,7 +45,12 @@ interface MemberRow extends Record<string, unknown> {
 
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : 0 }
+
+  if (typeof v === 'string') {
+    const n = Number(v)
+
+    return Number.isFinite(n) ? n : 0
+  }
 
   return 0
 }
@@ -135,6 +140,7 @@ const refreshPersonIntelligence = async (
   // 5. Compute capacity
   const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation: totalFte })
   const activeTasks = toNum(ico?.active_tasks)
+
   const utilizationPct = expectedThroughput > 0
     ? getUtilizationPercent({ activeAssets: activeTasks, expectedMonthlyThroughput: expectedThroughput })
     : 0

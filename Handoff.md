@@ -49,6 +49,77 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 08:02 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Limpiar el subset abierto de `person-intelligence/My` para dejarlo sin ruido de formato antes de próximos commits funcionales.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/api/cron/ico-member-sync/route.ts`
+- `src/lib/person-360/get-person-ico-profile.ts`
+- `src/lib/person-360/get-person-operational-serving.ts`
+- `src/lib/person-intelligence/store.ts`
+- `src/lib/sync/projections/ico-member-metrics.ts`
+- `src/lib/sync/projections/person-intelligence.ts`
+
+### Verificacion
+
+- `git diff --check -- 'src/lib/person-intelligence' 'src/lib/person-360' 'src/lib/sync/projections/person-intelligence.ts' 'src/lib/sync/projections/ico-member-metrics.ts' 'src/app/api/cron/ico-member-sync/route.ts' 'src/views/greenhouse/my' 'src/app/(dashboard)/my'`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- El subset quedó limpio y sin cambios funcionales; era ruido de formato residual.
+- No se tocó el resto del worktree porque pertenece a otras lanes activas.
+
+## 2026-03-26 10:55 -03
+
+### Agente
+- Antigravity
+
+### Objetivo del turno
+- Implementar **Greenhouse Home Nexa v2** (TASK-009).
+- Crear el nuevo Punto de Entrada Conversacional para clientes.
+
+### Rama
+- `develop`
+
+### Archivos tocados
+- `src/types/home.ts`
+- `src/config/home-greetings.ts`, `src/config/home-suggestions.ts`
+- `src/lib/home/get-home-snapshot.ts`
+- `src/lib/nexa/nexa-service.ts`
+- `src/app/api/home/snapshot/route.ts`, `src/app/api/home/nexa/route.ts`
+- `src/views/greenhouse/home/HomeView.tsx` (y sus 4 componentes)
+- `src/app/(dashboard)/home/page.tsx` (Redirect -> HomeView)
+- `src/lib/tenant/access.ts` (Rollout `portalHomePath` -> `/home`)
+
+### Verificacion
+- `pnpm lint` exitoso en todos los archivos nuevos.
+- Snapshot orchestrator probado; Nexa AI conversando con contexto de tareas.
+- Diseño Vuexy-First verificado con componentes premium.
+
+### Riesgos o pendientes
+- La integración de Nexa requiere `GOOGLE_GENAI_API_KEY` (o Vertex AI config) válida para responder.
+- Se recomienda un smoke test con un usuario cliente real para validar la carga de módulos dinámicos.
+- Próximo paso: Expandir Nexa con herramientas (tool calling) para consultar métricas ICO directamente.
+
+---
+
 ## 2026-03-26 07:44 -03
 
 ### Agente
