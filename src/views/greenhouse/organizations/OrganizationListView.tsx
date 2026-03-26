@@ -13,19 +13,24 @@ import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
 
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
-
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -75,6 +80,62 @@ const COUNTRY_FLAGS: Record<string, string> = {
 
 const countryFlag = (code: string | null) => code ? COUNTRY_FLAGS[code.toUpperCase()] ?? '🌐' : ''
 
+// ── Columns ──
+
+const columnHelper = createColumnHelper<OrganizationListItem>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const orgColumns: ColumnDef<OrganizationListItem, any>[] = [
+  columnHelper.accessor('organizationName', {
+    header: 'Organización',
+    cell: ({ row }) => {
+      const org = row.original
+
+      return (
+        <>
+          <Typography component={Link} href={`/agency/organizations/${org.organizationId}`} variant='body2' fontWeight={600} sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+            {org.organizationName}
+          </Typography>
+          {org.legalName && org.legalName !== org.organizationName && (
+            <Typography variant='caption' display='block' color='text.secondary'>{org.legalName}</Typography>
+          )}
+        </>
+      )
+    }
+  }),
+  columnHelper.accessor('publicId', {
+    header: 'ID',
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue()}</Typography>
+  }),
+  columnHelper.accessor('country', {
+    header: 'País',
+    cell: ({ getValue }) => {
+      const c = getValue() as string | null
+
+      return c ? <Typography variant='body2'>{countryFlag(c)} {c}</Typography> : <Typography variant='body2' color='text.secondary'>—</Typography>
+    }
+  }),
+  columnHelper.accessor('status', {
+    header: 'Estado',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={STATUS_COLOR[getValue()] ?? 'secondary'} label={STATUS_LABEL[getValue()] ?? getValue()} />,
+    meta: { align: 'center' }
+  }),
+  columnHelper.accessor('spaceCount', {
+    header: 'Spaces',
+    cell: ({ getValue }) => <Chip size='small' label={getValue()} variant='outlined' />,
+    meta: { align: 'center' }
+  }),
+  columnHelper.accessor('uniquePersonCount', {
+    header: 'Personas',
+    cell: ({ getValue }) => <Chip size='small' label={getValue()} variant='outlined' />,
+    meta: { align: 'center' }
+  }),
+  columnHelper.accessor('industry', {
+    header: 'Industria',
+    cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+  })
+]
+
 // ── Component ──────────────────────────────────────────────────────────
 
 const OrganizationListView = () => {
@@ -84,6 +145,7 @@ const OrganizationListView = () => {
   const [pageSize, setPageSize] = useState(25)
   const [search, setSearch] = useState('')
   const [searchDebounced, setSearchDebounced] = useState('')
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'organizationName', desc: false }])
 
   // Debounce search
   useEffect(() => {
@@ -116,6 +178,15 @@ const OrganizationListView = () => {
   useEffect(() => {
     void loadData()
   }, [loadData])
+
+  const table = useReactTable({
+    data: data?.items ?? [],
+    columns: orgColumns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   // Aggregated KPIs from current page data
   const totalOrgs = data?.total ?? 0
@@ -206,81 +277,33 @@ const OrganizationListView = () => {
             </CardContent>
           ) : (
             <>
-              <TableContainer>
-                <Table size='small'>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Organización</TableCell>
-                      <TableCell>ID</TableCell>
-                      <TableCell>País</TableCell>
-                      <TableCell>Estado</TableCell>
-                      <TableCell align='center'>Spaces</TableCell>
-                      <TableCell align='center'>Personas</TableCell>
-                      <TableCell>Industria</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {data.items.map(org => (
-                      <TableRow
-                        key={org.organizationId}
-                        hover
-                        sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                      >
-                        <TableCell>
-                          <Typography
-                            component={Link}
-                            href={`/agency/organizations/${org.organizationId}`}
-                            variant='body2'
-                            fontWeight={600}
-                            sx={{ color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-                          >
-                            {org.organizationName}
-                          </Typography>
-                          {org.legalName && org.legalName !== org.organizationName && (
-                            <Typography variant='caption' display='block' color='text.secondary'>
-                              {org.legalName}
-                            </Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                            {org.publicId}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          {org.country ? (
-                            <Typography variant='body2'>
-                              {countryFlag(org.country)} {org.country}
-                            </Typography>
-                          ) : (
-                            <Typography variant='body2' color='text.secondary'>—</Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <CustomChip
-                            round='true'
-                            size='small'
-                            variant='tonal'
-                            color={STATUS_COLOR[org.status] ?? 'secondary'}
-                            label={STATUS_LABEL[org.status] ?? org.status}
-                          />
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Chip size='small' label={org.spaceCount} variant='outlined' />
-                        </TableCell>
-                        <TableCell align='center'>
-                          <Chip size='small' label={org.uniquePersonCount} variant='outlined' />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant='body2' color='text.secondary'>
-                            {org.industry ?? '—'}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
+              <div className='overflow-x-auto'>
+                <table className={tableStyles.table}>
+                  <thead>
+                    {table.getHeaderGroups().map(hg => (
+                      <tr key={hg.id}>
+                        {hg.headers.map(header => (
+                          <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                          </th>
+                        ))}
+                      </tr>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                  </thead>
+                  <tbody>
+                    {table.getRowModel().rows.map(row => (
+                      <tr key={row.id}>
+                        {row.getVisibleCells().map(cell => (
+                          <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               <Divider />
               <TablePagination
                 component='div'
