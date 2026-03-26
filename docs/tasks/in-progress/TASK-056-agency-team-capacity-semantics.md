@@ -15,6 +15,14 @@
   - fallback honesto a `—`
 - La carga comercial sigue excluyendo `Efeonce` interno.
 - El snapshot todavía deja `overhead` en `0` y `suggestedBillRateTarget` como referencia base; falta profundizar la capa de costos compartidos/política comercial en siguientes slices.
+- `People > Person Intelligence` ahora hace overlay de capacidad/costo desde `member_capacity_economics` en su API de lectura, en vez de seguir confiando en semántica propia para esos campos.
+- `My > Assignments` ahora consume el resumen del mismo snapshot para:
+  - horas asignadas
+  - disponible comercial
+  - uso operativo
+- Riesgo explícito para el siguiente slice:
+  - `overhead` sigue placeholder en `0`
+  - `suggestedBillRateTarget` sigue siendo una policy base, no pricing comercial final
 - Validación ejecutada en este slice:
   - `pnpm test src/lib/team-capacity/units.test.ts src/lib/team-capacity/economics.test.ts src/lib/team-capacity/overhead.test.ts src/lib/team-capacity/pricing.test.ts src/lib/team-capacity/shared.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx`
   - `pnpm exec tsc --noEmit --pretty false`

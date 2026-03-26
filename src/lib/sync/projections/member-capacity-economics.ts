@@ -559,7 +559,10 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
   }
 }
 
-const refreshMember = async (memberId: string, period: Period): Promise<MemberCapacityEconomicsSnapshot | null> => {
+export const refreshMemberCapacityEconomicsForMember = async (
+  memberId: string,
+  period: Period
+): Promise<MemberCapacityEconomicsSnapshot | null> => {
   const sources = await loadMemberCapacityEconomicsSources(memberId, period)
   const snapshot = buildMemberCapacityEconomicsSnapshot(sources)
 
@@ -582,7 +585,7 @@ const refreshAllMembersForPeriod = async (period: Period): Promise<number> => {
 
   for (const row of members) {
     try {
-      await refreshMember(row.member_id, period)
+      await refreshMemberCapacityEconomicsForMember(row.member_id, period)
       refreshed++
     } catch {
       // Keep the batch moving; a single bad row should not block the full refresh.
@@ -630,7 +633,7 @@ export const memberCapacityEconomicsProjection: ProjectionDefinition = {
       return `refreshed member_capacity_economics for ${refreshed} members in ${scope.entityId}`
     }
 
-    const snapshot = await refreshMember(scope.entityId, period)
+    const snapshot = await refreshMemberCapacityEconomicsForMember(scope.entityId, period)
 
     return snapshot
       ? `refreshed member_capacity_economics for ${scope.entityId} (${snapshot.periodYear}-${pad2(snapshot.periodMonth)})`

@@ -347,6 +347,56 @@ export const readLatestMemberCapacityEconomicsSnapshot = async (
   }
 }
 
+export const readMemberCapacityEconomicsTrend = async (
+  memberId: string,
+  months: number = 6
+): Promise<MemberCapacityEconomicsSnapshot[]> => {
+  await ensureMemberCapacityEconomicsSchema()
+
+  const rows = await runGreenhousePostgresQuery<MemberCapacityEconomicsRow>(
+    `
+      SELECT *
+      FROM greenhouse_serving.member_capacity_economics
+      WHERE member_id = $1
+      ORDER BY period_year DESC, period_month DESC
+      LIMIT $2
+    `,
+    [memberId, Math.min(months, 24)]
+  )
+
+  return rows.map(row => ({
+    memberId: row.member_id,
+    periodYear: toNum(row.period_year),
+    periodMonth: toNum(row.period_month),
+    contractedFte: toNum(row.contracted_fte),
+    contractedHours: toNum(row.contracted_hours),
+    assignedHours: toNum(row.assigned_hours),
+    usageKind: row.usage_kind,
+    usedHours: toNullableNum(row.used_hours),
+    usagePercent: toNullableNum(row.usage_percent),
+    commercialAvailabilityHours: toNum(row.commercial_availability_hours),
+    operationalAvailabilityHours: toNullableNum(row.operational_availability_hours),
+    sourceCurrency: row.source_currency,
+    targetCurrency: row.target_currency,
+    totalCompSource: toNullableNum(row.total_comp_source),
+    totalLaborCostTarget: toNullableNum(row.total_labor_cost_target),
+    directOverheadTarget: toNum(row.direct_overhead_target),
+    sharedOverheadTarget: toNum(row.shared_overhead_target),
+    loadedCostTarget: toNullableNum(row.loaded_cost_target),
+    costPerHourTarget: toNullableNum(row.cost_per_hour_target),
+    suggestedBillRateTarget: toNullableNum(row.suggested_bill_rate_target),
+    fxRate: toNullableNum(row.fx_rate),
+    fxRateDate: toDateString(row.fx_rate_date),
+    fxProvider: toNullableString(row.fx_provider),
+    fxStrategy: toNullableString(row.fx_strategy),
+    snapshotStatus: row.snapshot_status,
+    sourceCompensationVersionId: row.source_compensation_version_id,
+    sourcePayrollPeriodId: row.source_payroll_period_id,
+    assignmentCount: toNum(row.assignment_count),
+    materializedAt: toTimestampString(row.materialized_at)
+  })).reverse()
+}
+
 export const readMemberCapacityEconomicsBatch = async ({
   memberIds,
   year,

@@ -27,6 +27,10 @@ export interface CostContext {
   monthlyBaseSalary: number | null
   monthlyTotalComp: number | null
   compensationVersionId: string | null
+  targetCurrency?: string | null
+  loadedCostTarget?: number | null
+  costPerHourTarget?: number | null
+  suggestedBillRateTarget?: number | null
 }
 
 // ── Capacity context ──
@@ -37,6 +41,10 @@ export interface CapacityContext extends CapacityBreakdown {
   expectedThroughput: number
   capacityHealth: string
   activeAssignmentCount: number
+  usageKind?: string
+  usagePercent?: number | null
+  commercialAvailabilityHours?: number
+  operationalAvailabilityHours?: number | null
 }
 
 // ── Full intelligence snapshot (one period) ──

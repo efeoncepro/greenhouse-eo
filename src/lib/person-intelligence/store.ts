@@ -94,21 +94,29 @@ const rowToSnapshot = (row: PersonOperational360Row): PersonIntelligenceSnapshot
   const capacity: CapacityContext = {
     contractedHoursMonth: toNum(row.contracted_hours_month),
     assignedHoursMonth: toNum(row.assigned_hours_month),
-    usedHoursMonth: toNum(row.used_hours_month),
+    usedHoursMonth: toNullNum(row.used_hours_month),
     availableHoursMonth: toNum(row.available_hours_month),
     overcommitted: row.overcommitted === true,
     roleCategory: row.role_category,
     totalFteAllocation: toNum(row.total_fte_allocation),
     expectedThroughput: toNum(row.expected_throughput),
     capacityHealth: row.capacity_health ?? 'idle',
-    activeAssignmentCount: toNum(row.active_assignment_count)
+    activeAssignmentCount: toNum(row.active_assignment_count),
+    usageKind: toNullNum(row.used_hours_month) !== null ? 'hours' : toNullNum(row.utilization_pct) !== null ? 'percent' : 'none',
+    usagePercent: toNullNum(row.utilization_pct),
+    commercialAvailabilityHours: toNum(row.available_hours_month),
+    operationalAvailabilityHours: toNullNum(row.used_hours_month) !== null
+      ? Math.max(0, toNum(row.contracted_hours_month) - toNum(row.used_hours_month))
+      : null
   }
 
   const cost: CostContext = {
     currency: row.compensation_currency,
     monthlyBaseSalary: toNullNum(row.monthly_base_salary),
     monthlyTotalComp: toNullNum(row.monthly_total_comp),
-    compensationVersionId: row.compensation_version_id as string | null
+    compensationVersionId: row.compensation_version_id as string | null,
+    targetCurrency: 'CLP',
+    costPerHourTarget: toNullNum(row.cost_per_hour)
   }
 
   // Overall health: based on quality index + capacity health
@@ -270,7 +278,7 @@ export interface PersonIntelligenceUpsertInput {
   totalFteAllocation: number
   contractedHoursMonth: number
   assignedHoursMonth: number
-  usedHoursMonth: number
+  usedHoursMonth: number | null
   availableHoursMonth: number
   expectedThroughput: number
   capacityHealth: string

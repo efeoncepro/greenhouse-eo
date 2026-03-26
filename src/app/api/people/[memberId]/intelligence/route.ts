@@ -3,8 +3,105 @@ import { NextResponse } from 'next/server'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 import { readPersonIntelligence, readPersonIntelligenceTrend } from '@/lib/person-intelligence/store'
 import type { PersonIntelligenceResponse } from '@/lib/person-intelligence/types'
+import {
+  readMemberCapacityEconomicsSnapshot,
+  readMemberCapacityEconomicsTrend
+} from '@/lib/member-capacity-economics/store'
 
 export const dynamic = 'force-dynamic'
+
+const overlayCapacityEconomics = <
+  T extends {
+    period: { year: number; month: number }
+    capacity: {
+      contractedHoursMonth: number
+      assignedHoursMonth: number
+      usedHoursMonth: number | null
+      availableHoursMonth: number
+      roleCategory: string | null
+      totalFteAllocation: number
+      expectedThroughput: number
+      capacityHealth: string
+      activeAssignmentCount: number
+      overcommitted: boolean
+      usageKind?: string
+      usagePercent?: number | null
+      commercialAvailabilityHours?: number
+      operationalAvailabilityHours?: number | null
+    }
+    cost: {
+      currency: string | null
+      monthlyBaseSalary: number | null
+      monthlyTotalComp: number | null
+      compensationVersionId: string | null
+      targetCurrency?: string | null
+      loadedCostTarget?: number | null
+      costPerHourTarget?: number | null
+      suggestedBillRateTarget?: number | null
+    }
+    derivedMetrics: Array<{ metricId: string; value: number | null; zone: string | null }>
+    materializedAt: string | null
+  }
+>(snapshot: T, economics: {
+  contractedFte: number
+  contractedHours: number
+  assignedHours: number
+  usageKind: string
+  usedHours: number | null
+  usagePercent: number | null
+  commercialAvailabilityHours: number
+  operationalAvailabilityHours: number | null
+  sourceCurrency: string
+  targetCurrency: string
+  totalCompSource: number | null
+  loadedCostTarget: number | null
+  costPerHourTarget: number | null
+  suggestedBillRateTarget: number | null
+  sourceCompensationVersionId: string | null
+  assignmentCount: number
+  materializedAt: string | null
+} | null) => {
+  if (!economics) {
+    return snapshot
+  }
+
+  const nextDerivedMetrics = snapshot.derivedMetrics.map(metric =>
+    metric.metricId === 'cost_per_hour'
+      ? { ...metric, value: economics.costPerHourTarget }
+      : metric.metricId === 'utilization_pct'
+        ? { ...metric, value: economics.usagePercent }
+        : metric
+  )
+
+  return {
+    ...snapshot,
+    derivedMetrics: nextDerivedMetrics,
+    capacity: {
+      ...snapshot.capacity,
+      contractedHoursMonth: economics.contractedHours,
+      assignedHoursMonth: economics.assignedHours,
+      usedHoursMonth: economics.usedHours,
+      availableHoursMonth: economics.commercialAvailabilityHours,
+      totalFteAllocation: economics.contractedFte,
+      activeAssignmentCount: economics.assignmentCount,
+      usageKind: economics.usageKind,
+      usagePercent: economics.usagePercent,
+      commercialAvailabilityHours: economics.commercialAvailabilityHours,
+      operationalAvailabilityHours: economics.operationalAvailabilityHours
+    },
+    cost: {
+      ...snapshot.cost,
+      currency: economics.sourceCurrency,
+      monthlyTotalComp: economics.totalCompSource,
+      compensationVersionId: economics.sourceCompensationVersionId,
+      targetCurrency: economics.targetCurrency,
+      loadedCostTarget: economics.loadedCostTarget,
+      costPerHourTarget: economics.costPerHourTarget,
+      suggestedBillRateTarget: economics.suggestedBillRateTarget
+    },
+    materializedAt: economics.materializedAt ?? snapshot.materializedAt
+  }
+}
 
 export async function GET(
   request: Request,
@@ -25,20 +122,33 @@ export async function GET(
     const year = now.getFullYear()
     const month = now.getMonth() + 1
 
-    // Parallel: current period + trend
-    const [current, trend] = await Promise.all([
+    const [current, trend, currentEconomics, trendEconomics] = await Promise.all([
       readPersonIntelligence(memberId, year, month),
-      readPersonIntelligenceTrend(memberId, trendMonths)
+      readPersonIntelligenceTrend(memberId, trendMonths),
+      readMemberCapacityEconomicsSnapshot(memberId, year, month),
+      readMemberCapacityEconomicsTrend(memberId, trendMonths)
     ])
+
+    const economicsByPeriod = new Map(
+      trendEconomics.map(snapshot => [`${snapshot.periodYear}-${snapshot.periodMonth}`, snapshot] as const)
+    )
+
+    const currentOverlay = current ? overlayCapacityEconomics(current, currentEconomics) : null
+    const trendOverlay = trend.map(snapshot =>
+      overlayCapacityEconomics(
+        snapshot,
+        economicsByPeriod.get(`${snapshot.period.year}-${snapshot.period.month}`) ?? null
+      )
+    )
 
     const response: PersonIntelligenceResponse = {
       memberId,
-      current,
-      trend,
+      current: currentOverlay,
+      trend: trendOverlay,
       meta: {
-        source: current?.source ?? 'person_intelligence',
-        materializedAt: current?.materializedAt ?? null,
-        engineVersion: current?.engineVersion ?? 'v2.0.0-person-intelligence'
+        source: currentOverlay?.source ?? 'person_intelligence',
+        materializedAt: currentOverlay?.materializedAt ?? null,
+        engineVersion: currentOverlay?.engineVersion ?? 'v2.0.0-person-intelligence'
       }
     }
 

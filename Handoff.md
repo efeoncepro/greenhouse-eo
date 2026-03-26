@@ -49,6 +49,54 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 20:45 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cortar `People > Person Intelligence` y `My > Assignments` al snapshot canónico `member_capacity_economics`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/api/people/[memberId]/intelligence/route.ts`
+- `src/app/api/people/[memberId]/intelligence/route.test.ts`
+- `src/lib/member-capacity-economics/store.ts`
+- `src/lib/person-intelligence/types.ts`
+- `src/views/greenhouse/people/tabs/PersonIntelligenceTab.tsx`
+- `src/app/api/my/assignments/route.ts`
+- `src/views/greenhouse/my/MyAssignmentsView.tsx`
+- `src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/my/MyAssignmentsView.test.tsx src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx src/lib/sync/projections/member-capacity-economics.test.ts`
+- Resultado: `5 files passed`, `12 tests passed`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Riesgos o pendientes
+
+- `Person Intelligence` ya overlaya capacidad/costo desde el snapshot, pero `person_operational_360` sigue existiendo como serving de delivery/derived; el siguiente refactor grande podría simplificar esa dualidad.
+- `My Assignments` ya no calcula disponibilidad con `fte * 160` a ciegas, pero todavía no expone costo hora o tarifa sugerida en UI.
+- El siguiente slice real de `TASK-056` debe entrar por:
+  - overhead compartido canónico
+  - pricing policy más rica
+  - no por crear más consumers nuevos
+
 ## 2026-03-26 21:00 -03
 
 ### Agente

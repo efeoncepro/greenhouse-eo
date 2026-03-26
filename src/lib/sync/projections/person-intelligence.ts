@@ -1,13 +1,14 @@
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
-  computeCapacityBreakdown,
   getExpectedMonthlyThroughput,
-  getUtilizationPercent,
   getCapacityHealth
 } from '@/lib/team-capacity/shared'
 import type { TeamRoleCategory } from '@/types/team'
+import { hoursToFte } from '@/lib/team-capacity/units'
+import { readMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
 import { computeDerivedMetrics } from '@/lib/person-intelligence/compute'
 import { upsertPersonIntelligence } from '@/lib/person-intelligence/store'
+import { refreshMemberCapacityEconomicsForMember } from './member-capacity-economics'
 import type { ProjectionDefinition } from '../projection-registry'
 
 // ── Row types for source queries ──
@@ -25,11 +26,6 @@ interface IcoRow extends Record<string, unknown> {
   total_tasks: string | number | null
   completed_tasks: string | number | null
   active_tasks: string | number | null
-}
-
-interface AssignmentRow extends Record<string, unknown> {
-  fte_allocation: string | number
-  contracted_hours_month: number | null
 }
 
 interface CompRow extends Record<string, unknown> {
@@ -69,9 +65,10 @@ const refreshPersonIntelligence = async (
   scope: { entityType: string; entityId: string }
 ): Promise<string | null> => {
   const memberId = scope.entityId
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+  const year = match ? Number(match[1]) : new Date().getFullYear()
+  const month = match ? Number(match[2]) : new Date().getMonth() + 1
 
   // 1. Read ICO metrics from Postgres (already populated by BQ materialization)
   let ico: IcoRow | null = null
@@ -88,22 +85,12 @@ const refreshPersonIntelligence = async (
     // Table may not exist yet — continue with nulls
   }
 
-  // 2. Read active assignments
-  let assignments: AssignmentRow[] = []
+  // 2. Read or refresh the canonical member capacity snapshot
+  let memberCapacity = await readMemberCapacityEconomicsSnapshot(memberId, year, month).catch(() => null)
 
-  try {
-    assignments = await runGreenhousePostgresQuery<AssignmentRow>(
-      `SELECT fte_allocation, contracted_hours_month
-       FROM greenhouse_core.client_team_assignments
-       WHERE member_id = $1 AND active = TRUE`,
-      [memberId]
-    )
-  } catch {
-    // Non-blocking
+  if (!memberCapacity) {
+    memberCapacity = await refreshMemberCapacityEconomicsForMember(memberId, { year, month }).catch(() => null)
   }
-
-  const totalFte = assignments.reduce((s, a) => s + toNum(a.fte_allocation), 0)
-  const totalContracted = assignments.reduce((s, a) => s + (a.contracted_hours_month ?? Math.round(toNum(a.fte_allocation) * 160)), 0)
 
   // 3. Read current compensation
   let comp: CompRow | null = null
@@ -137,26 +124,23 @@ const refreshPersonIntelligence = async (
     // Non-blocking
   }
 
-  // 5. Compute capacity
-  const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation: totalFte })
-  const activeTasks = toNum(ico?.active_tasks)
-
-  const utilizationPct = expectedThroughput > 0
-    ? getUtilizationPercent({ activeAssets: activeTasks, expectedMonthlyThroughput: expectedThroughput })
-    : 0
-
-  const capacity = computeCapacityBreakdown({
-    fteAllocation: totalFte,
-    contractedHoursMonth: totalContracted || null,
-    utilizationPercent: utilizationPct
+  // 5. Compute capacity from the canonical snapshot
+  const contractedHoursMonth = memberCapacity?.contractedHours ?? 0
+  const assignedHoursMonth = memberCapacity?.assignedHours ?? 0
+  const totalAssignedFte = hoursToFte(assignedHoursMonth)
+  const expectedThroughput = getExpectedMonthlyThroughput({
+    roleCategory,
+    fteAllocation: totalAssignedFte > 0 ? totalAssignedFte : 1
   })
-
-  const capacityHealth = getCapacityHealth(utilizationPct)
+  const utilizationPct = memberCapacity?.usagePercent ?? null
+  const capacityHealth = getCapacityHealth(utilizationPct ?? 0)
 
   // 6. Compute derived metrics
   const monthlyBase = toNum(comp?.base_salary)
   const monthlyRemote = toNum(comp?.remote_allowance)
-  const monthlyTotalComp = comp ? monthlyBase + monthlyRemote : null
+  const monthlyTotalComp = comp
+    ? monthlyBase + monthlyRemote
+    : memberCapacity?.totalCompSource ?? null
 
   const derived = computeDerivedMetrics(
     {
@@ -167,12 +151,18 @@ const refreshPersonIntelligence = async (
       activeTasks: toNullNum(ico?.active_tasks)
     },
     {
-      totalFte,
-      contractedHoursMonth: totalContracted,
+      totalFte: totalAssignedFte,
+      contractedHoursMonth,
       roleCategory
     },
     { monthlyTotalComp }
   )
+  const throughputCount = toNullNum(ico?.throughput_count)
+  const targetCostBasis = memberCapacity?.totalLaborCostTarget ?? null
+  const costPerAsset = targetCostBasis != null && throughputCount != null && throughputCount > 0
+    ? Math.round(targetCostBasis / throughputCount)
+    : derived.costPerAsset
+  const costPerHour = memberCapacity?.costPerHourTarget ?? derived.costPerHour
 
   // 7. Upsert
   await upsertPersonIntelligence({
@@ -195,30 +185,30 @@ const refreshPersonIntelligence = async (
     activeTasks: toNum(ico?.active_tasks),
 
     // Derived
-    utilizationPct: derived.utilizationPct,
+    utilizationPct: utilizationPct ?? derived.utilizationPct,
     allocationVariance: derived.allocationVariance,
-    costPerAsset: derived.costPerAsset,
-    costPerHour: derived.costPerHour,
+    costPerAsset,
+    costPerHour,
     qualityIndex: derived.qualityIndex,
     dedicationIndex: derived.dedicationIndex,
 
     // Capacity
     roleCategory,
-    totalFteAllocation: totalFte,
-    contractedHoursMonth: capacity.contractedHoursMonth,
-    assignedHoursMonth: capacity.assignedHoursMonth,
-    usedHoursMonth: capacity.usedHoursMonth ?? 0,
-    availableHoursMonth: capacity.availableHoursMonth,
+    totalFteAllocation: totalAssignedFte,
+    contractedHoursMonth,
+    assignedHoursMonth,
+    usedHoursMonth: memberCapacity?.usedHours ?? null,
+    availableHoursMonth: memberCapacity?.commercialAvailabilityHours ?? contractedHoursMonth,
     expectedThroughput,
     capacityHealth,
-    overcommitted: capacity.overcommitted,
-    activeAssignmentCount: assignments.length,
+    overcommitted: assignedHoursMonth > contractedHoursMonth,
+    activeAssignmentCount: memberCapacity?.assignmentCount ?? 0,
 
     // Cost
-    compensationCurrency: comp?.currency as string | null ?? null,
+    compensationCurrency: comp?.currency as string | null ?? memberCapacity?.sourceCurrency ?? null,
     monthlyBaseSalary: comp ? monthlyBase : null,
     monthlyTotalComp,
-    compensationVersionId: comp?.version_id as string | null ?? null
+    compensationVersionId: comp?.version_id as string | null ?? memberCapacity?.sourceCompensationVersionId ?? null
   })
 
   return `refreshed person_intelligence for ${memberId} (${year}-${String(month).padStart(2, '0')})`
@@ -239,6 +229,16 @@ export const personIntelligenceProjection: ProjectionDefinition = {
     'assignment.removed',
     'compensation.updated',
     'compensation_version.created',
+    'compensation_version.updated',
+    'payroll_period.created',
+    'payroll_period.updated',
+    'payroll_period.calculated',
+    'payroll_period.approved',
+    'payroll_entry.upserted',
+    'finance.exchange_rate.upserted',
+    'finance.overhead.updated',
+    'finance.license_cost.updated',
+    'finance.tooling_cost.updated',
     'ico.materialization.completed'
   ],
 

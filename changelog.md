@@ -7,6 +7,14 @@
 
 ## 2026-03-26
 
+### TASK-056 — People y My ya escalan desde `member_capacity_economics`
+- `GET /api/people/[memberId]/intelligence` ahora hace overlay de capacidad/costo desde `member_capacity_economics` para alinear `Person Intelligence` con la misma semántica de `Agency > Team`.
+- `My > Assignments` ahora consume el resumen del snapshot para:
+  - horas asignadas
+  - disponible comercial
+  - uso operativo
+- Se agregaron pruebas Vitest para el overlay de `Person Intelligence` y para el resumen canónico de `My Assignments`.
+
 ### Arquitectura — team capacity canónica
 - Se agregó `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md` como fuente canónica de:
   - helpers puros de capacidad/economía

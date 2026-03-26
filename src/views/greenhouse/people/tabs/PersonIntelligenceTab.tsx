@@ -21,8 +21,8 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 // ── Types ──
 
 interface MetricValue { metricId: string; value: number | null; zone: string | null }
-interface CapacityCtx { contractedHoursMonth: number; assignedHoursMonth: number; usedHoursMonth: number; availableHoursMonth: number; overcommitted: boolean; roleCategory: string | null; totalFteAllocation: number; expectedThroughput: number; capacityHealth: string; activeAssignmentCount: number }
-interface CostCtx { currency: string | null; monthlyBaseSalary: number | null; monthlyTotalComp: number | null; compensationVersionId: string | null }
+interface CapacityCtx { contractedHoursMonth: number; assignedHoursMonth: number; usedHoursMonth: number | null; availableHoursMonth: number; overcommitted: boolean; roleCategory: string | null; totalFteAllocation: number; expectedThroughput: number; capacityHealth: string; activeAssignmentCount: number; usageKind?: string; usagePercent?: number | null; commercialAvailabilityHours?: number; operationalAvailabilityHours?: number | null }
+interface CostCtx { currency: string | null; monthlyBaseSalary: number | null; monthlyTotalComp: number | null; compensationVersionId: string | null; targetCurrency?: string | null; loadedCostTarget?: number | null; costPerHourTarget?: number | null; suggestedBillRateTarget?: number | null }
 interface Snapshot { period: { year: number; month: number }; deliveryMetrics: MetricValue[]; derivedMetrics: MetricValue[]; capacity: CapacityCtx; cost: CostCtx; health: 'green' | 'yellow' | 'red'; materializedAt: string | null; engineVersion: string; source: string }
 interface IntelligenceResponse { memberId: string; current: Snapshot | null; trend: Snapshot[]; meta: { source: string; materializedAt: string | null; engineVersion: string } }
 
@@ -59,6 +59,13 @@ const fmtNum = (v: number | null | undefined, suffix = ''): string =>
 
 const fmtClp = (v: number | null | undefined): string =>
   v != null ? `$${Math.round(v).toLocaleString('es-CL')}` : '—'
+
+const fmtUsage = (kind: string | undefined, usedHours: number | null | undefined, usagePercent: number | null | undefined): string => {
+  if (kind === 'hours') return fmtNum(usedHours, 'h')
+  if (kind === 'percent' && usagePercent != null) return fmtNum(usagePercent, '%')
+
+  return '—'
+}
 
 const fmtPeriod = (year: number, month: number): string =>
   `${MONTHS[month]} ${year}`
@@ -251,11 +258,11 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
                 <Typography variant='body1' fontWeight={600}>{cap.assignedHoursMonth}h</Typography>
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <Typography variant='caption' color='text.secondary'>Usadas</Typography>
-                <Typography variant='body1' fontWeight={600}>{cap.usedHoursMonth}h</Typography>
+                <Typography variant='caption' color='text.secondary'>Uso operativo</Typography>
+                <Typography variant='body1' fontWeight={600}>{fmtUsage(cap.usageKind, cap.usedHoursMonth, cap.usagePercent)}</Typography>
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <Typography variant='caption' color='text.secondary'>Disponibles</Typography>
+                <Typography variant='caption' color='text.secondary'>Disponible comercial</Typography>
                 <Typography variant='body1' fontWeight={600} color={cap.availableHoursMonth < 0 ? 'error.main' : 'success.main'}>{cap.availableHoursMonth}h</Typography>
               </Grid>
               <Grid size={{ xs: 6 }}>
@@ -298,7 +305,11 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <Typography variant='caption' color='text.secondary'>Costo por hora</Typography>
-                <Typography variant='body1' fontWeight={600}>{fmtClp(getMetric(current.derivedMetrics, 'cost_per_hour')?.value ?? null)}</Typography>
+                <Typography variant='body1' fontWeight={600}>{fmtClp(cost.costPerHourTarget ?? getMetric(current.derivedMetrics, 'cost_per_hour')?.value ?? null)}</Typography>
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <Typography variant='caption' color='text.secondary'>Tarifa sugerida</Typography>
+                <Typography variant='body1' fontWeight={600}>{fmtClp(cost.suggestedBillRateTarget ?? null)}</Typography>
               </Grid>
             </Grid>
           </CardContent>
