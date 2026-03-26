@@ -49,6 +49,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 07:15 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Ejecutar el cálculo real de Payroll para `2026-02` con UF `39779.29` y verificar si eso desbloqueaba costo laboral para `Finance Intelligence`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+
+### Verificacion
+
+- Ejecución operativa vía stores del módulo Payroll:
+  - crear/actualizar período `2026-02`
+  - `calculatePayroll({ periodId: '2026-02' })`
+  - `pgSetPeriodApproved('2026-02', null)`
+- Query runtime posterior:
+  - `greenhouse_payroll.payroll_entries` para `2026-02`
+  - `greenhouse_core.client_team_assignments` para `daniela-ferreira`, `melkin-hernandez`
+  - `greenhouse_serving.client_labor_cost_allocation` para `2026-02`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- `2026-02` quedó aprobado con `2` entries calculadas, así que febrero ya existe en `greenhouse_payroll`.
+- `client_labor_cost_allocation` permanece vacío para febrero porque los assignments de ambos miembros empiezan el `2026-03-13`; no hay solape temporal válido con febrero.
+- El gap restante para `Finance Intelligence` ya no es “falta de nómina febrero”, sino falta de `client_team_assignments` compatibles con ese período o falta de otro payroll/assignment del mes que sí corresponda al cliente esperado.
+
 ## 2026-03-26 07:06 -03
 
 ### Agente

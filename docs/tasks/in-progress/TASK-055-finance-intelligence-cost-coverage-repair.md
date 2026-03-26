@@ -30,6 +30,13 @@
 - Con el backfill ya autenticando correctamente, BigQuery devolvió `0` filas para `greenhouse.payroll_periods`, `greenhouse.payroll_entries` y `greenhouse.compensation_versions`.
 - Conclusión operativa: el payroll de febrero no falta solo en PostgreSQL; tampoco está materializado en la fuente BigQuery que este repo usa como origen de backfill.
 
+## Delta 2026-03-26 (cálculo real de febrero con Payroll)
+
+- Se materializó `2026-02` usando las herramientas reales de Payroll (`create/update period -> calculate -> approve`) con `UF = 39779.29`.
+- Resultado: período `2026-02` aprobado con `2` entries calculadas (`daniela-ferreira`, `melkin-hernandez`).
+- `client_labor_cost_allocation` siguió vacío para `2026-02` por una razón válida de datos: los assignments activos de ambos miembros comienzan el `2026-03-13`, así que no existe solape temporal con febrero para atribuir costo a cliente.
+- Conclusión: el pipeline ya no está bloqueado por falta de payroll en febrero; el gap remanente para Finance Intelligence es que no existe asignación cliente-período compatible con ese payroll.
+
 ## Summary
 
 Corregir la integridad del pipeline que alimenta `Finance > Intelligence` y los snapshots de `greenhouse_finance.client_economics`, para que la rentabilidad por Space no vuelva a mostrar márgenes ficticios por falta de costos canonizados.
