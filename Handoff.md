@@ -49,6 +49,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 06:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Auditar `Agency > Team` porque la vista estaba mostrando headcount y capacidad incorrectos.
+- Corregir duplicados por assignment, semántica de capacidad libre y fallback cuando faltan métricas operativas.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/api/team/capacity-breakdown/route.ts`
+- `src/views/agency/AgencyTeamView.tsx`
+- `src/lib/team-capacity/shared.ts`
+- `src/lib/team-capacity/shared.test.ts`
+- `src/app/api/team/capacity-breakdown/route.test.ts`
+- `src/views/agency/AgencyTeamView.test.tsx`
+
+### Verificacion
+
+- `pnpm test src/lib/team-capacity/shared.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- Auditoría runtime con `pnpm pg:doctor --profile=runtime`
+- Query ad hoc contra Postgres confirmó:
+  - `11` assignments activos
+  - `7` miembros únicos
+  - `greenhouse_serving.person_operational_metrics` no existe en este entorno
+
+### Riesgos o pendientes
+
+- `Agency > Team` ya no debe mostrar personas duplicadas ni `0h usadas` como si fueran métricas reales; ahora agrega por `member_id` y muestra ausencia de métricas operativas explícitamente.
+- `Disponibles` cambió a semántica de capacidad libre contractual (`contratada - asignada`), no `contratada - usada`.
+- Si se quiere volver a poblar `Usadas`, el siguiente paso real es materializar `greenhouse_serving.person_operational_metrics` o conectar esta vista a un adapter ICO más estable.
+
 ## 2026-03-26 04:30 -03
 
 ### Agente

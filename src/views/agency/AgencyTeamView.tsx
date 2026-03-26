@@ -38,7 +38,7 @@ import tableStyles from '@core/styles/table.module.css'
 interface CapacityBreakdown {
   contractedHoursMonth: number
   assignedHoursMonth: number
-  usedHoursMonth: number
+  usedHoursMonth: number | null
   availableHoursMonth: number
   overcommitted: boolean
 }
@@ -56,6 +56,7 @@ interface TeamData {
   team: CapacityBreakdown
   members: TeamMember[]
   memberCount: number
+  hasOperationalMetrics: boolean
   overcommittedCount: number
   overcommittedMembers: Array<{ displayName: string; deficit: number }>
 }
@@ -69,6 +70,8 @@ const HEALTH_COLORS: Record<string, 'secondary' | 'success' | 'warning' | 'error
 const HEALTH_LABELS: Record<string, string> = {
   idle: 'Disponible', balanced: 'Balanceado', high: 'Alta carga', overloaded: 'Sobrecargado'
 }
+
+const formatHours = (value: number | null) => (value === null ? '—' : `${value}h`)
 
 // ── Table columns ──
 
@@ -104,7 +107,7 @@ const columns: ColumnDef<TeamMember, any>[] = [
   columnHelper.accessor(row => row.capacity.usedHoursMonth, {
     id: 'used',
     header: 'Usadas',
-    cell: ({ getValue }) => `${getValue()}h`,
+    cell: ({ getValue }) => formatHours(getValue()),
     meta: { align: 'right' }
   }),
   columnHelper.accessor(row => row.capacity.availableHoursMonth, {
@@ -186,7 +189,7 @@ const AgencyTeamView = () => {
         <HorizontalWithSubtitle title='Asignadas' stats={`${data.team.assignedHoursMonth}h`} avatarIcon='tabler-clock' avatarColor='info' subtitle='FTE comprometido' />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Usadas' stats={`${data.team.usedHoursMonth}h`} avatarIcon='tabler-bolt' avatarColor='warning' subtitle='Horas efectivas' />
+        <HorizontalWithSubtitle title='Usadas' stats={formatHours(data.team.usedHoursMonth)} avatarIcon='tabler-bolt' avatarColor='warning' subtitle={data.hasOperationalMetrics ? 'Horas efectivas' : 'Sin métricas operativas'} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle title='Disponibles' stats={`${data.team.availableHoursMonth}h`} avatarIcon='tabler-calendar-stats' avatarColor={data.team.availableHoursMonth < 0 ? 'error' : 'success'} subtitle={data.team.overcommitted ? 'Sobrecomprometido' : 'Capacidad libre'} />
@@ -205,6 +208,14 @@ const AgencyTeamView = () => {
           <Alert severity='error' variant='outlined'>
             <strong>{data.overcommittedCount} sobrecargado{data.overcommittedCount !== 1 ? 's' : ''}:</strong>{' '}
             {data.overcommittedMembers.map(m => `${m.displayName} (${m.deficit}h)`).join(', ')}
+          </Alert>
+        </Grid>
+      )}
+
+      {!data.hasOperationalMetrics && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='info' variant='outlined'>
+            Las horas usadas aún no están disponibles en este entorno. La carga se está leyendo desde capacidad comprometida, no desde producción efectiva.
           </Alert>
         </Grid>
       )}

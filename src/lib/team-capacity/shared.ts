@@ -69,7 +69,7 @@ export const getCapacityHealth = (utilizationPercent: number): TeamCapacityHealt
 export interface CapacityBreakdown {
   contractedHoursMonth: number
   assignedHoursMonth: number
-  usedHoursMonth: number
+  usedHoursMonth: number | null
   availableHoursMonth: number
   overcommitted: boolean
 }
@@ -77,23 +77,25 @@ export interface CapacityBreakdown {
 export const computeCapacityBreakdown = ({
   fteAllocation,
   contractedHoursMonth,
-  utilizationPercent
+  utilizationPercent,
+  hasUsageData = true
 }: {
   fteAllocation: number
   contractedHoursMonth: number | null
   utilizationPercent: number
+  hasUsageData?: boolean
 }): CapacityBreakdown => {
   const assigned = getAssignedHoursMonth(fteAllocation)
   const contracted = contractedHoursMonth ?? assigned
-  const used = Math.round(assigned * (utilizationPercent / 100))
-  const available = contracted - used
+  const used = hasUsageData ? Math.round(assigned * (utilizationPercent / 100)) : null
+  const available = contracted - assigned
 
   return {
     contractedHoursMonth: contracted,
     assignedHoursMonth: assigned,
     usedHoursMonth: used,
     availableHoursMonth: available,
-    overcommitted: available < 0
+    overcommitted: assigned > contracted
   }
 }
 
@@ -103,8 +105,9 @@ export const computeCapacityBreakdown = ({
 export const aggregateCapacityBreakdown = (breakdowns: CapacityBreakdown[]): CapacityBreakdown => {
   const contracted = breakdowns.reduce((s, b) => s + b.contractedHoursMonth, 0)
   const assigned = breakdowns.reduce((s, b) => s + b.assignedHoursMonth, 0)
-  const used = breakdowns.reduce((s, b) => s + b.usedHoursMonth, 0)
-  const available = contracted - used
+  const usedValues = breakdowns.map(b => b.usedHoursMonth).filter((value): value is number => value !== null)
+  const used = usedValues.length > 0 ? usedValues.reduce((s, value) => s + value, 0) : null
+  const available = contracted - assigned
 
   return {
     contractedHoursMonth: contracted,

@@ -15,9 +15,7 @@ import type { TeamRoleCategory } from '@/types/team'
 export const dynamic = 'force-dynamic'
 
 interface AssignmentRow extends Record<string, unknown> {
-  assignment_id: string
   member_id: string
-  client_id: string
   display_name: string
   role_title: string | null
   fte_allocation: string | number
@@ -47,6 +45,34 @@ const inferRoleCategory = (roleTitle: string | null): TeamRoleCategory => {
   return 'unknown'
 }
 
+const getCommitmentHealth = ({
+  assignedHoursMonth,
+  contractedHoursMonth
+}: {
+  assignedHoursMonth: number
+  contractedHoursMonth: number
+}) => {
+  if (contractedHoursMonth <= 0) {
+    return 'idle'
+  }
+
+  if (assignedHoursMonth > contractedHoursMonth) {
+    return 'overloaded'
+  }
+
+  const commitmentPercent = Math.round((assignedHoursMonth / contractedHoursMonth) * 100)
+
+  if (commitmentPercent >= 85) {
+    return 'high'
+  }
+
+  if (commitmentPercent >= 35) {
+    return 'balanced'
+  }
+
+  return 'idle'
+}
+
 export async function GET() {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
 
@@ -66,9 +92,10 @@ export async function GET() {
     // Get assignments with contracted hours from Postgres
     const query = pomExists
       ? `SELECT
-          a.assignment_id, a.member_id, a.client_id, m.display_name,
-          COALESCE(a.role_title_override, m.role_title) AS role_title,
-          a.fte_allocation, a.contracted_hours_month,
+          a.member_id, m.display_name,
+          COALESCE(MAX(a.role_title_override), m.role_title) AS role_title,
+          SUM(a.fte_allocation) AS fte_allocation,
+          SUM(COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160)))::int AS contracted_hours_month,
           COALESCE(pom.tasks_active, 0) AS active_assets
         FROM greenhouse_core.client_team_assignments a
         JOIN greenhouse_core.members m ON m.member_id = a.member_id
@@ -77,15 +104,18 @@ export async function GET() {
           AND pom.period_year = EXTRACT(YEAR FROM CURRENT_DATE)
           AND pom.period_month = EXTRACT(MONTH FROM CURRENT_DATE)
         WHERE a.active = TRUE
+        GROUP BY a.member_id, m.display_name, m.role_title, pom.tasks_active
         ORDER BY m.display_name`
       : `SELECT
-          a.assignment_id, a.member_id, a.client_id, m.display_name,
-          COALESCE(a.role_title_override, m.role_title) AS role_title,
-          a.fte_allocation, a.contracted_hours_month,
+          a.member_id, m.display_name,
+          COALESCE(MAX(a.role_title_override), m.role_title) AS role_title,
+          SUM(a.fte_allocation) AS fte_allocation,
+          SUM(COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160)))::int AS contracted_hours_month,
           0 AS active_assets
         FROM greenhouse_core.client_team_assignments a
         JOIN greenhouse_core.members m ON m.member_id = a.member_id
         WHERE a.active = TRUE
+        GROUP BY a.member_id, m.display_name, m.role_title
         ORDER BY m.display_name`
 
     const rows = await runGreenhousePostgresQuery<AssignmentRow>(query)
@@ -94,7 +124,6 @@ export async function GET() {
       memberId: string
       displayName: string
       roleTitle: string | null
-      clientId: string
       fteAllocation: number
       utilizationPercent: number
       capacityHealth: string
@@ -111,17 +140,22 @@ export async function GET() {
       const capacity = computeCapacityBreakdown({
         fteAllocation,
         contractedHoursMonth: row.contracted_hours_month,
-        utilizationPercent
+        utilizationPercent,
+        hasUsageData: pomExists
       })
 
       memberBreakdowns.push({
         memberId: row.member_id,
         displayName: row.display_name,
         roleTitle: row.role_title,
-        clientId: row.client_id,
         fteAllocation,
         utilizationPercent,
-        capacityHealth: getCapacityHealth(utilizationPercent),
+        capacityHealth: pomExists
+          ? getCapacityHealth(utilizationPercent)
+          : getCommitmentHealth({
+              assignedHoursMonth: capacity.assignedHoursMonth,
+              contractedHoursMonth: capacity.contractedHoursMonth
+            }),
         capacity
       })
     }
@@ -133,6 +167,7 @@ export async function GET() {
       team: teamTotal,
       members: memberBreakdowns,
       memberCount: memberBreakdowns.length,
+      hasOperationalMetrics: pomExists,
       overcommittedCount,
       overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
         memberId: m.memberId,

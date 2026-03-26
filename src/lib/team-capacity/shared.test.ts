@@ -19,19 +19,32 @@ describe('computeCapacityBreakdown', () => {
     expect(result.contractedHoursMonth).toBe(160)
     expect(result.assignedHoursMonth).toBe(160) // 1.0 FTE * 160
     expect(result.usedHoursMonth).toBe(120) // 75% of 160
-    expect(result.availableHoursMonth).toBe(40) // 160 - 120
+    expect(result.availableHoursMonth).toBe(0) // 160 - 160 assigned
     expect(result.overcommitted).toBe(false)
   })
 
   it('detects overcommitted member', () => {
     const result = computeCapacityBreakdown({
       fteAllocation: 1.0,
-      contractedHoursMonth: 160,
+      contractedHoursMonth: 120,
       utilizationPercent: 110
     })
 
     expect(result.overcommitted).toBe(true)
     expect(result.availableHoursMonth).toBeLessThan(0)
+  })
+
+  it('returns unknown usage when operational metrics are unavailable', () => {
+    const result = computeCapacityBreakdown({
+      fteAllocation: 1.0,
+      contractedHoursMonth: 160,
+      utilizationPercent: 0,
+      hasUsageData: false
+    })
+
+    expect(result.usedHoursMonth).toBeNull()
+    expect(result.availableHoursMonth).toBe(0)
+    expect(result.overcommitted).toBe(false)
   })
 
   it('uses default 160 hours when contractedHoursMonth is null', () => {
@@ -57,6 +70,7 @@ describe('aggregateCapacityBreakdown', () => {
 
     expect(total.contractedHoursMonth).toBe(320)
     expect(total.assignedHoursMonth).toBe(240) // 160 + 80
+    expect(total.availableHoursMonth).toBe(80)
   })
 
   it('returns zero for empty array', () => {
@@ -64,6 +78,7 @@ describe('aggregateCapacityBreakdown', () => {
 
     expect(total.contractedHoursMonth).toBe(0)
     expect(total.assignedHoursMonth).toBe(0)
+    expect(total.usedHoursMonth).toBeNull()
     expect(total.overcommitted).toBe(false)
   })
 })
