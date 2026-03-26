@@ -1,4 +1,23 @@
-# CODEX TASK -- Greenhouse Home Nexa v2: Home conversacional y client-first sobre el runtime real del portal
+# TASK-009 - Greenhouse Home Nexa v2: Home conversacional y client-first sobre el runtime real del portal
+
+## Delta 2026-03-26
+
+- Se implementó el MVP de `Home` como nueva superficie de entrada client-first en `/home`.
+- El redirect stub a `/dashboard` fue reemplazado por `HomeView`, y `portalHomePath` para cliente ahora aterriza en `/home`.
+- Se agregó el snapshot server-side:
+  - `GET /api/home/snapshot`
+  - greeting rotativo
+  - módulos resueltos por capacidades
+  - shortlist de notificaciones no leídas
+- Se agregó `POST /api/home/nexa` con `NexaService` sobre Google GenAI, grounded en el `HomeSnapshot` del usuario.
+- Se implementó la UI inicial:
+  - `GreetingCard`
+  - `ModuleGrid`
+  - `TaskShortlist`
+  - `NexaPanel`
+- Pendiente posterior:
+  - tool calling y grounding más profundo sobre métricas/consumers operativos
+  - tests unitarios/RTL de la nueva superficie
 
 ## Estado
 

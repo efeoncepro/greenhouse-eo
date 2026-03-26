@@ -6,6 +6,17 @@
 - Usar entradas cortas, fechadas y accionables.
 
 ## 2026-03-26
+
+### Home / Nexa — MVP client-first implementado
+- `/home` dejó de redirigir automáticamente a `/dashboard`; ahora renderiza `HomeView` como nueva superficie de entrada client-first.
+- `portalHomePath` para clientes quedó alineado a `/home`.
+- Se agregaron:
+  - `GET /api/home/snapshot`
+  - `POST /api/home/nexa`
+  - `getHomeSnapshot()` como orquestador server-side
+  - `NexaService` sobre Google GenAI
+- La nueva UI de Home incluye greeting dinámico, grid de módulos por capacidades, shortlist de pendientes y panel conversacional `Nexa`.
+- `TASK-009` quedó materialmente implementada como MVP y movida a `docs/tasks/complete/`.
  
 ### Greenhouse Home Nexa v2 — TASK-009 implementation
 - **Orchestration**: Implemented `getHomeSnapshot.ts` to aggregate user context, capability-based modules, and pending task counts.

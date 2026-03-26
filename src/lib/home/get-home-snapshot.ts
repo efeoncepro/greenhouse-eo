@@ -3,7 +3,6 @@ import 'server-only'
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { HOME_GREETINGS } from '@/config/home-greetings'
-import { NEXA_SUGGESTIONS } from '@/config/home-suggestions'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
 interface HomeSnapshotInput {
@@ -26,6 +25,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
 
   // 1. Resolve Greeting
   let greetingPool = HOME_GREETINGS.default
+
   if (hour >= 5 && hour < 12) greetingPool = HOME_GREETINGS.morning
   else if (hour >= 12 && hour < 19) greetingPool = HOME_GREETINGS.afternoon
   else if (hour >= 19 || hour < 5) greetingPool = HOME_GREETINGS.evening
