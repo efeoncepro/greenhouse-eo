@@ -35,7 +35,7 @@ interface OpsKpis {
 
 interface Subsystem {
   name: string
-  status: 'healthy' | 'degraded' | 'down'
+  status: 'healthy' | 'degraded' | 'down' | 'not_configured' | 'idle'
   processed: number
   failed: number
   lastRun: string | null
@@ -66,8 +66,9 @@ interface OpsData {
 
 // ── Helpers ──
 
-const statusColor = (s: string): 'success' | 'warning' | 'error' | 'secondary' => {
+const statusColor = (s: string): 'success' | 'warning' | 'error' | 'secondary' | 'info' => {
   if (s === 'healthy' || s === 'processed') return 'success'
+  if (s === 'idle') return 'info'
   if (s === 'degraded' || s === 'pending') return 'warning'
   if (s === 'not_configured') return 'secondary'
 
@@ -76,6 +77,7 @@ const statusColor = (s: string): 'success' | 'warning' | 'error' | 'secondary' =
 
 const statusLabel = (s: string): string => {
   if (s === 'healthy') return 'Saludable'
+  if (s === 'idle') return 'Sin actividad'
   if (s === 'degraded') return 'Degradado'
   if (s === 'down') return 'Caído'
   if (s === 'not_configured') return 'No configurado'
@@ -250,7 +252,13 @@ const AgencyOperationsView = () => {
             title={s.name}
             avatarIcon={subsystemIcon(s.name)}
             color={statusColor(s.status)}
-            description={s.lastRun ? `Última ejecución: ${timeAgo(s.lastRun)}` : `${s.processed} procesados, ${s.failed} fallidos`}
+            description={
+              s.status === 'not_configured' ? 'Tabla no provisionada'
+              : s.status === 'idle' ? 'Provisionado, esperando actividad'
+              : s.lastRun ? `Última ejecución: ${timeAgo(s.lastRun)}${s.processed > 0 ? ` · ${s.processed} activos` : ''}`
+              : s.processed > 0 ? `${s.processed} activos${s.failed > 0 ? `, ${s.failed} con errores` : ''}`
+              : 'Sin actividad reciente'
+            }
             chipLabel={statusLabel(s.status)}
           />
         </Grid>

@@ -21,12 +21,17 @@ const safeCount = async (query: string, params?: unknown[]): Promise<number> => 
 
 // ── Subsystem health derivation ──
 
-type HealthStatus = 'healthy' | 'degraded' | 'down' | 'not_configured'
+type HealthStatus = 'healthy' | 'degraded' | 'down' | 'not_configured' | 'idle'
 
-const deriveHealth = (processed: number, failed: number, lastRun: string | null, tableExists: boolean): HealthStatus => {
-  // No table or no data yet — not a failure, just not configured
-  if (!tableExists || (processed === 0 && failed === 0 && !lastRun)) return 'not_configured'
-  if (!lastRun && failed === 0) return 'healthy' // Table exists, no failures, no timestamp tracked
+const deriveHealth = (processed: number, failed: number, lastRun: string | null, tblExists: boolean): HealthStatus => {
+  // Table doesn't exist at all
+  if (!tblExists) return 'not_configured'
+
+  // Table exists but no data ever — system is provisioned but idle
+  if (processed === 0 && failed === 0 && !lastRun) return 'idle'
+
+  // No failures and no tracked lastRun — healthy
+  if (!lastRun && failed === 0) return 'healthy'
 
   if (lastRun) {
     const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
@@ -117,13 +122,22 @@ export async function GET() {
   // space_notion_sources always exists if activeSyncs > 0
   const hasNotionSync = activeSyncs > 0
 
+  // Count real services and ICO metrics for accurate status
+  const servicesCount = hasServices
+    ? await safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.services WHERE active = TRUE`)
+    : 0
+
+  const icoMetricsCount = hasIcoMetrics
+    ? await safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_serving.ico_member_metrics`)
+    : 0
+
   const subsystems = [
     { name: 'Outbox', status: deriveHealth(outboxProcessed, outboxFailed, outboxLastRun as string | null, hasOutbox), processed: outboxProcessed, failed: outboxFailed, lastRun: outboxLastRun },
     { name: 'Proyecciones', status: deriveHealth(projCompleted, projFailed, projLastRun as string | null, hasProjections), processed: projCompleted, failed: projFailed, lastRun: projLastRun },
     { name: 'Notificaciones', status: deriveHealth(notifTotal, notifFailed, null, hasNotifications), processed: notifTotal, failed: notifFailed, lastRun: null },
     { name: 'Notion Sync', status: deriveHealth(activeSyncs, 0, notionLastSync as string | null, hasNotionSync), processed: activeSyncs, failed: 0, lastRun: notionLastSync },
-    { name: 'Services Sync', status: deriveHealth(1, 0, servicesLastSync as string | null, hasServices), processed: 0, failed: 0, lastRun: servicesLastSync },
-    { name: 'ICO Sync', status: deriveHealth(1, 0, icoLastSync as string | null, hasIcoMetrics), processed: 0, failed: 0, lastRun: icoLastSync }
+    { name: 'Services Sync', status: deriveHealth(servicesCount, 0, servicesLastSync as string | null, hasServices), processed: servicesCount, failed: 0, lastRun: servicesLastSync },
+    { name: 'ICO Sync', status: deriveHealth(icoMetricsCount, 0, icoLastSync as string | null, hasIcoMetrics), processed: icoMetricsCount, failed: 0, lastRun: icoLastSync }
   ]
 
   // Recent events
