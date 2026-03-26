@@ -10,6 +10,19 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+const getCurrentSantiagoPeriod = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+
+  if (!match) {
+    const now = new Date()
+
+    return { year: now.getFullYear(), month: now.getMonth() + 1 }
+  }
+
+  return { year: Number(match[1]), month: Number(match[2]) }
+}
+
 const overlayCapacityEconomics = <
   T extends {
     period: { year: number; month: number }
@@ -118,9 +131,7 @@ export async function GET(
   const trendMonths = Math.min(24, Math.max(1, Number(searchParams.get('trend') || '6')))
 
   try {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
+    const { year, month } = getCurrentSantiagoPeriod()
 
     const [current, trend, currentEconomics, trendEconomics] = await Promise.all([
       readPersonIntelligence(memberId, year, month),

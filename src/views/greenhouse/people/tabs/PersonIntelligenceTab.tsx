@@ -59,6 +59,12 @@ const fmtNum = (v: number | null | undefined, suffix = ''): string =>
 
 const fmtClp = (v: number | null | undefined): string =>
   v != null ? `$${Math.round(v).toLocaleString('es-CL')}` : '—'
+const fmtMoney = (v: number | null | undefined, currency: string | null | undefined): string => {
+  if (v == null) return '—'
+  if (currency === 'USD') return `US$${Math.round(v).toLocaleString('en-US')}`
+
+  return `$${Math.round(v).toLocaleString('es-CL')}`
+}
 
 const fmtUsage = (kind: string | undefined, usedHours: number | null | undefined, usagePercent: number | null | undefined): string => {
   if (kind === 'hours') return fmtNum(usedHours, 'h')
@@ -289,7 +295,7 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
             <Grid container spacing={3}>
               <Grid size={{ xs: 6 }}>
                 <Typography variant='caption' color='text.secondary'>Compensación mensual</Typography>
-                <Typography variant='h6'>{fmtClp(cost.monthlyTotalComp)}</Typography>
+                <Typography variant='h6'>{fmtMoney(cost.monthlyTotalComp, cost.currency)}</Typography>
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <Typography variant='caption' color='text.secondary'>Moneda</Typography>
@@ -297,7 +303,7 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <Typography variant='caption' color='text.secondary'>Salario base</Typography>
-                <Typography variant='body1' fontWeight={600}>{fmtClp(cost.monthlyBaseSalary)}</Typography>
+                <Typography variant='body1' fontWeight={600}>{fmtMoney(cost.monthlyBaseSalary, cost.currency)}</Typography>
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <Typography variant='caption' color='text.secondary'>Costo por activo</Typography>

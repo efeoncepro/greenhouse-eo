@@ -161,8 +161,8 @@ const refreshPersonIntelligence = async (
   const targetCostBasis = memberCapacity?.totalLaborCostTarget ?? null
   const costPerAsset = targetCostBasis != null && throughputCount != null && throughputCount > 0
     ? Math.round(targetCostBasis / throughputCount)
-    : derived.costPerAsset
-  const costPerHour = memberCapacity?.costPerHourTarget ?? derived.costPerHour
+    : null
+  const costPerHour = memberCapacity?.costPerHourTarget ?? null
 
   // 7. Upsert
   await upsertPersonIntelligence({

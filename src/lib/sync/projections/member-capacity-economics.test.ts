@@ -210,7 +210,7 @@ describe('memberCapacityEconomicsProjection', () => {
         {
           expense_count: 2,
           total_shared_overhead_target: 320000,
-          active_member_count: 4
+          billable_member_count: 4
         }
       ])
 

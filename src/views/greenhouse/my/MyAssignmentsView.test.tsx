@@ -20,13 +20,13 @@ describe('MyAssignmentsView', () => {
     vi.unstubAllGlobals()
   })
 
-  it('uses member_capacity_economics summary for commercial availability and operational usage', async () => {
+  it('renders the canonical capacity snapshot instead of recomputing usage from assignments', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
         assignments: [
           {
-            assignmentId: 'a-1',
+            assignmentId: 'asg-1',
             clientId: 'client-sky',
             clientName: 'Sky Airline',
             fteAllocation: 1,
@@ -48,8 +48,8 @@ describe('MyAssignmentsView', () => {
           commercialAvailabilityHours: 0,
           operationalAvailabilityHours: null,
           targetCurrency: 'CLP',
-          costPerHourTarget: 13500,
-          suggestedBillRateTarget: 18225
+          costPerHourTarget: 12937.5,
+          suggestedBillRateTarget: 17465.63
         }
       })
     })
@@ -60,11 +60,9 @@ describe('MyAssignmentsView', () => {
       expect(screen.getByText('Mis Asignaciones')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('Horas asignadas')).toBeInTheDocument()
-    expect(screen.getByText('Disponible comercial')).toBeInTheDocument()
+    expect(screen.getByText('FTE asignado')).toBeInTheDocument()
     expect(screen.getByText('Uso operativo')).toBeInTheDocument()
-    expect(screen.getByText('Índice operativo')).toBeInTheDocument()
     expect(screen.getAllByText('86%').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('0h').length).toBeGreaterThan(0)
+    expect(screen.getByText('0h')).toBeInTheDocument()
   })
 })

@@ -2,6 +2,20 @@
 
 ## Delta 2026-03-26
 
+- Se cerró el corte de `People > Person Intelligence` y `My > Performance/Assignments` a la semántica canónica del período actual en `America/Santiago`:
+  - los readers ya no dependen del mes UTC implícito del servidor
+  - `Person Intelligence` preserva moneda fuente (`USD`/`CLP`) al presentar compensación mensual y salario base
+  - `person_intelligence` dejó de inventar `costPerHour` y `costPerAsset` desde fórmulas derivadas cuando falta el snapshot canónico
+- El reparto de `shared_overhead_target` cambió de “todos los miembros activos” a cohort billable del período:
+  - solo miembros con al menos una asignación externa activa y solapada con el período
+  - se sigue ponderando por `contracted_hours`
+  - esto alinea la proyección con la semántica comercial ya usada en `Agency > Team`
+- `direct_overhead_target` sigue en `0` por falta de fuente canónica madura; la decisión quedó reafirmada tras auditoría del repo.
+- Validación ejecutada en este sub-slice:
+  - `pnpm test src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projections/person-intelligence.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx src/app/api/my/assignments/route.test.ts src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 - Se enriqueció `member_capacity_economics` con `shared_overhead_target` desde `greenhouse_finance.expenses`:
   - fuente mínima defendible: egresos no asignados a cliente
   - categorías incluidas en esta iteración: `operational`, `infrastructure`, `tax_social`

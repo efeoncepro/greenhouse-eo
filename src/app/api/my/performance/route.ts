@@ -7,6 +7,19 @@ import { readPersonIntelligence, readPersonIntelligenceTrend } from '@/lib/perso
 
 export const dynamic = 'force-dynamic'
 
+const getCurrentSantiagoPeriod = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+
+  if (!match) {
+    const now = new Date()
+
+    return { year: now.getFullYear(), month: now.getMonth() + 1 }
+  }
+
+  return { year: Number(match[1]), month: Number(match[2]) }
+}
+
 export async function GET() {
   const { tenant, memberId, errorResponse } = await requireMyTenantContext()
 
@@ -15,12 +28,12 @@ export async function GET() {
   }
 
   try {
-    const now = new Date()
+    const { year, month } = getCurrentSantiagoPeriod()
 
     const [ico, operational, intelligence, trend] = await Promise.allSettled([
       getPersonIcoProfile(memberId, 6),
       getPersonOperationalServing(memberId),
-      readPersonIntelligence(memberId, now.getFullYear(), now.getMonth() + 1),
+      readPersonIntelligence(memberId, year, month),
       readPersonIntelligenceTrend(memberId, 6)
     ])
 

@@ -86,7 +86,7 @@ type ExchangeRateRow = {
 type SharedOverheadPoolRow = {
   expense_count: number | string
   total_shared_overhead_target: number | string | null
-  active_member_count: number | string
+  billable_member_count: number | string
 }
 
 type Period = {
@@ -347,10 +347,10 @@ const buildSharedOverheadPool = (
   }
 
   const totalSharedOverheadTarget = toNullableNum(row.total_shared_overhead_target)
-  const activeMemberCount = Math.max(0, Math.round(toNum(row.active_member_count)))
-  const totalWeight = activeMemberCount * CAPACITY_HOURS_PER_FTE
+  const billableMemberCount = Math.max(0, Math.round(toNum(row.billable_member_count)))
+  const totalWeight = billableMemberCount * CAPACITY_HOURS_PER_FTE
 
-  if (totalSharedOverheadTarget === null || activeMemberCount <= 0 || totalWeight <= 0) {
+  if (totalSharedOverheadTarget === null || billableMemberCount <= 0 || totalWeight <= 0) {
     return { pool: null, totalWeight: 0 }
   }
 
@@ -609,10 +609,14 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
         COUNT(*)::int AS expense_count,
         COALESCE(SUM(total_amount_clp), 0) AS total_shared_overhead_target,
         (
-          SELECT COUNT(*)::int
-          FROM greenhouse_core.members
+          SELECT COUNT(DISTINCT member_id)::int
+          FROM greenhouse_core.client_team_assignments
           WHERE active = TRUE
-        ) AS active_member_count
+            AND start_date <= $2::date
+            AND (end_date IS NULL OR end_date >= $1::date)
+            AND COALESCE(NULLIF(LOWER(TRIM(client_id)), ''), '__missing__') NOT IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            AND COALESCE(NULLIF(LOWER(TRIM(client_name)), ''), '__missing__') NOT IN ('efeonce internal', 'efeonce')
+        ) AS billable_member_count
       FROM greenhouse_finance.expenses
       WHERE allocated_client_id IS NULL
         AND COALESCE(cost_is_direct, FALSE) = FALSE
