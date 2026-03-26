@@ -49,6 +49,49 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-25 21:50 -03
+
+### Agente
+
+- Codex GPT-5
+
+### Objetivo del turno
+
+- Verificar por qué `staging` seguía mostrando el comportamiento viejo de `Campaigns`, destrabar el pipeline de deploy sin revertir la migración a React Table y dejar inventario de deuda restante.
+
+### Rama
+
+- `develop`
+- destino esperado: `develop`
+
+### Ambiente objetivo
+
+- staging / Vercel
+
+### Archivos tocados
+
+- `postcss.config.mjs`
+- `src/views/greenhouse/finance/ReconciliationView.tsx`
+
+### Verificacion
+
+- `pnpm test src/lib/campaigns/backfill-heuristics.test.ts src/lib/campaigns/campaign-store.test.ts src/app/api/campaigns/route.test.ts src/views/agency/AgencyCampaignsView.test.tsx` — ok (`4 files`, `9 tests`)
+- `pnpm build` — ok
+- `vercel ls --scope efeonce --yes` — confirmó que `dev-greenhouse` seguía sirviendo el último deployment `Ready`
+
+### Riesgos o pendientes
+
+- Hallazgo confirmado: `dev-greenhouse.efeoncepro.com` seguía apuntando al último `staging` `Ready` porque los deploys más recientes fallaron antes de publicar.
+- La causa raíz del fallo ya no es `Campaigns` ni datos de PostgreSQL: era la incompatibilidad de `postcss.config.mjs` entre `Turbopack` y `Vitest`.
+- `postcss.config.mjs` quedó ajustado a sintaxis de objeto (`'@tailwindcss/postcss': {}`), que valida tanto en `pnpm build` como en `Vitest`.
+- `ReconciliationView.tsx` siguió avanzando en la migración a TanStack React Table y el branch volvió a compilar con ese cambio presente.
+- Inventario actual: quedan `42` archivos `.tsx` con tablas legacy sin `@tanstack/react-table` en `src/`.
+- Prioridad sugerida para la migración restante:
+  - `Agency`: `AgencyDeliveryView`, `AgencyOperationsView`, `ServicesListView`, `ServiceDetailView`
+  - `Finance`: `ReconciliationView`, `FinanceDashboardView`, detail views (`Client`, `Income`, `Supplier`, `ReconciliationDetail`)
+  - `HR/Payroll`
+  - luego `Organizations`, `People`, `Admin tenant detail`, `My`
+
 ## 2026-03-25 20:45 -03
 
 ### Agente
