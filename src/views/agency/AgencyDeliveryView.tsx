@@ -11,7 +11,6 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
 
 import {
   createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
@@ -22,14 +21,10 @@ import classnames from 'classnames'
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomerStats from '@components/card-statistics/CustomerStats'
-import AppRecharts from '@/libs/styles/AppRecharts'
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 
 import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──
-
-interface TrendPoint { year: number; month: number; rpaAvg: number | null; otdPct: number | null }
 
 interface SpaceHealth {
   clientId: string
@@ -51,11 +46,19 @@ interface PulseKpis {
 
 // ── Helpers ──
 
-const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-
 type SemaphoreColor = 'success' | 'warning' | 'error'
 
-const semaphore = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
+// RPA is a ratio (1.0-3.0+), lower is better. NOT a percentage.
+const rpaColor = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
+  if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }
+  if (v <= 1.5) return { color: 'success', label: 'Óptimo' }
+  if (v <= 2.5) return { color: 'warning', label: 'Atención' }
+
+  return { color: 'error', label: 'Crítico' }
+}
+
+// OTD/FTR are percentages (0-100), higher is better
+const pctSemaphore = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
   if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }
   if (v >= 80) return { color: 'success', label: 'Óptimo' }
   if (v >= 60) return { color: 'warning', label: 'Atención' }
@@ -63,6 +66,7 @@ const semaphore = (v: number | null | undefined): { color: SemaphoreColor; label
   return { color: 'error', label: 'Crítico' }
 }
 
+const fmtRpa = (v: number | null | undefined) => v != null ? v.toFixed(1) : '—'
 const fmtPct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 
 // ── Delivery table columns ──
@@ -77,12 +81,12 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
   }),
   spaceColumnHelper.accessor('rpaAvg', {
     header: 'RPA',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={semaphore(getValue()).color} label={fmtPct(getValue())} />,
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={rpaColor(getValue()).color} label={fmtRpa(getValue())} />,
     meta: { align: 'center' }
   }),
   spaceColumnHelper.accessor('otdPct', {
     header: 'OTD',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={semaphore(getValue()).color} label={fmtPct(getValue())} />,
+    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={pctSemaphore(getValue()).color} label={fmtPct(getValue())} />,
     meta: { align: 'center' }
   }),
   spaceColumnHelper.accessor('projectCount', {
@@ -101,7 +105,7 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
     header: 'Health',
     accessorFn: (row: SpaceHealth) => row.rpaAvg,
     cell: ({ row }: { row: { original: SpaceHealth } }) => {
-      const h = semaphore(row.original.rpaAvg)
+      const h = rpaColor(row.original.rpaAvg)
 
       return <CustomChip round='true' size='small' variant='tonal' color={h.color} label={h.label} />
     },
@@ -112,10 +116,8 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
 // ── Component ──
 
 const AgencyDeliveryView = () => {
-  const theme = useTheme()
   const [kpis, setKpis] = useState<PulseKpis | null>(null)
   const [spaces, setSpaces] = useState<SpaceHealth[]>([])
-  const [trend, setTrend] = useState<TrendPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [spaceSorting, setSpaceSorting] = useState<SortingState>([{ id: 'rpaAvg', desc: false }])
 
@@ -123,9 +125,9 @@ const AgencyDeliveryView = () => {
     setLoading(true)
 
     try {
-      const [pulseRes, statusRes] = await Promise.allSettled([
+      const [pulseRes, spacesRes] = await Promise.allSettled([
         fetch('/api/agency/pulse'),
-        fetch('/api/agency/pulse')
+        fetch('/api/agency/spaces')
       ])
 
       if (pulseRes.status === 'fulfilled' && pulseRes.value.ok) {
@@ -134,22 +136,13 @@ const AgencyDeliveryView = () => {
         setKpis(d.kpis ?? null)
       }
 
-      if (statusRes.status === 'fulfilled' && statusRes.value.ok) {
-        const d = await statusRes.value.json()
+      if (spacesRes.status === 'fulfilled' && spacesRes.value.ok) {
+        const d = await spacesRes.value.json()
 
-        setSpaces(d.statusMix ?? [])
+        // Filter out internal spaces for delivery view
+        const deliverySpaces = (d.spaces ?? []).filter((s: SpaceHealth & { isInternal?: boolean }) => !s.isInternal)
 
-        // Build trend from weekly activity if available
-        const wa = d.weeklyActivity as Array<{ weekStart: string; completed: number }> | undefined
-
-        if (wa && wa.length > 0) {
-          setTrend(wa.map((w, i) => ({
-            year: new Date(w.weekStart).getFullYear(),
-            month: new Date(w.weekStart).getMonth() + 1,
-            rpaAvg: kpis?.rpaGlobal != null ? kpis.rpaGlobal + (i * 0.5 - wa.length * 0.25) : null,
-            otdPct: kpis?.otdPctGlobal != null ? kpis.otdPctGlobal + (i * 0.3 - wa.length * 0.15) : null
-          })))
-        }
+        setSpaces(deliverySpaces)
       }
     } catch { /* silent */ } finally {
       setLoading(false)
@@ -169,22 +162,16 @@ const AgencyDeliveryView = () => {
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
-  const rpa = kpis?.rpaGlobal ?? 0
-  const otd = kpis?.otdPctGlobal ?? 0
+  const rpa = kpis?.rpaGlobal ?? null
+  const otd = kpis?.otdPctGlobal ?? null
   const stuck = kpis?.assetsActivos ?? 0
   const totalProjects = kpis?.totalProjects ?? 0
   const feedback = kpis?.feedbackPendiente ?? 0
-  const rpaS = semaphore(rpa)
-  const otdS = semaphore(otd)
+  const rpaS = rpaColor(rpa)
+  const otdS = pctSemaphore(otd)
 
-  // Chart data
-  const chartData = trend.length > 0
-    ? trend.map(t => ({
-        label: `${MONTHS[t.month]} '${String(t.year).slice(2)}`,
-        rpa: t.rpaAvg != null ? Math.round(t.rpaAvg) : null,
-        otd: t.otdPct != null ? Math.round(t.otdPct) : null
-      }))
-    : []
+  // Spaces count for display
+  const spaceCount = spaces.length
 
   return (
     <Grid container spacing={6}>
@@ -201,13 +188,13 @@ const AgencyDeliveryView = () => {
 
       {/* KPI Row 1 */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Proyectos activos' stats={String(totalProjects)} avatarIcon='tabler-folders' avatarColor='success' subtitle={`${spaces.length} Spaces`} />
+        <HorizontalWithSubtitle title='Proyectos activos' stats={String(totalProjects)} avatarIcon='tabler-folders' avatarColor='success' subtitle={`${spaceCount} Spaces`} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle title='Feedback pendiente' stats={String(feedback)} avatarIcon='tabler-message-dots' avatarColor='info' subtitle='Revisiones abiertas' />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='RPA promedio' stats={fmtPct(rpa)} avatarIcon='tabler-chart-line' avatarColor={rpaS.color} subtitle={rpaS.label} />
+        <HorizontalWithSubtitle title='RPA promedio' stats={fmtRpa(rpa)} avatarIcon='tabler-chart-line' avatarColor={rpaS.color} subtitle={rpaS.label} />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle title='OTD' stats={fmtPct(otd)} avatarIcon='tabler-clock-check' avatarColor={otdS.color} subtitle={otdS.label} />
@@ -220,52 +207,6 @@ const AgencyDeliveryView = () => {
       <Grid size={{ xs: 12, sm: 6 }}>
         <HorizontalWithSubtitle title='Spaces totales' stats={String(spaces.length)} avatarIcon='tabler-building' avatarColor='primary' subtitle='Con delivery activo' />
       </Grid>
-
-      {/* Trend Chart */}
-      {chartData.length > 1 && (
-        <Grid size={{ xs: 12 }}>
-          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-            <CardHeader
-              title='Tendencia de rendimiento'
-              subheader='Últimos períodos'
-              avatar={<Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}><i className='tabler-chart-dots' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} /></Avatar>}
-            />
-            <Divider />
-            <CardContent>
-              <AppRecharts>
-                <ResponsiveContainer width='100%' height={300}>
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray='3 3' />
-                    <XAxis dataKey='label' />
-                    <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} />
-                    <Tooltip formatter={(v) => `${v}%`} />
-                    <Legend />
-                    <Area
-                      type='monotone'
-                      dataKey='rpa'
-                      stroke={theme.palette.success.main}
-                      fill={theme.palette.success.main}
-                      fillOpacity={0.1}
-                      strokeDasharray='5 5'
-                      strokeWidth={2}
-                      name='RPA %'
-                    />
-                    <Area
-                      type='monotone'
-                      dataKey='otd'
-                      stroke={theme.palette.info.main}
-                      fill={theme.palette.info.main}
-                      fillOpacity={0.1}
-                      strokeWidth={2}
-                      name='OTD %'
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </AppRecharts>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
 
       {/* Projects Table + Sprint Status */}
       <Grid size={{ xs: 12, md: 8 }}>
