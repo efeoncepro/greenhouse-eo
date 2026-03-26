@@ -7,6 +7,8 @@ import { icoMemberProjection } from './ico-member-metrics'
 import { clientEconomicsProjection } from './client-economics'
 import { organizationExecutiveProjection } from './organization-executive'
 import { personIntelligenceProjection } from './person-intelligence'
+import { icoOrganizationProjection } from './ico-organization-metrics'
+import { organizationOperationalProjection } from './organization-operational'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -24,4 +26,6 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(clientEconomicsProjection)
   registerProjection(organizationExecutiveProjection)
   registerProjection(personIntelligenceProjection) // Replaces personOperationalProjection
+  registerProjection(icoOrganizationProjection)
+  registerProjection(organizationOperationalProjection)
 }

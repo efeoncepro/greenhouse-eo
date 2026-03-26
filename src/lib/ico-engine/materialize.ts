@@ -13,12 +13,12 @@ interface MaterializationResult {
   projectMetricsWritten: number
   memberMetricsWritten: number
   sprintMetricsWritten: number
+  organizationMetricsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
   engineVersion: string
 }
-
 interface CscDistributionRow {
   space_id: string
   fase_csc: string
@@ -216,6 +216,38 @@ export const materializeMonthlySnapshots = async (
   // Step 8: Materialize sprint-level metrics for current period
   const sprintMetricsWritten = await materializeSprintMetrics(projectId, periodYear, periodMonth)
 
+  // Step 9: Materialize organization-level metrics for current period
+  const organizationMetricsWritten = await materializeOrganizationMetrics(projectId, periodYear, periodMonth)
+
+  // Step 9b: Publish ico.materialization.completed for each affected organization
+  if (organizationMetricsWritten > 0) {
+    try {
+      const orgRows = await runIcoEngineQuery<{ organization_id: string }>(
+        `SELECT DISTINCT organization_id FROM \`${projectId}.ico_engine.metrics_by_organization\`
+         WHERE period_year = @year AND period_month = @month`,
+        { year: periodYear, month: periodMonth }
+      )
+
+      const orgIds = orgRows.map(r => r.organization_id).filter(Boolean)
+
+      // Import publishOutboxEvent lazily to avoid circular deps
+      const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
+
+      for (const orgId of orgIds) {
+        await publishOutboxEvent({
+          aggregateType: 'ico_materialization',
+          aggregateId: `ico-mat-org-${periodYear}-${periodMonth}-${orgId}`,
+          eventType: 'ico.materialization.completed',
+          payload: { organizationId: orgId, periodYear, periodMonth, organizationMetricsWritten }
+        }).catch(() => {
+          // Non-blocking
+        })
+      }
+    } catch {
+      // Non-blocking
+    }
+  }
+
   return {
     spacesProcessed: totalSnapshots,
     snapshotsWritten: totalSnapshots,
@@ -224,6 +256,7 @@ export const materializeMonthlySnapshots = async (
     projectMetricsWritten,
     memberMetricsWritten,
     sprintMetricsWritten,
+    organizationMetricsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,
@@ -450,4 +483,49 @@ const materializeSprintMetrics = async (
   `, { periodYear, periodMonth })
 
   return toNumber(sprintCountRows[0]?.cnt)
+}
+
+// ─── Organization-Level Metrics Materialization ────────────────────────────────
+const materializeOrganizationMetrics = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
+      (organization_id, period_year, period_month,
+       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       materialized_at)
+    SELECT
+      client_id AS organization_id,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+
+      ${buildMetricSelectSQL()},
+
+      CURRENT_TIMESTAMP() AS materialized_at
+
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    WHERE client_id IS NOT NULL
+      AND client_id != ''
+      AND (${buildPeriodFilterSQL()})
+    GROUP BY client_id
+  `, { periodYear, periodMonth })
+
+  const orgCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(orgCountRows[0]?.cnt)
 }
