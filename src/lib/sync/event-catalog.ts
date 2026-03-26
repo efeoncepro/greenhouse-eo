@@ -145,5 +145,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.compensationUpdated,
   EVENT_TYPES.icoMaterializationCompleted,
   EVENT_TYPES.memberCreated,
-  EVENT_TYPES.memberUpdated
+  EVENT_TYPES.memberUpdated,
+
+  // Payroll compensation (published by payroll store directly)
+  'compensation_version.created' as EventType
 ] as const

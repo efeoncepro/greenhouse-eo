@@ -232,6 +232,7 @@ export const personIntelligenceProjection: ProjectionDefinition = {
     'assignment.updated',
     'assignment.removed',
     'compensation.updated',
+    'compensation_version.created',
     'ico.materialization.completed'
   ],
 

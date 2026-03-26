@@ -184,6 +184,35 @@ export const materializeMonthlySnapshots = async (
   // Step 7: Materialize member-level metrics for current period
   const memberMetricsWritten = await materializeMemberMetrics(projectId, periodYear, periodMonth)
 
+  // Step 7b: Publish ico.materialization.completed for each affected member
+  if (memberMetricsWritten > 0) {
+    try {
+      const memberRows = await runIcoEngineQuery<{ member_id: string }>(
+        `SELECT DISTINCT member_id FROM \`${projectId}.ico_engine.metrics_by_member\`
+         WHERE period_year = @year AND period_month = @month`,
+        { year: periodYear, month: periodMonth }
+      )
+
+      const memberIds = memberRows.map(r => r.member_id).filter(Boolean)
+
+      // Import publishOutboxEvent lazily to avoid circular deps
+      const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
+
+      for (const memberId of memberIds) {
+        await publishOutboxEvent({
+          aggregateType: 'ico_materialization',
+          aggregateId: `ico-mat-${periodYear}-${periodMonth}-${memberId}`,
+          eventType: 'ico.materialization.completed',
+          payload: { memberId, periodYear, periodMonth, memberMetricsWritten }
+        }).catch(() => {
+          // Non-blocking — outbox publish failure should not break materialization
+        })
+      }
+    } catch {
+      // Non-blocking — if outbox not available, materialization still succeeds
+    }
+  }
+
   // Step 8: Materialize sprint-level metrics for current period
   const sprintMetricsWritten = await materializeSprintMetrics(projectId, periodYear, periodMonth)
 
