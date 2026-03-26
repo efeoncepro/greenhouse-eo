@@ -215,7 +215,7 @@ const normalizeHistoryEntry = (r: HistoryRow): ServiceHistoryEntry => ({
 
 const LIST_COLUMNS = `
   s.service_id, s.public_id, s.name,
-  s.space_id, sp.display_name AS space_name,
+  s.space_id, sp.space_name AS space_name,
   s.organization_id, o.organization_name,
   s.pipeline_stage, s.linea_de_servicio, s.servicio_especifico,
   s.modalidad, s.billing_frequency, s.country,
