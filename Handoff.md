@@ -49,6 +49,48 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 08:00 -03
+
+### Agente
+
+- Claude Opus 4.6 (1M context)
+
+### Objetivo del turno
+
+- ICO Engine Expansion: Person Operational Intelligence end-to-end
+- Assignee resolution pipeline (Notion responsable → member_id)
+- Data pipeline verification + materialization
+
+### Lo completado
+
+| Pieza | Estado |
+|-------|--------|
+| ICO Metric Registry | MetricScope + composite kind + 6 person metrics |
+| Compute functions | 15 unit tests, pure functions |
+| person_operational_360 | 4 members with real capacity/utilization data |
+| Reactive projection | person_intelligence (7 trigger events) |
+| API /intelligence | GET /api/people/:id/intelligence?trend=6 |
+| PersonIntelligenceTab | 8 KPIs + trend chart + capacity + cost + delivery grid |
+| Assignee backfill | 1403/2832 tasks resolved (49.5%) |
+| BQ member metrics | 4 members materialized from v_tasks_enriched |
+| Services fix | sp.display_name → sp.space_name |
+| Delivery fix | RPA ratio display, correct API calls |
+| Notion user IDs | daniela-ferreira + melkin-hernandez updated |
+
+### Descubrimientos
+
+- delivery_tasks.assignee_member_id estaba NULL en 100% tasks — resuelto con backfill
+- metrics_by_member tenía 0 rows — resuelto con materialización manual
+- RPA/OTD/FTR per-member null para marzo (no hay completed tasks este período)
+
+### Pendientes
+
+- Notion sync pipeline: agregar mapping automático Responsable → member_id
+- TASK-053/054: tablas TanStack pendientes
+- Frontend integration de PersonIntelligenceTab con datos reales (visible tras deploy)
+
+---
+
 ## 2026-03-26 07:50 -03
 
 ### Agente
