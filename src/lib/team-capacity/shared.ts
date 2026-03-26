@@ -1,6 +1,14 @@
 import type { TeamCapacityHealth, TeamRoleCategory } from '@/types/team'
+import {
+  buildCapacityEnvelope,
+  clampFte,
+  clampPercent,
+  DEFAULT_MONTHLY_BASE_HOURS,
+  fteToHours,
+  roundToTenths
+} from '@/lib/team-capacity/units'
 
-export const CAPACITY_HOURS_PER_FTE = 160
+export const CAPACITY_HOURS_PER_FTE = DEFAULT_MONTHLY_BASE_HOURS
 
 const throughputBenchmarks: Record<TeamRoleCategory, number> = {
   account: 30,
@@ -12,13 +20,9 @@ const throughputBenchmarks: Record<TeamRoleCategory, number> = {
   unknown: 18
 }
 
-export const roundToTenths = (value: number) => Math.round(value * 10) / 10
+export { roundToTenths, clampPercent, clampFte }
 
-export const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
-
-export const clampFte = (value: number, maxFte = 1) => roundToTenths(Math.max(0, Math.min(maxFte, value)))
-
-export const getAssignedHoursMonth = (fteAllocation: number) => Math.round(Math.max(0, fteAllocation) * CAPACITY_HOURS_PER_FTE)
+export const getAssignedHoursMonth = (fteAllocation: number) => fteToHours(Math.max(0, fteAllocation))
 
 export const getExpectedMonthlyThroughput = ({
   roleCategory,
@@ -73,6 +77,8 @@ export interface CapacityBreakdown {
   assignedHoursMonth: number
   usedHoursMonth: number | null
   availableHoursMonth: number
+  commercialAvailabilityHours?: number
+  operationalAvailabilityHours?: number | null
   overcommitted: boolean
 }
 
@@ -90,14 +96,20 @@ export const computeCapacityBreakdown = ({
   const assigned = getAssignedHoursMonth(fteAllocation)
   const contracted = contractedHoursMonth ?? assigned
   const used = hasUsageData ? Math.round(assigned * (utilizationPercent / 100)) : null
-  const available = contracted - assigned
+  const envelope = buildCapacityEnvelope({
+    contractedFte: contracted / CAPACITY_HOURS_PER_FTE,
+    assignedHours: assigned,
+    usedHours: used
+  })
 
   return {
     contractedHoursMonth: contracted,
     assignedHoursMonth: assigned,
     usedHoursMonth: used,
-    availableHoursMonth: available,
-    overcommitted: assigned > contracted
+    availableHoursMonth: envelope.commercialAvailabilityHours,
+    commercialAvailabilityHours: envelope.commercialAvailabilityHours,
+    operationalAvailabilityHours: envelope.operationalAvailabilityHours,
+    overcommitted: envelope.overassignedCommercially
   }
 }
 
@@ -116,6 +128,8 @@ export const aggregateCapacityBreakdown = (breakdowns: CapacityBreakdown[]): Cap
     assignedHoursMonth: assigned,
     usedHoursMonth: used,
     availableHoursMonth: available,
+    commercialAvailabilityHours: available,
+    operationalAvailabilityHours: used !== null ? contracted - used : null,
     overcommitted: available < 0
   }
 }

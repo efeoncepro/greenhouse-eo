@@ -2,12 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
 import {
-  computeCapacityBreakdown,
-  aggregateCapacityBreakdown,
-  clampFte,
-  getExpectedMonthlyThroughput,
-  getUtilizationPercent,
   getCapacityHealth,
   type CapacityBreakdown
 } from '@/lib/team-capacity/shared'
@@ -25,42 +21,6 @@ interface AssignmentRow extends Record<string, unknown> {
   contracted_hours_month: number | null
   client_id: string | null
   client_name: string | null
-}
-
-interface LatestMetricsRow extends Record<string, unknown> {
-  member_id: string
-  period_year: string | number
-  period_month: string | number
-  active_tasks: string | number | null
-  completed_tasks: string | number | null
-  throughput_count: string | number | null
-}
-
-const toNum = (v: unknown): number => {
-  if (typeof v === 'number') return v
-
-  if (typeof v === 'string') { const n = Number(v);
-
- 
-
-return Number.isFinite(n) ? n : 0 }
-
-  return 0
-}
-
-const inferRoleCategory = (roleTitle: string | null): TeamRoleCategory => {
-  if (!roleTitle) return 'unknown'
-
-  const lower = roleTitle.toLowerCase()
-
-  if (lower.includes('account') || lower.includes('ejecutiv')) return 'account'
-  if (lower.includes('operation') || lower.includes('project') || lower.includes('tráfico')) return 'operations'
-  if (lower.includes('strate') || lower.includes('plan')) return 'strategy'
-  if (lower.includes('diseñ') || lower.includes('design') || lower.includes('art')) return 'design'
-  if (lower.includes('develop') || lower.includes('dev') || lower.includes('front') || lower.includes('back')) return 'development'
-  if (lower.includes('media') || lower.includes('pauta') || lower.includes('social')) return 'media'
-
-  return 'unknown'
 }
 
 const isInternalClientAssignment = (row: AssignmentRow) => {
@@ -140,30 +100,15 @@ export async function GET() {
       })
 
     const memberIds = Array.from(new Set(rows.map(row => row.member_id)))
-    const latestMetricsRows = memberIds.length > 0
-      ? await withTimeout(
-          runGreenhousePostgresQuery<LatestMetricsRow>(
-            `WITH ranked AS (
-              SELECT
-                member_id,
-                period_year,
-                period_month,
-                active_tasks,
-                completed_tasks,
-                throughput_count,
-                ROW_NUMBER() OVER (PARTITION BY member_id ORDER BY period_year DESC, period_month DESC) AS rn
-              FROM greenhouse_serving.ico_member_metrics
-              WHERE member_id = ANY($1::text[])
-            )
-            SELECT member_id, period_year, period_month, active_tasks, completed_tasks, throughput_count
-            FROM ranked
-            WHERE rn = 1`,
-            [memberIds]
-          ),
-          'team capacity metrics query'
-        ).catch(() => [] as LatestMetricsRow[])
-      : []
-    const latestMetricsByMember = new Map(latestMetricsRows.map(row => [row.member_id, row]))
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+    const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+    const currentYear = match ? Number(match[1]) : new Date().getFullYear()
+    const currentMonth = match ? Number(match[2]) : new Date().getMonth() + 1
+    const snapshots = await readMemberCapacityEconomicsBatch({
+      memberIds,
+      year: currentYear,
+      month: currentMonth
+    }).catch(() => new Map())
     const rowsByMember = new Map<string, AssignmentRow[]>()
 
     for (const row of rows) {
@@ -177,9 +122,16 @@ export async function GET() {
       displayName: string
       roleTitle: string | null
       fteAllocation: number
+      usageKind: 'none' | 'hours' | 'percent' | string
+      usagePercent: number | null
       utilizationPercent: number
       capacityHealth: string
       capacity: CapacityBreakdown
+      intelligence: {
+        costPerHour: number | null
+        suggestedBillRate: number | null
+        targetCurrency: string | null
+      } | null
     }> = []
 
     for (const [memberId, memberRows] of rowsByMember.entries()) {
@@ -190,106 +142,76 @@ export async function GET() {
         continue
       }
 
-      const latestMetrics = latestMetricsByMember.get(memberId)
+      const snapshot = snapshots.get(memberId)
 
-      if (!latestMetrics) {
+      if (!snapshot || snapshot.usageKind === 'none') {
         continue
       }
 
-      const totalActiveFte = memberRows.reduce((sum, row) => sum + toNum(row.fte_allocation), 0)
-      const clientFacingFte = externalAssignments.reduce((sum, row) => sum + toNum(row.fte_allocation), 0)
-      const contractedFte = clampFte(totalActiveFte)
-      const assignedFte = Math.min(clientFacingFte, contractedFte)
-      const contractedHoursMonth = Math.round(contractedFte * 160)
-      const roleCategory = primaryRow.role_category || inferRoleCategory(primaryRow.role_title)
-      const activityCount = Math.max(
-        toNum(latestMetrics.throughput_count),
-        toNum(latestMetrics.completed_tasks),
-        toNum(latestMetrics.active_tasks)
-      )
-      const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation: assignedFte })
-      const utilizationPercent = getUtilizationPercent({ activeAssets: activityCount, expectedMonthlyThroughput: expectedThroughput })
-
-      const capacity = computeCapacityBreakdown({
-        fteAllocation: assignedFte,
-        contractedHoursMonth,
-        utilizationPercent,
-        hasUsageData: true
-      })
+      const utilizationPercent = snapshot.usagePercent ?? 0
+      const assignedFte = snapshot.contractedFte
+      const capacity: CapacityBreakdown = {
+        contractedHoursMonth: snapshot.contractedHours,
+        assignedHoursMonth: snapshot.assignedHours,
+        usedHoursMonth: snapshot.usedHours,
+        availableHoursMonth: snapshot.commercialAvailabilityHours,
+        commercialAvailabilityHours: snapshot.commercialAvailabilityHours,
+        operationalAvailabilityHours: snapshot.operationalAvailabilityHours,
+        overcommitted: snapshot.assignedHours > snapshot.contractedHours
+      }
 
       memberBreakdowns.push({
         memberId,
         displayName: primaryRow.display_name,
         roleTitle: primaryRow.role_title,
         fteAllocation: assignedFte,
+        usageKind: snapshot.usageKind,
+        usagePercent: snapshot.usagePercent,
         utilizationPercent,
-        capacityHealth: getCapacityHealth(utilizationPercent),
-        capacity
+        capacityHealth: getCapacityHealth(utilizationPercent || (snapshot.assignedHours >= snapshot.contractedHours ? 85 : 0)),
+        capacity,
+        intelligence: {
+          costPerHour: snapshot.costPerHourTarget,
+          suggestedBillRate: snapshot.suggestedBillRateTarget,
+          targetCurrency: snapshot.targetCurrency
+        }
       })
     }
-
-    // Enrich with person_operational_360 intelligence (quality, dedication, cost)
-    const enrichedMemberIds = memberBreakdowns.map(m => m.memberId)
-
-    interface IntelligenceRow extends Record<string, unknown> {
-      member_id: string
-      quality_index: string | number | null
-      dedication_index: string | number | null
-      cost_per_asset: string | number | null
-      cost_per_hour: string | number | null
-      rpa_avg: string | number | null
-      otd_pct: string | number | null
-      ftr_pct: string | number | null
+    const totalContracted = memberBreakdowns.reduce((sum, m) => sum + m.capacity.contractedHoursMonth, 0)
+    const totalAssigned = memberBreakdowns.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0)
+    const totalUsed = memberBreakdowns.every(m => m.capacity.usedHoursMonth !== null)
+      ? memberBreakdowns.reduce((sum, m) => sum + (m.capacity.usedHoursMonth ?? 0), 0)
+      : null
+    const weightedUsagePercent = memberBreakdowns.length > 0
+      ? Math.round(
+          memberBreakdowns.reduce((sum, m) => sum + ((m.usagePercent ?? 0) * m.capacity.assignedHoursMonth), 0) /
+          Math.max(1, memberBreakdowns.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0))
+        )
+      : null
+    const teamTotal = {
+      contractedHoursMonth: totalContracted,
+      assignedHoursMonth: totalAssigned,
+      usedHoursMonth: totalUsed,
+      availableHoursMonth: memberBreakdowns.reduce((sum, m) => sum + m.capacity.availableHoursMonth, 0),
+      commercialAvailabilityHours: memberBreakdowns.reduce((sum, m) => sum + (m.capacity.commercialAvailabilityHours ?? 0), 0),
+      operationalAvailabilityHours: totalUsed === null ? null : Math.max(0, totalContracted - totalUsed),
+      usageKind: totalUsed !== null ? 'hours' : weightedUsagePercent !== null ? 'percent' : 'none',
+      usagePercent: totalUsed === null ? weightedUsagePercent : null,
+      overcommitted: memberBreakdowns.some(m => m.capacity.overcommitted)
     }
-
-    const intelligenceRows = enrichedMemberIds.length > 0
-      ? await withTimeout(
-          runGreenhousePostgresQuery<IntelligenceRow>(
-            `SELECT member_id, quality_index, dedication_index, cost_per_asset, cost_per_hour,
-                    rpa_avg, otd_pct, ftr_pct
-             FROM greenhouse_serving.person_operational_360
-             WHERE member_id = ANY($1::text[])
-               AND period_year = EXTRACT(YEAR FROM CURRENT_DATE)
-               AND period_month = EXTRACT(MONTH FROM CURRENT_DATE)`,
-            [enrichedMemberIds]
-          ),
-          'person intelligence query'
-        ).catch(() => [] as IntelligenceRow[])
-      : []
-
-    const intelligenceByMember = new Map(intelligenceRows.map(r => [r.member_id, r]))
-
-    const enrichedMembers = memberBreakdowns.map(m => {
-      const intel = intelligenceByMember.get(m.memberId)
-
-      return {
-        ...m,
-        intelligence: intel ? {
-          qualityIndex: toNum(intel.quality_index) || null,
-          dedicationIndex: toNum(intel.dedication_index) || null,
-          costPerAsset: toNum(intel.cost_per_asset) || null,
-          costPerHour: toNum(intel.cost_per_hour) || null,
-          rpaAvg: toNum(intel.rpa_avg) || null,
-          otdPct: toNum(intel.otd_pct) || null,
-          ftrPct: toNum(intel.ftr_pct) || null
-        } : null
-      }
-    })
-
-    const teamTotal = aggregateCapacityBreakdown(memberBreakdowns.map(m => m.capacity))
     const overcommittedCount = memberBreakdowns.filter(m => m.capacity.overcommitted).length
 
     return NextResponse.json(
       {
         team: teamTotal,
-        members: enrichedMembers,
-        memberCount: enrichedMembers.length,
-        hasOperationalMetrics: enrichedMembers.length > 0,
+        members: memberBreakdowns,
+        memberCount: memberBreakdowns.length,
+        hasOperationalMetrics: memberBreakdowns.some(m => m.usageKind !== 'none'),
         overcommittedCount,
-        overcommittedMembers: enrichedMembers.filter(m => m.capacity.overcommitted).map(m => ({
+        overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
           memberId: m.memberId,
           displayName: m.displayName,
-          deficit: Math.abs(m.capacity.availableHoursMonth)
+          deficit: Math.abs(m.capacity.commercialAvailabilityHours ?? m.capacity.availableHoursMonth)
         }))
       },
       {

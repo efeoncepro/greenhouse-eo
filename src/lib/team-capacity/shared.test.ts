@@ -31,7 +31,8 @@ describe('computeCapacityBreakdown', () => {
     })
 
     expect(result.overcommitted).toBe(true)
-    expect(result.availableHoursMonth).toBeLessThan(0)
+    expect(result.availableHoursMonth).toBe(0)
+    expect(result.commercialAvailabilityHours).toBe(0)
   })
 
   it('returns unknown usage when operational metrics are unavailable', () => {

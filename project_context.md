@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-26 TASK-056 reactive capacity economics slice
+- Se materializó la nueva proyección reactiva `member_capacity_economics` en `greenhouse_serving.member_capacity_economics`.
+- El snapshot quedó centrado en `member_id + period_year + period_month` y materializa:
+  - capacidad contractual
+  - carga comercial asignada
+  - uso operativo derivado de ICO
+  - economía laboral convertida a `CLP`
+- La lane quedó wireada al projection registry y al event catalog con triggers para:
+  - `member.*`
+  - `assignment.*`
+  - `compensation_version.*`
+  - `payroll_period.*`
+  - `payroll_entry.upserted`
+  - `finance.exchange_rate.upserted`
+  - eventos futuros de overhead/licencias/tooling
+- Alcance deliberadamente no tocado:
+  - `src/lib/team-capacity/*.ts`
+  - routes UI
+  - views
+- Validación realizada:
+  - `pnpm test src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projection-registry.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+
 ## Delta 2026-03-24 Task system normalization
 - El sistema de tasks deja de nacer bajo el prefijo `CODEX_TASK_*` como convencion nueva.
 - Regla operativa derivada:

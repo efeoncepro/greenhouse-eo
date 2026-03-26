@@ -1,12 +1,32 @@
 # TASK-056 - Agency Team Capacity Semantics
 
+## Delta 2026-03-26
+
+- Se implementaron los helpers puros canónicos en `src/lib/team-capacity/`:
+  - `units.ts`
+  - `economics.ts`
+  - `overhead.ts`
+  - `pricing.ts`
+- Se agregó la proyección reactiva `member_capacity_economics` y su store en `greenhouse_serving`.
+- `Agency > Team` ya consume el snapshot `member_capacity_economics` por período actual en vez de recomputar semántica híbrida on-read.
+- La vista dejó de tratar `Usadas` como horas por defecto y ahora presenta `Uso operativo`, con soporte para:
+  - horas reales si existieran
+  - índice/porcentaje cuando la fuente operativa es ICO
+  - fallback honesto a `—`
+- La carga comercial sigue excluyendo `Efeonce` interno.
+- El snapshot todavía deja `overhead` en `0` y `suggestedBillRateTarget` como referencia base; falta profundizar la capa de costos compartidos/política comercial en siguientes slices.
+- Validación ejecutada en este slice:
+  - `pnpm test src/lib/team-capacity/units.test.ts src/lib/team-capacity/economics.test.ts src/lib/team-capacity/overhead.test.ts src/lib/team-capacity/pricing.test.ts src/lib/team-capacity/shared.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Parcial`
 - Rank: `2`
 - Domain: `ops`
 - Legacy ID: `TASK-008` follow-up

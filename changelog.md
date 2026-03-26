@@ -7,6 +7,49 @@
 
 ## 2026-03-26
 
+### TASK-056 — `Agency > Team` ya consume el contrato nuevo de capacidad
+- `Agency > Team` ahora lee `member_capacity_economics` para el período actual en vez de mezclar joins y fórmulas híbridas on-read.
+- La card/columna `Usadas` fue reemplazada por `Uso operativo`:
+  - muestra horas solo si la fuente existe
+  - muestra porcentaje/índice cuando la señal operativa proviene de ICO
+  - cae a `—` cuando no hay una fuente defendible
+- Se corrigió un bug en la capa económica: cuando faltaba FX y la compensación estaba en otra moneda, el snapshot podía tratar el costo como si ya estuviera en moneda objetivo.
+- Validación del slice:
+  - `Vitest`: `8 files passed`, `39 tests passed`
+  - `TypeScript`: sin errores
+  - `Next build`: exitoso
+
+### TASK-056 — snapshot reactivo `member_capacity_economics` implementado
+- Se agregó la nueva proyección reactiva `member_capacity_economics` con tabla de serving `greenhouse_serving.member_capacity_economics`.
+- El snapshot persiste por `member_id + period_year + period_month` e integra:
+  - asignaciones comerciales filtrando carga interna
+  - uso operativo derivado de ICO
+  - compensación de payroll / versión vigente
+  - conversión FX a `CLP` con contexto de período
+- Se añadió el wiring mínimo al projection registry y al event catalog para:
+  - `compensation_version.updated`
+  - `finance.exchange_rate.upserted`
+  - eventos reactivos futuros de overhead/licencias/tooling
+- Se agregaron tests Vitest para:
+  - parsing de período y scope
+  - cálculo del snapshot
+  - refresh reactivo y registro en el registry
+- El slice no tocó `src/lib/team-capacity/*.ts`, routes UI ni views.
+
+### TASK-056 — helpers puros de capacidad y economía ya están disponibles
+- Se agregaron cuatro módulos puros en `src/lib/team-capacity/`:
+  - `units.ts`
+  - `economics.ts`
+  - `overhead.ts`
+  - `pricing.ts`
+- Cada módulo tiene su suite Vitest asociada en `src/lib/team-capacity/*.test.ts`.
+- La nueva capa cubre:
+  - conversiones `FTE <-> horas` y envelopes de capacidad
+  - cuantificación de compensación, costo horario y snapshot laboral
+  - prorrateo de overhead directo y compartido
+  - referencia sugerida de venta sobre costo cargado
+- No se tocaron routes, views ni proyecciones; el cambio quedó acotado a helpers puros y tests.
+
 ### Agency Team — contrato de capacidad documentado como lane separada
 - Se creó `TASK-056 - Agency Team Capacity Semantics` para formalizar la semántica pendiente de `Agency > Team` antes de seguir iterando backend/UI.
 - La task separa explícitamente:

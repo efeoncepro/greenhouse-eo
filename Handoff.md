@@ -49,6 +49,183 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 20:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Completar el slice funcional de `TASK-056`: helpers puros, snapshot reactivo y cutover de `Agency > Team` al contrato nuevo de capacidad/economía.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/team-capacity/units.ts`
+- `src/lib/team-capacity/economics.ts`
+- `src/lib/team-capacity/overhead.ts`
+- `src/lib/team-capacity/pricing.ts`
+- `src/lib/team-capacity/*.test.ts`
+- `src/lib/team-capacity/shared.ts`
+- `src/lib/member-capacity-economics/store.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/member-capacity-economics.test.ts`
+- `src/lib/sync/projections/index.ts`
+- `src/lib/sync/event-catalog.ts`
+- `src/app/api/team/capacity-breakdown/route.ts`
+- `src/app/api/team/capacity-breakdown/route.test.ts`
+- `src/views/agency/AgencyTeamView.tsx`
+- `src/views/agency/AgencyTeamView.test.tsx`
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/team-capacity/units.test.ts src/lib/team-capacity/economics.test.ts src/lib/team-capacity/overhead.test.ts src/lib/team-capacity/pricing.test.ts src/lib/team-capacity/shared.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx`
+- Resultado: `8 files passed`, `39 tests passed`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Riesgos o pendientes
+
+- `Agency > Team` ya consume `member_capacity_economics`, pero otros consumers siguen pendientes de corte:
+  - `Person Intelligence`
+  - `My Assignments`
+- `Uso operativo` ya no se presenta como horas ficticias, pero todavía depende de una señal porcentual derivada de ICO cuando no exista time tracking/hours source defendible.
+- `overhead` y `suggestedBillRateTarget` siguen en modo base; falta el siguiente slice de `TASK-056` para costos compartidos y pricing policy más rica.
+
+## 2026-03-26 20:17 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar el slice reactivo de `TASK-056` para materializar `member_capacity_economics` sin tocar `src/lib/team-capacity/*.ts`, routes UI ni views.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/member-capacity-economics/store.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/member-capacity-economics.test.ts`
+- `src/lib/sync/projections/index.ts`
+- `src/lib/sync/event-catalog.ts`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm test src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projection-registry.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- El snapshot reactivo ya existe y se registra correctamente, pero el contrato UI/API todavía no se consumió en routes ni views.
+- La lane quedó deliberadamente parcial en pricing final y overhead real:
+  - `suggestedBillRateTarget` sigue en `null`
+  - `directOverheadTarget` y `sharedOverheadTarget` siguen en `0`
+- Si después se decide exponer esta data en UI, conviene leer el snapshot nuevo en lugar de recomputar semántica localmente.
+
+## 2026-03-26 20:15 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar la capa pura de `TASK-056` para unidades, economics, overhead y pricing, con tests Vitest locales y sin tocar routes, views ni proyecciones.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/team-capacity/units.ts`
+- `src/lib/team-capacity/units.test.ts`
+- `src/lib/team-capacity/economics.ts`
+- `src/lib/team-capacity/economics.test.ts`
+- `src/lib/team-capacity/overhead.ts`
+- `src/lib/team-capacity/overhead.test.ts`
+- `src/lib/team-capacity/pricing.ts`
+- `src/lib/team-capacity/pricing.test.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/team-capacity/units.test.ts src/lib/team-capacity/economics.test.ts src/lib/team-capacity/overhead.test.ts src/lib/team-capacity/pricing.test.ts`
+- Resultado: 4 files passed, 26 tests passed
+
+### Riesgos o pendientes
+
+- La capa pura ya quedó lista y autocontenida, pero todavía no se conectó al runtime existente de `Agency > Team` ni a las proyecciones de `person-intelligence`.
+- `TASK-056` sigue abierta para el siguiente tramo de adopción en consumidores.
+
+## 2026-03-26 14:05 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Iniciar la implementación completa de `TASK-056` con helpers puros, snapshot reactivo y cutover de consumers de capacidad/economía.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Movimiento de task a `in-progress`
+- Alineación de índice y registry
+
+### Riesgos o pendientes
+
+- `TASK-056` entra a implementación con dos workers en paralelo:
+  - helpers puros `units/economics/overhead/pricing`
+  - snapshot reactivo `member_capacity_economics`
+- El objetivo de este turno es cerrar no solo el diseño sino el runtime básico con tests unitarios y validación final antes de empujar.
+
 ## 2026-03-26 13:05 -03
 
 ### Agente

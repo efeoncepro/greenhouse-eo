@@ -64,6 +64,16 @@ Mutacion en store
 |---|---|---|---|---|
 | `payroll_period` | `payroll.period.*` | `payroll/postgres-store.ts` | `{ periodId, month, year }` | — |
 | `payroll_entry` | `payroll.entry.*` | `payroll/postgres-store.ts` | `{ entryId, memberId }` | — |
+| `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence` |
+
+### Capacity Economics (nuevo)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `finance_exchange_rate` | `finance.exchange_rate.upserted` | `finance/postgres-store.ts` | `{ rateId, fromCurrency, toCurrency, rate, rateDate, source }` | `member_capacity_economics` |
+| `finance_overhead` | `finance.overhead.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
+| `finance_license_cost` | `finance.license_cost.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
+| `finance_tooling_cost` | `finance.tooling_cost.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
 
 ### AI Tools
 
@@ -118,6 +128,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `notification_dispatch` | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked | Despacha notificacion in-app + email via NotificationService |
 | `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
 | `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
+| `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 
 ## Extensibilidad
 

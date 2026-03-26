@@ -40,6 +40,8 @@ interface CapacityBreakdown {
   assignedHoursMonth: number
   usedHoursMonth: number | null
   availableHoursMonth: number
+  commercialAvailabilityHours?: number
+  operationalAvailabilityHours?: number | null
   overcommitted: boolean
 }
 
@@ -48,12 +50,22 @@ interface TeamMember {
   displayName: string
   roleTitle: string | null
   fteAllocation: number
+  usageKind: 'none' | 'hours' | 'percent' | string
+  usagePercent: number | null
   capacityHealth: string
   capacity: CapacityBreakdown
+  intelligence?: {
+    costPerHour: number | null
+    suggestedBillRate: number | null
+    targetCurrency: string | null
+  } | null
 }
 
 interface TeamData {
-  team: CapacityBreakdown
+  team: CapacityBreakdown & {
+    usageKind?: 'none' | 'hours' | 'percent' | string
+    usagePercent?: number | null
+  }
   members: TeamMember[]
   memberCount: number
   hasOperationalMetrics: boolean
@@ -72,6 +84,25 @@ const HEALTH_LABELS: Record<string, string> = {
 }
 
 const formatHours = (value: number | null) => (value === null ? '—' : `${value}h`)
+const formatUsage = (usageKind: string | undefined, usedHours: number | null, usagePercent: number | null) => {
+  if (usageKind === 'hours') {
+    return formatHours(usedHours)
+  }
+
+  if (usageKind === 'percent' && usagePercent !== null) {
+    return `${usagePercent}%`
+  }
+
+  return '—'
+}
+
+const getUsageSubtitle = (usageKind: string | undefined, hasOperationalMetrics: boolean) => {
+  if (!hasOperationalMetrics || usageKind === 'none') return 'Sin métricas operativas'
+  if (usageKind === 'hours') return 'Horas efectivas'
+  if (usageKind === 'percent') return 'Índice operativo'
+
+  return 'Uso operativo'
+}
 
 // ── Table columns ──
 
@@ -106,8 +137,8 @@ const columns: ColumnDef<TeamMember, any>[] = [
   }),
   columnHelper.accessor(row => row.capacity.usedHoursMonth, {
     id: 'used',
-    header: 'Usadas',
-    cell: ({ getValue }) => formatHours(getValue()),
+    header: 'Uso operativo',
+    cell: ({ row }) => formatUsage(row.original.usageKind, row.original.capacity.usedHoursMonth, row.original.usagePercent),
     meta: { align: 'right' }
   }),
   columnHelper.accessor(row => row.capacity.availableHoursMonth, {
@@ -196,10 +227,22 @@ return acc }, {} as Record<string, number>)
         <HorizontalWithSubtitle title='Asignadas' stats={`${data.team.assignedHoursMonth}h`} avatarIcon='tabler-clock' avatarColor='info' subtitle='Carga cliente comprometida' />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Usadas' stats={formatHours(data.team.usedHoursMonth)} avatarIcon='tabler-bolt' avatarColor='warning' subtitle={data.hasOperationalMetrics ? 'Horas efectivas' : 'Sin métricas operativas'} />
+        <HorizontalWithSubtitle
+          title='Uso operativo'
+          stats={formatUsage(data.team.usageKind, data.team.usedHoursMonth, data.team.usagePercent ?? null)}
+          avatarIcon='tabler-bolt'
+          avatarColor='warning'
+          subtitle={getUsageSubtitle(data.team.usageKind, data.hasOperationalMetrics)}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Disponibles' stats={`${data.team.availableHoursMonth}h`} avatarIcon='tabler-calendar-stats' avatarColor={data.team.availableHoursMonth < 0 ? 'error' : 'success'} subtitle={data.team.overcommitted ? 'Sobrecomprometido' : 'Capacidad libre'} />
+        <HorizontalWithSubtitle
+          title='Disponible comercial'
+          stats={`${data.team.availableHoursMonth}h`}
+          avatarIcon='tabler-calendar-stats'
+          avatarColor={data.team.availableHoursMonth < 0 ? 'error' : 'success'}
+          subtitle={data.team.overcommitted ? 'Sobrecomprometido' : 'Capacidad libre'}
+        />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -222,7 +265,7 @@ return acc }, {} as Record<string, number>)
       {!data.hasOperationalMetrics && (
         <Grid size={{ xs: 12 }}>
           <Alert severity='info' variant='outlined'>
-            Las horas usadas aún no están disponibles en este entorno. La carga comprometida excluye Efeonce interno y no reemplaza producción efectiva.
+            El uso operativo aún no tiene una fuente horaria defendible en este entorno. La carga comprometida excluye Efeonce interno y no reemplaza producción efectiva.
           </Alert>
         </Grid>
       )}
