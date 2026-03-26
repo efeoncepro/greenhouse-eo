@@ -15,17 +15,27 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 
 // ---------------------------------------------------------------------------
@@ -117,11 +127,70 @@ const formatDate = (date: string | null): string => {
 // Component
 // ---------------------------------------------------------------------------
 
+const expColumnHelper = createColumnHelper<Expense>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const expColumns: ColumnDef<Expense, any>[] = [
+  expColumnHelper.accessor('expenseType', {
+    header: 'Tipo',
+    cell: ({ getValue }) => {
+      const conf = TYPE_CONFIG[getValue()] || TYPE_CONFIG.miscellaneous
+
+      return <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
+    }
+  }),
+  expColumnHelper.accessor('description', {
+    header: 'Descripción',
+    cell: ({ row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={600} sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {row.original.description}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.25 }}>
+          {row.original.documentNumber && (
+            <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              Doc: {row.original.documentNumber}
+            </Typography>
+          )}
+          {row.original.nuboxPurchaseId && <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' />}
+        </Box>
+      </Box>
+    )
+  }),
+  expColumnHelper.accessor('supplierName', {
+    header: 'Proveedor',
+    cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography>
+  }),
+  expColumnHelper.accessor('paymentDate', {
+    header: 'Fecha',
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+  }),
+  expColumnHelper.accessor('dueDate', {
+    header: 'Vencimiento',
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+  }),
+  expColumnHelper.accessor('totalAmount', {
+    header: 'Monto',
+    cell: ({ row }) => <Typography variant='body2' fontWeight={600} color='error.main'>{formatAmount(row.original.totalAmount, row.original.currency)}</Typography>,
+    meta: { align: 'right' }
+  }),
+  expColumnHelper.accessor('paymentStatus', {
+    header: 'Estado',
+    cell: ({ getValue }) => {
+      const conf = STATUS_CONFIG[getValue()] || STATUS_CONFIG.pending
+
+      return <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
+    }
+  })
+]
+
 const ExpensesListView = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Expense[]>([])
   const [total, setTotal] = useState(0)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'paymentDate', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -159,6 +228,19 @@ const ExpensesListView = () => {
   useEffect(() => {
     fetchExpenses()
   }, [fetchExpenses])
+
+  const expTable = useReactTable({
+    data: items,
+    columns: expColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
 
   // Derived KPIs
   const totalExpenses = items.reduce((sum, e) => sum + e.totalAmountClp, 0)
@@ -295,91 +377,36 @@ const ExpensesListView = () => {
           </CustomTextField>
         </CardContent>
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 100 }}>Tipo</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell sx={{ width: 140 }}>Proveedor</TableCell>
-                <TableCell sx={{ width: 100 }}>Fecha</TableCell>
-                <TableCell sx={{ width: 100 }}>Vencimiento</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
-                <TableCell sx={{ width: 100 }}>Estado</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay egresos registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                items.map(item => {
-                  const statusConf = STATUS_CONFIG[item.paymentStatus] || STATUS_CONFIG.pending
-                  const typeConf = TYPE_CONFIG[item.expenseType] || TYPE_CONFIG.miscellaneous
-
-                  return (
-                    <TableRow key={item.expenseId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/expenses/${item.expenseId}`)}>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={typeConf.color}
-                          label={typeConf.label}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant='body2' fontWeight={600} sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {item.description}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.25 }}>
-                            {item.documentNumber ? (
-                              <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                                Doc: {item.documentNumber}
-                              </Typography>
-                            ) : null}
-                            {item.nuboxPurchaseId ? (
-                              <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' />
-                            ) : null}
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>
-                          {item.supplierName || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{formatDate(item.paymentDate)}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{formatDate(item.dueDate)}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2' fontWeight={600} color='error.main'>
-                          {formatAmount(item.totalAmount, item.currency)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={statusConf.color}
-                          label={statusConf.label}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {expTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {expTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={expColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay egresos registrados aún</Typography></td></tr>
+              ) : expTable.getRowModel().rows.map(row => (
+                <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/expenses/${row.original.expenseId}`)}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePaginationComponent table={expTable as ReturnType<typeof useReactTable>} />
       </Card>
 
       <CreateExpenseDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchExpenses() }} />
