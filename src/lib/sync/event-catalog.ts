@@ -78,6 +78,23 @@ export const EVENT_TYPES = {
   dteMatched: 'finance.dte.matched',
   dteDiscrepancyFound: 'finance.dte.discrepancy_found',
 
+  // Finance
+  financeIncomeCreated: 'finance.income.created',
+  financeIncomeUpdated: 'finance.income.updated',
+  financeExpenseCreated: 'finance.expense.created',
+  financeExpenseUpdated: 'finance.expense.updated',
+  financeIncomePaymentCreated: 'finance.income_payment.created',
+  financeIncomePaymentRecorded: 'finance.income_payment.recorded',
+  financeCostAllocationCreated: 'finance.cost_allocation.created',
+  financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
+
+  // Payroll
+  payrollPeriodCreated: 'payroll_period.created',
+  payrollPeriodUpdated: 'payroll_period.updated',
+  payrollPeriodCalculated: 'payroll_period.calculated',
+  payrollPeriodApproved: 'payroll_period.approved',
+  payrollEntryUpserted: 'payroll_entry.upserted',
+
   // Services
   serviceCreated: 'service.created',
   serviceUpdated: 'service.updated',
@@ -96,6 +113,19 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.membershipCreated,
   EVENT_TYPES.membershipUpdated,
   EVENT_TYPES.membershipDeactivated,
+  EVENT_TYPES.financeIncomeCreated,
+  EVENT_TYPES.financeIncomeUpdated,
+  EVENT_TYPES.financeExpenseCreated,
+  EVENT_TYPES.financeExpenseUpdated,
+  EVENT_TYPES.financeIncomePaymentCreated,
+  EVENT_TYPES.financeIncomePaymentRecorded,
+  EVENT_TYPES.financeCostAllocationCreated,
+  EVENT_TYPES.financeCostAllocationDeleted,
+  EVENT_TYPES.payrollPeriodCreated,
+  EVENT_TYPES.payrollPeriodUpdated,
+  EVENT_TYPES.payrollPeriodCalculated,
+  EVENT_TYPES.payrollPeriodApproved,
+  EVENT_TYPES.payrollEntryUpserted,
 
   // Notification triggers
   EVENT_TYPES.serviceCreated,

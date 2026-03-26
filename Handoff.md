@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 06:48 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Activar `TASK-055` y corregir la parte reactiva del pipeline de `client_economics`, para que el outbox sí recompute `Finance > Intelligence` por período afectado cuando cambian ingresos, egresos, allocations o payroll.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/sync/projections/client-economics.ts`
+- `src/lib/sync/projections/client-economics.test.ts`
+- `src/lib/sync/event-catalog.ts`
+- `src/lib/finance/postgres-store-intelligence.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+
+### Verificacion
+
+- `pnpm test src/lib/sync/projections/client-economics.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts src/views/greenhouse/finance/ClientEconomicsView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- `client_economics` ya no refresca solo el mes actual: ahora deriva `year/month` desde payloads de `finance` y `payroll`, y recomputa el período afectado.
+- `cost_allocations` empezó a publicar eventos outbox canónicos (`finance.cost_allocation.created/deleted`) y payroll ahora publica `payroll_period.updated/calculated/approved` con `year/month`; eso destraba la invalidación automática de snapshots.
+- La lane sigue abierta: falta corregir el bridge laboral histórico en `scripts/setup-postgres-finance-intelligence-p2.sql` y cerrar la cobertura canónica de costos, no solo el recompute reactivo.
+- Hay cambios paralelos fuera de este lote en `src/views/greenhouse/agency/services/ServiceDetailView.tsx`, `src/views/greenhouse/agency/services/ServicesListView.test.tsx`, `src/lib/ico-engine/metric-registry.ts` y `src/lib/person-intelligence/`; no fueron tocados ni deben mezclarse en este commit.
+
 ## 2026-03-26 06:26 -03
 
 ### Agente

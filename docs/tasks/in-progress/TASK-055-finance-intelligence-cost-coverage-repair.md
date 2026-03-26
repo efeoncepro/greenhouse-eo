@@ -2,14 +2,21 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Parcial`
 - Rank: `21`
 - Domain: `finance`
 - GitHub Project: `Greenhouse Delivery`
+
+## Delta 2026-03-26
+
+- Se activó el trabajo de la lane y se corrigió el primer gap reactivo del pipeline: `client_economics` ya no depende solo de `assignment/membership` ni del mes actual.
+- La proyección reactiva ahora escucha eventos de `finance` y `payroll`, deriva `year/month` desde payloads reales y recomputa el período afectado.
+- `cost_allocations` comenzó a publicar eventos outbox canónicos (`finance.cost_allocation.created/deleted`) y payroll ahora publica cambios de período (`updated/calculated/approved`) con `year/month`.
+- Cerrado parcialmente por trabajo en `TASK-055`; siguen abiertos el bridge laboral histórico por período y la cobertura canónica de costos.
 
 ## Summary
 

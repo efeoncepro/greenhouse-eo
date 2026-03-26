@@ -284,6 +284,14 @@ const isCurrentCompensationWindow = (effectiveFrom: string, effectiveTo: string 
   return effectiveFrom <= today && (!effectiveTo || effectiveTo >= today)
 }
 
+const toFinitePeriodNumber = (value: string | undefined): number | null => {
+  if (!value) return null
+
+  const parsed = Number(value)
+
+  return Number.isInteger(parsed) ? parsed : null
+}
+
 const publishPayrollOutboxEvent = async ({
   eventType,
   aggregateType,
@@ -1178,6 +1186,20 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
       throw new PayrollValidationError('Unable to read updated payroll period.', 500)
     }
 
+    await publishPayrollOutboxEvent({
+      eventType: 'payroll_period.updated',
+      aggregateType: 'payroll_period',
+      aggregateId: updated.periodId,
+      payload: {
+        periodId: updated.periodId,
+        previousPeriodId: periodId,
+        year: updated.year,
+        month: updated.month,
+        status: updated.status
+      },
+      client
+    })
+
     return updated
   })
 }
@@ -1196,20 +1218,42 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
     actorUserId = actorRow?.user_id ?? null
   }
 
-  await runGreenhousePostgresQuery(
-    `
-      UPDATE greenhouse_payroll.payroll_periods
-      SET
-        status = 'calculated',
-        calculated_at = CURRENT_TIMESTAMP,
-        calculated_by_user_id = $1,
-        approved_at = NULL,
-        approved_by_user_id = NULL,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE period_id = $2
-    `,
-    [actorUserId, periodId]
-  )
+  await withGreenhousePostgresTransaction(async client => {
+    const result = await client.query<PgPeriodRow>(
+      `
+        UPDATE greenhouse_payroll.payroll_periods
+        SET
+          status = 'calculated',
+          calculated_at = CURRENT_TIMESTAMP,
+          calculated_by_user_id = $1,
+          approved_at = NULL,
+          approved_by_user_id = NULL,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE period_id = $2
+        RETURNING *
+      `,
+      [actorUserId, periodId]
+    )
+
+    const updated = result.rows[0] ? mapPeriod(result.rows[0]) : null
+
+    if (!updated) {
+      throw new PayrollValidationError('Payroll period not found.', 404)
+    }
+
+    await publishPayrollOutboxEvent({
+      eventType: 'payroll_period.calculated',
+      aggregateType: 'payroll_period',
+      aggregateId: updated.periodId,
+      payload: {
+        periodId: updated.periodId,
+        year: updated.year,
+        month: updated.month,
+        status: updated.status
+      },
+      client
+    })
+  })
 }
 
 export const pgSetPeriodApproved = async (periodId: string, actorEmail: string | null) => {
@@ -1226,14 +1270,36 @@ export const pgSetPeriodApproved = async (periodId: string, actorEmail: string |
     actorUserId = actorRow?.user_id ?? null
   }
 
-  await runGreenhousePostgresQuery(
-    `
-      UPDATE greenhouse_payroll.payroll_periods
-      SET status = 'approved', approved_at = CURRENT_TIMESTAMP, approved_by_user_id = $1, updated_at = CURRENT_TIMESTAMP
-      WHERE period_id = $2
-    `,
-    [actorUserId, periodId]
-  )
+  await withGreenhousePostgresTransaction(async client => {
+    const result = await client.query<PgPeriodRow>(
+      `
+        UPDATE greenhouse_payroll.payroll_periods
+        SET status = 'approved', approved_at = CURRENT_TIMESTAMP, approved_by_user_id = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE period_id = $2
+        RETURNING *
+      `,
+      [actorUserId, periodId]
+    )
+
+    const updated = result.rows[0] ? mapPeriod(result.rows[0]) : null
+
+    if (!updated) {
+      throw new PayrollValidationError('Payroll period not found.', 404)
+    }
+
+    await publishPayrollOutboxEvent({
+      eventType: 'payroll_period.approved',
+      aggregateType: 'payroll_period',
+      aggregateId: updated.periodId,
+      payload: {
+        periodId: updated.periodId,
+        year: updated.year,
+        month: updated.month,
+        status: updated.status
+      },
+      client
+    })
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -1479,6 +1545,8 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       payload: {
         entryId: entry.entryId,
         periodId: entry.periodId,
+        year: toFinitePeriodNumber(entry.periodId.split('-')[0]),
+        month: toFinitePeriodNumber(entry.periodId.split('-')[1]),
         memberId: entry.memberId,
         netTotal: entry.netTotal,
         grossTotal: entry.grossTotal
