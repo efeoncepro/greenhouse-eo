@@ -124,6 +124,165 @@ Reglas obligatorias:
   - horas estimadas
   - índice/porcentaje operativo
 
+## Consumers Audit
+
+Superficies del repo que hoy consumen o probablemente consumirán estas capas:
+
+### Consumo directo de capacidad
+
+- `src/app/api/team/capacity-breakdown/route.ts`
+  - runtime actual de `Agency > Team`
+  - hoy mezcla cálculo de envelope, uso operativo y enriquecimiento con inteligencia
+- `src/lib/team-capacity/shared.ts`
+  - helper actual de capacidad
+  - candidato natural a descomponerse en `units.ts` y contratos más explícitos
+- `src/views/agency/AgencyTeamView.tsx`
+  - UI principal que hoy mezcla `Asignadas`, `Usadas` y `Disponibles`
+- `src/app/api/agency/capacity/route.ts`
+  - superficie Agency adicional que debe mantenerse coherente con el nuevo contrato
+- `src/views/greenhouse/GreenhouseClientTeam.tsx`
+  - muestra FTE, horas/mes y breakdown de equipo
+
+### Consumo por persona
+
+- `src/lib/sync/projections/person-intelligence.ts`
+  - hoy materializa capacidad y `cost_per_hour`
+  - hoy usa `computeCapacityBreakdown()` con semántica todavía parcial
+- `src/views/greenhouse/people/tabs/PersonIntelligenceTab.tsx`
+  - consume `contratadas`, `asignadas`, `usadas`, `disponibles`, `cost_per_hour`
+- `src/views/greenhouse/my/MyAssignmentsView.tsx`
+  - hoy hace conversiones locales `fte * 160` y calcula disponibilidad de forma demasiado simplificada
+- `src/types/team.ts`
+- `src/types/people.ts`
+  - ambos tipos deberán alinearse al nuevo contrato
+
+### Consumo económico / financiero
+
+- `src/lib/account-360/organization-economics.ts`
+  - ya usa `headcountFte`, `costPerFte` y costo laboral; probable consumidor futuro de `costPerHour`/`loadedCost`
+- `src/lib/account-360/organization-store.ts`
+  - consume `headcount_fte` y economics derivados
+- `src/app/api/organizations/[id]/economics/route.ts`
+  - posible consumer futuro del snapshot de costo/capacidad por persona agregado
+- `src/lib/finance/postgres-store-intelligence.ts`
+  - no debería duplicar fórmulas de costo horario si esta lane las canoniza
+
+### Superficies de referencia / nomenclatura
+
+- `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
+- `docs/tasks/complete/TASK-008-team-identity-capacity-system.md`
+
+## Reactive Projection Fit
+
+### Qué sí debe quedarse como helper puro
+
+Estas piezas conviene que sigan siendo funciones puras reutilizables, sin `outbox` ni materialización:
+
+- conversiones de unidades:
+  - `fteToHours`
+  - `hoursToFte`
+  - clamps y envelopes básicos
+- aritmética económica pura:
+  - `costPerHour`
+  - `loadedCostPerHour`
+  - `suggestedBillRate`
+- prorrateo puro:
+  - reparto de overhead por regla ya definida
+- conversión de moneda cuando ya se tiene `fxRate`
+
+Regla:
+- helper puro = sin acceso a DB, sin heurísticas de membresía, sin decidir el período por sí solo
+
+### Qué sí conviene materializar con outbox -> projections
+
+La combinación de fuentes para producir una lectura estable por miembro/período sí conviene materializarla:
+
+- assignments
+- compensación/payroll
+- tipo de cambio
+- overhead/persona
+- señal operativa ICO
+
+Propuesta de serving/proyección derivada:
+
+- `greenhouse_serving.member_capacity_economics`
+  - granularidad: `member_id + period_year + period_month`
+  - pensado para alimentar:
+    - `Agency > Team`
+    - `People > Intelligence`
+    - `My Assignments`
+    - vistas de economics agregadas
+
+Campos mínimos sugeridos:
+
+- `member_id`
+- `period_year`
+- `period_month`
+- `contracted_fte`
+- `contracted_hours`
+- `assigned_hours`
+- `usage_kind`
+- `used_hours` o `usage_percent`
+- `commercial_availability_hours`
+- `operational_availability_hours`
+- `source_currency`
+- `target_currency`
+- `total_comp_source`
+- `total_labor_cost_target`
+- `direct_overhead_target`
+- `shared_overhead_target`
+- `loaded_cost_target`
+- `cost_per_hour_target`
+- `suggested_bill_rate_target`
+- `fx_rate`
+- `fx_rate_date`
+- `fx_provider`
+- `fx_strategy`
+- `snapshot_status`
+- `materialized_at`
+
+### Por qué conviene proyección y no solo cálculo on-read
+
+- `Agency > Team` ya demostró que on-read mezcla demasiadas fuentes y semánticas.
+- `person-intelligence` ya usa el patrón de proyección para capacidad + costo.
+- `costPerHour` y `suggestedBillRate` dependen de múltiples dominios con distintos triggers.
+- un snapshot mensual evita que cada vista recalcule distinto o con distinto fallback.
+
+### Eventos/Triggers que deberían refrescar esta proyección
+
+Eventos ya existentes del catálogo que deberían impactarla:
+
+- `assignment.created`
+- `assignment.updated`
+- `assignment.removed`
+- `member.updated`
+- `compensation.updated`
+- `compensation_version.created`
+- `payroll_period.updated`
+- `payroll_period.calculated`
+- `payroll_period.approved`
+- `payroll_entry.upserted`
+- `ico.materialization.completed`
+
+Eventos que probablemente faltan o deben ampliarse:
+
+- `finance.exchange_rate.updated`
+- `finance.exchange_rate.synced`
+- `finance.overhead.updated`
+- `finance.license_cost.updated`
+- `finance.tooling_cost.updated`
+
+Regla derivada:
+- si la lane crea catálogo de overhead/licencias, debe publicar outbox events para mantener `member_capacity_economics` fresco
+
+### Recomendación operativa
+
+- Helpers puros para fórmulas y conversiones
+- Proyección reactiva para snapshot por miembro/período
+- Routes/UI deben leer el snapshot y no recomputar semántica compleja localmente
+- `person-intelligence` y `Agency > Team` deben converger en el mismo snapshot base en vez de duplicar fórmulas
+
 ## Scope
 
 ### Slice 1 - Contrato de dominio
@@ -286,6 +445,8 @@ Reglas obligatorias:
 - [ ] Queda definido el comportamiento de `Efeonce` interno como costo hundido/autogestión, fuera de carga cliente.
 - [ ] Queda propuesta una capa reusable de conversiones `FTE <-> horas` sin lógica de negocio embebida.
 - [ ] Queda propuesta una capa reusable de cuantificación económica por persona/período para `costPerHour` y `suggestedBillRate`.
+- [ ] Quedan inventariados los consumers del repo que deberán converger a esta semántica.
+- [ ] Queda documentado qué parte debe resolverse con helpers puros y qué parte conviene materializar vía `outbox -> projections`.
 - [ ] El siguiente trabajo de implementación puede ejecutarse sin depender de memoria conversacional.
 
 ## Verification

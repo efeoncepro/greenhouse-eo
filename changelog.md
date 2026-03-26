@@ -23,6 +23,11 @@
   - `mindicador` como fuente primaria de `USD/CLP`
   - `greenhouse_finance.exchange_rates` como persistencia
   - estrategia sugerida para capacidad/pricing: último día hábil del período
+- `TASK-056` ahora incluye también:
+  - inventario de consumers del repo que usan o usarán esta semántica
+  - recomendación explícita de arquitectura híbrida:
+    - helpers puros para fórmulas
+    - proyección reactiva `member_capacity_economics` para snapshot mensual por persona
 - `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
 
 ### Agency Team — capacidad cliente efectiva corregida

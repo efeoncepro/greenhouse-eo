@@ -98,6 +98,10 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - `greenhouse_finance.exchange_rates`
   - `mindicador` como proveedor primario
   - estrategia canónica propuesta: último día hábil del período
+- Se agregó auditoría de consumers y recomendación arquitectónica:
+  - helpers puros para unidades/economics/overhead/pricing
+  - proyección reactiva sugerida `member_capacity_economics` para snapshot por miembro/período
+  - consumers directos ya identificados: `Agency > Team`, `People > Intelligence`, `My Assignments`, `GreenhouseClientTeam`, `organization-economics`
 - La siguiente decisión de producto/dominio pendiente es si `Uso operativo` se mostrará como horas reales, horas estimadas o índice/porcentaje operativo.
 
 ## 2026-03-26 12:32 -03
