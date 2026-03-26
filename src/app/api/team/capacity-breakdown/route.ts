@@ -14,6 +14,7 @@ import {
 import type { TeamRoleCategory } from '@/types/team'
 
 export const dynamic = 'force-dynamic'
+const QUERY_TIMEOUT_MS = 5000
 
 interface AssignmentRow extends Record<string, unknown> {
   member_id: string
@@ -88,6 +89,21 @@ const getCommitmentHealth = ({
   return 'idle'
 }
 
+const withTimeout = async <T>(promise: Promise<T>, label: string, timeoutMs = QUERY_TIMEOUT_MS): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | null = null
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
+      })
+    ])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
+}
+
 export async function GET() {
   const { tenant, errorResponse } = await requireAgencyTenantContext()
 
@@ -97,11 +113,14 @@ export async function GET() {
 
   try {
     // Check if person_operational_metrics exists for LEFT JOIN
-    const pomExists = await runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
-      `SELECT EXISTS (
-        SELECT 1 FROM information_schema.tables
-        WHERE table_schema = 'greenhouse_serving' AND table_name = 'person_operational_metrics'
-      ) AS exists`
+    const pomExists = await withTimeout(
+      runGreenhousePostgresQuery<Record<string, unknown> & { exists: boolean }>(
+        `SELECT EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'greenhouse_serving' AND table_name = 'person_operational_metrics'
+        ) AS exists`
+      ),
+      'team capacity serving probe'
     ).then(r => r[0]?.exists === true).catch(() => false)
 
     // Get assignments with contracted hours from Postgres
@@ -143,7 +162,28 @@ export async function GET() {
           AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
         ORDER BY m.display_name, a.client_id`
 
-    const rows = await runGreenhousePostgresQuery<AssignmentRow>(query)
+    const baseFallbackQuery = `SELECT
+      a.member_id,
+      m.display_name,
+      COALESCE(a.role_title_override, m.role_title) AS role_title,
+      a.client_id,
+      c.client_name,
+      a.fte_allocation,
+      COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
+      0 AS active_assets
+    FROM greenhouse_core.client_team_assignments a
+    JOIN greenhouse_core.members m ON m.member_id = a.member_id
+    LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+    WHERE a.active = TRUE
+      AND m.active = TRUE
+      AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+    ORDER BY m.display_name, a.client_id`
+
+    const rows = await withTimeout(runGreenhousePostgresQuery<AssignmentRow>(query), 'team capacity query')
+      .catch(async error => {
+        console.warn('[team-capacity] primary query degraded to fallback:', error instanceof Error ? error.message : error)
+        return withTimeout(runGreenhousePostgresQuery<AssignmentRow>(baseFallbackQuery), 'team capacity fallback query')
+      })
     const rowsByMember = new Map<string, AssignmentRow[]>()
 
     for (const row of rows) {

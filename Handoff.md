@@ -90,6 +90,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - evita sumar `contracted_hours_month` por assignment como si fueran horas distintas
 - Si más adelante se necesita distinguir explícitamente billable vs non-billable fuera del cliente interno, conviene formalizar ese atributo en `greenhouse_core.client_team_assignments`.
 - Se agregó `no-store` en la API y en el fetch client-side de `AgencyTeamView` porque `staging` llegó a mostrar el copy anterior aun después del deploy correcto; el síntoma era consistente con caché de cliente/respuesta.
+- Se agregó timeout + fallback en `GET /api/team/capacity-breakdown` y `AbortSignal.timeout()` en el fetch del cliente para que `Agency > Team` no vuelva a colgar la navegación completa si Postgres se pone lento.
 
 ## 2026-03-26 12:18 -03
 
