@@ -102,6 +102,13 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
   - helpers puros para unidades/economics/overhead/pricing
   - proyección reactiva sugerida `member_capacity_economics` para snapshot por miembro/período
   - consumers directos ya identificados: `Agency > Team`, `People > Intelligence`, `My Assignments`, `GreenhouseClientTeam`, `organization-economics`
+- `TASK-056` ya incluye además el contrato exacto propuesto para:
+  - `units.ts`
+  - `economics.ts`
+  - `overhead.ts`
+  - `pricing.ts`
+  - snapshot `member_capacity_economics`
+  - respuesta futura de `GET /api/team/capacity-breakdown`
 - La siguiente decisión de producto/dominio pendiente es si `Uso operativo` se mostrará como horas reales, horas estimadas o índice/porcentaje operativo.
 
 ## 2026-03-26 12:32 -03

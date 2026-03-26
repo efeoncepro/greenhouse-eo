@@ -28,6 +28,10 @@
   - recomendación explícita de arquitectura híbrida:
     - helpers puros para fórmulas
     - proyección reactiva `member_capacity_economics` para snapshot mensual por persona
+- La misma task ahora deja también el contrato exacto propuesto de:
+  - módulos `units`, `economics`, `overhead`, `pricing`
+  - snapshot `member_capacity_economics`
+  - payload futuro de `GET /api/team/capacity-breakdown`
 - `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
 
 ### Agency Team — capacidad cliente efectiva corregida

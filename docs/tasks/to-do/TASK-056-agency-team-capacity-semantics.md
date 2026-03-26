@@ -438,6 +438,329 @@ Regla derivada:
 - Si no hay FX válido:
   - mantener moneda fuente y explicitar ausencia de conversión
 
+## Exact Module Contracts
+
+Los siguientes contratos quedan propuestos como baseline de implementación. Todavía no se implementan en esta task; se documentan para evitar drift entre módulos.
+
+### 1. `src/lib/team-capacity/units.ts`
+
+Responsabilidad:
+- conversiones puras entre `FTE`, horas y envelopes de capacidad
+- sin acceso a DB
+- sin semántica de cliente interno
+- sin inferir uso operativo
+
+Tipos propuestos:
+
+```ts
+export type CapacityUnitConfig = {
+  monthlyBaseHours?: number // default: 160
+  maxFte?: number // default: 1
+}
+
+export type CapacityEnvelope = {
+  contractedFte: number
+  contractedHours: number
+  assignedHours: number
+  usedHours: number | null
+  commercialAvailabilityHours: number
+  operationalAvailabilityHours: number | null
+  overassignedCommercially: boolean
+  overloadedOperationally: boolean | null
+}
+```
+
+Funciones propuestas:
+
+```ts
+export const fteToHours: (fte: number, config?: CapacityUnitConfig) => number
+export const hoursToFte: (hours: number, config?: CapacityUnitConfig) => number
+export const clampFte: (fte: number, config?: CapacityUnitConfig) => number
+export const clampHours: (hours: number) => number
+export const buildCapacityEnvelope: (input: {
+  contractedFte: number
+  assignedHours: number
+  usedHours?: number | null
+  config?: CapacityUnitConfig
+}) => CapacityEnvelope
+```
+
+Reglas:
+- `contractedHours = fteToHours(contractedFte)`
+- `commercialAvailabilityHours = max(contractedHours - assignedHours, 0)`
+- `operationalAvailabilityHours = usedHours != null ? max(contractedHours - usedHours, 0) : null`
+- `overassignedCommercially = assignedHours > contractedHours`
+- `overloadedOperationally = usedHours != null ? usedHours > contractedHours : null`
+
+### 2. `src/lib/team-capacity/economics.ts`
+
+Responsabilidad:
+- convertir compensación del período en costo laboral por hora
+- conservar moneda fuente y conversión objetivo
+- sin decidir pricing comercial final
+
+Tipos propuestos:
+
+```ts
+export type CompensationBreakdown = {
+  sourceCurrency: 'CLP' | 'USD'
+  baseSalarySource: number
+  fixedBonusesSource: number
+  variableBonusesSource: number
+  employerCostsSource: number
+}
+
+export type FxContext = {
+  sourceCurrency: 'CLP' | 'USD'
+  targetCurrency: 'CLP' | 'USD'
+  rate: number
+  rateDate: string
+  provider: string
+  strategy: 'period_last_business_day'
+}
+
+export type LaborEconomicsSnapshot = {
+  sourceCurrency: 'CLP' | 'USD'
+  targetCurrency: 'CLP' | 'USD'
+  totalCompensationSource: number
+  totalLaborCostTarget: number | null
+  contractedHours: number
+  costPerHourTarget: number | null
+  fx: FxContext | null
+  snapshotStatus: 'complete' | 'missing_fx' | 'missing_compensation' | 'invalid_capacity'
+}
+```
+
+Funciones propuestas:
+
+```ts
+export const getTotalCompensationSource: (input: CompensationBreakdown) => number
+export const convertCompensationToTarget: (input: {
+  compensation: CompensationBreakdown
+  fx?: FxContext | null
+}) => { totalCompensationSource: number; totalLaborCostTarget: number | null; snapshotStatus: LaborEconomicsSnapshot['snapshotStatus'] }
+export const getCostPerHour: (input: {
+  totalLaborCostTarget: number | null
+  contractedHours: number
+}) => number | null
+export const buildLaborEconomicsSnapshot: (input: {
+  compensation: CompensationBreakdown | null
+  contractedHours: number
+  targetCurrency: 'CLP' | 'USD'
+  fx?: FxContext | null
+}) => LaborEconomicsSnapshot
+```
+
+Reglas:
+- `totalCompensationSource = base + fixedBonuses + variableBonuses + employerCosts`
+- si `sourceCurrency === targetCurrency`, `fx` es opcional
+- si falta FX y las monedas difieren, `totalLaborCostTarget = null`
+- si `contractedHours <= 0`, `costPerHourTarget = null`
+
+### 3. `src/lib/team-capacity/overhead.ts`
+
+Responsabilidad:
+- prorratear costos no salariales sobre la capacidad
+- separar overhead directo por persona y overhead compartido
+
+Tipos propuestos:
+
+```ts
+export type DirectMemberOverhead = {
+  memberId: string
+  periodYear: number
+  periodMonth: number
+  sourceCurrency: 'CLP' | 'USD'
+  licenseCostSource: number
+  toolingCostSource: number
+  equipmentCostSource: number
+}
+
+export type SharedOverheadPool = {
+  periodYear: number
+  periodMonth: number
+  targetCurrency: 'CLP' | 'USD'
+  totalSharedOverheadTarget: number
+  allocationMethod: 'headcount' | 'fte_weighted' | 'contracted_hours' | 'assigned_hours'
+}
+
+export type MemberOverheadSnapshot = {
+  directOverheadTarget: number | null
+  sharedOverheadTarget: number | null
+  totalOverheadTarget: number | null
+  overheadPerHourTarget: number | null
+  snapshotStatus: 'complete' | 'partial' | 'missing_inputs'
+}
+```
+
+Funciones propuestas:
+
+```ts
+export const getDirectOverheadTarget: (input: {
+  direct: DirectMemberOverhead | null
+  targetCurrency: 'CLP' | 'USD'
+  fx?: FxContext | null
+}) => number | null
+export const allocateSharedOverheadTarget: (input: {
+  pool: SharedOverheadPool | null
+  memberWeight: number
+  totalWeight: number
+}) => number | null
+export const buildMemberOverheadSnapshot: (input: {
+  directOverheadTarget: number | null
+  sharedOverheadTarget: number | null
+  contractedHours: number
+}) => MemberOverheadSnapshot
+```
+
+Reglas:
+- el prorrateo compartido no puede dividir por `0`
+- `overheadPerHourTarget = totalOverheadTarget / contractedHours` cuando ambos existan
+- si solo existe una parte del overhead, el snapshot queda `partial`
+
+### 4. `src/lib/team-capacity/pricing.ts`
+
+Responsabilidad:
+- producir una referencia de venta desde costo cargado
+- no reemplaza pricing comercial final ni descuentos de negocio
+
+Tipos propuestos:
+
+```ts
+export type PricingPolicy = {
+  targetMarginPct?: number
+  markupMultiplier?: number
+  minimumBillRateTarget?: number | null
+}
+
+export type PricingSnapshot = {
+  loadedCostPerHourTarget: number | null
+  suggestedBillRateTarget: number | null
+  targetCurrency: 'CLP' | 'USD'
+  policyType: 'margin' | 'markup' | 'minimum_floor'
+  snapshotStatus: 'complete' | 'missing_cost'
+}
+```
+
+Funciones propuestas:
+
+```ts
+export const getLoadedCostPerHour: (input: {
+  laborCostPerHourTarget: number | null
+  overheadPerHourTarget: number | null
+}) => number | null
+export const getSuggestedBillRate: (input: {
+  loadedCostPerHourTarget: number | null
+  pricingPolicy: PricingPolicy
+}) => PricingSnapshot
+```
+
+Reglas:
+- si existe `targetMarginPct`, `suggestedBillRate = loadedCost / (1 - margin)`
+- si existe `markupMultiplier`, `suggestedBillRate = loadedCost * markup`
+- si existe `minimumBillRateTarget`, aplicar piso
+- si falta costo cargado, no inventar tarifa sugerida
+
+### 5. Snapshot canónico `member_capacity_economics`
+
+Responsabilidad:
+- ensamblar por miembro/período las distintas fuentes ya normalizadas
+- surface compartida para Agency, People, My y Economics
+
+Tipo propuesto:
+
+```ts
+export type MemberCapacityEconomicsSnapshot = {
+  memberId: string
+  periodYear: number
+  periodMonth: number
+
+  contractedFte: number
+  contractedHours: number
+  assignedHours: number
+
+  usageKind: 'hours' | 'percent' | 'index' | 'none'
+  usedHours: number | null
+  usagePercent: number | null
+  usageIndex: number | null
+
+  commercialAvailabilityHours: number
+  operationalAvailabilityHours: number | null
+
+  sourceCurrency: 'CLP' | 'USD'
+  targetCurrency: 'CLP' | 'USD'
+  totalCompensationSource: number | null
+  totalLaborCostTarget: number | null
+  directOverheadTarget: number | null
+  sharedOverheadTarget: number | null
+  loadedCostTarget: number | null
+  costPerHourTarget: number | null
+  loadedCostPerHourTarget: number | null
+  suggestedBillRateTarget: number | null
+
+  fxRate: number | null
+  fxRateDate: string | null
+  fxProvider: string | null
+  fxStrategy: 'period_last_business_day' | null
+
+  snapshotStatus: 'complete' | 'partial_usage' | 'partial_cost' | 'partial_fx' | 'invalid'
+  materializedAt: string
+}
+```
+
+Read model sugerido:
+
+- `Agency > Team`
+  - usa `contractedHours`, `assignedHours`, `usage*`, `commercialAvailabilityHours`
+- `People > Intelligence`
+  - usa snapshot completo
+- `My Assignments`
+  - usa contracted/assigned/commercial availability
+- `Organization Economics`
+  - consume agregados o derivados por cliente/organización, no recalcula `costPerHour` desde cero
+
+### 6. Contrato sugerido para `GET /api/team/capacity-breakdown`
+
+La route no debería exponer cálculo ad hoc, sino leer el snapshot y traducirlo a UI:
+
+```ts
+export type TeamCapacityBreakdownResponse = {
+  period: { year: number; month: number }
+  summary: {
+    contractedHours: number
+    assignedHours: number
+    usageKind: 'hours' | 'percent' | 'index' | 'none'
+    usedHours: number | null
+    usagePercent: number | null
+    commercialAvailabilityHours: number
+    memberCount: number
+  }
+  members: Array<{
+    memberId: string
+    displayName: string
+    roleTitle: string | null
+    contractedFte: number
+    contractedHours: number
+    assignedHours: number
+    usageKind: 'hours' | 'percent' | 'index' | 'none'
+    usedHours: number | null
+    usagePercent: number | null
+    commercialAvailabilityHours: number
+    operationalAvailabilityHours: number | null
+    snapshotStatus: MemberCapacityEconomicsSnapshot['snapshotStatus']
+    economics?: {
+      targetCurrency: 'CLP' | 'USD'
+      costPerHourTarget: number | null
+      suggestedBillRateTarget: number | null
+    } | null
+  }>
+}
+```
+
+Regla UX derivada:
+- la route debe devolver tanto `usageKind` como el valor asociado para que la UI no asuma que siempre son horas
+- `Agency > Team` no debe etiquetar `Usadas` como horas si `usageKind !== 'hours'`
+
 ## Acceptance Criteria
 
 - [ ] Existe un contrato escrito y estable para `Contratadas`, `Asignadas`, `Uso operativo` y `Disponibilidad`.
