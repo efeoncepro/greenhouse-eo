@@ -49,6 +49,48 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 13:05 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Congelar la semántica pendiente de `Agency > Team` en documentación formal antes de seguir tocando backend/UI.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-056-agency-team-capacity-semantics.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `docs/tasks/complete/TASK-008-team-identity-capacity-system.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Revisión de `TASK-008`, `TASK_TEMPLATE`, índice y registry de tasks.
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- El gap actual ya no es solo de código: la vista `Agency > Team` necesita un contrato explícito para separar:
+  - capacidad contractual
+  - carga comercial comprometida
+  - uso operativo
+  - disponibilidad
+- Se creó `TASK-056` como lane específica para cerrar esa definición antes de seguir iterando implementación.
+- La siguiente decisión de producto/dominio pendiente es si `Uso operativo` se mostrará como horas reales, horas estimadas o índice/porcentaje operativo.
+
 ## 2026-03-26 12:32 -03
 
 ### Agente

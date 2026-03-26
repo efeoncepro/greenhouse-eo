@@ -71,10 +71,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-053` | `to-do` | TanStack Table Migration Remaining | `docs/tasks/to-do/TASK-053-tanstack-table-migration-remaining.md` |
 | `TASK-054` | `to-do` | TanStack High Impact Remaining | `docs/tasks/to-do/TASK-054-tanstack-high-impact-remaining.md` |
 | `TASK-055` | `in-progress` | Finance Intelligence Cost Coverage Repair | `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md` |
+| `TASK-056` | `to-do` | Agency Team Capacity Semantics | `docs/tasks/to-do/TASK-056-agency-team-capacity-semantics.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-056`
+- `TASK-057`
 
 ## Regla de asignacion desde aqui
 

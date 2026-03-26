@@ -7,6 +7,16 @@
 
 ## 2026-03-26
 
+### Agency Team — contrato de capacidad documentado como lane separada
+- Se creó `TASK-056 - Agency Team Capacity Semantics` para formalizar la semántica pendiente de `Agency > Team` antes de seguir iterando backend/UI.
+- La task separa explícitamente:
+  - capacidad contractual
+  - carga comercial comprometida
+  - uso operativo
+  - disponibilidad
+- También deja propuesta una capa reusable de conversiones `FTE <-> horas` sin meter lógica de negocio en el helper.
+- `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
+
 ### Agency Team — capacidad cliente efectiva corregida
 - `Agency > Team` dejó de sumar `Efeonce Internal` como carga cliente comprometida.
 - La capacidad ahora se calcula por miembro con un sobre contractual máximo de `1.0 FTE`, evitando casos falsos de `2.0 FTE / 320h` para una sola persona.
