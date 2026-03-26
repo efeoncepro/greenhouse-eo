@@ -49,6 +49,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 08:16 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el lote `Home/Nexa` que quedó abierto en el worktree y empujarlo como feature separada.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/app/(dashboard)/home/page.tsx`
+- `src/lib/tenant/access.ts`
+- `src/app/api/home/snapshot/route.ts`
+- `src/app/api/home/nexa/route.ts`
+- `src/lib/home/get-home-snapshot.ts`
+- `src/lib/nexa/nexa-service.ts`
+- `src/config/home-greetings.ts`
+- `src/config/home-suggestions.ts`
+- `src/types/home.ts`
+- `src/views/greenhouse/home/**`
+- `docs/tasks/complete/TASK-009-greenhouse-home-nexa.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `git diff --check -- 'src/app/(dashboard)/home' 'src/app/api/home' 'src/config/home-greetings.ts' 'src/config/home-suggestions.ts' 'src/lib/home' 'src/lib/nexa' 'src/types/home.ts' 'src/lib/tenant/access.ts' 'src/views/greenhouse/home'`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Riesgos o pendientes
+
+- `Home/Nexa` quedó implementado como MVP client-first y `portalHomePath` para cliente ya resuelve `/home`.
+- `Nexa` requiere configuración válida de Google GenAI para responder en runtime.
+- No se actualizó `docs/tasks/README.md` en este turno porque el archivo ya trae cambios concurrentes e inconsistentes de otra lane; se evitó mezclar ese delta en este push.
+
 ## 2026-03-26 08:02 -03
 
 ### Agente
