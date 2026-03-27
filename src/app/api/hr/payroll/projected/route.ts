@@ -17,6 +17,15 @@ type OfficialEntryRow = {
   currency: string
   gross_total: number | string
   net_total: number | string
+  kpi_otd_percent: number | string | null
+  kpi_rpa_avg: number | string | null
+  kpi_tasks_completed: number | string | null
+  working_days_in_period: number | string | null
+  days_present: number | string | null
+  days_absent: number | string | null
+  days_on_leave: number | string | null
+  chile_uf_value: number | string | null
+  base_salary: number | string | null
 }
 
 export async function GET(request: Request) {
@@ -45,7 +54,10 @@ export async function GET(request: Request) {
     const [result, officialRows, latestPromotion] = await Promise.all([
       projectPayrollForPeriod({ year, month, mode }),
       runGreenhousePostgresQuery<OfficialEntryRow>(
-        `SELECT e.member_id, e.currency, e.gross_total, e.net_total
+        `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
+                e.kpi_otd_percent, e.kpi_rpa_avg, e.kpi_tasks_completed,
+                e.working_days_in_period, e.days_present, e.days_absent, e.days_on_leave,
+                e.chile_uf_value, e.base_salary
          FROM greenhouse_payroll.payroll_entries e
          INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
          WHERE p.period_id = $1
@@ -58,17 +70,43 @@ export async function GET(request: Request) {
         : Promise.resolve(null)
     ])
 
-    // Build official map
-    const officialByMember = new Map<string, { grossTotal: number; netTotal: number }>()
+    // Build official map with inputs for variance
+    const toNum = (v: unknown) => v != null ? Number(v) : null
+    const round2 = (n: number) => Math.round(n * 100) / 100
+
+    type OfficialSnapshot = {
+      grossTotal: number
+      netTotal: number
+      kpiOtdPercent: number | null
+      kpiRpaAvg: number | null
+      kpiTasksCompleted: number | null
+      workingDays: number | null
+      daysPresent: number | null
+      daysAbsent: number | null
+      daysOnLeave: number | null
+      ufValue: number | null
+      baseSalary: number | null
+    }
+
+    const officialByMember = new Map<string, OfficialSnapshot>()
 
     for (const row of officialRows) {
       officialByMember.set(row.member_id, {
         grossTotal: Number(row.gross_total),
-        netTotal: Number(row.net_total)
+        netTotal: Number(row.net_total),
+        kpiOtdPercent: toNum(row.kpi_otd_percent),
+        kpiRpaAvg: toNum(row.kpi_rpa_avg),
+        kpiTasksCompleted: toNum(row.kpi_tasks_completed),
+        workingDays: toNum(row.working_days_in_period),
+        daysPresent: toNum(row.days_present),
+        daysAbsent: toNum(row.days_absent),
+        daysOnLeave: toNum(row.days_on_leave),
+        ufValue: toNum(row.chile_uf_value),
+        baseSalary: toNum(row.base_salary)
       })
     }
 
-    // Compute delta
+    // Compute totals delta
     const officialGrossByCurrency: Record<string, number> = {}
     const officialNetByCurrency: Record<string, number> = {}
 
@@ -79,16 +117,33 @@ export async function GET(request: Request) {
 
     const hasOfficial = officialRows.length > 0
 
-    // Enrich entries with delta
+    // Enrich entries with output delta + input variance
     const entriesWithDelta = result.entries.map(entry => {
       const official = officialByMember.get(entry.memberId)
+
+      const inputVariance = official ? {
+        kpiOtdChanged: official.kpiOtdPercent != null && entry.kpiOtdPercent != null && official.kpiOtdPercent !== entry.kpiOtdPercent,
+        kpiRpaChanged: official.kpiRpaAvg != null && entry.kpiRpaAvg != null && official.kpiRpaAvg !== entry.kpiRpaAvg,
+        attendanceChanged: official.daysPresent != null && entry.daysPresent != null && official.daysPresent !== entry.daysPresent,
+        ufChanged: official.ufValue != null && entry.chileUfValue != null && official.ufValue !== entry.chileUfValue,
+        baseSalaryChanged: official.baseSalary != null && entry.baseSalary != null && official.baseSalary !== entry.baseSalary,
+        officialInputs: {
+          kpiOtdPercent: official.kpiOtdPercent,
+          kpiRpaAvg: official.kpiRpaAvg,
+          workingDays: official.workingDays,
+          daysPresent: official.daysPresent,
+          daysAbsent: official.daysAbsent,
+          ufValue: official.ufValue
+        }
+      } : null
 
       return {
         ...entry,
         officialGrossTotal: official?.grossTotal ?? null,
         officialNetTotal: official?.netTotal ?? null,
-        deltaGross: official ? Math.round((entry.grossTotal - official.grossTotal) * 100) / 100 : null,
-        deltaNet: official ? Math.round((entry.netTotal - official.netTotal) * 100) / 100 : null
+        deltaGross: official ? round2(entry.grossTotal - official.grossTotal) : null,
+        deltaNet: official ? round2(entry.netTotal - official.netTotal) : null,
+        inputVariance
       }
     })
 

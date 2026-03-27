@@ -20,10 +20,16 @@ import {
 } from '@/lib/payroll/projected-payroll-promotion-store'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
 
+export type InputDriftWarning = {
+  field: string
+  message: string
+}
+
 export type PromoteProjectedPayrollResult = {
   promotion: ProjectedPayrollPromotionRecord
   calculation: PayrollCalculationResult
   createdPeriod: boolean
+  driftWarnings: InputDriftWarning[]
 }
 
 const getUserIdFromActorIdentifier = (actorIdentifier: string | null) => {
@@ -101,6 +107,41 @@ export const promoteProjectedPayrollToOfficialDraft = async (
       }
     })
 
+    // Detect input drift between projected snapshot and official calculation
+    const driftWarnings: InputDriftWarning[] = []
+    const projectedByMember = new Map(projection.entries.map(e => [e.memberId, e]))
+
+    for (const officialEntry of calculation.entries) {
+      const projected = projectedByMember.get(officialEntry.memberId)
+
+      if (!projected) {
+        driftWarnings.push({ field: 'members', message: `${officialEntry.memberName}: presente en oficial pero no en proyección` })
+        continue
+      }
+
+      if (projected.kpiOtdPercent != null && officialEntry.kpiOtdPercent != null && projected.kpiOtdPercent !== officialEntry.kpiOtdPercent) {
+        driftWarnings.push({ field: 'kpi_otd', message: `${officialEntry.memberName}: OTD cambió de ${projected.kpiOtdPercent}% a ${officialEntry.kpiOtdPercent}%` })
+      }
+
+      if (projected.kpiRpaAvg != null && officialEntry.kpiRpaAvg != null && projected.kpiRpaAvg !== officialEntry.kpiRpaAvg) {
+        driftWarnings.push({ field: 'kpi_rpa', message: `${officialEntry.memberName}: RpA cambió de ${projected.kpiRpaAvg} a ${officialEntry.kpiRpaAvg}` })
+      }
+
+      if (projected.daysPresent != null && officialEntry.daysPresent != null && projected.daysPresent !== officialEntry.daysPresent) {
+        driftWarnings.push({ field: 'attendance', message: `${officialEntry.memberName}: días presentes cambió de ${projected.daysPresent} a ${officialEntry.daysPresent}` })
+      }
+
+      if (projected.chileUfValue != null && officialEntry.chileUfValue != null && projected.chileUfValue !== officialEntry.chileUfValue) {
+        driftWarnings.push({ field: 'uf_value', message: `${officialEntry.memberName}: UF cambió de ${projected.chileUfValue} a ${officialEntry.chileUfValue}` })
+      }
+    }
+
+    for (const projectedEntry of projection.entries) {
+      if (!calculation.entries.some(e => e.memberId === projectedEntry.memberId)) {
+        driftWarnings.push({ field: 'members', message: `${projectedEntry.memberName}: presente en proyección pero no en oficial` })
+      }
+    }
+
     const completedPromotion = await pgMarkProjectedPayrollPromotionCompleted({
       promotionId: promotion.promotionId,
       promotedEntryCount: calculation.entries.length
@@ -118,7 +159,8 @@ export const promoteProjectedPayrollToOfficialDraft = async (
     return {
       promotion: resolvedPromotion,
       calculation,
-      createdPeriod: officialPeriod.created
+      createdPeriod: officialPeriod.created,
+      driftWarnings
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown payroll promotion failure'

@@ -225,3 +225,22 @@ Se debe poder comparar:
   - `pnpm test src/lib/payroll/project-payroll.test.ts src/lib/payroll/promote-projected-payroll.test.ts`
   - `pnpm exec eslint ...` sobre los archivos tocados
   - `pnpm exec tsc --noEmit --pretty false`
+
+## Delta 2026-03-27 18:50 -03
+
+- Gaps cerrados:
+  - **Variance view por inputs**: `/api/hr/payroll/projected` ahora expone `inputVariance` por entry con flags booleanos (`kpiOtdChanged`, `kpiRpaChanged`, `attendanceChanged`, `ufChanged`, `baseSalaryChanged`) y snapshot de inputs oficiales (`officialInputs`) para comparación
+  - **Drift guardrail**: `promoteProjectedPayrollToOfficialDraft()` ahora detecta drift entre proyección e oficial y retorna `driftWarnings[]` con campo + mensaje por cada input que cambió entre lo proyectado y lo calculado
+  - **Evento `payroll_period.recalculated_from_projection`**: ya existía — verificado en `publishProjectedPayrollPromotionEvents()`
+  - **Migration ejecutada**: `greenhouse_payroll.projected_payroll_promotions` table + index en Cloud SQL (fix: comment SQL que el runner filtraba)
+- Validación:
+  - `tsc --noEmit`: 0 errores
+  - `pnpm test`: 7/7 payroll promotion tests passed
+  - `pnpm build`: exitoso
+- Acceptance criteria status:
+  - ✅ contrato claro de promoción
+  - ✅ mismo motor canónico
+  - ✅ trazabilidad de origen
+  - ✅ variance view con diff por inputs
+  - ✅ drift guardrail con warnings
+  - ✅ lifecycle oficial no se rompe
