@@ -1,8 +1,50 @@
 # TASK-060 — Team Assignment Admin: gestión centralizada de asignaciones desde Agency > Team
 
+## Delta 2026-03-27
+
+### Implementado (slices 1-5)
+- API `capacity-breakdown` enriquecida con `assignments[]` por miembro
+- Botón "Asignar miembro" con drawer (búsqueda, FTE slider, preview de capacidad)
+- Drawer de edición (FTE, horas, rol override)
+- Desasignar con confirmación
+- Filas expandibles con sub-tabla de asignaciones por cliente
+- Columna de acciones por fila
+
+### Pendiente — Slice 6: Mostrar todos los miembros del equipo
+
+La vista actual tiene dos filtros en `capacity-breakdown/route.ts` que ocultan miembros:
+
+```
+Filtro 1: externalAssignments.length === 0 → skip
+Filtro 2: !snapshot || snapshot.usageKind === 'none' → skip
+```
+
+**Auditoría de los 7 miembros activos:**
+
+| Miembro | Ext. Assign | usageKind | Visible? | Razón |
+|---------|-------------|-----------|----------|-------|
+| Andres Carlosama | 1 (Sky) | percent | ✓ | — |
+| Daniela Ferreira | 1 (Sky) | percent | ✓ | — |
+| Melkin Hernandez | 1 (Sky) | percent | ✓ | — |
+| Luis Reyes | 1 (ANAM) | none | ✗ | Filtro 2: usageKind='none' lo descarta |
+| Humberly Henriquez | 0 | none | ✗ | Filtro 1: sin external + Filtro 2 |
+| Valentina Hoyos | 0 | percent | ✗ | Filtro 1: sin external |
+| Julio Reyes | 0 | percent | ✗ | Filtro 1: sin external (admin/dueño — OK) |
+
+**Lo que necesita el Slice 6:**
+
+1. **Relajar filtro 1**: mostrar TODOS los miembros activos (excepto owner/admin si se desea), no solo los que tienen asignaciones externas. Los que no tienen asignaciones deben mostrarse con 0h asignadas y estado "Disponible".
+
+2. **Relajar filtro 2**: `usageKind === 'none'` no debe ocultar al miembro — solo indica que no hay métricas operativas. El miembro sigue siendo asignable y su capacidad contratada es real.
+
+3. **El drawer "Asignar miembro"** necesita buscar de la lista completa de miembros activos, no solo de los que ya aparecen en la tabla.
+
+4. **Considerar**: excluir a Julio Reyes (admin/owner) con un flag configurable, o simplemente mostrarlo también y dejar que el admin decida no asignarlo.
+
 ## Estado
 
-Pendiente. Prerequisito de TASK-038 (Staff Augmentation) y TASK-041 (HRIS Addendum).
+En progreso. Slices 1-5 implementados (CRUD completo). Falta Slice 6 (mostrar todos los miembros).
+Prerequisito de TASK-038 (Staff Augmentation) y TASK-041 (HRIS Addendum).
 
 ## Problema
 
