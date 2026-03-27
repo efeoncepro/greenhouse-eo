@@ -7,6 +7,13 @@
 
 ## 2026-03-26
 
+### Assignment → Membership sync projection
+- Nueva proyección `assignment_membership_sync`: cuando se crea/actualiza un `client_team_assignment`, se asegura automáticamente que el miembro tenga su `person_membership` correspondiente en la organización del cliente, vía el bridge `spaces`
+- Bridge chain: `assignment.client_id → spaces.client_id → spaces.organization_id → person_memberships`
+- En `assignment.removed`: desactiva el membership solo si el miembro no tiene otros assignments activos a la misma org
+- Backfill ejecutado: 4 memberships sincronizados (incluyendo Melkin → Sky Airline que faltaba)
+- Fix: query de assignments y shared overhead en `member-capacity-economics` ahora hace JOIN a `clients` para resolver `client_name` (antes fallaba por columna inexistente)
+
 ### TASK-057 — cierre: taxonomía + Finance expenses + resiliencia
 - Completada la taxonomía canónica de overhead directo: `DIRECT_OVERHEAD_SCOPES` (none, member_direct, shared) + `DIRECT_OVERHEAD_KINDS` (tool_license, tool_usage, equipment, reimbursement, other)
 - `tool-cost-reader` ahora lee 3 fuentes con degradación independiente: AI licenses, AI credits, Finance member_direct expenses
