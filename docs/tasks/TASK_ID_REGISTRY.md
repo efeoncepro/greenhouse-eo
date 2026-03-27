@@ -93,9 +93,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-075` | `complete` | Projected Payroll UX Polish | `docs/tasks/complete/TASK-075-projected-payroll-ux-polish.md` |
 
+| `TASK-076` | `to-do` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/to-do/TASK-076-payroll-chile-liquidacion-parity.md` |
+
 ## Siguiente ID disponible
 
-- `TASK-076`
+- `TASK-077`
 
 ## Regla de asignacion desde aqui
 
