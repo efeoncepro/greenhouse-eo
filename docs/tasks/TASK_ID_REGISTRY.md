@@ -71,11 +71,13 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-053` | `to-do` | TanStack Table Migration Remaining | `docs/tasks/to-do/TASK-053-tanstack-table-migration-remaining.md` |
 | `TASK-054` | `to-do` | TanStack High Impact Remaining | `docs/tasks/to-do/TASK-054-tanstack-high-impact-remaining.md` |
 | `TASK-055` | `in-progress` | Finance Intelligence Cost Coverage Repair | `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md` |
-| `TASK-056` | `in-progress` | Agency Team Capacity Semantics | `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md` |
+| `TASK-056` | `complete` | Agency Team Capacity Semantics | `docs/tasks/complete/TASK-056-agency-team-capacity-semantics.md` |
+| `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
+| `TASK-058` | `in-progress` | Economic Indicators Runtime Layer | `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-057`
+- `TASK-059`
 
 ## Regla de asignacion desde aqui
 

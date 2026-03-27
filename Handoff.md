@@ -49,6 +49,123 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 — Producción release + sesión completa
+
+### Agente
+
+- Claude Code (Opus)
+
+### Objetivo del turno
+
+Sesión completa que cerró 2 tasks, arregló una regresión, creó una proyección nueva, y deployó a producción.
+
+### Trabajo ejecutado
+
+#### 1. TASK-057 — Cierre completo
+- Completada la taxonomía de overhead directo que Codex dejó incompleta (sin créditos)
+- 3 columnas nuevas en expenses: `direct_overhead_scope`, `direct_overhead_kind`, `direct_overhead_member_id`
+- Reader extendido con 3 fuentes independientes + degradación por fuente (`safeQuery`)
+- Guardia de deduplicación: `tool_license`/`tool_usage` solo de AI; `equipment`/`reimbursement`/`other` de Finance
+- Fix TS: destructuring faltante en `createFinanceExpenseInPostgres` + campos en expense route
+- Migration: `scripts/migrations/add-expense-direct-overhead-columns.sql` ejecutada en BD
+- Task movida a `docs/tasks/complete/`
+
+#### 2. TASK-056 — Cierre
+- Todos los acceptance criteria verificados como cumplidos
+- Task movida a `docs/tasks/complete/`
+
+#### 3. Fix regresión de Codex
+- `readMemberDirectToolCosts` tiraba error si las tablas AI no existían → projection fallaba silenciosamente → vista Team vacía
+- Fix: try-catch con degradación a overhead 0 + `safeQuery` per-source
+- Fix adicional: query de assignments hacía `SELECT client_name FROM client_team_assignments` pero esa columna no existe en esa tabla → agregado JOIN a `clients`
+
+#### 4. Re-materialización
+- Ejecutada: 7/7 miembros con snapshots frescos en `member_capacity_economics`
+- Script: `scripts/refresh-member-capacity-economics.ts`
+
+#### 5. Assignment → Membership sync projection
+- Problema: Agency Team mostraba miembros (desde `client_team_assignments`) que no aparecían en Organization People (desde `person_memberships`) — no había bridge entre ambas tablas
+- Solución: nueva proyección `assignment_membership_sync` que reacciona a `assignment.created/updated/removed`
+- Bridge chain: `client_id → spaces → organization_id → person_memberships`
+- En `assignment.removed`: desactiva membership solo si no quedan otros assignments a la misma org
+- Backfill ejecutado: 4 memberships (Andres, Daniela, Luis, Melkin) — Melkin faltaba en Sky Airline
+
+#### 6. Deploy a producción
+- PR #20 mergeado: `develop → main`
+- ~150 commits acumulados incluyendo todo el trabajo anterior de capacity, TanStack, login, etc.
+- Dev y prod comparten la misma BD Cloud SQL (`greenhouse-pg-dev`) — migration y backfills ya aplicados
+
+### Rama
+
+- `develop` → mergeado a `main` vía PR #20
+
+### Ambiente objetivo
+
+- Production (`greenhouse.efeoncepro.com`)
+
+### Archivos clave tocados
+
+- `src/lib/sync/projections/assignment-membership-sync.ts` (NUEVO)
+- `src/lib/sync/projections/member-capacity-economics.ts` (resilience + JOIN fix)
+- `src/lib/team-capacity/tool-cost-reader.ts` (3 fuentes + safeQuery)
+- `src/lib/finance/shared.ts` (DIRECT_OVERHEAD_SCOPES/KINDS)
+- `src/lib/finance/postgres-store-slice2.ts` (fix destructuring + 3 columnas)
+- `src/app/api/finance/expenses/route.ts` (3 campos overhead)
+- `scripts/migrations/add-expense-direct-overhead-columns.sql` (NUEVO)
+- `scripts/refresh-member-capacity-economics.ts` (NUEVO)
+- `scripts/backfill-assignment-memberships.ts` (NUEVO)
+
+### Verificacion
+
+- `pnpm test` — todas las suites pasan (25+ tests core)
+- `tsc --noEmit` — 0 errores
+- `pnpm build` — exitoso
+- Migration ejecutada en BD compartida
+- Backfills ejecutados y verificados
+
+### Riesgos o pendientes
+
+- Verificar visualmente que la vista Team muestre datos en producción después del deploy de Vercel
+- Verificar que Melkin aparezca en Organization People de Sky Airline en producción
+- Ejecutar migration de overhead columns en BD de producción si se separan las BDs en el futuro
+- TASK-058 (Economic Indicators) iniciada por Codex — en progreso documental
+
+---
+
+## 2026-03-27 12:20 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Activar `TASK-058` para materializar una capa común de indicadores económicos Chile (`USD_CLP`, `UF`, `UTM`, `IPC`), con histórico desde `2026-01-01`, sync diario y refresh reactivo para consumers derivados.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Sin validación de runtime todavía; inicio documental de la lane antes de tocar código.
+
+### Riesgos o pendientes
+
+- Decidir si la persistencia nueva vive extendiendo `greenhouse_finance.exchange_rates` o en una tabla general `economic_indicators`.
+- Mantener compatibilidad con los eventos reactivos ya existentes (`finance.exchange_rate.upserted`) sin romper projections actuales.
+
 ## 2026-03-26 22:00 -03
 
 ### Agente

@@ -5,6 +5,13 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-27
+
+### Production release (PR #20 → main)
+- Mergeado `develop → main` con ~150 commits acumulados
+- Incluye: TASK-056 (capacity semantics), TASK-057 (direct overhead), assignment→membership sync, TanStack migration, login redesign, Finance Postgres migration, ICO expansion, y más
+- Migration de overhead columns y backfills ya ejecutados en la BD compartida
+
 ## 2026-03-26
 
 ### Assignment → Membership sync projection
