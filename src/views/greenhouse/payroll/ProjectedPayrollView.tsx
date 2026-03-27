@@ -15,6 +15,7 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import Tab from '@mui/material/Tab'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import TabContext from '@mui/lab/TabContext'
@@ -49,12 +50,15 @@ interface ProjectedEntry {
   memberId: string
   memberName: string
   currency: string
+  payRegime: string
   baseSalary: number
   remoteAllowance: number
   fixedBonusLabel: string | null
   fixedBonusAmount: number
   bonusOtdAmount: number
   bonusRpaAmount: number
+  bonusOtdMax: number
+  bonusRpaMax: number
   kpiOtdPercent: number | null
   kpiRpaAvg: number | null
   kpiOtdQualifies: boolean
@@ -120,6 +124,11 @@ interface ProjectedData {
     promotedEntryCount: number
     createdAt: string | null
   } | null
+  clpEquivalent: {
+    grossClp: number
+    netClp: number
+    fxRate: number
+  } | null
 }
 
 // ── Helpers ──
@@ -141,6 +150,19 @@ const rpaColor = (avg: number | null) => {
 
   return 'error'
 }
+
+const payoutPct = (amount: number, max: number) => max > 0 ? Math.round((amount / max) * 100) : 0
+
+const chipTooltip = (color: 'success' | 'warning' | 'error' | 'secondary') => {
+  if (color === 'success') return 'En meta o por encima'
+  if (color === 'warning') return 'Bajo meta, payout parcial'
+  if (color === 'error') return 'Bajo umbral, sin payout'
+
+  return ''
+}
+
+const isInternationalRegime = (e: ProjectedEntry) =>
+  e.payRegime === 'international' || (e.currency === 'USD' && e.chileTotalDeductions === 0)
 
 const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   const parts: string[] = []
@@ -300,7 +322,15 @@ const ProjectedPayrollView = () => {
     }),
     columnHelper.accessor('chileTotalDeductions', {
       header: 'Descuentos',
-      cell: ({ row }) => <Typography variant='body2' color='error.main'>{formatCurrency(-row.original.chileTotalDeductions, row.original.currency as 'CLP' | 'USD')}</Typography>,
+      cell: ({ row }) => {
+        const e = row.original
+
+        if (isInternationalRegime(e)) {
+          return <Tooltip title='Régimen USD internacional — sin retenciones previsionales chilenas'><CustomChip round='true' size='small' variant='tonal' color='secondary' label='Sin descuentos' /></Tooltip>
+        }
+
+        return <Typography variant='body2' color='error.main'>{formatCurrency(-e.chileTotalDeductions, e.currency as 'CLP' | 'USD')}</Typography>
+      },
       meta: { align: 'right' }
     }),
     columnHelper.accessor('netTotal', {
@@ -361,8 +391,8 @@ const ProjectedPayrollView = () => {
         <TabContext value={mode}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CustomTabList onChange={(_, v: string) => setMode(v as ProjectionMode)}>
-              <Tab label='Hoy' value='actual_to_date' icon={<i className='tabler-clock' />} iconPosition='start' />
-              <Tab label='Fin de mes' value='projected_month_end' icon={<i className='tabler-calendar-event' />} iconPosition='start' />
+              <Tab label={`Hoy (${data?.asOfDate?.slice(8, 10) ?? ''} ${MONTHS[month - 1]?.slice(0, 3) ?? ''})`} value='actual_to_date' icon={<i className='tabler-clock' />} iconPosition='start' />
+              <Tab label={`Fin de mes — ${MONTHS[month - 1]} ${year}`} value='projected_month_end' icon={<i className='tabler-calendar-event' />} iconPosition='start' />
             </CustomTabList>
           </Card>
           <TabPanel value={mode} sx={{ p: 0 }} />
@@ -378,7 +408,11 @@ const ProjectedPayrollView = () => {
               stats={currencySummaryLabel(data.totals.grossByCurrency)}
               avatarIcon='tabler-cash'
               avatarColor='info'
-              subtitle={mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'}
+              subtitle={
+                data.clpEquivalent
+                  ? `~${formatCurrency(data.clpEquivalent.grossClp, 'CLP')} CLP total`
+                  : mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'
+              }
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
@@ -387,7 +421,11 @@ const ProjectedPayrollView = () => {
               stats={currencySummaryLabel(data.totals.netByCurrency)}
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle='Líquido a pagar'
+              subtitle={
+                data.clpEquivalent
+                  ? `~${formatCurrency(data.clpEquivalent.netClp, 'CLP')} CLP total`
+                  : 'Líquido a pagar'
+              }
             />
           </Grid>
           {data.official && (
@@ -527,36 +565,60 @@ const ProjectedPayrollView = () => {
                               <Collapse in={isExpanded} timeout='auto' unmountOnExit>
                                 <Box sx={{ px: 6, py: 3, bgcolor: 'action.hover' }}>
                                   <Grid container spacing={4}>
-                                    {/* Composición */}
-                                    <Grid size={{ xs: 12, md: 4 }}>
-                                      <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Composición</Typography>
+                                    {/* Composición — wider column (Fix 7) */}
+                                    <Grid size={{ xs: 12, md: isInternationalRegime(e) ? 6 : 5 }}>
+                                      <Typography variant='subtitle2' color='text.primary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Composición</Typography>
                                       <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                         <Row label='Base' value={formatCurrency(e.baseSalary, cur)} />
-                                        <Row label='Remote' value={formatCurrency(e.remoteAllowance, cur)} />
+                                        {e.remoteAllowance > 0 && <Row label='Remote' value={formatCurrency(e.remoteAllowance, cur)} />}
                                         {e.fixedBonusAmount > 0 && <Row label={e.fixedBonusLabel || 'Bono fijo'} value={formatCurrency(e.fixedBonusAmount, cur)} />}
-                                        <Row label={`OTD ${e.kpiOtdPercent != null ? `(${e.kpiOtdPercent}%)` : ''}`} value={formatCurrency(e.bonusOtdAmount, cur)} chip={e.kpiOtdPercent != null ? otdColor(e.kpiOtdPercent) : undefined} />
-                                        <Row label={`RpA ${e.kpiRpaAvg != null ? `(${e.kpiRpaAvg})` : ''}`} value={formatCurrency(e.bonusRpaAmount, cur)} chip={e.kpiRpaAvg != null ? rpaColor(e.kpiRpaAvg) : undefined} />
+                                        <Row
+                                          label={`OTD (${e.kpiOtdPercent ?? '—'}%) — ${payoutPct(e.bonusOtdAmount, e.bonusOtdMax)}% payout`}
+                                          value={formatCurrency(e.bonusOtdAmount, cur)}
+                                          chip={e.kpiOtdPercent != null ? otdColor(e.kpiOtdPercent) : undefined}
+                                          chipTooltipText={e.kpiOtdPercent != null ? chipTooltip(otdColor(e.kpiOtdPercent)) : undefined}
+                                        />
+                                        <Row
+                                          label={`RpA (${e.kpiRpaAvg ?? '—'}) — ${payoutPct(e.bonusRpaAmount, e.bonusRpaMax)}% payout`}
+                                          value={formatCurrency(e.bonusRpaAmount, cur)}
+                                          chip={e.kpiRpaAvg != null ? rpaColor(e.kpiRpaAvg) : undefined}
+                                          chipTooltipText={e.kpiRpaAvg != null ? chipTooltip(rpaColor(e.kpiRpaAvg)) : undefined}
+                                        />
                                       </Box>
                                     </Grid>
-                                    {/* Descuentos Chile */}
-                                    <Grid size={{ xs: 12, md: 4 }}>
-                                      <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Descuentos</Typography>
-                                      <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                        <Row label='AFP' value={formatCurrency(-e.chileAfpAmount, cur)} />
-                                        <Row label='Salud' value={formatCurrency(-e.chileHealthAmount, cur)} />
-                                        <Row label='Cesantía' value={formatCurrency(-e.chileUnemploymentAmount, cur)} />
-                                        {e.chileApvAmount > 0 && <Row label='APV' value={formatCurrency(-e.chileApvAmount, cur)} />}
-                                        <Row label='Impuesto' value={formatCurrency(-e.chileTaxAmount, cur)} />
-                                      </Box>
-                                    </Grid>
+                                    {/* Descuentos — conditional by regime */}
+                                    {isInternationalRegime(e) ? (
+                                      <Grid size={{ xs: 12, md: 3 }}>
+                                        <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Descuentos</Typography>
+                                        <Box sx={{ mt: 1 }}>
+                                          <CustomChip round='true' size='small' variant='tonal' color='secondary' label='Sin descuentos previsionales' />
+                                          <Typography variant='caption' display='block' color='text.disabled' sx={{ mt: 0.5 }}>Régimen USD internacional</Typography>
+                                        </Box>
+                                      </Grid>
+                                    ) : (
+                                      <Grid size={{ xs: 12, md: 3 }}>
+                                        <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Descuentos</Typography>
+                                        <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                          <Row label='AFP' value={formatCurrency(-e.chileAfpAmount, cur)} />
+                                          <Row label='Salud' value={formatCurrency(-e.chileHealthAmount, cur)} />
+                                          <Row label='Cesantía' value={formatCurrency(-e.chileUnemploymentAmount, cur)} />
+                                          {e.chileApvAmount > 0 && <Row label='APV' value={formatCurrency(-e.chileApvAmount, cur)} />}
+                                          <Row label='Impuesto' value={formatCurrency(-e.chileTaxAmount, cur)} />
+                                        </Box>
+                                      </Grid>
+                                    )}
                                     {/* Indicadores */}
-                                    <Grid size={{ xs: 12, md: 4 }}>
+                                    <Grid size={{ xs: 12, md: isInternationalRegime(e) ? 6 : 4 }}>
                                       <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Indicadores</Typography>
                                       <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                                        {e.chileUfValue && <Row label='UF' value={formatCurrency(e.chileUfValue, 'CLP')} />}
+                                        {e.chileUfValue != null && e.chileUfValue > 0 && <Row label='UF' value={formatCurrency(e.chileUfValue, 'CLP')} />}
                                         <Row label='Días hábiles' value={`${e.projectedWorkingDays} / ${e.projectedWorkingDaysTotal}`} />
-                                        {e.daysAbsent != null && e.daysAbsent > 0 && <Row label='Ausencias' value={String(e.daysAbsent)} />}
-                                        {e.daysOnLeave != null && e.daysOnLeave > 0 && <Row label='Permisos' value={`${e.daysOnLeave} (${e.daysOnUnpaidLeave ?? 0} sin goce)`} />}
+                                        <Row label='Permisos' value={e.daysOnLeave != null && e.daysOnLeave > 0 ? `${e.daysOnLeave} (${e.daysOnUnpaidLeave ?? 0} sin goce)` : '0'} />
+                                        <Row
+                                          label='Ausencias'
+                                          value={String(e.daysAbsent ?? 0)}
+                                          chip={e.daysAbsent != null && e.daysAbsent > 0 ? 'warning' : undefined}
+                                        />
                                       </Box>
                                       {e.inputVariance && (e.inputVariance.kpiOtdChanged || e.inputVariance.kpiRpaChanged || e.inputVariance.attendanceChanged || e.inputVariance.ufChanged || e.inputVariance.baseSalaryChanged) && (
                                         <Box sx={{ mt: 2 }}>
@@ -602,11 +664,15 @@ const ProjectedPayrollView = () => {
 
 // ── Sub-component ──
 
-const Row = ({ label, value, chip }: { label: string; value: string; chip?: 'success' | 'warning' | 'error' | 'secondary' }) => (
+const Row = ({ label, value, chip, chipTooltipText }: { label: string; value: string; chip?: 'success' | 'warning' | 'error' | 'secondary'; chipTooltipText?: string }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
     <Typography variant='caption' color='text.secondary'>{label}</Typography>
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {chip && <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: `${chip}.main` }} />}
+      {chip && (
+        chipTooltipText
+          ? <Tooltip title={chipTooltipText}><Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: `${chip}.main`, cursor: 'help' }} /></Tooltip>
+          : <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: `${chip}.main` }} />
+      )}
       <Typography variant='body2'>{value}</Typography>
     </Box>
   </Box>

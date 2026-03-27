@@ -91,7 +91,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-073` | `in-progress` | People Canonical Capacity Cutover | `docs/tasks/in-progress/TASK-073-people-canonical-capacity-cutover.md` |
 | `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
 
-| `TASK-075` | `to-do` | Projected Payroll UX Polish | `docs/tasks/to-do/TASK-075-projected-payroll-ux-polish.md` |
+| `TASK-075` | `complete` | Projected Payroll UX Polish | `docs/tasks/complete/TASK-075-projected-payroll-ux-polish.md` |
 
 ## Siguiente ID disponible
 

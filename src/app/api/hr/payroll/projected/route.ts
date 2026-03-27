@@ -4,6 +4,7 @@ import type { ProjectionMode } from '@/types/payroll'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveExchangeRateToClp } from '@/lib/finance/shared'
 import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
 import {
   pgGetLatestProjectedPayrollPromotion
@@ -147,6 +148,23 @@ export async function GET(request: Request) {
       }
     })
 
+    // CLP equivalent for USD totals
+    let clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null = null
+
+    if (result.totals.grossByCurrency.USD && result.totals.grossByCurrency.USD > 0) {
+      try {
+        const fxRate = await resolveExchangeRateToClp({ currency: 'USD' })
+
+        clpEquivalent = {
+          grossClp: round2(result.totals.grossByCurrency.USD * fxRate + (result.totals.grossByCurrency.CLP ?? 0)),
+          netClp: round2(result.totals.netByCurrency.USD * fxRate + (result.totals.netByCurrency.CLP ?? 0)),
+          fxRate
+        }
+      } catch {
+        // FX not available — skip CLP equivalent
+      }
+    }
+
     return NextResponse.json(
       {
         ...result,
@@ -156,7 +174,8 @@ export async function GET(request: Request) {
           netByCurrency: officialNetByCurrency,
           entryCount: officialRows.length
         } : null,
-        latestPromotion
+        latestPromotion,
+        clpEquivalent
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )
