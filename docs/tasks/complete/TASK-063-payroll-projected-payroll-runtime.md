@@ -520,12 +520,18 @@ Desde `src/views/greenhouse/payroll/helpers.ts`:
 
 ## Acceptance Criteria
 
-- [ ] Existe una task y diseño claros para `Nómina proyectada` sin duplicar el motor de `Payroll`
-- [ ] El contrato diferencia explícitamente `actual_to_date` vs `projected_month_end`
-- [ ] La solución propuesta preserva mixed currency y no muta `payroll_entries` oficiales
-- [ ] Se define dónde usar cálculo on-demand y dónde usar projections reactivas
-- [ ] Quedan identificados los eventos y triggers que deben refrescar snapshots proyectados
-- [ ] La lane deja claro el MVP inicial por persona y por grupo
+- [x] Existe una task y diseño claros para `Nómina proyectada` sin duplicar el motor de `Payroll`
+- [x] El contrato diferencia explícitamente `actual_to_date` vs `projected_month_end`
+- [x] La solución propuesta preserva mixed currency y no muta `payroll_entries` oficiales
+- [x] Se define dónde usar cálculo on-demand y dónde usar projections reactivas
+- [x] Quedan identificados los eventos y triggers que deben refrescar snapshots proyectados
+- [x] La lane deja claro el MVP inicial por persona y por grupo
+- [x] API endpoint `GET /api/hr/payroll/projected` implementado
+- [x] Vista `ProjectedPayrollView` con tabs, KPIs, tabla expandible, delta vs oficial
+- [x] Serving table `projected_payroll_snapshots` + store con upsert/read
+- [x] Projection reactiva registrada con 6 eventos entrantes y 2 salientes
+- [x] Sidebar entry "Nómina Proyectada"
+- [x] `tsc --noEmit` limpio, `pnpm build` exitoso, 4 tests passing
 
 ## Verification
 
