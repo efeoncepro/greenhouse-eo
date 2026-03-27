@@ -76,6 +76,10 @@ interface ProjectedEntry {
   projectionMode: ProjectionMode
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
+  officialGrossTotal: number | null
+  officialNetTotal: number | null
+  deltaGross: number | null
+  deltaNet: number | null
 }
 
 interface ProjectedData {
@@ -88,6 +92,11 @@ interface ProjectedData {
     netByCurrency: Record<string, number>
     memberCount: number
   }
+  official: {
+    grossByCurrency: Record<string, number>
+    netByCurrency: Record<string, number>
+    entryCount: number
+  } | null
 }
 
 // ── Helpers ──
@@ -288,7 +297,7 @@ const ProjectedPayrollView = () => {
       {/* KPI cards */}
       {data && (
         <>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
             <HorizontalWithSubtitle
               title='Bruto total'
               stats={currencySummaryLabel(data.totals.grossByCurrency)}
@@ -297,7 +306,7 @@ const ProjectedPayrollView = () => {
               subtitle={mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
             <HorizontalWithSubtitle
               title='Neto total'
               stats={currencySummaryLabel(data.totals.netByCurrency)}
@@ -306,7 +315,26 @@ const ProjectedPayrollView = () => {
               subtitle='Líquido a pagar'
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          {data.official && (
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <HorizontalWithSubtitle
+                title='Δ vs Oficial'
+                stats={currencySummaryLabel(
+                  Object.fromEntries(
+                    Object.entries(data.totals.netByCurrency).map(([cur, projected]) => {
+                      const official = data.official?.netByCurrency[cur] ?? 0
+
+                      return [cur, Math.round((projected - official) * 100) / 100]
+                    })
+                  )
+                )}
+                avatarIcon='tabler-arrows-diff'
+                avatarColor='warning'
+                subtitle='Proyectado − oficial'
+              />
+            </Grid>
+          )}
+          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
             <HorizontalWithSubtitle
               title='Personas'
               stats={String(data.totals.memberCount)}

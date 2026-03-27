@@ -26,6 +26,7 @@ export const AGGREGATE_TYPES = {
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
   compensationVersion: 'compensation_version',
+  projectedPayroll: 'projected_payroll',
 
   // AI Tools
   aiCredits: 'ai_credits',
@@ -119,6 +120,10 @@ export const EVENT_TYPES = {
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
   icoMaterializationCompleted: 'ico.materialization.completed',
+
+  // Projected Payroll
+  projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
+  projectedPayrollPeriodRefreshed: 'payroll.projected_period.refreshed',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
