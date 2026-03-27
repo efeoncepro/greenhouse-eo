@@ -624,101 +624,82 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
-      {/* KPI row */}
+      {/* Financial KPIs */}
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <HorizontalWithSubtitle
             title='Saldo total'
             stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
             subtitle={accounts.length === 0
               ? 'Sin cuentas activas registradas'
               : latestBalanceAsOf
-                ? `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''} · al ${formatDate(latestBalanceAsOf)}`
+                ? `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`
                 : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
             avatarIcon='tabler-wallet'
             avatarColor='primary'
+            footer={latestBalanceAsOf ? `Al ${formatDate(latestBalanceAsOf)}` : undefined}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <HorizontalWithSubtitle
             title='Facturación del mes'
             titleTooltip='Facturado = emitido por invoice_date. Cobrado = recibido por payment_date.'
             stats={formatCLP(accrualIncomeClp)}
-            subtitle={(() => {
-              if (cashIncomeClp > 0 && cashIncomeClp < accrualIncomeClp) {
-                return `Cobrado: ${formatCLP(cashIncomeClp)} · Por cobrar: ${formatCLP(accrualIncomeClp - cashIncomeClp)}`
-              }
-
-              if (cashIncomeClp > 0) {
-                return `Cobrado: ${formatCLP(cashIncomeClp)}`
-              }
-
-              const change = incomeSummary?.accrualCurrentMonth?.changePercent ?? incomeSummary?.currentMonth.changePercent
-
-              return change !== undefined && change !== 0
-                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
-                : 'Sin cobros registrados'
-            })()}
+            subtitle={cashIncomeClp > 0
+              ? `Cobrado: ${formatCLP(cashIncomeClp)}`
+              : 'Sin cobros registrados'}
             avatarIcon='tabler-file-invoice'
             avatarColor='success'
             trend={incomeSummary?.accrualCurrentMonth?.trend ?? incomeSummary?.currentMonth.trend ?? 'positive'}
             trendNumber={incomeSummary?.accrualCurrentMonth?.changePercent !== undefined ? `${Math.abs(incomeSummary.accrualCurrentMonth.changePercent)}%` : undefined}
+            footer={cashIncomeClp > 0 && cashIncomeClp < accrualIncomeClp ? `Por cobrar: ${formatCLP(accrualIncomeClp - cashIncomeClp)}` : undefined}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <HorizontalWithSubtitle
             title='Costos del mes'
             titleTooltip='Incluye gastos operacionales y costo de personal cuando hay nómina aprobada.'
             stats={formatCLP(expenseWithPayroll)}
-            subtitle={(() => {
-              if (pnl && payrollIncluded) {
-                const opex = pnl.costs.totalExpenses - (pnl.costs.unlinkedPayrollCost ?? 0)
-
-                return `Operacional: ${formatCLP(opex)} · Personal: ${formatCLP(pnl.costs.unlinkedPayrollCost ?? 0)}`
-              }
-
-              if (pnl && !payrollIncluded) {
-                return 'Sin nómina aprobada para este período'
-              }
-
-              const change = expenseSummary?.currentMonth.changePercent
-
-              return change !== undefined && change !== 0
-                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
-                : 'Sin nómina aprobada'
-            })()}
+            subtitle={pnl && payrollIncluded
+              ? `Operacional: ${formatCLP(pnl.costs.totalExpenses - (pnl.costs.unlinkedPayrollCost ?? 0))}`
+              : 'Sin nómina aprobada'}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
+            footer={pnl && payrollIncluded ? `Personal: ${formatCLP(pnl.costs.unlinkedPayrollCost ?? 0)}` : undefined}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+      </Grid>
+
+      {/* Economic Indicators */}
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='Dólar obs.'
             stats={indicators.USD_CLP?.value ? formatIndicatorValue(indicators.USD_CLP.value, 'USD_CLP') : 'Sin datos'}
             subtitle={indicators.USD_CLP
-              ? `${indicators.USD_CLP.source ?? 'manual'}${indicators.USD_CLP.indicatorDate ? ` · ${formatDate(indicators.USD_CLP.indicatorDate)}` : ''}`
+              ? `${indicators.USD_CLP.source ?? 'manual'} · ${indicators.USD_CLP.indicatorDate ? formatDate(indicators.USD_CLP.indicatorDate) : ''}`
               : 'Sin registros'}
             avatarIcon='tabler-arrows-exchange'
             avatarColor='info'
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='UF'
             stats={indicators.UF?.value ? formatIndicatorValue(indicators.UF.value, 'UF') : 'Sin datos'}
             subtitle={indicators.UF
-              ? `${indicators.UF.source ?? 'manual'}${indicators.UF.indicatorDate ? ` · ${formatDate(indicators.UF.indicatorDate)}` : ''}`
+              ? `${indicators.UF.source ?? 'manual'} · ${indicators.UF.indicatorDate ? formatDate(indicators.UF.indicatorDate) : ''}`
               : 'Sin registros'}
             avatarIcon='tabler-chart-histogram'
             avatarColor='primary'
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='UTM'
             stats={indicators.UTM?.value ? formatIndicatorValue(indicators.UTM.value, 'UTM') : 'Sin datos'}
             subtitle={indicators.UTM
-              ? `${indicators.UTM.source ?? 'manual'}${indicators.UTM.indicatorDate ? ` · ${formatDate(indicators.UTM.indicatorDate)}` : ''}`
+              ? `${indicators.UTM.source ?? 'manual'} · ${indicators.UTM.indicatorDate ? formatDate(indicators.UTM.indicatorDate) : ''}`
               : 'Sin registros'}
             avatarIcon='tabler-scale'
             avatarColor='warning'
