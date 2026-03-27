@@ -71,6 +71,16 @@ const isWithinRange = (date: string, fromDate: string, toDate: string) => date >
 const sortSnapshotsAsc = (items: EconomicIndicatorSnapshot[]) =>
   [...items].sort((a, b) => a.indicatorDate.localeCompare(b.indicatorDate))
 
+export const shouldIgnoreEconomicIndicatorsBigQueryError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error)
+
+  return (
+    /not found: table/i.test(message)
+    || /dataset .* was not found/i.test(message)
+    || message.includes('fin_economic_indicators')
+  )
+}
+
 const normalizeStoredRecord = (record: FinanceEconomicIndicatorRecord): EconomicIndicatorSnapshot => ({
   indicatorId: record.indicatorId,
   indicatorCode: record.indicatorCode,
@@ -120,6 +130,37 @@ const mapMindicadorSeries = (indicatorCode: EconomicIndicatorCode, items: Mindic
       frequency: definition.frequency
     }] satisfies EconomicIndicatorSnapshot[]
   })
+}
+
+export const pickLatestMindicadorSnapshot = (
+  indicatorCode: EconomicIndicatorCode,
+  items: MindicadorSerieItem[]
+) => {
+  const snapshots = sortSnapshotsAsc(mapMindicadorSeries(indicatorCode, items))
+
+  return snapshots.at(-1) ?? null
+}
+
+const fetchLatestMindicadorIndicator = async (indicatorCode: EconomicIndicatorCode) => {
+  const definition = DEFINITIONS[indicatorCode]
+
+  const response = await fetch(`${MINDICADOR_BASE_URL}/${definition.path}`, {
+    headers: { Accept: 'application/json' },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(8000)
+  })
+
+  if (!response.ok) {
+    return null
+  }
+
+  const payload = (await response.json()) as { serie?: MindicadorSerieItem[] }
+
+  if (!Array.isArray(payload.serie)) {
+    return null
+  }
+
+  return pickLatestMindicadorSnapshot(indicatorCode, payload.serie)
 }
 
 const fetchMindicadorIndicatorRange = async ({
@@ -248,8 +289,7 @@ const getStoredEconomicIndicatorAtOrBeforeFromBigQuery = async ({
   requestedDate: string
 }) => {
   const projectId = getFinanceProjectId()
-
-  const rows = await runFinanceQuery<{
+  let rows: Array<{
     indicator_id: string
     indicator_code: string
     indicator_date: unknown
@@ -257,17 +297,35 @@ const getStoredEconomicIndicatorAtOrBeforeFromBigQuery = async ({
     source: string | null
     unit: string | null
     frequency: string | null
-  }>(
-    `
-      SELECT indicator_id, indicator_code, indicator_date, value, source, unit, frequency
-      FROM \`${projectId}.greenhouse.fin_economic_indicators\`
-      WHERE indicator_code = @indicatorCode
-        AND indicator_date <= CAST(@requestedDate AS DATE)
-      ORDER BY indicator_date DESC
-      LIMIT 1
-    `,
-    { indicatorCode, requestedDate }
-  )
+  }>
+
+  try {
+    rows = await runFinanceQuery<{
+      indicator_id: string
+      indicator_code: string
+      indicator_date: unknown
+      value: unknown
+      source: string | null
+      unit: string | null
+      frequency: string | null
+    }>(
+      `
+        SELECT indicator_id, indicator_code, indicator_date, value, source, unit, frequency
+        FROM \`${projectId}.greenhouse.fin_economic_indicators\`
+        WHERE indicator_code = @indicatorCode
+          AND indicator_date <= CAST(@requestedDate AS DATE)
+        ORDER BY indicator_date DESC
+        LIMIT 1
+      `,
+      { indicatorCode, requestedDate }
+    )
+  } catch (error) {
+    if (shouldIgnoreEconomicIndicatorsBigQueryError(error)) {
+      return null
+    }
+
+    throw error
+  }
 
   const row = rows[0]
 
@@ -288,8 +346,7 @@ const getStoredEconomicIndicatorAtOrBeforeFromBigQuery = async ({
 
 const getLatestStoredEconomicIndicatorFromBigQuery = async (indicatorCode: EconomicIndicatorCode) => {
   const projectId = getFinanceProjectId()
-
-  const rows = await runFinanceQuery<{
+  let rows: Array<{
     indicator_id: string
     indicator_code: string
     indicator_date: unknown
@@ -297,16 +354,34 @@ const getLatestStoredEconomicIndicatorFromBigQuery = async (indicatorCode: Econo
     source: string | null
     unit: string | null
     frequency: string | null
-  }>(
-    `
-      SELECT indicator_id, indicator_code, indicator_date, value, source, unit, frequency
-      FROM \`${projectId}.greenhouse.fin_economic_indicators\`
-      WHERE indicator_code = @indicatorCode
-      ORDER BY indicator_date DESC
-      LIMIT 1
-    `,
-    { indicatorCode }
-  )
+  }>
+
+  try {
+    rows = await runFinanceQuery<{
+      indicator_id: string
+      indicator_code: string
+      indicator_date: unknown
+      value: unknown
+      source: string | null
+      unit: string | null
+      frequency: string | null
+    }>(
+      `
+        SELECT indicator_id, indicator_code, indicator_date, value, source, unit, frequency
+        FROM \`${projectId}.greenhouse.fin_economic_indicators\`
+        WHERE indicator_code = @indicatorCode
+        ORDER BY indicator_date DESC
+        LIMIT 1
+      `,
+      { indicatorCode }
+    )
+  } catch (error) {
+    if (shouldIgnoreEconomicIndicatorsBigQueryError(error)) {
+      return null
+    }
+
+    throw error
+  }
 
   const row = rows[0]
 
@@ -381,6 +456,20 @@ export const syncEconomicIndicator = async ({
   const latest = fetched.at(-1) || null
 
   if (!latest) {
+    const fallbackLatest = await fetchLatestMindicadorIndicator(indicatorCode)
+
+    if (fallbackLatest) {
+      await upsertStoredEconomicIndicator(fallbackLatest)
+
+      return {
+        synced: true,
+        indicatorCode,
+        requestedDate: desiredDate,
+        fetchedDate: fallbackLatest.indicatorDate,
+        snapshot: fallbackLatest
+      }
+    }
+
     return {
       synced: false,
       indicatorCode,

@@ -49,6 +49,82 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 15:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Diagnosticar el `500` del dashboard de indicadores económicos en `Finance`, endurecer el fallback a BigQuery y contrastar/documentar dependencias y eventos reactivos de `TASK-063` (`Nómina proyectada`).
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/finance/economic-indicators.ts`
+- `src/lib/finance/economic-indicators.test.ts`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/tasks/to-do/TASK-063-payroll-projected-payroll-runtime.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Se verificó estado real de storage:
+  - PostgreSQL `greenhouse_finance.economic_indicators` existe y tiene datos para `USD_CLP`, `UF`, `UTM`
+  - BigQuery no tenía `greenhouse.fin_economic_indicators`; se provisionó con `ensureFinanceInfrastructure()`
+- `pnpm test src/lib/finance/economic-indicators.test.ts`
+- `pnpm exec eslint src/lib/finance/economic-indicators.ts src/lib/finance/economic-indicators.test.ts`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- El fix del helper evita que falte una tabla analítica y se caiga toda la ruta, pero para ver el cambio en `staging` hay que desplegar estos cambios.
+- `TASK-063` quedó contrastada respecto a dependencias y eventos, pero sigue en estado `to-do`; no hay runtime proyectado implementado todavía.
+
+## 2026-03-27 09:05 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar una nueva lane para `Nómina proyectada` como complemento de `Payroll`, orientada a responder cuánto cobraría una persona o grupo hoy y a fin de mes sin mutar `payroll_entries` oficiales.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-063-payroll-projected-payroll-runtime.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+
+- revisión del template canónico `docs/tasks/TASK_TEMPLATE.md`
+- revisión del índice `docs/tasks/README.md`
+- revisión del registro `docs/tasks/TASK_ID_REGISTRY.md`
+
+### Riesgos o pendientes
+
+- La lane quedó solo documentada; no hay runtime ni UI implementados todavía.
+- La implementación debe reutilizar el motor canónico de `Payroll` y no crear una segunda lógica paralela de cálculo.
+
 ## 2026-03-27 08:35 -03
 
 ### Agente
