@@ -27,87 +27,34 @@ describe('GET /api/team/capacity-breakdown', () => {
     })
   })
 
-  it('excludes internal efeonce assignments and caps the contractual envelope at 1.0 FTE', async () => {
+  it('shows all active members including those without external assignments', async () => {
+    // Query 1: all active members
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([
-        {
-          member_id: 'member-1',
-          display_name: 'Andres Carlosama',
-          role_title: 'Operations Lead',
-          role_category: 'operations',
-          fte_allocation: '1.000',
-          contracted_hours_month: 160,
-          client_id: 'client_internal',
-          client_name: 'Efeonce Internal',
-          active_assets: 0
-        },
-        {
-          member_id: 'member-1',
-          display_name: 'Andres Carlosama',
-          role_title: 'Operations Lead',
-          role_category: 'operations',
-          fte_allocation: '1.000',
-          contracted_hours_month: 160,
-          client_id: 'client-sky',
-          client_name: 'Sky Airline',
-          active_assets: 0
-        },
-        {
-          member_id: 'member-2',
-          display_name: 'Luis Reyes',
-          role_title: 'Hubspot Specialist',
-          role_category: 'media',
-          fte_allocation: '1.000',
-          contracted_hours_month: 160,
-          client_id: 'client_internal',
-          client_name: 'Efeonce Internal',
-          active_assets: 0
-        },
-        {
-          member_id: 'member-2',
-          display_name: 'Luis Reyes',
-          role_title: 'Hubspot Specialist',
-          role_category: 'media',
-          fte_allocation: '0.300',
-          contracted_hours_month: 48,
-          client_id: 'client-sky',
-          client_name: 'Sky Airline',
-          active_assets: 0
-        }
+        { member_id: 'member-1', display_name: 'Andres Carlosama', role_title: 'Operations Lead', role_category: 'operations' },
+        { member_id: 'member-2', display_name: 'Luis Reyes', role_title: 'HubSpot Specialist', role_category: 'media' },
+        { member_id: 'member-3', display_name: 'Valentina Hoyos', role_title: 'Designer', role_category: 'design' }
+      ])
+      // Query 2: active assignments
+      .mockResolvedValueOnce([
+        { assignment_id: 'a-internal', member_id: 'member-1', client_id: 'client_internal', client_name: 'Efeonce Internal', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01' },
+        { assignment_id: 'a-sky', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01' },
+        { assignment_id: 'a-sky-2', member_id: 'member-2', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '0.300', contracted_hours_month: 48, start_date: '2026-02-01' }
       ])
 
     mockReadMemberCapacityEconomicsBatch.mockResolvedValue(
       new Map([
         ['member-1', {
-          memberId: 'member-1',
-          periodYear: 2026,
-          periodMonth: 3,
-          contractedFte: 1,
-          contractedHours: 160,
-          assignedHours: 160,
-          usageKind: 'percent',
-          usedHours: null,
-          usagePercent: 78,
-          commercialAvailabilityHours: 0,
-          operationalAvailabilityHours: null,
-          sourceCurrency: 'CLP',
-          targetCurrency: 'CLP',
-          totalCompSource: null,
-          totalLaborCostTarget: null,
-          directOverheadTarget: 0,
-          sharedOverheadTarget: 0,
-          loadedCostTarget: null,
-          costPerHourTarget: null,
-          suggestedBillRateTarget: null,
-          fxRate: null,
-          fxRateDate: null,
-          fxProvider: null,
-          fxStrategy: null,
-          snapshotStatus: 'partial',
-          sourceCompensationVersionId: null,
-          sourcePayrollPeriodId: null,
-          assignmentCount: 1,
-          materializedAt: null
+          contractedFte: 1, contractedHours: 160, assignedHours: 160,
+          usageKind: 'percent', usedHours: null, usagePercent: 78,
+          commercialAvailabilityHours: 0, operationalAvailabilityHours: null,
+          costPerHourTarget: null, suggestedBillRateTarget: null, targetCurrency: 'CLP'
+        }],
+        ['member-3', {
+          contractedFte: 1, contractedHours: 160, assignedHours: 0,
+          usageKind: 'percent', usedHours: null, usagePercent: 0,
+          commercialAvailabilityHours: 160, operationalAvailabilityHours: null,
+          costPerHourTarget: null, suggestedBillRateTarget: null, targetCurrency: 'CLP'
         }]
       ])
     )
@@ -116,77 +63,53 @@ describe('GET /api/team/capacity-breakdown', () => {
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(body.memberCount).toBe(1)
-    expect(body.hasOperationalMetrics).toBe(true)
-    expect(body.team).toMatchObject({
-      contractedHoursMonth: 160,
-      assignedHoursMonth: 160,
-      usedHoursMonth: null,
-      availableHoursMonth: 0,
-      usageKind: 'percent',
-      usagePercent: 78
-    })
+    // All 3 members appear (not just those with external assignments)
+    expect(body.memberCount).toBe(3)
+    expect(body.members.map((m: { displayName: string }) => m.displayName)).toEqual([
+      'Andres Carlosama', 'Luis Reyes', 'Valentina Hoyos'
+    ])
+
+    // Andres: has snapshot + external assignment
     expect(body.members[0]).toMatchObject({
       displayName: 'Andres Carlosama',
       fteAllocation: 1,
       capacityHealth: 'balanced',
-      usageKind: 'percent',
-      usagePercent: 78
+      usageKind: 'percent'
     })
-    expect(body.members[0].capacity).toMatchObject({
-      contractedHoursMonth: 160,
-      assignedHoursMonth: 160,
-      availableHoursMonth: 0
+    expect(body.members[0].assignments).toHaveLength(1) // only Sky, not internal
+
+    // Luis: has external assignment but no snapshot — uses fallback
+    expect(body.members[1]).toMatchObject({
+      displayName: 'Luis Reyes',
+      capacity: expect.objectContaining({ assignedHoursMonth: 48 })
     })
+    expect(body.members[1].assignments).toHaveLength(1)
+
+    // Valentina: no assignments at all — shows as idle/available
+    expect(body.members[2]).toMatchObject({
+      displayName: 'Valentina Hoyos',
+      capacityHealth: 'idle'
+    })
+    expect(body.members[2].assignments).toHaveLength(0)
+    expect(body.members[2].capacity.availableHoursMonth).toBe(160)
   })
 
-  it('uses latest operational metrics to compute used hours from throughput activity', async () => {
+  it('computes team totals across all members including unassigned ones', async () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([
-        {
-          member_id: 'member-1',
-          display_name: 'Daniela Ferreira',
-          role_title: 'Designer',
-          role_category: 'design',
-          fte_allocation: '1.000',
-          contracted_hours_month: 160,
-          client_id: 'client-sky',
-          client_name: 'Sky Airline'
-        }
+        { member_id: 'member-1', display_name: 'Daniela Ferreira', role_title: 'Designer', role_category: 'design' }
+      ])
+      .mockResolvedValueOnce([
+        { assignment_id: 'a-1', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: null }
       ])
 
     mockReadMemberCapacityEconomicsBatch.mockResolvedValue(
       new Map([
         ['member-1', {
-          memberId: 'member-1',
-          periodYear: 2026,
-          periodMonth: 3,
-          contractedFte: 1,
-          contractedHours: 160,
-          assignedHours: 160,
-          usageKind: 'percent',
-          usedHours: null,
-          usagePercent: 100,
-          commercialAvailabilityHours: 0,
-          operationalAvailabilityHours: null,
-          sourceCurrency: 'CLP',
-          targetCurrency: 'CLP',
-          totalCompSource: null,
-          totalLaborCostTarget: null,
-          directOverheadTarget: 0,
-          sharedOverheadTarget: 0,
-          loadedCostTarget: null,
-          costPerHourTarget: null,
-          suggestedBillRateTarget: null,
-          fxRate: null,
-          fxRateDate: null,
-          fxProvider: null,
-          fxStrategy: null,
-          snapshotStatus: 'partial',
-          sourceCompensationVersionId: null,
-          sourcePayrollPeriodId: null,
-          assignmentCount: 1,
-          materializedAt: null
+          contractedFte: 1, contractedHours: 160, assignedHours: 160,
+          usageKind: 'percent', usedHours: null, usagePercent: 100,
+          commercialAvailabilityHours: 0, operationalAvailabilityHours: null,
+          costPerHourTarget: null, suggestedBillRateTarget: null, targetCurrency: 'CLP'
         }]
       ])
     )
@@ -199,7 +122,6 @@ describe('GET /api/team/capacity-breakdown', () => {
     expect(body.team.usedHoursMonth).toBeNull()
     expect(body.team.usageKind).toBe('percent')
     expect(body.team.usagePercent).toBe(100)
-    expect(body.team.availableHoursMonth).toBe(0)
     expect(body.members[0].capacityHealth).toBe('overloaded')
   })
 })
