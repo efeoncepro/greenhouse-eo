@@ -105,7 +105,7 @@ const HEALTH_COLORS: Record<string, 'secondary' | 'success' | 'warning' | 'error
 }
 
 const HEALTH_LABELS: Record<string, string> = {
-  idle: 'Disponible', balanced: 'Balanceado', high: 'Alta carga', overloaded: 'Sobrecargado'
+  idle: 'Disponible', balanced: 'Balanceado', high: 'Dedicación completa', overloaded: 'Sobrecomprometido'
 }
 
 const formatHours = (value: number | null) => (value === null ? '—' : `${value}h`)

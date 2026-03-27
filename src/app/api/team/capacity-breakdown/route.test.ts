@@ -122,6 +122,6 @@ describe('GET /api/team/capacity-breakdown', () => {
     expect(body.team.usedHoursMonth).toBeNull()
     expect(body.team.usageKind).toBe('percent')
     expect(body.team.usagePercent).toBe(100)
-    expect(body.members[0].capacityHealth).toBe('overloaded')
+    expect(body.members[0].capacityHealth).toBe('high') // 100% allocation = full dedication, not overloaded
   })
 })

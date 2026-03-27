@@ -172,9 +172,13 @@ export async function GET() {
         overcommitted: assignedHours > contractedHours
       }
 
+      const allocationPercent = contractedHours > 0 ? Math.round((assignedHours / contractedHours) * 100) : 0
       const capacityHealth = assignedHours === 0
         ? 'idle'
-        : getCapacityHealth(utilizationPercent || (assignedHours >= contractedHours ? 85 : 0))
+        : getCapacityHealth(
+            utilizationPercent || allocationPercent,
+            assignedHours > contractedHours
+          )
 
       memberBreakdowns.push({
         memberId: member.member_id,
