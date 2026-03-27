@@ -138,9 +138,19 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.projected_payroll_snapshots (
 
 `fetchKpisForPeriod()` ya resuelve esto — lee de `metrics_by_member` para el período actual. No necesita cambios.
 
-**Decisión**: Política conservadora. No extrapolar. Si un miembro tiene OTD 92% hoy, la proyección de fin de mes asume 92%. Si materializa de nuevo y sube a 95%, la proyección se actualiza reactivamente vía `ico.materialization.completed`.
+**Decisión**: Usar el snapshot materializado más reciente (se actualiza diario a las 6:15 AM vía `vercel.json` cron `ico-materialize`). RpA y OTD son métricas vivas que cambian con cada tarea completada y cada ronda de corrección — no se pueden asumir como constantes. Pero con materialización diaria, la proyección refleja el estado real hasta la mañana del día actual. Cuando ICO materializa y publica `ico.materialization.completed`, la cadena reactiva actualiza los snapshots de Postgres automáticamente.
+
+**Cadena de frescura de KPIs:**
+```
+6:15 AM  → ico-materialize (BigQuery) — computa OTD/RpA del mes acumulado
+         → publica ico.materialization.completed
+6:20 AM  → outbox-react → ico-member-metrics projection (BQ → Postgres)
+         → person_intelligence projection (actualiza quality index)
+Día      → usuario abre Nómina Proyectada → fetchKpisForPeriod() lee Postgres → KPIs frescos del día
+```
 
 **Archivos que NO se modifican**: `fetch-kpis-for-period.ts`, `materialize.ts`
+**Configuración existente**: `vercel.json` → `"15 6 * * *"` (diario, ya configurado)
 
 #### Gap 3: Sin asistencia diaria pre-cierre
 
