@@ -19,6 +19,7 @@ interface MemberRow extends Record<string, unknown> {
   display_name: string
   role_title: string | null
   role_category: TeamRoleCategory | null
+  assignable: boolean
 }
 
 interface AssignmentRow extends Record<string, unknown> {
@@ -70,7 +71,7 @@ export async function GET() {
     // 1. Fetch ALL active members
     const allMembers = await withTimeout(
       runGreenhousePostgresQuery<MemberRow>(
-        `SELECT member_id, display_name, role_title, role_category
+        `SELECT member_id, display_name, role_title, role_category, COALESCE(assignable, TRUE) AS assignable
          FROM greenhouse_core.members
          WHERE active = TRUE
          ORDER BY display_name`
@@ -118,11 +119,12 @@ export async function GET() {
       month: currentMonth
     }).catch(() => new Map())
 
-    // 5. Build breakdowns for ALL members
+    // 5. Build breakdowns for ALL assignable members
     const memberBreakdowns: Array<{
       memberId: string
       displayName: string
       roleTitle: string | null
+      assignable: boolean
       fteAllocation: number
       usageKind: 'none' | 'hours' | 'percent' | string
       usagePercent: number | null
@@ -178,6 +180,7 @@ export async function GET() {
         memberId: member.member_id,
         displayName: member.display_name,
         roleTitle,
+        assignable: member.assignable !== false,
         fteAllocation: snapshot?.contractedFte ?? 1,
         usageKind,
         usagePercent,
@@ -200,16 +203,20 @@ export async function GET() {
       })
     }
 
-    // 6. Aggregate team totals
-    const totalContracted = memberBreakdowns.reduce((sum, m) => sum + m.capacity.contractedHoursMonth, 0)
-    const totalAssigned = memberBreakdowns.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0)
-    const totalUsed = memberBreakdowns.every(m => m.capacity.usedHoursMonth !== null)
-      ? memberBreakdowns.reduce((sum, m) => sum + (m.capacity.usedHoursMonth ?? 0), 0)
+    // 6. Split assignable vs excluded
+    const assignableMembers = memberBreakdowns.filter(m => m.assignable)
+    const excludedMembers = memberBreakdowns.filter(m => !m.assignable)
+
+    // 7. Aggregate team totals (only from assignable members)
+    const totalContracted = assignableMembers.reduce((sum, m) => sum + m.capacity.contractedHoursMonth, 0)
+    const totalAssigned = assignableMembers.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0)
+    const totalUsed = assignableMembers.every(m => m.capacity.usedHoursMonth !== null)
+      ? assignableMembers.reduce((sum, m) => sum + (m.capacity.usedHoursMonth ?? 0), 0)
       : null
-    const weightedUsagePercent = memberBreakdowns.length > 0
+    const weightedUsagePercent = assignableMembers.length > 0
       ? Math.round(
-          memberBreakdowns.reduce((sum, m) => sum + ((m.usagePercent ?? 0) * m.capacity.assignedHoursMonth), 0) /
-          Math.max(1, memberBreakdowns.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0))
+          assignableMembers.reduce((sum, m) => sum + ((m.usagePercent ?? 0) * m.capacity.assignedHoursMonth), 0) /
+          Math.max(1, assignableMembers.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0))
         )
       : null
 
@@ -217,24 +224,26 @@ export async function GET() {
       contractedHoursMonth: totalContracted,
       assignedHoursMonth: totalAssigned,
       usedHoursMonth: totalUsed,
-      availableHoursMonth: memberBreakdowns.reduce((sum, m) => sum + m.capacity.availableHoursMonth, 0),
-      commercialAvailabilityHours: memberBreakdowns.reduce((sum, m) => sum + (m.capacity.commercialAvailabilityHours ?? 0), 0),
+      availableHoursMonth: assignableMembers.reduce((sum, m) => sum + m.capacity.availableHoursMonth, 0),
+      commercialAvailabilityHours: assignableMembers.reduce((sum, m) => sum + (m.capacity.commercialAvailabilityHours ?? 0), 0),
       operationalAvailabilityHours: totalUsed === null ? null : Math.max(0, totalContracted - totalUsed),
       usageKind: totalUsed !== null ? 'hours' : weightedUsagePercent !== null ? 'percent' : 'none',
       usagePercent: totalUsed === null ? weightedUsagePercent : null,
-      overcommitted: memberBreakdowns.some(m => m.capacity.overcommitted)
+      overcommitted: assignableMembers.some(m => m.capacity.overcommitted)
     }
 
-    const overcommittedCount = memberBreakdowns.filter(m => m.capacity.overcommitted).length
+    const overcommittedCount = assignableMembers.filter(m => m.capacity.overcommitted).length
 
     return NextResponse.json(
       {
         team: teamTotal,
-        members: memberBreakdowns,
-        memberCount: memberBreakdowns.length,
-        hasOperationalMetrics: memberBreakdowns.some(m => m.usageKind !== 'none'),
+        members: assignableMembers,
+        excludedMembers,
+        memberCount: assignableMembers.length,
+        excludedCount: excludedMembers.length,
+        hasOperationalMetrics: assignableMembers.some(m => m.usageKind !== 'none'),
         overcommittedCount,
-        overcommittedMembers: memberBreakdowns.filter(m => m.capacity.overcommitted).map(m => ({
+        overcommittedMembers: assignableMembers.filter(m => m.capacity.overcommitted).map(m => ({
           memberId: m.memberId,
           displayName: m.displayName,
           deficit: Math.abs(m.capacity.commercialAvailabilityHours ?? m.capacity.availableHoursMonth)

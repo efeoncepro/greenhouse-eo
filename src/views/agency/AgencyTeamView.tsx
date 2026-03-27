@@ -70,6 +70,7 @@ interface TeamMember {
   memberId: string
   displayName: string
   roleTitle: string | null
+  assignable?: boolean
   fteAllocation: number
   usageKind: 'none' | 'hours' | 'percent' | string
   usagePercent: number | null
@@ -89,7 +90,9 @@ interface TeamData {
     usagePercent?: number | null
   }
   members: TeamMember[]
+  excludedMembers?: TeamMember[]
   memberCount: number
+  excludedCount?: number
   hasOperationalMetrics: boolean
   overcommittedCount: number
   overcommittedMembers: Array<{ displayName: string; deficit: number }>
@@ -139,6 +142,9 @@ const AgencyTeamView = () => {
   const [unassignTarget, setUnassignTarget] = useState<{ assignmentId: string; memberName: string; clientName: string } | null>(null)
   const [unassigning, setUnassigning] = useState(false)
 
+  // Excluded members section
+  const [showExcluded, setShowExcluded] = useState(false)
+
   const load = useCallback(async () => {
     setLoading(true)
 
@@ -157,6 +163,20 @@ const AgencyTeamView = () => {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const toggleAssignable = async (memberId: string, assignable: boolean) => {
+    try {
+      await fetch(`/api/admin/team/members/${memberId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignable })
+      })
+
+      void load()
+    } catch {
+      // silent
+    }
+  }
 
   const members = useMemo(() => data?.members ?? [], [data])
 
@@ -274,21 +294,21 @@ const AgencyTeamView = () => {
         const m = row.original
         const primaryAssignment = m.assignments?.[0]
 
-        if (!primaryAssignment) return null
-
         return (
           <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-            <Tooltip title='Editar asignación'>
-              <IconButton size='small' onClick={() => handleEditAssignment(m, primaryAssignment)}>
-                <i className='tabler-edit' style={{ fontSize: 18 }} />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Desasignar'>
-              <IconButton
-                size='small'
-                color='error'
-                onClick={() => setUnassignTarget({
-                  assignmentId: primaryAssignment.assignmentId,
+            {primaryAssignment && (
+              <>
+                <Tooltip title='Editar asignación'>
+                  <IconButton size='small' onClick={() => handleEditAssignment(m, primaryAssignment)}>
+                    <i className='tabler-edit' style={{ fontSize: 18 }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title='Desasignar'>
+                  <IconButton
+                    size='small'
+                    color='error'
+                    onClick={() => setUnassignTarget({
+                      assignmentId: primaryAssignment.assignmentId,
                   memberName: m.displayName,
                   clientName: primaryAssignment.clientName || 'cliente'
                 })}
@@ -296,10 +316,17 @@ const AgencyTeamView = () => {
                 <i className='tabler-user-minus' style={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
+              </>
+            )}
+            <Tooltip title='Excluir del equipo'>
+              <IconButton size='small' onClick={() => toggleAssignable(m.memberId, false)}>
+                <i className='tabler-eye-off' style={{ fontSize: 18 }} />
+              </IconButton>
+            </Tooltip>
           </Box>
         )
       },
-      size: 90,
+      size: 120,
       meta: { align: 'right' }
     })
   ], [columnHelper])
@@ -531,6 +558,59 @@ return acc }, {} as Record<string, number>)
             <TablePaginationComponent table={table as ReturnType<typeof useReactTable>} />
           </Card>
         </Grid>
+
+        {/* Excluded members section */}
+        {(data.excludedMembers?.length ?? 0) > 0 && (
+          <Grid size={{ xs: 12 }}>
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, opacity: 0.8 }}>
+              <CardHeader
+                title={`Excluidos (${data.excludedCount ?? 0})`}
+                subheader='Miembros excluidos del equipo asignable'
+                avatar={<Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity' }}><i className='tabler-eye-off' style={{ fontSize: 20, color: 'var(--mui-palette-secondary-main)' }} /></Avatar>}
+                action={
+                  <Button variant='tonal' size='small' color='secondary' onClick={() => setShowExcluded(!showExcluded)}>
+                    {showExcluded ? 'Ocultar' : 'Mostrar'}
+                  </Button>
+                }
+              />
+              {showExcluded && (
+                <>
+                  <Divider />
+                  <CardContent sx={{ p: 0 }}>
+                    <table className={tableStyles.table}>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left' }}>Nombre</th>
+                          <th style={{ textAlign: 'left' }}>Rol</th>
+                          <th style={{ textAlign: 'right' }}></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.excludedMembers?.map(m => (
+                          <tr key={m.memberId}>
+                            <td><Typography variant='body2'>{m.displayName}</Typography></td>
+                            <td><Typography variant='caption' color='text.secondary'>{m.roleTitle || '—'}</Typography></td>
+                            <td style={{ textAlign: 'right' }}>
+                              <Button
+                                variant='tonal'
+                                size='small'
+                                color='info'
+                                startIcon={<i className='tabler-eye' style={{ fontSize: 16 }} />}
+                                onClick={() => toggleAssignable(m.memberId, true)}
+                              >
+                                Incluir
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </CardContent>
+                </>
+              )}
+            </Card>
+          </Grid>
+        )}
       </Grid>
 
       {/* Edit Assignment Drawer */}

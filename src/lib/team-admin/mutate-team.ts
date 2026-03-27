@@ -46,7 +46,8 @@ const writableMemberColumns = new Set([
   'azure_oid',
   'notion_user_id',
   'hubspot_owner_id',
-  'active'
+  'active',
+  'assignable'
 ])
 
 const writableAssignmentColumns = new Set([
