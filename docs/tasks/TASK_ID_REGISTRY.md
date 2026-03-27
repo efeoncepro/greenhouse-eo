@@ -95,9 +95,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-076` | `to-do` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/to-do/TASK-076-payroll-chile-liquidacion-parity.md` |
 
+| `TASK-077` | `to-do` | Payroll Receipt Generation & Delivery | `docs/tasks/to-do/TASK-077-payroll-receipt-generation-delivery.md` |
+
 ## Siguiente ID disponible
 
-- `TASK-077`
+- `TASK-078`
 
 ## Regla de asignacion desde aqui
 
