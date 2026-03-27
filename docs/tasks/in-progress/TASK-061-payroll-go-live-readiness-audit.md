@@ -9,6 +9,10 @@
   - `personal` ahora es no remunerado
   - `medical` pasa a representar `permiso médico / cita médica` remunerado
   - `personal_unpaid` queda como alias legacy inactivo
+- Se amplió además el catálogo con una baseline internacional de HR, sin alterar la lógica Chile aplicada:
+  - remunerados por defecto: `floating_holiday`, `bereavement`, `civic_duty`
+  - no remunerados por defecto: `parental`, `study`
+- Estos nuevos tipos se documentan como defaults operativos y no como verdad legal universal; la empresa puede ajustar `is_paid` según país/política.
 
 ## Status
 

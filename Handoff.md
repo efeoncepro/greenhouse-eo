@@ -49,6 +49,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 08:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Ampliar el catálogo de permisos con una baseline internacional útil para HR, manteniendo intacta la política Chile ya aplicada para cálculo de nómina.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `scripts/setup-postgres-hr-leave.sql`
+- `scripts/setup-hr-core-tables.sql`
+- `src/lib/hr-core/schema.ts`
+- `scripts/migrations/expand-leave-types-international-baseline.sql`
+- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm exec tsx scripts/run-migration.ts scripts/migrations/expand-leave-types-international-baseline.sql`
+- verificación runtime en PostgreSQL del catálogo:
+  - remunerados / activos: `vacation`, `medical`, `floating_holiday`, `bereavement`, `civic_duty`
+  - no remunerados / activos: `personal`, `parental`, `study`, `unpaid`
+  - alias legacy inactivo: `personal_unpaid`
+
+### Riesgos o pendientes
+
+- Los nuevos tipos internacionales son defaults de política y no deben leerse como cumplimiento legal universal por país; si una operación internacional necesita otra política, basta ajustar `is_paid` en `leave_types`.
+
 ## 2026-03-27 08:15 -03
 
 ### Agente

@@ -21,6 +21,10 @@
   - `medical` ahora representa `permiso médico / cita médica` remunerado
   - `personal_unpaid` queda como alias legacy inactivo para no romper requests históricos
 - Ejecutada la migration `scripts/migrations/normalize-leave-type-paid-policy.sql` y verificado el estado final del catálogo en PostgreSQL.
+- Se amplió el catálogo con una baseline internacional de permisos:
+  - remunerados por defecto: `floating_holiday`, `bereavement`, `civic_duty`
+  - no remunerados por defecto: `parental`, `study`
+- Ejecutada la migration `scripts/migrations/expand-leave-types-international-baseline.sql` y verificado el catálogo final en PostgreSQL.
 
 ### Payroll go-live hardening
 - `Payroll` ya no consolida períodos mixtos `CLP/USD` bajo una sola moneda en dashboard ni en `Personnel Expense`; ahora separa subtotales por moneda y evita visualizaciones engañosas.
