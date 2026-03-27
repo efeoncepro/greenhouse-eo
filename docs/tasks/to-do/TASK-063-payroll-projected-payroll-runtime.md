@@ -257,6 +257,161 @@ Reglas obligatorias:
   - KPI `ICO`
   - indicadores económicos
 
+## UI/UX Spec — Nómina Proyectada
+
+### Decisión de superficie
+
+Vista hermana de Nómina en el sidebar: **EQUIPO > Nómina Proyectada** (`/payroll/projected`).
+
+Razones:
+- Separación semántica: oficial (cerrable) vs simulación (informativa)
+- Escala hacia forecast multi-mes sin quedar atrapada en contexto de período
+- Puede ser consumida por Finance y Agency sin depender del módulo oficial
+
+### Eventos reactivos
+
+**Entrantes** — la proyección se refresca cuando ocurren:
+
+| Evento | Efecto en la proyección |
+|--------|------------------------|
+| `compensation_version.created` | Recalcular con nuevo salario base |
+| `compensation_version.updated` | Recalcular con comp editada |
+| `payroll_entry.upserted` | Actualizar delta oficial vs proyectado |
+| `payroll_period.calculated` | Snapshot oficial disponible para comparación |
+| `finance.exchange_rate.upserted` | Recalcular conversión USD→CLP |
+| `ico.materialization.completed` | Actualizar bonus variable con KPIs frescos |
+
+**Salientes** — la proyección emite:
+
+| Evento | Consumers downstream |
+|--------|---------------------|
+| `payroll.projected_snapshot.refreshed` | `member_capacity_economics` (labor cost esperado), `person_intelligence` (costo proyectado), `client_economics` (forecast gasto por cliente) |
+| `payroll.projected_period.refreshed` | Fanout: recalcular todos los snapshots del período |
+
+### Arquitectura de archivos
+
+```
+src/views/greenhouse/payroll/
+  ProjectedPayrollView.tsx          ← Vista principal (page-level)
+  ProjectedPayrollTable.tsx         ← Tabla por persona con expandable rows
+  ProjectedPayrollDesglose.tsx      ← Componente de desglose expandido
+
+src/app/api/hr/payroll/projected/
+  route.ts                          ← GET: cálculo on-demand por período + modo
+  [memberId]/route.ts               ← GET: detalle por persona
+
+src/lib/payroll/
+  project-payroll.ts                ← Pure compute: reutiliza buildPayrollEntry con asOfDate
+  projected-payroll-store.ts        ← Read/write de snapshots materializados
+
+src/lib/sync/projections/
+  projected-payroll.ts              ← Projection definition (eventos + refresh)
+```
+
+### Layout principal — ProjectedPayrollView
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Nómina Proyectada · Marzo 2026                    [◀ ▶]  │  ← CardHeader + month nav
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌─ Hoy ─┐  ┌─ Fin de mes ─┐                            │  ← CustomTabList (2 tabs)
+│                                                          │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐               │
+│  │Bruto     │  │Neto      │  │Δ Oficial │               │  ← 3 × HorizontalWithSubtitle
+│  │$4.850.000│  │$3.920.000│  │+$120.000 │               │
+│  │+2.1% ↑  │  │Proyectado│  │vs cerrado│               │
+│  └──────────┘  └──────────┘  └──────────┘               │
+│                                                          │
+│  ┌── Subtotales por moneda ──────────────────────┐       │
+│  │  CLP: $3.200.000 bruto · $2.580.000 neto      │       │  ← CustomChip badges
+│  │  USD: $1.650 bruto · $1.340 neto               │       │
+│  └────────────────────────────────────────────────┘       │
+│                                                          │
+├──────────────────────────────────────────────────────────┤
+│ Detalle por persona                    [Buscar...]       │  ← CardHeader + search
+│ ┌────────────────────────────────────────────────────┐   │
+│ │ ▶ │Nombre     │Moneda│Bruto    │Variable│Neto     │   │  ← TanStack table
+│ │ ▼ │Andres C.  │CLP   │$850.000 │$45.000 │$680.000 │   │
+│ │   ├── Desglose ─────────────────────────────────┤   │  ← Collapse row
+│ │   │ Base: $650.000                              │   │
+│ │   │ Remote: $100.000                            │   │
+│ │   │ Bono fijo: $50.000 (Bono productividad)     │   │
+│ │   │ Variable OTD: $30.000 (94% → 100% elegible) │   │
+│ │   │ Variable RpA: $15.000 (2.1 → 100% elegible) │   │
+│ │   │ ─── Descuentos Chile ───                     │   │
+│ │   │ AFP: -$85.000 (10%)                          │   │
+│ │   │ Salud: -$58.000 (7%)                         │   │
+│ │   │ Seguro cesantía: -$5.100 (0.6%)              │   │
+│ │   │ Impuesto: -$32.000 (UTM: $67.294)            │   │
+│ │   │ ─── Indicadores ───                          │   │
+│ │   │ UF: $38.150 · UTM: $67.294                   │   │
+│ │   │ Asistencia: 18/22 días · 2 ausencias         │   │
+│ │   └─────────────────────────────────────────────┘   │
+│ │   │Daniela F. │USD   │$2.100   │$0      │$2.100   │   │
+│ │   │Melkin H.  │CLP   │$850.000 │$45.000 │$680.000 │   │
+│ └────────────────────────────────────────────────────┘   │
+│ [Showing 1 to 6 of 6 entries]            [< 1 >]        │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Componentes Vuexy reutilizables
+
+| Componente | Import | Uso en esta vista |
+|-----------|--------|-------------------|
+| `HorizontalWithSubtitle` | `@components/card-statistics/HorizontalWithSubtitle` | 3 KPI cards (Bruto, Neto, Δ Oficial) con trend |
+| `CustomTabList` | `@core/components/mui/TabList` | Toggle "Hoy" / "Fin de mes" |
+| `CustomChip` | `@core/components/mui/Chip` | Currency badges, status, semáforos OTD/RpA |
+| `CustomTextField` | `@core/components/mui/TextField` | Search en tabla |
+| `Card/CardHeader/CardContent` | `@mui/material` | Estructura de paneles |
+| `Collapse` | `@mui/material/Collapse` | Row expansion para desglose |
+| `IconButton` | `@mui/material/IconButton` | Expand/collapse toggle |
+| `Divider` | `@mui/material/Divider` | Separadores visuales |
+| `TablePaginationComponent` | `@components/TablePaginationComponent` | Paginación de tabla |
+| TanStack React Table | `@tanstack/react-table` | Sorting, filtering, expansion |
+| `fuzzyFilter` | `@/components/tableUtils` | Búsqueda fuzzy |
+
+### Helpers reutilizables desde Payroll existente
+
+Desde `src/views/greenhouse/payroll/helpers.ts`:
+- `formatCurrency(amount, currency)` — formato CLP/USD con Intl
+- `buildPayrollCurrencySummary(entries)` — subtotales por moneda
+- `otdSemaphore(percent)` / `rpaSemaphore(avg)` — colores de semáforo para KPIs
+- `periodStatusConfig` — labels y colores de estado
+
+### Interacción y estados
+
+**Tab "Hoy":**
+- Muestra `actual_to_date`: cuánto cobraría cada persona si cerráramos el período hoy
+- Prorateo de días trabajados al corte actual
+- KPIs ICO acumulados hasta hoy
+- Indicadores económicos del día actual
+
+**Tab "Fin de mes":**
+- Muestra `projected_month_end`: cuánto cobraría asumiendo que nada cambia
+- Proyección lineal de asistencia restante (asume ratio actual)
+- KPIs ICO proyectados (conservador: mantener actual)
+- Indicadores económicos del último día hábil del mes
+
+**Δ Oficial:**
+- Solo visible si existe un `payroll_period` calculado o aprobado para el mismo mes
+- Muestra la diferencia entre proyectado y oficial
+- Color: verde si proyectado < oficial, rojo si proyectado > oficial, gris si no hay oficial
+
+**Desglose expandido:**
+- Click en chevron ▶ expande fila
+- Muestra: base, remote, bonos fijos, variables (OTD con %, RpA con avg), descuentos Chile
+- Muestra indicadores usados: UF, UTM, asistencia
+- Reutiliza el patrón de `PayrollEntryTable.tsx` (Collapse + sub-grid)
+
+### Responsive
+
+- Desktop: 3 KPI cards en fila + tabla completa
+- Tablet: 3 KPI cards apilados 2+1 + tabla con scroll horizontal
+- Mobile: KPI cards stacked + tabla colapsada (solo Nombre + Neto)
+
 ## Out of Scope
 
 - reemplazar el flujo oficial de cierre mensual
@@ -283,11 +438,11 @@ Reglas obligatorias:
 - `pnpm exec eslint`
 - `pnpm exec tsc --noEmit --pretty false`
 
-## Open Questions
+## Open Questions (resueltas 2026-03-27)
 
-- si `projected_month_end` debe proyectar `OTD` / `RpA` solo con extrapolación lineal simple o con una política más conservadora
-- si la primera UI debe vivir dentro de `Payroll` o como sub-superficie separada (`Payroll > Proyectada`)
-- si el consumer financiero necesita además conversión opcional a moneda de reporte o solo desglose nativo por moneda
+- ~~si `projected_month_end` debe proyectar `OTD` / `RpA` solo con extrapolación lineal simple o con una política más conservadora~~ → **Conservador**: mantener el valor actual como proyección (no extrapolar). Razón: evitar falsos positivos en bonus variable.
+- ~~si la primera UI debe vivir dentro de `Payroll` o como sub-superficie separada~~ → **Vista hermana** en sidebar: EQUIPO > Nómina Proyectada. Razón: separación semántica oficial vs simulación, escala hacia forecast multi-mes.
+- ~~si el consumer financiero necesita además conversión opcional a moneda de reporte o solo desglose nativo por moneda~~ → **Desglose nativo por moneda** con subtotales por currency. La conversión a moneda de reporte es follow-up de Finance, no de esta lane.
 
 ## Follow-ups
 
