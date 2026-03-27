@@ -97,9 +97,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-077` | `to-do` | Payroll Receipt Generation & Delivery | `docs/tasks/to-do/TASK-077-payroll-receipt-generation-delivery.md` |
 
+| `TASK-078` | `to-do` | Payroll Chile: Reverse Calculation Engine | `docs/tasks/to-do/TASK-078-payroll-chile-reverse-calculation-engine.md` |
+
 ## Siguiente ID disponible
 
-- `TASK-078`
+- `TASK-079`
 
 ## Regla de asignacion desde aqui
 
