@@ -15,6 +15,8 @@ import {
   buildMemberOverheadSnapshot,
   type SharedOverheadPool
 } from '@/lib/team-capacity/overhead'
+import { computeDirectOverheadForMember } from '@/lib/team-capacity/tool-cost-attribution'
+import { readMemberDirectToolCosts } from '@/lib/team-capacity/tool-cost-reader'
 import {
   getBasePricingPolicy,
   getLoadedCostPerHour,
@@ -104,6 +106,8 @@ type MemberCapacityEconomicsInputs = {
   exchangeRate: ExchangeRateRow | null
   sharedOverheadPool: SharedOverheadPool | null
   sharedOverheadTotalWeight: number
+  directOverheadTarget: number
+  directOverheadStatus: 'complete' | 'partial' | 'missing_inputs'
 }
 
 const toNum = (value: unknown): number => {
@@ -375,7 +379,9 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   icoMetrics,
   exchangeRate,
   sharedOverheadPool,
-  sharedOverheadTotalWeight
+  sharedOverheadTotalWeight,
+  directOverheadTarget,
+  directOverheadStatus
 }: MemberCapacityEconomicsInputs): MemberCapacityEconomicsSnapshot => {
   const activeAssignments = assignments.filter(row => row.active !== false && !isInternalAssignment(row))
   const contractedFte = 1
@@ -440,7 +446,7 @@ export const buildMemberCapacityEconomicsSnapshot = ({
     totalWeight: sharedOverheadTotalWeight
   })
   const overheadSnapshot = buildMemberOverheadSnapshot({
-    directOverheadTarget: 0,
+    directOverheadTarget,
     sharedOverheadTarget,
     contractedHours
   })
@@ -464,7 +470,8 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   const snapshotStatus =
     laborSnapshot.snapshotStatus === 'complete' &&
     usageContext.usageKind !== 'none' &&
-    overheadSnapshot.snapshotStatus === 'complete'
+    overheadSnapshot.snapshotStatus === 'complete' &&
+    directOverheadStatus === 'complete'
       ? 'complete'
       : 'partial'
 
@@ -603,6 +610,19 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
       )
     : [null]
 
+  const directToolCosts = await readMemberDirectToolCosts(memberId, period, {
+    targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
+  })
+  const directOverhead = computeDirectOverheadForMember({
+    memberId,
+    periodYear: period.year,
+    periodMonth: period.month,
+    targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
+    licenses: directToolCosts.licenses,
+    toolingCostTarget: directToolCosts.toolingCostTarget,
+    fxByCurrency: directToolCosts.fxByCurrency
+  })
+
   const [sharedOverheadPoolRow] = await runGreenhousePostgresQuery<SharedOverheadPoolRow>(
     `
       SELECT
@@ -638,7 +658,9 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     icoMetrics: icoMetrics || null,
     exchangeRate: exchangeRate || null,
     sharedOverheadPool: sharedOverheadContext.pool,
-    sharedOverheadTotalWeight: sharedOverheadContext.totalWeight
+    sharedOverheadTotalWeight: sharedOverheadContext.totalWeight,
+    directOverheadTarget: directOverhead.direct.licenseCostSource + directOverhead.direct.toolingCostSource + directOverhead.direct.equipmentCostSource,
+    directOverheadStatus: directOverhead.snapshotStatus
   }
 }
 

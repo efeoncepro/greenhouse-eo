@@ -7,6 +7,21 @@
 
 ## 2026-03-26
 
+### TASK-057 — direct overhead canónico desde AI tooling
+- `member_capacity_economics` ya no deja `directOverheadTarget = 0` por defecto cuando un miembro tiene licencias activas o consumo de créditos AI en el período.
+- Se agregó una capa pura nueva para el cálculo de overhead directo por persona:
+  - `src/lib/team-capacity/tool-cost-attribution.ts`
+  - `src/lib/team-capacity/tool-cost-reader.ts`
+- La fuente canónica inicial del slice quedó acotada a datos defendibles:
+  - `greenhouse_ai.member_tool_licenses` + `greenhouse_ai.tool_catalog`
+  - `greenhouse_ai.credit_ledger`
+- Se decidió explícitamente no sumar todavía `greenhouse_finance.expenses` genéricos a `directOverheadTarget`, para evitar doble conteo y falsos positivos hasta que exista taxonomía madura de overhead directo por persona.
+- `src/lib/ai-tools/postgres-store.ts` ahora publica:
+  - `finance.license_cost.updated` en mutaciones de licencias
+  - `finance.license_cost.updated` fanout cuando cambia el costo de un tool con licencias activas
+  - `finance.tooling_cost.updated` cuando el credit ledger debita costo member-linked
+- La arquitectura de Team Capacity ya documenta esta baseline y deja la regla explícita de no abrir un segundo path para overhead directo por miembro.
+
 ### TASK-056 — People/My alineados al snapshot canónico y overhead sobre cohort billable
 - `GET /api/people/[memberId]/intelligence` y `GET /api/my/performance` ahora resuelven el período actual usando `America/Santiago`, evitando drift por mes UTC implícito.
 - `Person Intelligence` ya no presenta compensación fuente en `CLP` cuando la fuente real es `USD`; la UI preserva la moneda original para salario base y compensación mensual.

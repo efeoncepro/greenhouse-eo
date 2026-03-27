@@ -1,5 +1,19 @@
 # Greenhouse Team Capacity Architecture V1
 
+## Delta 2026-03-26
+
+- `direct_overhead_target` ya tiene baseline canónica desde AI tooling:
+  - licencias activas member-linked (`greenhouse_ai.member_tool_licenses` + `greenhouse_ai.tool_catalog`)
+  - consumo de créditos member-linked (`greenhouse_ai.credit_ledger`)
+- La capa pura adicional quedó dividida en:
+  - `src/lib/team-capacity/tool-cost-attribution.ts`
+  - `src/lib/team-capacity/tool-cost-reader.ts`
+- La proyección `member_capacity_economics` ya reacciona a:
+  - `finance.license_cost.updated`
+  - `finance.tooling_cost.updated`
+- Regla explícita de arquitectura:
+  - no sumar `greenhouse_finance.expenses` genéricos a `direct_overhead_target` hasta que exista taxonomía canónica de overhead directo por persona
+
 ## Purpose
 
 Este documento define la arquitectura canónica de capacidad de equipo en Greenhouse.

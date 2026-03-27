@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-057`
+- siguiente ID disponible: `TASK-058`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -34,6 +34,7 @@ Primer bloque operativo asignado:
 | `TASK-001` | [TASK-001-hr-payroll-operational-hardening.md](in-progress/TASK-001-hr-payroll-operational-hardening.md) | P1        | Alto    | Alto     | Parcial     | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
 | `TASK-055` | [TASK-055-finance-intelligence-cost-coverage-repair.md](in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md) | P1        | Muy alto | Alto    | Parcial     | Reparación del pipeline de `client_economics`: recompute reactivo por período, cobertura de costos y bridge laboral histórico |
 | `TASK-056` | [TASK-056-agency-team-capacity-semantics.md](in-progress/TASK-056-agency-team-capacity-semantics.md) | P1        | Alto     | Medio    | Parcial     | Contrato e implementación de capacidad/economía por miembro: helpers puros, snapshot reactivo `member_capacity_economics` y cutover de consumers clave |
+| `TASK-057` | [TASK-057-direct-overhead-tool-cost-attribution.md](in-progress/TASK-057-direct-overhead-tool-cost-attribution.md) | P1        | Alto     | Medio    | Parcial      | Atribución de overhead directo por persona desde AI tooling ya implementada; pendiente solo la extensión a gastos member-linked con taxonomía madura |
 
 ## To Do
 

@@ -2,6 +2,17 @@
 
 ## Delta 2026-03-26
 
+- `direct_overhead_target` ya no es placeholder fijo en `0` para miembros con AI tooling atribuible:
+  - `TASK-057` implementó baseline canónica desde `greenhouse_ai.member_tool_licenses` + `greenhouse_ai.credit_ledger`
+  - la proyección `member_capacity_economics` ya refresca con `finance.license_cost.updated` y `finance.tooling_cost.updated`
+  - se deja fuera, por ahora, cualquier `expense` member-linked sin taxonomía madura de overhead directo
+- El contrato de capacidad/economía queda entonces en este estado:
+  - `labor cost` ✅
+  - `shared overhead` ✅
+  - `direct overhead` ✅ baseline AI tooling
+  - `pricing policy` ✅ baseline
+  - `expenses member-linked` ⏳ follow-up futuro
+
 - Se cerró el corte de `People > Person Intelligence` y `My > Performance/Assignments` a la semántica canónica del período actual en `America/Santiago`:
   - los readers ya no dependen del mes UTC implícito del servidor
   - `Person Intelligence` preserva moneda fuente (`USD`/`CLP`) al presentar compensación mensual y salario base

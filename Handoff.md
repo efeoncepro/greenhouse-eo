@@ -49,6 +49,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 21:45 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar `TASK-057` para cerrar el baseline de `direct_overhead_target` en `member_capacity_economics` usando solo fuentes canónicas defendibles de AI tooling y cablear su refresh reactivo.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/team-capacity/tool-cost-attribution.ts`
+- `src/lib/team-capacity/tool-cost-attribution.test.ts`
+- `src/lib/team-capacity/tool-cost-reader.ts`
+- `src/lib/team-capacity/tool-cost-reader.test.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/member-capacity-economics.test.ts`
+- `src/lib/ai-tools/postgres-store.ts`
+- `docs/tasks/in-progress/TASK-057-direct-overhead-tool-cost-attribution.md`
+- `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md`
+- `docs/tasks/README.md`
+- `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/team-capacity/tool-cost-attribution.test.ts src/lib/team-capacity/tool-cost-reader.test.ts src/lib/team-capacity/overhead.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projections/person-intelligence.test.ts 'src/app/api/people/[memberId]/intelligence/route.test.ts' src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.test.tsx src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx src/views/greenhouse/my/MyAssignmentsView.test.tsx`
+- Resultado: `10 files passed`, `22 tests passed`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Riesgos o pendientes
+
+- `direct_overhead_target` ya cubre licencias y consumo de créditos AI por miembro, pero todavía excluye `greenhouse_finance.expenses` genéricos a propósito.
+- El siguiente follow-up de esta lane solo debería entrar cuando exista taxonomía canónica de overhead directo por persona en Finance; no inferirlo desde `expenses.member_id`.
+- `member_capacity_economics` y `person_intelligence` ya están preparados para reaccionar a `finance.license_cost.updated` y `finance.tooling_cost.updated`.
+
 ## 2026-03-26 21:20 -03
 
 ### Agente

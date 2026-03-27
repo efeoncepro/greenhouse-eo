@@ -119,7 +119,9 @@ describe('memberCapacityEconomicsProjection', () => {
         totalSharedOverheadTarget: 320000,
         allocationMethod: 'contracted_hours'
       },
-      sharedOverheadTotalWeight: 640
+      sharedOverheadTotalWeight: 640,
+      directOverheadTarget: 30500,
+      directOverheadStatus: 'complete'
     })
 
     expect(snapshot).toMatchObject({
@@ -138,11 +140,11 @@ describe('memberCapacityEconomicsProjection', () => {
       targetCurrency: 'CLP',
       totalCompSource: 2100,
       totalLaborCostTarget: 1890000,
-      directOverheadTarget: 0,
+      directOverheadTarget: 30500,
       sharedOverheadTarget: 80000,
-      loadedCostTarget: 1970000,
+      loadedCostTarget: 2000500,
       costPerHourTarget: 11812.5,
-      suggestedBillRateTarget: 18942.31,
+      suggestedBillRateTarget: 19235.58,
       snapshotStatus: 'complete',
       sourceCompensationVersionId: 'cv-1',
       sourcePayrollPeriodId: null,
@@ -208,6 +210,18 @@ describe('memberCapacityEconomicsProjection', () => {
       ])
       .mockResolvedValueOnce([
         {
+          tool_id: 'claude-team',
+          cost_model: 'subscription',
+          subscription_amount: 60,
+          subscription_currency: 'USD',
+          subscription_billing_cycle: 'monthly',
+          subscription_seats: 3
+        }
+      ])
+      .mockResolvedValueOnce([{ total_tooling_cost_target: 12500 }])
+      .mockResolvedValueOnce([{ from_currency: 'USD', rate: 900 }])
+      .mockResolvedValueOnce([
+        {
           expense_count: 2,
           total_shared_overhead_target: 320000,
           billable_member_count: 4
@@ -227,8 +241,9 @@ describe('memberCapacityEconomicsProjection', () => {
       assignmentCount: 1,
       sourceCurrency: 'USD',
       fxProvider: 'mindicador',
+      directOverheadTarget: 30500,
       sharedOverheadTarget: 80000,
-      suggestedBillRateTarget: 18942.31
+      suggestedBillRateTarget: 19235.58
     })
   })
 
