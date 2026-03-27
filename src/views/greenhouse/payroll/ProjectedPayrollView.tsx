@@ -80,6 +80,21 @@ interface ProjectedEntry {
   officialNetTotal: number | null
   deltaGross: number | null
   deltaNet: number | null
+  inputVariance: {
+    kpiOtdChanged: boolean
+    kpiRpaChanged: boolean
+    attendanceChanged: boolean
+    ufChanged: boolean
+    baseSalaryChanged: boolean
+    officialInputs: {
+      kpiOtdPercent: number | null
+      kpiRpaAvg: number | null
+      workingDays: number | null
+      daysPresent: number | null
+      daysAbsent: number | null
+      ufValue: number | null
+    }
+  } | null
 }
 
 interface ProjectedData {
@@ -149,6 +164,8 @@ const ProjectedPayrollView = () => {
   const [promoting, setPromoting] = useState(false)
   const [promotionMessage, setPromotionMessage] = useState<string | null>(null)
   const [promotionError, setPromotionError] = useState<string | null>(null)
+  const [driftWarnings, setDriftWarnings] = useState<Array<{ field: string; message: string }>>([])
+
 
   const today = useMemo(() => {
     const d = new Date()
@@ -185,6 +202,7 @@ const ProjectedPayrollView = () => {
     setPromoting(true)
     setPromotionMessage(null)
     setPromotionError(null)
+    setDriftWarnings([])
 
     try {
       const res = await fetch('/api/hr/payroll/projected/promote', {
@@ -204,6 +222,11 @@ const ProjectedPayrollView = () => {
           ? 'Se creó el período oficial y se recalculó con el corte proyectado.'
           : 'La nómina oficial se recalculó usando el corte proyectado.'
       )
+
+      if (Array.isArray(payload?.driftWarnings) && payload.driftWarnings.length > 0) {
+        setDriftWarnings(payload.driftWarnings)
+      }
+
       await load()
     } catch (error) {
       setPromotionError(error instanceof Error ? error.message : 'No fue posible promover la nómina proyectada.')
@@ -416,6 +439,17 @@ const ProjectedPayrollView = () => {
         </Grid>
       )}
 
+      {driftWarnings.length > 0 && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='warning' variant='outlined'>
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>Inputs cambiaron entre la proyección y el cálculo oficial:</Typography>
+            {driftWarnings.map((w, i) => (
+              <Typography key={i} variant='caption' display='block'>• {w.message}</Typography>
+            ))}
+          </Alert>
+        </Grid>
+      )}
+
       {data?.latestPromotion && (
         <Grid size={{ xs: 12 }}>
           <Alert severity='info' variant='outlined'>
@@ -524,6 +558,28 @@ const ProjectedPayrollView = () => {
                                         {e.daysAbsent != null && e.daysAbsent > 0 && <Row label='Ausencias' value={String(e.daysAbsent)} />}
                                         {e.daysOnLeave != null && e.daysOnLeave > 0 && <Row label='Permisos' value={`${e.daysOnLeave} (${e.daysOnUnpaidLeave ?? 0} sin goce)`} />}
                                       </Box>
+                                      {e.inputVariance && (e.inputVariance.kpiOtdChanged || e.inputVariance.kpiRpaChanged || e.inputVariance.attendanceChanged || e.inputVariance.ufChanged || e.inputVariance.baseSalaryChanged) && (
+                                        <Box sx={{ mt: 2 }}>
+                                          <Typography variant='caption' color='warning.main' sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>Cambios vs oficial</Typography>
+                                          <Box sx={{ mt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                            {e.inputVariance.kpiOtdChanged && (
+                                              <Row label='OTD' value={`oficial: ${e.inputVariance.officialInputs.kpiOtdPercent ?? '—'}%`} chip='warning' />
+                                            )}
+                                            {e.inputVariance.kpiRpaChanged && (
+                                              <Row label='RpA' value={`oficial: ${e.inputVariance.officialInputs.kpiRpaAvg ?? '—'}`} chip='warning' />
+                                            )}
+                                            {e.inputVariance.attendanceChanged && (
+                                              <Row label='Asistencia' value={`oficial: ${e.inputVariance.officialInputs.daysPresent ?? '—'} días`} chip='warning' />
+                                            )}
+                                            {e.inputVariance.ufChanged && (
+                                              <Row label='UF' value={`oficial: ${e.inputVariance.officialInputs.ufValue ?? '—'}`} chip='warning' />
+                                            )}
+                                            {e.inputVariance.baseSalaryChanged && (
+                                              <Row label='Base' value='cambió' chip='warning' />
+                                            )}
+                                          </Box>
+                                        </Box>
+                                      )}
                                     </Grid>
                                   </Grid>
                                 </Box>
