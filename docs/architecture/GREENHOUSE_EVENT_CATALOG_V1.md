@@ -67,6 +67,17 @@ Mutacion en store
 | `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
 | `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence` |
 
+### ICO Materialization
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `ico_materialization` | `ico.materialization.completed` | `ico-engine/materialize.ts` | `{ memberId?, organizationId?, periodYear, periodMonth, memberMetricsWritten?, organizationMetricsWritten? }` | `person_intelligence`, `projected_payroll`, organization-level projections derivadas |
+
+Notas:
+- `ico.materialization.completed` es hoy la señal reactiva canónica downstream cuando ya quedaron materializadas las métricas mensuales de `ICO`.
+- `projected_payroll` y `person_intelligence` deben reaccionar a este evento derivado, no recalcular directamente desde cambios crudos de tareas.
+- La introducción futura de un evento base tipo `delivery.task_assignment.upserted` puede complementar refresh dirigido de `ico_member_metrics`, pero no reemplaza el contrato de `ico.materialization.completed` para consumers derivados.
+
 Notas:
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.
 - los eventos `payroll_period.*` pueden resolverse por `finance_period` en projections que necesiten fanout a todos los miembros del período.
@@ -136,6 +147,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
 | `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 | `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
+| `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |
 
 ## Extensibilidad
 
