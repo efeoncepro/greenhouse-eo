@@ -7,6 +7,15 @@
 
 ## 2026-03-26
 
+### TASK-057 — cierre: taxonomía + Finance expenses + resiliencia
+- Completada la taxonomía canónica de overhead directo: `DIRECT_OVERHEAD_SCOPES` (none, member_direct, shared) + `DIRECT_OVERHEAD_KINDS` (tool_license, tool_usage, equipment, reimbursement, other)
+- `tool-cost-reader` ahora lee 3 fuentes con degradación independiente: AI licenses, AI credits, Finance member_direct expenses
+- Guardia de deduplicación: `tool_license` y `tool_usage` solo se leen desde AI tooling; `equipment`, `reimbursement`, `other` desde Finance
+- Migration script para BD existentes: `scripts/migrations/add-expense-direct-overhead-columns.sql`
+- Expense CRUD soporta los 3 campos nuevos (`directOverheadScope`, `directOverheadKind`, `directOverheadMemberId`)
+- Proyección resiliente: si las tablas de AI o las columnas de Finance no existen, degrada a overhead 0 sin romper el batch
+- Fix: arreglado destructuring faltante en `createFinanceExpenseInPostgres` y campos faltantes en expense route
+
 ### TASK-057 — direct overhead canónico desde AI tooling
 - `member_capacity_economics` ya no deja `directOverheadTarget = 0` por defecto cuando un miembro tiene licencias activas o consumo de créditos AI en el período.
 - Se agregó una capa pura nueva para el cálculo de overhead directo por persona:

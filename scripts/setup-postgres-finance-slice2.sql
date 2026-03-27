@@ -198,6 +198,11 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
   is_reconciled BOOLEAN NOT NULL DEFAULT FALSE,
   reconciliation_id TEXT,
   linked_income_id TEXT,
+  direct_overhead_scope TEXT DEFAULT 'none'
+    CHECK (direct_overhead_scope IN ('none', 'member_direct', 'shared')),
+  direct_overhead_kind TEXT
+    CHECK (direct_overhead_kind IN ('tool_license', 'tool_usage', 'equipment', 'reimbursement', 'other')),
+  direct_overhead_member_id TEXT REFERENCES greenhouse_core.members(member_id),
   notes TEXT,
   created_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

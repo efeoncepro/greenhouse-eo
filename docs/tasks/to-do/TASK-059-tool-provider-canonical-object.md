@@ -1,5 +1,10 @@
 # TASK-059 — Tool Provider: Objeto Canónico Cross-Module
 
+## Delta 2026-03-26
+- TASK-057 cerrada: `direct_overhead_target` ya consume AI tooling + Finance expenses con taxonomía canónica (`DIRECT_OVERHEAD_SCOPES`, `DIRECT_OVERHEAD_KINDS`)
+- El acceptance criterion "TASK-057 consume `tool_member_licenses` para `direct_overhead_target`" ya está resuelto con `greenhouse_ai.member_tool_licenses` — cuando TASK-059 migre a `greenhouse_core.tool_member_licenses`, el reader solo necesita cambiar el schema prefix
+- La guardia de deduplicación ya existe: Finance expenses con `direct_overhead_kind IN ('tool_license', 'tool_usage')` se excluyen del reader para no duplicar AI tooling
+
 ## Estado
 
 Pendiente. Diseño documentado. No bloquea operación actual — el AI Tools module funciona para AI vendors y TASK-057 cubre direct overhead sin necesidad de este objeto.

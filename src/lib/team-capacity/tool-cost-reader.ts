@@ -59,9 +59,14 @@ const getLastBusinessDay = (period: Period) => {
   return end.toISOString().slice(0, 10)
 }
 
+type MemberDirectExpenseRow = {
+  total_direct_expense_clp: number | string | null
+}
+
 export type MemberDirectToolCostSources = {
   licenses: SubscriptionLicenseCostInput[]
   toolingCostTarget: number
+  memberDirectExpensesTarget: number
   targetCurrency: FinanceCurrency
   fxByCurrency: Partial<Record<FinanceCurrency, number>>
 }
@@ -75,8 +80,12 @@ export const readMemberDirectToolCosts = async (
   const periodEnd = getPeriodEndDate(period)
   const lastBusinessDay = getLastBusinessDay(period)
 
-  const [licenseRows, toolingRows] = await Promise.all([
-    runGreenhousePostgresQuery<LicenseCostRow>(
+  // Each source degrades independently — missing tables should not block the others
+  const safeQuery = <T>(promise: Promise<T[]>): Promise<T[]> =>
+    promise.catch(() => [] as T[])
+
+  const [licenseRows, toolingRows, directExpenseRows] = await Promise.all([
+    safeQuery(runGreenhousePostgresQuery<LicenseCostRow>(
       `
         SELECT
           t.tool_id,
@@ -97,8 +106,8 @@ export const readMemberDirectToolCosts = async (
         ORDER BY t.tool_id ASC
       `,
       [memberId, periodStart, periodEnd]
-    ),
-    runGreenhousePostgresQuery<ToolingCostRow>(
+    )),
+    safeQuery(runGreenhousePostgresQuery<ToolingCostRow>(
       `
         SELECT
           COALESCE(SUM(COALESCE(total_cost_clp, 0)), 0) AS total_tooling_cost_target
@@ -109,7 +118,22 @@ export const readMemberDirectToolCosts = async (
           AND created_at::date <= $3::date
       `,
       [memberId, periodStart, periodEnd]
-    )
+    )),
+    // Member-direct expenses from finance (equipment, reimbursements, other).
+    // tool_license and tool_usage are EXCLUDED to avoid double-counting with AI tooling sources above.
+    safeQuery(runGreenhousePostgresQuery<MemberDirectExpenseRow>(
+      `
+        SELECT
+          COALESCE(SUM(COALESCE(total_amount_clp, 0)), 0) AS total_direct_expense_clp
+        FROM greenhouse_finance.expenses
+        WHERE direct_overhead_member_id = $1
+          AND direct_overhead_scope = 'member_direct'
+          AND direct_overhead_kind NOT IN ('tool_license', 'tool_usage')
+          AND COALESCE(document_date, payment_date) >= $2::date
+          AND COALESCE(document_date, payment_date) <= $3::date
+      `,
+      [memberId, periodStart, periodEnd]
+    ))
   ])
 
   const neededCurrencies = Array.from(
@@ -150,6 +174,7 @@ export const readMemberDirectToolCosts = async (
       subscriptionSeats: row.subscription_seats == null ? null : toNum(row.subscription_seats)
     })),
     toolingCostTarget: toNum(toolingRows[0]?.total_tooling_cost_target),
+    memberDirectExpensesTarget: toNum(directExpenseRows[0]?.total_direct_expense_clp),
     targetCurrency,
     fxByCurrency
   }

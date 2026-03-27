@@ -21,6 +21,8 @@ import {
   SERVICE_LINES,
   SOCIAL_SECURITY_TYPES,
   TAX_TYPES,
+  DIRECT_OVERHEAD_SCOPES,
+  DIRECT_OVERHEAD_KINDS,
   buildMonthlySequenceId,
   resolveExchangeRateToClp,
   type ExpenseType,
@@ -341,6 +343,11 @@ export async function POST(request: Request) {
         costCategory: body.costCategory ? normalizeString(body.costCategory) : null,
         costIsDirect: Boolean(body.costIsDirect),
         allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null,
+        directOverheadScope: body.directOverheadScope && DIRECT_OVERHEAD_SCOPES.includes(body.directOverheadScope)
+          ? normalizeString(body.directOverheadScope) : 'none',
+        directOverheadKind: body.directOverheadKind && DIRECT_OVERHEAD_KINDS.includes(body.directOverheadKind)
+          ? normalizeString(body.directOverheadKind) : null,
+        directOverheadMemberId: body.directOverheadMemberId ? normalizeString(body.directOverheadMemberId) : null,
         notes: body.notes ? normalizeString(body.notes) : null,
         actorUserId: tenant.userId || null
       })

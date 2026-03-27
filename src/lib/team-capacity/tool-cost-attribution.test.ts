@@ -55,6 +55,22 @@ describe('team-capacity/tool-cost-attribution', () => {
     expect(result.snapshotStatus).toBe('partial')
   })
 
+  it('includes equipment cost from finance direct expenses in the overhead', () => {
+    const result = computeDirectOverheadForMember({
+      memberId: 'member-1',
+      periodYear: 2026,
+      periodMonth: 3,
+      targetCurrency: 'CLP',
+      licenses: [],
+      toolingCostTarget: 0,
+      equipmentCostTarget: 45000
+    })
+
+    expect(result.breakdown.equipmentCostTarget).toBe(45000)
+    expect(result.direct.equipmentCostSource).toBe(45000)
+    expect(result.snapshotStatus).toBe('complete')
+  })
+
   it('treats the absence of direct tooling as a valid zero-cost snapshot', () => {
     const result = computeDirectOverheadForMember({
       memberId: 'member-1',

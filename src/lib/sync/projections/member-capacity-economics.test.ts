@@ -219,6 +219,7 @@ describe('memberCapacityEconomicsProjection', () => {
         }
       ])
       .mockResolvedValueOnce([{ total_tooling_cost_target: 12500 }])
+      .mockResolvedValueOnce([{ total_direct_expense_clp: 0 }])
       .mockResolvedValueOnce([{ from_currency: 'USD', rate: 900 }])
       .mockResolvedValueOnce([
         {

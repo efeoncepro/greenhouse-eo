@@ -610,18 +610,29 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
       )
     : [null]
 
-  const directToolCosts = await readMemberDirectToolCosts(memberId, period, {
-    targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
-  })
-  const directOverhead = computeDirectOverheadForMember({
-    memberId,
-    periodYear: period.year,
-    periodMonth: period.month,
-    targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
-    licenses: directToolCosts.licenses,
-    toolingCostTarget: directToolCosts.toolingCostTarget,
-    fxByCurrency: directToolCosts.fxByCurrency
-  })
+  let directOverheadTarget = 0
+  let directOverheadStatus: 'complete' | 'partial' | 'missing_inputs' = 'complete'
+
+  try {
+    const directToolCosts = await readMemberDirectToolCosts(memberId, period, {
+      targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
+    })
+    const directOverhead = computeDirectOverheadForMember({
+      memberId,
+      periodYear: period.year,
+      periodMonth: period.month,
+      targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
+      licenses: directToolCosts.licenses,
+      toolingCostTarget: directToolCosts.toolingCostTarget,
+      equipmentCostTarget: directToolCosts.memberDirectExpensesTarget,
+      fxByCurrency: directToolCosts.fxByCurrency
+    })
+
+    directOverheadTarget = directOverhead.direct.licenseCostSource + directOverhead.direct.toolingCostSource + directOverhead.direct.equipmentCostSource
+    directOverheadStatus = directOverhead.snapshotStatus
+  } catch {
+    // AI tooling tables may not exist yet — degrade gracefully to zero overhead
+  }
 
   const [sharedOverheadPoolRow] = await runGreenhousePostgresQuery<SharedOverheadPoolRow>(
     `
@@ -659,8 +670,8 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     exchangeRate: exchangeRate || null,
     sharedOverheadPool: sharedOverheadContext.pool,
     sharedOverheadTotalWeight: sharedOverheadContext.totalWeight,
-    directOverheadTarget: directOverhead.direct.licenseCostSource + directOverhead.direct.toolingCostSource + directOverhead.direct.equipmentCostSource,
-    directOverheadStatus: directOverhead.snapshotStatus
+    directOverheadTarget,
+    directOverheadStatus
   }
 }
 

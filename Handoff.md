@@ -49,6 +49,49 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-26 22:00 -03
+
+### Agente
+
+- Claude Code (Opus)
+
+### Objetivo del turno
+
+- Cerrar TASK-057: completar taxonomía de overhead directo, extender reader a Finance expenses, arreglar resiliencia de la proyección, fix TS errors que Codex dejó incompletos
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/team-capacity/tool-cost-reader.ts` — extendido con 3ra fuente (finance expenses) + degradación por fuente
+- `src/lib/sync/projections/member-capacity-economics.ts` — try-catch resiliente + wire equipmentCostTarget
+- `src/lib/finance/shared.ts` — tipos `DIRECT_OVERHEAD_SCOPES` + `DIRECT_OVERHEAD_KINDS` (ya estaba de Codex, sin commit)
+- `src/lib/finance/postgres-store-slice2.ts` — fix destructuring + 3 columnas overhead en create/update/map
+- `src/app/api/finance/expenses/route.ts` — pasaje de los 3 campos nuevos + validación
+- `scripts/setup-postgres-finance.sql` + `scripts/setup-postgres-finance-slice2.sql` — DDL columnas
+- `scripts/migrations/add-expense-direct-overhead-columns.sql` — ALTER TABLE + index (NUEVO)
+- Tests: tool-cost-reader, tool-cost-attribution, member-capacity-economics
+
+### Verificacion
+
+- `pnpm test` — 25 tests passing (4 suites core + 8 downstream)
+- `tsc --noEmit --pretty false` — 0 errors
+- `pnpm build` — exitoso
+
+### Riesgos o pendientes
+
+- **Migration pendiente**: ejecutar `scripts/migrations/add-expense-direct-overhead-columns.sql` en la BD de dev antes de que Finance expenses con overhead directo funcionen
+- **Re-materialización**: después de deploy, forzar refresh de `member_capacity_economics` para que los snapshots se repoblen (la vista Team estaba vacía por la regresión de Codex)
+- TASK-057 está completa y movida a `docs/tasks/complete/`
+
+---
+
 ## 2026-03-26 21:45 -03
 
 ### Agente

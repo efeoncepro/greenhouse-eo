@@ -218,6 +218,18 @@ export const SUPPLIER_CATEGORIES = [
 ] as const
 export type SupplierCategory = (typeof SUPPLIER_CATEGORIES)[number]
 
+export const DIRECT_OVERHEAD_SCOPES = ['none', 'member_direct', 'shared'] as const
+export type DirectOverheadScope = (typeof DIRECT_OVERHEAD_SCOPES)[number]
+
+export const DIRECT_OVERHEAD_KINDS = [
+  'tool_license',
+  'tool_usage',
+  'equipment',
+  'reimbursement',
+  'other'
+] as const
+export type DirectOverheadKind = (typeof DIRECT_OVERHEAD_KINDS)[number]
+
 export const TAX_ID_TYPES = ['RUT', 'NIT', 'RFC', 'RUC', 'EIN', 'OTHER'] as const
 export type TaxIdType = (typeof TAX_ID_TYPES)[number]
 
