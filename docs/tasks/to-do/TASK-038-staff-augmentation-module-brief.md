@@ -1,5 +1,10 @@
 # CODEX TASK — Staff Augmentation Module: Gestión de Placements y Capa Comercial para Greenhouse
 
+## Delta 2026-03-27
+- **Nuevo prerequisito:** TASK-060 (Team Assignment Admin) construye la gestión centralizada de assignments en Agency > Team. Staff Aug extiende esa base con `assignment_type = 'staff_augmentation'`, billing rates, SLA, compliance y onboarding — no necesita construir el CRUD de assignments desde cero.
+- TASK-056 y TASK-057 cerraron la cadena de loaded cost (labor + shared + direct overhead). Staff Aug hereda esa economía para calcular márgenes reales por placement.
+- La proyección `assignment_membership_sync` ya garantiza que al crear un assignment se crea automáticamente el `person_membership` en la organización del cliente vía spaces bridge.
+
 ## Estado 2026-03-19
 
 Este brief se conserva como framing funcional y de producto del módulo de `Staff Augmentation`.

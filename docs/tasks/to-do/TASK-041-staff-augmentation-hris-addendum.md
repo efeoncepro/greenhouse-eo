@@ -1,5 +1,10 @@
 # CODEX TASK — Staff Augmentation Module: Addendum HRIS Integration
 
+## Delta 2026-03-27
+- TASK-060 (Team Assignment Admin) es prerequisito de TASK-038, que a su vez es prerequisito de esta addendum. La cadena es: TASK-060 (CRUD assignments) → TASK-038 (Staff Aug placements) → TASK-041 (HRIS enrichment)
+- El drawer de "Asignar miembro" que construye TASK-060 es el que TASK-041 enriquece con pre-fill de campos HRIS (contract_type, cost_rate_source, deel_contract_id)
+- `compensation_versions.base_salary` ya se usa en `member_capacity_economics` para labor cost; el snapshot al crear placement puede reutilizar esa misma fuente canónica
+
 ## Purpose
 
 This addendum documents how the Staff Augmentation module connects to the HRIS architecture defined in `Greenhouse_HRIS_Architecture_v1.md`. It specifies which fields in `staff_aug_placements` are snapshots of canonical HRIS fields, which data flows are bidirectional, and how the implementation sequence should be coordinated.

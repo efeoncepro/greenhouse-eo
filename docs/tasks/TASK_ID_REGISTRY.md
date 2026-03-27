@@ -75,9 +75,12 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
 | `TASK-058` | `in-progress` | Economic Indicators Runtime Layer | `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md` |
 
+| `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
+| `TASK-060` | `to-do` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/to-do/TASK-060-team-assignment-admin.md` |
+
 ## Siguiente ID disponible
 
-- `TASK-059`
+- `TASK-061`
 
 ## Regla de asignacion desde aqui
 
