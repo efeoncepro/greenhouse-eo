@@ -377,11 +377,50 @@ Si la entry pertenecía a un período `approved`, el período se reabre a `calcu
 ### Regla de export
 - solo un período `approved` o ya `exported` puede exportarse
 - al exportar CSV, el período pasa a `exported`
+- el cambio a `exported` debe publicarse como evento outbox canónico `payroll_period.exported`
+- el path transaccional canonico de exportación es PostgreSQL; los consumers reactivos deben escuchar ese evento y no depender de side effects del archivo exportado
 
 ### Semántica operativa
 `exported` representa el cierre final del ciclo mensual.
 
-## 16. Consumers aguas abajo
+## 16. Moneda y períodos mixtos
+
+`Payroll` soporta colaboradores `Chile` en `CLP` e internacionales en `USD` dentro del mismo período imputable.
+
+### Regla canónica
+- la moneda vive por `payroll_entry`, no por período
+- un período puede contener entries `CLP`, `USD` o ambas
+- no se debe consolidar un período mixto en una sola moneda por conveniencia visual o de reporting
+
+### Implicaciones UI y reporting
+- dashboards y KPIs del período deben mostrar subtotales por moneda cuando exista mezcla `CLP/USD`
+- `Personnel Expense` debe agregar por moneda y no sumar cross-currency en una sola serie monetaria
+- `CSV` puede seguir siendo plano por entry siempre que no prometa total consolidado cross-currency
+- `PDF` y `Excel` deben preservar separación operativa `CLP/USD` en sus resúmenes
+
+### Regla de compatibilidad
+- si un consumer aguas abajo necesita consolidación cross-currency, esa conversión debe ocurrir explícitamente en otra capa con tipo de cambio y fecha, no dentro de `Payroll`
+
+## 17. Cálculo Chile y prerequisitos bloqueantes
+
+Para entries con `pay_regime = chile`, el cálculo mensual debe usar snapshots históricos reproducibles del período imputable.
+
+### Insumos obligatorios
+- `UF` histórica del período cuando exista plan `Isapre` en `UF`
+- `tax_table_version` del período para impuesto mensual Chile
+- `UTM` histórica del período cuando se calcule impuesto con tabla tributaria
+
+### Regla de bloqueo
+- si falta `UF` y la entry la requiere para `Isapre`, el período no está listo para calcular
+- si el período incluye colaboradores `Chile` y falta `tax_table_version`, el cálculo debe bloquearse
+- si el período incluye colaboradores `Chile`, existe `tax_table_version` y no se puede resolver `UTM`, el cálculo debe bloquearse
+- el sistema no debe degradar silenciosamente `chileTaxAmount` a `0` en esos casos
+
+### Fricción operativa esperada
+- la UI de creación de período puede capturar `tax_table_version` desde el alta
+- `UF` debe seguir autohidratándose desde indicadores económicos según `year/month`
+
+## 18. Consumers aguas abajo
 
 ### People 360
 - la ficha oficial del colaborador se ve en `/people/[memberId]?tab=payroll`
@@ -395,7 +434,7 @@ Si la entry pertenecía a un período `approved`, el período se reabre a `calcu
 - `Gasto de personal` agrega períodos `approved/exported`
 - `member_payroll_360` y reports agregados consumen snapshots ya calculados
 
-## 17. Permisos y acceso
+## 19. Permisos y acceso
 
 Roles con acceso típico al módulo:
 - `hr_payroll`
@@ -406,7 +445,7 @@ Regla:
 - el módulo es una superficie `hr`
 - el colaborador no usa `/hr/payroll` para self-service; su vista personal debe entrar por `People` o por surfaces personales futuras
 
-## 18. No-goals
+## 20. No-goals
 
 `Payroll` no debe:
 - administrar roster base de team members
@@ -415,7 +454,7 @@ Regla:
 - depender de exports para representar el estado real de un cálculo
 - duplicar ficha individual de persona fuera de People 360
 
-## 19. Archivos runtime clave
+## 21. Archivos runtime clave
 
 ### UI
 - `src/views/greenhouse/payroll/PayrollDashboard.tsx`
@@ -442,16 +481,20 @@ Regla:
 - `src/lib/payroll/personnel-expense.ts`
 - `src/lib/payroll/period-lifecycle.ts`
 - `src/lib/payroll/compensation-versioning.ts`
+- `src/lib/payroll/payroll-readiness.ts`
 
 ### Schema
 - `scripts/setup-postgres-payroll.sql`
 
-## 20. Reglas canónicas resumidas
+## 22. Reglas canónicas resumidas
 
 - `member_id` es la ancla de colaborador para Payroll.
 - La compensación es versionada por vigencia, no mensual.
 - El período representa mes imputable, no mes de pago.
 - `approved` sigue siendo editable; `exported` es el cierre final.
+- `payroll_period.exported` es el evento canónico de cierre/exportación.
 - Los KPI mensuales de `Payroll` vienen desde `ICO`.
+- La moneda vive por entry; los períodos mixtos `CLP/USD` no se consolidan implícitamente.
+- `UF`, `tax_table_version` y `UTM` son prerequisitos bloqueantes cuando el cálculo Chile los requiere.
 - `payroll_entries` son snapshots congelados del cálculo mensual.
 - People 360 es la ficha individual oficial del colaborador.

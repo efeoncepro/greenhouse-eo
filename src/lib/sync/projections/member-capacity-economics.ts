@@ -291,13 +291,16 @@ const getUsageContext = (member: MemberRow, icoMetrics: IcoMemberMetricsRow | nu
   }
 
   const roleCategory = getRoleCategory(member)
+
   const activityCount = Math.max(
     toNum(icoMetrics.throughput_count),
     toNum(icoMetrics.completed_tasks),
     toNum(icoMetrics.active_tasks),
     toNum(icoMetrics.total_tasks)
   )
+
   const expectedThroughput = getExpectedMonthlyThroughput({ roleCategory, fteAllocation: 1 })
+
   const usagePercent = expectedThroughput > 0
     ? getUtilizationPercent({ activeAssets: activityCount, expectedMonthlyThroughput: expectedThroughput })
     : null
@@ -388,6 +391,7 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   const contractedHours = fteToHours(contractedFte)
   const assignedHours = getAssignedHours(activeAssignments)
   const usageContext = getUsageContext(member, icoMetrics)
+
   const envelope = buildCapacityEnvelope({
     contractedFte,
     assignedHours,
@@ -397,6 +401,7 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   const sourceCurrency = payrollEntry?.currency || compensation?.currency || TARGET_CURRENCY
   const sourceCompensationVersionId = payrollEntry?.compensation_version_id || compensation?.version_id || null
   const sourcePayrollPeriodId = payrollEntry?.period_id || null
+
   const compensationBreakdown: CompensationBreakdown | null = payrollEntry?.gross_total != null
     ? {
         sourceCurrency: sourceCurrency as 'CLP' | 'USD',
@@ -420,6 +425,7 @@ export const buildMemberCapacityEconomicsSnapshot = ({
       : null
 
   const fxContext = getExchangeRateContext(period, sourceCurrency, TARGET_CURRENCY, exchangeRate)
+
   const normalizedFx: FxContext | null =
     sourceCurrency === TARGET_CURRENCY
       ? null
@@ -440,20 +446,24 @@ export const buildMemberCapacityEconomicsSnapshot = ({
     targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD',
     fx: normalizedFx
   })
+
   const sharedOverheadTarget = allocateSharedOverheadTarget({
     pool: sharedOverheadPool,
     memberWeight: contractedHours,
     totalWeight: sharedOverheadTotalWeight
   })
+
   const overheadSnapshot = buildMemberOverheadSnapshot({
     directOverheadTarget,
     sharedOverheadTarget,
     contractedHours
   })
+
   const loadedCostPerHourTarget = getLoadedCostPerHour({
     laborCostPerHourTarget: laborSnapshot.costPerHourTarget,
     overheadPerHourTarget: overheadSnapshot.overheadPerHourTarget
   })
+
   const pricingSnapshot = getSuggestedBillRate({
     loadedCostPerHourTarget,
     pricingPolicy: getBasePricingPolicy({
@@ -462,6 +472,7 @@ export const buildMemberCapacityEconomicsSnapshot = ({
     }),
     targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
   })
+
   const loadedCostTarget =
     laborSnapshot.totalLaborCostTarget == null || overheadSnapshot.totalOverheadTarget == null
       ? laborSnapshot.totalLaborCostTarget
@@ -618,6 +629,7 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
     const directToolCosts = await readMemberDirectToolCosts(memberId, period, {
       targetCurrency: TARGET_CURRENCY as 'CLP' | 'USD'
     })
+
     const directOverhead = computeDirectOverheadForMember({
       memberId,
       periodYear: period.year,
@@ -731,6 +743,7 @@ export const memberCapacityEconomicsProjection: ProjectionDefinition = {
     'payroll_period.updated',
     'payroll_period.calculated',
     'payroll_period.approved',
+    'payroll_period.exported',
     'payroll_entry.upserted',
     'finance.expense.created',
     'finance.expense.updated',

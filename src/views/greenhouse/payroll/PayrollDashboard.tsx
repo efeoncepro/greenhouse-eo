@@ -29,7 +29,7 @@ import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
 import PayrollPersonnelExpenseTab from './PayrollPersonnelExpenseTab'
-import { formatCurrency, formatPeriodLabel, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatPeriodLabel, periodStatusConfig } from './helpers'
 
 const PayrollDashboard = () => {
   const [tab, setTab] = useState('period')
@@ -49,6 +49,7 @@ const PayrollDashboard = () => {
   const [newPeriodOpen, setNewPeriodOpen] = useState(false)
   const [newYear, setNewYear] = useState(new Date().getFullYear())
   const [newMonth, setNewMonth] = useState(new Date().getMonth() + 1)
+  const [newTaxTableVersion, setNewTaxTableVersion] = useState('')
 
   const fetchAll = useCallback(async () => {
     try {
@@ -127,7 +128,8 @@ const PayrollDashboard = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         year: newYear,
-        month: newMonth
+        month: newMonth,
+        taxTableVersion: newTaxTableVersion || null
       })
     })
 
@@ -139,9 +141,10 @@ const PayrollDashboard = () => {
       return
     }
 
+    setNewTaxTableVersion('')
     setNewPeriodOpen(false)
     handleRefresh()
-  }, [newYear, newMonth, handleRefresh])
+  }, [newYear, newMonth, newTaxTableVersion, handleRefresh])
 
   const handleSelectHistoryPeriod = useCallback(
     async (periodId: string) => {
@@ -180,12 +183,11 @@ const PayrollDashboard = () => {
   }
 
   // Stats
-  const totalGross = entries.reduce((s, e) => s + e.grossTotal, 0)
-  const totalNet = entries.reduce((s, e) => s + e.netTotal, 0)
   const statusConfig = currentPeriod ? periodStatusConfig[currentPeriod.status] : null
-  const primaryCurrency = entries[0]?.currency ?? 'CLP'
   const needsCompensationSetup = compensations.length === 0
   const hasActivePayrollMembers = compensationMembers.length > 0
+  const grossSummary = buildPayrollCurrencySummary(entries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
 
   return (
     <>
@@ -260,19 +262,19 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Costo bruto'
-              stats={formatCurrency(totalGross, primaryCurrency)}
+              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
               avatarIcon='tabler-currency-dollar'
               avatarColor='warning'
-              subtitle='Total bruto del período'
+              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : 'Total bruto del período'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={formatCurrency(totalNet, primaryCurrency)}
+              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle='Total neto a pagar'
+              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'Total neto a pagar'}
             />
           </Grid>
         </Grid>
@@ -370,13 +372,29 @@ const PayrollDashboard = () => {
                 />
               </Grid>
             </Grid>
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Tabla impuesto Chile'
+              placeholder='SII-2026-03'
+              value={newTaxTableVersion}
+              onChange={e => setNewTaxTableVersion(e.target.value)}
+              helperText='Requerida si el período incluye colaboradores Chile.'
+            />
             <Alert severity='info'>
-              La UF del período se sincroniza automáticamente según el mes imputable. El salario base, AFP, salud y bonos se configuran en Compensaciones.
+              La UF del período se sincroniza automáticamente según el mes imputable. Si el período incluye Chile, define también la tabla tributaria antes de calcular. El salario base, AFP, salud y bonos se configuran en Compensaciones.
             </Alert>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setNewPeriodOpen(false)}>
+          <Button
+            variant='tonal'
+            color='secondary'
+            onClick={() => {
+              setNewTaxTableVersion('')
+              setNewPeriodOpen(false)
+            }}
+          >
             Cancelar
           </Button>
           <Button variant='contained' onClick={handleCreatePeriod}>

@@ -106,6 +106,7 @@ export const EVENT_TYPES = {
   payrollPeriodUpdated: 'payroll_period.updated',
   payrollPeriodCalculated: 'payroll_period.calculated',
   payrollPeriodApproved: 'payroll_period.approved',
+  payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
@@ -151,6 +152,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,
   EVENT_TYPES.payrollPeriodApproved,
+  EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
   EVENT_TYPES.compensationVersionUpdated,
 

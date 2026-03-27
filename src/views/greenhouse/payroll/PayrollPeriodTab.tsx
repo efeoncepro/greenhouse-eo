@@ -31,7 +31,7 @@ import {
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
-import { formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
 type Props = {
   period: PayrollPeriod | null
@@ -263,48 +263,40 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
       nextTaxTableVersion: editTaxTable || null
     })
 
-  const totals = entries.reduce(
-    (acc, e) => ({
-      gross: acc.gross + e.grossTotal,
-      net: acc.net + e.netTotal,
-      deductions: acc.deductions + (e.chileTotalDeductions ?? 0)
-    }),
-    { gross: 0, net: 0, deductions: 0 }
-  )
-
-  const hasMixedCurrency = new Set(entries.map(e => e.currency)).size > 1
-  const primaryCurrency = entries[0]?.currency ?? 'CLP'
+  const grossSummary = buildPayrollCurrencySummary(entries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
+  const deductionsSummary = buildPayrollCurrencySummary(entries, entry => entry.chileTotalDeductions ?? 0)
 
   return (
     <>
       {/* Period totals KPI row */}
-      {!hasMixedCurrency && entries.length > 0 && (
+      {entries.length > 0 && (
         <Grid container spacing={6} sx={{ mb: 4 }}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Bruto total'
-              stats={formatCurrency(totals.gross, primaryCurrency)}
+              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
               avatarIcon='tabler-coins'
               avatarColor='warning'
-              subtitle={`${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`}
+              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : `${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Descuentos'
-              stats={formatCurrency(totals.deductions, 'CLP')}
+              stats={deductionsSummary.hasMixedCurrency ? 'Mixto' : deductionsSummary.summaryLabel}
               avatarIcon='tabler-receipt-tax'
               avatarColor='error'
-              subtitle='Previsión + impuesto'
+              subtitle={deductionsSummary.hasMixedCurrency ? deductionsSummary.summaryLabel : 'Previsión + impuesto'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={formatCurrency(totals.net, primaryCurrency)}
+              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle='A pagar'
+              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'A pagar'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>

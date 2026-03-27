@@ -62,9 +62,14 @@ Mutacion en store
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `payroll_period` | `payroll.period.*` | `payroll/postgres-store.ts` | `{ periodId, month, year }` | — |
-| `payroll_entry` | `payroll.entry.*` | `payroll/postgres-store.ts` | `{ entryId, memberId }` | — |
+| `payroll_period` | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts` | `{ periodId, month, year, status? }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
+| `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics` |
 | `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence` |
+
+Notas:
+- `payroll_period.exported` es el evento canónico de cierre mensual de nómina.
+- los eventos `payroll_period.*` pueden resolverse por `finance_period` en projections que necesiten fanout a todos los miembros del período.
+- el fallback BigQuery de Payroll mantiene compatibilidad funcional, pero la arquitectura reactiva canonica depende del path `Postgres-first` con outbox.
 
 ### Capacity Economics (nuevo)
 
@@ -129,6 +134,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
 | `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
 | `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
+| `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
 
 ## Extensibilidad
 

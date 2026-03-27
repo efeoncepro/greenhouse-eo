@@ -43,6 +43,7 @@ describe('clientEconomicsProjection', () => {
     expect(clientEconomicsProjection.triggerEvents).toContain('finance.expense.updated')
     expect(clientEconomicsProjection.triggerEvents).toContain('finance.cost_allocation.created')
     expect(clientEconomicsProjection.triggerEvents).toContain('payroll_period.calculated')
+    expect(clientEconomicsProjection.triggerEvents).toContain('payroll_period.exported')
     expect(clientEconomicsProjection.triggerEvents).toContain('payroll_entry.upserted')
   })
 

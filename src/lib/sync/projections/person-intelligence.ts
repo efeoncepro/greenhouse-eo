@@ -39,6 +39,11 @@ interface MemberRow extends Record<string, unknown> {
   role_category: string | null
 }
 
+type Period = {
+  year: number
+  month: number
+}
+
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
 
@@ -59,16 +64,89 @@ const toNullNum = (v: unknown): number | null => {
   return n
 }
 
-// ── Refresh function ──
+const pad2 = (value: number) => String(value).padStart(2, '0')
 
-const refreshPersonIntelligence = async (
-  scope: { entityType: string; entityId: string }
-): Promise<string | null> => {
-  const memberId = scope.entityId
+const getCurrentPeriod = (): Period => {
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
   const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
-  const year = match ? Number(match[1]) : new Date().getFullYear()
-  const month = match ? Number(match[2]) : new Date().getMonth() + 1
+
+  return match
+    ? { year: Number(match[1]), month: Number(match[2]) }
+    : { year: new Date().getFullYear(), month: new Date().getMonth() + 1 }
+}
+
+const parsePeriodId = (value: unknown): Period | null => {
+  if (typeof value !== 'string') return null
+
+  const match = value.match(/^(\d{4})-(\d{2})$/)
+
+  if (!match) return null
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    return null
+  }
+
+  return { year, month }
+}
+
+const parsePeriodFromDateLike = (value: unknown): Period | null => {
+  if (typeof value !== 'string') return null
+
+  const match = value.match(/^(\d{4})-(\d{2})-\d{2}/)
+
+  if (!match) return null
+
+  const year = Number(match[1])
+  const month = Number(match[2])
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    return null
+  }
+
+  return { year, month }
+}
+
+export const getPersonIntelligencePeriodFromPayload = (payload: Record<string, unknown>): Period | null => {
+  const explicitYear = toNullNum(payload.periodYear) ?? toNullNum(payload.year)
+  const explicitMonth = toNullNum(payload.periodMonth) ?? toNullNum(payload.month)
+
+  if (explicitYear && explicitMonth && explicitMonth >= 1 && explicitMonth <= 12) {
+    return { year: explicitYear, month: explicitMonth }
+  }
+
+  const fromPeriodId = parsePeriodId(payload.periodId) ?? parsePeriodId(payload.payrollPeriodId)
+
+  if (fromPeriodId) {
+    return fromPeriodId
+  }
+
+  return (
+    parsePeriodFromDateLike(payload.effectiveFrom) ??
+    parsePeriodFromDateLike(payload.effective_from) ??
+    parsePeriodFromDateLike(payload.rateDate) ??
+    parsePeriodFromDateLike(payload.rate_date) ??
+    parsePeriodFromDateLike(payload.updatedAt) ??
+    parsePeriodFromDateLike(payload.updated_at)
+  )
+}
+
+const getPeriodEndDate = (period: Period) =>
+  new Date(Date.UTC(period.year, period.month, 0)).toISOString().slice(0, 10)
+
+const getPeriodOrCurrent = (payload: Record<string, unknown>): Period =>
+  getPersonIntelligencePeriodFromPayload(payload) ?? getCurrentPeriod()
+
+// ── Refresh function ──
+
+const refreshPersonIntelligenceForMember = async (
+  memberId: string,
+  period: Period
+): Promise<string | null> => {
+  const { year, month } = period
+  const periodEndDate = getPeriodEndDate(period)
 
   // 1. Read ICO metrics from Postgres (already populated by BQ materialization)
   let ico: IcoRow | null = null
@@ -99,10 +177,11 @@ const refreshPersonIntelligence = async (
     const compRows = await runGreenhousePostgresQuery<CompRow>(
       `SELECT version_id, base_salary, remote_allowance, currency
        FROM greenhouse_payroll.compensation_versions
-       WHERE member_id = $1 AND effective_from <= CURRENT_DATE
-         AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+       WHERE member_id = $1
+         AND effective_from <= $2::date
+         AND (effective_to IS NULL OR effective_to >= $2::date)
        ORDER BY effective_from DESC LIMIT 1`,
-      [memberId]
+      [memberId, periodEndDate]
     )
 
     comp = compRows[0] ?? null
@@ -128,16 +207,19 @@ const refreshPersonIntelligence = async (
   const contractedHoursMonth = memberCapacity?.contractedHours ?? 0
   const assignedHoursMonth = memberCapacity?.assignedHours ?? 0
   const totalAssignedFte = hoursToFte(assignedHoursMonth)
+
   const expectedThroughput = getExpectedMonthlyThroughput({
     roleCategory,
     fteAllocation: totalAssignedFte > 0 ? totalAssignedFte : 1
   })
+
   const utilizationPct = memberCapacity?.usagePercent ?? null
   const capacityHealth = getCapacityHealth(utilizationPct ?? 0)
 
   // 6. Compute derived metrics
   const monthlyBase = toNum(comp?.base_salary)
   const monthlyRemote = toNum(comp?.remote_allowance)
+
   const monthlyTotalComp = comp
     ? monthlyBase + monthlyRemote
     : memberCapacity?.totalCompSource ?? null
@@ -157,11 +239,14 @@ const refreshPersonIntelligence = async (
     },
     { monthlyTotalComp }
   )
+
   const throughputCount = toNullNum(ico?.throughput_count)
   const targetCostBasis = memberCapacity?.totalLaborCostTarget ?? null
+
   const costPerAsset = targetCostBasis != null && throughputCount != null && throughputCount > 0
     ? Math.round(targetCostBasis / throughputCount)
     : null
+
   const costPerHour = memberCapacity?.costPerHourTarget ?? null
 
   // 7. Upsert
@@ -214,6 +299,30 @@ const refreshPersonIntelligence = async (
   return `refreshed person_intelligence for ${memberId} (${year}-${String(month).padStart(2, '0')})`
 }
 
+const refreshAllMembersForPeriod = async (period: Period): Promise<number> => {
+  const rows = await runGreenhousePostgresQuery<{ member_id: string }>(
+    `
+      SELECT member_id
+      FROM greenhouse_core.members
+      WHERE active = TRUE
+      ORDER BY member_id ASC
+    `
+  )
+
+  let refreshed = 0
+
+  for (const row of rows) {
+    try {
+      await refreshPersonIntelligenceForMember(row.member_id, period)
+      refreshed++
+    } catch {
+      // Keep the batch moving; a single bad row should not block the full refresh.
+    }
+  }
+
+  return refreshed
+}
+
 // ── Projection definition ──
 
 export const personIntelligenceProjection: ProjectionDefinition = {
@@ -234,6 +343,7 @@ export const personIntelligenceProjection: ProjectionDefinition = {
     'payroll_period.updated',
     'payroll_period.calculated',
     'payroll_period.approved',
+    'payroll_period.exported',
     'payroll_entry.upserted',
     'finance.exchange_rate.upserted',
     'finance.overhead.updated',
@@ -245,10 +355,26 @@ export const personIntelligenceProjection: ProjectionDefinition = {
   extractScope: (payload) => {
     const memberId = (payload.memberId ?? payload.member_id) as string | undefined
 
-    return memberId ? { entityType: 'member', entityId: memberId } : null
+    if (memberId) {
+      return { entityType: 'member', entityId: memberId }
+    }
+
+    const period = getPersonIntelligencePeriodFromPayload(payload)
+
+    return period ? { entityType: 'finance_period', entityId: `${period.year}-${pad2(period.month)}` } : null
   },
 
-  refresh: async (scope, _payload) => refreshPersonIntelligence(scope),
+  refresh: async (scope, payload) => {
+    const period = getPeriodOrCurrent(payload)
+
+    if (scope.entityType === 'finance_period') {
+      const refreshed = await refreshAllMembersForPeriod(period)
+
+      return `refreshed person_intelligence for ${refreshed} members in ${scope.entityId}`
+    }
+
+    return refreshPersonIntelligenceForMember(scope.entityId, period)
+  },
 
   maxRetries: 2
 }

@@ -124,11 +124,18 @@ const PayrollPersonnelExpenseTab = () => {
   const { totals, periods, byRegime } = data
   const chileRegime = byRegime.find(r => r.regime === 'chile')
   const intlRegime = byRegime.find(r => r.regime === 'international')
+  const clpTotals = totals.byCurrency.find(bucket => bucket.currency === 'CLP')
+  const usdTotals = totals.byCurrency.find(bucket => bucket.currency === 'USD')
+  const clpAvg = totals.avgMonthlyByCurrency.find(bucket => bucket.currency === 'CLP')
+  const usdAvg = totals.avgMonthlyByCurrency.find(bucket => bucket.currency === 'USD')
+  const hasMixedCurrency = totals.byCurrency.length > 1
 
-  // Chart: gross vs net evolution
   const chartCategories = periods.map(p => formatPeriodLabel(p.year, p.month))
-  const chartGross = periods.map(p => p.totalGross)
-  const chartNet = periods.map(p => p.totalNet)
+  const chartGrossClp = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'CLP')?.gross ?? 0)
+  const chartNetClp = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'CLP')?.net ?? 0)
+  const chartGrossUsd = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'USD')?.gross ?? 0)
+  const chartNetUsd = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'USD')?.net ?? 0)
+  const chartCurrency = clpTotals ? 'CLP' : 'USD'
 
   const lineOptions: ApexOptions = {
     chart: {
@@ -148,17 +155,16 @@ const PayrollPersonnelExpenseTab = () => {
     yaxis: {
       labels: {
         style: { colors: 'var(--mui-palette-text-secondary)' },
-        formatter: v => formatCurrency(v, 'CLP')
+        formatter: v => formatCurrency(v, chartCurrency)
       }
     },
     colors: [theme.palette.warning.main, theme.palette.success.main],
     legend: { position: 'top' },
     tooltip: {
-      y: { formatter: v => formatCurrency(v, 'CLP') }
+      y: { formatter: v => formatCurrency(v, chartCurrency) }
     }
   }
 
-  // Chart: regime distribution (donut)
   const donutLabels: string[] = []
   const donutSeries: number[] = []
 
@@ -179,7 +185,7 @@ const PayrollPersonnelExpenseTab = () => {
     legend: { position: 'bottom' },
     dataLabels: { enabled: true },
     tooltip: {
-      y: { formatter: v => formatCurrency(v, 'CLP') }
+      y: { formatter: v => formatCurrency(v, chartCurrency) }
     }
   }
 
@@ -228,33 +234,50 @@ const PayrollPersonnelExpenseTab = () => {
 
       {/* KPI summary cards */}
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='Gasto bruto total'
-            stats={formatCurrency(totals.totalGross, 'CLP')}
-            avatarIcon='tabler-coins'
-            avatarColor='warning'
-            subtitle={`${periods.length} período${periods.length !== 1 ? 's' : ''}`}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='Neto total pagado'
-            stats={formatCurrency(totals.totalNet, 'CLP')}
-            avatarIcon='tabler-wallet'
-            avatarColor='success'
-            subtitle='Acumulado en rango'
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
-            title='Promedio mensual bruto'
-            stats={formatCurrency(totals.avgMonthlyGross, 'CLP')}
-            avatarIcon='tabler-chart-bar'
-            avatarColor='info'
-            subtitle='Promedio por período'
-          />
-        </Grid>
+        {clpTotals && (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Bruto total CLP'
+              stats={formatCurrency(clpTotals.gross, 'CLP')}
+              avatarIcon='tabler-coins'
+              avatarColor='warning'
+              subtitle={`${periods.length} período${periods.length !== 1 ? 's' : ''}`}
+            />
+          </Grid>
+        )}
+        {usdTotals && (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Bruto total USD'
+              stats={formatCurrency(usdTotals.gross, 'USD')}
+              avatarIcon='tabler-coins'
+              avatarColor='info'
+              subtitle={`${periods.length} período${periods.length !== 1 ? 's' : ''}`}
+            />
+          </Grid>
+        )}
+        {clpAvg && (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Promedio CLP'
+              stats={formatCurrency(clpAvg.gross, 'CLP')}
+              avatarIcon='tabler-chart-bar'
+              avatarColor='success'
+              subtitle='Bruto promedio mensual'
+            />
+          </Grid>
+        )}
+        {usdAvg && (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Promedio USD'
+              stats={formatCurrency(usdAvg.gross, 'USD')}
+              avatarIcon='tabler-chart-bar'
+              avatarColor='secondary'
+              subtitle='Bruto promedio mensual'
+            />
+          </Grid>
+        )}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Headcount máximo'
@@ -281,15 +304,21 @@ const PayrollPersonnelExpenseTab = () => {
             />
             <Divider />
             <CardContent>
-              <AppReactApexCharts
-                type='line'
-                height={300}
-                options={lineOptions}
-                series={[
-                  { name: 'Bruto', data: chartGross },
-                  { name: 'Neto', data: chartNet }
-                ]}
-              />
+              {hasMixedCurrency ? (
+                <Alert severity='info'>
+                  Este rango mezcla `CLP` y `USD`. Para evitar sumar monedas distintas en un mismo eje, revisa el desglose por moneda y la tabla detallada de períodos.
+                </Alert>
+              ) : (
+                <AppReactApexCharts
+                  type='line'
+                  height={300}
+                  options={lineOptions}
+                  series={[
+                    { name: `Bruto ${chartCurrency}`, data: chartCurrency === 'CLP' ? chartGrossClp : chartGrossUsd },
+                    { name: `Neto ${chartCurrency}`, data: chartCurrency === 'CLP' ? chartNetClp : chartNetUsd }
+                  ]}
+                />
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -394,45 +423,56 @@ const PayrollPersonnelExpenseTab = () => {
                 <TableRow>
                   <TableCell>Período</TableCell>
                   <TableCell align='right'>Headcount</TableCell>
-                  <TableCell align='right'>Total bruto</TableCell>
-                  <TableCell align='right'>Bonos</TableCell>
-                  <TableCell align='right'>Descuentos</TableCell>
-                  <TableCell align='right' sx={{ fontWeight: 700 }}>Total neto</TableCell>
+                  <TableCell align='right'>Bruto CLP</TableCell>
+                  <TableCell align='right'>Neto CLP</TableCell>
+                  <TableCell align='right'>Descuentos CLP</TableCell>
+                  <TableCell align='right'>Bruto USD</TableCell>
+                  <TableCell align='right' sx={{ fontWeight: 700 }}>Neto USD</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {periods.map(p => (
-                  <TableRow key={p.periodId} hover>
+                {periods.map(period => {
+                  const clpBucket = period.totalsByCurrency.find(bucket => bucket.currency === 'CLP')
+                  const usdBucket = period.totalsByCurrency.find(bucket => bucket.currency === 'USD')
+
+                  return (
+                    <TableRow key={period.periodId} hover>
                     <TableCell>
                       <Typography variant='body2' fontWeight={500}>
-                        {formatPeriodLabel(p.year, p.month)}
+                        {formatPeriodLabel(period.year, period.month)}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
-                      <Typography variant='body2'>{p.headcount}</Typography>
+                      <Typography variant='body2'>{period.headcount}</Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {formatCurrency(p.totalGross, 'CLP')}
+                        {clpBucket ? formatCurrency(clpBucket.gross, 'CLP') : '—'}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {formatCurrency(p.totalBonuses, 'CLP')}
+                        {clpBucket ? formatCurrency(clpBucket.net, 'CLP') : '—'}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
-                        {p.totalDeductions > 0 ? `- ${formatCurrency(p.totalDeductions, 'CLP')}` : '—'}
+                        {clpBucket && clpBucket.deductions > 0 ? `- ${formatCurrency(clpBucket.deductions, 'CLP')}` : '—'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align='right'>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {usdBucket ? formatCurrency(usdBucket.gross, 'USD') : '—'}
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
                       <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
-                        {formatCurrency(p.totalNet, 'CLP')}
+                        {usdBucket ? formatCurrency(usdBucket.net, 'USD') : '—'}
                       </Typography>
                     </TableCell>
-                  </TableRow>
-                ))}
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>

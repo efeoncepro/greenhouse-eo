@@ -20,7 +20,10 @@ vi.mock('@/lib/sync/projections/member-capacity-economics', () => ({
   refreshMemberCapacityEconomicsForMember: vi.fn()
 }))
 
-import { personIntelligenceProjection } from '@/lib/sync/projections/person-intelligence'
+import {
+  getPersonIntelligencePeriodFromPayload,
+  personIntelligenceProjection
+} from '@/lib/sync/projections/person-intelligence'
 
 describe('personIntelligenceProjection', () => {
   beforeEach(() => {
@@ -117,5 +120,42 @@ describe('personIntelligenceProjection', () => {
       activeAssignmentCount: 1,
       compensationCurrency: 'USD'
     })
+  })
+
+  it('extracts the target period from payroll payloads and refreshes all members for period-scoped events', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ member_id: 'member-1' }, { member_id: 'member-2' }])
+      .mockResolvedValue([])
+
+    const scope = personIntelligenceProjection.extractScope({
+      periodId: '2026-02',
+      status: 'calculated'
+    })
+
+    expect(scope).toEqual({ entityType: 'finance_period', entityId: '2026-02' })
+
+    const result = await personIntelligenceProjection.refresh(
+      { entityType: 'finance_period', entityId: '2026-02' },
+      { periodId: '2026-02', status: 'calculated' }
+    )
+
+    expect(result).toBe('refreshed person_intelligence for 2 members in 2026-02')
+    expect(mockUpsertPersonIntelligence).toHaveBeenCalledTimes(2)
+    expect(mockUpsertPersonIntelligence.mock.calls[0]?.[0]).toMatchObject({
+      memberId: 'member-1',
+      periodYear: 2026,
+      periodMonth: 2
+    })
+    expect(mockUpsertPersonIntelligence.mock.calls[1]?.[0]).toMatchObject({
+      memberId: 'member-2',
+      periodYear: 2026,
+      periodMonth: 2
+    })
+  })
+
+  it('parses period hints from payroll and FX payloads', () => {
+    expect(getPersonIntelligencePeriodFromPayload({ periodId: '2026-04' })).toEqual({ year: 2026, month: 4 })
+    expect(getPersonIntelligencePeriodFromPayload({ payrollPeriodId: '2026-05' })).toEqual({ year: 2026, month: 5 })
+    expect(getPersonIntelligencePeriodFromPayload({ rateDate: '2026-03-31' })).toEqual({ year: 2026, month: 3 })
   })
 })

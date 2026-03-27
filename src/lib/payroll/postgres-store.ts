@@ -1338,6 +1338,45 @@ export const pgSetPeriodApproved = async (periodId: string, actorEmail: string |
   })
 }
 
+export const pgSetPeriodExported = async (periodId: string) => {
+  await assertPayrollPostgresReady()
+
+  await withGreenhousePostgresTransaction(async client => {
+    const result = await client.query<PgPeriodRow>(
+      `
+        UPDATE greenhouse_payroll.payroll_periods
+        SET
+          status = 'exported',
+          exported_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE period_id = $1
+          AND status = 'approved'
+        RETURNING *
+      `,
+      [periodId]
+    )
+
+    const updated = result.rows[0] ? mapPeriod(result.rows[0]) : null
+
+    if (!updated) {
+      return
+    }
+
+    await publishPayrollOutboxEvent({
+      eventType: 'payroll_period.exported',
+      aggregateType: 'payroll_period',
+      aggregateId: updated.periodId,
+      payload: {
+        periodId: updated.periodId,
+        year: updated.year,
+        month: updated.month,
+        status: updated.status
+      },
+      client
+    })
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Entry queries
 // ---------------------------------------------------------------------------

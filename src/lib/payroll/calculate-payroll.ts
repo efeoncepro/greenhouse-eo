@@ -253,6 +253,8 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
+  const includesChilePayroll = compensationRows.some(row => row.payRegime === 'chile')
+
   const indicatorValues = await resolvePayrollPeriodIndicators({
     periodId,
     periodUfValue: period.ufValue,
@@ -261,6 +263,14 @@ export const calculatePayroll = async ({
 
   if (requiresUfValue && typeof indicatorValues.ufValue !== 'number') {
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
+  }
+
+  if (includesChilePayroll && !period.taxTableVersion) {
+    throw new PayrollValidationError('This payroll period requires taxTableVersion to calculate Chile payroll taxes.', 400)
+  }
+
+  if (includesChilePayroll && period.taxTableVersion && typeof indicatorValues.utmValue !== 'number') {
+    throw new PayrollValidationError('This payroll period requires a historical UTM value to calculate Chile payroll taxes.', 400)
   }
 
   const memberIds = compensationRows.map(row => row.memberId)

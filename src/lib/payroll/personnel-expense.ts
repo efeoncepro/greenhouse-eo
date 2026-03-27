@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { PayRegime } from '@/types/payroll'
+import type { PayRegime, PayrollCurrency } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
@@ -12,37 +12,47 @@ export interface PersonnelExpensePeriod {
   year: number
   month: number
   headcount: number
-  totalGross: number
-  totalNet: number
-  totalDeductions: number
-  totalBonuses: number
+  totalsByCurrency: PersonnelExpenseMoneyByCurrency[]
+  hasMixedCurrency: boolean
 }
 
 export interface PersonnelExpenseByRegime {
   regime: PayRegime
+  currency: PayrollCurrency
   headcount: number
   gross: number
   net: number
 }
 
+export interface PersonnelExpenseMoneyByCurrency {
+  currency: PayrollCurrency
+  gross: number
+  net: number
+  deductions: number
+  bonuses: number
+}
+
 export interface PersonnelExpenseReport {
   periods: PersonnelExpensePeriod[]
   totals: {
-    totalGross: number
-    totalNet: number
-    totalDeductions: number
-    totalBonuses: number
-    avgMonthlyGross: number
-    avgMonthlyNet: number
     totalHeadcount: number
+    byCurrency: PersonnelExpenseMoneyByCurrency[]
+    avgMonthlyByCurrency: Array<{
+      currency: PayrollCurrency
+      gross: number
+      net: number
+      deductions: number
+      bonuses: number
+    }>
   }
   byRegime: PersonnelExpenseByRegime[]
 }
 
-type PgExpenseRow = {
+type PgExpenseCurrencyRow = {
   period_id: string
   year: number | string
   month: number | string
+  currency: string
   headcount: number | string
   total_gross: number | string
   total_net: number | string
@@ -52,12 +62,120 @@ type PgExpenseRow = {
 
 type PgRegimeRow = {
   pay_regime: string
+  currency: string
   headcount: number | string
   gross: number | string
   net: number | string
 }
 
 const getProjectId = () => getBigQueryProjectId()
+
+const normalizePayrollCurrency = (value: string): PayrollCurrency => (value === 'USD' ? 'USD' : 'CLP')
+
+const upsertCurrencyBucket = (
+  buckets: PersonnelExpenseMoneyByCurrency[],
+  row: {
+    currency: string
+    gross: number | string
+    net: number | string
+    deductions: number | string | null
+    bonuses: number | string
+  }
+) => {
+  const currency = normalizePayrollCurrency(row.currency)
+  const existing = buckets.find(bucket => bucket.currency === currency)
+
+  if (existing) {
+    existing.gross += toNumber(row.gross)
+    existing.net += toNumber(row.net)
+    existing.deductions += toNumber(row.deductions ?? 0)
+    existing.bonuses += toNumber(row.bonuses)
+
+    return
+  }
+
+  buckets.push({
+    currency,
+    gross: toNumber(row.gross),
+    net: toNumber(row.net),
+    deductions: toNumber(row.deductions ?? 0),
+    bonuses: toNumber(row.bonuses)
+  })
+}
+
+export const buildPersonnelExpenseReport = ({
+  periodRows,
+  regimeRows
+}: {
+  periodRows: PgExpenseCurrencyRow[]
+  regimeRows: PgRegimeRow[]
+}): PersonnelExpenseReport => {
+  const periodsMap = new Map<string, PersonnelExpensePeriod>()
+  const totalBuckets: PersonnelExpenseMoneyByCurrency[] = []
+
+  for (const row of periodRows) {
+    const periodId = String(row.period_id)
+
+    const existing = periodsMap.get(periodId) ?? {
+      periodId,
+      year: toNumber(row.year),
+      month: toNumber(row.month),
+      headcount: 0,
+      totalsByCurrency: [],
+      hasMixedCurrency: false
+    }
+
+    existing.headcount += toNumber(row.headcount)
+    upsertCurrencyBucket(existing.totalsByCurrency, {
+      currency: row.currency,
+      gross: row.total_gross,
+      net: row.total_net,
+      deductions: row.total_deductions ?? 0,
+      bonuses: row.total_bonuses
+    })
+    existing.hasMixedCurrency = existing.totalsByCurrency.length > 1
+    periodsMap.set(periodId, existing)
+
+    upsertCurrencyBucket(totalBuckets, {
+      currency: row.currency,
+      gross: row.total_gross,
+      net: row.total_net,
+      deductions: row.total_deductions ?? 0,
+      bonuses: row.total_bonuses
+    })
+  }
+
+  const periods = Array.from(periodsMap.values()).sort((a, b) => a.periodId.localeCompare(b.periodId))
+  const periodCount = periods.length || 1
+
+  const byRegime: PersonnelExpenseByRegime[] = regimeRows.map(row => ({
+    regime: row.pay_regime === 'international' ? 'international' : 'chile',
+    currency: normalizePayrollCurrency(row.currency),
+    headcount: toNumber(row.headcount),
+    gross: toNumber(row.gross),
+    net: toNumber(row.net)
+  }))
+
+  const avgMonthlyByCurrency = totalBuckets.map(bucket => ({
+    currency: bucket.currency,
+    gross: Math.round(bucket.gross / periodCount),
+    net: Math.round(bucket.net / periodCount),
+    deductions: Math.round(bucket.deductions / periodCount),
+    bonuses: Math.round(bucket.bonuses / periodCount)
+  }))
+
+  const maxHeadcount = periods.length > 0 ? Math.max(...periods.map(period => period.headcount)) : 0
+
+  return {
+    periods,
+    totals: {
+      totalHeadcount: maxHeadcount,
+      byCurrency: totalBuckets,
+      avgMonthlyByCurrency
+    },
+    byRegime
+  }
+}
 
 export const getPersonnelExpenseReport = async (
   yearFrom: number,
@@ -68,17 +186,18 @@ export const getPersonnelExpenseReport = async (
   const periodIdFrom = `${yearFrom}-${String(monthFrom).padStart(2, '0')}`
   const periodIdTo = `${yearTo}-${String(monthTo).padStart(2, '0')}`
 
-  let periodRows: PgExpenseRow[]
+  let periodRows: PgExpenseCurrencyRow[]
   let regimeRows: PgRegimeRow[]
 
   if (isPayrollPostgresEnabled()) {
     ;[periodRows, regimeRows] = await Promise.all([
-      runGreenhousePostgresQuery<PgExpenseRow>(
+      runGreenhousePostgresQuery<PgExpenseCurrencyRow>(
         `
           SELECT
             p.period_id,
             p.year,
             p.month,
+            e.currency,
             COUNT(e.entry_id) AS headcount,
             COALESCE(SUM(e.gross_total), 0) AS total_gross,
             COALESCE(SUM(e.net_total), 0) AS total_net,
@@ -89,8 +208,8 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= $1
             AND p.period_id <= $2
-          GROUP BY p.period_id, p.year, p.month
-          ORDER BY p.period_id ASC
+          GROUP BY p.period_id, p.year, p.month, e.currency
+          ORDER BY p.period_id ASC, e.currency ASC
         `,
         [periodIdFrom, periodIdTo]
       ),
@@ -98,6 +217,7 @@ export const getPersonnelExpenseReport = async (
         `
           SELECT
             e.pay_regime,
+            e.currency,
             COUNT(DISTINCT e.member_id) AS headcount,
             COALESCE(SUM(e.gross_total), 0) AS gross,
             COALESCE(SUM(e.net_total), 0) AS net
@@ -106,7 +226,7 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= $1
             AND p.period_id <= $2
-          GROUP BY e.pay_regime
+          GROUP BY e.pay_regime, e.currency
         `,
         [periodIdFrom, periodIdTo]
       )
@@ -115,12 +235,13 @@ export const getPersonnelExpenseReport = async (
     const projectId = getProjectId()
 
     ;[periodRows, regimeRows] = await Promise.all([
-      runPayrollQuery<PgExpenseRow>(
+      runPayrollQuery<PgExpenseCurrencyRow>(
         `
           SELECT
             p.period_id,
             p.year,
             p.month,
+            e.currency,
             COUNT(e.entry_id) AS headcount,
             COALESCE(SUM(e.gross_total), 0) AS total_gross,
             COALESCE(SUM(e.net_total), 0) AS total_net,
@@ -131,8 +252,8 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= @periodIdFrom
             AND p.period_id <= @periodIdTo
-          GROUP BY p.period_id, p.year, p.month
-          ORDER BY p.period_id ASC
+          GROUP BY p.period_id, p.year, p.month, e.currency
+          ORDER BY p.period_id ASC, e.currency ASC
         `,
         { periodIdFrom, periodIdTo }
       ),
@@ -140,6 +261,7 @@ export const getPersonnelExpenseReport = async (
         `
           SELECT
             e.pay_regime,
+            e.currency,
             COUNT(DISTINCT e.member_id) AS headcount,
             COALESCE(SUM(e.gross_total), 0) AS gross,
             COALESCE(SUM(e.net_total), 0) AS net
@@ -148,49 +270,12 @@ export const getPersonnelExpenseReport = async (
           WHERE p.status IN ('approved', 'exported')
             AND p.period_id >= @periodIdFrom
             AND p.period_id <= @periodIdTo
-          GROUP BY e.pay_regime
+          GROUP BY e.pay_regime, e.currency
         `,
         { periodIdFrom, periodIdTo }
       )
     ])
   }
 
-  const periods: PersonnelExpensePeriod[] = periodRows.map(row => ({
-    periodId: String(row.period_id),
-    year: toNumber(row.year),
-    month: toNumber(row.month),
-    headcount: toNumber(row.headcount),
-    totalGross: toNumber(row.total_gross),
-    totalNet: toNumber(row.total_net),
-    totalDeductions: toNumber(row.total_deductions ?? 0),
-    totalBonuses: toNumber(row.total_bonuses)
-  }))
-
-  const byRegime: PersonnelExpenseByRegime[] = regimeRows.map(row => ({
-    regime: row.pay_regime === 'international' ? 'international' : 'chile' as PayRegime,
-    headcount: toNumber(row.headcount),
-    gross: toNumber(row.gross),
-    net: toNumber(row.net)
-  }))
-
-  const totalGross = periods.reduce((s, p) => s + p.totalGross, 0)
-  const totalNet = periods.reduce((s, p) => s + p.totalNet, 0)
-  const totalDeductions = periods.reduce((s, p) => s + p.totalDeductions, 0)
-  const totalBonuses = periods.reduce((s, p) => s + p.totalBonuses, 0)
-  const monthCount = periods.length || 1
-  const maxHeadcount = periods.length > 0 ? Math.max(...periods.map(p => p.headcount)) : 0
-
-  return {
-    periods,
-    totals: {
-      totalGross,
-      totalNet,
-      totalDeductions,
-      totalBonuses,
-      avgMonthlyGross: Math.round(totalGross / monthCount),
-      avgMonthlyNet: Math.round(totalNet / monthCount),
-      totalHeadcount: maxHeadcount
-    },
-    byRegime
-  }
+  return buildPersonnelExpenseReport({ periodRows, regimeRows })
 }

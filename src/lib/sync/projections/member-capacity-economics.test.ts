@@ -251,6 +251,7 @@ describe('memberCapacityEconomicsProjection', () => {
   it('registers the expected trigger events', () => {
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('assignment.created')
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('compensation_version.updated')
+    expect(memberCapacityEconomicsProjection.triggerEvents).toContain('payroll_period.exported')
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('finance.expense.updated')
     expect(memberCapacityEconomicsProjection.triggerEvents).toContain('finance.exchange_rate.upserted')
   })

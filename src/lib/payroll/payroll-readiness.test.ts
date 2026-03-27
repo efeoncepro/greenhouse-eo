@@ -155,7 +155,7 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_uf_value'])
   })
 
-  it('warns when a Chile period lacks tax table version', () => {
+  it('blocks calculation when a Chile period lacks tax table version', () => {
     const readiness = buildPayrollPeriodReadiness({
       period: {
         ...period,
@@ -175,7 +175,29 @@ describe('buildPayrollPeriodReadiness', () => {
       attendanceDiagnostics
     })
 
-    expect(readiness.ready).toBe(true)
-    expect(readiness.warnings.map(issue => issue.code)).toEqual(['missing_tax_table_version'])
+    expect(readiness.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_tax_table_version'])
+  })
+
+  it('blocks calculation when Chile tax inputs need UTM and historical UTM is unavailable', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [
+        {
+          ...compensatedMember,
+          memberId: 'member-chile',
+          payRegime: 'chile',
+          currency: 'CLP',
+          healthSystem: 'fonasa'
+        }
+      ],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      missingUtmValue: true
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_utm_value'])
   })
 })

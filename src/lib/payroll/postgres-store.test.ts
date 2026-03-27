@@ -12,7 +12,7 @@ vi.mock('@/lib/postgres/client', () => ({
     callback({ query: mockClientQuery })
 }))
 
-const { pgUpdatePayrollPeriod } = await import('./postgres-store')
+const { pgUpdatePayrollPeriod, pgSetPeriodExported } = await import('./postgres-store')
 
 const PAYROLL_REQUIRED_TABLES = [
   'greenhouse_core.members',
@@ -86,8 +86,52 @@ describe('pgUpdatePayrollPeriod', () => {
     expect(updated.month).toBe(2)
     expect(updated.status).toBe('draft')
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(2)
-    expect(mockClientQuery).toHaveBeenCalledTimes(4)
-    expect(mockClientQuery.mock.calls[3]?.[0]).toContain('FROM greenhouse_payroll.payroll_periods')
-    expect(mockClientQuery.mock.calls[3]?.[1]).toEqual(['2026-02'])
+    expect(mockClientQuery).toHaveBeenCalledTimes(5)
+
+    const selectUpdatedPeriodCall = mockClientQuery.mock.calls.find(call =>
+      String(call[0]).includes('FROM greenhouse_payroll.payroll_periods')
+    )
+
+    expect(selectUpdatedPeriodCall?.[1]).toEqual(['2026-02'])
+  })
+})
+
+describe('pgSetPeriodExported', () => {
+  beforeEach(() => {
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockClientQuery.mockReset()
+  })
+
+  it('publishes an outbox event when an approved payroll period is exported', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
+
+    mockClientQuery
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'exported',
+            calculated_at: '2026-03-05T12:00:00.000Z',
+            calculated_by_user_id: 'user-1',
+            approved_at: '2026-03-06T12:00:00.000Z',
+            approved_by_user_id: 'user-2',
+            exported_at: '2026-03-07T12:00:00.000Z',
+            uf_value: 39990,
+            tax_table_version: 'SII-2026-03',
+            notes: null,
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      })
+      .mockResolvedValueOnce({ rows: [] })
+
+    await pgSetPeriodExported('2026-03')
+
+    expect(mockClientQuery).toHaveBeenCalledTimes(2)
+    expect(mockClientQuery.mock.calls[0]?.[0]).toContain('UPDATE greenhouse_payroll.payroll_periods')
+    expect(mockClientQuery.mock.calls[1]?.[0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
+    expect(mockClientQuery.mock.calls[1]?.[1]?.[3]).toBe('payroll_period.exported')
   })
 })

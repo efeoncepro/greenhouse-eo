@@ -206,6 +206,86 @@ Sesión completa que cerró 2 tasks, arregló una regresión, creó una proyecci
 - Documentación canónica alineada en `Finance`, `Payroll`, `Sync Pipelines`, `README` e índice de tasks.
 - `USD_CLP` mantiene compatibilidad con `greenhouse_finance.exchange_rates`, pero `UF/UTM/IPC` nuevos todavía no tienen projections reactivas dedicadas porque los consumers actuales fuera de `Payroll` no las requieren.
 
+## 2026-03-27 18:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Abrir `TASK-061` para auditar readiness go-live de `Payroll` antes de montar la primera nómina real mixta `CLP/USD`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/payroll-readiness.ts`
+- `src/lib/payroll/personnel-expense.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/sync/event-catalog.ts`
+- `src/lib/sync/projections/person-intelligence.ts`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+- `src/lib/sync/projections/client-economics.ts`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx`
+- `src/views/greenhouse/payroll/helpers.ts`
+- tests asociados en `src/lib/payroll/*.test.ts`, `src/lib/sync/**/*.test.ts`, `src/views/greenhouse/payroll/*.test.tsx`
+
+### Verificacion
+
+- `pnpm exec eslint src/lib/payroll/payroll-readiness.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/types/payroll.ts src/lib/payroll/personnel-expense.ts src/lib/payroll/personnel-expense.test.ts src/lib/payroll/export-payroll.ts src/lib/payroll/postgres-store.ts src/lib/payroll/postgres-store.test.ts 'src/app/api/hr/payroll/periods/[periodId]/entries/route.ts' src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx src/views/greenhouse/payroll/helpers.ts src/views/greenhouse/payroll/helpers.test.ts src/lib/sync/event-catalog.ts src/lib/sync/event-catalog.test.ts src/lib/sync/projections/client-economics.ts src/lib/sync/projections/client-economics.test.ts src/lib/sync/projections/member-capacity-economics.ts src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projections/person-intelligence.ts src/lib/sync/projections/person-intelligence.test.ts`
+- `pnpm test src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/personnel-expense.test.ts src/lib/payroll/postgres-store.test.ts src/views/greenhouse/payroll/helpers.test.ts src/lib/sync/event-catalog.test.ts src/lib/sync/projections/client-economics.test.ts src/lib/sync/projections/member-capacity-economics.test.ts src/lib/sync/projections/person-intelligence.test.ts`
+- `pnpm test src/lib/payroll src/views/greenhouse/payroll`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- La auditoría `TASK-061` dejó a `Payroll` mucho más sano para go-live, pero todavía no existe un modelo genérico de bonos fijos recurrentes fuera de `remoteAllowance`.
+- Semántica confirmada del cálculo actual:
+  - sí usa `baseSalary`
+  - sí usa `remoteAllowance`
+  - sí usa bonos variables `OTD` y `RpA`
+  - sí permite `bonusOtherAmount` manual por entry
+  - sí descuenta `daysAbsent` y `daysOnUnpaidLeave`
+  - no descuenta `daysOnLeave` pagadas
+- Si la operación real necesita más de un bono fijo recurrente, eso requiere extensión de modelo y no debe asumirse cubierto implícitamente por el runtime actual.
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+
+### Verificacion
+
+- Revisión de template, registry y arquitectura canónica de Payroll antes de abrir la lane.
+
+### Riesgos o pendientes
+
+- Pendiente ejecutar la auditoría completa del módulo `Payroll` con foco en mixed currency, cálculo Chile, exports y gaps críticos de go-live.
+
 ## 2026-03-26 22:00 -03
 
 ### Agente

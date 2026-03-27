@@ -215,6 +215,14 @@ export const recalculatePayrollEntry = async ({
       }))?.value ?? null
     : null
 
+  if (compensation.payRegime === 'chile' && !period.taxTableVersion) {
+    throw new PayrollValidationError('This payroll period requires taxTableVersion to recalculate Chile payroll taxes.', 400)
+  }
+
+  if (compensation.payRegime === 'chile' && period.taxTableVersion && typeof resolvedUtmValue !== 'number') {
+    throw new PayrollValidationError('This payroll period requires a historical UTM value to recalculate Chile payroll taxes.', 400)
+  }
+
   validateBonusAmount({
     qualifies: otdResult.qualifies,
     amount: nextBonusOtdAmount,

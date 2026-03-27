@@ -235,6 +235,7 @@ export type PayrollReadinessIssueCode =
   | 'missing_kpi'
   | 'missing_attendance_signal'
   | 'missing_uf_value'
+  | 'missing_utm_value'
   | 'missing_tax_table_version'
 
 export interface PayrollReadinessIssue {

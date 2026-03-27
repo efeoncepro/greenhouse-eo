@@ -30,13 +30,15 @@ export const buildPayrollPeriodReadiness = ({
   compensationRows,
   missingKpiMemberIds,
   missingAttendanceMemberIds,
-  attendanceDiagnostics
+  attendanceDiagnostics,
+  missingUtmValue = false
 }: {
   period: PayrollPeriod
   compensationRows: ApplicableCompensation[]
   missingKpiMemberIds: string[]
   missingAttendanceMemberIds: string[]
   attendanceDiagnostics: PayrollPeriodReadiness['attendanceDiagnostics']
+  missingUtmValue?: boolean
 }): PayrollPeriodReadiness => {
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
   const includedMemberIds = includedCompensations.map(row => row.memberId)
@@ -45,6 +47,8 @@ export const buildPayrollPeriodReadiness = ({
   const requiresUfValue = includedCompensations.some(
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
+
+  const includesChilePayroll = includedCompensations.some(row => row.payRegime === 'chile')
 
   const blockingIssues: PayrollReadinessIssue[] = []
   const warnings: PayrollReadinessIssue[] = []
@@ -62,6 +66,22 @@ export const buildPayrollPeriodReadiness = ({
       code: 'missing_uf_value',
       severity: 'blocking',
       message: 'Falta el valor UF y este período lo requiere para calcular descuentos Isapre.'
+    })
+  }
+
+  if (includesChilePayroll && !period.taxTableVersion) {
+    blockingIssues.push({
+      code: 'missing_tax_table_version',
+      severity: 'blocking',
+      message: 'Este período incluye colaboradores Chile y requiere una versión de tabla impositiva para calcular impuesto.'
+    })
+  }
+
+  if (includesChilePayroll && period.taxTableVersion && missingUtmValue) {
+    blockingIssues.push({
+      code: 'missing_utm_value',
+      severity: 'blocking',
+      message: 'No fue posible resolver el valor UTM histórico del período para calcular impuesto Chile.'
     })
   }
 
@@ -89,14 +109,6 @@ export const buildPayrollPeriodReadiness = ({
       severity: 'warning',
       message: `${missingAttendanceMemberIds.length} colaborador(es) no muestran señales de asistencia/licencias en el período.`,
       memberIds: missingAttendanceMemberIds
-    })
-  }
-
-  if (includedCompensations.some(row => row.payRegime === 'chile') && !period.taxTableVersion) {
-    warnings.push({
-      code: 'missing_tax_table_version',
-      severity: 'warning',
-      message: 'Este período incluye colaboradores Chile y no tiene versión de tabla impositiva configurada.'
     })
   }
 
@@ -131,6 +143,16 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
       }))?.value ?? null
 
   const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
+  const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
+  const includesChilePayroll = includedCompensations.some(row => row.payRegime === 'chile')
+
+  const resolvedUtmValue = includesChilePayroll && period.taxTableVersion
+    ? (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UTM',
+        periodDate: range.periodEnd
+      }))?.value ?? null
+    : null
+
   const includedMemberIds = compensationRows.filter(row => row.hasCompensationVersion).map(row => row.memberId)
 
   const [kpiData, attendanceResult] = await Promise.all([
@@ -152,6 +174,7 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
     compensationRows,
     missingKpiMemberIds,
     missingAttendanceMemberIds,
-    attendanceDiagnostics: attendanceResult.diagnostics
+    attendanceDiagnostics: attendanceResult.diagnostics,
+    missingUtmValue: includesChilePayroll && period.taxTableVersion != null && typeof resolvedUtmValue !== 'number'
   })
 }

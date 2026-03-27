@@ -4,8 +4,7 @@ import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError, escapeCsvValue, runPayrollQuery } from '@/lib/payroll/shared'
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isPayrollPostgresEnabled, pgSetPeriodExported } from '@/lib/payroll/postgres-store'
 
 const getProjectId = () => getBigQueryProjectId()
 
@@ -91,14 +90,7 @@ export const exportPayrollCsv = async (periodId: string) => {
   ]
 
   if (isPayrollPostgresEnabled()) {
-    await runGreenhousePostgresQuery(
-      `
-        UPDATE greenhouse_payroll.payroll_periods
-        SET status = 'exported', exported_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-        WHERE period_id = $1 AND status = 'approved'
-      `,
-      [periodId]
-    )
+    await pgSetPeriodExported(periodId)
   } else {
     await runPayrollQuery(
       `
