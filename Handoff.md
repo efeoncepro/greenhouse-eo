@@ -107,6 +107,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 - Falta ejecutar en BD la migration `scripts/migrations/add-payroll-fixed-bonus-columns.sql` antes de usar el nuevo campo en runtime PostgreSQL.
 - Hay cambios paralelos de otra lane en `team/*` y `agency/*`; no se deben mezclar con este commit de payroll.
+- `pnpm exec tsc --noEmit --pretty false` sigue bloqueado por errores JSX en `src/views/agency/AgencyTeamView.tsx`, ajenos a esta lane.
 
 ## 2026-03-27 — Producción release + sesión completa
 
