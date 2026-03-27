@@ -16,7 +16,11 @@
 
 ### Payroll leave type clarification
 - Se confirmó que `Payroll` ya diferencia permisos remunerados vs no remunerados: solo `daysAbsent` y `daysOnUnpaidLeave` descuentan pago; `daysOnLeave` remunerado no descuenta.
-- Para evitar ambigüedad operativa se agregó el tipo de permiso `personal_unpaid` en seeds/migrations de HR, de modo que una gestión personal sin goce de sueldo no tenga que registrarse con un código genérico.
+- Se normalizó el catálogo operativo de permisos:
+  - `personal` ahora es no remunerado
+  - `medical` ahora representa `permiso médico / cita médica` remunerado
+  - `personal_unpaid` queda como alias legacy inactivo para no romper requests históricos
+- Ejecutada la migration `scripts/migrations/normalize-leave-type-paid-policy.sql` y verificado el estado final del catálogo en PostgreSQL.
 
 ### Payroll go-live hardening
 - `Payroll` ya no consolida períodos mixtos `CLP/USD` bajo una sola moneda en dashboard ni en `Personnel Expense`; ahora separa subtotales por moneda y evita visualizaciones engañosas.

@@ -219,9 +219,9 @@ export const buildHrCoreBootstrapStatements = (projectId: string) => [
     MERGE \`${projectId}.greenhouse.leave_types\` AS target
     USING (
       SELECT 'vacation' AS leave_type_code, 'Vacaciones' AS leave_type_name, 'Vacaciones anuales pagadas.' AS description, 15 AS default_annual_allowance_days, FALSE AS requires_attachment, TRUE AS is_paid, 'success' AS color_token, TRUE AS active UNION ALL
-      SELECT 'personal' AS leave_type_code, 'Permiso personal' AS leave_type_name, 'Permiso administrativo o personal.' AS description, 5 AS default_annual_allowance_days, FALSE AS requires_attachment, TRUE AS is_paid, 'primary' AS color_token, TRUE AS active UNION ALL
-      SELECT 'personal_unpaid' AS leave_type_code, 'Permiso personal no remunerado' AS leave_type_name, 'Permiso por gestión personal sin goce de sueldo.' AS description, 0 AS default_annual_allowance_days, FALSE AS requires_attachment, FALSE AS is_paid, 'secondary' AS color_token, TRUE AS active UNION ALL
-      SELECT 'medical' AS leave_type_code, 'Licencia medica' AS leave_type_name, 'Ausencia por licencia o reposo medico.' AS description, 0 AS default_annual_allowance_days, TRUE AS requires_attachment, TRUE AS is_paid, 'warning' AS color_token, TRUE AS active UNION ALL
+      SELECT 'personal' AS leave_type_code, 'Permiso personal' AS leave_type_name, 'Permiso por gestión personal sin goce de sueldo.' AS description, 0 AS default_annual_allowance_days, FALSE AS requires_attachment, FALSE AS is_paid, 'secondary' AS color_token, TRUE AS active UNION ALL
+      SELECT 'personal_unpaid' AS leave_type_code, 'Permiso personal no remunerado' AS leave_type_name, 'Alias legacy para permiso personal sin goce de sueldo.' AS description, 0 AS default_annual_allowance_days, FALSE AS requires_attachment, FALSE AS is_paid, 'secondary' AS color_token, FALSE AS active UNION ALL
+      SELECT 'medical' AS leave_type_code, 'Permiso médico / cita médica' AS leave_type_name, 'Permiso breve remunerado por atención o control médico justificado.' AS description, 0 AS default_annual_allowance_days, TRUE AS requires_attachment, TRUE AS is_paid, 'warning' AS color_token, TRUE AS active UNION ALL
       SELECT 'unpaid' AS leave_type_code, 'Permiso sin goce' AS leave_type_name, 'Ausencia sin goce de sueldo.' AS description, 0 AS default_annual_allowance_days, FALSE AS requires_attachment, FALSE AS is_paid, 'secondary' AS color_token, TRUE AS active
     ) AS source
     ON target.leave_type_code = source.leave_type_code

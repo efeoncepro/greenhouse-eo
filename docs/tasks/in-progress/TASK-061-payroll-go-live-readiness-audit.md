@@ -5,7 +5,10 @@
 - El gap de “bonos fijos y variables por colaborador” quedó parcialmente cerrado por `TASK-062`: `Payroll` ahora soporta un bono fijo recurrente versionado además de `baseSalary`, `remoteAllowance` y bonos variables.
 - El cálculo, snapshot y exports ya consideran `fixedBonusAmount` / `fixedBonusLabel`; la auditoría de go-live ya no debe tratar ese punto como pendiente estructural.
 - Se verificó además la lógica de permisos remunerados vs no remunerados: `Payroll` ya descuenta solo `daysAbsent + daysOnUnpaidLeave`; el gap real estaba en taxonomía de `leave_types`, no en el motor de cálculo.
-- Se agregó un tipo explícito `personal_unpaid` para gestión personal sin goce de sueldo, de modo que RRHH pueda diferenciarlo de `personal` remunerado y de `medical`.
+- Se normalizó la política del catálogo:
+  - `personal` ahora es no remunerado
+  - `medical` pasa a representar `permiso médico / cita médica` remunerado
+  - `personal_unpaid` queda como alias legacy inactivo
 
 ## Status
 

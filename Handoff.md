@@ -49,6 +49,49 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 08:15 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir la política del catálogo de permisos para que `personal` no quede remunerado y alinear `Payroll` con una taxonomía operativa más realista para Chile.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `scripts/setup-postgres-hr-leave.sql`
+- `scripts/setup-hr-core-tables.sql`
+- `scripts/migrations/normalize-leave-type-paid-policy.sql`
+- `src/lib/hr-core/schema.ts`
+- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm exec tsx scripts/run-migration.ts scripts/migrations/normalize-leave-type-paid-policy.sql`
+- verificación runtime en PostgreSQL:
+  - `vacation` -> pagado / activo
+  - `medical` -> pagado / activo (`Permiso médico / cita médica`)
+  - `personal` -> no pagado / activo
+  - `personal_unpaid` -> no pagado / inactivo (alias legacy)
+  - `unpaid` -> no pagado / activo
+
+### Riesgos o pendientes
+
+- El motor de nómina no requirió cambio: ya descuenta solo `daysAbsent + daysOnUnpaidLeave`.
+- Riesgo abierto y ya documentado fuera de esta vuelta: permisos que cruzan períodos siguen pudiendo sobreimputar `requested_days` completos; eso sigue en `TASK-005` / `TASK-001`.
+
 ## 2026-03-27 07:55 -03
 
 ### Agente
