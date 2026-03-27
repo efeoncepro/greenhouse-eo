@@ -354,34 +354,150 @@ Usar la liquidación real de Valentina Hoyos como test case:
 - Con APV
 - Sueldo que topa base imponible AFP (90 UF)
 
+### Slice 6 — Forward engine cutover a indicadores synced
+
+El motor forward (`calculatePayroll`, `projectPayrollForPeriod`) hoy usa valores hardcodeados o manuales. Debe cortarse a indicadores synced:
+
+**`calculate-chile-deductions.ts` cambios:**
+- `afpRate` → leer de `afp_rates` del período (no del input manual de `compensation_versions`)
+- `computeChileTax()` → leer `tax_brackets` del período (no tablas hardcodeadas)
+- Topes imponibles → leer de `previred_indicators.tope_afp_pesos` / `tope_cesantia_pesos`
+- Cesantía rates → leer de `previred_indicators.afc_*` por tipo contrato
+- SIS empleador → leer de `previred_indicators.tasa_sis`
+
+**`project-payroll.ts` cambios:**
+- Mismos cambios — reutiliza el motor forward
+- Si no hay indicadores del mes futuro: usar último período disponible + warning en resultado
+
+**Compatibilidad:**
+- El campo `afpRate` en `compensation_versions` pasa a ser **override opcional**: si existe y difiere del catálogo, se usa el override (caso AFP no estándar)
+- Si `afpRate` es null o no está, se lee del catálogo synced
+- `unemploymentRate` sigue como override si fue seteado manualmente; si no, viene de Previred
+
+### Slice 7 — Wiring reactivo (outbox events + projection triggers)
+
+**Eventos nuevos en el catálogo:**
+
+| Evento | Aggregate | Cuándo se emite |
+|--------|-----------|-----------------|
+| `payroll.previred_indicators.synced` | `previred_sync` | Cron mensual o sync manual exitoso |
+| `payroll.tax_brackets.synced` | `previred_sync` | Mismo cron |
+
+**Proyecciones que deben reaccionar a `previred_indicators.synced`:**
+
+| Projection | Reacción |
+|------------|----------|
+| `member_capacity_economics` | Recalcular costos empleador (SIS, cesantía) con nuevas tasas para todos los miembros activos del período |
+| `projected_payroll` | Refrescar proyección del período con nuevos indicadores |
+| `client_economics` | Transitivo — se actualiza cuando `payroll_entry.upserted` o `member_capacity_economics` cambia |
+
+**Agregar triggers al projection registry:**
+- `member_capacity_economics` → agregar `payroll.previred_indicators.synced` a su lista de triggers (scope: `finance_period`)
+- `projected_payroll` → agregar `payroll.previred_indicators.synced` (scope: `finance_period`)
+
+**Wiring en cron:**
+```
+/api/cron/sync-previred
+  1. syncPreviredIndicators(year, month)
+  2. syncImpuestoUnico(year, month)
+  3. Emitir payroll.previred_indicators.synced
+  4. Emitir payroll.tax_brackets.synced
+  → reactive consumer procesa: member_capacity_economics, projected_payroll se refrescan
+```
+
+### Slice 8 — Impacto en `member_capacity_economics` (loaded cost real)
+
+El snapshot de capacidad/economía debe incluir costos empleador para reflejar el costo real:
+
+**Campos nuevos o derivados en el snapshot:**
+
+| Campo | Cálculo | Fuente |
+|-------|---------|--------|
+| `employerSisTarget` | `baseImponible × tasaSIS` | `previred_indicators.tasa_sis` |
+| `employerCesantiaTarget` | `baseImponible × tasaCesantiaEmpleador` | `previred_indicators.afc_*_empleador` |
+| `employerMutualTarget` | `baseImponible × tasaMutual` | Config empresa (manual) |
+
+**Impacto en campos existentes:**
+```
+ANTES:  loadedCostTarget = totalLaborCostTarget + directOverhead + sharedOverhead
+AHORA:  loadedCostTarget = totalLaborCostTarget + employerCosts + directOverhead + sharedOverhead
+
+Donde:
+  totalLaborCostTarget = baseSalary + gratificación + colación + movilización (en CLP)
+  employerCosts = SIS + cesantía empleador + mutual
+```
+
+**Resultado:** `costPerHourTarget` y `suggestedBillRateTarget` suben ~15-25% para colaboradores Chile. Eso es correcto — hoy están subestimados.
+
+**Consumer chain downstream:**
+```
+member_capacity_economics (loaded cost real)
+    ↓
+person_intelligence (cost per hour, cost per asset)
+    ↓
+client_economics (labor cost allocation por FTE)
+    ↓
+operational_pl (P&L con labor cost correcto)
+    ↓
+Agency margin, Org Economics, People Finance tab
+```
+
+## Cross-Module Impact Summary
+
+| Módulo | Qué cambia | Magnitud |
+|--------|------------|----------|
+| **Payroll official** | Indicadores de Previred en vez de hardcoded; gratificación en base imponible | Alto — cálculos cambian |
+| **Payroll projected** | Mismo motor, mismos indicadores | Alto |
+| **Payroll receipts** (TASK-077) | PDF con campos legales completos | Alto |
+| **Compensation UI** | Nuevo modo reverse + dropdown AFP | Alto — UX cambia |
+| **member_capacity_economics** | Loaded cost incluye employer costs | Alto — +15-25% costo CLP |
+| **person_intelligence** | Cost per hour sube | Medio — transitivo |
+| **client_economics** | Labor cost per client sube | Alto — márgenes bajan |
+| **Cost Intelligence P&L** | Números más realistas | Alto — transitivo |
+| **Agency Team** | Loaded cost por persona sube | Medio |
+| **Organization Economics** | P&L corregido | Medio |
+| **People Finance tab** | Costo fully-loaded real | Medio |
+| **Payroll export (Excel)** | Nuevas columnas | Bajo |
+
 ## Out of Scope
 
 - Cálculo para trabajadores independientes (boleta de honorarios)
 - Gratificación anual proporcional (solo mensual 25% para MVP)
 - Multi-empresa (múltiples RUT/razones sociales)
 - Pago de cotizaciones via Previred (solo lectura de indicadores)
+- Re-cálculo automático de compensaciones vigentes al cambiar indicadores (solo el cálculo de nómina usa indicadores nuevos; la compensación es contrato fijo)
 
 ## Dependencies & Impact
 
 ### Depende de
 - **TASK-076** — campos de gratificación legal, colación, movilización, AFP desglose, costos empleador
-- **TASK-058** — economic indicators (UF, UTM ya existen; IMM por agregar)
-- Motor forward actual (`calculate-chile-deductions.ts`)
+- **TASK-058** — economic indicators runtime (UF, UTM ya existen)
+- Motor forward actual (`calculate-chile-deductions.ts`, `compute-chile-tax.ts`)
+- Projection registry (`src/lib/sync/projections/index.ts`)
+- Event catalog (`src/lib/sync/event-catalog.ts`)
 
 ### Impacta a
-- Alta/edición de compensación (`/hr/payroll/compensation`)
-- Preview de cálculo en la UI de compensación
-- `member_capacity_economics` — costo empresa real
-- Cost Intelligence — P&L con costo laboral completo
-- TASK-077 — recibos de nómina con datos completos
+- **Payroll** — motor forward y projected usan indicadores synced
+- **Compensation UI** — nuevo modo reverse + dropdown AFP
+- **member_capacity_economics** — loaded cost con employer costs reales
+- **person_intelligence** — cost per hour/asset corregido
+- **client_economics** — labor cost per client real
+- **Cost Intelligence** (TASK-067-071) — P&L con costo laboral completo
+- **TASK-077** — recibos de nómina con datos completos
+- **Agency, Organization, People** — transitivo via capacity economics
 
 ### Archivos owned
+- `src/lib/payroll/previred-sync.ts` (nuevo)
 - `src/lib/payroll/reverse-payroll.ts` (nuevo)
-- `src/lib/payroll/afp-catalog.ts` (nuevo)
 - `src/lib/payroll/chile-previsional-helpers.ts` (nuevo)
-- `scripts/setup-postgres-payroll.sql` (extensión: `afp_catalog` table)
-- `scripts/migrations/add-afp-catalog.sql`
-- Tests de reverse calculation
+- `src/lib/payroll/calculate-chile-deductions.ts` (modificar: leer de synced)
+- `src/lib/payroll/compute-chile-tax.ts` (modificar: leer de tax_brackets)
+- `src/app/api/cron/sync-previred/route.ts` (nuevo)
+- `src/lib/sync/event-catalog.ts` (agregar eventos)
+- `src/lib/sync/projections/member-capacity-economics.ts` (agregar trigger + employer costs)
+- `scripts/setup-postgres-payroll.sql` (extensión: 3 tablas nuevas)
+- `scripts/migrations/add-previred-tables.sql`
+- Tests de reverse calculation, sync, y forward con indicadores
 
 ## Acceptance Criteria
 
