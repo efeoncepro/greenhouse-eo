@@ -189,6 +189,14 @@ type FinanceSupplierRow = {
   payment_currency: string | null
 }
 
+type ActiveLicenseEventRow = {
+  license_id: string
+  member_id: string
+  tool_id: string
+  activated_at: string | Date | null
+  expires_at: string | Date | null
+}
+
 const AI_TOOLING_POSTGRES_REQUIRED_TABLES = [
   'greenhouse_core.providers',
   'greenhouse_core.clients',
@@ -253,6 +261,48 @@ const providerKindFromType = (providerType: string | null) => {
     default:
       return 'organization' as const
   }
+}
+
+const getCurrentSantiagoPeriod = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+
+  if (!match) {
+    const now = new Date()
+
+    return { periodYear: now.getFullYear(), periodMonth: now.getMonth() + 1 }
+  }
+
+  return { periodYear: Number(match[1]), periodMonth: Number(match[2]) }
+}
+
+const getActiveLicenseScopesForTool = async (toolId: string, client: QueryableClient) =>
+  queryRows<ActiveLicenseEventRow>(
+    `
+      SELECT license_id, member_id, tool_id, activated_at, expires_at
+      FROM greenhouse_ai.member_tool_licenses
+      WHERE tool_id = $1
+        AND license_status = 'active'
+      ORDER BY member_id ASC, license_id ASC
+    `,
+    [toolId],
+    client
+  )
+
+const hasToolCostImpact = (input: UpdateAiToolInput) =>
+  input.costModel !== undefined ||
+  input.subscriptionAmount !== undefined ||
+  input.subscriptionCurrency !== undefined ||
+  input.subscriptionBillingCycle !== undefined ||
+  input.subscriptionSeats !== undefined ||
+  input.creditUnitCost !== undefined ||
+  input.creditUnitCurrency !== undefined
+
+const toIsoDate = (value: string | Date | null) => {
+  if (!value) return null
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+
+  return value.slice(0, 10)
 }
 
 const mapProvider = (row: ProviderRow): ProviderRecord => ({
@@ -1469,6 +1519,7 @@ export const pgUpdateAiTool = async (toolId: string, input: UpdateAiToolInput) =
 
   values.push(toolId)
   const toolIdIndex = values.length
+  const publishesFinanceLicenseCost = hasToolCostImpact(input)
 
   await withGreenhousePostgresTransaction(async client => {
     await queryRows(
@@ -1488,6 +1539,28 @@ export const pgUpdateAiTool = async (toolId: string, input: UpdateAiToolInput) =
       eventType: 'ai_tool.updated',
       payload: { toolId }
     })
+
+    if (publishesFinanceLicenseCost) {
+      const period = getCurrentSantiagoPeriod()
+      const activeLicenses = await getActiveLicenseScopesForTool(toolId, client)
+
+      for (const license of activeLicenses) {
+        await publishAiToolingOutboxEvent({
+          client,
+          aggregateType: 'finance_license_cost',
+          aggregateId: license.license_id,
+          eventType: 'finance.license_cost.updated',
+          payload: {
+            licenseId: license.license_id,
+            memberId: license.member_id,
+            toolId: license.tool_id,
+            activatedAt: toIsoDate(license.activated_at),
+            expiresAt: toIsoDate(license.expires_at),
+            ...period
+          }
+        })
+      }
+    }
   })
 
   const updated = await getToolByIdInternal(toolId)
@@ -1586,6 +1659,21 @@ export const pgCreateLicense = async (input: CreateLicenseInput, actorUserId: st
       eventType: existing ? 'ai_license.reactivated' : 'ai_license.created',
       payload: { licenseId, memberId: input.memberId, toolId: input.toolId }
     })
+
+    await publishAiToolingOutboxEvent({
+      client,
+      aggregateType: 'finance_license_cost',
+      aggregateId: licenseId,
+      eventType: 'finance.license_cost.updated',
+      payload: {
+        licenseId,
+        memberId: input.memberId,
+        toolId: input.toolId,
+        activatedAt: getCurrentDateString(),
+        expiresAt,
+        ...getCurrentSantiagoPeriod()
+      }
+    })
   })
 
   const created = await getLicenseByIdInternal(licenseId)
@@ -1643,6 +1731,21 @@ export const pgUpdateLicense = async (licenseId: string, input: UpdateLicenseInp
       aggregateId: licenseId,
       eventType: 'ai_license.updated',
       payload: { licenseId }
+    })
+
+    await publishAiToolingOutboxEvent({
+      client,
+      aggregateType: 'finance_license_cost',
+      aggregateId: licenseId,
+      eventType: 'finance.license_cost.updated',
+      payload: {
+        licenseId,
+        memberId: existing.memberId,
+        toolId: existing.toolId,
+        activatedAt: existing.activatedAt,
+        expiresAt: input.expiresAt ?? existing.expiresAt,
+        ...getCurrentSantiagoPeriod()
+      }
     })
   })
 
@@ -2079,6 +2182,21 @@ export const pgConsumeAiCredits = async ({
       aggregateId: wallet.walletId,
       eventType: 'ai_wallet.credits_consumed',
       payload: { walletId: wallet.walletId, requestId, creditAmount, clientId }
+    })
+
+    await publishAiToolingOutboxEvent({
+      client,
+      aggregateType: 'finance_tooling_cost',
+      aggregateId: wallet.walletId,
+      eventType: 'finance.tooling_cost.updated',
+      payload: {
+        memberId: normalizeString(input.consumedByMemberId),
+        walletId: wallet.walletId,
+        toolId: wallet.toolId,
+        requestId,
+        creditAmount,
+        ...getCurrentSantiagoPeriod()
+      }
     })
   })
 

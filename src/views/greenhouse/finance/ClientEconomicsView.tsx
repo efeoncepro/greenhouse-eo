@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
@@ -18,18 +18,20 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-import TableSortLabel from '@mui/material/TableSortLabel'
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
+
+
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+
+import tableStyles from '@core/styles/table.module.css'
+import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
@@ -59,12 +61,31 @@ interface ClientEconomicsSnapshot {
   revenuePerFte: number | null
   costPerFte: number | null
   notes: string | null
+  hasCompleteCostCoverage?: boolean
   computedAt: string
   createdAt: string
   updatedAt: string
 }
 
 type SortField = 'revenue' | 'grossMargin' | 'netMargin'
+
+// ── TanStack columns ──
+
+const ceColumnHelper = createColumnHelper<ClientEconomicsSnapshot>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ceColumns: ColumnDef<ClientEconomicsSnapshot, any>[] = [
+  ceColumnHelper.accessor('clientName', { header: 'Space', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
+  ceColumnHelper.accessor('totalRevenueClp', { header: 'Ingreso', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('directCostsClp', { header: 'C. directos', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('indirectCostsClp', { header: 'C. indirectos', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('grossMarginPercent', { header: 'Margen bruto', cell: ({ getValue }) => <CustomChip round='true' size='small' color={getMarginChipColor(getValue())} label={formatPercent(getValue())} />, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('netMarginPercent', { header: 'Margen neto', cell: ({ getValue }) => <CustomChip round='true' size='small' color={getMarginChipColor(getValue())} label={formatPercent(getValue())} />, meta: { align: 'right' } }),
+  ceColumnHelper.accessor('headcountFte', { header: 'FTE', cell: ({ getValue }) => getValue() != null ? getValue().toFixed(1) : '—', meta: { align: 'center' } }),
+  ceColumnHelper.accessor('revenuePerFte', { header: 'Ingreso/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } }),
+  ceColumnHelper.accessor('costPerFte', { header: 'Costo/FTE', cell: ({ getValue }) => getValue() != null ? <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(getValue())}</Typography> : '—', meta: { align: 'right' } })
+]
+
 type SortDir = 'asc' | 'desc'
 
 // ---------------------------------------------------------------------------
@@ -135,6 +156,7 @@ const buildMarginBarOptions = (theme: Theme, categories: string[], colors: strin
     padding: { left: 0, right: 16, top: -12, bottom: -8 }
   },
   xaxis: {
+    categories,
     labels: {
       formatter: (val: string) => `${Number(val).toFixed(0)}%`,
       style: {
@@ -378,6 +400,8 @@ const ClientEconomicsView = () => {
 
         for (const c of clients) {
           for (const p of c.periods) {
+            if (p.grossMarginPercent == null && p.netMarginPercent == null) continue
+
             const key = `${p.periodYear}-${String(p.periodMonth).padStart(2, '0')}`
             const entry = periodMap.get(key) ?? { wGross: 0, wNet: 0, rev: 0 }
 
@@ -419,12 +443,26 @@ const ClientEconomicsView = () => {
   const totalRevenue = snapshots.reduce((sum, s) => sum + s.totalRevenueClp, 0)
 
   const avgGrossMargin = snapshots.length > 0
-    ? snapshots.reduce((sum, s) => sum + (s.grossMarginPercent ?? 0), 0) / snapshots.length
+    ? (() => {
+        const valid = snapshots.filter(s => s.hasCompleteCostCoverage !== false && s.grossMarginPercent != null)
+
+        return valid.length > 0
+          ? valid.reduce((sum, s) => sum + (s.grossMarginPercent ?? 0), 0) / valid.length
+          : 0
+      })()
     : 0
 
   const avgNetMargin = snapshots.length > 0
-    ? snapshots.reduce((sum, s) => sum + (s.netMarginPercent ?? 0), 0) / snapshots.length
+    ? (() => {
+        const valid = snapshots.filter(s => s.hasCompleteCostCoverage !== false && s.netMarginPercent != null)
+
+        return valid.length > 0
+          ? valid.reduce((sum, s) => sum + (s.netMarginPercent ?? 0), 0) / valid.length
+          : 0
+      })()
     : 0
+
+  const hasAnyCompleteCostCoverage = snapshots.some(s => s.hasCompleteCostCoverage !== false)
 
   const avgGrossPct = avgGrossMargin * 100
   const avgNetPct = avgNetMargin * 100
@@ -441,7 +479,7 @@ const ClientEconomicsView = () => {
     }
   }
 
-  const sorted = [...snapshots].sort((a, b) => {
+  const sorted = useMemo(() => [...snapshots].sort((a, b) => {
     let av = 0
     let bv = 0
 
@@ -454,6 +492,13 @@ const ClientEconomicsView = () => {
     }
 
     return sortDir === 'asc' ? av - bv : bv - av
+  }), [snapshots, sortField, sortDir])
+
+  const ceTable = useReactTable({
+    data: sorted,
+    columns: ceColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
   })
 
   // CSV export handler
@@ -539,7 +584,7 @@ const ClientEconomicsView = () => {
           <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>Inteligencia financiera</Typography>
           <Typography variant='body2' color='text.secondary'>Rentabilidad y economía por Space</Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
           <CustomTextField
             select
             size='small'
@@ -567,9 +612,11 @@ const ClientEconomicsView = () => {
           <Button
             variant='contained'
             color='primary'
+            size='large'
             startIcon={computing ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-calculator' />}
             onClick={handleCompute}
             disabled={computing}
+            sx={{ height: 40 }}
           >
             {computing ? 'Calculando…' : 'Calcular'}
           </Button>
@@ -606,28 +653,34 @@ const ClientEconomicsView = () => {
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Margen bruto prom.'
-            stats={snapshots.length > 0 ? `${avgGrossPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? '' : 'sin datos'}
+            stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgGrossPct.toFixed(1)}%` : '—'}
+            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
             avatarIcon='tabler-chart-arrows-vertical'
-            avatarColor={snapshots.length > 0 ? grossSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 ? grossSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 ? grossSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 ? grossSemaphore.icon : undefined}
+            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : 'secondary'}
+            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.label : undefined}
+            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : undefined}
+            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.icon : undefined}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
             title='Margen neto prom.'
-            stats={snapshots.length > 0 ? `${avgNetPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? '' : 'sin datos'}
+            stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgNetPct.toFixed(1)}%` : '—'}
+            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
             avatarIcon='tabler-trending-up'
-            avatarColor={snapshots.length > 0 ? netSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 ? netSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 ? netSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 ? netSemaphore.icon : undefined}
+            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : 'secondary'}
+            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.label : undefined}
+            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : undefined}
+            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.icon : undefined}
           />
         </Grid>
       </Grid>
+
+      {snapshots.length > 0 && !hasAnyCompleteCostCoverage && (
+        <Alert severity='warning'>
+          La rentabilidad del período todavía no tiene cobertura de costos suficiente. Los ingresos sí están cargados, pero los márgenes quedan ocultos hasta que existan costos directos y/o laborales canonizados.
+        </Alert>
+      )}
 
       {/* ROW 2 — Charts (only when >= 2 clients) */}
       {snapshots.length >= 2 && (
@@ -768,102 +821,35 @@ const ClientEconomicsView = () => {
             </Button>
           </Box>
         ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Space</TableCell>
-                  <TableCell align='right' sortDirection={sortField === 'revenue' ? sortDir : false}>
-                    <TableSortLabel
-                      active={sortField === 'revenue'}
-                      direction={sortField === 'revenue' ? sortDir : 'desc'}
-                      onClick={() => handleSort('revenue')}
-                    >
-                      Ingreso
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align='right'>C. directos</TableCell>
-                  <TableCell align='right'>C. indirectos</TableCell>
-                  <TableCell align='right' sortDirection={sortField === 'grossMargin' ? sortDir : false}>
-                    <TableSortLabel
-                      active={sortField === 'grossMargin'}
-                      direction={sortField === 'grossMargin' ? sortDir : 'desc'}
-                      onClick={() => handleSort('grossMargin')}
-                    >
-                      Margen bruto
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align='right' sortDirection={sortField === 'netMargin' ? sortDir : false}>
-                    <TableSortLabel
-                      active={sortField === 'netMargin'}
-                      direction={sortField === 'netMargin' ? sortDir : 'desc'}
-                      onClick={() => handleSort('netMargin')}
-                    >
-                      Margen neto
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align='center'>FTE</TableCell>
-                  <TableCell align='right'>Ingreso/FTE</TableCell>
-                  <TableCell align='right'>Costo/FTE</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sorted.map(snap => (
-                  <TableRow key={snap.snapshotId} hover>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={600}>{snap.clientName}</Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {formatCLP(snap.totalRevenueClp)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {formatCLP(snap.directCostsClp)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {formatCLP(snap.indirectCostsClp)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        color={getMarginChipColor(snap.grossMarginPercent)}
-                        label={formatPercent(snap.grossMarginPercent)}
-                      />
-                    </TableCell>
-                    <TableCell align='right'>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        color={getMarginChipColor(snap.netMarginPercent)}
-                        label={formatPercent(snap.netMarginPercent)}
-                      />
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography variant='body2'>
-                        {snap.headcountFte != null ? snap.headcountFte.toFixed(1) : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {snap.revenuePerFte != null ? formatCLP(snap.revenuePerFte) : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {snap.costPerFte != null ? formatCLP(snap.costPerFte) : '—'}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
+          <>
+          <div className='overflow-x-auto'>
+            <table className={tableStyles.table}>
+              <thead>
+                {ceTable.getHeaderGroups().map(hg => (
+                  <tr key={hg.id}>
+                    {hg.headers.map(header => (
+                      <th key={header.id} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+              </thead>
+              <tbody>
+                {ceTable.getRowModel().rows.map(row => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <TablePaginationComponent table={ceTable as ReturnType<typeof useReactTable>} />
+          </>
         )}
       </Card>
     </Box>

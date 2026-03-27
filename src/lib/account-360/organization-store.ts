@@ -2,9 +2,11 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
+import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { getOrganizationOperationalServing } from './get-organization-operational-serving'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -283,6 +285,11 @@ export const getOrganizationDetail = async (id: string): Promise<OrganizationDet
   return rows.length > 0 ? normalizeDetail(rows[0]) : null
 }
 
+export const getOrganizationOperationalMetrics = async (organizationId: string) => {
+  return getOrganizationOperationalServing(organizationId)
+}
+
+
 export const updateOrganization = async (
   id: string,
   data: Partial<{
@@ -474,6 +481,7 @@ export interface OrganizationClientFinance {
   grossMarginPercent: number | null
   netMarginPercent: number | null
   headcountFte: number | null
+  hasCompleteCostCoverage?: boolean
 }
 
 export interface OrganizationFinanceSummary {
@@ -530,16 +538,19 @@ export const getOrganizationFinanceSummary = async (
     rows = await queryRows()
   }
 
-  const clients: OrganizationClientFinance[] = rows.map(r => ({
-    clientId: String(r.client_id),
-    clientName: String(r.client_name),
-    totalRevenueClp: toNum(r.total_revenue_clp),
-    directCostsClp: toNum(r.direct_costs_clp),
-    indirectCostsClp: toNum(r.indirect_costs_clp),
-    grossMarginPercent: r.gross_margin_percent != null ? toNum(r.gross_margin_percent) : null,
-    netMarginPercent: r.net_margin_percent != null ? toNum(r.net_margin_percent) : null,
-    headcountFte: r.headcount_fte != null ? toNum(r.headcount_fte) : null
-  }))
+  const clients: OrganizationClientFinance[] = rows.map(r =>
+    sanitizeSnapshotForPresentation({
+      clientId: String(r.client_id),
+      clientName: String(r.client_name),
+      totalRevenueClp: toNum(r.total_revenue_clp),
+      directCostsClp: toNum(r.direct_costs_clp),
+      indirectCostsClp: toNum(r.indirect_costs_clp),
+      grossMarginPercent: r.gross_margin_percent != null ? toNum(r.gross_margin_percent) : null,
+      netMarginPercent: r.net_margin_percent != null ? toNum(r.net_margin_percent) : null,
+      headcountFte: r.headcount_fte != null ? toNum(r.headcount_fte) : null,
+      notes: null
+    })
+  )
 
   const totalRev = clients.reduce((s, c) => s + c.totalRevenueClp, 0)
   const totalDirect = clients.reduce((s, c) => s + c.directCostsClp, 0)
@@ -550,9 +561,17 @@ export const getOrganizationFinanceSummary = async (
   let avgGross: number | null = null
   let avgNet: number | null = null
 
-  if (totalRev > 0) {
-    avgGross = clients.reduce((s, c) => s + (c.grossMarginPercent ?? 0) * c.totalRevenueClp, 0) / totalRev
-    avgNet = clients.reduce((s, c) => s + (c.netMarginPercent ?? 0) * c.totalRevenueClp, 0) / totalRev
+  const validForGross = clients.filter(c => c.grossMarginPercent != null)
+  const validGrossRevenue = validForGross.reduce((sum, client) => sum + client.totalRevenueClp, 0)
+  const validForNet = clients.filter(c => c.netMarginPercent != null)
+  const validNetRevenue = validForNet.reduce((sum, client) => sum + client.totalRevenueClp, 0)
+
+  if (validGrossRevenue > 0) {
+    avgGross = validForGross.reduce((sum, client) => sum + (client.grossMarginPercent ?? 0) * client.totalRevenueClp, 0) / validGrossRevenue
+  }
+
+  if (validNetRevenue > 0) {
+    avgNet = validForNet.reduce((sum, client) => sum + (client.netMarginPercent ?? 0) * client.totalRevenueClp, 0) / validNetRevenue
   }
 
   return {

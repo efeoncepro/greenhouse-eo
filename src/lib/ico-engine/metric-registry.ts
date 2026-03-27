@@ -1,7 +1,8 @@
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type MetricGranularity = 'monthly' | 'weekly'
-export type MetricKind = 'average' | 'percentage' | 'count' | 'duration' | 'distribution' | 'ratio'
+export type MetricKind = 'average' | 'percentage' | 'count' | 'duration' | 'distribution' | 'ratio' | 'composite'
+export type MetricScope = 'space' | 'project' | 'member' | 'sprint' | 'person'
 export type ThresholdZone = 'optimal' | 'attention' | 'critical'
 
 export interface MetricThreshold {
@@ -32,6 +33,12 @@ export interface MetricDefinition {
   higherIsBetter: boolean
   icon: string
   color: 'success' | 'warning' | 'error' | 'primary' | 'info'
+
+  /** Scopes where this metric is available. Defaults to all if omitted. */
+  scopes?: readonly MetricScope[]
+
+  /** For composite metrics: input metric codes or data source fields needed. */
+  compositeInputs?: readonly string[]
 }
 
 /** Forward-compatible config for AI-generated metrics (spec §12.5.7). */
@@ -79,8 +86,8 @@ export const TASK_STATUS_TO_CSC: Record<string, CscPhase> = {
 
 // ─── Done / Excluded Status Sets ────────────────────────────────────────────
 
-export const DONE_STATUSES = ['Listo', 'Done', 'Finalizado', 'Completado'] as const
-export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled'] as const
+export const DONE_STATUSES = ['Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado'] as const
+export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled', 'Archivado'] as const
 export const BLOCKED_STATUSES = ['Bloqueado', 'Detenido'] as const
 
 // ─── Stuck Threshold (hours without edit while in an active state) ──────────

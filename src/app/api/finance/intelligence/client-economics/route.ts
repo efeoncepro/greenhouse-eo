@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
 import { FinanceValidationError, toNumber } from '@/lib/finance/shared'
 import {
   assertFinanceSlice2PostgresReady,
@@ -29,12 +30,12 @@ export async function GET(request: Request) {
   if (clientId) {
     const snapshot = await getClientEconomics(clientId, year, month)
 
-    return NextResponse.json({ snapshot })
+    return NextResponse.json({ snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null })
   }
 
   const snapshots = await listClientEconomicsByPeriod(year, month)
 
-  return NextResponse.json({ snapshots, year, month })
+  return NextResponse.json({ snapshots: snapshots.map(sanitizeSnapshotForPresentation), year, month })
 }
 
 // POST /api/finance/intelligence/client-economics?action=compute

@@ -2,7 +2,9 @@ import 'server-only'
 
 import {
   getFinanceProjectId,
+  invertExchangeRate,
   normalizeString,
+  roundDecimal,
   roundCurrency,
   runFinanceQuery,
   toDateString,
@@ -31,6 +33,22 @@ type PersistedExchangeRate = {
   rate: number
   rateDate: string
   source: string
+}
+
+export const buildHistoricalMindicadorLookupDates = (requestedDate: string, lookbackDays = 7) => {
+  const baseDate = new Date(`${requestedDate}T00:00:00Z`)
+
+  if (Number.isNaN(baseDate.getTime())) {
+    return [requestedDate]
+  }
+
+  return Array.from({ length: Math.max(1, lookbackDays + 1) }, (_, offset) => {
+    const candidate = new Date(baseDate)
+
+    candidate.setUTCDate(baseDate.getUTCDate() - offset)
+
+    return candidate.toISOString().slice(0, 10)
+  })
 }
 
 const formatDateAsMindicador = (date: string) => {
@@ -114,10 +132,24 @@ const fetchOpenExchangeRateUsdToClp = async (): Promise<ExchangeRateProviderResu
 export const fetchUsdToClpFromProviders = async (rateDate?: string | null) => {
   const requestedDate = normalizeString(rateDate) || null
 
+  if (requestedDate) {
+    for (const lookupDate of buildHistoricalMindicadorLookupDates(requestedDate)) {
+      const historical = await fetchMindicadorUsdToClp(lookupDate)
+
+      if (historical) {
+        return historical
+      }
+    }
+  }
+
   const primary = await fetchMindicadorUsdToClp(requestedDate)
 
   if (primary) {
     return primary
+  }
+
+  if (requestedDate) {
+    return null
   }
 
   const fallback = await fetchOpenExchangeRateUsdToClp()
@@ -206,18 +238,20 @@ const buildRatePair = ({
   toCurrency,
   rate,
   rateDate,
-  source
+  source,
+  decimals = 6
 }: {
   fromCurrency: FinanceCurrency
   toCurrency: FinanceCurrency
   rate: number
   rateDate: string
   source: string
+  decimals?: number
 }): PersistedExchangeRate => ({
   rateId: `${fromCurrency}_${toCurrency}_${rateDate}`,
   fromCurrency,
   toCurrency,
-  rate: roundCurrency(rate),
+  rate: roundDecimal(rate, decimals),
   rateDate,
   source
 })
@@ -232,7 +266,7 @@ export const buildUsdClpRatePairs = ({
   source: string
 }) => {
   const normalizedUsdToClp = roundCurrency(usdToClp)
-  const clpToUsd = roundCurrency(1 / normalizedUsdToClp)
+  const clpToUsd = invertExchangeRate({ rate: normalizedUsdToClp })
 
   return [
     buildRatePair({
@@ -240,7 +274,8 @@ export const buildUsdClpRatePairs = ({
       toCurrency: 'CLP',
       rate: normalizedUsdToClp,
       rateDate,
-      source
+      source,
+      decimals: 2
     }),
     buildRatePair({
       fromCurrency: 'CLP',

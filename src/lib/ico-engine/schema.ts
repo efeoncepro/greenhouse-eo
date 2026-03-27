@@ -315,6 +315,33 @@ const buildMetricsBySprintTable = (projectId: string) => `
 `
 
 /**
+ * Organization-level metrics. Same structure as metrics_by_project but keyed by organization_id (from client_id).
+ */
+const buildMetricsByOrganizationTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.metrics_by_organization\` (
+    organization_id STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    rpa_avg FLOAT64,
+    rpa_median FLOAT64,
+    otd_pct FLOAT64,
+    ftr_pct FLOAT64,
+    cycle_time_avg_days FLOAT64,
+    cycle_time_p50_days FLOAT64,
+    cycle_time_variance FLOAT64,
+    throughput_count INT64,
+    pipeline_velocity FLOAT64,
+    stuck_asset_count INT64,
+    stuck_asset_pct FLOAT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
+    materialized_at TIMESTAMP
+  )
+  CLUSTER BY organization_id
+`
+
+/**
  * Configurable mapping of task_status → CSC phase per space.
  * Used by v_tasks_enriched via LEFT JOIN — unmapped statuses fall back to the
  * hardcoded CASE (Efeonce defaults).
@@ -350,6 +377,16 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     active_tasks: 'INT64'
   },
   metrics_by_member: {
+    otd_pct: 'FLOAT64',
+    throughput_count: 'INT64',
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_count: 'INT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64'
+  },
+  metrics_by_organization: {
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
@@ -396,7 +433,7 @@ export const ensureIcoEngineInfrastructure = async () => {
           WHERE table_name IN (
             'metric_snapshots_monthly', 'ai_metric_scores',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
-            'metrics_by_member', 'status_phase_config'
+            'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization', 'status_phase_config'
           )
         `
       })
@@ -413,6 +450,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['metrics_by_project', buildMetricsByProjectTable(projectId)],
         ['metrics_by_member', buildMetricsByMemberTable(projectId)],
         ['metrics_by_sprint', buildMetricsBySprintTable(projectId)],
+        ['metrics_by_organization', buildMetricsByOrganizationTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 

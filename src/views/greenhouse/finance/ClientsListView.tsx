@@ -17,17 +17,62 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel,
+  getPaginationRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
+
+// ── Client columns ──
+
+const cliColumnHelper = createColumnHelper<ClientProfile>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cliColumns: ColumnDef<ClientProfile, any>[] = [
+  cliColumnHelper.accessor('legalName', {
+    header: 'Razón social',
+    cell: ({ row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={600}>{row.original.legalName || row.original.clientProfileId}</Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{row.original.hubspotCompanyId}</Typography>
+      </Box>
+    )
+  }),
+  cliColumnHelper.accessor('taxId', {
+    header: 'RUT',
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{getValue() || '—'}</Typography>
+  }),
+  cliColumnHelper.accessor('paymentTermsDays', {
+    header: 'Plazo',
+    cell: ({ getValue }) => `${getValue()} días`
+  }),
+  cliColumnHelper.accessor('paymentCurrency', {
+    header: 'Moneda',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
+  }),
+  cliColumnHelper.accessor('requiresPo', {
+    header: 'OC',
+    cell: ({ getValue }) => getValue() ? <CustomChip round='true' size='small' color='warning' label='Sí' /> : <Typography variant='caption' color='text.secondary'>No</Typography>,
+    meta: { align: 'center' }
+  }),
+  cliColumnHelper.accessor('requiresHes', {
+    header: 'HES',
+    cell: ({ getValue }) => getValue() ? <CustomChip round='true' size='small' color='info' label='Sí' /> : <Typography variant='caption' color='text.secondary'>No</Typography>,
+    meta: { align: 'center' }
+  })
+]
+
 import CreateClientDrawer from '@views/greenhouse/finance/drawers/CreateClientDrawer'
 
 // ---------------------------------------------------------------------------
@@ -60,6 +105,8 @@ const ClientsListView = () => {
   const [error, setError] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'legalName', desc: false }])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const fetchClients = useCallback(async () => {
     setLoading(true)
@@ -100,6 +147,19 @@ const ClientsListView = () => {
   useEffect(() => {
     fetchClients()
   }, [fetchClients])
+
+  const cliTable = useReactTable({
+    data: clients,
+    columns: cliColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
 
   // Derived KPIs
   const poCount = clients.filter(c => c.requiresPo).length
@@ -277,76 +337,36 @@ const ClientsListView = () => {
           </CustomTextField>
         </CardContent>
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Razón social</TableCell>
-                <TableCell sx={{ width: 120 }}>RUT</TableCell>
-                <TableCell sx={{ width: 100 }}>Plazo</TableCell>
-                <TableCell sx={{ width: 80 }}>Moneda</TableCell>
-                <TableCell sx={{ width: 60 }} align='center'>OC</TableCell>
-                <TableCell sx={{ width: 60 }} align='center'>HES</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {clients.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay perfiles de clientes registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clients.map(client => (
-                  <TableRow
-                    key={client.clientProfileId}
-                    hover
-                    sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                    onClick={() => router.push(`/finance/clients/${client.clientProfileId}`)}
-                  >
-                    <TableCell>
-                      <Box>
-                        <Typography variant='body2' fontWeight={600}>
-                          {client.legalName || client.clientProfileId}
-                        </Typography>
-                        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-                          {client.hubspotCompanyId}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                        {client.taxId || '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>{client.paymentTermsDays} días</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={500}>{client.paymentCurrency}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      {client.requiresPo ? (
-                        <CustomChip round='true' size='small' color='warning' label='Sí' />
-                      ) : (
-                        <Typography variant='caption' color='text.secondary'>No</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell align='center'>
-                      {client.requiresHes ? (
-                        <CustomChip round='true' size='small' color='info' label='Sí' />
-                      ) : (
-                        <Typography variant='caption' color='text.secondary'>No</Typography>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {cliTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {cliTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={cliColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay perfiles de clientes registrados aún</Typography></td></tr>
+              ) : cliTable.getRowModel().rows.map(row => (
+                <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/clients/${row.original.clientProfileId}`)}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePaginationComponent table={cliTable as ReturnType<typeof useReactTable>} />
       </Card>
 
       <CreateClientDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchClients() }} />

@@ -3,7 +3,7 @@ import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
 import type { TeamCapacityHealth, TeamMemberProfile } from '@/types/team'
 
-export type PersonTab = 'activity' | 'compensation' | 'payroll' | 'finance' | 'memberships' | 'hr-profile' | 'ai-tools' | 'identity'
+export type PersonTab = 'activity' | 'compensation' | 'payroll' | 'finance' | 'memberships' | 'hr-profile' | 'ai-tools' | 'identity' | 'intelligence'
 
 export interface PersonListItem {
   memberId: string

@@ -5,7 +5,8 @@ import {
   getOrganizationEconomics,
   getOrganizationEconomicsTrend,
   getOrganizationProfitabilityBreakdown,
-  getOrganizationIcoSummary
+  getOrganizationIcoSummary,
+  getOrganizationTeamIntelligence
 } from '@/lib/account-360/organization-economics'
 
 export const dynamic = 'force-dynamic'
@@ -34,10 +35,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   try {
     // Fetch current period economics + breakdown in parallel
-    const [current, breakdown, ico] = await Promise.all([
+    const [current, breakdown, ico, teamIntelligence] = await Promise.all([
       getOrganizationEconomics(id, year, month),
       getOrganizationProfitabilityBreakdown(id, year, month),
-      getOrganizationIcoSummary(id, year, month)
+      getOrganizationIcoSummary(id, year, month),
+      getOrganizationTeamIntelligence(id, year, month)
     ])
 
     // Optional trend
@@ -49,6 +51,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       current,
       breakdown,
       ico,
+      teamIntelligence,
       trend
     })
   } catch (error) {

@@ -3,7 +3,8 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import {
-  runGreenhousePostgresQuery
+  runGreenhousePostgresQuery,
+  withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
 import {
   normalizeString,
@@ -12,6 +13,7 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { getMonthDateRange } from '@/lib/finance/periods'
 import {
   assertFinanceSlice2PostgresReady,
   type CostAllocationRecord,
@@ -19,6 +21,7 @@ import {
   type AllocationMethod
 } from '@/lib/finance/postgres-store-slice2'
 import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Row types ──────────────────────────────────────────────────────
 
@@ -138,33 +141,53 @@ export const createCostAllocation = async ({
 
   const allocationId = randomUUID()
 
-  const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
-    `
-      INSERT INTO greenhouse_finance.cost_allocations (
-        allocation_id, expense_id, client_id, client_name,
-        allocation_percent, allocated_amount_clp,
-        period_year, period_month, allocation_method,
-        notes, created_by_user_id,
-        created_at, updated_at
-      )
-      VALUES (
-        $1, $2, $3, $4,
-        $5, $6,
-        $7, $8, $9,
-        $10, $11,
-        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-      )
-      RETURNING *
-    `,
-    [
-      allocationId, expenseId, clientId, clientName,
-      allocationPercent, roundCurrency(allocatedAmountClp),
-      periodYear, periodMonth, allocationMethod,
-      notes, actorUserId
-    ]
-  )
+  return withGreenhousePostgresTransaction(async client => {
+    const result = await client.query<CostAllocationRow>(
+      `
+        INSERT INTO greenhouse_finance.cost_allocations (
+          allocation_id, expense_id, client_id, client_name,
+          allocation_percent, allocated_amount_clp,
+          period_year, period_month, allocation_method,
+          notes, created_by_user_id,
+          created_at, updated_at
+        )
+        VALUES (
+          $1, $2, $3, $4,
+          $5, $6,
+          $7, $8, $9,
+          $10, $11,
+          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+        RETURNING *
+      `,
+      [
+        allocationId, expenseId, clientId, clientName,
+        allocationPercent, roundCurrency(allocatedAmountClp),
+        periodYear, periodMonth, allocationMethod,
+        notes, actorUserId
+      ]
+    )
 
-  return mapCostAllocation(rows[0])
+    const created = mapCostAllocation(result.rows[0])
+
+    await publishOutboxEvent({
+      aggregateType: 'cost_allocation',
+      aggregateId: allocationId,
+      eventType: 'finance.cost_allocation.created',
+      payload: {
+        allocationId,
+        expenseId,
+        clientId,
+        clientName,
+        periodYear,
+        periodMonth,
+        allocationMethod,
+        allocatedAmountClp: created.allocatedAmountClp
+      }
+    }, client)
+
+    return created
+  })
 }
 
 export const getCostAllocationsByExpense = async (expenseId: string): Promise<CostAllocationRecord[]> => {
@@ -214,10 +237,36 @@ export const getCostAllocationsByClient = async (
 export const deleteCostAllocation = async (allocationId: string): Promise<void> => {
   await assertFinanceSlice2PostgresReady()
 
-  await runGreenhousePostgresQuery(
-    `DELETE FROM greenhouse_finance.cost_allocations WHERE allocation_id = $1`,
-    [allocationId]
-  )
+  await withGreenhousePostgresTransaction(async client => {
+    const result = await client.query<CostAllocationRow>(
+      `
+        DELETE FROM greenhouse_finance.cost_allocations
+        WHERE allocation_id = $1
+        RETURNING *
+      `,
+      [allocationId]
+    )
+
+    const deleted = result.rows[0]
+
+    if (!deleted) return
+
+    await publishOutboxEvent({
+      aggregateType: 'cost_allocation',
+      aggregateId: allocationId,
+      eventType: 'finance.cost_allocation.deleted',
+      payload: {
+        allocationId: deleted.allocation_id,
+        expenseId: deleted.expense_id,
+        clientId: deleted.client_id,
+        clientName: deleted.client_name,
+        periodYear: toNumber(deleted.period_year),
+        periodMonth: toNumber(deleted.period_month),
+        allocationMethod: deleted.allocation_method,
+        allocatedAmountClp: toNumber(deleted.allocated_amount_clp)
+      }
+    }, client)
+  })
 }
 
 // ─── Client Economics: CRUD ─────────────────────────────────────────
@@ -318,8 +367,7 @@ export const computeClientEconomicsSnapshots = async (
 ): Promise<ClientEconomicsRecord[]> => {
   await assertFinanceSlice2PostgresReady()
 
-  const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
-  const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
+  const { periodStart, periodEnd } = getMonthDateRange(year, month)
 
   const revenueRows = await runGreenhousePostgresQuery<{
     client_id: string

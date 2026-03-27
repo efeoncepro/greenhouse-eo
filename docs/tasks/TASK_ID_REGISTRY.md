@@ -68,10 +68,14 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-050` | `to-do` | Finance Client Canonical Runtime Cutover | `docs/tasks/to-do/TASK-050-finance-client-canonical-runtime-cutover.md` |
 | `TASK-051` | `to-do` | Finance Payroll Bridge Postgres Alignment | `docs/tasks/to-do/TASK-051-finance-payroll-bridge-postgres-alignment.md` |
 | `TASK-052` | `to-do` | Person 360 Finance Access Alignment | `docs/tasks/to-do/TASK-052-person-360-finance-access-alignment.md` |
+| `TASK-053` | `to-do` | TanStack Table Migration Remaining | `docs/tasks/to-do/TASK-053-tanstack-table-migration-remaining.md` |
+| `TASK-054` | `to-do` | TanStack High Impact Remaining | `docs/tasks/to-do/TASK-054-tanstack-high-impact-remaining.md` |
+| `TASK-055` | `in-progress` | Finance Intelligence Cost Coverage Repair | `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md` |
+| `TASK-056` | `in-progress` | Agency Team Capacity Semantics | `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-053`
+- `TASK-057`
 
 ## Regla de asignacion desde aqui
 

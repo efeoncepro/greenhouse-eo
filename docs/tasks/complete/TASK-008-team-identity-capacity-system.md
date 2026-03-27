@@ -1,5 +1,13 @@
 # CODEX TASK — Team Identity & Capacity: Canonical Identity Closed, Formal Capacity Pending (v2)
 
+## Delta 2026-03-26
+- `Agency > Team` confirmó en runtime que la capacidad seguía mezclando contrato, dedicación y uso operativo en una sola semántica visual.
+- Se deriva `TASK-056 - Agency Team Capacity Semantics` para cerrar el contrato de dominio antes de seguir iterando backend/UI.
+- Regla nueva derivada del caso real:
+  - `Asignadas` expresa carga comercial comprometida
+  - `Usadas` no debe asumirse igual a `Asignadas`
+  - `Efeonce` interno debe tratarse como autogestión/costo hundido fuera de carga cliente para esta vista
+
 ## Delta 2026-03-22
 - Admin Team mutations and reads now Postgres-first; `client_team_assignments` dual-write flipped to Postgres-primary; `syncAssignmentToPostgres` removed — cerrado por trabajo en `CODEX_TASK_Admin_Team_Postgres_Runtime_Migration_v1`
 - Capacity queries in `team-queries.ts` now read roster from Postgres (operational load stays in BigQuery via `notion_ops`)

@@ -202,6 +202,34 @@ All available domain events are defined in `src/lib/sync/event-catalog.ts`. Key 
 
 To add new events: extend `EVENT_TYPES` in `event-catalog.ts` and call `publishOutboxEvent()` from your domain store.
 
+## Existing reusable example — member capacity economics
+
+Greenhouse ya tiene un ejemplo real de este patrón en:
+
+- proyección: `src/lib/sync/projections/member-capacity-economics.ts`
+- store: `src/lib/member-capacity-economics/store.ts`
+- tabla serving: `greenhouse_serving.member_capacity_economics`
+
+Qué resuelve:
+
+- combina assignments, payroll/compensation, FX y señal operativa por `member_id + period`
+- evita que `Agency`, `People` o `My` recalculen fórmulas parecidas con semánticas distintas
+
+Cuándo reutilizar esta proyección:
+
+- cuando un consumer necesite capacidad/economía por miembro y período
+- cuando se agregue una nueva fuente que deba enriquecer esa lectura
+
+Cuándo no crear una proyección nueva:
+
+- si el problema es un nuevo campo derivado del mismo snapshot
+- si el problema es un nuevo consumer del mismo snapshot
+- si falta agregar un nuevo trigger o una nueva fuente al mismo dominio
+
+Referencia arquitectónica:
+
+- `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
+
 ## File Reference
 
 | File | Purpose |

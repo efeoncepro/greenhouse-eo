@@ -59,6 +59,7 @@ async function getPostgresFirstSummary() {
   const cashEntries = paymentRows
     .map(row => {
       const rate = toNumber(row.exchange_rate_to_clp) || 1
+
       const amountClp = row.currency === 'CLP'
         ? roundCurrency(toNumber(row.amount))
         : roundCurrency(toNumber(row.amount) * rate)

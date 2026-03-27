@@ -10,6 +10,7 @@ describe('people access matrix', () => {
     expect(access.visibleTabs).toEqual([
       'memberships',
       'activity',
+      'intelligence',
       'compensation',
       'payroll',
       'finance',
@@ -47,6 +48,7 @@ describe('people access matrix', () => {
     expect(access.visibleTabs).toEqual([
       'memberships',
       'activity',
+      'intelligence',
       'finance',
       'ai-tools',
       'identity'
@@ -77,6 +79,7 @@ describe('people meta contract', () => {
     expect(meta.supportedTabs).toEqual([
       'memberships',
       'activity',
+      'intelligence',
       'compensation',
       'payroll',
       'finance',

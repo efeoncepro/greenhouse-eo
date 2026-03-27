@@ -14,19 +14,20 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
 
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
-
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+
+import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -97,6 +98,52 @@ const formatCurrency = (amount: number | null, currency: string) => {
 
 // ── Component ──────────────────────────────────────────────────────────
 
+// ── TanStack columns ──
+
+const svcColumnHelper = createColumnHelper<ServiceListItem>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const svcColumns: ColumnDef<ServiceListItem, any>[] = [
+  svcColumnHelper.accessor('name', {
+    header: 'Servicio',
+    cell: ({ row }) => (
+      <Box>
+        <Typography
+          component={Link}
+          href={`/agency/services/${row.original.serviceId}`}
+          variant='body2'
+          fontWeight={600}
+          color='text.primary'
+          sx={{ textDecoration: 'none' }}
+        >
+          {row.original.name}
+        </Typography>
+        <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }} color='text.secondary'>{row.original.publicId ?? row.original.serviceId}</Typography>
+      </Box>
+    )
+  }),
+  svcColumnHelper.accessor('spaceName', { header: 'Space', cell: ({ getValue }) => <Typography variant='body2'>{getValue() ?? '—'}</Typography> }),
+  svcColumnHelper.accessor('lineaDeServicio', {
+    header: 'Línea',
+    cell: ({ getValue }) => <Chip label={LINEA_LABEL[getValue()] ?? getValue()} size='small' variant='outlined' />
+  }),
+  svcColumnHelper.accessor('pipelineStage', {
+    header: 'Stage',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' color={STAGE_COLOR[getValue()] ?? 'secondary'} variant='tonal' label={STAGE_LABEL[getValue()] ?? getValue()} />
+  }),
+  svcColumnHelper.accessor('modalidad', {
+    header: 'Modalidad',
+    cell: ({ getValue }) => <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>{getValue() ?? '—'}</Typography>
+  }),
+  svcColumnHelper.accessor('totalCost', {
+    header: 'Costo',
+    cell: ({ row }) => <Typography variant='body2'>{formatCurrency(row.original.totalCost, row.original.currency)}</Typography>,
+    meta: { align: 'right' }
+  }),
+  svcColumnHelper.accessor('startDate', { header: 'Inicio', cell: ({ getValue }) => getValue() ?? '—' }),
+  svcColumnHelper.accessor('targetEndDate', { header: 'Fin', cell: ({ getValue }) => getValue() ?? '—' })
+]
+
 const ServicesListView = () => {
   const [data, setData] = useState<ListResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -106,6 +153,7 @@ const ServicesListView = () => {
   const [searchDebounced, setSearchDebounced] = useState('')
   const [lineaFilter, setLineaFilter] = useState('')
   const [stageFilter, setStageFilter] = useState('')
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'name', desc: false }])
 
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 400)
@@ -142,9 +190,19 @@ const ServicesListView = () => {
   // Compute KPIs from current data
   const items = data?.items ?? []
   const totalCount = data?.total ?? 0
+
   const activeCount = items.filter(s => s.pipelineStage === 'active').length
   const renewalCount = items.filter(s => s.pipelineStage === 'renewal_pending').length
   const onboardingCount = items.filter(s => s.pipelineStage === 'onboarding').length
+
+  const table = useReactTable({
+    data: items,
+    columns: svcColumns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   const kpis = [
     { title: 'Total servicios', stats: String(totalCount), avatarIcon: 'tabler-packages', avatarColor: 'primary' as const, subtitle: 'En esta vista' },
@@ -171,7 +229,7 @@ const ServicesListView = () => {
           />
           <Divider />
           <CardContent>
-            <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <CustomTextField
                 placeholder='Buscar por nombre o ID...'
                 value={search}
@@ -217,71 +275,57 @@ const ServicesListView = () => {
               </Box>
             ) : (
               <>
-                <TableContainer>
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Servicio</TableCell>
-                        <TableCell>Space</TableCell>
-                        <TableCell>Línea</TableCell>
-                        <TableCell>Stage</TableCell>
-                        <TableCell>Modalidad</TableCell>
-                        <TableCell align='right'>Costo</TableCell>
-                        <TableCell>Inicio</TableCell>
-                        <TableCell>Fin</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {items.map(svc => (
-                        <TableRow
-                          key={svc.serviceId}
-                          hover
-                          sx={{ cursor: 'pointer', '&:last-child td': { borderBottom: 0 } }}
-                          component={Link}
-                          href={`/agency/services/${svc.serviceId}`}
-                        >
-                          <TableCell>
-                            <Box>
-                              <Typography variant='body2' fontWeight={600}>{svc.name}</Typography>
-                              <Typography variant='caption' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }} color='text.secondary'>
-                                {svc.publicId ?? svc.serviceId}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant='body2'>{svc.spaceName ?? '—'}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Chip label={LINEA_LABEL[svc.lineaDeServicio] ?? svc.lineaDeServicio} size='small' variant='outlined' />
-                          </TableCell>
-                          <TableCell>
-                            <CustomChip
-                              round='true'
-                              size='small'
-                              color={STAGE_COLOR[svc.pipelineStage] ?? 'secondary'}
-                              variant='tonal'
-                              label={STAGE_LABEL[svc.pipelineStage] ?? svc.pipelineStage}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-                              {svc.modalidad ?? '—'}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align='right'>
-                            <Typography variant='body2'>{formatCurrency(svc.totalCost, svc.currency)}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant='body2'>{svc.startDate ?? '—'}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant='body2'>{svc.targetEndDate ?? '—'}</Typography>
-                          </TableCell>
-                        </TableRow>
+                <div className='overflow-x-auto'>
+                  <table className={tableStyles.table}>
+                    <thead>
+                      {table.getHeaderGroups().map(headerGroup => (
+                        <tr key={headerGroup.id}>
+                          {headerGroup.headers.map(header => (
+                            <th
+                              key={header.id}
+                              onClick={header.column.getToggleSortingHandler()}
+                              className={classnames({
+                                'cursor-pointer select-none': header.column.getCanSort()
+                              })}
+                              style={{
+                                textAlign:
+                                  (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right'
+                                    ? 'right'
+                                    : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center'
+                                      ? 'center'
+                                      : 'left'
+                              }}
+                            >
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                            </th>
+                          ))}
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </thead>
+                    <tbody>
+                      {table.getRowModel().rows.map(row => (
+                        <tr key={row.id}>
+                          {row.getVisibleCells().map(cell => (
+                            <td
+                              key={cell.id}
+                              style={{
+                                textAlign:
+                                  (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right'
+                                    ? 'right'
+                                    : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center'
+                                      ? 'center'
+                                      : 'left'
+                              }}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 <TablePagination
                   component='div'
                   count={totalCount}

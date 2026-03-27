@@ -52,7 +52,12 @@ export interface PersonIcoProfile {
 const toNum = (v: unknown): number | null => {
   if (v === null || v === undefined) return null
   if (typeof v === 'number') return v
-  if (typeof v === 'string') { const n = Number(v); return Number.isFinite(n) ? n : null }
+
+  if (typeof v === 'string') {
+    const n = Number(v)
+
+    return Number.isFinite(n) ? n : null
+  }
 
   return null
 }

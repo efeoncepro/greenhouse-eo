@@ -15,17 +15,22 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getFilteredRowModel,
+  getPaginationRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import tableStyles from '@core/styles/table.module.css'
 import CreateReconciliationPeriodDrawer from '@views/greenhouse/finance/drawers/CreateReconciliationPeriodDrawer'
 import CreateAccountDrawer from '@views/greenhouse/finance/drawers/CreateAccountDrawer'
 
@@ -117,6 +122,34 @@ const formatDate = (date: string | null): string => {
 // Component
 // ---------------------------------------------------------------------------
 
+// ── Pending movements columns (static — no closures needed) ──
+
+const mvColumnHelper = createColumnHelper<PendingMovement>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mvColumns: ColumnDef<PendingMovement, any>[] = [
+  mvColumnHelper.accessor('type', {
+    header: 'Tipo',
+    cell: ({ getValue }) => <CustomChip round='true' size='small' color={getValue() === 'income' ? 'success' : 'error'} label={getValue() === 'income' ? 'Ingreso' : 'Egreso'} />
+  }),
+  mvColumnHelper.accessor('description', {
+    header: 'Descripción',
+    cell: ({ row }) => (
+      <>
+        <Typography variant='body2' fontWeight={500}>{row.original.description}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
+      </>
+    )
+  }),
+  mvColumnHelper.accessor('partyName', { header: 'Entidad', cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography> }),
+  mvColumnHelper.accessor('date', { header: 'Fecha', cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography> }),
+  mvColumnHelper.accessor('amount', {
+    header: 'Monto',
+    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'}>{formatCLP(getValue())}</Typography>,
+    meta: { align: 'right' }
+  })
+]
+
 const ReconciliationView = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -128,6 +161,8 @@ const ReconciliationView = () => {
   const [fetchErrors, setFetchErrors] = useState<string[]>([])
   const [createDrawerOpen, setCreateDrawerOpen] = useState(false)
   const [accountDrawerOpen, setAccountDrawerOpen] = useState(false)
+  const [periodSorting, setPeriodSorting] = useState<SortingState>([{ id: 'year', desc: true }])
+  const [mvSorting, setMvSorting] = useState<SortingState>([])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -222,6 +257,55 @@ const ReconciliationView = () => {
   const reconciledCount = periods.filter(p => p.status === 'reconciled').length
   const inProgressCount = periods.filter(p => p.status === 'in_progress').length
   const pendingMovementCount = pendingMovements.length
+
+  // Period columns (need accounts for lookup)
+  const periodColumnHelper = createColumnHelper<ReconciliationPeriod>()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const periodColumns: ColumnDef<ReconciliationPeriod, any>[] = [
+    periodColumnHelper.accessor('month', { header: 'Período', cell: ({ row }) => <Typography variant='body2' fontWeight={600}>{MONTH_NAMES[row.original.month]} {row.original.year}</Typography> }),
+    periodColumnHelper.accessor('accountId', { header: 'Cuenta', cell: ({ getValue }) => <Typography variant='body2'>{accounts.find(a => a.accountId === getValue())?.accountName || getValue()}</Typography> }),
+    periodColumnHelper.accessor('openingBalance', { header: 'Saldo apertura', cell: ({ getValue }) => <Typography variant='body2'>{formatCLP(getValue())}</Typography>, meta: { align: 'right' } }),
+    periodColumnHelper.accessor('closingBalanceBank', { header: 'Saldo banco', cell: ({ getValue }) => <Typography variant='body2'>{getValue() ? formatCLP(getValue()) : '—'}</Typography>, meta: { align: 'right' } }),
+    periodColumnHelper.accessor('closingBalanceSystem', { header: 'Saldo sistema', cell: ({ getValue }) => <Typography variant='body2'>{getValue() ? formatCLP(getValue()) : '—'}</Typography>, meta: { align: 'right' } }),
+    periodColumnHelper.accessor('difference', {
+      header: 'Diferencia',
+      cell: ({ row }) => {
+        const hasDiff = row.original.difference !== 0 && row.original.status !== 'reconciled'
+
+        return <Typography variant='body2' fontWeight={600} color={hasDiff ? 'error.main' : 'success.main'}>{row.original.difference !== 0 ? formatCLP(row.original.difference) : '$0'}</Typography>
+      },
+      meta: { align: 'right' }
+    }),
+    periodColumnHelper.accessor('statementRowCount', { header: 'Filas', cell: ({ getValue }) => getValue() || 0, meta: { align: 'center' } }),
+    periodColumnHelper.accessor('status', {
+      header: 'Estado',
+      cell: ({ getValue }) => { const c = STATUS_CONFIG[getValue()] || STATUS_CONFIG.open;
+
+ 
+
+return <CustomChip round='true' size='small' color={c.color} label={c.label} /> }
+    })
+  ]
+
+  const periodTable = useReactTable({
+    data: periods,
+    columns: periodColumns,
+    state: { sorting: periodSorting },
+    onSortingChange: setPeriodSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
+
+  const mvTable = useReactTable({
+    data: pendingMovements,
+    columns: mvColumns,
+    state: { sorting: mvSorting },
+    onSortingChange: setMvSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   const totalDifference = periods
     .filter(p => p.status !== 'reconciled')
@@ -393,94 +477,36 @@ const ReconciliationView = () => {
           </CustomTextField>
         </CardContent>
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Período</TableCell>
-                <TableCell>Cuenta</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Saldo apertura</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Saldo banco</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Saldo sistema</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Diferencia</TableCell>
-                <TableCell sx={{ width: 80 }} align='center'>Filas</TableCell>
-                <TableCell sx={{ width: 100 }}>Estado</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {periods.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      {accounts.length === 0
-                        ? 'No hay períodos de conciliación porque aún no existen cuentas activas registradas.'
-                        : 'No hay períodos de conciliación registrados aún'}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                periods.map(period => {
-                  const statusConf = STATUS_CONFIG[period.status] || STATUS_CONFIG.open
-                  const accountName = accounts.find(a => a.accountId === period.accountId)?.accountName || period.accountId
-                  const hasDifference = period.difference !== 0 && period.status !== 'reconciled'
-
-                  return (
-                    <TableRow
-                      key={period.periodId}
-                      hover
-                      onClick={() => router.push(`/finance/reconciliation/${period.periodId}`)}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell>
-                        <Typography variant='body2' fontWeight={600}>
-                          {MONTH_NAMES[period.month]} {period.year}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant='body2'>{accountName}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2'>{formatCLP(period.openingBalance)}</Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2'>
-                          {period.closingBalanceBank ? formatCLP(period.closingBalanceBank) : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography variant='body2'>
-                          {period.closingBalanceSystem ? formatCLP(period.closingBalanceSystem) : '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Typography
-                          variant='body2'
-                          fontWeight={600}
-                          color={hasDifference ? 'error.main' : 'success.main'}
-                        >
-                          {period.difference !== 0 ? formatCLP(period.difference) : '$0'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align='center'>
-                        <Typography variant='body2'>
-                          {period.statementRowCount || 0}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          color={statusConf.color}
-                          label={statusConf.label}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {periodTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {periodTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={periodColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>{accounts.length === 0 ? 'No hay períodos de conciliación porque aún no existen cuentas activas registradas.' : 'No hay períodos de conciliación registrados aún'}</Typography></td></tr>
+              ) : periodTable.getRowModel().rows.map(row => (
+                <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/reconciliation/${row.original.periodId}`)}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <TablePaginationComponent table={periodTable as ReturnType<typeof useReactTable>} />
       </Card>
 
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -494,66 +520,35 @@ const ReconciliationView = () => {
           }
         />
         <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 80 }}>Tipo</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell sx={{ width: 160 }}>Entidad</TableCell>
-                <TableCell sx={{ width: 110 }}>Fecha</TableCell>
-                <TableCell sx={{ width: 140 }} align='right'>Monto</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pendingMovements.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay movimientos pendientes por conciliar.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                pendingMovements.map(movement => (
-                  <TableRow key={movement.id} hover>
-                    <TableCell>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        color={movement.type === 'income' ? 'success' : 'error'}
-                        label={movement.type === 'income' ? 'Ingreso' : 'Egreso'}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={500}>
-                        {movement.description}
-                      </Typography>
-                      <Typography variant='caption' color='text.secondary'>
-                        {movement.id}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>{movement.partyName || '—'}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>{formatDate(movement.date)}</Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography
-                        variant='body2'
-                        fontWeight={600}
-                        color={movement.amount >= 0 ? 'success.main' : 'error.main'}
-                      >
-                        {formatCLP(movement.amount)}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {mvTable.getHeaderGroups().map(hg => (
+                <tr key={hg.id}>
+                  {hg.headers.map(header => (
+                    <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {mvTable.getRowModel().rows.length === 0 ? (
+                <tr><td colSpan={mvColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay movimientos pendientes por conciliar.</Typography></td></tr>
+              ) : mvTable.getRowModel().rows.map(row => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       <CreateReconciliationPeriodDrawer

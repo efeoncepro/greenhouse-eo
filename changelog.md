@@ -5,7 +5,296 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-26
+
+### Assignment → Membership sync projection
+- Nueva proyección `assignment_membership_sync`: cuando se crea/actualiza un `client_team_assignment`, se asegura automáticamente que el miembro tenga su `person_membership` correspondiente en la organización del cliente, vía el bridge `spaces`
+- Bridge chain: `assignment.client_id → spaces.client_id → spaces.organization_id → person_memberships`
+- En `assignment.removed`: desactiva el membership solo si el miembro no tiene otros assignments activos a la misma org
+- Backfill ejecutado: 4 memberships sincronizados (incluyendo Melkin → Sky Airline que faltaba)
+- Fix: query de assignments y shared overhead en `member-capacity-economics` ahora hace JOIN a `clients` para resolver `client_name` (antes fallaba por columna inexistente)
+
+### TASK-057 — cierre: taxonomía + Finance expenses + resiliencia
+- Completada la taxonomía canónica de overhead directo: `DIRECT_OVERHEAD_SCOPES` (none, member_direct, shared) + `DIRECT_OVERHEAD_KINDS` (tool_license, tool_usage, equipment, reimbursement, other)
+- `tool-cost-reader` ahora lee 3 fuentes con degradación independiente: AI licenses, AI credits, Finance member_direct expenses
+- Guardia de deduplicación: `tool_license` y `tool_usage` solo se leen desde AI tooling; `equipment`, `reimbursement`, `other` desde Finance
+- Migration script para BD existentes: `scripts/migrations/add-expense-direct-overhead-columns.sql`
+- Expense CRUD soporta los 3 campos nuevos (`directOverheadScope`, `directOverheadKind`, `directOverheadMemberId`)
+- Proyección resiliente: si las tablas de AI o las columnas de Finance no existen, degrada a overhead 0 sin romper el batch
+- Fix: arreglado destructuring faltante en `createFinanceExpenseInPostgres` y campos faltantes en expense route
+
+### TASK-057 — direct overhead canónico desde AI tooling
+- `member_capacity_economics` ya no deja `directOverheadTarget = 0` por defecto cuando un miembro tiene licencias activas o consumo de créditos AI en el período.
+- Se agregó una capa pura nueva para el cálculo de overhead directo por persona:
+  - `src/lib/team-capacity/tool-cost-attribution.ts`
+  - `src/lib/team-capacity/tool-cost-reader.ts`
+- La fuente canónica inicial del slice quedó acotada a datos defendibles:
+  - `greenhouse_ai.member_tool_licenses` + `greenhouse_ai.tool_catalog`
+  - `greenhouse_ai.credit_ledger`
+- Se decidió explícitamente no sumar todavía `greenhouse_finance.expenses` genéricos a `directOverheadTarget`, para evitar doble conteo y falsos positivos hasta que exista taxonomía madura de overhead directo por persona.
+- `src/lib/ai-tools/postgres-store.ts` ahora publica:
+  - `finance.license_cost.updated` en mutaciones de licencias
+  - `finance.license_cost.updated` fanout cuando cambia el costo de un tool con licencias activas
+  - `finance.tooling_cost.updated` cuando el credit ledger debita costo member-linked
+- La arquitectura de Team Capacity ya documenta esta baseline y deja la regla explícita de no abrir un segundo path para overhead directo por miembro.
+
+### TASK-056 — People/My alineados al snapshot canónico y overhead sobre cohort billable
+- `GET /api/people/[memberId]/intelligence` y `GET /api/my/performance` ahora resuelven el período actual usando `America/Santiago`, evitando drift por mes UTC implícito.
+- `Person Intelligence` ya no presenta compensación fuente en `CLP` cuando la fuente real es `USD`; la UI preserva la moneda original para salario base y compensación mensual.
+- `person_intelligence` dejó de fabricar `costPerHour` y `costPerAsset` desde derivaciones locales cuando falta el snapshot canónico; ahora cae a `null` en vez de inventar precisión.
+- `member_capacity_economics` cambió el reparto de `sharedOverheadTarget`: ahora usa solo el cohort billable externo del período y no todos los miembros activos.
+- Se agregaron/ajustaron tests Vitest para:
+  - `person_intelligence` projection
+  - `PersonIntelligenceTab`
+  - `My Assignments` route
+  - snapshot de `member_capacity_economics`
+
+### TASK-056 — overhead compartido y pricing base ya alimentan `member_capacity_economics`
+- `member_capacity_economics` dejó de persistir `sharedOverheadTarget = 0` por defecto: ahora toma overhead compartido desde `greenhouse_finance.expenses` no asignados a cliente, limitado en esta iteración a `cost_category IN ('operational', 'infrastructure', 'tax_social')`.
+- El prorrateo inicial del overhead compartido quedó canonizado por `contracted_hours`, evitando cargar el costo a partir de ruido operativo.
+- `directOverheadTarget` se mantiene en `0` por ahora: no se infiere overhead por miembro desde `expenses.member_id` ni desde tooling no canonizado.
+- `suggestedBillRateTarget` dejó de usar `markupMultiplier: 1.35` inline; ahora usa una policy base centralizada en `team-capacity/pricing` con `targetMarginPct: 0.35`, alineada a la semántica de margen ya documentada para Staff Aug.
+- La proyección reactiva `member_capacity_economics` ahora refresca también ante `finance.expense.created` y `finance.expense.updated`.
+
+### TASK-056 — People y My ya escalan desde `member_capacity_economics`
+- `GET /api/people/[memberId]/intelligence` ahora hace overlay de capacidad/costo desde `member_capacity_economics` para alinear `Person Intelligence` con la misma semántica de `Agency > Team`.
+- `My > Assignments` ahora consume el resumen del snapshot para:
+  - horas asignadas
+  - disponible comercial
+  - uso operativo
+- Se agregaron pruebas Vitest para el overlay de `Person Intelligence` y para el resumen canónico de `My Assignments`.
+
+### Arquitectura — team capacity canónica
+- Se agregó `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md` como fuente canónica de:
+  - helpers puros de capacidad/economía
+  - snapshot reactivo `member_capacity_economics`
+  - reglas de consumer y de escalamiento
+- Se enlazó esta arquitectura desde:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+  - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+  - `docs/README.md`
+  - `project_context.md`
+
+### TASK-056 — `Agency > Team` ya consume el contrato nuevo de capacidad
+- `Agency > Team` ahora lee `member_capacity_economics` para el período actual en vez de mezclar joins y fórmulas híbridas on-read.
+- La card/columna `Usadas` fue reemplazada por `Uso operativo`:
+  - muestra horas solo si la fuente existe
+  - muestra porcentaje/índice cuando la señal operativa proviene de ICO
+  - cae a `—` cuando no hay una fuente defendible
+- Se corrigió un bug en la capa económica: cuando faltaba FX y la compensación estaba en otra moneda, el snapshot podía tratar el costo como si ya estuviera en moneda objetivo.
+- Validación del slice:
+  - `Vitest`: `8 files passed`, `39 tests passed`
+  - `TypeScript`: sin errores
+  - `Next build`: exitoso
+
+### TASK-056 — snapshot reactivo `member_capacity_economics` implementado
+- Se agregó la nueva proyección reactiva `member_capacity_economics` con tabla de serving `greenhouse_serving.member_capacity_economics`.
+- El snapshot persiste por `member_id + period_year + period_month` e integra:
+  - asignaciones comerciales filtrando carga interna
+  - uso operativo derivado de ICO
+  - compensación de payroll / versión vigente
+  - conversión FX a `CLP` con contexto de período
+- Se añadió el wiring mínimo al projection registry y al event catalog para:
+  - `compensation_version.updated`
+  - `finance.exchange_rate.upserted`
+  - eventos reactivos futuros de overhead/licencias/tooling
+- Se agregaron tests Vitest para:
+  - parsing de período y scope
+  - cálculo del snapshot
+  - refresh reactivo y registro en el registry
+- El slice no tocó `src/lib/team-capacity/*.ts`, routes UI ni views.
+
+### TASK-056 — helpers puros de capacidad y economía ya están disponibles
+- Se agregaron cuatro módulos puros en `src/lib/team-capacity/`:
+  - `units.ts`
+  - `economics.ts`
+  - `overhead.ts`
+  - `pricing.ts`
+- Cada módulo tiene su suite Vitest asociada en `src/lib/team-capacity/*.test.ts`.
+- La nueva capa cubre:
+  - conversiones `FTE <-> horas` y envelopes de capacidad
+  - cuantificación de compensación, costo horario y snapshot laboral
+  - prorrateo de overhead directo y compartido
+  - referencia sugerida de venta sobre costo cargado
+- No se tocaron routes, views ni proyecciones; el cambio quedó acotado a helpers puros y tests.
+
+### Agency Team — contrato de capacidad documentado como lane separada
+- Se creó `TASK-056 - Agency Team Capacity Semantics` para formalizar la semántica pendiente de `Agency > Team` antes de seguir iterando backend/UI.
+- La task separa explícitamente:
+  - capacidad contractual
+  - carga comercial comprometida
+  - uso operativo
+  - disponibilidad
+- También deja propuesta una capa reusable de conversiones `FTE <-> horas` sin meter lógica de negocio en el helper.
+- La misma lane ahora incluye una segunda capa reusable de economía de capacidad para convertir compensación del período en:
+  - `costPerHour`
+  - costo hundido interno
+  - `suggestedBillRate` como referencia de venta, sin confundirlo con pricing comercial final.
+- La spec quedó alineada además con la integración FX existente del repo:
+  - `mindicador` como fuente primaria de `USD/CLP`
+  - `greenhouse_finance.exchange_rates` como persistencia
+  - estrategia sugerida para capacidad/pricing: último día hábil del período
+- `TASK-056` ahora incluye también:
+  - inventario de consumers del repo que usan o usarán esta semántica
+  - recomendación explícita de arquitectura híbrida:
+    - helpers puros para fórmulas
+    - proyección reactiva `member_capacity_economics` para snapshot mensual por persona
+- La misma task ahora deja también el contrato exacto propuesto de:
+  - módulos `units`, `economics`, `overhead`, `pricing`
+  - snapshot `member_capacity_economics`
+  - payload futuro de `GET /api/team/capacity-breakdown`
+- `TASK-008` recibió un delta para dejar explícito que la identidad canónica ya está cerrada, pero la semántica de capacidad sigue abierta y ahora tiene lane propia.
+
+### Agency Team — capacidad cliente efectiva corregida
+- `Agency > Team` dejó de sumar `Efeonce Internal` como carga cliente comprometida.
+- La capacidad ahora se calcula por miembro con un sobre contractual máximo de `1.0 FTE`, evitando casos falsos de `2.0 FTE / 320h` para una sola persona.
+- También se corrigió la sobrecuenta de `contracted_hours_month`: ya no se suma por assignment como si cada fila representara horas nuevas.
+- La UI ahora deja explícito que, cuando faltan métricas operativas, la carga comprometida excluye `Efeonce interno` y no reemplaza producción efectiva.
+- La ruta `GET /api/team/capacity-breakdown` y el fetch client-side quedaron con `no-store` para evitar que `staging` siga mostrando respuestas previas al deploy correcto.
+- `Agency > Team` ahora degrada de forma segura ante lentitud de Postgres: la API usa timeout + fallback de query y el cliente aborta el fetch tras 8s en vez de dejar la pantalla colgada.
+- La vista dejó de depender de `greenhouse_serving.person_operational_metrics` vacía y ahora usa la última señal disponible de `ico_member_metrics` para calcular `Usadas` desde throughput real.
+- La selección de miembros quedó alineada al runtime real: solo se muestran miembros con assignment cliente externo y señal operacional materializada; en el estado actual eso reduce la vista operativa a Sky (`Andres`, `Daniela`, `Melkin`).
+
+### Home / Nexa — rollout retirado del camino crítico de ingreso
+- Se desactivó temporalmente `Home/Nexa` como landing por defecto para clientes.
+- `/home` volvió a redirigir a `/dashboard` y el fallback de `portalHomePath` para clientes dejó de resolver `/home`.
+- Motivo: mitigación rápida de un freeze reportado al ingresar a `dev-greenhouse`, mientras se aísla la causa raíz del rollout.
+
+### Home / Nexa — MVP client-first implementado
+- `/home` dejó de redirigir automáticamente a `/dashboard`; ahora renderiza `HomeView` como nueva superficie de entrada client-first.
+- `portalHomePath` para clientes quedó alineado a `/home`.
+- Se agregaron:
+  - `GET /api/home/snapshot`
+  - `POST /api/home/nexa`
+  - `getHomeSnapshot()` como orquestador server-side
+  - `NexaService` sobre Google GenAI
+- La nueva UI de Home incluye greeting dinámico, grid de módulos por capacidades, shortlist de pendientes y panel conversacional `Nexa`.
+- `TASK-009` quedó materialmente implementada como MVP y movida a `docs/tasks/complete/`.
+ 
+### Greenhouse Home Nexa v2 — TASK-009 implementation
+- **Orchestration**: Implemented `getHomeSnapshot.ts` to aggregate user context, capability-based modules, and pending task counts.
+- **Nexa AI Assistant**: Deployed `nexa-service.ts` using Google GenAI (Gemini) with a persona-driven system prompt and operational context.
+- **UI Components**: Built a suite of premium components (`GreetingCard`, `NexaPanel`, `ModuleGrid`, `TaskShortlist`) adapting Vuexy advanced widgets.
+- **API Surface**: Created `/api/home/snapshot` and `/api/home/nexa` for state management and conversational streams.
+- **Rollout**: Updated `portalHomePath` in `src/lib/tenant/access.ts` to default client users to the new `/home` experience.
+- **Verification**: Fixed all lint errors in the new components and verified type safety.
+
+### Finance Intelligence — marzo 2026 materializado correctamente
+- `2026-03` dejó de quedar en estado parcial para `Sky Airline`: el período de payroll quedó `approved` y el snapshot de `greenhouse_finance.client_economics` se rematerializó con costos laborales canonizados.
+- Resultado operativo validado:
+  - `directCostsClp = 1,119,441.76`
+  - `grossMarginPercent = netMarginPercent = 0.9189`
+  - `headcountFte = 3`
+  - `notes = march-payroll-materialization`
+- La sanitización de presentación ya no oculta marzo: `sanitizeSnapshotForPresentation()` devuelve `hasCompleteCostCoverage = true` para ese snapshot.
+- `dev-greenhouse.efeoncepro.com` quedó apuntando al deployment `staging` `greenhouse-fi5qtnqhf-efeonce-7670142f.vercel.app`; si todavía se ve el warning viejo en navegador, corresponde a un estado previo al recompute y no al backend actual.
+
+### Finance Intelligence — febrero trazable sin mezclar monedas
+- `computeClientEconomicsSnapshots()` dejó de romperse en meses cortos: el fin de mes ya no se hardcodea como `31`, sino que se deriva con un helper de rango mensual real cubierto por `Vitest`.
+- `greenhouse_serving.client_labor_cost_allocation` dejó de asumir que `gross_total` de Payroll ya está en CLP. Ahora la view preserva `payroll_currency`, montos fuente (`gross_total_source`, `allocated_labor_source`) y solo llena `allocated_labor_clp` cuando la entry ya viene en CLP o existe `USD/CLP` histórico no posterior al cierre del período.
+- Se aplicó un backfill quirúrgico para febrero 2026 sobre la asignación billable de `Sky Airline` para Daniela, Andrés y Melkin, sin tocar la asignación interna de `Efeonce`.
+- `fetchUsdToClpFromProviders()` ahora retrocede automáticamente hasta encontrar el último día hábil con dato cuando se pide una fecha histórica a `mindicador`. Para febrero 2026 resolvió `2026-02-27` con `USD/CLP = 861.19`.
+- Resultado operativo final: febrero 2026 ya quedó materializado en CLP para `Sky Airline` con `directCostsClp = 1,485,552.75`, `headcountFte = 2` y `grossMarginPercent = netMarginPercent = 0.8924`.
+- Se agregó helper reusable de tasas en `finance/shared` y se corrigió la precisión del par inverso: `CLP_USD_2026-02-27` ahora persiste como `0.001161` en vez de `0`.
+- `sanitizeSnapshotForPresentation()` salió a una utilidad reusable y `organization-store.ts` ya no pondera márgenes incompletos como si fueran `0`.
+- `organization-economics.ts` dejó de doble-contar costo laboral sobre `client_economics.direct_costs_clp`; Organization ahora trata nómina como desglose y no como costo adicional.
+
+### Account Operational Metrics — TASK-014 implementation
+- **BigQuery to Postgres**: Se agregó `metrics_by_organization` al engine ICO e incluyó a `getOrganizationOperationalServing.ts` para extraer KPIs (RpA, throughput, delivery health) a nivel de cuenta (Organization).
+- **Reactive Projection**: Se agregó `ico_organization_metrics` como tabla de Postgres y `icoOrganizationProjection` / `organizationOperationalProjection` al projection registry para mantener los datos de BQ cacheados mediante eventos outbox al finalizar el cron job.
+- **Organization Store APIs**: `organization-store.ts` exporta ahora `getOrganizationOperationalMetrics` que será provisto al frontend en el executive dashboard.
+- **Setup script**: Se agregó `scripts/setup-postgres-organization-operational-serving.sql` con el DDL necesario en Postgres.
+
+### ICO Engine Expansion — Person Operational Intelligence
+- **Metric Registry**: Extended with `MetricScope`, `composite` MetricKind. 6 new person-scoped derived metrics.
+- **Metrics**: `utilization_pct`, `allocation_variance`, `cost_per_asset`, `cost_per_hour`, `quality_index`, `dedication_index`
+- **Storage**: `person_operational_360` table (9 ICO + 6 derived + capacity + cost, 12-month retention)
+- **Enterprise**: `metric_threshold_overrides` table for per-organization threshold configuration
+- **Reactive**: `personIntelligenceProjection` replaces old person_operational projection. Unified refresh from Postgres only.
+- **API**: `GET /api/people/:memberId/intelligence?trend=6`
+- **Tests**: 15 unit tests for compute functions
+- **TASK-055**: Frontend integration + event publishing wiring pendiente
+
+### Finance Intelligence — proyección reactiva por período afectado
+- `client_economics` dejó de recomputarse ciegamente sobre el mes actual cuando el outbox procesa eventos reactivos.
+- La proyección ahora escucha eventos relevantes de `finance` y `payroll`, deriva `year/month` desde payloads reales (`invoiceDate`, `documentDate`, `paymentDate`, `periodId`, `periodYear/periodMonth`) y recomputa el período afectado.
+- `greenhouse_finance.cost_allocations` empezó a publicar eventos outbox canónicos al crear/eliminar allocations, y Payroll ahora publica cambios de período (`updated`, `calculated`, `approved`) con `year/month`.
+- Se agregaron tests `Vitest` para la proyección reactiva de `client_economics`, cubriendo trigger coverage, derivación de período y recompute determinístico.
+
+### Finance Intelligence — bridge laboral histórico corregido
+- `greenhouse_serving.client_labor_cost_allocation` dejó de resolver assignments con `CURRENT_DATE`; ahora cruza `payroll_entries` con assignments que se solapan con la ventana real del `payroll_period`.
+- La materialización `scripts/setup-postgres-finance-intelligence-p2.sql` quedó reaplicada en Postgres con la nueva semántica temporal.
+- Se agregó test `Vitest` para `computeClientLaborCosts()`.
+- La verificación runtime confirmó que el view sigue vacío en este entorno porque `2026-03` está en `draft`, no porque el bridge temporal siga roto.
+
+### Payroll backfill — credencial de servicio restaurada
+- `scripts/backfill-postgres-payroll.ts` pasó a usar `GOOGLE_APPLICATION_CREDENTIALS_JSON` vía `getGoogleCredentials()`, evitando fallos `invalid_rapt` por refresh token OAuth local.
+- Con la autenticación corregida, el backfill confirmó que la fuente BigQuery actual no tiene filas de `payroll_periods`, `payroll_entries` ni `compensation_versions`; el gap de febrero está en la fuente, no en el import a PostgreSQL.
+
+### Finance Intelligence — márgenes ocultos cuando el snapshot está incompleto
+- `Finance > Intelligence` dejó de mostrar márgenes `100% / Óptimo` cuando el snapshot mensual tiene ingresos pero cobertura insuficiente de costos.
+- El route de `client-economics` ahora marca snapshots incompletos y oculta `grossMarginPercent` / `netMarginPercent` cuando detecta costos faltantes o placeholder de backfill.
+- `ClientEconomicsView` muestra `—`, subtítulo `costos incompletos` y un warning explícito en vez de semáforos engañosos.
+- La ruta de tendencia quedó alineada con la misma sanitización, evitando charts optimistas construidos sobre snapshots incompletos.
+- Se agregaron tests `Vitest` para el route y la vista de rentabilidad.
+
+### Agency Team — datos corregidos y fallback honesto
+- `Agency > Team` dejó de contar assignments activos como si fueran personas: la API ahora agrega por `member_id`, eliminando duplicados en headcount y tabla.
+- `Disponibles` cambió a semántica de capacidad libre contractual (`contratadas - asignadas`), evitando casos donde alguien aparecía 100% asignado y aun así “disponible”.
+- Cuando faltan métricas operativas (`greenhouse_serving.person_operational_metrics`), la vista ya no muestra `0h usadas` como dato real: muestra `—` y un aviso explícito de ausencia de source.
+- Se agregaron tests `Vitest` para la capa shared, el route handler y la vista de Agency Team.
+
+### TanStack React Table Mass Migration — 22 of 48 tables
+- **Agency views:** Team, Campaigns, Economics, Delivery, Operations (5 tables) — all with Vuexy tableStyles + sorting
+- **Finance lists:** Income, Expenses, Suppliers, Clients, ClientEconomics, Reconciliation (2 tables), CostAllocations — search + sort + pagination
+- **Organization:** OrgList (server-side pagination + sort), OrgPeopleTab (search + sort)
+- **Admin:** Tenants (search + sort + pagination), Roles (sort-only matrix)
+- **Client-facing:** DeliveryAnalytics (project metrics sort), ReviewQueue (2 tables: queue + history)
+- **Services:** ServicesListView (sort + server-side pagination)
+- **Brand icons:** Notion SVG fixed (was invisible on white bg), HubSpot SVG replaced with 24x24 sprocket
+- **Operations health:** `not_configured` status for missing Postgres tables (was showing false "down")
+- **Tasks created:** TASK-053 (25 remaining low-impact), TASK-054 (4 remaining high-impact)
+
 ## 2026-03-25
+
+### React Table migration — build/test compatibility restored
+- `postcss.config.mjs` quedó ajustado a sintaxis compatible con `Next.js 16 / Turbopack` y `Vitest`, evitando que la migración a `@tanstack/react-table` rompa `staging` o la suite unitaria.
+- `staging` había quedado sirviendo un deployment viejo porque los deploys recientes fallaban en build; con este ajuste el repo vuelve a pasar `pnpm build`.
+- Se confirmó además la deuda remanente de migración: `42` archivos `.tsx` de Greenhouse todavía usan tablas legacy y deben converger al patrón React Table de Vuexy `full-version`.
+
+### Agency Campaigns — contract fix + explicit Postgres bootstrap
+- `Agency > Campaigns` dejó de depender de un `spaceId` obligatorio para usuarios internos; `GET /api/campaigns` ahora puede listar campañas cross-space con `campaignScopes` aplicados.
+- `AgencyCampaignsView` ya no oculta respuestas `400/500` como si fueran `0` campañas; muestra estado de error explícito cuando la carga falla.
+- Campaign 360 ya tiene bootstrap explícito `pnpm setup:postgres:campaigns` con perfil `migrator`, y el runtime dejó de crear tablas/columnas request-time.
+- Se validó el dominio en Cloud SQL dev: `greenhouse_core.campaigns`, `greenhouse_core.campaign_project_links` y `greenhouse_core.campaigns_eo_id_seq` existen, pero siguen con `0` filas; el siguiente gap real es seed/canonización de campañas, no schema.
+- Se agregaron tests `Vitest` para el route handler, la vista Agency y el store de campañas para detectar regresiones de contrato, UX y bootstrap.
+
+### Campaign 360 — initial canonical seed
+- Se agregó `pnpm backfill:postgres:campaigns` con heurística conservadora sobre `greenhouse_delivery.projects`, mapeando `space_id` legado de `notion_workspaces` al `space_id` canónico de `greenhouse_core.spaces`.
+- Se sumó además un seed manual curado para `Sky Airlines Kick-Off` para cubrir el caso de campaña singleton válida.
+- El backfill quedó aplicado en dev: `7` campañas canónicas y `24` links proyecto-campaña.
+- Se agregó cobertura `Vitest` para la heurística de seed y se corrigió `postcss.config.mjs` para destrabar tests de componentes que cargan CSS modules.
+
+### Agency Spaces — RpA/OTD cutover a ICO
+- `Agency > Spaces` dejó de leer `RpA` desde `notion_ops.tareas.rpa` y `OTD` desde `notion_ops.proyectos`.
+- `getAgencySpacesHealth()` y `getAgencyPulseKpis()` ahora toman ambos KPIs desde el snapshot ICO más reciente por `space_id` en `ico_engine.metric_snapshots_monthly`, agregando luego por cliente visible en Agency.
+- Se agregó test de regresión para impedir que la vista vuelva a calcular o leer `RpA` desde la capa legacy.
+
+### Agency Operator Layer Redesign — Fase 1
+- **Architecture**: Tab monolítico → 9 rutas independientes bajo `/agency/`.
+- **Navigation**: Gestión expandida de 3 a 9 items (Agencia, Spaces, Economía, Equipo, Delivery, Campañas, Servicios, Operaciones, Organizaciones).
+- **Economics** (`/agency/economics`): P&L KPIs (revenue, costs, margin, EBITDA) + expense trend chart + top clients by revenue table.
+- **Team** (`/agency/team`): 4-type capacity model (contracted/assigned/used/available) + health distribution + overcommitted alerts + member table.
+- **Campaigns** (`/agency/campaigns`): Cross-space campaign overview con KPIs + campaign table completa.
+- **Backend**: `listAllCampaigns()` sin filtro spaceId, `getServicesExpiringBefore(days)` para renewal risk.
+- Delivery y Operations como stubs listos para implementación.
+
+### Client Organization Identity Bridge
+- Migration backfill `identity_profile_id` + create `person_memberships` para client_users.
+- `ensureClientMembership()` auto-link en login.
+- APIs `/api/my/organization` + `/api/my/organization/members` para directorio de colegas.
+- Vista `MyOrganizationView` con KPIs y tabla de miembros.
 
 ### Collaborator Portal — Full Implementation
 - **Session Bridge**: `memberId` + `identityProfileId` propagated through JWT, Session, TenantContext.
@@ -2133,6 +2422,12 @@
 - Rebalanced `/admin/tenants/[id]` so tenant identity, validation CTA, and governance appear in a clearer order instead of pushing the editor into a narrow left rail.
 - Removed automatic capability derivation from HubSpot `closedwon` deals in `POST /api/admin/tenants/[id]/capabilities/sync`.
 - The sync route now requires explicit `businessLines` or `serviceModules` in the payload and treats the source as company-level or external metadata only.
+
+# 2026-03-25
+
+- fix: `Agency > Campaigns` dejó de depender de un `spaceId` obligatorio para usuarios internos; `GET /api/campaigns` ahora expone listado cross-space para Agency y preserva `campaignScopes` cuando aplica.
+- fix: `AgencyCampaignsView` ya no oculta fallas de carga como si fueran `0` campañas; ahora comunica error explícito cuando la API responde `non-OK`.
+- test: se agregaron suites `Vitest` para `src/app/api/campaigns/route.ts` y `src/views/agency/AgencyCampaignsView.tsx`, además del lote combinado con `agency-queries`, para detectar temprano regresiones de contrato y de UI.
 
 ### 2026-03-11 - Generic integrations API
 

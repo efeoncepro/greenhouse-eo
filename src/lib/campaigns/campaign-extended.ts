@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import { ensureCampaignSchema } from './campaign-store'
+import { assertCampaignSchemaReady } from './campaign-store'
 
 // ── Budget & Financial Attribution ──
 
@@ -19,7 +19,7 @@ export interface CampaignFinancials {
 }
 
 export const getCampaignFinancials = async (campaignId: string): Promise<CampaignFinancials> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   // Get budget from campaign
   const budgetRows = await runGreenhousePostgresQuery<{ budget_clp: string | number | null } & Record<string, unknown>>(
@@ -116,7 +116,7 @@ export interface CampaignTeamMember {
 }
 
 export const getCampaignRoster = async (campaignId: string): Promise<CampaignTeamMember[]> => {
-  await ensureCampaignSchema()
+  await assertCampaignSchemaReady()
 
   const links = await runGreenhousePostgresQuery<{ project_source_id: string } & Record<string, unknown>>(
     `SELECT project_source_id FROM greenhouse_core.campaign_project_links WHERE campaign_id = $1`,

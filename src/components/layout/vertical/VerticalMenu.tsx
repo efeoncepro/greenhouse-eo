@@ -141,21 +141,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       isSection: true,
       label: 'Gestión',
       children: [
-        {
-          label: <NavLabel label={GH_AGENCY_NAV.workspace.label} subtitle={GH_AGENCY_NAV.workspace.subtitle} show={showSub} />,
-          href: '/agency',
-          icon: 'tabler-building'
-        },
-        {
-          label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />,
-          href: '/agency/organizations',
-          icon: 'tabler-building-community'
-        },
-        {
-          label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />,
-          href: '/agency/services',
-          icon: 'tabler-packages'
-        }
+        { label: <NavLabel label='Agencia' subtitle='Command Center' show={showSub} />, href: '/agency', icon: 'tabler-building' },
+        { label: <NavLabel label='Spaces' subtitle='Clientes y salud operativa' show={showSub} />, href: '/agency/spaces', icon: 'tabler-grid-4x4' },
+        { label: <NavLabel label='Economía' subtitle='P&L y rentabilidad' show={showSub} />, href: '/agency/economics', icon: 'tabler-chart-line' },
+        { label: <NavLabel label='Equipo' subtitle='Capacidad y dedicación' show={showSub} />, href: '/agency/team', icon: 'tabler-users-group' },
+        { label: <NavLabel label='Delivery' subtitle='ICO, sprints y producción' show={showSub} />, href: '/agency/delivery', icon: 'tabler-cpu' },
+        { label: <NavLabel label='Campañas' subtitle='Iniciativas cross-space' show={showSub} />, href: '/agency/campaigns', icon: 'tabler-speakerphone' },
+        { label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />, href: '/agency/services', icon: 'tabler-packages' },
+        { label: <NavLabel label='Operaciones' subtitle='Salud del platform' show={showSub} />, href: '/agency/operations', icon: 'tabler-activity' },
+        { label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />, href: '/agency/organizations', icon: 'tabler-building-community' }
       ]
     })
   }

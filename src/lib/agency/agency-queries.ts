@@ -207,9 +207,33 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
+      ico_latest_by_space AS (
+        SELECT
+          latest.space_id,
+          latest.rpa_avg,
+          latest.otd_pct
+        FROM (
+          SELECT
+            ms.space_id,
+            ms.rpa_avg,
+            ms.otd_pct,
+            ROW_NUMBER() OVER (
+              PARTITION BY ms.space_id
+              ORDER BY ms.period_year DESC, ms.period_month DESC, ms.computed_at DESC
+            ) AS row_num
+          FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
+          WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
+        ) latest
+        WHERE latest.row_num = 1
+      ),
+      ico_global AS (
+        SELECT
+          AVG(ils.rpa_avg) AS rpa_global,
+          AVG(ils.otd_pct) AS otd_pct_global
+        FROM ico_latest_by_space ils
+      ),
       task_agg AS (
         SELECT
-          AVG(SAFE_CAST(t.rpa AS FLOAT64)) AS rpa_global,
           COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente,
           MAX(t.last_edited_time) AS last_synced_at
@@ -218,21 +242,19 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
       ),
       project_agg AS (
         SELECT
-          COUNT(DISTINCT pr.notion_page_id) AS total_projects,
-          AVG(SAFE_CAST(REGEXP_REPLACE(COALESCE(pr.pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64)) AS otd_pct_global
-        FROM client_spaces cs
-        LEFT JOIN \`${projectId}.notion_ops.proyectos\` pr
-          ON pr.space_id = cs.space_id
+          SUM(pi.project_count) AS total_projects
+        FROM project_inventory pi
       )
       SELECT
-        ta.rpa_global,
+        ig.rpa_global,
         ta.assets_activos,
         ta.feedback_pendiente,
         ta.last_synced_at,
         pa.total_projects,
-        pa.otd_pct_global,
+        ig.otd_pct_global,
         (SELECT COUNT(*) FROM active_clients) AS total_spaces
       FROM task_agg ta
+      CROSS JOIN ico_global ig
       CROSS JOIN project_agg pa
     `
   })
@@ -257,24 +279,43 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
+      ico_latest_by_space AS (
+        SELECT
+          latest.space_id,
+          latest.rpa_avg,
+          latest.otd_pct
+        FROM (
+          SELECT
+            ms.space_id,
+            ms.rpa_avg,
+            ms.otd_pct,
+            ROW_NUMBER() OVER (
+              PARTITION BY ms.space_id
+              ORDER BY ms.period_year DESC, ms.period_month DESC, ms.computed_at DESC
+            ) AS row_num
+          FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
+          WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
+        ) latest
+        WHERE latest.row_num = 1
+      ),
+      ico_health AS (
+        SELECT
+          cs.client_id,
+          AVG(ils.rpa_avg) AS rpa_avg,
+          AVG(ils.otd_pct) AS otd_pct
+        FROM client_spaces cs
+        LEFT JOIN ico_latest_by_space ils
+          ON ils.space_id = cs.space_id
+        GROUP BY cs.client_id
+      ),
       task_health AS (
         SELECT
           cs.client_id,
-          AVG(SAFE_CAST(t.rpa AS FLOAT64)) AS rpa_avg,
           COUNTIF(t.estado NOT IN ('Listo', 'Cancelado')) AS assets_activos,
           COUNTIF(SAFE_CAST(t.open_frame_comments AS INT64) > 0) AS feedback_pendiente
         FROM client_spaces cs
         LEFT JOIN \`${projectId}.notion_ops.tareas\` t
           ON t.space_id = cs.space_id
-        GROUP BY cs.client_id
-      ),
-      project_health AS (
-        SELECT
-          cs.client_id,
-          AVG(SAFE_CAST(REGEXP_REPLACE(COALESCE(pr.pct_on_time, ''), r'[^0-9.]', '') AS FLOAT64)) AS otd_pct
-        FROM client_spaces cs
-        LEFT JOIN \`${projectId}.notion_ops.proyectos\` pr
-          ON pr.space_id = cs.space_id
         GROUP BY cs.client_id
       ),
       module_agg AS (
@@ -293,8 +334,8 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
         ac.client_id,
         ac.client_name,
         COALESCE(ma.business_lines, []) AS business_lines,
-        th.rpa_avg,
-        ph.otd_pct,
+        ih.rpa_avg,
+        ih.otd_pct,
         COALESCE(th.assets_activos, 0) AS assets_activos,
         COALESCE(th.feedback_pendiente, 0) AS feedback_pendiente,
         COALESCE(pi.project_count, 0) AS project_count,
@@ -305,10 +346,10 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
         COALESCE(us.total_users, 0) AS total_users,
         COALESCE(us.active_users, 0) AS active_users
       FROM active_clients ac
+      LEFT JOIN ico_health ih
+        ON ih.client_id = ac.client_id
       LEFT JOIN task_health th
         ON th.client_id = ac.client_id
-      LEFT JOIN project_health ph
-        ON ph.client_id = ac.client_id
       LEFT JOIN project_inventory pi
         ON pi.client_id = ac.client_id
       LEFT JOIN assignment_summary asg

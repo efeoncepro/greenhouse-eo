@@ -45,6 +45,7 @@ export const computeClientLaborCosts = async (
        COUNT(DISTINCT member_id) AS headcount_members
      FROM greenhouse_serving.client_labor_cost_allocation
      WHERE period_year = $1 AND period_month = $2
+       AND allocated_labor_clp IS NOT NULL
      GROUP BY client_id, client_name
      ORDER BY SUM(allocated_labor_clp) DESC`,
     [year, month]

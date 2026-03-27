@@ -11,17 +11,19 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
+import {
+  createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+
+import tableStyles from '@core/styles/table.module.css'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 
@@ -72,9 +74,29 @@ const num = (v: number | null) => v != null ? String(Math.round(v)) : '—'
 
 // ── Component ──
 
+// ── TanStack columns ──
+
+const projColHelper = createColumnHelper<ProjectMetric>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const projMetricColumns: ColumnDef<ProjectMetric, any>[] = [
+  projColHelper.accessor('projectName', { header: 'Proyecto', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
+  projColHelper.accessor('totalTasks', { header: 'Tasks', cell: ({ getValue }) => num(getValue()), meta: { align: 'center' } }),
+  projColHelper.accessor('rpaAvg', { header: 'RPA', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={metricColor(getValue(), 70)} label={pct(getValue())} />, meta: { align: 'center' } }),
+  projColHelper.accessor('otdPct', { header: 'OTD%', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={metricColor(getValue(), 80)} label={pct(getValue())} />, meta: { align: 'center' } }),
+  projColHelper.accessor('ftrPct', { header: 'FTR%', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={metricColor(getValue(), 80)} label={pct(getValue())} />, meta: { align: 'center' } }),
+  projColHelper.accessor('cycleTimeAvgDays', { header: 'Cycle Time', cell: ({ getValue }) => getValue() != null ? `${Math.round(getValue())}d` : '—', meta: { align: 'center' } }),
+  projColHelper.accessor('stuckAssetCount', {
+    header: 'Stuck',
+    cell: ({ getValue }) => (getValue() ?? 0) > 0 ? <CustomChip round='true' size='small' variant='tonal' color='error' label={String(getValue())} /> : <Typography variant='caption' color='text.disabled'>0</Typography>,
+    meta: { align: 'center' }
+  })
+]
+
 const GreenhouseDeliveryAnalytics = () => {
   const theme = useTheme()
   const [data, setData] = useState<AnalyticsData | null>(null)
+  const [projSorting, setProjSorting] = useState<SortingState>([{ id: 'rpaAvg', desc: false }])
   const [loading, setLoading] = useState(true)
   const [months, setMonths] = useState(6)
 
@@ -93,6 +115,15 @@ const GreenhouseDeliveryAnalytics = () => {
   }, [months])
 
   useEffect(() => { void fetchData() }, [fetchData])
+
+  const projTable = useReactTable({
+    data: data?.projects ?? [],
+    columns: projMetricColumns,
+    state: { sorting: projSorting },
+    onSortingChange: setProjSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
 
   const chartData = data?.trend.map(t => ({
     label: `${MONTHS[t.month]} ${String(t.year).slice(2)}`,
@@ -208,46 +239,33 @@ const GreenhouseDeliveryAnalytics = () => {
                   </Typography>
                 </CardContent>
               ) : (
-                <TableContainer>
-                  <Table size='small'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Proyecto</TableCell>
-                        <TableCell align='center'>Tasks</TableCell>
-                        <TableCell align='center'>RPA</TableCell>
-                        <TableCell align='center'>OTD%</TableCell>
-                        <TableCell align='center'>FTR%</TableCell>
-                        <TableCell align='center'>Cycle Time</TableCell>
-                        <TableCell align='center'>Stuck</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {data.projects.map(p => (
-                        <TableRow key={p.projectId} hover>
-                          <TableCell><Typography variant='body2' fontWeight={600}>{p.projectName}</Typography></TableCell>
-                          <TableCell align='center'>{num(p.totalTasks)}</TableCell>
-                          <TableCell align='center'>
-                            <CustomChip round='true' size='small' variant='tonal' color={metricColor(p.rpaAvg, 70)} label={pct(p.rpaAvg)} />
-                          </TableCell>
-                          <TableCell align='center'>
-                            <CustomChip round='true' size='small' variant='tonal' color={metricColor(p.otdPct, 80)} label={pct(p.otdPct)} />
-                          </TableCell>
-                          <TableCell align='center'>
-                            <CustomChip round='true' size='small' variant='tonal' color={metricColor(p.ftrPct, 80)} label={pct(p.ftrPct)} />
-                          </TableCell>
-                          <TableCell align='center'>{p.cycleTimeAvgDays != null ? `${Math.round(p.cycleTimeAvgDays)}d` : '—'}</TableCell>
-                          <TableCell align='center'>
-                            {(p.stuckAssetCount ?? 0) > 0 ? (
-                              <CustomChip round='true' size='small' variant='tonal' color='error' label={String(p.stuckAssetCount)} />
-                            ) : (
-                              <Typography variant='caption' color='text.disabled'>0</Typography>
-                            )}
-                          </TableCell>
-                        </TableRow>
+                <div className='overflow-x-auto'>
+                  <table className={tableStyles.table}>
+                    <thead>
+                      {projTable.getHeaderGroups().map(hg => (
+                        <tr key={hg.id}>
+                          {hg.headers.map(header => (
+                            <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                            </th>
+                          ))}
+                        </tr>
                       ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    </thead>
+                    <tbody>
+                      {projTable.getRowModel().rows.map(row => (
+                        <tr key={row.id}>
+                          {row.getVisibleCells().map(cell => (
+                            <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </Card>
           </Grid>

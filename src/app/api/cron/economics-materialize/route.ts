@@ -22,6 +22,7 @@ export async function GET(request: Request) {
 
     // Also materialize previous month (catches late entries)
     const prevDate = new Date(year, month - 2, 1)
+
     const prevResults = await computeClientEconomicsSnapshots(
       prevDate.getFullYear(),
       prevDate.getMonth() + 1,

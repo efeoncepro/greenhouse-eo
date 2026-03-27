@@ -11,6 +11,8 @@ import {
 } from '@/lib/postgres/client'
 import {
   FinanceValidationError,
+  DIRECT_OVERHEAD_KINDS,
+  DIRECT_OVERHEAD_SCOPES,
   normalizeString,
   normalizeBoolean,
   roundCurrency,
@@ -115,6 +117,9 @@ type PostgresExpenseRow = {
   cost_category: string | null
   cost_is_direct: boolean | null
   allocated_client_id: string | null
+  direct_overhead_scope: string | null
+  direct_overhead_kind: string | null
+  direct_overhead_member_id: string | null
   notes: string | null
   created_by_user_id: string | null
   created_at: string | Date | null
@@ -245,6 +250,9 @@ export type FinanceExpenseRecord = {
   costCategory: CostCategory | null
   costIsDirect: boolean
   allocatedClientId: string | null
+  directOverheadScope: string | null
+  directOverheadKind: string | null
+  directOverheadMemberId: string | null
   notes: string | null
   createdBy: string | null
   createdAt: string | null
@@ -421,6 +429,9 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   costCategory: str(row.cost_category) as CostCategory | null,
   costIsDirect: normalizeBoolean(row.cost_is_direct),
   allocatedClientId: str(row.allocated_client_id),
+  directOverheadScope: str(row.direct_overhead_scope),
+  directOverheadKind: str(row.direct_overhead_kind),
+  directOverheadMemberId: str(row.direct_overhead_member_id),
   notes: str(row.notes),
   createdBy: str(row.created_by_user_id),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
@@ -957,6 +968,12 @@ export const updateFinanceExpenseInPostgres = async (
     serviceLine: 'service_line',
     isRecurring: 'is_recurring',
     recurrenceFrequency: 'recurrence_frequency',
+    costCategory: 'cost_category',
+    costIsDirect: 'cost_is_direct',
+    allocatedClientId: 'allocated_client_id',
+    directOverheadScope: 'direct_overhead_scope',
+    directOverheadKind: 'direct_overhead_kind',
+    directOverheadMemberId: 'direct_overhead_member_id',
     notes: 'notes'
   }
 
@@ -1297,6 +1314,9 @@ export const createFinanceExpenseInPostgres = async ({
   costCategory,
   costIsDirect,
   allocatedClientId,
+  directOverheadScope,
+  directOverheadKind,
+  directOverheadMemberId,
   notes,
   actorUserId
 }: {
@@ -1339,6 +1359,9 @@ export const createFinanceExpenseInPostgres = async ({
   costCategory: string | null
   costIsDirect: boolean
   allocatedClientId: string | null
+  directOverheadScope: string | null
+  directOverheadKind: string | null
+  directOverheadMemberId: string | null
   notes: string | null
   actorUserId: string | null
 }) => {
@@ -1360,6 +1383,7 @@ export const createFinanceExpenseInPostgres = async ({
           miscellaneous_category, service_line, is_recurring, recurrence_frequency,
           is_reconciled,
           cost_category, cost_is_direct, allocated_client_id,
+          direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
           notes, created_by_user_id,
           created_at, updated_at
         )
@@ -1376,7 +1400,8 @@ export const createFinanceExpenseInPostgres = async ({
           $33, $34, $35, $36,
           FALSE,
           $37, $38, $39,
-          $40, $41,
+          $40, $41, $42,
+          $43, $44,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1393,6 +1418,7 @@ export const createFinanceExpenseInPostgres = async ({
         taxType, taxPeriod, taxFormNumber,
         miscellaneousCategory, serviceLine, isRecurring, recurrenceFrequency,
         costCategory, costIsDirect, allocatedClientId,
+        directOverheadScope, directOverheadKind, directOverheadMemberId,
         notes, actorUserId
       ],
       client

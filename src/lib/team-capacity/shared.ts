@@ -1,6 +1,14 @@
 import type { TeamCapacityHealth, TeamRoleCategory } from '@/types/team'
+import {
+  buildCapacityEnvelope,
+  clampFte,
+  clampPercent,
+  DEFAULT_MONTHLY_BASE_HOURS,
+  fteToHours,
+  roundToTenths
+} from '@/lib/team-capacity/units'
 
-export const CAPACITY_HOURS_PER_FTE = 160
+export const CAPACITY_HOURS_PER_FTE = DEFAULT_MONTHLY_BASE_HOURS
 
 const throughputBenchmarks: Record<TeamRoleCategory, number> = {
   account: 30,
@@ -12,11 +20,9 @@ const throughputBenchmarks: Record<TeamRoleCategory, number> = {
   unknown: 18
 }
 
-export const roundToTenths = (value: number) => Math.round(value * 10) / 10
+export { roundToTenths, clampPercent, clampFte }
 
-export const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)))
-
-export const getAssignedHoursMonth = (fteAllocation: number) => Math.round(Math.max(0, fteAllocation) * CAPACITY_HOURS_PER_FTE)
+export const getAssignedHoursMonth = (fteAllocation: number) => fteToHours(Math.max(0, fteAllocation))
 
 export const getExpectedMonthlyThroughput = ({
   roleCategory,
@@ -69,31 +75,41 @@ export const getCapacityHealth = (utilizationPercent: number): TeamCapacityHealt
 export interface CapacityBreakdown {
   contractedHoursMonth: number
   assignedHoursMonth: number
-  usedHoursMonth: number
+  usedHoursMonth: number | null
   availableHoursMonth: number
+  commercialAvailabilityHours?: number
+  operationalAvailabilityHours?: number | null
   overcommitted: boolean
 }
 
 export const computeCapacityBreakdown = ({
   fteAllocation,
   contractedHoursMonth,
-  utilizationPercent
+  utilizationPercent,
+  hasUsageData = true
 }: {
   fteAllocation: number
   contractedHoursMonth: number | null
   utilizationPercent: number
+  hasUsageData?: boolean
 }): CapacityBreakdown => {
   const assigned = getAssignedHoursMonth(fteAllocation)
   const contracted = contractedHoursMonth ?? assigned
-  const used = Math.round(assigned * (utilizationPercent / 100))
-  const available = contracted - used
+  const used = hasUsageData ? Math.round(assigned * (utilizationPercent / 100)) : null
+  const envelope = buildCapacityEnvelope({
+    contractedFte: contracted / CAPACITY_HOURS_PER_FTE,
+    assignedHours: assigned,
+    usedHours: used
+  })
 
   return {
     contractedHoursMonth: contracted,
     assignedHoursMonth: assigned,
     usedHoursMonth: used,
-    availableHoursMonth: available,
-    overcommitted: available < 0
+    availableHoursMonth: envelope.commercialAvailabilityHours,
+    commercialAvailabilityHours: envelope.commercialAvailabilityHours,
+    operationalAvailabilityHours: envelope.operationalAvailabilityHours,
+    overcommitted: envelope.overassignedCommercially
   }
 }
 
@@ -103,14 +119,17 @@ export const computeCapacityBreakdown = ({
 export const aggregateCapacityBreakdown = (breakdowns: CapacityBreakdown[]): CapacityBreakdown => {
   const contracted = breakdowns.reduce((s, b) => s + b.contractedHoursMonth, 0)
   const assigned = breakdowns.reduce((s, b) => s + b.assignedHoursMonth, 0)
-  const used = breakdowns.reduce((s, b) => s + b.usedHoursMonth, 0)
-  const available = contracted - used
+  const usedValues = breakdowns.map(b => b.usedHoursMonth).filter((value): value is number => value !== null)
+  const used = usedValues.length > 0 ? usedValues.reduce((s, value) => s + value, 0) : null
+  const available = contracted - assigned
 
   return {
     contractedHoursMonth: contracted,
     assignedHoursMonth: assigned,
     usedHoursMonth: used,
     availableHoursMonth: available,
+    commercialAvailabilityHours: available,
+    operationalAvailabilityHours: used !== null ? contracted - used : null,
     overcommitted: available < 0
   }
 }

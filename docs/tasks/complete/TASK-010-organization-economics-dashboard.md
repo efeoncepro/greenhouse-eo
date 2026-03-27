@@ -1,3 +1,6 @@
+## Delta 2026-03-26
+- `organization-economics.ts` y `organization-store.ts` quedaron corregidos por trabajo en `TASK-055`: Organization ya no pondera márgenes incompletos como `0` y dejó de doble-contar costo laboral encima de `client_economics.direct_costs_clp`.
+
 ## Delta 2026-03-24
 - DTE coverage metrics per organization now available via `getDteCoverage()` / `getDteCoverageSummary()` in `src/lib/finance/dte-coverage.ts` and API `GET /api/organizations/[id]/dte-coverage` — closed by TASK-013. Can be integrated as a "tax health" card in the economics dashboard.
 

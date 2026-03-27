@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { fteToHours, hoursToFte } from '@/lib/team-capacity/units'
 
 interface Assignment {
   assignmentId: string
@@ -34,6 +35,29 @@ interface Assignment {
 
 interface AssignmentsData {
   assignments: Assignment[]
+  capacity?: {
+    periodYear: number
+    periodMonth: number
+    contractedFte: number
+    contractedHours: number
+    assignedHours: number
+    usageKind: string
+    usedHours: number | null
+    usagePercent: number | null
+    commercialAvailabilityHours: number
+    operationalAvailabilityHours: number | null
+    targetCurrency: string | null
+    costPerHourTarget: number | null
+    suggestedBillRateTarget: number | null
+  } | null
+}
+
+const formatHours = (value: number | null | undefined) => (value == null ? '—' : `${value}h`)
+const formatUsage = (usageKind: string | undefined, usedHours: number | null | undefined, usagePercent: number | null | undefined) => {
+  if (usageKind === 'hours') return formatHours(usedHours ?? null)
+  if (usageKind === 'percent' && usagePercent != null) return `${usagePercent}%`
+
+  return '—'
 }
 
 const MyAssignmentsView = () => {
@@ -57,8 +81,12 @@ const MyAssignmentsView = () => {
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
   const assignments = data?.assignments ?? []
-  const totalFte = assignments.reduce((s, a) => s + (a.fteAllocation || 0), 0)
-  const totalHours = Math.round(totalFte * 160)
+  const activeAssignments = assignments.filter(assignment => assignment.active)
+  const capacity = data?.capacity ?? null
+  const totalFte = capacity ? hoursToFte(capacity.assignedHours) : activeAssignments.reduce((sum, assignment) => sum + (assignment.fteAllocation || 0), 0)
+  const totalHours = capacity?.assignedHours ?? fteToHours(totalFte)
+  const contractedHours = capacity?.contractedHours ?? fteToHours(Math.min(1, totalFte))
+  const commercialAvailability = capacity?.commercialAvailabilityHours ?? Math.max(0, contractedHours - totalHours)
 
   return (
     <Grid container spacing={6}>
@@ -72,14 +100,17 @@ const MyAssignmentsView = () => {
         </Card>
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 4 }}>
-        <HorizontalWithSubtitle title='FTE total' stats={totalFte.toFixed(1)} avatarIcon='tabler-clock' avatarColor='primary' subtitle={`${assignments.length} asignaciones`} />
+      <Grid size={{ xs: 12, sm: 3 }}>
+        <HorizontalWithSubtitle title='FTE asignado' stats={totalFte.toFixed(1)} avatarIcon='tabler-clock' avatarColor='primary' subtitle={`${activeAssignments.length} asignaciones activas`} />
       </Grid>
-      <Grid size={{ xs: 12, sm: 4 }}>
+      <Grid size={{ xs: 12, sm: 3 }}>
         <HorizontalWithSubtitle title='Horas asignadas' stats={`${totalHours}h`} avatarIcon='tabler-hourglass' avatarColor='info' subtitle='Por mes' />
       </Grid>
-      <Grid size={{ xs: 12, sm: 4 }}>
-        <HorizontalWithSubtitle title='Disponible' stats={`${Math.max(0, 160 - totalHours)}h`} avatarIcon='tabler-calendar-stats' avatarColor={totalHours >= 160 ? 'warning' : 'success'} subtitle='Capacidad restante' />
+      <Grid size={{ xs: 12, sm: 3 }}>
+        <HorizontalWithSubtitle title='Disponible comercial' stats={`${commercialAvailability}h`} avatarIcon='tabler-calendar-stats' avatarColor={commercialAvailability <= 0 ? 'warning' : 'success'} subtitle='Capacidad restante' />
+      </Grid>
+      <Grid size={{ xs: 12, sm: 3 }}>
+        <HorizontalWithSubtitle title='Uso operativo' stats={formatUsage(capacity?.usageKind, capacity?.usedHours, capacity?.usagePercent)} avatarIcon='tabler-bolt' avatarColor='warning' subtitle={capacity?.usageKind === 'hours' ? 'Horas efectivas' : capacity?.usageKind === 'percent' ? 'Índice operativo' : 'Sin métricas operativas'} />
       </Grid>
 
       <Grid size={{ xs: 12 }}>
@@ -112,7 +143,7 @@ const MyAssignmentsView = () => {
                           <Typography variant='body2'>{Math.round((a.fteAllocation || 0) * 100)}%</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align='right'>{a.hoursPerMonth || Math.round((a.fteAllocation || 0) * 160)}</TableCell>
+                      <TableCell align='right'>{a.hoursPerMonth || fteToHours(a.fteAllocation || 0)}</TableCell>
                       <TableCell><Typography variant='caption'>{a.startDate || '—'}</Typography></TableCell>
                       <TableCell align='center'>
                         <CustomChip round='true' size='small' variant='tonal' color={a.active ? 'success' : 'secondary'} label={a.active ? 'Activo' : 'Inactivo'} />

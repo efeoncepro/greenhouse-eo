@@ -215,7 +215,7 @@ const normalizeHistoryEntry = (r: HistoryRow): ServiceHistoryEntry => ({
 
 const LIST_COLUMNS = `
   s.service_id, s.public_id, s.name,
-  s.space_id, sp.display_name AS space_name,
+  s.space_id, sp.space_name AS space_name,
   s.organization_id, o.organization_name,
   s.pipeline_stage, s.linea_de_servicio, s.servicio_especifico,
   s.modalidad, s.billing_frequency, s.country,
@@ -554,6 +554,20 @@ export const getServicesByOrganization = async (organizationId: string): Promise
     WHERE s.organization_id = $1 AND s.active = TRUE
     ORDER BY s.linea_de_servicio, s.servicio_especifico
   `, [organizationId])
+
+  return rows.map(normalizeListItem)
+}
+
+export const getServicesExpiringBefore = async (days: number): Promise<ServiceListItem[]> => {
+  const rows = await runGreenhousePostgresQuery<ServiceListRow>(`
+    SELECT ${LIST_COLUMNS}
+    ${LIST_JOINS}
+    WHERE s.active = TRUE
+      AND s.target_end_date IS NOT NULL
+      AND s.target_end_date >= CURRENT_DATE
+      AND s.target_end_date <= CURRENT_DATE + ($1 || ' days')::interval
+    ORDER BY s.target_end_date ASC
+  `, [days])
 
   return rows.map(normalizeListItem)
 }

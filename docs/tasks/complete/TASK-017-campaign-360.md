@@ -1,5 +1,13 @@
 # CODEX TASK -- Campaign 360 v2: Objeto Canonico de Campana para Greenhouse
 
+## Delta 2026-03-25
+
+- Se agregó `pnpm setup:postgres:campaigns` como bootstrap explícito del dominio canónico `Campaign 360`.
+- El runtime de campañas dejó de hacer `DDL` request-time; ahora valida que `greenhouse_core.campaigns`, `greenhouse_core.campaign_project_links` y `greenhouse_core.campaigns_eo_id_seq` existan antes de operar.
+- Se verificó el bootstrap en Cloud SQL dev: el schema quedó provisionado y visible para `runtime`, pero todavía con `0` campañas y `0` links. Un vacío en `/agency/campaigns` ya no debe interpretarse como ausencia de schema sino como ausencia de datos canonizados.
+- Se agregó `pnpm backfill:postgres:campaigns` para poblar campañas desde `greenhouse_delivery.projects` usando clustering conservador por prefijo dentro del mismo `space_id` canónico.
+- El backfill quedó aplicado en dev con `7` campañas y `24` `campaign_project_links`, incluyendo un seed manual de `Sky Airlines Kick-Off` para validar también el caso singleton curado.
+
 ## Estado
 
 Baseline canonica de implementacion al 2026-03-18.

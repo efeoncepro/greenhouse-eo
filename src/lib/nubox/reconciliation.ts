@@ -86,11 +86,13 @@ type ProposalRow = {
 
 const toNumber = (v: unknown): number => {
   if (typeof v === 'number') return v
+
   if (typeof v === 'string') {
     const n = Number(v)
 
     return Number.isFinite(n) ? n : 0
   }
+
   if (v && typeof v === 'object' && 'valueOf' in v) {
     const prim = (v as { valueOf: () => unknown }).valueOf()
 
@@ -500,6 +502,7 @@ export async function runDteReconciliation(opts?: {
     ])
 
     const allDtes = [...saleDtes, ...purchaseDtes]
+
     result.dtesScanned = allDtes.length
 
     if (allDtes.length === 0) {

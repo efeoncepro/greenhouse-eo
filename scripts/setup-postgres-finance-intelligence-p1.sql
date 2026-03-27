@@ -9,7 +9,10 @@
 ALTER TABLE greenhouse_finance.expenses
   ADD COLUMN IF NOT EXISTS cost_category TEXT DEFAULT 'operational',
   ADD COLUMN IF NOT EXISTS cost_is_direct BOOLEAN DEFAULT FALSE,
-  ADD COLUMN IF NOT EXISTS allocated_client_id TEXT;
+  ADD COLUMN IF NOT EXISTS allocated_client_id TEXT,
+  ADD COLUMN IF NOT EXISTS direct_overhead_scope TEXT DEFAULT 'none',
+  ADD COLUMN IF NOT EXISTS direct_overhead_kind TEXT,
+  ADD COLUMN IF NOT EXISTS direct_overhead_member_id TEXT REFERENCES greenhouse_core.members(member_id);
 
 COMMENT ON COLUMN greenhouse_finance.expenses.cost_category
   IS 'direct_labor | indirect_labor | operational | infrastructure | tax_social';
@@ -17,6 +20,12 @@ COMMENT ON COLUMN greenhouse_finance.expenses.cost_is_direct
   IS 'Whether expense is directly attributable to client delivery';
 COMMENT ON COLUMN greenhouse_finance.expenses.allocated_client_id
   IS 'FK to greenhouse_core.client_profiles when expense is directly allocated';
+COMMENT ON COLUMN greenhouse_finance.expenses.direct_overhead_scope
+  IS 'none | member_direct | shared. Explicit scope for non-labor overhead attribution.';
+COMMENT ON COLUMN greenhouse_finance.expenses.direct_overhead_kind
+  IS 'tool_license | tool_usage | equipment | reimbursement | other';
+COMMENT ON COLUMN greenhouse_finance.expenses.direct_overhead_member_id
+  IS 'Member target for explicit member_direct overhead attribution; never infer from member_id alone.';
 
 -- ─── 1b. Income: partnership columns ───────────────────────────────────────
 

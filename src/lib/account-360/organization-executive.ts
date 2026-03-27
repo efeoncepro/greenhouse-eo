@@ -2,6 +2,10 @@ import 'server-only'
 
 import { getOrganizationEconomics, getOrganizationEconomicsTrend } from './organization-economics'
 import { getOrganizationProjects } from './organization-projects'
+import { getOrganizationOperationalServing } from './get-organization-operational-serving'
+import type { OrganizationOperationalServing } from './get-organization-operational-serving'
+import { getDteCoverageSummary } from '@/lib/finance/dte-coverage'
+import type { DteCoverageSummary } from '@/lib/finance/dte-coverage'
 
 /**
  * Organization Executive Snapshot — Consolidated serving read model.
@@ -38,6 +42,12 @@ export interface OrganizationExecutiveSnapshot {
     overallHealth: 'green' | 'yellow' | 'red'
   } | null
 
+  // Operational metrics (ICO derived)
+  operations: OrganizationOperationalServing['current'] | null
+
+  // Tax health summary (DTE coverage)
+  taxHealth: DteCoverageSummary | null
+
   // Economics trend (last N months)
   trend: Array<{
     periodYear: number
@@ -61,11 +71,13 @@ export const getOrganizationExecutiveSnapshot = async (
   const month = options?.month ?? (now.getMonth() + 1)
   const trendMonths = options?.trendMonths ?? 6
 
-  // Parallel fetch: economics + projects + trend
-  const [economicsResult, projectsResult, trendResult] = await Promise.allSettled([
+  // Parallel fetch: economics + projects + trend + operations + tax
+  const [economicsResult, projectsResult, trendResult, operationsResult, taxResult] = await Promise.allSettled([
     getOrganizationEconomics(organizationId, year, month),
     getOrganizationProjects(organizationId),
-    getOrganizationEconomicsTrend(organizationId, trendMonths)
+    getOrganizationEconomicsTrend(organizationId, trendMonths),
+    getOrganizationOperationalServing(organizationId),
+    getDteCoverageSummary(organizationId, year, month)
   ])
 
   // Economics
@@ -100,6 +112,20 @@ export const getOrganizationExecutiveSnapshot = async (
     }
   }
 
+  // Operations
+  let operations: OrganizationExecutiveSnapshot['operations'] = null
+
+  if (operationsResult.status === 'fulfilled' && operationsResult.value?.hasData) {
+    operations = operationsResult.value.current
+  }
+
+  // Tax health
+  let taxHealth: OrganizationExecutiveSnapshot['taxHealth'] = null
+
+  if (taxResult.status === 'fulfilled' && taxResult.value) {
+    taxHealth = taxResult.value
+  }
+
   // Trend
   let trend: OrganizationExecutiveSnapshot['trend'] = null
 
@@ -120,6 +146,8 @@ export const getOrganizationExecutiveSnapshot = async (
     periodMonth: month,
     economics,
     delivery,
+    operations,
+    taxHealth,
     trend,
     computedAt: new Date().toISOString()
   }
