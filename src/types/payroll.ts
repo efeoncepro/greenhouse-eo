@@ -43,6 +43,8 @@ export interface CompensationVersion {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  fixedBonusLabel: string | null
+  fixedBonusAmount: number
   bonusOtdMin: number
   bonusOtdMax: number
   bonusRpaMin: number
@@ -69,6 +71,8 @@ export interface CreateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  fixedBonusLabel?: string | null
+  fixedBonusAmount?: number
   bonusOtdMin?: number
   bonusOtdMax?: number
   bonusRpaMin?: number
@@ -90,6 +94,8 @@ export interface UpdateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  fixedBonusLabel?: string | null
+  fixedBonusAmount?: number
   bonusOtdMin?: number
   bonusOtdMax?: number
   bonusRpaMin?: number
@@ -150,6 +156,8 @@ export interface PayrollEntry {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  fixedBonusLabel: string | null
+  fixedBonusAmount: number
   kpiOtdPercent: number | null
   kpiRpaAvg: number | null
   kpiOtdQualifies: boolean
@@ -191,6 +199,7 @@ export interface PayrollEntry {
   daysOnUnpaidLeave: number | null
   adjustedBaseSalary: number | null
   adjustedRemoteAllowance: number | null
+  adjustedFixedBonusAmount: number | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -283,6 +292,7 @@ export interface PayrollEntryExplain {
     attendanceRatio: number | null
     effectiveBaseSalary: number
     effectiveRemoteAllowance: number
+    effectiveFixedBonusAmount: number
     totalVariableBonus: number
     hasAttendanceAdjustment: boolean
     usesManualKpi: boolean

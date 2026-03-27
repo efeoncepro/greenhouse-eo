@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -20,6 +20,8 @@ const existingVersion: CompensationVersion = {
   currency: 'USD',
   baseSalary: 2000,
   remoteAllowance: 50,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 150,
   bonusOtdMin: 0,
   bonusOtdMax: 500,
   bonusRpaMin: 0,
@@ -83,5 +85,44 @@ describe('CompensationDrawer', () => {
     expect(
       screen.getByText('Si cambias la fecha, se creará una nueva versión desde esa vigencia.')
     ).toBeInTheDocument()
+  })
+
+  it('sends recurring fixed bonus fields in the save payload', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined)
+
+    renderWithTheme(
+      <CompensationDrawer
+        open
+        onClose={vi.fn()}
+        existingVersion={existingVersion}
+        memberId={existingVersion.memberId}
+        memberName={existingVersion.memberName}
+        onSave={onSave}
+      />
+    )
+
+    fireEvent.change(screen.getByLabelText('Nombre bono fijo'), {
+      target: { value: 'Bono guardia' }
+    })
+    fireEvent.change(screen.getByLabelText('Monto bono fijo'), {
+      target: { value: '220' }
+    })
+    fireEvent.change(screen.getByLabelText('Motivo del cambio *'), {
+      target: { value: 'Ajuste marzo' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalled()
+    })
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          fixedBonusLabel: 'Bono guardia',
+          fixedBonusAmount: 220
+        })
+      })
+    )
   })
 })

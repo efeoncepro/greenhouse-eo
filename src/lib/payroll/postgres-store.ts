@@ -59,6 +59,8 @@ type PgCompensationRow = {
   currency: string
   base_salary: number | string
   remote_allowance: number | string
+  fixed_bonus_label: string | null
+  fixed_bonus_amount: number | string
   bonus_otd_min: number | string
   bonus_otd_max: number | string
   bonus_rpa_min: number | string
@@ -131,6 +133,8 @@ type PgEntryRow = {
   currency: string
   base_salary: number | string
   remote_allowance: number | string
+  fixed_bonus_label: string | null
+  fixed_bonus_amount: number | string
   member_display_name: string | null
   kpi_otd_percent: number | string | null
   kpi_rpa_avg: number | string | null
@@ -173,6 +177,7 @@ type PgEntryRow = {
   days_on_unpaid_leave: number | string | null
   adjusted_base_salary: number | string | null
   adjusted_remote_allowance: number | string | null
+  adjusted_fixed_bonus_amount: number | string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -365,6 +370,8 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     currency: row.currency === 'USD' ? 'USD' : 'CLP',
     baseSalary: toNumber(row.base_salary),
     remoteAllowance: toNumber(row.remote_allowance),
+    fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
+    fixedBonusAmount: toNumber(row.fixed_bonus_amount),
     bonusOtdMin: toNumber(row.bonus_otd_min),
     bonusOtdMax: toNumber(row.bonus_otd_max),
     bonusRpaMin: toNumber(row.bonus_rpa_min),
@@ -414,6 +421,8 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   currency: row.currency === 'USD' ? 'USD' : 'CLP',
   baseSalary: toNumber(row.base_salary),
   remoteAllowance: toNumber(row.remote_allowance),
+  fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
+  fixedBonusAmount: toNumber(row.fixed_bonus_amount),
   kpiOtdPercent: toNullableNumber(row.kpi_otd_percent),
   kpiRpaAvg: toNullableNumber(row.kpi_rpa_avg),
   kpiOtdQualifies: normalizeBoolean(row.kpi_otd_qualifies),
@@ -455,6 +464,7 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   daysOnUnpaidLeave: toNullableNumber(row.days_on_unpaid_leave),
   adjustedBaseSalary: toNullableNumber(row.adjusted_base_salary),
   adjustedRemoteAllowance: toNullableNumber(row.adjusted_remote_allowance),
+  adjustedFixedBonusAmount: toNullableNumber(row.adjusted_fixed_bonus_amount),
   createdAt: toPgTimestampString(row.created_at),
   updatedAt: toPgTimestampString(row.updated_at)
 })
@@ -500,6 +510,8 @@ const COMPENSATION_BASE_SELECT = `
     cv.currency,
     cv.base_salary,
     cv.remote_allowance,
+    cv.fixed_bonus_label,
+    cv.fixed_bonus_amount,
     cv.bonus_otd_min,
     cv.bonus_otd_max,
     cv.bonus_rpa_min,
@@ -584,6 +596,8 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         cv.currency,
         cv.base_salary,
         cv.remote_allowance,
+        cv.fixed_bonus_label,
+        cv.fixed_bonus_amount,
         cv.bonus_otd_min,
         cv.bonus_otd_max,
         cv.bonus_rpa_min,
@@ -642,6 +656,7 @@ export const pgCreateCompensationVersion = async ({
 
   parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
   parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
+  parsePayrollNumber(input.fixedBonusAmount ?? 0, 'fixedBonusAmount', { min: 0 })
   parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
   parsePayrollNumber(input.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 })
   parsePayrollNumber(input.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 })
@@ -773,7 +788,7 @@ export const pgCreateCompensationVersion = async ({
       `
         INSERT INTO greenhouse_payroll.compensation_versions (
           version_id, member_id, version, pay_regime, currency,
-          base_salary, remote_allowance,
+          base_salary, remote_allowance, fixed_bonus_label, fixed_bonus_amount,
           bonus_otd_min, bonus_otd_max, bonus_rpa_min, bonus_rpa_max,
           afp_name, afp_rate, health_system, health_plan_uf,
           unemployment_rate, contract_type, has_apv, apv_amount,
@@ -782,17 +797,18 @@ export const pgCreateCompensationVersion = async ({
         )
         VALUES (
           $1, $2, $3, $4, $5,
-          $6, $7,
-          $8, $9, $10, $11,
-          $12, $13, $14, $15,
-          $16, $17, $18, $19,
-          $20::date, $21, $22,
-          $23, $24
+          $6, $7, $8, $9,
+          $10, $11, $12, $13,
+          $14, $15, $16, $17,
+          $18, $19, $20, $21,
+          $22::date, $23, $24,
+          $25, $26
         )
       `,
       [
         versionId, input.memberId, nextVersion, input.payRegime, input.currency,
         Number(input.baseSalary), Number(input.remoteAllowance ?? 0),
+        normalizeNullableString(input.fixedBonusLabel), Number(input.fixedBonusAmount ?? 0),
         Number(input.bonusOtdMin ?? 0), Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0), Number(input.bonusRpaMax ?? 0),
         normalizeNullableString(input.afpName), input.afpRate ?? null,
@@ -847,6 +863,7 @@ export const pgUpdateCompensationVersion = async ({
 
   parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
   parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
+  parsePayrollNumber(input.fixedBonusAmount ?? 0, 'fixedBonusAmount', { min: 0 })
   parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
   parsePayrollNumber(input.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 })
   parsePayrollNumber(input.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 })
@@ -934,26 +951,30 @@ export const pgUpdateCompensationVersion = async ({
           currency = $2,
           base_salary = $3,
           remote_allowance = $4,
-          bonus_otd_min = $5,
-          bonus_otd_max = $6,
-          bonus_rpa_min = $7,
-          bonus_rpa_max = $8,
-          afp_name = $9,
-          afp_rate = $10,
-          health_system = $11,
-          health_plan_uf = $12,
-          unemployment_rate = $13,
-          contract_type = $14,
-          has_apv = $15,
-          apv_amount = $16,
-          change_reason = $17
-        WHERE version_id = $18
+          fixed_bonus_label = $5,
+          fixed_bonus_amount = $6,
+          bonus_otd_min = $7,
+          bonus_otd_max = $8,
+          bonus_rpa_min = $9,
+          bonus_rpa_max = $10,
+          afp_name = $11,
+          afp_rate = $12,
+          health_system = $13,
+          health_plan_uf = $14,
+          unemployment_rate = $15,
+          contract_type = $16,
+          has_apv = $17,
+          apv_amount = $18,
+          change_reason = $19
+        WHERE version_id = $20
       `,
       [
         input.payRegime,
         input.currency,
         Number(input.baseSalary),
         Number(input.remoteAllowance ?? 0),
+        normalizeNullableString(input.fixedBonusLabel),
+        Number(input.fixedBonusAmount ?? 0),
         Number(input.bonusOtdMin ?? 0),
         Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0),
@@ -1394,6 +1415,8 @@ const ENTRY_BASE_SELECT = `
     e.currency,
     e.base_salary,
     e.remote_allowance,
+    e.fixed_bonus_label,
+    e.fixed_bonus_amount,
     e.member_display_name,
     e.kpi_otd_percent,
     e.kpi_rpa_avg,
@@ -1436,6 +1459,7 @@ const ENTRY_BASE_SELECT = `
     e.days_on_unpaid_leave,
     e.adjusted_base_salary,
     e.adjusted_remote_allowance,
+    e.adjusted_fixed_bonus_amount,
     e.created_at,
     e.updated_at
   FROM greenhouse_payroll.payroll_entries AS e
@@ -1505,7 +1529,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       `
         INSERT INTO greenhouse_payroll.payroll_entries (
           entry_id, period_id, member_id, compensation_version_id,
-          pay_regime, currency, base_salary, remote_allowance,
+          pay_regime, currency, base_salary, remote_allowance, fixed_bonus_label, fixed_bonus_amount,
           member_display_name,
           kpi_otd_percent, kpi_rpa_avg, kpi_otd_qualifies, kpi_rpa_qualifies,
           kpi_tasks_completed, kpi_data_source,
@@ -1521,27 +1545,27 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           bonus_otd_proration_factor, bonus_rpa_proration_factor,
           working_days_in_period, days_present, days_absent,
           days_on_leave, days_on_unpaid_leave,
-          adjusted_base_salary, adjusted_remote_allowance
+          adjusted_base_salary, adjusted_remote_allowance, adjusted_fixed_bonus_amount
         )
         VALUES (
           $1, $2, $3, $4,
-          $5, $6, $7, $8,
-          $9,
-          $10, $11, $12, $13,
-          $14, $15,
-          $16, $17, $18, $19,
-          $20,
-          $21, $22, $23,
-          $24, $25,
+          $5, $6, $7, $8, $9, $10,
+          $11,
+          $12, $13, $14, $15,
+          $16, $17,
+          $18, $19, $20, $21,
+          $22,
+          $23, $24, $25,
           $26, $27,
-          $28, $29, $30, $31,
-          $32,
-          $33, $34, $35,
-          $36, $37,
+          $28, $29,
+          $30, $31, $32, $33,
+          $34,
+          $35, $36, $37,
           $38, $39,
-          $40, $41, $42,
-          $43, $44,
-          $45, $46
+          $40, $41,
+          $42, $43, $44,
+          $45, $46,
+          $47, $48
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1551,6 +1575,8 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           currency = EXCLUDED.currency,
           base_salary = EXCLUDED.base_salary,
           remote_allowance = EXCLUDED.remote_allowance,
+          fixed_bonus_label = EXCLUDED.fixed_bonus_label,
+          fixed_bonus_amount = EXCLUDED.fixed_bonus_amount,
           member_display_name = EXCLUDED.member_display_name,
           kpi_otd_percent = EXCLUDED.kpi_otd_percent,
           kpi_rpa_avg = EXCLUDED.kpi_rpa_avg,
@@ -1589,11 +1615,12 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           days_on_unpaid_leave = EXCLUDED.days_on_unpaid_leave,
           adjusted_base_salary = EXCLUDED.adjusted_base_salary,
           adjusted_remote_allowance = EXCLUDED.adjusted_remote_allowance,
+          adjusted_fixed_bonus_amount = EXCLUDED.adjusted_fixed_bonus_amount,
           updated_at = CURRENT_TIMESTAMP
       `,
       [
         entry.entryId, entry.periodId, entry.memberId, entry.compensationVersionId,
-        entry.payRegime, entry.currency, entry.baseSalary, entry.remoteAllowance,
+        entry.payRegime, entry.currency, entry.baseSalary, entry.remoteAllowance, entry.fixedBonusLabel, entry.fixedBonusAmount,
         memberRow?.display_name ?? entry.memberName,
         entry.kpiOtdPercent, entry.kpiRpaAvg, entry.kpiOtdQualifies, entry.kpiRpaQualifies,
         entry.kpiTasksCompleted, entry.kpiDataSource,
@@ -1609,7 +1636,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.bonusOtdProrationFactor, entry.bonusRpaProrationFactor,
         entry.workingDaysInPeriod, entry.daysPresent, entry.daysAbsent,
         entry.daysOnLeave, entry.daysOnUnpaidLeave,
-        entry.adjustedBaseSalary, entry.adjustedRemoteAllowance
+        entry.adjustedBaseSalary, entry.adjustedRemoteAllowance, entry.adjustedFixedBonusAmount
       ]
     )
 

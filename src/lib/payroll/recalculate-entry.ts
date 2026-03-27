@@ -239,11 +239,13 @@ export const recalculatePayrollEntry = async ({
   // Use adjusted base/remote from the entry if attendance was already computed
   const effectiveBaseSalary = entry.adjustedBaseSalary ?? compensation.baseSalary
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount
 
   const provisionalTotals = calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
+    fixedBonusAmount: effectiveFixedBonusAmount,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
     bonusOtherAmount: nextBonusOtherAmount,
@@ -273,6 +275,7 @@ export const recalculatePayrollEntry = async ({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
+    fixedBonusAmount: effectiveFixedBonusAmount,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
     bonusOtherAmount: nextBonusOtherAmount,

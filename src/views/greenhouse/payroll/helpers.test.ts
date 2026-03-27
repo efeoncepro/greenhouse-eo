@@ -15,6 +15,8 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   currency: 'USD',
   baseSalary: 1000,
   remoteAllowance: 100,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 50,
   kpiOtdPercent: null,
   kpiRpaAvg: null,
   kpiOtdQualifies: false,
@@ -56,6 +58,7 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   daysOnUnpaidLeave: 0,
   adjustedBaseSalary: 1000,
   adjustedRemoteAllowance: 100,
+  adjustedFixedBonusAmount: 50,
   createdAt: '2026-03-01T00:00:00.000Z',
   updatedAt: null,
   ...overrides

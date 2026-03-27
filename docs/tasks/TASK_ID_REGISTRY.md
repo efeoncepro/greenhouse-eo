@@ -78,10 +78,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
 | `TASK-060` | `to-do` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/to-do/TASK-060-team-assignment-admin.md` |
 | `TASK-061` | `in-progress` | Payroll Go-Live Readiness Audit | `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md` |
+| `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-062`
+- `TASK-063`
 
 ## Regla de asignacion desde aqui
 

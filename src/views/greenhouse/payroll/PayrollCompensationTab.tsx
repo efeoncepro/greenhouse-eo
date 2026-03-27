@@ -139,6 +139,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                   <TableCell align='center'>Régimen</TableCell>
                   <TableCell align='right'>Salario base</TableCell>
                   <TableCell align='right'>Conectividad</TableCell>
+                  <TableCell align='right'>Bono fijo</TableCell>
                   <TableCell align='right'>Bono OTD</TableCell>
                   <TableCell align='right'>Bono RpA</TableCell>
                   <TableCell align='center'>Versión</TableCell>
@@ -185,6 +186,18 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                       </Typography>
                     </TableCell>
                     <TableCell align='right'>
+                      <Stack alignItems='flex-end' spacing={0.25}>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {formatCurrency(comp.fixedBonusAmount, comp.currency)}
+                        </Typography>
+                        {comp.fixedBonusLabel && (
+                          <Typography variant='caption' color='text.secondary'>
+                            {comp.fixedBonusLabel}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </TableCell>
+                    <TableCell align='right'>
                       <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
                         {formatCurrency(comp.bonusOtdMax, comp.currency)}
                       </Typography>
@@ -206,7 +219,7 @@ const PayrollCompensationTab = ({ compensations, eligibleMembers, members, onRef
                 ))}
                 {compensations.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
+                    <TableCell colSpan={9} align='center' sx={{ py: 6 }}>
                       <Stack alignItems='center' spacing={1}>
                         <i className='tabler-adjustments-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
                         <Typography color='text.secondary'>No hay compensaciones configuradas.</Typography>

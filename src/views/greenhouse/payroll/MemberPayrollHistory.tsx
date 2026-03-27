@@ -312,7 +312,13 @@ const MemberPayrollHistory = ({ memberId }: Props) => {
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                          {formatCurrency(entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount, entry.currency)}
+                          {formatCurrency(
+                            (entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount)
+                              + entry.bonusOtdAmount
+                              + entry.bonusRpaAmount
+                              + entry.bonusOtherAmount,
+                            entry.currency
+                          )}
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>

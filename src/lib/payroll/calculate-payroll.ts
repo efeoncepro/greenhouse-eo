@@ -141,10 +141,15 @@ const buildPayrollEntry = ({
     ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
     : compensation.remoteAllowance
 
+  const adjustedFixedBonusAmount = deductibleDays > 0
+    ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
+    : compensation.fixedBonusAmount
+
   const totals = calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: adjustedBaseSalary,
     remoteAllowance: adjustedRemoteAllowance,
+    fixedBonusAmount: adjustedFixedBonusAmount,
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
@@ -172,6 +177,8 @@ const buildPayrollEntry = ({
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
     remoteAllowance: compensation.remoteAllowance,
+    fixedBonusLabel: compensation.fixedBonusLabel,
+    fixedBonusAmount: compensation.fixedBonusAmount,
     kpiOtdPercent,
     kpiRpaAvg,
     kpiOtdQualifies: otdResult.qualifies,
@@ -213,6 +220,7 @@ const buildPayrollEntry = ({
     daysOnUnpaidLeave: attendance?.daysOnUnpaidLeave ?? null,
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
+    adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
     createdAt: null,
     updatedAt: null
   }
@@ -319,6 +327,7 @@ export const calculatePayroll = async ({
         payRegime: compensation.payRegime,
         baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
         remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
+        fixedBonusAmount: entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount,
         bonusOtdAmount: entry.bonusOtdAmount,
         bonusRpaAmount: entry.bonusRpaAmount,
         bonusOtherAmount: entry.bonusOtherAmount,

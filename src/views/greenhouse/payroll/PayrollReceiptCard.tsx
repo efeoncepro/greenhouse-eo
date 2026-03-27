@@ -36,6 +36,7 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
   const currency = entry.currency
   const isChile = entry.payRegime === 'chile'
   const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
 
   // Build haberes rows
   const haberesRows: [string, string][] = [
@@ -50,6 +51,22 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
 
   if (hasAttendanceAdjustment && entry.adjustedRemoteAllowance != null) {
     haberesRows.push(['Teletrabajo ajustado (por inasistencia)', formatCurrency(entry.adjustedRemoteAllowance, currency)])
+  }
+
+  if (entry.fixedBonusAmount > 0) {
+    haberesRows.push([
+      entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo',
+      formatCurrency(entry.fixedBonusAmount, currency)
+    ])
+  }
+
+  if (entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount) {
+    haberesRows.push([
+      entry.fixedBonusLabel
+        ? `Bono fijo ajustado (${entry.fixedBonusLabel})`
+        : 'Bono fijo ajustado (por inasistencia)',
+      formatCurrency(effectiveFixedBonusAmount, currency)
+    ])
   }
 
   haberesRows.push(

@@ -36,7 +36,10 @@ const LineItem = ({ label, amount, isDeduction = false, isBold = false }: LineIt
 )
 
 const ChileDeductionBreakdown = ({ entry }: Props) => {
-  const rentaImponible = entry.baseSalary + entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount
+  const rentaImponible =
+    entry.baseSalary + entry.fixedBonusAmount + entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount
+
+  const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? entry.remoteAllowance
 
   return (
     <Stack spacing={0.5} sx={{ px: 2, py: 1, bgcolor: 'action.hover', borderRadius: 1, minWidth: 320 }}>
@@ -67,7 +70,17 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
         <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
           <Typography variant='body2'>Asig. teletrabajo</Typography>
           <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
-            + {formatCurrency(entry.remoteAllowance, 'CLP')}
+            + {formatCurrency(effectiveRemoteAllowance, 'CLP')}
+          </Typography>
+        </Stack>
+      )}
+      {(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount) > 0 && (
+        <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
+          <Typography variant='body2'>
+            {entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo'}
+          </Typography>
+          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+            + {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, 'CLP')}
           </Typography>
         </Stack>
       )}

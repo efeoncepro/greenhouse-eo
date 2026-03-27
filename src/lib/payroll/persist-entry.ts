@@ -13,6 +13,7 @@ const PAYROLL_ENTRY_MUTATION_TYPES = {
   kpiOtdPercent: 'FLOAT64',
   kpiRpaAvg: 'FLOAT64',
   kpiTasksCompleted: 'INT64',
+  fixedBonusLabel: 'STRING',
   bonusOtherDescription: 'STRING',
   chileAfpName: 'STRING',
   chileAfpRate: 'FLOAT64',
@@ -28,6 +29,7 @@ const PAYROLL_ENTRY_MUTATION_TYPES = {
   chileTotalDeductions: 'FLOAT64',
   netTotalCalculated: 'FLOAT64',
   netTotalOverride: 'FLOAT64',
+  adjustedFixedBonusAmount: 'FLOAT64',
   manualOverrideNote: 'STRING'
 } as const
 
@@ -53,6 +55,8 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           @currency AS currency,
           @baseSalary AS base_salary,
           @remoteAllowance AS remote_allowance,
+          @fixedBonusLabel AS fixed_bonus_label,
+          @fixedBonusAmount AS fixed_bonus_amount,
           @kpiOtdPercent AS kpi_otd_percent,
           @kpiRpaAvg AS kpi_rpa_avg,
           @kpiOtdQualifies AS kpi_otd_qualifies,
@@ -79,6 +83,7 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           @netTotalCalculated AS net_total_calculated,
           @netTotalOverride AS net_total_override,
           @netTotal AS net_total,
+          @adjustedFixedBonusAmount AS adjusted_fixed_bonus_amount,
           @manualOverride AS manual_override,
           @manualOverrideNote AS manual_override_note
       ) AS source
@@ -92,6 +97,8 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           currency = source.currency,
           base_salary = source.base_salary,
           remote_allowance = source.remote_allowance,
+          fixed_bonus_label = source.fixed_bonus_label,
+          fixed_bonus_amount = source.fixed_bonus_amount,
           kpi_otd_percent = source.kpi_otd_percent,
           kpi_rpa_avg = source.kpi_rpa_avg,
           kpi_otd_qualifies = source.kpi_otd_qualifies,
@@ -118,6 +125,7 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           net_total_calculated = source.net_total_calculated,
           net_total_override = source.net_total_override,
           net_total = source.net_total,
+          adjusted_fixed_bonus_amount = source.adjusted_fixed_bonus_amount,
           manual_override = source.manual_override,
           manual_override_note = source.manual_override_note,
           updated_at = CURRENT_TIMESTAMP()
@@ -131,6 +139,8 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           currency,
           base_salary,
           remote_allowance,
+          fixed_bonus_label,
+          fixed_bonus_amount,
           kpi_otd_percent,
           kpi_rpa_avg,
           kpi_otd_qualifies,
@@ -157,6 +167,7 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           net_total_calculated,
           net_total_override,
           net_total,
+          adjusted_fixed_bonus_amount,
           manual_override,
           manual_override_note,
           created_at,
@@ -171,6 +182,8 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           source.currency,
           source.base_salary,
           source.remote_allowance,
+          source.fixed_bonus_label,
+          source.fixed_bonus_amount,
           source.kpi_otd_percent,
           source.kpi_rpa_avg,
           source.kpi_otd_qualifies,
@@ -197,6 +210,7 @@ export const upsertPayrollEntry = async (entry: PayrollEntry) => {
           source.net_total_calculated,
           source.net_total_override,
           source.net_total,
+          source.adjusted_fixed_bonus_amount,
           source.manual_override,
           source.manual_override_note,
           CURRENT_TIMESTAMP(),

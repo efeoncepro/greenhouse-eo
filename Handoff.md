@@ -49,6 +49,65 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 07:30 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-062` para soportar bono fijo recurrente canónico en `Payroll`, sin depender de `bonusOtherAmount` manual por entry.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/migrations/add-payroll-fixed-bonus-columns.sql`
+- `src/types/payroll.ts`
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/calculate-chile-deductions.test.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/schema.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/lib/payroll/generate-payroll-pdf.tsx`
+- `src/lib/payroll/payroll-entry-explain.ts`
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+- `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptCard.tsx`
+- `src/views/greenhouse/payroll/ChileDeductionBreakdown.tsx`
+- `src/views/greenhouse/payroll/MemberPayrollHistory.tsx`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/payroll/calculate-chile-deductions.ts src/lib/payroll/calculate-chile-deductions.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/lib/payroll/get-payroll-entries.ts src/lib/payroll/persist-entry.ts src/lib/payroll/payroll-entry-explain.ts src/lib/payroll/payroll-entry-explain.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/export-payroll.ts src/lib/payroll/generate-payroll-excel.ts src/lib/payroll/generate-payroll-pdf.tsx src/views/greenhouse/payroll/CompensationDrawer.tsx src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx src/views/greenhouse/payroll/PayrollReceiptCard.tsx src/views/greenhouse/payroll/ChileDeductionBreakdown.tsx src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx src/views/greenhouse/payroll/PayrollCompensationTab.tsx src/views/greenhouse/payroll/MemberPayrollHistory.tsx src/views/greenhouse/payroll/helpers.test.ts src/types/payroll.ts`
+- `pnpm test src/lib/payroll/calculate-chile-deductions.test.ts src/lib/payroll/payroll-entry-explain.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/lib/payroll/export-payroll.test.ts src/lib/payroll/payroll-readiness.test.ts src/views/greenhouse/payroll/helpers.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx`
+- `pnpm test src/lib/payroll src/views/greenhouse/payroll`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta ejecutar en BD la migration `scripts/migrations/add-payroll-fixed-bonus-columns.sql` antes de usar el nuevo campo en runtime PostgreSQL.
+- Hay cambios paralelos de otra lane en `team/*` y `agency/*`; no se deben mezclar con este commit de payroll.
+
 ## 2026-03-27 — Producción release + sesión completa
 
 ### Agente

@@ -24,6 +24,7 @@ const DEFAULT_CONFIG: BonusProrationConfig = {
 const internationalCompensation = {
   baseSalary: 2000,
   remoteAllowance: 50, // connectivity bonus
+  fixedBonusAmount: 120,
   bonusOtdMin: 0,
   bonusOtdMax: 500, // On-Time target at 100%
   bonusRpaMin: 0,
@@ -34,6 +35,7 @@ const internationalCompensation = {
 const seniorCompensation = {
   baseSalary: 3500,
   remoteAllowance: 50,
+  fixedBonusAmount: 200,
   bonusOtdMin: 0,
   bonusOtdMax: 800,
   bonusRpaMin: 0,
@@ -55,6 +57,7 @@ const computeBonuses = (
 
   const grossTotal = compensation.baseSalary
     + compensation.remoteAllowance
+    + compensation.fixedBonusAmount
     + otd.amount
     + rpa.amount
 
@@ -101,7 +104,7 @@ describe('compensation → bonus calculation flow', () => {
 
       expect(result.otd.amount).toBe(500) // 100% of bonusOtdMax
       expect(result.rpa.amount).toBe(300) // 100% of bonusRpaMax (rpa=0 → factor 1.0)
-      expect(result.grossTotal).toBe(2000 + 50 + 500 + 300) // $2,850
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 500 + 300)
     })
 
     it('exactly at OTD threshold (94%) and RpA at 1.5: full OTD, partial RpA', () => {
@@ -113,7 +116,7 @@ describe('compensation → bonus calculation flow', () => {
       // RpA: (3 - 1.5) / 3 = 0.5
       expect(result.rpa.prorationFactor).toBe(0.5)
       expect(result.rpa.amount).toBe(150)
-      expect(result.grossTotal).toBe(2000 + 50 + 500 + 150) // $2,700
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 500 + 150)
     })
 
     it('OTD 82% (prorated) and RpA 2.5 (prorated): both partial', () => {
@@ -126,7 +129,7 @@ describe('compensation → bonus calculation flow', () => {
       // RpA: (3 - 2.5) / 3 = 0.1667 → $50.01
       expect(result.rpa.prorationFactor).toBe(0.1667)
       expect(result.rpa.amount).toBe(50.01)
-      expect(result.grossTotal).toBe(2000 + 50 + 250 + 50.01)
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 250 + 50.01)
     })
 
     it('OTD below floor (65%): loses OTD bonus entirely', () => {
@@ -137,7 +140,7 @@ describe('compensation → bonus calculation flow', () => {
 
       // RpA still valid: (3 - 1) / 3 = 0.6667 → 300 * 0.6667 = $200.01
       expect(result.rpa.amount).toBe(200.01)
-      expect(result.grossTotal).toBe(2000 + 50 + 0 + 200.01) // $2,250.01
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 0 + 200.01)
     })
 
     it('RpA above threshold (3.5): loses RpA bonus entirely', () => {
@@ -146,7 +149,7 @@ describe('compensation → bonus calculation flow', () => {
       expect(result.otd.amount).toBe(500)
       expect(result.rpa.amount).toBe(0)
       expect(result.rpa.qualifies).toBe(false)
-      expect(result.grossTotal).toBe(2000 + 50 + 500 + 0)
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 500 + 0)
     })
 
     it('both KPIs disqualified: only base + connectivity', () => {
@@ -154,7 +157,7 @@ describe('compensation → bonus calculation flow', () => {
 
       expect(result.otd.amount).toBe(0)
       expect(result.rpa.amount).toBe(0)
-      expect(result.grossTotal).toBe(2000 + 50) // $2,050 — minimum payout
+      expect(result.grossTotal).toBe(2000 + 50 + 120)
     })
 
     it('null KPIs (no Notion data): falls back to manual entry', () => {
@@ -164,7 +167,7 @@ describe('compensation → bonus calculation flow', () => {
       expect(result.otd.qualifies).toBe(false)
       expect(result.rpa.amount).toBe(0)
       expect(result.rpa.qualifies).toBe(false)
-      expect(result.grossTotal).toBe(2000 + 50) // base only
+      expect(result.grossTotal).toBe(2000 + 50 + 120)
     })
   })
 

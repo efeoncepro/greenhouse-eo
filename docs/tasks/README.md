@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-062`
+- siguiente ID disponible: `TASK-063`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -32,11 +32,12 @@ Primer bloque operativo asignado:
 | Task ID    | Task                                                                                                     | Prioridad | Impacto | Esfuerzo | Estado real | Foco                                                                                                                    |
 | ---------- | -------------------------------------------------------------------------------------------------------- | --------- | ------- | -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `TASK-001` | [TASK-001-hr-payroll-operational-hardening.md](in-progress/TASK-001-hr-payroll-operational-hardening.md) | P1        | Alto    | Alto     | Parcial     | Hardening operativo de Payroll: readiness, auditabilidad por entry, consistencia de fuentes y cálculo Chile más robusto |
-| `TASK-061` | [TASK-061-payroll-go-live-readiness-audit.md](in-progress/TASK-061-payroll-go-live-readiness-audit.md) | P0        | Muy alto | Medio    | Diseño      | Auditoría de readiness go-live de Payroll para nómina real mixta `CLP/USD`, con corrección de gaps críticos y tests de cálculo/exportables |
+| `TASK-061` | [TASK-061-payroll-go-live-readiness-audit.md](in-progress/TASK-061-payroll-go-live-readiness-audit.md) | P0        | Muy alto | Medio    | Avanzada    | Auditoría de readiness go-live de Payroll para nómina real mixta `CLP/USD`, con corrección de gaps críticos y tests de cálculo/exportables |
 | `TASK-058` | [TASK-058-economic-indicators-runtime-layer.md](in-progress/TASK-058-economic-indicators-runtime-layer.md) | P1        | Alto    | Medio    | Implementación      | Capa común de indicadores económicos (`USD_CLP`, `UF`, `UTM`, `IPC`), histórico desde `2026-01-01`, sync diario y refresh reactivo de consumers derivados |
 | `TASK-055` | [TASK-055-finance-intelligence-cost-coverage-repair.md](in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md) | P1        | Muy alto | Alto    | Parcial     | Reparación del pipeline de `client_economics`: recompute reactivo por período, cobertura de costos y bridge laboral histórico |
 | `TASK-056` | [TASK-056-agency-team-capacity-semantics.md](complete/TASK-056-agency-team-capacity-semantics.md) | P1        | Alto     | Medio    | **Completa** | Contrato canónico de capacidad/economía por miembro: helpers puros (units, economics, overhead, pricing), snapshot reactivo `member_capacity_economics`, cutover de Agency Team + Person Intelligence + My Assignments, doc de arquitectura |
 | `TASK-057` | [TASK-057-direct-overhead-tool-cost-attribution.md](complete/TASK-057-direct-overhead-tool-cost-attribution.md) | P1        | Alto     | Medio    | **Completa**      | Direct overhead per person: AI tooling (licenses + credits) + Finance expenses (equipment/reimbursement/other) con dedup guard, degradación resiliente por fuente, taxonomía canónica y migration |
+| `TASK-062` | [TASK-062-payroll-recurring-fixed-bonus-support.md](complete/TASK-062-payroll-recurring-fixed-bonus-support.md) | P0        | Alto | Medio    | **Completa** | Payroll ya soporta un bono fijo recurrente versionado, snapshot por entry, prorrateo por asistencia y reflejo consistente en cálculo, exports y recibos |
 
 ## To Do
 

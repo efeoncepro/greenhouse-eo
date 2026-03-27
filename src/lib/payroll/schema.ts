@@ -14,6 +14,8 @@ const buildStatements = (projectId: string) => [
       currency STRING NOT NULL,
       base_salary FLOAT64 NOT NULL,
       remote_allowance FLOAT64,
+      fixed_bonus_label STRING,
+      fixed_bonus_amount FLOAT64,
       bonus_otd_min FLOAT64,
       bonus_otd_max FLOAT64,
       bonus_rpa_min FLOAT64,
@@ -61,6 +63,8 @@ const buildStatements = (projectId: string) => [
       currency STRING NOT NULL,
       base_salary FLOAT64 NOT NULL,
       remote_allowance FLOAT64,
+      fixed_bonus_label STRING,
+      fixed_bonus_amount FLOAT64,
       kpi_otd_percent FLOAT64,
       kpi_rpa_avg FLOAT64,
       kpi_otd_qualifies BOOL,
@@ -89,6 +93,7 @@ const buildStatements = (projectId: string) => [
       net_total FLOAT64 NOT NULL,
       manual_override BOOL,
       manual_override_note STRING,
+      adjusted_fixed_bonus_amount FLOAT64,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
     )

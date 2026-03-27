@@ -68,6 +68,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
             <TableCell align='center'>RpA</TableCell>
             <TableCell align='right'>Bono RpA</TableCell>
             <TableCell align='right'>Teletrabajo</TableCell>
+            <TableCell align='right'>Bono fijo</TableCell>
             <TableCell align='right'>Bruto</TableCell>
             <TableCell align='right'>Descuentos</TableCell>
             <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
@@ -220,6 +221,17 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                     }>
                       <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
                         {formatCurrency(entry.adjustedRemoteAllowance ?? entry.remoteAllowance, entry.currency)}
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
+
+                  <TableCell align='right'>
+                    <Tooltip title={entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount
+                      ? `Original: ${formatCurrency(entry.fixedBonusAmount, entry.currency)} | Ajustado por inasistencia`
+                      : entry.fixedBonusLabel || ''
+                    }>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, entry.currency)}
                       </Typography>
                     </Tooltip>
                   </TableCell>

@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.compensation_versions (
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   base_salary NUMERIC(14, 2) NOT NULL,
   remote_allowance NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  fixed_bonus_label TEXT,
+  fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_otd_min NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_otd_max NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_rpa_min NUMERIC(14, 2) NOT NULL DEFAULT 0,
@@ -86,6 +88,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   base_salary NUMERIC(14, 2) NOT NULL,
   remote_allowance NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  fixed_bonus_label TEXT,
+  fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
 
   -- Snapshot: member display name for exports/history (Rule 6 — secondary)
   member_display_name TEXT,
@@ -138,6 +142,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   days_on_unpaid_leave INTEGER,
   adjusted_base_salary NUMERIC(14, 2),
   adjusted_remote_allowance NUMERIC(14, 2),
+  adjusted_fixed_bonus_amount NUMERIC(14, 2),
 
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -206,11 +211,20 @@ SET
 -- ============================================================
 DO $$
 BEGIN
+  ALTER TABLE greenhouse_payroll.compensation_versions
+    ADD COLUMN IF NOT EXISTS fixed_bonus_label TEXT;
+  ALTER TABLE greenhouse_payroll.compensation_versions
+    ADD COLUMN IF NOT EXISTS fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0;
+
   -- bonus_config: otd_floor
   ALTER TABLE greenhouse_payroll.payroll_bonus_config
     ADD COLUMN IF NOT EXISTS otd_floor NUMERIC(6, 2) NOT NULL DEFAULT 70;
 
   -- payroll_entries: proration + attendance columns
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS fixed_bonus_label TEXT;
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0;
   ALTER TABLE greenhouse_payroll.payroll_entries
     ADD COLUMN IF NOT EXISTS bonus_otd_proration_factor NUMERIC(6, 4);
   ALTER TABLE greenhouse_payroll.payroll_entries
@@ -229,6 +243,8 @@ BEGIN
     ADD COLUMN IF NOT EXISTS adjusted_base_salary NUMERIC(14, 2);
   ALTER TABLE greenhouse_payroll.payroll_entries
     ADD COLUMN IF NOT EXISTS adjusted_remote_allowance NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS adjusted_fixed_bonus_amount NUMERIC(14, 2);
 END $$;
 
 -- ============================================================
@@ -251,6 +267,8 @@ SELECT
   cv.currency,
   cv.base_salary,
   cv.remote_allowance,
+  cv.fixed_bonus_label,
+  cv.fixed_bonus_amount,
   cv.contract_type,
   cv.effective_from AS compensation_effective_from,
   cv.effective_to AS compensation_effective_to,

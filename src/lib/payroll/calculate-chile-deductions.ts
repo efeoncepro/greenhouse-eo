@@ -8,6 +8,7 @@ type PayrollTotalsInput = {
   payRegime: PayRegime
   baseSalary: number
   remoteAllowance: number
+  fixedBonusAmount: number
   bonusOtdAmount: number
   bonusRpaAmount: number
   bonusOtherAmount: number
@@ -46,6 +47,7 @@ export const calculatePayrollTotals = ({
   payRegime,
   baseSalary,
   remoteAllowance,
+  fixedBonusAmount,
   bonusOtdAmount,
   bonusRpaAmount,
   bonusOtherAmount,
@@ -61,7 +63,7 @@ export const calculatePayrollTotals = ({
   taxAmount
 }: PayrollTotalsInput): ChileDeductionResult => {
   const totalVariableBonus = bonusOtdAmount + bonusRpaAmount + bonusOtherAmount
-  const grossTotal = roundCurrency(baseSalary + remoteAllowance + totalVariableBonus)
+  const grossTotal = roundCurrency(baseSalary + remoteAllowance + fixedBonusAmount + totalVariableBonus)
 
   if (payRegime === 'international') {
     return {
@@ -82,7 +84,7 @@ export const calculatePayrollTotals = ({
     }
   }
 
-  const imponibleBase = Math.max(0, baseSalary + totalVariableBonus)
+  const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus)
   const normalizedAfpRate = typeof afpRate === 'number' && Number.isFinite(afpRate) ? afpRate : 0
 
   const derivedUnemploymentRate =

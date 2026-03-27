@@ -188,6 +188,10 @@ const PayrollEntryExplainDialog = ({ open, entryId, memberName, onClose }: Props
                     label='Teletrabajo efectivo'
                     value={formatCurrency(data.calculation.effectiveRemoteAllowance, data.entry.currency)}
                   />
+                  <DetailItem
+                    label={data.entry.fixedBonusLabel ? `Bono fijo efectivo (${data.entry.fixedBonusLabel})` : 'Bono fijo efectivo'}
+                    value={formatCurrency(data.calculation.effectiveFixedBonusAmount, data.entry.currency)}
+                  />
                 </Stack>
               </Grid>
             </Grid>

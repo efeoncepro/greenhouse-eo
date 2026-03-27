@@ -135,6 +135,9 @@ const buildDetalleSheet = (
     'Base ajustada',
     'Asig. teletrabajo',
     'Teletrabajo ajust.',
+    'Etiqueta bono fijo',
+    'Bono fijo',
+    'Bono fijo ajust.',
     'Bono OTD',
     'Bono RpA',
     'Bono adicional',
@@ -173,6 +176,9 @@ const buildDetalleSheet = (
       entry.adjustedBaseSalary ?? entry.baseSalary,
       entry.remoteAllowance,
       entry.adjustedRemoteAllowance ?? entry.remoteAllowance,
+      entry.fixedBonusLabel,
+      entry.fixedBonusAmount,
+      entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount,
       entry.bonusOtdAmount,
       entry.bonusRpaAmount,
       entry.bonusOtherAmount,
@@ -189,8 +195,8 @@ const buildDetalleSheet = (
       entry.manualOverride ? 'Sí' : 'No'
     ])
 
-    // Apply currency format to numeric cells (columns 5-21)
-    for (let col = 5; col <= 21; col++) {
+    // Apply currency format to numeric cells excluding text/date style columns.
+    for (const col of [5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]) {
       const cell = row.getCell(col)
 
       if (typeof cell.value === 'number') {
@@ -207,7 +213,7 @@ const buildDetalleSheet = (
   }
 
   // Auto-filter
-  sheet.autoFilter = { from: 'A1', to: `V${entries.length + 1}` }
+  sheet.autoFilter = { from: 'A1', to: `Y${entries.length + 1}` }
 
   return sheet
 }

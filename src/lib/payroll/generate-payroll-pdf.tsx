@@ -316,6 +316,7 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
   const generatedAt = new Date().toISOString().split('T')[0]
 
   const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
 
   const haberesRows: [string, string][] = [
     ['Sueldo base', fmtCurrency(entry.baseSalary, currency)]
@@ -335,6 +336,22 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
     haberesRows.push(
       ['Teletrabajo ajustado (por inasistencia)', fmtCurrency(entry.adjustedRemoteAllowance, currency)]
     )
+  }
+
+  if (entry.fixedBonusAmount > 0) {
+    haberesRows.push([
+      entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo',
+      fmtCurrency(entry.fixedBonusAmount, currency)
+    ])
+  }
+
+  if (entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount) {
+    haberesRows.push([
+      entry.fixedBonusLabel
+        ? `Bono fijo ajustado (${entry.fixedBonusLabel})`
+        : 'Bono fijo ajustado (por inasistencia)',
+      fmtCurrency(effectiveFixedBonusAmount, currency)
+    ])
   }
 
   haberesRows.push(

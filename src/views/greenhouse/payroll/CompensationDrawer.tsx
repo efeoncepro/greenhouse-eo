@@ -44,6 +44,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [currency, setCurrency] = useState(ev?.currency ?? 'CLP')
   const [baseSalary, setBaseSalary] = useState(ev?.baseSalary ?? 0)
   const [remoteAllowance, setRemoteAllowance] = useState(ev?.remoteAllowance ?? 0)
+  const [fixedBonusLabel, setFixedBonusLabel] = useState(ev?.fixedBonusLabel ?? '')
+  const [fixedBonusAmount, setFixedBonusAmount] = useState(ev?.fixedBonusAmount ?? 0)
   const [bonusOtd, setBonusOtd] = useState(ev?.bonusOtdMax ?? 0)
   const [bonusRpa, setBonusRpa] = useState(ev?.bonusRpaMax ?? 0)
   const [afpName, setAfpName] = useState(ev?.afpName ?? '')
@@ -73,6 +75,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setCurrency(ev?.currency ?? 'CLP')
     setBaseSalary(ev?.baseSalary ?? 0)
     setRemoteAllowance(ev?.remoteAllowance ?? 0)
+    setFixedBonusLabel(ev?.fixedBonusLabel ?? '')
+    setFixedBonusAmount(ev?.fixedBonusAmount ?? 0)
     setBonusOtd(ev?.bonusOtdMax ?? 0)
     setBonusRpa(ev?.bonusRpaMax ?? 0)
     setAfpName(ev?.afpName ?? '')
@@ -120,6 +124,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         currency,
         baseSalary,
         remoteAllowance,
+        fixedBonusLabel: fixedBonusLabel.trim() || null,
+        fixedBonusAmount,
         bonusOtdMin: 0,
         bonusOtdMax: bonusOtd,
         bonusRpaMin: 0,
@@ -208,6 +214,30 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               onChange={e => setRemoteAllowance(Number(e.target.value))}
               helperText='Monto fijo mensual (ej. $50 USD)'
             />
+
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 7 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Nombre bono fijo'
+                  value={fixedBonusLabel}
+                  onChange={e => setFixedBonusLabel(e.target.value)}
+                  helperText='Opcional. Ej. Bono responsabilidad'
+                />
+              </Grid>
+              <Grid size={{ xs: 5 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Monto bono fijo'
+                  type='number'
+                  value={fixedBonusAmount}
+                  onChange={e => setFixedBonusAmount(Number(e.target.value))}
+                  helperText='Monto fijo mensual recurrente'
+                />
+              </Grid>
+            </Grid>
 
             {/* Bonos */}
             <Divider />

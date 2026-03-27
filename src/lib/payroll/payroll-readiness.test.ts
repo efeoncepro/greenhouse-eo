@@ -42,6 +42,8 @@ const compensatedMember = {
   currency: 'USD' as const,
   baseSalary: 1000,
   remoteAllowance: 50,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   bonusOtdMin: 0,
   bonusOtdMax: 100,
   bonusRpaMin: 0,

@@ -1,5 +1,10 @@
 # TASK-061 - Payroll Go-Live Readiness Audit
 
+## Delta 2026-03-27
+
+- El gap de “bonos fijos y variables por colaborador” quedó parcialmente cerrado por `TASK-062`: `Payroll` ahora soporta un bono fijo recurrente versionado además de `baseSalary`, `remoteAllowance` y bonos variables.
+- El cálculo, snapshot y exports ya consideran `fixedBonusAmount` / `fixedBonusLabel`; la auditoría de go-live ya no debe tratar ese punto como pendiente estructural.
+
 ## Status
 
 - Lifecycle: `in-progress`

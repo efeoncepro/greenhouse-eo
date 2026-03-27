@@ -32,6 +32,8 @@ const compensationVersion: CompensationVersion = {
   currency: 'USD',
   baseSalary: 675,
   remoteAllowance: 50,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   bonusOtdMin: 0,
   bonusOtdMax: 150,
   bonusRpaMin: 0,
@@ -64,6 +66,8 @@ const entry: PayrollEntry = {
   currency: 'USD',
   baseSalary: 675,
   remoteAllowance: 50,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   kpiOtdPercent: 58.3,
   kpiRpaAvg: 2,
   kpiOtdQualifies: false,
@@ -105,6 +109,7 @@ const entry: PayrollEntry = {
   daysOnUnpaidLeave: 1,
   adjustedBaseSalary: 607.5,
   adjustedRemoteAllowance: 45,
+  adjustedFixedBonusAmount: 67.5,
   createdAt: null,
   updatedAt: null
 }
@@ -121,6 +126,7 @@ describe('buildPayrollEntryExplain', () => {
     expect(explain.calculation.attendanceRatio).toBe(0.9)
     expect(explain.calculation.effectiveBaseSalary).toBe(607.5)
     expect(explain.calculation.effectiveRemoteAllowance).toBe(45)
+    expect(explain.calculation.effectiveFixedBonusAmount).toBe(67.5)
     expect(explain.calculation.totalVariableBonus).toBe(35)
     expect(explain.calculation.hasAttendanceAdjustment).toBe(true)
     expect(explain.compensationVersion?.versionId).toBe('member-1_v1')
