@@ -103,9 +103,42 @@ const buildStatements = (projectId: string) => [
       config_id STRING NOT NULL,
       otd_threshold FLOAT64 NOT NULL,
       rpa_threshold FLOAT64 NOT NULL,
+      otd_floor FLOAT64 NOT NULL,
+      rpa_full_payout_threshold FLOAT64 NOT NULL,
+      rpa_soft_band_end FLOAT64 NOT NULL,
+      rpa_soft_band_floor_factor FLOAT64 NOT NULL,
       effective_from DATE NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
     )
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_bonus_config\`
+    ADD COLUMN IF NOT EXISTS otd_floor FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_bonus_config\`
+    ADD COLUMN IF NOT EXISTS rpa_full_payout_threshold FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_bonus_config\`
+    ADD COLUMN IF NOT EXISTS rpa_soft_band_end FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_bonus_config\`
+    ADD COLUMN IF NOT EXISTS rpa_soft_band_floor_factor FLOAT64
+  `,
+  `
+    UPDATE \`${projectId}.greenhouse.payroll_bonus_config\`
+    SET
+      otd_floor = COALESCE(otd_floor, 70.0),
+      rpa_full_payout_threshold = COALESCE(rpa_full_payout_threshold, 1.7),
+      rpa_soft_band_end = COALESCE(rpa_soft_band_end, 2.0),
+      rpa_soft_band_floor_factor = COALESCE(rpa_soft_band_floor_factor, 0.8)
+    WHERE
+      otd_floor IS NULL
+      OR rpa_full_payout_threshold IS NULL
+      OR rpa_soft_band_end IS NULL
+      OR rpa_soft_band_floor_factor IS NULL
   `,
   `
     MERGE \`${projectId}.greenhouse.payroll_bonus_config\` AS target
@@ -113,14 +146,47 @@ const buildStatements = (projectId: string) => [
       SELECT
         'default' AS config_id,
         89.0 AS otd_threshold,
-        2.0 AS rpa_threshold,
+        3.0 AS rpa_threshold,
+        70.0 AS otd_floor,
+        1.7 AS rpa_full_payout_threshold,
+        2.0 AS rpa_soft_band_end,
+        0.8 AS rpa_soft_band_floor_factor,
         DATE '2026-01-01' AS effective_from,
         CURRENT_TIMESTAMP() AS created_at
     ) AS source
     ON target.config_id = source.config_id AND target.effective_from = source.effective_from
+    WHEN MATCHED THEN
+      UPDATE SET
+        otd_threshold = source.otd_threshold,
+        rpa_threshold = source.rpa_threshold,
+        otd_floor = source.otd_floor,
+        rpa_full_payout_threshold = source.rpa_full_payout_threshold,
+        rpa_soft_band_end = source.rpa_soft_band_end,
+        rpa_soft_band_floor_factor = source.rpa_soft_band_floor_factor,
+        created_at = source.created_at
     WHEN NOT MATCHED THEN
-      INSERT (config_id, otd_threshold, rpa_threshold, effective_from, created_at)
-      VALUES (source.config_id, source.otd_threshold, source.rpa_threshold, source.effective_from, source.created_at)
+      INSERT (
+        config_id,
+        otd_threshold,
+        rpa_threshold,
+        otd_floor,
+        rpa_full_payout_threshold,
+        rpa_soft_band_end,
+        rpa_soft_band_floor_factor,
+        effective_from,
+        created_at
+      )
+      VALUES (
+        source.config_id,
+        source.otd_threshold,
+        source.rpa_threshold,
+        source.otd_floor,
+        source.rpa_full_payout_threshold,
+        source.rpa_soft_band_end,
+        source.rpa_soft_band_floor_factor,
+        source.effective_from,
+        source.created_at
+      )
   `,
   `
     MERGE \`${projectId}.greenhouse.roles\` AS target

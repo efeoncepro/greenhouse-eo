@@ -1,5 +1,16 @@
 # DELTA — HR Payroll Module v2: Reemplazo de Bono RpA por Bono FTR%
 
+## Delta 2026-03-27
+- La lane inmediata aprobada por negocio no es reemplazar `RpA` todavía, sino recalibrar el payout vigente de `OTD + RpA` para hacerlo más flexible.
+- La ejecución inmediata queda capturada en [TASK-065](../in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md).
+- Interpretación actual:
+  - `TASK-025` sigue vigente como propuesta estratégica de migración a `FTR`
+  - pero ya no debe asumirse como el siguiente paso obligatorio antes de cerrar la nómina
+- Si `TASK-065` se implementa, `TASK-025` debe reevaluarse después como:
+  - reemplazo futuro de `RpA`
+  - complemento a `OTD`
+  - o lane cancelada si la recalibración de `RpA` resulta suficiente
+
 **Aplica sobre:** `CODEX_TASK_HR_Payroll_Module_v2.md`
 **Fecha:** 2026-03-21
 **Decisión:** Reemplazar el bono por RpA (Rounds per Asset) con bono por FTR% (First Time Right)

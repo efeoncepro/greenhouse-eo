@@ -4,6 +4,7 @@ import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResul
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
@@ -31,26 +32,31 @@ type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
   otd_floor: number | string | null
+  rpa_full_payout_threshold: number | string | null
+  rpa_soft_band_end: number | string | null
+  rpa_soft_band_floor_factor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
 
 const getBonusConfigForDate = async (periodEnd: string): Promise<BonusProrationConfig> => {
   if (isPayrollPostgresEnabled()) {
-    const config = await pgGetActiveBonusConfig()
+    const config = await pgGetActiveBonusConfig(periodEnd)
 
-    return {
-      otdThreshold: config?.otdThreshold ?? 94,
-      otdFloor: config?.otdFloor ?? 70,
-      rpaThreshold: config?.rpaThreshold ?? 3
-    }
+    return normalizeBonusProrationConfig(config)
   }
 
   const projectId = getProjectId()
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold, otd_floor
+      SELECT
+        otd_threshold,
+        rpa_threshold,
+        otd_floor,
+        rpa_full_payout_threshold,
+        rpa_soft_band_end,
+        rpa_soft_band_floor_factor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -59,11 +65,27 @@ const getBonusConfigForDate = async (periodEnd: string): Promise<BonusProrationC
     { periodEnd }
   )
 
-  return {
-    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
-    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
-  }
+  return normalizeBonusProrationConfig(
+    row
+      ? {
+          otdThreshold: toNumber(row.otd_threshold),
+          otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : DEFAULT_BONUS_PRORATION_CONFIG.otdFloor,
+          rpaThreshold: toNumber(row.rpa_threshold),
+          rpaFullPayoutThreshold:
+            row.rpa_full_payout_threshold != null
+              ? toNumber(row.rpa_full_payout_threshold)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaFullPayoutThreshold,
+          rpaSoftBandEnd:
+            row.rpa_soft_band_end != null
+              ? toNumber(row.rpa_soft_band_end)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandEnd,
+          rpaSoftBandFloorFactor:
+            row.rpa_soft_band_floor_factor != null
+              ? toNumber(row.rpa_soft_band_floor_factor)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandFloorFactor
+        }
+      : undefined
+  )
 }
 
 type AttendanceSnapshot = {

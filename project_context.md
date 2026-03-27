@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-27 Payroll variable bonus policy recalibration
+- `Payroll` ya no depende de una policy simple para bonos variables (`OTD >= threshold`, `RpA` lineal hasta un único umbral).
+- Baseline nuevo materializado:
+  - `OTD` con full payout desde `89%` y piso `70%`
+  - `RpA` con bandas versionadas:
+    - `<= 1.7` -> `100%`
+    - `1.7 - 2.0` -> descenso suave hasta `80%`
+    - `2.0 - 3.0` -> descenso hasta `0`
+  - config canónica ampliada en `greenhouse_payroll.payroll_bonus_config` con:
+    - `rpa_full_payout_threshold`
+    - `rpa_soft_band_end`
+    - `rpa_soft_band_floor_factor`
+- Regla operativa derivada:
+  - `Payroll` official, `projected payroll` y `recalculate-entry` deben leer exactamente la misma policy canónica
+  - los cambios de payout variable deben versionarse por `effective_from`, no esconderse en fórmulas locales por consumer
+  - `TASK-025` (`FTR`) deja de ser el siguiente paso obligatorio; pasa a ser una alternativa estratégica futura
+
 ## Delta 2026-03-27 Economic indicators runtime baseline
 - Finance ya no queda limitado semánticamente a `exchange_rates` para datos macroeconómicos chilenos.
 - Baseline nuevo materializado:
@@ -14,8 +31,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa derivada:
   - `USD/CLP` sigue manteniendo compatibilidad con `greenhouse_finance.exchange_rates`
   - indicadores no FX (`UF`, `UTM`, `IPC`) no deben modelarse como monedas ni reusar contratos de currency a la fuerza
-  - consumers que necesiten snapshots históricos de período deben leer desde la capa común de indicadores antes de pedir input manual al usuario
-  - `Payroll` ya no debe pedir `UF` manualmente por defecto al crear/editar períodos; debe autohidratarla desde indicadores usando el mes imputable
+- consumers que necesiten snapshots históricos de período deben leer desde la capa común de indicadores antes de pedir input manual al usuario
+- `Payroll` ya no debe pedir `UF` manualmente por defecto al crear/editar períodos; debe autohidratarla desde indicadores usando el mes imputable
+
+## Delta 2026-03-27 Payroll variable bonus policy recalibrated
+- `Payroll` mantiene a `ICO` como fuente canónica de `OTD` y `RpA`, pero su policy de payout ya no es solo un threshold lineal simple.
+- Regla operativa nueva:
+  - `OTD` paga `100%` desde `89%`, con piso de prorrateo en `70%`
+  - `RpA` usa bandas versionadas:
+    - `<= 1.7` -> `100%`
+    - `1.7 - 2.0` -> baja suavemente hasta `80%`
+    - `2.0 - 3.0` -> baja desde `80%` hasta `0`
+    - `>= 3.0` -> `0`
+- La policy ya no depende solo de `rpa_threshold`; queda versionada en `greenhouse_payroll.payroll_bonus_config` con:
+  - `rpa_full_payout_threshold`
+  - `rpa_soft_band_end`
+  - `rpa_soft_band_floor_factor`
+- Impacto derivado:
+  - `Payroll` oficial, `projected payroll` y `recalculate-entry` deben consumir exactamente la misma config canónica
+  - cualquier fallback analítico debe tolerar esquemas viejos y rellenar defaults para no romper ambientes parcialmente migrados
 
 ## Delta 2026-03-26 Team capacity architecture canonized
 - La arquitectura de capacidad/economía de equipo ya no vive solo en una task o en el código.

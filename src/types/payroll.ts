@@ -10,6 +10,9 @@ export interface BonusProrationConfig {
   otdThreshold: number
   otdFloor: number
   rpaThreshold: number
+  rpaFullPayoutThreshold: number
+  rpaSoftBandEnd: number
+  rpaSoftBandFloorFactor: number
 }
 
 export interface PayrollMemberSummary {

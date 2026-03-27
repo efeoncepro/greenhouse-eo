@@ -166,11 +166,15 @@ Campos clave:
 - `otd_threshold`
 - `rpa_threshold`
 - `otd_floor`
+- `rpa_full_payout_threshold`
+- `rpa_soft_band_end`
+- `rpa_soft_band_floor_factor`
 - `effective_from`
 
 Regla:
 - los montos máximos de bono son por colaborador
 - los thresholds de calificación siguen siendo globales por vigencia
+- la policy de payout de `RpA` puede usar bandas suaves versionadas; no debe quedar hardcodeada solo en `bonus-proration.ts`
 
 ### Serving view
 - `greenhouse_serving.member_payroll_360`
@@ -327,14 +331,20 @@ Los bonos no son binarios puros. Se prorratean.
 - si supera `otd_threshold`, paga 100% del bono máximo
 - si queda entre `otd_floor` y `otd_threshold`, paga proporcional
 - si queda bajo el piso, paga 0
+- baseline vigente:
+  - `otd_floor = 70`
+  - `otd_threshold = 89`
 
 ### `RpA`
-- si queda dentro del threshold, paga proporcional hasta el máximo
-- si excede el umbral permitido, puede pagar 0 según la fórmula vigente
+- si queda en o bajo `rpa_full_payout_threshold`, paga 100% del bono máximo
+- si cae entre `rpa_full_payout_threshold` y `rpa_soft_band_end`, baja suavemente desde 100% hasta el factor piso configurado
+- si cae entre `rpa_soft_band_end` y `rpa_threshold`, baja desde el factor piso configurado hasta 0
+- si llega o supera `rpa_threshold`, paga 0
 
 ### Ownership
 - el monto máximo pertenece a la compensación del colaborador
 - la regla de elegibilidad pertenece a `payroll_bonus_config`
+- la selección de config debe resolverse por fecha del período imputable para preservar recálculo histórico correcto
 
 ## 13. Asistencia, licencias y prorrateo
 

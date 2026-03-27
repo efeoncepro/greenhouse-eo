@@ -3,6 +3,7 @@ import 'server-only'
 import type { BonusProrationConfig, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
 import { countWeekdays, fetchAttendanceForAllMembers } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
@@ -46,18 +47,14 @@ const getPeriodEnd = (year: number, month: number) => {
 
 const getToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
 
-const getBonusConfig = async (): Promise<BonusProrationConfig> => {
+const getBonusConfig = async (periodEnd: string): Promise<BonusProrationConfig> => {
   if (isPayrollPostgresEnabled()) {
-    const config = await pgGetActiveBonusConfig()
+    const config = await pgGetActiveBonusConfig(periodEnd)
 
-    return {
-      otdThreshold: config?.otdThreshold ?? 94,
-      otdFloor: config?.otdFloor ?? 70,
-      rpaThreshold: config?.rpaThreshold ?? 3
-    }
+    return normalizeBonusProrationConfig(config)
   }
 
-  return { otdThreshold: 94, otdFloor: 70, rpaThreshold: 3 }
+  return DEFAULT_BONUS_PRORATION_CONFIG
 }
 
 const roundCurrency = (n: number) => Math.round(n * 100) / 100
@@ -112,7 +109,7 @@ export const projectPayrollForPeriod = async ({
       .catch(() => new Map<string, PayrollKpiSnapshot>()),
     fetchAttendanceForAllMembers(memberIds, periodStart, attendanceCutDate)
       .catch(() => new Map()),
-    getBonusConfig(),
+    getBonusConfig(periodEnd),
     getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UF', periodDate: asOfDate }).catch(() => null)
   ])
 

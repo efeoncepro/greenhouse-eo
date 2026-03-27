@@ -63,7 +63,14 @@ const baseCompensation = {
 describe('projectPayrollForPeriod', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockPgGetActiveBonusConfig.mockResolvedValue({ otdThreshold: 94, otdFloor: 70, rpaThreshold: 3 })
+    mockPgGetActiveBonusConfig.mockResolvedValue({
+      otdThreshold: 89,
+      otdFloor: 70,
+      rpaThreshold: 3,
+      rpaFullPayoutThreshold: 1.7,
+      rpaSoftBandEnd: 2,
+      rpaSoftBandFloorFactor: 0.8
+    })
     mockGetHistoricalEconomicIndicatorForPeriod.mockResolvedValue({ value: 38150 })
   })
 
@@ -90,7 +97,8 @@ describe('projectPayrollForPeriod', () => {
     expect(entry.kpiOtdPercent).toBe(96)
     expect(entry.kpiRpaAvg).toBe(1.8)
     expect(entry.kpiOtdQualifies).toBe(true)
-    expect(entry.bonusOtdAmount).toBe(60000) // 96% >= 94% → 100%
+    expect(entry.bonusOtdAmount).toBe(60000)
+    expect(entry.bonusRpaAmount).toBe(37332)
     expect(entry.grossTotal).toBeGreaterThan(0)
     expect(entry.netTotal).toBeGreaterThan(0)
     expect(entry.netTotal).toBeLessThan(entry.grossTotal)

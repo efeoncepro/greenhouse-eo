@@ -7,6 +7,20 @@
 
 ## 2026-03-27
 
+### Payroll variable bonus policy recalibration
+- `Payroll` ahora usa una policy de payout más flexible para bonos variables:
+  - `OTD` paga `100%` desde `89%` y prorratea linealmente desde `70%`
+  - `RpA` paga `100%` hasta `1.7`, cae suavemente hasta `80%` en `2.0`, y luego desciende hasta `0` al llegar a `3.0`
+- Se amplió `greenhouse_payroll.payroll_bonus_config` para versionar explícitamente la banda suave de `RpA` con:
+  - `rpa_full_payout_threshold`
+  - `rpa_soft_band_end`
+  - `rpa_soft_band_floor_factor`
+- El cutover se aplicó al runtime canónico de:
+  - cálculo oficial de nómina
+  - projected payroll
+  - recálculo manual por entry
+- Se agregaron tests de prorrateo y de flujo de compensación para asegurar compatibilidad con projected payroll y exportables.
+
 ### ICO assignee attribution remediation
 - Se detectó y remediò un incidente sistémico donde tareas con `responsables_ids` en `notion_ops.tareas` no estaban quedando atribuidas en `greenhouse_conformed.delivery_tasks`, dejando `ICO` sin KPI por persona y `Payroll` con bonos variables en cero.
 - Se ejecutó un rerun operativo de `syncNotionToConformed()` y `materializeMonthlySnapshots(2026, 3)`, recuperando atribución en `delivery_tasks` y filas reales en `ico_engine.metrics_by_member`.

@@ -49,6 +49,99 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 17:15 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar `TASK-065` para recalibrar el payout variable de `Payroll` (`OTD + RpA`) con una policy más flexible y compatible con consumers oficiales y proyectados.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/payroll/bonus-config.ts`
+- `src/lib/payroll/bonus-proration.ts`
+- `src/lib/payroll/bonus-proration.test.ts`
+- `src/lib/payroll/compensation-bonus-flow.test.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/project-payroll.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/schema.ts`
+- `src/types/payroll.ts`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/migrate-payroll-proration-attendance.sql`
+- `scripts/backfill-postgres-payroll.ts`
+- `scripts/migrations/add-payroll-bonus-policy-bands.sql`
+- `docs/tasks/in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm test src/lib/payroll`
+- `pnpm exec vitest run src/lib/payroll/bonus-proration.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/lib/payroll/project-payroll.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/payroll/bonus-config.ts src/lib/payroll/bonus-proration.ts src/lib/payroll/bonus-proration.test.ts src/lib/payroll/compensation-bonus-flow.test.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/lib/payroll/project-payroll.ts src/lib/payroll/postgres-store.ts src/lib/payroll/schema.ts src/types/payroll.ts scripts/backfill-postgres-payroll.ts`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta validación manual en `/hr/payroll` y `/hr/payroll/projected` antes de commit/push.
+- Falta correr `eslint` y validación manual en `/hr/payroll` y `/hr/payroll/projected` antes de commit/push.
+- La migration `scripts/migrations/add-payroll-bonus-policy-bands.sql` debe ejecutarse para que PostgreSQL persista la banda suave de `RpA`.
+- El fallback BigQuery quedó endurecido con columnas nuevas y defaults, pero conviene validar un ambiente donde `PAYROLL_POSTGRES` esté apagado antes de cerrar del todo.
+
+## 2026-03-27 16:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar una nueva lane para recalibrar la policy de bonos variables de nómina (`OTD + RpA`) y contrastarla con la propuesta legacy de migración a `FTR`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-065-payroll-variable-bonus-policy-recalibration.md`
+- `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+
+- revisión de `TASK-025`
+- contraste con runtime real actual de `Payroll` (`OTD + RpA`)
+- revisión de arquitectura base:
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+
+### Riesgos o pendientes
+
+- `TASK-025` ya no debe interpretarse como ejecución inmediata para cierre de nómina.
+- La decisión abierta es si `FTR` reemplazará después a `RpA` o si la recalibración de `RpA` vuelve innecesaria esa migración.
+
 ## 2026-03-27 17:05 -03
 
 ### Agente

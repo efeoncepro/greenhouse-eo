@@ -4,6 +4,7 @@ import type { BonusProrationConfig, PayrollEntry, UpdatePayrollEntryInput } from
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
@@ -20,6 +21,9 @@ type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
   otd_floor: number | string | null
+  rpa_full_payout_threshold: number | string | null
+  rpa_soft_band_end: number | string | null
+  rpa_soft_band_floor_factor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
@@ -75,23 +79,27 @@ const getBonusConfigForPeriod = async (periodId: string) => {
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
-  if (isPayrollPostgresEnabled()) {
-    const config = await pgGetActiveBonusConfig()
-
-    return {
-      period,
-      otdThreshold: config?.otdThreshold ?? 94,
-      otdFloor: config?.otdFloor ?? 70,
-      rpaThreshold: config?.rpaThreshold ?? 3
-    }
-  }
-
   const projectId = getProjectId()
   const { periodEnd } = getPeriodRangeFromId(periodId)
 
+  if (isPayrollPostgresEnabled()) {
+    const config = await pgGetActiveBonusConfig(periodEnd)
+
+    return {
+      period,
+      ...normalizeBonusProrationConfig(config)
+    }
+  }
+
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold, otd_floor
+      SELECT
+        otd_threshold,
+        rpa_threshold,
+        otd_floor,
+        rpa_full_payout_threshold,
+        rpa_soft_band_end,
+        rpa_soft_band_floor_factor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -102,9 +110,27 @@ const getBonusConfigForPeriod = async (periodId: string) => {
 
   return {
     period,
-    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
-    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
+    ...normalizeBonusProrationConfig(
+      row
+        ? {
+            otdThreshold: toNumber(row.otd_threshold),
+            otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : DEFAULT_BONUS_PRORATION_CONFIG.otdFloor,
+            rpaThreshold: toNumber(row.rpa_threshold),
+            rpaFullPayoutThreshold:
+              row.rpa_full_payout_threshold != null
+                ? toNumber(row.rpa_full_payout_threshold)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaFullPayoutThreshold,
+            rpaSoftBandEnd:
+              row.rpa_soft_band_end != null
+                ? toNumber(row.rpa_soft_band_end)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandEnd,
+            rpaSoftBandFloorFactor:
+              row.rpa_soft_band_floor_factor != null
+                ? toNumber(row.rpa_soft_band_floor_factor)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandFloorFactor
+          }
+        : undefined
+    )
   }
 }
 
@@ -171,13 +197,28 @@ export const recalculatePayrollEntry = async ({
     throw new PayrollValidationError('Compensation version not found for payroll entry.', 500)
   }
 
-  const { period, otdThreshold, otdFloor, rpaThreshold } = await getBonusConfigForPeriod(entry.periodId)
+  const {
+    period,
+    otdThreshold,
+    otdFloor,
+    rpaThreshold,
+    rpaFullPayoutThreshold,
+    rpaSoftBandEnd,
+    rpaSoftBandFloorFactor
+  } = await getBonusConfigForPeriod(entry.periodId)
 
   if (!canEditPayrollEntries(period.status)) {
     throw new PayrollValidationError('Exported payroll entries cannot be edited.', 409)
   }
 
-  const bonusConfig: BonusProrationConfig = { otdThreshold, otdFloor, rpaThreshold }
+  const bonusConfig: BonusProrationConfig = {
+    otdThreshold,
+    otdFloor,
+    rpaThreshold,
+    rpaFullPayoutThreshold,
+    rpaSoftBandEnd,
+    rpaSoftBandFloorFactor
+  }
 
   const forceManualKpi = input.kpiDataSource === 'manual' || entry.kpiDataSource === 'manual'
 

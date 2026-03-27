@@ -81,10 +81,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
 | `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
 | `TASK-064` | `in-progress` | ICO Assignee Attribution Remediation | `docs/tasks/in-progress/TASK-064-ico-assignee-attribution-remediation.md` |
+| `TASK-065` | `in-progress` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-065`
+- `TASK-066`
 
 ## Regla de asignacion desde aqui
 

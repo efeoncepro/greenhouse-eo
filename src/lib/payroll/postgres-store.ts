@@ -1726,7 +1726,7 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
 // Bonus config
 // ---------------------------------------------------------------------------
 
-export const pgGetActiveBonusConfig = async () => {
+export const pgGetActiveBonusConfig = async (effectiveDate?: string) => {
   await assertPayrollPostgresReady()
 
   const [row] = await runGreenhousePostgresQuery<{
@@ -1734,14 +1734,18 @@ export const pgGetActiveBonusConfig = async () => {
     otd_threshold: number | string
     rpa_threshold: number | string
     otd_floor: number | string | null
+    rpa_full_payout_threshold: number | string | null
+    rpa_soft_band_end: number | string | null
+    rpa_soft_band_floor_factor: number | string | null
     effective_from: string | Date
-  }>(
+    }>(
     `
       SELECT * FROM greenhouse_payroll.payroll_bonus_config
-      WHERE effective_from <= CURRENT_DATE
+      WHERE effective_from <= COALESCE($1::date, CURRENT_DATE)
       ORDER BY effective_from DESC
       LIMIT 1
-    `
+    `,
+    [effectiveDate ?? null]
   )
 
   return row
@@ -1750,6 +1754,11 @@ export const pgGetActiveBonusConfig = async () => {
         otdThreshold: toNumber(row.otd_threshold),
         rpaThreshold: toNumber(row.rpa_threshold),
         otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : 70,
+        rpaFullPayoutThreshold:
+          row.rpa_full_payout_threshold != null ? toNumber(row.rpa_full_payout_threshold) : 1.7,
+        rpaSoftBandEnd: row.rpa_soft_band_end != null ? toNumber(row.rpa_soft_band_end) : 2,
+        rpaSoftBandFloorFactor:
+          row.rpa_soft_band_floor_factor != null ? toNumber(row.rpa_soft_band_floor_factor) : 0.8,
         effectiveFrom: toPgDateString(row.effective_from)
       }
     : null

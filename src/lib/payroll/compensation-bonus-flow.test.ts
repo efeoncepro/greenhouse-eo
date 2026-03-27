@@ -10,15 +10,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { BonusProrationConfig } from '@/types/payroll'
 
+import { DEFAULT_BONUS_PRORATION_CONFIG } from './bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from './bonus-proration'
 
 // ---------- Shared fixtures ----------
 
-const DEFAULT_CONFIG: BonusProrationConfig = {
-  otdThreshold: 94,
-  otdFloor: 70,
-  rpaThreshold: 3
-}
+const DEFAULT_CONFIG: BonusProrationConfig = DEFAULT_BONUS_PRORATION_CONFIG
 
 /** Simulates a typical international collaborator compensation */
 const internationalCompensation = {
@@ -81,10 +78,9 @@ describe('compensation → bonus calculation flow', () => {
       const result = computeBonuses(internationalCompensation, { otdPercent: 95, rpaAvg: 1.0 })
 
       // With the bug (bonusRpaMin = 0): amount would be $0
-      // After fix (bonusRpaMax = 300): amount is $200.01
-      // (3 - 1.0) / 3 = 0.6667 → 300 * 0.6667 = $200.01
-      expect(result.rpa.amount).toBe(200.01)
+      // After fix (bonusRpaMax = 300): amount is $300
       expect(result.rpa.qualifies).toBe(true)
+      expect(result.rpa.amount).toBe(300)
     })
 
     it('would return $0 if bonusMin were used (documents the old bug)', () => {
@@ -113,23 +109,22 @@ describe('compensation → bonus calculation flow', () => {
       expect(result.otd.amount).toBe(500)
       expect(result.otd.prorationFactor).toBe(1)
 
-      // RpA: (3 - 1.5) / 3 = 0.5
-      expect(result.rpa.prorationFactor).toBe(0.5)
-      expect(result.rpa.amount).toBe(150)
-      expect(result.grossTotal).toBe(2000 + 50 + 120 + 500 + 150)
+      expect(result.rpa.prorationFactor).toBe(1)
+      expect(result.rpa.amount).toBe(300)
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 500 + 300)
     })
 
     it('OTD 82% (prorated) and RpA 2.5 (prorated): both partial', () => {
       const result = computeBonuses(internationalCompensation, { otdPercent: 82, rpaAvg: 2.5 })
 
-      // OTD: (82 - 70) / (94 - 70) = 12/24 = 0.5 → $250
-      expect(result.otd.prorationFactor).toBe(0.5)
-      expect(result.otd.amount).toBe(250)
+      // OTD: (82 - 70) / (89 - 70) = 12/19 = 0.6316 → $315.8
+      expect(result.otd.prorationFactor).toBe(0.6316)
+      expect(result.otd.amount).toBe(315.8)
 
-      // RpA: (3 - 2.5) / 3 = 0.1667 → $50.01
-      expect(result.rpa.prorationFactor).toBe(0.1667)
-      expect(result.rpa.amount).toBe(50.01)
-      expect(result.grossTotal).toBe(2000 + 50 + 120 + 250 + 50.01)
+      // RpA: 2.5 sits in the decline band → 40% of max = $120
+      expect(result.rpa.prorationFactor).toBe(0.4)
+      expect(result.rpa.amount).toBe(120)
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 315.8 + 120)
     })
 
     it('OTD below floor (65%): loses OTD bonus entirely', () => {
@@ -138,9 +133,8 @@ describe('compensation → bonus calculation flow', () => {
       expect(result.otd.amount).toBe(0)
       expect(result.otd.qualifies).toBe(false)
 
-      // RpA still valid: (3 - 1) / 3 = 0.6667 → 300 * 0.6667 = $200.01
-      expect(result.rpa.amount).toBe(200.01)
-      expect(result.grossTotal).toBe(2000 + 50 + 120 + 0 + 200.01)
+      expect(result.rpa.amount).toBe(300)
+      expect(result.grossTotal).toBe(2000 + 50 + 120 + 0 + 300)
     })
 
     it('RpA above threshold (3.5): loses RpA bonus entirely', () => {
@@ -182,9 +176,8 @@ describe('compensation → bonus calculation flow', () => {
       expect(standard.otd.amount).toBe(500)
       expect(senior.otd.amount).toBe(800)
 
-      // RpA: (3 - 1) / 3 = 0.6667
-      expect(standard.rpa.amount).toBe(200.01) // 300 * 0.6667
-      expect(senior.rpa.amount).toBe(333.35) // 500 * 0.6667
+      expect(standard.rpa.amount).toBe(300)
+      expect(senior.rpa.amount).toBe(500)
     })
 
     it('partial proration scales with bonus ceiling', () => {
@@ -193,13 +186,13 @@ describe('compensation → bonus calculation flow', () => {
       const standard = computeBonuses(internationalCompensation, kpi)
       const senior = computeBonuses(seniorCompensation, kpi)
 
-      // OTD: (82 - 70) / (94 - 70) = 0.5
-      expect(standard.otd.amount).toBe(250) // 500 * 0.5
-      expect(senior.otd.amount).toBe(400) // 800 * 0.5
+      // OTD: (82 - 70) / (89 - 70) = 12/19 = 0.6316
+      expect(standard.otd.amount).toBe(315.8)
+      expect(senior.otd.amount).toBe(505.28)
 
-      // RpA: (3 - 2) / 3 = 0.3333
-      expect(standard.rpa.amount).toBe(99.99) // 300 * 0.3333
-      expect(senior.rpa.amount).toBe(166.65) // 500 * 0.3333
+      // RpA: 2.0 is the soft-band floor factor = 80%
+      expect(standard.rpa.amount).toBe(240)
+      expect(senior.rpa.amount).toBe(400)
     })
   })
 
@@ -208,7 +201,10 @@ describe('compensation → bonus calculation flow', () => {
       const customConfig: BonusProrationConfig = {
         otdThreshold: 89,
         otdFloor: 70,
-        rpaThreshold: 3
+        rpaThreshold: 3,
+        rpaFullPayoutThreshold: 1.7,
+        rpaSoftBandEnd: 2,
+        rpaSoftBandFloorFactor: 0.8
       }
 
       // 89% qualifies at 100% with custom config, but only 79% proration with default (94%)
@@ -218,9 +214,8 @@ describe('compensation → bonus calculation flow', () => {
       expect(withCustom.otd.prorationFactor).toBe(1) // 89 >= 89 → full
       expect(withCustom.otd.amount).toBe(500)
 
-      // (89 - 70) / (94 - 70) = 19/24 = 0.7917
-      expect(withDefault.otd.prorationFactor).toBe(0.7917)
-      expect(withDefault.otd.amount).toBe(395.85)
+      expect(withDefault.otd.prorationFactor).toBe(1)
+      expect(withDefault.otd.amount).toBe(500)
     })
   })
 })

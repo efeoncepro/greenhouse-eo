@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-065`
+- siguiente ID disponible: `TASK-066`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -40,6 +40,7 @@ Primer bloque operativo asignado:
 | `TASK-057` | [TASK-057-direct-overhead-tool-cost-attribution.md](complete/TASK-057-direct-overhead-tool-cost-attribution.md) | P1        | Alto     | Medio    | **Completa**      | Direct overhead per person: AI tooling (licenses + credits) + Finance expenses (equipment/reimbursement/other) con dedup guard, degradación resiliente por fuente, taxonomía canónica y migration |
 | `TASK-062` | [TASK-062-payroll-recurring-fixed-bonus-support.md](complete/TASK-062-payroll-recurring-fixed-bonus-support.md) | P0        | Alto | Medio    | **Completa** | Payroll ya soporta un bono fijo recurrente versionado, snapshot por entry, prorrateo por asistencia y reflejo consistente en cálculo, exports y recibos |
 | `TASK-063` | [TASK-063-payroll-projected-payroll-runtime.md](to-do/TASK-063-payroll-projected-payroll-runtime.md) | P1        | Alto | Alto    | Diseño | Complemento de `Payroll` para responder nómina estimada al día y a fin de mes por persona o grupo, reutilizando el motor canónico, preservando mixed currency y apoyándose en events/outbox/projections donde aporten lectura rápida |
+| `TASK-065` | [TASK-065-payroll-variable-bonus-policy-recalibration.md](in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md) | P0 | Muy alto | Medio | Implementación | Recalibración del payout variable de `Payroll` con full payout `OTD` desde `89%` y bandas suaves de `RpA`, manteniendo compatibilidad con payroll oficial, proyectado, recálculo y exports |
 
 ## To Do
 

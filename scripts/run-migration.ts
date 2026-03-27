@@ -7,8 +7,128 @@ import process from 'node:process'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
+const splitSqlStatements = (sql: string) => {
+  const statements: string[] = []
+  let current = ''
+  let i = 0
+  let inSingleQuote = false
+  let inDoubleQuote = false
+  let inLineComment = false
+  let inBlockComment = false
+  let dollarTag: string | null = null
+
+  while (i < sql.length) {
+    const char = sql[i]
+    const next = sql[i + 1]
+
+    if (inLineComment) {
+      current += char
+
+      if (char === '\n') {
+        inLineComment = false
+      }
+
+      i += 1
+      continue
+    }
+
+    if (inBlockComment) {
+      current += char
+
+      if (char === '*' && next === '/') {
+        current += next
+        inBlockComment = false
+        i += 2
+        continue
+      }
+
+      i += 1
+      continue
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && !dollarTag && char === '-' && next === '-') {
+      current += char + next
+      inLineComment = true
+      i += 2
+      continue
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && !dollarTag && char === '/' && next === '*') {
+      current += char + next
+      inBlockComment = true
+      i += 2
+      continue
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && char === '$') {
+      const remainder = sql.slice(i)
+      const match = remainder.match(/^\$[A-Za-z0-9_]*\$/)
+
+      if (match) {
+        const tag = match[0]
+
+        current += tag
+
+        if (dollarTag === tag) {
+          dollarTag = null
+        } else if (!dollarTag) {
+          dollarTag = tag
+        }
+
+        i += tag.length
+        continue
+      }
+    }
+
+    if (!inDoubleQuote && !dollarTag && char === '\'') {
+      if (inSingleQuote && next === '\'') {
+        current += char + next
+        i += 2
+        continue
+      }
+
+      inSingleQuote = !inSingleQuote
+      current += char
+      i += 1
+      continue
+    }
+
+    if (!inSingleQuote && !dollarTag && char === '"') {
+      inDoubleQuote = !inDoubleQuote
+      current += char
+      i += 1
+      continue
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && !dollarTag && char === ';') {
+      const statement = current.trim()
+
+      if (statement.length > 0 && !statement.startsWith('--')) {
+        statements.push(statement)
+      }
+
+      current = ''
+      i += 1
+      continue
+    }
+
+    current += char
+    i += 1
+  }
+
+  const trailingStatement = current.trim()
+
+  if (trailingStatement.length > 0 && !trailingStatement.startsWith('--')) {
+    statements.push(trailingStatement)
+  }
+
+  return statements
+}
+
 const main = async () => {
   const sqlFile = process.argv[2]
+  const profileArg = process.argv.find(arg => arg.startsWith('--profile='))
+  const profile = profileArg?.split('=')[1] ?? 'migrator'
 
   if (!sqlFile) {
     console.error('Usage: npx tsx scripts/run-migration.ts <path-to-sql-file>')
@@ -18,18 +138,14 @@ const main = async () => {
   console.log(`=== Running migration: ${sqlFile} ===\n`)
 
   loadGreenhouseToolEnv()
-  applyGreenhousePostgresProfile('migrator')
+  applyGreenhousePostgresProfile(profile as 'runtime' | 'migrator' | 'admin')
 
   const { closeGreenhousePostgres, runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 
   try {
     const sql = readFileSync(sqlFile, 'utf-8')
 
-    // Split on semicolons, filter empty statements
-    const statements = sql
-      .split(/;\s*$/m)
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'))
+    const statements = splitSqlStatements(sql)
 
     console.log(`Found ${statements.length} statements\n`)
 
