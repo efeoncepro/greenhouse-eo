@@ -545,13 +545,14 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
 
   const assignments = await runGreenhousePostgresQuery<AssignmentRow>(
     `
-      SELECT assignment_id, client_id, client_name, fte_allocation, hours_per_month, start_date, end_date, active
-      FROM greenhouse_core.client_team_assignments
-      WHERE member_id = $1
-        AND active = TRUE
-        AND start_date <= $2::date
-        AND (end_date IS NULL OR end_date >= $3::date)
-      ORDER BY client_name ASC, assignment_id ASC
+      SELECT a.assignment_id, a.client_id, c.client_name, a.fte_allocation, a.hours_per_month, a.start_date, a.end_date, a.active
+      FROM greenhouse_core.client_team_assignments a
+      LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+      WHERE a.member_id = $1
+        AND a.active = TRUE
+        AND a.start_date <= $2::date
+        AND (a.end_date IS NULL OR a.end_date >= $3::date)
+      ORDER BY c.client_name ASC, a.assignment_id ASC
     `,
     [memberId, periodEnd, periodStart]
   )
@@ -640,13 +641,14 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
         COUNT(*)::int AS expense_count,
         COALESCE(SUM(total_amount_clp), 0) AS total_shared_overhead_target,
         (
-          SELECT COUNT(DISTINCT member_id)::int
-          FROM greenhouse_core.client_team_assignments
-          WHERE active = TRUE
-            AND start_date <= $2::date
-            AND (end_date IS NULL OR end_date >= $1::date)
-            AND COALESCE(NULLIF(LOWER(TRIM(client_id)), ''), '__missing__') NOT IN ('efeonce_internal', 'client_internal', 'space-efeonce')
-            AND COALESCE(NULLIF(LOWER(TRIM(client_name)), ''), '__missing__') NOT IN ('efeonce internal', 'efeonce')
+          SELECT COUNT(DISTINCT a2.member_id)::int
+          FROM greenhouse_core.client_team_assignments a2
+          LEFT JOIN greenhouse_core.clients c2 ON c2.client_id = a2.client_id
+          WHERE a2.active = TRUE
+            AND a2.start_date <= $2::date
+            AND (a2.end_date IS NULL OR a2.end_date >= $1::date)
+            AND COALESCE(NULLIF(LOWER(TRIM(a2.client_id)), ''), '__missing__') NOT IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            AND COALESCE(NULLIF(LOWER(TRIM(c2.client_name)), ''), '__missing__') NOT IN ('efeonce internal', 'efeonce')
         ) AS billable_member_count
       FROM greenhouse_finance.expenses
       WHERE allocated_client_id IS NULL
