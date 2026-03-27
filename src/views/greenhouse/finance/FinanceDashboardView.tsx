@@ -32,6 +32,7 @@ import { toast } from 'react-toastify'
 import Chip from '@mui/material/Chip'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import CustomChip from '@core/components/mui/Chip'
 import OptionMenu from '@core/components/option-menu'
 
@@ -624,48 +625,39 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
-      {/* Financial KPIs */}
+      {/* Financial KPIs with sparklines */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
+          <StatsWithAreaChart
             title='Saldo total'
             stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
-            subtitle={accounts.length === 0
-              ? 'Sin cuentas activas registradas'
-              : latestBalanceAsOf
-                ? `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`
-                : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
             avatarIcon='tabler-wallet'
             avatarColor='primary'
-            footer={latestBalanceAsOf ? `Al ${formatDate(latestBalanceAsOf)}` : undefined}
+            avatarSkin='light'
+            chartColor='primary'
+            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
+          <StatsWithAreaChart
             title='Facturación del mes'
-            titleTooltip='Facturado = emitido por invoice_date. Cobrado = recibido por payment_date.'
             stats={formatCLP(accrualIncomeClp)}
-            subtitle={cashIncomeClp > 0
-              ? `Cobrado: ${formatCLP(cashIncomeClp)}`
-              : 'Sin cobros registrados'}
             avatarIcon='tabler-file-invoice'
             avatarColor='success'
-            trend={incomeSummary?.accrualCurrentMonth?.trend ?? incomeSummary?.currentMonth.trend ?? 'positive'}
-            trendNumber={incomeSummary?.accrualCurrentMonth?.changePercent !== undefined ? `${Math.abs(incomeSummary.accrualCurrentMonth.changePercent)}%` : undefined}
-            footer={cashIncomeClp > 0 && cashIncomeClp < accrualIncomeClp ? `Por cobrar: ${formatCLP(accrualIncomeClp - cashIncomeClp)}` : undefined}
+            avatarSkin='light'
+            chartColor='success'
+            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <HorizontalWithSubtitle
+          <StatsWithAreaChart
             title='Costos del mes'
-            titleTooltip='Incluye gastos operacionales y costo de personal cuando hay nómina aprobada.'
             stats={formatCLP(expenseWithPayroll)}
-            subtitle={pnl && payrollIncluded
-              ? `Operacional: ${formatCLP(pnl.costs.totalExpenses - (pnl.costs.unlinkedPayrollCost ?? 0))}`
-              : 'Sin nómina aprobada'}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
-            footer={pnl && payrollIncluded ? `Personal: ${formatCLP(pnl.costs.unlinkedPayrollCost ?? 0)}` : undefined}
+            avatarSkin='light'
+            chartColor='error'
+            chartSeries={[{ data: expenseMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
       </Grid>
