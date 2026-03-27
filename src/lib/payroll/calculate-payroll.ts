@@ -3,8 +3,10 @@ import 'server-only'
 import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResult, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
@@ -73,6 +75,34 @@ type AttendanceSnapshot = {
 }
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
+
+const resolvePayrollPeriodIndicators = async ({
+  periodId,
+  periodUfValue,
+  taxTableVersion
+}: {
+  periodId: string
+  periodUfValue: number | null
+  taxTableVersion: string | null
+}) => {
+  const { periodEnd } = getPeriodRangeFromId(periodId)
+
+  const ufValue = typeof periodUfValue === 'number'
+    ? periodUfValue
+    : (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UF',
+        periodDate: periodEnd
+      }))?.value ?? null
+
+  const utmValue = taxTableVersion
+    ? (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UTM',
+        periodDate: periodEnd
+      }))?.value ?? null
+    : null
+
+  return { ufValue, utmValue }
+}
 
 const buildPayrollEntry = ({
   periodId,
@@ -223,7 +253,13 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  if (requiresUfValue && typeof period.ufValue !== 'number') {
+  const indicatorValues = await resolvePayrollPeriodIndicators({
+    periodId,
+    periodUfValue: period.ufValue,
+    taxTableVersion: period.taxTableVersion
+  })
+
+  if (requiresUfValue && typeof indicatorValues.ufValue !== 'number') {
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
   }
 
@@ -253,14 +289,60 @@ export const calculatePayroll = async ({
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
 
-    const entry = buildPayrollEntry({
+    let entry = buildPayrollEntry({
       periodId,
       compensation,
-      ufValue: period.ufValue,
+      ufValue: indicatorValues.ufValue,
       bonusConfig,
       kpi,
       attendance
     })
+
+    if (compensation.payRegime === 'chile' && period.taxTableVersion) {
+      const taxResult = await computeChileTax({
+        taxableBaseClp: entry.chileTaxableBase ?? 0,
+        taxTableVersion: period.taxTableVersion,
+        utmValue: indicatorValues.utmValue
+      })
+
+      const totalsWithTax = calculatePayrollTotals({
+        payRegime: compensation.payRegime,
+        baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
+        remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
+        bonusOtdAmount: entry.bonusOtdAmount,
+        bonusRpaAmount: entry.bonusRpaAmount,
+        bonusOtherAmount: entry.bonusOtherAmount,
+        afpName: compensation.afpName,
+        afpRate: compensation.afpRate,
+        healthSystem: compensation.healthSystem,
+        healthPlanUf: compensation.healthPlanUf,
+        unemploymentRate: compensation.unemploymentRate,
+        contractType: compensation.contractType,
+        hasApv: compensation.hasApv,
+        apvAmount: compensation.apvAmount,
+        ufValue: indicatorValues.ufValue,
+        taxAmount: taxResult.taxAmountClp
+      })
+
+      entry = {
+        ...entry,
+        grossTotal: totalsWithTax.grossTotal,
+        chileAfpName: totalsWithTax.chileAfpName,
+        chileAfpRate: totalsWithTax.chileAfpRate,
+        chileAfpAmount: totalsWithTax.chileAfpAmount,
+        chileHealthSystem: totalsWithTax.chileHealthSystem,
+        chileHealthAmount: totalsWithTax.chileHealthAmount,
+        chileUnemploymentRate: totalsWithTax.chileUnemploymentRate,
+        chileUnemploymentAmount: totalsWithTax.chileUnemploymentAmount,
+        chileTaxableBase: totalsWithTax.chileTaxableBase,
+        chileTaxAmount: totalsWithTax.chileTaxAmount,
+        chileApvAmount: totalsWithTax.chileApvAmount,
+        chileUfValue: totalsWithTax.chileUfValue,
+        chileTotalDeductions: totalsWithTax.chileTotalDeductions,
+        netTotalCalculated: totalsWithTax.netTotalCalculated,
+        netTotal: totalsWithTax.netTotalCalculated
+      }
+    }
 
     await upsertPayrollEntry(entry)
     entries.push(entry)

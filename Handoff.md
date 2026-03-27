@@ -155,16 +155,56 @@ Sesión completa que cerró 2 tasks, arregló una regresión, creó una proyecci
 - `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
+- `src/lib/finance/economic-indicators.ts`
+- `src/lib/finance/postgres-store.ts`
+- `src/lib/finance/schema.ts`
+- `src/app/api/finance/economic-indicators/latest/route.ts`
+- `src/app/api/finance/economic-indicators/sync/route.ts`
+- `src/lib/ai-tools/service.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/payroll-readiness.ts`
+- `src/lib/payroll/get-payroll-periods.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `src/views/greenhouse/finance/FinanceDashboardView.tsx`
+- `src/lib/sync/event-catalog.ts`
+- `docs/architecture/FINANCE_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+- `README.md`
+- `scripts/setup-postgres-finance.sql`
+- `scripts/migrations/add-economic-indicators.sql`
+- `vercel.json`
+- `project_context.md`
+- `changelog.md`
 - `Handoff.md`
 
 ### Verificacion
 
-- Sin validación de runtime todavía; inicio documental de la lane antes de tocar código.
+- `pnpm exec eslint src/lib/finance/economic-indicators.ts src/lib/finance/postgres-store.ts src/lib/finance/schema.ts src/lib/ai-tools/service.ts src/lib/payroll/calculate-payroll.ts src/lib/payroll/recalculate-entry.ts src/lib/payroll/payroll-readiness.ts src/app/api/finance/economic-indicators/latest/route.ts src/app/api/finance/economic-indicators/sync/route.ts src/views/greenhouse/finance/FinanceDashboardView.tsx src/lib/sync/event-catalog.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec tsx scripts/run-migration.ts scripts/migrations/add-economic-indicators.sql`
+- `pnpm exec tsx scripts/backfill-economic-indicators.ts --from=2026-01-01 --to=2026-03-27`
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm pg:doctor --profile=runtime`
+- runtime query de verificación sobre `greenhouse_finance.economic_indicators` y `greenhouse_finance.exchange_rates`
+- `pnpm exec eslint src/lib/payroll/get-payroll-periods.ts src/lib/payroll/postgres-store.ts src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
 
 ### Riesgos o pendientes
 
-- Decidir si la persistencia nueva vive extendiendo `greenhouse_finance.exchange_rates` o en una tabla general `economic_indicators`.
-- Mantener compatibilidad con los eventos reactivos ya existentes (`finance.exchange_rate.upserted`) sin romper projections actuales.
+- Migration ejecutada en PostgreSQL y tabla `greenhouse_finance.economic_indicators` accesible desde `runtime`.
+- Backfill histórico ejecutado para `2026-01-01 -> 2026-03-27` con script reusable `scripts/backfill-economic-indicators.ts`.
+- Cobertura verificada en runtime:
+  - `UF`: 86 rows (`2026-01-01` → `2026-03-27`)
+  - `USD_CLP`: 61 rows (`2026-01-02` → `2026-03-27`)
+  - `UTM`: 3 rows (`2026-01-01` → `2026-03-01`)
+  - `IPC`: 0 rows aún devueltos por `mindicador` para el rango 2026 consultado
+- `exchange_rates` quedó además con histórico compatible para `USD -> CLP` y `CLP -> USD` desde `2026-01-02`.
+- `Payroll` ya no pide `UF` manualmente por defecto en create/edit de período; ahora la resuelve y persiste automáticamente desde indicadores según el mes imputable.
+- Documentación canónica alineada en `Finance`, `Payroll`, `Sync Pipelines`, `README` e índice de tasks.
+- `USD_CLP` mantiene compatibilidad con `greenhouse_finance.exchange_rates`, pero `UF/UTM/IPC` nuevos todavía no tienen projections reactivas dedicadas porque los consumers actuales fuera de `Payroll` no las requieren.
 
 ## 2026-03-26 22:00 -03
 

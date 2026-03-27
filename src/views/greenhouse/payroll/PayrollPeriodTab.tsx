@@ -46,7 +46,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const [editMetaOpen, setEditMetaOpen] = useState(false)
   const [editYear, setEditYear] = useState<number | ''>('')
   const [editMonth, setEditMonth] = useState<number | ''>('')
-  const [editUf, setEditUf] = useState<number | ''>('')
   const [editTaxTable, setEditTaxTable] = useState('')
   const [editNotes, setEditNotes] = useState('')
   const [editSaving, setEditSaving] = useState(false)
@@ -191,7 +190,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
 
     setEditYear(period.year)
     setEditMonth(period.month)
-    setEditUf(period.ufValue ?? '')
     setEditTaxTable(period.taxTableVersion ?? '')
     setEditNotes(period.notes ?? '')
     setEditMetaOpen(true)
@@ -213,7 +211,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
         body: JSON.stringify({
           year: nextYear,
           month: nextMonth,
-          ufValue: editUf === '' ? null : editUf,
           taxTableVersion: editTaxTable || null,
           notes: editNotes || null
         })
@@ -232,7 +229,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     } finally {
       setEditSaving(false)
     }
-  }, [period, editYear, editMonth, editUf, editTaxTable, editNotes, onRefresh])
+  }, [period, editYear, editMonth, editTaxTable, editNotes, onRefresh])
 
   if (!period) {
     return (
@@ -253,7 +250,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const canEditPeriod = canEditPayrollPeriodMetadata(period.status)
   const nextYearPreview = editYear === '' ? period.year : editYear
   const nextMonthPreview = editMonth === '' ? period.month : editMonth
-  const nextUfPreview = editUf === '' ? null : editUf
 
   const resetWarning =
     canEditPeriod && doesPayrollPeriodUpdateRequireReset({
@@ -263,7 +259,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
       currentTaxTableVersion: period.taxTableVersion,
       nextYear: typeof nextYearPreview === 'number' ? nextYearPreview : period.year,
       nextMonth: typeof nextMonthPreview === 'number' ? nextMonthPreview : period.month,
-      nextUfValue: nextUfPreview,
+      nextUfValue: period.ufValue,
       nextTaxTableVersion: editTaxTable || null
     })
 
@@ -317,7 +313,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
               stats={period.ufValue ? period.ufValue.toLocaleString('es-CL') : '—'}
               avatarIcon='tabler-chart-dots'
               avatarColor='info'
-              subtitle={period.ufValue ? 'Configurado' : 'No configurado'}
+              subtitle={period.ufValue ? 'Sincronizado' : 'Pendiente de sincronizar'}
             />
           </Grid>
         </Grid>
@@ -326,7 +322,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
       {/* UF warning for Chile entries without UF */}
       {!period.ufValue && entries.some(e => e.payRegime === 'chile') && period.status === 'draft' && (
         <Alert severity='warning' sx={{ mb: 4 }}>
-          El valor UF no está configurado. Es necesario para calcular Isapre en régimen CLP.
+          La UF del período aún no está sincronizada. Si el indicador existe para ese mes, se tomará automáticamente al calcular.
         </Alert>
       )}
 
@@ -668,15 +664,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                 ))}
               </CustomTextField>
             </Stack>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Valor UF'
-              type='number'
-              value={editUf}
-              onChange={e => setEditUf(e.target.value === '' ? '' : Number(e.target.value))}
-              helperText='Necesario para calcular Isapre'
-            />
+            <Alert severity='info'>
+              La UF se sincroniza automáticamente desde indicadores económicos según el mes imputable guardado para este período.
+            </Alert>
             <CustomTextField
               fullWidth
               size='small'
@@ -696,7 +686,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
             />
             {resetWarning && (
               <Alert severity='warning'>
-                Cambiar mes/año imputable, UF o tabla impositiva reiniciará este período a borrador y eliminará las entries calculadas para que puedas recalcularlo con el mes correcto.
+                Cambiar mes/año imputable o tabla impositiva reiniciará este período a borrador y eliminará las entries calculadas para que puedas recalcularlo con los valores correctos del período.
               </Alert>
             )}
           </Stack>

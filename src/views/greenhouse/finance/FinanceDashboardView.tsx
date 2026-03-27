@@ -55,13 +55,21 @@ interface AccountSummary {
   isActive: boolean
 }
 
-interface ExchangeRate {
-  available: boolean
-  fromCurrency?: string
-  toCurrency?: string
-  rate?: number
-  rateDate?: string
-  source?: string
+interface IndicatorSnapshot {
+  indicatorId: string
+  indicatorCode: string
+  indicatorDate: string
+  value: number
+  source: string
+  unit: string
+  frequency: string
+}
+
+interface IndicatorsSummary {
+  USD_CLP?: IndicatorSnapshot | null
+  UF?: IndicatorSnapshot | null
+  UTM?: IndicatorSnapshot | null
+  IPC?: IndicatorSnapshot | null
 }
 
 interface MonthlyDataPoint {
@@ -202,6 +210,14 @@ const formatRate = (rate: number): string => {
   return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(rate)
 }
 
+const formatIndicatorValue = (value: number, indicatorCode: string): string => {
+  if (indicatorCode === 'IPC') {
+    return `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value)}%`
+  }
+
+  return `$${formatRate(value)}`
+}
+
 const formatDate = (date: string | null): string => {
   if (!date) {
     return '—'
@@ -326,7 +342,7 @@ const FinanceDashboardView = () => {
 
   const [loading, setLoading] = useState(true)
   const [accounts, setAccounts] = useState<AccountSummary[]>([])
-  const [exchangeRate, setExchangeRate] = useState<ExchangeRate>({ available: false })
+  const [indicators, setIndicators] = useState<IndicatorsSummary>({})
   const [incomeSummary, setIncomeSummary] = useState<SummaryData | null>(null)
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
   const [recentMovements, setRecentMovements] = useState<RecentMovement[]>([])
@@ -346,9 +362,9 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
-        fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
+        fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
         fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
         fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
@@ -371,18 +387,18 @@ const FinanceDashboardView = () => {
         errors.push(`Cuentas: ${accountsRes.status}`)
       }
 
-      if (rateRes.ok) {
-        const rateData = await rateRes.json()
+      if (indicatorsRes.ok) {
+        const indicatorsData = await indicatorsRes.json()
 
-        setExchangeRate(rateData)
+        setIndicators(indicatorsData.indicators ?? {})
 
-        if (!rateData.available) {
-          errors.push('Tipo de cambio: sin snapshot disponible')
+        if (!indicatorsData.indicators?.USD_CLP) {
+          errors.push('Indicadores: USD/CLP sin snapshot disponible')
         }
       } else {
-        const d = await rateRes.json().catch(() => ({}))
+        const d = await indicatorsRes.json().catch(() => ({}))
 
-        errors.push(`Tipo de cambio: ${d.error || rateRes.status}`)
+        errors.push(`Indicadores: ${d.error || indicatorsRes.status}`)
       }
 
       if (incomeSummaryRes.ok) {
@@ -610,7 +626,7 @@ const FinanceDashboardView = () => {
 
       {/* KPI row */}
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <HorizontalWithSubtitle
             title='Saldo total'
             stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
@@ -623,7 +639,7 @@ const FinanceDashboardView = () => {
             avatarColor='primary'
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <HorizontalWithSubtitle
             title='Facturación del mes'
             titleTooltip='Facturado = emitido por invoice_date. Cobrado = recibido por payment_date.'
@@ -649,7 +665,7 @@ const FinanceDashboardView = () => {
             trendNumber={incomeSummary?.accrualCurrentMonth?.changePercent !== undefined ? `${Math.abs(incomeSummary.accrualCurrentMonth.changePercent)}%` : undefined}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <HorizontalWithSubtitle
             title='Costos del mes'
             titleTooltip='Incluye gastos operacionales y costo de personal cuando hay nómina aprobada.'
@@ -675,15 +691,37 @@ const FinanceDashboardView = () => {
             avatarColor='error'
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <HorizontalWithSubtitle
-            title='Tipo de cambio'
-            stats={exchangeRate.available && exchangeRate.rate ? `$${formatRate(exchangeRate.rate)}` : 'Sin datos'}
-            subtitle={exchangeRate.available
-              ? `USD → CLP · ${exchangeRate.source ?? 'manual'}${exchangeRate.rateDate ? ` · ${formatDate(exchangeRate.rateDate)}` : ''}`
+            title='Dólar obs.'
+            stats={indicators.USD_CLP?.value ? formatIndicatorValue(indicators.USD_CLP.value, 'USD_CLP') : 'Sin datos'}
+            subtitle={indicators.USD_CLP
+              ? `${indicators.USD_CLP.source ?? 'manual'}${indicators.USD_CLP.indicatorDate ? ` · ${formatDate(indicators.USD_CLP.indicatorDate)}` : ''}`
               : 'Sin registros'}
             avatarIcon='tabler-arrows-exchange'
             avatarColor='info'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+          <HorizontalWithSubtitle
+            title='UF'
+            stats={indicators.UF?.value ? formatIndicatorValue(indicators.UF.value, 'UF') : 'Sin datos'}
+            subtitle={indicators.UF
+              ? `${indicators.UF.source ?? 'manual'}${indicators.UF.indicatorDate ? ` · ${formatDate(indicators.UF.indicatorDate)}` : ''}`
+              : 'Sin registros'}
+            avatarIcon='tabler-chart-histogram'
+            avatarColor='primary'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
+          <HorizontalWithSubtitle
+            title='UTM'
+            stats={indicators.UTM?.value ? formatIndicatorValue(indicators.UTM.value, 'UTM') : 'Sin datos'}
+            subtitle={indicators.UTM
+              ? `${indicators.UTM.source ?? 'manual'}${indicators.UTM.indicatorDate ? ` · ${formatDate(indicators.UTM.indicatorDate)}` : ''}`
+              : 'Sin registros'}
+            avatarIcon='tabler-scale'
+            avatarColor='warning'
           />
         </Grid>
       </Grid>

@@ -3,8 +3,10 @@ import 'server-only'
 import type { BonusProrationConfig, PayrollEntry, UpdatePayrollEntryInput } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
@@ -197,7 +199,21 @@ export const recalculatePayrollEntry = async ({
   const nextBonusOtdAmount = input.bonusOtdAmount ?? entry.bonusOtdAmount
   const nextBonusRpaAmount = input.bonusRpaAmount ?? entry.bonusRpaAmount
   const nextBonusOtherAmount = input.bonusOtherAmount ?? entry.bonusOtherAmount
-  const nextTaxAmount = input.chileTaxAmount ?? entry.chileTaxAmount ?? 0
+  const { periodEnd } = getPeriodRangeFromId(entry.periodId)
+
+  const resolvedUfValue = typeof period.ufValue === 'number'
+    ? period.ufValue
+    : (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UF',
+        periodDate: periodEnd
+      }))?.value ?? null
+
+  const resolvedUtmValue = period.taxTableVersion
+    ? (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UTM',
+        periodDate: periodEnd
+      }))?.value ?? null
+    : null
 
   validateBonusAmount({
     qualifies: otdResult.qualifies,
@@ -216,6 +232,35 @@ export const recalculatePayrollEntry = async ({
   const effectiveBaseSalary = entry.adjustedBaseSalary ?? compensation.baseSalary
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
 
+  const provisionalTotals = calculatePayrollTotals({
+    payRegime: compensation.payRegime,
+    baseSalary: effectiveBaseSalary,
+    remoteAllowance: effectiveRemoteAllowance,
+    bonusOtdAmount: nextBonusOtdAmount,
+    bonusRpaAmount: nextBonusRpaAmount,
+    bonusOtherAmount: nextBonusOtherAmount,
+    afpName: compensation.afpName,
+    afpRate: compensation.afpRate,
+    healthSystem: compensation.healthSystem,
+    healthPlanUf: compensation.healthPlanUf,
+    unemploymentRate: compensation.unemploymentRate,
+    contractType: compensation.contractType,
+    hasApv: compensation.hasApv,
+    apvAmount: compensation.apvAmount,
+    ufValue: resolvedUfValue,
+    taxAmount: 0
+  })
+
+  const autoTaxAmount = compensation.payRegime === 'chile' && period.taxTableVersion
+    ? (await computeChileTax({
+        taxableBaseClp: provisionalTotals.chileTaxableBase ?? 0,
+        taxTableVersion: period.taxTableVersion,
+        utmValue: resolvedUtmValue
+      })).taxAmountClp
+    : 0
+
+  const nextTaxAmount = input.chileTaxAmount ?? autoTaxAmount
+
   const totals = calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
@@ -231,7 +276,7 @@ export const recalculatePayrollEntry = async ({
     contractType: compensation.contractType,
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
-    ufValue: period.ufValue,
+    ufValue: resolvedUfValue,
     taxAmount: nextTaxAmount
   })
 

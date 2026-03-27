@@ -331,6 +331,7 @@ What Finance still owns:
 - bank accounts
 - finance supplier profiles
 - exchange rates
+- economic indicators (`USD_CLP`, `UF`, `UTM`, `IPC`) y su histórico operativo mínimo
 - reconciliation periods and statement rows
 - client billing profile extensions
 - income and expense transactions
@@ -367,6 +368,7 @@ The transition prevents breakage in:
 - financial profile extensions
 - banking and reconciliation data
 - exchange rates
+- economic indicators compartidos para consumers cross-module
 
 ### Finance must not own
 
@@ -389,6 +391,22 @@ Still pending or partial:
 - fuller client 360 spend attribution from `fin_expenses.client_id`
 - broader frontend consumption of collaborator finance overview
 - complete product documentation for 360 UI surfaces outside Finance and People
+
+## Delta 2026-03-27 - Economic indicators runtime baseline
+
+Finance dejó de quedar restringido semánticamente a `exchange_rates` como único contrato macroeconómico reutilizable.
+
+Baseline materializado:
+- helper server-side común para `USD_CLP`, `UF`, `UTM`, `IPC`
+- endpoint `GET /api/finance/economic-indicators/latest`
+- endpoint `GET/POST /api/finance/economic-indicators/sync`
+- persistencia operacional en `greenhouse_finance.economic_indicators`
+- compatibilidad mantenida con `greenhouse_finance.exchange_rates` para `USD/CLP`
+
+Reglas derivadas:
+- indicadores no FX no deben modelarse como monedas por conveniencia
+- `UF`, `UTM` e `IPC` viven como catálogo de indicadores económicos, no como pares de currency
+- consumers de período que necesiten reproducibilidad histórica deben leer desde esta capa antes de pedir input manual al usuario
 
 ## Source Files
 

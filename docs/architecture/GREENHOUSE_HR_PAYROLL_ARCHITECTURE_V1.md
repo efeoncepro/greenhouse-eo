@@ -141,6 +141,8 @@ Reglas:
 - `year` + `month` representan el mes imputable, no el mes de pago
 - una nómina de febrero pagada en los primeros días de marzo sigue siendo `2026-02`
 - el período puede corregirse mientras no esté exportado
+- `uf_value` puede persistirse automáticamente desde la capa de indicadores económicos según `year/month`; no debe depender por defecto de captura manual en UI
+- si el usuario no define override explícito, Payroll debe preferir la `UF` histórica del período imputable para Isapre y snapshots derivados
 
 ### `greenhouse_payroll.payroll_entries`
 Snapshot calculado por colaborador para un período.

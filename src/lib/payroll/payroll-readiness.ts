@@ -1,5 +1,6 @@
 import type { PayrollPeriod, PayrollPeriodReadiness, PayrollReadinessIssue } from '@/types/payroll'
 
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
@@ -121,6 +122,14 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
   }
 
   const range = getPeriodRangeFromId(periodId)
+
+  const resolvedUfValue = typeof period.ufValue === 'number'
+    ? period.ufValue
+    : (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UF',
+        periodDate: range.periodEnd
+      }))?.value ?? null
+
   const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const includedMemberIds = compensationRows.filter(row => row.hasCompensationVersion).map(row => row.memberId)
 
@@ -139,7 +148,7 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
   const missingAttendanceMemberIds = includedMemberIds.filter(memberId => !hasAttendanceSignal(attendanceData.get(memberId)))
 
   return buildPayrollPeriodReadiness({
-    period,
+    period: resolvedUfValue == null ? period : { ...period, ufValue: resolvedUfValue },
     compensationRows,
     missingKpiMemberIds,
     missingAttendanceMemberIds,

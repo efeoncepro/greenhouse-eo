@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-27 Economic indicators runtime baseline
+- Finance ya no queda limitado semánticamente a `exchange_rates` para datos macroeconómicos chilenos.
+- Baseline nuevo materializado:
+  - helper server-side común para `USD_CLP`, `UF`, `UTM`, `IPC`
+  - endpoint `GET /api/finance/economic-indicators/latest`
+  - endpoint `GET/POST /api/finance/economic-indicators/sync`
+  - storage histórico previsto desde `2026-01-01`
+  - cron diario movido a `/api/finance/economic-indicators/sync`
+- Regla operativa derivada:
+  - `USD/CLP` sigue manteniendo compatibilidad con `greenhouse_finance.exchange_rates`
+  - indicadores no FX (`UF`, `UTM`, `IPC`) no deben modelarse como monedas ni reusar contratos de currency a la fuerza
+  - consumers que necesiten snapshots históricos de período deben leer desde la capa común de indicadores antes de pedir input manual al usuario
+  - `Payroll` ya no debe pedir `UF` manualmente por defecto al crear/editar períodos; debe autohidratarla desde indicadores usando el mes imputable
+
 ## Delta 2026-03-26 Team capacity architecture canonized
 - La arquitectura de capacidad/economía de equipo ya no vive solo en una task o en el código.
 - La fuente canónica quedó fijada en:

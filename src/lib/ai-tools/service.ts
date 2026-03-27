@@ -51,6 +51,7 @@ import {
   shouldFallbackFromAiToolingPostgres
 } from '@/lib/ai-tools/postgres-store'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { getLatestEconomicIndicator } from '@/lib/finance/economic-indicators'
 import { syncProviderRegistryFromFinanceSuppliers } from '@/lib/providers/canonical'
 import {
   ACCESS_LEVELS,
@@ -597,21 +598,10 @@ const assertWalletVisibleToTenant = (tenant: TenantContext, wallet: AiCreditWall
 }
 
 const getUsdToClpRate = async () => {
-  const projectId = getProjectId()
-
   try {
-    const [row] = await runAiToolingQuery<{ rate: number | string | null }>(
-      `
-        SELECT rate
-        FROM \`${projectId}.greenhouse.fin_exchange_rates\`
-        WHERE from_currency = 'USD'
-          AND to_currency = 'CLP'
-        ORDER BY rate_date DESC
-        LIMIT 1
-      `
-    )
+    const indicator = await getLatestEconomicIndicator('USD_CLP')
 
-    return toNullableNumber(row?.rate) ?? 950
+    return indicator?.value ?? 950
   } catch {
     return 950
   }

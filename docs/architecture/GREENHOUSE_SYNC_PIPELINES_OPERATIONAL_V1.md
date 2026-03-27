@@ -79,10 +79,10 @@ Greenhouse uses a multi-layer sync architecture to move data between external so
 - Source: src/lib/ico-engine/materialize.ts
 - Health: /api/ico-engine/health — returns materialization freshness (status, lastMaterializedAt, hoursSinceLastMaterialization)
 
-### 11. Exchange Rate Sync (Vercel Cron)
-- Path: /api/finance/exchange-rates/sync
+### 11. Economic Indicators Sync (Vercel Cron)
+- Path: /api/finance/economic-indicators/sync
 - Schedule: Daily 11:05 PM UTC
-- Function: Fetches latest exchange rates, writes to greenhouse.fin_exchange_rates
+- Function: Fetches latest economic indicators for Chile, writes to `greenhouse_finance.economic_indicators`, and keeps `USD/CLP` compatibility synchronized into `greenhouse_finance.exchange_rates`
 
 ## Data Flow Layers
 ```

@@ -41,6 +41,7 @@ import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 // ---------------------------------------------------------------------------
@@ -76,6 +77,30 @@ type PgCompensationRow = {
   change_reason: string | null
   created_by_user_id: string | null
   created_at: string | Date | null
+}
+
+const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
+  `${year}-${String(month).padStart(2, '0')}-31`
+
+const resolvePayrollPeriodUfValue = async ({
+  year,
+  month,
+  ufValue
+}: {
+  year: number
+  month: number
+  ufValue?: number | null
+}) => {
+  if (typeof ufValue === 'number') {
+    return ufValue
+  }
+
+  const snapshot = await getHistoricalEconomicIndicatorForPeriod({
+    indicatorCode: 'UF',
+    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+  })
+
+  return snapshot?.value ?? null
 }
 
 type PgPeriodRow = {
@@ -1027,6 +1052,12 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
   const periodId = buildPeriodId(input.year, input.month)
   const existing = await pgGetPayrollPeriod(periodId)
 
+  const resolvedUfValue = await resolvePayrollPeriodUfValue({
+    year: input.year,
+    month: input.month,
+    ufValue: input.ufValue
+  })
+
   if (existing) {
     throw new PayrollValidationError('Payroll period already exists.', 409)
   }
@@ -1041,7 +1072,7 @@ export const pgCreatePayrollPeriod = async (input: CreatePayrollPeriodInput) => 
       `,
       [
         periodId, input.year, input.month,
-        input.ufValue ?? null,
+        resolvedUfValue,
         normalizeNullableString(input.taxTableVersion),
         normalizeNullableString(input.notes)
       ]
@@ -1074,7 +1105,12 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
 
   const nextYear = input.year ?? current.year
   const nextMonth = input.month ?? current.month
-  const nextUfValue = input.ufValue ?? current.ufValue
+
+  const nextUfValue = await resolvePayrollPeriodUfValue({
+    year: nextYear,
+    month: nextMonth,
+    ufValue: input.ufValue === undefined ? current.ufValue : input.ufValue
+  })
 
   const nextTaxTableVersion =
     input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)

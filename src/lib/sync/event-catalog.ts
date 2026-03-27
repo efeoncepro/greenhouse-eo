@@ -9,6 +9,7 @@ export const AGGREGATE_TYPES = {
   account: 'account',
   supplier: 'supplier',
   exchangeRate: 'exchange_rate',
+  economicIndicator: 'economic_indicator',
 
   // Nubox
   nuboxEmission: 'nubox_emission',
@@ -98,6 +99,7 @@ export const EVENT_TYPES = {
   financeIncomePaymentRecorded: 'finance.income_payment.recorded',
   financeCostAllocationCreated: 'finance.cost_allocation.created',
   financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
+  financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
 
   // Payroll
   payrollPeriodCreated: 'payroll_period.created',
@@ -144,6 +146,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeIncomePaymentRecorded,
   EVENT_TYPES.financeCostAllocationCreated,
   EVENT_TYPES.financeCostAllocationDeleted,
+  EVENT_TYPES.financeEconomicIndicatorUpserted,
   EVENT_TYPES.payrollPeriodCreated,
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,

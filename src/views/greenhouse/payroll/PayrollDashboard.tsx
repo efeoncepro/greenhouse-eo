@@ -49,7 +49,6 @@ const PayrollDashboard = () => {
   const [newPeriodOpen, setNewPeriodOpen] = useState(false)
   const [newYear, setNewYear] = useState(new Date().getFullYear())
   const [newMonth, setNewMonth] = useState(new Date().getMonth() + 1)
-  const [newUf, setNewUf] = useState<number | ''>('')
 
   const fetchAll = useCallback(async () => {
     try {
@@ -128,8 +127,7 @@ const PayrollDashboard = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         year: newYear,
-        month: newMonth,
-        ...(newUf !== '' && { ufValue: newUf })
+        month: newMonth
       })
     })
 
@@ -142,9 +140,8 @@ const PayrollDashboard = () => {
     }
 
     setNewPeriodOpen(false)
-    setNewUf('')
     handleRefresh()
-  }, [newYear, newMonth, newUf, handleRefresh])
+  }, [newYear, newMonth, handleRefresh])
 
   const handleSelectHistoryPeriod = useCallback(
     async (periodId: string) => {
@@ -373,15 +370,9 @@ const PayrollDashboard = () => {
                 />
               </Grid>
             </Grid>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Valor UF (opcional)'
-              type='number'
-              value={newUf}
-              onChange={e => setNewUf(e.target.value === '' ? '' : Number(e.target.value))}
-              helperText='Necesario para calcular Isapre. El salario base, AFP, salud y bonos se configuran en Compensaciones.'
-            />
+            <Alert severity='info'>
+              La UF del período se sincroniza automáticamente según el mes imputable. El salario base, AFP, salud y bonos se configuran en Compensaciones.
+            </Alert>
           </Stack>
         </DialogContent>
         <DialogActions>

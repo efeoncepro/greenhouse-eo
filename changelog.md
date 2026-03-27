@@ -7,6 +7,21 @@
 
 ## 2026-03-27
 
+### Economic indicators migration + historical backfill
+- Ejecutada la migration `scripts/migrations/add-economic-indicators.sql` para materializar `greenhouse_finance.economic_indicators`.
+- Se agregó el script reusable `scripts/backfill-economic-indicators.ts` para poblar indicadores desde `mindicador` usando perfil `migrator`.
+- Backfill ejecutado para `2026-01-01 -> 2026-03-27`:
+  - `UF`: 86 filas
+  - `USD_CLP`: 61 filas
+  - `UTM`: 3 filas
+- `IPC`: 0 filas disponibles en la serie 2026 consultada
+- El backfill también dejó sincronizado `greenhouse_finance.exchange_rates` para `USD/CLP` y `CLP/USD` en el mismo rango histórico compatible.
+
+### Payroll UF auto-sync
+- `Payroll` deja de pedir `UF` manual como flujo normal al crear o editar períodos.
+- El backend ahora resuelve y persiste `uf_value` automáticamente según el `year/month` imputable usando la capa común de indicadores económicos.
+- La UI de períodos de nómina pasó de input manual a estado informativo sobre sincronización automática de `UF`.
+
 ### Production release (PR #20 → main)
 - Mergeado `develop → main` con ~150 commits acumulados
 - Incluye: TASK-056 (capacity semantics), TASK-057 (direct overhead), assignment→membership sync, TanStack migration, login redesign, Finance Postgres migration, ICO expansion, y más
@@ -2496,3 +2511,10 @@
 # 2026-03-15
 
 - Fix: corrected the AI Tooling bootstrap seed so `ensureAiToolingInfrastructure()` no longer fails when a seeded tool omits optional params like `subscriptionAmount`, restoring the admin catalog/licenses/wallets/meta routes in preview.
+# 2026-03-27
+
+- Se agregó una capa común de indicadores económicos Chile para `USD_CLP`, `UF`, `UTM` e `IPC`, con nuevas rutas `GET /api/finance/economic-indicators/latest` y `GET/POST /api/finance/economic-indicators/sync`.
+- `AI Tooling` dejó de leer `USD/CLP` con query propia y fallback aislado; ahora consume el helper común.
+- `Payroll` ahora puede resolver `UF` histórica para Isapre y `UTM` histórica para impuesto Chile durante cálculo/readiness/recálculo de entries.
+- `Finance Dashboard` pasó de una card única de tipo de cambio a exponer `Dólar observado`, `UF` y `UTM`.
+- Se agregó storage SQL para `greenhouse_finance.economic_indicators` y migration `scripts/migrations/add-economic-indicators.sql`.

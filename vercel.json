@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "/api/finance/exchange-rates/sync",
+      "path": "/api/finance/economic-indicators/sync",
       "schedule": "5 23 * * *"
     },
     {
