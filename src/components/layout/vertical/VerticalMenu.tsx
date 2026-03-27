@@ -165,6 +165,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           icon: 'tabler-receipt'
         },
         {
+          label: <NavLabel label='Nómina Proyectada' subtitle='Simulación y previsión' show={showSub} />,
+          href: '/hr/payroll/projected',
+          icon: 'tabler-calculator'
+        },
+        {
           label: <NavLabel label={GH_HR_NAV.departments.label} subtitle={GH_HR_NAV.departments.subtitle} show={showSub} />,
           href: '/hr/departments',
           icon: 'tabler-sitemap'
