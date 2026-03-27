@@ -2,7 +2,31 @@
 
 ## Project Overview
 
-Greenhouse EO — portal operativo de Efeonce Group. Next.js App Router + MUI v5 + Vuexy starter-kit. Deploy en Vercel.
+Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel.
+
+### Data Architecture
+
+- **PostgreSQL** (Cloud SQL `greenhouse-pg-dev`, Postgres 16, `us-east4`) — OLTP, workflows mutables, runtime-first
+- **BigQuery** (`efeonce-group`) — raw snapshots, conformed analytics, marts, histórico
+- Patrón de lectura: **Postgres first, BigQuery fallback**
+- Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`
+
+### Canonical 360 Object Model
+
+- `Cliente` → `greenhouse.clients.client_id`
+- `Colaborador` → `greenhouse.team_members.member_id`
+- `Persona` → `greenhouse_core.identity_profiles.identity_profile_id`
+- `Proveedor` → `greenhouse_core.providers.provider_id`
+- `Space` → `greenhouse_core.spaces.space_id`
+- `Servicio` → `greenhouse.service_modules.module_id`
+
+Regla: módulos de dominio extienden estos objetos, no crean identidades paralelas.
+
+### Deploy Environments
+
+- **Production** → `main` → `greenhouse.efeoncepro.com`
+- **Staging** → `develop` (Custom Environment) → `dev-greenhouse.efeoncepro.com`
+- **Preview** → ramas `feature/*`, `fix/*`, `hotfix/*`
 
 ## Quick Reference
 
@@ -15,11 +39,25 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js App Router + MUI v5
 
 ## Key Docs
 
-- `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación
-- `project_context.md` — arquitectura, stack, decisiones, restricciones
+- `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
+- `project_context.md` — arquitectura, stack, decisiones, restricciones (documento vivo con deltas)
 - `Handoff.md` — trabajo en curso, riesgos, próximos pasos
-- `docs/tasks/README.md` — pipeline de tareas `CODEX_TASK_*`
-- `docs/architecture/` — specs de arquitectura canónicas
+- `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
+- `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
+- `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
+
+### Architecture Docs (los más críticos)
+
+- `GREENHOUSE_ARCHITECTURE_V1.md` — documento maestro de arquitectura
+- `GREENHOUSE_360_OBJECT_MODEL_V1.md` — modelo canónico 360
+- `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` — contrato completo de Payroll
+- `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — estrategia PostgreSQL + BigQuery
+- `GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` — perfiles de acceso (runtime/migrator/admin)
+- `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — backbone 360 en Cloud SQL
+- `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` — desacople de Notion/HubSpot
+- `GREENHOUSE_IDENTITY_ACCESS_V2.md` — identidad y acceso (12/12 implementado)
+- `GREENHOUSE_EVENT_CATALOG_V1.md` — catálogo de eventos outbox
+- `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
 
 ## Task Lifecycle Protocol
 
@@ -65,10 +103,36 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 
 ## Conventions
 
+### Estructura de código
 - Componentes UI compartidos: `src/components/greenhouse/*`
 - Vistas por módulo: `src/views/greenhouse/*`
-- Lógica de dominio: `src/lib/*`
+- Lógica de dominio: `src/lib/*` (organizada por módulo: `payroll/`, `finance/`, `people/`, `agency/`, `sync/`, etc.)
+- Tipos por dominio: `src/types/*`
+- Nomenclatura centralizada: `src/config/greenhouse-nomenclature.ts`
+
+### API Routes
+- HR: `/api/hr/payroll/**`, `/api/hr/core/**`
+- Finance: `/api/finance/**`
+- People (read-only): `/api/people/**`
+- Admin Team (writes): `/api/admin/team/**`
+- Admin Tenants: `/api/admin/tenants/**`
+- Capabilities: `/api/capabilities/**`
+- Agency: `/api/agency/**`
+- AI: `/api/ai-tools/**`, `/api/ai-credits/**`
+- Cron: `/api/cron/**`, `/api/finance/economic-indicators/sync`
+
+### PostgreSQL Access
+- **Runtime** del portal: solo credenciales `runtime` (`GREENHOUSE_POSTGRES_USER`)
+- **Migraciones**: `migrator` (`GREENHOUSE_POSTGRES_MIGRATOR_USER`)
+- **Bootstrap**: `admin` (`GREENHOUSE_POSTGRES_ADMIN_USER`)
+- Health check: `pnpm pg:doctor`
+
+### Tests y validación
 - Tests unitarios: Vitest + Testing Library + jsdom
 - Helper de render para tests: `src/test/render.tsx`
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `npx tsc --noEmit`
+
+### Otras convenciones
 - Line endings: LF (ver `.gitattributes`)
 - Commit format: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
+- Tasks nuevas: usar `TASK-###` (registrar en `docs/tasks/TASK_ID_REGISTRY.md`)

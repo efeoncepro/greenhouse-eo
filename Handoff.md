@@ -49,6 +49,56 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 — Cost Intelligence Architecture & Task Pipeline
+
+### Agente
+
+- Claude (Opus)
+
+### Objetivo del turno
+
+- Diseñar y documentar la arquitectura de Cost Intelligence: layer de contabilidad de gestión que consolida señales de Payroll, Finance, Admin Team e ICO para materializar P&L operativo, cierre de período y alertas de margen.
+- Crear pipeline de 5 tasks incrementales para implementación gradual.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` (nuevo)
+- `docs/tasks/to-do/TASK-067-cost-intelligence-foundation.md` (nuevo)
+- `docs/tasks/to-do/TASK-068-period-closure-status-projection.md` (nuevo)
+- `docs/tasks/to-do/TASK-069-operational-pl-projection.md` (nuevo)
+- `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md` (nuevo)
+- `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` (nuevo)
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `CLAUDE.md` (actualizado con stack, data architecture, 360 model, deploy, conventions)
+- `Handoff.md`
+
+### Verificacion
+
+- Revisión exhaustiva de toda la documentación del proyecto: `AGENTS.md`, `project_context.md`, `Handoff.md`, `docs/architecture/` (30+ docs), `docs/tasks/README.md`
+- Investigación de los 11 projections existentes, 95+ trigger events, y todos los cross-module data flows
+- Contraste con event catalog, projection registry, y serving views actuales
+- Decisiones arquitectónicas iteradas con el usuario antes de documentar
+
+### Riesgos o pendientes
+
+- Las 5 tasks son solo documentación (diseño); no hay implementación de runtime todavía
+- TASK-067 (foundation) es blocker de TASK-068 y TASK-069
+- TASK-068 + TASK-069 son blockers de TASK-070 (UI) y TASK-071 (consumers)
+- Decisión abierta: si Efeonce contrata módulo contable de Nubox, el boundary de Cost Intelligence se redefine
+- Gaps declarados para fase 3: provisiones laborales, costos empleador no-nómina (SIS, mutual), budget vs actual, cost centers por department/BU
+- Tasks parcialmente absorbidas por Cost Intelligence: TASK-055, TASK-051, TASK-015 — revisar sus estados al implementar
+
+---
+
 ## 2026-03-27 17:15 -03
 
 ### Agente
