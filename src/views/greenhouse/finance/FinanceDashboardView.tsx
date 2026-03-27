@@ -1149,34 +1149,26 @@ const movementColumns: any[] = [
         color={getValue() === 'income' ? 'success' : 'error'}
         label={getValue() === 'income' ? 'Ingreso' : 'Egreso'}
       />
-    ),
-    size: 100
+    )
   }),
   movementColumnHelper.accessor('description', {
     header: 'Descripción',
     cell: ({ getValue, row }) => (
       <Box>
-        <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
-        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
+        <Typography variant='body2' fontWeight={500} noWrap sx={{ maxWidth: 320 }}>{getValue()}</Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{row.original.id}</Typography>
       </Box>
     )
   }),
   movementColumnHelper.accessor('partyName', {
-    header: 'Entidad / Cuenta',
+    header: 'Entidad',
     cell: ({ row }) => (
-      <Box>
-        <Typography variant='body2'>{row.original.partyName || row.original.accountName || '—'}</Typography>
-        {row.original.accountName && row.original.partyName && (
-          <Typography variant='caption' color='text.secondary'>{row.original.accountName}</Typography>
-        )}
-      </Box>
-    ),
-    size: 160
+      <Typography variant='body2'>{row.original.partyName || row.original.accountName || '—'}</Typography>
+    )
   }),
   movementColumnHelper.accessor('date', {
     header: 'Fecha',
-    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>,
-    size: 100
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
   }),
   movementColumnHelper.accessor('amount', {
     header: 'Monto',
@@ -1185,8 +1177,7 @@ const movementColumns: any[] = [
         {formatCLP(getValue())}
       </Typography>
     ),
-    meta: { align: 'right' },
-    size: 130
+    meta: { align: 'right' }
   })
 ]
 
@@ -1218,15 +1209,16 @@ const RecentMovementsTable = ({ movements }: { movements: RecentMovement[] }) =>
         }
       />
       <Divider />
-      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4, pb: 0 }}>
+      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
         <CustomTextField
           value={globalFilter}
           onChange={e => setGlobalFilter(e.target.value)}
           placeholder='Buscar movimiento…'
-          sx={{ minWidth: 250 }}
+          size='small'
+          sx={{ minWidth: 220 }}
         />
-        <Typography variant='caption' color='text.secondary' sx={{ alignSelf: 'center' }}>
-          {table.getFilteredRowModel().rows.length} movimientos
+        <Typography variant='caption' color='text.secondary'>
+          {table.getFilteredRowModel().rows.length} de {movements.length} movimientos
         </Typography>
       </CardContent>
       <div className='overflow-x-auto'>
