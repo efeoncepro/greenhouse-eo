@@ -21,6 +21,17 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
@@ -33,6 +44,13 @@ import Chip from '@mui/material/Chip'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import CustomTextField from '@core/components/mui/TextField'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+import classnames from 'classnames'
+
+import tableStyles from '@core/styles/table.module.css'
 import CustomChip from '@core/components/mui/Chip'
 import OptionMenu from '@core/components/option-menu'
 
@@ -1092,88 +1110,8 @@ const FinanceDashboardView = () => {
         </Card>
       )}
 
-      {/* Recent transactions table */}
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardHeader
-          title='Últimos movimientos'
-          avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity' }}>
-              <i className='tabler-list' style={{ fontSize: 22, color: 'var(--mui-palette-secondary-main)' }} />
-            </Avatar>
-          }
-        />
-        <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 80 }}>Tipo</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell sx={{ width: 160 }}>Entidad / Cuenta</TableCell>
-                <TableCell sx={{ width: 100 }}>Fecha</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {recentMovements.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay movimientos registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                recentMovements.map(movement => (
-                  <TableRow key={movement.id} hover>
-                    <TableCell>
-                      <Typography
-                        variant='body2'
-                        fontWeight={600}
-                        color={movement.type === 'income' ? 'success.main' : 'error.main'}
-                      >
-                        {movement.type === 'income' ? 'Ingreso' : 'Egreso'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={500}>
-                        {movement.description}
-                      </Typography>
-                      {movement.id && (
-                        <Typography variant='caption' color='text.secondary'>
-                          {movement.id}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>
-                        {movement.partyName || movement.accountName || '—'}
-                      </Typography>
-                      {movement.accountName && movement.partyName && (
-                        <Typography variant='caption' color='text.secondary'>
-                          {movement.accountName}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>{formatDate(movement.date)}</Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography
-                        variant='body2'
-                        fontWeight={600}
-                        color={movement.amount >= 0 ? 'success.main' : 'error.main'}
-                      >
-                        {formatCLP(movement.amount)}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+      {/* Recent transactions table — TanStack React Table */}
+      <RecentMovementsTable movements={recentMovements} />
 
       <CreateIncomeDrawer
         open={incomeDrawerOpen}
@@ -1192,6 +1130,153 @@ const FinanceDashboardView = () => {
         }}
       />
     </Box>
+  )
+}
+
+// ── Recent Movements Table (TanStack) ──
+
+const movementColumnHelper = createColumnHelper<RecentMovement>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const movementColumns: any[] = [
+  movementColumnHelper.accessor('type', {
+    header: 'Tipo',
+    cell: ({ getValue }) => (
+      <CustomChip
+        round='true'
+        size='small'
+        variant='tonal'
+        color={getValue() === 'income' ? 'success' : 'error'}
+        label={getValue() === 'income' ? 'Ingreso' : 'Egreso'}
+      />
+    ),
+    size: 100
+  }),
+  movementColumnHelper.accessor('description', {
+    header: 'Descripción',
+    cell: ({ getValue, row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
+        <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
+      </Box>
+    )
+  }),
+  movementColumnHelper.accessor('partyName', {
+    header: 'Entidad / Cuenta',
+    cell: ({ row }) => (
+      <Box>
+        <Typography variant='body2'>{row.original.partyName || row.original.accountName || '—'}</Typography>
+        {row.original.accountName && row.original.partyName && (
+          <Typography variant='caption' color='text.secondary'>{row.original.accountName}</Typography>
+        )}
+      </Box>
+    ),
+    size: 160
+  }),
+  movementColumnHelper.accessor('date', {
+    header: 'Fecha',
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>,
+    size: 100
+  }),
+  movementColumnHelper.accessor('amount', {
+    header: 'Monto',
+    cell: ({ getValue }) => (
+      <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'}>
+        {formatCLP(getValue())}
+      </Typography>
+    ),
+    meta: { align: 'right' },
+    size: 130
+  })
+]
+
+const RecentMovementsTable = ({ movements }: { movements: RecentMovement[] }) => {
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
+
+  const table = useReactTable({
+    data: movements,
+    columns: movementColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
+
+  return (
+    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <CardHeader
+        title='Últimos movimientos'
+        avatar={
+          <Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity' }}>
+            <i className='tabler-list' style={{ fontSize: 22, color: 'var(--mui-palette-secondary-main)' }} />
+          </Avatar>
+        }
+      />
+      <Divider />
+      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4, pb: 0 }}>
+        <CustomTextField
+          value={globalFilter}
+          onChange={e => setGlobalFilter(e.target.value)}
+          placeholder='Buscar movimiento…'
+          sx={{ minWidth: 250 }}
+        />
+        <Typography variant='caption' color='text.secondary' sx={{ alignSelf: 'center' }}>
+          {table.getFilteredRowModel().rows.length} movimientos
+        </Typography>
+      </CardContent>
+      <div className='overflow-x-auto'>
+        <table className={tableStyles.table}>
+          <thead>
+            {table.getHeaderGroups().map(hg => (
+              <tr key={hg.id}>
+                {hg.headers.map(header => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                    className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
+                    style={{
+                      textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left',
+                      width: header.column.getSize() !== 150 ? header.column.getSize() : undefined
+                    }}
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={movementColumns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Typography variant='body2' color='text.secondary'>No hay movimientos registrados aún</Typography>
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map(row => (
+                <tr key={row.id} className={classnames({ 'hover:bg-actionHover': true })}>
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <TablePaginationComponent table={table as ReturnType<typeof useReactTable>} />
+    </Card>
   )
 }
 
