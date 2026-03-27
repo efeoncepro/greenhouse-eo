@@ -89,7 +89,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-071` | `to-do` | Cost Intelligence Cross-Module Consumers | `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` |
 | `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
 | `TASK-073` | `in-progress` | People Canonical Capacity Cutover | `docs/tasks/in-progress/TASK-073-people-canonical-capacity-cutover.md` |
-| `TASK-074` | `in-progress` | Projected Payroll to Official Promotion Flow | `docs/tasks/in-progress/TASK-074-projected-payroll-to-official-promotion-flow.md` |
+| `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
 
 | `TASK-075` | `to-do` | Projected Payroll UX Polish | `docs/tasks/to-do/TASK-075-projected-payroll-ux-polish.md` |
 
