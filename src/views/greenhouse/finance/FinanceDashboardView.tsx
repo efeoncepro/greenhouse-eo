@@ -1155,20 +1155,23 @@ const movementColumns: any[] = [
     header: 'Descripción',
     cell: ({ getValue, row }) => (
       <Box>
-        <Typography variant='body2' fontWeight={500} noWrap sx={{ maxWidth: 320 }}>{getValue()}</Typography>
+        <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
         <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{row.original.id}</Typography>
       </Box>
-    )
+    ),
+    meta: { minWidth: 300 }
   }),
   movementColumnHelper.accessor('partyName', {
     header: 'Entidad',
     cell: ({ row }) => (
-      <Typography variant='body2'>{row.original.partyName || row.original.accountName || '—'}</Typography>
-    )
+      <Typography variant='body2' color='text.secondary'>{row.original.partyName || row.original.accountName || '—'}</Typography>
+    ),
+    meta: { width: 180 }
   }),
   movementColumnHelper.accessor('date', {
     header: 'Fecha',
-    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>,
+    meta: { width: 110 }
   }),
   movementColumnHelper.accessor('amount', {
     header: 'Monto',
@@ -1177,7 +1180,7 @@ const movementColumns: any[] = [
         {formatCLP(getValue())}
       </Typography>
     ),
-    meta: { align: 'right' }
+    meta: { align: 'right', width: 130 }
   })
 ]
 
@@ -1209,15 +1212,14 @@ const RecentMovementsTable = ({ movements }: { movements: RecentMovement[] }) =>
         }
       />
       <Divider />
-      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
         <CustomTextField
           value={globalFilter}
           onChange={e => setGlobalFilter(e.target.value)}
           placeholder='Buscar movimiento…'
-          size='small'
-          sx={{ minWidth: 220 }}
+          sx={{ minWidth: 250 }}
         />
-        <Typography variant='caption' color='text.secondary'>
+        <Typography variant='caption' color='text.secondary' sx={{ alignSelf: 'center' }}>
           {table.getFilteredRowModel().rows.length} de {movements.length} movimientos
         </Typography>
       </CardContent>
@@ -1232,8 +1234,9 @@ const RecentMovementsTable = ({ movements }: { movements: RecentMovement[] }) =>
                     onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                     className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
                     style={{
-                      textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left',
-                      width: header.column.getSize() !== 150 ? header.column.getSize() : undefined
+                      textAlign: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.align === 'right' ? 'right' : 'left',
+                      width: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.width as number | undefined,
+                      minWidth: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.minWidth as number | undefined
                     }}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
