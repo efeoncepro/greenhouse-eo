@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic'
 const QUERY_TIMEOUT_MS = 5000
 
 interface AssignmentRow extends Record<string, unknown> {
+  assignment_id: string
   member_id: string
   display_name: string
   role_title: string | null
@@ -21,6 +22,7 @@ interface AssignmentRow extends Record<string, unknown> {
   contracted_hours_month: number | null
   client_id: string | null
   client_name: string | null
+  start_date: string | null
 }
 
 const isInternalClientAssignment = (row: AssignmentRow) => {
@@ -60,6 +62,7 @@ export async function GET() {
 
   try {
     const query = `SELECT
+      a.assignment_id,
       a.member_id,
       m.display_name,
       COALESCE(a.role_title_override, m.role_title) AS role_title,
@@ -67,7 +70,8 @@ export async function GET() {
       a.client_id,
       c.client_name,
       a.fte_allocation,
-      COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month
+      COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
+      a.start_date::text AS start_date
     FROM greenhouse_core.client_team_assignments a
     JOIN greenhouse_core.members m ON m.member_id = a.member_id
     LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
@@ -77,6 +81,7 @@ export async function GET() {
     ORDER BY m.display_name, a.client_id`
 
     const baseFallbackQuery = `SELECT
+      a.assignment_id,
       a.member_id,
       m.display_name,
       COALESCE(a.role_title_override, m.role_title) AS role_title,
@@ -84,7 +89,8 @@ export async function GET() {
       a.client_id,
       c.client_name,
       a.fte_allocation,
-      COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month
+      COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
+      a.start_date::text AS start_date
     FROM greenhouse_core.client_team_assignments a
     JOIN greenhouse_core.members m ON m.member_id = a.member_id
     LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
@@ -132,6 +138,14 @@ export async function GET() {
         suggestedBillRate: number | null
         targetCurrency: string | null
       } | null
+      assignments: Array<{
+        assignmentId: string
+        clientId: string | null
+        clientName: string | null
+        fteAllocation: number
+        hoursPerMonth: number
+        startDate: string | null
+      }>
     }> = []
 
     for (const [memberId, memberRows] of rowsByMember.entries()) {
@@ -174,7 +188,15 @@ export async function GET() {
           costPerHour: snapshot.costPerHourTarget,
           suggestedBillRate: snapshot.suggestedBillRateTarget,
           targetCurrency: snapshot.targetCurrency
-        }
+        },
+        assignments: externalAssignments.map(row => ({
+          assignmentId: row.assignment_id,
+          clientId: row.client_id,
+          clientName: row.client_name,
+          fteAllocation: Number(row.fte_allocation) || 0,
+          hoursPerMonth: Number(row.contracted_hours_month) || 0,
+          startDate: row.start_date
+        }))
       })
     }
     const totalContracted = memberBreakdowns.reduce((sum, m) => sum + m.capacity.contractedHoursMonth, 0)
