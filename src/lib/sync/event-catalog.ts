@@ -124,6 +124,8 @@ export const EVENT_TYPES = {
   // Projected Payroll
   projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
   projectedPayrollPeriodRefreshed: 'payroll.projected_period.refreshed',
+  projectedPayrollPromotedToOfficialDraft: 'payroll.projected_promoted_to_official_draft',
+  payrollPeriodRecalculatedFromProjection: 'payroll_period.recalculated_from_projection',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',

@@ -1,6 +1,13 @@
 import 'server-only'
 
-import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResult, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
+import type {
+  BonusProrationConfig,
+  CompensationVersion,
+  PayrollCalculationResult,
+  PayrollEntry,
+  PayrollKpiSnapshot,
+  PayrollProjectionContext
+} from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
@@ -24,6 +31,7 @@ import {
 } from '@/lib/payroll/shared'
 import {
   isPayrollPostgresEnabled,
+  pgDeleteStalePayrollEntries,
   pgGetActiveBonusConfig,
   pgSetPeriodCalculated
 } from '@/lib/payroll/postgres-store'
@@ -101,25 +109,28 @@ const roundCurrency = (value: number) => Math.round(value * 100) / 100
 const resolvePayrollPeriodIndicators = async ({
   periodId,
   periodUfValue,
-  taxTableVersion
+  taxTableVersion,
+  indicatorPeriodDate
 }: {
   periodId: string
   periodUfValue: number | null
   taxTableVersion: string | null
+  indicatorPeriodDate?: string | null
 }) => {
   const { periodEnd } = getPeriodRangeFromId(periodId)
+  const resolvedIndicatorDate = indicatorPeriodDate || periodEnd
 
   const ufValue = typeof periodUfValue === 'number'
     ? periodUfValue
     : (await getHistoricalEconomicIndicatorForPeriod({
         indicatorCode: 'UF',
-        periodDate: periodEnd
+        periodDate: resolvedIndicatorDate
       }))?.value ?? null
 
   const utmValue = taxTableVersion
     ? (await getHistoricalEconomicIndicatorForPeriod({
         indicatorCode: 'UTM',
-        periodDate: periodEnd
+        periodDate: resolvedIndicatorDate
       }))?.value ?? null
     : null
 
@@ -250,10 +261,12 @@ export const buildPayrollEntry = ({
 
 export const calculatePayroll = async ({
   periodId,
-  actorIdentifier
+  actorIdentifier,
+  projectionContext
 }: {
   periodId: string
   actorIdentifier: string | null
+  projectionContext?: PayrollProjectionContext | null
 }): Promise<PayrollCalculationResult> => {
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
@@ -269,6 +282,12 @@ export const calculatePayroll = async ({
   }
 
   const range = getPeriodRangeFromId(periodId)
+
+  const attendanceCutDate =
+    projectionContext?.mode === 'actual_to_date'
+      ? (projectionContext.asOfDate < range.periodEnd ? projectionContext.asOfDate : range.periodEnd)
+      : range.periodEnd
+
   const allRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const compensationRows = allRows.filter(row => row.hasCompensationVersion)
   const missingCompensationMemberIds = allRows.filter(row => !row.hasCompensationVersion).map(row => row.memberId)
@@ -288,7 +307,8 @@ export const calculatePayroll = async ({
   const indicatorValues = await resolvePayrollPeriodIndicators({
     periodId,
     periodUfValue: period.ufValue,
-    taxTableVersion: period.taxTableVersion
+    taxTableVersion: period.taxTableVersion,
+    indicatorPeriodDate: projectionContext?.asOfDate ?? null
   })
 
   if (requiresUfValue && typeof indicatorValues.ufValue !== 'number') {
@@ -312,7 +332,7 @@ export const calculatePayroll = async ({
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, range.periodEnd)
+    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, attendanceCutDate)
   ])
 
   const attendanceData = attendanceResult.snapshots
@@ -387,6 +407,13 @@ export const calculatePayroll = async ({
 
     await upsertPayrollEntry(entry)
     entries.push(entry)
+  }
+
+  if (isPayrollPostgresEnabled()) {
+    await pgDeleteStalePayrollEntries({
+      periodId,
+      keepMemberIds: compensationRows.map(row => row.memberId)
+    })
   }
 
   if (isPayrollPostgresEnabled()) {

@@ -5,6 +5,7 @@ export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
 export type PayrollAttendanceSource = 'legacy_attendance_daily_plus_hr_leave' | 'microsoft_teams'
+export type ProjectionMode = 'actual_to_date' | 'projected_month_end'
 
 export interface BonusProrationConfig {
   otdThreshold: number
@@ -241,6 +242,12 @@ export interface PayrollKpiDiagnostics {
   missingMembers: number
 }
 
+export interface PayrollProjectionContext {
+  mode: ProjectionMode
+  asOfDate: string
+  promotionId?: string | null
+}
+
 export type PayrollReadinessIssueCode =
   | 'no_compensated_members'
   | 'missing_compensation'
@@ -268,6 +275,46 @@ export interface PayrollPeriodReadiness {
   attendanceDiagnostics: PayrollAttendanceDiagnostics
   warnings: PayrollReadinessIssue[]
   blockingIssues: PayrollReadinessIssue[]
+}
+
+export interface ProjectedPayrollPromotionRecord {
+  promotionId: string
+  periodId: string
+  periodYear: number
+  periodMonth: number
+  projectionMode: ProjectionMode
+  asOfDate: string
+  sourceSnapshotCount: number
+  promotedEntryCount: number
+  sourcePeriodStatus: PeriodStatus | null
+  actorUserId: string | null
+  actorIdentifier: string | null
+  promotionStatus: 'started' | 'completed' | 'failed'
+  promotedAt: string | null
+  failureReason: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export interface ProjectedPayrollPromotion {
+  promotionId: string
+  periodId: string
+  periodYear: number
+  periodMonth: number
+  projectionMode: 'actual_to_date' | 'projected_month_end'
+  asOfDate: string
+  sourceSnapshotCount: number
+  promotedEntryCount: number
+  promotedByUserId: string | null
+  promotedByActor: string | null
+  createdAt: string | null
+}
+
+export interface PromoteProjectedPayrollInput {
+  year: number
+  month: number
+  mode: 'actual_to_date' | 'projected_month_end'
+  actorIdentifier: string | null
 }
 
 export interface PayrollAttendanceDiagnostics {

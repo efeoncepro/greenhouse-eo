@@ -1658,6 +1658,34 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
   })
 }
 
+export const pgDeleteStalePayrollEntries = async ({
+  periodId,
+  keepMemberIds
+}: {
+  periodId: string
+  keepMemberIds: string[]
+}) => {
+  await assertPayrollPostgresReady()
+
+  if (keepMemberIds.length === 0) {
+    await runGreenhousePostgresQuery(
+      `DELETE FROM greenhouse_payroll.payroll_entries WHERE period_id = $1`,
+      [periodId]
+    )
+
+    return
+  }
+
+  await runGreenhousePostgresQuery(
+    `
+      DELETE FROM greenhouse_payroll.payroll_entries
+      WHERE period_id = $1
+        AND NOT (member_id = ANY($2::text[]))
+    `,
+    [periodId, keepMemberIds]
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Member queries
 // ---------------------------------------------------------------------------

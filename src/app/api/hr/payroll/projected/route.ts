@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server'
 
+import type { ProjectionMode } from '@/types/payroll'
+
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { projectPayrollForPeriod, type ProjectionMode } from '@/lib/payroll/project-payroll'
+import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
+import {
+  pgGetLatestProjectedPayrollPromotion
+} from '@/lib/payroll/projected-payroll-promotion-store'
+import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,16 +42,20 @@ export async function GET(request: Request) {
     // Fetch projection + official entries in parallel
     const periodId = `${year}-${String(month).padStart(2, '0')}`
 
-    const [result, officialRows] = await Promise.all([
+    const [result, officialRows, latestPromotion] = await Promise.all([
       projectPayrollForPeriod({ year, month, mode }),
       runGreenhousePostgresQuery<OfficialEntryRow>(
         `SELECT e.member_id, e.currency, e.gross_total, e.net_total
-         FROM greenhouse_hr.payroll_entries e
-         INNER JOIN greenhouse_hr.payroll_periods p ON p.period_id = e.period_id
+         FROM greenhouse_payroll.payroll_entries e
+         INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
          WHERE p.period_id = $1
            AND p.status IN ('calculated', 'approved', 'exported')`,
         [periodId]
       ).catch(() => [] as OfficialEntryRow[])
+      ,
+      isPayrollPostgresEnabled()
+        ? pgGetLatestProjectedPayrollPromotion({ year, month, mode }).catch(() => null)
+        : Promise.resolve(null)
     ])
 
     // Build official map
@@ -90,7 +100,8 @@ export async function GET(request: Request) {
           grossByCurrency: officialGrossByCurrency,
           netByCurrency: officialNetByCurrency,
           entryCount: officialRows.length
-        } : null
+        } : null,
+        latestPromotion
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )

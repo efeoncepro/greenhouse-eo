@@ -97,6 +97,14 @@ interface ProjectedData {
     netByCurrency: Record<string, number>
     entryCount: number
   } | null
+  latestPromotion: {
+    promotionId: string
+    periodId: string
+    asOfDate: string
+    projectionMode: ProjectionMode
+    promotedEntryCount: number
+    createdAt: string | null
+  } | null
 }
 
 // ── Helpers ──
@@ -138,6 +146,9 @@ const ProjectedPayrollView = () => {
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'memberName', desc: false }])
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [promoting, setPromoting] = useState(false)
+  const [promotionMessage, setPromotionMessage] = useState<string | null>(null)
+  const [promotionError, setPromotionError] = useState<string | null>(null)
 
   const today = useMemo(() => {
     const d = new Date()
@@ -169,6 +180,37 @@ const ProjectedPayrollView = () => {
   }, [year, month, mode])
 
   useEffect(() => { void load() }, [load])
+
+  const promoteProjection = useCallback(async () => {
+    setPromoting(true)
+    setPromotionMessage(null)
+    setPromotionError(null)
+
+    try {
+      const res = await fetch('/api/hr/payroll/projected/promote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ year, month, mode })
+      })
+
+      const payload = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        throw new Error(payload?.error || 'No fue posible promover la nómina proyectada.')
+      }
+
+      setPromotionMessage(
+        payload?.createdPeriod
+          ? 'Se creó el período oficial y se recalculó con el corte proyectado.'
+          : 'La nómina oficial se recalculó usando el corte proyectado.'
+      )
+      await load()
+    } catch (error) {
+      setPromotionError(error instanceof Error ? error.message : 'No fue posible promover la nómina proyectada.')
+    } finally {
+      setPromoting(false)
+    }
+  }, [load, mode, month, year])
 
   const entries = useMemo(() => data?.entries ?? [], [data])
 
@@ -272,6 +314,16 @@ const ProjectedPayrollView = () => {
             avatar={<Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}><i className='tabler-calculator' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} /></Avatar>}
             action={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Button
+                  variant='contained'
+                  size='small'
+                  color='primary'
+                  onClick={() => void promoteProjection()}
+                  disabled={promoting || loading}
+                  startIcon={promoting ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-arrow-forward-up' />}
+                >
+                  {data?.official ? 'Recalcular oficial' : 'Crear borrador oficial'}
+                </Button>
                 <IconButton size='small' onClick={() => navMonth(-1)}><i className='tabler-chevron-left' style={{ fontSize: 18 }} /></IconButton>
                 <Typography variant='body2' fontWeight={600}>{MONTHS[month - 1]} {year}</Typography>
                 <IconButton size='small' onClick={() => navMonth(1)}><i className='tabler-chevron-right' style={{ fontSize: 18 }} /></IconButton>
@@ -349,6 +401,26 @@ const ProjectedPayrollView = () => {
       {!data && (
         <Grid size={{ xs: 12 }}>
           <Alert severity='info' variant='outlined'>Sin datos de proyección para este período.</Alert>
+        </Grid>
+      )}
+
+      {promotionMessage && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='success' variant='outlined'>{promotionMessage}</Alert>
+        </Grid>
+      )}
+
+      {promotionError && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='error' variant='outlined'>{promotionError}</Alert>
+        </Grid>
+      )}
+
+      {data?.latestPromotion && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='info' variant='outlined'>
+            Última promoción oficial: corte {data.latestPromotion.asOfDate} · {data.latestPromotion.promotedEntryCount} entries recalculadas.
+          </Alert>
         </Grid>
       )}
 

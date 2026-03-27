@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { BonusProrationConfig, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
+import type { BonusProrationConfig, PayrollEntry, PayrollKpiSnapshot, ProjectionMode } from '@/types/payroll'
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
@@ -11,8 +11,6 @@ import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-co
 import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/postgres-store'
 
 // ── Types ──
-
-export type ProjectionMode = 'actual_to_date' | 'projected_month_end'
 
 export type ProjectedPayrollEntry = PayrollEntry & {
   projectionMode: ProjectionMode

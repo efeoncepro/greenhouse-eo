@@ -7,6 +7,13 @@
 
 ## 2026-03-27
 
+### Projected Payroll -> Official promotion flow
+- `Projected Payroll` ahora puede promoverse explícitamente a borrador/recalculo oficial vía `POST /api/hr/payroll/projected/promote`, reutilizando el motor oficial con `projectionContext` (`actual_to_date` o `projected_month_end` + `asOfDate`).
+- Se agregó audit trail en PostgreSQL con `greenhouse_payroll.projected_payroll_promotions`, incluyendo `promotionId`, corte proyectado, actor, status (`started/completed/failed`) y cantidad de entries promovidas.
+- `/api/hr/payroll/projected` ya compara contra `greenhouse_payroll.*` en vez del schema legacy `greenhouse_hr.*`, y expone la última promoción completada del período/modo.
+- `Projected Payroll` ahora incluye CTA para crear o recalcular el borrador oficial desde la propia vista.
+- Guardrail nuevo: al recalcular un período oficial se eliminan `payroll_entries` sobrantes cuyo `member_id` ya no pertenece al universo vigente del cálculo.
+
 ### Payroll variable bonus policy recalibration
 - `Payroll` ahora usa una policy de payout más flexible para bonos variables:
   - `OTD` paga `100%` desde `89%` y prorratea linealmente desde `70%`
