@@ -104,7 +104,7 @@ const resolvePayrollPeriodIndicators = async ({
   return { ufValue, utmValue }
 }
 
-const buildPayrollEntry = ({
+export const buildPayrollEntry = ({
   periodId,
   compensation,
   ufValue,
