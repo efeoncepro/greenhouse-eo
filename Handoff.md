@@ -49,6 +49,94 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 17:05 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Ejecutar la remediación urgente de atribución `ICO`, recuperar KPI por persona para marzo 2026 y endurecer `Payroll projected` para que no vuelva a perder todo el batch por miembros sin compensación o `memberId` nulo.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/sync/sync-notion-conformed.ts`
+- `scripts/remediate-ico-assignee-attribution.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/fetch-kpis-for-period.test.ts`
+- `src/lib/payroll/project-payroll.ts`
+- `src/lib/payroll/project-payroll.test.ts`
+- `docs/tasks/in-progress/TASK-064-ico-assignee-attribution-remediation.md`
+- `Handoff.md`
+
+### Verificacion
+
+- auditoría directa de BigQuery:
+  - `notion_ops.tareas` sí tenía tareas de Andrés con `responsables_ids`
+  - `greenhouse_conformed.delivery_tasks` estaba persistiendo assignees vacíos antes de la remediación
+- ejecución operativa:
+  - rerun de `syncNotionToConformed()`
+  - rerun de `materializeMonthlySnapshots(2026, 3)`
+- validación posterior:
+  - `greenhouse_conformed.delivery_tasks` quedó con assignees persistidos (`with_assignee_source = 1063`, `with_assignee_member = 714`, `with_assignee_member_ids = 792`)
+  - `ico_engine.metrics_by_member` volvió a tener fila para `andres-carlosama` en marzo 2026
+  - `fetchKpisForPeriod()` ahora devuelve KPI materializado para Andrés
+  - `projectPayrollForMember()` volvió a calcular variable para Andrés tras filtrar miembros sin compensación real y tolerar `memberId` nulo
+- tests:
+  - `pnpm test src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/project-payroll.test.ts`
+
+### Riesgos o pendientes
+
+- El recovery ya quedó validado con datos reales, pero falta rematar documentación arquitectónica y validación estática (`eslint`, `tsc`, `git diff --check`) antes de commit/push.
+- Sigue pendiente decidir si se introduce ahora el evento base `delivery.task_assignment.upserted` o si se deja como follow-up, usando por ahora `ico.materialization.completed` como señal reactiva suficiente para consumers downstream.
+
+## 2026-03-27 16:10 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Tomar como lane urgente la remediación de atribución de responsables en `ICO`, porque hoy está dejando KPI por persona vacíos y afectando `Payroll` oficial y proyectado.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-064-ico-assignee-attribution-remediation.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+
+### Verificacion
+
+- revisión de `project_context.md`
+- revisión de `Handoff.md`
+- revisión de arquitectura:
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+
+### Riesgos o pendientes
+
+- La auditoría previa ya indica que el problema no es de `Payroll`, sino del pipeline `notion_ops -> greenhouse_conformed -> ico_engine`.
+- `TASK-064` queda activa como P0 y el siguiente paso es aislar el punto exacto donde se pierden `assignee_source_id`, `assignee_member_id` y `assignee_member_ids`.
+
 ## 2026-03-27 15:35 -03
 
 ### Agente

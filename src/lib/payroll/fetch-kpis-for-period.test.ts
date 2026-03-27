@@ -142,4 +142,32 @@ describe('fetchKpisForPeriod', () => {
     expect(result.diagnostics.missingMembers).toBe(1)
     expect(result.diagnostics.liveComputedMembers).toBe(0)
   })
+
+  it('ignores null and blank member ids instead of failing the whole batch', async () => {
+    readMemberMetricsBatch.mockResolvedValue(
+      new Map([
+        [
+          'member-1',
+          buildIcoSnapshot({
+            memberId: 'member-1',
+            rpa: 1.7,
+            otd: 91,
+            completedTasks: 9,
+            source: 'materialized'
+          })
+        ]
+      ])
+    )
+
+    const result = await fetchKpisForPeriod({
+      memberIds: ['member-1', null, undefined, '   '],
+      periodYear: 2026,
+      periodMonth: 3
+    })
+
+    expect(readMemberMetricsBatch).toHaveBeenCalledWith(['member-1'], 2026, 3)
+    expect(result.snapshots.get('member-1')?.otdPercent).toBe(91)
+    expect(result.diagnostics.materializedMembers).toBe(1)
+    expect(result.diagnostics.missingMembers).toBe(0)
+  })
 })

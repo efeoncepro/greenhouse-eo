@@ -17,7 +17,7 @@ vi.mock('@/lib/payroll/fetch-kpis-for-period', () => ({
 
 vi.mock('@/lib/payroll/fetch-attendance-for-period', () => ({
   fetchAttendanceForAllMembers: (...args: unknown[]) => mockFetchAttendanceForAllMembers(...args),
-  countWeekdays: (_start: string, _end: string) => 22
+  countWeekdays: () => 22
 }))
 
 vi.mock('@/lib/payroll/postgres-store', () => ({
@@ -56,7 +56,8 @@ const baseCompensation = {
   hasApv: false,
   apvAmount: 0,
   effectiveFrom: '2026-01-01',
-  effectiveTo: null
+  effectiveTo: null,
+  hasCompensationVersion: true
 }
 
 describe('projectPayrollForPeriod', () => {
@@ -127,10 +128,37 @@ describe('projectPayrollForPeriod', () => {
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'actual_to_date' })
 
     expect(result.entries).toHaveLength(1)
+
     // Without KPIs: no variable bonus
     expect(result.entries[0].bonusOtdAmount).toBe(0)
     expect(result.entries[0].bonusRpaAmount).toBe(0)
+
     // Without attendance: no deductions for absence
     expect(result.entries[0].grossTotal).toBeGreaterThan(0)
+  })
+
+  it('ignores active members without compensation versions when building the projection batch', async () => {
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([
+      { ...baseCompensation, hasCompensationVersion: true },
+      {
+        ...baseCompensation,
+        versionId: '',
+        memberId: '',
+        memberName: 'Sin compensacion',
+        hasCompensationVersion: false
+      }
+    ])
+    mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
+    mockFetchAttendanceForAllMembers.mockResolvedValue(new Map())
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'actual_to_date' })
+
+    expect(result.entries).toHaveLength(1)
+    expect(result.entries[0].memberId).toBe('member-1')
+    expect(mockFetchKpisForPeriod).toHaveBeenCalledWith({
+      memberIds: ['member-1'],
+      periodYear: 2026,
+      periodMonth: 3
+    })
   })
 })

@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { BonusProrationConfig, CompensationVersion, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
+import type { BonusProrationConfig, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
@@ -94,13 +94,16 @@ export const projectPayrollForPeriod = async ({
     : periodEnd
 
   // 1. Fetch all active compensation versions for the period
-  const compensations = await getApplicableCompensationVersionsForPeriod(periodStart, periodEnd)
+  const compensationRows = await getApplicableCompensationVersionsForPeriod(periodStart, periodEnd)
+  const compensations = compensationRows.filter(row => row.hasCompensationVersion)
 
   if (compensations.length === 0) {
     return { period: { year, month }, mode, asOfDate, entries: [], totals: { grossByCurrency: {}, netByCurrency: {}, memberCount: 0 } }
   }
 
-  const memberIds = compensations.map(c => c.memberId)
+  const memberIds = compensations
+    .map(c => (typeof c.memberId === 'string' ? c.memberId.trim() : ''))
+    .filter(Boolean)
 
   // 2. Fetch inputs in parallel
   const [kpiMap, attendanceResult, bonusConfig, ufIndicator] = await Promise.all([
@@ -150,6 +153,7 @@ export const projectPayrollForPeriod = async ({
 
   for (const entry of entries) {
     const cur = entry.currency
+
     grossByCurrency[cur] = roundCurrency((grossByCurrency[cur] ?? 0) + entry.grossTotal)
     netByCurrency[cur] = roundCurrency((netByCurrency[cur] ?? 0) + entry.netTotal)
   }

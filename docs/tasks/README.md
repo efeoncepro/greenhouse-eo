@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-064`
+- siguiente ID disponible: `TASK-065`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -35,6 +35,7 @@ Primer bloque operativo asignado:
 | `TASK-061` | [TASK-061-payroll-go-live-readiness-audit.md](in-progress/TASK-061-payroll-go-live-readiness-audit.md) | P0        | Muy alto | Medio    | Avanzada    | Auditoría de readiness go-live de Payroll para nómina real mixta `CLP/USD`, con corrección de gaps críticos y tests de cálculo/exportables |
 | `TASK-058` | [TASK-058-economic-indicators-runtime-layer.md](in-progress/TASK-058-economic-indicators-runtime-layer.md) | P1        | Alto    | Medio    | Implementación      | Capa común de indicadores económicos (`USD_CLP`, `UF`, `UTM`, `IPC`), histórico desde `2026-01-01`, sync diario y refresh reactivo de consumers derivados |
 | `TASK-055` | [TASK-055-finance-intelligence-cost-coverage-repair.md](in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md) | P1        | Muy alto | Alto    | Parcial     | Reparación del pipeline de `client_economics`: recompute reactivo por período, cobertura de costos y bridge laboral histórico |
+| `TASK-064` | [TASK-064-ico-assignee-attribution-remediation.md](in-progress/TASK-064-ico-assignee-attribution-remediation.md) | P0        | Muy alto | Alto    | Avanzada | Remediación sistémica de atribución de responsables entre `notion_ops` y `greenhouse_conformed`, con backfill, rematerialización de `metrics_by_member`, wiring reactivo y recuperación de KPI/bonos variables por persona |
 | `TASK-056` | [TASK-056-agency-team-capacity-semantics.md](complete/TASK-056-agency-team-capacity-semantics.md) | P1        | Alto     | Medio    | **Completa** | Contrato canónico de capacidad/economía por miembro: helpers puros (units, economics, overhead, pricing), snapshot reactivo `member_capacity_economics`, cutover de Agency Team + Person Intelligence + My Assignments, doc de arquitectura |
 | `TASK-057` | [TASK-057-direct-overhead-tool-cost-attribution.md](complete/TASK-057-direct-overhead-tool-cost-attribution.md) | P1        | Alto     | Medio    | **Completa**      | Direct overhead per person: AI tooling (licenses + credits) + Finance expenses (equipment/reimbursement/other) con dedup guard, degradación resiliente por fuente, taxonomía canónica y migration |
 | `TASK-062` | [TASK-062-payroll-recurring-fixed-bonus-support.md](complete/TASK-062-payroll-recurring-fixed-bonus-support.md) | P0        | Alto | Medio    | **Completa** | Payroll ya soporta un bono fijo recurrente versionado, snapshot por entry, prorrateo por asistencia y reflejo consistente en cálculo, exports y recibos |

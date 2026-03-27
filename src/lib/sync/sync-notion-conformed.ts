@@ -16,6 +16,10 @@ export interface SyncConformedResult {
   tasksRead: number
   sprintsRead: number
   conformedRowsWritten: number
+  sourceTasksWithResponsables: number
+  conformedTasksWithAssigneeSource: number
+  conformedTasksWithAssigneeMember: number
+  conformedTasksWithAssigneeMemberIds: number
   durationMs: number
 }
 
@@ -269,6 +273,10 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     `)
   ])
 
+  const sourceTasksWithResponsables = tasks.reduce((count, row) => (
+    count + ((row.responsables_ids?.length ?? 0) > 0 ? 1 : 0)
+  ), 0)
+
   // 2. Resolve client_id via space_notion_sources (space_id comes from raw data)
   //    Cloud Run v3.0 stamps every row with space_id, so we use it directly.
   //    PostgreSQL lookup is only needed to resolve space_id → client_id.
@@ -469,6 +477,10 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       tasksRead: tasks.length,
       sprintsRead: sprints.length,
       conformedRowsWritten: 0,
+      sourceTasksWithResponsables,
+      conformedTasksWithAssigneeSource: 0,
+      conformedTasksWithAssigneeMember: 0,
+      conformedTasksWithAssigneeMemberIds: 0,
       durationMs: Date.now() - start
     }
   }
@@ -482,6 +494,28 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_sprints', deliverySprints)
 
   const conformedRowsWritten = deliveryProjects.length + deliveryTasks.length + deliverySprints.length
+
+  const bq = getBigQueryClient()
+
+  const [validationRows] = await bq.query({
+    query: `
+      SELECT
+        COUNTIF(assignee_source_id IS NOT NULL) AS with_assignee_source,
+        COUNTIF(assignee_member_id IS NOT NULL) AS with_assignee_member,
+        COUNTIF(assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(assignee_member_ids) > 0) AS with_assignee_member_ids
+      FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+    `
+  })
+
+  const conformedTasksWithAssigneeSource = toNumber(validationRows[0]?.with_assignee_source) ?? 0
+  const conformedTasksWithAssigneeMember = toNumber(validationRows[0]?.with_assignee_member) ?? 0
+  const conformedTasksWithAssigneeMemberIds = toNumber(validationRows[0]?.with_assignee_member_ids) ?? 0
+
+  if (sourceTasksWithResponsables > 0 && conformedTasksWithAssigneeSource === 0) {
+    throw new Error(
+      `Conformed sync lost task assignee attribution: source has ${sourceTasksWithResponsables} tasks with responsables but delivery_tasks persisted 0 assignee_source_id rows`
+    )
+  }
 
   // 7. Record sync run in PostgreSQL
   try {
@@ -516,6 +550,10 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     tasksRead: tasks.length,
     sprintsRead: sprints.length,
     conformedRowsWritten,
+    sourceTasksWithResponsables,
+    conformedTasksWithAssigneeSource,
+    conformedTasksWithAssigneeMember,
+    conformedTasksWithAssigneeMemberIds,
     durationMs: Date.now() - start
   }
 }

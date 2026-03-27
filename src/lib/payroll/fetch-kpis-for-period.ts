@@ -6,7 +6,7 @@ import { computeMetricsByContext, readMemberMetricsBatch } from '@/lib/ico-engin
 import { ensureIcoEngineInfrastructure } from '@/lib/ico-engine/schema'
 
 type FetchKpisInput = {
-  memberIds: string[]
+  memberIds: Array<string | null | undefined>
   periodYear: number
   periodMonth: number
 }
@@ -24,7 +24,13 @@ export const fetchKpisForPeriod = async ({
   snapshots: Map<string, PayrollKpiSnapshot>
   diagnostics: PayrollKpiDiagnostics
 }> => {
-  const uniqueMemberIds = Array.from(new Set(memberIds.map(memberId => memberId.trim()).filter(Boolean)))
+  const uniqueMemberIds = Array.from(
+    new Set(
+      memberIds
+        .map(memberId => (typeof memberId === 'string' ? memberId.trim() : ''))
+        .filter(Boolean)
+    )
+  )
 
   const diagnostics: PayrollKpiDiagnostics = {
     source: 'ico',
