@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { countWeekdays } from './fetch-attendance-for-period'
+import { buildMemberLeaveSummary, countWeekdays } from './fetch-attendance-for-period'
 
 describe('countWeekdays', () => {
   it('counts 5 weekdays for a full Mon-Fri week', () => {
@@ -50,5 +50,19 @@ describe('countWeekdays', () => {
   it('returns 0 for inverted range', () => {
     // End before start
     expect(countWeekdays('2026-03-20', '2026-03-16')).toBe(0)
+  })
+})
+
+describe('buildMemberLeaveSummary', () => {
+  it('preserves total leave days and isolates unpaid leave for payroll deductions', () => {
+    const summary = buildMemberLeaveSummary([
+      { member_id: 'member-1', total_days: 2, unpaid_days: 0 },
+      { member_id: 'member-2', total_days: 3, unpaid_days: 1 },
+      { member_id: 'member-3', total_days: 1, unpaid_days: 1 }
+    ])
+
+    expect(summary.get('member-1')).toEqual({ totalDays: 2, unpaidDays: 0 })
+    expect(summary.get('member-2')).toEqual({ totalDays: 3, unpaidDays: 1 })
+    expect(summary.get('member-3')).toEqual({ totalDays: 1, unpaidDays: 1 })
   })
 })

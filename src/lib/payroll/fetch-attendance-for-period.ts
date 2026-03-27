@@ -26,6 +26,19 @@ type LeaveCountRow = {
   unpaid_days: number | string
 }
 
+export const buildMemberLeaveSummary = (leaveRows: LeaveCountRow[]) => {
+  const memberLeave = new Map<string, { totalDays: number; unpaidDays: number }>()
+
+  for (const row of leaveRows) {
+    memberLeave.set(row.member_id, {
+      totalDays: Number(row.total_days),
+      unpaidDays: Number(row.unpaid_days)
+    })
+  }
+
+  return memberLeave
+}
+
 const getProjectId = () => getBigQueryProjectId()
 
 export const getPayrollAttendanceDiagnostics = (): PayrollAttendanceDiagnostics => ({
@@ -119,14 +132,7 @@ export const fetchAttendanceForAllMembers = async (
   }
 
   // Build per-member leave counts from Postgres
-  const memberLeave = new Map<string, { totalDays: number; unpaidDays: number }>()
-
-  for (const row of leaveRows) {
-    memberLeave.set(row.member_id, {
-      totalDays: Number(row.total_days),
-      unpaidDays: Number(row.unpaid_days)
-    })
-  }
+  const memberLeave = buildMemberLeaveSummary(leaveRows)
 
   // Assemble snapshots
   const result = new Map<string, AttendanceSnapshot>()

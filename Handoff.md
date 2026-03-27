@@ -49,6 +49,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 07:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Confirmar si `Payroll` desconta correctamente permisos remunerados vs no remunerados y cerrar el gap operativo de taxonomía para “gestión personal” sin romper la lógica actual.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/payroll/fetch-attendance-for-period.ts`
+- `src/lib/payroll/fetch-attendance-for-period.test.ts`
+- `src/lib/hr-core/schema.ts`
+- `scripts/setup-postgres-hr-leave.sql`
+- `scripts/setup-hr-core-tables.sql`
+- `scripts/migrations/add-personal-unpaid-leave-type.sql`
+- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Validación conceptual del path actual:
+  - `fetch-attendance-for-period.ts` ya separa `total_days` de `unpaid_days` usando `greenhouse_hr.leave_types.is_paid`
+  - `calculate-payroll.ts` descuenta solo `daysAbsent + daysOnUnpaidLeave`
+- `pnpm test src/lib/payroll/fetch-attendance-for-period.test.ts`
+- `pnpm exec eslint src/lib/payroll/fetch-attendance-for-period.ts src/lib/payroll/fetch-attendance-for-period.test.ts src/lib/hr-core/schema.ts`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta ejecutar la migration `scripts/migrations/add-personal-unpaid-leave-type.sql` para que el nuevo tipo exista en PostgreSQL.
+- Riesgo ya conocido y no resuelto en esta vuelta: si un permiso cruza dos períodos, el fetch actual sigue usando `requested_days` completo por traslape; ese hardening sigue owned por `TASK-005` / `TASK-001`.
+
 ## 2026-03-27 07:30 -03
 
 ### Agente

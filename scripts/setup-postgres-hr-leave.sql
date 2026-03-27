@@ -90,6 +90,7 @@ INSERT INTO greenhouse_hr.leave_types (
 VALUES
   ('vacation', 'Vacaciones', 'Vacaciones anuales pagadas.', 15, FALSE, TRUE, 'success', TRUE),
   ('personal', 'Permiso personal', 'Permiso administrativo o personal.', 5, FALSE, TRUE, 'primary', TRUE),
+  ('personal_unpaid', 'Permiso personal no remunerado', 'Permiso por gestión personal sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE),
   ('medical', 'Licencia medica', 'Ausencia por licencia o reposo medico.', 0, TRUE, TRUE, 'warning', TRUE),
   ('unpaid', 'Permiso sin goce', 'Ausencia sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE)
 ON CONFLICT (leave_type_code) DO UPDATE

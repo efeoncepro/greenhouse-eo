@@ -192,6 +192,7 @@ MERGE `efeonce-group.greenhouse.leave_types` AS target
 USING (
   SELECT 'vacation' AS leave_type_code, 'Vacaciones' AS leave_type_name, 'Vacaciones anuales pagadas.' AS description, 15 AS default_annual_allowance_days, FALSE AS requires_attachment, TRUE AS is_paid, 'success' AS color_token, TRUE AS active UNION ALL
   SELECT 'personal', 'Permiso personal', 'Permiso administrativo o personal.', 5, FALSE, TRUE, 'primary', TRUE UNION ALL
+  SELECT 'personal_unpaid', 'Permiso personal no remunerado', 'Permiso por gestión personal sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE UNION ALL
   SELECT 'medical', 'Licencia medica', 'Ausencia por licencia o reposo medico.', 0, TRUE, TRUE, 'warning', TRUE UNION ALL
   SELECT 'unpaid', 'Permiso sin goce', 'Ausencia sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE
 ) AS source
