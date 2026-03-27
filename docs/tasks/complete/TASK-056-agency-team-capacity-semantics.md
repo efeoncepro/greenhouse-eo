@@ -832,14 +832,14 @@ Regla UX derivada:
 
 ## Acceptance Criteria
 
-- [ ] Existe un contrato escrito y estable para `Contratadas`, `Asignadas`, `Uso operativo` y `Disponibilidad`.
-- [ ] Queda documentado que `Asignadas` no equivale a `Usadas`.
-- [ ] Queda definido el comportamiento de `Efeonce` interno como costo hundido/autogestión, fuera de carga cliente.
-- [ ] Queda propuesta una capa reusable de conversiones `FTE <-> horas` sin lógica de negocio embebida.
-- [ ] Queda propuesta una capa reusable de cuantificación económica por persona/período para `costPerHour` y `suggestedBillRate`.
-- [ ] Quedan inventariados los consumers del repo que deberán converger a esta semántica.
-- [ ] Queda documentado qué parte debe resolverse con helpers puros y qué parte conviene materializar vía `outbox -> projections`.
-- [ ] El siguiente trabajo de implementación puede ejecutarse sin depender de memoria conversacional.
+- [x] Existe un contrato escrito y estable para `Contratadas`, `Asignadas`, `Uso operativo` y `Disponibilidad`.
+- [x] Queda documentado que `Asignadas` no equivale a `Usadas`.
+- [x] Queda definido el comportamiento de `Efeonce` interno como costo hundido/autogestión, fuera de carga cliente.
+- [x] Queda propuesta una capa reusable de conversiones `FTE <-> horas` sin lógica de negocio embebida.
+- [x] Queda propuesta una capa reusable de cuantificación económica por persona/período para `costPerHour` y `suggestedBillRate`.
+- [x] Quedan inventariados los consumers del repo que deberán converger a esta semántica.
+- [x] Queda documentado qué parte debe resolverse con helpers puros y qué parte conviene materializar vía `outbox -> projections`.
+- [x] El siguiente trabajo de implementación puede ejecutarse sin depender de memoria conversacional.
 
 ## Verification
 
