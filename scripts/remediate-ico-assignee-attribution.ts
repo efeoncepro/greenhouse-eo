@@ -2,9 +2,14 @@ import Module from 'node:module'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
-const originalLoad = Module._load
+type PatchedModule = typeof Module & {
+  _load: (request: string, parent: unknown, isMain: boolean) => unknown
+}
 
-Module._load = function patchedLoad(request, parent, isMain) {
+const patchedModule = Module as PatchedModule
+const originalLoad = patchedModule._load
+
+patchedModule._load = function patchedLoad(request, parent, isMain) {
   if (request === 'server-only') {
     return {}
   }
