@@ -9,7 +9,7 @@
 | Impact | `Muy alto` |
 | Effort | `Alto` |
 | Status real | `Diseño` |
-| Rank | — |
+| Rank | 3 de 3 (ejecutar después de TASK-078 y TASK-076) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -28,6 +28,26 @@ Hoy el sistema puede generar un recibo on-demand via `generatePayrollReceiptPdf(
 - No se notifica al colaborador que su nómina fue procesada
 
 La expectativa operativa es: exporto el período → se generan todos los recibos → cada persona recibe un email con su PDF → lo puede consultar después en su ficha.
+
+## Execution Order
+
+Esta task es la **tercera** (y última) de una cadena de 3:
+
+```
+TASK-078 → TASK-076 → TASK-077 (esta)
+```
+
+**Por qué va al final:**
+- El PDF Chile necesita todos los campos legales de TASK-076 (gratificación, colación, movilización, AFP desglose, isapre desglose, costos empleador, RUT) — sin ellos la liquidación sale incompleta
+- TASK-076 a su vez necesita TASK-078 (indicadores Previred synced) para calcular esos campos correctamente
+- El PDF Internacional no depende de 076/078 pero se implementa junto por consistencia
+
+**Lo que ya estará listo cuando esta task empiece:**
+- Motor forward con indicadores Previred reales (TASK-078)
+- Reverse engine para preview preciso (TASK-078)
+- Todos los campos legales en `payroll_entries`: gratificación, colación, movilización, AFP cotización/comisión, isapre obligatoria/voluntaria, costos empleador (TASK-076)
+- RUT y datos bancarios en members (TASK-076)
+- `payroll_entries` con datos completos y correctos para generar PDFs fidedignos
 
 ## Goal
 
@@ -305,10 +325,11 @@ Efeonce Greenhouse™
 ## Dependencies & Impact
 
 ### Depende de
-- **TASK-076** (Payroll Chile Liquidación Parity) — para que el PDF Chile tenga todos los campos legales (gratificación, colación, AFP desglose, etc.)
-- Sistema de email Resend ya integrado
-- GCS media storage ya operativo
-- `@react-pdf/renderer` ya instalado
+- **TASK-078** (Reverse Calculation Engine) — provee indicadores Previred synced y motor forward con datos correctos
+- **TASK-076** (Payroll Chile Liquidación Parity) — **blocker** — provee los campos legales que el PDF Chile necesita (gratificación, colación, movilización, AFP desglose cotización/comisión, isapre desglose obligatoria/voluntaria, costos empleador, RUT)
+- Sistema de email Resend ya integrado (v6.9.4 con soporte de attachments)
+- GCS media storage ya operativo (`src/lib/storage/greenhouse-media.ts`)
+- `@react-pdf/renderer` ya instalado (v4.3.2)
 - `generate-payroll-pdf.tsx` como base del generador
 
 ### Impacta a

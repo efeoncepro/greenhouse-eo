@@ -9,7 +9,7 @@
 | Impact | `Muy alto` |
 | Effort | `Alto` |
 | Status real | `Diseño` |
-| Rank | — |
+| Rank | 2 de 3 (ejecutar después de TASK-078, antes de TASK-077) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -29,6 +29,28 @@ Sin estos campos, Greenhouse no puede:
 - Calcular correctamente el costo real por colaborador chileno
 - Alimentar Cost Intelligence con datos fidedignos
 - Emitir documentos que cumplan con la normativa laboral chilena
+
+## Execution Order
+
+Esta task es la **segunda** de una cadena de 3:
+
+```
+TASK-078 → TASK-076 (esta) → TASK-077
+```
+
+**Prerequisito:** TASK-078 debe completarse primero porque provee:
+- `previred_indicators` con IMM → necesario para tope de gratificación legal (slice 1)
+- `afp_rates` con tasas separadas → necesario para AFP desglose (slice 3)
+- `previred_indicators.tasa_sis` → necesario para costos empleador SIS (slice 5)
+- Forward engine ya cortado a indicadores synced → los nuevos campos se calculan correctamente
+- Helpers previsionales (`getImmForPeriod`, `getAfpRateForCode`, `getSisRate`) listos para usar
+
+**Lo que desbloquea para TASK-077:**
+- Gratificación legal, colación, movilización → secciones del PDF Chile
+- AFP desglosada (cotización + comisión) → desglose legal en liquidación
+- Isapre desglosada (obligatoria + voluntaria) → desglose legal
+- Costos empleador → información adicional del PDF
+- RUT → encabezado de la liquidación
 
 ## Goal
 
@@ -232,18 +254,20 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 ## Dependencies & Impact
 
 ### Depende de
-- `TASK-058` Economic Indicators Runtime Layer — para IMM
+- **TASK-078** (Reverse Calculation Engine) — **blocker** — provee sync Previred con IMM, tasas AFP, tasa SIS, topes imponibles, tabla impuesto, helpers previsionales y forward engine ya cortado a indicadores synced
+- `TASK-058` Economic Indicators Runtime Layer — UF, UTM ya existen
 - `TASK-061` Payroll Go-Live Readiness Audit — puede requerir re-validación
-- Motor de cálculo actual (`calculate-payroll.ts`, `calculate-chile-deductions.ts`)
+- Motor de cálculo ya cortado a indicadores synced (lo hace TASK-078)
 
 ### Impacta a
-- `/hr/payroll/periods/[periodId]` — vista oficial
-- `/hr/payroll/projected` — proyección
-- `/hr/payroll/compensation` — alta de compensación
-- `member_capacity_economics` — loaded cost con costos empleador
+- **TASK-077** (Payroll Receipts) — desbloquea PDFs con campos legales completos
+- `/hr/payroll/periods/[periodId]` — vista oficial con gratificación, colación, AFP desglose
+- `/hr/payroll/projected` — proyección con campos completos
+- `/hr/payroll/compensation` — alta con nuevos campos Chile
+- `member_capacity_economics` — loaded cost con employer costs reales
 - Cost Intelligence (TASK-067 a TASK-071) — P&L con costo laboral real
-- Exportación de nómina
-- Recibos de pago
+- Exportación de nómina — nuevas columnas
+- Recibos de pago (TASK-077)
 
 ### Archivos owned
 - `src/lib/payroll/calculate-chile-deductions.ts`

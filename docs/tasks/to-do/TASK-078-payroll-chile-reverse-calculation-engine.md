@@ -9,7 +9,7 @@
 | Impact | `Muy alto` |
 | Effort | `Alto` |
 | Status real | `Diseño` |
-| Rank | — |
+| Rank | 1 de 3 (ejecutar antes de TASK-076 y TASK-077) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -36,6 +36,29 @@ Que al crear o editar una compensación Chile, el usuario solo ingrese:
 - Gratificación legal (sí/no)
 
 Y el sistema calcule automáticamente todo lo demás.
+
+## Execution Order
+
+Esta task es la **primera** de una cadena de 3:
+
+```
+TASK-078 (esta) → TASK-076 → TASK-077
+```
+
+**Por qué va primero:**
+- TASK-076 necesita IMM (para gratificación legal), tasas AFP (para desglose), tasa SIS (para costos empleador) — todo viene del sync Previred que esta task implementa
+- TASK-077 necesita campos legales completos en las entries (gratificación, colación, AFP desglose) — eso lo implementa TASK-076 que depende de esta
+- Sin esta task, 076 obliga a HR a buscar tasas manualmente en Previred, que es exactamente lo que queremos eliminar
+
+**Lo que desbloquea para TASK-076:**
+- `previred_indicators` con IMM, topes, tasa SIS → slice 1 y 5 de 076
+- `afp_rates` con tasas por AFP → slice 3 de 076
+- `tax_brackets` con tabla de impuesto → forward engine correcto
+- Helpers previsionales (`getImmForPeriod`, `getSisRate`, etc.)
+
+**Lo que desbloquea para TASK-077:**
+- Motor forward con indicadores synced → PDFs con cálculos correctos
+- Reverse engine → preview preciso antes de generar recibo
 
 ## Architecture Alignment
 
