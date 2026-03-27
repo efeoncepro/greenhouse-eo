@@ -86,58 +86,138 @@ Requiere resolución iterativa (Newton-Raphson o bisección):
 
 ## Scope
 
-### Slice 1 — Catálogo AFP con tasas vigentes
+### Slice 1 — Integración Gael Cloud API (indicadores Previred + impuesto único)
 
-**Nueva tabla `greenhouse_payroll.afp_catalog`:**
+**Descubrimiento:** Existe una API pública gratuita que retorna todos los indicadores previsionales de Previred y la tabla de impuesto único en JSON, sin autenticación.
 
-| Columna | Tipo | Descripción |
-|---------|------|-------------|
-| `afp_code` | TEXT PK | `capital`, `cuprum`, `habitat`, `planvital`, `provida`, `modelo`, `uno` |
-| `afp_name` | TEXT | Nombre legal |
-| `cotizacion_obligatoria_rate` | NUMERIC(5,4) | Tasa cotización (e.g. 0.10 para 10%) |
-| `comision_rate` | NUMERIC(5,4) | Tasa comisión (e.g. 0.0046 para 0.46%) |
-| `total_dependiente_rate` | NUMERIC(5,4) | Total cargo trabajador |
-| `cargo_empleador_rate` | NUMERIC(5,4) | Cargo empleador (0.001 = 0.1%) |
-| `independiente_rate` | NUMERIC(5,4) | Tasa independientes |
-| `effective_from` | DATE | Vigencia desde |
-| `effective_to` | DATE | Vigencia hasta (NULL = vigente) |
-| `source` | TEXT | `previred_manual` o `previred_sync` |
-| `updated_at` | TIMESTAMPTZ | |
+**Endpoints:**
+- `GET https://api.gael.cloud/general/public/previred/{MMYYYY}` — 40+ campos con UF, UTM, IMM, tasas AFP (7 fondos), topes imponibles, cesantía, SIS, asignación familiar
+- `GET https://api.gael.cloud/general/public/impunico/{MMYYYY}` — 8 tramos de impuesto único con desde, hasta, factor, cantidad a rebajar, tasa efectiva
 
-**Seed inicial (Marzo 2026 — datos de la screenshot de Previred):**
+**Rate limit:** 9 requests / 10 segundos. Suficiente para sync mensual.
 
-| AFP | Cotización | Comisión | Total Dep. | Independientes |
-|-----|-----------|----------|------------|----------------|
-| Capital | 10.00% | 1.44% | 11.44% | 12.98% |
-| Cuprum | 10.00% | 1.44% | 11.44% | 12.98% |
-| Habitat | 10.00% | 1.27% | 11.27% | 12.81% |
-| PlanVital | 10.00% | 1.16% | 11.16% | 12.70% |
-| Provida | 10.00% | 1.45% | 11.45% | 12.99% |
-| Modelo | 10.00% | 0.58% | 10.58% | 12.12% |
-| Uno | 10.00% | 0.46% | 10.46% | 12.00% |
+**Campos clave del response de Previred (Marzo 2026 real):**
+
+| Campo API | Valor | Uso en Greenhouse |
+|-----------|-------|-------------------|
+| `UFValPeriodo` | 39,841.72 | Ya tenemos UF — validar cruzado |
+| `UTMVal` | 69,889 | Ya tenemos UTM — validar cruzado |
+| `RMITrabDepeInd` | 539,000 | **IMM** — tope gratificación legal |
+| `RTIAfpPesos` | 3,585,755 | **Tope imponible AFP** (90 UF en $) |
+| `RTISegCesPesos` | 5,386,601 | **Tope imponible cesantía** (135.2 UF en $) |
+| `TasaSIS` | 1.54 | **Tasa SIS empleador** |
+| `AFPUnoTasaDepTrab` | 10.46 | Tasa total dependiente AFP Uno |
+| `AFPUnoTasaDepAPagar` | 10.56 | Tasa a pagar (incluye cargo empleador) |
+| `AFPUnoTasaInd` | 12.00 | Tasa independiente AFP Uno |
+| `AFCCpiEmpleador` | 2.4 | Cesantía empleador indefinido |
+| `AFCCpiTrabajador` | 0.6 | Cesantía trabajador indefinido |
+| `AFCCpfEmpleador` | 3.0 | Cesantía empleador plazo fijo |
+| `AFCCpfTrabajador` | 0 | Cesantía trabajador plazo fijo |
+| `Dist7PorcCCAF` | 4.2 | Distribución 7% salud CCAF |
+| `Dist7PorcFonasa` | 2.8 | Distribución 7% salud Fonasa |
+| (7 AFP × 3 tasas) | ... | Todas las tasas AFP actualizadas |
+
+**Campos clave del response de impuesto único (Marzo 2026 real):**
+
+| Campo API | Valor | Uso |
+|-----------|-------|-----|
+| `TR1Desde` / `TR1Hasta` | 0 / 943,501.50 | Tramo 1 exento |
+| `TR1Factor` | 0 | Sin impuesto |
+| `TR2Desde` / `TR2Hasta` | 943,501.51 / 2,096,670 | Tramo 2 |
+| `TR2Factor` / `TR2CReb` | 0.04 / 37,740.06 | 4% con rebaja |
+| ... hasta TR8 | ... | 8 tramos completos |
+
+**Implementación:**
+
+Nuevo servicio: `src/lib/payroll/previred-sync.ts`
+
+```
+syncPreviredIndicators(year, month):
+  1. GET api.gael.cloud/general/public/previred/{MMYYYY}
+  2. Parsear y normalizar (comas → puntos, strings → numbers)
+  3. Upsert en greenhouse_payroll.previred_indicators
+  4. Extraer tasas AFP → upsert en greenhouse_payroll.afp_rates
+  5. Emitir evento payroll.previred_indicators.synced
+
+syncImpuestoUnico(year, month):
+  1. GET api.gael.cloud/general/public/impunico/{MMYYYY}
+  2. Parsear 8 tramos
+  3. Upsert en greenhouse_payroll.tax_brackets
+  4. Emitir evento payroll.tax_brackets.synced
+```
+
+**Cron:** `GET /api/cron/sync-previred` — mensual (día 1 de cada mes) o al crear período.
+
+**Tablas nuevas:**
+
+`greenhouse_payroll.previred_indicators`:
+| Columna | Tipo |
+|---------|------|
+| `period_year` | INT |
+| `period_month` | INT |
+| `uf_value` | NUMERIC(12,2) |
+| `utm_value` | NUMERIC(12,0) |
+| `uta_value` | NUMERIC(12,0) |
+| `imm_value` | NUMERIC(12,0) |
+| `tope_afp_pesos` | NUMERIC(12,0) |
+| `tope_cesantia_pesos` | NUMERIC(12,0) |
+| `tasa_sis` | NUMERIC(5,2) |
+| `afc_indefinido_empleador` | NUMERIC(5,2) |
+| `afc_indefinido_trabajador` | NUMERIC(5,2) |
+| `afc_plazo_fijo_empleador` | NUMERIC(5,2) |
+| `afc_plazo_fijo_trabajador` | NUMERIC(5,2) |
+| `raw_json` | JSONB |
+| `synced_at` | TIMESTAMPTZ |
+| PRIMARY KEY | `(period_year, period_month)` |
+
+`greenhouse_payroll.afp_rates`:
+| Columna | Tipo |
+|---------|------|
+| `afp_code` | TEXT |
+| `period_year` | INT |
+| `period_month` | INT |
+| `tasa_dependiente_trabajador` | NUMERIC(5,2) |
+| `tasa_dependiente_a_pagar` | NUMERIC(5,2) |
+| `tasa_independiente` | NUMERIC(5,2) |
+| PRIMARY KEY | `(afp_code, period_year, period_month)` |
+
+`greenhouse_payroll.tax_brackets`:
+| Columna | Tipo |
+|---------|------|
+| `period_year` | INT |
+| `period_month` | INT |
+| `tramo` | INT (1-8) |
+| `desde` | NUMERIC(14,2) |
+| `hasta` | NUMERIC(14,2) |
+| `factor` | NUMERIC(5,4) |
+| `cantidad_rebajar` | NUMERIC(14,2) |
+| `tasa_efectiva` | NUMERIC(5,2) |
+| PRIMARY KEY | `(period_year, period_month, tramo)` |
 
 **UX en alta de compensación:**
-- Dropdown de AFP con nombre → tasa se autocompleta
-- No se edita la tasa manualmente (viene del catálogo)
-- Si la AFP no está en el catálogo: opción "Otra AFP" con tasa manual (fallback)
+- Dropdown de AFP con nombre → tasa se autocompleta desde `afp_rates` del período actual
+- No se edita la tasa manualmente
+- Si no hay indicadores synced para el período: warning + opción de sync manual
 
-### Slice 2 — Indicadores previsionales automáticos
+### Slice 2 — Helpers previsionales canónicos
 
-**Agregar a `economic-indicators` o tabla dedicada:**
+Basados en datos synced de Gael Cloud:
 
-| Indicador | Fuente | Frecuencia | Uso |
-|-----------|--------|------------|-----|
-| `IMM` (Ingreso Mínimo Mensual) | Gobierno/manual | Anual (cuando cambia) | Tope gratificación legal |
-| `TOPE_IMPONIBLE_AFP` | 90 UF (fijo por ley) | Al cambiar UF | Tope base imponible AFP |
-| `TOPE_IMPONIBLE_CESANTIA` | 135.2 UF (fijo por ley) | Al cambiar UF | Tope base imponible cesantía |
-| `TASA_SIS` | Previred | Anual | Costo empleador SIS |
-| `TASA_MUTUAL` | Configurable por empresa | Manual | Costo empleador mutual |
+**Readers:**
+- `getPreviredIndicators(year, month)` → indicadores del período (con auto-sync si no existe)
+- `getAfpRates(year, month)` → Map de AFP → tasas
+- `getAfpRateForCode(afpCode, year, month)` → tasa específica
+- `getTaxBrackets(year, month)` → 8 tramos
+- `computeTaxFromBrackets(taxableBase, brackets)` → impuesto calculado
 
-**Helpers:**
-- `getImmForPeriod(year, month)` → IMM vigente
-- `getAfpRatesForPeriod(afpCode, date)` → tasas vigentes
-- `getTopeImponibleAfp(ufValue)` → `90 × ufValue`
-- `getTopeImponibleCesantia(ufValue)` → `135.2 × ufValue`
+**Derivados:**
+- `getImmForPeriod(year, month)` → `previred_indicators.imm_value`
+- `getTopeAfpForPeriod(year, month)` → `previred_indicators.tope_afp_pesos`
+- `getTopeCesantiaForPeriod(year, month)` → `previred_indicators.tope_cesantia_pesos`
+- `getSisRate(year, month)` → `previred_indicators.tasa_sis`
+- `getCesantiaRates(contractType, year, month)` → `{ empleador, trabajador }`
+
+**Impacto:** Estos helpers reemplazan todos los valores hardcodeados o manuales en `calculate-chile-deductions.ts` y en `compute-chile-tax.ts`.
 
 ### Slice 3 — Reverse calculation engine
 
@@ -276,10 +356,10 @@ Usar la liquidación real de Valentina Hoyos como test case:
 
 ## Out of Scope
 
-- Sync automático con Previred (fase 2 — por ahora seed manual del catálogo AFP)
 - Cálculo para trabajadores independientes (boleta de honorarios)
 - Gratificación anual proporcional (solo mensual 25% para MVP)
 - Multi-empresa (múltiples RUT/razones sociales)
+- Pago de cotizaciones via Previred (solo lectura de indicadores)
 
 ## Dependencies & Impact
 
@@ -305,11 +385,14 @@ Usar la liquidación real de Valentina Hoyos como test case:
 
 ## Acceptance Criteria
 
-- [ ] Catálogo AFP con 7 AFP vigentes y tasas separadas (cotización + comisión)
+- [ ] `syncPreviredIndicators()` trae y persiste indicadores de Gael Cloud API para el período
+- [ ] `syncImpuestoUnico()` trae y persiste 8 tramos de impuesto único
+- [ ] Cron `/api/cron/sync-previred` funciona mensualmente
+- [ ] Tasas AFP (7 fondos) se autocompletan desde `afp_rates` sin input manual
+- [ ] IMM, topes imponibles, tasa SIS, cesantía — todos vienen del sync, no hardcodeados
 - [ ] `computeGrossFromNet()` converge en <50 iteraciones para todos los casos base
 - [ ] Para Valentina Hoyos: input líquido $595,656 → output renta base $539,000 (±$1)
-- [ ] IMM disponible como indicador económico
-- [ ] Topes imponibles (90 UF AFP, 135.2 UF cesantía) aplicados automáticamente
+- [ ] Impuesto se calcula desde `tax_brackets` synced, no desde tablas hardcodeadas
 - [ ] UI de compensación permite ingresar líquido deseado con preview en tiempo real
 - [ ] Modo "ingresar bruto" sigue disponible como toggle
 - [ ] Costos empleador (SIS, cesantía, mutual) calculados y visibles en preview
