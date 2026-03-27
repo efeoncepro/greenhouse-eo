@@ -290,12 +290,12 @@ P&L operativo por scope y período.
 
 ## 8. Superficie UI
 
-Cost Intelligence no tiene sección propia en el sidebar. Su data se consume distribuida:
+La surface principal vive dentro de la sección **"Economía"** del sidebar (ya existe como `Economía — P&L y rentabilidad`). El resto se consume distribuido:
 
 | Surface | Ubicación | Qué muestra |
 |---------|-----------|-------------|
-| **Period Closure Dashboard** | Finance → nueva tab "Cierre de Período" | Tabla de meses con semáforos por pata, readiness %, botón cerrar/reabrir |
-| **P&L inline** | Finance → Period Closure → expandir mes | P&L operativo del período seleccionado por client |
+| **Period Closure Dashboard** | Economía → "Cierre de Período" | Tabla de meses con semáforos por pata, readiness %, botón cerrar/reabrir |
+| **P&L inline** | Economía → Period Closure → expandir mes | P&L operativo del período seleccionado por client |
 | **Agency margin** | Agency → space cards | Margin % badge por space (lee operational_pl) |
 | **Organization 360 P&L** | Org detail → tab Rentabilidad | Trend de P&L por organización (ya existe parcialmente) |
 | **People fully-loaded cost** | People → Person → Finance tab | Costo fully-loaded con closure awareness |

@@ -49,6 +49,96 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-27 18:15 -03
+
+### Agente
+
+- Claude (Opus)
+
+### Objetivo del turno
+
+- Implementar TASK-073: People Canonical Capacity Cutover — cortar People list/detail de fuentes crudas a serving canónico (`member_capacity_economics`, `person_intelligence`).
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/types/people.ts` — `PersonListItem` +`contractedFte`, `PersonCapacitySummary` +`contractedHoursMonth`/`source`
+- `src/lib/people/get-people-list.ts` — enrichment con `readMemberCapacityEconomicsBatch`
+- `src/lib/people/get-person-detail.ts` — `readPersonIntelligence` para capacity, `buildCapacitySummaryFromServing` vs `buildCapacitySummaryDerived`
+- `src/lib/people/get-people-list.test.ts` — mock de `member-capacity-economics/store`
+- `src/lib/people/get-person-detail.test.ts` — mock de `person-intelligence/store`
+- `docs/tasks/in-progress/TASK-073-people-canonical-capacity-cutover.md` — movida de to-do
+- `docs/tasks/TASK_ID_REGISTRY.md` — actualizado
+- `docs/tasks/README.md` — actualizado
+
+### Verificacion
+
+- `npx tsc --noEmit` — 0 errores
+- `pnpm test src/lib/people/` — 30/30 tests passed (4 files)
+- `pnpm build` — exitoso
+
+### Riesgos o pendientes
+
+- `contractedFte` en People list depende de que `member_capacity_economics` esté materializado para el período actual; si no lo está, queda `null` (fallback graceful)
+- `person_intelligence` serving view se usa para capacity en Person detail; si no existe para el miembro, cae a derivación local desde assignments + raw metrics (mismo comportamiento anterior)
+- `getPersonOperationalMetrics()` sigue corriendo para poblar `detail.operationalMetrics` (Activity tab); un follow-up podría reemplazarlo completamente por `ico_member_metrics` serving cuando la cobertura de ICO sea confiable
+- Falta validación visual en staging para confirmar que los nuevos campos se renderizan correctamente en el frontend
+
+---
+
+## 2026-03-27 18:10 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar `TASK-074` para conectar `Projected Payroll` con la nómina oficial mediante una promoción explícita y auditable a borrador/recalculo oficial.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/projected-payroll-promotion-store.ts`
+- `src/lib/payroll/promote-projected-payroll.ts`
+- `src/lib/payroll/promote-projected-payroll.test.ts`
+- `src/app/api/hr/payroll/projected/route.ts`
+- `src/app/api/hr/payroll/projected/promote/route.ts`
+- `src/views/greenhouse/payroll/ProjectedPayrollView.tsx`
+- `src/types/payroll.ts`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/migrations/add-projected-payroll-promotions.sql`
+- `docs/tasks/in-progress/TASK-074-projected-payroll-to-official-promotion-flow.md`
+
+### Verificacion
+
+- `pnpm test src/lib/payroll/project-payroll.test.ts src/lib/payroll/promote-projected-payroll.test.ts`
+- `pnpm exec eslint src/lib/payroll/calculate-payroll.ts src/lib/payroll/projected-payroll-promotion-store.ts src/lib/payroll/promote-projected-payroll.ts src/lib/payroll/promote-projected-payroll.test.ts src/app/api/hr/payroll/projected/route.ts src/app/api/hr/payroll/projected/promote/route.ts src/views/greenhouse/payroll/ProjectedPayrollView.tsx src/lib/payroll/postgres-store.ts src/types/payroll.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta ejecutar la migration `scripts/migrations/add-projected-payroll-promotions.sql` en el ambiente compartido.
+- El promote flow ya crea/recalcula el período oficial usando el corte projected, pero el cálculo oficial sigue escribiendo entries una a una; no quedó transaccional completo por período en esta iteración.
+- Hay cambios ajenos en el worktree/documentación paralela (`Cost Intelligence`, backlog) que no pertenecen a `TASK-074`; si se hace commit, conviene separar esta lane de ese resto.
+
 ## 2026-03-27 — Cost Intelligence Architecture & Task Pipeline
 
 ### Agente

@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-073`
+- siguiente ID disponible: `TASK-075`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -41,11 +41,15 @@ Primer bloque operativo asignado:
 | `TASK-062` | [TASK-062-payroll-recurring-fixed-bonus-support.md](complete/TASK-062-payroll-recurring-fixed-bonus-support.md) | P0        | Alto | Medio    | **Completa** | Payroll ya soporta un bono fijo recurrente versionado, snapshot por entry, prorrateo por asistencia y reflejo consistente en cálculo, exports y recibos |
 | `TASK-063` | [TASK-063-payroll-projected-payroll-runtime.md](to-do/TASK-063-payroll-projected-payroll-runtime.md) | P1        | Alto | Alto    | Diseño | Complemento de `Payroll` para responder nómina estimada al día y a fin de mes por persona o grupo, reutilizando el motor canónico, preservando mixed currency y apoyándose en events/outbox/projections donde aporten lectura rápida |
 | `TASK-065` | [TASK-065-payroll-variable-bonus-policy-recalibration.md](in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md) | P0 | Muy alto | Medio | Implementación | Recalibración del payout variable de `Payroll` con full payout `OTD` desde `89%` y bandas suaves de `RpA`, manteniendo compatibilidad con payroll oficial, proyectado, recálculo y exports |
+| `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](in-progress/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Avanzada | Cutover de People list/detail a serving canónico: `contractedFte`, capacity desde `person_intelligence`, fallback raw cuando serving no disponible |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
-| `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](to-do/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Diseño | Finance UI: tab "Cierre de Período" con semáforos, P&L inline, close/reopen |
+| `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](to-do/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Diseño | Economía UI: surface "Cierre de Período" con semáforos, P&L inline, close/reopen |
+| `TASK-075` | [TASK-075-projected-payroll-ux-polish.md](to-do/TASK-075-projected-payroll-ux-polish.md) | P1 | Alto | Bajo | Diseño | Polish UX de nómina proyectada: contexto período, descuentos condicionales por régimen, % payout en bonos, equivalente CLP, indicadores enriquecidos |
 | `TASK-071` | [TASK-071-cost-intelligence-cross-module-consumers.md](to-do/TASK-071-cost-intelligence-cross-module-consumers.md) | P2 | Alto | Medio | Diseño | Enriquecer Agency, Org 360, People 360 y Home con datos de Cost Intelligence |
+| `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
+| `TASK-074` | [TASK-074-projected-payroll-to-official-promotion-flow.md](in-progress/TASK-074-projected-payroll-to-official-promotion-flow.md) | P1 | Alto | Medio | Implementación | Conectar `Projected Payroll` con `Payroll official` mediante promoción explícita a borrador/recalculo, compartiendo motor pero sin fusionar los objetos transaccionales |
 
 ## To Do
 
