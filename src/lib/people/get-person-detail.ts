@@ -30,8 +30,10 @@ import {
   enrichProfile
 } from '@/lib/people/shared'
 import { getPersonProfileByEoId, getPersonProfileByMemberId } from '@/lib/person-360/get-person-profile'
-import { getAssignedHoursMonth, getCapacityHealth, getExpectedMonthlyThroughput, getUtilizationPercent } from '@/lib/team-capacity/shared'
-import type { TeamIdentityProvider, TeamRoleCategory } from '@/types/team'
+import { readLatestMemberCapacityEconomicsSnapshot, type MemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
+import { readPersonIntelligence } from '@/lib/person-intelligence/store'
+import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
+import type { TeamIdentityProvider } from '@/types/team'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type MemberRow = {
@@ -141,45 +143,35 @@ const buildAssignmentsSummary = (rows: AssignmentRow[]) => {
 
   return {
     activeAssignments,
+    contractedFte: 1,
+    assignedFte: totalFte,
     totalFte,
     totalHoursMonth
   }
 }
 
-const buildCapacitySummary = ({
-  roleCategory,
-  totalFte,
-  metrics
-}: {
-  roleCategory: string
-  totalFte: number
-  metrics: PersonDetail['operationalMetrics'] | null | undefined
-}) => {
-  const assignedHoursMonth = getAssignedHoursMonth(totalFte)
-
-  const expectedMonthlyThroughput = getExpectedMonthlyThroughput({
-    roleCategory: roleCategory as TeamRoleCategory,
-    fteAllocation: totalFte
-  })
-
-  const activeAssets = metrics?.tasksActiveNow || 0
-  const completedAssets = metrics?.tasksCompleted30d || 0
-
-  const utilizationPercent = getUtilizationPercent({
-    activeAssets,
-    expectedMonthlyThroughput
-  })
-
-  return {
-    assignedHoursMonth,
-    activeAssets,
-    completedAssets,
-    projectCount: metrics?.projectBreakdown.length || 0,
-    expectedMonthlyThroughput,
-    utilizationPercent,
-    capacityHealth: getCapacityHealth(utilizationPercent)
-  }
-}
+/**
+ * Build capacity summary from canonical snapshots.
+ * Per GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1 consumer rules:
+ * "no recalcular costPerHour ni contracted/assigned/used por otra vía si el snapshot ya lo resuelve"
+ */
+const buildCapacityFromSnapshot = (
+  snapshot: MemberCapacityEconomicsSnapshot,
+  intelligence: PersonIntelligenceSnapshot | null
+): PersonDetail['capacity'] => ({
+  contractedHoursMonth: snapshot.contractedHours,
+  assignedHoursMonth: snapshot.assignedHours,
+  commercialAvailabilityHours: snapshot.commercialAvailabilityHours,
+  usageKind: snapshot.usageKind,
+  usedHours: snapshot.usedHours,
+  utilizationPercent: intelligence?.derivedMetrics.find(m => m.metricId === 'utilization_pct')?.value ?? snapshot.usagePercent ?? 0,
+  capacityHealth: intelligence?.capacity.capacityHealth ?? (snapshot.snapshotStatus === 'complete' ? 'normal' : 'unknown'),
+  activeAssets: intelligence?.deliveryMetrics.find(m => m.metricId === 'throughput')?.value != null
+    ? (intelligence.capacity.activeAssignmentCount ?? 0)
+    : 0,
+  completedAssets: intelligence?.deliveryMetrics.find(m => m.metricId === 'throughput')?.value ?? 0,
+  expectedMonthlyThroughput: intelligence?.capacity.expectedThroughput ?? 0
+})
 
 const buildIntegrations = ({
   providers,
@@ -672,6 +664,8 @@ export const getPersonDetail = async ({
     access,
     summary: {
       activeAssignments: 0,
+      contractedFte: 1,
+      assignedFte: 0,
       totalFte: 0,
       totalHoursMonth: 0
     },
@@ -693,29 +687,67 @@ export const getPersonDetail = async ({
   // linkedUserId already resolved from person_360
   detail.linkedUserId = resolved?.userId ?? null
 
+  // Canonical capacity snapshot — single source of truth per GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1
+  let capacitySnapshot: MemberCapacityEconomicsSnapshot | null = null
+  let intelligence: PersonIntelligenceSnapshot | null = null
+
+  if (isGreenhousePostgresConfigured()) {
+    tasks.push(
+      readLatestMemberCapacityEconomicsSnapshot(memberId).then(snap => {
+        capacitySnapshot = snap
+
+        if (snap) {
+          detail.summary = {
+            activeAssignments: snap.assignmentCount,
+            contractedFte: roundToTenths(snap.contractedFte),
+            assignedFte: roundToTenths(snap.assignedHours / 160),
+            totalFte: roundToTenths(snap.assignedHours / 160),
+            totalHoursMonth: snap.assignedHours
+          }
+        }
+      }).catch(error => {
+        console.warn(`[people/${memberId}] capacity snapshot failed:`, error instanceof Error ? error.message : error)
+      })
+    )
+
+    tasks.push(
+      (async () => {
+        try {
+          const now = new Date()
+
+          intelligence = await readPersonIntelligence(memberId, now.getFullYear(), now.getMonth() + 1)
+        } catch (error) {
+          console.warn(`[people/${memberId}] person intelligence failed:`, error instanceof Error ? error.message : error)
+        }
+      })()
+    )
+  }
+
+  // Assignments raw — only for the expandable detail table, not for FTE/capacity derivation
   tasks.push(
     (async () => {
       const rows = await getAssignmentsByMember(memberId)
 
-      // Derive summary only from assignments that have a corresponding membership
-      // so the sidebar stats align with what the Organizations tab shows.
-      let membershipClientIds: Set<string> | null = null
+      // If no capacity snapshot was loaded, fall back to assignment-derived summary
+      if (!capacitySnapshot) {
+        let membershipClientIds: Set<string> | null = null
 
-      if (member.identityProfileId) {
-        try {
-          const memberships = await getPersonMemberships(member.identityProfileId)
+        if (member.identityProfileId) {
+          try {
+            const memberships = await getPersonMemberships(member.identityProfileId)
 
-          membershipClientIds = new Set(memberships.map(m => m.clientId).filter(Boolean) as string[])
-        } catch {
-          // If memberships lookup fails, fall back to all assignments
+            membershipClientIds = new Set(memberships.map(m => m.clientId).filter(Boolean) as string[])
+          } catch {
+            // If memberships lookup fails, fall back to all assignments
+          }
         }
+
+        const summaryRows = membershipClientIds
+          ? rows.filter(r => membershipClientIds!.has(String(r.client_id || '')))
+          : rows
+
+        detail.summary = buildAssignmentsSummary(summaryRows)
       }
-
-      const summaryRows = membershipClientIds
-        ? rows.filter(r => membershipClientIds!.has(String(r.client_id || '')))
-        : rows
-
-      detail.summary = buildAssignmentsSummary(summaryRows)
 
       if (access.canViewAssignments) {
         detail.assignments = normalizeAssignments(rows)
@@ -726,6 +758,8 @@ export const getPersonDetail = async ({
   )
 
   if (access.canViewActivity) {
+    // Operational metrics: prefer person_intelligence serving, raw from notion_ops as fallback.
+    // The intelligence snapshot is loaded above in a parallel task; raw only fires if serving unavailable.
     tasks.push(
       getPersonOperationalMetrics({
         displayName: member.displayName,
@@ -736,6 +770,7 @@ export const getPersonDetail = async ({
         identityMatchSignals,
         notionUserCandidates
       }).then(metrics => {
+        // Will be overridden by serving data after Promise.all if intelligence exists
         detail.operationalMetrics = metrics
       }).catch(error => {
         console.warn(`[people/${memberId}] operational metrics failed:`, error instanceof Error ? error.message : error)
@@ -812,12 +847,29 @@ export const getPersonDetail = async ({
 
   await Promise.all(tasks)
 
+  // After Promise.all, the async callbacks may have mutated these closures
+  const resolvedIntelligence = intelligence as PersonIntelligenceSnapshot | null
+  const resolvedSnapshot = capacitySnapshot as MemberCapacityEconomicsSnapshot | null
+
+  // Override operational metrics from serving if person_intelligence exists
+  if (resolvedIntelligence && access.canViewActivity) {
+    const throughput = resolvedIntelligence.deliveryMetrics.find(m => m.metricId === 'throughput')
+    const rpa = resolvedIntelligence.deliveryMetrics.find(m => m.metricId === 'rpa')
+    const otd = resolvedIntelligence.deliveryMetrics.find(m => m.metricId === 'otd_pct')
+
+    detail.operationalMetrics = {
+      rpaAvg30d: rpa?.value ?? detail.operationalMetrics?.rpaAvg30d ?? null,
+      otdPercent30d: otd?.value ?? detail.operationalMetrics?.otdPercent30d ?? null,
+      tasksCompleted30d: throughput?.value ?? detail.operationalMetrics?.tasksCompleted30d ?? 0,
+      tasksActiveNow: resolvedIntelligence.capacity.activeAssignmentCount ?? detail.operationalMetrics?.tasksActiveNow ?? 0,
+      projectBreakdown: detail.operationalMetrics?.projectBreakdown ?? []
+    }
+  }
+
   if (access.canViewActivity || access.canViewAssignments) {
-    detail.capacity = buildCapacitySummary({
-      roleCategory: member.roleCategory,
-      totalFte: detail.summary.totalFte,
-      metrics: detail.operationalMetrics
-    })
+    if (resolvedSnapshot) {
+      detail.capacity = buildCapacityFromSnapshot(resolvedSnapshot, resolvedIntelligence)
+    }
   }
 
   return detail

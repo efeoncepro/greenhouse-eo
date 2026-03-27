@@ -16,6 +16,11 @@ export interface PersonListItem {
   locationCountry: string | null
   active: boolean
   totalAssignments: number
+  /** FTE contractual — desde member_capacity_economics snapshot */
+  contractedFte: number
+  /** FTE asignado comercialmente — desde member_capacity_economics snapshot */
+  assignedFte: number
+  /** @deprecated alias de assignedFte para compatibilidad con consumers existentes */
   totalFte: number
   payRegime: 'chile' | 'international' | null
 }
@@ -114,18 +119,24 @@ export interface PersonAccess {
 
 export interface PersonSummary {
   activeAssignments: number
+  contractedFte: number
+  assignedFte: number
+  /** @deprecated alias de assignedFte */
   totalFte: number
   totalHoursMonth: number
 }
 
 export interface PersonCapacitySummary {
+  contractedHoursMonth: number
   assignedHoursMonth: number
+  commercialAvailabilityHours: number
+  usageKind: string
+  usedHours: number | null
+  utilizationPercent: number
+  capacityHealth: string
   activeAssets: number
   completedAssets: number
-  projectCount: number
   expectedMonthlyThroughput: number
-  utilizationPercent: number
-  capacityHealth: TeamCapacityHealth
 }
 
 export interface PersonFinanceSummary {

@@ -30,7 +30,27 @@ vi.mock('@/lib/people/resolve-avatar-path', () => ({
   resolveAvatarPath: () => '/default-avatar.png'
 }))
 
+const mockCapacityBatch = vi.fn()
+
+vi.mock('@/lib/member-capacity-economics/store', () => ({
+  readMemberCapacityEconomicsBatch: (...args: unknown[]) => mockCapacityBatch(...args)
+}))
+
 import { getPeopleList } from '@/lib/people/get-people-list'
+
+const makeSnapshot = (memberId: string, overrides: Record<string, unknown> = {}) => ({
+  memberId,
+  contractedFte: 1,
+  assignedHours: 128,
+  assignmentCount: 2,
+  ...overrides
+})
+
+const setupCapacityBatch = (entries: Array<{ memberId: string; [k: string]: unknown }> = []) => {
+  const map = new Map(entries.map(e => [e.memberId, e]))
+
+  mockCapacityBatch.mockResolvedValue(map)
+}
 
 const makePgRow = (overrides: Record<string, unknown> = {}) => ({
   member_id: 'member-1',
@@ -42,8 +62,6 @@ const makePgRow = (overrides: Record<string, unknown> = {}) => ({
   avatar_url: null,
   location_country: 'CL',
   active: true,
-  total_assignments: 2,
-  total_fte: 0.8,
   pay_regime: 'chile',
   ...overrides
 })
@@ -59,15 +77,17 @@ const setupBigQueryFallback = (rows: Record<string, unknown>[] = [makePgRow()], 
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockCapacityBatch.mockResolvedValue(new Map())
 })
 
 describe('getPeopleList', () => {
   describe('Postgres-first path', () => {
-    it('returns data from Postgres when configured', async () => {
+    it('returns data from Postgres enriched with capacity snapshot', async () => {
       mockIsConfigured.mockReturnValue(true)
       mockPgQuery
         .mockResolvedValueOnce([makePgRow()])
         .mockResolvedValueOnce([{ covered_clients: 5 }])
+      setupCapacityBatch([makeSnapshot('member-1', { contractedFte: 1, assignedHours: 128, assignmentCount: 2 })])
 
       const result = await getPeopleList()
 
@@ -80,21 +100,28 @@ describe('getPeopleList', () => {
         publicEmail: 'test@efeonce.com',
         roleCategory: 'development',
         active: true,
-        totalFte: 0.8,
+        contractedFte: 1,
+        assignedFte: 0.8,
+        totalAssignments: 2,
         payRegime: 'chile'
       })
       expect(result.summary.coveredClients).toBe(5)
     })
 
-    it('computes correct summary statistics from Postgres rows', async () => {
+    it('computes summary from capacity snapshots', async () => {
       mockIsConfigured.mockReturnValue(true)
       mockPgQuery
         .mockResolvedValueOnce([
-          makePgRow({ member_id: 'm-1', active: true, pay_regime: 'chile', total_fte: 0.5 }),
-          makePgRow({ member_id: 'm-2', active: true, pay_regime: 'international', total_fte: 1.0 }),
-          makePgRow({ member_id: 'm-3', active: false, pay_regime: null, total_fte: 0 })
+          makePgRow({ member_id: 'm-1', active: true, pay_regime: 'chile' }),
+          makePgRow({ member_id: 'm-2', active: true, pay_regime: 'international' }),
+          makePgRow({ member_id: 'm-3', active: false, pay_regime: null })
         ])
         .mockResolvedValueOnce([{ covered_clients: 10 }])
+      setupCapacityBatch([
+        makeSnapshot('m-1', { contractedFte: 0.5 }),
+        makeSnapshot('m-2', { contractedFte: 1.0 }),
+        makeSnapshot('m-3', { contractedFte: 0 })
+      ])
 
       const result = await getPeopleList()
 
