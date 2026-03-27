@@ -131,6 +131,84 @@ La vista mantiene su estructura actual de 4 cards + tabla, pero agrega:
 - [ ] `tsc --noEmit` limpio
 - [ ] `pnpm build` limpio
 
+## Auditoría de consumers y cadena reactiva
+
+### Cadena reactiva al crear/editar/eliminar un assignment
+
+Cuando el admin crea, edita o elimina un assignment desde Agency > Team, esta es la cascada completa:
+
+```
+POST/PATCH/DELETE /api/admin/team/assignments
+  → mutate-team.ts (PostgreSQL + BigQuery dual-write)
+  → publishOutboxEvent('assignment.created/updated/removed')
+  │
+  ├── assignment_membership_sync          → UPSERT person_memberships (vía spaces bridge)
+  │     └── publishOutboxEvent('membership.created')
+  │           ├── organization_360         → invalidar cache org (updated_at)
+  │           └── organization_executive   → invalidar cache executive
+  │
+  ├── member_capacity_economics           → recalcular snapshot (FTE, horas, overhead, bill rate)
+  │     └── person_intelligence           → actualizar serving de inteligencia por persona
+  │
+  ├── organization_360                    → invalidar cache org
+  ├── organization_executive              → invalidar cache executive
+  ├── client_economics                    → recomputar economics del cliente
+  └── person_operational_metrics          → actualizar métricas operativas
+```
+
+**5 projections se disparan** por cada cambio de assignment. Todas ya están implementadas y registradas.
+
+### Consumers directos de `client_team_assignments` (read path)
+
+| Consumer | Archivo | Qué lee |
+|----------|---------|---------|
+| Agency Team view | `src/app/api/team/capacity-breakdown/route.ts` | Assignments activos + snapshots de capacity economics |
+| My Assignments | `src/app/api/my/assignments/route.ts` | Assignments del usuario + snapshot personal |
+| Team Capacity | `src/app/api/team/capacity/route.ts` | Agregados de capacidad por cliente/proyecto |
+| Person Detail | `src/lib/people/get-person-detail.ts` | Assignments activos del miembro |
+| Person Finance | `src/lib/person-360/get-person-finance.ts` | FTE allocation para overview financiero |
+| Payroll Cost Allocation | `src/lib/finance/payroll-cost-allocation.ts` | FTE weights para prorrateo de costos |
+| Organization Economics | `src/lib/account-360/organization-economics.ts` | Vía `client_labor_cost_allocation` |
+| Agency Queries | `src/lib/agency/agency-queries.ts` | Health de espacios, FTE por cliente |
+| Client Team | `src/views/greenhouse/GreenhouseClientTeam.tsx` | Equipo por cliente con capacidad |
+
+### Consumers de `person_memberships` (downstream del sync)
+
+| Consumer | Archivo | Qué lee |
+|----------|---------|---------|
+| Organization People Tab | `src/app/api/organizations/[id]/memberships/route.ts` | Memberships por org |
+| Person Memberships Tab | `src/app/api/people/[memberId]/memberships/route.ts` | Memberships del miembro |
+| My Organization | `src/app/api/my/organization/members/route.ts` | Miembros de la org del usuario |
+| HubSpot Sync | `src/app/api/organizations/[id]/hubspot-sync/route.ts` | Contactos como memberships |
+| Ensure Client Membership | `src/lib/my/ensure-client-membership.ts` | Lazy creation on login |
+
+### Tablas materializadas afectadas
+
+| Tabla | Quién la escribe | Trigger |
+|-------|-----------------|---------|
+| `greenhouse_core.person_memberships` | `assignment_membership_sync` | assignment.created/updated/removed |
+| `greenhouse_serving.member_capacity_economics` | `member_capacity_economics` projection | assignment + compensation + payroll events |
+| `greenhouse_serving.person_intelligence` | `person_intelligence` projection | cascada desde capacity economics |
+| `greenhouse_serving.ico_member_metrics` | `ico_member` projection | assignment + ICO events |
+| `greenhouse_core.organizations.updated_at` | `organization_360` + `organization_executive` | membership + assignment events |
+
+### Conclusión: ¿Necesita TASK-060 infraestructura nueva?
+
+**No.** Toda la infraestructura reactiva ya está implementada:
+
+- **Eventos outbox**: `assignment.created/updated/removed` ya se publican desde `mutate-team.ts`
+- **Projections**: Las 5 projections reactivas ya procesan estos eventos
+- **Sync membership**: La proyección `assignment_membership_sync` ya crea/desactiva memberships
+- **Tablas**: No se necesitan tablas nuevas — todo opera sobre `client_team_assignments` + `person_memberships` existentes
+- **APIs de escritura**: `POST/PATCH/DELETE /api/admin/team/assignments` ya existen
+- **Cron**: `/api/cron/outbox-react-people` ya procesa los eventos del dominio people
+
+**TASK-060 es 100% trabajo de frontend** — ampliar `AgencyTeamView` para exponer las capacidades de escritura que el backend ya tiene.
+
+La única pieza backend que podría necesitar ajuste menor es:
+- Enriquecer `GET /api/team/capacity-breakdown` para incluir el `assignmentId` y `clientId` por miembro (hoy no los devuelve, y los necesita el drawer de edición)
+- O crear un endpoint ligero `GET /api/admin/team/assignments?memberId=X` para cargar assignments al expandir una fila
+
 ## Dependencies & Impact
 
 ### Depende de
@@ -144,6 +222,9 @@ La vista mantiene su estructura actual de 4 cards + tabla, pero agrega:
 
 - **TASK-038** (Staff Augmentation) — esta task crea la base de gestión de assignments que Staff Aug extiende con `assignment_type = 'staff_augmentation'`, billing rates, compliance, SLA
 - **TASK-041** (HRIS Addendum) — los campos HRIS se snapshotean al crear un placement/assignment; esta task provee la UI de creación que HRIS enriquece
+- **9 consumers de lectura** (ver tabla arriba) — todos se benefician de datos más frescos si el admin gestiona desde Agency > Team
+- **5 projections reactivas** — ya implementadas, no necesitan cambios
+- **6 tablas materializadas** — ya se actualizan reactivamente
 
 ### Archivos owned
 
