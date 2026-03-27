@@ -97,16 +97,105 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.projected_payroll_snapshots (
 );
 ```
 
-### Archivos clave del motor de cálculo
+### Resolución de los 4 gaps críticos
 
-| Archivo | Función | Requiere refactor para `as_of_date` |
-|---------|---------|--------------------------------------|
-| `src/lib/payroll/calculate-payroll.ts` | `calculatePayroll()`, `buildPayrollEntry()` | Sí — factorizar pure calc |
-| `src/lib/payroll/bonus-proration.ts` | OTD/RpA proration logic | No — ya es puro |
-| `src/lib/payroll/calculate-chile-deductions.ts` | AFP, salud, impuestos | No — ya es puro |
-| `src/lib/payroll/fetch-kpis-for-period.ts` | Fetch OTD/RpA de ICO | Sí — agregar soporte parcial |
-| `src/lib/payroll/fetch-attendance-for-period.ts` | Fetch asistencia | Sí — agregar soporte parcial |
-| `src/lib/finance/economic-indicators.ts` | Resolve UF/UTM/FX | No — ya soporta `periodDate` |
+#### Gap 1: Sin soporte `as_of_date` en el motor de cálculo
+
+**Diagnóstico**: `buildPayrollEntry()` ya es una función pura que recibe `compensation`, `ufValue`, `bonusConfig`, `kpi`, `attendance` y devuelve un `PayrollEntry`. No toca BD. El problema no es el cálculo — es cómo se alimentan sus inputs.
+
+**Solución**: No refactorizar `buildPayrollEntry()`. Crear un wrapper `projectPayrollEntry()` que:
+
+1. Construye un `AttendanceSnapshot` virtual con días al corte:
+   ```
+   actual_to_date:
+     workingDaysInPeriod = weekdays(period_start, today)
+     daysAbsent/leave = acumulados reales del período (HR leave_requests)
+
+   projected_month_end:
+     workingDaysInPeriod = weekdays(period_start, period_end)
+     daysAbsent/leave = acumulados reales + prorateo del ratio actual para días restantes
+   ```
+
+2. Pasa el snapshot virtual a `buildPayrollEntry()` tal cual — sin tocar la función existente
+
+3. Llama a `calculatePayrollTotals()` para descuentos Chile — ya es puro, acepta cualquier monto
+
+**Archivo nuevo**: `src/lib/payroll/project-payroll.ts`
+**Archivos que NO se modifican**: `calculate-payroll.ts`, `calculate-chile-deductions.ts`, `bonus-proration.ts`
+
+**Dependencia resuelta**: `buildPayrollEntry()` ya proratéa por asistencia internamente (líneas 131-146). Solo necesitamos alimentarle la asistencia correcta para el corte.
+
+#### Gap 2: Sin KPIs diarios (ICO solo materializa mensual)
+
+**Diagnóstico**: ICO materializa `metrics_by_member` por mes completo. No hay snapshots diarios de OTD/RpA. Pero el concepto de "OTD parcial de mes" no tiene sentido — OTD es un porcentaje acumulado que ya refleja el estado real del mes hasta hoy.
+
+**Solución**: **No se necesitan KPIs diarios**. La lógica es:
+
+| Modo | Qué KPI usar | Por qué |
+|------|-------------|---------|
+| `actual_to_date` | KPIs materializados del mes actual | Reflejan el acumulado real hasta la última materialización |
+| `projected_month_end` | Mismos KPIs (conservador) | Asumir que el rendimiento actual se mantiene hasta fin de mes |
+
+`fetchKpisForPeriod()` ya resuelve esto — lee de `metrics_by_member` para el período actual. No necesita cambios.
+
+**Decisión**: Política conservadora. No extrapolar. Si un miembro tiene OTD 92% hoy, la proyección de fin de mes asume 92%. Si materializa de nuevo y sube a 95%, la proyección se actualiza reactivamente vía `ico.materialization.completed`.
+
+**Archivos que NO se modifican**: `fetch-kpis-for-period.ts`, `materialize.ts`
+
+#### Gap 3: Sin asistencia diaria pre-cierre
+
+**Diagnóstico**: `fetchAttendanceForAllMembers()` consulta `attendance_daily` (BigQuery) + `leave_requests` (Postgres). Ambas fuentes ya tienen datos parciales de mes:
+- `attendance_daily` tiene registros diarios incluso antes del cierre del período
+- `leave_requests` tiene permisos aprobados con fechas (incluso futuras)
+
+**Solución**: `fetchAttendanceForAllMembers()` ya acepta `periodStart` y `periodEnd` como parámetros. Para la proyección:
+
+| Modo | periodStart | periodEnd | Resultado |
+|------|------------|-----------|-----------|
+| `actual_to_date` | Primer día del mes | **Hoy** | Solo cuenta asistencia hasta hoy |
+| `projected_month_end` | Primer día del mes | **Último día del mes** | Cuenta toda la asistencia real + permisos aprobados futuros |
+
+El wrapper `projectPayrollEntry()` simplemente pasa las fechas correctas. `fetchAttendanceForAllMembers()` ya hace el cálculo de weekdays y holidays automáticamente via `countWeekdays()`.
+
+**Para `actual_to_date`**: si no hay registros de attendance para días que aún no ocurrieron, `daysPresent/daysAbsent` serán parciales — correcto, es el estado real "hasta hoy".
+
+**Para `projected_month_end`**: los permisos aprobados futuros ya se incluyen vía `fetchApprovedLeaveForPeriod()`. La asistencia de días no ocurridos se asume como presente (ratio 100% para días restantes sin permiso).
+
+**Archivos que NO se modifican**: `fetch-attendance-for-period.ts` — ya soporta rangos de fechas arbitrarios
+
+#### Gap 4: Policy de FX para proyecciones
+
+**Diagnóstico**: El período oficial usa tasa del último día hábil del mes (`period_last_business_day`). Para proyecciones, necesitamos decidir qué tasa usar.
+
+**Solución**:
+
+| Modo | Tasa FX | Fuente | Razón |
+|------|---------|--------|-------|
+| `actual_to_date` | Tasa del día actual | `getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'USD_CLP', periodDate: today })` | Refleja el costo real de conversión hoy |
+| `projected_month_end` | Tasa del día actual | Misma función, mismo día | No predecir FX — usar la mejor información disponible |
+
+`getHistoricalEconomicIndicatorForPeriod()` ya soporta cualquier fecha y busca la tasa más reciente hasta esa fecha. No necesita cambios.
+
+**Cuando el período oficial se cierre**: la tasa oficial del último día hábil reemplaza la proyección. Esto ocurre naturalmente cuando `payroll_period.calculated` dispara el refresh de `member_capacity_economics`.
+
+**Archivos que NO se modifican**: `src/lib/finance/economic-indicators.ts`
+
+### Resumen de impacto en código
+
+| Archivo | Cambio necesario |
+|---------|-----------------|
+| `src/lib/payroll/project-payroll.ts` | **NUEVO** — wrapper que alimenta `buildPayrollEntry()` con inputs al corte |
+| `src/lib/payroll/calculate-payroll.ts` | **Sin cambios** — `buildPayrollEntry()` ya es puro |
+| `src/lib/payroll/bonus-proration.ts` | **Sin cambios** — ya es puro |
+| `src/lib/payroll/calculate-chile-deductions.ts` | **Sin cambios** — ya es puro |
+| `src/lib/payroll/fetch-kpis-for-period.ts` | **Sin cambios** — ya lee del mes actual |
+| `src/lib/payroll/fetch-attendance-for-period.ts` | **Sin cambios** — ya acepta rangos de fecha |
+| `src/lib/finance/economic-indicators.ts` | **Sin cambios** — ya soporta cualquier fecha |
+| `src/lib/sync/projections/projected-payroll.ts` | **NUEVO** — projection reactiva |
+| `src/app/api/hr/payroll/projected/route.ts` | **NUEVO** — API endpoint |
+| `src/views/greenhouse/payroll/ProjectedPayrollView.tsx` | **NUEVO** — vista |
+
+**Conclusión**: Los 4 gaps se resuelven con **1 archivo nuevo** de lógica (`project-payroll.ts`) que es un wrapper delgado sobre el motor existente. No se modifica ninguna función de cálculo. La clave es que `buildPayrollEntry()`, `calculatePayrollTotals()`, `calculateOtdBonus()`, `calculateRpaBonus()` y `fetchAttendanceForAllMembers()` ya son lo suficientemente puros y parametrizables para soportar proyecciones sin refactor.
 
 ## Status
 
