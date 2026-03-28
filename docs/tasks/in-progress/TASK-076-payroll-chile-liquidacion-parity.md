@@ -1,5 +1,21 @@
 # TASK-076 — Payroll Chile: Paridad con Liquidación Legal
 
+## Delta 2026-03-28
+- Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos un smoke de nómina Chile con IMM sembrado en `539000`.
+- Resultado validado del motor core:
+  - `baseSalary = 539000`
+  - `gratificacionLegal = 134750`
+  - `grossTotal = 673750`
+  - `chileAfpAmount = 70474.25`
+  - `chileHealthAmount = 161947.86`
+  - `chileUnemploymentAmount = 4042.5`
+  - `netTotal = 437285.39`
+- Conclusión:
+  - el núcleo legal de la liquidación ya calza con el PDF en imponibles y descuentos
+  - el gap restante para llegar al líquido final del PDF son los haberes no imponibles `colación` y `movilización`
+  - hasta que se modelen esos haberes, el motor seguirá llegando al líquido imponible correcto pero no al total final de la liquidación impresa
+- No se introdujo ningún evento nuevo; la propagación sigue por `compensation_version.created/updated` y `payroll_entry.upserted`.
+
 ## Status
 
 | Campo | Valor |

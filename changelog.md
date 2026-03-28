@@ -7,6 +7,22 @@
 
 ## 2026-03-27
 
+### Valentina February 2026 payroll smoke
+- Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos el núcleo legal del cálculo Chile de Greenhouse.
+- Se sembró IMM `539000` en `greenhouse_finance.economic_indicators` para habilitar la gratificación legal de febrero.
+- Resultado validado del motor:
+  - `baseSalary = 539000`
+  - `gratificacionLegal = 134750`
+  - `grossTotal = 673750`
+  - `chileAfpAmount = 70474.25`
+  - `chileHealthAmount = 161947.86`
+  - `chileUnemploymentAmount = 4042.5`
+  - `netTotal = 437285.39`
+- Gap restante para igualar el PDF completo:
+  - `colación`
+  - `movilización`
+- No se agregó un evento nuevo; la propagación sigue por `compensation_version.created/updated` y `payroll_entry.upserted`.
+
 ### Projected Payroll -> Official promotion flow
 - `Projected Payroll` ahora puede promoverse explícitamente a borrador/recalculo oficial vía `POST /api/hr/payroll/projected/promote`, reutilizando el motor oficial con `projectionContext` (`actual_to_date` o `projected_month_end` + `asOfDate`).
 - Se agregó audit trail en PostgreSQL con `greenhouse_payroll.projected_payroll_promotions`, incluyendo `promotionId`, corte proyectado, actor, status (`started/completed/failed`) y cantidad de entries promovidas.

@@ -49,6 +49,52 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 03:01 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar y dejar publicado el smoke de nómina Chile de Valentina contra su liquidación real de febrero 2026, validar el núcleo legal del cálculo y registrar el gap restante de haberes no imponibles.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-076-payroll-chile-liquidacion-parity.md`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+
+- Smoke manual del cálculo de nómina proyectada para `valentina-hoyos` con IMM sembrado en `539000`
+- Resultado validado:
+  - `baseSalary = 539000`
+  - `gratificacionLegal = 134750`
+  - `grossTotal = 673750`
+  - `chileAfpAmount = 70474.25`
+  - `chileHealthAmount = 161947.86`
+  - `chileUnemploymentAmount = 4042.5`
+  - `netTotal = 437285.39`
+- Lo que no se pudo verificar:
+  - la liquidación completa del PDF aún no calza porque el motor no modela todavía `colación` y `movilización`
+  - el helper/route de alta de compensación sigue mostrando 500 en el path actual, aunque el cálculo core sí funciona cuando la compensación e IMM están cargados
+
+### Riesgos o pendientes
+
+- Faltan haberes no imponibles `colación` y `movilización` para igualar el líquido final del PDF de febrero
+- Pendiente investigar el 500 del helper/ruta de creación de compensación, separado del motor de cálculo
+- Próximo paso recomendado: cerrar el slice de haberes no imponibles para terminar la paridad legal Chile
+
 ## 2026-03-27 18:15 -03
 
 ### Agente

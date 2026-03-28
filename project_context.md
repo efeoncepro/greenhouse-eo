@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll Chile smoke validation
+- Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos que el núcleo legal de `Payroll Chile` ya calza con el PDF cuando existen los insumos correctos:
+  - `IMM = 539000`
+  - compensación Chile vigente con gratificación legal mensual
+- El motor devuelve correctamente:
+  - `baseSalary`
+  - `gratificacionLegal`
+  - `AFP`
+  - `salud`
+  - `cesantía`
+  - `netTotal` imponible
+- Regla operativa derivada:
+  - la paridad completa con la liquidación impresa sigue pendiente mientras no se modelen `colación` y `movilización`
+  - el helper/ruta de creación de compensación sigue requiriendo revisión separada, pero no invalida el cálculo core cuando la data está cargada
+
 ## Delta 2026-03-27 Payroll variable bonus policy recalibration
 - `Payroll` ya no depende de una policy simple para bonos variables (`OTD >= threshold`, `RpA` lineal hasta un único umbral).
 - Baseline nuevo materializado:
