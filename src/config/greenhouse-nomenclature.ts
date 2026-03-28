@@ -14,7 +14,8 @@ export const GH_INTERNAL_NAV = {
   adminTeam: { label: 'Equipo', subtitle: 'Colaboradores, activación y asignaciones' },
   adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' },
-  adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' }
+  adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' },
+  adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' }
 } as const
 
 export const GH_PEOPLE_NAV = {

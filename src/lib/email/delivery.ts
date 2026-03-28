@@ -625,3 +625,61 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
     claimed
   }
 }
+
+export const retryFailedDelivery = async (deliveryId: string): Promise<{
+  status: 'sent' | 'failed' | 'skipped'
+  resendId: string | null
+  error?: string
+}> => {
+  if (!isResendConfigured()) {
+    return { status: 'skipped', resendId: null, error: 'RESEND_API_KEY is not configured.' }
+  }
+
+  await ensureEmailSchema()
+
+  const claimed = await claimFailedDelivery(deliveryId)
+
+  if (!claimed) {
+    return { status: 'skipped', resendId: null, error: 'Delivery not eligible for retry.' }
+  }
+
+  const payload = reviveDeliveryPayload(claimed.delivery_payload)
+
+  if (!payload) {
+    await updateDeliveryRow({
+      deliveryId: claimed.delivery_id,
+      resendId: null,
+      status: 'skipped',
+      errorMessage: 'Unable to revive delivery payload for retry.'
+    })
+
+    return { status: 'skipped', resendId: null, error: 'Unable to revive delivery payload.' }
+  }
+
+  const recipient = payload.recipients.find(
+    item => normalizeEmail(item.email) === normalizeEmail(claimed.recipient_email)
+  ) ?? {
+    email: claimed.recipient_email,
+    name: claimed.recipient_name ?? undefined,
+    userId: claimed.recipient_user_id ?? undefined
+  }
+
+  const result = await deliverRecipient({
+    batchId: claimed.batch_id,
+    emailType: claimed.email_type as EmailType,
+    domain: claimed.domain as EmailDomain,
+    recipient,
+    context: payload.context,
+    attachments: payload.attachments,
+    sourceEventId: claimed.source_event_id ?? undefined,
+    sourceEntity: claimed.source_entity ?? undefined,
+    actorEmail: claimed.actor_email ?? undefined,
+    existingDeliveryId: claimed.delivery_id
+  })
+
+  return {
+    status: result.status,
+    resendId: result.resendId,
+    ...(result.error ? { error: result.error } : {})
+  }
+}
