@@ -654,6 +654,89 @@ El drawer muestra un desglose en tiempo real con tres secciones semánticas:
 - **Descuentos legales** (fondo error.lighterOpacity): AFP, salud 7%, cesantía, impuesto, total descuentos
 - **Resultado** (fondo primary.lighterOpacity): líquido deseado, excedente Isapre, líquido a pagar, costo empleador
 
+## 25. Receipt PDF branding and template versioning
+
+### Branding
+
+Los recibos individuales y reportes de período se generan con `@react-pdf/renderer` y llevan la identidad visual de Efeonce:
+
+- **Logo**: `public/branding/logo-full.png` (PNG 420×98, convertido desde SVG porque `@react-pdf/renderer` Image no soporta SVG)
+- **Paleta**: azul corporativo `#023c70`, fondo light `#F7F9FC`, accent `#E8EFF7`
+- **Identidad legal**: razón social, RUT y dirección desde `getOperatingEntityIdentity()` (server) o `useOperatingEntity()` (client)
+
+### Layout del recibo individual
+
+```
+┌──────────────────────────────────────────────────┐
+│ [Logo PNG]                          Marzo 2026   │
+│ ▌ Efeonce Group SpA           Recibo de remun.   │
+│ ▌ RUT 77.357.182-1                   2026-03     │
+│ ▌ Dr. Manuel Barros Borgoño...                   │
+├──────────────── accent line ─────────────────────┤
+│        RECIBO DE REMUNERACIONES                  │
+│ ┌───────────── employee box (#F7F9FC) ─────────┐ │
+│ │ NOMBRE         EMAIL                         │ │
+│ │ RÉGIMEN        MONEDA                        │ │
+│ └──────────────────────────────────────────────┘ │
+│ ▌ HABERES           (zebra rows, right-aligned)  │
+│ ─── Total bruto ─────────────────── accent bg ── │
+│ ▌ ASISTENCIA                                     │
+│ ▌ DESCUENTOS LEGALES                             │
+│ ─── Total descuentos ───────────── accent bg ──  │
+│ ▓▓▓▓▓ Líquido a pagar    $XXX ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │
+├──────────────────────────────────────────────────┤
+│ Efeonce Group SpA  ·  efeoncepro.com  ·  Gen:.. │
+└──────────────────────────────────────────────────┘
+```
+
+Componentes compartidos:
+- `PdfHeader` — logo + bloque legal con accent bar izquierdo + período derecho
+- `PdfFooter` — tres columnas: razón social | efeoncepro.com | fecha generación
+- `SectionHeader` — accent bar vertical 3pt + título uppercase letter-spaced
+
+### Template versioning y lazy cache invalidation
+
+Los PDFs de recibos se almacenan en GCS (`gs://efeonce-group-greenhouse-media/payroll-receipts/`). Cuando el template cambia, los PDFs cacheados quedan stale.
+
+**Mecanismo:**
+1. `RECEIPT_TEMPLATE_VERSION` (constante en `generate-payroll-pdf.tsx`) se bumpa con cada cambio de template
+2. `template_version` (columna en `payroll_receipts`) registra la versión que generó cada PDF
+3. Al servir un recibo, la route compara `storedReceipt.templateVersion` vs `RECEIPT_TEMPLATE_VERSION`:
+   - **Match** → serve desde GCS (fast path, ~100ms)
+   - **Mismatch o NULL** → regenera PDF → sube a GCS → actualiza record → serve fresh
+4. El update es non-fatal: si falla el upload/update, el PDF se sirve igualmente (regenerado on-demand)
+
+**Flujo:**
+```
+GET /api/hr/payroll/entries/:id/receipt
+  → fetch storedReceipt
+  → storedReceipt.templateVersion === RECEIPT_TEMPLATE_VERSION?
+     ✅ → downloadGreenhouseMediaAsset() → serve
+     ❌ → generatePayrollReceiptPdf()
+          → uploadGreenhouseStorageObject() (replace in GCS)
+          → updateReceiptAfterRegeneration() (stamp new version)
+          → serve buffer
+```
+
+Ambas rutas (`/api/hr/payroll/entries/[entryId]/receipt` y `/api/my/payroll/entries/[entryId]/receipt`) implementan el mismo patrón.
+
+**Regla operativa:**
+- Todo cambio visual al PDF (colores, layout, campos, logo) requiere bump de `RECEIPT_TEMPLATE_VERSION`
+- La regeneración es lazy — no necesita batch job ni migration de datos
+- Nuevos recibos generados por el pipeline batch (`generate-payroll-receipts.ts`) ya stamplan la versión actual
+
+### Archivos runtime
+
+| Archivo | Rol |
+|---|---|
+| `src/lib/payroll/generate-payroll-pdf.tsx` | Templates de PDF (recibo + reporte), `RECEIPT_TEMPLATE_VERSION` |
+| `src/lib/payroll/payroll-receipts-store.ts` | CRUD de registros de recibos, `updateReceiptAfterRegeneration()` |
+| `src/lib/payroll/generate-payroll-receipts.ts` | Pipeline batch de generación + envío de recibos |
+| `src/app/api/hr/payroll/entries/[entryId]/receipt/route.ts` | Ruta HR con lazy regeneration |
+| `src/app/api/my/payroll/entries/[entryId]/receipt/route.ts` | Ruta My Payroll con lazy regeneration |
+| `public/branding/logo-full.png` | Logo Efeonce (PNG, @react-pdf/renderer compatible) |
+| `scripts/migrations/add-receipt-template-version.sql` | DDL para columna `template_version` |
+
 ### Archivos runtime
 
 - `src/lib/payroll/reverse-payroll.ts` — motor `computeGrossFromNet()`
