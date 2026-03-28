@@ -77,6 +77,7 @@ Rules:
 - runtime does not own these schemas
 - projection-owned serving caches can receive explicit per-table DML grants when a runtime or worker must materialize them; those exceptions must be documented in the owning domain bootstrap and kept narrow
 - `greenhouse_serving.projected_payroll_snapshots` is one of those narrow exceptions: Payroll runtime may write the projection cache to promote projected payroll into an official draft, but the official transactional write path remains `greenhouse_payroll`
+- `greenhouse_sync.outbox_reactive_log` and `greenhouse_sync.projection_refresh_queue` are also narrow shared exceptions: they back the reactive projection engine and should be provisioned by shared setup, not ad hoc runtime DDL
 
 ## Domain Schema Contract
 

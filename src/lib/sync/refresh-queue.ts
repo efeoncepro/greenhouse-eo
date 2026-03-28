@@ -21,27 +21,15 @@ export const ensureRefreshQueue = async (): Promise<void> => {
   if (ensureQueuePromise) return ensureQueuePromise
 
   ensureQueuePromise = (async () => {
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_sync.projection_refresh_queue (
-        queue_id TEXT PRIMARY KEY,
-        projection_name TEXT NOT NULL,
-        entity_type TEXT NOT NULL,
-        entity_id TEXT NOT NULL,
-        priority INT NOT NULL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'pending',
-        attempts INT NOT NULL DEFAULT 0,
-        last_error TEXT,
-        enqueued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        started_at TIMESTAMPTZ,
-        completed_at TIMESTAMPTZ,
-        CONSTRAINT uq_refresh_pending UNIQUE (projection_name, entity_type, entity_id)
+    const rows = await runGreenhousePostgresQuery<{ exists: boolean }>(
+      `SELECT to_regclass('greenhouse_sync.projection_refresh_queue') IS NOT NULL AS exists`
+    )
+
+    if (!rows[0]?.exists) {
+      throw new Error(
+        'greenhouse_sync.projection_refresh_queue is missing. Run scripts/setup-postgres-operations-infra.sql with an admin profile before enabling reactive projections.'
       )
-    `)
-    await runGreenhousePostgresQuery(`
-      CREATE INDEX IF NOT EXISTS idx_refresh_queue_pending
-        ON greenhouse_sync.projection_refresh_queue (priority DESC, enqueued_at ASC)
-        WHERE status = 'pending'
-    `).catch(() => {})
+    }
   })().catch(err => {
     ensureQueuePromise = null
     throw err

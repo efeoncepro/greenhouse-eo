@@ -35,16 +35,15 @@ export const ensureReactiveSchema = async () => {
   if (ensureReactiveSchemaPromise) return ensureReactiveSchemaPromise
 
   ensureReactiveSchemaPromise = (async () => {
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_sync.outbox_reactive_log (
-        event_id TEXT PRIMARY KEY,
-        reacted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        handler TEXT,
-        result TEXT,
-        retries INT NOT NULL DEFAULT 0,
-        last_error TEXT
+    const rows = await runGreenhousePostgresQuery<{ exists: boolean }>(
+      `SELECT to_regclass('greenhouse_sync.outbox_reactive_log') IS NOT NULL AS exists`
+    )
+
+    if (!rows[0]?.exists) {
+      throw new Error(
+        'greenhouse_sync.outbox_reactive_log is missing. Run scripts/setup-postgres-operations-infra.sql with an admin profile before enabling reactive projections.'
       )
-    `)
+    }
   })().catch(error => {
     ensureReactiveSchemaPromise = null
     throw error

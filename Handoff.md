@@ -14286,3 +14286,9 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - Los routes de recibo individual ahora toleran fallos de lookup en `greenhouse_payroll.payroll_receipts` y caen al render on-demand en lugar de abortar con `500`.
 - Se mantiene la preferencia por el PDF almacenado cuando existe; el fallback directo asegura que la descarga no quede bloqueada si el registry aún no tiene la fila sincronizada o está momentáneamente indisponible.
 - Esto cierra una grieta práctica de `TASK-077`: exportar y poder descargar el recibo aunque la proyección de delivery todavía no haya materializado el registry para el entry específico.
+
+## 2026-03-28 - Reactive projection infra preprovisioned for receipts
+
+- `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron creadas por setup compartido para que el consumer reactivo no dependa de DDL en runtime.
+- `ensureReactiveSchema` y `ensureRefreshQueue` dejaron de intentar crear tablas/índices en tiempo de ejecución y ahora solo validan que la infraestructura exista.
+- Esto destraba el consumo reactivo que materializa `payroll_receipts_delivery` después del evento `payroll_period.exported`.

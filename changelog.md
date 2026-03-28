@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Reactive receipts infrastructure preprovisioned
+- `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron provisionadas por setup compartido.
+- El runtime reactivo dejó de intentar DDL en `greenhouse_sync`; ahora solo verifica existencia y usa la infraestructura ya creada.
+- Eso habilita la proyección `payroll_receipts_delivery` para materializar el batch de recibos después de `payroll_period.exported`.
+
 ### Payroll receipt routes tolerate registry lookup failures
 - Los routes de recibo individual ya no dependen de que `greenhouse_payroll.payroll_receipts` esté disponible para responder.
 - Si el lookup del registry falla, la API cae al render on-demand del PDF y mantiene la descarga operativa.

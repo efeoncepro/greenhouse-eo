@@ -7,8 +7,9 @@
 --
 -- Tables:
 --   1. greenhouse_sync.projection_refresh_queue — tracks projection refresh requests
---   2. greenhouse_notifications.notifications — user notification storage
---   3. greenhouse_notifications.notification_preferences — per-user channel prefs
+--   2. greenhouse_sync.outbox_reactive_log — idempotency / retry log for reactive projections
+--   3. greenhouse_notifications.notifications — user notification storage
+--   4. greenhouse_notifications.notification_preferences — per-user channel prefs
 -- ════════════════════════════════════════════════════════════════════════════
 
 -- ── Schemas ──
@@ -36,6 +37,15 @@ CREATE TABLE IF NOT EXISTS greenhouse_sync.projection_refresh_queue (
 CREATE INDEX IF NOT EXISTS idx_prq_status ON greenhouse_sync.projection_refresh_queue(status);
 CREATE INDEX IF NOT EXISTS idx_prq_projection ON greenhouse_sync.projection_refresh_queue(projection_name);
 CREATE INDEX IF NOT EXISTS idx_prq_entity ON greenhouse_sync.projection_refresh_queue(entity_type, entity_id);
+
+CREATE TABLE IF NOT EXISTS greenhouse_sync.outbox_reactive_log (
+  event_id TEXT PRIMARY KEY,
+  reacted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  handler TEXT,
+  result TEXT,
+  retries INT NOT NULL DEFAULT 0,
+  last_error TEXT
+);
 
 -- ── 2. Notifications ─────────────────────────────────────────────────────
 
@@ -98,5 +108,9 @@ GRANT USAGE ON SCHEMA greenhouse_sync TO greenhouse_ops;
 GRANT USAGE ON SCHEMA greenhouse_notifications TO greenhouse_ops;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_ops;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_ops;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_sync TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_runtime;
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync GRANT ALL PRIVILEGES ON TABLES TO greenhouse_ops;
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_notifications GRANT ALL PRIVILEGES ON TABLES TO greenhouse_ops;
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_notifications GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;

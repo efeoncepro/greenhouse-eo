@@ -28,6 +28,12 @@
 - Eso preserva la experiencia de descarga aunque el registry todavía no tenga una fila sincronizada para el entry exportado.
 - El comportamiento canónico sigue siendo usar el PDF almacenado cuando exista; la mejora solo evita que la ausencia o indisponibilidad del registry bloquee el recibo.
 
+## Delta 2026-03-28 - Reactive queue preprovisioned and runtime DDL removed
+
+- `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron provisionadas como infraestructura compartida.
+- El runtime reactivo ya no intenta `CREATE TABLE` ni `CREATE INDEX` sobre `greenhouse_sync`; ahora solo verifica existencia y falla con un mensaje de setup si la infraestructura no está lista.
+- Eso elimina el último bloqueo operativo para que la proyección `payroll_receipts_delivery` materialice el batch al exportar un período.
+
 ## Status
 
 | Campo | Valor |
