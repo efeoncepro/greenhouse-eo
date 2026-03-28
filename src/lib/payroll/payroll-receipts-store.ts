@@ -25,6 +25,7 @@ export interface PayrollReceiptRecord {
   emailSentAt: string | null
   emailDeliveryId: string | null
   emailError: string | null
+  templateVersion: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -48,6 +49,7 @@ type PayrollReceiptRow = {
   email_sent_at: { value?: string } | string | null
   email_delivery_id: string | null
   email_error: string | null
+  template_version: string | null
   created_at: { value?: string } | string | null
   updated_at: { value?: string } | string | null
 }
@@ -79,6 +81,7 @@ const mapReceipt = (row: PayrollReceiptRow): PayrollReceiptRecord => ({
   emailSentAt: toTimestampString(row.email_sent_at),
   emailDeliveryId: normalizeNullableString(row.email_delivery_id),
   emailError: normalizeNullableString(row.email_error),
+  templateVersion: normalizeNullableString(row.template_version),
   createdAt: toTimestampString(row.created_at),
   updatedAt: toTimestampString(row.updated_at)
 })
@@ -155,6 +158,7 @@ export const savePayrollReceipt = async (input: {
   emailSentAt?: string | null
   emailDeliveryId?: string | null
   emailError?: string | null
+  templateVersion?: string | null
 }) => {
   await assertPayrollReceiptsReady()
 
@@ -179,11 +183,12 @@ export const savePayrollReceipt = async (input: {
         email_sent_at,
         email_delivery_id,
         email_error,
+        template_version,
         created_at,
         updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
+        $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       ON CONFLICT (entry_id, revision) DO UPDATE SET
@@ -199,6 +204,7 @@ export const savePayrollReceipt = async (input: {
         email_sent_at = COALESCE(EXCLUDED.email_sent_at, greenhouse_payroll.payroll_receipts.email_sent_at),
         email_delivery_id = COALESCE(EXCLUDED.email_delivery_id, greenhouse_payroll.payroll_receipts.email_delivery_id),
         email_error = EXCLUDED.email_error,
+        template_version = COALESCE(EXCLUDED.template_version, greenhouse_payroll.payroll_receipts.template_version),
         updated_at = CURRENT_TIMESTAMP
     `,
     [
@@ -219,7 +225,36 @@ export const savePayrollReceipt = async (input: {
       input.emailRecipient ?? null,
       input.emailSentAt ?? null,
       input.emailDeliveryId ?? null,
-      input.emailError ?? null
+      input.emailError ?? null,
+      input.templateVersion ?? null
     ]
+  )
+}
+
+/**
+ * Update the template version, storage path, and file size after a lazy
+ * regeneration of a stale cached PDF.
+ */
+export const updateReceiptAfterRegeneration = async (input: {
+  receiptId: string
+  storagePath: string
+  storageBucket: string
+  fileSizeBytes: number
+  templateVersion: string
+}) => {
+  await assertPayrollReceiptsReady()
+
+  await runGreenhousePostgresQuery(
+    `
+      UPDATE greenhouse_payroll.payroll_receipts
+      SET storage_path = $2,
+          storage_bucket = $3,
+          file_size_bytes = $4,
+          template_version = $5,
+          generated_at = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE receipt_id = $1
+    `,
+    [input.receiptId, input.storagePath, input.storageBucket, input.fileSizeBytes, input.templateVersion]
   )
 }

@@ -4,7 +4,7 @@ import { Buffer } from 'node:buffer'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { generatePayrollReceiptPdf } from '@/lib/payroll/generate-payroll-pdf'
+import { generatePayrollReceiptPdf, RECEIPT_TEMPLATE_VERSION } from '@/lib/payroll/generate-payroll-pdf'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
 import {
   assertPayrollReceiptsReady
@@ -306,6 +306,7 @@ export const generatePayrollReceiptsForPeriod = async (
           emailSentAt: null,
           emailDeliveryId: null,
           emailError: null,
+          templateVersion: null,
           createdAt: null,
           updatedAt: null
         }
@@ -324,7 +325,8 @@ export const generatePayrollReceiptsForPeriod = async (
         emailRecipient: entry.memberEmail,
         emailSentAt: new Date().toISOString(),
         emailDeliveryId: resendId,
-        generatedBy: input.actorEmail ?? null
+        generatedBy: input.actorEmail ?? null,
+        templateVersion: RECEIPT_TEMPLATE_VERSION
       })
 
       emailed++

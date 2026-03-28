@@ -13,6 +13,13 @@ import { getOperatingEntityIdentity, type OperatingEntityIdentity } from '@/lib/
 
 const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.svg')
 
+/**
+ * Bump this constant whenever the receipt/report PDF template changes
+ * (branding, layout, fields, colors). Stale cached PDFs with a different
+ * version are lazily regenerated on next access.
+ */
+export const RECEIPT_TEMPLATE_VERSION = '2'
+
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
