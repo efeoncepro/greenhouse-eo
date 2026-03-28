@@ -49,6 +49,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 09:31 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-077` con smoke end-to-end real: reemitir `payroll_period.exported`, publicar el outbox, materializar `payroll_receipts_delivery` y validar almacenamiento GCS + email Resend.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-077-payroll-receipt-generation-delivery.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+
+- `vercel curl /api/cron/outbox-publish --deployment https://greenhouse-kzunmyl3v-efeonce-7670142f.vercel.app --scope efeonce-7670142f --yes -- --header 'x-vercel-cron: 1'`
+- `vercel curl /api/cron/outbox-react --deployment https://greenhouse-kzunmyl3v-efeonce-7670142f.vercel.app --scope efeonce-7670142f --yes -- --header 'x-vercel-cron: 1'`
+- consultas directas a `greenhouse_payroll.payroll_receipts` y `greenhouse_sync.outbox_events`
+- resultado: `payroll_receipts_delivery` generó `4` recibos y envió `4` correos; bucket GCS operativo y PDFs almacenados
+
+### Riesgos o pendientes
+
+- `TASK-077` queda lista para cierre formal y commit final del turno; no quedan blockers funcionales en receipts.
+
 ## 2026-03-28 06:18 -03
 
 ### Agente

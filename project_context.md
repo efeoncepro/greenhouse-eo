@@ -8,6 +8,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La cola persistente `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)` para que `enqueueRefresh()` deduzca intents sin caer en `ON CONFLICT` inválido.
 - Esto destraba la materialización de `payroll_receipts_delivery` después de `payroll_period.exported`, que era el último bloqueo estructural del smoke de `TASK-077`.
 
+## Delta 2026-03-28 Payroll receipts smoke complete
+- `TASK-077` quedó cerrada en staging con smoke end-to-end real:
+  - `outbox-publish` publicó el evento nuevo de `payroll_period.exported`
+  - `outbox-react` materializó `payroll_receipts_delivery`
+  - se generaron 4 recibos y se enviaron 4 correos
+- Los PDFs quedaron almacenados en `gs://efeonce-group-greenhouse-media/payroll-receipts/2026-03/...`
+- El flujo de recibos queda ahora validado no solo por código y docs, sino también por ejecución real sobre marzo 2026.
+
 ## Delta 2026-03-28 Payroll receipts registry + reactive delivery
 - `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
 - La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.

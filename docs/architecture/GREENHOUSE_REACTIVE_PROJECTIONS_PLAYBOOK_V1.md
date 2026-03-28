@@ -4,6 +4,8 @@
 
 Este playbook documenta cómo registrar, operar y monitorear proyecciones reactivas en Greenhouse. El sistema permite que cualquier módulo declare qué eventos de dominio invalidan sus snapshots serving, y el consumer reactivo se encarga del refresh en tiempo real.
 
+`payroll_receipts_delivery` ya está validado end-to-end sobre `payroll_period.exported`: el evento se publica al outbox, el publicador lo marca `published` y el reactor genera el batch de recibos sin quedar bloqueado por otros handlers del mismo evento.
+
 ## Architecture
 
 ```

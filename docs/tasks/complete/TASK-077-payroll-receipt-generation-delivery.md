@@ -2,12 +2,18 @@
 
 ## Delta 2026-03-28
 
+- `TASK-077` quedó cerrada end-to-end tras re-exportar marzo 2026, publicar el outbox y re-ejecutar el reactor:
+  - `outbox-publish` procesó el `payroll_period.exported` nuevo y lo llevó a `published`
+  - `outbox-react` materializó `payroll_receipts_delivery`
+  - resultado final: `generated 4 receipts (reused 0, emailed 4) for 2026-03`
+- El smoke final confirmó:
+  - `greenhouse_payroll.payroll_receipts` con 4 recibos `email_sent`
+  - PDFs almacenados en `gs://efeonce-group-greenhouse-media/payroll-receipts/2026-03/...`
+  - emails transaccionales enviados para `Andres Carlosama`, `Daniela Ferreira`, `Melkin Hernandez` y `Valentina Hoyos`
 - El pipeline reactivo quedó corregido para que un handler exitoso no bloquee a los demás del mismo evento:
   - `greenhouse_sync.outbox_reactive_log` ahora se keyea por `(event_id, handler)`
   - `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)`
-- Con eso `payroll_receipts_delivery` ya puede volver a materializarse aunque otro consumer haya procesado previamente el mismo `payroll_period.exported`.
-- El log reactivo quedó corregido a granularidad `(event_id, handler)` para que `payroll_receipts_delivery` no quede bloqueada si otras proyecciones del mismo evento ya lo procesaron.
-- La base operativa de recibos ya quedó implementada en runtime:
+- La base operativa de recibos quedó implementada en runtime:
   - registry persistido en `greenhouse_payroll.payroll_receipts`
   - batch generator `generatePayrollReceiptsForPeriod()`
   - proyección reactiva `payroll_receipts_delivery` disparada por `payroll_period.exported`
@@ -17,8 +23,6 @@
   - `My Nómina` muestra botón de descarga por período usando `GET /api/my/payroll/entries/[entryId]/receipt`
   - `People > Person > Nómina` muestra botón de descarga por entry usando el route HR existente
 - El flujo está integrado por outbox/reactive projections, no como cron separado.
-- Queda abierto para esta task:
-  - smoke real sobre exportación completa en staging con entrega de correo
 
 ## Delta 2026-03-28 - Approval gate aligned to recalibrated bonus policy
 
@@ -43,12 +47,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `En progreso` |
-| Rank | 3 de 4 (ejecutar después de TASK-078 y TASK-076; TASK-079 queda como follow-up si se decide mostrar preview reverse en esta superficie) |
+| Status real | `Cerrada` |
+| Rank | 3 de 4 (ya ejecutada; TASK-079 queda como follow-up si se decide mostrar preview reverse en esta superficie) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -131,7 +135,7 @@ Que al exportar un período de nómina:
 
 ### Lo que sigue pendiente
 
-- Smoke end-to-end en staging con colas/Resend confirmadas
+- Nada funcional pendiente; el smoke end-to-end ya quedó validado en staging con colas/Resend confirmadas.
 
 ## Scope
 
