@@ -118,4 +118,23 @@ describe('PayrollPeriodTab readiness', () => {
       await findByText('Estás viendo un período histórico seleccionado desde Historial. El período abierto o vigente sigue mostrándose en el resumen superior.')
     ).toBeInTheDocument()
   })
+
+  it('exposes export delivery actions for exported periods', async () => {
+    const { findByRole } = render(
+      <PayrollPeriodTab
+        period={{ ...period, status: 'exported', approvedAt: '2026-03-28T12:00:00.000Z', exportedAt: '2026-03-28T13:00:00.000Z' }}
+        entries={[]}
+        onRefresh={vi.fn()}
+        onCreatePeriod={vi.fn()}
+        createPeriodLabel='Abril 2026'
+      />
+    )
+
+    expect(
+      await findByRole('button', { name: 'Reenviar correo de exportación del período Marzo 2026' })
+    ).toBeInTheDocument()
+    expect(
+      await findByRole('button', { name: 'Descargar PDF del período Marzo 2026' })
+    ).toBeInTheDocument()
+  })
 })

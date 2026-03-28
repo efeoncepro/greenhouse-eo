@@ -222,6 +222,29 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
     URL.revokeObjectURL(url)
   }, [period])
 
+  const handleDownloadPdf = useCallback(async () => {
+    if (!period) return
+
+    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/pdf`)
+
+    if (!res.ok) {
+      const data = await res.json()
+
+      setError(data.error || 'Error al descargar PDF')
+
+      return
+    }
+
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+
+    a.href = url
+    a.download = `nomina_${period.periodId}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [period])
+
   const handleEntryUpdate = useCallback(
     (entryId: string, field: string, value: number | string | boolean | null) => {
       startTransition(async () => {
@@ -415,7 +438,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
             </Typography>
           }
           action={
-            <Stack direction='row' spacing={1}>
+            <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               {period.status === 'draft' && (
                 <>
                   <Button
@@ -515,11 +538,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     size='small'
                     color='success'
                     startIcon={<i className='tabler-file-type-pdf' />}
-                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    onClick={handleDownloadPdf}
                     disabled={isPending}
-                    aria-label={`Abrir PDF del período ${formatPeriodLabel(period.year, period.month)}`}
+                    aria-label={`Descargar PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    Ver PDF
+                    Descargar PDF
                   </Button>
                   <Button
                     variant='tonal'
@@ -551,11 +574,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     size='small'
                     color='info'
                     startIcon={<i className='tabler-file-type-pdf' />}
-                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    onClick={handleDownloadPdf}
                     disabled={isPending}
-                    aria-label={`Abrir PDF del período ${formatPeriodLabel(period.year, period.month)}`}
+                    aria-label={`Descargar PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    Ver PDF
+                    Descargar PDF
                   </Button>
                   <Button
                     variant='tonal'

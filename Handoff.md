@@ -49,6 +49,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:57 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Hacer visible la acción de reenvío en el header exportado de Payroll y convertir la descarga de PDF en una descarga real en vez de depender de `window.open`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `pnpm build`
+- Resultado: todos pasaron
+
+### Riesgos o pendientes
+
+- `Reenviar correo` sigue apareciendo solo en períodos `exported`; no se habilitó para `approved` porque el contrato de negocio sigue siendo cierre canónico primero.
+- `Ver Excel` todavía usa navegación directa al route de export; si vuelve a generar fricción en browser, convendrá homogeneizar también esa acción.
+
 ## 2026-03-28 13:47 -03
 
 ### Agente
