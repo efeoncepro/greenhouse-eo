@@ -356,21 +356,28 @@ Ante conflicto, prevalecen:
   - `src/config/greenhouse-home-suggestions.ts`
   - `src/types/home.ts`
 ## Delta 2026-03-26
-- Se retiró temporalmente el rollout de `/home` como landing por defecto del portal y `/home` volvió a redirigir a `/dashboard` para estabilizar ingreso en `staging`.
-- La implementación del módulo `Home/Nexa` sigue presente en código, pero quedó fuera del camino crítico hasta aislar el freeze reportado por usuarios.
+- Se retiro temporalmente el rollout de `/home` como landing por defecto del portal y `/home` volvio a redirigir a `/dashboard` para estabilizar ingreso en `staging`.
+- La implementacion del modulo `Home/Nexa` sigue presente en codigo, pero quedo fuera del camino critico hasta aislar el freeze reportado por usuarios.
 
-## Delta 2026-03-28 — Diagnóstico del freeze
+## Delta 2026-03-28 — Auditoria completa y plan de reactivacion
 
-### Lifecycle revertido a `in-progress`
-La task estaba en `complete/` pero la feature está deshabilitada en producción y staging. No puede considerarse cerrada.
+### Lifecycle: `in-progress`
+La task estaba en `complete/` pero la feature esta deshabilitada en produccion y staging. No puede considerarse cerrada. Se realizo auditoria completa de los 12 archivos de la implementacion.
 
-### Root cause analysis
+### Root cause del freeze
 
-Se auditaron los 12 archivos de la implementación. El freeze al cargar `/home` tiene dos causas probables:
+La cadena que congela el browser es:
 
-**Causa 1 (alta probabilidad): `NotificationService.getNotifications()` cuelga o falla en staging**
+```
+/home mounts → HomeView useEffect → fetch('/api/home/snapshot') SIN timeout
+  → getHomeSnapshot() → NotificationService.getNotifications() SIN try/catch
+  → query PG sin timeout (tabla puede no existir en staging)
+  → endpoint colgado → fetch colgado → browser frozen en skeleton
+```
 
-`GET /api/home/snapshot` (línea 52 de `get-home-snapshot.ts`) llama a:
+**Causa 1 (critica): `NotificationService.getNotifications()` sin try/catch ni timeout**
+
+`get-home-snapshot.ts` linea 52 llama:
 ```typescript
 const { items: notifications } = await NotificationService.getNotifications(input.userId, {
   unreadOnly: true,
@@ -378,56 +385,103 @@ const { items: notifications } = await NotificationService.getNotifications(inpu
 })
 ```
 
-Si la tabla `greenhouse_core.notifications` no existe en staging, o la query no tiene timeout, el endpoint se cuelga indefinidamente. `HomeView` se queda en estado `loading` (skeleton) sin ningún feedback al usuario porque el fetch del cliente no tiene timeout.
+Si la tabla `greenhouse_core.notifications` no existe en staging, o Cloud SQL esta lento, el endpoint se cuelga indefinidamente. No hay catch, no hay fallback.
 
-**Causa 2 (media probabilidad): Fetch sin timeout en HomeView**
+**Causa 2 (critica): Fetch sin timeout en HomeView**
 
-`HomeView.tsx` línea 52:
+`HomeView.tsx` linea 52:
 ```typescript
 const res = await fetch('/api/home/snapshot')
 ```
 
-No tiene `signal: AbortSignal.timeout()`. Si el API se cuelga, el componente se queda en skeleton forever. El usuario percibe un freeze.
+No tiene `AbortController` ni `AbortSignal.timeout()`. Si el API se cuelga, el componente se queda en skeleton forever. El usuario percibe un freeze.
 
-**Causa 3 (descartada): render loop**
+**Causa 3 (descartada): render loop** — `useEffect` tiene `[]` como deps, corre una sola vez.
 
-El `useEffect` de `HomeView` tiene `[]` como deps — corre una sola vez. No hay re-renders infinitos.
+**Causa 4 (descartada): Gemini API** — `NexaService` solo se invoca en `POST /api/home/nexa` (chat), no en la carga inicial.
 
-**Causa 4 (descartada): Gemini API**
+### Inventario completo de issues
 
-`NexaService` solo se invoca en `POST /api/home/nexa` (chat), no en la carga inicial. El freeze es al entrar a la página, no al chatear.
+Se auditaron los 12 archivos. Aqui todos los problemas encontrados, no solo el freeze:
 
-### Fixes requeridos para reactivar
-
-| Fix | Archivo | Cambio |
-|-----|---------|--------|
-| **F1**: Notifications fallback | `src/lib/home/get-home-snapshot.ts` | Envolver `NotificationService.getNotifications()` en try/catch con fallback `tasks: []` |
-| **F2**: Fetch timeout | `src/views/greenhouse/home/HomeView.tsx` | Agregar `signal: AbortSignal.timeout(8000)` al fetch de snapshot |
-| **F3**: Error UX | `src/views/greenhouse/home/HomeView.tsx` | Si timeout, mostrar Home sin tasks en vez de pantalla de error completa |
-| **F4**: Verificar tabla | staging | Confirmar que `greenhouse_core.notifications` existe en Cloud SQL staging |
-
-### Ruta para reactivar
-
-1. Aplicar F1 + F2 + F3 (código)
-2. Verificar F4 en staging
-3. Desplegar a staging
-4. Testear `/home` directamente (no como landing default)
-5. Si funciona: cambiar `portalHomePath` para un tenant de prueba
-6. Si estable: revertir redirect en `page.tsx` para rollout general
+| # | Severidad | Archivo | Problema |
+|---|-----------|---------|----------|
+| 1 | **Critico** | `HomeView.tsx` | `fetch('/api/home/snapshot')` sin timeout ni AbortController — causa el freeze |
+| 2 | **Critico** | `get-home-snapshot.ts` | `NotificationService.getNotifications()` sin try/catch — si falla, tira todo el snapshot |
+| 3 | **Alto** | `NexaPanel.tsx` | `fetch('/api/home/nexa')` sin timeout — si Gemini no responde, se cuelga el chat |
+| 4 | **Alto** | `nexa/route.ts` | Llama `getHomeSnapshot()` completo antes de generar respuesta IA — doble cuello secuencial |
+| 5 | **Alto** | `NexaPanel.tsx` | Envia `history: messages` completo en cada request — payload crece sin limite |
+| 6 | **Medio** | `HomeView.tsx` | Sin error boundary alrededor de `NexaPanel` — un error en Nexa mata toda la Home |
+| 7 | **Medio** | `google-genai.ts` | Escribe credenciales a disco en cada init — race condition si hay requests concurrentes |
+| 8 | **Bajo** | `NexaPanel.tsx` | `useEffect` de scroll en `[messages]` — reflows en cada mensaje, no debounced |
 
 ### Archivos auditados
 
-| Archivo | Estado | Problema |
-|---------|--------|----------|
-| `src/app/(dashboard)/home/page.tsx` | Redirect a /dashboard | Correcto (defensivo) |
-| `src/views/greenhouse/home/HomeView.tsx` | Falta timeout en fetch | **Fix F2** |
-| `src/lib/home/get-home-snapshot.ts` | `NotificationService` sin try/catch | **Fix F1** |
-| `src/app/api/home/snapshot/route.ts` | OK — tiene try/catch en el endpoint | Sin problema |
-| `src/app/api/home/nexa/route.ts` | Llama `getHomeSnapshot` por cada mensaje (ineficiente pero no causa freeze) | Optimización futura |
-| `src/views/greenhouse/home/components/GreetingCard.tsx` | OK — componente puro | Sin problema |
-| `src/views/greenhouse/home/components/ModuleGrid.tsx` | OK — componente puro | Sin problema |
-| `src/views/greenhouse/home/components/NexaPanel.tsx` | OK — fetch solo al enviar mensaje | Sin problema |
-| `src/views/greenhouse/home/components/TaskShortlist.tsx` | OK — componente puro | Sin problema |
-| `src/lib/nexa/nexa-service.ts` | OK — solo se invoca en POST | Sin problema |
-| `src/config/home-greetings.ts` | OK — constantes | Sin problema |
-| `src/config/home-suggestions.ts` | OK — constantes | Sin problema |
+| Archivo | Estado |
+|---------|--------|
+| `src/app/(dashboard)/home/page.tsx` | Redirect defensivo a /dashboard — correcto, se quitara al reactivar |
+| `src/views/greenhouse/home/HomeView.tsx` | **Fix F1 + F2 + F6** |
+| `src/lib/home/get-home-snapshot.ts` | **Fix F3** |
+| `src/app/api/home/snapshot/route.ts` | OK — tiene try/catch en endpoint |
+| `src/app/api/home/nexa/route.ts` | **Fix F5** — optimizar context |
+| `src/views/greenhouse/home/components/GreetingCard.tsx` | OK — componente puro |
+| `src/views/greenhouse/home/components/ModuleGrid.tsx` | OK — componente puro |
+| `src/views/greenhouse/home/components/NexaPanel.tsx` | **Fix F4 + F7** |
+| `src/views/greenhouse/home/components/TaskShortlist.tsx` | OK — componente puro |
+| `src/lib/nexa/nexa-service.ts` | OK — solo se invoca en POST |
+| `src/config/home-greetings.ts` | OK — constantes |
+| `src/config/home-suggestions.ts` | OK — constantes |
+
+### Plan de fixes
+
+#### Slice A — Corregir freeze (blocker)
+
+| Fix | Archivo | Cambio | Esfuerzo |
+|-----|---------|--------|----------|
+| F1 | `HomeView.tsx` | Agregar `AbortSignal.timeout(5000)` al fetch de snapshot | 2 min |
+| F2 | `HomeView.tsx` | Si timeout, mostrar Home sin tasks (degradacion elegante, no error page) | 3 min |
+| F3 | `get-home-snapshot.ts` | Envolver `NotificationService.getNotifications()` en try/catch con fallback `tasks: []` | 2 min |
+
+#### Slice B — Hardening de Nexa
+
+| Fix | Archivo | Cambio | Esfuerzo |
+|-----|---------|--------|----------|
+| F4 | `NexaPanel.tsx` | Agregar `AbortSignal.timeout(15000)` al fetch de chat | 2 min |
+| F5 | `nexa/route.ts` | NO llamar `getHomeSnapshot()` completo por cada mensaje — solo pasar context minimo (modules, userName) | 5 min |
+| F6 | `HomeView.tsx` | Error boundary alrededor de `NexaPanel` — si Nexa falla, Home sigue funcionando | 3 min |
+| F7 | `NexaPanel.tsx` | Limitar `history` a ultimos 10 mensajes en cada request | 2 min |
+
+#### Slice C — Navegacion y rollout
+
+| Fix | Archivo | Cambio | Esfuerzo |
+|-----|---------|--------|----------|
+| F8 | `home/page.tsx` | Quitar redirect defensivo, renderizar `HomeView` | 1 min |
+| F9 | `VerticalMenu.tsx` | Mover "Torre de control" a la seccion Administracion en el sidebar | 3 min |
+| F10 | `access.ts` | Cambiar `portalHomePath` de internos de `/internal/dashboard` a `/home` | 2 min |
+
+#### Slice D — Enriquecer snapshot (posterior)
+
+Agregar datos operativos reales al `getHomeSnapshot()`:
+- Periodo de nomina actual (status, headcount) desde `payroll_periods`
+- Facturas pendientes de cobro (aging) desde `fin_income`
+- OTD global del mes desde `ico_organization_metrics`
+- Correos fallidos desde `email_deliveries`
+
+Este slice no bloquea la reactivacion — se puede hacer despues.
+
+### Orden de ejecucion recomendado
+
+1. Slice A (corregir freeze) → deploy a staging → probar `/home` manualmente
+2. Slice B (hardening Nexa) → deploy
+3. Slice C (navegacion + rollout) → deploy → Home es la landing default
+4. Slice D (enriquecer) → iterativo
+
+### Decision de navegacion post-reactivacion
+
+| Ruta | Vista | Quien la usa | Cuando |
+|------|-------|-------------|--------|
+| `/home` | Home Nexa (reactivada) | Todos los internos | Cada dia al entrar |
+| `/internal/dashboard` | Control Tower (actual) | Solo admin | Cuando hace onboarding o revisa tenant health |
+
+Control Tower se mueve a la seccion Administracion en el sidebar (junto a Spaces, Usuarios, Roles, Correos).
+El sidebar "Torre de control" como item principal del menu desaparece — pasa a ser un hijo mas de Administracion.
