@@ -222,14 +222,18 @@ type PgCompensationMemberRow = PgMemberRow & {
 // Schema readiness check (replicated from Leave store pattern)
 // ---------------------------------------------------------------------------
 
-const PAYROLL_REQUIRED_TABLES = [
+const PAYROLL_CORE_REQUIRED_TABLES = [
   'greenhouse_core.members',
   'greenhouse_core.client_users',
   'greenhouse_payroll.compensation_versions',
   'greenhouse_payroll.payroll_periods',
   'greenhouse_payroll.payroll_entries',
-  'greenhouse_payroll.payroll_receipts',
   'greenhouse_payroll.payroll_bonus_config'
+] as const
+
+const PAYROLL_RECEIPT_REQUIRED_TABLES = [
+  ...PAYROLL_CORE_REQUIRED_TABLES,
+  'greenhouse_payroll.payroll_receipts'
 ] as const
 
 let payrollStoreReadyPromise: Promise<void> | null = null
@@ -239,10 +243,10 @@ const PAYROLL_STORE_READY_TTL_MS = 60_000
 
 export const isPayrollPostgresEnabled = () => isGreenhousePostgresConfigured()
 
-export const assertPayrollPostgresReady = async () => {
+const assertPayrollTablesReady = async (requiredTables: readonly string[], label: string) => {
   if (!isPayrollPostgresEnabled()) {
     throw new PayrollValidationError(
-      'Payroll Postgres store is not configured in this environment.',
+      `${label} is not configured in this environment.`,
       503
     )
   }
@@ -266,11 +270,11 @@ export const assertPayrollPostgresReady = async () => {
     )
 
     const existing = new Set(rows.map(row => row.qualified_name))
-    const missing = PAYROLL_REQUIRED_TABLES.filter(t => !existing.has(t))
+    const missing = requiredTables.filter(t => !existing.has(t))
 
     if (missing.length > 0) {
       throw new PayrollValidationError(
-        `Payroll Postgres schema is not ready. Missing tables: ${missing.join(', ')}. Run setup-postgres-payroll.sql first.`,
+        `${label} schema is not ready. Missing tables: ${missing.join(', ')}. Run setup-postgres-payroll.sql first.`,
         503
       )
     }
@@ -285,6 +289,12 @@ export const assertPayrollPostgresReady = async () => {
     payrollStoreReadyPromise = null
   })
 }
+
+export const assertPayrollPostgresReady = async () =>
+  assertPayrollTablesReady(PAYROLL_CORE_REQUIRED_TABLES, 'Payroll Postgres store')
+
+export const assertPayrollReceiptsReady = async () =>
+  assertPayrollTablesReady(PAYROLL_RECEIPT_REQUIRED_TABLES, 'Payroll receipts store')
 
 // ---------------------------------------------------------------------------
 // Helpers

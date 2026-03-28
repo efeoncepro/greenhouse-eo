@@ -7,6 +7,13 @@
 
 ## 2026-03-28
 
+### Payroll projected core schema readiness split
+- `Payroll Proyectada` ya no debe depender de `greenhouse_payroll.payroll_receipts` para renderizar la proyección.
+- Se separó la verificación de schema en dos niveles:
+  - core payroll: compensaciones, períodos, entries y bonus config
+  - receipts payroll: schema adicional para generación/consulta de recibos
+- Con esto, la vista proyectada deja de caer por una tabla de recibos ausente aunque el resto del core payroll esté sano.
+
 ### Payroll projected route access aligned to HR
 - `Payroll Proyectada` estaba quedando en vacío porque su API principal usaba `requireAdminTenantContext`, a diferencia del resto del módulo `Payroll` que opera con `requireHrTenantContext`.
 - El endpoint `/api/hr/payroll/projected` quedó alineado al mismo guard que `compensation`, `periods` y `receipts`, así que la vista ya no depende de un rol admin estricto para leer la proyección.

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { assertPayrollPostgresReady } from '@/lib/payroll/postgres-store'
+import { assertPayrollReceiptsReady } from '@/lib/payroll/postgres-store'
 import { normalizeNullableString, toNumber, toTimestampString } from '@/lib/payroll/shared'
 
 export type PayrollReceiptStatus = 'generated' | 'generation_failed' | 'email_sent' | 'email_failed'
@@ -89,7 +89,7 @@ export const buildPayrollReceiptStoragePath = (periodId: string, memberId: strin
   `payroll-receipts/${periodId}/${memberId}-r${revision}.pdf`
 
 export const getLatestPayrollReceiptRevision = async (periodId: string): Promise<number> => {
-  await assertPayrollPostgresReady()
+  await assertPayrollReceiptsReady()
 
   const rows = await runGreenhousePostgresQuery<{ revision: number | string | null }>(
     `
@@ -104,7 +104,7 @@ export const getLatestPayrollReceiptRevision = async (periodId: string): Promise
 }
 
 export const getPayrollReceiptByEntryId = async (entryId: string): Promise<PayrollReceiptRecord | null> => {
-  await assertPayrollPostgresReady()
+  await assertPayrollReceiptsReady()
 
   const rows = await runGreenhousePostgresQuery<PayrollReceiptRow>(
     `
@@ -121,7 +121,7 @@ export const getPayrollReceiptByEntryId = async (entryId: string): Promise<Payro
 }
 
 export const getPayrollReceiptRowsBySourceEvent = async (sourceEventId: string): Promise<PayrollReceiptRecord[]> => {
-  await assertPayrollPostgresReady()
+  await assertPayrollReceiptsReady()
 
   const rows = await runGreenhousePostgresQuery<PayrollReceiptRow>(
     `
@@ -156,7 +156,7 @@ export const savePayrollReceipt = async (input: {
   emailDeliveryId?: string | null
   emailError?: string | null
 }) => {
-  await assertPayrollPostgresReady()
+  await assertPayrollReceiptsReady()
 
   await runGreenhousePostgresQuery(
     `

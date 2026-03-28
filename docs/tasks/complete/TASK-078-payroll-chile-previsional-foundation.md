@@ -1,7 +1,7 @@
 # Delta 2026-03-28
 - El código de Payroll Chile ya referencia `gratificacion_legal_mode`, `colacion_amount`, `movilizacion_amount`, `afp_cotizacion_rate` y `afp_comision_rate`.
 - El vacío de `Payroll Proyectada` en `dev-greenhouse` no era solo un tema de schema: el route principal estaba protegido con `requireAdminTenantContext`, mientras el resto del módulo Payroll opera con `requireHrTenantContext`.
-- La causa operativa queda así alineada: la BD sí tiene compensaciones activas para marzo 2026, pero el endpoint de proyección necesita el guard correcto para que HR pueda leer la vista sin un rol admin estricto.
+- La causa operativa quedó doblemente alineada: la BD sí tiene compensaciones activas para marzo 2026, pero además el core de Payroll no debe depender de `greenhouse_payroll.payroll_receipts` para leer la proyección. La readiness de schema ahora se separa entre core payroll y receipts payroll.
 
 # TASK-078 - Payroll Chile: Previsional Foundation & Forward Cutover
 

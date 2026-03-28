@@ -7,7 +7,7 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { generatePayrollReceiptPdf } from '@/lib/payroll/generate-payroll-pdf'
 import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
 import {
-  assertPayrollPostgresReady
+  assertPayrollReceiptsReady
 } from '@/lib/payroll/postgres-store'
 import {
   buildPayrollReceiptId,
@@ -168,7 +168,7 @@ const sendReceiptEmail = async (params: {
 export const generatePayrollReceiptsForPeriod = async (
   input: GeneratePayrollReceiptsInput
 ): Promise<GeneratePayrollReceiptsResult> => {
-  await assertPayrollPostgresReady()
+  await assertPayrollReceiptsReady()
 
   const period = await getPayrollPeriod(input.periodId)
 

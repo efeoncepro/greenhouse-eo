@@ -49,6 +49,45 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 05:07 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir la causa raíz de `Payroll Proyectada` que seguía devolviendo vacío/500: la verificación de schema de Payroll estaba exigiendo `greenhouse_payroll.payroll_receipts` para un flujo que no la necesita.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/payroll-receipts-store.ts`
+- `src/lib/payroll/generate-payroll-receipts.ts`
+- `src/app/api/hr/payroll/projected/route.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm test src/lib/payroll/postgres-store.test.ts src/lib/payroll/payroll-receipts-store.test.ts`
+- `pnpm exec eslint src/lib/payroll/postgres-store.ts src/lib/payroll/payroll-receipts-store.ts src/lib/payroll/generate-payroll-receipts.ts src/app/api/hr/payroll/projected/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta publicar el push para que staging reciba la separación entre core payroll y receipts payroll.
+- Si tras el deploy la vista siguiera vacía, el siguiente paso sería leer el JSON real del endpoint desde el browser autenticado y no asumir un problema de datos.
+
 ## 2026-03-28 05:18 -03
 
 ### Agente
