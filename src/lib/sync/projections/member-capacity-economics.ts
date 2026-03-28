@@ -69,6 +69,10 @@ type PayrollEntryRow = {
   compensation_version_id: string
   currency: string | null
   gross_total: number | string | null
+  chile_employer_sis_amount: number | string | null
+  chile_employer_cesantia_amount: number | string | null
+  chile_employer_mutual_amount: number | string | null
+  chile_employer_total_cost: number | string | null
 }
 
 type IcoMemberMetricsRow = {
@@ -402,13 +406,20 @@ export const buildMemberCapacityEconomicsSnapshot = ({
   const sourceCompensationVersionId = payrollEntry?.compensation_version_id || compensation?.version_id || null
   const sourcePayrollPeriodId = payrollEntry?.period_id || null
 
+  const payrollEmployerCostsSource =
+    payrollEntry?.chile_employer_total_cost != null
+      ? toNum(payrollEntry.chile_employer_total_cost)
+      : toNum(payrollEntry?.chile_employer_sis_amount) +
+        toNum(payrollEntry?.chile_employer_cesantia_amount) +
+        toNum(payrollEntry?.chile_employer_mutual_amount)
+
   const compensationBreakdown: CompensationBreakdown | null = payrollEntry?.gross_total != null
     ? {
         sourceCurrency: sourceCurrency as 'CLP' | 'USD',
         baseSalarySource: toNum(payrollEntry.gross_total),
         fixedBonusesSource: 0,
         variableBonusesSource: 0,
-        employerCostsSource: 0
+        employerCostsSource: payrollEmployerCostsSource
       }
     : compensation
       ? {
@@ -570,7 +581,16 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
 
   const [payrollEntry] = await runGreenhousePostgresQuery<PayrollEntryRow>(
     `
-      SELECT entry_id, period_id, compensation_version_id, currency, gross_total
+      SELECT
+        entry_id,
+        period_id,
+        compensation_version_id,
+        currency,
+        gross_total,
+        chile_employer_sis_amount,
+        chile_employer_cesantia_amount,
+        chile_employer_mutual_amount,
+        chile_employer_total_cost
       FROM greenhouse_payroll.payroll_entries
       WHERE member_id = $1 AND period_id = $2
       LIMIT 1

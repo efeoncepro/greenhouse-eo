@@ -64,6 +64,19 @@ Regla arquitectónica:
 - el cálculo legal puede seguir consumiendo el total AFP para imponibles y neto, pero las salidas oficiales deben mostrar el split cuando exista
 - el contrato canónico no depende de un evento nuevo; se propaga con `compensation_version.created/updated` y `payroll_entry.upserted`
 
+## 2.3. Chile Isapre split and employer cost traceability
+
+`Payroll Chile` también mantiene el total de salud como ancla canónica y, cuando el sistema de salud es `Isapre`, desglosa el monto en:
+- `cotización obligatoria`
+- `voluntaria` o excedente del plan
+
+Regla arquitectónica:
+- `chile_health_amount` sigue siendo el total del plan
+- `chile_health_obligatoria_amount` y `chile_health_voluntaria_amount` existen para trazabilidad legal y exportes
+- la misma entry de nómina ahora también puede alimentar costos empleador derivados
+- `member_capacity_economics.total_labor_cost_target` puede absorber esos costos empleador reales para que Cost Intelligence vea el costo laboral cargado canónico
+- la propagación sigue ocurriendo por `compensation_version.created/updated` y `payroll_entry.upserted`; no se introduce un evento nuevo solo para el desglose
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

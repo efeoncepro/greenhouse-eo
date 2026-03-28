@@ -93,6 +93,12 @@ const buildStatements = (projectId: string) => [
       chile_afp_comision_amount FLOAT64,
       chile_health_system STRING,
       chile_health_amount FLOAT64,
+      chile_health_obligatoria_amount FLOAT64,
+      chile_health_voluntaria_amount FLOAT64,
+      chile_employer_sis_amount FLOAT64,
+      chile_employer_cesantia_amount FLOAT64,
+      chile_employer_mutual_amount FLOAT64,
+      chile_employer_total_cost FLOAT64,
       chile_unemployment_rate FLOAT64,
       chile_unemployment_amount FLOAT64,
       chile_taxable_base FLOAT64,
@@ -151,6 +157,30 @@ const buildStatements = (projectId: string) => [
   `
     ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
     ADD COLUMN IF NOT EXISTS chile_movilizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_health_obligatoria_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_health_voluntaria_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_employer_sis_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_employer_cesantia_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_employer_mutual_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_employer_total_cost FLOAT64
   `,
   `
     ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`

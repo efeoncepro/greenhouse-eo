@@ -11,6 +11,7 @@
 - La proyección `member_capacity_economics` ya reacciona a:
   - `finance.license_cost.updated`
   - `finance.tooling_cost.updated`
+- `member_capacity_economics.total_labor_cost_target` ya puede absorber costos empleador reales desde `payroll_entries` cuando Payroll Chile los materializa, manteniendo el snapshot como base canónica para labor cost loaded.
 - Regla explícita de arquitectura:
   - no sumar `greenhouse_finance.expenses` genéricos a `direct_overhead_target` hasta que exista taxonomía canónica de overhead directo por persona
 

@@ -1,5 +1,9 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-28
+- `member_capacity_economics.total_labor_cost_target` ahora puede absorber el costo empleador real calculado por Payroll Chile desde `payroll_entries`, reutilizando la proyección canónica de Team Capacity como base loaded cost en vez de crear un store paralelo.
+- El boundary de Cost Intelligence sigue igual: consume `member_capacity_economics` y no recalcula payroll ni employer costs por su cuenta.
+
 ## Objetivo
 
 Definir la arquitectura del layer de **Cost Intelligence** de Greenhouse: un layer de orquestación que consolida señales de costo, ingreso y cierre de período desde módulos existentes (Payroll, Finance, Admin Team, ICO) para materializar P&L operativo, cost centers y ceremonia de cierre — sin crear stores transaccionales nuevos ni duplicar la contabilidad legal.
@@ -13,7 +17,7 @@ Greenhouse tiene hoy toda la data necesaria para responder preguntas financieras
 - **Finance** registra ingresos, gastos, reconciliación bancaria y DTEs (Nubox)
 - **Admin Team** gestiona assignments con FTE allocation
 - **ICO** materializa métricas de eficiencia operativa
-- **Team Capacity** computa overhead y loaded cost
+- **Team Capacity** computa overhead y loaded cost, incluyendo employer costs absorbidos desde Payroll cuando exista materialización canónica
 
 Pero esa data vive dispersa en 5+ módulos, 3+ schemas y 11 projections sin un punto de consolidación que responda:
 - ¿Cuánto ganamos/perdimos con este cliente este mes?

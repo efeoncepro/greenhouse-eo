@@ -170,6 +170,10 @@ type PgEntryRow = {
   chile_health_amount: number | string | null
   chile_health_obligatoria_amount: number | string | null
   chile_health_voluntaria_amount: number | string | null
+  chile_employer_sis_amount: number | string | null
+  chile_employer_cesantia_amount: number | string | null
+  chile_employer_mutual_amount: number | string | null
+  chile_employer_total_cost: number | string | null
   chile_unemployment_rate: number | string | null
   chile_unemployment_amount: number | string | null
   chile_taxable_base: number | string | null
@@ -490,6 +494,10 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   chileHealthAmount: toNullableNumber(row.chile_health_amount),
   chileHealthObligatoriaAmount: toNullableNumber(row.chile_health_obligatoria_amount),
   chileHealthVoluntariaAmount: toNullableNumber(row.chile_health_voluntaria_amount),
+  chileEmployerSisAmount: toNullableNumber(row.chile_employer_sis_amount),
+  chileEmployerCesantiaAmount: toNullableNumber(row.chile_employer_cesantia_amount),
+  chileEmployerMutualAmount: toNullableNumber(row.chile_employer_mutual_amount),
+  chileEmployerTotalCost: toNullableNumber(row.chile_employer_total_cost),
   chileUnemploymentRate: toNullableNumber(row.chile_unemployment_rate),
   chileUnemploymentAmount: toNullableNumber(row.chile_unemployment_amount),
   chileTaxableBase: toNullableNumber(row.chile_taxable_base),
@@ -1550,6 +1558,10 @@ const ENTRY_BASE_SELECT = `
     e.chile_health_amount,
     e.chile_health_obligatoria_amount,
     e.chile_health_voluntaria_amount,
+    e.chile_employer_sis_amount,
+    e.chile_employer_cesantia_amount,
+    e.chile_employer_mutual_amount,
+    e.chile_employer_total_cost,
     e.chile_unemployment_rate,
     e.chile_unemployment_amount,
     e.chile_taxable_base,
@@ -1653,6 +1665,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_colacion_amount, chile_movilizacion_amount,
           chile_afp_name, chile_afp_rate, chile_afp_amount, chile_afp_cotizacion_amount, chile_afp_comision_amount,
           chile_health_system, chile_health_amount, chile_health_obligatoria_amount, chile_health_voluntaria_amount,
+          chile_employer_sis_amount, chile_employer_cesantia_amount, chile_employer_mutual_amount, chile_employer_total_cost,
           chile_unemployment_rate, chile_unemployment_amount,
           chile_taxable_base, chile_tax_amount, chile_apv_amount, chile_uf_value,
           chile_total_deductions,
@@ -1676,13 +1689,13 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           $33, $34,
           $35, $36,
           $37, $38, $39, $40,
-          $41,
-          $42, $43, $44,
-          $45, $46,
-          $47, $48,
-          $49, $50, $51,
-          $52, $53,
-          $54, $55, $56, $57, $58
+          $41, $42, $43, $44,
+          $45, $46, $47, $48,
+          $49, $50,
+          $51, $52,
+          $53, $54, $55,
+          $56, $57,
+          $58, $59, $60, $61, $62
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1718,6 +1731,10 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_health_amount = EXCLUDED.chile_health_amount,
           chile_health_obligatoria_amount = EXCLUDED.chile_health_obligatoria_amount,
           chile_health_voluntaria_amount = EXCLUDED.chile_health_voluntaria_amount,
+          chile_employer_sis_amount = EXCLUDED.chile_employer_sis_amount,
+          chile_employer_cesantia_amount = EXCLUDED.chile_employer_cesantia_amount,
+          chile_employer_mutual_amount = EXCLUDED.chile_employer_mutual_amount,
+          chile_employer_total_cost = EXCLUDED.chile_employer_total_cost,
           chile_unemployment_rate = EXCLUDED.chile_unemployment_rate,
           chile_unemployment_amount = EXCLUDED.chile_unemployment_amount,
           chile_taxable_base = EXCLUDED.chile_taxable_base,
@@ -1756,6 +1773,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.chileColacionAmount, entry.chileMovilizacionAmount,
         entry.chileAfpName, entry.chileAfpRate, entry.chileAfpAmount, entry.chileAfpCotizacionAmount, entry.chileAfpComisionAmount,
         entry.chileHealthSystem, entry.chileHealthAmount, entry.chileHealthObligatoriaAmount, entry.chileHealthVoluntariaAmount,
+        entry.chileEmployerSisAmount, entry.chileEmployerCesantiaAmount, entry.chileEmployerMutualAmount, entry.chileEmployerTotalCost,
         entry.chileUnemploymentRate, entry.chileUnemploymentAmount,
         entry.chileTaxableBase, entry.chileTaxAmount, entry.chileApvAmount, entry.chileUfValue,
         entry.chileTotalDeductions,

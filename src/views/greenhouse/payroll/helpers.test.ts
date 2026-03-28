@@ -71,6 +71,10 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   createdAt: '2026-03-01T00:00:00.000Z',
   updatedAt: null,
   ...overrides,
+  chileEmployerSisAmount: overrides.chileEmployerSisAmount ?? 0,
+  chileEmployerCesantiaAmount: overrides.chileEmployerCesantiaAmount ?? 0,
+  chileEmployerMutualAmount: overrides.chileEmployerMutualAmount ?? 0,
+  chileEmployerTotalCost: overrides.chileEmployerTotalCost ?? 0,
   chileHealthObligatoriaAmount: overrides.chileHealthObligatoriaAmount ?? 0,
   chileHealthVoluntariaAmount: overrides.chileHealthVoluntariaAmount ?? 0
 })

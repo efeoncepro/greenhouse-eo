@@ -10,6 +10,13 @@ export type ChileAfpSplitRates = {
   comisionRate: number
 }
 
+export type ChileEmployerCostAmounts = {
+  sisAmount: number
+  cesantiaAmount: number
+  mutualAmount: number
+  totalCost: number
+}
+
 export const resolveChileAfpSplitRates = ({
   totalRate,
   cotizacionRate,
@@ -93,6 +100,39 @@ export const resolveChileHealthSplitAmounts = ({
   return {
     obligatoriaAmount: obligatoryAmount,
     voluntariaAmount: roundCurrency(Math.max(0, totalHealthAmount - obligatoryAmount))
+  }
+}
+
+export const resolveChileEmployerCostAmounts = async ({
+  payRegime,
+  contractType,
+  imponibleBase,
+  periodDate
+}: {
+  payRegime: 'chile' | 'intl'
+  contractType: 'indefinido' | 'plazo_fijo'
+  imponibleBase: number
+  periodDate: string
+}): Promise<ChileEmployerCostAmounts | null> => {
+  if (payRegime !== 'chile') {
+    return null
+  }
+
+  const roundCurrency = (value: number) => Math.round(value * 100) / 100
+  const safeBase = Math.max(0, imponibleBase)
+  const sisRate = await getSisRate(periodDate)
+  const cesantiaRate = contractType === 'plazo_fijo' ? 0 : 0.024
+  const mutualRate = 0.0093
+
+  const sisAmount = roundCurrency(safeBase * sisRate)
+  const cesantiaAmount = roundCurrency(safeBase * cesantiaRate)
+  const mutualAmount = roundCurrency(safeBase * mutualRate)
+
+  return {
+    sisAmount,
+    cesantiaAmount,
+    mutualAmount,
+    totalCost: roundCurrency(sisAmount + cesantiaAmount + mutualAmount)
   }
 }
 

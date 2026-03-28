@@ -6,6 +6,7 @@ import {
   getAfpRateForCode,
   getImmForPeriod,
   getUnemploymentRateForPeriod,
+  resolveChileEmployerCostAmounts,
   resolveChileHealthSplitAmounts,
   resolveChileAfpRateSplitForCompensation,
   resolveChileAfpSplitRates
@@ -53,6 +54,10 @@ export type ChileDeductionResult = {
   chileHealthAmount: number | null
   chileHealthObligatoriaAmount: number | null
   chileHealthVoluntariaAmount: number | null
+  chileEmployerSisAmount: number | null
+  chileEmployerCesantiaAmount: number | null
+  chileEmployerMutualAmount: number | null
+  chileEmployerTotalCost: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null
@@ -140,6 +145,10 @@ export const calculatePayrollTotals = async ({
       chileHealthAmount: null,
       chileHealthObligatoriaAmount: null,
       chileHealthVoluntariaAmount: null,
+      chileEmployerSisAmount: null,
+      chileEmployerCesantiaAmount: null,
+      chileEmployerMutualAmount: null,
+      chileEmployerTotalCost: null,
       chileUnemploymentRate: null,
       chileUnemploymentAmount: null,
       chileTaxableBase: null,
@@ -214,6 +223,12 @@ export const calculatePayrollTotals = async ({
     imponibleBase,
     totalHealthAmount: healthAmount
   })
+  const employerCosts = await resolveChileEmployerCostAmounts({
+    payRegime,
+    contractType,
+    imponibleBase,
+    periodDate: fallbackPeriodDate
+  })
 
   const unemploymentAmount = roundCurrency(imponibleBase * derivedUnemploymentRate)
   const normalizedApvAmount = hasApv ? roundCurrency(apvAmount || 0) : 0
@@ -240,6 +255,10 @@ export const calculatePayrollTotals = async ({
     chileHealthAmount: healthAmount,
     chileHealthObligatoriaAmount: healthSplit?.obligatoriaAmount ?? null,
     chileHealthVoluntariaAmount: healthSplit?.voluntariaAmount ?? null,
+    chileEmployerSisAmount: employerCosts?.sisAmount ?? null,
+    chileEmployerCesantiaAmount: employerCosts?.cesantiaAmount ?? null,
+    chileEmployerMutualAmount: employerCosts?.mutualAmount ?? null,
+    chileEmployerTotalCost: employerCosts?.totalCost ?? null,
     chileUnemploymentRate: derivedUnemploymentRate,
     chileUnemploymentAmount: unemploymentAmount,
     chileTaxableBase: taxableBase,

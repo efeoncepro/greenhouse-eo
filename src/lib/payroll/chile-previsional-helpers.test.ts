@@ -6,7 +6,8 @@ import {
   getSisRate,
   getTopeAfpForPeriod,
   getTopeCesantiaForPeriod,
-  getUnemploymentRateForPeriod
+  getUnemploymentRateForPeriod,
+  resolveChileEmployerCostAmounts
 } from './chile-previsional-helpers'
 
 describe('chile provisional helpers', () => {
@@ -27,5 +28,30 @@ describe('chile provisional helpers', () => {
   it('returns canonical topes for AFP and cesantía', async () => {
     await expect(getTopeAfpForPeriod('2026-03-31')).resolves.toBe(0)
     await expect(getTopeCesantiaForPeriod('2026-03-31')).resolves.toBe(0)
+  })
+
+  it('derives employer cost amounts for Chile payroll entries', async () => {
+    await expect(
+      resolveChileEmployerCostAmounts({
+        payRegime: 'intl',
+        contractType: 'indefinido',
+        imponibleBase: 100000,
+        periodDate: '2026-03-31'
+      })
+    ).resolves.toBeNull()
+
+    await expect(
+      resolveChileEmployerCostAmounts({
+        payRegime: 'chile',
+        contractType: 'indefinido',
+        imponibleBase: 100000,
+        periodDate: '2026-03-31'
+      })
+    ).resolves.toEqual({
+      sisAmount: 0,
+      cesantiaAmount: 2400,
+      mutualAmount: 930,
+      totalCost: 3330
+    })
   })
 })

@@ -207,6 +207,10 @@ export interface PayrollEntry {
   chileHealthAmount: number | null
   chileHealthObligatoriaAmount: number | null
   chileHealthVoluntariaAmount: number | null
+  chileEmployerSisAmount: number | null
+  chileEmployerCesantiaAmount: number | null
+  chileEmployerMutualAmount: number | null
+  chileEmployerTotalCost: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null

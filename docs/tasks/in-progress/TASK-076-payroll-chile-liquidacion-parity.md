@@ -1,6 +1,15 @@
 # TASK-076 — Payroll Chile: Paridad con Liquidación Legal
 
 ## Delta 2026-03-28
+- Los costos empleador ya quedaron modelados en Payroll Chile y se alimentan en `member_capacity_economics.total_labor_cost_target`, por lo que Cost Intelligence no necesita un store paralelo para ver el costo laboral cargado real.
+- En esta task, el siguiente foco real pasa a ser exponer/usar ese breakdown donde falte en surfaces de consumo o exportes, no inventar otra capa de costos.
+
+## Delta 2026-03-28
+- El desglose de Isapre quedó implementado en el motor y persistencia de Payroll Chile: `chile_health_amount` sigue como total del plan, pero ahora se calculan y almacenan `chile_health_obligatoria_amount` y `chile_health_voluntaria_amount` para liquidación y exportes.
+- La proyección canónica `member_capacity_economics` ya puede absorber el costo empleador de Chile desde `payroll_entries`, reutilizando la capa de Cost Intelligence existente en vez de crear un store paralelo.
+- El siguiente gap real de este task, si se quiere seguir cerrando paridad legal completa, es exponer/usar ese breakdown de costos empleador en las surfaces de consumo apropiadas.
+
+## Delta 2026-03-28
 - `AFP` de Payroll Chile ya no se guarda y expone como un único monto opaco: ahora la compensación versionada, los payroll entries y las salidas operativas mantienen `cotización` y `comisión` como columnas separadas, además del total agregado.
 - El cálculo forward sigue usando el total AFP para imponibles y neto, pero la trazabilidad legal ya permite explicar y exportar el split sin romper compatibilidad histórica.
 - Se agregó migration `scripts/migrations/add-chile-afp-breakdown.sql` para expandir el esquema de PostgreSQL y backfillear el split en compensaciones/entries existentes.
@@ -45,7 +54,7 @@
 
 ## Summary
 
-Cerrar los gaps entre el cálculo de nómina chilena de Greenhouse y una liquidación de sueldos legal real. Contrastado contra liquidación Feb 2026 de Valentina Hoyos (Efeonce Group SPA), se identificaron 3 gaps críticos: gratificación legal ausente, haberes no imponibles (colación + movilización) no modelados, y costos empleador (SIS, cesantía empleador, mutual) no rastreados.
+Cerrar los gaps entre el cálculo de nómina chilena de Greenhouse y una liquidación de sueldos legal real. Contrastado contra liquidación Feb 2026 de Valentina Hoyos (Efeonce Group SPA), inicialmente se identificaron 3 gaps críticos: gratificación legal ausente, haberes no imponibles (colación + movilización) no modelados, y costos empleador (SIS, cesantía empleador, mutual) no rastreados. Los costos empleador ya quedaron modelados y absorbidos en la base canónica de Cost Intelligence; el foco restante es cerrar o exponer correctamente los demás tramos donde todavía falte paridad.
 
 ## Why This Task Exists
 
@@ -53,7 +62,7 @@ La liquidación real de Valentina muestra un **Total Haberes de $832,121** y un 
 
 1. **Gratificación legal** ($134,750/mes) no se calcula — la base imponible está subestimada en $134,750, lo que invalida AFP, base tributable y bruto total
 2. **Colación** ($83,371) y **Movilización** ($75,000) no se modelan — son haberes no imponibles que van al líquido pero no pasan por descuentos
-3. **Costos empleador** (~$32,846/mes) son invisibles — SIS empleador, cesantía empleador y mutual no se rastrean
+3. **Costos empleador** (~$32,846/mes) ya quedan rastreados en la base canónica — SIS empleador, cesantía empleador y mutual se absorben en `member_capacity_economics.total_labor_cost_target`
 
 Sin estos campos, Greenhouse no puede:
 - Generar una liquidación de sueldos válida para firma
@@ -158,7 +167,7 @@ COSTOS EMPLEADOR (no deducidos)
 | Movilización | Alto | Líquido subestimado, liquidación incompleta |
 | AFP desglose cotización/comisión | Medio | Liquidación no muestra el desglose legal requerido |
 | Isapre desglose obligatoria/voluntaria | Medio | Liquidación no muestra cotización 7% vs plan UF excedente |
-| Costos empleador (SIS, cesantía, mutual) | Alto | Costo real por persona invisible para Cost Intelligence |
+| Costos empleador (SIS, cesantía, mutual) | Resuelto | Se absorben en `member_capacity_economics.total_labor_cost_target`; falta solo exponer/consumir el breakdown donde corresponda |
 | RUT del colaborador | Medio | Requerido para liquidación legal |
 | Datos bancarios (banco, cuenta, tipo) | Medio | Requerido para liquidación legal y pago |
 | IMM (Ingreso Mínimo Mensual) como indicador | Alto | Necesario para tope de gratificación legal |
@@ -329,7 +338,7 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 - [ ] Colación y movilización se modelan como haberes no imponibles y se suman al líquido
 - [ ] AFP se desglosa en cotización obligatoria + comisión
 - [ ] Isapre se desglosa en cotización obligatoria (7%) + voluntaria (excedente)
-- [ ] Costos empleador (SIS, cesantía, mutual) se calculan y almacenan
+- [x] Costos empleador (SIS, cesantía, mutual) se calculan y almacenan
 - [ ] RUT y datos bancarios modelados en members
 - [ ] Para Valentina Hoyos con los mismos inputs, Greenhouse produce líquido = $595,656
 - [ ] `pnpm build` pasa

@@ -8,6 +8,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.
 - La migration operativa quedó disponible en `scripts/migrations/add-chile-afp-breakdown.sql`.
 
+## Delta 2026-03-28 Chile employer cost base
+- `Payroll Chile` ya calcula un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) y lo persiste junto a las entries.
+- `member_capacity_economics.total_labor_cost_target` absorbe ese breakdown para que Cost Intelligence pueda ver el costo laboral cargado real sin inventar otra proyección.
+- Esta base reutiliza la misma propagación reactiva de `compensation_version.created/updated` y `payroll_entry.upserted`.
+
 ## Delta 2026-03-28 Payroll Chile smoke validation
 - Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos que el núcleo legal de `Payroll Chile` ya calza con el PDF cuando existen los insumos correctos:
   - `IMM = 539000`

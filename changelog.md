@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Chile employer cost base
+- `Payroll Chile` ahora calcula y persiste un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) junto a cada `payroll_entry`.
+- La proyección canónica `member_capacity_economics` absorbe ese breakdown para que `total_labor_cost_target` refleje el costo laboral cargado real sin crear otra capa de cálculo.
+- La propagación sigue usando los eventos existentes de `compensation_version.created/updated` y `payroll_entry.upserted`.
+
 ### Chile AFP breakdown
 - `Payroll Chile` ahora separa `AFP` en `cotización` y `comisión` dentro de la compensación versionada, `payroll_entries` y los exports/recibos, manteniendo el total agregado como compatibilidad histórica.
 - Se agregó migration para expandir el esquema de PostgreSQL y backfillear el split en datos existentes.

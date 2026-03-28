@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:05 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el siguiente slice de `TASK-076` conectando el breakdown de costos empleador de Payroll Chile con la base canónica de Cost Intelligence (`member_capacity_economics`).
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/schema.ts`
+- `scripts/setup-postgres-payroll.sql`
+- `src/lib/sync/projections/member-capacity-economics.ts`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/payroll/calculate-chile-deductions.test.ts src/lib/payroll/export-payroll.test.ts src/lib/payroll/payroll-entry-explain.test.ts src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx src/views/greenhouse/payroll/helpers.test.ts`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- Falta revisar UI/export de los nuevos campos de costos empleador si se quiere exponer el breakdown al usuario final.
+- Falta validar el backfill/migration en PostgreSQL y el smoke en staging antes de dar por cerrado el slice.
+
 ## 2026-03-28 03:41 -03
 
 ### Agente

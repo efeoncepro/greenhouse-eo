@@ -127,6 +127,12 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   chile_afp_comision_amount NUMERIC(14, 2),
   chile_health_system TEXT,
   chile_health_amount NUMERIC(14, 2),
+  chile_health_obligatoria_amount NUMERIC(14, 2),
+  chile_health_voluntaria_amount NUMERIC(14, 2),
+  chile_employer_sis_amount NUMERIC(14, 2),
+  chile_employer_cesantia_amount NUMERIC(14, 2),
+  chile_employer_mutual_amount NUMERIC(14, 2),
+  chile_employer_total_cost NUMERIC(14, 2),
   chile_unemployment_rate NUMERIC(6, 4),
   chile_unemployment_amount NUMERIC(14, 2),
   chile_taxable_base NUMERIC(14, 2),
@@ -466,6 +472,18 @@ BEGIN
     ADD COLUMN IF NOT EXISTS adjusted_base_salary NUMERIC(14, 2);
   ALTER TABLE greenhouse_payroll.payroll_entries
     ADD COLUMN IF NOT EXISTS adjusted_remote_allowance NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_health_obligatoria_amount NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_health_voluntaria_amount NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_employer_sis_amount NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_employer_cesantia_amount NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_employer_mutual_amount NUMERIC(14, 2);
+  ALTER TABLE greenhouse_payroll.payroll_entries
+    ADD COLUMN IF NOT EXISTS chile_employer_total_cost NUMERIC(14, 2);
   ALTER TABLE greenhouse_payroll.payroll_entries
     ADD COLUMN IF NOT EXISTS adjusted_fixed_bonus_amount NUMERIC(14, 2);
 
