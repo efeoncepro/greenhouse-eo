@@ -116,6 +116,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-090` | `complete` | Receipt Branding Efeonce + PDF Template Versioning | `docs/tasks/complete/TASK-090-receipt-branding-and-template-versioning.md` |
 | `TASK-091` | `complete` | Greenhouse Operational Calendar Utility | `docs/tasks/complete/TASK-091-greenhouse-operational-calendar-utility.md` |
 | `TASK-092` | `to-do` | Payroll Operational Current Period Semantics | `docs/tasks/to-do/TASK-092-payroll-operational-current-period-semantics.md` |
+| `TASK-093` | `to-do` | Personnel Expense Data Consistency | `docs/tasks/to-do/TASK-093-personnel-expense-data-consistency.md` |
 
 ## Regla de asignacion desde aqui
 

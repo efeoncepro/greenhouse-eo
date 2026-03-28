@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-093`
+- siguiente ID disponible: `TASK-094`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
