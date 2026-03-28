@@ -10,6 +10,12 @@ La relacion correcta entre ambas es:
 - `CODEX_TASK_Transactional_Email_System.md` define la infraestructura base de envio, tokens, templates y flows de acceso
 - esta task define el catalogo mas amplio de emails que Greenhouse necesitara como portal ejecutivo-operativo
 
+## Delta 2026-03-28
+
+- `TASK-095` quedó implementada como capa unificada de delivery sobre Resend en `src/lib/email/delivery.ts`.
+- Los callers de Auth, NotificationService y Payroll ya consumen `sendEmail()` con templates centralizados y persistencia unificada en `greenhouse_notifications.email_deliveries`.
+- `NotificationEmail` reemplaza el plain text ad hoc para el canal `notification`, y `email_subscriptions` queda como resolver canónico para recipientes por tipo.
+
 ## Resumen
 
 Greenhouse ya necesita una capa de email mas amplia que el baseline de:

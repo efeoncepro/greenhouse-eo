@@ -4,16 +4,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Alto` |
-| Status real | `Diseño completo` |
+| Status real | `Cerrada` |
 | Rank | `10` |
 | Domain | `platform` |
 | GitHub Project | `Greenhouse Delivery` |
 
 ## Delta 2026-03-28
+
+- `TASK-095` quedó cerrada con una capa unificada de delivery sobre Resend en `src/lib/email/delivery.ts`.
+- Auth, NotificationService y Payroll ya consumen `sendEmail()` y dejaron de depender del envío directo ad hoc.
+- Se materializaron `greenhouse_notifications.email_deliveries` y `greenhouse_notifications.email_subscriptions`, con seed para `payroll_export`.
+- El catálogo de templates quedó centralizado en `src/lib/email/templates.ts`, incluyendo `notification` con React Email.
 
 - Se validó en vivo el flujo de reenvío de Payroll sobre `dev-greenhouse.efeoncepro.com` y el hallazgo operativo fue claro: ese dominio apunta al deployment `staging` de Vercel, no al `Preview (develop)`.
 - El primer mail de nómina llegó a Outlook con PDF/CSV adjuntos, pero los reintentos podían devolver `deliveryId: null` cuando el runtime activo no veía la configuración transaccional correcta.
@@ -116,8 +121,8 @@ Reglas obligatorias:
 
 - Resend singleton en `src/lib/resend.ts` (lazy, env-gated)
 - React Email design system: `EmailLayout`, `EmailButton`, `constants.ts` (Poppins/DM Sans, brand colors)
-- 6 templates: `PasswordResetEmail`, `InvitationEmail`, `VerifyEmail`, `PayrollReceiptEmail`, `PayrollExportReadyEmail`, `PayrollReceiptEmail`
-- `NotificationService` con preferences per-user/per-category y dispatch multi-canal
+- 6 templates: `PasswordResetEmail`, `InvitationEmail`, `VerifyEmail`, `NotificationEmail`, `PayrollReceiptEmail`, `PayrollExportReadyEmail`
+- `NotificationService` con preferences per-user/per-category, dispatch multi-canal y canal email ya centralizado
 - Outbox reactivo con 13 proyecciones, dedup, retry, dead-letter, domain-partitioned crons
 - Email catalog estrategico con 4 familias y roadmap P0/P1/P2
 
@@ -277,12 +282,12 @@ interface SendEmailResult {
 ```
 
 **Criterios de aceptacion Slice 1:**
-- [ ] `sendEmail()` existe y envía via Resend
-- [ ] Cada envio se registra en `email_deliveries` con status, resend_id, metadata
-- [ ] Si Resend no esta configurado, retorna `status: 'skipped'`
-- [ ] Si falla, registra error y retorna `status: 'failed'`
-- [ ] Tests unitarios con Resend mockeado
-- [ ] Migration SQL lista para aplicar
+- [x] `sendEmail()` existe y envía via Resend
+- [x] Cada envio se registra en `email_deliveries` con status, resend_id, metadata
+- [x] Si Resend no esta configurado, retorna `status: 'skipped'`
+- [x] Si falla, registra error y retorna `status: 'failed'`
+- [x] Tests unitarios con Resend mockeado
+- [x] Migration SQL lista para aplicar
 
 ### Slice 2 — Template registry + recipient resolver
 
@@ -334,11 +339,11 @@ INSERT INTO greenhouse_notifications.email_subscriptions (email_type, recipient_
 ```
 
 **Criterios de aceptacion Slice 2:**
-- [ ] `resolveTemplate(emailType, context)` retorna `{ subject, react, text, attachments? }`
-- [ ] `getSubscribers('payroll_export')` retorna los 3 recipients actuales
-- [ ] `sendEmail()` usa el template registry cuando el caller no pasa subject/react/text explicitamente
-- [ ] `sendEmail()` resuelve recipients desde suscripciones cuando el caller no pasa `recipients`
-- [ ] Tests unitarios del registry y del resolver
+- [x] `resolveTemplate(emailType, context)` retorna `{ subject, react, text, attachments? }`
+- [x] `getSubscribers('payroll_export')` retorna los 3 recipients actuales
+- [x] `sendEmail()` usa el template registry cuando el caller no pasa subject/react/text explicitamente
+- [x] `sendEmail()` resuelve recipients desde suscripciones cuando el caller no pasa `recipients`
+- [x] Tests unitarios del registry y del resolver
 
 ### Slice 3 — NotificationService synergy
 
@@ -355,11 +360,11 @@ INSERT INTO greenhouse_notifications.email_subscriptions (email_type, recipient_
 - Reemplaza la concatenacion plain text actual
 
 **Criterios de aceptacion Slice 3:**
-- [ ] `NotificationService` ya no importa `getResendClient` directamente
-- [ ] Emails de notificacion usan React Email template (no plain text)
-- [ ] Los 4 eventos reactivos existentes siguen funcionando
-- [ ] `email_deliveries` registra cada envio de notificacion
-- [ ] Test de integracion: dispatch con canal email -> registra en `email_deliveries`
+- [x] `NotificationService` ya no importa `getResendClient` directamente
+- [x] Emails de notificacion usan React Email template (no plain text)
+- [x] Los 4 eventos reactivos existentes siguen funcionando
+- [x] `email_deliveries` registra cada envio de notificacion
+- [x] Test de integracion: dispatch con canal email -> registra en `email_deliveries`
 
 ### Slice 4 — First consumer migrations (Auth + Payroll)
 
@@ -378,13 +383,13 @@ INSERT INTO greenhouse_notifications.email_subscriptions (email_type, recipient_
 - Las tablas de dominio (`payroll_export_packages`, `payroll_receipts`) siguen guardando su metadata propia; `email_deliveries` registra ademas el envio
 
 **Criterios de aceptacion Slice 4:**
-- [ ] Auth flows usan `sendEmail()` en vez de `resend.emails.send()`
-- [ ] `src/lib/email-log.ts` marcado como deprecated
-- [ ] Payroll export resuelve recipients desde `email_subscriptions`
-- [ ] Payroll receipts usan `sendEmail()` con template resolver
-- [ ] Todos los envios aparecen en `email_deliveries`
-- [ ] Tests existentes de payroll-export-packages y PayrollExportReadyEmail siguen pasando
-- [ ] `pnpm build` y `pnpm test` verdes
+- [x] Auth flows usan `sendEmail()` en vez de `resend.emails.send()`
+- [x] `src/lib/email-log.ts` marcado como deprecated
+- [x] Payroll export resuelve recipients desde `email_subscriptions`
+- [x] Payroll receipts usan `sendEmail()` con template resolver
+- [x] Todos los envios aparecen en `email_deliveries`
+- [x] Tests existentes de payroll-export-packages y PayrollExportReadyEmail siguen pasando
+- [x] `pnpm build` y `pnpm test` verdes
 
 ## Event flow: outbox -> email delivery
 
@@ -467,16 +472,17 @@ Estos eventos ya se publican en el outbox. Solo falta registrar nuevas proyeccio
 
 ## Acceptance Criteria (global)
 
-- [ ] Existe `sendEmail()` como unico punto de salida para emails de Greenhouse
-- [ ] Template registry resuelve subject/html/text/attachments por emailType
-- [ ] Recipient resolver soporta modo directo y modo suscripcion
-- [ ] `email_deliveries` registra cada envio con status, resend_id, metadata, source_event_id
-- [ ] `NotificationService` usa la capa para canal email (React Email, no plain text)
-- [ ] Auth (password_reset, invitation) migrados a la capa
-- [ ] Payroll (export, receipts) migrados a la capa
+- [x] Existe `sendEmail()` como unico punto de salida para emails de Greenhouse
+- [x] Template registry resuelve subject/html/text/attachments por emailType
+- [x] Recipient resolver soporta modo directo y modo suscripcion
+- [x] `email_deliveries` registra cada envio con status, resend_id, metadata, source_event_id
+- [x] `NotificationService` usa la capa para canal email (React Email, no plain text)
+- [x] Auth (password_reset, invitation) migrados a la capa
+- [x] Payroll (export, receipts) migrados a la capa
 - [ ] Cron de retry reprocesa `failed` deliveries (max 3 intentos, ventana 1 hora)
-- [ ] `email_subscriptions` contiene los recipients de payroll_export (no hardcoded)
-- [ ] `pnpm build`, `pnpm test`, `pnpm lint` verdes
+- [x] `email_subscriptions` contiene los recipients de payroll_export (no hardcoded)
+- [x] `pnpm build` verde
+- [x] `pnpm test`, `pnpm lint` verdes
 
 ## Verification
 

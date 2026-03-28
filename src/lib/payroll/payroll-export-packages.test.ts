@@ -11,9 +11,7 @@ const mockGeneratePayrollCsv = vi.fn()
 const mockUploadGreenhouseStorageObject = vi.fn()
 const mockUpsertPayrollExportPackageArtifacts = vi.fn()
 const mockRecordPayrollExportPackageDelivery = vi.fn()
-const mockIsResendConfigured = vi.fn()
-const mockGetEmailFromAddress = vi.fn()
-const mockGetResendClient = vi.fn()
+const mockSendEmail = vi.fn()
 
 vi.mock('@/lib/payroll/get-payroll-periods', () => ({
   getPayrollPeriod: (...args: unknown[]) => mockGetPayrollPeriod(...args)
@@ -48,10 +46,8 @@ vi.mock('@/lib/payroll/export-payroll', () => ({
   generatePayrollCsv: (...args: unknown[]) => mockGeneratePayrollCsv(...args)
 }))
 
-vi.mock('@/lib/resend', () => ({
-  isResendConfigured: () => mockIsResendConfigured(),
-  getEmailFromAddress: () => mockGetEmailFromAddress(),
-  getResendClient: () => mockGetResendClient()
+vi.mock('@/lib/email/delivery', () => ({
+  sendEmail: (...args: unknown[]) => mockSendEmail(...args)
 }))
 
 const {
@@ -62,12 +58,10 @@ const {
 describe('payroll export packages', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockIsResendConfigured.mockReturnValue(true)
-    mockGetEmailFromAddress.mockReturnValue('no-reply@efeoncepro.com')
-    mockGetResendClient.mockReturnValue({
-      emails: {
-        send: vi.fn().mockResolvedValue({ data: { id: 'email_123' } })
-      }
+    mockSendEmail.mockResolvedValue({
+      deliveryId: 'delivery_123',
+      resendId: 'email_123',
+      status: 'sent'
     })
   })
 
@@ -188,18 +182,13 @@ describe('payroll export packages', () => {
         lastEmailDeliveryId: 'email_123'
       })
     )
+    expect(mockSendEmail).toHaveBeenCalledTimes(1)
 
-    const resendClient = mockGetResendClient.mock.results[0]?.value as any
+    const call = mockSendEmail.mock.calls[0]?.[0]
 
-    expect(resendClient.emails.send).toHaveBeenCalledTimes(1)
-
-    const call = resendClient.emails.send.mock.calls[0]?.[0]
-
-    expect(call.subject).toContain('Nómina cerrada — Marzo 2026')
-    expect(call.subject).toContain('2 colaboradores')
+    expect(call.emailType).toBe('payroll_export')
+    expect(call.context.periodLabel).toBe('Marzo 2026')
+    expect(call.context.entryCount).toBe(2)
     expect(call.attachments).toHaveLength(2)
-    expect(call.text).toContain('Chile (CLP)')
-    expect(call.text).toContain('Internacional (USD)')
-    expect(call.text).toContain('ADJUNTOS')
   })
 })

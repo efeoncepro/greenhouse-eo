@@ -126,9 +126,6 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
 
           if (intel.current) {
             // Map intelligence response to IcoMetricSnapshot-compatible format
-            const getMetricValue = (metrics: Array<{ metricId: string; value: number | null }>, id: string) =>
-              metrics?.find((m: { metricId: string }) => m.metricId === id)?.value ?? null
-
             const syntheticIco: IcoMetricSnapshot = {
               dimension: 'member',
               dimensionValue: memberId,

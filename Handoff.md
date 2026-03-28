@@ -49,6 +49,61 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 14:48 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-095` end-to-end con la capa centralizada de email delivery, sin romper Auth, NotificationService ni Payroll.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/email/delivery.ts`
+- `src/lib/email/schema.ts`
+- `src/lib/email/templates.ts`
+- `src/lib/email/subscriptions.ts`
+- `src/lib/email/types.ts`
+- `src/emails/NotificationEmail.tsx`
+- `src/app/api/account/forgot-password/route.ts`
+- `src/app/api/admin/invite/route.ts`
+- `src/lib/notifications/notification-service.ts`
+- `src/lib/payroll/generate-payroll-receipts.ts`
+- `src/lib/payroll/payroll-export-packages.ts`
+- `src/lib/email-log.ts`
+- `scripts/migrations/add-email-delivery-tables.sql`
+- `docs/tasks/complete/TASK-095-centralized-email-delivery-layer.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/email/delivery.test.ts src/lib/email/templates.test.ts src/lib/notifications/notification-service.test.ts src/lib/payroll/payroll-export-packages.test.ts src/lib/payroll/generate-payroll-receipts.test.ts`
+- `pnpm exec eslint src/lib/email/delivery.ts src/lib/email/delivery.test.ts src/lib/email/schema.ts src/lib/email/subscriptions.ts src/lib/email/templates.ts src/lib/email/templates.test.ts src/lib/email/types.ts src/emails/NotificationEmail.tsx src/app/api/account/forgot-password/route.ts src/app/api/admin/invite/route.ts src/lib/notifications/notification-service.ts src/lib/notifications/notification-service.test.ts src/lib/payroll/generate-payroll-receipts.ts src/lib/payroll/generate-payroll-receipts.test.ts src/lib/payroll/payroll-export-packages.ts src/lib/payroll/payroll-export-packages.test.ts`
+- `pnpm exec eslint src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx src/views/greenhouse/people/tabs/person-hr-profile-view-model.ts`
+- `pnpm test`
+- `pnpm build`
+- Resultado: todo verde para este scope; la suite completa pasó 467/467 y el build terminó sin errores.
+
+### Riesgos o pendientes
+
+- Falta un cron de retry para `failed` deliveries; la task lo dejó documentado como follow-up.
+- `pnpm lint` global sigue fallando por deuda preexistente en múltiples scripts y vistas fuera del scope de esta entrega; los archivos tocados en esta iteración sí pasaron lint focal.
+
 ## 2026-03-28 17:34 -03
 
 ### Agente

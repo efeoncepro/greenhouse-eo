@@ -2,8 +2,8 @@ import 'server-only'
 
 import { Buffer } from 'node:buffer'
 
-import { APP_URL } from '@/emails/constants'
-import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
+import type { CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
+import { sendEmail } from '@/lib/email/delivery'
 import { generatePayrollCsv } from '@/lib/payroll/export-payroll'
 import { generatePayrollPeriodPdf } from '@/lib/payroll/generate-payroll-pdf'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
@@ -19,13 +19,6 @@ import {
 } from '@/lib/payroll/payroll-export-packages-store'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 import { downloadGreenhouseMediaAsset, getGreenhouseMediaBucket, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
-import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
-
-const PAYROLL_EXPORT_READY_RECIPIENTS = [
-  'finance@efeoncepro.com',
-  'hhumberly@efeoncepro.com',
-  'jreyes@efeoncepro.com'
-] as const
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -231,88 +224,64 @@ export const getPayrollExportArtifact = async (
 
 export const sendPayrollExportReadyNotification = async (periodId: string, actorEmail?: string | null) => {
   const assets = await getOrCreatePayrollExportPackageAssets(periodId, actorEmail)
+  const periodLabel = `${MONTH_NAMES[assets.periodMonth - 1] ?? String(assets.periodMonth)} ${assets.periodYear}`
 
-  if (!isResendConfigured()) {
-    return null
-  }
-
-  const monthName = MONTH_NAMES[assets.periodMonth - 1] ?? String(assets.periodMonth)
-  const periodLabel = `${monthName} ${assets.periodYear}`
   const breakdowns = buildBreakdowns(assets.entries)
   const netTotalDisplay = buildNetTotalDisplay(breakdowns)
 
-  const exportedAt = new Date().toLocaleDateString('es-CL', {
-    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  })
-
-  const resend = getResendClient()
-
   try {
-    const result = await resend.emails.send({
-      from: getEmailFromAddress(),
-      to: [...PAYROLL_EXPORT_READY_RECIPIENTS],
-      subject: `Nómina cerrada — ${periodLabel} · ${assets.entries.length} colaboradores`,
-      react: PayrollExportReadyEmail({
+    const result = await sendEmail({
+      emailType: 'payroll_export',
+      domain: 'payroll',
+      context: {
         periodLabel,
         entryCount: assets.entries.length,
         breakdowns,
         netTotalDisplay,
-        exportedBy: actorEmail,
-        exportedAt
-      }),
-      text: [
-        `NÓMINA — ${periodLabel.toUpperCase()}`,
-        '═══════════════════',
-        '',
-        'Nómina cerrada y lista para revisión.',
-        '',
-        `Colaboradores: ${assets.entries.length}`,
-        '',
-        ...breakdowns.flatMap(b => [
-          `${b.regimeLabel} (${b.currency})`,
-          `  Bruto:  ${b.grossTotal}`,
-          `  Neto:   ${b.netTotal}`,
-          ''
-        ]),
-        '───────────────────',
-        'ADJUNTOS',
-        '• Reporte de nómina (PDF) — resumen por colaborador',
-        '• Detalle de nómina (CSV) — desglose completo para contabilidad',
-        '',
-        actorEmail ? `Exportado por ${actorEmail} · ${exportedAt}` : `Exportado: ${exportedAt}`,
-        '',
-        '→ Ver nómina en Greenhouse:',
-        `  ${APP_URL}/hr/payroll`,
-        '',
-        '— Greenhouse by Efeonce Group'
-      ].join('\n'),
+        exportedBy: actorEmail ?? null,
+        exportedAt: new Date().toISOString()
+      },
       attachments: [
         {
           filename: buildPayrollExportArtifactFilename(periodId, 'pdf'),
-          content: assets.pdfBuffer.toString('base64'),
+          content: assets.pdfBuffer,
           contentType: 'application/pdf'
         },
         {
           filename: buildPayrollExportArtifactFilename(periodId, 'csv'),
-          content: assets.csvBuffer.toString('base64'),
+          content: assets.csvBuffer,
           contentType: 'text/csv; charset=utf-8'
         }
-      ]
-    } as any)
+      ],
+      sourceEntity: periodId,
+      actorEmail: actorEmail ?? undefined
+    })
 
-    const deliveryId = result?.data?.id ?? null
+    if (result.status === 'sent') {
+      await recordPayrollExportPackageDelivery({
+        periodId,
+        deliveryStatus: 'sent',
+        deliveryAttemptsDelta: 1,
+        lastSentAt: new Date().toISOString(),
+        lastSentBy: actorEmail ?? null,
+        lastEmailDeliveryId: result.resendId,
+        lastSendError: null
+      })
+
+      return result.resendId
+    }
 
     await recordPayrollExportPackageDelivery({
       periodId,
-      deliveryStatus: 'sent',
-      deliveryAttemptsDelta: 1,
-      lastSentAt: new Date().toISOString(),
+      deliveryStatus: 'failed',
+      deliveryAttemptsDelta: result.status === 'failed' ? 1 : 0,
+      lastSentAt: null,
       lastSentBy: actorEmail ?? null,
-      lastEmailDeliveryId: deliveryId,
-      lastSendError: null
+      lastEmailDeliveryId: null,
+      lastSendError: result.error ?? 'Email delivery skipped.'
     })
 
-    return deliveryId
+    return null
   } catch (error) {
     await recordPayrollExportPackageDelivery({
       periodId,

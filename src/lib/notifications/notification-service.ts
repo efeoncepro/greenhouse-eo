@@ -2,7 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getCategoryConfig, type NotificationChannel } from '@/config/notification-categories'
-import { isResendConfigured, getResendClient, getEmailFromAddress } from '@/lib/resend'
+import { sendEmail } from '@/lib/email/delivery'
+import type { SendEmailResult } from '@/lib/email/types'
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -92,9 +93,18 @@ export class NotificationService {
       // ── Email channel ──
       if (channels.includes('email') && recipient.email) {
         try {
-          await this.sendEmailNotification(input, recipient)
-          sentChannels.push('email')
-          await this.logDispatch(null, recipient.userId, input.category, 'email', 'sent')
+          const emailResult = await this.sendEmailNotification(input, recipient)
+
+          if (emailResult.status === 'sent') {
+            sentChannels.push('email')
+            await this.logDispatch(null, recipient.userId, input.category, 'email', 'sent')
+          } else if (emailResult.status === 'skipped') {
+            result.skipped.push({ userId: recipient.userId, reason: emailResult.error || 'email_delivery_skipped' })
+            await this.logDispatch(null, recipient.userId, input.category, 'email', 'skipped', emailResult.error || 'email_delivery_skipped')
+          } else {
+            result.failed.push({ userId: recipient.userId, channel: 'email', error: emailResult.error || 'Email delivery failed' })
+            await this.logDispatch(null, recipient.userId, input.category, 'email', 'failed', undefined, emailResult.error || 'Email delivery failed')
+          }
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
@@ -171,24 +181,32 @@ export class NotificationService {
   private static async sendEmailNotification(
     input: DispatchInput,
     recipient: { userId: string; email?: string; fullName?: string }
-  ): Promise<void> {
-    if (!isResendConfigured() || !recipient.email) return
+  ): Promise<SendEmailResult> {
+    if (!recipient.email) {
+      return {
+        deliveryId: 'skipped',
+        resendId: null,
+        status: 'skipped' as const,
+        error: 'email_not_provided'
+      }
+    }
 
-    const resend = getResendClient()
-
-    await resend.emails.send({
-      from: getEmailFromAddress(),
-      to: recipient.email,
-      subject: input.title,
-      text: [
-        recipient.fullName ? `Hola ${recipient.fullName},` : 'Hola,',
-        '',
-        input.body || input.title,
-        '',
-        input.actionUrl ? `Ver más: ${input.actionUrl}` : '',
-        '',
-        '— Greenhouse by Efeonce Group'
-      ].filter(Boolean).join('\n')
+    return sendEmail({
+      emailType: 'notification',
+      domain: 'system',
+      recipients: [{
+        userId: recipient.userId,
+        email: recipient.email,
+        name: recipient.fullName
+      }],
+      context: {
+        title: input.title,
+        body: input.body,
+        actionUrl: input.actionUrl,
+        actionLabel: input.actionUrl ? 'Ver en Greenhouse' : undefined,
+        recipientName: recipient.fullName
+      },
+      sourceEntity: input.category
     })
   }
 

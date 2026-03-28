@@ -4,11 +4,8 @@ import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
-import { logEmail } from '@/lib/email-log'
+import { sendEmail } from '@/lib/email/delivery'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
-import { resend, EMAIL_FROM } from '@/lib/resend'
-
-import InvitationEmail from '@/emails/InvitationEmail'
 
 export async function POST(request: Request) {
   try {
@@ -89,33 +86,26 @@ export async function POST(request: Request) {
 
     const clientName = clients[0]?.display_name || 'Greenhouse'
 
-    try {
-      const result = await resend.emails.send({
-        from: EMAIL_FROM,
-        to: normalizedEmail,
-        subject: 'Te invitaron a Greenhouse — Efeonce',
-        react: InvitationEmail({ inviteUrl, inviterName, clientName, userName: full_name })
-      })
+    const delivery = await sendEmail({
+      emailType: 'invitation',
+      domain: 'identity',
+      recipients: [{
+        email: normalizedEmail,
+        userId,
+        name: full_name
+      }],
+      context: {
+        inviteUrl,
+        inviterName,
+        clientName,
+        userName: full_name
+      },
+      sourceEntity: 'client_users',
+      actorEmail: session.user.email || undefined
+    })
 
-      await logEmail({
-        email_to: normalizedEmail,
-        email_type: 'invitation',
-        user_id: userId,
-        client_id,
-        status: 'sent',
-        resend_id: result.data?.id
-      })
-    } catch (err) {
-      console.error('[admin/invite] Resend error:', err)
-
-      await logEmail({
-        email_to: normalizedEmail,
-        email_type: 'invitation',
-        user_id: userId,
-        client_id,
-        status: 'failed',
-        error_message: err instanceof Error ? err.message : 'Unknown error'
-      })
+    if (delivery.status === 'failed') {
+      console.error('[admin/invite] Email delivery failed:', delivery.error)
     }
 
     return NextResponse.json({ success: true, userId, message: `Invitación enviada a ${normalizedEmail}` })
