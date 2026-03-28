@@ -48,6 +48,8 @@
     "clear": "node scripts/clean-paths.mjs node_modules .next-local .next"
   },
   "dependencies": {
+    "@assistant-ui/react": "^0.12.21",
+    "@assistant-ui/react-markdown": "^0.12.7",
     "@emoji-mart/data": "1.2.1",
     "@emoji-mart/react": "1.1.1",
     "@emotion/cache": "11.14.0",
