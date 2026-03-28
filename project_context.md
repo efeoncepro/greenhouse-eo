@@ -8,6 +8,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.
 - La migration operativa quedó disponible en `scripts/migrations/add-chile-afp-breakdown.sql`.
 
+## Delta 2026-03-28 Employer legal identity
+- La razón social canónica de la organización operativa propietaria de Greenhouse es `Efeonce Group SpA`.
+- El RUT canónico es `77.357.182-1`.
+- La dirección legal canónica es `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+- Estos datos deben reutilizarse en liquidaciones, recibos, exportes legales, Finance y surfaces comerciales como identidad de la organización/empleador, no como dato de persona ni como identidad de cliente.
+
 ## Delta 2026-03-28 Chile employer cost base
 - `Payroll Chile` ya calcula un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) y lo persiste junto a las entries.
 - `member_capacity_economics.total_labor_cost_target` absorbe ese breakdown para que Cost Intelligence pueda ver el costo laboral cargado real sin inventar otra proyección.

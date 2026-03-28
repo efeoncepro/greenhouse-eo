@@ -7,6 +7,10 @@
 
 ## 2026-03-28
 
+### Organization legal identity canonical
+- La identidad legal canónica de la organización operativa propietaria de Greenhouse quedó documentada de forma transversal para Payroll, Finance y surfaces comerciales: `Efeonce Group SpA`, RUT `77.357.182-1`, dirección `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+- La referencia canónica se asentó en la arquitectura de Account 360 / organización y en el contexto vivo del repo para evitar duplicación por módulo.
+
 ### Chile employer cost base
 - `Payroll Chile` ahora calcula y persiste un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) junto a cada `payroll_entry`.
 - La proyección canónica `member_capacity_economics` absorbe ese breakdown para que `total_labor_cost_target` refleje el costo laboral cargado real sin crear otra capa de cálculo.

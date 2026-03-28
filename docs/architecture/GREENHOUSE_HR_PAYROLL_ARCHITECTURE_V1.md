@@ -77,6 +77,20 @@ Regla arquitectónica:
 - `member_capacity_economics.total_labor_cost_target` puede absorber esos costos empleador reales para que Cost Intelligence vea el costo laboral cargado canónico
 - la propagación sigue ocurriendo por `compensation_version.created/updated` y `payroll_entry.upserted`; no se introduce un evento nuevo solo para el desglose
 
+## 2.4. Employer legal identity for Chile payroll
+
+La identidad legal del empleador usada por `Payroll Chile` para encabezados, liquidaciones y documentos legales es:
+
+- Razón social: `Efeonce Group SpA`
+- RUT: `77.357.182-1`
+- Dirección: `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`
+
+Regla arquitectónica:
+
+- esta identidad pertenece al empleador/tenant, no al colaborador
+- se debe reutilizar de forma consistente en liquidaciones, recibos, exportes y superficies legales de Payroll Chile
+- si cambia la razón social o la dirección, el cambio debe venir desde la capa canónica de empresa/tenant y no desde una compensación individual
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

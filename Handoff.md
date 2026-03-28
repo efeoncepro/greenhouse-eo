@@ -49,6 +49,76 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:48 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Registrar la identidad legal canónica de la organización operativa propietaria de Greenhouse para reutilización cruzada: `Efeonce Group SpA`, RUT `77.357.182-1`, dirección `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `project_context.md`
+- `docs/tasks/complete/TASK-076-payroll-chile-liquidacion-parity.md`
+
+### Verificacion
+
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- Este dato debe reutilizarse como identidad de la organización/empleador en Payroll, Finance y surfaces comerciales.
+- Si cambia, debe actualizarse desde la capa canónica de organización, no por compensación individual.
+
+## 2026-03-28 04:41 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar formalmente `TASK-076` después de completar la paridad legal de Payroll Chile y alinear `README` + registry con el estado real.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-076-payroll-chile-liquidacion-parity.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm build`
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- `TASK-076` ya no debe tratarse como trabajo abierto; el siguiente paso natural en la cadena es `TASK-077` una vez que se quiera arrancar recibos.
+- `TASK-078` sigue siendo lane activa y no debe mezclarse con este cierre documental.
+
 ## 2026-03-28 04:28 -03
 
 ### Agente

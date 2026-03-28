@@ -9,6 +9,10 @@
 - Si se quiere seguir ampliando esta task, el trabajo restante sería de exposición/consumo en surfaces oficiales y no de creación del modelo.
 
 ## Delta 2026-03-28
+- La identidad legal de la organización operativa propietaria de Greenhouse quedó documentada como `Efeonce Group SpA`, RUT `77.357.182-1`, dirección `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+- Ese dato debe reutilizarse como identidad canónica de la organización/empleador en superficies legales, no como campo suelto por persona ni como identidad de cliente.
+
+## Delta 2026-03-28
 - El desglose de Isapre quedó implementado en el motor y persistencia de Payroll Chile: `chile_health_amount` sigue como total del plan, pero ahora se calculan y almacenan `chile_health_obligatoria_amount` y `chile_health_voluntaria_amount` para liquidación y exportes.
 - La proyección canónica `member_capacity_economics` ya puede absorber el costo empleador de Chile desde `payroll_entries`, reutilizando la capa de Cost Intelligence existente en vez de crear un store paralelo.
 - El siguiente gap real de este task, si se quiere seguir cerrando paridad legal completa, es exponer/usar ese breakdown de costos empleador en las surfaces de consumo apropiadas.
@@ -48,11 +52,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `En progreso` |
+| Status real | `Cerrada` |
 | Rank | 2 de 4 (ejecutar después de TASK-078, antes de TASK-077 y TASK-079) |
 | Domain | HR Payroll |
 
@@ -337,17 +341,17 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 
 ## Acceptance Criteria
 
-- [ ] Gratificación legal se calcula automáticamente con modo `mensual_25pct` y tope 4.75 IMM
-- [ ] Base imponible incluye gratificación legal
-- [ ] Colación y movilización se modelan como haberes no imponibles y se suman al líquido
-- [ ] AFP se desglosa en cotización obligatoria + comisión
-- [ ] Isapre se desglosa en cotización obligatoria (7%) + voluntaria (excedente)
+- [x] Gratificación legal se calcula automáticamente con modo `mensual_25pct` y tope 4.75 IMM
+- [x] Base imponible incluye gratificación legal
+- [x] Colación y movilización se modelan como haberes no imponibles y se suman al líquido
+- [x] AFP se desglosa en cotización obligatoria + comisión
+- [x] Isapre se desglosa en cotización obligatoria (7%) + voluntaria (excedente)
 - [x] Costos empleador (SIS, cesantía, mutual) se calculan y almacenan
 - [x] RUT y datos bancarios modelados en members
-- [ ] Para Valentina Hoyos con los mismos inputs, Greenhouse produce líquido = $595,656
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
-- [ ] Tests de cálculo cubren: gratificación con tope, colación+movilización en neto, AFP desglosada, isapre desglosada, costos empleador
+- [x] Para Valentina Hoyos con los mismos inputs, Greenhouse produce líquido = $595,656
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
+- [x] Tests de cálculo cubren: gratificación con tope, colación+movilización en neto, AFP desglosada, isapre desglosada, costos empleador
 
 ## Verification
 

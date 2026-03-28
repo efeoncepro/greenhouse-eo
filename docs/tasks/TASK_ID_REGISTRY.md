@@ -93,7 +93,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-075` | `complete` | Projected Payroll UX Polish | `docs/tasks/complete/TASK-075-projected-payroll-ux-polish.md` |
 
-| `TASK-076` | `in-progress` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/in-progress/TASK-076-payroll-chile-liquidacion-parity.md` |
+| `TASK-076` | `complete` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/complete/TASK-076-payroll-chile-liquidacion-parity.md` |
 
 | `TASK-077` | `to-do` | Payroll Receipt Generation & Delivery | `docs/tasks/to-do/TASK-077-payroll-receipt-generation-delivery.md` |
 
