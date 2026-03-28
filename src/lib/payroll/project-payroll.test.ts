@@ -29,6 +29,40 @@ vi.mock('@/lib/finance/economic-indicators', () => ({
   getHistoricalEconomicIndicatorForPeriod: (...args: unknown[]) => mockGetHistoricalEconomicIndicatorForPeriod(...args)
 }))
 
+vi.mock('@/lib/payroll/chile-previsional-helpers', () => ({
+  resolveChileAfpSplitRates: ({ totalRate }: { totalRate: number }) => ({
+    cotizacionRate: totalRate * 0.8,
+    comisionRate: totalRate * 0.2
+  }),
+  resolveChileHealthSplitAmounts: ({ healthAmount }: { healthAmount: number }) => ({
+    mandatoryHealthAmount: healthAmount,
+    excessHealthAmount: 0,
+    totalHealthAmount: healthAmount
+  }),
+  resolveChileEmployerCostAmounts: vi.fn().mockResolvedValue({
+    sisAmount: 0,
+    employerUnemploymentAmount: 0,
+    mutualAmount: 0,
+    totalEmployerCost: 0
+  }),
+  getImmForPeriod: vi.fn().mockResolvedValue(539000),
+  getSisRate: vi.fn().mockResolvedValue(0.0154),
+  getTopeAfpForPeriod: vi.fn().mockResolvedValue(90.3),
+  getTopeCesantiaForPeriod: vi.fn().mockResolvedValue(135.5),
+  getChileAfpRatesForPeriod: vi.fn().mockResolvedValue([
+    { afpCode: 'habitat', afpName: 'Habitat', totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01 }
+  ]),
+  getAfpRateForCode: vi.fn().mockResolvedValue({ totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01, afpName: 'Habitat' }),
+  getUnemploymentRateForPeriod: vi.fn().mockResolvedValue(0.006),
+  resolveChileAfpRateForCompensation: vi.fn().mockResolvedValue({ totalRate: 0.1127, afpName: 'Habitat' }),
+  resolveChileAfpRateSplitForCompensation: vi.fn().mockResolvedValue({
+    totalRate: 0.1127,
+    cotizacionRate: 0.1027,
+    comisionRate: 0.01,
+    afpName: 'Habitat'
+  })
+}))
+
 import { projectPayrollForPeriod } from './project-payroll'
 
 const baseCompensation = {

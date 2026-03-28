@@ -67,7 +67,7 @@ describe('CompensationDrawer', () => {
 
     expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument()
     expect(
-      screen.getByText('Si mantienes esta fecha, actualizarás la compensación vigente.')
+      screen.getByText('Misma fecha = actualiza vigente')
     ).toBeInTheDocument()
   })
 
@@ -89,7 +89,7 @@ describe('CompensationDrawer', () => {
 
     expect(screen.getByRole('button', { name: 'Crear nueva versión' })).toBeInTheDocument()
     expect(
-      screen.getByText('Si cambias la fecha, se creará una nueva versión desde esa vigencia.')
+      screen.getByText('Nueva fecha = nueva versión')
     ).toBeInTheDocument()
   })
 
@@ -110,7 +110,7 @@ describe('CompensationDrawer', () => {
     fireEvent.change(screen.getByLabelText('Nombre bono fijo'), {
       target: { value: 'Bono guardia' }
     })
-    fireEvent.change(screen.getByLabelText('Monto bono fijo'), {
+    fireEvent.change(screen.getByLabelText('Monto'), {
       target: { value: '220' }
     })
     fireEvent.change(screen.getByLabelText('Motivo del cambio *'), {
