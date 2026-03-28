@@ -139,10 +139,10 @@ Reglas obligatorias:
 - [x] el resultado del reverse reproduce el líquido deseado con tolerancia de `±$1 CLP`
 - [x] la UI de compensación puede mostrar un preview por líquido deseado
 - [x] tests cubren Fonasa, Isapre, APV, gratificación y tramos tributarios
-- [ ] `desired_net_clp` persistido en `compensation_versions` para trazabilidad
-- [ ] AFP rate sincronizada desde Previred al guardar (no solo en preview)
-- [ ] round-trip check forward vs reverse al guardar
-- [ ] base salary protegido en modo reverse (no editable manualmente)
+- [x] `desired_net_clp` persistido en `compensation_versions` para trazabilidad
+- [x] AFP rate sincronizada desde Previred al guardar (no solo en preview)
+- [ ] round-trip check forward vs reverse al guardar (nice-to-have)
+- [x] base salary protegido en modo reverse (display chip, no editable)
 
 ## Verification
 
