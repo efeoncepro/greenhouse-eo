@@ -49,6 +49,43 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 11:36 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Reservar y documentar dos lanes nuevas para cerrar la semántica operativa de Payroll sin mezclarla con la lógica de calendario:
+  - `TASK-091` para una utilidad canónica de calendario operativo
+  - `TASK-092` para la semántica de período actual/historial/cards en Payroll
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/to-do/TASK-091-greenhouse-operational-calendar-utility.md`
+- `docs/tasks/to-do/TASK-092-payroll-operational-current-period-semantics.md`
+
+### Verificacion
+
+- `git diff --check` -> pass
+- no se ejecutaron tests ni build porque esta ronda fue solo documental
+
+### Riesgos o pendientes
+
+- `TASK-092` depende explícitamente de `TASK-091`; conviene implementar primero la utilidad base antes de ajustar la selección de período.
+- El runtime de Payroll sigue con la semántica previa hasta que esas lanes se implementen.
+
 ## 2026-03-28 11:17 -03
 
 ### Agente

@@ -7,6 +7,10 @@
 
 ## 2026-03-28
 
+### Payroll operational calendar and current-period semantics split into separate lanes
+- Se reservaron `TASK-091` y `TASK-092` para separar la utilidad canónica de calendario operativo de la semántica de período actual en Payroll.
+- No hubo cambio de runtime en esta vuelta; el ajuste quedó explícitamente como backlog y documentación viva.
+
 ### TASK-089 Payroll UX semantics and feedback hardened
 - El dashboard de Payroll separa ahora período activo e histórico seleccionado, evitando que un clic en historial reemplace el contexto del período abierto.
 - `Payroll History`, `Payroll Period`, `Mi Nómina`, `People > Nómina` y `Payroll Proyectada` ganaron affordances, copy y estados de error/retry más explícitos.
@@ -717,7 +721,7 @@
 ### Bootstrap registry for TASK-001 to TASK-010 added
 
 - Se agregó `docs/tasks/TASK_ID_REGISTRY.md` para reservar el primer bloque estable `TASK-001..010` sobre la lane activa y el backlog abierto más prioritario.
-- `docs/tasks/README.md` ahora refleja esos IDs bootstrap y deja `TASK-011` como siguiente ID disponible.
+- `docs/tasks/README.md` ahora refleja esos IDs bootstrap y deja `TASK-093` como siguiente ID disponible.
 
 ### GitHub Project and bootstrap issues created
 

@@ -3,6 +3,14 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll operational calendar / current-period semantics split
+- La semántica operativa de Payroll quedó partida en dos lanes explícitas para evitar mezclar calendario y UI:
+  - `TASK-091` para una utilidad canónica de calendario operativo
+  - `TASK-092` para la lectura de período actual, historial y cards KPI en `/hr/payroll`
+- Regla operativa derivada:
+  - el runtime actual aún no cambia; la semántica de período vigente seguirá siendo la previa hasta que ambas tasks se implementen
+  - el helper temporal no debe seguir creciendo dentro de la vista de Payroll si el contrato se reutiliza en otros dominios
+
 ## Delta 2026-03-28 Payroll UX semantics and feedback hardening
 - `TASK-089` cerró el endurecimiento de UX de Payroll sin alterar el dominio de cálculo:
   - el dashboard separa período activo e histórico seleccionado
