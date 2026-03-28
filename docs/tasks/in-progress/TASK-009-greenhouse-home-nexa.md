@@ -469,12 +469,105 @@ Agregar datos operativos reales al `getHomeSnapshot()`:
 
 Este slice no bloquea la reactivacion — se puede hacer despues.
 
-### Orden de ejecucion recomendado
+#### Slice E — Migrar NexaPanel a assistant-ui
 
-1. Slice A (corregir freeze) → deploy a staging → probar `/home` manualmente
-2. Slice B (hardening Nexa) → deploy
-3. Slice C (navegacion + rollout) → deploy → Home es la landing default
-4. Slice D (enriquecer) → iterativo
+**Dependencia:** `@assistant-ui/react`, `@assistant-ui/react-markdown`
+
+**Contexto:** El `NexaPanel` actual (180 lineas) implementa a mano: estado de mensajes, scroll, abort, retry, input, loading indicator, suggestion chips. La libreria `assistant-ui` (50k+ descargas/mes, YC-backed) resuelve todo eso con primitivos composables, ademas de agregar: streaming nativo, markdown rendering, auto-scroll inteligente, retry/cancel/edit por mensaje, keyboard shortcuts, y ARIA completo.
+
+**Evaluacion de compatibilidad:**
+
+| Dimension | Estado |
+|-----------|--------|
+| React 19 / Next.js 16 | Compatible (docs muestran React 19 support) |
+| MUI coexistencia | OK — assistant-ui expone primitivos sin estilo (`ThreadPrimitive`, `MessagePrimitive`, `ComposerPrimitive`) que se wrappean con cualquier styling |
+| Tailwind | Ya lo usamos en el portal — NexaPanel actual usa clases Tailwind extensivamente |
+| Backend custom | `LocalRuntime` con `ChatModelAdapter` apunta a `/api/home/nexa` existente — el backend no cambia |
+| Streaming | Opcional — funciona sin streaming (respuesta completa), pero la UX mejora significativamente con streaming |
+
+**Runtime seleccionado: `LocalRuntime`**
+
+assistant-ui maneja el estado internamente. Solo necesitamos un adapter que haga fetch a nuestro endpoint:
+
+```typescript
+const nexaAdapter: ChatModelAdapter = {
+  async run({ messages, abortSignal }) {
+    const lastMessage = messages[messages.length - 1]
+    const prompt = lastMessage.content.filter(c => c.type === 'text').map(c => c.text).join('')
+    const history = messages.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content.filter(c => c.type === 'text').map(c => c.text).join('')
+    }))
+
+    const res = await fetch('/api/home/nexa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, history }),
+      signal: abortSignal
+    })
+
+    const data = await res.json()
+
+    return { content: [{ type: 'text', text: data.content }] }
+  }
+}
+```
+
+**Lo que reemplaza vs lo que se mantiene:**
+
+| Componente actual | Reemplazo assistant-ui |
+|-------------------|----------------------|
+| `useState<NexaMessage[]>` manual | `LocalRuntime` state management |
+| `fetch` con `AbortSignal.timeout` manual (F4) | `abortSignal` nativo del adapter |
+| `messages.slice(-10)` manual (F7) | Configurable en el adapter |
+| `useEffect` scroll en `[messages]` (F8) | Auto-scroll inteligente built-in |
+| `CircularProgress` loading | Typing indicator built-in |
+| `Chip` suggestion chips | Se mantienen (UI custom fuera del chat) |
+| Error catch → mensaje de error | Retry button built-in por mensaje |
+| `NexaBoundary` error boundary (F6) | Se mantiene como safety net externo |
+
+**Ganancia neta:** NexaPanel pasa de ~180 lineas a ~60, eliminando 3 fixes manuales (F4, F7, F8) y ganando streaming, markdown, retry, cancel, edit, y accessibility ARIA completa.
+
+**Archivos afectados:**
+
+| Archivo | Cambio |
+|---------|--------|
+| `package.json` | `pnpm add @assistant-ui/react @assistant-ui/react-markdown` |
+| `src/views/greenhouse/home/components/NexaPanel.tsx` | Reescribir con `LocalRuntime` + `ChatModelAdapter` + primitivos assistant-ui |
+| `src/app/api/home/nexa/route.ts` | Sin cambios (o migrar a streaming con `ReadableStream` para UX optima) |
+| `src/lib/nexa/nexa-service.ts` | Sin cambios (o agregar `generateStream()` si se habilita streaming) |
+
+**Fase opcional: streaming**
+
+Si se habilita streaming, `NexaService.generateStream()` devuelve un `ReadableStream` y el adapter usa `async *run()` (generator) en vez de `async run()`. Esto permite que Nexa "escriba" la respuesta en tiempo real. No es blocker — assistant-ui funciona con respuestas completas tambien.
+
+#### Slice D — Enriquecer snapshot (posterior)
+
+Agregar datos operativos reales al `getHomeSnapshot()`:
+- Periodo de nomina actual (status, headcount) desde `payroll_periods`
+- Facturas pendientes de cobro (aging) desde `fin_income`
+- OTD global del mes desde `ico_organization_metrics`
+- Correos fallidos desde `email_deliveries`
+
+Este slice no bloquea la reactivacion — se puede hacer despues.
+
+### Orden de ejecucion
+
+1. ~~Slice A (corregir freeze)~~ → **Completado 2026-03-28** (commit `1d4fbd2`)
+2. ~~Slice B (hardening Nexa)~~ → **Completado 2026-03-28** (commit `1d4fbd2`)
+3. Slice C (navegacion + rollout) → **Pendiente** — requiere validacion manual en staging primero
+4. Slice E (assistant-ui) → **Pendiente** — mejora de UX, no blocker
+5. Slice D (enriquecer snapshot) → **Pendiente** — iterativo
+
+### Validacion pre-rollout (Slice C)
+
+Antes de habilitar `/home` como landing:
+1. Deploy Slice A+B a staging (ya hecho)
+2. Navegar a `dev-greenhouse.efeoncepro.com/home` manualmente
+3. Verificar: greeting carga, modules grid aparece, NexaPanel no congela
+4. Si tasks estan vacias (notifications table vacia), es esperado — no es error
+5. Probar chat de Nexa: enviar un mensaje, verificar respuesta
+6. Si todo OK: aplicar Slice C (quitar redirect, mover Control Tower, cambiar portalHomePath)
 
 ### Decision de navegacion post-reactivacion
 
