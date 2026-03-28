@@ -101,10 +101,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-079` | `to-do` | Payroll Chile: Reverse Calculation Engine | `docs/tasks/to-do/TASK-079-payroll-chile-reverse-calculation-engine.md` |
 
 | `TASK-080` | `complete` | ICO Person Intelligence Frontend + Event Wiring | `docs/tasks/complete/TASK-080-ico-person-intelligence-frontend.md` |
+| `TASK-081` | `to-do` | Organization Legal Entity Canonicalization | `docs/tasks/to-do/TASK-081-organization-legal-entity-canonicalization.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-081`
+- `TASK-082`
 
 ## Regla de asignacion desde aqui
 

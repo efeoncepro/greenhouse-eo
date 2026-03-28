@@ -49,6 +49,41 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Abrir la lane de definición canónica de la entidad legal propietaria de Greenhouse como `TASK-081`, para resolver semántica persistida y consumers sin usar `business_unit` ni strings hardcoded.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-081-organization-legal-entity-canonicalization.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- La definición final del nombre semántico de la entidad (`legal_entity` vs `operating_entity` vs extensión de `organizations`) queda para la implementación de la task.
+- Payroll, Finance y receipts deberán consumir la identidad desde una helper canónica cuando esta lane avance.
+
 ## 2026-03-28 04:48 -03
 
 ### Agente

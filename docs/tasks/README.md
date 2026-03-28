@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-080`
+- siguiente ID disponible: `TASK-082`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -128,6 +128,7 @@ Primer bloque operativo asignado:
 | 38 | `TASK-050` | [TASK-050-finance-client-canonical-runtime-cutover.md](to-do/TASK-050-finance-client-canonical-runtime-cutover.md) | P1 | Muy alto | Alto | Diseño | Cortar `Finance Clients` al grafo canónico actual del portal y sacar el request path principal del runtime legacy en BigQuery |
 | 39 | `TASK-051` | [TASK-051-finance-payroll-bridge-postgres-alignment.md](to-do/TASK-051-finance-payroll-bridge-postgres-alignment.md) | P1 | Muy alto | Medio | Diseño | Alinear todos los reads Finance dependientes de Payroll al schema canónico `greenhouse_payroll` y corregir paths híbridos o erróneos |
 | 40 | `TASK-052` | [TASK-052-person-360-finance-access-alignment.md](to-do/TASK-052-person-360-finance-access-alignment.md) | P1 | Alto | Medio | Diseño | Permitir a Finance consumir la ficha financiera por persona dentro de `Person 360` sin sobreexponer el resto de tabs |
+| 41 | `TASK-081` | [TASK-081-organization-legal-entity-canonicalization.md](to-do/TASK-081-organization-legal-entity-canonicalization.md) | P1 | Alto | Medio | Diseño | Definir y persistir la entidad legal de Efeonce como org propietaria del sistema, con helper reusable para Payroll/Finance y surfaces legales |
 
 ### Briefs Históricos o de Producto
 
