@@ -46,6 +46,8 @@ type ReverseQuoteResult = {
   employerTotalCost: number | null
   isapreExcess: number | null
   netAfterIsapre: number | null
+  belowImm: boolean
+  immValue: number | null
   forward: {
     grossTotal: number
     chileGratificacionLegalAmount: number | null
@@ -370,7 +372,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     type='number'
                     value={desiredNet || ''}
                     onChange={e => setDesiredNet(Number(e.target.value))}
-                    helperText='Monto que el colaborador recibirá en su cuenta'
+                    helperText='Neto antes de deducciones voluntarias (Isapre, APV)'
                     data-testid='desired-net-input'
                     slotProps={{
                       input: {
@@ -415,7 +417,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       {reverseResult.isapreExcess != null && reverseResult.isapreExcess > 0 && (
                         <>
                           <Row label='Excedente Isapre' value={fmtCLP(reverseResult.isapreExcess)} negative />
-                          <Row label='Alcance líquido' value={fmtCLP(reverseResult.netAfterIsapre)} bold />
+                          <Row label='Líquido a pagar' value={fmtCLP(reverseResult.netAfterIsapre)} bold />
                         </>
                       )}
                       {reverseResult.employerTotalCost != null && reverseResult.employerTotalCost > 0 && (
@@ -428,6 +430,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                 {reverseMode && reverseResult && !reverseResult.converged && (
                   <Alert severity='warning' variant='outlined'>
                     No se pudo converger a una solución exacta. Diferencia: {fmtCLP(reverseResult.netDifferenceCLP)}
+                  </Alert>
+                )}
+
+                {reverseMode && reverseResult && reverseResult.converged && reverseResult.belowImm && (
+                  <Alert severity='error' variant='outlined'>
+                    El sueldo base calculado ({fmtCLP(reverseResult.baseSalary)}) es inferior al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). Aumente el líquido deseado.
                   </Alert>
                 )}
               </>

@@ -4,6 +4,7 @@ import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { parsePayrollNumber } from '@/lib/payroll/shared'
 import { computeGrossFromNet } from '@/lib/payroll/reverse-payroll'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { getImmForPeriod } from '@/lib/payroll/chile-previsional-helpers'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -38,15 +39,18 @@ export async function POST(request: Request) {
     const year = Number(periodDate.slice(0, 4))
     const month = Number(periodDate.slice(5, 7))
 
-    const [ufSnapshot, utmSnapshot] = await Promise.all([
+    const [ufSnapshot, utmSnapshot, immValue] = await Promise.all([
       getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UF', periodDate }),
-      getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UTM', periodDate })
+      getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UTM', periodDate }),
+      getImmForPeriod(periodDate)
     ])
 
-    // Reverse calculation always uses the LEGAL 7% health deduction (fonasa),
-    // not the member's actual Isapre plan. The "líquido deseado" represents net
-    // after mandatory deductions only. Isapre excess over 7% is a voluntary
-    // deduction that the employee opts into — it doesn't affect the base salary.
+    // Reverse calculation:
+    // - Uses LEGAL 7% health (fonasa), not the member's Isapre plan
+    // - Does NOT pass afpRate — lets the forward engine resolve it from Previred
+    // - Excludes voluntary deductions (APV, Isapre excess)
+    const afpName = typeof body.afpName === 'string' ? body.afpName : null
+
     const result = await computeGrossFromNet({
       desiredNetClp,
       periodDate,
@@ -60,8 +64,10 @@ export async function POST(request: Request) {
         body.gratificacionLegalMode === 'ninguna'
           ? body.gratificacionLegalMode
           : 'ninguna',
-      afpName: typeof body.afpName === 'string' ? body.afpName : null,
-      afpRate: parsePayrollNumber(body.afpRate, 'afpRate', { allowNull: true, min: 0, max: 1 }),
+      afpName,
+      afpRate: null,
+      afpCotizacionRate: null,
+      afpComisionRate: null,
       healthSystem: 'fonasa',
       healthPlanUf: null,
       contractType: body.contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
@@ -73,7 +79,10 @@ export async function POST(request: Request) {
       utmValue: utmSnapshot?.value ?? null
     })
 
-    // If the member has Isapre, compute the excess over the 7% legal obligation
+    // IMM floor check
+    const belowImm = typeof immValue === 'number' && immValue > 0 && result.baseSalary < immValue
+
+    // Isapre excess: compute difference between plan cost and 7% legal
     const actualHealthSystem = body.healthSystem === 'isapre' ? 'isapre' : 'fonasa'
     const actualHealthPlanUf = parsePayrollNumber(body.healthPlanUf, 'healthPlanUf', { allowNull: true, min: 0 })
     let isapreExcess: number | null = null
@@ -111,6 +120,8 @@ export async function POST(request: Request) {
       },
       isapreExcess,
       netAfterIsapre,
+      belowImm,
+      immValue: typeof immValue === 'number' ? immValue : null,
       indicators: {
         ufValue: ufSnapshot?.value ?? null,
         utmValue: utmSnapshot?.value ?? null,
