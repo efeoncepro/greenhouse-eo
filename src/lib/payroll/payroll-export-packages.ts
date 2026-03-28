@@ -240,9 +240,11 @@ export const sendPayrollExportReadyNotification = async (periodId: string, actor
   const periodLabel = `${monthName} ${assets.periodYear}`
   const breakdowns = buildBreakdowns(assets.entries)
   const netTotalDisplay = buildNetTotalDisplay(breakdowns)
+
   const exportedAt = new Date().toLocaleDateString('es-CL', {
     day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
   })
+
   const resend = getResendClient()
 
   try {

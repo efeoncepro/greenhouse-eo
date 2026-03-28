@@ -3,6 +3,11 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll export package auto-bootstrap
+- La capa de exportación de Payroll ahora materializa su propia tabla `greenhouse_payroll.payroll_export_packages` si el entorno de preview aún no la tiene aplicada.
+- El objetivo es evitar que `Reenviar correo` y la descarga de artefactos queden bloqueados por un schema ausente en deployments viejos o incompletos.
+- La migración canónica sigue siendo `scripts/migrations/add-payroll-export-packages.sql`; el runtime bootstrap solo actúa como red de seguridad operacional.
+
 ## Delta 2026-03-28 Payroll export actions UX hardening
 - `PayrollPeriodTab` ahora envuelve las acciones exportadas para que el CTA `Reenviar correo` no quede fuera de vista cuando el header tiene demasiados botones.
 - La descarga de PDF del período cambió de `window.open` a una descarga explícita por `fetch -> blob -> anchor`, con lo que el browser debe iniciar un archivo real y no una navegación dependiente del pop-up handling.

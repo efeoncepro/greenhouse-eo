@@ -49,6 +49,45 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 14:07 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Destrabar `Reenviar correo` de Payroll en preview aplicando autocreación del paquete de exportación cuando la tabla `greenhouse_payroll.payroll_export_packages` falta en la base.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- preview
+
+### Archivos tocados
+
+- `src/lib/payroll/payroll-export-packages-store.ts`
+- `src/lib/payroll/payroll-export-packages-store.test.ts`
+- `src/lib/payroll/payroll-export-packages.ts`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/payroll-export-packages-store.test.ts src/lib/payroll/payroll-export-packages.test.ts`
+- `pnpm exec eslint src/lib/payroll/payroll-export-packages-store.ts src/lib/payroll/payroll-export-packages-store.test.ts src/lib/payroll/payroll-export-packages.ts`
+- `pnpm build`
+- Resultado: todos pasaron
+
+### Riesgos o pendientes
+
+- La solución es un bootstrap defensivo para preview; la migración canónica sigue existiendo en `scripts/migrations/add-payroll-export-packages.sql`.
+- Si el runtime del entorno pierde permisos de creación sobre `greenhouse_payroll`, el bootstrap podría volver a fallar y habría que ejecutar la migración de forma administrativa.
+
 ## 2026-03-28 13:57 -03
 
 ### Agente

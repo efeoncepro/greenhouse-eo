@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll export package auto-bootstrap added
+- La capa de `payroll_export_packages` ahora materializa su propia tabla e índices si faltan en el entorno de preview antes de leer o persistir artefactos.
+- Esto destraba `Reenviar correo` en deployments que todavía no tenían aplicada la migración del paquete documental de exportación.
+- La migración canónica sigue viva en `scripts/migrations/add-payroll-export-packages.sql`; el bootstrap runtime solo evita que la UI quede bloqueada por un schema ausente.
+
 ### Payroll export actions made more discoverable
 - `PayrollPeriodTab` ahora deja envolver el bloque de acciones exportadas para que `Reenviar correo` no quede recortado en la cabecera cuando hay varias acciones en pantalla.
 - La descarga de PDF dejó de depender de `window.open` y ahora baja como archivo real vía `fetch -> blob -> anchor`, con copy explícito de descarga en la UI.
