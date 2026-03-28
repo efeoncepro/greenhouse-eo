@@ -3,15 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
-## Delta 2026-03-28 Reverse payroll engine (Slice 1)
-- `TASK-079` Slice 1 cerrado: `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`.
-- Algoritmo: binary search sobre el forward engine real (`calculatePayrollTotals` + `computeChileTax`), sin lógica paralela ni tablas duplicadas.
-- Convergencia garantizada en ~24 iteraciones con tolerancia de ±$1 CLP.
-- 10 golden tests cubren: Fonasa, Isapre, APV, gratificación mensual, plazo fijo, tramos tributarios altos, round-trip, sin impuesto, haberes no imponibles, salario bajo.
-- No se introdujeron nuevos eventos ni cambios de schema; el reverse es una capa computacional pura.
-- Regla operativa derivada:
-  - la UI de compensación puede invocar `computeGrossFromNet()` para ofrecer preview por líquido deseado (Slice 2)
-  - cuando el usuario acepte el resultado, se persiste como `compensation_version` normal y los eventos existentes (`compensation_version.created`) se disparan sin cambios
+## Delta 2026-03-28 Reverse payroll engine (Slices 1-2 validados)
+- `TASK-079` Slices 1-2 validados en staging contra liquidación real de Valentina Hoyos (Feb 2026).
+- Motor `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`: binary search sobre forward engine real, ±$1 CLP, 10 golden tests.
+- Reglas de negocio Chile validadas:
+  - **Líquido deseado = neto con descuentos legales solamente** (AFP + 7% salud + cesantía + impuesto). No incluye Isapre ni APV.
+  - **Excedente Isapre** mostrado aparte como deducción voluntaria. "Líquido a pagar" = líquido deseado - excedente.
+  - **Piso IMM**: el binary search arranca desde el Ingreso Mínimo Mensual ($539.000). Nunca calcula base inferior al mínimo legal.
+  - **AFP desde Previred**: la tasa AFP se resuelve del período (Previred sync), no de la compensación guardada.
+- Archivos: `reverse-payroll.ts`, `reverse-payroll.test.ts`, `reverse-quote/route.ts`, `CompensationDrawer.tsx`
+- Hardening pendiente (Slice 3): persistir `desired_net_clp` en `compensation_versions`, sincronizar AFP rate al guardar, round-trip check, auto changeReason.
+- No se introdujeron nuevos eventos ni cambios de schema (aún); el campo `desired_net_clp` requiere migration.
 
 ## Delta 2026-03-28 Reactive receipts projection log + queue fix
 - El ledger reactivo ahora es projection-aware: `greenhouse_sync.outbox_reactive_log` quedó keyeado por `(event_id, handler)` para que un handler no bloquee al resto de proyecciones del mismo evento.

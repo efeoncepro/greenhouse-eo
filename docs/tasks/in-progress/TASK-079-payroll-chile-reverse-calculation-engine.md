@@ -137,8 +137,12 @@ Reglas obligatorias:
 
 - [x] `computeGrossFromNet()` converge para casos base en menos de 50 iteraciones
 - [x] el resultado del reverse reproduce el líquido deseado con tolerancia de `±$1 CLP`
-- [ ] la UI de compensación puede mostrar un preview por líquido deseado
+- [x] la UI de compensación puede mostrar un preview por líquido deseado
 - [x] tests cubren Fonasa, Isapre, APV, gratificación y tramos tributarios
+- [ ] `desired_net_clp` persistido en `compensation_versions` para trazabilidad
+- [ ] AFP rate sincronizada desde Previred al guardar (no solo en preview)
+- [ ] round-trip check forward vs reverse al guardar
+- [ ] base salary protegido en modo reverse (no editable manualmente)
 
 ## Verification
 
@@ -146,6 +150,27 @@ Reglas obligatorias:
 - `pnpm test src/lib/payroll/reverse-payroll.test.ts`
 - `pnpm exec eslint src/lib/payroll/reverse-payroll.ts src/lib/payroll/reverse-payroll.test.ts src/views/greenhouse/payroll/CompensationDrawer.tsx`
 - validación manual con un caso real de liquidación
+
+## Delta 2026-03-28 Slices 1-2 validated on staging
+
+- Motor reverse validado contra liquidación real de Valentina Hoyos (Feb 2026, base IMM $539.000)
+- Reglas de negocio implementadas:
+  - Calcula con 7% salud legal (no Isapre completa); el excedente Isapre se muestra aparte
+  - Piso IMM: el binary search arranca desde el IMM, nunca calcula base inferior al mínimo legal
+  - AFP resuelta desde Previred para el período (no desde tasa almacenada en compensación)
+  - Preview muestra: líquido deseado, excedente Isapre, líquido a pagar, costo empleador
+- Archivos implementados:
+  - `src/lib/payroll/reverse-payroll.ts` — motor con `computeGrossFromNet()`, `minBaseSalary`, `clampedAtFloor`
+  - `src/lib/payroll/reverse-payroll.test.ts` — 10 golden tests
+  - `src/app/api/hr/payroll/compensation/reverse-quote/route.ts` — API con indicadores, IMM, Isapre excess
+  - `src/views/greenhouse/payroll/CompensationDrawer.tsx` — toggle, preview, UX copy
+- Pendiente para robustez (Slice 3 hardening):
+  1. Persistir `desired_net_clp` en `compensation_versions` para trazabilidad
+  2. Sincronizar AFP rate de Previred al drawer antes de guardar
+  3. Auto-fill `changeReason` con contexto reverse
+  4. Limpiar `desired_net_clp` si el usuario sale de reverse mode
+  5. Round-trip check forward vs reverse al guardar
+  6. Mostrar tasa AFP resuelta en preview
 
 ## Delta 2026-03-28 Slice 1 complete
 

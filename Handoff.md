@@ -49,6 +49,46 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 12:10 -03
+
+### Agente
+
+- Claude Code (Opus)
+
+### Objetivo del turno
+
+- Implementar y validar TASK-079 slices 1-2: motor reverse payroll Chile + preview en CompensationDrawer. Validación contra liquidación real de Valentina Hoyos (Feb 2026).
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging (dev-greenhouse.efeoncepro.com)
+
+### Archivos tocados
+
+- `src/lib/payroll/reverse-payroll.ts` — motor `computeGrossFromNet()` con binary search, piso IMM, `clampedAtFloor`
+- `src/lib/payroll/reverse-payroll.test.ts` — 10 golden tests
+- `src/app/api/hr/payroll/compensation/reverse-quote/route.ts` — API con indicadores, IMM, Isapre excess, AFP Previred
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx` — toggle reverse, preview desglose, líquido deseado + líquido a pagar
+
+### Verificacion
+
+- `pnpm test src/lib/payroll/reverse-payroll.test.ts` → 10/10 pass
+- `npx tsc --noEmit` → clean
+- `pnpm build` → OK
+- Staging: validado manualmente con Valentina Hoyos ($710.441 → base $539.658, líquido a pagar $596.874)
+
+### Riesgos o pendientes
+
+- Hardening pendiente: persistir `desired_net_clp`, sincronizar AFP Previred al guardar, round-trip check, auto changeReason, proteger base en reverse mode.
+- La diferencia de ~$658 entre base calculado y real se debe a tasa AFP Previred marzo vs febrero.
+- Siguiente paso: implementar los 6 items de hardening del Slice 3.
+
+---
+
 ## 2026-03-28 10:50 -03
 
 ### Agente
