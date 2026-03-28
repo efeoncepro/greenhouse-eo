@@ -26,13 +26,20 @@ type Props = {
 }
 
 const PayrollHistoryTab = ({ periods, selectedPeriodId, onSelectPeriod }: Props) => {
-  const closedPeriods = periods.filter(p => p.status === 'approved' || p.status === 'exported')
+  const approvedPeriods = periods.filter(p => p.status === 'approved')
+  const exportedPeriods = periods.filter(p => p.status === 'exported')
+  const closedPeriods = [...exportedPeriods, ...approvedPeriods]
 
   return (
     <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
       <CardHeader
         title='Historial de nóminas'
-        subheader={`${closedPeriods.length} período${closedPeriods.length !== 1 ? 's' : ''} cerrado${closedPeriods.length !== 1 ? 's' : ''}`}
+        subheader={[
+          `${exportedPeriods.length} período${exportedPeriods.length !== 1 ? 's' : ''} cerrado${exportedPeriods.length !== 1 ? 's' : ''}`,
+          approvedPeriods.length > 0
+            ? `${approvedPeriods.length} período${approvedPeriods.length !== 1 ? 's' : ''} aprobado${approvedPeriods.length !== 1 ? 's' : ''} en cierre`
+            : null
+        ].filter(Boolean).join(' · ')}
         avatar={
           <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
             <i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -79,13 +86,18 @@ const PayrollHistoryTab = ({ periods, selectedPeriodId, onSelectPeriod }: Props)
                       </Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        icon={<i className={status.icon} />}
-                        label={status.label}
-                        color={status.color === 'default' ? 'secondary' : status.color}
-                      />
+                      <Stack spacing={0.5} alignItems='center'>
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          icon={<i className={status.icon} />}
+                          label={status.label}
+                          color={status.color === 'default' ? 'secondary' : status.color}
+                        />
+                        <Typography variant='caption' color='text.secondary'>
+                          {period.status === 'approved' ? 'Pendiente de exportación' : 'Cierre final'}
+                        </Typography>
+                      </Stack>
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2' color='text.secondary'>

@@ -36,6 +36,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el runtime actual aún no cambia; la semántica de período vigente seguirá siendo la previa hasta que ambas tasks se implementen
   - el helper temporal no debe seguir creciendo dentro de la vista de Payroll si el contrato se reutiliza en otros dominios
 
+## Delta 2026-03-28 Payroll current-period semantics implementation started
+- `TASK-092` empezó a mover la lectura del período actual hacia el mes operativo vigente resuelto por la utility compartida.
+- `PayrollHistoryTab` dejó de contar `approved` como si fuera cierre final y ahora distingue `aprobado en cierre` de `cerrado/exportado`.
+- La selección temporal de `current-payroll-period` ahora busca el período del mes operativo vigente, no solo el último periodo no exportado.
+
+## Delta 2026-03-28 Payroll current-period semantics completed
+- `TASK-092` quedó cerrada con la semántica operativa de período actual y la distinción visual de historial entre cierres reales y aprobaciones aún en cierre.
+- El dashboard de Payroll mantiene KPI y copy atados al período activo, mientras el historial muestra los períodos aprobados en cierre como estado intermedio y los exportados como cierre final.
+
 ## Delta 2026-03-28 Payroll UX semantics and feedback hardening
 - `TASK-089` cerró el endurecimiento de UX de Payroll sin alterar el dominio de cálculo:
   - el dashboard separa período activo e histórico seleccionado

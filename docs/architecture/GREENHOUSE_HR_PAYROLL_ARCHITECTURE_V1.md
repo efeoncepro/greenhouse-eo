@@ -116,6 +116,7 @@ Regla operativa canónica para Efeonce:
 - la nómina de un mes se calcula al cierre de ese mes o dentro de los primeros 5 días hábiles del mes siguiente
 - `approved` sigue siendo un estado operativo válido solo mientras el período aún está dentro de su ventana de cierre
 - cuando el período ya fue exportado o la ventana de cierre terminó, la selección de "período actual" no debe retroceder a un período aprobado antiguo
+- la selección de "período actual" debe resolver el mes operativo vigente con la utilidad compartida y no basarse únicamente en el último período no exportado
 
 Esta regla define la semántica de negocio del dashboard, no solo su copy.
 

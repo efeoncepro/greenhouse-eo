@@ -42,22 +42,40 @@ describe('current-payroll-period helpers', () => {
     expect(sorted.map(period => period.periodId)).toEqual(['2026-04', '2026-02', '2025-12'])
   })
 
-  it('returns the latest period when it is still open', () => {
-    const current = getCurrentPayrollPeriod([
-      buildPeriod('2026-02', 'approved'),
-      buildPeriod('2026-03', 'draft')
-    ])
+  it('returns the matching operational month when it is still open', () => {
+    const current = getCurrentPayrollPeriod(
+      [
+        buildPeriod('2026-02', 'approved'),
+        buildPeriod('2026-03', 'draft')
+      ],
+      '2026-03-28T12:00:00.000Z'
+    )
 
     expect(current?.periodId).toBe('2026-03')
   })
 
-  it('returns null when the latest chronological period is exported', () => {
-    const current = getCurrentPayrollPeriod([
-      buildPeriod('2026-02', 'approved'),
-      buildPeriod('2026-03', 'exported')
-    ])
+  it('returns null when the current operational month is already exported, even if an earlier period remains approved', () => {
+    const current = getCurrentPayrollPeriod(
+      [
+        buildPeriod('2026-02', 'approved'),
+        buildPeriod('2026-03', 'exported')
+      ],
+      '2026-03-28T12:00:00.000Z'
+    )
 
     expect(current).toBeNull()
+  })
+
+  it('rolls back to the prior month while the close window is still open', () => {
+    const current = getCurrentPayrollPeriod(
+      [
+        buildPeriod('2026-02', 'approved'),
+        buildPeriod('2026-03', 'draft')
+      ],
+      '2026-04-08T02:00:00.000Z'
+    )
+
+    expect(current?.periodId).toBe('2026-03')
   })
 
   it('suggests the next period after the latest existing one', () => {

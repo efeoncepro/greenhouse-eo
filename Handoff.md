@@ -49,6 +49,88 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:52 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-092` con la semántica operativa de período actual basada en mes operativo vigente, más la distinción visual de historial entre períodos aprobados en cierre y períodos exportados cerrados.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/current-payroll-period.ts`
+- `src/lib/payroll/current-payroll-period.test.ts`
+- `src/views/greenhouse/payroll/PayrollHistoryTab.tsx`
+- `src/views/greenhouse/payroll/PayrollHistoryTab.test.tsx`
+- `docs/tasks/complete/TASK-092-payroll-operational-current-period-semantics.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/current-payroll-period.test.ts src/views/greenhouse/payroll/PayrollHistoryTab.test.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx` -> pass
+- `pnpm exec eslint src/lib/payroll/current-payroll-period.ts src/lib/payroll/current-payroll-period.test.ts src/views/greenhouse/payroll/PayrollHistoryTab.tsx src/views/greenhouse/payroll/PayrollHistoryTab.test.tsx` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- `TASK-093` sigue siendo un cambio paralelo en el árbol; no se tocó ni se revertió.
+- Si el negocio decide mostrar otro copy para los períodos `approved` en cierre, el lugar a ajustar será `PayrollHistoryTab`, no el helper temporal.
+
+## 2026-03-28 13:40 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Iniciar `TASK-092` y ajustar la semántica de período actual de Payroll para usar el mes operativo vigente, separando cierre/exportación de períodos aprobados en histórico.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/current-payroll-period.ts`
+- `src/lib/payroll/current-payroll-period.test.ts`
+- `src/views/greenhouse/payroll/PayrollHistoryTab.tsx`
+- `src/views/greenhouse/payroll/PayrollHistoryTab.test.tsx`
+- `docs/tasks/in-progress/TASK-092-payroll-operational-current-period-semantics.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- pendiente correr Vitest, ESLint y build sobre este slice
+
+### Riesgos o pendientes
+
+- Falta validar si la vista de `/hr/payroll` necesita un smoke manual adicional para confirmar que Febrero no reaparece como actual cuando Marzo ya está exportado.
+- `TASK-093` sigue siendo un cambio paralelo en el árbol; no se tocó ni se revertió.
+
 ## 2026-03-28 13:18 -03
 
 ### Agente

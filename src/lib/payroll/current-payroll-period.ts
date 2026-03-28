@@ -1,19 +1,43 @@
 import type { PayrollPeriod } from '@/types/payroll'
 
+import {
+  DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+  getOperationalPayrollMonth,
+  type OperationalCalendarContextInput
+} from '@/lib/calendar/operational-calendar'
+
 const comparePayrollPeriodsDesc = (a: PayrollPeriod, b: PayrollPeriod) =>
   b.year - a.year || b.month - a.month
+
+const toPeriodMonthKey = (period: PayrollPeriod) => `${period.year}-${String(period.month).padStart(2, '0')}`
 
 export const sortPayrollPeriodsDescending = (periods: PayrollPeriod[]) =>
   [...periods].sort(comparePayrollPeriodsDesc)
 
-export const getCurrentPayrollPeriod = (periods: PayrollPeriod[]) => {
-  const [latestPeriod] = sortPayrollPeriodsDescending(periods)
+export const getCurrentPayrollPeriod = (
+  periods: PayrollPeriod[],
+  referenceDate: Date | string = new Date(),
+  options?: OperationalCalendarContextInput | null
+) => {
+  const normalizedOptions = {
+    timezone: options?.timezone ?? DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+    countryCode: options?.countryCode ?? null,
+    holidayCalendarCode: options?.holidayCalendarCode ?? null,
+    holidayDates: options?.holidayDates ?? null,
+    closeWindowBusinessDays: options?.closeWindowBusinessDays ?? null
+  }
 
-  if (!latestPeriod || latestPeriod.status === 'exported') {
+  const operationalMonth = getOperationalPayrollMonth(referenceDate, normalizedOptions)
+
+  const currentPeriod = sortPayrollPeriodsDescending(periods).find(
+    period => toPeriodMonthKey(period) === operationalMonth.operationalMonthKey
+  )
+
+  if (!currentPeriod || currentPeriod.status === 'exported') {
     return null
   }
 
-  return latestPeriod
+  return currentPeriod
 }
 
 export const getNextPayrollPeriodSuggestion = (

@@ -2,14 +2,23 @@
 
 ## Status
 
-- Lifecycle: `to-do`
-- Priority: `P1`
-- Impact: `Alto`
-- Effort: `Medio`
-- Status real: `Diseño`
-- Rank: `7`
-- Domain: `ui`
-- GitHub Project: `Greenhouse Delivery`
+| Campo | Valor |
+|-------|-------|
+| Lifecycle | `complete` |
+| Priority | `P1` |
+| Impact | `Alto` |
+| Effort | `Medio` |
+| Status real | `Implementado` |
+| Rank | `7` |
+| Domain | `ui` |
+| GitHub Project | `Greenhouse Delivery` |
+
+## Result
+
+- El período actual se resuelve por mes operativo vigente usando la utility compartida de calendario operativo.
+- `Historial` ya no cuenta `approved` como si fuera cierre final y ahora distingue `aprobado en cierre` de `cerrado/exportado`.
+- Las cards KPI siguen leyendo del período activo, no del histórico seleccionado.
+- El empty state mantiene la guía operativa cuando no hay período abierto vigente.
 
 ## Summary
 
@@ -79,11 +88,12 @@ Reglas obligatorias:
 - separación parcial entre período actual e histórico en UI
 - empty state operativo para cuando no hay período abierto
 - cards KPI y tabs funcionales
+- utilidad canónica de calendario operativo ya implementada y disponible para resolver el mes operativo vigente
 
 ### Gap actual
 
-- la selección de período actual todavía depende de una semántica incompleta
-- `Historial` trata `approved` como si ya fuera cierre
+- la selección de período actual todavía depende de una semántica incompleta en el helper y debe leer la ventana operativa vigente
+- `Historial` trata `approved` como si ya fuera cierre y además no lo distingue lo suficiente como estado en cierre
 - las cards superiores pueden quedar inconsistentes con el contexto mostrado
 - el empty state puede sugerir un período nuevo sin dejar claro si el período anterior realmente quedó cerrado
 

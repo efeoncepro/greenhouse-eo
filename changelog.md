@@ -7,6 +7,16 @@
 
 ## 2026-03-28
 
+### TASK-092 payroll operational current period semantics completed
+- `current-payroll-period` ahora resuelve el período actual por mes operativo vigente, usando la utility compartida de calendario operativo.
+- `PayrollHistoryTab` deja de contar `approved` como cierre final y lo muestra como `aprobado en cierre`, separado de `cerrado/exportado`.
+- La task quedó cerrada con tests de helper, tests de historial y build validado.
+
+### TASK-092 operational current period semantics started
+- `current-payroll-period` ya resuelve el período vigente por mes operativo y no solo por el último período no exportado.
+- `PayrollHistoryTab` distingue ahora períodos cerrados/exportados de períodos aprobados que siguen en cierre, evitando presentar `approved` como cierre final.
+- La arquitectura de Payroll quedó alineada para que la selección de período actual use la utility compartida de calendario operativo.
+
 ### Payroll operational calendar consumers mapped
 - Se dejó explícito que la utilidad de calendario operativo hoy solo tiene consumidores directos dentro de Payroll: helpers de período actual, readiness, routes de approve/readiness y las vistas operativas del módulo.
 - Se documentó también que Finance y Cost Intelligence solo consumen derivados de nómina, no la policy temporal.
