@@ -70,7 +70,9 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   adjustedFixedBonusAmount: 50,
   createdAt: '2026-03-01T00:00:00.000Z',
   updatedAt: null,
-  ...overrides
+  ...overrides,
+  chileHealthObligatoriaAmount: overrides.chileHealthObligatoriaAmount ?? 0,
+  chileHealthVoluntariaAmount: overrides.chileHealthVoluntariaAmount ?? 0
 })
 
 describe('buildPayrollCurrencySummary', () => {

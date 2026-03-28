@@ -205,6 +205,8 @@ export interface PayrollEntry {
   chileAfpComisionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
+  chileHealthObligatoriaAmount: number | null
+  chileHealthVoluntariaAmount: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null

@@ -100,6 +100,8 @@ const entry: PayrollEntry = {
   chileAfpComisionAmount: null,
   chileHealthSystem: null,
   chileHealthAmount: null,
+  chileHealthObligatoriaAmount: null,
+  chileHealthVoluntariaAmount: null,
   chileUnemploymentRate: null,
   chileUnemploymentAmount: null,
   chileTaxableBase: null,

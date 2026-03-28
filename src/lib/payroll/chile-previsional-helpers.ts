@@ -68,6 +68,34 @@ export const resolveChileAfpSplitRates = ({
   }
 }
 
+export const resolveChileHealthSplitAmounts = ({
+  payRegime,
+  healthSystem,
+  imponibleBase,
+  totalHealthAmount
+}: {
+  payRegime: 'chile' | 'intl'
+  healthSystem: 'fonasa' | 'isapre' | null | undefined
+  imponibleBase: number
+  totalHealthAmount: number
+}): {
+  obligatoriaAmount: number
+  voluntariaAmount: number
+} | null => {
+  if (payRegime !== 'chile' || healthSystem !== 'isapre') {
+    return null
+  }
+
+  const roundCurrency = (value: number) => Math.round(value * 100) / 100
+  const obligatoryCap = roundCurrency(Math.max(0, imponibleBase) * 0.07)
+  const obligatoryAmount = roundCurrency(Math.min(Math.max(0, totalHealthAmount), obligatoryCap))
+
+  return {
+    obligatoriaAmount: obligatoryAmount,
+    voluntariaAmount: roundCurrency(Math.max(0, totalHealthAmount - obligatoryAmount))
+  }
+}
+
 export type ChileAfpRateSnapshot = {
   afpName: string
   workerRate: number

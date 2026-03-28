@@ -6,6 +6,7 @@ import {
   getAfpRateForCode,
   getImmForPeriod,
   getUnemploymentRateForPeriod,
+  resolveChileHealthSplitAmounts,
   resolveChileAfpRateSplitForCompensation,
   resolveChileAfpSplitRates
 } from '@/lib/payroll/chile-previsional-helpers'
@@ -50,6 +51,8 @@ export type ChileDeductionResult = {
   chileMovilizacionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
+  chileHealthObligatoriaAmount: number | null
+  chileHealthVoluntariaAmount: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null
@@ -135,6 +138,8 @@ export const calculatePayrollTotals = async ({
       chileMovilizacionAmount: null,
       chileHealthSystem: null,
       chileHealthAmount: null,
+      chileHealthObligatoriaAmount: null,
+      chileHealthVoluntariaAmount: null,
       chileUnemploymentRate: null,
       chileUnemploymentAmount: null,
       chileTaxableBase: null,
@@ -203,6 +208,13 @@ export const calculatePayrollTotals = async ({
     healthAmount = roundCurrency(imponibleBase * 0.07)
   }
 
+  const healthSplit = resolveChileHealthSplitAmounts({
+    payRegime,
+    healthSystem,
+    imponibleBase,
+    totalHealthAmount: healthAmount
+  })
+
   const unemploymentAmount = roundCurrency(imponibleBase * derivedUnemploymentRate)
   const normalizedApvAmount = hasApv ? roundCurrency(apvAmount || 0) : 0
   const normalizedTaxAmount = roundCurrency(taxAmount || 0)
@@ -226,6 +238,8 @@ export const calculatePayrollTotals = async ({
     chileMovilizacionAmount: movilizacionAmount > 0 ? movilizacionAmount : null,
     chileHealthSystem: healthSystem || 'fonasa',
     chileHealthAmount: healthAmount,
+    chileHealthObligatoriaAmount: healthSplit?.obligatoriaAmount ?? null,
+    chileHealthVoluntariaAmount: healthSplit?.voluntariaAmount ?? null,
     chileUnemploymentRate: derivedUnemploymentRate,
     chileUnemploymentAmount: unemploymentAmount,
     chileTaxableBase: taxableBase,
