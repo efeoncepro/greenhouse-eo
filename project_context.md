@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Compensation Chile líquido-first + reverse engine completo
+- `TASK-079` a `TASK-085` cerradas en una sesión:
+  - Motor reverse `computeGrossFromNet()` con binary search, piso IMM, convergencia ±$1 CLP
+  - Regla de negocio: líquido deseado = neto con descuentos legales (7% salud, no Isapre)
+  - Excedente Isapre mostrado como deducción voluntaria separada
+  - AFP resuelta desde Previred, no desde compensación guardada
+  - `desired_net_clp` persistido en `compensation_versions` (migration corrida)
+  - Para Chile, el drawer siempre abre en modo reverse (sin switch) — el líquido es el punto de partida
+  - Para internacional, salary base directo sin cambios
+  - Preview enterprise con secciones semánticas (haberes/descuentos/resultado), monospace, accordion previsional
+  - Error de guardado visible arriba del botón (no oculto en scroll)
+  - Sección 24 agregada a `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- Regla operativa derivada:
+  - toda nueva compensación Chile se crea desde un líquido deseado contractual
+  - el sueldo base es siempre un resultado del motor reverse, nunca un input manual
+  - el líquido a pagar varía mes a mes por ausencias, bonos, excedente Isapre, etc.
+
 ## Delta 2026-03-28 Reverse payroll engine (Slices 1-2 validados)
 - `TASK-079` Slices 1-2 validados en staging contra liquidación real de Valentina Hoyos (Feb 2026).
 - Motor `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`: binary search sobre forward engine real, ±$1 CLP, 10 golden tests.

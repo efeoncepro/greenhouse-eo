@@ -49,6 +49,65 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:45 -03
+
+### Agente
+
+- Claude Code (Opus)
+
+### Objetivo del turno
+
+- Sesión completa TASK-079 → TASK-085: motor reverse payroll Chile, preview enterprise, hardening, UX redesign, líquido-first flow.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging (dev-greenhouse.efeoncepro.com)
+
+### Tasks cerradas en esta sesión
+
+| Task | Descripción |
+|------|-------------|
+| TASK-079 | Motor reverse `computeGrossFromNet()` + API + preview + hardening + validación con liquidación real |
+| TASK-082 | Collapse previsional params en reverse mode Chile |
+| TASK-083 | Enterprise UX redesign: preview semántico, accordion, monospace, chip |
+| TASK-084 | Manual mode UX polish: secciones con borders, accordion previsional en todos los modos |
+| TASK-085 | Líquido-first flow: eliminar switch, Chile siempre abre en reverse |
+
+### Tasks documentadas (to-do)
+
+- TASK-084 (cerrada) incluía formato de moneda CLP con separador de miles como pendiente futuro
+
+### Archivos clave tocados
+
+- `src/lib/payroll/reverse-payroll.ts` — motor reverse con binary search, piso IMM, clampedAtFloor
+- `src/lib/payroll/reverse-payroll.test.ts` — 10 golden tests
+- `src/app/api/hr/payroll/compensation/reverse-quote/route.ts` — API con IMM, AFP Previred, Isapre excess
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx` — reescritura completa UX
+- `src/types/payroll.ts` — desiredNetClp en CompensationVersion
+- `src/lib/payroll/postgres-store.ts` + `get-compensation.ts` — persistencia desired_net_clp
+- `src/app/api/hr/payroll/compensation/route.ts` + `[versionId]/route.ts` — API compensation
+- `scripts/migrations/add-compensation-desired-net-clp.sql` — migration (corrida en staging)
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` — sección 24 reverse engine
+
+### Verificacion
+
+- `pnpm test src/lib/payroll/reverse-payroll.test.ts` → 10/10 pass
+- `npx tsc --noEmit` → clean
+- `pnpm build` → OK
+- Staging: validado manualmente con Valentina Hoyos
+
+### Riesgos o pendientes
+
+- La diferencia de ~$658 entre base calculado ($539.658) y base real ($539.000) se debe a la tasa AFP resuelta de Previred para marzo vs la del PDF (febrero). Es un tema de datos, no del algoritmo.
+- Formato de moneda CLP con separador de miles en inputs queda como mejora futura.
+- Playwright MCP se configuró en `~/.claude/.mcp.json` pero necesita reinicio de sesión para activarse.
+
+---
+
 ## 2026-03-28 12:10 -03
 
 ### Agente

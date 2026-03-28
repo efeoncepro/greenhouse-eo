@@ -7,6 +7,16 @@
 
 ## 2026-03-28
 
+### Reverse payroll engine + compensation líquido-first (TASK-079 → TASK-085)
+- Motor `computeGrossFromNet()`: binary search sobre forward engine, ±$1 CLP, piso IMM, AFP desde Previred
+- Regla Chile: líquido deseado = neto con 7% salud legal; excedente Isapre como deducción voluntaria visible
+- API `POST /api/hr/payroll/compensation/reverse-quote` con resolución de UF, UTM, IMM, tax brackets
+- `desired_net_clp` persistido en `compensation_versions` (migration `add-compensation-desired-net-clp.sql`)
+- CompensationDrawer: Chile siempre en modo reverse (sin switch), preview enterprise con secciones semánticas, accordion previsional, $ InputAdornment, skeleton loading, error visible sobre botón
+- Internacional: sin cambios (salary base directo)
+- Validado contra liquidación real Valentina Hoyos (Feb 2026)
+- Sección 24 en `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+
 ### Payroll receipt smoke completed
 - `TASK-077` quedó cerrada end-to-end: el período de marzo 2026 se reemitió a `approved`, se publicó el outbox, `payroll_receipts_delivery` materializó 4 recibos y se enviaron 4 correos.
 - Los recibos quedaron persistidos en GCS bajo `gs://efeonce-group-greenhouse-media/payroll-receipts/2026-03/...`.

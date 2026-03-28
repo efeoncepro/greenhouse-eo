@@ -586,3 +586,60 @@ Regla:
   - `greenhouse_payroll.chile_tax_brackets`
 - El cron `GET /api/cron/sync-previred` y el backfill `pnpm backfill:chile-previsional` son los mecanismos operativos para mantener la base previsional viva.
 - `ImpUnico` se convierte a UTM usando la UTM del mismo período para preservar el contrato de `greenhouse_payroll.chile_tax_brackets`.
+
+## 24. Reverse payroll engine (gross from net)
+
+### Concepto
+
+El motor reverse resuelve el sueldo base dado un **líquido deseado** — el monto contractual neto que el empleador acuerda con el colaborador, antes de deducciones voluntarias (Isapre, APV).
+
+### Regla de negocio Chile
+
+- **Líquido deseado** = neto después de descuentos legales obligatorios: AFP (cotización + comisión), salud 7% (Fonasa), cesantía, impuesto único.
+- **Líquido a pagar** = líquido deseado − excedente Isapre − APV. Varía mensualmente por ausencias, bonos variables, cambio de tasas.
+- El excedente Isapre (plan pactado − 7% obligatorio) es una **deducción voluntaria** del trabajador. No afecta el cálculo del sueldo base.
+- El **piso IMM** (Ingreso Mínimo Mensual) es el límite inferior del binary search. El motor nunca calcula un base inferior al mínimo legal.
+- La **tasa AFP** se resuelve desde Previred para el período, no desde la tasa almacenada en la compensación.
+
+### Algoritmo
+
+- `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`
+- Binary search sobre `baseSalary` envolviendo el forward engine real (`calculatePayrollTotals` + `computeChileTax`)
+- Convergencia garantizada en ~24 iteraciones con tolerancia de ±$1 CLP
+- `minBaseSalary` = IMM (piso legal)
+- `clampedAtFloor` = true cuando el líquido deseado requiere base ≤ IMM
+
+### Persistencia
+
+- `desired_net_clp` se persiste en `compensation_versions` como el acuerdo contractual
+- Compensaciones legacy sin `desired_net_clp` se manejan con el campo vacío
+- El `changeReason` incluye automáticamente `[Líquido deseado: $X]` cuando se guarda desde reverse
+
+### Superficie
+
+- `POST /api/hr/payroll/compensation/reverse-quote` — API que resuelve indicadores (UF, UTM, IMM, AFP Previred, tax brackets) y ejecuta el reverse
+- `CompensationDrawer` — para régimen Chile, el líquido deseado es siempre el campo principal (no hay modo manual). Para internacional, salary base directo.
+
+### Preview
+
+El drawer muestra un desglose en tiempo real con tres secciones semánticas:
+- **Haberes** (fondo neutro): sueldo base calculado, gratificación legal, colación, movilización, total haberes
+- **Descuentos legales** (fondo error.lighterOpacity): AFP, salud 7%, cesantía, impuesto, total descuentos
+- **Resultado** (fondo primary.lighterOpacity): líquido deseado, excedente Isapre, líquido a pagar, costo empleador
+
+### Archivos runtime
+
+- `src/lib/payroll/reverse-payroll.ts` — motor `computeGrossFromNet()`
+- `src/lib/payroll/reverse-payroll.test.ts` — 10 golden tests
+- `src/app/api/hr/payroll/compensation/reverse-quote/route.ts` — API endpoint
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx` — UI drawer
+- `scripts/migrations/add-compensation-desired-net-clp.sql` — migration
+
+### Reglas canónicas
+
+- Para Chile, el líquido deseado es siempre el punto de partida de la compensación.
+- El sueldo base es un resultado del reverse, no un input manual.
+- El reverse calcula con descuentos legales solamente (7% salud, no Isapre).
+- El IMM es un piso absoluto del cálculo, no una advertencia.
+- El excedente Isapre se muestra pero no altera el sueldo base.
+- Para internacional, el salary base es input directo (sin reverse).
