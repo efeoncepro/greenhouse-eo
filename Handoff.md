@@ -14274,3 +14274,9 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - Se corrigió el `INSERT` de `greenhouse_payroll.payroll_entries` para incluir los dos valores ajustados faltantes al final de la tupla.
 - Se aplicó una migration adicional para los campos de `chile_health_*` / `chile_employer_*` que la promoción esperaba ya en `payroll_entries`.
 - Resultado validado con repro local usando ADC de Google: promoción `completed`, `sourceSnapshotCount = 4`, `promotedEntryCount = 4`, período `2026-03` creado como `approved`.
+
+## 2026-03-28 - Payroll approval guard aligned to bonus policy
+
+- El approval gate de `Payroll` dejó de bloquear por los pisos mínimos legacy de bono (`bonusOtdMin` / `bonusRpaMin`) cuando la policy vigente ya prorratea sobre `max` y la elegibilidad.
+- La validación ahora rechaza solo montos negativos o por encima del máximo configurado, manteniendo el guardrail de elegibilidad sin romper la nueva policy de bonos variables.
+- Este cambio desbloquea el smoke operativo de `TASK-077`, que depende de que marzo 2026 pueda pasar de `calculated` a `approved` y luego a `exported` para disparar recibos.

@@ -15,6 +15,13 @@
 - Queda abierto para esta task:
   - smoke real sobre exportación completa en staging con entrega de correo
 
+## Delta 2026-03-28 - Approval gate aligned to recalibrated bonus policy
+
+- El smoke de `TASK-077` dependía de poder llevar marzo 2026 desde `calculated` a `approved` y luego a `exported`.
+- El approval gate de `Payroll` estaba bloqueando por pisos mínimos legacy (`bonusOtdMin` / `bonusRpaMin`) incluso cuando la policy recalibrada ya prorratea sobre `max` y eligibilidad.
+- La validación quedó alineada para rechazar solo montos negativos o por encima del máximo configurado, manteniendo el guardrail de elegibilidad sin romper la nueva policy de bonos variables.
+- Con eso, `TASK-077` ya puede continuar su smoke de exportación y delivery sobre un período real una vez que el deploy de `develop` esté visible en staging.
+
 ## Status
 
 | Campo | Valor |

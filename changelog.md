@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll approval guard aligned to new bonus policy
+- El guard de `POST /api/hr/payroll/periods/[periodId]/approve` ya no bloquea por pisos mínimos legacy (`bonusOtdMin` / `bonusRpaMin`) cuando la liquidación calculada cae dentro del máximo permitido y cumple elegibilidad.
+- El criterio de aprobación quedó alineado con la policy recalibrada de bonos variables, que prorratea sobre el máximo y preserva `bonusOtdMin` / `bonusRpaMin` solo como metadata histórica.
+- Este ajuste desbloquea el smoke de exportación y recibos de `TASK-077`, que dependía de poder llevar marzo 2026 desde `calculated` a `approved` y luego a `exported`.
+
 ### Payroll projected AFP helper aligned to staging schema
 - `Payroll Proyectada` seguía fallando con `column "worker_rate" does not exist`.
 - Se inspeccionó la tabla real `greenhouse_payroll.chile_afp_rates` en Cloud SQL y se confirmó que solo expone `total_rate`.
