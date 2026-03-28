@@ -13,7 +13,6 @@
   - `People > Person > Nómina` muestra botón de descarga por entry usando el route HR existente
 - El flujo está integrado por outbox/reactive projections, no como cron separado.
 - Queda abierto para esta task:
-  - pulido del template de email/branding
   - smoke real sobre exportación completa en staging con entrega de correo
 
 ## Status
@@ -99,17 +98,15 @@ Que al exportar un período de nómina:
 | `PayrollReceiptCard.tsx` | `src/views/greenhouse/payroll/` | Vista MUI inline |
 | `PayrollReceiptDialog.tsx` | mismo directorio | Modal con botón descargar |
 | `generatePayrollExcel()` | `src/lib/payroll/generate-payroll-excel.ts` | Export Excel |
-| Resend email system | `src/lib/email/` | Integrado con React Email |
+| Resend email system | `src/emails/` | Integrado con React Email y template específico para recibos |
 | GCS media storage | `src/lib/storage/greenhouse-media.ts` | Upload/download autenticado |
 | `greenhouse_payroll.payroll_receipts` | PostgreSQL | Registry canónico de recibos |
 | `generatePayrollReceiptsForPeriod()` | `src/lib/payroll/generate-payroll-receipts.ts` | Batch generator + email delivery |
 | `payroll_receipts_delivery` projection | `src/lib/sync/projections/payroll-receipts.ts` | Reactivo sobre `payroll_period.exported` |
 | Vuexy Invoice patterns | `full-version/src/views/apps/invoice/` | PreviewCard, PreviewActions, SendDrawer |
 
-### Lo que NO existe
+### Lo que sigue pendiente
 
-- UI de recibos en Mi Nómina y People ya conectada a la descarga
-- Template de email finalizado con branding de producción
 - Smoke end-to-end en staging con colas/Resend confirmadas
 
 ## Scope
@@ -278,6 +275,8 @@ Puedes consultar el detalle completo en tu portal Greenhouse:
 
 Efeonce Greenhouse™
 ```
+
+**Estado real actual:** el batch de recibos ya usa un template React Email dedicado (`src/emails/PayrollReceiptEmail.tsx`) con branding Greenhouse/Efeonce, CTA al portal y PDF adjunto; se mantiene fallback de texto para deliverability.
 
 **Para internacionales:**
 ```

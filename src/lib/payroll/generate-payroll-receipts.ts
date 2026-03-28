@@ -5,6 +5,7 @@ import { Buffer } from 'node:buffer'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { generatePayrollReceiptPdf } from '@/lib/payroll/generate-payroll-pdf'
+import PayrollReceiptEmail from '@/emails/PayrollReceiptEmail'
 import {
   assertPayrollPostgresReady
 } from '@/lib/payroll/postgres-store'
@@ -49,8 +50,10 @@ const formatMoney = (value: number, currency: 'CLP' | 'USD') =>
     ? `$${Math.round(value).toLocaleString('es-CL')}`
     : `US$${value.toFixed(2)}`
 
-const buildEmailSubject = (periodYear: number, periodMonth: number) =>
-  `Tu recibo de nómina — ${MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)} ${periodYear}`
+const buildEmailSubject = (periodYear: number, periodMonth: number, payRegime: 'chile' | 'international') =>
+  payRegime === 'chile'
+    ? `Tu recibo de nómina — ${MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)} ${periodYear}`
+    : `Your payment statement — ${MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)} ${periodYear}`
 
 const buildEmailText = (params: {
   fullName: string
@@ -60,23 +63,40 @@ const buildEmailText = (params: {
   grossTotal: number
   totalDeductions: number | null
   netTotal: number
+  payRegime: 'chile' | 'international'
 }) => {
   const monthName = MONTH_NAMES[params.periodMonth - 1] ?? String(params.periodMonth)
+  const firstName = params.fullName.split(' ')[0] || params.fullName
 
-  return [
-    `Hola ${params.fullName},`,
-    '',
-    `Tu recibo de nómina de ${monthName} ${params.periodYear} ya está disponible.`,
-    '',
-    `Resumen:`,
-    `- Bruto: ${formatMoney(params.grossTotal, params.entryCurrency)}`,
-    `- Descuentos: ${formatMoney(params.totalDeductions ?? 0, params.entryCurrency)}`,
-    `- Líquido: ${formatMoney(params.netTotal, params.entryCurrency)}`,
-    '',
-    'Adjuntamos el PDF de tu recibo.',
-    '',
-    '— Greenhouse by Efeonce Group'
-  ].join('\n')
+  return params.payRegime === 'chile'
+    ? [
+        `Hola ${firstName},`,
+        '',
+        `Tu recibo de nómina de ${monthName} ${params.periodYear} ya está disponible.`,
+        '',
+        `Resumen:`,
+        `- Bruto: ${formatMoney(params.grossTotal, params.entryCurrency)}`,
+        `- Descuentos: ${formatMoney(params.totalDeductions ?? 0, params.entryCurrency)}`,
+        `- Líquido: ${formatMoney(params.netTotal, params.entryCurrency)}`,
+        '',
+        'Adjuntamos el PDF de tu recibo.',
+        '',
+        '— Greenhouse by Efeonce Group'
+      ].join('\n')
+    : [
+        `Hi ${firstName},`,
+        '',
+        `Your payment statement for ${monthName} ${params.periodYear} is ready.`,
+        '',
+        `Summary:`,
+        `- Gross: ${formatMoney(params.grossTotal, params.entryCurrency)}`,
+        `- Deductions: ${formatMoney(params.totalDeductions ?? 0, params.entryCurrency)}`,
+        `- Net payment: ${formatMoney(params.netTotal, params.entryCurrency)}`,
+        '',
+        'We attached the PDF for your records.',
+        '',
+        '— Greenhouse by Efeonce Group'
+      ].join('\n')
 }
 
 const getPayrollReceiptBatchRevision = async ({
@@ -112,7 +132,17 @@ const sendReceiptEmail = async (params: {
   const result = await resend.emails.send({
     from: getEmailFromAddress(),
     to: params.entry.memberEmail,
-    subject: buildEmailSubject(params.periodYear, params.periodMonth),
+    subject: buildEmailSubject(params.periodYear, params.periodMonth, params.entry.payRegime),
+    react: PayrollReceiptEmail({
+      fullName: params.entry.memberName,
+      periodYear: params.periodYear,
+      periodMonth: params.periodMonth,
+      entryCurrency: params.entry.currency,
+      grossTotal: params.entry.grossTotal,
+      totalDeductions: params.entry.chileTotalDeductions,
+      netTotal: params.entry.netTotal,
+      payRegime: params.entry.payRegime
+    }),
     text: buildEmailText({
       fullName: params.entry.memberName,
       periodYear: params.periodYear,
@@ -120,7 +150,8 @@ const sendReceiptEmail = async (params: {
       entryCurrency: params.entry.currency,
       grossTotal: params.entry.grossTotal,
       totalDeductions: params.entry.chileTotalDeductions,
-      netTotal: params.entry.netTotal
+      netTotal: params.entry.netTotal,
+      payRegime: params.entry.payRegime
     }),
     attachments: [
       {
