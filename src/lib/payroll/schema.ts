@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
 
 let ensurePayrollInfrastructurePromise: Promise<void> | null = null
 
@@ -335,6 +336,10 @@ const buildStatements = (projectId: string) => [
 ]
 
 export const ensurePayrollInfrastructure = async () => {
+  if (isPayrollPostgresEnabled()) {
+    return
+  }
+
   if (ensurePayrollInfrastructurePromise) {
     return ensurePayrollInfrastructurePromise
   }

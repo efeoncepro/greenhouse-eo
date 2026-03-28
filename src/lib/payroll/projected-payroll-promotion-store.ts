@@ -18,6 +18,7 @@ import {
 } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { PayrollValidationError } from '@/lib/payroll/shared'
 
 type PgPromotionRow = {
   promotion_id: string
@@ -99,29 +100,15 @@ const ensureSchema = async () => {
     return
   }
 
-  await runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions (
-      promotion_id TEXT PRIMARY KEY,
-      period_id TEXT NOT NULL REFERENCES greenhouse_payroll.payroll_periods(period_id) ON DELETE CASCADE,
-      period_year INT NOT NULL,
-      period_month INT NOT NULL,
-      projection_mode TEXT NOT NULL CHECK (projection_mode IN ('actual_to_date', 'projected_month_end')),
-      as_of_date DATE NOT NULL,
-      source_snapshot_count INT NOT NULL DEFAULT 0,
-      promoted_entry_count INT NOT NULL DEFAULT 0,
-      source_period_status TEXT,
-      actor_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
-      actor_identifier TEXT,
-      promotion_status TEXT NOT NULL DEFAULT 'started' CHECK (promotion_status IN ('started', 'completed', 'failed')),
-      promoted_at TIMESTAMPTZ,
-      failure_reason TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );
+  const [row] = await runGreenhousePostgresQuery<{ exists: boolean }>(
+    `
+      SELECT to_regclass('greenhouse_payroll.projected_payroll_promotions') IS NOT NULL AS exists
+    `
+  )
 
-    CREATE INDEX IF NOT EXISTS idx_projected_payroll_promotions_period
-      ON greenhouse_payroll.projected_payroll_promotions (period_year, period_month, projection_mode);
-  `)
+  if (!row?.exists) {
+    throw new PayrollValidationError('Projected payroll promotion store is not ready.', 500)
+  }
 
   ensured = true
 }

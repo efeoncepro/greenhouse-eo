@@ -1708,7 +1708,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           $51, $52,
           $53, $54, $55,
           $56, $57,
-          $58, $59, $60, $61, $62
+          $58, $59, $60, $61, $62, $63, $64
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1795,7 +1795,8 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.bonusOtdProrationFactor, entry.bonusRpaProrationFactor,
         entry.workingDaysInPeriod, entry.daysPresent, entry.daysAbsent,
         entry.daysOnLeave, entry.daysOnUnpaidLeave,
-        entry.adjustedBaseSalary, entry.adjustedRemoteAllowance, entry.adjustedColacionAmount, entry.adjustedMovilizacionAmount, entry.adjustedFixedBonusAmount
+        entry.adjustedBaseSalary, entry.adjustedRemoteAllowance, entry.adjustedColacionAmount,
+        entry.adjustedMovilizacionAmount, entry.adjustedFixedBonusAmount
       ]
     )
 

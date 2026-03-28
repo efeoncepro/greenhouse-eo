@@ -86,7 +86,7 @@ export const upsertProjectedPayrollSnapshot = async (
       entry.projectionMode, entry.asOfDate,
       entry.currency, entry.baseSalary, entry.remoteAllowance,
       entry.fixedBonusAmount, entry.bonusOtdAmount, entry.bonusRpaAmount,
-      entry.grossTotal, entry.chileTotalDeductions, entry.netTotal,
+      entry.grossTotal, entry.chileTotalDeductions ?? 0, entry.netTotal,
       entry.kpiOtdPercent, entry.kpiRpaAvg,
       entry.projectedWorkingDays, entry.projectedWorkingDaysTotal,
       entry.daysAbsent ?? 0, entry.daysOnLeave ?? 0,

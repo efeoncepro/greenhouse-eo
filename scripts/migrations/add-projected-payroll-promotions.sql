@@ -19,3 +19,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions ( -- 
 
 CREATE INDEX IF NOT EXISTS projected_payroll_promotions_period_idx
   ON greenhouse_payroll.projected_payroll_promotions (period_year DESC, period_month DESC, projection_mode);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_payroll.projected_payroll_promotions TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_payroll.projected_payroll_promotions TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_payroll.projected_payroll_promotions TO greenhouse_migrator;

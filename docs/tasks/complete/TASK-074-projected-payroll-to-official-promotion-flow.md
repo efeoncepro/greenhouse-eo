@@ -1,5 +1,9 @@
 # TASK-074 - Projected Payroll to Official Promotion Flow
 
+## Delta 2026-03-28
+- El flujo de promoción proyectado -> oficial quedó validado end-to-end en PostgreSQL para marzo 2026: el repro local con ADC de Google completó `promotion_status = completed`, `sourceSnapshotCount = 4` y `promotedEntryCount = 4`.
+- La causa raíz del bloqueo no era el contrato de promoción sino wiring incompleto del insert de `payroll_entries` más una inicialización que seguía tocando BigQuery aun en runtime Postgres; ambos puntos quedaron corregidos en el implementation slice final.
+
 ## Summary
 
 Conectar `Projected Payroll` con `Payroll official` mediante un flujo explícito de promoción controlada, de forma que una proyección confiable pueda usarse como base para el borrador oficial sin mezclar simulación con snapshot transaccional final.

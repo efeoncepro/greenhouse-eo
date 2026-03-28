@@ -14266,3 +14266,11 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - Se aplicó la migration `scripts/migrations/add-projected-payroll-snapshots.sql` con `admin` y se probó un `INSERT`/`DELETE` real sobre la tabla con el perfil `runtime`.
 - Pendiente inmediato:
   - revalidar en staging el POST de promoción y confirmar que el borrador oficial de marzo 2026 se crea sin 42501.
+
+## 2026-03-28 - Projected payroll promotion wiring fix
+
+- La promoción `Projected Payroll -> Official Draft` quedó validada end-to-end en PostgreSQL para marzo 2026.
+- Se corrigió `ensurePayrollInfrastructure()` para no tocar BigQuery cuando `Payroll` corre en runtime PostgreSQL, evitando un costo/timeout innecesario en la promoción.
+- Se corrigió el `INSERT` de `greenhouse_payroll.payroll_entries` para incluir los dos valores ajustados faltantes al final de la tupla.
+- Se aplicó una migration adicional para los campos de `chile_health_*` / `chile_employer_*` que la promoción esperaba ya en `payroll_entries`.
+- Resultado validado con repro local usando ADC de Google: promoción `completed`, `sourceSnapshotCount = 4`, `promotedEntryCount = 4`, período `2026-03` creado como `approved`.
