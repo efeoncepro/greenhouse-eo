@@ -1,5 +1,48 @@
 # CODEX TASK — HR Payroll Attendance/Leave Work Entries Hardening (v1)
 
+## Delta 2026-03-28 — Auditoría de implementación
+
+### Estado real: la capa canónica `work_entries` NO existe
+
+Se auditó el código contra los 7 criterios de aceptación. El resultado es que la task sigue en `to-do` correctamente — la pieza central (capa canónica de work entries) no se ha construido.
+
+### Lo que ya existe
+
+| Pieza | Archivo | Estado |
+|-------|---------|--------|
+| Fetch de attendance por período | `src/lib/payroll/fetch-attendance-for-period.ts` | Funcional — query a `attendance_daily` (BQ) + `leave_requests` (PG) |
+| Range overlap check | mismo archivo, líneas 199-200 | `start_date <= periodEnd AND end_date >= periodStart` |
+| Leave type `is_paid` | `greenhouse_hr.leave_types` | Payroll distingue paid vs unpaid correctamente |
+| Teams webhook | `src/app/api/hr/core/attendance/webhook/teams/route.ts` | Recibe attendance records, escribe a `attendance_records` |
+| Attendance snapshot reference | `src/lib/payroll/attendance-snapshot.ts` | Código que referencia `attendance_monthly_snapshot` — **tabla nunca creada** |
+| Tests unitarios | `fetch-attendance-for-period.test.ts` | 10 tests: `countWeekdays` (9) + `buildMemberLeaveSummary` (1) |
+| Diagnostic label | `fetch-attendance-for-period.ts` línea 45 | Retorna `source: 'legacy_attendance_daily_plus_hr_leave'` — reconoce que es legacy |
+
+### Lo que NO existe
+
+| Criterio | Gap |
+|----------|-----|
+| **Capa canónica `work_entries`** | No existe tabla, no existe DDL, no existe store. `attendance_monthly_snapshot` está en código pero la tabla nunca se creó en ningún setup script. |
+| **Prorrateo de permisos cross-período** | Solo hay overlap check simple. Un permiso de 5 días que cruza dos meses no prorratea — imputa `requested_days` completo al período que intersecta. |
+| **Collision contract** | No existe regla de precedencia cuando holiday + leave + absence confluyen el mismo día. Sin detección de doble descuento. |
+| **Late approval policy** | No existe tratamiento para permisos aprobados después de que la nómina se calculó/aprobó/exportó. `canRecalculatePayrollPeriod('approved')` permite recálculo pero sin enforcement de política. |
+| **Teams → work_entries** | Webhook escribe a `attendance_records` (HR Core), no a una capa consumible por Payroll. El diagnostic dice `integrationTarget: 'microsoft_teams'` pero el dato no fluye al cálculo. |
+| **Tests de integración** | No hay tests de: cross-period leave, collisions, late approval, Teams data flow. |
+
+### Blocker principal
+
+La tabla `work_entries` / `attendance_monthly_snapshot` es la pieza central. Sin ella:
+- Payroll sigue recombinando `attendance_daily + leave_requests` en cada cálculo
+- No hay snapshot congelable ni auditable
+- Teams no tiene dónde aterrizar datos normalizados
+- El prorrateo fino no tiene dónde persistir
+
+### Recomendación de ejecución (actualizada)
+
+Mismo orden propuesto en la task (Slice 1→3→2→6→4→5) pero con prerequisito nuevo:
+- **TASK-078** (Previsional Foundation) debe completarse primero porque cambia el forward engine que consume attendance
+- **TASK-076** (Liquidación Parity) agrega campos de asistencia al PDF de liquidación que dependen de esta capa
+
 ## Resumen
 
 Endurecer la integración entre `Permisos`, `Asistencia` y `Payroll` para que la nómina no dependa de agregados ad-hoc por request y quede preparada para una futura integración con `Microsoft Teams`.
