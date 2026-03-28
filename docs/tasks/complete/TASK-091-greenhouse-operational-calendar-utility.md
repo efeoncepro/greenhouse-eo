@@ -82,6 +82,10 @@ Reglas obligatorias:
 - hay helpers de días hábiles en `fetch-attendance-for-period.ts`
 - la arquitectura de Payroll ya declara ventana operativa de cierre
 - todavía no existe un contrato canónico de policy operativa persistida para timezone/jurisdicción/feriados
+- los consumidores directos actuales viven dentro del dominio Payroll: `current-payroll-period`, `payroll-readiness`, `approve/readiness routes`, `PayrollDashboard`, `PayrollPeriodTab`, `PayrollHistoryTab`, `MyPayrollView`, `PersonPayrollTab`, `PayrollPersonnelExpenseTab` y `ProjectedPayrollView`
+- no hay consumidores directos en otros módulos del producto todavía; Finance y Cost Intelligence solo consumen estados derivados de Payroll, no el calendario operativo
+- potencialmente puede servir a `ICO`, `Finance`, `Campaigns` y `Cost Intelligence` si esos dominios formalizan cierres mensuales o ventanas operativas propias
+- módulos sin cierre mensual no deberían arrastrar esta policy por defecto; si solo necesitan calendario civil, la complejidad no se justifica
 
 ### Gap actual
 

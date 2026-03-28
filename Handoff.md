@@ -49,6 +49,39 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar el mapa de consumidores del calendario operativo para dejar claro qué módulos lo usan hoy, cuáles podrían adoptarlo después y cuáles no deberían cargar esa complejidad por defecto.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/complete/TASK-091-greenhouse-operational-calendar-utility.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- no hubo cambios de runtime en esta vuelta; solo documentación y contexto
+
+### Riesgos o pendientes
+
+- `TASK-091` sigue cerrada; el siguiente paso de código real sería un follow-up de adopción en consumidores concretos, probablemente comenzando por Payroll y luego evaluando ICO/Finance según necesidad real.
+
 ## 2026-03-28 13:00 -03
 
 ### Agente

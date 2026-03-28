@@ -160,6 +160,24 @@ Regla operativa:
 - los cambios de configuración de calendario solo justifican persistencia reactiva si existe una entidad editable real; el cálculo de fecha no debe publicar outbox events por sí mismo
 - Payroll debe consumir esta política como lectura de dominio, no como lógica local embebida en la vista
 
+Consumer map:
+
+- consumidores directos actuales: `current-payroll-period`, `payroll-readiness`, `approve/readiness routes`, `PayrollDashboard`, `PayrollPeriodTab`, `PayrollHistoryTab`, `MyPayrollView`, `PersonPayrollTab`, `PayrollPersonnelExpenseTab` y `ProjectedPayrollView`
+- no hay consumidores directos fuera de Payroll en el runtime actual; otros módulos leen derivados de nómina, no la policy temporal
+- si otro dominio necesita la misma regla, debe importar la utilidad compartida y no copiar la lógica de negocio
+
+Potential cross-domain candidates:
+
+- `ICO`, si alguna métrica o bono necesita cierre mensual o ventana de corte por jurisdicción
+- `Finance`, si algún snapshot, cierre o reporting mensual debe respetar días hábiles y timezone operativo
+- `Campaigns`, solo si su operación introduce ciclos de cierre mensuales reales
+- `Cost Intelligence`, si materializa snapshots o cierres por período que deban alinearse con la ventana operativa
+
+Non-fit modules:
+
+- módulos sin concepto de cierre mensual ni ventana de aprobación no deberían depender de esta policy por defecto
+- si un módulo solo necesita una fecha de calendario civil simple, no debe cargar la complejidad de la policy operativa
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

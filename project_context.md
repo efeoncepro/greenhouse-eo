@@ -8,6 +8,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts`.
 - El contrato operativo sigue siendo timezone-aware, con base `America/Santiago`, feriados nacionales desde `Nager.Date` y overrides persistidos en Greenhouse.
 - No se introdujo una API pública de cálculo temporal; la utility es de lectura y debe ser consumida por Payroll y otros dominios server-side.
+- El mapa de consumidores actual quedó acotado a Payroll: `current-payroll-period`, `payroll-readiness`, routes de approve/readiness y las vistas `PayrollDashboard`, `PayrollPeriodTab`, `PayrollHistoryTab`, `MyPayrollView`, `PersonPayrollTab`, `PayrollPersonnelExpenseTab` y `ProjectedPayrollView`.
+- No hay consumidores directos en otros módulos del producto todavía; Finance y Cost Intelligence solo ven estados derivados de nómina.
+- Posibles futuros consumidores: `ICO`, `Finance`, `Campaigns` y `Cost Intelligence`, pero solo si esos dominios formalizan ciclos de cierre mensuales o ventanas operativas reales.
 
 ## Delta 2026-03-28 Payroll operational calendar timezone + jurisdiction
 - El calendario operativo de Payroll quedó definido como una política timezone-aware con base en `America/Santiago`.

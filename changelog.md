@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll operational calendar consumers mapped
+- Se dejó explícito que la utilidad de calendario operativo hoy solo tiene consumidores directos dentro de Payroll: helpers de período actual, readiness, routes de approve/readiness y las vistas operativas del módulo.
+- Se documentó también que Finance y Cost Intelligence solo consumen derivados de nómina, no la policy temporal.
+- Se agregaron candidatos futuros de adopción transversal: ICO, Finance, Campaigns y Cost Intelligence, condicionados a que formalicen ciclos de cierre mensuales o ventanas operativas reales.
+
 ### TASK-091 operational calendar utility implemented
 - Se implementó la utilidad canónica de calendario operativo en `src/lib/calendar/operational-calendar.ts`.
 - La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts` con `Nager.Date` como fuente recomendada.
