@@ -18,6 +18,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la paridad completa con la liquidación impresa sigue pendiente mientras no se modelen `colación` y `movilización`
   - el helper/ruta de creación de compensación sigue requiriendo revisión separada, pero no invalida el cálculo core cuando la data está cargada
 
+## Delta 2026-03-28 Chile payroll non-imponible allowances
+- `Payroll Chile` ahora modela `colación` y `movilización` como haberes canónicos versionados en la compensación y en `payroll_entries`.
+- El motor forward los incorpora al devengado y al neto, manteniendo su carácter no imponible.
+- El cambio se expone por las superficies existentes de `compensation_version.created/updated` y `payroll_entry.upserted`; no se agregó un nuevo evento.
+- Regla operativa derivada:
+  - los consumidores de recibos, PDF, Excel, breakdown y projected payroll deben mostrar esos haberes cuando existan y tratarlos como parte del contrato de nómina Chile, no como un bono manual ad hoc
+
 ## Delta 2026-03-27 Payroll variable bonus policy recalibration
 - `Payroll` ya no depende de una policy simple para bonos variables (`OTD >= threshold`, `RpA` lineal hasta un único umbral).
 - Baseline nuevo materializado:

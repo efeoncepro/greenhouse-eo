@@ -20,6 +20,8 @@ const existingVersion: CompensationVersion = {
   currency: 'USD',
   baseSalary: 2000,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
   fixedBonusLabel: 'Responsabilidad',
   fixedBonusAmount: 150,
   bonusOtdMin: 0,
@@ -117,7 +119,7 @@ describe('CompensationDrawer', () => {
       expect(onSave).toHaveBeenCalled()
     })
 
-      expect(onSave).toHaveBeenCalledWith(
+    expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
           fixedBonusLabel: 'Bono guardia',

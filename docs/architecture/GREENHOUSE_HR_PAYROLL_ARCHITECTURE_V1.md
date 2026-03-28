@@ -41,6 +41,18 @@ Su responsabilidad es:
 - KPI mensuales `On-Time` y `RpA` desde `ICO`
 - exports y reporting como consumers aguas abajo
 
+## 2.1. Chile non-imponible allowances
+
+`Payroll Chile` también versiona en la compensación y snapshottea en `payroll_entries` los haberes no imponibles recurrentes de:
+- `colación`
+- `movilización`
+
+Estos montos:
+- viven como parte de la compensación vigente del colaborador
+- se prorratean si existe ajuste por asistencia o inasistencia no remunerada
+- se incluyen en el devengado y en el neto calculado
+- no requieren un evento reactivo nuevo para propagarse; siguen el contrato canónico de `compensation_version.created/updated` y `payroll_entry.upserted`
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

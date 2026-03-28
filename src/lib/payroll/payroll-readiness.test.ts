@@ -42,6 +42,8 @@ const compensatedMember = {
   currency: 'USD' as const,
   baseSalary: 1000,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
   fixedBonusLabel: 'Responsabilidad',
   fixedBonusAmount: 75,
   bonusOtdMin: 0,
@@ -145,7 +147,9 @@ describe('buildPayrollPeriodReadiness', () => {
           payRegime: 'chile',
           currency: 'CLP',
           healthSystem: 'isapre',
-          healthPlanUf: 2.1
+          healthPlanUf: 2.1,
+          colacionAmount: 0,
+          movilizacionAmount: 0
         }
       ],
       missingKpiMemberIds: [],
@@ -170,7 +174,9 @@ describe('buildPayrollPeriodReadiness', () => {
           memberId: 'member-chile',
           payRegime: 'chile',
           currency: 'CLP',
-          healthSystem: 'fonasa'
+          healthSystem: 'fonasa',
+          colacionAmount: 0,
+          movilizacionAmount: 0
         }
       ],
       missingKpiMemberIds: [],
@@ -191,7 +197,9 @@ describe('buildPayrollPeriodReadiness', () => {
           memberId: 'member-chile',
           payRegime: 'chile',
           currency: 'CLP',
-          healthSystem: 'fonasa'
+          healthSystem: 'fonasa',
+          colacionAmount: 0,
+          movilizacionAmount: 0
         }
       ],
       missingKpiMemberIds: [],

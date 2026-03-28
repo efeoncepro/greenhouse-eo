@@ -176,6 +176,14 @@ export const buildPayrollEntry = async ({
     ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
     : compensation.remoteAllowance
 
+  const adjustedColacionAmount = deductibleDays > 0
+    ? roundCurrency((compensation.colacionAmount ?? 0) * attendanceRatio)
+    : (compensation.colacionAmount ?? 0)
+
+  const adjustedMovilizacionAmount = deductibleDays > 0
+    ? roundCurrency((compensation.movilizacionAmount ?? 0) * attendanceRatio)
+    : (compensation.movilizacionAmount ?? 0)
+
   const adjustedFixedBonusAmount = deductibleDays > 0
     ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
     : compensation.fixedBonusAmount
@@ -184,6 +192,8 @@ export const buildPayrollEntry = async ({
     payRegime: compensation.payRegime,
     baseSalary: adjustedBaseSalary,
     remoteAllowance: adjustedRemoteAllowance,
+    colacionAmount: adjustedColacionAmount,
+    movilizacionAmount: adjustedMovilizacionAmount,
     fixedBonusAmount: adjustedFixedBonusAmount,
     bonusOtdAmount,
     bonusRpaAmount,
@@ -214,6 +224,8 @@ export const buildPayrollEntry = async ({
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
     remoteAllowance: compensation.remoteAllowance,
+    colacionAmount: compensation.colacionAmount,
+    movilizacionAmount: compensation.movilizacionAmount,
     fixedBonusLabel: compensation.fixedBonusLabel,
     fixedBonusAmount: compensation.fixedBonusAmount,
     kpiOtdPercent,
@@ -235,6 +247,8 @@ export const buildPayrollEntry = async ({
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,
     chileGratificacionLegalAmount: totals.chileGratificacionLegalAmount,
+    chileColacionAmount: totals.chileColacionAmount,
+    chileMovilizacionAmount: totals.chileMovilizacionAmount,
     chileHealthSystem: totals.chileHealthSystem,
     chileHealthAmount: totals.chileHealthAmount,
     chileUnemploymentRate: totals.chileUnemploymentRate,
@@ -258,6 +272,8 @@ export const buildPayrollEntry = async ({
     daysOnUnpaidLeave: attendance?.daysOnUnpaidLeave ?? null,
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
+    adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
+    adjustedMovilizacionAmount: deductibleDays > 0 ? adjustedMovilizacionAmount : null,
     adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
     createdAt: null,
     updatedAt: null
@@ -375,6 +391,8 @@ export const calculatePayroll = async ({
         payRegime: compensation.payRegime,
         baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
         remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
+        colacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
+        movilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount,
         fixedBonusAmount: entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount,
         bonusOtdAmount: entry.bonusOtdAmount,
         bonusRpaAmount: entry.bonusRpaAmount,
@@ -400,6 +418,8 @@ export const calculatePayroll = async ({
         chileAfpRate: totalsWithTax.chileAfpRate,
         chileAfpAmount: totalsWithTax.chileAfpAmount,
         chileGratificacionLegalAmount: totalsWithTax.chileGratificacionLegalAmount,
+        chileColacionAmount: totalsWithTax.chileColacionAmount,
+        chileMovilizacionAmount: totalsWithTax.chileMovilizacionAmount,
         chileHealthSystem: totalsWithTax.chileHealthSystem,
         chileHealthAmount: totalsWithTax.chileHealthAmount,
         chileUnemploymentRate: totalsWithTax.chileUnemploymentRate,

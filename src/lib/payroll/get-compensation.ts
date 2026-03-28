@@ -45,6 +45,8 @@ import {
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
   afpRate: 'FLOAT64',
+  colacionAmount: 'FLOAT64',
+  movilizacionAmount: 'FLOAT64',
   healthSystem: 'STRING',
   healthPlanUf: 'FLOAT64',
   unemploymentRate: 'FLOAT64',
@@ -65,6 +67,8 @@ type CompensationRow = {
   currency: string | null
   base_salary: number | string | null
   remote_allowance: number | string | null
+  colacion_amount: number | string | null
+  movilizacion_amount: number | string | null
   fixed_bonus_label: string | null
   fixed_bonus_amount: number | string | null
   bonus_otd_min: number | string | null
@@ -159,6 +163,8 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     currency: row.currency === 'USD' ? 'USD' : 'CLP',
     baseSalary: toNumber(row.base_salary),
     remoteAllowance: toNumber(row.remote_allowance),
+    colacionAmount: toNumber(row.colacion_amount),
+    movilizacionAmount: toNumber(row.movilizacion_amount),
     fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
     fixedBonusAmount: toNumber(row.fixed_bonus_amount),
     bonusOtdMin: toNumber(row.bonus_otd_min),
@@ -204,6 +210,8 @@ const assertCompensationValues = (input: CompensationValueInput | UpdateCompensa
   assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
   parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
   parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
+  parsePayrollNumber(input.colacionAmount ?? 0, 'colacionAmount', { min: 0 })
+  parsePayrollNumber(input.movilizacionAmount ?? 0, 'movilizacionAmount', { min: 0 })
   parsePayrollNumber(input.fixedBonusAmount ?? 0, 'fixedBonusAmount', { min: 0 })
   parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
   parsePayrollNumber(input.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 })
@@ -642,6 +650,8 @@ export const createCompensationVersion = async ({
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
     remoteAllowance: Number(input.remoteAllowance ?? 0),
+    colacionAmount: Number(input.colacionAmount ?? 0),
+    movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
     fixedBonusAmount: Number(input.fixedBonusAmount ?? 0),
     bonusOtdMin: Number(input.bonusOtdMin ?? 0),
@@ -674,6 +684,8 @@ export const createCompensationVersion = async ({
         currency,
         base_salary,
         remote_allowance,
+        colacion_amount,
+        movilizacion_amount,
         fixed_bonus_label,
         fixed_bonus_amount,
         bonus_otd_min,
@@ -704,6 +716,8 @@ export const createCompensationVersion = async ({
         @currency,
         @baseSalary,
         @remoteAllowance,
+        @colacionAmount,
+        @movilizacionAmount,
         @fixedBonusLabel,
         @fixedBonusAmount,
         @bonusOtdMin,
@@ -823,6 +837,8 @@ export const updateCompensationVersion = async ({
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
     remoteAllowance: Number(input.remoteAllowance ?? 0),
+    colacionAmount: Number(input.colacionAmount ?? 0),
+    movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
     fixedBonusAmount: Number(input.fixedBonusAmount ?? 0),
     bonusOtdMin: Number(input.bonusOtdMin ?? 0),
@@ -849,6 +865,8 @@ export const updateCompensationVersion = async ({
         currency = @currency,
         base_salary = @baseSalary,
         remote_allowance = @remoteAllowance,
+        colacion_amount = @colacionAmount,
+        movilizacion_amount = @movilizacionAmount,
         fixed_bonus_label = @fixedBonusLabel,
         fixed_bonus_amount = @fixedBonusAmount,
         bonus_otd_min = @bonusOtdMin,

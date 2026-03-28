@@ -39,6 +39,16 @@ const DetailItem = ({ label, value }: { label: string; value: string }) => (
   </Box>
 )
 
+type PayrollEntryExplainAllowances = PayrollEntryExplain['entry'] & {
+  chileColacionAmount?: number | null
+  chileMovilizacionAmount?: number | null
+  chileColacion?: number | null
+  chileMovilizacion?: number | null
+  colacionAmount?: number | null
+  movilizacionAmount?: number | null
+  totalHaberesNoImponibles?: number | null
+}
+
 const PayrollEntryExplainDialog = ({ open, entryId, memberName, onClose }: Props) => {
   const [data, setData] = useState<PayrollEntryExplain | null>(null)
   const [loading, setLoading] = useState(false)
@@ -204,6 +214,27 @@ const PayrollEntryExplainDialog = ({ open, entryId, memberName, onClose }: Props
                   Totales
                 </Typography>
                 <Stack spacing={1.5}>
+                  {(() => {
+                    const entryWithAllowances = data.entry as PayrollEntryExplainAllowances
+
+                    const colacion =
+                      entryWithAllowances.chileColacionAmount ??
+                      entryWithAllowances.chileColacion ??
+                      entryWithAllowances.colacionAmount ??
+                      0
+
+                    const movilizacion =
+                      entryWithAllowances.chileMovilizacionAmount ??
+                      entryWithAllowances.chileMovilizacion ??
+                      entryWithAllowances.movilizacionAmount ??
+                      0
+
+                    const totalNoImponible = colacion + movilizacion
+
+                    return totalNoImponible > 0
+                      ? <DetailItem label='Haberes no imponibles' value={formatCurrency(totalNoImponible, data.entry.currency)} />
+                      : null
+                  })()}
                   <DetailItem
                     label='Bonos variables totales'
                     value={formatCurrency(data.calculation.totalVariableBonus, data.entry.currency)}

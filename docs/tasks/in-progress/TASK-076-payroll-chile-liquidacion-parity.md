@@ -12,8 +12,8 @@
   - `netTotal = 437285.39`
 - Conclusión:
   - el núcleo legal de la liquidación ya calza con el PDF en imponibles y descuentos
-  - el gap restante para llegar al líquido final del PDF son los haberes no imponibles `colación` y `movilización`
-  - hasta que se modelen esos haberes, el motor seguirá llegando al líquido imponible correcto pero no al total final de la liquidación impresa
+  - el gap restante histórico era la modelación de los haberes no imponibles `colación` y `movilización`
+- `colación` y `movilización` ya quedaron modelados como haberes canónicos y versionados en compensación/entries, manteniendo su carácter no imponible
 - No se introdujo ningún evento nuevo; la propagación sigue por `compensation_version.created/updated` y `payroll_entry.upserted`.
 
 ## Status

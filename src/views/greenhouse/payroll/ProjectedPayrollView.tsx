@@ -75,6 +75,13 @@ interface ProjectedEntry {
   chileTaxAmount: number
   chileApvAmount: number
   chileUfValue: number | null
+  chileColacionAmount?: number | null
+  chileMovilizacionAmount?: number | null
+  chileColacion?: number | null
+  chileMovilizacion?: number | null
+  colacionAmount?: number | null
+  movilizacionAmount?: number | null
+  totalHaberesNoImponibles?: number | null
   workingDaysInPeriod: number | null
   daysPresent: number | null
   daysAbsent: number | null
@@ -175,6 +182,22 @@ const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   }
 
   return parts.join(' + ') || '—'
+}
+
+const readNonTaxableAllowances = (entry: ProjectedEntry) => {
+  const colacion =
+    entry.chileColacionAmount ??
+    entry.chileColacion ??
+    entry.colacionAmount ??
+    0
+
+  const movilizacion =
+    entry.chileMovilizacionAmount ??
+    entry.chileMovilizacion ??
+    entry.movilizacionAmount ??
+    0
+
+  return { colacion, movilizacion }
 }
 
 // ── Component ──
@@ -550,6 +573,7 @@ const ProjectedPayrollView = () => {
                       const e = row.original
                       const cur = e.currency as 'CLP' | 'USD'
                       const isExpanded = expandedRows.has(e.memberId)
+                      const { colacion, movilizacion } = readNonTaxableAllowances(e)
 
                       return (
                         <Fragment key={row.id}>
@@ -583,6 +607,8 @@ const ProjectedPayrollView = () => {
                                               <LineItem label='Base' value={formatCurrency(e.baseSalary, cur)} />
                                               {e.remoteAllowance > 0 && <LineItem label='Remote' value={formatCurrency(e.remoteAllowance, cur)} />}
                                               {e.fixedBonusAmount > 0 && <LineItem label={e.fixedBonusLabel || 'Bono fijo'} value={formatCurrency(e.fixedBonusAmount, cur)} />}
+                                              {colacion > 0 && <LineItem label='Colación' value={formatCurrency(colacion, cur)} />}
+                                              {movilizacion > 0 && <LineItem label='Movilización' value={formatCurrency(movilizacion, cur)} />}
                                             </Stack>
                                             <Divider />
                                             <BonusPayoutBlock label='OTD' kpiLabel={`${e.kpiOtdPercent ?? '—'}%`} amount={e.bonusOtdAmount} max={e.bonusOtdMax} color={otdColor(e.kpiOtdPercent)} tooltip={chipTooltip(otdColor(e.kpiOtdPercent))} cur={cur} />

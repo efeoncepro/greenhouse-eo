@@ -19,6 +19,16 @@ type Props = {
   period: PayrollPeriod
 }
 
+type PayrollEntryWithAllowances = PayrollEntry & {
+  chileColacionAmount?: number | null
+  chileMovilizacionAmount?: number | null
+  chileColacion?: number | null
+  chileMovilizacion?: number | null
+  colacionAmount?: number | null
+  movilizacionAmount?: number | null
+  totalHaberesNoImponibles?: number | null
+}
+
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -37,6 +47,19 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
   const isChile = entry.payRegime === 'chile'
   const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
   const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
+  const entryWithAllowances = entry as PayrollEntryWithAllowances
+
+  const colacion =
+    entryWithAllowances.chileColacionAmount ??
+    entryWithAllowances.chileColacion ??
+    entryWithAllowances.colacionAmount ??
+    0
+
+  const movilizacion =
+    entryWithAllowances.chileMovilizacionAmount ??
+    entryWithAllowances.chileMovilizacion ??
+    entryWithAllowances.movilizacionAmount ??
+    0
 
   // Build haberes rows
   const haberesRows: [string, string][] = [
@@ -67,6 +90,14 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
         : 'Bono fijo ajustado (por inasistencia)',
       formatCurrency(effectiveFixedBonusAmount, currency)
     ])
+  }
+
+  if (colacion > 0) {
+    haberesRows.push(['Colación', formatCurrency(colacion, currency)])
+  }
+
+  if (movilizacion > 0) {
+    haberesRows.push(['Movilización', formatCurrency(movilizacion, currency)])
   }
 
   haberesRows.push(

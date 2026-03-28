@@ -11,6 +11,16 @@ type Props = {
   entry: PayrollEntry
 }
 
+type PayrollEntryWithAllowances = PayrollEntry & {
+  chileColacionAmount?: number | null
+  chileMovilizacionAmount?: number | null
+  chileColacion?: number | null
+  chileMovilizacion?: number | null
+  colacionAmount?: number | null
+  movilizacionAmount?: number | null
+  totalHaberesNoImponibles?: number | null
+}
+
 type LineItemProps = {
   label: string
   amount: number | null
@@ -40,6 +50,19 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
     entry.baseSalary + entry.fixedBonusAmount + entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount
 
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? entry.remoteAllowance
+  const entryWithAllowances = entry as PayrollEntryWithAllowances
+
+  const colacion =
+    entryWithAllowances.chileColacionAmount ??
+    entryWithAllowances.chileColacion ??
+    entryWithAllowances.colacionAmount ??
+    0
+
+  const movilizacion =
+    entryWithAllowances.chileMovilizacionAmount ??
+    entryWithAllowances.chileMovilizacion ??
+    entryWithAllowances.movilizacionAmount ??
+    0
 
   return (
     <Stack spacing={0.5} sx={{ px: 2, py: 1, bgcolor: 'action.hover', borderRadius: 1, minWidth: 320 }}>
@@ -71,6 +94,22 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
           <Typography variant='body2'>Asig. teletrabajo</Typography>
           <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
             + {formatCurrency(effectiveRemoteAllowance, 'CLP')}
+          </Typography>
+        </Stack>
+      )}
+      {colacion > 0 && (
+        <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
+          <Typography variant='body2'>Colación</Typography>
+          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+            + {formatCurrency(colacion, 'CLP')}
+          </Typography>
+        </Stack>
+      )}
+      {movilizacion > 0 && (
+        <Stack direction='row' justifyContent='space-between' sx={{ py: 0.25 }}>
+          <Typography variant='body2'>Movilización</Typography>
+          <Typography variant='body2' sx={{ fontFamily: 'monospace' }} color='success.main'>
+            + {formatCurrency(movilizacion, 'CLP')}
           </Typography>
         </Stack>
       )}

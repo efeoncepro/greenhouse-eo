@@ -49,6 +49,67 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 03:14 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el slice de `TASK-076` que modela `colación` y `movilización` como haberes no imponibles canónicos en Payroll Chile, validar compile/tests/migration, y dejarlo listo para publicación.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- Development / staging
+
+### Archivos tocados
+
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/lib/payroll/generate-payroll-pdf.tsx`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/schema.ts`
+- `src/types/payroll.ts`
+- `src/views/greenhouse/payroll/ChileDeductionBreakdown.tsx`
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptCard.tsx`
+- `src/views/greenhouse/payroll/ProjectedPayrollView.tsx`
+- `src/lib/payroll/calculate-chile-deductions.test.ts`
+- `src/lib/payroll/payroll-entry-explain.test.ts`
+- `src/lib/payroll/payroll-readiness.test.ts`
+- `src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+- `src/views/greenhouse/payroll/helpers.test.ts`
+- `src/app/api/hr/payroll/compensation/route.ts`
+- `src/app/api/hr/payroll/compensation/[versionId]/route.ts`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/migrations/add-chile-colacion-movilizacion.sql`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/payroll src/views/greenhouse/payroll`
+- `pnpm pg:doctor --profile=runtime`
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm exec eslint ...`
+- Migration `scripts/migrations/add-chile-colacion-movilizacion.sql` aplicada con `admin`
+
+### Riesgos o pendientes
+
+- Falta smoke manual final en staging con una compensación chilena completa para Valentina que incluya `colación` y `movilización`.
+- El avance sigue dependiendo de los eventos canónicos existentes `compensation_version.created/updated` y `payroll_entry.upserted`; no se agregó un outbox event nuevo.
+
 ## 2026-03-28 03:01 -03
 
 ### Agente

@@ -51,6 +51,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [currency, setCurrency] = useState(ev?.currency ?? 'CLP')
   const [baseSalary, setBaseSalary] = useState(ev?.baseSalary ?? 0)
   const [remoteAllowance, setRemoteAllowance] = useState(ev?.remoteAllowance ?? 0)
+  const [colacionAmount, setColacionAmount] = useState(ev?.colacionAmount ?? 0)
+  const [movilizacionAmount, setMovilizacionAmount] = useState(ev?.movilizacionAmount ?? 0)
   const [fixedBonusLabel, setFixedBonusLabel] = useState(ev?.fixedBonusLabel ?? '')
   const [fixedBonusAmount, setFixedBonusAmount] = useState(ev?.fixedBonusAmount ?? 0)
 
@@ -87,6 +89,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setCurrency(ev?.currency ?? 'CLP')
     setBaseSalary(ev?.baseSalary ?? 0)
     setRemoteAllowance(ev?.remoteAllowance ?? 0)
+    setColacionAmount(ev?.colacionAmount ?? 0)
+    setMovilizacionAmount(ev?.movilizacionAmount ?? 0)
     setFixedBonusLabel(ev?.fixedBonusLabel ?? '')
     setFixedBonusAmount(ev?.fixedBonusAmount ?? 0)
     setGratificacionLegalMode(ev?.gratificacionLegalMode ?? (ev?.payRegime === 'chile' ? 'mensual_25pct' : 'ninguna'))
@@ -140,6 +144,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         currency,
         baseSalary,
         remoteAllowance,
+        colacionAmount: payRegime === 'chile' ? colacionAmount : 0,
+        movilizacionAmount: payRegime === 'chile' ? movilizacionAmount : 0,
         fixedBonusLabel: fixedBonusLabel.trim() || null,
         fixedBonusAmount,
         gratificacionLegalMode: payRegime === 'chile' ? gratificacionLegalMode : 'ninguna',
@@ -231,6 +237,33 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               onChange={e => setRemoteAllowance(Number(e.target.value))}
               helperText='Monto fijo mensual (ej. $50 USD)'
             />
+
+            {payRegime === 'chile' && (
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 6 }}>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    label='Colación'
+                    type='number'
+                    value={colacionAmount}
+                    onChange={e => setColacionAmount(Number(e.target.value))}
+                    helperText='Haber no imponible mensual'
+                  />
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    label='Movilización'
+                    type='number'
+                    value={movilizacionAmount}
+                    onChange={e => setMovilizacionAmount(Number(e.target.value))}
+                    helperText='Haber no imponible mensual'
+                  />
+                </Grid>
+              </Grid>
+            )}
 
             <Grid container spacing={2}>
               <Grid size={{ xs: 7 }}>

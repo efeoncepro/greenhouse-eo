@@ -31,6 +31,8 @@ export const exportPayrollCsv = async (periodId: string) => {
     'Base ajustada',
     'Asignacion teletrabajo',
     'Teletrabajo ajustado',
+    'Colacion',
+    'Movilizacion',
     'Etiqueta bono fijo',
     'Bono fijo',
     'Bono fijo ajustado',
@@ -58,7 +60,30 @@ export const exportPayrollCsv = async (periodId: string) => {
   const lines = [
     headers.join(','),
     ...entries.map(entry =>
-      [
+      (() => {
+        const entryWithAllowances = entry as typeof entry & {
+          chileColacionAmount?: number | null
+          chileMovilizacionAmount?: number | null
+          chileColacion?: number | null
+          chileMovilizacion?: number | null
+          colacionAmount?: number | null
+          movilizacionAmount?: number | null
+          totalHaberesNoImponibles?: number | null
+        }
+
+        const colacion =
+          entryWithAllowances.chileColacionAmount ??
+          entryWithAllowances.chileColacion ??
+          entryWithAllowances.colacionAmount ??
+          0
+
+        const movilizacion =
+          entryWithAllowances.chileMovilizacionAmount ??
+          entryWithAllowances.chileMovilizacion ??
+          entryWithAllowances.movilizacionAmount ??
+          0
+
+        return [
         entry.memberName,
         entry.memberEmail,
         entry.payRegime,
@@ -67,6 +92,8 @@ export const exportPayrollCsv = async (periodId: string) => {
         entry.adjustedBaseSalary,
         entry.remoteAllowance,
         entry.adjustedRemoteAllowance,
+        colacion,
+        movilizacion,
         entry.fixedBonusLabel,
         entry.fixedBonusAmount,
         entry.adjustedFixedBonusAmount,
@@ -89,7 +116,8 @@ export const exportPayrollCsv = async (periodId: string) => {
         entry.chileApvAmount,
         entry.chileTotalDeductions,
         entry.netTotal
-      ]
+        ]
+      })()
         .map(escapeCsvValue)
         .join(',')
     )

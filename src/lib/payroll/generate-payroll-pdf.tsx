@@ -315,6 +315,28 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
   const isChile = entry.payRegime === 'chile'
   const generatedAt = new Date().toISOString().split('T')[0]
 
+  const entryWithAllowances = entry as PayrollEntry & {
+    chileColacionAmount?: number | null
+    chileMovilizacionAmount?: number | null
+    chileColacion?: number | null
+    chileMovilizacion?: number | null
+    colacionAmount?: number | null
+    movilizacionAmount?: number | null
+    totalHaberesNoImponibles?: number | null
+  }
+
+  const colacion =
+    entryWithAllowances.chileColacionAmount ??
+    entryWithAllowances.chileColacion ??
+    entryWithAllowances.colacionAmount ??
+    0
+
+  const movilizacion =
+    entryWithAllowances.chileMovilizacionAmount ??
+    entryWithAllowances.chileMovilizacion ??
+    entryWithAllowances.movilizacionAmount ??
+    0
+
   const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
   const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
 
@@ -352,6 +374,14 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
         : 'Bono fijo ajustado (por inasistencia)',
       fmtCurrency(effectiveFixedBonusAmount, currency)
     ])
+  }
+
+  if (colacion > 0) {
+    haberesRows.push(['Colación', fmtCurrency(colacion, currency)])
+  }
+
+  if (movilizacion > 0) {
+    haberesRows.push(['Movilización', fmtCurrency(movilizacion, currency)])
   }
 
   haberesRows.push(

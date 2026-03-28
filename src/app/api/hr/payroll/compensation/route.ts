@@ -49,6 +49,8 @@ export async function POST(request: Request) {
         currency: body.currency === 'USD' ? 'USD' : 'CLP',
         baseSalary: parsePayrollNumber(body.baseSalary, 'baseSalary', { min: 0 }) ?? 0,
         remoteAllowance: parsePayrollNumber(body.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 }) ?? 0,
+        colacionAmount: parsePayrollNumber(body.colacionAmount ?? 0, 'colacionAmount', { min: 0 }) ?? 0,
+        movilizacionAmount: parsePayrollNumber(body.movilizacionAmount ?? 0, 'movilizacionAmount', { min: 0 }) ?? 0,
         bonusOtdMin: parsePayrollNumber(body.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 }) ?? 0,
         bonusOtdMax: parsePayrollNumber(body.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 }) ?? 0,
         bonusRpaMin: parsePayrollNumber(body.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 }) ?? 0,

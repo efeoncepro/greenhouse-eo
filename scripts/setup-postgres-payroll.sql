@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.compensation_versions (
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   base_salary NUMERIC(14, 2) NOT NULL,
   remote_allowance NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  colacion_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  movilizacion_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   fixed_bonus_label TEXT,
   fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_otd_min NUMERIC(14, 2) NOT NULL DEFAULT 0,
@@ -89,6 +91,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   base_salary NUMERIC(14, 2) NOT NULL,
   remote_allowance NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  colacion_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  movilizacion_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   fixed_bonus_label TEXT,
   fixed_bonus_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
 
@@ -110,6 +114,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   bonus_other_description TEXT,
   gross_total NUMERIC(14, 2) NOT NULL,
   chile_gratificacion_legal NUMERIC(14, 2),
+  chile_colacion_amount NUMERIC(14, 2),
+  chile_movilizacion_amount NUMERIC(14, 2),
 
   -- Chile-specific deductions
   chile_afp_name TEXT,
@@ -144,6 +150,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   days_on_unpaid_leave INTEGER,
   adjusted_base_salary NUMERIC(14, 2),
   adjusted_remote_allowance NUMERIC(14, 2),
+  adjusted_colacion_amount NUMERIC(14, 2),
+  adjusted_movilizacion_amount NUMERIC(14, 2),
   adjusted_fixed_bonus_amount NUMERIC(14, 2),
 
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
