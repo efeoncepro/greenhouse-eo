@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Implementación parcial` |
+| Status real | `Cerrada` |
 | Rank | 4 de 4 (después de TASK-078, TASK-076 y TASK-077) |
 | Domain | HR Payroll |
 
@@ -141,7 +141,7 @@ Reglas obligatorias:
 - [x] tests cubren Fonasa, Isapre, APV, gratificación y tramos tributarios
 - [x] `desired_net_clp` persistido en `compensation_versions` para trazabilidad
 - [x] AFP rate sincronizada desde Previred al guardar (no solo en preview)
-- [ ] round-trip check forward vs reverse al guardar (nice-to-have)
+- [x] ~~round-trip check~~ — innecesario: la convergencia ±$1 del binary search ya valida cada iteración contra el forward engine
 - [x] base salary protegido en modo reverse (display chip, no editable)
 
 ## Verification
