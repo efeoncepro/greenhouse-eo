@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { PayrollPeriod } from '@/types/payroll'
@@ -71,13 +71,34 @@ describe('PayrollPeriodTab readiness', () => {
   })
 
   it('renders readiness issues and disables calculate when blockers exist', async () => {
-    render(<PayrollPeriodTab period={period} entries={[]} onRefresh={vi.fn()} />)
+    const { findByText, getByRole, getByText } = render(
+      <PayrollPeriodTab
+        period={period}
+        entries={[]}
+        onRefresh={vi.fn()}
+        onCreatePeriod={vi.fn()}
+        createPeriodLabel='Abril 2026'
+      />
+    )
 
-    await waitFor(() => {
-      expect(screen.getByText('Falta el valor UF y este período lo requiere para calcular descuentos Isapre.')).toBeInTheDocument()
-    })
+    await findByText('Falta el valor UF y este período lo requiere para calcular descuentos Isapre.')
 
-    expect(screen.getByText('1 colaborador(es) activos quedarían fuera por no tener compensación vigente.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Calcular' })).toBeDisabled()
+    expect(getByText('1 colaborador(es) activos quedarían fuera por no tener compensación vigente.')).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Calcular' })).toBeDisabled()
+  })
+
+  it('renders the operational empty state when no period is selected', () => {
+    const { getByText, getByRole } = render(
+      <PayrollPeriodTab
+        period={null}
+        entries={[]}
+        onRefresh={vi.fn()}
+        onCreatePeriod={vi.fn()}
+        createPeriodLabel='Abril 2026'
+      />
+    )
+
+    expect(getByText('No hay período abierto')).toBeInTheDocument()
+    expect(getByRole('button', { name: 'Crear período Abril 2026' })).toBeInTheDocument()
   })
 })

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { generatePayrollReceiptPdf } from '@/lib/payroll/generate-payroll-pdf'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { getPayrollReceiptByEntryId } from '@/lib/payroll/payroll-receipts-store'
+import { buildPayrollReceiptDownloadFilename } from '@/lib/payroll/receipt-filename'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { downloadGreenhouseMediaAsset } from '@/lib/storage/greenhouse-media'
 
@@ -40,7 +41,16 @@ export async function GET(_: Request, { params }: { params: Promise<{ entryId: s
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${storedReceipt?.receiptId || `receipt-${entryId}`}.pdf"`
+        'Content-Disposition': `attachment; filename="${
+          storedReceipt
+            ? buildPayrollReceiptDownloadFilename({
+                entryId,
+                periodId: storedReceipt.periodId,
+                memberId: storedReceipt.memberId,
+                payRegime: storedReceipt.payRegime
+              })
+            : `receipt-${entryId}.pdf`
+        }"`
       }
     })
   } catch (error) {

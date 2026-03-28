@@ -20,6 +20,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 
 interface PayrollEntry {
   entryId: string
@@ -33,6 +34,7 @@ interface PayrollEntry {
 }
 
 interface PayrollData {
+  memberId: string
   payrollHistory: PayrollEntry[]
   compensation: {
     activeAssignmentsCount: number
@@ -62,6 +64,20 @@ const MyPayrollView = () => {
   }, [])
 
   useEffect(() => { void load() }, [load])
+
+  const handleDownloadReceipt = async (entry: PayrollEntry) => {
+    try {
+      await downloadPayrollReceiptPdf({
+        route: `/api/my/payroll/entries/${entry.entryId}/receipt`,
+        entryId: entry.entryId,
+        periodId: entry.periodId,
+        memberId: data?.memberId ?? null,
+        currency: entry.currency === 'USD' ? 'USD' : 'CLP'
+      })
+    } catch (error) {
+      console.error('Unable to download my payroll receipt.', error)
+    }
+  }
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
@@ -103,7 +119,7 @@ const MyPayrollView = () => {
                 <Button
                   variant='tonal'
                   startIcon={<i className='tabler-file-download' />}
-                  onClick={() => window.open(`/api/my/payroll/entries/${latest.entryId}/receipt`, '_blank')}
+                  onClick={() => { void handleDownloadReceipt(latest) }}
                 >
                   Descargar recibo
                 </Button>
@@ -149,7 +165,7 @@ const MyPayrollView = () => {
                           size='small'
                           variant='tonal'
                           startIcon={<i className='tabler-file-download' />}
-                          onClick={() => window.open(`/api/my/payroll/entries/${e.entryId}/receipt`, '_blank')}
+                          onClick={() => { void handleDownloadReceipt(e) }}
                         >
                           Descargar
                         </Button>

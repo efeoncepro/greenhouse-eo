@@ -1,6 +1,8 @@
 import 'server-only'
 
-import { Document, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
+import path from 'path'
+
+import { Document, Image, Page, StyleSheet, Text, View, renderToStream } from '@react-pdf/renderer'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 
@@ -8,6 +10,8 @@ import { getPayrollEntries, getPayrollEntryById } from '@/lib/payroll/get-payrol
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 import { getOperatingEntityIdentity, type OperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+
+const LOGO_PATH = path.join(process.cwd(), 'public/branding/logo-full.svg')
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -47,12 +51,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 12,
     borderBottomWidth: 2,
-    borderBottomColor: '#2E7D32'
-  },
-  companyName: {
-    fontSize: 16,
-    fontFamily: 'Helvetica-Bold',
-    color: '#2E7D32'
+    borderBottomColor: '#023c70'
   },
   companyDetail: {
     fontSize: 8,
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica-Bold',
     marginTop: 16,
     marginBottom: 8,
-    color: '#2E7D32'
+    color: '#023c70'
   },
   metaRow: {
     flexDirection: 'row',
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#023c70',
     paddingVertical: 5,
     paddingHorizontal: 4
   },
@@ -113,9 +112,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 6,
     paddingHorizontal: 4,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#E8EFF7',
     borderTopWidth: 1.5,
-    borderTopColor: '#2E7D32'
+    borderTopColor: '#023c70'
   },
   totalsCell: {
     fontSize: 8,
@@ -161,9 +160,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 6,
     paddingHorizontal: 6,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#E8EFF7',
     borderTopWidth: 1.5,
-    borderTopColor: '#2E7D32'
+    borderTopColor: '#023c70'
   },
   receiptTotalLabel: {
     width: '55%',
@@ -210,11 +209,14 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>{operatingEntity?.legalName ?? 'Greenhouse EO'}</Text>
-            <Text style={styles.companyDetail}>{operatingEntity?.taxId ? `RUT ${operatingEntity.taxId} · ` : ''}Reporte de nómina</Text>
+            <Image src={LOGO_PATH} style={{ width: 120, height: 28, marginBottom: 4 }} />
+            <Text style={styles.companyDetail}>{operatingEntity?.legalName ?? 'Efeonce Group SpA'}</Text>
+            {operatingEntity?.taxId && <Text style={styles.companyDetail}>{`RUT ${operatingEntity.taxId}`}</Text>}
+            {operatingEntity?.legalAddress && <Text style={styles.companyDetail}>{operatingEntity.legalAddress}</Text>}
           </View>
           <View>
             <Text style={{ fontSize: 10, textAlign: 'right' as const }}>{`${monthName} ${period.year}`}</Text>
+            <Text style={{ ...styles.companyDetail, textAlign: 'right' as const }}>Reporte de nómina</Text>
             <Text style={{ ...styles.companyDetail, textAlign: 'right' as const }}>{period.periodId}</Text>
           </View>
         </View>
@@ -300,7 +302,7 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text>{`Greenhouse EO — Nómina ${monthName} ${period.year}`}</Text>
+          <Text>{`${operatingEntity?.legalName ?? 'Efeonce Group SpA'} — Nómina ${monthName} ${period.year}`}</Text>
           <Text>{`Generado: ${generatedAt}`}</Text>
         </View>
       </Page>
@@ -436,11 +438,14 @@ const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEnt
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>{operatingEntity?.legalName ?? 'Greenhouse EO'}</Text>
-            <Text style={styles.companyDetail}>{operatingEntity?.taxId ? `RUT ${operatingEntity.taxId} · ` : ''}Recibo de remuneraciones</Text>
+            <Image src={LOGO_PATH} style={{ width: 120, height: 28, marginBottom: 4 }} />
+            <Text style={styles.companyDetail}>{operatingEntity?.legalName ?? 'Efeonce Group SpA'}</Text>
+            {operatingEntity?.taxId && <Text style={styles.companyDetail}>{`RUT ${operatingEntity.taxId}`}</Text>}
+            {operatingEntity?.legalAddress && <Text style={styles.companyDetail}>{operatingEntity.legalAddress}</Text>}
           </View>
           <View>
             <Text style={{ fontSize: 10, textAlign: 'right' as const }}>{`${monthName} ${period.year}`}</Text>
+            <Text style={{ ...styles.companyDetail, textAlign: 'right' as const }}>Recibo de remuneraciones</Text>
             <Text style={{ ...styles.companyDetail, textAlign: 'right' as const }}>{period.periodId}</Text>
           </View>
         </View>
@@ -519,7 +524,7 @@ const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEnt
 
         {/* Net total */}
         <View style={{ ...styles.receiptSection, marginTop: 8 }}>
-          <View style={{ ...styles.receiptTotalRow, backgroundColor: '#2E7D32', paddingVertical: 10 }}>
+          <View style={{ ...styles.receiptTotalRow, backgroundColor: '#023c70', paddingVertical: 10 }}>
             <Text style={{ ...styles.receiptTotalLabel, color: '#ffffff', fontSize: 12 }}>Líquido a pagar</Text>
             <Text style={{ ...styles.receiptTotalValue, color: '#ffffff', fontSize: 12 }}>{fmtCurrency(entry.netTotal, currency)}</Text>
           </View>
@@ -534,7 +539,7 @@ const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEnt
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text>{`Greenhouse EO — Recibo ${monthName} ${period.year}`}</Text>
+          <Text>{`${operatingEntity?.legalName ?? 'Efeonce Group SpA'} — Recibo ${monthName} ${period.year}`}</Text>
           <Text>{`Generado: ${generatedAt}`}</Text>
         </View>
       </Page>

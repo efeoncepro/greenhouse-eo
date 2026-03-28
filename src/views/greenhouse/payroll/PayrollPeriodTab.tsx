@@ -37,9 +37,11 @@ type Props = {
   period: PayrollPeriod | null
   entries: PayrollEntry[]
   onRefresh: () => void
+  onCreatePeriod: () => void
+  createPeriodLabel: string
 }
 
-const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
+const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
@@ -234,12 +236,16 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   if (!period) {
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardContent sx={{ py: 8, textAlign: 'center' }}>
-          <Stack alignItems='center' spacing={1}>
+        <CardContent sx={{ py: 8 }}>
+          <Stack alignItems='center' spacing={2} textAlign='center'>
             <i className='tabler-calendar-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+            <Typography variant='h6'>No hay período abierto</Typography>
             <Typography color='text.secondary'>
-              No hay período seleccionado. Crea un período para comenzar.
+              El siguiente ciclo sugerido es {createPeriodLabel}. Si ya cerraste el período anterior, crea el nuevo borrador para continuar.
             </Typography>
+            <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={onCreatePeriod}>
+              Crear período {createPeriodLabel}
+            </Button>
           </Stack>
         </CardContent>
       </Card>

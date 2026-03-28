@@ -24,6 +24,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
+import { getCurrentPayrollPeriod, getNextPayrollPeriodSuggestion } from '@/lib/payroll/current-payroll-period'
 import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
@@ -51,6 +52,17 @@ const PayrollDashboard = () => {
   const [newMonth, setNewMonth] = useState(new Date().getMonth() + 1)
   const [newTaxTableVersion, setNewTaxTableVersion] = useState('')
 
+  const createPeriodSuggestion = getNextPayrollPeriodSuggestion(periods)
+  const createPeriodLabel = formatPeriodLabel(createPeriodSuggestion.year, createPeriodSuggestion.month)
+
+  const openNewPeriodDialog = useCallback(() => {
+    const suggestion = getNextPayrollPeriodSuggestion(periods)
+
+    setNewYear(suggestion.year)
+    setNewMonth(suggestion.month)
+    setNewPeriodOpen(true)
+  }, [periods])
+
   const fetchAll = useCallback(async () => {
     try {
       const [periodsRes, compRes] = await Promise.all([
@@ -63,12 +75,12 @@ const PayrollDashboard = () => {
       if (periodsRes.ok) {
         const data = await periodsRes.json()
 
-        setPeriods(data.periods || [])
+        const nextPeriods = data.periods || []
 
-        // Auto-select the most recent non-exported period, or the first one
-        const active = (data.periods || []).find(
-          (p: PayrollPeriod) => p.status !== 'exported'
-        ) || (data.periods || [])[0] || null
+        setPeriods(nextPeriods)
+
+        // Auto-select only the latest chronological period if it is still open
+        const active = getCurrentPayrollPeriod(nextPeriods)
 
         if (active) {
           setCurrentPeriod(active)
@@ -203,7 +215,7 @@ const PayrollDashboard = () => {
           <Button
             variant='contained'
             startIcon={<i className='tabler-plus' />}
-            onClick={() => setNewPeriodOpen(true)}
+            onClick={openNewPeriodDialog}
           >
             Nuevo período
           </Button>
@@ -313,6 +325,8 @@ const PayrollDashboard = () => {
               period={currentPeriod}
               entries={entries}
               onRefresh={handleRefresh}
+              onCreatePeriod={openNewPeriodDialog}
+              createPeriodLabel={createPeriodLabel}
             />
           </TabPanel>
 

@@ -7,6 +7,18 @@
 
 ## 2026-03-28
 
+### TASK-086 current period selector + receipt download implemented
+- `PayrollDashboard` ahora usa un helper puro para seleccionar el período actual sin retroceder a rezagos exportados.
+- `PayrollPeriodTab` muestra empty state operativo con CTA de creación del siguiente período.
+- La descarga de recibos PDF dejó de depender de `window.open` y ahora usa `fetch -> blob -> anchor` con nombre legible para HR y Mi Nómina.
+- Se añadió `@testing-library/dom` como devDependency explícita para estabilizar la suite de tests de componentes que usa Testing Library.
+
+### TASK-086 payroll cut-off rule clarified
+- `TASK-086` quedó ajustada para reflejar la regla operativa real de Efeonce: la nómina se imputa al mes cerrado y se calcula/cierra al final del mes o dentro de los primeros 5 días hábiles del mes siguiente.
+- El brief ahora separa "período actual" de simple cambio de calendario y ancla el selector a la ventana de cierre operativo.
+- Se dejó explícito que `approved` puede seguir siendo el período actual solo mientras siga dentro de la ventana de cierre; fuera de ese corte debe dejar de mostrarse como vigente.
+- La misma task ahora absorbe también el flujo de descarga del recibo PDF, porque el botón no estaba cerrando una experiencia confiable y el filename seguía saliendo del `receiptId` técnico.
+
 ### Reverse payroll engine + compensation líquido-first (TASK-079 → TASK-085)
 - Motor `computeGrossFromNet()`: binary search sobre forward engine, ±$1 CLP, piso IMM, AFP desde Previred
 - Regla Chile: líquido deseado = neto con 7% salud legal; excedente Isapre como deducción voluntaria visible

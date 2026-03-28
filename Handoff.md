@@ -49,6 +49,123 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 18:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-086` end-to-end: selector de "Período actual" con cut-off operativo de nómina y descarga confiable de recibos PDF por HR/Mi Nómina con nombre legible.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-086-payroll-current-period-view-logic.md`
+- `src/lib/payroll/current-payroll-period.ts`
+- `src/lib/payroll/current-payroll-period.test.ts`
+- `src/lib/payroll/receipt-filename.ts`
+- `src/lib/payroll/receipt-filename.test.ts`
+- `src/lib/payroll/download-payroll-receipt.ts`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptDialog.tsx`
+- `src/views/greenhouse/my/MyPayrollView.tsx`
+- `src/views/greenhouse/people/tabs/PersonPayrollTab.tsx`
+- `src/app/api/hr/payroll/entries/[entryId]/receipt/route.ts`
+- `src/app/api/my/payroll/entries/[entryId]/receipt/route.ts`
+- `package.json`
+- `pnpm-lock.yaml`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/receipt-filename.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx` -> 3 suites, 10 tests pass
+- `pnpm exec eslint ...` sobre los archivos tocados -> pass
+- `pnpm build` -> pass
+- `pnpm exec tsc --noEmit --pretty false` -> falla por deuda preexistente en otras suites de Testing Library, no por los archivos de esta task
+- `pnpm add -D @testing-library/dom@10.4.1` para estabilizar la superficie de tests de componentes
+
+### Riesgos o pendientes
+
+- La task quedó cerrada y validada; lo que queda es review o integración normal según el flujo del repo.
+- El único ruido técnico observado fue el `tsc` de la base legada de Testing Library en otras suites ajenas a esta task.
+- Quedaron diffs colaterales en `src/lib/payroll/generate-payroll-pdf.tsx` y `src/views/greenhouse/payroll/PayrollReceiptCard.tsx` que no tocamos en esta tarea; revisar si vienen de una lane previa antes de integrarlos.
+
+## 2026-03-28 17:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Enriquecer `TASK-086` con hallazgos de auditoría para desarrollo: lifecycle oficial de nómina, rol contextual de `TASK-074`, bug de selección del período actual y vacío operativo.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-086-payroll-current-period-view-logic.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Auditoría y edición documental; no hubo cambios de runtime ni tests ejecutados.
+
+### Riesgos o pendientes
+
+- La task todavía deja abierta la decisión de si el naming del PDF de recibo se absorbe aquí o se deriva a una follow-up de receipts.
+- La implementación sigue pendiente; solo quedó explicitada la regla esperada para el selector de período actual.
+
+## 2026-03-28 17:20 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Auditar `TASK-086` y enriquecer el brief sin tocar código funcional. Se detectó además un gap adyacente en la descarga de recibos PDF: el endpoint responde `application/pdf` con `attachment`, pero el nombre descargado usa `receiptId` técnico y no un nombre humano-readable.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-086-payroll-current-period-view-logic.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Auditoria de código y documentación; no se ejecutaron tests porque no hubo cambios de runtime.
+
+### Riesgos o pendientes
+
+- Definir si el naming del PDF de recibo entra en esta misma task o si se separa en un follow-up propio de receipts.
+- La regla de selección de "Período actual" sigue pendiente de implementación; solo quedó mejor especificada en el brief.
+
 ## 2026-03-28 13:45 -03
 
 ### Agente

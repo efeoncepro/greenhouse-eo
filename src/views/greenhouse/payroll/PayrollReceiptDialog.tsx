@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PayrollReceiptCard from './PayrollReceiptCard'
 
 type Props = {
@@ -19,6 +20,22 @@ type Props = {
 const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
   if (!entry) return null
 
+  const handleDownload = async () => {
+    try {
+      await downloadPayrollReceiptPdf({
+        route: `/api/hr/payroll/entries/${entry.entryId}/receipt`,
+        entryId: entry.entryId,
+        periodId: period.periodId,
+        memberId: entry.memberId,
+        memberName: entry.memberName,
+        payRegime: entry.payRegime,
+        currency: entry.currency
+      })
+    } catch (error) {
+      console.error('Unable to download payroll receipt.', error)
+    }
+  }
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth closeAfterTransition={false}>
       <DialogTitle>Recibo — {entry.memberName}</DialogTitle>
@@ -29,7 +46,7 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
         <Button
           variant='tonal'
           startIcon={<i className='tabler-file-download' />}
-          onClick={() => window.open(`/api/hr/payroll/entries/${entry.entryId}/receipt`, '_blank')}
+          onClick={() => { void handleDownload() }}
         >
           Descargar PDF
         </Button>

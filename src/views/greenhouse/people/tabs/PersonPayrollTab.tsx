@@ -24,6 +24,7 @@ import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
 import type { PayrollEntry } from '@/types/payroll'
+import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import { formatCurrency, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -76,6 +77,22 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
 
   const sorted = [...entries].sort((a, b) => a.periodId.localeCompare(b.periodId))
   const currency = sorted[0].currency as 'CLP' | 'USD'
+
+  const handleDownloadReceipt = async (entry: PayrollEntry) => {
+    try {
+      await downloadPayrollReceiptPdf({
+        route: `/api/hr/payroll/entries/${entry.entryId}/receipt`,
+        entryId: entry.entryId,
+        periodId: entry.periodId,
+        memberId: entry.memberId,
+        memberName: entry.memberName,
+        payRegime: entry.payRegime,
+        currency: entry.currency
+      })
+    } catch (error) {
+      console.error('Unable to download payroll receipt.', error)
+    }
+  }
 
   const chartOptions: ApexOptions = {
     chart: { parentHeightOffset: 0, toolbar: { show: false } },
@@ -169,7 +186,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                           size='small'
                           variant='tonal'
                           startIcon={<i className='tabler-file-download' />}
-                          onClick={() => window.open(`/api/hr/payroll/entries/${entry.entryId}/receipt`, '_blank')}
+                          onClick={() => { void handleDownloadReceipt(entry) }}
                         >
                           PDF
                         </Button>
