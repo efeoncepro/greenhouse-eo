@@ -316,7 +316,7 @@ const EmailDeliveryHistoryTab = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <CustomTextField
-                    fullWidth size='small' placeholder='Buscar por destinatario o asunto...'
+                    fullWidth size='small' label='Buscar' placeholder='Destinatario o asunto...'
                     value={search}
                     onChange={e => { setSearch(e.target.value); setPage(0) }}
                   />
