@@ -228,6 +228,7 @@ const PAYROLL_REQUIRED_TABLES = [
   'greenhouse_payroll.compensation_versions',
   'greenhouse_payroll.payroll_periods',
   'greenhouse_payroll.payroll_entries',
+  'greenhouse_payroll.payroll_receipts',
   'greenhouse_payroll.payroll_bonus_config'
 ] as const
 
@@ -389,6 +390,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
   const effectiveTo = toPgDateString(row.effective_to)
   const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
   const afpRate = toNullableNumber(row.afp_rate)
+
   const resolvedAfpSplitRates = resolveChileAfpSplitRates({
     totalRate: afpRate,
     cotizacionRate: toNullableNumber(row.afp_cotizacion_rate),
@@ -846,6 +848,7 @@ export const pgCreateCompensationVersion = async ({
 
     const today = getCurrentDateString()
     const isCurrent = effectiveFrom <= today && (!nextScheduledFrom || nextScheduledFrom > today)
+
     const resolvedAfpSplitRates = resolveChileAfpSplitRates({
       totalRate: input.afpRate ?? null,
       cotizacionRate: input.afpCotizacionRate ?? null,

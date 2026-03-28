@@ -103,6 +103,7 @@ export const processReactiveEvents = async (options?: {
 
     // Inject event type into payload for notification routing
     payload._eventType = event.event_type
+    payload._eventId = event.event_id
 
     const projections = getProjectionsForEvent(event.event_type, domain)
 

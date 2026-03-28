@@ -1,5 +1,20 @@
 # TASK-077 — Payroll Receipt Generation & Delivery
 
+## Delta 2026-03-28
+
+- La base operativa de recibos ya quedó implementada en runtime:
+  - registry persistido en `greenhouse_payroll.payroll_receipts`
+  - batch generator `generatePayrollReceiptsForPeriod()`
+  - proyección reactiva `payroll_receipts_delivery` disparada por `payroll_period.exported`
+  - storage GCS reutilizable para PDFs
+  - descarga on-demand del recibo prioriza el PDF almacenado y cae a render en vivo solo como fallback
+- El flujo está integrado por outbox/reactive projections, no como cron separado.
+- Queda abierto para esta task:
+  - superficie UI de `Mi Nómina`
+  - acceso descargable desde `People > Person > Nómina`
+  - pulido del template de email/branding
+  - smoke real sobre exportación completa en staging con entrega de correo
+
 ## Status
 
 | Campo | Valor |
@@ -78,23 +93,23 @@ Que al exportar un período de nómina:
 | `@react-pdf/renderer` | `package.json` | Instalado v4.3.2 |
 | `generatePayrollReceiptPdf(entryId)` | `src/lib/payroll/generate-payroll-pdf.tsx` | Funciona, formato básico |
 | `generatePayrollPeriodPdf(periodId)` | mismo archivo | Reporte de período |
-| `GET /api/hr/payroll/entries/[entryId]/receipt` | API route | Genera on-demand |
+| `GET /api/hr/payroll/entries/[entryId]/receipt` | API route | Prioriza PDF almacenado y cae a render on-demand |
 | `PayrollReceiptCard.tsx` | `src/views/greenhouse/payroll/` | Vista MUI inline |
 | `PayrollReceiptDialog.tsx` | mismo directorio | Modal con botón descargar |
 | `generatePayrollExcel()` | `src/lib/payroll/generate-payroll-excel.ts` | Export Excel |
 | Resend email system | `src/lib/email/` | Integrado con React Email |
 | GCS media storage | `src/lib/storage/greenhouse-media.ts` | Upload/download autenticado |
+| `greenhouse_payroll.payroll_receipts` | PostgreSQL | Registry canónico de recibos |
+| `generatePayrollReceiptsForPeriod()` | `src/lib/payroll/generate-payroll-receipts.ts` | Batch generator + email delivery |
+| `payroll_receipts_delivery` projection | `src/lib/sync/projections/payroll-receipts.ts` | Reactivo sobre `payroll_period.exported` |
 | Vuexy Invoice patterns | `full-version/src/views/apps/invoice/` | PreviewCard, PreviewActions, SendDrawer |
 
 ### Lo que NO existe
 
-- Generación batch automática al exportar
-- Storage de PDFs en GCS
-- Tabla de registro de recibos
-- Formato liquidación legal chilena con branding
-- Formato payment statement internacional
-- Email de notificación con PDF adjunto
-- Acceso del colaborador a sus propios recibos
+- UI completa de Mi Nómina con listado de recibos
+- Descarga desde `People > Person > Nómina`
+- Template de email finalizado con branding de producción
+- Smoke end-to-end en staging con colas/Resend confirmadas
 
 ## Scope
 
@@ -120,6 +135,8 @@ Que al exportar un período de nómina:
 | `email_recipient` | TEXT | Email del colaborador |
 
 **GCS path convention:** `payroll-receipts/{year}-{month}/{memberId}-r{revision}.pdf`
+
+**Estado:** base implementada en PostgreSQL + helper de paths + uso real del batch generator.
 
 ### Slice 2 — Liquidación Chile (PDF redesign)
 
@@ -225,6 +242,8 @@ Nuevo template para `payRegime === 'international'`:
 - Se ejecuta como parte del flow de exportación, no como cron separado
 - Si el período se re-exporta: incrementar `revision`, generar nuevos PDFs, no borrar los anteriores
 
+**Estado real actual:** ya está implementado como `src/lib/payroll/generate-payroll-receipts.ts` y se dispara por la proyección reactiva `payroll_receipts_delivery` cuando entra `payroll_period.exported`.
+
 **Guardrails:**
 - Si la generación de un PDF falla, no bloquear la exportación — marcar como `failed` en el registro
 - Timeout por PDF: 10 segundos max
@@ -280,6 +299,8 @@ Efeonce Greenhouse™
 
 **Registro:** Actualizar `payroll_receipts.email_sent = TRUE`, `email_sent_at`, `email_recipient`
 
+**Estado real actual:** el envío sale desde el batch generator con attachment PDF y se persiste `email_sent_at`/`email_delivery_id` en el registry.
+
 **Guardrails:**
 - No enviar email si el colaborador no tiene email
 - Rate limiting: Resend tiene límites por segundo, implementar throttle si hay muchos entries
@@ -302,6 +323,8 @@ Efeonce Greenhouse™
 - `GET /api/my/payroll/receipts/[receiptId]/download` — descarga PDF (proxy GCS autenticado)
 - `GET /api/hr/payroll/entries/[entryId]/receipt/download` — descarga por HR (ya existe parcialmente, adaptar a GCS)
 
+**Estado actual:** la descarga por HR ya prioriza el PDF almacenado. Las listas `/my/payroll` y el botón por entry en People siguen pendientes.
+
 ### Slice 7 — Eventos y outbox
 
 **Eventos nuevos:**
@@ -312,6 +335,8 @@ Efeonce Greenhouse™
 | `payroll.receipt_emailed` | `payroll_entry` | `{ entryId, memberId, receiptId, email }` |
 
 **Consumer:** `notification_dispatch` puede escuchar `payroll.receipts_generated` para notificar a HR que el batch terminó.
+
+**Estado actual:** no se agregó un evento nuevo; el trigger principal ya es `payroll_period.exported` y el reaction flow vive en projections/outbox. Si luego se decide anunciar el batch a HR, se puede derivar un evento secundario sin romper el flujo actual.
 
 ## Out of Scope
 

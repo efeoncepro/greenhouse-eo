@@ -3,6 +3,12 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll receipts registry + reactive delivery
+- `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
+- La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.
+- La descarga de recibos por HR prioriza el PDF almacenado en GCS y cae a render on-demand solo como fallback.
+- Las superficies de `Mi Nómina` y `People > Person > Nómina` siguen pendientes para exponer el listado/descarga del colaborador.
+
 ## Delta 2026-03-28 Payroll AFP split
 - `Payroll Chile` ahora versiona y snapshottea `AFP` con split explícito de `cotización` y `comisión`, manteniendo también el total agregado para compatibilidad histórica.
 - Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.

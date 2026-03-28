@@ -20,6 +20,7 @@ const PAYROLL_REQUIRED_TABLES = [
   'greenhouse_payroll.compensation_versions',
   'greenhouse_payroll.payroll_periods',
   'greenhouse_payroll.payroll_entries',
+  'greenhouse_payroll.payroll_receipts',
   'greenhouse_payroll.payroll_bonus_config'
 ]
 

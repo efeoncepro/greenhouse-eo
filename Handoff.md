@@ -49,6 +49,55 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:37 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el slice base de `TASK-077` dejando batch de recibos, registry Postgres, storage GCS y proyección reactiva listos; actualizar documentación viva sin mezclar con la UI pendiente.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `src/lib/storage/greenhouse-media.ts`
+- `src/lib/payroll/payroll-receipts-store.ts`
+- `src/lib/payroll/generate-payroll-receipts.ts`
+- `src/lib/sync/projections/payroll-receipts.ts`
+- `src/lib/sync/projections/index.ts`
+- `src/lib/sync/reactive-consumer.ts`
+- `src/app/api/hr/payroll/entries/[entryId]/receipt/route.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/postgres-store.test.ts`
+- `src/lib/payroll/payroll-receipts-store.test.ts`
+- `src/lib/sync/projections/payroll-receipts.test.ts`
+- `docs/tasks/in-progress/TASK-077-payroll-receipt-generation-delivery.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/payroll/payroll-receipts-store.test.ts src/lib/sync/projections/payroll-receipts.test.ts`
+- `pnpm exec eslint src/lib/storage/greenhouse-media.ts src/lib/payroll/payroll-receipts-store.ts src/lib/payroll/generate-payroll-receipts.ts src/lib/sync/projections/payroll-receipts.ts src/lib/sync/projections/index.ts src/lib/sync/reactive-consumer.ts '"'"'src/app/api/hr/payroll/entries/[entryId]/receipt/route.ts'"'"' src/lib/payroll/postgres-store.ts src/lib/payroll/postgres-store.test.ts src/lib/payroll/payroll-receipts-store.test.ts src/lib/sync/projections/payroll-receipts.test.ts`
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- Falta la superficie UI de `Mi Nómina` y el botón de descarga por entry en People.
+- Falta smoketest end-to-end en staging con export real y confirmación de Resend.
+- `TASK-077` sigue in-progress; no debe moverse a complete todavía.
+
 ## 2026-03-28 04:22 -03
 
 ### Agente
