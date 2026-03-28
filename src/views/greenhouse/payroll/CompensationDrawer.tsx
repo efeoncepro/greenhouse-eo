@@ -8,7 +8,6 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
@@ -319,55 +318,20 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Stack spacing={2.5}>
 
-            {/* ── Section: Régimen y salario ── */}
-            <Box sx={sectionSx}>
-              <Typography variant='overline' color='text.secondary' fontSize={10}>Régimen y salario</Typography>
-              <Stack spacing={2} sx={{ mt: 1 }}>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6 }}>
-                    <FormControl fullWidth size='small'>
-                      <InputLabel>Régimen</InputLabel>
-                      <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)}>
-                        <MenuItem value='chile'>Chile (CLP)</MenuItem>
-                        <MenuItem value='international'>Internacional (USD)</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid size={{ xs: 6 }}>
-                    {isChileReverse ? (
-                      <Box>
-                        <Typography variant='caption' color='text.secondary'>Base calculado</Typography>
-                        <Stack direction='row' alignItems='center' spacing={0.5}>
-                          <Typography fontWeight={700} fontFamily='monospace' fontSize={15}>{fmt(baseSalary)}</Typography>
-                          <Chip label='Reverse' size='small' color='primary' variant='tonal' sx={{ height: 18, fontSize: 10 }} />
-                        </Stack>
-                      </Box>
-                    ) : (
-                      <CustomTextField fullWidth size='small' label='Salario base' type='number' value={baseSalary || ''} onChange={e => setBaseSalary(Number(e.target.value))} />
-                    )}
-                  </Grid>
-                </Grid>
+            {/* ── Régimen ── */}
+            <FormControl fullWidth size='small'>
+              <InputLabel>Régimen</InputLabel>
+              <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)}>
+                <MenuItem value='chile'>Chile (CLP)</MenuItem>
+                <MenuItem value='international'>Internacional (USD)</MenuItem>
+              </Select>
+            </FormControl>
 
-                {isChile && (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={reverseMode}
-                        size='small'
-                        onChange={e => {
-                          setReverseMode(e.target.checked)
-
-                          if (!e.target.checked) { setReverseResult(null); setDesiredNet(0) }
-                        }}
-                        data-testid='reverse-mode-toggle'
-                      />
-                    }
-                    label={<Typography variant='body2' fontWeight={500}>Calcular desde líquido</Typography>}
-                    sx={{ ml: 0, mt: -0.5 }}
-                  />
-                )}
-
-                {isChileReverse && (
+            {/* ── Salario base (manual) or Líquido deseado (reverse) ── */}
+            {isChileReverse ? (
+              <Box sx={sectionSx}>
+                <Typography variant='overline' color='text.secondary' fontSize={10}>Cálculo desde líquido</Typography>
+                <Stack spacing={2} sx={{ mt: 1 }}>
                   <CustomTextField
                     fullWidth size='small'
                     label='Líquido deseado (CLP)'
@@ -378,9 +342,31 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     data-testid='desired-net-input'
                     slotProps={{ input: { endAdornment: reverseLoading ? <CircularProgress size={18} /> : null } }}
                   />
-                )}
-              </Stack>
-            </Box>
+                </Stack>
+              </Box>
+            ) : (
+              <CustomTextField fullWidth size='small' label='Salario base' type='number' value={baseSalary || ''} onChange={e => setBaseSalary(Number(e.target.value))} />
+            )}
+
+            {/* ── Toggle reverse (Chile only) ── */}
+            {isChile && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={reverseMode}
+                    size='small'
+                    onChange={e => {
+                      setReverseMode(e.target.checked)
+
+                      if (!e.target.checked) { setReverseResult(null); setDesiredNet(0) }
+                    }}
+                    data-testid='reverse-mode-toggle'
+                  />
+                }
+                label={<Typography variant='body2' fontWeight={500}>Calcular desde líquido</Typography>}
+                sx={{ ml: 0 }}
+              />
+            )}
 
             {/* ── Reverse preview ── */}
             {previewReady && (
