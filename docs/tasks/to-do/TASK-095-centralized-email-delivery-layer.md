@@ -13,6 +13,13 @@
 | Domain | `platform` |
 | GitHub Project | `Greenhouse Delivery` |
 
+## Delta 2026-03-28
+
+- Se validó en vivo el flujo de reenvío de Payroll sobre `dev-greenhouse.efeoncepro.com` y el hallazgo operativo fue claro: ese dominio apunta al deployment `staging` de Vercel, no al `Preview (develop)`.
+- El primer mail de nómina llegó a Outlook con PDF/CSV adjuntos, pero los reintentos podían devolver `deliveryId: null` cuando el runtime activo no veía la configuración transaccional correcta.
+- Para que esta lane de delivery sea confiable, el contrato futuro debe distinguir explícitamente entre `sent`, `failed` y `skipped`; un `skipped` no debe presentarse como éxito de UX.
+- Hardening recomendado para la siguiente iteración: mantener `RESEND_API_KEY` y `EMAIL_FROM` alineados en el entorno que realmente sirve el alias `dev-greenhouse`, y evaluar un sync administrado desde Google Secret Manager con service account solo como capa de gestión, no como reemplazo del runtime env de Vercel.
+
 ## Summary
 
 Centralizar todas las solicitudes de email de Greenhouse en una capa de delivery unificada que use Resend como provider de salida, pero que exponga un contrato propio para request, template resolution, attachments, retries, observability y routing por tipo de notificacion. La meta es que Payroll, Finance, Delivery, Permissions y flujos de sistema dejen de enviar mails por caminos ad hoc.

@@ -49,6 +49,42 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 17:34 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar el hallazgo operativo del reenvío de Payroll: `dev-greenhouse.efeoncepro.com` sirve el deployment `staging`, por lo que el mail depende de las env vars activas en ese entorno y no solo de `Preview (develop)`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-095-centralized-email-delivery-layer.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Reenvío de Payroll validado en Playwright sobre `dev-greenhouse.efeoncepro.com`
+- Outlook confirmado como buzón receptor real
+- El endpoint de reenvío pasó de `deliveryId: null` a `deliveryId` real después de alinear `RESEND_API_KEY` y `EMAIL_FROM` en `staging`
+
+### Riesgos o pendientes
+
+- El contrato futuro de la delivery layer debería distinguir `sent`, `failed` y `skipped` para no volver a mostrar éxito cuando el mailer no está habilitado.
+- Como hardening adicional, conviene evaluar Secret Manager + service account para administrar secretos transaccionales, pero el runtime seguirá necesitando env vars en Vercel.
+
 ## 2026-03-28 14:07 -03
 
 ### Agente
