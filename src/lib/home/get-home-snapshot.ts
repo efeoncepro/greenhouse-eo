@@ -2,7 +2,7 @@ import 'server-only'
 
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
-import { HOME_GREETINGS } from '@/config/home-greetings'
+import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
 interface HomeSnapshotInput {
@@ -84,7 +84,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     },
     greeting: {
       title: resolvedGreeting,
-      subtitle: 'Bienvenido a tu centro de mando.'
+      subtitle: HOME_SUBTITLE
     },
     modules,
     tasks,

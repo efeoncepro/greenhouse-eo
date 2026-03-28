@@ -7,22 +7,25 @@ export interface HomeGreeting {
 
 export const HOME_GREETINGS: HomeGreeting = {
   morning: [
-    'Buenos días, {name}. Rechequeemos juntos el pulso de hoy.',
-    'Hola {name}, ¡qué gusto verte de nuevo! Listos para arrancar con todo.',
-    'Buen día. Aquí tienes el panorama de tu operación.'
+    '¿Qué revisamos hoy, {name}?',
+    'Buenos días, {name}. ¿Empezamos?',
+    'Tu operación te espera, {name}.'
   ],
   afternoon: [
-    'Buenas tardes, {name}. ¿Cómo va el ritmo del día?',
-    'Hola {name}, aquí tienes tu Snapshot ejecutivo actualizado.',
-    'Buenas tardes. Sigamos moviendo la aguja.'
+    '¿Cómo va la tarde, {name}?',
+    '¿En qué te ayudo, {name}?',
+    'Sigamos avanzando, {name}.'
   ],
   evening: [
-    'Buenas noches, {name}. Repasemos el cierre de hoy.',
-    'Hola {name}, un vistazo rápido a los últimos movimientos antes de cerrar.',
-    'Casi terminando el día. Aquí tienes el resumen final.'
+    'Cerrando el día, {name}. ¿Algo pendiente?',
+    '¿Última consulta del día, {name}?'
   ],
   default: [
-    'Hola {name}, bienvenido a Greenhouse.',
-    'Todo listo para seguir operando, {name}.'
+    '¿En qué te ayudo, {name}?',
+    'Tu operación al alcance, {name}.'
   ]
 }
+
+export const HOME_SUBTITLE = 'Tu operación al alcance de una pregunta.'
+
+export const HOME_DISCLAIMER = 'Nexa usa IA generativa. Verifica la información importante.'

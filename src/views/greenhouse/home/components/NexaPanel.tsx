@@ -10,9 +10,7 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-
-import CustomAvatar from '@core/components/mui/Avatar'
-
+import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
 import {
   AssistantRuntimeProvider,
   useLocalRuntime,
@@ -22,8 +20,8 @@ import {
   ComposerPrimitive,
   MessagePrimitive
 } from '@assistant-ui/react'
-import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
-import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
+
+import CustomAvatar from '@core/components/mui/Avatar'
 
 import { NEXA_SUGGESTIONS } from '@/config/home-suggestions'
 
@@ -34,6 +32,7 @@ interface Props {
 const nexaAdapter: ChatModelAdapter = {
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
+
     const prompt = lastMessage?.content
       ?.filter(part => part.type === 'text')
       .map(part => (part as { type: 'text'; text: string }).text)
@@ -66,29 +65,41 @@ const nexaAdapter: ChatModelAdapter = {
 
 // ── Custom message bubbles ─────────────────────────────────────
 
+const TextPart = ({ text }: { text: string }) => <span>{text}</span>
+
 const UserMessage = () => (
-  <Box className='flex justify-end mb-3'>
-    <Box className='max-w-[85%] p-3 rounded-xl rounded-tr-none bg-primary text-white'>
-      <Typography variant='body2' component='div' className='leading-relaxed'>
-        <MessagePrimitive.Content
-          components={{
-            Text: ({ text }: { text: string }) => <span>{text}</span>
-          }}
-        />
+  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+    <Box sx={{
+      maxWidth: '85%',
+      p: 1.5,
+      borderRadius: '12px 0 12px 12px',
+      bgcolor: 'primary.main',
+      color: 'primary.contrastText'
+    }}>
+      <Typography variant='body2' component='div' sx={{ lineHeight: 1.6 }}>
+        <MessagePrimitive.Content components={{ Text: TextPart }} />
       </Typography>
     </Box>
   </Box>
 )
 
 const AssistantMessage = () => (
-  <Box className='flex justify-start mb-3'>
-    <Box className='max-w-[85%] p-3 rounded-xl rounded-tl-none bg-actionHover text-text-primary border border-divider'>
-      <Typography variant='body2' component='div' className='leading-relaxed [&_p]:m-0 [&_ul]:my-1 [&_ol]:my-1 [&_li]:ml-4 [&_code]:text-xs [&_code]:bg-action-selected [&_code]:px-1 [&_code]:rounded'>
-        <MessagePrimitive.Content
-          components={{
-            Text: MarkdownTextPrimitive as any
-          }}
-        />
+  <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1.5 }}>
+    <Box sx={{
+      maxWidth: '85%',
+      p: 1.5,
+      borderRadius: '0 12px 12px 12px',
+      bgcolor: 'action.hover',
+      color: 'text.primary',
+      border: 1,
+      borderColor: 'divider',
+      '& p': { m: 0 },
+      '& ul, & ol': { my: 0.5 },
+      '& li': { ml: 2 },
+      '& code': { fontSize: '0.75rem', bgcolor: 'action.selected', px: 0.5, borderRadius: 1 }
+    }}>
+      <Typography variant='body2' component='div' sx={{ lineHeight: 1.6 }}>
+        <MessagePrimitive.Content components={{ Text: TextPart }} />
       </Typography>
     </Box>
   </Box>
