@@ -109,7 +109,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-083` | `in-progress` | Compensation Drawer Enterprise UX Redesign | `docs/tasks/in-progress/TASK-083-compensation-drawer-enterprise-ux-redesign.md` |
 | `TASK-084` | `to-do` | Compensation Drawer Manual Mode UX Polish | `docs/tasks/to-do/TASK-084-compensation-drawer-manual-mode-ux-polish.md` |
 | `TASK-085` | `in-progress` | Compensation Chile Líquido-First Flow | `docs/tasks/in-progress/TASK-085-compensation-chile-liquido-first-flow.md` |
-- `TASK-086`
+| `TASK-086` | `to-do` | Payroll Current Period View Logic Fix | `docs/tasks/to-do/TASK-086-payroll-current-period-view-logic.md` |
+- `TASK-087`
 
 ## Regla de asignacion desde aqui
 
