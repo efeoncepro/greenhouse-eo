@@ -6,6 +6,12 @@ import { PayrollValidationError } from '@/lib/payroll/shared'
 import { isPayrollPostgresEnabled, pgSetPeriodExported } from '@/lib/payroll/postgres-store'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import type { PayrollPeriod } from '@/types/payroll'
+
+export interface ClosePayrollPeriodResult {
+  period: PayrollPeriod
+  exportedNow: boolean
+}
 
 const getProjectId = () => getBigQueryProjectId()
 
@@ -22,7 +28,7 @@ const getDmlAffectedRows = (job: unknown) =>
     } | undefined)?.metadata?.statistics?.query?.numDmlAffectedRows ?? 0
   )
 
-export const closePayrollPeriod = async (periodId: string) => {
+export const closePayrollPeriod = async (periodId: string): Promise<ClosePayrollPeriodResult> => {
   const projectId = getProjectId()
   const period = await getPayrollPeriod(periodId)
 
@@ -31,7 +37,10 @@ export const closePayrollPeriod = async (periodId: string) => {
   }
 
   if (period.status === 'exported') {
-    return period
+    return {
+      period,
+      exportedNow: false
+    }
   }
 
   if (period.status !== 'approved') {
@@ -57,7 +66,10 @@ export const closePayrollPeriod = async (periodId: string) => {
       const current = await getPayrollPeriod(periodId)
 
       if (current?.status === 'exported') {
-        return current
+        return {
+          period: current,
+          exportedNow: false
+        }
       }
 
       throw new PayrollValidationError('Only approved payroll periods can be exported.', 409)
@@ -82,5 +94,8 @@ export const closePayrollPeriod = async (periodId: string) => {
     throw new PayrollValidationError('Payroll period not found after export.', 404)
   }
 
-  return updated
+  return {
+    period: updated,
+    exportedNow: true
+  }
 }

@@ -240,6 +240,11 @@ const PAYROLL_RECEIPT_REQUIRED_TABLES = [
   'greenhouse_payroll.payroll_receipts'
 ] as const
 
+const PAYROLL_EXPORT_PACKAGE_REQUIRED_TABLES = [
+  ...PAYROLL_CORE_REQUIRED_TABLES,
+  'greenhouse_payroll.payroll_export_packages'
+] as const
+
 let payrollStoreReadyPromise: Promise<void> | null = null
 let payrollStoreReadyAt = 0
 
@@ -299,6 +304,9 @@ export const assertPayrollPostgresReady = async () =>
 
 export const assertPayrollReceiptsReady = async () =>
   assertPayrollTablesReady(PAYROLL_RECEIPT_REQUIRED_TABLES, 'Payroll receipts store')
+
+export const assertPayrollExportPackagesReady = async () =>
+  assertPayrollTablesReady(PAYROLL_EXPORT_PACKAGE_REQUIRED_TABLES, 'Payroll export packages store')
 
 // ---------------------------------------------------------------------------
 // Helpers

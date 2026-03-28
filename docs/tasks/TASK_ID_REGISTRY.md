@@ -119,6 +119,15 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-093` | `complete` | Personnel Expense Data Consistency | `docs/tasks/complete/TASK-093-personnel-expense-data-consistency.md` |
 | `TASK-094` | `complete` | Payroll Close and CSV Download Separation | `docs/tasks/complete/TASK-094-payroll-close-and-csv-download-separation.md` |
 | `TASK-095` | `to-do` | Centralized Email Delivery Layer | `docs/tasks/to-do/TASK-095-centralized-email-delivery-layer.md` |
+| `TASK-097` | `complete` | Payroll Export Artifact Persistence and Resend | `docs/tasks/complete/TASK-097-payroll-export-artifact-persistence-and-resend.md` |
+
+| `TASK-096` | `to-do` | GCP Secret Management & Security Hardening | `docs/tasks/to-do/TASK-096-gcp-secret-management-security-hardening.md` |
+| `TASK-098` | `to-do` | Observability MVP (Sentry + Health + Slack Alerts) | `docs/tasks/to-do/TASK-098-observability-mvp.md` |
+| `TASK-099` | `to-do` | Security Headers & Next.js Middleware | `docs/tasks/to-do/TASK-099-security-headers-middleware.md` |
+| `TASK-100` | `to-do` | CI Pipeline: Add Test Step | `docs/tasks/to-do/TASK-100-ci-pipeline-test-step.md` |
+| `TASK-101` | `to-do` | Cron Auth Standardization | `docs/tasks/to-do/TASK-101-cron-auth-standardization.md` |
+| `TASK-102` | `to-do` | Database Resilience Baseline | `docs/tasks/to-do/TASK-102-database-resilience-baseline.md` |
+| `TASK-103` | `to-do` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 
 ## Regla de asignacion desde aqui
 

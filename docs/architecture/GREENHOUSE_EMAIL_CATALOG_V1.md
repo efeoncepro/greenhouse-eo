@@ -158,6 +158,7 @@ Emails ligados a capacidades o modulos especificos, pero solo cuando el evento i
 Notas:
 - `payroll_period_approved` se usa como aviso de estado listo para exportar/revisar.
 - `payroll_export_ready` debe entenderse como notificación downstream de cierre/exportación canonica de nómina, disparada desde `payroll_period.exported`, y puede incluir CSV/PDF adjuntos o enlaces seguros al portal.
+- el reenvío de `payroll_export_ready` reutiliza el paquete documental persistido del período exportado; no debe volver a cerrar la nómina ni depender de un click de descarga manual
 
 ### AI Tooling
 

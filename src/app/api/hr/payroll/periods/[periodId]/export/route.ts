@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { generatePayrollCsv } from '@/lib/payroll/export-payroll'
+import { getPayrollExportArtifact } from '@/lib/payroll/payroll-export-packages'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
@@ -15,12 +15,12 @@ export async function GET(_: Request, { params }: { params: Promise<{ periodId: 
 
   try {
     const { periodId } = await params
-    const csv = await generatePayrollCsv(periodId)
+    const artifact = await getPayrollExportArtifact(periodId, 'csv')
 
-    return new NextResponse(csv, {
+    return new NextResponse(new Uint8Array(artifact.buffer), {
       headers: {
-        'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="payroll-${periodId}.csv"`
+        'Content-Type': artifact.contentType,
+        'Content-Disposition': `attachment; filename="${artifact.filename}"`
       }
     })
   } catch (error) {

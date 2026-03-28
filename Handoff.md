@@ -49,6 +49,167 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:47 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-097` con persistencia de artefactos Payroll, ruta de reenvío y rutas de descarga respaldadas por GCS.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-097-payroll-export-artifact-persistence-and-resend.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/payroll-export-packages.test.ts src/lib/payroll/close-payroll-period.test.ts src/lib/payroll/dispatch-payroll-export-notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/payroll/payroll-export-packages.ts src/lib/payroll/payroll-export-packages-store.ts src/lib/payroll/payroll-export-packages.test.ts 'src/app/api/hr/payroll/periods/[periodId]/pdf/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/csv/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/export/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/resend-export-ready/route.ts' src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/lib/payroll/send-payroll-export-ready.ts src/lib/payroll/postgres-store.ts`
+- `pnpm build`
+- Resultado: todos pasaron
+
+### Riesgos o pendientes
+
+- Falta smoke manual en staging sobre un período exportado real para confirmar `Reenviar correo` y descargas persistidas end-to-end.
+- `TASK-095` sigue como lane paralela futura para centralizar email delivery; por ahora Payroll sigue usando Resend directo vía helper actual.
+
+## 2026-03-28 13:35 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar `TASK-097` para persistir el paquete documental de exportación Payroll en GCS, servir PDF/CSV desde storage y habilitar reenvío de correo sin volver a cerrar el período.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/payroll-export-packages.ts`
+- `src/lib/payroll/payroll-export-packages-store.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/pdf/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/csv/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/export/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/resend-export-ready/route.ts`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `scripts/setup-postgres-payroll.sql`
+- `scripts/migrations/add-payroll-export-packages.sql`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/payroll-export-packages.test.ts src/lib/payroll/close-payroll-period.test.ts src/lib/payroll/dispatch-payroll-export-notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- Resultado: ambos pasaron
+
+### Riesgos o pendientes
+
+- Falta correr `eslint` y `build` sobre el lote completo antes de cerrar la task.
+- Falta mover `TASK-097` a `complete` y alinear `README`, registry y arquitectura cuando quede cerrada la iteración.
+- El selector `Resend` sigue siendo la dependencia transaccional del mail; `TASK-095` queda como refactor transversal futuro.
+
+## 2026-03-28 13:19 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Registrar una lane paralela para persistir artefactos de exportación de Payroll en GCS y permitir reenvío de correo sin volver a cerrar el período.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-097-payroll-export-artifact-persistence-and-resend.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Validacion documental y alineacion de registry
+- No hubo cambios de runtime ni tests asociados a esta lane nueva
+
+### Riesgos o pendientes
+
+- La lane queda separada de `TASK-094` y `TASK-095`.
+- Se asume bucket GCS como almacenamiento canónico de artefactos de cierre; si se decide otro backend o policy de naming, la task deberá ajustarse.
+
+## 2026-03-28 13:13 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Investigar por qué `Cerrar y notificar` no enviaba mail a los destinatarios internos y cerrar el gap con una entrega inmediata best-effort para Payroll.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/app/api/hr/payroll/periods/[periodId]/close/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/close/route.test.ts`
+- `src/lib/payroll/dispatch-payroll-export-notifications.ts`
+- `src/lib/payroll/dispatch-payroll-export-notifications.test.ts`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `project_context.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/dispatch-payroll-export-notifications.test.ts src/lib/payroll/close-payroll-period.test.ts 'src/app/api/hr/payroll/periods/[periodId]/close/route.test.ts'` -> pass
+- `pnpm exec eslint src/lib/payroll/dispatch-payroll-export-notifications.ts src/lib/payroll/dispatch-payroll-export-notifications.test.ts 'src/app/api/hr/payroll/periods/[periodId]/close/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/close/route.test.ts'` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- El flush inmediato de notificaciones es best-effort; el cron `outbox-publish` / `outbox-react` sigue siendo safety net y puede seguir siendo necesario si el entorno no deja correr el camino interactivo.
+- La route de cierre ahora evita reenviar mails si el período ya estaba `exported`.
+
 ## 2026-03-28 12:50 -03
 
 ### Agente

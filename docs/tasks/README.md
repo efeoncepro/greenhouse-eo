@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-096`
+- siguiente ID disponible: `TASK-098`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -120,11 +120,18 @@ Primer bloque operativo asignado:
 | 23 | `TASK-018` | [TASK-018-scim-user-provisioning.md](to-do/TASK-018-scim-user-provisioning.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
 | 24 | `TASK-019` | [TASK-019-staff-augmentation-module.md](to-do/TASK-019-staff-augmentation-module.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
 | 25 | `TASK-020` | [TASK-020-frameio-bigquery-analytics-pipeline.md](to-do/TASK-020-frameio-bigquery-analytics-pipeline.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
-| 26 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
-| 27 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
-| 28 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
-| 29 | `TASK-021` | [TASK-021-typography-variant-adoption.md](to-do/TASK-021-typography-variant-adoption.md) | P3 | Medio | Bajo | Diseño | Migrar 56+ fontWeight/fontFamily hardcodeados a theme variants en 4 slices: redundantes finance, executive cards, monoId/monoAmount, kpiValue |
-| 30 | `TASK-042` | [TASK-042-person-operational-serving-cutover.md](to-do/TASK-042-person-operational-serving-cutover.md) | P1 | Alto | Alto | Diseño | Cerrar la última pata híbrida de Person: métricas operativas canónicas por `member_id` en vez de matching heurístico sobre BigQuery |
+| 26 | `TASK-100` | [TASK-100-ci-pipeline-test-step.md](to-do/TASK-100-ci-pipeline-test-step.md) | P1 | Alto | Muy bajo | Diseño | **[Hardening 1/7]** Agregar `pnpm test` al CI workflow. 86 test files no corren en CI |
+| 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](to-do/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Diseño | **[Hardening 2/7]** Crear middleware.ts con CSP, X-Frame-Options, HSTS, Referrer-Policy |
+| 28 | `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](to-do/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Diseño | **[Hardening 3/7]** Cloud SQL network + WIF vía Vercel OIDC + Secret Manager para 6 secretos |
+| 29 | `TASK-098` | [TASK-098-observability-mvp.md](to-do/TASK-098-observability-mvp.md) | P1 | Alto | Bajo | Diseño | **[Hardening 4/7]** Sentry + health endpoint + Slack alerts para crons críticos |
+| 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](to-do/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | Diseño | **[Hardening 5/7]** Helper único `requireCronAuth()` timing-safe para 18 cron routes |
+| 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](to-do/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Diseño | **[Hardening 6/7]** PITR + slow query logging + pool size + testear restore |
+| 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
+| 34 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
+| 29 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
+| 30 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
+| 31 | `TASK-021` | [TASK-021-typography-variant-adoption.md](to-do/TASK-021-typography-variant-adoption.md) | P3 | Medio | Bajo | Diseño | Migrar 56+ fontWeight/fontFamily hardcodeados a theme variants en 4 slices: redundantes finance, executive cards, monoId/monoAmount, kpiValue |
+| 32 | `TASK-042` | [TASK-042-person-operational-serving-cutover.md](to-do/TASK-042-person-operational-serving-cutover.md) | P1 | Alto | Alto | Diseño | Cerrar la última pata híbrida de Person: métricas operativas canónicas por `member_id` en vez de matching heurístico sobre BigQuery |
 | 31 | `TASK-043` | [TASK-043-person-360-runtime-consolidation.md](to-do/TASK-043-person-360-runtime-consolidation.md) | P1 | Alto | Alto | Diseño | Consolidar `Person 360` como lectura serving-first reusable y reducir fan-out/fallback por sub-query en People |
 | 32 | `TASK-044` | [TASK-044-organization-executive-snapshot.md](complete/TASK-044-organization-executive-snapshot.md) | P1 | Medio | Medio | Cerrada | Snapshot ejecutivo por organización... economics/health. |
 | 33 | `TASK-045` | [TASK-045-reactive-projection-refresh.md](to-do/TASK-045-reactive-projection-refresh.md) | P1 | Alto | Medio | Diseño | Formalizar refresh reactivo de proyecciones cross-module sobre outbox para persona y organización |
@@ -175,6 +182,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md](complete/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md) | Guards de transición en dominio, approval gate por readiness canónico, reapertura explícita de entries en período aprobado y reset correcto a `draft` cuando cambian metadatos |
 | [TASK-088-payroll-reactive-projections-and-delivery-hardening.md](complete/TASK-088-payroll-reactive-projections-and-delivery-hardening.md) | Cola reactiva durable con completion/failure observable, fallback BigQuery con export parity y contrato de `projected_payroll` clarificado como serving cache + cálculo vivo |
 | [TASK-089-payroll-ux-semantics-and-feedback-hardening.md](complete/TASK-089-payroll-ux-semantics-and-feedback-hardening.md) | Separación explícita entre período actual, histórico y proyectado; retry visible, feedback de descarga, affordances accesibles y copy más claro |
+| [TASK-097-payroll-export-artifact-persistence-and-resend.md](complete/TASK-097-payroll-export-artifact-persistence-and-resend.md) | Paquete documental de exportación Payroll persistido en GCS, rutas de descarga con fallback y reenvío del correo sin recerrar el período |
 | [TASK-078-payroll-chile-previsional-foundation.md](complete/TASK-078-payroll-chile-previsional-foundation.md) | Base previsional canónica de Payroll Chile: Gael Cloud sync, IMM/tasas/topes/cesantía/SIS, forward cutover y wiring reactivo |
 | [TASK-076-payroll-chile-liquidacion-parity.md](complete/TASK-076-payroll-chile-liquidacion-parity.md) | Paridad legal de Payroll Chile: gratificación, colación, movilización, AFP/isapre split, costos empleador absorbidos en `member_capacity_economics`, RUT y datos bancarios ya modelados en HR Core |
 | [TASK-073-people-canonical-capacity-cutover.md](complete/TASK-073-people-canonical-capacity-cutover.md) | People list/detail cortados a serving canónico: `contractedFte`/`assignedFte` desde `member_capacity_economics`, capacity desde `person_intelligence`, operational metrics serving-first |

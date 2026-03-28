@@ -7,6 +7,26 @@
 
 ## 2026-03-28
 
+### TASK-097 export package persistence completed
+- Payroll persistió el paquete documental de exportación en GCS y ahora reutiliza ese artefacto para descargas PDF/CSV y reenvíos de correo sin recerrar el período.
+- Se agregó `greenhouse_payroll.payroll_export_packages`, la ruta `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` y la UI de `PayrollPeriodTab` para `Reenviar correo`.
+- La arquitectura de Payroll, el catálogo de emails y el playbook reactivo quedaron alineados con el nuevo contrato.
+
+### TASK-097 export package persistence implementation started
+- Se implementó la capa base para persistir PDF/CSV de exportación Payroll en GCS con metadata transaccional en `greenhouse_payroll.payroll_export_packages`.
+- Las rutas de descarga de PDF/CSV y el nuevo `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` ya consumen ese paquete persistido.
+- El cierre canónico sigue siendo `payroll_period.exported`; el paquete documental es derivado y reutilizable para reenvío o descarga posterior.
+
+### TASK-097 payroll export artifact persistence and resend documented
+- Se registró una lane nueva para persistir PDF/CSV de cierre de Payroll en GCS y habilitar reenvío del correo sin volver a cerrar el período.
+- El brief deja claro que el cierre canónico sigue siendo `payroll_period.exported`, mientras que el bucket se usa para descargas posteriores y reenvíos.
+- La task se apoya en el patrón de recibos ya persistidos, pero queda separada de `TASK-094` y de la capa transversal de delivery `TASK-095`.
+
+### Payroll close now flushes notifications immediately after export
+- El route `POST /api/hr/payroll/periods/[periodId]/close` ahora intenta publicar el outbox pendiente y procesar el dominio `notifications` en caliente justo después de marcar el período como `exported`.
+- El cron de outbox/reactive sigue existiendo como safety net; el flush inmediato solo reduce la dependencia del scheduler en staging y en el flujo interactivo.
+- El dispatch evita reenvíos sobre períodos ya exportados.
+
 ### TASK-095 centralized email delivery layer documented
 - Se registró una lane paralela para centralizar el delivery de emails sobre Resend, compartiendo contrato con el sistema de notificaciones.
 - El brief deja claro que Payroll, Finance, Delivery, Permissions y Auth deben consumir una capa única de envío y no helpers ad hoc.

@@ -49,10 +49,11 @@ describe('closePayrollPeriod', () => {
       month: 3
     })
 
-    const period = await closePayrollPeriod('2026-03')
+    const result = await closePayrollPeriod('2026-03')
 
     expect(mockPgSetPeriodExported).toHaveBeenCalledWith('2026-03')
-    expect(period.status).toBe('exported')
+    expect(result.period.status).toBe('exported')
+    expect(result.exportedNow).toBe(true)
   })
 
   it('returns exported periods as-is', async () => {
@@ -63,9 +64,10 @@ describe('closePayrollPeriod', () => {
       month: 3
     })
 
-    const period = await closePayrollPeriod('2026-03')
+    const result = await closePayrollPeriod('2026-03')
 
     expect(mockPgSetPeriodExported).not.toHaveBeenCalled()
-    expect(period.status).toBe('exported')
+    expect(result.period.status).toBe('exported')
+    expect(result.exportedNow).toBe(false)
   })
 })

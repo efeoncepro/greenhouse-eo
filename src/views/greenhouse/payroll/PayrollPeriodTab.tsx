@@ -45,6 +45,7 @@ type Props = {
 const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
   const [editMetaOpen, setEditMetaOpen] = useState(false)
   const [editYear, setEditYear] = useState<number | ''>('')
@@ -52,6 +53,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const [editTaxTable, setEditTaxTable] = useState('')
   const [editNotes, setEditNotes] = useState('')
   const [editSaving, setEditSaving] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
   const [readiness, setReadiness] = useState<PayrollPeriodReadiness | null>(null)
   const [readinessError, setReadinessError] = useState<string | null>(null)
   const [readinessLoading, setReadinessLoading] = useState(false)
@@ -144,6 +146,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
     if (!period) return
 
     setError(null)
+    setNotice(null)
     startTransition(async () => {
       const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/close`, { method: 'POST' })
 
@@ -155,8 +158,44 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
         return
       }
 
+      const data = await res.json().catch(() => null)
+
+      if (data?.notificationDispatch?.error) {
+        setError(data.notificationDispatch.error)
+
+        return
+      }
+
+      setNotice('El período se cerró y se disparó la notificación de exportación.')
       onRefresh()
     })
+  }, [period, onRefresh])
+
+  const handleResendExportReady = useCallback(async () => {
+    if (!period) return
+
+    setError(null)
+    setNotice(null)
+    setResendLoading(true)
+
+    try {
+      const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/resend-export-ready`, {
+        method: 'POST'
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+
+        setError(data.error || 'Error al reenviar la notificación')
+
+        return
+      }
+
+      setNotice('Se reenviaron el correo y los adjuntos de exportación.')
+      onRefresh()
+    } finally {
+      setResendLoading(false)
+    }
   }, [period, onRefresh])
 
   const handleDownloadCsv = useCallback(async () => {
@@ -539,6 +578,17 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                   >
                     Descargar CSV
                   </Button>
+                  <Button
+                    variant='contained'
+                    size='small'
+                    color='secondary'
+                    startIcon={<i className='tabler-mail-forward' />}
+                    onClick={handleResendExportReady}
+                    disabled={isPending || resendLoading}
+                    aria-label={`Reenviar correo de exportación del período ${formatPeriodLabel(period.year, period.month)}`}
+                  >
+                    Reenviar correo
+                  </Button>
                 </>
               )}
             </Stack>
@@ -549,6 +599,12 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
           {error && (
             <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
               {error}
+            </Alert>
+          )}
+
+          {notice && (
+            <Alert severity='success' sx={{ mb: 2 }} onClose={() => setNotice(null)}>
+              {notice}
             </Alert>
           )}
 

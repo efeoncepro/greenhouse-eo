@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll export package persistence completed
+- `TASK-097` quedó cerrada: Payroll ahora persiste PDF/CSV de exportación en GCS, sirve descargas desde storage con fallback y permite reenvío del correo desde un período ya exportado.
+- La implementación añade `greenhouse_payroll.payroll_export_packages`, la ruta `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` y botones/CTAs en `PayrollPeriodTab` para reenvío.
+- El contrato de negocio no cambia: `payroll_period.exported` sigue siendo el cierre canónico; el paquete documental es derivado y reutilizable.
+
+## Delta 2026-03-28 Payroll export package persistence in progress
+- `TASK-097` quedó en progreso para persistir el paquete documental de exportación Payroll en GCS y permitir reenvío del correo sin volver a cerrar el período.
+- La implementación añade una tabla `greenhouse_payroll.payroll_export_packages`, rutas de descarga basadas en storage y `POST /api/hr/payroll/periods/[periodId]/resend-export-ready`.
+- El cierre canónico sigue siendo `payroll_period.exported`; el paquete documental es un artefacto derivado y reutilizable.
+
+## Delta 2026-03-28 Payroll export artifact persistence lane added
+- Se documentó `TASK-097` como follow-up de Payroll para persistir PDF/CSV de cierre en GCS y habilitar reenvío del correo sin volver a cerrar el período.
+- La lane se apoya en el contrato ya existente de `payroll_period.exported`, en el delivery de Resend y en la experiencia de recibos almacenados en bucket.
+- El alcance explícito separa cierre canónico, reenvío de correo y descargas posteriores; el cierre sigue siendo `exported`, no el click de archivo.
+
 ## Delta 2026-03-28 Centralized email delivery lane added
 - Se documentó `TASK-095` como lane paralela para centralizar el delivery de emails sobre Resend.
 - La idea es que Payroll, Finance, Delivery, Permissions y Auth consuman una capa única de envío en vez de helpers ad hoc.
@@ -15,6 +30,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La UI de `PayrollPeriodTab` ahora expone `Cerrar y notificar` y `Descargar CSV` como acciones distintas.
 - La notificación downstream a Finance/HR sale desde `payroll_period.exported` vía Resend, con PDF/CSV adjuntos.
 - La arquitectura y el catálogo de emails quedaron alineados con ese contrato.
+
+## Delta 2026-03-28 Payroll export notification immediate flush
+- El cierre de Payroll ahora intenta además un flush inmediato del dominio `notifications` después de exportar el período, para no depender exclusivamente del cron en entornos interactivos o staging.
+- El flush inmediato sigue siendo best-effort: `outbox-publish` y `outbox-react` continúan como safety net operativo y la idempotencia se conserva por `outbox_reactive_log`.
+- La mutación canónica sigue siendo `payroll_period.exported`; el cambio solo acelera la entrega del correo y de los recibos downstream cuando el entorno permite procesarlos en caliente.
 
 ## Delta 2026-03-28 Payroll operational calendar utility implemented
 - La utilidad canónica de calendario operativo quedó implementada en `src/lib/calendar/operational-calendar.ts`.

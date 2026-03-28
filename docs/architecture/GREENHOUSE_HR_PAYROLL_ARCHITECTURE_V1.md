@@ -547,9 +547,18 @@ Si la entry pertenecía a un período `approved`, el período se reabre a `calcu
 - el cierre canónico debe poder completarse sin que el usuario descargue el CSV
 - cualquier correo downstream a Finance/HR debe dispararse desde `payroll_period.exported`, no desde el click de descarga
 - la descarga del CSV es un artefacto opcional; puede convivir con el cierre, pero no define el cierre
+- el período exportado puede persistir un paquete documental canónico en GCS (`payroll-export-packages/`) con PDF y CSV reutilizables
+- `Reenviar correo` reutiliza ese paquete persistido y no vuelve a cerrar ni reexportar el período
+- PDF/CSV deben seguir siendo descargables desde artefactos persistidos; si faltan, pueden regenerarse como fallback operativo
 
 ### Semántica operativa
 `exported` representa el cierre final del ciclo mensual.
+
+### Entrega de notificaciones
+- al cerrar un período desde la UI o la API, el backend intenta publicar el outbox pendiente y procesar de forma inmediata el dominio `notifications`
+- ese flush inmediato es best-effort y no reemplaza al cron de outbox/reactive, que sigue siendo safety net operativo
+- la notificación downstream a Finance/HR y la entrega de recibos siguen saliendo de `payroll_period.exported`; lo inmediato solo reduce la dependencia del scheduler en staging/operación interactiva
+- el paquete documental del cierre se persiste de forma reutilizable para que reenvíos y descargas no dependan de regenerar desde cero en cada click
 
 ## 16. Moneda y períodos mixtos
 

@@ -8,6 +8,8 @@ Este playbook documenta cómo registrar, operar y monitorear proyecciones reacti
 
 La implementación actual ya publica el evento, lo enruta por el projection registry y genera la entrega de recibos, pero la cola persistente todavía debe terminar de cerrar su ciclo operativo para que la durabilidad sea literal y no solo conceptual.
 
+Operativamente, Payroll puede hacer un flush inmediato del dominio `notifications` al cerrar un período para no depender exclusivamente del cron. Ese flush sigue siendo best-effort: el cron de `outbox-publish` y `outbox-react` continúa como safety net, y el ledger `outbox_reactive_log` conserva la idempotencia para evitar reenvíos al repetir el procesamiento.
+
 ## Architecture
 
 ```
@@ -129,6 +131,7 @@ Current hardening note:
 
 - la cola persistente ya cierra su ciclo con completion/failure observables y sigue siendo la referencia operacional de durabilidad
 - `projected_payroll` y `payroll_receipts_delivery` son los consumidores de referencia de este control plane
+- `payroll_export_ready_notification` usa el paquete documental persistido del período exportado cuando está disponible; eso desacopla el mail downstream del click de descarga y evita regeneraciones innecesarias
 - el contrato operacional sigue siendo: intents persistentes, ledger reactivo idempotente y observabilidad por queue health
 
 ### How it works

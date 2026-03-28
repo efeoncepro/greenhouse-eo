@@ -222,7 +222,38 @@ CREATE INDEX IF NOT EXISTS payroll_receipts_source_event_idx
   ON greenhouse_payroll.payroll_receipts (source_event_id, created_at DESC);
 
 -- ------------------------------------------------------------
--- 6. previred_period_indicators
+-- 6. payroll_export_packages
+--    Persisted PDF/CSV artifacts for exported payroll periods.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_export_packages (
+  period_id TEXT PRIMARY KEY REFERENCES greenhouse_payroll.payroll_periods(period_id) ON DELETE CASCADE,
+  storage_bucket TEXT,
+  pdf_storage_path TEXT,
+  csv_storage_path TEXT,
+  pdf_file_size_bytes INTEGER,
+  csv_file_size_bytes INTEGER,
+  pdf_template_version TEXT,
+  csv_template_version TEXT,
+  generated_at TIMESTAMPTZ,
+  generated_by TEXT,
+  delivery_status TEXT NOT NULL DEFAULT 'pending' CHECK (delivery_status IN ('pending', 'sent', 'failed')),
+  delivery_attempts INTEGER NOT NULL DEFAULT 0,
+  last_sent_at TIMESTAMPTZ,
+  last_sent_by TEXT,
+  last_email_delivery_id TEXT,
+  last_send_error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS payroll_export_packages_delivery_status_idx
+  ON greenhouse_payroll.payroll_export_packages (delivery_status, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS payroll_export_packages_last_sent_idx
+  ON greenhouse_payroll.payroll_export_packages (last_sent_at DESC, updated_at DESC);
+
+-- ------------------------------------------------------------
+-- 7. previred_period_indicators
 --    Canonical monthly Chile previsional snapshot.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_period_indicators (
@@ -243,7 +274,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_period_indicators (
 );
 
 -- ------------------------------------------------------------
--- 7. previred_afp_rates
+-- 8. previred_afp_rates
 --    AFP rate catalog by period and fund.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_afp_rates (
@@ -262,7 +293,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_afp_rates (
 );
 
 -- ------------------------------------------------------------
--- 7. projected_payroll_promotions
+-- 9. projected_payroll_promotions
 --    Audit trail connecting projected payroll cuts with official payroll recalculations.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions (
@@ -285,7 +316,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions (
 );
 
 -- ------------------------------------------------------------
--- 6. Chile previsional foundation (optional, forward-compatible)
+-- 10. Chile previsional foundation (optional, forward-compatible)
 -- ------------------------------------------------------------
 -- These tables support cutting the Chile payroll engine off manual rates.
 -- They are additive and do not block current Payroll usage.
