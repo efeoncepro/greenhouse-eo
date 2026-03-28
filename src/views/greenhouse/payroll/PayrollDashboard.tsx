@@ -95,15 +95,20 @@ const PayrollDashboard = () => {
         setActivePeriod(active)
         setSelectedPeriodId(nextSelectedPeriodId)
 
-        if (active) {
-          const entriesRes = await fetch(`/api/hr/payroll/periods/${active.periodId}/entries`)
+        // Fetch entries for the period to display in KPIs: active period, or last period as fallback
+        const kpiTargetPeriod = active ?? (nextPeriods.length > 0
+          ? nextPeriods.reduce((latest: PayrollPeriod, p: PayrollPeriod) => (p.periodId > latest.periodId ? p : latest), nextPeriods[0])
+          : null)
+
+        if (kpiTargetPeriod) {
+          const entriesRes = await fetch(`/api/hr/payroll/periods/${kpiTargetPeriod.periodId}/entries`)
 
           if (entriesRes.ok) {
             const eData = await entriesRes.json()
 
             setActiveEntries(eData.entries || [])
 
-            if (nextSelectedPeriodId === active.periodId) {
+            if (nextSelectedPeriodId === kpiTargetPeriod.periodId) {
               setSelectedEntries(eData.entries || [])
             }
           }
@@ -214,12 +219,19 @@ const PayrollDashboard = () => {
     )
   }
 
-  // Stats
-  const statusConfig = activePeriod ? periodStatusConfig[activePeriod.status] : null
+  // Stats — show active period, or last period as fallback for KPI context
+  const lastPeriod = periods.length > 0
+    ? periods.reduce((latest, p) => (p.periodId > latest.periodId ? p : latest), periods[0])
+    : null
+
+  const kpiPeriod = activePeriod ?? lastPeriod
+  const kpiEntries = activeEntries
+  const isKpiFallback = !activePeriod && lastPeriod !== null
+  const statusConfig = kpiPeriod ? periodStatusConfig[kpiPeriod.status] : null
   const needsCompensationSetup = compensations.length === 0
   const hasActivePayrollMembers = compensationMembers.length > 0
-  const grossSummary = buildPayrollCurrencySummary(activeEntries, entry => entry.grossTotal)
-  const netSummary = buildPayrollCurrencySummary(activeEntries, entry => entry.netTotal)
+  const grossSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.netTotal)
 
   const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
   const displayedPeriod = selectedPeriod ?? activePeriod
@@ -277,11 +289,11 @@ const PayrollDashboard = () => {
         <Grid container spacing={6}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
-              title='Período actual'
-              stats={activePeriod ? formatPeriodLabel(activePeriod.year, activePeriod.month) : '—'}
+              title={isKpiFallback ? 'Último período' : 'Período actual'}
+              stats={kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}
               avatarIcon='tabler-calendar'
-              avatarColor='primary'
-              subtitle={statusConfig?.label ?? 'Sin período'}
+              avatarColor={isKpiFallback ? 'secondary' : 'primary'}
+              subtitle={isKpiFallback ? 'No hay período abierto' : (statusConfig?.label ?? 'Sin período')}
               statusLabel={statusConfig?.label}
               statusColor={statusConfig?.color}
               statusIcon={statusConfig?.icon}
@@ -290,10 +302,10 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Colaboradores'
-              stats={String(activeEntries.length)}
+              stats={String(kpiEntries.length)}
               avatarIcon='tabler-users'
               avatarColor='info'
-              subtitle='Con nómina en este período'
+              subtitle={isKpiFallback ? `Último: ${kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}` : 'Con nómina en este período'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>

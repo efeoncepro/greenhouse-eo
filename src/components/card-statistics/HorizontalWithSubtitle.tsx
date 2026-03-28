@@ -61,8 +61,8 @@ const HorizontalWithSubtitle = (props: HorizontalWithSubtitleData) => {
   const hasTrend = Boolean(trend && trendNumber)
 
   return (
-    <Card>
-      <CardContent className='flex flex-col gap-3'>
+    <Card sx={{ height: '100%' }}>
+      <CardContent className='flex flex-col gap-3' sx={{ height: '100%' }}>
         <div className='flex justify-between gap-1'>
           <div className='flex flex-col gap-1 grow'>
             <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
