@@ -76,7 +76,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-058` | `complete` | Economic Indicators Runtime Layer | `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md` |
 
 | `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
-| `TASK-060` | `to-do` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/to-do/TASK-060-team-assignment-admin.md` |
+| `TASK-060` | `complete` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/complete/TASK-060-team-assignment-admin.md` |
 | `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
 | `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
