@@ -119,6 +119,46 @@ Regla operativa canónica para Efeonce:
 
 Esta regla define la semántica de negocio del dashboard, no solo su copy.
 
+## 2.7. Timezone-aware operational calendar
+
+La casa matriz operativa de Payroll está anclada en Santiago de Chile y el ciclo mensual debe calcularse sobre su zona horaria canónica, no sobre la hora del servidor ni sobre la zona horaria individual de cada colaborador.
+
+Regla arquitectónica:
+
+- la base temporal canónica del módulo es `America/Santiago`
+- el cambio horario de invierno/verano afecta el offset de la zona, pero no la semántica del cierre mensual
+- la utilidad de calendario operativo debe trabajar sobre la fecha local efectiva del tenant o jurisdicción de nómina
+- el colaborador puede tener `location_country` distinto, pero eso no redefine el cierre del período oficial
+- la jurisdicción de la nómina debe poder parametrizarse por tenant o por contrato de payroll cuando existan operaciones multi-país
+
+Contexto de contrato:
+
+- `timezone` define cómo se interpreta el borde de fecha/hora
+- `country` o `jurisdiction` define qué calendario de feriados y reglas laborales aplica
+- `holiday calendar` define qué días cuentan como hábiles para la ventana de cierre
+
+Fuente de verdad de la policy:
+
+- la configuración operativa debe persistirse por tenant o por ámbito de nómina antes de ser consumida por la utilidad
+- la policy puede vivir en una tabla de configuración o en un read model administrativo, pero no debe inferirse de la UI
+- la utilidad recibe un objeto de contexto ya resuelto; no necesita una API pública de cálculo
+- si existe una API, debe ser de administración de policy, no de cálculo temporal ad hoc
+
+Fuente externa recomendada para feriados:
+
+- la timezone base sigue saliendo de la librería IANA del runtime, no de una API de mercado
+- para feriados nacionales, la fuente pública de mercado recomendada es `Nager.Date`
+- `Nager.Date` cubre Chile (`CL`) y expone holidays por año/país vía REST
+- endpoint canónico de consulta: `GET https://date.nager.at/api/v3/PublicHolidays/{Year}/{CountryCode}`
+- si la política requiere excepciones locales o feriados corporativos, esos overrides deben persistirse en Greenhouse encima de la fuente externa, no en el consumer
+- si en algún país la cobertura externa resulta insuficiente, la policy local de Greenhouse debe poder sobreescribirla sin romper la utilidad pura
+
+Regla operativa:
+
+- la lógica temporal canónica debe vivir en una utilidad pura compartida
+- los cambios de configuración de calendario solo justifican persistencia reactiva si existe una entidad editable real; el cálculo de fecha no debe publicar outbox events por sí mismo
+- Payroll debe consumir esta política como lectura de dominio, no como lógica local embebida en la vista
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

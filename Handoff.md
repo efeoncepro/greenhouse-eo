@@ -49,6 +49,75 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 12:25 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar la fuente de feriados para el calendario operativo de Payroll y dejar explícito que la timezone se resuelve con IANA mientras que los feriados se hidratan desde `Nager.Date` con overrides locales persistidos en Greenhouse.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/TASK-091-greenhouse-operational-calendar-utility.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- `git diff --check` -> pass
+- no se ejecutaron tests ni build porque esta vuelta fue documental
+
+### Riesgos o pendientes
+
+- Aún falta decidir si la policy operativa de feriados vivirá solo como configuración persistida o si además habrá un admin endpoint para editarla.
+- `TASK-091` sigue siendo la lane de implementación; esta vuelta solo cerró el contrato de fuentes.
+
+## 2026-03-28 12:10 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Documentar en arquitectura cómo debe resolverse el calendario operativo de Payroll para un entorno multi-país con casa matriz en Santiago, timezone con DST y feriados por jurisdicción.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/to-do/TASK-091-greenhouse-operational-calendar-utility.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- no se ejecutaron tests ni build porque esta vuelta fue de documentación / contrato
+
+### Riesgos o pendientes
+
+- `TASK-091` ahora debe implementarse como utilidad pura timezone-aware con jurisdicción explícita; no conviene volver a meter esta lógica en vistas de Payroll.
+- Falta definir si habrá una entidad editable de política operativa por tenant antes de pensar en invalidación reactiva.
+
 ## 2026-03-28 11:36 -03
 
 ### Agente

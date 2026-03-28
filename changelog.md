@@ -7,6 +7,15 @@
 
 ## 2026-03-28
 
+### Payroll holiday source set to Nager.Date
+- Se decidió documentar `Nager.Date` como la fuente pública de mercado recomendada para feriados nacionales del calendario operativo.
+- El timezone/DST sigue resolviéndose con IANA en el runtime, mientras que los overrides corporativos o jurisdiccionales pueden persistirse en Greenhouse sobre esa fuente.
+
+### Payroll operational calendar made timezone-aware in architecture
+- Se documentó que el calendario operativo de Payroll debe ser timezone-aware y calcularse sobre `America/Santiago` como base de la casa matriz.
+- La nueva regla separa `timezone`, `country/jurisdiction` y `holiday calendar` para soportar operaciones multi-país sin depender de la zona horaria del servidor ni del país de residencia del colaborador.
+- `TASK-091` quedó alineada para nacer como utilidad pura de dominio y no como projection reactiva.
+
 ### Payroll operational calendar and current-period semantics split into separate lanes
 - Se reservaron `TASK-091` y `TASK-092` para separar la utilidad canónica de calendario operativo de la semántica de período actual en Payroll.
 - No hubo cambio de runtime en esta vuelta; el ajuste quedó explícitamente como backlog y documentación viva.

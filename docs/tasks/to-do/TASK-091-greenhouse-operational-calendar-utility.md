@@ -13,7 +13,7 @@
 
 ## Summary
 
-Extraer una utilidad canónica de calendario operativo para Greenhouse que permita calcular ventanas de cierre, mes operativo vigente y días hábiles de forma reutilizable entre Payroll y futuros dominios de cierre mensual.
+Extraer una utilidad canónica de calendario operativo para Greenhouse que permita calcular ventanas de cierre, mes operativo vigente y días hábiles de forma reutilizable entre Payroll y futuros dominios de cierre mensual. La utilidad debe ser timezone-aware y admitir contexto por jurisdicción, porque la casa matriz opera en Santiago y el grupo puede tener colaboradores en distintos países.
 
 ## Why This Task Exists
 
@@ -24,6 +24,8 @@ Payroll necesita distinguir entre calendario civil y ciclo operativo real. Hoy e
 - Definir una utilidad única para mes operativo y ventana de cierre.
 - Hacer reusable el cálculo de días hábiles sin repetirlo en Payroll.
 - Dejar la regla testeada y documentada como contrato de negocio.
+- Hacer explícito el contexto de `timezone`, `country/jurisdiction` y `holiday calendar`.
+- Definir la fuente externa pública recomendada para feriados por país.
 
 ## Architecture Alignment
 
@@ -37,8 +39,13 @@ Reglas obligatorias:
 
 - la utilidad debe ser pura y testeable
 - no debe depender de React ni de la UI
-- no debe introducir feriados ni calendarios regionales si no están explicitados en el contrato
+- no debe depender del timezone del servidor
+- no debe introducir feriados ni calendarios regionales implícitos: deben entrar por configuración explícita
 - si más adelante se incorporan feriados, deben entrar como extensión de esta misma utilidad, no como helper paralelo
+- la utilidad no publica outbox events ni mantiene projections propias; solo calcula reglas temporales de lectura
+- la timezone canónica sigue resolviéndose con IANA; no se usa una API externa para el DST
+- para feriados, la fuente pública recomendada es `Nager.Date` y cualquier override local debe persistirse en Greenhouse
+- el endpoint de feriados recomendado es `GET https://date.nager.at/api/v3/PublicHolidays/{Year}/{CountryCode}`
 
 ## Dependencies & Impact
 
@@ -65,20 +72,25 @@ Reglas obligatorias:
 - `Payroll` ya tiene lógica temporal parcial para selección de período actual
 - hay helpers de días hábiles en `fetch-attendance-for-period.ts`
 - la arquitectura de Payroll ya declara ventana operativa de cierre
+- todavía no existe un contrato canónico de policy operativa persistida para timezone/jurisdicción/feriados
 
 ### Gap actual
 
 - la lógica de ventana de cierre vive dispersa
 - no existe una utilidad canónica compartida para calendario operativo
 - Payroll no debería seguir creciendo con reglas temporales locales duplicadas
+- el cierre mensual necesita distinguir entre fecha local de la casa matriz, país/jurisdicción y días hábiles efectivos
+- la fuente de verdad de la policy no está documentada como contrato explícito
+- no existe una decisión documentada sobre la fuente externa de feriados ni sobre cómo se sobreescriben excepciones corporativas
 
 ## Scope
 
 ### Slice 1 - Core utility
 
-- `countBusinessDays(startDate, endDate)`
-- `isWithinPayrollCloseWindow(referenceDate, closeWindowBusinessDays = 5)`
-- `getOperationalPayrollMonth(referenceDate)`
+- `countBusinessDays(startDate, endDate, options)`
+- `isWithinPayrollCloseWindow(referenceDate, closeWindowBusinessDays = 5, options)`
+- `getOperationalPayrollMonth(referenceDate, options)`
+- `resolveOperationalCalendarContext(tenant | payrollPolicy | fallback)`
 
 ### Slice 2 - Tests
 
@@ -87,17 +99,25 @@ Reglas obligatorias:
 - cruce de mes
 - enero hacia diciembre anterior
 - caso fuera de ventana de cierre
+- timezone con DST de Santiago
+- jurisdicción con feriados explícitos
+- país distinto al de residencia del colaborador no altera el ciclo si la nómina pertenece a otra jurisdicción
 
 ### Slice 3 - Documentation
 
 - documentar el contrato canónico en arquitectura si se aprueba como utilidad compartida
+- documentar la separación entre timezone operativo, jurisdicción y feriados
+- documentar que la utilidad consume policy persistida y no expone API pública de cálculo
+- documentar la decisión de usar IANA para timezone y `Nager.Date` para feriados
 
 ## Out of Scope
 
-- feriados chilenos
 - lógica de UI
 - reglas específicas de selección de período en Payroll
 - cambios de lifecycle de nómina
+- outbox events y projections
+- motor de cálculo de nómina
+- API pública de cálculo temporal
 
 ## Acceptance Criteria
 
