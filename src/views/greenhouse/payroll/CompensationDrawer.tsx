@@ -552,19 +552,21 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </Stack>
             </Box>
 
-            {error && error !== 'El motivo del cambio es obligatorio' && (
-              <Typography variant='body2' color='error.main'>{error}</Typography>
-            )}
           </Stack>
         </Box>
 
         {/* Actions */}
         <Divider />
-        <Stack direction='row' spacing={2} sx={{ p: 3 }}>
-          <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving}>
-            {saving ? 'Guardando...' : ev ? (saveMode === 'update' ? 'Guardar cambios' : 'Crear nueva versión') : 'Crear compensación'}
-          </Button>
-          <Button variant='tonal' color='secondary' fullWidth onClick={onClose} disabled={saving}>Cancelar</Button>
+        <Stack spacing={1.5} sx={{ p: 3 }}>
+          {error && (
+            <Alert severity='error' variant='outlined' sx={{ py: 0.5 }}>{error}</Alert>
+          )}
+          <Stack direction='row' spacing={2}>
+            <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving}>
+              {saving ? 'Guardando...' : ev ? (saveMode === 'update' ? 'Guardar cambios' : 'Crear nueva versión') : 'Crear compensación'}
+            </Button>
+            <Button variant='tonal' color='secondary' fullWidth onClick={onClose} disabled={saving}>Cancelar</Button>
+          </Stack>
         </Stack>
       </Stack>
     </Drawer>
