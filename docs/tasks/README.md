@@ -31,7 +31,6 @@ Primer bloque operativo asignado:
 
 | Task ID    | Task                                                                                                     | Prioridad | Impacto | Esfuerzo | Estado real | Foco                                                                                                                    |
 | ---------- | -------------------------------------------------------------------------------------------------------- | --------- | ------- | -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `TASK-058` | [TASK-058-economic-indicators-runtime-layer.md](in-progress/TASK-058-economic-indicators-runtime-layer.md) | P1 | Alto | Medio | Avanzada | Capa común de indicadores económicos. Core completo; faltan: AI Tooling integration, Finance Dashboard UI, outbox events |
 | `TASK-078` | [TASK-078-payroll-chile-previsional-foundation.md](in-progress/TASK-078-payroll-chile-previsional-foundation.md) | P0 | Muy alto | Alto | En progreso | **[1/4]** Sync Previred via Gael Cloud API + indicadores previsionales + forward cutover + wiring reactivo |
 | `TASK-076` | [TASK-076-payroll-chile-liquidacion-parity.md](to-do/TASK-076-payroll-chile-liquidacion-parity.md) | P0 | Muy alto | Alto | Diseño | **[2/4]** Campos legales: gratificación, colación, movilización, AFP/isapre desglose, costos empleador. Depende de TASK-078. |
 | `TASK-077` | [TASK-077-payroll-receipt-generation-delivery.md](to-do/TASK-077-payroll-receipt-generation-delivery.md) | P1 | Muy alto | Alto | Diseño | **[3/4]** Recibos PDF + email Resend + Mi Nómina. Depende de TASK-076. |
@@ -157,6 +156,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-058-economic-indicators-runtime-layer.md](complete/TASK-058-economic-indicators-runtime-layer.md) | Capa común de indicadores económicos (USD_CLP, UF, UTM, IPC), histórico desde 2026-01, sync diario, Finance Dashboard UI, AI Tooling delegado a capa común, outbox events canónicos |
 | [TASK-055-finance-intelligence-cost-coverage-repair.md](complete/TASK-055-finance-intelligence-cost-coverage-repair.md) | Pipeline client_economics reparado: bridge laboral histórico por período, completitud de snapshots con sanitización, FX histórico invertible, consumers Organization/Agency alineados, feb+mar 2026 materializados, 11 tests |
 | [TASK-064-ico-assignee-attribution-remediation.md](complete/TASK-064-ico-assignee-attribution-remediation.md) | Remediación sistémica de atribución ICO: sync conformed corregido, backfill histórico, rematerialización por miembro, wiring reactivo `ico.materialization.completed`, guardrail operativo de cobertura en health endpoint |
 | [TASK-061-payroll-go-live-readiness-audit.md](complete/TASK-061-payroll-go-live-readiness-audit.md) | Auditoría go-live completa: mixed currency CLP/USD, 77 tests, hallazgos críticos corregidos (exported event, tax table blocking, mixed currency dashboard), go-live ready |

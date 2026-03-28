@@ -73,7 +73,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-055` | `complete` | Finance Intelligence Cost Coverage Repair | `docs/tasks/complete/TASK-055-finance-intelligence-cost-coverage-repair.md` |
 | `TASK-056` | `complete` | Agency Team Capacity Semantics | `docs/tasks/complete/TASK-056-agency-team-capacity-semantics.md` |
 | `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
-| `TASK-058` | `in-progress` | Economic Indicators Runtime Layer | `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md` |
+| `TASK-058` | `complete` | Economic Indicators Runtime Layer | `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md` |
 
 | `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
 | `TASK-060` | `to-do` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/to-do/TASK-060-team-assignment-admin.md` |
