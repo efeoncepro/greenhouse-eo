@@ -84,22 +84,88 @@ Reglas obligatorias:
 - `project_context.md`
 - `Handoff.md`
 
+## Delta 2026-03-28 — Auditoría de implementación
+
+### Hallazgo principal: la base ya existe, solo faltan 2 gaps menores
+
+Se auditó `greenhouse_core.organizations`, `organization-identity.ts`, `generate-payroll-pdf.tsx`, event catalog y arquitectura. El resultado es que la mayor parte del trabajo ya está hecho.
+
+### Lo que ya está implementado
+
+| Pieza | Estado | Evidencia |
+|-------|--------|-----------|
+| Schema `organizations` con `legal_name`, `tax_id`, `tax_id_type` | **Hecho** | `setup-postgres-account-360-m0.sql` líneas 133-136 |
+| Helper `findOrganizationByTaxId(taxId)` | **Hecho** | `src/lib/account-360/organization-identity.ts` |
+| Helper `ensureOrganizationForSupplier()` | **Hecho** | mismo archivo — crea/encuentra org por RUT |
+| Helper `resolveOrganizationForClient(clientId)` | **Hecho** | mismo archivo — bridge client → space → org |
+| Efeonce identity persistida | **Hecho** | `ACCOUNT_360_IMPLEMENTATION_V1.md` documenta razón social, RUT 77.357.182-1, dirección |
+| Eventos outbox `organization.created/updated` | **Hecho** | `event-catalog.ts` líneas 68-69 |
+| Types con `legalName`, `taxId` | **Hecho** | `organization-store.ts` — `OrganizationDetail` |
+
+### Lo que falta (2 gaps)
+
+**Gap 1: Dirección legal NO está en el schema**
+
+`greenhouse_core.organizations` tiene `legal_name`, `tax_id`, `tax_id_type`, `country` — pero **no tiene `legal_address`**. La liquidación de Valentina muestra "Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile" como dirección del empleador. Para generar un PDF legal completo se necesita:
+
+```sql
+ALTER TABLE greenhouse_core.organizations
+  ADD COLUMN IF NOT EXISTS legal_address TEXT;
+```
+
+**Gap 2: PDFs de Payroll usan "Greenhouse EO" hardcoded**
+
+`src/lib/payroll/generate-payroll-pdf.tsx`:
+- Línea 212: `<Text style={styles.companyName}>Greenhouse EO</Text>` (reporte de período)
+- Línea 438: `<Text style={styles.companyName}>Greenhouse EO</Text>` (recibo individual)
+
+Debería resolver dinámicamente desde la organización operativa:
+- Razón social: `Efeonce Group SpA`
+- RUT: `77.357.182-1`
+- Dirección: `Dr. Manuel Barros Borgoño 71 of 05, Providencia`
+
+### Cómo implementar
+
+**Slice 1 (schema):**
+1. Migration: `ALTER TABLE greenhouse_core.organizations ADD COLUMN IF NOT EXISTS legal_address TEXT`
+2. Backfill Efeonce: `UPDATE greenhouse_core.organizations SET legal_address = 'Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile' WHERE tax_id = '77.357.182-1'`
+
+**Slice 2 (helper):**
+1. Agregar función `getOperatingEntityIdentity()` en `organization-identity.ts`:
+   - Lee la organización con `organization_type = 'internal'` o `tax_id = '77.357.182-1'` (config o fallback)
+   - Retorna `{ legalName, taxId, taxIdType, legalAddress, country }`
+   - Cacheable — la identidad legal no cambia entre requests
+
+**Slice 3 (consumer cutover):**
+1. `generate-payroll-pdf.tsx`: reemplazar `"Greenhouse EO"` por `operatingEntity.legalName`
+2. El receipt/PDF debe recibir la identidad legal como parámetro, no resolverla inline
+3. `generatePayrollPeriodPdf(periodId)` y `generatePayrollReceiptPdf(entryId)` deben llamar al helper y pasar la identidad al Document component
+
+**Eventos reactivos:**
+- No se necesitan eventos nuevos — `organization.updated` ya existe y cubre cambios a la identidad legal
+- Si la organización operativa cambia `legal_name` o `tax_id`, los PDFs futuros usarán el nuevo valor automáticamente
+- PDFs ya generados no se re-generan (son snapshots del momento de exportación)
+
+**Projections:**
+- No se necesitan projections nuevas — la identidad legal se lee on-demand (no cambia frecuentemente)
+- `organization_360` serving view ya expone los campos existentes; agregar `legal_address` al view
+
+**Esfuerzo real:** Bajo — 1 migration, 1 helper de ~20 líneas, 2 cambios en PDF template
+
 ## Current Repo State
 
 ### Ya existe
 
-- `greenhouse_core.organizations` ya es el anchor de organización en Account 360.
-- `organization_360` ya sirve una vista denormalizada para consumo de UI/API.
-- `TenantContext` ya expone `organizationId` y `organizationName`.
-- Payroll ya tiene exportables PDF/receipt que pueden consumir identidad organizacional.
-- La identidad legal de Efeonce ya quedó documentada en arquitectura y contexto vivo.
+- `greenhouse_core.organizations` con `legal_name`, `tax_id`, `tax_id_type`, `country`
+- `organization-identity.ts` con helpers funcionales (`findOrganizationByTaxId`, `resolveOrganizationForClient`)
+- `organization_360` serving view
+- Eventos `organization.created/updated` en event catalog
+- Identidad legal de Efeonce documentada en `ACCOUNT_360_IMPLEMENTATION_V1.md`
 
 ### Gap actual
 
-- No existe un contrato canónico de `legal entity` o `operating entity` para la organización propietaria.
-- No hay persistencia explícita de la dirección legal en el modelo de organización.
-- Los headers y footers de Payroll PDF/recibos siguen con texto hardcoded.
-- El modelo semántico todavía puede confundirse con BU o con cliente si no se formaliza ahora.
+- Falta columna `legal_address` en `greenhouse_core.organizations`
+- PDFs de Payroll usan `"Greenhouse EO"` hardcoded en vez de `organization.legal_name`
 
 ## Scope
 
