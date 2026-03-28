@@ -7,7 +7,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
 - La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.
 - La descarga de recibos por HR prioriza el PDF almacenado en GCS y cae a render on-demand solo como fallback.
-- Las superficies de `Mi Nómina` y `People > Person > Nómina` siguen pendientes para exponer el listado/descarga del colaborador.
+- `My Nómina` ya expone descarga de recibo para el colaborador autenticado y `People > Person > Nómina` la expone para HR desde el mismo contrato de receipt.
+- Quedan pendientes el pulido del layout de recibos y el smoke end-to-end con correo + descarga en staging.
 
 ## Delta 2026-03-28 Payroll AFP split
 - `Payroll Chile` ahora versiona y snapshottea `AFP` con split explícito de `cotización` y `comisión`, manteniendo también el total agregado para compatibilidad histórica.

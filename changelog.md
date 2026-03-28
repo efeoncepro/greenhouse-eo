@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll receipt access surfaces wired
+- `My Nómina` ya expone descarga directa del recibo por período usando `GET /api/my/payroll/entries/[entryId]/receipt`.
+- `People > Person > Nómina` ya expone descarga directa del recibo por entry para HR, reutilizando el route que prioriza el PDF almacenado.
+- La task de recibos queda con la base delivery completa; lo pendiente ya es el pulido visual final y el smoke end-to-end de entrega.
+
 ### Payroll receipts delivery foundation
 - `Payroll` ya tiene la base de recibos persistidos: registry en `greenhouse_payroll.payroll_receipts`, upload a GCS, batch generator `generatePayrollReceiptsForPeriod()` y proyección reactiva `payroll_receipts_delivery`.
 - La descarga por HR ahora prioriza el PDF almacenado y solo cae al render on-demand como fallback, evitando regenerar el documento en cada consulta.

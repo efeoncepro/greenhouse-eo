@@ -128,6 +128,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Descuentos</TableCell>
                     <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
+                    <TableCell align='center'>Recibo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -162,6 +163,16 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                         <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
                           {formatCurrency(entry.netTotal, currency)}
                         </Typography>
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Button
+                          size='small'
+                          variant='tonal'
+                          startIcon={<i className='tabler-file-download' />}
+                          onClick={() => window.open(`/api/hr/payroll/entries/${entry.entryId}/receipt`, '_blank')}
+                        >
+                          PDF
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

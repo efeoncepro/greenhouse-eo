@@ -10,6 +10,7 @@ import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -98,6 +99,15 @@ const MyPayrollView = () => {
                 <Typography variant='caption' color='text.secondary'>Moneda</Typography>
                 <Typography variant='h5'>{latest.currency}</Typography>
               </Box>
+              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+                <Button
+                  variant='tonal'
+                  startIcon={<i className='tabler-file-download' />}
+                  onClick={() => window.open(`/api/my/payroll/entries/${latest.entryId}/receipt`, '_blank')}
+                >
+                  Descargar recibo
+                </Button>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -122,6 +132,7 @@ const MyPayrollView = () => {
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Neto</TableCell>
                     <TableCell align='center'>Estado</TableCell>
+                    <TableCell align='center'>Recibo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -132,6 +143,16 @@ const MyPayrollView = () => {
                       <TableCell align='right'><Typography fontWeight={600}>{fmt(e.netTotal, e.currency)}</Typography></TableCell>
                       <TableCell align='center'>
                         <CustomChip round='true' size='small' variant='tonal' color={e.status === 'exported' ? 'success' : e.status === 'approved' ? 'primary' : 'secondary'} label={e.status === 'exported' ? 'Exportada' : e.status === 'approved' ? 'Aprobada' : e.status} />
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Button
+                          size='small'
+                          variant='tonal'
+                          startIcon={<i className='tabler-file-download' />}
+                          onClick={() => window.open(`/api/my/payroll/entries/${e.entryId}/receipt`, '_blank')}
+                        >
+                          Descargar
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

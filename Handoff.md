@@ -49,6 +49,48 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:56 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar la superficie de acceso a recibos de `TASK-077` en `My Nómina` y `People > Person > Nómina`, dejando el route empleado propio y la descarga HR alineada con el registry GCS.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `src/app/api/my/payroll/entries/[entryId]/receipt/route.ts`
+- `src/views/greenhouse/my/MyPayrollView.tsx`
+- `src/views/greenhouse/people/tabs/PersonPayrollTab.tsx`
+- `docs/tasks/in-progress/TASK-077-payroll-receipt-generation-delivery.md`
+- `Handoff.md`
+- `changelog.md`
+- `project_context.md`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/payroll/postgres-store.test.ts`
+- `pnpm test src/lib/payroll/payroll-receipts-store.test.ts src/lib/sync/projections/payroll-receipts.test.ts`
+- `pnpm exec eslint ...`
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- Falta el smoke end-to-end completo en staging con recibo descargado desde `My Nómina`.
+- `TASK-077` sigue in-progress porque falta el pulido final del template/email y la validación de entrega real.
+
 ## 2026-03-28 04:37 -03
 
 ### Agente

@@ -8,10 +8,11 @@
   - proyección reactiva `payroll_receipts_delivery` disparada por `payroll_period.exported`
   - storage GCS reutilizable para PDFs
   - descarga on-demand del recibo prioriza el PDF almacenado y cae a render en vivo solo como fallback
+- Las superficies de acceso ya quedaron conectadas:
+  - `My Nómina` muestra botón de descarga por período usando `GET /api/my/payroll/entries/[entryId]/receipt`
+  - `People > Person > Nómina` muestra botón de descarga por entry usando el route HR existente
 - El flujo está integrado por outbox/reactive projections, no como cron separado.
 - Queda abierto para esta task:
-  - superficie UI de `Mi Nómina`
-  - acceso descargable desde `People > Person > Nómina`
   - pulido del template de email/branding
   - smoke real sobre exportación completa en staging con entrega de correo
 
@@ -94,6 +95,7 @@ Que al exportar un período de nómina:
 | `generatePayrollReceiptPdf(entryId)` | `src/lib/payroll/generate-payroll-pdf.tsx` | Funciona, formato básico |
 | `generatePayrollPeriodPdf(periodId)` | mismo archivo | Reporte de período |
 | `GET /api/hr/payroll/entries/[entryId]/receipt` | API route | Prioriza PDF almacenado y cae a render on-demand |
+| `GET /api/my/payroll/entries/[entryId]/receipt` | API route | Descarga del colaborador autenticado |
 | `PayrollReceiptCard.tsx` | `src/views/greenhouse/payroll/` | Vista MUI inline |
 | `PayrollReceiptDialog.tsx` | mismo directorio | Modal con botón descargar |
 | `generatePayrollExcel()` | `src/lib/payroll/generate-payroll-excel.ts` | Export Excel |
@@ -106,8 +108,7 @@ Que al exportar un período de nómina:
 
 ### Lo que NO existe
 
-- UI completa de Mi Nómina con listado de recibos
-- Descarga desde `People > Person > Nómina`
+- UI de recibos en Mi Nómina y People ya conectada a la descarga
 - Template de email finalizado con branding de producción
 - Smoke end-to-end en staging con colas/Resend confirmadas
 
@@ -319,11 +320,10 @@ Efeonce Greenhouse™
 - Usar pattern de Vuexy Invoice `PreviewActions` (Download, Print)
 
 **API:**
-- `GET /api/my/payroll/receipts` — lista de recibos del usuario autenticado
-- `GET /api/my/payroll/receipts/[receiptId]/download` — descarga PDF (proxy GCS autenticado)
-- `GET /api/hr/payroll/entries/[entryId]/receipt/download` — descarga por HR (ya existe parcialmente, adaptar a GCS)
+- `GET /api/my/payroll/entries/[entryId]/receipt` — descarga PDF del usuario autenticado
+- `GET /api/hr/payroll/entries/[entryId]/receipt` — descarga por HR (ya existe parcialmente, prioriza GCS)
 
-**Estado actual:** la descarga por HR ya prioriza el PDF almacenado. Las listas `/my/payroll` y el botón por entry en People siguen pendientes.
+**Estado actual:** la descarga por HR ya prioriza el PDF almacenado; `My Nómina` y `People` ya muestran botón de descarga por entry.
 
 ### Slice 7 — Eventos y outbox
 
