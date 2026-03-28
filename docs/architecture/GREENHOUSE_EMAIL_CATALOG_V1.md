@@ -155,6 +155,10 @@ Emails ligados a capacidades o modulos especificos, pero solo cuando el evento i
 - `payroll_period_approved`
 - `payroll_export_ready`
 
+Notas:
+- `payroll_period_approved` se usa como aviso de estado listo para exportar/revisar.
+- `payroll_export_ready` debe entenderse como notificación downstream de cierre/exportación canonica de nómina, disparada desde `payroll_period.exported`, y puede incluir CSV/PDF adjuntos o enlaces seguros al portal.
+
 ### AI Tooling
 
 - `license_assigned`

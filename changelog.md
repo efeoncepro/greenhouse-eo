@@ -7,6 +7,21 @@
 
 ## 2026-03-28
 
+### TASK-094 completed with explicit Payroll close flow
+- Payroll now separates the canonical close mutation from CSV download: `POST /api/hr/payroll/periods/[periodId]/close` marks `exported`, while `GET /api/hr/payroll/periods/[periodId]/csv` serves the artifact.
+- Finance/HR notification is emitted from `payroll_period.exported` through a Resend-backed projection, with PDF and CSV attachments.
+- The architecture, event catalog, email catalog, and task registry were aligned to the new contract.
+
+### TASK-094 architecture context expanded for payroll close vs CSV download
+- La task nueva de Payroll ahora explicita que `exported` es el cierre canónico y que la descarga del CSV es un artefacto opcional, no el mecanismo de cierre.
+- La arquitectura de Payroll quedó alineada para que cualquier correo downstream a Finance/HR salga de `payroll_period.exported`.
+- `GREENHOUSE_EMAIL_CATALOG_V1.md` ahora documenta `payroll_export_ready` como notificación downstream de cierre/exportación canónica.
+
+### TASK-094 payroll close and CSV download separation added
+- Se documentó una lane nueva para separar el cierre/exportación de un periodo de Payroll de la descarga opcional del CSV.
+- El brief deja explícito que el estado `exported` debe surgir de una mutación de negocio, no de la entrega del archivo.
+- Se corrigió el registry de tasks para reflejar que `TASK-093` ya estaba cerrada.
+
 ### TASK-092 payroll operational current period semantics completed
 - `current-payroll-period` ahora resuelve el período actual por mes operativo vigente, usando la utility compartida de calendario operativo.
 - `PayrollHistoryTab` deja de contar `approved` como cierre final y lo muestra como `aprobado en cierre`, separado de `cerrado/exportado`.

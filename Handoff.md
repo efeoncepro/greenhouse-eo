@@ -49,6 +49,95 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 12:39 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-094` implementando la separacion entre cierre canonico de Payroll y descarga de CSV, con notificacion downstream a Finance/HR por Resend.
+- Alinear la arquitectura, el catalogo de eventos/emails y el pipeline de tasks con el nuevo contrato `close` + `csv`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/close-payroll-period.ts`
+- `src/lib/payroll/send-payroll-export-ready.ts`
+- `src/lib/sync/projections/payroll-export-ready.ts`
+- `src/emails/PayrollExportReadyEmail.tsx`
+- `src/app/api/hr/payroll/periods/[periodId]/close/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/csv/route.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/export/route.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `docs/tasks/complete/TASK-094-payroll-close-and-csv-download-separation.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/export-payroll.test.ts src/lib/payroll/close-payroll-period.test.ts` -> OK
+- `pnpm exec vitest run src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx` -> OK
+- `pnpm exec eslint src/lib/payroll/export-payroll.ts src/lib/payroll/close-payroll-period.ts src/lib/payroll/send-payroll-export-ready.ts src/lib/sync/projections/payroll-export-ready.ts src/emails/PayrollExportReadyEmail.tsx 'src/app/api/hr/payroll/periods/[periodId]/close/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/csv/route.ts' 'src/app/api/hr/payroll/periods/[periodId]/export/route.ts' src/views/greenhouse/payroll/PayrollPeriodTab.tsx` -> OK
+- `pnpm build` -> OK
+
+### Riesgos o pendientes
+
+- El mail de cierre usa destinatarios internos hardcodeados; si se quiere operarlo por tenant/config, conviene moverlos a policy/env en una tarea separada.
+- El route `export` queda por compatibilidad como descarga de CSV; la UI ya usa `close` + `csv`.
+
+## 2026-03-28 12:21 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Registrar `TASK-094` para separar el cierre/exportacion del periodo de Payroll de la descarga opcional del CSV, y alinear el registry con el estado real de `TASK-093`.
+- Enriquecer la arquitectura de Payroll/Email para dejar claro que `exported` es cierre canónico y que Finance/HR reciben notificación downstream desde ese evento, no desde la descarga.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-094-payroll-close-and-csv-download-separation.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- no hubo cambios de runtime en esta vuelta; solo documentacion y pipeline de tasks
+
+### Riesgos o pendientes
+
+- `TASK-094` queda lista para implementarse cuando se decida el contrato exacto entre accion de cierre y entrega del CSV.
+- `TASK-093` ya estaba cerrada; se corrigio el registry para reflejarlo.
+
 ## 2026-03-28 13:52 -03
 
 ### Agente

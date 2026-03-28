@@ -3,6 +3,14 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll close/export split completed
+- Payroll separó el cierre canónico del período de la descarga del CSV.
+- `POST /api/hr/payroll/periods/[periodId]/close` marca el período como `exported` y publica `payroll_period.exported`.
+- `GET /api/hr/payroll/periods/[periodId]/csv` y el route legacy `export` quedaron como descarga de artefacto, sin mutar estado.
+- La UI de `PayrollPeriodTab` ahora expone `Cerrar y notificar` y `Descargar CSV` como acciones distintas.
+- La notificación downstream a Finance/HR sale desde `payroll_period.exported` vía Resend, con PDF/CSV adjuntos.
+- La arquitectura y el catálogo de emails quedaron alineados con ese contrato.
+
 ## Delta 2026-03-28 Payroll operational calendar utility implemented
 - La utilidad canónica de calendario operativo quedó implementada en `src/lib/calendar/operational-calendar.ts`.
 - La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts`.

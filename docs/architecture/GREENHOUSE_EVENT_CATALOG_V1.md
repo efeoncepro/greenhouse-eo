@@ -153,6 +153,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
 | `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |
 | `payroll_receipts_delivery` | notifications | payroll_period.exported | Genera, persiste y envía el batch de recibos del período exportado |
+| `payroll_export_ready_notification` | notifications | payroll_period.exported | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período |
 
 ## Extensibilidad
 

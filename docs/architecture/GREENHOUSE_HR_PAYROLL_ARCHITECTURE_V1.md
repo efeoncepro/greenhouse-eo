@@ -207,6 +207,8 @@ Non-fit modules:
 - `GET /api/hr/payroll/periods/[periodId]/entries`
 - `GET /api/hr/payroll/periods/[periodId]/pdf`
 - `GET /api/hr/payroll/periods/[periodId]/excel`
+- `POST /api/hr/payroll/periods/[periodId]/close`
+- `GET /api/hr/payroll/periods/[periodId]/csv`
 - `GET /api/hr/payroll/periods/[periodId]/export`
 - `GET /api/hr/payroll/projected`
 - `POST /api/hr/payroll/projected/promote`
@@ -542,6 +544,9 @@ Si la entry pertenecía a un período `approved`, el período se reabre a `calcu
 - al exportar CSV, el período pasa a `exported`
 - el cambio a `exported` debe publicarse como evento outbox canónico `payroll_period.exported`
 - el path transaccional canonico de exportación es PostgreSQL; los consumers reactivos deben escuchar ese evento y no depender de side effects del archivo exportado
+- el cierre canónico debe poder completarse sin que el usuario descargue el CSV
+- cualquier correo downstream a Finance/HR debe dispararse desde `payroll_period.exported`, no desde el click de descarga
+- la descarga del CSV es un artefacto opcional; puede convivir con el cierre, pero no define el cierre
 
 ### Semántica operativa
 `exported` representa el cierre final del ciclo mensual.
@@ -592,6 +597,7 @@ Para entries con `pay_regime = chile`, el cálculo mensual debe usar snapshots h
 ### Finance
 - `Finance` puede descubrir candidates de gasto de nómina desde entries aprobadas/exportadas
 - el linkage `payroll_entry_id -> member_id` permite anclar gasto de personal al colaborador
+- el gasto final del período debe consolidarse al entrar en `exported`; `approved` sigue siendo una etapa operativa previa al cierre
 
 ### Reporting
 - `Gasto de personal` agrega períodos `approved/exported`
@@ -641,6 +647,8 @@ Regla:
 - `src/lib/payroll/get-payroll-entries.ts`
 - `src/lib/payroll/postgres-store.ts`
 - `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/close-payroll-period.ts`
+- `src/lib/payroll/send-payroll-export-ready.ts`
 - `src/lib/payroll/personnel-expense.ts`
 - `src/lib/payroll/period-lifecycle.ts`
 - `src/lib/payroll/compensation-versioning.ts`
@@ -656,6 +664,9 @@ Regla:
 - El período representa mes imputable, no mes de pago.
 - `approved` sigue siendo editable; `exported` es el cierre final.
 - `payroll_period.exported` es el evento canónico de cierre/exportación.
+- el email downstream de cierre a Finance/HR nace de `payroll_period.exported` y puede adjuntar CSV/PDF o enlazar artefactos seguros
+- `GET /api/hr/payroll/periods/[periodId]/export` permanece como descarga de CSV por compatibilidad; el cierre canónico vive en `POST /api/hr/payroll/periods/[periodId]/close`
+- `GET /api/hr/payroll/periods/[periodId]/csv` es la ruta explícita de descarga del CSV
 - Los KPI mensuales de `Payroll` vienen desde `ICO`.
 - La moneda vive por entry; los períodos mixtos `CLP/USD` no se consolidan implícitamente.
 - `UF`, `tax_table_version` y `UTM` son prerequisitos bloqueantes cuando el cálculo Chile los requiere.

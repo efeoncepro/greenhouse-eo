@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-094`
+- siguiente ID disponible: `TASK-095`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -33,6 +33,7 @@ Primer bloque operativo asignado:
 | ---------- | -------------------------------------------------------------------------------------------------------- | --------- | ------- | -------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `TASK-078` | [TASK-078-payroll-chile-previsional-foundation.md](complete/TASK-078-payroll-chile-previsional-foundation.md) | P0 | Muy alto | Alto | Cerrada | **[1/4]** Sync Previred via Gael Cloud API + indicadores previsionales + forward cutover + wiring reactivo |
 | `TASK-079` | [TASK-079-payroll-chile-reverse-calculation-engine.md](complete/TASK-079-payroll-chile-reverse-calculation-engine.md) | P0 | Muy alto | Alto | Cerrada | **[4/4]** Motor reverse `gross from net` completo: engine + preview enterprise + hardening + validación con liquidación real. |
+| `TASK-094` | [TASK-094-payroll-close-and-csv-download-separation.md](complete/TASK-094-payroll-close-and-csv-download-separation.md) | P1 | Alto | Medio | Cerrada | Separar el cierre/exportacion del periodo de la descarga opcional del CSV; el cierre deja de depender del archivo |
 | `TASK-082` | [TASK-082-compensation-drawer-chile-ux-simplification.md](complete/TASK-082-compensation-drawer-chile-ux-simplification.md) | P1 | Alto | Bajo | Cerrada | Colapsar parámetros previsionales en reverse mode Chile. Accordion expandible, colación/movilización siempre visibles. |
 | `TASK-083` | [TASK-083-compensation-drawer-enterprise-ux-redesign.md](complete/TASK-083-compensation-drawer-enterprise-ux-redesign.md) | P1 | Alto | Medio | Cerrada | Preview con secciones semánticas, salary base como chip, accordion MUI, font mono, micro-copy conciso. |
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |

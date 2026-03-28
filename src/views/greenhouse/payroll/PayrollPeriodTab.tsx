@@ -121,7 +121,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
 
       onRefresh()
     })
-  }, [period, onRefresh])
+  }, [period, onRefresh, startTransition])
 
   const handleApprove = useCallback(async () => {
     if (!period) return
@@ -140,15 +140,34 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
     onRefresh()
   }, [period, onRefresh])
 
-  const handleExport = useCallback(async () => {
+  const handleClosePeriod = useCallback(async () => {
     if (!period) return
 
-    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/export`)
+    setError(null)
+    startTransition(async () => {
+      const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/close`, { method: 'POST' })
+
+      if (!res.ok) {
+        const data = await res.json()
+
+        setError(data.error || 'Error al cerrar período')
+
+        return
+      }
+
+      onRefresh()
+    })
+  }, [period, onRefresh])
+
+  const handleDownloadCsv = useCallback(async () => {
+    if (!period) return
+
+    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/csv`)
 
     if (!res.ok) {
       const data = await res.json()
 
-      setError(data.error || 'Error al exportar')
+      setError(data.error || 'Error al descargar CSV')
 
       return
     }
@@ -162,8 +181,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
     a.download = `nomina_${period.periodId}.csv`
     a.click()
     URL.revokeObjectURL(url)
-    onRefresh()
-  }, [period, onRefresh])
+  }, [period])
 
   const handleEntryUpdate = useCallback(
     (entryId: string, field: string, value: number | string | boolean | null) => {
@@ -433,6 +451,17 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     </Button>
                   )}
                   <Button
+                    variant='contained'
+                    size='small'
+                    color='warning'
+                    startIcon={<i className='tabler-mail-forward' />}
+                    onClick={handleClosePeriod}
+                    disabled={isPending}
+                    aria-label={`Cerrar y notificar el período ${formatPeriodLabel(period.year, period.month)}`}
+                  >
+                    Cerrar y notificar
+                  </Button>
+                  <Button
                     variant='tonal'
                     size='small'
                     color='info'
@@ -461,19 +490,19 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
                     disabled={isPending}
                     aria-label={`Abrir Excel del período ${formatPeriodLabel(period.year, period.month)}`}
-                  >
-                    Ver Excel
-                  </Button>
-                  <Button
-                    variant='tonal'
-                    size='small'
-                    startIcon={<i className='tabler-file-export' />}
-                    onClick={handleExport}
-                    disabled={isPending}
-                    aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
-                  >
-                    Descargar CSV
-                  </Button>
+                    >
+                      Ver Excel
+                    </Button>
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      startIcon={<i className='tabler-file-export' />}
+                      onClick={handleDownloadCsv}
+                      disabled={isPending}
+                      aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
+                    >
+                      Descargar CSV
+                    </Button>
                 </>
               )}
               {period.status === 'exported' && (
@@ -504,7 +533,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     variant='tonal'
                     size='small'
                     startIcon={<i className='tabler-file-export' />}
-                    onClick={handleExport}
+                    onClick={handleDownloadCsv}
                     disabled={isPending}
                     aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
