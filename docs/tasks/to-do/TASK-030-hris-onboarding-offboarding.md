@@ -1,5 +1,21 @@
 # CODEX TASK — HRIS Fase 1B: Onboarding y Offboarding Checklists
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **Trigger de auto-creación**: NO hookear directamente en el PATCH endpoint de members. Usar el sistema de outbox events + reactive projections:
+  - Crear nueva projection `onboardingAutoCreation` en `src/lib/sync/projections/`
+  - Trigger events: `member.created`, `member.updated`, `member.deactivated` (ya existen en event catalog)
+  - La projection detecta cambios de status en el payload → crea instancia de onboarding/offboarding idempotentemente
+  - Registrar en `src/lib/sync/projections/index.ts`
+- **Outbox events propios**: registrar en `src/lib/sync/event-catalog.ts`:
+  - Aggregate type: `onboardingInstance`
+  - Eventos: `hr.onboarding.instance_created`, `hr.onboarding.item_completed`, `hr.onboarding.instance_completed`, `hr.offboarding.instance_created`, `hr.offboarding.instance_completed`
+- **Notificaciones IN SCOPE** (no out-of-scope como decía la task original): `NotificationService` (`src/lib/notifications/notification-service.ts`) ya existe y soporta canal email via Resend. Usar para:
+  - Welcome notification al crear onboarding instance
+  - Reminder a responsables de items pendientes
+  - Notice de offboarding a partes relevantes
+- **Email via Resend**: welcome email al nuevo colaborador cuando se crea instancia de onboarding. El patrón de email transaccional ya está operativo (`src/lib/resend.ts`).
+
 ## Resumen
 
 Implementar el **módulo de onboarding y offboarding** del HRIS en Greenhouse. Permite a HR configurar plantillas de checklist (qué pasos ejecutar cuando alguien entra o sale), y ejecutar instancias asignadas a cada colaborador con tracking de progreso por responsable.

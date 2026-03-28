@@ -1,6 +1,23 @@
 # DELTA — HR Payroll Module v2: Reemplazo de Bono RpA por Bono FTR%
 
-## Delta 2026-03-27
+## Status
+
+| Campo | Valor |
+|-------|-------|
+| Lifecycle | `deferred` |
+| Razón | TASK-065 recalibró RpA con soft bands y se mantuvo como indicador de bonos. FTR es propuesta estratégica pendiente de decisión de producto. |
+
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **Lifecycle cambiado a `deferred`**: el body de esta task está CONGELADO. Ningún slice debe ejecutarse hasta que exista una decisión de producto que active formalmente FTR como indicador de bonos.
+- **Correcciones obligatorias si FTR se activa:**
+  - Fuente de KPI: usar `greenhouse_serving.ico_member_metrics.ftr_pct` (PostgreSQL serving, ya materializado por ICO projection). NO usar `notion_ops.tareas` directo.
+  - Approach de schema: AGREGAR `bonus_ftr_min`, `bonus_ftr_max`, `kpi_ftr_percent`, `bonus_ftr_amount` como campos nuevos JUNTO a `bonus_rpa_*` existentes. NO renombrar ni eliminar los campos RpA — están en producción y son usados por TASK-065, proyecciones, exports y recibos.
+  - `payroll_bonus_config`: extender la tabla PostgreSQL existente (ya ampliada por TASK-065 con `rpa_soft_band_*`). No crear tabla paralela ni referenciar BigQuery.
+  - Motor de cálculo: integrar sobre el forward engine cortado a indicadores synced (TASK-078), no sobre el engine manual anterior.
+- **Prerequisitos si se reactiva:** TASK-078 (forward engine cutover), TASK-065 (bonus config canónico)
+
+## Delta 2026-03-27 (original)
 - La lane inmediata aprobada por negocio no es reemplazar `RpA` todavía, sino recalibrar el payout vigente de `OTD + RpA` para hacerlo más flexible.
 - La ejecución inmediata queda capturada en [TASK-065](../in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md).
 - Interpretación actual:

@@ -1,5 +1,19 @@
 # CODEX TASK — HRIS Fase 3: Evaluaciones de Desempeño 360°
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **Fuente ICO corregida**: métricas ICO (RpA, OTD%, FTR%, throughput, cycle time) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL). NUNCA leer de BigQuery directamente en este módulo. El pipeline BQ→PG ya está manejado por `src/lib/sync/projections/ico-member-metrics.ts`.
+- **TASK-029 es hard dependency**: `greenhouse_hr.goals` debe existir para input de goal completion en el summary. Si no existe al momento de generar summary, retornar null para campos de goals (degradación graceful).
+- **Outbox events obligatorios**: registrar en `src/lib/sync/event-catalog.ts`:
+  - Aggregate types: `evalCycle`, `evalAssignment`
+  - Eventos: `hr.eval_cycle.activated`, `hr.eval_cycle.advanced`, `hr.eval_cycle.closed`, `hr.eval_assignment.created`, `hr.eval_assignment.submitted`, `hr.eval_summary.finalized`
+- **Integration con `person_intelligence`**: cuando un eval summary se finaliza (`hr.eval_summary.finalized`), la projection `person_intelligence` debe refrescarse para incluir `eval_overall_rating` y `eval_cycle_id` en el snapshot unificado. Esto enriquece People 360 con contexto de evaluación.
+- **Notifications**: usar `NotificationService` via outbox events para:
+  - Notificar a colaboradores cuando ciclo avanza a `self_eval`
+  - Notificar a peer evaluators cuando ciclo avanza a `peer_eval`
+  - Notificar a todos cuando resultados disponibles
+- **Regla**: `ico-metrics-fetcher.ts` (si se crea) debe leer de `greenhouse_serving.ico_member_metrics`, no de BigQuery.
+
 ## Resumen
 
 Implementar el **módulo de evaluaciones de desempeño** del HRIS en Greenhouse. Permite ejecutar ciclos de evaluación 360° donde cada colaborador es evaluado por sí mismo (auto-evaluación), sus pares, su supervisor directo, y opcionalmente sus reportes directos. El resultado combina ratings cualitativos por competencia con métricas cuantitativas del ICO Engine y progreso de goals.

@@ -1,5 +1,14 @@
 # CODEX TASK — HRIS Fase 1A: Document Vault (Bóveda de Documentos)
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **TASK-026 es soft dependency**: el Document Vault puede avanzar sin contract type consolidation, pero las reglas de elegibilidad por `contract_type` no funcionarán hasta que TASK-026 agregue el campo canónico en `greenhouse_core.members`.
+- **GCS pattern**: reutilizar el patrón de signed URLs de `src/lib/storage/greenhouse-media.ts` (ya operativo para logos/avatars). No duplicar el client de `@google-cloud/storage`.
+- **Outbox events obligatorios**: registrar en `src/lib/sync/event-catalog.ts`:
+  - Aggregate type: `memberDocument`
+  - Eventos: `hr.document.uploaded`, `hr.document.verified`, `hr.document.expired`
+  - Estos eventos alimentan audit trail y pueden triggerear `notification_dispatch` para alertas de expiración.
+
 ## Resumen
 
 Implementar el **módulo de bóveda de documentos** del HRIS en Greenhouse. Permite a HR gestionar documentos del equipo (contratos, NDAs, certificados, licencias médicas) y a cada colaborador ver y subir sus propios documentos desde su portal self-service.
