@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### TASK-088 reactive projections and delivery hardened
+- La cola reactiva de Payroll ahora cierra su ciclo con `pending -> completed/failed`, conserva dedupe por `event_id + handler` y mantiene el queue completion como paso best-effort posterior al ledger reactivo.
+- El fallback BigQuery de export ya no publica `payroll_period.exported` si la mutación no actualiza ninguna fila, evitando eventos duplicados y receipts repetidos.
+- La arquitectura quedó alineada para tratar `projected_payroll_snapshots` como serving cache interno y no como source of truth transaccional.
+
 ### TASK-087 lifecycle invariants and readiness gate hardened
 - El contrato de nómina oficial ahora valida transiciones en el store: `calculated`, `approved` y `exported` solo avanzan desde estados permitidos.
 - `POST /api/hr/payroll/periods/[periodId]/approve` ahora consume el readiness canónico y rechaza blockers antes de aprobar.

@@ -49,6 +49,52 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 11:02 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-088` con hardening real de la cola reactiva, parity de export fallback y documentación del contrato de `projected_payroll`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/complete/TASK-088-payroll-reactive-projections-and-delivery-hardening.md`
+- `project_context.md`
+- `changelog.md`
+- `src/lib/sync/reactive-consumer.ts`
+- `src/lib/sync/reactive-consumer.test.ts`
+- `src/lib/sync/refresh-queue.ts`
+- `src/lib/sync/refresh-queue.test.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/export-payroll.test.ts`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/sync/reactive-consumer.test.ts src/lib/sync/refresh-queue.test.ts src/lib/payroll/export-payroll.test.ts src/lib/sync/projections/payroll-receipts.test.ts` -> pass
+- `pnpm exec eslint src/lib/sync/reactive-consumer.ts src/lib/sync/reactive-consumer.test.ts src/lib/sync/refresh-queue.ts src/lib/sync/refresh-queue.test.ts src/lib/payroll/export-payroll.ts src/lib/payroll/export-payroll.test.ts` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- `TASK-088` quedó cerrada; lo que sigue es integrar o revisar en staging si el pipeline de outbox/reactivo necesita smoke adicional.
+- Los cambios de `projected_payroll` quedaron a nivel de contrato/documentación, no de nuevo API surface.
+
 ## 2026-03-28 10:47 -03
 
 ### Agente

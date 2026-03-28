@@ -77,8 +77,9 @@ Notas:
 - `ico.materialization.completed` es hoy la señal reactiva canónica downstream cuando ya quedaron materializadas las métricas mensuales de `ICO`.
 - `projected_payroll` y `person_intelligence` deben reaccionar a este evento derivado, no recalcular directamente desde cambios crudos de tareas.
 - La introducción futura de un evento base tipo `delivery.task_assignment.upserted` puede complementar refresh dirigido de `ico_member_metrics`, pero no reemplaza el contrato de `ico.materialization.completed` para consumers derivados.
+- `payroll_period.exported` sigue siendo el cierre canónico de nómina; tanto Postgres-first como BigQuery fallback deben emitirlo solo si la mutación realmente avanzó el período.
 - `payroll_period.exported` ya quedó smoke-validado como disparador de `payroll_receipts_delivery`: primero se publica el outbox y luego el reactor materializa la entrega de recibos, sin depender de cron separado ni de un consumer bloqueado por otro handler del mismo evento.
-- Los eventos `payroll.projected_snapshot.refreshed`, `payroll.projected_period.refreshed`, `payroll.projected_promoted_to_official_draft` y `payroll_period.recalculated_from_projection` existen como trazas de promoción/proyección, pero deben tratarse explícitamente como audit trail hasta que un consumer real los reclame.
+- Los eventos `payroll.projected_snapshot.refreshed`, `payroll.projected_period.refreshed`, `payroll.projected_promoted_to_official_draft` y `payroll_period.recalculated_from_projection` existen como trazas de promoción/proyección, pero deben tratarse explícitamente como audit trail hasta que un consumer real los reclame; `projected_payroll_snapshots` es serving cache, no transaccional source of truth.
 
 Notas:
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.

@@ -2,11 +2,26 @@ import 'server-only'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { PayrollValidationError, escapeCsvValue, runPayrollQuery } from '@/lib/payroll/shared'
-import { getBigQueryProjectId } from '@/lib/bigquery'
+import { PayrollValidationError, escapeCsvValue } from '@/lib/payroll/shared'
+import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isPayrollPostgresEnabled, pgSetPeriodExported } from '@/lib/payroll/postgres-store'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 const getProjectId = () => getBigQueryProjectId()
+
+const getDmlAffectedRows = (job: unknown) =>
+  Number(
+    (job as {
+      metadata?: {
+        statistics?: {
+          query?: {
+            numDmlAffectedRows?: string | number
+          }
+        }
+      }
+    } | undefined)?.metadata?.statistics?.query?.numDmlAffectedRows ?? 0
+  )
 
 export const exportPayrollCsv = async (periodId: string) => {
   const projectId = getProjectId()
@@ -127,20 +142,36 @@ export const exportPayrollCsv = async (periodId: string) => {
     )
   ]
 
-  if (isPayrollPostgresEnabled()) {
-    await pgSetPeriodExported(periodId)
-  } else {
-    await runPayrollQuery(
-      `
-        UPDATE \`${projectId}.greenhouse.payroll_periods\`
-        SET
-          status = 'exported',
-          exported_at = CURRENT_TIMESTAMP()
-        WHERE period_id = @periodId
-          AND status = 'approved'
-      `,
-      { periodId }
-    )
+  if (period.status === 'approved') {
+    if (isPayrollPostgresEnabled()) {
+      await pgSetPeriodExported(periodId)
+    } else {
+      const [, job] = await getBigQueryClient().query({
+        query: `
+          UPDATE \`${projectId}.greenhouse.payroll_periods\`
+          SET
+            status = 'exported',
+            exported_at = CURRENT_TIMESTAMP()
+          WHERE period_id = @periodId
+            AND status = 'approved'
+        `,
+        params: { periodId }
+      })
+
+      if (getDmlAffectedRows(job) === 1) {
+        await publishOutboxEvent({
+          aggregateType: AGGREGATE_TYPES.payrollPeriod,
+          aggregateId: periodId,
+          eventType: EVENT_TYPES.payrollPeriodExported,
+          payload: {
+            periodId,
+            year: period.year,
+            month: period.month,
+            status: 'exported'
+          }
+        })
+      }
+    }
   }
 
   return lines.join('\n')

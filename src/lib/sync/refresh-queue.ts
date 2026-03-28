@@ -38,6 +38,9 @@ export const ensureRefreshQueue = async (): Promise<void> => {
   return ensureQueuePromise
 }
 
+export const buildRefreshQueueId = (projectionName: string, entityType: string, entityId: string) =>
+  `${projectionName}:${entityType}:${entityId}`
+
 export const enqueueRefresh = async (input: {
   projectionName: string
   entityType: string
@@ -48,7 +51,7 @@ export const enqueueRefresh = async (input: {
 }): Promise<void> => {
   await ensureRefreshQueue()
 
-  const queueId = `${input.projectionName}:${input.entityType}:${input.entityId}`
+  const queueId = buildRefreshQueueId(input.projectionName, input.entityType, input.entityId)
 
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.projection_refresh_queue
@@ -58,8 +61,17 @@ export const enqueueRefresh = async (input: {
      DO UPDATE SET
        priority = GREATEST(EXCLUDED.priority, projection_refresh_queue.priority),
        updated_at = NOW(),
+       triggered_by_event_id = EXCLUDED.triggered_by_event_id,
        error_message = NULL,
        max_retries = GREATEST(EXCLUDED.max_retries, projection_refresh_queue.max_retries),
+       created_at = CASE
+         WHEN projection_refresh_queue.status IN ('completed', 'failed') THEN NOW()
+         ELSE projection_refresh_queue.created_at
+       END,
+       retry_count = CASE
+         WHEN projection_refresh_queue.status IN ('completed', 'failed') THEN 0
+         ELSE projection_refresh_queue.retry_count
+       END,
        status = CASE
          WHEN projection_refresh_queue.status IN ('completed', 'failed') THEN 'pending'
          ELSE projection_refresh_queue.status
@@ -130,7 +142,8 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
 export const markRefreshFailed = async (queueId: string, error: string, maxAttempts = 3): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
-     SET status = CASE WHEN retry_count >= $2 THEN 'failed' ELSE 'pending' END,
+     SET retry_count = retry_count + 1,
+         status = CASE WHEN retry_count + 1 >= $2 THEN 'failed' ELSE 'pending' END,
          error_message = $3,
          updated_at = NOW()
      WHERE refresh_id = $1`,

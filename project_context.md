@@ -15,6 +15,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el Provider se resuelve una vez por layout render, no por componente
   - multi-tenant ready: si la operación se fragmenta por tenant, el layout resuelve el operating entity del scope de la sesión
 
+## Delta 2026-03-28 Payroll reactive hardening complete
+- `TASK-088` cerró la lane reactiva de Payroll sin cambiar la semántica funcional del módulo:
+  - la cola persistente `greenhouse_sync.projection_refresh_queue` ya vuelve de forma observable a `completed` o `failed`
+  - `reactive-consumer` completa best-effort después del ledger reactivo y no convierte un fallo de completion en fallo del refresh exitoso
+  - el fallback BigQuery de export solo publica `payroll_period.exported` cuando la mutación realmente afecta una fila
+  - `projected_payroll_snapshots` quedó documentado como serving cache interno; `/api/hr/payroll/projected` sigue resolviendo cálculo vivo + `latestPromotion`
+- Regla operativa derivada:
+  - `payroll_period.exported` sigue siendo el cierre canónico de nómina, independientemente del runtime Postgres-first o BigQuery fallback
+
 ## Delta 2026-03-28 Payroll hardening backlog documented
 - La auditoría de Payroll dejó tres lanes explícitas para seguir endureciendo el módulo sin mezclar objetivos:
   - `TASK-087`: invariantes del lifecycle oficial y gate de readiness

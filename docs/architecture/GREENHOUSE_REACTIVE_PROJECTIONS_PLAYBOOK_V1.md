@@ -127,9 +127,9 @@ The reactive consumer also persists `greenhouse_sync.outbox_reactive_log` as its
 
 Current hardening note:
 
-- la cola existe y acepta intents, pero el shared dequeue/completion worker todavía debe tratarse como un requisito operacional de primera clase
-- la documentación no debe describir la cola como "fully durable" hasta que completion/failure sea observable end-to-end
+- la cola persistente ya cierra su ciclo con completion/failure observables y sigue siendo la referencia operacional de durabilidad
 - `projected_payroll` y `payroll_receipts_delivery` son los consumidores de referencia de este control plane
+- el contrato operacional sigue siendo: intents persistentes, ledger reactivo idempotente y observabilidad por queue health
 
 ### How it works
 

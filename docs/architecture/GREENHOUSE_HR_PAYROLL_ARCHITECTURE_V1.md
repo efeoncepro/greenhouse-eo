@@ -105,6 +105,7 @@ Regla arquitectónica:
 - `Projected Payroll` sigue siendo simulación y cache auditable
 - la promoción a oficial es una acción explícita, separada y reversible en términos de tracking, pero no en lifecycle transaccional
 - la capa de promoción debe fallar por schema o datos reales de nómina, no por infraestructura analítica no relacionada con el período
+- la surface `/api/hr/payroll/projected` sigue resolviendo cálculo vivo + `latestPromotion`; `projected_payroll_snapshots` es una materialización serving interna para acelerar el read, no la source of truth transaccional
 
 ## 2.6. Operational cut-off and close window
 

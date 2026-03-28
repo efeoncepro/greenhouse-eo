@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Parcial`
+- Status real: `Cerrada`
 - Rank: `4`
 - Domain: `hr`
 - GitHub Project: `Greenhouse Delivery`
@@ -16,6 +16,12 @@
 Endurecer la capa reactiva de Payroll para que la entrega de recibos, la proyección reactiva y la materialización serving tengan un contrato duradero, observables y sin drift entre docs y runtime.
 
 La task cubre `payroll_receipts_delivery`, la cola reactiva, el fallback de export y la clarificación del contrato de `projected_payroll`.
+
+## Delivery
+
+- La cola reactiva ya cierra su ciclo con `pending -> completed/failed` y mantiene idempotencia por `event_id + handler`.
+- El fallback BigQuery de export publica `payroll_period.exported` solo cuando la mutación realmente avanza el período.
+- `projected_payroll_snapshots` quedó documentado como serving cache interno; `projected_payroll` sigue consumiendo cálculo vivo + `latestPromotion`.
 
 ## Why This Task Exists
 
@@ -120,14 +126,19 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] La cola reactiva avanza de forma verificable de `pending` a `completed` o `failed`.
-- [ ] El export fallback publica `payroll_period.exported` y dispara receipts como el path Postgres.
-- [ ] El contrato de `projected_payroll` queda explícito en docs y runtime.
-- [ ] Los tests cubren expiración, retries, export parity y receipts delivery.
+- [x] La cola reactiva avanza de forma verificable de `pending` a `completed` o `failed`.
+- [x] El export fallback publica `payroll_period.exported` y dispara receipts como el path Postgres.
+- [x] El contrato de `projected_payroll` queda explícito en docs y runtime.
+- [x] Los tests cubren expiración, retries, export parity y receipts delivery.
 
 ## Verification
 
-- `pnpm exec vitest run src/lib/sync/reactive-consumer.test.ts src/lib/sync/refresh-queue.test.ts src/lib/payroll/export-payroll.test.ts src/lib/payroll/promote-projected-payroll.test.ts`
+- `pnpm exec vitest run src/lib/sync/reactive-consumer.test.ts src/lib/sync/refresh-queue.test.ts src/lib/payroll/export-payroll.test.ts src/lib/sync/projections/payroll-receipts.test.ts`
 - `pnpm lint`
 - `pnpm build`
-- smoke en staging de export + receipts + projected payroll
+- smoke en staging de export + receipts + projected payroll (pendiente)
+
+## Notes
+
+- El path de fallback BigQuery ya no emite el evento canónico si la mutación no actualiza ninguna fila.
+- La completitud de la queue es best-effort después del ledger reactivo; si falla el update de completion, el handler queda logueado sin reventar el resto del pipeline.

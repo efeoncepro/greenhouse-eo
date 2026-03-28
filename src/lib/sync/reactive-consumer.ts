@@ -5,7 +5,12 @@ import { randomUUID } from 'node:crypto'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getProjectionsForEvent, getAllTriggerEventTypes, type ProjectionDomain } from './projection-registry'
 import { ensureProjectionsRegistered } from './projections'
-import { enqueueRefresh } from './refresh-queue'
+import {
+  buildRefreshQueueId,
+  enqueueRefresh,
+  markRefreshCompleted,
+  markRefreshFailed
+} from './refresh-queue'
 
 // ── Types ──
 
@@ -85,7 +90,6 @@ export const processReactiveEvents = async (options?: {
      FROM greenhouse_sync.outbox_events
      WHERE status = 'published'
        AND event_type = ANY($1)
-       AND occurred_at > NOW() - INTERVAL '6 hours'
      ORDER BY occurred_at ASC
      LIMIT $2`,
     [triggerEventTypes, batchSize]
@@ -107,6 +111,8 @@ export const processReactiveEvents = async (options?: {
     const projections = getProjectionsForEvent(event.event_type, domain)
 
     for (const projection of projections) {
+      let scope: { entityType: string; entityId: string } | null = null
+
       try {
         const handlerKey = buildReactiveHandlerKey(projection.name, event.event_type)
 
@@ -125,9 +131,11 @@ export const processReactiveEvents = async (options?: {
           continue
         }
 
-        const scope = projection.extractScope(payload)
+        scope = projection.extractScope(payload)
 
         if (!scope) continue
+
+        const queueId = buildRefreshQueueId(projection.name, scope.entityType, scope.entityId)
 
         // Enqueue persistent intent (survives outbox expiration)
         await enqueueRefresh({
@@ -137,7 +145,7 @@ export const processReactiveEvents = async (options?: {
           priority: projection.maxRetries ?? 2,
           triggeredByEventId: event.event_id,
           maxRetries: projection.maxRetries ?? 2
-        }).catch(() => {})
+        })
 
         const actionDescription = await projection.refresh(scope, payload)
 
@@ -146,7 +154,7 @@ export const processReactiveEvents = async (options?: {
           projectionsTriggered++
         }
 
-        // Mark as processed
+        // Mark as processed in the reactive ledger first; queue completion is best-effort after this.
         await runGreenhousePostgresQuery(
           `INSERT INTO greenhouse_sync.outbox_reactive_log (event_id, reacted_at, handler, result, retries)
            VALUES ($1, CURRENT_TIMESTAMP, $2, $3, 0)
@@ -157,12 +165,26 @@ export const processReactiveEvents = async (options?: {
              last_error = NULL`,
           [event.event_id, handlerKey, actionDescription || 'no-op']
         )
+
+        try {
+          await markRefreshCompleted(queueId)
+        } catch (completionError) {
+          console.error(
+            `[reactive-consumer] ${projection.name} queue completion failed for event ${event.event_id}:`,
+            completionError
+          )
+        }
       } catch (error) {
         eventsFailed++
         const errorMsg = error instanceof Error ? error.message : String(error)
         const handlerKey = buildReactiveHandlerKey(projection.name, event.event_type)
+        const queueId = scope ? buildRefreshQueueId(projection.name, scope.entityType, scope.entityId) : null
 
         console.error(`[reactive-consumer] ${projection.name} failed for event ${event.event_id}:`, error)
+
+        if (queueId) {
+          await markRefreshFailed(queueId, errorMsg, projection.maxRetries ?? 2).catch(() => {})
+        }
 
         // Check retry count
         const retryRows = await runGreenhousePostgresQuery<{ retries: number } & Record<string, unknown>>(
