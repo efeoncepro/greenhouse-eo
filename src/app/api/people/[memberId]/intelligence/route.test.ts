@@ -101,6 +101,7 @@ describe('GET /api/people/[memberId]/intelligence', () => {
       new Request('http://localhost/api/people/member-1/intelligence?trend=6'),
       { params: Promise.resolve({ memberId: 'member-1' }) }
     )
+
     const body = await response.json()
 
     expect(response.status).toBe(200)

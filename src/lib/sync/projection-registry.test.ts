@@ -15,7 +15,12 @@ const makeTestProjection = (name: string, triggers: string[]): ProjectionDefinit
   domain: 'delivery',
   triggerEvents: triggers,
   extractScope: () => ({ entityType: 'test', entityId: 'test-1' }),
-  refresh: async (_scope, _payload) => `refreshed ${name}`,
+  refresh: async (_scope, _payload) => {
+    void _scope
+    void _payload
+
+    return `refreshed ${name}`
+  },
   maxRetries: 1
 })
 

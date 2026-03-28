@@ -35,6 +35,7 @@ describe('GET /api/team/capacity-breakdown', () => {
         { member_id: 'member-2', display_name: 'Luis Reyes', role_title: 'HubSpot Specialist', role_category: 'media' },
         { member_id: 'member-3', display_name: 'Valentina Hoyos', role_title: 'Designer', role_category: 'design' }
       ])
+
       // Query 2: active assignments
       .mockResolvedValueOnce([
         { assignment_id: 'a-internal', member_id: 'member-1', client_id: 'client_internal', client_name: 'Efeonce Internal', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01' },
@@ -63,6 +64,7 @@ describe('GET /api/team/capacity-breakdown', () => {
     const body = await response.json()
 
     expect(response.status).toBe(200)
+
     // All 3 members appear (not just those with external assignments)
     expect(body.memberCount).toBe(3)
     expect(body.members.map((m: { displayName: string }) => m.displayName)).toEqual([

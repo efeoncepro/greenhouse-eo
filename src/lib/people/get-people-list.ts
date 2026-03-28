@@ -57,6 +57,7 @@ const enrichFromCapacitySnapshot = async (items: PersonListItem[]): Promise<void
 
   const now = new Date()
   const memberIds = items.map(item => item.memberId).filter(Boolean)
+
   const snapshots = await readMemberCapacityEconomicsBatch({
     memberIds,
     year: now.getFullYear(),

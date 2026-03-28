@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import type * as ChilePrevHelpers from '@/lib/payroll/chile-previsional-helpers'
+
 const mockGetImmForPeriod = vi.fn(async () => 1_200_000)
 
 vi.mock('@/lib/payroll/chile-previsional-helpers', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/payroll/chile-previsional-helpers')>(
-    '@/lib/payroll/chile-previsional-helpers'
-  )
+  const actual = await vi.importActual<typeof ChilePrevHelpers>('@/lib/payroll/chile-previsional-helpers')
 
   return {
     ...actual,

@@ -3,7 +3,7 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
-import { roundCurrency, toNumber } from '@/lib/finance/shared'
+import { roundCurrency } from '@/lib/finance/shared'
 import { getOrganizationDetail } from './organization-store'
 
 // ── Types ──

@@ -60,6 +60,7 @@ const AssignMemberDrawer = ({ open, existingMembers, onClose, onSuccess }: Props
   const [error, setError] = useState<string | null>(null)
 
   const calculatedHours = Math.round(fteAllocation * 160)
+
   const availableAfter = selectedMember
     ? selectedMember.availableHours - (hoursOverride ? Number(hoursOverride) : calculatedHours)
     : null
@@ -101,6 +102,7 @@ const AssignMemberDrawer = ({ open, existingMembers, onClose, onSuccess }: Props
 
       if (res.ok) {
         const data = await res.json()
+
         const members: MemberOption[] = (data.members ?? []).map((m: Record<string, unknown>) => ({
           memberId: m.memberId as string,
           displayName: m.displayName as string,

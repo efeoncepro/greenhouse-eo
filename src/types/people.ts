@@ -1,7 +1,7 @@
 import type { PersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
-import type { TeamCapacityHealth, TeamMemberProfile } from '@/types/team'
+import type { TeamMemberProfile } from '@/types/team'
 
 export type PersonTab = 'activity' | 'compensation' | 'payroll' | 'finance' | 'memberships' | 'hr-profile' | 'ai-tools' | 'identity' | 'intelligence'
 
@@ -16,10 +16,13 @@ export interface PersonListItem {
   locationCountry: string | null
   active: boolean
   totalAssignments: number
+
   /** FTE contractual — desde member_capacity_economics snapshot */
   contractedFte: number
+
   /** FTE asignado comercialmente — desde member_capacity_economics snapshot */
   assignedFte: number
+
   /** @deprecated alias de assignedFte para compatibilidad con consumers existentes */
   totalFte: number
   payRegime: 'chile' | 'international' | null
@@ -121,6 +124,7 @@ export interface PersonSummary {
   activeAssignments: number
   contractedFte: number
   assignedFte: number
+
   /** @deprecated alias de assignedFte */
   totalFte: number
   totalHoursMonth: number

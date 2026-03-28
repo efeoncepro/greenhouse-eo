@@ -6,10 +6,10 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 
+import { ComposerPrimitive } from '@assistant-ui/react'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
-
-import { ComposerPrimitive } from '@assistant-ui/react'
 
 import { NEXA_SUGGESTIONS } from '@/config/home-suggestions'
 import { HOME_SUBTITLE, HOME_DISCLAIMER } from '@/config/home-greetings'

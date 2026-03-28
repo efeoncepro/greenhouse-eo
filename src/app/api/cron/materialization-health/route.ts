@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       ageHours,
       healthy: ageHours !== null && ageHours <= MAX_AGE_HOURS
     })
-  } catch (error) {
+  } catch {
     checks.push({
       name: 'ICO metric_snapshots_monthly',
       source: 'bigquery',

@@ -78,6 +78,7 @@ const MyOrganizationView = () => {
       ])
 
       if (orgRes.status === 'fulfilled' && orgRes.value.ok) setOrg(await orgRes.value.json())
+
       if (memRes.status === 'fulfilled' && memRes.value.ok) {
         const data = await memRes.value.json()
 

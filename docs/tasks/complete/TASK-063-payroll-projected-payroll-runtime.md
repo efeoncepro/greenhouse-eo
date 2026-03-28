@@ -1,5 +1,15 @@
 # TASK-063 - Payroll Projected Payroll Runtime
 
+## Delta 2026-03-28 - Cierre administrativo de la lane
+
+- La lane base de `Projected Payroll Runtime` se considera cerrada y movida a `complete`.
+- El runtime ya cubre cálculo projected por período/modo, surface UI, materialización de snapshots y promoción explícita a borrador oficial.
+- Lo que queda abierto ya no pertenece al baseline de `TASK-063`, sino a hardening/operación:
+  - eliminar DDL defensivo en runtime (`CREATE TABLE IF NOT EXISTS` en store)
+  - reforzar observabilidad de proyección reactiva (stale/failures)
+  - definir consumidores downstream reales para eventos `payroll.projected_*` más allá de audit trail
+- Estos pendientes se derivan a `TASK-109`.
+
 ## Delta 2026-03-28 — Runtime y contrato reactivo alineados a la realidad actual
 
 - `Projected Payroll` ya tiene superficie propia en `/hr/payroll/projected` y promoción explícita a borrador oficial.
@@ -215,11 +225,11 @@ El wrapper `projectPayrollEntry()` simplemente pasa las fechas correctas. `fetch
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `3`
 - Domain: `hr`
 - GitHub Project: `Greenhouse Delivery`
@@ -274,8 +284,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md`
-- `docs/tasks/in-progress/TASK-058-economic-indicators-runtime-layer.md`
+- `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md`
+- `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md`
 - `src/lib/payroll/*`
 - `src/lib/ico-engine/*`
 - `src/lib/hr-core/*`
@@ -314,10 +324,10 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- no existe una superficie para responder `cuánto cobraría X hoy`
-- no existe una proyección formal `fin de mes`
-- no hay snapshots reactivos de nómina esperada por persona/período
-- la simulación hoy requiere reconstrucción manual o correr el cálculo oficial del período
+- baseline funcional implementado; los gaps restantes son de hardening operacional y observabilidad
+- remover DDL en runtime para `projected_payroll_snapshots` y depender solo de migraciones/bootstrap
+- reforzar monitoreo de proyección reactiva y frescura de snapshots
+- formalizar consumidores downstream de eventos `payroll.projected_*` cuando haya contrato de negocio real
 
 ## Scope
 
@@ -557,5 +567,5 @@ Desde `src/views/greenhouse/payroll/helpers.ts`:
 
 ## Follow-ups
 
-- contrastar esta lane con `TASK-061` cuando cierre el `go/no-go` de la nómina oficial
+- `TASK-109` - Projected Payroll Runtime Hardening and Observability
 - decidir si `projected payroll` alimenta luego una proyección de gasto de personal en `Finance`

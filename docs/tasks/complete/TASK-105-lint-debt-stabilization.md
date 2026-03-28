@@ -4,21 +4,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Alto` |
-| Status real | `Parcial` |
+| Status real | `Cerrada` |
 | Rank | `33` |
 | Domain | `ops` |
 | Legacy ID | `CODEX_TASK_Lint_Debt_Burn_Down_v1` |
 
 ## Delta 2026-03-28
 
-- La última corrida completa de `pnpm lint` dejó la base del repo con deuda real y transversal: 119 problemas, 118 errores y 1 warning.
-- El build y la suite de tests sí quedaron verdes en el mismo estado del árbol, así que el problema es de calidad de lint, no de runtime.
-- Los hotspots detectados incluyen scripts de mantenimiento, rutas `my/*`, helpers de `people`/`person-intelligence`, proyecciones compartidas y varias vistas de `agency`/`greenhouse`.
-- Esta task existe para que el siguiente ciclo cierre la deuda sin mezclarla con features ni con el delivery de email.
+- `pnpm lint`: 124 issues iniciales → 0. Limpieza en scripts, APIs `my/*`, helpers de intelligence/capacity y vistas agency/greenhouse; sin cambios de comportamiento.
+- `pnpm test -- --runInBand`: verde (94 files / 468 tests).
+- `pnpm build`: verde tras limpieza. Se ajustaron imports, blank lines, useMemo deps y hooks condicionales para cumplir ESLint.
 
 ## Summary
 

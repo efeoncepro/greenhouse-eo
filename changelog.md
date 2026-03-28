@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### TASK-063 reclassified as complete with hardening follow-up
+- `TASK-063` se movió a `complete` al alinear su estado documental con el runtime real ya implementado de `Projected Payroll` (API, UI, snapshots y promoción a oficial).
+- Se creó `TASK-109` para la deuda remanente de robustez: eliminar DDL en runtime, reforzar observabilidad de la proyección reactiva y cerrar el contrato downstream de `payroll.projected_*`.
+- El índice y el registry de tasks quedaron actualizados con el nuevo estado y el siguiente ID disponible.
+
 ### TASK-095 centralized email delivery layer completed
 - Se implementó la capa unificada `sendEmail()` sobre Resend con template registry, resolver de suscripciones y persistencia en `greenhouse_notifications.email_deliveries`.
 - Auth, NotificationService y Payroll ya migraron al contrato central, incluyendo el template `NotificationEmail` para dejar atrás el plain text del canal de notificaciones.
@@ -2817,6 +2822,7 @@
 - `Payroll Chile` ya expone `colación` y `movilización` en staging para la nómina proyectada de Valentina Hoyos, con el neto subiendo de `CLP 437.077` a `CLP 596.257` al incorporar los haberes no imponibles.
 - La compensación vigente `valentina-hoyos_v1` quedó actualizada en staging con los valores del PDF de febrero para `baseSalary`, `gratificacionLegalMode`, `AFP`, `Isapre`, `colación` y `movilización`.
 - El smoke se validó sobre el deployment de staging `greenhouse-mk7eglbat-efeonce-7670142f.vercel.app`, alias `dev-greenhouse.efeoncepro.com`.
+- TASK-105 (lint hardening): 124 lint issues → 0; se limpiaron imports/blank lines/unused vars y dependencias de hooks en agency/greenhouse, scripts y helpers. `pnpm lint`, `pnpm test -- --runInBand` y `pnpm build` verdes.
 
 # 2026-03-27
 

@@ -1,7 +1,7 @@
-import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const _require = createRequire(import.meta.url)
+
 _require('module').Module._cache[_require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
@@ -60,6 +60,7 @@ const main = async () => {
   }
 
   const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
   await closeGreenhousePostgres()
 }
 

@@ -11,8 +11,6 @@ import {
 } from '@/lib/postgres/client'
 import {
   FinanceValidationError,
-  DIRECT_OVERHEAD_KINDS,
-  DIRECT_OVERHEAD_SCOPES,
   normalizeString,
   normalizeBoolean,
   roundCurrency,

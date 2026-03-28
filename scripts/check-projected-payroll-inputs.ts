@@ -1,7 +1,7 @@
-import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const _require = createRequire(import.meta.url)
+
 _require('module').Module._cache[_require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
@@ -14,6 +14,7 @@ const main = async () => {
 
   // 1. Check compensation versions
   console.log('=== Compensation Versions ===')
+
   const comps = await runGreenhousePostgresQuery<{
     version_id: string; member_id: string; display_name: string;
     currency: string; base_salary: string; effective_from: string; effective_to: string | null
@@ -36,6 +37,7 @@ const main = async () => {
 
   // 2. Check if maybe they're in BigQuery only
   console.log('\n=== Payroll Periods ===')
+
   const periods = await runGreenhousePostgresQuery<{
     period_id: string; status: string; year: string; month: string
   }>(`
@@ -55,10 +57,13 @@ const main = async () => {
 
   // 3. Check what getApplicableCompensationVersionsForPeriod would return
   console.log('\n=== Testing getApplicableCompensationVersionsForPeriod ===')
+
   try {
     const { getApplicableCompensationVersionsForPeriod } = await import('@/lib/payroll/get-compensation')
     const result = await getApplicableCompensationVersionsForPeriod('2026-03-01', '2026-03-31')
+
     console.log(`  Found ${result.length} applicable versions for 2026-03`)
+
     for (const r of result) {
       console.log(`  ${(r as any).memberName?.padEnd(25) ?? 'unknown'} ${(r as any).currency} base:${(r as any).baseSalary}`)
     }
@@ -67,6 +72,7 @@ const main = async () => {
   }
 
   const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
   await closeGreenhousePostgres()
 }
 

@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getThresholdZone } from '@/lib/ico-engine/metric-registry'
-import { PERSON_METRICS, getPersonMetricById } from './metric-registry'
+import { getPersonMetricById } from './metric-registry'
 import type {
   PersonOperational360Row,
   PersonIntelligenceSnapshot,
@@ -63,7 +63,7 @@ const DERIVED_FIELDS: Array<{ id: string; field: keyof PersonOperational360Row }
 
 // ── Row → Snapshot normalizer ──
 
-const buildMetricValue = (metricId: string, value: number | null, higherIsBetter: boolean): MetricValue => {
+const buildMetricValue = (metricId: string, value: number | null): MetricValue => {
   const zone = value != null
     ? (() => {
         const def = getPersonMetricById(metricId)
@@ -88,7 +88,7 @@ const rowToSnapshot = (row: PersonOperational360Row): PersonIntelligenceSnapshot
   const derivedMetrics: MetricValue[] = DERIVED_FIELDS.map(m => {
     const value = toNullNum(row[m.field])
 
-    return buildMetricValue(m.id, value, getPersonMetricById(m.id)?.higherIsBetter ?? true)
+    return buildMetricValue(m.id, value)
   })
 
   const capacity: CapacityContext = {

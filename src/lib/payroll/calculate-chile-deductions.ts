@@ -168,6 +168,7 @@ export const calculatePayrollTotals = async ({
 
   const fallbackYear = Number(fallbackPeriodDate.slice(0, 4))
   const fallbackMonth = Number(fallbackPeriodDate.slice(5, 7))
+
   const resolvedAfpSplit =
     Number.isFinite(fallbackYear) && Number.isFinite(fallbackMonth)
       ? await resolveChileAfpRateSplitForCompensation({
@@ -223,6 +224,7 @@ export const calculatePayrollTotals = async ({
     imponibleBase,
     totalHealthAmount: healthAmount
   })
+
   const employerCosts = await resolveChileEmployerCostAmounts({
     payRegime,
     contractType,

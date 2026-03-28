@@ -49,6 +49,113 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 20:12 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Sanear `TASK-063` contra runtime real: moverla a `complete`, alinear index/registry y abrir `TASK-109` para hardening pendiente.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md`
+- `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Auditoría documental + contraste con runtime:
+  - API projected activa (`/api/hr/payroll/projected`)
+  - proyección reactiva registrada (`projected_payroll`)
+  - UI projected activa (`ProjectedPayrollView`)
+  - migraciones/grants de snapshots/promotions existentes
+
+### Riesgos o pendientes
+
+- `TASK-063` queda cerrada como baseline implementada.
+- Pendiente real movido a `TASK-109`: eliminar DDL runtime defensivo y reforzar observabilidad/contrato downstream de `payroll.projected_*`.
+
+## 2026-03-28 19:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Formalizar `Admin Center` como lane de gobernanza y documentar el split entre admin governance y la surface operativa de `AI Tools`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-108-admin-center-governance-shell.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Validación documental: task creada, registrada y agregada al índice operativo
+
+### Riesgos o pendientes
+
+- `Admin Center` aún no está implementado en runtime; la tarea quedó preparada para ejecución sin romper las rutas actuales.
+- El scope quedó ampliado para incluir `Cloud & Integrations`, health de outbox/projections/webhooks y un patrón futuro para llaves API por `secret_ref`.
+- La task ahora ya documenta control plane, señales entrantes/salientes, capas sin UI, capas con UI existente y patrón de escalabilidad por dominios.
+
+## 2026-03-28 18:42 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Formalizar la deuda adyacente de Auth que quedó al revisar `verify_email`: request de verificación con token y sender canónico.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Validación documental: task creada y registrada en index + registry
+
+### Riesgos o pendientes
+
+- La deuda sigue pendiente de implementación; quedó separada de `TASK-095` para no mezclar delivery central con request flow de Auth.
+
 ## 2026-03-28 18:26 -03
 
 ### Agente
@@ -15616,3 +15723,9 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron creadas por setup compartido para que el consumer reactivo no dependa de DDL en runtime.
 - `ensureReactiveSchema` y `ensureRefreshQueue` dejaron de intentar crear tablas/índices en tiempo de ejecución y ahora solo validan que la infraestructura exista.
 - Esto destraba el consumo reactivo que materializa `payroll_receipts_delivery` después del evento `payroll_period.exported`.
+
+## 2026-03-28 - TASK-105 lint debt stabilization
+
+- `pnpm lint` pasó de 124 issues a 0. Se limpiaron imports/blank lines/unused vars, se estabilizaron dependencias de hooks y el uso condicional de `useReactTable` en Agency/Greenhouse.
+- `pnpm test -- --runInBand` verde (94 files / 468 tests) y `pnpm build` verde.
+- Cambios tocados: scripts backfill/health, cron materialization, finance dashboards, agency team/service detail, admin email tabs, Nexa components, varios views `my/*` y helpers de intelligence/capacity.

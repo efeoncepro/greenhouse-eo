@@ -59,6 +59,7 @@ const fmtNum = (v: number | null | undefined, suffix = ''): string =>
 
 const fmtClp = (v: number | null | undefined): string =>
   v != null ? `$${Math.round(v).toLocaleString('es-CL')}` : '—'
+
 const fmtMoney = (v: number | null | undefined, currency: string | null | undefined): string => {
   if (v == null) return '—'
   if (currency === 'USD') return `US$${Math.round(v).toLocaleString('en-US')}`

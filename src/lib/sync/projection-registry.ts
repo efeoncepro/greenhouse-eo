@@ -14,6 +14,7 @@ import 'server-only'
 export type ProjectionDomain = 'organization' | 'people' | 'finance' | 'notifications' | 'delivery'
 
 export interface ProjectionDefinition {
+
   /** Unique name for logging and observability */
   name: string
 

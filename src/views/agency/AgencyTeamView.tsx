@@ -109,6 +109,7 @@ const HEALTH_LABELS: Record<string, string> = {
 }
 
 const formatHours = (value: number | null) => (value === null ? '—' : `${value}h`)
+
 const formatUsage = (usageKind: string | undefined, usedHours: number | null, usagePercent: number | null) => {
   if (usageKind === 'hours') return formatHours(usedHours)
   if (usageKind === 'percent' && usagePercent !== null) return `${usagePercent}%`
@@ -164,7 +165,7 @@ const AgencyTeamView = () => {
 
   useEffect(() => { void load() }, [load])
 
-  const toggleAssignable = async (memberId: string, assignable: boolean) => {
+  const toggleAssignable = useCallback(async (memberId: string, assignable: boolean) => {
     try {
       await fetch(`/api/admin/team/members/${memberId}`, {
         method: 'PATCH',
@@ -176,11 +177,11 @@ const AgencyTeamView = () => {
     } catch {
       // silent
     }
-  }
+  }, [load])
 
   const members = useMemo(() => data?.members ?? [], [data])
 
-  const handleEditAssignment = (member: TeamMember, assignment: MemberAssignment) => {
+  const handleEditAssignment = useCallback((member: TeamMember, assignment: MemberAssignment) => {
     setEditMemberName(member.displayName)
     setEditAssignment({
       assignmentId: assignment.assignmentId,
@@ -191,7 +192,7 @@ const AgencyTeamView = () => {
       startDate: assignment.startDate
     })
     setEditDrawerOpen(true)
-  }
+  }, [])
 
   const handleUnassign = async () => {
     if (!unassignTarget) return
@@ -329,7 +330,7 @@ const AgencyTeamView = () => {
       size: 120,
       meta: { align: 'right' }
     })
-  ], [columnHelper])
+  ], [columnHelper, handleEditAssignment, setUnassignTarget, toggleAssignable])
 
   const table = useReactTable({
     data: members,

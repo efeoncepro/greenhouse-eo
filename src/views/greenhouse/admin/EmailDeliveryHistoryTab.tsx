@@ -155,10 +155,10 @@ const EmailDeliveryHistoryTab = () => {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const handleRetry = async (delivery: EmailDelivery) => {
+  const handleRetry = useCallback(async (delivery: EmailDelivery) => {
     await fetch(`/api/admin/email-deliveries/${delivery.deliveryId}/retry`, { method: 'POST' })
     fetchData()
-  }
+  }, [fetchData])
 
   const columns = useMemo(() => [
     columnHelper.accessor('emailType', {
@@ -243,7 +243,7 @@ const EmailDeliveryHistoryTab = () => {
       },
       size: 50
     })
-  ], [])
+  ], [handleRetry])
 
   const table = useReactTable({
     data,

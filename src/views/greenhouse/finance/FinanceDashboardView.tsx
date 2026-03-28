@@ -18,8 +18,6 @@ import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import {
@@ -42,13 +40,14 @@ import { toast } from 'react-toastify'
 
 import Chip from '@mui/material/Chip'
 
+import classnames from 'classnames'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
 
-import classnames from 'classnames'
 
 import tableStyles from '@core/styles/table.module.css'
 import CustomChip from '@core/components/mui/Chip'
@@ -514,14 +513,6 @@ const FinanceDashboardView = () => {
     ? accounts.reduce((sum, account) => sum + (account.currentBalance ?? account.openingBalance ?? 0), 0)
     : null
 
-  const activeAccountCount = accounts.filter(a => a.isActive).length
-
-  const latestBalanceAsOf = [...accounts]
-    .map(account => account.balanceAsOf)
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1) ?? null
-
   // Use accrual series (Postgres-first) for bar chart — consistent base across all months
   const incomeMonthly = incomeSummary?.accrualMonthly ?? incomeSummary?.monthly ?? []
   const expenseMonthly = expenseSummary?.accrualMonthly ?? expenseSummary?.monthly ?? []
@@ -531,7 +522,6 @@ const FinanceDashboardView = () => {
   const cashIncomeClp = incomeSummary?.cashCurrentMonth?.totalAmountClp ?? 0
   const accrualExpenseClp = expenseSummary?.accrualCurrentMonth?.totalAmountClp ?? expenseSummary?.currentMonth.totalAmountClp ?? 0
   const expenseWithPayroll = pnl ? pnl.costs.totalExpenses : accrualExpenseClp
-  const payrollIncluded = pnl ? pnl.payroll.headcount > 0 : false
 
   // Build aligned month labels from accrual series (same base for all months)
   const allMonths = new Set<string>()

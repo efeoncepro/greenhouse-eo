@@ -173,6 +173,7 @@ export async function GET() {
       }
 
       const allocationPercent = contractedHours > 0 ? Math.round((assignedHours / contractedHours) * 100) : 0
+
       const capacityHealth = assignedHours === 0
         ? 'idle'
         : getCapacityHealth(
@@ -214,9 +215,11 @@ export async function GET() {
     // 7. Aggregate team totals (only from assignable members)
     const totalContracted = assignableMembers.reduce((sum, m) => sum + m.capacity.contractedHoursMonth, 0)
     const totalAssigned = assignableMembers.reduce((sum, m) => sum + m.capacity.assignedHoursMonth, 0)
+
     const totalUsed = assignableMembers.every(m => m.capacity.usedHoursMonth !== null)
       ? assignableMembers.reduce((sum, m) => sum + (m.capacity.usedHoursMonth ?? 0), 0)
       : null
+
     const weightedUsagePercent = assignableMembers.length > 0
       ? Math.round(
           assignableMembers.reduce((sum, m) => sum + ((m.usagePercent ?? 0) * m.capacity.assignedHoursMonth), 0) /

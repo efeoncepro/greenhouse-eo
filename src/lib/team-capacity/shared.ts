@@ -107,6 +107,7 @@ export const computeCapacityBreakdown = ({
   const assigned = getAssignedHoursMonth(fteAllocation)
   const contracted = contractedHoursMonth ?? assigned
   const used = hasUsageData ? Math.round(assigned * (utilizationPercent / 100)) : null
+
   const envelope = buildCapacityEnvelope({
     contractedFte: contracted / CAPACITY_HOURS_PER_FTE,
     assignedHours: assigned,

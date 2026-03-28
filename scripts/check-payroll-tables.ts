@@ -1,7 +1,7 @@
-import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const _require = createRequire(import.meta.url)
+
 _require('module').Module._cache[_require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
@@ -22,6 +22,7 @@ const main = async () => {
   for (const { label, q } of checks) {
     try {
       const [row] = await runGreenhousePostgresQuery<{ cnt: string }>(q)
+
       console.log(`${label.padEnd(30)} ${row?.cnt ?? '?'} rows`)
     } catch (e) {
       console.log(`${label.padEnd(30)} ✗ ${(e as Error).message.slice(0, 60)}`)
@@ -30,10 +31,13 @@ const main = async () => {
 
   // Check what pgGetApplicableCompensationVersionsForPeriod returns
   console.log('\n--- getApplicableCompensationVersionsForPeriod ---')
+
   try {
     const { getApplicableCompensationVersionsForPeriod } = await import('@/lib/payroll/get-compensation')
     const result = await getApplicableCompensationVersionsForPeriod('2026-03-01', '2026-03-31')
+
     console.log(`Found ${result.length} versions`)
+
     for (const r of result.slice(0, 5)) {
       console.log(`  ${String((r as Record<string, unknown>).memberName).padEnd(25)} ${(r as Record<string, unknown>).currency} base:${(r as Record<string, unknown>).baseSalary}`)
     }

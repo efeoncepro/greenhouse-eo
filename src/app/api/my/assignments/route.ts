@@ -27,6 +27,7 @@ export async function GET() {
       readMemberCapacityEconomicsSnapshot(memberId, year, month).catch(() => null),
       readLatestMemberCapacityEconomicsSnapshot(memberId).catch(() => null)
     ])
+
     const snapshot = currentSnapshot ?? latestSnapshot
 
     return NextResponse.json({
