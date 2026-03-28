@@ -7,6 +7,7 @@ import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import { getPayrollEntries, getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError } from '@/lib/payroll/shared'
+import { getOperatingEntityIdentity, type OperatingEntityIdentity } from '@/lib/account-360/organization-identity'
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -190,7 +191,7 @@ const COL_WIDTHS = {
   net: '10%'
 }
 
-const PeriodReportDocument = ({ period, entries }: { period: PayrollPeriod; entries: PayrollEntry[] }) => {
+const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: PayrollPeriod; entries: PayrollEntry[]; operatingEntity: OperatingEntityIdentity | null }) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const generatedAt = new Date().toISOString().split('T')[0]
 
@@ -209,8 +210,8 @@ const PeriodReportDocument = ({ period, entries }: { period: PayrollPeriod; entr
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>Greenhouse EO</Text>
-            <Text style={styles.companyDetail}>Reporte de nómina</Text>
+            <Text style={styles.companyName}>{operatingEntity?.legalName ?? 'Greenhouse EO'}</Text>
+            <Text style={styles.companyDetail}>{operatingEntity?.taxId ? `RUT ${operatingEntity.taxId} · ` : ''}Reporte de nómina</Text>
           </View>
           <View>
             <Text style={{ fontSize: 10, textAlign: 'right' as const }}>{`${monthName} ${period.year}`}</Text>
@@ -309,7 +310,7 @@ const PeriodReportDocument = ({ period, entries }: { period: PayrollPeriod; entr
 
 // ─── Individual Receipt PDF ───────────────────────────────────────
 
-const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: PayrollPeriod }) => {
+const ReceiptDocument = ({ entry, period, operatingEntity }: { entry: PayrollEntry; period: PayrollPeriod; operatingEntity: OperatingEntityIdentity | null }) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const currency = entry.currency
   const isChile = entry.payRegime === 'chile'
@@ -435,8 +436,8 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.companyName}>Greenhouse EO</Text>
-            <Text style={styles.companyDetail}>Recibo de remuneraciones</Text>
+            <Text style={styles.companyName}>{operatingEntity?.legalName ?? 'Greenhouse EO'}</Text>
+            <Text style={styles.companyDetail}>{operatingEntity?.taxId ? `RUT ${operatingEntity.taxId} · ` : ''}Recibo de remuneraciones</Text>
           </View>
           <View>
             <Text style={{ fontSize: 10, textAlign: 'right' as const }}>{`${monthName} ${period.year}`}</Text>
@@ -554,8 +555,12 @@ export const generatePayrollPeriodPdf = async (periodId: string): Promise<Buffer
     throw new PayrollValidationError('Only approved or exported periods can generate reports.', 409)
   }
 
-  const entries = await getPayrollEntries(periodId)
-  const stream = await renderToStream(<PeriodReportDocument period={period} entries={entries} />)
+  const [entries, operatingEntity] = await Promise.all([
+    getPayrollEntries(periodId),
+    getOperatingEntityIdentity()
+  ])
+
+  const stream = await renderToStream(<PeriodReportDocument period={period} entries={entries} operatingEntity={operatingEntity} />)
 
   const chunks: Uint8Array[] = []
 
@@ -583,7 +588,8 @@ export const generatePayrollReceiptPdf = async (entryId: string): Promise<Buffer
     throw new PayrollValidationError('Only approved or exported periods can generate receipts.', 409)
   }
 
-  const stream = await renderToStream(<ReceiptDocument entry={entry} period={period} />)
+  const operatingEntity = await getOperatingEntityIdentity()
+  const stream = await renderToStream(<ReceiptDocument entry={entry} period={period} operatingEntity={operatingEntity} />)
 
   const chunks: Uint8Array[] = []
 
