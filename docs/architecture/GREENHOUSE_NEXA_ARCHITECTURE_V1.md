@@ -56,6 +56,68 @@ Google Vertex AI (Gemini)
 Browser: assistant-ui renderiza mensaje con MarkdownTextPrimitive
 ```
 
+## 2.1 Decision de styling: Opcion B — primitivos assistant-ui con wrapping MUI
+
+### Contexto
+
+assistant-ui ofrece 3 caminos para estilizar los componentes del chat:
+
+- **Opcion A (puro MUI):** Usar solo primitivos sin estilo (`ThreadPrimitive.*`, `MessagePrimitive.*`) y hacer todo el layout con `sx` props de MUI. Maximo control, maximo esfuerzo.
+- **Opcion B (hybrid adaptado):** Copiar la estructura del `thread.tsx` oficial de assistant-ui, pero reemplazar los componentes shadcn/Tailwind por equivalentes MUI/Vuexy usando `asChild`. La logica de assistant-ui se mantiene intacta.
+- **Opcion C (Tailwind puro):** Usar los componentes pre-styled con Tailwind dentro del chat, MUI fuera. Dos mundos de styling coexistiendo.
+
+### Decision: Opcion B
+
+**Razones:**
+1. **Logica completa de assistant-ui** — `autohide`, `hideWhenRunning`, copy feedback (icon swap 📋→✓), error boundaries, animations — todo funciona sin reimplementar
+2. **Se ve como Greenhouse** — los botones usan `CustomIconButton` con `variant='tonal'`, los avatares usan `CustomAvatar` con `skin='light'`, los chips usan `CustomChip`
+3. **Esfuerzo acotado** — son ~15 componentes internos a adaptar, la mayoria 3-5 lineas cada uno
+4. **Upgrade path claro** — cuando assistant-ui actualice su `thread.tsx`, comparamos diff vs nuestra version adaptada
+
+### Patron de adaptacion
+
+El patron es: usar el primitivo de assistant-ui con `asChild` y wrappear con el componente MUI/Vuexy equivalente.
+
+```tsx
+// assistant-ui oficial (shadcn)
+<ActionBarPrimitive.Copy asChild>
+  <TooltipIconButton tooltip="Copy">
+    <CopyIcon />
+  </TooltipIconButton>
+</ActionBarPrimitive.Copy>
+
+// Greenhouse adaptado (MUI/Vuexy)
+<ActionBarPrimitive.Copy asChild>
+  <CustomIconButton variant='tonal' size='small' aria-label='Copiar'>
+    <i className='tabler-copy' />
+  </CustomIconButton>
+</ActionBarPrimitive.Copy>
+```
+
+Las props logicas de assistant-ui (`hideWhenRunning`, `autohide`, `autoSend`, `prompt`) se mantienen identicas. Solo cambia el componente visual que wrappea.
+
+### Componentes MUI/Vuexy que reemplazan shadcn
+
+| shadcn (oficial) | Greenhouse (adaptado) |
+|---|---|
+| `<Button variant="ghost">` | `<Button color='secondary' size='small'>` |
+| `<TooltipIconButton>` (custom) | `<CustomIconButton variant='tonal' size='small'>` con MUI `Tooltip` |
+| `<Button variant="default" size="icon">` | `<IconButton sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>` |
+| `cn()` utility | `sx` prop de MUI |
+| `text-muted-foreground` | `color='text.secondary'` |
+| `bg-muted` | `bgcolor: 'action.hover'` |
+| `border-destructive bg-destructive/10` | `borderColor: 'error.main', bgcolor: 'error.lighterOpacity'` |
+| `rounded-2xl` | `borderRadius: '16px'` o `borderRadius: 4` |
+| Lucide icons (`CopyIcon`, `RefreshCwIcon`) | Tabler icons (`tabler-copy`, `tabler-refresh`) |
+
+### Regla operativa
+
+- Todo componente de chat que use assistant-ui primitivos debe wrappear con MUI/Vuexy via `asChild`
+- Los primitivos logicos (`ActionBarPrimitive.Root`, `ThreadPrimitive.Viewport`, etc.) pueden usar `className` o `style` directamente — no necesitan MUI wrapper
+- Los primitivos interactivos (`Copy`, `Reload`, `Send`, `Cancel`, `Edit`) siempre wrappean con `CustomIconButton` o `Button` de MUI
+- Los iconos usan Tabler (`tabler-*`) consistente con el resto del portal, no Lucide
+- Las animaciones CSS (`fade-in`, `slide-in`) se implementan con `sx` + `@keyframes`, no con `tailwindcss-animate`
+
 ## 3. Superficie UI
 
 ### 3.1 Home Landing (`/home` — estado sin conversacion)

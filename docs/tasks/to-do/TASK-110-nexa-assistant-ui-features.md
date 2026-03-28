@@ -37,8 +37,13 @@ El NexaThread actual reimplementa a mano lo que assistant-ui ya resuelve:
 ## Architecture Alignment
 
 - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md` — documento canonico de Nexa
+- **Seccion 2.1 (Decision de styling: Opcion B)** — primitivos assistant-ui con wrapping MUI/Vuexy via `asChild`
 - TASK-009 Slice E (assistant-ui migration) — completado
 - `@assistant-ui/react` + `@assistant-ui/react-markdown` ya instalados
+
+### Regla de styling (Opcion B)
+
+Los primitivos de assistant-ui (`ActionBarPrimitive`, `ComposerPrimitive`, etc.) se usan con `asChild` para wrappear componentes MUI/Vuexy. Esto preserva la logica de assistant-ui (autohide, hideWhenRunning, copy feedback) con el look visual de Greenhouse. Ver seccion 2.1 del doc de arquitectura para ejemplos y tabla de mapeo shadcn → MUI.
 
 ## Dependencies & Impact
 
