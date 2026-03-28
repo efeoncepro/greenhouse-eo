@@ -78,6 +78,7 @@ export const projectedPayrollProjection: ProjectionDefinition = {
     'payroll_entry.upserted',
     'payroll_period.calculated',
     'finance.exchange_rate.upserted',
+    'payroll.previsional_snapshot.upserted',
     'ico.materialization.completed'
   ],
 

@@ -748,6 +748,7 @@ export const memberCapacityEconomicsProjection: ProjectionDefinition = {
     'finance.expense.created',
     'finance.expense.updated',
     'finance.exchange_rate.upserted',
+    'payroll.previsional_snapshot.upserted',
     'finance.overhead.updated',
     'finance.license_cost.updated',
     'finance.tooling_cost.updated'

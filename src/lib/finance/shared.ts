@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 
 export class FinanceValidationError extends Error {

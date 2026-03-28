@@ -508,3 +508,15 @@ Regla:
 - `UF`, `tax_table_version` y `UTM` son prerequisitos bloqueantes cuando el cálculo Chile los requiere.
 - `payroll_entries` son snapshots congelados del cálculo mensual.
 - People 360 es la ficha individual oficial del colaborador.
+
+## 23. Payroll Chile previsional foundation
+
+- La fuente canónica mensual para indicadores previsionales y tabla de impuesto único es la API pública de Gael Cloud:
+  - `GET /general/public/previred/{periodo}`
+  - `GET /general/public/impunico/{periodo}`
+- `src/lib/payroll/previred-sync.ts` materializa esos datos en:
+  - `greenhouse_payroll.chile_previred_indicators`
+  - `greenhouse_payroll.chile_afp_rates`
+  - `greenhouse_payroll.chile_tax_brackets`
+- El cron `GET /api/cron/sync-previred` y el backfill `pnpm backfill:chile-previsional` son los mecanismos operativos para mantener la base previsional viva.
+- `ImpUnico` se convierte a UTM usando la UTM del mismo período para preservar el contrato de `greenhouse_payroll.chile_tax_brackets`.

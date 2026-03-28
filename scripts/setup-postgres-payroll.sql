@@ -167,7 +167,47 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_bonus_config (
 );
 
 -- ------------------------------------------------------------
--- 5. projected_payroll_promotions
+-- 5. previred_period_indicators
+--    Canonical monthly Chile previsional snapshot.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_period_indicators (
+  indicator_id TEXT PRIMARY KEY,
+  indicator_date DATE NOT NULL,
+  imm_value NUMERIC(14, 2) NOT NULL,
+  sis_rate NUMERIC(6, 4) NOT NULL,
+  unemployment_rate_indefinite NUMERIC(6, 4) NOT NULL,
+  unemployment_rate_fixed_term NUMERIC(6, 4) NOT NULL,
+  afp_top_unf NUMERIC(10, 2) NOT NULL,
+  unemployment_top_unf NUMERIC(10, 2) NOT NULL,
+  apv_top_unf NUMERIC(10, 2) NOT NULL DEFAULT 50,
+  source TEXT,
+  source_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT previred_period_indicators_unique UNIQUE (indicator_date)
+);
+
+-- ------------------------------------------------------------
+-- 6. previred_afp_rates
+--    AFP rate catalog by period and fund.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_afp_rates (
+  indicator_id TEXT PRIMARY KEY,
+  indicator_date DATE NOT NULL,
+  afp_code TEXT NOT NULL,
+  afp_name TEXT NOT NULL,
+  worker_rate NUMERIC(6, 4) NOT NULL,
+  employer_rate NUMERIC(6, 4) NOT NULL DEFAULT 0,
+  total_rate NUMERIC(6, 4) NOT NULL,
+  source TEXT,
+  source_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT previred_afp_rates_unique UNIQUE (indicator_date, afp_code)
+);
+
+-- ------------------------------------------------------------
+-- 7. projected_payroll_promotions
 --    Audit trail connecting projected payroll cuts with official payroll recalculations.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions (
@@ -188,6 +228,44 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.projected_payroll_promotions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ------------------------------------------------------------
+-- 6. Chile previsional foundation (optional, forward-compatible)
+-- ------------------------------------------------------------
+-- These tables support cutting the Chile payroll engine off manual rates.
+-- They are additive and do not block current Payroll usage.
+
+CREATE TABLE IF NOT EXISTS greenhouse_payroll.chile_previred_indicators (
+  period_year INTEGER NOT NULL,
+  period_month INTEGER NOT NULL CHECK (period_month BETWEEN 1 AND 12),
+  imm_clp NUMERIC(14, 2),
+  sis_rate NUMERIC(6, 4),
+  tope_afp_uf NUMERIC(10, 4),
+  tope_cesantia_uf NUMERIC(10, 4),
+  source TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (period_year, period_month)
+);
+
+CREATE INDEX IF NOT EXISTS chile_previred_indicators_period_idx
+  ON greenhouse_payroll.chile_previred_indicators (period_year DESC, period_month DESC);
+
+CREATE TABLE IF NOT EXISTS greenhouse_payroll.chile_afp_rates (
+  afp_rate_id TEXT PRIMARY KEY,
+  period_year INTEGER NOT NULL,
+  period_month INTEGER NOT NULL CHECK (period_month BETWEEN 1 AND 12),
+  afp_name TEXT NOT NULL,
+  total_rate NUMERIC(6, 4) NOT NULL,
+  source TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chile_afp_rates_period_name_unique UNIQUE (period_year, period_month, afp_name)
+);
+
+CREATE INDEX IF NOT EXISTS chile_afp_rates_period_idx
+  ON greenhouse_payroll.chile_afp_rates (period_year DESC, period_month DESC);
 
 -- ============================================================
 -- Indexes
@@ -210,6 +288,12 @@ CREATE INDEX IF NOT EXISTS payroll_entries_period_idx
 
 CREATE INDEX IF NOT EXISTS payroll_entries_member_idx
   ON greenhouse_payroll.payroll_entries (member_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS previred_period_indicators_date_idx
+  ON greenhouse_payroll.previred_period_indicators (indicator_date DESC);
+
+CREATE INDEX IF NOT EXISTS previred_afp_rates_date_code_idx
+  ON greenhouse_payroll.previred_afp_rates (indicator_date DESC, afp_code);
 
 CREATE INDEX IF NOT EXISTS projected_payroll_promotions_period_idx
   ON greenhouse_payroll.projected_payroll_promotions (period_year DESC, period_month DESC, projection_mode);
@@ -261,6 +345,70 @@ SET
   rpa_soft_band_end = EXCLUDED.rpa_soft_band_end,
   rpa_soft_band_floor_factor = EXCLUDED.rpa_soft_band_floor_factor;
 
+-- Seed canonical Previred baseline snapshots (current operational baseline)
+INSERT INTO greenhouse_payroll.previred_period_indicators (
+  indicator_id,
+  indicator_date,
+  imm_value,
+  sis_rate,
+  unemployment_rate_indefinite,
+  unemployment_rate_fixed_term,
+  afp_top_unf,
+  unemployment_top_unf,
+  apv_top_unf,
+  source,
+  source_url,
+  created_at,
+  updated_at
+)
+VALUES
+  ('previred_2026-01-01', DATE '2026-01-01', 539000.00, 0.0154, 0.0060, 0.0300, 89.9, 135.1, 50.0, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2025/12/Indicadores-Previsionales-Previred-Diciembre-2025-1.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_2026-02-01', DATE '2026-02-01', 539000.00, 0.0154, 0.0060, 0.0300, 90.0, 135.2, 50.0, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/01/Indicadores-Previsionales-Previred-Enero-2026.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_2026-03-01', DATE '2026-03-01', 539000.00, 0.0154, 0.0060, 0.0300, 90.0, 135.2, 50.0, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+ON CONFLICT (indicator_date) DO UPDATE
+SET
+  imm_value = EXCLUDED.imm_value,
+  sis_rate = EXCLUDED.sis_rate,
+  unemployment_rate_indefinite = EXCLUDED.unemployment_rate_indefinite,
+  unemployment_rate_fixed_term = EXCLUDED.unemployment_rate_fixed_term,
+  afp_top_unf = EXCLUDED.afp_top_unf,
+  unemployment_top_unf = EXCLUDED.unemployment_top_unf,
+  apv_top_unf = EXCLUDED.apv_top_unf,
+  source = EXCLUDED.source,
+  source_url = EXCLUDED.source_url,
+  updated_at = CURRENT_TIMESTAMP;
+
+INSERT INTO greenhouse_payroll.previred_afp_rates (
+  indicator_id,
+  indicator_date,
+  afp_code,
+  afp_name,
+  worker_rate,
+  employer_rate,
+  total_rate,
+  source,
+  source_url,
+  created_at,
+  updated_at
+)
+VALUES
+  ('previred_afp_2026-03-01_capital', DATE '2026-03-01', 'capital', 'Capital', 0.1144, 0.0010, 0.1154, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_cuprum', DATE '2026-03-01', 'cuprum', 'Cuprum', 0.1144, 0.0010, 0.1154, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_habitat', DATE '2026-03-01', 'habitat', 'Habitat', 0.1127, 0.0010, 0.1137, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_planvital', DATE '2026-03-01', 'planvital', 'PlanVital', 0.1116, 0.0010, 0.1126, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_provida', DATE '2026-03-01', 'provida', 'Provida', 0.1145, 0.0010, 0.1155, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_modelo', DATE '2026-03-01', 'modelo', 'Modelo', 0.1058, 0.0010, 0.1068, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('previred_afp_2026-03-01_uno', DATE '2026-03-01', 'uno', 'Uno', 0.1046, 0.0010, 0.1056, 'previred_pdf', 'https://www.previred.com/wp-content/uploads/2026/02/Indicadores-Previsionales-Previred-Febrero-2026-2.pdf', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+ON CONFLICT (indicator_date, afp_code) DO UPDATE
+SET
+  afp_name = EXCLUDED.afp_name,
+  worker_rate = EXCLUDED.worker_rate,
+  employer_rate = EXCLUDED.employer_rate,
+  total_rate = EXCLUDED.total_rate,
+  source = EXCLUDED.source,
+  source_url = EXCLUDED.source_url,
+  updated_at = CURRENT_TIMESTAMP;
+
 -- ============================================================
 -- Additive migration (for databases where tables already exist)
 -- ============================================================
@@ -306,6 +454,38 @@ BEGIN
     ADD COLUMN IF NOT EXISTS adjusted_remote_allowance NUMERIC(14, 2);
   ALTER TABLE greenhouse_payroll.payroll_entries
     ADD COLUMN IF NOT EXISTS adjusted_fixed_bonus_amount NUMERIC(14, 2);
+
+  CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_period_indicators (
+    indicator_id TEXT PRIMARY KEY,
+    indicator_date DATE NOT NULL,
+    imm_value NUMERIC(14, 2) NOT NULL,
+    sis_rate NUMERIC(6, 4) NOT NULL,
+    unemployment_rate_indefinite NUMERIC(6, 4) NOT NULL,
+    unemployment_rate_fixed_term NUMERIC(6, 4) NOT NULL,
+    afp_top_unf NUMERIC(10, 2) NOT NULL,
+    unemployment_top_unf NUMERIC(10, 2) NOT NULL,
+    apv_top_unf NUMERIC(10, 2) NOT NULL DEFAULT 50,
+    source TEXT,
+    source_url TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT previred_period_indicators_unique UNIQUE (indicator_date)
+  );
+
+  CREATE TABLE IF NOT EXISTS greenhouse_payroll.previred_afp_rates (
+    indicator_id TEXT PRIMARY KEY,
+    indicator_date DATE NOT NULL,
+    afp_code TEXT NOT NULL,
+    afp_name TEXT NOT NULL,
+    worker_rate NUMERIC(6, 4) NOT NULL,
+    employer_rate NUMERIC(6, 4) NOT NULL DEFAULT 0,
+    total_rate NUMERIC(6, 4) NOT NULL,
+    source TEXT,
+    source_url TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT previred_afp_rates_unique UNIQUE (indicator_date, afp_code)
+  );
 END $$;
 
 -- ============================================================

@@ -7,6 +7,36 @@ import process from 'node:process'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
+const stripLeadingSqlComments = (sql: string) => {
+  let out = sql
+
+  // Remove leading whitespace + line comments.
+  // Note: we keep inline/trailing comments intact; this is only for statement detection.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const next = out.replace(/^\s+/, '')
+
+    if (next.startsWith('--')) {
+      const newlineIdx = next.indexOf('\n')
+
+      out = newlineIdx >= 0 ? next.slice(newlineIdx + 1) : ''
+      continue
+    }
+
+    if (next.startsWith('/*')) {
+      const endIdx = next.indexOf('*/')
+
+      out = endIdx >= 0 ? next.slice(endIdx + 2) : ''
+      continue
+    }
+
+    out = next
+    break
+  }
+
+  return out.trim()
+}
+
 const splitSqlStatements = (sql: string) => {
   const statements: string[] = []
   let current = ''
@@ -102,9 +132,10 @@ const splitSqlStatements = (sql: string) => {
 
     if (!inSingleQuote && !inDoubleQuote && !dollarTag && char === ';') {
       const statement = current.trim()
+      const cleaned = stripLeadingSqlComments(statement)
 
-      if (statement.length > 0 && !statement.startsWith('--')) {
-        statements.push(statement)
+      if (cleaned.length > 0) {
+        statements.push(cleaned)
       }
 
       current = ''
@@ -117,9 +148,10 @@ const splitSqlStatements = (sql: string) => {
   }
 
   const trailingStatement = current.trim()
+  const trailingCleaned = stripLeadingSqlComments(trailingStatement)
 
-  if (trailingStatement.length > 0 && !trailingStatement.startsWith('--')) {
-    statements.push(trailingStatement)
+  if (trailingCleaned.length > 0) {
+    statements.push(trailingCleaned)
   }
 
   return statements

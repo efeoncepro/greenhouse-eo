@@ -13484,3 +13484,48 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 
 - Revalidar `Agency > Campaigns` en staging UI ya con datos presentes.
 - Si la vista sigue vacía, el siguiente problema ya no es datos ni schema; sería consumo runtime/deploy o auth/session del entorno.
+
+## 2026-03-27 - Payroll Chile task split
+
+- Se reestructuró la lane de Payroll Chile para evitar mezclar foundation previsional con reverse payroll:
+  - `TASK-078` = `Payroll Chile: Previsional Foundation & Forward Cutover`
+  - `TASK-076` = `Payroll Chile: Paridad con Liquidación Legal`
+  - `TASK-077` = `Payroll Receipt Generation & Delivery`
+  - `TASK-079` = `Payroll Chile: Reverse Calculation Engine`
+- Se actualizó `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` para reflejar el nuevo orden `1/4 -> 4/4` y evitar colisiones semánticas con el ID `TASK-078`.
+- `TASK-077` ahora queda dependiente de `TASK-076` y considera `TASK-079` solo como follow-up opcional si se expone preview reverse desde esa superficie.
+
+## 2026-03-27 - TASK-078 lane activa
+
+- Se abrió `TASK-078` como lane activa del trabajo de Payroll Chile:
+  - `TASK-078` = `Payroll Chile: Previsional Foundation & Forward Cutover`
+  - `TASK-076` = `Payroll Chile: Paridad con Liquidación Legal`
+  - `TASK-077` = `Payroll Receipt Generation & Delivery`
+  - `TASK-079` = `Payroll Chile: Reverse Calculation Engine`
+- La intención operativa quedó explícita: primero se cierra la base previsional y el cutover forward, luego liquidación legal, recibos y finalmente reverse.
+- El índice documental y el registry deben reflejar esa secuencia para evitar que el siguiente agente tome `TASK-079` como punto de partida.
+
+## 2026-03-27 - TASK-078 foundation previsional materializada
+
+- Se materializó la base previsional de Payroll Chile en runtime:
+  - helper canónico `src/lib/payroll/chile-previsional-helpers.ts`
+  - tablas `greenhouse_payroll.chile_previred_indicators` y `greenhouse_payroll.chile_afp_rates`
+  - migración `scripts/migrations/add-chile-previsional-foundation.sql`
+  - bootstrap alineado en `scripts/setup-postgres-payroll.sql`
+- `calculate-chile-deductions.ts`, `calculate-payroll.ts`, `project-payroll.ts` y `recalculate-entry.ts` ya consumen la base previsional por período vía helpers async.
+- La migración se ejecutó con perfil `migrator` para aplicar índices y grants al owner real de las tablas.
+- Las tablas quedaron provisionadas y accesibles desde runtime, pero todavía vacías: el sync mensual / seed canónico sigue pendiente.
+- Queda pendiente el slice de sync externo mensual (`previred-sync.ts` + cron), pero el forward engine ya puede resolver con fallback canónico y tablas materializadas.
+
+## 2026-03-27 - TASK-078 Gael sync completado
+
+- La fuente canónica previsional quedó alineada con la API pública de Gael Cloud:
+  - `GET /general/public/previred/{periodo}` para indicadores previsionales mensuales
+  - `GET /general/public/impunico/{periodo}` para tabla de impuesto único
+- Se implementó `src/lib/payroll/previred-sync.ts`, el cron `src/app/api/cron/sync-previred/route.ts` y el backfill `scripts/backfill-chile-previsional.ts`.
+- Se corrigió `ImpUnico` para convertir tramos de CLP a UTM con la UTM del mismo período, evitando overflow en `greenhouse_payroll.chile_tax_brackets`.
+- Backfill histórico validado para `2026-01 -> 2026-03`:
+  - `chile_previred_indicators`: `3` filas
+  - `chile_afp_rates`: `21` filas
+  - `chile_tax_brackets`: `32` filas
+- El forward engine sigue consumiendo helpers async, pero ahora con data synced real disponible para períodos backfilleados.

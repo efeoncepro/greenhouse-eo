@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
@@ -156,7 +154,7 @@ export type FinanceExchangeRateRecord = {
   updatedAt: string | null
 }
 
-export type FinanceEconomicIndicatorCode = 'USD_CLP' | 'UF' | 'UTM' | 'IPC'
+export type FinanceEconomicIndicatorCode = 'USD_CLP' | 'UF' | 'UTM' | 'IPC' | 'IMM'
 
 export type FinanceEconomicIndicatorRecord = {
   indicatorId: string

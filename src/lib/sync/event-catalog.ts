@@ -1,5 +1,3 @@
-import 'server-only'
-
 // ── Aggregate Types ──
 
 export const AGGREGATE_TYPES = {
@@ -27,6 +25,7 @@ export const AGGREGATE_TYPES = {
   payrollEntry: 'payroll_entry',
   compensationVersion: 'compensation_version',
   projectedPayroll: 'projected_payroll',
+  payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
 
   // AI Tools
   aiCredits: 'ai_credits',
@@ -111,6 +110,7 @@ export const EVENT_TYPES = {
   payrollEntryUpserted: 'payroll_entry.upserted',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
+  payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',
 
   // Services
   serviceCreated: 'service.created',
@@ -161,6 +161,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.payrollPeriodApproved,
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
+  EVENT_TYPES.payrollPrevisionalSnapshotUpserted,
   EVENT_TYPES.compensationVersionUpdated,
 
   // Notification triggers
