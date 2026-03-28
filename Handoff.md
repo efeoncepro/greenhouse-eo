@@ -49,6 +49,47 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 10:50 -03
+
+### Agente
+
+- Claude Code (Opus)
+
+### Objetivo del turno
+
+- Implementar Slice 1 de `TASK-079`: motor reverse payroll `computeGrossFromNet()` con binary search sobre el forward engine real.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/reverse-payroll.ts` (nuevo)
+- `src/lib/payroll/reverse-payroll.test.ts` (nuevo)
+- `docs/tasks/in-progress/TASK-079-payroll-chile-reverse-calculation-engine.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `project_context.md`
+
+### Verificacion
+
+- `pnpm test src/lib/payroll/reverse-payroll.test.ts` → 10/10 pass (3ms)
+- `npx tsc --noEmit --pretty false` → clean
+- `pnpm exec eslint src/lib/payroll/reverse-payroll.ts src/lib/payroll/reverse-payroll.test.ts` → clean
+
+### Riesgos o pendientes
+
+- Slice 2 (preview en CompensationDrawer) y Slice 3 (validación con caso real de liquidación) siguen pendientes.
+- El motor reverse no ha sido desplegado ni probado con datos reales de staging aún. Para validar con caso real se necesita un API route o un script que lo invoque.
+- No se tocó el forward engine ni ningún código existente; el riesgo de regresión es mínimo.
+
+---
+
 ## 2026-03-28 09:31 -03
 
 ### Agente

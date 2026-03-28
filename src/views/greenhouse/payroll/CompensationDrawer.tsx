@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
@@ -34,6 +36,29 @@ export type CompensationSavePayload = {
   input: CreateCompensationVersionInput
   versionId?: string
 }
+
+type ReverseQuoteResult = {
+  converged: boolean
+  baseSalary: number
+  netTotalWithTax: number
+  netDifferenceCLP: number
+  taxAmountClp: number
+  employerTotalCost: number | null
+  forward: {
+    grossTotal: number
+    chileGratificacionLegalAmount: number | null
+    chileAfpAmount: number | null
+    chileHealthAmount: number | null
+    chileUnemploymentAmount: number | null
+    chileApvAmount: number | null
+    chileTotalDeductions: number | null
+  }
+}
+
+const fmtCLP = (n: number | null | undefined) =>
+  n != null
+    ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+    : '-'
 
 type Props = {
   open: boolean
@@ -75,6 +100,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Reverse mode state
+  const [reverseMode, setReverseMode] = useState(false)
+  const [desiredNet, setDesiredNet] = useState(0)
+  const [reverseResult, setReverseResult] = useState<ReverseQuoteResult | null>(null)
+  const [reverseLoading, setReverseLoading] = useState(false)
+  const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const saveMode = getCompensationSaveMode({
     existingVersion: ev,
     effectiveFrom
@@ -108,7 +140,84 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setChangeReason('')
     setSaving(false)
     setError(null)
+    setReverseMode(false)
+    setDesiredNet(0)
+    setReverseResult(null)
+    setReverseLoading(false)
   }, [open, ev, memberId])
+
+  // Debounced reverse calculation
+  useEffect(() => {
+    if (!reverseMode || desiredNet <= 0 || payRegime !== 'chile') {
+      return
+    }
+
+    if (reverseTimerRef.current) {
+      clearTimeout(reverseTimerRef.current)
+    }
+
+    reverseTimerRef.current = setTimeout(async () => {
+      setReverseLoading(true)
+
+      try {
+        const res = await fetch('/api/hr/payroll/compensation/reverse-quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            desiredNetClp: desiredNet,
+            periodDate: effectiveFrom,
+            remoteAllowance,
+            colacionAmount,
+            movilizacionAmount,
+            fixedBonusAmount,
+            gratificacionLegalMode,
+            afpName: afpName || null,
+            afpRate,
+            healthSystem,
+            healthPlanUf: healthSystem === 'isapre' ? healthPlanUf : null,
+            contractType,
+            hasApv,
+            apvAmount: hasApv ? apvAmount : 0,
+            unemploymentRate
+          })
+        })
+
+        if (!res.ok) {
+          const errorBody = await res.json().catch(() => null)
+
+          setReverseResult(null)
+          setError(errorBody?.error || 'Error al calcular')
+
+          return
+        }
+
+        const data: ReverseQuoteResult = await res.json()
+
+        setReverseResult(data)
+
+        if (data.converged) {
+          setBaseSalary(data.baseSalary)
+          setError(null)
+        }
+      } catch {
+        setReverseResult(null)
+      } finally {
+        setReverseLoading(false)
+      }
+    }, 600)
+
+    return () => {
+      if (reverseTimerRef.current) {
+        clearTimeout(reverseTimerRef.current)
+      }
+    }
+  }, [
+    reverseMode, desiredNet, payRegime, effectiveFrom,
+    remoteAllowance, colacionAmount, movilizacionAmount, fixedBonusAmount,
+    gratificacionLegalMode, afpName, afpRate,
+    healthSystem, healthPlanUf, contractType,
+    hasApv, apvAmount, unemploymentRate
+  ])
 
   const handleRegimeChange = (regime: PayRegime) => {
     setPayRegime(regime)
@@ -119,6 +228,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
       setGratificacionLegalMode(ev?.gratificacionLegalMode ?? 'mensual_25pct')
     } else {
       setGratificacionLegalMode('ninguna')
+      setReverseMode(false)
+      setReverseResult(null)
     }
   }
 
@@ -224,9 +335,95 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   type='number'
                   value={baseSalary}
                   onChange={e => setBaseSalary(Number(e.target.value))}
+                  disabled={reverseMode}
+                  helperText={reverseMode ? 'Calculado desde líquido' : undefined}
                 />
               </Grid>
             </Grid>
+
+            {/* Reverse mode toggle — Chile only */}
+            {payRegime === 'chile' && (
+              <>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={reverseMode}
+                      onChange={e => {
+                        setReverseMode(e.target.checked)
+
+                        if (!e.target.checked) {
+                          setReverseResult(null)
+                        }
+                      }}
+                      data-testid='reverse-mode-toggle'
+                    />
+                  }
+                  label='Calcular desde líquido'
+                />
+                {reverseMode && (
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    label='Líquido deseado (CLP)'
+                    type='number'
+                    value={desiredNet || ''}
+                    onChange={e => setDesiredNet(Number(e.target.value))}
+                    helperText='Monto que el colaborador recibirá en su cuenta'
+                    data-testid='desired-net-input'
+                    slotProps={{
+                      input: {
+                        endAdornment: reverseLoading ? <CircularProgress size={18} /> : null
+                      }
+                    }}
+                  />
+                )}
+
+                {/* Reverse preview */}
+                {reverseMode && reverseResult && reverseResult.converged && (
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: 1,
+                      bgcolor: 'action.hover',
+                      border: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                    data-testid='reverse-preview'
+                  >
+                    <Typography variant='subtitle2' sx={{ mb: 1 }}>Desglose estimado</Typography>
+                    <Stack spacing={0.5}>
+                      <Row label='Sueldo base' value={fmtCLP(reverseResult.baseSalary)} bold />
+                      {reverseResult.forward.chileGratificacionLegalAmount != null && reverseResult.forward.chileGratificacionLegalAmount > 0 && (
+                        <Row label='Gratificación legal' value={fmtCLP(reverseResult.forward.chileGratificacionLegalAmount)} />
+                      )}
+                      <Row label='Total haberes' value={fmtCLP(reverseResult.forward.grossTotal)} />
+                      <Divider sx={{ my: 0.5 }} />
+                      <Row label='AFP' value={fmtCLP(reverseResult.forward.chileAfpAmount)} negative />
+                      <Row label='Salud' value={fmtCLP(reverseResult.forward.chileHealthAmount)} negative />
+                      <Row label='Cesantía' value={fmtCLP(reverseResult.forward.chileUnemploymentAmount)} negative />
+                      {reverseResult.taxAmountClp > 0 && (
+                        <Row label='Impuesto' value={fmtCLP(reverseResult.taxAmountClp)} negative />
+                      )}
+                      {reverseResult.forward.chileApvAmount != null && reverseResult.forward.chileApvAmount > 0 && (
+                        <Row label='APV' value={fmtCLP(reverseResult.forward.chileApvAmount)} negative />
+                      )}
+                      <Row label='Total descuentos' value={fmtCLP(reverseResult.forward.chileTotalDeductions)} negative />
+                      <Divider sx={{ my: 0.5 }} />
+                      <Row label='Líquido calculado' value={fmtCLP(reverseResult.netTotalWithTax)} bold />
+                      {reverseResult.employerTotalCost != null && reverseResult.employerTotalCost > 0 && (
+                        <Row label='Costo empleador' value={fmtCLP(reverseResult.employerTotalCost)} muted />
+                      )}
+                    </Stack>
+                  </Box>
+                )}
+
+                {reverseMode && reverseResult && !reverseResult.converged && (
+                  <Alert severity='warning' variant='outlined'>
+                    No se pudo converger a una solución exacta. Diferencia: {fmtCLP(reverseResult.netDifferenceCLP)}
+                  </Alert>
+                )}
+              </>
+            )}
 
             <CustomTextField
               fullWidth
@@ -424,5 +621,30 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     </Drawer>
   )
 }
+
+const Row = ({ label, value, bold, negative, muted }: {
+  label: string
+  value: string
+  bold?: boolean
+  negative?: boolean
+  muted?: boolean
+}) => (
+  <Stack direction='row' justifyContent='space-between'>
+    <Typography
+      variant='body2'
+      color={muted ? 'text.disabled' : 'text.secondary'}
+      fontWeight={bold ? 600 : 400}
+    >
+      {label}
+    </Typography>
+    <Typography
+      variant='body2'
+      fontWeight={bold ? 600 : 400}
+      color={negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}
+    >
+      {negative && value !== '-' ? `−${value.replace('-', '')}` : value}
+    </Typography>
+  </Stack>
+)
 
 export default CompensationDrawer

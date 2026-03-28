@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
+| Status real | `Implementación parcial` |
 | Rank | 4 de 4 (después de TASK-078, TASK-076 y TASK-077) |
 | Domain | HR Payroll |
 
@@ -135,10 +135,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `computeGrossFromNet()` converge para casos base en menos de 50 iteraciones
-- [ ] el resultado del reverse reproduce el líquido deseado con tolerancia de `±$1 CLP`
+- [x] `computeGrossFromNet()` converge para casos base en menos de 50 iteraciones
+- [x] el resultado del reverse reproduce el líquido deseado con tolerancia de `±$1 CLP`
 - [ ] la UI de compensación puede mostrar un preview por líquido deseado
-- [ ] tests cubren Fonasa, Isapre, APV, gratificación y tramos tributarios
+- [x] tests cubren Fonasa, Isapre, APV, gratificación y tramos tributarios
 
 ## Verification
 
@@ -146,6 +146,14 @@ Reglas obligatorias:
 - `pnpm test src/lib/payroll/reverse-payroll.test.ts`
 - `pnpm exec eslint src/lib/payroll/reverse-payroll.ts src/lib/payroll/reverse-payroll.test.ts src/views/greenhouse/payroll/CompensationDrawer.tsx`
 - validación manual con un caso real de liquidación
+
+## Delta 2026-03-28 Slice 1 complete
+
+- `computeGrossFromNet()` implementado en `src/lib/payroll/reverse-payroll.ts`
+- Algoritmo: binary search sobre `baseSalary` envolviendo el forward engine real (calculatePayrollTotals + computeChileTax), sin lógica paralela
+- Convergencia en ~24 iteraciones para cualquier caso dentro de ±$1 CLP
+- 10 golden tests pasan: Fonasa, Isapre, APV, gratificación mensual, plazo fijo, tramos tributarios altos, round-trip, sin impuesto, haberes no imponibles, salario bajo cerca del mínimo
+- Slices pendientes: preview en CompensationDrawer (Slice 2) y paridad/validación con caso real (Slice 3)
 
 ## Delta 2026-03-27
 
