@@ -199,8 +199,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
         setReverseResult(data)
 
-        if (data.converged) {
+        if (data.converged && !data.belowImm) {
           setBaseSalary(data.baseSalary)
+          setError(null)
+        } else if (data.converged && data.belowImm) {
+          setBaseSalary(data.immValue ?? 0)
           setError(null)
         }
       } catch {
@@ -435,7 +438,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
                 {reverseMode && reverseResult && reverseResult.converged && reverseResult.belowImm && (
                   <Alert severity='error' variant='outlined'>
-                    El sueldo base calculado ({fmtCLP(reverseResult.baseSalary)}) es inferior al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). Aumente el líquido deseado.
+                    El líquido ingresado requiere un sueldo base inferior al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). No es posible fijar esta compensación.
                   </Alert>
                 )}
               </>
@@ -620,7 +623,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         {/* Actions */}
         <Divider />
         <Stack direction='row' spacing={2} sx={{ p: 3 }}>
-          <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving}>
+          <Button variant='contained' fullWidth onClick={handleSubmit} disabled={saving || (reverseMode && reverseResult?.belowImm === true)}>
             {saving
               ? 'Guardando...'
               : ev
