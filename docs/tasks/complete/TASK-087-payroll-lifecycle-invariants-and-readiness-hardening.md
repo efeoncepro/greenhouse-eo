@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Parcial`
+- Status real: `Cerrada`
 - Rank: `3`
 - Domain: `hr`
 - GitHub Project: `Greenhouse Delivery`

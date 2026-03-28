@@ -49,6 +49,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 10:47 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Completar `TASK-087` y endurecer el contrato de payroll official: guards de transición en el store, readiness gate en approval y reapertura explícita al editar entries de un período aprobado.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/tasks/complete/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md`
+- `project_context.md`
+- `changelog.md`
+- `src/lib/payroll/period-lifecycle.ts`
+- `src/lib/payroll/period-lifecycle.test.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/postgres-store.test.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/app/api/hr/payroll/periods/[periodId]/approve/route.ts`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/postgres-store.test.ts src/lib/payroll/payroll-readiness.test.ts` -> pass
+- `pnpm exec eslint src/lib/payroll/period-lifecycle.ts src/lib/payroll/period-lifecycle.test.ts src/lib/payroll/postgres-store.ts src/lib/payroll/postgres-store.test.ts src/lib/payroll/recalculate-entry.ts 'src/app/api/hr/payroll/periods/[periodId]/approve/route.ts'` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- La edición aprobada ahora reabre explícitamente el período antes de mutar entries; conviene vigilar que ningún flujo legado dependa de la vieja semántica implícita.
+- `TASK-087` quedó cerrada a nivel de task; queda solo commit/push y revisión normal de integración.
+
 ## 2026-03-28 19:15 -03
 
 ### Agente
@@ -74,7 +118,7 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
 - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
 - `docs/tasks/to-do/TASK-063-payroll-projected-payroll-runtime.md`
-- `docs/tasks/to-do/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md`
+- `docs/tasks/in-progress/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md`
 - `docs/tasks/to-do/TASK-088-payroll-reactive-projections-and-delivery-hardening.md`
 - `docs/tasks/to-do/TASK-089-payroll-ux-semantics-and-feedback-hardening.md`
 - `docs/tasks/README.md`

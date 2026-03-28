@@ -357,6 +357,8 @@ Estados válidos:
 ### Regla importante
 `approved` no es cierre final.
 
+La aprobación solo puede avanzar cuando el período está `calculated` y cumple el readiness canónico; los warnings informativos no bloquean, pero los issues bloqueantes sí.
+
 Si un período `approved`:
 - se recalcula, o
 - se edita una entry

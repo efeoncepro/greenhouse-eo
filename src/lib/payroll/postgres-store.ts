@@ -37,6 +37,9 @@ import {
 } from '@/lib/payroll/compensation-versioning'
 import {
   canEditPayrollPeriodMetadata,
+  canSetPayrollPeriodApproved,
+  canSetPayrollPeriodCalculated,
+  canSetPayrollPeriodExported,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
@@ -1282,20 +1285,26 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
   const nextPeriodId = buildPeriodId(nextYear, nextMonth)
   const identityChanged = nextPeriodId !== current.periodId
 
-  const requiresReset = doesPayrollPeriodUpdateRequireReset({
-    currentYear: current.year,
-    currentMonth: current.month,
-    currentUfValue: current.ufValue,
+    const requiresReset = doesPayrollPeriodUpdateRequireReset({
+      currentYear: current.year,
+      currentMonth: current.month,
+      currentUfValue: current.ufValue,
     currentTaxTableVersion: current.taxTableVersion,
     nextYear,
     nextMonth,
     nextUfValue: nextUfValue ?? null,
-    nextTaxTableVersion
-  })
+      nextTaxTableVersion
+    })
 
-  return withGreenhousePostgresTransaction(async client => {
-    if (identityChanged) {
-      const [existing] = await queryRows<{ period_id: string }>(
+    const nextStatus = requiresReset ? 'draft' : current.status
+    const nextCalculatedAt = requiresReset ? null : current.calculatedAt
+    const nextCalculatedBy = requiresReset ? null : current.calculatedBy
+    const nextApprovedAt = requiresReset ? null : current.approvedAt
+    const nextApprovedBy = requiresReset ? null : current.approvedBy
+
+    return withGreenhousePostgresTransaction(async client => {
+      if (identityChanged) {
+        const [existing] = await queryRows<{ period_id: string }>(
         `
           SELECT period_id
           FROM greenhouse_payroll.payroll_periods
@@ -1343,11 +1352,11 @@ export const pgUpdatePayrollPeriod = async (periodId: string, input: UpdatePayro
         nextPeriodId,
         nextYear,
         nextMonth,
-        requiresReset ? 'draft' : current.status,
-        requiresReset ? null : current.calculatedAt,
-        requiresReset ? null : current.calculatedBy,
-        requiresReset ? null : current.approvedAt,
-        requiresReset ? null : current.approvedBy,
+        nextStatus,
+        nextCalculatedAt,
+        nextCalculatedBy,
+        nextApprovedAt,
+        nextApprovedBy,
         nextUfValue ?? null,
         nextTaxTableVersion,
         nextNotes,
@@ -1405,6 +1414,27 @@ export const pgSetPeriodCalculated = async (periodId: string, actorEmail: string
   }
 
   await withGreenhousePostgresTransaction(async client => {
+    const current = await queryRows<PgPeriodRow>(
+      `
+        SELECT *
+        FROM greenhouse_payroll.payroll_periods
+        WHERE period_id = $1
+        LIMIT 1
+      `,
+      [periodId],
+      client
+    )
+
+    const currentPeriod = current[0] ? mapPeriod(current[0]) : null
+
+    if (!currentPeriod) {
+      throw new PayrollValidationError('Payroll period not found.', 404)
+    }
+
+    if (!canSetPayrollPeriodCalculated(currentPeriod.status)) {
+      throw new PayrollValidationError('Payroll periods can only be calculated from draft, calculated, or approved states.', 409)
+    }
+
     const result = await client.query<PgPeriodRow>(
       `
         UPDATE greenhouse_payroll.payroll_periods
@@ -1457,6 +1487,27 @@ export const pgSetPeriodApproved = async (periodId: string, actorEmail: string |
   }
 
   await withGreenhousePostgresTransaction(async client => {
+    const current = await queryRows<PgPeriodRow>(
+      `
+        SELECT *
+        FROM greenhouse_payroll.payroll_periods
+        WHERE period_id = $1
+        LIMIT 1
+      `,
+      [periodId],
+      client
+    )
+
+    const currentPeriod = current[0] ? mapPeriod(current[0]) : null
+
+    if (!currentPeriod) {
+      throw new PayrollValidationError('Payroll period not found.', 404)
+    }
+
+    if (!canSetPayrollPeriodApproved(currentPeriod.status)) {
+      throw new PayrollValidationError('Only calculated payroll periods can be approved.', 409)
+    }
+
     const result = await client.query<PgPeriodRow>(
       `
         UPDATE greenhouse_payroll.payroll_periods
@@ -1492,6 +1543,27 @@ export const pgSetPeriodExported = async (periodId: string) => {
   await assertPayrollPostgresReady()
 
   await withGreenhousePostgresTransaction(async client => {
+    const current = await queryRows<PgPeriodRow>(
+      `
+        SELECT *
+        FROM greenhouse_payroll.payroll_periods
+        WHERE period_id = $1
+        LIMIT 1
+      `,
+      [periodId],
+      client
+    )
+
+    const currentPeriod = current[0] ? mapPeriod(current[0]) : null
+
+    if (!currentPeriod) {
+      throw new PayrollValidationError('Payroll period not found.', 404)
+    }
+
+    if (!canSetPayrollPeriodExported(currentPeriod.status)) {
+      throw new PayrollValidationError('Only approved payroll periods can be exported.', 409)
+    }
+
     const result = await client.query<PgPeriodRow>(
       `
         UPDATE greenhouse_payroll.payroll_periods

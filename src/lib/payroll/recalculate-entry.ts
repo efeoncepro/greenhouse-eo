@@ -207,8 +207,35 @@ export const recalculatePayrollEntry = async ({
     rpaSoftBandFloorFactor
   } = await getBonusConfigForPeriod(entry.periodId)
 
-  if (!canEditPayrollEntries(period.status)) {
-    throw new PayrollValidationError('Exported payroll entries cannot be edited.', 409)
+  let effectivePeriodStatus = period.status
+
+  if (shouldReopenApprovedPayrollPeriod(effectivePeriodStatus)) {
+    if (isPayrollPostgresEnabled()) {
+      await pgSetPeriodCalculated(entry.periodId, actorIdentifier ?? null)
+    } else {
+      await runPayrollQuery(
+        `
+          UPDATE \`${getProjectId()}.greenhouse.payroll_periods\`
+          SET
+            status = 'calculated',
+            calculated_at = CURRENT_TIMESTAMP(),
+            calculated_by = @actorIdentifier,
+            approved_at = NULL,
+            approved_by = NULL
+          WHERE period_id = @periodId
+        `,
+        {
+          periodId: entry.periodId,
+          actorIdentifier: actorIdentifier ?? null
+        }
+      )
+    }
+
+    effectivePeriodStatus = 'calculated'
+  }
+
+  if (!canEditPayrollEntries(effectivePeriodStatus)) {
+    throw new PayrollValidationError('Payroll entries can only be edited after calculation and before export.', 409)
   }
 
   const bonusConfig: BonusProrationConfig = {
@@ -395,29 +422,6 @@ export const recalculatePayrollEntry = async ({
   }
 
   await upsertPayrollEntry(updatedEntry)
-
-  if (shouldReopenApprovedPayrollPeriod(period.status)) {
-    if (isPayrollPostgresEnabled()) {
-      await pgSetPeriodCalculated(entry.periodId, actorIdentifier ?? null)
-    } else {
-      await runPayrollQuery(
-        `
-          UPDATE \`${getProjectId()}.greenhouse.payroll_periods\`
-          SET
-            status = 'calculated',
-            calculated_at = CURRENT_TIMESTAMP(),
-            calculated_by = @actorIdentifier,
-            approved_at = NULL,
-            approved_by = NULL
-          WHERE period_id = @periodId
-        `,
-        {
-          periodId: entry.periodId,
-          actorIdentifier: actorIdentifier ?? null
-        }
-      )
-    }
-  }
 
   const persisted = await getPayrollEntryById(entryId)
 

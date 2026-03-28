@@ -12,7 +12,7 @@ vi.mock('@/lib/postgres/client', () => ({
     callback({ query: mockClientQuery })
 }))
 
-const { pgUpdatePayrollPeriod, pgSetPeriodExported } = await import('./postgres-store')
+const { pgUpdatePayrollPeriod, pgSetPeriodApproved, pgSetPeriodExported } = await import('./postgres-store')
 
 const PAYROLL_REQUIRED_TABLES = [
   'greenhouse_core.members',
@@ -94,6 +94,149 @@ describe('pgUpdatePayrollPeriod', () => {
 
     expect(selectUpdatedPeriodCall?.[1]).toEqual(['2026-02'])
   })
+
+  it('resets an approved period back to draft when metadata changes require a recalculation', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
+      .mockResolvedValueOnce([
+        {
+          period_id: '2026-03',
+          year: 2026,
+          month: 3,
+          status: 'approved',
+          calculated_at: '2026-03-05T12:00:00.000Z',
+          calculated_by_user_id: 'user-1',
+          approved_at: '2026-03-06T12:00:00.000Z',
+          approved_by_user_id: 'user-2',
+          exported_at: null,
+          uf_value: 39990,
+          tax_table_version: 'SII-2026-03',
+          notes: 'Periodo aprobado',
+          created_at: '2026-03-01T12:00:00.000Z'
+        }
+      ])
+
+    mockClientQuery
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'draft',
+            calculated_at: null,
+            calculated_by_user_id: null,
+            approved_at: null,
+            approved_by_user_id: null,
+            exported_at: null,
+            uf_value: 40000,
+            tax_table_version: 'SII-2026-04',
+            notes: 'Periodo ajustado',
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'draft',
+            calculated_at: null,
+            calculated_by_user_id: null,
+            approved_at: null,
+            approved_by_user_id: null,
+            exported_at: null,
+            uf_value: 40000,
+            tax_table_version: 'SII-2026-04',
+            notes: 'Periodo ajustado',
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'draft',
+            calculated_at: null,
+            calculated_by_user_id: null,
+            approved_at: null,
+            approved_by_user_id: null,
+            exported_at: null,
+            uf_value: 40000,
+            tax_table_version: 'SII-2026-04',
+            notes: 'Periodo ajustado',
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      })
+
+    const updated = await pgUpdatePayrollPeriod('2026-03', {
+      year: 2026,
+      month: 3,
+      ufValue: 40000,
+      taxTableVersion: 'SII-2026-04',
+      notes: 'Periodo ajustado'
+    })
+
+    expect(updated.status).toBe('draft')
+    expect(updated.calculatedAt).toBeNull()
+    expect(updated.approvedAt).toBeNull()
+
+    const updateCall = mockClientQuery.mock.calls.find(call =>
+      String(call[0]).includes('UPDATE greenhouse_payroll.payroll_periods')
+    )
+
+    expect(updateCall?.[1]?.[3]).toBe('draft')
+    expect(updateCall?.[1]?.[4]).toBeNull()
+    expect(updateCall?.[1]?.[5]).toBeNull()
+    expect(updateCall?.[1]?.[6]).toBeNull()
+    expect(updateCall?.[1]?.[7]).toBeNull()
+  })
+})
+
+describe('pgSetPeriodApproved', () => {
+  beforeEach(() => {
+    mockRunGreenhousePostgresQuery.mockReset()
+    mockClientQuery.mockReset()
+  })
+
+  it('rejects approval when the period is not calculated', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
+      .mockResolvedValueOnce([{ user_id: 'user-1' }])
+
+    mockClientQuery.mockResolvedValueOnce({
+      rows: [
+        {
+          period_id: '2026-03',
+          year: 2026,
+          month: 3,
+          status: 'draft',
+          calculated_at: null,
+          calculated_by_user_id: null,
+          approved_at: null,
+          approved_by_user_id: null,
+          exported_at: null,
+          uf_value: 39990,
+          tax_table_version: 'SII-2026-03',
+          notes: null,
+          created_at: '2026-03-01T12:00:00.000Z'
+        }
+      ]
+    })
+
+    await expect(pgSetPeriodApproved('2026-03', 'hr@example.com')).rejects.toThrow(
+      'Only calculated payroll periods can be approved.'
+    )
+
+    expect(mockClientQuery).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('pgSetPeriodExported', () => {
@@ -106,6 +249,25 @@ describe('pgSetPeriodExported', () => {
     mockRunGreenhousePostgresQuery.mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
 
     mockClientQuery
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            period_id: '2026-03',
+            year: 2026,
+            month: 3,
+            status: 'approved',
+            calculated_at: '2026-03-05T12:00:00.000Z',
+            calculated_by_user_id: 'user-1',
+            approved_at: '2026-03-06T12:00:00.000Z',
+            approved_by_user_id: 'user-2',
+            exported_at: '2026-03-07T12:00:00.000Z',
+            uf_value: 39990,
+            tax_table_version: 'SII-2026-03',
+            notes: null,
+            created_at: '2026-03-01T12:00:00.000Z'
+          }
+        ]
+      })
       .mockResolvedValueOnce({
         rows: [
           {
@@ -129,9 +291,38 @@ describe('pgSetPeriodExported', () => {
 
     await pgSetPeriodExported('2026-03')
 
-    expect(mockClientQuery).toHaveBeenCalledTimes(2)
-    expect(mockClientQuery.mock.calls[0]?.[0]).toContain('UPDATE greenhouse_payroll.payroll_periods')
-    expect(mockClientQuery.mock.calls[1]?.[0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
-    expect(mockClientQuery.mock.calls[1]?.[1]?.[3]).toBe('payroll_period.exported')
+    expect(mockClientQuery).toHaveBeenCalledTimes(3)
+    expect(mockClientQuery.mock.calls[0]?.[0]).toContain('SELECT *')
+    expect(mockClientQuery.mock.calls[1]?.[0]).toContain('UPDATE greenhouse_payroll.payroll_periods')
+    expect(mockClientQuery.mock.calls[2]?.[0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
+    expect(mockClientQuery.mock.calls[2]?.[1]?.[3]).toBe('payroll_period.exported')
+  })
+
+  it('rejects export when the period is not approved yet', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce(PAYROLL_REQUIRED_TABLES.map(qualified_name => ({ qualified_name })))
+
+    mockClientQuery.mockResolvedValueOnce({
+      rows: [
+        {
+          period_id: '2026-03',
+          year: 2026,
+          month: 3,
+          status: 'draft',
+          calculated_at: null,
+          calculated_by_user_id: null,
+          approved_at: null,
+          approved_by_user_id: null,
+          exported_at: null,
+          uf_value: 39990,
+          tax_table_version: 'SII-2026-03',
+          notes: null,
+          created_at: '2026-03-01T12:00:00.000Z'
+        }
+      ]
+    })
+
+    await expect(pgSetPeriodExported('2026-03')).rejects.toThrow('Only approved payroll periods can be exported.')
+
+    expect(mockClientQuery).toHaveBeenCalledTimes(1)
   })
 })

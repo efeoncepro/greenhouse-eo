@@ -7,6 +7,12 @@
 
 ## 2026-03-28
 
+### TASK-087 lifecycle invariants and readiness gate hardened
+- El contrato de nómina oficial ahora valida transiciones en el store: `calculated`, `approved` y `exported` solo avanzan desde estados permitidos.
+- `POST /api/hr/payroll/periods/[periodId]/approve` ahora consume el readiness canónico y rechaza blockers antes de aprobar.
+- La edición de entries de períodos `approved` reabre explícitamente el período a `calculated` antes de mutar datos.
+- `pgUpdatePayrollPeriod()` vuelve a `draft` cuando un cambio de metadatos exige recalcular, evitando que quede un `approved` mentiroso tras reset de entries.
+
 ### Payroll hardening backlog and architecture alignment documented
 - Se documentaron tres lanes nuevas para endurecer Payroll sin mezclar objetivos: lifecycle/readiness, reactivo/delivery y UX/feedback.
 - La arquitectura de Payroll ahora declara la ventana operativa de cierre, `/hr/payroll/projected` como surface derivada y `payroll_receipts_delivery` como downstream de `payroll_period.exported`.

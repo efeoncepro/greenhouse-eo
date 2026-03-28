@@ -27,6 +27,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa derivada:
   - la nómina oficial y la proyectada siguen siendo objetos distintos; la proyección alimenta, pero no reemplaza, el lifecycle oficial
 
+## Delta 2026-03-28 Payroll lifecycle invariants hardened
+- `TASK-087` ya quedó cerrada para mover la semántica del lifecycle oficial desde los routes hacia el dominio.
+- Nuevo contrato operativo:
+  - `approved` solo se acepta desde `calculated`
+  - la aprobación consulta readiness canónico y rechaza blockers antes de persistir
+  - la edición de entries de un período aprobado reabre explícitamente el período a `calculated`
+- Regla operativa derivada:
+  - `approved` sigue siendo checkpoint editable, no cierre final; el cierre real sigue siendo `exported`
+
 ## Delta 2026-03-28 Compensation Chile líquido-first + reverse engine completo
 - `TASK-079` a `TASK-085` cerradas en una sesión:
   - Motor reverse `computeGrossFromNet()` con binary search, piso IMM, convergencia ±$1 CLP

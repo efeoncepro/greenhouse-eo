@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import { getPayrollPeriodReadiness } from '@/lib/payroll/payroll-readiness'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import { PayrollValidationError, runPayrollQuery } from '@/lib/payroll/shared'
@@ -55,6 +56,14 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     if (invalidBonusEntries.length > 0) {
       throw new PayrollValidationError('Some payroll entries still have bonus values outside the allowed rules.', 400, {
         entryIds: invalidBonusEntries.map(entry => entry.entryId)
+      })
+    }
+
+    const readiness = await getPayrollPeriodReadiness(periodId)
+
+    if (!readiness.ready) {
+      throw new PayrollValidationError('Payroll period is not ready for approval.', 409, {
+        blockingIssues: readiness.blockingIssues
       })
     }
 
