@@ -134,6 +134,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-107` | `to-do` | Auth Email Verification Request Flow | `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md` |
 | `TASK-108` | `to-do` | Admin Center Governance Shell | `docs/tasks/to-do/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
+| `TASK-110` | `to-do` | Nexa: assistant-ui Feature Adoption | `docs/tasks/to-do/TASK-110-nexa-assistant-ui-features.md` |
 
 ## Regla de asignacion desde aqui
 
