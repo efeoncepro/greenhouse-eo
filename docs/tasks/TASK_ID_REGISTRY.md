@@ -77,23 +77,23 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
 | `TASK-060` | `to-do` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/to-do/TASK-060-team-assignment-admin.md` |
-| `TASK-061` | `in-progress` | Payroll Go-Live Readiness Audit | `docs/tasks/in-progress/TASK-061-payroll-go-live-readiness-audit.md` |
+| `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
 | `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
 | `TASK-064` | `in-progress` | ICO Assignee Attribution Remediation | `docs/tasks/in-progress/TASK-064-ico-assignee-attribution-remediation.md` |
-| `TASK-065` | `in-progress` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
+| `TASK-065` | `complete` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
 | `TASK-067` | `to-do` | Cost Intelligence Foundation | `docs/tasks/to-do/TASK-067-cost-intelligence-foundation.md` |
 | `TASK-068` | `to-do` | Period Closure Status Projection | `docs/tasks/to-do/TASK-068-period-closure-status-projection.md` |
 | `TASK-069` | `to-do` | Operational P&L Projection | `docs/tasks/to-do/TASK-069-operational-pl-projection.md` |
 | `TASK-070` | `to-do` | Cost Intelligence Finance UI | `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md` |
 | `TASK-071` | `to-do` | Cost Intelligence Cross-Module Consumers | `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` |
 | `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
-| `TASK-073` | `in-progress` | People Canonical Capacity Cutover | `docs/tasks/in-progress/TASK-073-people-canonical-capacity-cutover.md` |
+| `TASK-073` | `complete` | People Canonical Capacity Cutover | `docs/tasks/complete/TASK-073-people-canonical-capacity-cutover.md` |
 | `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
 
 | `TASK-075` | `complete` | Projected Payroll UX Polish | `docs/tasks/complete/TASK-075-projected-payroll-ux-polish.md` |
 
-| `TASK-076` | `to-do` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/to-do/TASK-076-payroll-chile-liquidacion-parity.md` |
+| `TASK-076` | `in-progress` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/in-progress/TASK-076-payroll-chile-liquidacion-parity.md` |
 
 | `TASK-077` | `to-do` | Payroll Receipt Generation & Delivery | `docs/tasks/to-do/TASK-077-payroll-receipt-generation-delivery.md` |
 
