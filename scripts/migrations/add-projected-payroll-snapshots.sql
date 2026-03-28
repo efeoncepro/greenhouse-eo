@@ -30,3 +30,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.projected_payroll_snapshots (
 
 CREATE INDEX IF NOT EXISTS idx_projected_payroll_period
   ON greenhouse_serving.projected_payroll_snapshots (period_year, period_month);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_migrator;

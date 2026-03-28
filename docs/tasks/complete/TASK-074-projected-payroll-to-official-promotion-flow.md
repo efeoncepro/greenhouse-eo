@@ -244,3 +244,18 @@ Se debe poder comparar:
   - ✅ variance view con diff por inputs
   - ✅ drift guardrail con warnings
   - ✅ lifecycle oficial no se rompe
+
+## Delta 2026-03-28 - Payroll projected snapshot grants
+
+- Hallazgo operativo:
+  - `POST /api/hr/payroll/projected/promote` no fallaba por cálculo ni por access guard; el bloqueo real era `permission denied for table projected_payroll_snapshots`.
+  - `greenhouse_serving.projected_payroll_snapshots` es una materialización serving que también escribe el runtime de Payroll projected, igual que otras proyecciones del portal.
+- Corrección aplicada:
+  - migration `scripts/migrations/add-projected-payroll-snapshots.sql` actualizada con `GRANT SELECT, INSERT, UPDATE, DELETE` para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`
+  - `scripts/setup-postgres-payroll.sql` alineado con el mismo grant explícito
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md` documenta la excepción de materializaciones serving escribibles por tabla
+- Validación:
+  - `pnpm pg:doctor --profile=runtime` OK
+  - prueba directa de `INSERT` + `DELETE` sobre `greenhouse_serving.projected_payroll_snapshots` con runtime OK
+- Nota:
+  - la promoción proyectado -> oficial sigue usando el snapshot serving como cache auditable, no como source of truth transaccional.

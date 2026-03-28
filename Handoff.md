@@ -14258,3 +14258,11 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - `projected payroll` y `member_capacity_economics` quedan cubiertos por esa propagación sin crear una ruta paralela.
 - La migration `scripts/migrations/add-gratificacion-legal-mode.sql` ya se aplicó con `admin` porque `migrator` no tenía ownership sobre `greenhouse_payroll.compensation_versions` / `payroll_entries`; runtime ya ve ambas columnas nuevas.
 - El smoke test en `staging` quedó bloqueado por protección/auth de Vercel sobre `dev-greenhouse.efeoncepro.com`, así que la validación manual se dejó registrada como pendiente de acceso y no como bug funcional del slice.
+
+## 2026-03-28 - Projected payroll snapshot grant fix
+
+- Se corrigió el bloqueo de `POST /api/hr/payroll/projected/promote` causado por `permission denied for table projected_payroll_snapshots`.
+- La tabla `greenhouse_serving.projected_payroll_snapshots` se mantiene como materialización serving escribible y recibió grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`.
+- Se aplicó la migration `scripts/migrations/add-projected-payroll-snapshots.sql` con `admin` y se probó un `INSERT`/`DELETE` real sobre la tabla con el perfil `runtime`.
+- Pendiente inmediato:
+  - revalidar en staging el POST de promoción y confirmar que el borrador oficial de marzo 2026 se crea sin 42501.

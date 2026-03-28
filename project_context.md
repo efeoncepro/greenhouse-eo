@@ -10,6 +10,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `My Nómina` ya expone descarga de recibo para el colaborador autenticado y `People > Person > Nómina` la expone para HR desde el mismo contrato de receipt.
 - Quedan pendientes el pulido del layout de recibos y el smoke end-to-end con correo + descarga en staging.
 
+## Delta 2026-03-28 Projected payroll snapshot grants
+- `greenhouse_serving.projected_payroll_snapshots` es una materialización serving escribible por el runtime de Payroll projected, con grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`.
+- La promoción `Projected -> Official` usa ese snapshot como cache auditable, no como source of truth transaccional.
+- El permiso denegado en staging se resolvió añadiendo el grant a la migration/bootstrap de Payroll, sin mover la tabla fuera de `greenhouse_serving`.
+
 ## Delta 2026-03-28 Payroll AFP split
 - `Payroll Chile` ahora versiona y snapshottea `AFP` con split explícito de `cotización` y `comisión`, manteniendo también el total agregado para compatibilidad histórica.
 - Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.

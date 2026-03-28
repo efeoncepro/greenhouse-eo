@@ -353,6 +353,10 @@ CREATE INDEX IF NOT EXISTS previred_afp_rates_date_code_idx
 CREATE INDEX IF NOT EXISTS projected_payroll_promotions_period_idx
   ON greenhouse_payroll.projected_payroll_promotions (period_year DESC, period_month DESC, projection_mode);
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.projected_payroll_snapshots TO greenhouse_migrator;
+
 -- ============================================================
 -- Seed data
 -- ============================================================

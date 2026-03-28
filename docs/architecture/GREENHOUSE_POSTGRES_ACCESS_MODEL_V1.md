@@ -75,6 +75,7 @@ Rules:
 - domains publish operational truth to `greenhouse_sync.outbox_events`
 - read models can be exposed via `greenhouse_serving`
 - runtime does not own these schemas
+- projection-owned serving caches can receive explicit per-table DML grants when a runtime or worker must materialize them; those exceptions must be documented in the owning domain bootstrap and kept narrow
 
 ## Domain Schema Contract
 
@@ -165,3 +166,4 @@ It also aligns with the 360 model:
 - runtime uses only runtime credentials
 - migrations and setup use only migrator credentials
 - admin role is reserved for rare platform-level changes
+- writable serving materializations remain exceptional and must be explicitly granted per table, not via broad schema ownership
