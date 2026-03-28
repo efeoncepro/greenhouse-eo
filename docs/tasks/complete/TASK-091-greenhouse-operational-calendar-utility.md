@@ -2,18 +2,27 @@
 
 ## Status
 
-- Lifecycle: `to-do`
-- Priority: `P1`
-- Impact: `Alto`
-- Effort: `Bajo`
-- Status real: `Diseño`
-- Rank: `6`
-- Domain: `platform`
-- GitHub Project: `Greenhouse Delivery`
+| Campo | Valor |
+|-------|-------|
+| Lifecycle | `complete` |
+| Priority | `P1` |
+| Impact | `Alto` |
+| Effort | `Bajo` |
+| Status real | `Implementado` |
+| Rank | `6` |
+| Domain | `platform` |
+| GitHub Project | `Greenhouse Delivery` |
 
 ## Summary
 
 Extraer una utilidad canónica de calendario operativo para Greenhouse que permita calcular ventanas de cierre, mes operativo vigente y días hábiles de forma reutilizable entre Payroll y futuros dominios de cierre mensual. La utilidad debe ser timezone-aware y admitir contexto por jurisdicción, porque la casa matriz opera en Santiago y el grupo puede tener colaboradores en distintos países.
+
+## Result
+
+- La utilidad quedó implementada en `src/lib/calendar/operational-calendar.ts`.
+- La hidratación de feriados por país quedó implementada en `src/lib/calendar/nager-date-holidays.ts`.
+- La solución es pura, timezone-aware y dependiente de policy explícita, no del timezone del servidor.
+- La cobertura de tests valida business days, close window, rollover de mes, DST de Santiago y normalización de `Nager.Date`.
 
 ## Why This Task Exists
 

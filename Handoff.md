@@ -49,6 +49,87 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 13:00 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-091` con implementación completa de la utilidad de calendario operativo, loader de feriados `Nager.Date`, documentación arquitectónica y actualización del contexto de agentes.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/calendar/operational-calendar.ts`
+- `src/lib/calendar/nager-date-holidays.ts`
+- `src/lib/calendar/operational-calendar.test.ts`
+- `src/lib/calendar/nager-date-holidays.test.ts`
+- `docs/tasks/complete/TASK-091-greenhouse-operational-calendar-utility.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `CLAUDE.md`
+- `AGENTS.md`
+- `project_context.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/calendar/operational-calendar.test.ts src/lib/calendar/nager-date-holidays.test.ts` -> pass
+- `pnpm exec eslint src/lib/calendar/operational-calendar.ts src/lib/calendar/nager-date-holidays.ts src/lib/calendar/operational-calendar.test.ts src/lib/calendar/nager-date-holidays.test.ts` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- `TASK-092` sigue viva para ajustar la semántica de período actual y las cards de `/hr/payroll` usando esta utilidad.
+- Si el negocio requiere feriados corporativos o jurisdicciones nuevas, la siguiente capa a agregar será policy persistida/administrable, no otra API de cálculo.
+
+## 2026-03-28 12:55 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Implementar `TASK-091` completa: utilidad pura de calendario operativo, loader de feriados Nager.Date, tests unitarios y alineación del pipeline documental.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/calendar/operational-calendar.ts`
+- `src/lib/calendar/nager-date-holidays.ts`
+- `src/lib/calendar/operational-calendar.test.ts`
+- `src/lib/calendar/nager-date-holidays.test.ts`
+- `docs/tasks/in-progress/TASK-091-greenhouse-operational-calendar-utility.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+
+### Verificacion
+
+- aún pendiente correr Vitest / lint / build sobre el nuevo slice
+
+### Riesgos o pendientes
+
+- Falta decidir si se agrega un helper de persistencia/admin para policy operativa o si la lectura queda solo en server-side consumers.
+- Si los tests revelan diferencias de timezone alrededor de DST, hay que ajustar los fixtures sin tocar la policy canónica.
+
 ## 2026-03-28 12:25 -03
 
 ### Agente

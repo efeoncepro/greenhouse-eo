@@ -11,6 +11,14 @@ Greenhouse EO — portal operativo de Efeonce Group. Next.js 16 App Router + MUI
 - Patrón de lectura: **Postgres first, BigQuery fallback**
 - Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`
 
+### Payroll Operational Calendar
+
+- Calendario operativo canónico: `src/lib/calendar/operational-calendar.ts`
+- Hidratación pública de feriados: `src/lib/calendar/nager-date-holidays.ts`
+- Timezone canónica de base: `America/Santiago` vía IANA del runtime
+- Feriados nacionales: `Nager.Date` + overrides persistidos en Greenhouse
+- No usar helpers locales de vista para decidir ventana de cierre o mes operativo vigente
+
 ### Canonical 360 Object Model
 
 - `Cliente` → `greenhouse.clients.client_id`

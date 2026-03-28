@@ -143,6 +143,7 @@ Fuente de verdad de la policy:
 - la policy puede vivir en una tabla de configuración o en un read model administrativo, pero no debe inferirse de la UI
 - la utilidad recibe un objeto de contexto ya resuelto; no necesita una API pública de cálculo
 - si existe una API, debe ser de administración de policy, no de cálculo temporal ad hoc
+- la implementación canónica vive en `src/lib/calendar/operational-calendar.ts` y `src/lib/calendar/nager-date-holidays.ts`; los consumers de Payroll y otros dominios deben depender de esa capa, no de helpers locales
 
 Fuente externa recomendada para feriados:
 

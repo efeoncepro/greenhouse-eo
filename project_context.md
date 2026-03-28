@@ -3,6 +3,12 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll operational calendar utility implemented
+- La utilidad canónica de calendario operativo quedó implementada en `src/lib/calendar/operational-calendar.ts`.
+- La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts`.
+- El contrato operativo sigue siendo timezone-aware, con base `America/Santiago`, feriados nacionales desde `Nager.Date` y overrides persistidos en Greenhouse.
+- No se introdujo una API pública de cálculo temporal; la utility es de lectura y debe ser consumida por Payroll y otros dominios server-side.
+
 ## Delta 2026-03-28 Payroll operational calendar timezone + jurisdiction
 - El calendario operativo de Payroll quedó definido como una política timezone-aware con base en `America/Santiago`.
 - La semántica de cierre debe separar:

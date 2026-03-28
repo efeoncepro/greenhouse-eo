@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### TASK-091 operational calendar utility implemented
+- Se implementó la utilidad canónica de calendario operativo en `src/lib/calendar/operational-calendar.ts`.
+- La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts` con `Nager.Date` como fuente recomendada.
+- La tarea se cerró con tests de business days, close window, rollover mensual y normalización del loader externo.
+
 ### Payroll holiday source set to Nager.Date
 - Se decidió documentar `Nager.Date` como la fuente pública de mercado recomendada para feriados nacionales del calendario operativo.
 - El timezone/DST sigue resolviéndose con IANA en el runtime, mientras que los overrides corporativos o jurisdiccionales pueden persistirse en Greenhouse sobre esa fuente.
