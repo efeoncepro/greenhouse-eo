@@ -2,6 +2,11 @@
 
 ## Delta 2026-03-28
 
+- El pipeline reactivo quedó corregido para que un handler exitoso no bloquee a los demás del mismo evento:
+  - `greenhouse_sync.outbox_reactive_log` ahora se keyea por `(event_id, handler)`
+  - `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)`
+- Con eso `payroll_receipts_delivery` ya puede volver a materializarse aunque otro consumer haya procesado previamente el mismo `payroll_period.exported`.
+- El log reactivo quedó corregido a granularidad `(event_id, handler)` para que `payroll_receipts_delivery` no quede bloqueada si otras proyecciones del mismo evento ya lo procesaron.
 - La base operativa de recibos ya quedó implementada en runtime:
   - registry persistido en `greenhouse_payroll.payroll_receipts`
   - batch generator `generatePayrollReceiptsForPeriod()`

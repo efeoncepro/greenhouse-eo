@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Reactive receipts projection log fixed
+- `greenhouse_sync.outbox_reactive_log` ahora está keyed por `(event_id, handler)` para que un handler exitoso no bloquee al resto de proyecciones del mismo outbox event.
+- `greenhouse_sync.projection_refresh_queue` recuperó su dedup canónica con `UNIQUE (projection_name, entity_type, entity_id)`, de modo que `enqueueRefresh()` ya puede persistir refresh intents sin caer en un `ON CONFLICT` inválido.
+- Esto corrige el último bloqueo estructural que impedía a `payroll_receipts_delivery` materializar recibos cuando otro consumer ya había procesado el mismo `payroll_period.exported`.
+
 ### Reactive receipts infrastructure preprovisioned
 - `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron provisionadas por setup compartido.
 - El runtime reactivo dejó de intentar DDL en `greenhouse_sync`; ahora solo verifica existencia y usa la infraestructura ya creada.

@@ -119,7 +119,7 @@ The catch-all `/api/cron/outbox-react` still works for processing ALL domains se
 ## Refresh Queue
 
 The persistent queue (`greenhouse_sync.projection_refresh_queue`) ensures refresh intents survive outbox event expiration.
-The reactive consumer also persists `greenhouse_sync.outbox_reactive_log` as its idempotency / retry ledger; both tables are part of the shared reactive control plane and should be provisioned up front.
+The reactive consumer also persists `greenhouse_sync.outbox_reactive_log` as its idempotency / retry ledger. The ledger is keyed by `(event_id, handler)` so each projection handler can react independently to the same outbox event; both tables are part of the shared reactive control plane and should be provisioned up front.
 
 ### How it works
 

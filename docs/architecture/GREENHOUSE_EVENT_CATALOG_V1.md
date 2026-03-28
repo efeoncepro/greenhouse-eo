@@ -20,7 +20,7 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 | Cron react (people) | `/api/cron/outbox-react-people` | Solo dominio `people` |
 | Cron react (finance) | `/api/cron/outbox-react-finance` | Solo dominio `finance` |
 | Cron react (notify) | `/api/cron/outbox-react-notify` | Solo dominio `notifications` |
-| Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter |
+| Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter, keyed by `(event_id, handler)` |
 | Observabilidad | `/api/internal/projections` | Stats por proyeccion + queue health |
 
 ## Ciclo de vida de un evento
@@ -29,7 +29,7 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 Mutacion en store
   -> publishOutboxEvent() inserta en outbox_events (status: 'pending')
   -> outbox-publish cron lee pending, escribe a BigQuery, marca 'published'
-  -> outbox-react cron lee published + tipo reactivo, ejecuta handler, registra en reactive_log
+  -> outbox-react cron lee published + tipo reactivo, ejecuta handler, registra en reactive_log (evento + handler)
 ```
 
 ## Catalogo de eventos
@@ -82,6 +82,7 @@ Notas:
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.
 - los eventos `payroll_period.*` pueden resolverse por `finance_period` en projections que necesiten fanout a todos los miembros del período.
 - el fallback BigQuery de Payroll mantiene compatibilidad funcional, pero la arquitectura reactiva canonica depende del path `Postgres-first` con outbox.
+- el `outbox_reactive_log` debe quedar en granularidad `(event_id, handler)` para que un handler exitoso no bloquee a los demás projections del mismo evento.
 
 ### Capacity Economics (nuevo)
 

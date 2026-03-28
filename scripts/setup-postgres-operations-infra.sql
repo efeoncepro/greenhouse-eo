@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_sync.projection_refresh_queue (
   retry_count INT NOT NULL DEFAULT 0,
   max_retries INT NOT NULL DEFAULT 3,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (projection_name, entity_type, entity_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_prq_status ON greenhouse_sync.projection_refresh_queue(status);
@@ -39,12 +40,13 @@ CREATE INDEX IF NOT EXISTS idx_prq_projection ON greenhouse_sync.projection_refr
 CREATE INDEX IF NOT EXISTS idx_prq_entity ON greenhouse_sync.projection_refresh_queue(entity_type, entity_id);
 
 CREATE TABLE IF NOT EXISTS greenhouse_sync.outbox_reactive_log (
-  event_id TEXT PRIMARY KEY,
+  event_id TEXT NOT NULL,
+  handler TEXT NOT NULL,
   reacted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  handler TEXT,
   result TEXT,
   retries INT NOT NULL DEFAULT 0,
-  last_error TEXT
+  last_error TEXT,
+  PRIMARY KEY (event_id, handler)
 );
 
 -- ── 2. Notifications ─────────────────────────────────────────────────────

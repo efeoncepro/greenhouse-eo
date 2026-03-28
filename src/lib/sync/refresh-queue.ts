@@ -43,6 +43,8 @@ export const enqueueRefresh = async (input: {
   entityType: string
   entityId: string
   priority?: number
+  triggeredByEventId?: string | null
+  maxRetries?: number
 }): Promise<void> => {
   await ensureRefreshQueue()
 
@@ -50,17 +52,27 @@ export const enqueueRefresh = async (input: {
 
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.projection_refresh_queue
-       (queue_id, projection_name, entity_type, entity_id, priority, status, enqueued_at)
-     VALUES ($1, $2, $3, $4, $5, 'pending', NOW())
+       (refresh_id, projection_name, entity_type, entity_id, priority, status, triggered_by_event_id, error_message, retry_count, max_retries, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, 'pending', $6, NULL, 0, $7, NOW(), NOW())
      ON CONFLICT (projection_name, entity_type, entity_id)
      DO UPDATE SET
        priority = GREATEST(EXCLUDED.priority, projection_refresh_queue.priority),
-       enqueued_at = LEAST(EXCLUDED.enqueued_at, projection_refresh_queue.enqueued_at),
+       updated_at = NOW(),
+       error_message = NULL,
+       max_retries = GREATEST(EXCLUDED.max_retries, projection_refresh_queue.max_retries),
        status = CASE
          WHEN projection_refresh_queue.status IN ('completed', 'failed') THEN 'pending'
          ELSE projection_refresh_queue.status
        END`,
-    [queueId, input.projectionName, input.entityType, input.entityId, input.priority ?? 0]
+    [
+      queueId,
+      input.projectionName,
+      input.entityType,
+      input.entityId,
+      input.priority ?? 0,
+      input.triggeredByEventId ?? null,
+      input.maxRetries ?? 3
+    ]
   )
 }
 
@@ -79,20 +91,20 @@ export const dequeueRefreshBatch = async (batchSize = 10): Promise<QueueItem[]> 
   // Atomic claim: set status = 'processing' and return claimed items
   const rows = await runGreenhousePostgresQuery<QueueItem & Record<string, unknown>>(
     `UPDATE greenhouse_sync.projection_refresh_queue
-     SET status = 'processing', started_at = NOW(), attempts = attempts + 1
-     WHERE queue_id IN (
-       SELECT queue_id FROM greenhouse_sync.projection_refresh_queue
+     SET status = 'processing', updated_at = NOW(), retry_count = retry_count + 1
+     WHERE refresh_id IN (
+       SELECT refresh_id FROM greenhouse_sync.projection_refresh_queue
        WHERE status = 'pending'
-       ORDER BY priority DESC, enqueued_at ASC
+       ORDER BY priority DESC, created_at ASC
        LIMIT $1
        FOR UPDATE SKIP LOCKED
      )
-     RETURNING queue_id AS "queueId",
+     RETURNING refresh_id AS "queueId",
        projection_name AS "projectionName",
        entity_type AS "entityType",
        entity_id AS "entityId",
        priority,
-       attempts`,
+       retry_count AS "attempts"`,
     [batchSize]
   )
 
@@ -109,8 +121,8 @@ export const dequeueRefreshBatch = async (batchSize = 10): Promise<QueueItem[]> 
 export const markRefreshCompleted = async (queueId: string): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
-     SET status = 'completed', completed_at = NOW(), last_error = NULL
-     WHERE queue_id = $1`,
+     SET status = 'completed', updated_at = NOW(), error_message = NULL
+     WHERE refresh_id = $1`,
     [queueId]
   )
 }
@@ -118,9 +130,10 @@ export const markRefreshCompleted = async (queueId: string): Promise<void> => {
 export const markRefreshFailed = async (queueId: string, error: string, maxAttempts = 3): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_sync.projection_refresh_queue
-     SET status = CASE WHEN attempts >= $2 THEN 'failed' ELSE 'pending' END,
-         last_error = $3
-     WHERE queue_id = $1`,
+     SET status = CASE WHEN retry_count >= $2 THEN 'failed' ELSE 'pending' END,
+         error_message = $3,
+         updated_at = NOW()
+     WHERE refresh_id = $1`,
     [queueId, maxAttempts, error]
   )
 }
@@ -136,7 +149,7 @@ export const getQueueStats = async (): Promise<{
   const rows = await runGreenhousePostgresQuery<{ status: string; count: string } & Record<string, unknown>>(
     `SELECT status, COUNT(*)::text AS count
      FROM greenhouse_sync.projection_refresh_queue
-     WHERE enqueued_at > NOW() - INTERVAL '24 hours'
+     WHERE created_at > NOW() - INTERVAL '24 hours'
      GROUP BY status`
   )
 
@@ -157,7 +170,7 @@ export const purgeCompletedRefreshItems = async (): Promise<number> => {
   const rows = await runGreenhousePostgresQuery<{ count: string } & Record<string, unknown>>(
     `WITH deleted AS (
        DELETE FROM greenhouse_sync.projection_refresh_queue
-       WHERE status = 'completed' AND completed_at < NOW() - INTERVAL '24 hours'
+       WHERE status = 'completed' AND updated_at < NOW() - INTERVAL '24 hours'
        RETURNING 1
      )
      SELECT COUNT(*)::text AS count FROM deleted`

@@ -3,6 +3,11 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Reactive receipts projection log + queue fix
+- El ledger reactivo ahora es projection-aware: `greenhouse_sync.outbox_reactive_log` quedó keyeado por `(event_id, handler)` para que un handler no bloquee al resto de proyecciones del mismo evento.
+- La cola persistente `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)` para que `enqueueRefresh()` deduzca intents sin caer en `ON CONFLICT` inválido.
+- Esto destraba la materialización de `payroll_receipts_delivery` después de `payroll_period.exported`, que era el último bloqueo estructural del smoke de `TASK-077`.
+
 ## Delta 2026-03-28 Payroll receipts registry + reactive delivery
 - `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
 - La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.

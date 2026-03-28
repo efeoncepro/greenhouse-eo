@@ -49,6 +49,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 06:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Destrabar `TASK-077` corrigiendo el ledger reactivo para que `payroll_receipts_delivery` no quede bloqueada por otros handlers del mismo evento y alinear la cola persistente con el schema real de PostgreSQL.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/sync/reactive-consumer.ts`
+- `src/lib/sync/reactive-consumer.test.ts`
+- `src/lib/sync/refresh-queue.ts`
+- `scripts/setup-postgres-operations-infra.sql`
+- `scripts/migrations/alter-outbox-reactive-log-composite-key.sql`
+- `scripts/migrations/add-projection-refresh-queue-unique.sql`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/tasks/in-progress/TASK-077-payroll-receipt-generation-delivery.md`
+- `Handoff.md`
+
+### Verificacion
+
+- `pnpm tsx scripts/run-migration.ts scripts/migrations/alter-outbox-reactive-log-composite-key.sql --profile=admin`
+- `pnpm tsx scripts/run-migration.ts scripts/migrations/add-projection-refresh-queue-unique.sql --profile=admin`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/sync/reactive-consumer.test.ts src/lib/sync/projections/payroll-receipts.test.ts`
+- `pnpm exec eslint src/lib/sync/reactive-consumer.ts src/lib/sync/refresh-queue.ts src/lib/sync/reactive-consumer.test.ts src/lib/sync/projections/payroll-receipts.ts src/lib/sync/projections/payroll-receipts.test.ts`
+- `git diff --check`
+
+### Riesgos o pendientes
+
+- Falta desplegar `develop` para validar que el cron `/api/cron/outbox-react` materializa el registro de recibos y que el PDF deja de depender del fallback on-demand.
+- Si el smoke sigue sin registrar recibos, revisar la salida del cron reactivo ya con el ledger compuesto activo.
+
 ## 2026-03-28 05:12 -03
 
 ### Agente
