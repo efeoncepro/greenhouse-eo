@@ -145,6 +145,8 @@ const buildDetalleSheet = (
     'Bono adicional',
     'Total bruto',
     'AFP',
+    'AFP cotización',
+    'AFP comisión',
     'Salud',
     'Seg. cesantía',
     'Impuesto',
@@ -210,6 +212,8 @@ const buildDetalleSheet = (
       entry.bonusOtherAmount,
       entry.grossTotal,
       entry.chileAfpAmount ?? 0,
+      entry.chileAfpCotizacionAmount ?? 0,
+      entry.chileAfpComisionAmount ?? 0,
       entry.chileHealthAmount ?? 0,
       entry.chileUnemploymentAmount ?? 0,
       entry.chileTaxAmount ?? 0,
@@ -222,7 +226,7 @@ const buildDetalleSheet = (
     ])
 
     // Apply currency format to numeric cells excluding text/date style columns.
-    for (const col of [5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]) {
+    for (const col of [5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
       const cell = row.getCell(col)
 
       if (typeof cell.value === 'number') {
@@ -239,7 +243,7 @@ const buildDetalleSheet = (
   }
 
   // Auto-filter
-  sheet.autoFilter = { from: 'A1', to: `AA${entries.length + 1}` }
+  sheet.autoFilter = { from: 'A1', to: `AC${entries.length + 1}` }
 
   return sheet
 }

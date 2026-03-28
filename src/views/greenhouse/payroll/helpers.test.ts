@@ -40,6 +40,8 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   chileAfpName: null,
   chileAfpRate: null,
   chileAfpAmount: 0,
+  chileAfpCotizacionAmount: 0,
+  chileAfpComisionAmount: 0,
   chileHealthSystem: null,
   chileHealthAmount: 0,
   chileUnemploymentRate: null,

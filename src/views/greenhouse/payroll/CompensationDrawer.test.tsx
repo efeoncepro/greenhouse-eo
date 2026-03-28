@@ -31,6 +31,8 @@ const existingVersion: CompensationVersion = {
   gratificacionLegalMode: 'ninguna',
   afpName: null,
   afpRate: null,
+  afpCotizacionRate: null,
+  afpComisionRate: null,
   healthSystem: null,
   healthPlanUf: null,
   unemploymentRate: 0,

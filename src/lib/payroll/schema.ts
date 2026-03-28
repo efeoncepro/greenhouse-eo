@@ -25,6 +25,8 @@ const buildStatements = (projectId: string) => [
       gratificacion_legal_mode STRING,
       afp_name STRING,
       afp_rate FLOAT64,
+      afp_cotizacion_rate FLOAT64,
+      afp_comision_rate FLOAT64,
       health_system STRING,
       health_plan_uf FLOAT64,
       unemployment_rate FLOAT64,
@@ -87,6 +89,8 @@ const buildStatements = (projectId: string) => [
       chile_afp_name STRING,
       chile_afp_rate FLOAT64,
       chile_afp_amount FLOAT64,
+      chile_afp_cotizacion_amount FLOAT64,
+      chile_afp_comision_amount FLOAT64,
       chile_health_system STRING,
       chile_health_amount FLOAT64,
       chile_unemployment_rate FLOAT64,
@@ -110,11 +114,27 @@ const buildStatements = (projectId: string) => [
   `,
   `
     ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
+    ADD COLUMN IF NOT EXISTS afp_cotizacion_rate FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
+    ADD COLUMN IF NOT EXISTS afp_comision_rate FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
     ADD COLUMN IF NOT EXISTS colacion_amount FLOAT64
   `,
   `
     ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
     ADD COLUMN IF NOT EXISTS movilizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_afp_cotizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_afp_comision_amount FLOAT64
   `,
   `
     ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`

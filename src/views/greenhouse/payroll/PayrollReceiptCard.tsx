@@ -60,6 +60,9 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
     entryWithAllowances.chileMovilizacion ??
     entryWithAllowances.movilizacionAmount ??
     0
+  const afpCotizacion = entry.chileAfpCotizacionAmount ?? null
+  const afpComision = entry.chileAfpComisionAmount ?? null
+  const hasAfpSplit = (afpCotizacion ?? 0) > 0 || (afpComision ?? 0) > 0
 
   // Build haberes rows
   const haberesRows: [string, string][] = [
@@ -119,12 +122,27 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
   ] : []
 
   // Deduction rows (Chile only)
-  const deductionRows: [string, string][] = isChile ? [
-    [`AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`, formatCurrency(entry.chileAfpAmount, currency)],
-    [`Salud (${entry.chileHealthSystem ?? '—'})`, formatCurrency(entry.chileHealthAmount, currency)],
-    [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, formatCurrency(entry.chileUnemploymentAmount, currency)],
-    ['Impuesto único', formatCurrency(entry.chileTaxAmount, currency)]
-  ] : []
+  const deductionRows: [string, string][] = []
+
+  if (isChile) {
+    deductionRows.push([
+      `AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`,
+      formatCurrency(entry.chileAfpAmount, currency)
+    ])
+
+    if (hasAfpSplit) {
+      deductionRows.push(
+        ['↳ Cotización', formatCurrency(afpCotizacion, currency)],
+        ['↳ Comisión', formatCurrency(afpComision, currency)]
+      )
+    }
+
+    deductionRows.push(
+      [`Salud (${entry.chileHealthSystem ?? '—'})`, formatCurrency(entry.chileHealthAmount, currency)],
+      [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, formatCurrency(entry.chileUnemploymentAmount, currency)],
+      ['Impuesto único', formatCurrency(entry.chileTaxAmount, currency)]
+    )
+  }
 
   if (isChile && entry.chileApvAmount != null && entry.chileApvAmount > 0) {
     deductionRows.push(['APV', formatCurrency(entry.chileApvAmount, currency)])

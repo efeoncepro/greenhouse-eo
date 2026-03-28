@@ -53,6 +53,8 @@ const compensatedMember = {
   gratificacionLegalMode: 'ninguna' as const,
   afpName: null,
   afpRate: null,
+  afpCotizacionRate: null,
+  afpComisionRate: null,
   healthSystem: null,
   healthPlanUf: null,
   unemploymentRate: 0,

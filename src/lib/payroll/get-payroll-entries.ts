@@ -61,6 +61,8 @@ type PayrollEntryRow = {
   chile_afp_name: string | null
   chile_afp_rate: number | string | null
   chile_afp_amount: number | string | null
+  chile_afp_cotizacion_amount: number | string | null
+  chile_afp_comision_amount: number | string | null
   chile_health_system: string | null
   chile_health_amount: number | string | null
   chile_unemployment_rate: number | string | null
@@ -137,6 +139,8 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   chileAfpName: normalizeNullableString(row.chile_afp_name),
   chileAfpRate: toNullableNumber(row.chile_afp_rate),
   chileAfpAmount: toNullableNumber(row.chile_afp_amount),
+  chileAfpCotizacionAmount: toNullableNumber(row.chile_afp_cotizacion_amount),
+  chileAfpComisionAmount: toNullableNumber(row.chile_afp_comision_amount),
   chileHealthSystem: normalizeNullableString(row.chile_health_system),
   chileHealthAmount: toNullableNumber(row.chile_health_amount),
   chileUnemploymentRate: toNullableNumber(row.chile_unemployment_rate),
@@ -205,6 +209,8 @@ const buildBaseEntryQuery = (projectId: string) => `
     e.chile_afp_name,
     e.chile_afp_rate,
     e.chile_afp_amount,
+    e.chile_afp_cotizacion_amount,
+    e.chile_afp_comision_amount,
     e.chile_health_system,
     e.chile_health_amount,
     e.chile_unemployment_rate,

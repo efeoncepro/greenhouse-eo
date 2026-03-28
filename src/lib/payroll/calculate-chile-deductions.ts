@@ -5,7 +5,9 @@ import type { ContractType, GratificacionLegalMode, HealthSystem, PayRegime } fr
 import {
   getAfpRateForCode,
   getImmForPeriod,
-  getUnemploymentRateForPeriod
+  getUnemploymentRateForPeriod,
+  resolveChileAfpRateSplitForCompensation,
+  resolveChileAfpSplitRates
 } from '@/lib/payroll/chile-previsional-helpers'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 
@@ -22,6 +24,8 @@ type PayrollTotalsInput = {
   gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
@@ -39,6 +43,8 @@ export type ChileDeductionResult = {
   chileAfpName: string | null
   chileAfpRate: number | null
   chileAfpAmount: number | null
+  chileAfpCotizacionAmount: number | null
+  chileAfpComisionAmount: number | null
   chileGratificacionLegalAmount: number | null
   chileColacionAmount: number | null
   chileMovilizacionAmount: number | null
@@ -68,6 +74,8 @@ export const calculatePayrollTotals = async ({
   gratificacionLegalMode = 'ninguna',
   afpName,
   afpRate,
+  afpCotizacionRate,
+  afpComisionRate,
   healthSystem,
   healthPlanUf,
   unemploymentRate,
@@ -120,6 +128,8 @@ export const calculatePayrollTotals = async ({
       chileAfpName: null,
       chileAfpRate: null,
       chileAfpAmount: null,
+      chileAfpCotizacionAmount: null,
+      chileAfpComisionAmount: null,
       chileGratificacionLegalAmount: null,
       chileColacionAmount: null,
       chileMovilizacionAmount: null,
@@ -137,16 +147,49 @@ export const calculatePayrollTotals = async ({
 
   const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
 
-  const normalizedAfpRate = typeof afpRate === 'number' && Number.isFinite(afpRate)
-    ? afpRate
-    : await getAfpRateForCode(afpName || '', fallbackPeriodDate)
+  const normalizedAfpRate =
+    typeof afpRate === 'number' && Number.isFinite(afpRate)
+      ? afpRate
+      : await getAfpRateForCode(afpName || '', fallbackPeriodDate)
+
+  const fallbackYear = Number(fallbackPeriodDate.slice(0, 4))
+  const fallbackMonth = Number(fallbackPeriodDate.slice(5, 7))
+  const resolvedAfpSplit =
+    Number.isFinite(fallbackYear) && Number.isFinite(fallbackMonth)
+      ? await resolveChileAfpRateSplitForCompensation({
+          year: fallbackYear,
+          month: fallbackMonth,
+          afpName: afpName || null,
+          afpRate: normalizedAfpRate
+        })
+      : null
+
+  const hasExplicitSplit =
+    (typeof afpCotizacionRate === 'number' && Number.isFinite(afpCotizacionRate)) ||
+    (typeof afpComisionRate === 'number' && Number.isFinite(afpComisionRate))
+
+  // Prefer explicit split stored on compensation. Otherwise, fall back to the
+  // synced Previred foundation (worker_rate vs total_rate), and finally to a
+  // conservative 10% cotizacion + remainder commission split.
+  const resolvedSplitRates =
+    resolveChileAfpSplitRates({
+      totalRate: normalizedAfpRate,
+      cotizacionRate: hasExplicitSplit ? (afpCotizacionRate ?? null) : resolvedAfpSplit?.cotizacionRate ?? null,
+      comisionRate: hasExplicitSplit ? (afpComisionRate ?? null) : resolvedAfpSplit?.comisionRate ?? null
+    }) ?? { cotizacionRate: 0, comisionRate: 0 }
+
+  const totalAfpRate = hasExplicitSplit
+    ? resolvedSplitRates.cotizacionRate + resolvedSplitRates.comisionRate
+    : normalizedAfpRate
 
   const derivedUnemploymentRate =
     typeof unemploymentRate === 'number' && Number.isFinite(unemploymentRate)
       ? unemploymentRate
       : await getUnemploymentRateForPeriod(fallbackPeriodDate, contractType)
 
-  const afpAmount = roundCurrency(imponibleBase * normalizedAfpRate)
+  const afpCotizacionAmount = roundCurrency(imponibleBase * resolvedSplitRates.cotizacionRate)
+  const afpComisionAmount = roundCurrency(imponibleBase * resolvedSplitRates.comisionRate)
+  const afpAmount = roundCurrency(afpCotizacionAmount + afpComisionAmount)
 
   let healthAmount = 0
 
@@ -174,8 +217,10 @@ export const calculatePayrollTotals = async ({
     grossTotal,
     netTotalCalculated,
     chileAfpName: afpName || null,
-    chileAfpRate: normalizedAfpRate || null,
+    chileAfpRate: totalAfpRate || null,
     chileAfpAmount: afpAmount,
+    chileAfpCotizacionAmount: afpCotizacionAmount,
+    chileAfpComisionAmount: afpComisionAmount,
     chileGratificacionLegalAmount: gratificationLegalAmount > 0 ? gratificationLegalAmount : null,
     chileColacionAmount: colacionAmount > 0 ? colacionAmount : null,
     chileMovilizacionAmount: movilizacionAmount > 0 ? movilizacionAmount : null,

@@ -41,10 +41,13 @@ import {
   pgUpdateCompensationVersion,
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
+import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
   afpRate: 'FLOAT64',
+  afpCotizacionRate: 'FLOAT64',
+  afpComisionRate: 'FLOAT64',
   colacionAmount: 'FLOAT64',
   movilizacionAmount: 'FLOAT64',
   healthSystem: 'STRING',
@@ -78,6 +81,8 @@ type CompensationRow = {
   gratificacion_legal_mode: string | null
   afp_name: string | null
   afp_rate: number | string | null
+  afp_cotizacion_rate: number | string | null
+  afp_comision_rate: number | string | null
   health_system: string | null
   health_plan_uf: number | string | null
   unemployment_rate: number | string | null
@@ -129,6 +134,43 @@ const normalizeGratificacionLegalMode = (
       ? value
       : 'mensual_25pct'
 
+const normalizeChileAfpSplitRates = ({
+  afpRate,
+  afpCotizacionRate,
+  afpComisionRate,
+  payRegime
+}: {
+  afpRate: number | null
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
+  payRegime: 'chile' | 'international'
+}) => {
+  if (payRegime !== 'chile') {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  const resolved = resolveChileAfpSplitRates({
+    totalRate: afpRate,
+    cotizacionRate: afpCotizacionRate,
+    comisionRate: afpComisionRate
+  })
+
+  if (!resolved) {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  return {
+    afpCotizacionRate: resolved.cotizacionRate,
+    afpComisionRate: resolved.comisionRate
+  }
+}
+
 const getCurrentDateString = () =>
   new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Santiago'
@@ -174,6 +216,12 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     gratificacionLegalMode: normalizeGratificacionLegalMode(row.gratificacion_legal_mode, payRegime),
     afpName: normalizeNullableString(row.afp_name),
     afpRate: toNullableNumber(row.afp_rate),
+    ...normalizeChileAfpSplitRates({
+      afpRate: toNullableNumber(row.afp_rate),
+      afpCotizacionRate: toNullableNumber(row.afp_cotizacion_rate),
+      afpComisionRate: toNullableNumber(row.afp_comision_rate),
+      payRegime
+    }),
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
@@ -250,6 +298,33 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
 
 const assertCompensationUpdateInput = (input: UpdateCompensationVersionInput) => {
   assertCompensationValues(input)
+}
+
+const resolvePersistedAfpSplitRates = (
+  input: Pick<CreateCompensationVersionInput, 'payRegime' | 'afpRate' | 'afpCotizacionRate' | 'afpComisionRate'> & {
+    afpRate: number | null | undefined
+  }
+): {
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
+} => {
+  if (input.payRegime !== 'chile' || input.afpRate == null) {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  const resolved = resolveChileAfpSplitRates({
+    totalRate: input.afpRate,
+    cotizacionRate: input.afpCotizacionRate ?? null,
+    comisionRate: input.afpComisionRate ?? null
+  })
+
+  return {
+    afpCotizacionRate: resolved?.cotizacionRate ?? null,
+    afpComisionRate: resolved?.comisionRate ?? null
+  }
 }
 
 export const getCurrentCompensation = async () => {
@@ -472,6 +547,8 @@ export const getApplicableCompensationVersionsForPeriod = async (periodStart: st
           cv.gratificacion_legal_mode,
           cv.afp_name,
           cv.afp_rate,
+          cv.afp_cotizacion_rate,
+          cv.afp_comision_rate,
           cv.health_system,
           cv.health_plan_uf,
           cv.unemployment_rate,
@@ -661,6 +738,12 @@ export const createCompensationVersion = async ({
     gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
+    ...resolvePersistedAfpSplitRates({
+      payRegime: input.payRegime,
+      afpRate: input.afpRate ?? null,
+      afpCotizacionRate: input.afpCotizacionRate ?? null,
+      afpComisionRate: input.afpComisionRate ?? null
+    }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
     unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
@@ -695,6 +778,8 @@ export const createCompensationVersion = async ({
         gratificacion_legal_mode,
         afp_name,
         afp_rate,
+        afp_cotizacion_rate,
+        afp_comision_rate,
         health_system,
         health_plan_uf,
         unemployment_rate,
@@ -727,6 +812,8 @@ export const createCompensationVersion = async ({
         @gratificacionLegalMode,
         @afpName,
         @afpRate,
+        @afpCotizacionRate,
+        @afpComisionRate,
         @healthSystem,
         @healthPlanUf,
         @unemploymentRate,
@@ -848,6 +935,12 @@ export const updateCompensationVersion = async ({
     gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
+    ...resolvePersistedAfpSplitRates({
+      payRegime: input.payRegime,
+      afpRate: input.afpRate ?? null,
+      afpCotizacionRate: input.afpCotizacionRate ?? null,
+      afpComisionRate: input.afpComisionRate ?? null
+    }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
     unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
@@ -876,6 +969,8 @@ export const updateCompensationVersion = async ({
         gratificacion_legal_mode = @gratificacionLegalMode,
         afp_name = @afpName,
         afp_rate = @afpRate,
+        afp_cotizacion_rate = @afpCotizacionRate,
+        afp_comision_rate = @afpComisionRate,
         health_system = @healthSystem,
         health_plan_uf = @healthPlanUf,
         unemployment_rate = @unemploymentRate,

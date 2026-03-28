@@ -64,6 +64,10 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
     entryWithAllowances.movilizacionAmount ??
     0
 
+  const afpCotizacion = entry.chileAfpCotizacionAmount ?? null
+  const afpComision = entry.chileAfpComisionAmount ?? null
+  const hasAfpSplit = (afpCotizacion ?? 0) > 0 || (afpComision ?? 0) > 0
+
   return (
     <Stack spacing={0.5} sx={{ px: 2, py: 1, bgcolor: 'action.hover', borderRadius: 1, minWidth: 320 }}>
       <LineItem label='Renta imponible' amount={rentaImponible} />
@@ -73,6 +77,20 @@ const ChileDeductionBreakdown = ({ entry }: Props) => {
         amount={entry.chileAfpAmount}
         isDeduction
       />
+      {hasAfpSplit && (
+        <>
+          <LineItem
+            label='↳ Cotización'
+            amount={afpCotizacion}
+            isDeduction
+          />
+          <LineItem
+            label='↳ Comisión'
+            amount={afpComision}
+            isDeduction
+          />
+        </>
+      )}
       <LineItem
         label={entry.chileHealthSystem === 'isapre' ? `Isapre (${entry.chileUfValue ? `UF ${entry.chileUfValue}` : ''})` : 'Fonasa (7%)'}
         amount={entry.chileHealthAmount}

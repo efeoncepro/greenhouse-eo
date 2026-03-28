@@ -72,6 +72,8 @@ describe('exportPayrollCsv', () => {
         bonusOtherAmount: 0,
         grossTotal: 2450,
         chileAfpAmount: 0,
+        chileAfpCotizacionAmount: 0,
+        chileAfpComisionAmount: 0,
         chileHealthAmount: 0,
         chileUnemploymentAmount: 0,
         chileTaxAmount: 0,
@@ -84,6 +86,8 @@ describe('exportPayrollCsv', () => {
     const csv = await exportPayrollCsv('2026-03')
 
     expect(csv).toContain('Jane Doe')
+    expect(csv.split('\n')[0]).toContain('AFP cotización')
+    expect(csv.split('\n')[0]).toContain('AFP comisión')
     expect(mockPgSetPeriodExported).toHaveBeenCalledWith('2026-03')
     expect(mockRunPayrollQuery).not.toHaveBeenCalled()
   })

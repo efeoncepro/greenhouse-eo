@@ -403,12 +403,27 @@ const ReceiptDocument = ({ entry, period }: { entry: PayrollEntry; period: Payro
     ['Días licencia no remunerada', String(entry.daysOnUnpaidLeave ?? 0)]
   ] : []
 
-  const deductionRows: [string, string][] = isChile ? [
-    [`AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`, fmtCurrency(entry.chileAfpAmount, currency)],
-    [`Salud (${entry.chileHealthSystem ?? '—'})`, fmtCurrency(entry.chileHealthAmount, currency)],
-    [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, fmtCurrency(entry.chileUnemploymentAmount, currency)],
-    ['Impuesto único', fmtCurrency(entry.chileTaxAmount, currency)]
-  ] : []
+  const deductionRows: [string, string][] = []
+
+  if (isChile) {
+    deductionRows.push([
+      `AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`,
+      fmtCurrency(entry.chileAfpAmount, currency)
+    ])
+
+    if (entry.chileAfpCotizacionAmount != null || entry.chileAfpComisionAmount != null) {
+      deductionRows.push(
+        ['↳ Cotización', fmtCurrency(entry.chileAfpCotizacionAmount, currency)],
+        ['↳ Comisión', fmtCurrency(entry.chileAfpComisionAmount, currency)]
+      )
+    }
+
+    deductionRows.push(
+      [`Salud (${entry.chileHealthSystem ?? '—'})`, fmtCurrency(entry.chileHealthAmount, currency)],
+      [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, fmtCurrency(entry.chileUnemploymentAmount, currency)],
+      ['Impuesto único', fmtCurrency(entry.chileTaxAmount, currency)]
+    )
+  }
 
   if (isChile && entry.chileApvAmount != null && entry.chileApvAmount > 0) {
     deductionRows.push(['APV', fmtCurrency(entry.chileApvAmount, currency)])

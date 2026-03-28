@@ -92,6 +92,7 @@ type ChileAfpRateSnapshot = {
   periodYear: number
   periodMonth: number
   afpName: string
+  workerRate: number
   totalRate: number
   source: string
   isActive: boolean
@@ -232,6 +233,7 @@ const parseAfpRateRow = (
   periodYear: number,
   periodMonth: number,
   afpName: string,
+  workerRate: unknown,
   totalRate: unknown
 ): ChileAfpRateSnapshot | null => {
   const normalizedName = normalizeString(afpName)
@@ -251,6 +253,7 @@ const parseAfpRateRow = (
     periodYear,
     periodMonth,
     afpName: normalizedName,
+    workerRate: parseGaelPercent(workerRate),
     totalRate: parsedRate,
     source: SOURCE_LABEL,
     isActive: true
@@ -264,18 +267,18 @@ export const parsePreviredAfpRates = (payload: GaelPreviredPayload): ChileAfpRat
     throw new Error('Gael Previred payload is missing a valid PeriodoMY value.')
   }
 
-  const entries: Array<[string, unknown]> = [
-    ['Capital', payload.AFPCapitalTasaDepAPagar],
-    ['Cuprum', payload.AFPCuprumTasaDepAPagar],
-    ['Habitat', payload.AFPHabitatTasaDepAPagar],
-    ['PlanVital', payload.AFPPlanVitalTasaDepAPagar],
-    ['ProVida', payload.AFPProVidaTasaDepAPagar],
-    ['Modelo', payload.AFPModeloTasaDepAPagar],
-    ['Uno', payload.AFPUnoTasaDepAPagar]
+  const entries: Array<[string, unknown, unknown]> = [
+    ['Capital', payload.AFPCapitalTasaDepTrab, payload.AFPCapitalTasaDepAPagar],
+    ['Cuprum', payload.AFCuprumTasaDepTrab, payload.AFPCuprumTasaDepAPagar],
+    ['Habitat', payload.AFPHabitatTasaDepTrab, payload.AFPHabitatTasaDepAPagar],
+    ['PlanVital', payload.AFPPlanVitalTasaDepTrab, payload.AFPPlanVitalTasaDepAPagar],
+    ['ProVida', payload.AFPProVidaTasaDepTrab, payload.AFPProVidaTasaDepAPagar],
+    ['Modelo', payload.AFPModeloTasaDepTrab, payload.AFPModeloTasaDepAPagar],
+    ['Uno', payload.AFPUnoTasaDepTrab, payload.AFPUnoTasaDepAPagar]
   ]
 
   return entries
-    .map(([name, rate]) => parseAfpRateRow(parsedPeriod.year, parsedPeriod.month, name, rate))
+    .map(([name, workerRate, rate]) => parseAfpRateRow(parsedPeriod.year, parsedPeriod.month, name, workerRate, rate))
     .filter((row): row is ChileAfpRateSnapshot => row !== null)
 }
 
@@ -489,6 +492,7 @@ const upsertAfpRates = async (
           period_year,
           period_month,
           afp_name,
+          worker_rate,
           total_rate,
           source,
           is_active,
@@ -504,15 +508,16 @@ const upsertAfpRates = async (
           updated_at = CURRENT_TIMESTAMP
       `,
       [
-        row.afpRateId,
-        row.periodYear,
-        row.periodMonth,
-        row.afpName,
-        row.totalRate,
-        row.source,
-        row.isActive
-      ]
-    )
+          row.afpRateId,
+          row.periodYear,
+          row.periodMonth,
+          row.afpName,
+          row.workerRate,
+          row.totalRate,
+          row.source,
+          row.isActive
+        ]
+      )
   }
 
   return rows.length

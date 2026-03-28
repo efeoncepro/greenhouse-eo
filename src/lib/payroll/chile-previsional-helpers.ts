@@ -5,8 +5,82 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
 import { normalizeString, toNumber } from '@/lib/payroll/shared'
 
+export type ChileAfpSplitRates = {
+  cotizacionRate: number
+  comisionRate: number
+}
+
+export const resolveChileAfpSplitRates = ({
+  totalRate,
+  cotizacionRate,
+  comisionRate
+}: {
+  totalRate: number | null
+  cotizacionRate: number | null
+  comisionRate: number | null
+}): ChileAfpSplitRates | null => {
+  const isFiniteRate = (value: unknown): value is number =>
+    typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1
+
+  const hasCot = isFiniteRate(cotizacionRate)
+  const hasCom = isFiniteRate(comisionRate)
+  const hasTotal = isFiniteRate(totalRate)
+
+  if (!hasCot && !hasCom && !hasTotal) {
+    return null
+  }
+
+  if (hasCot && hasCom) {
+    return {
+      cotizacionRate,
+      comisionRate
+    }
+  }
+
+  if (hasTotal && hasCot) {
+    return {
+      cotizacionRate,
+      comisionRate: Math.max(0, totalRate - cotizacionRate)
+    }
+  }
+
+  if (hasTotal && hasCom) {
+    return {
+      cotizacionRate: Math.max(0, totalRate - comisionRate),
+      comisionRate
+    }
+  }
+
+  if (hasTotal) {
+    // Conservative default: 10% mandatory contribution, commission is the remainder.
+    const defaultCotizacion = Math.min(0.1, totalRate)
+
+    return {
+      cotizacionRate: defaultCotizacion,
+      comisionRate: Math.max(0, totalRate - defaultCotizacion)
+    }
+  }
+
+  // Only one split rate present but no total: treat missing part as 0.
+  return {
+    cotizacionRate: hasCot ? cotizacionRate : 0,
+    comisionRate: hasCom ? comisionRate : 0
+  }
+}
+
 export type ChileAfpRateSnapshot = {
   afpName: string
+  workerRate: number
+  totalRate: number
+  periodYear: number
+  periodMonth: number
+  source: string
+}
+
+export type ChileAfpRateSplitSnapshot = {
+  afpName: string
+  cotizacionRate: number
+  comisionRate: number
   totalRate: number
   periodYear: number
   periodMonth: number
@@ -189,6 +263,7 @@ export const getChileAfpRatesForPeriod = async ({
   // to the compensation-provided rate.
   const chileRows = await runGreenhousePostgresQuery<{
     afp_name: string
+    worker_rate: number | string
     total_rate: number | string
     source: string | null
     period_year: number | string
@@ -197,6 +272,7 @@ export const getChileAfpRatesForPeriod = async ({
     `
       SELECT
         afp_name,
+        worker_rate,
         total_rate,
         source,
         period_year,
@@ -215,6 +291,7 @@ export const getChileAfpRatesForPeriod = async ({
       .filter(r => normalizeString(r.afp_name))
       .map(r => ({
         afpName: normalizeString(r.afp_name),
+        workerRate: toNumber(r.worker_rate),
         totalRate: toNumber(r.total_rate),
         source: normalizeString(r.source) || 'manual',
         periodYear: Number(r.period_year),
@@ -225,6 +302,7 @@ export const getChileAfpRatesForPeriod = async ({
 
   return runGreenhousePostgresQuery<{
     afp_name: string
+    worker_rate: number | string
     total_rate: number | string
     source: string | null
     period_year: number | string
@@ -233,6 +311,7 @@ export const getChileAfpRatesForPeriod = async ({
     `
       SELECT
         afp_name,
+        worker_rate,
         total_rate,
         source,
         period_year,
@@ -247,11 +326,12 @@ export const getChileAfpRatesForPeriod = async ({
     .then(rows =>
       rows
         .filter(r => normalizeString(r.afp_name))
-        .map(r => ({
-          afpName: normalizeString(r.afp_name),
-          totalRate: toNumber(r.total_rate),
-          source: normalizeString(r.source) || 'manual',
-          periodYear: Number(r.period_year),
+      .map(r => ({
+        afpName: normalizeString(r.afp_name),
+        workerRate: toNumber(r.worker_rate),
+        totalRate: toNumber(r.total_rate),
+        source: normalizeString(r.source) || 'manual',
+        periodYear: Number(r.period_year),
           periodMonth: Number(r.period_month)
         }))
         .filter(r => Number.isFinite(r.totalRate) && r.totalRate >= 0 && r.totalRate <= 1)
@@ -345,4 +425,49 @@ export const resolveChileAfpRateForCompensation = async ({
   const partial = rates.find(r => normalizeAfpNameKey(r.afpName).includes(desiredKey) || desiredKey.includes(normalizeAfpNameKey(r.afpName)))
 
   return partial?.totalRate ?? null
+}
+
+export const resolveChileAfpRateSplitForCompensation = async ({
+  year,
+  month,
+  afpName,
+  afpRate
+}: {
+  year: number
+  month: number
+  afpName: string | null
+  afpRate: number | null
+}): Promise<ChileAfpRateSplitSnapshot | null> => {
+  const normalizedName = normalizeString(afpName)
+  const rates = normalizedName ? await getChileAfpRatesForPeriod({ year, month }) : []
+
+  const desiredKey = normalizeAfpNameKey(normalizedName)
+  const exact = rates.find(r => normalizeAfpNameKey(r.afpName) === desiredKey)
+  const partial =
+    exact ??
+    rates.find(
+      r =>
+        normalizeAfpNameKey(r.afpName).includes(desiredKey) ||
+        desiredKey.includes(normalizeAfpNameKey(r.afpName))
+    )
+
+  const totalRate =
+    partial?.totalRate ??
+    (typeof afpRate === 'number' && Number.isFinite(afpRate) && afpRate > 0 ? afpRate : null)
+
+  if (totalRate === null) {
+    return null
+  }
+
+  const cotizacionRate = partial?.workerRate ?? totalRate
+
+  return {
+    afpName: partial?.afpName ?? normalizedName,
+    cotizacionRate,
+    comisionRate: Math.max(0, totalRate - cotizacionRate),
+    totalRate,
+    periodYear: year,
+    periodMonth: month,
+    source: partial?.source || 'manual'
+  }
 }

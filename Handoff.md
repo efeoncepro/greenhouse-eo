@@ -49,6 +49,125 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 03:41 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el slice de `TASK-076` para AFP Chile, guardando el split `cotización/comisión` en compensación y payroll entries, y dejarlo visible en exports/recibos sin romper compatibilidad con el total AFP.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local + staging
+
+### Archivos tocados
+
+- `scripts/migrations/add-chile-afp-breakdown.sql`
+- `scripts/setup-postgres-payroll.sql`
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/calculate-chile-deductions.test.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/chile-previsional-helpers.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/export-payroll.test.ts`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/lib/payroll/generate-payroll-pdf.tsx`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/payroll-entry-explain.test.ts`
+- `src/lib/payroll/payroll-readiness.test.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/previred-sync.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/types/payroll.ts`
+- `src/views/greenhouse/payroll/ChileDeductionBreakdown.tsx`
+- `src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptCard.tsx`
+- `src/views/greenhouse/payroll/helpers.test.ts`
+
+### Verificacion
+
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm test src/lib/payroll/calculate-chile-deductions.test.ts src/lib/payroll/export-payroll.test.ts src/lib/payroll/payroll-entry-explain.test.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/views/greenhouse/payroll/PayrollEntryExplainDialog.test.tsx src/views/greenhouse/payroll/helpers.test.ts src/lib/payroll/payroll-readiness.test.ts`
+- `git diff --check`
+- Resultado: pasando
+
+### Riesgos o pendientes
+
+- Conviene revisar en staging el PDF y el Excel, porque el cálculo ya quedó consistente pero las representaciones visuales apenas fueron ajustadas y merece un smoke visual.
+- Aún queda remanente de `TASK-076` en Isapre/costos empleador, pero el split AFP ya no es un gap abierto.
+
+## 2026-03-28 03:30 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Validar en `staging` que el deployment nuevo de `Payroll Chile` ya expone `colación` y `movilización` en la nómina proyectada, y cerrar el smoke real con Valentina Hoyos.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/calculate-chile-deductions.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/export-payroll.ts`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/lib/payroll/generate-payroll-pdf.tsx`
+- `src/lib/payroll/get-compensation.ts`
+- `src/lib/payroll/get-payroll-entries.ts`
+- `src/lib/payroll/persist-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/schema.ts`
+- `src/types/payroll.ts`
+- `src/views/greenhouse/payroll/ChileDeductionBreakdown.tsx`
+- `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryExplainDialog.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptCard.tsx`
+- `src/views/greenhouse/payroll/ProjectedPayrollView.tsx`
+- `scripts/migrations/add-chile-colacion-movilizacion.sql`
+
+### Verificacion
+
+- `vercel alias ls` y `vercel inspect greenhouse-mk7eglbat-efeonce-7670142f.vercel.app`
+  - staging apuntó al deployment `greenhouse-mk7eglbat-efeonce-7670142f.vercel.app`
+  - status: `Ready`
+- Smoke manual en `https://dev-greenhouse.efeoncepro.com/hr/payroll/projected`
+  - `Valentina Hoyos` pasó de `CLP $437.077` a `CLP $596.257` al incorporar `colación` y `movilización`
+  - la fila proyectada ahora muestra `Bruto $832.121`, `Variable $0`, `Descuentos $-235.864`, `Neto $596.257`
+- Smoke manual en `https://dev-greenhouse.efeoncepro.com/people/valentina-hoyos`
+  - la compensación vigente `valentina-hoyos_v1` fue actualizada por PATCH con:
+    - `baseSalary = 539000`
+    - `colacionAmount = 83371`
+    - `movilizacionAmount = 75000`
+    - `gratificacionLegalMode = mensual_25pct`
+    - `afpRate = 0.1046`
+    - `healthSystem = isapre`
+    - `healthPlanUf = 4.0497`
+
+### Riesgos o pendientes
+
+- El smoke valida la liquidación proyectada completa para Valentina con el nuevo deploy, pero todavía conviene revisar el PDF/export final para confirmar que la visualización de haberes no imponibles coincide exactamente en todos los formatos.
+- `Payroll projected` ya refleja el contrato nuevo; el siguiente paso natural es cerrar la documentación del slice y seguir con el remanente de `TASK-076`.
+
 ## 2026-03-28 03:14 -03
 
 ### Agente

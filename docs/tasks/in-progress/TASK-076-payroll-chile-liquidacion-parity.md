@@ -1,6 +1,11 @@
 # TASK-076 — Payroll Chile: Paridad con Liquidación Legal
 
 ## Delta 2026-03-28
+- `AFP` de Payroll Chile ya no se guarda y expone como un único monto opaco: ahora la compensación versionada, los payroll entries y las salidas operativas mantienen `cotización` y `comisión` como columnas separadas, además del total agregado.
+- El cálculo forward sigue usando el total AFP para imponibles y neto, pero la trazabilidad legal ya permite explicar y exportar el split sin romper compatibilidad histórica.
+- Se agregó migration `scripts/migrations/add-chile-afp-breakdown.sql` para expandir el esquema de PostgreSQL y backfillear el split en compensaciones/entries existentes.
+
+## Delta 2026-03-28
 - Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos un smoke de nómina Chile con IMM sembrado en `539000`.
 - Resultado validado del motor core:
   - `baseSalary = 539000`
@@ -15,6 +20,16 @@
   - el gap restante histórico era la modelación de los haberes no imponibles `colación` y `movilización`
 - `colación` y `movilización` ya quedaron modelados como haberes canónicos y versionados en compensación/entries, manteniendo su carácter no imponible
 - No se introdujo ningún evento nuevo; la propagación sigue por `compensation_version.created/updated` y `payroll_entry.upserted`.
+- Smoke de staging posterior al despliegue correcto:
+  - `Valentina Hoyos` pasó de `CLP 437.077` a `CLP 596.257` al incluir `colación` y `movilización`
+  - la compensación vigente `valentina-hoyos_v1` quedó actualizada con:
+    - `baseSalary = 539000`
+    - `gratificacionLegalMode = mensual_25pct`
+    - `afpRate = 0.1046`
+    - `healthSystem = isapre`
+    - `healthPlanUf = 4.0497`
+    - `colacionAmount = 83371`
+    - `movilizacionAmount = 75000`
 
 ## Status
 

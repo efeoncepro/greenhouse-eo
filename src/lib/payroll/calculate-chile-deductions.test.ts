@@ -2,9 +2,17 @@ import { describe, expect, it, vi } from 'vitest'
 
 const mockGetImmForPeriod = vi.fn(async () => 1_200_000)
 
-vi.mock('@/lib/payroll/chile-previsional-helpers', () => ({
-  getImmForPeriod: async () => mockGetImmForPeriod()
-}))
+vi.mock('@/lib/payroll/chile-previsional-helpers', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/payroll/chile-previsional-helpers')>(
+    '@/lib/payroll/chile-previsional-helpers'
+  )
+
+  return {
+    ...actual,
+    getImmForPeriod: async () => mockGetImmForPeriod(),
+    resolveChileAfpRateSplitForCompensation: async () => null
+  }
+})
 
 import { calculatePayrollTotals } from './calculate-chile-deductions'
 
@@ -125,6 +133,8 @@ describe('calculatePayrollTotals', () => {
       gratificacionLegalMode: 'ninguna',
       afpName: 'Modelo',
       afpRate: 0,
+      afpCotizacionRate: 0,
+      afpComisionRate: 0,
       healthSystem: 'isapre',
       healthPlanUf: 0,
       unemploymentRate: 0,
@@ -139,5 +149,7 @@ describe('calculatePayrollTotals', () => {
     expect(totals.chileTaxableBase).toBe(1000)
     expect(totals.netTotalCalculated).toBe(1150)
     expect(totals.grossTotal).toBe(1150)
+    expect(totals.chileAfpCotizacionAmount).toBe(0)
+    expect(totals.chileAfpComisionAmount).toBe(0)
   })
 })

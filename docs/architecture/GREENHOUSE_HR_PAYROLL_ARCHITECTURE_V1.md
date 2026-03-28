@@ -53,6 +53,17 @@ Estos montos:
 - se incluyen en el devengado y en el neto calculado
 - no requieren un evento reactivo nuevo para propagarse; siguen el contrato canónico de `compensation_version.created/updated` y `payroll_entry.upserted`
 
+## 2.2. Chile AFP split traceability
+
+`Payroll Chile` también mantiene la trazabilidad de `AFP` con dos componentes separados:
+- `cotización`
+- `comisión`
+
+Regla arquitectónica:
+- la compensación versionada y los payroll entries conservan ambos montos además del total agregado
+- el cálculo legal puede seguir consumiendo el total AFP para imponibles y neto, pero las salidas oficiales deben mostrar el split cuando exista
+- el contrato canónico no depende de un evento nuevo; se propaga con `compensation_version.created/updated` y `payroll_entry.upserted`
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

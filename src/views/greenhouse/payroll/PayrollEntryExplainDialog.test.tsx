@@ -44,6 +44,8 @@ describe('PayrollEntryExplainDialog', () => {
             chileAfpName: null,
             chileAfpRate: null,
             chileAfpAmount: null,
+            chileAfpCotizacionAmount: null,
+            chileAfpComisionAmount: null,
             chileHealthSystem: null,
             chileHealthAmount: null,
             chileUnemploymentRate: null,

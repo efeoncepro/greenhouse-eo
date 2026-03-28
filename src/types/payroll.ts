@@ -59,6 +59,8 @@ export interface CompensationVersion {
   gratificacionLegalMode: GratificacionLegalMode
   afpName: string | null
   afpRate: number | null
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
   healthSystem: HealthSystem | null
   healthPlanUf: number | null
   unemploymentRate: number
@@ -90,6 +92,8 @@ export interface CreateCompensationVersionInput {
   gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
@@ -116,6 +120,8 @@ export interface UpdateCompensationVersionInput {
   gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
@@ -195,6 +201,8 @@ export interface PayrollEntry {
   chileAfpName: string | null
   chileAfpRate: number | null
   chileAfpAmount: number | null
+  chileAfpCotizacionAmount: number | null
+  chileAfpComisionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
   chileUnemploymentRate: number | null

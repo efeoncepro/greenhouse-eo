@@ -236,6 +236,18 @@ const PayrollEntryExplainDialog = ({ open, entryId, memberName, onClose }: Props
                       : null
                   })()}
                   <DetailItem
+                    label='AFP total'
+                    value={formatCurrency(data.entry.chileAfpAmount, data.entry.currency)}
+                  />
+                  <DetailItem
+                    label='AFP cotización'
+                    value={formatCurrency(data.entry.chileAfpCotizacionAmount, data.entry.currency)}
+                  />
+                  <DetailItem
+                    label='AFP comisión'
+                    value={formatCurrency(data.entry.chileAfpComisionAmount, data.entry.currency)}
+                  />
+                  <DetailItem
                     label='Bonos variables totales'
                     value={formatCurrency(data.calculation.totalVariableBonus, data.entry.currency)}
                   />

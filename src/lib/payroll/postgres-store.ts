@@ -40,6 +40,7 @@ import {
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 // ---------------------------------------------------------------------------
@@ -68,6 +69,8 @@ type PgCompensationRow = {
   gratificacion_legal_mode: string | null
   afp_name: string | null
   afp_rate: number | string | null
+  afp_cotizacion_rate: number | string | null
+  afp_comision_rate: number | string | null
   health_system: string | null
   health_plan_uf: number | string | null
   unemployment_rate: number | string | null
@@ -161,6 +164,8 @@ type PgEntryRow = {
   chile_afp_name: string | null
   chile_afp_rate: number | string | null
   chile_afp_amount: number | string | null
+  chile_afp_cotizacion_amount: number | string | null
+  chile_afp_comision_amount: number | string | null
   chile_health_system: string | null
   chile_health_amount: number | string | null
   chile_unemployment_rate: number | string | null
@@ -377,6 +382,12 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
   const effectiveFrom = toPgDateString(row.effective_from) || ''
   const effectiveTo = toPgDateString(row.effective_to)
   const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
+  const afpRate = toNullableNumber(row.afp_rate)
+  const resolvedAfpSplitRates = resolveChileAfpSplitRates({
+    totalRate: afpRate,
+    cotizacionRate: toNullableNumber(row.afp_cotizacion_rate),
+    comisionRate: toNullableNumber(row.afp_comision_rate)
+  })
 
   return {
     versionId: row.version_id,
@@ -400,7 +411,9 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     bonusRpaMax: toNumber(row.bonus_rpa_max),
     gratificacionLegalMode: normalizeGratificacionLegalMode(row.gratificacion_legal_mode, payRegime),
     afpName: normalizeNullableString(row.afp_name),
-    afpRate: toNullableNumber(row.afp_rate),
+    afpRate,
+    afpCotizacionRate: payRegime === 'chile' ? resolvedAfpSplitRates?.cotizacionRate ?? null : null,
+    afpComisionRate: payRegime === 'chile' ? resolvedAfpSplitRates?.comisionRate ?? null : null,
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
@@ -469,6 +482,8 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   chileAfpName: normalizeNullableString(row.chile_afp_name),
   chileAfpRate: toNullableNumber(row.chile_afp_rate),
   chileAfpAmount: toNullableNumber(row.chile_afp_amount),
+  chileAfpCotizacionAmount: toNullableNumber(row.chile_afp_cotizacion_amount),
+  chileAfpComisionAmount: toNullableNumber(row.chile_afp_comision_amount),
   chileHealthSystem: normalizeNullableString(row.chile_health_system),
   chileHealthAmount: toNullableNumber(row.chile_health_amount),
   chileUnemploymentRate: toNullableNumber(row.chile_unemployment_rate),
@@ -551,6 +566,8 @@ const COMPENSATION_BASE_SELECT = `
     cv.gratificacion_legal_mode,
     cv.afp_name,
     cv.afp_rate,
+    cv.afp_cotizacion_rate,
+    cv.afp_comision_rate,
     cv.health_system,
     cv.health_plan_uf,
     cv.unemployment_rate,
@@ -640,6 +657,8 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         cv.gratificacion_legal_mode,
         cv.afp_name,
         cv.afp_rate,
+        cv.afp_cotizacion_rate,
+        cv.afp_comision_rate,
         cv.health_system,
         cv.health_plan_uf,
         cv.unemployment_rate,
@@ -703,6 +722,14 @@ export const pgCreateCompensationVersion = async ({
 
   if (input.afpRate !== undefined && input.afpRate !== null) {
     parsePayrollNumber(input.afpRate, 'afpRate', { min: 0, max: 1 })
+  }
+
+  if (input.afpCotizacionRate !== undefined && input.afpCotizacionRate !== null) {
+    parsePayrollNumber(input.afpCotizacionRate, 'afpCotizacionRate', { min: 0, max: 1 })
+  }
+
+  if (input.afpComisionRate !== undefined && input.afpComisionRate !== null) {
+    parsePayrollNumber(input.afpComisionRate, 'afpComisionRate', { min: 0, max: 1 })
   }
 
   if (input.healthPlanUf !== undefined && input.healthPlanUf !== null) {
@@ -807,6 +834,11 @@ export const pgCreateCompensationVersion = async ({
 
     const today = getCurrentDateString()
     const isCurrent = effectiveFrom <= today && (!nextScheduledFrom || nextScheduledFrom > today)
+    const resolvedAfpSplitRates = resolveChileAfpSplitRates({
+      totalRate: input.afpRate ?? null,
+      cotizacionRate: input.afpCotizacionRate ?? null,
+      comisionRate: input.afpComisionRate ?? null
+    })
 
     // Close covering version
     if (coveringVersion) {
@@ -828,7 +860,7 @@ export const pgCreateCompensationVersion = async ({
           version_id, member_id, version, pay_regime, currency,
           base_salary, remote_allowance, colacion_amount, movilizacion_amount, fixed_bonus_label, fixed_bonus_amount,
           bonus_otd_min, bonus_otd_max, bonus_rpa_min, bonus_rpa_max, gratificacion_legal_mode,
-          afp_name, afp_rate, health_system, health_plan_uf,
+          afp_name, afp_rate, afp_cotizacion_rate, afp_comision_rate, health_system, health_plan_uf,
           unemployment_rate, contract_type, has_apv, apv_amount,
           effective_from, effective_to, is_current,
           change_reason, created_by_user_id
@@ -836,12 +868,11 @@ export const pgCreateCompensationVersion = async ({
         VALUES (
           $1, $2, $3, $4, $5,
           $6, $7, $8, $9, $10, $11,
-          $12, $13, $14, $15,
-          $16, $17, $18, $19,
-          $20, $21, $22, $23,
-          $24::date, $25, $26,
-          $27, $28,
-          $29
+          $12, $13, $14, $15, $16,
+          $17, $18, $19, $20, $21, $22,
+          $23, $24, $25, $26,
+          $27::date, $28, $29,
+          $30, $31
         )
       `,
       [
@@ -852,6 +883,8 @@ export const pgCreateCompensationVersion = async ({
         Number(input.bonusRpaMin ?? 0), Number(input.bonusRpaMax ?? 0),
         normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
         normalizeNullableString(input.afpName), input.afpRate ?? null,
+        resolvedAfpSplitRates?.cotizacionRate ?? null,
+        resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null, input.healthPlanUf ?? null,
         input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
         input.contractType ?? 'indefinido', Boolean(input.hasApv), Number(input.apvAmount ?? 0),
@@ -916,6 +949,14 @@ export const pgUpdateCompensationVersion = async ({
     parsePayrollNumber(input.afpRate, 'afpRate', { min: 0, max: 1 })
   }
 
+  if (input.afpCotizacionRate !== undefined && input.afpCotizacionRate !== null) {
+    parsePayrollNumber(input.afpCotizacionRate, 'afpCotizacionRate', { min: 0, max: 1 })
+  }
+
+  if (input.afpComisionRate !== undefined && input.afpComisionRate !== null) {
+    parsePayrollNumber(input.afpComisionRate, 'afpComisionRate', { min: 0, max: 1 })
+  }
+
   if (input.healthPlanUf !== undefined && input.healthPlanUf !== null) {
     parsePayrollNumber(input.healthPlanUf, 'healthPlanUf', { min: 0 })
   }
@@ -931,6 +972,12 @@ export const pgUpdateCompensationVersion = async ({
   if (Number(input.bonusRpaMax ?? 0) < Number(input.bonusRpaMin ?? 0)) {
     throw new PayrollValidationError('bonusRpaMax must be greater than or equal to bonusRpaMin.')
   }
+
+  const resolvedAfpSplitRates = resolveChileAfpSplitRates({
+    totalRate: input.afpRate ?? null,
+    cotizacionRate: input.afpCotizacionRate ?? null,
+    comisionRate: input.afpComisionRate ?? null
+  })
 
   return withGreenhousePostgresTransaction(async client => {
     const [versionRow] = await queryRows<PgCompensationRow>(
@@ -1004,14 +1051,16 @@ export const pgUpdateCompensationVersion = async ({
           gratificacion_legal_mode = $13,
           afp_name = $14,
           afp_rate = $15,
-          health_system = $16,
-          health_plan_uf = $17,
-          unemployment_rate = $18,
-          contract_type = $19,
-          has_apv = $20,
-          apv_amount = $21,
-          change_reason = $22
-        WHERE version_id = $23
+          afp_cotizacion_rate = $16,
+          afp_comision_rate = $17,
+          health_system = $18,
+          health_plan_uf = $19,
+          unemployment_rate = $20,
+          contract_type = $21,
+          has_apv = $22,
+          apv_amount = $23,
+          change_reason = $24
+        WHERE version_id = $25
       `,
       [
         input.payRegime,
@@ -1029,6 +1078,8 @@ export const pgUpdateCompensationVersion = async ({
         normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
         normalizeNullableString(input.afpName),
         input.afpRate ?? null,
+        resolvedAfpSplitRates?.cotizacionRate ?? null,
+        resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null,
         input.healthPlanUf ?? null,
         input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
@@ -1486,6 +1537,8 @@ const ENTRY_BASE_SELECT = `
     e.chile_afp_name,
     e.chile_afp_rate,
     e.chile_afp_amount,
+    e.chile_afp_cotizacion_amount,
+    e.chile_afp_comision_amount,
     e.chile_gratificacion_legal,
     e.chile_colacion_amount,
     e.chile_movilizacion_amount,
@@ -1592,7 +1645,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           gross_total,
           chile_gratificacion_legal,
           chile_colacion_amount, chile_movilizacion_amount,
-          chile_afp_name, chile_afp_rate, chile_afp_amount,
+          chile_afp_name, chile_afp_rate, chile_afp_amount, chile_afp_cotizacion_amount, chile_afp_comision_amount,
           chile_health_system, chile_health_amount,
           chile_unemployment_rate, chile_unemployment_amount,
           chile_taxable_base, chile_tax_amount, chile_apv_amount, chile_uf_value,
@@ -1613,15 +1666,17 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           $20, $21, $22, $23,
           $24,
           $25, $26, $27, $28,
-          $29, $30,
-          $31, $32,
-          $33, $34, $35, $36,
-          $37,
-          $38, $39, $40,
-          $41, $42,
-          $43, $44, $45,
-          $46, $47, $48, $49,
-          $50, $51
+          $29, $30, $31, $32,
+          $33, $34,
+          $35, $36,
+          $37, $38, $39, $40,
+          $41,
+          $42, $43, $44,
+          $45, $46,
+          $47, $48,
+          $49, $50, $51,
+          $52, $53,
+          $54, $55, $56, $57, $58
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1651,6 +1706,8 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_afp_name = EXCLUDED.chile_afp_name,
           chile_afp_rate = EXCLUDED.chile_afp_rate,
           chile_afp_amount = EXCLUDED.chile_afp_amount,
+          chile_afp_cotizacion_amount = EXCLUDED.chile_afp_cotizacion_amount,
+          chile_afp_comision_amount = EXCLUDED.chile_afp_comision_amount,
           chile_health_system = EXCLUDED.chile_health_system,
           chile_health_amount = EXCLUDED.chile_health_amount,
           chile_unemployment_rate = EXCLUDED.chile_unemployment_rate,
@@ -1689,7 +1746,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.grossTotal,
         entry.chileGratificacionLegalAmount,
         entry.chileColacionAmount, entry.chileMovilizacionAmount,
-        entry.chileAfpName, entry.chileAfpRate, entry.chileAfpAmount,
+        entry.chileAfpName, entry.chileAfpRate, entry.chileAfpAmount, entry.chileAfpCotizacionAmount, entry.chileAfpComisionAmount,
         entry.chileHealthSystem, entry.chileHealthAmount,
         entry.chileUnemploymentRate, entry.chileUnemploymentAmount,
         entry.chileTaxableBase, entry.chileTaxAmount, entry.chileApvAmount, entry.chileUfValue,
