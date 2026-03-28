@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { useOperatingEntity } from '@/context/OperatingEntityContext'
 import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import PayrollReceiptCard from './PayrollReceiptCard'
 
@@ -18,7 +19,13 @@ type Props = {
 }
 
 const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
+  const operatingEntity = useOperatingEntity()
+
   if (!entry) return null
+
+  const employerInfo = operatingEntity
+    ? { legalName: operatingEntity.legalName, taxId: operatingEntity.taxId, legalAddress: operatingEntity.legalAddress ?? undefined }
+    : undefined
 
   const handleDownload = async () => {
     try {
@@ -40,7 +47,7 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
     <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth closeAfterTransition={false}>
       <DialogTitle>Recibo — {entry.memberName}</DialogTitle>
       <DialogContent dividers>
-        <PayrollReceiptCard entry={entry} period={period} />
+        <PayrollReceiptCard entry={entry} period={period} employerInfo={employerInfo} />
       </DialogContent>
       <DialogActions>
         <Button

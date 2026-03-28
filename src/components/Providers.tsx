@@ -6,11 +6,15 @@ import type { ChildrenType, Direction } from '@core/types'
 // Context Imports
 import { VerticalNavProvider } from '@menu/contexts/verticalNavContext'
 import { SettingsProvider } from '@core/contexts/settingsContext'
+import { OperatingEntityProvider } from '@/context/OperatingEntityContext'
 import AuthSessionProvider from '@components/auth/AuthSessionProvider'
 import ThemeProvider from '@components/theme'
 
 // Styled Component Imports
 import AppReactToastify from '@/libs/styles/AppReactToastify'
+
+// Lib Imports
+import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
 
 // Util Imports
 import { getMode, getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
@@ -29,16 +33,20 @@ const Providers = async (props: Props) => {
   const settingsCookie = await getSettingsFromCookie()
   const systemMode = await getSystemMode()
 
+  const operatingEntity = session ? await getOperatingEntityIdentity() : null
+
   return (
     <AuthSessionProvider session={session}>
-      <VerticalNavProvider>
-        <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
-          <ThemeProvider direction={direction} systemMode={systemMode}>
-            {children}
-            <AppReactToastify hideProgressBar />
-          </ThemeProvider>
-        </SettingsProvider>
-      </VerticalNavProvider>
+      <OperatingEntityProvider operatingEntity={operatingEntity}>
+        <VerticalNavProvider>
+          <SettingsProvider settingsCookie={settingsCookie} mode={mode}>
+            <ThemeProvider direction={direction} systemMode={systemMode}>
+              {children}
+              <AppReactToastify hideProgressBar />
+            </ThemeProvider>
+          </SettingsProvider>
+        </VerticalNavProvider>
+      </OperatingEntityProvider>
     </AuthSessionProvider>
   )
 }

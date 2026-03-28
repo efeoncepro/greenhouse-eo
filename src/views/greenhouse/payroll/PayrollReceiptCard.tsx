@@ -163,11 +163,14 @@ const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
           <Box>
             <Box component='img' src='/branding/logo-full.svg' alt='Efeonce' sx={{ height: 28, display: 'block', mb: 0.5 }} />
-            <Typography variant='caption' color='text.secondary'>
+            <Typography variant='caption' display='block' color='text.secondary'>
               {employerInfo?.legalName ?? 'Efeonce Group SpA'}
               {employerInfo?.taxId ? ` · RUT ${employerInfo.taxId}` : ''}
             </Typography>
-            <Typography variant='body2' color='text.secondary'>Recibo de remuneraciones</Typography>
+            {employerInfo?.legalAddress && (
+              <Typography variant='caption' display='block' color='text.secondary'>{employerInfo.legalAddress}</Typography>
+            )}
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>Recibo de remuneraciones</Typography>
           </Box>
           <Box sx={{ textAlign: 'right' }}>
             <Typography variant='h6'>{monthName} {period.year}</Typography>

@@ -381,6 +381,39 @@ NextAuth.js 4.24 with three providers:
 - `spaceId`
 - `organizationId`
 
+### Operating Entity Identity
+
+The **operating entity** is the legal organization that owns and operates Greenhouse — the employer that signs payroll documents, emits DTEs, and appears on formal HR/Finance surfaces.
+
+**Resolution:**
+- Server-side: `getOperatingEntityIdentity()` in `src/lib/account-360/organization-identity.ts` queries `greenhouse_core.organizations WHERE is_operating_entity = TRUE`. Result is cached in memory (the operating entity does not change between requests).
+- Client-side: `OperatingEntityProvider` in `src/context/OperatingEntityContext.tsx` hydrates the data from the server layout into React context. Components consume via `useOperatingEntity()` hook — zero additional fetch.
+- API fallback: `GET /api/admin/operating-entity` returns the entity as JSON for non-React consumers (webhooks, external integrations, cron jobs). Requires authenticated session (`requireTenantContext`).
+
+**Shape:**
+
+| Field | Type | Example |
+|---|---|---|
+| `organizationId` | `string` | UUID |
+| `legalName` | `string` | `Efeonce Group SpA` |
+| `taxId` | `string` | `77.357.182-1` |
+| `taxIdType` | `string \| null` | `RUT` |
+| `legalAddress` | `string \| null` | `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile` |
+| `country` | `string` | `CL` |
+
+**Hydration flow:**
+```
+Layout (server) → getOperatingEntityIdentity() → Providers.tsx (server)
+  → OperatingEntityProvider (client) → useOperatingEntity() in any component
+```
+
+**Consumers:**
+- Payroll receipt card + PDF (employer header)
+- Payroll period report PDF (employer header + footer)
+- Future: Finance DTEs, HR contracts, Agency proposals, email templates
+
+**Multi-tenant readiness:** if Greenhouse becomes multi-tenant, the layout resolves per-tenant operating entity from the session scope. The provider + hook contract remains the same.
+
 ### Rules
 
 - Never trust browser-provided client or project IDs for access decisions
@@ -462,6 +495,7 @@ NextAuth.js 4.24 with three providers:
 | `/admin/roles` | Role management |
 | `/admin/ai-tools` | AI tools administration |
 | `/admin/team` | Team roster |
+| `GET /api/admin/operating-entity` | Operating entity identity (legal name, RUT, address) |
 
 ### Internal routes
 
