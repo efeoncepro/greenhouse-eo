@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-098`
+- siguiente ID disponible: `TASK-106`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -126,6 +126,7 @@ Primer bloque operativo asignado:
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](to-do/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | Diseño | **[Hardening 5/7]** Helper único `requireCronAuth()` timing-safe para 18 cron routes |
 | 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](to-do/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Diseño | **[Hardening 6/7]** PITR + slow query logging + pool size + testear restore |
 | 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
+| 33 | `TASK-105` | [TASK-105-lint-debt-stabilization.md](to-do/TASK-105-lint-debt-stabilization.md) | P1 | Alto | Alto | Parcial | **[Hardening 8/8]** Cerrar la deuda transversal de `pnpm lint` sin cambiar comportamiento |
 | 34 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 29 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 30 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

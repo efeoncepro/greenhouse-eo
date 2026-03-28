@@ -129,6 +129,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-102` | `to-do` | Database Resilience Baseline | `docs/tasks/to-do/TASK-102-database-resilience-baseline.md` |
 | `TASK-103` | `to-do` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
+| `TASK-105` | `to-do` | Lint Debt Stabilization | `docs/tasks/to-do/TASK-105-lint-debt-stabilization.md` |
 
 ## Regla de asignacion desde aqui
 
