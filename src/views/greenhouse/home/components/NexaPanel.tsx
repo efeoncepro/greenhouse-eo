@@ -60,10 +60,13 @@ const NexaPanel = ({ initialMessage }: Props) => {
     setIsLoading(true)
 
     try {
+      const recentHistory = messages.slice(-10)
+
       const response = await fetch('/api/home/nexa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, history: messages })
+        body: JSON.stringify({ prompt: text, history: recentHistory }),
+        signal: AbortSignal.timeout(15000)
       })
 
       if (!response.ok) throw new Error('Failed to chat')

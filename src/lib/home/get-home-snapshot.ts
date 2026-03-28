@@ -48,11 +48,19 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     color: 'primary' // Default color for now
   }))
 
-  // 3. Resolve Tasks (Unread Notifications)
-  const { items: notifications } = await NotificationService.getNotifications(input.userId, {
-    unreadOnly: true,
-    pageSize: 5
-  })
+  // 3. Resolve Tasks (Unread Notifications) — graceful fallback if DB unavailable
+  let notifications: Awaited<ReturnType<typeof NotificationService.getNotifications>>['items'] = []
+
+  try {
+    const result = await NotificationService.getNotifications(input.userId, {
+      unreadOnly: true,
+      pageSize: 5
+    })
+
+    notifications = result.items
+  } catch (error) {
+    console.warn('[home-snapshot] Failed to fetch notifications, continuing with empty tasks:', error instanceof Error ? error.message : error)
+  }
 
   const tasks: PendingTask[] = notifications.map(n => ({
     id: n.notification_id,
