@@ -33,6 +33,7 @@ export type ReversePayrollInput = {
   ufValue?: number | null
   taxTableVersion?: string | null
   utmValue?: number | null
+  minBaseSalary?: number
 }
 
 export type ReversePayrollResult = {
@@ -80,7 +81,8 @@ export async function computeGrossFromNet(input: ReversePayrollInput): Promise<R
     unemploymentRate = null,
     ufValue = null,
     taxTableVersion = null,
-    utmValue = null
+    utmValue = null,
+    minBaseSalary = 0
   } = input
 
   // Shared forward params (everything except baseSalary and taxAmount)
@@ -136,8 +138,8 @@ export async function computeGrossFromNet(input: ReversePayrollInput): Promise<R
     return { forward: pass1, taxAmountClp, netTotalWithTax }
   }
 
-  // --- Binary search ---
-  let lo = 0
+  // --- Binary search (lo = IMM floor when set) ---
+  let lo = minBaseSalary > 0 ? minBaseSalary : 0
   let hi = Math.max(desiredNetClp * 3, 10_000_000)
   let bestResult: Awaited<ReturnType<typeof computeNetForSalary>> | null = null
   let bestBaseSalary = 0

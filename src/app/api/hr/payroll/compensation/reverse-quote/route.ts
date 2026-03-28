@@ -76,7 +76,8 @@ export async function POST(request: Request) {
       unemploymentRate: parsePayrollNumber(body.unemploymentRate, 'unemploymentRate', { allowNull: true, min: 0, max: 1 }),
       ufValue: ufSnapshot?.value ?? null,
       taxTableVersion: buildTaxTableVersion(year, month),
-      utmValue: utmSnapshot?.value ?? null
+      utmValue: utmSnapshot?.value ?? null,
+      minBaseSalary: typeof immValue === 'number' && immValue > 0 ? immValue : 0
     })
 
     // IMM floor check
