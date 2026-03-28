@@ -46,7 +46,7 @@ type ReverseQuoteResult = {
   employerTotalCost: number | null
   isapreExcess: number | null
   netAfterIsapre: number | null
-  belowImm: boolean
+  clampedAtFloor: boolean
   immValue: number | null
   forward: {
     grossTotal: number
@@ -433,9 +433,9 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   </Alert>
                 )}
 
-                {reverseMode && reverseResult && reverseResult.converged && reverseResult.belowImm && (
+                {reverseMode && reverseResult && reverseResult.clampedAtFloor && (
                   <Alert severity='info' variant='outlined'>
-                    El sueldo base se ajustó al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). El líquido deseado mínimo con esta configuración es {fmtCLP(reverseResult.netTotalWithTax)}.
+                    El sueldo base se ajustó al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). El líquido mínimo con esta configuración es {fmtCLP(reverseResult.netTotalWithTax)}.
                   </Alert>
                 )}
               </>

@@ -45,6 +45,7 @@ export type ReversePayrollResult = {
   taxAmountClp: number
   netTotalWithTax: number
   employerTotalCost: number | null
+  clampedAtFloor: boolean
 }
 
 /**
@@ -183,14 +184,20 @@ export async function computeGrossFromNet(input: ReversePayrollInput): Promise<R
     taxAmount: bestResult.taxAmountClp
   })
 
+  // Clamped at floor: the desired net requires a base below the legal minimum.
+  // The result is valid — baseSalary = floor, and netTotalWithTax is the actual
+  // liquid at that floor (will be >= desiredNetClp).
+  const clampedAtFloor = minBaseSalary > 0 && bestBaseSalary <= minBaseSalary && bestDiff > TOLERANCE_CLP
+
   return {
-    converged: Math.abs(bestDiff) <= TOLERANCE_CLP,
+    converged: Math.abs(bestDiff) <= TOLERANCE_CLP || clampedAtFloor,
     iterations,
     baseSalary: bestBaseSalary,
     netDifferenceCLP: Math.round(bestDiff),
     forward: finalForward,
     taxAmountClp: bestResult.taxAmountClp,
     netTotalWithTax: bestResult.netTotalWithTax,
-    employerTotalCost: finalForward.chileEmployerTotalCost
+    employerTotalCost: finalForward.chileEmployerTotalCost,
+    clampedAtFloor
   }
 }

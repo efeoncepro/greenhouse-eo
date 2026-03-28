@@ -80,8 +80,7 @@ export async function POST(request: Request) {
       minBaseSalary: typeof immValue === 'number' && immValue > 0 ? immValue : 0
     })
 
-    // IMM floor check
-    const belowImm = typeof immValue === 'number' && immValue > 0 && result.baseSalary < immValue
+    const clampedAtFloor = result.clampedAtFloor
 
     // Isapre excess: compute difference between plan cost and 7% legal
     const actualHealthSystem = body.healthSystem === 'isapre' ? 'isapre' : 'fonasa'
@@ -121,7 +120,7 @@ export async function POST(request: Request) {
       },
       isapreExcess,
       netAfterIsapre,
-      belowImm,
+      clampedAtFloor,
       immValue: typeof immValue === 'number' ? immValue : null,
       indicators: {
         ufValue: ufSnapshot?.value ?? null,
