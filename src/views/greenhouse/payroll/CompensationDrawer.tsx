@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
+import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
@@ -110,6 +111,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [desiredNet, setDesiredNet] = useState(0)
   const [reverseResult, setReverseResult] = useState<ReverseQuoteResult | null>(null)
   const [reverseLoading, setReverseLoading] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const saveMode = getCompensationSaveMode({
@@ -149,6 +151,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setDesiredNet(0)
     setReverseResult(null)
     setReverseLoading(false)
+    setShowAdvanced(false)
   }, [open, ev, memberId])
 
   // Debounced reverse calculation
@@ -458,16 +461,6 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </>
             )}
 
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Bono conectividad'
-              type='number'
-              value={remoteAllowance || ''}
-              onChange={e => setRemoteAllowance(Number(e.target.value))}
-              helperText='Monto fijo mensual (ej. $50 USD)'
-            />
-
             {payRegime === 'chile' && (
               <Grid container spacing={2}>
                 <Grid size={{ xs: 6 }}>
@@ -494,6 +487,34 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                 </Grid>
               </Grid>
             )}
+
+            {reverseMode && payRegime === 'chile' && (
+              <>
+                <Divider />
+                <Button
+                  variant='text'
+                  size='small'
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+                  startIcon={<i className={showAdvanced ? 'tabler-chevron-up' : 'tabler-chevron-down'} />}
+                >
+                  {showAdvanced ? 'Ocultar parámetros' : 'Parámetros previsionales y bonos'}
+                </Button>
+              </>
+            )}
+
+            <Collapse in={!reverseMode || payRegime !== 'chile' || showAdvanced}>
+              <Stack spacing={3}>
+
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Bono conectividad'
+              type='number'
+              value={remoteAllowance || ''}
+              onChange={e => setRemoteAllowance(Number(e.target.value))}
+              helperText='Monto fijo mensual (ej. $50 USD)'
+            />
 
             <Grid container spacing={2}>
               <Grid size={{ xs: 7 }}>
@@ -594,6 +615,9 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                 )}
               </>
             )}
+
+              </Stack>
+            </Collapse>
 
             {/* Vigencia */}
             <Divider />

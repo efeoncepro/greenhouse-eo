@@ -105,7 +105,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 ## Siguiente ID disponible
 
-- `TASK-082`
+| `TASK-082` | `in-progress` | Compensation Drawer Chile UX Simplification | `docs/tasks/in-progress/TASK-082-compensation-drawer-chile-ux-simplification.md` |
+- `TASK-083`
 
 ## Regla de asignacion desde aqui
 
