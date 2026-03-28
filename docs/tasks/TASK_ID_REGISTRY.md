@@ -100,7 +100,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-078` | `in-progress` | Payroll Chile: Previsional Foundation & Forward Cutover | `docs/tasks/in-progress/TASK-078-payroll-chile-previsional-foundation.md` |
 | `TASK-079` | `to-do` | Payroll Chile: Reverse Calculation Engine | `docs/tasks/to-do/TASK-079-payroll-chile-reverse-calculation-engine.md` |
 
-| `TASK-080` | `to-do` | ICO Person Intelligence Frontend + Event Wiring | `docs/tasks/to-do/TASK-080-ico-person-intelligence-frontend.md` |
+| `TASK-080` | `complete` | ICO Person Intelligence Frontend + Event Wiring | `docs/tasks/complete/TASK-080-ico-person-intelligence-frontend.md` |
 
 ## Siguiente ID disponible
 
