@@ -49,6 +49,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 04:28 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar la documentación del costo empleador de Payroll Chile y corregir `TASK-076` para no tratar `rut` y datos bancarios como gap de modelado cuando ya existen en `HR Core`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- local
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+- `docs/tasks/in-progress/TASK-076-payroll-chile-liquidacion-parity.md`
+
+### Verificacion
+
+- `git diff --check`
+- `git status --short`
+- Resultado: limpio
+
+### Riesgos o pendientes
+
+- `TASK-076` sigue teniendo trabajo abierto en paridad legal completa, pero ya no debe arrastrar como gap el modelado de `rut` y datos bancarios.
+- El siguiente foco real queda en surfaces de consumo/exportes y en validar el smoke final de la paridad chilena.
+
 ## 2026-03-28 04:05 -03
 
 ### Agente

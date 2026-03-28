@@ -5,6 +5,10 @@
 - En esta task, el siguiente foco real pasa a ser exponer/usar ese breakdown donde falte en surfaces de consumo o exportes, no inventar otra capa de costos.
 
 ## Delta 2026-03-28
+- `rut` y los datos bancarios (`bank_name`, `bank_account_type`, `bank_account_number`) ya existen en `HR Core`, así que no son un gap de modelado de Payroll Chile sino un dato de identidad/pago ya soportado por la base canónica.
+- Si se quiere seguir ampliando esta task, el trabajo restante sería de exposición/consumo en surfaces oficiales y no de creación del modelo.
+
+## Delta 2026-03-28
 - El desglose de Isapre quedó implementado en el motor y persistencia de Payroll Chile: `chile_health_amount` sigue como total del plan, pero ahora se calculan y almacenan `chile_health_obligatoria_amount` y `chile_health_voluntaria_amount` para liquidación y exportes.
 - La proyección canónica `member_capacity_economics` ya puede absorber el costo empleador de Chile desde `payroll_entries`, reutilizando la capa de Cost Intelligence existente en vez de crear un store paralelo.
 - El siguiente gap real de este task, si se quiere seguir cerrando paridad legal completa, es exponer/usar ese breakdown de costos empleador en las surfaces de consumo apropiadas.
@@ -339,7 +343,7 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 - [ ] AFP se desglosa en cotización obligatoria + comisión
 - [ ] Isapre se desglosa en cotización obligatoria (7%) + voluntaria (excedente)
 - [x] Costos empleador (SIS, cesantía, mutual) se calculan y almacenan
-- [ ] RUT y datos bancarios modelados en members
+- [x] RUT y datos bancarios modelados en members
 - [ ] Para Valentina Hoyos con los mismos inputs, Greenhouse produce líquido = $595,656
 - [ ] `pnpm build` pasa
 - [ ] `pnpm test` pasa
