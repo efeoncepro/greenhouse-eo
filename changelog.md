@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll projected AFP helper aligned to staging schema
+- `Payroll Proyectada` seguía fallando con `column "worker_rate" does not exist`.
+- Se inspeccionó la tabla real `greenhouse_payroll.chile_afp_rates` en Cloud SQL y se confirmó que solo expone `total_rate`.
+- El helper previsional de AFP ahora toma `total_rate` como fuente de cotización cuando el split explícito no existe, evitando que la proyección dependa de una columna ausente en staging.
+
 ### Payroll projected core schema readiness split
 - `Payroll Proyectada` ya no debe depender de `greenhouse_payroll.payroll_receipts` para renderizar la proyección.
 - Se separó la verificación de schema en dos niveles:

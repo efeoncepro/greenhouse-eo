@@ -49,6 +49,40 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 05:12 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir el 500 persistente de `Payroll Proyectada` que ahora apunta a `column "worker_rate" does not exist` en la tabla `greenhouse_payroll.chile_afp_rates`.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/payroll/chile-previsional-helpers.ts`
+- `Handoff.md`
+
+### Verificacion
+
+- Se confirmó desde el browser autenticado que el endpoint seguía devolviendo `500` con el error `column "worker_rate" does not exist`.
+- Se inspeccionó `greenhouse_payroll.chile_afp_rates` en Cloud SQL y la tabla real solo tiene `total_rate`, no `worker_rate`.
+- Se ajustó el helper para usar `total_rate` como fuente de cotización en esa tabla.
+
+### Riesgos o pendientes
+
+- Falta push + redeploy para validar si el cambio ya destraba la vista proyectada.
+- Si después del deploy aparece otro 500 distinto, el siguiente paso es leer la respuesta exacta del endpoint de nuevo en el browser autenticado.
+
 ## 2026-03-28 05:07 -03
 
 ### Agente

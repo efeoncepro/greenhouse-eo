@@ -331,7 +331,6 @@ export const getChileAfpRatesForPeriod = async ({
   // to the compensation-provided rate.
   const chileRows = await runGreenhousePostgresQuery<{
     afp_name: string
-    worker_rate: number | string
     total_rate: number | string
     source: string | null
     period_year: number | string
@@ -340,7 +339,6 @@ export const getChileAfpRatesForPeriod = async ({
     `
       SELECT
         afp_name,
-        worker_rate,
         total_rate,
         source,
         period_year,
@@ -359,7 +357,7 @@ export const getChileAfpRatesForPeriod = async ({
       .filter(r => normalizeString(r.afp_name))
       .map(r => ({
         afpName: normalizeString(r.afp_name),
-        workerRate: toNumber(r.worker_rate),
+        workerRate: toNumber(r.total_rate),
         totalRate: toNumber(r.total_rate),
         source: normalizeString(r.source) || 'manual',
         periodYear: Number(r.period_year),
@@ -370,7 +368,6 @@ export const getChileAfpRatesForPeriod = async ({
 
   return runGreenhousePostgresQuery<{
     afp_name: string
-    worker_rate: number | string
     total_rate: number | string
     source: string | null
     period_year: number | string
@@ -379,7 +376,6 @@ export const getChileAfpRatesForPeriod = async ({
     `
       SELECT
         afp_name,
-        worker_rate,
         total_rate,
         source,
         period_year,
@@ -396,11 +392,11 @@ export const getChileAfpRatesForPeriod = async ({
         .filter(r => normalizeString(r.afp_name))
       .map(r => ({
         afpName: normalizeString(r.afp_name),
-        workerRate: toNumber(r.worker_rate),
+        workerRate: toNumber(r.total_rate),
         totalRate: toNumber(r.total_rate),
         source: normalizeString(r.source) || 'manual',
         periodYear: Number(r.period_year),
-          periodMonth: Number(r.period_month)
+        periodMonth: Number(r.period_month)
         }))
         .filter(r => Number.isFinite(r.totalRate) && r.totalRate >= 0 && r.totalRate <= 1)
     )
@@ -511,6 +507,7 @@ export const resolveChileAfpRateSplitForCompensation = async ({
 
   const desiredKey = normalizeAfpNameKey(normalizedName)
   const exact = rates.find(r => normalizeAfpNameKey(r.afpName) === desiredKey)
+
   const partial =
     exact ??
     rates.find(
