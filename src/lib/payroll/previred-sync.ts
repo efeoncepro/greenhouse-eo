@@ -19,7 +19,7 @@ type GaelPreviredPayload = {
   RTISegCesUF?: string | number
   AFPCapitalTasaDepTrab?: string | number
   AFPCapitalTasaDepAPagar?: string | number
-  AFCuprumTasaDepTrab?: string | number
+  AFPCuprumTasaDepTrab?: string | number
   AFPCuprumTasaDepAPagar?: string | number
   AFPHabitatTasaDepTrab?: string | number
   AFPHabitatTasaDepAPagar?: string | number
@@ -269,7 +269,7 @@ export const parsePreviredAfpRates = (payload: GaelPreviredPayload): ChileAfpRat
 
   const entries: Array<[string, unknown, unknown]> = [
     ['Capital', payload.AFPCapitalTasaDepTrab, payload.AFPCapitalTasaDepAPagar],
-    ['Cuprum', payload.AFCuprumTasaDepTrab, payload.AFPCuprumTasaDepAPagar],
+    ['Cuprum', payload.AFPCuprumTasaDepTrab, payload.AFPCuprumTasaDepAPagar],
     ['Habitat', payload.AFPHabitatTasaDepTrab, payload.AFPHabitatTasaDepAPagar],
     ['PlanVital', payload.AFPPlanVitalTasaDepTrab, payload.AFPPlanVitalTasaDepAPagar],
     ['ProVida', payload.AFPProVidaTasaDepTrab, payload.AFPProVidaTasaDepAPagar],
