@@ -123,14 +123,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [changeReason, setChangeReason] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [reverseMode, setReverseMode] = useState(false)
   const [desiredNet, setDesiredNet] = useState(0)
   const [reverseResult, setReverseResult] = useState<ReverseQuoteResult | null>(null)
   const [reverseLoading, setReverseLoading] = useState(false)
   const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const isChile = payRegime === 'chile'
-  const isChileReverse = reverseMode && isChile
   const saveMode = getCompensationSaveMode({ existingVersion: ev, effectiveFrom })
 
   useEffect(() => {
@@ -159,14 +157,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setChangeReason('')
     setSaving(false)
     setError(null)
-    setReverseMode(false)
-    setDesiredNet(0)
+    setDesiredNet(ev?.desiredNetClp ?? 0)
     setReverseResult(null)
     setReverseLoading(false)
   }, [open, ev, memberId])
 
   useEffect(() => {
-    if (!reverseMode || desiredNet <= 0 || !isChile) return
+    if (!isChile || desiredNet <= 0) return
 
     if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current)
 
@@ -212,7 +209,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
     return () => { if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current) }
   }, [
-    reverseMode, desiredNet, isChile, effectiveFrom,
+    isChile, desiredNet, effectiveFrom,
     remoteAllowance, colacionAmount, movilizacionAmount, fixedBonusAmount,
     gratificacionLegalMode, afpName, afpRate,
     healthSystem, healthPlanUf, contractType,
@@ -228,8 +225,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
       setGratificacionLegalMode(ev?.gratificacionLegalMode ?? 'mensual_25pct')
     } else {
       setGratificacionLegalMode('ninguna')
-      setReverseMode(false)
       setReverseResult(null)
+      setDesiredNet(0)
     }
   }
 
@@ -249,13 +246,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setError(null)
 
     try {
-      const resolvedChangeReason = reverseMode && desiredNet > 0 && !changeReason.includes('líquido')
-        ? `${changeReason.trim()} [Calculado desde líquido deseado: $${desiredNet.toLocaleString('es-CL')}]`
+      const resolvedChangeReason = isChile && desiredNet > 0 && !changeReason.includes('líquido')
+        ? `${changeReason.trim()} [Líquido deseado: $${desiredNet.toLocaleString('es-CL')}]`
         : changeReason.trim()
 
       const input: CreateCompensationVersionInput = {
         memberId, payRegime, currency, baseSalary,
-        desiredNetClp: reverseMode && desiredNet > 0 ? desiredNet : null,
+        desiredNetClp: isChile && desiredNet > 0 ? desiredNet : null,
         remoteAllowance,
         colacionAmount: isChile ? colacionAmount : 0,
         movilizacionAmount: isChile ? movilizacionAmount : 0,
@@ -282,7 +279,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   }
 
   const r = reverseResult
-  const previewReady = isChileReverse && r && r.converged
+  const previewReady = isChile && r && r.converged
 
   const previsionSummary = [
     afpName ? `AFP ${afpName}` : null,
@@ -317,23 +314,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </Select>
             </FormControl>
 
-            {/* ── Toggle FIRST (Chile only) — user decides mode before input ── */}
-            {isChile && (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={reverseMode} size='small'
-                    onChange={e => { setReverseMode(e.target.checked); if (!e.target.checked) { setReverseResult(null); setDesiredNet(0) } }}
-                    data-testid='reverse-mode-toggle'
-                  />
-                }
-                label={<Typography variant='body2' fontWeight={500}>Calcular desde líquido</Typography>}
-                sx={{ ml: 0 }}
-              />
-            )}
-
-            {/* ── Input: salary (manual) or líquido deseado (reverse) ── */}
-            {isChileReverse ? (
+            {/* ── Input: líquido deseado (Chile) or salary base (internacional) ── */}
+            {isChile ? (
               <CustomTextField
                 fullWidth size='small'
                 label='Líquido deseado (CLP)'
@@ -358,7 +340,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             )}
 
             {/* ── Preview (with skeleton while loading) ── */}
-            {isChileReverse && reverseLoading && !previewReady && desiredNet > 0 && (
+            {isChile && reverseLoading && !previewReady && desiredNet > 0 && (
               <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
                 <Box sx={{ p: 2 }}>
                   <Skeleton variant='text' width='40%' height={16} sx={{ mb: 1 }} />
@@ -420,10 +402,10 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </Box>
             )}
 
-            {isChileReverse && r && !r.converged && (
+            {isChile && r && !r.converged && (
               <Alert severity='warning' variant='outlined' sx={{ py: 0.5 }}>No convergió. Diferencia: {fmt(r.netDifferenceCLP)}</Alert>
             )}
-            {isChileReverse && r && r.clampedAtFloor && (
+            {isChile && r && r.clampedAtFloor && (
               <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>Base ajustada al IMM ({fmt(r.immValue)}). Líquido mínimo: {fmt(r.netTotalWithTax)}.</Alert>
             )}
 
