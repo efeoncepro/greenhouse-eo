@@ -15,9 +15,11 @@ import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
@@ -69,19 +71,18 @@ const fmt = (n: number | null | undefined) =>
     : '-'
 
 const sectionSx = {
-  p: 2,
-  borderRadius: 1.5,
-  border: '1px solid',
-  borderColor: 'divider',
+  p: 2, borderRadius: 1.5,
+  border: '1px solid', borderColor: 'divider',
   bgcolor: 'background.paper'
 } as const
 
 const accordionSx = {
-  border: '1px solid',
-  borderColor: 'divider',
+  border: '1px solid', borderColor: 'divider',
   borderRadius: '8px !important',
   '&::before': { display: 'none' }
 } as const
+
+const clpAdornment = <InputAdornment position='start'>$</InputAdornment>
 
 type Props = {
   open: boolean
@@ -122,7 +123,6 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [changeReason, setChangeReason] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const [reverseMode, setReverseMode] = useState(false)
   const [desiredNet, setDesiredNet] = useState(0)
   const [reverseResult, setReverseResult] = useState<ReverseQuoteResult | null>(null)
@@ -131,7 +131,6 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
   const isChile = payRegime === 'chile'
   const isChileReverse = reverseMode && isChile
-
   const saveMode = getCompensationSaveMode({ existingVersion: ev, effectiveFrom })
 
   useEffect(() => {
@@ -260,8 +259,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         remoteAllowance,
         colacionAmount: isChile ? colacionAmount : 0,
         movilizacionAmount: isChile ? movilizacionAmount : 0,
-        fixedBonusLabel: fixedBonusLabel.trim() || null,
-        fixedBonusAmount,
+        fixedBonusLabel: fixedBonusLabel.trim() || null, fixedBonusAmount,
         gratificacionLegalMode: isChile ? gratificacionLegalMode : 'ninguna',
         bonusOtdMin: 0, bonusOtdMax: bonusOtd,
         bonusRpaMin: 0, bonusRpaMax: bonusRpa,
@@ -293,26 +291,18 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   ].filter(Boolean).join(' · ')
 
   return (
-    <Drawer
-      anchor='right'
-      open={open}
-      onClose={onClose}
-      PaperProps={{ sx: { width: { xs: '100%', sm: 440 } } }}
-    >
+    <Drawer anchor='right' open={open} onClose={onClose} PaperProps={{ sx: { width: { xs: '100%', sm: 440 } } }}>
       <Stack sx={{ height: '100%' }}>
         {/* Header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ p: 3, pb: 2 }}>
           <Box>
-            <Typography variant='h6' fontWeight={600}>
-              {ev ? 'Editar compensación' : 'Nueva compensación'}
-            </Typography>
+            <Typography variant='h6' fontWeight={600}>{ev ? 'Editar compensación' : 'Nueva compensación'}</Typography>
             <Typography variant='body2' color='text.secondary'>{memberName}</Typography>
           </Box>
-          <IconButton onClick={onClose} size='small'>
+          <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
             <i className='tabler-x' />
           </IconButton>
         </Stack>
-
         <Divider />
 
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
@@ -327,39 +317,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </Select>
             </FormControl>
 
-            {/* ── Salario base (manual) or Líquido deseado (reverse) ── */}
-            {isChileReverse ? (
-              <Box sx={sectionSx}>
-                <Typography variant='overline' color='text.secondary' fontSize={10}>Cálculo desde líquido</Typography>
-                <Stack spacing={2} sx={{ mt: 1 }}>
-                  <CustomTextField
-                    fullWidth size='small'
-                    label='Líquido deseado (CLP)'
-                    type='number'
-                    value={desiredNet || ''}
-                    onChange={e => setDesiredNet(Number(e.target.value))}
-                    helperText='Neto contractual antes de Isapre y APV'
-                    data-testid='desired-net-input'
-                    slotProps={{ input: { endAdornment: reverseLoading ? <CircularProgress size={18} /> : null } }}
-                  />
-                </Stack>
-              </Box>
-            ) : (
-              <CustomTextField fullWidth size='small' label='Salario base' type='number' value={baseSalary || ''} onChange={e => setBaseSalary(Number(e.target.value))} />
-            )}
-
-            {/* ── Toggle reverse (Chile only) ── */}
+            {/* ── Toggle FIRST (Chile only) — user decides mode before input ── */}
             {isChile && (
               <FormControlLabel
                 control={
                   <Switch
-                    checked={reverseMode}
-                    size='small'
-                    onChange={e => {
-                      setReverseMode(e.target.checked)
-
-                      if (!e.target.checked) { setReverseResult(null); setDesiredNet(0) }
-                    }}
+                    checked={reverseMode} size='small'
+                    onChange={e => { setReverseMode(e.target.checked); if (!e.target.checked) { setReverseResult(null); setDesiredNet(0) } }}
                     data-testid='reverse-mode-toggle'
                   />
                 }
@@ -368,12 +332,56 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               />
             )}
 
-            {/* ── Reverse preview ── */}
+            {/* ── Input: salary (manual) or líquido deseado (reverse) ── */}
+            {isChileReverse ? (
+              <CustomTextField
+                fullWidth size='small'
+                label='Líquido deseado (CLP)'
+                type='number'
+                value={desiredNet || ''}
+                onChange={e => setDesiredNet(Number(e.target.value))}
+                helperText='Neto contractual antes de Isapre y APV'
+                data-testid='desired-net-input'
+                slotProps={{
+                  input: {
+                    startAdornment: clpAdornment,
+                    endAdornment: reverseLoading ? <CircularProgress size={18} /> : null
+                  }
+                }}
+              />
+            ) : (
+              <CustomTextField
+                fullWidth size='small' label='Salario base' type='number'
+                value={baseSalary || ''} onChange={e => setBaseSalary(Number(e.target.value))}
+                slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }}
+              />
+            )}
+
+            {/* ── Preview (with skeleton while loading) ── */}
+            {isChileReverse && reverseLoading && !previewReady && desiredNet > 0 && (
+              <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ p: 2 }}>
+                  <Skeleton variant='text' width='40%' height={16} sx={{ mb: 1 }} />
+                  <Stack spacing={0.5}>
+                    <Skeleton variant='text' width='100%' height={14} />
+                    <Skeleton variant='text' width='100%' height={14} />
+                    <Skeleton variant='text' width='100%' height={14} />
+                    <Skeleton variant='text' width='60%' height={14} />
+                  </Stack>
+                </Box>
+                <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Skeleton variant='text' width='100%' height={14} />
+                  <Skeleton variant='text' width='100%' height={14} />
+                  <Skeleton variant='text' width='80%' height={14} />
+                </Box>
+              </Box>
+            )}
+
             {previewReady && (
               <Box data-testid='reverse-preview' sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-                <Box sx={{ px: 2, py: 1.5, bgcolor: 'action.hover' }}>
+                <Box sx={{ px: 2, py: 1.25, bgcolor: 'action.hover' }}>
                   <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes</Typography>
-                  <Stack spacing={0.25} sx={{ mt: 0.5 }}>
+                  <Stack spacing={0.15} sx={{ mt: 0.25 }}>
                     <Row label='Sueldo base' amount={r.baseSalary} bold />
                     {r.forward.chileGratificacionLegalAmount != null && r.forward.chileGratificacionLegalAmount > 0 && (
                       <Row label='Gratificación legal' amount={r.forward.chileGratificacionLegalAmount} />
@@ -383,9 +391,9 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     <Row label='Total haberes' amount={r.forward.grossTotal} bold />
                   </Stack>
                 </Box>
-                <Box sx={{ px: 2, py: 1.5, bgcolor: 'error.lighter', borderTop: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ px: 2, py: 1.25, bgcolor: 'var(--mui-palette-error-lighterOpacity)', borderTop: '1px solid', borderColor: 'divider' }}>
                   <Typography variant='overline' color='text.secondary' fontSize={10}>Descuentos legales</Typography>
-                  <Stack spacing={0.25} sx={{ mt: 0.5 }}>
+                  <Stack spacing={0.15} sx={{ mt: 0.25 }}>
                     <Row label='AFP' amount={r.forward.chileAfpAmount} negative />
                     <Row label='Salud (7%)' amount={r.forward.chileHealthAmount} negative />
                     <Row label='Cesantía' amount={r.forward.chileUnemploymentAmount} negative />
@@ -393,8 +401,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     <Row label='Total descuentos' amount={r.forward.chileTotalDeductions} negative bold />
                   </Stack>
                 </Box>
-                <Box sx={{ px: 2, py: 1.5, bgcolor: 'primary.lighter', borderTop: '1px solid', borderColor: 'divider' }}>
-                  <Stack spacing={0.25}>
+                <Box sx={{ px: 2, py: 1.25, bgcolor: 'var(--mui-palette-primary-lighterOpacity)', borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Stack spacing={0.15}>
                     <Row label='Líquido deseado' amount={r.netTotalWithTax} bold primary />
                     {r.isapreExcess != null && r.isapreExcess > 0 && (
                       <>
@@ -405,7 +413,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   </Stack>
                 </Box>
                 {r.employerTotalCost != null && r.employerTotalCost > 0 && (
-                  <Box sx={{ px: 2, py: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Box sx={{ px: 2, py: 0.75, borderTop: '1px solid', borderColor: 'divider' }}>
                     <Row label='Costo empleador' amount={r.employerTotalCost} muted />
                   </Box>
                 )}
@@ -415,40 +423,38 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             {isChileReverse && r && !r.converged && (
               <Alert severity='warning' variant='outlined' sx={{ py: 0.5 }}>No convergió. Diferencia: {fmt(r.netDifferenceCLP)}</Alert>
             )}
-
             {isChileReverse && r && r.clampedAtFloor && (
               <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>Base ajustada al IMM ({fmt(r.immValue)}). Líquido mínimo: {fmt(r.netTotalWithTax)}.</Alert>
             )}
 
-            {/* ── Section: Haberes no imponibles (Chile) ── */}
+            {/* ── Haberes no imponibles (Chile) ── */}
             {isChile && (
               <Box sx={sectionSx}>
                 <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes no imponibles</Typography>
                 <Grid container spacing={2} sx={{ mt: 0.5 }}>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Colación' type='number' value={colacionAmount || ''} onChange={e => setColacionAmount(Number(e.target.value))} />
+                    <CustomTextField fullWidth size='small' label='Colación' type='number' value={colacionAmount || ''} onChange={e => setColacionAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: clpAdornment } }} />
                   </Grid>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Movilización' type='number' value={movilizacionAmount || ''} onChange={e => setMovilizacionAmount(Number(e.target.value))} />
+                    <CustomTextField fullWidth size='small' label='Movilización' type='number' value={movilizacionAmount || ''} onChange={e => setMovilizacionAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: clpAdornment } }} />
                   </Grid>
                 </Grid>
               </Box>
             )}
 
-            {/* ── Section: Bonos y haberes adicionales ── */}
+            {/* ── Bonos y haberes ── */}
             <Box sx={sectionSx}>
               <Typography variant='overline' color='text.secondary' fontSize={10}>Bonos y haberes</Typography>
               <Stack spacing={2} sx={{ mt: 1 }}>
-                <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} />
+                <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 7 }}>
                     <CustomTextField fullWidth size='small' label='Nombre bono fijo' value={fixedBonusLabel} onChange={e => setFixedBonusLabel(e.target.value)} />
                   </Grid>
                   <Grid size={{ xs: 5 }}>
-                    <CustomTextField fullWidth size='small' label='Monto' type='number' value={fixedBonusAmount || ''} onChange={e => setFixedBonusAmount(Number(e.target.value))} />
+                    <CustomTextField fullWidth size='small' label='Monto' type='number' value={fixedBonusAmount || ''} onChange={e => setFixedBonusAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
                   </Grid>
                 </Grid>
-
                 {isChile && (
                   <FormControl fullWidth size='small'>
                     <InputLabel>Gratificación legal</InputLabel>
@@ -459,19 +465,18 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     </Select>
                   </FormControl>
                 )}
-
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Bono OTD' type='number' value={bonusOtd || ''} onChange={e => setBonusOtd(Number(e.target.value))} />
+                    <CustomTextField fullWidth size='small' label='Bono OTD' type='number' value={bonusOtd || ''} onChange={e => setBonusOtd(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
                   </Grid>
                   <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa || ''} onChange={e => setBonusRpa(Number(e.target.value))} />
+                    <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa || ''} onChange={e => setBonusRpa(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
                   </Grid>
                 </Grid>
               </Stack>
             </Box>
 
-            {/* ── Section: Previsión Chile (accordion, collapsed by default) ── */}
+            {/* ── Previsión Chile (accordion) ── */}
             {isChile && (
               <Accordion disableGutters elevation={0} sx={accordionSx}>
                 <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
@@ -521,14 +526,14 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       label={<Typography variant='body2'>APV</Typography>}
                     />
                     {hasApv && (
-                      <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount || ''} onChange={e => setApvAmount(Number(e.target.value))} />
+                      <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount || ''} onChange={e => setApvAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: clpAdornment } }} />
                     )}
                   </Stack>
                 </AccordionDetails>
               </Accordion>
             )}
 
-            {/* ── Section: Vigencia ── */}
+            {/* ── Vigencia ── */}
             <Box sx={sectionSx}>
               <Typography variant='overline' color='text.secondary' fontSize={10}>Vigencia</Typography>
               <Stack spacing={2} sx={{ mt: 1 }}>
@@ -565,8 +570,6 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     </Drawer>
   )
 }
-
-/* ---------- Row ---------- */
 
 const Row = ({ label, amount, bold, negative, primary, muted }: {
   label: string
