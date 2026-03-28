@@ -337,7 +337,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   size='small'
                   label='Salario base'
                   type='number'
-                  value={baseSalary}
+                  value={baseSalary || ''}
                   onChange={e => setBaseSalary(Number(e.target.value))}
                   disabled={reverseMode}
                   helperText={reverseMode ? 'Calculado desde líquido' : undefined}
@@ -446,7 +446,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               size='small'
               label='Bono conectividad'
               type='number'
-              value={remoteAllowance}
+              value={remoteAllowance || ''}
               onChange={e => setRemoteAllowance(Number(e.target.value))}
               helperText='Monto fijo mensual (ej. $50 USD)'
             />
@@ -459,7 +459,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     size='small'
                     label='Colación'
                     type='number'
-                    value={colacionAmount}
+                    value={colacionAmount || ''}
                     onChange={e => setColacionAmount(Number(e.target.value))}
                     helperText='Haber no imponible mensual'
                   />
@@ -470,7 +470,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     size='small'
                     label='Movilización'
                     type='number'
-                    value={movilizacionAmount}
+                    value={movilizacionAmount || ''}
                     onChange={e => setMovilizacionAmount(Number(e.target.value))}
                     helperText='Haber no imponible mensual'
                   />
@@ -495,7 +495,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   size='small'
                   label='Monto bono fijo'
                   type='number'
-                  value={fixedBonusAmount}
+                  value={fixedBonusAmount || ''}
                   onChange={e => setFixedBonusAmount(Number(e.target.value))}
                   helperText='Monto fijo mensual recurrente'
                 />
@@ -522,10 +522,10 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <Typography variant='subtitle2' color='text.secondary'>Bonos variables</Typography>
             <Grid container spacing={2}>
               <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono On-Time' type='number' value={bonusOtd} onChange={e => setBonusOtd(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
+                <CustomTextField fullWidth size='small' label='Bono On-Time' type='number' value={bonusOtd || ''} onChange={e => setBonusOtd(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa} onChange={e => setBonusRpa(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
+                <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa || ''} onChange={e => setBonusRpa(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
               </Grid>
             </Grid>
 
@@ -573,7 +573,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   label='APV'
                 />
                 {hasApv && (
-                  <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount} onChange={e => setApvAmount(Number(e.target.value))} />
+                  <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount || ''} onChange={e => setApvAmount(Number(e.target.value))} />
                 )}
               </>
             )}
