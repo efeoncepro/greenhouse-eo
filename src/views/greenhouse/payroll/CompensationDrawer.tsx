@@ -19,7 +19,14 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { CompensationVersion, CreateCompensationVersionInput, PayRegime, HealthSystem, ContractType } from '@/types/payroll'
+import type {
+  CompensationVersion,
+  CreateCompensationVersionInput,
+  PayRegime,
+  HealthSystem,
+  ContractType,
+  GratificacionLegalMode
+} from '@/types/payroll'
 import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
 
 export type CompensationSavePayload = {
@@ -46,6 +53,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [remoteAllowance, setRemoteAllowance] = useState(ev?.remoteAllowance ?? 0)
   const [fixedBonusLabel, setFixedBonusLabel] = useState(ev?.fixedBonusLabel ?? '')
   const [fixedBonusAmount, setFixedBonusAmount] = useState(ev?.fixedBonusAmount ?? 0)
+
+  const [gratificacionLegalMode, setGratificacionLegalMode] = useState<GratificacionLegalMode>(
+    ev?.gratificacionLegalMode ?? (ev?.payRegime === 'chile' ? 'mensual_25pct' : 'ninguna')
+  )
+
   const [bonusOtd, setBonusOtd] = useState(ev?.bonusOtdMax ?? 0)
   const [bonusRpa, setBonusRpa] = useState(ev?.bonusRpaMax ?? 0)
   const [afpName, setAfpName] = useState(ev?.afpName ?? '')
@@ -77,6 +89,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setRemoteAllowance(ev?.remoteAllowance ?? 0)
     setFixedBonusLabel(ev?.fixedBonusLabel ?? '')
     setFixedBonusAmount(ev?.fixedBonusAmount ?? 0)
+    setGratificacionLegalMode(ev?.gratificacionLegalMode ?? (ev?.payRegime === 'chile' ? 'mensual_25pct' : 'ninguna'))
     setBonusOtd(ev?.bonusOtdMax ?? 0)
     setBonusRpa(ev?.bonusRpaMax ?? 0)
     setAfpName(ev?.afpName ?? '')
@@ -99,6 +112,9 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
     if (regime === 'chile') {
       setUnemploymentRate(contractType === 'indefinido' ? 0.006 : 0.03)
+      setGratificacionLegalMode(ev?.gratificacionLegalMode ?? 'mensual_25pct')
+    } else {
+      setGratificacionLegalMode('ninguna')
     }
   }
 
@@ -126,6 +142,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         remoteAllowance,
         fixedBonusLabel: fixedBonusLabel.trim() || null,
         fixedBonusAmount,
+        gratificacionLegalMode: payRegime === 'chile' ? gratificacionLegalMode : 'ninguna',
         bonusOtdMin: 0,
         bonusOtdMax: bonusOtd,
         bonusRpaMin: 0,
@@ -238,6 +255,21 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                 />
               </Grid>
             </Grid>
+
+            {payRegime === 'chile' && (
+              <FormControl fullWidth size='small'>
+                <InputLabel>Gratificación legal</InputLabel>
+                <Select
+                  value={gratificacionLegalMode}
+                  label='Gratificación legal'
+                  onChange={e => setGratificacionLegalMode(e.target.value as GratificacionLegalMode)}
+                >
+                  <MenuItem value='mensual_25pct'>Mensual 25%</MenuItem>
+                  <MenuItem value='anual_proporcional'>Anual proporcional</MenuItem>
+                  <MenuItem value='ninguna'>No aplica</MenuItem>
+                </Select>
+              </FormControl>
+            )}
 
             {/* Bonos */}
             <Divider />

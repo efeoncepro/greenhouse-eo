@@ -137,8 +137,9 @@ const resolvePayrollPeriodIndicators = async ({
   return { ufValue, utmValue }
 }
 
-export const buildPayrollEntry = ({
+export const buildPayrollEntry = async ({
   periodId,
+  periodDate,
   compensation,
   ufValue,
   bonusConfig,
@@ -146,12 +147,13 @@ export const buildPayrollEntry = ({
   attendance
 }: {
   periodId: string
+  periodDate: string
   compensation: CompensationVersion
   ufValue: number | null
   bonusConfig: BonusProrationConfig
   kpi: PayrollKpiSnapshot | null
   attendance: AttendanceSnapshot | null
-}): PayrollEntry => {
+}): Promise<PayrollEntry> => {
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
 
@@ -178,7 +180,7 @@ export const buildPayrollEntry = ({
     ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
     : compensation.fixedBonusAmount
 
-  const totals = calculatePayrollTotals({
+  const totals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: adjustedBaseSalary,
     remoteAllowance: adjustedRemoteAllowance,
@@ -186,6 +188,7 @@ export const buildPayrollEntry = ({
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
+    gratificacionLegalMode: compensation.gratificacionLegalMode,
     afpName: compensation.afpName,
     afpRate: compensation.afpRate,
     healthSystem: compensation.healthSystem,
@@ -195,7 +198,8 @@ export const buildPayrollEntry = ({
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
     ufValue,
-    taxAmount: 0
+    taxAmount: 0,
+    periodDate
   })
 
   return {
@@ -230,6 +234,7 @@ export const buildPayrollEntry = ({
     chileAfpName: totals.chileAfpName,
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,
+    chileGratificacionLegalAmount: totals.chileGratificacionLegalAmount,
     chileHealthSystem: totals.chileHealthSystem,
     chileHealthAmount: totals.chileHealthAmount,
     chileUnemploymentRate: totals.chileUnemploymentRate,
@@ -349,8 +354,9 @@ export const calculatePayroll = async ({
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
 
-    let entry = buildPayrollEntry({
+    let entry = await buildPayrollEntry({
       periodId,
+      periodDate: range.periodEnd,
       compensation,
       ufValue: indicatorValues.ufValue,
       bonusConfig,
@@ -365,7 +371,7 @@ export const calculatePayroll = async ({
         utmValue: indicatorValues.utmValue
       })
 
-      const totalsWithTax = calculatePayrollTotals({
+      const totalsWithTax = await calculatePayrollTotals({
         payRegime: compensation.payRegime,
         baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
         remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
@@ -373,6 +379,7 @@ export const calculatePayroll = async ({
         bonusOtdAmount: entry.bonusOtdAmount,
         bonusRpaAmount: entry.bonusRpaAmount,
         bonusOtherAmount: entry.bonusOtherAmount,
+        gratificacionLegalMode: compensation.gratificacionLegalMode,
         afpName: compensation.afpName,
         afpRate: compensation.afpRate,
         healthSystem: compensation.healthSystem,
@@ -382,7 +389,8 @@ export const calculatePayroll = async ({
         hasApv: compensation.hasApv,
         apvAmount: compensation.apvAmount,
         ufValue: indicatorValues.ufValue,
-        taxAmount: taxResult.taxAmountClp
+        taxAmount: taxResult.taxAmountClp,
+        periodDate: range.periodEnd
       })
 
       entry = {
@@ -391,6 +399,7 @@ export const calculatePayroll = async ({
         chileAfpName: totalsWithTax.chileAfpName,
         chileAfpRate: totalsWithTax.chileAfpRate,
         chileAfpAmount: totalsWithTax.chileAfpAmount,
+        chileGratificacionLegalAmount: totalsWithTax.chileGratificacionLegalAmount,
         chileHealthSystem: totalsWithTax.chileHealthSystem,
         chileHealthAmount: totalsWithTax.chileHealthAmount,
         chileUnemploymentRate: totalsWithTax.chileUnemploymentRate,

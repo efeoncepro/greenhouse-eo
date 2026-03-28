@@ -42,4 +42,12 @@ describe('economic indicator conversions', () => {
       value: -0.2
     })
   })
+
+  it('does not throw when syncing IMM (manual-only indicator)', async () => {
+    const result = await economicIndicators.syncEconomicIndicator({ indicatorCode: 'IMM' })
+
+    expect(result.indicatorCode).toBe('IMM')
+    expect(result.synced).toBe(false)
+    expect(result.snapshot).toBeNull()
+  })
 })

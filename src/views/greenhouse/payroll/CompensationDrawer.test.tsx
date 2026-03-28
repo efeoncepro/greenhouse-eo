@@ -26,6 +26,7 @@ const existingVersion: CompensationVersion = {
   bonusOtdMax: 500,
   bonusRpaMin: 0,
   bonusRpaMax: 300,
+  gratificacionLegalMode: 'ninguna',
   afpName: null,
   afpRate: null,
   healthSystem: null,
@@ -116,11 +117,12 @@ describe('CompensationDrawer', () => {
       expect(onSave).toHaveBeenCalled()
     })
 
-    expect(onSave).toHaveBeenCalledWith(
+      expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
           fixedBonusLabel: 'Bono guardia',
-          fixedBonusAmount: 220
+          fixedBonusAmount: 220,
+          gratificacionLegalMode: 'ninguna'
         })
       })
     )

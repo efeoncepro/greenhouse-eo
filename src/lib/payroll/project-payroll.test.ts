@@ -47,6 +47,7 @@ const baseCompensation = {
   bonusOtdMax: 60000,
   bonusRpaMin: 0,
   bonusRpaMax: 40000,
+  gratificacionLegalMode: 'ninguna',
   afpName: 'habitat',
   afpRate: 0.1127,
   healthSystem: 'fonasa',
@@ -115,7 +116,7 @@ describe('projectPayrollForPeriod', () => {
   })
 
   it('handles mixed currency (CLP + USD) members', async () => {
-    const usdComp = { ...baseCompensation, versionId: 'cv-2', memberId: 'member-2', memberName: 'Daniela Ferreira', currency: 'USD', baseSalary: 2000, remoteAllowance: 100, fixedBonusAmount: 0, bonusOtdMax: 0, bonusRpaMax: 0, payRegime: 'contractor_usd' }
+    const usdComp = { ...baseCompensation, versionId: 'cv-2', memberId: 'member-2', memberName: 'Daniela Ferreira', currency: 'USD', baseSalary: 2000, remoteAllowance: 100, fixedBonusAmount: 0, bonusOtdMax: 0, bonusRpaMax: 0, payRegime: 'contractor_usd', gratificacionLegalMode: 'ninguna' }
 
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation, usdComp])
     mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })

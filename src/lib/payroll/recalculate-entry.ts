@@ -282,7 +282,7 @@ export const recalculatePayrollEntry = async ({
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
   const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount
 
-  const provisionalTotals = calculatePayrollTotals({
+  const provisionalTotals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
@@ -299,7 +299,8 @@ export const recalculatePayrollEntry = async ({
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
     ufValue: resolvedUfValue,
-    taxAmount: 0
+    taxAmount: 0,
+    periodDate: periodEnd
   })
 
   const autoTaxAmount = compensation.payRegime === 'chile' && period.taxTableVersion
@@ -312,7 +313,7 @@ export const recalculatePayrollEntry = async ({
 
   const nextTaxAmount = input.chileTaxAmount ?? autoTaxAmount
 
-  const totals = calculatePayrollTotals({
+  const totals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
@@ -329,7 +330,8 @@ export const recalculatePayrollEntry = async ({
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
     ufValue: resolvedUfValue,
-    taxAmount: nextTaxAmount
+    taxAmount: nextTaxAmount,
+    periodDate: periodEnd
   })
 
   const nextManualOverride = input.manualOverride ?? entry.manualOverride

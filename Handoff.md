@@ -13529,3 +13529,18 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
   - `chile_afp_rates`: `21` filas
   - `chile_tax_brackets`: `32` filas
 - El forward engine sigue consumiendo helpers async, pero ahora con data synced real disponible para períodos backfilleados.
+
+## 2026-03-27 - TASK-076 lane activa
+
+- Se abrió `TASK-076` como la siguiente lane operativa de Payroll Chile después de cerrar la base previsional de `TASK-078`.
+- Objetivo inmediato: cerrar el gap de gratificación legal e IMM sobre el motor forward ya synced, sin mezclar todavía recibos ni reverse payroll.
+- La primera iteración se enfocará en el cálculo de `gratificacion_legal_mode` y su impacto sobre base imponible, AFP y tributación.
+
+## 2026-03-27 - TASK-076 gratificación legal slice
+
+- Se cerró el primer slice de `TASK-076` con `gratificacionLegalMode` persistido en `compensation_versions` y `chileGratificacionLegalAmount` persistido en `payroll_entries`.
+- El motor forward de Chile ya calcula gratificación legal sobre IMM cuando el modo es `mensual_25pct` o `anual_proporcional`; `ninguna` mantiene el comportamiento previo.
+- No se añadieron eventos nuevos: la propagación sigue apoyada en los `outbox events` canónicos ya existentes (`compensation_version.created/updated`, `payroll_entry.upserted`) y las `projections` downstream se refrescan por esos mismos disparadores.
+- `projected payroll` y `member_capacity_economics` quedan cubiertos por esa propagación sin crear una ruta paralela.
+- La migration `scripts/migrations/add-gratificacion-legal-mode.sql` ya se aplicó con `admin` porque `migrator` no tenía ownership sobre `greenhouse_payroll.compensation_versions` / `payroll_entries`; runtime ya ve ambas columnas nuevas.
+- El smoke test en `staging` quedó bloqueado por protección/auth de Vercel sobre `dev-greenhouse.efeoncepro.com`, así que la validación manual se dejó registrada como pendiente de acceso y no como bug funcional del slice.

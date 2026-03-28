@@ -53,6 +53,7 @@ type PayrollEntryRow = {
   bonus_otd_max: number | string | null
   bonus_rpa_min: number | string | null
   bonus_rpa_max: number | string | null
+  chile_gratificacion_legal: number | string | null
   chile_afp_name: string | null
   chile_afp_rate: number | string | null
   chile_afp_amount: number | string | null
@@ -122,6 +123,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   bonusOtdMax: toNumber(row.bonus_otd_max),
   bonusRpaMin: toNumber(row.bonus_rpa_min),
   bonusRpaMax: toNumber(row.bonus_rpa_max),
+  chileGratificacionLegalAmount: toNullableNumber(row.chile_gratificacion_legal),
   chileAfpName: normalizeNullableString(row.chile_afp_name),
   chileAfpRate: toNullableNumber(row.chile_afp_rate),
   chileAfpAmount: toNullableNumber(row.chile_afp_amount),
@@ -179,6 +181,7 @@ const buildBaseEntryQuery = (projectId: string) => `
     e.bonus_other_amount,
     e.bonus_other_description,
     e.gross_total,
+    e.chile_gratificacion_legal,
     cv.bonus_otd_min,
     cv.bonus_otd_max,
     cv.bonus_rpa_min,

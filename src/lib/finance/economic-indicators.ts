@@ -1,5 +1,3 @@
-import 'server-only'
-
 import {
   getFinanceProjectId,
   normalizeString,
@@ -21,7 +19,11 @@ import { buildUsdClpRatePairs, upsertExchangeRates } from '@/lib/finance/exchang
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 
-export const ECONOMIC_INDICATOR_CODES = ['USD_CLP', 'UF', 'UTM', 'IPC'] as const
+// Default set used by Finance dashboard cards.
+export const ECONOMIC_INDICATOR_DASHBOARD_CODES = ['USD_CLP', 'UF', 'UTM', 'IPC'] as const
+
+// Full supported set for canonical storage and historical queries.
+export const ECONOMIC_INDICATOR_CODES = [...ECONOMIC_INDICATOR_DASHBOARD_CODES, 'IMM'] as const
 export type EconomicIndicatorCode = (typeof ECONOMIC_INDICATOR_CODES)[number]
 
 type EconomicIndicatorFrequency = 'daily' | 'monthly'
@@ -31,6 +33,7 @@ type EconomicIndicatorDefinition = {
   path: string
   unit: string
   frequency: EconomicIndicatorFrequency
+  provider: 'mindicador' | 'manual_only'
 }
 
 type MindicadorSerieItem = {
@@ -49,10 +52,14 @@ type EconomicIndicatorSnapshot = {
 }
 
 const DEFINITIONS: Record<EconomicIndicatorCode, EconomicIndicatorDefinition> = {
-  USD_CLP: { code: 'USD_CLP', path: 'dolar', unit: 'Pesos', frequency: 'daily' },
-  UF: { code: 'UF', path: 'uf', unit: 'Pesos', frequency: 'daily' },
-  UTM: { code: 'UTM', path: 'utm', unit: 'Pesos', frequency: 'monthly' },
-  IPC: { code: 'IPC', path: 'ipc', unit: 'Porcentaje', frequency: 'monthly' }
+  USD_CLP: { code: 'USD_CLP', path: 'dolar', unit: 'Pesos', frequency: 'daily', provider: 'mindicador' },
+  UF: { code: 'UF', path: 'uf', unit: 'Pesos', frequency: 'daily', provider: 'mindicador' },
+  UTM: { code: 'UTM', path: 'utm', unit: 'Pesos', frequency: 'monthly', provider: 'mindicador' },
+  IPC: { code: 'IPC', path: 'ipc', unit: 'Porcentaje', frequency: 'monthly', provider: 'mindicador' },
+
+  // Ingreso Minimo Mensual (Chile): stored canonically, but the source is not mindicador.
+  // This intentionally does not fetch from mindicador to avoid relying on a non-existent endpoint.
+  IMM: { code: 'IMM', path: 'imm', unit: 'Pesos', frequency: 'monthly', provider: 'manual_only' }
 }
 
 const getTodayInSantiago = () =>
@@ -93,6 +100,10 @@ const normalizeStoredRecord = (record: FinanceEconomicIndicatorRecord): Economic
 
 const fetchMindicadorSeriesForYear = async (indicatorCode: EconomicIndicatorCode, year: number) => {
   const definition = DEFINITIONS[indicatorCode]
+
+  if (definition.provider !== 'mindicador') {
+    return [] as MindicadorSerieItem[]
+  }
 
   const response = await fetch(`${MINDICADOR_BASE_URL}/${definition.path}/${year}`, {
     headers: { Accept: 'application/json' },
@@ -143,6 +154,10 @@ export const pickLatestMindicadorSnapshot = (
 
 const fetchLatestMindicadorIndicator = async (indicatorCode: EconomicIndicatorCode) => {
   const definition = DEFINITIONS[indicatorCode]
+
+  if (definition.provider !== 'mindicador') {
+    return null
+  }
 
   const response = await fetch(`${MINDICADOR_BASE_URL}/${definition.path}`, {
     headers: { Accept: 'application/json' },
@@ -526,7 +541,7 @@ export const syncEconomicIndicatorsHistory = async ({
 
 export const getLatestEconomicIndicatorsSummary = async () => {
   const indicators = await Promise.all(
-    ECONOMIC_INDICATOR_CODES.map(async indicatorCode => {
+    ECONOMIC_INDICATOR_DASHBOARD_CODES.map(async indicatorCode => {
       let snapshot = await getLatestEconomicIndicator(indicatorCode)
 
       if (!snapshot) {

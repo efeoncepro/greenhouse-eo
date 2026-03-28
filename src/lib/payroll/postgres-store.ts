@@ -63,6 +63,7 @@ type PgCompensationRow = {
   bonus_otd_max: number | string
   bonus_rpa_min: number | string
   bonus_rpa_max: number | string
+  gratificacion_legal_mode: string | null
   afp_name: string | null
   afp_rate: number | string | null
   health_system: string | null
@@ -149,6 +150,8 @@ type PgEntryRow = {
   bonus_otd_max: number | string | null
   bonus_rpa_min: number | string | null
   bonus_rpa_max: number | string | null
+  gratificacion_legal_mode: string | null
+  chile_gratificacion_legal: number | string | null
   chile_afp_name: string | null
   chile_afp_rate: number | string | null
   chile_afp_amount: number | string | null
@@ -312,6 +315,16 @@ const isCurrentCompensationWindow = (effectiveFrom: string, effectiveTo: string 
   return effectiveFrom <= today && (!effectiveTo || effectiveTo >= today)
 }
 
+const normalizeGratificacionLegalMode = (
+  value: string | null | undefined,
+  payRegime: 'chile' | 'international'
+): 'mensual_25pct' | 'anual_proporcional' | 'ninguna' =>
+  payRegime === 'international'
+    ? 'ninguna'
+    : value === 'mensual_25pct' || value === 'anual_proporcional' || value === 'ninguna'
+      ? value
+      : 'mensual_25pct'
+
 const toFinitePeriodNumber = (value: string | undefined): number | null => {
   if (!value) return null
 
@@ -355,6 +368,7 @@ const publishPayrollOutboxEvent = async ({
 const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => {
   const effectiveFrom = toPgDateString(row.effective_from) || ''
   const effectiveTo = toPgDateString(row.effective_to)
+  const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
 
   return {
     versionId: row.version_id,
@@ -364,7 +378,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.primary_email }),
     notionUserId: null,
     version: toNumber(row.version),
-    payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+    payRegime,
     currency: row.currency === 'USD' ? 'USD' : 'CLP',
     baseSalary: toNumber(row.base_salary),
     remoteAllowance: toNumber(row.remote_allowance),
@@ -374,6 +388,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     bonusOtdMax: toNumber(row.bonus_otd_max),
     bonusRpaMin: toNumber(row.bonus_rpa_min),
     bonusRpaMax: toNumber(row.bonus_rpa_max),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(row.gratificacion_legal_mode, payRegime),
     afpName: normalizeNullableString(row.afp_name),
     afpRate: toNullableNumber(row.afp_rate),
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
@@ -436,6 +451,7 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   bonusOtdMax: toNumber(row.bonus_otd_max),
   bonusRpaMin: toNumber(row.bonus_rpa_min),
   bonusRpaMax: toNumber(row.bonus_rpa_max),
+  chileGratificacionLegalAmount: toNullableNumber(row.chile_gratificacion_legal),
   chileAfpName: normalizeNullableString(row.chile_afp_name),
   chileAfpRate: toNullableNumber(row.chile_afp_rate),
   chileAfpAmount: toNullableNumber(row.chile_afp_amount),
@@ -514,6 +530,7 @@ const COMPENSATION_BASE_SELECT = `
     cv.bonus_otd_max,
     cv.bonus_rpa_min,
     cv.bonus_rpa_max,
+    cv.gratificacion_legal_mode,
     cv.afp_name,
     cv.afp_rate,
     cv.health_system,
@@ -600,6 +617,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         cv.bonus_otd_max,
         cv.bonus_rpa_min,
         cv.bonus_rpa_max,
+        cv.gratificacion_legal_mode,
         cv.afp_name,
         cv.afp_rate,
         cv.health_system,
@@ -787,7 +805,7 @@ export const pgCreateCompensationVersion = async ({
         INSERT INTO greenhouse_payroll.compensation_versions (
           version_id, member_id, version, pay_regime, currency,
           base_salary, remote_allowance, fixed_bonus_label, fixed_bonus_amount,
-          bonus_otd_min, bonus_otd_max, bonus_rpa_min, bonus_rpa_max,
+          bonus_otd_min, bonus_otd_max, bonus_rpa_min, bonus_rpa_max, gratificacion_legal_mode,
           afp_name, afp_rate, health_system, health_plan_uf,
           unemployment_rate, contract_type, has_apv, apv_amount,
           effective_from, effective_to, is_current,
@@ -800,7 +818,8 @@ export const pgCreateCompensationVersion = async ({
           $14, $15, $16, $17,
           $18, $19, $20, $21,
           $22::date, $23, $24,
-          $25, $26
+          $25, $26,
+          $27
         )
       `,
       [
@@ -809,6 +828,7 @@ export const pgCreateCompensationVersion = async ({
         normalizeNullableString(input.fixedBonusLabel), Number(input.fixedBonusAmount ?? 0),
         Number(input.bonusOtdMin ?? 0), Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0), Number(input.bonusRpaMax ?? 0),
+        normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
         normalizeNullableString(input.afpName), input.afpRate ?? null,
         input.healthSystem ?? null, input.healthPlanUf ?? null,
         input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
@@ -955,16 +975,17 @@ export const pgUpdateCompensationVersion = async ({
           bonus_otd_max = $8,
           bonus_rpa_min = $9,
           bonus_rpa_max = $10,
-          afp_name = $11,
-          afp_rate = $12,
-          health_system = $13,
-          health_plan_uf = $14,
-          unemployment_rate = $15,
-          contract_type = $16,
-          has_apv = $17,
-          apv_amount = $18,
-          change_reason = $19
-        WHERE version_id = $20
+          gratificacion_legal_mode = $11,
+          afp_name = $12,
+          afp_rate = $13,
+          health_system = $14,
+          health_plan_uf = $15,
+          unemployment_rate = $16,
+          contract_type = $17,
+          has_apv = $18,
+          apv_amount = $19,
+          change_reason = $20
+        WHERE version_id = $21
       `,
       [
         input.payRegime,
@@ -977,6 +998,7 @@ export const pgUpdateCompensationVersion = async ({
         Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0),
         Number(input.bonusRpaMax ?? 0),
+        normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
         normalizeNullableString(input.afpName),
         input.afpRate ?? null,
         input.healthSystem ?? null,
@@ -1434,6 +1456,7 @@ const ENTRY_BASE_SELECT = `
     e.chile_afp_name,
     e.chile_afp_rate,
     e.chile_afp_amount,
+    e.chile_gratificacion_legal,
     e.chile_health_system,
     e.chile_health_amount,
     e.chile_unemployment_rate,
@@ -1533,6 +1556,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           kpi_tasks_completed, kpi_data_source,
           bonus_otd_amount, bonus_rpa_amount, bonus_other_amount, bonus_other_description,
           gross_total,
+          chile_gratificacion_legal,
           chile_afp_name, chile_afp_rate, chile_afp_amount,
           chile_health_system, chile_health_amount,
           chile_unemployment_rate, chile_unemployment_amount,
@@ -1553,17 +1577,17 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           $16, $17,
           $18, $19, $20, $21,
           $22,
-          $23, $24, $25,
-          $26, $27,
-          $28, $29,
-          $30, $31, $32, $33,
-          $34,
-          $35, $36, $37,
-          $38, $39,
-          $40, $41,
-          $42, $43, $44,
-          $45, $46,
-          $47, $48
+          $23, $24, $25, $26,
+          $27, $28,
+          $29, $30,
+          $31, $32, $33, $34,
+          $35,
+          $36, $37, $38,
+          $39, $40,
+          $41, $42, $43,
+          $44, $45,
+          $46, $47, $48,
+          $49, $50
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
@@ -1587,6 +1611,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           bonus_other_amount = EXCLUDED.bonus_other_amount,
           bonus_other_description = EXCLUDED.bonus_other_description,
           gross_total = EXCLUDED.gross_total,
+          chile_gratificacion_legal = EXCLUDED.chile_gratificacion_legal,
           chile_afp_name = EXCLUDED.chile_afp_name,
           chile_afp_rate = EXCLUDED.chile_afp_rate,
           chile_afp_amount = EXCLUDED.chile_afp_amount,
@@ -1624,6 +1649,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.kpiTasksCompleted, entry.kpiDataSource,
         entry.bonusOtdAmount, entry.bonusRpaAmount, entry.bonusOtherAmount, entry.bonusOtherDescription,
         entry.grossTotal,
+        entry.chileGratificacionLegalAmount,
         entry.chileAfpName, entry.chileAfpRate, entry.chileAfpAmount,
         entry.chileHealthSystem, entry.chileHealthAmount,
         entry.chileUnemploymentRate, entry.chileUnemploymentAmount,

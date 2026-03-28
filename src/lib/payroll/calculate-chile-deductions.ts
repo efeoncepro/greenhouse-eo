@@ -1,7 +1,12 @@
 import 'server-only'
 
-import type { ContractType, HealthSystem, PayRegime } from '@/types/payroll'
+import type { ContractType, GratificacionLegalMode, HealthSystem, PayRegime } from '@/types/payroll'
 
+import {
+  getAfpRateForCode,
+  getImmForPeriod,
+  getUnemploymentRateForPeriod
+} from '@/lib/payroll/chile-previsional-helpers'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 
 type PayrollTotalsInput = {
@@ -12,6 +17,7 @@ type PayrollTotalsInput = {
   bonusOtdAmount: number
   bonusRpaAmount: number
   bonusOtherAmount: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
   healthSystem?: HealthSystem | null
@@ -22,6 +28,7 @@ type PayrollTotalsInput = {
   apvAmount?: number
   ufValue?: number | null
   taxAmount?: number | null
+  periodDate?: string | null
 }
 
 export type ChileDeductionResult = {
@@ -30,6 +37,7 @@ export type ChileDeductionResult = {
   chileAfpName: string | null
   chileAfpRate: number | null
   chileAfpAmount: number | null
+  chileGratificacionLegalAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
   chileUnemploymentRate: number | null
@@ -43,7 +51,7 @@ export type ChileDeductionResult = {
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
-export const calculatePayrollTotals = ({
+export const calculatePayrollTotals = async ({
   payRegime,
   baseSalary,
   remoteAllowance,
@@ -51,6 +59,7 @@ export const calculatePayrollTotals = ({
   bonusOtdAmount,
   bonusRpaAmount,
   bonusOtherAmount,
+  gratificacionLegalMode = 'ninguna',
   afpName,
   afpRate,
   healthSystem,
@@ -60,10 +69,34 @@ export const calculatePayrollTotals = ({
   hasApv = false,
   apvAmount = 0,
   ufValue,
-  taxAmount
-}: PayrollTotalsInput): ChileDeductionResult => {
+  taxAmount,
+  periodDate
+}: PayrollTotalsInput): Promise<ChileDeductionResult> => {
+  const fallbackPeriodDate = periodDate || new Date().toISOString().slice(0, 10)
+  const shouldApplyGratification = payRegime === 'chile' && gratificacionLegalMode !== 'ninguna'
+
+  const immValue = shouldApplyGratification
+    ? await getImmForPeriod(fallbackPeriodDate)
+    : null
+
+  const gratificationLegalAmount = (() => {
+    if (!shouldApplyGratification) {
+      return 0
+    }
+
+    if (typeof immValue !== 'number' || !Number.isFinite(immValue) || immValue <= 0) {
+      throw new PayrollValidationError('IMM value is required to calculate legal gratification.', 400)
+    }
+
+    if (gratificacionLegalMode === 'mensual_25pct' || gratificacionLegalMode === 'anual_proporcional') {
+      return roundCurrency(Math.min(baseSalary * 0.25, (immValue * 4.75) / 12))
+    }
+
+    return 0
+  })()
+
   const totalVariableBonus = bonusOtdAmount + bonusRpaAmount + bonusOtherAmount
-  const grossTotal = roundCurrency(baseSalary + remoteAllowance + fixedBonusAmount + totalVariableBonus)
+  const grossTotal = roundCurrency(baseSalary + remoteAllowance + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
 
   if (payRegime === 'international') {
     return {
@@ -72,6 +105,7 @@ export const calculatePayrollTotals = ({
       chileAfpName: null,
       chileAfpRate: null,
       chileAfpAmount: null,
+      chileGratificacionLegalAmount: null,
       chileHealthSystem: null,
       chileHealthAmount: null,
       chileUnemploymentRate: null,
@@ -84,15 +118,16 @@ export const calculatePayrollTotals = ({
     }
   }
 
-  const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus)
-  const normalizedAfpRate = typeof afpRate === 'number' && Number.isFinite(afpRate) ? afpRate : 0
+  const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
+
+  const normalizedAfpRate = typeof afpRate === 'number' && Number.isFinite(afpRate)
+    ? afpRate
+    : await getAfpRateForCode(afpName || '', fallbackPeriodDate)
 
   const derivedUnemploymentRate =
     typeof unemploymentRate === 'number' && Number.isFinite(unemploymentRate)
       ? unemploymentRate
-      : contractType === 'plazo_fijo'
-        ? 0.03
-        : 0.006
+      : await getUnemploymentRateForPeriod(fallbackPeriodDate, contractType)
 
   const afpAmount = roundCurrency(imponibleBase * normalizedAfpRate)
 
@@ -121,6 +156,7 @@ export const calculatePayrollTotals = ({
     chileAfpName: afpName || null,
     chileAfpRate: normalizedAfpRate || null,
     chileAfpAmount: afpAmount,
+    chileGratificacionLegalAmount: gratificationLegalAmount > 0 ? gratificationLegalAmount : null,
     chileHealthSystem: healthSystem || 'fonasa',
     chileHealthAmount: healthAmount,
     chileUnemploymentRate: derivedUnemploymentRate,

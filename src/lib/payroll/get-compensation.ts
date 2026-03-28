@@ -5,6 +5,7 @@ import type {
   CreateCompensationVersionInput,
   PayrollCompensationMember,
   PayrollCompensationOverview,
+  GratificacionLegalMode,
   UpdateCompensationVersionInput
 } from '@/types/payroll'
 
@@ -47,6 +48,7 @@ const COMPENSATION_MUTATION_TYPES = {
   healthSystem: 'STRING',
   healthPlanUf: 'FLOAT64',
   unemploymentRate: 'FLOAT64',
+  gratificacionLegalMode: 'STRING',
   effectiveTo: 'DATE',
   createdBy: 'STRING'
 } as const
@@ -69,6 +71,7 @@ type CompensationRow = {
   bonus_otd_max: number | string | null
   bonus_rpa_min: number | string | null
   bonus_rpa_max: number | string | null
+  gratificacion_legal_mode: string | null
   afp_name: string | null
   afp_rate: number | string | null
   health_system: string | null
@@ -112,6 +115,16 @@ const addDaysToDateString = (dateString: string, days: number) => {
   return date.toISOString().slice(0, 10)
 }
 
+const normalizeGratificacionLegalMode = (
+  value: string | null | undefined,
+  payRegime: 'chile' | 'international'
+): GratificacionLegalMode =>
+  payRegime === 'international'
+    ? 'ninguna'
+    : value === 'mensual_25pct' || value === 'anual_proporcional' || value === 'ninguna'
+      ? value
+      : 'mensual_25pct'
+
 const getCurrentDateString = () =>
   new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Santiago'
@@ -132,6 +145,7 @@ const isCurrentCompensationWindow = ({
 const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => {
   const effectiveFrom = toDateString(row.effective_from) || ''
   const effectiveTo = toDateString(row.effective_to)
+  const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
 
   return {
     versionId: String(row.version_id || ''),
@@ -141,7 +155,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
     notionUserId: normalizeNullableString(row.notion_user_id),
     version: toNumber(row.version),
-    payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+    payRegime,
     currency: row.currency === 'USD' ? 'USD' : 'CLP',
     baseSalary: toNumber(row.base_salary),
     remoteAllowance: toNumber(row.remote_allowance),
@@ -151,6 +165,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     bonusOtdMax: toNumber(row.bonus_otd_max),
     bonusRpaMin: toNumber(row.bonus_rpa_min),
     bonusRpaMax: toNumber(row.bonus_rpa_max),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(row.gratificacion_legal_mode, payRegime),
     afpName: normalizeNullableString(row.afp_name),
     afpRate: toNullableNumber(row.afp_rate),
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
@@ -173,6 +188,17 @@ type CompensationValueInput = Omit<CreateCompensationVersionInput, 'memberId'>
 const assertCompensationValues = (input: CompensationValueInput | UpdateCompensationVersionInput) => {
   if (!normalizeString(input.changeReason)) {
     throw new PayrollValidationError('changeReason is required.')
+  }
+
+  if (
+    input.gratificacionLegalMode !== undefined &&
+    input.gratificacionLegalMode !== 'mensual_25pct' &&
+    input.gratificacionLegalMode !== 'anual_proporcional' &&
+    input.gratificacionLegalMode !== 'ninguna'
+  ) {
+    throw new PayrollValidationError(
+      'gratificacionLegalMode must be one of mensual_25pct, anual_proporcional, or ninguna.'
+    )
   }
 
   assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
@@ -435,6 +461,7 @@ export const getApplicableCompensationVersionsForPeriod = async (periodStart: st
           cv.bonus_otd_max,
           cv.bonus_rpa_min,
           cv.bonus_rpa_max,
+          cv.gratificacion_legal_mode,
           cv.afp_name,
           cv.afp_rate,
           cv.health_system,
@@ -621,6 +648,7 @@ export const createCompensationVersion = async ({
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
     healthSystem: input.healthSystem ?? null,
@@ -652,6 +680,7 @@ export const createCompensationVersion = async ({
         bonus_otd_max,
         bonus_rpa_min,
         bonus_rpa_max,
+        gratificacion_legal_mode,
         afp_name,
         afp_rate,
         health_system,
@@ -681,6 +710,7 @@ export const createCompensationVersion = async ({
         @bonusOtdMax,
         @bonusRpaMin,
         @bonusRpaMax,
+        @gratificacionLegalMode,
         @afpName,
         @afpRate,
         @healthSystem,
@@ -799,6 +829,7 @@ export const updateCompensationVersion = async ({
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
     healthSystem: input.healthSystem ?? null,
@@ -824,6 +855,7 @@ export const updateCompensationVersion = async ({
         bonus_otd_max = @bonusOtdMax,
         bonus_rpa_min = @bonusRpaMin,
         bonus_rpa_max = @bonusRpaMax,
+        gratificacion_legal_mode = @gratificacionLegalMode,
         afp_name = @afpName,
         afp_rate = @afpRate,
         health_system = @healthSystem,

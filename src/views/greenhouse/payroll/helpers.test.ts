@@ -32,6 +32,7 @@ const buildEntry = (overrides: Partial<PayrollEntry>): PayrollEntry => ({
   bonusOtherAmount: 0,
   bonusOtherDescription: null,
   grossTotal: 1100,
+  chileGratificacionLegalAmount: null,
   chileAfpName: null,
   chileAfpRate: null,
   chileAfpAmount: 0,

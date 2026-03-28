@@ -48,6 +48,7 @@ const compensatedMember = {
   bonusOtdMax: 100,
   bonusRpaMin: 0,
   bonusRpaMax: 50,
+  gratificacionLegalMode: 'ninguna' as const,
   afpName: null,
   afpRate: null,
   healthSystem: null,

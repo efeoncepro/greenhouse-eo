@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.compensation_versions (
   bonus_otd_max NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_rpa_min NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_rpa_max NUMERIC(14, 2) NOT NULL DEFAULT 0,
+  gratificacion_legal_mode TEXT NOT NULL DEFAULT 'ninguna' CHECK (gratificacion_legal_mode IN ('mensual_25pct', 'anual_proporcional', 'ninguna')),
   afp_name TEXT,
   afp_rate NUMERIC(6, 4),
   health_system TEXT CHECK (health_system IS NULL OR health_system IN ('fonasa', 'isapre')),
@@ -108,6 +109,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   bonus_other_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   bonus_other_description TEXT,
   gross_total NUMERIC(14, 2) NOT NULL,
+  chile_gratificacion_legal NUMERIC(14, 2),
 
   -- Chile-specific deductions
   chile_afp_name TEXT,

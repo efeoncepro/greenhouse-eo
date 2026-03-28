@@ -53,6 +53,12 @@ export async function POST(request: Request) {
         bonusOtdMax: parsePayrollNumber(body.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 }) ?? 0,
         bonusRpaMin: parsePayrollNumber(body.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 }) ?? 0,
         bonusRpaMax: parsePayrollNumber(body.bonusRpaMax ?? 0, 'bonusRpaMax', { min: 0 }) ?? 0,
+        gratificacionLegalMode:
+          body.gratificacionLegalMode === 'mensual_25pct' ||
+          body.gratificacionLegalMode === 'anual_proporcional' ||
+          body.gratificacionLegalMode === 'ninguna'
+            ? body.gratificacionLegalMode
+            : undefined,
         afpName: typeof body.afpName === 'string' ? body.afpName : null,
         afpRate: parsePayrollNumber(body.afpRate, 'afpRate', { allowNull: true, min: 0, max: 1 }),
         healthSystem: body.healthSystem === 'isapre' ? 'isapre' : body.healthSystem === 'fonasa' ? 'fonasa' : null,

@@ -4,12 +4,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
-| Rank | 2 de 3 (ejecutar después de TASK-078, antes de TASK-077) |
+| Status real | `En progreso` |
+| Rank | 2 de 4 (ejecutar después de TASK-078, antes de TASK-077 y TASK-079) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -36,6 +36,7 @@ Esta task es la **segunda** de una cadena de 3:
 
 ```
 TASK-078 → TASK-076 (esta) → TASK-077
+                         ↘ TASK-079
 ```
 
 **Prerequisito:** TASK-078 debe completarse primero porque provee:
@@ -254,7 +255,7 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 ## Dependencies & Impact
 
 ### Depende de
-- **TASK-078** (Reverse Calculation Engine) — **blocker** — provee sync Previred con IMM, tasas AFP, tasa SIS, topes imponibles, tabla impuesto, helpers previsionales y forward engine ya cortado a indicadores synced
+- **TASK-078** (Previsional Foundation & Forward Cutover) — **blocker** — provee sync Previred con IMM, tasas AFP, tasa SIS, topes imponibles, tabla impuesto, helpers previsionales y forward engine ya cortado a indicadores synced
 - `TASK-058` Economic Indicators Runtime Layer — UF, UTM ya existen
 - `TASK-061` Payroll Go-Live Readiness Audit — puede requerir re-validación
 - Motor de cálculo ya cortado a indicadores synced (lo hace TASK-078)
@@ -276,6 +277,19 @@ totalHealth = obligatoria + voluntaria = healthPlanUfAmount
 - `src/types/payroll.ts`
 - `scripts/setup-postgres-payroll.sql`
 - Migrations para nuevos campos
+
+## Delta 2026-03-27
+
+- La task quedó promovida a `in-progress` como siguiente lane operativa luego de `TASK-078`.
+- La primera iteración será `gratificacion_legal_mode` + `IMM`, porque ese gap es el que más altera la base imponible y el líquido real.
+- El alcance de `TASK-076` sigue siendo la paridad legal completa, pero se desarrollará por slices para no mezclar con `TASK-077` ni `TASK-079`.
+
+## Delta 2026-03-27 - Gratificación legal slice
+
+- Se agregó `gratificacionLegalMode` a la compensación versionada y `chileGratificacionLegalAmount` al entry de nómina, con persistencia en PostgreSQL y BigQuery.
+- El cálculo forward de Chile ahora incorpora la gratificación legal sobre IMM cuando el modo no es `ninguna`, y la superficie de compensación permite editar el modo sin perder la vigencia canónica.
+- No se agregó un evento nuevo: este slice se apoya en los mismos `outbox events` existentes para `compensation_version.created/updated` y `payroll_entry.upserted`, que ya disparan las `projections` downstream.
+- Las proyecciones afectadas siguen siendo `projected payroll`, `member_capacity_economics` y cualquier consumidor que lea las tablas canónicas de compensación / entries.
 
 ## Acceptance Criteria
 

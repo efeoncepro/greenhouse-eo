@@ -3,6 +3,7 @@ export type PayrollCurrency = 'CLP' | 'USD'
 export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
+export type GratificacionLegalMode = 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
 export type PayrollAttendanceSource = 'legacy_attendance_daily_plus_hr_leave' | 'microsoft_teams'
 export type ProjectionMode = 'actual_to_date' | 'projected_month_end'
@@ -53,6 +54,7 @@ export interface CompensationVersion {
   bonusOtdMax: number
   bonusRpaMin: number
   bonusRpaMax: number
+  gratificacionLegalMode: GratificacionLegalMode
   afpName: string | null
   afpRate: number | null
   healthSystem: HealthSystem | null
@@ -81,6 +83,7 @@ export interface CreateCompensationVersionInput {
   bonusOtdMax?: number
   bonusRpaMin?: number
   bonusRpaMax?: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
   healthSystem?: HealthSystem | null
@@ -104,6 +107,7 @@ export interface UpdateCompensationVersionInput {
   bonusOtdMax?: number
   bonusRpaMin?: number
   bonusRpaMax?: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
   healthSystem?: HealthSystem | null
@@ -173,6 +177,7 @@ export interface PayrollEntry {
   bonusOtherAmount: number
   bonusOtherDescription: string | null
   grossTotal: number
+  chileGratificacionLegalAmount: number | null
   bonusOtdMin: number
   bonusOtdMax: number
   bonusRpaMin: number

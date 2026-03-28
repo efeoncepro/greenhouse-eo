@@ -9,7 +9,7 @@
 | Impact | `Muy alto` |
 | Effort | `Alto` |
 | Status real | `Diseño` |
-| Rank | 3 de 3 (ejecutar después de TASK-078 y TASK-076) |
+| Rank | 3 de 4 (ejecutar después de TASK-078 y TASK-076; TASK-079 queda como follow-up si se decide mostrar preview reverse en esta superficie) |
 | Domain | HR Payroll |
 
 ## Summary
@@ -41,10 +41,10 @@ TASK-078 → TASK-076 → TASK-077 (esta)
 - El PDF Chile necesita todos los campos legales de TASK-076 (gratificación, colación, movilización, AFP desglose, isapre desglose, costos empleador, RUT) — sin ellos la liquidación sale incompleta
 - TASK-076 a su vez necesita TASK-078 (indicadores Previred synced) para calcular esos campos correctamente
 - El PDF Internacional no depende de 076/078 pero se implementa junto por consistencia
+- TASK-079 queda como habilitador opcional si se decide mostrar preview reverse o sueldo líquido objetivo desde esta misma superficie
 
 **Lo que ya estará listo cuando esta task empiece:**
 - Motor forward con indicadores Previred reales (TASK-078)
-- Reverse engine para preview preciso (TASK-078)
 - Todos los campos legales en `payroll_entries`: gratificación, colación, movilización, AFP cotización/comisión, isapre obligatoria/voluntaria, costos empleador (TASK-076)
 - RUT y datos bancarios en members (TASK-076)
 - `payroll_entries` con datos completos y correctos para generar PDFs fidedignos
@@ -325,7 +325,7 @@ Efeonce Greenhouse™
 ## Dependencies & Impact
 
 ### Depende de
-- **TASK-078** (Reverse Calculation Engine) — provee indicadores Previred synced y motor forward con datos correctos
+- **TASK-078** (Previsional Foundation & Forward Cutover) — provee indicadores Previred synced y motor forward con datos correctos
 - **TASK-076** (Payroll Chile Liquidación Parity) — **blocker** — provee los campos legales que el PDF Chile necesita (gratificación, colación, movilización, AFP desglose cotización/comisión, isapre desglose obligatoria/voluntaria, costos empleador, RUT)
 - Sistema de email Resend ya integrado (v6.9.4 con soporte de attachments)
 - GCS media storage ya operativo (`src/lib/storage/greenhouse-media.ts`)
@@ -338,6 +338,7 @@ Efeonce Greenhouse™
 - `/people/[memberId]` — tab Nómina muestra botón descargar recibo
 - Email catalog — nuevos templates transaccionales
 - Event catalog — nuevos eventos de receipts
+- `TASK-079` — follow-up opcional si esta superficie expone preview reverse
 
 ### Archivos owned
 - `src/lib/payroll/generate-payroll-pdf.tsx` — rediseño de templates

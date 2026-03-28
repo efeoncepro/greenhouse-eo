@@ -124,14 +124,15 @@ export const projectPayrollForPeriod = async ({
     const kpi = kpiMap.get(compensation.memberId) ?? null
     const attendance = attendanceResult.get(compensation.memberId) ?? null
 
-    const entry = buildPayrollEntry({
+    const entry = await buildPayrollEntry({
       periodId,
-      compensation,
-      ufValue,
-      bonusConfig,
-      kpi,
-      attendance
-    })
+      periodDate: periodEnd,
+        compensation,
+        ufValue,
+        bonusConfig,
+        kpi,
+        attendance
+      })
 
     entries.push({
       ...entry,
