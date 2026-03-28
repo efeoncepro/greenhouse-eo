@@ -47,9 +47,9 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     const invalidBonusEntries = entries.filter(
       entry =>
         (!entry.kpiOtdQualifies && entry.bonusOtdAmount !== 0) ||
-        (entry.kpiOtdQualifies && (entry.bonusOtdAmount < entry.bonusOtdMin || entry.bonusOtdAmount > entry.bonusOtdMax)) ||
+        (entry.kpiOtdQualifies && (entry.bonusOtdAmount < 0 || entry.bonusOtdAmount > entry.bonusOtdMax)) ||
         (!entry.kpiRpaQualifies && entry.bonusRpaAmount !== 0) ||
-        (entry.kpiRpaQualifies && (entry.bonusRpaAmount < entry.bonusRpaMin || entry.bonusRpaAmount > entry.bonusRpaMax))
+        (entry.kpiRpaQualifies && (entry.bonusRpaAmount < 0 || entry.bonusRpaAmount > entry.bonusRpaMax))
     )
 
     if (invalidBonusEntries.length > 0) {

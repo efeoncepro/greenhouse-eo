@@ -91,6 +91,21 @@ Regla arquitectónica:
 - se debe reutilizar de forma consistente en liquidaciones, recibos, exportes y superficies legales de Payroll Chile
 - si cambia la razón social o la dirección, el cambio debe venir desde la capa canónica de empresa/tenant y no desde una compensación individual
 
+## 2.5. Projected payroll promotion contract
+
+`Projected Payroll` comparte motor con `Payroll official`, pero su promoción explícita a borrador oficial tiene contrato propio:
+
+- la promoción debe materializar primero los snapshots proyectados en `greenhouse_serving.projected_payroll_snapshots`
+- la ejecución oficial debe correr contra `greenhouse_payroll.payroll_entries` usando `Postgres-first`
+- si el runtime ya opera sobre PostgreSQL, la inicialización de infraestructura no debe reintentar materializaciones BigQuery que no forman parte del camino crítico de promoción
+- el flujo promotion/projection no debe depender de una tabla de recibos para poder crear el borrador oficial
+
+Regla arquitectónica:
+
+- `Projected Payroll` sigue siendo simulación y cache auditable
+- la promoción a oficial es una acción explícita, separada y reversible en términos de tracking, pero no en lifecycle transaccional
+- la capa de promoción debe fallar por schema o datos reales de nómina, no por infraestructura analítica no relacionada con el período
+
 ## 3. Superficies oficiales
 
 ### Rutas UI
@@ -225,6 +240,7 @@ Regla:
 - los montos máximos de bono son por colaborador
 - los thresholds de calificación siguen siendo globales por vigencia
 - la policy de payout de `RpA` puede usar bandas suaves versionadas; no debe quedar hardcodeada solo en `bonus-proration.ts`
+- los campos mínimos históricos (`bonusOtdMin`, `bonusRpaMin`) no deben bloquear el cierre del período cuando el payout calculado ya cumple la policy vigente; la aprobación debe validar contra el máximo permitido y la elegibilidad, no contra pisos legacy que quedaron como metadata
 
 ### Serving view
 - `greenhouse_serving.member_payroll_360`

@@ -76,6 +76,7 @@ Rules:
 - read models can be exposed via `greenhouse_serving`
 - runtime does not own these schemas
 - projection-owned serving caches can receive explicit per-table DML grants when a runtime or worker must materialize them; those exceptions must be documented in the owning domain bootstrap and kept narrow
+- `greenhouse_serving.projected_payroll_snapshots` is one of those narrow exceptions: Payroll runtime may write the projection cache to promote projected payroll into an official draft, but the official transactional write path remains `greenhouse_payroll`
 
 ## Domain Schema Contract
 
