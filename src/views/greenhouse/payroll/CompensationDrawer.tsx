@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
-import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import FormControl from '@mui/material/FormControl'
@@ -61,7 +64,7 @@ type ReverseQuoteResult = {
   }
 }
 
-const fmtCLP = (n: number | null | undefined) =>
+const fmt = (n: number | null | undefined) =>
   n != null
     ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
     : '-'
@@ -106,13 +109,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Reverse mode state
   const [reverseMode, setReverseMode] = useState(false)
   const [desiredNet, setDesiredNet] = useState(0)
   const [reverseResult, setReverseResult] = useState<ReverseQuoteResult | null>(null)
   const [reverseLoading, setReverseLoading] = useState(false)
-  const [showAdvanced, setShowAdvanced] = useState(false)
   const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isChileReverse = reverseMode && payRegime === 'chile'
 
   const saveMode = getCompensationSaveMode({
     existingVersion: ev,
@@ -120,9 +123,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   })
 
   useEffect(() => {
-    if (!open) {
-      return
-    }
+    if (!open) return
 
     setPayRegime(ev?.payRegime ?? 'chile')
     setCurrency(ev?.currency ?? 'CLP')
@@ -151,18 +152,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setDesiredNet(0)
     setReverseResult(null)
     setReverseLoading(false)
-    setShowAdvanced(false)
   }, [open, ev, memberId])
 
-  // Debounced reverse calculation
   useEffect(() => {
-    if (!reverseMode || desiredNet <= 0 || payRegime !== 'chile') {
-      return
-    }
+    if (!reverseMode || desiredNet <= 0 || payRegime !== 'chile') return
 
-    if (reverseTimerRef.current) {
-      clearTimeout(reverseTimerRef.current)
-    }
+    if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current)
 
     reverseTimerRef.current = setTimeout(async () => {
       setReverseLoading(true)
@@ -219,9 +214,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     }, 600)
 
     return () => {
-      if (reverseTimerRef.current) {
-        clearTimeout(reverseTimerRef.current)
-      }
+      if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current)
     }
   }, [
     reverseMode, desiredNet, payRegime, effectiveFrom,
@@ -308,21 +301,32 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     }
   }
 
+  const r = reverseResult
+  const previewReady = isChileReverse && r && r.converged
+
+  const advancedSummary = [
+    afpName ? `AFP ${afpName}` : null,
+    healthSystem === 'isapre' ? 'Isapre' : 'Fonasa',
+    contractType === 'indefinido' ? 'Indefinido' : 'Plazo fijo'
+  ].filter(Boolean).join(' · ')
+
   return (
     <Drawer
       anchor='right'
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: { xs: '100%', sm: 420 } } }}
+      PaperProps={{ sx: { width: { xs: '100%', sm: 440 } } }}
     >
       <Stack sx={{ height: '100%' }}>
         {/* Header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ p: 3, pb: 2 }}>
           <Box>
-            <Typography variant='h6'>{ev ? 'Editar compensación' : 'Nueva compensación'}</Typography>
+            <Typography variant='h6' fontWeight={600}>
+              {ev ? 'Editar compensación' : 'Nueva compensación'}
+            </Typography>
             <Typography variant='body2' color='text.secondary'>{memberName}</Typography>
           </Box>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} size='small'>
             <i className='tabler-x' />
           </IconButton>
         </Stack>
@@ -331,34 +335,39 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
         {/* Form */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-          <Stack spacing={3}>
+          <Stack spacing={2.5}>
             {/* Régimen */}
-            <Typography variant='subtitle2' color='text.secondary'>Régimen y salario</Typography>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth size='small'>
-                  <InputLabel>Régimen</InputLabel>
-                  <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)}>
-                    <MenuItem value='chile'>Chile (CLP)</MenuItem>
-                    <MenuItem value='international'>Internacional (USD)</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField
-                  fullWidth
-                  size='small'
-                  label='Salario base'
-                  type='number'
-                  value={baseSalary || ''}
-                  onChange={e => setBaseSalary(Number(e.target.value))}
-                  disabled={reverseMode}
-                  helperText={reverseMode ? 'Calculado desde líquido' : undefined}
-                />
-              </Grid>
-            </Grid>
+            <FormControl fullWidth size='small'>
+              <InputLabel>Régimen</InputLabel>
+              <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)}>
+                <MenuItem value='chile'>Chile (CLP)</MenuItem>
+                <MenuItem value='international'>Internacional (USD)</MenuItem>
+              </Select>
+            </FormControl>
 
-            {/* Reverse mode toggle — Chile only */}
+            {/* Salary base — display or input */}
+            {isChileReverse ? (
+              <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
+                <Typography variant='caption' color='text.secondary'>Sueldo base calculado</Typography>
+                <Stack direction='row' alignItems='center' spacing={1}>
+                  <Typography variant='h6' fontWeight={700} fontFamily='monospace'>
+                    {fmt(baseSalary)}
+                  </Typography>
+                  <Chip label='Desde líquido' size='small' color='primary' variant='tonal' />
+                </Stack>
+              </Box>
+            ) : (
+              <CustomTextField
+                fullWidth
+                size='small'
+                label='Salario base'
+                type='number'
+                value={baseSalary || ''}
+                onChange={e => setBaseSalary(Number(e.target.value))}
+              />
+            )}
+
+            {/* Reverse mode — Chile only */}
             {payRegime === 'chile' && (
               <>
                 <FormControlLabel
@@ -376,7 +385,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       data-testid='reverse-mode-toggle'
                     />
                   }
-                  label='Calcular desde líquido'
+                  label={<Typography variant='body2' fontWeight={500}>Calcular desde líquido</Typography>}
+                  sx={{ ml: 0 }}
                 />
                 {reverseMode && (
                   <CustomTextField
@@ -386,7 +396,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     type='number'
                     value={desiredNet || ''}
                     onChange={e => setDesiredNet(Number(e.target.value))}
-                    helperText='Neto antes de deducciones voluntarias (Isapre, APV)'
+                    helperText='Neto contractual antes de Isapre y APV'
                     data-testid='desired-net-input'
                     slotProps={{
                       input: {
@@ -396,232 +406,136 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   />
                 )}
 
-                {/* Reverse preview */}
-                {reverseMode && reverseResult && reverseResult.converged && (
+                {/* Preview card */}
+                {previewReady && (
                   <Box
-                    sx={{
-                      p: 2,
-                      borderRadius: 1,
-                      bgcolor: 'action.hover',
-                      border: '1px solid',
-                      borderColor: 'divider'
-                    }}
                     data-testid='reverse-preview'
+                    sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}
                   >
-                    <Typography variant='subtitle2' sx={{ mb: 1 }}>Desglose estimado</Typography>
-                    <Stack spacing={0.5}>
-                      <Row label='Sueldo base' value={fmtCLP(reverseResult.baseSalary)} bold />
-                      {reverseResult.forward.chileGratificacionLegalAmount != null && reverseResult.forward.chileGratificacionLegalAmount > 0 && (
-                        <Row label='Gratificación legal' value={fmtCLP(reverseResult.forward.chileGratificacionLegalAmount)} />
-                      )}
-                      {colacionAmount > 0 && (
-                        <Row label='Colación' value={fmtCLP(colacionAmount)} />
-                      )}
-                      {movilizacionAmount > 0 && (
-                        <Row label='Movilización' value={fmtCLP(movilizacionAmount)} />
-                      )}
-                      <Row label='Total haberes' value={fmtCLP(reverseResult.forward.grossTotal)} />
-                      <Divider sx={{ my: 0.5 }} />
-                      <Row label='AFP' value={fmtCLP(reverseResult.forward.chileAfpAmount)} negative />
-                      <Row label='Salud' value={fmtCLP(reverseResult.forward.chileHealthAmount)} negative />
-                      <Row label='Cesantía' value={fmtCLP(reverseResult.forward.chileUnemploymentAmount)} negative />
-                      {reverseResult.taxAmountClp > 0 && (
-                        <Row label='Impuesto' value={fmtCLP(reverseResult.taxAmountClp)} negative />
-                      )}
-                      {reverseResult.forward.chileApvAmount != null && reverseResult.forward.chileApvAmount > 0 && (
-                        <Row label='APV' value={fmtCLP(reverseResult.forward.chileApvAmount)} negative />
-                      )}
-                      <Row label='Total descuentos' value={fmtCLP(reverseResult.forward.chileTotalDeductions)} negative />
-                      <Divider sx={{ my: 0.5 }} />
-                      <Row label='Líquido deseado' value={fmtCLP(reverseResult.netTotalWithTax)} bold />
-                      {reverseResult.isapreExcess != null && reverseResult.isapreExcess > 0 && (
-                        <>
-                          <Row label='Excedente Isapre' value={fmtCLP(reverseResult.isapreExcess)} negative />
-                          <Row label='Líquido a pagar' value={fmtCLP(reverseResult.netAfterIsapre)} bold />
-                        </>
-                      )}
-                      {reverseResult.employerTotalCost != null && reverseResult.employerTotalCost > 0 && (
-                        <Row label='Costo empleador' value={fmtCLP(reverseResult.employerTotalCost)} muted />
-                      )}
-                    </Stack>
+                    {/* Haberes */}
+                    <Box sx={{ px: 2, py: 1.5, bgcolor: 'action.hover' }}>
+                      <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes</Typography>
+                      <Stack spacing={0.25} sx={{ mt: 0.5 }}>
+                        <Row label='Sueldo base' amount={r.baseSalary} bold />
+                        {r.forward.chileGratificacionLegalAmount != null && r.forward.chileGratificacionLegalAmount > 0 && (
+                          <Row label='Gratificación legal' amount={r.forward.chileGratificacionLegalAmount} />
+                        )}
+                        {colacionAmount > 0 && <Row label='Colación' amount={colacionAmount} />}
+                        {movilizacionAmount > 0 && <Row label='Movilización' amount={movilizacionAmount} />}
+                        <Row label='Total haberes' amount={r.forward.grossTotal} bold />
+                      </Stack>
+                    </Box>
+
+                    {/* Descuentos */}
+                    <Box sx={{ px: 2, py: 1.5, bgcolor: 'error.lighter', borderTop: '1px solid', borderColor: 'divider' }}>
+                      <Typography variant='overline' color='text.secondary' fontSize={10}>Descuentos legales</Typography>
+                      <Stack spacing={0.25} sx={{ mt: 0.5 }}>
+                        <Row label='AFP' amount={r.forward.chileAfpAmount} negative />
+                        <Row label='Salud (7%)' amount={r.forward.chileHealthAmount} negative />
+                        <Row label='Cesantía' amount={r.forward.chileUnemploymentAmount} negative />
+                        {r.taxAmountClp > 0 && <Row label='Impuesto' amount={r.taxAmountClp} negative />}
+                        {r.forward.chileApvAmount != null && r.forward.chileApvAmount > 0 && (
+                          <Row label='APV' amount={r.forward.chileApvAmount} negative />
+                        )}
+                        <Row label='Total descuentos' amount={r.forward.chileTotalDeductions} negative bold />
+                      </Stack>
+                    </Box>
+
+                    {/* Resultado */}
+                    <Box sx={{ px: 2, py: 1.5, bgcolor: 'primary.lighter', borderTop: '1px solid', borderColor: 'divider' }}>
+                      <Stack spacing={0.25}>
+                        <Row label='Líquido deseado' amount={r.netTotalWithTax} bold primary />
+                        {r.isapreExcess != null && r.isapreExcess > 0 && (
+                          <>
+                            <Row label='Excedente Isapre' amount={r.isapreExcess} negative />
+                            <Row label='Líquido a pagar' amount={r.netAfterIsapre} bold />
+                          </>
+                        )}
+                      </Stack>
+                    </Box>
+
+                    {/* Costo empleador */}
+                    {r.employerTotalCost != null && r.employerTotalCost > 0 && (
+                      <Box sx={{ px: 2, py: 1, borderTop: '1px solid', borderColor: 'divider' }}>
+                        <Row label='Costo empleador' amount={r.employerTotalCost} muted />
+                      </Box>
+                    )}
                   </Box>
                 )}
 
-                {reverseMode && reverseResult && !reverseResult.converged && (
-                  <Alert severity='warning' variant='outlined'>
-                    No se pudo converger a una solución exacta. Diferencia: {fmtCLP(reverseResult.netDifferenceCLP)}
+                {reverseMode && r && !r.converged && (
+                  <Alert severity='warning' variant='outlined' sx={{ py: 0.5 }}>
+                    No convergió. Diferencia: {fmt(r.netDifferenceCLP)}
                   </Alert>
                 )}
 
-                {reverseMode && reverseResult && reverseResult.clampedAtFloor && (
-                  <Alert severity='info' variant='outlined'>
-                    El sueldo base se ajustó al Ingreso Mínimo Mensual ({fmtCLP(reverseResult.immValue)}). El líquido mínimo con esta configuración es {fmtCLP(reverseResult.netTotalWithTax)}.
+                {reverseMode && r && r.clampedAtFloor && (
+                  <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>
+                    Base ajustada al IMM ({fmt(r.immValue)}). Líquido mínimo: {fmt(r.netTotalWithTax)}.
                   </Alert>
                 )}
               </>
             )}
 
+            {/* Colación / Movilización — always visible for Chile */}
             {payRegime === 'chile' && (
               <Grid container spacing={2}>
                 <Grid size={{ xs: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    size='small'
-                    label='Colación'
-                    type='number'
-                    value={colacionAmount || ''}
-                    onChange={e => setColacionAmount(Number(e.target.value))}
-                    helperText='Haber no imponible mensual'
-                  />
+                  <CustomTextField fullWidth size='small' label='Colación' type='number' value={colacionAmount || ''} onChange={e => setColacionAmount(Number(e.target.value))} helperText='No imponible' />
                 </Grid>
                 <Grid size={{ xs: 6 }}>
-                  <CustomTextField
-                    fullWidth
-                    size='small'
-                    label='Movilización'
-                    type='number'
-                    value={movilizacionAmount || ''}
-                    onChange={e => setMovilizacionAmount(Number(e.target.value))}
-                    helperText='Haber no imponible mensual'
-                  />
+                  <CustomTextField fullWidth size='small' label='Movilización' type='number' value={movilizacionAmount || ''} onChange={e => setMovilizacionAmount(Number(e.target.value))} helperText='No imponible' />
                 </Grid>
               </Grid>
             )}
 
-            {reverseMode && payRegime === 'chile' && (
-              <>
-                <Divider />
-                <Button
-                  variant='text'
-                  size='small'
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                  sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
-                  startIcon={<i className={showAdvanced ? 'tabler-chevron-up' : 'tabler-chevron-down'} />}
-                >
-                  {showAdvanced ? 'Ocultar parámetros' : 'Parámetros previsionales y bonos'}
-                </Button>
-              </>
+            {/* Advanced params — accordion in Chile reverse, always visible otherwise */}
+            {isChileReverse ? (
+              <Accordion
+                disableGutters
+                elevation={0}
+                sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '8px !important', '&::before': { display: 'none' } }}
+              >
+                <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
+                  <Stack>
+                    <Typography variant='body2' fontWeight={500}>Parámetros previsionales</Typography>
+                    <Typography variant='caption' color='text.secondary'>{advancedSummary}</Typography>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Stack spacing={2.5}>
+                    <AdvancedFields
+                      {...{
+                        payRegime, remoteAllowance, setRemoteAllowance,
+                        fixedBonusLabel, setFixedBonusLabel, fixedBonusAmount, setFixedBonusAmount,
+                        gratificacionLegalMode, setGratificacionLegalMode,
+                        bonusOtd, setBonusOtd, bonusRpa, setBonusRpa,
+                        afpName, setAfpName, afpRate, setAfpRate,
+                        healthSystem, setHealthSystem, healthPlanUf, setHealthPlanUf,
+                        contractType, handleContractChange, unemploymentRate,
+                        hasApv, setHasApv, apvAmount, setApvAmount
+                      }}
+                    />
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+            ) : (
+              <AdvancedFields
+                {...{
+                  payRegime, remoteAllowance, setRemoteAllowance,
+                  fixedBonusLabel, setFixedBonusLabel, fixedBonusAmount, setFixedBonusAmount,
+                  gratificacionLegalMode, setGratificacionLegalMode,
+                  bonusOtd, setBonusOtd, bonusRpa, setBonusRpa,
+                  afpName, setAfpName, afpRate, setAfpRate,
+                  healthSystem, setHealthSystem, healthPlanUf, setHealthPlanUf,
+                  contractType, handleContractChange, unemploymentRate,
+                  hasApv, setHasApv, apvAmount, setApvAmount
+                }}
+              />
             )}
-
-            <Collapse in={!reverseMode || payRegime !== 'chile' || showAdvanced}>
-              <Stack spacing={3}>
-
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Bono conectividad'
-              type='number'
-              value={remoteAllowance || ''}
-              onChange={e => setRemoteAllowance(Number(e.target.value))}
-              helperText='Monto fijo mensual (ej. $50 USD)'
-            />
-
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 7 }}>
-                <CustomTextField
-                  fullWidth
-                  size='small'
-                  label='Nombre bono fijo'
-                  value={fixedBonusLabel}
-                  onChange={e => setFixedBonusLabel(e.target.value)}
-                  helperText='Opcional. Ej. Bono responsabilidad'
-                />
-              </Grid>
-              <Grid size={{ xs: 5 }}>
-                <CustomTextField
-                  fullWidth
-                  size='small'
-                  label='Monto bono fijo'
-                  type='number'
-                  value={fixedBonusAmount || ''}
-                  onChange={e => setFixedBonusAmount(Number(e.target.value))}
-                  helperText='Monto fijo mensual recurrente'
-                />
-              </Grid>
-            </Grid>
-
-            {payRegime === 'chile' && (
-              <FormControl fullWidth size='small'>
-                <InputLabel>Gratificación legal</InputLabel>
-                <Select
-                  value={gratificacionLegalMode}
-                  label='Gratificación legal'
-                  onChange={e => setGratificacionLegalMode(e.target.value as GratificacionLegalMode)}
-                >
-                  <MenuItem value='mensual_25pct'>Mensual 25%</MenuItem>
-                  <MenuItem value='anual_proporcional'>Anual proporcional</MenuItem>
-                  <MenuItem value='ninguna'>No aplica</MenuItem>
-                </Select>
-              </FormControl>
-            )}
-
-            {/* Bonos */}
-            <Divider />
-            <Typography variant='subtitle2' color='text.secondary'>Bonos variables</Typography>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono On-Time' type='number' value={bonusOtd || ''} onChange={e => setBonusOtd(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa || ''} onChange={e => setBonusRpa(Number(e.target.value))} helperText='Monto al 100% de cumplimiento' />
-              </Grid>
-            </Grid>
-
-            {/* Chile */}
-            {payRegime === 'chile' && (
-              <>
-                <Divider />
-                <Typography variant='subtitle2' color='text.secondary'>Previsión Chile</Typography>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='AFP' value={afpName} onChange={e => setAfpName(e.target.value)} />
-                  </Grid>
-                  <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Tasa AFP' type='number' value={afpRate} onChange={e => setAfpRate(Number(e.target.value))} inputProps={{ step: 0.0001 }} />
-                  </Grid>
-                  <Grid size={{ xs: 6 }}>
-                    <FormControl fullWidth size='small'>
-                      <InputLabel>Salud</InputLabel>
-                      <Select value={healthSystem} label='Salud' onChange={e => setHealthSystem(e.target.value as HealthSystem)}>
-                        <MenuItem value='fonasa'>Fonasa</MenuItem>
-                        <MenuItem value='isapre'>Isapre</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  {healthSystem === 'isapre' && (
-                    <Grid size={{ xs: 6 }}>
-                      <CustomTextField fullWidth size='small' label='Plan Isapre (UF)' type='number' value={healthPlanUf} onChange={e => setHealthPlanUf(Number(e.target.value))} inputProps={{ step: 0.01 }} />
-                    </Grid>
-                  )}
-                  <Grid size={{ xs: 6 }}>
-                    <FormControl fullWidth size='small'>
-                      <InputLabel>Contrato</InputLabel>
-                      <Select value={contractType} label='Contrato' onChange={e => handleContractChange(e.target.value as ContractType)}>
-                        <MenuItem value='indefinido'>Indefinido</MenuItem>
-                        <MenuItem value='plazo_fijo'>Plazo fijo</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid size={{ xs: 6 }}>
-                    <CustomTextField fullWidth size='small' label='Tasa cesantía' type='number' value={unemploymentRate} onChange={e => setUnemploymentRate(Number(e.target.value))} inputProps={{ step: 0.001 }} disabled />
-                  </Grid>
-                </Grid>
-                <FormControlLabel
-                  control={<Switch checked={hasApv} onChange={e => setHasApv(e.target.checked)} />}
-                  label='APV'
-                />
-                {hasApv && (
-                  <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount || ''} onChange={e => setApvAmount(Number(e.target.value))} />
-                )}
-              </>
-            )}
-
-              </Stack>
-            </Collapse>
 
             {/* Vigencia */}
             <Divider />
-            <Typography variant='subtitle2' color='text.secondary'>Vigencia</Typography>
             <CustomTextField
               fullWidth
               size='small'
@@ -633,13 +547,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               helperText={
                 ev
                   ? saveMode === 'update'
-                    ? 'Si mantienes esta fecha, actualizarás la compensación vigente.'
-                    : 'Si cambias la fecha, se creará una nueva versión desde esa vigencia.'
+                    ? 'Misma fecha = actualiza la versión vigente'
+                    : 'Nueva fecha = crea nueva versión'
                   : undefined
               }
             />
 
-            {/* Motivo */}
             <CustomTextField
               fullWidth
               size='small'
@@ -679,29 +592,159 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   )
 }
 
-const Row = ({ label, value, bold, negative, muted }: {
+/* ---------- Subcomponents ---------- */
+
+const Row = ({ label, amount, bold, negative, primary, muted }: {
   label: string
-  value: string
+  amount: number | null | undefined
   bold?: boolean
   negative?: boolean
+  primary?: boolean
   muted?: boolean
 }) => (
-  <Stack direction='row' justifyContent='space-between'>
+  <Stack direction='row' justifyContent='space-between' alignItems='baseline'>
     <Typography
       variant='body2'
       color={muted ? 'text.disabled' : 'text.secondary'}
       fontWeight={bold ? 600 : 400}
+      fontSize={13}
     >
       {label}
     </Typography>
     <Typography
-      variant='body2'
-      fontWeight={bold ? 600 : 400}
-      color={negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}
+      fontFamily='monospace'
+      fontSize={13}
+      fontWeight={bold ? 700 : 500}
+      color={primary ? 'primary.main' : negative ? 'error.main' : muted ? 'text.disabled' : 'text.primary'}
     >
-      {negative && value !== '-' ? `−${value.replace('-', '')}` : value}
+      {negative && amount != null && amount > 0 ? `−${fmt(amount)}` : fmt(amount)}
     </Typography>
   </Stack>
+)
+
+type AdvancedFieldsProps = {
+  payRegime: PayRegime
+  remoteAllowance: number
+  setRemoteAllowance: (v: number) => void
+  fixedBonusLabel: string
+  setFixedBonusLabel: (v: string) => void
+  fixedBonusAmount: number
+  setFixedBonusAmount: (v: number) => void
+  gratificacionLegalMode: GratificacionLegalMode
+  setGratificacionLegalMode: (v: GratificacionLegalMode) => void
+  bonusOtd: number
+  setBonusOtd: (v: number) => void
+  bonusRpa: number
+  setBonusRpa: (v: number) => void
+  afpName: string
+  setAfpName: (v: string) => void
+  afpRate: number
+  setAfpRate: (v: number) => void
+  healthSystem: HealthSystem
+  setHealthSystem: (v: HealthSystem) => void
+  healthPlanUf: number
+  setHealthPlanUf: (v: number) => void
+  contractType: ContractType
+  handleContractChange: (v: ContractType) => void
+  unemploymentRate: number
+  hasApv: boolean
+  setHasApv: (v: boolean) => void
+  apvAmount: number
+  setApvAmount: (v: number) => void
+}
+
+const AdvancedFields = ({
+  payRegime, remoteAllowance, setRemoteAllowance,
+  fixedBonusLabel, setFixedBonusLabel, fixedBonusAmount, setFixedBonusAmount,
+  gratificacionLegalMode, setGratificacionLegalMode,
+  bonusOtd, setBonusOtd, bonusRpa, setBonusRpa,
+  afpName, setAfpName, afpRate, setAfpRate,
+  healthSystem, setHealthSystem, healthPlanUf, setHealthPlanUf,
+  contractType, handleContractChange, unemploymentRate,
+  hasApv, setHasApv, apvAmount, setApvAmount
+}: AdvancedFieldsProps) => (
+  <>
+    <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} />
+
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 7 }}>
+        <CustomTextField fullWidth size='small' label='Nombre bono fijo' value={fixedBonusLabel} onChange={e => setFixedBonusLabel(e.target.value)} />
+      </Grid>
+      <Grid size={{ xs: 5 }}>
+        <CustomTextField fullWidth size='small' label='Monto bono fijo' type='number' value={fixedBonusAmount || ''} onChange={e => setFixedBonusAmount(Number(e.target.value))} />
+      </Grid>
+    </Grid>
+
+    {payRegime === 'chile' && (
+      <FormControl fullWidth size='small'>
+        <InputLabel>Gratificación legal</InputLabel>
+        <Select value={gratificacionLegalMode} label='Gratificación legal' onChange={e => setGratificacionLegalMode(e.target.value as GratificacionLegalMode)}>
+          <MenuItem value='mensual_25pct'>Mensual 25%</MenuItem>
+          <MenuItem value='anual_proporcional'>Anual proporcional</MenuItem>
+          <MenuItem value='ninguna'>No aplica</MenuItem>
+        </Select>
+      </FormControl>
+    )}
+
+    <Divider />
+    <Typography variant='overline' color='text.secondary' fontSize={10}>Bonos variables</Typography>
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 6 }}>
+        <CustomTextField fullWidth size='small' label='Bono OTD' type='number' value={bonusOtd || ''} onChange={e => setBonusOtd(Number(e.target.value))} />
+      </Grid>
+      <Grid size={{ xs: 6 }}>
+        <CustomTextField fullWidth size='small' label='Bono RpA' type='number' value={bonusRpa || ''} onChange={e => setBonusRpa(Number(e.target.value))} />
+      </Grid>
+    </Grid>
+
+    {payRegime === 'chile' && (
+      <>
+        <Divider />
+        <Typography variant='overline' color='text.secondary' fontSize={10}>Previsión Chile</Typography>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 6 }}>
+            <CustomTextField fullWidth size='small' label='AFP' value={afpName} onChange={e => setAfpName(e.target.value)} />
+          </Grid>
+          <Grid size={{ xs: 6 }}>
+            <CustomTextField fullWidth size='small' label='Tasa AFP' type='number' value={afpRate} onChange={e => setAfpRate(Number(e.target.value))} inputProps={{ step: 0.0001 }} />
+          </Grid>
+          <Grid size={{ xs: 6 }}>
+            <FormControl fullWidth size='small'>
+              <InputLabel>Salud</InputLabel>
+              <Select value={healthSystem} label='Salud' onChange={e => setHealthSystem(e.target.value as HealthSystem)}>
+                <MenuItem value='fonasa'>Fonasa</MenuItem>
+                <MenuItem value='isapre'>Isapre</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          {healthSystem === 'isapre' && (
+            <Grid size={{ xs: 6 }}>
+              <CustomTextField fullWidth size='small' label='Plan Isapre (UF)' type='number' value={healthPlanUf} onChange={e => setHealthPlanUf(Number(e.target.value))} inputProps={{ step: 0.01 }} />
+            </Grid>
+          )}
+          <Grid size={{ xs: 6 }}>
+            <FormControl fullWidth size='small'>
+              <InputLabel>Contrato</InputLabel>
+              <Select value={contractType} label='Contrato' onChange={e => handleContractChange(e.target.value as ContractType)}>
+                <MenuItem value='indefinido'>Indefinido</MenuItem>
+                <MenuItem value='plazo_fijo'>Plazo fijo</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 6 }}>
+            <CustomTextField fullWidth size='small' label='Cesantía' type='number' value={unemploymentRate} inputProps={{ step: 0.001 }} disabled />
+          </Grid>
+        </Grid>
+        <FormControlLabel
+          control={<Switch checked={hasApv} onChange={e => setHasApv(e.target.checked)} size='small' />}
+          label={<Typography variant='body2'>APV</Typography>}
+        />
+        {hasApv && (
+          <CustomTextField fullWidth size='small' label='Monto APV' type='number' value={apvAmount || ''} onChange={e => setApvAmount(Number(e.target.value))} />
+        )}
+      </>
+    )}
+  </>
 )
 
 export default CompensationDrawer
