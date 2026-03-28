@@ -2,7 +2,8 @@ import 'server-only'
 
 import { Buffer } from 'node:buffer'
 
-import PayrollExportReadyEmail from '@/emails/PayrollExportReadyEmail'
+import { APP_URL } from '@/emails/constants'
+import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
 import { generatePayrollCsv } from '@/lib/payroll/export-payroll'
 import { generatePayrollPeriodPdf } from '@/lib/payroll/generate-payroll-pdf'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
@@ -36,26 +37,41 @@ const formatMoney = (value: number, currency: string) =>
     ? `$${Math.round(value).toLocaleString('es-CL')}`
     : `US$${value.toFixed(2)}`
 
-const summarizeCurrency = (
-  entries: Awaited<ReturnType<typeof getPayrollEntries>>,
-  selector: (entry: Awaited<ReturnType<typeof getPayrollEntries>>[number]) => number
-) => {
-  const totals = new Map<string, number>()
+const buildBreakdowns = (
+  entries: Awaited<ReturnType<typeof getPayrollEntries>>
+): CurrencyBreakdown[] => {
+  const grouped = new Map<string, { currency: string; regimeLabel: string; gross: number; net: number; count: number }>()
 
   for (const entry of entries) {
     const currency = entry.currency || 'CLP'
+    const existing = grouped.get(currency)
 
-    totals.set(currency, (totals.get(currency) || 0) + selector(entry))
+    if (existing) {
+      existing.gross += entry.grossTotal
+      existing.net += entry.netTotal
+      existing.count++
+    } else {
+      grouped.set(currency, {
+        currency,
+        regimeLabel: entry.payRegime === 'chile' ? 'Chile' : 'Internacional',
+        gross: entry.grossTotal,
+        net: entry.netTotal,
+        count: 1
+      })
+    }
   }
 
-  const items = Array.from(totals.entries()).map(([currency, total]) => formatMoney(total, currency))
-
-  if (items.length === 0) {
-    return '—'
-  }
-
-  return items.length === 1 ? items[0] : `Mixto (${items.join(' / ')})`
+  return Array.from(grouped.values()).map(g => ({
+    currency: g.currency,
+    regimeLabel: g.regimeLabel,
+    grossTotal: formatMoney(g.gross, g.currency),
+    netTotal: formatMoney(g.net, g.currency),
+    entryCount: g.count
+  }))
 }
+
+const buildNetTotalDisplay = (breakdowns: CurrencyBreakdown[]) =>
+  breakdowns.map(b => b.netTotal).join(' + ') || '—'
 
 export interface PayrollExportPackageAssets {
   periodId: string
@@ -220,32 +236,51 @@ export const sendPayrollExportReadyNotification = async (periodId: string, actor
     return null
   }
 
-  const grossSummary = summarizeCurrency(assets.entries, entry => entry.grossTotal)
-  const netSummary = summarizeCurrency(assets.entries, entry => entry.netTotal)
   const monthName = MONTH_NAMES[assets.periodMonth - 1] ?? String(assets.periodMonth)
   const periodLabel = `${monthName} ${assets.periodYear}`
+  const breakdowns = buildBreakdowns(assets.entries)
+  const netTotalDisplay = buildNetTotalDisplay(breakdowns)
+  const exportedAt = new Date().toLocaleDateString('es-CL', {
+    day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  })
   const resend = getResendClient()
 
   try {
     const result = await resend.emails.send({
       from: getEmailFromAddress(),
       to: [...PAYROLL_EXPORT_READY_RECIPIENTS],
-      subject: `Payroll exportado — ${periodLabel}`,
+      subject: `Nómina cerrada — ${periodLabel} · ${assets.entries.length} colaboradores`,
       react: PayrollExportReadyEmail({
         periodLabel,
         entryCount: assets.entries.length,
-        grossTotal: grossSummary,
-        netTotal: netSummary,
-        exportedBy: actorEmail
+        breakdowns,
+        netTotalDisplay,
+        exportedBy: actorEmail,
+        exportedAt
       }),
       text: [
-        `Payroll ${periodLabel} exportado y listo para revisar.`,
+        `NÓMINA — ${periodLabel.toUpperCase()}`,
+        '═══════════════════',
+        '',
+        'Nómina cerrada y lista para revisión.',
         '',
         `Colaboradores: ${assets.entries.length}`,
-        `Bruto total: ${grossSummary}`,
-        `Neto total: ${netSummary}`,
         '',
-        'Adjuntamos el PDF de período y el CSV de soporte.',
+        ...breakdowns.flatMap(b => [
+          `${b.regimeLabel} (${b.currency})`,
+          `  Bruto:  ${b.grossTotal}`,
+          `  Neto:   ${b.netTotal}`,
+          ''
+        ]),
+        '───────────────────',
+        'ADJUNTOS',
+        '• Reporte de nómina (PDF) — resumen por colaborador',
+        '• Detalle de nómina (CSV) — desglose completo para contabilidad',
+        '',
+        actorEmail ? `Exportado por ${actorEmail} · ${exportedAt}` : `Exportado: ${exportedAt}`,
+        '',
+        '→ Ver nómina en Greenhouse:',
+        `  ${APP_URL}/hr/payroll`,
         '',
         '— Greenhouse by Efeonce Group'
       ].join('\n'),

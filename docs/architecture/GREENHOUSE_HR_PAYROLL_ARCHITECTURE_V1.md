@@ -560,6 +560,23 @@ Si la entry pertenecía a un período `approved`, el período se reabre a `calcu
 - la notificación downstream a Finance/HR y la entrega de recibos siguen saliendo de `payroll_period.exported`; lo inmediato solo reduce la dependencia del scheduler en staging/operación interactiva
 - el paquete documental del cierre se persiste de forma reutilizable para que reenvíos y descargas no dependan de regenerar desde cero en cada click
 
+### Email de cierre — contrato de contenido
+
+El email `PayrollExportReadyEmail` que se envía a Finance y HR al cerrar un período sigue este contrato:
+
+- **Subject**: `Nómina cerrada — {Mes Año} · {N} colaboradores` (100% español, headcount en inbox)
+- **Desglose por régimen/moneda**: cada régimen (Chile CLP, Internacional USD) muestra su bruto y neto por separado — no se consolida cross-currency
+- **Neto total display**: concatenación de netos por moneda con `+` (ej. `$595.657 + US$2,696.27`)
+- **Adjuntos descritos**: el email incluye sección explícita "Adjuntos incluidos" con el propósito de cada archivo (PDF = reporte imprimible, CSV = desglose para contabilidad)
+- **Metadata operativa**: quién exportó + timestamp
+- **Plain text profesional**: el fallback plain text tiene la misma calidad informativa que el HTML — secciones, desglose por régimen, adjuntos, metadata y link al portal
+- **Interfaz `CurrencyBreakdown`**: tipo exportado desde el template, reutilizable por otros consumers
+
+Archivos runtime del email:
+- `src/emails/PayrollExportReadyEmail.tsx` — template React Email
+- `src/lib/payroll/payroll-export-packages.ts` — lógica de envío, `buildBreakdowns()`, `buildNetTotalDisplay()`
+- `src/emails/constants.ts` — colores, fuentes, URLs compartidas
+
 ## 16. Moneda y períodos mixtos
 
 `Payroll` soporta colaboradores `Chile` en `CLP` e internacionales en `USD` dentro del mismo período imputable.

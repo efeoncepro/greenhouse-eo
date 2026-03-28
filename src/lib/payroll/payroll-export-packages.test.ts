@@ -125,8 +125,8 @@ describe('payroll export packages', () => {
       status: 'exported'
     } as any)
     mockGetPayrollEntries.mockResolvedValueOnce([
-      { memberId: 'm1', grossTotal: 1200, netTotal: 900, currency: 'CLP', memberName: 'Ada Lovelace' },
-      { memberId: 'm2', grossTotal: 500, netTotal: 420, currency: 'USD', memberName: 'Grace Hopper' }
+      { memberId: 'm1', grossTotal: 1200, netTotal: 900, currency: 'CLP', payRegime: 'chile', memberName: 'Ada Lovelace' },
+      { memberId: 'm2', grossTotal: 500, netTotal: 420, currency: 'USD', payRegime: 'international', memberName: 'Grace Hopper' }
     ] as any)
     mockGetPayrollExportPackageByPeriodId.mockResolvedValueOnce(null)
     mockGeneratePayrollPeriodPdf.mockResolvedValueOnce(Buffer.from('pdf-binary'))
@@ -195,7 +195,11 @@ describe('payroll export packages', () => {
 
     const call = resendClient.emails.send.mock.calls[0]?.[0]
 
-    expect(call.subject).toContain('Payroll exportado — Marzo 2026')
+    expect(call.subject).toContain('Nómina cerrada — Marzo 2026')
+    expect(call.subject).toContain('2 colaboradores')
     expect(call.attachments).toHaveLength(2)
+    expect(call.text).toContain('Chile (CLP)')
+    expect(call.text).toContain('Internacional (USD)')
+    expect(call.text).toContain('ADJUNTOS')
   })
 })

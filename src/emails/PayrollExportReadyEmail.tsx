@@ -4,20 +4,30 @@ import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
+export interface CurrencyBreakdown {
+  currency: string
+  regimeLabel: string
+  grossTotal: string
+  netTotal: string
+  entryCount: number
+}
+
 interface PayrollExportReadyEmailProps {
   periodLabel: string
   entryCount: number
-  grossTotal: string
-  netTotal: string
+  breakdowns: CurrencyBreakdown[]
+  netTotalDisplay: string
   exportedBy?: string | null
+  exportedAt?: string | null
 }
 
 const BRAND_BLUE = '#023c70'
 
-const summaryRow = (label: string, value: string) => (
+const summaryRow = (label: string, value: string, indent = false) => (
   <tr>
     <td style={{
       padding: '10px 0',
+      paddingLeft: indent ? '16px' : '0',
       fontFamily: EMAIL_FONTS.body,
       fontSize: '14px',
       color: EMAIL_COLORS.secondary,
@@ -39,15 +49,70 @@ const summaryRow = (label: string, value: string) => (
   </tr>
 )
 
+const regimeHeaderRow = (label: string) => (
+  <tr>
+    <td colSpan={2} style={{
+      padding: '12px 0 4px',
+      fontFamily: EMAIL_FONTS.heading,
+      fontSize: '12px',
+      fontWeight: 600,
+      color: EMAIL_COLORS.muted,
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase' as const,
+      borderBottom: `1px solid ${EMAIL_COLORS.border}`,
+    }}>
+      {label}
+    </td>
+  </tr>
+)
+
+const attachmentRow = (title: string, subtitle: string) => (
+  <tr>
+    <td style={{
+      padding: '10px 0',
+      borderBottom: `1px solid ${EMAIL_COLORS.border}`,
+    }}>
+      <span style={{
+        fontFamily: EMAIL_FONTS.heading,
+        fontSize: '14px',
+        fontWeight: 600,
+        color: EMAIL_COLORS.text,
+        display: 'block',
+        lineHeight: '20px',
+      }}>
+        {title}
+      </span>
+      <span style={{
+        fontFamily: EMAIL_FONTS.body,
+        fontSize: '12px',
+        color: EMAIL_COLORS.muted,
+        display: 'block',
+        lineHeight: '18px',
+        marginTop: '2px',
+      }}>
+        {subtitle}
+      </span>
+    </td>
+  </tr>
+)
+
 export default function PayrollExportReadyEmail({
   periodLabel,
   entryCount,
-  grossTotal,
-  netTotal,
-  exportedBy
+  breakdowns,
+  netTotalDisplay,
+  exportedBy,
+  exportedAt
 }: PayrollExportReadyEmailProps) {
+  const metaParts: string[] = []
+
+  if (exportedBy) metaParts.push(`Exportado por ${exportedBy}`)
+  if (exportedAt) metaParts.push(exportedAt)
+
+  const metaLine = metaParts.join(' · ')
+
   return (
-    <EmailLayout previewText={`Nómina ${periodLabel} exportada — neto total ${netTotal}`} lang='es'>
+    <EmailLayout previewText={`Nómina ${periodLabel} cerrada — neto total ${netTotalDisplay}`} lang='es'>
       {/* Overline */}
       <Text style={{
         fontFamily: EMAIL_FONTS.body,
@@ -70,7 +135,7 @@ export default function PayrollExportReadyEmail({
         margin: '0 0 8px',
         lineHeight: '34px',
       }}>
-        Nómina exportada
+        Nómina cerrada y lista para revisión
       </Heading>
 
       <Text style={{
@@ -79,8 +144,9 @@ export default function PayrollExportReadyEmail({
         lineHeight: '24px',
         margin: '0 0 24px',
       }}>
-        El período <strong>{periodLabel}</strong> fue cerrado y exportado. A continuación
-        el resumen del cierre para Finance y HR.
+        El período <strong>{periodLabel}</strong> fue cerrado con{' '}
+        <strong>{entryCount} colaboradores</strong>. Adjuntamos el reporte
+        y el detalle para tu revisión.
       </Text>
 
       {/* Summary table */}
@@ -93,9 +159,14 @@ export default function PayrollExportReadyEmail({
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
-            {summaryRow('Período', periodLabel)}
             {summaryRow('Colaboradores', String(entryCount))}
-            {summaryRow('Bruto total', grossTotal)}
+            {breakdowns.map((b) => (
+              <>
+                {regimeHeaderRow(`${b.regimeLabel} (${b.currency})`)}
+                {summaryRow('Bruto', b.grossTotal, true)}
+                {summaryRow('Neto', b.netTotal, true)}
+              </>
+            ))}
           </tbody>
         </table>
       </Section>
@@ -105,7 +176,7 @@ export default function PayrollExportReadyEmail({
         backgroundColor: BRAND_BLUE,
         borderRadius: '0 0 12px 12px',
         padding: '20px 18px',
-        margin: '0 0 12px',
+        margin: '0 0 20px',
       }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
@@ -117,7 +188,7 @@ export default function PayrollExportReadyEmail({
                 fontWeight: 500,
                 verticalAlign: 'bottom',
               }}>
-                Neto a pagar
+                Neto total a pagar
               </td>
               <td style={{
                 fontFamily: EMAIL_FONTS.heading,
@@ -127,15 +198,49 @@ export default function PayrollExportReadyEmail({
                 textAlign: 'right' as const,
                 lineHeight: '34px',
               }}>
-                {netTotal}
+                {netTotalDisplay}
               </td>
             </tr>
           </tbody>
         </table>
       </Section>
 
-      {/* Exported by caption */}
-      {exportedBy && (
+      {/* Attachments section */}
+      <Section style={{
+        backgroundColor: '#F8FAFC',
+        border: `1px solid ${EMAIL_COLORS.border}`,
+        borderRadius: '12px',
+        padding: '16px 18px 6px',
+        margin: '0 0 12px',
+      }}>
+        <Text style={{
+          fontFamily: EMAIL_FONTS.heading,
+          fontSize: '11px',
+          fontWeight: 600,
+          color: EMAIL_COLORS.muted,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase' as const,
+          margin: '0 0 8px',
+          lineHeight: '16px',
+        }}>
+          Adjuntos incluidos
+        </Text>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {attachmentRow(
+              'Reporte de nómina (PDF)',
+              'Resumen por colaborador en formato imprimible'
+            )}
+            {attachmentRow(
+              'Detalle de nómina (CSV)',
+              'Desglose completo para contabilidad'
+            )}
+          </tbody>
+        </table>
+      </Section>
+
+      {/* Metadata caption */}
+      {metaLine && (
         <Text style={{
           fontSize: '12px',
           color: EMAIL_COLORS.muted,
@@ -143,26 +248,14 @@ export default function PayrollExportReadyEmail({
           margin: '0 0 24px',
           textAlign: 'right' as const,
         }}>
-          Exportado por {exportedBy}
+          {metaLine}
         </Text>
       )}
 
       {/* CTA */}
-      <Section style={{ textAlign: 'center' as const, margin: `${exportedBy ? '0' : '12px'} 0 24px` }}>
+      <Section style={{ textAlign: 'center' as const, margin: `${metaLine ? '0' : '12px'} 0 24px` }}>
         <EmailButton href={`${APP_URL}/hr/payroll`}>Ver nómina en Greenhouse</EmailButton>
       </Section>
-
-      {/* Microcopy */}
-      <Text style={{
-        fontSize: '13px',
-        color: EMAIL_COLORS.muted,
-        lineHeight: '20px',
-        margin: '0 0 16px',
-        borderTop: `1px solid ${EMAIL_COLORS.border}`,
-        paddingTop: '20px',
-      }}>
-        El PDF del período y el detalle por colaborador están disponibles en el módulo de Nómina.
-      </Text>
 
       {/* Brand footer inside card */}
       <Text style={{
@@ -170,6 +263,8 @@ export default function PayrollExportReadyEmail({
         color: EMAIL_COLORS.muted,
         lineHeight: '18px',
         margin: '0',
+        borderTop: `1px solid ${EMAIL_COLORS.border}`,
+        paddingTop: '20px',
       }}>
         Efeonce Group SpA · efeoncepro.com
       </Text>
