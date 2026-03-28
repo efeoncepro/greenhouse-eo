@@ -261,22 +261,36 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ## 9. Security Notes
 
+> **Full security posture, secret management strategy, and hardening plan:** see [GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md](GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md).
+> The sections below are retained for quick reference but the posture doc is authoritative.
+
 ### Current Gaps
 
-| Issue | Severity | Current State | Recommendation |
-|-------|----------|---------------|----------------|
-| Cloud SQL authorized network | **High** | `0.0.0.0/0` — any IP can attempt connection | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks |
-| Cloud SQL SSL enforcement | **Medium** | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections |
-| Plaintext API tokens | **Medium** | Most Cloud Functions store tokens in env vars | Migrate all secrets to Secret Manager; reference via `--set-secrets` at deploy time |
-| Cloud SQL Connector adoption | **Low** | Available but not enforced | Standardize on Cloud SQL Connector with IAM authentication to eliminate password-based access |
-| Service account key in Vercel | **Medium** | `GOOGLE_APPLICATION_CREDENTIALS_JSON` contains a full JSON key | Consider Workload Identity Federation for keyless authentication from Vercel |
+| Issue | Severity | Current State | Recommendation | Task |
+|-------|----------|---------------|----------------|------|
+| Cloud SQL authorized network | **High** | `0.0.0.0/0` — any IP can attempt connection | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks | TASK-096 Fase 1 |
+| Cloud SQL SSL enforcement | **Medium** | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections | TASK-096 Fase 1 |
+| Plaintext API tokens | **Medium** | Most Cloud Functions store tokens in env vars | Migrate critical secrets to Secret Manager | TASK-096 Fase 3 |
+| Cloud SQL Connector adoption | **Low** | Available but not enforced | Standardize on Cloud SQL Connector with IAM authentication | TASK-096 Fase 2 |
+| Service account key in Vercel | **Medium** | `GOOGLE_APPLICATION_CREDENTIALS_JSON` contains a full JSON key | Workload Identity Federation for keyless authentication from Vercel | TASK-096 Fase 2 |
+| No security headers | **Medium** | No middleware.ts, no CSP/HSTS/X-Frame-Options | Create middleware.ts with security headers | TASK-099 |
+| Silent production failures | **High** | console.error() only, zero alerting | Sentry + health endpoint + Slack alerts | TASK-098 |
+| Inconsistent cron auth | **Medium** | 2 patterns, some fail-open, no timing-safe | Centralized requireCronAuth() helper | TASK-101 |
+| No PITR | **Medium** | Daily backup only, never tested restore | Enable PITR + test restore | TASK-102 |
+| No cost visibility | **Low** | Zero budget alerts | GCP budget alerts + BigQuery cost guards | TASK-103 |
 
 ### Priority Actions
 
-1. **Restrict Cloud SQL network access** — replace `0.0.0.0/0` with explicit CIDR ranges.
-2. **Enforce SSL** — change SSL mode to `ENCRYPTED_ONLY`.
-3. **Migrate secrets** — move all plaintext tokens to Secret Manager across all Cloud Functions.
-4. **Audit IAM bindings** — ensure each service uses a dedicated service account with minimal permissions.
+1. **Restrict Cloud SQL network access** — replace `0.0.0.0/0` with explicit CIDR ranges (TASK-096 Fase 1).
+2. **Enforce SSL** — change SSL mode to `ENCRYPTED_ONLY` (TASK-096 Fase 1).
+3. **Add tests to CI** — 86 test files not running in pipeline (TASK-100).
+4. **Security headers middleware** — CSP, HSTS, X-Frame-Options (TASK-099).
+5. **Workload Identity Federation** — eliminate static SA key (TASK-096 Fase 2).
+6. **Observability MVP** — Sentry + health endpoint + Slack cron alerts (TASK-098).
+7. **Migrate critical secrets** — 6 secrets to Secret Manager (TASK-096 Fase 3).
+8. **Standardize cron auth** — single timing-safe helper for 18 routes (TASK-101).
+9. **Database resilience** — PITR, slow query logging, pool sizing, restore test (TASK-102).
+10. **Budget alerts** — GCP billing + BigQuery cost guards (TASK-103).
 
 ---
 
