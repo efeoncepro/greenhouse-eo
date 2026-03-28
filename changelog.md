@@ -7,6 +7,10 @@
 
 ## 2026-03-28
 
+### Payroll Chile foundation closure and receipt lane open
+- `TASK-078` quedó formalmente cerrada como `complete`: la base previsional canónica, el sync Gael Cloud y el forward cutover ya están estabilizados en runtime y docs.
+- `TASK-077` quedó abierta como siguiente lane operativa para recibos PDF/email/GCS/Mi Nómina, siguiendo el orden definido para Payroll Chile.
+
 ### Organization legal identity canonical
 - La identidad legal canónica de la organización operativa propietaria de Greenhouse quedó documentada de forma transversal para Payroll, Finance y surfaces comerciales: `Efeonce Group SpA`, RUT `77.357.182-1`, dirección `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
 - La referencia canónica se asentó en la arquitectura de Account 360 / organización y en el contexto vivo del repo para evitar duplicación por módulo.
