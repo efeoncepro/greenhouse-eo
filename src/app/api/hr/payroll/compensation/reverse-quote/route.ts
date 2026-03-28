@@ -43,6 +43,10 @@ export async function POST(request: Request) {
       getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UTM', periodDate })
     ])
 
+    // Reverse calculation always uses the LEGAL 7% health deduction (fonasa),
+    // not the member's actual Isapre plan. The "líquido deseado" represents net
+    // after mandatory deductions only. Isapre excess over 7% is a voluntary
+    // deduction that the employee opts into — it doesn't affect the base salary.
     const result = await computeGrossFromNet({
       desiredNetClp,
       periodDate,
@@ -58,16 +62,32 @@ export async function POST(request: Request) {
           : 'ninguna',
       afpName: typeof body.afpName === 'string' ? body.afpName : null,
       afpRate: parsePayrollNumber(body.afpRate, 'afpRate', { allowNull: true, min: 0, max: 1 }),
-      healthSystem: body.healthSystem === 'isapre' ? 'isapre' : body.healthSystem === 'fonasa' ? 'fonasa' : 'fonasa',
-      healthPlanUf: parsePayrollNumber(body.healthPlanUf, 'healthPlanUf', { allowNull: true, min: 0 }),
+      healthSystem: 'fonasa',
+      healthPlanUf: null,
       contractType: body.contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
-      hasApv: Boolean(body.hasApv),
-      apvAmount: parsePayrollNumber(body.apvAmount ?? 0, 'apvAmount', { min: 0 }) ?? 0,
+      hasApv: false,
+      apvAmount: 0,
       unemploymentRate: parsePayrollNumber(body.unemploymentRate, 'unemploymentRate', { allowNull: true, min: 0, max: 1 }),
       ufValue: ufSnapshot?.value ?? null,
       taxTableVersion: buildTaxTableVersion(year, month),
       utmValue: utmSnapshot?.value ?? null
     })
+
+    // If the member has Isapre, compute the excess over the 7% legal obligation
+    const actualHealthSystem = body.healthSystem === 'isapre' ? 'isapre' : 'fonasa'
+    const actualHealthPlanUf = parsePayrollNumber(body.healthPlanUf, 'healthPlanUf', { allowNull: true, min: 0 })
+    let isapreExcess: number | null = null
+    let netAfterIsapre: number | null = null
+
+    if (actualHealthSystem === 'isapre' && actualHealthPlanUf && actualHealthPlanUf > 0 && ufSnapshot?.value) {
+      const isapreTotal = Math.round(actualHealthPlanUf * ufSnapshot.value)
+      const legalHealth7pct = result.forward.chileHealthAmount ?? 0
+
+      if (isapreTotal > legalHealth7pct) {
+        isapreExcess = isapreTotal - legalHealth7pct
+        netAfterIsapre = Math.round(result.netTotalWithTax - isapreExcess)
+      }
+    }
 
     return NextResponse.json({
       converged: result.converged,
@@ -89,6 +109,8 @@ export async function POST(request: Request) {
         chileMovilizacionAmount: result.forward.chileMovilizacionAmount,
         chileEmployerTotalCost: result.forward.chileEmployerTotalCost
       },
+      isapreExcess,
+      netAfterIsapre,
       indicators: {
         ufValue: ufSnapshot?.value ?? null,
         utmValue: utmSnapshot?.value ?? null,

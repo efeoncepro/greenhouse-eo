@@ -44,6 +44,8 @@ type ReverseQuoteResult = {
   netDifferenceCLP: number
   taxAmountClp: number
   employerTotalCost: number | null
+  isapreExcess: number | null
+  netAfterIsapre: number | null
   forward: {
     grossTotal: number
     chileGratificacionLegalAmount: number | null
@@ -409,7 +411,13 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       )}
                       <Row label='Total descuentos' value={fmtCLP(reverseResult.forward.chileTotalDeductions)} negative />
                       <Divider sx={{ my: 0.5 }} />
-                      <Row label='Líquido calculado' value={fmtCLP(reverseResult.netTotalWithTax)} bold />
+                      <Row label='Líquido deseado' value={fmtCLP(reverseResult.netTotalWithTax)} bold />
+                      {reverseResult.isapreExcess != null && reverseResult.isapreExcess > 0 && (
+                        <>
+                          <Row label='Excedente Isapre' value={fmtCLP(reverseResult.isapreExcess)} negative />
+                          <Row label='Alcance líquido' value={fmtCLP(reverseResult.netAfterIsapre)} bold />
+                        </>
+                      )}
                       {reverseResult.employerTotalCost != null && reverseResult.employerTotalCost > 0 && (
                         <Row label='Costo empleador' value={fmtCLP(reverseResult.employerTotalCost)} muted />
                       )}
