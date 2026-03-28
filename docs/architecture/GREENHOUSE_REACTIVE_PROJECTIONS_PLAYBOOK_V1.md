@@ -4,7 +4,9 @@
 
 Este playbook documenta cómo registrar, operar y monitorear proyecciones reactivas en Greenhouse. El sistema permite que cualquier módulo declare qué eventos de dominio invalidan sus snapshots serving, y el consumer reactivo se encarga del refresh en tiempo real.
 
-`payroll_receipts_delivery` ya está validado end-to-end sobre `payroll_period.exported`: el evento se publica al outbox, el publicador lo marca `published` y el reactor genera el batch de recibos sin quedar bloqueado por otros handlers del mismo evento.
+`payroll_receipts_delivery` ya está definido como la primera proyección operativa del dominio Payroll sobre `payroll_period.exported`.
+
+La implementación actual ya publica el evento, lo enruta por el projection registry y genera la entrega de recibos, pero la cola persistente todavía debe terminar de cerrar su ciclo operativo para que la durabilidad sea literal y no solo conceptual.
 
 ## Architecture
 
@@ -122,6 +124,12 @@ The catch-all `/api/cron/outbox-react` still works for processing ALL domains se
 
 The persistent queue (`greenhouse_sync.projection_refresh_queue`) ensures refresh intents survive outbox event expiration.
 The reactive consumer also persists `greenhouse_sync.outbox_reactive_log` as its idempotency / retry ledger. The ledger is keyed by `(event_id, handler)` so each projection handler can react independently to the same outbox event; both tables are part of the shared reactive control plane and should be provisioned up front.
+
+Current hardening note:
+
+- la cola existe y acepta intents, pero el shared dequeue/completion worker todavía debe tratarse como un requisito operacional de primera clase
+- la documentación no debe describir la cola como "fully durable" hasta que completion/failure sea observable end-to-end
+- `projected_payroll` y `payroll_receipts_delivery` son los consumidores de referencia de este control plane
 
 ### How it works
 

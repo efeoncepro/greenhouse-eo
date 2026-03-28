@@ -106,10 +106,23 @@ Regla arquitectónica:
 - la promoción a oficial es una acción explícita, separada y reversible en términos de tracking, pero no en lifecycle transaccional
 - la capa de promoción debe fallar por schema o datos reales de nómina, no por infraestructura analítica no relacionada con el período
 
+## 2.6. Operational cut-off and close window
+
+Payroll se imputa al mes cerrado.
+
+Regla operativa canónica para Efeonce:
+
+- la nómina de un mes se calcula al cierre de ese mes o dentro de los primeros 5 días hábiles del mes siguiente
+- `approved` sigue siendo un estado operativo válido solo mientras el período aún está dentro de su ventana de cierre
+- cuando el período ya fue exportado o la ventana de cierre terminó, la selección de "período actual" no debe retroceder a un período aprobado antiguo
+
+Esta regla define la semántica de negocio del dashboard, no solo su copy.
+
 ## 3. Superficies oficiales
 
 ### Rutas UI
 - `/hr/payroll`
+- `/hr/payroll/projected`
 - `/hr/payroll/member/[memberId]`
 
 ### Surface actual
@@ -134,10 +147,21 @@ Regla arquitectónica:
 - `GET /api/hr/payroll/periods/[periodId]/pdf`
 - `GET /api/hr/payroll/periods/[periodId]/excel`
 - `GET /api/hr/payroll/periods/[periodId]/export`
+- `GET /api/hr/payroll/projected`
+- `POST /api/hr/payroll/projected/promote`
 - `PATCH /api/hr/payroll/entries/[entryId]`
 - `GET /api/hr/payroll/entries/[entryId]/receipt`
 - `GET /api/hr/payroll/members/[memberId]/history`
 - `GET /api/hr/payroll/personnel-expense`
+
+### Downstream receipts
+
+La entrega de recibos es parte del contrato downstream de Payroll:
+
+- los recibos individuales se registran en `greenhouse_payroll.payroll_receipts`
+- la proyección `payroll_receipts_delivery` reacciona a `payroll_period.exported`
+- `My Nómina` y `People > Nómina` consumen el mismo contrato de descarga/visualización de recibos
+- `period.pdf` y `period.excel` siguen siendo exports de período, distintos al recibo individual por entry
 
 ## 4. Anclas canónicas
 

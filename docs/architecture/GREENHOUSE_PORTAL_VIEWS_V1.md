@@ -47,6 +47,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Servicios | `/agency/services` | Implementada | Servicios por space con sync HubSpot |
 | Personas | `/people` | Implementada | Directorio + ficha 360 de cada colaborador; debe escalar capacidad/economía desde `member_capacity_economics` cuando aplique |
 | Nómina | `/hr/payroll` | Implementada | Períodos, cálculo, entries, readiness |
+| Nómina Proyectada | `/hr/payroll/projected` | Implementada | Simulación proyectada + promoción explícita a borrador oficial |
 | Departamentos | `/hr/departments` | Implementada | Estructura organizacional |
 | Permisos | `/hr/leave` | Implementada | Solicitudes y saldos del equipo |
 | Asistencia | `/hr/attendance` | Implementada | Registros de asistencia |

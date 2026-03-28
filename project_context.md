@@ -3,6 +3,30 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Operating Entity Identity — React context + API endpoint
+- La identidad de la entidad operadora (razón social, RUT, dirección legal) ya no se resuelve ad hoc por cada consumer.
+- Nuevo baseline:
+  - `OperatingEntityProvider` + `useOperatingEntity()` hook en `src/context/OperatingEntityContext.tsx`
+  - Hydration server → client: `Providers.tsx` llama `getOperatingEntityIdentity()` una vez y pasa al Provider
+  - API endpoint `GET /api/admin/operating-entity` para consumers no-React (webhooks, integraciones, cron)
+  - Payroll receipt card y PDF ya consumen la identidad del empleador desde el contexto
+- Regla operativa derivada:
+  - todo documento formal (recibo, DTE, contrato, propuesta, email) debe obtener la identidad del empleador desde `useOperatingEntity()` (client) o `getOperatingEntityIdentity()` (server), no hardcodearla
+  - el Provider se resuelve una vez por layout render, no por componente
+  - multi-tenant ready: si la operación se fragmenta por tenant, el layout resuelve el operating entity del scope de la sesión
+
+## Delta 2026-03-28 Payroll hardening backlog documented
+- La auditoría de Payroll dejó tres lanes explícitas para seguir endureciendo el módulo sin mezclar objetivos:
+  - `TASK-087`: invariantes del lifecycle oficial y gate de readiness
+  - `TASK-088`: cola reactiva, export parity y contrato de projected payroll / receipts
+  - `TASK-089`: UX, copy, feedback y accesibilidad en HR, My Payroll y People
+- La arquitectura de Payroll ahora documenta explícitamente:
+  - la ventana operativa de cierre de nómina
+  - `/hr/payroll/projected` como surface derivada
+  - `payroll_receipts_delivery` como consumer downstream de `payroll_period.exported`
+- Regla operativa derivada:
+  - la nómina oficial y la proyectada siguen siendo objetos distintos; la proyección alimenta, pero no reemplaza, el lifecycle oficial
+
 ## Delta 2026-03-28 Compensation Chile líquido-first + reverse engine completo
 - `TASK-079` a `TASK-085` cerradas en una sesión:
   - Motor reverse `computeGrossFromNet()` con binary search, piso IMM, convergencia ±$1 CLP

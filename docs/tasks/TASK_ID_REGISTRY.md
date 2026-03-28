@@ -79,7 +79,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-060` | `complete` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/complete/TASK-060-team-assignment-admin.md` |
 | `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
-| `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
+| `TASK-063` | `to-do` | Payroll Projected Payroll Runtime | `docs/tasks/to-do/TASK-063-payroll-projected-payroll-runtime.md` |
 | `TASK-064` | `complete` | ICO Assignee Attribution Remediation | `docs/tasks/complete/TASK-064-ico-assignee-attribution-remediation.md` |
 | `TASK-065` | `complete` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
 | `TASK-067` | `to-do` | Cost Intelligence Foundation | `docs/tasks/to-do/TASK-067-cost-intelligence-foundation.md` |
@@ -110,7 +110,9 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-084` | `to-do` | Compensation Drawer Manual Mode UX Polish | `docs/tasks/to-do/TASK-084-compensation-drawer-manual-mode-ux-polish.md` |
 | `TASK-085` | `in-progress` | Compensation Chile Líquido-First Flow | `docs/tasks/in-progress/TASK-085-compensation-chile-liquido-first-flow.md` |
 | `TASK-086` | `complete` | Payroll Current Period View Logic Fix | `docs/tasks/complete/TASK-086-payroll-current-period-view-logic.md` |
-- `TASK-087`
+| `TASK-087` | `to-do` | Payroll Lifecycle Invariants and Readiness Hardening | `docs/tasks/to-do/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md` |
+| `TASK-088` | `to-do` | Payroll Reactive Projections and Delivery Hardening | `docs/tasks/to-do/TASK-088-payroll-reactive-projections-and-delivery-hardening.md` |
+| `TASK-089` | `to-do` | Payroll UX Semantics and Feedback Hardening | `docs/tasks/to-do/TASK-089-payroll-ux-semantics-and-feedback-hardening.md` |
 
 ## Regla de asignacion desde aqui
 

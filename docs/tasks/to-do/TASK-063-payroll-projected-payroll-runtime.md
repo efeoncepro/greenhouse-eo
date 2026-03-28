@@ -1,5 +1,11 @@
 # TASK-063 - Payroll Projected Payroll Runtime
 
+## Delta 2026-03-28 — Runtime y contrato reactivo alineados a la realidad actual
+
+- `Projected Payroll` ya tiene superficie propia en `/hr/payroll/projected` y promoción explícita a borrador oficial.
+- La lane que queda abierta no es la creación del baseline inicial, sino el endurecimiento del contrato reactivo, el serving snapshot y la observabilidad.
+- Los eventos `payroll.projected_*` que este brief proponía como nuevos consumers deben leerse hoy como contexto histórico; el contrato activo se está cerrando en las tasks de hardening.
+
 ## Delta 2026-03-27 — Auditoría de dependencias, eventos reactivos y gaps
 
 ### Estado de dependencias

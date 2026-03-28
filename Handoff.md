@@ -49,6 +49,51 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 19:15 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Convertir la auditoría de Payroll en documentación viva: alinear arquitectura, surfaces y event catalog, y crear backlog explícito para lifecycle, reactivo y UX hardening.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- `docs/tasks/to-do/TASK-063-payroll-projected-payroll-runtime.md`
+- `docs/tasks/to-do/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md`
+- `docs/tasks/to-do/TASK-088-payroll-reactive-projections-and-delivery-hardening.md`
+- `docs/tasks/to-do/TASK-089-payroll-ux-semantics-and-feedback-hardening.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `project_context.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Verificacion
+
+- Auditoría documental y actualización de tareas; no se ejecutaron tests porque no hubo cambios de runtime.
+
+### Riesgos o pendientes
+
+- Falta decidir si `TASK-063` termina de reclasificarse como referencia histórica o se mantiene como brief vivo.
+- Los tres nuevos tasks de hardening quedaron creados pero todavía no hay implementación.
+- Falta validar que el índice de tasks quedó coherente visualmente con el nuevo payroll lane.
+- Hay cambios ajenos ya presentes en el árbol en `src/components/Providers.tsx`, `src/views/greenhouse/payroll/PayrollReceiptCard.tsx`, `src/views/greenhouse/payroll/PayrollReceiptDialog.tsx` y los directorios untracked `src/app/api/admin/operating-entity/` y `src/context/`; no se tocaron en esta lane.
+
 ## 2026-03-28 18:35 -03
 
 ### Agente

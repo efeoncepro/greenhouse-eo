@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll hardening backlog and architecture alignment documented
+- Se documentaron tres lanes nuevas para endurecer Payroll sin mezclar objetivos: lifecycle/readiness, reactivo/delivery y UX/feedback.
+- La arquitectura de Payroll ahora declara la ventana operativa de cierre, `/hr/payroll/projected` como surface derivada y `payroll_receipts_delivery` como downstream de `payroll_period.exported`.
+- `TASK-063` recibió un delta de alineación para dejar claro que los nuevos eventos proyectados ya no son el contrato principal y que el cierre actual vive en hardening.
+
 ### TASK-086 current period selector + receipt download implemented
 - `PayrollDashboard` ahora usa un helper puro para seleccionar el período actual sin retroceder a rezagos exportados.
 - `PayrollPeriodTab` muestra empty state operativo con CTA de creación del siguiente período.

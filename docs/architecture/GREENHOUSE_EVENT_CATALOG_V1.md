@@ -78,6 +78,7 @@ Notas:
 - `projected_payroll` y `person_intelligence` deben reaccionar a este evento derivado, no recalcular directamente desde cambios crudos de tareas.
 - La introducción futura de un evento base tipo `delivery.task_assignment.upserted` puede complementar refresh dirigido de `ico_member_metrics`, pero no reemplaza el contrato de `ico.materialization.completed` para consumers derivados.
 - `payroll_period.exported` ya quedó smoke-validado como disparador de `payroll_receipts_delivery`: primero se publica el outbox y luego el reactor materializa la entrega de recibos, sin depender de cron separado ni de un consumer bloqueado por otro handler del mismo evento.
+- Los eventos `payroll.projected_snapshot.refreshed`, `payroll.projected_period.refreshed`, `payroll.projected_promoted_to_official_draft` y `payroll_period.recalculated_from_projection` existen como trazas de promoción/proyección, pero deben tratarse explícitamente como audit trail hasta que un consumer real los reclame.
 
 Notas:
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.
@@ -150,6 +151,7 @@ El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarat
 | `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
 | `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
 | `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |
+| `payroll_receipts_delivery` | notifications | payroll_period.exported | Genera, persiste y envía el batch de recibos del período exportado |
 
 ## Extensibilidad
 
