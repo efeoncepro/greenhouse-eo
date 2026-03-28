@@ -31,6 +31,12 @@ export interface EmailTemplateRenderResult {
   attachments?: EmailAttachment[]
 }
 
+export interface EmailDeliveryPayload<TContext extends EmailTemplateContext = EmailTemplateContext> {
+  recipients: EmailRecipient[]
+  context: TContext
+  attachments?: EmailAttachment[]
+}
+
 export interface EmailTemplateContext extends Record<string, unknown> {
   recipientEmail?: string
   recipientName?: string
@@ -55,5 +61,11 @@ export interface SendEmailResult {
   deliveryId: string
   resendId: string | null
   status: EmailDeliveryStatus
+  recipientResults?: Array<{
+    recipientEmail: string
+    resendId: string | null
+    status: EmailDeliveryStatus
+    error?: string
+  }>
   error?: string
 }

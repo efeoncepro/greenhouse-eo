@@ -27,6 +27,10 @@
     {
       "path": "/api/cron/webhook-dispatch",
       "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/cron/email-delivery-retry",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

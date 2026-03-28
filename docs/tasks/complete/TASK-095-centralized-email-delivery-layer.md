@@ -19,6 +19,7 @@
 - Auth, NotificationService y Payroll ya consumen `sendEmail()` y dejaron de depender del envío directo ad hoc.
 - Se materializaron `greenhouse_notifications.email_deliveries` y `greenhouse_notifications.email_subscriptions`, con seed para `payroll_export`.
 - El catálogo de templates quedó centralizado en `src/lib/email/templates.ts`, incluyendo `notification` con React Email.
+- El retry cron quedó implementado en `/api/cron/email-delivery-retry` y usa el payload persistido en `delivery_payload` para reprocesar `failed` deliveries con un máximo de 3 intentos dentro de 1 hora.
 
 - Se validó en vivo el flujo de reenvío de Payroll sobre `dev-greenhouse.efeoncepro.com` y el hallazgo operativo fue claro: ese dominio apunta al deployment `staging` de Vercel, no al `Preview (develop)`.
 - El primer mail de nómina llegó a Outlook con PDF/CSV adjuntos, pero los reintentos podían devolver `deliveryId: null` cuando el runtime activo no veía la configuración transaccional correcta.
@@ -128,13 +129,8 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- No existe capa unica y reusable para solicitar emails
-- 3 sistemas de logging sin audit trail unificado
-- `NotificationService` envia plain text (no React Email)
-- Recipients hardcoded en payroll export
-- 0 retries en cualquier caller
-- `VerifyEmail` template sin caller (dead code)
-- Sin unsubscribe headers ni bounce tracking
+- La capa unificada, el audit trail y el retry cron ya existen.
+- Quedan como follow-up opcional el bounce tracking via webhooks de Resend y los unsubscribe headers si el catalogo de emails crece hacia una superficie opt-in.
 
 ## Decisiones de diseno
 
@@ -178,7 +174,7 @@ Valores de `domain`: `identity`, `payroll`, `finance`, `hr`, `delivery`, `system
 
 Dos caminos:
 1. **Reactivo** (proyecciones): ya tiene retry built-in via `outbox_reactive_log` (max retries configurable por proyeccion)
-2. **Directo** (auth, ad-hoc): nuevo cron `processFailedEmailDeliveries()` que lee `email_deliveries WHERE status='failed' AND attempt_number < 3 AND created_at > NOW() - INTERVAL '1 hour'`
+2. **Directo** (auth, ad-hoc): cron `processFailedEmailDeliveries()` que lee `email_deliveries WHERE status='failed' AND attempt_number < 3 AND created_at > NOW() - INTERVAL '1 hour'`
 
 No se introduce cola async ni inline backoff. El outbox pattern existente ya resuelve el problema.
 
@@ -479,7 +475,7 @@ Estos eventos ya se publican en el outbox. Solo falta registrar nuevas proyeccio
 - [x] `NotificationService` usa la capa para canal email (React Email, no plain text)
 - [x] Auth (password_reset, invitation) migrados a la capa
 - [x] Payroll (export, receipts) migrados a la capa
-- [ ] Cron de retry reprocesa `failed` deliveries (max 3 intentos, ventana 1 hora)
+- [x] Cron de retry reprocesa `failed` deliveries (max 3 intentos, ventana 1 hora)
 - [x] `email_subscriptions` contiene los recipients de payroll_export (no hardcoded)
 - [x] `pnpm build` verde
 - [x] `pnpm test`, `pnpm lint` verdes

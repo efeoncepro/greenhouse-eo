@@ -19,6 +19,7 @@ const DDL_STATEMENTS = [
     resend_id          TEXT,
     status             TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed', 'skipped')),
     has_attachments    BOOLEAN NOT NULL DEFAULT FALSE,
+    delivery_payload   JSONB NOT NULL DEFAULT '{}'::jsonb,
     source_event_id    TEXT,
     source_entity      TEXT,
     actor_email        TEXT,

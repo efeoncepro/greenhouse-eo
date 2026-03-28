@@ -9,9 +9,11 @@ import { ensureEmailSchema } from './schema'
 import { getSubscribers } from './subscriptions'
 import { resolveTemplate } from './templates'
 import type {
+  EmailDomain,
   EmailAttachment,
+  EmailDeliveryPayload,
   EmailRecipient,
-  EmailTemplateRenderResult,
+  EmailType,
   SendEmailInput,
   SendEmailResult
 } from './types'
@@ -23,12 +25,118 @@ const mergeAttachments = (templateAttachments: EmailAttachment[] | undefined, in
   ...(inputAttachments ?? [])
 ]
 
+const serializeJsonSafe = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
+
+const reviveJsonSafe = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(item => reviveJsonSafe(item))
+  }
+
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+
+    if (record.type === 'Buffer' && Array.isArray(record.data)) {
+      return Buffer.from(record.data as number[])
+    }
+
+    return Object.fromEntries(
+      Object.entries(record).map(([key, entry]) => [key, reviveJsonSafe(entry)])
+    )
+  }
+
+  return value
+}
+
 const toResendAttachments = (attachments: EmailAttachment[] | undefined) =>
   (attachments ?? []).map(attachment => ({
     filename: attachment.filename,
     content: attachment.content.toString('base64'),
     contentType: attachment.contentType
   }))
+
+const normalizePayload = <TContext extends Record<string, unknown>>(input: {
+  recipients: EmailRecipient[]
+  context: TContext
+  attachments?: EmailAttachment[]
+}): EmailDeliveryPayload<TContext> => ({
+  recipients: input.recipients.map(recipient => ({
+    email: normalizeEmail(recipient.email),
+    name: recipient.name,
+    userId: recipient.userId
+  })),
+  context: serializeJsonSafe(input.context),
+  attachments: input.attachments?.map(attachment => ({
+    filename: attachment.filename,
+    content: Buffer.from(attachment.content),
+    contentType: attachment.contentType
+  }))
+})
+
+const reviveDeliveryPayload = <TContext extends Record<string, unknown>>(
+  payload: unknown
+): EmailDeliveryPayload<TContext> | null => {
+  if (!payload || typeof payload !== 'object') {
+    return null
+  }
+
+  const record = reviveJsonSafe(payload) as Record<string, unknown>
+
+  const recipients = Array.isArray(record.recipients)
+    ? record.recipients
+        .map(item => {
+          if (!item || typeof item !== 'object') return null
+
+          const recipient = item as Record<string, unknown>
+
+          if (typeof recipient.email !== 'string') return null
+
+          return {
+            email: recipient.email,
+            ...(typeof recipient.name === 'string' ? { name: recipient.name } : {}),
+            ...(typeof recipient.userId === 'string' ? { userId: recipient.userId } : {})
+          } as EmailRecipient
+        })
+        .filter((recipient): recipient is EmailRecipient => recipient !== null)
+    : []
+
+  if (recipients.length === 0) {
+    return null
+  }
+
+  const context = record.context && typeof record.context === 'object'
+    ? (record.context as TContext)
+    : ({} as TContext)
+
+  const attachments = Array.isArray(record.attachments)
+    ? record.attachments
+        .map(item => {
+          if (!item || typeof item !== 'object') return null
+
+          const attachment = item as Record<string, unknown>
+
+          if (
+            typeof attachment.filename !== 'string' ||
+            typeof attachment.contentType !== 'string' ||
+            !(attachment.content instanceof Buffer)
+          ) {
+            return null
+          }
+
+          return {
+            filename: attachment.filename,
+            content: attachment.content,
+            contentType: attachment.contentType
+          }
+        })
+        .filter((attachment): attachment is EmailAttachment => Boolean(attachment))
+    : undefined
+
+  return {
+    recipients,
+    context,
+    attachments
+  }
+}
 
 const createDeliveryRow = async (input: {
   batchId: string
@@ -39,6 +147,7 @@ const createDeliveryRow = async (input: {
   resendId: string | null
   status: SendEmailResult['status']
   hasAttachments: boolean
+  payload: EmailDeliveryPayload
   sourceEventId?: string
   sourceEntity?: string
   actorEmail?: string
@@ -63,6 +172,7 @@ const createDeliveryRow = async (input: {
         resend_id,
         status,
         has_attachments,
+        delivery_payload,
         source_event_id,
         source_entity,
         actor_email,
@@ -71,7 +181,7 @@ const createDeliveryRow = async (input: {
         created_at,
         updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 1, NOW(), NOW()
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, 1, NOW(), NOW()
       )
       RETURNING delivery_id
     `,
@@ -86,6 +196,7 @@ const createDeliveryRow = async (input: {
       input.resendId,
       input.status,
       input.hasAttachments,
+      JSON.stringify(input.payload),
       input.sourceEventId ?? null,
       input.sourceEntity ?? null,
       input.actorEmail ?? null,
@@ -94,6 +205,244 @@ const createDeliveryRow = async (input: {
   )
 
   return rows[0]?.delivery_id ?? null
+}
+
+const updateDeliveryRow = async (input: {
+  deliveryId: string
+  resendId: string | null
+  status: SendEmailResult['status']
+  errorMessage?: string | null
+}) => {
+  await runGreenhousePostgresQuery(
+    `
+      UPDATE greenhouse_notifications.email_deliveries
+      SET resend_id = $2,
+          status = $3,
+          error_message = $4,
+          updated_at = NOW()
+      WHERE delivery_id = $1
+    `,
+    [
+      input.deliveryId,
+      input.resendId,
+      input.status,
+      input.errorMessage ?? null
+    ]
+  )
+}
+
+interface FailedDeliveryRow {
+  delivery_id: string
+  batch_id: string
+  email_type: string
+  domain: string
+  recipient_email: string
+  recipient_name: string | null
+  recipient_user_id: string | null
+  subject: string
+  resend_id: string | null
+  status: SendEmailResult['status']
+  has_attachments: boolean
+  delivery_payload: unknown
+  source_event_id: string | null
+  source_entity: string | null
+  actor_email: string | null
+  error_message: string | null
+  attempt_number: number
+}
+
+const claimFailedDelivery = async (deliveryId: string) => {
+  const rows = await runGreenhousePostgresQuery<FailedDeliveryRow & Record<string, unknown>>(
+    `
+      UPDATE greenhouse_notifications.email_deliveries
+      SET status = 'pending',
+          attempt_number = attempt_number + 1,
+          error_message = NULL,
+          updated_at = NOW()
+      WHERE delivery_id = $1
+        AND status = 'failed'
+        AND attempt_number < 3
+      RETURNING
+        delivery_id,
+        batch_id,
+        email_type,
+        domain,
+        recipient_email,
+        recipient_name,
+        recipient_user_id,
+        subject,
+        resend_id,
+        status,
+        has_attachments,
+        delivery_payload,
+        source_event_id,
+        source_entity,
+        actor_email,
+        error_message,
+        attempt_number
+    `,
+    [deliveryId]
+  )
+
+  return rows[0] ?? null
+}
+
+const deliverRecipient = async <TContext extends Record<string, unknown>>(input: {
+  batchId: string
+  emailType: EmailType
+  domain: EmailDomain
+  recipient: EmailRecipient
+  context: TContext
+  attachments?: EmailAttachment[]
+  sourceEventId?: string
+  sourceEntity?: string
+  actorEmail?: string
+  existingDeliveryId?: string | null
+}) => {
+  const basePayload = normalizePayload({
+    recipients: [input.recipient],
+    context: input.context,
+    attachments: input.attachments
+  })
+
+  try {
+    const resolvedTemplate = resolveTemplate(input.emailType, {
+      ...input.context,
+      recipientEmail: input.recipient.email,
+      recipientName: input.recipient.name,
+      recipientUserId: input.recipient.userId
+    })
+
+    const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, input.attachments)
+    const resendAttachments = toResendAttachments(mergedAttachments)
+
+    const payload = normalizePayload({
+      recipients: [input.recipient],
+      context: input.context,
+      attachments: mergedAttachments
+    })
+
+    if (!isResendConfigured()) {
+      if (input.existingDeliveryId) {
+        await updateDeliveryRow({
+          deliveryId: input.existingDeliveryId,
+          resendId: null,
+          status: 'skipped',
+          errorMessage: 'RESEND_API_KEY is not configured.'
+        })
+      } else {
+        await createDeliveryRow({
+          batchId: input.batchId,
+          emailType: input.emailType,
+          domain: input.domain,
+          recipient: input.recipient,
+          subject: resolvedTemplate.subject,
+          resendId: null,
+          status: 'skipped',
+          hasAttachments: Boolean(resendAttachments.length),
+          payload,
+          sourceEventId: input.sourceEventId,
+          sourceEntity: input.sourceEntity,
+          actorEmail: input.actorEmail,
+          errorMessage: 'RESEND_API_KEY is not configured.'
+        })
+      }
+
+      return {
+        deliveryId: input.existingDeliveryId || input.batchId,
+        recipientEmail: input.recipient.email,
+        resendId: null,
+        status: 'skipped' as const,
+        error: 'RESEND_API_KEY is not configured.'
+      }
+    }
+
+    const resend = getResendClient()
+
+    const result = await resend.emails.send({
+      from: getEmailFromAddress(),
+      to: normalizeEmail(input.recipient.email),
+      subject: resolvedTemplate.subject,
+      react: resolvedTemplate.react,
+      text: resolvedTemplate.text,
+      ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {})
+    })
+
+    const resendId = result?.data?.id ?? null
+
+    if (input.existingDeliveryId) {
+      await updateDeliveryRow({
+        deliveryId: input.existingDeliveryId,
+        resendId,
+        status: 'sent'
+      })
+    } else {
+      await createDeliveryRow({
+        batchId: input.batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient: input.recipient,
+        subject: resolvedTemplate.subject,
+        resendId,
+        status: 'sent',
+        hasAttachments: resendAttachments.length > 0,
+        payload,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail
+      })
+    }
+
+    return {
+      deliveryId: input.existingDeliveryId || input.batchId,
+      recipientEmail: input.recipient.email,
+      resendId,
+      status: 'sent' as const
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to send email.'
+
+    const subject = error instanceof Error && error.message.includes('No email template registered')
+      ? '[template missing]'
+      : '[email delivery failed]'
+
+    if (input.existingDeliveryId) {
+      await updateDeliveryRow({
+        deliveryId: input.existingDeliveryId,
+        resendId: null,
+        status: 'failed',
+        errorMessage: message
+      }).catch(err => {
+        console.warn('[email-delivery] Failed to update retried delivery row:', err)
+      })
+    } else {
+      await createDeliveryRow({
+        batchId: input.batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient: input.recipient,
+        subject,
+        resendId: null,
+        status: 'failed',
+        hasAttachments: Boolean(input.attachments?.length),
+        payload: basePayload,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail,
+        errorMessage: message
+      }).catch(err => {
+        console.warn('[email-delivery] Failed to persist failed delivery row:', err)
+      })
+    }
+
+    return {
+      deliveryId: input.existingDeliveryId || input.batchId,
+      recipientEmail: input.recipient.email,
+      resendId: null,
+      status: 'failed' as const,
+      error: message
+    }
+  }
 }
 
 export const sendEmail = async <TContext extends Record<string, unknown>>(input: SendEmailInput<TContext>): Promise<SendEmailResult> => {
@@ -124,147 +473,38 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(input:
     }
   }
 
-  if (!isResendConfigured()) {
-    for (const recipient of recipients) {
-      let resolvedTemplate: EmailTemplateRenderResult
-
-      try {
-        resolvedTemplate = resolveTemplate(input.emailType, {
-          ...input.context,
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
-          recipientUserId: recipient.userId
-        })
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unable to resolve email template.'
-
-        await createDeliveryRow({
-          batchId,
-          emailType: input.emailType,
-          domain: input.domain,
-          recipient,
-          subject: '[template missing]',
-          resendId: null,
-          status: 'failed',
-          hasAttachments: Boolean(input.attachments?.length),
-          sourceEventId: input.sourceEventId,
-          sourceEntity: input.sourceEntity,
-          actorEmail: input.actorEmail,
-          errorMessage: message
-        }).catch(err => {
-          console.warn('[email-delivery] Failed to persist template error row:', err)
-        })
-
-        return {
-          deliveryId: batchId,
-          resendId: null,
-          status: 'failed',
-          error: message
-        }
-      }
-
-      await createDeliveryRow({
-        batchId,
-        emailType: input.emailType,
-        domain: input.domain,
-        recipient,
-        subject: resolvedTemplate.subject,
-        resendId: null,
-        status: 'skipped',
-        hasAttachments: Boolean(mergeAttachments(resolvedTemplate.attachments, input.attachments).length),
-        sourceEventId: input.sourceEventId,
-        sourceEntity: input.sourceEntity,
-        actorEmail: input.actorEmail,
-        errorMessage: 'RESEND_API_KEY is not configured.'
-      }).catch(err => {
-        console.warn('[email-delivery] Failed to persist skipped delivery row:', err)
-      })
-    }
-
-    return {
-      deliveryId: batchId,
-      resendId: null,
-      status: 'skipped',
-      error: 'RESEND_API_KEY is not configured.'
-    }
-  }
-
-  const resend = getResendClient()
-
   let firstResendId: string | null = null
   let sawFailure = false
   let lastError: string | undefined
+  const recipientResults: NonNullable<SendEmailResult['recipientResults']> = []
 
   for (const recipient of recipients) {
-    let resolvedTemplate: EmailTemplateRenderResult
+    const result = await deliverRecipient({
+      batchId,
+      emailType: input.emailType,
+      domain: input.domain,
+      recipient,
+      context: input.context,
+      attachments: input.attachments,
+      sourceEventId: input.sourceEventId,
+      sourceEntity: input.sourceEntity,
+      actorEmail: input.actorEmail
+    })
 
-    try {
-      resolvedTemplate = resolveTemplate(input.emailType, {
-        ...input.context,
-        recipientEmail: recipient.email,
-        recipientName: recipient.name,
-        recipientUserId: recipient.userId
-      })
+    if (result.resendId && !firstResendId) {
+      firstResendId = result.resendId
+    }
 
-      const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, input.attachments)
-      const resendAttachments = toResendAttachments(mergedAttachments)
+    recipientResults.push({
+      recipientEmail: recipient.email,
+      resendId: result.resendId,
+      status: result.status,
+      ...(result.error ? { error: result.error } : {})
+    })
 
-      const result = await resend.emails.send({
-        from: getEmailFromAddress(),
-        to: normalizeEmail(recipient.email),
-        subject: resolvedTemplate.subject,
-        react: resolvedTemplate.react,
-        text: resolvedTemplate.text,
-        ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {})
-      })
-
-      const resendId = result?.data?.id ?? null
-
-      if (!firstResendId && resendId) {
-        firstResendId = resendId
-      }
-
-      await createDeliveryRow({
-        batchId,
-        emailType: input.emailType,
-        domain: input.domain,
-        recipient,
-        subject: resolvedTemplate.subject,
-        resendId,
-        status: 'sent',
-        hasAttachments: resendAttachments.length > 0,
-        sourceEventId: input.sourceEventId,
-        sourceEntity: input.sourceEntity,
-        actorEmail: input.actorEmail
-      }).catch(err => {
-        console.warn('[email-delivery] Failed to persist sent delivery row:', err)
-      })
-    } catch (error) {
+    if (result.status === 'failed') {
       sawFailure = true
-      const message = error instanceof Error ? error.message : 'Failed to send email.'
-
-      lastError = lastError || message
-
-      const subject = error instanceof Error && error.message.includes('No email template registered')
-        ? '[template missing]'
-        : '[email delivery failed]'
-
-      await createDeliveryRow({
-        batchId,
-        emailType: input.emailType,
-        domain: input.domain,
-        recipient,
-        subject,
-        resendId: null,
-        status: 'failed',
-        hasAttachments: Boolean(input.attachments?.length),
-        sourceEventId: input.sourceEventId,
-        sourceEntity: input.sourceEntity,
-        actorEmail: input.actorEmail,
-        errorMessage: message
-      }).catch(err => {
-        console.warn('[email-delivery] Failed to persist failed delivery row:', err)
-      })
+      lastError = lastError || result.error
     }
   }
 
@@ -272,6 +512,116 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(input:
     deliveryId: batchId,
     resendId: firstResendId,
     status: sawFailure ? 'failed' : 'sent',
+    recipientResults,
     ...(lastError ? { error: lastError } : {})
+  }
+}
+
+export const processFailedEmailDeliveries = async (limit = 25) => {
+  if (!isResendConfigured()) {
+    return {
+      attempted: 0,
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      claimed: 0
+    }
+  }
+
+  await ensureEmailSchema()
+
+  const rows = await runGreenhousePostgresQuery<FailedDeliveryRow & Record<string, unknown>>(
+    `
+      SELECT
+        delivery_id,
+        batch_id,
+        email_type,
+        domain,
+        recipient_email,
+        recipient_name,
+        recipient_user_id,
+        subject,
+        resend_id,
+        status,
+        has_attachments,
+        delivery_payload,
+        source_event_id,
+        source_entity,
+        actor_email,
+        error_message,
+        attempt_number
+      FROM greenhouse_notifications.email_deliveries
+      WHERE status = 'failed'
+        AND attempt_number < 3
+        AND created_at > NOW() - INTERVAL '1 hour'
+      ORDER BY created_at ASC
+      LIMIT $1
+    `,
+    [limit]
+  )
+
+  let attempted = 0
+  let sent = 0
+  let failed = 0
+  let skipped = 0
+  let claimed = 0
+
+  for (const row of rows) {
+    const claimedRow = await claimFailedDelivery(row.delivery_id)
+
+    if (!claimedRow) {
+      continue
+    }
+
+    claimed++
+    attempted++
+
+    const payload = reviveDeliveryPayload(claimedRow.delivery_payload)
+
+    if (!payload) {
+      skipped++
+      await updateDeliveryRow({
+        deliveryId: claimedRow.delivery_id,
+        resendId: null,
+        status: 'skipped',
+        errorMessage: 'Unable to revive delivery payload for retry.'
+      })
+      continue
+    }
+
+    const recipient = payload.recipients.find(item => normalizeEmail(item.email) === normalizeEmail(claimedRow.recipient_email)) ?? {
+      email: claimedRow.recipient_email,
+      name: claimedRow.recipient_name ?? undefined,
+      userId: claimedRow.recipient_user_id ?? undefined
+    }
+
+    const retryResult = await deliverRecipient({
+      batchId: claimedRow.batch_id,
+      emailType: claimedRow.email_type as EmailType,
+      domain: claimedRow.domain as EmailDomain,
+      recipient,
+      context: payload.context,
+      attachments: payload.attachments,
+      sourceEventId: claimedRow.source_event_id ?? undefined,
+      sourceEntity: claimedRow.source_entity ?? undefined,
+      actorEmail: claimedRow.actor_email ?? undefined,
+      existingDeliveryId: claimedRow.delivery_id
+    })
+
+    if (retryResult.status === 'sent') {
+      sent++
+    } else if (retryResult.status === 'skipped') {
+      skipped++
+    } else {
+      failed++
+    }
+  }
+
+  return {
+    attempted,
+    sent,
+    failed,
+    skipped,
+    claimed
   }
 }

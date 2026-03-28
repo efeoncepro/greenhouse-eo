@@ -11,6 +11,7 @@
 - Se implementó la capa unificada `sendEmail()` sobre Resend con template registry, resolver de suscripciones y persistencia en `greenhouse_notifications.email_deliveries`.
 - Auth, NotificationService y Payroll ya migraron al contrato central, incluyendo el template `NotificationEmail` para dejar atrás el plain text del canal de notificaciones.
 - La task quedó movida a `complete/` y el catálogo de emails, el registry de tasks y el contexto del proyecto quedaron alineados al runtime nuevo.
+- El cron `email-delivery-retry` quedó agregado para reprocesar `failed` deliveries usando el `delivery_payload` persistido, con límite de 3 intentos en una ventana de 1 hora.
 
 ### Payroll email resend staging env clarified
 - Se documentó que `dev-greenhouse.efeoncepro.com` sirve el deployment `staging` de Vercel, por lo que `RESEND_API_KEY` y `EMAIL_FROM` deben existir en ese entorno para que `Reenviar correo` funcione realmente.

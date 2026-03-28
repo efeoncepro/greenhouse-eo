@@ -15,6 +15,7 @@ La relacion correcta entre ambas es:
 - `TASK-095` quedó implementada como capa unificada de delivery sobre Resend en `src/lib/email/delivery.ts`.
 - Los callers de Auth, NotificationService y Payroll ya consumen `sendEmail()` con templates centralizados y persistencia unificada en `greenhouse_notifications.email_deliveries`.
 - `NotificationEmail` reemplaza el plain text ad hoc para el canal `notification`, y `email_subscriptions` queda como resolver canónico para recipientes por tipo.
+- El retry cron `/api/cron/email-delivery-retry` usa `delivery_payload` para reintentar entregas fallidas con máximo 3 intentos dentro de 1 hora.
 
 ## Resumen
 

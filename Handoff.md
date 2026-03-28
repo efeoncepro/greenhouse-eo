@@ -49,6 +49,50 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 18:26 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar el gap real que quedaba en `TASK-095`: retry cron para `failed` deliveries, con payload persistido para replay y schedule de Vercel.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/lib/email/delivery.ts`
+- `src/lib/email/delivery.test.ts`
+- `src/lib/email/schema.ts`
+- `src/lib/email/types.ts`
+- `src/app/api/cron/email-delivery-retry/route.ts`
+- `scripts/migrations/add-email-delivery-tables.sql`
+- `vercel.json`
+- `docs/tasks/complete/TASK-095-centralized-email-delivery-layer.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- `pnpm exec vitest run src/lib/email/delivery.test.ts src/lib/notifications/notification-service.test.ts src/lib/payroll/payroll-export-packages.test.ts src/lib/payroll/generate-payroll-receipts.test.ts`
+- `pnpm exec eslint src/lib/email/delivery.ts src/lib/email/delivery.test.ts src/lib/email/schema.ts src/lib/email/types.ts src/app/api/cron/email-delivery-retry/route.ts`
+- `pnpm build`
+- Resultado: todo verde; el retry cron, el replay del payload y los consumidores existentes quedaron validados.
+
+### Riesgos o pendientes
+
+- Quedan como follow-up opcional el bounce tracking y los unsubscribe headers si el catálogo crece hacia superficies opt-in.
+
 ## 2026-03-28 14:48 -03
 
 ### Agente
