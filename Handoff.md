@@ -14280,3 +14280,9 @@ Sesión intensiva cubriendo 15+ tasks implementadas + auditorías de robustez.
 - El approval gate de `Payroll` dejó de bloquear por los pisos mínimos legacy de bono (`bonusOtdMin` / `bonusRpaMin`) cuando la policy vigente ya prorratea sobre `max` y la elegibilidad.
 - La validación ahora rechaza solo montos negativos o por encima del máximo configurado, manteniendo el guardrail de elegibilidad sin romper la nueva policy de bonos variables.
 - Este cambio desbloquea el smoke operativo de `TASK-077`, que depende de que marzo 2026 pueda pasar de `calculated` a `approved` y luego a `exported` para disparar recibos.
+
+## 2026-03-28 - Payroll receipt routes tolerate registry lookup failures
+
+- Los routes de recibo individual ahora toleran fallos de lookup en `greenhouse_payroll.payroll_receipts` y caen al render on-demand en lugar de abortar con `500`.
+- Se mantiene la preferencia por el PDF almacenado cuando existe; el fallback directo asegura que la descarga no quede bloqueada si el registry aún no tiene la fila sincronizada o está momentáneamente indisponible.
+- Esto cierra una grieta práctica de `TASK-077`: exportar y poder descargar el recibo aunque la proyección de delivery todavía no haya materializado el registry para el entry específico.

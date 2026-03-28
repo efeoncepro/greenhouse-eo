@@ -17,7 +17,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ entryId: s
 
   try {
     const { entryId } = await params
-    const storedReceipt = await getPayrollReceiptByEntryId(entryId)
+    let storedReceipt = null
+
+    try {
+      storedReceipt = await getPayrollReceiptByEntryId(entryId)
+    } catch {
+      storedReceipt = null
+    }
+
     let buffer: Buffer
 
     if (storedReceipt?.storagePath) {

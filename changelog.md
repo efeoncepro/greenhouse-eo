@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### Payroll receipt routes tolerate registry lookup failures
+- Los routes de recibo individual ya no dependen de que `greenhouse_payroll.payroll_receipts` esté disponible para responder.
+- Si el lookup del registry falla, la API cae al render on-demand del PDF y mantiene la descarga operativa.
+- Esto evita que `TASK-077` quede bloqueada por una fila de registry no materializada aunque la exportación y el período oficial ya estén correctos.
+
 ### Payroll approval guard aligned to new bonus policy
 - El guard de `POST /api/hr/payroll/periods/[periodId]/approve` ya no bloquea por pisos mínimos legacy (`bonusOtdMin` / `bonusRpaMin`) cuando la liquidación calculada cae dentro del máximo permitido y cumple elegibilidad.
 - El criterio de aprobación quedó alineado con la policy recalibrada de bonos variables, que prorratea sobre el máximo y preserva `bonusOtdMin` / `bonusRpaMin` solo como metadata histórica.

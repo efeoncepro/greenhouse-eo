@@ -22,6 +22,12 @@
 - La validación quedó alineada para rechazar solo montos negativos o por encima del máximo configurado, manteniendo el guardrail de elegibilidad sin romper la nueva policy de bonos variables.
 - Con eso, `TASK-077` ya puede continuar su smoke de exportación y delivery sobre un período real una vez que el deploy de `develop` esté visible en staging.
 
+## Delta 2026-03-28 - Receipt route tolerant to registry lookup failures
+
+- El route de recibo individual ahora tolera fallos de lookup en `greenhouse_payroll.payroll_receipts` y cae al render on-demand en lugar de responder 500.
+- Eso preserva la experiencia de descarga aunque el registry todavía no tenga una fila sincronizada para el entry exportado.
+- El comportamiento canónico sigue siendo usar el PDF almacenado cuando exista; la mejora solo evita que la ausencia o indisponibilidad del registry bloquee el recibo.
+
 ## Status
 
 | Campo | Valor |
