@@ -361,30 +361,55 @@ const PeriodReportDocument = ({ period, entries, operatingEntity }: { period: Pa
   const totalGrossUsd = intlEntries.reduce((sum, e) => sum + e.grossTotal, 0)
   const totalNetUsd = intlEntries.reduce((sum, e) => sum + e.netTotal, 0)
 
+  // Build summary KPI items
+  const summaryItems: Array<{ label: string; value: string }> = [
+    { label: 'COLABORADORES', value: String(entries.length) },
+    { label: 'ESTADO', value: period.status === 'exported' ? 'Exportado' : period.status === 'approved' ? 'Aprobado' : period.status }
+  ]
+
+  if (chileEntries.length > 0) {
+    summaryItems.push({ label: 'BRUTO CLP', value: fmtCurrency(totalGrossClp, 'CLP') })
+    summaryItems.push({ label: 'NETO CLP', value: fmtCurrency(totalNetClp, 'CLP') })
+  }
+
+  if (intlEntries.length > 0) {
+    summaryItems.push({ label: 'BRUTO USD', value: fmtCurrency(totalGrossUsd, 'USD') })
+    summaryItems.push({ label: 'NETO USD', value: fmtCurrency(totalNetUsd, 'USD') })
+  }
+
   return (
     <Document>
       <Page size="LETTER" orientation="landscape" style={s.page}>
         <PdfHeader operatingEntity={operatingEntity} monthName={monthName} year={period.year} docType="Reporte de nómina" periodId={period.periodId} />
 
-        {/* Meta */}
-        <View style={{ marginBottom: 12 }}>
-          <View style={{ flexDirection: 'row', marginBottom: 3 }}>
-            <Text style={{ width: 120, fontFamily: 'Helvetica-Bold', fontSize: 9 }}>Estado:</Text>
-            <Text style={{ fontSize: 9 }}>{period.status}</Text>
-          </View>
-          {period.ufValue != null && (
-            <View style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ width: 120, fontFamily: 'Helvetica-Bold', fontSize: 9 }}>Valor UF:</Text>
-              <Text style={{ fontSize: 9 }}>{`$${period.ufValue.toLocaleString('es-CL')}`}</Text>
+        {/* Document title */}
+        <Text style={s.docTitle}>REPORTE DE NÓMINA</Text>
+
+        {/* Summary strip */}
+        <View style={{ backgroundColor: BRAND_LIGHT, flexDirection: 'row', paddingVertical: 10, paddingHorizontal: 12, marginBottom: 14 }}>
+          {summaryItems.map((item, i) => (
+            <View key={i} style={{ flex: 1, paddingHorizontal: 6, borderRightWidth: i < summaryItems.length - 1 ? 0.5 : 0, borderRightColor: BORDER_LIGHT }}>
+              <Text style={{ fontSize: 6, fontFamily: 'Helvetica', color: TEXT_MUTED, letterSpacing: 1, marginBottom: 2 }}>{item.label}</Text>
+              <Text style={{ fontSize: 11, fontFamily: 'Helvetica-Bold', color: TEXT_PRIMARY }}>{item.value}</Text>
             </View>
-          )}
-          {period.approvedAt && (
-            <View style={{ flexDirection: 'row', marginBottom: 3 }}>
-              <Text style={{ width: 120, fontFamily: 'Helvetica-Bold', fontSize: 9 }}>Aprobado:</Text>
-              <Text style={{ fontSize: 9 }}>{period.approvedAt}</Text>
-            </View>
-          )}
+          ))}
         </View>
+
+        {/* Meta — compact row for UF and approval date */}
+        {(period.ufValue != null || period.approvedAt) && (
+          <View style={{ flexDirection: 'row', marginBottom: 10, gap: 16 }}>
+            {period.ufValue != null && (
+              <Text style={{ fontSize: 8, color: TEXT_MUTED }}>
+                {`UF: $${period.ufValue.toLocaleString('es-CL')}`}
+              </Text>
+            )}
+            {period.approvedAt && (
+              <Text style={{ fontSize: 8, color: TEXT_MUTED }}>
+                {`Aprobado: ${period.approvedAt}`}
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Table */}
         <SectionHeader title={`Detalle — ${entries.length} miembros`} />
