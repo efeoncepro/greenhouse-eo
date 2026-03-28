@@ -32,11 +32,23 @@ export interface PersonnelExpenseMoneyByCurrency {
   bonuses: number
 }
 
+export interface PersonnelExpenseCurrencyMeta {
+  currency: PayrollCurrency
+  periodCount: number
+  headcount: number
+  monthFrom: number
+  monthTo: number
+  yearFrom: number
+  yearTo: number
+}
+
 export interface PersonnelExpenseReport {
   periods: PersonnelExpensePeriod[]
   totals: {
     totalHeadcount: number
+    headcountByRegime: Array<{ regime: PayRegime; headcount: number }>
     byCurrency: PersonnelExpenseMoneyByCurrency[]
+    currencyMeta: PersonnelExpenseCurrencyMeta[]
     avgMonthlyByCurrency: Array<{
       currency: PayrollCurrency
       gross: number
@@ -146,7 +158,52 @@ export const buildPersonnelExpenseReport = ({
   }
 
   const periods = Array.from(periodsMap.values()).sort((a, b) => a.periodId.localeCompare(b.periodId))
-  const periodCount = periods.length || 1
+
+  // Count periods, headcount, and month range per currency
+  const currencyPeriodsMap = new Map<PayrollCurrency, { periodIds: Set<string>; headcounts: Set<string>; months: Array<{ year: number; month: number }> }>()
+
+  for (const row of periodRows) {
+    const currency = normalizePayrollCurrency(row.currency)
+    const entry = currencyPeriodsMap.get(currency) ?? { periodIds: new Set(), headcounts: new Set(), months: [] }
+
+    entry.periodIds.add(String(row.period_id))
+    entry.months.push({ year: toNumber(row.year), month: toNumber(row.month) })
+    currencyPeriodsMap.set(currency, entry)
+  }
+
+  // Derive distinct headcount per currency from regime rows (more accurate: uses DISTINCT member_id)
+  for (const row of regimeRows) {
+    const currency = normalizePayrollCurrency(row.currency)
+    const entry = currencyPeriodsMap.get(currency)
+
+    if (entry) {
+      entry.headcounts.add(`${row.pay_regime}:${toNumber(row.headcount)}`)
+    }
+  }
+
+  const currencyMeta: PersonnelExpenseCurrencyMeta[] = totalBuckets.map(bucket => {
+    const meta = currencyPeriodsMap.get(bucket.currency)
+    const periodCount = meta?.periodIds.size ?? 1
+    const months = meta?.months ?? []
+    const sortedMonths = [...months].sort((a, b) => a.year * 100 + a.month - (b.year * 100 + b.month))
+    const first = sortedMonths[0]
+    const last = sortedMonths[sortedMonths.length - 1]
+
+    // Sum headcount from regime rows for this currency
+    const headcount = regimeRows
+      .filter(r => normalizePayrollCurrency(r.currency) === bucket.currency)
+      .reduce((sum, r) => sum + toNumber(r.headcount), 0)
+
+    return {
+      currency: bucket.currency,
+      periodCount,
+      headcount,
+      monthFrom: first?.month ?? 1,
+      monthTo: last?.month ?? 12,
+      yearFrom: first?.year ?? 0,
+      yearTo: last?.year ?? 0
+    }
+  })
 
   const byRegime: PersonnelExpenseByRegime[] = regimeRows.map(row => ({
     regime: row.pay_regime === 'international' ? 'international' : 'chile',
@@ -156,13 +213,30 @@ export const buildPersonnelExpenseReport = ({
     net: toNumber(row.net)
   }))
 
-  const avgMonthlyByCurrency = totalBuckets.map(bucket => ({
-    currency: bucket.currency,
-    gross: Math.round(bucket.gross / periodCount),
-    net: Math.round(bucket.net / periodCount),
-    deductions: Math.round(bucket.deductions / periodCount),
-    bonuses: Math.round(bucket.bonuses / periodCount)
-  }))
+  const headcountByRegime = byRegime.reduce<Array<{ regime: PayRegime; headcount: number }>>((acc, r) => {
+    const existing = acc.find(a => a.regime === r.regime)
+
+    if (existing) {
+      existing.headcount = Math.max(existing.headcount, r.headcount)
+    } else {
+      acc.push({ regime: r.regime, headcount: r.headcount })
+    }
+
+    return acc
+  }, [])
+
+  // Averages use per-currency period count
+  const avgMonthlyByCurrency = totalBuckets.map(bucket => {
+    const periodCount = currencyMeta.find(m => m.currency === bucket.currency)?.periodCount || 1
+
+    return {
+      currency: bucket.currency,
+      gross: Math.round(bucket.gross / periodCount),
+      net: Math.round(bucket.net / periodCount),
+      deductions: Math.round(bucket.deductions / periodCount),
+      bonuses: Math.round(bucket.bonuses / periodCount)
+    }
+  })
 
   const maxHeadcount = periods.length > 0 ? Math.max(...periods.map(period => period.headcount)) : 0
 
@@ -170,7 +244,9 @@ export const buildPersonnelExpenseReport = ({
     periods,
     totals: {
       totalHeadcount: maxHeadcount,
+      headcountByRegime,
       byCurrency: totalBuckets,
+      currencyMeta,
       avgMonthlyByCurrency
     },
     byRegime

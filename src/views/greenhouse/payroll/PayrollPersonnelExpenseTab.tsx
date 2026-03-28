@@ -1,19 +1,20 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
-import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
+import Alert from '@mui/material/Alert'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -21,18 +22,36 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { useTheme } from '@mui/material/styles'
+import { useTheme, type Theme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
+import { TabContext, TabPanel } from '@mui/lab'
 
 import CustomChip from '@core/components/mui/Chip'
+import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
-import type { PersonnelExpenseReport } from '@/lib/payroll/personnel-expense'
+import type { PayrollCurrency } from '@/types/payroll'
+import type { PersonnelExpenseReport, PersonnelExpenseCurrencyMeta } from '@/lib/payroll/personnel-expense'
 import { formatCurrency, formatPeriodLabel } from './helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
+
+const SHORT_MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
+const formatMonthRange = (meta: PersonnelExpenseCurrencyMeta): string => {
+  if (meta.periodCount === 1) {
+    return `${SHORT_MONTH_NAMES[meta.monthFrom - 1]} ${meta.yearFrom}`
+  }
+
+  const from = `${SHORT_MONTH_NAMES[meta.monthFrom - 1]}`
+  const to = `${SHORT_MONTH_NAMES[meta.monthTo - 1]}`
+
+  return meta.yearFrom === meta.yearTo
+    ? `${from}–${to} ${meta.yearFrom}`
+    : `${from} ${meta.yearFrom}–${to} ${meta.yearTo}`
+}
 
 const PayrollPersonnelExpenseTab = () => {
   const theme = useTheme()
@@ -45,6 +64,7 @@ const PayrollPersonnelExpenseTab = () => {
   const [data, setData] = useState<PersonnelExpenseReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [chartCurrencyTab, setChartCurrencyTab] = useState<string>('CLP')
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -79,6 +99,13 @@ const PayrollPersonnelExpenseTab = () => {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Set initial chart tab to first available currency
+  useEffect(() => {
+    if (data && data.totals.byCurrency.length > 0) {
+      setChartCurrencyTab(data.totals.byCurrency[0].currency)
+    }
+  }, [data])
 
   if (loading) {
     return (
@@ -130,27 +157,79 @@ const PayrollPersonnelExpenseTab = () => {
     )
   }
 
+  return <ExpenseContent data={data} theme={theme} chartCurrencyTab={chartCurrencyTab} setChartCurrencyTab={setChartCurrencyTab} yearFrom={yearFrom} setYearFrom={setYearFrom} monthFrom={monthFrom} setMonthFrom={setMonthFrom} yearTo={yearTo} setYearTo={setYearTo} monthTo={monthTo} setMonthTo={setMonthTo} />
+}
+
+// ─── Content component (only renders when data exists) ──────────
+
+type ExpenseContentProps = {
+  data: PersonnelExpenseReport
+  theme: Theme
+  chartCurrencyTab: string
+  setChartCurrencyTab: (v: string) => void
+  yearFrom: number
+  setYearFrom: (v: number) => void
+  monthFrom: number
+  setMonthFrom: (v: number) => void
+  yearTo: number
+  setYearTo: (v: number) => void
+  monthTo: number
+  setMonthTo: (v: number) => void
+}
+
+const ExpenseContent = ({ data, theme, chartCurrencyTab, setChartCurrencyTab, yearFrom, setYearFrom, monthFrom, setMonthFrom, yearTo, setYearTo, monthTo, setMonthTo }: ExpenseContentProps) => {
   const { totals, periods, byRegime } = data
   const chileRegime = byRegime.find(r => r.regime === 'chile')
   const intlRegime = byRegime.find(r => r.regime === 'international')
-  const clpTotals = totals.byCurrency.find(bucket => bucket.currency === 'CLP')
-  const usdTotals = totals.byCurrency.find(bucket => bucket.currency === 'USD')
-  const clpAvg = totals.avgMonthlyByCurrency.find(bucket => bucket.currency === 'CLP')
-  const usdAvg = totals.avgMonthlyByCurrency.find(bucket => bucket.currency === 'USD')
+  const clpTotals = totals.byCurrency.find(b => b.currency === 'CLP')
+  const usdTotals = totals.byCurrency.find(b => b.currency === 'USD')
+  const clpAvg = totals.avgMonthlyByCurrency.find(b => b.currency === 'CLP')
+  const usdAvg = totals.avgMonthlyByCurrency.find(b => b.currency === 'USD')
   const hasMixedCurrency = totals.byCurrency.length > 1
+  const currencies = totals.byCurrency.map(b => b.currency)
 
+  const metaFor = (currency: PayrollCurrency) => totals.currencyMeta?.find(m => m.currency === currency)
+  const clpMeta = metaFor('CLP')
+  const usdMeta = metaFor('USD')
+
+  // Headcount breakdown label
+  const headcountParts: string[] = []
+
+  if (totals.headcountByRegime) {
+    const chile = totals.headcountByRegime.find(r => r.regime === 'chile')
+    const intl = totals.headcountByRegime.find(r => r.regime === 'international')
+
+    if (chile && chile.headcount > 0) headcountParts.push(`${chile.headcount} Chile`)
+    if (intl && intl.headcount > 0) headcountParts.push(`${intl.headcount} Internacional`)
+  }
+
+  const headcountSubtitle = headcountParts.length > 0 ? headcountParts.join(' · ') : 'Colaboradores'
+
+  // Build KPI subtitle per currency: "N períodos · M colaboradores · Meses"
+  const buildCurrencySubtitle = (meta: PersonnelExpenseCurrencyMeta | undefined) => {
+    if (!meta) return ''
+
+    const parts: string[] = []
+
+    parts.push(`${meta.periodCount} período${meta.periodCount !== 1 ? 's' : ''}`)
+    parts.push(`${meta.headcount} colab.`)
+    parts.push(formatMonthRange(meta))
+
+    return parts.join(' · ')
+  }
+
+  // Chart data per currency
   const chartCategories = periods.map(p => formatPeriodLabel(p.year, p.month))
-  const chartGrossClp = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'CLP')?.gross ?? 0)
-  const chartNetClp = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'CLP')?.net ?? 0)
-  const chartGrossUsd = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'USD')?.gross ?? 0)
-  const chartNetUsd = periods.map(p => p.totalsByCurrency.find(bucket => bucket.currency === 'USD')?.net ?? 0)
-  const chartCurrency = clpTotals ? 'CLP' : 'USD'
 
-  const lineOptions: ApexOptions = {
-    chart: {
-      parentHeightOffset: 0,
-      toolbar: { show: false }
-    },
+  const buildChartForCurrency = (currency: PayrollCurrency) => {
+    const gross = periods.map(p => p.totalsByCurrency.find(b => b.currency === currency)?.gross ?? 0)
+    const net = periods.map(p => p.totalsByCurrency.find(b => b.currency === currency)?.net ?? 0)
+
+    return { gross, net }
+  }
+
+  const lineOptions = useMemo((): ApexOptions => ({
+    chart: { parentHeightOffset: 0, toolbar: { show: false } },
     dataLabels: { enabled: false },
     stroke: { width: 3, curve: 'smooth' },
     grid: {
@@ -164,27 +243,31 @@ const PayrollPersonnelExpenseTab = () => {
     yaxis: {
       labels: {
         style: { colors: 'var(--mui-palette-text-secondary)' },
-        formatter: v => formatCurrency(v, chartCurrency)
+        formatter: v => formatCurrency(v, chartCurrencyTab as PayrollCurrency)
       }
     },
     colors: [theme.palette.warning.main, theme.palette.success.main],
     legend: { position: 'top' },
     tooltip: {
-      y: { formatter: v => formatCurrency(v, chartCurrency) }
+      y: { formatter: v => formatCurrency(v, chartCurrencyTab as PayrollCurrency) }
     }
-  }
+  }), [chartCategories, chartCurrencyTab, theme])
 
+  // Donut: only for single-currency, using headcount (not amounts)
   const donutLabels: string[] = []
   const donutSeries: number[] = []
+  const showDonut = !hasMixedCurrency
 
-  if (chileRegime && chileRegime.gross > 0) {
-    donutLabels.push('Chile')
-    donutSeries.push(chileRegime.gross)
-  }
+  if (showDonut) {
+    if (chileRegime && chileRegime.headcount > 0) {
+      donutLabels.push('Chile')
+      donutSeries.push(chileRegime.headcount)
+    }
 
-  if (intlRegime && intlRegime.gross > 0) {
-    donutLabels.push('Internacional')
-    donutSeries.push(intlRegime.gross)
+    if (intlRegime && intlRegime.headcount > 0) {
+      donutLabels.push('Internacional')
+      donutSeries.push(intlRegime.headcount)
+    }
   }
 
   const donutOptions: ApexOptions = {
@@ -192,9 +275,9 @@ const PayrollPersonnelExpenseTab = () => {
     labels: donutLabels,
     colors: [theme.palette.success.main, theme.palette.info.main],
     legend: { position: 'bottom' },
-    dataLabels: { enabled: true },
+    dataLabels: { enabled: true, formatter: (_, opts) => `${donutSeries[opts.seriesIndex]}` },
     tooltip: {
-      y: { formatter: v => formatCurrency(v, chartCurrency) }
+      y: { formatter: v => `${v} colaborador${v !== 1 ? 'es' : ''}` }
     }
   }
 
@@ -250,7 +333,7 @@ const PayrollPersonnelExpenseTab = () => {
               stats={formatCurrency(clpTotals.gross, 'CLP')}
               avatarIcon='tabler-coins'
               avatarColor='warning'
-              subtitle={`${periods.length} período${periods.length !== 1 ? 's' : ''}`}
+              subtitle={buildCurrencySubtitle(clpMeta)}
             />
           </Grid>
         )}
@@ -261,29 +344,29 @@ const PayrollPersonnelExpenseTab = () => {
               stats={formatCurrency(usdTotals.gross, 'USD')}
               avatarIcon='tabler-coins'
               avatarColor='info'
-              subtitle={`${periods.length} período${periods.length !== 1 ? 's' : ''}`}
+              subtitle={buildCurrencySubtitle(usdMeta)}
             />
           </Grid>
         )}
         {clpAvg && (
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
-              title='Promedio CLP'
+              title='Promedio mensual CLP'
               stats={formatCurrency(clpAvg.gross, 'CLP')}
               avatarIcon='tabler-chart-bar'
               avatarColor='success'
-              subtitle='Bruto promedio mensual'
+              subtitle={`Bruto total / ${clpMeta?.periodCount ?? periods.length} meses`}
             />
           </Grid>
         )}
         {usdAvg && (
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
-              title='Promedio USD'
+              title='Promedio mensual USD'
               stats={formatCurrency(usdAvg.gross, 'USD')}
               avatarIcon='tabler-chart-bar'
               avatarColor='secondary'
-              subtitle='Bruto promedio mensual'
+              subtitle={`Bruto total / ${usdMeta?.periodCount ?? periods.length} meses`}
             />
           </Grid>
         )}
@@ -293,14 +376,14 @@ const PayrollPersonnelExpenseTab = () => {
             stats={String(totals.totalHeadcount)}
             avatarIcon='tabler-users'
             avatarColor='primary'
-            subtitle='Colaboradores'
+            subtitle={headcountSubtitle}
           />
         </Grid>
       </Grid>
 
-      {/* Evolution chart + Regime donut */}
+      {/* Evolution chart + Regime distribution */}
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, md: 8 }}>
+        <Grid size={{ xs: 12, md: showDonut ? 8 : 12 }}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardHeader
               title='Evolución gasto de personal'
@@ -314,48 +397,73 @@ const PayrollPersonnelExpenseTab = () => {
             <Divider />
             <CardContent>
               {hasMixedCurrency ? (
-                <Alert severity='info'>
-                  Este rango mezcla `CLP` y `USD`. Para evitar sumar monedas distintas en un mismo eje, revisa el desglose por moneda y la tabla detallada de períodos.
-                </Alert>
+                <TabContext value={chartCurrencyTab}>
+                  <CustomTabList onChange={(_, v) => setChartCurrencyTab(v)} sx={{ mb: 2 }}>
+                    {currencies.map(c => (
+                      <Tab key={c} value={c} label={c} />
+                    ))}
+                  </CustomTabList>
+                  {currencies.map(c => {
+                    const chartData = buildChartForCurrency(c)
+
+                    return (
+                      <TabPanel key={c} value={c} sx={{ p: 0 }}>
+                        <AppReactApexCharts
+                          type='line'
+                          height={300}
+                          options={lineOptions}
+                          series={[
+                            { name: `Bruto ${c}`, data: chartData.gross },
+                            { name: `Neto ${c}`, data: chartData.net }
+                          ]}
+                        />
+                      </TabPanel>
+                    )
+                  })}
+                </TabContext>
               ) : (
                 <AppReactApexCharts
                   type='line'
                   height={300}
                   options={lineOptions}
-                  series={[
-                    { name: `Bruto ${chartCurrency}`, data: chartCurrency === 'CLP' ? chartGrossClp : chartGrossUsd },
-                    { name: `Neto ${chartCurrency}`, data: chartCurrency === 'CLP' ? chartNetClp : chartNetUsd }
-                  ]}
+                  series={(() => {
+                    const c = currencies[0] ?? 'CLP'
+                    const chartData = buildChartForCurrency(c)
+
+                    return [
+                      { name: `Bruto ${c}`, data: chartData.gross },
+                      { name: `Neto ${c}`, data: chartData.net }
+                    ]
+                  })()}
                 />
               )}
             </CardContent>
           </Card>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, height: '100%' }}>
-            <CardHeader
-              title='Distribución por régimen'
-              avatar={
-                <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
-                  <i className='tabler-chart-pie' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
-                </Avatar>
-              }
-            />
-            <Divider />
-            <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {donutSeries.length > 0 ? (
+        {showDonut && donutSeries.length > 0 && (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, height: '100%' }}>
+              <CardHeader
+                title='Distribución por régimen'
+                subheader='Por headcount'
+                avatar={
+                  <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+                    <i className='tabler-chart-pie' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
+                  </Avatar>
+                }
+              />
+              <Divider />
+              <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <AppReactApexCharts
                   type='donut'
                   height={250}
                   options={donutOptions}
                   series={donutSeries}
                 />
-              ) : (
-                <Typography color='text.disabled'>Sin datos de régimen</Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
 
       {/* Regime breakdown cards */}
@@ -366,7 +474,7 @@ const PayrollPersonnelExpenseTab = () => {
               <CardContent>
                 <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
                   <CustomChip round='true' size='small' label='Chile' color='success' />
-                  <Typography variant='subtitle2'>{chileRegime.headcount} colaboradores</Typography>
+                  <Typography variant='subtitle2'>{chileRegime.headcount} colaborador{chileRegime.headcount !== 1 ? 'es' : ''}</Typography>
                 </Stack>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
@@ -392,7 +500,7 @@ const PayrollPersonnelExpenseTab = () => {
               <CardContent>
                 <Stack direction='row' spacing={2} alignItems='center' sx={{ mb: 2 }}>
                   <CustomChip round='true' size='small' label='Internacional' color='info' />
-                  <Typography variant='subtitle2'>{intlRegime.headcount} colaboradores</Typography>
+                  <Typography variant='subtitle2'>{intlRegime.headcount} colaborador{intlRegime.headcount !== 1 ? 'es' : ''}</Typography>
                 </Stack>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
@@ -441,44 +549,44 @@ const PayrollPersonnelExpenseTab = () => {
               </TableHead>
               <TableBody>
                 {periods.map(period => {
-                  const clpBucket = period.totalsByCurrency.find(bucket => bucket.currency === 'CLP')
-                  const usdBucket = period.totalsByCurrency.find(bucket => bucket.currency === 'USD')
+                  const clpBucket = period.totalsByCurrency.find(b => b.currency === 'CLP')
+                  const usdBucket = period.totalsByCurrency.find(b => b.currency === 'USD')
 
                   return (
                     <TableRow key={period.periodId} hover>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={500}>
-                        {formatPeriodLabel(period.year, period.month)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2'>{period.headcount}</Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {clpBucket ? formatCurrency(clpBucket.gross, 'CLP') : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {clpBucket ? formatCurrency(clpBucket.net, 'CLP') : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
-                        {clpBucket && clpBucket.deductions > 0 ? `- ${formatCurrency(clpBucket.deductions, 'CLP')}` : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
-                        {usdBucket ? formatCurrency(usdBucket.gross, 'USD') : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
-                        {usdBucket ? formatCurrency(usdBucket.net, 'USD') : '—'}
-                      </Typography>
-                    </TableCell>
+                      <TableCell>
+                        <Typography variant='body2' fontWeight={500}>
+                          {formatPeriodLabel(period.year, period.month)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2'>{period.headcount}</Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {clpBucket ? formatCurrency(clpBucket.gross, 'CLP') : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {clpBucket ? formatCurrency(clpBucket.net, 'CLP') : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2' color='error.main' sx={{ fontFamily: 'monospace' }}>
+                          {clpBucket && clpBucket.deductions > 0 ? `- ${formatCurrency(clpBucket.deductions, 'CLP')}` : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                          {usdBucket ? formatCurrency(usdBucket.gross, 'USD') : '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
+                          {usdBucket ? formatCurrency(usdBucket.net, 'USD') : '—'}
+                        </Typography>
+                      </TableCell>
                     </TableRow>
                   )
                 })}

@@ -44,6 +44,7 @@ Primer bloque operativo asignado:
 | `TASK-071` | [TASK-071-cost-intelligence-cross-module-consumers.md](to-do/TASK-071-cost-intelligence-cross-module-consumers.md) | P2 | Alto | Medio | Diseño | Enriquecer Agency, Org 360, People 360 y Home con datos de Cost Intelligence |
 | `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
 | `TASK-074` | [TASK-074-projected-payroll-to-official-promotion-flow.md](in-progress/TASK-074-projected-payroll-to-official-promotion-flow.md) | P1 | Alto | Medio | Implementación | Conectar `Projected Payroll` con `Payroll official` mediante promoción explícita a borrador/recalculo, compartiendo motor pero sin fusionar los objetos transaccionales |
+| `TASK-093` | [TASK-093-personnel-expense-data-consistency.md](complete/TASK-093-personnel-expense-data-consistency.md) | P1 | Alto | Medio | Cerrada | Consistencia de datos en Gasto de Personal: promedios per-currency, labels semánticos, donut sin mix, headcount breakdown |
 
 ## To Do
 
