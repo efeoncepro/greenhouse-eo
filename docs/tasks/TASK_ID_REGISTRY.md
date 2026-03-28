@@ -118,6 +118,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-092` | `complete` | Payroll Operational Current Period Semantics | `docs/tasks/complete/TASK-092-payroll-operational-current-period-semantics.md` |
 | `TASK-093` | `complete` | Personnel Expense Data Consistency | `docs/tasks/complete/TASK-093-personnel-expense-data-consistency.md` |
 | `TASK-094` | `complete` | Payroll Close and CSV Download Separation | `docs/tasks/complete/TASK-094-payroll-close-and-csv-download-separation.md` |
+| `TASK-095` | `to-do` | Centralized Email Delivery Layer | `docs/tasks/to-do/TASK-095-centralized-email-delivery-layer.md` |
 
 ## Regla de asignacion desde aqui
 

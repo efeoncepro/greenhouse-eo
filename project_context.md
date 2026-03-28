@@ -3,6 +3,11 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Centralized email delivery lane added
+- Se documentó `TASK-095` como lane paralela para centralizar el delivery de emails sobre Resend.
+- La idea es que Payroll, Finance, Delivery, Permissions y Auth consuman una capa única de envío en vez de helpers ad hoc.
+- La nueva task se apoya conceptualmente en la infraestructura de notificaciones existente, pero no cambia todavía el runtime de delivery.
+
 ## Delta 2026-03-28 Payroll close/export split completed
 - Payroll separó el cierre canónico del período de la descarga del CSV.
 - `POST /api/hr/payroll/periods/[periodId]/close` marca el período como `exported` y publica `payroll_period.exported`.

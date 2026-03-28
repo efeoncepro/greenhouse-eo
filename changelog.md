@@ -7,6 +7,11 @@
 
 ## 2026-03-28
 
+### TASK-095 centralized email delivery layer documented
+- Se registró una lane paralela para centralizar el delivery de emails sobre Resend, compartiendo contrato con el sistema de notificaciones.
+- El brief deja claro que Payroll, Finance, Delivery, Permissions y Auth deben consumir una capa única de envío y no helpers ad hoc.
+- La task queda como backlog separado para no desviar la iteración activa de Payroll.
+
 ### TASK-094 completed with explicit Payroll close flow
 - Payroll now separates the canonical close mutation from CSV download: `POST /api/hr/payroll/periods/[periodId]/close` marks `exported`, while `GET /api/hr/payroll/periods/[periodId]/csv` serves the artifact.
 - Finance/HR notification is emitted from `payroll_period.exported` through a Resend-backed projection, with PDF and CSV attachments.
