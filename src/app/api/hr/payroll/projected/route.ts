@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import type { ProjectionMode } from '@/types/payroll'
 
-import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveExchangeRateToClp } from '@/lib/finance/shared'
 import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
@@ -30,7 +30,7 @@ type OfficialEntryRow = {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireHrTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

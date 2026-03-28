@@ -49,6 +49,76 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 05:18 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Corregir la causa raíz funcional de `Payroll Proyectada`: el route estaba protegido con `requireAdminTenantContext` en vez de `requireHrTenantContext`, dejando la vista vacía para usuarios HR que sí deberían verla.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `src/app/api/hr/payroll/projected/route.ts`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Revisión local del route y de los demás endpoints de Payroll, que ya usan `requireHrTenantContext`
+- Verificación de que la BD sí tiene compensaciones activas para marzo 2026
+- Pendiente ejecutar lint/build tras el cambio y validar en staging con el nuevo deployment
+
+### Riesgos o pendientes
+
+- La vista puede seguir vacía hasta que staging reciba el deployment con el guard corregido.
+- Si después del deploy sigue vacía, el siguiente paso es revisar el status/response real del endpoint en staging, no asumir que sigue siendo schema.
+
+## 2026-03-28 05:02 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Auditar el 500 de `Payroll Proyectada` en `dev-greenhouse` y dejar trazado que la BD de staging probablemente no tiene aún el schema de `TASK-076/TASK-078` aplicado.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-078-payroll-chile-previsional-foundation.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Verificacion
+
+- Revisión de código de `src/lib/payroll/project-payroll.ts` y `src/lib/payroll/postgres-store.ts`
+- Revisión local del árbol y migrations asociadas
+- No se pudo confirmar directamente la BD de staging porque el entorno local no trae credenciales de Postgres cargadas
+
+### Riesgos o pendientes
+
+- `dev-greenhouse` está devolviendo 500/0 personas en `Payroll Proyectada` porque la query espera columnas añadidas por migrations de Payroll Chile; hay que ejecutar esas migrations en la BD del entorno compartido.
+- No marcar `TASK-078` como “cerrada operativamente” hasta que staging quede con schema aplicado y la vista proyectada vuelva a renderizar datos.
+
 ## 2026-03-28 04:47 -03
 
 ### Agente
