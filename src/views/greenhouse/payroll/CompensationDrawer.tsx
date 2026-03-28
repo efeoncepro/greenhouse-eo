@@ -411,6 +411,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       {reverseResult.forward.chileGratificacionLegalAmount != null && reverseResult.forward.chileGratificacionLegalAmount > 0 && (
                         <Row label='Gratificación legal' value={fmtCLP(reverseResult.forward.chileGratificacionLegalAmount)} />
                       )}
+                      {colacionAmount > 0 && (
+                        <Row label='Colación' value={fmtCLP(colacionAmount)} />
+                      )}
+                      {movilizacionAmount > 0 && (
+                        <Row label='Movilización' value={fmtCLP(movilizacionAmount)} />
+                      )}
                       <Row label='Total haberes' value={fmtCLP(reverseResult.forward.grossTotal)} />
                       <Divider sx={{ my: 0.5 }} />
                       <Row label='AFP' value={fmtCLP(reverseResult.forward.chileAfpAmount)} negative />
