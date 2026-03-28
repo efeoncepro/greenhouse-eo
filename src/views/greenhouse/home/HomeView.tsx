@@ -29,34 +29,50 @@ const SNAPSHOT_TIMEOUT_MS = 5000
 
 const nexaAdapter: ChatModelAdapter = {
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
-    const lastMessage = messages[messages.length - 1]
+    try {
+      const lastMessage = messages[messages.length - 1]
 
-    const prompt = lastMessage?.content
-      ?.filter(part => part.type === 'text')
-      .map(part => (part as { type: 'text'; text: string }).text)
-      .join('') ?? ''
-
-    const history = messages.slice(-10).map(m => ({
-      role: m.role as 'user' | 'assistant',
-      content: m.content
+      const prompt = lastMessage?.content
         ?.filter(part => part.type === 'text')
         .map(part => (part as { type: 'text'; text: string }).text)
         .join('') ?? ''
-    }))
 
-    const res = await fetch('/api/home/nexa', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, history }),
-      signal: abortSignal
-    })
+      const history = messages.slice(-10).map(m => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content
+          ?.filter(part => part.type === 'text')
+          .map(part => (part as { type: 'text'; text: string }).text)
+          .join('') ?? ''
+      }))
 
-    if (!res.ok) throw new Error('Failed to get Nexa response')
+      const res = await fetch('/api/home/nexa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, history }),
+        signal: abortSignal
+      })
 
-    const data = await res.json()
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null)
 
-    return {
-      content: [{ type: 'text' as const, text: data.content || 'No pude procesar tu solicitud.' }]
+        return {
+          content: [{ type: 'text' as const, text: `No pude procesar tu mensaje (${res.status}). ${errorBody?.error || 'Intenta de nuevo.'}` }]
+        }
+      }
+
+      const data = await res.json()
+
+      return {
+        content: [{ type: 'text' as const, text: data.content || 'No obtuve una respuesta. Intenta de nuevo.' }]
+      }
+    } catch (err) {
+      const message = err instanceof DOMException && err.name === 'AbortError'
+        ? 'La solicitud fue cancelada.'
+        : 'No pude conectarme con Nexa. Verifica tu conexión e intenta de nuevo.'
+
+      return {
+        content: [{ type: 'text' as const, text: message }]
+      }
     }
   }
 }

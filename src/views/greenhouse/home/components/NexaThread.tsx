@@ -6,9 +6,6 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 
-import CustomAvatar from '@core/components/mui/Avatar'
-import CustomTextField from '@core/components/mui/TextField'
-
 import {
   useAuiState,
   ThreadPrimitive,
@@ -16,50 +13,59 @@ import {
   MessagePrimitive
 } from '@assistant-ui/react'
 
+import CustomAvatar from '@core/components/mui/Avatar'
+import CustomTextField from '@core/components/mui/TextField'
+
 interface Props {
   onBack: () => void
 }
 
-const TextPart = ({ text }: { text: string }) => <span>{text}</span>
+const TextPart = ({ text }: { text: string }) => (
+  <span style={{ whiteSpace: 'pre-wrap' }}>{text}</span>
+)
 
 const UserMessage = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-    <Box sx={{
-      maxWidth: '80%',
-      px: 2.5,
-      py: 1.5,
-      borderRadius: '16px 4px 16px 16px',
-      bgcolor: 'primary.main',
-      color: 'primary.contrastText'
-    }}>
-      <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
-        <MessagePrimitive.Content components={{ Text: TextPart }} />
-      </Typography>
+  <MessagePrimitive.Root>
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      <Box sx={{
+        maxWidth: '80%',
+        px: 2.5,
+        py: 1.5,
+        borderRadius: '16px 4px 16px 16px',
+        bgcolor: 'primary.main',
+        color: 'primary.contrastText'
+      }}>
+        <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
+          <MessagePrimitive.Content components={{ Text: TextPart }} />
+        </Typography>
+      </Box>
     </Box>
-  </Box>
+  </MessagePrimitive.Root>
 )
 
 const AssistantMessage = () => (
-  <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 1.5, mb: 2 }}>
-    <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 28, height: 28, mt: 0.5, flexShrink: 0 }}>
-      <i className='tabler-sparkles' style={{ fontSize: '0.875rem' }} />
-    </CustomAvatar>
-    <Box sx={{
-      maxWidth: '80%',
-      px: 2.5,
-      py: 1.5,
-      borderRadius: '4px 16px 16px 16px',
-      border: 1,
-      borderColor: 'divider',
-      '& p': { m: 0 },
-      '& ul, & ol': { my: 0.5, pl: 2 },
-      '& code': { fontSize: '0.75rem', bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5 }
-    }}>
-      <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
-        <MessagePrimitive.Content components={{ Text: TextPart }} />
-      </Typography>
+  <MessagePrimitive.Root>
+    <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 1.5, mb: 2 }}>
+      <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 28, height: 28, mt: 0.5, flexShrink: 0 }}>
+        <i className='tabler-sparkles' style={{ fontSize: '0.875rem' }} />
+      </CustomAvatar>
+      <Box sx={{
+        maxWidth: '80%',
+        px: 2.5,
+        py: 1.5,
+        borderRadius: '4px 16px 16px 16px',
+        border: 1,
+        borderColor: 'divider',
+        '& p': { m: 0 },
+        '& ul, & ol': { my: 0.5, pl: 2 },
+        '& code': { fontSize: '0.75rem', bgcolor: 'action.selected', px: 0.5, borderRadius: 0.5 }
+      }}>
+        <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
+          <MessagePrimitive.Content components={{ Text: TextPart }} />
+        </Typography>
+      </Box>
     </Box>
-  </Box>
+  </MessagePrimitive.Root>
 )
 
 const ThinkingIndicator = () => {
