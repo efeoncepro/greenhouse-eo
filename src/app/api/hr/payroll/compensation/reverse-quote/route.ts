@@ -122,6 +122,7 @@ export async function POST(request: Request) {
       netAfterIsapre,
       clampedAtFloor,
       immValue: typeof immValue === 'number' ? immValue : null,
+      resolvedAfpRate: result.forward.chileAfpRate,
       indicators: {
         ufValue: ufSnapshot?.value ?? null,
         utmValue: utmSnapshot?.value ?? null,

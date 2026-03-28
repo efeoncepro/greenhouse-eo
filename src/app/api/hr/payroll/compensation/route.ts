@@ -73,6 +73,7 @@ export async function POST(request: Request) {
         contractType: body.contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
         hasApv: Boolean(body.hasApv),
         apvAmount: parsePayrollNumber(body.apvAmount ?? 0, 'apvAmount', { min: 0 }) ?? 0,
+        desiredNetClp: parsePayrollNumber(body.desiredNetClp, 'desiredNetClp', { allowNull: true, min: 0 }),
         effectiveFrom: assertPayrollDateString(body.effectiveFrom, 'effectiveFrom'),
         changeReason: String(body.changeReason || '')
       },

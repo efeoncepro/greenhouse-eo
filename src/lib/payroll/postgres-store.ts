@@ -81,6 +81,7 @@ type PgCompensationRow = {
   effective_to: string | Date | null
   is_current: boolean
   change_reason: string | null
+  desired_net_clp: number | string | null
   created_by_user_id: string | null
   created_at: string | Date | null
 }
@@ -442,6 +443,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     effectiveTo,
     isCurrent: effectiveFrom ? isCurrentCompensationWindow(effectiveFrom, effectiveTo) : Boolean(row.is_current),
     changeReason: normalizeNullableString(row.change_reason),
+    desiredNetClp: toNullableNumber(row.desired_net_clp),
     createdBy: normalizeNullableString(row.created_by_user_id),
     createdAt: toPgTimestampString(row.created_at)
   }
@@ -602,6 +604,7 @@ const COMPENSATION_BASE_SELECT = `
     cv.effective_to,
     cv.is_current,
     cv.change_reason,
+    cv.desired_net_clp,
     cv.created_by_user_id,
     cv.created_at
   FROM greenhouse_payroll.compensation_versions AS cv
@@ -888,7 +891,7 @@ export const pgCreateCompensationVersion = async ({
           afp_name, afp_rate, afp_cotizacion_rate, afp_comision_rate, health_system, health_plan_uf,
           unemployment_rate, contract_type, has_apv, apv_amount,
           effective_from, effective_to, is_current,
-          change_reason, created_by_user_id
+          change_reason, desired_net_clp, created_by_user_id
         )
         VALUES (
           $1, $2, $3, $4, $5,
@@ -897,7 +900,7 @@ export const pgCreateCompensationVersion = async ({
           $17, $18, $19, $20, $21, $22,
           $23, $24, $25, $26,
           $27::date, $28, $29,
-          $30, $31
+          $30, $31, $32
         )
       `,
       [
@@ -914,7 +917,7 @@ export const pgCreateCompensationVersion = async ({
         input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
         input.contractType ?? 'indefinido', Boolean(input.hasApv), Number(input.apvAmount ?? 0),
         effectiveFrom, nextEffectiveTo, isCurrent,
-        input.changeReason.trim(), actorUserId
+        input.changeReason.trim(), input.desiredNetClp ?? null, actorUserId
       ]
     )
 
@@ -1084,8 +1087,9 @@ export const pgUpdateCompensationVersion = async ({
           contract_type = $21,
           has_apv = $22,
           apv_amount = $23,
-          change_reason = $24
-        WHERE version_id = $25
+          change_reason = $24,
+          desired_net_clp = $25
+        WHERE version_id = $26
       `,
       [
         input.payRegime,
@@ -1112,6 +1116,7 @@ export const pgUpdateCompensationVersion = async ({
         Boolean(input.hasApv),
         Number(input.apvAmount ?? 0),
         input.changeReason.trim(),
+        input.desiredNetClp ?? null,
         versionId
       ]
     )

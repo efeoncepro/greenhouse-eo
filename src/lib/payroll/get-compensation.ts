@@ -93,6 +93,7 @@ type CompensationRow = {
   effective_to: { value?: string } | string | null
   is_current: boolean | null
   change_reason: string | null
+  desired_net_clp: number | string | null
   created_by: string | null
   created_at: { value?: string } | string | null
 }
@@ -232,6 +233,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     effectiveTo,
     isCurrent: effectiveFrom ? isCurrentCompensationWindow({ effectiveFrom, effectiveTo }) : normalizeBoolean(row.is_current),
     changeReason: normalizeNullableString(row.change_reason),
+    desiredNetClp: toNullableNumber(row.desired_net_clp),
     createdBy: normalizeNullableString(row.created_by),
     createdAt: toTimestampString(row.created_at)
   }
@@ -754,6 +756,7 @@ export const createCompensationVersion = async ({
     effectiveTo: nextEffectiveTo,
     isCurrent,
     changeReason: input.changeReason.trim(),
+    desiredNetClp: input.desiredNetClp ?? null,
     createdBy: actorEmail
   }
 
@@ -790,6 +793,7 @@ export const createCompensationVersion = async ({
         effective_to,
         is_current,
         change_reason,
+        desired_net_clp,
         created_by,
         created_at
       )
@@ -824,6 +828,7 @@ export const createCompensationVersion = async ({
         @effectiveTo,
         @isCurrent,
         @changeReason,
+        @desiredNetClp,
         @createdBy,
         CURRENT_TIMESTAMP()
       )
@@ -947,7 +952,8 @@ export const updateCompensationVersion = async ({
     contractType: input.contractType ?? 'indefinido',
     hasApv: Boolean(input.hasApv),
     apvAmount: Number(input.apvAmount ?? 0),
-    changeReason: input.changeReason.trim()
+    changeReason: input.changeReason.trim(),
+    desiredNetClp: input.desiredNetClp ?? null
   }
 
   await runPayrollQuery(
@@ -977,7 +983,8 @@ export const updateCompensationVersion = async ({
         contract_type = @contractType,
         has_apv = @hasApv,
         apv_amount = @apvAmount,
-        change_reason = @changeReason
+        change_reason = @changeReason,
+        desired_net_clp = @desiredNetClp
       WHERE version_id = @versionId
     `,
     updateParams,

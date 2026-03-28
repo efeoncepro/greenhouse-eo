@@ -48,6 +48,7 @@ type ReverseQuoteResult = {
   netAfterIsapre: number | null
   clampedAtFloor: boolean
   immValue: number | null
+  resolvedAfpRate: number | null
   forward: {
     grossTotal: number
     chileGratificacionLegalAmount: number | null
@@ -202,6 +203,10 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         if (data.converged) {
           setBaseSalary(data.baseSalary)
           setError(null)
+
+          if (data.resolvedAfpRate != null && data.resolvedAfpRate > 0) {
+            setAfpRate(data.resolvedAfpRate)
+          }
         }
       } catch {
         setReverseResult(null)
@@ -253,11 +258,16 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setError(null)
 
     try {
+      const resolvedChangeReason = reverseMode && desiredNet > 0 && !changeReason.includes('líquido')
+        ? `${changeReason.trim()} [Calculado desde líquido deseado: $${desiredNet.toLocaleString('es-CL')}]`
+        : changeReason.trim()
+
       const input: CreateCompensationVersionInput = {
         memberId,
         payRegime,
         currency,
         baseSalary,
+        desiredNetClp: reverseMode && desiredNet > 0 ? desiredNet : null,
         remoteAllowance,
         colacionAmount: payRegime === 'chile' ? colacionAmount : 0,
         movilizacionAmount: payRegime === 'chile' ? movilizacionAmount : 0,
@@ -269,7 +279,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         bonusRpaMin: 0,
         bonusRpaMax: bonusRpa,
         effectiveFrom,
-        changeReason: changeReason.trim(),
+        changeReason: resolvedChangeReason,
         ...(payRegime === 'chile' && {
           afpName: afpName || null,
           afpRate,
@@ -357,6 +367,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
                         if (!e.target.checked) {
                           setReverseResult(null)
+                          setDesiredNet(0)
                         }
                       }}
                       data-testid='reverse-mode-toggle'

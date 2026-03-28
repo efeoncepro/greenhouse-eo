@@ -70,6 +70,7 @@ export interface CompensationVersion {
   effectiveFrom: string
   effectiveTo: string | null
   isCurrent: boolean
+  desiredNetClp: number | null
   changeReason: string | null
   createdBy: string | null
   createdAt: string | null
@@ -100,6 +101,7 @@ export interface CreateCompensationVersionInput {
   contractType?: ContractType
   hasApv?: boolean
   apvAmount?: number
+  desiredNetClp?: number | null
   effectiveFrom: string
   changeReason: string
 }
@@ -128,6 +130,7 @@ export interface UpdateCompensationVersionInput {
   contractType?: ContractType
   hasApv?: boolean
   apvAmount?: number
+  desiredNetClp?: number | null
   effectiveFrom: string
   changeReason: string
 }

@@ -55,6 +55,7 @@ const compensationVersion: CompensationVersion = {
   effectiveTo: null,
   isCurrent: true,
   changeReason: 'Nómina Marzo',
+  desiredNetClp: null,
   createdBy: null,
   createdAt: null
 }

@@ -65,6 +65,7 @@ const compensatedMember = {
   effectiveTo: null,
   isCurrent: true,
   changeReason: 'Alta inicial',
+  desiredNetClp: null,
   createdBy: null,
   createdAt: null,
   hasCompensationVersion: true
