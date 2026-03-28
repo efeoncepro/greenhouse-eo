@@ -1447,6 +1447,10 @@ const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInp
     updates.active = Boolean(input.active)
   }
 
+  if ('assignable' in input) {
+    updates.assignable = Boolean(input.assignable)
+  }
+
   return {
     existing,
     updates
