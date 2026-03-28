@@ -101,4 +101,21 @@ describe('PayrollPeriodTab readiness', () => {
     expect(getByText('No hay período abierto')).toBeInTheDocument()
     expect(getByRole('button', { name: 'Crear período Abril 2026' })).toBeInTheDocument()
   })
+
+  it('shows a banner when the user is viewing a historical period from history', async () => {
+    const { findByText } = render(
+      <PayrollPeriodTab
+        period={period}
+        entries={[]}
+        onRefresh={vi.fn()}
+        onCreatePeriod={vi.fn()}
+        createPeriodLabel='Abril 2026'
+        isHistoricalSelection
+      />
+    )
+
+    expect(
+      await findByText('Estás viendo un período histórico seleccionado desde Historial. El período abierto o vigente sigue mostrándose en el resumen superior.')
+    ).toBeInTheDocument()
+  })
 })

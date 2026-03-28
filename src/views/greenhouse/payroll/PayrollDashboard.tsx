@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 
 import Link from 'next/link'
 
@@ -38,8 +38,11 @@ const PayrollDashboard = () => {
 
   // Data
   const [periods, setPeriods] = useState<PayrollPeriod[]>([])
-  const [currentPeriod, setCurrentPeriod] = useState<PayrollPeriod | null>(null)
-  const [entries, setEntries] = useState<PayrollEntry[]>([])
+  const [activePeriod, setActivePeriod] = useState<PayrollPeriod | null>(null)
+  const [activeEntries, setActiveEntries] = useState<PayrollEntry[]>([])
+  const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null)
+  const [selectedEntries, setSelectedEntries] = useState<PayrollEntry[]>([])
+  const selectedPeriodIdRef = useRef<string | null>(null)
   const [compensations, setCompensations] = useState<CompensationVersion[]>([])
   const [eligibleMembers, setEligibleMembers] = useState<PayrollCompensationMember[]>([])
   const [compensationMembers, setCompensationMembers] = useState<PayrollCompensationMember[]>([])
@@ -82,18 +85,31 @@ const PayrollDashboard = () => {
         // Auto-select only the latest chronological period if it is still open
         const active = getCurrentPayrollPeriod(nextPeriods)
 
+        const currentSelectedPeriodId = selectedPeriodIdRef.current
+
+        const nextSelectedPeriodId =
+          currentSelectedPeriodId && nextPeriods.some((period: PayrollPeriod) => period.periodId === currentSelectedPeriodId)
+            ? currentSelectedPeriodId
+            : active?.periodId ?? null
+
+        setActivePeriod(active)
+        setSelectedPeriodId(nextSelectedPeriodId)
+
         if (active) {
-          setCurrentPeriod(active)
           const entriesRes = await fetch(`/api/hr/payroll/periods/${active.periodId}/entries`)
 
           if (entriesRes.ok) {
             const eData = await entriesRes.json()
 
-            setEntries(eData.entries || [])
+            setActiveEntries(eData.entries || [])
+
+            if (nextSelectedPeriodId === active.periodId) {
+              setSelectedEntries(eData.entries || [])
+            }
           }
         } else {
-          setCurrentPeriod(null)
-          setEntries([])
+          setActiveEntries([])
+          setSelectedEntries([])
         }
       } else {
         const data = await periodsRes.json().catch(() => null)
@@ -127,6 +143,10 @@ const PayrollDashboard = () => {
   useEffect(() => {
     fetchAll()
   }, [fetchAll])
+
+  useEffect(() => {
+    selectedPeriodIdRef.current = selectedPeriodId
+  }, [selectedPeriodId])
 
   const handleRefresh = useCallback(() => {
     startTransition(() => {
@@ -163,14 +183,14 @@ const PayrollDashboard = () => {
       const period = periods.find(p => p.periodId === periodId)
 
       if (!period) return
-      setCurrentPeriod(period)
+      setSelectedPeriodId(periodId)
 
       const entriesRes = await fetch(`/api/hr/payroll/periods/${periodId}/entries`)
 
       if (entriesRes.ok) {
         const data = await entriesRes.json()
 
-        setEntries(data.entries || [])
+        setSelectedEntries(data.entries || [])
       }
 
       setTab('period')
@@ -195,11 +215,16 @@ const PayrollDashboard = () => {
   }
 
   // Stats
-  const statusConfig = currentPeriod ? periodStatusConfig[currentPeriod.status] : null
+  const statusConfig = activePeriod ? periodStatusConfig[activePeriod.status] : null
   const needsCompensationSetup = compensations.length === 0
   const hasActivePayrollMembers = compensationMembers.length > 0
-  const grossSummary = buildPayrollCurrencySummary(entries, entry => entry.grossTotal)
-  const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
+  const grossSummary = buildPayrollCurrencySummary(activeEntries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(activeEntries, entry => entry.netTotal)
+
+  const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
+  const displayedPeriod = selectedPeriod ?? activePeriod
+  const displayedEntries = selectedPeriod?.periodId === activePeriod?.periodId ? activeEntries : selectedEntries
+  const isHistoricalSelection = Boolean(displayedPeriod && activePeriod && displayedPeriod.periodId !== activePeriod.periodId)
 
   return (
     <>
@@ -253,7 +278,7 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Período actual'
-              stats={currentPeriod ? formatPeriodLabel(currentPeriod.year, currentPeriod.month) : '—'}
+              stats={activePeriod ? formatPeriodLabel(activePeriod.year, activePeriod.month) : '—'}
               avatarIcon='tabler-calendar'
               avatarColor='primary'
               subtitle={statusConfig?.label ?? 'Sin período'}
@@ -265,7 +290,7 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Colaboradores'
-              stats={String(entries.length)}
+              stats={String(activeEntries.length)}
               avatarIcon='tabler-users'
               avatarColor='info'
               subtitle='Con nómina en este período'
@@ -322,11 +347,12 @@ const PayrollDashboard = () => {
 
           <TabPanel value='period' sx={{ p: 0 }}>
             <PayrollPeriodTab
-              period={currentPeriod}
-              entries={entries}
+              period={displayedPeriod}
+              entries={displayedEntries}
               onRefresh={handleRefresh}
               onCreatePeriod={openNewPeriodDialog}
               createPeriodLabel={createPeriodLabel}
+              isHistoricalSelection={isHistoricalSelection}
             />
           </TabPanel>
 
@@ -342,6 +368,7 @@ const PayrollDashboard = () => {
           <TabPanel value='history' sx={{ p: 0 }}>
             <PayrollHistoryTab
               periods={periods}
+              selectedPeriodId={selectedPeriodId}
               onSelectPeriod={handleSelectHistoryPeriod}
             />
           </TabPanel>

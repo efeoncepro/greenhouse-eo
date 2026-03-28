@@ -1,5 +1,8 @@
 'use client'
 
+import { useState } from 'react'
+
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -20,6 +23,7 @@ type Props = {
 
 const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
   const operatingEntity = useOperatingEntity()
+  const [downloadError, setDownloadError] = useState<string | null>(null)
 
   if (!entry) return null
 
@@ -28,6 +32,8 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
     : undefined
 
   const handleDownload = async () => {
+    setDownloadError(null)
+
     try {
       await downloadPayrollReceiptPdf({
         route: `/api/hr/payroll/entries/${entry.entryId}/receipt`,
@@ -39,6 +45,9 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
         currency: entry.currency
       })
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'No fue posible descargar el recibo.'
+
+      setDownloadError(message)
       console.error('Unable to download payroll receipt.', error)
     }
   }
@@ -47,6 +56,11 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
     <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth closeAfterTransition={false}>
       <DialogTitle>Recibo — {entry.memberName}</DialogTitle>
       <DialogContent dividers>
+        {downloadError && (
+          <Alert severity='error' sx={{ mb: 2 }} onClose={() => setDownloadError(null)}>
+            {downloadError}
+          </Alert>
+        )}
         <PayrollReceiptCard entry={entry} period={period} employerInfo={employerInfo} />
       </DialogContent>
       <DialogActions>
@@ -54,6 +68,7 @@ const PayrollReceiptDialog = ({ open, onClose, entry, period }: Props) => {
           variant='tonal'
           startIcon={<i className='tabler-file-download' />}
           onClick={() => { void handleDownload() }}
+          aria-label={`Descargar PDF del recibo de ${entry.memberName}`}
         >
           Descargar PDF
         </Button>

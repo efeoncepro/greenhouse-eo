@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Payroll UX semantics and feedback hardening
+- `TASK-089` cerró el endurecimiento de UX de Payroll sin alterar el dominio de cálculo:
+  - el dashboard separa período activo e histórico seleccionado
+  - las vistas críticas muestran error y retry visibles
+  - los CTAs de descarga y los icon buttons del módulo tienen copy/labels accesibles más claros
+  - `Mi Nómina` y `People > Nómina` ya no dependen de un orden implícito para definir el último período
+- Regla operativa derivada:
+  - el período histórico es navegación, no el nuevo contexto del período actual
+  - los fallos de carga no deben verse como vacíos neutros
+  - las descargas de recibos deben comunicar fallo y nombre humano del documento, no solo disparar una navegación o log interno
+
 ## Delta 2026-03-28 Operating Entity Identity — React context + API endpoint
 - La identidad de la entidad operadora (razón social, RUT, dirección legal) ya no se resuelve ad hoc por cada consumer.
 - Nuevo baseline:

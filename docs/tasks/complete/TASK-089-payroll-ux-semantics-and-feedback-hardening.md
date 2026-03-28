@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Parcial`
+- Status real: `Complete`
 - Rank: `5`
 - Domain: `ui`
 - GitHub Project: `Greenhouse Delivery`
@@ -82,13 +82,13 @@ Reglas obligatorias:
 - empty state operativo para período abierto
 - tablas y drawers funcionales
 
-### Gap actual
+### Coverage resuelta
 
-- `Período actual` se mezcla con historial seleccionado
-- los fallos de carga todavía se perciben como vacíos
-- descarga/exportación carece de feedback visible y uniforme
-- hay icon buttons y row clicks sin affordance suficientemente explícita
-- `Mi Nómina` asume orden del API para definir el último período
+- `Período actual` ahora se mantiene separado del historial seleccionado
+- los fallos de carga muestran error visible con retry en las vistas críticas
+- descarga/exportación expone feedback visible y labels accesibles consistentes
+- los icon buttons y row clicks críticos tienen affordance explícita
+- `Mi Nómina` y `People > Nómina` ya no dependen de un orden implícito del API para definir el último período
 
 ## Scope
 
@@ -117,14 +117,14 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] El dashboard no muestra un período histórico como si fuera el actual.
-- [ ] Las vistas críticas muestran error y retry cuando falla la carga.
-- [ ] Los CTAs de descarga usan copy consistente y feedback visible.
-- [ ] Las interacciones por teclado y lector de pantalla quedan razonablemente cubiertas.
+- [x] El dashboard no muestra un período histórico como si fuera el actual.
+- [x] Las vistas críticas muestran error y retry cuando falla la carga.
+- [x] Los CTAs de descarga usan copy consistente y feedback visible.
+- [x] Las interacciones por teclado y lector de pantalla quedan razonablemente cubiertas.
 
 ## Verification
 
 - `pnpm exec vitest run src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
-- tests de las vistas afectadas
-- `pnpm lint`
-- validación manual en HR, Mi Nómina y People
+- `pnpm exec eslint src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx src/views/greenhouse/payroll/PayrollHistoryTab.tsx src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx src/views/greenhouse/payroll/PayrollReceiptDialog.tsx src/views/greenhouse/payroll/ProjectedPayrollView.tsx src/views/greenhouse/my/MyPayrollView.tsx src/views/greenhouse/people/tabs/PersonPayrollTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+- `pnpm build`
+- validación manual recomendada en HR, Mi Nómina y People

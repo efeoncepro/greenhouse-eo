@@ -11,6 +11,7 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
@@ -97,7 +98,15 @@ const PayrollPersonnelExpenseTab = () => {
 
   if (error) {
     return (
-      <Alert severity='error' onClose={() => setError(null)}>
+      <Alert
+        severity='error'
+        onClose={() => setError(null)}
+        action={(
+          <Button color='inherit' size='small' onClick={() => void fetchData()}>
+            Reintentar
+          </Button>
+        )}
+      >
         {error}
       </Alert>
     )

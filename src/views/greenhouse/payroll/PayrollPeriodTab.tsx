@@ -39,9 +39,10 @@ type Props = {
   onRefresh: () => void
   onCreatePeriod: () => void
   createPeriodLabel: string
+  isHistoricalSelection?: boolean
 }
 
-const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel }: Props) => {
+const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
@@ -275,6 +276,12 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
 
   return (
     <>
+      {isHistoricalSelection && (
+        <Alert severity='info' sx={{ mb: 4 }}>
+          Estás viendo un período histórico seleccionado desde Historial. El período abierto o vigente sigue mostrándose en el resumen superior.
+        </Alert>
+      )}
+
       {/* Period totals KPI row */}
       {entries.length > 0 && (
         <Grid container spacing={6} sx={{ mb: 4 }}>
@@ -442,8 +449,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-type-pdf' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
                     disabled={isPending}
+                    aria-label={`Abrir PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    PDF
+                    Ver PDF
                   </Button>
                   <Button
                     variant='tonal'
@@ -452,8 +460,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-spreadsheet' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
                     disabled={isPending}
+                    aria-label={`Abrir Excel del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    Excel
+                    Ver Excel
                   </Button>
                   <Button
                     variant='tonal'
@@ -461,8 +470,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-export' />}
                     onClick={handleExport}
                     disabled={isPending}
+                    aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    CSV
+                    Descargar CSV
                   </Button>
                 </>
               )}
@@ -475,8 +485,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-type-pdf' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
                     disabled={isPending}
+                    aria-label={`Abrir PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    PDF
+                    Ver PDF
                   </Button>
                   <Button
                     variant='tonal'
@@ -485,8 +496,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-spreadsheet' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
                     disabled={isPending}
+                    aria-label={`Abrir Excel del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    Excel
+                    Ver Excel
                   </Button>
                   <Button
                     variant='tonal'
@@ -494,8 +506,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     startIcon={<i className='tabler-file-export' />}
                     onClick={handleExport}
                     disabled={isPending}
+                    aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    CSV
+                    Descargar CSV
                   </Button>
                 </>
               )}

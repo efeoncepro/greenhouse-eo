@@ -213,6 +213,7 @@ const ProjectedPayrollView = () => {
   const [promotionMessage, setPromotionMessage] = useState<string | null>(null)
   const [promotionError, setPromotionError] = useState<string | null>(null)
   const [driftWarnings, setDriftWarnings] = useState<Array<{ field: string; message: string }>>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
 
 
   const today = useMemo(() => {
@@ -226,6 +227,7 @@ const ProjectedPayrollView = () => {
 
   const load = useCallback(async () => {
     setLoading(true)
+    setLoadError(null)
 
     try {
       const res = await fetch(`/api/hr/payroll/projected?year=${year}&month=${month}&mode=${mode}`, {
@@ -236,9 +238,14 @@ const ProjectedPayrollView = () => {
       if (res.ok) {
         setData(await res.json())
         setExpandedRows(new Set())
+      } else {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible cargar la nómina proyectada.')
       }
-    } catch {
+    } catch (error) {
       setData(null)
+      setLoadError(error instanceof Error ? error.message : 'No fue posible cargar la nómina proyectada.')
     } finally {
       setLoading(false)
     }
@@ -317,7 +324,12 @@ const ProjectedPayrollView = () => {
       id: 'expander',
       header: '',
       cell: ({ row }) => (
-        <IconButton size='small' onClick={() => toggleRow(row.original.memberId)} sx={{ p: 0.5 }}>
+        <IconButton
+          size='small'
+          onClick={() => toggleRow(row.original.memberId)}
+          sx={{ p: 0.5 }}
+          aria-label={expandedRows.has(row.original.memberId) ? `Contraer ${row.original.memberName}` : `Expandir ${row.original.memberName}`}
+        >
           <i className={expandedRows.has(row.original.memberId) ? 'tabler-chevron-down' : 'tabler-chevron-right'} style={{ fontSize: 16 }} />
         </IconButton>
       ),
@@ -400,12 +412,17 @@ const ProjectedPayrollView = () => {
                   onClick={() => void promoteProjection()}
                   disabled={promoting || loading}
                   startIcon={promoting ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-arrow-forward-up' />}
+                  aria-label={data?.official ? `Recalcular nómina oficial para ${MONTHS[month - 1]} ${year}` : `Crear borrador oficial para ${MONTHS[month - 1]} ${year}`}
                 >
                   {data?.official ? 'Recalcular oficial' : 'Crear borrador oficial'}
                 </Button>
-                <IconButton size='small' onClick={() => navMonth(-1)}><i className='tabler-chevron-left' style={{ fontSize: 18 }} /></IconButton>
+                <IconButton size='small' onClick={() => navMonth(-1)} aria-label='Mes anterior'>
+                  <i className='tabler-chevron-left' style={{ fontSize: 18 }} />
+                </IconButton>
                 <Typography variant='body2' fontWeight={600}>{MONTHS[month - 1]} {year}</Typography>
-                <IconButton size='small' onClick={() => navMonth(1)}><i className='tabler-chevron-right' style={{ fontSize: 18 }} /></IconButton>
+                <IconButton size='small' onClick={() => navMonth(1)} aria-label='Mes siguiente'>
+                  <i className='tabler-chevron-right' style={{ fontSize: 18 }} />
+                </IconButton>
               </Box>
             }
           />
@@ -417,8 +434,18 @@ const ProjectedPayrollView = () => {
         <TabContext value={mode}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CustomTabList onChange={(_, v: string) => setMode(v as ProjectionMode)}>
-              <Tab label={`Hoy (${data?.asOfDate?.slice(8, 10) ?? ''} ${MONTHS[month - 1]?.slice(0, 3) ?? ''})`} value='actual_to_date' icon={<i className='tabler-clock' />} iconPosition='start' />
-              <Tab label={`Fin de mes — ${MONTHS[month - 1]} ${year}`} value='projected_month_end' icon={<i className='tabler-calendar-event' />} iconPosition='start' />
+              <Tab
+                label='Corte actual'
+                value='actual_to_date'
+                icon={<i className='tabler-clock' />}
+                iconPosition='start'
+              />
+              <Tab
+                label={`Cierre proyectado — ${MONTHS[month - 1]} ${year}`}
+                value='projected_month_end'
+                icon={<i className='tabler-calendar-event' />}
+                iconPosition='start'
+              />
             </CustomTabList>
           </Card>
           <TabPanel value={mode} sx={{ p: 0 }} />
@@ -485,7 +512,23 @@ const ProjectedPayrollView = () => {
         </>
       )}
 
-      {!data && (
+      {loadError && (
+        <Grid size={{ xs: 12 }}>
+          <Alert
+            severity='error'
+            variant='outlined'
+            action={(
+              <Button color='inherit' size='small' onClick={() => void load()}>
+                Reintentar
+              </Button>
+            )}
+          >
+            {loadError}
+          </Alert>
+        </Grid>
+      )}
+
+      {!data && !loadError && !loading && (
         <Grid size={{ xs: 12 }}>
           <Alert severity='info' variant='outlined'>Sin datos de proyección para este período.</Alert>
         </Grid>

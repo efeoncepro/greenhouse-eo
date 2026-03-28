@@ -49,6 +49,53 @@ Si hace falta contexto historico detallado, revisar `Handoff.archive.md`.
 
 ## Estado Actual
 
+## 2026-03-28 11:17 -03
+
+### Agente
+
+- Codex
+
+### Objetivo del turno
+
+- Cerrar `TASK-089` con hardening de UX en Payroll: separación visual de período actual/histórico/proyectado, retry visible en errores, affordances accesibles y feedback mejorado para descargas de recibos.
+
+### Rama
+
+- `develop`
+
+### Ambiente objetivo
+
+- staging
+
+### Archivos tocados
+
+- `docs/tasks/complete/TASK-089-payroll-ux-semantics-and-feedback-hardening.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `project_context.md`
+- `changelog.md`
+- `src/views/greenhouse/payroll/PayrollDashboard.tsx`
+- `src/views/greenhouse/payroll/PayrollHistoryTab.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.tsx`
+- `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+- `src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx`
+- `src/views/greenhouse/payroll/PayrollReceiptDialog.tsx`
+- `src/views/greenhouse/payroll/ProjectedPayrollView.tsx`
+- `src/views/greenhouse/my/MyPayrollView.tsx`
+- `src/views/greenhouse/people/tabs/PersonPayrollTab.tsx`
+- `src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+
+### Verificacion
+
+- `pnpm exec vitest run src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx` -> pass
+- `pnpm exec eslint src/views/greenhouse/payroll/PayrollDashboard.tsx src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx src/views/greenhouse/payroll/PayrollHistoryTab.tsx src/views/greenhouse/payroll/PayrollPersonnelExpenseTab.tsx src/views/greenhouse/payroll/PayrollReceiptDialog.tsx src/views/greenhouse/payroll/ProjectedPayrollView.tsx src/views/greenhouse/my/MyPayrollView.tsx src/views/greenhouse/people/tabs/PersonPayrollTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx` -> pass
+- `pnpm build` -> pass
+
+### Riesgos o pendientes
+
+- La selección histórica ahora queda explícita en UI; conviene validar en staging que la lectura del usuario sea natural con datos reales.
+- La descarga de recibos ya muestra feedback visible, pero aún conviene smoke manual en HR y Mi Nómina para validar naming y apertura en el navegador.
+
 ## 2026-03-28 11:02 -03
 
 ### Agente

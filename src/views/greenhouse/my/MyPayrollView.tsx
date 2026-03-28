@@ -8,6 +8,7 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
@@ -50,15 +51,25 @@ const fmt = (amount: number, currency: string) =>
 const MyPayrollView = () => {
   const [data, setData] = useState<PayrollData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
 
     try {
       const res = await fetch('/api/my/payroll')
 
-      if (res.ok) setData(await res.json())
-    } catch { /* silent */ } finally {
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible cargar tu nómina.')
+      }
+
+      setData(await res.json())
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar tu nómina.')
+    } finally {
       setLoading(false)
     }
   }, [])
@@ -81,7 +92,22 @@ const MyPayrollView = () => {
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
-  const entries = data?.payrollHistory ?? []
+  if (error) {
+    return (
+      <Alert
+        severity='error'
+        action={(
+          <Button color='inherit' size='small' onClick={() => void load()}>
+            Reintentar
+          </Button>
+        )}
+      >
+        {error}
+      </Alert>
+    )
+  }
+
+  const entries = [...(data?.payrollHistory ?? [])].sort((a, b) => b.periodId.localeCompare(a.periodId))
   const latest = entries[0]
 
   return (
@@ -120,8 +146,9 @@ const MyPayrollView = () => {
                   variant='tonal'
                   startIcon={<i className='tabler-file-download' />}
                   onClick={() => { void handleDownloadReceipt(latest) }}
+                  aria-label={`Descargar recibo PDF de ${MONTHS[latest.month]} ${latest.year}`}
                 >
-                  Descargar recibo
+                  Descargar PDF
                 </Button>
               </Box>
             </CardContent>
@@ -166,8 +193,9 @@ const MyPayrollView = () => {
                           variant='tonal'
                           startIcon={<i className='tabler-file-download' />}
                           onClick={() => { void handleDownloadReceipt(e) }}
+                          aria-label={`Descargar recibo PDF de ${MONTHS[e.month]} ${e.year}`}
                         >
-                          Descargar
+                          PDF
                         </Button>
                       </TableCell>
                     </TableRow>

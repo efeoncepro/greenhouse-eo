@@ -21,10 +21,11 @@ import { formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helper
 
 type Props = {
   periods: PayrollPeriod[]
+  selectedPeriodId: string | null
   onSelectPeriod: (periodId: string) => void
 }
 
-const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
+const PayrollHistoryTab = ({ periods, selectedPeriodId, onSelectPeriod }: Props) => {
   const closedPeriods = periods.filter(p => p.status === 'approved' || p.status === 'exported')
 
   return (
@@ -59,8 +60,18 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
                   <TableRow
                     key={period.periodId}
                     hover
+                    selected={selectedPeriodId === period.periodId}
                     sx={{ cursor: 'pointer' }}
                     onClick={() => onSelectPeriod(period.periodId)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        onSelectPeriod(period.periodId)
+                      }
+                    }}
+                    role='button'
+                    tabIndex={0}
+                    aria-label={`Abrir período ${formatPeriodLabel(period.year, period.month)}`}
                   >
                     <TableCell>
                       <Typography variant='body2' fontWeight={500}>
