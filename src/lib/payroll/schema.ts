@@ -14,6 +14,8 @@ const buildStatements = (projectId: string) => [
       currency STRING NOT NULL,
       base_salary FLOAT64 NOT NULL,
       remote_allowance FLOAT64,
+      colacion_amount FLOAT64 DEFAULT 0,
+      movilizacion_amount FLOAT64 DEFAULT 0,
       fixed_bonus_label STRING,
       fixed_bonus_amount FLOAT64,
       bonus_otd_min FLOAT64,
@@ -64,6 +66,8 @@ const buildStatements = (projectId: string) => [
       currency STRING NOT NULL,
       base_salary FLOAT64 NOT NULL,
       remote_allowance FLOAT64,
+      colacion_amount FLOAT64 DEFAULT 0,
+      movilizacion_amount FLOAT64 DEFAULT 0,
       fixed_bonus_label STRING,
       fixed_bonus_amount FLOAT64,
       kpi_otd_percent FLOAT64,
@@ -78,6 +82,8 @@ const buildStatements = (projectId: string) => [
       bonus_other_description STRING,
       gross_total FLOAT64 NOT NULL,
       chile_gratificacion_legal FLOAT64,
+      chile_colacion_amount FLOAT64,
+      chile_movilizacion_amount FLOAT64,
       chile_afp_name STRING,
       chile_afp_rate FLOAT64,
       chile_afp_amount FLOAT64,
@@ -95,10 +101,44 @@ const buildStatements = (projectId: string) => [
       net_total FLOAT64 NOT NULL,
       manual_override BOOL,
       manual_override_note STRING,
+      adjusted_colacion_amount FLOAT64,
+      adjusted_movilizacion_amount FLOAT64,
       adjusted_fixed_bonus_amount FLOAT64,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
     )
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
+    ADD COLUMN IF NOT EXISTS colacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.compensation_versions\`
+    ADD COLUMN IF NOT EXISTS movilizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS colacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS movilizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_colacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS chile_movilizacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS adjusted_colacion_amount FLOAT64
+  `,
+  `
+    ALTER TABLE \`${projectId}.greenhouse.payroll_entries\`
+    ADD COLUMN IF NOT EXISTS adjusted_movilizacion_amount FLOAT64
   `,
   `
     CREATE TABLE IF NOT EXISTS \`${projectId}.greenhouse.payroll_bonus_config\` (

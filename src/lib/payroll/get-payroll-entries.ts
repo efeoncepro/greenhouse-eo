@@ -36,6 +36,8 @@ type PayrollEntryRow = {
   currency: string | null
   base_salary: number | string | null
   remote_allowance: number | string | null
+  colacion_amount: number | string | null
+  movilizacion_amount: number | string | null
   fixed_bonus_label: string | null
   fixed_bonus_amount: number | string | null
   kpi_otd_percent: number | string | null
@@ -54,6 +56,8 @@ type PayrollEntryRow = {
   bonus_rpa_min: number | string | null
   bonus_rpa_max: number | string | null
   chile_gratificacion_legal: number | string | null
+  chile_colacion_amount: number | string | null
+  chile_movilizacion_amount: number | string | null
   chile_afp_name: string | null
   chile_afp_rate: number | string | null
   chile_afp_amount: number | string | null
@@ -80,6 +84,8 @@ type PayrollEntryRow = {
   days_on_unpaid_leave: number | string | null
   adjusted_base_salary: number | string | null
   adjusted_remote_allowance: number | string | null
+  adjusted_colacion_amount: number | string | null
+  adjusted_movilizacion_amount: number | string | null
   adjusted_fixed_bonus_amount: number | string | null
   created_at: { value?: string } | string | null
   updated_at: { value?: string } | string | null
@@ -106,6 +112,8 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   currency: row.currency === 'USD' ? 'USD' : 'CLP',
   baseSalary: toNumber(row.base_salary),
   remoteAllowance: toNumber(row.remote_allowance),
+  colacionAmount: toNumber(row.colacion_amount),
+  movilizacionAmount: toNumber(row.movilizacion_amount),
   fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
   fixedBonusAmount: toNumber(row.fixed_bonus_amount),
   kpiOtdPercent: toNullableNumber(row.kpi_otd_percent),
@@ -124,6 +132,8 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   bonusRpaMin: toNumber(row.bonus_rpa_min),
   bonusRpaMax: toNumber(row.bonus_rpa_max),
   chileGratificacionLegalAmount: toNullableNumber(row.chile_gratificacion_legal),
+  chileColacionAmount: toNullableNumber(row.chile_colacion_amount),
+  chileMovilizacionAmount: toNullableNumber(row.chile_movilizacion_amount),
   chileAfpName: normalizeNullableString(row.chile_afp_name),
   chileAfpRate: toNullableNumber(row.chile_afp_rate),
   chileAfpAmount: toNullableNumber(row.chile_afp_amount),
@@ -150,6 +160,8 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   daysOnUnpaidLeave: toNullableNumber(row.days_on_unpaid_leave),
   adjustedBaseSalary: toNullableNumber(row.adjusted_base_salary),
   adjustedRemoteAllowance: toNullableNumber(row.adjusted_remote_allowance),
+  adjustedColacionAmount: toNullableNumber(row.adjusted_colacion_amount),
+  adjustedMovilizacionAmount: toNullableNumber(row.adjusted_movilizacion_amount),
   adjustedFixedBonusAmount: toNullableNumber(row.adjusted_fixed_bonus_amount),
   createdAt: toTimestampString(row.created_at),
   updatedAt: toTimestampString(row.updated_at)
@@ -168,6 +180,8 @@ const buildBaseEntryQuery = (projectId: string) => `
     e.currency,
     e.base_salary,
     e.remote_allowance,
+    e.colacion_amount,
+    e.movilizacion_amount,
     e.fixed_bonus_label,
     e.fixed_bonus_amount,
     e.kpi_otd_percent,
@@ -182,6 +196,8 @@ const buildBaseEntryQuery = (projectId: string) => `
     e.bonus_other_description,
     e.gross_total,
     e.chile_gratificacion_legal,
+    e.chile_colacion_amount,
+    e.chile_movilizacion_amount,
     cv.bonus_otd_min,
     cv.bonus_otd_max,
     cv.bonus_rpa_min,
@@ -212,7 +228,9 @@ const buildBaseEntryQuery = (projectId: string) => `
     CAST(NULL AS INT64) AS days_on_unpaid_leave,
     CAST(NULL AS FLOAT64) AS adjusted_base_salary,
     CAST(NULL AS FLOAT64) AS adjusted_remote_allowance,
-    CAST(NULL AS FLOAT64) AS adjusted_fixed_bonus_amount,
+    e.adjusted_colacion_amount,
+    e.adjusted_movilizacion_amount,
+    e.adjusted_fixed_bonus_amount,
     e.created_at,
     e.updated_at
   FROM \`${projectId}.greenhouse.payroll_entries\` AS e

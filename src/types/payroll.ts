@@ -48,6 +48,8 @@ export interface CompensationVersion {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  colacionAmount: number
+  movilizacionAmount: number
   fixedBonusLabel: string | null
   fixedBonusAmount: number
   bonusOtdMin: number
@@ -77,6 +79,8 @@ export interface CreateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  colacionAmount?: number
+  movilizacionAmount?: number
   fixedBonusLabel?: string | null
   fixedBonusAmount?: number
   bonusOtdMin?: number
@@ -101,6 +105,8 @@ export interface UpdateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  colacionAmount?: number
+  movilizacionAmount?: number
   fixedBonusLabel?: string | null
   fixedBonusAmount?: number
   bonusOtdMin?: number
@@ -164,6 +170,8 @@ export interface PayrollEntry {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  colacionAmount: number
+  movilizacionAmount: number
   fixedBonusLabel: string | null
   fixedBonusAmount: number
   kpiOtdPercent: number | null
@@ -178,6 +186,8 @@ export interface PayrollEntry {
   bonusOtherDescription: string | null
   grossTotal: number
   chileGratificacionLegalAmount: number | null
+  chileColacionAmount: number | null
+  chileMovilizacionAmount: number | null
   bonusOtdMin: number
   bonusOtdMax: number
   bonusRpaMin: number
@@ -208,6 +218,8 @@ export interface PayrollEntry {
   daysOnUnpaidLeave: number | null
   adjustedBaseSalary: number | null
   adjustedRemoteAllowance: number | null
+  adjustedColacionAmount: number | null
+  adjustedMovilizacionAmount: number | null
   adjustedFixedBonusAmount: number | null
   createdAt: string | null
   updatedAt: string | null

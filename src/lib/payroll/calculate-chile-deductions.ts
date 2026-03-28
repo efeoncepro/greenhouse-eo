@@ -13,6 +13,8 @@ type PayrollTotalsInput = {
   payRegime: PayRegime
   baseSalary: number
   remoteAllowance: number
+  colacionAmount?: number
+  movilizacionAmount?: number
   fixedBonusAmount: number
   bonusOtdAmount: number
   bonusRpaAmount: number
@@ -38,6 +40,8 @@ export type ChileDeductionResult = {
   chileAfpRate: number | null
   chileAfpAmount: number | null
   chileGratificacionLegalAmount: number | null
+  chileColacionAmount: number | null
+  chileMovilizacionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
   chileUnemploymentRate: number | null
@@ -55,6 +59,8 @@ export const calculatePayrollTotals = async ({
   payRegime,
   baseSalary,
   remoteAllowance,
+  colacionAmount = 0,
+  movilizacionAmount = 0,
   fixedBonusAmount,
   bonusOtdAmount,
   bonusRpaAmount,
@@ -96,7 +102,16 @@ export const calculatePayrollTotals = async ({
   })()
 
   const totalVariableBonus = bonusOtdAmount + bonusRpaAmount + bonusOtherAmount
-  const grossTotal = roundCurrency(baseSalary + remoteAllowance + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
+
+  const grossTotal = roundCurrency(
+    baseSalary +
+      remoteAllowance +
+      colacionAmount +
+      movilizacionAmount +
+      fixedBonusAmount +
+      totalVariableBonus +
+      gratificationLegalAmount
+  )
 
   if (payRegime === 'international') {
     return {
@@ -106,6 +121,8 @@ export const calculatePayrollTotals = async ({
       chileAfpRate: null,
       chileAfpAmount: null,
       chileGratificacionLegalAmount: null,
+      chileColacionAmount: null,
+      chileMovilizacionAmount: null,
       chileHealthSystem: null,
       chileHealthAmount: null,
       chileUnemploymentRate: null,
@@ -148,7 +165,10 @@ export const calculatePayrollTotals = async ({
   const normalizedTaxAmount = roundCurrency(taxAmount || 0)
   const taxableBase = roundCurrency(Math.max(0, imponibleBase - afpAmount - healthAmount - unemploymentAmount))
   const totalDeductions = roundCurrency(afpAmount + healthAmount + unemploymentAmount + normalizedTaxAmount + normalizedApvAmount)
-  const netTotalCalculated = roundCurrency(imponibleBase + remoteAllowance - totalDeductions)
+
+  const netTotalCalculated = roundCurrency(
+    imponibleBase + remoteAllowance + colacionAmount + movilizacionAmount - totalDeductions
+  )
 
   return {
     grossTotal,
@@ -157,6 +177,8 @@ export const calculatePayrollTotals = async ({
     chileAfpRate: normalizedAfpRate || null,
     chileAfpAmount: afpAmount,
     chileGratificacionLegalAmount: gratificationLegalAmount > 0 ? gratificationLegalAmount : null,
+    chileColacionAmount: colacionAmount > 0 ? colacionAmount : null,
+    chileMovilizacionAmount: movilizacionAmount > 0 ? movilizacionAmount : null,
     chileHealthSystem: healthSystem || 'fonasa',
     chileHealthAmount: healthAmount,
     chileUnemploymentRate: derivedUnemploymentRate,

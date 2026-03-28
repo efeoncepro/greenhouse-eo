@@ -280,12 +280,16 @@ export const recalculatePayrollEntry = async ({
   // Use adjusted base/remote from the entry if attendance was already computed
   const effectiveBaseSalary = entry.adjustedBaseSalary ?? compensation.baseSalary
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
+  const effectiveColacionAmount = entry.adjustedColacionAmount ?? compensation.colacionAmount ?? 0
+  const effectiveMovilizacionAmount = entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount ?? 0
   const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount
 
   const provisionalTotals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
+    colacionAmount: effectiveColacionAmount,
+    movilizacionAmount: effectiveMovilizacionAmount,
     fixedBonusAmount: effectiveFixedBonusAmount,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
@@ -317,6 +321,8 @@ export const recalculatePayrollEntry = async ({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
+    colacionAmount: effectiveColacionAmount,
+    movilizacionAmount: effectiveMovilizacionAmount,
     fixedBonusAmount: effectiveFixedBonusAmount,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
@@ -356,6 +362,8 @@ export const recalculatePayrollEntry = async ({
     chileAfpName: totals.chileAfpName,
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,
+    chileColacionAmount: totals.chileColacionAmount,
+    chileMovilizacionAmount: totals.chileMovilizacionAmount,
     chileHealthSystem: totals.chileHealthSystem,
     chileHealthAmount: totals.chileHealthAmount,
     chileUnemploymentRate: totals.chileUnemploymentRate,
@@ -369,7 +377,9 @@ export const recalculatePayrollEntry = async ({
     netTotalOverride: nextManualOverride ? Number(nextNetTotalOverride) : null,
     netTotal: nextNetTotal,
     manualOverride: nextManualOverride,
-    manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote
+    manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote,
+    adjustedColacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
+    adjustedMovilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount
   }
 
   await upsertPayrollEntry(updatedEntry)
