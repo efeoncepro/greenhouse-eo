@@ -4,6 +4,15 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-127 creada como follow-on de consolidación Cloud
+
+### Completado
+- Se creó `TASK-127` para capturar la siguiente necesidad institucional del dominio Cloud:
+  - scorecard semáforo por dominio
+  - cleanup de drift documental residual
+  - plan corto de “next hardening wave”
+- La task no reabre lanes ya cerradas; sirve para consolidar la lectura post-baseline después de `TASK-096`, `TASK-098`, `TASK-099`, `TASK-102`, `TASK-103`, `TASK-124` y `TASK-126`.
+
 ## Sesión 2026-03-29 — TASK-102 cerrada
 
 ### Completado

@@ -71,6 +71,7 @@ Primer bloque operativo asignado:
   - `TASK-100`, `TASK-099`, `TASK-098`, `TASK-101` y `TASK-102` ya quedaron cerradas
   - el remanente operativo del bloque se concentra en `TASK-103`
 - `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
+- `TASK-127` nace como follow-on institucional para consolidar la lectura arquitectónica Cloud post-baseline, sin reabrir lanes ya cerradas.
 - Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
@@ -170,6 +171,8 @@ Primer bloque operativo asignado:
 | 48 | `TASK-122` | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | P1 | Alto | Medio | **Cerrada** | Baseline del dominio Cloud cerrada: operating model canónico + capa mínima real en `src/lib/cloud/*` para dar base a `TASK-100` a `TASK-103` |
 | 49 | `TASK-123` | [TASK-123-nexa-product-hardening.md](to-do/TASK-123-nexa-product-hardening.md) | P1 | Muy alto | Alto | Diseño | Streaming, tool results como cards ricas, code copy, timestamps, shortcuts, context chips, export, runtime compartido |
 | 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](in-progress/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | Implementación | Canary subscription + endpoint interno para validar pipeline E2E; pendiente: configurar secret en Vercel y activar desde Admin Center |
+| 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
+| 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

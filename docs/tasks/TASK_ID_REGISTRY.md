@@ -164,5 +164,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-124` | `complete` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
 | `TASK-125` | `in-progress` | Webhook Activation: First Consumers & E2E Validation | `docs/tasks/in-progress/TASK-125-webhook-activation-first-consumers.md` |
 | `TASK-126` | `to-do` | CSP Enforcement Hardening | `docs/tasks/to-do/TASK-126-csp-enforcement-hardening.md` |
+| `TASK-127` | `to-do` | Cloud Architecture Posture Consolidation | `docs/tasks/to-do/TASK-127-cloud-architecture-posture-consolidation.md` |
 
-`TASK-127`
+`TASK-128`

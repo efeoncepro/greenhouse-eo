@@ -7,6 +7,10 @@
 
 ## 2026-03-29
 
+### TASK-127 created for Cloud architecture consolidation
+- Se creó `TASK-127` como follow-on explícito para consolidar la lectura de arquitectura Cloud después del baseline ya implementado.
+- El objetivo de esta lane no es reabrir hardening ya cerrado, sino sintetizar el estado real por dominio, reducir drift documental y ordenar la siguiente ola de mejoras.
+
 ### TASK-102 closed after restore verification
 - Se completó el restore test end-to-end de Cloud SQL con el clone efímero `greenhouse-pg-restore-test-20260329d`.
 - La verificación SQL confirmó datos en tablas críticas y schemata esperados (`greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`).
