@@ -38,7 +38,6 @@ Primer bloque operativo asignado:
 | `TASK-083` | [TASK-083-compensation-drawer-enterprise-ux-redesign.md](complete/TASK-083-compensation-drawer-enterprise-ux-redesign.md) | P1 | Alto | Medio | Cerrada | Preview con secciones semánticas, salary base como chip, accordion MUI, font mono, micro-copy conciso. |
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
-| `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Validación avanzada | **[Hardening 6/7]** PITR, WAL, slow query logging y runtime `staging/production` ya verificados; solo falta cerrar restore test end-to-end |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
@@ -69,10 +68,10 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — bloque `TASK-098` a `TASK-103`
 
 - Estado consolidado a 2026-03-29:
-  - `TASK-100`, `TASK-099`, `TASK-098` y `TASK-101` ya quedaron cerradas
-  - el remanente operativo del bloque se concentra en `TASK-102` y `TASK-103`
+  - `TASK-100`, `TASK-099`, `TASK-098`, `TASK-101` y `TASK-102` ya quedaron cerradas
+  - el remanente operativo del bloque se concentra en `TASK-103`
 - `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
-- Criterio vigente: primero cerrar resiliencia/restores, luego costo y guardrails de BigQuery.
+- Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
 
@@ -91,7 +90,7 @@ Primer bloque operativo asignado:
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-117` → `TASK-030`.
 - **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
-- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-099` → `TASK-102` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
+- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
@@ -154,7 +153,6 @@ Primer bloque operativo asignado:
 | 26 | `TASK-100` | [TASK-100-ci-pipeline-test-step.md](complete/TASK-100-ci-pipeline-test-step.md) | P1 | Alto | Muy bajo | **Cerrada** | **[Hardening 1/7]** CI ahora ejecuta `pnpm test` entre lint y build con timeout de 5 minutos |
 | 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 2/7]** Baseline de seguridad cross-cutting cerrada: `proxy.ts`, headers estáticos, `HSTS` en `production` y `CSP-Report-Only` |
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 5/7]** Helper único `requireCronAuth()` ya migró 19 rutas scheduler-driven con fail-closed y timing-safe comparison |
-| 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Validación avanzada | **[Hardening 6/7]** PITR, flags, pool `15` y slow-query signal ya verificados; queda solo restore test limpio |
 | 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Bajo | Implementación | **[Hardening 7/7]** Cost guard automático en 50+ queries, Slack alert + Admin Center UI para blocked queries; pendiente: budget alerts GCP Console |
 | 35 | `TASK-107` | [TASK-107-auth-email-verification-request-flow.md](to-do/TASK-107-auth-email-verification-request-flow.md) | P2 | Medio | Medio | Diseño | Endpoint request de verificación de email + token `verify` + envío con `verify_email` |
 | 36 | `TASK-108` | [TASK-108-admin-center-governance-shell.md](complete/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | **Cerrada** | Baseline del shell de `Admin Center`: landing institucional, taxonomía de governance y dominios `Cloud & Integrations` + `Ops Health` |
@@ -218,6 +216,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
 | [TASK-096-gcp-secret-management-security-hardening.md](complete/TASK-096-gcp-secret-management-security-hardening.md) | Hardening cloud cerrado para su alcance útil: WIF/OIDC validado en `preview` + `staging` + `production`, Cloud SQL externo endurecido y Fase 3 absorbida posteriormente por `TASK-124`. |
 | [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | Baseline de security headers cerrada: `src/proxy.ts`, matcher conservador, `HSTS` en `production` y `Content-Security-Policy-Report-Only` como capa segura de observación. |
+| [TASK-102-database-resilience-baseline.md](complete/TASK-102-database-resilience-baseline.md) | Baseline de resiliencia de Cloud SQL cerrada: PITR + WAL retention, slow query logging, pool runtime `15`, health runtime validado en `staging` + `production` y restore test end-to-end documentado con clone efímero verificado y limpiado. |
 | [TASK-009-greenhouse-home-nexa.md](complete/TASK-009-greenhouse-home-nexa.md) | Baseline principal de `Home + Nexa v2` cerrada: `/home` materializado, snapshot server-side, Nexa operativo y evolución posterior derivada a `TASK-119` y `TASK-110`. |
 | [TASK-114-nexa-backend-persistence-suggestions.md](complete/TASK-114-nexa-backend-persistence-suggestions.md) | Backend de Nexa cerrado: persistencia de conversación y feedback en PostgreSQL, thread history, `threadId` y follow-up suggestions dinámicas listas para consumo UI. |
 | [TASK-108-admin-center-governance-shell.md](complete/TASK-108-admin-center-governance-shell.md) | Baseline del shell de `Admin Center` cerrada: `/admin` como landing institucional, taxonomía de governance y dominios iniciales de control plane. |

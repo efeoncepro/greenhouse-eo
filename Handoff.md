@@ -4,6 +4,22 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-102 cerrada
+
+### Completado
+- Se completó el restore test end-to-end con el clone efímero `greenhouse-pg-restore-test-20260329d`.
+- Verificación SQL real sobre el clone:
+  - `payroll_entries=6`
+  - `identity_profiles=40`
+  - `outbox_events=1188`
+  - schemata presentes: `greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`
+- El clone fue eliminado después de validar datos y `gcloud sql instances list` volvió a mostrar solo `greenhouse-pg-dev`.
+- `TASK-102` ya no queda abierta:
+  - PITR y WAL retention verificados
+  - slow query logging con evidencia real en Cloud Logging
+  - runtime health confirmado en `staging` y `production`
+  - restore verification ya documentada de punta a punta
+
 ## Sesión 2026-03-29 — TASK-102 validación externa casi cerrada
 
 ### Completado

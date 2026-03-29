@@ -7,6 +7,12 @@
 
 ## 2026-03-29
 
+### TASK-102 closed after restore verification
+- Se completó el restore test end-to-end de Cloud SQL con el clone efímero `greenhouse-pg-restore-test-20260329d`.
+- La verificación SQL confirmó datos en tablas críticas y schemata esperados (`greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`).
+- El clone se eliminó después del check y no quedaron instancias temporales vivas.
+- `TASK-102` queda cerrada: PITR, WAL retention, slow query logging, pool runtime `15` y restore confidence ya tienen evidencia operativa completa.
+
 ### TASK-102 external validation narrowed the remaining gap
 - Se confirmó en GCP la postura activa de `greenhouse-pg-dev`: `PITR`, WAL retention, `log_min_duration_statement=1000`, `log_statement=ddl` y `sslMode=ENCRYPTED_ONLY`.
 - `staging` y `production` respondieron por `vercel curl /api/internal/health` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true` y `maxConnections=15`.

@@ -1,5 +1,16 @@
 # TASK-102 — Database Resilience Baseline
 
+## Delta 2026-03-29 — Restore verificado y task cerrada
+
+- Se completó el restore test end-to-end con clone efímero `greenhouse-pg-restore-test-20260329d`.
+- Verificación SQL real contra el clone:
+  - `payroll_entries=6`
+  - `identity_profiles=40`
+  - `outbox_events=1188`
+  - schemata presentes: `greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`
+- El clone fue eliminado después de la verificación y `gcloud sql instances list` volvió a mostrar solo `greenhouse-pg-dev`.
+- `TASK-102` queda cerrada: PITR, WAL retention, slow query logging, pool runtime `15`, runtime health y restore verification ya tienen evidencia operativa documentada.
+
 ## Delta 2026-03-29 — Validación externa cerrada salvo restore
 
 - Validación real confirmada en esta sesión:
@@ -18,16 +29,16 @@
     - `sslEnabled=true`
     - `maxConnections=15`
     - `version=272dd8d`
-- Restore test sigue pendiente, pero ahora el remanente quedó acotado:
+- Restore test seguía pendiente en ese momento, pero el remanente quedó acotado:
   - clone `greenhouse-pg-restore-test-20260329b` llegó a `RUNNABLE` y fue eliminado sin dejar residuos antes de completar la verificación SQL
   - clone `greenhouse-pg-restore-test-20260329c` quedó demasiado tiempo en `PENDING_CREATE` y también fue eliminado para no dejar infraestructura efímera colgada
-  - por lo tanto, el único blocker real restante de `TASK-102` ya no es configuración ni runtime, sino completar una ventana limpia de restore verification end-to-end
+  - por lo tanto, el único blocker real restante de `TASK-102` en ese punto ya no era configuración ni runtime, sino completar una ventana limpia de restore verification end-to-end
 
 ## Delta 2026-03-29
 
 - La capa Cloud ya expone postura runtime de Postgres en `src/lib/cloud/postgres.ts`.
 - `GET /api/internal/health` ya puede funcionar como consumer de runtime health una vez que la postura externa de Cloud SQL cambie.
-- Sigue pendiente toda la parte externa de Cloud SQL: PITR, flags, restore test y env rollout de pool size.
+- En ese momento seguía pendiente toda la parte externa de Cloud SQL: PITR, flags, restore test y env rollout de pool size.
 
 ## Delta 2026-03-29
 
@@ -40,17 +51,17 @@
   - fallback del runtime en repo actualizado a `15` en `src/lib/postgres/client.ts`
   - `.env.example` alineado a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15`
 - `pnpm pg:doctor --profile=runtime` y `pnpm pg:doctor --profile=migrator` pasaron contra `greenhouse-pg-dev`.
-- Restore test iniciado con clone efímero `greenhouse-pg-restore-test-20260329`, pero al cierre de esta actualización seguía en `PENDING_CREATE`.
+- Restore test iniciado con clone efímero `greenhouse-pg-restore-test-20260329`, pero al cierre de esa actualización seguía en `PENDING_CREATE`.
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Validación avanzada` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Database |
 | Sequence | Cloud Posture Hardening **5 of 6** — after TASK-096 Fase 1, connects to TASK-098 |
@@ -81,11 +92,11 @@ Cloud SQL `greenhouse-pg-dev` es el OLTP store de Greenhouse — payroll, compen
 | Aspecto | Estado | Riesgo |
 |---------|--------|--------|
 | Backup automático | Diario a las 07:00 UTC, 7 días retención | Si corrupción a las 06:59, se pierde ~24h de datos |
-| PITR | **Deshabilitado** | No hay recovery granular (solo snapshots diarios) |
+| PITR | **Habilitado** | Recovery granular habilitado vía WAL + PITR |
 | Slow query logging | **Habilitado y verificado** | Señal visible en Cloud Logging |
 | Connection pool | **15 conexiones** | Headroom alineado al patrón serverless actual |
 | Read replica | No existe | Single point of failure |
-| Restore testeado | **Pendiente** | No hay evidencia final documentada del clone + verificación SQL |
+| Restore testeado | **Verificado** | Clone efímero validado y eliminado sin residuos |
 
 ## Goal
 
@@ -127,8 +138,8 @@ pool = new Pool({
 - **Storage:** 20 GB SSD, auto-resize
 - **Region:** us-east4-a (single zone)
 - **Backup:** Daily at 07:00 UTC, 7 days retention
-- **PITR:** Disabled
-- **Flags:** Default (no custom database flags)
+- **PITR:** Enabled
+- **Flags:** `log_min_duration_statement=1000`, `log_statement=ddl`
 
 ## Scope
 
@@ -221,9 +232,9 @@ pool = new Pool({
 - [x] `log_statement=ddl` activo (cambios de schema auditados)
 - [x] Slow queries visibles en Cloud Logging
 - [x] `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` configurado en Vercel
-- [ ] Restore de backup testeado exitosamente (clone + verificación)
-- [ ] Resultado del restore documentado
-- [ ] Instancia de test eliminada post-verificación
+- [x] Restore de backup testeado exitosamente (clone + verificación)
+- [x] Resultado del restore documentado
+- [x] Instancia de test eliminada post-verificación
 - [x] Production y staging funcionan correctamente post-cambios
 
 ## Verification
