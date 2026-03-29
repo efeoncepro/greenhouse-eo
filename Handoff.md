@@ -4,6 +4,26 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-099 cerrada con `CSP-Report-Only`
+
+### Completado
+- `TASK-099` queda cerrada para su baseline segura y reversible.
+- `src/proxy.ts` ahora agrega también `Content-Security-Policy-Report-Only` con allowlist amplia para no romper:
+  - login `Azure AD` / `Google`
+  - MUI / Emotion
+  - observabilidad (`Sentry`)
+  - assets y uploads
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/proxy.test.ts`
+  - `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Decisión explícita
+- La task no intenta endurecer a `Content-Security-Policy` enforce.
+- Cualquier tightening posterior (`Report-Only` tuning, nonces, eliminación de `unsafe-*`) queda como mejora futura y ya no bloquea el hardening baseline.
+- Esa mejora futura ya quedó registrada como `TASK-126`.
+
 ## Sesión 2026-03-29 — TASK-099 re-acotada al baseline real
 
 ### Completado

@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-099 closed with CSP report-only baseline
+- `src/proxy.ts` ahora suma `Content-Security-Policy-Report-Only` sobre la baseline previa de security headers.
+- `pnpm exec vitest run src/proxy.test.ts`, `eslint`, `tsc --noEmit` y `pnpm build` pasaron con el nuevo header.
+- `TASK-099` queda cerrada para el alcance seguro de hardening cross-cutting; el endurecimiento futuro de `CSP` ya no bloquea esta lane.
+
 ### TASK-099 scope aligned with the validated proxy baseline
 - `TASK-099` se re-acotó documentalmente para reflejar el estado real del repo.
 - El baseline ya validado incluye solo `src/proxy.ts`, headers estáticos, matcher conservador y `HSTS` en `production`.
