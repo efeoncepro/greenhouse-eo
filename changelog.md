@@ -7,6 +7,14 @@
 
 ## 2026-03-29
 
+### TASK-098 observability MVP closed in production
+- `main` absorbió `develop` en `bcbd0c3` y `production` quedó validada con `observability=ok`.
+- `GET /api/internal/health` ya reporta en producción:
+  - `Sentry runtime + source maps listos`
+  - `Slack alerts configuradas`
+- `GET /api/auth/session` respondió `{}` en el deployment productivo validado.
+- `TASK-098` queda cerrada para el alcance MVP declarado.
+
 ### TASK-098 observability validated end-to-end in staging
 - `staging` ya quedó con `Sentry` y `Slack alerts` operativas, no solo configuradas.
 - `GET /api/internal/health` reporta `observability` en estado `ok`.
