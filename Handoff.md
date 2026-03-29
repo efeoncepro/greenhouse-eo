@@ -33,6 +33,14 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - validación local con OIDC + WIF:
     - BigQuery respondió OK sin SA key
     - Cloud SQL Connector respondió `SELECT 1` sin SA key usando `runGreenhousePostgresQuery()`
+  - validación real en preview Vercel:
+    - se completó el env set mínimo de la branch `feature/codex-task-096-wif-baseline`
+    - se forzó redeploy del preview
+    - `greenhouse-i3cak6akh-efeonce-7670142f.vercel.app/api/internal/health` respondió `200 OK`
+    - posture observada:
+      - `auth.mode=wif`
+      - BigQuery reachable
+      - Cloud SQL reachable con connector e `instanceConnectionName=efeonce-group:us-east4:greenhouse-pg-dev`
 
 ### Validación
 - `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts src/lib/bigquery.ts src/lib/postgres/client.ts src/lib/storage/greenhouse-media.ts src/lib/ai/google-genai.ts scripts/check-ico-bq.ts scripts/backfill-ico-to-postgres.ts scripts/materialize-member-metrics.ts scripts/backfill-task-assignees.ts scripts/backfill-postgres-payroll.ts scripts/admin-team-runtime-smoke.ts`
@@ -46,8 +54,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Limpiar drift de Vercel env antes del endurecimiento final:
   - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` quedó guardada con sufijo literal `\n` en al menos un entorno
   - también aparecieron valores con `\n` en credenciales Postgres al hacer `env pull`
-  - antes de endurecer Cloud SQL hay que corregir esos valores en Vercel y revalidar preview/staging
-- Validar preview/staging con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - antes de endurecer Cloud SQL hay que corregir esos valores en Vercel y revalidar el entorno compartido
+- Aclarar y corregir el mapa de ambientes Vercel:
+  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 como preview de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`)
+  - no asumir que ese alias hoy represente un `staging` inequívoco hasta corregirlo
+- Validar el entorno compartido con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`
