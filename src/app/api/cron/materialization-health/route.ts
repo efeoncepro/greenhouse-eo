@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -16,10 +18,10 @@ interface HealthCheck {
 const MAX_AGE_HOURS = 48 // Consider stale after 48h
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
+  const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!authorized) {
+    return errorResponse
   }
 
   const checks: HealthCheck[] = []

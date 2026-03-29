@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-121`
+- siguiente ID disponible: `TASK-125`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -40,6 +40,8 @@ Primer bloque operativo asignado:
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, WAL retention, slow query logging y pool `15` ya aplicados; restore clone en curso para cerrar la verificación |
 | `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](in-progress/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Implementación | Lane WIF/OIDC y hardening Cloud SQL ya absorbida; queda como referencia viva del track cloud |
+| `TASK-098` | [TASK-098-observability-mvp.md](in-progress/TASK-098-observability-mvp.md) | P1 | Alto | Bajo | Validada en staging | Health, Sentry mínimo y Slack alerts ya están operativas en `staging`; el remanente real quedó concentrado en `production` |
+| `TASK-099` | [TASK-099-security-headers-middleware.md](in-progress/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Implementación | Slice 1 activo: proxy de headers estáticos con matcher conservador; CSP real diferida por riesgo |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
@@ -69,8 +71,8 @@ Primer bloque operativo asignado:
 
 ### Prioridad vigente — bloque `TASK-098` a `TASK-103`
 
-- Orden recomendado de ejecución a 2026-03-28: `TASK-100` → `TASK-101` → `TASK-098` → `TASK-099` → `TASK-102` → `TASK-103`.
-- Criterio: primero guardrails transversales baratos (`CI`), luego seguridad real de crons, después visibilidad operativa, y recién luego middleware, resiliencia de base y controles de costo.
+- Orden recomendado de ejecución a 2026-03-29: `TASK-100` → `TASK-099` → `TASK-098` → `TASK-101` → `TASK-102` → `TASK-103`.
+- Criterio: primero guardrails transversales baratos (`CI`), luego middleware de headers seguro y barato, después observabilidad externa ya apoyada en esa capa, y luego el resto del hardening cloud.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
 
@@ -150,8 +152,8 @@ Primer bloque operativo asignado:
 | 24 | `TASK-019` | [TASK-019-staff-augmentation-module.md](to-do/TASK-019-staff-augmentation-module.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
 | 25 | `TASK-020` | [TASK-020-frameio-bigquery-analytics-pipeline.md](to-do/TASK-020-frameio-bigquery-analytics-pipeline.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
 | 26 | `TASK-100` | [TASK-100-ci-pipeline-test-step.md](complete/TASK-100-ci-pipeline-test-step.md) | P1 | Alto | Muy bajo | **Cerrada** | **[Hardening 1/7]** CI ahora ejecuta `pnpm test` entre lint y build con timeout de 5 minutos |
-| 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](to-do/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Diseño | **[Hardening 2/7]** Crear middleware.ts con CSP, X-Frame-Options, HSTS, Referrer-Policy |
-| 29 | `TASK-098` | [TASK-098-observability-mvp.md](to-do/TASK-098-observability-mvp.md) | P1 | Alto | Bajo | Diseño | **[Hardening 4/7]** Sentry + health endpoint + Slack alerts para crons críticos |
+| 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](in-progress/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Implementación | **[Hardening 2/7]** Slice 1 activo: `proxy.ts` con headers estáticos y matcher conservador; CSP real diferida |
+| 29 | `TASK-098` | [TASK-098-observability-mvp.md](in-progress/TASK-098-observability-mvp.md) | P1 | Alto | Bajo | Validada en staging | **[Hardening 4/7]** Health posture, Sentry runtime y Slack alerts ya están operativas en `staging`; resta rollout equivalente en `production` |
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 5/7]** Helper único `requireCronAuth()` ya migró 19 rutas scheduler-driven con fail-closed y timing-safe comparison |
 | 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, flags y pool `15` ya aplicados; restore clone pendiente de completar y verificar |
 | 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
@@ -170,6 +172,7 @@ Primer bloque operativo asignado:
 | 47 | `TASK-120` | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | P2 | Medio | Bajo | **Absorbida** | Follow-on absorbido por la unificación efectiva de `Admin Center + Control Tower` |
 | 48 | `TASK-122` | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | P1 | Alto | Medio | **Cerrada** | Baseline del dominio Cloud cerrada: operating model canónico + capa mínima real en `src/lib/cloud/*` para dar base a `TASK-100` a `TASK-103` |
 | 49 | `TASK-123` | [TASK-123-nexa-product-hardening.md](to-do/TASK-123-nexa-product-hardening.md) | P1 | Muy alto | Alto | Diseño | Streaming, tool results como cards ricas, code copy, timestamps, shortcuts, context chips, export, runtime compartido |
+| 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](to-do/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | Diseño | Activar infraestructura de webhooks (TASK-006): registrar primer endpoint + subscription, validar flujo E2E, llevar Admin Center de warning a ok |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

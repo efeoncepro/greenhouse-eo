@@ -22,6 +22,8 @@ export type HorizontalWithBorderProps = {
   trendNumber: number
   avatarIcon: string
   color?: ThemeColor
+  trendLabel?: string
+  onClick?: () => void
 }
 
 type StyledCardProps = CardProps & {
@@ -44,10 +46,10 @@ const Card = styled(MuiCard)<StyledCardProps>(({ color }) => ({
 }))
 
 const HorizontalWithBorder = (props: HorizontalWithBorderProps) => {
-  const { title, stats, trendNumber, avatarIcon, color = 'primary' } = props
+  const { title, stats, trendNumber, avatarIcon, color = 'primary', trendLabel, onClick } = props
 
   return (
-    <Card color={color}>
+    <Card color={color} onClick={onClick} sx={onClick ? { cursor: 'pointer' } : undefined}>
       <CardContent className='flex flex-col gap-1'>
         <div className='flex items-center gap-4'>
           <CustomAvatar color={color} skin='light' variant='rounded'>
@@ -61,9 +63,9 @@ const HorizontalWithBorder = (props: HorizontalWithBorderProps) => {
             <Typography
               color='text.primary'
               className='font-medium'
-            >{`${trendNumber > 0 ? '+' : ''}${trendNumber}%`}</Typography>
+            >{`${trendNumber > 0 ? '+' : ''}${trendNumber}`}</Typography>
             <Typography variant='body2' color='text.disabled'>
-              vs. semana anterior
+              {trendLabel ?? 'vs. semana anterior'}
             </Typography>
           </div>
         </div>

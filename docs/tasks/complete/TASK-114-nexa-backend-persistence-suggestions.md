@@ -1,12 +1,23 @@
 # TASK-114 — Nexa Backend: Persistence, Feedback & Dynamic Suggestions
 
+## Delta 2026-03-29
+
+- `TASK-114` pasa a implementación efectiva con backend real para persistencia de Nexa sobre PostgreSQL.
+- Se agregaron contratos explícitos para `feedback`, `thread history` y `threadId` en `NexaResponse`.
+- `/api/home/nexa` ahora persiste pares `user + assistant`, retorna `threadId` y genera `suggestions` dinámicas con fallback seguro a `[]`.
+- Se agregaron endpoints dedicados:
+  - `POST /api/home/nexa/feedback`
+  - `GET /api/home/nexa/threads`
+  - `GET /api/home/nexa/threads/[threadId]`
+- Se agregó validación runtime no mutante para asegurar que las tablas existan en `greenhouse_ai`, con DDL canónico en `scripts/migrations/add-nexa-ai-tables.sql`.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `41`
 - Domain: `home / ai`
 - Assigned to: **Codex**
@@ -230,11 +241,20 @@ Hoy `NexaService.generateResponse()` retorna `suggestions: []`. El contrato ya e
 
 ## Acceptance Criteria
 
-- [ ] `POST /api/home/nexa/feedback` persiste feedback en `greenhouse_ai.nexa_feedback`
-- [ ] `GET /api/home/nexa/threads` retorna threads del usuario
-- [ ] `GET /api/home/nexa/threads/[threadId]` retorna mensajes del thread
-- [ ] `POST /api/home/nexa` persiste mensajes y retorna `threadId`
-- [ ] `NexaResponse.suggestions` se puebla con 2-3 follow-ups reales
-- [ ] `NexaResponse.threadId` presente en la response
-- [ ] Migraciones DDL incluidas y documentadas
-- [ ] Zero TS errors, lint clean
+- [x] `POST /api/home/nexa/feedback` persiste feedback en `greenhouse_ai.nexa_feedback`
+- [x] `GET /api/home/nexa/threads` retorna threads del usuario
+- [x] `GET /api/home/nexa/threads/[threadId]` retorna mensajes del thread
+- [x] `POST /api/home/nexa` persiste mensajes y retorna `threadId`
+- [x] `NexaResponse.suggestions` se puebla con 2-3 follow-ups reales
+- [x] `NexaResponse.threadId` presente en la response
+- [x] Migraciones DDL incluidas y documentadas
+- [x] Zero TS errors, lint clean
+
+## Verification
+
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm exec tsx scripts/run-migration.ts scripts/migrations/add-nexa-ai-tables.sql --profile=migrator`
+- `pnpm pg:doctor --profile=runtime`
+- `pnpm exec eslint src/lib/nexa/nexa-contract.ts src/lib/nexa/nexa-service.ts src/lib/nexa/nexa-service.test.ts src/lib/nexa/store.ts src/app/api/home/nexa/route.ts src/app/api/home/nexa/feedback/route.ts src/app/api/home/nexa/threads/route.ts src/app/api/home/nexa/threads/[threadId]/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec vitest run src/lib/nexa/nexa-service.test.ts`

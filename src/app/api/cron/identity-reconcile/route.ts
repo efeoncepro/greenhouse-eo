@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export const dynamic = 'force-dynamic'
@@ -14,10 +16,10 @@ interface ProfileRow extends Record<string, unknown> {
 }
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
+  const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!authorized) {
+    return errorResponse
   }
 
   try {

@@ -18,6 +18,7 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 
 import NexaHero from './components/NexaHero'
 import NexaThread from './components/NexaThread'
+import NexaThreadSidebar from './components/NexaThreadSidebar'
 import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
@@ -53,7 +54,14 @@ const toJsonValue = (value: unknown): ReadonlyJSONValue => {
   return null
 }
 
-const createNexaAdapter = (selectedModelRef: MutableRefObject<NexaModelId>): ChatModelAdapter => ({
+type AdapterRefs = {
+  selectedModelRef: MutableRefObject<NexaModelId>
+  threadIdRef: MutableRefObject<string | null>
+  onSuggestionsChange: (suggestions: string[]) => void
+  onThreadIdChange: (threadId: string) => void
+}
+
+const createNexaAdapter = (refs: AdapterRefs): ChatModelAdapter => ({
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
 
@@ -76,13 +84,18 @@ const createNexaAdapter = (selectedModelRef: MutableRefObject<NexaModelId>): Cha
       res = await fetch('/api/home/nexa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, history, model: selectedModelRef.current }),
+        body: JSON.stringify({
+          prompt,
+          history,
+          model: refs.selectedModelRef.current,
+          threadId: refs.threadIdRef.current
+        }),
         signal: abortSignal
       })
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') throw err
 
-      throw new Error('No pude conectarme con Nexa. Verifica tu conexión e intenta de nuevo.')
+      throw new Error('No pude conectarme con Nexa. Verifica tu conexion e intenta de nuevo.')
     }
 
     if (!res.ok) {
@@ -92,6 +105,15 @@ const createNexaAdapter = (selectedModelRef: MutableRefObject<NexaModelId>): Cha
     }
 
     const data = await res.json() as NexaResponse
+
+    // Track threadId from response
+    if (data.threadId) {
+      refs.threadIdRef.current = data.threadId
+      refs.onThreadIdChange(data.threadId)
+    }
+
+    // Track suggestions from response
+    refs.onSuggestionsChange(data.suggestions ?? [])
 
     const toolParts = (data.toolInvocations || []).map(invocation => ({
       type: 'tool-call' as const,
@@ -132,7 +154,7 @@ class NexaBoundary extends Component<{ children: ReactNode }, { hasError: boolea
       return (
         <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary' }}>
           <i className='tabler-robot-off' style={{ fontSize: '2.5rem', display: 'block', marginBottom: 12 }} />
-          <Typography variant='body1'>Nexa no está disponible en este momento.</Typography>
+          <Typography variant='body1'>Nexa no esta disponible en este momento.</Typography>
         </Box>
       )
     }
@@ -163,30 +185,45 @@ const HomeContent = ({
   snapshot,
   operationItems,
   selectedModel,
-  onModelChange
+  onModelChange,
+  suggestions,
+  threadId,
+  onSelectThread,
+  onNewThread
 }: {
   snapshot: HomeSnapshot
   operationItems: StatusItem[]
   selectedModel: NexaModelId
   onModelChange: (model: NexaModelId) => void
+  suggestions: string[]
+  threadId: string | null
+  onSelectThread: (threadId: string) => void
+  onNewThread: () => void
 }) => {
   const messageCount = useAuiState(s => s.thread.messages.length)
   const isChatActive = messageCount > INITIAL_MESSAGE_COUNT
 
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
   const handleBack = useCallback(() => {
-    // Can't reset thread in LocalRuntime easily — reload the page
     window.location.reload()
   }, [])
 
   return (
     <>
+      <NexaThreadSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        activeThreadId={threadId}
+        onSelectThread={onSelectThread}
+        onNewThread={onNewThread}
+      />
+
       {/* Landing state */}
       {!isChatActive && (
         <Fade in timeout={400}>
           <Box>
             <NexaHero greeting={snapshot.greeting.title} selectedModel={selectedModel} onModelChange={onModelChange} />
-
-            {/* Secondary content below hero */}
             <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, mt: 4, pb: 6 }}>
               <Grid container spacing={4}>
                 <Grid size={{ xs: 12, md: 7 }}>
@@ -205,7 +242,13 @@ const HomeContent = ({
       {isChatActive && (
         <Fade in timeout={400}>
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <NexaThread onBack={handleBack} selectedModel={selectedModel} onModelChange={onModelChange} />
+            <NexaThread
+              onBack={handleBack}
+              selectedModel={selectedModel}
+              onModelChange={onModelChange}
+              suggestions={suggestions}
+              onHistoryToggle={() => setSidebarOpen(true)}
+            />
           </Box>
         </Fade>
       )}
@@ -220,7 +263,11 @@ const HomeView = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [threadId, setThreadId] = useState<string | null>(null)
+
   const selectedModelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const threadIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     const storedModel = typeof window !== 'undefined' ? window.localStorage.getItem(NEXA_MODEL_STORAGE_KEY) : null
@@ -239,6 +286,25 @@ const HomeView = () => {
     window.localStorage.setItem(NEXA_MODEL_STORAGE_KEY, resolved)
   }, [])
 
+  const handleThreadIdChange = useCallback((id: string) => {
+    setThreadId(id)
+    threadIdRef.current = id
+  }, [])
+
+  const handleSelectThread = useCallback(async (selectedThreadId: string) => {
+    // For now, navigate to reload with the thread — full thread loading requires
+    // resetting the LocalRuntime which isn't cleanly supported. Reload with param.
+    threadIdRef.current = selectedThreadId
+    setThreadId(selectedThreadId)
+    window.location.href = `/home?thread=${selectedThreadId}`
+  }, [])
+
+  const handleNewThread = useCallback(() => {
+    threadIdRef.current = null
+    setThreadId(null)
+    window.location.href = '/home'
+  }, [])
+
   useEffect(() => {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), SNAPSHOT_TIMEOUT_MS)
@@ -255,7 +321,7 @@ const HomeView = () => {
           setSnapshot(null)
           setError(null)
         } else {
-          setError('Ocurrió un error al cargar tu centro de mando. Por favor, intenta de nuevo.')
+          setError('Ocurrio un error al cargar tu centro de mando. Por favor, intenta de nuevo.')
         }
       } finally {
         clearTimeout(timeoutId)
@@ -270,18 +336,22 @@ const HomeView = () => {
 
   const greeting = snapshot?.greeting ?? { title: 'Bienvenido a Greenhouse', subtitle: 'Tu centro de mando operativo.' }
   const modules = snapshot?.modules ?? []
-  const nexaIntro = snapshot?.nexaIntro ?? 'Hola, soy Nexa. ¿En qué puedo ayudarte hoy?'
+  const nexaIntro = snapshot?.nexaIntro ?? 'Hola, soy Nexa. ¿En que puedo ayudarte hoy?'
 
   const operationItems = useMemo((): StatusItem[] => {
-    // Placeholder — will be enriched in Slice D with real payroll/OTD/email data
     return [
-      { label: 'Nómina del mes', value: 'Sin datos', status: 'secondary', icon: 'tabler-file-invoice' },
+      { label: 'Nomina del mes', value: 'Sin datos', status: 'secondary', icon: 'tabler-file-invoice' },
       { label: 'OTD global', value: 'Sin datos', status: 'secondary', icon: 'tabler-target' },
       { label: 'Correos fallidos', value: '0', status: 'success', icon: 'tabler-mail-check' }
     ]
   }, [])
 
-  const nexaAdapter = useMemo(() => createNexaAdapter(selectedModelRef), [])
+  const nexaAdapter = useMemo(() => createNexaAdapter({
+    selectedModelRef,
+    threadIdRef,
+    onSuggestionsChange: setSuggestions,
+    onThreadIdChange: handleThreadIdChange
+  }), [handleThreadIdChange])
 
   const runtime = useLocalRuntime(nexaAdapter, {
     initialMessages: [
@@ -317,6 +387,10 @@ const HomeView = () => {
           operationItems={operationItems}
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
+          suggestions={suggestions}
+          threadId={threadId}
+          onSelectThread={handleSelectThread}
+          onNewThread={handleNewThread}
         />
       </AssistantRuntimeProvider>
     </NexaBoundary>

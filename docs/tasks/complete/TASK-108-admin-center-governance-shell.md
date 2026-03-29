@@ -1,5 +1,11 @@
 # TASK-108 - Admin Center Governance Shell
 
+## Delta 2026-03-29
+
+- `TASK-108` se cierra como baseline del shell de `Admin Center`.
+- El objetivo principal ya quedó resuelto: `/admin` dejó de ser redirect, existe landing institucional, la taxonomía de governance está visible y los dominios `Cloud & Integrations` y `Ops Health` ya tienen surfaces propias dentro del route group admin.
+- Lo pendiente se mueve a `TASK-120`, enfocada en follow-ons de cutover, role scoping y verificación especializada, sin reabrir la baseline del shell.
+
 ## Delta 2026-03-28
 
 - `/admin` ya funciona como landing real de `Admin Center`.
@@ -10,11 +16,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Implementación`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `platform`
 
@@ -446,14 +452,14 @@ Decisión para `AI Tools`:
 
 ## Acceptance Criteria
 
-- [ ] `/admin` deja de ser un redirect ciego y muestra una landing de `Admin Center`.
-- [ ] La navegación admin expresa una taxonomía clara de gobernanza.
-- [ ] `AI Tools` queda documentado como dominio dual sin romper su acceso operativo actual.
-- [ ] Las rutas existentes de admin siguen funcionando.
-- [ ] La task deja documentado qué se mueve, qué se agrupa y qué se conserva.
-- [ ] Existe una categoría explícita para `Cloud & Integrations` dentro del centro.
-- [ ] Existe una estrategia documentada para monitorear eventos reactivos, proyecciones y webhooks.
-- [ ] Existe una estrategia documentada para llaves API / credenciales sin exponer secretos.
+- [x] `/admin` deja de ser un redirect ciego y muestra una landing de `Admin Center`.
+- [x] La navegación admin expresa una taxonomía clara de gobernanza.
+- [x] `AI Tools` queda documentado como dominio dual sin romper su acceso operativo actual.
+- [x] Las rutas existentes de admin siguen funcionando.
+- [x] La task deja documentado qué se mueve, qué se agrupa y qué se conserva.
+- [x] Existe una categoría explícita para `Cloud & Integrations` dentro del centro.
+- [x] Existe una estrategia documentada para monitorear eventos reactivos, proyecciones y webhooks.
+- [x] Existe una estrategia documentada para llaves API / credenciales sin exponer secretos.
 
 ## Verification
 
@@ -468,3 +474,7 @@ Decisión para `AI Tools`:
   - `/admin/team`
   - `/admin/ai-tools`
   - `/admin/email-delivery`
+
+## Follow-ups
+
+- `TASK-120` - Admin Center governance follow-on cutover and role scoping

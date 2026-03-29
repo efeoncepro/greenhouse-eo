@@ -123,7 +123,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 
 | `TASK-096` | `in-progress` | GCP Secret Management & Security Hardening | `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md` |
 | `TASK-098` | `to-do` | Observability MVP (Sentry + Health + Slack Alerts) | `docs/tasks/to-do/TASK-098-observability-mvp.md` |
-| `TASK-099` | `to-do` | Security Headers & Next.js Middleware | `docs/tasks/to-do/TASK-099-security-headers-middleware.md` |
+| `TASK-099` | `in-progress` | Security Headers & Next.js Proxy | `docs/tasks/in-progress/TASK-099-security-headers-middleware.md` |
 | `TASK-100` | `complete` | CI Pipeline: Add Test Step | `docs/tasks/complete/TASK-100-ci-pipeline-test-step.md` |
 | `TASK-101` | `complete` | Cron Auth Standardization | `docs/tasks/complete/TASK-101-cron-auth-standardization.md` |
 | `TASK-102` | `in-progress` | Database Resilience Baseline | `docs/tasks/in-progress/TASK-102-database-resilience-baseline.md` |
@@ -161,6 +161,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 ## Siguiente ID disponible
 
 | `TASK-123` | `to-do` | Nexa Product Hardening: Streaming, Rich Tools, UX Polish | `docs/tasks/to-do/TASK-123-nexa-product-hardening.md` |
-| `TASK-124` | `in-progress` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/in-progress/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
+| `TASK-124` | `complete` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
+| `TASK-125` | `to-do` | Webhook Activation: First Consumers & E2E Validation | `docs/tasks/to-do/TASK-125-webhook-activation-first-consumers.md` |
 
-`TASK-125`
+`TASK-126`

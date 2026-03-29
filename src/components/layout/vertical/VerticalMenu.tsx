@@ -88,7 +88,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   if (isInternalUser) {
     // Flat item — no section wrapper (single item doesn't warrant a section)
     menuData.push({
-      label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
+      label: <NavLabel label={GH_INTERNAL_NAV.home.label} subtitle={GH_INTERNAL_NAV.home.subtitle} show={showSub} />,
       href: dashboardHref,
       icon: 'tabler-smart-home'
     })

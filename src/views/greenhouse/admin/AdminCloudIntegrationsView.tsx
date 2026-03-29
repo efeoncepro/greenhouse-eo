@@ -107,6 +107,7 @@ const syncSubsystems = (subsystems: OperationsSubsystem[]) =>
 const AdminCloudIntegrationsView = ({ data }: Props) => {
   const syncs = syncSubsystems(data.subsystems)
   const retryPressure = data.webhooks.deliveriesPending + data.webhooks.deliveriesRetryScheduled
+  const cloudChecks = data.cloud.health.checks
 
   /* ── TASK-112: Integration health rows ── */
   const integrationRows = [
@@ -230,6 +231,76 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
           icon='tabler-arrows-shuffle'
         />
       </Box>
+
+      <ExecutiveCardShell
+        title='Postura cloud institucional'
+        subtitle='La UI ya consume la baseline de `src/lib/cloud/*`: runtime health, cron posture y cost guard de BigQuery.'
+      >
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }
+          }}
+        >
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                  <Typography variant='h6'>Cloud runtime</Typography>
+                  <Chip
+                    size='small'
+                    variant='tonal'
+                    color={data.cloud.posture.overallStatus === 'ok' ? 'success' : data.cloud.posture.overallStatus === 'warning' ? 'warning' : 'error'}
+                    label={data.cloud.posture.overallStatus}
+                  />
+                </Stack>
+                <Typography variant='body2' color='text.secondary'>
+                  {cloudChecks.filter(check => check.ok).length} checks sanos · {cloudChecks.filter(check => !check.ok).length} con atención
+                </Typography>
+                <Stack spacing={1}>
+                  {cloudChecks.map(check => (
+                    <Stack key={check.name} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                      <Typography variant='body2'>{check.name}</Typography>
+                      <Chip
+                        size='small'
+                        variant='outlined'
+                        color={check.ok ? 'success' : check.status === 'not_configured' ? 'warning' : 'error'}
+                        label={check.ok ? 'ok' : check.status}
+                      />
+                    </Stack>
+                  ))}
+                </Stack>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Typography variant='h6'>Controls base</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Contratos mínimos que `TASK-100` a `TASK-103` ya pueden reutilizar sin inventar otra capa.
+                </Typography>
+                <Stack spacing={1}>
+                  <Typography variant='body2' color='text.secondary'>
+                    Cron: {data.cloud.cron.summary}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Postgres: {data.cloud.postgres.summary}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    BigQuery: {data.cloud.bigquery.summary}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    maximumBytesBilled: {data.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes
+                  </Typography>
+                </Stack>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
+      </ExecutiveCardShell>
 
       {/* TASK-112: Integration Health & Freshness */}
       <ExecutiveCardShell
@@ -376,6 +447,9 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                 <Typography variant='body2' color='text.secondary'>
                   Estas acciones no sustituyen los cron canónicos, pero ayudan a destrabar retries y dispatch manual.
                 </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Estado cron actual: {data.cloud.cron.summary}
+                </Typography>
                 <AdminOpsActionButton
                   endpoint='/api/admin/ops/webhooks/dispatch'
                   label='Despachar webhooks pendientes'
@@ -456,9 +530,14 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
             </Table>
           </TableContainer>
         ) : (
-          <Typography variant='body2' color='text.secondary' sx={{ py: 2 }}>
-            No se observan secret refs registradas en la capa webhook. La tabla se poblará al crear endpoints o subscriptions con secret_ref.
-          </Typography>
+          <Stack spacing={1.5} sx={{ py: 2 }}>
+            <Typography variant='body2' color='text.secondary'>
+              No se observan secret refs registradas en la capa webhook. La tabla se poblará al crear endpoints o subscriptions con secret_ref.
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              La postura base del dominio Cloud sigue visible aunque todavía no haya secret refs: cron, BigQuery guard y runtime health ya consumen `src/lib/cloud/*`.
+            </Typography>
+          </Stack>
         )}
       </ExecutiveCardShell>
 

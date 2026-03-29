@@ -21,6 +21,39 @@
   - los env vars legacy siguen existiendo por compatibilidad durante la transición
   - `production` ya tiene refs y secretos preparados, pero falta validación real tras promover a `main`
 
+## Delta 2026-03-29 — Slack alerts adopta `*_SECRET_REF` sin abrir un bigbang
+
+- `TASK-098` extendió el helper canónico a `SLACK_ALERTS_WEBHOOK_URL`.
+- Nuevo contrato operativo:
+  - `SLACK_ALERTS_WEBHOOK_URL`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Esta decisión mantiene una postura proporcional:
+  - webhook de Slack sí puede vivir en Secret Manager
+  - `CRON_SECRET` sigue fuera por ahora porque su consumer principal es síncrono (`requireCronAuth()`)
+  - `SENTRY_AUTH_TOKEN` sigue fuera por ahora porque su consumer principal es build-time (`next.config.ts`)
+
+## Delta 2026-03-29 — Health posture separa runtime de perfiles Postgres
+
+- `GET /api/internal/health` mantiene `postgres` como postura del runtime del portal.
+- Los secretos `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no degradan el significado del runtime principal.
+- Para visibilidad operativa sin mezclar semánticas, el payload ahora expone `postgresAccessProfiles` con:
+  - `runtime`
+  - `migrator`
+  - `admin`
+- Esta separación permite vigilar readiness de tooling privilegiado sin convertirlo en outage del portal.
+
+## Delta 2026-03-29 — Proxy baseline para headers de seguridad
+
+- `TASK-099` inició un primer slice seguro sobre `src/proxy.ts`.
+- La capa nueva agrega headers estáticos cross-cutting:
+  - `X-Frame-Options`
+  - `X-Content-Type-Options`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+  - `X-DNS-Prefetch-Control`
+  - `Strict-Transport-Security` solo en `production`
+- El `Content-Security-Policy` real queda diferido para una segunda iteración por riesgo de romper MUI/Emotion, OAuth y assets.
+
 ## Delta 2026-03-29 — Transitional WIF-aware repo baseline
 
 - `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.

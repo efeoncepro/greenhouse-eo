@@ -1,5 +1,14 @@
 # TASK-115 — Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History
 
+## Delta 2026-03-29
+
+- `TASK-114` quedó implementada y cerrada.
+- El backend ya expone endpoints reales para:
+  - `POST /api/home/nexa/feedback`
+  - `GET /api/home/nexa/threads`
+  - `GET /api/home/nexa/threads/[threadId]`
+- `POST /api/home/nexa` ya retorna `threadId` y `suggestions` dinámicas, así que `Slice B` y `Slice D` quedan desbloqueados sin depender de mocks.
+
 ## Status
 
 - Lifecycle: `to-do`

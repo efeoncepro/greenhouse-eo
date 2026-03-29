@@ -121,9 +121,15 @@ const UserDropdown = () => {
                   <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, dashboardHref)}>
                     <i className='tabler-layout-dashboard' />
                     <Typography color='text.primary'>
-                      {isInternalUser ? GH_INTERNAL_NAV.internalDashboard.label : GH_CLIENT_NAV.dashboard.label}
+                      {isInternalUser ? GH_INTERNAL_NAV.home.label : GH_CLIENT_NAV.dashboard.label}
                     </Typography>
                   </MenuItem>
+                  {isInternalUser ? (
+                    <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/admin')}>
+                      <i className='tabler-shield-lock' />
+                      <Typography color='text.primary'>{GH_INTERNAL_NAV.adminCenter.label}</Typography>
+                    </MenuItem>
+                  ) : null}
                   {!isInternalUser ? (
                     <>
                       <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/proyectos')}>

@@ -118,6 +118,64 @@ export class NexaService {
       : 'Recuperé datos operativos, pero no pude sintetizarlos en lenguaje natural.'
   }
 
+  private static async generateSuggestions({
+    client,
+    model,
+    prompt,
+    responseText
+  }: {
+    client: Awaited<ReturnType<typeof getGoogleGenAIClient>>
+    model: string
+    prompt: string
+    responseText: string
+  }) {
+    try {
+      const suggestionResult = await client.models.generateContent({
+        model,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: [
+                  'Genera exactamente 3 preguntas de seguimiento cortas en español para una conversación operativa.',
+                  'Devuelve solo JSON válido con forma {"suggestions":["...", "...", "..."]}.',
+                  'No uses markdown.',
+                  `Prompt original: ${prompt}`,
+                  `Respuesta de Nexa: ${responseText}`
+                ].join('\n')
+              }
+            ]
+          }
+        ] as any,
+        config: {
+          temperature: 0.3,
+          maxOutputTokens: 200
+        }
+      })
+
+      const rawText = suggestionResult.text?.trim() || ''
+
+      if (!rawText) {
+        return []
+      }
+
+      const parsed = JSON.parse(rawText) as { suggestions?: unknown }
+
+      if (!Array.isArray(parsed.suggestions)) {
+        return []
+      }
+
+      return parsed.suggestions
+        .filter((item): item is string => typeof item === 'string')
+        .map(item => item.trim())
+        .filter(Boolean)
+        .slice(0, 3)
+    } catch {
+      return []
+    }
+  }
+
   private static async resolveToolTurn({
     client,
     model,
@@ -215,12 +273,19 @@ export class NexaService {
         input
       })
 
+      const suggestions = await this.generateSuggestions({
+        client,
+        model,
+        prompt: input.prompt,
+        responseText: result.text
+      })
+
       return {
         id: crypto.randomUUID(),
         role: 'assistant',
         content: result.text,
         timestamp: this.getTimestamp(),
-        suggestions: [],
+        suggestions,
         toolInvocations: result.toolInvocations,
         modelId: model
       }

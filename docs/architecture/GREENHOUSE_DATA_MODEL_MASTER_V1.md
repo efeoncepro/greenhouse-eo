@@ -158,6 +158,9 @@ Main objects:
 - `member_tool_licenses`
 - `credit_wallets`
 - `credit_ledger`
+- `nexa_threads`
+- `nexa_messages`
+- `nexa_feedback`
 
 Anchors:
 - `provider_id -> greenhouse_core.providers`
@@ -171,6 +174,12 @@ Rules:
 - the operational module must not depend on bootstrap DDL in request path
 - seed catalog and provider visibility must exist directly in PostgreSQL so admin surfaces do not start empty
 - BigQuery legacy AI tables may still exist for compatibility/backfill, but they are not the runtime truth
+
+Nexa conversational runtime:
+- `nexa_threads` stores thread ownership and summary metadata by `user_id` + `client_id`
+- `nexa_messages` stores the ordered conversation log, `tool_invocations`, generated `suggestions`, and `model_id`
+- `nexa_feedback` stores explicit thumbs up/down feedback per assistant response with optional free-text comment
+- runtime routes should validate readiness, but canonical DDL for these tables must stay in the migration layer
 
 ### `greenhouse_crm`
 

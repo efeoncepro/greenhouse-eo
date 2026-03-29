@@ -4,9 +4,15 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
   getSecretSource: vi.fn(async ({ envVarName }: { envVarName: string }) => ({
     envVarName,
     secretRefEnvVarName: `${envVarName}_SECRET_REF`,
-    secretRef: envVarName === 'NUBOX_BEARER_TOKEN' ? 'projects/efeonce-group/secrets/nubox/versions/latest' : null,
+    secretRef:
+      envVarName === 'NUBOX_BEARER_TOKEN'
+        ? 'projects/efeonce-group/secrets/nubox/versions/latest'
+        : envVarName === 'SLACK_ALERTS_WEBHOOK_URL'
+          ? 'projects/efeonce-group/secrets/slack-alerts/versions/latest'
+          : null,
     source:
       envVarName === 'NUBOX_BEARER_TOKEN'
+        || envVarName === 'SLACK_ALERTS_WEBHOOK_URL'
         ? 'secret_manager'
         : envVarName === 'NEXTAUTH_SECRET'
           ? 'env'
@@ -25,6 +31,7 @@ describe('getCloudSecretsPosture', () => {
     const posture = await getCloudSecretsPosture()
     const nubox = posture.entries.find(entry => entry.key === 'nubox_bearer_token')
     const nextAuth = posture.entries.find(entry => entry.key === 'nextauth_secret')
+    const slack = posture.entries.find(entry => entry.key === 'slack_alerts_webhook')
 
     expect(posture.summary).toContain('via Secret Manager')
     expect(posture.summary).toContain('via env var')
@@ -32,5 +39,6 @@ describe('getCloudSecretsPosture', () => {
     expect(nubox?.source).toBe('secret_manager')
     expect(nubox?.secretRefConfigured).toBe(true)
     expect(nextAuth?.source).toBe('env')
+    expect(slack?.source).toBe('secret_manager')
   })
 })

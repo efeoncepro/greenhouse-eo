@@ -1,31 +1,137 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — `staging` validado end-to-end; remanente en `production`
+
+- `staging` ya quedó operativo para observabilidad externa sobre `develop`:
+  - `GET /api/internal/health` responde `postureChecks.observability.status=ok`
+  - `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+- Validación operativa real ya ejecutada:
+  - smoke de Slack con respuesta `HTTP 200`
+  - smoke de Sentry con issue visible en el dashboard del proyecto `javascript-nextjs`
+- El remanente real ya no está en repo ni en `staging`, sino en:
+  - replicar `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` en `production`
+  - validar `main/production` con smoke equivalente
+  - rotar el webhook expuesto en una captura previa cuando se decida hacerlo
+
+## Delta 2026-03-29 — Slack webhook alineado al patrón Secret Manager
+
+- `SLACK_ALERTS_WEBHOOK_URL` ahora soporta ref opcional `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`.
+- `src/lib/alerts/slack-notify.ts` resuelve el webhook vía `Secret Manager -> env fallback`.
+- `GET /api/internal/health` y `src/lib/cloud/secrets.ts` ya reflejan `slack_alerts_webhook` como parte de la postura de secretos.
+- `src/lib/cloud/observability.ts` ahora considera ese path real antes de decidir si Slack alerts están configuradas.
+- Deliberadamente fuera de este slice para no abrir un cambio transversal más riesgoso:
+  - `CRON_SECRET` sigue `env-only`
+  - `SENTRY_AUTH_TOKEN` sigue `env-only` en build
+  - `SENTRY_DSN` se mantiene como config runtime/env
+
+## Delta 2026-03-29 — Slice 2 mínimo de Sentry en repo
+
+- `TASK-099` ya dejó la capa `src/proxy.ts` disponible, así que `TASK-098` retoma ahora su primer carril externo.
+- Se instaló `@sentry/nextjs` y quedó configurado el wiring mínimo y reversible para App Router:
+  - `next.config.ts` usa `withSentryConfig(...)`
+  - `src/instrumentation.ts`
+  - `src/instrumentation-client.ts`
+  - `sentry.server.config.ts`
+  - `sentry.edge.config.ts`
+- El runtime se mantiene fail-open:
+  - si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa
+  - no se exponen valores sensibles ni se cambia el contrato HTTP del portal
+- La postura de observabilidad ahora distingue mejor:
+  - runtime server/client
+  - readiness de source maps (`SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`)
+- Sigue fuera de este lote:
+  - rollout de variables en Vercel
+  - validación preview/staging con eventos reales en dashboard Sentry
+
+## Delta 2026-03-29 — Estado real en `develop/staging`
+
+- `develop` absorbió el slice mínimo de Sentry en `ac11287` y el deployment compartido quedó `READY`.
+- Validación autenticada de `GET /api/internal/health` sobre ese deployment:
+  - `version=ac11287`
+  - `overallStatus=degraded`
+  - `runtimeChecks`: Postgres y BigQuery `ok`
+  - `postureChecks.observability`: `unconfigured`
+- El motivo del estado `unconfigured` ya no es falta de código:
+  - el repo ya tiene `@sentry/nextjs`
+  - el repo ya tiene `src/lib/alerts/slack-notify.ts`
+  - los crons críticos ya llaman `alertCronFailure(...)`
+- El remanente real de la task queda concentrado en rollout externo:
+  - cargar `SENTRY_DSN` o `NEXT_PUBLIC_SENTRY_DSN`
+  - cargar `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` si se quieren source maps
+  - cargar `SLACK_ALERTS_WEBHOOK_URL` o `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+  - verificar eventos reales en dashboard/canal
+
+## Delta 2026-03-29 — Lane iniciada con posture de observabilidad
+
+- `TASK-098` pasa a `in-progress`.
+- Slice inicial elegido por seguridad y reversibilidad:
+  - formalizar postura de observabilidad en `GET /api/internal/health`
+  - proyectar si existen `SENTRY_DSN`, `SENTRY_AUTH_TOKEN` y `SLACK_ALERTS_WEBHOOK_URL`
+  - dejar tests unitarios del contrato antes de conectar integraciones externas reales
+- Fuera de este primer lote:
+  - instalar `@sentry/nextjs`
+  - wiring real de Slack alerts en crons
+  - rollout de variables en Vercel
+
 ## Delta 2026-03-29 — Baseline parcial absorbida por TASK-124
 
 - Parte del endurecimiento del payload de `GET /api/internal/health` ya fue absorbido por `TASK-124`:
   - ahora proyecta postura de secretos críticos sin exponer valores
+  - `staging` y `production` ya validan en runtime la resolución real de secretos críticos vía Secret Manager
   - el remanente de esta task ya no es crear ese bloque, sino completar observabilidad externa y el contract final del endpoint
 
 ## Delta 2026-03-29 — Baseline cloud ya adelantada
 
 - Parte del baseline ya quedó adelantado:
   - `GET /api/internal/health` ya existe
-  - `src/lib/alerts/slack-notify.ts` ya existe
-  - los crons críticos ya tienen hook base de `alertCronFailure()`
+  - la capa cloud ya proyecta postura de auth, Postgres y secretos
 - Lo pendiente real de esta task se concentra ahora en:
   - integración Sentry
   - endurecimiento del payload/contract del health endpoint
   - wiring operativo final de `SLACK_ALERTS_WEBHOOK_URL`
 
+## Delta 2026-03-29 — Slice 1 implementado
+
+- `GET /api/internal/health` ahora proyecta también `observability`.
+- El contract del endpoint quedó separado en:
+  - `runtimeChecks`
+  - `postureChecks`
+  - `overallStatus`
+  - `summary`
+- `503` sigue dependiendo solo de checks runtime; posture incompleta ahora se reporta como `degraded`.
+- Para no mezclar disponibilidad del portal con tooling privilegiado:
+  - `postgres` sigue describiendo solo el runtime del portal
+  - `postgresAccessProfiles` ahora expone aparte los perfiles `runtime`, `migrator` y `admin`
+- Nuevo contrato mínimo:
+  - `sentry.dsnConfigured`
+  - `sentry.authTokenConfigured`
+  - `sentry.enabled`
+  - `slack.alertsWebhookConfigured`
+  - `slack.enabled`
+  - `summary`
+- Nueva capa canónica:
+  - `src/lib/cloud/observability.ts`
+- Variables documentadas en `.env.example`:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL`
+- Sigue pendiente:
+  - validación externa de `@sentry/nextjs` en preview/staging
+  - rollout externo de `SLACK_ALERTS_WEBHOOK_URL`
+  - validación real de alertas Slack en crons críticos
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Validada en staging; rollout production pendiente` |
 | Rank | — |
 | Domain | Infrastructure / Observability |
 | Sequence | Cloud Posture Hardening **3 of 6** — after TASK-100, TASK-099 |
@@ -173,17 +279,17 @@ Que cualquier error no-manejado en producción sea capturado, deduplicado y noti
 
 ## Acceptance Criteria
 
-- [ ] `@sentry/nextjs` instalado y configurado
-- [ ] `instrumentation.ts` registra Sentry en server y edge
-- [ ] Un error forzado en staging aparece en Sentry dashboard en <2 min
-- [ ] `GET /api/internal/health` retorna 200 con estado de Postgres y BigQuery
+- [x] `@sentry/nextjs` instalado y configurado
+- [x] `instrumentation.ts` registra Sentry en server y edge
+- [x] Un error forzado en staging aparece en Sentry dashboard en <2 min
+- [x] `GET /api/internal/health` retorna 200 con estado de Postgres y BigQuery
 - [ ] `GET /api/internal/health` retorna 503 si algún servicio no responde
-- [ ] `alertCronFailure()` envía mensaje a Slack cuando un cron falla
-- [ ] Los 5 crons críticos tienen alerting integrado
-- [ ] `SENTRY_DSN` y `SLACK_ALERTS_WEBHOOK_URL` configurados en Vercel
-- [ ] Source maps subidos a Sentry en build
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `alertCronFailure()` envía mensaje a Slack cuando un cron falla
+- [x] Los 5 crons críticos tienen alerting integrado
+- [x] `SENTRY_DSN` y `SLACK_ALERTS_WEBHOOK_URL` configurados en Vercel
+- [x] Source maps subidos a Sentry en build
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
 
 ## Verification
 
@@ -200,3 +306,15 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
   https://dev-greenhouse.efeoncepro.com/api/cron/outbox-publish
 # Verificar #greenhouse-alerts
 ```
+
+## Remanente para cierre
+
+- Replicar el rollout externo en `production`:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Ejecutar smoke equivalente en `production`
+- Rotar el webhook de Slack expuesto en una captura previa

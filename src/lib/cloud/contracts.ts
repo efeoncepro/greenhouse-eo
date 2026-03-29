@@ -9,8 +9,20 @@ export interface CloudHealthCheck {
   details?: Record<string, unknown>
 }
 
+export type CloudPostureStatus = 'ok' | 'warning' | 'unconfigured'
+
+export interface CloudPostureCheck {
+  name: string
+  status: CloudPostureStatus
+  summary: string
+}
+
 export interface CloudHealthSnapshot {
   ok: boolean
+  overallStatus: 'ok' | 'degraded' | 'error'
+  summary: string
+  runtimeChecks: CloudHealthCheck[]
+  postureChecks: CloudPostureCheck[]
   checks: CloudHealthCheck[]
   timestamp: string
 }
@@ -38,6 +50,21 @@ export interface CloudPostgresPosture {
   risks: string[]
 }
 
+export interface CloudPostgresAccessProfile {
+  profile: 'runtime' | 'migrator' | 'admin'
+  configured: boolean
+  secretRefConfigured: boolean
+  source: CloudSecretSource
+  envVarName: string
+  secretRefEnvVarName: string
+  summary: string
+}
+
+export interface CloudPostgresAccessProfilesPosture {
+  summary: string
+  profiles: CloudPostgresAccessProfile[]
+}
+
 export type CloudSecretSource = 'secret_manager' | 'env' | 'unconfigured'
 
 export interface CloudSecretPostureEntry {
@@ -51,4 +78,21 @@ export interface CloudSecretPostureEntry {
 export interface CloudSecretsPosture {
   summary: string
   entries: CloudSecretPostureEntry[]
+}
+
+export interface CloudObservabilityPosture {
+  summary: string
+  sentry: {
+    dsnConfigured: boolean
+    clientDsnConfigured: boolean
+    authTokenConfigured: boolean
+    orgConfigured: boolean
+    projectConfigured: boolean
+    enabled: boolean
+    sourceMapsReady: boolean
+  }
+  slack: {
+    alertsWebhookConfigured: boolean
+    enabled: boolean
+  }
 }

@@ -7,7 +7,10 @@ import { authOptions } from '@/lib/auth'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
+import { persistNexaConversation } from '@/lib/nexa/store'
 import type { NexaMessage } from '@/types/home'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * Handle conversational interaction with Nexa.
@@ -23,7 +26,13 @@ export async function POST(req: Request) {
 
   const { user } = session
   const body = await req.json()
-  const { prompt, history = [], model } = body as { prompt: string; history: NexaMessage[]; model?: string | null }
+
+  const {
+    prompt,
+    history = [],
+    model,
+    threadId
+  } = body as { prompt: string; history: NexaMessage[]; model?: string | null; threadId?: string | null }
 
   if (!prompt) {
     return NextResponse.json({ error: 'Missing prompt' }, { status: 400 })
@@ -68,7 +77,27 @@ export async function POST(req: Request) {
       requestedModel: resolveNexaModel({ requestedModel: model })
     })
 
-    return NextResponse.json(nexaResponse)
+    const persistedThreadId = await persistNexaConversation({
+      userId: user.userId,
+      clientId: user.clientId,
+      threadId,
+      prompt: {
+        messageId: crypto.randomUUID(),
+        content: prompt
+      },
+      response: {
+        messageId: nexaResponse.id,
+        content: nexaResponse.content,
+        suggestions: nexaResponse.suggestions,
+        toolInvocations: nexaResponse.toolInvocations,
+        modelId: nexaResponse.modelId
+      }
+    })
+
+    return NextResponse.json({
+      ...nexaResponse,
+      threadId: persistedThreadId
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 

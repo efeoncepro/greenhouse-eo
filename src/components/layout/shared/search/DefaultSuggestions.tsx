@@ -103,9 +103,14 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-robot'
       },
       {
+        label: 'Home',
+        href: '/home',
+        icon: 'tabler-smart-home'
+      },
+      {
         label: 'Torre de control',
         href: '/internal/dashboard',
-        icon: 'tabler-smart-home'
+        icon: 'tabler-layout-dashboard'
       },
       {
         label: 'Agencia',

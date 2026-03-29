@@ -6,6 +6,47 @@
 
 ---
 
+## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
+
+- `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.
+- `staging` ya validó ese commit en `dev-greenhouse.efeoncepro.com`.
+- `dev-greenhouse.efeoncepro.com/api/internal/health` confirmó en runtime:
+  - `GREENHOUSE_POSTGRES_PASSWORD` via `secret_manager`
+  - `NEXTAUTH_SECRET` via `secret_manager`
+  - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
+  - `NUBOX_BEARER_TOKEN` via `secret_manager`
+- `production` ya validó el mismo patrón en `greenhouse.efeoncepro.com/api/internal/health` sobre `version=7238a90`.
+- El rollout externo previo también dejó preparados en Vercel:
+  - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - `NEXTAUTH_SECRET_SECRET_REF`
+  - `AZURE_AD_CLIENT_SECRET_SECRET_REF`
+  - `GOOGLE_CLIENT_SECRET_SECRET_REF`
+  - `NUBOX_BEARER_TOKEN_SECRET_REF`
+  para `staging` y `production`, sin retirar aún los env vars legacy.
+- Estado residual observado en `staging`:
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
+
+## Delta 2026-03-29 — Observability webhook secret ref baseline
+
+- `SLACK_ALERTS_WEBHOOK_URL` quedó alineado al patrón `Secret Manager -> env fallback`.
+- Variable nueva documentada para rollout por entorno:
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Alcance deliberadamente acotado:
+  - no cambia todavía `CRON_SECRET`
+  - no cambia `SENTRY_AUTH_TOKEN` en build
+
+## Delta 2026-03-29 — Proxy baseline for security headers
+
+- `TASK-099` inició una capa `src/proxy.ts` para headers cross-cutting del portal.
+- El slice actual agrega:
+  - `X-Frame-Options`
+  - `X-Content-Type-Options`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+  - `X-DNS-Prefetch-Control`
+  - `Strict-Transport-Security` solo en `production`
+- El `Content-Security-Policy` real se difiere a una segunda iteración para no romper MUI/Emotion, OAuth y assets en el primer rollout.
+
 ## Delta 2026-03-29 — Runtime auth baseline + Cloud SQL verified posture
 
 - El repo ya no depende solo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` para su runtime Vercel.

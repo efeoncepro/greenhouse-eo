@@ -1,6 +1,13 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
+import type { CloudHealthSnapshot } from '@/lib/cloud/contracts'
+import { getCronSecretState } from '@/lib/cloud/cron'
+import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
+import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
+import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getBigQueryProjectId } from '@/lib/bigquery'
+import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface OperationsKpis {
   outboxEvents24h: number
@@ -70,6 +77,43 @@ export interface OperationsOverview {
   failedProjections: OperationsFailedProjection[]
   failedHandlers: OperationsFailedHandler[]
   webhooks: OperationsWebhookOverview
+  cloud: CloudPlatformOverview
+}
+
+export interface CloudPlatformOverview {
+  health: CloudHealthSnapshot
+  posture: {
+    overallStatus: 'ok' | 'warning' | 'failed'
+    controls: CloudPlatformControl[]
+  }
+  auth: {
+    mode: 'wif' | 'service_account_key' | 'mixed' | 'unconfigured'
+    summary: string
+  }
+  cron: {
+    secretConfigured: boolean
+    summary: string
+  }
+  postgres: {
+    configured: boolean
+    usesConnector: boolean
+    sslEnabled: boolean
+    maxConnections: number
+    summary: string
+  }
+  bigquery: {
+    projectId: string | null
+    maximumBytesBilled: number
+    summary: string
+  }
+}
+
+export interface CloudPlatformControl {
+  key: 'postgres' | 'bigquery' | 'cron' | 'cost_guard' | 'gcp_auth'
+  label: string
+  status: 'ok' | 'warning' | 'failed'
+  summary: string
+  details?: Record<string, unknown>
 }
 
 interface CountRow extends Record<string, unknown> {
@@ -418,6 +462,98 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     secretRefs = []
   }
 
+  const cloudHealth = await getCloudPlatformHealthSnapshot().catch<CloudHealthSnapshot>(() =>
+    buildCloudHealthSnapshot({
+      runtimeChecks: [],
+      timestamp: new Date().toISOString()
+    })
+  )
+
+  const cronState = getCronSecretState()
+  const postgresConfig = getGreenhousePostgresConfig()
+  const postgresConfigured = isGreenhousePostgresConfigured()
+  const postgresPosture = getCloudPostgresPosture()
+  const gcpAuthPosture = getCloudGcpAuthPosture()
+  const maximumBytesBilled = getBigQueryMaximumBytesBilled()
+
+  const bigQueryProjectId = (() => {
+    try {
+      return getBigQueryProjectId()
+    } catch {
+      return null
+    }
+  })()
+
+  const healthChecksByName = new Map(cloudHealth.checks.map(check => [check.name, check]))
+  const postgresHealth = healthChecksByName.get('postgres')
+  const bigQueryHealth = healthChecksByName.get('bigquery')
+
+  const cloudControls: CloudPlatformControl[] = [
+    {
+      key: 'gcp_auth',
+      label: 'GCP auth posture',
+      status:
+        gcpAuthPosture.mode === 'wif'
+          ? 'ok'
+          : gcpAuthPosture.mode === 'mixed' || gcpAuthPosture.mode === 'service_account_key'
+            ? 'warning'
+            : 'failed',
+      summary: gcpAuthPosture.summary,
+      details: {
+        oidcAvailable: gcpAuthPosture.oidcAvailable,
+        workloadIdentityConfigured: gcpAuthPosture.workloadIdentityConfigured,
+        serviceAccountKeyConfigured: gcpAuthPosture.serviceAccountKeyConfigured
+      }
+    },
+    {
+      key: 'postgres',
+      label: 'Cloud SQL runtime',
+      status: postgresHealth?.ok ? (postgresPosture.risks.length === 0 ? 'ok' : 'warning') : postgresConfigured ? 'failed' : 'warning',
+      summary:
+        postgresHealth?.ok
+          ? postgresPosture.summary
+          : (postgresHealth?.summary ?? (postgresConfigured ? 'Cloud SQL no respondió al health check' : 'Postgres runtime no configurado')),
+      details: {
+        maxConnections: postgresConfig.maxConnections,
+        usesConnector: Boolean(postgresConfig.instanceConnectionName),
+        sslEnabled: postgresPosture.sslEnabled,
+        risks: postgresPosture.risks
+      }
+    },
+    {
+      key: 'bigquery',
+      label: 'BigQuery runtime',
+      status: bigQueryHealth?.ok ? 'ok' : bigQueryProjectId ? 'failed' : 'warning',
+      summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'BigQuery no respondió al health check' : 'BigQuery project no configurado'),
+      details: {
+        projectId: bigQueryProjectId
+      }
+    },
+    {
+      key: 'cron',
+      label: 'Cron control plane',
+      status: cronState.configured ? 'ok' : 'failed',
+      summary: cronState.configured ? 'CRON_SECRET configurado para routes scheduler-driven' : 'CRON_SECRET ausente; control plane incompleto'
+    },
+    {
+      key: 'cost_guard',
+      label: 'BigQuery cost guard',
+      status: maximumBytesBilled <= 1_000_000_000 ? 'ok' : 'warning',
+      summary:
+        maximumBytesBilled <= 1_000_000_000
+          ? `Guard activo: ${maximumBytesBilled.toLocaleString('en-US')} bytes`
+          : `Guard permisivo: ${maximumBytesBilled.toLocaleString('en-US')} bytes`,
+      details: {
+        maximumBytesBilled
+      }
+    }
+  ]
+
+  const failedCloudControls = cloudControls.filter(control => control.status === 'failed').length
+  const warningCloudControls = cloudControls.filter(control => control.status === 'warning').length
+  const cloudOverallStatus = failedCloudControls > 0 ? 'failed' : warningCloudControls > 0 ? 'warning' : 'ok'
+
+
   return {
     kpis: { outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers },
     subsystems,
@@ -437,6 +573,33 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       lastInboxAt: webhookLastInboxAt,
       lastDeliveryAt: webhookLastDeliveryAt,
       schemaReady: hasWebhookEndpoints && hasWebhookInbox && hasWebhookDeliveries && hasWebhookSubscriptions
+    },
+    cloud: {
+      health: cloudHealth,
+      posture: {
+        overallStatus: cloudOverallStatus,
+        controls: cloudControls
+      },
+      auth: {
+        mode: gcpAuthPosture.mode,
+        summary: gcpAuthPosture.summary
+      },
+      cron: {
+        secretConfigured: cronState.configured,
+        summary: cronState.configured ? 'CRON_SECRET presente' : 'CRON_SECRET ausente'
+      },
+      postgres: {
+        configured: postgresConfigured,
+        usesConnector: Boolean(postgresConfig.instanceConnectionName),
+        sslEnabled: postgresPosture.sslEnabled,
+        maxConnections: postgresConfig.maxConnections,
+        summary: postgresHealth?.ok ? postgresPosture.summary : (postgresHealth?.summary ?? (postgresConfigured ? 'Configurado sin respuesta de health' : 'No configurado'))
+      },
+      bigquery: {
+        projectId: bigQueryProjectId,
+        maximumBytesBilled,
+        summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado')
+      }
     }
   }
 }

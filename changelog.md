@@ -7,6 +7,41 @@
 
 ## 2026-03-29
 
+### TASK-098 observability validated end-to-end in staging
+- `staging` ya quedó con `Sentry` y `Slack alerts` operativas, no solo configuradas.
+- `GET /api/internal/health` reporta `observability` en estado `ok`.
+- Se validó ingestión real en Sentry con un evento de smoke visible en el dashboard del proyecto `javascript-nextjs`.
+- Se validó entrega real a Slack con respuesta `HTTP 200` usando el webhook resuelto desde Secret Manager.
+- El remanente real de `TASK-098` ya quedó concentrado en replicar el rollout a `production`.
+
+### TASK-098 Slack alerts Secret Manager-ready
+- `SLACK_ALERTS_WEBHOOK_URL` ahora soporta `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` con fallback controlado a env var.
+- `src/lib/alerts/slack-notify.ts` consume el helper canónico y ya no depende solo del env directo.
+- `GET /api/internal/health` y `src/lib/cloud/secrets.ts` reflejan también la postura de `slack_alerts_webhook`.
+- Se mantuvo deliberadamente fuera de este slice:
+  - `CRON_SECRET`, por su path síncrono transversal
+  - `SENTRY_AUTH_TOKEN`, por su path build-time en `next.config.ts`
+
+### TASK-098 Sentry minimal runtime baseline
+- Se instaló `@sentry/nextjs` y quedó cableado el wiring mínimo para App Router en `next.config.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`, `sentry.server.config.ts` y `sentry.edge.config.ts`.
+- El runtime queda fail-open: si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa.
+- La postura de observabilidad ahora distingue DSN runtime, DSN público, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` y readiness de source maps.
+- `pnpm build` ya pasa con esta base y `develop/staging` quedó validado en `ac11287`.
+- Ese estado inicial ya fue superado: `staging` terminó con observabilidad externa operativa; el rollout pendiente ya es solo `production`.
+
+### TASK-099 security headers proxy baseline
+- Se creó `src/proxy.ts` con headers estáticos (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-DNS-Prefetch-Control`) para todo el runtime salvo `_next/*` y assets estáticos.
+- `Strict-Transport-Security` se aplica solo en `production`.
+- El `Content-Security-Policy` real queda diferido a una segunda iteración por riesgo de romper MUI/Emotion, OAuth y assets.
+
+### TASK-098 observability posture baseline
+- `GET /api/internal/health` ahora expone también `observability`, con un contrato mínimo para saber si Sentry y Slack alerts están configurados en runtime.
+- Se creó `src/lib/cloud/observability.ts` y su test unitario como capa canónica de postura para `SENTRY_DSN`, `SENTRY_AUTH_TOKEN` y `SLACK_ALERTS_WEBHOOK_URL`.
+- El health interno ahora separa `runtimeChecks` de `postureChecks`, mantiene `503` solo para fallos reales de Postgres/BigQuery y agrega `overallStatus` + `summary` para lectura operativa.
+- El payload ahora suma `postgresAccessProfiles` para visibilidad separada de credenciales `runtime`, `migrator` y `admin`, sin mezclar tooling privilegiado con la postura runtime del portal.
+- `.env.example` quedó alineado con esas tres variables para preparar el rollout posterior de observabilidad externa.
+- El repo hoy ya tiene además Sentry mínimo y adapter base de Slack; el remanente de `TASK-098` pasó a ser rollout/configuración externa.
+
 ### TASK-124 validada de forma segura en staging
 - `develop` absorbió los tres slices de `TASK-124` en `497cb19` mediante una integración mínima desde `origin/develop`, sin arrastrar el resto de la branch auxiliar.
 - Validación real en `staging`:

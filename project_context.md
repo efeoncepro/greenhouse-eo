@@ -3,6 +3,75 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Observability MVP operativa en staging
+- `TASK-098` ya quedó validada end-to-end en `staging`.
+- Señales confirmadas:
+  - `GET /api/internal/health` devuelve `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+  - `observability.sentry.enabled=true`
+  - `observability.slack.enabled=true`
+- Validación operativa adicional ya ejecutada:
+  - smoke real de Slack con respuesta `HTTP 200`
+  - smoke real de Sentry con issue visible en el dashboard del proyecto `javascript-nextjs`
+- El remanente real de `TASK-098` ya no está en repo ni en `staging`, sino en replicar el rollout a `production/main`.
+
+## Delta 2026-03-29 Slack alerts Secret Manager-ready
+- `TASK-098` extendió el patrón de `TASK-124` a `SLACK_ALERTS_WEBHOOK_URL`.
+- Nuevo contrato soportado:
+  - `SLACK_ALERTS_WEBHOOK_URL`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- `src/lib/alerts/slack-notify.ts` ahora resuelve el webhook vía helper canónico y `GET /api/internal/health` ya refleja esa postura real.
+- Decisión de borde explícita para mantener este lote seguro:
+  - `CRON_SECRET` sigue `env-only`
+  - `SENTRY_AUTH_TOKEN` sigue `env-only` en build
+  - `SENTRY_DSN` se mantiene como config runtime/env
+
+## Delta 2026-03-29 Sentry minimal runtime baseline
+- `TASK-098` ya no está solo en posture interna: el repo ahora incluye el wiring mínimo de `@sentry/nextjs` para App Router.
+- Archivos canónicos del slice:
+  - `next.config.ts`
+  - `src/instrumentation.ts`
+  - `src/instrumentation-client.ts`
+  - `sentry.server.config.ts`
+  - `sentry.edge.config.ts`
+- Contrato ambiental actualizado:
+  - `SENTRY_DSN` o `NEXT_PUBLIC_SENTRY_DSN` habilitan runtime error tracking
+  - `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` habilitan readiness de source maps
+- El wiring es fail-open:
+  - si no existe DSN, Sentry no inicializa
+  - no cambia rutas ni contrato HTTP del portal
+- `develop/staging` ya evolucionó desde ese baseline y hoy la observabilidad externa está operativa.
+- El rollout externo pendiente ya quedó concentrado en `production/main`.
+
+## Delta 2026-03-29 Observability posture baseline
+- `TASK-098` quedó iniciada con un slice mínimo y reversible de contrato.
+- `GET /api/internal/health` ahora proyecta también `observability`, con postura de:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL`
+- La capa canónica vive en `src/lib/cloud/observability.ts`.
+- El contrato del health interno ahora separa:
+  - `runtimeChecks`
+  - `postureChecks`
+  - `overallStatus`
+  - `summary`
+- El payload también proyecta `postgresAccessProfiles` para distinguir:
+  - credencial runtime del portal
+  - perfiles `migrator` y `admin` de tooling/operación
+- `503` sigue reservado para fallos reales de runtime; la postura incompleta solo degrada señal operativa.
+- El wiring mínimo de `@sentry/nextjs` ya existe.
+- El adapter `src/lib/alerts/slack-notify.ts` y los hooks base de cron ya existen; el remanente de Slack es cargar `SLACK_ALERTS_WEBHOOK_URL` y validar envíos reales.
+
+## Delta 2026-03-29 Security headers proxy baseline
+- `TASK-099` quedó iniciada con un `proxy.ts` mínimo de headers estáticos.
+- La primera versión de `src/proxy.ts`:
+  - no implementa auth
+  - no centraliza guards de API
+  - no aplica todavía `Content-Security-Policy`
+- Objetivo del slice: sumar protección cross-cutting barata y reversible sin romper MUI, OAuth ni assets estáticos.
+
 ## Delta 2026-03-29 Secret Manager validado en staging + production
 - `develop` absorbió `TASK-124` en `497cb19` y `main` absorbió el slice mínimo en `7238a90`.
 - `staging` ya ejecuta `497cb19` y `/api/internal/health` confirmó resolución real por Secret Manager para:

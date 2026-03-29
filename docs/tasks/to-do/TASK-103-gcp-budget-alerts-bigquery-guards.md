@@ -1,5 +1,22 @@
 # TASK-103 — GCP Budget Alerts & BigQuery Cost Guards
 
+## Delta 2026-03-29
+
+- El guard base de BigQuery ya existía en `src/lib/cloud/bigquery.ts`.
+- La expansión actual de la capa Cloud deja además posture runtime y health route listos para que esta task se concentre en:
+  - budgets/alerts de billing
+  - overrides explícitos para queries grandes
+  - baseline documentado de gasto real
+
+## Delta 2026-03-29 — BigQuery auth centralizada
+
+- `src/lib/bigquery.ts` ya no depende solo de SA key JSON/base64; ahora usa el helper canónico `src/lib/google-credentials.ts`.
+- Esto deja a `TASK-103` más enfocada en FinOps real:
+  - `maximumBytesBilled`
+  - budgets/alerts
+  - overrides explícitos para queries grandes
+- El cambio no cierra la task: solo elimina drift de autenticación mientras el baseline WIF-aware avanza en `TASK-096`.
+
 ## Status
 
 | Campo | Valor |
@@ -7,7 +24,7 @@
 | Lifecycle | `to-do` |
 | Priority | `P2` |
 | Impact | `Medio` |
-| Effort | `Muy bajo` |
+| Effort | `Bajo` |
 | Status real | `Diseño` |
 | Rank | — |
 | Domain | Infrastructure / Cost Management |
@@ -16,6 +33,20 @@
 ## Summary
 
 Configurar budget alerts en GCP Billing para detectar anomalías de costo, y agregar `maximumBytesBilled` a las queries de BigQuery desde el código para prevenir full-table scans accidentales. Hoy hay zero visibilidad del gasto en infraestructura.
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+
+Reglas obligatorias:
+
+- `TASK-103` se interpreta como baseline de FinOps y cost guardrails del dominio Cloud
+- los budgets viven en billing/config, pero los guards de BigQuery deben vivir en código compartido
+- cualquier override para queries grandes debe quedar explícito y documentado
 
 ## Why This Task Exists
 
@@ -37,6 +68,7 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 
 - **Depende de:**
   - Acceso admin a GCP Billing
+  - `TASK-122` como framing institucional del dominio Cloud
   - Email o Slack para recibir alertas
 - **Impacta a:**
   - TASK-098 (Observability) — budget alerts complementan error alerting
@@ -44,6 +76,7 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
   - Scripts de backfill que hacen queries masivas
 - **Archivos owned:**
   - Configuración de GCP Budget (GCP Console)
+  - `src/lib/cloud/bigquery.ts`
   - `src/lib/bigquery.ts` (agregar `maximumBytesBilled`)
 
 ## Current Repo State
@@ -142,6 +175,50 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 2. Identificar el top 3 servicios por costo
 3. Ajustar budget amounts según el baseline real
 
+### Slice 4 — Notificaciones y alertas multi-canal (~1.5h)
+
+Las budget alerts de GCP por defecto solo llegan a un email de billing admin. Para que sean accionables, deben llegar por los canales que el equipo ya usa.
+
+#### 4a. Slack alerts (vía TASK-098)
+
+1. Configurar GCP Budget notification channel → Pub/Sub topic
+2. Crear Cloud Function liviana que reciba el mensaje de Pub/Sub y llame al `SLACK_ALERTS_WEBHOOK_URL` que TASK-098 ya provisiona:
+   ```
+   Budget "Greenhouse Monthly" al 80% ($160 de $200)
+   Servicio principal: BigQuery ($45), Cloud SQL ($38)
+   ```
+3. Alternativa más simple: configurar el notification channel directamente como Slack webhook en GCP Monitoring (sin Cloud Function intermedia)
+
+#### 4b. Email a administradores del portal
+
+1. Usar la capa de email delivery de Greenhouse (`src/lib/email/`) para notificar a usuarios con rol admin cuando:
+   - Un budget threshold se cruza (50%, 80%, 100%)
+   - Una query BigQuery es bloqueada por `maximumBytesBilled`
+2. Template de email con:
+   - Qué threshold se cruzó o qué query fue bloqueada
+   - Gasto actual vs presupuesto
+   - Link a GCP Billing Reports para drill-down
+3. Depende de: TASK-095 (email delivery layer, ya `complete`)
+
+#### 4c. Notificación in-app (Admin Center)
+
+1. Registrar evento en `greenhouse_notifications` cuando un guard de BigQuery bloquea una query en producción
+2. Surfacear en Admin Center > Ops Health como alerta visible:
+   - Qué query fue bloqueada
+   - Qué ruta/cron la disparó
+   - Bytes estimados vs límite configurado
+3. Depende de: TASK-023 (notification system) si se quiere notificación push; sin eso, basta con mostrar en el log de Ops Health
+
+#### Canales por tipo de evento
+
+| Evento | Slack | Email admin | Admin Center |
+|--------|-------|-------------|--------------|
+| Budget threshold 50% | Si | No | No |
+| Budget threshold 80% | Si | Si | No |
+| Budget threshold 100% | Si | Si | Si |
+| Query BigQuery bloqueada | Si (si es cron) | No | Si |
+| Clone Cloud SQL olvidado >24h | Si | Si | No |
+
 ## Out of Scope
 
 - Optimización de queries BigQuery (mejora futura post-slow query analysis)
@@ -160,6 +237,9 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 - [ ] Queries que excedan el límite fallan con error claro (no silenciosamente)
 - [ ] Scripts de backfill tienen override explícito documentado
 - [ ] Gasto actual del último mes documentado como baseline
+- [ ] Budget alerts llegan a Slack vía `SLACK_ALERTS_WEBHOOK_URL` (al menos threshold 80% y 100%)
+- [ ] Email a admins del portal cuando budget cruza 80% o 100%
+- [ ] Query BigQuery bloqueada genera registro visible en Admin Center > Ops Health
 - [ ] `pnpm build` pasa
 - [ ] `pnpm test` pasa
 

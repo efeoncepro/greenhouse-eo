@@ -126,6 +126,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
   const subsystems = healthSubsystems(data.subsystems)
   const uniqueRecentEventTypes = Array.from(new Set(data.recentEvents.map(event => event.eventType))).slice(0, 8)
   const auditEvents = buildAuditEvents(data)
+  const cloudAlerts = data.cloud.posture.controls.filter(control => control.status !== 'ok')
 
   return (
     <Stack spacing={6}>
@@ -237,6 +238,81 @@ const AdminOpsHealthView = ({ data }: Props) => {
               </Card>
             )
           })}
+        </Box>
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Cloud runtime'
+        subtitle='Conexión directa con la baseline de `src/lib/cloud/*`: checks compartidos y postura institucional de plataforma.'
+      >
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 3,
+            gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
+          }}
+        >
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                  <Typography variant='h6'>Health checks</Typography>
+                  <Chip
+                    size='small'
+                    variant='tonal'
+                    color={data.cloud.posture.overallStatus === 'ok' ? 'success' : data.cloud.posture.overallStatus === 'warning' ? 'warning' : 'error'}
+                    label={data.cloud.posture.overallStatus}
+                  />
+                </Stack>
+                {data.cloud.health.checks.map(check => (
+                  <Stack key={check.name} spacing={0.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                      <Typography variant='body2'>{check.name}</Typography>
+                      <Chip
+                        size='small'
+                        variant='outlined'
+                        color={check.ok ? 'success' : check.status === 'not_configured' ? 'warning' : 'error'}
+                        label={check.ok ? 'ok' : check.status}
+                      />
+                    </Stack>
+                    <Typography variant='caption' color='text.secondary'>
+                      {check.summary}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Typography variant='h6'>Cloud controls con atención</Typography>
+                {cloudAlerts.length > 0 ? (
+                  cloudAlerts.map(control => (
+                    <Stack key={control.key} spacing={0.5}>
+                      <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                        <Typography variant='body2'>{control.label}</Typography>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={control.status === 'failed' ? 'error' : 'warning'}
+                          label={control.status}
+                        />
+                      </Stack>
+                      <Typography variant='caption' color='text.secondary'>
+                        {control.summary}
+                      </Typography>
+                    </Stack>
+                  ))
+                ) : (
+                  <Typography variant='body2' color='text.secondary'>
+                    No hay controles cloud degradados. El runtime base de plataforma está sano.
+                  </Typography>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
         </Box>
       </ExecutiveCardShell>
 

@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { alertCronFailure } from '@/lib/alerts/slack-notify'
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+
 import { syncNuboxToRaw } from '@/lib/nubox/sync-nubox-raw'
 import { syncNuboxToConformed } from '@/lib/nubox/sync-nubox-conformed'
 import { syncNuboxToPostgres } from '@/lib/nubox/sync-nubox-to-postgres'
@@ -7,21 +10,11 @@ import { syncNuboxToPostgres } from '@/lib/nubox/sync-nubox-to-postgres'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
-const hasInternalSyncAccess = (request: Request) => {
-  const configuredSecret = (process.env.CRON_SECRET || '').trim()
-  const authHeader = (request.headers.get('authorization') || '').trim()
-  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
-  const vercelCronHeader = (request.headers.get('x-vercel-cron') || '').trim()
-  const userAgent = (request.headers.get('user-agent') || '').trim()
-
-  if (configuredSecret && bearerToken && bearerToken === configuredSecret) return true
-
-  return vercelCronHeader === '1' || userAgent.startsWith('vercel-cron/')
-}
-
 export async function GET(request: Request) {
-  if (!hasInternalSyncAccess(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { authorized, errorResponse } = requireCronAuth(request)
+
+  if (!authorized) {
+    return errorResponse
   }
 
   const results: Record<string, unknown> = {}
@@ -33,6 +26,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox raw sync failed:', error)
+    await alertCronFailure('nubox-sync/raw', error)
     results.raw = { error: message }
   }
 
@@ -43,6 +37,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox conformed sync failed:', error)
+    await alertCronFailure('nubox-sync/conformed', error)
     results.conformed = { error: message }
   }
 
@@ -53,6 +48,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox postgres projection failed:', error)
+    await alertCronFailure('nubox-sync/postgres', error)
     results.postgres = { error: message }
   }
 

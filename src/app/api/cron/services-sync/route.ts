@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+
 import { syncAllOrganizationServices } from '@/lib/services/service-sync'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization')
+  const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!authorized) {
+    return errorResponse
   }
 
   try {

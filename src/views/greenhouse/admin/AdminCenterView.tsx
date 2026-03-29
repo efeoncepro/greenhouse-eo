@@ -1,6 +1,9 @@
 'use client'
 
+import { useCallback, useMemo, useState } from 'react'
+
 import Link from 'next/link'
+import { usePathname, useRouter as useNavRouter, useSearchParams } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -11,20 +14,39 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
+
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
-import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
+import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
+
+import {
+  buildControlTowerSummary,
+  compareControlTowerTenants,
+  finalizeControlTowerTenant,
+  formatPercent
+} from '../internal/dashboard/helpers'
+import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'
+
+import AdminCenterSpacesTable from './AdminCenterSpacesTable'
+
+type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
 type Props = {
   access: AdminAccessOverview
   tenants: AdminTenantsOverview
+  controlTower: InternalDashboardOverview
+  operations: OperationsOverview
 }
 
 type DomainCard = {
   title: string
   subtitle: string
   icon: string
+  avatarColor: 'info' | 'success' | 'warning' | 'primary' | 'error' | 'secondary'
   status: { label: string; color: 'success' | 'warning' | 'info' | 'secondary' }
   href: string
   primaryAction: string
@@ -32,25 +54,65 @@ type DomainCard = {
   points: string[]
 }
 
-const domainCards = ({ access, tenants }: Props): DomainCard[] => [
-  {
-    title: 'Spaces',
-    subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',
-    icon: 'tabler-grid-4x4',
-    status: { label: tenants.totals.activeTenants > 0 ? 'Activo' : 'Sin spaces', color: tenants.totals.activeTenants > 0 ? 'success' : 'warning' },
-    href: '/admin/tenants',
-    primaryAction: 'Abrir spaces',
-    routes: ['/admin', '/admin/tenants'],
-    points: [
-      `${tenants.totals.totalTenants} spaces visibles en governance`,
-      `${tenants.totals.tenantsWithScopedProjects} con proyectos scoped`,
-      'Aquí vive el contexto de capabilities y acceso por empresa'
+const cloudStatusLabel = (operations: OperationsOverview) => {
+  if (operations.cloud.posture.overallStatus === 'failed') {
+    return 'Posture crítica'
+  }
+
+  if (operations.cloud.posture.overallStatus === 'warning') {
+    return 'Posture parcial'
+  }
+
+  return 'Posture ok'
+}
+
+const cloudStatusColor = (operations: OperationsOverview): 'success' | 'warning' | 'info' | 'secondary' => {
+  if (operations.cloud.posture.overallStatus === 'failed') {
+    return 'warning'
+  }
+
+  if (operations.cloud.posture.overallStatus === 'warning') {
+    return 'info'
+  }
+
+  return 'success'
+}
+
+const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
+  const headers = ['Cliente', 'Estado', 'Contacto', 'Usuarios activos', 'Usuarios totales', 'Proyectos', 'OTD', 'Ultima actividad']
+
+  const lines = rows.map(row =>
+    [
+      row.clientName,
+      row.statusLabel,
+      row.primaryContactEmail || '',
+      row.activeUsers,
+      row.totalUsers,
+      row.scopedProjects,
+      row.avgOnTimePct === null ? '' : Math.round(row.avgOnTimePct),
+      row.lastActivityLabel
     ]
-  },
+      .map(value => `"${String(value).replace(/"/g, '""')}"`)
+      .join(',')
+  )
+
+  const csvContent = [headers.join(','), ...lines].join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = 'greenhouse-control-tower.csv'
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' | 'tenants' | 'operations'>): DomainCard[] => [
   {
     title: 'Identity & Access',
     subtitle: 'Usuarios, roles, equipo interno y scopes visibles del portal.',
     icon: 'tabler-shield-lock',
+    avatarColor: 'info',
     status: { label: access.totals.activeUsers > 0 ? 'Operativo' : 'Pendiente', color: access.totals.activeUsers > 0 ? 'success' : 'warning' },
     href: '/admin/users',
     primaryAction: 'Abrir usuarios',
@@ -58,96 +120,202 @@ const domainCards = ({ access, tenants }: Props): DomainCard[] => [
     points: [
       `${access.totals.totalUsers} usuarios y ${access.roles.length} roles registrados`,
       `${access.totals.invitedUsers} invitaciones pendientes`,
-      'Esta familia separa gobierno de acceso de las vistas operativas del producto'
+      'Gobierno de acceso separado de las vistas operativas del producto'
     ]
   },
   {
     title: 'Delivery',
     subtitle: 'Historial de envios, suscripciones y trazabilidad de delivery operacional.',
     icon: 'tabler-mail-bolt',
+    avatarColor: 'success',
     status: { label: 'Listo', color: 'success' },
     href: '/admin/email-delivery',
     primaryAction: 'Abrir correos',
     routes: ['/admin/email-delivery'],
     points: [
-      'La capa centralizada de email ya tiene surface administrativa',
-      'Permite revisar delivery, retries y destinatarios por tipo',
-      'Es la slice de governance para notificaciones transaccionales'
+      'Capa centralizada de email con surface administrativa',
+      'Delivery, retries y destinatarios por tipo',
+      'Governance para notificaciones transaccionales'
     ]
   },
   {
     title: 'AI Governance',
-    subtitle: 'Catálogo, licencias, wallets y control administrativo de AI Tools.',
+    subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',
     icon: 'tabler-robot',
+    avatarColor: 'warning',
     status: { label: 'Dual', color: 'info' },
     href: '/admin/ai-tools',
     primaryAction: 'Abrir AI governance',
     routes: ['/admin/ai-tools'],
     points: [
-      'Sigue existiendo como domain surface para usuarios de AI Tooling',
-      'Dentro de Admin Center funciona como capa de gobernanza y control',
-      'No mezcla uso diario con administración de créditos o licencias'
+      'Domain surface para usuarios de AI Tooling',
+      'Capa de gobernanza y control de creditos o licencias',
+      'Separacion entre uso diario y administracion'
     ]
   },
   {
     title: 'Cloud & Integrations',
     subtitle: GH_INTERNAL_NAV.adminCloudIntegrations.subtitle,
     icon: 'tabler-plug-connected',
-    status: { label: 'warning', color: 'warning' },
+    avatarColor: 'primary',
+    status: {
+      label: cloudStatusLabel(operations),
+      color: cloudStatusColor(operations)
+    },
     href: '/admin/cloud-integrations',
     primaryAction: 'Abrir cloud & integrations',
-    routes: ['/admin/cloud-integrations', '/agency/operations'],
+    routes: ['/admin/cloud-integrations'],
     points: [
-      'Ya tiene entrypoint propio dentro de Admin Center para syncs y webhooks',
-      'Sigue pudiendo deep-linkear a operaciones compartidas cuando hace falta más contexto',
-      'El foco es health, stale data, retries y auth por referencia'
+      `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
+      operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
+      `BigQuery guard: ${operations.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes`
     ]
   },
   {
     title: 'Ops Health',
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,
     icon: 'tabler-activity-heartbeat',
-    status: { label: 'stale', color: 'secondary' },
+    avatarColor: 'error',
+    status: {
+      label: operations.kpis.failedHandlers > 0 ? `${operations.kpis.failedHandlers} degradados` : 'Ok',
+      color: operations.kpis.failedHandlers > 0 ? 'warning' : 'success'
+    },
     href: '/admin/ops-health',
     primaryAction: 'Abrir ops health',
-    routes: ['/admin/ops-health', '/agency/operations'],
+    routes: ['/admin/ops-health'],
     points: [
-      'Ahora vive dentro de /admin como vista mínima de outbox, queue y handlers reactivos',
-      'La semántica objetivo es ok, warning, failed y stale',
-      'La mutación real de replay o retry debe seguir viviendo en helpers canónicos'
+      `${operations.kpis.outboxEvents24h} eventos en 24h`,
+      operations.kpis.pendingProjections > 0
+        ? `${operations.kpis.pendingProjections} proyecciones pendientes`
+        : 'Sin proyecciones en cola',
+      `${operations.cloud.health.checks.filter(check => !check.ok).length} checks cloud con atención`
+    ]
+  },
+  {
+    title: 'Spaces',
+    subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',
+    icon: 'tabler-grid-4x4',
+    avatarColor: 'primary',
+    status: { label: tenants.totals.activeTenants > 0 ? 'Activo' : 'Sin spaces', color: tenants.totals.activeTenants > 0 ? 'success' : 'warning' },
+    href: '/admin/tenants',
+    primaryAction: 'Abrir spaces',
+    routes: ['/admin/tenants'],
+    points: [
+      `${tenants.totals.totalTenants} spaces visibles en governance`,
+      `${tenants.totals.tenantsWithScopedProjects} con proyectos scoped`,
+      'Contexto de capabilities y acceso por empresa'
     ]
   }
 ]
 
-const AdminCenterView = ({ access, tenants }: Props) => {
-  const cards = domainCards({ access, tenants })
-  const healthTone = access.totals.invitedUsers > 0 ? 'warning' : 'info'
+const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
+
+const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) => {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const navRouter = useNavRouter()
+
+  const initialFilter = searchParams.get('filter') as StatusFilter | null
+  const initialQuery = searchParams.get('q') ?? ''
+
+  const [searchValue, setSearchValue] = useState(initialQuery)
+
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
+    initialFilter && validFilters.includes(initialFilter) ? initialFilter : 'all'
+  )
+
+  const syncParams = useCallback(
+    (filter: StatusFilter, query: string) => {
+      const params = new URLSearchParams()
+
+      if (filter !== 'all') params.set('filter', filter)
+      if (query.trim()) params.set('q', query.trim())
+
+      const qs = params.toString()
+
+      navRouter.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false })
+    },
+    [pathname, navRouter]
+  )
+
+  const handleFilterChange = useCallback(
+    (value: StatusFilter) => {
+      setStatusFilter(value)
+      syncParams(value, searchValue)
+    },
+    [searchValue, syncParams]
+  )
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchValue(value)
+      syncParams(statusFilter, value)
+    },
+    [statusFilter, syncParams]
+  )
+
+  const ctTenants = useMemo(
+    () => controlTower.clients.map(finalizeControlTowerTenant).sort(compareControlTowerTenants),
+    [controlTower.clients]
+  )
+
+  const filteredTenants = useMemo(() => {
+    const query = searchValue.trim().toLowerCase()
+
+    return ctTenants.filter(tenant => {
+      const matchesStatus = statusFilter === 'all' || tenant.statusKey === statusFilter
+
+      const matchesSearch =
+        query.length === 0 ||
+        [tenant.clientName, tenant.primaryContactEmail || '']
+          .join(' ')
+          .toLowerCase()
+          .includes(query)
+
+      return matchesStatus && matchesSearch
+    })
+  }, [searchValue, statusFilter, ctTenants])
+
+  const summary = useMemo(
+    () => buildControlTowerSummary(ctTenants, controlTower.totals.internalAdmins),
+    [controlTower.totals.internalAdmins, ctTenants]
+  )
+
+  const otdKpiTone: 'success' | 'warning' | 'error' | 'info' =
+    summary.avgOnTimePct === null ? 'info'
+      : summary.avgOnTimePct >= 90 ? 'success'
+        : summary.avgOnTimePct >= 70 ? 'warning'
+          : 'error'
+
+  const cards = buildDomainCards({ access, tenants, operations })
 
   return (
     <Stack spacing={6}>
+      {/* ── Hero ── */}
       <Card sx={{ overflow: 'hidden' }}>
         <CardContent
           sx={{
             p: { xs: 4, md: 6 },
             background:
-              'linear-gradient(135deg, rgba(14,165,233,0.15) 0%, rgba(34,197,94,0.1) 32%, rgba(15,23,42,0) 100%)'
+              'linear-gradient(135deg, rgba(115,103,240,0.14) 0%, rgba(14,165,233,0.12) 36%, rgba(15,23,42,0) 100%)'
           }}
         >
           <Stack spacing={2.5}>
-            <Chip label={GH_INTERNAL_NAV.adminCenter.label} color='info' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Chip label={GH_INTERNAL_NAV.adminCenter.label} color='primary' variant='outlined' sx={{ width: 'fit-content' }} />
             <Typography variant='h3'>{GH_INTERNAL_NAV.adminCenter.subtitle}</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 980 }}>
-              Esta landing deja de tratar <strong>/admin</strong> como redirect y lo convierte en control plane. Desde aquí agrupamos
-              identity, delivery, AI governance y la observabilidad operativa que necesita crecer sin romper las rutas especialistas ya activas.
+              Plano de gobierno que unifica health de spaces, identity, delivery, integraciones y observabilidad operativa.
+              Cada dominio indexa una family funcional sin reemplazar las surfaces especialistas.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/users' variant='contained'>Abrir Identity & Access</Button>
+              <Button component={Link} href='/admin/tenants' variant='contained'>Abrir Spaces</Button>
               <Button component={Link} href='/admin/cloud-integrations' variant='outlined'>Ver Cloud & Integrations</Button>
             </Stack>
           </Stack>
         </CardContent>
       </Card>
 
+      {/* ── 4 KPIs ── */}
       <Box
         sx={{
           display: 'grid',
@@ -160,7 +328,7 @@ const AdminCenterView = ({ access, tenants }: Props) => {
           tone='info'
           title='Spaces activos'
           value={String(tenants.totals.activeTenants)}
-          detail='Tenants visibles con postura operativa vigente.'
+          detail='Tenants con postura operativa vigente.'
           icon='tabler-grid-4x4'
         />
         <ExecutiveMiniStatCard
@@ -174,24 +342,150 @@ const AdminCenterView = ({ access, tenants }: Props) => {
         <ExecutiveMiniStatCard
           eyebrow='Access'
           tone='warning'
-          title='Invitados pendientes'
+          title='Pendientes activacion'
           value={String(access.totals.invitedUsers)}
-          detail='Invitaciones o onboarding aún sin cerrar.'
+          detail='Invitaciones o onboarding sin cerrar.'
           icon='tabler-mail-exclamation'
         />
         <ExecutiveMiniStatCard
-          eyebrow='RBAC'
-          tone={healthTone}
-          title='Roles registrados'
-          value={String(access.roles.length)}
-          detail='Catálogo visible de roles y route groups.'
-          icon='tabler-shield-lock'
+          eyebrow='Delivery'
+          tone={otdKpiTone}
+          title='OTD global'
+          value={formatPercent(summary.avgOnTimePct)}
+          detail='Promedio ponderado de entrega.'
+          icon='tabler-target-arrow'
         />
       </Box>
 
+      {/* ── Alertas consolidadas (solo si hay señales) ── */}
+      {(() => {
+        const alerts: Array<{ icon: string; tone: 'error' | 'warning'; label: string; detail: string }> = []
+
+        if (summary.attentionCount > 0) {
+          alerts.push({
+            icon: 'tabler-alert-triangle',
+            tone: 'error',
+            label: `${summary.attentionCount} spaces requieren atencion`,
+            detail: 'Sin proyectos scoped, sin activacion o sin actividad reciente.'
+          })
+        }
+
+        if (operations.kpis.failedHandlers > 0) {
+          alerts.push({
+            icon: 'tabler-bug',
+            tone: 'error',
+            label: `${operations.kpis.failedHandlers} handlers degradados`,
+            detail: 'Retries o dead-letters visibles en el runtime reactivo.'
+          })
+        }
+
+        if (operations.webhooks.deliveriesDeadLetter > 0) {
+          alerts.push({
+            icon: 'tabler-mail-x',
+            tone: 'warning',
+            label: `${operations.webhooks.deliveriesDeadLetter} deliveries en dead-letter`,
+            detail: 'Webhooks que agotaron reintentos y requieren intervencion.'
+          })
+        }
+
+        if (operations.kpis.pendingProjections > 3) {
+          alerts.push({
+            icon: 'tabler-refresh-alert',
+            tone: 'warning',
+            label: `${operations.kpis.pendingProjections} proyecciones pendientes`,
+            detail: 'Cola de refreshes reactivos acumulada.'
+          })
+        }
+
+        if (access.totals.invitedUsers > 10) {
+          alerts.push({
+            icon: 'tabler-user-exclamation',
+            tone: 'warning',
+            label: `${access.totals.invitedUsers} usuarios sin activar`,
+            detail: 'Invitaciones pendientes con posible friccion de onboarding.'
+          })
+        }
+
+        if (alerts.length === 0) return null
+
+        return (
+          <ExecutiveCardShell
+            title='Requiere atencion'
+            subtitle='Senales activas de governance que necesitan revision.'
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }
+              }}
+            >
+              {alerts.map(alert => (
+                <Card
+                  key={alert.label}
+                  variant='outlined'
+                  sx={{
+                    borderLeft: '4px solid',
+                    borderLeftColor: `${alert.tone}.main`
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Stack direction='row' spacing={2} alignItems='flex-start'>
+                      <Avatar
+                        variant='rounded'
+                        sx={{
+                          bgcolor: `${alert.tone}.lightOpacity`,
+                          color: `${alert.tone}.main`,
+                          width: 36,
+                          height: 36
+                        }}
+                      >
+                        <i className={alert.icon} />
+                      </Avatar>
+                      <Stack spacing={0.5}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {alert.label}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {alert.detail}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </ExecutiveCardShell>
+        )
+      })()}
+
+      {/* ── Torre de control (Spaces health table) ── */}
+      <SectionErrorBoundary
+        sectionName='admin-center-control-tower'
+        title={GH_INTERNAL_MESSAGES.internal_dashboard_table_error_title}
+        description={GH_INTERNAL_MESSAGES.internal_dashboard_table_error_description}
+      >
+        <ExecutiveCardShell
+          title='Torre de control'
+          subtitle='Control operativo de spaces con prioridad para onboarding, activacion y delivery.'
+        >
+          <AdminCenterSpacesTable
+            rows={filteredTenants}
+            totalRows={ctTenants.length}
+            searchValue={searchValue}
+            onSearchChange={handleSearchChange}
+            statusFilter={statusFilter}
+            onStatusFilterChange={handleFilterChange}
+            onExport={() => exportToCsv(filteredTenants)}
+            attentionCount={summary.attentionCount}
+          />
+        </ExecutiveCardShell>
+      </SectionErrorBoundary>
+
+      {/* ── Mapa de dominios ── */}
       <ExecutiveCardShell
-        title='Mapa de dominios de governance'
-        subtitle='Cada dominio indexa una family operacional distinta. Las rutas especialistas siguen vivas; Admin Center las contextualiza.'
+        title='Mapa de dominios'
+        subtitle='Cada dominio indexa una family operacional distinta. Las rutas especialistas siguen vivas.'
       >
         <Box
           sx={{
@@ -207,7 +501,7 @@ const AdminCenterView = ({ access, tenants }: Props) => {
                   <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                     <Stack spacing={1}>
                       <Stack direction='row' spacing={1.5} alignItems='center'>
-                        <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity', color: 'info.main' }}>
+                        <Avatar variant='rounded' sx={{ bgcolor: `${card.avatarColor}.lightOpacity`, color: `${card.avatarColor}.main` }}>
                           <i className={card.icon} />
                         </Avatar>
                         <Typography variant='h5'>{card.title}</Typography>
@@ -232,13 +526,6 @@ const AdminCenterView = ({ access, tenants }: Props) => {
                         <Chip key={route} size='small' label={route} variant='outlined' sx={{ fontFamily: 'monospace' }} />
                       ))}
                     </Stack>
-                    {(card.title === 'Identity & Access' || card.title === 'Cloud & Integrations' || card.title === 'Ops Health') ? (
-                      <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 2 }}>
-                        {card.title === 'Identity & Access'
-                          ? 'Esta familia agrupa usuarios, roles y equipo sin rehacer sus routes existentes.'
-                          : 'Esta landing indexa el dominio de governance aunque el detalle operativo siga viviendo fuera de /admin en este MVP.'}
-                      </Typography>
-                    ) : null}
                     <Button component={Link} href={card.href} variant='outlined'>
                       {card.primaryAction}
                     </Button>
@@ -247,34 +534,6 @@ const AdminCenterView = ({ access, tenants }: Props) => {
               </CardContent>
             </Card>
           ))}
-        </Box>
-      </ExecutiveCardShell>
-
-      <ExecutiveCardShell
-        title='Criterio operativo del shell'
-        subtitle='Lo que pertenece aquí y lo que deliberadamente sigue viviendo fuera del control plane.'
-      >
-        <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' } }}>
-          <Card variant='outlined'>
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant='h6'>Pertenece a Admin Center</Typography>
-                <Typography variant='body2' color='text.secondary'>- Alcance, acceso, delivery, health, retries, syncs, auditoría y config operativa.</Typography>
-                <Typography variant='body2' color='text.secondary'>- Índices de secciones futuras como secret refs, economics readiness y capacity freshness.</Typography>
-                <Typography variant='body2' color='text.secondary'>- Entry points que ordenan la navegación sin romper las surfaces existentes.</Typography>
-              </Stack>
-            </CardContent>
-          </Card>
-          <Card variant='outlined'>
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant='h6'>No reemplaza módulos especialistas</Typography>
-                <Typography variant='body2' color='text.secondary'>- No se convierte en mega-dashboard de producto ni en consola cloud vendor-specific.</Typography>
-                <Typography variant='body2' color='text.secondary'>- No absorbe la surface operativa diaria de AI Tools, Finance, Payroll o Agency.</Typography>
-                <Typography variant='body2' color='text.secondary'>- No expone secretos en claro; solo debe crecer hacia metadata y `secret_ref` gobernado.</Typography>
-              </Stack>
-            </CardContent>
-          </Card>
         </Box>
       </ExecutiveCardShell>
     </Stack>
