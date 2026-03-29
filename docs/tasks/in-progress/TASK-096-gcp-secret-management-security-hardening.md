@@ -61,6 +61,11 @@
   - staging sigue pendiente de absorber el baseline WIF final porque aún corre código previo de `develop` (`version=7a2ecec`)
   - decisión operativa: no desplegar la feature branch al entorno compartido; cerrar esta fase por merge a `develop` y revalidación de staging
   - no se endurece Cloud SQL hasta completar esa validación en staging compartido
+  - estado posterior:
+    - `develop` ya recibió el lote limpio de `TASK-096`
+    - el deploy manual de ese árbol a `staging` falló dos veces en Vercel con `Unexpected error`
+    - `inspect --format json` devolvió `readyState=ERROR` con build `READY`
+    - esto se trata como bloqueo operativo externo antes de seguir con retiros de SA key o hardening de Cloud SQL
 
 ## Status
 

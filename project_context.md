@@ -21,6 +21,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa derivada:
   - no desplegar la feature branch al entorno compartido solo para cerrar `TASK-096`
   - no endurecer Cloud SQL externo ni retirar la SA key hasta que `develop` absorba este baseline y `staging` quede validado con WIF final
+  - `develop` ya fue actualizado con los commits de `TASK-096`, pero el deploy manual a `staging` desde ese árbol integrado falló dos veces en Vercel con `Unexpected error` pese a que el build quedó `READY`
+  - hasta resolver ese bloqueo de plataforma, `staging` sigue operativo sobre el deployment anterior (`version=7a2ecec`, `auth.mode=mixed`)
 
 ## Delta 2026-03-29 Home landing cutover baseline
 - `TASK-119` quedó cerrada sobre la policy de landing del portal.

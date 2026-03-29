@@ -61,6 +61,12 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - no desplegar la feature branch al entorno compartido `staging`
   - mantener el flujo `feature -> preview -> develop/staging -> main`
 - Validar el entorno compartido con WIF final después de mergear a `develop`, antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- Bloqueo actual:
+  - `develop` ya recibió el lote limpio de `TASK-096` (integración selectiva)
+  - se intentó desplegar ese árbol integrado a `staging` dos veces
+  - ambos deploys fallaron en Vercel con `Unexpected error`
+  - `inspect --format json` mostró `readyState=ERROR` aunque el build quedó `READY`
+  - no seguir reintentando a ciegas; el próximo paso debería ser investigar el fallo de plataforma/deployment en Vercel antes de asumir problema de código
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`

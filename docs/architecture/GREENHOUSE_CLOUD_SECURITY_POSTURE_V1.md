@@ -29,6 +29,7 @@
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
     - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
     - el riesgo remanente ahora es de rollout parcial: staging ya usa connector, pero todavía no absorbió el baseline WIF final de esta rama
+    - además apareció un bloqueo operativo de deployment: el intento de desplegar el árbol integrado de `develop` a `staging` falló dos veces en Vercel con error inesperado
   - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
 

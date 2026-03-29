@@ -17,6 +17,7 @@
 - Las variables activas del rollout WIF/conector ya fueron saneadas en Vercel.
 - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`; tras redeploy ya usa connector pero todavía corre el baseline previo de `develop` (`auth.mode=mixed`).
 - Cloud SQL sigue sin endurecimiento externo final porque primero hay que llevar este baseline a `develop/staging` por el flujo normal y solo después cerrar red + SSL obligatoria.
+- `develop` ya recibió el lote limpio de `TASK-096`, pero el deploy manual posterior a `staging` falló dos veces en Vercel con `Unexpected error`; queda como bloqueo operativo externo a investigar.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).

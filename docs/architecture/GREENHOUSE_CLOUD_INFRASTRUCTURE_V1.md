@@ -51,6 +51,7 @@
     - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
     - tras redeploy del staging activo, el entorno compartido respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
     - eso deja explícito que staging ya tomó el connector y la configuración nueva, pero no aún el baseline WIF final de esta rama
+    - `develop` ya recibió el lote limpio de `TASK-096`, pero el deploy manual posterior a `staging` falló dos veces en Vercel con `Unexpected error` y `readyState=ERROR` aun cuando el build quedó `READY`
 
 ## 1. Overview
 
