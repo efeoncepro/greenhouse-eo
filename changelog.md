@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-099 scope aligned with the validated proxy baseline
+- `TASK-099` se re-acotó documentalmente para reflejar el estado real del repo.
+- El baseline ya validado incluye solo `src/proxy.ts`, headers estáticos, matcher conservador y `HSTS` en `production`.
+- `Content-Security-Policy` queda explícitamente como follow-on pendiente, no como criterio ya cumplido del slice actual.
+
 ### TASK-096 closed after WIF + Cloud SQL hardening
 - `TASK-096` queda cerrada para el alcance declarado:
   - baseline WIF-aware en repo

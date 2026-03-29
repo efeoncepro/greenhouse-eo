@@ -1,5 +1,15 @@
 # TASK-099 — Security Headers & Next.js Proxy
 
+## Delta 2026-03-29 — Alcance acotado al baseline real
+
+- Se confirma que el repo ya cerró y validó solo el baseline seguro de `proxy.ts`.
+- La task sigue `in-progress`, pero ya no debe leerse como si el slice actual incluyera `Content-Security-Policy`.
+- `CSP` queda explicitamente como follow-on posterior porque todavía requiere tuning sobre:
+  - MUI/Emotion
+  - OAuth (`Azure AD`, `Google`, credentials)
+  - assets estáticos y uploads
+- La task se re-acota para que el contrato documental no exija validaciones que hoy pertenecen al siguiente lote.
+
 ## Delta 2026-03-29 — Slice 1 seguro iniciado
 
 - `TASK-099` pasa a `in-progress`.
@@ -24,14 +34,14 @@
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Implementación` |
+| Status real | `Slice 1 validado` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 | Sequence | Cloud Posture Hardening **2 of 6** — after TASK-100, before TASK-098 |
 
 ## Summary
 
-Crear `proxy.ts` con security headers (CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy). Hoy no existe esta capa cross-cutting y las rutas API no tienen headers de seguridad centralizados.
+Consolidar el baseline cross-cutting de seguridad vía `src/proxy.ts` para headers estáticos y `HSTS` en `production`, dejando `Content-Security-Policy` como follow-on separado dentro de la misma lane. Hoy el repo ya tiene esa capa mínima; lo pendiente es decidir si `CSP` entra como `Report-Only`, con allowlist explícita o se deriva a otra task para no romper login, MUI ni uploads.
 
 ## Why This Task Exists
 
@@ -70,7 +80,7 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
 
 ## Scope
 
-### Slice 1 — Security Headers baseline (~2h)
+### Slice 1 — Security Headers baseline (~2h) — completado
 
 1. Crear `src/proxy.ts`:
    ```typescript
@@ -124,17 +134,18 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
    > Nota: CSP con `unsafe-inline` y `unsafe-eval` no es ideal, pero MUI v5/v7 con Emotion requiere inline styles. Endurecer con nonces es una mejora futura.
    > En este primer lote no se aplica todavía para no romper login, assets o render de dashboard.
 
-### Slice 2 — Verificación y ajuste (~1h)
+### Slice 2 — CSP y verificación ampliada (~1h) — pendiente
 
-1. Deploy en staging
-2. Verificar que no se rompen:
+1. Introducir `Content-Security-Policy` primero en modo `Report-Only` o con rollout controlado
+2. Deploy en staging
+3. Verificar que no se rompen:
    - Login (Azure AD, Google OAuth, Credentials)
    - Dashboard con MUI components
    - Uploads de media (avatars, logos)
    - Integrations API calls (HubSpot, Notion)
    - Cron routes (no deben ser afectados por CSP)
-3. Ajustar CSP si hay violaciones (revisar Console de DevTools)
-4. Verificar headers con `curl -I`:
+4. Ajustar CSP si hay violaciones (revisar Console de DevTools)
+5. Verificar headers con `curl -I`:
    ```bash
    curl -I https://dev-greenhouse.efeoncepro.com/login
    # Confirmar presencia de todos los headers
@@ -150,30 +161,31 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
 
 ## Acceptance Criteria
 
-- [ ] `src/proxy.ts` creado y funcional
-- [ ] `X-Frame-Options: DENY` presente en todas las respuestas
-- [ ] `X-Content-Type-Options: nosniff` presente
-- [ ] `Referrer-Policy: strict-origin-when-cross-origin` presente
-- [ ] `Permissions-Policy` presente (camera, microphone, geolocation denegados)
-- [ ] `Content-Security-Policy` presente (modo permisivo inicial o `Report-Only` en slice posterior)
-- [ ] `Strict-Transport-Security` presente en production
-- [ ] Login funciona correctamente (3 providers)
-- [ ] Dashboard MUI renderiza sin errores de CSP
-- [ ] Media uploads funcionan
-- [ ] Cron routes no son afectados
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `src/proxy.ts` creado y funcional
+- [x] `X-Frame-Options: DENY` presente
+- [x] `X-Content-Type-Options: nosniff` presente
+- [x] `Referrer-Policy: strict-origin-when-cross-origin` presente
+- [x] `Permissions-Policy` presente (camera, microphone, geolocation denegados)
+- [x] `Strict-Transport-Security` presente en `production`
+- [x] matcher conservador evita `_next/*` y assets estáticos
+- [x] `pnpm build` pasa para el baseline actual
+- [x] `src/proxy.test.ts` valida headers y matcher
+- [ ] `Content-Security-Policy` introducida con rollout seguro (`Report-Only` o equivalente)
+- [ ] Login funciona correctamente bajo la capa nueva de `CSP`
+- [ ] Dashboard MUI renderiza sin errores de `CSP`
+- [ ] Media uploads funcionan bajo la política nueva
+- [ ] Cron routes no son afectados por `CSP`
 
 ## Verification
 
 ```bash
-# Verificar headers
-curl -sI https://dev-greenhouse.efeoncepro.com/login | grep -E "x-frame|x-content|referrer|permissions|content-security|strict-transport"
-
-# Verificar que CSP no rompe nada
-# Abrir DevTools > Console en staging y buscar CSP violations
-
-# Build validation
+# Baseline actual validada
+pnpm exec vitest run src/proxy.test.ts
+pnpm exec eslint src/proxy.ts src/proxy.test.ts
+pnpm exec tsc --noEmit --pretty false
 pnpm build
-pnpm test
+
+# Follow-on para CSP
+curl -sI https://dev-greenhouse.efeoncepro.com/login | grep -E "x-frame|x-content|referrer|permissions|content-security|strict-transport"
+# Abrir DevTools > Console en staging y buscar CSP violations
 ```

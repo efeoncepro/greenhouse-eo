@@ -4,6 +4,21 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-099 re-acotada al baseline real
+
+### Completado
+- Se revisó `TASK-099` contra el estado real de `src/proxy.ts` y `src/proxy.test.ts`.
+- Hallazgo consolidado:
+  - el repo ya tiene validado el baseline de headers estáticos
+  - la task seguía abierta con criterios mezclados de un lote futuro de `Content-Security-Policy`
+- Se re-acotó la task para reflejar correctamente el slice actual:
+  - `Status real` pasa a `Slice 1 validado`
+  - `CSP` queda explícitamente como follow-on pendiente
+  - el baseline ya no exige en falso login/uploads/dashboard bajo `CSP`
+
+### Pendiente inmediato
+- Decidir si `CSP` se implementa todavía dentro de `TASK-099` como `Report-Only` o si conviene derivarla a una task nueva para no inflar esta lane.
+
 ## Sesión 2026-03-29 — TASK-096 cerrada
 
 ### Completado

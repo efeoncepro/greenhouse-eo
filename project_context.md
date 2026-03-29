@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-099 re-scoped to the validated baseline
+- `TASK-099` sigue `in-progress`, pero ya no debe interpretarse como si el repo tuviera `Content-Security-Policy`.
+- Estado real consolidado:
+  - `src/proxy.ts` ya aplica headers estáticos cross-cutting
+  - `Strict-Transport-Security` ya se limita a `production`
+  - el matcher ya evita `_next/*` y assets estáticos
+- Lo pendiente de la lane es solo `CSP`, que se mantiene diferida por riesgo sobre:
+  - MUI/Emotion
+  - OAuth
+  - uploads/assets
+- Decisión operativa vigente:
+  - no cerrar `TASK-099` en falso
+  - no introducir `CSP` sin rollout controlado tipo `Report-Only` o equivalente
+
 ## Delta 2026-03-29 Observability MVP cerrada
 - `TASK-098` quedó cerrada tras validación en `staging` y `production`.
 - `production` ya valida:
