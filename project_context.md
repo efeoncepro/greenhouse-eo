@@ -15,7 +15,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GREENHOUSE_POSTGRES_USER`
   - `GREENHOUSE_POSTGRES_PASSWORD`
 - Drift operativo verificado el 2026-03-29:
-  - varias env vars de Vercel siguen guardadas con sufijo literal `\n`
+  - las env vars activas del rollout WIF/conector ya quedaron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió desde un deployment `preview` de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`) y no como `staging` inequívoco
 - Regla operativa derivada:
   - no endurecer Cloud SQL externo ni retirar la SA key hasta normalizar ese mapa de ambientes y revalidar el entorno compartido

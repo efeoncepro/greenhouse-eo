@@ -26,7 +26,8 @@
   - el rollout externo WIF ya existe en GCP/Vercel y quedó validado en un preview real (`version=7638f85`) con BigQuery + Cloud SQL Connector OK y sin SA key
   - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
   - además sigue habiendo drift de ambientación:
-    - env vars de Vercel con sufijo literal `\n`
+    - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
+    - el riesgo remanente está en el mapping no inequívoco del entorno compartido
     - `dev-greenhouse.efeoncepro.com` no respondió el 2026-03-29 como un `staging` inequívoco, sino como preview de `develop`
   - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`

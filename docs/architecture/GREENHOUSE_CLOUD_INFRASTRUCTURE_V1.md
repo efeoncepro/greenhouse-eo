@@ -46,7 +46,8 @@
     - BigQuery reachable
     - Cloud SQL reachable vía connector usando `efeonce-group:us-east4:greenhouse-pg-dev`
   - también se detectó drift de configuración/env mapping:
-    - varios envs siguen almacenados con sufijo literal `\n`
+    - las variables del rollout WIF/conector ya fueron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
+    - el preview activo ya quedó con baseline mínima de Postgres para validar el connector
     - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 desde un deployment `preview` de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`), no desde un target `staging` inequívoco
 
 ## 1. Overview

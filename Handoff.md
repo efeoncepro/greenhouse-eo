@@ -52,9 +52,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Pendiente inmediato
 - Limpiar drift de Vercel env antes del endurecimiento final:
-  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` quedó guardada con sufijo literal `\n` en al menos un entorno
-  - también aparecieron valores con `\n` en credenciales Postgres al hacer `env pull`
-  - antes de endurecer Cloud SQL hay que corregir esos valores en Vercel y revalidar el entorno compartido
+  - las variables activas del rollout WIF/conector ya fueron corregidas en Vercel
+  - el paso pendiente ya no es el formato, sino revalidar el entorno compartido que hoy no mapea de forma inequívoca a `staging`
 - Aclarar y corregir el mapa de ambientes Vercel:
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 como preview de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`)
   - no asumir que ese alias hoy represente un `staging` inequívoco hasta corregirlo
