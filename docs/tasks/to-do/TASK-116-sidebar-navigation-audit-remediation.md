@@ -109,26 +109,26 @@ Gestión mezcla surfaces de negocio (Agencia, Spaces, Economía, Delivery) con s
 
 ## Auditoría: Hallazgos de UX Writing
 
-### C1 — Spanglish en labels de primer nivel (Alta)
+### C1 — Spanglish: postura táctica (Info — decisión de diseño)
 
-- "Cloud & Integrations" → debería ser **"Integraciones"**
-- "Ops Health" → debería ser **"Salud operativa"**
+**El equipo Efeonce habla en Spanglish técnico de forma natural.** Los términos ingleses que acortan labels o son jerga universal de industria se mantienen intencionalmente. Solo se corrige cuando la mezcla es accidental o el resultado es opaco.
 
-### C2 — Spanglish en subtitles (Alta)
+**Mantener (Spanglish táctico válido):**
+- "Cloud & Integrations" — nombre de la surface, universalmente entendido
+- "Ops Health" — conciso, distinguible
+- "Command Center" — más corto que "Centro de mando operativo"
+- "Delivery" — nadie dice "Entregas" internamente
+- "ICO, sprints y producción" — ICO y sprints son la jerga real
 
-| Label | Subtitle actual | Problema |
-|-------|----------------|----------|
-| Agencia | Command Center | Inglés |
-| Cloud & Integrations | Syncs, webhooks, auth y runtime operativo | Inglés técnico |
-| Ops Health | Outbox, proyecciones y freshness del serving | Inglés técnico |
-| Delivery | ICO, sprints y producción | Jerga interna |
-| Operaciones | Salud del platform | "platform" sin traducir |
+**Corregir (mezcla accidental, no táctica):**
+- "Salud del platform" → "Platform health" o "Salud de la plataforma" — mezcla a medias
+- "Outbox, proyecciones y freshness del serving" → demasiado técnico como subtitle, no por el inglés sino por la opacidad. Algo como "Events, proyecciones y freshness" es igual de corto y más claro
 
-### C3 — Subtitles demasiado técnicos en Admin (Media)
+### C2 — Subtitle de Ops Health demasiado opaco (Media)
 
-"Outbox, proyecciones y freshness del serving" — un usuario de governance no sabe qué es un outbox. El subtitle debería hablar de beneficio, no de implementación.
+"Outbox, proyecciones y freshness del serving" — incluso para el equipo técnico, "outbox" y "serving" son implementación interna. El subtitle debería usar jerga que el equipo ya comparte, no nombres de tablas PG.
 
-### C4 — Redundancia label/subtitle "Proyectos" (Media)
+### C3 — Redundancia label/subtitle "Proyectos" (Media)
 
 "Proyectos / Proyectos activos" — el subtitle repite el label con un adjetivo.
 
@@ -162,17 +162,17 @@ Label y subtitle son consistentes. No hay acción. Documentar como OK.
 
 | Hoy | Label propuesto | Subtitle propuesto |
 |-----|----------------|--------------------|
-| Cloud & Integrations / Syncs, webhooks, auth y runtime operativo | **Integraciones** | Syncs, credenciales y salud de conectores |
-| Ops Health / Outbox, proyecciones y freshness del serving | **Salud operativa** | Cola de eventos, proyecciones y señales del runtime |
-| Admin Center / Gobernanza institucional del portal | Admin Center | Gobierno y configuración del portal |
+| Cloud & Integrations / Syncs, webhooks, auth y runtime operativo | Cloud & Integrations (mantener) | Syncs, credenciales y health de conectores |
+| Ops Health / Outbox, proyecciones y freshness del serving | Ops Health (mantener) | Events, proyecciones y freshness |
+| Admin Center / Gobernanza institucional del portal | Admin Center (mantener) | Gobierno y configuración del portal |
 
 ### Gestión nav
 
 | Hoy subtitle | Subtitle propuesto |
 |--------------|--------------------|
-| Command Center | Centro de mando operativo |
-| ICO, sprints y producción | Entregas, ciclos y producción |
-| Salud del platform | Salud de la plataforma |
+| Command Center | Command Center (mantener — Spanglish táctico) |
+| ICO, sprints y producción | ICO, sprints y producción (mantener — jerga real) |
+| Salud del platform | Platform health (completar hacia un lado u otro) |
 
 ### Redundancias
 
@@ -240,12 +240,13 @@ El parent del submenu ya dice "Admin Center" y es clickable → `/admin`. El hij
 
 ### Slice 1 — Copy fixes (sin cambio estructural)
 
-- Corregir Spanglish: labels y subtitles en `greenhouse-nomenclature.ts`
+- Corregir mezclas accidentales: "Salud del platform" → "Platform health"
+- Reducir opacidad: "Outbox, proyecciones y freshness del serving" → "Events, proyecciones y freshness"
 - Normalizar "MI FICHA" → "Mi ficha"
-- Corregir subtitles redundantes
+- Corregir subtitles redundantes (Proyectos, Conciliación)
 - Centralizar "Nómina Proyectada" en `GH_HR_NAV`
 - Corregir tildes faltantes
-- Desambiguar labels duplicados (Equipo, Spaces)
+- Desambiguar labels duplicados (Equipo → Capacidad, Admin Spaces → Gobierno de Spaces)
 
 **Esfuerzo:** ~30 min. Sin riesgo de regresión.
 
@@ -277,7 +278,7 @@ El parent del submenu ya dice "Admin Center" y es clickable → `/admin`. El hij
 ## Acceptance Criteria
 
 ### Slice 1
-- [ ] Zero Spanglish en labels y subtitles del sidebar
+- [ ] Spanglish táctico validado: mezclas accidentales corregidas, jerga intencional mantenida
 - [ ] Todos los labels centralizados en `greenhouse-nomenclature.ts`
 - [ ] Section headers en sentence case
 - [ ] Subtitles no redundantes con sus labels
