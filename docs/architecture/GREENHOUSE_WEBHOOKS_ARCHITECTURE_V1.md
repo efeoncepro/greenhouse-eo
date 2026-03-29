@@ -32,27 +32,50 @@ The goal is narrower and more practical:
 
 ## Current State
 
-As of 2026-03:
-- Greenhouse has one inbound webhook route for HR attendance:
-  - `POST /api/hr/core/attendance/webhook/teams`
-- that route is protected by a shared secret, but it is domain-specific
-- Greenhouse also has a token-based integrations API under `/api/integrations/v1/*`
-- that API is sync-oriented, not webhook-oriented
-- outbound webhooks are explicitly not implemented yet
-- PostgreSQL already emits operational truth into `greenhouse_sync.outbox_events`
-- the current outbox consumer publishes only to BigQuery, not to external subscribers
+As of 2026-03-29:
 
-This means the repo already has:
-- a transactional event source
-- a retry/failure vocabulary in `greenhouse_sync`
-- real integration pressure
+### Implemented (TASK-006 + TASK-125)
 
-But it still lacks:
-- a canonical webhook envelope
-- subscription and delivery tracking
-- generic inbound receipt storage
-- reusable signature handling
-- one shared operational model for retries and dead letters
+| Component | Status | Location |
+|-----------|--------|----------|
+| Canonical tables (5) | Provisioned | `greenhouse_sync.webhook_endpoints`, `webhook_inbox_events`, `webhook_subscriptions`, `webhook_deliveries`, `webhook_delivery_attempts` |
+| Shared webhook library | Complete | `src/lib/webhooks/*` (signing, envelope, inbound, outbound, store, retry-policy, types) |
+| Inbound gateway | Active | `POST /api/webhooks/[endpointKey]` |
+| Outbound dispatcher | Active | `GET /api/cron/webhook-dispatch` (every 2 min via Vercel cron) |
+| HMAC-SHA256 signing | Complete | `src/lib/webhooks/signing.ts` (timing-safe verification) |
+| Canonical envelope | Complete | `src/lib/webhooks/envelope.ts` |
+| Retry policy | Complete | 5 attempts: immediate, +1m, +5m, +15m, +60m → dead-letter |
+| Teams attendance migration | Complete | Migrated to generic inbound gateway |
+| Canary subscription | Deployable | `POST /api/admin/ops/webhooks/seed-canary` + `POST /api/internal/webhooks/canary` |
+| Admin Center visibility | Active | Endpoint/subscription/delivery counters, dead-letter tracking, dispatch button |
+
+### First Consumer: Canary Subscription (TASK-125)
+
+The first outbound consumer is a self-loop canary that validates the full pipeline:
+
+```
+outbox_events (published) → webhook-dispatch cron (*/2 min) → matches subscription
+  → creates delivery → HTTP POST to /api/internal/webhooks/canary
+  → validates HMAC signature → returns 200 → delivery marked succeeded
+```
+
+- Subscription ID: `wh-sub-canary`
+- Event filter baseline: `finance.income.nubox_synced` (observada como activa y de bajo riesgo en `staging`)
+- Target: same deployment via `VERCEL_URL`
+- Secret contract: `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF`
+- Optional protection bypass:
+  - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
+  - fallback `VERCEL_AUTOMATION_BYPASS_SECRET`
+- Activation: Admin Center button "Activar canary subscription" or direct POST to `/api/admin/ops/webhooks/seed-canary`
+- Dispatcher baseline:
+  - prioriza eventos `published` más recientes (`published_at DESC NULLS LAST, occurred_at DESC`)
+  - evita hambrear subscriptions nuevas cuando existe historial de eventos ya publicados dentro de la ventana de 24h
+
+### Not Yet Active
+
+- No external consumers registered (first real external consumer is a future task)
+- Budget/cost alerting via webhooks (TASK-103 scope)
+- Slack notifications via webhook subscription (currently uses direct `sendSlackAlert()`, not the webhook pipeline)
 
 ## Architectural Decision
 
@@ -271,31 +294,62 @@ Recommended inbound verification order:
 
 ### Inbound gateway
 
-Recommended route:
-- `/api/webhooks/[endpointKey]`
+Route: `POST /api/webhooks/[endpointKey]`
+File: `src/app/api/webhooks/[endpointKey]/route.ts`
 
 Responsibilities:
 - read raw body without mutating it first
-- verify auth/signature
-- persist `webhook_inbox_events`
-- dispatch to handler registry
+- verify auth/signature via `src/lib/webhooks/signing.ts`
+- persist `webhook_inbox_events` via `src/lib/webhooks/store.ts`
+- dispatch to registered handler via `src/lib/webhooks/inbound.ts`
 - return fast acknowledgement
 
 ### Outbound dispatcher
 
-Recommended trigger:
-- Vercel cron or Cloud Run worker on a short cadence
-
-Recommended path for MVP:
-- `/api/cron/webhook-dispatch`
+Route: `GET /api/cron/webhook-dispatch`
+Schedule: `*/2 * * * *` (every 2 minutes via Vercel cron)
+File: `src/app/api/cron/webhook-dispatch/route.ts`
+Core: `src/lib/webhooks/dispatcher.ts`
 
 Responsibilities:
-- read pending outbox events
-- resolve matching subscriptions
-- upsert `webhook_deliveries`
-- execute deliveries with signing
-- write attempt logs
-- schedule retries
+- read published outbox events (last 24h, batch of 30)
+- resolve matching subscriptions via filter logic in `src/lib/webhooks/outbound.ts`
+- upsert `webhook_deliveries` (dedupe by `event_id + subscription_id`)
+- execute deliveries with HMAC-SHA256 signing
+- write attempt logs to `webhook_delivery_attempts`
+- schedule retries per `src/lib/webhooks/retry-policy.ts`
+
+### Canary endpoint
+
+Route: `POST /api/internal/webhooks/canary`
+File: `src/app/api/internal/webhooks/canary/route.ts`
+
+Purpose: internal self-loop target for E2E validation. Validates HMAC signature, logs receipt, returns 200.
+
+### Admin operations
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/admin/ops/webhooks/dispatch` | POST | Manual dispatch trigger |
+| `/api/admin/ops/webhooks/seed-canary` | POST | Register/reactivate canary subscription |
+| `/api/internal/webhooks/inbox` | GET | Read-only inbox events |
+| `/api/internal/webhooks/deliveries` | GET | Read-only delivery logs |
+| `/api/internal/webhooks/failures` | GET | Read-only failure/dead-letter logs |
+
+### File reference
+
+| File | Purpose |
+|------|---------|
+| `src/lib/webhooks/store.ts` | Database operations (endpoints, subscriptions, deliveries, attempts) |
+| `src/lib/webhooks/dispatcher.ts` | Main dispatch loop (match events → create deliveries → deliver) |
+| `src/lib/webhooks/outbound.ts` | HTTP delivery + subscription filter matching |
+| `src/lib/webhooks/inbound.ts` | Inbound webhook processing + handler dispatch |
+| `src/lib/webhooks/signing.ts` | HMAC-SHA256 signing/verification + secret resolution |
+| `src/lib/webhooks/envelope.ts` | Canonical webhook envelope builder |
+| `src/lib/webhooks/types.ts` | TypeScript interfaces |
+| `src/lib/webhooks/retry-policy.ts` | Retry delays + dead-letter logic |
+| `scripts/setup-postgres-webhooks.sql` | Table schemas + seed data |
+| `scripts/setup-postgres-webhooks.ts` | TypeScript provisioning runner |
 
 ## Retry and Dead-Letter Policy
 
@@ -347,23 +401,83 @@ This architecture does not force immediate migration of:
 
 But it creates a reusable Greenhouse-side surface so future integrations do not require one-off product routes every time.
 
-## Initial Adoption Plan
+## Adoption Plan
 
-### Phase 1 - Foundation
-- canonical tables in `greenhouse_sync`
-- shared signing and verification helpers
-- shared event envelope
-- delivery worker and receipt logging
+### Phase 1 - Foundation — `complete` (TASK-006)
+- Canonical tables in `greenhouse_sync` (5 tables)
+- Shared signing and verification helpers (`src/lib/webhooks/signing.ts`)
+- Shared event envelope (`src/lib/webhooks/envelope.ts`)
+- Delivery worker and receipt logging (`src/lib/webhooks/dispatcher.ts`)
+- Inbound gateway (`POST /api/webhooks/[endpointKey]`)
+- Outbound dispatcher cron (`/api/cron/webhook-dispatch`, every 2 min)
 
-### Phase 2 - First inbound adopter
-- migrate Teams attendance ingestion to the generic inbound gateway
+### Phase 2 - First inbound adopter — `complete` (TASK-006)
+- Teams attendance ingestion migrated to generic inbound gateway
 
-### Phase 3 - First outbound adopters
-- fan out one or two existing outbox-backed event families to webhook subscriptions
-- recommended first domains: `finance` and `hr.leave_request`
+### Phase 3 - First outbound consumer — `complete` (TASK-125)
+- Internal canary subscription validates E2E pipeline
+- Schema + subscription + deliveries ya fueron validados en `staging`
+- `Protection Bypass for Automation` quedó integrado al target del canary para atravesar `Deployment Protection`
+- Validación real ejecutada:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - canary receipt `HTTP 200`
 
-### Phase 4 - Operational visibility
-- admin or internal read-only surface for receipts, deliveries, failures, and dead letters
+### Phase 4 - Operational visibility — `complete` (TASK-108, TASK-112)
+- Admin Center shows endpoint/subscription/delivery counters
+- Dead-letter and failure tracking visible in Ops Health
+- Manual dispatch button available
+- Canary activation button available
+
+### Phase 5 - Real consumers — `to-do` (TASK-128)
+
+Cinco slices ordenados por impacto vs esfuerzo:
+
+#### 5a. Slack como consumer outbound (~1h)
+- Subscription con `target_url` apuntando a un relay interno que formatea el envelope en texto legible para Slack
+- Eventos: `payroll_period.closed`, `payroll_period.exported`, `finance.dte.discrepancy_found`
+- Diferencia con `sendSlackAlert()` directo: auditable, con retries, dead-letter, visible en Admin Center
+
+#### 5b. Invalidación de cache interna (~1.5h)
+- Subscription self-loop a endpoint de invalidación
+- `compensation_version.created` → invalidar payroll proyectado
+- `assignment.created/updated` → invalidar capacity economics
+- Reduce latencia de horas a minutos sin re-computar snapshots completos
+
+#### 5c. Nubox push (~2h)
+- Invertir el flujo de pull diario a push en tiempo real
+- `finance.income.created` / `finance.expense.created` → push a API de Nubox
+- Cron `nubox-sync` se mantiene como safety net de reconciliación
+
+#### 5d. Notificaciones in-app via webhook bus (~2h) — mayor impacto en UX
+- Consumer que recibe eventos del bus y llama a `dispatchNotification()` de `notification-service.ts`
+- La campanita del navbar muestra actividad real alimentada por el bus de eventos
+- Preferencias in-app/email del usuario se respetan automáticamente (TASK-023)
+- Mapeo declarativo evento → notificación (recipients, título, action_url)
+- Cada nuevo event type genera notificaciones con solo agregar un mapping
+
+#### 5e. Data Node / consumers externos (futuro)
+- Partners o servicios externos se suscriben a eventos vía API
+- Requiere admin UI para gestión de subscriptions + documentación pública del event catalog
+
+#### Diagrama de consumers
+
+```
+                              outbox_events
+                                    │
+                    ┌───────────────┼───────────────┬──────────────────┐
+                    │               │               │                  │
+              BigQuery pub    Reactive proj    Webhook dispatch    (future)
+              (analytics)    (serving interno)       │
+                                              ┌─────┼─────┬──────────┐
+                                              │     │     │          │
+                                          Slack   Cache  Nubox   In-app
+                                          relay   inval  push    notifications
+                                              │     │     │          │
+                                           #channel stale  API    campanita
+                                                   flag  call    + email
+```
 
 ## Explicit Non-Goals For V1
 

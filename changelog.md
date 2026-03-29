@@ -7,6 +7,59 @@
 
 ## 2026-03-29
 
+### TASK-125 webhook activation closed in staging
+- El canary outbound ya quedó validado end-to-end en `staging` con `HTTP 200` real.
+- Vercel ya tenía `Protection Bypass for Automation` habilitado; el portal ahora lo consume vía `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`.
+- La canary subscription quedó alineada a `finance.income.nubox_synced` y el dispatcher ya prioriza eventos `published` más recientes para evitar starvation de subscriptions nuevas.
+
+### TASK-125 canary target now supports optional Vercel protection bypass
+- La seed route del canary ya puede construir el target con `x-vercel-protection-bypass` de forma opcional.
+- Se soporta una env dedicada (`WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`) con fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`.
+- El repo ya no necesita más cambios para atravesar `Deployment Protection`; el remanente quedó concentrado en habilitar y cargar ese secreto en Vercel.
+
+### TASK-125 reduced to Vercel deployment-protection bypass
+- La capa de webhooks ya quedó alineada a Secret Manager refs y el schema de webhooks fue provisionado en la base usada por `staging`.
+- `wh-sub-canary` ya pudo generar deliveries reales desde `webhook-dispatch`; el bus outbound dejó de estar idle.
+- El bloqueo restante es externo al repo: `dev-greenhouse.efeoncepro.com` responde `401 Authentication Required` al self-loop del canary por `Vercel Deployment Protection`.
+
+### TASK-125 webhook canary now supports Secret Manager refs
+- La capa de webhooks quedó alineada al helper canónico de secretos.
+- `inbound`, `outbound` y el canary interno ya soportan `WEBHOOK_CANARY_SECRET_SECRET_REF` además del env legacy.
+- Esto permite activar `TASK-125` en Vercel sin exponer el secreto crudo cuando ya existe en Secret Manager.
+
+### TASK-127 created for Cloud architecture consolidation
+- Se creó `TASK-127` como follow-on explícito para consolidar la lectura de arquitectura Cloud después del baseline ya implementado.
+- El objetivo de esta lane no es reabrir hardening ya cerrado, sino sintetizar el estado real por dominio, reducir drift documental y ordenar la siguiente ola de mejoras.
+
+### TASK-102 closed after restore verification
+- Se completó el restore test end-to-end de Cloud SQL con el clone efímero `greenhouse-pg-restore-test-20260329d`.
+- La verificación SQL confirmó datos en tablas críticas y schemata esperados (`greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`).
+- El clone se eliminó después del check y no quedaron instancias temporales vivas.
+- `TASK-102` queda cerrada: PITR, WAL retention, slow query logging, pool runtime `15` y restore confidence ya tienen evidencia operativa completa.
+
+### TASK-102 external validation narrowed the remaining gap
+- Se confirmó en GCP la postura activa de `greenhouse-pg-dev`: `PITR`, WAL retention, `log_min_duration_statement=1000`, `log_statement=ddl` y `sslMode=ENCRYPTED_ONLY`.
+- `staging` y `production` respondieron por `vercel curl /api/internal/health` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true` y `maxConnections=15`.
+- Cloud Logging ya mostró una slow query real con `duration: 1203.206 ms` para `SELECT pg_sleep(1.2)`.
+- `TASK-102` sigue abierta solo por el restore test end-to-end; los clones efímeros intentados en esta sesión se limpiaron para no dejar infraestructura temporal viva.
+
+### TASK-099 closed with CSP report-only baseline
+- `src/proxy.ts` ahora suma `Content-Security-Policy-Report-Only` sobre la baseline previa de security headers.
+- `pnpm exec vitest run src/proxy.test.ts`, `eslint`, `tsc --noEmit` y `pnpm build` pasaron con el nuevo header.
+- `TASK-099` queda cerrada para el alcance seguro de hardening cross-cutting; el endurecimiento futuro de `CSP` ya no bloquea esta lane.
+
+### TASK-099 scope aligned with the validated proxy baseline
+- `TASK-099` se re-acotó documentalmente para reflejar el estado real del repo.
+- El baseline ya validado incluye solo `src/proxy.ts`, headers estáticos, matcher conservador y `HSTS` en `production`.
+- `Content-Security-Policy` queda explícitamente como follow-on pendiente, no como criterio ya cumplido del slice actual.
+
+### TASK-096 closed after WIF + Cloud SQL hardening
+- `TASK-096` queda cerrada para el alcance declarado:
+  - baseline WIF-aware en repo
+  - rollout WIF validado en `preview`, `staging` y `production`
+  - hardening externo de Cloud SQL aplicado
+- La Fase 3 de secretos críticos quedó absorbida posteriormente por `TASK-124`.
+
 ### TASK-098 observability MVP closed in production
 - `main` absorbió `develop` en `bcbd0c3` y `production` quedó validada con `observability=ok`.
 - `GET /api/internal/health` ya reporta en producción:

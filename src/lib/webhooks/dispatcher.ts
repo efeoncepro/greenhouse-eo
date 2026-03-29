@@ -50,7 +50,7 @@ export const dispatchPendingWebhooks = async (options?: {
      FROM greenhouse_sync.outbox_events
      WHERE status = 'published'
        AND occurred_at > NOW() - INTERVAL '24 hours'
-     ORDER BY occurred_at ASC
+     ORDER BY published_at DESC NULLS LAST, occurred_at DESC
      LIMIT $1`,
     [batchSize]
   )

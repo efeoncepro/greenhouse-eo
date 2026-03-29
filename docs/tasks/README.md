@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-126`
+- siguiente ID disponible: `TASK-127`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -38,9 +38,6 @@ Primer bloque operativo asignado:
 | `TASK-083` | [TASK-083-compensation-drawer-enterprise-ux-redesign.md](complete/TASK-083-compensation-drawer-enterprise-ux-redesign.md) | P1 | Alto | Medio | Cerrada | Preview con secciones semánticas, salary base como chip, accordion MUI, font mono, micro-copy conciso. |
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
-| `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, WAL retention, slow query logging y pool `15` ya aplicados; restore clone en curso para cerrar la verificación |
-| `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](in-progress/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Implementación | Lane WIF/OIDC y hardening Cloud SQL ya absorbida; queda como referencia viva del track cloud |
-| `TASK-099` | [TASK-099-security-headers-middleware.md](in-progress/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Implementación | Slice 1 activo: proxy de headers estáticos con matcher conservador; CSP real diferida por riesgo |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
@@ -70,8 +67,12 @@ Primer bloque operativo asignado:
 
 ### Prioridad vigente — bloque `TASK-098` a `TASK-103`
 
-- Orden recomendado de ejecución a 2026-03-29: `TASK-100` → `TASK-099` → `TASK-098` → `TASK-101` → `TASK-102` → `TASK-103`.
-- Criterio: primero guardrails transversales baratos (`CI`), luego middleware de headers seguro y barato, después observabilidad externa ya apoyada en esa capa, y luego el resto del hardening cloud.
+- Estado consolidado a 2026-03-29:
+  - `TASK-100`, `TASK-099`, `TASK-098`, `TASK-101` y `TASK-102` ya quedaron cerradas
+  - el remanente operativo del bloque se concentra en `TASK-103`
+- `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
+- `TASK-127` nace como follow-on institucional para consolidar la lectura arquitectónica Cloud post-baseline, sin reabrir lanes ya cerradas.
+- Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
 
@@ -90,7 +91,7 @@ Primer bloque operativo asignado:
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-117` → `TASK-030`.
 - **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
-- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-099` → `TASK-102` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
+- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
@@ -151,10 +152,9 @@ Primer bloque operativo asignado:
 | 24 | `TASK-019` | [TASK-019-staff-augmentation-module.md](to-do/TASK-019-staff-augmentation-module.md) | P2 | Alto | Alto | Diseño | Placements de staff aug sobre assignments, people y services |
 | 25 | `TASK-020` | [TASK-020-frameio-bigquery-analytics-pipeline.md](to-do/TASK-020-frameio-bigquery-analytics-pipeline.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
 | 26 | `TASK-100` | [TASK-100-ci-pipeline-test-step.md](complete/TASK-100-ci-pipeline-test-step.md) | P1 | Alto | Muy bajo | **Cerrada** | **[Hardening 1/7]** CI ahora ejecuta `pnpm test` entre lint y build con timeout de 5 minutos |
-| 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](in-progress/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Implementación | **[Hardening 2/7]** Slice 1 activo: `proxy.ts` con headers estáticos y matcher conservador; CSP real diferida |
+| 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 2/7]** Baseline de seguridad cross-cutting cerrada: `proxy.ts`, headers estáticos, `HSTS` en `production` y `CSP-Report-Only` |
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 5/7]** Helper único `requireCronAuth()` ya migró 19 rutas scheduler-driven con fail-closed y timing-safe comparison |
-| 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, flags y pool `15` ya aplicados; restore clone pendiente de completar y verificar |
-| 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
+| 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](in-progress/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Bajo | Implementación | **[Hardening 7/7]** Cost guard automático en 50+ queries, Slack alert + Admin Center UI para blocked queries; pendiente: budget alerts GCP Console |
 | 35 | `TASK-107` | [TASK-107-auth-email-verification-request-flow.md](to-do/TASK-107-auth-email-verification-request-flow.md) | P2 | Medio | Medio | Diseño | Endpoint request de verificación de email + token `verify` + envío con `verify_email` |
 | 36 | `TASK-108` | [TASK-108-admin-center-governance-shell.md](complete/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | **Cerrada** | Baseline del shell de `Admin Center`: landing institucional, taxonomía de governance y dominios `Cloud & Integrations` + `Ops Health` |
 | 37 | `TASK-109` | [TASK-109-projected-payroll-runtime-hardening-observability.md](to-do/TASK-109-projected-payroll-runtime-hardening-observability.md) | P1 | Alto | Medio | Diseño | Hardening post `TASK-063`: sin DDL runtime + health de proyección + contrato downstream de `payroll.projected_*` |
@@ -170,7 +170,9 @@ Primer bloque operativo asignado:
 | 47 | `TASK-120` | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | P2 | Medio | Bajo | **Absorbida** | Follow-on absorbido por la unificación efectiva de `Admin Center + Control Tower` |
 | 48 | `TASK-122` | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | P1 | Alto | Medio | **Cerrada** | Baseline del dominio Cloud cerrada: operating model canónico + capa mínima real en `src/lib/cloud/*` para dar base a `TASK-100` a `TASK-103` |
 | 49 | `TASK-123` | [TASK-123-nexa-product-hardening.md](to-do/TASK-123-nexa-product-hardening.md) | P1 | Muy alto | Alto | Diseño | Streaming, tool results como cards ricas, code copy, timestamps, shortcuts, context chips, export, runtime compartido |
-| 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](to-do/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | Diseño | Activar infraestructura de webhooks (TASK-006): registrar primer endpoint + subscription, validar flujo E2E, llevar Admin Center de warning a ok |
+| 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](complete/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | **Cerrada** | Primer consumer outbound validado E2E en `staging`: schema provisionado, canary self-loop con Secret Manager + Vercel bypass, delivery `HTTP 200` y counters activos para Admin Center |
+| 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
+| 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
@@ -215,6 +217,9 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 ## Complete
 
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
+| [TASK-096-gcp-secret-management-security-hardening.md](complete/TASK-096-gcp-secret-management-security-hardening.md) | Hardening cloud cerrado para su alcance útil: WIF/OIDC validado en `preview` + `staging` + `production`, Cloud SQL externo endurecido y Fase 3 absorbida posteriormente por `TASK-124`. |
+| [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | Baseline de security headers cerrada: `src/proxy.ts`, matcher conservador, `HSTS` en `production` y `Content-Security-Policy-Report-Only` como capa segura de observación. |
+| [TASK-102-database-resilience-baseline.md](complete/TASK-102-database-resilience-baseline.md) | Baseline de resiliencia de Cloud SQL cerrada: PITR + WAL retention, slow query logging, pool runtime `15`, health runtime validado en `staging` + `production` y restore test end-to-end documentado con clone efímero verificado y limpiado. |
 | [TASK-009-greenhouse-home-nexa.md](complete/TASK-009-greenhouse-home-nexa.md) | Baseline principal de `Home + Nexa v2` cerrada: `/home` materializado, snapshot server-side, Nexa operativo y evolución posterior derivada a `TASK-119` y `TASK-110`. |
 | [TASK-114-nexa-backend-persistence-suggestions.md](complete/TASK-114-nexa-backend-persistence-suggestions.md) | Backend de Nexa cerrado: persistencia de conversación y feedback en PostgreSQL, thread history, `threadId` y follow-up suggestions dinámicas listas para consumo UI. |
 | [TASK-108-admin-center-governance-shell.md](complete/TASK-108-admin-center-governance-shell.md) | Baseline del shell de `Admin Center` cerrada: `/admin` como landing institucional, taxonomía de governance y dominios iniciales de control plane. |
@@ -222,6 +227,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [TASK-098-observability-mvp.md](complete/TASK-098-observability-mvp.md) | Observability MVP cerrada: health interno endurecido, Sentry runtime + source maps operativos y Slack cron alerts validadas en `staging` y `production`. |
 | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | Cron auth centralizado con `requireCronAuth()`, fail-closed en ausencia de `CRON_SECRET`, comparación timing-safe y migración de 19 rutas scheduler-driven. |
 | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | Capa Cloud institucionalizada como dominio interno de governance: operating model canónico, boundary de surfaces y baseline real en `src/lib/cloud/*` para `TASK-100` a `TASK-103`. |
+| [TASK-125-webhook-activation-first-consumers.md](complete/TASK-125-webhook-activation-first-consumers.md) | Primer consumer outbound validado E2E en `staging`: schema de webhooks provisionado, canary interno con Secret Manager + Vercel bypass, delivery `HTTP 200` y baseline lista para futuros consumers reales. |
 | [TASK-119-home-landing-rollout-navigation-cutover.md](complete/TASK-119-home-landing-rollout-navigation-cutover.md) | Cutover de landing completado: internos/admin aterrizan en `/home`, sesiones legadas se normalizan y la verificación manual del flujo de login/landing quedó cerrada. |
 | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | Follow-on absorbido por la consolidación posterior de `Admin Center`; `/internal/dashboard` redirige a `/admin` y el shell unificado ya no necesita esta lane separada. |
 | [TASK-111-admin-center-secret-ref-governance-ui.md](complete/TASK-111-admin-center-secret-ref-governance-ui.md) | Tabla de governance de secret refs con dirección inbound/outbound, auth mode, owner, scope, estado y verificación. Nunca expone valores crudos. |

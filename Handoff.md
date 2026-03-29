@@ -4,6 +4,154 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-125 cerrada con validación E2E real en staging
+
+### Completado
+- `TASK-125` ya quedó validada end-to-end en `staging`.
+- Se confirmó que el proyecto ya tenía `Protection Bypass for Automation` activo en Vercel.
+- `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET` quedó cargado en `staging`.
+- La canary subscription `wh-sub-canary` quedó apuntando al deployment protegido con `x-vercel-protection-bypass`.
+- Validación real:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - `HTTP 200` en el canary
+  - `webhook_delivery_id=wh-del-b9dc275a-f5b5-4104-adcd-d9519fa3794c`
+- Ajustes de baseline dejados en repo:
+  - `seed-canary` usa `finance.income.nubox_synced` como familia activa observada en `staging`
+  - el dispatcher ya prioriza eventos `published` más recientes para no hambrear subscriptions nuevas
+
+## Sesión 2026-03-29 — TASK-125 canary soporta bypass opcional de Vercel
+
+### Completado
+- `POST /api/admin/ops/webhooks/seed-canary` ya puede registrar el target del canary con bypass opcional de `Deployment Protection`.
+- Contrato soportado:
+  - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
+  - fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`
+
+## Sesión 2026-03-29 — TASK-125 casi cerrada, bloqueada por Vercel Deployment Protection
+
+### Completado
+- `WEBHOOK_CANARY_SECRET_SECRET_REF` quedó cargado en Vercel `staging`.
+- El schema de webhooks quedó provisionado en la base usada por `develop/staging`; antes solo existía `outbox_events`.
+- Se activó `wh-sub-canary` en DB y se validó el dispatcher con tráfico real:
+  - `eventsMatched=3`
+  - `deliveriesAttempted=3`
+  - attempts registrados en `greenhouse_sync.webhook_delivery_attempts`
+- Se verificó también que la base usada por `production/main` ya ve las tablas de webhooks provisionadas.
+
+### Bloqueo real
+- El self-loop a `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary` no falla por firma ni por schema.
+- Falla por `Vercel Deployment Protection`: los attempts reciben `401 Authentication Required` antes de llegar al route handler.
+- El remanente real de `TASK-125` ya no es repo ni Postgres; es definir el mecanismo de bypass/target para que el canary pueda atravesar la protección de Vercel en entornos compartidos.
+
+## Sesión 2026-03-29 — TASK-125 canary alineada a Secret Manager
+
+### Completado
+- `src/lib/webhooks/signing.ts` ya no resuelve secretos solo por env plano; ahora usa el helper canónico de Secret Manager.
+- Impacto práctico:
+  - inbound webhooks
+  - outbound deliveries
+  - `POST /api/internal/webhooks/canary`
+  ya soportan `*_SECRET_REF` además del env legacy.
+- `TASK-125` ya no requiere exponer `WEBHOOK_CANARY_SECRET` crudo en Vercel si el secreto ya existe en Secret Manager.
+
+## Sesión 2026-03-29 — TASK-127 creada como follow-on de consolidación Cloud
+
+### Completado
+- Se creó `TASK-127` para capturar la siguiente necesidad institucional del dominio Cloud:
+  - scorecard semáforo por dominio
+  - cleanup de drift documental residual
+  - plan corto de “next hardening wave”
+- La task no reabre lanes ya cerradas; sirve para consolidar la lectura post-baseline después de `TASK-096`, `TASK-098`, `TASK-099`, `TASK-102`, `TASK-103`, `TASK-124` y `TASK-126`.
+
+## Sesión 2026-03-29 — TASK-102 cerrada
+
+### Completado
+- Se completó el restore test end-to-end con el clone efímero `greenhouse-pg-restore-test-20260329d`.
+- Verificación SQL real sobre el clone:
+  - `payroll_entries=6`
+  - `identity_profiles=40`
+  - `outbox_events=1188`
+  - schemata presentes: `greenhouse_core`, `greenhouse_payroll`, `greenhouse_sync`
+- El clone fue eliminado después de validar datos y `gcloud sql instances list` volvió a mostrar solo `greenhouse-pg-dev`.
+- `TASK-102` ya no queda abierta:
+  - PITR y WAL retention verificados
+  - slow query logging con evidencia real en Cloud Logging
+  - runtime health confirmado en `staging` y `production`
+  - restore verification ya documentada de punta a punta
+
+## Sesión 2026-03-29 — TASK-102 validación externa casi cerrada
+
+### Completado
+- Se confirmó postura real de `greenhouse-pg-dev` en GCP:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+  - `sslMode=ENCRYPTED_ONLY`
+- `pnpm pg:doctor --profile=runtime` y `pnpm pg:doctor --profile=migrator` pasaron por connector contra `greenhouse-pg-dev`.
+- Slow query logging ya quedó verificada con evidencia real en Cloud Logging:
+  - `duration: 1203.206 ms`
+  - `statement: SELECT pg_sleep(1.2)`
+- `staging` y `production` también quedaron revalidadas por `vercel curl /api/internal/health`:
+  - `postgres.status=ok`
+  - `usesConnector=true`
+  - `sslEnabled=true`
+  - `maxConnections=15`
+
+### Pendiente inmediato
+- En ese momento, el único remanente real de `TASK-102` era el restore test end-to-end.
+- Dos clones efímeros fueron creados y limpiados:
+  - `greenhouse-pg-restore-test-20260329b`
+  - `greenhouse-pg-restore-test-20260329c`
+- El primero se eliminó antes de completar la verificación SQL y el segundo quedó demasiado tiempo en `PENDING_CREATE`; ese remanente ya quedó resuelto después con el clone `greenhouse-pg-restore-test-20260329d`.
+
+## Sesión 2026-03-29 — TASK-099 cerrada con `CSP-Report-Only`
+
+### Completado
+- `TASK-099` queda cerrada para su baseline segura y reversible.
+- `src/proxy.ts` ahora agrega también `Content-Security-Policy-Report-Only` con allowlist amplia para no romper:
+  - login `Azure AD` / `Google`
+  - MUI / Emotion
+  - observabilidad (`Sentry`)
+  - assets y uploads
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/proxy.test.ts`
+  - `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Decisión explícita
+- La task no intenta endurecer a `Content-Security-Policy` enforce.
+- Cualquier tightening posterior (`Report-Only` tuning, nonces, eliminación de `unsafe-*`) queda como mejora futura y ya no bloquea el hardening baseline.
+- Esa mejora futura ya quedó registrada como `TASK-126`.
+
+## Sesión 2026-03-29 — TASK-099 re-acotada al baseline real
+
+### Completado
+- Se revisó `TASK-099` contra el estado real de `src/proxy.ts` y `src/proxy.test.ts`.
+- Hallazgo consolidado:
+  - el repo ya tiene validado el baseline de headers estáticos
+  - la task seguía abierta con criterios mezclados de un lote futuro de `Content-Security-Policy`
+- Se re-acotó la task para reflejar correctamente el slice actual:
+  - `Status real` pasa a `Slice 1 validado`
+  - `CSP` queda explícitamente como follow-on pendiente
+  - el baseline ya no exige en falso login/uploads/dashboard bajo `CSP`
+
+### Pendiente inmediato
+- Decidir si `CSP` se implementa todavía dentro de `TASK-099` como `Report-Only` o si conviene derivarla a una task nueva para no inflar esta lane.
+
+## Sesión 2026-03-29 — TASK-096 cerrada
+
+### Completado
+- `TASK-096` deja de seguir `in-progress` y pasa a `complete`.
+- Razón de cierre:
+  - baseline WIF-aware ya validada en `preview`, `staging` y `production`
+  - hardening externo de Cloud SQL ya aplicado
+  - la Fase 3 de Secret Manager ya quedó absorbida y cerrada por `TASK-124`
+- La task queda como referencia histórica del track cloud, no como lane activa.
+
 ## Sesión 2026-03-29 — TASK-098 cerrada en `production`
 
 ### Completado
@@ -355,7 +503,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Pendiente inmediato
 - `TASK-096` ya puede apoyarse en una postura GCP explícita en código en vez de partir solo desde env vars sueltas.
 - `TASK-098` ya no necesita inventar desde cero el health endpoint ni el adapter Slack.
-- `TASK-099`, `TASK-102` y `TASK-103` siguen abiertas, pero ahora encajan sobre una capa Cloud más robusta.
+- En ese momento `TASK-099`, `TASK-102` y `TASK-103` seguían abiertas, pero hoy solo queda `TASK-103` como remanente del bloque cloud baseline.
 
 ## Sesión 2026-03-29 — TASK-102 en progreso
 
@@ -385,6 +533,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Cuando el clone quede `RUNNABLE`:
   - verificar tablas críticas
   - documentar resultado
+- Este remanente ya quedó resuelto después con el clone `greenhouse-pg-restore-test-20260329d`.
   - eliminar la instancia efímera
 
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120

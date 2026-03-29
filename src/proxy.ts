@@ -9,6 +9,23 @@ const SECURITY_HEADERS = {
   'X-DNS-Prefetch-Control': 'on'
 } as const
 
+const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "form-action 'self' https://login.microsoftonline.com https://accounts.google.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+  "style-src 'self' 'unsafe-inline' https:",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https:",
+  "connect-src 'self' https: wss:",
+  "frame-src 'self' https://login.microsoftonline.com https://accounts.google.com",
+  "worker-src 'self' blob:",
+  "manifest-src 'self'",
+  "media-src 'self' data: blob: https:"
+].join('; ')
+
 export function proxy(request: NextRequest) {
   void request
 
@@ -17,6 +34,8 @@ export function proxy(request: NextRequest) {
   for (const [headerName, headerValue] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(headerName, headerValue)
   }
+
+  response.headers.set('Content-Security-Policy-Report-Only', CONTENT_SECURITY_POLICY_REPORT_ONLY)
 
   if (process.env.VERCEL_ENV === 'production') {
     response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload')

@@ -13,6 +13,10 @@ describe('proxy', () => {
     expect(response.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
     expect(response.headers.get('Permissions-Policy')).toBe('camera=(), microphone=(), geolocation=(), browsing-topics=()')
     expect(response.headers.get('X-DNS-Prefetch-Control')).toBe('on')
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain("default-src 'self'")
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain("object-src 'none'")
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain('https://login.microsoftonline.com')
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain('https://accounts.google.com')
     expect(response.headers.has('Strict-Transport-Security')).toBe(false)
   })
 

@@ -3,6 +3,69 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-125 cerrada
+- `TASK-125` quedó cerrada con validación E2E real en `staging`.
+- Baseline operativo vigente:
+  - `POST /api/admin/ops/webhooks/seed-canary` registra una subscription interna self-loop
+  - el target del canary soporta bypass opcional de `Deployment Protection`
+  - `WEBHOOK_CANARY_SECRET_SECRET_REF` ya sirve el secreto desde Secret Manager en `staging`
+  - el primer consumer canónico usa `finance.income.nubox_synced` como familia activa de bajo riesgo
+- Validación real ejecutada:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - canary receipt `HTTP 200`
+- Ajuste estructural derivado:
+  - `src/lib/webhooks/dispatcher.ts` ahora prioriza eventos `published` más recientes dentro de la ventana de 24h, para evitar starvation de subscriptions recién activadas
+
+## Delta 2026-03-29 TASK-102 cerrada
+- `TASK-102` quedó cerrada con verificación externa completa.
+- Evidencia final incorporada:
+  - `PITR=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+  - `staging` y `production` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true`, `maxConnections=15`
+  - slow query real visible en Cloud Logging
+  - restore test exitoso vía clone efímero `greenhouse-pg-restore-test-20260329d`
+- El clone de restore se verificó por SQL y luego se eliminó; no quedaron instancias temporales vivas.
+
+## Delta 2026-03-29 TASK-102 casi cerrada
+- `TASK-102` ya no está bloqueada por postura de Cloud SQL ni por rollout runtime.
+- Validaciones externas ya confirmadas:
+  - `PITR=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+  - `sslMode=ENCRYPTED_ONLY`
+  - `staging` y `production` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true`, `maxConnections=15`
+- `Cloud Logging` ya mostró una slow query real (`SELECT pg_sleep(1.2)` con `duration: 1203.206 ms`).
+- Ese remanente ya quedó resuelto con un restore test limpio y documentado.
+
+## Delta 2026-03-29 TASK-099 cerrada
+- `TASK-099` ya quedó cerrada para el alcance baseline de hardening seguro.
+- `src/proxy.ts` ahora materializa:
+  - headers estáticos cross-cutting
+  - `Strict-Transport-Security` solo en `production`
+  - `Content-Security-Policy-Report-Only` como capa de observación no bloqueante
+- Decisión operativa vigente:
+  - el baseline de seguridad headers ya no depende de introducir `CSP` enforce
+  - cualquier tightening posterior de `CSP` se considera mejora futura, no blocker del track cloud
+
+## Delta 2026-03-29 TASK-099 re-scoped to the validated baseline
+- `TASK-099` sigue `in-progress`, pero ya no debe interpretarse como si el repo tuviera `Content-Security-Policy`.
+- Estado real consolidado:
+  - `src/proxy.ts` ya aplica headers estáticos cross-cutting
+  - `Strict-Transport-Security` ya se limita a `production`
+  - el matcher ya evita `_next/*` y assets estáticos
+- Lo pendiente de la lane es solo `CSP`, que se mantiene diferida por riesgo sobre:
+  - MUI/Emotion
+  - OAuth
+  - uploads/assets
+- Decisión operativa vigente:
+  - no cerrar `TASK-099` en falso
+  - no introducir `CSP` sin rollout controlado tipo `Report-Only` o equivalente
+
 ## Delta 2026-03-29 Observability MVP cerrada
 - `TASK-098` quedó cerrada tras validación en `staging` y `production`.
 - `production` ya valida:
@@ -203,7 +266,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime del portal también quedó alineado al nuevo pool target:
   - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` en `Production`, `staging` y `Preview (develop)`
   - fallback por defecto del repo subido a `15`
-- El restore test todavía no estaba cerrado al final de esta actualización; se lanzó el clone `greenhouse-pg-restore-test-20260329` y su verificación/eliminación siguen como remanente operativo.
+- Ese remanente ya quedó resuelto después en la misma fecha con un restore test limpio y documentado sobre `greenhouse-pg-restore-test-20260329d`.
 
 ## Delta 2026-03-29 Cloud layer robustness expansion
 - La capa `src/lib/cloud/*` ahora incorpora posture helpers reutilizables para el siguiente bloque `TASK-096` a `TASK-103`.
@@ -214,6 +277,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `src/lib/alerts/slack-notify.ts` como adapter base de alertas operativas
 - `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL, no solo reachability y cost guard.
 - Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
+
+## Delta 2026-03-29 TASK-096 cerrada
+- `TASK-096` ya quedó cerrada para su alcance útil.
+- Estado consolidado:
+  - WIF/OIDC validado en `preview`, `staging` y `production`
+  - Cloud SQL externo endurecido
+  - Fase 3 de Secret Manager absorbida y cerrada por `TASK-124`
 
 ## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
 - `TASK-096` quedó iniciada en el repo con baseline real en código; esta sesión trabajó sobre el estado actual de `develop`.

@@ -145,7 +145,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 | Observability | 1/10 | `console.error()` only, zero external alerting |
 | CI/CD Validation | 3/10 | Lint + build only, 86 test files not in CI |
 | API Auth Consistency | 4/10 | 2 inconsistent cron auth patterns, no timing-safe |
-| Database Resilience | 6/10 | PITR, WAL retention, slow query logging y pool `15` ya avanzaron; restore test sigue pendiente |
+| Database Resilience | 8/10 | PITR, WAL retention, slow query logging, pool `15` y restore test manual ya quedaron verificados |
 | Cost Visibility | 0/10 | No budget alerts, no BigQuery cost guards |
 
 ### 2.3 Threat Model
@@ -158,7 +158,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
 | BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
 | Silent production failure | **High** — zero alerting on cron/webhook/projection failures | Data inconsistency, delayed detection |
-| Backup unusable | **Medium** — PITR ya existe, pero el restore test todavía no quedó completamente verificado/cerrado | Unable to recover from corruption |
+| Backup unusable | **Low** — PITR ya existe y el restore test manual quedó verificado con clone efímero | Unable to recover from corruption |
 
 ---
 
@@ -371,7 +371,7 @@ requireCronAuth(request)
 | **1** | TASK-100 (CI tests), TASK-099 (headers), TASK-096 Fase 1 (Cloud SQL), TASK-103 (budgets) | All four in parallel | Cloud SQL must stay accessible from Vercel post-restriction |
 | **2-3** | TASK-096 Fase 2 (WIF), TASK-098 (Sentry + health + Slack) | Parallel | WIF must work in staging before touching production |
 | **3** | TASK-101 (cron auth standardization) | After TASK-098 (uses Slack alerting) | All 18 crons must pass auth after migration |
-| **4** | TASK-096 Fase 3 (Secret Manager), TASK-102 (DB resilience) | Parallel | Restore test must succeed before closing |
+| **4** | TASK-096 Fase 3 (Secret Manager), TASK-102 (DB resilience) | Parallel | Restore test succeeded; lane closed for baseline scope |
 
 ### Task Cross-Reference
 
@@ -382,7 +382,7 @@ requireCronAuth(request)
 | GCP Secret Management (3 phases) | TASK-096 | **3 of 7** | 2w | Fase 2 needs Fase 1 complete |
 | Observability MVP | TASK-098 | **4 of 7** | 1d | TASK-096 Fase 1 (health check validates post-hardening) |
 | Cron Auth Standardization | TASK-101 | **5 of 7** | 2h | TASK-098 (integrates Slack alerting) |
-| Database Resilience Baseline | TASK-102 | **6 of 7** | 0.5d | TASK-096 Fase 1 (no concurrent Cloud SQL changes) |
+| Database Resilience Baseline | TASK-102 | **Closed** | 0.5d | TASK-096 Fase 1 (no concurrent Cloud SQL changes) |
 | GCP Budget Alerts | TASK-103 | **7 of 7** | 30m | None (independent) |
 
 ---

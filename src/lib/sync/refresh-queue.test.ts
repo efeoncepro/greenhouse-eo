@@ -6,7 +6,7 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
-import { buildRefreshQueueId, enqueueRefresh, markRefreshCompleted, markRefreshFailed } from './refresh-queue'
+import { buildRefreshQueueId, enqueueRefresh, markRefreshCompleted, markRefreshFailed, claimOrphanedRefreshItems } from './refresh-queue'
 
 describe('refresh queue helpers', () => {
   beforeEach(() => {
@@ -59,5 +59,45 @@ describe('refresh queue helpers', () => {
       expect.stringContaining('retry_count = retry_count + 1'),
       ['queue-2', 3, 'boom']
     )
+  })
+
+  describe('claimOrphanedRefreshItems', () => {
+    it('claims orphaned pending/processing items older than stale threshold', async () => {
+      mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+        {
+          queueId: 'org360:organization:org-1',
+          projectionName: 'organization_360',
+          entityType: 'organization',
+          entityId: 'org-1',
+          priority: 2,
+          attempts: 1
+        }
+      ])
+
+      const items = await claimOrphanedRefreshItems(10, 30)
+
+      expect(items).toHaveLength(1)
+      expect(items[0]).toEqual({
+        queueId: 'org360:organization:org-1',
+        projectionName: 'organization_360',
+        entityType: 'organization',
+        entityId: 'org-1',
+        priority: 2,
+        attempts: 1
+      })
+
+      expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
+        expect.stringContaining("status = 'pending'"),
+        [10, 30]
+      )
+    })
+
+    it('returns empty array when no orphans exist', async () => {
+      mockRunGreenhousePostgresQuery.mockResolvedValueOnce([])
+
+      const items = await claimOrphanedRefreshItems()
+
+      expect(items).toHaveLength(0)
+    })
   })
 })

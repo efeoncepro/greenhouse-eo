@@ -331,9 +331,15 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | Path | Schedule (UTC) | Purpose |
 |------|----------------|---------|
 | `/api/cron/outbox-publish` | `*/5 * * * *` (every 5 min) | Consumes the Postgres transactional outbox and publishes events to BigQuery |
+| `/api/cron/outbox-react` | `*/5 * * * *` (every 5 min) | Processes reactive projections (all domains sequentially) |
+| `/api/cron/webhook-dispatch` | `*/2 * * * *` (every 2 min) | Dispatches pending outbound webhooks to subscribed endpoints |
+| `/api/cron/email-delivery-retry` | `*/5 * * * *` (every 5 min) | Retries failed email deliveries |
+| `/api/cron/projection-recovery` | `*/15 * * * *` (every 15 min) | Recovers orphaned projection refresh items stuck as pending/processing >30 min |
 | `/api/cron/sync-conformed` | `45 3 * * *` (daily 3:45 AM) | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
 | `/api/cron/ico-materialize` | `15 6 * * *` (daily 6:15 AM) | Materializes ICO Engine monthly metric snapshots from conformed and raw data |
+| `/api/cron/nubox-sync` | `30 7 * * *` (daily 7:30 AM) | Syncs Nubox DTE and financial data |
 | `/api/finance/exchange-rates/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres |
+| `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC) |
 
 ---
 
@@ -398,7 +404,7 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 | No security headers | **Medium** | No middleware.ts, no CSP/HSTS/X-Frame-Options | Create middleware.ts with security headers | TASK-099 |
 | Silent production failures | **High** | console.error() only, zero alerting | Sentry + health endpoint + Slack alerts | TASK-098 |
 | Inconsistent cron auth | **Medium** | 2 patterns, some fail-open, no timing-safe | Centralized requireCronAuth() helper | TASK-101 |
-| Restore test pendiente | **Medium** | PITR ya está habilitado, pero el restore test no quedó cerrado | Completar prueba de restore y documentar evidencia | TASK-102 |
+| Restore test pendiente | **Resolved** | Restore test ya quedó verificado con clone efímero y evidencia SQL documentada | Mantener runbook y repetir ante cambios mayores de postura | TASK-102 |
 | No cost visibility | **Low** | Zero budget alerts | GCP budget alerts + BigQuery cost guards | TASK-103 |
 
 ### Priority Actions

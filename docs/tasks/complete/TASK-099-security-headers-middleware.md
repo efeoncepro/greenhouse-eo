@@ -1,5 +1,25 @@
 # TASK-099 — Security Headers & Next.js Proxy
 
+## Delta 2026-03-29 — Task cerrada con `CSP-Report-Only`
+
+- `TASK-099` queda cerrada para el alcance seguro y verificable de esta lane.
+- El runtime ya incorpora:
+  - headers estáticos cross-cutting
+  - `Strict-Transport-Security` en `production`
+  - `Content-Security-Policy-Report-Only` con política amplia para no romper login, MUI, observabilidad ni assets
+- La decisión explícita es no endurecer a `Content-Security-Policy` enforce dentro de esta task.
+- Cualquier endurecimiento posterior (`Report-Only` tuning, nonces, eliminación de `unsafe-*`, allowlists más estrictas) queda como mejora futura en `TASK-126` y no bloquea el baseline de hardening.
+
+## Delta 2026-03-29 — Alcance acotado al baseline real
+
+- Se confirma que el repo ya cerró y validó solo el baseline seguro de `proxy.ts`.
+- La task ya no debe leerse como si el slice actual incluyera `Content-Security-Policy` enforce.
+- `CSP` queda explicitamente como follow-on posterior porque todavía requiere tuning sobre:
+  - MUI/Emotion
+  - OAuth (`Azure AD`, `Google`, credentials)
+  - assets estáticos y uploads
+- La task se re-acota para que el contrato documental no exija validaciones que hoy pertenecen al siguiente lote.
+
 ## Delta 2026-03-29 — Slice 1 seguro iniciado
 
 - `TASK-099` pasa a `in-progress`.
@@ -20,18 +40,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 | Sequence | Cloud Posture Hardening **2 of 6** — after TASK-100, before TASK-098 |
 
 ## Summary
 
-Crear `proxy.ts` con security headers (CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy). Hoy no existe esta capa cross-cutting y las rutas API no tienen headers de seguridad centralizados.
+Cerrar el baseline cross-cutting de seguridad vía `src/proxy.ts` para headers estáticos, `HSTS` en `production` y `Content-Security-Policy-Report-Only` como capa segura de observación. El endurecimiento estricto de `CSP` queda fuera de esta task.
 
 ## Why This Task Exists
 
@@ -63,14 +83,14 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
 
 ## Current Repo State
 
-- No existe `proxy.ts`
+- `src/proxy.ts` existe y está activo como capa cross-cutting
 - Protección autenticación: layout-level via `getServerSession()` en `src/app/(dashboard)/layout.tsx`
 - Guards de API: manuales por ruta (`requireTenantContext()`, `requireAdminTenantContext()`, etc.)
-- `next.config.ts` no define headers de seguridad
+- `next.config.ts` sigue sin definir headers; la capa canónica quedó en `proxy.ts`
 
 ## Scope
 
-### Slice 1 — Security Headers baseline (~2h)
+### Slice 1 — Security Headers baseline (~2h) — completado
 
 1. Crear `src/proxy.ts`:
    ```typescript
@@ -105,75 +125,69 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
    }
    ```
 
-2. **CSP como header separado** (diferido del primer lote por riesgo):
+2. **CSP como header separado** (aterrizado finalmente en `Report-Only`):
    ```typescript
-   // CSP inicial — permisivo, luego endurecer
+   // CSP inicial — observación segura, no enforcement
    const csp = [
      "default-src 'self'",
-     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",  // MUI/Emotion necesitan unsafe-inline
-     "style-src 'self' 'unsafe-inline'",                  // MUI emotion styles
-     "img-src 'self' data: blob: https://storage.googleapis.com",
-     "font-src 'self' data:",
-     "connect-src 'self' https://*.googleapis.com https://*.sentry.io",
+     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+     "style-src 'self' 'unsafe-inline' https:",
+     "img-src 'self' data: blob: https:",
+     "font-src 'self' data: https:",
+     "connect-src 'self' https: wss:",
+     "form-action 'self' https://login.microsoftonline.com https://accounts.google.com",
      "frame-ancestors 'none'",
+     "object-src 'none'",
    ].join('; ')
 
-   response.headers.set('Content-Security-Policy', csp)
+   response.headers.set('Content-Security-Policy-Report-Only', csp)
    ```
 
-   > Nota: CSP con `unsafe-inline` y `unsafe-eval` no es ideal, pero MUI v5/v7 con Emotion requiere inline styles. Endurecer con nonces es una mejora futura.
-   > En este primer lote no se aplica todavía para no romper login, assets o render de dashboard.
+   > Nota: `Report-Only` permite capturar la forma de la política sin bloquear tráfico. Endurecer con nonces y eliminar `unsafe-*` queda como mejora futura.
 
-### Slice 2 — Verificación y ajuste (~1h)
+### Slice 2 — Endurecimiento estricto de CSP (~1h) — fuera de alcance
 
-1. Deploy en staging
-2. Verificar que no se rompen:
+1. Revisar señales reales del `Report-Only`
+2. Introducir `Content-Security-Policy` enforce o una policy más estricta
+3. Verificar que no se rompen:
    - Login (Azure AD, Google OAuth, Credentials)
    - Dashboard con MUI components
    - Uploads de media (avatars, logos)
    - Integrations API calls (HubSpot, Notion)
    - Cron routes (no deben ser afectados por CSP)
-3. Ajustar CSP si hay violaciones (revisar Console de DevTools)
-4. Verificar headers con `curl -I`:
-   ```bash
-   curl -I https://dev-greenhouse.efeoncepro.com/login
-   # Confirmar presencia de todos los headers
-   ```
+4. Ajustar CSP si hay violaciones
+5. Decidir si esto merece una task separada
 
 ## Out of Scope
 
 - CORS explícito por ruta (requiere análisis de consumidores externos — mejora futura)
-- CSP con nonces (requiere custom Document o Emotion cache config — mejora futura)
+- CSP enforce con nonces y eliminación de `unsafe-*` (requiere tuning extra — mejora futura)
 - Rate limiting en middleware (TASK-101 maneja crons; rate limiting general es mejora futura)
 - Request correlation IDs (mejora futura post-TASK-098)
 - IP allowlisting (el portal es multi-tenant público)
 
 ## Acceptance Criteria
 
-- [ ] `src/proxy.ts` creado y funcional
-- [ ] `X-Frame-Options: DENY` presente en todas las respuestas
-- [ ] `X-Content-Type-Options: nosniff` presente
-- [ ] `Referrer-Policy: strict-origin-when-cross-origin` presente
-- [ ] `Permissions-Policy` presente (camera, microphone, geolocation denegados)
-- [ ] `Content-Security-Policy` presente (modo permisivo inicial o `Report-Only` en slice posterior)
-- [ ] `Strict-Transport-Security` presente en production
-- [ ] Login funciona correctamente (3 providers)
-- [ ] Dashboard MUI renderiza sin errores de CSP
-- [ ] Media uploads funcionan
-- [ ] Cron routes no son afectados
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `src/proxy.ts` creado y funcional
+- [x] `X-Frame-Options: DENY` presente
+- [x] `X-Content-Type-Options: nosniff` presente
+- [x] `Referrer-Policy: strict-origin-when-cross-origin` presente
+- [x] `Permissions-Policy` presente (camera, microphone, geolocation denegados)
+- [x] `Content-Security-Policy-Report-Only` presente con política amplia y segura
+- [x] `Strict-Transport-Security` presente en `production`
+- [x] matcher conservador evita `_next/*` y assets estáticos
+- [x] `pnpm exec vitest run src/proxy.test.ts` pasa
+- [x] `pnpm exec eslint src/proxy.ts src/proxy.test.ts` pasa
+- [x] `pnpm exec tsc --noEmit --pretty false` pasa
+- [x] `pnpm build` pasa para el baseline actual
+- [x] `src/proxy.test.ts` valida headers y matcher
 
 ## Verification
 
 ```bash
-# Verificar headers
-curl -sI https://dev-greenhouse.efeoncepro.com/login | grep -E "x-frame|x-content|referrer|permissions|content-security|strict-transport"
-
-# Verificar que CSP no rompe nada
-# Abrir DevTools > Console en staging y buscar CSP violations
-
-# Build validation
+# Baseline cerrado y validado
+pnpm exec vitest run src/proxy.test.ts
+pnpm exec eslint src/proxy.ts src/proxy.test.ts
+pnpm exec tsc --noEmit --pretty false
 pnpm build
-pnpm test
 ```

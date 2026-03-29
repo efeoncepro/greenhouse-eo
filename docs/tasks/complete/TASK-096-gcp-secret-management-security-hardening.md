@@ -1,5 +1,15 @@
 # TASK-096 — GCP Secret Management & Security Hardening
 
+## Delta 2026-03-29 — Task lista para cierre
+
+- El alcance útil de `TASK-096` ya quedó materializado:
+  - baseline WIF-aware en repo
+  - rollout WIF validado en `preview`, `staging` y `production`
+  - hardening externo de Cloud SQL ya aplicado (`authorizedNetworks` vacía, `sslMode=ENCRYPTED_ONLY`)
+- La Fase 3 de Secret Manager ya no pertenece a esta task:
+  - fue absorbida y cerrada por `TASK-124`
+- El remanente práctico ya no es implementación pendiente, sino solo referencia histórica del track cloud.
+
 ## Delta 2026-03-29
 
 - La Fase 3 de secretos críticos ya no queda pendiente en esta task.
@@ -76,11 +86,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 

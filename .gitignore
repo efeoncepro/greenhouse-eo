@@ -39,6 +39,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+.tmp/
 
 # typescript
 *.tsbuildinfo
@@ -57,7 +58,6 @@ src/assets/iconify-icons/generated-icons.css
 .codex/skills/greenhouse-vuexy-ui-expert/
 /CODEX_TASK_*.md
 !docs/tasks/**/CODEX_TASK*.md
-src/app/api/internal/
 src/lib/ai/
 
 .vercel
