@@ -140,6 +140,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-113` | `to-do` | Admin Center Ops Audit Trail UI | `docs/tasks/to-do/TASK-113-admin-center-ops-audit-trail-ui.md` |
 | `TASK-114` | `to-do` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/to-do/TASK-114-nexa-backend-persistence-suggestions.md` |
 | `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
+| `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 
 ## Regla de asignacion desde aqui
 

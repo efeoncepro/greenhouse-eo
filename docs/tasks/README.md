@@ -65,6 +65,11 @@ Primer bloque operativo asignado:
   - si existe `v2`, esa es la baseline de implementación
   - los briefs originales `v1` o sin sufijo quedan como referencia de producto o histórico, no como primer ejecutable
 
+### Prioridad vigente — bloque `TASK-098` a `TASK-103`
+
+- Orden recomendado de ejecución a 2026-03-28: `TASK-100` → `TASK-101` → `TASK-098` → `TASK-099` → `TASK-102` → `TASK-103`.
+- Criterio: primero guardrails transversales baratos (`CI`), luego seguridad real de crons, después visibilidad operativa, y recién luego middleware, resiliencia de base y controles de costo.
+
 ### Backlog Priorizado
 
 | Rank | Task ID                                                                                                  | Task                                                                                                                       | Prioridad | Impacto  | Esfuerzo          | Estado real                                                                                                          | Foco                                                                                                                                                                                    |
@@ -137,6 +142,7 @@ Primer bloque operativo asignado:
 | 40 | `TASK-113` | [TASK-113-admin-center-ops-audit-trail-ui.md](complete/TASK-113-admin-center-ops-audit-trail-ui.md) | P2 | Medio | Medio | **Cerrada** | Mini-task UI para audit trail con ActivityTimeline (actor, acción, resultado, follow-up) |
 | 41 | `TASK-114` | [TASK-114-nexa-backend-persistence-suggestions.md](to-do/TASK-114-nexa-backend-persistence-suggestions.md) | P1 | Alto | Medio | Diseño | **[Codex]** Backend Nexa: feedback PG, thread history, dynamic suggestions. Contratos explícitos para UI |
 | 42 | `TASK-115` | [TASK-115-nexa-ui-completion.md](to-do/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Diseño | **[Claude]** UI Nexa: edit inline, follow-up suggestions, feedback thumbs, floating modal, thread sidebar |
+| 43 | `TASK-116` | [TASK-116-sidebar-navigation-audit-remediation.md](to-do/TASK-116-sidebar-navigation-audit-remediation.md) | P2 | Alto | Bajo-Medio | Auditoría completada | **[Claude]** Sidebar: fix Spanglish, desambiguar duplicados, Gestión/Mi Ficha a submenu, agregar /home, documentar reglas |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
