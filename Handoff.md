@@ -4,6 +4,34 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-124 promovida a `develop` y validada en `staging`
+
+### Completado
+- Se armó una integración mínima desde `origin/develop` para no arrastrar el resto de `feature/codex-task-096-wif-baseline`.
+- `develop` quedó promovido a `497cb19` con los tres slices de `TASK-124`:
+  - helper canónico `src/lib/secrets/secret-manager.ts`
+  - postura de secretos en `GET /api/internal/health`
+  - migración de `NUBOX_BEARER_TOKEN`, Postgres secret refs y auth/SSO (`NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET`, `GOOGLE_CLIENT_SECRET`)
+- Validación local sobre la base integrada:
+  - `pnpm exec eslint ...`
+  - `pnpm exec vitest run src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.test.ts src/lib/postgres/client.test.ts scripts/lib/load-greenhouse-tool-env.test.ts src/lib/auth-secrets.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm pg:doctor --profile=runtime`
+- Rollout externo ya preparado:
+  - secretos nuevos creados en GCP Secret Manager para `staging` y `production`
+  - `*_SECRET_REF` cargados en Vercel `staging` y `production`
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/secretmanager.secretAccessor` sobre los secretos nuevos
+- Validación compartida en `staging`:
+  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200`
+  - `version=497cb19`
+  - `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` reportan `source=secret_manager`
+  - `GET /api/auth/session` responde `200`
+
+### Pendiente inmediato
+- `production` sigue pendiente de validación real; no se promovió a `main` en esta sesión.
+- En `staging`, `GREENHOUSE_POSTGRES_PASSWORD` todavía reporta `source=env`.
+- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en la postura runtime del portal.
+
 ## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
 
 ### Completado

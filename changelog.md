@@ -7,6 +7,15 @@
 
 ## 2026-03-29
 
+### TASK-124 promoted to `develop` and validated in `staging`
+- `develop` absorbió los tres slices de `TASK-124` en `497cb19` mediante una integración mínima desde `origin/develop`, sin arrastrar el resto de la branch auxiliar.
+- `staging` redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` validó runtime real con `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` resueltos por Secret Manager.
+- `GET /api/auth/session` en `staging` respondió `200`, confirmando que NextAuth siguió estable con el helper nuevo.
+- El rollout quedó intencionalmente transicional:
+  - `GREENHOUSE_POSTGRES_PASSWORD` todavía aparece como `env` en posture runtime de `staging`
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen sin proyección runtime allí
+  - `production` conserva los secretos y `*_SECRET_REF` preparados, pero su validación real queda pendiente hasta promover a `main`
+
 ### TASK-124 slice 1 de Secret Manager
 - Se agregó `src/lib/secrets/secret-manager.ts` como helper canónico para secretos críticos con `@google-cloud/secret-manager`, cache corta, fallback a env var y convención `<ENV_VAR>_SECRET_REF`.
 - `GET /api/internal/health` ahora expone postura de secretos críticos sin devolver valores, distinguiendo `secret_manager`, `env` y `unconfigured`.

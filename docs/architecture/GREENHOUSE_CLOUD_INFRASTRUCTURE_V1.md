@@ -6,6 +6,25 @@
 
 ---
 
+## Delta 2026-03-29 — Secret Manager rollout staged in shared environment
+
+- `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.
+- Vercel `staging` ya redeployó ese commit en `greenhouse-6hgbcuhd0-efeonce-7670142f.vercel.app`.
+- `dev-greenhouse.efeoncepro.com/api/internal/health` confirmó en runtime:
+  - `NEXTAUTH_SECRET` via `secret_manager`
+  - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
+  - `NUBOX_BEARER_TOKEN` via `secret_manager`
+- El rollout externo previo también dejó preparados en Vercel:
+  - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - `NEXTAUTH_SECRET_SECRET_REF`
+  - `AZURE_AD_CLIENT_SECRET_SECRET_REF`
+  - `GOOGLE_CLIENT_SECRET_SECRET_REF`
+  - `NUBOX_BEARER_TOKEN_SECRET_REF`
+  para `staging` y `production`, sin retirar aún los env vars legacy.
+- Estado residual observado en `staging`:
+  - `GREENHOUSE_POSTGRES_PASSWORD` todavía cae al env legacy
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
+
 ## Delta 2026-03-29 — Runtime auth baseline + Cloud SQL verified posture
 
 - El repo ya no depende solo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` para su runtime Vercel.

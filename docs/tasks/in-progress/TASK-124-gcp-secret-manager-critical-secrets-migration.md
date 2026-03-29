@@ -1,5 +1,21 @@
 # TASK-124 — GCP Secret Manager Critical Secrets Migration
 
+## Delta 2026-03-29 — Staging rollout validado en `develop`
+
+- Los commits de `TASK-124` ya fueron promovidos a `develop` en `497cb19`.
+- `staging` ya redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK`.
+- Validación real observada en `staging`:
+  - `version=497cb19`
+  - `GET /api/auth/session` responde `200`
+  - secretos críticos ya resueltos por `secret_manager`:
+    - `NEXTAUTH_SECRET`
+    - `AZURE_AD_CLIENT_SECRET`
+    - `NUBOX_BEARER_TOKEN`
+- Estado residual observado:
+  - `GREENHOUSE_POSTGRES_PASSWORD` todavía reporta `source=env` en health
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en posture runtime de `staging`
+  - `production` ya tiene secretos y `*_SECRET_REF` preparados, pero sigue pendiente validación después de promover a `main`
+
 ## Delta 2026-03-29
 
 - Nace como derivada directa del cierre operativo de `TASK-096`.
@@ -156,7 +172,8 @@ Reglas obligatorias:
 ### Gap actual
 
 - secretos críticos siguen viviendo en Vercel env vars mientras dura la transición
-- la validación real por entorno con secretos servidos desde Secret Manager sigue pendiente
+- `production` sigue pendiente de validación real con secretos servidos desde Secret Manager
+- la credencial runtime de Postgres en `staging` todavía está cayendo al env legacy
 
 ## Scope
 
@@ -197,9 +214,9 @@ Reglas obligatorias:
 - [x] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
 - [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
 - [x] `/api/internal/health` reporta postura de secretos
-- [ ] `staging` validado con al menos un secreto crítico servido desde Secret Manager
+- [x] `staging` validado con al menos un secreto crítico servido desde Secret Manager
 - [ ] `production` validado con al menos un secreto crítico servido desde Secret Manager
-- [ ] documentación viva actualizada
+- [x] documentación viva actualizada
 
 ## Verification
 
