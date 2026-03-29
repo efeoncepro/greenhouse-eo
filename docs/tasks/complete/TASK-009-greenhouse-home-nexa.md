@@ -1,5 +1,14 @@
 # TASK-009 - Greenhouse Home Nexa v2: Home conversacional y client-first sobre el runtime real del portal
 
+## Delta 2026-03-29
+
+- `TASK-009` se cierra como baseline principal de `Home + Nexa v2`.
+- El runtime base ya quedó materializado en `/home`, con snapshot server-side, `HomeView`, `Nexa` operativo y adopción sustantiva de assistant-ui sobre la integración real del portal.
+- Lo pendiente deja de bloquear el objetivo principal y se divide así:
+  - `TASK-119` — rollout final de navegación y cutover de `/home`
+  - `TASK-110` — evolución de Nexa como asistente (`tool calling`, UI avanzada, feedback, floating entrypoint)
+- `Slice D` de enriquecimiento operativo del snapshot queda absorbido por la evolución de Nexa/Home en tareas derivadas, no como blocker de cierre de esta baseline.
+
 ## Delta 2026-03-26
 
 - Se implementó el MVP de `Home` como nueva superficie de entrada client-first en `/home`.
@@ -21,7 +30,7 @@
 
 ## Estado
 
-Baseline canonica de implementacion al 2026-03-19.
+Baseline canonica de implementacion cerrada al 2026-03-29.
 
 Esta version conserva la vision de producto de `CODEX_TASK_Greenhouse_Home_Nexa.md`, pero reescribe su base tecnica para alinearla con el repo vivo:
 - `portalHomePath` y redirects existentes
@@ -578,3 +587,18 @@ Antes de habilitar `/home` como landing:
 
 Control Tower se mueve a la seccion Administracion en el sidebar (junto a Spaces, Usuarios, Roles, Correos).
 El sidebar "Torre de control" como item principal del menu desaparece — pasa a ser un hijo mas de Administracion.
+
+## Status
+
+- Lifecycle: `complete`
+- Priority: `P1`
+- Impact: `Alto`
+- Effort: `Medio`
+- Status real: `Cerrada`
+- Rank: `TBD`
+- Domain: `home`
+
+## Follow-ups
+
+- `TASK-119` - Home landing rollout and navigation cutover
+- `TASK-110` - Nexa assistant-ui feature adoption

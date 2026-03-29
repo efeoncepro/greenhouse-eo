@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### Task lifecycle cleanup
+- `TASK-009` quedó cerrada como baseline principal de `Home + Nexa v2`; lo pendiente se derivó a `TASK-119` y `TASK-110`.
+- `TASK-108` quedó cerrada como baseline del shell de `Admin Center`; lo pendiente se derivó a `TASK-120`.
+- Se alinearon `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` para reflejar el estado real de `TASK-074`, `TASK-110`, `TASK-111`, `TASK-112` y `TASK-113`.
+
 ### Release channels operating model documented
 - Greenhouse formalizo una policy operativa para lanzar capacidades en `alpha`, `beta`, `stable` y `deprecated`, con foco principal por modulo o feature visible y disponibilidad separada por cohort (`internal`, `pilot`, `selected_tenants`, `general`).
 - La fuente canonica quedo en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`, con referencias cortas añadidas en `AGENTS.md`, `docs/README.md`, `project_context.md` y `GREENHOUSE_ARCHITECTURE_V1.md`.

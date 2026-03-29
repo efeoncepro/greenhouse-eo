@@ -27,8 +27,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 |-----------|------|-----------|
 | 1 | TASK-110 Slice 1b | EditComposer inline, FollowupSuggestions (requiere backend), deprecar NexaPanel.tsx |
 | 2 | TASK-110 Slice 4 | Nexa flotante portal-wide (AssistantModalPrimitive) |
-| 5 | TASK-009 Slice C | Mover Control Tower a admin, `/home` como landing default |
-| 6 | TASK-009 Slice D | Enriquecer snapshot con datos operativos reales |
+| 5 | TASK-119 | Rollout final de `/home`, `portalHomePath`, sidebar y cutover de `Control Tower` |
+| 6 | TASK-120 | Role scoping fino y verification bundle de `Admin Center` |
 
 ### Notas de staging
 - `dev-greenhouse.efeoncepro.com/home` funcional (Gemini responde, Home carga)
@@ -68,6 +68,18 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Nueva task documentada
 - `TASK-117` creada en `to-do`: policy de Payroll para dejar el período oficial en `calculated` el último día hábil del mes operativo, reutilizando la utility de calendario y sin alterar el lifecycle base `draft -> calculated -> approved -> exported`.
 - La task también deja explícito que `payroll_period.calculated` debería notificar a Julio Reyes y Humberly Henríquez vía `NotificationService`/email delivery, idealmente como consumer reactivo del dominio `notifications`.
+
+### Cierre administrativo de tasks cercanas
+- `TASK-009` quedó en `complete` como baseline principal de `Home + Nexa v2`.
+- Lo pendiente de `TASK-009` se repartió así:
+  - `TASK-119` para rollout final de `/home`, `portalHomePath`, sidebar y cutover de `Control Tower`
+  - `TASK-110` sigue como owner de la evolución funcional y visual de Nexa
+- `TASK-108` quedó en `complete` como baseline del shell de `Admin Center`.
+- Lo pendiente de `TASK-108` se deriva a `TASK-120` para role scoping fino, convivencia con surfaces especialistas y verificación manual consolidada.
+- Drift documental corregido en pipeline:
+  - `TASK-074` ya no debe tratarse como activa
+  - `TASK-110` se trata como `in-progress`
+  - `TASK-111`, `TASK-112` y `TASK-113` se tratan como `complete`
 
 ### Sesión 2026-03-28 — TASK-110 Lane A
 - Archivos tocados: `src/lib/nexa/nexa-tools.ts`, `src/lib/nexa/nexa-service.ts`, `src/app/api/home/nexa/route.ts`, `src/views/greenhouse/home/HomeView.tsx`, `src/views/greenhouse/home/components/NexaToolRenderers.tsx`, docs de task/handoff/changelog.
