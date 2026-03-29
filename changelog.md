@@ -24,6 +24,7 @@
 - El path `vercel deploy --target staging` siguió fallando de forma intermitente, pero `vercel redeploy <deployment-ready> --target staging` funcionó como promoción segura del custom environment.
 - `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`; `Production`, `Staging` y `pnpm pg:doctor --profile=runtime` siguieron sanos después del cambio.
 - Se corrigió además el supuesto arquitectónico de Cloud SQL PostgreSQL: `ENCRYPTED_ONLY` no puede combinarse con `requireSsl=true`, así que el enforcement correcto queda documentado solo vía `sslMode`.
+- Administrativamente, `TASK-096` quedó cerrada y la migración de secretos críticos a Secret Manager se derivó a `TASK-124` para mantener separada la lane de follow-on.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).

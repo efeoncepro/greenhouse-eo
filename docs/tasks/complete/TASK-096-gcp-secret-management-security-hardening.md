@@ -142,17 +142,25 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Fase 1 y 2 completas` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
 ## Summary
 
 Hardening progresivo de la gestión de secretos y autenticación GCP en Greenhouse EO. Tres fases: (1) restringir red Cloud SQL + forzar SSL, (2) adoptar Workload Identity Federation vía Vercel OIDC para eliminar la SA key estática, (3) migrar los 6 secretos más críticos a GCP Secret Manager.
+
+## Delta 2026-03-29 — Cierre administrativo
+
+- `TASK-096` se cierra como lane de:
+  - baseline WIF/OIDC
+  - cutover WIF-only en `staging` y `production`
+  - hardening externo de Cloud SQL
+- La Fase 3 de Secret Manager se separa a `TASK-124` para no mezclar una lane ya resuelta con una migración de secretos distinta.
 
 ## Why This Task Exists
 

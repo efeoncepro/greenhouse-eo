@@ -4,10 +4,14 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
-## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
+## Sesión 2026-03-29 — TASK-096 cerrada y TASK-124 derivada
 
 ### Completado
-- `TASK-096` pasó a `in-progress` sobre el estado actual del repo.
+- `TASK-096` queda cerrada para el alcance ya completado:
+  - baseline WIF-aware en repo
+  - cutover WIF-only en `staging` y `production`
+  - hardening externo de Cloud SQL
+- `TASK-124` nace como follow-on para la Fase 3 de Secret Manager, sin reabrir la lane ya resuelta de WIF + Cloud SQL.
 - El repo ya quedó WIF-aware sin romper el runtime actual:
   - `src/lib/google-credentials.ts` resuelve `wif | service_account_key | ambient_adc`
   - el helper ahora también sabe pedir el token OIDC desde runtime Vercel con `@vercel/oidc`, no solo desde `process.env.VERCEL_OIDC_TOKEN`
@@ -74,9 +78,9 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `sslMode=ENCRYPTED_ONLY`
   - `requireSsl=false` por compatibilidad requerida del producto Cloud SQL PostgreSQL
 - Siguiente paso recomendado:
-  - decidir si la Fase 3 de Secret Manager sigue en esta misma task o se separa a una nueva task derivada
+  - continuar por `TASK-124` para migrar secretos críticos a Secret Manager con fallback controlado
   - evaluar si vale la pena `connector enforcement` en Cloud SQL como endurecimiento adicional
-- No declarar `TASK-096` cerrada todavía solo si se mantiene Fase 3 dentro del mismo documento; la parte WIF + Cloud SQL hardening ya quedó sana.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedan alineados con `TASK-096` en `complete` y `TASK-124` en `to-do`.
 
 ## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
 
