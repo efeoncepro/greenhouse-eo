@@ -4,6 +4,18 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-122 documentada
+
+### Completado
+- Se creó `TASK-122` en `to-do` para institucionalizar `Cloud` como capa interna de platform governance.
+- La task nace para agrupar y dar framing institucional al track `TASK-096`, `TASK-098` a `TASK-103`, sin convertirlo en un módulo client-facing nuevo.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados:
+  - `TASK-121` ya se reconoce como ocupada por `Admin Center Hardening & Scalability`
+  - `TASK-122` queda reservada para `Cloud Governance Layer Institutionalization`
+
+### Pendiente inmediato
+- decidir si `TASK-122` entra solo como umbrella documental o si en una segunda pasada deriva mini-tasks de surface para `Admin Center`
+
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
 
 ### Completado

@@ -145,6 +145,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
 | `TASK-119` | `complete` | Home Landing Rollout and Navigation Cutover | `docs/tasks/complete/TASK-119-home-landing-rollout-navigation-cutover.md` |
 | `TASK-120` | `complete` | Admin Center Governance Follow-on Cutover | `docs/tasks/complete/TASK-120-admin-center-governance-follow-on-cutover.md` |
+| `TASK-121` | `in-progress` | Admin Center Hardening & Scalability | `docs/tasks/in-progress/TASK-121-admin-center-hardening.md` |
+| `TASK-122` | `to-do` | Cloud Governance Layer Institutionalization | `docs/tasks/to-do/TASK-122-cloud-governance-layer-institutionalization.md` |
 
 ## Regla de asignacion desde aqui
 
@@ -158,6 +160,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-| `TASK-121` | `in-progress` | Admin Center Hardening & Scalability | `docs/tasks/in-progress/TASK-121-admin-center-hardening.md` |
-
-`TASK-122`
+`TASK-123`
