@@ -1,4 +1,15 @@
-# TASK-099 — Security Headers & Next.js Middleware
+# TASK-099 — Security Headers & Next.js Proxy
+
+## Delta 2026-03-29 — Slice 1 seguro iniciado
+
+- `TASK-099` pasa a `in-progress`.
+- Se implementa primero el slice mínimo y reversible:
+  - `src/proxy.ts` con headers estáticos
+  - matcher conservador para no tocar `_next/*` ni assets
+  - `Strict-Transport-Security` solo en `production`
+- Se difiere intencionalmente el `Content-Security-Policy` real para una segunda iteración:
+  - riesgo alto de romper MUI/Emotion, OAuth y assets si se aplica global sin tuning
+  - mejor introducirlo luego como `Report-Only` o en un rollout validado
 
 ## Delta 2026-03-29
 
@@ -9,18 +20,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 | Sequence | Cloud Posture Hardening **2 of 6** — after TASK-100, before TASK-098 |
 
 ## Summary
 
-Crear `middleware.ts` con security headers (CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy). Hoy no existe middleware y las 238 rutas API no tienen headers de seguridad.
+Crear `proxy.ts` con security headers (CSP, X-Frame-Options, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy). Hoy no existe esta capa cross-cutting y las rutas API no tienen headers de seguridad centralizados.
 
 ## Why This Task Exists
 
@@ -33,7 +44,7 @@ La auditoría de marzo 2026 identificó que Greenhouse no tiene:
 - **Permissions-Policy** → acceso innecesario a cámara/micrófono/geolocation
 - **CORS explícito** → APIs abiertas a cualquier origen por defecto
 
-Además, no existe `middleware.ts` — toda la protección es layout-level, lo que significa que si una ruta API se crea sin guard manual, queda expuesta.
+Además, no existe `proxy.ts`/`middleware.ts` — toda la protección es layout-level, lo que significa que si una ruta API se crea sin guard manual, queda expuesta.
 
 ## Goal
 
@@ -48,25 +59,25 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
   - TASK-101 (Cron Auth) — middleware podría centralizar validación de crons
   - Todas las rutas existentes — headers se aplican automáticamente
 - **Archivos owned:**
-  - `src/middleware.ts` (nuevo)
+  - `src/proxy.ts` (nuevo)
 
 ## Current Repo State
 
-- No existe `middleware.ts`
+- No existe `proxy.ts`
 - Protección autenticación: layout-level via `getServerSession()` en `src/app/(dashboard)/layout.tsx`
 - Guards de API: manuales por ruta (`requireTenantContext()`, `requireAdminTenantContext()`, etc.)
 - `next.config.ts` no define headers de seguridad
 
 ## Scope
 
-### Slice 1 — Security Headers (~2h)
+### Slice 1 — Security Headers baseline (~2h)
 
-1. Crear `src/middleware.ts`:
+1. Crear `src/proxy.ts`:
    ```typescript
    import { NextResponse } from 'next/server'
    import type { NextRequest } from 'next/server'
 
-   export function middleware(request: NextRequest) {
+   export function proxy(request: NextRequest) {
      const response = NextResponse.next()
 
      // --- Security headers ---
@@ -94,7 +105,7 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
    }
    ```
 
-2. **CSP como header separado** (requiere ajuste iterativo):
+2. **CSP como header separado** (diferido del primer lote por riesgo):
    ```typescript
    // CSP inicial — permisivo, luego endurecer
    const csp = [
@@ -111,6 +122,7 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
    ```
 
    > Nota: CSP con `unsafe-inline` y `unsafe-eval` no es ideal, pero MUI v5/v7 con Emotion requiere inline styles. Endurecer con nonces es una mejora futura.
+   > En este primer lote no se aplica todavía para no romper login, assets o render de dashboard.
 
 ### Slice 2 — Verificación y ajuste (~1h)
 
@@ -138,12 +150,12 @@ Agregar una capa de seguridad cross-cutting que proteja todas las rutas sin requ
 
 ## Acceptance Criteria
 
-- [ ] `src/middleware.ts` creado y funcional
+- [ ] `src/proxy.ts` creado y funcional
 - [ ] `X-Frame-Options: DENY` presente en todas las respuestas
 - [ ] `X-Content-Type-Options: nosniff` presente
 - [ ] `Referrer-Policy: strict-origin-when-cross-origin` presente
 - [ ] `Permissions-Policy` presente (camera, microphone, geolocation denegados)
-- [ ] `Content-Security-Policy` presente (modo permisivo inicial)
+- [ ] `Content-Security-Policy` presente (modo permisivo inicial o `Report-Only` en slice posterior)
 - [ ] `Strict-Transport-Security` presente en production
 - [ ] Login funciona correctamente (3 providers)
 - [ ] Dashboard MUI renderiza sin errores de CSP

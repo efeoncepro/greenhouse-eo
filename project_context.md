@@ -21,6 +21,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `503` sigue reservado para fallos reales de runtime; la postura incompleta solo degrada señal operativa.
 - Este lote no instala todavía `@sentry/nextjs` ni conecta Slack real; solo deja visibilidad operativa previa al rollout externo.
 
+## Delta 2026-03-29 Security headers proxy baseline
+- `TASK-099` quedó iniciada con un `proxy.ts` mínimo de headers estáticos.
+- La primera versión de `src/proxy.ts`:
+  - no implementa auth
+  - no centraliza guards de API
+  - no aplica todavía `Content-Security-Policy`
+- Objetivo del slice: sumar protección cross-cutting barata y reversible sin romper MUI, OAuth ni assets estáticos.
+
 ## Delta 2026-03-29 Secret Manager validado en staging + production
 - `develop` absorbió `TASK-124` en `497cb19` y `main` absorbió el slice mínimo en `7238a90`.
 - `staging` ya ejecuta `497cb19` y `/api/internal/health` confirmó resolución real por Secret Manager para:

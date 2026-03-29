@@ -31,6 +31,18 @@
   - `admin`
 - Esta separación permite vigilar readiness de tooling privilegiado sin convertirlo en outage del portal.
 
+## Delta 2026-03-29 — Proxy baseline para headers de seguridad
+
+- `TASK-099` inició un primer slice seguro sobre `src/proxy.ts`.
+- La capa nueva agrega headers estáticos cross-cutting:
+  - `X-Frame-Options`
+  - `X-Content-Type-Options`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+  - `X-DNS-Prefetch-Control`
+  - `Strict-Transport-Security` solo en `production`
+- El `Content-Security-Policy` real queda diferido para una segunda iteración por riesgo de romper MUI/Emotion, OAuth y assets.
+
 ## Delta 2026-03-29 — Transitional WIF-aware repo baseline
 
 - `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.

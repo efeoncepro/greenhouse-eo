@@ -26,6 +26,18 @@
 - Estado residual observado en `staging`:
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
 
+## Delta 2026-03-29 — Proxy baseline for security headers
+
+- `TASK-099` inició una capa `src/proxy.ts` para headers cross-cutting del portal.
+- El slice actual agrega:
+  - `X-Frame-Options`
+  - `X-Content-Type-Options`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+  - `X-DNS-Prefetch-Control`
+  - `Strict-Transport-Security` solo en `production`
+- El `Content-Security-Policy` real se difiere a una segunda iteración para no romper MUI/Emotion, OAuth y assets en el primer rollout.
+
 ## Delta 2026-03-29 — Runtime auth baseline + Cloud SQL verified posture
 
 - El repo ya no depende solo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` para su runtime Vercel.
