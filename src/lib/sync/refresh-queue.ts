@@ -176,6 +176,56 @@ export const getQueueStats = async (): Promise<{
   }
 }
 
+/**
+ * Claim orphaned refresh items — items stuck as `pending` (never picked up inline)
+ * or `processing` (process died mid-flight).
+ *
+ * Orphan criteria:
+ * - `pending` with `updated_at` older than `staleMinutes` (default 30 min)
+ * - `processing` with `updated_at` older than `staleMinutes` (default 30 min)
+ *
+ * Items are atomically claimed as `processing` to prevent double-pickup.
+ */
+export const claimOrphanedRefreshItems = async (
+  batchSize = 10,
+  staleMinutes = 30
+): Promise<QueueItem[]> => {
+  await ensureRefreshQueue()
+
+  const rows = await runGreenhousePostgresQuery<QueueItem & Record<string, unknown>>(
+    `UPDATE greenhouse_sync.projection_refresh_queue
+     SET status = 'processing', updated_at = NOW(), retry_count = retry_count + 1
+     WHERE refresh_id IN (
+       SELECT refresh_id FROM greenhouse_sync.projection_refresh_queue
+       WHERE (
+         (status = 'pending' AND updated_at < NOW() - INTERVAL '1 minute' * $2)
+         OR
+         (status = 'processing' AND updated_at < NOW() - INTERVAL '1 minute' * $2)
+       )
+       AND retry_count < max_retries
+       ORDER BY priority DESC, created_at ASC
+       LIMIT $1
+       FOR UPDATE SKIP LOCKED
+     )
+     RETURNING refresh_id AS "queueId",
+       projection_name AS "projectionName",
+       entity_type AS "entityType",
+       entity_id AS "entityId",
+       priority,
+       retry_count AS "attempts"`,
+    [batchSize, staleMinutes]
+  )
+
+  return rows.map(r => ({
+    queueId: String(r.queueId),
+    projectionName: String(r.projectionName),
+    entityType: String(r.entityType),
+    entityId: String(r.entityId),
+    priority: Number(r.priority),
+    attempts: Number(r.attempts)
+  }))
+}
+
 /** Cleanup completed items older than 24h */
 export const purgeCompletedRefreshItems = async (): Promise<number> => {
   await ensureRefreshQueue()

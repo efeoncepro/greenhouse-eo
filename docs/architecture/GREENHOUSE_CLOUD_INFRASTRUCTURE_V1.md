@@ -331,9 +331,15 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | Path | Schedule (UTC) | Purpose |
 |------|----------------|---------|
 | `/api/cron/outbox-publish` | `*/5 * * * *` (every 5 min) | Consumes the Postgres transactional outbox and publishes events to BigQuery |
+| `/api/cron/outbox-react` | `*/5 * * * *` (every 5 min) | Processes reactive projections (all domains sequentially) |
+| `/api/cron/webhook-dispatch` | `*/2 * * * *` (every 2 min) | Dispatches pending outbound webhooks to subscribed endpoints |
+| `/api/cron/email-delivery-retry` | `*/5 * * * *` (every 5 min) | Retries failed email deliveries |
+| `/api/cron/projection-recovery` | `*/15 * * * *` (every 15 min) | Recovers orphaned projection refresh items stuck as pending/processing >30 min |
 | `/api/cron/sync-conformed` | `45 3 * * *` (daily 3:45 AM) | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
 | `/api/cron/ico-materialize` | `15 6 * * *` (daily 6:15 AM) | Materializes ICO Engine monthly metric snapshots from conformed and raw data |
+| `/api/cron/nubox-sync` | `30 7 * * *` (daily 7:30 AM) | Syncs Nubox DTE and financial data |
 | `/api/finance/exchange-rates/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres |
+| `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC) |
 
 ---
 

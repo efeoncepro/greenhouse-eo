@@ -31,7 +31,14 @@ Operativamente, Payroll puede hacer un flush inmediato del dominio `notification
                               │  Refresh   │         │  Refresh │        │  Refresh   │
                               │  Queue     │         │  Handler │        │  Log       │
                               │ (persist)  │         │ (execute)│        │ (observe)  │
-                              └───────────┘         └──────────┘        └────────────┘
+                              └─────┬─────┘         └──────────┘        └────────────┘
+                                    │
+                              ┌─────▼──────────────┐
+                              │  Recovery Cron      │
+                              │  (*/15 min)         │
+                              │  claims orphans     │
+                              │  re-runs refresh()  │
+                              └────────────────────┘
 ```
 
 ## How to Add a New Projection
@@ -136,12 +143,42 @@ Current hardening note:
 
 ### How it works
 
-1. Consumer detects event → enqueues refresh intent
-2. Consumer executes refresh immediately
+1. Consumer detects event → enqueues refresh intent (`pending`)
+2. Consumer executes refresh immediately (inline)
 3. If refresh succeeds → queue item marked `completed`
 4. If refresh fails → item stays `pending` for retry (up to `maxRetries`)
 5. After max retries → item marked `failed` (dead-letter)
 6. Completed items purged after 24h
+
+### Orphan recovery
+
+The inline processing model (enqueue → execute → mark) can leave items stuck as `pending` or `processing` if:
+- The inline `refresh()` call fails silently or the process dies mid-flight
+- `markRefreshCompleted()` throws after a successful refresh
+- `CRON_SECRET` is absent and the reactive crons don't execute
+
+These orphaned items are **not picked up by subsequent reactive runs** because the reactive consumer only processes new outbox events, not pending queue items.
+
+**Solution:** The `projection-recovery` cron (`/api/cron/projection-recovery`) runs every 15 minutes and:
+
+1. Claims items stuck as `pending` or `processing` for >30 minutes via `claimOrphanedRefreshItems()`
+2. Looks up the projection by name in the registry
+3. Re-runs `projection.refresh(scope, {})` with scope only (no original event payload needed — all refreshes are idempotent)
+4. Marks `completed` or `failed` based on result
+5. Respects `max_retries` — items that exceeded their retry budget are skipped
+6. Reports to Slack via `alertCronFailure()` if the cron itself fails
+
+```
+Reactive path (real-time, inline):
+  event → enqueue(pending) → refresh() → mark(completed)
+         ↓ if fails
+         stays pending → recovery cron picks up
+
+Recovery path (periodic, orphan sweep):
+  cron (*/15) → claimOrphanedRefreshItems(stale >30min) → refresh() → mark(completed/failed)
+```
+
+Key implementation detail: `claimOrphanedRefreshItems` uses `FOR UPDATE SKIP LOCKED` for atomic claim, preventing double-pickup if the reactive consumer and recovery cron overlap.
 
 ### Queue features
 
@@ -180,6 +217,15 @@ Returns staleness checks for all materialized data sources (ICO, economics, memb
 | Queue pending | < 10 | > 50 | Consumer may be falling behind — check cron execution |
 | Queue failed | 0 | > 0 | Manual intervention needed — check `last_error` |
 | Lag hours | < 2h | > 6h | Check if crons are running |
+| Orphans recovered | 0 | > 0 frequently | Indicates inline processing is failing — investigate root cause |
+
+### Recovery cron
+
+```
+GET /api/cron/projection-recovery
+```
+
+Runs every 15 minutes via Vercel cron. Claims and re-processes orphaned queue items (pending/processing >30 min). Returns `{ recovered, failed, total, details }`. If all projections are healthy and inline processing works, this cron returns `{ recovered: 0 }` consistently.
 
 ## Migrating Existing Crons
 
@@ -256,5 +302,6 @@ Referencia arquitectónica:
 | `src/lib/sync/event-catalog.ts` | Domain event type definitions |
 | `src/lib/sync/publish-event.ts` | Outbox event publisher |
 | `src/app/api/cron/outbox-react-*/route.ts` | Domain-partitioned cron routes |
+| `src/app/api/cron/projection-recovery/route.ts` | Orphan recovery cron (every 15 min) |
 | `src/app/api/internal/projections/route.ts` | Observability endpoint |
 | `src/app/api/cron/materialization-health/route.ts` | Staleness health check |

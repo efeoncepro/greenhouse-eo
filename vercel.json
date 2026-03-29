@@ -31,6 +31,10 @@
     {
       "path": "/api/cron/email-delivery-retry",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/projection-recovery",
+      "schedule": "*/15 * * * *"
     }
   ]
 }
