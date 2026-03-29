@@ -59,7 +59,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
 - Estado productivo ya resuelto:
   - `main` recibió un lote mínimo de runtime cloud/WIF en `74bb5a1`
-  - `greenhouse.efeoncepro.com` quedó sobre `greenhouse-bvxe3j7n9-efeonce-7670142f.vercel.app`
+  - `greenhouse.efeoncepro.com` quedó sobre `greenhouse-r30nfskix-efeonce-7670142f.vercel.app`
   - `production` ya valida `auth.mode=wif`, `selectedSource=wif` y `serviceAccountKeyConfigured=false`
   - `GET /api/auth/session` responde `{}` sin error
   - el inventario actual de `Production` ya no incluye `GOOGLE_APPLICATION_CREDENTIALS_JSON`
@@ -69,14 +69,14 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Camino seguro reafirmado:
   - mantener el flujo `feature -> preview -> develop/staging -> main`
   - no usar feature branches para pinchar el entorno compartido
+- Estado Cloud SQL ya endurecido:
+  - `authorizedNetworks` vacía
+  - `sslMode=ENCRYPTED_ONLY`
+  - `requireSsl=false` por compatibilidad requerida del producto Cloud SQL PostgreSQL
 - Siguiente paso recomendado:
-  - validar impacto externo antes de endurecer Cloud SQL
-  - confirmar consumers fuera de Vercel que todavía puedan depender de acceso directo por IP
-- Cerrar Fase 1 externa de Cloud SQL:
-  - remover `0.0.0.0/0`
-  - pasar `sslMode` a `ENCRYPTED_ONLY`
-  - activar `requireSsl=true`
-- No declarar `TASK-096` cerrada todavía: la fase WIF ya quedó sana en `staging` y `production`, pero el hardening externo de Cloud SQL sigue pendiente.
+  - decidir si la Fase 3 de Secret Manager sigue en esta misma task o se separa a una nueva task derivada
+  - evaluar si vale la pena `connector enforcement` en Cloud SQL como endurecimiento adicional
+- No declarar `TASK-096` cerrada todavía solo si se mantiene Fase 3 dentro del mismo documento; la parte WIF + Cloud SQL hardening ya quedó sana.
 
 ## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
 

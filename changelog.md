@@ -22,7 +22,8 @@
 - `greenhouse.efeoncepro.com` ya corre sin `GOOGLE_APPLICATION_CREDENTIALS_JSON`; `/api/internal/health` reporta `auth.mode=wif`, `selectedSource=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK.
 - `GET /api/auth/session` en `Production` responde `{}` después del redeploy WIF-only.
 - El path `vercel deploy --target staging` siguió fallando de forma intermitente, pero `vercel redeploy <deployment-ready> --target staging` funcionó como promoción segura del custom environment.
-- Cloud SQL sigue sin endurecimiento externo final; ahora el pendiente real es cerrar red + SSL obligatoria sin afectar consumers fuera de Vercel.
+- `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`; `Production`, `Staging` y `pnpm pg:doctor --profile=runtime` siguieron sanos después del cambio.
+- Se corrigió además el supuesto arquitectónico de Cloud SQL PostgreSQL: `ENCRYPTED_ONLY` no puede combinarse con `requireSsl=true`, así que el enforcement correcto queda documentado solo vía `sslMode`.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).

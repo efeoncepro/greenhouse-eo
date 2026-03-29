@@ -24,7 +24,8 @@
 - La postura externa todavía sigue transicional:
   - el repo ya soporta WIF/OIDC
   - el rollout externo WIF ya existe en GCP/Vercel y quedó validado en un preview real (`version=7638f85`) con BigQuery + Cloud SQL Connector OK y sin SA key
-  - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
+  - `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`
+  - para PostgreSQL, Cloud SQL no permite combinar `sslMode=ENCRYPTED_ONLY` con `requireSsl=true`; el target correcto es `ENCRYPTED_ONLY`
   - además sigue habiendo drift de ambientación:
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
     - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
@@ -32,9 +33,10 @@
     - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
     - `dev-greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
     - `production` ya absorbió el baseline mínimo WIF y `greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `selectedSource=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
-    - el riesgo remanente ya no es WIF en Vercel, sino el hardening externo de Cloud SQL
+    - `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`
+    - el riesgo remanente principal ya no es WIF en Vercel ni exposición pública abierta de Cloud SQL, sino la eventual Fase 3 de Secret Manager
     - el path `vercel deploy --target staging` sigue mostrando un problema operativo intermitente; el workaround validado fue `vercel redeploy <deployment-ready> --target staging`
-  - por lo tanto `TASK-096` ya cerró la fase WIF en Vercel y no debe considerarse completa hasta cerrar el hardening externo de Cloud SQL
+  - por lo tanto `TASK-096` ya cerró la fase WIF en Vercel y el hardening externo de Cloud SQL; el remanente del documento es la Fase 3 de Secret Manager
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
 
 ## 1. Purpose
@@ -67,7 +69,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 | Dimension | Score | Key Gap |
 |-----------|-------|---------|
 | Secret Management | 7/10 | Staging y Production ya usan WIF; queda solo la SA key transicional en Preview y el cierre de drift operativo menor |
-| Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
+| Network Security | 7/10 | Cloud SQL ya no expone authorized networks y fuerza cifrado; falta evaluar si se endurece todavía más con connector enforcement |
 | Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
 | Observability | 1/10 | `console.error()` only, zero external alerting |
 | CI/CD Validation | 3/10 | Lint + build only, 86 test files not in CI |
@@ -80,7 +82,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 | Threat | Current Exposure | Impact |
 |--------|-----------------|--------|
 | SA key leak (env var exfiltration) | **Low-Medium** — `staging` y `production` ya no usan SA key; el fallback transicional queda concentrado en `preview` | Full GCP compromise |
-| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var | Database compromise (payroll, identity, finance) |
+| Cloud SQL brute force | **Low-Medium** — `authorizedNetworks` vacía + `ENCRYPTED_ONLY`; el riesgo remanente principal es credencial runtime, no exposición pública abierta | Database compromise (payroll, identity, finance) |
 | XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
 | BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
@@ -197,12 +199,12 @@ Error occurs
 
 ```
 Before:  0.0.0.0/0 → Cloud SQL (any IP, optional SSL)
-After:   Vercel IPs + Cloud Run NAT + Dev VPN → Cloud SQL (restricted, SSL enforced)
+After:   no authorized networks → Cloud SQL reachable by connector / encrypted paths only
 ```
 
 | Control | Before | After |
 |---------|--------|-------|
-| Authorized networks | `0.0.0.0/0` | Vercel egress CIDRs + Cloud Run NAT IP + dev VPN |
+| Authorized networks | `0.0.0.0/0` | none |
 | SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` | `ENCRYPTED_ONLY` |
 | Cloud SQL Connector | Available, not mandatory | Preferred for all runtime connections |
 

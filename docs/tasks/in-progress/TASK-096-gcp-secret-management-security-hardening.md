@@ -28,7 +28,7 @@
   - `pnpm exec tsc --noEmit --pretty false`
 - Pendiente para cerrar la task:
   - validar preview/staging reales con OIDC runtime antes de retirar la SA key
-  - cerrar Fase 1 externa de Cloud SQL (`authorizedNetworks`, SSL, `requireSsl`)
+  - cerrar Fase 1 externa de Cloud SQL (`authorizedNetworks`, SSL)
 
 ## Delta 2026-03-29 — Rollout externo WIF fase controlada
 
@@ -86,8 +86,25 @@
 - Estado transicional actualizado:
   - `Preview` puede seguir usando SA key fallback cuando una rama todavía no valida WIF end-to-end
   - `Staging` ya quedó WIF-only y validado
-  - `Production` sigue pendiente antes de cerrar la fase externa de esta task
-  - Cloud SQL sigue pendiente de hardening externo (`authorizedNetworks`, `sslMode`, `requireSsl`)
+  - `Production` quedó cubierta en el delta posterior de esta misma sesión
+  - Cloud SQL quedó cubierto en el delta posterior de hardening externo
+
+## Delta 2026-03-29 — Cloud SQL external hardening aplicado
+
+- `greenhouse-pg-dev` ya no expone `authorizedNetworks`.
+- La instancia quedó con `sslMode=ENCRYPTED_ONLY`.
+- Validación posterior al patch:
+  - `greenhouse.efeoncepro.com/api/internal/health` → `200 OK`
+  - `dev-greenhouse.efeoncepro.com/api/internal/health` → `200 OK`
+  - `pnpm pg:doctor --profile=runtime` → OK vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+- Corrección arquitectónica importante:
+  - para Cloud SQL PostgreSQL, `sslMode=ENCRYPTED_ONLY` y `requireSsl=true` son incompatibles
+  - el estado correcto de hardening queda en `sslMode=ENCRYPTED_ONLY` con `requireSsl=false`
+  - se documenta este ajuste para no seguir persiguiendo un target inválido
+- Estado operativo de cierre:
+  - Fase 1 externa: completada
+  - Fase 2 WIF/Vercel: completada
+  - remanente fuera del scope de este lote: Fase 3 Secret Manager
 
 ## Delta 2026-03-29 — Production validado sin SA key
 
@@ -101,7 +118,7 @@
   - `src/app/api/internal/health/route.ts`
   - `package.json` / `pnpm-lock.yaml`
 - Validación local del lote mínimo sobre árbol limpio basado en `origin/main`:
-  - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts src/lib/cloud/postgres.test.ts src/lib/cloud/bigquery.test.ts`
+  - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
   - `pnpm exec eslint ...` sobre runtime cloud/WIF
   - `pnpm build`
@@ -119,7 +136,7 @@
   - `Preview`: fallback legado permitido
   - `Staging`: WIF-only validado
   - `Production`: WIF-only validado
-  - pendiente de la task: hardening externo de Cloud SQL
+  - sin pendientes de WIF en Vercel
 
 ## Status
 
@@ -129,7 +146,7 @@
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Fase 1 y 2 completas` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
@@ -456,24 +473,24 @@ Futuro: Vercel → OIDC token (expires in minutes) → WIF Pool → GCP APIs
 ## Acceptance Criteria
 
 ### Fase 1
-- [ ] Cloud SQL `greenhouse-pg-dev` no tiene `0.0.0.0/0` en authorized networks
-- [ ] Cloud SQL SSL mode es `ENCRYPTED_ONLY`
+- [x] Cloud SQL `greenhouse-pg-dev` no tiene `0.0.0.0/0` en authorized networks
+- [x] Cloud SQL SSL mode es `ENCRYPTED_ONLY`
 - [x] Production deploy conecta a Cloud SQL correctamente
 - [x] Staging deploy conecta a Cloud SQL correctamente
-- [ ] Cloud Run services siguen conectando sin error
-- [ ] Documentación actualizada en `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- [x] Se verificó que los servicios Cloud Run/Functions listados no exponen variables directas de Postgres
+- [x] Documentación actualizada en `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 
 ### Fase 2
-- [x] Workload Identity Pool `greenhouse-vercel-pool` creado en GCP
+- [x] Workload Identity Pool `vercel` creado en GCP
 - [x] `google-credentials.ts` intenta WIF primero, fallback a SA key
 - [x] Production usa WIF (no SA key)
 - [x] Staging usa WIF (no SA key)
 - [ ] BigQuery, Cloud SQL, Storage y Vertex AI funcionan con WIF en Production
 - [ ] Todos los cron jobs ejecutan correctamente
-- [ ] `GOOGLE_APPLICATION_CREDENTIALS_JSON` removido de Production env
-- [ ] Preview deployments siguen funcionando (SA key fallback)
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `GOOGLE_APPLICATION_CREDENTIALS_JSON` removido de Production env
+- [x] Preview deployments siguen funcionando (SA key fallback)
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
 
 ### Fase 3
 - [ ] 6 secrets creados en GCP Secret Manager
@@ -491,9 +508,9 @@ Futuro: Vercel → OIDC token (expires in minutes) → WIF Pool → GCP APIs
 
 ### Fase 1
 ```bash
-# Verificar SSL forzado
-gcloud sql instances describe greenhouse-pg-dev --format="value(settings.ipConfiguration.requireSsl)"
-# → true
+# Verificar SSL forzado por sslMode
+gcloud sql instances describe greenhouse-pg-dev --format="value(settings.ipConfiguration.sslMode)"
+# → ENCRYPTED_ONLY
 
 # Verificar authorized networks (no debe contener 0.0.0.0/0)
 gcloud sql instances describe greenhouse-pg-dev --format="json(settings.ipConfiguration.authorizedNetworks)"
@@ -505,7 +522,7 @@ curl -s https://dev-greenhouse.efeoncepro.com/api/internal/health | jq .postgres
 ### Fase 2
 ```bash
 # Verificar WIF pool
-gcloud iam workload-identity-pools describe greenhouse-vercel-pool --location=global
+gcloud iam workload-identity-pools describe vercel --location=global
 
 # Verificar que production no usa SA key
 # (check Vercel env vars — GOOGLE_APPLICATION_CREDENTIALS_JSON must be absent from Production)

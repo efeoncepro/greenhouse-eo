@@ -28,10 +28,13 @@
   - `transactionLogRetentionDays=7`
   - `replicationLogArchivingEnabled=true`
   - flags `log_min_duration_statement=1000` y `log_statement=ddl`
-  - sigue pendiente el hardening externo:
-    - `authorizedNetworks` incluye `0.0.0.0/0`
-    - `sslMode=ALLOW_UNENCRYPTED_AND_ENCRYPTED`
+  - hardening externo ya aplicado:
+    - `authorizedNetworks` vacía
+    - `sslMode=ENCRYPTED_ONLY`
     - `requireSsl=false`
+  - nota de compatibilidad Cloud SQL PostgreSQL:
+    - `sslMode=ENCRYPTED_ONLY` y `requireSsl=true` son incompatibles
+    - el enforcement correcto queda dado por `sslMode`
 - Rollout externo WIF ya materializado en GCP:
   - project number `183008134038`
   - Workload Identity Pool `vercel`
@@ -96,9 +99,9 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 | Machine type | `db-custom-1-3840` (1 vCPU, 3.75 GB RAM) |
 | Storage | 20 GB SSD, **auto-resize enabled** |
 | Public IP | `34.86.135.144` |
-| SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` |
-| `requireSsl` | `false` |
-| Authorized networks | `0.0.0.0/0` (**see Security Notes**) |
+| SSL mode | `ENCRYPTED_ONLY` |
+| `requireSsl` | `false` (`ENCRYPTED_ONLY` ya fuerza cifrado en PostgreSQL) |
+| Authorized networks | none |
 | Backup window | Daily at **07:00 UTC**, 7-day retention |
 | PITR | `Enabled` |
 | WAL retention | `7 days` |
@@ -137,7 +140,7 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 ### Connectivity
 
 - **Cloud SQL Connector** (preferred) — metadata/auth tokens now resolve through the shared WIF-aware helper in `src/lib/google-credentials.ts`; Postgres app access still uses runtime username/password and **not** IAM DB auth.
-- **Direct IP** — connect to `34.86.135.144:5432` with username/password. Currently allowed from any IP.
+- **Direct IP** — ya no está expuesto vía `authorizedNetworks`; el camino operativo recomendado es Cloud SQL Connector.
 
 ---
 
@@ -348,11 +351,11 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 | Issue | Severity | Current State | Recommendation | Task |
 |-------|----------|---------------|----------------|------|
-| Cloud SQL authorized network | **High** | `0.0.0.0/0` — any IP can attempt connection | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks | TASK-096 Fase 1 |
-| Cloud SQL SSL enforcement | **Medium** | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections | TASK-096 Fase 1 |
+| Cloud SQL authorized network | **Resolved** | `authorizedNetworks` vacía | Mantener connector como camino estándar; evaluar connector enforcement más adelante | TASK-096 Fase 1 |
+| Cloud SQL SSL enforcement | **Resolved** | `ENCRYPTED_ONLY` | Mantener enforcement vía `sslMode` | TASK-096 Fase 1 |
 | Plaintext API tokens | **Medium** | Most Cloud Functions store tokens in env vars | Migrate critical secrets to Secret Manager | TASK-096 Fase 3 |
-| Cloud SQL Connector adoption | **Low** | Preview WIF path ya quedó validado con connector, pero `develop/dev-greenhouse` sigue observándose con host directo | Estandarizar connector en el entorno compartido antes del hardening externo | TASK-096 Fase 2 |
-| Service account key in Vercel | **Medium** | WIF ya existe y quedó validado en preview, pero la SA key sigue presente como fallback transicional | Retirar la SA key después de validar entorno compartido y producción | TASK-096 Fase 2 |
+| Cloud SQL Connector adoption | **Resolved** | `preview`, `staging` y `production` ya validaron connector | Mantener connector como baseline y revisar si conviene connector enforcement | TASK-096 Fase 2 |
+| Service account key in Vercel | **Low** | `staging` y `production` ya no usan SA key; `preview` conserva fallback transicional | Retirar el fallback de preview cuando deje de ser necesario | TASK-096 Fase 2 |
 | No security headers | **Medium** | No middleware.ts, no CSP/HSTS/X-Frame-Options | Create middleware.ts with security headers | TASK-099 |
 | Silent production failures | **High** | console.error() only, zero alerting | Sentry + health endpoint + Slack alerts | TASK-098 |
 | Inconsistent cron auth | **Medium** | 2 patterns, some fail-open, no timing-safe | Centralized requireCronAuth() helper | TASK-101 |
@@ -361,15 +364,11 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ### Priority Actions
 
-1. **Restrict Cloud SQL network access** — replace `0.0.0.0/0` with explicit CIDR ranges (TASK-096 Fase 1).
-2. **Enforce SSL** — change SSL mode to `ENCRYPTED_ONLY` (TASK-096 Fase 1).
-3. **Add tests to CI** — 86 test files not running in pipeline (TASK-100).
-4. **Security headers middleware** — CSP, HSTS, X-Frame-Options (TASK-099).
-5. **Workload Identity Federation** — eliminate static SA key (TASK-096 Fase 2).
-6. **Observability MVP** — Sentry + health endpoint + Slack cron alerts (TASK-098).
-7. **Migrate critical secrets** — 6 secrets to Secret Manager (TASK-096 Fase 3).
-8. **Standardize cron auth** — single timing-safe helper for 18 routes (TASK-101).
-9. **Database resilience** — PITR, slow query logging, pool sizing, restore test (TASK-102).
+1. **Migrate critical secrets** — 6 secrets to Secret Manager (TASK-096 Fase 3).
+2. **Observability MVP** — Sentry + health endpoint + Slack cron alerts (TASK-098).
+3. **Security headers middleware** — CSP, HSTS, X-Frame-Options (TASK-099).
+4. **Database resilience** — PITR, slow query logging, pool sizing, restore test (TASK-102).
+5. **Cost visibility** — GCP budget alerts + BigQuery cost guards (TASK-103).
 10. **Budget alerts** — GCP billing + BigQuery cost guards (TASK-103).
 
 ---
