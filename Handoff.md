@@ -4,6 +4,21 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-099 iniciada sobre `develop`
+
+### Completado
+- `develop` absorbió el baseline sano de `TASK-098` (`4167650`, `4d485f4`) y el fix de compatibilidad `3463dc8`.
+- Se abrió `feature/codex-task-099-security-headers` desde ese `develop` ya integrado.
+- `TASK-099` pasa a `in-progress` con un primer slice mínimo:
+  - nuevo `src/proxy.ts`
+  - headers estáticos cross-cutting
+  - matcher conservador para no tocar `_next/*` ni assets
+  - `Strict-Transport-Security` solo en `production`
+
+### Pendiente inmediato
+- validar lint, tests, `tsc` y `build` del middleware
+- decidir si el siguiente slice de `TASK-099` introduce CSP en `Report-Only` o la difiere hasta después de retomar `TASK-098`
+
 ## Sesión 2026-03-29 — TASK-098 iniciada con slice seguro de postura
 
 ### Completado

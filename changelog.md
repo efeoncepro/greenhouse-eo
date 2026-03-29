@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-099 security headers proxy baseline
+- Se creó `src/proxy.ts` con headers estáticos (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-DNS-Prefetch-Control`) para todo el runtime salvo `_next/*` y assets estáticos.
+- `Strict-Transport-Security` se aplica solo en `production`.
+- El `Content-Security-Policy` real queda diferido a una segunda iteración por riesgo de romper MUI/Emotion, OAuth y assets.
+
 ### TASK-098 observability posture baseline
 - `GET /api/internal/health` ahora expone también `observability`, con un contrato mínimo para saber si Sentry y Slack alerts están configurados en runtime.
 - Se creó `src/lib/cloud/observability.ts` y su test unitario como capa canónica de postura para `SENTRY_DSN`, `SENTRY_AUTH_TOKEN` y `SLACK_ALERTS_WEBHOOK_URL`.
