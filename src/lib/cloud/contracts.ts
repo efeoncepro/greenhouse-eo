@@ -21,6 +21,7 @@ export interface CloudGcpAuthPosture {
   mode: CloudAuthMode
   summary: string
   oidcAvailable: boolean
+  selectedSource: 'wif' | 'service_account_key' | 'ambient_adc'
   workloadIdentityConfigured: boolean
   serviceAccountKeyConfigured: boolean
   serviceAccountEmailConfigured: boolean

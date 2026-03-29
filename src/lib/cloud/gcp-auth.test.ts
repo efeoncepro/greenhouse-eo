@@ -14,28 +14,45 @@ describe('getCloudGcpAuthPosture', () => {
     vi.stubEnv('GOOGLE_APPLICATION_CREDENTIALS_JSON', '')
     vi.stubEnv('GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64', '')
 
-    expect(getCloudGcpAuthPosture().mode).toBe('unconfigured')
+    const posture = getCloudGcpAuthPosture()
+
+    expect(posture.mode).toBe('unconfigured')
+    expect(posture.selectedSource).toBe('ambient_adc')
   })
 
   it('reports service account key mode when only key fallback is present', () => {
     vi.stubEnv('GOOGLE_APPLICATION_CREDENTIALS_JSON', '{"client_email":"x"}')
 
-    expect(getCloudGcpAuthPosture().mode).toBe('service_account_key')
+    const posture = getCloudGcpAuthPosture()
+
+    expect(posture.mode).toBe('service_account_key')
+    expect(posture.selectedSource).toBe('service_account_key')
   })
 
   it('reports wif when provider and service account are configured', () => {
     vi.stubEnv('GCP_WORKLOAD_IDENTITY_PROVIDER', 'projects/123/locations/global/workloadIdentityPools/p/providers/p')
     vi.stubEnv('GCP_SERVICE_ACCOUNT_EMAIL', 'runtime@example.com')
+    vi.stubEnv('VERCEL', '1')
+    vi.stubEnv('VERCEL_ENV', 'staging')
 
-    expect(getCloudGcpAuthPosture().mode).toBe('wif')
+    const posture = getCloudGcpAuthPosture()
+
+    expect(posture.mode).toBe('wif')
+    expect(posture.selectedSource).toBe('wif')
   })
 
   it('reports mixed when wif and service account key coexist', () => {
     vi.stubEnv('GCP_WORKLOAD_IDENTITY_PROVIDER', 'projects/123/locations/global/workloadIdentityPools/p/providers/p')
     vi.stubEnv('GCP_SERVICE_ACCOUNT_EMAIL', 'runtime@example.com')
     vi.stubEnv('GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64', 'e30=')
+    vi.stubEnv('VERCEL', '1')
+    vi.stubEnv('VERCEL_ENV', 'staging')
 
-    expect(getCloudGcpAuthPosture().mode).toBe('mixed')
+    const posture = getCloudGcpAuthPosture()
+
+    expect(posture.mode).toBe('mixed')
+    expect(posture.selectedSource).toBe('wif')
+    expect(posture.summary).toContain('preferido en runtime')
   })
 
   it('reports wif when provider is derived from split env vars', () => {

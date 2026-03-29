@@ -111,6 +111,8 @@ const normalizeParsedCredentials = (value: unknown) => {
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
+const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) => hasValue(env.VERCEL) || hasValue(env.VERCEL_ENV)
+
 const getAvailableVercelOidcTokenSync = (env: NodeJS.ProcessEnv = process.env) => {
   if (env !== process.env) {
     return env.VERCEL_OIDC_TOKEN?.trim()
@@ -199,6 +201,9 @@ const getWorkloadIdentityProvider = (env: NodeJS.ProcessEnv = process.env) => {
   return `projects/${projectNumber}/locations/global/workloadIdentityPools/${poolId}/providers/${providerId}`
 }
 
+export const isWorkloadIdentityConfigured = (env: NodeJS.ProcessEnv = process.env) =>
+  hasValue(getWorkloadIdentityProvider(env)) && hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL)
+
 const getWorkloadIdentityAuthClient = ({
   env = process.env,
   scopes
@@ -244,10 +249,17 @@ const getWorkloadIdentityAuthClient = ({
   return client
 }
 
-export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) =>
-  hasValue(getWorkloadIdentityProvider(env)) &&
-  hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL) &&
-  hasValue(getAvailableVercelOidcTokenSync(env))
+export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) => {
+  if (!isWorkloadIdentityConfigured(env)) {
+    return false
+  }
+
+  if (hasValue(getAvailableVercelOidcTokenSync(env))) {
+    return true
+  }
+
+  return isVercelRuntime(env)
+}
 
 export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialSource => {
   if (shouldUseWorkloadIdentity(env)) {

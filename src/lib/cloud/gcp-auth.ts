@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { CloudGcpAuthPosture } from '@/lib/cloud/contracts'
-import { shouldUseWorkloadIdentity } from '@/lib/google-credentials'
+import { getGoogleCredentialSource, isWorkloadIdentityConfigured, shouldUseWorkloadIdentity } from '@/lib/google-credentials'
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
@@ -13,18 +13,21 @@ export const getCloudGcpAuthPosture = (env: NodeJS.ProcessEnv = process.env): Cl
   const serviceAccountEmailConfigured = hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL)
   const oidcAvailable = hasValue(env.VERCEL_OIDC_TOKEN)
   const serviceAccountKeyConfigured = hasValue(env.GOOGLE_APPLICATION_CREDENTIALS_JSON) || hasValue(env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64)
-
-  const workloadIdentityConfigured = providerConfigured && serviceAccountEmailConfigured
-
+  const workloadIdentityConfigured = isWorkloadIdentityConfigured(env)
   const workloadIdentityActive = shouldUseWorkloadIdentity(env)
+  const selectedSource = getGoogleCredentialSource(env)
 
   if (workloadIdentityConfigured && serviceAccountKeyConfigured) {
     return {
       mode: 'mixed',
-      summary: workloadIdentityActive
-        ? 'WIF configurado con token OIDC activo y SA key fallback presente'
-        : 'WIF configurado, pero la SA key sigue presente como fallback',
+      summary:
+        selectedSource === 'wif'
+          ? 'WIF configurado y preferido en runtime; la SA key sigue presente como fallback'
+          : workloadIdentityActive
+            ? 'WIF configurado con token OIDC activo y SA key fallback presente'
+            : 'WIF configurado, pero la SA key sigue presente como fallback',
       oidcAvailable,
+      selectedSource,
       workloadIdentityConfigured,
       serviceAccountKeyConfigured,
       serviceAccountEmailConfigured,
@@ -36,9 +39,10 @@ export const getCloudGcpAuthPosture = (env: NodeJS.ProcessEnv = process.env): Cl
     return {
       mode: 'wif',
       summary: workloadIdentityActive
-        ? 'WIF configurado y token OIDC presente en runtime'
+        ? 'WIF configurado y preferido en runtime'
         : 'WIF configurado; falta el token OIDC del runtime para activarse',
       oidcAvailable,
+      selectedSource,
       workloadIdentityConfigured,
       serviceAccountKeyConfigured,
       serviceAccountEmailConfigured,
@@ -51,6 +55,7 @@ export const getCloudGcpAuthPosture = (env: NodeJS.ProcessEnv = process.env): Cl
       mode: 'service_account_key',
       summary: 'Runtime autenticando con SA key estática',
       oidcAvailable,
+      selectedSource,
       workloadIdentityConfigured,
       serviceAccountKeyConfigured,
       serviceAccountEmailConfigured,
@@ -62,6 +67,7 @@ export const getCloudGcpAuthPosture = (env: NodeJS.ProcessEnv = process.env): Cl
     mode: 'unconfigured',
     summary: 'No hay postura GCP configurada para runtime',
     oidcAvailable,
+    selectedSource,
     workloadIdentityConfigured,
     serviceAccountKeyConfigured,
     serviceAccountEmailConfigured,
