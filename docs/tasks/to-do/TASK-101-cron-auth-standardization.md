@@ -1,5 +1,9 @@
 # TASK-101 — Cron Auth Standardization
 
+## Delta 2026-03-29
+
+- `TASK-100` ya dejó `pnpm test` gateado en CI, así que los tests del helper `requireCronAuth()` quedarán cubiertos automáticamente una vez que esta task se implemente.
+
 ## Status
 
 | Campo | Valor |

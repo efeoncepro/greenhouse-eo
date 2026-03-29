@@ -4,18 +4,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Muy bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / CI-CD |
 | Sequence | Cloud Posture Hardening **1 of 6** — first to implement, no dependencies |
 
 ## Summary
 
-Agregar `pnpm test` al workflow de GitHub Actions. Hoy existen 86 archivos de test con Vitest que no corren en CI — una regresión puede llegar a production sin detección.
+Agregar `pnpm test` al workflow de GitHub Actions. Hoy existen 99 archivos de test con Vitest y esta task formaliza su ejecución dentro de CI para evitar que una regresión llegue a production sin detección.
 
 ## Architecture Alignment
 
@@ -32,12 +32,12 @@ Reglas obligatorias:
 
 ## Why This Task Exists
 
-El CI workflow (`.github/workflows/ci.yml`) solo ejecuta:
+El CI workflow (`.github/workflows/ci.yml`) venía ejecutando solo:
 1. `pnpm install`
 2. `pnpm lint`
 3. `pnpm build`
 
-Los tests (`pnpm test` → Vitest) **no están incluidos**. Esto significa que los 86 archivos de test son validación local opcional. Una PR puede pasar CI con tests rotos.
+Los tests (`pnpm test` → Vitest) **no estaban incluidos**. Esto significa que los 99 archivos de test eran validación local opcional. Una PR podía pasar CI con tests rotos.
 
 ## Goal
 
@@ -60,7 +60,7 @@ Que ningún merge a `develop` o `main` pueda ocurrir con tests fallando.
 ## Current Repo State
 
 ```yaml
-# .github/workflows/ci.yml (extracto actual)
+# .github/workflows/ci.yml (estado previo)
 steps:
   - uses: actions/checkout@v4
   - uses: pnpm/action-setup@v4
@@ -73,10 +73,10 @@ steps:
     run: pnpm lint
   - name: Build
     run: pnpm build
-  # ← NO HAY STEP DE TEST
+  # ← faltaba el step de Test
 ```
 
-- **86 test files** en `src/` (Vitest + Testing Library + jsdom)
+- **99 test files** en `src/` (Vitest + Testing Library + jsdom)
 - Test helper: `src/test/render.tsx`
 - Config: `vitest.config.ts`
 - Script: `pnpm test` → `vitest run`
@@ -119,9 +119,9 @@ steps:
 
 ## Acceptance Criteria
 
-- [ ] `.github/workflows/ci.yml` incluye step `pnpm test`
+- [x] `.github/workflows/ci.yml` incluye step `pnpm test`
 - [ ] El workflow pasa en un PR de prueba
-- [ ] Los 86 archivos de test ejecutan correctamente en CI
+- [ ] Los 99 archivos de test ejecutan correctamente en CI
 - [ ] El workflow falla si un test está roto (verificar con test roto temporal)
 - [ ] El tiempo total del workflow no excede 10 minutos
 
@@ -135,3 +135,12 @@ pnpm test
 # Crear PR con el cambio y confirmar que el workflow ejecuta tests
 gh pr checks
 ```
+
+## Delta 2026-03-29
+
+- La task pasó a `in-progress`.
+- `.github/workflows/ci.yml` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con `timeout-minutes: 5`.
+- Validación local previa al cambio:
+  - `99` archivos de test verdes
+  - `488` pruebas verdes
+  - duración total `6.18s`
