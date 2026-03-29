@@ -423,16 +423,54 @@ But it creates a reusable Greenhouse-side surface so future integrations do not 
 - Manual dispatch button available
 - Canary activation button available
 
-### Phase 5 - First external consumer — `future`
-- Register a real external subscriber (Slack channel, sibling service, or partner API)
-- Validate delivery over the public internet with real retry/dead-letter scenarios
-- Recommended first domains: `finance.*` or `payroll_period.*`
+### Phase 5 - Real consumers — `to-do` (TASK-128)
 
-### Phase 6 - UI signals in domain modules — `future` (documented in TASK-125)
-- Payroll: badge when receipts delivery webhook succeeds
-- People: indicator when compensation change propagated
-- Finance: signal when DTE reconciliation reached Nubox
-- Home: activity feed powered by outbox events
+Cinco slices ordenados por impacto vs esfuerzo:
+
+#### 5a. Slack como consumer outbound (~1h)
+- Subscription con `target_url` apuntando a un relay interno que formatea el envelope en texto legible para Slack
+- Eventos: `payroll_period.closed`, `payroll_period.exported`, `finance.dte.discrepancy_found`
+- Diferencia con `sendSlackAlert()` directo: auditable, con retries, dead-letter, visible en Admin Center
+
+#### 5b. Invalidación de cache interna (~1.5h)
+- Subscription self-loop a endpoint de invalidación
+- `compensation_version.created` → invalidar payroll proyectado
+- `assignment.created/updated` → invalidar capacity economics
+- Reduce latencia de horas a minutos sin re-computar snapshots completos
+
+#### 5c. Nubox push (~2h)
+- Invertir el flujo de pull diario a push en tiempo real
+- `finance.income.created` / `finance.expense.created` → push a API de Nubox
+- Cron `nubox-sync` se mantiene como safety net de reconciliación
+
+#### 5d. Notificaciones in-app via webhook bus (~2h) — mayor impacto en UX
+- Consumer que recibe eventos del bus y llama a `dispatchNotification()` de `notification-service.ts`
+- La campanita del navbar muestra actividad real alimentada por el bus de eventos
+- Preferencias in-app/email del usuario se respetan automáticamente (TASK-023)
+- Mapeo declarativo evento → notificación (recipients, título, action_url)
+- Cada nuevo event type genera notificaciones con solo agregar un mapping
+
+#### 5e. Data Node / consumers externos (futuro)
+- Partners o servicios externos se suscriben a eventos vía API
+- Requiere admin UI para gestión de subscriptions + documentación pública del event catalog
+
+#### Diagrama de consumers
+
+```
+                              outbox_events
+                                    │
+                    ┌───────────────┼───────────────┬──────────────────┐
+                    │               │               │                  │
+              BigQuery pub    Reactive proj    Webhook dispatch    (future)
+              (analytics)    (serving interno)       │
+                                              ┌─────┼─────┬──────────┐
+                                              │     │     │          │
+                                          Slack   Cache  Nubox   In-app
+                                          relay   inval  push    notifications
+                                              │     │     │          │
+                                           #channel stale  API    campanita
+                                                   flag  call    + email
+```
 
 ## Explicit Non-Goals For V1
 
