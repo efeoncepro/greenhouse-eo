@@ -4,6 +4,7 @@ import { createHash } from 'crypto'
 
 import jwt from 'jsonwebtoken'
 
+import { getNextAuthSecret } from '@/lib/auth-secrets'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ── Types ────────────────────────────────────────────────────────────
@@ -32,11 +33,7 @@ interface TokenRecord {
 // ── Helpers ──────────────────────────────────────────────────────────
 
 const getSecret = () => {
-  const secret = process.env.NEXTAUTH_SECRET
-
-  if (!secret) throw new Error('NEXTAUTH_SECRET is not set')
-
-  return secret
+  return getNextAuthSecret()
 }
 
 const hashToken = (token: string): string =>

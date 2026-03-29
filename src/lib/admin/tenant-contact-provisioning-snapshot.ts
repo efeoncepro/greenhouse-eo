@@ -3,6 +3,7 @@ import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
 import type { HubSpotGreenhouseContactProfile } from '@/lib/integrations/hubspot-greenhouse-service'
+import { getNextAuthSecret } from '@/lib/auth-secrets'
 
 const SNAPSHOT_VERSION = 1
 const SNAPSHOT_MAX_AGE_MS = 15 * 60 * 1000
@@ -16,13 +17,7 @@ type TenantContactProvisioningSnapshotPayload = {
 }
 
 const getSnapshotSecret = () => {
-  const secret = process.env.NEXTAUTH_SECRET?.trim()
-
-  if (!secret) {
-    return null
-  }
-
-  return secret
+  return getNextAuthSecret()
 }
 
 const toBase64Url = (value: string) => Buffer.from(value, 'utf8').toString('base64url')
@@ -60,7 +55,7 @@ export const buildTenantContactProvisioningSnapshotToken = ({
 }) => {
   const secret = getSnapshotSecret()
 
-  if (!secret || !hubspotCompanyId || !fetchedAt || contacts.length === 0) {
+  if (!hubspotCompanyId || !fetchedAt || contacts.length === 0) {
     return null
   }
 
@@ -89,7 +84,7 @@ export const verifyTenantContactProvisioningSnapshotToken = ({
 }): HubSpotGreenhouseContactProfile[] | null => {
   const secret = getSnapshotSecret()
 
-  if (!secret || !hubspotCompanyId) {
+  if (!hubspotCompanyId) {
     return null
   }
 
