@@ -3,6 +3,18 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Release channels y changelog client-facing
+- Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
+- Regla vigente:
+  - el release se comunica principalmente por modulo o feature visible, no solo por plataforma completa
+  - cada capacidad puede declararse `alpha`, `beta`, `stable` o `deprecated`
+  - el canal no equivale automaticamente a disponibilidad general; tambien debe distinguirse el scope (`internal`, `pilot`, `selected_tenants`, `general`)
+- Versionado vigente:
+  - producto y modulos visibles usan `CalVer + canal`
+  - APIs y contratos tecnicos versionados usan `SemVer`
+- El changelog client-facing quedo separado del changelog interno del repo y nace en `docs/changelog/CLIENT_CHANGELOG.md`.
+- `Preview`, `Staging` y `Production` siguen siendo los ambientes tecnicos; los canales de release se apoyan en ellos pero no los reemplazan.
+
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.

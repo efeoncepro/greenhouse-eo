@@ -1,5 +1,20 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-29 — Release channels model reference
+
+Greenhouse maneja release channels principalmente por modulo o feature visible, con una capa opcional de canal global de plataforma.
+
+La politica canonica de:
+
+- `alpha`, `beta`, `stable`, `deprecated`
+- disponibilidad por cohort o tenant
+- changelog client-facing
+
+vive en:
+
+- `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`
+- `docs/changelog/CLIENT_CHANGELOG.md`
+
 ## Purpose
 
 This document is the master architecture reference for Greenhouse EO.

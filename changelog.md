@@ -5,6 +5,16 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-29
+
+### Release channels operating model documented
+- Greenhouse formalizo una policy operativa para lanzar capacidades en `alpha`, `beta`, `stable` y `deprecated`, con foco principal por modulo o feature visible y disponibilidad separada por cohort (`internal`, `pilot`, `selected_tenants`, `general`).
+- La fuente canonica quedo en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`, con referencias cortas añadidas en `AGENTS.md`, `docs/README.md`, `project_context.md` y `GREENHOUSE_ARCHITECTURE_V1.md`.
+- Se creo `docs/changelog/CLIENT_CHANGELOG.md` como changelog client-facing separado del `changelog.md` tecnico-operativo del repo.
+- La policy ahora deja explicito el esquema hibrido: `CalVer + canal` para modulos/producto visible y `SemVer` reservado para APIs o contratos tecnicos versionados.
+- La misma policy ahora define namespaces de Git tags para releases: `platform/...`, `<module>/...` y `api/<slug>/...`.
+- Se agrego una baseline inicial de modulos/versiones/tags sugeridos y se dejo explicito que los tags reales deben crearse solo sobre un commit limpio.
+
 ## 2026-03-28
 
 ### Nexa model switch aligned to Vertex model IDs

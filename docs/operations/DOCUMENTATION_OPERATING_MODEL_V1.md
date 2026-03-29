@@ -23,6 +23,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 - La taxonomia vigente es:
   - `docs/architecture/`
   - `docs/api/`
+  - `docs/changelog/`
   - `docs/ui/`
   - `docs/roadmap/`
   - `docs/operations/`
@@ -61,6 +62,12 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
   - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
+
+### 6. Changelog curado
+- `docs/changelog/CLIENT_CHANGELOG.md`
+- Aqui vive el changelog client-facing del producto.
+- No debe duplicar el detalle tecnico de `changelog.md`.
+- Solo debe registrar cambios visibles para usuarios, canales de release y disponibilidad real de capacidades.
 
 ## Regla de compresion
 
