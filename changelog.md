@@ -7,6 +7,15 @@
 
 ## 2026-03-29
 
+### Nexa chat visual redesign — Enterprise AI 2025
+- User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).
+- Assistant messages: bubble eliminada — ahora es prosa abierta sin borde ni fondo, con avatar circular y label "Nexa".
+- ActionBar: iconos sueltos reemplazados por barra contenida con fondo `action.hover` y border-radius.
+- ThinkingIndicator: 3 dots bouncing reemplazados por shimmer skeleton (3 lineas animadas con MUI Skeleton wave).
+- Suggestions: chips outlined reemplazados por mini-cards con borde, icono sparkles y hover interactivo.
+- Composer: TextField WhatsApp-style reemplazado por input premium con sombra sutil, focus ring purple, border-top separator.
+- Header: barra plana reemplazada por header frosted glass sticky con backdrop-filter blur.
+
 ### CI incorpora tests de Vitest
 - El workflow `CI` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con timeout explícito de `5` minutos.
 - La suite actual entra limpia al pipeline con `99` archivos y `488` pruebas verdes en validación local previa.
