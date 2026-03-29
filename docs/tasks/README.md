@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-125`
+- siguiente ID disponible: `TASK-126`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -172,6 +172,7 @@ Primer bloque operativo asignado:
 | 47 | `TASK-120` | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | P2 | Medio | Bajo | **Absorbida** | Follow-on absorbido por la unificación efectiva de `Admin Center + Control Tower` |
 | 48 | `TASK-122` | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | P1 | Alto | Medio | **Cerrada** | Baseline del dominio Cloud cerrada: operating model canónico + capa mínima real en `src/lib/cloud/*` para dar base a `TASK-100` a `TASK-103` |
 | 49 | `TASK-123` | [TASK-123-nexa-product-hardening.md](to-do/TASK-123-nexa-product-hardening.md) | P1 | Muy alto | Alto | Diseño | Streaming, tool results como cards ricas, code copy, timestamps, shortcuts, context chips, export, runtime compartido |
+| 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](to-do/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | Diseño | Activar infraestructura de webhooks (TASK-006): registrar primer endpoint + subscription, validar flujo E2E, llevar Admin Center de warning a ok |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

@@ -246,6 +246,8 @@ Que cualquier error no-manejado en producción sea capturado, deduplicado y noti
 - [ ] Los 5 crons críticos tienen alerting integrado
 - [ ] `SENTRY_DSN` y `SLACK_ALERTS_WEBHOOK_URL` configurados en Vercel
 - [ ] Source maps subidos a Sentry en build
+- [ ] Verificar que `CRON_SECRET` está presente en staging — su ausencia causa proyecciones pendientes stuck en `projection_refresh_queue` (observado 2026-03-29: 9 items pending porque los crons reactivos no se procesan sin secret)
+- [ ] Cola de proyecciones pendientes en 0 o procesándose post-rollout de env vars
 - [ ] `pnpm build` pasa
 - [ ] `pnpm test` pasa
 
