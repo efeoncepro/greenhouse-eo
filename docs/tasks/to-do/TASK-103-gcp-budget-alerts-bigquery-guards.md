@@ -24,7 +24,7 @@
 | Lifecycle | `to-do` |
 | Priority | `P2` |
 | Impact | `Medio` |
-| Effort | `Muy bajo` |
+| Effort | `Bajo` |
 | Status real | `Diseño` |
 | Rank | — |
 | Domain | Infrastructure / Cost Management |
@@ -175,6 +175,50 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 2. Identificar el top 3 servicios por costo
 3. Ajustar budget amounts según el baseline real
 
+### Slice 4 — Notificaciones y alertas multi-canal (~1.5h)
+
+Las budget alerts de GCP por defecto solo llegan a un email de billing admin. Para que sean accionables, deben llegar por los canales que el equipo ya usa.
+
+#### 4a. Slack alerts (vía TASK-098)
+
+1. Configurar GCP Budget notification channel → Pub/Sub topic
+2. Crear Cloud Function liviana que reciba el mensaje de Pub/Sub y llame al `SLACK_ALERTS_WEBHOOK_URL` que TASK-098 ya provisiona:
+   ```
+   Budget "Greenhouse Monthly" al 80% ($160 de $200)
+   Servicio principal: BigQuery ($45), Cloud SQL ($38)
+   ```
+3. Alternativa más simple: configurar el notification channel directamente como Slack webhook en GCP Monitoring (sin Cloud Function intermedia)
+
+#### 4b. Email a administradores del portal
+
+1. Usar la capa de email delivery de Greenhouse (`src/lib/email/`) para notificar a usuarios con rol admin cuando:
+   - Un budget threshold se cruza (50%, 80%, 100%)
+   - Una query BigQuery es bloqueada por `maximumBytesBilled`
+2. Template de email con:
+   - Qué threshold se cruzó o qué query fue bloqueada
+   - Gasto actual vs presupuesto
+   - Link a GCP Billing Reports para drill-down
+3. Depende de: TASK-095 (email delivery layer, ya `complete`)
+
+#### 4c. Notificación in-app (Admin Center)
+
+1. Registrar evento en `greenhouse_notifications` cuando un guard de BigQuery bloquea una query en producción
+2. Surfacear en Admin Center > Ops Health como alerta visible:
+   - Qué query fue bloqueada
+   - Qué ruta/cron la disparó
+   - Bytes estimados vs límite configurado
+3. Depende de: TASK-023 (notification system) si se quiere notificación push; sin eso, basta con mostrar en el log de Ops Health
+
+#### Canales por tipo de evento
+
+| Evento | Slack | Email admin | Admin Center |
+|--------|-------|-------------|--------------|
+| Budget threshold 50% | Si | No | No |
+| Budget threshold 80% | Si | Si | No |
+| Budget threshold 100% | Si | Si | Si |
+| Query BigQuery bloqueada | Si (si es cron) | No | Si |
+| Clone Cloud SQL olvidado >24h | Si | Si | No |
+
 ## Out of Scope
 
 - Optimización de queries BigQuery (mejora futura post-slow query analysis)
@@ -193,6 +237,9 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 - [ ] Queries que excedan el límite fallan con error claro (no silenciosamente)
 - [ ] Scripts de backfill tienen override explícito documentado
 - [ ] Gasto actual del último mes documentado como baseline
+- [ ] Budget alerts llegan a Slack vía `SLACK_ALERTS_WEBHOOK_URL` (al menos threshold 80% y 100%)
+- [ ] Email a admins del portal cuando budget cruza 80% o 100%
+- [ ] Query BigQuery bloqueada genera registro visible en Admin Center > Ops Health
 - [ ] `pnpm build` pasa
 - [ ] `pnpm test` pasa
 
