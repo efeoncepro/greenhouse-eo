@@ -7,11 +7,11 @@
 
 ## 2026-03-29
 
-### Admin Center absorbe Control Tower
-- `/admin` es ahora la landing unificada de governance: Hero + 6 KPIs operativos + tabla "Torre de control" (health de spaces) + mapa de dominios clickable.
+### Admin Center absorbe Control Tower (v2)
+- `/admin` es ahora la landing unificada de governance: Hero → 4 ExecutiveMiniStatCards → tabla limpia "Torre de control" (5 cols MUI, sin scroll horizontal) → mapa de dominios (outlined cards ricos).
+- Nuevo `AdminCenterSpacesTable`: MUI Table size='small', filter chips, search, export CSV, paginación 8 filas, click-to-navigate.
 - `/internal/dashboard` redirige a `/admin`; item "Torre de control" removido del sidebar.
-- `HorizontalWithBorder` extendido con `trendLabel` y `onClick` para domain cards navegables.
-- Patrón visual alineado con Cloud & Integrations y Ops Health (Hero → KPIs → ExecutiveCardShell → tables).
+- Patrón visual alineado con Cloud & Integrations y Ops Health.
 
 ### Home landing cutover baseline
 - Los usuarios internos/admin ahora caen por defecto en `/home` cuando no tienen un `portalHomePath` explícito más específico; `hr`, `finance` y `my` conservan sus landings funcionales.

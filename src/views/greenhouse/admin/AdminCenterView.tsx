@@ -3,37 +3,33 @@
 import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
+import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
-import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import HorizontalWithBorder from '@components/card-statistics/HorizontalWithBorder'
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
-import { ExecutiveCardShell } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
 
-import InternalControlTowerTable from '../internal/dashboard/InternalControlTowerTable'
 import {
   buildControlTowerSummary,
   compareControlTowerTenants,
   finalizeControlTowerTenant,
-  formatInteger,
-  formatPercent,
-  formatRelativeDate,
-  getOtdTone
+  formatPercent
 } from '../internal/dashboard/helpers'
+import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'
+
+import AdminCenterSpacesTable from './AdminCenterSpacesTable'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
 
@@ -43,7 +39,19 @@ type Props = {
   controlTower: InternalDashboardOverview
 }
 
-const exportToCsv = (rows: ReturnType<typeof finalizeControlTowerTenant>[]) => {
+type DomainCard = {
+  title: string
+  subtitle: string
+  icon: string
+  avatarColor: 'info' | 'success' | 'warning' | 'primary' | 'error' | 'secondary'
+  status: { label: string; color: 'success' | 'warning' | 'info' | 'secondary' }
+  href: string
+  primaryAction: string
+  routes: string[]
+  points: string[]
+}
+
+const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
   const headers = ['Cliente', 'Estado', 'Contacto', 'Usuarios activos', 'Usuarios totales', 'Proyectos', 'OTD', 'Ultima actividad']
 
   const lines = rows.map(row =>
@@ -72,18 +80,100 @@ const exportToCsv = (rows: ReturnType<typeof finalizeControlTowerTenant>[]) => {
   URL.revokeObjectURL(url)
 }
 
-type DomainCardData = {
-  title: string
-  stats: string
-  avatarIcon: string
-  color: 'primary' | 'info' | 'success' | 'warning' | 'error' | 'secondary'
-  trendNumber: number
-  trendLabel: string
-  href: string
-}
+const buildDomainCards = ({ access, tenants }: Pick<Props, 'access' | 'tenants'>): DomainCard[] => [
+  {
+    title: 'Identity & Access',
+    subtitle: 'Usuarios, roles, equipo interno y scopes visibles del portal.',
+    icon: 'tabler-shield-lock',
+    avatarColor: 'info',
+    status: { label: access.totals.activeUsers > 0 ? 'Operativo' : 'Pendiente', color: access.totals.activeUsers > 0 ? 'success' : 'warning' },
+    href: '/admin/users',
+    primaryAction: 'Abrir usuarios',
+    routes: ['/admin/users', '/admin/roles', '/admin/team'],
+    points: [
+      `${access.totals.totalUsers} usuarios y ${access.roles.length} roles registrados`,
+      `${access.totals.invitedUsers} invitaciones pendientes`,
+      'Gobierno de acceso separado de las vistas operativas del producto'
+    ]
+  },
+  {
+    title: 'Delivery',
+    subtitle: 'Historial de envios, suscripciones y trazabilidad de delivery operacional.',
+    icon: 'tabler-mail-bolt',
+    avatarColor: 'success',
+    status: { label: 'Listo', color: 'success' },
+    href: '/admin/email-delivery',
+    primaryAction: 'Abrir correos',
+    routes: ['/admin/email-delivery'],
+    points: [
+      'Capa centralizada de email con surface administrativa',
+      'Delivery, retries y destinatarios por tipo',
+      'Governance para notificaciones transaccionales'
+    ]
+  },
+  {
+    title: 'AI Governance',
+    subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',
+    icon: 'tabler-robot',
+    avatarColor: 'warning',
+    status: { label: 'Dual', color: 'info' },
+    href: '/admin/ai-tools',
+    primaryAction: 'Abrir AI governance',
+    routes: ['/admin/ai-tools'],
+    points: [
+      'Domain surface para usuarios de AI Tooling',
+      'Capa de gobernanza y control de creditos o licencias',
+      'Separacion entre uso diario y administracion'
+    ]
+  },
+  {
+    title: 'Cloud & Integrations',
+    subtitle: GH_INTERNAL_NAV.adminCloudIntegrations.subtitle,
+    icon: 'tabler-plug-connected',
+    avatarColor: 'primary',
+    status: { label: 'Activo', color: 'success' },
+    href: '/admin/cloud-integrations',
+    primaryAction: 'Abrir cloud & integrations',
+    routes: ['/admin/cloud-integrations'],
+    points: [
+      'Health, stale data, retries y auth por referencia',
+      'Syncs y webhooks con entrypoint propio',
+      'Deep-link a operaciones cuando hace falta mas contexto'
+    ]
+  },
+  {
+    title: 'Ops Health',
+    subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,
+    icon: 'tabler-activity-heartbeat',
+    avatarColor: 'error',
+    status: { label: 'Runtime', color: 'info' },
+    href: '/admin/ops-health',
+    primaryAction: 'Abrir ops health',
+    routes: ['/admin/ops-health'],
+    points: [
+      'Outbox, queue y handlers reactivos',
+      'Semantica ok, warning, failed y stale',
+      'Replay y retry sobre helpers canonicos'
+    ]
+  },
+  {
+    title: 'Spaces',
+    subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',
+    icon: 'tabler-grid-4x4',
+    avatarColor: 'primary',
+    status: { label: tenants.totals.activeTenants > 0 ? 'Activo' : 'Sin spaces', color: tenants.totals.activeTenants > 0 ? 'success' : 'warning' },
+    href: '/admin/tenants',
+    primaryAction: 'Abrir spaces',
+    routes: ['/admin/tenants'],
+    points: [
+      `${tenants.totals.totalTenants} spaces visibles en governance`,
+      `${tenants.totals.tenantsWithScopedProjects} con proyectos scoped`,
+      'Contexto de capabilities y acceso por empresa'
+    ]
+  }
+]
 
 const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
-  const router = useRouter()
   const [searchValue, setSearchValue] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
@@ -100,7 +190,7 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
 
       const matchesSearch =
         query.length === 0 ||
-        [tenant.clientName, tenant.primaryContactEmail || '', tenant.capabilityCodes.join(' ')]
+        [tenant.clientName, tenant.primaryContactEmail || '']
           .join(' ')
           .toLowerCase()
           .includes(query)
@@ -114,159 +204,13 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
     [controlTower.totals.internalAdmins, ctTenants]
   )
 
-  const activeUsersRate = summary.totalUsers > 0 ? (summary.activeUsers / summary.totalUsers) * 100 : 0
-  const pendingUsersRate = summary.totalUsers > 0 ? (summary.invitedUsers / summary.totalUsers) * 100 : 0
-  const globalOtdTone = getOtdTone(summary.avgOnTimePct)
+  const otdKpiTone: 'success' | 'warning' | 'error' | 'info' =
+    summary.avgOnTimePct === null ? 'info'
+      : summary.avgOnTimePct >= 90 ? 'success'
+        : summary.avgOnTimePct >= 70 ? 'warning'
+          : 'error'
 
-  /* ── KPI cards (HorizontalWithSubtitle) ── */
-  const kpiCards = [
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_clients,
-      stats: formatInteger(controlTower.totals.totalClients),
-      avatarIcon: 'tabler-building-community',
-      avatarColor: 'primary' as const,
-      trend: summary.newClientsThisMonth > 0 ? ('positive' as const) : ('neutral' as const),
-      trendNumber: formatInteger(summary.newClientsThisMonth),
-      subtitle: `${formatInteger(summary.activeClients)} activos hoy`,
-      footer:
-        summary.newClientsThisMonth > 0
-          ? `${formatInteger(summary.newClientsThisMonth)} nuevos este mes.`
-          : GH_INTERNAL_MESSAGES.internal_dashboard_no_new_clients
-    },
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_active_users,
-      stats: formatInteger(summary.activeUsers),
-      avatarIcon: 'tabler-user-check',
-      avatarColor: 'success' as const,
-      trend: activeUsersRate < 20 ? ('negative' as const) : ('positive' as const),
-      trendNumber: `${Math.round(activeUsersRate)}%`,
-      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_active_subtitle(summary.activeUsers, summary.totalUsers),
-      statusLabel:
-        activeUsersRate < 20
-          ? GH_INTERNAL_MESSAGES.internal_dashboard_active_status_low
-          : GH_INTERNAL_MESSAGES.internal_dashboard_active_status_healthy,
-      statusColor: activeUsersRate < 20 ? ('warning' as const) : ('success' as const),
-      footer: GH_INTERNAL_MESSAGES.internal_dashboard_active_footer
-    },
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_pending_users,
-      stats: formatInteger(summary.invitedUsers),
-      avatarIcon: 'tabler-user-search',
-      avatarColor: 'warning' as const,
-      trend: pendingUsersRate > 80 ? ('negative' as const) : ('neutral' as const),
-      trendNumber: `${Math.round(pendingUsersRate)}%`,
-      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_pending_subtitle,
-      statusLabel:
-        pendingUsersRate > 80
-          ? GH_INTERNAL_MESSAGES.internal_dashboard_pending_status_risk
-          : GH_INTERNAL_MESSAGES.internal_dashboard_pending_status_ok,
-      statusColor: pendingUsersRate > 80 ? ('error' as const) : ('warning' as const),
-      footer: GH_INTERNAL_MESSAGES.internal_dashboard_pending_footer
-    },
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_internal_admins,
-      stats: formatInteger(summary.internalAdmins),
-      avatarIcon: 'tabler-shield-lock',
-      avatarColor: 'info' as const,
-      trend: 'neutral' as const,
-      trendNumber: formatInteger(summary.internalAdmins),
-      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_admins_subtitle,
-      footer: GH_INTERNAL_MESSAGES.internal_dashboard_admins_footer
-    },
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity,
-      stats: formatInteger(summary.spacesWithoutActivity),
-      avatarIcon: 'tabler-alert-triangle',
-      avatarColor: 'error' as const,
-      trend: summary.spacesWithoutActivity > 0 ? ('negative' as const) : ('positive' as const),
-      trendNumber: formatInteger(summary.attentionCount),
-      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_subtitle,
-      statusLabel:
-        summary.spacesWithoutActivity > 0
-          ? GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_status_alert
-          : GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_status_clear,
-      statusColor: summary.spacesWithoutActivity > 0 ? ('error' as const) : ('success' as const),
-      footer: GH_INTERNAL_MESSAGES.internal_dashboard_spaces_without_activity_footer
-    },
-    {
-      title: GH_INTERNAL_MESSAGES.internal_dashboard_global_otd,
-      stats: formatPercent(summary.avgOnTimePct),
-      avatarIcon: 'tabler-target-arrow',
-      avatarColor: globalOtdTone === 'default' ? ('secondary' as const) : globalOtdTone,
-      trend:
-        summary.avgOnTimePct === null ? ('neutral' as const) : summary.avgOnTimePct >= 90 ? ('positive' as const) : summary.avgOnTimePct >= 70 ? ('neutral' as const) : ('negative' as const),
-      trendNumber: formatInteger(summary.trackedOtdProjects),
-      subtitle: GH_INTERNAL_MESSAGES.internal_dashboard_global_subtitle,
-      statusLabel:
-        summary.avgOnTimePct === null
-          ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_empty
-          : summary.avgOnTimePct >= 90
-            ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_healthy
-            : summary.avgOnTimePct >= 70
-              ? GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_watch
-              : GH_INTERNAL_MESSAGES.internal_dashboard_otd_status_alert,
-      statusColor: globalOtdTone,
-      footer: GH_INTERNAL_MESSAGES.internal_dashboard_otd_footer(summary.trackedOtdProjects)
-    }
-  ]
-
-  /* ── Domain navigation cards (HorizontalWithBorder) ── */
-  const domainCards: DomainCardData[] = [
-    {
-      title: 'Spaces',
-      stats: String(tenants.totals.activeTenants),
-      avatarIcon: 'tabler-grid-4x4',
-      color: 'primary',
-      trendNumber: tenants.totals.tenantsWithScopedProjects,
-      trendLabel: 'con proyectos en scope',
-      href: '/admin/tenants'
-    },
-    {
-      title: 'Identity & Access',
-      stats: String(access.totals.activeUsers),
-      avatarIcon: 'tabler-shield-lock',
-      color: 'info',
-      trendNumber: access.totals.invitedUsers,
-      trendLabel: 'pendientes de activacion',
-      href: '/admin/users'
-    },
-    {
-      title: 'Delivery',
-      stats: 'Activo',
-      avatarIcon: 'tabler-mail-bolt',
-      color: 'success',
-      trendNumber: 0,
-      trendLabel: 'alertas en delivery',
-      href: '/admin/email-delivery'
-    },
-    {
-      title: 'AI Governance',
-      stats: 'Dual',
-      avatarIcon: 'tabler-robot',
-      color: 'warning',
-      trendNumber: 0,
-      trendLabel: 'wallets activas',
-      href: '/admin/ai-tools'
-    },
-    {
-      title: 'Cloud & Integrations',
-      stats: 'Syncs',
-      avatarIcon: 'tabler-plug-connected',
-      color: 'error',
-      trendNumber: 0,
-      trendLabel: 'alertas de integracion',
-      href: '/admin/cloud-integrations'
-    },
-    {
-      title: 'Ops Health',
-      stats: 'Runtime',
-      avatarIcon: 'tabler-activity-heartbeat',
-      color: 'secondary',
-      trendNumber: 0,
-      trendLabel: 'handlers degradados',
-      href: '/admin/ops-health'
-    }
-  ]
+  const cards = buildDomainCards({ access, tenants })
 
   return (
     <Stack spacing={6}>
@@ -286,39 +230,55 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
               Plano de gobierno que unifica health de spaces, identity, delivery, integraciones y observabilidad operativa.
               Cada dominio indexa una family funcional sin reemplazar las surfaces especialistas.
             </Typography>
-            <Typography variant='body2' color='text.secondary'>
-              {GH_INTERNAL_MESSAGES.internal_dashboard_summary(
-                summary.activeClients,
-                summary.invitedUsers,
-                formatRelativeDate(summary.lastActivityAt)
-              )}
-            </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/tenants' variant='contained'>
-                Abrir Spaces
-              </Button>
-              <Button component={Link} href='/admin/cloud-integrations' variant='outlined'>
-                Ver Cloud & Integrations
-              </Button>
+              <Button component={Link} href='/admin/tenants' variant='contained'>Abrir Spaces</Button>
+              <Button component={Link} href='/admin/cloud-integrations' variant='outlined'>Ver Cloud & Integrations</Button>
             </Stack>
           </Stack>
         </CardContent>
       </Card>
 
-      {/* ── KPIs ── */}
-      <SectionErrorBoundary
-        sectionName='admin-center-kpis'
-        title={GH_INTERNAL_MESSAGES.internal_dashboard_kpis_error_title}
-        description={GH_INTERNAL_MESSAGES.internal_dashboard_kpis_error_description}
+      {/* ── 4 KPIs ── */}
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }
+        }}
       >
-        <Grid container spacing={6}>
-          {kpiCards.map(card => (
-            <Grid key={card.title} size={{ xs: 12, sm: 6, xl: 4 }}>
-              <HorizontalWithSubtitle {...card} />
-            </Grid>
-          ))}
-        </Grid>
-      </SectionErrorBoundary>
+        <ExecutiveMiniStatCard
+          eyebrow='Governance'
+          tone='info'
+          title='Spaces activos'
+          value={String(tenants.totals.activeTenants)}
+          detail='Tenants con postura operativa vigente.'
+          icon='tabler-grid-4x4'
+        />
+        <ExecutiveMiniStatCard
+          eyebrow='Identity'
+          tone='success'
+          title='Usuarios activos'
+          value={String(access.totals.activeUsers)}
+          detail='Base con acceso habilitado dentro del portal.'
+          icon='tabler-users'
+        />
+        <ExecutiveMiniStatCard
+          eyebrow='Access'
+          tone='warning'
+          title='Pendientes activacion'
+          value={String(access.totals.invitedUsers)}
+          detail='Invitaciones o onboarding sin cerrar.'
+          icon='tabler-mail-exclamation'
+        />
+        <ExecutiveMiniStatCard
+          eyebrow='Delivery'
+          tone={otdKpiTone}
+          title='OTD global'
+          value={formatPercent(summary.avgOnTimePct)}
+          detail='Promedio ponderado de entrega.'
+          icon='tabler-target-arrow'
+        />
+      </Box>
 
       {/* ── Torre de control (Spaces health table) ── */}
       <SectionErrorBoundary
@@ -328,61 +288,17 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
       >
         <ExecutiveCardShell
           title='Torre de control'
-          subtitle={GH_INTERNAL_MESSAGES.internal_dashboard_table_subtitle}
-          action={
-            <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap'>
-              {summary.attentionCount > 0 ? (
-                <Button
-                  variant='tonal'
-                  color='error'
-                  size='small'
-                  startIcon={<i className='tabler-alert-triangle' />}
-                  onClick={() => setStatusFilter('attention')}
-                >
-                  {GH_INTERNAL_MESSAGES.internal_dashboard_requires_attention(summary.attentionCount)}
-                </Button>
-              ) : null}
-              {summary.onboardingCount > 0 ? (
-                <Button
-                  variant='tonal'
-                  color='warning'
-                  size='small'
-                  startIcon={<i className='tabler-rocket' />}
-                  onClick={() => setStatusFilter('onboarding')}
-                >
-                  {GH_INTERNAL_MESSAGES.internal_dashboard_onboarding(summary.onboardingCount)}
-                </Button>
-              ) : null}
-              {summary.inactiveCount > 0 ? (
-                <Button
-                  variant='tonal'
-                  color='secondary'
-                  size='small'
-                  startIcon={<i className='tabler-moon-stars' />}
-                  onClick={() => setStatusFilter('inactive')}
-                >
-                  {GH_INTERNAL_MESSAGES.internal_dashboard_inactive(summary.inactiveCount)}
-                </Button>
-              ) : null}
-              <Button
-                variant='tonal'
-                color='secondary'
-                size='small'
-                startIcon={<i className='tabler-upload' />}
-                onClick={() => exportToCsv(filteredTenants)}
-              >
-                {GH_INTERNAL_MESSAGES.internal_dashboard_export}
-              </Button>
-            </Stack>
-          }
+          subtitle='Control operativo de spaces con prioridad para onboarding, activacion y delivery.'
         >
-          <InternalControlTowerTable
+          <AdminCenterSpacesTable
             rows={filteredTenants}
             totalRows={ctTenants.length}
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
+            onExport={() => exportToCsv(filteredTenants)}
+            attentionCount={summary.attentionCount}
           />
         </ExecutiveCardShell>
       </SectionErrorBoundary>
@@ -396,20 +312,48 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
           sx={{
             display: 'grid',
             gap: 3,
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }
+            gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
           }}
         >
-          {domainCards.map(card => (
-            <HorizontalWithBorder
-              key={card.title}
-              title={card.title}
-              stats={card.stats}
-              avatarIcon={card.avatarIcon}
-              color={card.color}
-              trendNumber={card.trendNumber}
-              trendLabel={card.trendLabel}
-              onClick={() => router.push(card.href)}
-            />
+          {cards.map(card => (
+            <Card key={card.title} variant='outlined' sx={{ height: '100%' }}>
+              <CardContent sx={{ p: 4 }}>
+                <Stack spacing={3} sx={{ height: '100%' }}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
+                    <Stack spacing={1}>
+                      <Stack direction='row' spacing={1.5} alignItems='center'>
+                        <Avatar variant='rounded' sx={{ bgcolor: `${card.avatarColor}.lightOpacity`, color: `${card.avatarColor}.main` }}>
+                          <i className={card.icon} />
+                        </Avatar>
+                        <Typography variant='h5'>{card.title}</Typography>
+                      </Stack>
+                      <Typography color='text.secondary'>{card.subtitle}</Typography>
+                    </Stack>
+                    <Chip size='small' color={card.status.color} variant='tonal' label={card.status.label} />
+                  </Stack>
+
+                  <Stack spacing={1.25}>
+                    {card.points.map(point => (
+                      <Typography key={point} variant='body2' color='text.secondary'>
+                        - {point}
+                      </Typography>
+                    ))}
+                  </Stack>
+
+                  <Box sx={{ mt: 'auto' }}>
+                    <Typography variant='overline' color='text.secondary'>Rutas indexadas</Typography>
+                    <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.25, mb: 2.5 }}>
+                      {card.routes.map(route => (
+                        <Chip key={route} size='small' label={route} variant='outlined' sx={{ fontFamily: 'monospace' }} />
+                      ))}
+                    </Stack>
+                    <Button component={Link} href={card.href} variant='outlined'>
+                      {card.primaryAction}
+                    </Button>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
           ))}
         </Box>
       </ExecutiveCardShell>

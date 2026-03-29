@@ -7,11 +7,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ## Sesión 2026-03-29 — Admin Center + Control Tower unificado
 
 ### Completado
-- **Admin Center landing redesign**: Control Tower absorbido como sección dentro de `/admin`
-  - Hero con gradiente purple→cyan, KPIs unificados (6× HorizontalWithSubtitle), tabla de tenants en ExecutiveCardShell, mapa de dominios con HorizontalWithBorder clickables
+- **Admin Center landing redesign v2**: Control Tower absorbido como sección dentro de `/admin`
+  - Hero (gradiente purple→cyan) → 4 ExecutiveMiniStatCards → Torre de control (tabla MUI limpia 5 cols, sin scroll horizontal) → Mapa de dominios (outlined cards ricos con avatar, bullets, CTA)
+  - Nuevo componente `AdminCenterSpacesTable.tsx`: MUI Table size='small', 5 columnas (Space, Estado, Usuarios, Proyectos, Actividad), paginación 8 filas, filter chips + search + export
   - `/internal/dashboard` redirige a `/admin` (backward compat)
   - Sidebar: removido item "Torre de control" de Gestión; UserDropdown apunta a `/admin`
-  - `HorizontalWithBorder` extendido con props `trendLabel` y `onClick`
 - `TASK-119` movida a `in-progress`.
 - Se aplicó el cutover base de landing para internos/admin:
   - fallback de `portalHomePath` ahora cae en `/home` en vez de `/internal/dashboard`
