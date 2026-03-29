@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Observability posture baseline
+- `TASK-098` quedó iniciada con un slice mínimo y reversible de contrato.
+- `GET /api/internal/health` ahora proyecta también `observability`, con postura de:
+  - `SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SLACK_ALERTS_WEBHOOK_URL`
+- La capa canónica vive en `src/lib/cloud/observability.ts`.
+- El contrato del health interno ahora separa:
+  - `runtimeChecks`
+  - `postureChecks`
+  - `overallStatus`
+  - `summary`
+- `503` sigue reservado para fallos reales de runtime; la postura incompleta solo degrada señal operativa.
+- Este lote no instala todavía `@sentry/nextjs` ni conecta Slack real; solo deja visibilidad operativa previa al rollout externo.
+
 ## Delta 2026-03-29 Secret Manager validado en staging + production
 - `develop` absorbió `TASK-124` en `497cb19` y `main` absorbió el slice mínimo en `7238a90`.
 - `staging` ya ejecuta `497cb19` y `/api/internal/health` confirmó resolución real por Secret Manager para:

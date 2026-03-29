@@ -1,5 +1,17 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — Lane iniciada con posture de observabilidad
+
+- `TASK-098` pasa a `in-progress`.
+- Slice inicial elegido por seguridad y reversibilidad:
+  - formalizar postura de observabilidad en `GET /api/internal/health`
+  - proyectar si existen `SENTRY_DSN`, `SENTRY_AUTH_TOKEN` y `SLACK_ALERTS_WEBHOOK_URL`
+  - dejar tests unitarios del contrato antes de conectar integraciones externas reales
+- Fuera de este primer lote:
+  - instalar `@sentry/nextjs`
+  - wiring real de Slack alerts en crons
+  - rollout de variables en Vercel
+
 ## Delta 2026-03-29 — Baseline parcial absorbida por TASK-124
 
 - Parte del endurecimiento del payload de `GET /api/internal/health` ya fue absorbido por `TASK-124`:
@@ -11,22 +23,47 @@
 
 - Parte del baseline ya quedó adelantado:
   - `GET /api/internal/health` ya existe
-  - `src/lib/alerts/slack-notify.ts` ya existe
-  - los crons críticos ya tienen hook base de `alertCronFailure()`
+  - la capa cloud ya proyecta postura de auth, Postgres y secretos
 - Lo pendiente real de esta task se concentra ahora en:
   - integración Sentry
   - endurecimiento del payload/contract del health endpoint
   - wiring operativo final de `SLACK_ALERTS_WEBHOOK_URL`
 
+## Delta 2026-03-29 — Slice 1 implementado
+
+- `GET /api/internal/health` ahora proyecta también `observability`.
+- El contract del endpoint quedó separado en:
+  - `runtimeChecks`
+  - `postureChecks`
+  - `overallStatus`
+  - `summary`
+- `503` sigue dependiendo solo de checks runtime; posture incompleta ahora se reporta como `degraded`.
+- Nuevo contrato mínimo:
+  - `sentry.dsnConfigured`
+  - `sentry.authTokenConfigured`
+  - `sentry.enabled`
+  - `slack.alertsWebhookConfigured`
+  - `slack.enabled`
+  - `summary`
+- Nueva capa canónica:
+  - `src/lib/cloud/observability.ts`
+- Variables documentadas en `.env.example`:
+  - `SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SLACK_ALERTS_WEBHOOK_URL`
+- Sigue pendiente:
+  - integración real de `@sentry/nextjs`
+  - wiring real de Slack alerts en crons críticos
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Observability |
 | Sequence | Cloud Posture Hardening **3 of 6** — after TASK-100, TASK-099 |
