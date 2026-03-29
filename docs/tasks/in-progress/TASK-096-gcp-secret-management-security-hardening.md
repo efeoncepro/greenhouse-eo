@@ -89,6 +89,38 @@
   - `Production` sigue pendiente antes de cerrar la fase externa de esta task
   - Cloud SQL sigue pendiente de hardening externo (`authorizedNetworks`, `sslMode`, `requireSsl`)
 
+## Delta 2026-03-29 — Production validado sin SA key
+
+- Se promovió a `main` un lote mínimo de runtime para no arrastrar UI/Nexa:
+  - `src/lib/google-credentials.ts`
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+  - `src/lib/cloud/*`
+  - `src/app/api/internal/health/route.ts`
+  - `package.json` / `pnpm-lock.yaml`
+- Validación local del lote mínimo sobre árbol limpio basado en `origin/main`:
+  - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts src/lib/cloud/postgres.test.ts src/lib/cloud/bigquery.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm exec eslint ...` sobre runtime cloud/WIF
+  - `pnpm build`
+- `Production` ya corre `version=74bb5a1`.
+- El inventario actual de Vercel `Production` ya no incluye `GOOGLE_APPLICATION_CREDENTIALS_JSON`.
+- Tras redeploy de `greenhouse.efeoncepro.com`, la validación real respondió:
+  - `GET /api/internal/health` → `200 OK`
+  - `auth.mode=wif`
+  - `selectedSource=wif`
+  - `serviceAccountKeyConfigured=false`
+  - BigQuery reachable
+  - Cloud SQL reachable vía connector
+  - `GET /api/auth/session` → `{}`
+- Estado final de la fase WIF:
+  - `Preview`: fallback legado permitido
+  - `Staging`: WIF-only validado
+  - `Production`: WIF-only validado
+  - pendiente de la task: hardening externo de Cloud SQL
+
 ## Status
 
 | Campo | Valor |
@@ -426,15 +458,15 @@ Futuro: Vercel → OIDC token (expires in minutes) → WIF Pool → GCP APIs
 ### Fase 1
 - [ ] Cloud SQL `greenhouse-pg-dev` no tiene `0.0.0.0/0` en authorized networks
 - [ ] Cloud SQL SSL mode es `ENCRYPTED_ONLY`
-- [ ] Production deploy conecta a Cloud SQL correctamente
+- [x] Production deploy conecta a Cloud SQL correctamente
 - [x] Staging deploy conecta a Cloud SQL correctamente
 - [ ] Cloud Run services siguen conectando sin error
 - [ ] Documentación actualizada en `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 
 ### Fase 2
-- [ ] Workload Identity Pool `greenhouse-vercel-pool` creado en GCP
-- [ ] `google-credentials.ts` intenta WIF primero, fallback a SA key
-- [ ] Production usa WIF (no SA key)
+- [x] Workload Identity Pool `greenhouse-vercel-pool` creado en GCP
+- [x] `google-credentials.ts` intenta WIF primero, fallback a SA key
+- [x] Production usa WIF (no SA key)
 - [x] Staging usa WIF (no SA key)
 - [ ] BigQuery, Cloud SQL, Storage y Vertex AI funcionan con WIF en Production
 - [ ] Todos los cron jobs ejecutan correctamente

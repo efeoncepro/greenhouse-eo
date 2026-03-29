@@ -2165,6 +2165,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Mantener `.env.example` alineado con las variables requeridas.
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` en `Preview` puede llegar en mas de una serializacion; el parser de `src/lib/bigquery.ts` ya soporta JSON minified y JSON legacy escapado.
 - Desde `TASK-096`, `Staging` ya no depende de `GOOGLE_APPLICATION_CREDENTIALS_JSON`; ese entorno usa `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL` y Cloud SQL Connector como baseline compartido.
+- Desde `TASK-096`, `Production` ya tampoco depende de `GOOGLE_APPLICATION_CREDENTIALS_JSON`; el runtime productivo corre con WIF y Cloud SQL Connector.
 - Si `Preview` rechaza un login que en BigQuery esta activo y con hash correcto, revisar primero alias del dominio y el parseo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir fallo de credenciales.
 
 ## Variables de Entorno
@@ -2195,7 +2196,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
 - `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` son ahora la postura objetivo para runtimes Vercel con acceso GCP.
-- `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya no existe en `staging`; sigue como fallback transicional en `Preview` y `Production` hasta cerrar el rollout.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya no existe en `Staging` ni en `Production`; sigue como fallback transicional solo en `Preview`.
 - `GCP_PROJECT` sigue siendo obligatorio en `Development`, `Preview`, `Staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.

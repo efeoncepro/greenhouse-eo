@@ -57,6 +57,12 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `staging` ya valida `auth.mode=wif` y `serviceAccountKeyConfigured=false`
   - `GET /api/auth/session` responde `{}` sin error
   - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
+- Estado productivo ya resuelto:
+  - `main` recibió un lote mínimo de runtime cloud/WIF en `74bb5a1`
+  - `greenhouse.efeoncepro.com` quedó sobre `greenhouse-bvxe3j7n9-efeonce-7670142f.vercel.app`
+  - `production` ya valida `auth.mode=wif`, `selectedSource=wif` y `serviceAccountKeyConfigured=false`
+  - `GET /api/auth/session` responde `{}` sin error
+  - el inventario actual de `Production` ya no incluye `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - Hallazgo operativo Vercel:
   - `vercel deploy --target staging` siguió fallando con `Unexpected error`
   - `vercel redeploy <deployment-ready> --target staging` sí funcionó y quedó como workaround seguro para este custom environment
@@ -64,14 +70,13 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - mantener el flujo `feature -> preview -> develop/staging -> main`
   - no usar feature branches para pinchar el entorno compartido
 - Siguiente paso recomendado:
-  - repetir el mismo patrón en `Production` de forma controlada
-  - retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON` de `Production`
-  - validar `/api/internal/health` y `/api/auth/session` en producción
+  - validar impacto externo antes de endurecer Cloud SQL
+  - confirmar consumers fuera de Vercel que todavía puedan depender de acceso directo por IP
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`
   - activar `requireSsl=true`
-- No declarar `TASK-096` cerrada todavía: `staging` ya quedó sano, pero `production` y el hardening externo de Cloud SQL siguen pendientes.
+- No declarar `TASK-096` cerrada todavía: la fase WIF ya quedó sana en `staging` y `production`, pero el hardening externo de Cloud SQL sigue pendiente.
 
 ## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
 

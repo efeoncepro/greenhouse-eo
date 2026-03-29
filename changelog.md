@@ -18,8 +18,11 @@
 - `develop` ya absorbió el lote limpio de `TASK-096` y `dev-greenhouse.efeoncepro.com` quedó validado sobre `version=796f5e5`.
 - `staging` ya corre sin `GOOGLE_APPLICATION_CREDENTIALS_JSON`; `/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK.
 - `GET /api/auth/session` en `staging` responde `{}`, confirmando que el retiro de la SA key no rompió NextAuth ni el runtime compartido.
+- `main` recibió un lote mínimo de runtime cloud/WIF (`74bb5a1`) sin arrastrar cambios de UI/Nexa.
+- `greenhouse.efeoncepro.com` ya corre sin `GOOGLE_APPLICATION_CREDENTIALS_JSON`; `/api/internal/health` reporta `auth.mode=wif`, `selectedSource=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK.
+- `GET /api/auth/session` en `Production` responde `{}` después del redeploy WIF-only.
 - El path `vercel deploy --target staging` siguió fallando de forma intermitente, pero `vercel redeploy <deployment-ready> --target staging` funcionó como promoción segura del custom environment.
-- Cloud SQL sigue sin endurecimiento externo final porque todavía falta repetir este cutover en `Production` y luego cerrar red + SSL obligatoria.
+- Cloud SQL sigue sin endurecimiento externo final; ahora el pendiente real es cerrar red + SSL obligatoria sin afectar consumers fuera de Vercel.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).

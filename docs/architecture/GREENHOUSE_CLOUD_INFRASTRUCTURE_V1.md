@@ -59,6 +59,16 @@
       - BigQuery reachable
       - Cloud SQL reachable vía connector
     - `staging` ya no tiene `GOOGLE_APPLICATION_CREDENTIALS_JSON`; el fallback de SA key queda reservado para `Preview` mientras dure la transición
+  - `production` ya absorbió el baseline mínimo WIF en `version=74bb5a1`
+  - `greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK` con:
+    - `environment=production`
+    - `auth.mode=wif`
+    - `selectedSource=wif`
+    - `serviceAccountKeyConfigured=false`
+    - BigQuery reachable
+    - Cloud SQL reachable vía connector
+  - `GET /api/auth/session` en producción respondió `{}` después del redeploy WIF-only
+  - el inventario actual de `Production` ya no incluye `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 
 ## 1. Overview
 
