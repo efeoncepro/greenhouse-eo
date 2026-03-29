@@ -6,6 +6,12 @@
 
 ---
 
+## Delta 2026-03-29 — Health runtime ya no degrada por perfiles Postgres de tooling
+
+- El repo cerró `TASK-131` para corregir el warning residual del health cloud.
+- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen documentados como perfiles de tooling, no como dependencias del runtime del portal.
+- La postura operativa mantiene su visibilidad, pero el `overallStatus` del health ya no debe degradarse solo por esos perfiles ausentes.
+
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
 - `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.

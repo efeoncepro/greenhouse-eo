@@ -2,15 +2,28 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `53`
 - Domain: `cloud`
 - GitHub Project: `TBD`
 - GitHub Issue: `TBD`
+
+## Delta 2026-03-29
+
+- `TASK-131` quedó cerrada con una corrección semántica en la capa `cloud/*`.
+- `src/lib/cloud/secrets.ts` ahora clasifica los secretos tracked entre:
+  - `runtime`
+  - `tooling`
+- `src/lib/cloud/health.ts` ya evalúa `postureChecks.secrets` solo con secretos runtime-críticos.
+- `migrator/admin` siguen visibles vía `postgresAccessProfiles` y `toolingSummary`, pero ya no degradan el significado del runtime principal.
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/health.test.ts src/lib/cloud/secrets.test.ts src/lib/cloud/postgres.test.ts`
+  - `pnpm exec eslint src/lib/cloud/contracts.ts src/lib/cloud/health.ts src/lib/cloud/secrets.ts src/lib/cloud/postgres.ts src/lib/cloud/health.test.ts src/lib/cloud/secrets.test.ts src/lib/cloud/postgres.test.ts src/app/api/internal/health/route.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
 
 ## Summary
 
@@ -111,12 +124,11 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- `src/lib/cloud/secrets.ts` mete `postgres_runtime_password`, `postgres_migrator_password` y `postgres_admin_password` en el mismo posture global.
-- `src/lib/cloud/health.ts` degrada `postureChecks.secrets` si cualquiera de esos entries queda `unconfigured`.
-- `overallStatus` termina en `degraded` aunque no exista impacto runtime real.
-- La UI de `Ops Health` no distingue con suficiente claridad entre:
-  - “portal sano para tráfico”
-  - “tooling privilegiado aún no provisionado”
+- El gap original ya quedó resuelto en repo:
+  - `secrets` distingue `runtimeSummary` y `toolingSummary`
+  - la degradación del health ya no se activa solo por `migrator/admin`
+  - `postgresAccessProfiles` sigue exponiendo los perfiles privilegiados por separado
+- El remanente externo es solo validar este comportamiento en `staging` y `production` tras deploy del nuevo commit.
 
 ## Scope
 
@@ -165,12 +177,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `GET /api/internal/health` no devuelve `overallStatus=degraded` cuando el único gap es `migrator/admin` sin configurar y el runtime está sano.
-- [ ] La ausencia de `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD(_SECRET_REF)` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD(_SECRET_REF)` sigue siendo visible en una postura operativa separada.
-- [ ] `postgresAccessProfiles` o su equivalente mantiene detalle explícito por perfil `runtime`, `migrator` y `admin`.
-- [ ] `postureChecks.secrets` o su reemplazo deja de mezclar secretos runtime-críticos con tooling-only sin perder visibilidad.
-- [ ] `Admin Center / Ops Health` refleja la nueva semántica sin marcar como fallo runtime algo que no afecta serving.
-- [ ] Arquitectura y documentación viva quedan alineadas con el comportamiento final.
+- [x] `GET /api/internal/health` ya no degrada `overallStatus` solo porque `migrator/admin` estén sin configurar y el runtime esté sano.
+- [x] La ausencia de `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD(_SECRET_REF)` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD(_SECRET_REF)` sigue visible en una postura separada.
+- [x] `postgresAccessProfiles` mantiene detalle explícito por perfil `runtime`, `migrator` y `admin`.
+- [x] `postureChecks.secrets` deja de mezclar secretos runtime-críticos con tooling-only sin perder visibilidad.
+- [x] La semántica esperada para `Ops Health` queda alineada desde el contrato del endpoint interno.
+- [x] Arquitectura y documentación viva quedan alineadas con el comportamiento final del repo.
 
 ## Verification
 

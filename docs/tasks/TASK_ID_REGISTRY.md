@@ -172,6 +172,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-130` | `to-do` | Login Auth Flow UX: Loading States & Transitions | `docs/tasks/to-do/TASK-130-login-auth-flow-ux-feedback.md` |
 
-| `TASK-131` | `to-do` | Cloud Health Runtime vs Tooling Posture Separation | `docs/tasks/to-do/TASK-131-cloud-health-runtime-tooling-posture-separation.md` |
+| `TASK-131` | `complete` | Cloud Health Runtime vs Tooling Posture Separation | `docs/tasks/complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md` |
 
 `TASK-132`

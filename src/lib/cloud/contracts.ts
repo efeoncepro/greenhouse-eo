@@ -73,10 +73,13 @@ export interface CloudSecretPostureEntry {
   secretRefEnvVarName: string
   secretRefConfigured: boolean
   source: CloudSecretSource
+  classification: 'runtime' | 'tooling'
 }
 
 export interface CloudSecretsPosture {
   summary: string
+  runtimeSummary: string
+  toolingSummary: string
   entries: CloudSecretPostureEntry[]
 }
 

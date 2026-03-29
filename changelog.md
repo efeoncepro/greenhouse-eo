@@ -7,6 +7,12 @@
 
 ## 2026-03-29
 
+### TASK-131 closed with runtime-vs-tooling secret posture separation
+- `src/lib/cloud/secrets.ts` ahora clasifica secretos tracked entre `runtime` y `tooling`.
+- `src/lib/cloud/health.ts` evalúa `postureChecks.secrets` solo con secretos runtime-críticos y conserva el detalle de tooling por separado.
+- Esto evita degradar `overallStatus` solo porque `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` o `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no vivan en el runtime del portal.
+- `postgresAccessProfiles` sigue exponiendo `runtime`, `migrator` y `admin` para operaciones.
+
 ### TASK-125 webhook activation closed in staging
 - El canary outbound ya quedó validado end-to-end en `staging` con `HTTP 200` real.
 - Vercel ya tenía `Protection Bypass for Automation` habilitado; el portal ahora lo consume vía `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`.

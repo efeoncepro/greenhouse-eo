@@ -60,13 +60,24 @@ describe('getCloudPostureChecks', () => {
       },
       secrets: {
         summary: '1 via Secret Manager · 1 via env var',
+        runtimeSummary: '1 via env var',
+        toolingSummary: '1 via Secret Manager',
         entries: [
           {
             key: 'nextauth_secret',
             envVarName: 'NEXTAUTH_SECRET',
             secretRefEnvVarName: 'NEXTAUTH_SECRET_SECRET_REF',
             secretRefConfigured: false,
-            source: 'env'
+            source: 'env',
+            classification: 'runtime'
+          },
+          {
+            key: 'postgres_migrator_password',
+            envVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD',
+            secretRefEnvVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF',
+            secretRefConfigured: true,
+            source: 'secret_manager',
+            classification: 'tooling'
           }
         ]
       },
@@ -92,5 +103,82 @@ describe('getCloudPostureChecks', () => {
     expect(checks.find(check => check.name === 'postgres_posture')?.status).toBe('ok')
     expect(checks.find(check => check.name === 'secrets')?.status).toBe('warning')
     expect(checks.find(check => check.name === 'observability')?.status).toBe('unconfigured')
+  })
+
+  it('does not degrade secrets posture when only tooling postgres profiles are unconfigured', () => {
+    const checks = getCloudPostureChecks({
+      auth: {
+        mode: 'wif',
+        summary: 'WIF activo',
+        oidcAvailable: true,
+        selectedSource: 'wif',
+        workloadIdentityConfigured: true,
+        serviceAccountKeyConfigured: false,
+        serviceAccountEmailConfigured: true,
+        providerConfigured: true
+      },
+      postgres: {
+        configured: true,
+        usesConnector: true,
+        sslEnabled: true,
+        maxConnections: 15,
+        meetsRecommendedPool: true,
+        summary: 'Cloud SQL Connector activo',
+        risks: []
+      },
+      secrets: {
+        summary: '1 via Secret Manager · 2 sin configurar',
+        runtimeSummary: '1 via Secret Manager',
+        toolingSummary: '2 sin configurar',
+        entries: [
+          {
+            key: 'postgres_runtime_password',
+            envVarName: 'GREENHOUSE_POSTGRES_PASSWORD',
+            secretRefEnvVarName: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF',
+            secretRefConfigured: true,
+            source: 'secret_manager',
+            classification: 'runtime'
+          },
+          {
+            key: 'postgres_migrator_password',
+            envVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD',
+            secretRefEnvVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF',
+            secretRefConfigured: false,
+            source: 'unconfigured',
+            classification: 'tooling'
+          },
+          {
+            key: 'postgres_admin_password',
+            envVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD',
+            secretRefEnvVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD_SECRET_REF',
+            secretRefConfigured: false,
+            source: 'unconfigured',
+            classification: 'tooling'
+          }
+        ]
+      },
+      observability: {
+        summary: 'Sentry runtime + source maps listos · Slack alerts configuradas',
+        sentry: {
+          dsnConfigured: true,
+          clientDsnConfigured: true,
+          authTokenConfigured: true,
+          orgConfigured: true,
+          projectConfigured: true,
+          enabled: true,
+          sourceMapsReady: true
+        },
+        slack: {
+          alertsWebhookConfigured: true,
+          enabled: true
+        }
+      }
+    })
+
+    expect(checks.find(check => check.name === 'secrets')).toEqual({
+      name: 'secrets',
+      status: 'ok',
+      summary: 'Runtime: 1 via Secret Manager · Tooling: 2 sin configurar'
+    })
   })
 })

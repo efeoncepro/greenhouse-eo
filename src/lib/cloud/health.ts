@@ -104,7 +104,8 @@ export const getCloudPostureChecks = ({
   secrets: CloudSecretsPosture
   observability: CloudObservabilityPosture
 }): CloudPostureCheck[] => {
-  const secretSources = new Set(secrets.entries.map(entry => entry.source))
+  const runtimeSecretEntries = secrets.entries.filter(entry => entry.classification === 'runtime')
+  const runtimeSecretSources = new Set(runtimeSecretEntries.map(entry => entry.source))
   const observabilityEnabled = observability.sentry.enabled && observability.slack.enabled
 
   return [
@@ -120,12 +121,12 @@ export const getCloudPostureChecks = ({
     },
     {
       name: 'secrets',
-      status: secretSources.size === 1 && secretSources.has('secret_manager')
+      status: runtimeSecretSources.size === 1 && runtimeSecretSources.has('secret_manager')
         ? 'ok'
-        : secretSources.has('unconfigured')
+        : runtimeSecretSources.has('unconfigured')
           ? 'unconfigured'
           : 'warning',
-      summary: secrets.summary
+      summary: `Runtime: ${secrets.runtimeSummary}${secrets.toolingSummary !== 'Sin secretos registrados' ? ` · Tooling: ${secrets.toolingSummary}` : ''}`
     },
     {
       name: 'observability',
