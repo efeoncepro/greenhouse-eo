@@ -265,7 +265,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
           : roleCodes.includes('collaborator') && !roleCodes.includes('efeonce_admin') && !roleCodes.includes('efeonce_operations')
             ? '/my'
             : tenantType === 'efeonce_internal'
-              ? '/internal/dashboard'
+              ? '/home'
               : '/dashboard'),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
@@ -319,7 +319,7 @@ const getIdentityAccessRecord = async ({
         ARRAY_AGG(DISTINCT IF(sm.module_kind = 'service_module', csm.module_code, NULL) IGNORE NULLS ORDER BY IF(sm.module_kind = 'service_module', csm.module_code, NULL)) AS service_modules,
         ARRAY_AGG(DISTINCT cff.feature_code IGNORE NULLS ORDER BY cff.feature_code) AS feature_flags,
         COALESCE(cu.timezone, c.timezone, 'UTC') AS timezone,
-        COALESCE(cu.default_portal_home_path, c.portal_home_path, IF(cu.tenant_type = 'efeonce_internal', '/internal/dashboard', '/dashboard')) AS portal_home_path,
+        COALESCE(cu.default_portal_home_path, c.portal_home_path, IF(cu.tenant_type = 'efeonce_internal', '/home', '/dashboard')) AS portal_home_path,
         cu.auth_mode,
         cu.active,
         cu.status,

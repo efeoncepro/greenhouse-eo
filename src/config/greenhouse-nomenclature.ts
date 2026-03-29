@@ -9,6 +9,7 @@ export const GH_CLIENT_NAV = {
 // Internal/admin surfaces are operational runtime, not part of the client portal
 // nomenclature contract defined in Greenhouse_Nomenclatura_Portal_v3.md.
 export const GH_INTERNAL_NAV = {
+  home: { label: 'Home', subtitle: 'Nexa y operación de hoy' },
   internalDashboard: { label: 'Torre de control', subtitle: 'Operacion interna de spaces' },
   adminCenter: { label: 'Admin Center', subtitle: 'Gobernanza institucional del portal' },
   adminTenants: { label: 'Spaces', subtitle: 'Spaces, acceso y gobierno del portal' },

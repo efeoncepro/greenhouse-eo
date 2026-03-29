@@ -4,6 +4,28 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-119 en progreso
+
+### Completado
+- `TASK-119` movida a `in-progress`.
+- Se aplicó el cutover base de landing para internos/admin:
+  - fallback de `portalHomePath` ahora cae en `/home` en vez de `/internal/dashboard`
+  - `Home` pasa a ser la entrada principal interna en sidebar y dropdown
+  - `Control Tower` queda preservado como surface especialista dentro de `Gestión` y en sugerencias globales
+- Se mantuvieron intactos los landings especializados:
+  - `hr_*` sigue cayendo en `/hr/payroll`
+  - `finance_*` sigue cayendo en `/finance`
+  - `collaborator` puro sigue cayendo en `/my`
+
+### Validación
+- `pnpm exec eslint src/lib/tenant/access.ts src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx src/components/layout/shared/search/DefaultSuggestions.tsx src/app/auth/landing/page.tsx src/app/page.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- smoke manual en staging de login → `/auth/landing` → `/home`
+- verificar navegación interna a `/internal/dashboard` y convivencia con `Admin Center`
+- decidir si `Control Tower` debe aparecer además dentro de `Administración` o si `Gestión` queda como ubicación final
+
 ## Sesión 2026-03-28 — Resumen
 
 ### Completado

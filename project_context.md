@@ -3,6 +3,14 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Home landing cutover baseline
+- `TASK-119` arrancó su implementación sobre la policy de landing del portal.
+- Nuevo contrato base:
+  - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
+  - roles funcionales siguen priorizando su landing especializada (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
+- `Control Tower` deja de funcionar como home implícito de internos; permanece accesible como surface operativa especializada en navegación interna.
+- `portalHomePath` sigue siendo el contrato canónico de aterrizaje, pero su fallback institucional para `efeonce_internal` ya no es `/internal/dashboard`, sino `/home`.
+
 ## Delta 2026-03-29 Release channels y changelog client-facing
 - Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
 - Regla vigente:

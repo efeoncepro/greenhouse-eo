@@ -88,7 +88,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   if (isInternalUser) {
     // Flat item — no section wrapper (single item doesn't warrant a section)
     menuData.push({
-      label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
+      label: <NavLabel label={GH_INTERNAL_NAV.home.label} subtitle={GH_INTERNAL_NAV.home.subtitle} show={showSub} />,
       href: dashboardHref,
       icon: 'tabler-smart-home'
     })
@@ -149,6 +149,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label='Campañas' subtitle='Iniciativas cross-space' show={showSub} />, href: '/agency/campaigns', icon: 'tabler-speakerphone' },
         { label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />, href: '/agency/services', icon: 'tabler-packages' },
         { label: <NavLabel label='Operaciones' subtitle='Salud del platform' show={showSub} />, href: '/agency/operations', icon: 'tabler-activity' },
+        ...(isInternalUser
+          ? [
+              {
+                label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
+                href: '/internal/dashboard',
+                icon: 'tabler-layout-dashboard'
+              }
+            ]
+          : []),
         { label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />, href: '/agency/organizations', icon: 'tabler-building-community' }
       ]
     })

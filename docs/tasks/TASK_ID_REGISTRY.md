@@ -143,7 +143,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 | `TASK-117` | `to-do` | Payroll Last Business Day Auto-Calculation | `docs/tasks/to-do/TASK-117-payroll-last-business-day-auto-calculation.md` |
 | `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
-| `TASK-119` | `to-do` | Home Landing Rollout and Navigation Cutover | `docs/tasks/to-do/TASK-119-home-landing-rollout-navigation-cutover.md` |
+| `TASK-119` | `in-progress` | Home Landing Rollout and Navigation Cutover | `docs/tasks/in-progress/TASK-119-home-landing-rollout-navigation-cutover.md` |
 | `TASK-120` | `to-do` | Admin Center Governance Follow-on Cutover | `docs/tasks/to-do/TASK-120-admin-center-governance-follow-on-cutover.md` |
 
 ## Regla de asignacion desde aqui

@@ -1,12 +1,25 @@
 # TASK-119 - Home Landing Rollout and Navigation Cutover
 
+## Delta 2026-03-29 — Slice 1 + Slice 2 baseline implemented
+
+- `TASK-119` pasa a `in-progress` por implementación efectiva del cutover base.
+- La policy aplicada en runtime queda así:
+  - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
+  - roles especialistas mantienen su landing funcional (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
+- `portalHomePath` fallback dejó de resolver a `/internal/dashboard` para internos y ahora cae en `/home`.
+- La navegación principal ya deja de presentar `Control Tower` como home ambiguo:
+  - el item principal interno pasa a `Home`
+  - `Control Tower` sigue visible como surface operativa especializada dentro de `Gestión`
+  - el `UserDropdown` y las sugerencias globales ya distinguen `Home` de `Torre de control`
+- Validación manual en staging sigue pendiente para confirmar login, auth landing y navegación base sobre el deployment compartido.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Parcial`
 - Rank: `TBD`
 - Domain: `home`
 
@@ -110,10 +123,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe una policy explícita de landing por cohort para `/home`
-- [ ] `portalHomePath` queda alineado con esa policy
-- [ ] El sidebar deja de mezclar Home y `Control Tower` como entradas principales conflictivas
-- [ ] `Control Tower` sigue accesible sin quedar como home ambiguo
+- [x] Existe una policy explícita de landing por cohort para `/home`
+- [x] `portalHomePath` queda alineado con esa policy
+- [x] El sidebar deja de mezclar Home y `Control Tower` como entradas principales conflictivas
+- [x] `Control Tower` sigue accesible sin quedar como home ambiguo
 - [ ] Staging queda validado manualmente para login, landing y navegación base
 
 ## Verification
