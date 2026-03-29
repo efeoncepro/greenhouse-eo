@@ -13,8 +13,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GET /api/internal/health` ahora proyecta postura de secretos críticos bajo `secrets.summary` y `secrets.entries`, sin devolver valores.
 - Primer consumer migrado al patrón:
   - `src/lib/nubox/client.ts` ahora resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado
+- Postgres también quedó alineado al patrón:
+  - `src/lib/postgres/client.ts` ahora acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs equivalentes para `runtime`, `migrator` y `admin`
+- Validación operativa local ya ejecutada:
+  - `pnpm pg:doctor --profile=runtime`
 - Estado pendiente explícito:
-  - passwords PostgreSQL y secretos de auth todavía siguen en env vars legacy hasta futuros slices de `TASK-124`
+  - secretos de auth todavía siguen en env vars legacy hasta futuros slices de `TASK-124`
 
 ## Delta 2026-03-29 WIF preview validation + non-prod environment drift
 - El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:

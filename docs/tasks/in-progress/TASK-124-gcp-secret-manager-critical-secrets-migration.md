@@ -30,9 +30,24 @@
 - Primer consumer migrado en runtime:
   - `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado
 - Sigue pendiente para slices posteriores:
-  - passwords PostgreSQL
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
+
+## Delta 2026-03-29 — Slice 2 implementado
+
+- `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF` como alternativa canónica al password legacy.
+- El runtime de Cloud SQL ahora resuelve la credencial por:
+  - `Secret Manager`
+  - fallback a `GREENHOUSE_POSTGRES_PASSWORD`
+  - `unconfigured` si no existe ninguna ruta
+- `scripts/lib/load-greenhouse-tool-env.ts` ya alinea también perfiles `runtime`, `migrator` y `admin` hacia:
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+- `pnpm pg:doctor --profile=runtime` ya quedó validado con este path en local.
+- Sigue pendiente para slices posteriores:
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - validación real en `staging` y `production` con secretos servidos desde Secret Manager
 
 ## Status
 
@@ -125,8 +140,8 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- secretos críticos siguen viviendo en Vercel env vars
-- los passwords PostgreSQL y secretos de auth siguen sin migrar al helper
+- secretos críticos siguen viviendo en Vercel env vars mientras dura la transición
+- los secretos de auth todavía siguen sin migrar al helper
 - la validación real por entorno con secretos servidos desde Secret Manager sigue pendiente
 
 ## Scope
@@ -164,7 +179,7 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [x] Existe helper canónico `src/lib/secrets/secret-manager.ts`
-- [ ] PostgreSQL passwords pueden resolverse desde Secret Manager con fallback
+- [x] PostgreSQL passwords pueden resolverse desde Secret Manager con fallback
 - [ ] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
 - [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
 - [x] `/api/internal/health` reporta postura de secretos
@@ -178,4 +193,4 @@ Reglas obligatorias:
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm exec vitest run ...`
 - smoke de `/api/internal/health`
-- `pnpm pg:doctor --profile=runtime` cuando se migren passwords PostgreSQL
+- `pnpm pg:doctor --profile=runtime`
