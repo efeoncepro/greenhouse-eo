@@ -7,6 +7,97 @@
 
 ## 2026-03-29
 
+### TASK-124 slice 1 de Secret Manager
+- Se agregó `src/lib/secrets/secret-manager.ts` como helper canónico para secretos críticos con `@google-cloud/secret-manager`, cache corta, fallback a env var y convención `<ENV_VAR>_SECRET_REF`.
+- `GET /api/internal/health` ahora expone postura de secretos críticos sin devolver valores, distinguiendo `secret_manager`, `env` y `unconfigured`.
+- `src/lib/nubox/client.ts` quedó como primer consumer migrado al patrón nuevo: `NUBOX_BEARER_TOKEN` ya puede resolverse desde Secret Manager con fallback controlado al env legacy.
+- Se agregaron tests unitarios para helper, postura cloud de secretos y consumer de Nubox.
+
+### TASK-096 baseline WIF-aware sin bigbang
+- `src/lib/google-credentials.ts` ahora resuelve autenticación GCP con prioridad `WIF/OIDC -> SA key fallback -> ambient ADC`, manteniendo compatibilidad con el runtime actual.
+- `src/lib/bigquery.ts`, `src/lib/postgres/client.ts`, `src/lib/storage/greenhouse-media.ts` y `src/lib/ai/google-genai.ts` quedaron alineados al helper canónico.
+- Se migraron scripts operativos que todavía parseaban `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente, reduciendo drift para el rollout transicional de WIF.
+- El helper ahora también obtiene el token OIDC desde runtime Vercel con `@vercel/oidc`, habilitando WIF real sin depender solo de `process.env`.
+- El rollout externo quedó parcialmente materializado: pool/provider WIF en GCP, env vars en Vercel y smoke exitoso de BigQuery + Cloud SQL Connector sin SA key.
+- El preview real de `feature/codex-task-096-wif-baseline` quedó validado con health `200 OK`, `auth.mode=wif` y Cloud SQL reachable vía connector.
+- Las variables activas del rollout WIF/conector ya fueron saneadas en Vercel.
+- `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`; tras redeploy ya usa connector pero todavía corre el baseline previo de `develop` (`auth.mode=mixed`).
+- Cloud SQL sigue sin endurecimiento externo final porque primero hay que llevar este baseline a `develop/staging` por el flujo normal y solo después cerrar red + SSL obligatoria.
+
+### Nexa chat visual redesign — Enterprise AI 2025
+- User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).
+- Assistant messages: bubble eliminada — ahora es prosa abierta sin borde ni fondo, con avatar circular y label "Nexa".
+- ActionBar: iconos sueltos reemplazados por barra contenida con fondo `action.hover` y border-radius.
+- ThinkingIndicator: 3 dots bouncing reemplazados por shimmer skeleton (3 lineas animadas con MUI Skeleton wave).
+- Suggestions: chips outlined reemplazados por mini-cards con borde, icono sparkles y hover interactivo.
+- Composer: TextField WhatsApp-style reemplazado por input premium con sombra sutil, focus ring purple, border-top separator.
+- Header: barra plana reemplazada por header frosted glass sticky con backdrop-filter blur.
+
+### CI incorpora tests de Vitest
+- El workflow `CI` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con timeout explícito de `5` minutos.
+- La suite actual entra limpia al pipeline con `99` archivos y `488` pruebas verdes en validación local previa.
+- El control queda institucionalizado en repo dentro de `.github/workflows/ci.yml`, alineado con el dominio Cloud como guardrail de delivery validation.
+
+### Cron auth centralizada para rutas scheduler-driven
+- Se creó `src/lib/cron/require-cron-auth.ts` como helper canónico con `timingSafeEqual`, fail-closed cuando falta `CRON_SECRET` y soporte reusable para requests de Vercel cron.
+- `src/lib/cloud/cron.ts` ahora expone helpers compartidos para postura del secret y detección del origen scheduler.
+- Se migraron `19` rutas scheduler-driven, incluyendo `email-delivery-retry` y los sync endpoints de Finance, eliminando la auth inline inconsistente.
+- El lote quedó validado con `pnpm lint`, `pnpm test` y `pnpm build`.
+
+### Cloud SQL resilience baseline started
+- `greenhouse-pg-dev` ahora expone PITR con `7` días de WAL retention y flags `log_min_duration_statement=1000` + `log_statement=ddl`.
+- `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` quedó aplicado en `Production`, `staging` y `Preview (develop)`, y el fallback del repo se alineó al mismo valor.
+- `TASK-102` sigue abierta solo por el restore clone de verificación, que quedó lanzado como `greenhouse-pg-restore-test-20260329`.
+
+### Cloud layer reforzada para el track 096–103
+- La capa institucional `src/lib/cloud/*` ahora incluye postura GCP (`gcp-auth.ts`) y postura Cloud SQL (`postgres.ts`) además de health, cron y cost guards.
+- Se creó `GET /api/internal/health` como endpoint canónico de runtime health para Postgres y BigQuery, incluyendo versión, entorno y postura base de auth/runtime.
+- `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL dentro del dominio Cloud.
+- Se agregó `src/lib/alerts/slack-notify.ts` y hooks de alerting a crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`).
+
+### Nexa UI completion (TASK-115)
+- Edit inline de mensajes user con ComposerPrimitive (pencil hover → EditComposer → Guardar/Cancelar).
+- Follow-up suggestions como chips clicables + feedback thumbs 👍/👎 fire-and-forget.
+- Nexa flotante portal-wide: FAB sparkles → panel 400×550 en desktop, Drawer bottom en mobile, oculto en `/home`.
+- Thread history sidebar con lista agrupada por fecha, selección y creación de threads.
+- `NexaPanel.tsx` legacy eliminado.
+
+### Cloud governance operating model established
+- `Cloud` quedó institucionalizado como dominio interno de platform governance con operating model canónico en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
+- Se dejó explícito el boundary entre `Admin Center`, `Cloud & Integrations`, `Ops Health`, contracts de código y runbooks/config.
+- Se agregó una baseline mínima real en `src/lib/cloud/*` para health compartido, cost guards de BigQuery y postura base de cron.
+- `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103` ahora se leen como slices del dominio Cloud y ya no como hardening suelto.
+- La UI de `Admin Center`, `Cloud & Integrations` y `Ops Health` ahora consume ese dominio vía `getOperationsOverview().cloud`, conectando runtime health, cron posture y BigQuery guards con surfaces reales.
+
+### Admin Center hardening (TASK-121)
+- Sorting por columna en tabla de spaces (TableSortLabel en las 5 columnas).
+- Loading skeleton (`/admin/loading.tsx`) para hero, KPIs, tabla y domain cards.
+- Domain cards de Cloud & Integrations y Ops Health muestran health real desde `getOperationsOverview`.
+- Deep-link a filtros: `/admin?filter=attention&q=empresa`.
+- Bloque "Requiere atencion" consolidado cross-dominio — solo visible cuando hay senales activas.
+
+### Admin Center absorbe Control Tower (v2)
+- `/admin` es ahora la landing unificada de governance: Hero → 4 ExecutiveMiniStatCards → tabla limpia "Torre de control" (5 cols MUI, sin scroll horizontal) → mapa de dominios (outlined cards ricos).
+- Nuevo `AdminCenterSpacesTable`: MUI Table size='small', filter chips, search, export CSV, paginación 8 filas, click-to-navigate.
+- `/internal/dashboard` redirige a `/admin`; item "Torre de control" removido del sidebar.
+- Patrón visual alineado con Cloud & Integrations y Ops Health.
+
+### Home landing cutover baseline
+- Los usuarios internos/admin ahora caen por defecto en `/home` cuando no tienen un `portalHomePath` explícito más específico; `hr`, `finance` y `my` conservan sus landings funcionales.
+- La navegación interna ya separa `Home` del shell heredado de `Control Tower`: `Home` queda como entrada principal y el patrón operativo queda absorbido por `Admin Center`.
+- Las sesiones legadas de internos que todavía traían `'/internal/dashboard'` como home histórico ahora se normalizan en runtime a `'/home'`.
+
+### Nexa backend persistence and suggestions
+- Nexa ahora persiste threads, mensajes y feedback en PostgreSQL bajo `greenhouse_ai`, con migración canónica y validación runtime no mutante del schema requerido.
+- `/api/home/nexa` retorna `threadId`, guarda el par `user + assistant` y genera `suggestions` dinámicas para follow-ups.
+- Se agregaron `POST /api/home/nexa/feedback`, `GET /api/home/nexa/threads` y `GET /api/home/nexa/threads/[threadId]` para destrabar `TASK-115`.
+
+### Task lifecycle cleanup
+- `TASK-009` quedó cerrada como baseline principal de `Home + Nexa v2`; lo pendiente se derivó a `TASK-119` y `TASK-110`.
+- `TASK-108` quedó cerrada como baseline del shell de `Admin Center`; `TASK-120` quedó absorbida por la unificación posterior con `Control Tower`.
+- `TASK-114`, `TASK-119` y `TASK-120` quedaron cerradas y el índice de tasks se alineó al estado real del repo.
+- Se alinearon `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` para reflejar el estado real de `TASK-074`, `TASK-110`, `TASK-111`, `TASK-112` y `TASK-113`.
+
 ### Release channels operating model documented
 - Greenhouse formalizo una policy operativa para lanzar capacidades en `alpha`, `beta`, `stable` y `deprecated`, con foco principal por modulo o feature visible y disponibilidad separada por cohort (`internal`, `pilot`, `selected_tenants`, `general`).
 - La fuente canonica quedo en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`, con referencias cortas añadidas en `AGENTS.md`, `docs/README.md`, `project_context.md` y `GREENHOUSE_ARCHITECTURE_V1.md`.

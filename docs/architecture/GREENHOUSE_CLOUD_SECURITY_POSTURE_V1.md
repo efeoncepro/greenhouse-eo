@@ -8,11 +8,61 @@
 
 ---
 
+## Delta 2026-03-29 — Transitional WIF-aware repo baseline
+
+- `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.
+- La capa `src/lib/google-credentials.ts` ahora resuelve una estrategia transicional:
+  - `wif` cuando existen `VERCEL_OIDC_TOKEN`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `service_account_key` como fallback
+  - `ambient_adc` para runtimes con credenciales implícitas
+- Consumers alineados en esta sesión:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+  - scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente
+- La postura externa todavía sigue transicional:
+  - el repo ya soporta WIF/OIDC
+  - el rollout externo WIF ya existe en GCP/Vercel y quedó validado en un preview real (`version=7638f85`) con BigQuery + Cloud SQL Connector OK y sin SA key
+  - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
+  - además sigue habiendo drift de ambientación:
+    - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
+    - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
+    - `staging` ya absorbió el baseline WIF final de `develop`
+    - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
+    - `dev-greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
+    - `production` ya absorbió el baseline mínimo WIF y `greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `selectedSource=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
+    - `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`
+    - el riesgo remanente principal ya no es WIF en Vercel ni exposición pública abierta de Cloud SQL, sino la eventual Fase 3 de Secret Manager
+    - el path `vercel deploy --target staging` sigue mostrando un problema operativo intermitente; el workaround validado fue `vercel redeploy <deployment-ready> --target staging`
+- por lo tanto `TASK-096` ya cerró la fase WIF en Vercel y el hardening externo de Cloud SQL; el remanente del documento es la Fase 3 de Secret Manager
+- La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
+
+## Delta 2026-03-29 — Secret Manager helper baseline
+
+- `TASK-124` ya abrió implementación real para la Fase 3 de secretos críticos.
+- Nuevo helper canónico:
+  - `src/lib/secrets/secret-manager.ts`
+  - contrato de resolución: `Secret Manager -> env fallback -> unconfigured`
+  - convención operativa por secreto crítico: `<ENV_VAR>_SECRET_REF`
+- El helper usa `@google-cloud/secret-manager`, cache corta y logging sin valores crudos.
+- `GET /api/internal/health` ahora proyecta postura de secretos críticos sin exponer payloads:
+  - `secret_manager`
+  - `env`
+  - `unconfigured`
+- Primer consumer migrado al patrón:
+  - `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper
+- Estado remanente de la fase:
+  - passwords PostgreSQL
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - validación real en `staging` y `production` con al menos un secreto servido desde Secret Manager
+
 ## 1. Purpose
 
 This document defines the target security posture, observability strategy, and operational resilience baseline for Greenhouse EO's cloud infrastructure. It serves as the architectural reference for the Cloud Posture Hardening track (7 tasks) and governs how secrets, credentials, monitoring, and database resilience should be managed going forward.
 
-It is **not** a task execution plan — each task has its own detailed spec in `docs/tasks/to-do/`. This document is the "why" and "what"; the tasks are the "how".
+It is **not** a task execution plan — each task has its own detailed spec under `docs/tasks/`. This document is the "why" and "what"; the tasks are the "how".
 
 ---
 
@@ -37,26 +87,26 @@ It is **not** a task execution plan — each task has its own detailed spec in `
 
 | Dimension | Score | Key Gap |
 |-----------|-------|---------|
-| Secret Management | 2/10 | Static SA key in env var, no rotation, no audit |
+| Secret Management | 5/10 | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
 | Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
 | Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
 | Observability | 1/10 | `console.error()` only, zero external alerting |
 | CI/CD Validation | 3/10 | Lint + build only, 86 test files not in CI |
 | API Auth Consistency | 4/10 | 2 inconsistent cron auth patterns, no timing-safe |
-| Database Resilience | 4/10 | Daily backup, no PITR, pool=5, no slow query logging |
+| Database Resilience | 6/10 | PITR, WAL retention, slow query logging y pool `15` ya avanzaron; restore test sigue pendiente |
 | Cost Visibility | 0/10 | No budget alerts, no BigQuery cost guards |
 
 ### 2.3 Threat Model
 
 | Threat | Current Exposure | Impact |
 |--------|-----------------|--------|
-| SA key leak (env var exfiltration) | **High** — never-expiring JSON key with BigQuery + Cloud SQL + Storage + Vertex AI access | Full GCP compromise |
-| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password in env var | Database compromise (payroll, identity, finance) |
+| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF | Full GCP compromise |
+| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var | Database compromise (payroll, identity, finance) |
 | XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
 | BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
 | Silent production failure | **High** — zero alerting on cron/webhook/projection failures | Data inconsistency, delayed detection |
-| Backup unusable | **Medium** — never tested restore, no PITR | Unable to recover from corruption |
+| Backup unusable | **Medium** — PITR ya existe, pero el restore test todavía no quedó completamente verificado/cerrado | Unable to recover from corruption |
 
 ---
 
@@ -107,8 +157,8 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 
 **Key decisions:**
 - Vercel OIDC token → WIF → SA impersonation (no static key in runtime)
-- SA key retained **only** for Preview environments and local dev (fallback)
-- `GOOGLE_APPLICATION_CREDENTIALS_JSON` removed from Production and Staging
+- SA key retained as **transitional fallback** for local dev, scripts, and any runtime shared todavía no verificado con WIF
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` remains legacy until Production/Staging complete the real rollout and validation window
 
 #### Secret Classification
 
@@ -116,7 +166,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 |------|----------|---------|----------|-------|-------|
 | **Critical** | Compromise = financial/legal/identity damage | GCP Secret Manager | Future: automated | Cloud Audit Logs | 6 |
 | **Standard** | Compromise = limited blast radius | Vercel env vars (encrypted) | Manual | Vercel audit log | 10 |
-| **Eliminated** | Replaced by keyless auth | N/A | N/A | N/A | 2 (SA key + base64 variant) |
+| **Target elimination** | Replaced by keyless auth after rollout | N/A | N/A | N/A | 2 (SA key + base64 variant) |
 
 **Critical secrets (Secret Manager):**
 1. `GREENHOUSE_POSTGRES_PASSWORD` (runtime)
@@ -129,7 +179,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 **Standard secrets (Vercel env vars):**
 - `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `GREENHOUSE_INTEGRATION_API_TOKEN`, `CRON_SECRET`, `HR_CORE_TEAMS_WEBHOOK_SECRET`, `NUBOX_X_API_KEY`, `SLACK_ALERTS_WEBHOOK_URL`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
 
-**Eliminated:**
+**Target elimination once rollout is verified:**
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` (replaced by WIF)
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` (replaced by WIF)
 - `GCP_ACCESS_TOKEN` (deprecated legacy)

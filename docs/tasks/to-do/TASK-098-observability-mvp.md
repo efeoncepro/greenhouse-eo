@@ -1,5 +1,22 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — Baseline parcial absorbida por TASK-124
+
+- Parte del endurecimiento del payload de `GET /api/internal/health` ya fue absorbido por `TASK-124`:
+  - ahora proyecta postura de secretos críticos sin exponer valores
+  - el remanente de esta task ya no es crear ese bloque, sino completar observabilidad externa y el contract final del endpoint
+
+## Delta 2026-03-29 — Baseline cloud ya adelantada
+
+- Parte del baseline ya quedó adelantado:
+  - `GET /api/internal/health` ya existe
+  - `src/lib/alerts/slack-notify.ts` ya existe
+  - los crons críticos ya tienen hook base de `alertCronFailure()`
+- Lo pendiente real de esta task se concentra ahora en:
+  - integración Sentry
+  - endurecimiento del payload/contract del health endpoint
+  - wiring operativo final de `SLACK_ALERTS_WEBHOOK_URL`
+
 ## Status
 
 | Campo | Valor |

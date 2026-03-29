@@ -3,6 +3,57 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Secret Manager helper baseline
+- `TASK-124` ya inició implementación real con un helper canónico en `src/lib/secrets/secret-manager.ts`.
+- Nuevo contrato base para secretos críticos:
+  - env var legacy: `<ENV_VAR>`
+  - secret ref opcional: `<ENV_VAR>_SECRET_REF`
+  - resolución runtime: `Secret Manager -> env fallback -> unconfigured`
+- El helper usa `@google-cloud/secret-manager`, cache corta y no expone valores crudos en logs.
+- `GET /api/internal/health` ahora proyecta postura de secretos críticos bajo `secrets.summary` y `secrets.entries`, sin devolver valores.
+- Primer consumer migrado al patrón:
+  - `src/lib/nubox/client.ts` ahora resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado
+- Estado pendiente explícito:
+  - passwords PostgreSQL y secretos de auth todavía siguen en env vars legacy hasta futuros slices de `TASK-124`
+
+## Delta 2026-03-29 WIF preview validation + non-prod environment drift
+- El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:
+  - `version=7638f85`
+  - `auth.mode=wif`
+  - BigQuery reachable
+  - Cloud SQL reachable vía connector usando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+- Para que ese preview fuera validable hubo que completar un env set mínimo de branch:
+  - `GCP_PROJECT`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+- Drift operativo verificado el 2026-03-29:
+  - las env vars activas del rollout WIF/conector ya quedaron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
+  - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
+  - tras redeploy del staging activo, `/api/internal/health` respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
+- Regla operativa derivada:
+  - no desplegar la feature branch al entorno compartido solo para cerrar `TASK-096`
+  - no endurecer Cloud SQL externo ni retirar la SA key hasta que `develop` absorba este baseline y `staging` quede validado con WIF final
+
+## Delta 2026-03-29 Home landing cutover baseline
+- `TASK-119` quedó cerrada sobre la policy de landing del portal.
+- Nuevo contrato base:
+  - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
+  - roles funcionales siguen priorizando su landing especializada (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
+- `Control Tower` deja de funcionar como home implícito de internos y el patrón heredado queda absorbido por `Admin Center`.
+- `portalHomePath` sigue siendo el contrato canónico de aterrizaje, pero su fallback institucional para `efeonce_internal` ya no es `/internal/dashboard`, sino `/home`.
+- El runtime también normaliza sesiones legadas: si `NextAuth` o un registro viejo trae `'/internal/dashboard'` como home interno, el resolver canónico lo reescribe a `'/home'` antes de hidratar `session.user.portalHomePath`.
+
+## Delta 2026-03-29 Nexa backend persistence and thread runtime
+- `TASK-114` quedó cerrada con persistencia operativa para Nexa en PostgreSQL bajo `greenhouse_ai`.
+- El runtime ahora materializa:
+  - `nexa_threads`
+  - `nexa_messages`
+  - `nexa_feedback`
+- `/api/home/nexa` ya persiste conversación, retorna `threadId` y genera `suggestions` post-respuesta.
+- `src/lib/nexa/store.ts` valida readiness de las tablas, pero no intenta hacer DDL con el usuario `runtime`; la migración canónica vive en `scripts/migrations/add-nexa-ai-tables.sql`.
+- Se agregaron endpoints dedicados para feedback e historial de threads que destraban la UI pendiente de `TASK-115`.
+
 ## Delta 2026-03-29 Release channels y changelog client-facing
 - Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
 - Regla vigente:
@@ -14,6 +65,78 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - APIs y contratos tecnicos versionados usan `SemVer`
 - El changelog client-facing quedo separado del changelog interno del repo y nace en `docs/changelog/CLIENT_CHANGELOG.md`.
 - `Preview`, `Staging` y `Production` siguen siendo los ambientes tecnicos; los canales de release se apoyan en ellos pero no los reemplazan.
+
+## Delta 2026-03-29 Cloud governance operating model
+- `Cloud` quedó institucionalizado como dominio interno de platform governance, no como módulo client-facing nuevo.
+- La base canónica vive en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
+- El dominio ahora queda explícitamente separado en:
+  - shell de governance (`Admin Center`)
+  - surface de inventory/freshness (`Cloud & Integrations`)
+  - surface de incidentes (`Ops Health`)
+  - contracts/helpers/runbooks para posture, resiliencia, cron y costos
+- La baseline mínima en código vive en `src/lib/cloud/*`:
+  - `health.ts` para health checks compartidos
+  - `bigquery.ts` para guards base de costo
+  - `cron.ts` para postura mínima de scheduler secret
+- La conexión UI ya quedó materializada vía `getOperationsOverview()`:
+  - `Admin Center`
+  - `/admin/cloud-integrations`
+  - `/admin/ops-health`
+  consumen el bloque `cloud` como snapshot institucional del dominio.
+- `TASK-100` a `TASK-103` ya se interpretan como slices del dominio Cloud y no como hardening aislado.
+
+## Delta 2026-03-29 Cloud SQL resilience baseline in progress
+- `TASK-102` ya aplicó la baseline principal de resiliencia sobre `greenhouse-pg-dev`.
+- Estado real verificado:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - flags `log_min_duration_statement=1000` y `log_statement=ddl`
+- El runtime del portal también quedó alineado al nuevo pool target:
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` en `Production`, `staging` y `Preview (develop)`
+  - fallback por defecto del repo subido a `15`
+- El restore test todavía no estaba cerrado al final de esta actualización; se lanzó el clone `greenhouse-pg-restore-test-20260329` y su verificación/eliminación siguen como remanente operativo.
+
+## Delta 2026-03-29 Cloud layer robustness expansion
+- La capa `src/lib/cloud/*` ahora incorpora posture helpers reutilizables para el siguiente bloque `TASK-096` a `TASK-103`.
+- Nuevas piezas institucionales:
+  - `src/lib/cloud/gcp-auth.ts` para postura de autenticación GCP (`wif | service_account_key | mixed | unconfigured`)
+  - `src/lib/cloud/postgres.ts` para postura runtime de Cloud SQL (`connector`, `ssl`, `pool`, riesgos)
+  - `GET /api/internal/health` en `src/app/api/internal/health/route.ts`
+  - `src/lib/alerts/slack-notify.ts` como adapter base de alertas operativas
+- `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL, no solo reachability y cost guard.
+- Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
+
+## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
+- `TASK-096` quedó iniciada en el repo con baseline real en código; esta sesión trabajó sobre el estado actual de `develop`.
+- El repo ahora resuelve autenticación GCP con un contrato explícito en `src/lib/google-credentials.ts`:
+  - `wif` si existen `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`, y el runtime puede obtener un token OIDC de Vercel
+  - `service_account_key` como fallback transicional
+  - `ambient_adc` para entornos con credenciales implícitas
+- Consumers alineados:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+- Scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente también quedaron migrados al helper canónico.
+- Nuevas variables de entorno documentadas para el rollout real:
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER`
+  - `GCP_PROJECT_NUMBER`
+  - `GCP_WORKLOAD_IDENTITY_POOL_ID`
+  - `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID`
+  - `GCP_SERVICE_ACCOUNT_EMAIL`
+- Estado externo ya materializado:
+  - GCP project `efeonce-group`
+  - Workload Identity Pool `vercel`
+  - Provider `greenhouse-eo`
+  - service account runtime actual vinculada: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - bindings por entorno Vercel para `development`, `preview`, `staging` y `production`
+- Validación de transición ya ejecutada:
+  - BigQuery respondió con WIF sin SA key
+  - Cloud SQL Connector respondió `SELECT 1` con WIF sin SA key usando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+  - preview Vercel real `version=7638f85` quedó sano con `/api/internal/health`
+- Restricción vigente:
+  - el runtime actual no hace bigbang ni retira la SA key por defecto
+  - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados en preview/staging reales y se limpie un drift detectado en variables Vercel que hoy agregan sufijos literales `\n`
 
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.

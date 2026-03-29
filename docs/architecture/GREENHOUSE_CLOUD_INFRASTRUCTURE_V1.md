@@ -1,10 +1,71 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
 > **Version:** 1.0
-> **Last updated:** 2026-03-18
+> **Last updated:** 2026-03-29
 > **Audience:** Platform engineers, DevOps, on-call operators
 
 ---
+
+## Delta 2026-03-29 — Runtime auth baseline + Cloud SQL verified posture
+
+- El repo ya no depende solo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` para su runtime Vercel.
+- La capa canónica ahora vive en:
+  - `src/lib/google-credentials.ts`
+  - `src/lib/cloud/gcp-auth.ts`
+  - `src/lib/cloud/postgres.ts`
+- El orden efectivo de autenticación GCP en runtime quedó formalizado así:
+  1. `Workload Identity Federation` vía `VERCEL_OIDC_TOKEN` + `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL`
+  2. fallback a `GOOGLE_APPLICATION_CREDENTIALS_JSON` o `_BASE64`
+  3. `ambient ADC` cuando el entorno ya provee credenciales implícitas
+- Consumers principales ya alineados:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+- Scripts legacy que parseaban SA key manualmente también quedaron migrados al helper canónico en esta sesión.
+- Estado real verificado de `greenhouse-pg-dev` al 2026-03-29:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - `replicationLogArchivingEnabled=true`
+  - flags `log_min_duration_statement=1000` y `log_statement=ddl`
+  - sigue pendiente el hardening externo:
+    - `authorizedNetworks` incluye `0.0.0.0/0`
+    - `sslMode=ALLOW_UNENCRYPTED_AND_ENCRYPTED`
+    - `requireSsl=false`
+- Rollout externo WIF ya materializado en GCP:
+  - project number `183008134038`
+  - Workload Identity Pool `vercel`
+  - Provider `greenhouse-eo`
+  - service account runtime actual: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - bindings `roles/iam.workloadIdentityUser` aplicados para principals de `development`, `preview`, `staging` y `production`
+- Estado Vercel verificado al 2026-03-29:
+  - `development`, `staging` y `production` ya tienen `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT_EMAIL` y `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - el preview de la rama `feature/codex-task-096-wif-baseline` necesitó además `GCP_PROJECT` + credenciales runtime Postgres para validar health end-to-end
+  - tras ese redeploy, el preview `greenhouse-i3cak6akh-efeonce-7670142f.vercel.app` respondió `200 OK` en `/api/internal/health` con:
+    - `auth.mode=wif`
+    - BigQuery reachable
+    - Cloud SQL reachable vía connector usando `efeonce-group:us-east4:greenhouse-pg-dev`
+  - también se detectó drift de configuración/env mapping:
+    - las variables del rollout WIF/conector ya fueron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
+    - el preview activo ya quedó con baseline mínima de Postgres para validar el connector
+    - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
+    - tras redeploy del staging activo, el entorno compartido respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
+    - eso deja explícito que staging ya tomó el connector y la configuración nueva, pero no aún el baseline WIF final de esta rama
+
+## Delta 2026-03-29 — Secret Manager runtime baseline
+
+- `TASK-124` ya materializó el helper canónico `src/lib/secrets/secret-manager.ts`.
+- Nuevo contrato runtime para secretos críticos:
+  - valor legacy: `<ENV_VAR>`
+  - referencia opcional a Secret Manager: `<ENV_VAR>_SECRET_REF`
+  - resolución efectiva: `Secret Manager -> env fallback -> unconfigured`
+- `GET /api/internal/health` ahora expone también la postura de secretos críticos sin devolver valores.
+- Primer consumer migrado en el portal:
+  - `src/lib/nubox/client.ts` para `NUBOX_BEARER_TOKEN`
+- El resto de secretos críticos siguen pendientes de migración por slices posteriores:
+  - passwords PostgreSQL
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
 
 ## 1. Overview
 
@@ -33,8 +94,13 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 | Storage | 20 GB SSD, **auto-resize enabled** |
 | Public IP | `34.86.135.144` |
 | SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` |
+| `requireSsl` | `false` |
 | Authorized networks | `0.0.0.0/0` (**see Security Notes**) |
 | Backup window | Daily at **07:00 UTC**, 7-day retention |
+| PITR | `Enabled` |
+| WAL retention | `7 days` |
+| Replication log archiving | `Enabled` |
+| Database flags | `log_min_duration_statement=1000`, `log_statement=ddl` |
 
 ### Databases
 
@@ -67,7 +133,7 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 
 ### Connectivity
 
-- **Cloud SQL Connector** (preferred) — uses IAM-based authentication; no IP allowlisting required.
+- **Cloud SQL Connector** (preferred) — metadata/auth tokens now resolve through the shared WIF-aware helper in `src/lib/google-credentials.ts`; Postgres app access still uses runtime username/password and **not** IAM DB auth.
 - **Direct IP** — connect to `34.86.135.144:5432` with username/password. Currently allowed from any IP.
 
 ---
@@ -231,9 +297,15 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | Property | Value |
 |----------|-------|
 | Production URL | `greenhouse.efeoncepro.com` |
-| Staging URL | `dev-greenhouse.efeoncepro.com` |
+| Shared non-prod URL | `dev-greenhouse.efeoncepro.com` |
 | Framework | Next.js **16.1** with Turbopack |
 | Build system | Vercel (automatic deploys from Git) |
+
+### Deployment Notes
+
+- El branch preview actual validado para `TASK-096` es `feature/codex-task-096-wif-baseline`.
+- El redeploy verificado con health OK fue `version=7638f85` en `greenhouse-i3cak6akh-efeonce-7670142f.vercel.app`.
+- `dev-greenhouse.efeoncepro.com` no debe asumirse como `staging` canónico sin revalidación: al 2026-03-29 respondió desde un deployment `preview` de `develop`.
 
 ### Key Environment Variables
 
@@ -242,7 +314,12 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | `NEXTAUTH_SECRET` | NextAuth.js session encryption |
 | `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `AZURE_AD_TENANT_ID` | Azure AD SSO provider |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth provider |
-| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | GCP service account key (JSON) for BigQuery and Cloud SQL access from Vercel |
+| `GCP_PROJECT` | Project ID efectivo para BigQuery/clients GCP |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Pool Provider resource name for Vercel OIDC |
+| `GCP_SERVICE_ACCOUNT_EMAIL` | Service account to impersonate from Vercel via WIF |
+| `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` | Cloud SQL instance connection name para Cloud SQL Connector |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Transitional fallback SA key for Preview/local or runtimes where WIF is not yet active |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` | Transitional fallback SA key variant |
 
 ---
 
@@ -271,12 +348,12 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 | Cloud SQL authorized network | **High** | `0.0.0.0/0` — any IP can attempt connection | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks | TASK-096 Fase 1 |
 | Cloud SQL SSL enforcement | **Medium** | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections | TASK-096 Fase 1 |
 | Plaintext API tokens | **Medium** | Most Cloud Functions store tokens in env vars | Migrate critical secrets to Secret Manager | TASK-096 Fase 3 |
-| Cloud SQL Connector adoption | **Low** | Available but not enforced | Standardize on Cloud SQL Connector with IAM authentication | TASK-096 Fase 2 |
-| Service account key in Vercel | **Medium** | `GOOGLE_APPLICATION_CREDENTIALS_JSON` contains a full JSON key | Workload Identity Federation for keyless authentication from Vercel | TASK-096 Fase 2 |
+| Cloud SQL Connector adoption | **Low** | Preview WIF path ya quedó validado con connector, pero `develop/dev-greenhouse` sigue observándose con host directo | Estandarizar connector en el entorno compartido antes del hardening externo | TASK-096 Fase 2 |
+| Service account key in Vercel | **Medium** | WIF ya existe y quedó validado en preview, pero la SA key sigue presente como fallback transicional | Retirar la SA key después de validar entorno compartido y producción | TASK-096 Fase 2 |
 | No security headers | **Medium** | No middleware.ts, no CSP/HSTS/X-Frame-Options | Create middleware.ts with security headers | TASK-099 |
 | Silent production failures | **High** | console.error() only, zero alerting | Sentry + health endpoint + Slack alerts | TASK-098 |
 | Inconsistent cron auth | **Medium** | 2 patterns, some fail-open, no timing-safe | Centralized requireCronAuth() helper | TASK-101 |
-| No PITR | **Medium** | Daily backup only, never tested restore | Enable PITR + test restore | TASK-102 |
+| Restore test pendiente | **Medium** | PITR ya está habilitado, pero el restore test no quedó cerrado | Completar prueba de restore y documentar evidencia | TASK-102 |
 | No cost visibility | **Low** | Zero budget alerts | GCP budget alerts + BigQuery cost guards | TASK-103 |
 
 ### Priority Actions

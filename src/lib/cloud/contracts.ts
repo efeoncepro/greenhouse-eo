@@ -37,3 +37,18 @@ export interface CloudPostgresPosture {
   summary: string
   risks: string[]
 }
+
+export type CloudSecretSource = 'secret_manager' | 'env' | 'unconfigured'
+
+export interface CloudSecretPostureEntry {
+  key: string
+  envVarName: string
+  secretRefEnvVarName: string
+  secretRefConfigured: boolean
+  source: CloudSecretSource
+}
+
+export interface CloudSecretsPosture {
+  summary: string
+  entries: CloudSecretPostureEntry[]
+}
