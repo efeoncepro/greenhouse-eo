@@ -1,5 +1,31 @@
 # TASK-124 — GCP Secret Manager Critical Secrets Migration
 
+## Delta 2026-03-29 — Production validado y cierre listo
+
+- `main` ya absorbió el slice mínimo de `TASK-124` y `production` ejecuta `version=7238a90`.
+- `greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK` con postura real:
+  - `postgres_runtime_password` -> `secret_manager`
+  - `nextauth_secret` -> `secret_manager`
+  - `azure_ad_client_secret` -> `secret_manager`
+  - `nubox_bearer_token` -> `secret_manager`
+- `greenhouse.efeoncepro.com/api/auth/session` respondió `200` con body `{}`.
+- Con esta validación, la task ya quedó comprobada en `staging` y `production` y puede pasar a `complete`.
+
+## Delta 2026-03-29 — Staging rollout validado en `develop`
+
+- Los commits de `TASK-124` ya fueron promovidos a `develop` en `497cb19`.
+- `staging` ya redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK`.
+- Validación real observada en `staging`:
+  - `version=497cb19`
+  - secretos críticos ya resueltos por `secret_manager`:
+    - `GREENHOUSE_POSTGRES_PASSWORD`
+    - `NEXTAUTH_SECRET`
+    - `AZURE_AD_CLIENT_SECRET`
+    - `NUBOX_BEARER_TOKEN`
+- Estado residual observado:
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en posture runtime de `staging`
+  - `production` ya tiene secretos y `*_SECRET_REF` preparados, pero sigue pendiente validación después de promover a `main`
+
 ## Delta 2026-03-29
 
 - Nace como derivada directa del cierre operativo de `TASK-096`.
@@ -68,11 +94,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
@@ -155,8 +181,8 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- secretos críticos siguen viviendo en Vercel env vars mientras dura la transición
-- la validación real por entorno con secretos servidos desde Secret Manager sigue pendiente
+- los env vars legacy todavía existen como fallback controlado
+- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen fuera del runtime del portal porque corresponden a tooling y bootstrap
 
 ## Scope
 
@@ -197,9 +223,9 @@ Reglas obligatorias:
 - [x] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
 - [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
 - [x] `/api/internal/health` reporta postura de secretos
-- [ ] `staging` validado con al menos un secreto crítico servido desde Secret Manager
-- [ ] `production` validado con al menos un secreto crítico servido desde Secret Manager
-- [ ] documentación viva actualizada
+- [x] `staging` validado con al menos un secreto crítico servido desde Secret Manager
+- [x] `production` validado con al menos un secreto crítico servido desde Secret Manager
+- [x] documentación viva actualizada
 
 ## Verification
 

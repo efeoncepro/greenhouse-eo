@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Secret Manager validado en staging + production
+- `develop` absorbió `TASK-124` en `497cb19` y `main` absorbió el slice mínimo en `7238a90`.
+- `staging` ya ejecuta `497cb19` y `/api/internal/health` confirmó resolución real por Secret Manager para:
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - `NUBOX_BEARER_TOKEN`
+- `production` ya ejecuta `7238a90` y confirmó por `/api/internal/health`:
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - `NUBOX_BEARER_TOKEN`
+- `greenhouse.efeoncepro.com/api/auth/session` respondió `200` con body `{}`.
+- Estado transicional todavía explícito:
+  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en runtime `staging`
+  - el fallback legacy a env var sigue existiendo por compatibilidad durante la transición
+
 ## Delta 2026-03-29 Secret Manager helper baseline
 - `TASK-124` ya inició implementación real con un helper canónico en `src/lib/secrets/secret-manager.ts`.
 - Nuevo contrato base para secretos críticos:
