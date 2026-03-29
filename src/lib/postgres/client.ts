@@ -42,7 +42,7 @@ export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
   user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
   password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
-  maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 5),
+  maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 15),
   sslEnabled: String(process.env.GREENHOUSE_POSTGRES_SSL || '').toLowerCase() === 'true'
 })
 

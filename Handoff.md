@@ -83,6 +83,36 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - La siguiente lane del bloque solicitado queda en `TASK-102`, con `TASK-103` después.
 - El árbol sigue teniendo cambios paralelos de `TASK-115` en Home/Nexa; no mezclar esos archivos al stage del lote Cloud.
 
+## Sesión 2026-03-29 — TASK-102 en progreso
+
+### Completado
+- Cloud SQL `greenhouse-pg-dev` quedó con:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+- `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` quedó aplicado y verificado en:
+  - `Production`
+  - `staging`
+  - `Preview (develop)`
+- El repo quedó alineado:
+  - `src/lib/postgres/client.ts` ahora usa `15` como fallback por defecto
+  - `.env.example` documenta `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15`
+- Validación ejecutada:
+  - `pnpm pg:doctor --profile=runtime`
+  - `pnpm pg:doctor --profile=migrator`
+  - `gcloud sql instances describe greenhouse-pg-dev`
+  - `vercel env pull` por entorno para confirmar el valor efectivo
+
+### Pendiente inmediato
+- Terminar el restore test:
+  - clone iniciado: `greenhouse-pg-restore-test-20260329`
+  - seguía en `PENDING_CREATE` al cierre de esta actualización
+- Cuando el clone quede `RUNNABLE`:
+  - verificar tablas críticas
+  - documentar resultado
+  - eliminar la instancia efímera
+
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
 
 ### Completado

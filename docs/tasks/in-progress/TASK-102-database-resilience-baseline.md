@@ -1,14 +1,27 @@
 # TASK-102 — Database Resilience Baseline
 
+## Delta 2026-03-29
+
+- `TASK-102` pasó a `in-progress`.
+- Estado real ya aplicado y verificado:
+  - Cloud SQL `greenhouse-pg-dev` con `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - flags `log_min_duration_statement=1000` y `log_statement=ddl`
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` verificado en `Production`, `staging` y `Preview (develop)` vía `vercel env pull`
+  - fallback del runtime en repo actualizado a `15` en `src/lib/postgres/client.ts`
+  - `.env.example` alineado a `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15`
+- `pnpm pg:doctor --profile=runtime` y `pnpm pg:doctor --profile=migrator` pasaron contra `greenhouse-pg-dev`.
+- Restore test iniciado con clone efímero `greenhouse-pg-restore-test-20260329`, pero al cierre de esta actualización seguía en `PENDING_CREATE`.
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Database |
 | Sequence | Cloud Posture Hardening **5 of 6** — after TASK-096 Fase 1, connects to TASK-098 |
@@ -68,7 +81,7 @@ Que una falla de base de datos tenga recovery point <5 minutos (PITR), queries l
 
 ### Configuración de conexión (`src/lib/postgres/client.ts`)
 ```typescript
-const MAX_CONNECTIONS = parseInt(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS ?? '5', 10)
+const MAX_CONNECTIONS = parseInt(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS ?? '15', 10)
 
 // Pool config
 pool = new Pool({
@@ -174,11 +187,11 @@ pool = new Pool({
 
 ## Acceptance Criteria
 
-- [ ] PITR habilitado con 7 días de retention de WAL logs
-- [ ] `log_min_duration_statement=1000` activo (queries >1s logeadas)
-- [ ] `log_statement=ddl` activo (cambios de schema auditados)
+- [x] PITR habilitado con 7 días de retention de WAL logs
+- [x] `log_min_duration_statement=1000` activo (queries >1s logeadas)
+- [x] `log_statement=ddl` activo (cambios de schema auditados)
 - [ ] Slow queries visibles en Cloud Logging
-- [ ] `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` configurado en Vercel
+- [x] `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` configurado en Vercel
 - [ ] Restore de backup testeado exitosamente (clone + verificación)
 - [ ] Resultado del restore documentado
 - [ ] Instancia de test eliminada post-verificación

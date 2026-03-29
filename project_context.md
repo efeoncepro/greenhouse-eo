@@ -53,6 +53,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   consumen el bloque `cloud` como snapshot institucional del dominio.
 - `TASK-100` a `TASK-103` ya se interpretan como slices del dominio Cloud y no como hardening aislado.
 
+## Delta 2026-03-29 Cloud SQL resilience baseline in progress
+- `TASK-102` ya aplicó la baseline principal de resiliencia sobre `greenhouse-pg-dev`.
+- Estado real verificado:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - flags `log_min_duration_statement=1000` y `log_statement=ddl`
+- El runtime del portal también quedó alineado al nuevo pool target:
+  - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` en `Production`, `staging` y `Preview (develop)`
+  - fallback por defecto del repo subido a `15`
+- El restore test todavía no estaba cerrado al final de esta actualización; se lanzó el clone `greenhouse-pg-restore-test-20260329` y su verificación/eliminación siguen como remanente operativo.
+
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.

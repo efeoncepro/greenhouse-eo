@@ -27,6 +27,11 @@
 - Se migraron `19` rutas scheduler-driven, incluyendo `email-delivery-retry` y los sync endpoints de Finance, eliminando la auth inline inconsistente.
 - El lote quedó validado con `pnpm lint`, `pnpm test` y `pnpm build`.
 
+### Cloud SQL resilience baseline started
+- `greenhouse-pg-dev` ahora expone PITR con `7` días de WAL retention y flags `log_min_duration_statement=1000` + `log_statement=ddl`.
+- `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` quedó aplicado en `Production`, `staging` y `Preview (develop)`, y el fallback del repo se alineó al mismo valor.
+- `TASK-102` sigue abierta solo por el restore clone de verificación, que quedó lanzado como `greenhouse-pg-restore-test-20260329`.
+
 ### Nexa UI completion (TASK-115)
 - Edit inline de mensajes user con ComposerPrimitive (pencil hover → EditComposer → Guardar/Cancelar).
 - Follow-up suggestions como chips clicables + feedback thumbs 👍/👎 fire-and-forget.
