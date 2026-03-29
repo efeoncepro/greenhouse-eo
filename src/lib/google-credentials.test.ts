@@ -71,6 +71,25 @@ describe('google credentials helpers', () => {
     expect(authOptions.authClient).toBeUndefined()
   })
 
+  it('prefers workload identity in vercel runtimes even when the oidc token is resolved lazily', () => {
+    const env = asEnv({
+      GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
+      GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
+      GCP_PROJECT: 'efeonce-group',
+      VERCEL: '1',
+      VERCEL_ENV: 'preview'
+    })
+
+    expect(shouldUseWorkloadIdentity(env)).toBe(true)
+    expect(getGoogleCredentialSource(env)).toBe('wif')
+
+    const authOptions = getGoogleAuthOptions({ env })
+
+    expect(authOptions.authClient).toBeDefined()
+    expect(authOptions.credentials).toBeUndefined()
+  })
+
   it('falls back to ambient adc when no explicit wif or key is available', () => {
     const authOptions = getGoogleAuthOptions({
       env: asEnv({
