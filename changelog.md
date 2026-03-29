@@ -7,6 +7,21 @@
 
 ## 2026-03-28
 
+### Nexa tool calling runtime connected on Home
+- `/api/home/nexa` ahora soporta function calling con Gemini y devuelve `toolInvocations` reales para `check_payroll`, `get_otd`, `check_emails`, `get_capacity` y `pending_invoices`.
+- `HomeView` traduce esas invocaciones a `tool-call` parts del runtime de `@assistant-ui/react`, y `/home` renderiza resultados operativos inline con un renderer mínimo sin rehacer `NexaThread`.
+- El comportamiento nuevo deja a Nexa grounded en datos reales del portal y separa la lógica backend de la futura Lane B visual.
+
+### Admin Center staging hardening and payroll alert split
+- `Cloud & Integrations` y `Ops Health` quedaron sanas en `staging` después de corregir el cruce Server/Client de sus views y fijar `America/Santiago` para estabilizar la hidratación de timestamps.
+- `Cloud & Integrations` ahora absorbe la nota estructural de attendance lineage (`attendance_daily + leave_requests` como fuente actual y `Microsoft Teams` como target), para que Payroll muestre solo el impacto funcional sobre readiness.
+- `PayrollPeriodTab` dejó de renderizar esas notas de integración en la pila de alertas; se mantienen warnings y blockers de negocio como compensación, attendance signal, KPI y UF/UTM.
+
+### Nexa staging fallback added after Vertex AI permission failure
+- Se diagnostico en runtime que el 500 de `/api/home/nexa` no venia del prompt ni del payload, sino de Vertex AI: `PERMISSION_DENIED` sobre `aiplatform.endpoints.predict` para `gemini-2.5-flash` en `efeonce-group`.
+- `NexaService` ahora usa `systemInstruction` de forma nativa con `@google/genai` y degrada con una respuesta util cuando el entorno no tiene permiso de inferencia, en vez de romper Home con un 500 visible.
+- Queda pendiente el fix de infraestructura: otorgar al service account de Vercel staging el rol/permisos de Vertex AI necesarios para restaurar la respuesta real del modelo.
+
 ### TASK-063 reclassified as complete with hardening follow-up
 - `TASK-063` se movió a `complete` al alinear su estado documental con el runtime real ya implementado de `Projected Payroll` (API, UI, snapshots y promoción a oficial).
 - Se creó `TASK-109` para la deuda remanente de robustez: eliminar DDL en runtime, reforzar observabilidad de la proyección reactiva y cerrar el contrato downstream de `payroll.projected_*`.
@@ -2816,6 +2831,11 @@
 
 - Fix: corrected the AI Tooling bootstrap seed so `ensureAiToolingInfrastructure()` no longer fails when a seeded tool omits optional params like `subscriptionAmount`, restoring the admin catalog/licenses/wallets/meta routes in preview.
 # 2026-03-28
+
+- Admin Center: `/admin` dejó de ser un redirect ciego y ahora renderiza una landing institucional de governance con KPIs, mapa de dominios y entrypoints hacia Spaces, Identity & Access, Delivery, AI Governance, Cloud & Integrations y Ops Health.
+- Navegación admin: el submenu histórico `Administración` pasó a `Admin Center`, incorpora la landing `/admin` como entrypoint explícito y reordena las rutas administrativas activas bajo una taxonomía más clara.
+- Admin Center observability: se agregaron las nuevas surfaces `/admin/cloud-integrations` y `/admin/ops-health`, alimentadas por una capa compartida `getOperationsOverview()` que reutiliza señales reales de outbox, proyecciones, notifications, syncs y webhooks.
+- Admin Center runbooks: `Cloud & Integrations` y `Ops Health` ahora exponen acciones manuales con auth admin para `dispatch webhooks`, `services sync`, `replay reactive` y `retry failed emails`, todas montadas sobre helpers existentes del runtime.
 
 - Projected payroll promotion: `POST /api/hr/payroll/projected/promote` quedó validado end-to-end en PostgreSQL para marzo 2026; el flujo ya promueve 4 personas a borrador oficial, y la causa raíz del bloqueo era una combinación de `payroll_entries` con columnas faltantes y un `ensurePayrollInfrastructure()` que seguía tocando BigQuery aun estando en runtime Postgres.
 - Payroll projected promotion: `greenhouse_serving.projected_payroll_snapshots` recibió grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`, resolviendo el `permission denied` que bloqueaba `POST /api/hr/payroll/projected/promote` sin mover la materialización fuera de `greenhouse_serving`.

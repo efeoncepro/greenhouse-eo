@@ -12,24 +12,37 @@ import {
   useAuiState,
   ThreadPrimitive,
   ComposerPrimitive,
-  MessagePrimitive
+  MessagePrimitive,
+  ActionBarPrimitive
 } from '@assistant-ui/react'
 import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
+import NexaToolRenderer from './NexaToolRenderers'
+
 interface Props {
   onBack: () => void
+}
+
+/* ── Animation keyframes ── */
+const msgInSx = {
+  '@keyframes nexa-msg-in': {
+    '0%': { opacity: 0, transform: 'translateY(8px)' },
+    '100%': { opacity: 1, transform: 'translateY(0)' }
+  },
+  animation: 'nexa-msg-in 0.3s ease-out'
 }
 
 const TextPart = ({ text }: { text: string }) => (
   <span style={{ whiteSpace: 'pre-wrap' }}>{text}</span>
 )
 
+/* ── User message ── */
 const UserMessage = () => (
   <MessagePrimitive.Root>
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2.5 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2.5, ...msgInSx }}>
       <Box sx={{
         maxWidth: '75%',
         px: 2.5,
@@ -47,57 +60,132 @@ const UserMessage = () => (
   </MessagePrimitive.Root>
 )
 
+/* ── Assistant message with ActionBar ── */
 const AssistantMessage = () => (
   <MessagePrimitive.Root>
-    <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5 }}>
+    <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5, ...msgInSx }}>
       <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 32, height: 32, mt: 0.5, flexShrink: 0 }}>
         <i className='tabler-sparkles' style={{ fontSize: '1rem' }} />
       </CustomAvatar>
-      <Box sx={{
-        maxWidth: '80%',
-        px: 2.5,
-        py: 1.5,
-        borderRadius: '4px 20px 20px 20px',
-        bgcolor: 'background.paper',
-        border: 1,
-        borderColor: 'divider',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-        // Markdown prose styles
-        '& .aui-md': {
-          fontSize: '0.875rem',
-          lineHeight: 1.7,
-          '& p': { m: 0, mb: 1, '&:last-child': { mb: 0 } },
-          '& ul, & ol': { my: 1, pl: 2.5, '& li': { mb: 0.5 } },
-          '& strong': { fontWeight: 600 },
-          '& code': {
-            fontSize: '0.8rem',
-            bgcolor: 'action.selected',
-            px: 0.75,
-            py: 0.25,
-            borderRadius: 0.5,
-            fontFamily: 'monospace'
-          },
-          '& pre': {
-            bgcolor: 'action.hover',
-            p: 1.5,
-            borderRadius: 1,
-            overflow: 'auto',
-            my: 1,
-            '& code': { bgcolor: 'transparent', p: 0 }
-          },
-          '& a': { color: 'primary.main', textDecoration: 'underline' }
-        }
-      }}>
-        <MessagePrimitive.Content
-          components={{
-            Text: MarkdownTextPrimitive as any
-          }}
-        />
+      <Box sx={{ maxWidth: '80%' }}>
+        <Box sx={{
+          px: 2.5,
+          py: 1.5,
+          borderRadius: '4px 20px 20px 20px',
+          bgcolor: 'background.paper',
+          border: 1,
+          borderColor: 'divider',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+
+          // Markdown prose styles
+          '& .aui-md': {
+            fontSize: '0.875rem',
+            lineHeight: 1.7,
+            '& p': { m: 0, mb: 1, '&:last-child': { mb: 0 } },
+            '& ul, & ol': { my: 1, pl: 2.5, '& li': { mb: 0.5 } },
+            '& strong': { fontWeight: 600 },
+            '& code': {
+              fontSize: '0.8rem',
+              bgcolor: 'action.selected',
+              px: 0.75,
+              py: 0.25,
+              borderRadius: 0.5,
+              fontFamily: 'monospace'
+            },
+            '& pre': {
+              bgcolor: 'action.hover',
+              p: 1.5,
+              borderRadius: 1,
+              overflow: 'auto',
+              my: 1,
+              '& code': { bgcolor: 'transparent', p: 0 }
+            },
+            '& a': { color: 'primary.main', textDecoration: 'underline' }
+          }
+        }}>
+          <MessagePrimitive.Content
+            components={{
+              Text: MarkdownTextPrimitive as any,
+              tools: {
+                Fallback: NexaToolRenderer
+              }
+            }}
+          />
+        </Box>
+
+        {/* Error state */}
+        <MessagePrimitive.Error>
+          <Box sx={{
+            mt: 1.5,
+            px: 2,
+            py: 1.5,
+            borderRadius: 1.5,
+            bgcolor: 'error.lighterOpacity',
+            border: 1,
+            borderColor: 'error.main',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5
+          }}>
+            <i className='tabler-alert-circle' style={{ fontSize: '1rem', color: 'inherit', flexShrink: 0 }} />
+            <Typography variant='body2' color='error.main' sx={{ flex: 1 }}>
+              No se pudo generar una respuesta.
+            </Typography>
+            <ActionBarPrimitive.Reload asChild>
+              <Button size='small' color='error' variant='outlined' sx={{ flexShrink: 0 }}>
+                Reintentar
+              </Button>
+            </ActionBarPrimitive.Reload>
+          </Box>
+        </MessagePrimitive.Error>
+
+        {/* ActionBar: Copy + Reload */}
+        <ActionBarPrimitive.Root
+          hideWhenRunning
+          autohide='not-last'
+          style={{ display: 'flex', gap: 4, marginTop: 6 }}
+        >
+          <ActionBarPrimitive.Copy asChild>
+            <IconButton
+              size='small'
+              aria-label='Copiar respuesta'
+              sx={{
+                width: 28,
+                height: 28,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' },
+                '&[data-copied]': { color: 'success.main' },
+                '& .aui-copy': { display: 'inline-flex' },
+                '& .aui-copied': { display: 'none' },
+                '&[data-copied] .aui-copy': { display: 'none' },
+                '&[data-copied] .aui-copied': { display: 'inline-flex' }
+              }}
+            >
+              <i className='tabler-copy aui-copy' style={{ fontSize: '0.875rem' }} />
+              <i className='tabler-check aui-copied' style={{ fontSize: '0.875rem' }} />
+            </IconButton>
+          </ActionBarPrimitive.Copy>
+          <ActionBarPrimitive.Reload asChild>
+            <IconButton
+              size='small'
+              aria-label='Regenerar respuesta'
+              sx={{
+                width: 28,
+                height: 28,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' }
+              }}
+            >
+              <i className='tabler-refresh' style={{ fontSize: '0.875rem' }} />
+            </IconButton>
+          </ActionBarPrimitive.Reload>
+        </ActionBarPrimitive.Root>
       </Box>
     </Box>
   </MessagePrimitive.Root>
 )
 
+/* ── Thinking indicator ── */
 const ThinkingIndicator = () => {
   const isRunning = useAuiState(s => s.thread.isRunning)
 
@@ -141,6 +229,7 @@ const ThinkingIndicator = () => {
   )
 }
 
+/* ── Composer with Send ↔ Cancel toggle ── */
 const ChatComposer = () => {
   const isRunning = useAuiState(s => s.thread.isRunning)
 
@@ -177,22 +266,38 @@ const ChatComposer = () => {
               input: {
                 endAdornment: (
                   <InputAdornment position='end'>
-                    <ComposerPrimitive.Send asChild>
-                      <IconButton
-                        color='primary'
-                        disabled={isRunning}
-                        sx={{
-                          bgcolor: 'primary.main',
-                          color: 'primary.contrastText',
-                          '&:hover': { bgcolor: 'primary.dark' },
-                          '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'action.disabled' },
-                          width: 36,
-                          height: 36
-                        }}
-                      >
-                        <i className='tabler-arrow-up' style={{ fontSize: '1.25rem' }} />
-                      </IconButton>
-                    </ComposerPrimitive.Send>
+                    {isRunning ? (
+                      <ComposerPrimitive.Cancel asChild>
+                        <IconButton
+                          aria-label='Detener generación'
+                          sx={{
+                            bgcolor: 'error.lighterOpacity',
+                            color: 'error.main',
+                            '&:hover': { bgcolor: 'error.lightOpacity' },
+                            width: 36,
+                            height: 36
+                          }}
+                        >
+                          <i className='tabler-player-stop-filled' style={{ fontSize: '1.125rem' }} />
+                        </IconButton>
+                      </ComposerPrimitive.Cancel>
+                    ) : (
+                      <ComposerPrimitive.Send asChild>
+                        <IconButton
+                          color='primary'
+                          sx={{
+                            bgcolor: 'primary.main',
+                            color: 'primary.contrastText',
+                            '&:hover': { bgcolor: 'primary.dark' },
+                            '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'action.disabled' },
+                            width: 36,
+                            height: 36
+                          }}
+                        >
+                          <i className='tabler-arrow-up' style={{ fontSize: '1.25rem' }} />
+                        </IconButton>
+                      </ComposerPrimitive.Send>
+                    )}
                   </InputAdornment>
                 )
               }
@@ -204,6 +309,7 @@ const ChatComposer = () => {
   )
 }
 
+/* ── Main thread ── */
 const NexaThread = ({ onBack }: Props) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '60vh' }}>
     {/* Header */}
@@ -234,8 +340,8 @@ const NexaThread = ({ onBack }: Props) => (
       </Box>
     </Box>
 
-    {/* Thread */}
-    <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+    {/* Thread with ScrollToBottom */}
+    <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
       <ThreadPrimitive.Viewport
         style={{
           flex: 1,
@@ -255,6 +361,29 @@ const NexaThread = ({ onBack }: Props) => (
         />
         <ThinkingIndicator />
       </ThreadPrimitive.Viewport>
+
+      {/* Floating scroll-to-bottom */}
+      <ThreadPrimitive.ScrollToBottom asChild>
+        <IconButton
+          aria-label='Ir al final'
+          sx={{
+            position: 'absolute',
+            bottom: 80,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bgcolor: 'background.paper',
+            border: 1,
+            borderColor: 'divider',
+            boxShadow: 2,
+            '&:hover': { bgcolor: 'action.hover' },
+            width: 36,
+            height: 36,
+            zIndex: 10
+          }}
+        >
+          <i className='tabler-arrow-down' style={{ fontSize: '1.25rem' }} />
+        </IconButton>
+      </ThreadPrimitive.ScrollToBottom>
 
       <ChatComposer />
     </ThreadPrimitive.Root>

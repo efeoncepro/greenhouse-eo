@@ -1,5 +1,8 @@
 # CODEX TASK — Greenhouse Home: Vista Principal con Agente Conversacional Nexa
 
+## Delta 2026-03-28
+- El runtime activo de `/api/home/nexa` ya soporta tool calling operativo y devuelve `toolInvocations` para `check_payroll`, `get_otd`, `check_emails`, `get_capacity` y `pending_invoices` — cerrado por trabajo en `TASK-110`.
+
 ## Estado 2026-03-19
 
 Este brief se conserva como framing de producto y UX para la superficie `Home + Nexa`.

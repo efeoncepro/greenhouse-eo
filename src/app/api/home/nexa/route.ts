@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import type { NexaMessage } from '@/types/home'
 
@@ -44,10 +45,25 @@ export async function POST(req: Request) {
       computedAt: new Date().toISOString()
     }
 
+    const runtimeContext: NexaRuntimeContext = {
+      userId: user.userId,
+      clientId: user.clientId,
+      clientName: user.clientName,
+      tenantType: user.tenantType,
+      role: user.role || 'user',
+      roleCodes: user.roleCodes || [],
+      routeGroups: user.routeGroups || [],
+      timezone: user.timezone || 'America/Santiago',
+      ...(user.organizationId ? { organizationId: user.organizationId } : {}),
+      ...(user.organizationName ? { organizationName: user.organizationName } : {}),
+      ...(user.memberId ? { memberId: user.memberId } : {})
+    }
+
     const nexaResponse = await NexaService.generateResponse({
       prompt,
       history: history.slice(-10),
-      context: lightContext
+      context: lightContext,
+      runtimeContext
     })
 
     return NextResponse.json(nexaResponse)

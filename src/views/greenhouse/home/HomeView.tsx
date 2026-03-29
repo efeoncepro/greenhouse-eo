@@ -11,68 +11,100 @@ import Typography from '@mui/material/Typography'
 import {
   AssistantRuntimeProvider,
   useLocalRuntime,
-  useAui,
   useAuiState
 } from '@assistant-ui/react'
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
+import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/utils'
 
 import NexaHero from './components/NexaHero'
 import NexaThread from './components/NexaThread'
 import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
+import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import type { HomeSnapshot } from '@/types/home'
 
 const SNAPSHOT_TIMEOUT_MS = 5000
 
 // ── Nexa adapter ───────────────────────────────────────────────
 
+const toJsonValue = (value: unknown): ReadonlyJSONValue => {
+  if (
+    value === null ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(item => toJsonValue(item))
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, toJsonValue(item)])
+    ) as ReadonlyJSONObject
+  }
+
+  return null
+}
+
 const nexaAdapter: ChatModelAdapter = {
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
-    try {
-      const lastMessage = messages[messages.length - 1]
+    const lastMessage = messages[messages.length - 1]
 
-      const prompt = lastMessage?.content
+    const prompt = lastMessage?.content
+      ?.filter(part => part.type === 'text')
+      .map(part => (part as { type: 'text'; text: string }).text)
+      .join('') ?? ''
+
+    const history = messages.slice(-10).map(m => ({
+      role: m.role as 'user' | 'assistant',
+      content: m.content
         ?.filter(part => part.type === 'text')
         .map(part => (part as { type: 'text'; text: string }).text)
         .join('') ?? ''
+    }))
 
-      const history = messages.slice(-10).map(m => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content
-          ?.filter(part => part.type === 'text')
-          .map(part => (part as { type: 'text'; text: string }).text)
-          .join('') ?? ''
-      }))
+    let res: Response
 
-      const res = await fetch('/api/home/nexa', {
+    try {
+      res = await fetch('/api/home/nexa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, history }),
         signal: abortSignal
       })
-
-      if (!res.ok) {
-        const errorBody = await res.json().catch(() => null)
-
-        return {
-          content: [{ type: 'text' as const, text: `No pude procesar tu mensaje (${res.status}). ${errorBody?.error || 'Intenta de nuevo.'}` }]
-        }
-      }
-
-      const data = await res.json()
-
-      return {
-        content: [{ type: 'text' as const, text: data.content || 'No obtuve una respuesta. Intenta de nuevo.' }]
-      }
     } catch (err) {
-      const message = err instanceof DOMException && err.name === 'AbortError'
-        ? 'La solicitud fue cancelada.'
-        : 'No pude conectarme con Nexa. Verifica tu conexión e intenta de nuevo.'
+      if (err instanceof DOMException && err.name === 'AbortError') throw err
 
-      return {
-        content: [{ type: 'text' as const, text: message }]
-      }
+      throw new Error('No pude conectarme con Nexa. Verifica tu conexión e intenta de nuevo.')
+    }
+
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => null)
+
+      throw new Error(errorBody?.error || `Error ${res.status}: no se pudo procesar tu mensaje.`)
+    }
+
+    const data = await res.json() as NexaResponse
+
+    const toolParts = (data.toolInvocations || []).map(invocation => ({
+      type: 'tool-call' as const,
+      toolCallId: invocation.toolCallId,
+      toolName: invocation.toolName,
+      args: toJsonValue(invocation.args) as ReadonlyJSONObject,
+      argsText: JSON.stringify(invocation.args ?? {}),
+      result: toJsonValue(invocation.result)
+    }))
+
+    return {
+      content: [
+        ...toolParts,
+        { type: 'text' as const, text: data.content || '' }
+      ]
     }
   }
 }
@@ -127,15 +159,7 @@ const INITIAL_MESSAGE_COUNT = 1
 
 const HomeContent = ({ snapshot, operationItems }: { snapshot: HomeSnapshot; operationItems: StatusItem[] }) => {
   const messageCount = useAuiState(s => s.thread.messages.length)
-  const aui = useAui()
   const isChatActive = messageCount > INITIAL_MESSAGE_COUNT
-
-  const handleSuggestionClick = useCallback((text: string) => {
-    aui.thread().append({
-      role: 'user',
-      content: [{ type: 'text' as const, text }]
-    })
-  }, [aui])
 
   const handleBack = useCallback(() => {
     // Can't reset thread in LocalRuntime easily — reload the page
@@ -148,10 +172,7 @@ const HomeContent = ({ snapshot, operationItems }: { snapshot: HomeSnapshot; ope
       {!isChatActive && (
         <Fade in timeout={400}>
           <Box>
-            <NexaHero
-              greeting={snapshot.greeting.title}
-              onSuggestionClick={handleSuggestionClick}
-            />
+            <NexaHero greeting={snapshot.greeting.title} />
 
             {/* Secondary content below hero */}
             <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, mt: 4, pb: 6 }}>

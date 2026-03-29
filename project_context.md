@@ -3,6 +3,12 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-28 Admin Center governance shell
+- `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
+- La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.
+- La señal operacional para esas vistas se resuelve desde una capa compartida `src/lib/operations/get-operations-overview.ts`, reutilizada también por `GET /api/agency/operations`.
+- `Admin Center` indexa la observabilidad operativa y la separa del uso diario del producto; no reemplaza `Agency > Operations`, sino que la contextualiza como vista extendida.
+
 ## Delta 2026-03-28 Centralized email delivery layer completed
 - `TASK-095` quedó cerrada con `sendEmail()` como capa canónica sobre Resend, registro unificado en `greenhouse_notifications.email_deliveries` y resolver por suscripción en `greenhouse_notifications.email_subscriptions`.
 - Auth, NotificationService y Payroll ya consumen esa capa; los envíos directos ad hoc y el plain text de notificaciones quedaron reemplazados por templates centralizados.

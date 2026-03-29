@@ -1,5 +1,11 @@
 # TASK-106 — Email Delivery Admin UI
 
+## Delta 2026-03-28
+
+- La surface runtime ya existe en el repo en `src/app/(dashboard)/admin/email-delivery/page.tsx` y `src/views/greenhouse/admin/EmailDeliveryView.tsx`.
+- `TASK-108` ya la indexa explícitamente dentro de `Admin Center` como slice activa de `Delivery governance`.
+- Pendiente recomendado: auditar esta task y decidir si corresponde moverla a `in-progress` o `complete` según el estado real del runtime y sus gaps restantes.
+
 ## Status
 
 | Campo | Valor |

@@ -132,9 +132,12 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
 | `TASK-106` | `to-do` | Email Delivery Admin UI | `docs/tasks/to-do/TASK-106-email-delivery-admin-ui.md` |
 | `TASK-107` | `to-do` | Auth Email Verification Request Flow | `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md` |
-| `TASK-108` | `to-do` | Admin Center Governance Shell | `docs/tasks/to-do/TASK-108-admin-center-governance-shell.md` |
+| `TASK-108` | `in-progress` | Admin Center Governance Shell | `docs/tasks/in-progress/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
 | `TASK-110` | `to-do` | Nexa: assistant-ui Feature Adoption | `docs/tasks/to-do/TASK-110-nexa-assistant-ui-features.md` |
+| `TASK-111` | `to-do` | Admin Center Secret Ref Governance UI | `docs/tasks/to-do/TASK-111-admin-center-secret-ref-governance-ui.md` |
+| `TASK-112` | `to-do` | Admin Center Integration Health and Freshness UI | `docs/tasks/to-do/TASK-112-admin-center-integration-health-freshness-ui.md` |
+| `TASK-113` | `to-do` | Admin Center Ops Audit Trail UI | `docs/tasks/to-do/TASK-113-admin-center-ops-audit-trail-ui.md` |
 
 ## Regla de asignacion desde aqui
 
