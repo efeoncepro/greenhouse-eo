@@ -1,5 +1,10 @@
 # TASK-099 — Security Headers & Next.js Middleware
 
+## Delta 2026-03-29
+
+- La capa Cloud ya tiene `health`, `alerts`, postura GCP y postura Cloud SQL, pero `middleware.ts` sigue ausente.
+- Esta task se mantiene plenamente vigente como la siguiente pieza cross-cutting de runtime protection.
+
 ## Status
 
 | Campo | Valor |

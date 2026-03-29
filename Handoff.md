@@ -83,6 +83,27 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - La siguiente lane del bloque solicitado queda en `TASK-102`, con `TASK-103` después.
 - El árbol sigue teniendo cambios paralelos de `TASK-115` en Home/Nexa; no mezclar esos archivos al stage del lote Cloud.
 
+## Sesión 2026-03-29 — Cloud layer robustness expansion
+
+### Completado
+- La capa `src/lib/cloud/*` quedó reforzada antes de entrar a `TASK-096`:
+  - `src/lib/cloud/gcp-auth.ts` modela la postura runtime GCP (`wif`, `service_account_key`, `mixed`, `unconfigured`)
+  - `src/lib/cloud/postgres.ts` modela la postura Cloud SQL (`connector`, `ssl`, `pool`, riesgos)
+  - `src/app/api/internal/health/route.ts` expone health institucional para deploy/runtime validation
+  - `src/lib/alerts/slack-notify.ts` deja listo el adapter base para alertas operativas
+- `getOperationsOverview()` ahora proyecta también posture de auth GCP y posture de Cloud SQL.
+- Se agregaron hooks de `alertCronFailure()` a los crons críticos:
+  - `outbox-publish`
+  - `webhook-dispatch`
+  - `sync-conformed`
+  - `ico-materialize`
+  - `nubox-sync`
+
+### Pendiente inmediato
+- `TASK-096` ya puede apoyarse en una postura GCP explícita en código en vez de partir solo desde env vars sueltas.
+- `TASK-098` ya no necesita inventar desde cero el health endpoint ni el adapter Slack.
+- `TASK-099`, `TASK-102` y `TASK-103` siguen abiertas, pero ahora encajan sobre una capa Cloud más robusta.
+
 ## Sesión 2026-03-29 — TASK-102 en progreso
 
 ### Completado

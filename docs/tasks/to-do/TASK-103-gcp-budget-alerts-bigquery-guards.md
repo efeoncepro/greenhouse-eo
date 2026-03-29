@@ -1,5 +1,13 @@
 # TASK-103 — GCP Budget Alerts & BigQuery Cost Guards
 
+## Delta 2026-03-29
+
+- El guard base de BigQuery ya existía en `src/lib/cloud/bigquery.ts`.
+- La expansión actual de la capa Cloud deja además posture runtime y health route listos para que esta task se concentre en:
+  - budgets/alerts de billing
+  - overrides explícitos para queries grandes
+  - baseline documentado de gasto real
+
 ## Status
 
 | Campo | Valor |

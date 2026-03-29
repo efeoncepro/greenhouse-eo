@@ -14,3 +14,25 @@ export interface CloudHealthSnapshot {
   checks: CloudHealthCheck[]
   timestamp: string
 }
+
+export type CloudAuthMode = 'wif' | 'service_account_key' | 'mixed' | 'unconfigured'
+
+export interface CloudGcpAuthPosture {
+  mode: CloudAuthMode
+  summary: string
+  oidcAvailable: boolean
+  workloadIdentityConfigured: boolean
+  serviceAccountKeyConfigured: boolean
+  serviceAccountEmailConfigured: boolean
+  providerConfigured: boolean
+}
+
+export interface CloudPostgresPosture {
+  configured: boolean
+  usesConnector: boolean
+  sslEnabled: boolean
+  maxConnections: number
+  meetsRecommendedPool: boolean
+  summary: string
+  risks: string[]
+}

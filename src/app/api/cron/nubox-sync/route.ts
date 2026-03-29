@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 import { syncNuboxToRaw } from '@/lib/nubox/sync-nubox-raw'
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox raw sync failed:', error)
+    await alertCronFailure('nubox-sync/raw', error)
     results.raw = { error: message }
   }
 
@@ -35,6 +37,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox conformed sync failed:', error)
+    await alertCronFailure('nubox-sync/conformed', error)
     results.conformed = { error: message }
   }
 
@@ -45,6 +48,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Nubox postgres projection failed:', error)
+    await alertCronFailure('nubox-sync/postgres', error)
     results.postgres = { error: message }
   }
 

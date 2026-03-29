@@ -3,7 +3,9 @@ import 'server-only'
 import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
 import type { CloudHealthSnapshot } from '@/lib/cloud/contracts'
 import { getCronSecretState } from '@/lib/cloud/cron'
+import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
+import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -84,6 +86,10 @@ export interface CloudPlatformOverview {
     overallStatus: 'ok' | 'warning' | 'failed'
     controls: CloudPlatformControl[]
   }
+  auth: {
+    mode: 'wif' | 'service_account_key' | 'mixed' | 'unconfigured'
+    summary: string
+  }
   cron: {
     secretConfigured: boolean
     summary: string
@@ -103,7 +109,7 @@ export interface CloudPlatformOverview {
 }
 
 export interface CloudPlatformControl {
-  key: 'postgres' | 'bigquery' | 'cron' | 'cost_guard'
+  key: 'postgres' | 'bigquery' | 'cron' | 'cost_guard' | 'gcp_auth'
   label: string
   status: 'ok' | 'warning' | 'failed'
   summary: string
@@ -465,6 +471,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
   const cronState = getCronSecretState()
   const postgresConfig = getGreenhousePostgresConfig()
   const postgresConfigured = isGreenhousePostgresConfigured()
+  const postgresPosture = getCloudPostgresPosture()
+  const gcpAuthPosture = getCloudGcpAuthPosture()
   const maximumBytesBilled = getBigQueryMaximumBytesBilled()
 
   const bigQueryProjectId = (() => {
@@ -481,14 +489,34 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
 
   const cloudControls: CloudPlatformControl[] = [
     {
+      key: 'gcp_auth',
+      label: 'GCP auth posture',
+      status:
+        gcpAuthPosture.mode === 'wif'
+          ? 'ok'
+          : gcpAuthPosture.mode === 'mixed' || gcpAuthPosture.mode === 'service_account_key'
+            ? 'warning'
+            : 'failed',
+      summary: gcpAuthPosture.summary,
+      details: {
+        oidcAvailable: gcpAuthPosture.oidcAvailable,
+        workloadIdentityConfigured: gcpAuthPosture.workloadIdentityConfigured,
+        serviceAccountKeyConfigured: gcpAuthPosture.serviceAccountKeyConfigured
+      }
+    },
+    {
       key: 'postgres',
       label: 'Cloud SQL runtime',
-      status: postgresHealth?.ok ? 'ok' : postgresConfigured ? 'failed' : 'warning',
-      summary: postgresHealth?.summary ?? (postgresConfigured ? 'Cloud SQL no respondió al health check' : 'Postgres runtime no configurado'),
+      status: postgresHealth?.ok ? (postgresPosture.risks.length === 0 ? 'ok' : 'warning') : postgresConfigured ? 'failed' : 'warning',
+      summary:
+        postgresHealth?.ok
+          ? postgresPosture.summary
+          : (postgresHealth?.summary ?? (postgresConfigured ? 'Cloud SQL no respondió al health check' : 'Postgres runtime no configurado')),
       details: {
         maxConnections: postgresConfig.maxConnections,
         usesConnector: Boolean(postgresConfig.instanceConnectionName),
-        sslEnabled: postgresConfig.sslEnabled
+        sslEnabled: postgresPosture.sslEnabled,
+        risks: postgresPosture.risks
       }
     },
     {
@@ -551,6 +579,10 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         overallStatus: cloudOverallStatus,
         controls: cloudControls
       },
+      auth: {
+        mode: gcpAuthPosture.mode,
+        summary: gcpAuthPosture.summary
+      },
       cron: {
         secretConfigured: cronState.configured,
         summary: cronState.configured ? 'CRON_SECRET presente' : 'CRON_SECRET ausente'
@@ -558,9 +590,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       postgres: {
         configured: postgresConfigured,
         usesConnector: Boolean(postgresConfig.instanceConnectionName),
-        sslEnabled: postgresConfig.sslEnabled,
+        sslEnabled: postgresPosture.sslEnabled,
         maxConnections: postgresConfig.maxConnections,
-        summary: postgresHealth?.summary ?? (postgresConfigured ? 'Configurado sin respuesta de health' : 'No configurado')
+        summary: postgresHealth?.ok ? postgresPosture.summary : (postgresHealth?.summary ?? (postgresConfigured ? 'Configurado sin respuesta de health' : 'No configurado'))
       },
       bigquery: {
         projectId: bigQueryProjectId,

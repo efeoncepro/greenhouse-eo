@@ -2,6 +2,12 @@
 
 ## Delta 2026-03-29
 
+- La capa Cloud ya expone postura runtime de Postgres en `src/lib/cloud/postgres.ts`.
+- `GET /api/internal/health` ya puede funcionar como consumer de runtime health una vez que la postura externa de Cloud SQL cambie.
+- Sigue pendiente toda la parte externa de Cloud SQL: PITR, flags, restore test y env rollout de pool size.
+
+## Delta 2026-03-29
+
 - `TASK-102` pasó a `in-progress`.
 - Estado real ya aplicado y verificado:
   - Cloud SQL `greenhouse-pg-dev` con `pointInTimeRecoveryEnabled=true`

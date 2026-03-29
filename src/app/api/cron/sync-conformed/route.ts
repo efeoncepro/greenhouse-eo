@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 import { syncNotionToConformed } from '@/lib/sync/sync-notion-conformed'
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('Conformed sync failed:', error)
+    await alertCronFailure('sync-conformed', error)
 
     return NextResponse.json({ error: message }, { status: 502 })
   }

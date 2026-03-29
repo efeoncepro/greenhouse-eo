@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 import { publishPendingOutboxEvents } from '@/lib/sync/outbox-consumer'
@@ -20,6 +21,8 @@ export async function GET(request: Request) {
     return NextResponse.json(result)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+
+    await alertCronFailure('outbox-publish', error)
 
     return NextResponse.json({ error: message }, { status: 502 })
   }

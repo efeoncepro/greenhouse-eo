@@ -64,6 +64,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - fallback por defecto del repo subido a `15`
 - El restore test todavía no estaba cerrado al final de esta actualización; se lanzó el clone `greenhouse-pg-restore-test-20260329` y su verificación/eliminación siguen como remanente operativo.
 
+## Delta 2026-03-29 Cloud layer robustness expansion
+- La capa `src/lib/cloud/*` ahora incorpora posture helpers reutilizables para el siguiente bloque `TASK-096` a `TASK-103`.
+- Nuevas piezas institucionales:
+  - `src/lib/cloud/gcp-auth.ts` para postura de autenticación GCP (`wif | service_account_key | mixed | unconfigured`)
+  - `src/lib/cloud/postgres.ts` para postura runtime de Cloud SQL (`connector`, `ssl`, `pool`, riesgos)
+  - `GET /api/internal/health` en `src/app/api/internal/health/route.ts`
+  - `src/lib/alerts/slack-notify.ts` como adapter base de alertas operativas
+- `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL, no solo reachability y cost guard.
+- Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
+
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.

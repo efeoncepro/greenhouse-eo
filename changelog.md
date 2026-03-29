@@ -32,6 +32,12 @@
 - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` quedó aplicado en `Production`, `staging` y `Preview (develop)`, y el fallback del repo se alineó al mismo valor.
 - `TASK-102` sigue abierta solo por el restore clone de verificación, que quedó lanzado como `greenhouse-pg-restore-test-20260329`.
 
+### Cloud layer reforzada para el track 096–103
+- La capa institucional `src/lib/cloud/*` ahora incluye postura GCP (`gcp-auth.ts`) y postura Cloud SQL (`postgres.ts`) además de health, cron y cost guards.
+- Se creó `GET /api/internal/health` como endpoint canónico de runtime health para Postgres y BigQuery, incluyendo versión, entorno y postura base de auth/runtime.
+- `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL dentro del dominio Cloud.
+- Se agregó `src/lib/alerts/slack-notify.ts` y hooks de alerting a crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`).
+
 ### Nexa UI completion (TASK-115)
 - Edit inline de mensajes user con ComposerPrimitive (pencil hover → EditComposer → Guardar/Cancelar).
 - Follow-up suggestions como chips clicables + feedback thumbs 👍/👎 fire-and-forget.

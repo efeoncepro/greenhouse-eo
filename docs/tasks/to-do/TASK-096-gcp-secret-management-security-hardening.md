@@ -1,5 +1,11 @@
 # TASK-096 — GCP Secret Management & Security Hardening
 
+## Delta 2026-03-29
+
+- La capa Cloud ahora ya expone postura runtime GCP en `src/lib/cloud/gcp-auth.ts`.
+- `GET /api/internal/health` ya existe y puede reportar la postura base de auth/runtime como parte de la validación posterior de esta task.
+- Esta task ya no parte solo desde `google-credentials.ts`; ahora puede apoyarse en la capa Cloud institucional.
+
 ## Status
 
 | Campo | Valor |

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 import { materializeMonthlySnapshots } from '@/lib/ico-engine/materialize'
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
     console.error('ICO materialization failed:', error)
+    await alertCronFailure('ico-materialize', error)
 
     return NextResponse.json({ error: message }, { status: 502 })
   }
