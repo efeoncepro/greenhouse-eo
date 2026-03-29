@@ -1,5 +1,3 @@
-import 'server-only'
-
 // ── Aggregate Types ──
 
 export const AGGREGATE_TYPES = {
@@ -9,6 +7,7 @@ export const AGGREGATE_TYPES = {
   account: 'account',
   supplier: 'supplier',
   exchangeRate: 'exchange_rate',
+  economicIndicator: 'economic_indicator',
 
   // Nubox
   nuboxEmission: 'nubox_emission',
@@ -25,6 +24,8 @@ export const AGGREGATE_TYPES = {
   payrollPeriod: 'payroll_period',
   payrollEntry: 'payroll_entry',
   compensationVersion: 'compensation_version',
+  projectedPayroll: 'projected_payroll',
+  payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
 
   // AI Tools
   aiCredits: 'ai_credits',
@@ -98,15 +99,18 @@ export const EVENT_TYPES = {
   financeIncomePaymentRecorded: 'finance.income_payment.recorded',
   financeCostAllocationCreated: 'finance.cost_allocation.created',
   financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
+  financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
 
   // Payroll
   payrollPeriodCreated: 'payroll_period.created',
   payrollPeriodUpdated: 'payroll_period.updated',
   payrollPeriodCalculated: 'payroll_period.calculated',
   payrollPeriodApproved: 'payroll_period.approved',
+  payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
+  payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',
 
   // Services
   serviceCreated: 'service.created',
@@ -116,6 +120,12 @@ export const EVENT_TYPES = {
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
   icoMaterializationCompleted: 'ico.materialization.completed',
+
+  // Projected Payroll
+  projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
+  projectedPayrollPeriodRefreshed: 'payroll.projected_period.refreshed',
+  projectedPayrollPromotedToOfficialDraft: 'payroll.projected_promoted_to_official_draft',
+  payrollPeriodRecalculatedFromProjection: 'payroll_period.recalculated_from_projection',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
@@ -144,11 +154,14 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeIncomePaymentRecorded,
   EVENT_TYPES.financeCostAllocationCreated,
   EVENT_TYPES.financeCostAllocationDeleted,
+  EVENT_TYPES.financeEconomicIndicatorUpserted,
   EVENT_TYPES.payrollPeriodCreated,
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,
   EVENT_TYPES.payrollPeriodApproved,
+  EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
+  EVENT_TYPES.payrollPrevisionalSnapshotUpserted,
   EVENT_TYPES.compensationVersionUpdated,
 
   // Notification triggers

@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server'
 
 import { getServerSession } from 'next-auth'
 
+import { resolveNexaModel } from '@/config/nexa-models'
 import { authOptions } from '@/lib/auth'
-import { getHomeSnapshot } from '@/lib/home/get-home-snapshot'
+import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import type { NexaMessage } from '@/types/home'
 
 /**
  * Handle conversational interaction with Nexa.
+ * Uses a lightweight context (modules + user name) instead of the full
+ * getHomeSnapshot() to avoid blocking on notifications/DB per message.
  */
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -19,35 +23,57 @@ export async function POST(req: Request) {
 
   const { user } = session
   const body = await req.json()
-  const { prompt, history = [] } = body as { prompt: string; history: NexaMessage[] }
+  const { prompt, history = [], model } = body as { prompt: string; history: NexaMessage[]; model?: string | null }
 
   if (!prompt) {
     return NextResponse.json({ error: 'Missing prompt' }, { status: 400 })
   }
 
   try {
-    // 1. Fetch current context (snapshot) to ground the AI
-    const context = await getHomeSnapshot({
-      userId: user.userId,
-      firstName: (user.name || '').split(' ')[0] || 'Usuario',
-      lastName: (user.name || '').split(' ').slice(1).join(' ') || null,
-      roleName: user.role || 'client_executive',
+    const firstName = (user.name || '').split(' ')[0] || 'Usuario'
+
+    const modules = resolveCapabilityModules({
       businessLines: user.businessLines || [],
-      serviceModules: user.serviceModules || [],
-      organizationId: user.organizationId
+      serviceModules: user.serviceModules || []
     })
 
-    // 2. Generate AI response
+    const lightContext = {
+      user: { firstName, lastName: null, role: user.role || 'user' },
+      greeting: { title: '', subtitle: '' },
+      modules: modules.map(m => ({ id: m.id, title: m.label, subtitle: m.description || '', icon: m.icon, route: m.route, color: 'primary' as const })),
+      tasks: [],
+      nexaIntro: '',
+      computedAt: new Date().toISOString()
+    }
+
+    const runtimeContext: NexaRuntimeContext = {
+      userId: user.userId,
+      clientId: user.clientId,
+      clientName: user.clientName,
+      tenantType: user.tenantType,
+      role: user.role || 'user',
+      roleCodes: user.roleCodes || [],
+      routeGroups: user.routeGroups || [],
+      timezone: user.timezone || 'America/Santiago',
+      ...(user.organizationId ? { organizationId: user.organizationId } : {}),
+      ...(user.organizationName ? { organizationName: user.organizationName } : {}),
+      ...(user.memberId ? { memberId: user.memberId } : {})
+    }
+
     const nexaResponse = await NexaService.generateResponse({
       prompt,
-      history,
-      context
+      history: history.slice(-10),
+      context: lightContext,
+      runtimeContext,
+      requestedModel: resolveNexaModel({ requestedModel: model })
     })
 
     return NextResponse.json(nexaResponse)
   } catch (error) {
-    console.error('Nexa API failed:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
 
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    console.error('Nexa API failed:', message, error)
+
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

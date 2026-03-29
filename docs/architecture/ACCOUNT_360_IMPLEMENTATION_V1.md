@@ -36,6 +36,13 @@ All tables live in `greenhouse_core` schema, owned by `migrator` role.
 | status | TEXT | active, inactive, prospect, churned |
 | active | BOOLEAN | Soft delete flag |
 
+For internal operating organizations, this table is the canonical owner of the legal identity used across Payroll, Finance and commercial surfaces. The organization row should carry the legal identity metadata needed for documents and exports, including reason social, tax ID and legal address where applicable.
+
+Current Efeonce operating-entity identity used by the portal:
+- Razón social: `Efeonce Group SpA`
+- Tax ID: `77.357.182-1`
+- Legal address: `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`
+
 #### `spaces`
 | Column | Type | Notes |
 |--------|------|-------|

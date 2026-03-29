@@ -11,6 +11,7 @@
 - La proyección `member_capacity_economics` ya reacciona a:
   - `finance.license_cost.updated`
   - `finance.tooling_cost.updated`
+- `member_capacity_economics.total_labor_cost_target` ya puede absorber costos empleador reales desde `payroll_entries` cuando Payroll Chile los materializa, manteniendo el snapshot como base canónica para labor cost loaded.
 - Regla explícita de arquitectura:
   - no sumar `greenhouse_finance.expenses` genéricos a `direct_overhead_target` hasta que exista taxonomía canónica de overhead directo por persona
 
@@ -263,6 +264,29 @@ Reglas:
 - no crear un segundo snapshot competidor con semántica parecida
 - si falta un input, agregar el evento y enriquecer la proyección existente
 
+## Member Assignability
+
+### Flag `assignable`
+
+`greenhouse_core.members.assignable` (BOOLEAN, default TRUE) controla si un miembro participa en la vista de capacidad comercial y es elegible para recibir asignaciones desde Agency > Team.
+
+Comportamiento:
+- `assignable = TRUE` → miembro visible en la tabla principal de Agency Team, incluido en totales de capacidad, elegible para asignación
+- `assignable = FALSE` → miembro excluido de la tabla principal, listado aparte en sección "Excluidos", no contabilizado en totales de equipo
+
+Reglas:
+- el flag NO desactiva al miembro (sigue `active = TRUE`)
+- el flag NO elimina asignaciones existentes — solo oculta al miembro de la vista de gestión
+- el flag se setea desde Agency > Team via botón "Excluir del equipo" → `PATCH /api/admin/team/members/{memberId}` con `{ assignable: false }`
+- para reincluir: botón "Incluir" en la sección de excluidos → `PATCH` con `{ assignable: true }`
+- `capacity-breakdown/route.ts` separa miembros en `assignableMembers` y `excludedMembers` basándose en este flag
+
+Caso de uso típico:
+- excluir al dueño/admin del equipo que no recibe asignaciones comerciales
+- excluir temporalmente a un miembro en licencia prolongada sin desactivarlo
+
+Migration: `scripts/migrations/add-member-assignable-flag.sql`
+
 ## Consumer Rules
 
 ### Agency
@@ -270,7 +294,8 @@ Reglas:
 `Agency > Team` debe:
 
 - usar el snapshot mensual actual
-- excluir `Efeonce` interno en capacidad comercial
+- separar miembros asignables de excluidos via `members.assignable`
+- excluir asignaciones internas (`Efeonce`) de la capacidad comercial
 - mostrar `Uso operativo` según `usage_kind`
 - no etiquetar `percent` como horas
 

@@ -56,6 +56,7 @@ const MyDashboardView = () => {
       ])
 
       if (dashRes.status === 'fulfilled' && dashRes.value.ok) setData(await dashRes.value.json())
+
       if (notifRes.status === 'fulfilled' && notifRes.value.ok) {
         const nd = await notifRes.value.json()
 

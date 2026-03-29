@@ -8,6 +8,7 @@ import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const _require = createRequire(import.meta.url)
+
 _require('module').Module._cache[_require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
@@ -59,6 +60,7 @@ const main = async () => {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
+
       console.log(`  ✗ ${row.display_name} → ${row.client_name || row.client_id}: ${msg.slice(0, 100)}`)
       skipped++
     }
@@ -74,5 +76,6 @@ main()
   })
   .finally(async () => {
     const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
     await closeGreenhousePostgres()
   })

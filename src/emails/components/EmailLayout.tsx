@@ -7,11 +7,12 @@ import { APP_URL, EMAIL_COLORS, EMAIL_FONTS, LOGO_URL } from '../constants'
 interface EmailLayoutProps {
   children: React.ReactNode
   previewText?: string
+  lang?: 'es' | 'en'
 }
 
-export default function EmailLayout({ children, previewText }: EmailLayoutProps) {
+export default function EmailLayout({ children, previewText, lang = 'es' }: EmailLayoutProps) {
   return (
-    <Html lang="es" dir="ltr">
+    <Html lang={lang} dir="ltr">
       <Head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />

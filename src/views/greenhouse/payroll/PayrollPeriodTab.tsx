@@ -31,29 +31,39 @@ import {
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
-import { formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
 type Props = {
   period: PayrollPeriod | null
   entries: PayrollEntry[]
   onRefresh: () => void
+  onCreatePeriod: () => void
+  createPeriodLabel: string
+  isHistoricalSelection?: boolean
 }
 
-const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
+const GOVERNANCE_ATTENDANCE_NOTES = new Set([
+  'La asistencia aún se resume desde attendance_daily + leave_requests.',
+  'La integración futura objetivo para asistencia es Microsoft Teams.'
+])
+
+const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [confirmApprove, setConfirmApprove] = useState(false)
   const [editMetaOpen, setEditMetaOpen] = useState(false)
   const [editYear, setEditYear] = useState<number | ''>('')
   const [editMonth, setEditMonth] = useState<number | ''>('')
-  const [editUf, setEditUf] = useState<number | ''>('')
   const [editTaxTable, setEditTaxTable] = useState('')
   const [editNotes, setEditNotes] = useState('')
   const [editSaving, setEditSaving] = useState(false)
+  const [resendLoading, setResendLoading] = useState(false)
   const [readiness, setReadiness] = useState<PayrollPeriodReadiness | null>(null)
   const [readinessError, setReadinessError] = useState<string | null>(null)
   const [readinessLoading, setReadinessLoading] = useState(false)
   const periodId = period?.periodId ?? null
+  const visibleAttendanceNotes = readiness?.attendanceDiagnostics.notes.filter(note => !GOVERNANCE_ATTENDANCE_NOTES.has(note)) ?? []
 
   useEffect(() => {
     if (!periodId) {
@@ -119,7 +129,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
 
       onRefresh()
     })
-  }, [period, onRefresh])
+  }, [period, onRefresh, startTransition])
 
   const handleApprove = useCallback(async () => {
     if (!period) return
@@ -138,15 +148,71 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     onRefresh()
   }, [period, onRefresh])
 
-  const handleExport = useCallback(async () => {
+  const handleClosePeriod = useCallback(async () => {
     if (!period) return
 
-    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/export`)
+    setError(null)
+    setNotice(null)
+    startTransition(async () => {
+      const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/close`, { method: 'POST' })
+
+      if (!res.ok) {
+        const data = await res.json()
+
+        setError(data.error || 'Error al cerrar período')
+
+        return
+      }
+
+      const data = await res.json().catch(() => null)
+
+      if (data?.notificationDispatch?.error) {
+        setError(data.notificationDispatch.error)
+
+        return
+      }
+
+      setNotice('El período se cerró y se disparó la notificación de exportación.')
+      onRefresh()
+    })
+  }, [period, onRefresh])
+
+  const handleResendExportReady = useCallback(async () => {
+    if (!period) return
+
+    setError(null)
+    setNotice(null)
+    setResendLoading(true)
+
+    try {
+      const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/resend-export-ready`, {
+        method: 'POST'
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+
+        setError(data.error || 'Error al reenviar la notificación')
+
+        return
+      }
+
+      setNotice('Se reenviaron el correo y los adjuntos de exportación.')
+      onRefresh()
+    } finally {
+      setResendLoading(false)
+    }
+  }, [period, onRefresh])
+
+  const handleDownloadCsv = useCallback(async () => {
+    if (!period) return
+
+    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/csv`)
 
     if (!res.ok) {
       const data = await res.json()
 
-      setError(data.error || 'Error al exportar')
+      setError(data.error || 'Error al descargar CSV')
 
       return
     }
@@ -160,8 +226,30 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     a.download = `nomina_${period.periodId}.csv`
     a.click()
     URL.revokeObjectURL(url)
-    onRefresh()
-  }, [period, onRefresh])
+  }, [period])
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!period) return
+
+    const res = await fetch(`/api/hr/payroll/periods/${period.periodId}/pdf`)
+
+    if (!res.ok) {
+      const data = await res.json()
+
+      setError(data.error || 'Error al descargar PDF')
+
+      return
+    }
+
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+
+    a.href = url
+    a.download = `nomina_${period.periodId}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [period])
 
   const handleEntryUpdate = useCallback(
     (entryId: string, field: string, value: number | string | boolean | null) => {
@@ -191,7 +279,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
 
     setEditYear(period.year)
     setEditMonth(period.month)
-    setEditUf(period.ufValue ?? '')
     setEditTaxTable(period.taxTableVersion ?? '')
     setEditNotes(period.notes ?? '')
     setEditMetaOpen(true)
@@ -213,7 +300,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
         body: JSON.stringify({
           year: nextYear,
           month: nextMonth,
-          ufValue: editUf === '' ? null : editUf,
           taxTableVersion: editTaxTable || null,
           notes: editNotes || null
         })
@@ -232,17 +318,21 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
     } finally {
       setEditSaving(false)
     }
-  }, [period, editYear, editMonth, editUf, editTaxTable, editNotes, onRefresh])
+  }, [period, editYear, editMonth, editTaxTable, editNotes, onRefresh])
 
   if (!period) {
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardContent sx={{ py: 8, textAlign: 'center' }}>
-          <Stack alignItems='center' spacing={1}>
+        <CardContent sx={{ py: 8 }}>
+          <Stack alignItems='center' spacing={2} textAlign='center'>
             <i className='tabler-calendar-off' style={{ fontSize: 40, color: 'var(--mui-palette-text-disabled)' }} />
+            <Typography variant='h6'>No hay período abierto</Typography>
             <Typography color='text.secondary'>
-              No hay período seleccionado. Crea un período para comenzar.
+              El siguiente ciclo sugerido es {createPeriodLabel}. Si ya cerraste el período anterior, crea el nuevo borrador para continuar.
             </Typography>
+            <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={onCreatePeriod}>
+              Crear período {createPeriodLabel}
+            </Button>
           </Stack>
         </CardContent>
       </Card>
@@ -253,7 +343,6 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
   const canEditPeriod = canEditPayrollPeriodMetadata(period.status)
   const nextYearPreview = editYear === '' ? period.year : editYear
   const nextMonthPreview = editMonth === '' ? period.month : editMonth
-  const nextUfPreview = editUf === '' ? null : editUf
 
   const resetWarning =
     canEditPeriod && doesPayrollPeriodUpdateRequireReset({
@@ -263,52 +352,50 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
       currentTaxTableVersion: period.taxTableVersion,
       nextYear: typeof nextYearPreview === 'number' ? nextYearPreview : period.year,
       nextMonth: typeof nextMonthPreview === 'number' ? nextMonthPreview : period.month,
-      nextUfValue: nextUfPreview,
+      nextUfValue: period.ufValue,
       nextTaxTableVersion: editTaxTable || null
     })
 
-  const totals = entries.reduce(
-    (acc, e) => ({
-      gross: acc.gross + e.grossTotal,
-      net: acc.net + e.netTotal,
-      deductions: acc.deductions + (e.chileTotalDeductions ?? 0)
-    }),
-    { gross: 0, net: 0, deductions: 0 }
-  )
-
-  const hasMixedCurrency = new Set(entries.map(e => e.currency)).size > 1
-  const primaryCurrency = entries[0]?.currency ?? 'CLP'
+  const grossSummary = buildPayrollCurrencySummary(entries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
+  const deductionsSummary = buildPayrollCurrencySummary(entries, entry => entry.chileTotalDeductions ?? 0)
 
   return (
     <>
+      {isHistoricalSelection && (
+        <Alert severity='info' sx={{ mb: 4 }}>
+          Estás viendo un período histórico seleccionado desde Historial. El período abierto o vigente sigue mostrándose en el resumen superior.
+        </Alert>
+      )}
+
       {/* Period totals KPI row */}
-      {!hasMixedCurrency && entries.length > 0 && (
+      {entries.length > 0 && (
         <Grid container spacing={6} sx={{ mb: 4 }}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Bruto total'
-              stats={formatCurrency(totals.gross, primaryCurrency)}
+              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
               avatarIcon='tabler-coins'
               avatarColor='warning'
-              subtitle={`${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`}
+              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : `${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Descuentos'
-              stats={formatCurrency(totals.deductions, 'CLP')}
+              stats={deductionsSummary.hasMixedCurrency ? 'Mixto' : deductionsSummary.summaryLabel}
               avatarIcon='tabler-receipt-tax'
               avatarColor='error'
-              subtitle='Previsión + impuesto'
+              subtitle={deductionsSummary.hasMixedCurrency ? deductionsSummary.summaryLabel : 'Previsión + impuesto'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={formatCurrency(totals.net, primaryCurrency)}
+              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle='A pagar'
+              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'A pagar'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -317,7 +404,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
               stats={period.ufValue ? period.ufValue.toLocaleString('es-CL') : '—'}
               avatarIcon='tabler-chart-dots'
               avatarColor='info'
-              subtitle={period.ufValue ? 'Configurado' : 'No configurado'}
+              subtitle={period.ufValue ? 'Sincronizado' : 'Pendiente de sincronizar'}
             />
           </Grid>
         </Grid>
@@ -326,7 +413,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
       {/* UF warning for Chile entries without UF */}
       {!period.ufValue && entries.some(e => e.payRegime === 'chile') && period.status === 'draft' && (
         <Alert severity='warning' sx={{ mb: 4 }}>
-          El valor UF no está configurado. Es necesario para calcular Isapre en régimen CLP.
+          La UF del período aún no está sincronizada. Si el indicador existe para ese mes, se tomará automáticamente al calcular.
         </Alert>
       )}
 
@@ -357,7 +444,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
             </Typography>
           }
           action={
-            <Stack direction='row' spacing={1}>
+            <Stack direction='row' spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               {period.status === 'draft' && (
                 <>
                   <Button
@@ -432,6 +519,17 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     </Button>
                   )}
                   <Button
+                    variant='contained'
+                    size='small'
+                    color='warning'
+                    startIcon={<i className='tabler-mail-forward' />}
+                    onClick={handleClosePeriod}
+                    disabled={isPending}
+                    aria-label={`Cerrar y notificar el período ${formatPeriodLabel(period.year, period.month)}`}
+                  >
+                    Cerrar y notificar
+                  </Button>
+                  <Button
                     variant='tonal'
                     size='small'
                     color='info'
@@ -446,10 +544,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     size='small'
                     color='success'
                     startIcon={<i className='tabler-file-type-pdf' />}
-                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    onClick={handleDownloadPdf}
                     disabled={isPending}
+                    aria-label={`Descargar PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    PDF
+                    Descargar PDF
                   </Button>
                   <Button
                     variant='tonal'
@@ -458,18 +557,20 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     startIcon={<i className='tabler-file-spreadsheet' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
                     disabled={isPending}
-                  >
-                    Excel
-                  </Button>
-                  <Button
-                    variant='tonal'
-                    size='small'
-                    startIcon={<i className='tabler-file-export' />}
-                    onClick={handleExport}
-                    disabled={isPending}
-                  >
-                    CSV
-                  </Button>
+                    aria-label={`Abrir Excel del período ${formatPeriodLabel(period.year, period.month)}`}
+                    >
+                      Ver Excel
+                    </Button>
+                    <Button
+                      variant='tonal'
+                      size='small'
+                      startIcon={<i className='tabler-file-export' />}
+                      onClick={handleDownloadCsv}
+                      disabled={isPending}
+                      aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
+                    >
+                      Descargar CSV
+                    </Button>
                 </>
               )}
               {period.status === 'exported' && (
@@ -479,10 +580,11 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     size='small'
                     color='info'
                     startIcon={<i className='tabler-file-type-pdf' />}
-                    onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/pdf`, '_blank')}
+                    onClick={handleDownloadPdf}
                     disabled={isPending}
+                    aria-label={`Descargar PDF del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    PDF
+                    Descargar PDF
                   </Button>
                   <Button
                     variant='tonal'
@@ -491,17 +593,30 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                     startIcon={<i className='tabler-file-spreadsheet' />}
                     onClick={() => window.open(`/api/hr/payroll/periods/${period.periodId}/excel`, '_blank')}
                     disabled={isPending}
+                    aria-label={`Abrir Excel del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    Excel
+                    Ver Excel
                   </Button>
                   <Button
                     variant='tonal'
                     size='small'
                     startIcon={<i className='tabler-file-export' />}
-                    onClick={handleExport}
+                    onClick={handleDownloadCsv}
                     disabled={isPending}
+                    aria-label={`Descargar CSV del período ${formatPeriodLabel(period.year, period.month)}`}
                   >
-                    CSV
+                    Descargar CSV
+                  </Button>
+                  <Button
+                    variant='contained'
+                    size='small'
+                    color='secondary'
+                    startIcon={<i className='tabler-mail-forward' />}
+                    onClick={handleResendExportReady}
+                    disabled={isPending || resendLoading}
+                    aria-label={`Reenviar correo de exportación del período ${formatPeriodLabel(period.year, period.month)}`}
+                  >
+                    Reenviar correo
                   </Button>
                 </>
               )}
@@ -513,6 +628,12 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
           {error && (
             <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError(null)}>
               {error}
+            </Alert>
+          )}
+
+          {notice && (
+            <Alert severity='success' sx={{ mb: 2 }} onClose={() => setNotice(null)}>
+              {notice}
             </Alert>
           )}
 
@@ -534,7 +655,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                   {issue.message}
                 </Alert>
               ))}
-              {readiness.attendanceDiagnostics.notes.map(note => (
+              {visibleAttendanceNotes.map(note => (
                 <Alert key={note} severity='info'>
                   {note}
                 </Alert>
@@ -668,15 +789,9 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
                 ))}
               </CustomTextField>
             </Stack>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Valor UF'
-              type='number'
-              value={editUf}
-              onChange={e => setEditUf(e.target.value === '' ? '' : Number(e.target.value))}
-              helperText='Necesario para calcular Isapre'
-            />
+            <Alert severity='info'>
+              La UF se sincroniza automáticamente desde indicadores económicos según el mes imputable guardado para este período.
+            </Alert>
             <CustomTextField
               fullWidth
               size='small'
@@ -696,7 +811,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh }: Props) => {
             />
             {resetWarning && (
               <Alert severity='warning'>
-                Cambiar mes/año imputable, UF o tabla impositiva reiniciará este período a borrador y eliminará las entries calculadas para que puedas recalcularlo con el mes correcto.
+                Cambiar mes/año imputable o tabla impositiva reiniciará este período a borrador y eliminará las entries calculadas para que puedas recalcularlo con los valores correctos del período.
               </Alert>
             )}
           </Stack>

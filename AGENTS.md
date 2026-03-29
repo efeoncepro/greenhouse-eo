@@ -32,11 +32,15 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el trabajo nace de una task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy), revisar obligatoriamente la arquitectura antes de implementar:
   - minimo: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md` y `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
   - ademas: toda arquitectura especializada que aplique al task, por ejemplo identidad, finance, service modules o multitenancy
+- Si el trabajo toca el calendario operativo de Payroll, revisar `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `src/lib/calendar/operational-calendar.ts` y `src/lib/calendar/nager-date-holidays.ts`; la timezone canónica es IANA (`America/Santiago`) y los feriados nacionales se hidratan desde `Nager.Date` con overrides locales persistidos.
 - Si el cambio toca modelado de datos, sync, fuentes externas, PostgreSQL o BigQuery:
   - revisar `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
   - revisar `docs/operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md`
 - Si el cambio toca pipelines externos, notificaciones, sync con Notion/HubSpot/Frame.io/Teams o dependencias multi-repo:
   - revisar `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- Si el cambio toca lanzamiento de una capacidad visible, promocion `alpha/beta/stable`, disponibilidad por tenant/cohort o comunicacion client-facing:
+  - revisar `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`
+  - revisar `docs/changelog/CLIENT_CHANGELOG.md`
 - Si el cambio toca webhooks, event delivery, callbacks o integraciones near-real-time:
   - revisar `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - Si el cambio toca PostgreSQL, Cloud SQL, backfills, source sync o migraciones runtime:
@@ -90,9 +94,12 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 
 ### 7. Regla de documentacion viva
 - Actualizar `changelog.md` cuando haya un cambio real en comportamiento, estructura, flujo de trabajo o despliegue.
+- Actualizar `docs/changelog/CLIENT_CHANGELOG.md` cuando cambie una capacidad visible para usuarios/clientes o cuando una feature/modulo cambie de canal o disponibilidad.
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
 - No usar estos documentos como dumping ground. Deben quedar legibles.
 - Usar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para evitar duplicacion: una fuente canonica por tema y deltas breves en el resto.
+- La politica canonica de release channels y changelog client-facing vive en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
+- La convención canonica de Git tags para releases (`platform/`, `<module>/`, `api/<slug>/`) vive en ese mismo documento; no improvisar tags globales ambiguos como `v1.1.0` para el portal completo.
 
 ### 8. Regla de line endings
 - El repositorio debe versionar archivos de texto con finales de linea `LF`.
@@ -191,6 +198,11 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - merge a `main`
   - deploy a Production
 - Si un cambio no paso por ese camino, debe existir razon explicita en `Handoff.md`.
+- Regla complementaria:
+  - `Preview` suele corresponder a `alpha`
+  - `Staging/develop` suele corresponder a `beta`
+  - `Production/main` es el unico lugar donde una capacidad puede declararse `stable`
+  - Greenhouse comunica releases principalmente por modulo o feature visible, no solo por plataforma completa
 
 ### Archivos sensibles
 - Tratar con cuidado:

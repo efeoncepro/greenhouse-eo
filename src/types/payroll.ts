@@ -3,13 +3,18 @@ export type PayrollCurrency = 'CLP' | 'USD'
 export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
 export type HealthSystem = 'fonasa' | 'isapre'
 export type ContractType = 'indefinido' | 'plazo_fijo'
+export type GratificacionLegalMode = 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
 export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
 export type PayrollAttendanceSource = 'legacy_attendance_daily_plus_hr_leave' | 'microsoft_teams'
+export type ProjectionMode = 'actual_to_date' | 'projected_month_end'
 
 export interface BonusProrationConfig {
   otdThreshold: number
   otdFloor: number
   rpaThreshold: number
+  rpaFullPayoutThreshold: number
+  rpaSoftBandEnd: number
+  rpaSoftBandFloorFactor: number
 }
 
 export interface PayrollMemberSummary {
@@ -43,12 +48,19 @@ export interface CompensationVersion {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  colacionAmount: number
+  movilizacionAmount: number
+  fixedBonusLabel: string | null
+  fixedBonusAmount: number
   bonusOtdMin: number
   bonusOtdMax: number
   bonusRpaMin: number
   bonusRpaMax: number
+  gratificacionLegalMode: GratificacionLegalMode
   afpName: string | null
   afpRate: number | null
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
   healthSystem: HealthSystem | null
   healthPlanUf: number | null
   unemploymentRate: number
@@ -58,6 +70,7 @@ export interface CompensationVersion {
   effectiveFrom: string
   effectiveTo: string | null
   isCurrent: boolean
+  desiredNetClp: number | null
   changeReason: string | null
   createdBy: string | null
   createdAt: string | null
@@ -69,18 +82,26 @@ export interface CreateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  colacionAmount?: number
+  movilizacionAmount?: number
+  fixedBonusLabel?: string | null
+  fixedBonusAmount?: number
   bonusOtdMin?: number
   bonusOtdMax?: number
   bonusRpaMin?: number
   bonusRpaMax?: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
   contractType?: ContractType
   hasApv?: boolean
   apvAmount?: number
+  desiredNetClp?: number | null
   effectiveFrom: string
   changeReason: string
 }
@@ -90,18 +111,26 @@ export interface UpdateCompensationVersionInput {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance?: number
+  colacionAmount?: number
+  movilizacionAmount?: number
+  fixedBonusLabel?: string | null
+  fixedBonusAmount?: number
   bonusOtdMin?: number
   bonusOtdMax?: number
   bonusRpaMin?: number
   bonusRpaMax?: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
   contractType?: ContractType
   hasApv?: boolean
   apvAmount?: number
+  desiredNetClp?: number | null
   effectiveFrom: string
   changeReason: string
 }
@@ -150,6 +179,10 @@ export interface PayrollEntry {
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
+  colacionAmount: number
+  movilizacionAmount: number
+  fixedBonusLabel: string | null
+  fixedBonusAmount: number
   kpiOtdPercent: number | null
   kpiRpaAvg: number | null
   kpiOtdQualifies: boolean
@@ -161,6 +194,9 @@ export interface PayrollEntry {
   bonusOtherAmount: number
   bonusOtherDescription: string | null
   grossTotal: number
+  chileGratificacionLegalAmount: number | null
+  chileColacionAmount: number | null
+  chileMovilizacionAmount: number | null
   bonusOtdMin: number
   bonusOtdMax: number
   bonusRpaMin: number
@@ -168,8 +204,16 @@ export interface PayrollEntry {
   chileAfpName: string | null
   chileAfpRate: number | null
   chileAfpAmount: number | null
+  chileAfpCotizacionAmount: number | null
+  chileAfpComisionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
+  chileHealthObligatoriaAmount: number | null
+  chileHealthVoluntariaAmount: number | null
+  chileEmployerSisAmount: number | null
+  chileEmployerCesantiaAmount: number | null
+  chileEmployerMutualAmount: number | null
+  chileEmployerTotalCost: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null
@@ -191,6 +235,9 @@ export interface PayrollEntry {
   daysOnUnpaidLeave: number | null
   adjustedBaseSalary: number | null
   adjustedRemoteAllowance: number | null
+  adjustedColacionAmount: number | null
+  adjustedMovilizacionAmount: number | null
+  adjustedFixedBonusAmount: number | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -229,12 +276,19 @@ export interface PayrollKpiDiagnostics {
   missingMembers: number
 }
 
+export interface PayrollProjectionContext {
+  mode: ProjectionMode
+  asOfDate: string
+  promotionId?: string | null
+}
+
 export type PayrollReadinessIssueCode =
   | 'no_compensated_members'
   | 'missing_compensation'
   | 'missing_kpi'
   | 'missing_attendance_signal'
   | 'missing_uf_value'
+  | 'missing_utm_value'
   | 'missing_tax_table_version'
 
 export interface PayrollReadinessIssue {
@@ -255,6 +309,46 @@ export interface PayrollPeriodReadiness {
   attendanceDiagnostics: PayrollAttendanceDiagnostics
   warnings: PayrollReadinessIssue[]
   blockingIssues: PayrollReadinessIssue[]
+}
+
+export interface ProjectedPayrollPromotionRecord {
+  promotionId: string
+  periodId: string
+  periodYear: number
+  periodMonth: number
+  projectionMode: ProjectionMode
+  asOfDate: string
+  sourceSnapshotCount: number
+  promotedEntryCount: number
+  sourcePeriodStatus: PeriodStatus | null
+  actorUserId: string | null
+  actorIdentifier: string | null
+  promotionStatus: 'started' | 'completed' | 'failed'
+  promotedAt: string | null
+  failureReason: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export interface ProjectedPayrollPromotion {
+  promotionId: string
+  periodId: string
+  periodYear: number
+  periodMonth: number
+  projectionMode: 'actual_to_date' | 'projected_month_end'
+  asOfDate: string
+  sourceSnapshotCount: number
+  promotedEntryCount: number
+  promotedByUserId: string | null
+  promotedByActor: string | null
+  createdAt: string | null
+}
+
+export interface PromoteProjectedPayrollInput {
+  year: number
+  month: number
+  mode: 'actual_to_date' | 'projected_month_end'
+  actorIdentifier: string | null
 }
 
 export interface PayrollAttendanceDiagnostics {
@@ -282,6 +376,7 @@ export interface PayrollEntryExplain {
     attendanceRatio: number | null
     effectiveBaseSalary: number
     effectiveRemoteAllowance: number
+    effectiveFixedBonusAmount: number
     totalVariableBonus: number
     hasAttendanceAdjustment: boolean
     usesManualKpi: boolean

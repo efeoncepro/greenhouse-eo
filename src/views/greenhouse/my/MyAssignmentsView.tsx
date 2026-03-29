@@ -7,7 +7,6 @@ import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
-import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import LinearProgress from '@mui/material/LinearProgress'
 import Table from '@mui/material/Table'
@@ -53,6 +52,7 @@ interface AssignmentsData {
 }
 
 const formatHours = (value: number | null | undefined) => (value == null ? '—' : `${value}h`)
+
 const formatUsage = (usageKind: string | undefined, usedHours: number | null | undefined, usagePercent: number | null | undefined) => {
   if (usageKind === 'hours') return formatHours(usedHours ?? null)
   if (usageKind === 'percent' && usagePercent != null) return `${usagePercent}%`

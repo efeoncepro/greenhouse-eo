@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -20,12 +20,19 @@ const existingVersion: CompensationVersion = {
   currency: 'USD',
   baseSalary: 2000,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 150,
   bonusOtdMin: 0,
   bonusOtdMax: 500,
   bonusRpaMin: 0,
   bonusRpaMax: 300,
+  gratificacionLegalMode: 'ninguna',
   afpName: null,
   afpRate: null,
+  afpCotizacionRate: null,
+  afpComisionRate: null,
   healthSystem: null,
   healthPlanUf: null,
   unemploymentRate: 0,
@@ -36,6 +43,7 @@ const existingVersion: CompensationVersion = {
   effectiveTo: null,
   isCurrent: true,
   changeReason: 'Alta inicial',
+  desiredNetClp: null,
   createdBy: 'hr@efeoncepro.com',
   createdAt: '2026-03-01T12:00:00.000Z'
 }
@@ -59,7 +67,7 @@ describe('CompensationDrawer', () => {
 
     expect(screen.getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument()
     expect(
-      screen.getByText('Si mantienes esta fecha, actualizarás la compensación vigente.')
+      screen.getByText('Misma fecha = actualiza vigente')
     ).toBeInTheDocument()
   })
 
@@ -81,7 +89,47 @@ describe('CompensationDrawer', () => {
 
     expect(screen.getByRole('button', { name: 'Crear nueva versión' })).toBeInTheDocument()
     expect(
-      screen.getByText('Si cambias la fecha, se creará una nueva versión desde esa vigencia.')
+      screen.getByText('Nueva fecha = nueva versión')
     ).toBeInTheDocument()
+  })
+
+  it('sends recurring fixed bonus fields in the save payload', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined)
+
+    renderWithTheme(
+      <CompensationDrawer
+        open
+        onClose={vi.fn()}
+        existingVersion={existingVersion}
+        memberId={existingVersion.memberId}
+        memberName={existingVersion.memberName}
+        onSave={onSave}
+      />
+    )
+
+    fireEvent.change(screen.getByLabelText('Nombre bono fijo'), {
+      target: { value: 'Bono guardia' }
+    })
+    fireEvent.change(screen.getByLabelText('Monto'), {
+      target: { value: '220' }
+    })
+    fireEvent.change(screen.getByLabelText('Motivo del cambio *'), {
+      target: { value: 'Ajuste marzo' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalled()
+    })
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          fixedBonusLabel: 'Bono guardia',
+          fixedBonusAmount: 220,
+          gratificacionLegalMode: 'ninguna'
+        })
+      })
+    )
   })
 })

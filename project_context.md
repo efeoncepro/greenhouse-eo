@@ -3,6 +3,314 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Release channels y changelog client-facing
+- Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
+- Regla vigente:
+  - el release se comunica principalmente por modulo o feature visible, no solo por plataforma completa
+  - cada capacidad puede declararse `alpha`, `beta`, `stable` o `deprecated`
+  - el canal no equivale automaticamente a disponibilidad general; tambien debe distinguirse el scope (`internal`, `pilot`, `selected_tenants`, `general`)
+- Versionado vigente:
+  - producto y modulos visibles usan `CalVer + canal`
+  - APIs y contratos tecnicos versionados usan `SemVer`
+- El changelog client-facing quedo separado del changelog interno del repo y nace en `docs/changelog/CLIENT_CHANGELOG.md`.
+- `Preview`, `Staging` y `Production` siguen siendo los ambientes tecnicos; los canales de release se apoyan en ellos pero no los reemplazan.
+
+## Delta 2026-03-28 Admin Center governance shell
+- `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
+- La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.
+- La señal operacional para esas vistas se resuelve desde una capa compartida `src/lib/operations/get-operations-overview.ts`, reutilizada también por `GET /api/agency/operations`.
+- `Admin Center` indexa la observabilidad operativa y la separa del uso diario del producto; no reemplaza `Agency > Operations`, sino que la contextualiza como vista extendida.
+
+## Delta 2026-03-28 Centralized email delivery layer completed
+- `TASK-095` quedó cerrada con `sendEmail()` como capa canónica sobre Resend, registro unificado en `greenhouse_notifications.email_deliveries` y resolver por suscripción en `greenhouse_notifications.email_subscriptions`.
+- Auth, NotificationService y Payroll ya consumen esa capa; los envíos directos ad hoc y el plain text de notificaciones quedaron reemplazados por templates centralizados.
+- El contrato operativo ahora distingue `sent`, `failed` y `skipped`, con la documentación de arquitectura y el índice de tasks ya alineados al runtime implementado.
+- El retry cron `email-delivery-retry` quedó conectado a `delivery_payload` para reprocesar `failed` deliveries con hasta 3 intentos en 1 hora.
+
+## Delta 2026-03-28 Payroll export package auto-bootstrap
+- La capa de exportación de Payroll ahora materializa su propia tabla `greenhouse_payroll.payroll_export_packages` si el entorno de preview aún no la tiene aplicada.
+- El objetivo es evitar que `Reenviar correo` y la descarga de artefactos queden bloqueados por un schema ausente en deployments viejos o incompletos.
+- La migración canónica sigue siendo `scripts/migrations/add-payroll-export-packages.sql`; el runtime bootstrap solo actúa como red de seguridad operacional.
+
+## Delta 2026-03-28 Payroll email delivery staging alias lesson
+- `dev-greenhouse.efeoncepro.com` apunta al deployment `staging` de Vercel, no al `Preview (develop)`, así que la validación del correo de Payroll debe hacerse contra el entorno que realmente sirve ese alias.
+- Para que `Reenviar correo` funcione en ese dominio, `RESEND_API_KEY` y `EMAIL_FROM` deben existir en `staging`; tenerlos solo en `Preview (develop)` no alcanza.
+- El endpoint de reenvío no debe presentar `deliveryId: null` como éxito visible; a nivel de capa de delivery, ese caso debe distinguirse como `skipped` o `failed`.
+- Como hardening futuro, la gestión de secretos transaccionales podría vivir en Google Secret Manager con service account de sincronización, pero la app desplegada seguirá consumiendo variables del entorno de Vercel.
+
+## Delta 2026-03-28 Payroll export actions UX hardening
+- `PayrollPeriodTab` ahora envuelve las acciones exportadas para que el CTA `Reenviar correo` no quede fuera de vista cuando el header tiene demasiados botones.
+- La descarga de PDF del período cambió de `window.open` a una descarga explícita por `fetch -> blob -> anchor`, con lo que el browser debe iniciar un archivo real y no una navegación dependiente del pop-up handling.
+- El contrato de negocio sigue igual: `Reenviar correo` y los artefactos descargables solo se exponen para períodos `exported`.
+
+## Delta 2026-03-28 Payroll export package persistence completed
+- `TASK-097` quedó cerrada: Payroll ahora persiste PDF/CSV de exportación en GCS, sirve descargas desde storage con fallback y permite reenvío del correo desde un período ya exportado.
+- La implementación añade `greenhouse_payroll.payroll_export_packages`, la ruta `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` y botones/CTAs en `PayrollPeriodTab` para reenvío.
+- El contrato de negocio no cambia: `payroll_period.exported` sigue siendo el cierre canónico; el paquete documental es derivado y reutilizable.
+
+## Delta 2026-03-28 Payroll export package persistence in progress
+- `TASK-097` quedó en progreso para persistir el paquete documental de exportación Payroll en GCS y permitir reenvío del correo sin volver a cerrar el período.
+- La implementación añade una tabla `greenhouse_payroll.payroll_export_packages`, rutas de descarga basadas en storage y `POST /api/hr/payroll/periods/[periodId]/resend-export-ready`.
+- El cierre canónico sigue siendo `payroll_period.exported`; el paquete documental es un artefacto derivado y reutilizable.
+
+## Delta 2026-03-28 Payroll export artifact persistence lane added
+- Se documentó `TASK-097` como follow-up de Payroll para persistir PDF/CSV de cierre en GCS y habilitar reenvío del correo sin volver a cerrar el período.
+- La lane se apoya en el contrato ya existente de `payroll_period.exported`, en el delivery de Resend y en la experiencia de recibos almacenados en bucket.
+- El alcance explícito separa cierre canónico, reenvío de correo y descargas posteriores; el cierre sigue siendo `exported`, no el click de archivo.
+
+## Delta 2026-03-28 Centralized email delivery lane added
+- Se documentó `TASK-095` como lane paralela para centralizar el delivery de emails sobre Resend.
+- La idea es que Payroll, Finance, Delivery, Permissions y Auth consuman una capa única de envío en vez de helpers ad hoc.
+- La nueva task se apoya conceptualmente en la infraestructura de notificaciones existente, pero no cambia todavía el runtime de delivery.
+
+## Delta 2026-03-28 Payroll close/export split completed
+- Payroll separó el cierre canónico del período de la descarga del CSV.
+- `POST /api/hr/payroll/periods/[periodId]/close` marca el período como `exported` y publica `payroll_period.exported`.
+- `GET /api/hr/payroll/periods/[periodId]/csv` y el route legacy `export` quedaron como descarga de artefacto, sin mutar estado.
+- La UI de `PayrollPeriodTab` ahora expone `Cerrar y notificar` y `Descargar CSV` como acciones distintas.
+- La notificación downstream a Finance/HR sale desde `payroll_period.exported` vía Resend, con PDF/CSV adjuntos.
+- La arquitectura y el catálogo de emails quedaron alineados con ese contrato.
+
+## Delta 2026-03-28 Payroll export notification immediate flush
+- El cierre de Payroll ahora intenta además un flush inmediato del dominio `notifications` después de exportar el período, para no depender exclusivamente del cron en entornos interactivos o staging.
+- El flush inmediato sigue siendo best-effort: `outbox-publish` y `outbox-react` continúan como safety net operativo y la idempotencia se conserva por `outbox_reactive_log`.
+- La mutación canónica sigue siendo `payroll_period.exported`; el cambio solo acelera la entrega del correo y de los recibos downstream cuando el entorno permite procesarlos en caliente.
+
+## Delta 2026-03-28 Payroll operational calendar utility implemented
+- La utilidad canónica de calendario operativo quedó implementada en `src/lib/calendar/operational-calendar.ts`.
+- La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts`.
+- El contrato operativo sigue siendo timezone-aware, con base `America/Santiago`, feriados nacionales desde `Nager.Date` y overrides persistidos en Greenhouse.
+- No se introdujo una API pública de cálculo temporal; la utility es de lectura y debe ser consumida por Payroll y otros dominios server-side.
+- El mapa de consumidores actual quedó acotado a Payroll: `current-payroll-period`, `payroll-readiness`, routes de approve/readiness y las vistas `PayrollDashboard`, `PayrollPeriodTab`, `PayrollHistoryTab`, `MyPayrollView`, `PersonPayrollTab`, `PayrollPersonnelExpenseTab` y `ProjectedPayrollView`.
+- No hay consumidores directos en otros módulos del producto todavía; Finance y Cost Intelligence solo ven estados derivados de nómina.
+- Posibles futuros consumidores: `ICO`, `Finance`, `Campaigns` y `Cost Intelligence`, pero solo si esos dominios formalizan ciclos de cierre mensuales o ventanas operativas reales.
+
+## Delta 2026-03-28 Payroll operational calendar timezone + jurisdiction
+- El calendario operativo de Payroll quedó definido como una política timezone-aware con base en `America/Santiago`.
+- La semántica de cierre debe separar:
+  - `timezone` operativo de la casa matriz
+  - `country/jurisdiction` del contrato de nómina
+  - `holiday calendar` aplicado para contar días hábiles
+- Regla operativa derivada:
+  - el país de residencia de un colaborador no redefine el ciclo de cierre de una nómina cuya jurisdicción sea otra
+  - el cambio de horario invierno/verano de Santiago afecta el offset, pero no el contrato mensual de cierre
+  - la utilidad temporal debe seguir siendo pura y no publicar outbox events por sí misma
+
+## Delta 2026-03-28 Payroll holiday source decision
+- La timezone canónica del calendario operativo se resuelve con la base IANA del runtime, no con una API externa.
+- La fuente pública de mercado recomendada para feriados nacionales es `Nager.Date`.
+- Greenhouse puede persistir overrides corporativos o jurisdiccionales encima de esa fuente cuando la política local lo requiera.
+
+## Delta 2026-03-28 Payroll operational calendar / current-period semantics split
+- La semántica operativa de Payroll quedó partida en dos lanes explícitas para evitar mezclar calendario y UI:
+  - `TASK-091` para una utilidad canónica de calendario operativo
+  - `TASK-092` para la lectura de período actual, historial y cards KPI en `/hr/payroll`
+- Regla operativa derivada:
+  - el runtime actual aún no cambia; la semántica de período vigente seguirá siendo la previa hasta que ambas tasks se implementen
+  - el helper temporal no debe seguir creciendo dentro de la vista de Payroll si el contrato se reutiliza en otros dominios
+
+## Delta 2026-03-28 Payroll current-period semantics implementation started
+- `TASK-092` empezó a mover la lectura del período actual hacia el mes operativo vigente resuelto por la utility compartida.
+- `PayrollHistoryTab` dejó de contar `approved` como si fuera cierre final y ahora distingue `aprobado en cierre` de `cerrado/exportado`.
+- La selección temporal de `current-payroll-period` ahora busca el período del mes operativo vigente, no solo el último periodo no exportado.
+
+## Delta 2026-03-28 Payroll current-period semantics completed
+- `TASK-092` quedó cerrada con la semántica operativa de período actual y la distinción visual de historial entre cierres reales y aprobaciones aún en cierre.
+- El dashboard de Payroll mantiene KPI y copy atados al período activo, mientras el historial muestra los períodos aprobados en cierre como estado intermedio y los exportados como cierre final.
+
+## Delta 2026-03-28 Payroll UX semantics and feedback hardening
+- `TASK-089` cerró el endurecimiento de UX de Payroll sin alterar el dominio de cálculo:
+  - el dashboard separa período activo e histórico seleccionado
+  - las vistas críticas muestran error y retry visibles
+  - los CTAs de descarga y los icon buttons del módulo tienen copy/labels accesibles más claros
+  - `Mi Nómina` y `People > Nómina` ya no dependen de un orden implícito para definir el último período
+- Regla operativa derivada:
+  - el período histórico es navegación, no el nuevo contexto del período actual
+  - los fallos de carga no deben verse como vacíos neutros
+  - las descargas de recibos deben comunicar fallo y nombre humano del documento, no solo disparar una navegación o log interno
+
+## Delta 2026-03-28 Operating Entity Identity — React context + API endpoint
+- La identidad de la entidad operadora (razón social, RUT, dirección legal) ya no se resuelve ad hoc por cada consumer.
+- Nuevo baseline:
+  - `OperatingEntityProvider` + `useOperatingEntity()` hook en `src/context/OperatingEntityContext.tsx`
+  - Hydration server → client: `Providers.tsx` llama `getOperatingEntityIdentity()` una vez y pasa al Provider
+  - API endpoint `GET /api/admin/operating-entity` para consumers no-React (webhooks, integraciones, cron)
+  - Payroll receipt card y PDF ya consumen la identidad del empleador desde el contexto
+- Regla operativa derivada:
+  - todo documento formal (recibo, DTE, contrato, propuesta, email) debe obtener la identidad del empleador desde `useOperatingEntity()` (client) o `getOperatingEntityIdentity()` (server), no hardcodearla
+  - el Provider se resuelve una vez por layout render, no por componente
+  - multi-tenant ready: si la operación se fragmenta por tenant, el layout resuelve el operating entity del scope de la sesión
+
+## Delta 2026-03-28 Payroll reactive hardening complete
+- `TASK-088` cerró la lane reactiva de Payroll sin cambiar la semántica funcional del módulo:
+  - la cola persistente `greenhouse_sync.projection_refresh_queue` ya vuelve de forma observable a `completed` o `failed`
+  - `reactive-consumer` completa best-effort después del ledger reactivo y no convierte un fallo de completion en fallo del refresh exitoso
+  - el fallback BigQuery de export solo publica `payroll_period.exported` cuando la mutación realmente afecta una fila
+  - `projected_payroll_snapshots` quedó documentado como serving cache interno; `/api/hr/payroll/projected` sigue resolviendo cálculo vivo + `latestPromotion`
+- Regla operativa derivada:
+  - `payroll_period.exported` sigue siendo el cierre canónico de nómina, independientemente del runtime Postgres-first o BigQuery fallback
+
+## Delta 2026-03-28 Payroll hardening backlog documented
+- La auditoría de Payroll dejó tres lanes explícitas para seguir endureciendo el módulo sin mezclar objetivos:
+  - `TASK-087`: invariantes del lifecycle oficial y gate de readiness
+  - `TASK-088`: cola reactiva, export parity y contrato de projected payroll / receipts
+  - `TASK-089`: UX, copy, feedback y accesibilidad en HR, My Payroll y People
+- La arquitectura de Payroll ahora documenta explícitamente:
+  - la ventana operativa de cierre de nómina
+  - `/hr/payroll/projected` como surface derivada
+  - `payroll_receipts_delivery` como consumer downstream de `payroll_period.exported`
+- Regla operativa derivada:
+  - la nómina oficial y la proyectada siguen siendo objetos distintos; la proyección alimenta, pero no reemplaza, el lifecycle oficial
+
+## Delta 2026-03-28 Payroll lifecycle invariants hardened
+- `TASK-087` ya quedó cerrada para mover la semántica del lifecycle oficial desde los routes hacia el dominio.
+- Nuevo contrato operativo:
+  - `approved` solo se acepta desde `calculated`
+  - la aprobación consulta readiness canónico y rechaza blockers antes de persistir
+  - la edición de entries de un período aprobado reabre explícitamente el período a `calculated`
+- Regla operativa derivada:
+  - `approved` sigue siendo checkpoint editable, no cierre final; el cierre real sigue siendo `exported`
+
+## Delta 2026-03-28 Compensation Chile líquido-first + reverse engine completo
+- `TASK-079` a `TASK-085` cerradas en una sesión:
+  - Motor reverse `computeGrossFromNet()` con binary search, piso IMM, convergencia ±$1 CLP
+  - Regla de negocio: líquido deseado = neto con descuentos legales (7% salud, no Isapre)
+  - Excedente Isapre mostrado como deducción voluntaria separada
+  - AFP resuelta desde Previred, no desde compensación guardada
+  - `desired_net_clp` persistido en `compensation_versions` (migration corrida)
+  - Para Chile, el drawer siempre abre en modo reverse (sin switch) — el líquido es el punto de partida
+  - Para internacional, salary base directo sin cambios
+  - Preview enterprise con secciones semánticas (haberes/descuentos/resultado), monospace, accordion previsional
+  - Error de guardado visible arriba del botón (no oculto en scroll)
+  - Sección 24 agregada a `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- Regla operativa derivada:
+  - toda nueva compensación Chile se crea desde un líquido deseado contractual
+  - el sueldo base es siempre un resultado del motor reverse, nunca un input manual
+  - el líquido a pagar varía mes a mes por ausencias, bonos, excedente Isapre, etc.
+
+## Delta 2026-03-28 Reverse payroll engine (Slices 1-2 validados)
+- `TASK-079` Slices 1-2 validados en staging contra liquidación real de Valentina Hoyos (Feb 2026).
+- Motor `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`: binary search sobre forward engine real, ±$1 CLP, 10 golden tests.
+- Reglas de negocio Chile validadas:
+  - **Líquido deseado = neto con descuentos legales solamente** (AFP + 7% salud + cesantía + impuesto). No incluye Isapre ni APV.
+  - **Excedente Isapre** mostrado aparte como deducción voluntaria. "Líquido a pagar" = líquido deseado - excedente.
+  - **Piso IMM**: el binary search arranca desde el Ingreso Mínimo Mensual ($539.000). Nunca calcula base inferior al mínimo legal.
+  - **AFP desde Previred**: la tasa AFP se resuelve del período (Previred sync), no de la compensación guardada.
+- Archivos: `reverse-payroll.ts`, `reverse-payroll.test.ts`, `reverse-quote/route.ts`, `CompensationDrawer.tsx`
+- Hardening pendiente (Slice 3): persistir `desired_net_clp` en `compensation_versions`, sincronizar AFP rate al guardar, round-trip check, auto changeReason.
+- No se introdujeron nuevos eventos ni cambios de schema (aún); el campo `desired_net_clp` requiere migration.
+
+## Delta 2026-03-28 Reactive receipts projection log + queue fix
+- El ledger reactivo ahora es projection-aware: `greenhouse_sync.outbox_reactive_log` quedó keyeado por `(event_id, handler)` para que un handler no bloquee al resto de proyecciones del mismo evento.
+- La cola persistente `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)` para que `enqueueRefresh()` deduzca intents sin caer en `ON CONFLICT` inválido.
+- Esto destraba la materialización de `payroll_receipts_delivery` después de `payroll_period.exported`, que era el último bloqueo estructural del smoke de `TASK-077`.
+
+## Delta 2026-03-28 Payroll receipts smoke complete
+- `TASK-077` quedó cerrada en staging con smoke end-to-end real:
+  - `outbox-publish` publicó el evento nuevo de `payroll_period.exported`
+  - `outbox-react` materializó `payroll_receipts_delivery`
+  - se generaron 4 recibos y se enviaron 4 correos
+- Los PDFs quedaron almacenados en `gs://efeonce-group-greenhouse-media/payroll-receipts/2026-03/...`
+- El flujo de recibos queda ahora validado no solo por código y docs, sino también por ejecución real sobre marzo 2026.
+
+## Delta 2026-03-28 Payroll receipts registry + reactive delivery
+- `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
+- La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.
+- La descarga de recibos por HR prioriza el PDF almacenado en GCS y cae a render on-demand solo como fallback.
+- `My Nómina` ya expone descarga de recibo para el colaborador autenticado y `People > Person > Nómina` la expone para HR desde el mismo contrato de receipt.
+- Quedan pendientes el pulido del layout de recibos y el smoke end-to-end con correo + descarga en staging.
+
+## Delta 2026-03-28 Projected payroll snapshot grants
+- `greenhouse_serving.projected_payroll_snapshots` es una materialización serving escribible por el runtime de Payroll projected, con grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`.
+- La promoción `Projected -> Official` usa ese snapshot como cache auditable, no como source of truth transaccional.
+- El permiso denegado en staging se resolvió añadiendo el grant a la migration/bootstrap de Payroll, sin mover la tabla fuera de `greenhouse_serving`.
+
+## Delta 2026-03-28 Payroll AFP split
+- `Payroll Chile` ahora versiona y snapshottea `AFP` con split explícito de `cotización` y `comisión`, manteniendo también el total agregado para compatibilidad histórica.
+- Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.
+- La migration operativa quedó disponible en `scripts/migrations/add-chile-afp-breakdown.sql`.
+
+## Delta 2026-03-28 Employer legal identity
+- La razón social canónica de la organización operativa propietaria de Greenhouse es `Efeonce Group SpA`.
+- El RUT canónico es `77.357.182-1`.
+- La dirección legal canónica es `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+- Estos datos deben reutilizarse en liquidaciones, recibos, exportes legales, Finance y surfaces comerciales como identidad de la organización/empleador, no como dato de persona ni como identidad de cliente.
+
+## Delta 2026-03-28 Chile employer cost base
+- `Payroll Chile` ya calcula un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) y lo persiste junto a las entries.
+- `member_capacity_economics.total_labor_cost_target` absorbe ese breakdown para que Cost Intelligence pueda ver el costo laboral cargado real sin inventar otra proyección.
+- Esta base reutiliza la misma propagación reactiva de `compensation_version.created/updated` y `payroll_entry.upserted`.
+
+## Delta 2026-03-28 Payroll Chile smoke validation
+- Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos que el núcleo legal de `Payroll Chile` ya calza con el PDF cuando existen los insumos correctos:
+  - `IMM = 539000`
+  - compensación Chile vigente con gratificación legal mensual
+- El motor devuelve correctamente:
+  - `baseSalary`
+  - `gratificacionLegal`
+  - `AFP`
+  - `salud`
+  - `cesantía`
+  - `netTotal` imponible
+- Regla operativa derivada:
+  - la paridad completa con la liquidación impresa sigue pendiente mientras no se modelen `colación` y `movilización`
+  - el helper/ruta de creación de compensación sigue requiriendo revisión separada, pero no invalida el cálculo core cuando la data está cargada
+
+## Delta 2026-03-28 Chile payroll non-imponible allowances
+- `Payroll Chile` ahora modela `colación` y `movilización` como haberes canónicos versionados en la compensación y en `payroll_entries`.
+- El motor forward los incorpora al devengado y al neto, manteniendo su carácter no imponible.
+- El cambio se expone por las superficies existentes de `compensation_version.created/updated` y `payroll_entry.upserted`; no se agregó un nuevo evento.
+- Regla operativa derivada:
+  - los consumidores de recibos, PDF, Excel, breakdown y projected payroll deben mostrar esos haberes cuando existan y tratarlos como parte del contrato de nómina Chile, no como un bono manual ad hoc
+
+## Delta 2026-03-27 Payroll variable bonus policy recalibration
+- `Payroll` ya no depende de una policy simple para bonos variables (`OTD >= threshold`, `RpA` lineal hasta un único umbral).
+- Baseline nuevo materializado:
+  - `OTD` con full payout desde `89%` y piso `70%`
+  - `RpA` con bandas versionadas:
+    - `<= 1.7` -> `100%`
+    - `1.7 - 2.0` -> descenso suave hasta `80%`
+    - `2.0 - 3.0` -> descenso hasta `0`
+  - config canónica ampliada en `greenhouse_payroll.payroll_bonus_config` con:
+    - `rpa_full_payout_threshold`
+    - `rpa_soft_band_end`
+    - `rpa_soft_band_floor_factor`
+- Regla operativa derivada:
+  - `Payroll` official, `projected payroll` y `recalculate-entry` deben leer exactamente la misma policy canónica
+  - los cambios de payout variable deben versionarse por `effective_from`, no esconderse en fórmulas locales por consumer
+  - `TASK-025` (`FTR`) deja de ser el siguiente paso obligatorio; pasa a ser una alternativa estratégica futura
+
+## Delta 2026-03-27 Economic indicators runtime baseline
+- Finance ya no queda limitado semánticamente a `exchange_rates` para datos macroeconómicos chilenos.
+- Baseline nuevo materializado:
+  - helper server-side común para `USD_CLP`, `UF`, `UTM`, `IPC`
+  - endpoint `GET /api/finance/economic-indicators/latest`
+  - endpoint `GET/POST /api/finance/economic-indicators/sync`
+  - storage histórico previsto desde `2026-01-01`
+  - cron diario movido a `/api/finance/economic-indicators/sync`
+- Regla operativa derivada:
+  - `USD/CLP` sigue manteniendo compatibilidad con `greenhouse_finance.exchange_rates`
+  - indicadores no FX (`UF`, `UTM`, `IPC`) no deben modelarse como monedas ni reusar contratos de currency a la fuerza
+- consumers que necesiten snapshots históricos de período deben leer desde la capa común de indicadores antes de pedir input manual al usuario
+- `Payroll` ya no debe pedir `UF` manualmente por defecto al crear/editar períodos; debe autohidratarla desde indicadores usando el mes imputable
+
+## Delta 2026-03-27 Payroll variable bonus policy recalibrated
+- `Payroll` mantiene a `ICO` como fuente canónica de `OTD` y `RpA`, pero su policy de payout ya no es solo un threshold lineal simple.
+- Regla operativa nueva:
+  - `OTD` paga `100%` desde `89%`, con piso de prorrateo en `70%`
+  - `RpA` usa bandas versionadas:
+    - `<= 1.7` -> `100%`
+    - `1.7 - 2.0` -> baja suavemente hasta `80%`
+    - `2.0 - 3.0` -> baja desde `80%` hasta `0`
+    - `>= 3.0` -> `0`
+- La policy ya no depende solo de `rpa_threshold`; queda versionada en `greenhouse_payroll.payroll_bonus_config` con:
+  - `rpa_full_payout_threshold`
+  - `rpa_soft_band_end`
+  - `rpa_soft_band_floor_factor`
+- Impacto derivado:
+  - `Payroll` oficial, `projected payroll` y `recalculate-entry` deben consumir exactamente la misma config canónica
+  - cualquier fallback analítico debe tolerar esquemas viejos y rellenar defaults para no romper ambientes parcialmente migrados
+
 ## Delta 2026-03-26 Team capacity architecture canonized
 - La arquitectura de capacidad/economía de equipo ya no vive solo en una task o en el código.
 - La fuente canónica quedó fijada en:

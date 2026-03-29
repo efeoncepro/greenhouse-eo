@@ -14,6 +14,61 @@ type SpaceOrgRow = {
   organization_id: string
 }
 
+// ─── Operating Entity Identity ──────────────────────────────────────────
+
+export interface OperatingEntityIdentity {
+  organizationId: string
+  legalName: string
+  taxId: string
+  taxIdType: string | null
+  legalAddress: string | null
+  country: string
+}
+
+type OperatingEntityRow = {
+  organization_id: string
+  legal_name: string
+  tax_id: string
+  tax_id_type: string | null
+  legal_address: string | null
+  country: string
+}
+
+let cachedOperatingEntity: OperatingEntityIdentity | null = null
+
+/**
+ * Resolves the operating entity — the legal organization that owns Greenhouse,
+ * employs collaborators, signs payroll documents, and emits DTEs.
+ *
+ * Uses `is_operating_entity = TRUE` flag. Result is cached in memory since
+ * the operating entity does not change between requests.
+ */
+export const getOperatingEntityIdentity = async (): Promise<OperatingEntityIdentity | null> => {
+  if (cachedOperatingEntity) return cachedOperatingEntity
+
+  const rows = await runGreenhousePostgresQuery<OperatingEntityRow>(
+    `SELECT organization_id, legal_name, tax_id, tax_id_type, legal_address, country
+     FROM greenhouse_core.organizations
+     WHERE is_operating_entity = TRUE AND active = TRUE
+     LIMIT 1`
+  )
+
+  if (rows.length === 0) return null
+
+  const row = rows[0]
+
+  cachedOperatingEntity = {
+    organizationId: row.organization_id,
+    legalName: row.legal_name,
+    taxId: row.tax_id,
+    taxIdType: row.tax_id_type,
+    legalAddress: row.legal_address,
+    country: row.country
+  }
+
+  return cachedOperatingEntity
+}
+
 // ─── Find Organization by Tax ID ────────────────────────────────────────
 
 /**

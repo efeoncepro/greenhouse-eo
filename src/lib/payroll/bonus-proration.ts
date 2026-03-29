@@ -9,10 +9,11 @@ type BonusResult = {
 }
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
+const roundFactor = (value: number) => Math.round(value * 10000) / 10000
 
 /**
  * OTD (On-Time Delivery) bonus with graduated proration:
- *   >= otdThreshold (94%) → 100% of bonusAmount
+ *   >= otdThreshold (89%) → 100% of bonusAmount
  *   >= otdFloor (70%) and < otdThreshold → linear proration
  *   < otdFloor → $0
  */
@@ -31,7 +32,7 @@ export const calculateOtdBonus = (
 
   if (otdPercent >= config.otdFloor) {
     const factor = (otdPercent - config.otdFloor) / (config.otdThreshold - config.otdFloor)
-    const proratedFactor = Math.round(factor * 10000) / 10000
+    const proratedFactor = roundFactor(factor)
 
     return {
       amount: roundCurrency(bonusAmount * proratedFactor),
@@ -44,9 +45,11 @@ export const calculateOtdBonus = (
 }
 
 /**
- * RpA (Rounds per Artwork) bonus with inverse proration:
- *   rpaAvg > rpaThreshold (3) → $0 (higher is worse)
- *   rpaAvg <= rpaThreshold → prorated: (threshold - avg) / threshold
+ * RpA (Rounds per Artwork) bonus with banded inverse proration:
+ *   <= rpaFullPayoutThreshold (1.7) → 100%
+ *   <= rpaSoftBandEnd (2.0) → from 100% down to soft-band floor factor (80%)
+ *   < rpaThreshold (3.0) → from soft-band floor factor down to 0%
+ *   >= rpaThreshold → $0 (higher is worse)
  */
 export const calculateRpaBonus = (
   rpaAvg: number | null,
@@ -57,12 +60,45 @@ export const calculateRpaBonus = (
     return { amount: 0, prorationFactor: 0, qualifies: false }
   }
 
-  if (rpaAvg > config.rpaThreshold) {
+  if (rpaAvg >= config.rpaThreshold) {
     return { amount: 0, prorationFactor: 0, qualifies: false }
   }
 
-  const factor = (config.rpaThreshold - rpaAvg) / config.rpaThreshold
-  const proratedFactor = Math.max(0, Math.round(factor * 10000) / 10000)
+  if (rpaAvg <= config.rpaFullPayoutThreshold) {
+    return { amount: roundCurrency(bonusAmount), prorationFactor: 1, qualifies: true }
+  }
+
+  if (config.rpaSoftBandEnd <= config.rpaFullPayoutThreshold) {
+    const factor = config.rpaThreshold > 0 ? (config.rpaThreshold - rpaAvg) / config.rpaThreshold : 0
+    const proratedFactor = roundFactor(Math.min(1, Math.max(0, factor)))
+
+    return {
+      amount: roundCurrency(bonusAmount * proratedFactor),
+      prorationFactor: proratedFactor,
+      qualifies: proratedFactor > 0
+    }
+  }
+
+  if (rpaAvg <= config.rpaSoftBandEnd) {
+    const bandProgress = (rpaAvg - config.rpaFullPayoutThreshold) / (config.rpaSoftBandEnd - config.rpaFullPayoutThreshold)
+    const factor = 1 - bandProgress * (1 - config.rpaSoftBandFloorFactor)
+    const proratedFactor = roundFactor(Math.min(1, Math.max(config.rpaSoftBandFloorFactor, factor)))
+
+    return {
+      amount: roundCurrency(bonusAmount * proratedFactor),
+      prorationFactor: proratedFactor,
+      qualifies: true
+    }
+  }
+
+  if (config.rpaThreshold <= config.rpaSoftBandEnd) {
+    return { amount: 0, prorationFactor: 0, qualifies: false }
+  }
+
+  const declineProgress = (rpaAvg - config.rpaSoftBandEnd) / (config.rpaThreshold - config.rpaSoftBandEnd)
+
+  const factor = config.rpaSoftBandFloorFactor * (1 - declineProgress)
+  const proratedFactor = roundFactor(Math.max(0, factor))
 
   return {
     amount: roundCurrency(bonusAmount * proratedFactor),

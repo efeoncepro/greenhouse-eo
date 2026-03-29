@@ -5,6 +5,362 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-29
+
+### Release channels operating model documented
+- Greenhouse formalizo una policy operativa para lanzar capacidades en `alpha`, `beta`, `stable` y `deprecated`, con foco principal por modulo o feature visible y disponibilidad separada por cohort (`internal`, `pilot`, `selected_tenants`, `general`).
+- La fuente canonica quedo en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`, con referencias cortas añadidas en `AGENTS.md`, `docs/README.md`, `project_context.md` y `GREENHOUSE_ARCHITECTURE_V1.md`.
+- Se creo `docs/changelog/CLIENT_CHANGELOG.md` como changelog client-facing separado del `changelog.md` tecnico-operativo del repo.
+- La policy ahora deja explicito el esquema hibrido: `CalVer + canal` para modulos/producto visible y `SemVer` reservado para APIs o contratos tecnicos versionados.
+- La misma policy ahora define namespaces de Git tags para releases: `platform/...`, `<module>/...` y `api/<slug>/...`.
+- Se agrego una baseline inicial de modulos/versiones/tags sugeridos y se dejo explicito que los tags reales deben crearse solo sobre un commit limpio.
+
+## 2026-03-28
+
+### Nexa model switch aligned to Vertex model IDs
+- `/home` ahora permite seleccionar el modelo de Nexa con IDs reales de Vertex entre `google/gemini-2.5-flash@default`, `google/gemini-2.5-pro@default`, `google/gemini-3-flash-preview@default`, `google/gemini-3-pro-preview@default` y `google/gemini-3.1-pro-preview@default`.
+- El backend valida el model ID con una allowlist compartida y cae de forma segura al default si recibe un valor inválido.
+- El runtime sigue siendo Gemini-only; Claude on Vertex no se conectó en este slice porque requiere una integración distinta al flujo actual de `@google/genai`.
+
+### Nexa tool calling runtime connected on Home
+- `/api/home/nexa` ahora soporta function calling con Gemini y devuelve `toolInvocations` reales para `check_payroll`, `get_otd`, `check_emails`, `get_capacity` y `pending_invoices`.
+- `HomeView` traduce esas invocaciones a `tool-call` parts del runtime de `@assistant-ui/react`, y `/home` renderiza resultados operativos inline con un renderer mínimo sin rehacer `NexaThread`.
+- El comportamiento nuevo deja a Nexa grounded en datos reales del portal y separa la lógica backend de la futura Lane B visual.
+
+### Admin Center staging hardening and payroll alert split
+- `Cloud & Integrations` y `Ops Health` quedaron sanas en `staging` después de corregir el cruce Server/Client de sus views y fijar `America/Santiago` para estabilizar la hidratación de timestamps.
+- `Cloud & Integrations` ahora absorbe la nota estructural de attendance lineage (`attendance_daily + leave_requests` como fuente actual y `Microsoft Teams` como target), para que Payroll muestre solo el impacto funcional sobre readiness.
+- `PayrollPeriodTab` dejó de renderizar esas notas de integración en la pila de alertas; se mantienen warnings y blockers de negocio como compensación, attendance signal, KPI y UF/UTM.
+
+### Nexa staging fallback added after Vertex AI permission failure
+- Se diagnostico en runtime que el 500 de `/api/home/nexa` no venia del prompt ni del payload, sino de Vertex AI: `PERMISSION_DENIED` sobre `aiplatform.endpoints.predict` para `gemini-2.5-flash` en `efeonce-group`.
+- `NexaService` ahora usa `systemInstruction` de forma nativa con `@google/genai` y degrada con una respuesta util cuando el entorno no tiene permiso de inferencia, en vez de romper Home con un 500 visible.
+- Queda pendiente el fix de infraestructura: otorgar al service account de Vercel staging el rol/permisos de Vertex AI necesarios para restaurar la respuesta real del modelo.
+
+### TASK-063 reclassified as complete with hardening follow-up
+- `TASK-063` se movió a `complete` al alinear su estado documental con el runtime real ya implementado de `Projected Payroll` (API, UI, snapshots y promoción a oficial).
+- Se creó `TASK-109` para la deuda remanente de robustez: eliminar DDL en runtime, reforzar observabilidad de la proyección reactiva y cerrar el contrato downstream de `payroll.projected_*`.
+- El índice y el registry de tasks quedaron actualizados con el nuevo estado y el siguiente ID disponible.
+
+### TASK-095 centralized email delivery layer completed
+- Se implementó la capa unificada `sendEmail()` sobre Resend con template registry, resolver de suscripciones y persistencia en `greenhouse_notifications.email_deliveries`.
+- Auth, NotificationService y Payroll ya migraron al contrato central, incluyendo el template `NotificationEmail` para dejar atrás el plain text del canal de notificaciones.
+- La task quedó movida a `complete/` y el catálogo de emails, el registry de tasks y el contexto del proyecto quedaron alineados al runtime nuevo.
+- El cron `email-delivery-retry` quedó agregado para reprocesar `failed` deliveries usando el `delivery_payload` persistido, con límite de 3 intentos en una ventana de 1 hora.
+
+### Payroll email resend staging env clarified
+- Se documentó que `dev-greenhouse.efeoncepro.com` sirve el deployment `staging` de Vercel, por lo que `RESEND_API_KEY` y `EMAIL_FROM` deben existir en ese entorno para que `Reenviar correo` funcione realmente.
+- El aprendizaje operativo quedó reflejado en `TASK-095`, `project_context.md` y `Handoff.md` para evitar que futuros agentes confundan `Preview (develop)` con el runtime que atiende el alias compartido.
+- El contrato futuro de la capa de delivery debería distinguir `sent`, `failed` y `skipped`; un envío sin provider activo no debe presentarse como éxito.
+
+### Payroll export package auto-bootstrap added
+- La capa de `payroll_export_packages` ahora materializa su propia tabla e índices si faltan en el entorno de preview antes de leer o persistir artefactos.
+- Esto destraba `Reenviar correo` en deployments que todavía no tenían aplicada la migración del paquete documental de exportación.
+- La migración canónica sigue viva en `scripts/migrations/add-payroll-export-packages.sql`; el bootstrap runtime solo evita que la UI quede bloqueada por un schema ausente.
+
+### Payroll export actions made more discoverable
+- `PayrollPeriodTab` ahora deja envolver el bloque de acciones exportadas para que `Reenviar correo` no quede recortado en la cabecera cuando hay varias acciones en pantalla.
+- La descarga de PDF dejó de depender de `window.open` y ahora baja como archivo real vía `fetch -> blob -> anchor`, con copy explícito de descarga en la UI.
+- El contrato de negocio no cambia: solo los períodos `exported` exponen reenvío de correo y descargas de artefactos.
+
+### TASK-097 export package persistence completed
+- Payroll persistió el paquete documental de exportación en GCS y ahora reutiliza ese artefacto para descargas PDF/CSV y reenvíos de correo sin recerrar el período.
+- Se agregó `greenhouse_payroll.payroll_export_packages`, la ruta `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` y la UI de `PayrollPeriodTab` para `Reenviar correo`.
+- La arquitectura de Payroll, el catálogo de emails y el playbook reactivo quedaron alineados con el nuevo contrato.
+
+### TASK-097 export package persistence implementation started
+- Se implementó la capa base para persistir PDF/CSV de exportación Payroll en GCS con metadata transaccional en `greenhouse_payroll.payroll_export_packages`.
+- Las rutas de descarga de PDF/CSV y el nuevo `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` ya consumen ese paquete persistido.
+- El cierre canónico sigue siendo `payroll_period.exported`; el paquete documental es derivado y reutilizable para reenvío o descarga posterior.
+
+### TASK-097 payroll export artifact persistence and resend documented
+- Se registró una lane nueva para persistir PDF/CSV de cierre de Payroll en GCS y habilitar reenvío del correo sin volver a cerrar el período.
+- El brief deja claro que el cierre canónico sigue siendo `payroll_period.exported`, mientras que el bucket se usa para descargas posteriores y reenvíos.
+- La task se apoya en el patrón de recibos ya persistidos, pero queda separada de `TASK-094` y de la capa transversal de delivery `TASK-095`.
+
+### Payroll close now flushes notifications immediately after export
+- El route `POST /api/hr/payroll/periods/[periodId]/close` ahora intenta publicar el outbox pendiente y procesar el dominio `notifications` en caliente justo después de marcar el período como `exported`.
+- El cron de outbox/reactive sigue existiendo como safety net; el flush inmediato solo reduce la dependencia del scheduler en staging y en el flujo interactivo.
+- El dispatch evita reenvíos sobre períodos ya exportados.
+
+### TASK-095 centralized email delivery layer documented
+- Se registró una lane paralela para centralizar el delivery de emails sobre Resend, compartiendo contrato con el sistema de notificaciones.
+- El brief deja claro que Payroll, Finance, Delivery, Permissions y Auth deben consumir una capa única de envío y no helpers ad hoc.
+- La task queda como backlog separado para no desviar la iteración activa de Payroll.
+
+### TASK-094 completed with explicit Payroll close flow
+- Payroll now separates the canonical close mutation from CSV download: `POST /api/hr/payroll/periods/[periodId]/close` marks `exported`, while `GET /api/hr/payroll/periods/[periodId]/csv` serves the artifact.
+- Finance/HR notification is emitted from `payroll_period.exported` through a Resend-backed projection, with PDF and CSV attachments.
+- The architecture, event catalog, email catalog, and task registry were aligned to the new contract.
+
+### TASK-094 architecture context expanded for payroll close vs CSV download
+- La task nueva de Payroll ahora explicita que `exported` es el cierre canónico y que la descarga del CSV es un artefacto opcional, no el mecanismo de cierre.
+- La arquitectura de Payroll quedó alineada para que cualquier correo downstream a Finance/HR salga de `payroll_period.exported`.
+- `GREENHOUSE_EMAIL_CATALOG_V1.md` ahora documenta `payroll_export_ready` como notificación downstream de cierre/exportación canónica.
+
+### TASK-094 payroll close and CSV download separation added
+- Se documentó una lane nueva para separar el cierre/exportación de un periodo de Payroll de la descarga opcional del CSV.
+- El brief deja explícito que el estado `exported` debe surgir de una mutación de negocio, no de la entrega del archivo.
+- Se corrigió el registry de tasks para reflejar que `TASK-093` ya estaba cerrada.
+
+### TASK-092 payroll operational current period semantics completed
+- `current-payroll-period` ahora resuelve el período actual por mes operativo vigente, usando la utility compartida de calendario operativo.
+- `PayrollHistoryTab` deja de contar `approved` como cierre final y lo muestra como `aprobado en cierre`, separado de `cerrado/exportado`.
+- La task quedó cerrada con tests de helper, tests de historial y build validado.
+
+### TASK-092 operational current period semantics started
+- `current-payroll-period` ya resuelve el período vigente por mes operativo y no solo por el último período no exportado.
+- `PayrollHistoryTab` distingue ahora períodos cerrados/exportados de períodos aprobados que siguen en cierre, evitando presentar `approved` como cierre final.
+- La arquitectura de Payroll quedó alineada para que la selección de período actual use la utility compartida de calendario operativo.
+
+### Payroll operational calendar consumers mapped
+- Se dejó explícito que la utilidad de calendario operativo hoy solo tiene consumidores directos dentro de Payroll: helpers de período actual, readiness, routes de approve/readiness y las vistas operativas del módulo.
+- Se documentó también que Finance y Cost Intelligence solo consumen derivados de nómina, no la policy temporal.
+- Se agregaron candidatos futuros de adopción transversal: ICO, Finance, Campaigns y Cost Intelligence, condicionados a que formalicen ciclos de cierre mensuales o ventanas operativas reales.
+
+### TASK-091 operational calendar utility implemented
+- Se implementó la utilidad canónica de calendario operativo en `src/lib/calendar/operational-calendar.ts`.
+- La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts` con `Nager.Date` como fuente recomendada.
+- La tarea se cerró con tests de business days, close window, rollover mensual y normalización del loader externo.
+
+### Payroll holiday source set to Nager.Date
+- Se decidió documentar `Nager.Date` como la fuente pública de mercado recomendada para feriados nacionales del calendario operativo.
+- El timezone/DST sigue resolviéndose con IANA en el runtime, mientras que los overrides corporativos o jurisdiccionales pueden persistirse en Greenhouse sobre esa fuente.
+
+### Payroll operational calendar made timezone-aware in architecture
+- Se documentó que el calendario operativo de Payroll debe ser timezone-aware y calcularse sobre `America/Santiago` como base de la casa matriz.
+- La nueva regla separa `timezone`, `country/jurisdiction` y `holiday calendar` para soportar operaciones multi-país sin depender de la zona horaria del servidor ni del país de residencia del colaborador.
+- `TASK-091` quedó alineada para nacer como utilidad pura de dominio y no como projection reactiva.
+
+### Payroll operational calendar and current-period semantics split into separate lanes
+- Se reservaron `TASK-091` y `TASK-092` para separar la utilidad canónica de calendario operativo de la semántica de período actual en Payroll.
+- No hubo cambio de runtime en esta vuelta; el ajuste quedó explícitamente como backlog y documentación viva.
+
+### TASK-089 Payroll UX semantics and feedback hardened
+- El dashboard de Payroll separa ahora período activo e histórico seleccionado, evitando que un clic en historial reemplace el contexto del período abierto.
+- `Payroll History`, `Payroll Period`, `Mi Nómina`, `People > Nómina` y `Payroll Proyectada` ganaron affordances, copy y estados de error/retry más explícitos.
+- La descarga de recibos y los icon buttons críticos ahora exponen labels accesibles y feedback visible, reduciendo dependencias de `console.error` o affordances implícitas.
+
+### TASK-088 reactive projections and delivery hardened
+- La cola reactiva de Payroll ahora cierra su ciclo con `pending -> completed/failed`, conserva dedupe por `event_id + handler` y mantiene el queue completion como paso best-effort posterior al ledger reactivo.
+- El fallback BigQuery de export ya no publica `payroll_period.exported` si la mutación no actualiza ninguna fila, evitando eventos duplicados y receipts repetidos.
+- La arquitectura quedó alineada para tratar `projected_payroll_snapshots` como serving cache interno y no como source of truth transaccional.
+
+### TASK-087 lifecycle invariants and readiness gate hardened
+- El contrato de nómina oficial ahora valida transiciones en el store: `calculated`, `approved` y `exported` solo avanzan desde estados permitidos.
+- `POST /api/hr/payroll/periods/[periodId]/approve` ahora consume el readiness canónico y rechaza blockers antes de aprobar.
+- La edición de entries de períodos `approved` reabre explícitamente el período a `calculated` antes de mutar datos.
+- `pgUpdatePayrollPeriod()` vuelve a `draft` cuando un cambio de metadatos exige recalcular, evitando que quede un `approved` mentiroso tras reset de entries.
+
+### Payroll hardening backlog and architecture alignment documented
+- Se documentaron tres lanes nuevas para endurecer Payroll sin mezclar objetivos: lifecycle/readiness, reactivo/delivery y UX/feedback.
+- La arquitectura de Payroll ahora declara la ventana operativa de cierre, `/hr/payroll/projected` como surface derivada y `payroll_receipts_delivery` como downstream de `payroll_period.exported`.
+- `TASK-063` recibió un delta de alineación para dejar claro que los nuevos eventos proyectados ya no son el contrato principal y que el cierre actual vive en hardening.
+
+### TASK-086 current period selector + receipt download implemented
+- `PayrollDashboard` ahora usa un helper puro para seleccionar el período actual sin retroceder a rezagos exportados.
+- `PayrollPeriodTab` muestra empty state operativo con CTA de creación del siguiente período.
+- La descarga de recibos PDF dejó de depender de `window.open` y ahora usa `fetch -> blob -> anchor` con nombre legible para HR y Mi Nómina.
+- Se añadió `@testing-library/dom` como devDependency explícita para estabilizar la suite de tests de componentes que usa Testing Library.
+
+### TASK-086 payroll cut-off rule clarified
+- `TASK-086` quedó ajustada para reflejar la regla operativa real de Efeonce: la nómina se imputa al mes cerrado y se calcula/cierra al final del mes o dentro de los primeros 5 días hábiles del mes siguiente.
+- El brief ahora separa "período actual" de simple cambio de calendario y ancla el selector a la ventana de cierre operativo.
+- Se dejó explícito que `approved` puede seguir siendo el período actual solo mientras siga dentro de la ventana de cierre; fuera de ese corte debe dejar de mostrarse como vigente.
+- La misma task ahora absorbe también el flujo de descarga del recibo PDF, porque el botón no estaba cerrando una experiencia confiable y el filename seguía saliendo del `receiptId` técnico.
+
+### Reverse payroll engine + compensation líquido-first (TASK-079 → TASK-085)
+- Motor `computeGrossFromNet()`: binary search sobre forward engine, ±$1 CLP, piso IMM, AFP desde Previred
+- Regla Chile: líquido deseado = neto con 7% salud legal; excedente Isapre como deducción voluntaria visible
+- API `POST /api/hr/payroll/compensation/reverse-quote` con resolución de UF, UTM, IMM, tax brackets
+- `desired_net_clp` persistido en `compensation_versions` (migration `add-compensation-desired-net-clp.sql`)
+- CompensationDrawer: Chile siempre en modo reverse (sin switch), preview enterprise con secciones semánticas, accordion previsional, $ InputAdornment, skeleton loading, error visible sobre botón
+- Internacional: sin cambios (salary base directo)
+- Validado contra liquidación real Valentina Hoyos (Feb 2026)
+- Sección 24 en `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+
+### Payroll receipt smoke completed
+- `TASK-077` quedó cerrada end-to-end: el período de marzo 2026 se reemitió a `approved`, se publicó el outbox, `payroll_receipts_delivery` materializó 4 recibos y se enviaron 4 correos.
+- Los recibos quedaron persistidos en GCS bajo `gs://efeonce-group-greenhouse-media/payroll-receipts/2026-03/...`.
+- Esto cierra el último smoke operativo pendiente de receipts sobre staging.
+
+### Reactive receipts projection log fixed
+- `greenhouse_sync.outbox_reactive_log` ahora está keyed por `(event_id, handler)` para que un handler exitoso no bloquee al resto de proyecciones del mismo outbox event.
+- `greenhouse_sync.projection_refresh_queue` recuperó su dedup canónica con `UNIQUE (projection_name, entity_type, entity_id)`, de modo que `enqueueRefresh()` ya puede persistir refresh intents sin caer en un `ON CONFLICT` inválido.
+- Esto corrige el último bloqueo estructural que impedía a `payroll_receipts_delivery` materializar recibos cuando otro consumer ya había procesado el mismo `payroll_period.exported`.
+
+### Reactive receipts infrastructure preprovisioned
+- `greenhouse_sync.outbox_reactive_log` y `greenhouse_sync.projection_refresh_queue` quedaron provisionadas por setup compartido.
+- El runtime reactivo dejó de intentar DDL en `greenhouse_sync`; ahora solo verifica existencia y usa la infraestructura ya creada.
+- Eso habilita la proyección `payroll_receipts_delivery` para materializar el batch de recibos después de `payroll_period.exported`.
+
+### Payroll receipt routes tolerate registry lookup failures
+- Los routes de recibo individual ya no dependen de que `greenhouse_payroll.payroll_receipts` esté disponible para responder.
+- Si el lookup del registry falla, la API cae al render on-demand del PDF y mantiene la descarga operativa.
+- Esto evita que `TASK-077` quede bloqueada por una fila de registry no materializada aunque la exportación y el período oficial ya estén correctos.
+
+### Payroll approval guard aligned to new bonus policy
+- El guard de `POST /api/hr/payroll/periods/[periodId]/approve` ya no bloquea por pisos mínimos legacy (`bonusOtdMin` / `bonusRpaMin`) cuando la liquidación calculada cae dentro del máximo permitido y cumple elegibilidad.
+- El criterio de aprobación quedó alineado con la policy recalibrada de bonos variables, que prorratea sobre el máximo y preserva `bonusOtdMin` / `bonusRpaMin` solo como metadata histórica.
+- Este ajuste desbloquea el smoke de exportación y recibos de `TASK-077`, que dependía de poder llevar marzo 2026 desde `calculated` a `approved` y luego a `exported`.
+
+### Payroll projected AFP helper aligned to staging schema
+- `Payroll Proyectada` seguía fallando con `column "worker_rate" does not exist`.
+- Se inspeccionó la tabla real `greenhouse_payroll.chile_afp_rates` en Cloud SQL y se confirmó que solo expone `total_rate`.
+- El helper previsional de AFP ahora toma `total_rate` como fuente de cotización cuando el split explícito no existe, evitando que la proyección dependa de una columna ausente en staging.
+
+### Payroll projected core schema readiness split
+- `Payroll Proyectada` ya no debe depender de `greenhouse_payroll.payroll_receipts` para renderizar la proyección.
+- Se separó la verificación de schema en dos niveles:
+  - core payroll: compensaciones, períodos, entries y bonus config
+  - receipts payroll: schema adicional para generación/consulta de recibos
+- Con esto, la vista proyectada deja de caer por una tabla de recibos ausente aunque el resto del core payroll esté sano.
+
+### Payroll projected route access aligned to HR
+- `Payroll Proyectada` estaba quedando en vacío porque su API principal usaba `requireAdminTenantContext`, a diferencia del resto del módulo `Payroll` que opera con `requireHrTenantContext`.
+- El endpoint `/api/hr/payroll/projected` quedó alineado al mismo guard que `compensation`, `periods` y `receipts`, así que la vista ya no depende de un rol admin estricto para leer la proyección.
+- La causa raíz ya no es la falta de datos en la compensación vigente: en la BD sí existen compensaciones activas para marzo 2026; el problema era el guard de acceso del route.
+
+### Payroll projected staging schema gap
+- `dev-greenhouse` sigue mostrando `Payroll Proyectada` vacía/500; la revisión del código apunta a un schema de PostgreSQL de staging que todavía no tiene aplicadas todas las migrations de Payroll Chile (`gratificacion_legal_mode`, `colacion_amount`, `movilizacion_amount`, split AFP, etc.).
+- `TASK-078` sigue completa en código y docs, pero queda una deuda operativa explícita: alinear la BD del ambiente compartido con el schema que la vista proyectada ya espera.
+
+### Payroll receipt email template branded
+- El batch de recibos de nómina ya usa un template React Email dedicado (`src/emails/PayrollReceiptEmail.tsx`) con branding Greenhouse/Efeonce, resumen por período y CTA al portal.
+- `generatePayrollReceiptsForPeriod()` sigue enviando el PDF adjunto y conserva fallback de texto para deliverability.
+- Se agregó test unitario del template para Chile e internacional, dejando el último gap visible de `TASK-077` en la parte de email/branding cerrado.
+
+### Payroll receipt access surfaces wired
+- `My Nómina` ya expone descarga directa del recibo por período usando `GET /api/my/payroll/entries/[entryId]/receipt`.
+- `People > Person > Nómina` ya expone descarga directa del recibo por entry para HR, reutilizando el route que prioriza el PDF almacenado.
+- La task de recibos queda con la base delivery completa; lo pendiente ya es el pulido visual final y el smoke end-to-end de entrega.
+
+### Payroll receipts delivery foundation
+- `Payroll` ya tiene la base de recibos persistidos: registry en `greenhouse_payroll.payroll_receipts`, upload a GCS, batch generator `generatePayrollReceiptsForPeriod()` y proyección reactiva `payroll_receipts_delivery`.
+- La descarga por HR ahora prioriza el PDF almacenado y solo cae al render on-demand como fallback, evitando regenerar el documento en cada consulta.
+- El flujo sale por `payroll_period.exported` y no como cron separado, manteniendo la propagación sobre el outbox/reactive projection pipeline ya existente.
+
+### Payroll Chile foundation closure and receipt lane open
+- `TASK-078` quedó formalmente cerrada como `complete`: la base previsional canónica, el sync Gael Cloud y el forward cutover ya están estabilizados en runtime y docs.
+- `TASK-077` quedó abierta como siguiente lane operativa para recibos PDF/email/GCS/Mi Nómina, siguiendo el orden definido para Payroll Chile.
+
+### Organization legal identity canonical
+- La identidad legal canónica de la organización operativa propietaria de Greenhouse quedó documentada de forma transversal para Payroll, Finance y surfaces comerciales: `Efeonce Group SpA`, RUT `77.357.182-1`, dirección `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
+- La referencia canónica se asentó en la arquitectura de Account 360 / organización y en el contexto vivo del repo para evitar duplicación por módulo.
+
+### Chile employer cost base
+- `Payroll Chile` ahora calcula y persiste un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) junto a cada `payroll_entry`.
+- La proyección canónica `member_capacity_economics` absorbe ese breakdown para que `total_labor_cost_target` refleje el costo laboral cargado real sin crear otra capa de cálculo.
+- La propagación sigue usando los eventos existentes de `compensation_version.created/updated` y `payroll_entry.upserted`.
+
+### Chile AFP breakdown
+- `Payroll Chile` ahora separa `AFP` en `cotización` y `comisión` dentro de la compensación versionada, `payroll_entries` y los exports/recibos, manteniendo el total agregado como compatibilidad histórica.
+- Se agregó migration para expandir el esquema de PostgreSQL y backfillear el split en datos existentes.
+- El cálculo forward no cambió semánticamente: sigue usando el total AFP para imponibles y neto, pero la trazabilidad legal quedó más explícita.
+
+### Chile payroll non-imponible allowances
+- `Payroll Chile` ahora modela `colación` y `movilización` como haberes canónicos en la compensación versionada y en `payroll_entries`.
+- El cálculo mensual incorpora esos montos al total devengado y al neto, manteniendo su carácter no imponible en la liquidación.
+- Se agregó migration de PostgreSQL para expandir `compensation_versions` y `payroll_entries` con las columnas necesarias.
+- La propagación del cambio sigue usando los eventos canónicos existentes `compensation_version.created/updated` y `payroll_entry.upserted`.
+
+## 2026-03-27
+
+### Valentina February 2026 payroll smoke
+- Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos el núcleo legal del cálculo Chile de Greenhouse.
+- Se sembró IMM `539000` en `greenhouse_finance.economic_indicators` para habilitar la gratificación legal de febrero.
+- Resultado validado del motor:
+  - `baseSalary = 539000`
+  - `gratificacionLegal = 134750`
+  - `grossTotal = 673750`
+  - `chileAfpAmount = 70474.25`
+  - `chileHealthAmount = 161947.86`
+  - `chileUnemploymentAmount = 4042.5`
+  - `netTotal = 437285.39`
+- Gap restante para igualar el PDF completo:
+  - `colación`
+  - `movilización`
+- No se agregó un evento nuevo; la propagación sigue por `compensation_version.created/updated` y `payroll_entry.upserted`.
+
+### Projected Payroll -> Official promotion flow
+- `Projected Payroll` ahora puede promoverse explícitamente a borrador/recalculo oficial vía `POST /api/hr/payroll/projected/promote`, reutilizando el motor oficial con `projectionContext` (`actual_to_date` o `projected_month_end` + `asOfDate`).
+- Se agregó audit trail en PostgreSQL con `greenhouse_payroll.projected_payroll_promotions`, incluyendo `promotionId`, corte proyectado, actor, status (`started/completed/failed`) y cantidad de entries promovidas.
+- `/api/hr/payroll/projected` ya compara contra `greenhouse_payroll.*` en vez del schema legacy `greenhouse_hr.*`, y expone la última promoción completada del período/modo.
+- `Projected Payroll` ahora incluye CTA para crear o recalcular el borrador oficial desde la propia vista.
+- Guardrail nuevo: al recalcular un período oficial se eliminan `payroll_entries` sobrantes cuyo `member_id` ya no pertenece al universo vigente del cálculo.
+
+### Payroll variable bonus policy recalibration
+- `Payroll` ahora usa una policy de payout más flexible para bonos variables:
+  - `OTD` paga `100%` desde `89%` y prorratea linealmente desde `70%`
+  - `RpA` paga `100%` hasta `1.7`, cae suavemente hasta `80%` en `2.0`, y luego desciende hasta `0` al llegar a `3.0`
+- Se amplió `greenhouse_payroll.payroll_bonus_config` para versionar explícitamente la banda suave de `RpA` con:
+  - `rpa_full_payout_threshold`
+  - `rpa_soft_band_end`
+  - `rpa_soft_band_floor_factor`
+- El cutover se aplicó al runtime canónico de:
+  - cálculo oficial de nómina
+  - projected payroll
+  - recálculo manual por entry
+- Se agregaron tests de prorrateo y de flujo de compensación para asegurar compatibilidad con projected payroll y exportables.
+
+### ICO assignee attribution remediation
+- Se detectó y remediò un incidente sistémico donde tareas con `responsables_ids` en `notion_ops.tareas` no estaban quedando atribuidas en `greenhouse_conformed.delivery_tasks`, dejando `ICO` sin KPI por persona y `Payroll` con bonos variables en cero.
+- Se ejecutó un rerun operativo de `syncNotionToConformed()` y `materializeMonthlySnapshots(2026, 3)`, recuperando atribución en `delivery_tasks` y filas reales en `ico_engine.metrics_by_member`.
+- Resultado validado con datos reales:
+  - `delivery_tasks` volvió a persistir assignees (`with_assignee_source = 1063`, `with_assignee_member = 714`, `with_assignee_member_ids = 792`)
+  - `andres-carlosama` recuperó KPI marzo 2026 en `ICO`
+- Se endureció el runtime de `Payroll projected`:
+  - `fetchKpisForPeriod()` ahora ignora `memberId` nulos o vacíos sin romper todo el batch
+  - `projectPayrollForPeriod()` ahora filtra miembros activos sin compensación vigente real antes de calcular proyecciones
+- Se agregó cobertura de tests para evitar que un miembro sin compensación o con `memberId` inválido vuelva a dejar a todo el período sin KPI.
+
+### Payroll recurring fixed bonus support
+- `Payroll` ahora soporta un bono fijo recurrente canónico en la compensación versionada mediante `fixedBonusLabel` y `fixedBonusAmount`.
+- El bono fijo se congela también en `payroll_entries` junto con `adjustedFixedBonusAmount`, para conservar snapshot histórico y prorrateo por inasistencia/licencia no remunerada.
+- El cálculo mensual lo incorpora al `grossTotal`, al imponible Chile y al `netTotalCalculated`, evitando depender de `bonusOtherAmount` manual para haberes fijos.
+- `CompensationDrawer`, tabla de compensaciones, tabla de entries, recibos, PDF, CSV, Excel e historial por colaborador ahora lo muestran de forma consistente.
+- Se agregó cobertura de tests para el cálculo del bono fijo y se extendió la suite del módulo `Payroll` sin regresiones (`80/80` tests del slice).
+
+### Payroll leave type clarification
+- Se confirmó que `Payroll` ya diferencia permisos remunerados vs no remunerados: solo `daysAbsent` y `daysOnUnpaidLeave` descuentan pago; `daysOnLeave` remunerado no descuenta.
+- Se normalizó el catálogo operativo de permisos:
+  - `personal` ahora es no remunerado
+  - `medical` ahora representa `permiso médico / cita médica` remunerado
+  - `personal_unpaid` queda como alias legacy inactivo para no romper requests históricos
+- Ejecutada la migration `scripts/migrations/normalize-leave-type-paid-policy.sql` y verificado el estado final del catálogo en PostgreSQL.
+- Se amplió el catálogo con una baseline internacional de permisos:
+  - remunerados por defecto: `floating_holiday`, `bereavement`, `civic_duty`
+  - no remunerados por defecto: `parental`, `study`
+- Ejecutada la migration `scripts/migrations/expand-leave-types-international-baseline.sql` y verificado el catálogo final en PostgreSQL.
+
+### Payroll go-live hardening
+- `Payroll` ya no consolida períodos mixtos `CLP/USD` bajo una sola moneda en dashboard ni en `Personnel Expense`; ahora separa subtotales por moneda y evita visualizaciones engañosas.
+- La exportación de nómina en PostgreSQL publica el evento canónico `payroll_period.exported`, incorporado al catálogo reactivo y consumido por projections downstream (`member_capacity_economics`, `person_intelligence`, `client_economics`).
+- `person_intelligence` pasó a refresco real por `finance_period`, por lo que los eventos `payroll_period.*` y `payroll_entry.upserted` ya no quedan como no-op.
+- El cálculo Chile ahora bloquea si falta `taxTableVersion` o si no se puede resolver la `UTM` histórica del período; dejó de ser posible degradar silenciosamente el impuesto a `0`.
+- La creación de período de nómina ahora también puede capturar `taxTableVersion`, mientras la `UF` sigue autohidratándose.
+- Hallazgo funcional documentado: el módulo sí calcula con salario base, conectividad y bonos variables (`OTD`, `RpA`, `bonusOtherAmount`) y descuenta ausencias/licencias no pagadas, pero todavía no modela un catálogo genérico de bonos fijos recurrentes aparte de `remoteAllowance`.
+
+### Economic indicators migration + historical backfill
+- Ejecutada la migration `scripts/migrations/add-economic-indicators.sql` para materializar `greenhouse_finance.economic_indicators`.
+- Se agregó el script reusable `scripts/backfill-economic-indicators.ts` para poblar indicadores desde `mindicador` usando perfil `migrator`.
+- Backfill ejecutado para `2026-01-01 -> 2026-03-27`:
+  - `UF`: 86 filas
+  - `USD_CLP`: 61 filas
+  - `UTM`: 3 filas
+- `IPC`: 0 filas disponibles en la serie 2026 consultada
+- El backfill también dejó sincronizado `greenhouse_finance.exchange_rates` para `USD/CLP` y `CLP/USD` en el mismo rango histórico compatible.
+
+### Payroll UF auto-sync
+- `Payroll` deja de pedir `UF` manual como flujo normal al crear o editar períodos.
+- El backend ahora resuelve y persiste `uf_value` automáticamente según el `year/month` imputable usando la capa común de indicadores económicos.
+- La UI de períodos de nómina pasó de input manual a estado informativo sobre sincronización automática de `UF`.
+
+### Production release (PR #20 → main)
+- Mergeado `develop → main` con ~150 commits acumulados
+- Incluye: TASK-056 (capacity semantics), TASK-057 (direct overhead), assignment→membership sync, TanStack migration, login redesign, Finance Postgres migration, ICO expansion, y más
+- Migration de overhead columns y backfills ya ejecutados en la BD compartida
+
 ## 2026-03-26
 
 ### Assignment → Membership sync projection
@@ -490,7 +846,7 @@
 ### Bootstrap registry for TASK-001 to TASK-010 added
 
 - Se agregó `docs/tasks/TASK_ID_REGISTRY.md` para reservar el primer bloque estable `TASK-001..010` sobre la lane activa y el backlog abierto más prioritario.
-- `docs/tasks/README.md` ahora refleja esos IDs bootstrap y deja `TASK-011` como siguiente ID disponible.
+- `docs/tasks/README.md` ahora refleja esos IDs bootstrap y deja `TASK-093` como siguiente ID disponible.
 
 ### GitHub Project and bootstrap issues created
 
@@ -2489,3 +2845,36 @@
 # 2026-03-15
 
 - Fix: corrected the AI Tooling bootstrap seed so `ensureAiToolingInfrastructure()` no longer fails when a seeded tool omits optional params like `subscriptionAmount`, restoring the admin catalog/licenses/wallets/meta routes in preview.
+# 2026-03-28
+
+- Admin Center: `/admin` dejó de ser un redirect ciego y ahora renderiza una landing institucional de governance con KPIs, mapa de dominios y entrypoints hacia Spaces, Identity & Access, Delivery, AI Governance, Cloud & Integrations y Ops Health.
+- Navegación admin: el submenu histórico `Administración` pasó a `Admin Center`, incorpora la landing `/admin` como entrypoint explícito y reordena las rutas administrativas activas bajo una taxonomía más clara.
+- Admin Center observability: se agregaron las nuevas surfaces `/admin/cloud-integrations` y `/admin/ops-health`, alimentadas por una capa compartida `getOperationsOverview()` que reutiliza señales reales de outbox, proyecciones, notifications, syncs y webhooks.
+- Admin Center runbooks: `Cloud & Integrations` y `Ops Health` ahora exponen acciones manuales con auth admin para `dispatch webhooks`, `services sync`, `replay reactive` y `retry failed emails`, todas montadas sobre helpers existentes del runtime.
+
+- Projected payroll promotion: `POST /api/hr/payroll/projected/promote` quedó validado end-to-end en PostgreSQL para marzo 2026; el flujo ya promueve 4 personas a borrador oficial, y la causa raíz del bloqueo era una combinación de `payroll_entries` con columnas faltantes y un `ensurePayrollInfrastructure()` que seguía tocando BigQuery aun estando en runtime Postgres.
+- Payroll projected promotion: `greenhouse_serving.projected_payroll_snapshots` recibió grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`, resolviendo el `permission denied` que bloqueaba `POST /api/hr/payroll/projected/promote` sin mover la materialización fuera de `greenhouse_serving`.
+- `Payroll Chile` ya expone `colación` y `movilización` en staging para la nómina proyectada de Valentina Hoyos, con el neto subiendo de `CLP 437.077` a `CLP 596.257` al incorporar los haberes no imponibles.
+- La compensación vigente `valentina-hoyos_v1` quedó actualizada en staging con los valores del PDF de febrero para `baseSalary`, `gratificacionLegalMode`, `AFP`, `Isapre`, `colación` y `movilización`.
+- El smoke se validó sobre el deployment de staging `greenhouse-mk7eglbat-efeonce-7670142f.vercel.app`, alias `dev-greenhouse.efeoncepro.com`.
+- TASK-105 (lint hardening): 124 lint issues → 0; se limpiaron imports/blank lines/unused vars y dependencias de hooks en agency/greenhouse, scripts y helpers. `pnpm lint`, `pnpm test -- --runInBand` y `pnpm build` verdes.
+
+# 2026-03-27
+
+- Se agregó una capa común de indicadores económicos Chile para `USD_CLP`, `UF`, `UTM` e `IPC`, con nuevas rutas `GET /api/finance/economic-indicators/latest` y `GET/POST /api/finance/economic-indicators/sync`.
+- `AI Tooling` dejó de leer `USD/CLP` con query propia y fallback aislado; ahora consume el helper común.
+- `Payroll` ahora puede resolver `UF` histórica para Isapre y `UTM` histórica para impuesto Chile durante cálculo/readiness/recálculo de entries.
+- `Finance Dashboard` pasó de una card única de tipo de cambio a exponer `Dólar observado`, `UF` y `UTM`.
+- Se agregó storage SQL para `greenhouse_finance.economic_indicators` y migration `scripts/migrations/add-economic-indicators.sql`.
+# 2026-03-27
+
+- Finance dashboard: hardened `economic-indicators` fallback so a missing BigQuery table `greenhouse.fin_economic_indicators` no longer crashes `/api/finance/economic-indicators/latest` with `500`; indicators can continue resolving from PostgreSQL and direct sync paths.
+- Finance infrastructure: provisioned `greenhouse.fin_economic_indicators` in BigQuery using the repo’s canonical `ensureFinanceInfrastructure()` path, aligning analytical fallback with the new economic indicators runtime layer.
+- Architecture/docs: registered `finance.economic_indicator.upserted` in the canonical event catalog and left `TASK-063` explicitly audited for dependencies plus incoming/outgoing reactive event design.
+
+- Payroll Chile task planning: split the old mixed `TASK-078` into a clean foundation lane (`TASK-078`), legal parity (`TASK-076`), receipts (`TASK-077`) and reverse payroll (`TASK-079`), then updated `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md` and the task docs to match the new order.
+- Payroll Chile foundation: provisioned `chile_previred_indicators` and `chile_afp_rates`, wired async Chile previsional helpers into payroll calculations/projections/recalculations, and executed the additive migration in PostgreSQL with runtime grants so the forward engine can resolve IMM/SIS/topes/AFP data from a canonical period source once synced/seeded.
+- Payroll Chile sync: aligned the previsional sync to the public Gael Cloud API (`previred` + `impunico`), fixed `ImpUnico` conversion to UTM using the period UTM from `previred`, added the protected cron `GET /api/cron/sync-previred`, and executed the historical backfill successfully for `2026-01 -> 2026-03`.
+- Payroll Chile liquidation parity: added `gratificacionLegalMode` to compensation versions and `chileGratificacionLegalAmount` to payroll entries so the forward engine now computes legal gratification over IMM when applicable; the slice reuses the existing `compensation_version.created/updated` and `payroll_entry.upserted` outbox events so projections refresh without introducing a new reactive contract.
+- Payroll Chile migration: applied `scripts/migrations/add-gratificacion-legal-mode.sql` with the `admin` profile because the existing tables are owned by `postgres`; runtime now sees `gratificacion_legal_mode` and `chile_gratificacion_legal` in `greenhouse_payroll`.
+- Payroll Chile smoke validation: `dev-greenhouse.efeoncepro.com` remained protected by Vercel auth during staging smoke, so manual validation was recorded as blocked by access protection rather than as an application regression.

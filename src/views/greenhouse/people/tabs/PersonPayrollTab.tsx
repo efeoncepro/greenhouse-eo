@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
+import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -24,6 +25,7 @@ import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
 import type { PayrollEntry } from '@/types/payroll'
+import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 import { formatCurrency, formatPeriodIdLabel } from '@views/greenhouse/payroll/helpers'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -37,30 +39,57 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
   const theme = useTheme()
   const [entries, setEntries] = useState<PayrollEntry[] | null>(initialEntries ?? null)
   const [loading, setLoading] = useState(!initialEntries)
+  const [error, setError] = useState<string | null>(null)
+
+  const loadHistory = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch(`/api/hr/payroll/members/${memberId}/history`)
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+
+        throw new Error(data?.error || 'No fue posible cargar el historial de nómina.')
+      }
+
+      const data = await res.json()
+
+      setEntries(data.entries ?? [])
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar el historial de nómina.')
+    } finally {
+      setLoading(false)
+    }
+  }, [memberId])
 
   useEffect(() => {
     if (initialEntries) return
 
-    const load = async () => {
-      const res = await fetch(`/api/hr/payroll/members/${memberId}/history`)
-
-      if (res.ok) {
-        const data = await res.json()
-
-        setEntries(data.entries ?? [])
-      }
-
-      setLoading(false)
-    }
-
-    load()
-  }, [memberId, initialEntries])
+    void loadHistory()
+  }, [initialEntries, loadHistory])
 
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
         <CircularProgress />
       </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert
+        severity='error'
+        action={(
+          <Button color='inherit' size='small' onClick={() => void loadHistory()}>
+            Reintentar
+          </Button>
+        )}
+      >
+        {error}
+      </Alert>
     )
   }
 
@@ -74,8 +103,25 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
     )
   }
 
-  const sorted = [...entries].sort((a, b) => a.periodId.localeCompare(b.periodId))
+  const sorted = [...entries].sort((a, b) => b.periodId.localeCompare(a.periodId))
   const currency = sorted[0].currency as 'CLP' | 'USD'
+  const chartEntries = [...entries].sort((a, b) => a.periodId.localeCompare(b.periodId))
+
+  const handleDownloadReceipt = async (entry: PayrollEntry) => {
+    try {
+      await downloadPayrollReceiptPdf({
+        route: `/api/hr/payroll/entries/${entry.entryId}/receipt`,
+        entryId: entry.entryId,
+        periodId: entry.periodId,
+        memberId: entry.memberId,
+        memberName: entry.memberName,
+        payRegime: entry.payRegime,
+        currency: entry.currency
+      })
+    } catch (error) {
+      console.error('Unable to download payroll receipt.', error)
+    }
+  }
 
   const chartOptions: ApexOptions = {
     chart: { parentHeightOffset: 0, toolbar: { show: false } },
@@ -86,7 +132,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
       padding: { top: -10, bottom: -5 }
     },
     xaxis: {
-      categories: sorted.map(e => formatPeriodIdLabel(e.periodId)),
+      categories: chartEntries.map(e => formatPeriodIdLabel(e.periodId)),
       labels: { style: { colors: 'var(--mui-palette-text-secondary)', fontSize: '11px' } }
     },
     yaxis: {
@@ -109,7 +155,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
               type='line'
               height={260}
               options={chartOptions}
-              series={[{ name: 'Neto', data: sorted.map(e => e.netTotal) }]}
+              series={[{ name: 'Neto', data: chartEntries.map(e => e.netTotal) }]}
             />
           </CardContent>
         </Card>
@@ -128,6 +174,7 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Descuentos</TableCell>
                     <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
+                    <TableCell align='center'>Recibo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -162,6 +209,17 @@ const PersonPayrollTab = ({ entries: initialEntries, memberId }: Props) => {
                         <Typography variant='subtitle2' sx={{ fontFamily: 'monospace', fontWeight: 700 }}>
                           {formatCurrency(entry.netTotal, currency)}
                         </Typography>
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Button
+                          size='small'
+                          variant='tonal'
+                          startIcon={<i className='tabler-file-download' />}
+                          onClick={() => { void handleDownloadReceipt(entry) }}
+                          aria-label={`Descargar recibo PDF de ${formatPeriodIdLabel(entry.periodId)}`}
+                        >
+                          PDF
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

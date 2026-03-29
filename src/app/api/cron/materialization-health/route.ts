@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       ageHours,
       healthy: ageHours !== null && ageHours <= MAX_AGE_HOURS
     })
-  } catch (error) {
+  } catch {
     checks.push({
       name: 'ICO metric_snapshots_monthly',
       source: 'bigquery',
@@ -145,7 +145,44 @@ export async function GET(request: Request) {
     checks.push({ name: 'Postgres client_economics', source: 'postgres', lastMaterializedAt: null, ageHours: null, healthy: false })
   }
 
+  // 6. Assignee attribution coverage in delivery_tasks (BigQuery)
+  const ASSIGNEE_COVERAGE_THRESHOLD = 0.5 // Alert if <50% of completed tasks have assignee
+  let assigneeCoverage: { totalCompleted: number; withAssignee: number; coveragePct: number } | null = null
+
+  try {
+    const projectId = getBigQueryProjectId()
+    const bigQuery = getBigQueryClient()
+
+    const [rows] = await bigQuery.query({
+      query: `
+        SELECT
+          COUNTIF(status IN ('Listo', 'Done', 'Finalizado', 'Completado')) AS total_completed,
+          COUNTIF(status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+            AND assignee_member_ids IS NOT NULL
+            AND ARRAY_LENGTH(assignee_member_ids) > 0) AS with_assignee
+        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        WHERE synced_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+      `
+    })
+
+    const totalCompleted = Number((rows[0] as Record<string, unknown>)?.total_completed ?? 0)
+    const withAssignee = Number((rows[0] as Record<string, unknown>)?.with_assignee ?? 0)
+    const coveragePct = totalCompleted > 0 ? Math.round((withAssignee / totalCompleted) * 100) : 100
+
+    assigneeCoverage = { totalCompleted, withAssignee, coveragePct }
+
+    checks.push({
+      name: 'Delivery assignee attribution (30d)',
+      source: 'bigquery',
+      lastMaterializedAt: new Date().toISOString(),
+      ageHours: 0,
+      healthy: coveragePct >= ASSIGNEE_COVERAGE_THRESHOLD * 100
+    })
+  } catch {
+    checks.push({ name: 'Delivery assignee attribution (30d)', source: 'bigquery', lastMaterializedAt: null, ageHours: null, healthy: false })
+  }
+
   const healthy = checks.every(c => c.healthy)
 
-  return NextResponse.json({ checks, healthy, checkedAt: new Date().toISOString() })
+  return NextResponse.json({ checks, healthy, assigneeCoverage, checkedAt: new Date().toISOString() })
 }

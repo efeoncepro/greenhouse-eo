@@ -209,6 +209,19 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       source STRING,
       created_at TIMESTAMP
     )
+  `,
+  fin_economic_indicators: `
+    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_economic_indicators\` (
+      indicator_id STRING NOT NULL,
+      indicator_code STRING NOT NULL,
+      indicator_date DATE NOT NULL,
+      value NUMERIC NOT NULL,
+      source STRING,
+      unit STRING,
+      frequency STRING,
+      created_at TIMESTAMP,
+      updated_at TIMESTAMP
+    )
   `
 }
 

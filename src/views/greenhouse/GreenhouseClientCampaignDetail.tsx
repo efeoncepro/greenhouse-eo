@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 
-import { useRouter } from 'next/navigation'
-
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -92,7 +90,6 @@ const pctStr = (v: number | null) => v != null ? `${Math.round(v)}%` : '—'
 // ── Component ──
 
 const GreenhouseClientCampaignDetail = ({ campaignId }: { campaignId: string }) => {
-  const router = useRouter()
   const [data, setData] = useState<Campaign360 | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('overview')

@@ -3,8 +3,11 @@ import 'server-only'
 import type { BonusProrationConfig, PayrollEntry, UpdatePayrollEntryInput } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { getCompensationVersionById } from '@/lib/payroll/get-compensation'
 import { getPayrollEntryById } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
@@ -18,6 +21,9 @@ type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
   otd_floor: number | string | null
+  rpa_full_payout_threshold: number | string | null
+  rpa_soft_band_end: number | string | null
+  rpa_soft_band_floor_factor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
@@ -73,23 +79,27 @@ const getBonusConfigForPeriod = async (periodId: string) => {
     throw new PayrollValidationError('Payroll period not found.', 404)
   }
 
-  if (isPayrollPostgresEnabled()) {
-    const config = await pgGetActiveBonusConfig()
-
-    return {
-      period,
-      otdThreshold: config?.otdThreshold ?? 94,
-      otdFloor: config?.otdFloor ?? 70,
-      rpaThreshold: config?.rpaThreshold ?? 3
-    }
-  }
-
   const projectId = getProjectId()
   const { periodEnd } = getPeriodRangeFromId(periodId)
 
+  if (isPayrollPostgresEnabled()) {
+    const config = await pgGetActiveBonusConfig(periodEnd)
+
+    return {
+      period,
+      ...normalizeBonusProrationConfig(config)
+    }
+  }
+
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold, otd_floor
+      SELECT
+        otd_threshold,
+        rpa_threshold,
+        otd_floor,
+        rpa_full_payout_threshold,
+        rpa_soft_band_end,
+        rpa_soft_band_floor_factor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -100,9 +110,27 @@ const getBonusConfigForPeriod = async (periodId: string) => {
 
   return {
     period,
-    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
-    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
+    ...normalizeBonusProrationConfig(
+      row
+        ? {
+            otdThreshold: toNumber(row.otd_threshold),
+            otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : DEFAULT_BONUS_PRORATION_CONFIG.otdFloor,
+            rpaThreshold: toNumber(row.rpa_threshold),
+            rpaFullPayoutThreshold:
+              row.rpa_full_payout_threshold != null
+                ? toNumber(row.rpa_full_payout_threshold)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaFullPayoutThreshold,
+            rpaSoftBandEnd:
+              row.rpa_soft_band_end != null
+                ? toNumber(row.rpa_soft_band_end)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandEnd,
+            rpaSoftBandFloorFactor:
+              row.rpa_soft_band_floor_factor != null
+                ? toNumber(row.rpa_soft_band_floor_factor)
+                : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandFloorFactor
+          }
+        : undefined
+    )
   }
 }
 
@@ -169,13 +197,55 @@ export const recalculatePayrollEntry = async ({
     throw new PayrollValidationError('Compensation version not found for payroll entry.', 500)
   }
 
-  const { period, otdThreshold, otdFloor, rpaThreshold } = await getBonusConfigForPeriod(entry.periodId)
+  const {
+    period,
+    otdThreshold,
+    otdFloor,
+    rpaThreshold,
+    rpaFullPayoutThreshold,
+    rpaSoftBandEnd,
+    rpaSoftBandFloorFactor
+  } = await getBonusConfigForPeriod(entry.periodId)
 
-  if (!canEditPayrollEntries(period.status)) {
-    throw new PayrollValidationError('Exported payroll entries cannot be edited.', 409)
+  let effectivePeriodStatus = period.status
+
+  if (shouldReopenApprovedPayrollPeriod(effectivePeriodStatus)) {
+    if (isPayrollPostgresEnabled()) {
+      await pgSetPeriodCalculated(entry.periodId, actorIdentifier ?? null)
+    } else {
+      await runPayrollQuery(
+        `
+          UPDATE \`${getProjectId()}.greenhouse.payroll_periods\`
+          SET
+            status = 'calculated',
+            calculated_at = CURRENT_TIMESTAMP(),
+            calculated_by = @actorIdentifier,
+            approved_at = NULL,
+            approved_by = NULL
+          WHERE period_id = @periodId
+        `,
+        {
+          periodId: entry.periodId,
+          actorIdentifier: actorIdentifier ?? null
+        }
+      )
+    }
+
+    effectivePeriodStatus = 'calculated'
   }
 
-  const bonusConfig: BonusProrationConfig = { otdThreshold, otdFloor, rpaThreshold }
+  if (!canEditPayrollEntries(effectivePeriodStatus)) {
+    throw new PayrollValidationError('Payroll entries can only be edited after calculation and before export.', 409)
+  }
+
+  const bonusConfig: BonusProrationConfig = {
+    otdThreshold,
+    otdFloor,
+    rpaThreshold,
+    rpaFullPayoutThreshold,
+    rpaSoftBandEnd,
+    rpaSoftBandFloorFactor
+  }
 
   const forceManualKpi = input.kpiDataSource === 'manual' || entry.kpiDataSource === 'manual'
 
@@ -197,7 +267,29 @@ export const recalculatePayrollEntry = async ({
   const nextBonusOtdAmount = input.bonusOtdAmount ?? entry.bonusOtdAmount
   const nextBonusRpaAmount = input.bonusRpaAmount ?? entry.bonusRpaAmount
   const nextBonusOtherAmount = input.bonusOtherAmount ?? entry.bonusOtherAmount
-  const nextTaxAmount = input.chileTaxAmount ?? entry.chileTaxAmount ?? 0
+  const { periodEnd } = getPeriodRangeFromId(entry.periodId)
+
+  const resolvedUfValue = typeof period.ufValue === 'number'
+    ? period.ufValue
+    : (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UF',
+        periodDate: periodEnd
+      }))?.value ?? null
+
+  const resolvedUtmValue = period.taxTableVersion
+    ? (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UTM',
+        periodDate: periodEnd
+      }))?.value ?? null
+    : null
+
+  if (compensation.payRegime === 'chile' && !period.taxTableVersion) {
+    throw new PayrollValidationError('This payroll period requires taxTableVersion to recalculate Chile payroll taxes.', 400)
+  }
+
+  if (compensation.payRegime === 'chile' && period.taxTableVersion && typeof resolvedUtmValue !== 'number') {
+    throw new PayrollValidationError('This payroll period requires a historical UTM value to recalculate Chile payroll taxes.', 400)
+  }
 
   validateBonusAmount({
     qualifies: otdResult.qualifies,
@@ -215,24 +307,68 @@ export const recalculatePayrollEntry = async ({
   // Use adjusted base/remote from the entry if attendance was already computed
   const effectiveBaseSalary = entry.adjustedBaseSalary ?? compensation.baseSalary
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? compensation.remoteAllowance
+  const effectiveColacionAmount = entry.adjustedColacionAmount ?? compensation.colacionAmount ?? 0
+  const effectiveMovilizacionAmount = entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount ?? 0
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount
 
-  const totals = calculatePayrollTotals({
+  const provisionalTotals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: effectiveBaseSalary,
     remoteAllowance: effectiveRemoteAllowance,
+    colacionAmount: effectiveColacionAmount,
+    movilizacionAmount: effectiveMovilizacionAmount,
+    fixedBonusAmount: effectiveFixedBonusAmount,
     bonusOtdAmount: nextBonusOtdAmount,
     bonusRpaAmount: nextBonusRpaAmount,
     bonusOtherAmount: nextBonusOtherAmount,
     afpName: compensation.afpName,
     afpRate: compensation.afpRate,
+    afpCotizacionRate: compensation.afpCotizacionRate,
+    afpComisionRate: compensation.afpComisionRate,
     healthSystem: compensation.healthSystem,
     healthPlanUf: compensation.healthPlanUf,
     unemploymentRate: compensation.unemploymentRate,
     contractType: compensation.contractType,
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
-    ufValue: period.ufValue,
-    taxAmount: nextTaxAmount
+    ufValue: resolvedUfValue,
+    taxAmount: 0,
+    periodDate: periodEnd
+  })
+
+  const autoTaxAmount = compensation.payRegime === 'chile' && period.taxTableVersion
+    ? (await computeChileTax({
+        taxableBaseClp: provisionalTotals.chileTaxableBase ?? 0,
+        taxTableVersion: period.taxTableVersion,
+        utmValue: resolvedUtmValue
+      })).taxAmountClp
+    : 0
+
+  const nextTaxAmount = input.chileTaxAmount ?? autoTaxAmount
+
+  const totals = await calculatePayrollTotals({
+    payRegime: compensation.payRegime,
+    baseSalary: effectiveBaseSalary,
+    remoteAllowance: effectiveRemoteAllowance,
+    colacionAmount: effectiveColacionAmount,
+    movilizacionAmount: effectiveMovilizacionAmount,
+    fixedBonusAmount: effectiveFixedBonusAmount,
+    bonusOtdAmount: nextBonusOtdAmount,
+    bonusRpaAmount: nextBonusRpaAmount,
+    bonusOtherAmount: nextBonusOtherAmount,
+    afpName: compensation.afpName,
+    afpRate: compensation.afpRate,
+    afpCotizacionRate: compensation.afpCotizacionRate,
+    afpComisionRate: compensation.afpComisionRate,
+    healthSystem: compensation.healthSystem,
+    healthPlanUf: compensation.healthPlanUf,
+    unemploymentRate: compensation.unemploymentRate,
+    contractType: compensation.contractType,
+    hasApv: compensation.hasApv,
+    apvAmount: compensation.apvAmount,
+    ufValue: resolvedUfValue,
+    taxAmount: nextTaxAmount,
+    periodDate: periodEnd
   })
 
   const nextManualOverride = input.manualOverride ?? entry.manualOverride
@@ -257,8 +393,18 @@ export const recalculatePayrollEntry = async ({
     chileAfpName: totals.chileAfpName,
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,
+    chileAfpCotizacionAmount: totals.chileAfpCotizacionAmount,
+    chileAfpComisionAmount: totals.chileAfpComisionAmount,
+    chileColacionAmount: totals.chileColacionAmount,
+    chileMovilizacionAmount: totals.chileMovilizacionAmount,
     chileHealthSystem: totals.chileHealthSystem,
     chileHealthAmount: totals.chileHealthAmount,
+    chileHealthObligatoriaAmount: totals.chileHealthObligatoriaAmount,
+    chileHealthVoluntariaAmount: totals.chileHealthVoluntariaAmount,
+    chileEmployerSisAmount: totals.chileEmployerSisAmount,
+    chileEmployerCesantiaAmount: totals.chileEmployerCesantiaAmount,
+    chileEmployerMutualAmount: totals.chileEmployerMutualAmount,
+    chileEmployerTotalCost: totals.chileEmployerTotalCost,
     chileUnemploymentRate: totals.chileUnemploymentRate,
     chileUnemploymentAmount: totals.chileUnemploymentAmount,
     chileTaxableBase: totals.chileTaxableBase,
@@ -270,33 +416,12 @@ export const recalculatePayrollEntry = async ({
     netTotalOverride: nextManualOverride ? Number(nextNetTotalOverride) : null,
     netTotal: nextNetTotal,
     manualOverride: nextManualOverride,
-    manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote
+    manualOverrideNote: input.manualOverrideNote !== undefined ? input.manualOverrideNote : entry.manualOverrideNote,
+    adjustedColacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
+    adjustedMovilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount
   }
 
   await upsertPayrollEntry(updatedEntry)
-
-  if (shouldReopenApprovedPayrollPeriod(period.status)) {
-    if (isPayrollPostgresEnabled()) {
-      await pgSetPeriodCalculated(entry.periodId, actorIdentifier ?? null)
-    } else {
-      await runPayrollQuery(
-        `
-          UPDATE \`${getProjectId()}.greenhouse.payroll_periods\`
-          SET
-            status = 'calculated',
-            calculated_at = CURRENT_TIMESTAMP(),
-            calculated_by = @actorIdentifier,
-            approved_at = NULL,
-            approved_by = NULL
-          WHERE period_id = @periodId
-        `,
-        {
-          periodId: entry.periodId,
-          actorIdentifier: actorIdentifier ?? null
-        }
-      )
-    }
-  }
 
   const persisted = await getPayrollEntryById(entryId)
 

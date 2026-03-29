@@ -21,17 +21,25 @@ import { formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helper
 
 type Props = {
   periods: PayrollPeriod[]
+  selectedPeriodId: string | null
   onSelectPeriod: (periodId: string) => void
 }
 
-const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
-  const closedPeriods = periods.filter(p => p.status === 'approved' || p.status === 'exported')
+const PayrollHistoryTab = ({ periods, selectedPeriodId, onSelectPeriod }: Props) => {
+  const approvedPeriods = periods.filter(p => p.status === 'approved')
+  const exportedPeriods = periods.filter(p => p.status === 'exported')
+  const closedPeriods = [...exportedPeriods, ...approvedPeriods]
 
   return (
     <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
       <CardHeader
         title='Historial de nóminas'
-        subheader={`${closedPeriods.length} período${closedPeriods.length !== 1 ? 's' : ''} cerrado${closedPeriods.length !== 1 ? 's' : ''}`}
+        subheader={[
+          `${exportedPeriods.length} período${exportedPeriods.length !== 1 ? 's' : ''} cerrado${exportedPeriods.length !== 1 ? 's' : ''}`,
+          approvedPeriods.length > 0
+            ? `${approvedPeriods.length} período${approvedPeriods.length !== 1 ? 's' : ''} aprobado${approvedPeriods.length !== 1 ? 's' : ''} en cierre`
+            : null
+        ].filter(Boolean).join(' · ')}
         avatar={
           <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
             <i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -59,8 +67,18 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
                   <TableRow
                     key={period.periodId}
                     hover
+                    selected={selectedPeriodId === period.periodId}
                     sx={{ cursor: 'pointer' }}
                     onClick={() => onSelectPeriod(period.periodId)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        onSelectPeriod(period.periodId)
+                      }
+                    }}
+                    role='button'
+                    tabIndex={0}
+                    aria-label={`Abrir período ${formatPeriodLabel(period.year, period.month)}`}
                   >
                     <TableCell>
                       <Typography variant='body2' fontWeight={500}>
@@ -68,13 +86,18 @@ const PayrollHistoryTab = ({ periods, onSelectPeriod }: Props) => {
                       </Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <CustomChip
-                        round='true'
-                        size='small'
-                        icon={<i className={status.icon} />}
-                        label={status.label}
-                        color={status.color === 'default' ? 'secondary' : status.color}
-                      />
+                      <Stack spacing={0.5} alignItems='center'>
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          icon={<i className={status.icon} />}
+                          label={status.label}
+                          color={status.color === 'default' ? 'secondary' : status.color}
+                        />
+                        <Typography variant='caption' color='text.secondary'>
+                          {period.status === 'approved' ? 'Pendiente de exportación' : 'Cierre final'}
+                        </Typography>
+                      </Stack>
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2' color='text.secondary'>

@@ -42,12 +42,19 @@ const compensatedMember = {
   currency: 'USD' as const,
   baseSalary: 1000,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   bonusOtdMin: 0,
   bonusOtdMax: 100,
   bonusRpaMin: 0,
   bonusRpaMax: 50,
+  gratificacionLegalMode: 'ninguna' as const,
   afpName: null,
   afpRate: null,
+  afpCotizacionRate: null,
+  afpComisionRate: null,
   healthSystem: null,
   healthPlanUf: null,
   unemploymentRate: 0,
@@ -58,6 +65,7 @@ const compensatedMember = {
   effectiveTo: null,
   isCurrent: true,
   changeReason: 'Alta inicial',
+  desiredNetClp: null,
   createdBy: null,
   createdAt: null,
   hasCompensationVersion: true
@@ -142,7 +150,9 @@ describe('buildPayrollPeriodReadiness', () => {
           payRegime: 'chile',
           currency: 'CLP',
           healthSystem: 'isapre',
-          healthPlanUf: 2.1
+          healthPlanUf: 2.1,
+          colacionAmount: 0,
+          movilizacionAmount: 0
         }
       ],
       missingKpiMemberIds: [],
@@ -155,7 +165,7 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_uf_value'])
   })
 
-  it('warns when a Chile period lacks tax table version', () => {
+  it('blocks calculation when a Chile period lacks tax table version', () => {
     const readiness = buildPayrollPeriodReadiness({
       period: {
         ...period,
@@ -167,7 +177,9 @@ describe('buildPayrollPeriodReadiness', () => {
           memberId: 'member-chile',
           payRegime: 'chile',
           currency: 'CLP',
-          healthSystem: 'fonasa'
+          healthSystem: 'fonasa',
+          colacionAmount: 0,
+          movilizacionAmount: 0
         }
       ],
       missingKpiMemberIds: [],
@@ -175,7 +187,31 @@ describe('buildPayrollPeriodReadiness', () => {
       attendanceDiagnostics
     })
 
-    expect(readiness.ready).toBe(true)
-    expect(readiness.warnings.map(issue => issue.code)).toEqual(['missing_tax_table_version'])
+    expect(readiness.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_tax_table_version'])
+  })
+
+  it('blocks calculation when Chile tax inputs need UTM and historical UTM is unavailable', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [
+        {
+          ...compensatedMember,
+          memberId: 'member-chile',
+          payRegime: 'chile',
+          currency: 'CLP',
+          healthSystem: 'fonasa',
+          colacionAmount: 0,
+          movilizacionAmount: 0
+        }
+      ],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      missingUtmValue: true
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_utm_value'])
   })
 })

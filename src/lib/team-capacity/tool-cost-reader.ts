@@ -32,6 +32,7 @@ const pad2 = (value: number) => String(value).padStart(2, '0')
 
 const toNum = (value: unknown): number => {
   if (typeof value === 'number') return value
+
   if (typeof value === 'string' && value.trim()) {
     const parsed = Number(value)
 
@@ -119,6 +120,7 @@ export const readMemberDirectToolCosts = async (
       `,
       [memberId, periodStart, periodEnd]
     )),
+
     // Member-direct expenses from finance (equipment, reimbursements, other).
     // tool_license and tool_usage are EXCLUDED to avoid double-counting with AI tooling sources above.
     safeQuery(runGreenhousePostgresQuery<MemberDirectExpenseRow>(

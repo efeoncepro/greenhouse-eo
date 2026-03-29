@@ -7,6 +7,7 @@ import { createRequire } from 'node:module'
 
 // Stub server-only so we can import Next.js server modules from scripts
 const _require = createRequire(import.meta.url)
+
 _require('module').Module._cache[_require.resolve('server-only')] = { id: 'server-only', exports: {} }
 
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
@@ -46,6 +47,7 @@ const main = async () => {
 
       if (snapshot) {
         const oh = snapshot.directOverheadTarget + snapshot.sharedOverheadTarget
+
         console.log(`  ✓ ${row.display_name} — assigned=${snapshot.assignedHours}h, overhead=${oh}, loaded=${snapshot.loadedCostTarget ?? 'n/a'}`)
         refreshed++
       } else {
@@ -53,6 +55,7 @@ const main = async () => {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
+
       console.log(`  ✗ ${row.display_name} — ${msg.slice(0, 100)}`)
       failed++
     }
@@ -68,5 +71,6 @@ main()
   })
   .finally(async () => {
     const { closeGreenhousePostgres } = await import('@/lib/postgres/client')
+
     await closeGreenhousePostgres()
   })

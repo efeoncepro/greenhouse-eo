@@ -18,9 +18,18 @@ import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 import { useTheme } from '@mui/material/styles'
@@ -31,7 +40,16 @@ import { toast } from 'react-toastify'
 
 import Chip from '@mui/material/Chip'
 
+import classnames from 'classnames'
+
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import CustomTextField from '@core/components/mui/TextField'
+import { fuzzyFilter } from '@/components/tableUtils'
+
+
+import tableStyles from '@core/styles/table.module.css'
 import CustomChip from '@core/components/mui/Chip'
 import OptionMenu from '@core/components/option-menu'
 
@@ -55,13 +73,21 @@ interface AccountSummary {
   isActive: boolean
 }
 
-interface ExchangeRate {
-  available: boolean
-  fromCurrency?: string
-  toCurrency?: string
-  rate?: number
-  rateDate?: string
-  source?: string
+interface IndicatorSnapshot {
+  indicatorId: string
+  indicatorCode: string
+  indicatorDate: string
+  value: number
+  source: string
+  unit: string
+  frequency: string
+}
+
+interface IndicatorsSummary {
+  USD_CLP?: IndicatorSnapshot | null
+  UF?: IndicatorSnapshot | null
+  UTM?: IndicatorSnapshot | null
+  IPC?: IndicatorSnapshot | null
 }
 
 interface MonthlyDataPoint {
@@ -202,6 +228,14 @@ const formatRate = (rate: number): string => {
   return new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(rate)
 }
 
+const formatIndicatorValue = (value: number, indicatorCode: string): string => {
+  if (indicatorCode === 'IPC') {
+    return `${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value)}%`
+  }
+
+  return `$${formatRate(value)}`
+}
+
 const formatDate = (date: string | null): string => {
   if (!date) {
     return '—'
@@ -326,7 +360,7 @@ const FinanceDashboardView = () => {
 
   const [loading, setLoading] = useState(true)
   const [accounts, setAccounts] = useState<AccountSummary[]>([])
-  const [exchangeRate, setExchangeRate] = useState<ExchangeRate>({ available: false })
+  const [indicators, setIndicators] = useState<IndicatorsSummary>({})
   const [incomeSummary, setIncomeSummary] = useState<SummaryData | null>(null)
   const [expenseSummary, setExpenseSummary] = useState<SummaryData | null>(null)
   const [recentMovements, setRecentMovements] = useState<RecentMovement[]>([])
@@ -346,9 +380,9 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, rateRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
-        fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' }),
+        fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
         fetch('/api/finance/expenses/summary', { cache: 'no-store' }),
         fetch('/api/finance/income?pageSize=12', { cache: 'no-store' }),
@@ -371,18 +405,18 @@ const FinanceDashboardView = () => {
         errors.push(`Cuentas: ${accountsRes.status}`)
       }
 
-      if (rateRes.ok) {
-        const rateData = await rateRes.json()
+      if (indicatorsRes.ok) {
+        const indicatorsData = await indicatorsRes.json()
 
-        setExchangeRate(rateData)
+        setIndicators(indicatorsData.indicators ?? {})
 
-        if (!rateData.available) {
-          errors.push('Tipo de cambio: sin snapshot disponible')
+        if (!indicatorsData.indicators?.USD_CLP) {
+          errors.push('Indicadores: USD/CLP sin snapshot disponible')
         }
       } else {
-        const d = await rateRes.json().catch(() => ({}))
+        const d = await indicatorsRes.json().catch(() => ({}))
 
-        errors.push(`Tipo de cambio: ${d.error || rateRes.status}`)
+        errors.push(`Indicadores: ${d.error || indicatorsRes.status}`)
       }
 
       if (incomeSummaryRes.ok) {
@@ -479,14 +513,6 @@ const FinanceDashboardView = () => {
     ? accounts.reduce((sum, account) => sum + (account.currentBalance ?? account.openingBalance ?? 0), 0)
     : null
 
-  const activeAccountCount = accounts.filter(a => a.isActive).length
-
-  const latestBalanceAsOf = [...accounts]
-    .map(account => account.balanceAsOf)
-    .filter((value): value is string => Boolean(value))
-    .sort()
-    .at(-1) ?? null
-
   // Use accrual series (Postgres-first) for bar chart — consistent base across all months
   const incomeMonthly = incomeSummary?.accrualMonthly ?? incomeSummary?.monthly ?? []
   const expenseMonthly = expenseSummary?.accrualMonthly ?? expenseSummary?.monthly ?? []
@@ -496,7 +522,6 @@ const FinanceDashboardView = () => {
   const cashIncomeClp = incomeSummary?.cashCurrentMonth?.totalAmountClp ?? 0
   const accrualExpenseClp = expenseSummary?.accrualCurrentMonth?.totalAmountClp ?? expenseSummary?.currentMonth.totalAmountClp ?? 0
   const expenseWithPayroll = pnl ? pnl.costs.totalExpenses : accrualExpenseClp
-  const payrollIncluded = pnl ? pnl.payroll.headcount > 0 : false
 
   // Build aligned month labels from accrual series (same base for all months)
   const allMonths = new Set<string>()
@@ -608,82 +633,76 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
-      {/* KPI row */}
+      {/* Financial KPIs with sparklines */}
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsWithAreaChart
             title='Saldo total'
             stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
-            subtitle={accounts.length === 0
-              ? 'Sin cuentas activas registradas'
-              : latestBalanceAsOf
-                ? `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''} · al ${formatDate(latestBalanceAsOf)}`
-                : `${activeAccountCount} cuenta${activeAccountCount !== 1 ? 's' : ''} activa${activeAccountCount !== 1 ? 's' : ''}`}
             avatarIcon='tabler-wallet'
             avatarColor='primary'
+            avatarSkin='light'
+            chartColor='primary'
+            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsWithAreaChart
             title='Facturación del mes'
-            titleTooltip='Facturado = emitido por invoice_date. Cobrado = recibido por payment_date.'
             stats={formatCLP(accrualIncomeClp)}
-            subtitle={(() => {
-              if (cashIncomeClp > 0 && cashIncomeClp < accrualIncomeClp) {
-                return `Cobrado: ${formatCLP(cashIncomeClp)} · Por cobrar: ${formatCLP(accrualIncomeClp - cashIncomeClp)}`
-              }
-
-              if (cashIncomeClp > 0) {
-                return `Cobrado: ${formatCLP(cashIncomeClp)}`
-              }
-
-              const change = incomeSummary?.accrualCurrentMonth?.changePercent ?? incomeSummary?.currentMonth.changePercent
-
-              return change !== undefined && change !== 0
-                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
-                : 'Sin cobros registrados'
-            })()}
             avatarIcon='tabler-file-invoice'
             avatarColor='success'
-            trend={incomeSummary?.accrualCurrentMonth?.trend ?? incomeSummary?.currentMonth.trend ?? 'positive'}
-            trendNumber={incomeSummary?.accrualCurrentMonth?.changePercent !== undefined ? `${Math.abs(incomeSummary.accrualCurrentMonth.changePercent)}%` : undefined}
+            avatarSkin='light'
+            chartColor='success'
+            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsWithAreaChart
             title='Costos del mes'
-            titleTooltip='Incluye gastos operacionales y costo de personal cuando hay nómina aprobada.'
             stats={formatCLP(expenseWithPayroll)}
-            subtitle={(() => {
-              if (pnl && payrollIncluded) {
-                const opex = pnl.costs.totalExpenses - (pnl.costs.unlinkedPayrollCost ?? 0)
-
-                return `Operacional: ${formatCLP(opex)} · Personal: ${formatCLP(pnl.costs.unlinkedPayrollCost ?? 0)}`
-              }
-
-              if (pnl && !payrollIncluded) {
-                return 'Sin nómina aprobada para este período'
-              }
-
-              const change = expenseSummary?.currentMonth.changePercent
-
-              return change !== undefined && change !== 0
-                ? `${change > 0 ? '+' : ''}${change}% vs mes anterior`
-                : 'Sin nómina aprobada'
-            })()}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
+            avatarSkin='light'
+            chartColor='error'
+            chartSeries={[{ data: expenseMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+      </Grid>
+
+      {/* Economic Indicators */}
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
-            title='Tipo de cambio'
-            stats={exchangeRate.available && exchangeRate.rate ? `$${formatRate(exchangeRate.rate)}` : 'Sin datos'}
-            subtitle={exchangeRate.available
-              ? `USD → CLP · ${exchangeRate.source ?? 'manual'}${exchangeRate.rateDate ? ` · ${formatDate(exchangeRate.rateDate)}` : ''}`
+            title='Dólar obs.'
+            stats={indicators.USD_CLP?.value ? formatIndicatorValue(indicators.USD_CLP.value, 'USD_CLP') : 'Sin datos'}
+            subtitle={indicators.USD_CLP
+              ? `${indicators.USD_CLP.source ?? 'manual'} · ${indicators.USD_CLP.indicatorDate ? formatDate(indicators.USD_CLP.indicatorDate) : ''}`
               : 'Sin registros'}
             avatarIcon='tabler-arrows-exchange'
             avatarColor='info'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='UF'
+            stats={indicators.UF?.value ? formatIndicatorValue(indicators.UF.value, 'UF') : 'Sin datos'}
+            subtitle={indicators.UF
+              ? `${indicators.UF.source ?? 'manual'} · ${indicators.UF.indicatorDate ? formatDate(indicators.UF.indicatorDate) : ''}`
+              : 'Sin registros'}
+            avatarIcon='tabler-chart-histogram'
+            avatarColor='primary'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='UTM'
+            stats={indicators.UTM?.value ? formatIndicatorValue(indicators.UTM.value, 'UTM') : 'Sin datos'}
+            subtitle={indicators.UTM
+              ? `${indicators.UTM.source ?? 'manual'} · ${indicators.UTM.indicatorDate ? formatDate(indicators.UTM.indicatorDate) : ''}`
+              : 'Sin registros'}
+            avatarIcon='tabler-scale'
+            avatarColor='warning'
           />
         </Grid>
       </Grid>
@@ -1081,88 +1100,8 @@ const FinanceDashboardView = () => {
         </Card>
       )}
 
-      {/* Recent transactions table */}
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardHeader
-          title='Últimos movimientos'
-          avatar={
-            <Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity' }}>
-              <i className='tabler-list' style={{ fontSize: 22, color: 'var(--mui-palette-secondary-main)' }} />
-            </Avatar>
-          }
-        />
-        <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 80 }}>Tipo</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell sx={{ width: 160 }}>Entidad / Cuenta</TableCell>
-                <TableCell sx={{ width: 100 }}>Fecha</TableCell>
-                <TableCell sx={{ width: 120 }} align='right'>Monto</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {recentMovements.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>
-                      No hay movimientos registrados aún
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                recentMovements.map(movement => (
-                  <TableRow key={movement.id} hover>
-                    <TableCell>
-                      <Typography
-                        variant='body2'
-                        fontWeight={600}
-                        color={movement.type === 'income' ? 'success.main' : 'error.main'}
-                      >
-                        {movement.type === 'income' ? 'Ingreso' : 'Egreso'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2' fontWeight={500}>
-                        {movement.description}
-                      </Typography>
-                      {movement.id && (
-                        <Typography variant='caption' color='text.secondary'>
-                          {movement.id}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>
-                        {movement.partyName || movement.accountName || '—'}
-                      </Typography>
-                      {movement.accountName && movement.partyName && (
-                        <Typography variant='caption' color='text.secondary'>
-                          {movement.accountName}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant='body2'>{formatDate(movement.date)}</Typography>
-                    </TableCell>
-                    <TableCell align='right'>
-                      <Typography
-                        variant='body2'
-                        fontWeight={600}
-                        color={movement.amount >= 0 ? 'success.main' : 'error.main'}
-                      >
-                        {formatCLP(movement.amount)}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+      {/* Recent transactions table — TanStack React Table */}
+      <RecentMovementsTable movements={recentMovements} />
 
       <CreateIncomeDrawer
         open={incomeDrawerOpen}
@@ -1181,6 +1120,148 @@ const FinanceDashboardView = () => {
         }}
       />
     </Box>
+  )
+}
+
+// ── Recent Movements Table (TanStack) ──
+
+const movementColumnHelper = createColumnHelper<RecentMovement>()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const movementColumns: any[] = [
+  movementColumnHelper.accessor('type', {
+    header: 'Tipo',
+    cell: ({ getValue }) => (
+      <CustomChip
+        round='true'
+        size='small'
+        variant='tonal'
+        color={getValue() === 'income' ? 'success' : 'error'}
+        label={getValue() === 'income' ? 'Ingreso' : 'Egreso'}
+      />
+    )
+  }),
+  movementColumnHelper.accessor('description', {
+    header: 'Descripción',
+    cell: ({ getValue, row }) => (
+      <Box>
+        <Typography variant='body2' fontWeight={500}>{getValue()}</Typography>
+        <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.7rem' }}>{row.original.id}</Typography>
+      </Box>
+    ),
+    meta: { minWidth: 300 }
+  }),
+  movementColumnHelper.accessor('partyName', {
+    header: 'Entidad',
+    cell: ({ row }) => (
+      <Typography variant='body2' color='text.secondary'>{row.original.partyName || row.original.accountName || '—'}</Typography>
+    ),
+    meta: { width: 180 }
+  }),
+  movementColumnHelper.accessor('date', {
+    header: 'Fecha',
+    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>,
+    meta: { width: 110 }
+  }),
+  movementColumnHelper.accessor('amount', {
+    header: 'Monto',
+    cell: ({ getValue }) => (
+      <Typography variant='body2' fontWeight={600} color={getValue() >= 0 ? 'success.main' : 'error.main'}>
+        {formatCLP(getValue())}
+      </Typography>
+    ),
+    meta: { align: 'right', width: 130 }
+  })
+]
+
+const RecentMovementsTable = ({ movements }: { movements: RecentMovement[] }) => {
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }])
+  const [globalFilter, setGlobalFilter] = useState('')
+
+  const table = useReactTable({
+    data: movements,
+    columns: movementColumns,
+    state: { sorting, globalFilter },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+  })
+
+  return (
+    <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+      <CardHeader
+        title='Últimos movimientos'
+        avatar={
+          <Avatar variant='rounded' sx={{ bgcolor: 'secondary.lightOpacity' }}>
+            <i className='tabler-list' style={{ fontSize: 22, color: 'var(--mui-palette-secondary-main)' }} />
+          </Avatar>
+        }
+      />
+      <Divider />
+      <CardContent sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+        <CustomTextField
+          value={globalFilter}
+          onChange={e => setGlobalFilter(e.target.value)}
+          placeholder='Buscar movimiento…'
+          sx={{ minWidth: 250 }}
+        />
+        <Typography variant='caption' color='text.secondary' sx={{ alignSelf: 'center' }}>
+          {table.getFilteredRowModel().rows.length} de {movements.length} movimientos
+        </Typography>
+      </CardContent>
+      <div className='overflow-x-auto'>
+        <table className={tableStyles.table}>
+          <thead>
+            {table.getHeaderGroups().map(hg => (
+              <tr key={hg.id}>
+                {hg.headers.map(header => (
+                  <th
+                    key={header.id}
+                    onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                    className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
+                    style={{
+                      textAlign: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.align === 'right' ? 'right' : 'left',
+                      width: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.width as number | undefined,
+                      minWidth: (header.column.columnDef.meta as Record<string, unknown> | undefined)?.minWidth as number | undefined
+                    }}
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.length === 0 ? (
+              <tr>
+                <td colSpan={movementColumns.length} style={{ textAlign: 'center', padding: '2rem' }}>
+                  <Typography variant='body2' color='text.secondary'>No hay movimientos registrados aún</Typography>
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map(row => (
+                <tr key={row.id} className={classnames({ 'hover:bg-actionHover': true })}>
+                  {row.getVisibleCells().map(cell => (
+                    <td
+                      key={cell.id}
+                      style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : 'left' }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <TablePaginationComponent table={table as ReturnType<typeof useReactTable>} />
+    </Card>
   )
 }
 

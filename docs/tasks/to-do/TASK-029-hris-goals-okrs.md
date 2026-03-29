@@ -1,5 +1,14 @@
 # CODEX TASK — HRIS Fase 2B: Goals y OKRs
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **Fuente ICO corregida**: las métricas ICO como contexto operativo (RpA, OTD%, throughput) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL serving view, materializada por `src/lib/sync/projections/ico-member-metrics.ts`). NO leer de BigQuery `member_performance_snapshots` ni de `notion_ops` directo.
+- **Outbox events obligatorios**: registrar en `src/lib/sync/event-catalog.ts`:
+  - Aggregate types: `goal`, `goalCycle`
+  - Eventos: `hr.goal.created`, `hr.goal.updated`, `hr.goal.progress_recorded`, `hr.goal_cycle.activated`, `hr.goal_cycle.closed`
+- **Integration con `person_intelligence`**: cuando se registra progreso de goal (`hr.goal.progress_recorded`), la projection `person_intelligence` debería refrescarse para incluir `goal_completion_pct` en el snapshot unificado. Esto es un follow-up que se wirea una vez que este módulo esté operativo.
+- **Complementariedad con ICO**: Goals miden intención estratégica, ICO mide delivery operativo. No se solapan — se complementan. El módulo de evaluaciones (TASK-031) combina ambos.
+
 ## Resumen
 
 Implementar el **módulo de objetivos y OKRs** del HRIS en Greenhouse. Permite definir ciclos de objetivos (trimestrales, semestrales, anuales), crear goals que cascadean desde empresa → departamento → individuo, con key results medibles y tracking de progreso.

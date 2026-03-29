@@ -6,6 +6,8 @@ import { join } from 'path'
 
 import { GoogleGenAI } from '@google/genai'
 
+import { resolveNexaModel } from '@/config/nexa-models'
+
 let googleGenAIClient: GoogleGenAI | undefined
 let credentialsFilePromise: Promise<string | undefined> | undefined
 
@@ -95,7 +97,9 @@ const getProjectId = () => {
 const getLocation = () => process.env.GOOGLE_CLOUD_LOCATION?.trim() || 'global'
 
 export const getGreenhouseAgentModel = () =>
-  process.env.GREENHOUSE_AGENT_MODEL?.trim() || 'gemini-2.5-flash'
+  resolveNexaModel({
+    fallbackModel: process.env.GREENHOUSE_AGENT_MODEL?.trim() || null
+  })
 
 const ensureCredentialFile = async () => {
   const explicitPath = process.env.GOOGLE_APPLICATION_CREDENTIALS?.trim()

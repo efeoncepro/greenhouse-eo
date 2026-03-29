@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { BigQuery } from '@google-cloud/bigquery'
 
 import { getGoogleCredentials } from '@/lib/google-credentials'

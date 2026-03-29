@@ -126,7 +126,13 @@ describe('getCapacityHealth', () => {
     expect(getCapacityHealth(85)).toBe('high')
   })
 
-  it('returns overloaded for over 100%', () => {
-    expect(getCapacityHealth(110)).toBe('overloaded')
+  it('returns high for 100% utilization without overcommitment', () => {
+    expect(getCapacityHealth(100)).toBe('high')
+    expect(getCapacityHealth(110)).toBe('high')
+  })
+
+  it('returns overloaded only when explicitly overcommitted', () => {
+    expect(getCapacityHealth(100, true)).toBe('overloaded')
+    expect(getCapacityHealth(50, true)).toBe('overloaded')
   })
 })

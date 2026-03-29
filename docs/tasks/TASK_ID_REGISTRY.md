@@ -23,7 +23,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-006` | `to-do`          | `CODEX_TASK_Webhook_Infrastructure_MVP_v1`                         | `docs/tasks/to-do/TASK-006-webhook-infrastructure-mvp.md`               |
 | `TASK-007` | `complete`       | `CODEX_TASK_Lint_Debt_Burn_Down_v1`                                | `docs/tasks/complete/CODEX_TASK_Lint_Debt_Burn_Down_v1.md`              |
 | `TASK-008` | `to-do`          | `CODEX_TASK_Team_Identity_Capacity_System_v2`                      | `docs/tasks/to-do/TASK-008-team-identity-capacity-system.md`            |
-| `TASK-009` | `to-do`          | `CODEX_TASK_Greenhouse_Home_Nexa_v2`                               | `docs/tasks/to-do/TASK-009-greenhouse-home-nexa.md`                     |
+| `TASK-009` | `in-progress`    | `CODEX_TASK_Greenhouse_Home_Nexa_v2`                               | `docs/tasks/in-progress/TASK-009-greenhouse-home-nexa.md`               |
 | `TASK-010` | `to-do`          | `CODEX_TASK_Organization_Economics_Dashboard_v1`                   | `docs/tasks/to-do/TASK-010-organization-economics-dashboard.md`         |
 | `TASK-011` | `to-do`          | `CODEX_TASK_ICO_Person_360_Integration_v1`                         | `docs/tasks/to-do/TASK-011-ico-person-360-integration.md`               |
 | `TASK-012` | `to-do`          | `CODEX_TASK_Outbox_Event_Expansion_v1`                             | `docs/tasks/to-do/TASK-012-outbox-event-expansion.md`                   |
@@ -39,7 +39,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-022` | `to-do`          | `CODEX_TASK_Services_Runtime_Closure_v1`                           | `docs/tasks/to-do/TASK-022-services-runtime-closure.md`                 |
 | `TASK-023` | `to-do`          | `CODEX_TASK_Notification_System`                                   | `docs/tasks/to-do/TASK-023-notification-system.md`                      |
 | `TASK-024` | `to-do`          | `CODEX_TASK_Greenhouse_Login_Redesign`                             | `docs/tasks/to-do/TASK-024-greenhouse-login-redesign.md`                |
-| `TASK-025` | `to-do`          | `CODEX_TASK_HR_Payroll_Module_v2_DELTA_FTR`                        | `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`              |
+| `TASK-025` | `deferred`       | `CODEX_TASK_HR_Payroll_Module_v2_DELTA_FTR`                        | `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`              |
 | `TASK-026` | `to-do`          | `CODEX_TASK_HRIS_Contract_Type_Consolidation`                      | `docs/tasks/to-do/TASK-026-hris-contract-type-consolidation.md`         |
 | `TASK-027` | `to-do`          | `CODEX_TASK_HRIS_Document_Vault`                                   | `docs/tasks/to-do/TASK-027-hris-document-vault.md`                      |
 | `TASK-028` | `to-do`          | `CODEX_TASK_HRIS_Expense_Reports`                                  | `docs/tasks/to-do/TASK-028-hris-expense-reports.md`                     |
@@ -70,12 +70,79 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-052` | `to-do` | Person 360 Finance Access Alignment | `docs/tasks/to-do/TASK-052-person-360-finance-access-alignment.md` |
 | `TASK-053` | `to-do` | TanStack Table Migration Remaining | `docs/tasks/to-do/TASK-053-tanstack-table-migration-remaining.md` |
 | `TASK-054` | `to-do` | TanStack High Impact Remaining | `docs/tasks/to-do/TASK-054-tanstack-high-impact-remaining.md` |
-| `TASK-055` | `in-progress` | Finance Intelligence Cost Coverage Repair | `docs/tasks/in-progress/TASK-055-finance-intelligence-cost-coverage-repair.md` |
-| `TASK-056` | `in-progress` | Agency Team Capacity Semantics | `docs/tasks/in-progress/TASK-056-agency-team-capacity-semantics.md` |
+| `TASK-055` | `complete` | Finance Intelligence Cost Coverage Repair | `docs/tasks/complete/TASK-055-finance-intelligence-cost-coverage-repair.md` |
+| `TASK-056` | `complete` | Agency Team Capacity Semantics | `docs/tasks/complete/TASK-056-agency-team-capacity-semantics.md` |
+| `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
+| `TASK-058` | `complete` | Economic Indicators Runtime Layer | `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md` |
+
+| `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
+| `TASK-060` | `complete` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/complete/TASK-060-team-assignment-admin.md` |
+| `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
+| `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
+| `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
+| `TASK-064` | `complete` | ICO Assignee Attribution Remediation | `docs/tasks/complete/TASK-064-ico-assignee-attribution-remediation.md` |
+| `TASK-065` | `complete` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
+| `TASK-067` | `to-do` | Cost Intelligence Foundation | `docs/tasks/to-do/TASK-067-cost-intelligence-foundation.md` |
+| `TASK-068` | `to-do` | Period Closure Status Projection | `docs/tasks/to-do/TASK-068-period-closure-status-projection.md` |
+| `TASK-069` | `to-do` | Operational P&L Projection | `docs/tasks/to-do/TASK-069-operational-pl-projection.md` |
+| `TASK-070` | `to-do` | Cost Intelligence Finance UI | `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md` |
+| `TASK-071` | `to-do` | Cost Intelligence Cross-Module Consumers | `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` |
+| `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
+| `TASK-073` | `complete` | People Canonical Capacity Cutover | `docs/tasks/complete/TASK-073-people-canonical-capacity-cutover.md` |
+| `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
+
+| `TASK-075` | `complete` | Projected Payroll UX Polish | `docs/tasks/complete/TASK-075-projected-payroll-ux-polish.md` |
+
+| `TASK-076` | `complete` | Payroll Chile: Paridad con Liquidación Legal | `docs/tasks/complete/TASK-076-payroll-chile-liquidacion-parity.md` |
+
+| `TASK-077` | `complete` | Payroll Receipt Generation & Delivery | `docs/tasks/complete/TASK-077-payroll-receipt-generation-delivery.md` |
+
+| `TASK-078` | `complete` | Payroll Chile: Previsional Foundation & Forward Cutover | `docs/tasks/complete/TASK-078-payroll-chile-previsional-foundation.md` |
+| `TASK-079` | `to-do` | Payroll Chile: Reverse Calculation Engine | `docs/tasks/to-do/TASK-079-payroll-chile-reverse-calculation-engine.md` |
+
+| `TASK-080` | `complete` | ICO Person Intelligence Frontend + Event Wiring | `docs/tasks/complete/TASK-080-ico-person-intelligence-frontend.md` |
+| `TASK-081` | `complete` | Organization Legal Entity Canonicalization | `docs/tasks/complete/TASK-081-organization-legal-entity-canonicalization.md` |
 
 ## Siguiente ID disponible
 
-- `TASK-057`
+| `TASK-082` | `in-progress` | Compensation Drawer Chile UX Simplification | `docs/tasks/in-progress/TASK-082-compensation-drawer-chile-ux-simplification.md` |
+| `TASK-083` | `in-progress` | Compensation Drawer Enterprise UX Redesign | `docs/tasks/in-progress/TASK-083-compensation-drawer-enterprise-ux-redesign.md` |
+| `TASK-084` | `to-do` | Compensation Drawer Manual Mode UX Polish | `docs/tasks/to-do/TASK-084-compensation-drawer-manual-mode-ux-polish.md` |
+| `TASK-085` | `in-progress` | Compensation Chile Líquido-First Flow | `docs/tasks/in-progress/TASK-085-compensation-chile-liquido-first-flow.md` |
+| `TASK-086` | `complete` | Payroll Current Period View Logic Fix | `docs/tasks/complete/TASK-086-payroll-current-period-view-logic.md` |
+| `TASK-087` | `complete` | Payroll Lifecycle Invariants and Readiness Hardening | `docs/tasks/complete/TASK-087-payroll-lifecycle-invariants-and-readiness-hardening.md` |
+| `TASK-088` | `complete` | Payroll Reactive Projections and Delivery Hardening | `docs/tasks/complete/TASK-088-payroll-reactive-projections-and-delivery-hardening.md` |
+| `TASK-089` | `complete` | Payroll UX Semantics and Feedback Hardening | `docs/tasks/complete/TASK-089-payroll-ux-semantics-and-feedback-hardening.md` |
+| `TASK-090` | `complete` | Receipt Branding Efeonce + PDF Template Versioning | `docs/tasks/complete/TASK-090-receipt-branding-and-template-versioning.md` |
+| `TASK-091` | `complete` | Greenhouse Operational Calendar Utility | `docs/tasks/complete/TASK-091-greenhouse-operational-calendar-utility.md` |
+| `TASK-092` | `complete` | Payroll Operational Current Period Semantics | `docs/tasks/complete/TASK-092-payroll-operational-current-period-semantics.md` |
+| `TASK-093` | `complete` | Personnel Expense Data Consistency | `docs/tasks/complete/TASK-093-personnel-expense-data-consistency.md` |
+| `TASK-094` | `complete` | Payroll Close and CSV Download Separation | `docs/tasks/complete/TASK-094-payroll-close-and-csv-download-separation.md` |
+| `TASK-095` | `complete` | Centralized Email Delivery Layer | `docs/tasks/complete/TASK-095-centralized-email-delivery-layer.md` |
+| `TASK-097` | `complete` | Payroll Export Artifact Persistence and Resend | `docs/tasks/complete/TASK-097-payroll-export-artifact-persistence-and-resend.md` |
+
+| `TASK-096` | `to-do` | GCP Secret Management & Security Hardening | `docs/tasks/to-do/TASK-096-gcp-secret-management-security-hardening.md` |
+| `TASK-098` | `to-do` | Observability MVP (Sentry + Health + Slack Alerts) | `docs/tasks/to-do/TASK-098-observability-mvp.md` |
+| `TASK-099` | `to-do` | Security Headers & Next.js Middleware | `docs/tasks/to-do/TASK-099-security-headers-middleware.md` |
+| `TASK-100` | `to-do` | CI Pipeline: Add Test Step | `docs/tasks/to-do/TASK-100-ci-pipeline-test-step.md` |
+| `TASK-101` | `to-do` | Cron Auth Standardization | `docs/tasks/to-do/TASK-101-cron-auth-standardization.md` |
+| `TASK-102` | `to-do` | Database Resilience Baseline | `docs/tasks/to-do/TASK-102-database-resilience-baseline.md` |
+| `TASK-103` | `to-do` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
+| `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
+| `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
+| `TASK-106` | `complete` | Email Delivery Admin UI | `docs/tasks/complete/TASK-106-email-delivery-admin-ui.md` |
+| `TASK-107` | `to-do` | Auth Email Verification Request Flow | `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md` |
+| `TASK-108` | `in-progress` | Admin Center Governance Shell | `docs/tasks/in-progress/TASK-108-admin-center-governance-shell.md` |
+| `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
+| `TASK-110` | `to-do` | Nexa: assistant-ui Feature Adoption | `docs/tasks/to-do/TASK-110-nexa-assistant-ui-features.md` |
+| `TASK-111` | `to-do` | Admin Center Secret Ref Governance UI | `docs/tasks/to-do/TASK-111-admin-center-secret-ref-governance-ui.md` |
+| `TASK-112` | `to-do` | Admin Center Integration Health and Freshness UI | `docs/tasks/to-do/TASK-112-admin-center-integration-health-freshness-ui.md` |
+| `TASK-113` | `to-do` | Admin Center Ops Audit Trail UI | `docs/tasks/to-do/TASK-113-admin-center-ops-audit-trail-ui.md` |
+| `TASK-114` | `to-do` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/to-do/TASK-114-nexa-backend-persistence-suggestions.md` |
+| `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
+| `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
+| `TASK-117` | `to-do` | Payroll Last Business Day Auto-Calculation | `docs/tasks/to-do/TASK-117-payroll-last-business-day-auto-calculation.md` |
+| `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
 
 ## Regla de asignacion desde aqui
 

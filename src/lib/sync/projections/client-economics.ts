@@ -145,7 +145,8 @@ export const CLIENT_ECONOMICS_TRIGGER_EVENTS = [
   'payroll_period.updated',
   'payroll_entry.upserted',
   'payroll_period.calculated',
-  'payroll_period.approved'
+  'payroll_period.approved',
+  'payroll_period.exported'
 ] as const
 
 export const clientEconomicsProjection: ProjectionDefinition = {

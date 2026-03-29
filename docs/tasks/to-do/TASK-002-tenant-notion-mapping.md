@@ -12,6 +12,35 @@
 
 ---
 
+## Delta 2026-03-28 — Auditoría de implementación
+
+### Lo que ya está implementado
+
+| Criterio | Estado | Evidencia |
+|----------|--------|-----------|
+| Tabla `space_notion_sources` | **Hecho** | `scripts/setup-postgres-space-notion-sources.sql` — DDL completo, seed Efeonce, RBAC grants |
+| `space_id` en delivery tables | **Hecho** | `sync-notion-conformed.ts` estampa `space_id` en `delivery_projects`, `delivery_tasks`, `delivery_sprints` |
+| TypeScript types | **Hecho** | `src/types/space-notion.ts` — `SpaceNotionSource`, `SpaceNotionSourceRow` |
+| Store de acceso | **Hecho** | `src/lib/space-notion/space-notion-store.ts` — `getSpaceNotionSource()`, `getSpaceNotionSourceByClientId()`, `getActiveSpaceNotionSources()` |
+| Nuevo código usa `space_id` | **Hecho** | `tenant-member-provisioning.ts` y `sync-notion-conformed.ts` resuelven por `space_id` first |
+
+### Lo que falta para cerrar
+
+| Gap | Archivo | Cambio requerido |
+|-----|---------|-----------------|
+| **Queries UNNEST legacy en Sprints** | `src/lib/sprints/sprint-store.ts` (5 ocurrencias) | Migrar `WHERE project_source_id IN UNNEST(@projectIds)` a `WHERE space_id = @spaceId` |
+| **Queries UNNEST legacy en Projects** | `src/lib/projects/get-projects-overview.ts` (3 ocurrencias) | Mismo patrón — migrar a `space_id` |
+| **Fallback a `notion_project_ids`** | `src/lib/admin/tenant-member-provisioning.ts` (líneas 147-170) | Eliminar fallback legacy una vez que todos los consumers usen `space_id` |
+| **BigQuery schema deprecation** | `greenhouse.clients.notion_project_ids` | Marcar como deprecated con `ALTER TABLE ... SET OPTIONS` (no eliminar aún) |
+| **Pipeline externo multi-tenant** | Repo `cesargrowth11/notion-bigquery` | Fuera de scope de `greenhouse-eo` — iterar como config de `space_notion_sources` por Space |
+| **Docs de arquitectura** | `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`, `GREENHOUSE_DATA_MODEL_MASTER_V1.md` | Actualizar referencia `space_source_bindings` → `space_notion_sources` (nombre real de la tabla) |
+
+### Regla de lectura
+
+- Los slices 3.1 (tabla), 3.3 (`space_id` en delivery), 4 (types) están cerrados
+- Los slices 3.2 (deprecar `notion_project_ids`), 3.4 (pipeline multi-tenant), 3.5 (migrar queries) están parciales
+- La task no se puede cerrar hasta que `sprint-store.ts` y `projects-overview.ts` dejen de usar `UNNEST(@projectIds)` como path principal
+
 ## Estado 2026-03-18
 
 Esta task sigue viva, pero ya no describe un greenfield puro.

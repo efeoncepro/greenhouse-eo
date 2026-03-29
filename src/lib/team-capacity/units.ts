@@ -93,8 +93,8 @@ export const buildCapacityEnvelope = ({
   }
 }
 
-export const getCapacityHealth = (utilizationPercent: number): TeamCapacityHealth => {
-  if (utilizationPercent >= 100) {
+export const getCapacityHealth = (utilizationPercent: number, overcommitted?: boolean): TeamCapacityHealth => {
+  if (overcommitted) {
     return 'overloaded'
   }
 

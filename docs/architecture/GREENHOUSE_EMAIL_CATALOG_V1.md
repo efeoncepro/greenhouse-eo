@@ -10,6 +10,13 @@ La relacion correcta entre ambas es:
 - `CODEX_TASK_Transactional_Email_System.md` define la infraestructura base de envio, tokens, templates y flows de acceso
 - esta task define el catalogo mas amplio de emails que Greenhouse necesitara como portal ejecutivo-operativo
 
+## Delta 2026-03-28
+
+- `TASK-095` quedó implementada como capa unificada de delivery sobre Resend en `src/lib/email/delivery.ts`.
+- Los callers de Auth, NotificationService y Payroll ya consumen `sendEmail()` con templates centralizados y persistencia unificada en `greenhouse_notifications.email_deliveries`.
+- `NotificationEmail` reemplaza el plain text ad hoc para el canal `notification`, y `email_subscriptions` queda como resolver canónico para recipientes por tipo.
+- El retry cron `/api/cron/email-delivery-retry` usa `delivery_payload` para reintentar entregas fallidas con máximo 3 intentos dentro de 1 hora.
+
 ## Resumen
 
 Greenhouse ya necesita una capa de email mas amplia que el baseline de:
@@ -154,6 +161,11 @@ Emails ligados a capacidades o modulos especificos, pero solo cuando el evento i
 - `leave_request_rejected`
 - `payroll_period_approved`
 - `payroll_export_ready`
+
+Notas:
+- `payroll_period_approved` se usa como aviso de estado listo para exportar/revisar.
+- `payroll_export_ready` debe entenderse como notificación downstream de cierre/exportación canonica de nómina, disparada desde `payroll_period.exported`, y puede incluir CSV/PDF adjuntos o enlaces seguros al portal.
+- el reenvío de `payroll_export_ready` reutiliza el paquete documental persistido del período exportado; no debe volver a cerrar la nómina ni depender de un click de descarga manual
 
 ### AI Tooling
 

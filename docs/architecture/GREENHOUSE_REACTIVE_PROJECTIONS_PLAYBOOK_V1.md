@@ -4,6 +4,12 @@
 
 Este playbook documenta cómo registrar, operar y monitorear proyecciones reactivas en Greenhouse. El sistema permite que cualquier módulo declare qué eventos de dominio invalidan sus snapshots serving, y el consumer reactivo se encarga del refresh en tiempo real.
 
+`payroll_receipts_delivery` ya está definido como la primera proyección operativa del dominio Payroll sobre `payroll_period.exported`.
+
+La implementación actual ya publica el evento, lo enruta por el projection registry y genera la entrega de recibos, pero la cola persistente todavía debe terminar de cerrar su ciclo operativo para que la durabilidad sea literal y no solo conceptual.
+
+Operativamente, Payroll puede hacer un flush inmediato del dominio `notifications` al cerrar un período para no depender exclusivamente del cron. Ese flush sigue siendo best-effort: el cron de `outbox-publish` y `outbox-react` continúa como safety net, y el ledger `outbox_reactive_log` conserva la idempotencia para evitar reenvíos al repetir el procesamiento.
+
 ## Architecture
 
 ```
@@ -119,6 +125,14 @@ The catch-all `/api/cron/outbox-react` still works for processing ALL domains se
 ## Refresh Queue
 
 The persistent queue (`greenhouse_sync.projection_refresh_queue`) ensures refresh intents survive outbox event expiration.
+The reactive consumer also persists `greenhouse_sync.outbox_reactive_log` as its idempotency / retry ledger. The ledger is keyed by `(event_id, handler)` so each projection handler can react independently to the same outbox event; both tables are part of the shared reactive control plane and should be provisioned up front.
+
+Current hardening note:
+
+- la cola persistente ya cierra su ciclo con completion/failure observables y sigue siendo la referencia operacional de durabilidad
+- `projected_payroll` y `payroll_receipts_delivery` son los consumidores de referencia de este control plane
+- `payroll_export_ready_notification` usa el paquete documental persistido del período exportado cuando está disponible; eso desacopla el mail downstream del click de descarga y evita regeneraciones innecesarias
+- el contrato operacional sigue siendo: intents persistentes, ledger reactivo idempotente y observabilidad por queue health
 
 ### How it works
 

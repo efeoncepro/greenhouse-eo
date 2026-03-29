@@ -14,9 +14,26 @@ import Typography from '@mui/material/Typography'
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import { formatCurrency, formatFactor, formatPercent } from './helpers'
 
+type EmployerInfo = {
+  legalName: string
+  taxId?: string
+  legalAddress?: string
+}
+
 type Props = {
   entry: PayrollEntry
   period: PayrollPeriod
+  employerInfo?: EmployerInfo
+}
+
+type PayrollEntryWithAllowances = PayrollEntry & {
+  chileColacionAmount?: number | null
+  chileMovilizacionAmount?: number | null
+  chileColacion?: number | null
+  chileMovilizacion?: number | null
+  colacionAmount?: number | null
+  movilizacionAmount?: number | null
+  totalHaberesNoImponibles?: number | null
 }
 
 const MONTH_NAMES = [
@@ -31,11 +48,29 @@ const ReceiptRow = ({ label, value, bold }: { label: string; value: string; bold
   </TableRow>
 )
 
-const PayrollReceiptCard = ({ entry, period }: Props) => {
+const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
   const monthName = MONTH_NAMES[period.month - 1] ?? String(period.month)
   const currency = entry.currency
   const isChile = entry.payRegime === 'chile'
   const hasAttendanceAdjustment = entry.adjustedBaseSalary != null && entry.adjustedBaseSalary !== entry.baseSalary
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
+  const entryWithAllowances = entry as PayrollEntryWithAllowances
+
+  const colacion =
+    entryWithAllowances.chileColacionAmount ??
+    entryWithAllowances.chileColacion ??
+    entryWithAllowances.colacionAmount ??
+    0
+
+  const movilizacion =
+    entryWithAllowances.chileMovilizacionAmount ??
+    entryWithAllowances.chileMovilizacion ??
+    entryWithAllowances.movilizacionAmount ??
+    0
+
+  const afpCotizacion = entry.chileAfpCotizacionAmount ?? null
+  const afpComision = entry.chileAfpComisionAmount ?? null
+  const hasAfpSplit = (afpCotizacion ?? 0) > 0 || (afpComision ?? 0) > 0
 
   // Build haberes rows
   const haberesRows: [string, string][] = [
@@ -50,6 +85,30 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
 
   if (hasAttendanceAdjustment && entry.adjustedRemoteAllowance != null) {
     haberesRows.push(['Teletrabajo ajustado (por inasistencia)', formatCurrency(entry.adjustedRemoteAllowance, currency)])
+  }
+
+  if (entry.fixedBonusAmount > 0) {
+    haberesRows.push([
+      entry.fixedBonusLabel ? `Bono fijo (${entry.fixedBonusLabel})` : 'Bono fijo',
+      formatCurrency(entry.fixedBonusAmount, currency)
+    ])
+  }
+
+  if (entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount) {
+    haberesRows.push([
+      entry.fixedBonusLabel
+        ? `Bono fijo ajustado (${entry.fixedBonusLabel})`
+        : 'Bono fijo ajustado (por inasistencia)',
+      formatCurrency(effectiveFixedBonusAmount, currency)
+    ])
+  }
+
+  if (colacion > 0) {
+    haberesRows.push(['Colación', formatCurrency(colacion, currency)])
+  }
+
+  if (movilizacion > 0) {
+    haberesRows.push(['Movilización', formatCurrency(movilizacion, currency)])
   }
 
   haberesRows.push(
@@ -71,12 +130,27 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
   ] : []
 
   // Deduction rows (Chile only)
-  const deductionRows: [string, string][] = isChile ? [
-    [`AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`, formatCurrency(entry.chileAfpAmount, currency)],
-    [`Salud (${entry.chileHealthSystem ?? '—'})`, formatCurrency(entry.chileHealthAmount, currency)],
-    [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, formatCurrency(entry.chileUnemploymentAmount, currency)],
-    ['Impuesto único', formatCurrency(entry.chileTaxAmount, currency)]
-  ] : []
+  const deductionRows: [string, string][] = []
+
+  if (isChile) {
+    deductionRows.push([
+      `AFP ${entry.chileAfpName ?? ''} (${entry.chileAfpRate != null ? (entry.chileAfpRate * 100).toFixed(2) : '—'}%)`,
+      formatCurrency(entry.chileAfpAmount, currency)
+    ])
+
+    if (hasAfpSplit) {
+      deductionRows.push(
+        ['↳ Cotización', formatCurrency(afpCotizacion, currency)],
+        ['↳ Comisión', formatCurrency(afpComision, currency)]
+      )
+    }
+
+    deductionRows.push(
+      [`Salud (${entry.chileHealthSystem ?? '—'})`, formatCurrency(entry.chileHealthAmount, currency)],
+      [`Seguro cesantía (${entry.chileUnemploymentRate != null ? (entry.chileUnemploymentRate * 100).toFixed(1) : '—'}%)`, formatCurrency(entry.chileUnemploymentAmount, currency)],
+      ['Impuesto único', formatCurrency(entry.chileTaxAmount, currency)]
+    )
+  }
 
   if (isChile && entry.chileApvAmount != null && entry.chileApvAmount > 0) {
     deductionRows.push(['APV', formatCurrency(entry.chileApvAmount, currency)])
@@ -88,8 +162,15 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
           <Box>
-            <Typography variant='h5' sx={{ color: '#2E7D32', fontWeight: 700 }}>Greenhouse EO</Typography>
-            <Typography variant='body2' color='text.secondary'>Recibo de remuneraciones</Typography>
+            <Box component='img' src='/branding/logo-full.svg' alt='Efeonce' sx={{ height: 28, display: 'block', mb: 0.5 }} />
+            <Typography variant='caption' display='block' color='text.secondary'>
+              {employerInfo?.legalName ?? 'Efeonce Group SpA'}
+              {employerInfo?.taxId ? ` · RUT ${employerInfo.taxId}` : ''}
+            </Typography>
+            {employerInfo?.legalAddress && (
+              <Typography variant='caption' display='block' color='text.secondary'>{employerInfo.legalAddress}</Typography>
+            )}
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>Recibo de remuneraciones</Typography>
           </Box>
           <Box sx={{ textAlign: 'right' }}>
             <Typography variant='h6'>{monthName} {period.year}</Typography>
@@ -97,7 +178,7 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: '#2E7D32', borderWidth: 1, mb: 3 }} />
+        <Divider sx={{ borderColor: '#023c70', borderWidth: 1, mb: 3 }} />
 
         {/* Employee info */}
         <Typography variant='subtitle2' sx={{ mb: 1.5 }}>Datos del colaborador</Typography>
@@ -165,7 +246,7 @@ const PayrollReceiptCard = ({ entry, period }: Props) => {
         {/* Net total */}
         <Box
           sx={{
-            bgcolor: '#2E7D32',
+            bgcolor: '#023c70',
             color: '#fff',
             borderRadius: 1,
             display: 'flex',

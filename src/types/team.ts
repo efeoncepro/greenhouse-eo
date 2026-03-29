@@ -196,6 +196,7 @@ export interface CreateMemberInput {
 
 export interface UpdateMemberInput extends Partial<CreateMemberInput> {
   active?: boolean
+  assignable?: boolean
 }
 
 export interface CreateAssignmentInput {

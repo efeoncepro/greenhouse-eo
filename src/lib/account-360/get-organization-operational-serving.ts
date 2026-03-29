@@ -80,10 +80,12 @@ export const ensureOrganizationOperationalSchema = async (): Promise<void> => {
     )
 
     const existing = new Set(rows.map(row => row.qualified_name))
+
     const required = [
       'greenhouse_serving.ico_organization_metrics',
       'greenhouse_serving.organization_operational_metrics'
     ]
+
     const missing = required.filter(name => !existing.has(name))
 
     if (missing.length > 0) {

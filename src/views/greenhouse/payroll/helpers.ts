@@ -1,4 +1,4 @@
-import type { PayrollCurrency, PeriodStatus, PayRegime } from '@/types/payroll'
+import type { PayrollCurrency, PayrollEntry, PeriodStatus, PayRegime } from '@/types/payroll'
 
 // ── Currency formatting ──────────────────────────────────────────────
 
@@ -20,6 +20,43 @@ export const formatCurrency = (amount: number | null | undefined, currency: Payr
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(amount)
+}
+
+export const buildPayrollCurrencySummary = (
+  entries: PayrollEntry[],
+  selectAmount: (entry: PayrollEntry) => number
+): {
+  hasMixedCurrency: boolean
+  primaryCurrency: PayrollCurrency
+  totals: Record<PayrollCurrency, number>
+  summaryLabel: string
+} => {
+  const totals = entries.reduce<Record<PayrollCurrency, number>>(
+    (acc, entry) => {
+      acc[entry.currency] += selectAmount(entry)
+
+      return acc
+    },
+    { CLP: 0, USD: 0 }
+  )
+
+  const currencies = (['CLP', 'USD'] as const).filter(currency =>
+    entries.some(entry => entry.currency === currency)
+  )
+
+  const primaryCurrency = currencies[0] ?? 'CLP'
+  const hasMixedCurrency = currencies.length > 1
+
+  const summaryLabel = hasMixedCurrency
+    ? currencies.map(currency => `${currency}: ${formatCurrency(totals[currency], currency)}`).join(' · ')
+    : formatCurrency(totals[primaryCurrency], primaryCurrency)
+
+  return {
+    hasMixedCurrency,
+    primaryCurrency,
+    totals,
+    summaryLabel
+  }
 }
 
 export const formatPercent = (value: number | null | undefined): string => {

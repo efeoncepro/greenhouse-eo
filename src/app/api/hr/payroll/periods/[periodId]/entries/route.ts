@@ -16,6 +16,15 @@ export async function GET(_: Request, { params }: { params: Promise<{ periodId: 
   try {
     const { periodId } = await params
     const entries = await getPayrollEntries(periodId)
+    const currencies = [...new Set(entries.map(entry => entry.currency))]
+
+    const totalsByCurrency = currencies.map(currency => ({
+      currency,
+      gross: entries.filter(entry => entry.currency === currency).reduce((sum, entry) => sum + entry.grossTotal, 0),
+      net: entries.filter(entry => entry.currency === currency).reduce((sum, entry) => sum + entry.netTotal, 0)
+    }))
+
+    const singleCurrencyTotals = totalsByCurrency.length === 1 ? totalsByCurrency[0] : null
 
     return NextResponse.json({
       entries,
@@ -23,8 +32,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ periodId: 
         total: entries.length,
         manualKpiEntries: entries.filter(entry => entry.kpiDataSource === 'manual').length,
         manualOverrideEntries: entries.filter(entry => entry.manualOverride).length,
-        totalGross: entries.reduce((sum, entry) => sum + entry.grossTotal, 0),
-        totalNet: entries.reduce((sum, entry) => sum + entry.netTotal, 0)
+        mixedCurrency: totalsByCurrency.length > 1,
+        totalsByCurrency,
+        totalGross: singleCurrencyTotals?.gross ?? null,
+        totalNet: singleCurrencyTotals?.net ?? null
       }
     })
   } catch (error) {

@@ -205,6 +205,15 @@ const ServiceDetailView = ({ serviceId }: Props) => {
     load()
   }, [serviceId])
 
+  const historyTable = useReactTable({
+    data: detail?.history ?? [],
+    columns: historyColumns,
+    state: { sorting: historySorting },
+    onSortingChange: setHistorySorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
@@ -225,15 +234,6 @@ const ServiceDetailView = ({ serviceId }: Props) => {
   }
 
   const amountRemaining = (detail.totalCost ?? 0) - (detail.amountPaid ?? 0)
-
-  const historyTable = useReactTable({
-    data: detail.history,
-    columns: historyColumns,
-    state: { sorting: historySorting },
-    onSortingChange: setHistorySorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel()
-  })
 
   return (
     <Grid container spacing={6}>

@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { checkRateLimit, generateToken, storeToken } from '@/lib/auth-tokens'
-import { logEmail } from '@/lib/email-log'
+import { sendEmail } from '@/lib/email/delivery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { resend, EMAIL_FROM } from '@/lib/resend'
-
-import PasswordResetEmail from '@/emails/PasswordResetEmail'
 
 const GENERIC_MESSAGE = 'Si tu email está registrado, recibirás un enlace para restablecer tu contraseña.'
 
@@ -94,32 +91,23 @@ export async function POST(request: Request) {
       // This also handles cases where the stored email domain lacks MX records.
       const sendTo = normalizedEmail
 
-      try {
-        const result = await resend.emails.send({
-          from: EMAIL_FROM,
-          to: sendTo,
-          subject: 'Restablece tu contraseña — Greenhouse',
-          react: PasswordResetEmail({ resetUrl, userName: user.full_name ?? undefined })
-        })
+      const delivery = await sendEmail({
+        emailType: 'password_reset',
+        domain: 'identity',
+        recipients: [{
+          email: sendTo,
+          userId: user.user_id,
+          name: user.full_name ?? undefined
+        }],
+        context: {
+          resetUrl,
+          userName: user.full_name ?? undefined
+        },
+        sourceEntity: 'auth_tokens'
+      })
 
-        await logEmail({
-          email_to: sendTo,
-          email_type: 'password_reset',
-          user_id: user.user_id,
-          client_id: user.client_id ?? undefined,
-          status: 'sent',
-          resend_id: result.data?.id
-        })
-      } catch (err) {
-        console.error('[forgot-password] Resend error:', err)
-
-        await logEmail({
-          email_to: sendTo,
-          email_type: 'password_reset',
-          user_id: user.user_id,
-          status: 'failed',
-          error_message: err instanceof Error ? err.message : 'Unknown error'
-        })
+      if (delivery.status === 'failed') {
+        console.error('[forgot-password] Email delivery failed:', delivery.error)
       }
     }
 

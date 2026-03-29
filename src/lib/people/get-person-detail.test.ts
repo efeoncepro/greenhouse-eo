@@ -96,11 +96,12 @@ vi.mock('@/lib/person-360/get-person-profile', () => ({
   getPersonProfileByMemberId: vi.fn(async () => null)
 }))
 
-vi.mock('@/lib/team-capacity/shared', () => ({
-  getAssignedHoursMonth: () => 0,
-  getCapacityHealth: () => 'unknown',
-  getExpectedMonthlyThroughput: () => 0,
-  getUtilizationPercent: () => 0
+vi.mock('@/lib/member-capacity-economics/store', () => ({
+  readLatestMemberCapacityEconomicsSnapshot: vi.fn().mockResolvedValue(null)
+}))
+
+vi.mock('@/lib/person-intelligence/store', () => ({
+  readPersonIntelligence: vi.fn().mockResolvedValue(null)
 }))
 
 import { getPersonDetail } from '@/lib/people/get-person-detail'

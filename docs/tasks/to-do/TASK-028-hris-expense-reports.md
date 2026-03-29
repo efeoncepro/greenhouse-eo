@@ -1,5 +1,15 @@
 # CODEX TASK — HRIS Fase 2A: Expense Reports (Gastos y Reembolsos)
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **Tabla de approval**: NO existe `greenhouse_hr.approval_actions` genérica. El patrón actual es tablas dedicadas por dominio (`leave_request_actions`). Crear `greenhouse_hr.expense_report_actions` con el mismo schema (action_id, report_id, action, actor_user_id, actor_member_id, actor_name, notes, created_at).
+- **Finance integration**: NO usar SQL directo para crear expense en Finance. Usar `createFinanceExpenseInPostgres()` de `src/lib/finance/postgres-store-slice2.ts` — maneja cost allocation, exchange rates, CLP conversion, audit fields, y emite `finance.expense.created` automáticamente.
+- **Outbox events obligatorios**: registrar en `src/lib/sync/event-catalog.ts`:
+  - Aggregate type: `expenseReport`
+  - Eventos: `hr.expense_report.submitted`, `hr.expense_report.approved`, `hr.expense_report.rejected`, `hr.expense_report.reimbursed`
+- **Notifications**: usar `NotificationService.dispatch()` (`src/lib/notifications/notification-service.ts`) para notificar a supervisor/finance en cada transición de estado. El pattern ya soporta canal email via Resend.
+- **Cost Intelligence downstream**: expenses reembolsados entran a Cost Intelligence via el evento existente `finance.expense.created` — no requiere wiring adicional.
+
 ## Resumen
 
 Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permite a colaboradores con contrato laboral (indefinido/plazo fijo) solicitar reembolsos de gastos con comprobantes, que pasan por un flujo de aprobación supervisor → finance y se integran con el Finance Module al momento del reembolso.

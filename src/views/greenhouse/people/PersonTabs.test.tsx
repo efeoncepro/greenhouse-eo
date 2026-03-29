@@ -108,6 +108,8 @@ const detail: PersonDetail = {
   },
   summary: {
     activeAssignments: 1,
+    contractedFte: 1,
+    assignedFte: 1,
     totalFte: 1,
     totalHoursMonth: 160
   },

@@ -165,6 +165,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           icon: 'tabler-receipt'
         },
         {
+          label: <NavLabel label='Nómina Proyectada' subtitle='Simulación y previsión' show={showSub} />,
+          href: '/hr/payroll/projected',
+          icon: 'tabler-calculator'
+        },
+        {
           label: <NavLabel label={GH_HR_NAV.departments.label} subtitle={GH_HR_NAV.departments.subtitle} show={showSub} />,
           href: '/hr/departments',
           icon: 'tabler-sitemap'
@@ -240,14 +245,18 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   // ── Administración (submenu — 5 children) ───────────────────────────
   if (isAdminUser) {
     menuData.push({
-      label: 'Administración',
+      label: GH_INTERNAL_NAV.adminCenter.label,
       icon: 'tabler-shield-lock',
       children: [
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminCenter.label} subtitle={GH_INTERNAL_NAV.adminCenter.subtitle} show={showSub} />, href: '/admin' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminTenants.label} subtitle={GH_INTERNAL_NAV.adminTenants.subtitle} show={showSub} />, href: '/admin/tenants' },
-        { label: <NavLabel label={GH_INTERNAL_NAV.adminTeam.label} subtitle={GH_INTERNAL_NAV.adminTeam.subtitle} show={showSub} />, href: '/admin/team' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminUsers.label} subtitle={GH_INTERNAL_NAV.adminUsers.subtitle} show={showSub} />, href: '/admin/users' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminRoles.label} subtitle={GH_INTERNAL_NAV.adminRoles.subtitle} show={showSub} />, href: '/admin/roles' },
-        { label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />, href: '/admin/ai-tools' }
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminTeam.label} subtitle={GH_INTERNAL_NAV.adminTeam.subtitle} show={showSub} />, href: '/admin/team' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminCorreos.label} subtitle={GH_INTERNAL_NAV.adminCorreos.subtitle} show={showSub} />, href: '/admin/email-delivery' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />, href: '/admin/ai-tools' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminCloudIntegrations.label} subtitle={GH_INTERNAL_NAV.adminCloudIntegrations.subtitle} show={showSub} />, href: '/admin/cloud-integrations' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminOpsHealth.label} subtitle={GH_INTERNAL_NAV.adminOpsHealth.subtitle} show={showSub} />, href: '/admin/ops-health' }
       ]
     })
   }

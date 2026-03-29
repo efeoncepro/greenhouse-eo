@@ -1,10 +1,20 @@
 import 'server-only'
 
-import type { BonusProrationConfig, CompensationVersion, PayrollCalculationResult, PayrollEntry, PayrollKpiSnapshot } from '@/types/payroll'
+import type {
+  BonusProrationConfig,
+  CompensationVersion,
+  PayrollCalculationResult,
+  PayrollEntry,
+  PayrollKpiSnapshot,
+  PayrollProjectionContext
+} from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
+import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
+import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
@@ -21,6 +31,7 @@ import {
 } from '@/lib/payroll/shared'
 import {
   isPayrollPostgresEnabled,
+  pgDeleteStalePayrollEntries,
   pgGetActiveBonusConfig,
   pgSetPeriodCalculated
 } from '@/lib/payroll/postgres-store'
@@ -29,26 +40,31 @@ type BonusConfigRow = {
   otd_threshold: number | string | null
   rpa_threshold: number | string | null
   otd_floor: number | string | null
+  rpa_full_payout_threshold: number | string | null
+  rpa_soft_band_end: number | string | null
+  rpa_soft_band_floor_factor: number | string | null
 }
 
 const getProjectId = () => getBigQueryProjectId()
 
 const getBonusConfigForDate = async (periodEnd: string): Promise<BonusProrationConfig> => {
   if (isPayrollPostgresEnabled()) {
-    const config = await pgGetActiveBonusConfig()
+    const config = await pgGetActiveBonusConfig(periodEnd)
 
-    return {
-      otdThreshold: config?.otdThreshold ?? 94,
-      otdFloor: config?.otdFloor ?? 70,
-      rpaThreshold: config?.rpaThreshold ?? 3
-    }
+    return normalizeBonusProrationConfig(config)
   }
 
   const projectId = getProjectId()
 
   const [row] = await runPayrollQuery<BonusConfigRow>(
     `
-      SELECT otd_threshold, rpa_threshold, otd_floor
+      SELECT
+        otd_threshold,
+        rpa_threshold,
+        otd_floor,
+        rpa_full_payout_threshold,
+        rpa_soft_band_end,
+        rpa_soft_band_floor_factor
       FROM \`${projectId}.greenhouse.payroll_bonus_config\`
       WHERE effective_from <= DATE(@periodEnd)
       ORDER BY effective_from DESC
@@ -57,11 +73,27 @@ const getBonusConfigForDate = async (periodEnd: string): Promise<BonusProrationC
     { periodEnd }
   )
 
-  return {
-    otdThreshold: row ? toNumber(row.otd_threshold) : 94,
-    otdFloor: row?.otd_floor != null ? toNumber(row.otd_floor) : 70,
-    rpaThreshold: row ? toNumber(row.rpa_threshold) : 3
-  }
+  return normalizeBonusProrationConfig(
+    row
+      ? {
+          otdThreshold: toNumber(row.otd_threshold),
+          otdFloor: row.otd_floor != null ? toNumber(row.otd_floor) : DEFAULT_BONUS_PRORATION_CONFIG.otdFloor,
+          rpaThreshold: toNumber(row.rpa_threshold),
+          rpaFullPayoutThreshold:
+            row.rpa_full_payout_threshold != null
+              ? toNumber(row.rpa_full_payout_threshold)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaFullPayoutThreshold,
+          rpaSoftBandEnd:
+            row.rpa_soft_band_end != null
+              ? toNumber(row.rpa_soft_band_end)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandEnd,
+          rpaSoftBandFloorFactor:
+            row.rpa_soft_band_floor_factor != null
+              ? toNumber(row.rpa_soft_band_floor_factor)
+              : DEFAULT_BONUS_PRORATION_CONFIG.rpaSoftBandFloorFactor
+        }
+      : undefined
+  )
 }
 
 type AttendanceSnapshot = {
@@ -74,8 +106,40 @@ type AttendanceSnapshot = {
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
-const buildPayrollEntry = ({
+const resolvePayrollPeriodIndicators = async ({
   periodId,
+  periodUfValue,
+  taxTableVersion,
+  indicatorPeriodDate
+}: {
+  periodId: string
+  periodUfValue: number | null
+  taxTableVersion: string | null
+  indicatorPeriodDate?: string | null
+}) => {
+  const { periodEnd } = getPeriodRangeFromId(periodId)
+  const resolvedIndicatorDate = indicatorPeriodDate || periodEnd
+
+  const ufValue = typeof periodUfValue === 'number'
+    ? periodUfValue
+    : (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UF',
+        periodDate: resolvedIndicatorDate
+      }))?.value ?? null
+
+  const utmValue = taxTableVersion
+    ? (await getHistoricalEconomicIndicatorForPeriod({
+        indicatorCode: 'UTM',
+        periodDate: resolvedIndicatorDate
+      }))?.value ?? null
+    : null
+
+  return { ufValue, utmValue }
+}
+
+export const buildPayrollEntry = async ({
+  periodId,
+  periodDate,
   compensation,
   ufValue,
   bonusConfig,
@@ -83,12 +147,13 @@ const buildPayrollEntry = ({
   attendance
 }: {
   periodId: string
+  periodDate: string
   compensation: CompensationVersion
   ufValue: number | null
   bonusConfig: BonusProrationConfig
   kpi: PayrollKpiSnapshot | null
   attendance: AttendanceSnapshot | null
-}): PayrollEntry => {
+}): Promise<PayrollEntry> => {
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
 
@@ -111,15 +176,33 @@ const buildPayrollEntry = ({
     ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
     : compensation.remoteAllowance
 
-  const totals = calculatePayrollTotals({
+  const adjustedColacionAmount = deductibleDays > 0
+    ? roundCurrency((compensation.colacionAmount ?? 0) * attendanceRatio)
+    : (compensation.colacionAmount ?? 0)
+
+  const adjustedMovilizacionAmount = deductibleDays > 0
+    ? roundCurrency((compensation.movilizacionAmount ?? 0) * attendanceRatio)
+    : (compensation.movilizacionAmount ?? 0)
+
+  const adjustedFixedBonusAmount = deductibleDays > 0
+    ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
+    : compensation.fixedBonusAmount
+
+  const totals = await calculatePayrollTotals({
     payRegime: compensation.payRegime,
     baseSalary: adjustedBaseSalary,
     remoteAllowance: adjustedRemoteAllowance,
+    colacionAmount: adjustedColacionAmount,
+    movilizacionAmount: adjustedMovilizacionAmount,
+    fixedBonusAmount: adjustedFixedBonusAmount,
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
+    gratificacionLegalMode: compensation.gratificacionLegalMode,
     afpName: compensation.afpName,
     afpRate: compensation.afpRate,
+    afpCotizacionRate: compensation.afpCotizacionRate,
+    afpComisionRate: compensation.afpComisionRate,
     healthSystem: compensation.healthSystem,
     healthPlanUf: compensation.healthPlanUf,
     unemploymentRate: compensation.unemploymentRate,
@@ -127,7 +210,8 @@ const buildPayrollEntry = ({
     hasApv: compensation.hasApv,
     apvAmount: compensation.apvAmount,
     ufValue,
-    taxAmount: 0
+    taxAmount: 0,
+    periodDate
   })
 
   return {
@@ -142,6 +226,10 @@ const buildPayrollEntry = ({
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
     remoteAllowance: compensation.remoteAllowance,
+    colacionAmount: compensation.colacionAmount,
+    movilizacionAmount: compensation.movilizacionAmount,
+    fixedBonusLabel: compensation.fixedBonusLabel,
+    fixedBonusAmount: compensation.fixedBonusAmount,
     kpiOtdPercent,
     kpiRpaAvg,
     kpiOtdQualifies: otdResult.qualifies,
@@ -160,8 +248,19 @@ const buildPayrollEntry = ({
     chileAfpName: totals.chileAfpName,
     chileAfpRate: totals.chileAfpRate,
     chileAfpAmount: totals.chileAfpAmount,
+    chileAfpCotizacionAmount: totals.chileAfpCotizacionAmount,
+    chileAfpComisionAmount: totals.chileAfpComisionAmount,
+    chileGratificacionLegalAmount: totals.chileGratificacionLegalAmount,
+    chileColacionAmount: totals.chileColacionAmount,
+    chileMovilizacionAmount: totals.chileMovilizacionAmount,
     chileHealthSystem: totals.chileHealthSystem,
     chileHealthAmount: totals.chileHealthAmount,
+    chileHealthObligatoriaAmount: totals.chileHealthObligatoriaAmount,
+    chileHealthVoluntariaAmount: totals.chileHealthVoluntariaAmount,
+    chileEmployerSisAmount: totals.chileEmployerSisAmount,
+    chileEmployerCesantiaAmount: totals.chileEmployerCesantiaAmount,
+    chileEmployerMutualAmount: totals.chileEmployerMutualAmount,
+    chileEmployerTotalCost: totals.chileEmployerTotalCost,
     chileUnemploymentRate: totals.chileUnemploymentRate,
     chileUnemploymentAmount: totals.chileUnemploymentAmount,
     chileTaxableBase: totals.chileTaxableBase,
@@ -183,6 +282,9 @@ const buildPayrollEntry = ({
     daysOnUnpaidLeave: attendance?.daysOnUnpaidLeave ?? null,
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
+    adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
+    adjustedMovilizacionAmount: deductibleDays > 0 ? adjustedMovilizacionAmount : null,
+    adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
     createdAt: null,
     updatedAt: null
   }
@@ -190,10 +292,12 @@ const buildPayrollEntry = ({
 
 export const calculatePayroll = async ({
   periodId,
-  actorIdentifier
+  actorIdentifier,
+  projectionContext
 }: {
   periodId: string
   actorIdentifier: string | null
+  projectionContext?: PayrollProjectionContext | null
 }): Promise<PayrollCalculationResult> => {
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
@@ -209,6 +313,12 @@ export const calculatePayroll = async ({
   }
 
   const range = getPeriodRangeFromId(periodId)
+
+  const attendanceCutDate =
+    projectionContext?.mode === 'actual_to_date'
+      ? (projectionContext.asOfDate < range.periodEnd ? projectionContext.asOfDate : range.periodEnd)
+      : range.periodEnd
+
   const allRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const compensationRows = allRows.filter(row => row.hasCompensationVersion)
   const missingCompensationMemberIds = allRows.filter(row => !row.hasCompensationVersion).map(row => row.memberId)
@@ -223,8 +333,25 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  if (requiresUfValue && typeof period.ufValue !== 'number') {
+  const includesChilePayroll = compensationRows.some(row => row.payRegime === 'chile')
+
+  const indicatorValues = await resolvePayrollPeriodIndicators({
+    periodId,
+    periodUfValue: period.ufValue,
+    taxTableVersion: period.taxTableVersion,
+    indicatorPeriodDate: projectionContext?.asOfDate ?? null
+  })
+
+  if (requiresUfValue && typeof indicatorValues.ufValue !== 'number') {
     throw new PayrollValidationError('This payroll period requires ufValue to calculate Isapre deductions.', 400)
+  }
+
+  if (includesChilePayroll && !period.taxTableVersion) {
+    throw new PayrollValidationError('This payroll period requires taxTableVersion to calculate Chile payroll taxes.', 400)
+  }
+
+  if (includesChilePayroll && period.taxTableVersion && typeof indicatorValues.utmValue !== 'number') {
+    throw new PayrollValidationError('This payroll period requires a historical UTM value to calculate Chile payroll taxes.', 400)
   }
 
   const memberIds = compensationRows.map(row => row.memberId)
@@ -236,7 +363,7 @@ export const calculatePayroll = async ({
       periodYear: range.year,
       periodMonth: range.month
     }),
-    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, range.periodEnd)
+    fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, attendanceCutDate)
   ])
 
   const attendanceData = attendanceResult.snapshots
@@ -253,17 +380,89 @@ export const calculatePayroll = async ({
 
     const attendance = attendanceData.get(compensation.memberId) ?? null
 
-    const entry = buildPayrollEntry({
+    let entry = await buildPayrollEntry({
       periodId,
+      periodDate: range.periodEnd,
       compensation,
-      ufValue: period.ufValue,
+      ufValue: indicatorValues.ufValue,
       bonusConfig,
       kpi,
       attendance
     })
 
+    if (compensation.payRegime === 'chile' && period.taxTableVersion) {
+      const taxResult = await computeChileTax({
+        taxableBaseClp: entry.chileTaxableBase ?? 0,
+        taxTableVersion: period.taxTableVersion,
+        utmValue: indicatorValues.utmValue
+      })
+
+      const totalsWithTax = await calculatePayrollTotals({
+        payRegime: compensation.payRegime,
+        baseSalary: entry.adjustedBaseSalary ?? compensation.baseSalary,
+        remoteAllowance: entry.adjustedRemoteAllowance ?? compensation.remoteAllowance,
+        colacionAmount: entry.adjustedColacionAmount ?? compensation.colacionAmount,
+        movilizacionAmount: entry.adjustedMovilizacionAmount ?? compensation.movilizacionAmount,
+        fixedBonusAmount: entry.adjustedFixedBonusAmount ?? compensation.fixedBonusAmount,
+        bonusOtdAmount: entry.bonusOtdAmount,
+        bonusRpaAmount: entry.bonusRpaAmount,
+        bonusOtherAmount: entry.bonusOtherAmount,
+        gratificacionLegalMode: compensation.gratificacionLegalMode,
+        afpName: compensation.afpName,
+        afpRate: compensation.afpRate,
+        afpCotizacionRate: compensation.afpCotizacionRate,
+        afpComisionRate: compensation.afpComisionRate,
+        healthSystem: compensation.healthSystem,
+        healthPlanUf: compensation.healthPlanUf,
+        unemploymentRate: compensation.unemploymentRate,
+        contractType: compensation.contractType,
+        hasApv: compensation.hasApv,
+        apvAmount: compensation.apvAmount,
+        ufValue: indicatorValues.ufValue,
+        taxAmount: taxResult.taxAmountClp,
+        periodDate: range.periodEnd
+      })
+
+      entry = {
+        ...entry,
+        grossTotal: totalsWithTax.grossTotal,
+        chileAfpName: totalsWithTax.chileAfpName,
+        chileAfpRate: totalsWithTax.chileAfpRate,
+        chileAfpAmount: totalsWithTax.chileAfpAmount,
+        chileAfpCotizacionAmount: totalsWithTax.chileAfpCotizacionAmount,
+        chileAfpComisionAmount: totalsWithTax.chileAfpComisionAmount,
+        chileGratificacionLegalAmount: totalsWithTax.chileGratificacionLegalAmount,
+        chileColacionAmount: totalsWithTax.chileColacionAmount,
+        chileMovilizacionAmount: totalsWithTax.chileMovilizacionAmount,
+        chileHealthSystem: totalsWithTax.chileHealthSystem,
+        chileHealthAmount: totalsWithTax.chileHealthAmount,
+        chileHealthObligatoriaAmount: totalsWithTax.chileHealthObligatoriaAmount,
+        chileHealthVoluntariaAmount: totalsWithTax.chileHealthVoluntariaAmount,
+        chileEmployerSisAmount: totalsWithTax.chileEmployerSisAmount,
+        chileEmployerCesantiaAmount: totalsWithTax.chileEmployerCesantiaAmount,
+        chileEmployerMutualAmount: totalsWithTax.chileEmployerMutualAmount,
+        chileEmployerTotalCost: totalsWithTax.chileEmployerTotalCost,
+        chileUnemploymentRate: totalsWithTax.chileUnemploymentRate,
+        chileUnemploymentAmount: totalsWithTax.chileUnemploymentAmount,
+        chileTaxableBase: totalsWithTax.chileTaxableBase,
+        chileTaxAmount: totalsWithTax.chileTaxAmount,
+        chileApvAmount: totalsWithTax.chileApvAmount,
+        chileUfValue: totalsWithTax.chileUfValue,
+        chileTotalDeductions: totalsWithTax.chileTotalDeductions,
+        netTotalCalculated: totalsWithTax.netTotalCalculated,
+        netTotal: totalsWithTax.netTotalCalculated
+      }
+    }
+
     await upsertPayrollEntry(entry)
     entries.push(entry)
+  }
+
+  if (isPayrollPostgresEnabled()) {
+    await pgDeleteStalePayrollEntries({
+      periodId,
+      keepMemberIds: compensationRows.map(row => row.memberId)
+    })
   }
 
   if (isPayrollPostgresEnabled()) {

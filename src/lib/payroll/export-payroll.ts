@@ -2,27 +2,9 @@ import 'server-only'
 
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
-import { PayrollValidationError, escapeCsvValue, runPayrollQuery } from '@/lib/payroll/shared'
-import { getBigQueryProjectId } from '@/lib/bigquery'
-import { isPayrollPostgresEnabled } from '@/lib/payroll/postgres-store'
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { PayrollValidationError, escapeCsvValue } from '@/lib/payroll/shared'
 
-const getProjectId = () => getBigQueryProjectId()
-
-export const exportPayrollCsv = async (periodId: string) => {
-  const projectId = getProjectId()
-  const period = await getPayrollPeriod(periodId)
-
-  if (!period) {
-    throw new PayrollValidationError('Payroll period not found.', 404)
-  }
-
-  if (period.status !== 'approved' && period.status !== 'exported') {
-    throw new PayrollValidationError('Only approved payroll periods can be exported.', 409)
-  }
-
-  const entries = await getPayrollEntries(periodId)
-
+const buildPayrollCsv = (entries: Awaited<ReturnType<typeof getPayrollEntries>>) => {
   const headers = [
     'Nombre',
     'Email',
@@ -32,6 +14,11 @@ export const exportPayrollCsv = async (periodId: string) => {
     'Base ajustada',
     'Asignacion teletrabajo',
     'Teletrabajo ajustado',
+    'Colacion',
+    'Movilizacion',
+    'Etiqueta bono fijo',
+    'Bono fijo',
+    'Bono fijo ajustado',
     'Dias habiles',
     'Dias presentes',
     'Dias ausentes',
@@ -45,6 +32,8 @@ export const exportPayrollCsv = async (periodId: string) => {
     'Bono adicional',
     'Total bruto',
     'AFP',
+    'AFP cotización',
+    'AFP comisión',
     'Salud',
     'Seg. cesantia',
     'Impuesto',
@@ -56,62 +45,88 @@ export const exportPayrollCsv = async (periodId: string) => {
   const lines = [
     headers.join(','),
     ...entries.map(entry =>
-      [
-        entry.memberName,
-        entry.memberEmail,
-        entry.payRegime,
-        entry.currency,
-        entry.baseSalary,
-        entry.adjustedBaseSalary,
-        entry.remoteAllowance,
-        entry.adjustedRemoteAllowance,
-        entry.workingDaysInPeriod,
-        entry.daysPresent,
-        entry.daysAbsent,
-        entry.daysOnLeave,
-        entry.kpiOtdPercent,
-        entry.bonusOtdProrationFactor,
-        entry.bonusOtdAmount,
-        entry.kpiRpaAvg,
-        entry.bonusRpaProrationFactor,
-        entry.bonusRpaAmount,
-        entry.bonusOtherAmount,
-        entry.grossTotal,
-        entry.chileAfpAmount,
-        entry.chileHealthAmount,
-        entry.chileUnemploymentAmount,
-        entry.chileTaxAmount,
-        entry.chileApvAmount,
-        entry.chileTotalDeductions,
-        entry.netTotal
-      ]
+      (() => {
+        const entryWithAllowances = entry as typeof entry & {
+          chileColacionAmount?: number | null
+          chileMovilizacionAmount?: number | null
+          chileColacion?: number | null
+          chileMovilizacion?: number | null
+          colacionAmount?: number | null
+          movilizacionAmount?: number | null
+          totalHaberesNoImponibles?: number | null
+        }
+
+        const colacion =
+          entryWithAllowances.chileColacionAmount ??
+          entryWithAllowances.chileColacion ??
+          entryWithAllowances.colacionAmount ??
+          0
+
+        const movilizacion =
+          entryWithAllowances.chileMovilizacionAmount ??
+          entryWithAllowances.chileMovilizacion ??
+          entryWithAllowances.movilizacionAmount ??
+          0
+
+        return [
+          entry.memberName,
+          entry.memberEmail,
+          entry.payRegime,
+          entry.currency,
+          entry.baseSalary,
+          entry.adjustedBaseSalary,
+          entry.remoteAllowance,
+          entry.adjustedRemoteAllowance,
+          colacion,
+          movilizacion,
+          entry.fixedBonusLabel,
+          entry.fixedBonusAmount,
+          entry.adjustedFixedBonusAmount,
+          entry.workingDaysInPeriod,
+          entry.daysPresent,
+          entry.daysAbsent,
+          entry.daysOnLeave,
+          entry.kpiOtdPercent,
+          entry.bonusOtdProrationFactor,
+          entry.bonusOtdAmount,
+          entry.kpiRpaAvg,
+          entry.bonusRpaProrationFactor,
+          entry.bonusRpaAmount,
+          entry.bonusOtherAmount,
+          entry.grossTotal,
+          entry.chileAfpAmount,
+          entry.chileAfpCotizacionAmount,
+          entry.chileAfpComisionAmount,
+          entry.chileHealthAmount,
+          entry.chileUnemploymentAmount,
+          entry.chileTaxAmount,
+          entry.chileApvAmount,
+          entry.chileTotalDeductions,
+          entry.netTotal
+        ]
+      })()
         .map(escapeCsvValue)
         .join(',')
     )
   ]
 
-  if (isPayrollPostgresEnabled()) {
-    await runGreenhousePostgresQuery(
-      `
-        UPDATE greenhouse_payroll.payroll_periods
-        SET status = 'exported', exported_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-        WHERE period_id = $1 AND status = 'approved'
-      `,
-      [periodId]
-    )
-  } else {
-    await runPayrollQuery(
-      `
-        UPDATE \`${projectId}.greenhouse.payroll_periods\`
-        SET
-          status = 'exported',
-          exported_at = CURRENT_TIMESTAMP()
-        WHERE period_id = @periodId
-          AND status = 'approved'
-      `,
-      { periodId }
-    )
-  }
-
   return lines.join('\n')
 }
+
+export const generatePayrollCsv = async (periodId: string) => {
+  const period = await getPayrollPeriod(periodId)
+
+  if (!period) {
+    throw new PayrollValidationError('Payroll period not found.', 404)
+  }
+
+  if (period.status !== 'approved' && period.status !== 'exported') {
+    throw new PayrollValidationError('Only approved payroll periods can be exported.', 409)
+  }
+
+  const entries = await getPayrollEntries(periodId)
+
+  return buildPayrollCsv(entries)
+}
+
+export const exportPayrollCsv = generatePayrollCsv

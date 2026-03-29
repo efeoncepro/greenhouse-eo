@@ -308,8 +308,8 @@ const ClientEconomicsView = () => {
   const [computing, setComputing] = useState(false)
   const [snapshots, setSnapshots] = useState<ClientEconomicsSnapshot[]>([])
   const [error, setError] = useState('')
-  const [sortField, setSortField] = useState<SortField>('netMargin')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [sortField] = useState<SortField>('netMargin')
+  const [sortDir] = useState<SortDir>('desc')
   const [trendData, setTrendData] = useState<TrendPoint[]>([])
   const [trendLoading, setTrendLoading] = useState(false)
 
@@ -468,16 +468,6 @@ const ClientEconomicsView = () => {
   const avgNetPct = avgNetMargin * 100
   const grossSemaphore = getSemaphore(avgGrossPct)
   const netSemaphore = getSemaphore(avgNetPct)
-
-  // Sort
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortField(field)
-      setSortDir('desc')
-    }
-  }
 
   const sorted = useMemo(() => [...snapshots].sort((a, b) => {
     let av = 0

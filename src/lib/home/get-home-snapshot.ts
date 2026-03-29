@@ -2,7 +2,7 @@ import 'server-only'
 
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
-import { HOME_GREETINGS } from '@/config/home-greetings'
+import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
 interface HomeSnapshotInput {
@@ -48,11 +48,19 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     color: 'primary' // Default color for now
   }))
 
-  // 3. Resolve Tasks (Unread Notifications)
-  const { items: notifications } = await NotificationService.getNotifications(input.userId, {
-    unreadOnly: true,
-    pageSize: 5
-  })
+  // 3. Resolve Tasks (Unread Notifications) — graceful fallback if DB unavailable
+  let notifications: Awaited<ReturnType<typeof NotificationService.getNotifications>>['items'] = []
+
+  try {
+    const result = await NotificationService.getNotifications(input.userId, {
+      unreadOnly: true,
+      pageSize: 5
+    })
+
+    notifications = result.items
+  } catch (error) {
+    console.warn('[home-snapshot] Failed to fetch notifications, continuing with empty tasks:', error instanceof Error ? error.message : error)
+  }
 
   const tasks: PendingTask[] = notifications.map(n => ({
     id: n.notification_id,
@@ -76,7 +84,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     },
     greeting: {
       title: resolvedGreeting,
-      subtitle: 'Bienvenido a tu centro de mando.'
+      subtitle: HOME_SUBTITLE
     },
     modules,
     tasks,

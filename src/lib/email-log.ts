@@ -14,6 +14,9 @@ interface EmailLogEntry {
   error_message?: string
 }
 
+/**
+ * @deprecated Use `src/lib/email/delivery.ts` and `greenhouse_notifications.email_deliveries`.
+ */
 export async function logEmail(entry: EmailLogEntry): Promise<void> {
   try {
     const bq = getBigQueryClient()

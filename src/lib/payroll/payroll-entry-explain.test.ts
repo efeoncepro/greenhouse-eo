@@ -32,12 +32,19 @@ const compensationVersion: CompensationVersion = {
   currency: 'USD',
   baseSalary: 675,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   bonusOtdMin: 0,
   bonusOtdMax: 150,
   bonusRpaMin: 0,
   bonusRpaMax: 75,
+  gratificacionLegalMode: 'ninguna',
   afpName: null,
   afpRate: null,
+  afpCotizacionRate: null,
+  afpComisionRate: null,
   healthSystem: null,
   healthPlanUf: null,
   unemploymentRate: 0,
@@ -48,6 +55,7 @@ const compensationVersion: CompensationVersion = {
   effectiveTo: null,
   isCurrent: true,
   changeReason: 'Nómina Marzo',
+  desiredNetClp: null,
   createdBy: null,
   createdAt: null
 }
@@ -64,6 +72,10 @@ const entry: PayrollEntry = {
   currency: 'USD',
   baseSalary: 675,
   remoteAllowance: 50,
+  colacionAmount: 0,
+  movilizacionAmount: 0,
+  fixedBonusLabel: 'Responsabilidad',
+  fixedBonusAmount: 75,
   kpiOtdPercent: 58.3,
   kpiRpaAvg: 2,
   kpiOtdQualifies: false,
@@ -75,6 +87,9 @@ const entry: PayrollEntry = {
   bonusOtherAmount: 10,
   bonusOtherDescription: 'Ajuste puntual',
   grossTotal: 710,
+  chileGratificacionLegalAmount: null,
+  chileColacionAmount: null,
+  chileMovilizacionAmount: null,
   bonusOtdMin: 0,
   bonusOtdMax: 150,
   bonusRpaMin: 0,
@@ -82,8 +97,16 @@ const entry: PayrollEntry = {
   chileAfpName: null,
   chileAfpRate: null,
   chileAfpAmount: null,
+  chileAfpCotizacionAmount: null,
+  chileAfpComisionAmount: null,
   chileHealthSystem: null,
   chileHealthAmount: null,
+  chileHealthObligatoriaAmount: null,
+  chileHealthVoluntariaAmount: null,
+  chileEmployerSisAmount: null,
+  chileEmployerCesantiaAmount: null,
+  chileEmployerMutualAmount: null,
+  chileEmployerTotalCost: null,
   chileUnemploymentRate: null,
   chileUnemploymentAmount: null,
   chileTaxableBase: null,
@@ -105,6 +128,9 @@ const entry: PayrollEntry = {
   daysOnUnpaidLeave: 1,
   adjustedBaseSalary: 607.5,
   adjustedRemoteAllowance: 45,
+  adjustedColacionAmount: 0,
+  adjustedMovilizacionAmount: 0,
+  adjustedFixedBonusAmount: 67.5,
   createdAt: null,
   updatedAt: null
 }
@@ -121,6 +147,7 @@ describe('buildPayrollEntryExplain', () => {
     expect(explain.calculation.attendanceRatio).toBe(0.9)
     expect(explain.calculation.effectiveBaseSalary).toBe(607.5)
     expect(explain.calculation.effectiveRemoteAllowance).toBe(45)
+    expect(explain.calculation.effectiveFixedBonusAmount).toBe(67.5)
     expect(explain.calculation.totalVariableBonus).toBe(35)
     expect(explain.calculation.hasAttendanceAdjustment).toBe(true)
     expect(explain.compensationVersion?.versionId).toBe('member-1_v1')

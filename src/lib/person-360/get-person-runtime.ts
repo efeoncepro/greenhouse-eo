@@ -17,6 +17,7 @@ import { getPersonIcoProfile } from './get-person-ico-profile'
  */
 
 export interface PersonRuntimeSnapshot {
+
   // Identity
   identityProfileId: string
   eoId: string | null

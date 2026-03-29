@@ -145,6 +145,7 @@ export async function GET(
     )
 
     const currentOverlay = current ? overlayCapacityEconomics(current, currentEconomics) : null
+
     const trendOverlay = trend.map(snapshot =>
       overlayCapacityEconomics(
         snapshot,

@@ -2004,6 +2004,112 @@ No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos end
 
 ---
 
-*Efeonce Greenhouse™ • ICO Engine Spec v1.0 + Apéndice B (v2 Context-Agnostic)*
+## 13. AI Core & Robustness Roadmap (TASK-118)
+
+> Agregado 2026-03-28. Spec completa: `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md`
+
+### 13.1 Visión
+
+Transformar ICO de motor de medición pasivo a motor de inteligencia embebida. La IA corre como daemon en cada ciclo de materialización — no como chat, no bajo demanda. Genera señales que se persisten como first-class data y se consumen directamente en dashboards.
+
+### 13.2 Design Decisions
+
+| Decisión | Postura | Razón |
+|----------|---------|-------|
+| Autonomía | **Advisory-only** | ICO alimenta bonos de payroll; acciones automáticas afectan liquidaciones reales |
+| Audiencia | **Internal-only** (agency surfaces) | El equipo ve predicciones y actúa; el cliente solo ve el resultado |
+| Runtime | **TypeScript in-process** | Math simple (z-scores, regression) es suficiente; BigQuery ML solo si la complejidad lo requiere |
+| Observabilidad | Dentro de **Ops Health** existente | Nueva sección como subsystem, no surface separada |
+| Threshold | **>=30 tasks completadas / 3 meses** por Space | Flag `ai_eligible`; spaces debajo ven métricas sin señales IA |
+| Calibración | **Prediction tracking desde día 1** | `ai_prediction_log` compara forecast vs actual al cierre de período |
+
+### 13.3 Pipeline Architecture
+
+```
+Steps 1-7: materialización actual (intacta, zero cambios)
+     ↓
+Step 8:  Anomaly Detection     — z-score sobre series históricas
+Step 9:  Root Cause Analysis   — drill-down dimensional automático
+Step 10: Predictive Metrics    — linear extrapolation / Markov (con CSC)
+Step 11: Persist ai_signals    — BigQuery + sync a Postgres cache
+```
+
+**Principio:** puramente aditivo. Si cualquier step AI falla, la materialización completa sin IA (graceful degradation).
+
+### 13.4 Tablas nuevas
+
+| Tabla | Schema | Propósito |
+|-------|--------|-----------|
+| `ai_signals` | `ico_engine` (BQ) + `greenhouse_serving` (PG) | Anomalías, predicciones, root cause, recomendaciones |
+| `ai_prediction_log` | `ico_engine` (BQ) | Tracking predicción vs resultado para calibración |
+| `csc_transition_matrix` | `ico_engine` (BQ) | Probabilidades Markov por Space |
+| `csc_dwell_times` | `ico_engine` (BQ) | Tiempo promedio por fase CSC |
+| `seasonal_indices` | `ico_engine` (BQ) | Index estacional por (Space, metric, month) |
+
+La tabla `ai_metric_scores` (§5.5, ya creada vacía) se activa en Slice 6 (Quality Scoring con LLM).
+
+### 13.5 Roadmap de ejecución
+
+#### Phase 1 — AI Intelligence
+
+| Slice | Entregable | Algoritmo | Esfuerzo |
+|-------|-----------|-----------|----------|
+| **1** | Anomaly Detection | Z-score (|z| >2 = warning, >3 = critical) | ~2h |
+| **2** | Root Cause Analysis | Top 3 contributors por member/project/phase | ~3h |
+| **3** | Predictive Metrics | Linear extrapolation + progress blending | ~4h |
+| **4** | Capacity Forecasting | Throughput × pipeline vs FTE contratado | ~3h |
+| **5** | Resource Optimization | Rule engine sobre señales 1-4 | ~3h |
+| **6** | Quality Scoring | LLM async sobre tasks completadas → `ai_metric_scores` | ~6h |
+
+#### Phase 2 — Robustness
+
+| Slice | Entregable | Qué mejora | Esfuerzo |
+|-------|-----------|------------|----------|
+| **7** | Data Quality Scoring | Confianza de cada métrica basada en completitud de campos | ~2h |
+| **8** | Revenue-Weighted Metrics | Pondera KPIs por revenue del Space (bridge `fin_income`) | ~3h |
+| **9** | CSC Pipeline Analytics | Markov chain: transition matrix + predicted delivery date | ~5h |
+| **10** | Seasonality Model | Seasonal adjustment para anomaly detection (>=12 meses) | ~3h |
+| **11** | Operational Maturity Model | 4 etapas (Onboarding→Excelling) con targets dinámicos | ~3h |
+| **12** | Member Growth Trajectory | Trends, peer comparison, early warning en Person 360 | ~4h |
+| **13** | Multi-Source Enrichment | Señales cross-schema: ICO × Finance × Payroll × Email | ~4h |
+
+**Total estimado:** ~45 horas (13 slices desplegables independientemente).
+
+**Slice 7 (Data Quality)** es prerequisite de confianza para toda Phase 1 — ejecutar antes o en paralelo con Slice 1.
+
+### 13.6 Ejemplo de output integrado
+
+**Hoy (solo medición):**
+```
+OTD: 84% ↓ — Atención
+```
+
+**Con AI Core (Phase 1 + 2):**
+```
+OTD: 84% ↓ — Anomalía detectada (z=2.3, ajustado por estacionalidad)
+  Confianza: 92% (data quality score del Space)
+  Predicción fin de mes: 79% (confidence 0.72)
+  Causa raíz: 4 tasks en revisión_interna >5d, proyecto Acme
+    → 65% probabilidad de ir a cambios_cliente (Markov)
+    → María contribuye 35% del delta (dedicación: 140%)
+  Revenue at risk: $28K/mes (Space Acme = 22% del revenue total)
+  Recomendación: Reasignar 2 tasks a Diego (60% capacity disponible)
+  Maturity stage: Optimizing (target OTD: 85%)
+```
+
+### 13.7 Relación con otros sistemas
+
+| Sistema | Cómo se relaciona |
+|---------|-------------------|
+| **Nexa** (TASK-114/115) | Consume `ico_ai_signals` como contexto enriquecido — no calcula, lee |
+| **Payroll** | Las señales son advisory; no modifican cálculos de bonos directamente |
+| **Person 360** | Slice 12 enriquece el perfil con trajectory y peer comparison |
+| **Agency Delivery** | Surface principal de consumo de todas las señales |
+| **Ops Health** | AI Core como subsystem en health check |
+| **Finance** | Slice 8 y 13 cruzan datos de revenue para ponderación |
+
+---
+
+*Efeonce Greenhouse™ • ICO Engine Spec v1.0 + Apéndice B (v2 Context-Agnostic) + §13 AI Core Roadmap*
 *Efeonce Group — Marzo 2026 — CONFIDENCIAL*
 *Documento técnico interno. Su reproducción o distribución sin autorización escrita está prohibida.*

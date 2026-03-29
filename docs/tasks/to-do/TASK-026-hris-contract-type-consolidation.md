@@ -40,16 +40,27 @@ Consolidar el modelo de tipos de contrato en Greenhouse para soportar los 5 tipo
 
 ---
 
+## Delta 2026-03-27 — Alineación arquitectónica
+
+- **TASK-078 es prerequisito** para la branch de honorarios: la tasa de retención SII debe resolverse desde indicadores synced (Gael Cloud API) cuando TASK-078 complete. Mientras tanto, `getSiiRetentionRate(year)` como lookup hardcoded es aceptable como fallback.
+- **TASK-065 confirma** que `bonus_rpa_*` fields son canónicos — las branches honorarios/Deel deben referenciar los nombres de campo actuales, no los propuestos por TASK-025 (FTR).
+- **Forward engine cutover** (TASK-078 slice 6): cambia el shape del contexto que recibe `calculateEntry`. La branch de honorarios debe aceptar el mismo contexto previsional pero solo usar `siiRetentionRate`. La branch Deel no necesita contexto previsional.
+- **Outbox events obligatorios**: todas las branches de cálculo deben emitir `payroll_entry.upserted` via `publishOutboxEvent()` para que `person_intelligence`, `member_capacity_economics` y `projected_payroll` reaccionen correctamente.
+- **Regla de `contract_type`**: el campo canónico vive en `greenhouse_core.members` (no en `compensation_versions`), alineado con HRIS Architecture V1.
+
 ## Dependencias
 
 | Dependencia | Estado | Impacto si no está |
 |---|---|---|
 | `greenhouse_core.members` table en PostgreSQL | Existe, migrada | Blocker — los ALTER TABLE van aquí |
 | `greenhouse_payroll.compensation_versions` table | Existe, migrada | Se lee `contract_type` existente para migración de datos |
+| **TASK-078** (Previsional Foundation) | `in-progress` | **Blocker para branch honorarios** — tasa SII debe usar indicadores synced |
+| **TASK-065** (Bonus Recalibration) | `complete` | Confirma `bonus_rpa_*` fields canónicos |
 | `calculate-payroll.ts` en el repo | Existe | Se extiende con Branch 2 y Branch 3 |
 | `CompensationDrawer.tsx` en el repo | Existe | Se actualiza UI para nuevos campos |
 | `greenhouse_serving.member_360` view | Existe | Se actualiza para exponer nuevos campos |
 | `greenhouse_serving.member_payroll_360` view | Existe | Se actualiza para exponer `payroll_via` |
+| `src/lib/sync/event-catalog.ts` | Existe | Registrar eventos si se agregan branches nuevas |
 
 ---
 

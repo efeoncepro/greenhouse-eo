@@ -25,6 +25,7 @@ export const buildPayrollEntryExplain = ({
 
   const effectiveBaseSalary = entry.adjustedBaseSalary ?? entry.baseSalary
   const effectiveRemoteAllowance = entry.adjustedRemoteAllowance ?? entry.remoteAllowance
+  const effectiveFixedBonusAmount = entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount
   const warnings: string[] = []
 
   if (entry.kpiDataSource === 'ico') {
@@ -48,10 +49,12 @@ export const buildPayrollEntryExplain = ({
       attendanceRatio,
       effectiveBaseSalary,
       effectiveRemoteAllowance,
+      effectiveFixedBonusAmount,
       totalVariableBonus: entry.bonusOtdAmount + entry.bonusRpaAmount + entry.bonusOtherAmount,
       hasAttendanceAdjustment:
         entry.adjustedBaseSalary != null
-        || entry.adjustedRemoteAllowance != null,
+        || entry.adjustedRemoteAllowance != null
+        || entry.adjustedFixedBonusAmount != null,
       usesManualKpi: entry.kpiDataSource === 'manual',
       usesManualOverride: entry.manualOverride,
       kpiSourceModeAvailable: entry.kpiDataSource === 'manual',

@@ -4,12 +4,36 @@ import {
   canEditPayrollPeriodMetadata,
   canEditPayrollEntries,
   canRecalculatePayrollPeriod,
+  canSetPayrollPeriodApproved,
+  canSetPayrollPeriodCalculated,
+  canSetPayrollPeriodExported,
   doesPayrollPeriodUpdateRequireReset,
   isPayrollPeriodFinalized,
   shouldReopenApprovedPayrollPeriod
 } from './period-lifecycle'
 
 describe('payroll period lifecycle', () => {
+  it('allows calculation for draft, calculated, and approved periods', () => {
+    expect(canSetPayrollPeriodCalculated('draft')).toBe(true)
+    expect(canSetPayrollPeriodCalculated('calculated')).toBe(true)
+    expect(canSetPayrollPeriodCalculated('approved')).toBe(true)
+    expect(canSetPayrollPeriodCalculated('exported')).toBe(false)
+  })
+
+  it('only allows approval from the calculated state', () => {
+    expect(canSetPayrollPeriodApproved('draft')).toBe(false)
+    expect(canSetPayrollPeriodApproved('calculated')).toBe(true)
+    expect(canSetPayrollPeriodApproved('approved')).toBe(false)
+    expect(canSetPayrollPeriodApproved('exported')).toBe(false)
+  })
+
+  it('only allows export from the approved state', () => {
+    expect(canSetPayrollPeriodExported('draft')).toBe(false)
+    expect(canSetPayrollPeriodExported('calculated')).toBe(false)
+    expect(canSetPayrollPeriodExported('approved')).toBe(true)
+    expect(canSetPayrollPeriodExported('exported')).toBe(false)
+  })
+
   it('allows recalculation for draft, calculated, and approved periods', () => {
     expect(canRecalculatePayrollPeriod('draft')).toBe(true)
     expect(canRecalculatePayrollPeriod('calculated')).toBe(true)
@@ -21,9 +45,9 @@ describe('payroll period lifecycle', () => {
     expect(canRecalculatePayrollPeriod('exported')).toBe(false)
   })
 
-  it('allows entry editing while the period is calculated or approved', () => {
+  it('allows entry editing only while the period is calculated', () => {
     expect(canEditPayrollEntries('calculated')).toBe(true)
-    expect(canEditPayrollEntries('approved')).toBe(true)
+    expect(canEditPayrollEntries('approved')).toBe(false)
     expect(canEditPayrollEntries('draft')).toBe(false)
     expect(canEditPayrollEntries('exported')).toBe(false)
   })

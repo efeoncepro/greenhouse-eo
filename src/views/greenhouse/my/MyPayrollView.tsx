@@ -8,8 +8,10 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Button from '@mui/material/Button'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -19,6 +21,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import { downloadPayrollReceiptPdf } from '@/lib/payroll/download-payroll-receipt'
 
 interface PayrollEntry {
   entryId: string
@@ -32,6 +35,7 @@ interface PayrollEntry {
 }
 
 interface PayrollData {
+  memberId: string
   payrollHistory: PayrollEntry[]
   compensation: {
     activeAssignmentsCount: number
@@ -47,24 +51,63 @@ const fmt = (amount: number, currency: string) =>
 const MyPayrollView = () => {
   const [data, setData] = useState<PayrollData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
 
     try {
       const res = await fetch('/api/my/payroll')
 
-      if (res.ok) setData(await res.json())
-    } catch { /* silent */ } finally {
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null)
+
+        throw new Error(payload?.error || 'No fue posible cargar tu nómina.')
+      }
+
+      setData(await res.json())
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'No fue posible cargar tu nómina.')
+    } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => { void load() }, [load])
 
+  const handleDownloadReceipt = async (entry: PayrollEntry) => {
+    try {
+      await downloadPayrollReceiptPdf({
+        route: `/api/my/payroll/entries/${entry.entryId}/receipt`,
+        entryId: entry.entryId,
+        periodId: entry.periodId,
+        memberId: data?.memberId ?? null,
+        currency: entry.currency === 'USD' ? 'USD' : 'CLP'
+      })
+    } catch (error) {
+      console.error('Unable to download my payroll receipt.', error)
+    }
+  }
+
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
-  const entries = data?.payrollHistory ?? []
+  if (error) {
+    return (
+      <Alert
+        severity='error'
+        action={(
+          <Button color='inherit' size='small' onClick={() => void load()}>
+            Reintentar
+          </Button>
+        )}
+      >
+        {error}
+      </Alert>
+    )
+  }
+
+  const entries = [...(data?.payrollHistory ?? [])].sort((a, b) => b.periodId.localeCompare(a.periodId))
   const latest = entries[0]
 
   return (
@@ -98,6 +141,16 @@ const MyPayrollView = () => {
                 <Typography variant='caption' color='text.secondary'>Moneda</Typography>
                 <Typography variant='h5'>{latest.currency}</Typography>
               </Box>
+              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+                <Button
+                  variant='tonal'
+                  startIcon={<i className='tabler-file-download' />}
+                  onClick={() => { void handleDownloadReceipt(latest) }}
+                  aria-label={`Descargar recibo PDF de ${MONTHS[latest.month]} ${latest.year}`}
+                >
+                  Descargar PDF
+                </Button>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -122,6 +175,7 @@ const MyPayrollView = () => {
                     <TableCell align='right'>Bruto</TableCell>
                     <TableCell align='right'>Neto</TableCell>
                     <TableCell align='center'>Estado</TableCell>
+                    <TableCell align='center'>Recibo</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -132,6 +186,17 @@ const MyPayrollView = () => {
                       <TableCell align='right'><Typography fontWeight={600}>{fmt(e.netTotal, e.currency)}</Typography></TableCell>
                       <TableCell align='center'>
                         <CustomChip round='true' size='small' variant='tonal' color={e.status === 'exported' ? 'success' : e.status === 'approved' ? 'primary' : 'secondary'} label={e.status === 'exported' ? 'Exportada' : e.status === 'approved' ? 'Aprobada' : e.status} />
+                      </TableCell>
+                      <TableCell align='center'>
+                        <Button
+                          size='small'
+                          variant='tonal'
+                          startIcon={<i className='tabler-file-download' />}
+                          onClick={() => { void handleDownloadReceipt(e) }}
+                          aria-label={`Descargar recibo PDF de ${MONTHS[e.month]} ${e.year}`}
+                        >
+                          PDF
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

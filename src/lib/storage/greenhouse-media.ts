@@ -74,6 +74,40 @@ export const assertSupportedImageFile = ({ contentType, size }: { contentType: s
   }
 }
 
+export const uploadGreenhouseStorageObject = async ({
+  objectName,
+  contentType,
+  bytes,
+  cacheControl
+}: {
+  objectName: string
+  contentType: string
+  bytes: ArrayBuffer | Uint8Array | Buffer
+  cacheControl?: string
+}) => {
+  const bucket = getGreenhouseMediaBucket()
+  const token = await getAccessToken()
+  const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o?uploadType=media&name=${encodeURIComponent(objectName)}`
+
+  const response = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': contentType,
+      ...(cacheControl ? { 'Cache-Control': cacheControl } : {})
+    },
+    body: bytes as unknown as BodyInit
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '')
+
+    throw new Error(`upload_failed:${response.status}:${errorText}`)
+  }
+
+  return `gs://${bucket}/${objectName}`
+}
+
 export const uploadGreenhouseMediaAsset = async ({
   entityFolder,
   entityId,
@@ -89,29 +123,15 @@ export const uploadGreenhouseMediaAsset = async ({
   contentType: string
   bytes: ArrayBuffer
 }) => {
-  const bucket = getGreenhouseMediaBucket()
   const extension = inferExtension(contentType, fileName)
   const objectName = `${entityFolder}/${entityId}/${kind}-${Date.now()}.${extension}`
-  const token = await getAccessToken()
-  const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o?uploadType=media&name=${encodeURIComponent(objectName)}`
 
-  const response = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=31536000, immutable'
-    },
-    body: bytes
+  return uploadGreenhouseStorageObject({
+    objectName,
+    contentType,
+    bytes,
+    cacheControl: 'public, max-age=31536000, immutable'
   })
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '')
-
-    throw new Error(`upload_failed:${response.status}:${errorText}`)
-  }
-
-  return `gs://${bucket}/${objectName}`
 }
 
 export const parseGsAssetPath = (value: string) => {

@@ -108,6 +108,8 @@ El portal no busca reemplazar Notion ni HubSpot. Su rol es exponer lectura ejecu
 - `/api/finance/clients/sync`
 - `/api/finance/exchange-rates`
 - `/api/finance/exchange-rates/latest`
+- `/api/finance/economic-indicators/latest`
+- `/api/finance/economic-indicators/sync`
 - `/api/finance/expenses`
 - `/api/finance/expenses/[id]`
 - `/api/finance/expenses/bulk`

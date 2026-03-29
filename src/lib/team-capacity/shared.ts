@@ -46,8 +46,19 @@ export const getUtilizationPercent = ({
   return clampPercent((Math.max(0, activeAssets) / expectedMonthlyThroughput) * 100)
 }
 
-export const getCapacityHealth = (utilizationPercent: number): TeamCapacityHealth => {
-  if (utilizationPercent >= 100) {
+/**
+ * Determine capacity health from commercial allocation and operational usage.
+ *
+ * - `overloaded`: only when commercially over-committed (assigned > contracted)
+ * - `high`: 85-100% allocation — full dedication, NOT overload
+ * - `balanced`: 35-84%
+ * - `idle`: < 35% or no assignments
+ */
+export const getCapacityHealth = (
+  utilizationPercent: number,
+  overcommitted?: boolean
+): TeamCapacityHealth => {
+  if (overcommitted) {
     return 'overloaded'
   }
 
@@ -96,6 +107,7 @@ export const computeCapacityBreakdown = ({
   const assigned = getAssignedHoursMonth(fteAllocation)
   const contracted = contractedHoursMonth ?? assigned
   const used = hasUsageData ? Math.round(assigned * (utilizationPercent / 100)) : null
+
   const envelope = buildCapacityEnvelope({
     contractedFte: contracted / CAPACITY_HOURS_PER_FTE,
     assignedHours: assigned,

@@ -65,6 +65,11 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_REPO_ECOSYSTEM_V1.md](operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md)
 - [GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md](operations/GREENHOUSE_DATA_MODEL_DOCUMENT_OPERATING_MODEL_V1.md)
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
+- [RELEASE_CHANNELS_OPERATING_MODEL_V1.md](operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md)
+
+### Changelog
+
+- [CLIENT_CHANGELOG.md](changelog/CLIENT_CHANGELOG.md)
 
 ### Tasks
 
@@ -78,3 +83,4 @@ Indice maestro de la documentacion no operativa del repo.
 - Regla obligatoria:
   - toda task nueva debe usar `TASK-###` y nacer desde `docs/tasks/TASK_TEMPLATE.md`
   - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
+  - si un trabajo cambia el canal o la disponibilidad de una capacidad visible, revisar tambien `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md` y evaluar si corresponde actualizar `docs/changelog/CLIENT_CHANGELOG.md`

@@ -4,6 +4,7 @@ import type { PeopleListPayload, PersonListItem } from '@/types/people'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
 import { getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
@@ -17,8 +18,6 @@ type PeopleListRow = {
   avatar_url: string | null
   location_country: string | null
   active: boolean | null
-  total_assignments: number | string | null
-  total_fte: number | string | null
   pay_regime: string | null
 }
 
@@ -40,9 +39,40 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     avatarUrl: row.avatar_url || resolveAvatarPath({ name: row.display_name, email: publicEmail }),
     locationCountry: row.location_country || null,
     active: Boolean(row.active),
-    totalAssignments: toNumber(row.total_assignments),
-    totalFte: roundToTenths(toNumber(row.total_fte)),
+    totalAssignments: 0,
+    contractedFte: 1,
+    assignedFte: 0,
+    totalFte: 0,
     payRegime: row.pay_regime === 'international' ? 'international' : row.pay_regime === 'chile' ? 'chile' : null
+  }
+}
+
+/**
+ * Enrich list items with canonical capacity data from member_capacity_economics snapshot.
+ * This is the single source of truth for FTE, assignments and capacity per the
+ * GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1 consumer rules.
+ */
+const enrichFromCapacitySnapshot = async (items: PersonListItem[]): Promise<void> => {
+  if (items.length === 0) return
+
+  const now = new Date()
+  const memberIds = items.map(item => item.memberId).filter(Boolean)
+
+  const snapshots = await readMemberCapacityEconomicsBatch({
+    memberIds,
+    year: now.getFullYear(),
+    month: now.getMonth() + 1
+  })
+
+  for (const item of items) {
+    const snapshot = snapshots.get(item.memberId)
+
+    if (snapshot) {
+      item.contractedFte = roundToTenths(snapshot.contractedFte)
+      item.assignedFte = roundToTenths(snapshot.assignedHours / 160)
+      item.totalFte = item.assignedFte
+      item.totalAssignments = snapshot.assignmentCount
+    }
   }
 }
 
@@ -85,42 +115,33 @@ const buildPayRegimeFilters = (items: PersonListItem[]) =>
 const buildPayload = async (
   items: PersonListItem[],
   getCoveredClients: () => Promise<number>
-): Promise<PeopleListPayload> => ({
-  items,
-  summary: {
-    activeMembers: items.filter(item => item.active).length,
-    totalFte: roundToTenths(items.reduce((sum, item) => sum + item.totalFte, 0)),
-    coveredClients: await getCoveredClients(),
-    chileCount: items.filter(item => item.payRegime === 'chile').length,
-    internationalCount: items.filter(item => item.payRegime === 'international').length
-  },
-  filters: {
-    roleCategories: buildRoleCategoryFilters(items),
-    countries: buildCountryFilters(items),
-    payRegimes: buildPayRegimeFilters(items)
+): Promise<PeopleListPayload> => {
+  await enrichFromCapacitySnapshot(items)
+
+  return {
+    items,
+    summary: {
+      activeMembers: items.filter(item => item.active).length,
+      totalFte: roundToTenths(items.reduce((sum, item) => sum + item.contractedFte, 0)),
+      coveredClients: await getCoveredClients(),
+      chileCount: items.filter(item => item.payRegime === 'chile').length,
+      internationalCount: items.filter(item => item.payRegime === 'international').length
+    },
+    filters: {
+      roleCategories: buildRoleCategoryFilters(items),
+      countries: buildCountryFilters(items),
+      payRegimes: buildPayRegimeFilters(items)
+    }
   }
-})
+}
 
 // ---------------------------------------------------------------------------
-// Postgres-first path
+// Postgres-first path — roster + pay_regime only; capacity from snapshot
 // ---------------------------------------------------------------------------
 
 const getPeopleListFromPostgres = async (): Promise<PeopleListPayload> => {
   const rows = await runGreenhousePostgresQuery<PeopleListRow>(`
-    WITH assignment_agg AS (
-      SELECT
-        member_id,
-        COUNT(*) FILTER (WHERE active AND (end_date IS NULL OR end_date >= CURRENT_DATE)) AS total_assignments,
-        ROUND(SUM(
-          CASE
-            WHEN active AND (end_date IS NULL OR end_date >= CURRENT_DATE) THEN COALESCE(fte_allocation, 0)
-            ELSE 0
-          END
-        )::numeric, 2) AS total_fte
-      FROM greenhouse_core.client_team_assignments
-      GROUP BY member_id
-    ),
-    current_comp AS (
+    WITH current_comp AS (
       SELECT DISTINCT ON (member_id)
         member_id,
         pay_regime
@@ -138,11 +159,8 @@ const getPeopleListFromPostgres = async (): Promise<PeopleListPayload> => {
       m.avatar_url,
       m.location_country,
       m.active,
-      COALESCE(a.total_assignments, 0) AS total_assignments,
-      COALESCE(a.total_fte, 0) AS total_fte,
       c.pay_regime
     FROM greenhouse_core.members m
-    LEFT JOIN assignment_agg a ON a.member_id = m.member_id
     LEFT JOIN current_comp c ON c.member_id = m.member_id
     ORDER BY
       CASE m.role_category
@@ -174,7 +192,7 @@ const getCoveredClientsCountFromPostgres = async () => {
 }
 
 // ---------------------------------------------------------------------------
-// BigQuery fallback path
+// BigQuery fallback path — roster + pay_regime only; capacity from snapshot
 // ---------------------------------------------------------------------------
 
 const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
@@ -211,20 +229,7 @@ const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
 
   const rows = await runPeopleQuery<PeopleListRow>(
     `
-      WITH assignment_agg AS (
-        SELECT
-          member_id,
-          COUNTIF(active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE())) AS total_assignments,
-          ROUND(SUM(
-            CASE
-              WHEN active = TRUE AND (end_date IS NULL OR end_date >= CURRENT_DATE()) THEN COALESCE(fte_allocation, 0)
-              ELSE 0
-            END
-          ), 2) AS total_fte
-        FROM \`${projectId}.greenhouse.client_team_assignments\`
-        GROUP BY member_id
-      ),
-      ${currentCompensationCte}
+      WITH ${currentCompensationCte}
       SELECT
         tm.member_id,
         tm.display_name,
@@ -235,12 +240,8 @@ const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
         tm.avatar_url,
         ${locationCountrySelect}
         tm.active,
-        COALESCE(a.total_assignments, 0) AS total_assignments,
-        COALESCE(a.total_fte, 0) AS total_fte,
         c.pay_regime
       FROM \`${projectId}.greenhouse.team_members\` AS tm
-      LEFT JOIN assignment_agg AS a
-        ON a.member_id = tm.member_id
       LEFT JOIN current_compensation AS c
         ON c.member_id = tm.member_id
       ORDER BY

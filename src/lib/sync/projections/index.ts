@@ -11,6 +11,9 @@ import { icoOrganizationProjection } from './ico-organization-metrics'
 import { organizationOperationalProjection } from './organization-operational'
 import { memberCapacityEconomicsProjection } from './member-capacity-economics'
 import { assignmentMembershipSyncProjection } from './assignment-membership-sync'
+import { projectedPayrollProjection } from './projected-payroll'
+import { payrollReceiptsProjection } from './payroll-receipts'
+import { payrollExportReadyProjection } from './payroll-export-ready'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -32,4 +35,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationOperationalProjection)
   registerProjection(memberCapacityEconomicsProjection)
   registerProjection(assignmentMembershipSyncProjection)
+  registerProjection(projectedPayrollProjection)
+  registerProjection(payrollReceiptsProjection)
+  registerProjection(payrollExportReadyProjection)
 }

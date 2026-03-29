@@ -3,7 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockPublishOutboxEvent = vi.fn()
 const mockGenerateMembershipId = vi.fn(() => 'mbr-test-001')
-const mockNextPublicId = vi.fn((_prefix?: string) => Promise.resolve('EO-MBR-0042'))
+
+const mockNextPublicId = vi.fn((_prefix?: string) => {
+  void _prefix
+
+  return Promise.resolve('EO-MBR-0042')
+})
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -31,10 +36,13 @@ describe('assignmentMembershipSyncProjection', () => {
     // member lookup
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([{ identity_profile_id: 'profile-melkin', role_title: 'Developer' }])
+
       // space bridge
       .mockResolvedValueOnce([{ space_id: 'space-sky', organization_id: 'org-sky' }])
+
       // existing membership check
       .mockResolvedValueOnce([])
+
       // INSERT membership
       .mockResolvedValueOnce([])
 
@@ -87,12 +95,16 @@ describe('assignmentMembershipSyncProjection', () => {
 
   it('deactivates membership on assignment.removed when no other assignments remain', async () => {
     mockRunGreenhousePostgresQuery
+
       // member lookup
       .mockResolvedValueOnce([{ identity_profile_id: 'profile-melkin' }])
+
       // space bridge
       .mockResolvedValueOnce([{ space_id: 'space-sky', organization_id: 'org-sky' }])
+
       // other assignments count
       .mockResolvedValueOnce([{ cnt: 0 }])
+
       // deactivate returns membership_id
       .mockResolvedValueOnce([{ membership_id: 'mbr-existing' }])
 

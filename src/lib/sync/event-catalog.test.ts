@@ -41,4 +41,9 @@ describe('event catalog', () => {
       expect(allEventValues.has(re), `${re} not in EVENT_TYPES`).toBe(true)
     }
   })
+
+  it('includes payroll_period.exported in both event catalog and reactive triggers', () => {
+    expect(EVENT_TYPES.payrollPeriodExported).toBe('payroll_period.exported')
+    expect(REACTIVE_EVENT_TYPES).toContain('payroll_period.exported')
+  })
 })

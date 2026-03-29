@@ -247,6 +247,15 @@ Multi-assignee enrichment:
 - `assignee_member_ids` stores all resolved IDs; `v_tasks_enriched` falls back to wrapping the singular `assignee_member_id` for legacy rows
 - Column added idempotently via `ALTER TABLE ADD COLUMN IF NOT EXISTS` at sync time
 
+Guardrails added after payroll/ICO remediation (2026-03-27):
+- the conformed sync must fail loudly if source tasks with `responsables_ids` are read but `greenhouse_conformed.delivery_tasks` persists `0` rows with `assignee_source_id`
+- sync results should expose validation counters at runtime:
+  - `sourceTasksWithResponsables`
+  - `conformedTasksWithAssigneeSource`
+  - `conformedTasksWithAssigneeMember`
+  - `conformedTasksWithAssigneeMemberIds`
+- this guardrail exists because person-level `ICO` metrics and payroll variable bonuses depend on `UNNEST(assignee_member_ids)`; silent loss of task attribution is therefore a payroll-impacting incident, not only a delivery analytics issue
+
 ### HubSpot conformed tables
 
 Recommended tables:
@@ -550,6 +559,7 @@ sync-source-runtime-projections.ts (TypeScript)
   │      └── If no mappings → uses default result (backward compatible)
   ├── 5. Writes to greenhouse_raw.tasks_snapshots (BQ, immutable)
   ├── 6. Writes to greenhouse_conformed.delivery_tasks (BQ, normalized)
+  │      └── validates that assignee attribution was not lost during persistence
   └── 7. Writes to greenhouse_delivery.tasks (Postgres, projection)
 ```
 
@@ -618,6 +628,24 @@ The script reads Space configurations from `greenhouse_core.space_notion_sources
 5. Run sync: `npx tsx scripts/sync-source-runtime-projections.ts`
 6. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
 7. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
+
+### Operational remediation runbook
+
+When payroll or person-level `ICO` metrics show missing KPI despite real completed work:
+
+1. Audit `notion_ops.tareas` for rows with `responsables_ids`
+2. Compare against `greenhouse_conformed.delivery_tasks`:
+   - `assignee_source_id`
+   - `assignee_member_id`
+   - `assignee_member_ids`
+3. If attribution was lost, run the canonical remediation:
+   - `pnpm exec tsx scripts/remediate-ico-assignee-attribution.ts <year> <month>`
+4. Re-verify:
+   - `greenhouse_conformed.delivery_tasks` attribution counters
+   - `ico_engine.metrics_by_member` for the affected period
+   - downstream consumers such as projected payroll
+
+This remediation is safe to rerun and is the canonical recovery path for attribution-driven KPI gaps.
 
 ---
 

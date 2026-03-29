@@ -5,6 +5,7 @@ import type {
   CreateCompensationVersionInput,
   PayrollCompensationMember,
   PayrollCompensationOverview,
+  GratificacionLegalMode,
   UpdateCompensationVersionInput
 } from '@/types/payroll'
 
@@ -40,13 +41,19 @@ import {
   pgUpdateCompensationVersion,
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
+import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
   afpRate: 'FLOAT64',
+  afpCotizacionRate: 'FLOAT64',
+  afpComisionRate: 'FLOAT64',
+  colacionAmount: 'FLOAT64',
+  movilizacionAmount: 'FLOAT64',
   healthSystem: 'STRING',
   healthPlanUf: 'FLOAT64',
   unemploymentRate: 'FLOAT64',
+  gratificacionLegalMode: 'STRING',
   effectiveTo: 'DATE',
   createdBy: 'STRING'
 } as const
@@ -63,12 +70,19 @@ type CompensationRow = {
   currency: string | null
   base_salary: number | string | null
   remote_allowance: number | string | null
+  colacion_amount: number | string | null
+  movilizacion_amount: number | string | null
+  fixed_bonus_label: string | null
+  fixed_bonus_amount: number | string | null
   bonus_otd_min: number | string | null
   bonus_otd_max: number | string | null
   bonus_rpa_min: number | string | null
   bonus_rpa_max: number | string | null
+  gratificacion_legal_mode: string | null
   afp_name: string | null
   afp_rate: number | string | null
+  afp_cotizacion_rate: number | string | null
+  afp_comision_rate: number | string | null
   health_system: string | null
   health_plan_uf: number | string | null
   unemployment_rate: number | string | null
@@ -79,6 +93,7 @@ type CompensationRow = {
   effective_to: { value?: string } | string | null
   is_current: boolean | null
   change_reason: string | null
+  desired_net_clp: number | string | null
   created_by: string | null
   created_at: { value?: string } | string | null
 }
@@ -110,6 +125,53 @@ const addDaysToDateString = (dateString: string, days: number) => {
   return date.toISOString().slice(0, 10)
 }
 
+const normalizeGratificacionLegalMode = (
+  value: string | null | undefined,
+  payRegime: 'chile' | 'international'
+): GratificacionLegalMode =>
+  payRegime === 'international'
+    ? 'ninguna'
+    : value === 'mensual_25pct' || value === 'anual_proporcional' || value === 'ninguna'
+      ? value
+      : 'mensual_25pct'
+
+const normalizeChileAfpSplitRates = ({
+  afpRate,
+  afpCotizacionRate,
+  afpComisionRate,
+  payRegime
+}: {
+  afpRate: number | null
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
+  payRegime: 'chile' | 'international'
+}) => {
+  if (payRegime !== 'chile') {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  const resolved = resolveChileAfpSplitRates({
+    totalRate: afpRate,
+    cotizacionRate: afpCotizacionRate,
+    comisionRate: afpComisionRate
+  })
+
+  if (!resolved) {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  return {
+    afpCotizacionRate: resolved.cotizacionRate,
+    afpComisionRate: resolved.comisionRate
+  }
+}
+
 const getCurrentDateString = () =>
   new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Santiago'
@@ -130,6 +192,7 @@ const isCurrentCompensationWindow = ({
 const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion => {
   const effectiveFrom = toDateString(row.effective_from) || ''
   const effectiveTo = toDateString(row.effective_to)
+  const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
 
   return {
     versionId: String(row.version_id || ''),
@@ -139,16 +202,27 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
     notionUserId: normalizeNullableString(row.notion_user_id),
     version: toNumber(row.version),
-    payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+    payRegime,
     currency: row.currency === 'USD' ? 'USD' : 'CLP',
     baseSalary: toNumber(row.base_salary),
     remoteAllowance: toNumber(row.remote_allowance),
+    colacionAmount: toNumber(row.colacion_amount),
+    movilizacionAmount: toNumber(row.movilizacion_amount),
+    fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
+    fixedBonusAmount: toNumber(row.fixed_bonus_amount),
     bonusOtdMin: toNumber(row.bonus_otd_min),
     bonusOtdMax: toNumber(row.bonus_otd_max),
     bonusRpaMin: toNumber(row.bonus_rpa_min),
     bonusRpaMax: toNumber(row.bonus_rpa_max),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(row.gratificacion_legal_mode, payRegime),
     afpName: normalizeNullableString(row.afp_name),
     afpRate: toNullableNumber(row.afp_rate),
+    ...normalizeChileAfpSplitRates({
+      afpRate: toNullableNumber(row.afp_rate),
+      afpCotizacionRate: toNullableNumber(row.afp_cotizacion_rate),
+      afpComisionRate: toNullableNumber(row.afp_comision_rate),
+      payRegime
+    }),
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
@@ -159,6 +233,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     effectiveTo,
     isCurrent: effectiveFrom ? isCurrentCompensationWindow({ effectiveFrom, effectiveTo }) : normalizeBoolean(row.is_current),
     changeReason: normalizeNullableString(row.change_reason),
+    desiredNetClp: toNullableNumber(row.desired_net_clp),
     createdBy: normalizeNullableString(row.created_by),
     createdAt: toTimestampString(row.created_at)
   }
@@ -171,9 +246,23 @@ const assertCompensationValues = (input: CompensationValueInput | UpdateCompensa
     throw new PayrollValidationError('changeReason is required.')
   }
 
+  if (
+    input.gratificacionLegalMode !== undefined &&
+    input.gratificacionLegalMode !== 'mensual_25pct' &&
+    input.gratificacionLegalMode !== 'anual_proporcional' &&
+    input.gratificacionLegalMode !== 'ninguna'
+  ) {
+    throw new PayrollValidationError(
+      'gratificacionLegalMode must be one of mensual_25pct, anual_proporcional, or ninguna.'
+    )
+  }
+
   assertPayrollDateString(input.effectiveFrom, 'effectiveFrom')
   parsePayrollNumber(input.baseSalary, 'baseSalary', { min: 0 })
   parsePayrollNumber(input.remoteAllowance ?? 0, 'remoteAllowance', { min: 0 })
+  parsePayrollNumber(input.colacionAmount ?? 0, 'colacionAmount', { min: 0 })
+  parsePayrollNumber(input.movilizacionAmount ?? 0, 'movilizacionAmount', { min: 0 })
+  parsePayrollNumber(input.fixedBonusAmount ?? 0, 'fixedBonusAmount', { min: 0 })
   parsePayrollNumber(input.bonusOtdMin ?? 0, 'bonusOtdMin', { min: 0 })
   parsePayrollNumber(input.bonusOtdMax ?? 0, 'bonusOtdMax', { min: 0 })
   parsePayrollNumber(input.bonusRpaMin ?? 0, 'bonusRpaMin', { min: 0 })
@@ -211,6 +300,33 @@ const assertCompensationInput = (input: CreateCompensationVersionInput) => {
 
 const assertCompensationUpdateInput = (input: UpdateCompensationVersionInput) => {
   assertCompensationValues(input)
+}
+
+const resolvePersistedAfpSplitRates = (
+  input: Pick<CreateCompensationVersionInput, 'payRegime' | 'afpRate' | 'afpCotizacionRate' | 'afpComisionRate'> & {
+    afpRate: number | null | undefined
+  }
+): {
+  afpCotizacionRate: number | null
+  afpComisionRate: number | null
+} => {
+  if (input.payRegime !== 'chile' || input.afpRate == null) {
+    return {
+      afpCotizacionRate: null,
+      afpComisionRate: null
+    }
+  }
+
+  const resolved = resolveChileAfpSplitRates({
+    totalRate: input.afpRate,
+    cotizacionRate: input.afpCotizacionRate ?? null,
+    comisionRate: input.afpComisionRate ?? null
+  })
+
+  return {
+    afpCotizacionRate: resolved?.cotizacionRate ?? null,
+    afpComisionRate: resolved?.comisionRate ?? null
+  }
 }
 
 export const getCurrentCompensation = async () => {
@@ -430,8 +546,11 @@ export const getApplicableCompensationVersionsForPeriod = async (periodStart: st
           cv.bonus_otd_max,
           cv.bonus_rpa_min,
           cv.bonus_rpa_max,
+          cv.gratificacion_legal_mode,
           cv.afp_name,
           cv.afp_rate,
+          cv.afp_cotizacion_rate,
+          cv.afp_comision_rate,
           cv.health_system,
           cv.health_plan_uf,
           cv.unemployment_rate,
@@ -610,12 +729,23 @@ export const createCompensationVersion = async ({
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
     remoteAllowance: Number(input.remoteAllowance ?? 0),
+    colacionAmount: Number(input.colacionAmount ?? 0),
+    movilizacionAmount: Number(input.movilizacionAmount ?? 0),
+    fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
+    fixedBonusAmount: Number(input.fixedBonusAmount ?? 0),
     bonusOtdMin: Number(input.bonusOtdMin ?? 0),
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
+    ...resolvePersistedAfpSplitRates({
+      payRegime: input.payRegime,
+      afpRate: input.afpRate ?? null,
+      afpCotizacionRate: input.afpCotizacionRate ?? null,
+      afpComisionRate: input.afpComisionRate ?? null
+    }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
     unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
@@ -626,6 +756,7 @@ export const createCompensationVersion = async ({
     effectiveTo: nextEffectiveTo,
     isCurrent,
     changeReason: input.changeReason.trim(),
+    desiredNetClp: input.desiredNetClp ?? null,
     createdBy: actorEmail
   }
 
@@ -639,12 +770,19 @@ export const createCompensationVersion = async ({
         currency,
         base_salary,
         remote_allowance,
+        colacion_amount,
+        movilizacion_amount,
+        fixed_bonus_label,
+        fixed_bonus_amount,
         bonus_otd_min,
         bonus_otd_max,
         bonus_rpa_min,
         bonus_rpa_max,
+        gratificacion_legal_mode,
         afp_name,
         afp_rate,
+        afp_cotizacion_rate,
+        afp_comision_rate,
         health_system,
         health_plan_uf,
         unemployment_rate,
@@ -655,6 +793,7 @@ export const createCompensationVersion = async ({
         effective_to,
         is_current,
         change_reason,
+        desired_net_clp,
         created_by,
         created_at
       )
@@ -666,12 +805,19 @@ export const createCompensationVersion = async ({
         @currency,
         @baseSalary,
         @remoteAllowance,
+        @colacionAmount,
+        @movilizacionAmount,
+        @fixedBonusLabel,
+        @fixedBonusAmount,
         @bonusOtdMin,
         @bonusOtdMax,
         @bonusRpaMin,
         @bonusRpaMax,
+        @gratificacionLegalMode,
         @afpName,
         @afpRate,
+        @afpCotizacionRate,
+        @afpComisionRate,
         @healthSystem,
         @healthPlanUf,
         @unemploymentRate,
@@ -682,6 +828,7 @@ export const createCompensationVersion = async ({
         @effectiveTo,
         @isCurrent,
         @changeReason,
+        @desiredNetClp,
         @createdBy,
         CURRENT_TIMESTAMP()
       )
@@ -782,19 +929,31 @@ export const updateCompensationVersion = async ({
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
     remoteAllowance: Number(input.remoteAllowance ?? 0),
+    colacionAmount: Number(input.colacionAmount ?? 0),
+    movilizacionAmount: Number(input.movilizacionAmount ?? 0),
+    fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
+    fixedBonusAmount: Number(input.fixedBonusAmount ?? 0),
     bonusOtdMin: Number(input.bonusOtdMin ?? 0),
     bonusOtdMax: Number(input.bonusOtdMax ?? 0),
     bonusRpaMin: Number(input.bonusRpaMin ?? 0),
     bonusRpaMax: Number(input.bonusRpaMax ?? 0),
+    gratificacionLegalMode: normalizeGratificacionLegalMode(input.gratificacionLegalMode ?? null, input.payRegime),
     afpName: normalizeNullableString(input.afpName),
     afpRate: input.afpRate ?? null,
+    ...resolvePersistedAfpSplitRates({
+      payRegime: input.payRegime,
+      afpRate: input.afpRate ?? null,
+      afpCotizacionRate: input.afpCotizacionRate ?? null,
+      afpComisionRate: input.afpComisionRate ?? null
+    }),
     healthSystem: input.healthSystem ?? null,
     healthPlanUf: input.healthPlanUf ?? null,
     unemploymentRate: input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
     contractType: input.contractType ?? 'indefinido',
     hasApv: Boolean(input.hasApv),
     apvAmount: Number(input.apvAmount ?? 0),
-    changeReason: input.changeReason.trim()
+    changeReason: input.changeReason.trim(),
+    desiredNetClp: input.desiredNetClp ?? null
   }
 
   await runPayrollQuery(
@@ -805,19 +964,27 @@ export const updateCompensationVersion = async ({
         currency = @currency,
         base_salary = @baseSalary,
         remote_allowance = @remoteAllowance,
+        colacion_amount = @colacionAmount,
+        movilizacion_amount = @movilizacionAmount,
+        fixed_bonus_label = @fixedBonusLabel,
+        fixed_bonus_amount = @fixedBonusAmount,
         bonus_otd_min = @bonusOtdMin,
         bonus_otd_max = @bonusOtdMax,
         bonus_rpa_min = @bonusRpaMin,
         bonus_rpa_max = @bonusRpaMax,
+        gratificacion_legal_mode = @gratificacionLegalMode,
         afp_name = @afpName,
         afp_rate = @afpRate,
+        afp_cotizacion_rate = @afpCotizacionRate,
+        afp_comision_rate = @afpComisionRate,
         health_system = @healthSystem,
         health_plan_uf = @healthPlanUf,
         unemployment_rate = @unemploymentRate,
         contract_type = @contractType,
         has_apv = @hasApv,
         apv_amount = @apvAmount,
-        change_reason = @changeReason
+        change_reason = @changeReason,
+        desired_net_clp = @desiredNetClp
       WHERE version_id = @versionId
     `,
     updateParams,

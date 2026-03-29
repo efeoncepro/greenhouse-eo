@@ -201,7 +201,7 @@ const main = async () => {
   // Extract Notion UUIDs from responsable values and map to members
   const notionIdMap = new Map<string, string>() // notion_uuid → member_id
 
-  for (const [responsable, memberIds] of resolvedMap) {
+  for (const [responsable] of resolvedMap) {
     const parts = responsable.split(',').map(p => p.trim())
 
     for (const part of parts) {

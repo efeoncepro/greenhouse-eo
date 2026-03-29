@@ -1,18 +1,33 @@
 import 'server-only'
 
-import type { ContractType, HealthSystem, PayRegime } from '@/types/payroll'
+import type { ContractType, GratificacionLegalMode, HealthSystem, PayRegime } from '@/types/payroll'
 
+import {
+  getAfpRateForCode,
+  getImmForPeriod,
+  getUnemploymentRateForPeriod,
+  resolveChileEmployerCostAmounts,
+  resolveChileHealthSplitAmounts,
+  resolveChileAfpRateSplitForCompensation,
+  resolveChileAfpSplitRates
+} from '@/lib/payroll/chile-previsional-helpers'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 
 type PayrollTotalsInput = {
   payRegime: PayRegime
   baseSalary: number
   remoteAllowance: number
+  colacionAmount?: number
+  movilizacionAmount?: number
+  fixedBonusAmount: number
   bonusOtdAmount: number
   bonusRpaAmount: number
   bonusOtherAmount: number
+  gratificacionLegalMode?: GratificacionLegalMode
   afpName?: string | null
   afpRate?: number | null
+  afpCotizacionRate?: number | null
+  afpComisionRate?: number | null
   healthSystem?: HealthSystem | null
   healthPlanUf?: number | null
   unemploymentRate?: number | null
@@ -21,6 +36,7 @@ type PayrollTotalsInput = {
   apvAmount?: number
   ufValue?: number | null
   taxAmount?: number | null
+  periodDate?: string | null
 }
 
 export type ChileDeductionResult = {
@@ -29,8 +45,19 @@ export type ChileDeductionResult = {
   chileAfpName: string | null
   chileAfpRate: number | null
   chileAfpAmount: number | null
+  chileAfpCotizacionAmount: number | null
+  chileAfpComisionAmount: number | null
+  chileGratificacionLegalAmount: number | null
+  chileColacionAmount: number | null
+  chileMovilizacionAmount: number | null
   chileHealthSystem: string | null
   chileHealthAmount: number | null
+  chileHealthObligatoriaAmount: number | null
+  chileHealthVoluntariaAmount: number | null
+  chileEmployerSisAmount: number | null
+  chileEmployerCesantiaAmount: number | null
+  chileEmployerMutualAmount: number | null
+  chileEmployerTotalCost: number | null
   chileUnemploymentRate: number | null
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null
@@ -42,15 +69,21 @@ export type ChileDeductionResult = {
 
 const roundCurrency = (value: number) => Math.round(value * 100) / 100
 
-export const calculatePayrollTotals = ({
+export const calculatePayrollTotals = async ({
   payRegime,
   baseSalary,
   remoteAllowance,
+  colacionAmount = 0,
+  movilizacionAmount = 0,
+  fixedBonusAmount,
   bonusOtdAmount,
   bonusRpaAmount,
   bonusOtherAmount,
+  gratificacionLegalMode = 'ninguna',
   afpName,
   afpRate,
+  afpCotizacionRate,
+  afpComisionRate,
   healthSystem,
   healthPlanUf,
   unemploymentRate,
@@ -58,10 +91,43 @@ export const calculatePayrollTotals = ({
   hasApv = false,
   apvAmount = 0,
   ufValue,
-  taxAmount
-}: PayrollTotalsInput): ChileDeductionResult => {
+  taxAmount,
+  periodDate
+}: PayrollTotalsInput): Promise<ChileDeductionResult> => {
+  const fallbackPeriodDate = periodDate || new Date().toISOString().slice(0, 10)
+  const shouldApplyGratification = payRegime === 'chile' && gratificacionLegalMode !== 'ninguna'
+
+  const immValue = shouldApplyGratification
+    ? await getImmForPeriod(fallbackPeriodDate)
+    : null
+
+  const gratificationLegalAmount = (() => {
+    if (!shouldApplyGratification) {
+      return 0
+    }
+
+    if (typeof immValue !== 'number' || !Number.isFinite(immValue) || immValue <= 0) {
+      throw new PayrollValidationError('IMM value is required to calculate legal gratification.', 400)
+    }
+
+    if (gratificacionLegalMode === 'mensual_25pct' || gratificacionLegalMode === 'anual_proporcional') {
+      return roundCurrency(Math.min(baseSalary * 0.25, (immValue * 4.75) / 12))
+    }
+
+    return 0
+  })()
+
   const totalVariableBonus = bonusOtdAmount + bonusRpaAmount + bonusOtherAmount
-  const grossTotal = roundCurrency(baseSalary + remoteAllowance + totalVariableBonus)
+
+  const grossTotal = roundCurrency(
+    baseSalary +
+      remoteAllowance +
+      colacionAmount +
+      movilizacionAmount +
+      fixedBonusAmount +
+      totalVariableBonus +
+      gratificationLegalAmount
+  )
 
   if (payRegime === 'international') {
     return {
@@ -70,8 +136,19 @@ export const calculatePayrollTotals = ({
       chileAfpName: null,
       chileAfpRate: null,
       chileAfpAmount: null,
+      chileAfpCotizacionAmount: null,
+      chileAfpComisionAmount: null,
+      chileGratificacionLegalAmount: null,
+      chileColacionAmount: null,
+      chileMovilizacionAmount: null,
       chileHealthSystem: null,
       chileHealthAmount: null,
+      chileHealthObligatoriaAmount: null,
+      chileHealthVoluntariaAmount: null,
+      chileEmployerSisAmount: null,
+      chileEmployerCesantiaAmount: null,
+      chileEmployerMutualAmount: null,
+      chileEmployerTotalCost: null,
       chileUnemploymentRate: null,
       chileUnemploymentAmount: null,
       chileTaxableBase: null,
@@ -82,17 +159,52 @@ export const calculatePayrollTotals = ({
     }
   }
 
-  const imponibleBase = Math.max(0, baseSalary + totalVariableBonus)
-  const normalizedAfpRate = typeof afpRate === 'number' && Number.isFinite(afpRate) ? afpRate : 0
+  const imponibleBase = Math.max(0, baseSalary + fixedBonusAmount + totalVariableBonus + gratificationLegalAmount)
+
+  const normalizedAfpRate =
+    typeof afpRate === 'number' && Number.isFinite(afpRate)
+      ? afpRate
+      : await getAfpRateForCode(afpName || '', fallbackPeriodDate)
+
+  const fallbackYear = Number(fallbackPeriodDate.slice(0, 4))
+  const fallbackMonth = Number(fallbackPeriodDate.slice(5, 7))
+
+  const resolvedAfpSplit =
+    Number.isFinite(fallbackYear) && Number.isFinite(fallbackMonth)
+      ? await resolveChileAfpRateSplitForCompensation({
+          year: fallbackYear,
+          month: fallbackMonth,
+          afpName: afpName || null,
+          afpRate: normalizedAfpRate
+        })
+      : null
+
+  const hasExplicitSplit =
+    (typeof afpCotizacionRate === 'number' && Number.isFinite(afpCotizacionRate)) ||
+    (typeof afpComisionRate === 'number' && Number.isFinite(afpComisionRate))
+
+  // Prefer explicit split stored on compensation. Otherwise, fall back to the
+  // synced Previred foundation (worker_rate vs total_rate), and finally to a
+  // conservative 10% cotizacion + remainder commission split.
+  const resolvedSplitRates =
+    resolveChileAfpSplitRates({
+      totalRate: normalizedAfpRate,
+      cotizacionRate: hasExplicitSplit ? (afpCotizacionRate ?? null) : resolvedAfpSplit?.cotizacionRate ?? null,
+      comisionRate: hasExplicitSplit ? (afpComisionRate ?? null) : resolvedAfpSplit?.comisionRate ?? null
+    }) ?? { cotizacionRate: 0, comisionRate: 0 }
+
+  const totalAfpRate = hasExplicitSplit
+    ? resolvedSplitRates.cotizacionRate + resolvedSplitRates.comisionRate
+    : normalizedAfpRate
 
   const derivedUnemploymentRate =
     typeof unemploymentRate === 'number' && Number.isFinite(unemploymentRate)
       ? unemploymentRate
-      : contractType === 'plazo_fijo'
-        ? 0.03
-        : 0.006
+      : await getUnemploymentRateForPeriod(fallbackPeriodDate, contractType)
 
-  const afpAmount = roundCurrency(imponibleBase * normalizedAfpRate)
+  const afpCotizacionAmount = roundCurrency(imponibleBase * resolvedSplitRates.cotizacionRate)
+  const afpComisionAmount = roundCurrency(imponibleBase * resolvedSplitRates.comisionRate)
+  const afpAmount = roundCurrency(afpCotizacionAmount + afpComisionAmount)
 
   let healthAmount = 0
 
@@ -106,21 +218,49 @@ export const calculatePayrollTotals = ({
     healthAmount = roundCurrency(imponibleBase * 0.07)
   }
 
+  const healthSplit = resolveChileHealthSplitAmounts({
+    payRegime,
+    healthSystem,
+    imponibleBase,
+    totalHealthAmount: healthAmount
+  })
+
+  const employerCosts = await resolveChileEmployerCostAmounts({
+    payRegime,
+    contractType,
+    imponibleBase,
+    periodDate: fallbackPeriodDate
+  })
+
   const unemploymentAmount = roundCurrency(imponibleBase * derivedUnemploymentRate)
   const normalizedApvAmount = hasApv ? roundCurrency(apvAmount || 0) : 0
   const normalizedTaxAmount = roundCurrency(taxAmount || 0)
   const taxableBase = roundCurrency(Math.max(0, imponibleBase - afpAmount - healthAmount - unemploymentAmount))
   const totalDeductions = roundCurrency(afpAmount + healthAmount + unemploymentAmount + normalizedTaxAmount + normalizedApvAmount)
-  const netTotalCalculated = roundCurrency(imponibleBase + remoteAllowance - totalDeductions)
+
+  const netTotalCalculated = roundCurrency(
+    imponibleBase + remoteAllowance + colacionAmount + movilizacionAmount - totalDeductions
+  )
 
   return {
     grossTotal,
     netTotalCalculated,
     chileAfpName: afpName || null,
-    chileAfpRate: normalizedAfpRate || null,
+    chileAfpRate: totalAfpRate || null,
     chileAfpAmount: afpAmount,
+    chileAfpCotizacionAmount: afpCotizacionAmount,
+    chileAfpComisionAmount: afpComisionAmount,
+    chileGratificacionLegalAmount: gratificationLegalAmount > 0 ? gratificationLegalAmount : null,
+    chileColacionAmount: colacionAmount > 0 ? colacionAmount : null,
+    chileMovilizacionAmount: movilizacionAmount > 0 ? movilizacionAmount : null,
     chileHealthSystem: healthSystem || 'fonasa',
     chileHealthAmount: healthAmount,
+    chileHealthObligatoriaAmount: healthSplit?.obligatoriaAmount ?? null,
+    chileHealthVoluntariaAmount: healthSplit?.voluntariaAmount ?? null,
+    chileEmployerSisAmount: employerCosts?.sisAmount ?? null,
+    chileEmployerCesantiaAmount: employerCosts?.cesantiaAmount ?? null,
+    chileEmployerMutualAmount: employerCosts?.mutualAmount ?? null,
+    chileEmployerTotalCost: employerCosts?.totalCost ?? null,
     chileUnemploymentRate: derivedUnemploymentRate,
     chileUnemploymentAmount: unemploymentAmount,
     chileTaxableBase: taxableBase,

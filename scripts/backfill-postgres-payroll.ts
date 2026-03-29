@@ -215,14 +215,31 @@ const main = async () => {
     for (const r of configRows as any[]) {
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_payroll.payroll_bonus_config (
-          config_id, otd_threshold, rpa_threshold, effective_from, created_at
-        ) VALUES ($1,$2,$3,$4,$5)
+          config_id,
+          otd_threshold,
+          rpa_threshold,
+          otd_floor,
+          rpa_full_payout_threshold,
+          rpa_soft_band_end,
+          rpa_soft_band_floor_factor,
+          effective_from,
+          created_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
         ON CONFLICT (config_id, effective_from) DO UPDATE SET
           otd_threshold = EXCLUDED.otd_threshold,
-          rpa_threshold = EXCLUDED.rpa_threshold`,
+          rpa_threshold = EXCLUDED.rpa_threshold,
+          otd_floor = EXCLUDED.otd_floor,
+          rpa_full_payout_threshold = EXCLUDED.rpa_full_payout_threshold,
+          rpa_soft_band_end = EXCLUDED.rpa_soft_band_end,
+          rpa_soft_band_floor_factor = EXCLUDED.rpa_soft_band_floor_factor`,
         [
           toStr(r.config_id) || 'default',
-          toNum(r.otd_threshold), toNum(r.rpa_threshold),
+          toNum(r.otd_threshold),
+          toNum(r.rpa_threshold),
+          toNum(r.otd_floor) || 70,
+          toNum(r.rpa_full_payout_threshold) || 1.7,
+          toNum(r.rpa_soft_band_end) || 2,
+          toNum(r.rpa_soft_band_floor_factor) || 0.8,
           toDate(r.effective_from) || '2026-01-01',
           toTs(r.created_at) || new Date().toISOString()
         ]

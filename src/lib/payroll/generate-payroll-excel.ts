@@ -135,11 +135,18 @@ const buildDetalleSheet = (
     'Base ajustada',
     'Asig. teletrabajo',
     'Teletrabajo ajust.',
+    'Colación',
+    'Movilización',
+    'Etiqueta bono fijo',
+    'Bono fijo',
+    'Bono fijo ajust.',
     'Bono OTD',
     'Bono RpA',
     'Bono adicional',
     'Total bruto',
     'AFP',
+    'AFP cotización',
+    'AFP comisión',
     'Salud',
     'Seg. cesantía',
     'Impuesto',
@@ -164,6 +171,28 @@ const buildDetalleSheet = (
   for (const entry of entries) {
     const currency = entry.currency
 
+    const entryWithAllowances = entry as PayrollEntry & {
+      chileColacionAmount?: number | null
+      chileMovilizacionAmount?: number | null
+      chileColacion?: number | null
+      chileMovilizacion?: number | null
+      colacionAmount?: number | null
+      movilizacionAmount?: number | null
+      totalHaberesNoImponibles?: number | null
+    }
+
+    const colacion =
+      entryWithAllowances.chileColacionAmount ??
+      entryWithAllowances.chileColacion ??
+      entryWithAllowances.colacionAmount ??
+      0
+
+    const movilizacion =
+      entryWithAllowances.chileMovilizacionAmount ??
+      entryWithAllowances.chileMovilizacion ??
+      entryWithAllowances.movilizacionAmount ??
+      0
+
     const row = sheet.addRow([
       entry.memberName,
       entry.memberEmail,
@@ -173,11 +202,18 @@ const buildDetalleSheet = (
       entry.adjustedBaseSalary ?? entry.baseSalary,
       entry.remoteAllowance,
       entry.adjustedRemoteAllowance ?? entry.remoteAllowance,
+      colacion,
+      movilizacion,
+      entry.fixedBonusLabel,
+      entry.fixedBonusAmount,
+      entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount,
       entry.bonusOtdAmount,
       entry.bonusRpaAmount,
       entry.bonusOtherAmount,
       entry.grossTotal,
       entry.chileAfpAmount ?? 0,
+      entry.chileAfpCotizacionAmount ?? 0,
+      entry.chileAfpComisionAmount ?? 0,
       entry.chileHealthAmount ?? 0,
       entry.chileUnemploymentAmount ?? 0,
       entry.chileTaxAmount ?? 0,
@@ -189,8 +225,8 @@ const buildDetalleSheet = (
       entry.manualOverride ? 'Sí' : 'No'
     ])
 
-    // Apply currency format to numeric cells (columns 5-21)
-    for (let col = 5; col <= 21; col++) {
+    // Apply currency format to numeric cells excluding text/date style columns.
+    for (const col of [5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]) {
       const cell = row.getCell(col)
 
       if (typeof cell.value === 'number') {
@@ -207,7 +243,7 @@ const buildDetalleSheet = (
   }
 
   // Auto-filter
-  sheet.autoFilter = { from: 'A1', to: `V${entries.length + 1}` }
+  sheet.autoFilter = { from: 'A1', to: `AC${entries.length + 1}` }
 
   return sheet
 }

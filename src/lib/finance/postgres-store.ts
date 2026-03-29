@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
@@ -85,6 +83,18 @@ type PostgresFinanceExchangeRateRow = {
   updated_at: string | Date | null
 }
 
+type PostgresEconomicIndicatorRow = {
+  indicator_id: string
+  indicator_code: string
+  indicator_date: string | Date
+  value: unknown
+  source: string | null
+  unit: string | null
+  frequency: string | null
+  created_at: string | Date | null
+  updated_at: string | Date | null
+}
+
 export type FinanceAccountRecord = {
   accountId: string
   accountName: string
@@ -140,6 +150,20 @@ export type FinanceExchangeRateRecord = {
   rate: number
   rateDate: string
   source: string
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export type FinanceEconomicIndicatorCode = 'USD_CLP' | 'UF' | 'UTM' | 'IPC' | 'IMM'
+
+export type FinanceEconomicIndicatorRecord = {
+  indicatorId: string
+  indicatorCode: FinanceEconomicIndicatorCode
+  indicatorDate: string
+  value: number
+  source: string
+  unit: string | null
+  frequency: string | null
   createdAt: string | null
   updatedAt: string | null
 }
@@ -212,6 +236,18 @@ const mapExchangeRate = (row: PostgresFinanceExchangeRateRow): FinanceExchangeRa
   rate: roundCurrency(toNumber(row.rate)),
   rateDate: toDateString(row.rate_date as string | { value?: string } | null) || '',
   source: row.source ? normalizeString(row.source) : 'manual',
+  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+  updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+})
+
+const mapEconomicIndicator = (row: PostgresEconomicIndicatorRow): FinanceEconomicIndicatorRecord => ({
+  indicatorId: normalizeString(row.indicator_id),
+  indicatorCode: normalizeString(row.indicator_code) as FinanceEconomicIndicatorCode,
+  indicatorDate: toDateString(row.indicator_date as string | { value?: string } | null) || '',
+  value: toNumber(row.value),
+  source: row.source ? normalizeString(row.source) : 'manual',
+  unit: row.unit ? normalizeString(row.unit) : null,
+  frequency: row.frequency ? normalizeString(row.frequency) : null,
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
   updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
 })
@@ -328,6 +364,8 @@ export const shouldFallbackFromFinancePostgres = (error: unknown) => {
   return (
     message.includes('finance postgres store is not configured') ||
     message.includes('finance postgres schema is not ready') ||
+    message.includes('greenhouse_finance.economic_indicators') ||
+    message.includes('economic_indicators') ||
     message.includes('greenhouse postgres is not configured') ||
     message.includes('cloud sql') ||
     message.includes('cloudsql') ||
@@ -854,6 +892,141 @@ export const upsertFinanceExchangeRateInPostgres = async ({
       aggregateType: 'finance_exchange_rate',
       aggregateId: rateId,
       eventType: 'finance.exchange_rate.upserted',
+      payload: persisted
+    })
+
+    return persisted
+  })
+}
+
+export const getLatestFinanceEconomicIndicatorFromPostgres = async ({
+  indicatorCode
+}: {
+  indicatorCode: FinanceEconomicIndicatorCode
+}) => {
+  await assertFinancePostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<PostgresEconomicIndicatorRow>(
+    `
+      SELECT
+        indicator_id,
+        indicator_code,
+        indicator_date,
+        value,
+        source,
+        unit,
+        frequency,
+        created_at,
+        updated_at
+      FROM greenhouse_finance.economic_indicators
+      WHERE indicator_code = $1
+      ORDER BY indicator_date DESC
+      LIMIT 1
+    `,
+    [indicatorCode]
+  )
+
+  return rows[0] ? mapEconomicIndicator(rows[0]) : null
+}
+
+export const getFinanceEconomicIndicatorAtOrBeforeFromPostgres = async ({
+  indicatorCode,
+  requestedDate
+}: {
+  indicatorCode: FinanceEconomicIndicatorCode
+  requestedDate: string
+}) => {
+  await assertFinancePostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<PostgresEconomicIndicatorRow>(
+    `
+      SELECT
+        indicator_id,
+        indicator_code,
+        indicator_date,
+        value,
+        source,
+        unit,
+        frequency,
+        created_at,
+        updated_at
+      FROM greenhouse_finance.economic_indicators
+      WHERE indicator_code = $1
+        AND indicator_date <= $2::date
+      ORDER BY indicator_date DESC
+      LIMIT 1
+    `,
+    [indicatorCode, requestedDate]
+  )
+
+  return rows[0] ? mapEconomicIndicator(rows[0]) : null
+}
+
+export const upsertFinanceEconomicIndicatorInPostgres = async ({
+  indicatorId,
+  indicatorCode,
+  indicatorDate,
+  value,
+  source,
+  unit,
+  frequency
+}: {
+  indicatorId: string
+  indicatorCode: FinanceEconomicIndicatorCode
+  indicatorDate: string
+  value: number
+  source: string
+  unit?: string | null
+  frequency?: string | null
+}) => {
+  await assertFinancePostgresReady()
+
+  return withGreenhousePostgresTransaction(async client => {
+    const rows = await queryRows<PostgresEconomicIndicatorRow>(
+      `
+        INSERT INTO greenhouse_finance.economic_indicators (
+          indicator_id,
+          indicator_code,
+          indicator_date,
+          value,
+          source,
+          unit,
+          frequency,
+          created_at,
+          updated_at
+        )
+        VALUES ($1, $2, $3::date, $4, $5, $6, $7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT (indicator_id) DO UPDATE
+        SET
+          indicator_code = EXCLUDED.indicator_code,
+          indicator_date = EXCLUDED.indicator_date,
+          value = EXCLUDED.value,
+          source = EXCLUDED.source,
+          unit = EXCLUDED.unit,
+          frequency = EXCLUDED.frequency,
+          updated_at = CURRENT_TIMESTAMP
+        RETURNING
+          indicator_id,
+          indicator_code,
+          indicator_date,
+          value,
+          source,
+          unit,
+          frequency,
+          created_at,
+          updated_at
+      `,
+      [indicatorId, indicatorCode, indicatorDate, value, source, unit ?? null, frequency ?? null],
+      client
+    )
+
+    const persisted = mapEconomicIndicator(rows[0])
+
+    await publishFinanceOutboxEvent({
+      client,
+      aggregateType: 'economic_indicator',
+      aggregateId: indicatorId,
+      eventType: 'finance.economic_indicator.upserted',
       payload: persisted
     })
 

@@ -61,7 +61,7 @@ describe('AgencyTeamView', () => {
     renderWithTheme(<AgencyTeamView />)
 
     await waitFor(() => {
-      expect(screen.getByText('1 personas · Capacidad 4 tipos')).toBeInTheDocument()
+      expect(screen.getByText('1 personas · Capacidad y dedicación')).toBeInTheDocument()
     })
 
     expect(screen.getByText('Sin métricas operativas')).toBeInTheDocument()
@@ -111,7 +111,7 @@ describe('AgencyTeamView', () => {
     renderWithTheme(<AgencyTeamView />)
 
     await waitFor(() => {
-      expect(screen.getByText('1 personas · Capacidad 4 tipos')).toBeInTheDocument()
+      expect(screen.getByText('1 personas · Capacidad y dedicación')).toBeInTheDocument()
     })
 
     expect(screen.getAllByText('Uso operativo').length).toBeGreaterThan(0)

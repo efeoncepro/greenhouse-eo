@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 
 import Link from 'next/link'
 
@@ -24,12 +24,13 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
+import { getCurrentPayrollPeriod, getNextPayrollPeriodSuggestion } from '@/lib/payroll/current-payroll-period'
 import type { CompensationVersion, PayrollCompensationMember, PayrollEntry, PayrollPeriod } from '@/types/payroll'
 import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
 import PayrollPersonnelExpenseTab from './PayrollPersonnelExpenseTab'
-import { formatCurrency, formatPeriodLabel, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatPeriodLabel, periodStatusConfig } from './helpers'
 
 const PayrollDashboard = () => {
   const [tab, setTab] = useState('period')
@@ -37,8 +38,11 @@ const PayrollDashboard = () => {
 
   // Data
   const [periods, setPeriods] = useState<PayrollPeriod[]>([])
-  const [currentPeriod, setCurrentPeriod] = useState<PayrollPeriod | null>(null)
-  const [entries, setEntries] = useState<PayrollEntry[]>([])
+  const [activePeriod, setActivePeriod] = useState<PayrollPeriod | null>(null)
+  const [activeEntries, setActiveEntries] = useState<PayrollEntry[]>([])
+  const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null)
+  const [selectedEntries, setSelectedEntries] = useState<PayrollEntry[]>([])
+  const selectedPeriodIdRef = useRef<string | null>(null)
   const [compensations, setCompensations] = useState<CompensationVersion[]>([])
   const [eligibleMembers, setEligibleMembers] = useState<PayrollCompensationMember[]>([])
   const [compensationMembers, setCompensationMembers] = useState<PayrollCompensationMember[]>([])
@@ -49,7 +53,18 @@ const PayrollDashboard = () => {
   const [newPeriodOpen, setNewPeriodOpen] = useState(false)
   const [newYear, setNewYear] = useState(new Date().getFullYear())
   const [newMonth, setNewMonth] = useState(new Date().getMonth() + 1)
-  const [newUf, setNewUf] = useState<number | ''>('')
+  const [newTaxTableVersion, setNewTaxTableVersion] = useState('')
+
+  const createPeriodSuggestion = getNextPayrollPeriodSuggestion(periods)
+  const createPeriodLabel = formatPeriodLabel(createPeriodSuggestion.year, createPeriodSuggestion.month)
+
+  const openNewPeriodDialog = useCallback(() => {
+    const suggestion = getNextPayrollPeriodSuggestion(periods)
+
+    setNewYear(suggestion.year)
+    setNewMonth(suggestion.month)
+    setNewPeriodOpen(true)
+  }, [periods])
 
   const fetchAll = useCallback(async () => {
     try {
@@ -63,25 +78,43 @@ const PayrollDashboard = () => {
       if (periodsRes.ok) {
         const data = await periodsRes.json()
 
-        setPeriods(data.periods || [])
+        const nextPeriods = data.periods || []
 
-        // Auto-select the most recent non-exported period, or the first one
-        const active = (data.periods || []).find(
-          (p: PayrollPeriod) => p.status !== 'exported'
-        ) || (data.periods || [])[0] || null
+        setPeriods(nextPeriods)
 
-        if (active) {
-          setCurrentPeriod(active)
-          const entriesRes = await fetch(`/api/hr/payroll/periods/${active.periodId}/entries`)
+        // Auto-select only the latest chronological period if it is still open
+        const active = getCurrentPayrollPeriod(nextPeriods)
+
+        const currentSelectedPeriodId = selectedPeriodIdRef.current
+
+        const nextSelectedPeriodId =
+          currentSelectedPeriodId && nextPeriods.some((period: PayrollPeriod) => period.periodId === currentSelectedPeriodId)
+            ? currentSelectedPeriodId
+            : active?.periodId ?? null
+
+        setActivePeriod(active)
+        setSelectedPeriodId(nextSelectedPeriodId)
+
+        // Fetch entries for the period to display in KPIs: active period, or last period as fallback
+        const kpiTargetPeriod = active ?? (nextPeriods.length > 0
+          ? nextPeriods.reduce((latest: PayrollPeriod, p: PayrollPeriod) => (p.periodId > latest.periodId ? p : latest), nextPeriods[0])
+          : null)
+
+        if (kpiTargetPeriod) {
+          const entriesRes = await fetch(`/api/hr/payroll/periods/${kpiTargetPeriod.periodId}/entries`)
 
           if (entriesRes.ok) {
             const eData = await entriesRes.json()
 
-            setEntries(eData.entries || [])
+            setActiveEntries(eData.entries || [])
+
+            if (nextSelectedPeriodId === kpiTargetPeriod.periodId) {
+              setSelectedEntries(eData.entries || [])
+            }
           }
         } else {
-          setCurrentPeriod(null)
-          setEntries([])
+          setActiveEntries([])
+          setSelectedEntries([])
         }
       } else {
         const data = await periodsRes.json().catch(() => null)
@@ -116,6 +149,10 @@ const PayrollDashboard = () => {
     fetchAll()
   }, [fetchAll])
 
+  useEffect(() => {
+    selectedPeriodIdRef.current = selectedPeriodId
+  }, [selectedPeriodId])
+
   const handleRefresh = useCallback(() => {
     startTransition(() => {
       fetchAll()
@@ -129,7 +166,7 @@ const PayrollDashboard = () => {
       body: JSON.stringify({
         year: newYear,
         month: newMonth,
-        ...(newUf !== '' && { ufValue: newUf })
+        taxTableVersion: newTaxTableVersion || null
       })
     })
 
@@ -141,24 +178,24 @@ const PayrollDashboard = () => {
       return
     }
 
+    setNewTaxTableVersion('')
     setNewPeriodOpen(false)
-    setNewUf('')
     handleRefresh()
-  }, [newYear, newMonth, newUf, handleRefresh])
+  }, [newYear, newMonth, newTaxTableVersion, handleRefresh])
 
   const handleSelectHistoryPeriod = useCallback(
     async (periodId: string) => {
       const period = periods.find(p => p.periodId === periodId)
 
       if (!period) return
-      setCurrentPeriod(period)
+      setSelectedPeriodId(periodId)
 
       const entriesRes = await fetch(`/api/hr/payroll/periods/${periodId}/entries`)
 
       if (entriesRes.ok) {
         const data = await entriesRes.json()
 
-        setEntries(data.entries || [])
+        setSelectedEntries(data.entries || [])
       }
 
       setTab('period')
@@ -182,13 +219,24 @@ const PayrollDashboard = () => {
     )
   }
 
-  // Stats
-  const totalGross = entries.reduce((s, e) => s + e.grossTotal, 0)
-  const totalNet = entries.reduce((s, e) => s + e.netTotal, 0)
-  const statusConfig = currentPeriod ? periodStatusConfig[currentPeriod.status] : null
-  const primaryCurrency = entries[0]?.currency ?? 'CLP'
+  // Stats — show active period, or last period as fallback for KPI context
+  const lastPeriod = periods.length > 0
+    ? periods.reduce((latest, p) => (p.periodId > latest.periodId ? p : latest), periods[0])
+    : null
+
+  const kpiPeriod = activePeriod ?? lastPeriod
+  const kpiEntries = activeEntries
+  const isKpiFallback = !activePeriod && lastPeriod !== null
+  const statusConfig = kpiPeriod ? periodStatusConfig[kpiPeriod.status] : null
   const needsCompensationSetup = compensations.length === 0
   const hasActivePayrollMembers = compensationMembers.length > 0
+  const grossSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.grossTotal)
+  const netSummary = buildPayrollCurrencySummary(kpiEntries, entry => entry.netTotal)
+
+  const selectedPeriod = selectedPeriodId ? periods.find(period => period.periodId === selectedPeriodId) ?? null : null
+  const displayedPeriod = selectedPeriod ?? activePeriod
+  const displayedEntries = selectedPeriod?.periodId === activePeriod?.periodId ? activeEntries : selectedEntries
+  const isHistoricalSelection = Boolean(displayedPeriod && activePeriod && displayedPeriod.periodId !== activePeriod.periodId)
 
   return (
     <>
@@ -204,7 +252,7 @@ const PayrollDashboard = () => {
           <Button
             variant='contained'
             startIcon={<i className='tabler-plus' />}
-            onClick={() => setNewPeriodOpen(true)}
+            onClick={openNewPeriodDialog}
           >
             Nuevo período
           </Button>
@@ -241,11 +289,11 @@ const PayrollDashboard = () => {
         <Grid container spacing={6}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
-              title='Período actual'
-              stats={currentPeriod ? formatPeriodLabel(currentPeriod.year, currentPeriod.month) : '—'}
+              title={isKpiFallback ? 'Último período' : 'Período actual'}
+              stats={kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}
               avatarIcon='tabler-calendar'
-              avatarColor='primary'
-              subtitle={statusConfig?.label ?? 'Sin período'}
+              avatarColor={isKpiFallback ? 'secondary' : 'primary'}
+              subtitle={isKpiFallback ? 'No hay período abierto' : (statusConfig?.label ?? 'Sin período')}
               statusLabel={statusConfig?.label}
               statusColor={statusConfig?.color}
               statusIcon={statusConfig?.icon}
@@ -254,28 +302,28 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Colaboradores'
-              stats={String(entries.length)}
+              stats={String(kpiEntries.length)}
               avatarIcon='tabler-users'
               avatarColor='info'
-              subtitle='Con nómina en este período'
+              subtitle={isKpiFallback ? `Último: ${kpiPeriod ? formatPeriodLabel(kpiPeriod.year, kpiPeriod.month) : '—'}` : 'Con nómina en este período'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Costo bruto'
-              stats={formatCurrency(totalGross, primaryCurrency)}
+              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
               avatarIcon='tabler-currency-dollar'
               avatarColor='warning'
-              subtitle='Total bruto del período'
+              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : 'Total bruto del período'}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={formatCurrency(totalNet, primaryCurrency)}
+              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle='Total neto a pagar'
+              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'Total neto a pagar'}
             />
           </Grid>
         </Grid>
@@ -311,9 +359,12 @@ const PayrollDashboard = () => {
 
           <TabPanel value='period' sx={{ p: 0 }}>
             <PayrollPeriodTab
-              period={currentPeriod}
-              entries={entries}
+              period={displayedPeriod}
+              entries={displayedEntries}
               onRefresh={handleRefresh}
+              onCreatePeriod={openNewPeriodDialog}
+              createPeriodLabel={createPeriodLabel}
+              isHistoricalSelection={isHistoricalSelection}
             />
           </TabPanel>
 
@@ -329,6 +380,7 @@ const PayrollDashboard = () => {
           <TabPanel value='history' sx={{ p: 0 }}>
             <PayrollHistoryTab
               periods={periods}
+              selectedPeriodId={selectedPeriodId}
               onSelectPeriod={handleSelectHistoryPeriod}
             />
           </TabPanel>
@@ -376,16 +428,26 @@ const PayrollDashboard = () => {
             <CustomTextField
               fullWidth
               size='small'
-              label='Valor UF (opcional)'
-              type='number'
-              value={newUf}
-              onChange={e => setNewUf(e.target.value === '' ? '' : Number(e.target.value))}
-              helperText='Necesario para calcular Isapre. El salario base, AFP, salud y bonos se configuran en Compensaciones.'
+              label='Tabla impuesto Chile'
+              placeholder='SII-2026-03'
+              value={newTaxTableVersion}
+              onChange={e => setNewTaxTableVersion(e.target.value)}
+              helperText='Requerida si el período incluye colaboradores Chile.'
             />
+            <Alert severity='info'>
+              La UF del período se sincroniza automáticamente según el mes imputable. Si el período incluye Chile, define también la tabla tributaria antes de calcular. El salario base, AFP, salud y bonos se configuran en Compensaciones.
+            </Alert>
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setNewPeriodOpen(false)}>
+          <Button
+            variant='tonal'
+            color='secondary'
+            onClick={() => {
+              setNewTaxTableVersion('')
+              setNewPeriodOpen(false)
+            }}
+          >
             Cancelar
           </Button>
           <Button variant='contained' onClick={handleCreatePeriod}>

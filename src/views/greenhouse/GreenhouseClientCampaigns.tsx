@@ -11,7 +11,6 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
-import LinearProgress from '@mui/material/LinearProgress'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'

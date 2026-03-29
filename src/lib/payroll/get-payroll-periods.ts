@@ -18,6 +18,7 @@ import {
   canEditPayrollPeriodMetadata,
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
+import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import {
   isPayrollPostgresEnabled,
   pgListPayrollPeriods,
@@ -53,6 +54,30 @@ type PayrollPeriodRow = {
 }
 
 const getProjectId = () => getBigQueryProjectId()
+
+const buildPayrollPeriodIndicatorDate = (year: number, month: number) =>
+  `${year}-${String(month).padStart(2, '0')}-31`
+
+const resolvePayrollPeriodUfValue = async ({
+  year,
+  month,
+  ufValue
+}: {
+  year: number
+  month: number
+  ufValue?: number | null
+}) => {
+  if (typeof ufValue === 'number') {
+    return ufValue
+  }
+
+  const snapshot = await getHistoricalEconomicIndicatorForPeriod({
+    indicatorCode: 'UF',
+    periodDate: buildPayrollPeriodIndicatorDate(year, month)
+  })
+
+  return snapshot?.value ?? null
+}
 
 const normalizePayrollPeriod = (row: PayrollPeriodRow): PayrollPeriod => ({
   periodId: String(row.period_id || ''),
@@ -111,8 +136,18 @@ export const getPayrollPeriod = async (periodId: string) => {
 }
 
 export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
+  const resolvedUfValue = await resolvePayrollPeriodUfValue({
+    year: input.year,
+    month: input.month,
+    ufValue: input.ufValue
+  })
+
   if (isPayrollPostgresEnabled()) {
-    const periodId = await pgCreatePayrollPeriod(input)
+    const periodId = await pgCreatePayrollPeriod({
+      ...input,
+      ufValue: resolvedUfValue
+    })
+
     const created = await pgGetPayrollPeriod(periodId)
 
     if (!created) {
@@ -148,7 +183,7 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
     periodId,
     year: input.year,
     month: input.month,
-    ufValue: input.ufValue ?? null,
+    ufValue: resolvedUfValue,
     taxTableVersion: normalizeNullableString(input.taxTableVersion),
     notes: normalizeNullableString(input.notes)
   }
@@ -190,8 +225,28 @@ export const createPayrollPeriod = async (input: CreatePayrollPeriodInput) => {
 }
 
 export const updatePayrollPeriod = async (periodId: string, input: UpdatePayrollPeriodInput) => {
+  const current = await getPayrollPeriod(periodId)
+
+  if (!current) {
+    throw new PayrollValidationError('Payroll period not found.', 404)
+  }
+
+  const resolvedYear = input.year ?? current.year
+  const resolvedMonth = input.month ?? current.month
+
+  const resolvedUfValue = await resolvePayrollPeriodUfValue({
+    year: resolvedYear,
+    month: resolvedMonth,
+    ufValue: input.ufValue === undefined ? current.ufValue : input.ufValue
+  })
+
   if (isPayrollPostgresEnabled()) {
-    const updated = await pgUpdatePayrollPeriod(periodId, input)
+    const updated = await pgUpdatePayrollPeriod(periodId, {
+      ...input,
+      year: resolvedYear,
+      month: resolvedMonth,
+      ufValue: resolvedUfValue
+    })
 
     if (!updated) {
       throw new PayrollValidationError('Unable to read updated payroll period.', 500)
@@ -203,19 +258,13 @@ export const updatePayrollPeriod = async (periodId: string, input: UpdatePayroll
   await ensurePayrollInfrastructure()
   const projectId = getProjectId()
 
-  const current = await getPayrollPeriod(periodId)
-
-  if (!current) {
-    throw new PayrollValidationError('Payroll period not found.', 404)
-  }
-
   if (!canEditPayrollPeriodMetadata(current.status)) {
     throw new PayrollValidationError('Exported payroll periods cannot be updated.', 409)
   }
 
-  const nextYear = input.year ?? current.year
-  const nextMonth = input.month ?? current.month
-  const nextUfValue = input.ufValue ?? current.ufValue
+  const nextYear = resolvedYear
+  const nextMonth = resolvedMonth
+  const nextUfValue = resolvedUfValue
 
   const nextTaxTableVersion =
     input.taxTableVersion === undefined ? current.taxTableVersion : normalizeNullableString(input.taxTableVersion)

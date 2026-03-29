@@ -4,7 +4,14 @@ export const isPayrollPeriodFinalized = (status: PeriodStatus) => status === 'ex
 
 export const canRecalculatePayrollPeriod = (status: PeriodStatus) => !isPayrollPeriodFinalized(status)
 
-export const canEditPayrollEntries = (status: PeriodStatus) => status === 'calculated' || status === 'approved'
+export const canSetPayrollPeriodCalculated = (status: PeriodStatus) =>
+  status === 'draft' || status === 'calculated' || status === 'approved'
+
+export const canSetPayrollPeriodApproved = (status: PeriodStatus) => status === 'calculated'
+
+export const canSetPayrollPeriodExported = (status: PeriodStatus) => status === 'approved'
+
+export const canEditPayrollEntries = (status: PeriodStatus) => status === 'calculated'
 
 export const shouldReopenApprovedPayrollPeriod = (status: PeriodStatus) => status === 'approved'
 

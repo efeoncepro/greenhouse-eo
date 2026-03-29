@@ -46,7 +46,8 @@ const writableMemberColumns = new Set([
   'azure_oid',
   'notion_user_id',
   'hubspot_owner_id',
-  'active'
+  'active',
+  'assignable'
 ])
 
 const writableAssignmentColumns = new Set([
@@ -1444,6 +1445,10 @@ const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInp
 
   if ('active' in input) {
     updates.active = Boolean(input.active)
+  }
+
+  if ('assignable' in input) {
+    updates.assignable = Boolean(input.assignable)
   }
 
   return {

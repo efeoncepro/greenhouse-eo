@@ -8,14 +8,6 @@ import type { ProjectionDefinition } from '../projection-registry'
 
 // ── Types ──
 
-type AssignmentContext = {
-  memberId: string
-  clientId: string
-  profileId: string | null
-  roleTitle: string | null
-  assignmentActive: boolean
-}
-
 type SpaceContext = {
   space_id: string
   organization_id: string

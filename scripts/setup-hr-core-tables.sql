@@ -191,8 +191,14 @@ WHEN NOT MATCHED THEN
 MERGE `efeonce-group.greenhouse.leave_types` AS target
 USING (
   SELECT 'vacation' AS leave_type_code, 'Vacaciones' AS leave_type_name, 'Vacaciones anuales pagadas.' AS description, 15 AS default_annual_allowance_days, FALSE AS requires_attachment, TRUE AS is_paid, 'success' AS color_token, TRUE AS active UNION ALL
-  SELECT 'personal', 'Permiso personal', 'Permiso administrativo o personal.', 5, FALSE, TRUE, 'primary', TRUE UNION ALL
-  SELECT 'medical', 'Licencia medica', 'Ausencia por licencia o reposo medico.', 0, TRUE, TRUE, 'warning', TRUE UNION ALL
+  SELECT 'floating_holiday', 'Día libre flotante', 'Día libre remunerado otorgado por política interna.', 1, FALSE, TRUE, 'info', TRUE UNION ALL
+  SELECT 'bereavement', 'Permiso por duelo', 'Permiso remunerado breve por fallecimiento de familiar.', 3, FALSE, TRUE, 'dark', TRUE UNION ALL
+  SELECT 'civic_duty', 'Permiso por deber cívico', 'Permiso remunerado por deberes cívicos o comparecencias obligatorias.', 2, TRUE, TRUE, 'primary', TRUE UNION ALL
+  SELECT 'parental', 'Permiso parental', 'Permiso prolongado por maternidad, paternidad o cuidado parental; no remunerado por defecto en la política base.', 0, TRUE, FALSE, 'warning', TRUE UNION ALL
+  SELECT 'study', 'Permiso por estudio', 'Permiso por formación, exámenes o actividades académicas; no remunerado por defecto.', 0, FALSE, FALSE, 'info', TRUE UNION ALL
+  SELECT 'personal', 'Permiso personal', 'Permiso por gestión personal sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE UNION ALL
+  SELECT 'personal_unpaid', 'Permiso personal no remunerado', 'Alias legacy para permiso personal sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', FALSE UNION ALL
+  SELECT 'medical', 'Permiso médico / cita médica', 'Permiso breve remunerado por atención o control médico justificado.', 0, TRUE, TRUE, 'warning', TRUE UNION ALL
   SELECT 'unpaid', 'Permiso sin goce', 'Ausencia sin goce de sueldo.', 0, FALSE, FALSE, 'secondary', TRUE
 ) AS source
 ON target.leave_type_code = source.leave_type_code

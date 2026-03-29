@@ -55,7 +55,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
   return (
     <>
-    <TableContainer>
+      <TableContainer>
       <Table size='small'>
         <TableHead>
           <TableRow>
@@ -68,6 +68,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
             <TableCell align='center'>RpA</TableCell>
             <TableCell align='right'>Bono RpA</TableCell>
             <TableCell align='right'>Teletrabajo</TableCell>
+            <TableCell align='right'>Bono fijo</TableCell>
             <TableCell align='right'>Bruto</TableCell>
             <TableCell align='right'>Descuentos</TableCell>
             <TableCell align='right' sx={{ fontWeight: 700 }}>Neto</TableCell>
@@ -89,7 +90,11 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   {/* Expand */}
                   <TableCell>
                     {canExpand && (
-                      <IconButton size='small' onClick={() => toggleExpand(entry.entryId)}>
+                      <IconButton
+                        size='small'
+                        onClick={() => toggleExpand(entry.entryId)}
+                        aria-label={isExpanded ? `Contraer detalles de ${entry.memberName}` : `Expandir detalles de ${entry.memberName}`}
+                      >
                         <i className={isExpanded ? 'tabler-chevron-up' : 'tabler-chevron-down'} />
                       </IconButton>
                     )}
@@ -224,6 +229,17 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                     </Tooltip>
                   </TableCell>
 
+                  <TableCell align='right'>
+                    <Tooltip title={entry.adjustedFixedBonusAmount != null && entry.adjustedFixedBonusAmount !== entry.fixedBonusAmount
+                      ? `Original: ${formatCurrency(entry.fixedBonusAmount, entry.currency)} | Ajustado por inasistencia`
+                      : entry.fixedBonusLabel || ''
+                    }>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+                        {formatCurrency(entry.adjustedFixedBonusAmount ?? entry.fixedBonusAmount, entry.currency)}
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
+
                   {/* Bruto */}
                   <TableCell align='right'>
                     <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
@@ -265,13 +281,13 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                   <TableCell>
                     <Stack direction='row' spacing={0.5}>
                       <Tooltip title='Detalle de cálculo'>
-                        <IconButton size='small' onClick={() => setExplainEntry(entry)}>
+                        <IconButton size='small' onClick={() => setExplainEntry(entry)} aria-label={`Ver detalle de cálculo de ${entry.memberName}`}>
                           <i className='tabler-search' />
                         </IconButton>
                       </Tooltip>
                       {(periodStatus === 'approved' || periodStatus === 'exported') && (
                         <Tooltip title='Ver recibo'>
-                          <IconButton size='small' onClick={() => setReceiptEntry(entry)}>
+                          <IconButton size='small' onClick={() => setReceiptEntry(entry)} aria-label={`Ver recibo de ${entry.memberName}`}>
                             <i className='tabler-file-invoice' />
                           </IconButton>
                         </Tooltip>
