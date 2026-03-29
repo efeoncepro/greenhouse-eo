@@ -66,6 +66,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md` — identidad y acceso (12/12 implementado)
 - `GREENHOUSE_EVENT_CATALOG_V1.md` — catálogo de eventos outbox
 - `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
+- `GREENHOUSE_AI_INTELLIGENCE_LAYER_V1.md` — capa de inteligencia cross-module (scores, alerts, features, predictions)
 
 ## Task Lifecycle Protocol
 
