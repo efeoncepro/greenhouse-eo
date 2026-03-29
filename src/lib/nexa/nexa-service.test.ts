@@ -4,7 +4,7 @@ vi.mock('server-only', () => ({}))
 
 const mockGenerateContent = vi.fn()
 const mockGetGoogleGenAIClient = vi.fn()
-const mockGetGreenhouseAgentModel = vi.fn(() => 'gemini-2.5-flash')
+const mockGetGreenhouseAgentModel = vi.fn(() => 'google/gemini-2.5-flash@default')
 
 vi.mock('@/lib/ai/google-genai', () => ({
   getGoogleGenAIClient: () => mockGetGoogleGenAIClient(),
@@ -63,7 +63,7 @@ describe('NexaService', () => {
     expect(response.role).toBe('assistant')
     expect(response.content).toBe('Hola, Julio. Todo en orden.')
     expect(mockGenerateContent).toHaveBeenCalledWith(expect.objectContaining({
-      model: 'gemini-2.5-flash',
+      model: 'google/gemini-2.5-flash@default',
       config: expect.objectContaining({
         systemInstruction: expect.stringContaining('Eres Nexa, el asistente inteligente de Greenhouse.')
       })
@@ -72,7 +72,7 @@ describe('NexaService', () => {
 
   it('falls back gracefully when Vertex denies predict permission', async () => {
     mockGenerateContent.mockRejectedValue(
-      new Error("Permission 'aiplatform.endpoints.predict' denied on resource '//aiplatform.googleapis.com/projects/efeonce-group/locations/global/publishers/google/models/gemini-2.5-flash'")
+      new Error("Permission 'aiplatform.endpoints.predict' denied on resource '//aiplatform.googleapis.com/projects/efeonce-group/locations/global/publishers/google/models/google/gemini-2.5-flash@default'")
     )
 
     const response = await NexaService.generateResponse({

@@ -15,12 +15,17 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { NEXA_SUGGESTIONS } from '@/config/home-suggestions'
 import { HOME_SUBTITLE, HOME_DISCLAIMER } from '@/config/home-greetings'
+import type { NexaModelId } from '@/config/nexa-models'
+
+import NexaModelSelector from './NexaModelSelector'
 
 interface Props {
   greeting: string
+  selectedModel: NexaModelId
+  onModelChange: (model: NexaModelId) => void
 }
 
-const NexaHero = ({ greeting }: Props) => {
+const NexaHero = ({ greeting, selectedModel, onModelChange }: Props) => {
   const aui = useAui()
 
   const handleSuggestion = useCallback((text: string) => {
@@ -59,6 +64,10 @@ const NexaHero = ({ greeting }: Props) => {
       <Typography variant='body1' color='text.secondary' sx={{ mb: 4 }}>
         {HOME_SUBTITLE}
       </Typography>
+
+      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 3 }}>
+        <NexaModelSelector selectedModel={selectedModel} onChange={onModelChange} />
+      </Box>
 
       {/* Prompt input */}
       <ComposerPrimitive.Root asChild>

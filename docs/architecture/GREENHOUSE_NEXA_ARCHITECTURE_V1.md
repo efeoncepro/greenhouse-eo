@@ -28,7 +28,7 @@ Nexa **no es**:
 | UI extras | `@assistant-ui/react-markdown` | Markdown rendering con streaming cursor |
 | Runtime | `LocalRuntime` + `ChatModelAdapter` | Estado de mensajes gestionado por assistant-ui, adapter hace fetch al backend |
 | Backend API | `POST /api/home/nexa` | Next.js API route, auth via NextAuth |
-| LLM | Google Gemini (Vertex AI) | `@google/genai` con `gemini-2.5-flash` |
+| LLM | Google Gemini (Vertex AI) | `@google/genai` con allowlist de IDs reales de Vertex (`google/gemini-*`) |
 | Credenciales | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Service account de GCP con acceso a Vertex AI |
 
 ### Diagrama de flujo
@@ -323,7 +323,7 @@ Patron:
 |----------|-----------|-----------|
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Credenciales GCP para Vertex AI | Si |
 | `GCP_PROJECT` | Project ID de GCP (`efeonce-group`) | Si |
-| `GREENHOUSE_AGENT_MODEL` | Modelo Gemini (default: `gemini-2.5-flash`) | No |
+| `GREENHOUSE_AGENT_MODEL` | Modelo Gemini de Vertex (default: `google/gemini-2.5-flash@default`) | No |
 | `GOOGLE_CLOUD_LOCATION` | Region Vertex AI (default: `global`) | No |
 
 ## 8. Greetings y copy

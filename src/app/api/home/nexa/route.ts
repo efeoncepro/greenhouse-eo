@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getServerSession } from 'next-auth'
 
+import { resolveNexaModel } from '@/config/nexa-models'
 import { authOptions } from '@/lib/auth'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
 
   const { user } = session
   const body = await req.json()
-  const { prompt, history = [] } = body as { prompt: string; history: NexaMessage[] }
+  const { prompt, history = [], model } = body as { prompt: string; history: NexaMessage[]; model?: string | null }
 
   if (!prompt) {
     return NextResponse.json({ error: 'Missing prompt' }, { status: 400 })
@@ -63,7 +64,8 @@ export async function POST(req: Request) {
       prompt,
       history: history.slice(-10),
       context: lightContext,
-      runtimeContext
+      runtimeContext,
+      requestedModel: resolveNexaModel({ requestedModel: model })
     })
 
     return NextResponse.json(nexaResponse)

@@ -1,8 +1,9 @@
 export type NexaModelId =
-  | 'gemini-2.5-flash'
-  | 'gemini-2.5-pro'
-  | 'gemini-3-flash-preview'
-  | 'gemini-3-pro-preview'
+  | 'google/gemini-2.5-flash@default'
+  | 'google/gemini-2.5-pro@default'
+  | 'google/gemini-3-flash-preview@default'
+  | 'google/gemini-3-pro-preview@default'
+  | 'google/gemini-3.1-pro-preview@default'
 
 export interface NexaModelOption {
   id: NexaModelId
@@ -11,31 +12,37 @@ export interface NexaModelOption {
   badge?: 'Stable' | 'Preview'
 }
 
-export const DEFAULT_NEXA_MODEL: NexaModelId = 'gemini-2.5-flash'
+export const DEFAULT_NEXA_MODEL: NexaModelId = 'google/gemini-2.5-flash@default'
 
 export const NEXA_MODEL_OPTIONS: NexaModelOption[] = [
   {
-    id: 'gemini-2.5-flash',
+    id: 'google/gemini-2.5-flash@default',
     label: 'Gemini 2.5 Flash',
     description: 'Rapido y economico para uso diario.',
     badge: 'Stable'
   },
   {
-    id: 'gemini-2.5-pro',
+    id: 'google/gemini-2.5-pro@default',
     label: 'Gemini 2.5 Pro',
     description: 'Mas profundidad para preguntas complejas.',
     badge: 'Stable'
   },
   {
-    id: 'gemini-3-flash-preview',
+    id: 'google/gemini-3-flash-preview@default',
     label: 'Gemini 3 Flash',
     description: 'Preview de Gemini 3 orientada a latencia baja.',
     badge: 'Preview'
   },
   {
-    id: 'gemini-3-pro-preview',
+    id: 'google/gemini-3-pro-preview@default',
     label: 'Gemini 3 Pro',
     description: 'Preview de razonamiento alto para workflows complejos.',
+    badge: 'Preview'
+  },
+  {
+    id: 'google/gemini-3.1-pro-preview@default',
+    label: 'Gemini 3.1 Pro',
+    description: 'Preview mas avanzado para razonamiento y tareas complejas.',
     badge: 'Preview'
   }
 ]

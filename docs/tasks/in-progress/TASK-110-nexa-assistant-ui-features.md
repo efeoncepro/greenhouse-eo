@@ -24,6 +24,8 @@
 - El backend de Nexa ya expone contratos operativos para `check_payroll`, `get_otd`, `check_emails`, `get_capacity` y `pending_invoices` en `src/lib/nexa/nexa-tools.ts`.
 - `NexaService` ya usa function calling con Gemini y un segundo turno de síntesis grounded; si el modelo decide usar tools, el resultado queda persistido en la respuesta del runtime.
 - Se agregó `src/views/greenhouse/home/components/NexaToolRenderers.tsx` como renderer mínimo de tool results para no bloquear la adopción visual posterior.
+- `/home` ya permite seleccionar a demanda entre IDs reales de Vertex: `google/gemini-2.5-flash@default`, `google/gemini-2.5-pro@default`, `google/gemini-3-flash-preview@default`, `google/gemini-3-pro-preview@default` y `google/gemini-3.1-pro-preview@default`, con allowlist compartida entre client y server.
+- El switch actual prepara Nexa solo para modelos Gemini; Claude on Vertex queda fuera de este slice porque requiere provider/runtime adicional, no solo un cambio de model ID.
 - `NexaPanel.tsx` no se tocó; cualquier drift visual entre esa pieza legacy y el runtime real sigue siendo hallazgo para Lane B.
 
 ## Delta 2026-03-28

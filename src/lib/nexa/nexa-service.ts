@@ -8,6 +8,7 @@ import {
   createUserContent
 } from '@google/genai'
 
+import { resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
@@ -19,6 +20,7 @@ interface NexaServiceInput {
   history: NexaMessage[]
   context: HomeSnapshot
   runtimeContext: NexaRuntimeContext
+  requestedModel?: string | null
 }
 
 /**
@@ -52,7 +54,7 @@ export class NexaService {
     return normalized.includes('permission_denied') || normalized.includes('aiplatform.endpoints.predict')
   }
 
-  private static buildPermissionDeniedFallback(context: HomeSnapshot): NexaResponse {
+  private static buildPermissionDeniedFallback(context: HomeSnapshot, modelId: NexaModelId): NexaResponse {
     const topModules = context.modules.slice(0, 3).map(module => module.title)
 
     const moduleHint =
@@ -66,7 +68,8 @@ export class NexaService {
       content: `Hoy no pude conectarme al motor de IA de este entorno. ${moduleHint}`,
       timestamp: this.getTimestamp(),
       suggestions: [],
-      toolInvocations: []
+      toolInvocations: [],
+      modelId
     }
   }
 
@@ -196,7 +199,12 @@ export class NexaService {
 
   static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
     const client = await getGoogleGenAIClient()
-    const model = getGreenhouseAgentModel()
+
+    const model = resolveNexaModel({
+      requestedModel: input.requestedModel,
+      fallbackModel: getGreenhouseAgentModel()
+    })
+
     const systemPrompt = this.buildSystemPrompt(input.context)
 
     try {
@@ -213,7 +221,8 @@ export class NexaService {
         content: result.text,
         timestamp: this.getTimestamp(),
         suggestions: [],
-        toolInvocations: result.toolInvocations
+        toolInvocations: result.toolInvocations,
+        modelId: model
       }
     } catch (error) {
       const errorMessage = this.extractErrorMessage(error)
@@ -223,7 +232,7 @@ export class NexaService {
       if (this.isVertexPermissionDenied(errorMessage)) {
         console.warn('Nexa AI permission denied on Vertex AI, serving graceful fallback response.')
 
-        return this.buildPermissionDeniedFallback(input.context)
+        return this.buildPermissionDeniedFallback(input.context, model)
       }
 
       throw new Error(errorMessage)

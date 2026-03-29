@@ -52,4 +52,5 @@ export interface NexaResponse {
   suggestions?: string[]
   timestamp: string
   toolInvocations?: NexaToolInvocation[]
+  modelId?: string
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { Component, useCallback, useEffect, useMemo, useState, type ErrorInfo, type ReactNode } from 'react'
+import { Component, useCallback, useEffect, useMemo, useRef, useState, type ErrorInfo, type MutableRefObject, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Fade from '@mui/material/Fade'
@@ -21,10 +21,12 @@ import NexaThread from './components/NexaThread'
 import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
+import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import type { HomeSnapshot } from '@/types/home'
 
 const SNAPSHOT_TIMEOUT_MS = 5000
+const NEXA_MODEL_STORAGE_KEY = 'greenhouse:nexa:model'
 
 // ── Nexa adapter ───────────────────────────────────────────────
 
@@ -51,7 +53,7 @@ const toJsonValue = (value: unknown): ReadonlyJSONValue => {
   return null
 }
 
-const nexaAdapter: ChatModelAdapter = {
+const createNexaAdapter = (selectedModelRef: MutableRefObject<NexaModelId>): ChatModelAdapter => ({
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
 
@@ -74,7 +76,7 @@ const nexaAdapter: ChatModelAdapter = {
       res = await fetch('/api/home/nexa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, history }),
+        body: JSON.stringify({ prompt, history, model: selectedModelRef.current }),
         signal: abortSignal
       })
     } catch (err) {
@@ -107,7 +109,7 @@ const nexaAdapter: ChatModelAdapter = {
       ]
     }
   }
-}
+})
 
 // ── Error boundary ─────────────────────────────────────────────
 
@@ -157,7 +159,17 @@ const HomeViewSkeleton = () => (
 
 const INITIAL_MESSAGE_COUNT = 1
 
-const HomeContent = ({ snapshot, operationItems }: { snapshot: HomeSnapshot; operationItems: StatusItem[] }) => {
+const HomeContent = ({
+  snapshot,
+  operationItems,
+  selectedModel,
+  onModelChange
+}: {
+  snapshot: HomeSnapshot
+  operationItems: StatusItem[]
+  selectedModel: NexaModelId
+  onModelChange: (model: NexaModelId) => void
+}) => {
   const messageCount = useAuiState(s => s.thread.messages.length)
   const isChatActive = messageCount > INITIAL_MESSAGE_COUNT
 
@@ -172,7 +184,7 @@ const HomeContent = ({ snapshot, operationItems }: { snapshot: HomeSnapshot; ope
       {!isChatActive && (
         <Fade in timeout={400}>
           <Box>
-            <NexaHero greeting={snapshot.greeting.title} />
+            <NexaHero greeting={snapshot.greeting.title} selectedModel={selectedModel} onModelChange={onModelChange} />
 
             {/* Secondary content below hero */}
             <Box sx={{ maxWidth: 720, mx: 'auto', px: 3, mt: 4, pb: 6 }}>
@@ -193,7 +205,7 @@ const HomeContent = ({ snapshot, operationItems }: { snapshot: HomeSnapshot; ope
       {isChatActive && (
         <Fade in timeout={400}>
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <NexaThread onBack={handleBack} />
+            <NexaThread onBack={handleBack} selectedModel={selectedModel} onModelChange={onModelChange} />
           </Box>
         </Fade>
       )}
@@ -207,6 +219,25 @@ const HomeView = () => {
   const [snapshot, setSnapshot] = useState<HomeSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const selectedModelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
+
+  useEffect(() => {
+    const storedModel = typeof window !== 'undefined' ? window.localStorage.getItem(NEXA_MODEL_STORAGE_KEY) : null
+
+    const resolved = resolveNexaModel({ requestedModel: storedModel })
+
+    setSelectedModel(resolved)
+    selectedModelRef.current = resolved
+  }, [])
+
+  const handleModelChange = useCallback((model: NexaModelId) => {
+    const resolved = resolveNexaModel({ requestedModel: model })
+
+    setSelectedModel(resolved)
+    selectedModelRef.current = resolved
+    window.localStorage.setItem(NEXA_MODEL_STORAGE_KEY, resolved)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -250,6 +281,8 @@ const HomeView = () => {
     ]
   }, [])
 
+  const nexaAdapter = useMemo(() => createNexaAdapter(selectedModelRef), [])
+
   const runtime = useLocalRuntime(nexaAdapter, {
     initialMessages: [
       { role: 'assistant', content: [{ type: 'text' as const, text: nexaIntro }] }
@@ -279,7 +312,12 @@ const HomeView = () => {
   return (
     <NexaBoundary>
       <AssistantRuntimeProvider runtime={runtime}>
-        <HomeContent snapshot={effectiveSnapshot} operationItems={operationItems} />
+        <HomeContent
+          snapshot={effectiveSnapshot}
+          operationItems={operationItems}
+          selectedModel={selectedModel}
+          onModelChange={handleModelChange}
+        />
       </AssistantRuntimeProvider>
     </NexaBoundary>
   )

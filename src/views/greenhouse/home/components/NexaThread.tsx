@@ -20,10 +20,15 @@ import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomTextField from '@core/components/mui/TextField'
 
+import type { NexaModelId } from '@/config/nexa-models'
+
+import NexaModelSelector from './NexaModelSelector'
 import NexaToolRenderer from './NexaToolRenderers'
 
 interface Props {
   onBack: () => void
+  selectedModel: NexaModelId
+  onModelChange: (model: NexaModelId) => void
 }
 
 /* ── Animation keyframes ── */
@@ -310,7 +315,7 @@ const ChatComposer = () => {
 }
 
 /* ── Main thread ── */
-const NexaThread = ({ onBack }: Props) => (
+const NexaThread = ({ onBack, selectedModel, onModelChange }: Props) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '60vh' }}>
     {/* Header */}
     <Box sx={{
@@ -338,6 +343,7 @@ const NexaThread = ({ onBack }: Props) => (
         </CustomAvatar>
         <Typography variant='subtitle2' color='text.secondary'>Nexa AI</Typography>
       </Box>
+      <NexaModelSelector compact selectedModel={selectedModel} onChange={onModelChange} />
     </Box>
 
     {/* Thread with ScrollToBottom */}
