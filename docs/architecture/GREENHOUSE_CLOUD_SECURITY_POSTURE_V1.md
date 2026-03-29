@@ -57,9 +57,12 @@
   - `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs para `runtime`, `migrator` y `admin`
   - `pnpm pg:doctor --profile=runtime` ya fue validado con este path
-- Estado remanente de la fase:
+- La capa auth también quedó alineada al helper:
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
+  - `GOOGLE_CLIENT_SECRET`
+  ahora resuelven vía `src/lib/auth-secrets.ts`
+- Estado remanente de la fase:
   - validación real en `staging` y `production` con al menos un secreto servido desde Secret Manager
 
 ## 1. Purpose

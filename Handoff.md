@@ -8,7 +8,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Completado
 - `TASK-124` pasó a `in-progress` en la rama `feature/codex-task-096-wif-baseline`.
-- Slices 1-2 ya quedaron implementados con cambios mínimos y reversibles:
+- Slices 1-3 ya quedaron implementados con cambios mínimos y reversibles:
+  - Auth runtime ya quedó alineado al helper:
+    - `NEXTAUTH_SECRET`
+    - `AZURE_AD_CLIENT_SECRET`
+    - `GOOGLE_CLIENT_SECRET`
   - helper canónico `src/lib/secrets/secret-manager.ts`
   - soporte `<ENV_VAR>_SECRET_REF` + cache corta + fallback a env var
   - visibilidad básica en `/api/internal/health` para secretos críticos (`secret_manager | env | unconfigured`)
@@ -24,8 +28,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `pnpm pg:doctor --profile=runtime`
 
 ### Pendiente inmediato
-- Migrar `NEXTAUTH_SECRET` y `AZURE_AD_CLIENT_SECRET` sin tocar producción fuera del repo.
 - Validar en `staging` y `production` al menos un secreto crítico servido realmente desde Secret Manager antes de retirar env vars legacy.
+- Google SSO ya quedó simétrico con Microsoft en runtime, aunque no forme parte del bloque crítico de posture en health.
 
 ## Sesión 2026-03-29 — TASK-096 cerrada y TASK-124 derivada
 

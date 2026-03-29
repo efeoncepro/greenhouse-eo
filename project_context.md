@@ -16,10 +16,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Postgres también quedó alineado al patrón:
   - `src/lib/postgres/client.ts` ahora acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs equivalentes para `runtime`, `migrator` y `admin`
+- Auth también quedó alineado al patrón:
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - `GOOGLE_CLIENT_SECRET`
+  resuelven vía `src/lib/auth-secrets.ts`
 - Validación operativa local ya ejecutada:
   - `pnpm pg:doctor --profile=runtime`
 - Estado pendiente explícito:
-  - secretos de auth todavía siguen en env vars legacy hasta futuros slices de `TASK-124`
+  - falta validación real en `staging` y `production` con secretos servidos desde Secret Manager
 
 ## Delta 2026-03-29 WIF preview validation + non-prod environment drift
 - El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:

@@ -86,9 +86,11 @@
 - La credencial runtime de PostgreSQL también quedó alineada:
   - `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs para `runtime`, `migrator` y `admin`
+- La capa auth del portal también quedó alineada:
+  - `src/lib/auth-secrets.ts` resuelve `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `GOOGLE_CLIENT_SECRET`
+  - Microsoft SSO y Google SSO conservan su disponibilidad condicionada por `*_CLIENT_ID` + secret resuelto
 - El resto de secretos críticos siguen pendientes de migración por slices posteriores:
-  - `NEXTAUTH_SECRET`
-  - `AZURE_AD_CLIENT_SECRET`
+  - validación real en `staging` y `production`
 
 ## 1. Overview
 
