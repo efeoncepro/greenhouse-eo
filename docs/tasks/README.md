@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-114`
+- siguiente ID disponible: `TASK-118`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -143,6 +143,8 @@ Primer bloque operativo asignado:
 | 41 | `TASK-114` | [TASK-114-nexa-backend-persistence-suggestions.md](to-do/TASK-114-nexa-backend-persistence-suggestions.md) | P1 | Alto | Medio | Diseño | **[Codex]** Backend Nexa: feedback PG, thread history, dynamic suggestions. Contratos explícitos para UI |
 | 42 | `TASK-115` | [TASK-115-nexa-ui-completion.md](to-do/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Diseño | **[Claude]** UI Nexa: edit inline, follow-up suggestions, feedback thumbs, floating modal, thread sidebar |
 | 43 | `TASK-116` | [TASK-116-sidebar-navigation-audit-remediation.md](to-do/TASK-116-sidebar-navigation-audit-remediation.md) | P2 | Alto | Bajo-Medio | Auditoría completada | **[Claude]** Sidebar: fix Spanglish, desambiguar duplicados, Gestión/Mi Ficha a submenu, agregar /home, documentar reglas |
+| 44 | `TASK-117` | [TASK-117-payroll-last-business-day-auto-calculation.md](to-do/TASK-117-payroll-last-business-day-auto-calculation.md) | P1 | Alto | Medio | Diseño | Payroll official debe quedar en `calculated` el último día hábil del mes operativo, con helper temporal canónico, readiness de cálculo y job idempotente |
+| 45 | `TASK-118` | [TASK-118-ico-ai-core-embedded-intelligence.md](to-do/TASK-118-ico-ai-core-embedded-intelligence.md) | P1 | Muy alto | Alto | Diseño completado | **[Codex+Claude]** IA embebida en ICO: anomaly detection, predictions, root cause, capacity forecast, recommendations. Advisory-only, internal, TypeScript in-process |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

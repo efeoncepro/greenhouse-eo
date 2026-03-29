@@ -141,6 +141,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-114` | `to-do` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/to-do/TASK-114-nexa-backend-persistence-suggestions.md` |
 | `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
+| `TASK-117` | `to-do` | Payroll Last Business Day Auto-Calculation | `docs/tasks/to-do/TASK-117-payroll-last-business-day-auto-calculation.md` |
+| `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
 
 ## Regla de asignacion desde aqui
 
