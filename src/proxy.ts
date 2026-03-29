@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
 const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY',
@@ -8,7 +9,9 @@ const SECURITY_HEADERS = {
   'X-DNS-Prefetch-Control': 'on'
 } as const
 
-export function proxy() {
+export function proxy(request: NextRequest) {
+  void request
+
   const response = NextResponse.next()
 
   for (const [headerName, headerValue] of Object.entries(SECURITY_HEADERS)) {
