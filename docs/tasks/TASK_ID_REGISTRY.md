@@ -170,4 +170,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-129` | `to-do` | In-App Notifications via Webhook Bus | `docs/tasks/to-do/TASK-129-in-app-notifications-via-webhook-bus.md` |
 
-`TASK-130`
+| `TASK-130` | `to-do` | Login Auth Flow UX: Loading States & Transitions | `docs/tasks/to-do/TASK-130-login-auth-flow-ux-feedback.md` |
+
+`TASK-131`
