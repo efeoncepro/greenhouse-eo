@@ -28,9 +28,35 @@
   - además sigue habiendo drift de ambientación:
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
     - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
-    - el riesgo remanente ahora es de rollout parcial: staging ya usa connector, pero todavía no absorbió el baseline WIF final de esta rama
-  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
+    - `staging` ya absorbió el baseline WIF final de `develop`
+    - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
+    - `dev-greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
+    - `production` ya absorbió el baseline mínimo WIF y `greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `selectedSource=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
+    - `greenhouse-pg-dev` ya quedó endurecido con `authorizedNetworks` vacía y `sslMode=ENCRYPTED_ONLY`
+    - el riesgo remanente principal ya no es WIF en Vercel ni exposición pública abierta de Cloud SQL, sino la eventual Fase 3 de Secret Manager
+    - el path `vercel deploy --target staging` sigue mostrando un problema operativo intermitente; el workaround validado fue `vercel redeploy <deployment-ready> --target staging`
+- por lo tanto `TASK-096` ya cerró la fase WIF en Vercel y el hardening externo de Cloud SQL; el remanente del documento es la Fase 3 de Secret Manager
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
+
+## Delta 2026-03-29 — Secret Manager helper baseline
+
+- `TASK-124` ya abrió implementación real para la Fase 3 de secretos críticos.
+- Nuevo helper canónico:
+  - `src/lib/secrets/secret-manager.ts`
+  - contrato de resolución: `Secret Manager -> env fallback -> unconfigured`
+  - convención operativa por secreto crítico: `<ENV_VAR>_SECRET_REF`
+- El helper usa `@google-cloud/secret-manager`, cache corta y logging sin valores crudos.
+- `GET /api/internal/health` ahora proyecta postura de secretos críticos sin exponer payloads:
+  - `secret_manager`
+  - `env`
+  - `unconfigured`
+- Primer consumer migrado al patrón:
+  - `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper
+- Estado remanente de la fase:
+  - passwords PostgreSQL
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - validación real en `staging` y `production` con al menos un secreto servido desde Secret Manager
 
 ## 1. Purpose
 

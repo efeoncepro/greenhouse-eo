@@ -1,0 +1,73 @@
+import 'server-only'
+
+import type { CloudSecretPostureEntry, CloudSecretsPosture } from '@/lib/cloud/contracts'
+import { getSecretSource } from '@/lib/secrets/secret-manager'
+
+const CRITICAL_SECRET_ENTRIES = [
+  {
+    key: 'postgres_runtime_password',
+    envVarName: 'GREENHOUSE_POSTGRES_PASSWORD'
+  },
+  {
+    key: 'postgres_migrator_password',
+    envVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD'
+  },
+  {
+    key: 'postgres_admin_password',
+    envVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD'
+  },
+  {
+    key: 'nextauth_secret',
+    envVarName: 'NEXTAUTH_SECRET'
+  },
+  {
+    key: 'azure_ad_client_secret',
+    envVarName: 'AZURE_AD_CLIENT_SECRET'
+  },
+  {
+    key: 'nubox_bearer_token',
+    envVarName: 'NUBOX_BEARER_TOKEN'
+  }
+] as const
+
+export const getCloudSecretsPosture = async (): Promise<CloudSecretsPosture> => {
+  const entries = await Promise.all(
+    CRITICAL_SECRET_ENTRIES.map(async entry => {
+      const source = await getSecretSource({
+        envVarName: entry.envVarName
+      })
+
+      return {
+        key: entry.key,
+        envVarName: entry.envVarName,
+        secretRefEnvVarName: source.secretRefEnvVarName,
+        secretRefConfigured: Boolean(source.secretRef),
+        source: source.source
+      } satisfies CloudSecretPostureEntry
+    })
+  )
+
+  const sourceCounts = entries.reduce<Record<CloudSecretPostureEntry['source'], number>>(
+    (counts, entry) => {
+      counts[entry.source] += 1
+
+      return counts
+    },
+    {
+      secret_manager: 0,
+      env: 0,
+      unconfigured: 0
+    }
+  )
+
+  const summaryParts = [
+    sourceCounts.secret_manager > 0 ? `${sourceCounts.secret_manager} via Secret Manager` : null,
+    sourceCounts.env > 0 ? `${sourceCounts.env} via env var` : null,
+    sourceCounts.unconfigured > 0 ? `${sourceCounts.unconfigured} sin configurar` : null
+  ].filter(Boolean)
+
+  return {
+    summary: summaryParts.length > 0 ? summaryParts.join(' · ') : 'Sin secretos críticos configurados',
+    entries
+  }
+}

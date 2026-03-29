@@ -4,11 +4,12 @@ import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getCloudSecretsPosture } from '@/lib/cloud/secrets'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const health = await getCloudPlatformHealthSnapshot()
+  const [health, secrets] = await Promise.all([getCloudPlatformHealthSnapshot(), getCloudSecretsPosture()])
   const auth = getCloudGcpAuthPosture()
   const postgres = getCloudPostgresPosture()
 
@@ -20,6 +21,7 @@ export async function GET() {
       version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'local',
       auth,
       postgres,
+      secrets,
       bigquery: {
         maximumBytesBilled: getBigQueryMaximumBytesBilled()
       },

@@ -52,6 +52,21 @@
     - tras redeploy del staging activo, el entorno compartido respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
     - eso deja explícito que staging ya tomó el connector y la configuración nueva, pero no aún el baseline WIF final de esta rama
 
+## Delta 2026-03-29 — Secret Manager runtime baseline
+
+- `TASK-124` ya materializó el helper canónico `src/lib/secrets/secret-manager.ts`.
+- Nuevo contrato runtime para secretos críticos:
+  - valor legacy: `<ENV_VAR>`
+  - referencia opcional a Secret Manager: `<ENV_VAR>_SECRET_REF`
+  - resolución efectiva: `Secret Manager -> env fallback -> unconfigured`
+- `GET /api/internal/health` ahora expone también la postura de secretos críticos sin devolver valores.
+- Primer consumer migrado en el portal:
+  - `src/lib/nubox/client.ts` para `NUBOX_BEARER_TOKEN`
+- El resto de secretos críticos siguen pendientes de migración por slices posteriores:
+  - passwords PostgreSQL
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+
 ## 1. Overview
 
 Greenhouse EO runs on **Google Cloud Platform** under the project **`efeonce-group`**, with Vercel handling the Next.js frontend and API routes. The workload is spread across three GCP regions chosen for latency, cost, and service availability:
