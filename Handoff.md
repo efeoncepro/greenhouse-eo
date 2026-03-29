@@ -25,11 +25,10 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200`
   - `version=497cb19`
   - `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` reportan `source=secret_manager`
-  - `GET /api/auth/session` responde `200`
+  - `GREENHOUSE_POSTGRES_PASSWORD` sigue reportando `source=env`
 
 ### Pendiente inmediato
 - `production` sigue pendiente de validación real; no se promovió a `main` en esta sesión.
-- En `staging`, `GREENHOUSE_POSTGRES_PASSWORD` todavía reporta `source=env`.
 - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en la postura runtime del portal.
 
 ## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
