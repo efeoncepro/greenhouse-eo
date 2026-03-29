@@ -15,9 +15,11 @@
 - El rollout externo quedó parcialmente materializado: pool/provider WIF en GCP, env vars en Vercel y smoke exitoso de BigQuery + Cloud SQL Connector sin SA key.
 - El preview real de `feature/codex-task-096-wif-baseline` quedó validado con health `200 OK`, `auth.mode=wif` y Cloud SQL reachable vía connector.
 - Las variables activas del rollout WIF/conector ya fueron saneadas en Vercel.
-- `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`; tras redeploy ya usa connector pero todavía corre el baseline previo de `develop` (`auth.mode=mixed`).
-- Cloud SQL sigue sin endurecimiento externo final porque primero hay que llevar este baseline a `develop/staging` por el flujo normal y solo después cerrar red + SSL obligatoria.
-- `develop` ya recibió el lote limpio de `TASK-096`, pero el deploy manual posterior a `staging` falló dos veces en Vercel con `Unexpected error`; queda como bloqueo operativo externo a investigar.
+- `develop` ya absorbió el lote limpio de `TASK-096` y `dev-greenhouse.efeoncepro.com` quedó validado sobre `version=796f5e5`.
+- `staging` ya corre sin `GOOGLE_APPLICATION_CREDENTIALS_JSON`; `/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK.
+- `GET /api/auth/session` en `staging` responde `{}`, confirmando que el retiro de la SA key no rompió NextAuth ni el runtime compartido.
+- El path `vercel deploy --target staging` siguió fallando de forma intermitente, pero `vercel redeploy <deployment-ready> --target staging` funcionó como promoción segura del custom environment.
+- Cloud SQL sigue sin endurecimiento externo final porque todavía falta repetir este cutover en `Production` y luego cerrar red + SSL obligatoria.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).

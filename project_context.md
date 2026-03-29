@@ -2164,6 +2164,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Si una feature necesita variable nueva, primero debe existir en `Preview` y `Staging` antes de promocionarse a `main`.
 - Mantener `.env.example` alineado con las variables requeridas.
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` en `Preview` puede llegar en mas de una serializacion; el parser de `src/lib/bigquery.ts` ya soporta JSON minified y JSON legacy escapado.
+- Desde `TASK-096`, `Staging` ya no depende de `GOOGLE_APPLICATION_CREDENTIALS_JSON`; ese entorno usa `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL` y Cloud SQL Connector como baseline compartido.
 - Si `Preview` rechaza un login que en BigQuery esta activo y con hash correcto, revisar primero alias del dominio y el parseo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir fallo de credenciales.
 
 ## Variables de Entorno
@@ -2193,13 +2194,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `GOOGLE_CLIENT_SECRET`
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
-- `GOOGLE_APPLICATION_CREDENTIALS_JSON` y `GCP_PROJECT` ya existen en Vercel para `Development`, `staging` y `Production`.
+- `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` son ahora la postura objetivo para runtimes Vercel con acceso GCP.
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya no existe en `staging`; sigue como fallback transicional en `Preview` y `Production` hasta cerrar el rollout.
+- `GCP_PROJECT` sigue siendo obligatorio en `Development`, `Preview`, `Staging` y `Production`.
 - `NEXTAUTH_SECRET` y `NEXTAUTH_URL` ya estan integradas al runtime actual.
 - `AZURE_AD_CLIENT_ID` y `AZURE_AD_CLIENT_SECRET` habilitan Microsoft SSO multi-tenant en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` habilitan Google SSO en NextAuth y deben existir en cualquier ambiente donde se quiera validar ese flujo.
 - `RESEND_API_KEY` y `EMAIL_FROM` quedan reservadas para el sistema de emails transaccionales; no deben commitearse con valores reales y deben existir al menos en `Development`, `Preview`, `Staging` y `Production` si ese flujo se habilita.
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL` permite apuntar Greenhouse al servicio dedicado `hubspot-greenhouse-integration`; si no se define, el runtime usa el endpoint activo de Cloud Run como fallback.
-- Cuando una branch requiera login funcional en `Preview`, tambien debe tener `GOOGLE_APPLICATION_CREDENTIALS_JSON`, `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL` definidos en ese ambiente.
+- Cuando una branch requiera login funcional en `Preview`, debe tener `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`; ademas puede necesitar `GOOGLE_APPLICATION_CREDENTIALS_JSON` como fallback si ese preview todavia no valida WIF end-to-end.
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
 
 ## Multi-Tenant Actual

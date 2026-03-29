@@ -51,27 +51,27 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - Cloud SQL Connector con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev` y query `SELECT 1::int as ok`
 
 ### Pendiente inmediato
-- Limpiar drift de Vercel env antes del endurecimiento final:
-  - las variables activas del rollout WIF/conector ya fueron corregidas en Vercel
-  - el paso pendiente ya no es el formato, sino cerrar el baseline WIF final en `develop/staging`
-- Aclarar y corregir el mapa de ambientes Vercel:
-  - `dev-greenhouse.efeoncepro.com` ya quedó confirmado como `target=staging`
-  - tras redeploy del staging activo respondió `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
-- Camino seguro elegido:
-  - no desplegar la feature branch al entorno compartido `staging`
+- Estado compartido ya resuelto:
+  - `develop` recibió el lote limpio de `TASK-096` (`version=796f5e5`)
+  - `dev-greenhouse.efeoncepro.com` quedó sobre `greenhouse-j8884qwf1-efeonce-7670142f.vercel.app`
+  - `staging` ya valida `auth.mode=wif` y `serviceAccountKeyConfigured=false`
+  - `GET /api/auth/session` responde `{}` sin error
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
+- Hallazgo operativo Vercel:
+  - `vercel deploy --target staging` siguió fallando con `Unexpected error`
+  - `vercel redeploy <deployment-ready> --target staging` sí funcionó y quedó como workaround seguro para este custom environment
+- Camino seguro reafirmado:
   - mantener el flujo `feature -> preview -> develop/staging -> main`
-- Validar el entorno compartido con WIF final después de mergear a `develop`, antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
-- Bloqueo actual:
-  - `develop` ya recibió el lote limpio de `TASK-096` (integración selectiva)
-  - se intentó desplegar ese árbol integrado a `staging` dos veces
-  - ambos deploys fallaron en Vercel con `Unexpected error`
-  - `inspect --format json` mostró `readyState=ERROR` aunque el build quedó `READY`
-  - no seguir reintentando a ciegas; el próximo paso debería ser investigar el fallo de plataforma/deployment en Vercel antes de asumir problema de código
+  - no usar feature branches para pinchar el entorno compartido
+- Siguiente paso recomendado:
+  - repetir el mismo patrón en `Production` de forma controlada
+  - retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON` de `Production`
+  - validar `/api/internal/health` y `/api/auth/session` en producción
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`
   - activar `requireSsl=true`
-- No declarar `TASK-096` cerrada todavía: el repo quedó listo, pero la postura cloud real sigue transicional.
+- No declarar `TASK-096` cerrada todavía: `staging` ya quedó sano, pero `production` y el hardening externo de Cloud SQL siguen pendientes.
 
 ## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
 

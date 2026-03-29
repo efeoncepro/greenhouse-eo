@@ -28,9 +28,12 @@
   - además sigue habiendo drift de ambientación:
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
     - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
-    - el riesgo remanente ahora es de rollout parcial: staging ya usa connector, pero todavía no absorbió el baseline WIF final de esta rama
-    - además apareció un bloqueo operativo de deployment: el intento de desplegar el árbol integrado de `develop` a `staging` falló dos veces en Vercel con error inesperado
-  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
+    - `staging` ya absorbió el baseline WIF final de `develop`
+    - `GOOGLE_APPLICATION_CREDENTIALS_JSON` ya fue retirada de `staging`
+    - `dev-greenhouse.efeoncepro.com/api/internal/health` reporta `auth.mode=wif`, `serviceAccountKeyConfigured=false`, BigQuery OK y Cloud SQL Connector OK
+    - el riesgo remanente ya no es el entorno compartido, sino `production` y el hardening externo de Cloud SQL
+    - el path `vercel deploy --target staging` sigue mostrando un problema operativo intermitente; el workaround validado fue `vercel redeploy <deployment-ready> --target staging`
+  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar production y cerrar el hardening externo de Cloud SQL
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
 
 ## 1. Purpose
@@ -62,7 +65,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 | Dimension | Score | Key Gap |
 |-----------|-------|---------|
-| Secret Management | 5/10 | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
+| Secret Management | 6/10 | Preview y Staging ya validaron WIF; falta retirar la SA key de Production y cerrar la ventana transicional |
 | Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
 | Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
 | Observability | 1/10 | `console.error()` only, zero external alerting |
@@ -75,7 +78,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 | Threat | Current Exposure | Impact |
 |--------|-----------------|--------|
-| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF | Full GCP compromise |
+| SA key leak (env var exfiltration) | **Medium** — `staging` ya no usa SA key, pero `preview/production` todavía mantienen fallback transicional | Full GCP compromise |
 | Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var | Database compromise (payroll, identity, finance) |
 | XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |

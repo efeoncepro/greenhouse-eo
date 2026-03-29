@@ -49,9 +49,16 @@
     - las variables del rollout WIF/conector ya fueron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
     - el preview activo ya quedó con baseline mínima de Postgres para validar el connector
     - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
-    - tras redeploy del staging activo, el entorno compartido respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
-    - eso deja explícito que staging ya tomó el connector y la configuración nueva, pero no aún el baseline WIF final de esta rama
-    - `develop` ya recibió el lote limpio de `TASK-096`, pero el deploy manual posterior a `staging` falló dos veces en Vercel con `Unexpected error` y `readyState=ERROR` aun cuando el build quedó `READY`
+    - `develop` ya recibió el lote limpio de `TASK-096` en `version=796f5e5`
+    - `vercel deploy --target staging` siguió fallando con `Unexpected error`, pero `vercel redeploy <deployment-ready> --target staging` sí permitió completar el rollout compartido
+    - `staging` ahora corre sobre `greenhouse-j8884qwf1-efeonce-7670142f.vercel.app`
+    - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK` con:
+      - `version=796f5e5`
+      - `auth.mode=wif`
+      - `serviceAccountKeyConfigured=false`
+      - BigQuery reachable
+      - Cloud SQL reachable vía connector
+    - `staging` ya no tiene `GOOGLE_APPLICATION_CREDENTIALS_JSON`; el fallback de SA key queda reservado para `Preview` mientras dure la transición
 
 ## 1. Overview
 
