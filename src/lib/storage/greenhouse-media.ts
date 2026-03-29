@@ -3,7 +3,7 @@ import 'server-only'
 import { GoogleAuth } from 'google-auth-library'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { getGoogleCredentials } from '@/lib/google-credentials'
+import { getGoogleAuthOptions } from '@/lib/google-credentials'
 
 const STORAGE_SCOPE = 'https://www.googleapis.com/auth/devstorage.read_write'
 const IMAGE_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'] as const
@@ -41,11 +41,11 @@ const inferExtension = (contentType: string, fileName: string) => {
 }
 
 const getStorageAuth = () =>
-  new GoogleAuth({
-    projectId: getBigQueryProjectId(),
-    credentials: getGoogleCredentials(),
-    scopes: [STORAGE_SCOPE]
-  })
+  new GoogleAuth(
+    getGoogleAuthOptions({
+      scopes: [STORAGE_SCOPE]
+    })
+  )
 
 const getAccessToken = async () => {
   const auth = getStorageAuth()

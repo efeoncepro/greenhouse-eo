@@ -3,7 +3,7 @@ import process from 'node:process'
 import { BigQuery } from '@google-cloud/bigquery'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
-import { getGoogleCredentials } from '@/lib/google-credentials'
+import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 
 const toNum = (v: unknown): number => {
   if (v === null || v === undefined) return 0
@@ -59,13 +59,8 @@ const main = async () => {
   applyGreenhousePostgresProfile('migrator')
 
   const { closeGreenhousePostgres, runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
-  const projectId = process.env.GCP_PROJECT!
-  const credentials = getGoogleCredentials()
-
-  const bq = new BigQuery({
-    projectId,
-    ...(credentials ? { credentials } : {})
-  })
+  const projectId = getGoogleProjectId()
+  const bq = new BigQuery(getGoogleAuthOptions())
 
   try {
     // ─── 1. Compensation Versions ──────────────────────────────

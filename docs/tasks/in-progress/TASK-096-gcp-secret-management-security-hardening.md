@@ -6,15 +6,41 @@
 - `GET /api/internal/health` ya existe y puede reportar la postura base de auth/runtime como parte de la validación posterior de esta task.
 - Esta task ya no parte solo desde `google-credentials.ts`; ahora puede apoyarse en la capa Cloud institucional.
 
+## Delta 2026-03-29 — Baseline WIF-aware implementado en repo
+
+- `TASK-096` pasó a `in-progress`.
+- El repo quedó con baseline WIF-aware sin hacer bigbang:
+  - `src/lib/google-credentials.ts` ahora resuelve `wif | service_account_key | ambient_adc`
+  - `src/lib/bigquery.ts` usa el helper canónico
+  - `src/lib/postgres/client.ts` usa `createGoogleAuth()` con Cloud SQL Connector y mantiene password runtime
+  - `src/lib/storage/greenhouse-media.ts` usa el helper canónico para Storage
+  - `src/lib/ai/google-genai.ts` solo crea archivo temporal cuando el source efectivo es `service_account_key`
+- Scripts que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente también quedaron alineados al helper central:
+  - `scripts/check-ico-bq.ts`
+  - `scripts/backfill-ico-to-postgres.ts`
+  - `scripts/materialize-member-metrics.ts`
+  - `scripts/backfill-task-assignees.ts`
+  - `scripts/backfill-postgres-payroll.ts`
+  - `scripts/admin-team-runtime-smoke.ts`
+- Validación ejecutada en repo:
+  - `pnpm exec eslint ...` sobre runtime/scripts tocados
+  - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+- Pendiente para cerrar la task:
+  - crear y bindear el Workload Identity Pool/Provider real en GCP
+  - configurar `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` en Vercel
+  - validar staging/production con OIDC real antes de retirar la SA key
+  - cerrar Fase 1 externa de Cloud SQL (`authorizedNetworks`, SSL, `requireSsl`)
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
@@ -72,7 +98,7 @@ Reducir el riesgo de compromiso de credenciales de **Alto** a **Bajo** sin agreg
 - BigQuery client: `src/lib/bigquery.ts`
 - PostgreSQL client: `src/lib/postgres/client.ts`
 - Cloud Storage client: `src/lib/storage/greenhouse-media.ts`
-- Vertex AI client: `src/lib/ai/greenhouse-agent-model.ts`
+- Vertex AI client: `src/lib/ai/google-genai.ts`
 
 ## Dependencies & Impact
 
@@ -86,7 +112,7 @@ Reducir el riesgo de compromiso de credenciales de **Alto** a **Bajo** sin agreg
   - Todas las API routes que usan BigQuery, PostgreSQL, o Cloud Storage
   - Cloud Run services (notion-bq-sync, hubspot-bq-sync, etc.) — solo si se estandariza SA
   - Scripts de backfill en `scripts/` que usan GCP credentials
-  - `src/lib/ai/greenhouse-agent-model.ts` — Vertex AI temp file workaround
+  - `src/lib/ai/google-genai.ts` — Vertex AI temp file workaround
   - CI/CD: preview deployments necesitan funcionar con WIF
 - **Archivos owned:**
   - `src/lib/google-credentials.ts` (refactor principal)
@@ -100,24 +126,23 @@ Reducir el riesgo de compromiso de credenciales de **Alto** a **Bajo** sin agreg
 
 ```
 src/lib/google-credentials.ts
-  → getGoogleCredentials()
-  → Lee GOOGLE_APPLICATION_CREDENTIALS_JSON o _BASE64
-  → Parsing resiliente: raw JSON, base64, escaped, nested quotes
-  → Retorna { credentials, projectId }
+  → getGoogleAuthOptions() / createGoogleAuth()
+  → Resuelve source efectivo: wif | service_account_key | ambient_adc
+  → Mantiene getGoogleCredentials() como fallback legado de SA key
 
 src/lib/bigquery.ts
-  → new BigQuery({ credentials, projectId })
+  → new BigQuery(getGoogleAuthOptions())
 
 src/lib/postgres/client.ts
-  → new GoogleAuth({ credentials, scopes: ['sqlservice.admin'] })
-  → Cloud SQL Connector con AuthTypes.PASSWORD (no IAM)
+  → createGoogleAuth({ scopes: ['sqlservice.admin'] })
+  → Cloud SQL Connector + password runtime (no IAM DB auth todavía)
 
 src/lib/storage/greenhouse-media.ts
-  → new GoogleAuth({ credentials, scopes: ['devstorage.read_write'] })
+  → new GoogleAuth(getGoogleAuthOptions({ scopes: ['devstorage.read_write'] }))
 
-src/lib/ai/greenhouse-agent-model.ts
-  → Escribe SA key a /tmp/greenhouse-genai-*/service-account.json
-  → Sets GOOGLE_APPLICATION_CREDENTIALS env var
+src/lib/ai/google-genai.ts
+  → usa ambient auth cuando hay WIF/ADC
+  → solo escribe SA key a /tmp/greenhouse-genai-*/service-account.json como fallback transicional
   → GoogleGenAI({ vertexai: true })
 ```
 
@@ -129,10 +154,10 @@ Vercel (Next.js 16)
   ├─ Staging     → develop → dev-greenhouse.efeoncepro.com
   └─ Preview     → feature/* → *.vercel.app
        │
-       ├── Cloud SQL (us-east4) ← SA key + password
-       ├── BigQuery (US)        ← SA key
-       ├── Cloud Storage        ← SA key
-       └── Vertex AI            ← SA key temp file
+       ├── Cloud SQL (us-east4) ← WIF-ready connector + runtime password
+       ├── BigQuery (US)        ← WIF-aware helper / SA key fallback
+       ├── Cloud Storage        ← WIF-aware helper / SA key fallback
+       └── Vertex AI            ← ambient auth when available, temp file only for SA key fallback
 ```
 
 ### Servicios GCP que autentican independientemente

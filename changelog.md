@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-096 baseline WIF-aware sin bigbang
+- `src/lib/google-credentials.ts` ahora resuelve autenticación GCP con prioridad `WIF/OIDC -> SA key fallback -> ambient ADC`, manteniendo compatibilidad con el runtime actual.
+- `src/lib/bigquery.ts`, `src/lib/postgres/client.ts`, `src/lib/storage/greenhouse-media.ts` y `src/lib/ai/google-genai.ts` quedaron alineados al helper canónico.
+- Se migraron scripts operativos que todavía parseaban `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente, reduciendo drift para el rollout transicional de WIF.
+
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).
 - Assistant messages: bubble eliminada — ahora es prosa abierta sin borde ni fondo, con avatar circular y label "Nexa".

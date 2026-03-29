@@ -37,4 +37,13 @@ describe('getCloudGcpAuthPosture', () => {
 
     expect(getCloudGcpAuthPosture().mode).toBe('mixed')
   })
+
+  it('reports wif when provider is derived from split env vars', () => {
+    vi.stubEnv('GCP_PROJECT_NUMBER', '1234567890')
+    vi.stubEnv('GCP_WORKLOAD_IDENTITY_POOL_ID', 'vercel')
+    vi.stubEnv('GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID', 'greenhouse')
+    vi.stubEnv('GCP_SERVICE_ACCOUNT_EMAIL', 'runtime@example.com')
+
+    expect(getCloudGcpAuthPosture().mode).toBe('wif')
+  })
 })

@@ -74,6 +74,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL, no solo reachability y cost guard.
 - Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
 
+## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
+- `TASK-096` quedó iniciada en rama `feature/codex-task-096-wif-baseline`.
+- El repo ahora resuelve autenticación GCP con un contrato explícito en `src/lib/google-credentials.ts`:
+  - `wif` si existen `VERCEL_OIDC_TOKEN`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `service_account_key` como fallback transicional
+  - `ambient_adc` para entornos con credenciales implícitas
+- Consumers alineados:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+- Scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente también quedaron migrados al helper canónico.
+- Nuevas variables de entorno documentadas para el rollout real:
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER`
+  - `GCP_SERVICE_ACCOUNT_EMAIL`
+- Restricción vigente:
+  - el runtime actual no hace bigbang ni retira la SA key por defecto
+  - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados con OIDC real
+
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.

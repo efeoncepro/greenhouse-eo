@@ -8,11 +8,30 @@
 
 ---
 
+## Delta 2026-03-29 — Transitional WIF-aware repo baseline
+
+- `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.
+- La capa `src/lib/google-credentials.ts` ahora resuelve una estrategia transicional:
+  - `wif` cuando existen `VERCEL_OIDC_TOKEN`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `service_account_key` como fallback
+  - `ambient_adc` para runtimes con credenciales implícitas
+- Consumers alineados en esta sesión:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+  - scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente
+- La postura externa todavía sigue transicional:
+  - el repo ya soporta WIF/OIDC
+  - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
+  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en GCP/Vercel
+- La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
+
 ## 1. Purpose
 
 This document defines the target security posture, observability strategy, and operational resilience baseline for Greenhouse EO's cloud infrastructure. It serves as the architectural reference for the Cloud Posture Hardening track (7 tasks) and governs how secrets, credentials, monitoring, and database resilience should be managed going forward.
 
-It is **not** a task execution plan — each task has its own detailed spec in `docs/tasks/to-do/`. This document is the "why" and "what"; the tasks are the "how".
+It is **not** a task execution plan — each task has its own detailed spec under `docs/tasks/`. This document is the "why" and "what"; the tasks are the "how".
 
 ---
 
@@ -107,8 +126,8 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 
 **Key decisions:**
 - Vercel OIDC token → WIF → SA impersonation (no static key in runtime)
-- SA key retained **only** for Preview environments and local dev (fallback)
-- `GOOGLE_APPLICATION_CREDENTIALS_JSON` removed from Production and Staging
+- SA key retained as **transitional fallback** for Preview, local dev, scripts, and any runtime where WIF is not yet active
+- `GOOGLE_APPLICATION_CREDENTIALS_JSON` remains legacy until Production/Staging complete the real rollout and validation window
 
 #### Secret Classification
 
