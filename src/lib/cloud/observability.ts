@@ -1,19 +1,31 @@
 import 'server-only'
 
 import type { CloudObservabilityPosture } from '@/lib/cloud/contracts'
+import { getSecretSource } from '@/lib/secrets/secret-manager'
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
-type ObservabilityEnv = Record<string, string | undefined>
+type ObservabilityEnv = Partial<NodeJS.ProcessEnv>
 
-export const getCloudObservabilityPosture = (env: ObservabilityEnv = process.env): CloudObservabilityPosture => {
-  const sentryDsnConfigured = hasValue(env.SENTRY_DSN) || hasValue(env.NEXT_PUBLIC_SENTRY_DSN)
+export const getCloudObservabilityPosture = async (env: ObservabilityEnv = process.env): Promise<CloudObservabilityPosture> => {
+  const [sentryDsnSource, slackWebhookSource] = await Promise.all([
+    getSecretSource({
+      envVarName: 'SENTRY_DSN',
+      env: env as NodeJS.ProcessEnv
+    }),
+    getSecretSource({
+      envVarName: 'SLACK_ALERTS_WEBHOOK_URL',
+      env: env as NodeJS.ProcessEnv
+    })
+  ])
+
+  const sentryDsnConfigured = sentryDsnSource.source !== 'unconfigured' || hasValue(env.NEXT_PUBLIC_SENTRY_DSN)
   const sentryClientDsnConfigured = hasValue(env.NEXT_PUBLIC_SENTRY_DSN)
   const sentryAuthTokenConfigured = hasValue(env.SENTRY_AUTH_TOKEN)
   const sentryOrgConfigured = hasValue(env.SENTRY_ORG)
   const sentryProjectConfigured = hasValue(env.SENTRY_PROJECT)
   const sentrySourceMapsReady = sentryAuthTokenConfigured && sentryOrgConfigured && sentryProjectConfigured
-  const slackAlertsWebhookConfigured = hasValue(env.SLACK_ALERTS_WEBHOOK_URL)
+  const slackAlertsWebhookConfigured = slackWebhookSource.source !== 'unconfigured'
 
   const summaryParts = [
     sentryDsnConfigured

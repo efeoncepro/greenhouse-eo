@@ -7,6 +7,14 @@
 
 ## 2026-03-29
 
+### TASK-098 Slack alerts Secret Manager-ready
+- `SLACK_ALERTS_WEBHOOK_URL` ahora soporta `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` con fallback controlado a env var.
+- `src/lib/alerts/slack-notify.ts` consume el helper canónico y ya no depende solo del env directo.
+- `GET /api/internal/health` y `src/lib/cloud/secrets.ts` reflejan también la postura de `slack_alerts_webhook`.
+- Se mantuvo deliberadamente fuera de este slice:
+  - `CRON_SECRET`, por su path síncrono transversal
+  - `SENTRY_AUTH_TOKEN`, por su path build-time en `next.config.ts`
+
 ### TASK-098 Sentry minimal runtime baseline
 - Se instaló `@sentry/nextjs` y quedó cableado el wiring mínimo para App Router en `next.config.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`, `sentry.server.config.ts` y `sentry.edge.config.ts`.
 - El runtime queda fail-open: si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa.

@@ -3,7 +3,7 @@ import 'server-only'
 import type { CloudSecretPostureEntry, CloudSecretsPosture } from '@/lib/cloud/contracts'
 import { getSecretSource } from '@/lib/secrets/secret-manager'
 
-const CRITICAL_SECRET_ENTRIES = [
+const TRACKED_SECRET_ENTRIES = [
   {
     key: 'postgres_runtime_password',
     envVarName: 'GREENHOUSE_POSTGRES_PASSWORD'
@@ -27,12 +27,16 @@ const CRITICAL_SECRET_ENTRIES = [
   {
     key: 'nubox_bearer_token',
     envVarName: 'NUBOX_BEARER_TOKEN'
+  },
+  {
+    key: 'slack_alerts_webhook',
+    envVarName: 'SLACK_ALERTS_WEBHOOK_URL'
   }
 ] as const
 
 export const getCloudSecretsPosture = async (): Promise<CloudSecretsPosture> => {
   const entries = await Promise.all(
-    CRITICAL_SECRET_ENTRIES.map(async entry => {
+    TRACKED_SECRET_ENTRIES.map(async entry => {
       const source = await getSecretSource({
         envVarName: entry.envVarName
       })

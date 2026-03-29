@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Slack alerts Secret Manager-ready
+- `TASK-098` extendió el patrón de `TASK-124` a `SLACK_ALERTS_WEBHOOK_URL`.
+- Nuevo contrato soportado:
+  - `SLACK_ALERTS_WEBHOOK_URL`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- `src/lib/alerts/slack-notify.ts` ahora resuelve el webhook vía helper canónico y `GET /api/internal/health` ya refleja esa postura real.
+- Decisión de borde explícita para mantener este lote seguro:
+  - `CRON_SECRET` sigue `env-only`
+  - `SENTRY_AUTH_TOKEN` sigue `env-only` en build
+  - `SENTRY_DSN` se mantiene como config runtime/env
+
 ## Delta 2026-03-29 Sentry minimal runtime baseline
 - `TASK-098` ya no está solo en posture interna: el repo ahora incluye el wiring mínimo de `@sentry/nextjs` para App Router.
 - Archivos canónicos del slice:

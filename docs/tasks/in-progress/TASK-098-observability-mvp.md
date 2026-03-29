@@ -1,5 +1,16 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — Slack webhook alineado al patrón Secret Manager
+
+- `SLACK_ALERTS_WEBHOOK_URL` ahora soporta ref opcional `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`.
+- `src/lib/alerts/slack-notify.ts` resuelve el webhook vía `Secret Manager -> env fallback`.
+- `GET /api/internal/health` y `src/lib/cloud/secrets.ts` ya reflejan `slack_alerts_webhook` como parte de la postura de secretos.
+- `src/lib/cloud/observability.ts` ahora considera ese path real antes de decidir si Slack alerts están configuradas.
+- Deliberadamente fuera de este slice para no abrir un cambio transversal más riesgoso:
+  - `CRON_SECRET` sigue `env-only`
+  - `SENTRY_AUTH_TOKEN` sigue `env-only` en build
+  - `SENTRY_DSN` se mantiene como config runtime/env
+
 ## Delta 2026-03-29 — Slice 2 mínimo de Sentry en repo
 
 - `TASK-099` ya dejó la capa `src/proxy.ts` disponible, así que `TASK-098` retoma ahora su primer carril externo.
@@ -34,7 +45,7 @@
 - El remanente real de la task queda concentrado en rollout externo:
   - cargar `SENTRY_DSN` o `NEXT_PUBLIC_SENTRY_DSN`
   - cargar `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` si se quieren source maps
-  - cargar `SLACK_ALERTS_WEBHOOK_URL`
+  - cargar `SLACK_ALERTS_WEBHOOK_URL` o `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
   - verificar eventos reales en dashboard/canal
 
 ## Delta 2026-03-29 — Lane iniciada con posture de observabilidad
