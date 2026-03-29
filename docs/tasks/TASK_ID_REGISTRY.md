@@ -130,7 +130,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-103` | `to-do` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
 | `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
-| `TASK-106` | `to-do` | Email Delivery Admin UI | `docs/tasks/to-do/TASK-106-email-delivery-admin-ui.md` |
+| `TASK-106` | `complete` | Email Delivery Admin UI | `docs/tasks/complete/TASK-106-email-delivery-admin-ui.md` |
 | `TASK-107` | `to-do` | Auth Email Verification Request Flow | `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md` |
 | `TASK-108` | `in-progress` | Admin Center Governance Shell | `docs/tasks/in-progress/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |

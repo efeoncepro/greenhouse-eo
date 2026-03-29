@@ -4,17 +4,17 @@
 
 - La surface runtime ya existe en el repo en `src/app/(dashboard)/admin/email-delivery/page.tsx` y `src/views/greenhouse/admin/EmailDeliveryView.tsx`.
 - `TASK-108` ya la indexa explícitamente dentro de `Admin Center` como slice activa de `Delivery governance`.
-- Pendiente recomendado: auditar esta task y decidir si corresponde moverla a `in-progress` o `complete` según el estado real del runtime y sus gaps restantes.
+- La task queda cerrada en `complete`: el runtime ya existe y el pipeline documental se alineó a su estado real.
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P2` |
 | Impact | `Medio` |
 | Effort | `Medio` |
-| Status real | `Diseño completo` |
+| Status real | `Cerrada` |
 | Domain | `platform` |
 
 ## Summary

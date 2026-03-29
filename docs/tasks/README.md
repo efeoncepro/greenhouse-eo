@@ -70,6 +70,27 @@ Primer bloque operativo asignado:
 - Orden recomendado de ejecución a 2026-03-28: `TASK-100` → `TASK-101` → `TASK-098` → `TASK-099` → `TASK-102` → `TASK-103`.
 - Criterio: primero guardrails transversales baratos (`CI`), luego seguridad real de crons, después visibilidad operativa, y recién luego middleware, resiliencia de base y controles de costo.
 
+### Prioridad vigente — bloque `TASK-025` a `TASK-031`
+
+- Orden recomendado de ejecución a 2026-03-28: `TASK-026` → `TASK-030` → `TASK-027` → `TASK-028` → `TASK-029` → `TASK-031` → `TASK-025`.
+- Criterio: primero cerrar la taxonomía canónica de vinculación (`contract_type`, `payroll_via`, elegibilidad), luego módulos operativos que reutilizan outbox/notificaciones y entregan valor inmediato, después módulos de gestión y finalmente evaluaciones dependientes de goals. `TASK-025` queda al final porque sigue en `deferred`.
+
+### Prioridad vigente — Staff Aug `TASK-038` y `TASK-041`
+
+- Lectura recomendada a 2026-03-28:
+  - `TASK-038`: importante como línea comercial, pero no inmediata frente al bloque HRIS `026-031`; tratarla como baseline futura sobre `v2`, no como siguiente ejecución del repo.
+  - `TASK-041`: necesaria solo al momento de conectar Staff Aug con HRIS canónico; no debe competir como lane autónoma antes de `TASK-026` ni antes del baseline moderno de Staff Aug.
+- Criterio: primero cerrar contratos/elegibilidad y módulos HRIS operativos; después retomar Staff Aug sobre sus dependencias reales (`TASK-060`, baseline `v2`, HRIS contract model). `TASK-041` se interpreta como addendum de integración, no como backlog inmediato independiente.
+
+### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
+
+- **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-117` → `TASK-030`.
+- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011` → `TASK-096`.
+- **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
+- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-099` → `TASK-102` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
+- **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
+- Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
+
 ### Backlog Priorizado
 
 | Rank | Task ID                                                                                                  | Task                                                                                                                       | Prioridad | Impacto  | Esfuerzo          | Estado real                                                                                                          | Foco                                                                                                                                                                                    |
@@ -133,7 +154,6 @@ Primer bloque operativo asignado:
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](to-do/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | Diseño | **[Hardening 5/7]** Helper único `requireCronAuth()` timing-safe para 18 cron routes |
 | 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](to-do/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Diseño | **[Hardening 6/7]** PITR + slow query logging + pool size + testear restore |
 | 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
-| 34 | `TASK-106` | [TASK-106-email-delivery-admin-ui.md](to-do/TASK-106-email-delivery-admin-ui.md) | P2 | Medio | Medio | Diseño | **[Hardening 9/9]** Tab de correos en Control Tower con historial, filtros, detalle y suscripciones |
 | 35 | `TASK-107` | [TASK-107-auth-email-verification-request-flow.md](to-do/TASK-107-auth-email-verification-request-flow.md) | P2 | Medio | Medio | Diseño | Endpoint request de verificación de email + token `verify` + envío con `verify_email` |
 | 36 | `TASK-108` | [TASK-108-admin-center-governance-shell.md](in-progress/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | Implementación | `Admin Center` como landing institucional con taxonomía de gobernanza y separación entre governance y surfaces operativas |
 | 37 | `TASK-109` | [TASK-109-projected-payroll-runtime-hardening-observability.md](to-do/TASK-109-projected-payroll-runtime-hardening-observability.md) | P1 | Alto | Medio | Diseño | Hardening post `TASK-063`: sin DDL runtime + health de proyección + contrato downstream de `payroll.projected_*` |
@@ -191,6 +211,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [TASK-111-admin-center-secret-ref-governance-ui.md](complete/TASK-111-admin-center-secret-ref-governance-ui.md) | Tabla de governance de secret refs con dirección inbound/outbound, auth mode, owner, scope, estado y verificación. Nunca expone valores crudos. |
 | [TASK-112-admin-center-integration-health-freshness-ui.md](complete/TASK-112-admin-center-integration-health-freshness-ui.md) | Tabla de health/freshness por integración con LinearProgress, stale thresholds (6h/24h/48h), registros y fallos por lane. Incluye Webhooks como integration row. |
 | [TASK-113-admin-center-ops-audit-trail-ui.md](complete/TASK-113-admin-center-ops-audit-trail-ui.md) | ActivityTimeline (patrón Vuexy) con eventos del bus operativo y handlers degradados. Muestra actor, resultado, timestamp y follow-up. Leyenda visual + placeholder para acciones manuales. |
+| [TASK-106-email-delivery-admin-ui.md](complete/TASK-106-email-delivery-admin-ui.md) | Control Tower / Admin Center para email delivery ya materializado: historial, filtros, detalle, retry y gestión de suscripciones sobre la capa centralizada de correo. |
 | [TASK-058-economic-indicators-runtime-layer.md](complete/TASK-058-economic-indicators-runtime-layer.md) | Capa común de indicadores económicos (USD_CLP, UF, UTM, IPC), histórico desde 2026-01, sync diario, Finance Dashboard UI, AI Tooling delegado a capa común, outbox events canónicos |
 | [TASK-091-greenhouse-operational-calendar-utility.md](complete/TASK-091-greenhouse-operational-calendar-utility.md) | Utilidad canónica de calendario operativo timezone-aware, policy explícita por jurisdicción, loader `Nager.Date`, tests de business days / close window / DST Santiago |
 | [TASK-095-centralized-email-delivery-layer.md](complete/TASK-095-centralized-email-delivery-layer.md) | Capa unificada de delivery de emails sobre Resend con `sendEmail()`, registry de templates, recipient resolver por suscripción, tabla PG `email_deliveries` y migración de Auth/NotificationService/Payroll |
