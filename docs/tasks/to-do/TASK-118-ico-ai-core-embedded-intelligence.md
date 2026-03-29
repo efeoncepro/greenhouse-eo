@@ -328,6 +328,245 @@ Rules:
 
 **Esfuerzo:** ~6 horas. Es el más experimental. Hacer último.
 
+---
+
+## Phase 2 — ICO Robustness (Slices 7-13)
+
+Los slices 1-6 agregan inteligencia al pipeline. Los slices 7-13 robustecen la base sobre la que esa inteligencia opera: calidad de datos, ponderación económica, modelado de pipeline, estacionalidad, y crecimiento de personas.
+
+### Slice 7 — Data Quality Scoring (prerequisite para confianza)
+
+**Qué hace:** Calcula un score de calidad por Space basado en completitud de campos clave en sus tasks. Cada métrica ICO se acompaña de un `confidence` basado en la calidad de los datos subyacentes.
+
+**Campos evaluados:**
+```
+Para cada task en v_tasks_enriched del Space:
+  has_assignee     = assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(assignee_member_ids) > 0
+  has_due_date     = fecha_entrega IS NOT NULL OR fecha_limite IS NOT NULL
+  has_status       = estado IS NOT NULL AND estado != ''
+  has_project      = proyecto_ids IS NOT NULL AND ARRAY_LENGTH(proyecto_ids) > 0
+  has_completed_at = fecha_de_completado IS NOT NULL (solo para completed tasks)
+
+  task_completeness = (has_assignee + has_due_date + has_status + has_project) / 4
+
+Space quality score:
+  data_quality_pct = AVG(task_completeness) * 100  -- 0-100%
+  otd_confidence   = % de tasks completadas que tienen due_date (sin due_date, OTD es incalculable)
+  rpa_confidence   = % de tasks completadas que tienen rpa_value > 0
+  ftr_confidence   = % de tasks completadas que tienen client_change_round_final definido
+```
+
+**Output:**
+- Nuevo campo `data_quality` en `metric_snapshots_monthly`: `{ score_pct, otd_confidence, rpa_confidence, ftr_confidence }`
+- Señales en `ai_signals` con `signal_type = 'data_quality'` cuando score < 70%
+- UI muestra badge de confianza junto a cada métrica: "OTD: 84% (confianza: 92%)" vs "OTD: 84% (confianza: 45% ⚠️)"
+
+**Archivos:**
+- `src/lib/ico-engine/ai/data-quality-scorer.ts` (nuevo)
+- `src/lib/ico-engine/materialize.ts` (agregar step previo a anomaly detection)
+
+**Esfuerzo:** ~2 horas. Queries simples sobre campos existentes.
+
+**Impacto:** TASK-118 Slices 1-3 (anomaly, root cause, predictions) deben leer `data_quality` y degradar confianza de sus señales cuando el score es bajo. Sin esto, predicciones sobre datos sucios son teatro.
+
+### Slice 8 — Revenue-Weighted Metrics
+
+**Qué hace:** Pondera métricas ICO por el revenue del Space, para que la degradación en un cliente de $50K/mes pese más que en uno de $5K/mes.
+
+**Datos disponibles:**
+- `greenhouse_finance.fin_income` ya tiene revenue por Space
+- `greenhouse_serving.organization_operational_metrics` tiene datos por org
+- El bridge `space_id → client_id → fin_income` ya existe
+
+**Métricas nuevas:**
+```
+revenue_weighted_otd = SUM(otd_pct * monthly_revenue) / SUM(monthly_revenue)
+revenue_at_risk = SUM(monthly_revenue) WHERE otd_pct < 80% OR anomaly detected
+revenue_concentration = TOP_3_spaces_revenue / total_revenue  -- riesgo de concentración
+```
+
+**Output:**
+- Campos adicionales en agency-level aggregation
+- Señal `ai_signals` con `signal_type = 'revenue_risk'` cuando `revenue_at_risk > 20%` del total
+
+**Archivos:**
+- `src/lib/ico-engine/ai/revenue-weighting.ts` (nuevo)
+- `src/lib/ico-engine/read-metrics.ts` (agregar revenue-weighted reads)
+
+**Esfuerzo:** ~3 horas. JOIN con finance tables, math de ponderación.
+
+### Slice 9 — CSC Pipeline Analytics (Markov Chain)
+
+**Qué hace:** Modela la dinámica del Creative Supply Chain como cadena de Markov: probabilidades de transición entre fases, tiempo de permanencia por fase, y predicción de fecha de entrega basada en fase actual.
+
+**Modelo:**
+```
+Fases CSC: briefing → produccion → revision_interna → cambios_cliente → entrega
+
+Para cada Space (rolling 6 meses):
+  transition_matrix[from][to] = COUNT(tasks that moved from→to) / COUNT(tasks in from)
+  avg_dwell_time[phase] = AVG(hours in phase before transitioning)
+
+  Ejemplo:
+    P(revision_interna → entrega) = 0.65  (65% pasan directo)
+    P(revision_interna → cambios_cliente) = 0.30  (30% van a cambios)
+    P(revision_interna → revision_interna) = 0.05  (5% se quedan stuck)
+    avg_dwell_time[revision_interna] = 52 hours
+
+Para una task en revision_interna:
+  predicted_delivery = now + avg_dwell_time[revision_interna]
+                     + P(cambios_cliente) * avg_dwell_time[cambios_cliente]
+                     + avg_dwell_time[entrega]
+```
+
+**Output:**
+- `ico_engine.csc_transition_matrix` — tabla con probabilidades por Space
+- `ico_engine.csc_dwell_times` — tiempo promedio por fase por Space
+- Señales: bottleneck identification (fase con mayor dwell time), predicted delivery date por task activa
+- UI: visualización Sankey o funnel con probabilidades reales
+
+**Archivos:**
+- `src/lib/ico-engine/ai/csc-pipeline-analyzer.ts` (nuevo)
+- `src/lib/ico-engine/materialize.ts` (agregar step)
+
+**Esfuerzo:** ~5 horas. Markov chain math, transition matrix computation.
+
+**Valor:** Más preciso que predicción lineal (Slice 3) porque modela el pipeline real. "Esta task tiene 65% de probabilidad de entrega directa y 30% de ir a cambios — delivery estimado: 4 de abril."
+
+### Slice 10 — Seasonality Model
+
+**Qué hace:** Calcula el patrón estacional de cada métrica por Space (12 meses mínimo). El anomaly detector (Slice 1) descuenta la estacionalidad para evitar false alarms.
+
+**Algoritmo:**
+```
+Para cada (space_id, metric) con >=12 meses de historia:
+  seasonal_index[month] = AVG(metric for that month) / AVG(metric overall)
+
+  Ejemplo para OTD:
+    enero: 1.05 (5% sobre promedio — post-vacaciones hay menos carga)
+    diciembre: 0.88 (12% bajo promedio — siempre lento)
+
+  seasonally_adjusted_value = current_value / seasonal_index[current_month]
+
+  Anomaly detection usa seasonally_adjusted_value en vez de current_value
+```
+
+**Output:**
+- `ico_engine.seasonal_indices` — tabla con index por (space_id, metric, month)
+- Anomaly detector (Slice 1) recibe flag `use_seasonality = true` cuando hay >=12 meses de data
+- Señal mejorada: "OTD bajó 5% pero el ajuste estacional es -4%, la anomalía real es solo 1% → no generar alerta"
+
+**Archivos:**
+- `src/lib/ico-engine/ai/seasonality-model.ts` (nuevo)
+- `src/lib/ico-engine/ai/anomaly-detector.ts` (modificar para usar seasonal adjustment)
+
+**Esfuerzo:** ~3 horas. Seasonal decomposition simple.
+
+**Prerequisite:** >=12 meses de `metric_snapshots_monthly` por Space. Spaces con menos historia no reciben ajuste estacional.
+
+### Slice 11 — Operational Maturity Model
+
+**Qué hace:** Clasifica cada Space en una etapa de madurez operativa y ajusta targets/thresholds según la etapa.
+
+**Framework:**
+```
+Etapas:
+  1. Onboarding    (0-3 meses, <50 tasks completadas)
+  2. Establishing   (3-9 meses, 50-200 tasks completadas)
+  3. Optimizing     (9-18 meses, 200-500 tasks, improving trends)
+  4. Excelling      (18+ meses, 500+ tasks, consistently above targets)
+
+Targets dinámicos:
+  Onboarding:    OTD >70% = Óptimo, >55% = Atención
+  Establishing:  OTD >80% = Óptimo, >65% = Atención
+  Optimizing:    OTD >85% = Óptimo, >75% = Atención
+  Excelling:     OTD >90% = Óptimo, >82% = Atención
+
+Progression:
+  score = weighted(months_active, total_completed, trend_direction, consistency)
+  stage = map(score → stage thresholds)
+```
+
+**Output:**
+- Campo `maturity_stage` en `metric_snapshots_monthly`
+- Targets de métricas ajustados por stage (el semáforo se recalibra)
+- Señal de progresión: "Space Acme pasó de Establishing a Optimizing este mes"
+- UI badge: etapa visible en Space cards
+
+**Archivos:**
+- `src/lib/ico-engine/ai/maturity-model.ts` (nuevo)
+- `src/lib/ico-engine/metric-registry.ts` (modificar thresholds para ser stage-aware)
+
+**Esfuerzo:** ~3 horas. Framework rule-based, sin modelo.
+
+### Slice 12 — Member Growth Trajectory
+
+**Qué hace:** Analiza la evolución de cada miembro en el tiempo y detecta trends positivos, negativos, y comparación con peers del mismo rol.
+
+**Métricas:**
+```
+Para cada member con >=3 meses de metrics_by_member:
+  otd_trend = slope of OTD% over last 6 months (positivo = mejorando)
+  rpa_trend = slope of RPA over last 6 months (negativo = mejorando)
+
+  peer_group = members with same role_code AND >=3 months of data
+  otd_percentile = PERCENT_RANK(member.otd) within peer_group
+  rpa_percentile = PERCENT_RANK(member.rpa) within peer_group
+
+  growth_signal:
+    'improving'  if otd_trend > 0.5%/month AND rpa_trend < -0.1/month
+    'declining'  if otd_trend < -1%/month for 3+ consecutive months
+    'stable'     otherwise
+
+  early_warning:
+    IF declining for 3+ months → signal: 'member_attention_needed'
+    IF percentile < 25% for 2+ months → signal: 'below_peer_benchmark'
+```
+
+**Output:**
+- Campos en serving: `otd_trend`, `growth_signal`, `otd_percentile`, `rpa_percentile`
+- Señales `ai_signals` con `signal_type = 'member_growth'`
+- Person 360 muestra: trend arrow, peer comparison, growth signal badge
+- HR surface: lista de miembros con declining trajectory para coaching proactivo
+
+**Archivos:**
+- `src/lib/ico-engine/ai/member-trajectory.ts` (nuevo)
+- `src/lib/person-360/get-person-ico-profile.ts` (enriquecer con trajectory)
+
+**Esfuerzo:** ~4 horas. Regression + percentile computation.
+
+### Slice 13 — Multi-Source Enrichment (Cross-Schema Signals)
+
+**Qué hace:** Cruza datos de ICO con Finance, Payroll, y Email Delivery para generar señales compuestas que ningún módulo puede ver solo.
+
+**Señales cross-schema:**
+```
+1. Cost-per-Delivery:
+   cost = member.compensation / member.throughput
+   → Señal si cost_per_delivery sube >20% vs promedio de 3 meses
+
+2. Revenue-Delivery Correlation:
+   IF Space.revenue declining AND Space.otd declining → 'correlated_decline' (alto riesgo)
+   IF Space.revenue declining AND Space.otd stable → 'commercial_issue' (no es delivery)
+
+3. Communication Health:
+   IF Space has >3 failed emails in 7 days AND otd declining → 'communication_breakdown'
+
+4. Dedication-Performance Mismatch:
+   IF member.dedication > 100% AND member.otd declining → 'overload_degradation'
+   IF member.dedication < 50% AND member.otd declining → 'engagement_risk'
+```
+
+**Input:** `greenhouse_serving.*` (ICO + finance + payroll + email_deliveries)
+**Output:** Señales `ai_signals` con `signal_type = 'cross_signal'`
+
+**Archivos:**
+- `src/lib/ico-engine/ai/cross-schema-signals.ts` (nuevo)
+
+**Esfuerzo:** ~4 horas. JOINs cross-schema, rule engine.
+
+---
+
 ## Contrato UI — cómo se consumen las señales
 
 ### En Agency Delivery dashboard
@@ -386,6 +625,7 @@ Nexa: "El OTD es 84%, con una anomalía detectada (2.3 desviaciones bajo tu tren
 
 ### Files owned
 
+**Phase 1 — AI Intelligence (Slices 1-6):**
 - `src/lib/ico-engine/ai/anomaly-detector.ts` (nuevo)
 - `src/lib/ico-engine/ai/root-cause-analyzer.ts` (nuevo)
 - `src/lib/ico-engine/ai/predictor.ts` (nuevo)
@@ -394,19 +634,36 @@ Nexa: "El OTD es 84%, con una anomalía detectada (2.3 desviaciones bajo tu tren
 - `src/lib/ico-engine/ai/recommender.ts` (nuevo)
 - `src/lib/ico-engine/ai/eligibility.ts` (nuevo — threshold check)
 - `src/lib/ico-engine/ai/types.ts` (nuevo — shared interfaces)
-- `src/lib/ico-engine/materialize.ts` (modificar — steps 8-11)
+
+**Phase 2 — Robustness (Slices 7-13):**
+- `src/lib/ico-engine/ai/data-quality-scorer.ts` (nuevo)
+- `src/lib/ico-engine/ai/revenue-weighting.ts` (nuevo)
+- `src/lib/ico-engine/ai/csc-pipeline-analyzer.ts` (nuevo)
+- `src/lib/ico-engine/ai/seasonality-model.ts` (nuevo)
+- `src/lib/ico-engine/ai/maturity-model.ts` (nuevo)
+- `src/lib/ico-engine/ai/member-trajectory.ts` (nuevo)
+- `src/lib/ico-engine/ai/cross-schema-signals.ts` (nuevo)
+- `src/lib/ico-engine/metric-registry.ts` (modificar — stage-aware thresholds)
+- `src/lib/person-360/get-person-ico-profile.ts` (enriquecer)
+
+**Shared:**
+- `src/lib/ico-engine/materialize.ts` (modificar — steps adicionales)
 - DDL migrations para BigQuery + Postgres
 
 ## Out of Scope
 
 - Acciones semi-automáticas (toda señal es advisory-only)
-- Client-facing signals (solo agency surfaces)
+- Client-facing signals en Phase 1 (solo agency surfaces; Phase 2 puede abrir semáforo curado)
 - BigQuery ML (se usa TypeScript in-process)
 - LLM para capas 1-5 (solo capa 6 usa LLM)
 - Cambios al pipeline de materialización existente (Steps 1-7 intactos)
-- Rediseño de UI (las señales se agregan a surfaces existentes)
+- Rediseño completo de UI (las señales se agregan a surfaces existentes)
+- HRIS integration (fuera del scope de este task)
+- Real-time streaming (el batch actual es suficiente para Phase 1 y 2)
 
 ## Orden de ejecución
+
+### Phase 1 — AI Intelligence
 
 ```
 Slice 1 (Anomaly) → Slice 2 (Root Cause) → Slice 3 (Predictions)
@@ -417,6 +674,26 @@ Slice 1 (Anomaly) → Slice 2 (Root Cause) → Slice 3 (Predictions)
                                                     ↓
                                           Slice 6 (Quality/LLM)
 ```
+
+### Phase 2 — Robustness
+
+```
+Slice 7 (Data Quality) ──→ mejora confianza de Slices 1-3
+         ↓
+Slice 8 (Revenue Weight) ─→ agrega dimensión económica a recommendations
+         ↓
+Slice 9 (CSC Markov) ─────→ reemplaza predicción lineal con modelo de pipeline
+         ↓
+Slice 10 (Seasonality) ───→ mejora anomaly detection con ajuste estacional
+         ↓
+Slice 11 (Maturity) ──────→ targets dinámicos por etapa de Space
+         ↓
+Slice 12 (Member Growth) ─→ trajectory y peer comparison en Person 360
+         ↓
+Slice 13 (Cross-Schema) ──→ señales compuestas ICO × Finance × Payroll × Email
+```
+
+**Nota:** Slice 7 (Data Quality) es el prerequisite más crítico de Phase 2 — idealmente se ejecuta antes o en paralelo con Phase 1 Slice 1. Sin calidad de datos medida, las señales de IA carecen de confianza.
 
 Cada slice es desplegable independientemente. El pipeline degrada gracefully si cualquier step falla.
 
@@ -450,8 +727,47 @@ Cada slice es desplegable independientemente. El pipeline degrada gracefully si 
 - [ ] Scores en `ai_metric_scores` (tabla existente)
 - [ ] Fallback: si LLM falla, task queda sin score (no bloquea)
 
+### Slice 7 — Data Quality Scoring
+- [ ] `data_quality` score (0-100%) calculado por Space en cada materialización
+- [ ] Per-metric confidence: `otd_confidence`, `rpa_confidence`, `ftr_confidence`
+- [ ] Señal `data_quality` cuando score < 70%
+- [ ] Slices 1-3 degradan confianza de señales cuando quality score es bajo
+
+### Slice 8 — Revenue-Weighted Metrics
+- [ ] `revenue_weighted_otd` calculado a nivel agency
+- [ ] `revenue_at_risk` calculado (sum revenue de Spaces degradados)
+- [ ] Señal `revenue_risk` cuando `revenue_at_risk > 20%` del total
+
+### Slice 9 — CSC Pipeline Analytics
+- [ ] Transition matrix calculada por Space (rolling 6 meses)
+- [ ] Dwell time promedio por fase por Space
+- [ ] Predicted delivery date por task activa basada en fase actual + Markov
+- [ ] Bottleneck identification (fase con mayor dwell time)
+
+### Slice 10 — Seasonality Model
+- [ ] Seasonal index por (Space, metric, month) con >=12 meses de data
+- [ ] Anomaly detector usa `seasonally_adjusted_value` cuando disponible
+- [ ] Spaces con <12 meses no reciben ajuste (fallback a z-score simple)
+
+### Slice 11 — Operational Maturity Model
+- [ ] Spaces clasificados en 4 etapas (Onboarding → Excelling)
+- [ ] Thresholds de semáforo ajustados por etapa
+- [ ] Señal de progresión cuando un Space cambia de etapa
+
+### Slice 12 — Member Growth Trajectory
+- [ ] `otd_trend`, `growth_signal`, `otd_percentile` por miembro
+- [ ] Early warning para declining trajectory (3+ meses consecutivos)
+- [ ] Peer comparison visible en Person 360
+
+### Slice 13 — Multi-Source Enrichment
+- [ ] Cost-per-delivery calculado (compensation / throughput)
+- [ ] Revenue-delivery correlation detectada
+- [ ] Dedication-performance mismatch flagged
+- [ ] Señales `cross_signal` persistidas en `ai_signals`
+
 ### Transversal
 - [ ] Zero TS errors, lint clean
 - [ ] `pnpm build` pasa
 - [ ] Ops Health muestra AI Core como subsystem
 - [ ] Señales sincronizadas a `greenhouse_serving.ico_ai_signals` vía cron o reactive
+- [ ] Cada slice degrada gracefully si falla (no bloquea materialización ni otros slices)
