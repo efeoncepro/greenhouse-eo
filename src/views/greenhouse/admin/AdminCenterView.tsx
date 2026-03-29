@@ -139,6 +139,21 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    title: 'Notificaciones',
+    subtitle: 'Gobierno del sistema de notificaciones in-app y email.',
+    icon: 'tabler-bell',
+    avatarColor: 'primary',
+    status: { label: 'Activo', color: 'success' },
+    href: '/admin/notifications',
+    primaryAction: 'Abrir notificaciones',
+    routes: ['/admin/notifications'],
+    points: [
+      '10 categorías configuradas con audiencia y prioridad',
+      'Canales in-app (campanita) y email (Resend)',
+      'Dispatch log y preferencias por usuario'
+    ]
+  },
+  {
     title: 'AI Governance',
     subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',
     icon: 'tabler-robot',
