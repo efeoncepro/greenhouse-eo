@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 WIF preview validation + non-prod environment drift
+- El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:
+  - `version=7638f85`
+  - `auth.mode=wif`
+  - BigQuery reachable
+  - Cloud SQL reachable vía connector usando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+- Para que ese preview fuera validable hubo que completar un env set mínimo de branch:
+  - `GCP_PROJECT`
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD`
+- Drift operativo verificado el 2026-03-29:
+  - varias env vars de Vercel siguen guardadas con sufijo literal `\n`
+  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió desde un deployment `preview` de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`) y no como `staging` inequívoco
+- Regla operativa derivada:
+  - no endurecer Cloud SQL externo ni retirar la SA key hasta normalizar ese mapa de ambientes y revalidar el entorno compartido
+
 ## Delta 2026-03-29 Home landing cutover baseline
 - `TASK-119` quedó cerrada sobre la policy de landing del portal.
 - Nuevo contrato base:
@@ -101,6 +118,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Validación de transición ya ejecutada:
   - BigQuery respondió con WIF sin SA key
   - Cloud SQL Connector respondió `SELECT 1` con WIF sin SA key usando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+  - preview Vercel real `version=7638f85` quedó sano con `/api/internal/health`
 - Restricción vigente:
   - el runtime actual no hace bigbang ni retira la SA key por defecto
   - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados en preview/staging reales y se limpie un drift detectado en variables Vercel que hoy agregan sufijos literales `\n`

@@ -1,5 +1,19 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-03-29 — Connector + WIF transition posture
+
+- El runtime canonical de Greenhouse para Vercel ya quedó diseñado para usar:
+  - password PostgreSQL de `runtime`
+  - Cloud SQL Connector
+  - autenticación GCP resuelta por `src/lib/google-credentials.ts`
+- Validación real del 2026-03-29:
+  - preview `version=7638f85` respondió `Cloud SQL reachable` vía `instanceConnectionName=efeonce-group:us-east4:greenhouse-pg-dev`
+  - el path usó WIF y no SA key
+- Estado transicional todavía vigente:
+  - el entorno compartido `dev-greenhouse.efeoncepro.com` sigue observándose con host directo en lugar de connector
+  - Cloud SQL externo aún no fue endurecido (`0.0.0.0/0`, SSL opcional)
+  - no retirar el fallback ni cerrar el host path hasta validar ese entorno compartido
+
 ## Purpose
 
 Define a scalable access model for Greenhouse PostgreSQL so new domains can be provisioned without repeating manual permission debugging.
@@ -118,6 +132,10 @@ Operational rule:
 - app code only uses `runtime`
 - setup scripts use `migrator`
 - access bootstrap uses `admin`
+- para runtime Vercel, `runtime` puede viajar por:
+  - host directo temporal (`GREENHOUSE_POSTGRES_HOST`)
+  - Cloud SQL Connector preferido (`GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`)
+  la dirección objetivo es converger en connector, no mantener ambos paths indefinidamente
 
 ## Required Tooling
 

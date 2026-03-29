@@ -23,8 +23,12 @@
   - scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente
 - La postura externa todavía sigue transicional:
   - el repo ya soporta WIF/OIDC
+  - el rollout externo WIF ya existe en GCP/Vercel y quedó validado en un preview real (`version=7638f85`) con BigQuery + Cloud SQL Connector OK y sin SA key
   - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
-  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en GCP/Vercel
+  - además sigue habiendo drift de ambientación:
+    - env vars de Vercel con sufijo literal `\n`
+    - `dev-greenhouse.efeoncepro.com` no respondió el 2026-03-29 como un `staging` inequívoco, sino como preview de `develop`
+  - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
 
 ## 1. Purpose
@@ -56,7 +60,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 | Dimension | Score | Key Gap |
 |-----------|-------|---------|
-| Secret Management | 4/10 | El rollout WIF ya existe en GCP/Vercel y fue validado sin SA key, pero la SA key sigue como fallback transicional y falta limpiar drift de env + retirar la key |
+| Secret Management | 5/10 | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
 | Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
 | Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
 | Observability | 1/10 | `console.error()` only, zero external alerting |
@@ -70,7 +74,7 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 | Threat | Current Exposure | Impact |
 |--------|-----------------|--------|
 | SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF | Full GCP compromise |
-| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password in env var | Database compromise (payroll, identity, finance) |
+| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var | Database compromise (payroll, identity, finance) |
 | XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
 | BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
@@ -126,7 +130,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 
 **Key decisions:**
 - Vercel OIDC token → WIF → SA impersonation (no static key in runtime)
-- SA key retained as **transitional fallback** for Preview, local dev, scripts, and any runtime where WIF is not yet active
+- SA key retained as **transitional fallback** for local dev, scripts, and any runtime shared todavía no verificado con WIF
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` remains legacy until Production/Staging complete the real rollout and validation window
 
 #### Secret Classification
