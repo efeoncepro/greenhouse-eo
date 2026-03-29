@@ -16,6 +16,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `runtimeChecks` para dependencias que sí definen `200/503`
   - `postureChecks` para hallazgos operativos que degradan señal pero no cortan tráfico
   - `overallStatus` y `summary` como resumen estable para futuras integraciones
+- `GET /api/internal/health` ahora expone también `postgresAccessProfiles`:
+  - `runtime`
+  - `migrator`
+  - `admin`
+  manteniendo `postgres` solo para postura runtime del portal
 - `.env.example` quedó alineado con esas variables.
 
 ### Pendiente inmediato

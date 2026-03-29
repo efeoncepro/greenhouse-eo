@@ -21,6 +21,16 @@
   - los env vars legacy siguen existiendo por compatibilidad durante la transición
   - `production` ya tiene refs y secretos preparados, pero falta validación real tras promover a `main`
 
+## Delta 2026-03-29 — Health posture separa runtime de perfiles Postgres
+
+- `GET /api/internal/health` mantiene `postgres` como postura del runtime del portal.
+- Los secretos `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no degradan el significado del runtime principal.
+- Para visibilidad operativa sin mezclar semánticas, el payload ahora expone `postgresAccessProfiles` con:
+  - `runtime`
+  - `migrator`
+  - `admin`
+- Esta separación permite vigilar readiness de tooling privilegiado sin convertirlo en outage del portal.
+
 ## Delta 2026-03-29 — Transitional WIF-aware repo baseline
 
 - `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.

@@ -38,6 +38,9 @@
   - `overallStatus`
   - `summary`
 - `503` sigue dependiendo solo de checks runtime; posture incompleta ahora se reporta como `degraded`.
+- Para no mezclar disponibilidad del portal con tooling privilegiado:
+  - `postgres` sigue describiendo solo el runtime del portal
+  - `postgresAccessProfiles` ahora expone aparte los perfiles `runtime`, `migrator` y `admin`
 - Nuevo contrato mínimo:
   - `sentry.dsnConfigured`
   - `sentry.authTokenConfigured`

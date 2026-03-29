@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getCloudPostgresAccessProfilesPosture, getCloudPostgresPosture } from '@/lib/cloud/postgres'
 
 describe('getCloudPostgresPosture', () => {
   afterEach(() => {
@@ -49,5 +49,60 @@ describe('getCloudPostgresPosture', () => {
     expect(posture.risks).toContain('Cloud SQL Connector no activo')
     expect(posture.risks).toContain('SSL no activo para conexión directa')
     expect(posture.risks).toContain('Pool bajo el baseline serverless (5/15)')
+  })
+})
+
+describe('getCloudPostgresAccessProfilesPosture', () => {
+  it('keeps runtime, migrator and admin as separate posture entries', () => {
+    const posture = getCloudPostgresAccessProfilesPosture({
+      summary: '2 via Secret Manager · 1 via env var',
+      entries: [
+        {
+          key: 'postgres_runtime_password',
+          envVarName: 'GREENHOUSE_POSTGRES_PASSWORD',
+          secretRefEnvVarName: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF',
+          secretRefConfigured: true,
+          source: 'secret_manager'
+        },
+        {
+          key: 'postgres_migrator_password',
+          envVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD',
+          secretRefEnvVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF',
+          secretRefConfigured: true,
+          source: 'secret_manager'
+        },
+        {
+          key: 'postgres_admin_password',
+          envVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD',
+          secretRefEnvVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD_SECRET_REF',
+          secretRefConfigured: false,
+          source: 'env'
+        }
+      ]
+    })
+
+    expect(posture.summary).toBe('3/3 perfiles configurados')
+    expect(posture.profiles.find(profile => profile.profile === 'runtime')?.source).toBe('secret_manager')
+    expect(posture.profiles.find(profile => profile.profile === 'migrator')?.secretRefConfigured).toBe(true)
+    expect(posture.profiles.find(profile => profile.profile === 'admin')?.summary).toBe('Perfil admin resuelto via env var')
+  })
+
+  it('reports missing tooling profiles without downgrading runtime semantics', () => {
+    const posture = getCloudPostgresAccessProfilesPosture({
+      summary: '1 via Secret Manager · 2 sin configurar',
+      entries: [
+        {
+          key: 'postgres_runtime_password',
+          envVarName: 'GREENHOUSE_POSTGRES_PASSWORD',
+          secretRefEnvVarName: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF',
+          secretRefConfigured: true,
+          source: 'secret_manager'
+        }
+      ]
+    })
+
+    expect(posture.summary).toBe('1/3 perfiles configurados · 2 sin configurar')
+    expect(posture.profiles.find(profile => profile.profile === 'migrator')?.configured).toBe(false)
+    expect(posture.profiles.find(profile => profile.profile === 'admin')?.source).toBe('unconfigured')
   })
 })
