@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-131 cerrada
+- El health cloud ya separa correctamente secretos runtime-críticos de secretos de tooling.
+- `src/lib/cloud/secrets.ts` ahora clasifica los secretos tracked entre:
+  - `runtime`
+  - `tooling`
+- `src/lib/cloud/health.ts` dejó de degradar `overallStatus` solo porque `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` o `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` estén ausentes en el runtime del portal.
+- La visibilidad operativa se conserva vía:
+  - `secrets.runtimeSummary`
+  - `secrets.toolingSummary`
+  - `postgresAccessProfiles`
+- Decisión institucional reforzada:
+  - el portal productivo no debe recibir credenciales `migrator/admin` solo para mejorar un semáforo de health
+  - esos perfiles siguen siendo tooling/operación, no dependencias de serving
+
 ## Delta 2026-03-29 TASK-125 cerrada
 - `TASK-125` quedó cerrada con validación E2E real en `staging`.
 - Baseline operativo vigente:

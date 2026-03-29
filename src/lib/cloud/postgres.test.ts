@@ -56,27 +56,32 @@ describe('getCloudPostgresAccessProfilesPosture', () => {
   it('keeps runtime, migrator and admin as separate posture entries', () => {
     const posture = getCloudPostgresAccessProfilesPosture({
       summary: '2 via Secret Manager · 1 via env var',
+      runtimeSummary: '1 via Secret Manager',
+      toolingSummary: '1 via Secret Manager · 1 via env var',
       entries: [
         {
           key: 'postgres_runtime_password',
           envVarName: 'GREENHOUSE_POSTGRES_PASSWORD',
           secretRefEnvVarName: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF',
           secretRefConfigured: true,
-          source: 'secret_manager'
+          source: 'secret_manager',
+          classification: 'runtime'
         },
         {
           key: 'postgres_migrator_password',
           envVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD',
           secretRefEnvVarName: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF',
           secretRefConfigured: true,
-          source: 'secret_manager'
+          source: 'secret_manager',
+          classification: 'tooling'
         },
         {
           key: 'postgres_admin_password',
           envVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD',
           secretRefEnvVarName: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD_SECRET_REF',
           secretRefConfigured: false,
-          source: 'env'
+          source: 'env',
+          classification: 'tooling'
         }
       ]
     })
@@ -90,13 +95,16 @@ describe('getCloudPostgresAccessProfilesPosture', () => {
   it('reports missing tooling profiles without downgrading runtime semantics', () => {
     const posture = getCloudPostgresAccessProfilesPosture({
       summary: '1 via Secret Manager · 2 sin configurar',
+      runtimeSummary: '1 via Secret Manager',
+      toolingSummary: '2 sin configurar',
       entries: [
         {
           key: 'postgres_runtime_password',
           envVarName: 'GREENHOUSE_POSTGRES_PASSWORD',
           secretRefEnvVarName: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF',
           secretRefConfigured: true,
-          source: 'secret_manager'
+          source: 'secret_manager',
+          classification: 'runtime'
         }
       ]
     })

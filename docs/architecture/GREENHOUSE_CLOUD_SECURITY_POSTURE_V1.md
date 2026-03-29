@@ -8,6 +8,16 @@
 
 ---
 
+## Delta 2026-03-29 — TASK-131 cierra la separación runtime vs tooling
+
+- `TASK-131` implementó la corrección pendiente en la capa `cloud/*`.
+- `CloudSecretsPosture` ahora distingue entre secretos `runtime` y `tooling`.
+- `postureChecks.secrets` se calcula solo sobre la porción runtime-crítica.
+- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen visibles, pero ya no degradan `overallStatus` del portal cuando el runtime principal está sano.
+- La visibilidad de perfiles privilegiados se conserva vía:
+  - `secrets.toolingSummary`
+  - `postgresAccessProfiles`
+
 ## Delta 2026-03-29 — Secret Manager validated in shared staging
 
 - `TASK-124` ya salió del estado solo-repo y quedó validada en el entorno compartido `staging`.

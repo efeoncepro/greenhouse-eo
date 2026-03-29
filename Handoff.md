@@ -4,6 +4,27 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-131 cerrada: health separa runtime vs tooling posture
+
+### Completado
+- `TASK-131` ya no está solo documentada; quedó implementada en la capa `cloud/*`.
+- Corrección aplicada:
+  - `src/lib/cloud/secrets.ts` clasifica secretos tracked entre `runtime` y `tooling`
+  - `src/lib/cloud/health.ts` evalúa `postureChecks.secrets` solo con la porción runtime-crítica
+  - `postgresAccessProfiles` mantiene la visibilidad separada de `runtime`, `migrator` y `admin`
+- Esto corrige el warning residual observado en `production`:
+  - `overallStatus=degraded`
+  - runtime `postgres/bigquery/observability` sanos
+  - gap real concentrado en perfiles Postgres `migrator/admin` no cargados en el runtime del portal
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/health.test.ts src/lib/cloud/secrets.test.ts src/lib/cloud/postgres.test.ts`
+  - `pnpm exec eslint src/lib/cloud/contracts.ts src/lib/cloud/health.ts src/lib/cloud/secrets.ts src/lib/cloud/postgres.ts src/lib/cloud/health.test.ts src/lib/cloud/secrets.test.ts src/lib/cloud/postgres.test.ts src/app/api/internal/health/route.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Validar el nuevo contrato en `staging` y `production` después del siguiente deploy de `develop/main`.
+- No cargar `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` ni `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` en el runtime productivo como workaround del health.
+
 ## Sesión 2026-03-29 — TASK-125 cerrada con validación E2E real en staging
 
 ### Completado
