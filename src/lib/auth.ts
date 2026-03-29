@@ -15,6 +15,7 @@ import {
   updateTenantLastLogin,
   verifyTenantPassword
 } from '@/lib/tenant/access'
+import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 
 const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
 const microsoftClientSecret = process.env.AZURE_AD_CLIENT_SECRET
@@ -492,6 +493,12 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      token.portalHomePath = resolvePortalHomePath({
+        portalHomePath: typeof token.portalHomePath === 'string' ? token.portalHomePath : null,
+        tenantType: token.tenantType,
+        roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : []
+      })
+
       return token
     },
     async session({ session, token }) {
@@ -521,7 +528,11 @@ export const authOptions: NextAuthOptions = {
           typeof token.role === 'string' ? token.role : session.user.primaryRoleCode || 'client_executive'
         session.user.featureFlags = Array.isArray(token.featureFlags) ? token.featureFlags.filter(Boolean) : []
         session.user.timezone = typeof token.timezone === 'string' ? token.timezone : 'UTC'
-        session.user.portalHomePath = typeof token.portalHomePath === 'string' ? token.portalHomePath : '/dashboard'
+        session.user.portalHomePath = resolvePortalHomePath({
+          portalHomePath: typeof token.portalHomePath === 'string' ? token.portalHomePath : null,
+          tenantType: token.tenantType,
+          roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : []
+        })
         session.user.authMode = typeof token.authMode === 'string' ? token.authMode : 'credentials'
         session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'
         session.user.microsoftEmail = typeof token.microsoftEmail === 'string' ? token.microsoftEmail : null

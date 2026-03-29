@@ -10,6 +10,7 @@
 ### Home landing cutover baseline
 - Los usuarios internos/admin ahora caen por defecto en `/home` cuando no tienen un `portalHomePath` explícito más específico; `hr`, `finance` y `my` conservan sus landings funcionales.
 - La navegación interna ya separa `Home` de `Control Tower`: `Home` queda como entrada principal y `Control Tower` sigue accesible como surface operativa especializada.
+- Las sesiones legadas de internos que todavía traían `'/internal/dashboard'` como home histórico ahora se normalizan en runtime a `'/home'`.
 
 ### Task lifecycle cleanup
 - `TASK-009` quedó cerrada como baseline principal de `Home + Nexa v2`; lo pendiente se derivó a `TASK-119` y `TASK-110`.

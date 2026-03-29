@@ -12,6 +12,9 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - fallback de `portalHomePath` ahora cae en `/home` en vez de `/internal/dashboard`
   - `Home` pasa a ser la entrada principal interna en sidebar y dropdown
   - `Control Tower` queda preservado como surface especialista dentro de `Gestión` y en sugerencias globales
+- Se corrigió el drift que seguía mandando a algunos usuarios a `'/internal/dashboard'`:
+  - `resolvePortalHomePath()` ahora normaliza también el valor legado en `NextAuth jwt/session`
+  - si la sesión trae `'/internal/dashboard'` como home histórico para un interno/admin, el runtime lo reescribe a `'/home'` sin depender de un relogin manual
 - Se mantuvieron intactos los landings especializados:
   - `hr_*` sigue cayendo en `/hr/payroll`
   - `finance_*` sigue cayendo en `/finance`
@@ -20,6 +23,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Validación
 - `pnpm exec eslint src/lib/tenant/access.ts src/config/greenhouse-nomenclature.ts src/components/layout/vertical/VerticalMenu.tsx src/components/layout/shared/UserDropdown.tsx src/components/layout/shared/search/DefaultSuggestions.tsx src/app/auth/landing/page.tsx src/app/page.tsx`
 - `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/auth.ts src/lib/tenant/access.ts src/lib/tenant/resolve-portal-home-path.ts src/lib/tenant/resolve-portal-home-path.test.ts`
+- `pnpm exec vitest run src/lib/tenant/resolve-portal-home-path.test.ts`
 
 ### Pendiente inmediato
 - smoke manual en staging de login → `/auth/landing` → `/home`

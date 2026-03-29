@@ -10,6 +10,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - roles funcionales siguen priorizando su landing especializada (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
 - `Control Tower` deja de funcionar como home implícito de internos; permanece accesible como surface operativa especializada en navegación interna.
 - `portalHomePath` sigue siendo el contrato canónico de aterrizaje, pero su fallback institucional para `efeonce_internal` ya no es `/internal/dashboard`, sino `/home`.
+- El runtime también normaliza sesiones legadas: si `NextAuth` o un registro viejo trae `'/internal/dashboard'` como home interno, el resolver canónico lo reescribe a `'/home'` antes de hidratar `session.user.portalHomePath`.
 
 ## Delta 2026-03-29 Release channels y changelog client-facing
 - Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.

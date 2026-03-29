@@ -21,6 +21,7 @@ import {
   updateLastLoginInPostgres,
   shouldFallbackFromIdentityPostgres
 } from '@/lib/tenant/identity-store'
+import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 
 type TenantType = 'client' | 'efeonce_internal'
 
@@ -256,17 +257,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     role: primaryRoleCode,
     featureFlags: normalizeStringArray(row.feature_flags),
     timezone: row.timezone || 'UTC',
-    portalHomePath:
-      row.portal_home_path ||
-      (roleCodes.includes('hr_payroll') || roleCodes.includes('hr_manager')
-        ? '/hr/payroll'
-        : roleCodes.includes('finance_analyst') || roleCodes.includes('finance_admin')
-          ? '/finance'
-          : roleCodes.includes('collaborator') && !roleCodes.includes('efeonce_admin') && !roleCodes.includes('efeonce_operations')
-            ? '/my'
-            : tenantType === 'efeonce_internal'
-              ? '/home'
-              : '/dashboard'),
+    portalHomePath: resolvePortalHomePath({ portalHomePath: row.portal_home_path, tenantType, roleCodes }),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',
