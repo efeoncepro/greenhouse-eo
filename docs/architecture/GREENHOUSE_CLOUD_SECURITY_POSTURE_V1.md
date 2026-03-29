@@ -27,8 +27,8 @@
   - pero `greenhouse-pg-dev` sigue con `0.0.0.0/0`, `ALLOW_UNENCRYPTED_AND_ENCRYPTED` y `requireSsl=false`
   - además sigue habiendo drift de ambientación:
     - el drift de `\n` en las variables activas del rollout WIF/conector ya fue corregido
-    - el riesgo remanente está en el mapping no inequívoco del entorno compartido
-    - `dev-greenhouse.efeoncepro.com` no respondió el 2026-03-29 como un `staging` inequívoco, sino como preview de `develop`
+    - el mapping del entorno compartido ya quedó aclarado: `dev-greenhouse.efeoncepro.com` sí es `staging`
+    - el riesgo remanente ahora es de rollout parcial: staging ya usa connector, pero todavía no absorbió el baseline WIF final de esta rama
   - por lo tanto `TASK-096` no debe considerarse cerrada hasta completar el rollout real en el entorno compartido y cerrar el hardening externo de Cloud SQL
 - La referencia de task activa ahora vive en `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md`
 

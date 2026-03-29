@@ -56,8 +56,11 @@
 - Drift detectado durante la validación:
   - `vercel env pull` devolvió algunos valores con sufijo literal `\n`
   - ese drift ya fue saneado en los targets activos del rollout WIF/conector
-  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 como preview de `develop` con `auth.mode=service_account_key`, no como `staging` inequívoco
-  - no se endurece Cloud SQL hasta aclarar/revalidar el entorno compartido
+  - `dev-greenhouse.efeoncepro.com` ya quedó confirmado como `target=staging`
+  - tras redeploy del staging activo, health respondió con `auth.mode=mixed` y `usesConnector=true`
+  - staging sigue pendiente de absorber el baseline WIF final porque aún corre código previo de `develop` (`version=7a2ecec`)
+  - decisión operativa: no desplegar la feature branch al entorno compartido; cerrar esta fase por merge a `develop` y revalidación de staging
+  - no se endurece Cloud SQL hasta completar esa validación en staging compartido
 
 ## Status
 

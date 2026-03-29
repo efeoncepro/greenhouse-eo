@@ -16,9 +16,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GREENHOUSE_POSTGRES_PASSWORD`
 - Drift operativo verificado el 2026-03-29:
   - las env vars activas del rollout WIF/conector ya quedaron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
-  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió desde un deployment `preview` de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`) y no como `staging` inequívoco
+  - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
+  - tras redeploy del staging activo, `/api/internal/health` respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
 - Regla operativa derivada:
-  - no endurecer Cloud SQL externo ni retirar la SA key hasta normalizar ese mapa de ambientes y revalidar el entorno compartido
+  - no desplegar la feature branch al entorno compartido solo para cerrar `TASK-096`
+  - no endurecer Cloud SQL externo ni retirar la SA key hasta que `develop` absorba este baseline y `staging` quede validado con WIF final
 
 ## Delta 2026-03-29 Home landing cutover baseline
 - `TASK-119` quedó cerrada sobre la policy de landing del portal.

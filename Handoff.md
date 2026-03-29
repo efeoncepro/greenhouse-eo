@@ -53,11 +53,14 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Pendiente inmediato
 - Limpiar drift de Vercel env antes del endurecimiento final:
   - las variables activas del rollout WIF/conector ya fueron corregidas en Vercel
-  - el paso pendiente ya no es el formato, sino revalidar el entorno compartido que hoy no mapea de forma inequívoca a `staging`
+  - el paso pendiente ya no es el formato, sino cerrar el baseline WIF final en `develop/staging`
 - Aclarar y corregir el mapa de ambientes Vercel:
-  - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 como preview de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`)
-  - no asumir que ese alias hoy represente un `staging` inequívoco hasta corregirlo
-- Validar el entorno compartido con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - `dev-greenhouse.efeoncepro.com` ya quedó confirmado como `target=staging`
+  - tras redeploy del staging activo respondió `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
+- Camino seguro elegido:
+  - no desplegar la feature branch al entorno compartido `staging`
+  - mantener el flujo `feature -> preview -> develop/staging -> main`
+- Validar el entorno compartido con WIF final después de mergear a `develop`, antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`
