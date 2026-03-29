@@ -56,26 +56,26 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 | Dimension | Score | Key Gap |
 |-----------|-------|---------|
-| Secret Management | 2/10 | Static SA key in env var, no rotation, no audit |
+| Secret Management | 4/10 | El rollout WIF ya existe en GCP/Vercel y fue validado sin SA key, pero la SA key sigue como fallback transicional y falta limpiar drift de env + retirar la key |
 | Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
 | Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
 | Observability | 1/10 | `console.error()` only, zero external alerting |
 | CI/CD Validation | 3/10 | Lint + build only, 86 test files not in CI |
 | API Auth Consistency | 4/10 | 2 inconsistent cron auth patterns, no timing-safe |
-| Database Resilience | 4/10 | Daily backup, no PITR, pool=5, no slow query logging |
+| Database Resilience | 6/10 | PITR, WAL retention, slow query logging y pool `15` ya avanzaron; restore test sigue pendiente |
 | Cost Visibility | 0/10 | No budget alerts, no BigQuery cost guards |
 
 ### 2.3 Threat Model
 
 | Threat | Current Exposure | Impact |
 |--------|-----------------|--------|
-| SA key leak (env var exfiltration) | **High** — never-expiring JSON key with BigQuery + Cloud SQL + Storage + Vertex AI access | Full GCP compromise |
+| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF | Full GCP compromise |
 | Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password in env var | Database compromise (payroll, identity, finance) |
 | XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
 | Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
 | BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
 | Silent production failure | **High** — zero alerting on cron/webhook/projection failures | Data inconsistency, delayed detection |
-| Backup unusable | **Medium** — never tested restore, no PITR | Unable to recover from corruption |
+| Backup unusable | **Medium** — PITR ya existe, pero el restore test todavía no quedó completamente verificado/cerrado | Unable to recover from corruption |
 
 ---
 
@@ -135,7 +135,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 |------|----------|---------|----------|-------|-------|
 | **Critical** | Compromise = financial/legal/identity damage | GCP Secret Manager | Future: automated | Cloud Audit Logs | 6 |
 | **Standard** | Compromise = limited blast radius | Vercel env vars (encrypted) | Manual | Vercel audit log | 10 |
-| **Eliminated** | Replaced by keyless auth | N/A | N/A | N/A | 2 (SA key + base64 variant) |
+| **Target elimination** | Replaced by keyless auth after rollout | N/A | N/A | N/A | 2 (SA key + base64 variant) |
 
 **Critical secrets (Secret Manager):**
 1. `GREENHOUSE_POSTGRES_PASSWORD` (runtime)
@@ -148,7 +148,7 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 **Standard secrets (Vercel env vars):**
 - `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `GREENHOUSE_INTEGRATION_API_TOKEN`, `CRON_SECRET`, `HR_CORE_TEAMS_WEBHOOK_SECRET`, `NUBOX_X_API_KEY`, `SLACK_ALERTS_WEBHOOK_URL`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
 
-**Eliminated:**
+**Target elimination once rollout is verified:**
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` (replaced by WIF)
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` (replaced by WIF)
 - `GCP_ACCESS_TOKEN` (deprecated legacy)

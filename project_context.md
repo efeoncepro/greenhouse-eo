@@ -75,9 +75,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
 
 ## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
-- `TASK-096` quedó iniciada en rama `feature/codex-task-096-wif-baseline`.
+- `TASK-096` quedó iniciada en el repo con baseline real en código; esta sesión trabajó sobre el estado actual de `develop`.
 - El repo ahora resuelve autenticación GCP con un contrato explícito en `src/lib/google-credentials.ts`:
-  - `wif` si existen `VERCEL_OIDC_TOKEN`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `wif` si existen `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`, y el runtime puede obtener un token OIDC de Vercel
   - `service_account_key` como fallback transicional
   - `ambient_adc` para entornos con credenciales implícitas
 - Consumers alineados:
@@ -88,10 +88,22 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Scripts operativos que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente también quedaron migrados al helper canónico.
 - Nuevas variables de entorno documentadas para el rollout real:
   - `GCP_WORKLOAD_IDENTITY_PROVIDER`
+  - `GCP_PROJECT_NUMBER`
+  - `GCP_WORKLOAD_IDENTITY_POOL_ID`
+  - `GCP_WORKLOAD_IDENTITY_POOL_PROVIDER_ID`
   - `GCP_SERVICE_ACCOUNT_EMAIL`
+- Estado externo ya materializado:
+  - GCP project `efeonce-group`
+  - Workload Identity Pool `vercel`
+  - Provider `greenhouse-eo`
+  - service account runtime actual vinculada: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - bindings por entorno Vercel para `development`, `preview`, `staging` y `production`
+- Validación de transición ya ejecutada:
+  - BigQuery respondió con WIF sin SA key
+  - Cloud SQL Connector respondió `SELECT 1` con WIF sin SA key usando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
 - Restricción vigente:
   - el runtime actual no hace bigbang ni retira la SA key por defecto
-  - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados con OIDC real
+  - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados en preview/staging reales y se limpie un drift detectado en variables Vercel que hoy agregan sufijos literales `\n`
 
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.

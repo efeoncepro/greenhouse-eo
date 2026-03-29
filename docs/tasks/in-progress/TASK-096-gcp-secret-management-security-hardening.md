@@ -14,7 +14,7 @@
   - `src/lib/bigquery.ts` usa el helper canónico
   - `src/lib/postgres/client.ts` usa `createGoogleAuth()` con Cloud SQL Connector y mantiene password runtime
   - `src/lib/storage/greenhouse-media.ts` usa el helper canónico para Storage
-  - `src/lib/ai/google-genai.ts` solo crea archivo temporal cuando el source efectivo es `service_account_key`
+  - `src/lib/ai/google-genai.ts` consume `googleAuthOptions` directamente y ya no escribe credenciales a `/tmp`
 - Scripts que seguían parseando `GOOGLE_APPLICATION_CREDENTIALS_JSON` manualmente también quedaron alineados al helper central:
   - `scripts/check-ico-bq.ts`
   - `scripts/backfill-ico-to-postgres.ts`
@@ -27,10 +27,29 @@
   - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
 - Pendiente para cerrar la task:
-  - crear y bindear el Workload Identity Pool/Provider real en GCP
-  - configurar `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` en Vercel
-  - validar staging/production con OIDC real antes de retirar la SA key
+  - validar preview/staging reales con OIDC runtime antes de retirar la SA key
   - cerrar Fase 1 externa de Cloud SQL (`authorizedNetworks`, SSL, `requireSsl`)
+
+## Delta 2026-03-29 — Rollout externo WIF fase controlada
+
+- Se creó el pool real `vercel` y el provider `greenhouse-eo` en `efeonce-group`.
+- `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` ya quedó bindada con `roles/iam.workloadIdentityUser` para principals de Vercel en:
+  - `development`
+  - `preview`
+  - `staging`
+  - `production`
+- Vercel ya tiene cargadas las variables:
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER`
+  - `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+- `src/lib/google-credentials.ts` se ajustó para leer el token OIDC desde `@vercel/oidc`, no depender solo de `process.env.VERCEL_OIDC_TOKEN`.
+- Validación externa ejecutada sin SA key:
+  - BigQuery OK
+  - Cloud SQL Connector OK con `SELECT 1::int as ok`
+- Drift detectado durante la validación:
+  - `vercel env pull` devolvió algunos valores con sufijo literal `\n`
+  - ese drift afecta al menos `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y credenciales Postgres en la extracción local
+  - no se endurece Cloud SQL hasta corregir ese drift en Vercel y revalidar preview/staging
 
 ## Status
 
@@ -141,9 +160,8 @@ src/lib/storage/greenhouse-media.ts
   → new GoogleAuth(getGoogleAuthOptions({ scopes: ['devstorage.read_write'] }))
 
 src/lib/ai/google-genai.ts
-  → usa ambient auth cuando hay WIF/ADC
-  → solo escribe SA key a /tmp/greenhouse-genai-*/service-account.json como fallback transicional
-  → GoogleGenAI({ vertexai: true })
+  → GoogleGenAI({ vertexai: true, googleAuthOptions })
+  → sin archivo temporal de credenciales
 ```
 
 ### Topología de deploy actual
@@ -157,7 +175,7 @@ Vercel (Next.js 16)
        ├── Cloud SQL (us-east4) ← WIF-ready connector + runtime password
        ├── BigQuery (US)        ← WIF-aware helper / SA key fallback
        ├── Cloud Storage        ← WIF-aware helper / SA key fallback
-       └── Vertex AI            ← ambient auth when available, temp file only for SA key fallback
+       └── Vertex AI            ← WIF-aware helper / SA key fallback / ADC
 ```
 
 ### Servicios GCP que autentican independientemente
