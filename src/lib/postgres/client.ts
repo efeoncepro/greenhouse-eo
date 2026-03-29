@@ -1,8 +1,7 @@
 import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
-import { GoogleAuth } from 'google-auth-library'
 import { Pool, type PoolClient } from 'pg'
 
-import { getGoogleCredentials } from '@/lib/google-credentials'
+import { createGoogleAuth } from '@/lib/google-credentials'
 
 type GreenhousePostgresConfig = {
   instanceConnectionName: string | null
@@ -42,7 +41,7 @@ export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
   user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
   password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
-  maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 5),
+  maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 15),
   sslEnabled: String(process.env.GREENHOUSE_POSTGRES_SSL || '').toLowerCase() === 'true'
 })
 
@@ -65,7 +64,6 @@ export const isGreenhousePostgresConfigured = () => getGreenhousePostgresMissing
 
 const buildPool = async () => {
   const config = getGreenhousePostgresConfig()
-  const credentials = getGoogleCredentials()
 
   if (!isGreenhousePostgresConfigured() || !config.database || !config.user || !config.password) {
     throw new Error(`Greenhouse Postgres is not configured. Missing: ${getGreenhousePostgresMissingConfig().join(', ')}`)
@@ -82,14 +80,11 @@ const buildPool = async () => {
 
   if (config.instanceConnectionName) {
     globalThis.__greenhousePostgresConnector ??= new Connector(
-      credentials
-        ? {
-            auth: new GoogleAuth({
-              credentials,
-              scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
-            })
-          }
-        : undefined
+      {
+        auth: createGoogleAuth({
+          scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
+        })
+      }
     )
 
     const connectorOptions = await globalThis.__greenhousePostgresConnector.getOptions({
