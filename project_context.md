@@ -9,7 +9,6 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
   - `NUBOX_BEARER_TOKEN`
-- `GET /api/auth/session` en `staging` responde `200`, así que NextAuth quedó sano con el helper nuevo.
 - Estado transicional todavía explícito:
   - `GREENHOUSE_POSTGRES_PASSWORD` sigue reportando `source=env` en posture runtime de `staging`
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en runtime `staging`

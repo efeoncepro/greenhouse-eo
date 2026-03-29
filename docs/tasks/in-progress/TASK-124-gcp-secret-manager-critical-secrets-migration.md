@@ -6,7 +6,6 @@
 - `staging` ya redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK`.
 - Validación real observada en `staging`:
   - `version=497cb19`
-  - `GET /api/auth/session` responde `200`
   - secretos críticos ya resueltos por `secret_manager`:
     - `NEXTAUTH_SECRET`
     - `AZURE_AD_CLIENT_SECRET`
@@ -88,7 +87,7 @@
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Rollout parcial validado` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 

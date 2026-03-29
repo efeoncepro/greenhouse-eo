@@ -15,7 +15,6 @@
   - `NEXTAUTH_SECRET` via `secret_manager`
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`
-- `GET /api/auth/session` respondió `200`, lo que reduce el riesgo de regresión en NextAuth durante la transición.
 - La postura sigue siendo transicional y no debe declararse cerrada aún para `production`:
   - `GREENHOUSE_POSTGRES_PASSWORD` todavía aparece como `env` en `staging`
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen fuera del posture runtime del portal
