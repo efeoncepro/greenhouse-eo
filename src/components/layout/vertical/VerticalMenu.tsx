@@ -149,15 +149,6 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label='Campañas' subtitle='Iniciativas cross-space' show={showSub} />, href: '/agency/campaigns', icon: 'tabler-speakerphone' },
         { label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />, href: '/agency/services', icon: 'tabler-packages' },
         { label: <NavLabel label='Operaciones' subtitle='Salud del platform' show={showSub} />, href: '/agency/operations', icon: 'tabler-activity' },
-        ...(isInternalUser
-          ? [
-              {
-                label: <NavLabel label={GH_INTERNAL_NAV.internalDashboard.label} subtitle={GH_INTERNAL_NAV.internalDashboard.subtitle} show={showSub} />,
-                href: '/internal/dashboard',
-                icon: 'tabler-layout-dashboard'
-              }
-            ]
-          : []),
         { label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />, href: '/agency/organizations', icon: 'tabler-building-community' }
       ]
     })

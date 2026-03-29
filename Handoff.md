@@ -4,9 +4,14 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
-## Sesión 2026-03-29 — TASK-119 en progreso
+## Sesión 2026-03-29 — Admin Center + Control Tower unificado
 
 ### Completado
+- **Admin Center landing redesign**: Control Tower absorbido como sección dentro de `/admin`
+  - Hero con gradiente purple→cyan, KPIs unificados (6× HorizontalWithSubtitle), tabla de tenants en ExecutiveCardShell, mapa de dominios con HorizontalWithBorder clickables
+  - `/internal/dashboard` redirige a `/admin` (backward compat)
+  - Sidebar: removido item "Torre de control" de Gestión; UserDropdown apunta a `/admin`
+  - `HorizontalWithBorder` extendido con props `trendLabel` y `onClick`
 - `TASK-119` movida a `in-progress`.
 - Se aplicó el cutover base de landing para internos/admin:
   - fallback de `portalHomePath` ahora cae en `/home` en vez de `/internal/dashboard`
