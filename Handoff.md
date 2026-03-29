@@ -8,18 +8,22 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Completado
 - `TASK-124` pasó a `in-progress` en la rama `feature/codex-task-096-wif-baseline`.
-- Slice 1 ya quedó implementado con cambios mínimos y reversibles:
+- Slices 1-2 ya quedaron implementados con cambios mínimos y reversibles:
   - helper canónico `src/lib/secrets/secret-manager.ts`
   - soporte `<ENV_VAR>_SECRET_REF` + cache corta + fallback a env var
   - visibilidad básica en `/api/internal/health` para secretos críticos (`secret_manager | env | unconfigured`)
   - primer consumer migrado: `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper
+  - runtime Postgres ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - tooling Postgres (`runtime`, `migrator`, `admin`) ya mapea `*_SECRET_REF` hacia el contrato genérico consumido por `src/lib/postgres/client.ts`
 - Validación local del slice:
   - `pnpm exec eslint src/lib/secrets/secret-manager.ts src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/app/api/internal/health/route.ts src/lib/cloud/contracts.ts`
   - `pnpm exec vitest run src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.test.ts`
+  - `pnpm exec eslint src/lib/secrets/secret-manager.ts src/lib/postgres/client.ts src/lib/postgres/client.test.ts src/lib/cloud/postgres.ts src/lib/cloud/postgres.test.ts scripts/lib/load-greenhouse-tool-env.ts scripts/lib/load-greenhouse-tool-env.test.ts`
+  - `pnpm exec vitest run src/lib/postgres/client.test.ts src/lib/cloud/postgres.test.ts scripts/lib/load-greenhouse-tool-env.test.ts src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm pg:doctor --profile=runtime`
 
 ### Pendiente inmediato
-- Migrar passwords Postgres (`runtime`, `migrator`, `admin`) al helper y recién ahí correr `pnpm pg:doctor --profile=runtime`.
 - Migrar `NEXTAUTH_SECRET` y `AZURE_AD_CLIENT_SECRET` sin tocar producción fuera del repo.
 - Validar en `staging` y `production` al menos un secreto crítico servido realmente desde Secret Manager antes de retirar env vars legacy.
 

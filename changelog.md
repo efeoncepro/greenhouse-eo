@@ -11,7 +11,9 @@
 - Se agregó `src/lib/secrets/secret-manager.ts` como helper canónico para secretos críticos con `@google-cloud/secret-manager`, cache corta, fallback a env var y convención `<ENV_VAR>_SECRET_REF`.
 - `GET /api/internal/health` ahora expone postura de secretos críticos sin devolver valores, distinguiendo `secret_manager`, `env` y `unconfigured`.
 - `src/lib/nubox/client.ts` quedó como primer consumer migrado al patrón nuevo: `NUBOX_BEARER_TOKEN` ya puede resolverse desde Secret Manager con fallback controlado al env legacy.
-- Se agregaron tests unitarios para helper, postura cloud de secretos y consumer de Nubox.
+- `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`, y `scripts/lib/load-greenhouse-tool-env.ts` ya alinea también perfiles `runtime`, `migrator` y `admin` al mismo patrón.
+- `pnpm pg:doctor --profile=runtime` quedó validado con el path nuevo.
+- Se agregaron tests unitarios para helper, postura cloud de secretos, consumer de Nubox y resolución Postgres runtime/tooling.
 
 ### TASK-096 baseline WIF-aware sin bigbang
 - `src/lib/google-credentials.ts` ahora resuelve autenticación GCP con prioridad `WIF/OIDC -> SA key fallback -> ambient ADC`, manteniendo compatibilidad con el runtime actual.

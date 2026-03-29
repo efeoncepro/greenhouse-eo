@@ -53,8 +53,11 @@
   - `unconfigured`
 - Primer consumer migrado al patrón:
   - `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper
+- La ruta PostgreSQL del portal también quedó alineada:
+  - `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs para `runtime`, `migrator` y `admin`
+  - `pnpm pg:doctor --profile=runtime` ya fue validado con este path
 - Estado remanente de la fase:
-  - passwords PostgreSQL
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
   - validación real en `staging` y `production` con al menos un secreto servido desde Secret Manager
