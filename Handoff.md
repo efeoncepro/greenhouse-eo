@@ -4,6 +4,34 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 validación end-to-end en `staging`
+
+### Completado
+- Se confirmó que `staging` ya no tiene solo postura configurada, sino observabilidad operativa real:
+  - `vercel curl /api/internal/health --deployment dpl_G5L2467CPUF6T2GxEaoB3tWhB41K`
+  - `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+  - `postureChecks.observability.status=ok`
+- Smoke real de Slack:
+  - envío con el webhook resuelto desde `greenhouse-slack-alerts-webhook`
+  - respuesta `HTTP 200`
+- Smoke real de Sentry:
+  - se emitió `task-098-staging-sentry-smoke-1774792462445`
+  - el issue quedó visible en el dashboard del proyecto `javascript-nextjs`
+- Hallazgo importante:
+  - el único remanente operativo de `TASK-098` ya no está en `develop/staging`
+  - queda concentrado en `main/production`
+
+### Pendiente inmediato
+- Replicar en `production`:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Validar `main/production` con smoke equivalente antes de mover `TASK-098` a `complete`
+- Rotar el webhook de Slack expuesto en una captura previa cuando se decida hacerlo
+
 ## Sesión 2026-03-29 — TASK-098 Secret Manager slice para Slack alerts
 
 ### Completado

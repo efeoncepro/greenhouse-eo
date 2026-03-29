@@ -1,5 +1,18 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — `staging` validado end-to-end; remanente en `production`
+
+- `staging` ya quedó operativo para observabilidad externa sobre `develop`:
+  - `GET /api/internal/health` responde `postureChecks.observability.status=ok`
+  - `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+- Validación operativa real ya ejecutada:
+  - smoke de Slack con respuesta `HTTP 200`
+  - smoke de Sentry con issue visible en el dashboard del proyecto `javascript-nextjs`
+- El remanente real ya no está en repo ni en `staging`, sino en:
+  - replicar `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` en `production`
+  - validar `main/production` con smoke equivalente
+  - rotar el webhook expuesto en una captura previa cuando se decida hacerlo
+
 ## Delta 2026-03-29 — Slack webhook alineado al patrón Secret Manager
 
 - `SLACK_ALERTS_WEBHOOK_URL` ahora soporta ref opcional `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`.
@@ -118,7 +131,7 @@
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Implementación` |
+| Status real | `Validada en staging; rollout production pendiente` |
 | Rank | — |
 | Domain | Infrastructure / Observability |
 | Sequence | Cloud Posture Hardening **3 of 6** — after TASK-100, TASK-099 |
@@ -266,17 +279,17 @@ Que cualquier error no-manejado en producción sea capturado, deduplicado y noti
 
 ## Acceptance Criteria
 
-- [ ] `@sentry/nextjs` instalado y configurado
-- [ ] `instrumentation.ts` registra Sentry en server y edge
-- [ ] Un error forzado en staging aparece en Sentry dashboard en <2 min
-- [ ] `GET /api/internal/health` retorna 200 con estado de Postgres y BigQuery
+- [x] `@sentry/nextjs` instalado y configurado
+- [x] `instrumentation.ts` registra Sentry en server y edge
+- [x] Un error forzado en staging aparece en Sentry dashboard en <2 min
+- [x] `GET /api/internal/health` retorna 200 con estado de Postgres y BigQuery
 - [ ] `GET /api/internal/health` retorna 503 si algún servicio no responde
-- [ ] `alertCronFailure()` envía mensaje a Slack cuando un cron falla
-- [ ] Los 5 crons críticos tienen alerting integrado
-- [ ] `SENTRY_DSN` y `SLACK_ALERTS_WEBHOOK_URL` configurados en Vercel
-- [ ] Source maps subidos a Sentry en build
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `alertCronFailure()` envía mensaje a Slack cuando un cron falla
+- [x] Los 5 crons críticos tienen alerting integrado
+- [x] `SENTRY_DSN` y `SLACK_ALERTS_WEBHOOK_URL` configurados en Vercel
+- [x] Source maps subidos a Sentry en build
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
 
 ## Verification
 
@@ -293,3 +306,15 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
   https://dev-greenhouse.efeoncepro.com/api/cron/outbox-publish
 # Verificar #greenhouse-alerts
 ```
+
+## Remanente para cierre
+
+- Replicar el rollout externo en `production`:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Ejecutar smoke equivalente en `production`
+- Rotar el webhook de Slack expuesto en una captura previa

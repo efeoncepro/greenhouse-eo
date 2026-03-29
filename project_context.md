@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Observability MVP operativa en staging
+- `TASK-098` ya quedó validada end-to-end en `staging`.
+- Señales confirmadas:
+  - `GET /api/internal/health` devuelve `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+  - `observability.sentry.enabled=true`
+  - `observability.slack.enabled=true`
+- Validación operativa adicional ya ejecutada:
+  - smoke real de Slack con respuesta `HTTP 200`
+  - smoke real de Sentry con issue visible en el dashboard del proyecto `javascript-nextjs`
+- El remanente real de `TASK-098` ya no está en repo ni en `staging`, sino en replicar el rollout a `production/main`.
+
 ## Delta 2026-03-29 Slack alerts Secret Manager-ready
 - `TASK-098` extendió el patrón de `TASK-124` a `SLACK_ALERTS_WEBHOOK_URL`.
 - Nuevo contrato soportado:
@@ -28,8 +39,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El wiring es fail-open:
   - si no existe DSN, Sentry no inicializa
   - no cambia rutas ni contrato HTTP del portal
-- `develop/staging` ya validó el runtime repo-safe en `ac11287`; el estado observado en health sigue siendo `observability=unconfigured` por ausencia de `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL` en Vercel.
-- El rollout externo y la validación real del dashboard/canal siguen pendientes; este lote cierra solo la base repo-safe.
+- `develop/staging` ya evolucionó desde ese baseline y hoy la observabilidad externa está operativa.
+- El rollout externo pendiente ya quedó concentrado en `production/main`.
 
 ## Delta 2026-03-29 Observability posture baseline
 - `TASK-098` quedó iniciada con un slice mínimo y reversible de contrato.

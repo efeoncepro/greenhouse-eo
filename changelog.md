@@ -7,6 +7,13 @@
 
 ## 2026-03-29
 
+### TASK-098 observability validated end-to-end in staging
+- `staging` ya quedó con `Sentry` y `Slack alerts` operativas, no solo configuradas.
+- `GET /api/internal/health` reporta `observability` en estado `ok`.
+- Se validó ingestión real en Sentry con un evento de smoke visible en el dashboard del proyecto `javascript-nextjs`.
+- Se validó entrega real a Slack con respuesta `HTTP 200` usando el webhook resuelto desde Secret Manager.
+- El remanente real de `TASK-098` ya quedó concentrado en replicar el rollout a `production`.
+
 ### TASK-098 Slack alerts Secret Manager-ready
 - `SLACK_ALERTS_WEBHOOK_URL` ahora soporta `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` con fallback controlado a env var.
 - `src/lib/alerts/slack-notify.ts` consume el helper canónico y ya no depende solo del env directo.
@@ -20,7 +27,7 @@
 - El runtime queda fail-open: si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa.
 - La postura de observabilidad ahora distingue DSN runtime, DSN público, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` y readiness de source maps.
 - `pnpm build` ya pasa con esta base y `develop/staging` quedó validado en `ac11287`.
-- El health compartido confirmó que el código ya está listo, pero la observabilidad externa sigue `unconfigured` por ausencia de `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL` en Vercel.
+- Ese estado inicial ya fue superado: `staging` terminó con observabilidad externa operativa; el rollout pendiente ya es solo `production`.
 
 ### TASK-099 security headers proxy baseline
 - Se creó `src/proxy.ts` con headers estáticos (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-DNS-Prefetch-Control`) para todo el runtime salvo `_next/*` y assets estáticos.
