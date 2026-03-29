@@ -4,6 +4,20 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-131 creada para separar runtime health vs tooling posture
+
+### Completado
+- Se creó `TASK-131` como follow-on explícito del warning residual observado en `production`:
+  - `overallStatus=degraded`
+  - runtime `postgres/bigquery/observability` sanos
+  - gap real concentrado en perfiles Postgres `migrator/admin` no cargados en el runtime del portal
+- Decisión recomendada capturada en backlog:
+  - no cargar credenciales privilegiadas en `production` solo para poner verde el panel
+  - corregir la semántica de `src/lib/cloud/health.ts` y `src/lib/cloud/secrets.ts` para separar runtime crítico de tooling posture
+
+### Pendiente inmediato
+- Resolver `TASK-131` en `develop/staging` antes de considerar cualquier workaround con `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` o `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` en el portal productivo.
+
 ## Sesión 2026-03-29 — TASK-125 cerrada con validación E2E real en staging
 
 ### Completado
