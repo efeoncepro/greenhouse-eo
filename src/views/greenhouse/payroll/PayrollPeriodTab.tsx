@@ -42,6 +42,11 @@ type Props = {
   isHistoricalSelection?: boolean
 }
 
+const GOVERNANCE_ATTENDANCE_NOTES = new Set([
+  'La asistencia aún se resume desde attendance_daily + leave_requests.',
+  'La integración futura objetivo para asistencia es Microsoft Teams.'
+])
+
 const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -58,6 +63,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const [readinessError, setReadinessError] = useState<string | null>(null)
   const [readinessLoading, setReadinessLoading] = useState(false)
   const periodId = period?.periodId ?? null
+  const visibleAttendanceNotes = readiness?.attendanceDiagnostics.notes.filter(note => !GOVERNANCE_ATTENDANCE_NOTES.has(note)) ?? []
 
   useEffect(() => {
     if (!periodId) {
@@ -649,7 +655,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                   {issue.message}
                 </Alert>
               ))}
-              {readiness.attendanceDiagnostics.notes.map(note => (
+              {visibleAttendanceNotes.map(note => (
                 <Alert key={note} severity='info'>
                   {note}
                 </Alert>

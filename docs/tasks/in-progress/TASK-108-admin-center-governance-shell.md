@@ -1,12 +1,20 @@
 # TASK-108 - Admin Center Governance Shell
 
+## Delta 2026-03-28
+
+- `/admin` ya funciona como landing real de `Admin Center`.
+- La navegación administrativa ya expone `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces propias dentro de `/admin`.
+- `Cloud & Integrations` y `Ops Health` reutilizan señal operacional real desde el runtime existente; no reemplazan `Agency > Operations`, pero sí dejan de depender solo de un deep link compartido.
+- El shell ya expone acciones operativas manuales para replay reactivo, dispatch webhook, retry de failed emails y services sync usando helpers/admin routes canónicos.
+- La explicación estructural de asistencia (`attendance_daily + leave_requests` y target `Microsoft Teams`) se movió a `Cloud & Integrations`; Payroll conserva solo las alertas funcionales que impactan el cálculo.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Implementación`
 - Rank: `TBD`
 - Domain: `platform`
 

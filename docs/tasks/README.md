@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-110`
+- siguiente ID disponible: `TASK-114`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -46,6 +46,8 @@ Primer bloque operativo asignado:
 | `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
 | `TASK-074` | [TASK-074-projected-payroll-to-official-promotion-flow.md](in-progress/TASK-074-projected-payroll-to-official-promotion-flow.md) | P1 | Alto | Medio | Implementación | Conectar `Projected Payroll` con `Payroll official` mediante promoción explícita a borrador/recalculo, compartiendo motor pero sin fusionar los objetos transaccionales |
 | `TASK-093` | [TASK-093-personnel-expense-data-consistency.md](complete/TASK-093-personnel-expense-data-consistency.md) | P1 | Alto | Medio | Cerrada | Consistencia de datos en Gasto de Personal: promedios per-currency, labels semánticos, donut sin mix, headcount breakdown |
+| `TASK-108` | [TASK-108-admin-center-governance-shell.md](in-progress/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | Implementación | `Admin Center` deja de ser redirect y pasa a control plane con landing, taxonomía y navegación de gobernanza |
+| `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; Lane B visual sigue separada |
 
 ## To Do
 
@@ -128,8 +130,11 @@ Primer bloque operativo asignado:
 | 32 | `TASK-103` | [TASK-103-gcp-budget-alerts-bigquery-guards.md](to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md) | P2 | Medio | Muy bajo | Diseño | **[Hardening 7/7]** Budget alerts GCP + `maximumBytesBilled` en BigQuery |
 | 34 | `TASK-106` | [TASK-106-email-delivery-admin-ui.md](to-do/TASK-106-email-delivery-admin-ui.md) | P2 | Medio | Medio | Diseño | **[Hardening 9/9]** Tab de correos en Control Tower con historial, filtros, detalle y suscripciones |
 | 35 | `TASK-107` | [TASK-107-auth-email-verification-request-flow.md](to-do/TASK-107-auth-email-verification-request-flow.md) | P2 | Medio | Medio | Diseño | Endpoint request de verificación de email + token `verify` + envío con `verify_email` |
-| 36 | `TASK-108` | [TASK-108-admin-center-governance-shell.md](to-do/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | Diseño | `Admin Center` como landing institucional con taxonomía de gobernanza y separación entre governance y surfaces operativas |
+| 36 | `TASK-108` | [TASK-108-admin-center-governance-shell.md](in-progress/TASK-108-admin-center-governance-shell.md) | P1 | Alto | Medio | Implementación | `Admin Center` como landing institucional con taxonomía de gobernanza y separación entre governance y surfaces operativas |
 | 37 | `TASK-109` | [TASK-109-projected-payroll-runtime-hardening-observability.md](to-do/TASK-109-projected-payroll-runtime-hardening-observability.md) | P1 | Alto | Medio | Diseño | Hardening post `TASK-063`: sin DDL runtime + health de proyección + contrato downstream de `payroll.projected_*` |
+| 38 | `TASK-111` | [TASK-111-admin-center-secret-ref-governance-ui.md](complete/TASK-111-admin-center-secret-ref-governance-ui.md) | P2 | Medio | Medio | **Cerrada** | Mini-task UI para `secret_ref governance`: tabla con dirección, auth, owner, scope, estado governance |
+| 39 | `TASK-112` | [TASK-112-admin-center-integration-health-freshness-ui.md](complete/TASK-112-admin-center-integration-health-freshness-ui.md) | P2 | Medio | Medio | **Cerrada** | Mini-task UI para health/freshness por integración con LinearProgress y stale thresholds |
+| 40 | `TASK-113` | [TASK-113-admin-center-ops-audit-trail-ui.md](complete/TASK-113-admin-center-ops-audit-trail-ui.md) | P2 | Medio | Medio | **Cerrada** | Mini-task UI para audit trail con ActivityTimeline (actor, acción, resultado, follow-up) |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
@@ -173,6 +178,9 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-111-admin-center-secret-ref-governance-ui.md](complete/TASK-111-admin-center-secret-ref-governance-ui.md) | Tabla de governance de secret refs con dirección inbound/outbound, auth mode, owner, scope, estado y verificación. Nunca expone valores crudos. |
+| [TASK-112-admin-center-integration-health-freshness-ui.md](complete/TASK-112-admin-center-integration-health-freshness-ui.md) | Tabla de health/freshness por integración con LinearProgress, stale thresholds (6h/24h/48h), registros y fallos por lane. Incluye Webhooks como integration row. |
+| [TASK-113-admin-center-ops-audit-trail-ui.md](complete/TASK-113-admin-center-ops-audit-trail-ui.md) | ActivityTimeline (patrón Vuexy) con eventos del bus operativo y handlers degradados. Muestra actor, resultado, timestamp y follow-up. Leyenda visual + placeholder para acciones manuales. |
 | [TASK-058-economic-indicators-runtime-layer.md](complete/TASK-058-economic-indicators-runtime-layer.md) | Capa común de indicadores económicos (USD_CLP, UF, UTM, IPC), histórico desde 2026-01, sync diario, Finance Dashboard UI, AI Tooling delegado a capa común, outbox events canónicos |
 | [TASK-091-greenhouse-operational-calendar-utility.md](complete/TASK-091-greenhouse-operational-calendar-utility.md) | Utilidad canónica de calendario operativo timezone-aware, policy explícita por jurisdicción, loader `Nager.Date`, tests de business days / close window / DST Santiago |
 | [TASK-095-centralized-email-delivery-layer.md](complete/TASK-095-centralized-email-delivery-layer.md) | Capa unificada de delivery de emails sobre Resend con `sendEmail()`, registry de templates, recipient resolver por suscripción, tabla PG `email_deliveries` y migración de Auth/NotificationService/Payroll |

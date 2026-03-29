@@ -10,12 +10,15 @@ export const GH_CLIENT_NAV = {
 // nomenclature contract defined in Greenhouse_Nomenclatura_Portal_v3.md.
 export const GH_INTERNAL_NAV = {
   internalDashboard: { label: 'Torre de control', subtitle: 'Operacion interna de spaces' },
+  adminCenter: { label: 'Admin Center', subtitle: 'Gobernanza institucional del portal' },
   adminTenants: { label: 'Spaces', subtitle: 'Spaces, acceso y gobierno del portal' },
   adminTeam: { label: 'Equipo', subtitle: 'Colaboradores, activación y asignaciones' },
   adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' },
   adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' },
-  adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' }
+  adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' },
+  adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },
+  adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' }
 } as const
 
 export const GH_PEOPLE_NAV = {

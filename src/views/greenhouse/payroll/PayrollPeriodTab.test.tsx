@@ -71,7 +71,7 @@ describe('PayrollPeriodTab readiness', () => {
   })
 
   it('renders readiness issues and disables calculate when blockers exist', async () => {
-    const { findByText, getByRole, getByText } = render(
+    const { findByText, getByRole, getByText, queryByText } = render(
       <PayrollPeriodTab
         period={period}
         entries={[]}
@@ -84,6 +84,8 @@ describe('PayrollPeriodTab readiness', () => {
     await findByText('Falta el valor UF y este período lo requiere para calcular descuentos Isapre.')
 
     expect(getByText('1 colaborador(es) activos quedarían fuera por no tener compensación vigente.')).toBeInTheDocument()
+    expect(queryByText('La asistencia aún se resume desde attendance_daily + leave_requests.')).not.toBeInTheDocument()
+    expect(queryByText('La integración futura objetivo para asistencia es Microsoft Teams.')).not.toBeInTheDocument()
     expect(getByRole('button', { name: 'Calcular' })).toBeDisabled()
   })
 
