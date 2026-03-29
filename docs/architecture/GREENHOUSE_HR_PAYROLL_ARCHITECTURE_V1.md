@@ -8,6 +8,14 @@ Este documento es la fuente canónica del módulo. No reemplaza:
 - `GREENHOUSE_360_OBJECT_MODEL_V1.md` como modelo 360 transversal
 - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` como placement del modelo en PostgreSQL
 
+## Delta 2026-03-28 — Próximo backlog operativo: cálculo el último día hábil
+
+- El siguiente backlog recomendado de Payroll queda documentado en `TASK-117`.
+- La dirección propuesta no cambia el lifecycle transaccional base (`draft -> calculated -> approved -> exported`).
+- La intención es formalizar que el período oficial del mes quede en `calculated` el último día hábil del mes operativo usando la utility canónica de calendario.
+- `approved` y `exported` siguen siendo pasos posteriores de revisión y cierre; no se propone auto-cierre.
+- La línea de trabajo también contempla notificación a stakeholders operativos cuando el período quede `calculated`, reutilizando `NotificationService` y la capa centralizada de email.
+
 ## 1. Alcance del módulo
 
 `Payroll` es el dominio transaccional de nómina mensual para colaboradores internos de Efeonce.
@@ -119,6 +127,13 @@ Regla operativa canónica para Efeonce:
 - la selección de "período actual" debe resolver el mes operativo vigente con la utilidad compartida y no basarse únicamente en el último período no exportado
 
 Esta regla define la semántica de negocio del dashboard, no solo su copy.
+
+Backlog recomendado del módulo:
+
+- Como siguiente iteración, Payroll debería formalizar una policy explícita para dejar el período oficial del mes en `calculated` el último día hábil del mes operativo.
+- Esa iteración debería apoyarse en la utility temporal compartida, separar `calculation readiness` de `approval readiness`, y resolver un job idempotente de cálculo mensual.
+- El hito de `calculated` debería poder notificar a stakeholders operativos vía el dominio reactivo `notifications`, sin convertir `approved` ni `exported` en eventos automáticos.
+- Esta línea de trabajo vive operativamente en `TASK-117-payroll-last-business-day-auto-calculation.md`.
 
 ## 2.7. Timezone-aware operational calendar
 
