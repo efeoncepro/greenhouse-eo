@@ -7,11 +7,12 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
 
 ### Completado
-- `TASK-096` pasó a `in-progress` en rama `feature/codex-task-096-wif-baseline`.
+- `TASK-096` pasó a `in-progress` sobre el estado actual del repo.
 - El repo ya quedó WIF-aware sin romper el runtime actual:
   - `src/lib/google-credentials.ts` resuelve `wif | service_account_key | ambient_adc`
+  - el helper ahora también sabe pedir el token OIDC desde runtime Vercel con `@vercel/oidc`, no solo desde `process.env.VERCEL_OIDC_TOKEN`
   - `src/lib/bigquery.ts`, `src/lib/postgres/client.ts`, `src/lib/storage/greenhouse-media.ts` y `src/lib/ai/google-genai.ts` consumen el helper canónico
-  - `src/lib/ai/google-genai.ts` solo mantiene el temp file para el fallback de SA key
+  - `src/lib/ai/google-genai.ts` ya no usa temp file para credenciales
 - Scripts con parsing manual de `GOOGLE_APPLICATION_CREDENTIALS_JSON` quedaron alineados al helper central:
   - `check-ico-bq`
   - `backfill-ico-to-postgres`
@@ -24,18 +25,29 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `project_context.md`
   - `changelog.md`
+- Rollout externo ya avanzado y validado sin bigbang:
+  - existe Workload Identity Pool `vercel` y provider `greenhouse-eo` en `efeonce-group`
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` ya tiene bindings `roles/iam.workloadIdentityUser` para `development`, `preview`, `staging` y `production`
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` ya quedaron cargadas en Vercel
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` quedó cargada en Vercel para preparar el cutover hacia Cloud SQL Connector
+  - validación local con OIDC + WIF:
+    - BigQuery respondió OK sin SA key
+    - Cloud SQL Connector respondió `SELECT 1` sin SA key usando `runGreenhousePostgresQuery()`
 
 ### Validación
 - `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts src/lib/bigquery.ts src/lib/postgres/client.ts src/lib/storage/greenhouse-media.ts src/lib/ai/google-genai.ts scripts/check-ico-bq.ts scripts/backfill-ico-to-postgres.ts scripts/materialize-member-metrics.ts scripts/backfill-task-assignees.ts scripts/backfill-postgres-payroll.ts scripts/admin-team-runtime-smoke.ts`
 - `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts`
 - `pnpm exec tsc --noEmit --pretty false`
+- Smoke adicional externo:
+  - BigQuery con `VERCEL_OIDC_TOKEN` y WIF sin SA key
+  - Cloud SQL Connector con `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev` y query `SELECT 1::int as ok`
 
 ### Pendiente inmediato
-- Completar el rollout externo en GCP/Vercel:
-  - crear Workload Identity Pool/Provider real
-  - bindear impersonation sobre `greenhouse-runtime@efeonce-group.iam.gserviceaccount.com`
-  - cargar `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` en Vercel
-  - validar staging con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- Limpiar drift de Vercel env antes del endurecimiento final:
+  - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` quedó guardada con sufijo literal `\n` en al menos un entorno
+  - también aparecieron valores con `\n` en credenciales Postgres al hacer `env pull`
+  - antes de endurecer Cloud SQL hay que corregir esos valores en Vercel y revalidar preview/staging
+- Validar preview/staging con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - Cerrar Fase 1 externa de Cloud SQL:
   - remover `0.0.0.0/0`
   - pasar `sslMode` a `ENCRYPTED_ONLY`

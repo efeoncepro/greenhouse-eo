@@ -1,3 +1,4 @@
+import { getVercelOidcToken, getVercelOidcTokenSync } from '@vercel/oidc'
 import { ExternalAccountClient, GoogleAuth, type AuthClient, type GoogleAuthOptions } from 'google-auth-library'
 
 export type GoogleCredentialSource = 'wif' | 'service_account_key' | 'ambient_adc'
@@ -110,6 +111,22 @@ const normalizeParsedCredentials = (value: unknown) => {
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
+const getAvailableVercelOidcTokenSync = (env: NodeJS.ProcessEnv = process.env) => {
+  if (env !== process.env) {
+    return env.VERCEL_OIDC_TOKEN?.trim()
+  }
+
+  if (hasValue(process.env.VERCEL_OIDC_TOKEN)) {
+    return process.env.VERCEL_OIDC_TOKEN!.trim()
+  }
+
+  try {
+    return getVercelOidcTokenSync().trim()
+  } catch {
+    return undefined
+  }
+}
+
 const normalizeWorkloadIdentityProvider = (value: string) => {
   const trimmed = value.trim()
 
@@ -191,9 +208,8 @@ const getWorkloadIdentityAuthClient = ({
 }) => {
   const provider = getWorkloadIdentityProvider(env)
   const serviceAccountEmail = env.GCP_SERVICE_ACCOUNT_EMAIL?.trim()
-  const subjectToken = env.VERCEL_OIDC_TOKEN?.trim()
 
-  if (!provider || !serviceAccountEmail || !subjectToken) {
+  if (!provider || !serviceAccountEmail) {
     throw new Error('Workload Identity Federation is not fully configured for this runtime')
   }
 
@@ -205,7 +221,19 @@ const getWorkloadIdentityAuthClient = ({
     service_account_impersonation_url: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(serviceAccountEmail)}:generateAccessToken`,
     ...(scopes ? { scopes: Array.isArray(scopes) ? scopes : [scopes] } : {}),
     subject_token_supplier: {
-      getSubjectToken: async () => subjectToken
+      getSubjectToken: async () => {
+        if (env !== process.env && hasValue(env.VERCEL_OIDC_TOKEN)) {
+          return env.VERCEL_OIDC_TOKEN!.trim()
+        }
+
+        const token = await getVercelOidcToken().catch(() => env.VERCEL_OIDC_TOKEN?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim())
+
+        if (!token) {
+          throw new Error('Vercel OIDC token is not available in this runtime context')
+        }
+
+        return token.trim()
+      }
     }
   })
 
@@ -217,7 +245,9 @@ const getWorkloadIdentityAuthClient = ({
 }
 
 export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) =>
-  hasValue(getWorkloadIdentityProvider(env)) && hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL) && hasValue(env.VERCEL_OIDC_TOKEN)
+  hasValue(getWorkloadIdentityProvider(env)) &&
+  hasValue(env.GCP_SERVICE_ACCOUNT_EMAIL) &&
+  hasValue(getAvailableVercelOidcTokenSync(env))
 
 export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialSource => {
   if (shouldUseWorkloadIdentity(env)) {
