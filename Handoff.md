@@ -4,6 +4,53 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-129 iniciada sobre webhook bus con convivencia explícita
+
+### Completado
+- `TASK-129` deja `to-do` y pasa a `in-progress`.
+- Estrategia elegida para evitar duplicados y mantener la arquitectura vigente:
+  - `src/lib/sync/projections/notifications.ts` se mantiene para eventos legacy internos
+  - el nuevo consumer webhook toma solo eventos UX-facing con payload estable
+- Ownership inicial por `eventType`:
+  - `reactive`: `service.created`, `identity.reconciliation.approved`, `finance.dte.discrepancy_found`, `identity.profile.linked`
+  - `webhook notifications`: `assignment.created`, `assignment.updated`, `assignment.removed`, `compensation_version.created`, `member.created`, `payroll_period.exported`
+- Contrato nuevo en implementación:
+  - `POST /api/internal/webhooks/notification-dispatch`
+  - `POST /api/admin/ops/webhooks/seed-notifications`
+  - `WEBHOOK_NOTIFICATIONS_SECRET`
+  - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+  - `WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET`
+
+### Criterio operativo
+- No eliminar el dominio reactivo `notifications`.
+- No tocar `payroll_export_ready_notification`; el correo operativo downstream sigue fuera del alcance de `TASK-129`.
+- El consumer nuevo debe apoyar su dedupe en metadata JSONB de `greenhouse_notifications.notifications`, evitando migración schema-first salvo que resulte impracticable.
+
+## Sesión 2026-03-29 — TASK-129 endurecida y env rollout listo en Vercel
+
+### Completado
+- El consumer webhook de notificaciones quedó endurecido:
+  - `POST /api/internal/webhooks/notification-dispatch` ahora exige firma HMAC cuando `WEBHOOK_NOTIFICATIONS_SECRET` resuelve a un secreto real
+  - el dedupe ya no mira solo `greenhouse_notifications.notifications`; también usa `notification_log` para cubrir casos `email-only`
+- `staging` y `production` ya tienen cargada en Vercel la ref:
+  - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
+- `staging` conserva además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional, lo que deja la migración fail-soft mientras se confirma GCP.
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/webhooks/consumers/notification-mapping.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/webhooks/consumers/notification-dispatch.test.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts src/lib/webhooks/notification-target.test.ts src/lib/notifications/notification-service.test.ts`
+  - `pnpm exec eslint src/views/greenhouse/admin/AdminNotificationsView.tsx src/lib/notifications/schema.ts src/lib/notifications/notification-service.ts src/lib/webhooks/consumers/notification-dispatch.ts src/app/api/internal/webhooks/notification-dispatch/route.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- Crear o verificar en GCP Secret Manager el secreto `webhook-notifications-secret`.
+- Bloqueo encontrado:
+  - `gcloud secrets describe webhook-notifications-secret --project=efeonce-group` falló por reautenticación no interactiva (`gcloud auth login` requerido).
+- Después de resolver GCP:
+  - redeploy de `staging`
+  - activar `wh-sub-notifications`
+  - smoke real con `assignment.created` y `payroll_period.exported`
+  - recién entonces evaluar retirar el env crudo `WEBHOOK_NOTIFICATIONS_SECRET` de `staging`
+
 ## Sesión 2026-03-29 — TASK-131 cerrada: health separa runtime vs tooling posture
 
 ### Completado

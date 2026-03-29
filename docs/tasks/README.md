@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-132`
+- siguiente ID disponible: `TASK-134`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -48,6 +48,7 @@ Primer bloque operativo asignado:
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
+| `TASK-129` | [TASK-129-in-app-notifications-via-webhook-bus.md](in-progress/TASK-129-in-app-notifications-via-webhook-bus.md) | P1 | Alto | Medio | Implementación | Consumer institucional de notificaciones sobre el bus outbound, con convivencia explícita con `notification_dispatch` legacy para evitar duplicados |
 
 ## To Do
 
@@ -174,6 +175,7 @@ Primer bloque operativo asignado:
 | 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
 | 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
 | 53 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
+| 54 | `TASK-133` | [TASK-133-ops-health-sentry-incident-surfacing.md](to-do/TASK-133-ops-health-sentry-incident-surfacing.md) | P1 | Alto | Medio | Diseño | Exponer incidentes abiertos/relevantes de Sentry dentro de `Ops Health`, con payload canónico fail-soft y contexto operativo por release/transacción |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

@@ -3,6 +3,30 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-129 iniciada
+- Greenhouse inicia un segundo carril institucional de notificaciones:
+  - `reactive notifications` sigue como control plane legacy para eventos internos existentes
+  - `webhook notifications` nace como consumer UX-facing del bus outbound
+- Contratos nuevos en repo:
+  - `POST /api/internal/webhooks/notification-dispatch`
+  - `POST /api/admin/ops/webhooks/seed-notifications`
+  - env/secret:
+    - `WEBHOOK_NOTIFICATIONS_SECRET`
+    - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+    - `WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET`
+- Decisión arquitectónica explícita:
+  - `TASK-129` no reemplaza `notification_dispatch`
+  - el ownership se define por `eventType` para evitar duplicados
+  - el self-loop del subscriber de notificaciones soporta bypass opcional de `Deployment Protection`, igual que el canary
+
+## Delta 2026-03-29 TASK-129 env rollout preparado en Vercel
+- `staging` y `production` ya tienen `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
+- Postura operativa vigente:
+  - `staging` mantiene además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional
+  - `production` queda preparada para consumir Secret Manager en cuanto exista/sea verificable el secreto canónico
+- Bloqueo externo actual:
+  - la creación/verificación de `webhook-notifications-secret` en GCP no pudo completarse desde este turno porque `gcloud` exigió reautenticación no interactiva
+
 ## Delta 2026-03-29 TASK-131 cerrada
 - El health cloud ya separa correctamente secretos runtime-críticos de secretos de tooling.
 - `src/lib/cloud/secrets.ts` ahora clasifica los secretos tracked entre:
