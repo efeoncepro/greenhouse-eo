@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
+import { getBlockedQueries } from '@/lib/bigquery'
 import type { CloudHealthSnapshot } from '@/lib/cloud/contracts'
 import { getCronSecretState } from '@/lib/cloud/cron'
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
@@ -80,6 +81,12 @@ export interface OperationsOverview {
   cloud: CloudPlatformOverview
 }
 
+export interface BlockedQueryEntry {
+  query: string
+  limit: string
+  timestamp: string
+}
+
 export interface CloudPlatformOverview {
   health: CloudHealthSnapshot
   posture: {
@@ -105,6 +112,7 @@ export interface CloudPlatformOverview {
     projectId: string | null
     maximumBytesBilled: number
     summary: string
+    blockedQueries: BlockedQueryEntry[]
   }
 }
 
@@ -598,7 +606,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       bigquery: {
         projectId: bigQueryProjectId,
         maximumBytesBilled,
-        summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado')
+        summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado'),
+        blockedQueries: [...getBlockedQueries()]
       }
     }
   }

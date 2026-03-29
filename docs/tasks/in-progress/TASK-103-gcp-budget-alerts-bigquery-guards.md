@@ -1,5 +1,19 @@
 # TASK-103 — GCP Budget Alerts & BigQuery Cost Guards
 
+## Delta 2026-03-29 — Slice 2 y 4 implementados en código
+
+- `getBigQueryClient()` ahora wrappea `.query()` para inyectar `maximumBytesBilled` automáticamente en todas las 50+ query sites sin cambios por archivo.
+- Si una query es bloqueada por exceder el límite:
+  - Se logea con contexto (`[bigquery-guard]`)
+  - Se guarda en un log in-memory (`getBlockedQueries()`)
+  - Se notifica a Slack vía `sendSlackAlert()` (fire-and-forget)
+- Admin Center > Cloud & Integrations ahora muestra tabla de queries bloqueadas con snippet, límite y timestamp.
+- `get-operations-overview.ts` expone `blockedQueries` en el payload de `cloud.bigquery`.
+- Sigue pendiente:
+  - Slice 1: Budget alerts en GCP Billing Console (manual)
+  - Slice 3: Verificar gasto actual y ajustar budgets
+  - Slice 4b/4c: Email a admins y notificación in-app (dependen de budget alerts configurados)
+
 ## Delta 2026-03-29
 
 - El guard base de BigQuery ya existía en `src/lib/cloud/bigquery.ts`.
@@ -21,11 +35,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P2` |
 | Impact | `Medio` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Cost Management |
 | Sequence | Cloud Posture Hardening **6 of 6** — independent, can run in parallel with any task |
@@ -233,15 +247,17 @@ Las budget alerts de GCP por defecto solo llegan a un email de billing admin. Pa
 - [ ] Budget alert `Greenhouse Monthly` creado con thresholds 50/80/100%
 - [ ] Budget alert `BigQuery Monthly` creado con threshold específico
 - [ ] Email de billing admin recibe notificaciones
-- [ ] `maximumBytesBilled` configurado en `src/lib/bigquery.ts`
-- [ ] Queries que excedan el límite fallan con error claro (no silenciosamente)
+- [x] `maximumBytesBilled` inyectado automáticamente en `getBigQueryClient()` wrapper — protege 50+ query sites
+- [x] Queries que excedan el límite fallan con error claro + log `[bigquery-guard]`
+- [x] Query bloqueada notifica a Slack vía `sendSlackAlert()` (fire-and-forget)
+- [x] Query bloqueada genera registro visible en Admin Center > Cloud & Integrations (tabla con snippet, límite, timestamp)
+- [x] `getBlockedQueries()` expone log in-memory para operadores
 - [ ] Scripts de backfill tienen override explícito documentado
 - [ ] Gasto actual del último mes documentado como baseline
 - [ ] Budget alerts llegan a Slack vía `SLACK_ALERTS_WEBHOOK_URL` (al menos threshold 80% y 100%)
 - [ ] Email a admins del portal cuando budget cruza 80% o 100%
-- [ ] Query BigQuery bloqueada genera registro visible en Admin Center > Ops Health
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa (539 tests)
 
 ## Verification
 

@@ -299,6 +299,64 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
               </Stack>
             </CardContent>
           </Card>
+
+          {/* BigQuery cost guard — blocked queries */}
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                  <Typography variant='h6'>Queries bloqueadas por cost guard</Typography>
+                  <Chip
+                    size='small'
+                    variant='tonal'
+                    color={chipColor(data.cloud.bigquery.blockedQueries.length === 0 ? 'ok' : 'warning')}
+                    label={data.cloud.bigquery.blockedQueries.length === 0 ? 'sin bloqueos' : `${data.cloud.bigquery.blockedQueries.length} bloqueada${data.cloud.bigquery.blockedQueries.length > 1 ? 's' : ''}`}
+                  />
+                </Stack>
+                <Typography variant='body2' color='text.secondary'>
+                  Queries rechazadas por exceder maximumBytesBilled. Se reinicia en cada cold start.
+                </Typography>
+                {data.cloud.bigquery.blockedQueries.length > 0 ? (
+                  <TableContainer>
+                    <Table size='small'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Query (snippet)</TableCell>
+                          <TableCell>Límite</TableCell>
+                          <TableCell>Timestamp</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {data.cloud.bigquery.blockedQueries.slice(0, 10).map((entry, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell>
+                              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem', maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {entry.query}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                {Number(entry.limit).toLocaleString('en-US')} B
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant='body2' color='text.secondary' sx={{ fontSize: '0.75rem' }}>
+                                {new Date(entry.timestamp).toLocaleString()}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Typography variant='body2' color='text.secondary'>
+                    Sin queries bloqueadas en este ciclo de runtime.
+                  </Typography>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
         </Box>
       </ExecutiveCardShell>
 
