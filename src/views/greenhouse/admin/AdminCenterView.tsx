@@ -1,8 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import Link from 'next/link'
+import { usePathname, useRouter as useNavRouter, useSearchParams } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -20,6 +21,7 @@ import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomen
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
 import type { InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
+import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
 
 import {
   buildControlTowerSummary,
@@ -37,6 +39,7 @@ type Props = {
   access: AdminAccessOverview
   tenants: AdminTenantsOverview
   controlTower: InternalDashboardOverview
+  operations: OperationsOverview
 }
 
 type DomainCard = {
@@ -80,7 +83,7 @@ const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
   URL.revokeObjectURL(url)
 }
 
-const buildDomainCards = ({ access, tenants }: Pick<Props, 'access' | 'tenants'>): DomainCard[] => [
+const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' | 'tenants' | 'operations'>): DomainCard[] => [
   {
     title: 'Identity & Access',
     subtitle: 'Usuarios, roles, equipo interno y scopes visibles del portal.',
@@ -131,14 +134,19 @@ const buildDomainCards = ({ access, tenants }: Pick<Props, 'access' | 'tenants'>
     subtitle: GH_INTERNAL_NAV.adminCloudIntegrations.subtitle,
     icon: 'tabler-plug-connected',
     avatarColor: 'primary',
-    status: { label: 'Activo', color: 'success' },
+    status: {
+      label: operations.kpis.activeSyncs > 0 ? `${operations.kpis.activeSyncs} syncs` : 'Sin syncs',
+      color: operations.kpis.activeSyncs > 0 ? 'success' : 'warning'
+    },
     href: '/admin/cloud-integrations',
     primaryAction: 'Abrir cloud & integrations',
     routes: ['/admin/cloud-integrations'],
     points: [
-      'Health, stale data, retries y auth por referencia',
-      'Syncs y webhooks con entrypoint propio',
-      'Deep-link a operaciones cuando hace falta mas contexto'
+      `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
+      `${operations.webhooks.subscriptionsActive} subscriptions webhook`,
+      operations.webhooks.deliveriesDeadLetter > 0
+        ? `${operations.webhooks.deliveriesDeadLetter} deliveries en dead-letter`
+        : 'Sin dead-letters visibles'
     ]
   },
   {
@@ -146,14 +154,19 @@ const buildDomainCards = ({ access, tenants }: Pick<Props, 'access' | 'tenants'>
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,
     icon: 'tabler-activity-heartbeat',
     avatarColor: 'error',
-    status: { label: 'Runtime', color: 'info' },
+    status: {
+      label: operations.kpis.failedHandlers > 0 ? `${operations.kpis.failedHandlers} degradados` : 'Ok',
+      color: operations.kpis.failedHandlers > 0 ? 'warning' : 'success'
+    },
     href: '/admin/ops-health',
     primaryAction: 'Abrir ops health',
     routes: ['/admin/ops-health'],
     points: [
-      'Outbox, queue y handlers reactivos',
-      'Semantica ok, warning, failed y stale',
-      'Replay y retry sobre helpers canonicos'
+      `${operations.kpis.outboxEvents24h} eventos en 24h`,
+      operations.kpis.pendingProjections > 0
+        ? `${operations.kpis.pendingProjections} proyecciones pendientes`
+        : 'Sin proyecciones en cola',
+      `${operations.kpis.notificationsSent24h} notificaciones enviadas`
     ]
   },
   {
@@ -173,9 +186,51 @@ const buildDomainCards = ({ access, tenants }: Pick<Props, 'access' | 'tenants'>
   }
 ]
 
-const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
-  const [searchValue, setSearchValue] = useState('')
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
+
+const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) => {
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const navRouter = useNavRouter()
+
+  const initialFilter = searchParams.get('filter') as StatusFilter | null
+  const initialQuery = searchParams.get('q') ?? ''
+
+  const [searchValue, setSearchValue] = useState(initialQuery)
+
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
+    initialFilter && validFilters.includes(initialFilter) ? initialFilter : 'all'
+  )
+
+  const syncParams = useCallback(
+    (filter: StatusFilter, query: string) => {
+      const params = new URLSearchParams()
+
+      if (filter !== 'all') params.set('filter', filter)
+      if (query.trim()) params.set('q', query.trim())
+
+      const qs = params.toString()
+
+      navRouter.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false })
+    },
+    [pathname, navRouter]
+  )
+
+  const handleFilterChange = useCallback(
+    (value: StatusFilter) => {
+      setStatusFilter(value)
+      syncParams(value, searchValue)
+    },
+    [searchValue, syncParams]
+  )
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchValue(value)
+      syncParams(statusFilter, value)
+    },
+    [statusFilter, syncParams]
+  )
 
   const ctTenants = useMemo(
     () => controlTower.clients.map(finalizeControlTowerTenant).sort(compareControlTowerTenants),
@@ -210,7 +265,7 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
         : summary.avgOnTimePct >= 70 ? 'warning'
           : 'error'
 
-  const cards = buildDomainCards({ access, tenants })
+  const cards = buildDomainCards({ access, tenants, operations })
 
   return (
     <Stack spacing={6}>
@@ -280,6 +335,108 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
         />
       </Box>
 
+      {/* ── Alertas consolidadas (solo si hay señales) ── */}
+      {(() => {
+        const alerts: Array<{ icon: string; tone: 'error' | 'warning'; label: string; detail: string }> = []
+
+        if (summary.attentionCount > 0) {
+          alerts.push({
+            icon: 'tabler-alert-triangle',
+            tone: 'error',
+            label: `${summary.attentionCount} spaces requieren atencion`,
+            detail: 'Sin proyectos scoped, sin activacion o sin actividad reciente.'
+          })
+        }
+
+        if (operations.kpis.failedHandlers > 0) {
+          alerts.push({
+            icon: 'tabler-bug',
+            tone: 'error',
+            label: `${operations.kpis.failedHandlers} handlers degradados`,
+            detail: 'Retries o dead-letters visibles en el runtime reactivo.'
+          })
+        }
+
+        if (operations.webhooks.deliveriesDeadLetter > 0) {
+          alerts.push({
+            icon: 'tabler-mail-x',
+            tone: 'warning',
+            label: `${operations.webhooks.deliveriesDeadLetter} deliveries en dead-letter`,
+            detail: 'Webhooks que agotaron reintentos y requieren intervencion.'
+          })
+        }
+
+        if (operations.kpis.pendingProjections > 3) {
+          alerts.push({
+            icon: 'tabler-refresh-alert',
+            tone: 'warning',
+            label: `${operations.kpis.pendingProjections} proyecciones pendientes`,
+            detail: 'Cola de refreshes reactivos acumulada.'
+          })
+        }
+
+        if (access.totals.invitedUsers > 10) {
+          alerts.push({
+            icon: 'tabler-user-exclamation',
+            tone: 'warning',
+            label: `${access.totals.invitedUsers} usuarios sin activar`,
+            detail: 'Invitaciones pendientes con posible friccion de onboarding.'
+          })
+        }
+
+        if (alerts.length === 0) return null
+
+        return (
+          <ExecutiveCardShell
+            title='Requiere atencion'
+            subtitle='Senales activas de governance que necesitan revision.'
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }
+              }}
+            >
+              {alerts.map(alert => (
+                <Card
+                  key={alert.label}
+                  variant='outlined'
+                  sx={{
+                    borderLeft: '4px solid',
+                    borderLeftColor: `${alert.tone}.main`
+                  }}
+                >
+                  <CardContent sx={{ p: 3 }}>
+                    <Stack direction='row' spacing={2} alignItems='flex-start'>
+                      <Avatar
+                        variant='rounded'
+                        sx={{
+                          bgcolor: `${alert.tone}.lightOpacity`,
+                          color: `${alert.tone}.main`,
+                          width: 36,
+                          height: 36
+                        }}
+                      >
+                        <i className={alert.icon} />
+                      </Avatar>
+                      <Stack spacing={0.5}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {alert.label}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {alert.detail}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </ExecutiveCardShell>
+        )
+      })()}
+
       {/* ── Torre de control (Spaces health table) ── */}
       <SectionErrorBoundary
         sectionName='admin-center-control-tower'
@@ -294,9 +451,9 @@ const AdminCenterView = ({ access, tenants, controlTower }: Props) => {
             rows={filteredTenants}
             totalRows={ctTenants.length}
             searchValue={searchValue}
-            onSearchChange={setSearchValue}
+            onSearchChange={handleSearchChange}
             statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
+            onStatusFilterChange={handleFilterChange}
             onExport={() => exportToCsv(filteredTenants)}
             attentionCount={summary.attentionCount}
           />

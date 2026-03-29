@@ -35,6 +35,13 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec vitest run src/lib/nexa/nexa-service.test.ts`
 - verificación runtime directa de `greenhouse_ai.nexa_threads`, `greenhouse_ai.nexa_messages` y `greenhouse_ai.nexa_feedback` bajo perfil `runtime`
 
+### TASK-121 Admin Center Hardening (5 slices cerrados)
+- **Slice 1**: Sorting por todas las columnas en AdminCenterSpacesTable (TableSortLabel)
+- **Slice 2**: `loading.tsx` skeleton para `/admin` (hero, KPIs, tabla 8 filas, domain cards)
+- **Slice 3**: Health real en domain cards — Cloud & Integrations y Ops Health consumen `getOperationsOverview`
+- **Slice 4**: Deep-link con `searchParams` — `/admin?filter=attention&q=empresa` funciona
+- **Slice 5**: Bloque "Requiere atencion" con alertas consolidadas cross-dominio
+
 ### Pendiente inmediato
 - `TASK-115` pasa a ser la siguiente lane natural de Nexa UI porque ya tiene backend real para feedback, suggestions y thread history
 - Si se quiere endurecer `TASK-114` más adelante:

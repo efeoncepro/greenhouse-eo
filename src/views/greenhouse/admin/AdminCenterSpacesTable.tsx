@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -16,6 +16,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
+import TableSortLabel from '@mui/material/TableSortLabel'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
@@ -30,6 +31,8 @@ import type { DerivedControlTowerTenant } from '../internal/dashboard/helpers'
 import { formatPercent, getOtdTone } from '../internal/dashboard/helpers'
 
 type StatusFilter = 'all' | 'active' | 'onboarding' | 'attention' | 'inactive'
+type SortKey = 'space' | 'status' | 'users' | 'projects' | 'activity'
+type SortDirection = 'asc' | 'desc'
 
 type Props = {
   rows: DerivedControlTowerTenant[]
@@ -52,6 +55,14 @@ const filterOptions: Array<{ value: StatusFilter; label: string }> = [
   { value: 'inactive', label: GH_INTERNAL_MESSAGES.internal_dashboard_table_filter_inactive }
 ]
 
+const sortComparators: Record<SortKey, (a: DerivedControlTowerTenant, b: DerivedControlTowerTenant) => number> = {
+  space: (a, b) => a.clientName.localeCompare(b.clientName),
+  status: (a, b) => a.statusPriority - b.statusPriority,
+  users: (a, b) => a.activeUsers - b.activeUsers,
+  projects: (a, b) => a.scopedProjects - b.scopedProjects,
+  activity: (a, b) => a.lastActivityTimestamp - b.lastActivityTimestamp
+}
+
 const AdminCenterSpacesTable = ({
   rows,
   totalRows,
@@ -65,11 +76,39 @@ const AdminCenterSpacesTable = ({
   const router = useRouter()
   const theme = useTheme()
   const [page, setPage] = useState(0)
+  const [sortKey, setSortKey] = useState<SortKey>('status')
+  const [sortDir, setSortDir] = useState<SortDirection>('asc')
+
+  const handleSort = useCallback((key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
+    }
+
+    setPage(0)
+  }, [sortKey])
+
+  const sortedRows = useMemo(() => {
+    const comparator = sortComparators[sortKey]
+    const sorted = [...rows].sort(comparator)
+
+    return sortDir === 'desc' ? sorted.reverse() : sorted
+  }, [rows, sortKey, sortDir])
 
   const paginatedRows = useMemo(
-    () => rows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
-    [rows, page]
+    () => sortedRows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
+    [sortedRows, page]
   )
+
+  const columns: Array<{ key: SortKey; label: string; align: 'left' | 'center' | 'right' }> = [
+    { key: 'space', label: 'Space', align: 'left' },
+    { key: 'status', label: 'Estado', align: 'left' },
+    { key: 'users', label: 'Usuarios', align: 'center' },
+    { key: 'projects', label: 'Proyectos', align: 'center' },
+    { key: 'activity', label: 'Actividad', align: 'right' }
+  ]
 
   return (
     <Stack spacing={3}>
@@ -152,11 +191,17 @@ const AdminCenterSpacesTable = ({
             <Table size='small'>
               <TableHead>
                 <TableRow>
-                  <TableCell>Space</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell align='center'>Usuarios</TableCell>
-                  <TableCell align='center'>Proyectos</TableCell>
-                  <TableCell align='right'>Actividad</TableCell>
+                  {columns.map(col => (
+                    <TableCell key={col.key} align={col.align}>
+                      <TableSortLabel
+                        active={sortKey === col.key}
+                        direction={sortKey === col.key ? sortDir : 'asc'}
+                        onClick={() => handleSort(col.key)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>

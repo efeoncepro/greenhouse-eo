@@ -46,6 +46,7 @@ Primer bloque operativo asignado:
 | `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
 | `TASK-093` | [TASK-093-personnel-expense-data-consistency.md](complete/TASK-093-personnel-expense-data-consistency.md) | P1 | Alto | Medio | Cerrada | Consistencia de datos en Gasto de Personal: promedios per-currency, labels semánticos, donut sin mix, headcount breakdown |
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
+| `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
 
 ## To Do
 

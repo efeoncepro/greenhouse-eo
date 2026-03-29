@@ -7,6 +7,13 @@
 
 ## 2026-03-29
 
+### Admin Center hardening (TASK-121)
+- Sorting por columna en tabla de spaces (TableSortLabel en las 5 columnas).
+- Loading skeleton (`/admin/loading.tsx`) para hero, KPIs, tabla y domain cards.
+- Domain cards de Cloud & Integrations y Ops Health muestran health real desde `getOperationsOverview`.
+- Deep-link a filtros: `/admin?filter=attention&q=empresa`.
+- Bloque "Requiere atencion" consolidado cross-dominio — solo visible cuando hay senales activas.
+
 ### Admin Center absorbe Control Tower (v2)
 - `/admin` es ahora la landing unificada de governance: Hero → 4 ExecutiveMiniStatCards → tabla limpia "Torre de control" (5 cols MUI, sin scroll horizontal) → mapa de dominios (outlined cards ricos).
 - Nuevo `AdminCenterSpacesTable`: MUI Table size='small', filter chips, search, export CSV, paginación 8 filas, click-to-navigate.
