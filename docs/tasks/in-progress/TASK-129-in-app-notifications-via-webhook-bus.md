@@ -1,14 +1,34 @@
 # TASK-129 — In-App Notifications via Webhook Bus
 
+## Delta 2026-03-29
+- La implementación arranca con convivencia explícita entre carriles:
+  - `reactive notifications` conserva `service.created`, `identity.reconciliation.approved`, `finance.dte.discrepancy_found`, `identity.profile.linked`
+  - `webhook notifications` toma `assignment.created`, `assignment.updated`, `assignment.removed`, `compensation_version.created`, `member.created`, `payroll_period.exported`
+- Se adopta `NotificationService.dispatch()` como API única y se agrega dedupe funcional por `eventId + category + userId` usando metadata en `greenhouse_notifications.notifications`.
+- El self-loop de `wh-sub-notifications` soporta bypass opcional de `Deployment Protection`, igual que el canary, para no nacer bloqueado en `staging`.
+
+## Delta 2026-03-29 — Hardening + env rollout
+- El consumer webhook ya no queda `fail-open`:
+  - si existe secreto resuelto y falta `x-greenhouse-signature`, responde `401`
+- El dedupe funcional ya cubre también los casos `email-only`:
+  - `notification_log` ahora persiste metadata del evento
+  - el filtro de dedupe consulta `notifications` + `notification_log`
+- Rollout externo avanzado:
+  - `staging`: `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
+  - `production`: `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
+- Estado transicional explícito:
+  - `staging` conserva además `WEBHOOK_NOTIFICATIONS_SECRET`
+  - la creación/verificación de `webhook-notifications-secret` en GCP quedó bloqueada por reautenticación de `gcloud`
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | UX / Infrastructure / Notifications |
 | Sequence | Post TASK-125 (Webhook Activation), parte de TASK-128 (Webhook Consumers Roadmap) |

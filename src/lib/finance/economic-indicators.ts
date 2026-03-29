@@ -218,7 +218,7 @@ const upsertEconomicIndicatorsInBigQuery = async (items: EconomicIndicatorSnapsh
             @indicatorId AS indicator_id,
             @indicatorCode AS indicator_code,
             CAST(@indicatorDate AS DATE) AS indicator_date,
-            @value AS value,
+            CAST(@value AS NUMERIC) AS value,
             @source AS source,
             @unit AS unit,
             @frequency AS frequency,
