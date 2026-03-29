@@ -410,8 +410,9 @@ But it creates a reusable Greenhouse-side surface so future integrations do not 
 
 ### Phase 3 - First outbound consumer — `in-progress` (TASK-125)
 - Internal canary subscription validates E2E pipeline
-- Matches `assignment.*` + `member.*` events
-- Pending: configure `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF` in Vercel and activate from Admin Center
+- Schema + subscription + deliveries ya fueron validados en `staging`
+- Current blocker: self-loop target in protected Vercel environments returns `401 Authentication Required`
+- Pending: define automation bypass or equivalent non-interactive target path for the canary
 
 ### Phase 4 - Operational visibility — `complete` (TASK-108, TASK-112)
 - Admin Center shows endpoint/subscription/delivery counters

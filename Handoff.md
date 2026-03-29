@@ -4,6 +4,22 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-125 casi cerrada, bloqueada por Vercel Deployment Protection
+
+### Completado
+- `WEBHOOK_CANARY_SECRET_SECRET_REF` quedó cargado en Vercel `staging`.
+- El schema de webhooks quedó provisionado en la base usada por `develop/staging`; antes solo existía `outbox_events`.
+- Se activó `wh-sub-canary` en DB y se validó el dispatcher con tráfico real:
+  - `eventsMatched=3`
+  - `deliveriesAttempted=3`
+  - attempts registrados en `greenhouse_sync.webhook_delivery_attempts`
+- Se verificó también que la base usada por `production/main` ya ve las tablas de webhooks provisionadas.
+
+### Bloqueo real
+- El self-loop a `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary` no falla por firma ni por schema.
+- Falla por `Vercel Deployment Protection`: los attempts reciben `401 Authentication Required` antes de llegar al route handler.
+- El remanente real de `TASK-125` ya no es repo ni Postgres; es definir el mecanismo de bypass/target para que el canary pueda atravesar la protección de Vercel en entornos compartidos.
+
 ## Sesión 2026-03-29 — TASK-125 canary alineada a Secret Manager
 
 ### Completado

@@ -1,5 +1,27 @@
 # TASK-125 — Webhook Activation: First Consumers & End-to-End Validation
 
+## Delta 2026-03-29 — Schema provisionado y bloqueo reducido a Vercel Deployment Protection
+
+- El schema de webhooks ya quedó provisionado en la base usada por `develop/staging`:
+  - `webhook_endpoints`
+  - `webhook_inbox_events`
+  - `webhook_subscriptions`
+  - `webhook_deliveries`
+  - `webhook_delivery_attempts`
+- `WEBHOOK_CANARY_SECRET_SECRET_REF` ya quedó cargado en Vercel `staging`.
+- La canary subscription `wh-sub-canary` quedó activa y se validó que el dispatcher ya puede:
+  - matchear eventos publicados
+  - crear deliveries
+  - registrar attempts
+- Validación real en `staging`:
+  - `eventsMatched=3`
+  - `deliveriesAttempted=3`
+  - los 3 attempts terminaron en `401` y `dead_letter`
+- El bloqueo restante ya no es Postgres ni el canary route:
+  - es `Vercel Deployment Protection`
+  - el self-loop a `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary` recibe `Authentication Required`
+- También se verificó que `production/main` usa una base donde el schema de webhooks ya existe; no quedó deuda adicional de provisioning ahí.
+
 ## Delta 2026-03-29 — Canary aligned to Secret Manager contract
 
 - La capa de webhooks ya no depende solo de `WEBHOOK_CANARY_SECRET` en env plano.
@@ -174,6 +196,11 @@ El backend ya tiene el bus (`outbox_events` → `webhook_deliveries`). La UI hoy
 - [ ] Flujo E2E validado: outbox event → subscription match → delivery → canary receipt
 - [x] `pnpm build` pasa
 - [x] `pnpm test` pasa (539 tests)
+
+## Open Questions
+
+- ¿Se habilitará un bypass de automatización para `staging`/`production` (`Deployment Protection`) que permita el self-loop del canary?
+- Si no se quiere bypass institucional, ¿conviene reemplazar el target del canary por un endpoint interno no protegido o por un consumidor externo controlado para esta task?
 
 ## Verification
 

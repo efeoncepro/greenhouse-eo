@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-125 reduced to Vercel deployment-protection bypass
+- La capa de webhooks ya quedó alineada a Secret Manager refs y el schema de webhooks fue provisionado en la base usada por `staging`.
+- `wh-sub-canary` ya pudo generar deliveries reales desde `webhook-dispatch`; el bus outbound dejó de estar idle.
+- El bloqueo restante es externo al repo: `dev-greenhouse.efeoncepro.com` responde `401 Authentication Required` al self-loop del canary por `Vercel Deployment Protection`.
+
 ### TASK-125 webhook canary now supports Secret Manager refs
 - La capa de webhooks quedó alineada al helper canónico de secretos.
 - `inbound`, `outbound` y el canary interno ya soportan `WEBHOOK_CANARY_SECRET_SECRET_REF` además del env legacy.
