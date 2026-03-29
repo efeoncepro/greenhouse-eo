@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-125 cerrada
+- `TASK-125` quedó cerrada con validación E2E real en `staging`.
+- Baseline operativo vigente:
+  - `POST /api/admin/ops/webhooks/seed-canary` registra una subscription interna self-loop
+  - el target del canary soporta bypass opcional de `Deployment Protection`
+  - `WEBHOOK_CANARY_SECRET_SECRET_REF` ya sirve el secreto desde Secret Manager en `staging`
+  - el primer consumer canónico usa `finance.income.nubox_synced` como familia activa de bajo riesgo
+- Validación real ejecutada:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - canary receipt `HTTP 200`
+- Ajuste estructural derivado:
+  - `src/lib/webhooks/dispatcher.ts` ahora prioriza eventos `published` más recientes dentro de la ventana de 24h, para evitar starvation de subscriptions recién activadas
+
 ## Delta 2026-03-29 TASK-102 cerrada
 - `TASK-102` quedó cerrada con verificación externa completa.
 - Evidencia final incorporada:

@@ -60,13 +60,16 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches subscr
 ```
 
 - Subscription ID: `wh-sub-canary`
-- Event filters: `assignment.*` + `member.*` (high volume, low risk)
+- Event filter baseline: `finance.income.nubox_synced` (observada como activa y de bajo riesgo en `staging`)
 - Target: same deployment via `VERCEL_URL`
 - Secret contract: `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF`
 - Optional protection bypass:
   - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
   - fallback `VERCEL_AUTOMATION_BYPASS_SECRET`
 - Activation: Admin Center button "Activar canary subscription" or direct POST to `/api/admin/ops/webhooks/seed-canary`
+- Dispatcher baseline:
+  - prioriza eventos `published` más recientes (`published_at DESC NULLS LAST, occurred_at DESC`)
+  - evita hambrear subscriptions nuevas cuando existe historial de eventos ya publicados dentro de la ventana de 24h
 
 ### Not Yet Active
 
@@ -411,11 +414,15 @@ But it creates a reusable Greenhouse-side surface so future integrations do not 
 ### Phase 2 - First inbound adopter — `complete` (TASK-006)
 - Teams attendance ingestion migrated to generic inbound gateway
 
-### Phase 3 - First outbound consumer — `in-progress` (TASK-125)
+### Phase 3 - First outbound consumer — `complete` (TASK-125)
 - Internal canary subscription validates E2E pipeline
 - Schema + subscription + deliveries ya fueron validados en `staging`
-- Current blocker: self-loop target in protected Vercel environments returns `401 Authentication Required`
-- Pending: define automation bypass or equivalent non-interactive target path for the canary
+- `Protection Bypass for Automation` quedó integrado al target del canary para atravesar `Deployment Protection`
+- Validación real ejecutada:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - canary receipt `HTTP 200`
 
 ### Phase 4 - Operational visibility — `complete` (TASK-108, TASK-112)
 - Admin Center shows endpoint/subscription/delivery counters

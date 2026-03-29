@@ -4,6 +4,23 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-125 cerrada con validación E2E real en staging
+
+### Completado
+- `TASK-125` ya quedó validada end-to-end en `staging`.
+- Se confirmó que el proyecto ya tenía `Protection Bypass for Automation` activo en Vercel.
+- `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET` quedó cargado en `staging`.
+- La canary subscription `wh-sub-canary` quedó apuntando al deployment protegido con `x-vercel-protection-bypass`.
+- Validación real:
+  - `eventsMatched=1`
+  - `deliveriesAttempted=1`
+  - `succeeded=1`
+  - `HTTP 200` en el canary
+  - `webhook_delivery_id=wh-del-b9dc275a-f5b5-4104-adcd-d9519fa3794c`
+- Ajustes de baseline dejados en repo:
+  - `seed-canary` usa `finance.income.nubox_synced` como familia activa observada en `staging`
+  - el dispatcher ya prioriza eventos `published` más recientes para no hambrear subscriptions nuevas
+
 ## Sesión 2026-03-29 — TASK-125 canary soporta bypass opcional de Vercel
 
 ### Completado
@@ -11,10 +28,6 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Contrato soportado:
   - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
   - fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`
-- Esto deja el remanente de `TASK-125` en un único paso externo:
-  - habilitar `Protection Bypass for Automation` en Vercel
-  - exponer el secreto al deployment
-  - reactivar la canary para obtener la primera delivery `200`
 
 ## Sesión 2026-03-29 — TASK-125 casi cerrada, bloqueada por Vercel Deployment Protection
 

@@ -14,7 +14,8 @@ const CANARY_SUBSCRIBER_CODE = 'greenhouse-canary'
  * the outbox → dispatch → delivery pipeline end-to-end.
  *
  * The subscription targets `/api/internal/webhooks/canary` on the same
- * deployment, matching all `assignment.*` events (high volume, low risk).
+ * deployment, matching `finance.income.nubox_synced`, which is active and
+ * low-risk in the current staging baseline.
  *
  * Idempotent: re-running activates the existing subscription if paused.
  */
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
        event_filters_json, active, created_at, updated_at
      ) VALUES (
        $1, $2, $3, 'hmac_sha256', 'WEBHOOK_CANARY_SECRET',
-       '[{"event_type": "assignment.*"}, {"event_type": "member.*"}]'::jsonb,
+       '[{"event_type": "finance.income.nubox_synced"}]'::jsonb,
        TRUE, NOW(), NOW()
      )
      ON CONFLICT (webhook_subscription_id) DO UPDATE SET
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     subscriptionId: CANARY_SUBSCRIPTION_ID,
     subscriberCode: CANARY_SUBSCRIBER_CODE,
     targetUrl,
-    eventFilters: ['assignment.*', 'member.*'],
+    eventFilters: ['finance.income.nubox_synced'],
     action: isNew ? 'created' : 'reactivated',
     note: 'The webhook-dispatch cron (*/2 min) will start delivering matched events on next cycle.'
   })

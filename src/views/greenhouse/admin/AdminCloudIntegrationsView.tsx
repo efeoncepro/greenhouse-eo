@@ -516,7 +516,7 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                 <AdminOpsActionButton
                   endpoint='/api/admin/ops/webhooks/seed-canary'
                   label='Activar canary subscription'
-                  helper='Registra una subscription interna que valida el pipeline E2E (assignment.*, member.*).'
+                  helper='Registra una subscription interna que valida el pipeline E2E sobre finance.income.nubox_synced.'
                 />
               </Stack>
             </CardContent>

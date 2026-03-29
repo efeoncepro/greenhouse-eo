@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-125 webhook activation closed in staging
+- El canary outbound ya quedó validado end-to-end en `staging` con `HTTP 200` real.
+- Vercel ya tenía `Protection Bypass for Automation` habilitado; el portal ahora lo consume vía `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`.
+- La canary subscription quedó alineada a `finance.income.nubox_synced` y el dispatcher ya prioriza eventos `published` más recientes para evitar starvation de subscriptions nuevas.
+
 ### TASK-125 canary target now supports optional Vercel protection bypass
 - La seed route del canary ya puede construir el target con `x-vercel-protection-bypass` de forma opcional.
 - Se soporta una env dedicada (`WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`) con fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`.

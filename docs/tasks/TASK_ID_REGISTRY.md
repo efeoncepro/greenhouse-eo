@@ -162,7 +162,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-123` | `to-do` | Nexa Product Hardening: Streaming, Rich Tools, UX Polish | `docs/tasks/to-do/TASK-123-nexa-product-hardening.md` |
 | `TASK-124` | `complete` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
-| `TASK-125` | `in-progress` | Webhook Activation: First Consumers & E2E Validation | `docs/tasks/in-progress/TASK-125-webhook-activation-first-consumers.md` |
+| `TASK-125` | `complete` | Webhook Activation: First Consumers & E2E Validation | `docs/tasks/complete/TASK-125-webhook-activation-first-consumers.md` |
 | `TASK-126` | `to-do` | CSP Enforcement Hardening | `docs/tasks/to-do/TASK-126-csp-enforcement-hardening.md` |
 | `TASK-127` | `to-do` | Cloud Architecture Posture Consolidation | `docs/tasks/to-do/TASK-127-cloud-architecture-posture-consolidation.md` |
 
