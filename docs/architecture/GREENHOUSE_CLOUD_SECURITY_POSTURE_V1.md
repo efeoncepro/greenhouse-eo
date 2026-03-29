@@ -17,8 +17,8 @@
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`
 - La postura sigue siendo transicional y no debe declararse cerrada aún para `production`:
-  - `GREENHOUSE_POSTGRES_PASSWORD` todavía aparece como `env` en `staging`
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen fuera del posture runtime del portal
+  - los env vars legacy siguen existiendo por compatibilidad durante la transición
   - `production` ya tiene refs y secretos preparados, pero falta validación real tras promover a `main`
 
 ## Delta 2026-03-29 — Transitional WIF-aware repo baseline

@@ -2,6 +2,16 @@
 
 ## Delta 2026-03-29
 
+- La Fase 3 de secretos críticos ya no queda pendiente en esta task.
+- Ese alcance fue absorbido y cerrado por `TASK-124`.
+- Estado real derivado:
+  - helper canónico `src/lib/secrets/secret-manager.ts` ya existe
+  - `/api/internal/health` ya proyecta postura de secretos
+  - `staging` ya quedó validado con secretos críticos sirviéndose desde Secret Manager
+  - `production` queda pendiente de la promoción final de `TASK-124`
+
+## Delta 2026-03-29
+
 - La capa Cloud ahora ya expone postura runtime GCP en `src/lib/cloud/gcp-auth.ts`.
 - `GET /api/internal/health` ya existe y puede reportar la postura base de auth/runtime como parte de la validación posterior de esta task.
 - Esta task ya no parte solo desde `google-credentials.ts`; ahora puede apoyarse en la capa Cloud institucional.

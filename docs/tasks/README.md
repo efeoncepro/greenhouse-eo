@@ -40,7 +40,6 @@ Primer bloque operativo asignado:
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, WAL retention, slow query logging y pool `15` ya aplicados; restore clone en curso para cerrar la verificación |
 | `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](in-progress/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Implementación | Lane WIF/OIDC y hardening Cloud SQL ya absorbida; queda como referencia viva del track cloud |
-| `TASK-124` | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](in-progress/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | P1 | Alto | Medio | Implementación | `staging` ya valida Postgres runtime, NextAuth, Azure AD y Nubox vía Secret Manager; `production` todavía pendiente |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
@@ -214,6 +213,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
 | [TASK-009-greenhouse-home-nexa.md](complete/TASK-009-greenhouse-home-nexa.md) | Baseline principal de `Home + Nexa v2` cerrada: `/home` materializado, snapshot server-side, Nexa operativo y evolución posterior derivada a `TASK-119` y `TASK-110`. |
 | [TASK-114-nexa-backend-persistence-suggestions.md](complete/TASK-114-nexa-backend-persistence-suggestions.md) | Backend de Nexa cerrado: persistencia de conversación y feedback en PostgreSQL, thread history, `threadId` y follow-up suggestions dinámicas listas para consumo UI. |
 | [TASK-108-admin-center-governance-shell.md](complete/TASK-108-admin-center-governance-shell.md) | Baseline del shell de `Admin Center` cerrada: `/admin` como landing institucional, taxonomía de governance y dominios iniciales de control plane. |

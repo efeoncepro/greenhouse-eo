@@ -1,5 +1,16 @@
 # TASK-124 — GCP Secret Manager Critical Secrets Migration
 
+## Delta 2026-03-29 — Production validado y cierre listo
+
+- `main` ya absorbió el slice mínimo de `TASK-124` y `production` ejecuta `version=7238a90`.
+- `greenhouse.efeoncepro.com/api/internal/health` respondió `200 OK` con postura real:
+  - `postgres_runtime_password` -> `secret_manager`
+  - `nextauth_secret` -> `secret_manager`
+  - `azure_ad_client_secret` -> `secret_manager`
+  - `nubox_bearer_token` -> `secret_manager`
+- `greenhouse.efeoncepro.com/api/auth/session` respondió `200` con body `{}`.
+- Con esta validación, la task ya quedó comprobada en `staging` y `production` y puede pasar a `complete`.
+
 ## Delta 2026-03-29 — Staging rollout validado en `develop`
 
 - Los commits de `TASK-124` ya fueron promovidos a `develop` en `497cb19`.
@@ -83,11 +94,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Rollout parcial validado` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
@@ -170,9 +181,8 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- secretos críticos siguen viviendo en Vercel env vars mientras dura la transición
-- `production` sigue pendiente de validación real con secretos servidos desde Secret Manager
-- la credencial runtime de Postgres en `staging` todavía está cayendo al env legacy
+- los env vars legacy todavía existen como fallback controlado
+- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen fuera del runtime del portal porque corresponden a tooling y bootstrap
 
 ## Scope
 
@@ -214,7 +224,7 @@ Reglas obligatorias:
 - [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
 - [x] `/api/internal/health` reporta postura de secretos
 - [x] `staging` validado con al menos un secreto crítico servido desde Secret Manager
-- [ ] `production` validado con al menos un secreto crítico servido desde Secret Manager
+- [x] `production` validado con al menos un secreto crítico servido desde Secret Manager
 - [x] documentación viva actualizada
 
 ## Verification

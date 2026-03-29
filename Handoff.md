@@ -4,7 +4,7 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
-## Sesión 2026-03-29 — TASK-124 promovida a `develop` y validada en `staging`
+## Sesión 2026-03-29 — TASK-124 validada en `staging`
 
 ### Completado
 - Se armó una integración mínima desde `origin/develop` para no arrastrar el resto de `feature/codex-task-096-wif-baseline`.
@@ -25,10 +25,16 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200`
   - `version=497cb19`
   - `GREENHOUSE_POSTGRES_PASSWORD`, `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` reportan `source=secret_manager`
+- Ajuste externo mínimo posterior:
+  - el secreto heredado `greenhouse-pg-dev-app-password` no tenía IAM para el runtime service account
+  - se agregó `roles/secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+  - luego de ese binding, `GREENHOUSE_POSTGRES_PASSWORD` pasó también a `source=secret_manager` en `staging`
 
 ### Pendiente inmediato
 - `production` sigue pendiente de validación real; no se promovió a `main` en esta sesión.
-- `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en la postura runtime del portal.
+- El remanente ya no es de código en `staging`, sino de rollout/control:
+  - decidir cuándo retirar env vars legacy
+  - decidir si `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` deben quedar proyectados en el health runtime del portal
 
 ## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
 

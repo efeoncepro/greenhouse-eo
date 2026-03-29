@@ -7,12 +7,16 @@
 
 ## 2026-03-29
 
-### TASK-124 promoted to `develop` and validated in `staging`
+### TASK-124 validada de forma segura en staging
 - `develop` absorbió los tres slices de `TASK-124` en `497cb19` mediante una integración mínima desde `origin/develop`, sin arrastrar el resto de la branch auxiliar.
-- `staging` redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` validó runtime real con `GREENHOUSE_POSTGRES_PASSWORD`, `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` resueltos por Secret Manager.
-- El rollout quedó intencionalmente transicional:
-  - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen sin proyección runtime allí
-  - `production` conserva los secretos y `*_SECRET_REF` preparados, pero su validación real queda pendiente hasta promover a `main`
+- Validación real en `staging`:
+  - `dev-greenhouse.efeoncepro.com/api/internal/health` confirmó `GREENHOUSE_POSTGRES_PASSWORD`, `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` vía Secret Manager
+- El último salto de Postgres runtime no requirió código nuevo:
+  - `greenhouse-pg-dev-app-password` necesitaba `roles/secretmanager.secretAccessor` para `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+- El remanente ya no es de código en `staging`, sino de rollout/control:
+  - mantener o retirar env vars legacy
+  - decidir si `migrator` y `admin` deben mostrarse también en el posture runtime
+  - validar `production` después de promover a `main`
 
 ### TASK-124 slice 1 de Secret Manager
 - Se agregó `src/lib/secrets/secret-manager.ts` como helper canónico para secretos críticos con `@google-cloud/secret-manager`, cache corta, fallback a env var y convención `<ENV_VAR>_SECRET_REF`.
