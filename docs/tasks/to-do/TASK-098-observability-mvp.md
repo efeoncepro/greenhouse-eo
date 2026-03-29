@@ -4,6 +4,7 @@
 
 - Parte del endurecimiento del payload de `GET /api/internal/health` ya fue absorbido por `TASK-124`:
   - ahora proyecta postura de secretos críticos sin exponer valores
+  - `staging` y `production` ya validan en runtime la resolución real de secretos críticos vía Secret Manager
   - el remanente de esta task ya no es crear ese bloque, sino completar observabilidad externa y el contract final del endpoint
 
 ## Delta 2026-03-29 — Baseline cloud ya adelantada

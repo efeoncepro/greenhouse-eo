@@ -6,15 +6,16 @@
 
 ---
 
-## Delta 2026-03-29 — Secret Manager rollout staged in shared environment
+## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
 - `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.
-- Vercel `staging` ya redeployó ese commit en `greenhouse-6hgbcuhd0-efeonce-7670142f.vercel.app`.
+- `staging` ya validó ese commit en `dev-greenhouse.efeoncepro.com`.
 - `dev-greenhouse.efeoncepro.com/api/internal/health` confirmó en runtime:
   - `GREENHOUSE_POSTGRES_PASSWORD` via `secret_manager`
   - `NEXTAUTH_SECRET` via `secret_manager`
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`
+- `production` ya validó el mismo patrón en `greenhouse.efeoncepro.com/api/internal/health` sobre `version=7238a90`.
 - El rollout externo previo también dejó preparados en Vercel:
   - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
   - `NEXTAUTH_SECRET_SECRET_REF`
