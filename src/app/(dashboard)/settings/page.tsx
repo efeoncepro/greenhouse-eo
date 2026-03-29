@@ -2,12 +2,13 @@ import { redirect } from 'next/navigation'
 
 import GreenhouseSettings from '@views/greenhouse/GreenhouseSettings'
 
+import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
   const tenant = await getTenantContext()
-  const hasMicrosoftAuth = Boolean(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET)
-  const hasGoogleAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+  const hasMicrosoftAuth = hasMicrosoftAuthProvider()
+  const hasGoogleAuth = hasGoogleAuthProvider()
 
   if (!tenant) {
     redirect('/login')

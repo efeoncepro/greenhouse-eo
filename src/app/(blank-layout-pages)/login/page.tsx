@@ -13,6 +13,7 @@ import Login from '@views/Login'
 import { getServerMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
+import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
 import { authOptions } from '@/lib/auth'
 
 export const metadata: Metadata = {
@@ -22,8 +23,8 @@ export const metadata: Metadata = {
 
 const LoginPage = async () => {
   const session = await getServerSession(authOptions)
-  const hasMicrosoftAuth = Boolean(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET)
-  const hasGoogleAuth = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+  const hasMicrosoftAuth = hasMicrosoftAuthProvider()
+  const hasGoogleAuth = hasGoogleAuthProvider()
 
   if (session) {
     redirect('/auth/landing')

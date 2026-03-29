@@ -4,6 +4,13 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 
 import {
+  getAzureAdClientSecret,
+  getGoogleClientSecret,
+  getNextAuthSecret,
+  hasGoogleAuthProvider,
+  hasMicrosoftAuthProvider
+} from '@/lib/auth-secrets'
+import {
   getTenantAccessRecordByAllowedEmailDomain,
   getTenantAccessRecordByEmail,
   getTenantAccessRecordByGoogleSub,
@@ -18,11 +25,11 @@ import {
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 
 const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
-const microsoftClientSecret = process.env.AZURE_AD_CLIENT_SECRET
+const microsoftClientSecret = getAzureAdClientSecret()
 const googleClientId = process.env.GOOGLE_CLIENT_ID
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
-const hasMicrosoftProvider = Boolean(microsoftClientId && microsoftClientSecret)
-const hasGoogleProvider = Boolean(googleClientId && googleClientSecret)
+const googleClientSecret = getGoogleClientSecret()
+const hasMicrosoftProvider = hasMicrosoftAuthProvider()
+const hasGoogleProvider = hasGoogleAuthProvider()
 
 const getMicrosoftProfileIdentity = ({
   profile,
@@ -123,6 +130,7 @@ const getRejectedTenantMatchRedirect = async ({
 }
 
 export const authOptions: NextAuthOptions = {
+  secret: getNextAuthSecret(),
   session: {
     strategy: 'jwt'
   },

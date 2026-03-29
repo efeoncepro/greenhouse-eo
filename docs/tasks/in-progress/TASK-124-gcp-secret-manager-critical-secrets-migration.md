@@ -45,8 +45,23 @@
   - `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
 - `pnpm pg:doctor --profile=runtime` ya quedó validado con este path en local.
 - Sigue pendiente para slices posteriores:
-  - `NEXTAUTH_SECRET`
-  - `AZURE_AD_CLIENT_SECRET`
+  - validación real en `staging` y `production` con secretos servidos desde Secret Manager
+
+## Delta 2026-03-29 — Slice 3 implementado
+
+- `NEXTAUTH_SECRET` ya quedó alineado al helper vía `src/lib/auth-secrets.ts`.
+- `AZURE_AD_CLIENT_SECRET` ya queda resuelto desde el mismo helper con fallback controlado.
+- `GOOGLE_CLIENT_SECRET` también quedó alineado al mismo patrón para dejar ambos SSO simétricos.
+- Superficies migradas:
+  - `src/lib/auth.ts`
+  - `src/lib/auth-tokens.ts`
+  - `src/lib/admin/tenant-contact-provisioning-snapshot.ts`
+  - `src/app/(blank-layout-pages)/login/page.tsx`
+  - `src/app/(dashboard)/settings/page.tsx`
+- Contrato operativo preservado:
+  - Microsoft SSO sigue disponible cuando existen `AZURE_AD_CLIENT_ID` y el secret resuelve por Secret Manager o env
+  - Google SSO sigue disponible cuando existen `GOOGLE_CLIENT_ID` y el secret resuelve por Secret Manager o env
+- Sigue pendiente:
   - validación real en `staging` y `production` con secretos servidos desde Secret Manager
 
 ## Status
@@ -141,7 +156,6 @@ Reglas obligatorias:
 ### Gap actual
 
 - secretos críticos siguen viviendo en Vercel env vars mientras dura la transición
-- los secretos de auth todavía siguen sin migrar al helper
 - la validación real por entorno con secretos servidos desde Secret Manager sigue pendiente
 
 ## Scope
@@ -180,7 +194,7 @@ Reglas obligatorias:
 
 - [x] Existe helper canónico `src/lib/secrets/secret-manager.ts`
 - [x] PostgreSQL passwords pueden resolverse desde Secret Manager con fallback
-- [ ] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
+- [x] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
 - [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
 - [x] `/api/internal/health` reporta postura de secretos
 - [ ] `staging` validado con al menos un secreto crítico servido desde Secret Manager
