@@ -54,6 +54,30 @@ type DomainCard = {
   points: string[]
 }
 
+const cloudStatusLabel = (operations: OperationsOverview) => {
+  if (operations.cloud.posture.overallStatus === 'failed') {
+    return 'Posture crítica'
+  }
+
+  if (operations.cloud.posture.overallStatus === 'warning') {
+    return 'Posture parcial'
+  }
+
+  return 'Posture ok'
+}
+
+const cloudStatusColor = (operations: OperationsOverview): 'success' | 'warning' | 'info' | 'secondary' => {
+  if (operations.cloud.posture.overallStatus === 'failed') {
+    return 'warning'
+  }
+
+  if (operations.cloud.posture.overallStatus === 'warning') {
+    return 'info'
+  }
+
+  return 'success'
+}
+
 const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
   const headers = ['Cliente', 'Estado', 'Contacto', 'Usuarios activos', 'Usuarios totales', 'Proyectos', 'OTD', 'Ultima actividad']
 
@@ -135,18 +159,16 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     icon: 'tabler-plug-connected',
     avatarColor: 'primary',
     status: {
-      label: operations.kpis.activeSyncs > 0 ? `${operations.kpis.activeSyncs} syncs` : 'Sin syncs',
-      color: operations.kpis.activeSyncs > 0 ? 'success' : 'warning'
+      label: cloudStatusLabel(operations),
+      color: cloudStatusColor(operations)
     },
     href: '/admin/cloud-integrations',
     primaryAction: 'Abrir cloud & integrations',
     routes: ['/admin/cloud-integrations'],
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
-      `${operations.webhooks.subscriptionsActive} subscriptions webhook`,
-      operations.webhooks.deliveriesDeadLetter > 0
-        ? `${operations.webhooks.deliveriesDeadLetter} deliveries en dead-letter`
-        : 'Sin dead-letters visibles'
+      operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
+      `BigQuery guard: ${operations.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes`
     ]
   },
   {
@@ -166,7 +188,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
       operations.kpis.pendingProjections > 0
         ? `${operations.kpis.pendingProjections} proyecciones pendientes`
         : 'Sin proyecciones en cola',
-      `${operations.kpis.notificationsSent24h} notificaciones enviadas`
+      `${operations.cloud.health.checks.filter(check => !check.ok).length} checks cloud con atención`
     ]
   },
   {

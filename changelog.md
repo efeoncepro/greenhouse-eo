@@ -12,6 +12,7 @@
 - Se dejó explícito el boundary entre `Admin Center`, `Cloud & Integrations`, `Ops Health`, contracts de código y runbooks/config.
 - Se agregó una baseline mínima real en `src/lib/cloud/*` para health compartido, cost guards de BigQuery y postura base de cron.
 - `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103` ahora se leen como slices del dominio Cloud y ya no como hardening suelto.
+- La UI de `Admin Center`, `Cloud & Integrations` y `Ops Health` ahora consume ese dominio vía `getOperationsOverview().cloud`, conectando runtime health, cron posture y BigQuery guards con surfaces reales.
 
 ### Admin Center hardening (TASK-121)
 - Sorting por columna en tabla de spaces (TableSortLabel en las 5 columnas).

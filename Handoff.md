@@ -21,6 +21,10 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - el framing operativo de `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103`
 - `TASK-100` a `TASK-103` quedaron actualizadas para referenciar esta base, evitando redecidir ownership y scope en cada ejecución.
 - `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados con `TASK-122` en `complete`.
+- La conexión con la UI ya es total:
+  - `getOperationsOverview()` ahora expone `cloud`
+  - `Admin Center`, `Cloud & Integrations` y `Ops Health` consumen el snapshot institucional del dominio Cloud
+  - la UI deja de reflejar solo integrations/ops aislados y pasa a mostrar runtime health, cron posture y BigQuery guard
 
 ### Pendiente inmediato
 - La base ya está lista para ejecutar `TASK-100` a `TASK-103` con framing consistente del dominio Cloud

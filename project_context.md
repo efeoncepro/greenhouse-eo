@@ -46,6 +46,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `health.ts` para health checks compartidos
   - `bigquery.ts` para guards base de costo
   - `cron.ts` para postura mínima de scheduler secret
+- La conexión UI ya quedó materializada vía `getOperationsOverview()`:
+  - `Admin Center`
+  - `/admin/cloud-integrations`
+  - `/admin/ops-health`
+  consumen el bloque `cloud` como snapshot institucional del dominio.
 - `TASK-100` a `TASK-103` ya se interpretan como slices del dominio Cloud y no como hardening aislado.
 
 ## Delta 2026-03-28 Admin Center governance shell
