@@ -62,18 +62,31 @@ export const loadGreenhouseToolEnv = (envFiles = DEFAULT_ENV_FILES) => {
   }
 }
 
-const PROFILE_KEY_MAP: Record<PostgresProfile, { user: string; password: string }> = {
+const assignOrDeleteEnv = (key: string, value: string | undefined) => {
+  if (value === undefined) {
+    delete process.env[key]
+
+    return
+  }
+
+  process.env[key] = value
+}
+
+const PROFILE_KEY_MAP: Record<PostgresProfile, { user: string; password: string; passwordSecretRef: string }> = {
   runtime: {
     user: 'GREENHOUSE_POSTGRES_USER',
-    password: 'GREENHOUSE_POSTGRES_PASSWORD'
+    password: 'GREENHOUSE_POSTGRES_PASSWORD',
+    passwordSecretRef: 'GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF'
   },
   migrator: {
     user: 'GREENHOUSE_POSTGRES_MIGRATOR_USER',
-    password: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD'
+    password: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD',
+    passwordSecretRef: 'GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD_SECRET_REF'
   },
   admin: {
     user: 'GREENHOUSE_POSTGRES_ADMIN_USER',
-    password: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD'
+    password: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD',
+    passwordSecretRef: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD_SECRET_REF'
   }
 }
 
@@ -96,8 +109,8 @@ export const getPostgresProfileMissingConfig = (profile: PostgresProfile) => {
     missing.push(keyMap.user)
   }
 
-  if (!process.env[keyMap.password]) {
-    missing.push(keyMap.password)
+  if (!process.env[keyMap.password] && !process.env[keyMap.passwordSecretRef]?.trim()) {
+    missing.push(`${keyMap.password} or ${keyMap.passwordSecretRef}`)
   }
 
   return missing
@@ -111,8 +124,9 @@ export const applyGreenhousePostgresProfile = (profile: PostgresProfile) => {
     throw new Error(`Greenhouse Postgres profile "${profile}" is not configured. Missing: ${missing.join(', ')}`)
   }
 
-  process.env.GREENHOUSE_POSTGRES_USER = process.env[keyMap.user]
-  process.env.GREENHOUSE_POSTGRES_PASSWORD = process.env[keyMap.password]
+  assignOrDeleteEnv('GREENHOUSE_POSTGRES_USER', process.env[keyMap.user])
+  assignOrDeleteEnv('GREENHOUSE_POSTGRES_PASSWORD', process.env[keyMap.password])
+  assignOrDeleteEnv('GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF', process.env[keyMap.passwordSecretRef])
 
   return {
     profile,

@@ -62,8 +62,10 @@
 - `GET /api/internal/health` ahora expone también la postura de secretos críticos sin devolver valores.
 - Primer consumer migrado en el portal:
   - `src/lib/nubox/client.ts` para `NUBOX_BEARER_TOKEN`
+- La credencial runtime de PostgreSQL también quedó alineada:
+  - `src/lib/postgres/client.ts` ya acepta `GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF`
+  - `scripts/lib/load-greenhouse-tool-env.ts` ya soporta refs para `runtime`, `migrator` y `admin`
 - El resto de secretos críticos siguen pendientes de migración por slices posteriores:
-  - passwords PostgreSQL
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
 

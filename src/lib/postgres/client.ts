@@ -2,6 +2,7 @@ import { Connector, IpAddressTypes } from '@google-cloud/cloud-sql-connector'
 import { Pool, type PoolClient } from 'pg'
 
 import { createGoogleAuth } from '@/lib/google-credentials'
+import { resolveSecret, type SecretResolutionSource } from '@/lib/secrets/secret-manager'
 
 type GreenhousePostgresConfig = {
   instanceConnectionName: string | null
@@ -11,8 +12,13 @@ type GreenhousePostgresConfig = {
   database: string | null
   user: string | null
   password: string | null
+  passwordSecretRef: string | null
   maxConnections: number
   sslEnabled: boolean
+}
+
+export type ResolvedGreenhousePostgresConfig = GreenhousePostgresConfig & {
+  passwordSource: SecretResolutionSource
 }
 
 declare global {
@@ -41,6 +47,7 @@ export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
   user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
   password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
+  passwordSecretRef: process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim() || null,
   maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 15),
   sslEnabled: String(process.env.GREENHOUSE_POSTGRES_SSL || '').toLowerCase() === 'true'
 })
@@ -51,7 +58,10 @@ export const getGreenhousePostgresMissingConfig = () => {
 
   if (!config.database) missing.push('GREENHOUSE_POSTGRES_DATABASE')
   if (!config.user) missing.push('GREENHOUSE_POSTGRES_USER')
-  if (!config.password) missing.push('GREENHOUSE_POSTGRES_PASSWORD')
+
+  if (!config.password && !config.passwordSecretRef) {
+    missing.push('GREENHOUSE_POSTGRES_PASSWORD or GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF')
+  }
 
   if (!config.instanceConnectionName && !config.host) {
     missing.push('GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME or GREENHOUSE_POSTGRES_HOST')
@@ -62,10 +72,25 @@ export const getGreenhousePostgresMissingConfig = () => {
 
 export const isGreenhousePostgresConfigured = () => getGreenhousePostgresMissingConfig().length === 0
 
-const buildPool = async () => {
+export const resolveGreenhousePostgresConfig = async (): Promise<ResolvedGreenhousePostgresConfig> => {
   const config = getGreenhousePostgresConfig()
 
-  if (!isGreenhousePostgresConfigured() || !config.database || !config.user || !config.password) {
+  const passwordResolution = await resolveSecret({
+    envVarName: 'GREENHOUSE_POSTGRES_PASSWORD'
+  })
+
+  return {
+    ...config,
+    password: passwordResolution.value,
+    passwordSecretRef: passwordResolution.secretRef,
+    passwordSource: passwordResolution.source
+  }
+}
+
+const buildPool = async () => {
+  const config = await resolveGreenhousePostgresConfig()
+
+  if (!config.database || !config.user || !config.password) {
     throw new Error(`Greenhouse Postgres is not configured. Missing: ${getGreenhousePostgresMissingConfig().join(', ')}`)
   }
 
