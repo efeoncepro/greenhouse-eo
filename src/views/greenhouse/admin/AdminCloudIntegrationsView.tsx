@@ -513,6 +513,11 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                   label='Despachar webhooks pendientes'
                   helper='Ejecuta una pasada del dispatcher outbound.'
                 />
+                <AdminOpsActionButton
+                  endpoint='/api/admin/ops/webhooks/seed-canary'
+                  label='Activar canary subscription'
+                  helper='Registra una subscription interna que valida el pipeline E2E (assignment.*, member.*).'
+                />
               </Stack>
             </CardContent>
           </Card>

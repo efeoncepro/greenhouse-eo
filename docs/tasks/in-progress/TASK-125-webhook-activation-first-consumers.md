@@ -1,14 +1,31 @@
 # TASK-125 — Webhook Activation: First Consumers & End-to-End Validation
 
+## Delta 2026-03-29 — Canary subscription implementada
+
+- Creado endpoint canary interno: `POST /api/internal/webhooks/canary`
+  - Recibe deliveries del dispatcher, valida firma HMAC-SHA256, logea y retorna 200
+  - Secret ref: `WEBHOOK_CANARY_SECRET` (env var)
+- Creada ruta admin: `POST /api/admin/ops/webhooks/seed-canary`
+  - Registra subscription `wh-sub-canary` apuntando al canary del mismo deployment
+  - Event filters: `assignment.*` + `member.*` (alto volumen, bajo riesgo)
+  - Idempotente: re-ejecutar reactiva la subscription si estaba pausada
+  - Auto-detecta base URL del deployment vía `VERCEL_URL`
+- Botón "Activar canary subscription" agregado en Admin Center > Webhooks y jobs
+- Pendiente para validación E2E:
+  - Configurar `WEBHOOK_CANARY_SECRET` en Vercel env vars
+  - Hacer click en "Activar canary subscription" desde Admin Center
+  - Esperar que el cron `webhook-dispatch` (cada 2 min) entregue el primer evento
+  - Verificar que Admin Center muestra subscriptions > 0 y deliveries con actividad
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P2` |
 | Impact | `Medio` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Integrations |
 | Sequence | Post TASK-006 (Webhook Infrastructure MVP) |
@@ -136,14 +153,19 @@ El backend ya tiene el bus (`outbox_events` → `webhook_deliveries`). La UI hoy
 
 ## Acceptance Criteria
 
-- [ ] Al menos 1 endpoint activo registrado en `webhook_endpoints`
+- [x] Canary endpoint creado: `POST /api/internal/webhooks/canary`
+- [x] Admin seed route creado: `POST /api/admin/ops/webhooks/seed-canary`
+- [x] Botón en Admin Center para activar canary subscription
+- [x] Subscription apunta al mismo deployment (self-loop E2E)
+- [x] Firma HMAC-SHA256 validada en canary (secret ref: `WEBHOOK_CANARY_SECRET`)
+- [ ] `WEBHOOK_CANARY_SECRET` configurado en Vercel env vars
+- [ ] Canary activado desde Admin Center (click en "Activar canary subscription")
 - [ ] Al menos 1 subscription activa registrada en `webhook_subscriptions`
 - [ ] Al menos 1 delivery exitosa registrada en `webhook_deliveries`
 - [ ] Admin Center muestra contadores > 0 en "Inbound + outbound"
-- [ ] Admin Center chip cambia de `warning` a `ok`
-- [ ] Flujo end-to-end validado: outbox event → subscription match → delivery → attempt exitoso
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [ ] Flujo E2E validado: outbox event → subscription match → delivery → canary receipt
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa (539 tests)
 
 ## Verification
 
