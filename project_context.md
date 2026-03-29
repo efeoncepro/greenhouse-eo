@@ -251,7 +251,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime del portal también quedó alineado al nuevo pool target:
   - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` en `Production`, `staging` y `Preview (develop)`
   - fallback por defecto del repo subido a `15`
-- El restore test todavía no estaba cerrado al final de esta actualización; se lanzó el clone `greenhouse-pg-restore-test-20260329` y su verificación/eliminación siguen como remanente operativo.
+- Ese remanente ya quedó resuelto después en la misma fecha con un restore test limpio y documentado sobre `greenhouse-pg-restore-test-20260329d`.
 
 ## Delta 2026-03-29 Cloud layer robustness expansion
 - La capa `src/lib/cloud/*` ahora incorpora posture helpers reutilizables para el siguiente bloque `TASK-096` a `TASK-103`.

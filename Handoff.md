@@ -40,11 +40,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `maxConnections=15`
 
 ### Pendiente inmediato
-- El único remanente real de `TASK-102` ya es el restore test end-to-end.
+- En ese momento, el único remanente real de `TASK-102` era el restore test end-to-end.
 - Dos clones efímeros fueron creados y limpiados:
   - `greenhouse-pg-restore-test-20260329b`
   - `greenhouse-pg-restore-test-20260329c`
-- El primero se eliminó antes de completar la verificación SQL y el segundo quedó demasiado tiempo en `PENDING_CREATE`; por eso la task sigue abierta, pero ya no por drift de configuración.
+- El primero se eliminó antes de completar la verificación SQL y el segundo quedó demasiado tiempo en `PENDING_CREATE`; ese remanente ya quedó resuelto después con el clone `greenhouse-pg-restore-test-20260329d`.
 
 ## Sesión 2026-03-29 — TASK-099 cerrada con `CSP-Report-Only`
 
@@ -442,7 +442,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Pendiente inmediato
 - `TASK-096` ya puede apoyarse en una postura GCP explícita en código en vez de partir solo desde env vars sueltas.
 - `TASK-098` ya no necesita inventar desde cero el health endpoint ni el adapter Slack.
-- `TASK-099`, `TASK-102` y `TASK-103` siguen abiertas, pero ahora encajan sobre una capa Cloud más robusta.
+- En ese momento `TASK-099`, `TASK-102` y `TASK-103` seguían abiertas, pero hoy solo queda `TASK-103` como remanente del bloque cloud baseline.
 
 ## Sesión 2026-03-29 — TASK-102 en progreso
 
@@ -472,6 +472,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Cuando el clone quede `RUNNABLE`:
   - verificar tablas críticas
   - documentar resultado
+- Este remanente ya quedó resuelto después con el clone `greenhouse-pg-restore-test-20260329d`.
   - eliminar la instancia efímera
 
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
