@@ -4,6 +4,26 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
+
+### Completado
+- **Slice A**: Edit inline de mensajes user — pencil hover button + EditComposer con ComposerPrimitive (Guardar/Cancelar)
+- **Slice B**: Follow-up suggestions (chips clicables desde `suggestions` del backend) + feedback thumbs (👍/👎 fire-and-forget a `/api/home/nexa/feedback`)
+- **Slice C**: Nexa floating portal-wide — FAB sparkles fixed bottom-right, panel 400×550 en desktop, Drawer bottom en mobile, hidden en `/home`
+- **Slice D**: Thread history sidebar (Drawer izquierdo, lista agrupada por fecha, new/select thread) + threadId tracking en adapter + NexaPanel.tsx eliminado
+
+### Archivos nuevos
+- `src/views/greenhouse/home/components/NexaThreadSidebar.tsx`
+- `src/components/greenhouse/NexaFloatingButton.tsx`
+
+### Archivos modificados
+- `src/views/greenhouse/home/components/NexaThread.tsx` — edit inline, feedback, suggestions, compact mode, history toggle
+- `src/views/greenhouse/home/HomeView.tsx` — threadId tracking, suggestions state, sidebar integration
+- `src/app/(dashboard)/layout.tsx` — NexaFloatingButton montado
+
+### Archivos eliminados
+- `src/views/greenhouse/home/components/NexaPanel.tsx` (legacy)
+
 ## Sesión 2026-03-29 — TASK-122 desarrollada y cerrada
 
 ### Completado
@@ -28,6 +48,20 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Pendiente inmediato
 - La base ya está lista para ejecutar `TASK-100` a `TASK-103` con framing consistente del dominio Cloud
+
+## Sesión 2026-03-29 — TASK-100 CI test step en progreso
+
+### Completado
+- `TASK-100` pasó a `in-progress` como primera lane activa del bloque Cloud hardening.
+- `.github/workflows/ci.yml` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con `timeout-minutes: 5`.
+- La validación local previa confirmó que la suite actual es apta para CI:
+  - `99` archivos de test
+  - `488` pruebas verdes
+  - runtime total `6.18s`
+
+### Pendiente inmediato
+- Confirmar la primera corrida real en GitHub Actions en el próximo push.
+- Mantener el commit aislado de `TASK-115`, porque el árbol sigue teniendo cambios paralelos en `Home/Nexa` no relacionados con CI.
 
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
 

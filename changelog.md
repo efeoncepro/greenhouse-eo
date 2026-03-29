@@ -7,6 +7,18 @@
 
 ## 2026-03-29
 
+### CI incorpora tests de Vitest
+- El workflow `CI` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con timeout explícito de `5` minutos.
+- La suite actual entra limpia al pipeline con `99` archivos y `488` pruebas verdes en validación local previa.
+- El control queda institucionalizado en repo dentro de `.github/workflows/ci.yml`, alineado con el dominio Cloud como guardrail de delivery validation.
+
+### Nexa UI completion (TASK-115)
+- Edit inline de mensajes user con ComposerPrimitive (pencil hover → EditComposer → Guardar/Cancelar).
+- Follow-up suggestions como chips clicables + feedback thumbs 👍/👎 fire-and-forget.
+- Nexa flotante portal-wide: FAB sparkles → panel 400×550 en desktop, Drawer bottom en mobile, oculto en `/home`.
+- Thread history sidebar con lista agrupada por fecha, selección y creación de threads.
+- `NexaPanel.tsx` legacy eliminado.
+
 ### Cloud governance operating model established
 - `Cloud` quedó institucionalizado como dominio interno de platform governance con operating model canónico en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
 - Se dejó explícito el boundary entre `Admin Center`, `Cloud & Integrations`, `Ops Health`, contracts de código y runbooks/config.

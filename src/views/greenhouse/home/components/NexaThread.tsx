@@ -2,13 +2,17 @@
 
 import '@assistant-ui/react-markdown/styles/dot.css'
 
+import { useCallback, useState } from 'react'
+
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography from '@mui/material/Typography'
 
 import {
+  useAui,
   useAuiState,
   ThreadPrimitive,
   ComposerPrimitive,
@@ -25,10 +29,13 @@ import type { NexaModelId } from '@/config/nexa-models'
 import NexaModelSelector from './NexaModelSelector'
 import NexaToolRenderer from './NexaToolRenderers'
 
-interface Props {
-  onBack: () => void
+export interface NexaThreadProps {
+  onBack?: () => void
   selectedModel: NexaModelId
   onModelChange: (model: NexaModelId) => void
+  compact?: boolean
+  suggestions?: string[]
+  onHistoryToggle?: () => void
 }
 
 /* ── Animation keyframes ── */
@@ -44,151 +51,319 @@ const TextPart = ({ text }: { text: string }) => (
   <span style={{ whiteSpace: 'pre-wrap' }}>{text}</span>
 )
 
-/* ── User message ── */
+/* ── User message with Edit inline (Slice A) ── */
 const UserMessage = () => (
   <MessagePrimitive.Root>
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2.5, ...msgInSx }}>
-      <Box sx={{
-        maxWidth: '75%',
-        px: 2.5,
-        py: 1.5,
-        borderRadius: '20px 20px 4px 20px',
-        bgcolor: 'primary.main',
-        color: 'primary.contrastText',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
-      }}>
-        <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
-          <MessagePrimitive.Content components={{ Text: TextPart }} />
-        </Typography>
-      </Box>
-    </Box>
-  </MessagePrimitive.Root>
-)
-
-/* ── Assistant message with ActionBar ── */
-const AssistantMessage = () => (
-  <MessagePrimitive.Root>
-    <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5, ...msgInSx }}>
-      <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 32, height: 32, mt: 0.5, flexShrink: 0 }}>
-        <i className='tabler-sparkles' style={{ fontSize: '1rem' }} />
-      </CustomAvatar>
-      <Box sx={{ maxWidth: '80%' }}>
+      <Box sx={{ maxWidth: '75%', position: 'relative' }}>
+        {/* Content mode */}
         <Box sx={{
           px: 2.5,
           py: 1.5,
-          borderRadius: '4px 20px 20px 20px',
-          bgcolor: 'background.paper',
-          border: 1,
-          borderColor: 'divider',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-
-          // Markdown prose styles
-          '& .aui-md': {
-            fontSize: '0.875rem',
-            lineHeight: 1.7,
-            '& p': { m: 0, mb: 1, '&:last-child': { mb: 0 } },
-            '& ul, & ol': { my: 1, pl: 2.5, '& li': { mb: 0.5 } },
-            '& strong': { fontWeight: 600 },
-            '& code': {
-              fontSize: '0.8rem',
-              bgcolor: 'action.selected',
-              px: 0.75,
-              py: 0.25,
-              borderRadius: 0.5,
-              fontFamily: 'monospace'
-            },
-            '& pre': {
-              bgcolor: 'action.hover',
-              p: 1.5,
-              borderRadius: 1,
-              overflow: 'auto',
-              my: 1,
-              '& code': { bgcolor: 'transparent', p: 0 }
-            },
-            '& a': { color: 'primary.main', textDecoration: 'underline' }
-          }
+          borderRadius: '20px 20px 4px 20px',
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
+          boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
         }}>
-          <MessagePrimitive.Content
-            components={{
-              Text: MarkdownTextPrimitive as any,
-              tools: {
-                Fallback: NexaToolRenderer
-              }
-            }}
-          />
+          <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
+            <MessagePrimitive.Content components={{ Text: TextPart }} />
+          </Typography>
         </Box>
 
-        {/* Error state */}
-        <MessagePrimitive.Error>
-          <Box sx={{
-            mt: 1.5,
-            px: 2,
-            py: 1.5,
-            borderRadius: 1.5,
-            bgcolor: 'error.lighterOpacity',
-            border: 1,
-            borderColor: 'error.main',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5
-          }}>
-            <i className='tabler-alert-circle' style={{ fontSize: '1rem', color: 'inherit', flexShrink: 0 }} />
-            <Typography variant='body2' color='error.main' sx={{ flex: 1 }}>
-              No se pudo generar una respuesta.
-            </Typography>
-            <ActionBarPrimitive.Reload asChild>
-              <Button size='small' color='error' variant='outlined' sx={{ flexShrink: 0 }}>
-                Reintentar
-              </Button>
-            </ActionBarPrimitive.Reload>
-          </Box>
-        </MessagePrimitive.Error>
-
-        {/* ActionBar: Copy + Reload */}
+        {/* Edit trigger (hover-only) */}
         <ActionBarPrimitive.Root
-          hideWhenRunning
-          autohide='not-last'
-          style={{ display: 'flex', gap: 4, marginTop: 6 }}
+          autohide='always'
+          style={{ position: 'absolute', bottom: -4, right: -4 }}
         >
-          <ActionBarPrimitive.Copy asChild>
+          <ActionBarPrimitive.Edit asChild>
             <IconButton
               size='small'
-              aria-label='Copiar respuesta'
+              aria-label='Editar mensaje'
               sx={{
                 width: 28,
                 height: 28,
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                boxShadow: 1,
                 color: 'text.secondary',
-                '&:hover': { color: 'text.primary' },
-                '&[data-copied]': { color: 'success.main' },
-                '& .aui-copy': { display: 'inline-flex' },
-                '& .aui-copied': { display: 'none' },
-                '&[data-copied] .aui-copy': { display: 'none' },
-                '&[data-copied] .aui-copied': { display: 'inline-flex' }
+                '&:hover': { color: 'primary.main', bgcolor: 'background.paper' }
               }}
             >
-              <i className='tabler-copy aui-copy' style={{ fontSize: '0.875rem' }} />
-              <i className='tabler-check aui-copied' style={{ fontSize: '0.875rem' }} />
+              <i className='tabler-pencil' style={{ fontSize: '0.8rem' }} />
             </IconButton>
-          </ActionBarPrimitive.Copy>
-          <ActionBarPrimitive.Reload asChild>
-            <IconButton
-              size='small'
-              aria-label='Regenerar respuesta'
-              sx={{
-                width: 28,
-                height: 28,
-                color: 'text.secondary',
-                '&:hover': { color: 'text.primary' }
-              }}
-            >
-              <i className='tabler-refresh' style={{ fontSize: '0.875rem' }} />
-            </IconButton>
-          </ActionBarPrimitive.Reload>
+          </ActionBarPrimitive.Edit>
         </ActionBarPrimitive.Root>
+
+        {/* Edit mode (ComposerPrimitive inside MessagePrimitive.Root = EditComposer) */}
+        <ComposerPrimitive.Root>
+          <Box sx={{
+            mt: 1,
+            border: 2,
+            borderColor: 'primary.main',
+            borderRadius: '12px',
+            overflow: 'hidden'
+          }}>
+            <ComposerPrimitive.Input asChild>
+              <CustomTextField
+                fullWidth
+                multiline
+                minRows={1}
+                maxRows={4}
+                autoFocus
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    '& fieldset': { border: 'none' }
+                  }
+                }}
+              />
+            </ComposerPrimitive.Input>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 1 }}>
+              <ComposerPrimitive.Cancel asChild>
+                <Button size='small' variant='outlined' color='secondary'>
+                  Cancelar
+                </Button>
+              </ComposerPrimitive.Cancel>
+              <ComposerPrimitive.Send asChild>
+                <Button size='small' variant='contained'>
+                  Guardar
+                </Button>
+              </ComposerPrimitive.Send>
+            </Box>
+          </Box>
+        </ComposerPrimitive.Root>
       </Box>
     </Box>
   </MessagePrimitive.Root>
 )
+
+/* ── Feedback thumbs (Slice B) ── */
+const FeedbackThumbs = ({ messageId }: { messageId: string }) => {
+  const [sentiment, setSentiment] = useState<'positive' | 'negative' | null>(null)
+
+  const handleFeedback = useCallback(
+    (value: 'positive' | 'negative') => {
+      if (sentiment === value) return
+
+      setSentiment(value)
+
+      fetch('/api/home/nexa/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ responseId: messageId, sentiment: value })
+      }).catch(() => {})
+    },
+    [messageId, sentiment]
+  )
+
+  return (
+    <>
+      <IconButton
+        size='small'
+        aria-label='Respuesta util'
+        aria-pressed={sentiment === 'positive'}
+        onClick={() => handleFeedback('positive')}
+        sx={{
+          width: 28,
+          height: 28,
+          color: sentiment === 'positive' ? 'success.main' : 'text.secondary',
+          opacity: sentiment === 'negative' ? 0.3 : 1,
+          '&:hover': { color: 'success.main' },
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <i className={sentiment === 'positive' ? 'tabler-thumb-up-filled' : 'tabler-thumb-up'} style={{ fontSize: '0.875rem' }} />
+      </IconButton>
+      <IconButton
+        size='small'
+        aria-label='Respuesta no util'
+        aria-pressed={sentiment === 'negative'}
+        onClick={() => handleFeedback('negative')}
+        sx={{
+          width: 28,
+          height: 28,
+          color: sentiment === 'negative' ? 'error.main' : 'text.secondary',
+          opacity: sentiment === 'positive' ? 0.3 : 1,
+          '&:hover': { color: 'error.main' },
+          transition: 'all 0.15s ease'
+        }}
+      >
+        <i className={sentiment === 'negative' ? 'tabler-thumb-down-filled' : 'tabler-thumb-down'} style={{ fontSize: '0.875rem' }} />
+      </IconButton>
+    </>
+  )
+}
+
+/* ── Assistant message with ActionBar + Feedback ── */
+const AssistantMessage = () => {
+  const messageId = useAuiState(s => {
+    const msgs = s.thread.messages
+
+    const lastAssistant = [...msgs].reverse().find(m => m.role === 'assistant')
+
+    return lastAssistant?.id ?? 'unknown'
+  })
+
+  return (
+    <MessagePrimitive.Root>
+      <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5, ...msgInSx }}>
+        <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 32, height: 32, mt: 0.5, flexShrink: 0 }}>
+          <i className='tabler-sparkles' style={{ fontSize: '1rem' }} />
+        </CustomAvatar>
+        <Box sx={{ maxWidth: '80%' }}>
+          <Box sx={{
+            px: 2.5,
+            py: 1.5,
+            borderRadius: '4px 20px 20px 20px',
+            bgcolor: 'background.paper',
+            border: 1,
+            borderColor: 'divider',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+            '& .aui-md': {
+              fontSize: '0.875rem',
+              lineHeight: 1.7,
+              '& p': { m: 0, mb: 1, '&:last-child': { mb: 0 } },
+              '& ul, & ol': { my: 1, pl: 2.5, '& li': { mb: 0.5 } },
+              '& strong': { fontWeight: 600 },
+              '& code': {
+                fontSize: '0.8rem',
+                bgcolor: 'action.selected',
+                px: 0.75,
+                py: 0.25,
+                borderRadius: 0.5,
+                fontFamily: 'monospace'
+              },
+              '& pre': {
+                bgcolor: 'action.hover',
+                p: 1.5,
+                borderRadius: 1,
+                overflow: 'auto',
+                my: 1,
+                '& code': { bgcolor: 'transparent', p: 0 }
+              },
+              '& a': { color: 'primary.main', textDecoration: 'underline' }
+            }
+          }}>
+            <MessagePrimitive.Content
+              components={{
+                Text: MarkdownTextPrimitive as any,
+                tools: { Fallback: NexaToolRenderer }
+              }}
+            />
+          </Box>
+
+          {/* Error state */}
+          <MessagePrimitive.Error>
+            <Box sx={{
+              mt: 1.5,
+              px: 2,
+              py: 1.5,
+              borderRadius: 1.5,
+              bgcolor: 'error.lighterOpacity',
+              border: 1,
+              borderColor: 'error.main',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5
+            }}>
+              <i className='tabler-alert-circle' style={{ fontSize: '1rem', color: 'inherit', flexShrink: 0 }} />
+              <Typography variant='body2' color='error.main' sx={{ flex: 1 }}>
+                No se pudo generar una respuesta.
+              </Typography>
+              <ActionBarPrimitive.Reload asChild>
+                <Button size='small' color='error' variant='outlined' sx={{ flexShrink: 0 }}>
+                  Reintentar
+                </Button>
+              </ActionBarPrimitive.Reload>
+            </Box>
+          </MessagePrimitive.Error>
+
+          {/* ActionBar: Copy + Reload + Feedback */}
+          <ActionBarPrimitive.Root
+            hideWhenRunning
+            autohide='not-last'
+            style={{ display: 'flex', gap: 4, marginTop: 6 }}
+          >
+            <ActionBarPrimitive.Copy asChild>
+              <IconButton
+                size='small'
+                aria-label='Copiar respuesta'
+                sx={{
+                  width: 28,
+                  height: 28,
+                  color: 'text.secondary',
+                  '&:hover': { color: 'text.primary' },
+                  '&[data-copied]': { color: 'success.main' },
+                  '& .aui-copy': { display: 'inline-flex' },
+                  '& .aui-copied': { display: 'none' },
+                  '&[data-copied] .aui-copy': { display: 'none' },
+                  '&[data-copied] .aui-copied': { display: 'inline-flex' }
+                }}
+              >
+                <i className='tabler-copy aui-copy' style={{ fontSize: '0.875rem' }} />
+                <i className='tabler-check aui-copied' style={{ fontSize: '0.875rem' }} />
+              </IconButton>
+            </ActionBarPrimitive.Copy>
+            <ActionBarPrimitive.Reload asChild>
+              <IconButton
+                size='small'
+                aria-label='Regenerar respuesta'
+                sx={{ width: 28, height: 28, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
+              >
+                <i className='tabler-refresh' style={{ fontSize: '0.875rem' }} />
+              </IconButton>
+            </ActionBarPrimitive.Reload>
+            <FeedbackThumbs messageId={messageId} />
+          </ActionBarPrimitive.Root>
+        </Box>
+      </Box>
+    </MessagePrimitive.Root>
+  )
+}
+
+/* ── Follow-up suggestions (Slice B) ── */
+const FollowupSuggestions = ({ suggestions }: { suggestions: string[] }) => {
+  const aui = useAui()
+  const isRunning = useAuiState(s => s.thread.isRunning)
+
+  if (isRunning || suggestions.length === 0) return null
+
+  return (
+    <Box sx={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: 1,
+      maxWidth: 720,
+      mx: 'auto',
+      mt: 1,
+      mb: 2,
+      px: 1.5,
+      ...msgInSx
+    }}>
+      {suggestions.map(suggestion => (
+        <Chip
+          key={suggestion}
+          label={suggestion}
+          size='small'
+          variant='outlined'
+          onClick={() => {
+            aui.thread().append({
+              role: 'user',
+              content: [{ type: 'text' as const, text: suggestion }]
+            })
+          }}
+          sx={{
+            borderRadius: '20px',
+            cursor: 'pointer',
+            '&:hover': { bgcolor: 'primary.lighterOpacity' }
+          }}
+        />
+      ))}
+    </Box>
+  )
+}
 
 /* ── Thinking indicator ── */
 const ThinkingIndicator = () => {
@@ -274,7 +449,7 @@ const ChatComposer = () => {
                     {isRunning ? (
                       <ComposerPrimitive.Cancel asChild>
                         <IconButton
-                          aria-label='Detener generación'
+                          aria-label='Detener generacion'
                           sx={{
                             bgcolor: 'error.lighterOpacity',
                             color: 'error.main',
@@ -315,36 +490,52 @@ const ChatComposer = () => {
 }
 
 /* ── Main thread ── */
-const NexaThread = ({ onBack, selectedModel, onModelChange }: Props) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '60vh' }}>
-    {/* Header */}
-    <Box sx={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      mb: 3,
-      maxWidth: 720,
-      mx: 'auto',
-      width: '100%',
-      px: 1
-    }}>
-      <Button
-        startIcon={<i className='tabler-arrow-left' />}
-        onClick={onBack}
-        size='small'
-        color='secondary'
-        aria-label='Volver al inicio de Nexa'
-      >
-        Inicio
-      </Button>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 24, height: 24 }}>
-          <i className='tabler-sparkles' style={{ fontSize: '0.75rem' }} />
-        </CustomAvatar>
-        <Typography variant='subtitle2' color='text.secondary'>Nexa AI</Typography>
+const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions = [], onHistoryToggle }: NexaThreadProps) => (
+  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: compact ? 'auto' : '60vh' }}>
+    {/* Header (hidden in compact mode) */}
+    {!compact && (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 3,
+        maxWidth: 720,
+        mx: 'auto',
+        width: '100%',
+        px: 1
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {onHistoryToggle ? (
+            <IconButton
+              size='small'
+              aria-label='Historial de conversaciones'
+              onClick={onHistoryToggle}
+              sx={{ width: 36, height: 36, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
+            >
+              <i className='tabler-history' style={{ fontSize: '1.125rem' }} />
+            </IconButton>
+          ) : null}
+          {onBack ? (
+            <Button
+              startIcon={<i className='tabler-arrow-left' />}
+              onClick={onBack}
+              size='small'
+              color='secondary'
+              aria-label='Volver al inicio de Nexa'
+            >
+              Inicio
+            </Button>
+          ) : null}
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <CustomAvatar skin='light' color='primary' variant='rounded' sx={{ width: 24, height: 24 }}>
+            <i className='tabler-sparkles' style={{ fontSize: '0.75rem' }} />
+          </CustomAvatar>
+          <Typography variant='subtitle2' color='text.secondary'>Nexa AI</Typography>
+        </Box>
+        <NexaModelSelector compact selectedModel={selectedModel} onChange={onModelChange} />
       </Box>
-      <NexaModelSelector compact selectedModel={selectedModel} onChange={onModelChange} />
-    </Box>
+    )}
 
     {/* Thread with ScrollToBottom */}
     <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
@@ -352,7 +543,7 @@ const NexaThread = ({ onBack, selectedModel, onModelChange }: Props) => (
         style={{
           flex: 1,
           overflowY: 'auto',
-          maxWidth: 720,
+          maxWidth: compact ? undefined : 720,
           margin: '0 auto',
           width: '100%',
           paddingLeft: 12,
@@ -360,13 +551,13 @@ const NexaThread = ({ onBack, selectedModel, onModelChange }: Props) => (
         }}
       >
         <ThreadPrimitive.Messages
-          components={{
-            UserMessage,
-            AssistantMessage
-          }}
+          components={{ UserMessage, AssistantMessage }}
         />
         <ThinkingIndicator />
       </ThreadPrimitive.Viewport>
+
+      {/* Follow-up suggestions */}
+      <FollowupSuggestions suggestions={suggestions} />
 
       {/* Floating scroll-to-bottom */}
       <ThreadPrimitive.ScrollToBottom asChild>
