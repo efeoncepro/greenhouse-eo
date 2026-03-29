@@ -4,6 +4,25 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-124 iniciada
+
+### Completado
+- `TASK-124` pasó a `in-progress` en la rama `feature/codex-task-096-wif-baseline`.
+- Slice 1 ya quedó implementado con cambios mínimos y reversibles:
+  - helper canónico `src/lib/secrets/secret-manager.ts`
+  - soporte `<ENV_VAR>_SECRET_REF` + cache corta + fallback a env var
+  - visibilidad básica en `/api/internal/health` para secretos críticos (`secret_manager | env | unconfigured`)
+  - primer consumer migrado: `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper
+- Validación local del slice:
+  - `pnpm exec eslint src/lib/secrets/secret-manager.ts src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/app/api/internal/health/route.ts src/lib/cloud/contracts.ts`
+  - `pnpm exec vitest run src/lib/secrets/secret-manager.test.ts src/lib/cloud/secrets.test.ts src/lib/nubox/client.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Migrar passwords Postgres (`runtime`, `migrator`, `admin`) al helper y recién ahí correr `pnpm pg:doctor --profile=runtime`.
+- Migrar `NEXTAUTH_SECRET` y `AZURE_AD_CLIENT_SECRET` sin tocar producción fuera del repo.
+- Validar en `staging` y `production` al menos un secreto crítico servido realmente desde Secret Manager antes de retirar env vars legacy.
+
 ## Sesión 2026-03-29 — TASK-096 cerrada y TASK-124 derivada
 
 ### Completado

@@ -1,6 +1,12 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
-## Delta 2026-03-29
+## Delta 2026-03-29 — Baseline parcial absorbida por TASK-124
+
+- Parte del endurecimiento del payload de `GET /api/internal/health` ya fue absorbido por `TASK-124`:
+  - ahora proyecta postura de secretos críticos sin exponer valores
+  - el remanente de esta task ya no es crear ese bloque, sino completar observabilidad externa y el contract final del endpoint
+
+## Delta 2026-03-29 — Baseline cloud ya adelantada
 
 - Parte del baseline ya quedó adelantado:
   - `GET /api/internal/health` ya existe

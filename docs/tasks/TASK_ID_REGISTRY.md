@@ -161,6 +161,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 ## Siguiente ID disponible
 
 | `TASK-123` | `to-do` | Nexa Product Hardening: Streaming, Rich Tools, UX Polish | `docs/tasks/to-do/TASK-123-nexa-product-hardening.md` |
-| `TASK-124` | `to-do` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/to-do/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
+| `TASK-124` | `in-progress` | GCP Secret Manager Critical Secrets Migration | `docs/tasks/in-progress/TASK-124-gcp-secret-manager-critical-secrets-migration.md` |
 
 `TASK-125`

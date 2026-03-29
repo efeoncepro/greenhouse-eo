@@ -12,6 +12,7 @@ import type {
   NuboxIssuanceRequest,
   NuboxIssuanceResponse
 } from '@/lib/nubox/types'
+import { resolveSecret } from '@/lib/secrets/secret-manager'
 
 // ─── Configuration ──────────────────────────────────────────────────────────
 
@@ -23,8 +24,10 @@ const getBaseUrl = () => {
   return url.replace(/\/+$/, '')
 }
 
-const getBearerToken = () => {
-  const token = process.env.NUBOX_BEARER_TOKEN
+const getBearerToken = async () => {
+  const { value: token } = await resolveSecret({
+    envVarName: 'NUBOX_BEARER_TOKEN'
+  })
 
   if (!token) throw new Error('NUBOX_BEARER_TOKEN is not configured')
 
@@ -72,7 +75,7 @@ const nuboxFetch = async <T>(options: NuboxRequestOptions): Promise<T> => {
   }
 
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${getBearerToken()}`,
+    Authorization: `Bearer ${await getBearerToken()}`,
     'x-api-key': getApiKey(),
     Accept: 'application/json'
   }
@@ -193,7 +196,7 @@ export const getNuboxSalePdf = async (id: number): Promise<ArrayBuffer> => {
 
   const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${getBearerToken()}`,
+      Authorization: `Bearer ${await getBearerToken()}`,
       'x-api-key': getApiKey()
     },
     cache: 'no-store',
@@ -213,7 +216,7 @@ export const getNuboxSaleXml = async (id: number): Promise<string> => {
 
   const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${getBearerToken()}`,
+      Authorization: `Bearer ${await getBearerToken()}`,
       'x-api-key': getApiKey()
     },
     cache: 'no-store',

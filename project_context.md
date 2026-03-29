@@ -3,6 +3,19 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Secret Manager helper baseline
+- `TASK-124` ya inició implementación real con un helper canónico en `src/lib/secrets/secret-manager.ts`.
+- Nuevo contrato base para secretos críticos:
+  - env var legacy: `<ENV_VAR>`
+  - secret ref opcional: `<ENV_VAR>_SECRET_REF`
+  - resolución runtime: `Secret Manager -> env fallback -> unconfigured`
+- El helper usa `@google-cloud/secret-manager`, cache corta y no expone valores crudos en logs.
+- `GET /api/internal/health` ahora proyecta postura de secretos críticos bajo `secrets.summary` y `secrets.entries`, sin devolver valores.
+- Primer consumer migrado al patrón:
+  - `src/lib/nubox/client.ts` ahora resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado
+- Estado pendiente explícito:
+  - passwords PostgreSQL y secretos de auth todavía siguen en env vars legacy hasta futuros slices de `TASK-124`
+
 ## Delta 2026-03-29 WIF preview validation + non-prod environment drift
 - El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:
   - `version=7638f85`

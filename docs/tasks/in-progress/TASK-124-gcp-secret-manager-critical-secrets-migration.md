@@ -6,15 +6,43 @@
 - `TASK-096` ya cerró el baseline WIF/OIDC en Vercel y el hardening externo de Cloud SQL.
 - El remanente real ya no es auth/runtime GCP, sino la migración de secretos críticos de Vercel env vars a GCP Secret Manager.
 
+## Delta 2026-03-29 — Lane iniciada
+
+- `TASK-124` pasa a `in-progress`.
+- Slice inicial acordado para minimizar riesgo:
+  - helper canónico `src/lib/secrets/secret-manager.ts`
+  - migración del primer consumer aislado con fallback a env var
+  - postura básica de secretos en `GET /api/internal/health`
+- Fuera de este primer lote:
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+  - passwords PostgreSQL (`runtime`, `migrator`, `admin`)
+
+## Delta 2026-03-29 — Slice 1 implementado
+
+- Ya existe el helper canónico `src/lib/secrets/secret-manager.ts`.
+- El helper soporta:
+  - cache corta
+  - fallback a env var
+  - convención `<ENV_VAR>_SECRET_REF`
+  - refs cortos o fully qualified sin exponer valores en logs
+- `GET /api/internal/health` ahora proyecta postura de secretos críticos por `secret_manager | env | unconfigured`.
+- Primer consumer migrado en runtime:
+  - `src/lib/nubox/client.ts` ya resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado
+- Sigue pendiente para slices posteriores:
+  - passwords PostgreSQL
+  - `NEXTAUTH_SECRET`
+  - `AZURE_AD_CLIENT_SECRET`
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 
@@ -98,8 +126,8 @@ Reglas obligatorias:
 ### Gap actual
 
 - secretos críticos siguen viviendo en Vercel env vars
-- no existe helper canónico de Secret Manager en el repo
-- `/api/internal/health` todavía no proyecta postura de secretos
+- los passwords PostgreSQL y secretos de auth siguen sin migrar al helper
+- la validación real por entorno con secretos servidos desde Secret Manager sigue pendiente
 
 ## Scope
 
@@ -119,7 +147,6 @@ Reglas obligatorias:
 
 - migrar `NEXTAUTH_SECRET`
 - migrar `AZURE_AD_CLIENT_SECRET`
-- migrar `NUBOX_BEARER_TOKEN`
 - mantener fallback transicional
 
 ### Slice 4 — Runtime visibility
@@ -136,11 +163,11 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe helper canónico `src/lib/secrets/secret-manager.ts`
+- [x] Existe helper canónico `src/lib/secrets/secret-manager.ts`
 - [ ] PostgreSQL passwords pueden resolverse desde Secret Manager con fallback
 - [ ] `NEXTAUTH_SECRET` puede resolverse desde Secret Manager con fallback
-- [ ] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
-- [ ] `/api/internal/health` reporta postura de secretos
+- [x] `NUBOX_BEARER_TOKEN` puede resolverse desde Secret Manager con fallback
+- [x] `/api/internal/health` reporta postura de secretos
 - [ ] `staging` validado con al menos un secreto crítico servido desde Secret Manager
 - [ ] `production` validado con al menos un secreto crítico servido desde Secret Manager
 - [ ] documentación viva actualizada
@@ -150,5 +177,5 @@ Reglas obligatorias:
 - `pnpm exec eslint ...`
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm exec vitest run ...`
-- `pnpm pg:doctor --profile=runtime`
 - smoke de `/api/internal/health`
+- `pnpm pg:doctor --profile=runtime` cuando se migren passwords PostgreSQL
