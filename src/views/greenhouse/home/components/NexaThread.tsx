@@ -56,84 +56,89 @@ const UserMessage = () => (
   <MessagePrimitive.Root>
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2.5, ...msgInSx }}>
       <Box sx={{ maxWidth: '75%', position: 'relative' }}>
-        {/* Content mode */}
-        <Box sx={{
-          px: 2.5,
-          py: 1.5,
-          borderRadius: '20px 20px 4px 20px',
-          bgcolor: 'primary.main',
-          color: 'primary.contrastText',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
-        }}>
-          <Typography variant='body2' component='div' sx={{ lineHeight: 1.7 }}>
-            <MessagePrimitive.Content components={{ Text: TextPart }} />
-          </Typography>
-        </Box>
-
-        {/* Edit trigger (hover-only) */}
-        <ActionBarPrimitive.Root
-          autohide='always'
-          style={{ position: 'absolute', bottom: -4, right: -4 }}
-        >
-          <ActionBarPrimitive.Edit asChild>
-            <IconButton
-              size='small'
-              aria-label='Editar mensaje'
-              sx={{
-                width: 28,
-                height: 28,
-                bgcolor: 'background.paper',
-                border: 1,
-                borderColor: 'divider',
-                boxShadow: 1,
-                color: 'text.secondary',
-                '&:hover': { color: 'primary.main', bgcolor: 'background.paper' }
-              }}
-            >
-              <i className='tabler-pencil' style={{ fontSize: '0.8rem' }} />
-            </IconButton>
-          </ActionBarPrimitive.Edit>
-        </ActionBarPrimitive.Root>
-
-        {/* Edit mode (ComposerPrimitive inside MessagePrimitive.Root = EditComposer) */}
-        <ComposerPrimitive.Root>
+        {/* Content mode — hidden when editing */}
+        <ComposerPrimitive.If editing={false}>
           <Box sx={{
-            mt: 1,
-            border: 2,
-            borderColor: 'primary.main',
-            borderRadius: '12px',
-            overflow: 'hidden'
+            px: 2.5,
+            py: 1.5,
+            borderRadius: '20px 20px 4px 20px',
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.08)'
           }}>
-            <ComposerPrimitive.Input asChild>
-              <CustomTextField
-                fullWidth
-                multiline
-                minRows={1}
-                maxRows={4}
-                autoFocus
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    fontSize: '0.875rem',
-                    '& fieldset': { border: 'none' }
-                  }
-                }}
-              />
-            </ComposerPrimitive.Input>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 1 }}>
-              <ComposerPrimitive.Cancel asChild>
-                <Button size='small' variant='outlined' color='secondary'>
-                  Cancelar
-                </Button>
-              </ComposerPrimitive.Cancel>
-              <ComposerPrimitive.Send asChild>
-                <Button size='small' variant='contained'>
-                  Guardar
-                </Button>
-              </ComposerPrimitive.Send>
-            </Box>
+            <Typography variant='body2' component='div' sx={{ lineHeight: 1.7, color: 'inherit' }}>
+              <MessagePrimitive.Content components={{ Text: TextPart }} />
+            </Typography>
           </Box>
-        </ComposerPrimitive.Root>
+
+          {/* Edit trigger (hover-only) */}
+          <ActionBarPrimitive.Root
+            autohide='always'
+            style={{ position: 'absolute', bottom: -4, right: -4 }}
+          >
+            <ActionBarPrimitive.Edit asChild>
+              <IconButton
+                size='small'
+                aria-label='Editar mensaje'
+                sx={{
+                  width: 28,
+                  height: 28,
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  boxShadow: 1,
+                  color: 'text.secondary',
+                  '&:hover': { color: 'primary.main', bgcolor: 'background.paper' }
+                }}
+              >
+                <i className='tabler-pencil' style={{ fontSize: '0.8rem' }} />
+              </IconButton>
+            </ActionBarPrimitive.Edit>
+          </ActionBarPrimitive.Root>
+        </ComposerPrimitive.If>
+
+        {/* Edit mode — only visible when editing */}
+        <ComposerPrimitive.If editing={true}>
+          <ComposerPrimitive.Root>
+            <Box sx={{
+              border: 2,
+              borderColor: 'primary.main',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              bgcolor: 'background.paper'
+            }}>
+              <ComposerPrimitive.Input asChild>
+                <CustomTextField
+                  fullWidth
+                  multiline
+                  minRows={1}
+                  maxRows={4}
+                  autoFocus
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      fontSize: '0.875rem',
+                      color: 'text.primary',
+                      '& fieldset': { border: 'none' }
+                    }
+                  }}
+                />
+              </ComposerPrimitive.Input>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, p: 1 }}>
+                <ComposerPrimitive.Cancel asChild>
+                  <Button size='small' variant='outlined' color='secondary'>
+                    Cancelar
+                  </Button>
+                </ComposerPrimitive.Cancel>
+                <ComposerPrimitive.Send asChild>
+                  <Button size='small' variant='contained'>
+                    Guardar
+                  </Button>
+                </ComposerPrimitive.Send>
+              </Box>
+            </Box>
+          </ComposerPrimitive.Root>
+        </ComposerPrimitive.If>
       </Box>
     </Box>
   </MessagePrimitive.Root>
