@@ -15,12 +15,18 @@
 
 ### Home landing cutover baseline
 - Los usuarios internos/admin ahora caen por defecto en `/home` cuando no tienen un `portalHomePath` explícito más específico; `hr`, `finance` y `my` conservan sus landings funcionales.
-- La navegación interna ya separa `Home` de `Control Tower`: `Home` queda como entrada principal y `Control Tower` sigue accesible como surface operativa especializada.
+- La navegación interna ya separa `Home` del shell heredado de `Control Tower`: `Home` queda como entrada principal y el patrón operativo queda absorbido por `Admin Center`.
 - Las sesiones legadas de internos que todavía traían `'/internal/dashboard'` como home histórico ahora se normalizan en runtime a `'/home'`.
+
+### Nexa backend persistence and suggestions
+- Nexa ahora persiste threads, mensajes y feedback en PostgreSQL bajo `greenhouse_ai`, con migración canónica y validación runtime no mutante del schema requerido.
+- `/api/home/nexa` retorna `threadId`, guarda el par `user + assistant` y genera `suggestions` dinámicas para follow-ups.
+- Se agregaron `POST /api/home/nexa/feedback`, `GET /api/home/nexa/threads` y `GET /api/home/nexa/threads/[threadId]` para destrabar `TASK-115`.
 
 ### Task lifecycle cleanup
 - `TASK-009` quedó cerrada como baseline principal de `Home + Nexa v2`; lo pendiente se derivó a `TASK-119` y `TASK-110`.
-- `TASK-108` quedó cerrada como baseline del shell de `Admin Center`; lo pendiente se derivó a `TASK-120`.
+- `TASK-108` quedó cerrada como baseline del shell de `Admin Center`; `TASK-120` quedó absorbida por la unificación posterior con `Control Tower`.
+- `TASK-114`, `TASK-119` y `TASK-120` quedaron cerradas y el índice de tasks se alineó al estado real del repo.
 - Se alinearon `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` para reflejar el estado real de `TASK-074`, `TASK-110`, `TASK-111`, `TASK-112` y `TASK-113`.
 
 ### Release channels operating model documented

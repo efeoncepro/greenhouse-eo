@@ -133,6 +133,9 @@ describe('NexaService', () => {
       .mockResolvedValueOnce({
         text: 'La nómina 03/2026 ya está exportada con 14 registros.'
       })
+      .mockResolvedValueOnce({
+        text: '{"suggestions":["¿Qué sigue en payroll?","¿Hubo errores?","¿Qué cambió vs el mes pasado?"]}'
+      })
 
     mockExecuteNexaTool.mockResolvedValue({
       toolCallId: 'tool-1',
@@ -168,8 +171,9 @@ describe('NexaService', () => {
       toolName: 'check_payroll',
       context: runtimeContext
     }))
-    expect(mockGenerateContent).toHaveBeenCalledTimes(2)
+    expect(mockGenerateContent).toHaveBeenCalledTimes(3)
     expect(response.content).toContain('nómina')
+    expect(response.suggestions).toHaveLength(3)
     expect(response.toolInvocations).toHaveLength(1)
     expect(response.toolInvocations?.[0]?.toolName).toBe('check_payroll')
   })

@@ -4,13 +4,23 @@
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
 ## Delta 2026-03-29 Home landing cutover baseline
-- `TASK-119` arrancó su implementación sobre la policy de landing del portal.
+- `TASK-119` quedó cerrada sobre la policy de landing del portal.
 - Nuevo contrato base:
   - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
   - roles funcionales siguen priorizando su landing especializada (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
-- `Control Tower` deja de funcionar como home implícito de internos; permanece accesible como surface operativa especializada en navegación interna.
+- `Control Tower` deja de funcionar como home implícito de internos y el patrón heredado queda absorbido por `Admin Center`.
 - `portalHomePath` sigue siendo el contrato canónico de aterrizaje, pero su fallback institucional para `efeonce_internal` ya no es `/internal/dashboard`, sino `/home`.
 - El runtime también normaliza sesiones legadas: si `NextAuth` o un registro viejo trae `'/internal/dashboard'` como home interno, el resolver canónico lo reescribe a `'/home'` antes de hidratar `session.user.portalHomePath`.
+
+## Delta 2026-03-29 Nexa backend persistence and thread runtime
+- `TASK-114` quedó cerrada con persistencia operativa para Nexa en PostgreSQL bajo `greenhouse_ai`.
+- El runtime ahora materializa:
+  - `nexa_threads`
+  - `nexa_messages`
+  - `nexa_feedback`
+- `/api/home/nexa` ya persiste conversación, retorna `threadId` y genera `suggestions` post-respuesta.
+- `src/lib/nexa/store.ts` valida readiness de las tablas, pero no intenta hacer DDL con el usuario `runtime`; la migración canónica vive en `scripts/migrations/add-nexa-ai-tables.sql`.
+- Se agregaron endpoints dedicados para feedback e historial de threads que destraban la UI pendiente de `TASK-115`.
 
 ## Delta 2026-03-29 Release channels y changelog client-facing
 - Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.

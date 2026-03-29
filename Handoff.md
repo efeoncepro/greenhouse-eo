@@ -4,6 +4,44 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
+
+### Completado
+- `TASK-114` quedó implementada y cerrada:
+  - nuevo store server-only `src/lib/nexa/store.ts`
+  - validación de readiness para `greenhouse_ai.nexa_threads`, `greenhouse_ai.nexa_messages`, `greenhouse_ai.nexa_feedback`
+  - migración canónica `scripts/migrations/add-nexa-ai-tables.sql` ya aplicada con perfil `migrator`
+  - endpoints:
+    - `POST /api/home/nexa/feedback`
+    - `GET /api/home/nexa/threads`
+    - `GET /api/home/nexa/threads/[threadId]`
+  - `/api/home/nexa` ahora persiste conversación, retorna `threadId` y genera `suggestions` dinámicas
+- `TASK-119` cerrada:
+  - verificación manual confirmada para `login -> /auth/landing -> /home`
+  - fallback interno y sesiones legadas ya normalizan a `/home`
+  - `Control Tower` deja de operar como home y el pattern final queda absorbido por `Admin Center`
+- `TASK-120` cerrada por absorción:
+  - `/internal/dashboard` redirige a `/admin`
+  - el follow-on separado ya no era necesario como lane autónoma
+- `TASK-115` quedó actualizada con delta para reflejar que su backend ya está disponible
+- `GREENHOUSE_DATA_MODEL_MASTER_V1.md` ya reconoce `nexa_threads`, `nexa_messages` y `nexa_feedback` dentro de `greenhouse_ai`
+
+### Validación
+- `pnpm pg:doctor --profile=runtime`
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm exec tsx scripts/run-migration.ts scripts/migrations/add-nexa-ai-tables.sql --profile=migrator`
+- `pnpm exec eslint src/lib/nexa/nexa-contract.ts src/lib/nexa/nexa-service.ts src/lib/nexa/nexa-service.test.ts src/lib/nexa/store.ts src/app/api/home/nexa/route.ts src/app/api/home/nexa/feedback/route.ts src/app/api/home/nexa/threads/route.ts src/app/api/home/nexa/threads/[threadId]/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec vitest run src/lib/nexa/nexa-service.test.ts`
+- verificación runtime directa de `greenhouse_ai.nexa_threads`, `greenhouse_ai.nexa_messages` y `greenhouse_ai.nexa_feedback` bajo perfil `runtime`
+
+### Pendiente inmediato
+- `TASK-115` pasa a ser la siguiente lane natural de Nexa UI porque ya tiene backend real para feedback, suggestions y thread history
+- Si se quiere endurecer `TASK-114` más adelante:
+  - agregar tests específicos para `src/lib/nexa/store.ts`
+  - decidir si el route principal de Nexa debe responder `404/400` en `threadId` inválido en vez de caer al handler genérico
+  - agregar smoke o tests de route para ownership y feedback
+
 ## Sesión 2026-03-29 — Admin Center + Control Tower unificado
 
 ### Completado
@@ -32,9 +70,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec vitest run src/lib/tenant/resolve-portal-home-path.test.ts`
 
 ### Pendiente inmediato
-- smoke manual en staging de login → `/auth/landing` → `/home`
-- verificar navegación interna a `/internal/dashboard` y convivencia con `Admin Center`
-- decidir si `Control Tower` debe aparecer además dentro de `Administración` o si `Gestión` queda como ubicación final
+- drift documental resuelto en la sesión posterior: `TASK-119` y `TASK-120` ya no quedan abiertas
 
 ## Sesión 2026-03-28 — Resumen
 

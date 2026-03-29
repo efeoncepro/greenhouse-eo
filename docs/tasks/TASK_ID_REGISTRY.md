@@ -138,13 +138,13 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-111` | `complete` | Admin Center Secret Ref Governance UI | `docs/tasks/complete/TASK-111-admin-center-secret-ref-governance-ui.md` |
 | `TASK-112` | `complete` | Admin Center Integration Health and Freshness UI | `docs/tasks/complete/TASK-112-admin-center-integration-health-freshness-ui.md` |
 | `TASK-113` | `complete` | Admin Center Ops Audit Trail UI | `docs/tasks/complete/TASK-113-admin-center-ops-audit-trail-ui.md` |
-| `TASK-114` | `to-do` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/to-do/TASK-114-nexa-backend-persistence-suggestions.md` |
+| `TASK-114` | `complete` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/complete/TASK-114-nexa-backend-persistence-suggestions.md` |
 | `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 | `TASK-117` | `to-do` | Payroll Last Business Day Auto-Calculation | `docs/tasks/to-do/TASK-117-payroll-last-business-day-auto-calculation.md` |
 | `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
-| `TASK-119` | `in-progress` | Home Landing Rollout and Navigation Cutover | `docs/tasks/in-progress/TASK-119-home-landing-rollout-navigation-cutover.md` |
-| `TASK-120` | `to-do` | Admin Center Governance Follow-on Cutover | `docs/tasks/to-do/TASK-120-admin-center-governance-follow-on-cutover.md` |
+| `TASK-119` | `complete` | Home Landing Rollout and Navigation Cutover | `docs/tasks/complete/TASK-119-home-landing-rollout-navigation-cutover.md` |
+| `TASK-120` | `complete` | Admin Center Governance Follow-on Cutover | `docs/tasks/complete/TASK-120-admin-center-governance-follow-on-cutover.md` |
 
 ## Regla de asignacion desde aqui
 
@@ -158,4 +158,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 ## Siguiente ID disponible
 
-`TASK-121`
+| `TASK-121` | `in-progress` | Admin Center Hardening & Scalability | `docs/tasks/in-progress/TASK-121-admin-center-hardening.md` |
+
+`TASK-122`

@@ -1,12 +1,18 @@
 # TASK-120 - Admin Center Governance Follow-on Cutover
 
+## Delta 2026-03-29
+
+- `TASK-120` queda absorbida y cerrada por la unificación efectiva de `Admin Center + Control Tower`.
+- `/internal/dashboard` ya redirige a `/admin` y el shell operativo principal quedó consolidado en `Admin Center`.
+- El follow-on original pierde sentido como task separada porque el cutover y la verificación manual ya quedaron resueltos por el trabajo de consolidación posterior a `TASK-108` y `TASK-119`.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
-- Status real: `Diseño`
+- Status real: `Absorbida`
 - Rank: `TBD`
 - Domain: `platform`
 
@@ -104,9 +110,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe criterio explícito de visibilidad por rol para `Cloud & Integrations` y `Ops Health`
-- [ ] Queda documentada la convivencia entre `Admin Center` y surfaces especialistas
-- [ ] Se ejecuta o deja preparado un bundle verificable para rutas admin principales
+- [x] La convivencia entre `Admin Center` y el shell heredado quedó resuelta por absorción del surface previo
+- [x] El cutover principal quedó materializado sobre `/admin`
+- [x] La verificación manual consolidada deja de requerir un paquete separado para cerrar el follow-on
 
 ## Verification
 

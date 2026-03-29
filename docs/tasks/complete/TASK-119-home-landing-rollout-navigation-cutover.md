@@ -1,31 +1,32 @@
 # TASK-119 - Home Landing Rollout and Navigation Cutover
 
-## Delta 2026-03-29 — Slice 1 + Slice 2 baseline implemented
+## Delta 2026-03-29 — Task closed after runtime cutover
 
-- `TASK-119` pasa a `in-progress` por implementación efectiva del cutover base.
+- `TASK-119` queda cerrada.
 - La policy aplicada en runtime queda así:
   - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
   - roles especialistas mantienen su landing funcional (`/hr/payroll`, `/finance`, `/my`) antes del fallback general
 - `portalHomePath` fallback dejó de resolver a `/internal/dashboard` para internos y ahora cae en `/home`.
 - La navegación principal ya deja de presentar `Control Tower` como home ambiguo:
   - el item principal interno pasa a `Home`
-  - `Control Tower` sigue visible como surface operativa especializada dentro de `Gestión`
-  - el `UserDropdown` y las sugerencias globales ya distinguen `Home` de `Torre de control`
-- Validación manual en staging sigue pendiente para confirmar login, auth landing y navegación base sobre el deployment compartido.
+  - el runtime ya no usa `Control Tower` como landing institucional
+  - el `UserDropdown` y las sugerencias globales distinguen `Home` del surface admin
+- La verificación manual ya quedó confirmada para `login -> /auth/landing -> /home`.
+- `Control Tower` dejó de ser surface separada de navegación y quedó absorbida por `Admin Center`, por lo que el cutover documental se cierra sobre `/admin`.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Parcial`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `home`
 
 ## Summary
 
-Cerrar el rollout operativo de `/home` como landing real del portal donde aplique, alineando `portalHomePath`, sidebar y la reubicación de `Control Tower` dentro de la taxonomía administrativa sin reabrir la baseline principal de `TASK-009`.
+Cerrar el rollout operativo de `/home` como landing real del portal donde aplique, alineando `portalHomePath`, sidebar y el cutover definitivo fuera del viejo `internal dashboard` sin reabrir la baseline principal de `TASK-009`.
 
 ## Why This Task Exists
 
@@ -36,7 +37,7 @@ Hoy siguen existiendo señales mezcladas:
 - `/home` ya existe como superficie real
 - el menú sigue tomando `portalHomePath` como entrada principal
 - usuarios internos siguen resolviendo fallback a `/internal/dashboard`
-- la reubicación formal de `Control Tower` dentro de `Administración` no quedó cerrada como cutover operativo
+- la salida definitiva del viejo `internal dashboard` no estaba cerrada como cutover operativo
 
 Eso ya no bloquea la baseline de Home, pero sí bloquea que el rollout quede consistente.
 
@@ -44,7 +45,7 @@ Eso ya no bloquea la baseline de Home, pero sí bloquea que el rollout quede con
 
 - Definir y aplicar la policy final de landing para los cohorts que deben usar `/home`
 - Alinear sidebar, redirects y `portalHomePath` con esa policy
-- Reubicar `Control Tower` como surface administrativa o especialista sin ambigüedad de navegación
+- Reubicar el patrón heredado de `Control Tower` sin ambigüedad de navegación
 - Validar manualmente el cutover en staging antes de promoverlo como default
 
 ## Architecture Alignment
@@ -59,7 +60,7 @@ Reglas obligatorias:
 
 - `/home` no debe romper los boundaries reales por route group
 - `portalHomePath` sigue siendo el contrato canónico de aterrizaje
-- `Control Tower` puede cambiar de ubicación taxonómica, pero no perder su acceso operativo
+- el landing institucional no debe depender de `Control Tower` ni del `internal dashboard` legado
 
 ## Dependencies & Impact
 
@@ -67,7 +68,7 @@ Reglas obligatorias:
 
 - `TASK-009` - Greenhouse Home Nexa v2
 - `TASK-108` - Admin Center Governance Shell
-- `TASK-116` - Sidebar Navigation Audit & Remediation
+- `TASK-120` - Admin Center Governance Follow-on Cutover
 
 ### Impacts to
 
@@ -94,9 +95,7 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- la policy final de `portalHomePath` sigue sin cortar claramente a `/home`
-- la navegación conserva ambigüedad entre Home y `Control Tower`
-- falta validación manual explícita del cutover en staging
+- cerrados en esta task
 
 ## Scope
 
@@ -126,8 +125,8 @@ Reglas obligatorias:
 - [x] Existe una policy explícita de landing por cohort para `/home`
 - [x] `portalHomePath` queda alineado con esa policy
 - [x] El sidebar deja de mezclar Home y `Control Tower` como entradas principales conflictivas
-- [x] `Control Tower` sigue accesible sin quedar como home ambiguo
-- [ ] Staging queda validado manualmente para login, landing y navegación base
+- [x] `Control Tower` deja de operar como home ambiguo y el cutover institucional queda absorbido por `Admin Center`
+- [x] Staging queda validado manualmente para login, landing y navegación base
 
 ## Verification
 

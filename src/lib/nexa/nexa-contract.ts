@@ -31,6 +31,39 @@ export interface NexaToolInvocation {
   result: NexaToolResult
 }
 
+export interface NexaFeedbackRequest {
+  responseId: string
+  sentiment: 'positive' | 'negative'
+  comment?: string
+}
+
+export interface NexaFeedbackResponse {
+  ok: boolean
+}
+
+export interface NexaThreadMessage {
+  messageId: string
+  role: 'user' | 'assistant'
+  content: string
+  toolInvocations?: NexaToolInvocation[]
+  suggestions?: string[]
+  modelId?: string
+  createdAt: string
+}
+
+export interface NexaThreadListItem {
+  threadId: string
+  title: string
+  messageCount: number
+  lastMessageAt: string
+  createdAt: string
+}
+
+export interface NexaThreadDetail {
+  threadId: string
+  messages: NexaThreadMessage[]
+}
+
 export interface NexaRuntimeContext {
   userId: string
   clientId: string
@@ -53,4 +86,5 @@ export interface NexaResponse {
   timestamp: string
   toolInvocations?: NexaToolInvocation[]
   modelId?: string
+  threadId?: string
 }
