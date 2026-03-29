@@ -63,6 +63,9 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches subscr
 - Event filters: `assignment.*` + `member.*` (high volume, low risk)
 - Target: same deployment via `VERCEL_URL`
 - Secret contract: `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF`
+- Optional protection bypass:
+  - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
+  - fallback `VERCEL_AUTOMATION_BYPASS_SECRET`
 - Activation: Admin Center button "Activar canary subscription" or direct POST to `/api/admin/ops/webhooks/seed-canary`
 
 ### Not Yet Active

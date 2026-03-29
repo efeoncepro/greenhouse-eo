@@ -22,6 +22,19 @@
   - el self-loop a `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary` recibe `Authentication Required`
 - También se verificó que `production/main` usa una base donde el schema de webhooks ya existe; no quedó deuda adicional de provisioning ahí.
 
+## Delta 2026-03-29 — Canary target con bypass opcional de Vercel
+
+- `POST /api/admin/ops/webhooks/seed-canary` ahora construye el target del canary con bypass opcional de `Deployment Protection`.
+- Contrato soportado:
+  - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
+  - fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`
+- Si existe alguno de esos valores, la subscription se registra con:
+  - `?x-vercel-protection-bypass=...`
+- Esto reduce el remanente operativo de la task a:
+  - habilitar `Protection Bypass for Automation` en Vercel
+  - exponer el secreto como env del deployment
+  - reactivar el canary para obtener el primer `200`
+
 ## Delta 2026-03-29 — Canary aligned to Secret Manager contract
 
 - La capa de webhooks ya no depende solo de `WEBHOOK_CANARY_SECRET` en env plano.
@@ -189,11 +202,11 @@ El backend ya tiene el bus (`outbox_events` → `webhook_deliveries`). La UI hoy
 - [x] Subscription apunta al mismo deployment (self-loop E2E)
 - [x] Firma HMAC-SHA256 validada en canary (secret ref: `WEBHOOK_CANARY_SECRET`)
 - [ ] `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF` configurado en Vercel
-- [ ] Canary activado desde Admin Center (click en "Activar canary subscription")
+- [ ] Canary activado desde Admin Center o seed route después de configurar bypass de Vercel
 - [ ] Al menos 1 subscription activa registrada en `webhook_subscriptions`
 - [ ] Al menos 1 delivery exitosa registrada en `webhook_deliveries`
 - [ ] Admin Center muestra contadores > 0 en "Inbound + outbound"
-- [ ] Flujo E2E validado: outbox event → subscription match → delivery → canary receipt
+- [ ] Flujo E2E validado: outbox event → subscription match → delivery → canary receipt `200`
 - [x] `pnpm build` pasa
 - [x] `pnpm test` pasa (539 tests)
 

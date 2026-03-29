@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { buildCanaryTargetUrl } from '@/lib/webhooks/canary-target'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
   // Resolve the base URL from the request or Vercel env
   const baseUrl = getBaseUrl(request)
 
-  const targetUrl = `${baseUrl}/api/internal/webhooks/canary`
+  const targetUrl = buildCanaryTargetUrl({ baseUrl })
 
   // Upsert canary subscription — idempotent
   const rows = await runGreenhousePostgresQuery<{ webhook_subscription_id: string; created: boolean } & Record<string, unknown>>(
@@ -64,9 +65,11 @@ export async function POST(request: Request) {
 function getBaseUrl(request: Request): string {
   // Use VERCEL_URL if available (includes protocol-less domain)
   const vercelUrl = process.env.VERCEL_URL
+
   if (vercelUrl) return `https://${vercelUrl}`
 
   // Fallback to request origin
   const url = new URL(request.url)
+
   return url.origin
 }

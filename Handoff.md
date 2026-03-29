@@ -4,6 +4,18 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-125 canary soporta bypass opcional de Vercel
+
+### Completado
+- `POST /api/admin/ops/webhooks/seed-canary` ya puede registrar el target del canary con bypass opcional de `Deployment Protection`.
+- Contrato soportado:
+  - `WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`
+  - fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`
+- Esto deja el remanente de `TASK-125` en un único paso externo:
+  - habilitar `Protection Bypass for Automation` en Vercel
+  - exponer el secreto al deployment
+  - reactivar la canary para obtener la primera delivery `200`
+
 ## Sesión 2026-03-29 — TASK-125 casi cerrada, bloqueada por Vercel Deployment Protection
 
 ### Completado

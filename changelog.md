@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-125 canary target now supports optional Vercel protection bypass
+- La seed route del canary ya puede construir el target con `x-vercel-protection-bypass` de forma opcional.
+- Se soporta una env dedicada (`WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET`) con fallback a `VERCEL_AUTOMATION_BYPASS_SECRET`.
+- El repo ya no necesita más cambios para atravesar `Deployment Protection`; el remanente quedó concentrado en habilitar y cargar ese secreto en Vercel.
+
 ### TASK-125 reduced to Vercel deployment-protection bypass
 - La capa de webhooks ya quedó alineada a Secret Manager refs y el schema de webhooks fue provisionado en la base usada por `staging`.
 - `wh-sub-canary` ya pudo generar deliveries reales desde `webhook-dispatch`; el bus outbound dejó de estar idle.
