@@ -1,5 +1,18 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — `production` validado y task lista para cierre
+
+- `main` absorbió `develop` en `bcbd0c3` y el deployment productivo quedó `READY`.
+- Validación real en `production`:
+  - `GET /api/internal/health` sobre `dpl_5fyHqra7AgV865QmHSuZ2iqYWcYk`
+  - `environment=production`
+  - `version=bcbd0c3`
+  - `postureChecks.observability.status=ok`
+  - `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
+  - `slack_alerts_webhook` resolviendo por `secret_manager`
+- `GET /api/auth/session` respondió `{}` en production.
+- `TASK-098` ya no tiene remanente técnico para el MVP declarado.
+
 ## Delta 2026-03-29 — `staging` validado end-to-end; remanente en `production`
 
 - `staging` ya quedó operativo para observabilidad externa sobre `develop`:
@@ -127,11 +140,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Validada en staging; rollout production pendiente` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Observability |
 | Sequence | Cloud Posture Hardening **3 of 6** — after TASK-100, TASK-099 |
@@ -307,14 +320,6 @@ curl -H "Authorization: Bearer $CRON_SECRET" \
 # Verificar #greenhouse-alerts
 ```
 
-## Remanente para cierre
+## Nota post-cierre
 
-- Replicar el rollout externo en `production`:
-  - `SENTRY_DSN`
-  - `NEXT_PUBLIC_SENTRY_DSN`
-  - `SENTRY_AUTH_TOKEN`
-  - `SENTRY_ORG`
-  - `SENTRY_PROJECT`
-  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
-- Ejecutar smoke equivalente en `production`
-- Rotar el webhook de Slack expuesto en una captura previa
+- Sigue recomendado rotar el webhook de Slack expuesto en una captura previa, pero ya no bloquea el cierre funcional del MVP.

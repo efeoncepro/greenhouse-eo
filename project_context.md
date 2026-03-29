@@ -3,6 +3,19 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 Observability MVP cerrada
+- `TASK-098` quedó cerrada tras validación en `staging` y `production`.
+- `production` ya valida:
+  - `observability.sentry.enabled=true`
+  - `observability.slack.enabled=true`
+  - `postureChecks.observability.status=ok`
+- Deployment productivo validado:
+  - commit `bcbd0c3`
+  - deployment `dpl_5fyHqra7AgV865QmHSuZ2iqYWcYk`
+  - `GET /api/auth/session` responde `{}` sin regresión visible de auth
+- La recomendación pendiente es solo operativa:
+  - rotar el webhook de Slack expuesto en una captura previa
+
 ## Delta 2026-03-29 Observability MVP operativa en staging
 - `TASK-098` ya quedó validada end-to-end en `staging`.
 - Señales confirmadas:

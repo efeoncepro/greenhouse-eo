@@ -4,6 +4,27 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 cerrada en `production`
+
+### Completado
+- `production` recibió el merge `main <- develop` en `bcbd0c3`.
+- Se cargaron las variables externas de observabilidad en `production`:
+  - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Hubo que reescribir `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF` en `production` y redeployar para corregir drift de la ref.
+- Deployment validado:
+  - `dpl_5fyHqra7AgV865QmHSuZ2iqYWcYk`
+  - `GET /api/internal/health` con `postureChecks.observability.status=ok`
+  - `GET /api/auth/session` con respuesta `{}`
+- `TASK-098` ya puede moverse a `complete`.
+
+### Pendiente no bloqueante
+- Rotar el webhook de Slack expuesto en una captura previa.
+
 ## Sesión 2026-03-29 — TASK-098 validación end-to-end en `staging`
 
 ### Completado
