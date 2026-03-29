@@ -17,7 +17,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El wiring es fail-open:
   - si no existe DSN, Sentry no inicializa
   - no cambia rutas ni contrato HTTP del portal
-- El rollout externo y la validación real del dashboard siguen pendientes; este lote cierra solo la base repo-safe.
+- `develop/staging` ya validó el runtime repo-safe en `ac11287`; el estado observado en health sigue siendo `observability=unconfigured` por ausencia de `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL` en Vercel.
+- El rollout externo y la validación real del dashboard/canal siguen pendientes; este lote cierra solo la base repo-safe.
 
 ## Delta 2026-03-29 Observability posture baseline
 - `TASK-098` quedó iniciada con un slice mínimo y reversible de contrato.
@@ -38,7 +39,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - credencial runtime del portal
   - perfiles `migrator` y `admin` de tooling/operación
 - `503` sigue reservado para fallos reales de runtime; la postura incompleta solo degrada señal operativa.
-- El wiring mínimo de `@sentry/nextjs` ya existe; Slack real sigue pendiente.
+- El wiring mínimo de `@sentry/nextjs` ya existe.
+- El adapter `src/lib/alerts/slack-notify.ts` y los hooks base de cron ya existen; el remanente de Slack es cargar `SLACK_ALERTS_WEBHOOK_URL` y validar envíos reales.
 
 ## Delta 2026-03-29 Security headers proxy baseline
 - `TASK-099` quedó iniciada con un `proxy.ts` mínimo de headers estáticos.

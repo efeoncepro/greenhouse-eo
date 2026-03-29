@@ -4,6 +4,28 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 validada en `develop/staging`
+
+### Completado
+- `develop` absorbió el slice mínimo de Sentry en `ac11287`.
+- El deployment compartido `dev-greenhouse.efeoncepro.com` quedó `READY` sobre ese commit.
+- Validación autenticada de `GET /api/internal/health`:
+  - `version=ac11287`
+  - Postgres `ok`
+  - BigQuery `ok`
+  - `observability.summary=Observabilidad externa no configurada`
+- Hallazgo importante:
+  - el repo ya tiene el adapter `src/lib/alerts/slack-notify.ts`
+  - los hooks de `alertCronFailure()` ya existen en `outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize` y `nubox-sync`
+  - por lo tanto el cuello de botella actual de `TASK-098` ya no es de código repo, sino de configuración externa en Vercel
+
+### Pendiente inmediato
+- Cargar en Vercel las variables externas de observabilidad:
+  - `SENTRY_DSN` o `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`
+  - `SLACK_ALERTS_WEBHOOK_URL`
+- Revalidar `GET /api/internal/health` y confirmar que `postureChecks.observability` deje de salir `unconfigured`.
+
 ## Sesión 2026-03-29 — TASK-098 retoma Sentry mínimo sobre branch dedicada
 
 ### Completado

@@ -11,7 +11,8 @@
 - Se instaló `@sentry/nextjs` y quedó cableado el wiring mínimo para App Router en `next.config.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`, `sentry.server.config.ts` y `sentry.edge.config.ts`.
 - El runtime queda fail-open: si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa.
 - La postura de observabilidad ahora distingue DSN runtime, DSN público, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` y readiness de source maps.
-- `pnpm build` ya pasa con esta base, sin tocar todavía Slack alerts ni el rollout externo en Vercel.
+- `pnpm build` ya pasa con esta base y `develop/staging` quedó validado en `ac11287`.
+- El health compartido confirmó que el código ya está listo, pero la observabilidad externa sigue `unconfigured` por ausencia de `SENTRY_*` y `SLACK_ALERTS_WEBHOOK_URL` en Vercel.
 
 ### TASK-099 security headers proxy baseline
 - Se creó `src/proxy.ts` con headers estáticos (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-DNS-Prefetch-Control`) para todo el runtime salvo `_next/*` y assets estáticos.
@@ -24,7 +25,7 @@
 - El health interno ahora separa `runtimeChecks` de `postureChecks`, mantiene `503` solo para fallos reales de Postgres/BigQuery y agrega `overallStatus` + `summary` para lectura operativa.
 - El payload ahora suma `postgresAccessProfiles` para visibilidad separada de credenciales `runtime`, `migrator` y `admin`, sin mezclar tooling privilegiado con la postura runtime del portal.
 - `.env.example` quedó alineado con esas tres variables para preparar el rollout posterior de observabilidad externa.
-- Este slice no instala todavía `@sentry/nextjs` ni conecta Slack real; solo formaliza el contrato y la visibilidad previa.
+- El repo hoy ya tiene además Sentry mínimo y adapter base de Slack; el remanente de `TASK-098` pasó a ser rollout/configuración externa.
 
 ### TASK-124 validada de forma segura en staging
 - `develop` absorbió los tres slices de `TASK-124` en `497cb19` mediante una integración mínima desde `origin/develop`, sin arrastrar el resto de la branch auxiliar.

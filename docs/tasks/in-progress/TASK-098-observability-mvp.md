@@ -16,9 +16,26 @@
   - runtime server/client
   - readiness de source maps (`SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`)
 - Sigue fuera de este lote:
-  - wiring real de Slack alerts
   - rollout de variables en Vercel
   - validación preview/staging con eventos reales en dashboard Sentry
+
+## Delta 2026-03-29 — Estado real en `develop/staging`
+
+- `develop` absorbió el slice mínimo de Sentry en `ac11287` y el deployment compartido quedó `READY`.
+- Validación autenticada de `GET /api/internal/health` sobre ese deployment:
+  - `version=ac11287`
+  - `overallStatus=degraded`
+  - `runtimeChecks`: Postgres y BigQuery `ok`
+  - `postureChecks.observability`: `unconfigured`
+- El motivo del estado `unconfigured` ya no es falta de código:
+  - el repo ya tiene `@sentry/nextjs`
+  - el repo ya tiene `src/lib/alerts/slack-notify.ts`
+  - los crons críticos ya llaman `alertCronFailure(...)`
+- El remanente real de la task queda concentrado en rollout externo:
+  - cargar `SENTRY_DSN` o `NEXT_PUBLIC_SENTRY_DSN`
+  - cargar `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` si se quieren source maps
+  - cargar `SLACK_ALERTS_WEBHOOK_URL`
+  - verificar eventos reales en dashboard/canal
 
 ## Delta 2026-03-29 — Lane iniciada con posture de observabilidad
 
@@ -79,7 +96,8 @@
   - `SLACK_ALERTS_WEBHOOK_URL`
 - Sigue pendiente:
   - validación externa de `@sentry/nextjs` en preview/staging
-  - wiring real de Slack alerts en crons críticos
+  - rollout externo de `SLACK_ALERTS_WEBHOOK_URL`
+  - validación real de alertas Slack en crons críticos
 
 ## Status
 
