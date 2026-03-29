@@ -138,6 +138,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-111` | `to-do` | Admin Center Secret Ref Governance UI | `docs/tasks/to-do/TASK-111-admin-center-secret-ref-governance-ui.md` |
 | `TASK-112` | `to-do` | Admin Center Integration Health and Freshness UI | `docs/tasks/to-do/TASK-112-admin-center-integration-health-freshness-ui.md` |
 | `TASK-113` | `to-do` | Admin Center Ops Audit Trail UI | `docs/tasks/to-do/TASK-113-admin-center-ops-audit-trail-ui.md` |
+| `TASK-114` | `to-do` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/to-do/TASK-114-nexa-backend-persistence-suggestions.md` |
+| `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
 
 ## Regla de asignacion desde aqui
 
