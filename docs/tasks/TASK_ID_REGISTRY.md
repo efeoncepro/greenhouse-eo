@@ -168,4 +168,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-128` | `to-do` | Webhook Consumers Roadmap: Slack, Cache, Nubox, In-App | `docs/tasks/to-do/TASK-128-webhook-consumers-roadmap.md` |
 
-`TASK-129`
+| `TASK-129` | `to-do` | In-App Notifications via Webhook Bus | `docs/tasks/to-do/TASK-129-in-app-notifications-via-webhook-bus.md` |
+
+`TASK-130`
