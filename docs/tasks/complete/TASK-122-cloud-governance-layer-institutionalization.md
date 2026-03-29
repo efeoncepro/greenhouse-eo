@@ -1,12 +1,27 @@
 # TASK-122 - Cloud Governance Layer Institutionalization
 
+## Delta 2026-03-29
+
+- `TASK-122` deja de ser solo documental y pasa a baseline de implementación del dominio Cloud.
+- Se creó la base canónica del dominio en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
+- Se agregó una capa mínima real en código:
+  - `src/lib/cloud/contracts.ts`
+  - `src/lib/cloud/bigquery.ts`
+  - `src/lib/cloud/cron.ts`
+  - `src/lib/cloud/health.ts`
+- `TASK-100` a `TASK-103` ya no quedan como hardening suelto: pasan a apoyarse en una base institucional y técnica compartida.
+- Se dejó explícito:
+  - boundary entre `Admin Center`, `Cloud & Integrations` y `Ops Health`
+  - qué vive en UI, qué vive en helpers/código y qué vive en runbooks/config
+  - el orden recomendado para construir la base mínima de `TASK-100` a `TASK-103`
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `48`
 - Domain: `platform / cloud`
 
@@ -83,6 +98,7 @@ Reglas obligatorias:
 
 - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 - `docs/tasks/to-do/TASK-096-gcp-secret-management-security-hardening.md`
 - `docs/tasks/to-do/TASK-098-observability-mvp.md`
@@ -91,6 +107,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-101-cron-auth-standardization.md`
 - `docs/tasks/to-do/TASK-102-database-resilience-baseline.md`
 - `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md`
+- `src/lib/cloud/**`
 - `src/views/greenhouse/admin/**`
 
 ## Current Repo State
@@ -146,19 +163,25 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe una task canónica que institucionaliza `Cloud` como dominio interno de governance/plataforma
-- [ ] El boundary entre `Cloud & Integrations`, `Ops Health` y el resto de `Admin Center` queda explícito
-- [ ] `TASK-096`, `TASK-098`, `TASK-099`, `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103` quedan referenciadas como slices del dominio Cloud
-- [ ] Queda documentado qué parte de la capa Cloud vive en UI, qué parte vive en contracts/helpers y qué parte en runbooks/config
-- [ ] El índice de tasks y el registry reflejan la nueva lane sin pisar tasks activas existentes
+- [x] Existe una task canónica que institucionaliza `Cloud` como dominio interno de governance/plataforma
+- [x] El boundary entre `Cloud & Integrations`, `Ops Health` y el resto de `Admin Center` queda explícito
+- [x] `TASK-096`, `TASK-098`, `TASK-099`, `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103` quedan referenciadas como slices del dominio Cloud
+- [x] Queda documentado qué parte de la capa Cloud vive en UI, qué parte vive en contracts/helpers y qué parte en runbooks/config
+- [x] Existe una capa mínima real en `src/lib/cloud/*` para health, cron posture y BigQuery cost guards
+- [x] El índice de tasks y el registry reflejan la nueva lane sin pisar tasks activas existentes
 
 ## Verification
 
 - Revisión documental cruzada de:
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
   - `docs/tasks/README.md`
   - `docs/tasks/TASK_ID_REGISTRY.md`
 - Validación de coherencia de backlog:
   - `TASK-096`, `TASK-098` a `TASK-103` siguen existiendo como lanes ejecutables
   - `TASK-122` funciona como umbrella institucional y no duplica implementación
+- Validación técnica base:
+  - `pnpm exec eslint src/lib/cloud/*.ts src/lib/cloud/*.test.ts src/lib/bigquery.ts`
+  - `pnpm exec vitest run src/lib/cloud/bigquery.test.ts src/lib/cloud/cron.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`

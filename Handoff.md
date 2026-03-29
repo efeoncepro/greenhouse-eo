@@ -4,17 +4,26 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
-## Sesión 2026-03-29 — TASK-122 documentada
+## Sesión 2026-03-29 — TASK-122 desarrollada y cerrada
 
 ### Completado
-- Se creó `TASK-122` en `to-do` para institucionalizar `Cloud` como capa interna de platform governance.
-- La task nace para agrupar y dar framing institucional al track `TASK-096`, `TASK-098` a `TASK-103`, sin convertirlo en un módulo client-facing nuevo.
-- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados:
-  - `TASK-121` ya se reconoce como ocupada por `Admin Center Hardening & Scalability`
-  - `TASK-122` queda reservada para `Cloud Governance Layer Institutionalization`
+- `TASK-122` quedó desarrollada y cerrada como base documental del dominio Cloud.
+- Se creó `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md` como operating model canónico para institucionalizar `Cloud` como capa interna de platform governance.
+- Se agregó una baseline real de código en `src/lib/cloud/*`:
+  - `contracts.ts` para checks y snapshots
+  - `health.ts` para checks compartidos de Postgres y BigQuery
+  - `bigquery.ts` para cost guards base (`maximumBytesBilled`)
+  - `cron.ts` para postura mínima de control plane sobre `CRON_SECRET`
+- El documento deja explícito:
+  - boundary entre `Admin Center`, `Cloud & Integrations` y `Ops Health`
+  - control families del dominio Cloud
+  - qué debe vivir en UI, qué en code/helpers y qué en runbooks/config
+  - el framing operativo de `TASK-100`, `TASK-101`, `TASK-102` y `TASK-103`
+- `TASK-100` a `TASK-103` quedaron actualizadas para referenciar esta base, evitando redecidir ownership y scope en cada ejecución.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados con `TASK-122` en `complete`.
 
 ### Pendiente inmediato
-- decidir si `TASK-122` entra solo como umbrella documental o si en una segunda pasada deriva mini-tasks de surface para `Admin Center`
+- La base ya está lista para ejecutar `TASK-100` a `TASK-103` con framing consistente del dominio Cloud
 
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
 

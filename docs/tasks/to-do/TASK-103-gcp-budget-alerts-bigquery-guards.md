@@ -17,6 +17,20 @@
 
 Configurar budget alerts en GCP Billing para detectar anomalías de costo, y agregar `maximumBytesBilled` a las queries de BigQuery desde el código para prevenir full-table scans accidentales. Hoy hay zero visibilidad del gasto en infraestructura.
 
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+
+Reglas obligatorias:
+
+- `TASK-103` se interpreta como baseline de FinOps y cost guardrails del dominio Cloud
+- los budgets viven en billing/config, pero los guards de BigQuery deben vivir en código compartido
+- cualquier override para queries grandes debe quedar explícito y documentado
+
 ## Why This Task Exists
 
 Greenhouse tiene 13 datasets BigQuery con 200+ tablas, 10 Cloud Run services, Cloud SQL, Cloud Storage, y Vertex AI — todo corriendo sin alertas de costo. Riesgos concretos:
@@ -37,6 +51,7 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
 
 - **Depende de:**
   - Acceso admin a GCP Billing
+  - `TASK-122` como framing institucional del dominio Cloud
   - Email o Slack para recibir alertas
 - **Impacta a:**
   - TASK-098 (Observability) — budget alerts complementan error alerting
@@ -44,6 +59,7 @@ Detectar anomalías de gasto en <24h y prevenir queries BigQuery abusivas desde 
   - Scripts de backfill que hacen queries masivas
 - **Archivos owned:**
   - Configuración de GCP Budget (GCP Console)
+  - `src/lib/cloud/bigquery.ts`
   - `src/lib/bigquery.ts` (agregar `maximumBytesBilled`)
 
 ## Current Repo State

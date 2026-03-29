@@ -17,6 +17,20 @@
 
 Reemplazar los 18 copy-paste de autenticación de cron con un helper único `requireCronAuth()` que use timing-safe comparison, fail-closed si `CRON_SECRET` no está configurado, y soporte alerting integrado (TASK-098).
 
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+
+Reglas obligatorias:
+
+- `TASK-101` se interpreta como contrato de auth del control plane de schedulers dentro del dominio Cloud
+- la protección debe vivir en helper reutilizable y no en copy-paste por ruta
+- el resultado debe endurecer Vercel cron y rutas scheduler-driven sin cambiar la semántica de negocio de cada dominio
+
 ## Why This Task Exists
 
 La auditoría de marzo 2026 encontró dos patrones inconsistentes de autenticación en los 18 cron endpoints:
@@ -54,12 +68,14 @@ Un único helper que todas las cron routes importen, con seguridad consistente y
 
 - **Depende de:**
   - TASK-098 (Observability) — para integrar `alertCronFailure()` en el catch handler
+  - `TASK-122` como boundary institucional del dominio Cloud
   - `timingSafeEqual` de `node:crypto` (ya disponible, usado en webhook signing)
 - **Impacta a:**
   - TASK-096 — alineado con el track de security hardening
   - Los 18 cron endpoints — refactor de auth pattern
   - Futuras cron routes — usarán el helper directamente
 - **Archivos owned:**
+  - `src/lib/cloud/cron.ts`
   - `src/lib/cron/require-cron-auth.ts` (nuevo)
   - `src/app/api/cron/*/route.ts` (refactor — 16 archivos)
   - `src/app/api/finance/economic-indicators/sync/route.ts` (refactor)

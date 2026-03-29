@@ -34,6 +34,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El changelog client-facing quedo separado del changelog interno del repo y nace en `docs/changelog/CLIENT_CHANGELOG.md`.
 - `Preview`, `Staging` y `Production` siguen siendo los ambientes tecnicos; los canales de release se apoyan en ellos pero no los reemplazan.
 
+## Delta 2026-03-29 Cloud governance operating model
+- `Cloud` quedó institucionalizado como dominio interno de platform governance, no como módulo client-facing nuevo.
+- La base canónica vive en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
+- El dominio ahora queda explícitamente separado en:
+  - shell de governance (`Admin Center`)
+  - surface de inventory/freshness (`Cloud & Integrations`)
+  - surface de incidentes (`Ops Health`)
+  - contracts/helpers/runbooks para posture, resiliencia, cron y costos
+- La baseline mínima en código vive en `src/lib/cloud/*`:
+  - `health.ts` para health checks compartidos
+  - `bigquery.ts` para guards base de costo
+  - `cron.ts` para postura mínima de scheduler secret
+- `TASK-100` a `TASK-103` ya se interpretan como slices del dominio Cloud y no como hardening aislado.
+
 ## Delta 2026-03-28 Admin Center governance shell
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.

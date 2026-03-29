@@ -17,6 +17,21 @@
 
 Hardening de resiliencia de Cloud SQL: habilitar Point-in-Time Recovery (PITR), activar slow query logging, ajustar pool size para Vercel serverless, y testear un restore de backup. Complementa TASK-096 Fase 1 (network + SSL).
 
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+
+Reglas obligatorias:
+
+- `TASK-102` se interpreta como contrato de resiliencia de Cloud SQL dentro del dominio Cloud
+- la task no debe mezclar cambios de producto con cambios de postura de base
+- toda mutación de configuración debe quedar respaldada por runbook o verificación documentada, no solo por memoria operativa
+
 ## Why This Task Exists
 
 Cloud SQL `greenhouse-pg-dev` es el OLTP store de Greenhouse — payroll, compensaciones, identidad, finanzas, outbox. La postura actual:
@@ -38,12 +53,14 @@ Que una falla de base de datos tenga recovery point <5 minutos (PITR), queries l
 
 - **Depende de:**
   - TASK-096 Fase 1 (Cloud SQL network hardening) — ejecutar primero para no hacer cambios concurrentes en la instancia
+  - `TASK-122` como framing institucional del dominio Cloud
   - Acceso admin a Cloud SQL en GCP Console
 - **Impacta a:**
   - TASK-098 (Observability) — slow query logs alimentan alerting futuro
   - TASK-096 Fase 3 (Secret Manager) — PITR habilita recovery seguro de datos sensibles
   - Todos los módulos que escriben a PostgreSQL — pool size afecta latencia bajo carga
 - **Archivos owned:**
+  - `src/lib/cloud/health.ts`
   - Configuración de Cloud SQL instance (GCP Console / gcloud CLI)
   - `GREENHOUSE_POSTGRES_MAX_CONNECTIONS` en Vercel env vars
 

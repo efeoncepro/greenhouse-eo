@@ -1,5 +1,6 @@
 import { BigQuery } from '@google-cloud/bigquery'
 
+import { getBigQueryQueryOptions } from '@/lib/cloud/bigquery'
 import { getGoogleCredentials } from '@/lib/google-credentials'
 
 let bigQueryClient: BigQuery | undefined
@@ -30,3 +31,4 @@ export const getBigQueryClient = () => {
 }
 
 export const getBigQueryProjectId = () => getProjectId()
+export { getBigQueryQueryOptions }

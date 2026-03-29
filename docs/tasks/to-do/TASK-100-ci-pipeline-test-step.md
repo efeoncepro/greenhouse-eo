@@ -17,6 +17,19 @@
 
 Agregar `pnpm test` al workflow de GitHub Actions. Hoy existen 86 archivos de test con Vitest que no corren en CI — una regresión puede llegar a production sin detección.
 
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+- `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+
+Reglas obligatorias:
+
+- `TASK-100` se interpreta como control de `delivery validation` dentro del dominio Cloud
+- el resultado debe expresarse en repo (`.github/workflows/ci.yml`), no depender de una policy externa opaca
+- el objetivo es bloquear merges inseguros antes de afectar Vercel o el runtime cloud
+
 ## Why This Task Exists
 
 El CI workflow (`.github/workflows/ci.yml`) solo ejecuta:
@@ -34,6 +47,7 @@ Que ningún merge a `develop` o `main` pueda ocurrir con tests fallando.
 
 - **Depende de:**
   - Ninguna — es la primera task del track de hardening
+  - `TASK-122` como framing institucional ya documentado para el dominio Cloud
 - **Impacta a:**
   - Todas las tasks futuras — cualquier código nuevo con tests será validado automáticamente
   - TASK-098 (Observability) — instalar Sentry no debe romper tests existentes
@@ -41,6 +55,7 @@ Que ningún merge a `develop` o `main` pueda ocurrir con tests fallando.
   - TASK-101 (Cron Auth) — tests de cron auth helpers se validan en CI
 - **Archivos owned:**
   - `.github/workflows/ci.yml`
+  - `src/lib/cloud/**` (solo como capa compartida de framing, no requiere cambio obligatorio en esta task)
 
 ## Current Repo State
 
