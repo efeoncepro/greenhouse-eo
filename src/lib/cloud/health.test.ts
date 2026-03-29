@@ -74,8 +74,12 @@ describe('getCloudPostureChecks', () => {
         summary: 'Observabilidad externa no configurada',
         sentry: {
           dsnConfigured: false,
+          clientDsnConfigured: false,
           authTokenConfigured: false,
-          enabled: false
+          orgConfigured: false,
+          projectConfigured: false,
+          enabled: false,
+          sourceMapsReady: false
         },
         slack: {
           alertsWebhookConfigured: false,
