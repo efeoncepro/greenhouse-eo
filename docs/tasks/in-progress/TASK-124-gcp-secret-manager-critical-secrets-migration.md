@@ -7,11 +7,11 @@
 - Validación real observada en `staging`:
   - `version=497cb19`
   - secretos críticos ya resueltos por `secret_manager`:
+    - `GREENHOUSE_POSTGRES_PASSWORD`
     - `NEXTAUTH_SECRET`
     - `AZURE_AD_CLIENT_SECRET`
     - `NUBOX_BEARER_TOKEN`
 - Estado residual observado:
-  - `GREENHOUSE_POSTGRES_PASSWORD` todavía reporta `source=env` en health
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen `unconfigured` en posture runtime de `staging`
   - `production` ya tiene secretos y `*_SECRET_REF` preparados, pero sigue pendiente validación después de promover a `main`
 

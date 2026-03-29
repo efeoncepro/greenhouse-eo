@@ -12,6 +12,7 @@
 
 - `TASK-124` ya salió del estado solo-repo y quedó validada en el entorno compartido `staging`.
 - `dev-greenhouse.efeoncepro.com/api/internal/health` sobre `version=497cb19` reportó:
+  - `GREENHOUSE_POSTGRES_PASSWORD` via `secret_manager`
   - `NEXTAUTH_SECRET` via `secret_manager`
   - `AZURE_AD_CLIENT_SECRET` via `secret_manager`
   - `NUBOX_BEARER_TOKEN` via `secret_manager`

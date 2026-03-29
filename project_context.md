@@ -6,11 +6,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-03-29 Secret Manager staged rollout on `develop/staging`
 - `develop` ya absorbió `TASK-124` en `497cb19`.
 - `staging` ya ejecuta ese commit y `/api/internal/health` confirmó resolución real por Secret Manager para:
+  - `GREENHOUSE_POSTGRES_PASSWORD`
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
   - `NUBOX_BEARER_TOKEN`
 - Estado transicional todavía explícito:
-  - `GREENHOUSE_POSTGRES_PASSWORD` sigue reportando `source=env` en posture runtime de `staging`
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en runtime `staging`
   - `production` ya tiene secretos nuevos y `*_SECRET_REF` cargados, pero falta validación real después de promover a `main`
 

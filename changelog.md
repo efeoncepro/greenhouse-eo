@@ -9,9 +9,8 @@
 
 ### TASK-124 promoted to `develop` and validated in `staging`
 - `develop` absorbió los tres slices de `TASK-124` en `497cb19` mediante una integración mínima desde `origin/develop`, sin arrastrar el resto de la branch auxiliar.
-- `staging` redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` validó runtime real con `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` resueltos por Secret Manager.
+- `staging` redeployó ese commit y `dev-greenhouse.efeoncepro.com/api/internal/health` validó runtime real con `GREENHOUSE_POSTGRES_PASSWORD`, `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` resueltos por Secret Manager.
 - El rollout quedó intencionalmente transicional:
-  - `GREENHOUSE_POSTGRES_PASSWORD` todavía aparece como `env` en posture runtime de `staging`
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen sin proyección runtime allí
   - `production` conserva los secretos y `*_SECRET_REF` preparados, pero su validación real queda pendiente hasta promover a `main`
 

@@ -24,8 +24,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Validación compartida en `staging`:
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió `200`
   - `version=497cb19`
-  - `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` reportan `source=secret_manager`
-  - `GREENHOUSE_POSTGRES_PASSWORD` sigue reportando `source=env`
+  - `GREENHOUSE_POSTGRES_PASSWORD`, `NEXTAUTH_SECRET`, `AZURE_AD_CLIENT_SECRET` y `NUBOX_BEARER_TOKEN` reportan `source=secret_manager`
 
 ### Pendiente inmediato
 - `production` sigue pendiente de validación real; no se promovió a `main` en esta sesión.
