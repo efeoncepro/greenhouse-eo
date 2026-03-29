@@ -21,6 +21,17 @@
   - los env vars legacy siguen existiendo por compatibilidad durante la transición
   - `production` ya tiene refs y secretos preparados, pero falta validación real tras promover a `main`
 
+## Delta 2026-03-29 — Slack alerts adopta `*_SECRET_REF` sin abrir un bigbang
+
+- `TASK-098` extendió el helper canónico a `SLACK_ALERTS_WEBHOOK_URL`.
+- Nuevo contrato operativo:
+  - `SLACK_ALERTS_WEBHOOK_URL`
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Esta decisión mantiene una postura proporcional:
+  - webhook de Slack sí puede vivir en Secret Manager
+  - `CRON_SECRET` sigue fuera por ahora porque su consumer principal es síncrono (`requireCronAuth()`)
+  - `SENTRY_AUTH_TOKEN` sigue fuera por ahora porque su consumer principal es build-time (`next.config.ts`)
+
 ## Delta 2026-03-29 — Health posture separa runtime de perfiles Postgres
 
 - `GET /api/internal/health` mantiene `postgres` como postura del runtime del portal.

@@ -10,9 +10,14 @@ import { getCloudSecretsPosture } from '@/lib/cloud/secrets'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const [runtimeHealth, secrets] = await Promise.all([getCloudPlatformHealthSnapshot(), getCloudSecretsPosture()])
+  const [runtimeHealth, secrets, observability] = await Promise.all([
+    getCloudPlatformHealthSnapshot(),
+    getCloudSecretsPosture(),
+    getCloudObservabilityPosture()
+  ])
+
   const auth = getCloudGcpAuthPosture()
-  const observability = getCloudObservabilityPosture()
+
   const postgres = getCloudPostgresPosture()
   const postgresAccessProfiles = getCloudPostgresAccessProfilesPosture(secrets)
 

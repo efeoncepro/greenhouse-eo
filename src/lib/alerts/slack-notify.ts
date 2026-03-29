@@ -1,6 +1,14 @@
 import 'server-only'
 
-const getSlackWebhookUrl = () => process.env.SLACK_ALERTS_WEBHOOK_URL?.trim() || null
+import { resolveSecret } from '@/lib/secrets/secret-manager'
+
+const getSlackWebhookUrl = async () => {
+  const resolution = await resolveSecret({
+    envVarName: 'SLACK_ALERTS_WEBHOOK_URL'
+  })
+
+  return resolution.value?.trim() || null
+}
 
 const toMessage = (error: unknown) => {
   if (error instanceof Error) return error.stack || error.message
@@ -9,7 +17,7 @@ const toMessage = (error: unknown) => {
 }
 
 export const sendSlackAlert = async (text: string) => {
-  const webhookUrl = getSlackWebhookUrl()
+  const webhookUrl = await getSlackWebhookUrl()
 
   if (!webhookUrl) return false
 

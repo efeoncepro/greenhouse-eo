@@ -26,6 +26,15 @@
 - Estado residual observado en `staging`:
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
 
+## Delta 2026-03-29 — Observability webhook secret ref baseline
+
+- `SLACK_ALERTS_WEBHOOK_URL` quedó alineado al patrón `Secret Manager -> env fallback`.
+- Variable nueva documentada para rollout por entorno:
+  - `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+- Alcance deliberadamente acotado:
+  - no cambia todavía `CRON_SECRET`
+  - no cambia `SENTRY_AUTH_TOKEN` en build
+
 ## Delta 2026-03-29 — Proxy baseline for security headers
 
 - `TASK-099` inició una capa `src/proxy.ts` para headers cross-cutting del portal.

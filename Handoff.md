@@ -4,6 +4,28 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 Secret Manager slice para Slack alerts
+
+### Completado
+- Se abrió `feature/codex-task-098-observability-secret-refs` desde `develop`.
+- `SLACK_ALERTS_WEBHOOK_URL` quedó alineado al helper canónico:
+  - valor legacy `SLACK_ALERTS_WEBHOOK_URL`
+  - ref opcional `SLACK_ALERTS_WEBHOOK_URL_SECRET_REF`
+  - resolución efectiva `Secret Manager -> env fallback`
+- `GET /api/internal/health` ahora refleja esta resolución real tanto en `observability` como en `secrets`.
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/alerts/slack-notify.test.ts src/lib/cloud/observability.test.ts src/lib/cloud/secrets.test.ts src/lib/cloud/health.test.ts`
+  - `pnpm exec eslint src/lib/alerts/slack-notify.ts src/lib/alerts/slack-notify.test.ts src/lib/cloud/observability.ts src/lib/cloud/observability.test.ts src/lib/cloud/secrets.ts src/lib/cloud/secrets.test.ts src/app/api/internal/health/route.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+
+### Decisión explícita
+- `CRON_SECRET` sigue `env-only`:
+  - moverlo a Secret Manager haría asíncrono `requireCronAuth()` y abriría un cambio transversal en múltiples routes
+- `SENTRY_AUTH_TOKEN` sigue `env-only`:
+  - hoy se consume en `next.config.ts` durante build
+- `SENTRY_DSN` también se deja fuera de este slice:
+  - el path client (`NEXT_PUBLIC_SENTRY_DSN`) lo vuelve config pública/operativa, no un secreto crítico prioritario
+
 ## Sesión 2026-03-29 — TASK-098 validada en `develop/staging`
 
 ### Completado
