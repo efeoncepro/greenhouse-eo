@@ -48,7 +48,9 @@
   - también se detectó drift de configuración/env mapping:
     - las variables del rollout WIF/conector ya fueron saneadas en `development`, `staging`, `production`, `preview/develop` y `preview/feature/codex-task-096-wif-baseline`
     - el preview activo ya quedó con baseline mínima de Postgres para validar el connector
-    - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 desde un deployment `preview` de `develop` (`version=7a2ecec`, `auth.mode=service_account_key`), no desde un target `staging` inequívoco
+    - `dev-greenhouse.efeoncepro.com` quedó confirmado como `target=staging`
+    - tras redeploy del staging activo, el entorno compartido respondió con `version=7a2ecec`, `auth.mode=mixed` y `usesConnector=true`
+    - eso deja explícito que staging ya tomó el connector y la configuración nueva, pero no aún el baseline WIF final de esta rama
 
 ## 1. Overview
 
