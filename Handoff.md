@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 retoma Sentry mínimo sobre branch dedicada
+
+### Completado
+- Se retomó `TASK-098` desde `feature/codex-task-098-sentry-resume` sobre una base donde `develop` ya absorbió el baseline de `TASK-098` y `TASK-099`.
+- Quedó reconstruido y validado el wiring mínimo de Sentry para App Router:
+  - `next.config.ts` con `withSentryConfig`
+  - `src/instrumentation.ts`
+  - `src/instrumentation-client.ts`
+  - `sentry.server.config.ts`
+  - `sentry.edge.config.ts`
+- La postura de observabilidad quedó endurecida para distinguir:
+  - DSN runtime total
+  - DSN público (`NEXT_PUBLIC_SENTRY_DSN`)
+  - auth token
+  - org/project
+  - readiness de source maps
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/cloud/health.test.ts`
+  - `pnpm exec eslint next.config.ts src/instrumentation.ts src/instrumentation-client.ts sentry.server.config.ts sentry.edge.config.ts src/lib/cloud/contracts.ts src/lib/cloud/observability.ts src/lib/cloud/observability.test.ts src/lib/cloud/health.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- Push de esta branch para obtener Preview Deployment y validar que `/api/internal/health` refleje la postura nueva de Sentry.
+- Solo después de esa verificación, decidir si este slice pasa a `develop`.
+
 ## Sesión 2026-03-29 — TASK-099 iniciada sobre `develop`
 
 ### Completado

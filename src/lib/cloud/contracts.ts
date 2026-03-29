@@ -84,8 +84,12 @@ export interface CloudObservabilityPosture {
   summary: string
   sentry: {
     dsnConfigured: boolean
+    clientDsnConfigured: boolean
     authTokenConfigured: boolean
+    orgConfigured: boolean
+    projectConfigured: boolean
     enabled: boolean
+    sourceMapsReady: boolean
   }
   slack: {
     alertsWebhookConfigured: boolean

@@ -1,5 +1,25 @@
 # TASK-098 — Observability MVP (Sentry + Health + Slack Alerts)
 
+## Delta 2026-03-29 — Slice 2 mínimo de Sentry en repo
+
+- `TASK-099` ya dejó la capa `src/proxy.ts` disponible, así que `TASK-098` retoma ahora su primer carril externo.
+- Se instaló `@sentry/nextjs` y quedó configurado el wiring mínimo y reversible para App Router:
+  - `next.config.ts` usa `withSentryConfig(...)`
+  - `src/instrumentation.ts`
+  - `src/instrumentation-client.ts`
+  - `sentry.server.config.ts`
+  - `sentry.edge.config.ts`
+- El runtime se mantiene fail-open:
+  - si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa
+  - no se exponen valores sensibles ni se cambia el contrato HTTP del portal
+- La postura de observabilidad ahora distingue mejor:
+  - runtime server/client
+  - readiness de source maps (`SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`)
+- Sigue fuera de este lote:
+  - wiring real de Slack alerts
+  - rollout de variables en Vercel
+  - validación preview/staging con eventos reales en dashboard Sentry
+
 ## Delta 2026-03-29 — Lane iniciada con posture de observabilidad
 
 - `TASK-098` pasa a `in-progress`.
@@ -52,10 +72,13 @@
   - `src/lib/cloud/observability.ts`
 - Variables documentadas en `.env.example`:
   - `SENTRY_DSN`
+  - `NEXT_PUBLIC_SENTRY_DSN`
   - `SENTRY_AUTH_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
   - `SLACK_ALERTS_WEBHOOK_URL`
 - Sigue pendiente:
-  - integración real de `@sentry/nextjs`
+  - validación externa de `@sentry/nextjs` en preview/staging
   - wiring real de Slack alerts en crons críticos
 
 ## Status

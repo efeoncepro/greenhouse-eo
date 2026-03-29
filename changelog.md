@@ -7,6 +7,12 @@
 
 ## 2026-03-29
 
+### TASK-098 Sentry minimal runtime baseline
+- Se instaló `@sentry/nextjs` y quedó cableado el wiring mínimo para App Router en `next.config.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`, `sentry.server.config.ts` y `sentry.edge.config.ts`.
+- El runtime queda fail-open: si no existe `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`, Sentry no inicializa.
+- La postura de observabilidad ahora distingue DSN runtime, DSN público, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` y readiness de source maps.
+- `pnpm build` ya pasa con esta base, sin tocar todavía Slack alerts ni el rollout externo en Vercel.
+
 ### TASK-099 security headers proxy baseline
 - Se creó `src/proxy.ts` con headers estáticos (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-DNS-Prefetch-Control`) para todo el runtime salvo `_next/*` y assets estáticos.
 - `Strict-Transport-Security` se aplica solo en `production`.
