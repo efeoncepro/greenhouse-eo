@@ -4,7 +4,7 @@ import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
 import type { CloudHealthSnapshot } from '@/lib/cloud/contracts'
 import { getCronSecretState } from '@/lib/cloud/cron'
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
-import { getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
+import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -462,11 +462,12 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     secretRefs = []
   }
 
-  const cloudHealth = await getCloudPlatformHealthSnapshot().catch<CloudHealthSnapshot>(() => ({
-    ok: false,
-    checks: [],
-    timestamp: new Date().toISOString()
-  }))
+  const cloudHealth = await getCloudPlatformHealthSnapshot().catch<CloudHealthSnapshot>(() =>
+    buildCloudHealthSnapshot({
+      runtimeChecks: [],
+      timestamp: new Date().toISOString()
+    })
+  )
 
   const cronState = getCronSecretState()
   const postgresConfig = getGreenhousePostgresConfig()
