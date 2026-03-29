@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-102 validación externa casi cerrada
+
+### Completado
+- Se confirmó postura real de `greenhouse-pg-dev` en GCP:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+  - `sslMode=ENCRYPTED_ONLY`
+- `pnpm pg:doctor --profile=runtime` y `pnpm pg:doctor --profile=migrator` pasaron por connector contra `greenhouse-pg-dev`.
+- Slow query logging ya quedó verificada con evidencia real en Cloud Logging:
+  - `duration: 1203.206 ms`
+  - `statement: SELECT pg_sleep(1.2)`
+- `staging` y `production` también quedaron revalidadas por `vercel curl /api/internal/health`:
+  - `postgres.status=ok`
+  - `usesConnector=true`
+  - `sslEnabled=true`
+  - `maxConnections=15`
+
+### Pendiente inmediato
+- El único remanente real de `TASK-102` ya es el restore test end-to-end.
+- Dos clones efímeros fueron creados y limpiados:
+  - `greenhouse-pg-restore-test-20260329b`
+  - `greenhouse-pg-restore-test-20260329c`
+- El primero se eliminó antes de completar la verificación SQL y el segundo quedó demasiado tiempo en `PENDING_CREATE`; por eso la task sigue abierta, pero ya no por drift de configuración.
+
 ## Sesión 2026-03-29 — TASK-099 cerrada con `CSP-Report-Only`
 
 ### Completado

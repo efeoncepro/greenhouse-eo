@@ -1,5 +1,28 @@
 # TASK-102 — Database Resilience Baseline
 
+## Delta 2026-03-29 — Validación externa cerrada salvo restore
+
+- Validación real confirmada en esta sesión:
+  - `gcloud logging read` sobre `cloudsql.googleapis.com/postgres.log` devolvió una slow query real:
+    - `duration: 1203.206 ms`
+    - `statement: SELECT pg_sleep(1.2)`
+  - `vercel curl /api/internal/health --deployment https://dev-greenhouse.efeoncepro.com` confirmó:
+    - `postgres.status=ok`
+    - `usesConnector=true`
+    - `sslEnabled=true`
+    - `maxConnections=15`
+    - `version=51fb55d`
+  - `vercel curl /api/internal/health --deployment https://greenhouse.efeoncepro.com` confirmó:
+    - `postgres.status=ok`
+    - `usesConnector=true`
+    - `sslEnabled=true`
+    - `maxConnections=15`
+    - `version=272dd8d`
+- Restore test sigue pendiente, pero ahora el remanente quedó acotado:
+  - clone `greenhouse-pg-restore-test-20260329b` llegó a `RUNNABLE` y fue eliminado sin dejar residuos antes de completar la verificación SQL
+  - clone `greenhouse-pg-restore-test-20260329c` quedó demasiado tiempo en `PENDING_CREATE` y también fue eliminado para no dejar infraestructura efímera colgada
+  - por lo tanto, el único blocker real restante de `TASK-102` ya no es configuración ni runtime, sino completar una ventana limpia de restore verification end-to-end
+
 ## Delta 2026-03-29
 
 - La capa Cloud ya expone postura runtime de Postgres en `src/lib/cloud/postgres.ts`.
@@ -27,7 +50,7 @@
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Implementación` |
+| Status real | `Validación avanzada` |
 | Rank | — |
 | Domain | Infrastructure / Database |
 | Sequence | Cloud Posture Hardening **5 of 6** — after TASK-096 Fase 1, connects to TASK-098 |
@@ -59,10 +82,10 @@ Cloud SQL `greenhouse-pg-dev` es el OLTP store de Greenhouse — payroll, compen
 |---------|--------|--------|
 | Backup automático | Diario a las 07:00 UTC, 7 días retención | Si corrupción a las 06:59, se pierde ~24h de datos |
 | PITR | **Deshabilitado** | No hay recovery granular (solo snapshots diarios) |
-| Slow query logging | **Deshabilitado** | Queries lentas son invisibles |
-| Connection pool | **5 conexiones** | Vercel serverless puede agotar el pool bajo carga |
+| Slow query logging | **Habilitado y verificado** | Señal visible en Cloud Logging |
+| Connection pool | **15 conexiones** | Headroom alineado al patrón serverless actual |
 | Read replica | No existe | Single point of failure |
-| Restore testeado | **Nunca** | No hay certeza de que el backup funcione |
+| Restore testeado | **Pendiente** | No hay evidencia final documentada del clone + verificación SQL |
 
 ## Goal
 
@@ -196,12 +219,12 @@ pool = new Pool({
 - [x] PITR habilitado con 7 días de retention de WAL logs
 - [x] `log_min_duration_statement=1000` activo (queries >1s logeadas)
 - [x] `log_statement=ddl` activo (cambios de schema auditados)
-- [ ] Slow queries visibles en Cloud Logging
+- [x] Slow queries visibles en Cloud Logging
 - [x] `GREENHOUSE_POSTGRES_MAX_CONNECTIONS=15` configurado en Vercel
 - [ ] Restore de backup testeado exitosamente (clone + verificación)
 - [ ] Resultado del restore documentado
 - [ ] Instancia de test eliminada post-verificación
-- [ ] Production y staging funcionan correctamente post-cambios
+- [x] Production y staging funcionan correctamente post-cambios
 
 ## Verification
 

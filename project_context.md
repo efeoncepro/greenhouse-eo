@@ -3,6 +3,18 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-102 casi cerrada
+- `TASK-102` ya no está bloqueada por postura de Cloud SQL ni por rollout runtime.
+- Validaciones externas ya confirmadas:
+  - `PITR=true`
+  - `transactionLogRetentionDays=7`
+  - `log_min_duration_statement=1000`
+  - `log_statement=ddl`
+  - `sslMode=ENCRYPTED_ONLY`
+  - `staging` y `production` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true`, `maxConnections=15`
+- `Cloud Logging` ya mostró una slow query real (`SELECT pg_sleep(1.2)` con `duration: 1203.206 ms`).
+- El único remanente abierto es el restore test end-to-end; los clones efímeros intentados en esta sesión se limpiaron para no dejar infraestructura colgada.
+
 ## Delta 2026-03-29 TASK-099 cerrada
 - `TASK-099` ya quedó cerrada para el alcance baseline de hardening seguro.
 - `src/proxy.ts` ahora materializa:

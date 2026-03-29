@@ -7,6 +7,12 @@
 
 ## 2026-03-29
 
+### TASK-102 external validation narrowed the remaining gap
+- Se confirmó en GCP la postura activa de `greenhouse-pg-dev`: `PITR`, WAL retention, `log_min_duration_statement=1000`, `log_statement=ddl` y `sslMode=ENCRYPTED_ONLY`.
+- `staging` y `production` respondieron por `vercel curl /api/internal/health` con `postgres.status=ok`, `usesConnector=true`, `sslEnabled=true` y `maxConnections=15`.
+- Cloud Logging ya mostró una slow query real con `duration: 1203.206 ms` para `SELECT pg_sleep(1.2)`.
+- `TASK-102` sigue abierta solo por el restore test end-to-end; los clones efímeros intentados en esta sesión se limpiaron para no dejar infraestructura temporal viva.
+
 ### TASK-099 closed with CSP report-only baseline
 - `src/proxy.ts` ahora suma `Content-Security-Policy-Report-Only` sobre la baseline previa de security headers.
 - `pnpm exec vitest run src/proxy.test.ts`, `eslint`, `tsc --noEmit` y `pnpm build` pasaron con el nuevo header.
