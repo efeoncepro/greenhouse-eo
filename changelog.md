@@ -7,6 +7,13 @@
 
 ## 2026-03-29
 
+### TASK-096 closed after WIF + Cloud SQL hardening
+- `TASK-096` queda cerrada para el alcance declarado:
+  - baseline WIF-aware en repo
+  - rollout WIF validado en `preview`, `staging` y `production`
+  - hardening externo de Cloud SQL aplicado
+- La Fase 3 de secretos críticos quedó absorbida posteriormente por `TASK-124`.
+
 ### TASK-098 observability MVP closed in production
 - `main` absorbió `develop` en `bcbd0c3` y `production` quedó validada con `observability=ok`.
 - `GET /api/internal/health` ya reporta en producción:

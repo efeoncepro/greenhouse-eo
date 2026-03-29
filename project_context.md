@@ -215,6 +215,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `getOperationsOverview()` ahora refleja también la postura de auth GCP y la postura de Cloud SQL, no solo reachability y cost guard.
 - Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
 
+## Delta 2026-03-29 TASK-096 cerrada
+- `TASK-096` ya quedó cerrada para su alcance útil.
+- Estado consolidado:
+  - WIF/OIDC validado en `preview`, `staging` y `production`
+  - Cloud SQL externo endurecido
+  - Fase 3 de Secret Manager absorbida y cerrada por `TASK-124`
+
 ## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
 - `TASK-096` quedó iniciada en el repo con baseline real en código; esta sesión trabajó sobre el estado actual de `develop`.
 - El repo ahora resuelve autenticación GCP con un contrato explícito en `src/lib/google-credentials.ts`:

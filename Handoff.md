@@ -4,6 +4,16 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-096 cerrada
+
+### Completado
+- `TASK-096` deja de seguir `in-progress` y pasa a `complete`.
+- Razón de cierre:
+  - baseline WIF-aware ya validada en `preview`, `staging` y `production`
+  - hardening externo de Cloud SQL ya aplicado
+  - la Fase 3 de Secret Manager ya quedó absorbida y cerrada por `TASK-124`
+- La task queda como referencia histórica del track cloud, no como lane activa.
+
 ## Sesión 2026-03-29 — TASK-098 cerrada en `production`
 
 ### Completado
