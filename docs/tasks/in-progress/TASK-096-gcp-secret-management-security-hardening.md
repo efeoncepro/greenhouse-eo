@@ -55,9 +55,9 @@
     - Cloud SQL reachable vía connector
 - Drift detectado durante la validación:
   - `vercel env pull` devolvió algunos valores con sufijo literal `\n`
-  - ese drift afecta al menos `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` y credenciales Postgres en la extracción local
+  - ese drift ya fue saneado en los targets activos del rollout WIF/conector
   - `dev-greenhouse.efeoncepro.com/api/internal/health` respondió el 2026-03-29 como preview de `develop` con `auth.mode=service_account_key`, no como `staging` inequívoco
-  - no se endurece Cloud SQL hasta corregir ese drift en Vercel y revalidar el entorno compartido
+  - no se endurece Cloud SQL hasta aclarar/revalidar el entorno compartido
 
 ## Status
 

@@ -14,7 +14,8 @@
 - El helper ahora también obtiene el token OIDC desde runtime Vercel con `@vercel/oidc`, habilitando WIF real sin depender solo de `process.env`.
 - El rollout externo quedó parcialmente materializado: pool/provider WIF en GCP, env vars en Vercel y smoke exitoso de BigQuery + Cloud SQL Connector sin SA key.
 - El preview real de `feature/codex-task-096-wif-baseline` quedó validado con health `200 OK`, `auth.mode=wif` y Cloud SQL reachable vía connector.
-- Cloud SQL sigue sin endurecimiento externo final porque primero hay que limpiar un drift detectado en variables Vercel con sufijos literales `\n` y corregir la ambigüedad actual del alias compartido `dev-greenhouse.efeoncepro.com`.
+- Las variables activas del rollout WIF/conector ya fueron saneadas en Vercel; el bloqueo remanente es la ambigüedad actual del alias compartido `dev-greenhouse.efeoncepro.com`.
+- Cloud SQL sigue sin endurecimiento externo final porque primero hay que validar ese entorno compartido con WIF + connector y solo después cerrar red + SSL obligatoria.
 
 ### Nexa chat visual redesign — Enterprise AI 2025
 - User messages: burbuja azul solida reemplazada por fondo sutil `action.hover` con texto oscuro legible y border-radius refinado (12px).
