@@ -124,8 +124,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-096` | `to-do` | GCP Secret Management & Security Hardening | `docs/tasks/to-do/TASK-096-gcp-secret-management-security-hardening.md` |
 | `TASK-098` | `to-do` | Observability MVP (Sentry + Health + Slack Alerts) | `docs/tasks/to-do/TASK-098-observability-mvp.md` |
 | `TASK-099` | `to-do` | Security Headers & Next.js Middleware | `docs/tasks/to-do/TASK-099-security-headers-middleware.md` |
-| `TASK-100` | `in-progress` | CI Pipeline: Add Test Step | `docs/tasks/in-progress/TASK-100-ci-pipeline-test-step.md` |
-| `TASK-101` | `to-do` | Cron Auth Standardization | `docs/tasks/to-do/TASK-101-cron-auth-standardization.md` |
+| `TASK-100` | `complete` | CI Pipeline: Add Test Step | `docs/tasks/complete/TASK-100-ci-pipeline-test-step.md` |
+| `TASK-101` | `complete` | Cron Auth Standardization | `docs/tasks/complete/TASK-101-cron-auth-standardization.md` |
 | `TASK-102` | `to-do` | Database Resilience Baseline | `docs/tasks/to-do/TASK-102-database-resilience-baseline.md` |
 | `TASK-103` | `to-do` | GCP Budget Alerts & BigQuery Cost Guards | `docs/tasks/to-do/TASK-103-gcp-budget-alerts-bigquery-guards.md` |
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |

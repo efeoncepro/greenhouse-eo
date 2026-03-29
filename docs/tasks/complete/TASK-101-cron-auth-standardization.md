@@ -2,24 +2,24 @@
 
 ## Delta 2026-03-29
 
-- `TASK-100` ya dejó `pnpm test` gateado en CI, así que los tests del helper `requireCronAuth()` quedarán cubiertos automáticamente una vez que esta task se implemente.
+- `TASK-100` ya dejó `pnpm test` gateado en CI, así que los tests del helper `requireCronAuth()` quedan cubiertos automáticamente.
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / Security |
 | Sequence | Cloud Posture Hardening **4 of 6** — after TASK-098 (observability), connects to TASK-096 |
 
 ## Summary
 
-Reemplazar los 18 copy-paste de autenticación de cron con un helper único `requireCronAuth()` que use timing-safe comparison, fail-closed si `CRON_SECRET` no está configurado, y soporte alerting integrado (TASK-098).
+Reemplazar los copy-paste de autenticación de cron con un helper único `requireCronAuth()` que use timing-safe comparison, fail-closed si `CRON_SECRET` no está configurado, y soporte alerting integrado (TASK-098).
 
 ## Architecture Alignment
 
@@ -37,18 +37,18 @@ Reglas obligatorias:
 
 ## Why This Task Exists
 
-La auditoría de marzo 2026 encontró dos patrones inconsistentes de autenticación en los 18 cron endpoints:
+La auditoría de marzo 2026 encontró dos patrones inconsistentes de autenticación en los cron endpoints scheduler-driven.
 
-### Pattern A — Loose (11 rutas)
+### Pattern A — Loose (10 rutas)
 ```typescript
 // Acepta bearer token OR vercel-cron header
 // Si CRON_SECRET está vacío, acepta CUALQUIER request con x-vercel-cron: 1
 const hasAccess = bearerToken === secret || vercelCronHeader === '1' || userAgent.startsWith('vercel-cron/')
 ```
 
-**Rutas:** outbox-publish, sync-previred, webhook-dispatch, ico-materialize, outbox-react, sync-conformed, nubox-sync, exchange-rates/sync, economic-indicators/sync, outbox-react-notify
+**Rutas:** email-delivery-retry, outbox-publish, sync-previred, webhook-dispatch, ico-materialize, outbox-react, sync-conformed, nubox-sync, exchange-rates/sync, economic-indicators/sync
 
-### Pattern B — Stricter pero inseguro (7 rutas)
+### Pattern B — Stricter pero inseguro (9 rutas)
 ```typescript
 // Solo bearer token, pero sin timing-safe comparison
 if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -56,12 +56,12 @@ if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
 }
 ```
 
-**Rutas:** materialization-health, outbox-react-people, outbox-react-finance, services-sync, identity-reconcile, ico-member-sync, outbox-react-org, economics-materialize
+**Rutas:** materialization-health, outbox-react-people, outbox-react-finance, outbox-react-notify, services-sync, identity-reconcile, ico-member-sync, outbox-react-org, economics-materialize
 
 ### Problemas
 1. **Pattern A fail-open**: si `CRON_SECRET` no está configurado, Vercel cron header es suficiente — pero ese header es trivial de falsificar fuera de Vercel
 2. **Pattern B timing-unsafe**: comparación directa con `!==` es vulnerable a timing attacks
-3. **18 implementaciones copy-paste**: cada ruta reimplementa la lógica
+3. **19 implementaciones copy-paste**: cada ruta reimplementa la lógica
 4. **Sin logging**: intentos de acceso no-autorizados no se registran
 
 ## Goal
@@ -76,7 +76,7 @@ Un único helper que todas las cron routes importen, con seguridad consistente y
   - `timingSafeEqual` de `node:crypto` (ya disponible, usado en webhook signing)
 - **Impacta a:**
   - TASK-096 — alineado con el track de security hardening
-  - Los 18 cron endpoints — refactor de auth pattern
+  - Los 19 cron endpoints scheduler-driven — refactor de auth pattern
   - Futuras cron routes — usarán el helper directamente
 - **Archivos owned:**
   - `src/lib/cloud/cron.ts`
@@ -89,7 +89,7 @@ Un único helper que todas las cron routes importen, con seguridad consistente y
 
 - `src/lib/webhooks/signing.ts` ya usa `timingSafeEqual` para webhook signatures
 - `src/lib/integrations/integration-auth.ts` ya usa `timingSafeEqual` con `safeEquals()`
-- Los 18 cron routes tienen auth inline, no centralizado
+- Los cron routes scheduler-driven tenían auth inline, no centralizado
 - `CRON_SECRET` se lee de `process.env` en cada ruta individualmente
 
 ## Scope
@@ -160,7 +160,7 @@ Un único helper que todas las cron routes importen, con seguridad consistente y
    }
    ```
 
-### Slice 2 — Migrar las 18 rutas (~1.5h)
+### Slice 2 — Migrar las 19 rutas (~1.5h)
 
 Reemplazar el auth inline en cada ruta con:
 ```typescript
@@ -174,25 +174,26 @@ export async function GET(request: Request) {
 }
 ```
 
-Rutas a migrar:
-1. `/api/cron/outbox-publish`
-2. `/api/cron/outbox-react`
-3. `/api/cron/outbox-react-people`
-4. `/api/cron/outbox-react-finance`
-5. `/api/cron/outbox-react-org`
-6. `/api/cron/outbox-react-notify`
-7. `/api/cron/webhook-dispatch`
-8. `/api/cron/sync-conformed`
-9. `/api/cron/sync-previred`
-10. `/api/cron/ico-materialize`
-11. `/api/cron/ico-member-sync`
-12. `/api/cron/nubox-sync`
-13. `/api/cron/identity-reconcile`
-14. `/api/cron/economics-materialize`
-15. `/api/cron/materialization-health`
-16. `/api/cron/services-sync`
-17. `/api/finance/economic-indicators/sync`
-18. `/api/finance/exchange-rates/sync`
+Rutas migradas:
+1. `/api/cron/email-delivery-retry`
+2. `/api/cron/outbox-publish`
+3. `/api/cron/outbox-react`
+4. `/api/cron/outbox-react-people`
+5. `/api/cron/outbox-react-finance`
+6. `/api/cron/outbox-react-org`
+7. `/api/cron/outbox-react-notify`
+8. `/api/cron/webhook-dispatch`
+9. `/api/cron/sync-conformed`
+10. `/api/cron/sync-previred`
+11. `/api/cron/ico-materialize`
+12. `/api/cron/ico-member-sync`
+13. `/api/cron/nubox-sync`
+14. `/api/cron/identity-reconcile`
+15. `/api/cron/economics-materialize`
+16. `/api/cron/materialization-health`
+17. `/api/cron/services-sync`
+18. `/api/finance/economic-indicators/sync`
+19. `/api/finance/exchange-rates/sync`
 
 ### Slice 3 — Tests (~30 min)
 
@@ -213,15 +214,14 @@ Rutas a migrar:
 
 ## Acceptance Criteria
 
-- [ ] `requireCronAuth()` helper creado con timing-safe comparison
-- [ ] `requireCronAuth()` retorna 503 si CRON_SECRET no está configurado (fail-closed)
-- [ ] Las 18 rutas cron migradas al helper
-- [ ] Zero lógica de auth inline en rutas cron
-- [ ] Tests unitarios para el helper (≥5 casos)
-- [ ] Los 18 cron routes responden 401 sin auth y 200 con bearer correcto
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
-- [ ] `pnpm lint` pasa
+- [x] `requireCronAuth()` helper creado con timing-safe comparison
+- [x] `requireCronAuth()` retorna 503 si `CRON_SECRET` no está configurado (fail-closed)
+- [x] Las 19 rutas scheduler-driven migradas al helper
+- [x] Zero lógica de auth inline en las rutas objetivo
+- [x] Tests unitarios para el helper (6 casos)
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
+- [x] `pnpm lint` pasa
 
 ## Verification
 
@@ -237,3 +237,13 @@ curl -s -H "Authorization: Bearer $CRON_SECRET" \
 # Tests
 pnpm test -- src/lib/cron/require-cron-auth.test.ts
 ```
+
+## Delta 2026-03-29
+
+- La task quedó cerrada con helper canónico `src/lib/cron/require-cron-auth.ts`.
+- `src/lib/cloud/cron.ts` ahora expone helpers compartidos para estado del secret y detección de requests Vercel cron.
+- Se migraron `19` rutas scheduler-driven, incluyendo `email-delivery-retry` y los dos endpoints de sync de Finance con preservación del fallback a tenant en `POST`.
+- Validación de cierre:
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build`

@@ -7,24 +7,11 @@ import {
   syncEconomicIndicatorsHistory,
   type EconomicIndicatorCode
 } from '@/lib/finance/economic-indicators'
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { assertDateString, FinanceValidationError, normalizeString } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
-
-const hasInternalSyncAccess = (request: Request) => {
-  const configuredSecret = normalizeString(process.env.CRON_SECRET)
-  const authHeader = normalizeString(request.headers.get('authorization'))
-  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : ''
-  const vercelCronHeader = normalizeString(request.headers.get('x-vercel-cron'))
-  const userAgent = normalizeString(request.headers.get('user-agent'))
-
-  if (configuredSecret && bearerToken && bearerToken === configuredSecret) {
-    return true
-  }
-
-  return vercelCronHeader === '1' || userAgent.startsWith('vercel-cron/')
-}
 
 const parseIndicatorCodes = (value: string | null): EconomicIndicatorCode[] => {
   const normalized = normalizeString(value)
@@ -41,8 +28,10 @@ const parseIndicatorCodes = (value: string | null): EconomicIndicatorCode[] => {
 
 export async function GET(request: Request) {
   try {
-    if (!hasInternalSyncAccess(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const { authorized, errorResponse } = requireCronAuth(request)
+
+    if (!authorized) {
+      return errorResponse
     }
 
     const { searchParams } = new URL(request.url)
@@ -85,11 +74,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    if (!hasInternalSyncAccess(request)) {
-      const { tenant, errorResponse } = await requireFinanceTenantContext()
+    const { authorized } = requireCronAuth(request)
+
+    if (!authorized) {
+      const { tenant, errorResponse: tenantErrorResponse } = await requireFinanceTenantContext()
 
       if (!tenant) {
-        return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        return tenantErrorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
     }
 

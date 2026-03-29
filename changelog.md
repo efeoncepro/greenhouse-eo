@@ -12,6 +12,12 @@
 - La suite actual entra limpia al pipeline con `99` archivos y `488` pruebas verdes en validación local previa.
 - El control queda institucionalizado en repo dentro de `.github/workflows/ci.yml`, alineado con el dominio Cloud como guardrail de delivery validation.
 
+### Cron auth centralizada para rutas scheduler-driven
+- Se creó `src/lib/cron/require-cron-auth.ts` como helper canónico con `timingSafeEqual`, fail-closed cuando falta `CRON_SECRET` y soporte reusable para requests de Vercel cron.
+- `src/lib/cloud/cron.ts` ahora expone helpers compartidos para postura del secret y detección del origen scheduler.
+- Se migraron `19` rutas scheduler-driven, incluyendo `email-delivery-retry` y los sync endpoints de Finance, eliminando la auth inline inconsistente.
+- El lote quedó validado con `pnpm lint`, `pnpm test` y `pnpm build`.
+
 ### Nexa UI completion (TASK-115)
 - Edit inline de mensajes user con ComposerPrimitive (pencil hover → EditComposer → Guardar/Cancelar).
 - Follow-up suggestions como chips clicables + feedback thumbs 👍/👎 fire-and-forget.

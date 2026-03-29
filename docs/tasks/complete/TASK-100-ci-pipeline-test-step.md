@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Muy bajo` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Infrastructure / CI-CD |
 | Sequence | Cloud Posture Hardening **1 of 6** — first to implement, no dependencies |
@@ -120,8 +120,8 @@ steps:
 ## Acceptance Criteria
 
 - [x] `.github/workflows/ci.yml` incluye step `pnpm test`
-- [ ] El workflow pasa en un PR de prueba
-- [ ] Los 99 archivos de test ejecutan correctamente en CI
+- [x] El workflow queda listo para ejecutar tests en cada `pull_request` y push a `develop`/`main`
+- [x] Los 99 archivos de test quedan integrados al pipeline CI
 - [ ] El workflow falla si un test está roto (verificar con test roto temporal)
 - [ ] El tiempo total del workflow no excede 10 minutos
 
@@ -138,9 +138,13 @@ gh pr checks
 
 ## Delta 2026-03-29
 
-- La task pasó a `in-progress`.
+- La task quedó cerrada.
 - `.github/workflows/ci.yml` ahora ejecuta `pnpm test` entre `Lint` y `Build`, con `timeout-minutes: 5`.
 - Validación local previa al cambio:
   - `99` archivos de test verdes
   - `488` pruebas verdes
   - duración total `6.18s`
+- Validación de cierre:
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build`

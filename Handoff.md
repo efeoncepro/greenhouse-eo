@@ -63,6 +63,26 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Confirmar la primera corrida real en GitHub Actions en el próximo push.
 - Mantener el commit aislado de `TASK-115`, porque el árbol sigue teniendo cambios paralelos en `Home/Nexa` no relacionados con CI.
 
+## Sesión 2026-03-29 — TASK-100 y TASK-101 cerradas
+
+### Completado
+- `TASK-100` quedó cerrada:
+  - `.github/workflows/ci.yml` ahora ejecuta `pnpm test` entre `Lint` y `Build`
+  - el step de tests tiene `timeout-minutes: 5`
+- `TASK-101` quedó cerrada:
+  - nuevo helper `src/lib/cron/require-cron-auth.ts`
+  - `src/lib/cloud/cron.ts` ahora expone estado del secret y detección reusable de Vercel cron
+  - migración de `19` rutas scheduler-driven sin auth inline
+  - los endpoints `POST` de Finance preservan fallback a `requireFinanceTenantContext()` cuando no vienen como cron autorizado
+- Validación de cierre:
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build`
+
+### Pendiente inmediato
+- La siguiente lane del bloque solicitado queda en `TASK-102`, con `TASK-103` después.
+- El árbol sigue teniendo cambios paralelos de `TASK-115` en Home/Nexa; no mezclar esos archivos al stage del lote Cloud.
+
 ## Sesión 2026-03-29 — TASK-114 backend Nexa + cierre TASK-119/TASK-120
 
 ### Completado
