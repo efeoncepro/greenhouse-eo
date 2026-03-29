@@ -9,10 +9,47 @@
   - Se notifica a Slack vía `sendSlackAlert()` (fire-and-forget)
 - Admin Center > Cloud & Integrations ahora muestra tabla de queries bloqueadas con snippet, límite y timestamp.
 - `get-operations-overview.ts` expone `blockedQueries` en el payload de `cloud.bigquery`.
-- Sigue pendiente:
-  - Slice 1: Budget alerts en GCP Billing Console (manual)
+- Sigue pendiente (trabajo manual en GCP Console, no requiere código):
+  - Slice 1: Budget alerts en GCP Billing Console
   - Slice 3: Verificar gasto actual y ajustar budgets
   - Slice 4b/4c: Email a admins y notificación in-app (dependen de budget alerts configurados)
+
+### Pendiente manual — Runbook para completar desde GCP Console
+
+#### Paso 1 — Crear budget general
+
+1. GCP Console → Billing → Budgets & Alerts → **Create Budget**
+2. Budget name: `Greenhouse Monthly`
+3. Scope: Project `efeonce-group`
+4. Amount: `$200 USD/mes` (ajustar según resultado del paso 3)
+5. Thresholds: `50%`, `80%`, `100%`
+6. Notification: email del billing admin
+7. Opcional: agregar Slack webhook como notification channel en Cloud Monitoring
+
+#### Paso 2 — Crear budget BigQuery
+
+1. Mismo flujo, Budget name: `BigQuery Monthly`
+2. Scope: Service = `BigQuery`
+3. Amount: `$50 USD/mes` (ajustar según resultado del paso 3)
+4. Thresholds: `50%`, `80%`, `100%`
+
+#### Paso 3 — Verificar gasto actual y calibrar
+
+1. GCP Console → Billing → Reports
+2. Filtrar último mes completo, agrupar por servicio
+3. Anotar top 3 servicios por costo
+4. Si el gasto real es muy diferente a $200/$50, ajustar los budgets del paso 1 y 2
+5. Documentar el baseline en este archivo como delta
+
+#### Paso 4 — Conectar budget alerts a Slack (opcional, recomendado)
+
+1. GCP Console → Monitoring → Notification Channels → Add Slack
+2. O bien: crear Pub/Sub topic como destino del budget alert + Cloud Function liviana que llame a `SLACK_ALERTS_WEBHOOK_URL`
+3. La alternativa más simple: configurar el webhook de Slack directamente como notification channel en Cloud Monitoring
+
+#### Paso 5 — Email a admins del portal (futuro)
+
+Depende de que los budgets estén creados. Usa la capa de email delivery (`src/lib/email/`) para notificar cuando un threshold se cruza. Requiere un receptor (Cloud Function o webhook endpoint) que traduzca la alerta de GCP a una llamada al API de email de Greenhouse.
 
 ## Delta 2026-03-29
 
