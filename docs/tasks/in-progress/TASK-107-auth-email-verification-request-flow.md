@@ -1,5 +1,10 @@
 # TASK-107 — Invitation & Verification: UI, Email Redesign, Verify Flow
 
+## Delta 2026-03-29 (segunda pasada)
+
+- **SSO-aware movido de FU-2 a scope principal**: algunos clientes ya usan Google o Microsoft SSO para iniciar sesión, así que el flujo de invitación debe detectar esto y adaptar el email + accept page.
+- Bug encontrado: `POST /api/admin/invite` hardcodea `auth_mode = 'credentials'` para todos — debe detectar si el dominio del email tiene SSO habilitado (`allowed_email_domains`) y setear `auth_mode = 'sso'` en ese caso.
+
 ## Delta 2026-03-29
 
 - Scope extendido: además del verify-email request endpoint, ahora incluye:
@@ -8,6 +13,7 @@
   - Reenvío y estado visible de invitaciones
   - Página de token expirado
   - Post-activación con auto-login
+  - SSO-aware: detección de dominio SSO, email diferenciado, accept page adaptada
   - El backend de invitación (`POST /api/admin/invite`) ya existe y está funcional
 
 ## Status
@@ -144,7 +150,23 @@ Cerrar el flujo completo de invitación y verificación end-to-end:
 
 **Archivo:** `src/app/(blank-layout-pages)/auth/accept-invite/page.tsx`
 
-### Slice 6 — Verify-email request endpoint
+### Slice 6 — SSO-aware invitation flow
+
+| Item | Detalle |
+|------|---------|
+| Detección | Al invitar, consultar si el dominio del email existe en `allowed_email_domains` de algún client activo en Postgres |
+| auth_mode | Si dominio tiene SSO → `auth_mode = 'sso'`. Si no → `auth_mode = 'credentials'`. Si el usuario ya tiene password → `auth_mode = 'both'` |
+| Email diferenciado | Si SSO: heading "Accede a Greenhouse", CTA "Iniciar sesion con SSO", texto "Usa tu cuenta corporativa de Google/Microsoft". Si credentials: heading "Bienvenido a Greenhouse", CTA "Activar mi cuenta" |
+| Accept page | Si el token es de un usuario SSO (`auth_mode = 'sso'`), no mostrar form de password → mostrar botón "Iniciar sesion con Google/Microsoft" que redirige a `/api/auth/signin` |
+| Backend fix | `POST /api/admin/invite` deja de hardcodear `'credentials'` y consulta el dominio |
+
+**Archivos:**
+- `src/app/api/admin/invite/route.ts` — detección de SSO domain
+- `src/emails/InvitationEmail.tsx` — variante SSO del contenido
+- `src/app/(blank-layout-pages)/auth/accept-invite/page.tsx` — variante SSO de accept
+- `src/lib/email/templates.ts` — prop `isSso` en el context
+
+### Slice 7 — Verify-email request endpoint
 
 | Item | Detalle |
 |------|---------|
@@ -156,14 +178,15 @@ Cerrar el flujo completo de invitación y verificación end-to-end:
 
 **Archivo nuevo:** `src/app/api/auth/verify-email/route.ts`
 
-### Slice 7 — Tests
+### Slice 8 — Tests
 
 | Item | Detalle |
 |------|---------|
 | Invite flow | Test del endpoint `/api/admin/invite` (mock de DB + email) |
+| SSO detection | Test de detección de dominio SSO en invite endpoint |
 | Resend flow | Test del endpoint `/api/admin/invite/resend` |
 | Verify request | Test del endpoint `/api/auth/verify-email` |
-| Email template | Snapshot test de `InvitationEmail` rediseñado |
+| Email template | Snapshot test de `InvitationEmail` (variantes credentials y SSO) |
 
 ## Follow-up — Documentado para después
 
@@ -175,13 +198,7 @@ Estos items quedan documentados pero fuera del scope de TASK-107. Deben crearse 
 - **Dónde:** Nuevo dialog o tab dentro del dialog de invitación
 - **Esfuerzo estimado:** Medio
 
-### FU-2 — SSO-aware invitation flow
-- **Qué:** Si el email del invitado corresponde a un dominio con SSO configurado (Microsoft/Google), el email de invitación debería decir "Inicia sesión con tu cuenta corporativa" en vez de "Crea tu contraseña", y el accept flow debería skipear la creación de password
-- **Cuándo:** Cuando se habilite SSO para clientes (hoy solo Efeonce internos usan SSO)
-- **Dónde:** `InvitationEmail.tsx` + `/auth/accept-invite` + `/api/admin/invite`
-- **Esfuerzo estimado:** Medio
-
-### FU-3 — Notificación al admin cuando la invitación es aceptada
+### FU-2 — Notificación al admin cuando la invitación es aceptada
 - **Qué:** El admin que invitó recibe un email o notificación in-app cuando el usuario acepta y activa su cuenta
 - **Cuándo:** Cuando la capa de notificaciones in-app exista (hoy solo hay email delivery)
 - **Dónde:** Hook en `/api/account/accept-invite` que emita un evento `identity.invitation.accepted` al outbox
@@ -231,11 +248,10 @@ Estos items quedan documentados pero fuera del scope de TASK-107. Deben crearse 
 ## Out of Scope
 
 - Invitaciones masivas (CSV) → FU-1
-- SSO-aware invitation → FU-2
-- Notificación al admin cuando aceptan → FU-3
-- Audit trail dedicado → FU-4
-- Revocación de invitación → FU-5
-- Onboarding post-primera-sesión → FU-6
+- Notificación al admin cuando aceptan → FU-2
+- Audit trail dedicado → FU-3
+- Revocación de invitación → FU-4
+- Onboarding post-primera-sesión → FU-5
 - Rediseñar la capa de Auth completa
 - Analytics de apertura/click en emails
 
@@ -249,8 +265,10 @@ Estos items quedan documentados pero fuera del scope de TASK-107. Deben crearse 
 - [ ] Estado visible: fecha de envío y "expira en Xh" o "expirado" en tabla de usuarios
 - [ ] Token expirado muestra página dedicada con mensaje claro y CTA a login
 - [ ] Post-activación hace auto-login y redirige a la landing correcta
+- [ ] SSO detection: invite con dominio SSO setea `auth_mode = 'sso'` y email muestra CTA de SSO
+- [ ] Accept page SSO: muestra botón "Iniciar sesion con SSO" en vez de form de password
 - [ ] `POST /api/auth/verify-email` genera token + envía correo con rate limit
-- [ ] Tests cubren invite, resend y verify flows
+- [ ] Tests cubren invite (credentials + SSO), resend y verify flows
 - [ ] `pnpm build`, `pnpm lint`, `pnpm exec tsc --noEmit` pasan
 
 ## Verification
