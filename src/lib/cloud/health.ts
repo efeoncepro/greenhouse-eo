@@ -1,7 +1,15 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
-import type { CloudHealthCheck, CloudHealthSnapshot } from '@/lib/cloud/contracts'
+import type {
+  CloudGcpAuthPosture,
+  CloudHealthCheck,
+  CloudHealthSnapshot,
+  CloudObservabilityPosture,
+  CloudPostgresPosture,
+  CloudPostureCheck,
+  CloudSecretsPosture
+} from '@/lib/cloud/contracts'
 import { getBigQueryQueryOptions } from '@/lib/cloud/bigquery'
 import {
   getGreenhousePostgresConfig,
@@ -33,6 +41,98 @@ const toErrorSummary = (error: unknown) => {
   }
 
   return String(error)
+}
+
+const formatCount = (count: number, singular: string, plural: string) => `${count} ${count === 1 ? singular : plural}`
+
+const summarizeCloudHealth = ({
+  runtimeChecks,
+  postureChecks
+}: {
+  runtimeChecks: CloudHealthCheck[]
+  postureChecks: CloudPostureCheck[]
+}) => {
+  const runtimeFailures = runtimeChecks.filter(check => !check.ok).length
+  const postureWarnings = postureChecks.filter(check => check.status !== 'ok').length
+
+  if (runtimeFailures > 0) {
+    return `${formatCount(runtimeFailures, 'runtime failing', 'runtime failing')} · ${formatCount(postureWarnings, 'posture warning', 'posture warnings')}`
+  }
+
+  if (postureWarnings > 0) {
+    return `${formatCount(runtimeChecks.length, 'runtime ok', 'runtime ok')} · ${formatCount(postureWarnings, 'posture warning', 'posture warnings')}`
+  }
+
+  return `${formatCount(runtimeChecks.length, 'runtime ok', 'runtime ok')} · posture sin hallazgos`
+}
+
+export const buildCloudHealthSnapshot = ({
+  runtimeChecks,
+  postureChecks,
+  timestamp = new Date().toISOString()
+}: {
+  runtimeChecks: CloudHealthCheck[]
+  postureChecks?: CloudPostureCheck[]
+  timestamp?: string
+}): CloudHealthSnapshot => {
+  const normalizedPostureChecks = postureChecks ?? []
+  const ok = runtimeChecks.every(check => check.ok)
+  const overallStatus = !ok ? 'error' : normalizedPostureChecks.some(check => check.status !== 'ok') ? 'degraded' : 'ok'
+
+  return {
+    ok,
+    overallStatus,
+    summary: summarizeCloudHealth({
+      runtimeChecks,
+      postureChecks: normalizedPostureChecks
+    }),
+    runtimeChecks,
+    postureChecks: normalizedPostureChecks,
+    checks: runtimeChecks,
+    timestamp
+  }
+}
+
+export const getCloudPostureChecks = ({
+  auth,
+  postgres,
+  secrets,
+  observability
+}: {
+  auth: CloudGcpAuthPosture
+  postgres: CloudPostgresPosture
+  secrets: CloudSecretsPosture
+  observability: CloudObservabilityPosture
+}): CloudPostureCheck[] => {
+  const secretSources = new Set(secrets.entries.map(entry => entry.source))
+  const observabilityEnabled = observability.sentry.enabled && observability.slack.enabled
+
+  return [
+    {
+      name: 'gcp_auth',
+      status: auth.mode === 'wif' ? 'ok' : auth.mode === 'unconfigured' ? 'unconfigured' : 'warning',
+      summary: auth.summary
+    },
+    {
+      name: 'postgres_posture',
+      status: !postgres.configured ? 'unconfigured' : postgres.risks.length > 0 ? 'warning' : 'ok',
+      summary: postgres.summary
+    },
+    {
+      name: 'secrets',
+      status: secretSources.size === 1 && secretSources.has('secret_manager')
+        ? 'ok'
+        : secretSources.has('unconfigured')
+          ? 'unconfigured'
+          : 'warning',
+      summary: secrets.summary
+    },
+    {
+      name: 'observability',
+      status: observabilityEnabled ? 'ok' : observability.sentry.enabled || observability.slack.enabled ? 'warning' : 'unconfigured',
+      summary: observability.summary
+    }
+  ]
 }
 
 export const checkCloudPostgresHealth = async ({ timeoutMs = 5000 }: { timeoutMs?: number } = {}): Promise<CloudHealthCheck> => {
@@ -119,9 +219,7 @@ export const checkCloudBigQueryHealth = async ({ timeoutMs = 5000 }: { timeoutMs
 export const getCloudPlatformHealthSnapshot = async (): Promise<CloudHealthSnapshot> => {
   const checks = await Promise.all([checkCloudPostgresHealth(), checkCloudBigQueryHealth()])
 
-  return {
-    ok: checks.every(check => check.ok),
-    checks,
-    timestamp: new Date().toISOString()
-  }
+  return buildCloudHealthSnapshot({
+    runtimeChecks: checks
+  })
 }

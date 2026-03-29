@@ -4,6 +4,25 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-098 iniciada con slice seguro de postura
+
+### Completado
+- `TASK-098` pasó a `in-progress`.
+- Se eligió un primer slice sin integraciones externas para no romper el runtime ya estabilizado:
+  - nuevo `src/lib/cloud/observability.ts`
+  - `GET /api/internal/health` ahora incluye `observability`
+  - el payload proyecta si existen `SENTRY_DSN`, `SENTRY_AUTH_TOKEN` y `SLACK_ALERTS_WEBHOOK_URL`
+- El contrato de `GET /api/internal/health` quedó separado en:
+  - `runtimeChecks` para dependencias que sí definen `200/503`
+  - `postureChecks` para hallazgos operativos que degradan señal pero no cortan tráfico
+  - `overallStatus` y `summary` como resumen estable para futuras integraciones
+- `.env.example` quedó alineado con esas variables.
+
+### Pendiente inmediato
+- Instalar y configurar `@sentry/nextjs`
+- decidir si el siguiente slice conecta primero Slack alerts o Sentry
+- validar este contrato nuevo en preview antes de cablear integraciones externas
+
 ## Sesión 2026-03-29 — TASK-124 validada en `staging`
 
 ### Completado
