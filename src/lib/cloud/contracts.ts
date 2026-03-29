@@ -50,6 +50,21 @@ export interface CloudPostgresPosture {
   risks: string[]
 }
 
+export interface CloudPostgresAccessProfile {
+  profile: 'runtime' | 'migrator' | 'admin'
+  configured: boolean
+  secretRefConfigured: boolean
+  source: CloudSecretSource
+  envVarName: string
+  secretRefEnvVarName: string
+  summary: string
+}
+
+export interface CloudPostgresAccessProfilesPosture {
+  summary: string
+  profiles: CloudPostgresAccessProfile[]
+}
+
 export type CloudSecretSource = 'secret_manager' | 'env' | 'unconfigured'
 
 export interface CloudSecretPostureEntry {

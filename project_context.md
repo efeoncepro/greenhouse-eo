@@ -15,6 +15,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `postureChecks`
   - `overallStatus`
   - `summary`
+- El payload también proyecta `postgresAccessProfiles` para distinguir:
+  - credencial runtime del portal
+  - perfiles `migrator` y `admin` de tooling/operación
 - `503` sigue reservado para fallos reales de runtime; la postura incompleta solo degrada señal operativa.
 - Este lote no instala todavía `@sentry/nextjs` ni conecta Slack real; solo deja visibilidad operativa previa al rollout externo.
 
