@@ -4,6 +4,44 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-096 WIF-aware baseline en progreso
+
+### Completado
+- `TASK-096` pasó a `in-progress` en rama `feature/codex-task-096-wif-baseline`.
+- El repo ya quedó WIF-aware sin romper el runtime actual:
+  - `src/lib/google-credentials.ts` resuelve `wif | service_account_key | ambient_adc`
+  - `src/lib/bigquery.ts`, `src/lib/postgres/client.ts`, `src/lib/storage/greenhouse-media.ts` y `src/lib/ai/google-genai.ts` consumen el helper canónico
+  - `src/lib/ai/google-genai.ts` solo mantiene el temp file para el fallback de SA key
+- Scripts con parsing manual de `GOOGLE_APPLICATION_CREDENTIALS_JSON` quedaron alineados al helper central:
+  - `check-ico-bq`
+  - `backfill-ico-to-postgres`
+  - `materialize-member-metrics`
+  - `backfill-task-assignees`
+  - `backfill-postgres-payroll`
+  - `admin-team-runtime-smoke`
+- Arquitectura y docs vivas alineadas:
+  - `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+  - `GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación
+- `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts src/lib/bigquery.ts src/lib/postgres/client.ts src/lib/storage/greenhouse-media.ts src/lib/ai/google-genai.ts scripts/check-ico-bq.ts scripts/backfill-ico-to-postgres.ts scripts/materialize-member-metrics.ts scripts/backfill-task-assignees.ts scripts/backfill-postgres-payroll.ts scripts/admin-team-runtime-smoke.ts`
+- `pnpm exec vitest run src/lib/google-credentials.test.ts src/lib/cloud/gcp-auth.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Completar el rollout externo en GCP/Vercel:
+  - crear Workload Identity Pool/Provider real
+  - bindear impersonation sobre `greenhouse-runtime@efeonce-group.iam.gserviceaccount.com`
+  - cargar `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL` en Vercel
+  - validar staging con OIDC real antes de retirar `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- Cerrar Fase 1 externa de Cloud SQL:
+  - remover `0.0.0.0/0`
+  - pasar `sslMode` a `ENCRYPTED_ONLY`
+  - activar `requireSsl=true`
+- No declarar `TASK-096` cerrada todavía: el repo quedó listo, pero la postura cloud real sigue transicional.
+
 ## Sesión 2026-03-29 — TASK-115 Nexa UI Completion (4 slices)
 
 ### Completado

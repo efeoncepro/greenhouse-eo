@@ -121,7 +121,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-095` | `complete` | Centralized Email Delivery Layer | `docs/tasks/complete/TASK-095-centralized-email-delivery-layer.md` |
 | `TASK-097` | `complete` | Payroll Export Artifact Persistence and Resend | `docs/tasks/complete/TASK-097-payroll-export-artifact-persistence-and-resend.md` |
 
-| `TASK-096` | `to-do` | GCP Secret Management & Security Hardening | `docs/tasks/to-do/TASK-096-gcp-secret-management-security-hardening.md` |
+| `TASK-096` | `in-progress` | GCP Secret Management & Security Hardening | `docs/tasks/in-progress/TASK-096-gcp-secret-management-security-hardening.md` |
 | `TASK-098` | `to-do` | Observability MVP (Sentry + Health + Slack Alerts) | `docs/tasks/to-do/TASK-098-observability-mvp.md` |
 | `TASK-099` | `to-do` | Security Headers & Next.js Middleware | `docs/tasks/to-do/TASK-099-security-headers-middleware.md` |
 | `TASK-100` | `complete` | CI Pipeline: Add Test Step | `docs/tasks/complete/TASK-100-ci-pipeline-test-step.md` |

@@ -39,6 +39,7 @@ Primer bloque operativo asignado:
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, WAL retention, slow query logging y pool `15` ya aplicados; restore clone en curso para cerrar la verificación |
+| `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](in-progress/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Implementación | **[Hardening 3/7]** Repo ya quedó WIF-aware con fallback seguro; falta rollout real en GCP/Vercel y hardening externo de Cloud SQL |
 | `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
@@ -86,7 +87,7 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-117` → `TASK-030`.
-- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011` → `TASK-096`.
+- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-099` → `TASK-102` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
@@ -150,7 +151,6 @@ Primer bloque operativo asignado:
 | 25 | `TASK-020` | [TASK-020-frameio-bigquery-analytics-pipeline.md](to-do/TASK-020-frameio-bigquery-analytics-pipeline.md) | P2 | Medio | Alto | Diseño | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub |
 | 26 | `TASK-100` | [TASK-100-ci-pipeline-test-step.md](complete/TASK-100-ci-pipeline-test-step.md) | P1 | Alto | Muy bajo | **Cerrada** | **[Hardening 1/7]** CI ahora ejecuta `pnpm test` entre lint y build con timeout de 5 minutos |
 | 27 | `TASK-099` | [TASK-099-security-headers-middleware.md](to-do/TASK-099-security-headers-middleware.md) | P1 | Alto | Bajo | Diseño | **[Hardening 2/7]** Crear middleware.ts con CSP, X-Frame-Options, HSTS, Referrer-Policy |
-| 28 | `TASK-096` | [TASK-096-gcp-secret-management-security-hardening.md](to-do/TASK-096-gcp-secret-management-security-hardening.md) | P1 | Alto | Medio | Diseño | **[Hardening 3/7]** Cloud SQL network + WIF vía Vercel OIDC + Secret Manager para 6 secretos |
 | 29 | `TASK-098` | [TASK-098-observability-mvp.md](to-do/TASK-098-observability-mvp.md) | P1 | Alto | Bajo | Diseño | **[Hardening 4/7]** Sentry + health endpoint + Slack alerts para crons críticos |
 | 30 | `TASK-101` | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | P1 | Alto | Bajo | **Cerrada** | **[Hardening 5/7]** Helper único `requireCronAuth()` ya migró 19 rutas scheduler-driven con fail-closed y timing-safe comparison |
 | 31 | `TASK-102` | [TASK-102-database-resilience-baseline.md](in-progress/TASK-102-database-resilience-baseline.md) | P1 | Alto | Bajo | Implementación | **[Hardening 6/7]** PITR, flags y pool `15` ya aplicados; restore clone pendiente de completar y verificar |

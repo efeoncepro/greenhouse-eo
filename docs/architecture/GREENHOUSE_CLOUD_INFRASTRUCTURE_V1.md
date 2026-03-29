@@ -1,10 +1,37 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
 > **Version:** 1.0
-> **Last updated:** 2026-03-18
+> **Last updated:** 2026-03-29
 > **Audience:** Platform engineers, DevOps, on-call operators
 
 ---
+
+## Delta 2026-03-29 — Runtime auth baseline + Cloud SQL verified posture
+
+- El repo ya no depende solo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` para su runtime Vercel.
+- La capa canónica ahora vive en:
+  - `src/lib/google-credentials.ts`
+  - `src/lib/cloud/gcp-auth.ts`
+  - `src/lib/cloud/postgres.ts`
+- El orden efectivo de autenticación GCP en runtime quedó formalizado así:
+  1. `Workload Identity Federation` vía `VERCEL_OIDC_TOKEN` + `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL`
+  2. fallback a `GOOGLE_APPLICATION_CREDENTIALS_JSON` o `_BASE64`
+  3. `ambient ADC` cuando el entorno ya provee credenciales implícitas
+- Consumers principales ya alineados:
+  - `src/lib/bigquery.ts`
+  - `src/lib/postgres/client.ts`
+  - `src/lib/storage/greenhouse-media.ts`
+  - `src/lib/ai/google-genai.ts`
+- Scripts legacy que parseaban SA key manualmente también quedaron migrados al helper canónico en esta sesión.
+- Estado real verificado de `greenhouse-pg-dev` al 2026-03-29:
+  - `pointInTimeRecoveryEnabled=true`
+  - `transactionLogRetentionDays=7`
+  - `replicationLogArchivingEnabled=true`
+  - flags `log_min_duration_statement=1000` y `log_statement=ddl`
+  - sigue pendiente el hardening externo:
+    - `authorizedNetworks` incluye `0.0.0.0/0`
+    - `sslMode=ALLOW_UNENCRYPTED_AND_ENCRYPTED`
+    - `requireSsl=false`
 
 ## 1. Overview
 
@@ -33,8 +60,13 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 | Storage | 20 GB SSD, **auto-resize enabled** |
 | Public IP | `34.86.135.144` |
 | SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` |
+| `requireSsl` | `false` |
 | Authorized networks | `0.0.0.0/0` (**see Security Notes**) |
 | Backup window | Daily at **07:00 UTC**, 7-day retention |
+| PITR | `Enabled` |
+| WAL retention | `7 days` |
+| Replication log archiving | `Enabled` |
+| Database flags | `log_min_duration_statement=1000`, `log_statement=ddl` |
 
 ### Databases
 
@@ -67,7 +99,7 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 
 ### Connectivity
 
-- **Cloud SQL Connector** (preferred) — uses IAM-based authentication; no IP allowlisting required.
+- **Cloud SQL Connector** (preferred) — metadata/auth tokens now resolve through the shared WIF-aware helper in `src/lib/google-credentials.ts`; Postgres app access still uses runtime username/password and **not** IAM DB auth.
 - **Direct IP** — connect to `34.86.135.144:5432` with username/password. Currently allowed from any IP.
 
 ---
@@ -242,7 +274,10 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | `NEXTAUTH_SECRET` | NextAuth.js session encryption |
 | `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `AZURE_AD_TENANT_ID` | Azure AD SSO provider |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth provider |
-| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | GCP service account key (JSON) for BigQuery and Cloud SQL access from Vercel |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Pool Provider resource name for Vercel OIDC |
+| `GCP_SERVICE_ACCOUNT_EMAIL` | Service account to impersonate from Vercel via WIF |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Transitional fallback SA key for Preview/local or runtimes where WIF is not yet active |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` | Transitional fallback SA key variant |
 
 ---
 

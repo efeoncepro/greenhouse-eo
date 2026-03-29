@@ -4,6 +4,7 @@
  *
  * Usage: npx tsx scripts/backfill-ico-to-postgres.ts
  */
+import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 const main = async () => {
@@ -14,21 +15,8 @@ const main = async () => {
 
   // Dynamic imports to work around server-only
   const { BigQuery } = await import('@google-cloud/bigquery')
-
-  const credJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-    || (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64
-      ? Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64, 'base64').toString()
-      : null)
-
-  if (!credJson) {
-    console.error('No BigQuery credentials found')
-    process.exit(1)
-  }
-
-  const credentials = JSON.parse(credJson.replace(/^["']|["']$/g, ''))
-  const projectId = process.env.GCP_PROJECT || credentials.project_id
-
-  const bq = new BigQuery({ projectId, credentials })
+  const projectId = getGoogleProjectId()
+  const bq = new BigQuery(getGoogleAuthOptions())
 
   console.log('Reading from BigQuery ico_engine.metrics_by_member...')
 

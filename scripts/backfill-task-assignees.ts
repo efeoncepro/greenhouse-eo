@@ -11,6 +11,7 @@
  */
 import { BigQuery } from '@google-cloud/bigquery'
 
+import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 // ── Name mapping (Notion display name → member_id) ──
@@ -34,16 +35,8 @@ const main = async () => {
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('runtime')
 
-  const raw = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-    || (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64
-      ? Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64, 'base64').toString()
-      : null)
-
-  if (!raw) { console.error('No BQ credentials'); process.exit(1) }
-
-  const credentials = JSON.parse(raw.replace(/^["']|["']$/g, ''))
-  const projectId = process.env.GCP_PROJECT || credentials.project_id
-  const bq = new BigQuery({ projectId, credentials })
+  const projectId = getGoogleProjectId()
+  const bq = new BigQuery(getGoogleAuthOptions())
 
   // Step 1: Load members from Postgres
   const { runGreenhousePostgresQuery, closeGreenhousePostgres } = await import('../src/lib/postgres/client')

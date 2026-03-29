@@ -8,6 +8,15 @@
   - overrides explícitos para queries grandes
   - baseline documentado de gasto real
 
+## Delta 2026-03-29 — BigQuery auth centralizada
+
+- `src/lib/bigquery.ts` ya no depende solo de SA key JSON/base64; ahora usa el helper canónico `src/lib/google-credentials.ts`.
+- Esto deja a `TASK-103` más enfocada en FinOps real:
+  - `maximumBytesBilled`
+  - budgets/alerts
+  - overrides explícitos para queries grandes
+- El cambio no cierra la task: solo elimina drift de autenticación mientras el baseline WIF-aware avanza en `TASK-096`.
+
 ## Status
 
 | Campo | Valor |
