@@ -1,5 +1,13 @@
 # TASK-125 — Webhook Activation: First Consumers & End-to-End Validation
 
+## Delta 2026-03-29 — Canary aligned to Secret Manager contract
+
+- La capa de webhooks ya no depende solo de `WEBHOOK_CANARY_SECRET` en env plano.
+- `src/lib/webhooks/signing.ts` ahora resuelve secretos vía helper canónico:
+  - `WEBHOOK_CANARY_SECRET`
+  - `WEBHOOK_CANARY_SECRET_SECRET_REF`
+- Esto alinea `TASK-125` con el patrón institucional de `TASK-124` y permite activar el canary desde Vercel usando solo la ref al secreto en Secret Manager.
+
 ## Delta 2026-03-29 — Canary subscription implementada
 
 - Creado endpoint canary interno: `POST /api/internal/webhooks/canary`
@@ -158,7 +166,7 @@ El backend ya tiene el bus (`outbox_events` → `webhook_deliveries`). La UI hoy
 - [x] Botón en Admin Center para activar canary subscription
 - [x] Subscription apunta al mismo deployment (self-loop E2E)
 - [x] Firma HMAC-SHA256 validada en canary (secret ref: `WEBHOOK_CANARY_SECRET`)
-- [ ] `WEBHOOK_CANARY_SECRET` configurado en Vercel env vars
+- [ ] `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF` configurado en Vercel
 - [ ] Canary activado desde Admin Center (click en "Activar canary subscription")
 - [ ] Al menos 1 subscription activa registrada en `webhook_subscriptions`
 - [ ] Al menos 1 delivery exitosa registrada en `webhook_deliveries`

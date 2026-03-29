@@ -74,7 +74,7 @@ export const deliverWebhook = async (
   }
 
   if (subscription.auth_mode === 'hmac_sha256' && subscription.secret_ref) {
-    const secret = resolveSecret(subscription.secret_ref)
+    const secret = await resolveSecret(subscription.secret_ref)
 
     if (secret) {
       requestHeaders['x-greenhouse-signature'] = signPayload(secret, timestamp, body)
@@ -82,7 +82,7 @@ export const deliverWebhook = async (
   }
 
   if (subscription.auth_mode === 'bearer' && subscription.secret_ref) {
-    const secret = resolveSecret(subscription.secret_ref)
+    const secret = await resolveSecret(subscription.secret_ref)
 
     if (secret) {
       requestHeaders['Authorization'] = `Bearer ${secret}`

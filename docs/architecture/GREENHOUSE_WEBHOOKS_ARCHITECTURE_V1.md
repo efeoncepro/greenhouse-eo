@@ -62,7 +62,7 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches subscr
 - Subscription ID: `wh-sub-canary`
 - Event filters: `assignment.*` + `member.*` (high volume, low risk)
 - Target: same deployment via `VERCEL_URL`
-- Secret ref: `WEBHOOK_CANARY_SECRET` (env var)
+- Secret contract: `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF`
 - Activation: Admin Center button "Activar canary subscription" or direct POST to `/api/admin/ops/webhooks/seed-canary`
 
 ### Not Yet Active
@@ -411,7 +411,7 @@ But it creates a reusable Greenhouse-side surface so future integrations do not 
 ### Phase 3 - First outbound consumer — `in-progress` (TASK-125)
 - Internal canary subscription validates E2E pipeline
 - Matches `assignment.*` + `member.*` events
-- Pending: configure `WEBHOOK_CANARY_SECRET` in Vercel and activate from Admin Center
+- Pending: configure `WEBHOOK_CANARY_SECRET` o `WEBHOOK_CANARY_SECRET_SECRET_REF` in Vercel and activate from Admin Center
 
 ### Phase 4 - Operational visibility — `complete` (TASK-108, TASK-112)
 - Admin Center shows endpoint/subscription/delivery counters

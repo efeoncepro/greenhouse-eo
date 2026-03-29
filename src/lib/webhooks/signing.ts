@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
+import { resolveSecret as resolveManagedSecret } from '@/lib/secrets/secret-manager'
+
 /**
  * Sign a payload with HMAC-SHA256.
  * Signature covers: timestamp + "." + body
@@ -26,11 +28,13 @@ export const verifySignature = (secret: string, timestamp: string, body: string,
 }
 
 /**
- * Resolve a secret from an environment variable name.
+ * Resolve a webhook secret from the canonical env var / Secret Manager contract.
  * Never stores actual secrets in DB rows — only references.
  */
-export const resolveSecret = (secretRef: string): string | null => {
-  const value = process.env[secretRef]?.trim() || null
+export const resolveSecret = async (secretRef: string): Promise<string | null> => {
+  const resolution = await resolveManagedSecret({
+    envVarName: secretRef
+  })
 
-  return value || null
+  return resolution.value
 }

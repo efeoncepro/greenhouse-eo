@@ -33,7 +33,7 @@ export const processInboundWebhook = async (
   const rawBody = await request.text()
 
   // 3. Verify auth/signature
-  const signatureVerified = verifyAuth(endpoint, request, rawBody)
+  const signatureVerified = await verifyAuth(endpoint, request, rawBody)
 
   if (signatureVerified === false) {
     return { status: 401, body: { error: 'Invalid webhook signature' } }
@@ -134,18 +134,18 @@ const extractSourceEventId = (payload: unknown): string | null => {
   return (obj.event_id || obj.eventId || obj.id || obj.messageId) as string | null
 }
 
-const verifyAuth = (
+const verifyAuth = async (
   endpoint: { auth_mode: string; secret_ref: string | null },
   request: Request,
   rawBody: string
-): boolean | null => {
+): Promise<boolean | null> => {
   if (endpoint.auth_mode === 'none') return null
 
   const secretRef = endpoint.secret_ref
 
   if (!secretRef) return null
 
-  const secret = resolveSecret(secretRef)
+  const secret = await resolveSecret(secretRef)
 
   if (!secret) return false
 

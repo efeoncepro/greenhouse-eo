@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const eventType = request.headers.get('x-greenhouse-event-type') ?? 'unknown'
   const deliveryId = request.headers.get('x-greenhouse-delivery-id') ?? 'unknown'
 
-  const secret = resolveSecret(CANARY_SECRET_REF)
+  const secret = await resolveSecret(CANARY_SECRET_REF)
 
   if (secret && signature) {
     const valid = verifySignature(secret, timestamp, body, signature)

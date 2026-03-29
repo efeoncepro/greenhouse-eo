@@ -4,6 +4,17 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-125 canary alineada a Secret Manager
+
+### Completado
+- `src/lib/webhooks/signing.ts` ya no resuelve secretos solo por env plano; ahora usa el helper canónico de Secret Manager.
+- Impacto práctico:
+  - inbound webhooks
+  - outbound deliveries
+  - `POST /api/internal/webhooks/canary`
+  ya soportan `*_SECRET_REF` además del env legacy.
+- `TASK-125` ya no requiere exponer `WEBHOOK_CANARY_SECRET` crudo en Vercel si el secreto ya existe en Secret Manager.
+
 ## Sesión 2026-03-29 — TASK-127 creada como follow-on de consolidación Cloud
 
 ### Completado

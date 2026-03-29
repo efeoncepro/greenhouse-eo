@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-125 webhook canary now supports Secret Manager refs
+- La capa de webhooks quedó alineada al helper canónico de secretos.
+- `inbound`, `outbound` y el canary interno ya soportan `WEBHOOK_CANARY_SECRET_SECRET_REF` además del env legacy.
+- Esto permite activar `TASK-125` en Vercel sin exponer el secreto crudo cuando ya existe en Secret Manager.
+
 ### TASK-127 created for Cloud architecture consolidation
 - Se creó `TASK-127` como follow-on explícito para consolidar la lectura de arquitectura Cloud después del baseline ya implementado.
 - El objetivo de esta lane no es reabrir hardening ya cerrado, sino sintetizar el estado real por dominio, reducir drift documental y ordenar la siguiente ola de mejoras.
