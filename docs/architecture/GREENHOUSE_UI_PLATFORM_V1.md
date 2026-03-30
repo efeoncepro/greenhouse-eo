@@ -191,6 +191,22 @@ No abrir nuevas pantallas visibles relevantes sin decidir al menos una de estas 
 - `tiene view_code propio`
 - `queda explícitamente fuera del modelo porque es una ruta base transversal`
 
+### Excepción documentada actual
+
+`/home` queda explícitamente fuera del modelo de `view_code`.
+
+Razón de plataforma:
+- es el landing base de internos vía `portalHomePath`
+- funciona como shell de arranque para Nexa, quick access y tareas
+- su contenido ya se restringe indirectamente por:
+  - módulos resueltos
+  - notificaciones visibles
+  - rutas destino posteriores
+
+Eso significa:
+- no debe aparecer en `/admin/views` como vista gobernable por ahora
+- no debe bloquearse con `hasAuthorizedViewCode()` mientras siga siendo la entrada transversal segura de la sesión interna
+
 ## State Management
 
 ### Patrón actual

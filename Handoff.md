@@ -22,6 +22,21 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Pendiente inmediato
 - Si en el siguiente corte nacen más superficies gobernables, ya no deberían documentarse solo en la task; deben actualizar también la arquitectura canónica.
 
+## Sesión 2026-03-30 — decisión explícita: `/home` queda fuera de `view_code`
+
+### Completado
+- Se revisó el rol arquitectónico de `/home` y se dejó la decisión documentada en:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+  - `project_context.md`
+  - `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- Decisión vigente:
+  - `/home` no entra al catálogo gobernable
+  - sigue siendo landing transversal interna resuelta por `portalHomePath`
+
+### Razón corta
+- Gobernar `/home` como vista revocable hoy metería riesgo innecesario en el punto de entrada base de internos.
+
 ## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
 
 ### Completado

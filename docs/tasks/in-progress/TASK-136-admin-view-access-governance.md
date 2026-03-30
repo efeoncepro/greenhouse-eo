@@ -232,6 +232,17 @@
   - menos rutas terciarias abiertas por omisión
   - mejor capacidad de revisar impacto real antes de guardar cambios de acceso
 
+## Delta 2026-03-30 — decisión explícita sobre `/home`
+
+- Se revisó si `/home` debía entrar al modelo de `view_code`.
+- Decisión vigente:
+  - no
+  - `/home` queda fuera del catálogo gobernable por ahora
+- Rationale:
+  - es el landing base de internos vía `portalHomePath`
+  - funciona como ruta transversal segura de entrada, no como módulo privilege-gated independiente
+  - su contenido ya se modula por capabilities, notificaciones y rutas destino posteriores
+
 ## Summary
 
 Crear un módulo de gobernanza de vistas en Admin Center que permita a admins visualizar, asignar y revocar acceso a módulos/secciones del portal por perfil de rol, con override por usuario individual cuando sea necesario. Reemplaza el mapping hardcoded `role → route_groups` en `deriveRouteGroups()` por una tabla configurable desde la UI, sin perder el failsafe de la resolución actual.

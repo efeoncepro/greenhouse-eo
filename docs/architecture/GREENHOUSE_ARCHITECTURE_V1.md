@@ -175,6 +175,16 @@ Operational rule:
 - user overrides apply after role baseline
 - expired overrides should degrade automatically and register audit history
 
+Explicit exception:
+- `/home` remains a base internal landing surface driven by `portalHomePath`
+- it is not currently modeled as a governed `view_code`
+- rationale:
+  - it is the default safe landing for many internal sessions
+  - revoking it would create avoidable dead-end navigation for authenticated users
+  - its content is already shaped by downstream modules, notifications, and capability resolution
+- future rule:
+  - if `/home` ever becomes a privilege-sensitive module instead of a transversal landing surface, that decision should be made explicitly and documented before introducing a `view_code`
+
 Primary admin surface:
 - `/admin/views`
 

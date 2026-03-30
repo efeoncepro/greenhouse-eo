@@ -2,6 +2,7 @@
 
 ## 2026-03-30
 
+- Se documentó además la excepción arquitectónica de `/home`: sigue fuera del modelo de `view_code` y se mantiene como landing transversal interna vía `portalHomePath`.
 - La arquitectura canónica ya documenta el modelo de gobernanza de vistas: `routeGroups` como capa broad y `view_code` / `authorizedViews` como capa fina, con `/admin/views` como superficie operativa oficial.
 - `TASK-136` amplió el catálogo de vistas client-facing con `cliente.campanas` y `cliente.notificaciones`, y esas superficies ya quedaron protegidas por layout en `/campanas/**`, `/campaigns/**` y `/notifications/**`.
 - `/admin/views` mejoró su operabilidad real: la matrix ahora expone cambios pendientes vs persistido, foco sobre fallback heredado y el preview ya separa baseline, grants extra, revokes efectivos e impacto visible por usuario.

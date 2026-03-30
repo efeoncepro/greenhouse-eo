@@ -34,6 +34,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - nuevas superficies visibles del portal deberían evaluarse explícitamente como:
     - gobernables por `view_code`, o
     - rutas base transversales fuera del modelo
+- Excepción explícita vigente:
+  - `/home` queda fuera del modelo de `view_code`
+  - sigue siendo landing base de internos vía `portalHomePath`
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
