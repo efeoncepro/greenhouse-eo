@@ -144,7 +144,7 @@ async function handlePostgresFirst(monthKeys: string[]) {
     monthKeys
   )
 
-  return buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
+  return await buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
 }
 
 // ── BigQuery fallback path ─────────────────────────────────────────
@@ -214,12 +214,12 @@ async function handleBigQueryFallback(monthKeys: string[]) {
     monthKeys
   )
 
-  return buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
+  return await buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
 }
 
 // ── Shared response builder ────────────────────────────────────────
 
-function buildResponse(
+async function buildResponse(
   incomeRows: Array<{ total_amount: unknown; total_amount_clp: unknown; amount_paid: unknown; payment_status: string }>,
   incomeAccrualSeries: ReturnType<typeof aggregateMonthlyEntries>,
   incomeCashSeries: ReturnType<typeof aggregateMonthlyEntries>,
@@ -272,16 +272,39 @@ function buildResponse(
   const dso = monthlyRevenue > 0 ? Math.round((receivables / monthlyRevenue) * 30) : null
   const dpo = monthlyExpenses > 0 ? Math.round((payables / monthlyExpenses) * 30) : null
 
-  // Payroll-to-revenue ratio (payroll expenses / total revenue)
-  const payrollExpenses = roundCurrency(
-    expenseRows.reduce((sum, row) => {
-      const expType = typeof row.expense_type === 'string' ? row.expense_type : ''
+  // Payroll-to-revenue ratio: read labor costs from payroll module (not finance expenses)
+  let payrollCostClp = 0
 
-      return (expType === 'payroll' || expType === 'social_security') ? sum + toNumber(row.total_amount_clp) : sum
-    }, 0)
-  )
+  try {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+    const periodKey = `${year}-${String(month).padStart(2, '0')}`
+
+    const payrollRows = await runGreenhousePostgresQuery<{ total_clp: string | number } & Record<string, unknown>>(
+      `SELECT COALESCE(SUM(total_cost_clp), 0) AS total_clp
+       FROM greenhouse_payroll.payroll_entries
+       WHERE period_id IN (
+         SELECT period_id FROM greenhouse_payroll.payroll_periods
+         WHERE year = $1 AND month = $2
+       )`,
+      [year, month]
+    )
+
+    payrollCostClp = roundCurrency(toNumber(payrollRows[0]?.total_clp))
+  } catch {
+    // Payroll tables may not exist — fallback to expense-based calculation
+    payrollCostClp = roundCurrency(
+      expenseRows.reduce((sum, row) => {
+        const expType = typeof row.expense_type === 'string' ? row.expense_type : ''
+
+        return (expType === 'payroll' || expType === 'social_security') ? sum + toNumber(row.total_amount_clp) : sum
+      }, 0)
+    )
+  }
+
   const payrollToRevenueRatio = monthlyRevenue > 0
-    ? Math.round((payrollExpenses / monthlyRevenue) * 1000) / 10
+    ? Math.round((payrollCostClp / monthlyRevenue) * 1000) / 10
     : null
 
   return NextResponse.json({
