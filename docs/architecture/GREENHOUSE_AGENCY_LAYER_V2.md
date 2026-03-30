@@ -881,3 +881,521 @@ Nexa ──tools──→ Natural language access to Agency Intelligence
 - No crear alertas sin acción — cada alerta debe sugerir qué hacer
 - No agregar tabs sin datos — si no hay API, no hay tab
 - No mezclar Agency con Admin — Agency es para operar, Admin es para gobernar
+- No agregar skills/SLA sin serving view — materializar primero, consumir después
+- No construir forecasting sin datos históricos de al menos 3 meses
+
+---
+
+## 11. Capacidades avanzadas — sobre el estándar de la industria
+
+Las secciones 1-10 ponen a Greenhouse a la par de las mejores herramientas de agencia (Kantata, Productive.io, Forecast.app). Esta sección define lo que lo pone **por encima**.
+
+### 11.1 Revenue Intelligence — Pipeline conectado a operación
+
+Hoy Finance sabe cuánto facturaste. Pero no sabe cuánto **vas** a facturar. La conexión CRM → Finance → Capacity no existe como pipeline unificado.
+
+**Flujo completo:**
+
+```
+HubSpot deals (pipeline)
+  │
+  ├── Expected revenue por mes (deal amount × probability)
+  │
+  ├── Services en renewal_pending
+  │   → Revenue at risk (si no renuevan)
+  │
+  ├── Services en onboarding
+  │   → Revenue incoming (confirmado, aún sin facturar)
+  │
+  └── Capacity required
+      → FTE que los deals van a necesitar si se cierran
+      → Match contra FTE disponible por skill
+
+= Revenue Forecast Real
+  ├── Best case: pipeline × 1.0
+  ├── Expected: pipeline × probability weighted
+  ├── Worst case: only confirmed (sin pipeline)
+  └── At risk: renewals pendientes sin acción
+```
+
+**Data model:**
+
+```sql
+CREATE TABLE greenhouse_serving.revenue_pipeline (
+  pipeline_id TEXT PRIMARY KEY,
+  source TEXT NOT NULL,           -- 'hubspot_deal', 'service_renewal', 'service_onboarding'
+  source_id TEXT NOT NULL,        -- deal_id, service_id
+  space_id TEXT,
+  organization_id TEXT,
+  expected_revenue_clp NUMERIC,
+  probability NUMERIC,            -- 0-1 (deals), 1.0 (renewals activas), 0.5 (renewals pendientes)
+  expected_start_date DATE,
+  expected_monthly_revenue NUMERIC,
+  required_fte JSONB,             -- {"design": 0.5, "development": 1.0}
+  status TEXT,                    -- 'pipeline', 'confirmed', 'at_risk', 'lost'
+  materialized_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+**Consumers:**
+- Capacity Forecast: ¿tenemos equipo para el pipeline?
+- Finance Forecast: ¿cuánto vamos a facturar los próximos 3 meses?
+- Risk Score: deals grandes at-risk incrementan risk score del Space
+- Nexa: "¿Cómo se ve el pipeline para Q2?"
+
+### 11.2 Task-Level Profitability — Rentabilidad por entregable
+
+Las mejores agencias miden margen **por asset**. No solo "Space X tiene 22% de margen" sino "este video costó $800K en horas y generó $200K — margen negativo".
+
+**Cálculo:**
+
+```
+Para cada task/asset completado:
+
+  cost_of_asset = Σ (team_member_hours × loaded_cost_per_hour)
+    └── loaded_cost_per_hour = member_capacity_economics.loaded_cost_target / (hours_per_month × fte)
+
+  revenue_per_asset = space_revenue_period / assets_delivered_period
+    └── distribuido uniformemente (v1) o por tipo de asset (v2)
+
+  asset_margin = revenue_per_asset - cost_of_asset
+  asset_margin_pct = asset_margin / revenue_per_asset × 100
+```
+
+**Prerequisito:** time tracking. Greenhouse no tiene time tracking hoy. Opciones:
+
+1. **Estimación por FTE** (v1, sin time tracking): usar FTE allocation × período para estimar horas por Space. Menos preciso pero implementable hoy.
+2. **Time tracking integrado** (v2): agregar time entries por task. Requiere UI + hábito del equipo.
+3. **Inferencia desde ICO** (v1.5): usar throughput + cycle time de ICO para inferir horas por task type.
+
+**Serving view:**
+
+```sql
+CREATE TABLE greenhouse_serving.asset_profitability (
+  asset_id TEXT PRIMARY KEY,          -- task_id from ICO/Notion
+  space_id TEXT NOT NULL,
+  period_key TEXT NOT NULL,           -- YYYY-MM
+  asset_type TEXT,                    -- 'video', 'post', 'design', etc.
+  estimated_cost_clp NUMERIC,        -- cost based on FTE or time
+  attributed_revenue_clp NUMERIC,    -- revenue share
+  margin_clp NUMERIC,
+  margin_pct NUMERIC,
+  computation_method TEXT,            -- 'fte_estimate', 'time_tracked', 'ico_inference'
+  materialized_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 11.3 Scope Intelligence — Detección automática de scope creep
+
+Cuando un proyecto fue vendido con un scope y se entrega significativamente más, la agencia pierde margen sin darse cuenta.
+
+**Señales de scope creep:**
+
+| Señal | Fuente | Threshold |
+|-------|--------|-----------|
+| Assets entregados > assets planeados | Service scope vs ICO tasks completed | >150% |
+| Duración real > duración contratada | Service start/end vs actual | >120% |
+| RPA creciente (más revisiones) | ICO rpa_avg trend | >2.0 y subiendo |
+| Horas/FTE consumidas > presupuesto | Capacity × período vs contrato | >130% |
+| Nuevos task types no contemplados | ICO task categorization vs scope original | Cualquier mismatch |
+
+**Implementación:**
+
+```typescript
+interface ScopeContract {
+  serviceId: string
+  plannedAssets: number | null
+  plannedMonths: number
+  plannedFte: number
+  assetTypes: string[]           // tipos de entregables contemplados
+  startDate: string
+  targetEndDate: string
+}
+
+interface ScopeStatus {
+  serviceId: string
+  assetsDelivered: number
+  assetsRatio: number            // actual / planned (1.0 = on scope)
+  monthsElapsed: number
+  monthsRatio: number            // elapsed / planned
+  fteConsumed: number
+  fteRatio: number               // consumed / planned
+  newAssetTypes: string[]        // tipos no contemplados originalmente
+  scopeCreepScore: number        // 0-100 (0 = on scope, 100 = severe creep)
+  alert: boolean
+}
+```
+
+**Scope Creep Score:**
+
+```
+score = weighted sum de:
+  assets_ratio > 1.5: +30 points
+  months_ratio > 1.2: +20 points
+  fte_ratio > 1.3: +25 points
+  rpa > 2.0 trending up: +15 points
+  new_asset_types.length > 0: +10 points
+
+Alert threshold: score > 40
+```
+
+### 11.4 Skills Matrix + Intelligent Staffing
+
+Hoy Team Capacity dice "María tiene 0.8 FTE". No dice **qué sabe hacer María**. La diferencia entre asignar bien y asignar mal es la diferencia entre OTD 95% y OTD 65%.
+
+**Data model:**
+
+```sql
+-- Skill catalog
+CREATE TABLE greenhouse_core.skill_catalog (
+  skill_code TEXT PRIMARY KEY,       -- 'motion_design', 'ux_research', 'react_development'
+  skill_name TEXT NOT NULL,
+  skill_category TEXT NOT NULL,      -- 'design', 'development', 'strategy', 'media', 'account'
+  seniority_levels TEXT[] DEFAULT ARRAY['junior', 'mid', 'senior', 'lead']
+);
+
+-- Member skills (many-to-many)
+CREATE TABLE greenhouse_core.member_skills (
+  member_id TEXT NOT NULL,
+  skill_code TEXT NOT NULL REFERENCES greenhouse_core.skill_catalog(skill_code),
+  seniority_level TEXT NOT NULL,     -- 'junior', 'mid', 'senior', 'lead'
+  verified_by TEXT,                  -- who validated this skill
+  verified_at TIMESTAMPTZ,
+  PRIMARY KEY (member_id, skill_code)
+);
+
+-- Service skill requirements (what a service needs)
+CREATE TABLE greenhouse_core.service_skill_requirements (
+  service_id TEXT NOT NULL,
+  skill_code TEXT NOT NULL,
+  required_seniority TEXT NOT NULL,  -- minimum level
+  required_fte NUMERIC NOT NULL,     -- how much FTE of this skill
+  PRIMARY KEY (service_id, skill_code)
+);
+```
+
+**Intelligent Staffing Engine:**
+
+```typescript
+interface StaffingMatch {
+  memberId: string
+  memberName: string
+  skillCode: string
+  memberSeniority: string
+  requiredSeniority: string
+  seniorityMatch: 'exact' | 'over_qualified' | 'under_qualified'
+  availableFte: number
+  requiredFte: number
+  fitScore: number              // 0-100
+}
+
+// El engine compara requirements vs available members:
+// 1. Filter by skill_code match
+// 2. Score by seniority match (exact=100, over=80, under=40)
+// 3. Score by FTE availability (available >= required = 100, else proportional)
+// 4. Rank by composite fit score
+// 5. Flag gaps: skills needed but no one available
+```
+
+**Consumer en Space 360 Team tab:**
+
+```
+Team tab muestra:
+  Assigned: 3 personas, 2.1 FTE
+  Skill coverage:
+    ✓ Motion Design (senior) — Carlos, 0.5 FTE
+    ✓ Copywriting (mid) — Luis, 0.4 FTE
+    ⚠ UX Research (senior) — sin asignación (required by service)
+
+  Recommendations:
+    "Service 'Creative Hub' requiere UX Research (senior).
+     Ana tiene esa skill y 0.3 FTE disponible.
+     ¿Asignar a este Space?"
+```
+
+### 11.5 SLA/SLO contractual por servicio
+
+Cada servicio contratado tiene compromisos formales. Hoy OTD es global — debería ser por servicio contra su SLA específico.
+
+**Data model:**
+
+```sql
+CREATE TABLE greenhouse_core.service_sla (
+  service_id TEXT NOT NULL,
+  sla_type TEXT NOT NULL,            -- 'response_time', 'first_delivery', 'revision_rounds', 'otd_target', 'rpa_target'
+  sla_value NUMERIC NOT NULL,        -- 24 (hours), 5 (days), 2 (rounds), 90 (%), 1.5 (ratio)
+  sla_unit TEXT NOT NULL,            -- 'hours', 'business_days', 'rounds', 'percent', 'ratio'
+  PRIMARY KEY (service_id, sla_type)
+);
+```
+
+**SLA Compliance Engine:**
+
+```typescript
+interface SlaComplianceReport {
+  serviceId: string
+  spaceName: string
+  slas: Array<{
+    type: string
+    target: number
+    actual: number
+    unit: string
+    compliant: boolean
+    deviation: number          // positive = over target (good for OTD, bad for response time)
+    trend: 'improving' | 'stable' | 'degrading'
+  }>
+  overallCompliance: number    // % of SLAs met
+  atRisk: string[]             // SLAs trending toward breach
+}
+```
+
+**Consumer:**
+- Service detail page: compliance dashboard
+- Space 360 Services tab: SLA status per service
+- Anomaly detection: SLA breach o trending-toward-breach → alert
+- Client portal: "Your SLA compliance: 95%" (transparent)
+
+### 11.6 Client Lifecycle Intelligence — Más allá del delivery
+
+El lifecycle completo de un cliente en la agencia, desde que entra hasta que se va (o crece).
+
+**Lifecycle Stages:**
+
+```
+Prospect → Onboarding → Active → Growth → Renewal → Churned
+    ↑                                          │
+    └──────────── Win-back ←───────────────────┘
+```
+
+**Signals por stage:**
+
+```typescript
+interface ClientLifecycleSignals {
+  // Onboarding quality
+  onboardingDays: number             // días desde service start hasta primer delivery
+  firstDeliveryOtd: boolean          // ¿el primer entregable fue on-time?
+  onboardingSatisfaction: number     // 1-5 (si se trackea)
+
+  // Engagement
+  loginFrequency: number             // logins/week del client user
+  feedbackResponseDays: number       // promedio días para responder feedback
+  lastLoginDaysAgo: number
+
+  // Growth
+  servicesCountTrend: 'growing' | 'stable' | 'shrinking'
+  revenueGrowthPct: number           // YoY o QoQ
+
+  // Churn signals
+  churnRiskScore: number             // composite 0-100
+  churnSignals: string[]             // lista de señales activas
+}
+```
+
+**Churn Prediction (rule-based, no ML):**
+
+```
+Churn Score = suma de:
+  OTD < 70% por 2+ meses: +25 points
+  RPA > 2.5 trending up: +15 points
+  Margin < 5%: +20 points
+  Receivables aging > 60 días: +15 points
+  No login en 30+ días: +10 points
+  Feedback pending > 5 items: +10 points
+  Service en renewal_pending sin acción > 30 días: +20 points
+  Revenue declining QoQ: +15 points
+
+Churn Risk:
+  0-20: Bajo → no action
+  21-40: Medio → watch
+  41-60: Alto → escalate to Account Lead
+  61+: Crítico → escalate to Operations Lead + Account Lead
+```
+
+**Expansion Signals:**
+
+```
+Señales de oportunidad de growth:
+  - OTD > 90% sostenido: cliente satisfecho, puede querer más
+  - Services budget < capacity allocated: cliente paga menos de lo que usamos
+  - Feedback positivo frecuente: relación fuerte
+  - New business lines not covered: tiene Reach pero no Digital
+
+→ Recommendation: "Space Acme tiene alta satisfacción (OTD 94%, feedback
+   response 2h) pero solo contrata Creative Hub. Oportunidad de upsell:
+   Social Media Management (línea Reach). Account Lead notificado."
+```
+
+### 11.7 Nexa Actionable — AI que ejecuta, no solo responde
+
+Hoy Nexa responde preguntas. La visión enterprise es que Nexa **opere**:
+
+**Nivel 1 — Query (ya existe):**
+
+```
+User: "¿Cómo está Space Acme?"
+Nexa: "Space Acme tiene health score 72..."
+```
+
+**Nivel 2 — Recommend (Fase 3 del roadmap):**
+
+```
+User: "¿Qué debería hacer con Space Acme?"
+Nexa: "Tengo 2 recomendaciones activas:
+  1. Reasignar 0.3 FTE Design de Space Beta (holgado)
+  2. Escalar cobro de $3.2M receivable aging 60+ días
+  ¿Quieres que ejecute alguna?"
+```
+
+**Nivel 3 — Act (Fase 4 del roadmap):**
+
+```
+User: "Sí, reasigna el Design"
+Nexa: "Moviendo 0.3 FTE de Carlos (Motion Design, senior) desde
+  Space Beta a Space Acme. Confirmo:
+  - Carlos pasa de 0.5 a 0.2 FTE en Beta
+  - Carlos pasa de 0 a 0.3 FTE en Acme
+  - Notificación enviada a Carlos y Account Lead de ambos Spaces
+  ¿Confirmo?"
+User: "Confirma"
+Nexa: [ejecuta via /api/admin/team/assignments, emite outbox event,
+       notifica via webhook bus, actualiza capacity forecast]
+  "Reasignación completada. Health score proyectado de Acme: 79 (↑7pts).
+   Space Beta mantiene OTD >90% con la capacidad restante."
+```
+
+**Nexa Tools necesarios:**
+
+```typescript
+// Tools que Nexa necesita para operar
+const NEXA_AGENCY_TOOLS = [
+  { name: 'get_space_360', description: 'Full Space health + anomalies + recommendations' },
+  { name: 'get_capacity_overview', description: 'Team utilization + available FTE by skill' },
+  { name: 'get_revenue_forecast', description: 'Pipeline + renewals + projections' },
+  { name: 'get_anomalies', description: 'Active anomalies with suggested actions' },
+  { name: 'execute_reassignment', description: 'Move FTE between spaces', requiresConfirmation: true },
+  { name: 'escalate_to_lead', description: 'Send notification to Account/Ops Lead' },
+  { name: 'generate_retrospective', description: 'Auto-generate cycle retrospective brief' },
+]
+```
+
+### 11.8 Auto-Retrospective — Knowledge capture automático
+
+Cuando un ciclo cierra o un período de servicio termina, Greenhouse genera automáticamente un brief:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Space Acme — Retrospective Q1 2026                  │
+│  Auto-generated from operational data                │
+├─────────────────────────────────────────────────────┤
+│                                                      │
+│  DELIVERY                                            │
+│  Delivered: 42 assets (planned: 35, +20%)            │
+│  OTD: 88% (target: 90%, -2pts)                       │
+│  RPA: 1.4 (target: <1.5, ✓)                         │
+│  Stuck assets peak: 8 (week 9)                       │
+│                                                      │
+│  FINANCE                                             │
+│  Revenue: $15.2M CLP                                 │
+│  Cost: $11.8M CLP (labor $9.1M + direct $2.7M)     │
+│  Margin: 22% ($3.4M)                                │
+│  Receivables: $0 (fully collected)                   │
+│                                                      │
+│  TEAM                                                │
+│  Assigned: 3 people, 2.1 FTE                         │
+│  Utilization: Design 110% (⚠), Dev 75%, Account 90% │
+│                                                      │
+│  CHALLENGES                                          │
+│  - Design bottleneck weeks 8-10 (RPA spiked to 2.1) │
+│  - Motion Design tasks took 2x estimated time        │
+│  - Scope expanded +20% vs original (no price adjust) │
+│                                                      │
+│  RECOMMENDATIONS FOR Q2                              │
+│  - Add 0.2 FTE Design or reduce video scope          │
+│  - Renegotiate pricing (+15% for expanded scope)     │
+│  - Set SLA: response time 24h, revision limit 2      │
+│                                                      │
+│  [Export PDF]  [Share with Client]  [Save to Wiki]   │
+└─────────────────────────────────────────────────────┘
+```
+
+**Generación:**
+- Trigger: `payroll_period.exported` o manual via Nexa/UI
+- Data sources: ICO metrics, Finance P&L, Capacity economics, anomalies del período
+- Template: structured markdown generado por code (no LLM para v1)
+- Output: persistido en `greenhouse_serving.retrospective_briefs`, exportable como PDF
+
+### 11.9 Client-Facing Transparency — El diferenciador
+
+Greenhouse ya tiene portal client-facing. **Esto es raro en la industria** — la mayoría de agencias tienen herramientas internas separadas.
+
+**Lo que podemos hacer que casi nadie hace:**
+
+Exponer al cliente (con su login) métricas seleccionadas de su Space:
+
+```
+Client Portal — Space Dashboard (lo que el cliente ve)
+
+  Tu equipo: 3 personas asignadas
+  Entrega a tiempo: 92% ✓
+  Próximo milestone: 15 de abril
+  Assets entregados este mes: 12
+  Feedback pendiente de tu lado: 2 items ⚠
+
+  [No muestra: margin, cost, internal capacity, churn risk]
+```
+
+**Implementación:** filtrar el Space 360 response según `tenantType === 'client'`:
+- Client ve: OTD, RPA, assets delivered, milestones, feedback pending
+- Client NO ve: margin, cost, capacity utilization, health score, risk score, internal recommendations
+
+---
+
+## 12. Roadmap extendido
+
+### Fases 1-4 (ya definidas en §6)
+
+Fix → Operate → Intelligence → Advanced
+
+### Fase 5 — Revenue & Scope Intelligence
+
+| Capacidad | Esfuerzo | Prerequisito |
+|-----------|----------|-------------|
+| Revenue pipeline (HubSpot → forecast) | Alto | HubSpot integration sync |
+| Scope Intelligence (planned vs actual) | Medio | Service scope fields + ICO data |
+| SLA/SLO por servicio | Medio | Service model extension |
+| Task-level profitability (v1 FTE estimate) | Medio | ICO tasks + capacity economics |
+
+### Fase 6 — Team & Client Intelligence
+
+| Capacidad | Esfuerzo | Prerequisito |
+|-----------|----------|-------------|
+| Skills matrix + catalog | Alto | New data model |
+| Intelligent staffing engine | Alto | Skills matrix |
+| Client lifecycle signals | Medio | Login tracking + engagement data |
+| Churn prediction (rule-based) | Medio | Client lifecycle + delivery + finance |
+| Expansion signal detection | Bajo | Client lifecycle + services |
+
+### Fase 7 — AI-Native Operations
+
+| Capacidad | Esfuerzo | Prerequisito |
+|-----------|----------|-------------|
+| Nexa agency tools (query + recommend) | Alto | Intelligence layer (Fase 3) |
+| Nexa actionable (execute with confirmation) | Muy alto | Agency tools + mutation APIs |
+| Auto-retrospective generation | Medio | ICO + Finance + template engine |
+| Client-facing transparency (filtered Space data) | Medio | Space 360 + client portal auth |
+
+---
+
+## 13. Métricas de éxito del Operator Layer
+
+Cómo saber que el sistema funciona:
+
+| Métrica | Baseline (hoy) | Target (6 meses) | Cómo medir |
+|---------|----------------|-------------------|------------|
+| Tiempo para detectar OTD degradation | Manual (días) | <2h (automático) | Anomaly detection latency |
+| Tiempo para detectar scope creep | Nunca (manual) | <1 semana | Scope intelligence alerts |
+| % de Spaces con health score | 0% | 100% | Materialized scores |
+| Recommendations generadas vs actuadas | 0 | >50% actuadas | Recommendation lifecycle |
+| Revenue forecast accuracy | No existe | ±15% vs actual | Pipeline vs actual revenue |
+| Client churn predicted vs actual | No existe | >70% predicted | Churn score vs actual churn |
+| Nexa queries sobre Agency | Low | 5x increase | Nexa tool usage analytics |
