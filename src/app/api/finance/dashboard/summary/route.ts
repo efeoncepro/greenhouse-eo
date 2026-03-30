@@ -272,52 +272,12 @@ async function buildResponse(
   const dso = monthlyRevenue > 0 ? Math.round((receivables / monthlyRevenue) * 30) : null
   const dpo = monthlyExpenses > 0 ? Math.round((payables / monthlyExpenses) * 30) : null
 
-  // Payroll-to-revenue ratio: sum gross_total from latest period with status >= calculated
-  let payrollCostClp = 0
-  let payrollPeriodLabel: string | null = null
-
-  try {
-    // Use the most complete cost field available per entry:
-    // chile_employer_total_cost > gross_total > base_salary
-    // chile_employer_total_cost = bruto + cargas empleador (SIS, cesantía, mutual)
-    // gross_total = total haberes (bruto del colaborador)
-    // base_salary = solo sueldo base
-    const payrollRows = await runGreenhousePostgresQuery<{
-      total_clp: string | number
-      total_employer: string | number
-      total_gross: string | number
-      total_base: string | number
-      entry_count: string | number
-      p_year: number
-      p_month: number
-    } & Record<string, unknown>>(
-      `SELECT
-         COALESCE(SUM(GREATEST(
-           COALESCE(e.chile_employer_total_cost, 0),
-           COALESCE(e.gross_total, 0),
-           COALESCE(e.base_salary, 0)
-         )), 0) AS total_clp,
-         COALESCE(SUM(e.chile_employer_total_cost), 0) AS total_employer,
-         COALESCE(SUM(e.gross_total), 0) AS total_gross,
-         COALESCE(SUM(e.base_salary), 0) AS total_base,
-         COUNT(*)::text AS entry_count,
-         p.year AS p_year,
-         p.month AS p_month
-       FROM greenhouse_payroll.payroll_entries e
-       INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
-       WHERE p.status IN ('calculated', 'approved', 'exported')
-       GROUP BY p.year, p.month
-       ORDER BY p.year DESC, p.month DESC
-       LIMIT 1`
-    )
-
-    if (payrollRows[0]) {
-      payrollCostClp = roundCurrency(toNumber(payrollRows[0].total_clp))
-      payrollPeriodLabel = `${payrollRows[0].p_year}-${String(payrollRows[0].p_month).padStart(2, '0')}`
-    }
-  } catch {
-    // Payroll tables may not exist
-  }
+  // Payroll-to-revenue ratio: use canonical helper that computes
+  // gross_total + chile_employer_total_cost = true company cost
+  const { getLatestPeriodCompanyCost } = await import('@/lib/payroll/total-company-cost')
+  const companyCost = await getLatestPeriodCompanyCost()
+  const payrollCostClp = companyCost?.totalCompanyCostClp ?? 0
+  const payrollPeriodLabel = companyCost ? `${companyCost.year}-${String(companyCost.month).padStart(2, '0')}` : null
 
   const payrollToRevenueRatio = monthlyRevenue > 0
     ? Math.round((payrollCostClp / monthlyRevenue) * 1000) / 10
@@ -338,12 +298,15 @@ async function buildResponse(
     dso,
     dpo,
     payrollToRevenueRatio,
-    payrollContext: {
-      costClp: payrollCostClp,
+    payrollContext: companyCost ? {
       periodLabel: payrollPeriodLabel,
-      revenueClp: monthlyRevenue,
-      breakdown: payrollCostClp > 0 ? 'See /api/finance/dashboard/summary for details' : 'No payroll data found'
-    },
+      periodStatus: companyCost.periodStatus,
+      entryCount: companyCost.entryCount,
+      grossClp: companyCost.totalGrossClp,
+      employerChargesClp: companyCost.totalEmployerChargesClp,
+      companyCostClp: companyCost.totalCompanyCostClp,
+      revenueClp: monthlyRevenue
+    } : null,
     cash: {
       incomeMonth: incomeCashMetrics.totalAmountClp,
       incomePrev: incomeCashMetrics.previousTotalAmountClp,
