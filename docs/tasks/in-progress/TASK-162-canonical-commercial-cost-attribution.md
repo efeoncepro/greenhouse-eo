@@ -105,6 +105,23 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
   - `src/lib/sync/event-catalog.ts`
 - Con esto la capa ya no depende solo del flujo de `operational_pl` para refrescarse.
 
+## Delta 2026-03-30 — slice 6: health semántico y explain surface mínima
+
+- Se agregó capa de insights:
+  - `src/lib/commercial-cost-attribution/insights.ts`
+- Capacidades nuevas:
+  - resumen semántico por período:
+    - cobertura de allocations
+    - miembros con atribución comercial
+    - miembros con carga interna
+    - delta no explicado entre costo base y costo comercial/internal
+  - explain por cliente/período con breakdown por miembro
+- APIs nuevas:
+  - `GET /api/cost-intelligence/commercial-cost-attribution/health`
+  - `GET /api/cost-intelligence/commercial-cost-attribution/explain/[year]/[month]/[clientId]`
+- Observability operativa:
+  - `/api/cron/materialization-health` ya incluye freshness de `greenhouse_serving.commercial_cost_attribution`
+
 ## Why This Task Exists
 
 Hoy Greenhouse ya tiene piezas importantes:
@@ -456,6 +473,7 @@ Reglas obligatorias:
 - [ ] Los consumers prioritarios de Finance + Agency + People tienen estrategia de cutover definida
 - [ ] Hay tests con fixtures de negocio reales que cubren casos tipo `Sky`
 - [ ] Existe una explain/audit surface para troubleshooting de attribution
+- [x] Existe una explain/audit surface para troubleshooting de attribution
 - [ ] Arquitectura y task docs quedan actualizadas sin contradicción entre módulos
 
 ## Verification

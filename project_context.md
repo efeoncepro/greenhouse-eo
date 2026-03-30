@@ -349,7 +349,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `member-period-attribution.ts` hace serving-first con fallback a recompute
   - `materializeOperationalPl()` ya rematerializa primero esta capa y luego el P&L operativo
   - `src/lib/sync/projections/commercial-cost-attribution.ts` ya hace refresh reactivo dedicado y publica `accounting.commercial_cost_attribution.materialized`
-  - el siguiente remanente es health/observability semántica + explainability/audit surface
+  - `src/lib/commercial-cost-attribution/insights.ts` ya expone health semántico y explain por cliente/período
+  - APIs disponibles:
+    - `/api/cost-intelligence/commercial-cost-attribution/health`
+    - `/api/cost-intelligence/commercial-cost-attribution/explain/[year]/[month]/[clientId]`
+  - `/api/cron/materialization-health` ya observa freshness de `commercial_cost_attribution`
+  - el siguiente remanente es endurecer policy/UX de observabilidad y decidir cierre formal de la lane
   - Payroll, Team Capacity y Finance siguen calculando sus piezas de dominio
   - la verdad consolidada de costo comercial sale de una sola capa shared
   - esa capa alimenta primero a:
