@@ -1,5 +1,13 @@
 # TASK-143 — Agency Economics API & View
 
+## Delta 2026-03-30
+
+- `TASK-162` ya dejó explícita la estrategia de cutover.
+- Para esta lane, la regla pasa a ser:
+  - Agency Economics debe consumir `operational_pl_snapshots`
+  - no debe leer `client_labor_cost_allocation` directamente
+  - si hace falta explain de costo comercial, debe delegarlo a la surface/API de `commercial_cost_attribution`, no recomputarlo localmente
+
 ## Status
 
 | Campo | Valor |

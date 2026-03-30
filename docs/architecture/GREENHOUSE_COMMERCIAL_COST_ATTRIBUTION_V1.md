@@ -113,6 +113,95 @@ Cada monto materializado debe poder explicar:
 - porción excluida por carga interna
 - porción atribuida comercialmente
 
+## Health semántico mínimo
+
+La capa debe poder responder al menos por período:
+
+- cuántas filas de attribution existen
+- cuántos `member_id` quedaron con atribución comercial
+- cuántos `member_id` quedaron con carga interna excluida
+- costo base total
+- costo comercial atribuido total
+- costo interno excluido total
+- loaded cost comercial total
+- delta no explicado entre:
+  - `base_labor_cost_target`
+  - `commercial_labor_cost_target`
+  - `internal_operational_cost_target`
+
+Regla operativa V1:
+
+- `unexplained_labor_delta_target` debe tender a `0`
+- una desviación absoluta `<= 1` se considera tolerable por redondeo
+- si supera ese umbral, el período se considera semánticamente degradado
+
+## Orden reactivo explícito
+
+Para evitar drift entre layers, el orden lógico queda así:
+
+1. eventos fuente de payroll / assignments / compensation / FX / expenses
+2. projection `commercial_cost_attribution`
+3. evento `accounting.commercial_cost_attribution.materialized`
+4. projection `operational_pl`
+5. evento `accounting.pl_snapshot.materialized`
+6. consumers downstream sobre serving
+
+Regla:
+
+- `client_labor_cost_allocation` sigue existiendo, pero pasa a ser bridge/input interno
+- la capa consumible por Finance y Cost Intelligence ya es `commercial_cost_attribution`
+
+## Estrategia de Cutover
+
+### Regla general
+
+El cutover no es “todos los consumers leen la nueva tabla directamente”.
+
+La política correcta es:
+
+- `commercial_cost_attribution`
+  - truth layer canónica de costo comercial
+- `operational_pl_snapshots`
+  - serving derivado para P&L operativo y consumers de rentabilidad por scope
+- `member_capacity_economics`
+  - serving canónico de costo/capacidad por miembro
+- `client_labor_cost_allocation`
+  - bridge histórico de entrada
+  - ya no debe considerarse contrato consumidor nuevo
+
+### Matriz por consumer
+
+- Finance base / `client_economics`
+  - debe consumir `commercial_cost_attribution` vía reader/shared layer
+  - no debe volver a leer `client_labor_cost_allocation` directamente
+- Cost Intelligence / `operational_pl`
+  - debe consumir `commercial_cost_attribution`
+  - no debe recomponer labor + overhead por queries divergentes
+- Agency / economics por space
+  - debe seguir leyendo `operational_pl_snapshots`
+  - no debe saltarse la capa a `commercial_cost_attribution` salvo para surfaces de auditoría futura
+- Organization 360
+  - economics resumida puede seguir sobre `operational_pl_snapshots`
+  - fallbacks on-read deben quedar alineados al reader shared, no al bridge histórico
+- People / Person Finance
+  - costo por persona sigue en `member_capacity_economics`
+  - explain comercial por cliente/período puede apoyarse en `commercial_cost_attribution` cuando aplique
+- Home y Nexa
+  - deben seguir leyendo serving derivado (`operational_pl_snapshots`, `member_capacity_economics`)
+  - no deben depender del shape interno completo de attribution
+
+### Criterio de cierre de bridge legacy
+
+`client_labor_cost_allocation` no se elimina todavía.
+
+Pero desde este contrato:
+
+- queda deprecado como source directo para consumers nuevos
+- queda permitido solo como:
+  - bridge histórico
+  - input del materializer de `commercial_cost_attribution`
+  - surface limitada de troubleshooting legado donde todavía no exista explain surface suficiente
+
 ## Primera adopción de repo
 
 Primer slice ya permitido por esta baseline:

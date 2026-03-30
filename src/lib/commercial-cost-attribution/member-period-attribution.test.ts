@@ -193,6 +193,134 @@ describe('readCommercialCostAttributionForPeriod', () => {
     ])
   })
 
+  it('keeps only the commercial slice when a member also carries internal operational load', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          period_year: 2026,
+          period_month: 3,
+          total_labor_cost_target: '1600',
+          direct_overhead_target: '200',
+          shared_overhead_target: '100'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          client_id: 'client-1',
+          client_name: 'Sky',
+          period_year: 2026,
+          period_month: 3,
+          total_fte: '1',
+          fte_contribution: '1',
+          allocated_labor_clp: '800'
+        }
+      ])
+
+    const rows = await readCommercialCostAttributionForPeriod(2026, 3)
+
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        baseLaborCostTarget: 1600,
+        totalCommercialLaborCostTarget: 800,
+        internalOperationalCostTarget: 800,
+        totalCommercialLoadedCostTarget: 1100
+      })
+    )
+  })
+
+  it('splits multiple commercial clients proportionally, including overhead', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-2',
+          period_year: 2026,
+          period_month: 4,
+          total_labor_cost_target: '2000',
+          direct_overhead_target: '200',
+          shared_overhead_target: '100'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-2',
+          client_id: 'client-a',
+          client_name: 'Acme',
+          period_year: 2026,
+          period_month: 4,
+          total_fte: '1',
+          fte_contribution: '0.75',
+          allocated_labor_clp: '1500'
+        },
+        {
+          member_id: 'member-2',
+          client_id: 'client-b',
+          client_name: 'Beta',
+          period_year: 2026,
+          period_month: 4,
+          total_fte: '1',
+          fte_contribution: '0.25',
+          allocated_labor_clp: '500'
+        }
+      ])
+
+    const rows = await readCommercialCostAttributionForPeriod(2026, 4)
+
+    expect(rows[0].allocations).toEqual([
+      expect.objectContaining({
+        clientId: 'client-a',
+        commercialLaborCostTarget: 1500,
+        commercialDirectOverheadTarget: 150,
+        commercialSharedOverheadTarget: 75,
+        commercialLoadedCostTarget: 1725
+      }),
+      expect.objectContaining({
+        clientId: 'client-b',
+        commercialLaborCostTarget: 500,
+        commercialDirectOverheadTarget: 50,
+        commercialSharedOverheadTarget: 25,
+        commercialLoadedCostTarget: 575
+      })
+    ])
+  })
+
+  it('supports mixed-currency provenance as long as the bridge already exposes CLP attribution', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-3',
+          period_year: 2026,
+          period_month: 5,
+          total_labor_cost_target: '980.5',
+          direct_overhead_target: '19.5',
+          shared_overhead_target: '0'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-3',
+          client_id: 'client-usd',
+          client_name: 'US Client',
+          period_year: 2026,
+          period_month: 5,
+          total_fte: '1',
+          fte_contribution: '1',
+          allocated_labor_clp: '980.5'
+        }
+      ])
+
+    const rows = await readCommercialCostAttributionForPeriod(2026, 5)
+
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        baseLaborCostTarget: 980.5,
+        totalCommercialLaborCostTarget: 980.5,
+        totalCommercialLoadedCostTarget: 1000
+      })
+    )
+  })
+
   it('reads client summaries directly for a period', async () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([

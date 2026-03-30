@@ -122,6 +122,25 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
 - Observability operativa:
   - `/api/cron/materialization-health` ya incluye freshness de `greenhouse_serving.commercial_cost_attribution`
 
+## Delta 2026-03-30 — estrategia de cutover explicitada
+
+- La lane ya no deja el cutover como decisión implícita.
+- Política formal:
+  - `commercial_cost_attribution` = truth layer canónica
+  - `operational_pl_snapshots` = serving derivado para rentabilidad por scope
+  - `member_capacity_economics` = costo/capacidad por miembro
+  - `client_labor_cost_allocation` = bridge histórico de entrada, no contrato consumidor nuevo
+- Consumers con estrategia explícita:
+  - Finance / `client_economics`
+  - Cost Intelligence / `operational_pl`
+  - Agency Economics
+  - Organization 360
+  - People / Person Finance
+  - Home
+  - Nexa
+- Fuente canónica del cutover:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+
 ## Why This Task Exists
 
 Hoy Greenhouse ya tiene piezas importantes:
@@ -465,16 +484,16 @@ Reglas obligatorias:
 
 - [ ] Existe un contrato canónico documentado para `commercial cost attribution`
 - [x] Existe un contrato canónico documentado para `commercial cost attribution`
-- [ ] El contrato define versión y estrategia de evolución
+- [x] El contrato define versión y estrategia de evolución
 - [x] Finance, Team Capacity y Cost Intelligence reutilizan la misma clasificación de assignments
-- [ ] `client_labor_cost_allocation` o su sucesor expone atribución comercial sin mezclar carga interna
-- [ ] Los eventos reactivos relevantes y su orden lógico quedan explícitamente documentados
-- [ ] Existe health técnico y health semántico para esta capa
-- [ ] Los consumers prioritarios de Finance + Agency + People tienen estrategia de cutover definida
-- [ ] Hay tests con fixtures de negocio reales que cubren casos tipo `Sky`
+- [x] `client_labor_cost_allocation` o su sucesor expone atribución comercial sin mezclar carga interna
+- [x] Los eventos reactivos relevantes y su orden lógico quedan explícitamente documentados
+- [x] Existe health técnico y health semántico para esta capa
+- [x] Los consumers prioritarios de Finance + Agency + People tienen estrategia de cutover definida
+- [x] Hay tests con fixtures de negocio reales que cubren casos tipo `Sky`
 - [ ] Existe una explain/audit surface para troubleshooting de attribution
 - [x] Existe una explain/audit surface para troubleshooting de attribution
-- [ ] Arquitectura y task docs quedan actualizadas sin contradicción entre módulos
+- [x] Arquitectura y task docs quedan actualizadas sin contradicción entre módulos
 
 ## Verification
 
@@ -498,3 +517,35 @@ Reglas obligatorias:
 - `TASK-146` Service-Level P&L
 - `TASK-147` Campaign ↔ Service Bridge
 - `TASK-160` Agency Enterprise Hardening
+
+## Cutover Strategy
+
+### Consumers ya alineados
+
+- `commercial_cost_attribution`
+  - materialización propia + projection reactiva
+- `computeOperationalPl()`
+  - ya consume el reader shared/materializado
+- `client_economics`
+  - ya consume el reader shared/materializado
+- `organization-economics`
+  - ya consume el reader shared/materializado
+
+### Consumers que siguen correctos sobre serving derivado
+
+- Agency Economics
+  - debe seguir sobre `operational_pl_snapshots`
+- Home
+  - debe seguir sobre `operational_pl_snapshots`
+- Nexa
+  - debe seguir sobre `operational_pl_snapshots` y `member_capacity_economics`
+- People / Person Finance
+  - debe seguir sobre `member_capacity_economics`, con explain comercial solo donde tenga sentido
+
+### Regla de siguientes lanes
+
+- `TASK-143`, `TASK-146`, `TASK-147` y `TASK-160` no deben volver a leer `client_labor_cost_allocation` directamente
+- si necesitan margen/rentabilidad por scope:
+  - leer `operational_pl_snapshots`
+- si necesitan explain de costo comercial:
+  - leer `commercial_cost_attribution` o su surface API
