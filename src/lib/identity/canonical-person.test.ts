@@ -17,10 +17,30 @@ const {
 describe('canonical person resolver', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    globalThis.__greenhousePerson360ColumnsPromise = undefined
   })
 
   it('resolves a fully linked person from person_360', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        { column_name: 'identity_profile_id' },
+        { column_name: 'member_id' },
+        { column_name: 'user_id' },
+        { column_name: 'eo_id' },
+        { column_name: 'resolved_display_name' },
+        { column_name: 'canonical_email' },
+        { column_name: 'resolved_email' },
+        { column_name: 'user_email' },
+        { column_name: 'user_full_name' },
+        { column_name: 'member_email' },
+        { column_name: 'tenant_type' },
+        { column_name: 'user_status' },
+        { column_name: 'user_active' },
+        { column_name: 'has_member_facet' },
+        { column_name: 'has_user_facet' },
+        { column_name: 'active_role_codes' }
+      ])
+      .mockResolvedValueOnce([
       {
         identity_profile_id: 'profile-1',
         member_id: 'member-1',
@@ -69,6 +89,24 @@ describe('canonical person resolver', () => {
 
   it('falls back to direct member resolution when person_360 is missing', async () => {
     mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        { column_name: 'identity_profile_id' },
+        { column_name: 'member_id' },
+        { column_name: 'user_id' },
+        { column_name: 'eo_id' },
+        { column_name: 'resolved_display_name' },
+        { column_name: 'canonical_email' },
+        { column_name: 'resolved_email' },
+        { column_name: 'user_email' },
+        { column_name: 'user_full_name' },
+        { column_name: 'member_email' },
+        { column_name: 'tenant_type' },
+        { column_name: 'user_status' },
+        { column_name: 'user_active' },
+        { column_name: 'has_member_facet' },
+        { column_name: 'has_user_facet' },
+        { column_name: 'active_role_codes' }
+      ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
         {
@@ -116,6 +154,24 @@ describe('canonical person resolver', () => {
 
   it('marks active users without canonical profile as degraded_link', async () => {
     mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        { column_name: 'identity_profile_id' },
+        { column_name: 'member_id' },
+        { column_name: 'user_id' },
+        { column_name: 'eo_id' },
+        { column_name: 'resolved_display_name' },
+        { column_name: 'canonical_email' },
+        { column_name: 'resolved_email' },
+        { column_name: 'user_email' },
+        { column_name: 'user_full_name' },
+        { column_name: 'member_email' },
+        { column_name: 'tenant_type' },
+        { column_name: 'user_status' },
+        { column_name: 'user_active' },
+        { column_name: 'has_member_facet' },
+        { column_name: 'has_user_facet' },
+        { column_name: 'active_role_codes' }
+      ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
         {
@@ -151,7 +207,26 @@ describe('canonical person resolver', () => {
   })
 
   it('resolves profile ids through the canonical backbone', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        { column_name: 'identity_profile_id' },
+        { column_name: 'member_id' },
+        { column_name: 'user_id' },
+        { column_name: 'eo_id' },
+        { column_name: 'resolved_display_name' },
+        { column_name: 'canonical_email' },
+        { column_name: 'resolved_email' },
+        { column_name: 'user_email' },
+        { column_name: 'user_full_name' },
+        { column_name: 'member_email' },
+        { column_name: 'tenant_type' },
+        { column_name: 'user_status' },
+        { column_name: 'user_active' },
+        { column_name: 'has_member_facet' },
+        { column_name: 'has_user_facet' },
+        { column_name: 'active_role_codes' }
+      ])
+      .mockResolvedValueOnce([
       {
         identity_profile_id: 'profile-9',
         member_id: null,
@@ -180,6 +255,57 @@ describe('canonical person resolver', () => {
       eoId: 'EO-ID0009',
       displayName: 'Person Nine',
       portalAccessState: 'missing_principal',
+      resolutionSource: 'person_360'
+    })
+  })
+
+  it('supports production-style person_360 columns using primary_user_id aliases', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        { column_name: 'identity_profile_id' },
+        { column_name: 'identity_profile_public_id' },
+        { column_name: 'primary_member_id' },
+        { column_name: 'primary_user_id' },
+        { column_name: 'display_name' },
+        { column_name: 'canonical_email' },
+        { column_name: 'primary_user_email' },
+        { column_name: 'primary_user_name' },
+        { column_name: 'member_email' },
+        { column_name: 'has_member_facet' },
+        { column_name: 'has_user_facet' },
+        { column_name: 'active_user_count' }
+      ])
+      .mockResolvedValueOnce([
+        {
+          identity_profile_id: 'profile-prod',
+          member_id: 'member-prod',
+          user_id: 'user-prod',
+          eo_id: 'EO-ID-PROD',
+          resolved_display_name: 'Prod Person',
+          canonical_email: 'prod.person@efeoncepro.com',
+          resolved_email: 'prod.person@efeoncepro.com',
+          user_email: 'prod.user@efeoncepro.com',
+          user_full_name: 'Prod User',
+          member_email: 'prod.person@efeoncepro.com',
+          tenant_type: null,
+          user_status: 'active',
+          user_active: true,
+          has_member_facet: true,
+          has_user_facet: true,
+          active_role_codes: [],
+          route_groups: []
+        }
+      ])
+
+    await expect(getCanonicalPersonByUserId('user-prod')).resolves.toMatchObject({
+      identityProfileId: 'profile-prod',
+      memberId: 'member-prod',
+      userId: 'user-prod',
+      eoId: 'EO-ID-PROD',
+      displayName: 'Prod Person',
+      portalEmail: 'prod.user@efeoncepro.com',
+      portalDisplayName: 'Prod User',
+      portalAccessState: 'active',
       resolutionSource: 'person_360'
     })
   })

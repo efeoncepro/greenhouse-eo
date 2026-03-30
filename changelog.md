@@ -2,6 +2,14 @@
 
 ## 2026-03-30
 
+- `TASK-134` quedó formalmente cerrada:
+  - Notifications institucionaliza `person-first` para recipient resolution
+  - webhook consumers y projections ya comparten el mismo shape de recipient
+  - `userId` se preserva explícitamente como llave operativa para inbox, preferencias, auditoría y dedupe por recipient key efectiva
+- `TASK-134` ya tiene primer slice real de implementación:
+  - `Notifications` ahora comparte resolución role-based `person-first` entre projections y webhook consumers
+  - nuevo helper shared `getRoleCodeNotificationRecipients(roleCodes)` en `src/lib/notifications/person-recipient-resolver.ts`
+  - el cambio elimina drift de mapping desde `session_360` sin tocar `buildNotificationRecipientKey()`, inbox, preferencias ni dedupe `userId`-scoped
 - `TASK-140` quedó formalmente cerrada:
   - `/admin/views` ya se interpreta y se opera como consumer persona-first
   - el selector/preview usa persona canónica cuando existe `identityProfileId`

@@ -137,6 +137,55 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Validación ejecutada
 - `git diff --check`
 
+## Sesión 2026-03-30 — `TASK-134` slice 1 shared recipients en Notifications
+
+### Objetivo
+- Empezar implementación real de `TASK-134` sin tocar llaves `userId`-scoped de inbox/preferences/dedupe y sin romper el carril reactivo webhook/projections.
+
+### Delta de ejecución
+- `TASK-134` ya quedó en `in-progress`.
+- Nuevo helper shared:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+    - `getRoleCodeNotificationRecipients(roleCodes)`
+- Adopción inicial en callers legacy/duplicados:
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Efecto del slice:
+  - recipients role-based ya no repiten mapping ad hoc desde `greenhouse_serving.session_360`
+  - projections y webhook consumers ya comparten el mismo shape persona/member/user/email/fullName
+  - `NotificationService`, `notification_preferences`, `notifications` y `notification_log` siguen intactos en su semántica `userId`-scoped / recipient-key-scoped
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/notifications/person-recipient-resolver.ts src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Cerrar el resto de callers legacy de Notifications que todavía no consuman el contrato shared.
+- Documentar el contrato transversal final de Notifications para poder cerrar `TASK-134` sin mover las fronteras `userId`-scoped del sistema.
+
+## Sesión 2026-03-30 — cierre formal de `TASK-134`
+
+### Objetivo
+- Cerrar la lane de hardening de identidad en Notifications sin cambiar la semántica `userId`-scoped del sistema.
+
+### Delta de ejecución
+- `TASK-134` se movió a `complete`.
+- La institucionalización final quedó reflejada en:
+  - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/tasks/to-do/TASK-128-webhook-consumers-roadmap.md`
+- Criterio de cierre explicitado:
+  - recipient resolution `person-first` ya es shared en projections y webhook consumers
+  - `identity_profile` es la raíz humana, pero `userId` sigue siendo la llave operativa de inbox/preferences/audit/dedupe
+  - no queda gap estructural abierto del recipient model; los remanentes futuros pasan a consumers de dominio, no a la base transversal de Notifications
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/notifications/person-recipient-resolver.ts src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — hardening urgente de Postgres por incidentes TLS en cron
 
 ### Objetivo

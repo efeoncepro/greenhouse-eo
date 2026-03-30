@@ -219,6 +219,30 @@ Not allowed:
 
 During transition, APIs may continue returning legacy references.
 
+## Delta 2026-03-30 — Notifications contract after person-first hardening
+
+Notifications ya no pueden modelarse como `client_user-first` cuando el problema real es resolver un humano.
+
+Regla institucional:
+- la resolución conceptual del recipient es `person-first`
+- `identity_profile` es la raíz humana
+- `member` sigue siendo la faceta operativa válida para payroll y colaboración
+- `client_user` sigue siendo la capacidad portal para inbox, preferencias y auditoría
+
+Para Notifications esto significa:
+- projections y webhook consumers deben compartir un shape explícito con:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `email`
+  - `fullName`
+- el sistema no debe colapsar ese grafo a un solo identificador
+- la recipient key efectiva puede seguir siendo `userId` o fallback `person:*` / `member:*` / `external:*` según el delivery disponible
+
+No permitido:
+- tratar `client_user` como raíz humana del sistema de notificaciones
+- reemplazar `notification_preferences`, `notifications` o `notification_log` por una semántica `identity_profile`-scoped sin migración explícita
+
 But every modern API should increasingly expose:
 - the canonical ID
 - relevant source IDs

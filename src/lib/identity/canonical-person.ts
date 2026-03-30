@@ -54,6 +54,10 @@ type Person360Row = Record<string, unknown> & {
   route_groups: string[] | null
 }
 
+type Person360ColumnRow = Record<string, unknown> & {
+  column_name: string
+}
+
 type DirectMemberRow = Record<string, unknown> & {
   identity_profile_id: string | null
   member_id: string
@@ -195,6 +199,39 @@ const toCanonicalPersonRecord = (
 const uniqueIdentifiers = (values: string[]) =>
   Array.from(new Set(values.map(value => value.trim()).filter(Boolean)))
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __greenhousePerson360ColumnsPromise: Promise<Set<string>> | undefined
+}
+
+const getPerson360Columns = async () => {
+  globalThis.__greenhousePerson360ColumnsPromise ??= runGreenhousePostgresQuery<Person360ColumnRow>(
+    `SELECT column_name
+     FROM information_schema.columns
+     WHERE table_schema = 'greenhouse_serving'
+       AND table_name = 'person_360'`
+  ).then(rows => new Set(rows.map(row => row.column_name)))
+
+  return globalThis.__greenhousePerson360ColumnsPromise
+}
+
+const getPerson360ColumnExpr = (columns: Set<string>, candidates: string[], fallback: string) =>
+  candidates.find(candidate => columns.has(candidate))
+    ? `p.${candidates.find(candidate => columns.has(candidate))}`
+    : fallback
+
+const getPerson360WhereExpr = (columns: Set<string>, whereColumn: 'identity_profile_id' | 'member_id' | 'user_id') => {
+  if (whereColumn === 'member_id') {
+    return columns.has('member_id') ? 'p.member_id' : 'p.primary_member_id'
+  }
+
+  if (whereColumn === 'user_id') {
+    return columns.has('user_id') ? 'p.user_id' : 'p.primary_user_id'
+  }
+
+  return 'p.identity_profile_id'
+}
+
 const getPeopleFromPerson360 = async ({
   ids,
   whereColumn
@@ -206,29 +243,63 @@ const getPeopleFromPerson360 = async ({
     return []
   }
 
+  const columns = await getPerson360Columns()
+  const memberIdExpr = getPerson360ColumnExpr(columns, ['member_id', 'primary_member_id'], 'NULL::text')
+  const userIdExpr = getPerson360ColumnExpr(columns, ['user_id', 'primary_user_id'], 'NULL::text')
+  const eoIdExpr = getPerson360ColumnExpr(columns, ['eo_id', 'identity_profile_public_id'], 'NULL::text')
+  const displayNameExpr = getPerson360ColumnExpr(columns, ['resolved_display_name', 'display_name'], 'NULL::text')
+  const canonicalEmailExpr = getPerson360ColumnExpr(columns, ['canonical_email'], 'NULL::text')
+  const resolvedEmailExpr = getPerson360ColumnExpr(columns, ['resolved_email', 'canonical_email'], 'NULL::text')
+  const userEmailExpr = getPerson360ColumnExpr(columns, ['user_email', 'primary_user_email'], 'NULL::text')
+  const userFullNameExpr = getPerson360ColumnExpr(columns, ['user_full_name', 'primary_user_name'], 'NULL::text')
+  const memberEmailExpr = getPerson360ColumnExpr(columns, ['member_email'], 'NULL::text')
+  const tenantTypeExpr = getPerson360ColumnExpr(columns, ['tenant_type'], 'NULL::text')
+
+  const userStatusExpr = columns.has('user_status')
+    ? 'p.user_status'
+    : columns.has('active_user_count')
+      ? `CASE
+           WHEN COALESCE(p.active_user_count, 0) > 0 THEN 'active'
+           WHEN ${userIdExpr} IS NOT NULL THEN 'inactive'
+           ELSE NULL
+         END`
+      : 'NULL::text'
+
+  const userActiveExpr = columns.has('user_active')
+    ? 'p.user_active'
+    : columns.has('active_user_count')
+      ? 'COALESCE(p.active_user_count, 0) > 0'
+      : 'NULL::boolean'
+
+  const activeRoleCodesExpr = columns.has('active_role_codes')
+    ? 'COALESCE(p.active_role_codes, ARRAY[]::text[])'
+    : 'ARRAY[]::text[]'
+
+  const whereExpr = getPerson360WhereExpr(columns, whereColumn)
+
   return runGreenhousePostgresQuery<Person360Row>(
     `SELECT
        p.identity_profile_id,
-       p.member_id,
-       p.user_id,
-       p.eo_id,
-       p.resolved_display_name,
-       p.canonical_email,
-       p.resolved_email,
-       p.user_email,
-       p.user_full_name,
-       p.member_email,
-       p.tenant_type,
-       p.user_status,
-       p.user_active,
+       ${memberIdExpr} AS member_id,
+       ${userIdExpr} AS user_id,
+       ${eoIdExpr} AS eo_id,
+       ${displayNameExpr} AS resolved_display_name,
+       ${canonicalEmailExpr} AS canonical_email,
+       ${resolvedEmailExpr} AS resolved_email,
+       ${userEmailExpr} AS user_email,
+       ${userFullNameExpr} AS user_full_name,
+       ${memberEmailExpr} AS member_email,
+       ${tenantTypeExpr} AS tenant_type,
+       ${userStatusExpr} AS user_status,
+       ${userActiveExpr} AS user_active,
        p.has_member_facet,
        p.has_user_facet,
-       p.active_role_codes,
+       ${activeRoleCodesExpr} AS active_role_codes,
        COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups
      FROM greenhouse_serving.person_360 AS p
      LEFT JOIN greenhouse_serving.session_360 AS s
-       ON s.user_id = p.user_id
-     WHERE p.${whereColumn} = ANY($1::text[])`,
+       ON s.user_id = ${userIdExpr}
+     WHERE ${whereExpr} = ANY($1::text[])`,
     [ids]
   )
 }

@@ -6,6 +6,7 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockDispatch = vi.fn()
 const mockEnsureNotificationSchema = vi.fn()
 const mockGetUserNotificationRecipient = vi.fn()
+const mockGetRoleCodeNotificationRecipients = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -47,6 +48,7 @@ vi.mock('@/lib/notifications/person-recipient-resolver', () => ({
     }]
   ])),
   getIdentityProfileNotificationRecipients: vi.fn(async () => new Map()),
+  getRoleCodeNotificationRecipients: (...args: unknown[]) => mockGetRoleCodeNotificationRecipients(...args),
   getUserNotificationRecipient: (...args: unknown[]) => mockGetUserNotificationRecipient(...args)
 }))
 
@@ -58,6 +60,7 @@ describe('notificationProjection payroll ops', () => {
     mockEnsureNotificationSchema.mockResolvedValue(undefined)
     mockDispatch.mockResolvedValue({ sent: [], skipped: [], failed: [] })
     mockGetUserNotificationRecipient.mockResolvedValue(null)
+    mockGetRoleCodeNotificationRecipients.mockResolvedValue([])
   })
 
   it('dispatches payroll ops notifications to mixed portal and email-only recipients', async () => {
@@ -133,6 +136,43 @@ describe('notificationProjection payroll ops', () => {
           userId: 'user-1',
           email: 'user-1@example.com',
           fullName: 'María López'
+        }
+      ]
+    }))
+  })
+
+  it('dispatches admin notifications through the shared role-based person-first helper', async () => {
+    mockGetRoleCodeNotificationRecipients.mockResolvedValueOnce([
+      {
+        identityProfileId: 'profile-admin',
+        memberId: 'member-admin',
+        userId: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        fullName: 'Admin One'
+      }
+    ])
+
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'service.created' },
+      {
+        name: 'Nueva propuesta SEO',
+        lineaDeServicio: 'SEO'
+      }
+    )
+
+    expect(result).toBe('notified 1 admins about service.created')
+    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({
+      category: 'system_event',
+      title: 'Nuevo servicio: Nueva propuesta SEO',
+      body: 'Línea: SEO',
+      actionUrl: '/agency/services',
+      recipients: [
+        {
+          identityProfileId: 'profile-admin',
+          memberId: 'member-admin',
+          userId: 'user-admin',
+          email: 'admin@efeoncepro.com',
+          fullName: 'Admin One'
         }
       ]
     }))

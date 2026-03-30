@@ -5,13 +5,15 @@ vi.mock('server-only', () => ({}))
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockGetMemberNotificationRecipients = vi.fn()
 const mockGetCanonicalPersonByUserId = vi.fn()
+const mockGetRoleCodeNotificationRecipients = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
 vi.mock('@/lib/notifications/person-recipient-resolver', () => ({
-  getMemberNotificationRecipients: (...args: unknown[]) => mockGetMemberNotificationRecipients(...args)
+  getMemberNotificationRecipients: (...args: unknown[]) => mockGetMemberNotificationRecipients(...args),
+  getRoleCodeNotificationRecipients: (...args: unknown[]) => mockGetRoleCodeNotificationRecipients(...args)
 }))
 
 vi.mock('@/lib/identity/canonical-person', () => ({
@@ -20,6 +22,7 @@ vi.mock('@/lib/identity/canonical-person', () => ({
 
 const {
   getMemberRecipient,
+  getFinanceAdminRecipients,
   getPayrollPeriodRecipients,
   getHrAdminRecipients,
   getUserRecipient
@@ -123,13 +126,13 @@ describe('notification recipient helpers', () => {
   })
 
   it('resolves HR/admin recipients from session_360', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+    mockGetRoleCodeNotificationRecipients.mockResolvedValueOnce([
       {
-        identity_profile_id: 'profile-admin',
-        member_id: 'member-admin',
-        user_id: 'user-admin',
+        identityProfileId: 'profile-admin',
+        memberId: 'member-admin',
+        userId: 'user-admin',
         email: 'admin@efeoncepro.com',
-        full_name: 'Admin One'
+        fullName: 'Admin One'
       }
     ])
 
@@ -140,6 +143,27 @@ describe('notification recipient helpers', () => {
         userId: 'user-admin',
         email: 'admin@efeoncepro.com',
         fullName: 'Admin One'
+      }],
+      unresolvedRecipients: 0
+    })
+  })
+
+  it('resolves finance/admin recipients through the shared role-based helper', async () => {
+    mockGetRoleCodeNotificationRecipients.mockResolvedValueOnce([
+      {
+        identityProfileId: 'profile-finance',
+        memberId: 'member-finance',
+        email: 'finance@efeoncepro.com',
+        fullName: 'Finance Person'
+      }
+    ])
+
+    await expect(getFinanceAdminRecipients()).resolves.toEqual({
+      recipients: [{
+        identityProfileId: 'profile-finance',
+        memberId: 'member-finance',
+        email: 'finance@efeoncepro.com',
+        fullName: 'Finance Person'
       }],
       unresolvedRecipients: 0
     })

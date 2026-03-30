@@ -5,6 +5,7 @@ import {
   getCanonicalPersonsByIdentityProfileIds,
   getCanonicalPersonsByMemberIds,
 } from '@/lib/identity/canonical-person'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface PersonNotificationRecipient {
   identityProfileId?: string
@@ -19,11 +20,25 @@ export interface PersonRecipientFallback {
   fullName?: string
 }
 
+interface SessionRecipientRow extends Record<string, unknown> {
+  identity_profile_id: string | null
+  member_id: string | null
+  user_id: string | null
+  email: string | null
+  full_name: string | null
+}
+
 const normalizeOptionalString = (value: unknown) =>
   typeof value === 'string' && value.trim() ? value.trim() : undefined
 
 const toFallbackMap = (fallbacks?: Record<string, PersonRecipientFallback>) =>
   new Map(Object.entries(fallbacks ?? {}))
+
+const buildRecipientResolutionKey = (recipient: PersonNotificationRecipient) =>
+  recipient.userId
+  ?? (recipient.identityProfileId ? `person:${recipient.identityProfileId}` : null)
+  ?? (recipient.memberId ? `member:${recipient.memberId}` : null)
+  ?? (recipient.email ? `external:${recipient.email.trim().toLowerCase()}` : null)
 
 const buildRecipient = (
   params: {
@@ -197,4 +212,55 @@ export const resolveNotificationRecipients = async (
   )
 
   return resolved.filter((recipient): recipient is PersonNotificationRecipient => recipient !== null)
+}
+
+export const getRoleCodeNotificationRecipients = async (
+  roleCodes: string[]
+): Promise<PersonNotificationRecipient[]> => {
+  const normalizedRoleCodes = Array.from(new Set(roleCodes.map(roleCode => roleCode.trim()).filter(Boolean)))
+
+  if (normalizedRoleCodes.length === 0) {
+    return []
+  }
+
+  const rows = await runGreenhousePostgresQuery<SessionRecipientRow>(
+    `SELECT DISTINCT
+       identity_profile_id,
+       member_id,
+       user_id,
+       email,
+       full_name
+     FROM greenhouse_serving.session_360
+     WHERE active = TRUE
+       AND status = 'active'
+       AND role_codes && $1::text[]
+     ORDER BY full_name ASC NULLS LAST, email ASC NULLS LAST`,
+    [normalizedRoleCodes]
+  )
+
+  const dedupedRecipients = new Map<string, PersonNotificationRecipient>()
+
+  for (const row of rows) {
+    const recipient = buildRecipient({
+      identityProfileId: row.identity_profile_id ?? undefined,
+      memberId: row.member_id ?? undefined,
+      userId: row.user_id ?? undefined,
+      email: row.email ?? undefined,
+      fullName: row.full_name ?? undefined
+    })
+
+    if (!recipient) {
+      continue
+    }
+
+    const recipientKey = buildRecipientResolutionKey(recipient)
+
+    if (!recipientKey || dedupedRecipients.has(recipientKey)) {
+      continue
+    }
+
+    dedupedRecipients.set(recipientKey, recipient)
+  }
+
+  return [...dedupedRecipients.values()]
 }

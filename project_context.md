@@ -111,6 +111,30 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - notifications sigue privilegiando `userId` como recipient key efectiva cuando existe principal portal
   - el carril no cambia todavía `/admin/views`, outbox payloads ni projections member-scoped
 
+## Delta 2026-03-30 TASK-134 ya comparte recipients role-based sobre el contrato persona-first
+- Notifications ya no mantiene dos lecturas distintas de recipients role-based entre projections y webhook consumers.
+- Nuevo baseline shared:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+    - `getRoleCodeNotificationRecipients(roleCodes)`
+- Adopción inicial cerrada:
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Guardrail vigente:
+  - inbox, preferencias y notificaciones persistidas siguen `userId`-scoped
+  - dedupe y `notification_log.user_id` siguen dependiendo de `buildNotificationRecipientKey()`
+  - el cut elimina drift de mapping, no cambia recipient keys ni semántica de delivery
+
+## Delta 2026-03-30 TASK-134 quedó cerrada como contrato transversal de Notifications
+- Greenhouse Notifications ya no tiene deuda estructural abierta entre identidad humana y delivery portal.
+- Contrato vigente:
+  - resolución humana `person-first`
+  - `identity_profile` como raíz humana
+  - `member` como faceta operativa cuando el evento nace desde colaboración/payroll
+  - `userId` preservado como llave operativa para inbox, preferencias, auditoría y recipient key efectiva
+- Regla para follow-ons:
+  - nuevos consumers UX-facing o webhook-based deben nacer sobre este contrato shared
+  - no reintroducir mappings `client_user-first` ni reinterpretar `notification_log.user_id` como FK estricta a portal user
+
 ## Delta 2026-03-30 TASK-141 quedó cerrada como baseline institucional
 - La lane `canonical person identity consumption` ya no queda abierta como framing.
 - Estado resultante:

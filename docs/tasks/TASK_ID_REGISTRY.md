@@ -176,7 +176,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-132` | `complete` | Admin Center: Notification System Landing | `docs/tasks/complete/TASK-132-admin-notification-center-landing.md` |
 | `TASK-133` | `complete` | Ops Health: Sentry Incident Surfacing | `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md` |
-| `TASK-134` | `to-do` | Notification Identity Model Hardening | `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md` |
+| `TASK-134` | `complete` | Notification Identity Model Hardening | `docs/tasks/complete/TASK-134-notification-identity-model-hardening.md` |
 | `TASK-135` | `to-do` | Ops Health Sentry Reactive Refresh | `docs/tasks/to-do/TASK-135-ops-health-sentry-reactive-refresh.md` |
 
 | `TASK-136` | `in-progress` | Admin Center: View Access Governance | `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md` |
@@ -213,4 +213,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-164` | `to-do` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/to-do/TASK-164-purchase-orders-module.md` |
 
-`TASK-165`
+| `TASK-165` | `to-do` | Nubox Full Data Enrichment: All Fields, Line Items, Sync Hardening | `docs/tasks/to-do/TASK-165-nubox-full-data-enrichment.md` |

@@ -5,6 +5,7 @@ vi.mock('server-only', () => ({}))
 const mockGetCanonicalPersonsByMemberIds = vi.fn()
 const mockGetCanonicalPersonsByIdentityProfileIds = vi.fn()
 const mockGetCanonicalPersonByUserId = vi.fn()
+const mockRunGreenhousePostgresQuery = vi.fn()
 
 vi.mock('@/lib/identity/canonical-person', () => ({
   getCanonicalPersonsByMemberIds: (...args: unknown[]) => mockGetCanonicalPersonsByMemberIds(...args),
@@ -12,9 +13,14 @@ vi.mock('@/lib/identity/canonical-person', () => ({
   getCanonicalPersonByUserId: (...args: unknown[]) => mockGetCanonicalPersonByUserId(...args)
 }))
 
+vi.mock('@/lib/postgres/client', () => ({
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+}))
+
 const {
   getIdentityProfileNotificationRecipients,
   getMemberNotificationRecipients,
+  getRoleCodeNotificationRecipients,
   getUserNotificationRecipient,
   resolveNotificationRecipients
 } = await import('./person-recipient-resolver')
@@ -181,6 +187,48 @@ describe('person recipient resolver', () => {
       {
         email: 'external@example.com',
         fullName: 'External Ops'
+      }
+    ])
+  })
+
+  it('resolves active role-based recipients through the shared person-first notification shape', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+      {
+        identity_profile_id: 'profile-admin',
+        member_id: 'member-admin',
+        user_id: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        full_name: 'Admin One'
+      },
+      {
+        identity_profile_id: 'profile-fallback',
+        member_id: 'member-fallback',
+        user_id: null,
+        email: 'fallback@efeonce.org',
+        full_name: 'Fallback Person'
+      },
+      {
+        identity_profile_id: 'profile-admin',
+        member_id: 'member-admin',
+        user_id: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        full_name: 'Admin One'
+      }
+    ])
+
+    await expect(getRoleCodeNotificationRecipients(['efeonce_admin', 'finance_manager'])).resolves.toEqual([
+      {
+        identityProfileId: 'profile-admin',
+        memberId: 'member-admin',
+        userId: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        fullName: 'Admin One'
+      },
+      {
+        identityProfileId: 'profile-fallback',
+        memberId: 'member-fallback',
+        email: 'fallback@efeonce.org',
+        fullName: 'Fallback Person'
       }
     ])
   })

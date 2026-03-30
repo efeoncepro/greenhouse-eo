@@ -3,7 +3,9 @@ import 'server-only'
 import {
   getMemberNotificationRecipients,
   getProfileNotificationRecipient,
+  getRoleCodeNotificationRecipients,
   getUserNotificationRecipient,
+  type PersonNotificationRecipient,
 } from '@/lib/notifications/person-recipient-resolver'
 import type { ProjectionDefinition } from '../projection-registry'
 import { buildNotificationRecipientKey, NotificationService } from '@/lib/notifications/notification-service'
@@ -15,42 +17,11 @@ const PAYROLL_OPS_RECIPIENTS = [
   { memberId: 'humberly-henriquez', contactEmail: 'hhumberly@efeoncepro.com', fullName: 'Humberly Henriquez' }
 ] as const
 
-type NotificationDispatchRecipient = {
-  identityProfileId?: string
-  memberId?: string
-  userId?: string
-  email?: string
-  fullName?: string
-}
+const getAdminRecipients = async () => getRoleCodeNotificationRecipients(['efeonce_admin'])
 
-const getRecipientsByRoleCodes = async (roleCodes: string[]) =>
-  runGreenhousePostgresQuery<{
-    identity_profile_id: string | null
-    member_id: string | null
-    user_id: string | null
-    email: string | null
-    full_name: string | null
-  } & Record<string, unknown>>(
-    `SELECT DISTINCT
-       identity_profile_id,
-       member_id,
-       user_id,
-       email,
-       full_name
-     FROM greenhouse_serving.session_360
-     WHERE active = TRUE
-       AND status = 'active'
-       AND role_codes && $1::text[]
-     ORDER BY full_name ASC NULLS LAST, email ASC NULLS LAST
-     LIMIT 20`,
-    [roleCodes]
-  )
+const getFinanceRecipients = async () => getRoleCodeNotificationRecipients(['finance_manager', 'efeonce_admin'])
 
-const getAdminUsers = async () => getRecipientsByRoleCodes(['efeonce_admin'])
-
-const getFinanceUsers = async () => getRecipientsByRoleCodes(['finance_manager', 'efeonce_admin'])
-
-const getPayrollOpsRecipients = async (): Promise<NotificationDispatchRecipient[]> => {
+const getPayrollOpsRecipients = async (): Promise<PersonNotificationRecipient[]> => {
   const recipientsByMemberId = await getMemberNotificationRecipients(
     PAYROLL_OPS_RECIPIENTS.map(recipient => recipient.memberId),
     {
@@ -65,7 +36,7 @@ const getPayrollOpsRecipients = async (): Promise<NotificationDispatchRecipient[
 
   return PAYROLL_OPS_RECIPIENTS
     .map(recipient => recipientsByMemberId.get(recipient.memberId) ?? null)
-    .filter((recipient): recipient is NotificationDispatchRecipient => recipient !== null)
+    .filter((recipient): recipient is PersonNotificationRecipient => recipient !== null)
 }
 
 const wasNotificationAlreadySent = async ({
@@ -132,9 +103,9 @@ export const notificationProjection: ProjectionDefinition = {
     const eventType = scope.entityId
 
     if (eventType === 'service.created') {
-      const users = await getAdminUsers()
+      const recipients = await getAdminRecipients()
 
-      if (users.length === 0) return null
+      if (recipients.length === 0) return null
 
       await NotificationService.dispatch({
         category: 'system_event',
@@ -142,22 +113,16 @@ export const notificationProjection: ProjectionDefinition = {
         body: `Línea: ${(payload.lineaDeServicio as string) || '—'}`,
         actionUrl: '/agency/services',
         metadata: payload,
-        recipients: users.map(u => ({
-          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
-          ...(u.member_id ? { memberId: u.member_id } : {}),
-          ...(u.user_id ? { userId: u.user_id } : {}),
-          ...(u.email ? { email: u.email } : {}),
-          ...(u.full_name ? { fullName: u.full_name } : {})
-        }))
+        recipients
       })
 
-      return `notified ${users.length} admins about service.created`
+      return `notified ${recipients.length} admins about service.created`
     }
 
     if (eventType === 'identity.reconciliation.approved') {
-      const users = await getAdminUsers()
+      const recipients = await getAdminRecipients()
 
-      if (users.length === 0) return null
+      if (recipients.length === 0) return null
 
       await NotificationService.dispatch({
         category: 'system_event',
@@ -165,22 +130,16 @@ export const notificationProjection: ProjectionDefinition = {
         body: 'Perfil vinculado correctamente',
         actionUrl: '/admin/identity',
         metadata: payload,
-        recipients: users.map(u => ({
-          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
-          ...(u.member_id ? { memberId: u.member_id } : {}),
-          ...(u.user_id ? { userId: u.user_id } : {}),
-          ...(u.email ? { email: u.email } : {}),
-          ...(u.full_name ? { fullName: u.full_name } : {})
-        }))
+        recipients
       })
 
       return 'notified admins about reconciliation.approved'
     }
 
     if (eventType === 'finance.dte.discrepancy_found') {
-      const users = await getFinanceUsers()
+      const recipients = await getFinanceRecipients()
 
-      if (users.length === 0) return null
+      if (recipients.length === 0) return null
 
       await NotificationService.dispatch({
         category: 'ico_alert',
@@ -188,16 +147,10 @@ export const notificationProjection: ProjectionDefinition = {
         body: 'Se encontró una discrepancia en la reconciliación de documentos tributarios',
         actionUrl: '/finance/dte-reconciliation',
         metadata: payload,
-        recipients: users.map(u => ({
-          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
-          ...(u.member_id ? { memberId: u.member_id } : {}),
-          ...(u.user_id ? { userId: u.user_id } : {}),
-          ...(u.email ? { email: u.email } : {}),
-          ...(u.full_name ? { fullName: u.full_name } : {})
-        }))
+        recipients
       })
 
-      return `notified ${users.length} finance users about DTE discrepancy`
+      return `notified ${recipients.length} finance users about DTE discrepancy`
     }
 
     if (eventType === 'identity.profile.linked') {
@@ -275,9 +228,9 @@ export const notificationProjection: ProjectionDefinition = {
     }
 
     if (eventType === 'accounting.margin_alert.triggered') {
-      const users = await getFinanceUsers()
+      const recipients = await getFinanceRecipients()
 
-      if (users.length === 0) return null
+      if (recipients.length === 0) return null
 
       const scopeName = typeof payload.scopeName === 'string' ? payload.scopeName : 'scope sin nombre'
       const scopeType = typeof payload.scopeType === 'string' ? payload.scopeType : 'scope'
@@ -292,16 +245,10 @@ export const notificationProjection: ProjectionDefinition = {
           : `Se detectó una caída de margen en ${scopeName}.`,
         actionUrl: '/finance/intelligence',
         metadata: payload,
-        recipients: users.map(u => ({
-          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
-          ...(u.member_id ? { memberId: u.member_id } : {}),
-          ...(u.user_id ? { userId: u.user_id } : {}),
-          ...(u.email ? { email: u.email } : {}),
-          ...(u.full_name ? { fullName: u.full_name } : {})
-        }))
+        recipients
       })
 
-      return `notified ${users.length} finance users about margin alert`
+      return `notified ${recipients.length} finance users about margin alert`
     }
 
     if (eventType === 'access.view_override_changed') {
