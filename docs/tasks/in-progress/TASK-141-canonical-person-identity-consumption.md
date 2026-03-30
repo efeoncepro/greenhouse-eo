@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Parcial`
 - Rank: `56`
 - Domain: `identity / platform / access`
 
@@ -15,6 +15,20 @@
 Institucionalizar en Greenhouse una regla canónica de consumo de identidad humana: la raíz de las superficies de lectura, administración, preview, recipients y resolución cross-module debe ser la persona canónica, no `client_user`.
 
 Esta task no existe para cambiar una sola pantalla. Existe para dejar explícito cómo debe funcionar el objeto persona en el producto y cómo deben consumirlo los módulos cuando necesiten representar un humano, resolver un destinatario o previsualizar acceso.
+
+## Delta 2026-03-30
+
+- Se abrió `TASK-141` como lane activa después de contrastarla contra arquitectura, codebase y carriles reactivos reales.
+- La fuente canónica nueva para el contrato quedó en:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Primer slice runtime conservador implementado:
+  - `src/lib/identity/canonical-person.ts`
+  - `src/lib/admin/get-admin-view-access-governance.ts`
+  - `src/lib/admin/view-access-store.ts`
+  - `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- Guardrail explícito del slice:
+  - no se tocaron recipient keys efectivas, inbox/preferences `userId`-scoped, payloads de outbox ni projections member-scoped
+  - `/admin/views` sigue `userId`-scoped para overrides y auditoría, pero ya expone bridge persona/member/user
 
 ## Why This Task Exists
 
@@ -167,11 +181,15 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `project_context.md`
 - `Handoff.md`
+- `src/lib/identity/canonical-person.ts`
+- `src/lib/notifications/person-recipient-resolver.ts`
+- `src/lib/webhooks/consumers/notification-recipients.ts`
 - `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md`
 - `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md`
 
@@ -184,6 +202,7 @@ Reglas obligatorias:
 - `member` como faceta fuerte para lo operativo
 - `client_user` como principal de acceso y sesión
 - notifications ya tiene parte del carril `person-first`
+- resolver shared `src/lib/identity/canonical-person.ts`
 - `/admin/views` ya tiene la necesidad visible de esta corrección
 
 ### Gap actual
@@ -192,7 +211,7 @@ Reglas obligatorias:
 - no todos los consumers saben cuándo usar persona, `member` o `client_user`
 - algunas surfaces ya muestran el drift al usuario
 - los límites de lo que seguirá siendo `userId`-scoped no están suficientemente formalizados
-- no existe todavía un resolver canónico único con shape reusable para consumers
+- falta adopción de ese resolver shared en consumers no alineados como `/admin/views`
 - no hay métricas institucionales para saber cuántos casos siguen degradados o parcialmente enlazados
 
 ## Scope

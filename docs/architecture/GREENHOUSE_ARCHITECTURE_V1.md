@@ -1,5 +1,21 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-30 — TASK-141 ya tiene primer slice runtime conservador
+
+Greenhouse ya no tiene solo un contrato documental para la migración `person-first`.
+
+Slice operativo nuevo:
+- resolver shared:
+  - `src/lib/identity/canonical-person.ts`
+- adopción inicial:
+  - notifications recipient resolution
+  - webhook notification recipient resolution
+
+Regla de este slice:
+- el consumer se enriquece con `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+- el carril sigue siendo `userId`-scoped para inbox, preferencias, overrides y auditoría
+- no se tocan recipient keys, payloads de outbox ni serving member-scoped
+
 ## Delta 2026-03-30 — Cost Intelligence ya es módulo operativo distribuido
 
 Greenhouse ya no debe leer Cost Intelligence como una lane experimental de Finance.

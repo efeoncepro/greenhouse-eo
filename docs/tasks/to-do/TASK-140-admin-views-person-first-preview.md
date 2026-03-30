@@ -16,6 +16,16 @@ Migrar el selector y preview de `/admin/views` para que consuman identidad `pers
 
 Esta task ya no define la política institucional completa. Toma esa política y la aterriza en el consumer concreto de `Admin Center > Vistas y acceso`.
 
+## Delta 2026-03-30
+
+- `TASK-141` ya dejó fuente canónica explícita en:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Ya existe primer slice shared reusable en:
+  - `src/lib/identity/canonical-person.ts`
+- Implicación nueva para este follow-on:
+  - `/admin/views` ya no necesita inventar su propio bridge persona/member/user
+  - debe adoptar el resolver shared y mantener `userId` solo como llave de compatibilidad para overrides, audit y `authorizedViews`
+
 ## Why This Task Exists
 
 Ya apareció una señal visible del problema en `/admin/views`:

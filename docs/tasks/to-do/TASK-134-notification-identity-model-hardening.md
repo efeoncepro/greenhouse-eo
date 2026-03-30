@@ -13,6 +13,16 @@
 
 Consolidar Greenhouse Notifications sobre un modelo `person-first`, usando `identity_profile` como raíz canónica, `member` como faceta fuerte para HR/Payroll y `client_user` como capacidad de acceso al portal.
 
+## Delta 2026-03-30
+
+- `TASK-141` ya dejó contrato institucional y primer resolver shared en:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+  - `src/lib/identity/canonical-person.ts`
+- El carril de notifications ya adoptó ese resolver en slices base:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- El remanente de esta task ya no es “definir persona/member/user”, sino endurecer Notifications como sistema transversal sobre ese contrato preservando inbox/preferences `userId`-scoped.
+
 ## Why This Task Exists
 
 Durante el cierre real de `TASK-117` y el hardening de `TASK-129` apareció un drift estructural:
