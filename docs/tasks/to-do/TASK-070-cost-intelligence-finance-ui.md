@@ -1,5 +1,13 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- **Bloqueada por TASK-068 + TASK-069** (necesita ambas APIs).
+- Puede ejecutarse **en paralelo con TASK-071** (ambas consumen las mismas APIs).
+- Los patterns de UI ya están establecidos: `ExecutiveCardShell`, `Chip` semáforo, `Table` expandible — esta task los reutiliza.
+- `FinanceDashboardView.tsx` (48KB) y `ClientEconomicsView.tsx` (31KB) ya existen como referencia de patterns.
+- TASK-138 Slice 2 (dashboard KPIs con contexto) complementa esta UI pero es independiente.
+
 ## Status
 
 | Campo | Valor |

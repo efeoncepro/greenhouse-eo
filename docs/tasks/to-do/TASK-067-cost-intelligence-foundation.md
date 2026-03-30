@@ -1,5 +1,15 @@
 # TASK-067 — Cost Intelligence Foundation
 
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- Auditoría completa del módulo Finance confirmó que esta task es el **blocker #1** de todo el pipeline Cost Intelligence.
+- Orden canónico de ejecución: **TASK-067 → (068 ∥ 069) → (070 ∥ 071)**
+- TASK-068 y TASK-069 pueden ejecutarse en paralelo después de esta.
+- TASK-138 (gaps de inteligencia) y TASK-139 (hardening) son independientes y pueden ejecutarse en paralelo.
+- No existe `greenhouse_cost_intelligence` schema — esta task lo crea.
+- No existen `accounting.*` event types — esta task los agrega.
+- No existe `cost_intelligence` domain en projections — esta task lo registra.
+
 ## Status
 
 | Campo | Valor |

@@ -1,5 +1,13 @@
 # TASK-071 — Cost Intelligence Cross-Module Consumer Enrichment
 
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- **Bloqueada por TASK-068 + TASK-069** (consume materialized P&L + closure status).
+- Puede ejecutarse **en paralelo con TASK-070** (ambas consumen las mismas APIs).
+- Reemplaza on-demand compute de `organization-economics.ts` con reads del P&L materializado.
+- TASK-138 Slice 3 (People finance bridge) y Slice 4 (Agency synergy) cubren parte del scope de esta task — coordinar para no duplicar.
+- El Home/Nexa widget (Slice 4 de esta task) depende de TASK-009 (Home, ya `complete`).
+
 ## Status
 
 | Campo | Valor |

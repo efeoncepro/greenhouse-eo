@@ -1,5 +1,15 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- **Bloqueada por TASK-067** (schema + domain + events).
+- Puede ejecutarse **en paralelo con TASK-069** (ambas dependen solo de 067).
+- TASK-070 (UI) necesita ESTA task + TASK-069 completadas antes de empezar.
+- El concepto de "período cerrado" no existe en el codebase actual — esta task lo introduce.
+- `greenhouse_payroll.payroll_periods` tiene `status` (draft → calculated → approved → exported) que esta task consume para readiness check.
+- `greenhouse_finance.income`, `expenses`, `exchange_rates` ya existen — esta task los consulta para readiness.
+- TASK-138 Slice 1 (finance notifications) depende de los eventos `accounting.period_closed/reopened` que esta task emite.
+
 ## Status
 
 | Campo | Valor |

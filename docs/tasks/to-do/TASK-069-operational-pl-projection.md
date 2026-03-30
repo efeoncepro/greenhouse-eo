@@ -1,5 +1,17 @@
 # TASK-069 — Operational P&L Projection
 
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- **Bloqueada por TASK-067** (schema + domain + events).
+- Puede ejecutarse **en paralelo con TASK-068** (ambas dependen solo de 067).
+- TASK-070 (UI) y TASK-071 (cross-module) necesitan ESTA task completada.
+- `computeClientEconomicsSnapshots()` ya existe en `postgres-store-intelligence.ts` — esta task la evoluciona a un P&L materializado con scopes (client → space → organization).
+- `client_labor_cost_allocation` ya existe como serving view — esta task lo consume para labor costs.
+- `member_capacity_economics` ya existe — esta task lo consume para overhead distribution.
+- El P&L actual se computa on-demand; esta task lo materializa como projection reactiva.
+- TASK-071 reemplazará el on-demand compute de `organization-economics.ts` con reads del P&L materializado.
+- TASK-138 Slice 4 (Agency synergy) también depende del P&L materializado de esta task.
+
 ## Status
 
 | Campo | Valor |
