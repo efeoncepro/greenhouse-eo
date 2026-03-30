@@ -79,6 +79,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Decisión operativa actual:
   - el dominio ya puede procesarse de forma dedicada
   - el scheduling fino puede seguir temporalmente apoyado en el catch-all `outbox-react` mientras no existan projections registradas
+  - la cron dedicada en `vercel.json` se difiere hasta que el smoke local del path dedicado deje de topar el warning OpenSSL/JWT del runtime server-side
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.

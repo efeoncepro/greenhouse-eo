@@ -29,10 +29,17 @@
 - Nueva route disponible:
   - `/api/cron/outbox-react-cost-intelligence`
 - `GET /api/internal/projections` ya expone `supportedDomains`, incluyendo `cost_intelligence`.
+- Smoke adicional ejecutado:
+  - dev server local con `CRON_SECRET` efímero en `:3101`
+  - request autenticado a `/api/cron/outbox-react-cost-intelligence`
+  - resultado: auth OK, pero runtime `502` con `error:1E08010C:DECODER routines::unsupported`
+- Lectura actual:
+  - la route ya no falla por wiring ni auth
+  - el remanente es del carril local runtime/credenciales, consistente con el warning OpenSSL/JWT ya visto en otros paths server-side del repo
 
 Pendiente para cerrar la task:
+- limpiar el smoke local del endpoint dedicado sin depender del carril OpenSSL/JWT del runtime
 - decidir si se agenda cron dedicada en `vercel.json` o si el catch-all `outbox-react` sigue siendo suficiente para esta fase
-- cerrar smoke explícito del endpoint con request autenticado de cron
 
 ## Status
 

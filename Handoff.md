@@ -40,8 +40,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - route `outbox-react-cost-intelligence` compila y entra al build
   - `supportedDomains` ya incluye `cost_intelligence`
 - Pendiente real de esta task:
+  - el smoke local con `CRON_SECRET` efímero ya autentica, pero cae en `502` por el carril local OpenSSL/JWT del runtime
   - decidir si se agenda cron dedicada en `vercel.json` ya en 067 o si se mantiene solo la route hasta que 068/069 registren projections
-  - smoke del endpoint con request autenticado
 
 ## Sesión 2026-03-30 — hardening documental para `TASK-141` sin romper reactive lanes
 
