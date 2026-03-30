@@ -200,6 +200,23 @@
   - lectura efectiva de sesión desde `authorizedViews`
 - Durante este cierre también se corrigió un drift incidental en `src/app/api/finance/income/reconcile-payments/route.ts` para mantener `tsc/build` sanos.
 
+## Delta 2026-03-30 — notificación reactiva al usuario afectado
+
+- Los overrides por usuario ya no quedan aislados en `Admin Center`:
+  - el save ahora compara el acceso efectivo antes/después del cambio
+  - si el set real de vistas cambia, publica `access.view_override_changed` al outbox
+- Los overrides vencidos también entran al mismo carril operativo:
+  - limpieza oportunista al resolver overrides persistidos
+  - inserción explícita de `expire_user` en `view_access_log`
+  - publicación reactiva si la expiración cambia el acceso efectivo del usuario
+- El dominio `notifications` ya consume ese evento y avisa al usuario afectado con:
+  - resumen de vistas concedidas
+  - resumen de vistas revocadas
+  - deep-link a la vista recién habilitada cuando aplica
+- Decisión explícita del corte:
+  - solo se notifica cuando cambia el acceso efectivo
+  - cambios de razón sin cambio de vistas no generan notificación adicional
+
 ## Summary
 
 Crear un módulo de gobernanza de vistas en Admin Center que permita a admins visualizar, asignar y revocar acceso a módulos/secciones del portal por perfil de rol, con override por usuario individual cuando sea necesario. Reemplaza el mapping hardcoded `role → route_groups` en `deriveRouteGroups()` por una tabla configurable desde la UI, sin perder el failsafe de la resolución actual.

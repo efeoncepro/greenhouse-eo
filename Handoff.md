@@ -4,6 +4,42 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-136 agrega notificación reactiva al usuario afectado
+
+### Completado
+- Los overrides por usuario de `/admin/views` ya no quedan solo en persistencia + auditoría:
+  - `saveUserViewOverrides()` ahora compara acceso efectivo antes/después del save
+  - cuando el set real de vistas cambia, publica un evento outbox `access.view_override_changed`
+- Los overrides expirados ya no quedan como deuda silenciosa:
+  - `getPersistedUserOverrides()` limpia overrides vencidos de forma oportunista
+  - registra `expire_user` en `greenhouse_core.view_access_log`
+  - publica el mismo evento reactivo si la expiración cambia el acceso efectivo del usuario
+- El dominio `notifications` ya consume ese evento y notifica al usuario afectado con:
+  - resumen de vistas concedidas
+  - resumen de vistas revocadas
+  - deep-link preferente a la vista recién habilitada o fallback `/dashboard`
+- Se agregó cobertura unitaria del projection reactivo para este caso.
+
+### Archivos tocados
+- `src/lib/admin/view-access-store.ts`
+- `src/lib/sync/projections/notifications.ts`
+- `src/lib/sync/projections/notifications.test.ts`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/admin/view-access-store.ts src/lib/sync/event-catalog.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El evento hoy notifica solo cuando cambia el acceso efectivo; ajustes de razón sin cambio de vistas no notifican al usuario, por diseño.
+- El siguiente cierre fuerte de `TASK-136` pasa por:
+  - modelar más rutas terciarias con `view_code` propio donde todavía exista herencia amplia
+  - decidir si conviene exponer en UI un historial más rico de expiraciones/cleanup automático
+
 ## Sesión 2026-03-30 — baseline moderna de UI/UX y skills locales
 
 ### Completado

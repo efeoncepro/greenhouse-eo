@@ -2,6 +2,7 @@
 
 ## 2026-03-30
 
+- `TASK-136` ahora emite un evento reactivo cuando un override por usuario cambia el acceso efectivo; además limpia overrides expirados, registra `expire_user` y el carril `notifications` ya avisa al usuario afectado con un resumen de vistas concedidas/revocadas.
 - `TASK-136` cerró el primer enforcement page-level por `view_code` usando `authorizedViews` en runtime con fallback controlado a `routeGroups`.
 - Rutas clave del portal ya bloquean acceso a nivel de página o nested layout para `dashboard`, `settings`, `proyectos`, `sprints`, Agency, People, Payroll, Finance, Admin Center, AI tools y `Mi Ficha`.
 - `TASK-136` amplió además el enforcement a layouts amplios de `Admin`, `Finance`, `HR` y `My`, y cubrió páginas vecinas como `hr/leave`, `admin/cloud-integrations`, `admin/email-delivery`, `admin/notifications`, `admin/operational-calendar`, `admin/team`, `finance/intelligence` y `finance/cost-allocations`.

@@ -351,6 +351,8 @@ const getPersistedAssignments = async () => {
 
 const getPersistedUserOverrides = async () => {
   try {
+    await expireStaleUserOverrides()
+
     const rows = await runGreenhousePostgresQuery<UserOverrideRow>(
       `
         SELECT
@@ -365,6 +367,148 @@ const getPersistedUserOverrides = async () => {
     )
 
     return rows
+  } catch (error) {
+    if (missingRelation(error)) {
+      throw new ViewAccessStoreError(
+        'View access tables are not provisioned. Run: pnpm setup:postgres:view-access',
+        'SCHEMA_NOT_READY'
+      )
+    }
+
+    throw error
+  }
+}
+
+const expireStaleUserOverrides = async () => {
+  try {
+    const expiredRows = await runGreenhousePostgresQuery<UserOverrideRow>(
+      `
+        SELECT
+          user_id,
+          view_code,
+          override_type,
+          reason,
+          expires_at
+        FROM greenhouse_core.user_view_overrides
+        WHERE expires_at IS NOT NULL
+          AND expires_at <= now()
+        ORDER BY expires_at ASC
+      `
+    )
+
+    if (expiredRows.length === 0) {
+      return { expiredOverrides: 0, notifiedUsers: 0 }
+    }
+
+    const affectedUserIds = Array.from(new Set(expiredRows.map(row => row.user_id)))
+
+    const [access, persistedRows, persistedRegistryRows, allPersistedOverrides] = await Promise.all([
+      getAdminAccessOverview(),
+      getPersistedAssignments(),
+      getPersistedViewRegistry().catch(() => []),
+      runGreenhousePostgresQuery<UserOverrideRow>(
+        `
+          SELECT
+            user_id,
+            view_code,
+            override_type,
+            reason,
+            expires_at
+          FROM greenhouse_core.user_view_overrides
+          WHERE user_id = ANY($1::text[])
+        `,
+        [affectedUserIds]
+      )
+    ])
+
+    const registryRows = toRegistryRows(persistedRegistryRows)
+    const persistedByRole = toPersistedByRole(persistedRows)
+
+    const accessChanges = affectedUserIds
+      .map(userId => {
+        const targetUser = access.users.find(candidate => candidate.userId === userId)
+
+        if (!targetUser) {
+          return null
+        }
+
+        const beforeUserOverrides = allPersistedOverrides.filter(override => override.user_id === userId)
+
+        const afterUserOverrides = beforeUserOverrides.filter(
+          override => !(override.expires_at && new Date(override.expires_at).getTime() <= Date.now())
+        )
+
+        return buildViewAccessChangePayload({
+          user: targetUser,
+          registryRows,
+          beforeAuthorizedViews: resolveAuthorizedViewsForTargetUser({
+            user: targetUser,
+            registryRows,
+            persistedByRole,
+            userOverrides: beforeUserOverrides
+          }),
+          afterAuthorizedViews: resolveAuthorizedViewsForTargetUser({
+            user: targetUser,
+            registryRows,
+            persistedByRole,
+            userOverrides: afterUserOverrides
+          }),
+          actorUserId: 'system',
+          activeOverrides: afterUserOverrides.map(override => ({
+            viewCode: override.view_code,
+            overrideType: override.override_type,
+            reason: override.reason,
+            expiresAt: override.expires_at
+          }))
+        })
+      })
+      .filter((payload): payload is NonNullable<typeof payload> => Boolean(payload))
+
+    await withGreenhousePostgresTransaction(async client => {
+      for (const override of expiredRows) {
+        await client.query(
+          `
+            DELETE FROM greenhouse_core.user_view_overrides
+            WHERE user_id = $1
+              AND view_code = $2
+              AND expires_at IS NOT NULL
+              AND expires_at <= now()
+          `,
+          [override.user_id, override.view_code]
+        )
+
+        await client.query(
+          `
+            INSERT INTO greenhouse_core.view_access_log (
+              action,
+              target_user,
+              view_code,
+              performed_by,
+              reason
+            )
+            VALUES ('expire_user', $1, $2, 'system', $3)
+          `,
+          [override.user_id, override.view_code, override.reason || 'User override expired automatically']
+        )
+      }
+
+      for (const payload of accessChanges) {
+        await publishOutboxEvent(
+          {
+            aggregateType: AGGREGATE_TYPES.viewAccess,
+            aggregateId: payload.userId,
+            eventType: EVENT_TYPES.viewAccessOverrideChanged,
+            payload
+          },
+          client
+        )
+      }
+    })
+
+    return {
+      expiredOverrides: expiredRows.length,
+      notifiedUsers: accessChanges.length
+    }
   } catch (error) {
     if (missingRelation(error)) {
       throw new ViewAccessStoreError(
