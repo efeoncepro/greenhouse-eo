@@ -155,6 +155,7 @@ If Greenhouse already has a canonical object for something, no module may invent
 Examples:
 - Finance must not invent a new tenant identity separate from `greenhouse.clients`
 - People must not treat `client_users` as the canonical collaborator entity
+- Notifications must not treat `client_users` as the canonical human identity when `identity_profile` or `member` already exists
 - Capabilities must not invent product identities outside `greenhouse.service_modules`
 
 ### Rule 2: Modules may own transactions, not shared identity

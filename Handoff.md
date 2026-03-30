@@ -4,6 +4,29 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — Notifications endurecida a person-first
+
+### Completado
+- Se confirmó y corrigió el drift de identidad del sistema de notificaciones:
+  - antes coexistían rutas `member-first`, `client_user-first` y `userId-first`
+  - ahora el resolver compartido nace desde `identity_profile` / `member`
+- Nuevo helper canónico:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+- `NotificationService.dispatch()` ahora resuelve recipients a través de ese helper antes de elegir canales.
+- `notification-recipients.ts` (webhook bus) ya quedó alineado al mismo contrato.
+- `notification-dispatch.ts` ya dedupea por recipient key efectiva, no solo `userId`.
+- `TASK-117` quedó revalidada con notificaciones reales para Julio y Humberly.
+- Se creó `TASK-134` para el follow-on transversal de governance del modelo Notifications.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/notifications/notification-service.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/webhooks/consumers/notification-dispatch.test.ts src/lib/webhooks/consumers/notification-mapping.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint ...` sobre notifications + webhook consumers + reactive projection
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- El inbox y las preferencias siguen `userId`-scoped por diseño; no reabrir eso sin un corte de schema/policy explícito.
+- Si se sigue esta línea, el siguiente slice natural es `TASK-134`.
+
 ## Sesión 2026-03-29 — TASK-117 cerrada con auto-cálculo mensual de payroll
 
 ### Completado

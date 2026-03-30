@@ -6,6 +6,8 @@
   - `assignment.created` visible en campanita
   - `payroll_period.exported` crea notificaciones `payroll_ready` para recipients resolubles del período
 - Este roadmap ya no debe tratar el consumer `notification-dispatch` como gap abierto; queda como baseline implementada y operativa.
+- Los consumers UX-facing del bus ya deben nacer sobre recipient resolution `person-first`, no `client_user-first`.
+- La deuda transversal del modelo de identidad en Notifications quedó formalizada en `TASK-134`.
 
 ## Status
 

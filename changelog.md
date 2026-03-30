@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### Notifications moved to a person-first recipient model
+- `NotificationService` y los helpers compartidos ya resuelven destinatarios desde identidad canónica de persona, no desde `client_user` como raíz.
+- El nuevo resolver soporta `identityProfileId`, `memberId`, `userId` y fallback `email-only`, manteniendo compatibilidad con inbox/preferences portal.
+- `TASK-117` quedó revalidada con notificaciones reales sobre este patrón, y la deuda transversal restante se formalizó en `TASK-134`.
+
 ### TASK-117 payroll auto-calculation baseline closed
 - Payroll ya formaliza el cálculo del período oficial el último día hábil del mes operativo, sin alterar el lifecycle `draft -> calculated -> approved -> exported`.
 - La utilidad de calendario ahora expone `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`, y Payroll separa `calculation readiness` de `approval readiness`.

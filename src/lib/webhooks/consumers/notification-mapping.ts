@@ -33,7 +33,7 @@ const toPeriodLabel = (envelope: WebhookEnvelope) => {
     month: 'long',
     year: 'numeric',
     timeZone: 'America/Santiago'
-  }).format(new Date(Date.UTC(year, month - 1, 1)))
+  }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
 }
 
 const getMemberId = (envelope: WebhookEnvelope) =>

@@ -1,5 +1,19 @@
 # TASK-117 - Payroll Last Business Day Auto-Calculation
 
+## Delta 2026-03-29 — validación real de notificaciones y corrección de identidad
+
+- `TASK-117` quedó revalidada con dispatch real de `payroll_ops`, no solo por tests y build.
+- La resolución de recipients operativos ahora nace desde la identidad canónica de persona:
+  - `identity_profile` como raíz
+  - `member` como faceta fuerte de Payroll
+  - `client_user` solo para `in_app`
+- Evidencia real confirmada:
+  - `user-efeonce-admin-julio-reyes`
+  - `user-efeonce-internal-humberly-henriquez`
+  - categoría `payroll_ops`
+  - título `Nómina marzo de 2026 calculada`
+- El gap sistémico descubierto en Notifications se deriva a `TASK-134`.
+
 ## Delta 2026-03-29
 
 - Cerrada con semántica operativa materializada en runtime:
@@ -129,7 +143,7 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- sin gaps abiertos dentro del alcance declarado; los follow-ons restantes son de policy/UX futura, no blockers del baseline
+- baseline cerrado y validado con recipients reales; el follow-on ya no es de Payroll sino del modelo transversal de identidad en Notifications (`TASK-134`)
 
 ## Scope
 

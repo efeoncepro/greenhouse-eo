@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-134`
+- siguiente ID disponible: `TASK-135`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -72,6 +72,7 @@ Primer bloque operativo asignado:
   - el remanente operativo del bloque se concentra en `TASK-103`
 - `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
 - `TASK-127` nace como follow-on institucional para consolidar la lectura arquitectónica Cloud post-baseline, sin reabrir lanes ya cerradas.
+- `TASK-134` nace como follow-on institucional para consolidar Notifications sobre identidad canónica `person-first`, sin reabrir el cierre funcional de `TASK-117` ni `TASK-129`.
 - Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
@@ -172,7 +173,8 @@ Primer bloque operativo asignado:
 | 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](complete/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | **Cerrada** | Primer consumer outbound validado E2E en `staging`: schema provisionado, canary self-loop con Secret Manager + Vercel bypass, delivery `HTTP 200` y counters activos para Admin Center |
 | 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
 | 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
-| 53 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
+| 53 | `TASK-134` | [TASK-134-notification-identity-model-hardening.md](to-do/TASK-134-notification-identity-model-hardening.md) | P1 | Alto | Medio | Descubierta | Consolidar Notifications sobre identidad canónica `person-first`: `identity_profile` raíz, `member` faceta operativa y `client_user` como acceso portal |
+| 54 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
@@ -217,7 +219,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 ## Complete
 
 | [TASK-133-ops-health-sentry-incident-surfacing.md](complete/TASK-133-ops-health-sentry-incident-surfacing.md) | Incidentes Sentry abiertos/relevantes visibles en `Ops Health` y `Cloud & Integrations` con snapshot fail-soft separado de la postura base de observability. |
-| [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y notificación reactiva `payroll_ops` al quedar `calculated`. |
+| [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada y revalidada con recipients reales: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y `payroll_ops` ya resuelta sobre identidad persona-first. |
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
 | [TASK-096-gcp-secret-management-security-hardening.md](complete/TASK-096-gcp-secret-management-security-hardening.md) | Hardening cloud cerrado para su alcance útil: WIF/OIDC validado en `preview` + `staging` + `production`, Cloud SQL externo endurecido y Fase 3 absorbida posteriormente por `TASK-124`. |
 | [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | Baseline de security headers cerrada: `src/proxy.ts`, matcher conservador, `HSTS` en `production` y `Content-Security-Policy-Report-Only` como capa segura de observación. |
@@ -230,7 +232,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 | [TASK-101-cron-auth-standardization.md](complete/TASK-101-cron-auth-standardization.md) | Cron auth centralizado con `requireCronAuth()`, fail-closed en ausencia de `CRON_SECRET`, comparación timing-safe y migración de 19 rutas scheduler-driven. |
 | [TASK-122-cloud-governance-layer-institutionalization.md](complete/TASK-122-cloud-governance-layer-institutionalization.md) | Capa Cloud institucionalizada como dominio interno de governance: operating model canónico, boundary de surfaces y baseline real en `src/lib/cloud/*` para `TASK-100` a `TASK-103`. |
 | [TASK-125-webhook-activation-first-consumers.md](complete/TASK-125-webhook-activation-first-consumers.md) | Primer consumer outbound validado E2E en `staging`: schema de webhooks provisionado, canary interno con Secret Manager + Vercel bypass, delivery `HTTP 200` y baseline lista para futuros consumers reales. |
-| [TASK-129-in-app-notifications-via-webhook-bus.md](complete/TASK-129-in-app-notifications-via-webhook-bus.md) | Consumer institucional de notificaciones sobre el bus outbound ya validado E2E en `staging`: firma HMAC, dedupe funcional, target estable en Vercel, campanita visible para `assignment.created` y fan-out `payroll_period.exported` a recipients reales. |
+| [TASK-129-in-app-notifications-via-webhook-bus.md](complete/TASK-129-in-app-notifications-via-webhook-bus.md) | Consumer institucional de notificaciones sobre el bus outbound ya validado E2E, ahora endurecido con recipient resolution `person-first`, fallback `email-only` y dedupe por recipient key efectiva. |
 | [TASK-119-home-landing-rollout-navigation-cutover.md](complete/TASK-119-home-landing-rollout-navigation-cutover.md) | Cutover de landing completado: internos/admin aterrizan en `/home`, sesiones legadas se normalizan y la verificación manual del flujo de login/landing quedó cerrada. |
 | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | Follow-on absorbido por la consolidación posterior de `Admin Center`; `/internal/dashboard` redirige a `/admin` y el shell unificado ya no necesita esta lane separada. |
 | [TASK-111-admin-center-secret-ref-governance-ui.md](complete/TASK-111-admin-center-secret-ref-governance-ui.md) | Tabla de governance de secret refs con dirección inbound/outbound, auth mode, owner, scope, estado y verificación. Nunca expone valores crudos. |

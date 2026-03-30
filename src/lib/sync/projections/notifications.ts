@@ -1,44 +1,79 @@
 import 'server-only'
 
+import {
+  getMemberNotificationRecipients,
+  getProfileNotificationRecipient,
+  getUserNotificationRecipient,
+} from '@/lib/notifications/person-recipient-resolver'
 import type { ProjectionDefinition } from '../projection-registry'
-import { NotificationService } from '@/lib/notifications/notification-service'
+import { buildNotificationRecipientKey, NotificationService } from '@/lib/notifications/notification-service'
 import { ensureNotificationSchema } from '@/lib/notifications/schema'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-const PAYROLL_OPS_RECIPIENT_EMAILS = ['jreyes@efeoncepro.com', 'hhumberly@efeoncepro.com'] as const
+const PAYROLL_OPS_RECIPIENTS = [
+  { memberId: 'julio-reyes', contactEmail: 'jreyes@efeoncepro.com', fullName: 'Julio Reyes' },
+  { memberId: 'humberly-henriquez', contactEmail: 'hhumberly@efeoncepro.com', fullName: 'Humberly Henriquez' }
+] as const
 
-const getAdminUsers = async () =>
-  runGreenhousePostgresQuery<{ user_id: string; email: string; full_name: string } & Record<string, unknown>>(
-    `SELECT user_id, email, full_name FROM greenhouse_core.client_users
-     WHERE status = 'active' AND role_codes @> ARRAY['efeonce_admin']
-     LIMIT 10`
-  )
+type NotificationDispatchRecipient = {
+  identityProfileId?: string
+  memberId?: string
+  userId?: string
+  email?: string
+  fullName?: string
+}
 
-const getFinanceUsers = async () =>
-  runGreenhousePostgresQuery<{ user_id: string; email: string; full_name: string } & Record<string, unknown>>(
-    `SELECT user_id, email, full_name FROM greenhouse_core.client_users
-     WHERE status = 'active'
-       AND (role_codes @> ARRAY['finance_manager'] OR role_codes @> ARRAY['efeonce_admin'])
-     LIMIT 10`
-  )
-
-const getPayrollOpsUsers = async () =>
-  runGreenhousePostgresQuery<{ user_id: string; email: string; full_name: string } & Record<string, unknown>>(
-    `SELECT user_id, email, full_name
-     FROM greenhouse_core.client_users
-     WHERE status = 'active'
-       AND LOWER(email) = ANY($1::text[])
+const getRecipientsByRoleCodes = async (roleCodes: string[]) =>
+  runGreenhousePostgresQuery<{
+    identity_profile_id: string | null
+    member_id: string | null
+    user_id: string | null
+    email: string | null
+    full_name: string | null
+  } & Record<string, unknown>>(
+    `SELECT DISTINCT
+       identity_profile_id,
+       member_id,
+       user_id,
+       email,
+       full_name
+     FROM greenhouse_serving.session_360
+     WHERE active = TRUE
+       AND status = 'active'
+       AND role_codes && $1::text[]
      ORDER BY full_name ASC NULLS LAST, email ASC NULLS LAST
-     LIMIT 10`,
-    [PAYROLL_OPS_RECIPIENT_EMAILS]
+     LIMIT 20`,
+    [roleCodes]
   )
+
+const getAdminUsers = async () => getRecipientsByRoleCodes(['efeonce_admin'])
+
+const getFinanceUsers = async () => getRecipientsByRoleCodes(['finance_manager', 'efeonce_admin'])
+
+const getPayrollOpsRecipients = async (): Promise<NotificationDispatchRecipient[]> => {
+  const recipientsByMemberId = await getMemberNotificationRecipients(
+    PAYROLL_OPS_RECIPIENTS.map(recipient => recipient.memberId),
+    {
+      fallbacks: Object.fromEntries(
+        PAYROLL_OPS_RECIPIENTS.map(recipient => [
+          recipient.memberId,
+          { email: recipient.contactEmail, fullName: recipient.fullName }
+        ])
+      )
+    }
+  )
+
+  return PAYROLL_OPS_RECIPIENTS
+    .map(recipient => recipientsByMemberId.get(recipient.memberId) ?? null)
+    .filter((recipient): recipient is NotificationDispatchRecipient => recipient !== null)
+}
 
 const wasNotificationAlreadySent = async ({
-  userId,
+  recipientKey,
   category,
   eventId
 }: {
-  userId: string
+  recipientKey: string
   category: string
   eventId: string | null
 }) => {
@@ -55,7 +90,7 @@ const wasNotificationAlreadySent = async ({
          AND status = 'sent'
          AND metadata ->> 'eventId' = $3
      ) AS exists`,
-    [userId, category, eventId]
+    [recipientKey, category, eventId]
   )
 
   return rows[0]?.exists === true
@@ -66,7 +101,7 @@ const formatPayrollPeriodLabel = (year: number, month: number) =>
     month: 'long',
     year: 'numeric',
     timeZone: 'America/Santiago'
-  }).format(new Date(Date.UTC(year, month - 1, 1)))
+  }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
 
 export const notificationProjection: ProjectionDefinition = {
   name: 'notification_dispatch',
@@ -105,7 +140,13 @@ export const notificationProjection: ProjectionDefinition = {
         body: `Línea: ${(payload.lineaDeServicio as string) || '—'}`,
         actionUrl: '/agency/services',
         metadata: payload,
-        recipients: users.map(u => ({ userId: u.user_id, email: u.email, fullName: u.full_name }))
+        recipients: users.map(u => ({
+          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
+          ...(u.member_id ? { memberId: u.member_id } : {}),
+          ...(u.user_id ? { userId: u.user_id } : {}),
+          ...(u.email ? { email: u.email } : {}),
+          ...(u.full_name ? { fullName: u.full_name } : {})
+        }))
       })
 
       return `notified ${users.length} admins about service.created`
@@ -122,7 +163,13 @@ export const notificationProjection: ProjectionDefinition = {
         body: 'Perfil vinculado correctamente',
         actionUrl: '/admin/identity',
         metadata: payload,
-        recipients: users.map(u => ({ userId: u.user_id, email: u.email, fullName: u.full_name }))
+        recipients: users.map(u => ({
+          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
+          ...(u.member_id ? { memberId: u.member_id } : {}),
+          ...(u.user_id ? { userId: u.user_id } : {}),
+          ...(u.email ? { email: u.email } : {}),
+          ...(u.full_name ? { fullName: u.full_name } : {})
+        }))
       })
 
       return 'notified admins about reconciliation.approved'
@@ -139,16 +186,29 @@ export const notificationProjection: ProjectionDefinition = {
         body: 'Se encontró una discrepancia en la reconciliación de documentos tributarios',
         actionUrl: '/finance/dte-reconciliation',
         metadata: payload,
-        recipients: users.map(u => ({ userId: u.user_id, email: u.email, fullName: u.full_name }))
+        recipients: users.map(u => ({
+          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
+          ...(u.member_id ? { memberId: u.member_id } : {}),
+          ...(u.user_id ? { userId: u.user_id } : {}),
+          ...(u.email ? { email: u.email } : {}),
+          ...(u.full_name ? { fullName: u.full_name } : {})
+        }))
       })
 
       return `notified ${users.length} finance users about DTE discrepancy`
     }
 
     if (eventType === 'identity.profile.linked') {
-      const userId = payload.userId as string
+      const profileId = typeof payload.profileId === 'string' && payload.profileId.trim() ? payload.profileId : null
+      const userId = typeof payload.userId === 'string' && payload.userId.trim() ? payload.userId : null
 
-      if (!userId) return null
+      const recipient = profileId
+        ? await getProfileNotificationRecipient(profileId)
+        : userId
+          ? await getUserNotificationRecipient(userId)
+          : null
+
+      if (!recipient) return null
 
       await NotificationService.dispatch({
         category: 'assignment_change',
@@ -156,10 +216,10 @@ export const notificationProjection: ProjectionDefinition = {
         body: 'Tu identidad fue verificada y vinculada a tu perfil de equipo',
         actionUrl: '/people/me',
         metadata: payload,
-        recipients: [{ userId }]
+        recipients: [recipient]
       })
 
-      return `notified user ${userId} about profile.linked`
+      return `notified ${buildNotificationRecipientKey(recipient)} about profile.linked`
     }
 
     if (eventType === 'payroll_period.calculated') {
@@ -170,22 +230,21 @@ export const notificationProjection: ProjectionDefinition = {
 
       if (!periodId || !year || !month) return null
 
-      const users = await getPayrollOpsUsers()
-
-      if (users.length === 0) return null
+      const recipients = await getPayrollOpsRecipients()
 
       const eligibleUsers = (
         await Promise.all(
-          users.map(async user => ({
-            ...user,
+          recipients.map(async recipient => ({
+            ...recipient,
+            recipientKey: buildNotificationRecipientKey(recipient),
             alreadySent: await wasNotificationAlreadySent({
-              userId: user.user_id,
+              recipientKey: buildNotificationRecipientKey(recipient) ?? 'unknown-recipient',
               category: 'payroll_ops',
               eventId
             })
           }))
         )
-      ).filter(user => !user.alreadySent)
+      ).filter(recipient => recipient.recipientKey && !recipient.alreadySent)
 
       if (eligibleUsers.length === 0) {
         return `payroll_period.calculated already notified for event ${eventId ?? 'without-event-id'}`
@@ -201,10 +260,12 @@ export const notificationProjection: ProjectionDefinition = {
           eventId,
           notificationScope: 'payroll_ops'
         },
-        recipients: eligibleUsers.map(user => ({
-          userId: user.user_id,
-          email: user.email,
-          fullName: user.full_name
+        recipients: eligibleUsers.map(recipient => ({
+          identityProfileId: recipient.identityProfileId,
+          memberId: recipient.memberId,
+          userId: recipient.userId,
+          email: recipient.email,
+          fullName: recipient.fullName
         }))
       })
 

@@ -39,7 +39,7 @@ describe('notification mappings', () => {
     const mapping = findNotificationMapping('payroll_period.exported')
 
     expect(mapping).not.toBeNull()
-    expect(mapping?.title(makeEnvelope())).toContain('2026')
+    expect(mapping?.title(makeEnvelope())).toBe('Tu nómina de marzo de 2026 está lista')
     expect(mapping?.actionUrl?.(makeEnvelope())).toBe('/my/payroll')
   })
 

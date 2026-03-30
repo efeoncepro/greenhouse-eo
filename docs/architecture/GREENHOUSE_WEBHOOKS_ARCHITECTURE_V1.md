@@ -100,7 +100,9 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
   - `member.created`
   - `payroll_period.exported`
 - Recipient resolution baseline:
-  - member-linked `client_users`
+  - `person-first` via `identity_profile` / `member`
+  - `client_user` cuando existe principal portal activo
+  - fallback `email-only` cuando la persona existe pero no tiene inbox portal
   - recipients del período exportado en nómina
   - respeto de preferencias in-app/email a través de `notification-service`
 - Guardrails ya implementados:

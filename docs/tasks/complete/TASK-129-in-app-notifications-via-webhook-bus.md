@@ -1,5 +1,15 @@
 # TASK-129 — In-App Notifications via Webhook Bus
 
+## Delta 2026-03-29 — recipient resolution canónica
+- El consumer webhook ya quedó alineado al resolver compartido `person-first`.
+- Contrato vigente del carril:
+  - `identity_profile` como raíz humana
+  - `member` para eventos colaborador/payroll
+  - `client_user` como inbox portal
+  - fallback `email-only` cuando no exista principal portal activo
+- El dedupe del consumer ya opera sobre la recipient key efectiva (`userId`, `person:*`, `member:*` o `external:*`), no solo sobre `userId`.
+- `payroll_period.exported` corrige además el label mensual con timezone `America/Santiago`, evitando deriva de mes en bordes UTC.
+
 ## Delta 2026-03-29
 - La implementación arranca con convivencia explícita entre carriles:
   - `reactive notifications` conserva `service.created`, `identity.reconciliation.approved`, `finance.dte.discrepancy_found`, `identity.profile.linked`
@@ -35,7 +45,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |

@@ -3,6 +3,19 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 notifications identity model
+- El sistema de notificaciones ya no debe leerse como `client_user-first`.
+- Contrato canónico vigente:
+  - `identity_profile` = raíz de persona
+  - `member` = faceta operativa fuerte para HR/Payroll/Assignments
+  - `client_user` = acceso portal, inbox y preferencias
+- `src/lib/notifications/person-recipient-resolver.ts` centraliza la resolución compartida para:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - fallback `email-only`
+- `TASK-117` y `TASK-129` ya consumen este patrón; el follow-on transversal queda formalizado en `TASK-134`.
+
 ## Delta 2026-03-29 TASK-117 auto-cálculo mensual de payroll
 - Payroll ya formaliza el hito mensual para dejar el período oficial en `calculated` el último día hábil del mes operativo.
 - Contratos nuevos o endurecidos:

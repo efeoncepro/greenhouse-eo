@@ -4,16 +4,13 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getCategoryConfig, type NotificationChannel } from '@/config/notification-categories'
 import { sendEmail } from '@/lib/email/delivery'
 import type { SendEmailResult } from '@/lib/email/types'
+import { resolveNotificationRecipients, type PersonNotificationRecipient } from './person-recipient-resolver'
 
 // ── Types ──────────────────────────────────────────────────────
 
 export interface DispatchInput {
   category: string
-  recipients: {
-    userId: string
-    email?: string
-    fullName?: string
-  }[]
+  recipients: PersonNotificationRecipient[]
   spaceId?: string
   title: string
   body?: string
@@ -26,6 +23,33 @@ export interface DispatchResult {
   sent: { userId: string; channels: NotificationChannel[] }[]
   skipped: { userId: string; reason: string }[]
   failed: { userId: string; channel: NotificationChannel; error: string }[]
+}
+
+const normalizeRecipientEmail = (email: string) => email.trim().toLowerCase()
+
+export const buildNotificationRecipientKey = (recipient: {
+  userId?: string
+  identityProfileId?: string
+  memberId?: string
+  email?: string
+}) => {
+  if (recipient.userId?.trim()) {
+    return recipient.userId.trim()
+  }
+
+  if (recipient.identityProfileId?.trim()) {
+    return `person:${recipient.identityProfileId.trim()}`
+  }
+
+  if (recipient.memberId?.trim()) {
+    return `member:${recipient.memberId.trim()}`
+  }
+
+  if (recipient.email?.trim()) {
+    return `external:${normalizeRecipientEmail(recipient.email)}`
+  }
+
+  return null
 }
 
 interface PreferenceRow extends Record<string, unknown> {
@@ -59,19 +83,29 @@ export class NotificationService {
   static async dispatch(input: DispatchInput): Promise<DispatchResult> {
     const categoryConfig = getCategoryConfig(input.category)
     const result: DispatchResult = { sent: [], skipped: [], failed: [] }
+    const resolvedRecipients = await resolveNotificationRecipients(input.recipients)
 
-    for (const recipient of input.recipients) {
-      const channels = await this.resolveChannels(
-        recipient.userId,
-        input.category,
-        categoryConfig.defaultChannels
-      )
+    for (const recipient of resolvedRecipients) {
+      const recipientKey = buildNotificationRecipientKey(recipient)
+
+      if (!recipientKey) {
+        result.skipped.push({ userId: 'unknown-recipient', reason: 'recipient_identifier_missing' })
+        continue
+      }
+
+      const channels = recipient.userId
+        ? await this.resolveChannels(
+            recipient.userId,
+            input.category,
+            categoryConfig.defaultChannels
+          )
+        : categoryConfig.defaultChannels.filter(channel => channel === 'email')
 
       if (channels.length === 0) {
-        result.skipped.push({ userId: recipient.userId, reason: 'all_channels_disabled' })
+        result.skipped.push({ userId: recipientKey, reason: 'all_channels_disabled' })
         await this.logDispatch(
           null,
-          recipient.userId,
+          recipientKey,
           input.category,
           'in_app',
           'skipped',
@@ -85,14 +119,14 @@ export class NotificationService {
       const sentChannels: NotificationChannel[] = []
 
       // ── In-app channel ──
-      if (channels.includes('in_app')) {
+      if (channels.includes('in_app') && recipient.userId) {
         try {
           const notificationId = await this.createInAppNotification(input, recipient.userId, categoryConfig.icon)
 
           sentChannels.push('in_app')
           await this.logDispatch(
             notificationId,
-            recipient.userId,
+            recipientKey,
             input.category,
             'in_app',
             'sent',
@@ -103,10 +137,10 @@ export class NotificationService {
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
-          result.failed.push({ userId: recipient.userId, channel: 'in_app', error: msg })
+          result.failed.push({ userId: recipientKey, channel: 'in_app', error: msg })
           await this.logDispatch(
             null,
-            recipient.userId,
+            recipientKey,
             input.category,
             'in_app',
             'failed',
@@ -126,7 +160,7 @@ export class NotificationService {
             sentChannels.push('email')
             await this.logDispatch(
               null,
-              recipient.userId,
+              recipientKey,
               input.category,
               'email',
               'sent',
@@ -135,10 +169,10 @@ export class NotificationService {
               input.metadata
             )
           } else if (emailResult.status === 'skipped') {
-            result.skipped.push({ userId: recipient.userId, reason: emailResult.error || 'email_delivery_skipped' })
+            result.skipped.push({ userId: recipientKey, reason: emailResult.error || 'email_delivery_skipped' })
             await this.logDispatch(
               null,
-              recipient.userId,
+              recipientKey,
               input.category,
               'email',
               'skipped',
@@ -147,10 +181,10 @@ export class NotificationService {
               input.metadata
             )
           } else {
-            result.failed.push({ userId: recipient.userId, channel: 'email', error: emailResult.error || 'Email delivery failed' })
+            result.failed.push({ userId: recipientKey, channel: 'email', error: emailResult.error || 'Email delivery failed' })
             await this.logDispatch(
               null,
-              recipient.userId,
+              recipientKey,
               input.category,
               'email',
               'failed',
@@ -162,10 +196,10 @@ export class NotificationService {
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
-          result.failed.push({ userId: recipient.userId, channel: 'email', error: msg })
+          result.failed.push({ userId: recipientKey, channel: 'email', error: msg })
           await this.logDispatch(
             null,
-            recipient.userId,
+            recipientKey,
             input.category,
             'email',
             'failed',
@@ -175,10 +209,10 @@ export class NotificationService {
           )
         }
       } else if (channels.includes('email') && !recipient.email) {
-        result.skipped.push({ userId: recipient.userId, reason: 'email_not_provided' })
+        result.skipped.push({ userId: recipientKey, reason: 'email_not_provided' })
         await this.logDispatch(
           null,
-          recipient.userId,
+          recipientKey,
           input.category,
           'email',
           'skipped',
@@ -189,7 +223,7 @@ export class NotificationService {
       }
 
       if (sentChannels.length > 0) {
-        result.sent.push({ userId: recipient.userId, channels: sentChannels })
+        result.sent.push({ userId: recipientKey, channels: sentChannels })
       }
     }
 
@@ -253,7 +287,13 @@ export class NotificationService {
 
   private static async sendEmailNotification(
     input: DispatchInput,
-    recipient: { userId: string; email?: string; fullName?: string }
+    recipient: {
+      identityProfileId?: string
+      memberId?: string
+      userId?: string
+      email?: string
+      fullName?: string
+    }
   ): Promise<SendEmailResult> {
     if (!recipient.email) {
       return {

@@ -1,9 +1,12 @@
 import 'server-only'
 
+import { getMemberNotificationRecipients, type PersonNotificationRecipient } from '@/lib/notifications/person-recipient-resolver'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface NotificationRecipient {
-  userId: string
+  identityProfileId?: string
+  userId?: string
+  memberId?: string
   email?: string
   fullName?: string
 }
@@ -14,6 +17,7 @@ export interface RecipientResolutionResult {
 }
 
 interface RecipientRow extends Record<string, unknown> {
+  identity_profile_id?: string | null
   member_id?: string | null
   user_id?: string | null
   email?: string | null
@@ -21,75 +25,67 @@ interface RecipientRow extends Record<string, unknown> {
 }
 
 const normalizeRecipient = (row: RecipientRow): NotificationRecipient | null => {
-  const userId = typeof row.user_id === 'string' ? row.user_id.trim() : ''
-
-  if (!userId) return null
-
+  const userId = typeof row.user_id === 'string' && row.user_id.trim() ? row.user_id.trim() : undefined
   const email = typeof row.email === 'string' && row.email.trim() ? row.email.trim() : undefined
   const fullName = typeof row.full_name === 'string' && row.full_name.trim() ? row.full_name.trim() : undefined
 
+  if (!userId && !email) return null
+
   return {
-    userId,
+    ...(typeof row.identity_profile_id === 'string' && row.identity_profile_id.trim()
+      ? { identityProfileId: row.identity_profile_id.trim() }
+      : {}),
+    ...(typeof row.member_id === 'string' && row.member_id.trim() ? { memberId: row.member_id.trim() } : {}),
+    ...(userId ? { userId } : {}),
     ...(email ? { email } : {}),
     ...(fullName ? { fullName } : {})
   }
 }
 
-export const getMemberRecipient = async (memberId: string): Promise<RecipientResolutionResult> => {
-  const rows = await runGreenhousePostgresQuery<RecipientRow>(
-    `SELECT
-       m.member_id,
-       cu.user_id,
-       cu.email,
-       COALESCE(cu.full_name, m.display_name) AS full_name
-     FROM greenhouse_core.members AS m
-     LEFT JOIN greenhouse_core.client_users AS cu
-       ON cu.member_id = m.member_id
-      AND cu.active = TRUE
-      AND cu.status = 'active'
-     WHERE m.member_id = $1
-       AND m.active = TRUE
-     LIMIT 1`,
-    [memberId]
-  )
+const toNotificationRecipient = (recipient: PersonNotificationRecipient | null): NotificationRecipient | null =>
+  recipient
+    ? {
+        ...(recipient.identityProfileId ? { identityProfileId: recipient.identityProfileId } : {}),
+        ...(recipient.memberId ? { memberId: recipient.memberId } : {}),
+        ...(recipient.userId ? { userId: recipient.userId } : {}),
+        ...(recipient.email ? { email: recipient.email } : {}),
+        ...(recipient.fullName ? { fullName: recipient.fullName } : {})
+      }
+    : null
 
-  if (rows.length === 0) {
+export const getMemberRecipient = async (memberId: string): Promise<RecipientResolutionResult> => {
+  const recipientsByMemberId = await getMemberNotificationRecipients([memberId])
+  const recipient = toNotificationRecipient(recipientsByMemberId.get(memberId) ?? null)
+
+  if (!recipient) {
     return { recipients: [], unresolvedRecipients: 0 }
   }
 
-  const recipient = normalizeRecipient(rows[0])
-
   return {
-    recipients: recipient ? [recipient] : [],
-    unresolvedRecipients: recipient ? 0 : 1
+    recipients: [recipient],
+    unresolvedRecipients: 0
   }
 }
 
 export const getPayrollPeriodRecipients = async (periodId: string): Promise<RecipientResolutionResult> => {
-  const rows = await runGreenhousePostgresQuery<RecipientRow>(
+  const rows = await runGreenhousePostgresQuery<{ member_id: string } & Record<string, unknown>>(
     `SELECT DISTINCT
-       e.member_id,
-       cu.user_id,
-       cu.email,
-       COALESCE(cu.full_name, m.display_name) AS full_name
+       e.member_id
      FROM greenhouse_payroll.payroll_entries AS e
      INNER JOIN greenhouse_core.members AS m
        ON m.member_id = e.member_id
-     LEFT JOIN greenhouse_core.client_users AS cu
-       ON cu.member_id = m.member_id
-      AND cu.active = TRUE
-      AND cu.status = 'active'
      WHERE e.period_id = $1
        AND m.active = TRUE
-     ORDER BY full_name ASC NULLS LAST, cu.email ASC NULLS LAST`,
+     ORDER BY e.member_id ASC`,
     [periodId]
   )
 
+  const recipientsByMemberId = await getMemberNotificationRecipients(rows.map(row => row.member_id))
   const recipients: NotificationRecipient[] = []
   let unresolvedRecipients = 0
 
   for (const row of rows) {
-    const recipient = normalizeRecipient(row)
+    const recipient = toNotificationRecipient(recipientsByMemberId.get(row.member_id) ?? null)
 
     if (recipient) {
       recipients.push(recipient)
@@ -104,6 +100,8 @@ export const getPayrollPeriodRecipients = async (periodId: string): Promise<Reci
 export const getHrAdminRecipients = async (): Promise<RecipientResolutionResult> => {
   const rows = await runGreenhousePostgresQuery<RecipientRow>(
     `SELECT DISTINCT
+       identity_profile_id,
+       member_id,
        user_id,
        email,
        full_name
