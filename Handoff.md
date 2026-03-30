@@ -111,6 +111,10 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Pendiente inmediato
 - Validación manual visual en `/admin/views` para confirmar copy, chips y casos borde.
 - Decidir si un siguiente slice debe abrir el universo a personas sin principal portal persistible o si ese caso queda fuera del preview editable.
+- UX hardening ya aplicado en este mismo carril:
+  - copy del panel alineado a `persona previewable`
+  - alertas explícitas para `active`, `inactive`, `missing_principal` y `degraded_link`
+  - roadmap tab ya refleja los remanentes reales de `TASK-140`
 
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 

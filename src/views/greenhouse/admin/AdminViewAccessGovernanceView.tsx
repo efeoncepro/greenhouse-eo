@@ -43,6 +43,29 @@ const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' 
   cliente: 'success'
 }
 
+const PREVIEW_STATE_COPY = {
+  active: {
+    severity: 'success' as const,
+    title: 'Persona con principal portal activo',
+    description: 'El preview puede resolver persona canónica y mantener compatibilidad total con overrides y auditoría user-scoped.'
+  },
+  inactive: {
+    severity: 'warning' as const,
+    title: 'Principal portal inactivo',
+    description: 'La persona conserva bridge portal, pero el principal operativo no está activo. Conviene revisar antes de usar este caso como referencia de acceso normal.'
+  },
+  missing_principal: {
+    severity: 'warning' as const,
+    title: 'Persona sin principal portal persistible',
+    description: 'La persona existe canónicamente, pero todavía no tiene un principal compatible para guardar overrides o auditar acceso efectivo.'
+  },
+  degraded_link: {
+    severity: 'warning' as const,
+    title: 'Bridge humano degradado',
+    description: 'El panel pudo resolver un principal portal, pero el vínculo completo hacia persona canónica sigue incompleto.'
+  }
+}
+
 const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<ActiveTab>('permissions')
@@ -290,6 +313,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     () => data.auditLog.filter(entry => entry.targetUser === previewUser?.userId).slice(0, 10),
     [data.auditLog, previewUser?.userId]
   )
+
+  const previewStateMeta = previewUser ? PREVIEW_STATE_COPY[previewUser.portalAccessState] : null
 
   const toggleRoleAccess = (viewCode: string, roleCode: string) => {
     setSaveError(null)
@@ -543,7 +568,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       >
         <ExecutiveMiniStatCard title='Vistas registradas' value={String(data.totals.registeredViews)} detail='Mapa inicial de superficies gobernables' icon='tabler-layout-grid' tone='info' />
         <ExecutiveMiniStatCard title='Roles configurados' value={String(data.totals.configuredRoles)} detail='Perfiles visibles en la matrix actual' icon='tabler-shield-lock' tone='info' />
-        <ExecutiveMiniStatCard title='Principales para preview' value={String(data.totals.previewableUsers)} detail='Base user-scoped con bridge a persona canónica' icon='tabler-user-search' tone='success' />
+        <ExecutiveMiniStatCard title='Personas previewables' value={String(data.totals.previewableUsers)} detail='Universo visible del consumer persona-first actual' icon='tabler-user-search' tone='success' />
         <ExecutiveMiniStatCard title='Secciones cubiertas' value={String(data.totals.sections)} detail='Gestión, equipo, finanzas y administración' icon='tabler-layout-kanban' tone='warning' />
       </Box>
 
@@ -870,6 +895,18 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
                 {previewUser ? (
                   <Stack spacing={3}>
+                    {previewStateMeta ? (
+                      <Alert severity={previewStateMeta.severity} variant='outlined'>
+                        <strong>{previewStateMeta.title}.</strong> {previewStateMeta.description}
+                      </Alert>
+                    ) : null}
+
+                    {previewUser.portalPrincipalCount > 1 ? (
+                      <Alert severity='info' variant='outlined'>
+                        Esta persona consolida {previewUser.portalPrincipalCount} principales portal. El panel usa uno compatible para overrides, pero la lectura del preview ya es person-first.
+                      </Alert>
+                    ) : null}
+
                     <Box
                       sx={{
                         display: 'grid',
@@ -893,7 +930,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               <Typography variant='h6'>{previewUser.fullName}</Typography>
                               <Typography color='text.secondary'>{previewUser.email}</Typography>
                               <Typography variant='body2' color='text.secondary'>
-                                {previewUser.previewMode === 'person' ? 'Persona previewable' : 'Principal portal sin bridge persona completo'}
+                              {previewUser.previewMode === 'person' ? 'Persona previewable' : 'Principal portal sin bridge persona completo'}
                               </Typography>
                             </Box>
                           </Stack>
@@ -1088,11 +1125,11 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               <Stack spacing={2}>
                               <Typography variant='h6'>Auditoría reciente</Typography>
                               <Typography variant='body2' color='text.secondary'>
-                                Últimos eventos visibles de access governance para este usuario.
+                                Últimos eventos visibles de access governance para el principal portal compatible de esta persona.
                               </Typography>
                               {previewUserAuditLog.length === 0 ? (
                                 <Alert severity='info' variant='outlined'>
-                                  Aún no hay actividad reciente registrada para este usuario.
+                                  Aún no hay actividad reciente registrada para este principal portal.
                                 </Alert>
                               ) : (
                                 <Stack spacing={1.25}>
@@ -1273,9 +1310,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Rutas terciarias</Typography>
+                      <Typography variant='h6'>Validación visual real</Typography>
                       <Typography color='text.secondary'>
-                        El remanente fino ahora vive en superficies menos visibles del árbol: detalles, subpaths y access points secundarios que todavía conviene modelar con `view_code` propio.
+                        Confirmar en preview que los casos persona interna, persona cliente y bridge degradado se leen bien y no inducen a confundir persona con principal portal.
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -1284,9 +1321,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Operación del panel</Typography>
+                      <Typography variant='h6'>Casos sin principal persistible</Typography>
                       <Typography color='text.secondary'>
-                        La matrix ya guarda, pero todavía puede crecer con bulk actions, edición por sección y una lectura más explícita de drift entre fallback y catálogo persistido.
+                        Falta decidir si las personas sin `userId` compatible deben quedar fuera del preview editable o entrar como casos informativos de acceso incompleto.
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -1295,9 +1332,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Auditoría y cleanup</Typography>
+                      <Typography variant='h6'>Cleanup de copy y policy</Typography>
                       <Typography color='text.secondary'>
-                        Ya existe notificación reactiva y expiración operativa. El siguiente refinamiento natural es mostrar mejor el histórico completo y los eventos automáticos dentro de la misma UI.
+                        Si el panel ya se siente estable, el cierre real de `TASK-140` pasa por fijar la policy final del universo previewable y dejar el resto del hardening a follow-ons.
                       </Typography>
                     </Stack>
                   </CardContent>

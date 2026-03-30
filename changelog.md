@@ -7,6 +7,7 @@
   - el selector de preview ahora agrupa por persona canónica cuando existe `identityProfileId`
   - el consumer sigue preservando `userId` como llave operativa para overrides, auditoría y `authorizedViews`
   - la UI distingue mejor entre persona, faceta operativa y principal portal compatible
+  - el panel además ya explica con alertas el estado `active`, `inactive`, `missing_principal` y `degraded_link`, y el roadmap del módulo quedó alineado al remanente real de `TASK-140`
 - `TASK-141` quedó formalmente cerrada como lane institucional:
   - el contrato canónico persona/member/client_user ya no queda abierto como diseño
   - la implementación mínima reusable quedó activa con `src/lib/identity/canonical-person.ts`
