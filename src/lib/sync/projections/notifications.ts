@@ -113,7 +113,8 @@ export const notificationProjection: ProjectionDefinition = {
     'identity.reconciliation.approved',
     'finance.dte.discrepancy_found',
     'identity.profile.linked',
-    'payroll_period.calculated'
+    'payroll_period.calculated',
+    'access.view_override_changed'
   ],
 
   extractScope: (payload) => {
@@ -270,6 +271,74 @@ export const notificationProjection: ProjectionDefinition = {
       })
 
       return `notified ${eligibleUsers.length} payroll ops users about payroll_period.calculated`
+    }
+
+    if (eventType === 'access.view_override_changed') {
+      const userId = typeof payload.userId === 'string' && payload.userId.trim() ? payload.userId : null
+
+      if (!userId) return null
+
+      const recipient = await getUserNotificationRecipient(userId, {
+        email: typeof payload.userEmail === 'string' ? payload.userEmail : undefined,
+        fullName: typeof payload.userName === 'string' ? payload.userName : undefined
+      })
+
+      if (!recipient) return null
+
+      const grantedViews = Array.isArray(payload.grantedViews)
+        ? payload.grantedViews
+            .map(entry => ({
+              label: typeof entry === 'object' && entry !== null && 'label' in entry && typeof entry.label === 'string' ? entry.label : null,
+              routePath: typeof entry === 'object' && entry !== null && 'routePath' in entry && typeof entry.routePath === 'string' ? entry.routePath : null
+            }))
+            .filter(entry => entry.label)
+        : []
+
+      const revokedViews = Array.isArray(payload.revokedViews)
+        ? payload.revokedViews
+            .map(entry => ({
+              label: typeof entry === 'object' && entry !== null && 'label' in entry && typeof entry.label === 'string' ? entry.label : null
+            }))
+            .filter(entry => entry.label)
+        : []
+
+      const grantedLabels = grantedViews.map(entry => entry.label as string)
+      const revokedLabels = revokedViews.map(entry => entry.label as string)
+
+      const title =
+        grantedLabels.length > 0 && revokedLabels.length > 0
+          ? 'Tu acceso al portal fue actualizado'
+          : grantedLabels.length > 0
+            ? 'Se habilitaron nuevas vistas en tu portal'
+            : 'Se actualizaron tus vistas disponibles'
+
+      const bodyParts: string[] = []
+
+      if (grantedLabels.length > 0) {
+        bodyParts.push(`Ahora puedes ver ${grantedLabels.slice(0, 3).join(', ')}`)
+      }
+
+      if (revokedLabels.length > 0) {
+        bodyParts.push(`Ya no verás ${revokedLabels.slice(0, 3).join(', ')}`)
+      }
+
+      const actionUrl =
+        grantedViews.find(entry => entry.routePath)?.routePath
+        || '/dashboard'
+
+      await NotificationService.dispatch({
+        category: 'system_event',
+        title,
+        body: bodyParts.join('. '),
+        actionUrl,
+        metadata: {
+          ...payload,
+          notificationScope: 'view_access'
+        },
+        recipients: [recipient]
+      })
+
+      return `notified ${buildNotificationRecipientKey(recipient)} about access.view_override_changed`
     }
 
     return null

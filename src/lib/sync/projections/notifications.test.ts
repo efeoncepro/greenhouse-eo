@@ -5,6 +5,7 @@ vi.mock('server-only', () => ({}))
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockDispatch = vi.fn()
 const mockEnsureNotificationSchema = vi.fn()
+const mockGetUserNotificationRecipient = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -46,7 +47,7 @@ vi.mock('@/lib/notifications/person-recipient-resolver', () => ({
     }]
   ])),
   getIdentityProfileNotificationRecipients: vi.fn(async () => new Map()),
-  getUserNotificationRecipient: vi.fn(async () => null)
+  getUserNotificationRecipient: (...args: unknown[]) => mockGetUserNotificationRecipient(...args)
 }))
 
 const { notificationProjection } = await import('./notifications')
@@ -56,6 +57,7 @@ describe('notificationProjection payroll ops', () => {
     vi.clearAllMocks()
     mockEnsureNotificationSchema.mockResolvedValue(undefined)
     mockDispatch.mockResolvedValue({ sent: [], skipped: [], failed: [] })
+    mockGetUserNotificationRecipient.mockResolvedValue(null)
   })
 
   it('dispatches payroll ops notifications to mixed portal and email-only recipients', async () => {
@@ -91,6 +93,46 @@ describe('notificationProjection payroll ops', () => {
           userId: 'user-efeonce-internal-humberly-henriquez',
           email: 'humberly.henriquez@efeonce.org',
           fullName: 'Humberly Henriquez'
+        }
+      ]
+    }))
+  })
+
+  it('dispatches a user-facing notification when view overrides change effective access', async () => {
+    mockGetUserNotificationRecipient.mockResolvedValue({
+      identityProfileId: 'profile-user-1',
+      userId: 'user-1',
+      email: 'user-1@example.com',
+      fullName: 'María López'
+    })
+
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'access.view_override_changed' },
+      {
+        userId: 'user-1',
+        userName: 'María López',
+        userEmail: 'user-1@example.com',
+        grantedViews: [
+          { viewCode: 'finanzas.inteligencia', label: 'Inteligencia financiera', routePath: '/finance/intelligence' }
+        ],
+        revokedViews: [
+          { viewCode: 'finanzas.conciliacion', label: 'Conciliación' }
+        ]
+      }
+    )
+
+    expect(result).toBe('notified user-1 about access.view_override_changed')
+    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({
+      category: 'system_event',
+      title: 'Tu acceso al portal fue actualizado',
+      body: 'Ahora puedes ver Inteligencia financiera. Ya no verás Conciliación',
+      actionUrl: '/finance/intelligence',
+      recipients: [
+        {
+          identityProfileId: 'profile-user-1',
+          userId: 'user-1',
+          email: 'user-1@example.com',
+          fullName: 'María López'
         }
       ]
     }))

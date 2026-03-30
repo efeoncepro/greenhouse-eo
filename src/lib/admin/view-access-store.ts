@@ -3,6 +3,8 @@ import 'server-only'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceViewRegistryEntry } from '@/lib/admin/view-access-catalog'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 type RoleAssignmentRow = {
   role_code: string
@@ -38,6 +40,8 @@ type ViewAccessLogRow = {
   reason: string | null
   created_at: string
 }
+
+type AccessOverviewUser = Awaited<ReturnType<typeof getAdminAccessOverview>>['users'][number]
 
 export type ViewAccessSource = 'persisted' | 'hardcoded_fallback'
 
@@ -161,6 +165,136 @@ const deriveRouteGroupsForSingleRole = (roleCode: string, tenantType: 'client' |
   }
 
   return Array.from(routeGroups)
+}
+
+const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) =>
+  persistedRegistryRows.length > 0
+    ? persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
+        viewCode: row.view_code,
+        section: row.section as GovernanceViewRegistryEntry['section'],
+        label: row.label,
+        description: row.description || '',
+        routeGroup: row.route_group,
+        routePath: row.route_path
+      }))
+    : VIEW_REGISTRY
+
+const toPersistedByRole = (persistedRows: RoleAssignmentRow[]) => {
+  const persistedByRole = new Map<string, Map<string, boolean>>()
+
+  for (const row of persistedRows) {
+    const current = persistedByRole.get(row.role_code) ?? new Map<string, boolean>()
+
+    current.set(row.view_code, row.granted)
+    persistedByRole.set(row.role_code, current)
+  }
+
+  return persistedByRole
+}
+
+const resolveAuthorizedViewsForTargetUser = ({
+  user,
+  registryRows,
+  persistedByRole,
+  userOverrides
+}: {
+  user: AccessOverviewUser
+  registryRows: GovernanceViewRegistryEntry[]
+  persistedByRole: Map<string, Map<string, boolean>>
+  userOverrides: UserOverrideRow[]
+}) => {
+  const baseAuthorizedViews = registryRows
+    .filter(view =>
+      user.roleCodes.some(roleCode =>
+        resolvePersistedOrFallbackRoleAccess({
+          roleAssignments: persistedByRole.get(roleCode),
+          role: {
+            roleCode,
+            isAdmin: roleCode === 'efeonce_admin',
+            isInternal: user.routeGroups.includes('internal'),
+            routeGroups: deriveRouteGroupsForSingleRole(roleCode, user.tenantType)
+          },
+          view
+        }).granted
+      )
+    )
+    .map(view => view.viewCode)
+
+  return Array.from(
+    userOverrides.reduce((current, override) => {
+      if (override.override_type === 'grant') {
+        current.add(override.view_code)
+      } else {
+        current.delete(override.view_code)
+      }
+
+      return current
+    }, new Set(baseAuthorizedViews))
+  )
+}
+
+const buildViewAccessChangePayload = ({
+  user,
+  registryRows,
+  beforeAuthorizedViews,
+  afterAuthorizedViews,
+  actorUserId,
+  activeOverrides
+}: {
+  user: AccessOverviewUser
+  registryRows: GovernanceViewRegistryEntry[]
+  beforeAuthorizedViews: string[]
+  afterAuthorizedViews: string[]
+  actorUserId: string
+  activeOverrides: PersistedUserViewOverrideInput[]
+}) => {
+  const registryByCode = new Map(registryRows.map(view => [view.viewCode, view]))
+  const beforeSet = new Set(beforeAuthorizedViews)
+  const afterSet = new Set(afterAuthorizedViews)
+
+  const grantedViews = afterAuthorizedViews
+    .filter(viewCode => !beforeSet.has(viewCode))
+    .map(viewCode => registryByCode.get(viewCode))
+    .filter((view): view is GovernanceViewRegistryEntry => Boolean(view))
+
+  const revokedViews = beforeAuthorizedViews
+    .filter(viewCode => !afterSet.has(viewCode))
+    .map(viewCode => registryByCode.get(viewCode))
+    .filter((view): view is GovernanceViewRegistryEntry => Boolean(view))
+
+  if (grantedViews.length === 0 && revokedViews.length === 0) {
+    return null
+  }
+
+  return {
+    userId: user.userId,
+    userName: user.fullName,
+    userEmail: user.email,
+    tenantType: user.tenantType,
+    actorUserId,
+    grantedViews: grantedViews.map(view => ({
+      viewCode: view.viewCode,
+      label: view.label,
+      routePath: view.routePath
+    })),
+    revokedViews: revokedViews.map(view => ({
+      viewCode: view.viewCode,
+      label: view.label,
+      routePath: view.routePath
+    })),
+    activeOverrides: activeOverrides.map(override => {
+      const view = registryByCode.get(override.viewCode)
+
+      return {
+        viewCode: override.viewCode,
+        label: view?.label ?? override.viewCode,
+        routePath: view?.routePath ?? null,
+        overrideType: override.overrideType,
+        expiresAt: override.expiresAt,
+        reason: override.reason
+      }
+    })
+  }
 }
 
 const resolvePersistedOrFallbackRoleAccess = ({
@@ -446,6 +580,53 @@ export const saveUserViewOverrides = async ({
   try {
     await syncViewRegistryCatalog(actorUserId)
 
+    const [access, persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
+      getAdminAccessOverview(),
+      getPersistedAssignments(),
+      getPersistedViewRegistry().catch(() => []),
+      getPersistedUserOverrides()
+    ])
+
+    const targetUser = access.users.find(candidate => candidate.userId === userId) ?? null
+    const registryRows = toRegistryRows(persistedRegistryRows)
+    const persistedByRole = toPersistedByRole(persistedRows)
+    const previousOverridesForUser = persistedUserOverrides.filter(override => override.user_id === userId)
+
+    const beforeAuthorizedViews = targetUser
+      ? resolveAuthorizedViewsForTargetUser({
+          user: targetUser,
+          registryRows,
+          persistedByRole,
+          userOverrides: previousOverridesForUser
+        })
+      : []
+
+    const afterAuthorizedViews = targetUser
+      ? resolveAuthorizedViewsForTargetUser({
+          user: targetUser,
+          registryRows,
+          persistedByRole,
+          userOverrides: dedupedOverrides.map(override => ({
+            user_id: userId,
+            view_code: override.viewCode,
+            override_type: override.overrideType,
+            reason: override.reason,
+            expires_at: override.expiresAt
+          }))
+        })
+      : []
+
+    const accessChangePayload = targetUser
+      ? buildViewAccessChangePayload({
+          user: targetUser,
+          registryRows,
+          beforeAuthorizedViews,
+          afterAuthorizedViews,
+          actorUserId,
+          activeOverrides: dedupedOverrides
+        })
+      : null
+
     await withGreenhousePostgresTransaction(async client => {
       await client.query(
         `
@@ -486,6 +667,18 @@ export const saveUserViewOverrides = async ({
           [override.overrideType === 'grant' ? 'grant_user' : 'revoke_user', userId, override.viewCode, actorUserId, override.reason || 'Admin Center user override save']
         )
       }
+
+      if (accessChangePayload) {
+        await publishOutboxEvent(
+          {
+            aggregateType: AGGREGATE_TYPES.viewAccess,
+            aggregateId: userId,
+            eventType: EVENT_TYPES.viewAccessOverrideChanged,
+            payload: accessChangePayload
+          },
+          client
+        )
+      }
     })
   } catch (error) {
     if (missingRelation(error)) {
@@ -515,25 +708,8 @@ export const getAdminPersistedViewAccessGovernance = async () => {
     getRecentViewAccessLog()
   ])
 
-  const registryRows = persistedRegistryRows.length > 0
-    ? persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
-        viewCode: row.view_code,
-        section: row.section as GovernanceViewRegistryEntry['section'],
-        label: row.label,
-        description: row.description || '',
-        routeGroup: row.route_group,
-        routePath: row.route_path
-      }))
-    : VIEW_REGISTRY
-
-  const persistedByRole = new Map<string, Map<string, boolean>>()
-
-  for (const row of persistedRows) {
-    const current = persistedByRole.get(row.role_code) ?? new Map<string, boolean>()
-
-    current.set(row.view_code, row.granted)
-    persistedByRole.set(row.role_code, current)
-  }
+  const registryRows = toRegistryRows(persistedRegistryRows)
+  const persistedByRole = toPersistedByRole(persistedRows)
 
   const roles = access.roles.map(role => ({
     roleCode: role.roleCode,
@@ -640,25 +816,8 @@ export const resolveAuthorizedViewsForUser = async ({
       getPersistedUserOverrides().catch(() => [])
     ])
 
-    const registryRows = persistedRegistryRows.length > 0
-      ? persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
-          viewCode: row.view_code,
-          section: row.section as GovernanceViewRegistryEntry['section'],
-          label: row.label,
-          description: row.description || '',
-          routeGroup: row.route_group,
-          routePath: row.route_path
-        }))
-      : VIEW_REGISTRY
-
-    const persistedByRole = new Map<string, Map<string, boolean>>()
-
-    for (const row of persistedRows) {
-      const current = persistedByRole.get(row.role_code) ?? new Map<string, boolean>()
-
-      current.set(row.view_code, row.granted)
-      persistedByRole.set(row.role_code, current)
-    }
+    const registryRows = toRegistryRows(persistedRegistryRows)
+    const persistedByRole = toPersistedByRole(persistedRows)
 
     const baseAuthorizedViews = registryRows
       .filter(view =>
