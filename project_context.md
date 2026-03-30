@@ -104,6 +104,28 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - smoke reactivo end-to-end validado con `pnpm smoke:cost-intelligence:period-closure`
   - el remanente real ya no es de wiring/runtime; cualquier mejora futura cae como follow-on semántico, no como blocker del carril
 
+## Delta 2026-03-30 TASK-069 operational_pl ya tiene primer slice materializado
+- Cost Intelligence ya no depende solo de `client_economics` on-read para economics agregada.
+- Nuevo carril implementado:
+  - `computeOperationalPl()` materializa snapshots en `greenhouse_serving.operational_pl_snapshots`
+  - scopes soportados: `client`, `space`, `organization`
+  - APIs:
+    - `/api/cost-intelligence/pl`
+    - `/api/cost-intelligence/pl/[scopeType]/[scopeId]`
+- Contrato aplicado:
+  - revenue por client = net revenue (`total_amount_clp - partner_share`)
+  - labor cost desde `client_labor_cost_allocation`
+  - overhead desde `member_capacity_economics`
+  - `period_closed` y `snapshot_revision` desde `period_closure_status`
+  - anti-doble-conteo: `direct_expense` excluye `expenses.payroll_entry_id`
+- Integraciones nuevas:
+  - projection reactiva `operational_pl` dentro del domain `cost_intelligence`
+  - `notification_dispatch` ya escucha `accounting.margin_alert.triggered`
+  - `materialization-health` ya observa `operational_pl_snapshots`
+- Estado actual:
+  - task abierta todavía
+  - el remanente principal ahora son consumers downstream (`TASK-071`) y hardening semántico, no wiring base
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

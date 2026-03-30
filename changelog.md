@@ -2,6 +2,20 @@
 
 ## 2026-03-30
 
+- `TASK-069` deja de estar en diseño puro:
+  - nuevo engine `computeOperationalPl()` para materializar `greenhouse_serving.operational_pl_snapshots`
+  - scopes soportados: `client`, `space`, `organization`
+  - APIs nuevas:
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+- El carril `operational_pl` ya nace amarrado al contrato financiero canónico:
+  - revenue por cliente como net revenue (`total_amount_clp - partner_share`)
+  - costo laboral desde `client_labor_cost_allocation`
+  - overhead desde `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` desde `period_closure_status`
+  - exclusión de `expenses.payroll_entry_id` para evitar doble conteo de payroll
+- `notification_dispatch` ya consume `accounting.margin_alert.triggered`.
+- `materialization-health` ya observa `greenhouse_serving.operational_pl_snapshots`.
 - `TASK-067` dejó aplicada la fundación técnica de Cost Intelligence: schema `greenhouse_cost_intelligence`, tablas base de cierre de período y P&L operativo, script `setup:postgres:cost-intelligence`, eventos `accounting.*`, domain `cost_intelligence` soportado por el projection registry y route `/api/cron/outbox-react-cost-intelligence`.
 - El remanente local de `TASK-067` quedó resuelto: `src/lib/google-credentials.ts` ahora normaliza PEMs colapsados para `google-auth-library`, y el smoke autenticado de `/api/cron/outbox-react-cost-intelligence` ya responde `200`.
 - Cost Intelligence queda además amarrado a la arquitectura canónica de Finance: `TASK-068` y `TASK-069` deben respetar el contrato del P&L financiero central y no redefinir semántica paralela para revenue, payroll multi-moneda ni anti-doble-conteo.

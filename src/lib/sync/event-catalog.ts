@@ -204,6 +204,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeOverheadUpdated,
   EVENT_TYPES.financeLicenseCostUpdated,
   EVENT_TYPES.financeToolingCostUpdated,
+  EVENT_TYPES.accountingMarginAlertTriggered,
 
   // Payroll compensation (published by payroll store directly)
   EVENT_TYPES.compensationVersionCreated,

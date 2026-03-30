@@ -1,5 +1,27 @@
 # TASK-069 — Operational P&L Projection
 
+## Delta 2026-03-30 — Slice 1 operativo implementado
+
+- `TASK-069` ya no está en diseño puro.
+- Slice implementado en repo:
+  - engine `computeOperationalPl()` en `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - tipos `OperationalPlSnapshot` / `PlComputationResult` en `src/lib/cost-intelligence/pl-types.ts`
+  - projection reactiva `operational_pl` en `src/lib/sync/projections/operational-pl.ts`
+  - APIs:
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+  - health check nuevo en `materialization-health` para `greenhouse_serving.operational_pl_snapshots`
+  - integración mínima con notificaciones para `accounting.margin_alert.triggered`
+- Contrato endurecido antes de implementar:
+  - revenue por cliente ya sale como net revenue (`total_amount_clp - partner_share`)
+  - costo laboral sale desde `client_labor_cost_allocation`
+  - overhead sale desde `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` salen desde `period_closure_status`
+  - se evita doble conteo excluyendo `expenses.payroll_entry_id` del carril `direct_expense`
+- Estado real después de este slice:
+  - ya existe serving materializado de P&L por `client`, `space` y `organization`
+  - todavía queda abierto para endurecer consumers downstream y semántica fina de alertas si hace falta
+
 ## Delta 2026-03-30 — TASK-068 cerrada
 
 - `TASK-068` ya quedó cerrada:
@@ -44,11 +66,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
+| Status real | `Parcial` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
@@ -108,7 +130,7 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 - `client_labor_cost_allocation` serving view existe
 - `member_capacity_economics` materializa overhead + loaded cost
 - `organization-economics.ts` computa on-demand (no materializado)
-- No existe P&L como serving view materializada
+- Ya existe P&L materializado por scope/período, pero todavía no reemplaza consumers downstream como `organization-economics.ts`
 
 ## Scope
 
@@ -116,9 +138,9 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 1. `src/lib/cost-intelligence/compute-operational-pl.ts`:
    - Input: `(year, month, reason)`
    - Para cada client con actividad en el período:
-     - Revenue: `SUM(income.amount_clp)` filtrado por período
-     - Labor cost: leer `client_labor_cost_allocation` o computar desde payroll entries × FTE weight
-     - Direct expenses: `SUM(expenses.amount_clp)` + cost allocations
+     - Revenue: net revenue (`SUM(total_amount_clp) - partner_share`)
+     - Labor cost: leer `client_labor_cost_allocation`
+     - Direct expenses: expenses atribuidos + cost allocations, excluyendo `payroll_entry_id` para no doble contar
      - Overhead: leer member_capacity_economics overhead pool, distribuir por FTE weight
    - Computar: `gross_margin = revenue - total_cost`, `margin_pct`
    - Agregar a nivel space: SUM clients del space
@@ -171,16 +193,16 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 
 ## Acceptance Criteria
 
-- [ ] `computeOperationalPl()` retorna P&L correcto para clients con income y payroll
-- [ ] Snapshots materializados en `operational_pl_snapshots` con `period_closed` flag
-- [ ] Aggregation funciona: client → space → organization
-- [ ] Multi-currency: payroll USD se convierte a CLP usando FX del período
-- [ ] Margin alert se emite cuando margin < threshold
-- [ ] `GET /api/cost-intelligence/pl` retorna snapshots filtrados
-- [ ] `GET /api/cost-intelligence/pl/client/[id]` retorna trend
-- [ ] Tests unitarios cubren: happy path, sin income, multi-currency, aggregation, alerts
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `computeOperationalPl()` retorna P&L correcto para clients con income y payroll
+- [x] Snapshots materializados en `operational_pl_snapshots` con `period_closed` flag
+- [x] Aggregation funciona: client → space → organization
+- [x] Multi-currency: costo laboral llega normalizado a CLP vía `client_labor_cost_allocation`
+- [x] Margin alert se emite cuando margin < threshold
+- [x] `GET /api/cost-intelligence/pl` retorna snapshots filtrados
+- [x] `GET /api/cost-intelligence/pl/client/[id]` retorna trend
+- [x] Tests unitarios cubren: happy path, sin income, aggregation, alerts
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
 
 ## Verification
 

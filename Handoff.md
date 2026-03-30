@@ -4,6 +4,53 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-069 slice 1 materializado
+
+### Objetivo
+- Abrir `TASK-069` con contraste previo duro contra:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - motor canónico de `src/app/api/finance/dashboard/pnl/route.ts`
+  - serving actual (`client_labor_cost_allocation`, `member_capacity_economics`, `period_closure_status`)
+
+### Delta de ejecución
+- `TASK-069` pasó a `in-progress`.
+- Slice implementado:
+  - `src/lib/cost-intelligence/pl-types.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - `src/lib/sync/projections/operational-pl.ts`
+  - `src/app/api/cost-intelligence/pl/route.ts`
+  - `src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts`
+  - tests:
+    - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+    - `src/lib/sync/projections/operational-pl.test.ts`
+- Integraciones mínimas cerradas en el mismo slice:
+  - registro de `operational_pl` en `src/lib/sync/projections/index.ts`
+  - `accounting.margin_alert.triggered` entra al carril reactivo
+  - `notification_dispatch` ya lo consume
+  - `materialization-health` ya revisa `greenhouse_serving.operational_pl_snapshots`
+
+### Decisiones semánticas aplicadas
+- `operational_pl` no redefine el P&L de Finance:
+  - revenue cliente = `total_amount_clp - partner_share`
+  - costo laboral = `client_labor_cost_allocation`
+  - overhead = `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` = `period_closure_status`
+- Para evitar doble conteo, el carril `direct_expense` excluye `expenses.payroll_entry_id`.
+- El primer slice ya materializa `client -> space -> organization`; todavía no reemplaza consumers on-read existentes como `organization-economics.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/sync/projections/operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/sync/projections/operational-pl.ts src/lib/sync/projections/operational-pl.test.ts src/app/api/cost-intelligence/pl/route.ts 'src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts' src/lib/sync/projections/notifications.ts src/app/api/cron/materialization-health/route.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- Siguiente corte sano:
+  - smoke reactivo E2E de `operational_pl`
+  - consumers downstream (`TASK-071`)
+  - decidir si el cron dedicado `outbox-react-cost-intelligence` ya merece scheduling propio o si seguimos temporalmente con catch-all
+
 ## Sesión 2026-03-30 — TASK-068 cerrada
 
 ### Completado

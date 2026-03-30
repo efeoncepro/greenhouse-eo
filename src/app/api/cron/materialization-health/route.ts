@@ -147,7 +147,33 @@ export async function GET(request: Request) {
     checks.push({ name: 'Postgres client_economics', source: 'postgres', lastMaterializedAt: null, ageHours: null, healthy: false })
   }
 
-  // 6. Assignee attribution coverage in delivery_tasks (BigQuery)
+  // 6. Operational P&L snapshots in Postgres
+  try {
+    const rows = await runGreenhousePostgresQuery<{ latest: string | null } & Record<string, unknown>>(
+      `SELECT MAX(materialized_at)::text AS latest FROM greenhouse_serving.operational_pl_snapshots`
+    )
+
+    const latestStr = rows[0]?.latest || null
+    const ageHours = latestStr ? Math.round((Date.now() - new Date(latestStr).getTime()) / 3_600_000) : null
+
+    checks.push({
+      name: 'Postgres operational_pl_snapshots',
+      source: 'postgres',
+      lastMaterializedAt: latestStr,
+      ageHours,
+      healthy: ageHours !== null && ageHours <= MAX_AGE_HOURS
+    })
+  } catch {
+    checks.push({
+      name: 'Postgres operational_pl_snapshots',
+      source: 'postgres',
+      lastMaterializedAt: null,
+      ageHours: null,
+      healthy: false
+    })
+  }
+
+  // 7. Assignee attribution coverage in delivery_tasks (BigQuery)
   const ASSIGNEE_COVERAGE_THRESHOLD = 0.5 // Alert if <50% of completed tasks have assignee
   let assigneeCoverage: { totalCompleted: number; withAssignee: number; coveragePct: number } | null = null
 

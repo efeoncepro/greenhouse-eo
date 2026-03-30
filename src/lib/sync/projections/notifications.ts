@@ -114,7 +114,8 @@ export const notificationProjection: ProjectionDefinition = {
     'finance.dte.discrepancy_found',
     'identity.profile.linked',
     'payroll_period.calculated',
-    'access.view_override_changed'
+    'access.view_override_changed',
+    'accounting.margin_alert.triggered'
   ],
 
   extractScope: (payload) => {
@@ -271,6 +272,36 @@ export const notificationProjection: ProjectionDefinition = {
       })
 
       return `notified ${eligibleUsers.length} payroll ops users about payroll_period.calculated`
+    }
+
+    if (eventType === 'accounting.margin_alert.triggered') {
+      const users = await getFinanceUsers()
+
+      if (users.length === 0) return null
+
+      const scopeName = typeof payload.scopeName === 'string' ? payload.scopeName : 'scope sin nombre'
+      const scopeType = typeof payload.scopeType === 'string' ? payload.scopeType : 'scope'
+      const actualPct = typeof payload.actualPct === 'number' ? payload.actualPct : null
+      const thresholdPct = typeof payload.thresholdPct === 'number' ? payload.thresholdPct : null
+
+      await NotificationService.dispatch({
+        category: 'system_event',
+        title: `Alerta de margen en ${scopeName}`,
+        body: actualPct != null && thresholdPct != null
+          ? `El margen de ${scopeType} cayó a ${actualPct}% y quedó bajo el umbral ${thresholdPct}%.`
+          : `Se detectó una caída de margen en ${scopeName}.`,
+        actionUrl: '/finance/intelligence',
+        metadata: payload,
+        recipients: users.map(u => ({
+          ...(u.identity_profile_id ? { identityProfileId: u.identity_profile_id } : {}),
+          ...(u.member_id ? { memberId: u.member_id } : {}),
+          ...(u.user_id ? { userId: u.user_id } : {}),
+          ...(u.email ? { email: u.email } : {}),
+          ...(u.full_name ? { fullName: u.full_name } : {})
+        }))
+      })
+
+      return `notified ${users.length} finance users about margin alert`
     }
 
     if (eventType === 'access.view_override_changed') {

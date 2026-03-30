@@ -82,9 +82,9 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-063` | `complete` | Payroll Projected Payroll Runtime | `docs/tasks/complete/TASK-063-payroll-projected-payroll-runtime.md` |
 | `TASK-064` | `complete` | ICO Assignee Attribution Remediation | `docs/tasks/complete/TASK-064-ico-assignee-attribution-remediation.md` |
 | `TASK-065` | `complete` | Payroll Variable Bonus Policy Recalibration | `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md` |
-| `TASK-067` | `to-do` | Cost Intelligence Foundation | `docs/tasks/to-do/TASK-067-cost-intelligence-foundation.md` |
-| `TASK-068` | `to-do` | Period Closure Status Projection | `docs/tasks/to-do/TASK-068-period-closure-status-projection.md` |
-| `TASK-069` | `to-do` | Operational P&L Projection | `docs/tasks/to-do/TASK-069-operational-pl-projection.md` |
+| `TASK-067` | `complete` | Cost Intelligence Foundation | `docs/tasks/complete/TASK-067-cost-intelligence-foundation.md` |
+| `TASK-068` | `complete` | Period Closure Status Projection | `docs/tasks/complete/TASK-068-period-closure-status-projection.md` |
+| `TASK-069` | `in-progress` | Operational P&L Projection | `docs/tasks/in-progress/TASK-069-operational-pl-projection.md` |
 | `TASK-070` | `to-do` | Cost Intelligence Finance UI | `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md` |
 | `TASK-071` | `to-do` | Cost Intelligence Cross-Module Consumers | `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` |
 | `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
