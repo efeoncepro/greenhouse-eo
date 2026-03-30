@@ -83,7 +83,12 @@ Después del redeploy:
 
 ## Estado
 
-`open` — variable configurada, redeploy pendiente
+`resolved` — 2026-03-30
+
+- Variable `GREENHOUSE_POSTGRES_IP_TYPE=PUBLIC` configurada en production
+- Redeploy de production ejecutado (`greenhouse-hh0xok5vo`)
+- Health endpoint confirmó `postgres: ok` con latencia 64ms vía Cloud SQL Connector
+- Slack `#greenhouse-alerts` dejó de reportar errores de `webhook-dispatch`
 
 ## Relacionado
 

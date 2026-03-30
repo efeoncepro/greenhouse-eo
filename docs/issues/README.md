@@ -53,10 +53,10 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Open
 
-| ID | Título | Ambiente | Detectado | Estado |
-|----|--------|----------|-----------|--------|
-| `ISSUE-001` | [SSL bad certificate en webhook-dispatch (production)](open/ISSUE-001-ssl-bad-certificate-production.md) | production | 2026-03-30 Slack #greenhouse-alerts | open |
+(ninguno activo)
 
 ## Resolved
 
-(ninguno aún)
+| ID | Título | Ambiente | Detectado | Resuelto | Causa |
+|----|--------|----------|-----------|----------|-------|
+| `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md) | production | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production |
