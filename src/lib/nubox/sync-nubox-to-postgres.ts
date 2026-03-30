@@ -548,7 +548,8 @@ const mapDteTypeToIncomeType = (dteCode: string | null): string => {
   switch (dteCode) {
     case '61': return 'credit_note'
     case '56': return 'debit_note'
-    case '52': return 'quote'
+    case '52':
+    case 'COT': return 'quote'
     default: return 'service_fee'
   }
 }
@@ -626,7 +627,7 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
     let orphanedRecords = 0
 
     for (const sale of conformedSales) {
-      if (sale.dte_type_code === '52') {
+      if (sale.dte_type_code === '52' || sale.dte_type_code === 'COT') {
         // Cotizaciones go to quotes table, not income
         const result = await upsertQuoteFromSale(sale)
 

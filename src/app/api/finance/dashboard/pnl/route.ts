@@ -42,7 +42,8 @@ export async function GET(request: Request) {
          COALESCE(SUM(partner_share_amount * COALESCE(exchange_rate_to_clp, 1)), 0) AS partner_share_clp
        FROM greenhouse_finance.income
        WHERE invoice_date >= $1::date AND invoice_date <= $2::date
-         AND COALESCE(income_type, 'service_fee') != 'quote'`,
+         AND COALESCE(income_type, 'service_fee') NOT IN ('quote')
+         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')`,
       [periodStart, periodEnd]
     ),
 
