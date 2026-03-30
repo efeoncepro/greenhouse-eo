@@ -2,6 +2,15 @@
 
 ## 2026-03-30
 
+- La validación visual real de `TASK-070` encontró y corrigió un bug de display en `/finance/intelligence`:
+  - `lastBusinessDayOfTargetMonth` ya venía correctamente calculado desde el calendario operativo
+  - la UI lo mostraba corrido por parsear `YYYY-MM-DD` con `new Date(...)`
+  - `FinancePeriodClosureDashboardView` ahora usa parseo seguro para fechas de solo fecha
+- El flujo principal de `TASK-070` quedó además validado con datos reales:
+  - tabla de períodos
+  - expandible inline de P&L
+  - diálogo de cierre
+
 - Se consolidó la documentación viva de Cost Intelligence a nivel arquitectura, índice de docs, pipeline de tasks y contexto operativo.
 - El módulo ya queda descrito como sistema operativo distribuido:
   - foundation (`TASK-067`)

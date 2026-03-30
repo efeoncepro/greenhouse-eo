@@ -1,5 +1,21 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — Validación visual: bug real de fecha corregido
+
+- Durante la validación visual real de `/finance/intelligence` apareció un bug de render:
+  - `lastBusinessDayOfTargetMonth` sí venía calculado desde el calendario operativo compartido
+  - la UI lo estaba mostrando corrido un día hacia atrás al parsear `YYYY-MM-DD` con `new Date(...)`
+- Fix aplicado:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx` ahora normaliza fechas de solo fecha (`YYYY-MM-DD`) con parseo seguro para display
+  - test reforzado en `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- Validación del fix:
+  - `pnpm exec vitest run src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+  - `pnpm exec eslint src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+- Hallazgo adicional de validación:
+  - la tabla, expansión inline y diálogo de cierre cargan bien con datos reales del entorno local admin
+  - el remanente de `TASK-070` ya no es de wiring funcional, sino de cierre visual/UX y decisión sobre `ClientEconomicsView`
+
 ## Delta 2026-03-30 — Módulo ya documentado end-to-end
 
 - La arquitectura ya refleja al módulo de Cost Intelligence como sistema operativo completo:

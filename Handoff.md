@@ -36,6 +36,36 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Validación visual real del slice en Agency / Organization 360 / People / Home.
 - Nexa ya recibe el mismo `financeStatus` resumido en `lightContext`; el remanente ya no es funcional sino de validación/cierre formal.
 
+## Sesión 2026-03-30 — TASK-070 validación visual + fix de fecha operativa
+
+### Objetivo
+- Validar visualmente `/finance/intelligence` con sesión local admin.
+- Confirmar que el “último día hábil” realmente venga del calendario operativo y no quede roto en UI.
+
+### Delta de ejecución
+- Se usó sesión local firmada vía `scripts/mint-local-admin-jwt.js` para entrar al portal en dev y validar `/finance/intelligence`.
+- Resultado:
+  - la API `/api/cost-intelligence/periods?limit=12` ya devolvía períodos correctos y `lastBusinessDayOfTargetMonth` calculado desde el calendario operativo
+  - el bug estaba en display: la UI parseaba `YYYY-MM-DD` con `new Date(...)` y corría la fecha por timezone
+- Fix aplicado:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- Validación visual adicional:
+  - la tabla de períodos, el expandible inline de P&L y el diálogo de cierre funcionan con datos reales
+  - Home ya muestra `financeStatus` usable
+  - People 360 ya muestra `latestCostSnapshot` y closure awareness
+  - Organization 360 no pudo validarse bien en este entorno por falta de datos
+  - Agency no mostró issue técnico; el consumer financiero está en `SpaceCard`, no en cualquier tabla listada
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Seguir validación visual de Agency/Organization 360 con dataset más representativo.
+- Decidir si el lifecycle de `TASK-070` y `TASK-071` se normaliza en docs, porque hoy sus archivos viven en `complete/` pero varias notas todavía las describen como lanes abiertas.
+
 ## Sesión 2026-03-30 — Consolidación documental de Cost Intelligence
 
 ### Objetivo

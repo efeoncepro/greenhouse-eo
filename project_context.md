@@ -198,6 +198,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Finance conserva ownership del motor financiero central.
 - Cost Intelligence queda formalizado como layer de management accounting, closure awareness y serving distribuido hacia Agency, Organization 360, People 360, Home y Nexa.
 
+## Delta 2026-03-30 Cost Intelligence visual validation found a display-only date bug
+- La validación visual real de `/finance/intelligence` confirmó que `lastBusinessDayOfTargetMonth` sí viene del calendario operativo compartido.
+- El bug detectado fue de render y timezone:
+  - la UI parseaba fechas `YYYY-MM-DD` con `new Date(...)`
+  - eso corría el “último día hábil” un día hacia atrás en algunos períodos
+- El fix quedó aplicado en `FinancePeriodClosureDashboardView` con parseo seguro para display.
+- Con ese ajuste, el carril `TASK-070` queda todavía más cerca de cierre funcional real; el remanente ya es principalmente visual/UX, no de datos ni semántica operativa.
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

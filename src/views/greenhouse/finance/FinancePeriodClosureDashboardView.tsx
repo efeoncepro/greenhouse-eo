@@ -128,13 +128,21 @@ const formatMargin = (value: number | null) => {
 
 const formatMonthLabel = (year: number, month: number) => `${MONTH_LABELS[month - 1] || month} ${year}`
 
+const parseDisplayDate = (value: string) => {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Date(`${value}T12:00:00`)
+  }
+
+  return new Date(value)
+}
+
 const formatDateTime = (value: string | null) => {
   if (!value) return '—'
 
   return new Intl.DateTimeFormat('es-CL', {
     dateStyle: 'medium',
     timeStyle: 'short'
-  }).format(new Date(value))
+  }).format(parseDisplayDate(value))
 }
 
 const formatDate = (value: string | null) => {
@@ -142,7 +150,7 @@ const formatDate = (value: string | null) => {
 
   return new Intl.DateTimeFormat('es-CL', {
     dateStyle: 'medium'
-  }).format(new Date(value))
+  }).format(parseDisplayDate(value))
 }
 
 const getLifecycleChip = (status: PeriodClosureLifecycle) => {

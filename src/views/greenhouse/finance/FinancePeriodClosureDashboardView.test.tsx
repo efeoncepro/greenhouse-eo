@@ -108,6 +108,7 @@ describe('FinancePeriodClosureDashboardView', () => {
     await waitFor(() => {
       expect(screen.getByText('Cierre de período')).toBeInTheDocument()
       expect(screen.getByText('Marzo 2026')).toBeInTheDocument()
+      expect(screen.getByText('Último día hábil: 31-03-2026')).toBeInTheDocument()
     })
 
     fireEvent.click(screen.getByLabelText('Expandir 2026-03'))
