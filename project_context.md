@@ -31,7 +31,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - BigQuery queda como fallback transicional solo cuando el flag permanece activo
 - Ajuste relevante:
   - `suppliers` ya es Postgres-first para writes y dejó de depender de BigQuery como path principal
-  - `clients` queda fail-closed con el mismo guard, pero todavía sin write path Postgres canónico
+  - `clients` ya es Postgres-first para `create/update/sync` vía `greenhouse_finance.client_profiles`
+  - el remanente de `Finance Clients` ya no es de writes, sino de reads/hydration BigQuery-first
 
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.

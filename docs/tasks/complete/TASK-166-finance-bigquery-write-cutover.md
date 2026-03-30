@@ -78,6 +78,23 @@ Reglas obligatorias:
 - el flag no estaba cableado de forma consistente en rutas write
 - varios endpoints todavía conservan fallback BigQuery sin policy explícita de fail-closed
 
+## Delta 2026-03-30 — clients write cutover real sobre Postgres
+
+- `POST /api/finance/clients`, `PUT /api/finance/clients/[id]` y `POST /api/finance/clients/sync` ya corren Postgres-first sobre:
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_core.clients`
+  - el bridge `spaces -> organization_id`
+- Nuevo baseline shared:
+  - `getFinanceClientProfileFromPostgres()`
+  - `upsertFinanceClientProfileInPostgres()`
+  - `syncFinanceClientProfilesFromPostgres()`
+- Compatibilidad preservada:
+  - si PostgreSQL no está disponible y `FINANCE_BIGQUERY_WRITE_ENABLED=true`, las rutas todavía pueden caer al fallback BigQuery legado
+  - si el flag está apagado, responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+- Lectura resultante:
+  - `clients` deja de ser solo “fail-closed” y pasa a ser write path canónico en PostgreSQL
+  - el remanente real ya no es write-path, sino los reads/hydration BigQuery-first de list/detail
+
 ## Delta 2026-03-30 — slice 1 implementado
 
 - Nuevo helper:
@@ -125,7 +142,7 @@ Reglas obligatorias:
   - sus rutas `sync` ahora propagan `code: FINANCE_BQ_WRITE_DISABLED` cuando el helper falla cerrado
 - Regla operativa resultante:
   - Finance ya no conserva write fallback legacy abierto en carriles core, master-data, reconciliation ni sync helpers principales
-  - `clients` queda fail-closed por diseño porque esas rutas siguen siendo BigQuery-first y todavía no existe write Postgres canónico reusable en el repo
+  - `clients` queda cubierto por el mismo guard, pero en este slice todavía seguía sin writer Postgres canónico reusable
 
 ## Delta 2026-03-30 — inventario clasificado del remanente
 
@@ -144,6 +161,7 @@ Reglas obligatorias:
 - `PUT /api/finance/suppliers/[id]`
 - `POST /api/finance/clients`
 - `PUT /api/finance/clients/[id]`
+- `POST /api/finance/clients/sync`
 - `POST /api/finance/reconciliation`
 - `PUT /api/finance/reconciliation/[id]`
 - `POST /api/finance/reconciliation/[id]/match`
@@ -157,8 +175,7 @@ Reglas obligatorias:
 ### Write paths residuales clasificados, no bloqueadores del cierre
 
 - residuales principales:
-  - `POST /api/finance/clients/sync`
-  - algunas rutas de lectura o sync siguen leyendo BigQuery por compatibilidad, pero ya no abren writes mutantes cuando el flag está apagado
+  - algunas rutas de lectura o hydration siguen leyendo BigQuery por compatibilidad, pero ya no abren writes mutantes cuando el flag está apagado
 - criterio de cierre:
   - `TASK-166` cierra el lifecycle real del flag y el cutover operativo del write fallback residual más sensible
   - el remanente se trata como deuda localizada por dominio, no como bloqueo del flag operativo
@@ -199,6 +216,7 @@ Reglas obligatorias:
 - [x] Al menos un segundo bloque de rutas write queda cortado o clasificado
 - [x] La estrategia de rollout por entorno queda documentada
 - [x] El bloque `core detail/payment`, `clients`, `reconciliation` y sync helpers principales ya respeta el guard operativo
+- [x] `clients create/update/sync` ya opera Postgres-first con fallback legado explícito y observable
 
 ## Verification
 

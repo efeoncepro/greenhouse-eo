@@ -36,8 +36,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Residual explícito
 - Siguen clasificados fuera de `TASK-166`:
-  - `POST /api/finance/clients/sync`
-  - reads legacy que aún consultan BigQuery por compatibilidad
+  - reads legacy de `Finance Clients` que aún consultan BigQuery por compatibilidad
 - El criterio vigente es tratarlos como lanes o follow-ons localizados, no como bloqueo del flag operativo core.
 
 ## Sesión 2026-03-30 — expansión final del guard sobre core + reconciliation + clients
@@ -64,6 +63,38 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec eslint ...` del bloque expandido
 - `pnpm exec tsc --noEmit --pretty false`
 - `git diff --check`
+
+## Sesión 2026-03-30 — clients write path Postgres-first
+
+### Objetivo
+- Cortar el residual real que quedaba después del fail-closed: `clients/sync` y el writer canónico de `Finance Clients`.
+
+### Delta de ejecución
+- Nuevo baseline shared en `src/lib/finance/postgres-store-slice2.ts`:
+  - `getFinanceClientProfileFromPostgres()`
+  - `upsertFinanceClientProfileInPostgres()`
+  - `syncFinanceClientProfilesFromPostgres()`
+- `Finance Clients` write path ya opera Postgres-first en:
+  - `src/app/api/finance/clients/route.ts`
+  - `src/app/api/finance/clients/[id]/route.ts`
+  - `src/app/api/finance/clients/sync/route.ts`
+- Compatibilidad preservada:
+  - si PostgreSQL no está disponible y `FINANCE_BIGQUERY_WRITE_ENABLED=true`, las rutas todavía conservan fallback BigQuery transicional
+  - si el flag está apagado, responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+- Apoyo de subagentes utilizado:
+  - explorer para confirmar el estado real de `Finance Clients`
+  - worker de tests para el carril `clients`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' src/app/api/finance/clients/sync/route.ts src/lib/finance/postgres-store-slice2.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- El remanente de `Finance Clients` ya no es write path:
+  - list/detail y algunos enrichments siguen BigQuery-first
+  - ese follow-on pertenece a `TASK-050`, no bloquea el cierre operativo de `TASK-166`
 
 ## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
 

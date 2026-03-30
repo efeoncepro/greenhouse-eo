@@ -108,7 +108,8 @@ Flag de control: `FINANCE_BIGQUERY_WRITE_ENABLED` (default: true).
 
 Estado operativo post `TASK-166`:
 - `income`, `expenses`, `accounts`, `suppliers`, `exchange_rates`, `reconciliation` y los sync helpers principales ya respetan el guard fail-closed cuando PostgreSQL falla y el flag está apagado.
-- `clients` también falla cerrado con el mismo código (`FINANCE_BQ_WRITE_DISABLED`), pero sigue siendo BigQuery-first hasta que exista write path canónico en Postgres.
+- `clients` (`create/update/sync`) ya opera Postgres-first sobre `greenhouse_finance.client_profiles`; BigQuery queda solo como fallback transicional cuando PostgreSQL no está disponible y el flag sigue activo.
+- El residual de `Finance Clients` ya no es write-path sino read-path: list/detail e hydrations CRM/modules siguen siendo BigQuery-first.
 
 ## P&L Endpoint — Motor Financiero Central
 

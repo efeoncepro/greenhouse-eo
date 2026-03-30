@@ -1,5 +1,21 @@
 # TASK-050 - Finance Client Canonical Runtime Cutover
 
+## Delta 2026-03-30
+
+- El write path de `Finance Clients` ya no queda completamente anclado a BigQuery:
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+  - `POST /api/finance/clients/sync`
+  ahora corren Postgres-first sobre `greenhouse_finance.client_profiles`.
+- Baseline runtime nuevo:
+  - `getFinanceClientProfileFromPostgres()`
+  - `upsertFinanceClientProfileInPostgres()`
+  - `syncFinanceClientProfilesFromPostgres()`
+- El remanente real de esta lane ya no es write-path sino read-path:
+  - list/detail y enrichment de `Finance Clients` siguen usando lecturas BigQuery-first e híbridas
+  - el resolver `resolveFinanceClientContext()` conserva fallback BigQuery explícito por compatibilidad
+- Este delta fue absorbido por el trabajo de `TASK-166`; no reabre la task, pero sí cambia el estado real del gap.
+
 ## Status
 
 - Lifecycle: `complete`

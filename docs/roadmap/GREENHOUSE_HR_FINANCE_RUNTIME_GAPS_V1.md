@@ -45,6 +45,18 @@ Brechas derivadas de revisar:
 
 ## Gap 1 - Finance client runtime todavía no está cortado al grafo canónico actual
 
+### Delta 2026-03-30
+
+- El write path ya no es el principal problema de este gap:
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+  - `POST /api/finance/clients/sync`
+  ya operan Postgres-first sobre `greenhouse_finance.client_profiles`.
+- El residual vigente del gap es read-path:
+  - list/detail siguen consultando BigQuery legacy e hydrations híbridas
+  - `resolveFinanceClientContext()` mantiene fallback BigQuery explícito
+- La tabla de brechas se mantiene abierta porque el request path completo todavía no está cortado al grafo canónico.
+
 ### Evidencia
 
 - `src/app/api/finance/clients/route.ts` usa `projectId.greenhouse.clients`, `projectId.greenhouse.fin_client_profiles`, `projectId.greenhouse_conformed.crm_companies` y `projectId.greenhouse.client_service_modules`

@@ -7,6 +7,11 @@ import {
 } from '@/lib/finance/hubspot'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  getFinanceClientProfileFromPostgres,
+  upsertFinanceClientProfileInPostgres
+} from '@/lib/finance/postgres-store-slice2'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -455,110 +460,188 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!isFinanceBigQueryWriteEnabled()) {
-    return NextResponse.json(
-      {
-        error: 'Finance BigQuery fallback write is disabled for client profiles.',
-        code: 'FINANCE_BQ_WRITE_DISABLED'
-      },
-      { status: 503 }
-    )
-  }
-
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: clientProfileId } = await params
     const body = await request.json()
-    const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{
-      client_profile_id: string
-      client_id: string | null
-      hubspot_company_id: string | null
-    }>(`
-      SELECT client_profile_id, client_id, hubspot_company_id
-      FROM \`${projectId}.greenhouse.fin_client_profiles\`
-      WHERE client_profile_id = @clientProfileId
-    `, { clientProfileId })
+    try {
+      const existing = await getFinanceClientProfileFromPostgres(clientProfileId)
 
-    if (existing.length === 0) {
-      return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
-    }
-
-    const updates: string[] = []
-    const updateParams: Record<string, unknown> = { clientProfileId }
-    const existingProfile = existing[0]
-
-    if (body.clientId !== undefined || body.hubspotCompanyId !== undefined || body.clientProfileId !== undefined) {
-      const resolvedClient = await resolveFinanceClientContext({
-        clientId: body.clientId ?? existingProfile.client_id,
-        clientProfileId: body.clientProfileId ?? existingProfile.client_profile_id,
-        hubspotCompanyId: body.hubspotCompanyId ?? existingProfile.hubspot_company_id
-      })
-
-      updates.push('client_id = @clientId')
-      updateParams.clientId = resolvedClient.clientId
-
-      updates.push('hubspot_company_id = @hubspotCompanyId')
-      updateParams.hubspotCompanyId = resolvedClient.hubspotCompanyId
-    }
-
-    const stringFields: [string, string][] = [
-      ['legalName', 'legal_name'], ['taxId', 'tax_id'],
-      ['billingAddress', 'billing_address'], ['billingCountry', 'billing_country'],
-      ['currentPoNumber', 'current_po_number'],
-      ['currentHesNumber', 'current_hes_number'], ['specialConditions', 'special_conditions']
-    ]
-
-    for (const [bodyKey, dbCol] of stringFields) {
-      if (body[bodyKey] !== undefined) {
-        updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
-        updates.push(`${dbCol} = @${bodyKey}`)
+      if (!existing) {
+        return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
       }
+
+      if (
+        body.clientId === undefined
+        && body.hubspotCompanyId === undefined
+        && body.clientProfileId === undefined
+        && body.legalName === undefined
+        && body.taxId === undefined
+        && body.billingAddress === undefined
+        && body.billingCountry === undefined
+        && body.currentPoNumber === undefined
+        && body.currentHesNumber === undefined
+        && body.specialConditions === undefined
+        && body.paymentTermsDays === undefined
+        && body.taxIdType === undefined
+        && body.paymentCurrency === undefined
+        && body.requiresPo === undefined
+        && body.requiresHes === undefined
+        && body.financeContacts === undefined
+      ) {
+        return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+      }
+
+      const resolvedClient = (body.clientId !== undefined || body.hubspotCompanyId !== undefined || body.clientProfileId !== undefined)
+        ? await resolveFinanceClientContext({
+          clientId: body.clientId ?? existing.clientId,
+          clientProfileId: body.clientProfileId ?? existing.clientProfileId,
+          hubspotCompanyId: body.hubspotCompanyId ?? existing.hubspotCompanyId
+        })
+        : null
+
+      await upsertFinanceClientProfileInPostgres({
+        clientProfileId,
+        clientId: resolvedClient?.clientId ?? existing.clientId,
+        hubspotCompanyId: resolvedClient?.hubspotCompanyId ?? existing.hubspotCompanyId,
+        taxId: body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId,
+        taxIdType: body.taxIdType !== undefined
+          ? (body.taxIdType ? assertValidTaxIdType(body.taxIdType) : null)
+          : existing.taxIdType,
+        legalName: body.legalName !== undefined ? (body.legalName ? normalizeString(body.legalName) : null) : existing.legalName,
+        billingAddress: body.billingAddress !== undefined
+          ? (body.billingAddress ? normalizeString(body.billingAddress) : null)
+          : existing.billingAddress,
+        billingCountry: body.billingCountry !== undefined
+          ? (body.billingCountry ? normalizeString(body.billingCountry) : null)
+          : existing.billingCountry,
+        paymentTermsDays: body.paymentTermsDays !== undefined ? (toNumber(body.paymentTermsDays) || 30) : existing.paymentTermsDays,
+        paymentCurrency: body.paymentCurrency !== undefined
+          ? (body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : null)
+          : existing.paymentCurrency,
+        requiresPo: body.requiresPo !== undefined ? Boolean(body.requiresPo) : existing.requiresPo,
+        requiresHes: body.requiresHes !== undefined ? Boolean(body.requiresHes) : existing.requiresHes,
+        currentPoNumber: body.currentPoNumber !== undefined
+          ? (body.currentPoNumber ? normalizeString(body.currentPoNumber) : null)
+          : existing.currentPoNumber,
+        currentHesNumber: body.currentHesNumber !== undefined
+          ? (body.currentHesNumber ? normalizeString(body.currentHesNumber) : null)
+          : existing.currentHesNumber,
+        financeContacts: body.financeContacts !== undefined
+          ? (Array.isArray(body.financeContacts) ? body.financeContacts : [])
+          : existing.financeContacts,
+        specialConditions: body.specialConditions !== undefined
+          ? (body.specialConditions ? normalizeString(body.specialConditions) : null)
+          : existing.specialConditions,
+        createdByUserId: existing.createdByUserId ?? tenant.userId ?? null
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled for client profiles.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
+      }
+
+      await ensureFinanceInfrastructure()
+
+      const projectId = getFinanceProjectId()
+
+      const existing = await runFinanceQuery<{
+        client_profile_id: string
+        client_id: string | null
+        hubspot_company_id: string | null
+      }>(`
+        SELECT client_profile_id, client_id, hubspot_company_id
+        FROM \`${projectId}.greenhouse.fin_client_profiles\`
+        WHERE client_profile_id = @clientProfileId
+      `, { clientProfileId })
+
+      if (existing.length === 0) {
+        return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
+      }
+
+      const updates: string[] = []
+      const updateParams: Record<string, unknown> = { clientProfileId }
+      const existingProfile = existing[0]
+
+      if (body.clientId !== undefined || body.hubspotCompanyId !== undefined || body.clientProfileId !== undefined) {
+        const resolvedClient = await resolveFinanceClientContext({
+          clientId: body.clientId ?? existingProfile.client_id,
+          clientProfileId: body.clientProfileId ?? existingProfile.client_profile_id,
+          hubspotCompanyId: body.hubspotCompanyId ?? existingProfile.hubspot_company_id
+        })
+
+        updates.push('client_id = @clientId')
+        updateParams.clientId = resolvedClient.clientId
+
+        updates.push('hubspot_company_id = @hubspotCompanyId')
+        updateParams.hubspotCompanyId = resolvedClient.hubspotCompanyId
+      }
+
+      const stringFields: [string, string][] = [
+        ['legalName', 'legal_name'], ['taxId', 'tax_id'],
+        ['billingAddress', 'billing_address'], ['billingCountry', 'billing_country'],
+        ['currentPoNumber', 'current_po_number'],
+        ['currentHesNumber', 'current_hes_number'], ['specialConditions', 'special_conditions']
+      ]
+
+      for (const [bodyKey, dbCol] of stringFields) {
+        if (body[bodyKey] !== undefined) {
+          updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
+          updates.push(`${dbCol} = @${bodyKey}`)
+        }
+      }
+
+      if (body.paymentTermsDays !== undefined) {
+        updates.push('payment_terms_days = @paymentTermsDays')
+        updateParams.paymentTermsDays = toNumber(body.paymentTermsDays) || 30
+      }
+
+      if (body.taxIdType !== undefined) {
+        updates.push('tax_id_type = @taxIdType')
+        updateParams.taxIdType = body.taxIdType ? assertValidTaxIdType(body.taxIdType) : null
+      }
+
+      if (body.paymentCurrency !== undefined) {
+        updates.push('payment_currency = @paymentCurrency')
+        updateParams.paymentCurrency = body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : null
+      }
+
+      if (body.requiresPo !== undefined) {
+        updates.push('requires_po = @requiresPo')
+        updateParams.requiresPo = Boolean(body.requiresPo)
+      }
+
+      if (body.requiresHes !== undefined) {
+        updates.push('requires_hes = @requiresHes')
+        updateParams.requiresHes = Boolean(body.requiresHes)
+      }
+
+      if (body.financeContacts !== undefined) {
+        updates.push('finance_contacts = PARSE_JSON(@financeContacts)')
+        updateParams.financeContacts = JSON.stringify(Array.isArray(body.financeContacts) ? body.financeContacts : [])
+      }
+
+      if (updates.length === 0) {
+        return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+      }
+
+      updates.push('updated_at = CURRENT_TIMESTAMP()')
+
+      await runFinanceQuery(`
+        UPDATE \`${projectId}.greenhouse.fin_client_profiles\`
+        SET ${updates.join(', ')}
+        WHERE client_profile_id = @clientProfileId
+      `, updateParams)
     }
-
-    if (body.paymentTermsDays !== undefined) {
-      updates.push('payment_terms_days = @paymentTermsDays')
-      updateParams.paymentTermsDays = toNumber(body.paymentTermsDays) || 30
-    }
-
-    if (body.taxIdType !== undefined) {
-      updates.push('tax_id_type = @taxIdType')
-      updateParams.taxIdType = body.taxIdType ? assertValidTaxIdType(body.taxIdType) : null
-    }
-
-    if (body.paymentCurrency !== undefined) {
-      updates.push('payment_currency = @paymentCurrency')
-      updateParams.paymentCurrency = body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : null
-    }
-
-    if (body.requiresPo !== undefined) {
-      updates.push('requires_po = @requiresPo')
-      updateParams.requiresPo = Boolean(body.requiresPo)
-    }
-
-    if (body.requiresHes !== undefined) {
-      updates.push('requires_hes = @requiresHes')
-      updateParams.requiresHes = Boolean(body.requiresHes)
-    }
-
-    if (body.financeContacts !== undefined) {
-      updates.push('finance_contacts = PARSE_JSON(@financeContacts)')
-      updateParams.financeContacts = JSON.stringify(Array.isArray(body.financeContacts) ? body.financeContacts : [])
-    }
-
-    if (updates.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
-    }
-
-    updates.push('updated_at = CURRENT_TIMESTAMP()')
-
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.fin_client_profiles\`
-      SET ${updates.join(', ')}
-      WHERE client_profile_id = @clientProfileId
-    `, updateParams)
 
     return NextResponse.json({ clientProfileId, updated: true })
   } catch (error) {

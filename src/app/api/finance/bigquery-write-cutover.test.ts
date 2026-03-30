@@ -10,6 +10,9 @@ const mockUpdateFinanceIncomeInPostgres = vi.fn()
 const mockUpdateFinanceExpenseInPostgres = vi.fn()
 const mockCreateFinanceIncomePaymentInPostgres = vi.fn()
 const mockCreateReconciliationPeriodInPostgres = vi.fn()
+const mockGetFinanceClientProfileFromPostgres = vi.fn()
+const mockUpsertFinanceClientProfileInPostgres = vi.fn()
+const mockSyncFinanceClientProfilesFromPostgres = vi.fn()
 const mockShouldFallbackFromFinancePostgres = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
@@ -29,6 +32,9 @@ vi.mock('@/lib/finance/postgres-store-slice2', () => ({
   updateFinanceIncomeInPostgres: (...args: unknown[]) => mockUpdateFinanceIncomeInPostgres(...args),
   updateFinanceExpenseInPostgres: (...args: unknown[]) => mockUpdateFinanceExpenseInPostgres(...args),
   createFinanceIncomePaymentInPostgres: (...args: unknown[]) => mockCreateFinanceIncomePaymentInPostgres(...args),
+  getFinanceClientProfileFromPostgres: (...args: unknown[]) => mockGetFinanceClientProfileFromPostgres(...args),
+  upsertFinanceClientProfileInPostgres: (...args: unknown[]) => mockUpsertFinanceClientProfileInPostgres(...args),
+  syncFinanceClientProfilesFromPostgres: (...args: unknown[]) => mockSyncFinanceClientProfilesFromPostgres(...args),
   getFinanceIncomeFromPostgres: vi.fn(),
   getFinanceExpenseFromPostgres: vi.fn(),
   listFinanceExpensesFromPostgres: vi.fn().mockResolvedValue({ items: [] })
@@ -63,6 +69,7 @@ import { POST as postIncomePayment } from '@/app/api/finance/income/[id]/payment
 import { POST as postReconciliation } from '@/app/api/finance/reconciliation/route'
 import { POST as postClient } from '@/app/api/finance/clients/route'
 import { PUT as putClient } from '@/app/api/finance/clients/[id]/route'
+import { POST as postClientSync } from '@/app/api/finance/clients/sync/route'
 
 describe('Finance BigQuery write cutover guards', () => {
   beforeEach(() => {
@@ -286,11 +293,13 @@ describe('Finance BigQuery write cutover guards', () => {
   })
 
   it('fails closed for client creation when legacy write fallback is disabled', async () => {
+    mockUpsertFinanceClientProfileInPostgres.mockRejectedValue(new Error('pg down'))
+
     const response = await postClient(
       new Request('http://localhost/api/finance/clients', {
         method: 'POST',
         body: JSON.stringify({
-          clientName: 'Cliente Test'
+          legalName: 'Cliente Test'
         })
       })
     )
@@ -300,6 +309,8 @@ describe('Finance BigQuery write cutover guards', () => {
   })
 
   it('fails closed for client updates when legacy write fallback is disabled', async () => {
+    mockGetFinanceClientProfileFromPostgres.mockRejectedValue(new Error('pg down'))
+
     const response = await putClient(
       new Request('http://localhost/api/finance/clients/client-1', {
         method: 'PUT',
@@ -309,6 +320,15 @@ describe('Finance BigQuery write cutover guards', () => {
       }),
       { params: Promise.resolve({ id: 'client-1' }) }
     )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for finance client sync when BigQuery fallback writes are disabled', async () => {
+    mockSyncFinanceClientProfilesFromPostgres.mockRejectedValue(new Error('pg down'))
+
+    const response = await postClientSync()
 
     expect(response.status).toBe(503)
     await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })

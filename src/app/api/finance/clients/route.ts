@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { getHubspotCompaniesExpressions, getHubspotTableColumns } from '@/lib/finance/hubspot'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { upsertFinanceClientProfileInPostgres } from '@/lib/finance/postgres-store-slice2'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -360,18 +362,6 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!isFinanceBigQueryWriteEnabled()) {
-    return NextResponse.json(
-      {
-        error: 'Finance BigQuery fallback write is disabled for client profiles.',
-        code: 'FINANCE_BQ_WRITE_DISABLED'
-      },
-      { status: 503 }
-    )
-  }
-
-  await ensureFinanceInfrastructure()
-
   try {
     const body = await request.json()
 
@@ -392,82 +382,120 @@ export async function POST(request: Request) {
     const paymentCurrency = body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : 'CLP'
     const taxIdType = body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT'
 
-    const projectId = getFinanceProjectId()
+    try {
+      await upsertFinanceClientProfileInPostgres({
+        clientProfileId,
+        clientId: resolvedClient.clientId,
+        hubspotCompanyId: hubspotCompanyId || clientProfileId,
+        taxId: body.taxId ? normalizeString(body.taxId) : null,
+        taxIdType,
+        legalName,
+        billingAddress: body.billingAddress ? normalizeString(body.billingAddress) : null,
+        billingCountry: normalizeString(body.billingCountry) || 'CL',
+        paymentTermsDays: toNumber(body.paymentTermsDays) || 30,
+        paymentCurrency,
+        requiresPo: Boolean(body.requiresPo),
+        requiresHes: Boolean(body.requiresHes),
+        currentPoNumber: body.currentPoNumber ? normalizeString(body.currentPoNumber) : null,
+        currentHesNumber: body.currentHesNumber ? normalizeString(body.currentHesNumber) : null,
+        financeContacts: Array.isArray(body.financeContacts) ? body.financeContacts : [],
+        specialConditions: body.specialConditions ? normalizeString(body.specialConditions) : null,
+        createdByUserId: tenant.userId || null
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
 
-    await runFinanceQuery(`
-      MERGE \`${projectId}.greenhouse.fin_client_profiles\` AS target
-      USING (
-        SELECT
-          @clientProfileId AS client_profile_id,
-          @clientId AS client_id,
-          @hubspotCompanyId AS hubspot_company_id,
-          @taxId AS tax_id,
-          @taxIdType AS tax_id_type,
-          @legalName AS legal_name,
-          @billingAddress AS billing_address,
-          @billingCountry AS billing_country,
-          @paymentTermsDays AS payment_terms_days,
-          @paymentCurrency AS payment_currency,
-          @requiresPo AS requires_po,
-          @requiresHes AS requires_hes,
-          @currentPoNumber AS current_po_number,
-          @currentHesNumber AS current_hes_number,
-          @specialConditions AS special_conditions,
-          @createdBy AS created_by,
-          CURRENT_TIMESTAMP() AS created_at,
-          CURRENT_TIMESTAMP() AS updated_at
-      ) AS source
-      ON target.client_profile_id = source.client_profile_id
-      WHEN MATCHED THEN
-        UPDATE SET
-          client_id = COALESCE(source.client_id, target.client_id),
-          hubspot_company_id = COALESCE(source.hubspot_company_id, target.hubspot_company_id),
-          legal_name = source.legal_name,
-          tax_id = source.tax_id,
-          tax_id_type = source.tax_id_type,
-          billing_address = source.billing_address,
-          billing_country = source.billing_country,
-          payment_terms_days = source.payment_terms_days,
-          payment_currency = source.payment_currency,
-          requires_po = source.requires_po,
-          requires_hes = source.requires_hes,
-          current_po_number = source.current_po_number,
-          current_hes_number = source.current_hes_number,
-          special_conditions = source.special_conditions,
-          updated_at = CURRENT_TIMESTAMP()
-      WHEN NOT MATCHED THEN
-        INSERT (
-          client_profile_id, client_id, hubspot_company_id, tax_id, tax_id_type, legal_name,
-          billing_address, billing_country, payment_terms_days, payment_currency,
-          requires_po, requires_hes, current_po_number, current_hes_number,
-          special_conditions, created_by, created_at, updated_at
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled for client profiles.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
         )
-        VALUES (
-          source.client_profile_id, source.client_id, source.hubspot_company_id, source.tax_id,
-          source.tax_id_type, source.legal_name, source.billing_address,
-          source.billing_country, source.payment_terms_days, source.payment_currency,
-          source.requires_po, source.requires_hes, source.current_po_number,
-          source.current_hes_number, source.special_conditions, source.created_by,
-          source.created_at, source.updated_at
-        )
-    `, {
-      clientProfileId,
-      clientId: resolvedClient.clientId,
-      hubspotCompanyId: hubspotCompanyId || clientProfileId,
-      taxId: body.taxId ? normalizeString(body.taxId) : null,
-      taxIdType,
-      legalName,
-      billingAddress: body.billingAddress ? normalizeString(body.billingAddress) : null,
-      billingCountry: normalizeString(body.billingCountry) || 'CL',
-      paymentTermsDays: toNumber(body.paymentTermsDays) || 30,
-      paymentCurrency,
-      requiresPo: Boolean(body.requiresPo),
-      requiresHes: Boolean(body.requiresHes),
-      currentPoNumber: body.currentPoNumber ? normalizeString(body.currentPoNumber) : null,
-      currentHesNumber: body.currentHesNumber ? normalizeString(body.currentHesNumber) : null,
-      specialConditions: body.specialConditions ? normalizeString(body.specialConditions) : null,
-      createdBy: tenant.userId || null
-    })
+      }
+
+      await ensureFinanceInfrastructure()
+
+      const projectId = getFinanceProjectId()
+
+      await runFinanceQuery(`
+        MERGE \`${projectId}.greenhouse.fin_client_profiles\` AS target
+        USING (
+          SELECT
+            @clientProfileId AS client_profile_id,
+            @clientId AS client_id,
+            @hubspotCompanyId AS hubspot_company_id,
+            @taxId AS tax_id,
+            @taxIdType AS tax_id_type,
+            @legalName AS legal_name,
+            @billingAddress AS billing_address,
+            @billingCountry AS billing_country,
+            @paymentTermsDays AS payment_terms_days,
+            @paymentCurrency AS payment_currency,
+            @requiresPo AS requires_po,
+            @requiresHes AS requires_hes,
+            @currentPoNumber AS current_po_number,
+            @currentHesNumber AS current_hes_number,
+            @specialConditions AS special_conditions,
+            @createdBy AS created_by,
+            CURRENT_TIMESTAMP() AS created_at,
+            CURRENT_TIMESTAMP() AS updated_at
+        ) AS source
+        ON target.client_profile_id = source.client_profile_id
+        WHEN MATCHED THEN
+          UPDATE SET
+            client_id = COALESCE(source.client_id, target.client_id),
+            hubspot_company_id = COALESCE(source.hubspot_company_id, target.hubspot_company_id),
+            legal_name = source.legal_name,
+            tax_id = source.tax_id,
+            tax_id_type = source.tax_id_type,
+            billing_address = source.billing_address,
+            billing_country = source.billing_country,
+            payment_terms_days = source.payment_terms_days,
+            payment_currency = source.payment_currency,
+            requires_po = source.requires_po,
+            requires_hes = source.requires_hes,
+            current_po_number = source.current_po_number,
+            current_hes_number = source.current_hes_number,
+            special_conditions = source.special_conditions,
+            updated_at = CURRENT_TIMESTAMP()
+        WHEN NOT MATCHED THEN
+          INSERT (
+            client_profile_id, client_id, hubspot_company_id, tax_id, tax_id_type, legal_name,
+            billing_address, billing_country, payment_terms_days, payment_currency,
+            requires_po, requires_hes, current_po_number, current_hes_number,
+            special_conditions, created_by, created_at, updated_at
+          )
+          VALUES (
+            source.client_profile_id, source.client_id, source.hubspot_company_id, source.tax_id,
+            source.tax_id_type, source.legal_name, source.billing_address,
+            source.billing_country, source.payment_terms_days, source.payment_currency,
+            source.requires_po, source.requires_hes, source.current_po_number,
+            source.current_hes_number, source.special_conditions, source.created_by,
+            source.created_at, source.updated_at
+          )
+      `, {
+        clientProfileId,
+        clientId: resolvedClient.clientId,
+        hubspotCompanyId: hubspotCompanyId || clientProfileId,
+        taxId: body.taxId ? normalizeString(body.taxId) : null,
+        taxIdType,
+        legalName,
+        billingAddress: body.billingAddress ? normalizeString(body.billingAddress) : null,
+        billingCountry: normalizeString(body.billingCountry) || 'CL',
+        paymentTermsDays: toNumber(body.paymentTermsDays) || 30,
+        paymentCurrency,
+        requiresPo: Boolean(body.requiresPo),
+        requiresHes: Boolean(body.requiresHes),
+        currentPoNumber: body.currentPoNumber ? normalizeString(body.currentPoNumber) : null,
+        currentHesNumber: body.currentHesNumber ? normalizeString(body.currentHesNumber) : null,
+        specialConditions: body.specialConditions ? normalizeString(body.specialConditions) : null,
+        createdBy: tenant.userId || null
+      })
+    }
 
     return NextResponse.json({ clientProfileId, created: true }, { status: 201 })
   } catch (error) {
